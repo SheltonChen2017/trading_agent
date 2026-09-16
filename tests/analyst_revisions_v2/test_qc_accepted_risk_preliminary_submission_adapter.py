@@ -474,20 +474,10 @@ def _stock_portfolio_aggregate_statistics(
             "conditioned_on_stale_mark_path" if proxy else "no_price_proxy"
         )
     )
-    signal_returns = {0: "0.10", 5: "0.09", 10: "0.08", 20: "0.06"}
-    matched_returns = {0: "0.05", 5: "0.04", 10: "0.03", 20: "0.01"}
-    signal_annual = {
-        0: "0.02",
-        5: "0.01496",
-        10: "0.00992",
-        20: "-0.00016",
-    }
-    matched_annual = {
-        0: "0.009",
-        5: "0.00522",
-        10: "0.00144",
-        20: "-0.00612",
-    }
+    signal_returns = {10: "0.08"}
+    matched_returns = {10: "0.03"}
+    signal_annual = {10: "0.00992"}
+    matched_annual = {10: "0.00144"}
     cells = []
     statistics = {}
     for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS:
@@ -518,7 +508,7 @@ def _stock_portfolio_aggregate_statistics(
             "annualized_arithmetic_return": signal_annual[cost],
             "annualized_volatility": "0.10",
             "zero_rate_sharpe": str(Decimal(signal_annual[cost]) / Decimal("0.10")),
-            "zero_rate_sortino": "-0.30" if cost == 20 else "0.30",
+            "zero_rate_sortino": "0.30",
             "maximum_drawdown": "-0.08",
             "average_daily_two_sided_turnover": "0.04",
             "average_cash_weight": "0.02",
@@ -527,7 +517,7 @@ def _stock_portfolio_aggregate_statistics(
             "matched_zero_rate_sharpe": str(
                 Decimal(matched_annual[cost]) / Decimal("0.09")
             ),
-            "matched_zero_rate_sortino": "-0.16" if cost == 20 else "0.16",
+            "matched_zero_rate_sortino": "0.16",
             "matched_maximum_drawdown": "-0.07",
             "matched_average_daily_two_sided_turnover": "0.03",
             "matched_average_cash_weight": "0",
@@ -553,12 +543,12 @@ def _stock_portfolio_aggregate_statistics(
         "portfolio_return_session_count": 1254,
         "invested_return_session_count": 1000,
         "signal_selected_decision_count": 261,
-        "selected_execution_count": 261 - int(proxy),
-        "rebalance_execution_count": 261 - int(proxy),
+        "selected_execution_count": 261,
+        "rebalance_execution_count": 261,
         "full_target_execution_count": 0,
-        "underfilled_target_execution_count": 261 - int(proxy),
-        "matched_rebalance_execution_count": 261 - int(proxy),
-        "matched_target_met_execution_count": 261 - int(proxy),
+        "underfilled_target_execution_count": 261,
+        "matched_rebalance_execution_count": 261,
+        "matched_target_met_execution_count": 261,
         "matched_underfilled_target_execution_count": 0,
         "sector_refused_decision_count": 1,
         "mean_eligible_score_count": "1",
@@ -568,13 +558,21 @@ def _stock_portfolio_aggregate_statistics(
         "average_holding_count": "1",
         "entry_price_refusal_count": 0,
         "stale_mark_session_count": int(proxy),
-        "deferred_rebalance_count": int(proxy),
+        "deferred_rebalance_count": 0,
+        "partial_rebalance_decision_count": int(proxy),
+        "stale_position_deferral_count": int(proxy),
+        "mean_locked_gross_at_partial_decisions": "0.005" if proxy else "0",
+        "locked_exposure_over_target_count": 0,
         "membership_end_liquidation_count": int(zero_recovery),
         "membership_end_zero_recovery_count": int(zero_recovery),
         "membership_end_entry_refusal_count": 0,
         "matched_entry_price_refusal_count": 0,
         "matched_stale_mark_session_count": 0,
-        "matched_deferred_rebalance_count": int(proxy),
+        "matched_deferred_rebalance_count": 0,
+        "matched_partial_rebalance_decision_count": 0,
+        "matched_stale_position_deferral_count": 0,
+        "matched_mean_locked_gross_at_partial_decisions": "0",
+        "matched_locked_exposure_over_target_count": 0,
         "matched_membership_end_liquidation_count": 0,
         "matched_membership_end_zero_recovery_count": 0,
         "matched_membership_end_entry_refusal_count": 0,
@@ -757,7 +755,7 @@ def test_regime_profile_allowlist_refuses_unknown_profile():
         adapter._look_accounting(evaluation_profile_id="arv2-stock-ic-unregistered")
 
 
-def test_stock_portfolio_profile_has_one_exact_r064_look_budget(stock_portfolio_plan):
+def test_stock_portfolio_profile_has_one_exact_r065_look_budget(stock_portfolio_plan):
     spec = adapter._run_spec(stock_portfolio_evaluator.PROFILE_ID)
     accounting = adapter._look_accounting(
         evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID
@@ -767,15 +765,15 @@ def test_stock_portfolio_profile_has_one_exact_r064_look_budget(stock_portfolio_
         evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
     )
 
-    assert spec.ledger_entry_id == "R-064"
-    assert spec.cell_count == 4
-    assert accounting["run_level_looks_before"] == 63
-    assert accounting["planned_run_level_looks_after_launch"] == 64
-    assert accounting["arv2_development_evaluations_before"] == 10
-    assert accounting["planned_arv2_development_evaluations_after_launch"] == 11
-    assert accounting["lifetime_alpha_cell_floor_before"] == 571
-    assert result_accounting["lifetime_alpha_cell_floor_after"] == 575
-    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 6
+    assert spec.ledger_entry_id == "R-065"
+    assert spec.cell_count == 1
+    assert accounting["run_level_looks_before"] == 64
+    assert accounting["planned_run_level_looks_after_launch"] == 65
+    assert accounting["arv2_development_evaluations_before"] == 11
+    assert accounting["planned_arv2_development_evaluations_after_launch"] == 12
+    assert accounting["lifetime_alpha_cell_floor_before"] == 575
+    assert result_accounting["lifetime_alpha_cell_floor_after"] == 576
+    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 3
 
 
 @pytest.mark.parametrize(
@@ -924,15 +922,15 @@ def test_stock_portfolio_validator_refuses_negative_return_with_null_sortino(
         _validate_statistics(stock_portfolio_plan, statistics)
 
 
-def test_stock_portfolio_validator_accepts_matched_only_stale_deferral(
+def test_stock_portfolio_validator_accepts_matched_only_partial_rebalance(
     stock_portfolio_plan,
 ):
     statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
     metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
-    metadata["matched_rebalance_execution_count"] = 260
-    metadata["matched_target_met_execution_count"] = 260
     metadata["matched_stale_mark_session_count"] = 1
-    metadata["matched_deferred_rebalance_count"] = 1
+    metadata["matched_partial_rebalance_decision_count"] = 1
+    metadata["matched_stale_position_deferral_count"] = 1
+    metadata["matched_mean_locked_gross_at_partial_decisions"] = "0.005"
     statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
         "ascii"
     )
@@ -950,6 +948,32 @@ def test_stock_portfolio_validator_accepts_matched_only_stale_deferral(
     _validate_statistics(stock_portfolio_plan, statistics)
 
 
+def test_stock_portfolio_validator_accepts_disclosed_locked_gross_over_target(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata["matched_target_met_execution_count"] = 260
+    metadata["matched_stale_mark_session_count"] = 1
+    metadata["matched_partial_rebalance_decision_count"] = 1
+    metadata["matched_stale_position_deferral_count"] = 1
+    metadata["matched_mean_locked_gross_at_partial_decisions"] = "0.5"
+    metadata["matched_locked_exposure_over_target_count"] = 1
+    metadata["matched_mean_executed_target_gross_exposure"] = "0.02"
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_10"
+    cell = json.loads(statistics[cell_name])
+    cell["status"] = "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
+    cell["return_metric_conditioning"] = "conditioned_on_stale_mark_path"
+    cell["risk_metrics_are_price_proxy_conditioned"] = True
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    _validate_statistics(stock_portfolio_plan, statistics)
+
+
 @pytest.mark.parametrize(
     ("updates", "message"),
     (
@@ -958,10 +982,6 @@ def test_stock_portfolio_validator_accepts_matched_only_stale_deferral(
                 "selected_execution_count": 261,
                 "rebalance_execution_count": 260,
                 "underfilled_target_execution_count": 260,
-                "deferred_rebalance_count": 1,
-                "matched_rebalance_execution_count": 260,
-                "matched_target_met_execution_count": 260,
-                "matched_deferred_rebalance_count": 1,
             },
             "aggregate metadata semantics changed",
         ),
@@ -1002,21 +1022,63 @@ def test_stock_portfolio_validator_refuses_rehashed_impossible_execution_census(
         _validate_statistics(stock_portfolio_plan, statistics)
 
 
-def test_stock_portfolio_validator_refuses_higher_cost_annual_return(
+@pytest.mark.parametrize(
+    ("updates", "message"),
+    (
+        (
+            {
+                "partial_rebalance_decision_count": 0,
+                "stale_position_deferral_count": 1,
+                "mean_locked_gross_at_partial_decisions": "0.005",
+            },
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {"stale_mark_session_count": 1255},
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {
+                "partial_rebalance_decision_count": 1,
+                "stale_mark_session_count": 1,
+                "stale_position_deferral_count": 2,
+                "mean_locked_gross_at_partial_decisions": "0.005",
+            },
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {
+                "matched_partial_rebalance_decision_count": 1,
+                "matched_stale_position_deferral_count": 0,
+                "matched_mean_locked_gross_at_partial_decisions": "0.005",
+            },
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {
+                "locked_exposure_over_target_count": 1,
+                "partial_rebalance_decision_count": 0,
+            },
+            "aggregate metadata semantics changed",
+        ),
+    ),
+)
+def test_stock_portfolio_validator_isolates_partial_rebalance_invariants(
     stock_portfolio_plan,
+    updates,
+    message,
 ):
     statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
-    cell_name = "ARV2_STOCK_PORTFOLIO_COST_20"
-    cell = json.loads(statistics[cell_name])
-    cell["annualized_arithmetic_return"] = "0.03"
-    cell["zero_rate_sharpe"] = "0.3"
-    cell["zero_rate_sortino"] = "0.3"
-    statistics[cell_name] = _canonical(cell).decode("ascii")
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata.update(updates)
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
     _rehash_stock_portfolio_summary(statistics)
 
     with pytest.raises(
         adapter.AcceptedRiskPreliminarySubmissionError,
-        match="stock-portfolio cost arithmetic changed",
+        match=message,
     ):
         _validate_statistics(stock_portfolio_plan, statistics)
 
@@ -1060,7 +1122,7 @@ def test_stock_contract_constant_mutation_refuses_before_network(
     assert not any(stock_portfolio_plan.control_directory.iterdir())
 
 
-def test_stock_contract_real_action_guard_accepts_clean_six_name_inventory(
+def test_stock_contract_real_action_guard_accepts_clean_three_name_inventory(
     stock_portfolio_plan,
 ):
     cells = dict(
@@ -1077,7 +1139,7 @@ def test_stock_contract_real_action_guard_accepts_clean_six_name_inventory(
         stock_portfolio_plan.expected_custom_statistic_names
     )
     assert "ARV2_RUNTIME_META" in stock_portfolio_plan.expected_custom_statistic_names
-    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 6
+    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 3
 
 
 def test_stock_contract_callable_reentry_refuses_before_side_effect(
@@ -1936,15 +1998,15 @@ def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(
     assert terminal.terminal_status == "Completed."
     assert backend.events.count("backtests/create") == 1
     assert backend.events.count("backtests/read") == 1
-    assert len(result.custom_statistics) == 6
+    assert len(result.custom_statistics) == 3
     assert result.custom_statistics == recovered_result.custom_statistics
     assert result_permit.permit_sha256 == recovered_permit.permit_sha256
     receipt = json.loads(result.persisted_path.read_bytes())
     accounting = receipt["look_accounting"]
-    assert accounting["shared_look_ledger_entry_id"] == "R-064"
-    assert accounting["run_level_looks_after"] == 64
-    assert accounting["arv2_development_evaluations_after"] == 11
-    assert accounting["lifetime_alpha_cell_floor_after"] == 575
+    assert accounting["shared_look_ledger_entry_id"] == "R-065"
+    assert accounting["run_level_looks_after"] == 65
+    assert accounting["arv2_development_evaluations_after"] == 12
+    assert accounting["lifetime_alpha_cell_floor_after"] == 576
 
 
 def test_regime_offline_submission_reads_only_its_eighteen_statistics(regime_plan):

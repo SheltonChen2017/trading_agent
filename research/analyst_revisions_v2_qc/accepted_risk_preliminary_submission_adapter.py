@@ -349,15 +349,15 @@ _EVALUATION_RUN_SPECS = (
     ),
     _EvaluationRunSpec(
         _PINNED_STOCK_PORTFOLIO_PROFILE_ID,
-        "arv2-eval-stock-portfolio-historical-qc-003",
-        "R-064",
-        63,
+        "arv2-eval-stock-portfolio-historical-qc-004",
+        "R-065",
         64,
-        10,
+        65,
         11,
-        4,
-        571,
+        12,
+        1,
         575,
+        576,
     ),
 )
 
@@ -495,7 +495,7 @@ def _canonical(value: object) -> bytes:
 
 
 def _stock_portfolio_contract_bindings_are_current() -> bool:
-    """Refuse in-memory weakening of the R-064 financial/result contract."""
+    """Refuse in-memory weakening of the R-065 financial/result contract."""
 
     namespace = stock_portfolio_evaluator.__dict__
     if type(namespace) is not dict:
@@ -2916,12 +2916,20 @@ _STOCK_PORTFOLIO_META_FIELDS = frozenset(
         "entry_price_refusal_count",
         "stale_mark_session_count",
         "deferred_rebalance_count",
+        "partial_rebalance_decision_count",
+        "stale_position_deferral_count",
+        "mean_locked_gross_at_partial_decisions",
+        "locked_exposure_over_target_count",
         "membership_end_liquidation_count",
         "membership_end_zero_recovery_count",
         "membership_end_entry_refusal_count",
         "matched_entry_price_refusal_count",
         "matched_stale_mark_session_count",
         "matched_deferred_rebalance_count",
+        "matched_partial_rebalance_decision_count",
+        "matched_stale_position_deferral_count",
+        "matched_mean_locked_gross_at_partial_decisions",
+        "matched_locked_exposure_over_target_count",
         "matched_membership_end_liquidation_count",
         "matched_membership_end_zero_recovery_count",
         "matched_membership_end_entry_refusal_count",
@@ -3955,12 +3963,18 @@ def _validate_stock_portfolio_aggregate_records(
         "entry_price_refusal_count",
         "stale_mark_session_count",
         "deferred_rebalance_count",
+        "partial_rebalance_decision_count",
+        "stale_position_deferral_count",
+        "locked_exposure_over_target_count",
         "membership_end_liquidation_count",
         "membership_end_zero_recovery_count",
         "membership_end_entry_refusal_count",
         "matched_entry_price_refusal_count",
         "matched_stale_mark_session_count",
         "matched_deferred_rebalance_count",
+        "matched_partial_rebalance_decision_count",
+        "matched_stale_position_deferral_count",
+        "matched_locked_exposure_over_target_count",
         "matched_membership_end_liquidation_count",
         "matched_membership_end_zero_recovery_count",
         "matched_membership_end_entry_refusal_count",
@@ -4002,25 +4016,52 @@ def _validate_stock_portfolio_aggregate_records(
         > meta["selected_execution_count"]
         or meta["full_target_execution_count"]
         + meta["underfilled_target_execution_count"]
+        + meta["locked_exposure_over_target_count"]
         != meta["rebalance_execution_count"]
-        or meta["rebalance_execution_count"]
-        + meta["deferred_rebalance_count"]
-        != meta["decision_session_count"]
+        or meta["rebalance_execution_count"] != meta["decision_session_count"]
+        or meta["deferred_rebalance_count"] != 0
         or meta["matched_target_met_execution_count"]
         + meta["matched_underfilled_target_execution_count"]
+        + meta["matched_locked_exposure_over_target_count"]
         != meta["matched_rebalance_execution_count"]
         or meta["matched_rebalance_execution_count"]
-        + meta["matched_deferred_rebalance_count"]
         != meta["decision_session_count"]
-        or meta["matched_rebalance_execution_count"]
+        or meta["matched_deferred_rebalance_count"] != 0
+        or meta["partial_rebalance_decision_count"]
         > meta["rebalance_execution_count"]
-        or meta["matched_deferred_rebalance_count"]
-        < meta["deferred_rebalance_count"]
+        or meta["matched_partial_rebalance_decision_count"]
+        > meta["matched_rebalance_execution_count"]
+        or meta["partial_rebalance_decision_count"]
+        > meta["stale_mark_session_count"]
+        or meta["matched_partial_rebalance_decision_count"]
+        > meta["matched_stale_mark_session_count"]
+        or meta["stale_mark_session_count"]
+        > meta["portfolio_return_session_count"]
+        or meta["matched_stale_mark_session_count"]
+        > meta["portfolio_return_session_count"]
+        or meta["stale_position_deferral_count"]
+        < meta["partial_rebalance_decision_count"]
+        or meta["matched_stale_position_deferral_count"]
+        < meta["matched_partial_rebalance_decision_count"]
+        or (meta["partial_rebalance_decision_count"] == 0)
+        is not (meta["stale_position_deferral_count"] == 0)
+        or (meta["matched_partial_rebalance_decision_count"] == 0)
+        is not (meta["matched_stale_position_deferral_count"] == 0)
+        or meta["stale_position_deferral_count"]
+        > (
+            meta["partial_rebalance_decision_count"]
+            * plan.package.runtime_symbol_binding_count
+        )
+        or meta["matched_stale_position_deferral_count"]
+        > (
+            meta["matched_partial_rebalance_decision_count"]
+            * plan.package.runtime_symbol_binding_count
+        )
+        or meta["locked_exposure_over_target_count"]
+        > meta["partial_rebalance_decision_count"]
+        or meta["matched_locked_exposure_over_target_count"]
+        > meta["matched_partial_rebalance_decision_count"]
         or meta["sector_refused_decision_count"]
-        > meta["decision_session_count"]
-        or meta["deferred_rebalance_count"]
-        > meta["decision_session_count"]
-        or meta["matched_deferred_rebalance_count"]
         > meta["decision_session_count"]
         or meta["membership_end_zero_recovery_count"]
         > meta["membership_end_liquidation_count"]
@@ -4059,8 +4100,10 @@ def _validate_stock_portfolio_aggregate_records(
     metric_bounds = (
         ("mean_eligible_score_count", Decimal(0), Decimal(plan.package.runtime_symbol_binding_count)),
         ("mean_selected_name_count", Decimal(0), Decimal(_PINNED_STOCK_PORTFOLIO_MAXIMUM_HOLDINGS)),
-        ("mean_executed_target_gross_exposure", Decimal(0), Decimal("0.98")),
-        ("matched_mean_executed_target_gross_exposure", Decimal(0), Decimal("0.98")),
+        ("mean_executed_target_gross_exposure", Decimal(0), Decimal(1)),
+        ("matched_mean_executed_target_gross_exposure", Decimal(0), Decimal(1)),
+        ("mean_locked_gross_at_partial_decisions", Decimal(0), Decimal(1)),
+        ("matched_mean_locked_gross_at_partial_decisions", Decimal(0), Decimal(1)),
         ("average_holding_count", Decimal(0), Decimal(_PINNED_STOCK_PORTFOLIO_MAXIMUM_HOLDINGS)),
     )
     parsed_meta_metrics = {}
@@ -4074,6 +4117,12 @@ def _validate_stock_portfolio_aggregate_records(
     ]
     matched_mean_gross = parsed_meta_metrics[
         "matched_mean_executed_target_gross_exposure"
+    ]
+    signal_mean_locked = parsed_meta_metrics[
+        "mean_locked_gross_at_partial_decisions"
+    ]
+    matched_mean_locked = parsed_meta_metrics[
+        "matched_mean_locked_gross_at_partial_decisions"
     ]
     rebalance_count = meta["rebalance_execution_count"]
     if rebalance_count == 0:
@@ -4092,16 +4141,32 @@ def _validate_stock_portfolio_aggregate_records(
             )
             or (
                 meta["underfilled_target_execution_count"] == 0
+                and meta["locked_exposure_over_target_count"] == 0
                 and signal_mean_gross != Decimal("0.98")
             )
             or (
                 meta["underfilled_target_execution_count"] > 0
-                and signal_mean_gross == Decimal("0.98")
+                and meta["locked_exposure_over_target_count"] == 0
+                and signal_mean_gross >= Decimal("0.98")
             )
             or (
                 meta["matched_rebalance_execution_count"] == 0
                 and matched_mean_gross != 0
             )
+            or (
+                meta["matched_underfilled_target_execution_count"] == 0
+                and meta["matched_locked_exposure_over_target_count"] == 0
+                and matched_mean_gross != signal_mean_gross
+            )
+            or (
+                meta["matched_underfilled_target_execution_count"] > 0
+                and meta["matched_locked_exposure_over_target_count"] == 0
+                and matched_mean_gross >= signal_mean_gross
+            )
+            or (meta["partial_rebalance_decision_count"] == 0)
+            is not (signal_mean_locked == 0)
+            or (meta["matched_partial_rebalance_decision_count"] == 0)
+            is not (matched_mean_locked == 0)
         )
     with localcontext(preliminary_evaluator._context()):
         signal_target_gross_sum = +(
@@ -4111,28 +4176,19 @@ def _validate_stock_portfolio_aggregate_records(
             matched_mean_gross
             * Decimal(meta["matched_rebalance_execution_count"])
         )
+        matched_locked_gross_sum = +(
+            matched_mean_locked
+            * Decimal(meta["matched_partial_rebalance_decision_count"])
+        )
     invalid_target_means = (
         invalid_target_means
-        or matched_target_gross_sum > signal_target_gross_sum
+        or matched_target_gross_sum
+        > signal_target_gross_sum + matched_locked_gross_sum
     )
     if invalid_target_means:
         _error("preliminary stock-portfolio target exposure changed")
 
     cells = []
-    spy_values = set()
-    signal_by_cost = {}
-    matched_by_cost = {}
-    signal_annual_by_cost = {}
-    matched_annual_by_cost = {}
-    path_invariants = {
-        name: set()
-        for name in (
-            "average_daily_two_sided_turnover",
-            "average_cash_weight",
-            "matched_average_daily_two_sided_turnover",
-            "matched_average_cash_weight",
-        )
-    }
     if (
         meta["portfolio_return_session_count"] < 252
         or meta["invested_return_session_count"]
@@ -4331,74 +4387,7 @@ def _validate_stock_portfolio_aggregate_records(
             or not 0 <= parsed["matched_average_cash_weight"] <= 1
         ):
             _error("preliminary stock-portfolio metric escaped bounds")
-        spy_values.add(cell["spy_cumulative_return"])
-        for name in path_invariants:
-            path_invariants[name].add(cell[name])
-        signal_by_cost[cost] = parsed["cumulative_return"]
-        matched_by_cost[cost] = parsed["matched_eligible_stock_cumulative_return"]
-        signal_annual_by_cost[cost] = parsed["annualized_arithmetic_return"]
-        matched_annual_by_cost[cost] = parsed[
-            "matched_annualized_arithmetic_return"
-        ]
         cells.append(cell)
-    if len(spy_values) != 1 or any(
-        len(values) != 1 for values in path_invariants.values()
-    ):
-        _error("preliminary stock-portfolio cost ordering changed")
-    signal_turnover = _cell_metric(
-        next(iter(path_invariants["average_daily_two_sided_turnover"])),
-        "stock portfolio average_daily_two_sided_turnover",
-    )
-    matched_turnover = _cell_metric(
-        next(
-            iter(
-                path_invariants[
-                    "matched_average_daily_two_sided_turnover"
-                ]
-            )
-        ),
-        "stock portfolio matched_average_daily_two_sided_turnover",
-    )
-    with localcontext(preliminary_evaluator._context()):
-        for cost in _PINNED_STOCK_PORTFOLIO_COSTS:
-            expected_signal_annual = +(
-                signal_annual_by_cost[0]
-                - Decimal(cost)
-                / Decimal(10000)
-                * signal_turnover
-                * Decimal(252)
-            )
-            expected_matched_annual = +(
-                matched_annual_by_cost[0]
-                - Decimal(cost)
-                / Decimal(10000)
-                * matched_turnover
-                * Decimal(252)
-            )
-            if (
-                abs(
-                    signal_annual_by_cost[cost]
-                    - expected_signal_annual
-                )
-                > Decimal("1e-40")
-                or abs(
-                    matched_annual_by_cost[cost]
-                    - expected_matched_annual
-                )
-                > Decimal("1e-40")
-            ):
-                _error("preliminary stock-portfolio cost arithmetic changed")
-    if (
-        any(
-            signal_by_cost[left] < signal_by_cost[right]
-            or matched_by_cost[left] < matched_by_cost[right]
-            for left, right in zip(
-                _PINNED_STOCK_PORTFOLIO_COSTS,
-                _PINNED_STOCK_PORTFOLIO_COSTS[1:],
-            )
-        )
-    ):
-        _error("preliminary stock-portfolio cost ordering changed")
 
     summary_id = meta.get("summary_id")
     summary_sha = meta.get("summary_sha256")

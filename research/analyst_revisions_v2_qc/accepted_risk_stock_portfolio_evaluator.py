@@ -23,11 +23,11 @@ class AcceptedRiskStockPortfolioError(_base.PreliminaryRatingEvaluationError):
     """The stock portfolio profile or arithmetic result is inexact."""
 
 
-PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v1"
-PROFILE_ID = "arv2-stock-long-only-2021-2025-r064-v1"
-CONTRACT_ID = "arv2-accepted-risk-stock-portfolio-v1"
-SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v3"
-PORTFOLIO_CELL_SCHEMA = "arv2-accepted-risk-stock-portfolio-cell-v1"
+PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v2"
+PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v1"
+CONTRACT_ID = "arv2-accepted-risk-stock-portfolio-v2"
+SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v4"
+PORTFOLIO_CELL_SCHEMA = "arv2-accepted-risk-stock-portfolio-cell-v2"
 DECISION_START_SESSION = "2021-01-04"
 DECISION_END_SESSION = "2025-12-29"
 MEASUREMENT_END_SESSION = "2025-12-31"
@@ -38,8 +38,8 @@ PRIMARY_SCORE_ARM = "firm_specific"
 MAXIMUM_HOLDINGS = 50
 TARGET_GROSS_EXPOSURE = Decimal("0.98")
 STOCK_WEIGHT_CAP = TARGET_GROSS_EXPOSURE / Decimal(MAXIMUM_HOLDINGS)
-COST_BPS_SCENARIOS = (0, 5, 10, 20)
 PRIMARY_COST_BPS = 10
+COST_BPS_SCENARIOS = (PRIMARY_COST_BPS,)
 MINIMUM_INVESTED_RETURN_SESSIONS = 50
 ANNUALIZATION_SESSIONS = Decimal("252")
 
@@ -96,10 +96,17 @@ def _profile_record():
         "matched_benchmark": (
             "weekly_equal_weight_all_resolvable_score_bearing_members_at_"
             "decision_time_targeting_the_signal_sleeves_actual_executed_"
-            "gross_exposure_with_failed_entries_left_cash"
+            "gross_exposure_with_failed_entries_left_cash_and_only_stale_"
+            "positions_locked"
         ),
         "within_membership_missing_price": (
-            "carry_last_observed_mark_and_defer_rebalance_until_tradable"
+            "carry_last_observed_mark_and_weight_defer_only_the_locked_"
+            "position_and_rebalance_tradable_holdings_within_remaining_gross"
+        ),
+        "account_wide_stale_rebalance_deferral": False,
+        "stale_position_turnover": "excluded_until_current_price_is_available",
+        "locked_position_gross_over_target": (
+            "preserve_the_locked_weight_and_assign_zero_remaining_budget"
         ),
         "membership_end_missing_price": (
             "assume_zero_terminal_value_as_a_conservative_lower_bound"
@@ -172,6 +179,10 @@ class _Account:
     entry_price_refusal_count: int = 0
     stale_mark_session_count: int = 0
     deferred_rebalance_count: int = 0
+    partial_rebalance_decision_count: int = 0
+    stale_position_deferral_count: int = 0
+    locked_gross_sum_at_partial_decisions: Decimal = Decimal(0)
+    locked_exposure_over_target_count: int = 0
     membership_end_liquidation_count: int = 0
     membership_end_zero_recovery_count: int = 0
     membership_end_entry_refusal_count: int = 0
@@ -352,9 +363,54 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             )
         return position >= interval[1]
 
-    def _targets(self, account, desired, position, *, target_gross=None):
+    def _targets(
+        self,
+        account,
+        desired,
+        position,
+        *,
+        target_gross=None,
+        locked_weights=None,
+    ):
+        if type(locked_weights) not in (type(None), dict):
+            raise AcceptedRiskStockPortfolioError(
+                "locked stock-portfolio weights changed"
+            )
+        locked = {} if locked_weights is None else dict(locked_weights)
+        if any(
+                type(security_id) is not str
+                or type(weight) is not Decimal
+                or not weight.is_finite()
+                or weight <= 0
+                for security_id, weight in locked.items()
+        ):
+            raise AcceptedRiskStockPortfolioError(
+                "locked stock-portfolio weights changed"
+            )
+        requested_target_gross = (
+            TARGET_GROSS_EXPOSURE
+            if account.role == "signal" or target_gross is None
+            else target_gross
+        )
+        if (
+            type(requested_target_gross) is not Decimal
+            or not requested_target_gross.is_finite()
+            or not Decimal(0)
+            <= requested_target_gross
+            <= Decimal(1)
+        ):
+            raise AcceptedRiskStockPortfolioError(
+                "stock-portfolio target gross exposure escaped unlevered bounds"
+            )
+        with localcontext(_base._context()):
+            locked_gross = +_base._stable_sum(locked.values())
+            remaining_gross = +max(
+                Decimal(0), requested_target_gross - locked_gross
+            )
         tradable = []
         for security_id in desired:
+            if security_id in locked:
+                continue
             if self._membership_ended(security_id, position):
                 account.membership_end_entry_refusal_count += 1
                 continue
@@ -362,31 +418,44 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
                 account.entry_price_refusal_count += 1
                 continue
             tradable.append(security_id)
+        targets = dict(locked)
         if account.role == "signal":
-            return {security_id: STOCK_WEIGHT_CAP for security_id in tradable}
-        if not desired:
-            return {}
-        if target_gross is None:
-            target_gross = TARGET_GROSS_EXPOSURE
-        if (
-            type(target_gross) is not Decimal
-            or not target_gross.is_finite()
-            or not Decimal(0) <= target_gross <= TARGET_GROSS_EXPOSURE
-        ):
+            if len(locked) > MAXIMUM_HOLDINGS:
+                raise AcceptedRiskStockPortfolioError(
+                    "locked signal holdings exceed the frozen holdings cap"
+                )
+            tradable = tradable[: MAXIMUM_HOLDINGS - len(locked)]
+            with localcontext(_base._context()):
+                for security_id in tradable:
+                    weight = +min(STOCK_WEIGHT_CAP, remaining_gross)
+                    if weight == 0:
+                        break
+                    targets[security_id] = weight
+                    remaining_gross = +(remaining_gross - weight)
+            return targets
+        if account.role != "matched":
             raise AcceptedRiskStockPortfolioError(
-                "matched target gross exposure escaped the signal sleeve"
+                "stock-portfolio account role changed"
             )
-        if target_gross == 0:
-            return {}
+        unlocked_desired_count = sum(
+            security_id not in locked for security_id in desired
+        )
+        if unlocked_desired_count == 0 or remaining_gross == 0:
+            return targets
         with localcontext(_base._context()):
-            weight = +(target_gross / Decimal(len(desired)))
-            targets = {security_id: weight for security_id in tradable}
-            if len(tradable) == len(desired):
+            weight = +(
+                remaining_gross / Decimal(unlocked_desired_count)
+            )
+            targets.update(
+                {security_id: weight for security_id in tradable if weight}
+            )
+            if len(tradable) == unlocked_desired_count and tradable:
                 residual = +(
-                    target_gross - _base._stable_sum(targets.values())
+                    requested_target_gross
+                    - _base._stable_sum(targets.values())
                 )
                 if residual:
-                    first = min(targets)
+                    first = min(tradable)
                     targets[first] = +(targets[first] + residual)
         return targets
 
@@ -397,7 +466,6 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
         desired,
         *,
         target_gross=None,
-        force_defer=False,
     ):
         starting_invested = _base._stable_sum(account.weights.values())
         ratios = {}
@@ -456,48 +524,69 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             pretrade[security_id] for security_id in sorted(ended)
         )
         if desired is not None:
-            if stale or force_defer:
-                account.deferred_rebalance_count += 1
+            requested_target_gross = (
+                TARGET_GROSS_EXPOSURE
+                if account.role == "signal" or target_gross is None
+                else target_gross
+            )
+            locked = {
+                security_id: drifted[security_id]
+                for security_id in sorted(stale)
+            }
+            target = self._targets(
+                account,
+                desired,
+                position,
+                target_gross=target_gross,
+                locked_weights=locked,
+            )
+            with localcontext(_base._context()):
+                locked_gross = +_base._stable_sum(locked.values())
+                turnover = _base._stable_sum(
+                    abs(
+                        target.get(security_id, Decimal(0))
+                        - pretrade.get(security_id, Decimal(0))
+                    )
+                    for security_id in sorted(set(target) | set(pretrade))
+                    if security_id not in stale
+                )
+                executed_target_gross = +(
+                    _base._stable_sum(target.values())
+                )
+                account.executed_target_gross_sum = +(
+                    account.executed_target_gross_sum
+                    + executed_target_gross
+                )
+                if stale:
+                    account.locked_gross_sum_at_partial_decisions = +(
+                        account.locked_gross_sum_at_partial_decisions
+                        + locked_gross
+                    )
+            if stale:
+                account.partial_rebalance_decision_count += 1
+                account.stale_position_deferral_count += len(stale)
+            account.rebalance_execution_count += 1
+            if executed_target_gross == requested_target_gross:
+                account.full_target_execution_count += 1
+            elif executed_target_gross < requested_target_gross:
+                account.underfilled_target_execution_count += 1
             else:
-                requested_target_gross = (
-                    TARGET_GROSS_EXPOSURE
-                    if account.role == "signal" or target_gross is None
-                    else target_gross
-                )
-                target = self._targets(
-                    account,
-                    desired,
-                    position,
-                    target_gross=target_gross,
-                )
-                with localcontext(_base._context()):
-                    turnover = _base._stable_sum(
-                        abs(
-                            target.get(security_id, Decimal(0))
-                            - pretrade.get(security_id, Decimal(0))
-                        )
-                        for security_id in sorted(set(target) | set(pretrade))
-                    )
-                    executed_target_gross = +(
-                        _base._stable_sum(target.values())
-                    )
-                    account.executed_target_gross_sum = +(
-                        account.executed_target_gross_sum
-                        + executed_target_gross
-                    )
-                account.rebalance_execution_count += 1
-                if executed_target_gross == requested_target_gross:
-                    account.full_target_execution_count += 1
-                else:
-                    account.underfilled_target_execution_count += 1
-                account.weights = target
-                account.marks = {
+                account.locked_exposure_over_target_count += 1
+            account.weights = target
+            account.marks = {
+                **{
+                    security_id: account.marks[security_id]
+                    for security_id in locked
+                },
+                **{
                     security_id: self._price(security_id, position)
                     for security_id in target
-                }
-                if target:
-                    account.selected_execution_count += 1
-        if desired is None or stale or force_defer:
+                    if security_id not in locked
+                },
+            }
+            if target:
+                account.selected_execution_count += 1
+        if desired is None:
             account.weights = drifted
         with localcontext(_base._context()):
             account.turnover_sum = +(account.turnover_sum + turnover)
@@ -535,7 +624,7 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             account.invested_return_session_count += 1
         return (
             executed_target_gross
-            if desired is not None and not stale and not force_defer
+            if desired is not None
             else None
         )
 
@@ -577,9 +666,6 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
                 position,
                 None if decision is None else decision[1],
                 target_gross=signal_target_gross,
-                force_defer=(
-                    decision is not None and signal_target_gross is None
-                ),
             )
         return_count = end - start
         if return_count != EXPECTED_RETURN_SESSION_COUNT:
@@ -762,6 +848,22 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
                     / Decimal(matched.rebalance_execution_count)
                 )
             )
+            mean_locked_gross = (
+                Decimal(0)
+                if signal.partial_rebalance_decision_count == 0
+                else +(
+                    signal.locked_gross_sum_at_partial_decisions
+                    / Decimal(signal.partial_rebalance_decision_count)
+                )
+            )
+            matched_mean_locked_gross = (
+                Decimal(0)
+                if matched.partial_rebalance_decision_count == 0
+                else +(
+                    matched.locked_gross_sum_at_partial_decisions
+                    / Decimal(matched.partial_rebalance_decision_count)
+                )
+            )
         record = {
             "schema": SUMMARY_SCHEMA,
             "contract_id": CONTRACT_ID,
@@ -811,6 +913,18 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             "entry_price_refusal_count": signal.entry_price_refusal_count,
             "stale_mark_session_count": signal.stale_mark_session_count,
             "deferred_rebalance_count": signal.deferred_rebalance_count,
+            "partial_rebalance_decision_count": (
+                signal.partial_rebalance_decision_count
+            ),
+            "stale_position_deferral_count": (
+                signal.stale_position_deferral_count
+            ),
+            "mean_locked_gross_at_partial_decisions": _decimal_text(
+                mean_locked_gross
+            ),
+            "locked_exposure_over_target_count": (
+                signal.locked_exposure_over_target_count
+            ),
             "membership_end_liquidation_count": (
                 signal.membership_end_liquidation_count
             ),
@@ -828,6 +942,18 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             ),
             "matched_deferred_rebalance_count": (
                 matched.deferred_rebalance_count
+            ),
+            "matched_partial_rebalance_decision_count": (
+                matched.partial_rebalance_decision_count
+            ),
+            "matched_stale_position_deferral_count": (
+                matched.stale_position_deferral_count
+            ),
+            "matched_mean_locked_gross_at_partial_decisions": _decimal_text(
+                matched_mean_locked_gross
+            ),
+            "matched_locked_exposure_over_target_count": (
+                matched.locked_exposure_over_target_count
             ),
             "matched_membership_end_liquidation_count": (
                 matched.membership_end_liquidation_count

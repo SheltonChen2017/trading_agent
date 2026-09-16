@@ -164,7 +164,14 @@ def test_profile_freezes_one_mathematically_consistent_stock_rule():
         "retain_residual_cash_and_label_every_result_cell"
     )
     assert profile["cash_return"] == "0"
-    assert profile["cost_bps_per_side"] == [0, 5, 10, 20]
+    assert profile["cost_bps_per_side"] == [10]
+    assert profile["account_wide_stale_rebalance_deferral"] is False
+    assert profile["stale_position_turnover"] == (
+        "excluded_until_current_price_is_available"
+    )
+    assert profile["locked_position_gross_over_target"] == (
+        "preserve_the_locked_weight_and_assign_zero_remaining_budget"
+    )
     assert profile["absolute_positive_score_gate"] is False
     assert profile["named_figi_resolution_refusals_excluded_before_ranking"] is True
     assert profile["membership_end_missing_price"] == (
@@ -358,7 +365,7 @@ def test_one_refused_sector_is_excluded_without_forcing_every_other_sector_to_ca
     assert runtime._sector_refused_decision_count == 1
 
 
-def test_completed_stock_portfolio_is_aggregate_only_and_cost_ordered():
+def test_completed_stock_portfolio_is_aggregate_only_and_primary_cost_only():
     runtime = _complete(_input())
     summary = runtime.aggregate_summary()
     statistics = runtime.custom_summary_statistics()
@@ -391,6 +398,14 @@ def test_completed_stock_portfolio_is_aggregate_only_and_cost_ordered():
     assert summary["terminal_payoff_applied"] is False
     assert summary["membership_end_liquidation_is_terminal_payoff"] is False
     assert summary["membership_end_zero_recovery_count"] == 0
+    assert summary["partial_rebalance_decision_count"] == 0
+    assert summary["stale_position_deferral_count"] == 0
+    assert summary["mean_locked_gross_at_partial_decisions"] == "0"
+    assert summary["locked_exposure_over_target_count"] == 0
+    assert summary["matched_partial_rebalance_decision_count"] == 0
+    assert summary["matched_stale_position_deferral_count"] == 0
+    assert summary["matched_mean_locked_gross_at_partial_decisions"] == "0"
+    assert summary["matched_locked_exposure_over_target_count"] == 0
     assert summary["named_figi_resolution_refusal_count"] == 0
     assert summary["economic_portfolio_evaluation"] is True
     assert summary["orders"] is False
@@ -399,9 +414,9 @@ def test_completed_stock_portfolio_is_aggregate_only_and_cost_ordered():
         *subject.expected_custom_summary_statistic_names(),
     )
     cells = summary["portfolio_cells"]
-    assert [cell["cost_bps_per_side"] for cell in cells] == [0, 5, 10, 20]
-    returns = [Decimal(cell["cumulative_return"]) for cell in cells]
-    assert returns == sorted(returns, reverse=True)
+    assert len(cells) == 1
+    assert cells[0]["cost_bps_per_side"] == subject.PRIMARY_COST_BPS
+    assert cells[0]["primary_cost_scenario"] is True
     assert Decimal(cells[0]["cumulative_return"]) > 0
     for cell in cells:
         with localcontext(base._context()):
@@ -573,6 +588,194 @@ def test_matched_nondivisor_name_count_preserves_exact_requested_gross():
     assert max(targets.values()) - min(targets.values()) <= Decimal("1e-49")
 
 
+def test_partial_rebalance_locks_exact_drifted_weight_and_trades_only_remainder():
+    value = _input()
+    runtime = subject.StockPortfolioEvaluationRuntime(
+        value,
+        profile_id=subject.PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=(),
+    )
+    stale = "perm-security-18"
+    tradable = "perm-security-19"
+    newcomer = "perm-security-17"
+    position = value.session_axis.index("2021-01-12")
+    history_position = runtime._history_session_positions["2021-01-12"]
+    runtime._history_prices[history_position][
+        runtime._history_security_positions[tradable]
+    ] = "110"
+    runtime._history_prices[history_position][
+        runtime._history_security_positions[newcomer]
+    ] = "100"
+    account = subject._Account(
+        "matched",
+        weights={stale: Decimal("0.4"), tradable: Decimal("0.4")},
+        marks={stale: Decimal("100"), tradable: Decimal("100")},
+    )
+
+    executed_gross = runtime._advance_account(
+        account,
+        position,
+        (stale, tradable, newcomer),
+        target_gross=subject.TARGET_GROSS_EXPOSURE,
+    )
+
+    with localcontext(base._context()):
+        gross_multiplier = Decimal("1.04")
+        expected_locked = +(Decimal("0.4") / gross_multiplier)
+        expected_tradable_pretrade = +(
+            Decimal("0.4") * Decimal("1.1") / gross_multiplier
+        )
+        expected_unlocked = +(
+            (subject.TARGET_GROSS_EXPOSURE - expected_locked) / Decimal(2)
+        )
+        expected_turnover = +(
+            abs(expected_unlocked - expected_tradable_pretrade)
+            + expected_unlocked
+        )
+        expected_net_return = +(
+            Decimal("0.04")
+            - Decimal("0.001") * expected_turnover
+        )
+    assert executed_gross == subject.TARGET_GROSS_EXPOSURE
+    assert account.weights == {
+        stale: expected_locked,
+        tradable: expected_unlocked,
+        newcomer: expected_unlocked,
+    }
+    assert account.marks == {
+        stale: Decimal("100"),
+        tradable: Decimal("110"),
+        newcomer: Decimal("100"),
+    }
+    assert account.turnover_sum == expected_turnover
+    assert account.accumulators[10].returns == [expected_net_return]
+    assert account.partial_rebalance_decision_count == 1
+    assert account.stale_position_deferral_count == 1
+    assert account.locked_gross_sum_at_partial_decisions == expected_locked
+
+
+def test_stale_position_recovery_books_cumulative_return_exactly_once():
+    value = _input()
+    runtime = subject.StockPortfolioEvaluationRuntime(
+        value,
+        profile_id=subject.PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=(),
+    )
+    security_id = "perm-security-19"
+    stale_position = value.session_axis.index("2021-01-12")
+    recovery_position = value.session_axis.index("2021-01-13")
+    unchanged_position = value.session_axis.index("2021-01-14")
+    for position in (recovery_position, unchanged_position):
+        session = value.session_axis[position]
+        history_position = runtime._history_session_positions[session]
+        runtime._history_prices[history_position][
+            runtime._history_security_positions[security_id]
+        ] = "120"
+    account = subject._Account(
+        "signal",
+        weights={security_id: Decimal("0.4")},
+        marks={security_id: Decimal("100")},
+    )
+
+    runtime._advance_account(account, stale_position, None)
+    runtime._advance_account(account, recovery_position, None)
+    recovered_weight = account.weights[security_id]
+    runtime._advance_account(account, unchanged_position, None)
+    with localcontext(base._context()):
+        expected_recovered_weight = +(
+            Decimal("0.4") * Decimal("1.2") / Decimal("1.08")
+        )
+
+    assert account.accumulators[10].returns == [
+        Decimal(0),
+        Decimal("0.08"),
+        Decimal(0),
+    ]
+    assert recovered_weight == expected_recovered_weight
+    assert account.weights[security_id] == recovered_weight
+    assert account.marks[security_id] == Decimal("120")
+    assert account.turnover_sum == 0
+    assert account.stale_mark_session_count == 1
+
+
+def test_locked_gross_above_target_is_preserved_without_new_trades():
+    value = _input()
+    runtime = subject.StockPortfolioEvaluationRuntime(
+        value,
+        profile_id=subject.PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=(),
+    )
+    stale = "perm-security-18"
+    newcomer = "perm-security-19"
+    position = value.session_axis.index("2021-01-12")
+    history_position = runtime._history_session_positions["2021-01-12"]
+    runtime._history_prices[history_position][
+        runtime._history_security_positions[newcomer]
+    ] = "100"
+    account = subject._Account(
+        "matched",
+        weights={stale: Decimal("0.99")},
+        marks={stale: Decimal("100")},
+    )
+
+    executed_gross = runtime._advance_account(
+        account,
+        position,
+        (newcomer,),
+        target_gross=subject.TARGET_GROSS_EXPOSURE,
+    )
+
+    assert executed_gross == Decimal("0.99")
+    assert account.weights == {stale: Decimal("0.99")}
+    assert account.marks == {stale: Decimal("100")}
+    assert account.turnover_sum == 0
+    assert account.partial_rebalance_decision_count == 1
+    assert account.stale_position_deferral_count == 1
+    assert account.locked_exposure_over_target_count == 1
+    assert account.full_target_execution_count == 0
+    assert account.underfilled_target_execution_count == 0
+
+
+def test_locked_nonselected_signal_name_consumes_one_holdings_slot():
+    value = _input(security_count=64)
+    runtime = subject.StockPortfolioEvaluationRuntime(
+        value,
+        profile_id=subject.PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=(),
+    )
+    stale = "perm-security-00"
+    desired = tuple(f"perm-security-{index:02d}" for index in range(14, 64))
+    position = value.session_axis.index("2021-01-12")
+    history_position = runtime._history_session_positions["2021-01-12"]
+    for security_id in desired:
+        runtime._history_prices[history_position][
+            runtime._history_security_positions[security_id]
+        ] = "100"
+    account = subject._Account(
+        "signal",
+        weights={stale: subject.STOCK_WEIGHT_CAP},
+        marks={stale: Decimal("100")},
+    )
+
+    runtime._advance_account(account, position, desired)
+
+    assert len(account.weights) == subject.MAXIMUM_HOLDINGS
+    assert stale in account.weights
+    assert tuple(security_id for security_id in desired if security_id in account.weights) == (
+        desired[: subject.MAXIMUM_HOLDINGS - 1]
+    )
+    assert desired[-1] not in account.weights
+    assert sum(account.weights.values()) <= subject.TARGET_GROSS_EXPOSURE
+
+
 def test_zero_signal_exposure_does_not_create_zero_weight_matched_holdings():
     value = _input()
     runtime = subject.StockPortfolioEvaluationRuntime(
@@ -611,14 +814,18 @@ def test_zero_signal_exposure_does_not_create_zero_weight_matched_holdings():
     assert account.underfilled_target_execution_count == 0
 
 
-def test_missing_held_mark_is_carried_and_rebalance_deferred_without_lookahead():
+def test_missing_held_mark_is_carried_while_tradable_positions_rebalance():
     value = _input()
     omission = ("perm-security-19", "2021-01-12")
     runtime = _complete(value, omissions=frozenset((omission,)))
     summary = runtime.aggregate_summary()
 
     assert summary["stale_mark_session_count"] == 1
-    assert summary["deferred_rebalance_count"] == 1
+    assert summary["deferred_rebalance_count"] == 0
+    assert summary["rebalance_execution_count"] == 261
+    assert summary["partial_rebalance_decision_count"] == 1
+    assert summary["stale_position_deferral_count"] == 1
+    assert Decimal(summary["mean_locked_gross_at_partial_decisions"]) > 0
     assert summary["membership_end_liquidation_count"] == 0
     assert all(
         cell["status"]
@@ -633,7 +840,7 @@ def test_missing_held_mark_is_carried_and_rebalance_deferred_without_lookahead()
     )
 
 
-def test_two_missing_held_marks_count_as_one_stale_account_session():
+def test_two_missing_held_marks_count_one_partial_decision_and_two_deferrals():
     value = _input()
     omissions = frozenset(
         (
@@ -646,11 +853,15 @@ def test_two_missing_held_marks_count_as_one_stale_account_session():
 
     assert summary["stale_mark_session_count"] == 1
     assert summary["matched_stale_mark_session_count"] == 1
-    assert summary["deferred_rebalance_count"] == 1
-    assert summary["matched_deferred_rebalance_count"] == 1
+    assert summary["deferred_rebalance_count"] == 0
+    assert summary["matched_deferred_rebalance_count"] == 0
+    assert summary["partial_rebalance_decision_count"] == 1
+    assert summary["matched_partial_rebalance_decision_count"] == 1
+    assert summary["stale_position_deferral_count"] == 2
+    assert summary["matched_stale_position_deferral_count"] == 2
 
 
-def test_matched_only_stale_name_defers_only_the_matched_comparator():
+def test_matched_only_stale_name_partially_rebalances_only_the_comparator():
     value = _input()
     runtime = _complete(
         value,
@@ -662,8 +873,13 @@ def test_matched_only_stale_name_defers_only_the_matched_comparator():
     assert summary["deferred_rebalance_count"] == 0
     assert summary["rebalance_execution_count"] == 261
     assert summary["matched_stale_mark_session_count"] == 1
-    assert summary["matched_deferred_rebalance_count"] == 1
-    assert summary["matched_rebalance_execution_count"] == 260
+    assert summary["matched_deferred_rebalance_count"] == 0
+    assert summary["matched_rebalance_execution_count"] == 261
+    assert summary["matched_partial_rebalance_decision_count"] == 1
+    assert summary["matched_stale_position_deferral_count"] == 1
+    assert Decimal(
+        summary["matched_mean_locked_gross_at_partial_decisions"]
+    ) > 0
     assert all(
         cell["status"]
         == "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
@@ -718,8 +934,8 @@ def test_zero_recovery_lower_bound_books_the_held_weight_as_a_loss():
     runtime._advance_account(account, position, None)
 
     assert account.weights == {}
-    assert account.accumulators[0].returns == [-subject.STOCK_WEIGHT_CAP]
-    assert account.accumulators[0].wealth == Decimal(1) - subject.STOCK_WEIGHT_CAP
+    assert account.accumulators[10].returns == [-subject.STOCK_WEIGHT_CAP]
+    assert account.accumulators[10].wealth == Decimal(1) - subject.STOCK_WEIGHT_CAP
     assert account.membership_end_zero_recovery_count == 1
 
 
@@ -752,7 +968,16 @@ def test_membership_end_forces_liquidation_and_refuses_reentry_even_with_open():
     assert account.membership_end_zero_recovery_count == 0
     assert account.membership_end_entry_refusal_count == 1
     assert account.turnover_sum > 0
-    assert account.accumulators[10].wealth < account.accumulators[0].wealth
+    with localcontext(base._context()):
+        gross_return = +(subject.STOCK_WEIGHT_CAP * Decimal("0.01"))
+        expected_net = +(
+            gross_return
+            - Decimal("0.001") * account.turnover_sum
+        )
+        expected_wealth = +(Decimal(1) + expected_net)
+        gross_wealth = +(Decimal(1) + gross_return)
+    assert account.accumulators[10].wealth == expected_wealth
+    assert account.accumulators[10].wealth < gross_wealth
 
 
 def test_base_runtime_hook_is_noop_and_preserves_existing_summary_shape():
@@ -764,18 +989,8 @@ def test_base_runtime_hook_is_noop_and_preserves_existing_summary_shape():
     )
 
 
-def test_one_held_name_going_untradable_freezes_the_whole_matched_comparator():
-    """ARV2R84-001: deferral is all-or-nothing per account, so it scales with sleeve size.
-
-    A rebalance defers when ANY held name lacks a current price, and the whole
-    session is marked stale. The signal sleeve holds at most fifty names, so it
-    is rarely affected; the matched comparator holds every resolvable
-    score-bearing member, so a single held name that stops pricing freezes it
-    for the remainder of the run. That is the mechanism behind R-064's
-    comparator reporting two executed rebalances against the sleeve's 261, and
-    it is why the signal-minus-matched difference measures trading against not
-    trading rather than the signal against its universe.
-    """
+def test_one_held_name_going_untradable_does_not_freeze_matched_comparator():
+    """ARV2R85-001: one locked name must not freeze account-wide rebalancing."""
     value = _input()
     later = tuple(
         session
@@ -795,13 +1010,18 @@ def test_one_held_name_going_untradable_freezes_the_whole_matched_comparator():
     assert summary["deferred_rebalance_count"] == 0
     assert summary["stale_mark_session_count"] == 0
 
-    # One name freezes the comparator almost completely.
-    assert summary["matched_rebalance_execution_count"] == 4
-    assert summary["matched_deferred_rebalance_count"] == 257
+    # The stale name remains locked, but all 261 comparator decisions execute.
+    assert summary["matched_rebalance_execution_count"] == 261
+    assert summary["matched_deferred_rebalance_count"] == 0
+    assert summary["matched_partial_rebalance_decision_count"] == 257
+    assert summary["matched_stale_position_deferral_count"] == 257
     assert summary["matched_stale_mark_session_count"] == 1236
+    assert Decimal(
+        summary["matched_mean_locked_gross_at_partial_decisions"]
+    ) > 0
 
-    # The comparator is therefore not a like-for-like benchmark here, and the
-    # summary must keep saying its metrics are proxy-conditioned.
+    # The stale position still makes the return proxy-conditioned, even though
+    # it no longer stops the rest of the matched comparator from rebalancing.
     assert all(
         cell["risk_metrics_are_price_proxy_conditioned"] is True
         for cell in summary["portfolio_cells"]

@@ -270,7 +270,14 @@ SINGLE PUSH; AFTER CLAUDE REVIEW AND CODEX COUNTER-REVIEW, THE NEXT
 IMPLEMENTATION IS A DIRECT-STOCK ECONOMIC TEST USING THE EXISTING SIGNAL.
 NO FURTHER ETF OR LEVERAGE RUN IS LAUNCHED IN THIS CLOSING ROUND.
 PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN
-CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
+CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.
+THE INDEPENDENT CLAUDE REVIEW OF THE FIXED-WINDOW AND ETF RANGE (SECTION 83)
+ACCEPTS ALL NINE COMMITS, CONFIRMS ALL SIX SECTION-77 FINDINGS AGAINST SECTION
+76, AND RECORDS THAT R-061'S THREE REPORTED ETF INFORMATION COEFFICIENTS ARE
+NOT DISTINGUISHABLE FROM ZERO: WITH A FIVE-NAME IC FLOOR AND OVERLAPPING
+WINDOWS, THE REPORTED 0.070551 AT H60 SITS UNDER ONE STANDARD ERROR FROM ZERO.
+NO ALPHA IS CLAIMED, THE UNLEVERED ETF BASELINE IS NEGATIVE AFTER COSTS, AND
+EVERY LATER GATE REMAINS CLOSED.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -942,6 +949,14 @@ backtest. The supplied updated strategy is an assessed proposal, not a
 wholesale replacement of the frozen scoring model. No further ETF or
 leveraged run is part of this closing round. No deployment, order, broker,
 paper/live, or trading action is authorized.
+
+Section 83 is the independent Claude review of `82897d7..d34bb5f`. It accepts
+all nine commits, confirms every section-77 finding against section 76, and
+records that R-061's three ETF information coefficients are not
+distinguishable from zero once the five-name cross-section and window overlap
+are accounted for, so the headline 0.070551 at H60 must not inform the
+direct-stock decision. The immediate next step is that Codex counter-reviews
+section 83.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -2591,6 +2606,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-15 | Claude review | `7bc8098` -> this record commit; three lane test corrections; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the accepted-risk QC evaluation range `d09fea1..7bc8098`, including the first outcome-bearing development evaluation R-053 and the retroactive R-031 to R-052 reconciliation | Dispositioned all 30 commits individually and cumulatively (section 74.2); accepted after correction. Verified rather than accepted: the redirect and proxy boundary reproduced with two loopback servers under hostile proxy environment variables; one-use permits refused reuse, overwrite, symlink, hardlink and a world-writable parent; the rotated owner key id recomputes and the superseded key is absent from the tree; the sequence-2 look ledger retains R-030 byte-identically, hash-chains to its predecessor and carries 23 unique entries with every alpha, order and statistics field false; all four projected modules pass the projection's own validator and twelve escape probes are refused; the pinned result inventory is exactly the 32-cell cross product plus two metadata records; and all 32 discovery attempts are dispositioned in this record. | Final complete Analyst lane selection on the corrected tree **10 failed, 5,397 passed, 7 skipped, 34 warnings in 5,739.56 s (1:35:39)**, every failure reproduced on a pristine export of `7bc8098` and therefore pre-existing; two touched batteries **125 passed**; eight-trial mutation matrix (three caught, three masked by an identified sibling guard, two real gaps corrected) plus five red/green correction trials in a scratch export; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **4 P2 and 7 P3** (`ARV2R74-001..011`); three corrected here with red/green evidence, eight documented or referred. `ARV2R74-001` raises the range's own `ARV2CR51-001` from P3 to P2: the frozen zero-MAD rule plus the complete-cross-section rule are unsatisfiable for an event-driven signal, so R-053's zero valid dates was the only reachable outcome and was determinable before the look was spent. `ARV2R50-022` remains open. | Codex counter-reviews this record commit and both Claude commits, and with the owner settles a satisfiable preregistered normalization before any R-054; later windows, ETF construction, leverage, deployment, orders and trading remain closed. |
 | 2026-09-15 | Claude review | `f950fe8` -> this record commit; one lane test correction; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the R-054/R-055 range `baef134..f950fe8`, including the first tangible preliminary stock-IC evidence | Dispositioned all four commits (76.2); accepted after correction. Confirmed all five section-75 findings against section 74, including that section 74 recorded a red/green proof its own evidence contradicts. Verified rather than accepted: the tangible-evidence gate wording is in git at `2d71cb3` (10:13 PDT), ten minutes before the backtest was created (10:23 PDT) and an hour before the single aggregate read (11:10 PDT), and decides on valid-date counts and non-null availability alone; the v2 rule computes median and MAD from active names only and gives structural zeros exact zero, with contract, manifest, summary and cell schemas all versioned; nine of the ten section-74 failures are fixed; and look accounting reconciles at 56 run looks, 3 development evaluations, 23 infrastructure looks and a 516 alpha-cell floor. | Final complete Analyst lane selection on the corrected tree **5,415 passed, 7 skipped, 0 failed, 35 warnings in 5,768.32 s (1:36:08)**, the first complete green run since the accepted-risk path began; focused three-file reproduction at `f950fe8` **1 failed, 129 passed** before the correction and the object-store battery **72 passed** after; six-trial mutation matrix, six of six caught; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **1 P2 and 3 P3** (`ARV2R76-001..004`); one corrected here with red/green evidence. `ARV2R76-001`: the no-external-I/O closure test was still red at the pushed head on an import edge added by `2d71cb3`, recorded as closed because the complete lane selection was again not run. `ARV2R76-002`: every reported IC is conditioned on price survival. | Codex counter-reviews this record commit; the complete lane selection should be run once per round before a push; the survival conditioning should be settled before later windows and ETF construction; later windows, ETF construction, leverage, deployment, orders and trading remain closed. |
 | 2026-09-15 | Codex ETF baseline implementation and QC evaluation | `9094aea` -> `9164146`, `6d4f101`, `3270a58`, `70e92fd`, and this record commit | Implement and measure the owner-directed unlevered ETF baseline, then correct the admission defect before one push and Claude review | R-060 failed on same-date QC Slice ordering; the isolated SPY-clock correction allowed R-061 to complete and return exactly nine aggregate statistics once. The pre-push audit identified the extra five-ETF portfolio minimum; `70e92fd` separates economic admission from IC sufficiency under a new local-only identity. Historical R-061 and its limitations remain intact. | Validation scope and exact totals are recorded in section 82.4. Two development evaluations; shared look total 61, ARV2 development total 8, infrastructure 23, lifetime exposed-cell floor 571. No additional look for the local correction. | 0 P0, 0 P1, 2 P2 corrected, 5 P3 corrected/disclosed/documented as detailed in section 82.4. R-061's primary net return is -2.38%, but its historical admission mismatch prevents a clean verdict on the intended portfolio. | Push once after fix and suite. Monitor Claude's subsequent review push; counter-review every commit, then build and backtest individual-stock economics with ETFs as a backup. No automatic leveraged run. |
+| 2026-09-15 | Claude review | `d34bb5f` -> this record commit; no code, test, specification or shared file change; Codex resolves the exact pushed head | Independent review of the fixed-window and ETF range `82897d7..d34bb5f`, including the first unlevered ETF portfolio result | Dispositioned all nine commits (83.2); accepted. Confirmed all six section-77 findings against section 76, including that section 76 overstated a Git author date as immutable proof. Verified rather than accepted: the three fixed windows were frozen in one commit before any ran; each regime profile expects exactly 18 statistics and the cell floor reconciles 516 to 564 to 571 with looks 59 to 61 and development evaluations 6 to 8; and four single-guard mutations over the ETF evaluator constants were all caught. | Complete standing Analyst lane selection at `d34bb5f`, the exact pushed tree because this review changes no source or test file: **5,555 passed, 7 skipped, 0 failed, 35 warnings in 5,803.07 s (1:36:43)**; four-trial ETF mutation matrix, four of four caught; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **1 P2 and 3 P3** (`ARV2R83-001..004`), all documented; no code or test correction was warranted. `ARV2R83-001`: R-061's reported mean ICs of 0.003093, 0.009836 and 0.070551 sit 0.10, 0.16 and 0.65 standard errors from zero once the five-name IC floor and H5/H20/H60 overlap are accounted for, and the sub-50% positive-date shares at H5 and H20 are the same small-sample skew. | Codex counter-reviews this record commit and should settle `ARV2R83-001` before the owner-directed direct-stock implementation; later ETF, leverage, deployment, order and trading gates remain closed. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -14402,3 +14418,150 @@ consistent rather than introducing another hidden all-cash gate. New raw
 score formulas, hard 20/60-day holding rules, multiple variants and fresh
 frameworks are not adopted by this agreement. The already-examined 2021-2025
 period is a development test, not newly untouched confirmation evidence.
+
+## 83. Independent Claude review of the fixed-window and ETF range `82897d7..d34bb5f`, 2026-09-15
+
+**Range reviewed:** `82897d7..d34bb5f`, nine commits, individually and
+cumulatively, in the dedicated lane worktree on the same branch: 14 files,
++7,210/-191. The range adds three fixed-window stock diagnostics
+(R-057, R-058, R-059), the first unlevered ETF portfolio baseline
+(R-060 technical failure, R-061 completed), and Codex's counter-review of
+section 76.
+**Disposition: ACCEPTED.** 0 P0, 0 P1, **1 P2 and 3 P3**
+(`ARV2R83-001..004`), all documented; this review makes no code or test
+correction, because none of the four is a defect a test can close and the one
+implementation defect in range, `ARV2ETF82-002`, was found and corrected by
+Codex's own pre-push audit in `70e92fd`. All six of Codex's findings against
+section 76 are confirmed against this reviewer's own committed text (83.1).
+**Zero research looks and zero development evaluations by this review.** It
+made no QuantConnect, Massive or Sharadar call, read no provider row, opened
+no credential, and fetched no external page. Validation used Python
+**3.13.15**.
+
+### 83.1 Acknowledgement of the section-77 findings against section 76
+
+All six are confirmed. Each was checked against this reviewer's own committed
+text or by direct execution.
+
+| ID | Confirmed? | Independent verification |
+|---|---|---|
+| `ARV2CR77-001` (P2) | Yes | Section 76's banner still named this reviewer's already-complete review as the next gate. |
+| `ARV2CR77-002` (P2) | Yes | At `82897d7` the evaluator held a single `missing_outcome_pairs` counter incremented once per missing pair with no cause attribution, so `ARV2R76-002`'s attribution of the horizon-increasing component to delisting and acquisition was an inference stated as a causal label. The rate arithmetic supported the inference; the data did not carry the labels. Codex did not merely correct the wording, it built the mutually exclusive cause census that makes the labels real. |
+| `ARV2CR77-003` (P3) | Yes | Section 76's own findings table contains two P2 and two P3 rows against a summary line and ledger row claiming one P2 and three P3. |
+| `ARV2CR77-004` (P3) | Yes | Section 76's commit table attached `ARV2R76-001` to `34f62a1` when the unpinned edge was introduced by `2d71cb3`, and marked `f950fe8` "accepted after correction" when every finding against it was documented only. |
+| `ARV2CR77-005` (P3) | Yes, **and it is the most substantive of the six** | Section 76 called a Git author date "immutably timestamped" and "the strongest form of the discipline". A Git author date is caller-settable, `2d71cb3` is unsigned, and no trusted pre-launch remote anchor was cited. The ordering evidence is real and still useful, because the preregistration text precedes the result text in the same append-only history, but this reviewer overstated its evidentiary class. A signed tag or a pushed remote reference before launch would supply what was claimed. |
+| `ARV2CR77-006` (P3) | Yes | `ARV2R76-003` asserted that no independent-date count appears beside the aggregates; the paragraph above the table gives 1,255 valid and zero invalid dates for every owner-window cell. The residual point, that no overlap-adjusted count or dispersion accompanies the means, stands and is restated precisely as `ARV2R83-001`. |
+
+Eleven findings have now been confirmed against this reviewer across sections
+77 and 75. The pattern is consistent and worth naming: the code and
+arithmetic findings have held (`ARV2R74-001` drove the R-054 rule change and
+`ARV2R76-002` drove the cause census), while the record-keeping around them,
+severity counts, commit attributions and evidentiary characterisations, has
+repeatedly been wrong. The counts in this section were computed from the
+findings table mechanically rather than by hand.
+
+### 83.2 Commit dispositions
+
+| # | Commit | Subject | Disposition |
+|---|---|---|---|
+| 1 | `8ad5e7e` | Counter-review Claude section 76 | **Accepted**. Record only. All six findings it raises are confirmed in 78.1. |
+| 2 | `e0ad90c` | Add fixed-window ARV2 stock diagnostics | **Accepted**. The regime evaluator imports the base evaluator and reuses its schemas rather than duplicating the scoring rule, and adds the mutually exclusive missing-pair cause census with a precedence rule, exclusivity and sum-matches-total invariants, a confirmed-terminal exit label, and an explicit `terminal_payoff_policy_applied: False`. |
+| 3 | `63d8400` | Preregister R057 through R059 stock windows | **Accepted**. All three windows are named in one commit before any of the three ran, which is a frozen family rather than sequential selection. |
+| 4 | `9094aea` | Record R057-R059 fixed-window QC results | **Accepted**. Record only. R-059's disclosure that 690 of 1,762 dates are invalid and the effective evidence begins 2015-09-29 is the kind of limitation that is easy to omit and was not. |
+| 5 | `9164146` | Add accepted-risk ARV2 ETF baseline | **Accepted after correction**, the correction being Codex's own `70e92fd` within this range, which removed the `ARV2ETF82-002` admission defect. `ARV2R83-001` is documented against it. |
+| 6 | `6d4f101` | Preregister R060 unlevered ETF evaluation | **Accepted**. Dates, costs, coverage and ranking rules are frozen before any outcome. |
+| 7 | `3270a58` | Retry ETF baseline on daily price slices | **Accepted**. The SPY-clock correction addresses the observed R-060 technical failure and its regression exercises the same-date trigger. |
+| 8 | `70e92fd` | Separate ETF portfolio admission from IC sufficiency | **Accepted**. Corrects `ARV2ETF82-002` locally without rewriting the historical R-061 result, which is the right handling. |
+| 9 | `d34bb5f` | Record R061 results and ETF correction review handoff | **Accepted**. Record only; `ARV2R83-001` to `-004` are documented against it, none corrected. |
+
+### 83.3 Verified rather than accepted
+
+- **The three fixed windows were frozen together before any ran.** The
+  evaluator landed at 14:36, the preregistration naming 2019-2023, 2023-2025
+  and 2013-2019 at 14:40, and the results at 16:39.
+- **Statistic inventories and look accounting reconcile.** Each regime
+  profile expects exactly 18 statistics, 16 cells plus a profile metadata
+  record plus `ARV2_RUNTIME_META`, matching the record. The cell floor moves
+  516 to 564 across three regime runs at 16 cells each, and 564 to 571 for
+  R-061's seven exposed cells; shared looks 59 to 61 and development
+  evaluations 6 to 8 with R-060 exposing nothing because it had no result
+  read.
+- **The ETF constant pins are load-bearing.** Four independent single-guard
+  mutations were all caught: lowering the IC floor from five to two names,
+  dropping the primary cost from 10 bps to zero, removing a cost scenario,
+  and lowering the invested-session floor from 50 to one.
+- **Codex ran the complete lane command this round**, 5,412 passed and 7
+  skipped, which is the process point section 76 raised. It covered
+  `tests/analyst_revisions_v2` but not the four root-level
+  `test_analyst_revisions_v2_*.py` files that the standing selection also
+  includes; this review runs the full selection (83.7).
+
+### 83.4 Findings
+
+| ID | P | Where | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R83-001` | P2 | `accepted_risk_etf_baseline_evaluator.py:76`; record R-061 result paragraph | R-061's three reported mean ICs are not distinguishable from zero, and the headline figure is a small-sample artifact. The ETF path sets `MINIMUM_ETF_IC_ROWS = 5` where the stock path uses `MINIMUM_IC_ROWS = 20`, so a date's Spearman IC may be computed over as few as five ETFs, whose null standard deviation is about `1/sqrt(n-1)` = 0.5. Over a 1,254-session span with overlapping windows the independent-block counts are roughly 251, 63 and 21 at H5, H20 and H60, giving mean-IC standard errors near 0.032, 0.063 and 0.109. The reported means of 0.003093, 0.009836 and 0.070551 are therefore 0.10, 0.16 and 0.65 standard errors from zero. Even the indefensibly generous assumption that all 358 valid dates are independent leaves H60 at 2.7 standard errors. The reported H60 mean is six times the largest H60 value from any prior window, and the sub-50% positive-date shares at H5 (48.88%) and H20 (47.49%) alongside positive means are the same small-sample skew seen from the other side. The record presents all three as bare means with no dispersion. | Documented, for Codex and the owner. This matters because the owner's next-phase direction is a direct-stock economic implementation informed partly by these diagnostics, and 0.070551 read at face value would badly misinform that choice. Recommendation: report a dispersion or interval and an overlap-adjusted independent count beside every ETF IC, or state that the ETF IC cells are not interpretable as effect estimates at this cross-section size. |
+| `ARV2R83-002` | P3 | `accepted_risk_etf_baseline_evaluator.py:76` | The five-row ETF IC floor is preregistered and is defensible given a 54-name candidate universe of which few are eligible on any date, but it is a four-fold weakening of the statistical floor the stock path applies, and the two floors are set independently rather than derived from one rule. Nothing records why the ETF cross-section may be four times smaller. | Documented. Recommendation: state the rationale beside the constant, or derive both floors from one documented rule. |
+| `ARV2R83-003` | P3 | Record R-061 paragraph | The record says the result "must not be presented as a definitive failure of the underlying analyst-revision strategy", which is correct and important, but states no symmetric caution about the IC cells. The economic numbers are hedged and the statistical ones are not. | Documented; `ARV2R83-001` supplies the symmetric caution. |
+| `ARV2R83-004` | P3 | `docs/research/alpha-result.md` R-061 entry | The 94.11% average cash figure is reported as a portfolio characteristic without noting that `ARV2ETF82-002`, disclosed two paragraphs later, is a principal cause of it. A reader taking the number alone would attribute the cash weight to signal sparsity rather than to the admission defect. | Documented. Recommendation: attach the defect reference to the cash figure itself. |
+
+### 83.5 Observations, not defects
+
+- R-061 is economically unattractive at the frozen primary cost: +2.58% gross,
+  -2.38% at 10 bps, against SPY +91.50%, with a primary-cost Sharpe of -0.194.
+  Codex reports this plainly and does not soften it. The correct reading is
+  the one the record gives: the implemented rules produced that return, and a
+  disclosed admission defect means it does not cleanly test the intended
+  portfolio.
+- Codex's own pre-push audit found seven issues (`ARV2ETF82-001` to `-007`)
+  and corrected or disclosed each before pushing. Finding one's own P2 before
+  a reviewer does is the behaviour this alternation is meant to produce.
+- The correction in `70e92fd` was deliberately not applied retroactively to
+  R-061's recorded result. That is the right handling of a spent look.
+
+### 83.6 Mutation matrix
+
+Four single-guard trials over the new ETF evaluator's frozen constants, in a
+`git archive` export of `d34bb5f`, each restored before the next; the
+worktree was never mutated.
+
+| Trial | Guard removed | Result |
+|---|---|---|
+| E1 | IC floor lowered from five names to two | Caught |
+| E2 | Primary cost silently drops from 10 bps to zero | Caught |
+| E3 | A cost scenario is dropped from the frozen set | Caught |
+| E4 | Invested-session floor drops from 50 to one | Caught |
+
+Four of four caught. The ETF constants are pinned, which is why
+`ARV2R83-001` is about the interpretation of the five-name floor rather than
+its enforcement.
+
+### 83.7 Validation
+
+- Complete standing Analyst lane selection at `d34bb5f`, which is the exact
+  pushed tree because this review changes no source or test file:
+  **5,555 passed, 7 skipped, 0 failed, 35 warnings in 5,803.07 s (1:36:43)**.
+  Only this sentence and the matching ledger sentence were written after that
+  run. The selection includes the four root-level
+  `test_analyst_revisions_v2_*.py` files that Codex's own lane command omits.
+- Four-trial mutation matrix over the ETF evaluator constants, all caught.
+- Independent arithmetic on the reported ETF ICs using the null variance of
+  Spearman's rho and overlap-adjusted independent-block counts (83.4).
+- `git diff --check` clean. Python **3.13.15**.
+- Codex's own full lane command this round returned 5,412 passed and 7
+  skipped over `tests/analyst_revisions_v2`; the selection run here also
+  includes the four root-level `test_analyst_revisions_v2_*.py` files.
+
+### 83.8 Next gate
+
+Codex counter-reviews section 78. Before the owner-directed direct-stock
+economic implementation, `ARV2R83-001` should be settled, because that
+decision would otherwise be informed by an H60 ETF mean IC of 0.070551 that
+is under one standard error from zero. The corrected ETF specification is a
+new prospective diagnostic with a new R-number, as the record already states.
+`ARV2CR77-005` is worth acting on generally: if commit ordering is to carry
+the evidentiary weight this lane places on it, a signed tag or a pushed
+remote reference before each launch would supply what an unsigned author date
+does not. `ARV2R74-008`, `ARV2R74-009` and the lane-wide `ARV2R50-022` debt
+remain open. No paper or live deployment, broker access, order or trading
+authority follows from R-057 through R-061.

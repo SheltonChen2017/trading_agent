@@ -757,7 +757,7 @@ def test_regime_profile_allowlist_refuses_unknown_profile():
         adapter._look_accounting(evaluation_profile_id="arv2-stock-ic-unregistered")
 
 
-def test_stock_portfolio_profile_has_one_exact_r063_look_budget(stock_portfolio_plan):
+def test_stock_portfolio_profile_has_one_exact_r064_look_budget(stock_portfolio_plan):
     spec = adapter._run_spec(stock_portfolio_evaluator.PROFILE_ID)
     accounting = adapter._look_accounting(
         evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID
@@ -767,12 +767,12 @@ def test_stock_portfolio_profile_has_one_exact_r063_look_budget(stock_portfolio_
         evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
     )
 
-    assert spec.ledger_entry_id == "R-063"
+    assert spec.ledger_entry_id == "R-064"
     assert spec.cell_count == 4
-    assert accounting["run_level_looks_before"] == 62
-    assert accounting["planned_run_level_looks_after_launch"] == 63
-    assert accounting["arv2_development_evaluations_before"] == 9
-    assert accounting["planned_arv2_development_evaluations_after_launch"] == 10
+    assert accounting["run_level_looks_before"] == 63
+    assert accounting["planned_run_level_looks_after_launch"] == 64
+    assert accounting["arv2_development_evaluations_before"] == 10
+    assert accounting["planned_arv2_development_evaluations_after_launch"] == 11
     assert accounting["lifetime_alpha_cell_floor_before"] == 571
     assert result_accounting["lifetime_alpha_cell_floor_after"] == 575
     assert len(stock_portfolio_plan.expected_custom_statistic_names) == 6
@@ -1941,9 +1941,9 @@ def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(
     assert result_permit.permit_sha256 == recovered_permit.permit_sha256
     receipt = json.loads(result.persisted_path.read_bytes())
     accounting = receipt["look_accounting"]
-    assert accounting["shared_look_ledger_entry_id"] == "R-063"
-    assert accounting["run_level_looks_after"] == 63
-    assert accounting["arv2_development_evaluations_after"] == 10
+    assert accounting["shared_look_ledger_entry_id"] == "R-064"
+    assert accounting["run_level_looks_after"] == 64
+    assert accounting["arv2_development_evaluations_after"] == 11
     assert accounting["lifetime_alpha_cell_floor_after"] == 575
 
 

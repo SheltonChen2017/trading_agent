@@ -349,12 +349,12 @@ _EVALUATION_RUN_SPECS = (
     ),
     _EvaluationRunSpec(
         _PINNED_STOCK_PORTFOLIO_PROFILE_ID,
-        "arv2-eval-stock-portfolio-historical-qc-002",
-        "R-063",
-        62,
+        "arv2-eval-stock-portfolio-historical-qc-003",
+        "R-064",
         63,
-        9,
+        64,
         10,
+        11,
         4,
         571,
         575,
@@ -495,7 +495,7 @@ def _canonical(value: object) -> bytes:
 
 
 def _stock_portfolio_contract_bindings_are_current() -> bool:
-    """Refuse in-memory weakening of the R-063 financial/result contract."""
+    """Refuse in-memory weakening of the R-064 financial/result contract."""
 
     namespace = stock_portfolio_evaluator.__dict__
     if type(namespace) is not dict:

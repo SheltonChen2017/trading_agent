@@ -24,9 +24,9 @@ class AcceptedRiskStockPortfolioError(_base.PreliminaryRatingEvaluationError):
 
 
 PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v1"
-PROFILE_ID = "arv2-stock-long-only-2021-2025-r063-v1"
+PROFILE_ID = "arv2-stock-long-only-2021-2025-r064-v1"
 CONTRACT_ID = "arv2-accepted-risk-stock-portfolio-v1"
-SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v2"
+SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v3"
 PORTFOLIO_CELL_SCHEMA = "arv2-accepted-risk-stock-portfolio-cell-v1"
 DECISION_START_SESSION = "2021-01-04"
 DECISION_END_SESSION = "2025-12-29"
@@ -649,6 +649,8 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             signal_return = +(signal_accumulator.wealth - Decimal(1))
             matched_return = +(matched_accumulator.wealth - Decimal(1))
             spy_return = +(benchmark_wealth - Decimal(1))
+            signal_minus_matched = +(signal_return - matched_return)
+            signal_minus_spy = +(signal_return - spy_return)
             average_turnover = +(signal.turnover_sum / Decimal(return_count))
             average_cash = +(signal.cash_weight_sum / Decimal(return_count))
             matched_turnover = +(matched.turnover_sum / Decimal(return_count))
@@ -680,10 +682,10 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
             ),
             "spy_cumulative_return": _decimal_text(spy_return),
             "cumulative_return_minus_matched": _decimal_text(
-                signal_return - matched_return
+                signal_minus_matched
             ),
             "cumulative_return_minus_spy": _decimal_text(
-                signal_return - spy_return
+                signal_minus_spy
             ),
             "annualized_arithmetic_return": _decimal_text(annual),
             "annualized_volatility": _decimal_text(volatility),

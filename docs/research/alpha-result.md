@@ -1621,3 +1621,32 @@ same 4,096-character ceiling.
 | **Access boundary** | One create/compile/backtest; statistics-free terminal polling; after `Completed.`, one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, order, deployment, broker, paper/live state, or trading action. |
 
 The result will be appended without changing this prospective rule block.
+
+R-063 created project `36609362`, compiled, and reached authenticated
+`Completed.` after 68 statistics-free polls (backtest
+`3632b79548f0839f47fbf6e04f62f190`). Its compact metadata corrected R-062's
+transport failure. The separately signed one-use aggregate read nevertheless
+refused locally before returning or persisting any statistic: the evaluator's
+two derived return-difference strings used Python's default 28-digit Decimal
+precision, while the validator recomputed them with the lane's 50-digit
+financial context. The read permit is consumed and the run will not be read
+again. No return value is reported. R-063 spends shared look **62 -> 63** and
+development evaluation **9 -> 10**; the lifetime cell floor remains **571**.
+
+## R-064 — Analyst Revisions V2 same-economics exact-arithmetic retry (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-064 changes only those two derived fields, calculating both inside the
+existing 50-digit context. The underlying holdings, daily returns, costs,
+wealth paths and every frozen economic rule are unchanged. A high-precision
+regression now crosses the evaluator-to-validator seam, and the summary schema
+is versioned from v2 to v3.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **63 -> 64**; ARV2 development evaluations **10 -> 11**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **571 -> 575**. |
+| **Profile** | `arv2-stock-long-only-2021-2025-r064-v1`, SHA-256 `37d0b80181dc736365abbf0f6caedd6e4b6bc70f818905681ac5a29bdcce774b`; projection SHA-256 `052879a56d116b339be561da8125a91b16d238b0729b39c30434cf09ae48eb29`. |
+| **Unchanged economics** | Exact R-055 score and R-062/R-063 stock portfolio, date, execution, missing-price, benchmark, cost and tangible-evidence rules. |
+| **QC identity** | Private project `10 ARV2_STOCK_R064_2021_2025 - 20260916`; backtest `ARV2 R064 direct stock arithmetic retry e9851c2f`; plan SHA-256 `c3c61d26041e41ed72746a55b9c60e1c175013d8af5b9c5f740ddafd8f0645b8`. |
+| **Access boundary** | One create/compile/backtest; statistics-free terminal polling; after `Completed.`, one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, order, deployment, broker, paper/live state, or trading action. |
+
+The result will be appended without changing this prospective rule block.

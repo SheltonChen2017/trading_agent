@@ -14725,3 +14725,54 @@ surface remains closed. Focused R-063 validation is **249 passed**, the exact
 QC import/authority closure battery is **72 passed**, and the complete
 5,603-test lane result remains applicable to the preceding source/test tree;
 the narrow transport correction will be reviewed with the run record.
+
+### 84.6 R-063 terminal/result disposition: completed run, refused aggregate read
+
+R-063 created private QC project `36609362`, compiled as
+`2120c8d250e06fc02c54452d995e826a-c29064def8c7d4c4f9b20e1c3a73e391`,
+and launched backtest `3632b79548f0839f47fbf6e04f62f190`. It reached
+authenticated `Completed.` after 68 statistics-free polls under terminal
+receipt SHA-256
+`de37f9b8e1e96d7471d3cfac9cc39996c09f4b8d0a38b4cf5ed40e91bdaf04e0`.
+The compact envelope therefore corrected the R-062 failure.
+
+The separately signed one-use result read then refused before persisting or
+returning any statistic because the aggregate validator reported
+`preliminary stock-portfolio metric escaped bounds`. The result-read permit
+remains consumed and the same run will not be read again. Reproduction against
+the local completed evaluator isolated the cause: its two derived
+`cumulative_return_minus_*` fields were subtracted under Python's default
+28-digit Decimal context, while the validator recomputed the same identities
+under the lane's 50-digit financial context. Every local cost cell reproduced
+the mismatch. The holdings, price path, daily returns, costs, wealth, Sharpe,
+Sortino and drawdown calculations were not implicated, but no rejected value
+is salvaged or reported. R-063 spends shared look **62 -> 63** and development
+evaluation **9 -> 10**; with no authenticated result receipt, the lifetime
+cell floor remains **571**.
+
+### 84.7 Prospective R-064 same-economics exact-arithmetic retry
+
+R-064 moves both derived return differences inside the existing 50-digit
+financial context and adds an evaluator-to-validator high-precision regression.
+It changes no score, selection, holdings, execution, price, cost, comparator,
+missing-outcome or evidence rule. The result schema is versioned from v2 to
+v3 and the run receives a new profile/evaluation identity rather than
+rewriting R-063.
+
+The profile is `arv2-stock-long-only-2021-2025-r064-v1`, SHA-256
+`37d0b80181dc736365abbf0f6caedd6e4b6bc70f818905681ac5a29bdcce774b`.
+The seven-file projection is
+`arv2-preliminary-qc-projection-052879a56d116b339be561da`, SHA-256
+`052879a56d116b339be561da8125a91b16d238b0729b39c30434cf09ae48eb29`,
+202,911 bytes. The prospective plan is
+`arv2-preliminary-qc-submission-c3c61d26041e41ed72746a55`, SHA-256
+`c3c61d26041e41ed72746a55b9c60e1c175013d8af5b9c5f740ddafd8f0645b8`.
+The private names are project
+`10 ARV2_STOCK_R064_2021_2025 - 20260916` and backtest
+`ARV2 R064 direct stock arithmetic retry e9851c2f`.
+
+If created, shared looks move **63 -> 64** and development evaluations
+**10 -> 11**. Only a successful separately signed read of the same four cost
+cells moves the lifetime cell floor **571 -> 575**. The access boundary is
+unchanged: six aggregate statistics only, with no raw row, unrestricted log,
+chart, order, deployment, broker, paper/live state or trading action.

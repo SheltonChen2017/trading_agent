@@ -403,6 +403,22 @@ def test_completed_stock_portfolio_is_aggregate_only_and_cost_ordered():
     returns = [Decimal(cell["cumulative_return"]) for cell in cells]
     assert returns == sorted(returns, reverse=True)
     assert Decimal(cells[0]["cumulative_return"]) > 0
+    for cell in cells:
+        with localcontext(base._context()):
+            expected_matched_difference = +(
+                Decimal(cell["cumulative_return"])
+                - Decimal(cell["matched_eligible_stock_cumulative_return"])
+            )
+            expected_spy_difference = +(
+                Decimal(cell["cumulative_return"])
+                - Decimal(cell["spy_cumulative_return"])
+            )
+        assert Decimal(cell["cumulative_return_minus_matched"]) == (
+            expected_matched_difference
+        )
+        assert Decimal(cell["cumulative_return_minus_spy"]) == (
+            expected_spy_difference
+        )
     with localcontext(base._context()):
         expected_wealth = Decimal(1)
         for _index in range(cells[0]["return_session_count"] - 1):

@@ -1563,3 +1563,31 @@ The owner's latest next-phase direction is Claude review, Codex counter-review,
 then an individual-stock economic implementation and backtest using the
 existing analyst score, with ETFs retained as a backup research path. No
 additional run or look is created by the local correction or that direction.
+
+## R-062 — Analyst Revisions V2 direct-stock economic portfolio (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-062 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-economic-qc-001`. Commit `2dcd449` freezes the source and
+tests before any project creation, outcome read, or aggregate result. It
+reuses the exact R-055 conservative-censored firm-specific score and the
+authenticated package
+`arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; it does not fit a new
+signal or select among variants after seeing portfolio returns.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **61 -> 62**; ARV2 development evaluations **8 -> 9**. A successful separately authorized aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **571 -> 575**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-2021-2025-v1`, SHA-256 `8cab242ae28cb29680b4053b7b19fa18f10b57bd21c48523b0d496794f63384b`; projection `arv2-preliminary-qc-projection-86b74c69844a63802b8291df`, SHA-256 `86b74c69844a63802b8291df3721f77922db52897d2f61deb93ae447f86424e3`. |
+| **Window** | 261 weekly decisions from 2021-01-04 through 2025-12-29; next-authenticated-open execution; 1,254 return sessions through 2025-12-31. |
+| **Portfolio rule** | At each first authenticated session of an ISO week, rank every resolvable score-bearing stock by the unchanged R-055 score; select the top decile, capped at 50, with score/security-ID tie order. Each selected stock targets 1.96%, for at most 98% gross; failed entries and any shortfall remain zero-yield cash. No absolute-positive-score gate, liquidity filter, leverage, order, or trade is introduced. |
+| **Comparators and costs** | SPY plus an equal-weight matched portfolio of all resolvable score-bearing names, targeted to the signal sleeve's actually executed gross. Cost scenarios are 0/5/10/20 bps per side; 10 bps is primary. |
+| **Missing outcomes** | Within-membership missing opens carry the last observed mark and defer that account's rebalance. An available membership-end open liquidates; an unavailable membership-end open uses a disclosed zero-recovery lower bound. Named FIGI refusals are excluded before ranking. |
+| **Tangible-evidence gate** | Exactly 1,254 return sessions and at least 50 signal-invested sessions. Every cell labels stale-price proxy, zero-recovery lower bound, and/or exposure underfill when present. No status is a formal accept/reject disposition. |
+| **QC identity** | Private project `8 ARV2_STOCK_R062_2021_2025 - 20260916`; backtest `ARV2 R062 direct stock portfolio e9851c2f`. |
+| **Access boundary** | One private project/create/upload/compile/backtest submission; statistics-free terminal polling; then at most one separately signed read of exactly six aggregate custom statistics (runtime metadata, portfolio metadata, and four cost cells). No raw provider row, security-level outcome, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action is authorized. |
+
+This period has already informed prior development and is not untouched
+confirmation evidence. R-062 is a practical, current-vintage,
+non-pristine-PIT economic diagnostic whose return may remain conditioned on
+price proxies and accepted vendor limitations. Its result will be appended
+without rewriting this prospective rule block.

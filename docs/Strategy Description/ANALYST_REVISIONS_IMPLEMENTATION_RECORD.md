@@ -950,13 +950,14 @@ wholesale replacement of the frozen scoring model. No further ETF or
 leveraged run is part of this closing round. No deployment, order, broker,
 paper/live, or trading action is authorized.
 
-Section 83 is the independent Claude review of `82897d7..d34bb5f`. It accepts
-all nine commits, confirms every section-77 finding against section 76, and
-records that R-061's three ETF information coefficients are not
-distinguishable from zero once the five-name cross-section and window overlap
-are accounted for, so the headline 0.070551 at H60 must not inform the
-direct-stock decision. The immediate next step is that Codex counter-reviews
-section 83.
+Section 83 is the independent Claude review of `82897d7..d34bb5f`; section 84
+records Codex's counter-review corrections and freezes the direct-stock R062
+profile before outcomes. The owner explicitly waives Claude review of section
+84 only through the one R062 launch and its bounded aggregate-result append,
+then requires the usual single push and independent Claude review. The
+immediate next step is the owner-waived R062 execution under section 84; no
+other outcome run, leverage, deployment, order, broker, paper/live, or trading
+action is opened by that waiver.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -14565,3 +14566,108 @@ remote reference before each launch would supply what an unsigned author date
 does not. `ARV2R74-008`, `ARV2R74-009` and the lane-wide `ARV2R50-022` debt
 remain open. No paper or live deployment, broker access, order or trading
 authority follows from R-057 through R-061.
+
+## 84. Codex counter-review of section 83 and prospective R-062 direct-stock evaluation, 2026-09-16
+
+### 84.1 Counter-review disposition
+
+**Range counter-reviewed:** `d34bb5f..e45a38a`, one record-only Claude commit.
+**Disposition: ACCEPTED AFTER PROSPECTIVE RECORD CORRECTION.** Claude changed
+no source, test, specification, shared result, or external state. Its broad
+acceptance of the fixed-window/ETF range stands, but the following statements
+are corrected here rather than rewriting the independent record:
+
+- `ARV2CR84-001` (P3): section 83.8 says Codex counter-reviews “section 78”;
+  the reviewed section is 83.
+- `ARV2CR84-002` (P3): `ARV2R83-001` correctly identifies missing dispersion
+  and overlap-aware inference, but its supplied heuristic cannot prove exact
+  standard errors, non-significance, or that H60 is a “small-sample artifact.”
+  The defensible disposition is that ETF IC inference is unavailable and H60
+  is descriptive, not confirmed alpha. `ARV2R83-002` remains a valid request
+  to explain the independently chosen ETF/stock IC floors; `ARV2R83-003` is
+  redundant because the existing record already cautions against treating the
+  ETF IC as definitive.
+- `ARV2CR84-003` (P3): the section-83 banner says there was one implementation
+  defect although section 82 records two P2 defects. The five-fund admission
+  mismatch is disclosed immediately after the cash figure, so
+  `ARV2R83-004` is a proximity/quantification observation, not proof that it
+  was the principal cause of 94.11% cash.
+- `ARV2CR84-004` (P3): unsigned, caller-controlled Git author timestamps were
+  rejected as immutable proof and then reused as ordering proof in 83.3.
+  Commit topology supports ordering inside this history; it supplies neither
+  a trusted timestamp nor an independently anchored pre-launch reference.
+- `ARV2CR84-005` (P3): “negative after costs” is true at the primary 10-bps
+  cost, not at every nonzero cost; the 5-bps result is +0.07%. Section 83.7's
+  complete-suite claim applies to the unchanged source/test bytes at
+  `d34bb5f`; the appended review text itself necessarily postdates that run.
+
+No Claude correction was reverted. These are record-precision corrections,
+not a reason to delay the owner-directed direct-stock economic test.
+
+### 84.2 Direct-stock implementation frozen before outcomes
+
+Commit `2dcd449` adds profile
+`arv2-stock-long-only-2021-2025-v1` and its exact QC projection, result-name
+contract, submission accounting, and aggregate validator. The profile reuses
+the R-055 conservative-censored firm-specific score without changing the
+signal. It takes the top decile of resolvable score-bearing stocks, capped at
+50, targets 1.96% each (98% maximum gross), rebalances weekly for next-open
+execution, and reports 0/5/10/20-bps-per-side cases with 10 bps primary.
+Residual capital earns zero. It compares the signal with SPY and with an
+equal-weight all-eligible-stock portfolio targeted to the signal sleeve's
+actually executed gross.
+
+The 261 decisions span 2021-01-04 through 2025-12-29 and the 1,254 return
+sessions end 2025-12-31. Named FIGI refusals are removed before ranking.
+Within-membership missing opens carry a stale mark and defer that account's
+rebalance; a missing open after membership end receives zero recovery as a
+conservative lower bound. Every aggregate result explicitly labels stale
+proxy, zero recovery, or exposure underfill. No liquidity filter, leverage,
+terminal-payoff splice, order, deployment, broker, paper/live action, or
+formal alpha disposition is claimed.
+
+During implementation review, the following lane-owned defects were corrected
+before freeze: optimistic missing terminal value, free terminal liquidation,
+matched/signal exposure mismatch, named-FIGI inclusion, hidden exposure
+underfill, zero-weight matched holdings, Decimal allocation residual, false
+Sharpe/Sortino availability, matched-only stale/underfill invisibility,
+weighted-exposure reconciliation, full-target/underfill contradiction, and
+annual cost arithmetic (P2 result-correctness class); plus runtime slice
+capacity, flat-QC import closure, action-seal re-entry/tuple-subclass
+hardening, stale-session naming, and missing end-to-end launch/read/reload
+coverage (P3 hardening/coverage class). Isolated regressions cover the
+load-bearing refusal guards, directly addressing section 83's test-isolation
+criticism rather than relying on message counts.
+
+### 84.3 Prospective R-062 gate
+
+The exact package SHA-256 remains
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+The profile SHA-256 is
+`8cab242ae28cb29680b4053b7b19fa18f10b57bd21c48523b0d496794f63384b`;
+the seven-file projection is
+`arv2-preliminary-qc-projection-86b74c69844a63802b8291df`, SHA-256
+`86b74c69844a63802b8291df3721f77922db52897d2f61deb93ae447f86424e3`,
+201,983 bytes. The private QC identity is project
+`8 ARV2_STOCK_R062_2021_2025 - 20260916`, backtest
+`ARV2 R062 direct stock portfolio e9851c2f`.
+
+If one backtest is created, shared looks move **61 -> 62** and ARV2
+development evaluations **8 -> 9**. A successful separately signed read of
+the four cost cells moves the lifetime alpha-cell floor **571 -> 575**.
+The tangible-evidence floor is exactly 1,254 return sessions and at least 50
+signal-invested sessions; descriptive availability does not itself mean
+economic success. The authorized result boundary is exactly six aggregate
+custom statistics and excludes raw rows, security outcomes, unrestricted
+logs/charts, orders, and trading. The 2021-2025 period is reused development
+evidence, not pristine holdout or confirmation evidence. Result text follows
+in a later subsection and must not rewrite this prospective block.
+
+Pre-launch validation on the frozen source/test tree: the complete standing
+Analyst lane selection passed **5,603 tests**, skipped 7, and emitted 35
+Python-3.13 `fork()` deprecation warnings in **5,727.62 s (1:35:27)**.
+An earlier run correctly failed one exhaustive QC-package closure test because
+the new evaluator had not yet been pinned; the exact source/import/edge pins
+were added, the isolated guard passed, and this complete rerun is the final
+tree. The complete repository suite was not run under the owner's lane-only
+rule. `git diff --check` was clean before this prospective record.

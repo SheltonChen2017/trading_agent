@@ -367,6 +367,8 @@ def test_qc_driver_accepts_constituent_and_tradebar_envelopes():
     )
     assert driver.accept_constituents("AIQ", (constituent,)) == ()
     bar = SimpleNamespace(open=100, close=101, volume=1_000_000)
+    driver.on_data(SimpleNamespace(bars={}))
+    assert fake.sessions == []
     driver.on_data(SimpleNamespace(bars={"SPY": bar, "AIQ": bar}))
 
     assert len(fake.snapshots) == 1
@@ -381,15 +383,15 @@ def test_etf_run_spec_and_look_accounting_are_frozen_before_outcomes():
         evaluation_profile_id=subject.PROFILE_ID
     )
 
-    assert spec.ledger_entry_id == "R-060"
-    assert spec.run_level_looks_before == 59
-    assert spec.run_level_looks_after == 60
-    assert spec.development_evaluations_before == 6
-    assert spec.development_evaluations_after == 7
+    assert spec.ledger_entry_id == "R-061"
+    assert spec.run_level_looks_before == 60
+    assert spec.run_level_looks_after == 61
+    assert spec.development_evaluations_before == 7
+    assert spec.development_evaluations_after == 8
     assert spec.cell_count == 7
     assert spec.lifetime_alpha_cell_floor_after == 571
-    assert accounting["run_level_looks_after"] == 59
-    assert accounting["planned_run_level_looks_after_launch"] == 60
+    assert accounting["run_level_looks_after"] == 60
+    assert accounting["planned_run_level_looks_after_launch"] == 61
     assert accounting["aggregate_result_authenticated"] is False
     assert adapter._expected_result_names(subject.PROFILE_ID) == (
         qc_runtime.expected_custom_summary_statistic_names()

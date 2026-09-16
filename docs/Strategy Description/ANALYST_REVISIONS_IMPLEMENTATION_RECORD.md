@@ -903,14 +903,15 @@ has positive mean and median IC, but the preliminary metrics remain explicitly
 conditioned on observed security and benchmark endpoint prices; no terminal
 payoff or portfolio return is inferred.
 
-Section 80 preregisters the bounded R-060 unlevered ETF baseline and its exact
+Section 80 preregistered the bounded R-060 unlevered ETF baseline and its exact
 all-cash, IC-census, H1-holdings, look-through-cap, overlap-cluster, drift-
-turnover, coverage, and aggregate-result guards. The owner explicitly waives
-an additional Claude review of section 80 before the one R-060 run; Claude
-will review section 80 and its result afterward. The immediate next step is to
-commit this preregistration, create and sign the exact private R-060 plan,
-launch one QC backtest, poll statistics-free terminal state, and—only after
-authenticated `Completed.`—read its nine aggregate custom statistics once.
+turnover, coverage, and aggregate-result guards. Section 81 records R-060's
+immediate technical runtime failure before any outcome read: a constituent-
+only QC Slice advanced the strict daily evaluator before the same-date equity
+TradeBars arrived; the owner explicitly waives Claude review of section 81
+before its same-rule R-061 retry. The correction makes the SPY daily bar the
+sole session clock. The immediate next step is the exact signed R-061 run and,
+only after authenticated `Completed.`, one aggregate-only read.
 Actual and synthetic leverage remain closed until usable unlevered evidence
 exists and a later reviewed milestone explicitly opens them.
 
@@ -14024,3 +14025,71 @@ Raw provider rows, raw constituents, security-level prices/outcomes,
 unrestricted logs, charts, deployment, orders, brokerage, paper/live state,
 and trading remain closed. Actual and synthetic 3x tests remain conditional on
 usable unlevered R-060 evidence and a later reviewed milestone.
+
+## 81. R-060 technical failure and same-rule R-061 retry, 2026-09-15
+
+R-060 used committed section-80 source and the separately signed execution
+authority exactly once. Plan
+`arv2-preliminary-qc-submission-323298dc26bf5fd6cd71ce2a`, SHA-256
+`323298dc26bf5fd6cd71ce2a002fcdf9971a17630c0aa47dba952abeff450942`,
+spent permit
+`arv2-preliminary-qc-execution-permit-48a39b9b9ee3613644a43f2d`, SHA-256
+`48a39b9b9ee3613644a43f2d8fd79faef18a4d79ad8f098f01912a85c59ee342`.
+It created private project `36594932`, compiled successfully as
+`e7c3ccb5e7fff10ee31b8f0e4ad9048f-88cda038946ad60897ea6ba576eeec88`,
+and launched backtest `81c9e7fd7e667ad9f2d54c7208200d92`. Launch receipt
+SHA-256 is
+`72b90cf2852fdb9a1b295646d12fe14d6a207cfd0d9f386b3aabe92ab0bd733b`.
+
+The first statistics-free poll authenticated terminal `Runtime Error` in
+receipt SHA-256
+`a008f762cc4ed70466a6490dbb9d1acb5970d0222285907010d8a086c56da2ff`.
+No result authority was rendered, no aggregate statistic was selected, and
+the lifetime cell floor remains 564. Under the owner's standing technical-
+retry authority, one bounded diagnostic `backtests/read` selected only status,
+error, and stack trace and explicitly discarded statistics, charts, orders,
+logs, and provider rows. It identified the exact failure at 2020-12-04:
+`ETF runtime sessions must be strictly increasing`.
+
+### 81.1 Cause and correction
+
+QuantConnect's ETF-constituent universe can emit a constituent-only Slice on
+the same algorithm date before the daily equity TradeBars. The R-060 driver
+incorrectly treated every Slice as a completed daily session, so it first
+advanced an empty 2020-12-04 session and then refused the same-date Slice that
+contained prices. The combined fake-Slice test did not represent that live QC
+ordering.
+
+The R-061 correction changes no candidate ETF, score, snapshot lag, coverage,
+liquidity, selection, cap, turnover, cost, date, metric, or tangible-evidence
+rule. The driver now treats the one daily SPY TradeBar as the frozen session
+clock and ignores constituent-only Slices. The regression first submits an
+empty same-date Slice and proves zero evaluator calls, then submits the SPY
+and ETF TradeBars and proves exactly one call. The ETF-focused file passes
+**11 tests** on Python 3.13.15.
+
+### 81.2 R-061 prospective binding
+
+R-060 consumes run-level look **59 -> 60** and ARV2 development evaluation
+**6 -> 7** despite the technical failure. R-061 is a new same-rule
+`development_evaluation`, `arv2-eval-etf-sector-baseline-qc-002`, and shared
+ledger entry `R-061`. Creating it consumes look **60 -> 61** and evaluation
+**7 -> 8**. Only an authenticated aggregate read may expose the same seven
+result cells and move the lifetime cell floor **564 -> 571**.
+
+The unchanged profile is `arv2-etf-sector-baseline-2021-2025`, SHA-256
+`eadb6aba26495ceb8d11417364e80a18b9860a2488519ee9c692a7031cfa59dd`.
+The corrected eight-file projection is
+`arv2-preliminary-qc-projection-1a6d0a13a16d418ca8e50b2a`, SHA-256
+`1a6d0a13a16d418ca8e50b2ab56d6c910d55fd4ff5de4261d5288ea5646c3b07`,
+219,897 bytes total. The private project is fixed as
+`7 ARV2_ETF_R061_2021_2025 - 20260915`; the backtest name is
+`ARV2 R061 unlevered ETF sector baseline retry e9851c2f`.
+
+The owner directed the ETF phase to continue without an intervening client
+review and previously authorized technical retries needed to reach a valid
+backtest. R-061 therefore may be committed, signed, created, compiled, and
+launched now. Polling remains statistics-free. Only after exact `Completed.`
+may a separately signed one-use authority read the nine aggregate custom
+statistics. Leverage, deployment, orders, brokerage, paper/live state, and
+trading remain closed.

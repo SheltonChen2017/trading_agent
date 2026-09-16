@@ -1472,7 +1472,7 @@ confirmatory-alpha looks remain zero. Independent Claude review and Codex
 counter-review are required before unlevered ETF/economic-portfolio work;
 actual or synthetic 3x leverage remains conditional on that baseline.
 
-## R-060 — Analyst Revisions V2 unlevered ETF sector baseline (PREREGISTERED; NOT YET LAUNCHED)
+## R-060 — Analyst Revisions V2 unlevered ETF sector baseline (TECHNICAL FAILURE; NO RESULT READ)
 
 R-060 is one accepted-risk `development_evaluation`, evaluation
 `arv2-eval-etf-sector-baseline-qc-001`. Before any ETF outcome read, commit
@@ -1495,7 +1495,33 @@ the projection SHA-256 is
 | **Limitations** | Fixed sleeve rather than exhaustive reverse-index discovery; no reliable PIT AUM filter; no direct-stock or industry comparator; current-vintage non-pristine-PIT provider input; endpoint-conditioned outcomes; no terminal-payoff splice; not formal ARV2-5/6. |
 | **Access boundary** | One backtest create, statistics-free terminal polling, then at most one separately authorized read of nine aggregate custom statistics. No raw rows, raw constituents, security-level outcomes, unrestricted logs/charts, leverage, deployment, orders, broker access, paper/live state, or trading. |
 
-This preregistration supersedes the prior text requiring an intervening Claude
-review only because the owner explicitly directed this one ETF round to run
-first and be reviewed afterward. Actual and synthetic 3x work remains closed
-until R-060 yields usable unlevered evidence and a later reviewed milestone.
+R-060 created project `36594932`, compiled successfully as
+`e7c3ccb5e7fff10ee31b8f0e4ad9048f-88cda038946ad60897ea6ba576eeec88`,
+and launched backtest `81c9e7fd7e667ad9f2d54c7208200d92`. Its first
+statistics-free poll authenticated `Runtime Error`: a constituent-only QC
+Slice and the later daily-bar Slice shared 2020-12-04, while the driver had
+incorrectly advanced both as full sessions. No result authority or aggregate
+outcome was opened, so the cell floor remains 564. The run nevertheless spends
+look **59 -> 60** and ARV2 development evaluation **6 -> 7**. One bounded
+technical diagnostic read selected only status/error/stack trace and no
+statistics, chart, order, log collection, provider row, or security outcome.
+
+## R-061 — Analyst Revisions V2 same-rule unlevered ETF retry (PREREGISTERED; NOT YET LAUNCHED)
+
+R-061 changes only QC Slice scheduling: the daily SPY TradeBar is now the sole
+session clock, so constituent-only Slices cannot advance the strict evaluator.
+All section-80 economic rules, dates, inputs, metrics, and gates are unchanged.
+The corrected projection is
+`arv2-preliminary-qc-projection-1a6d0a13a16d418ca8e50b2a`, SHA-256
+`1a6d0a13a16d418ca8e50b2ab56d6c910d55fd4ff5de4261d5288ea5646c3b07`.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **60 -> 61**; ARV2 development evaluations **7 -> 8**. An authenticated aggregate read exposes the unchanged three ETF IC plus four portfolio-cost cells and moves the lifetime cell floor **564 -> 571**. |
+| **QC identity** | Private project `7 ARV2_ETF_R061_2021_2025 - 20260915`; backtest `ARV2 R061 unlevered ETF sector baseline retry e9851c2f`. |
+| **Unchanged evidence gate** | Every IC cell must census all 1,253 dates; portfolio availability still requires at least 252 return sessions and 50 invested sessions. |
+| **Access boundary** | One create/compile/backtest, statistics-free polling, then one separately signed read of exactly nine aggregate custom statistics only after `Completed.` |
+
+The owner's direct-run and technical-retry authorization permits R-061 before
+the later client review. Actual and synthetic 3x work remains closed until a
+usable unlevered result exists and a later reviewed milestone opens leverage.

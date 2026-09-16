@@ -217,8 +217,13 @@ class AcceptedRiskEtfBaselineQcDriver:
             "SPY",
             session,
         )
-        if benchmark is not None:
-            records.append(benchmark)
+        # ETF-constituent universe updates can produce an additional Slice on
+        # the same QC algorithm date before the daily equity TradeBars arrive.
+        # SPY is the frozen session clock: only its one daily bar authorizes a
+        # call into the strictly increasing session evaluator.
+        if benchmark is None:
+            return
+        records.append(benchmark)
         for ticker in etf_evaluator.CANDIDATE_ETFS:
             row = self._bar(bars, self._etf_symbols[ticker], ticker, session)
             if row is not None:

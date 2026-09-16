@@ -25,7 +25,7 @@ import threading
 import time
 import weakref
 from datetime import datetime, timezone
-from decimal import Decimal, InvalidOperation
+from decimal import Decimal, InvalidOperation, localcontext
 from pathlib import Path
 from typing import Callable, Mapping, NoReturn
 
@@ -36,6 +36,8 @@ from . import accepted_risk_preliminary_qc_projection as projection_builder
 from . import accepted_risk_preliminary_qc_runtime as preliminary_runtime
 from . import accepted_risk_preliminary_rating_evaluator as preliminary_evaluator
 from . import accepted_risk_regime_rating_evaluator as regime_evaluator
+from . import accepted_risk_etf_baseline_evaluator as etf_evaluator
+from . import accepted_risk_etf_baseline_qc_runtime as etf_runtime
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -270,13 +272,29 @@ _EVALUATION_RUN_SPECS = (
         548,
         564,
     ),
+    _EvaluationRunSpec(
+        etf_evaluator.PROFILE_ID,
+        "arv2-eval-etf-sector-baseline-qc-001",
+        "R-060",
+        59,
+        60,
+        6,
+        7,
+        7,
+        564,
+        571,
+    ),
 )
 
 
 def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
     for spec in _EVALUATION_RUN_SPECS:
         if spec.profile_id == evaluation_profile_id:
-            if evaluation_profile_id is not None:
+            if evaluation_profile_id == etf_evaluator.PROFILE_ID:
+                etf_evaluator.require_etf_baseline_profile(
+                    evaluation_profile_id
+                )
+            elif evaluation_profile_id is not None:
                 _PINNED_REQUIRE_REGIME_PROFILE(evaluation_profile_id)
             return spec
     _error("preliminary evaluation profile is not allowlisted")
@@ -284,11 +302,18 @@ def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
 
 def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]:
     spec = _run_spec(evaluation_profile_id)
-    names = (
-        _PINNED_EXPECTED_RESULT_NAMES
-        if evaluation_profile_id is None
-        else tuple(_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(evaluation_profile_id))
-    )
+    if evaluation_profile_id is None:
+        names = _PINNED_EXPECTED_RESULT_NAMES
+    elif evaluation_profile_id == etf_evaluator.PROFILE_ID:
+        names = tuple(
+            etf_runtime.expected_custom_summary_statistic_names(
+                evaluation_profile_id
+            )
+        )
+    else:
+        names = tuple(
+            _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(evaluation_profile_id)
+        )
     if (
         type(names) is not tuple
         or len(names) != spec.cell_count + 2
@@ -909,9 +934,21 @@ def build_accepted_risk_preliminary_submission_plan(
         projection.package_id != package.package_id
         or projection.package_sha256 != package.package_sha256
         or len(projection.source_files)
-        != len(projection_builder.PROJECT_SOURCE_PATHS) + 1
+        != len(
+            projection_builder.project_source_paths_for_profile(
+                projection.evaluation_profile_id
+            )
+        )
+        + 1
         or tuple(item.project_path for item in projection.source_files)
-        != tuple(sorted(projection_builder.PROJECT_SOURCE_PATHS + ("main.py",)))
+        != tuple(
+            sorted(
+                projection_builder.project_source_paths_for_profile(
+                    projection.evaluation_profile_id
+                )
+                + ("main.py",)
+            )
+        )
     ):
         _error("preliminary package and profile-bound projection are not exact peers")
     uploads = _upload_entries(package)
@@ -2548,6 +2585,123 @@ _REGIME_META_FIELDS = frozenset(
         "summary_sha256",
     }
 )
+_ETF_RUNTIME_META_FIELDS = frozenset(
+    {
+        "schema",
+        "status",
+        "profile_id",
+        "profile_sha256",
+        "package_id",
+        "package_sha256",
+        "activation_manifest_sha256",
+        "symbol_resolution_id",
+        "symbol_resolution_sha256",
+        "resolved_security_count",
+        "named_security_refusal_count",
+        "candidate_etf_count",
+        "result_transport",
+        "host_object_store_export_required",
+        "preliminary",
+        "point_in_time",
+        "formal",
+        "control_residualized",
+        "economic_portfolio",
+        "etf",
+        "leverage",
+        "deployment",
+        "orders",
+        "trading",
+    }
+)
+_ETF_META_FIELDS = frozenset(
+    {
+        "schema",
+        "contract_id",
+        "profile",
+        "package_id",
+        "package_sha256",
+        "input_manifest_id",
+        "input_manifest_sha256",
+        "status",
+        "decision_session_count",
+        "portfolio_return_session_count",
+        "invested_return_session_count",
+        "selected_decision_session_count",
+        "mean_eligible_etf_count",
+        "mean_selected_etf_count",
+        "holdings_snapshot_refusal_count",
+        "stale_holdings_snapshot_refusal_count",
+        "holdings_completeness_refusal_count",
+        "mapping_refusal_count",
+        "liquidity_refusal_count",
+        "stock_sector_refusal_session_count",
+        "holdings_source",
+        "holdings_point_in_time_claim",
+        "fixed_sleeve_is_exhaustive_reverse_index",
+        "aum_filter_applied",
+        "aum_filter_omission",
+        "peer_normalization",
+        "direct_stock_comparator_present",
+        "industry_comparator_present",
+        "market_benchmark_present",
+        "terminal_payoff_applied",
+        "current_vintage_non_pristine_pit_input",
+        "raw_provider_rows_in_summary",
+        "raw_constituent_rows_in_summary",
+        "raw_price_rows_in_summary",
+        "formal_result",
+        "alpha_claim_authorized",
+        "economic_portfolio_evaluation",
+        "leverage",
+        "deployment",
+        "orders",
+        "trading",
+        "summary_id",
+        "summary_sha256",
+    }
+)
+_ETF_IC_FIELDS = frozenset(
+    {
+        "schema",
+        "profile_id",
+        "horizon_sessions",
+        "status",
+        "valid_ic_date_count",
+        "invalid_ic_date_count",
+        "accepted_outcome_pair_count",
+        "missing_outcome_pair_count",
+        "mean_daily_spearman_ic",
+        "median_daily_spearman_ic",
+        "positive_ic_date_share",
+        "entry_timing",
+        "benchmark",
+        "formal_accept_reject_disposition",
+    }
+)
+_ETF_PORTFOLIO_FIELDS = frozenset(
+    {
+        "schema",
+        "profile_id",
+        "cost_bps_per_side",
+        "primary_cost_scenario",
+        "status",
+        "return_session_count",
+        "invested_return_session_count",
+        "cumulative_return",
+        "spy_cumulative_return",
+        "cumulative_return_minus_spy",
+        "annualized_arithmetic_return",
+        "annualized_volatility",
+        "zero_rate_sharpe",
+        "zero_rate_sortino",
+        "maximum_drawdown",
+        "average_daily_two_sided_turnover",
+        "average_cash_weight",
+        "leverage",
+        "orders_submitted",
+        "formal_accept_reject_disposition",
+    }
+)
 _CELL_COUNT_FIELDS = (
     "eligible_score_row_count",
     "accepted_outcome_pair_count",
@@ -3134,6 +3288,305 @@ def _validate_regime_aggregate_records(
         _error("preliminary regime evaluator summary identity changed")
 
 
+def _validate_etf_aggregate_records(
+    records: Mapping[str, dict[str, object]],
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> None:
+    profile = etf_evaluator.require_etf_baseline_profile(
+        etf_evaluator.PROFILE_ID
+    )
+    runtime_meta = records.get("ARV2_RUNTIME_META")
+    if (
+        type(runtime_meta) is not dict
+        or set(runtime_meta) != _ETF_RUNTIME_META_FIELDS
+        or runtime_meta.get("schema")
+        != "arv2-accepted-risk-etf-sector-qc-runtime-meta-v1"
+        or runtime_meta.get("status")
+        != "PRELIMINARY_ACCEPTED_RISK_UNLEVERED_ETF_BASELINE_COMPLETED"
+        or runtime_meta.get("profile_id") != etf_evaluator.PROFILE_ID
+        or runtime_meta.get("profile_sha256") != profile["profile_sha256"]
+        or runtime_meta.get("package_id") != plan.package_id
+        or runtime_meta.get("package_sha256") != plan.package_sha256
+        or runtime_meta.get("activation_manifest_sha256")
+        != plan.activation_manifest_sha256
+        or _safe_name(
+            runtime_meta.get("symbol_resolution_id"),
+            "ETF symbol resolution id",
+            512,
+        )
+        != runtime_meta.get("symbol_resolution_id")
+        or _sha(
+            runtime_meta.get("symbol_resolution_sha256"),
+            "ETF symbol resolution",
+        )
+        != runtime_meta.get("symbol_resolution_sha256")
+        or runtime_meta.get("candidate_etf_count")
+        != len(etf_evaluator.CANDIDATE_ETFS)
+        or runtime_meta.get("result_transport")
+        != "aggregate_only_custom_summary_statistics"
+        or runtime_meta.get("host_object_store_export_required") is not False
+        or runtime_meta.get("preliminary") is not True
+        or runtime_meta.get("economic_portfolio") is not True
+        or runtime_meta.get("etf") is not True
+        or any(
+            runtime_meta.get(name) is not False
+            for name in (
+                "point_in_time",
+                "formal",
+                "control_residualized",
+                "leverage",
+                "deployment",
+                "orders",
+                "trading",
+            )
+        )
+        or any(
+            type(runtime_meta.get(name)) is not int
+            or runtime_meta[name] < 0
+            for name in (
+                "resolved_security_count",
+                "named_security_refusal_count",
+            )
+        )
+        or runtime_meta["resolved_security_count"]
+        + runtime_meta["named_security_refusal_count"]
+        != plan.package.runtime_symbol_binding_count
+    ):
+        _error("preliminary ETF runtime metadata changed")
+
+    meta = records.get("ARV2_ETF_2021_2025_META")
+    if type(meta) is not dict or set(meta) != _ETF_META_FIELDS:
+        _error("preliminary ETF aggregate metadata changed")
+    authenticated_manifest = _authenticated_evaluator_manifest(plan)
+    count_fields = (
+        "decision_session_count",
+        "portfolio_return_session_count",
+        "invested_return_session_count",
+        "selected_decision_session_count",
+        "holdings_snapshot_refusal_count",
+        "stale_holdings_snapshot_refusal_count",
+        "holdings_completeness_refusal_count",
+        "mapping_refusal_count",
+        "liquidity_refusal_count",
+        "stock_sector_refusal_session_count",
+    )
+    if (
+        meta.get("schema") != etf_evaluator.SUMMARY_SCHEMA
+        or meta.get("contract_id") != etf_evaluator.CONTRACT_ID
+        or meta.get("profile") != profile
+        or meta.get("package_id") != plan.package_id
+        or meta.get("package_sha256") != plan.package_sha256
+        or meta.get("input_manifest_id") != plan.evaluator_manifest_id
+        or meta.get("input_manifest_sha256")
+        != plan.evaluator_manifest_sha256
+        or meta.get("status")
+        != "PRELIMINARY_ACCEPTED_RISK_UNLEVERED_ETF_BASELINE"
+        or any(
+            type(meta.get(name)) is not int or meta[name] < 0
+            for name in count_fields
+        )
+        or meta["decision_session_count"] == 0
+        or meta["portfolio_return_session_count"] < 252
+        or meta["invested_return_session_count"]
+        > meta["portfolio_return_session_count"]
+        or meta["selected_decision_session_count"]
+        > meta["decision_session_count"]
+        or meta["stale_holdings_snapshot_refusal_count"]
+        > meta["holdings_snapshot_refusal_count"]
+        or meta.get("holdings_source")
+        != "QuantConnect_US_ETF_Constituents"
+        or meta.get("holdings_point_in_time_claim")
+        != "QC_callback_observation_from_exact_previous_authenticated_session"
+        or meta.get("fixed_sleeve_is_exhaustive_reverse_index") is not False
+        or meta.get("aum_filter_applied") is not False
+        or meta.get("aum_filter_omission")
+        != "no_reliable_point_in_time_AUM_input"
+        or meta.get("peer_normalization")
+        != "global_fixed_sleeve_percentile"
+        or meta.get("direct_stock_comparator_present") is not False
+        or meta.get("industry_comparator_present") is not False
+        or meta.get("market_benchmark_present") is not True
+        or meta.get("terminal_payoff_applied") is not False
+        or meta.get("current_vintage_non_pristine_pit_input") is not True
+        or meta.get("economic_portfolio_evaluation") is not True
+        or any(
+            meta.get(name) is not False
+            for name in (
+                "raw_provider_rows_in_summary",
+                "raw_constituent_rows_in_summary",
+                "raw_price_rows_in_summary",
+                "formal_result",
+                "alpha_claim_authorized",
+                "leverage",
+                "deployment",
+                "orders",
+                "trading",
+            )
+        )
+        or authenticated_manifest.get("manifest_id")
+        != meta.get("input_manifest_id")
+    ):
+        _error("preliminary ETF aggregate metadata semantics changed")
+    for name in ("mean_eligible_etf_count", "mean_selected_etf_count"):
+        parsed = _cell_metric(meta.get(name), name)
+        upper = (
+            etf_evaluator.MAXIMUM_HOLDINGS
+            if name == "mean_selected_etf_count"
+            else len(etf_evaluator.CANDIDATE_ETFS)
+        )
+        if parsed < 0 or parsed > upper:
+            _error("preliminary ETF mean count is out of bounds")
+
+    ic_cells = []
+    for horizon in etf_evaluator.HORIZONS:
+        cell = records.get("ARV2_ETF_IC_H" + str(horizon))
+        if type(cell) is not dict or set(cell) != _ETF_IC_FIELDS:
+            _error("preliminary ETF IC cell fields changed")
+        valid = cell.get("valid_ic_date_count")
+        invalid = cell.get("invalid_ic_date_count")
+        accepted = cell.get("accepted_outcome_pair_count")
+        missing = cell.get("missing_outcome_pair_count")
+        if (
+            cell.get("schema") != etf_evaluator.IC_CELL_SCHEMA
+            or cell.get("profile_id") != etf_evaluator.PROFILE_ID
+            or cell.get("horizon_sessions") != horizon
+            or any(
+                type(value) is not int or value < 0
+                for value in (valid, invalid, accepted, missing)
+            )
+            or cell.get("status")
+            != (
+                "PRELIMINARY_DESCRIPTIVE_AVAILABLE"
+                if valid >= 50
+                else "INCONCLUSIVE_UNDERFILLED"
+            )
+            or cell.get("entry_timing") != "next_session_open"
+            or cell.get("benchmark")
+            != "SPY_total_return_adjusted_open_to_open"
+            or cell.get("formal_accept_reject_disposition") is not None
+            or valid + invalid != meta["decision_session_count"]
+        ):
+            _error("preliminary ETF IC cell semantics changed")
+        metrics = (
+            cell.get("mean_daily_spearman_ic"),
+            cell.get("median_daily_spearman_ic"),
+            cell.get("positive_ic_date_share"),
+        )
+        if valid == 0:
+            if any(value is not None for value in metrics):
+                _error("preliminary ETF unavailable IC metrics changed")
+        else:
+            parsed = tuple(
+                _cell_metric(value, "ETF IC metric") for value in metrics
+            )
+            if (
+                not Decimal("-1") <= parsed[0] <= Decimal("1")
+                or not Decimal("-1") <= parsed[1] <= Decimal("1")
+                or not Decimal("0") <= parsed[2] <= Decimal("1")
+            ):
+                _error("preliminary ETF IC metric escaped bounds")
+        ic_cells.append(cell)
+
+    portfolio_cells = []
+    spy_values = set()
+    cumulative_by_cost = {}
+    for cost in etf_evaluator.COST_BPS_SCENARIOS:
+        cell = records.get("ARV2_ETF_PORTFOLIO_COST_" + str(cost))
+        if type(cell) is not dict or set(cell) != _ETF_PORTFOLIO_FIELDS:
+            _error("preliminary ETF portfolio cell fields changed")
+        if (
+            cell.get("schema") != etf_evaluator.PORTFOLIO_CELL_SCHEMA
+            or cell.get("profile_id") != etf_evaluator.PROFILE_ID
+            or cell.get("cost_bps_per_side") != cost
+            or cell.get("primary_cost_scenario")
+            is not (cost == etf_evaluator.PRIMARY_COST_BPS)
+            or cell.get("status")
+            != (
+                "PRELIMINARY_DESCRIPTIVE_AVAILABLE"
+                if (
+                    meta["portfolio_return_session_count"] >= 252
+                    and meta["invested_return_session_count"]
+                    >= etf_evaluator.MINIMUM_INVESTED_RETURN_SESSIONS
+                )
+                else "INCONCLUSIVE_UNDERFILLED"
+            )
+            or cell.get("return_session_count")
+            != meta["portfolio_return_session_count"]
+            or cell.get("invested_return_session_count")
+            != meta["invested_return_session_count"]
+            or cell.get("leverage") is not False
+            or cell.get("orders_submitted") != 0
+            or cell.get("formal_accept_reject_disposition") is not None
+        ):
+            _error("preliminary ETF portfolio cell semantics changed")
+        decimal_names = (
+            "cumulative_return",
+            "spy_cumulative_return",
+            "cumulative_return_minus_spy",
+            "annualized_arithmetic_return",
+            "annualized_volatility",
+            "maximum_drawdown",
+            "average_daily_two_sided_turnover",
+            "average_cash_weight",
+        )
+        parsed = {
+            name: _cell_metric(cell.get(name), "ETF " + name)
+            for name in decimal_names
+        }
+        for name in ("zero_rate_sharpe", "zero_rate_sortino"):
+            value = cell.get(name)
+            parsed[name] = (
+                None
+                if value is None
+                else _cell_metric(value, "ETF " + name)
+            )
+        with localcontext(preliminary_evaluator._context()):
+            exact_excess = +(
+                parsed["cumulative_return"]
+                - parsed["spy_cumulative_return"]
+            )
+        if (
+            parsed["cumulative_return"] <= Decimal("-1")
+            or parsed["spy_cumulative_return"] <= Decimal("-1")
+            or parsed["cumulative_return_minus_spy"]
+            != exact_excess
+            or parsed["annualized_volatility"] < 0
+            or not Decimal("-1") <= parsed["maximum_drawdown"] <= 0
+            or parsed["average_daily_two_sided_turnover"] < 0
+            or not Decimal("0") <= parsed["average_cash_weight"] <= 1
+        ):
+            _error("preliminary ETF portfolio metric escaped bounds")
+        spy_values.add(cell["spy_cumulative_return"])
+        cumulative_by_cost[cost] = parsed["cumulative_return"]
+        portfolio_cells.append(cell)
+    if len(spy_values) != 1 or any(
+        cumulative_by_cost[left] < cumulative_by_cost[right]
+        for left, right in zip(
+            etf_evaluator.COST_BPS_SCENARIOS,
+            etf_evaluator.COST_BPS_SCENARIOS[1:],
+        )
+    ):
+        _error("preliminary ETF cost-scenario ordering changed")
+
+    summary_id = meta.get("summary_id")
+    summary_sha = meta.get("summary_sha256")
+    if type(summary_id) is not str or type(summary_sha) is not str:
+        _error("preliminary ETF summary identity is absent")
+    record = {
+        key: value
+        for key, value in meta.items()
+        if key not in {"summary_id", "summary_sha256"}
+    }
+    record["ic_cells"] = ic_cells
+    record["portfolio_cells"] = portfolio_cells
+    digest = hashlib.sha256(_canonical(record)).hexdigest()
+    if (
+        summary_sha != digest
+        or summary_id != "arv2-etf-sector-baseline-summary-" + digest[:24]
+    ):
+        _error("preliminary ETF evaluator summary identity changed")
+
+
 def _validate_aggregate_records(
     records: Mapping[str, dict[str, object]],
     plan: AcceptedRiskPreliminarySubmissionPlan,
@@ -3146,6 +3599,9 @@ def _validate_aggregate_records(
         _error("preliminary aggregate result inventory changed")
     if profile_id is None:
         _validate_legacy_aggregate_records(records, plan)
+        return
+    if profile_id == etf_evaluator.PROFILE_ID:
+        _validate_etf_aggregate_records(records, plan)
         return
     _validate_regime_aggregate_records(records, plan, profile_id)
 
@@ -3776,6 +4232,10 @@ _seal_action_bindings(
         "_REGIME_RUNTIME_META_FIELDS",
         "_REGIME_CELL_FIELDS",
         "_REGIME_META_FIELDS",
+        "_ETF_RUNTIME_META_FIELDS",
+        "_ETF_META_FIELDS",
+        "_ETF_IC_FIELDS",
+        "_ETF_PORTFOLIO_FIELDS",
         "_CELL_COUNT_FIELDS",
         "_REGIME_MISSING_COUNT_FIELDS",
         "_CELL_METRIC_FIELDS",
@@ -3855,6 +4315,7 @@ _seal_action_bindings(
         "_regime_axis_inventory",
         "_validate_regime_cell_semantics",
         "_validate_regime_aggregate_records",
+        "_validate_etf_aggregate_records",
         "_validate_aggregate_records",
         "_result_receipt_path",
         "_result_authority_bound",
@@ -3874,6 +4335,7 @@ _seal_action_bindings(
         "timezone",
         "Decimal",
         "InvalidOperation",
+        "localcontext",
         "Path",
         "package_builder",
         "projection_builder",
@@ -3881,6 +4343,8 @@ _seal_action_bindings(
         "preliminary_runtime",
         "preliminary_evaluator",
         "regime_evaluator",
+        "etf_evaluator",
+        "etf_runtime",
         "formal",
         "FormalQcTransport",
         "OwnerSignatureAuthority",

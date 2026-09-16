@@ -12,6 +12,7 @@ from pathlib import Path
 from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_preliminary_qc_runtime as runtime_builder
 from . import accepted_risk_regime_rating_evaluator as regime_evaluator
+from . import accepted_risk_etf_baseline_evaluator as etf_evaluator
 
 
 class AcceptedRiskPreliminaryQcProjectionError(ValueError):
@@ -21,7 +22,7 @@ class AcceptedRiskPreliminaryQcProjectionError(ValueError):
 PROJECTION_SCHEMA = "arv2-accepted-risk-preliminary-qc-source-projection-v2"
 SOURCE_SCHEMA = "arv2-accepted-risk-preliminary-qc-source-file-v1"
 MAX_SOURCE_FILE_BYTES = 60_000
-MAX_TOTAL_SOURCE_BYTES = 180_000
+MAX_TOTAL_SOURCE_BYTES = 260_000
 ALGORITHM_START = (2026, 4, 1)
 ALGORITHM_END = (2026, 9, 11)
 PROJECT_SOURCE_PATHS = (
@@ -30,6 +31,15 @@ PROJECT_SOURCE_PATHS = (
     "accepted_risk_regime_rating_evaluator.py",
     "accepted_risk_preliminary_qc_figi.py",
     "accepted_risk_preliminary_qc_runtime.py",
+)
+ETF_PROJECT_SOURCE_PATHS = (
+    "accepted_risk_preliminary_rating_policy.py",
+    "accepted_risk_preliminary_rating_evaluator.py",
+    "accepted_risk_regime_rating_evaluator.py",
+    "accepted_risk_preliminary_qc_figi.py",
+    "accepted_risk_preliminary_qc_runtime.py",
+    "accepted_risk_etf_baseline_evaluator.py",
+    "accepted_risk_etf_baseline_qc_runtime.py",
 )
 MAIN_PROJECT_PATH = "main.py"
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
@@ -54,6 +64,8 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_preliminary_rating_evaluator",
     "accepted_risk_preliminary_rating_policy",
     "accepted_risk_regime_rating_evaluator",
+    "accepted_risk_etf_baseline_evaluator",
+    "accepted_risk_etf_baseline_qc_runtime",
     "collections",
     "collections.abc",
     "dataclasses",
@@ -382,6 +394,12 @@ def _main_source(
     activation_bytes: int,
     evaluation_profile_id: str | None,
 ) -> bytes:
+    if evaluation_profile_id == etf_evaluator.PROFILE_ID:
+        return _etf_main_source(
+            activation_key=activation_key,
+            activation_sha256=activation_sha256,
+            activation_bytes=activation_bytes,
+        )
     source = f'''from AlgorithmImports import *
 from accepted_risk_preliminary_qc_runtime import (
     AcceptedRiskPreliminaryQcDriver,
@@ -432,6 +450,104 @@ class ARV2AcceptedRiskPreliminaryAlgorithm(QCAlgorithm):
     return source.encode("ascii")
 
 
+def _etf_main_source(
+    *,
+    activation_key: str,
+    activation_sha256: str,
+    activation_bytes: int,
+) -> bytes:
+    start = tuple(
+        int(value)
+        for value in etf_evaluator.WARMUP_START_SESSION.split("-")
+    )
+    end = tuple(
+        int(value)
+        for value in etf_evaluator.OUTCOME_MATURITY_END_SESSION.split("-")
+    )
+    source = f'''from AlgorithmImports import *
+from accepted_risk_etf_baseline_evaluator import CANDIDATE_ETFS
+from accepted_risk_etf_baseline_qc_runtime import AcceptedRiskEtfBaselineQcDriver
+
+
+class ARV2AcceptedRiskEtfBaselineAlgorithm(QCAlgorithm):
+    def initialize(self):
+        self.set_time_zone("America/New_York")
+        self.settings.daily_precise_end_time = True
+        self.set_start_date({start[0]}, {start[1]}, {start[2]})
+        self.set_end_date({end[0]}, {end[1]}, {end[2]})
+        self.universe_settings.asynchronous = False
+        self.universe_settings.resolution = Resolution.DAILY
+        benchmark = self.add_equity(
+            "SPY",
+            Resolution.DAILY,
+            fill_forward=False,
+            leverage=1,
+            extended_market_hours=False,
+            data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+        ).symbol
+        self._arv2_etf_symbols = {{}}
+        for ticker in CANDIDATE_ETFS:
+            self._arv2_etf_symbols[ticker] = self.add_equity(
+                ticker,
+                Resolution.DAILY,
+                fill_forward=False,
+                leverage=1,
+                extended_market_hours=False,
+                data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+            ).symbol
+        self._arv2_driver = AcceptedRiskEtfBaselineQcDriver(
+            self,
+            activation_manifest_key={activation_key!r},
+            activation_manifest_sha256={activation_sha256!r},
+            activation_manifest_byte_count={activation_bytes},
+            benchmark_symbol=benchmark,
+            etf_symbols=self._arv2_etf_symbols,
+        )
+        self._arv2_universes = []
+        for ticker in CANDIDATE_ETFS:
+            self._arv2_universes.append(
+                self.add_universe(
+                    self.universe.etf(
+                        self._arv2_etf_symbols[ticker],
+                        self.universe_settings,
+                        self._arv2_filter(ticker),
+                    )
+                )
+            )
+
+    def _arv2_filter(self, ticker):
+        def selection(constituents):
+            return self._arv2_driver.accept_constituents(ticker, constituents)
+        return selection
+
+    def on_data(self, data):
+        self._arv2_driver.on_data(data)
+
+    def on_end_of_algorithm(self):
+        self._arv2_driver.require_completed_at_end()
+'''
+    return source.encode("ascii")
+
+
+def _profile(evaluation_profile_id):
+    if evaluation_profile_id is None:
+        return None
+    if evaluation_profile_id == etf_evaluator.PROFILE_ID:
+        return etf_evaluator.require_etf_baseline_profile(
+            evaluation_profile_id
+        )
+    return regime_evaluator.require_regime_profile(evaluation_profile_id)
+
+
+def project_source_paths_for_profile(evaluation_profile_id):
+    _profile(evaluation_profile_id)
+    return (
+        ETF_PROJECT_SOURCE_PATHS
+        if evaluation_profile_id == etf_evaluator.PROFILE_ID
+        else PROJECT_SOURCE_PATHS
+    )
+
+
 def _validate_source(project_path: str, source: bytes) -> PreliminaryQcSourceFile:
     if (
         type(project_path) is not str
@@ -479,11 +595,7 @@ def build_accepted_risk_preliminary_qc_projection(
     """Bind the compact activation to an exact flat QC source set."""
 
     package = package_builder.require_accepted_risk_preliminary_package(package)
-    profile = (
-        None
-        if evaluation_profile_id is None
-        else regime_evaluator.require_regime_profile(evaluation_profile_id)
-    )
+    profile = _profile(evaluation_profile_id)
     activation = package.upload_objects[-1]
     if (
         activation.role != "activation_manifest"
@@ -495,7 +607,8 @@ def build_accepted_risk_preliminary_qc_projection(
         )
     root = Path(__file__).resolve().parent
     files = []
-    for project_path in PROJECT_SOURCE_PATHS:
+    source_paths = project_source_paths_for_profile(evaluation_profile_id)
+    for project_path in source_paths:
         try:
             source = (root / project_path).read_bytes()
         except OSError as exc:
@@ -576,17 +689,14 @@ def require_accepted_risk_preliminary_qc_projection(
         raise AcceptedRiskPreliminaryQcProjectionError(
             "preliminary QC projection type changed"
         )
-    profile = (
-        None
-        if value.evaluation_profile_id is None
-        else regime_evaluator.require_regime_profile(value.evaluation_profile_id)
-    )
+    profile = _profile(value.evaluation_profile_id)
+    source_paths = project_source_paths_for_profile(value.evaluation_profile_id)
     if (
         value.schema != PROJECTION_SCHEMA
         or type(value.source_files) is not tuple
-        or len(value.source_files) != 6
+        or len(value.source_files) != len(source_paths) + 1
         or tuple(item.project_path for item in value.source_files)
-        != tuple(sorted((*PROJECT_SOURCE_PATHS, MAIN_PROJECT_PATH)))
+        != tuple(sorted((*source_paths, MAIN_PROJECT_PATH)))
         or value.total_source_byte_count
         != sum(item.byte_count for item in value.source_files)
         or value.evaluation_profile_sha256
@@ -659,4 +769,5 @@ __all__ = (
     "build_accepted_risk_preliminary_qc_projection",
     "iter_accepted_risk_preliminary_qc_sources",
     "require_accepted_risk_preliminary_qc_projection",
+    "project_source_paths_for_profile",
 )

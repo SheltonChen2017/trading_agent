@@ -76,7 +76,8 @@ B3_MODULE = PACKAGE / "synthetic_input_transport.py"
 # I/O.
 _PINNED_QC_PACKAGE_SOURCES = tuple(
     """
-    __init__.py accepted_risk_pair_bridge.py
+    __init__.py accepted_risk_etf_baseline_evaluator.py
+    accepted_risk_etf_baseline_qc_runtime.py accepted_risk_pair_bridge.py
     accepted_risk_preliminary_package.py
     accepted_risk_preliminary_qc_figi.py
     accepted_risk_preliminary_qc_projection.py
@@ -129,6 +130,14 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
 
 _ZERO_EXTERNAL_IO_IMPORTS = {
     "__init__.py": (),
+    "accepted_risk_etf_baseline_evaluator.py": tuple(
+        """
+        dataclasses hashlib json re decimal fractions types
+        accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        """.split()
+    ),
     "accepted_risk_pair_bridge.py": tuple(
         """
         __future__ hashlib
@@ -307,6 +316,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator
         """.split()
     ),
     "accepted_risk_preliminary_submission_adapter.py": tuple(
@@ -320,6 +330,8 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
         research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime
         research.analyst_revisions_v2_qc.formal_submission_adapter
         research.analyst_revisions_v2_qc.formal_qc_transport
         research.analyst_revisions_v2_qc.owner_signature_authority
@@ -994,6 +1006,17 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
 }
 
 _QC_RUNTIME_IMPORTS = {
+    "accepted_risk_etf_baseline_qc_runtime.py": tuple(
+        """
+        decimal accepted_risk_etf_baseline_evaluator
+        accepted_risk_preliminary_qc_figi
+        accepted_risk_preliminary_qc_runtime
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime
+        """.split()
+    ),
     "accepted_risk_preliminary_qc_runtime.py": tuple(
         """
         dataclasses gzip hashlib io json math re time datetime decimal types
@@ -1019,6 +1042,10 @@ _QC_RUNTIME_IMPORTS = {
     )
 }
 _QC_RUNTIME_IO_SURFACE = {
+    "accepted_risk_etf_baseline_qc_runtime.py": (
+        "call:open",
+        "call:set_summary_statistic",
+    ),
     "accepted_risk_preliminary_qc_runtime.py": (
         "call:contains_key",
         "call:history",
@@ -2109,6 +2136,10 @@ def _resolved_imports(
 _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
     tuple(line.split())
     for line in """
+research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_etf_baseline_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_preliminary_qc_figi
+research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_preliminary_qc_runtime
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.accepted_risk_input_pair
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.production_input_pipeline
@@ -2251,6 +2282,22 @@ research.analyst_revisions_v2_qc.production_evidence_composer scripts.build_arv2
 
 _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
     {
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
+            "accepted_risk_etf_baseline_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
+            "accepted_risk_preliminary_qc_runtime",
+        ),
         (
             "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime",
             "accepted_risk_preliminary_rating_evaluator",
@@ -2448,6 +2495,8 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
     assert reached == (
         "data.exchange_calendar",
         "research.analyst_revisions_v2_qc",
+        "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
+        "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_pair_bridge",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_package",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi",

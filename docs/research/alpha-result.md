@@ -1785,3 +1785,89 @@ credible benchmark result. At this preregistration snapshot no R-065 through
 R-068 QC project has been created or launched, no result has been read, and
 accounting remains **64 shared looks, 11 ARV2 development evaluations, 23
 infrastructure looks, and a 575-cell lifetime floor**.
+
+## R-065 result and R-066 technical failure — 2026-09-16
+
+R-065 completed in private QuantConnect project `36628077` (backtest
+`e596fea2ac3c9182d63057fbbbf63e7f`) after 47 statistics-free polls. One
+separately signed read authenticated exactly the six preregistered aggregate
+statistics. The plan SHA-256 is
+`57c97a4d61b176654dbd3be5309240a1e3836801bf7428ecdd9b33ee7eba43cb`,
+the aggregate semantic SHA-256 is
+`989d4a671f947a8c52b150ba9a5994b1b15ffe3f23191ac7e7f348c16541a654`,
+and the custom-statistics SHA-256 is
+`eab8ed256005b83cfea3b5a2c97218274b18184b3ab3c69ace420c71bcb9f213`.
+
+| Cost per side | Signal return | Corrected matched return | SPY return | Signal - matched | Signal - SPY | Max drawdown |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +27.1499% | +28.3695% | +94.2074% | -1.2195 pp | -67.0574 pp | -33.9629% |
+| 5 bps | +25.6668% | +27.4429% | +94.2074% | -1.7760 pp | -68.5405 pp | -34.4757% |
+| **10 bps primary** | **+24.2010%** | **+26.5229%** | **+94.2074%** | **-2.3219 pp** | **-70.0064 pp** | **-34.9955%** |
+| 20 bps | +21.3200% | +24.7027% | +94.2074% | -3.3827 pp | -72.8873 pp | -36.0228% |
+
+The signal executes all 261 decisions, is invested for 1,253 of 1,254 return
+sessions, averages 97.9925% gross exposure and 50 selected names, and has
+about 471.86% annualized two-sided turnover. The corrected comparator also
+executes 261 times, rather than freezing after two as in R-064. It remains a
+conservative lower-bound implementation: all 259 post-opening comparator
+decisions are partial, average gross exposure is 95.3203%, 1,247 sessions
+carry at least one stale mark, and 893 membership ends receive zero recovery.
+Those limitations remain visible, but the central attribution result is now
+directionally adverse: the score-selected sleeve underperforms its matched
+all-eligible universe at every frozen cost. No same-window score tuning or
+positive alpha claim follows. The already-preregistered universe diagnostics
+remain descriptive construction tests, not a search for a winning result.
+
+R-066 then created private project `36629203`, compiled, and launched
+backtest `851ebbb854f7b262aa3cf48eb5426ca2`. It reached authenticated
+`Runtime Error` after two statistics-free polls. A bounded diagnostic read
+selected only its terminal error and stack, not statistics, charts, orders or
+provider rows: `constituent-history exact SID mapped weight is below 99%`.
+No result authority or result-read permit was issued and no aggregate value
+was read. The plan SHA-256 is
+`891b27729dec7464547f332e2c1ac108eeb59636a030d07a0632cabf8414830d`
+and terminal-receipt SHA-256 is
+`5c5d5dd3201db7c98326c898865a904b228047c4219c3c4c495b803f00d4ee9c`.
+R-066 therefore consumes shared look **65 -> 66** and development evaluation
+**12 -> 13**, but emits zero cells: the authenticated cell floor stays 579.
+It is immutable and will not be retried under the same identity.
+
+The failure revealed a specification error, not a QuantConnect entitlement or
+API failure. These diagnostics select score-bearing stocks that are members
+of the named ETF; they do not replicate the ETF. Requiring the score-bearing
+input census to cover 99% of the ETF's full weight incorrectly treats ordinary
+out-of-census ETF members as identifier failures. The corrected rule keeps the
+full 0.95-1.05 positive ETF-weight, time, freshness, uniqueness and exact-SID
+checks, then takes the nonempty exact-QC-SID intersection with the authenticated
+score-bearing census. Every selected name is therefore still a point-in-time
+member, while no ETF-replication coverage claim is made.
+
+## R-067, R-068 and R-069 corrected intersection diagnostics (PROSPECTIVE)
+
+The unlaunched R-067 and R-068 v1 projections are superseded before project
+creation. R-067 v2 and R-068 v2 use the corrected intersection rule. R-069 is
+the new technical successor to spent R-066. All three preserve R-065's signal,
+portfolio, comparator, price, cost and output rules, use the same accepted-risk
+Massive input, and remain current-vintage/non-pristine-PIT diagnostics.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-067`; `arv2-eval-stock-qqq-holdings-intersection-qc-006` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2`; `a771718c06854a52b58c9c703e88c7429ecea2e0d09b398f73fd983565992293` | `arv2-preliminary-qc-projection-31ae75cdad1693a93c1727fa`; `31ae75cdad1693a93c1727fa1f91d5819f2f0f7b54dbd9ceee45b049cae4a163`; 7 files, 233,473 total / 59,415 max bytes | looks 66 -> 67; evaluations 13 -> 14; cells 579 -> 583 |
+| `R-068`; `arv2-eval-stock-spy-qqq-intersection-union-qc-007` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2`; `0ba38928df68137f5fcbf224daacea505d805145d8882291384bc4f8a9b19a5b` | `arv2-preliminary-qc-projection-85f87db4615fd46f828a9b18`; `85f87db4615fd46f828a9b18c7ffc0fd189beb69b3f38e04c92cfda526039b17`; 7 files, 233,480 total / 59,415 max bytes | looks 67 -> 68; evaluations 14 -> 15; cells 583 -> 587 |
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1`; `2461aae1e9418a97ebcf2b45ad48f64cb3fc1ce9a44b21bc98567ccc4bae0521` | `arv2-preliminary-qc-projection-935d3980a826f1a0c8dfa041`; `935d3980a826f1a0c8dfa0417bcc568d148fe3fd53a146591b5726ac7a3880b6`; 7 files, 233,184 total / 59,415 max bytes | looks 68 -> 69; evaluations 15 -> 16; cells 587 -> 591 |
+
+R-067 remains a QQQ/Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks;
+R-068 is the exact-SID-deduplicated SPY-plus-QQQ union; R-069 is the SPY/S&P
+500 holdings proxy, not official index membership. Their private projects are
+prospectively `13 ARV2_STOCK_R067_QQQ_2021_2025 - 20260916`, `14
+ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`, and `15
+ARV2_STOCK_R069_SPY_2021_2025 - 20260916`. Their backtest names are `ARV2
+R067 QQQ intersection e9851c2f`, `ARV2 R068 SPY QQQ intersection union
+e9851c2f`, and `ARV2 R069 SPY intersection retry e9851c2f`.
+
+This block is frozen after the R-066 technical error was known but before any
+R-067, R-068 or R-069 project creation, launch or outcome read. The current
+accounting is **66 shared looks, 13 development evaluations, 23 infrastructure
+looks and a 579-cell floor**. The three runs remain descriptive and are not a
+same-window winner-selection exercise. Leverage, formal acceptance,
+deployment, orders, broker access, paper/live state and trading remain closed.

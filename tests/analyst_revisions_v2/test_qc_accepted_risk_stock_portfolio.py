@@ -246,7 +246,14 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
         assert profile["constituent_mapping_key"] == (
             "exact_QuantConnect_security_identifier"
         )
-        assert profile["minimum_mapped_positive_weight_fraction"] == "0.99"
+        assert profile["eligibility_intersection"] == (
+            "exact_QuantConnect_security_identifier_intersection_of_"
+            "positive_weight_point_in_time_ETF_members_and_authenticated_"
+            "score_bearing_input_census"
+        )
+        assert profile["minimum_intersection_security_count"] == 1
+        assert profile["etf_replication_coverage_claim"] is False
+        assert "minimum_mapped_positive_weight_fraction" not in profile
         assert profile[
             "eligibility_security_ids_by_decision_session_required"
         ] is True

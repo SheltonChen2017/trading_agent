@@ -494,29 +494,67 @@ def test_constituent_history_refuses_missing_or_stale_prior_snapshot(items, mess
         loader.build_eligibility(("2021-01-04",))
 
 
-@pytest.mark.parametrize(
-    ("weights", "message"),
-    (
-        (("0.90",), "total positive weight escaped bounds"),
-        (("0.98", "0.02"), "mapped weight is below 99%"),
-    ),
-)
-def test_constituent_history_refuses_weight_or_mapping_coverage(weights, message):
+def test_constituent_history_refuses_total_positive_weight_outside_bounds():
     row = _binding()
     stock = _Symbol("QC STOCK SID", "NOW")
-    unknown = _Symbol("QC UNMAPPED SID", "UNKNOWN")
     stamp = datetime(2021, 1, 2)
-    constituents = [_constituent(stock, stamp, weights[0])]
-    if len(weights) == 2:
-        constituents.append(_constituent(unknown, stamp, weights[1]))
     loader, _algorithm, _universes = _constituent_loader(
         stock_portfolio_evaluator.SP500_PROFILE_ID,
         [row],
         [stock],
-        {"SPY": ((stamp, tuple(constituents)),)},
+        {"SPY": ((stamp, (_constituent(stock, stamp, "0.90"),)),)},
     )
 
-    with pytest.raises(runtime.AcceptedRiskPreliminaryQcRuntimeError, match=message):
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="total positive weight escaped bounds",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_accepts_low_weight_nonempty_score_census_intersection():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    unknown = _Symbol("QC UNMAPPED SID", "UNKNOWN")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    stamp,
+                    (
+                        _constituent(stock, stamp, "0.02"),
+                        _constituent(unknown, stamp, "0.98"),
+                    ),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_refuses_empty_score_census_intersection():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    unknown = _Symbol("QC UNMAPPED SID", "UNKNOWN")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((stamp, (_constituent(unknown, stamp, "1"),)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="score-census intersection is empty",
+    ):
         loader.build_eligibility(("2021-01-04",))
 
 

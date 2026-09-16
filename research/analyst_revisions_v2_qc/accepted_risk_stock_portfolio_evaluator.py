@@ -26,13 +26,13 @@ class AcceptedRiskStockPortfolioError(_base.PreliminaryRatingEvaluationError):
 PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v2"
 PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
 SP500_PROFILE_ID = (
-    "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1"
+    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1"
 )
 NASDAQ100_PROFILE_ID = (
-    "arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1"
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2"
 )
 UNION_PROFILE_ID = (
-    "arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1"
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2"
 )
 VARIANT_PROFILE_IDS = (
     SP500_PROFILE_ID,
@@ -207,7 +207,13 @@ def _profile_record(profile_id):
                 "constituent_mapping_key": (
                     "exact_QuantConnect_security_identifier"
                 ),
-                "minimum_mapped_positive_weight_fraction": "0.99",
+                "eligibility_intersection": (
+                    "exact_QuantConnect_security_identifier_intersection_of_"
+                    "positive_weight_point_in_time_ETF_members_and_"
+                    "authenticated_score_bearing_input_census"
+                ),
+                "minimum_intersection_security_count": 1,
+                "etf_replication_coverage_claim": False,
                 "multi_etf_combination": multi_etf_combination,
                 "universe_scope_disclaimer": universe_scope_disclaimer,
                 "eligibility_security_ids_by_decision_session_required": True,

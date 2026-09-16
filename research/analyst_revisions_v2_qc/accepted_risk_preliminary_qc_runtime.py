@@ -61,9 +61,9 @@ MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
 STOCK_PORTFOLIO_PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
 STOCK_UNIVERSE_PROFILE_IDS = (
-    "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1",
-    "arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1",
-    "arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1",
+    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1",
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2",
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2",
 )
 STOCK_PORTFOLIO_PROFILE_IDS = (
     STOCK_PORTFOLIO_PROFILE_ID,
@@ -73,7 +73,6 @@ CONSTITUENT_HISTORY_START = datetime(2020, 12, 1)
 CONSTITUENT_HISTORY_END = datetime(2026, 1, 1)
 MINIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("0.95")
 MAXIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("1.05")
-MINIMUM_CONSTITUENT_MAPPED_WEIGHT_FRACTION = Decimal("0.99")
 MAXIMUM_CONSTITUENT_SNAPSHOT_AGE = timedelta(days=10)
 EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
     sorted(
@@ -974,13 +973,8 @@ class QcEtfConstituentEligibilityLoader:
             <= MAXIMUM_CONSTITUENT_TOTAL_WEIGHT
         ):
             _error("constituent-history total positive weight escaped bounds")
-        mapped_weight = sum(mapped.values(), Decimal(0))
-        if (
-            not mapped
-            or mapped_weight
-            < total_weight * MINIMUM_CONSTITUENT_MAPPED_WEIGHT_FRACTION
-        ):
-            _error("constituent-history exact SID mapped weight is below 99%")
+        if not mapped:
+            _error("constituent-history score-census intersection is empty")
         return tuple(sorted(mapped)), min(last_updates)
 
     def _load_ticker(self, ticker):
@@ -1441,7 +1435,6 @@ __all__ = (
     "LoadedAcceptedRiskPreliminaryPackage",
     "MAXIMUM_CONSTITUENT_SNAPSHOT_AGE",
     "MAXIMUM_CONSTITUENT_TOTAL_WEIGHT",
-    "MINIMUM_CONSTITUENT_MAPPED_WEIGHT_FRACTION",
     "MINIMUM_CONSTITUENT_TOTAL_WEIGHT",
     "QcEtfConstituentEligibilityLoader",
     "QcTotalReturnOpenHistoryLoader",

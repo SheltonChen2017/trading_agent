@@ -426,37 +426,37 @@ _EVALUATION_RUN_SPECS = (
         579,
     ),
     _EvaluationRunSpec(
-        stock_portfolio_evaluator.SP500_PROFILE_ID,
-        "arv2-eval-stock-spy-holdings-qc-005",
-        "R-066",
-        65,
-        66,
-        12,
-        13,
-        4,
-        579,
-        583,
-    ),
-    _EvaluationRunSpec(
         stock_portfolio_evaluator.NASDAQ100_PROFILE_ID,
-        "arv2-eval-stock-qqq-holdings-qc-006",
+        "arv2-eval-stock-qqq-holdings-intersection-qc-006",
         "R-067",
         66,
         67,
         13,
         14,
         4,
+        579,
         583,
-        587,
     ),
     _EvaluationRunSpec(
         stock_portfolio_evaluator.UNION_PROFILE_ID,
-        "arv2-eval-stock-spy-qqq-union-qc-007",
+        "arv2-eval-stock-spy-qqq-intersection-union-qc-007",
         "R-068",
         67,
         68,
         14,
         15,
+        4,
+        583,
+        587,
+    ),
+    _EvaluationRunSpec(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        "arv2-eval-stock-spy-holdings-intersection-qc-008",
+        "R-069",
+        68,
+        69,
+        15,
+        16,
         4,
         587,
         591,
@@ -601,7 +601,7 @@ def _canonical(value: object) -> bytes:
 
 
 def _stock_portfolio_contract_bindings_are_current() -> bool:
-    """Refuse in-memory weakening of any exact R-065--R-068 contract."""
+    """Refuse in-memory weakening of any exact active stock contract."""
 
     namespace = stock_portfolio_evaluator.__dict__
     if type(namespace) is not dict:

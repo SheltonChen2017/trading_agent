@@ -293,9 +293,14 @@ OUTCOME IS READ: POINT-IN-TIME SPY HOLDINGS AS AN S&P 500 PROXY, POINT-IN-
 TIME QQQ HOLDINGS AS A NASDAQ-100 PROXY, AND THEIR AUTHENTICATED-SECURITY-ID
 UNION. QQQ IS NOT ALL NASDAQ-LISTED STOCKS. ALL FOUR RUNS REMAIN CURRENT-
 VINTAGE/NON-PRISTINE-PIT BECAUSE THEIR MASSIVE-BASED SIGNAL INPUT IS THE
-SAME ACCEPTED-RISK PACKAGE. NONE HAS BEEN LAUNCHED AT THIS PREREGISTRATION
-SNAPSHOT; ACCOUNTING THEREFORE REMAINS 64 SHARED LOOKS, 11 ARV2 DEVELOPMENT
-EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 575-CELL FLOOR. PAPER OR FUNDED
+SAME ACCEPTED-RISK PACKAGE. R-065 COMPLETED AND ITS SCORE-SELECTED SLEEVE
+UNDERPERFORMS THE CORRECTED MATCHED UNIVERSE AT EVERY COST. R-066 THEN FAILED
+ITS OWN 99%-OF-ETF-WEIGHT GUARD WITHOUT A RESULT READ. SECTION 88.10-88.12
+RECORD BOTH DISPOSITIONS, CORRECT THAT GUARD TO THE INTENDED EXACT-SID
+SCORE-CENSUS INTERSECTION, SUPERSEDE THE UNLAUNCHED R-067/R-068 IDENTITIES,
+AND PREREGISTER R-069 AS THE SPY SUCCESSOR. CURRENT ACCOUNTING IS 66 SHARED
+LOOKS, 13 ARV2 DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A
+579-CELL FLOOR. PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
 
@@ -987,7 +992,9 @@ exposure and membership-end rule unchanged. Section 87 is that independent
 Claude review: it accepts both commits, one after a test-only correction that
 genuinely pins the already-correct fifty-holding cap, and identifies the
 candidate's removal of the full cost ladder and three associated result-
-integrity checks. Section 88 counter-reviews both Claude commits. It accepts
+integrity checks. The owner explicitly waives Claude review of section 88
+until this round's three universe runs and single push are complete. Section
+88 counter-reviews both Claude commits. It accepts
 the cap regression, treats the cost-ladder omission as P2 rather than an
 execution/security P1, and corrects it before launch under R-065 v2 by
 restoring the 0/5/10/20-bps cells, cross-cell path invariance, cost
@@ -996,16 +1003,16 @@ three owner-directed 2021-2025 diagnostics before any new outcome read: point-
 in-time SPY holdings as an S&P 500 proxy, point-in-time QQQ holdings as a
 Nasdaq-100 proxy, and their exact-security-ID-deduplicated union. The
 constituent collection and source-vintage timestamps must be available
-strictly before each weekly decision and no more than ten calendar days old;
-each snapshot must carry 95%-105% total positive weight and map at least 99%
-of that weight exactly to authenticated input securities. Each filter applies
-before both ranking and matched-comparator construction. QQQ is not all
-Nasdaq-listed stocks, and all four diagnostics retain the current-vintage/non-
-pristine-PIT Massive signal limitation. The immediate next step is the one
-sequential signed QC sequence R-065 through R-068, followed by one aggregate-
-only read per run and durable result/accounting records. The owner explicitly
-waives Claude review of section 88 before that sequence and directs Claude to
-review the single pushed completed round afterward. Later windows, leverage,
+strictly before each weekly decision and no more than ten calendar days old.
+R-065 completed and the corrected comparator reverses R-064's apparent
+selection advantage: the signal trails matched at all costs. R-066 failed its
+99%-mapping gate before result production. Sections 88.10-88.12 preserve that
+spent failure and replace the invalid ETF-replication coverage condition with
+the intended nonempty exact-SID intersection, while retaining 95%-105% total
+positive ETF weight and every point-in-time/freshness guard. The immediate
+next step is the preregistered sequential R-067 v2, R-068 v2 and R-069 run,
+with one aggregate-only read per successful run and durable accounting. QQQ
+remains a Nasdaq-100 proxy, not all Nasdaq-listed stocks. Later windows, leverage,
 deployment, orders, broker, paper/live, and trading remain closed.
 
 
@@ -15554,3 +15561,71 @@ document gates and `git diff --check` are green. Complete-lane validation, the
 four QC receipts, aggregate-only results, final accounting and the section-5
 handoff row will be appended later in this same round. Nothing in this
 prospective section asserts a positive or negative result.
+
+### 88.10 R-065 result and R-066 terminal disposition
+
+R-065 completed in QC project `36628077`, backtest
+`e596fea2ac3c9182d63057fbbbf63e7f`, after 47 statistics-free polls. One
+signed aggregate read authenticated exactly six custom statistics and four
+cost cells. At the primary ten basis points per side, the signal returned
+**+24.2010%**, the corrected matched universe **+26.5229%**, and SPY
+**+94.2074%**. Signal minus matched is therefore **-2.3219 percentage
+points**, not the positive +3.2435 points reported against R-064's frozen
+comparator. The relation is adverse at all four costs. The signal executes
+261/261 rebalances at 97.9925% mean gross exposure. The corrected comparator
+also executes 261/261, although 259 are partial and it remains conditioned by
+1,247 stale-mark sessions and 893 zero-recovery membership ends. This is
+tangible negative same-window attribution evidence for the exact broad
+construction, not a formal alpha result, and it authorizes no score tuning or
+leverage.
+
+R-066 compiled and launched in project `36629203`, backtest
+`851ebbb854f7b262aa3cf48eb5426ca2`, then reached `Runtime Error` after two
+polls because `constituent-history exact SID mapped weight is below 99%`. A
+bounded diagnostic read selected only that error and stack; it read no result
+statistics, charts, orders, provider rows or security outcomes. No result
+authority or read permit exists. R-066 consumes one shared look and one
+development evaluation but zero cells, so live accounting becomes **66 shared
+looks, 13 development evaluations, 23 infrastructure looks and a 579-cell
+floor**. Its identity and failure are immutable.
+
+### 88.11 Counter-review correction to the constituent scope
+
+`ARV2D88-004` (**P2, corrected under new prospective identities**) — the
+99%-of-total-ETF-weight gate conflated an ETF-replication coverage condition
+with the intended stock-universe intersection. An ETF member absent from the
+authenticated score-bearing census cannot be selected, but its absence does
+not make a selected exact-SID member false. The corrected contract retains
+the 0.95-1.05 total positive snapshot-weight gate and every collection,
+timestamp, `LastUpdate`, uniqueness, freshness and exact reverse-mapping
+check. It then requires a nonempty exact-QC-security-ID intersection between
+positive-weight point-in-time ETF members and authenticated score-bearing
+inputs. It makes no ETF-replication coverage claim. A focused regression
+accepts a valid 2%-weight nonempty intersection; restoring the 99% gate makes
+that case red. A companion case refuses an empty intersection. The three-file
+evaluator/runtime/submission battery is **374 passed in 153.44 seconds**.
+
+Because R-066 was already spent, its SPY successor is R-069. Because R-067
+and R-068 were not launched, their v1 projections are prospectively
+superseded by v2 identities without spending a look. The old R-066/R-067/
+R-068 profile strings are not active submission specs and are isolated by a
+refusal test.
+
+### 88.12 Corrected prospective identities
+
+| Ledger | Profile SHA-256 | Projection SHA-256 | Prospective QC identity | Accounting after successful aggregate read |
+|---|---|---|---|---|
+| `R-067`; `arv2-eval-stock-qqq-holdings-intersection-qc-006` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2`; `a771718c06854a52b58c9c703e88c7429ecea2e0d09b398f73fd983565992293` | `arv2-preliminary-qc-projection-31ae75cdad1693a93c1727fa`; `31ae75cdad1693a93c1727fa1f91d5819f2f0f7b54dbd9ceee45b049cae4a163`; 7 files, 233,473 total / 59,415 max bytes | Project `13 ARV2_STOCK_R067_QQQ_2021_2025 - 20260916`; backtest `ARV2 R067 QQQ intersection e9851c2f` | looks 66 -> 67; evaluations 13 -> 14; cells 579 -> 583 |
+| `R-068`; `arv2-eval-stock-spy-qqq-intersection-union-qc-007` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2`; `0ba38928df68137f5fcbf224daacea505d805145d8882291384bc4f8a9b19a5b` | `arv2-preliminary-qc-projection-85f87db4615fd46f828a9b18`; `85f87db4615fd46f828a9b18c7ffc0fd189beb69b3f38e04c92cfda526039b17`; 7 files, 233,480 total / 59,415 max bytes | Project `14 ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R068 SPY QQQ intersection union e9851c2f` | looks 67 -> 68; evaluations 14 -> 15; cells 583 -> 587 |
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1`; `2461aae1e9418a97ebcf2b45ad48f64cb3fc1ce9a44b21bc98567ccc4bae0521` | `arv2-preliminary-qc-projection-935d3980a826f1a0c8dfa041`; `935d3980a826f1a0c8dfa0417bcc568d148fe3fd53a146591b5726ac7a3880b6`; 7 files, 233,184 total / 59,415 max bytes | Project `15 ARV2_STOCK_R069_SPY_2021_2025 - 20260916`; backtest `ARV2 R069 SPY intersection retry e9851c2f` | looks 68 -> 69; evaluations 15 -> 16; cells 587 -> 591 |
+
+R-067 remains a historical QQQ/Nasdaq-100 holdings proxy, explicitly not all
+Nasdaq-listed stocks. R-068 is the exact-SID union of the SPY and QQQ proxy
+intersections. R-069 is the historical SPY/S&P 500 holdings proxy, not
+official index membership. Every filter precedes both signal ranking and
+matched-comparator construction. These three blocks are frozen after the
+R-066 failure but before any successor project creation, launch, or result
+read. They are descriptive construction diagnostics, not a same-window
+candidate tournament. The accepted-risk Massive limitation, conservative
+price/terminal policies, no-tuning rule and all closed live-trading gates
+remain unchanged.

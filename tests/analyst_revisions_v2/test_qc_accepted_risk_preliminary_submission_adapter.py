@@ -763,16 +763,6 @@ _REGIME_ACCOUNTING = {
 }
 
 _STOCK_UNIVERSE_ACCOUNTING = {
-    stock_portfolio_evaluator.NASDAQ100_PROFILE_ID: (
-        "arv2-eval-stock-qqq-holdings-intersection-qc-006",
-        "R-067",
-        66,
-        67,
-        13,
-        14,
-        579,
-        583,
-    ),
     stock_portfolio_evaluator.UNION_PROFILE_ID: (
         "arv2-eval-stock-spy-qqq-intersection-union-qc-007",
         "R-068",
@@ -780,8 +770,8 @@ _STOCK_UNIVERSE_ACCOUNTING = {
         68,
         14,
         15,
+        579,
         583,
-        587,
     ),
     stock_portfolio_evaluator.SP500_PROFILE_ID: (
         "arv2-eval-stock-spy-holdings-intersection-qc-008",
@@ -790,6 +780,16 @@ _STOCK_UNIVERSE_ACCOUNTING = {
         69,
         15,
         16,
+        583,
+        587,
+    ),
+    stock_portfolio_evaluator.NASDAQ100_PROFILE_ID: (
+        "arv2-eval-stock-qqq-holdings-intersection-qc-009",
+        "R-070",
+        69,
+        70,
+        16,
+        17,
         587,
         591,
     ),
@@ -897,6 +897,7 @@ def test_each_stock_universe_profile_has_its_exact_four_cell_run_spec(
         "arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1",
         "arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1",
         "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r069-v1",
+        "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2",
     ),
 )
 def test_stock_shaped_profile_outside_exact_active_allowlist_refuses(profile_id):

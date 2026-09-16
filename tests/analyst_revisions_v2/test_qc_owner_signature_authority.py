@@ -849,7 +849,20 @@ def _with_closure_values(function, **replacements):
     return clone
 
 
-def _production_signature_runner():
+def _production_signature_attempt_runner():
+    runners = tuple(
+        value
+        for value in _reachable_closure_values(
+            authority.load_formal_execution_owner_signature
+        )
+        if type(value) is FunctionType
+        and value.__name__ == "run_signature_verifier_once"
+    )
+    assert len(runners) == 1
+    return runners[0]
+
+
+def _production_signature_retry_runner():
     runners = tuple(
         value
         for value in _reachable_closure_values(
@@ -1744,7 +1757,7 @@ def test_production_posix_runner_pins_spawn_contract_and_never_kills_after_echil
         raise ChildProcessError("already reaped")
 
     runner = _with_closure_values(
-        _production_signature_runner(),
+        _production_signature_attempt_runner(),
         pipe_file=lambda: next(pipe_pairs),
         set_blocking=lambda *_args: None,
         posix_spawn=fake_spawn,
@@ -1753,10 +1766,7 @@ def test_production_posix_runner_pins_spawn_contract_and_never_kills_after_echil
         waitpid=already_reaped,
         kill=lambda *args: kill_calls.append(args),
     )
-    with pytest.raises(
-        authority.OwnerSignatureAuthorityError,
-        match="detached owner signature verifier was unavailable",
-    ):
+    with pytest.raises(ChildProcessError, match="already reaped"):
         runner(b"payload", b"allowed", b"signature", "namespace")
 
     assert spawn_calls == [
@@ -1791,6 +1801,74 @@ def test_production_posix_runner_pins_spawn_contract_and_never_kills_after_echil
     assert kill_calls == []
 
 
+def test_production_signature_verifier_retries_one_external_reap_with_exact_inputs():
+    expected = (b"payload", b"allowed", b"signature", "namespace")
+    calls = []
+
+    def reaped_once_then_success(*inputs):
+        calls.append(inputs)
+        if len(calls) == 1:
+            raise ChildProcessError("first child was externally reaped")
+
+    runner = _with_closure_values(
+        _production_signature_retry_runner(),
+        run_signature_verifier_once=reaped_once_then_success,
+    )
+    runner(*expected)
+
+    assert calls == [expected, expected]
+
+
+def test_production_signature_verifier_refuses_after_external_reap_retry_exhausted():
+    expected = (b"payload", b"allowed", b"signature", "namespace")
+    calls = []
+
+    def always_reaped(*inputs):
+        calls.append(inputs)
+        raise ChildProcessError("child was externally reaped")
+
+    runner = _with_closure_values(
+        _production_signature_retry_runner(),
+        run_signature_verifier_once=always_reaped,
+    )
+    with pytest.raises(
+        authority.OwnerSignatureAuthorityError,
+        match="detached owner signature verifier was unavailable",
+    ) as failure:
+        runner(*expected)
+
+    assert type(failure.value.__cause__) is ChildProcessError
+    assert calls == [expected, expected]
+
+
+@pytest.mark.parametrize(
+    "message",
+    (
+        "detached owner signature verification failed",
+        "detached owner signature verifier timed out",
+        "trusted ssh-keygen verifier changed during use",
+    ),
+)
+def test_production_signature_verifier_never_retries_typed_refusals(message):
+    expected = (b"payload", b"allowed", b"signature", "namespace")
+    calls = []
+    refusal = authority.OwnerSignatureAuthorityError(message)
+
+    def refuse(*inputs):
+        calls.append(inputs)
+        raise refusal
+
+    runner = _with_closure_values(
+        _production_signature_retry_runner(),
+        run_signature_verifier_once=refuse,
+    )
+    with pytest.raises(authority.OwnerSignatureAuthorityError) as failure:
+        runner(*expected)
+
+    assert failure.value is refusal
+    assert calls == [expected]
+
+
 @POSIX_ONLY
 def test_production_posix_runner_refuses_any_broken_input_stream():
     pipe_pairs = iter(((10, 11), (12, 13), (14, 15)))
@@ -1802,7 +1880,7 @@ def test_production_posix_runner_refuses_any_broken_input_stream():
         return len(view)
 
     runner = _with_closure_values(
-        _production_signature_runner(),
+        _production_signature_attempt_runner(),
         pipe_file=lambda: next(pipe_pairs),
         set_blocking=lambda *_args: None,
         posix_spawn=lambda *_args, **_kwargs: 424242,
@@ -1833,7 +1911,7 @@ def test_production_posix_runner_timeout_is_wall_clock_not_idle_only():
         return (pid, 0) if options == 0 else (0, 0)
 
     runner = _with_closure_values(
-        _production_signature_runner(),
+        _production_signature_attempt_runner(),
         pipe_file=lambda: next(pipe_pairs),
         set_blocking=lambda *_args: None,
         posix_spawn=lambda *_args, **_kwargs: 424242,
@@ -1964,7 +2042,7 @@ def test_sealed_operations_refuse_missing_posix_primitives_at_call_time():
         read_control("/not-opened", 1, "fixture control")
 
     runner = _with_closure_values(
-        _production_closure("run_signature_verifier"), sigkill=None
+        _production_closure("run_signature_verifier_once"), sigkill=None
     )
     with pytest.raises(
         authority.OwnerSignatureAuthorityError,

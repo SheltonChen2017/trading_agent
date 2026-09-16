@@ -298,9 +298,13 @@ UNDERPERFORMS THE CORRECTED MATCHED UNIVERSE AT EVERY COST. R-066 THEN FAILED
 ITS OWN 99%-OF-ETF-WEIGHT GUARD WITHOUT A RESULT READ. SECTION 88.10-88.12
 RECORD BOTH DISPOSITIONS, CORRECT THAT GUARD TO THE INTENDED EXACT-SID
 SCORE-CENSUS INTERSECTION, SUPERSEDE THE UNLAUNCHED R-067/R-068 IDENTITIES,
-AND PREREGISTER R-069 AS THE SPY SUCCESSOR. CURRENT ACCOUNTING IS 66 SHARED
-LOOKS, 13 ARV2 DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A
-579-CELL FLOOR. PAPER OR FUNDED
+AND PREREGISTER R-069 AS THE SPY SUCCESSOR. R-067 THEN COMPLETED, BUT ITS
+ONE-USE RESULT READ ENDED AMBIGUOUSLY AFTER THE READ PERMIT WAS DURABLY
+SPENT AND BEFORE AN AGGREGATE RECEIPT EXISTED. NO RESULT VALUE WAS RETURNED
+OR RECORDED. R-067 IS IMMUTABLY SPENT WITH ZERO NEW CELLS; R-070 IS ITS
+PREREGISTERED QQQ SUCCESSOR. CURRENT ACCOUNTING IS 67 SHARED LOOKS, 14 ARV2
+DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 579-CELL FLOOR.
+PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
 
@@ -1009,10 +1013,18 @@ selection advantage: the signal trails matched at all costs. R-066 failed its
 99%-mapping gate before result production. Sections 88.10-88.12 preserve that
 spent failure and replace the invalid ETF-replication coverage condition with
 the intended nonempty exact-SID intersection, while retaining 95%-105% total
-positive ETF weight and every point-in-time/freshness guard. The immediate
-next step is the preregistered sequential R-067 v2, R-068 v2 and R-069 run,
-with one aggregate-only read per successful run and durable accounting. QQQ
-remains a Nasdaq-100 proxy, not all Nasdaq-listed stocks. Later windows, leverage,
+positive ETF weight and every point-in-time/freshness guard. R-067 then
+reached authenticated `Completed.`, but its one-use result-read permit was
+spent before an aggregate receipt existed and the exact post-permit failure
+phase is not recoverable from local evidence. No statistic or result value was
+persisted or disclosed, so it adds no cells but still consumes its look and
+evaluation. Section 88.13 freezes R-068, R-069 and fresh QQQ successor R-070
+before their launches and adds one bounded local retry only for an exact
+`ChildProcessError` race while verifying an owner signature, before any permit
+is spent. The immediate next step is the preregistered sequential R-068 v2,
+R-069 v1 and R-070 v3 run, with one aggregate-only read per successful run and
+durable accounting. QQQ remains a Nasdaq-100 proxy, not all Nasdaq-listed
+stocks. Later windows, leverage,
 deployment, orders, broker, paper/live, and trading remain closed.
 
 
@@ -15629,3 +15641,59 @@ read. They are descriptive construction diagnostics, not a same-window
 candidate tournament. The accepted-risk Massive limitation, conservative
 price/terminal policies, no-tuning rule and all closed live-trading gates
 remain unchanged.
+
+### 88.13 R-067 disposition, bounded signature retry, and successor freeze
+
+R-067 used the exact preregistered v2 QQQ-intersection projection. It compiled
+and reached authenticated `Completed.` in private project `36630516`, backtest
+`82d7a83ec2b9aad77a65c0a56a10b9b3`, after three statistics-free polls. Its
+submission-plan SHA-256 is
+`8a3e90228911980f002e8f7b84412edc07ad2b09c9b6d58e549f3c0a91ad05e2`,
+launch-receipt SHA-256 is
+`30681dbb8f69c6b491a555d6d06047685ec876147cbd17d4487b43d66b3480bf`,
+and terminal-receipt SHA-256 is
+`ea4cf4089622d617e148681453e40d26cf5f946267a1a4dcccde30bb635ee7e7`.
+
+The first result action refused before a result permit existed when the local
+detached signature verifier was unavailable. A later authenticated attempt
+durably spent result-read permit
+`e4dea6c1d7b23f2c1f487f2456fb2b63556d5560f494c462417bdbda0d54d19b`
+and then locked before any aggregate receipt was written. After the permit,
+the remaining phases are permit reauthentication, capability mint, the sole
+bounded result read, strict aggregate parsing, private receipt persistence and
+registration. Local evidence cannot prove which phase failed or whether the
+one network budget was consumed. The contract explicitly makes that ambiguity
+consume the permit, so R-067 is not read again. No aggregate statistic or
+result value was returned, persisted, interpreted or disclosed. It consumes
+look 67 and development evaluation 14 but adds zero cells: live accounting is
+**67 shared looks, 14 development evaluations, 23 infrastructure looks and a
+579-cell floor**.
+
+`ARV2D88-005` (**P2, corrected prospectively**) — a process-wide `SIGCHLD`
+waiter can reap a successful local signature-verifier child before this lane's
+`waitpid`, producing a direct `ChildProcessError`. Signature verification now
+retries only that exact condition once, with byte-identical authenticated
+inputs and a fresh local process, before any execution or result permit is
+spent. Timeout, spawn/OS, cryptographic, verifier-integrity and every typed
+authority refusal remain one-attempt fail-closed paths; a second external reap
+refuses. Isolated tests prove first-reap-then-success, exhaustion, unchanged
+inputs, no signal to a reaped PID, and no retry of the three typed refusal
+classes. This mitigation does not explain or recover R-067's later
+post-permit ambiguity.
+
+R-068 and R-069 retain the already frozen economic and universe rules. Their
+projection hashes change only because the shared source inventory now binds
+the R-070 QQQ successor and revised accounting. R-070 is a fresh QQQ run
+identity; it is not a retry under R-067's spent permit.
+
+| Ledger | Profile SHA-256 | Projection SHA-256 | Prospective QC identity | Accounting after successful aggregate read |
+|---|---|---|---|---|
+| `R-068`; `arv2-eval-stock-spy-qqq-intersection-union-qc-007` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2`; `0ba38928df68137f5fcbf224daacea505d805145d8882291384bc4f8a9b19a5b` | `arv2-preliminary-qc-projection-e03eb991acce1ebc01b4fdc4`; `e03eb991acce1ebc01b4fdc44fbcaf0c4f50eb90d5eb50c456d2d4285b938a00`; 7 files, 233,480 total / 59,415 max bytes | Project `14 ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R068 SPY QQQ intersection union e9851c2f` | looks 67 -> 68; evaluations 14 -> 15; cells 579 -> 583 |
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1`; `2461aae1e9418a97ebcf2b45ad48f64cb3fc1ce9a44b21bc98567ccc4bae0521` | `arv2-preliminary-qc-projection-54cb25fe96d602fcd0bae047`; `54cb25fe96d602fcd0bae04798286225dbb93980592718b65586a52c3593f25f`; 7 files, 233,184 total / 59,415 max bytes | Project `15 ARV2_STOCK_R069_SPY_2021_2025 - 20260916`; backtest `ARV2 R069 SPY intersection retry e9851c2f` | looks 68 -> 69; evaluations 15 -> 16; cells 583 -> 587 |
+| `R-070`; `arv2-eval-stock-qqq-holdings-intersection-qc-009` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3`; `fd8debc451518a74e426b8c05fb50dc9fc936af2c193b7cbc91040e51e4bfed9` | `arv2-preliminary-qc-projection-d170fa99cfd3c01decc887a7`; `d170fa99cfd3c01decc887a7ce463baf81185545882fe9433c5e72a3b3005361`; 7 files, 233,473 total / 59,415 max bytes | Project `16 ARV2_STOCK_R070_QQQ_2021_2025 - 20260916`; backtest `ARV2 R070 QQQ result retry e9851c2f` | looks 69 -> 70; evaluations 16 -> 17; cells 587 -> 591 |
+
+This table is frozen before any R-068, R-069 or R-070 project creation,
+compile, launch or result read. The three outcomes remain descriptive and
+cannot select a winning same-window universe. No result read may be repeated
+after its one-use permit is spent, and no live, paper, broker, order,
+deployment or trading authority follows from these diagnostics.

@@ -29,7 +29,7 @@ SP500_PROFILE_ID = (
     "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1"
 )
 NASDAQ100_PROFILE_ID = (
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2"
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3"
 )
 UNION_PROFILE_ID = (
     "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2"

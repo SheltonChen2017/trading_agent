@@ -1871,3 +1871,51 @@ accounting is **66 shared looks, 13 development evaluations, 23 infrastructure
 looks and a 579-cell floor**. The three runs remain descriptive and are not a
 same-window winner-selection exercise. Leverage, formal acceptance,
 deployment, orders, broker access, paper/live state and trading remain closed.
+
+## R-067 disposition and R-068/R-069/R-070 successors — 2026-09-16
+
+R-067 used its exact preregistered QQQ-intersection v2 projection. Private
+project `36630516`, backtest `82d7a83ec2b9aad77a65c0a56a10b9b3`, reached
+authenticated `Completed.` after three statistics-free polls. Its plan,
+launch, and terminal SHA-256 values are respectively
+`8a3e90228911980f002e8f7b84412edc07ad2b09c9b6d58e549f3c0a91ad05e2`,
+`30681dbb8f69c6b491a555d6d06047685ec876147cbd17d4487b43d66b3480bf`,
+and `ea4cf4089622d617e148681453e40d26cf5f946267a1a4dcccde30bb635ee7e7`.
+
+The first result action refused before a result permit existed because its
+local detached signature verifier was unavailable. A later authenticated
+attempt durably spent one-use result-read permit
+`e4dea6c1d7b23f2c1f487f2456fb2b63556d5560f494c462417bdbda0d54d19b`
+and then locked before an aggregate receipt existed. Local evidence cannot
+distinguish a pre-read capability failure, the sole bounded result call, strict
+aggregate parsing, or persistence. The permit makes ambiguity consuming and
+forbids retry. No result value or aggregate statistic was returned, persisted,
+or interpreted. R-067 therefore moves shared looks **66 -> 67** and
+development evaluations **13 -> 14**, but adds zero cells: the floor remains
+**579**.
+
+A bounded local correction retries exactly one direct `ChildProcessError`
+from the detached signature verifier once, with byte-identical inputs and a
+fresh process, before a permit is spent. It never retries timeouts,
+spawn/OS/cryptographic/integrity refusals and cannot recover an ambiguous
+post-permit result action. R-070 is therefore a fresh QQQ identity rather than
+a second read of R-067.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-068`; `arv2-eval-stock-spy-qqq-intersection-union-qc-007` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2`; `0ba38928df68137f5fcbf224daacea505d805145d8882291384bc4f8a9b19a5b` | `arv2-preliminary-qc-projection-e03eb991acce1ebc01b4fdc4`; `e03eb991acce1ebc01b4fdc44fbcaf0c4f50eb90d5eb50c456d2d4285b938a00`; 7 files, 233,480 total / 59,415 max bytes | looks 67 -> 68; evaluations 14 -> 15; cells 579 -> 583 |
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1`; `2461aae1e9418a97ebcf2b45ad48f64cb3fc1ce9a44b21bc98567ccc4bae0521` | `arv2-preliminary-qc-projection-54cb25fe96d602fcd0bae047`; `54cb25fe96d602fcd0bae04798286225dbb93980592718b65586a52c3593f25f`; 7 files, 233,184 total / 59,415 max bytes | looks 68 -> 69; evaluations 15 -> 16; cells 583 -> 587 |
+| `R-070`; `arv2-eval-stock-qqq-holdings-intersection-qc-009` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3`; `fd8debc451518a74e426b8c05fb50dc9fc936af2c193b7cbc91040e51e4bfed9` | `arv2-preliminary-qc-projection-d170fa99cfd3c01decc887a7`; `d170fa99cfd3c01decc887a7ce463baf81185545882fe9433c5e72a3b3005361`; 7 files, 233,473 total / 59,415 max bytes | looks 69 -> 70; evaluations 16 -> 17; cells 587 -> 591 |
+
+R-068 is the exact-SID-deduplicated SPY-plus-QQQ holdings-proxy union; R-069
+is the historical SPY/S&P 500 holdings proxy; R-070 is the historical
+QQQ/Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks. Their projects
+are prospectively `14 ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`, `15
+ARV2_STOCK_R069_SPY_2021_2025 - 20260916`, and `16
+ARV2_STOCK_R070_QQQ_2021_2025 - 20260916`. Their backtests are `ARV2 R068 SPY
+QQQ intersection union e9851c2f`, `ARV2 R069 SPY intersection retry
+e9851c2f`, and `ARV2 R070 QQQ result retry e9851c2f`. This block is frozen
+before any of those three project creations or outcome reads. They remain
+descriptive diagnostics, not a winner-selection exercise; leverage, formal
+acceptance, deployment, broker access, orders, paper/live state and trading
+remain closed.

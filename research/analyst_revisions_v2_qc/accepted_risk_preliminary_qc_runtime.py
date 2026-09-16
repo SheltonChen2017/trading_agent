@@ -62,7 +62,7 @@ RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
 STOCK_PORTFOLIO_PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
 STOCK_UNIVERSE_PROFILE_IDS = (
     "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1",
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2",
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3",
     "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2",
 )
 STOCK_PORTFOLIO_PROFILE_IDS = (

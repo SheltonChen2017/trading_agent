@@ -192,6 +192,9 @@ _PINNED_STOCK_PORTFOLIO_COSTS = tuple(
 _PINNED_STOCK_PORTFOLIO_PRIMARY_COST = (
     stock_portfolio_evaluator.PRIMARY_COST_BPS
 )
+_PINNED_STOCK_PORTFOLIO_ANNUALIZATION_SESSIONS = (
+    stock_portfolio_evaluator.ANNUALIZATION_SESSIONS
+)
 _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES = json.dumps(
     _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE(
         _PINNED_STOCK_PORTFOLIO_PROFILE_ID
@@ -355,9 +358,9 @@ _EVALUATION_RUN_SPECS = (
         65,
         11,
         12,
-        1,
+        4,
         575,
-        576,
+        579,
     ),
 )
 
@@ -553,6 +556,14 @@ def _stock_portfolio_contract_bindings_are_current() -> bool:
         type(costs) is not tuple
         or any(type(item) is not int for item in costs)
         or costs != _PINNED_STOCK_PORTFOLIO_COSTS
+    ):
+        return False
+    annualization_sessions = stock_portfolio_evaluator.ANNUALIZATION_SESSIONS
+    if (
+        type(annualization_sessions) is not Decimal
+        or annualization_sessions
+        != _PINNED_STOCK_PORTFOLIO_ANNUALIZATION_SESSIONS
+        or annualization_sessions != Decimal("252")
     ):
         return False
     stock_source_paths = projection_builder.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
@@ -4189,6 +4200,20 @@ def _validate_stock_portfolio_aggregate_records(
         _error("preliminary stock-portfolio target exposure changed")
 
     cells = []
+    spy_values = set()
+    signal_by_cost = {}
+    matched_by_cost = {}
+    signal_annual_by_cost = {}
+    matched_annual_by_cost = {}
+    path_invariants = {
+        name: set()
+        for name in (
+            "average_daily_two_sided_turnover",
+            "average_cash_weight",
+            "matched_average_daily_two_sided_turnover",
+            "matched_average_cash_weight",
+        )
+    }
     if (
         meta["portfolio_return_session_count"] < 252
         or meta["invested_return_session_count"]
@@ -4387,7 +4412,77 @@ def _validate_stock_portfolio_aggregate_records(
             or not 0 <= parsed["matched_average_cash_weight"] <= 1
         ):
             _error("preliminary stock-portfolio metric escaped bounds")
+        spy_values.add(cell["spy_cumulative_return"])
+        for name in path_invariants:
+            path_invariants[name].add(cell[name])
+        signal_by_cost[cost] = parsed["cumulative_return"]
+        matched_by_cost[cost] = parsed[
+            "matched_eligible_stock_cumulative_return"
+        ]
+        signal_annual_by_cost[cost] = parsed[
+            "annualized_arithmetic_return"
+        ]
+        matched_annual_by_cost[cost] = parsed[
+            "matched_annualized_arithmetic_return"
+        ]
         cells.append(cell)
+
+    if len(spy_values) != 1 or any(
+        len(values) != 1 for values in path_invariants.values()
+    ):
+        _error("preliminary stock-portfolio cost path invariance changed")
+    signal_turnover = _cell_metric(
+        next(iter(path_invariants["average_daily_two_sided_turnover"])),
+        "stock portfolio average_daily_two_sided_turnover",
+    )
+    matched_turnover = _cell_metric(
+        next(
+            iter(
+                path_invariants[
+                    "matched_average_daily_two_sided_turnover"
+                ]
+            )
+        ),
+        "stock portfolio matched_average_daily_two_sided_turnover",
+    )
+    with localcontext(preliminary_evaluator._context()):
+        for cost in _PINNED_STOCK_PORTFOLIO_COSTS:
+            expected_signal_annual = +(
+                signal_annual_by_cost[0]
+                - Decimal(cost)
+                / Decimal(10000)
+                * signal_turnover
+                * _PINNED_STOCK_PORTFOLIO_ANNUALIZATION_SESSIONS
+            )
+            expected_matched_annual = +(
+                matched_annual_by_cost[0]
+                - Decimal(cost)
+                / Decimal(10000)
+                * matched_turnover
+                * _PINNED_STOCK_PORTFOLIO_ANNUALIZATION_SESSIONS
+            )
+            if (
+                abs(
+                    signal_annual_by_cost[cost]
+                    - expected_signal_annual
+                )
+                > Decimal("1e-40")
+                or abs(
+                    matched_annual_by_cost[cost]
+                    - expected_matched_annual
+                )
+                > Decimal("1e-40")
+            ):
+                _error("preliminary stock-portfolio cost arithmetic changed")
+    if any(
+        signal_by_cost[left] < signal_by_cost[right]
+        or matched_by_cost[left] < matched_by_cost[right]
+        for left, right in zip(
+            _PINNED_STOCK_PORTFOLIO_COSTS,
+            _PINNED_STOCK_PORTFOLIO_COSTS[1:],
+        )
+    ):
+        _error("preliminary stock-portfolio cost monotonicity changed")
 
     summary_id = meta.get("summary_id")
     summary_sha = meta.get("summary_sha256")
@@ -5032,6 +5127,7 @@ _seal_action_bindings(
         "_PINNED_STOCK_PORTFOLIO_MINIMUM_INVESTED_RETURNS",
         "_PINNED_STOCK_PORTFOLIO_COSTS",
         "_PINNED_STOCK_PORTFOLIO_PRIMARY_COST",
+        "_PINNED_STOCK_PORTFOLIO_ANNUALIZATION_SESSIONS",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_BYTES",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_SHA256",
         "_PINNED_STOCK_PORTFOLIO_RESULT_NAMES",

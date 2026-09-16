@@ -152,7 +152,11 @@ def _complete(
 def test_profile_freezes_one_mathematically_consistent_stock_rule():
     profile = subject.require_stock_portfolio_profile(subject.PROFILE_ID)
     digest = profile.pop("profile_sha256")
+    assert subject.PROFILE_ID == "arv2-stock-long-only-2021-2025-r065-v2"
     assert subject._sha(profile) == digest
+    assert digest == (
+        "39773415f5d936166b3a224a5e26c55e4dc20a7e8052fb65c796f9fd3ce65678"
+    )
     assert profile["selection"] == (
         "top_decile_of_resolvable_score_bearing_universe_capped_at_50_"
         "ordered_by_score_then_security_id_without_absolute_score_gate"
@@ -164,7 +168,7 @@ def test_profile_freezes_one_mathematically_consistent_stock_rule():
         "retain_residual_cash_and_label_every_result_cell"
     )
     assert profile["cash_return"] == "0"
-    assert profile["cost_bps_per_side"] == [10]
+    assert profile["cost_bps_per_side"] == [0, 5, 10, 20]
     assert profile["account_wide_stale_rebalance_deferral"] is False
     assert profile["stale_position_turnover"] == (
         "excluded_until_current_price_is_available"
@@ -365,7 +369,7 @@ def test_one_refused_sector_is_excluded_without_forcing_every_other_sector_to_ca
     assert runtime._sector_refused_decision_count == 1
 
 
-def test_completed_stock_portfolio_is_aggregate_only_and_primary_cost_only():
+def test_completed_stock_portfolio_is_aggregate_only_and_cost_ordered():
     runtime = _complete(_input())
     summary = runtime.aggregate_summary()
     statistics = runtime.custom_summary_statistics()
@@ -414,9 +418,19 @@ def test_completed_stock_portfolio_is_aggregate_only_and_primary_cost_only():
         *subject.expected_custom_summary_statistic_names(),
     )
     cells = summary["portfolio_cells"]
-    assert len(cells) == 1
-    assert cells[0]["cost_bps_per_side"] == subject.PRIMARY_COST_BPS
-    assert cells[0]["primary_cost_scenario"] is True
+    assert [cell["cost_bps_per_side"] for cell in cells] == [0, 5, 10, 20]
+    assert [
+        cell["cost_bps_per_side"]
+        for cell in cells
+        if cell["primary_cost_scenario"] is True
+    ] == [subject.PRIMARY_COST_BPS]
+    returns = [Decimal(cell["cumulative_return"]) for cell in cells]
+    matched_returns = [
+        Decimal(cell["matched_eligible_stock_cumulative_return"])
+        for cell in cells
+    ]
+    assert returns == sorted(returns, reverse=True)
+    assert matched_returns == sorted(matched_returns, reverse=True)
     assert Decimal(cells[0]["cumulative_return"]) > 0
     for cell in cells:
         with localcontext(base._context()):
@@ -634,10 +648,6 @@ def test_partial_rebalance_locks_exact_drifted_weight_and_trades_only_remainder(
             abs(expected_unlocked - expected_tradable_pretrade)
             + expected_unlocked
         )
-        expected_net_return = +(
-            Decimal("0.04")
-            - Decimal("0.001") * expected_turnover
-        )
     assert executed_gross == subject.TARGET_GROSS_EXPOSURE
     assert account.weights == {
         stale: expected_locked,
@@ -650,7 +660,13 @@ def test_partial_rebalance_locks_exact_drifted_weight_and_trades_only_remainder(
         newcomer: Decimal("100"),
     }
     assert account.turnover_sum == expected_turnover
-    assert account.accumulators[10].returns == [expected_net_return]
+    for cost in subject.COST_BPS_SCENARIOS:
+        with localcontext(base._context()):
+            expected_net_return = +(
+                Decimal("0.04")
+                - Decimal(cost) / Decimal(10000) * expected_turnover
+            )
+        assert account.accumulators[cost].returns == [expected_net_return]
     assert account.partial_rebalance_decision_count == 1
     assert account.stale_position_deferral_count == 1
     assert account.locked_gross_sum_at_partial_decisions == expected_locked

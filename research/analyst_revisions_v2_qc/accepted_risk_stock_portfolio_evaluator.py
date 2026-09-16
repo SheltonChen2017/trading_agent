@@ -24,7 +24,7 @@ class AcceptedRiskStockPortfolioError(_base.PreliminaryRatingEvaluationError):
 
 
 PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v2"
-PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v1"
+PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
 CONTRACT_ID = "arv2-accepted-risk-stock-portfolio-v2"
 SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v4"
 PORTFOLIO_CELL_SCHEMA = "arv2-accepted-risk-stock-portfolio-cell-v2"
@@ -39,7 +39,7 @@ MAXIMUM_HOLDINGS = 50
 TARGET_GROSS_EXPOSURE = Decimal("0.98")
 STOCK_WEIGHT_CAP = TARGET_GROSS_EXPOSURE / Decimal(MAXIMUM_HOLDINGS)
 PRIMARY_COST_BPS = 10
-COST_BPS_SCENARIOS = (PRIMARY_COST_BPS,)
+COST_BPS_SCENARIOS = (0, 5, PRIMARY_COST_BPS, 20)
 MINIMUM_INVESTED_RETURN_SESSIONS = 50
 ANNUALIZATION_SESSIONS = Decimal("252")
 

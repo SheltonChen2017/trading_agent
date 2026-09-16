@@ -1019,7 +1019,7 @@ def test_projection_binds_stock_portfolio_profile_and_only_its_extra_module(
                 "import accepted_risk_preliminary_qc_runtime as runtime; "
                 "names = runtime.expected_custom_summary_statistic_names("
                 f"{stock_portfolio_evaluator.PROFILE_ID!r}); "
-                "assert len(names) == 3; "
+                    "assert len(names) == 6; "
                 "assert 'ARV2_RUNTIME_META' in names"
             ),
         ),
@@ -1630,7 +1630,7 @@ def test_runtime_result_inventory_is_exact_for_stock_portfolio_profile():
     expected = runtime.expected_custom_summary_statistic_names(
         stock_portfolio_evaluator.PROFILE_ID
     )
-    assert len(expected) == 3
+    assert len(expected) == 6
     assert set(expected) == {
         *stock_portfolio_evaluator.expected_custom_summary_statistic_names(),
         runtime.RUNTIME_META_STATISTIC,
@@ -1865,7 +1865,7 @@ def test_driver_emits_stock_portfolio_runtime_metadata():
 
     driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
 
-    assert len(algorithm.statistics) == 3
+    assert len(algorithm.statistics) == 6
     meta = json.loads(dict(algorithm.statistics)[runtime.RUNTIME_META_STATISTIC])
     assert meta["schema"] == (
         "arv2-accepted-risk-stock-portfolio-qc-runtime-meta-v1"

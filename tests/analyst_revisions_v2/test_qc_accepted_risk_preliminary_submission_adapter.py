@@ -474,10 +474,20 @@ def _stock_portfolio_aggregate_statistics(
             "conditioned_on_stale_mark_path" if proxy else "no_price_proxy"
         )
     )
-    signal_returns = {10: "0.08"}
-    matched_returns = {10: "0.03"}
-    signal_annual = {10: "0.00992"}
-    matched_annual = {10: "0.00144"}
+    signal_returns = {0: "0.10", 5: "0.09", 10: "0.08", 20: "0.06"}
+    matched_returns = {0: "0.05", 5: "0.04", 10: "0.03", 20: "0.01"}
+    signal_annual = {
+        0: "0.02",
+        5: "0.01496",
+        10: "0.00992",
+        20: "-0.00016",
+    }
+    matched_annual = {
+        0: "0.009",
+        5: "0.00522",
+        10: "0.00144",
+        20: "-0.00612",
+    }
     cells = []
     statistics = {}
     for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS:
@@ -508,7 +518,7 @@ def _stock_portfolio_aggregate_statistics(
             "annualized_arithmetic_return": signal_annual[cost],
             "annualized_volatility": "0.10",
             "zero_rate_sharpe": str(Decimal(signal_annual[cost]) / Decimal("0.10")),
-            "zero_rate_sortino": "0.30",
+            "zero_rate_sortino": "-0.30" if cost == 20 else "0.30",
             "maximum_drawdown": "-0.08",
             "average_daily_two_sided_turnover": "0.04",
             "average_cash_weight": "0.02",
@@ -517,7 +527,7 @@ def _stock_portfolio_aggregate_statistics(
             "matched_zero_rate_sharpe": str(
                 Decimal(matched_annual[cost]) / Decimal("0.09")
             ),
-            "matched_zero_rate_sortino": "0.16",
+            "matched_zero_rate_sortino": "-0.16" if cost == 20 else "0.16",
             "matched_maximum_drawdown": "-0.07",
             "matched_average_daily_two_sided_turnover": "0.03",
             "matched_average_cash_weight": "0",
@@ -766,14 +776,21 @@ def test_stock_portfolio_profile_has_one_exact_r065_look_budget(stock_portfolio_
     )
 
     assert spec.ledger_entry_id == "R-065"
-    assert spec.cell_count == 1
+    assert spec.cell_count == 4
     assert accounting["run_level_looks_before"] == 64
     assert accounting["planned_run_level_looks_after_launch"] == 65
     assert accounting["arv2_development_evaluations_before"] == 11
     assert accounting["planned_arv2_development_evaluations_after_launch"] == 12
     assert accounting["lifetime_alpha_cell_floor_before"] == 575
-    assert result_accounting["lifetime_alpha_cell_floor_after"] == 576
-    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 3
+    assert result_accounting["lifetime_alpha_cell_floor_after"] == 579
+    assert stock_portfolio_plan.expected_custom_statistic_names == (
+        "ARV2_RUNTIME_META",
+        "ARV2_STOCK_PORTFOLIO_COST_0",
+        "ARV2_STOCK_PORTFOLIO_COST_10",
+        "ARV2_STOCK_PORTFOLIO_COST_20",
+        "ARV2_STOCK_PORTFOLIO_COST_5",
+        "ARV2_STOCK_PORTFOLIO_META",
+    )
 
 
 @pytest.mark.parametrize(
@@ -963,12 +980,15 @@ def test_stock_portfolio_validator_accepts_disclosed_locked_gross_over_target(
     statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
         "ascii"
     )
-    cell_name = "ARV2_STOCK_PORTFOLIO_COST_10"
-    cell = json.loads(statistics[cell_name])
-    cell["status"] = "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
-    cell["return_metric_conditioning"] = "conditioned_on_stale_mark_path"
-    cell["risk_metrics_are_price_proxy_conditioned"] = True
-    statistics[cell_name] = _canonical(cell).decode("ascii")
+    for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS:
+        cell_name = "ARV2_STOCK_PORTFOLIO_COST_" + str(cost)
+        cell = json.loads(statistics[cell_name])
+        cell["status"] = (
+            "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
+        )
+        cell["return_metric_conditioning"] = "conditioned_on_stale_mark_path"
+        cell["risk_metrics_are_price_proxy_conditioned"] = True
+        statistics[cell_name] = _canonical(cell).decode("ascii")
     _rehash_stock_portfolio_summary(statistics)
 
     _validate_statistics(stock_portfolio_plan, statistics)
@@ -1083,6 +1103,86 @@ def test_stock_portfolio_validator_isolates_partial_rebalance_invariants(
         _validate_statistics(stock_portfolio_plan, statistics)
 
 
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("spy_cumulative_return", "0.21"),
+        ("average_daily_two_sided_turnover", "0.05"),
+        ("average_cash_weight", "0.03"),
+        ("matched_average_daily_two_sided_turnover", "0.04"),
+        ("matched_average_cash_weight", "0.01"),
+    ),
+)
+def test_stock_portfolio_validator_refuses_cross_cell_path_mutation(
+    stock_portfolio_plan, field, value
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_20"
+    cell = json.loads(statistics[cell_name])
+    cell[field] = value
+    if field == "spy_cumulative_return":
+        cell["cumulative_return_minus_spy"] = "-0.15"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cost path invariance changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize("account", ("signal", "matched"))
+def test_stock_portfolio_validator_refuses_nonmonotone_cost_return(
+    stock_portfolio_plan, account
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_20"
+    cell = json.loads(statistics[cell_name])
+    if account == "signal":
+        cell["cumulative_return"] = "0.081"
+        cell["cumulative_return_minus_matched"] = "0.071"
+        cell["cumulative_return_minus_spy"] = "-0.119"
+    else:
+        cell["matched_eligible_stock_cumulative_return"] = "0.031"
+        cell["cumulative_return_minus_matched"] = "0.029"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cost monotonicity changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize("account", ("signal", "matched"))
+def test_stock_portfolio_validator_refuses_wrong_closed_form_cost_arithmetic(
+    stock_portfolio_plan, account
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_20"
+    cell = json.loads(statistics[cell_name])
+    if account == "signal":
+        cell["annualized_arithmetic_return"] = "0.03"
+        cell["annualized_volatility"] = "0.10"
+        cell["zero_rate_sharpe"] = "0.3"
+        cell["zero_rate_sortino"] = "0.3"
+    else:
+        cell["matched_annualized_arithmetic_return"] = "0.03"
+        cell["matched_annualized_volatility"] = "0.10"
+        cell["matched_zero_rate_sharpe"] = "0.3"
+        cell["matched_zero_rate_sortino"] = "0.3"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cost arithmetic changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
 def test_stock_portfolio_runtime_slice_ceiling_is_isolated(
     stock_portfolio_plan,
 ):
@@ -1098,15 +1198,19 @@ def test_stock_portfolio_runtime_slice_ceiling_is_isolated(
         _validate_statistics(stock_portfolio_plan, statistics)
 
 
+@pytest.mark.parametrize(
+    ("name", "value"),
+    (
+        ("MINIMUM_INVESTED_RETURN_SESSIONS", 0),
+        ("COST_BPS_SCENARIOS", (10,)),
+        ("ANNUALIZATION_SESSIONS", Decimal("251")),
+    ),
+)
 def test_stock_contract_constant_mutation_refuses_before_network(
-    stock_portfolio_plan, monkeypatch
+    stock_portfolio_plan, monkeypatch, name, value
 ):
     backend = _Backend(stock_portfolio_plan)
-    monkeypatch.setattr(
-        stock_portfolio_evaluator,
-        "MINIMUM_INVESTED_RETURN_SESSIONS",
-        0,
-    )
+    monkeypatch.setattr(stock_portfolio_evaluator, name, value)
 
     with pytest.raises(
         adapter.AcceptedRiskPreliminarySubmissionError,
@@ -1122,7 +1226,7 @@ def test_stock_contract_constant_mutation_refuses_before_network(
     assert not any(stock_portfolio_plan.control_directory.iterdir())
 
 
-def test_stock_contract_real_action_guard_accepts_clean_three_name_inventory(
+def test_stock_contract_real_action_guard_accepts_clean_six_name_inventory(
     stock_portfolio_plan,
 ):
     cells = dict(
@@ -1139,7 +1243,7 @@ def test_stock_contract_real_action_guard_accepts_clean_three_name_inventory(
         stock_portfolio_plan.expected_custom_statistic_names
     )
     assert "ARV2_RUNTIME_META" in stock_portfolio_plan.expected_custom_statistic_names
-    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 3
+    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 6
 
 
 def test_stock_contract_callable_reentry_refuses_before_side_effect(
@@ -1998,7 +2102,7 @@ def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(
     assert terminal.terminal_status == "Completed."
     assert backend.events.count("backtests/create") == 1
     assert backend.events.count("backtests/read") == 1
-    assert len(result.custom_statistics) == 3
+    assert len(result.custom_statistics) == 6
     assert result.custom_statistics == recovered_result.custom_statistics
     assert result_permit.permit_sha256 == recovered_permit.permit_sha256
     receipt = json.loads(result.persisted_path.read_bytes())
@@ -2006,7 +2110,7 @@ def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(
     assert accounting["shared_look_ledger_entry_id"] == "R-065"
     assert accounting["run_level_looks_after"] == 65
     assert accounting["arv2_development_evaluations_after"] == 12
-    assert accounting["lifetime_alpha_cell_floor_after"] == 576
+    assert accounting["lifetime_alpha_cell_floor_after"] == 579
 
 
 def test_regime_offline_submission_reads_only_its_eighteen_statistics(regime_plan):

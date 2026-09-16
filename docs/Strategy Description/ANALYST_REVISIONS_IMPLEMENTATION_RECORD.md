@@ -254,30 +254,30 @@ AND R-059 (2013-2019). ALL 48 CELLS ARE DESCRIPTIVELY AVAILABLE AND EVERY
 MEAN IC IS POSITIVE; R-059 HAS 1,072 VALID AND 690 INVALID DATES PER CELL,
 WITH ITS VALID IC EVIDENCE BEGINNING 2015-09-29. THESE ARE SMALL,
 REGIME-DEPENDENT STOCK-RANKING ASSOCIATIONS, NOT ECONOMIC PORTFOLIO RETURNS.
-THE OWNER THEN AUTHORIZED THE ETF PHASE BEFORE LATER CLIENT REVIEW.
-SECTIONS 80-82 IMPLEMENT AND RECORD THE UNLEVERED ETF BASELINE: R-060
-FAILED TECHNICALLY BEFORE AN OUTCOME READ; THE SAME-RULE R-061 RETRY
-COMPLETED AND OPENED ITS NINE AGGREGATE STATISTICS ONCE. ITS 358 INVESTED
-SESSIONS PASS THE TANGIBLE-EVIDENCE GATE, BUT THE PRIMARY 10-BPS PORTFOLIO
-RETURN IS -2.38%, VERSUS SPY +91.50%, WITH 94.11% AVERAGE CASH. CLAUDE
-REVIEW OF THE EXACT `9094aea..HEAD` ETF RANGE AND CODEX COUNTER-REVIEW ARE
-THE NEXT GATE. THE PRE-PUSH AUDIT IDENTIFIED A P2: THE IC MINIMUM OF
-FIVE ELIGIBLE ETFS ALSO FORCES THE PORTFOLIO TO CASH, AN EXTRA CONDITION
-ABSENT FROM THE BLUEPRINT'S PORTFOLIO RULE. THIS AND THE ZERO-YIELD CASH
-CONVENTION LIMIT THE HISTORICAL R-061 ECONOMIC CONCLUSION. THE OWNER
-DIRECTS A LOCAL, SEPARATELY IDENTIFIED ADMISSION CORRECTION BEFORE THE
-SINGLE PUSH; AFTER CLAUDE REVIEW AND CODEX COUNTER-REVIEW, THE NEXT
-IMPLEMENTATION IS A DIRECT-STOCK ECONOMIC TEST USING THE EXISTING SIGNAL.
-NO FURTHER ETF OR LEVERAGE RUN IS LAUNCHED IN THIS CLOSING ROUND.
-PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN
-CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.
 THE INDEPENDENT CLAUDE REVIEW OF THE FIXED-WINDOW AND ETF RANGE (SECTION 83)
-ACCEPTS ALL NINE COMMITS, CONFIRMS ALL SIX SECTION-77 FINDINGS AGAINST SECTION
-76, AND RECORDS THAT R-061'S THREE REPORTED ETF INFORMATION COEFFICIENTS ARE
-NOT DISTINGUISHABLE FROM ZERO: WITH A FIVE-NAME IC FLOOR AND OVERLAPPING
-WINDOWS, THE REPORTED 0.070551 AT H60 SITS UNDER ONE STANDARD ERROR FROM ZERO.
-NO ALPHA IS CLAIMED, THE UNLEVERED ETF BASELINE IS NEGATIVE AFTER COSTS, AND
-EVERY LATER GATE REMAINS CLOSED.**
+ACCEPTS ALL NINE COMMITS AND RECORDS THAT R-061'S THREE ETF INFORMATION
+COEFFICIENTS ARE NOT DISTINGUISHABLE FROM ZERO. SECTION 84 COUNTER-REVIEWS
+THAT RECORD AND IMPLEMENTS THE OWNER-DIRECTED DIRECT-STOCK ECONOMIC TEST.
+R-062 FAILED ONLY BECAUSE ONE QC CUSTOM STATISTIC EXCEEDED THE FROZEN
+4,096-CHARACTER LIMIT. R-063 COMPLETED AFTER COMPACTING THAT ENVELOPE, BUT
+ITS ONE-USE RESULT READ REFUSED A 28-DIGIT-VERSUS-50-DIGIT DERIVED-VALUE
+MISMATCH AND DISCLOSED NO RETURN. R-064 CORRECTED THAT EXACT-ARITHMETIC SEAM,
+COMPLETED IN PRIVATE QC PROJECT `36610457`, AND OPENED EXACTLY SIX AGGREGATE
+STATISTICS ONCE. THE PORTFOLIO IS TANGIBLE: 1,253 OF 1,254 RETURN SESSIONS
+ARE INVESTED, AVERAGE GROSS EXPOSURE IS 97.99%, AND AVERAGE HOLDINGS ARE
+49.99. AT THE PRIMARY 10-BPS COST IT RETURNS +24.20% CUMULATIVELY, VERSUS
+SPY +94.21%, WITH A 0.304 SHARPE AND -35.00% MAXIMUM DRAWDOWN. THE MATCHED
+COMPARATOR'S +20.96% IS HEAVILY CONDITIONED BY 1,247 STALE-MARK SESSIONS AND
+585 ZERO-RECOVERY EXITS, SO THE POSITIVE SIGNAL-MINUS-MATCHED DIFFERENCE IS
+NOT CLEAN ALPHA EVIDENCE. THE RESULT IS PROFITABLE BUT NOT BENCHMARK-
+COMPETITIVE, REMAINS PRELIMINARY/CURRENT-VINTAGE/NON-PRISTINE-PIT, AND DOES
+NOT UNLOCK LEVERAGE. ACCOUNTING IS 64 SHARED LOOKS, 11 ARV2 DEVELOPMENT
+EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 575-CELL LIFETIME FLOOR. CLAUDE'S
+INDEPENDENT REVIEW OF SECTION 84 AND THE EXACT PUSHED RANGE IS NEXT. CODEX
+THEN COUNTER-REVIEWS EVERY CLAUDE COMMIT AND, USING THE REVIEW AND R-064
+EVIDENCE, EITHER REVISES THE ECONOMIC CONSTRUCTION OR PREREGISTERS THE NEXT
+BOUNDED QC DIAGNOSTIC. PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS,
+TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -930,34 +930,34 @@ has positive mean and median IC, but the preliminary metrics remain explicitly
 conditioned on observed security and benchmark endpoint prices; no terminal
 payoff or portfolio return is inferred.
 
-Section 80 preregistered the bounded R-060 unlevered ETF baseline and its exact
-all-cash, IC-census, H1-holdings, look-through-cap, overlap-cluster, drift-
-turnover, coverage, and aggregate-result guards. Section 81 records R-060's
-immediate technical runtime failure before any outcome read: a constituent-
-only QC Slice advanced the strict daily evaluator before the same-date equity
-TradeBars arrived; the owner explicitly waives Claude review of section 81
-before its same-rule R-061 retry. Section 82 records R-061's authenticated
-completion and nine-statistic aggregate read. The tangible-evidence gate
-passes, but the primary 10-bps portfolio loses 2.38% while SPY gains 91.50%,
-and average market exposure is only 5.89%. Claude will review section 82 and
-the exact `9094aea..HEAD` ETF range next; Codex then counter-reviews every
-review commit. The owner directs the portfolio-admission correction in this
-closing round, followed by one push, Claude review, and Codex counter-review.
-Only then does the next implementation move toward an individual-stock
-portfolio using the existing signal and accepted-risk data, followed by its
-backtest. The supplied updated strategy is an assessed proposal, not a
-wholesale replacement of the frozen scoring model. No further ETF or
-leveraged run is part of this closing round. No deployment, order, broker,
-paper/live, or trading action is authorized.
+Sections 80-82 preregister and record the R-060/R-061 unlevered ETF baseline.
+R-060 failed technically before an outcome read; R-061 completed, but its
+primary 10-bps portfolio lost 2.38% while SPY gained 91.50% and it averaged
+94.11% cash. Section 83 is Claude's independent acceptance of the fixed-window
+and ETF range. It also records that the three ETF IC estimates are not
+distinguishable from zero under the applicable five-name and overlap limits.
 
-Section 83 is the independent Claude review of `82897d7..d34bb5f`; section 84
-records Codex's counter-review corrections and freezes the direct-stock R062
-profile before outcomes. The owner explicitly waives Claude review of section
-84 only through the one R062 launch and its bounded aggregate-result append,
-then requires the usual single push and independent Claude review. The
-immediate next step is the owner-waived R062 execution under section 84; no
-other outcome run, leverage, deployment, order, broker, paper/live, or trading
-action is opened by that waiver.
+Section 84 counter-reviews that record and implements the direct-stock
+economic path. R-062 failed on QC's 4,096-character custom-statistic limit and
+had no result read. R-063 corrected the envelope and reached `Completed.`, but
+its one-use read refused a derived Decimal-precision mismatch and disclosed no
+return. R-064 corrected that exact seam under a new prospective identity,
+reached `Completed.` in project `36610457`, and authenticated six aggregate
+statistics once. It is invested on 1,253 of 1,254 sessions at 97.99% average
+gross exposure. At the primary 10-bps cost it returns +24.20% cumulatively,
+versus SPY +94.21%, with a 0.304 Sharpe and -35.00% maximum drawdown. Its
+matched comparator is too stale and zero-recovery-conditioned to support a
+strong relative-alpha claim. The direct-stock result is tangible and
+profitable, but not benchmark-competitive and not promoted to leverage.
+
+The immediate next step is that Claude will review section 84 and the exact
+pushed range beginning after `e45a38a` independently. Codex then
+counter-reviews every Claude commit and uses the review plus R-064 evidence
+to choose between a construction revision and the next preregistered QC
+diagnostic. The supplied
+updated strategy remains an assessed proposal rather than an automatic
+replacement of the frozen score. No leverage, deployment, order, broker,
+paper/live, or trading action is authorized by this result or handoff.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -2608,6 +2608,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-15 | Claude review | `f950fe8` -> this record commit; one lane test correction; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the R-054/R-055 range `baef134..f950fe8`, including the first tangible preliminary stock-IC evidence | Dispositioned all four commits (76.2); accepted after correction. Confirmed all five section-75 findings against section 74, including that section 74 recorded a red/green proof its own evidence contradicts. Verified rather than accepted: the tangible-evidence gate wording is in git at `2d71cb3` (10:13 PDT), ten minutes before the backtest was created (10:23 PDT) and an hour before the single aggregate read (11:10 PDT), and decides on valid-date counts and non-null availability alone; the v2 rule computes median and MAD from active names only and gives structural zeros exact zero, with contract, manifest, summary and cell schemas all versioned; nine of the ten section-74 failures are fixed; and look accounting reconciles at 56 run looks, 3 development evaluations, 23 infrastructure looks and a 516 alpha-cell floor. | Final complete Analyst lane selection on the corrected tree **5,415 passed, 7 skipped, 0 failed, 35 warnings in 5,768.32 s (1:36:08)**, the first complete green run since the accepted-risk path began; focused three-file reproduction at `f950fe8` **1 failed, 129 passed** before the correction and the object-store battery **72 passed** after; six-trial mutation matrix, six of six caught; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **1 P2 and 3 P3** (`ARV2R76-001..004`); one corrected here with red/green evidence. `ARV2R76-001`: the no-external-I/O closure test was still red at the pushed head on an import edge added by `2d71cb3`, recorded as closed because the complete lane selection was again not run. `ARV2R76-002`: every reported IC is conditioned on price survival. | Codex counter-reviews this record commit; the complete lane selection should be run once per round before a push; the survival conditioning should be settled before later windows and ETF construction; later windows, ETF construction, leverage, deployment, orders and trading remain closed. |
 | 2026-09-15 | Codex ETF baseline implementation and QC evaluation | `9094aea` -> `9164146`, `6d4f101`, `3270a58`, `70e92fd`, and this record commit | Implement and measure the owner-directed unlevered ETF baseline, then correct the admission defect before one push and Claude review | R-060 failed on same-date QC Slice ordering; the isolated SPY-clock correction allowed R-061 to complete and return exactly nine aggregate statistics once. The pre-push audit identified the extra five-ETF portfolio minimum; `70e92fd` separates economic admission from IC sufficiency under a new local-only identity. Historical R-061 and its limitations remain intact. | Validation scope and exact totals are recorded in section 82.4. Two development evaluations; shared look total 61, ARV2 development total 8, infrastructure 23, lifetime exposed-cell floor 571. No additional look for the local correction. | 0 P0, 0 P1, 2 P2 corrected, 5 P3 corrected/disclosed/documented as detailed in section 82.4. R-061's primary net return is -2.38%, but its historical admission mismatch prevents a clean verdict on the intended portfolio. | Push once after fix and suite. Monitor Claude's subsequent review push; counter-review every commit, then build and backtest individual-stock economics with ETFs as a backup. No automatic leveraged run. |
 | 2026-09-15 | Claude review | `d34bb5f` -> this record commit; no code, test, specification or shared file change; Codex resolves the exact pushed head | Independent review of the fixed-window and ETF range `82897d7..d34bb5f`, including the first unlevered ETF portfolio result | Dispositioned all nine commits (83.2); accepted. Confirmed all six section-77 findings against section 76, including that section 76 overstated a Git author date as immutable proof. Verified rather than accepted: the three fixed windows were frozen in one commit before any ran; each regime profile expects exactly 18 statistics and the cell floor reconciles 516 to 564 to 571 with looks 59 to 61 and development evaluations 6 to 8; and four single-guard mutations over the ETF evaluator constants were all caught. | Complete standing Analyst lane selection at `d34bb5f`, the exact pushed tree because this review changes no source or test file: **5,555 passed, 7 skipped, 0 failed, 35 warnings in 5,803.07 s (1:36:43)**; four-trial ETF mutation matrix, four of four caught; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **1 P2 and 3 P3** (`ARV2R83-001..004`), all documented; no code or test correction was warranted. `ARV2R83-001`: R-061's reported mean ICs of 0.003093, 0.009836 and 0.070551 sit 0.10, 0.16 and 0.65 standard errors from zero once the five-name IC floor and H5/H20/H60 overlap are accounted for, and the sub-50% positive-date shares at H5 and H20 are the same small-sample skew. | Codex counter-reviews this record commit and should settle `ARV2R83-001` before the owner-directed direct-stock implementation; later ETF, leverage, deployment, order and trading gates remain closed. |
+| 2026-09-16 | Codex counter-review, direct-stock implementation, and R-062/R-063/R-064 QC evaluations | `e45a38a` -> `2dcd449`, `7d37ad0`, `d7dcedf`, `b07c90b`, and this record commit | Accept section 83 after prospective record corrections, implement the fixed-score direct-stock portfolio, correct two transport seams, and obtain the first tangible economic stock result | Counter-reviewed Claude's record-only commit; froze the weekly top-decile/capped-50 stock profile; R-062 failed on QC's 4,096-character statistic limit without a result read; R-063 corrected the envelope and completed but its one-use read refused a Decimal-precision mismatch without disclosure; R-064 corrected that exact seam, completed in project `36610457`, and authenticated exactly six aggregate statistics once. | Complete pre-R062 Analyst lane **5,603 passed, 7 skipped, 0 failed in 5,727.62 s**; compact correction **249 focused + 72 closure passed**; exact-arithmetic correction **321 focused passed in 149.71 s** plus a direct evaluator-validator seam replay; final record gate and diff checks green. Complete repository suite not run. R-062..R-064 move shared looks 61 -> 64, development evaluations 8 -> 11, and the cell floor 571 -> 575; infrastructure stays 23. | Counter-review **0 P0/P1/P2 and 5 P3** (`ARV2CR84-001..005`), corrected prospectively. Two implementation P2 transport defects were reproduced and corrected under new prospective run identities. R-064 is tangible and profitable after costs but materially trails SPY; its matched comparator is severely stale/zero-recovery-conditioned. | Make the round's one same-lane push. Claude independently reviews section 84 and the exact range after `e45a38a`; Codex counter-reviews every Claude commit, then uses the review and R-064 evidence to revise the construction or launch the next preregistered QC diagnostic. Leverage, deployment, orders, broker, paper/live, and trading remain closed. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -14776,3 +14777,74 @@ If created, shared looks move **63 -> 64** and development evaluations
 cells moves the lifetime cell floor **571 -> 575**. The access boundary is
 unchanged: six aggregate statistics only, with no raw row, unrestricted log,
 chart, order, deployment, broker, paper/live state or trading action.
+
+### 84.8 R-064 terminal/result disposition: completed with tangible but benchmark-weak returns
+
+R-064 created private QC project `36610457`, compiled as
+`150eef99635c4477d95798d938efb58a-7831ef42e028042c918b35e4134db28f`,
+and reached authenticated `Completed.` in backtest
+`9318e40ca480437127b63d88d2dbcccb` after 94 statistics-free polls. The
+terminal receipt SHA-256 is
+`ba3f6f17c0e52f7c17d7a03a18dd96241373eecc3716e1d308ddf52161de3f6a`.
+One separately signed result read, and only that read, authenticated exactly
+the six frozen aggregate statistics. Its permit SHA-256 is
+`b845cceb8819f0eec801061ae224f6e7f248f05c490d7055885e8a4a3f7cb2f6`,
+its result-receipt SHA-256 is
+`b26d6e828dea3b1a488fc8056f5ae9cf6bd105d120202bb7157ce1eb9bbab50f`,
+and the selected custom-statistics SHA-256 is
+`f0a5a42eee6eaa7b761ce5b354737a09077c5d9d53f9d9b5e17612cbd49b0714`.
+No raw provider or security row, unrestricted log, chart, order, deployment,
+broker, paper/live state, or trading surface was selected.
+
+| Cost per side | Signal cumulative return | Matched cumulative return | SPY cumulative return | Signal minus matched | Signal minus SPY | Zero-rate Sharpe | Zero-rate Sortino | Maximum drawdown |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +27.1499% | +21.0818% | +94.2074% | +6.0681 pp | -67.0574 pp | 0.3238 | 0.4568 | -33.9629% |
+| 5 bps | +25.6668% | +21.0196% | +94.2074% | +4.6472 pp | -68.5405 pp | 0.3137 | 0.4423 | -34.4757% |
+| **10 bps primary** | **+24.2010%** | **+20.9575%** | **+94.2074%** | **+3.2435 pp** | **-70.0064 pp** | **0.3036** | **0.4279** | **-34.9955%** |
+| 20 bps | +21.3200% | +20.8333% | +94.2074% | +0.4867 pp | -72.8873 pp | 0.2833 | 0.3989 | -36.0228% |
+
+The signal portfolio is tangible rather than cash-bound: it is invested on
+1,253 of 1,254 return sessions, averages 49.993 holdings and 97.992% gross
+exposure, and executes all 261 weekly decisions. It selects 50 names on
+average from 4,177 eligible scores. One signal session uses a stale mark; two
+membership-end exits use the disclosed zero-recovery lower bound; one target
+is underfilled. Average daily two-sided turnover is 1.8725%, approximately
+471.9% annualized. Those facts make the signal portfolio's own P&L materially
+more informative than R-061's mostly-cash ETF result.
+
+The matched comparator is not equally clean. It executes only two rebalances,
+defers 259, has 1,247 stale-mark sessions, 418 entry-price refusals, 590
+membership-end liquidations, and 585 zero-recovery exits. Its return is
+therefore a heavily conditioned lower-bound diagnostic, not a robust estimate
+of an investable all-eligible-stock benchmark. R-064's positive difference
+from that comparator must not be promoted as strong alpha evidence.
+
+The economic conclusion is cautious and adverse to promotion. The signal is
+profitable after every frozen cost scenario, but at the primary 10-bps cost it
+earns only +24.20% cumulatively while SPY earns +94.21%, with a 0.304 Sharpe
+and a -35.00% maximum drawdown. It is not benchmark-competitive as a
+standalone long-only strategy in 2021-2025. The result remains preliminary,
+current-vintage, non-pristine point-in-time, conditioned on the disclosed
+price proxies and zero-recovery convention, and carries no formal alpha or
+deployment disposition. Because the unlevered baseline is not credible
+enough to promote, this round does not launch actual or synthetic 3x leverage.
+
+R-064 moves shared looks **63 -> 64**, ARV2 development evaluations
+**10 -> 11**, and the lifetime exposed-cell floor **571 -> 575**;
+infrastructure remains **23** and permanent and confirmatory looks remain
+zero. Before R-062, the complete standing Analyst-lane selection passed
+**5,603 passed, 7 skipped, 0 failed** in 5,727.62 seconds. The compact-envelope
+correction then passed **249 focused tests** plus **72 closure tests**. The
+exact-arithmetic correction and closure passed **321 focused tests** in
+149.71 seconds, and a direct evaluator-to-validator seam replay passed with a
+2,588-character maximum statistic. The final narrow corrections did not
+receive another 1.5-hour complete-lane rerun; they receive the focused and
+active-document gates recorded here. The complete repository suite was not
+run under the lane-only rule.
+
+The next gate is Claude's independent review of section 84 and the exact
+pushed range beginning after `e45a38a`. Codex then counter-reviews every
+Claude commit. Based on that review and this R-064 evidence, Codex may either
+revise the economic construction or preregister and launch the next bounded
+QC diagnostic; it must preserve the same-lane workflow and may not infer a
+leverage, deployment, order, broker, paper/live, or trading authorization.

@@ -1650,3 +1650,39 @@ is versioned from v2 to v3.
 | **Access boundary** | One create/compile/backtest; statistics-free terminal polling; after `Completed.`, one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, order, deployment, broker, paper/live state, or trading action. |
 
 The result will be appended without changing this prospective rule block.
+
+R-064 created project `36610457`, compiled successfully, and reached
+authenticated `Completed.` after 94 statistics-free polls (backtest
+`9318e40ca480437127b63d88d2dbcccb`). One separately signed result read
+authenticated exactly six aggregate statistics. The result receipt SHA-256 is
+`b26d6e828dea3b1a488fc8056f5ae9cf6bd105d120202bb7157ce1eb9bbab50f` and
+the custom-statistics SHA-256 is
+`f0a5a42eee6eaa7b761ce5b354737a09077c5d9d53f9d9b5e17612cbd49b0714`.
+
+| Cost per side | Signal return | Matched return | SPY return | Signal - matched | Signal - SPY | Sharpe | Max drawdown |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +27.1499% | +21.0818% | +94.2074% | +6.0681 pp | -67.0574 pp | 0.3238 | -33.9629% |
+| 5 bps | +25.6668% | +21.0196% | +94.2074% | +4.6472 pp | -68.5405 pp | 0.3137 | -34.4757% |
+| **10 bps primary** | **+24.2010%** | **+20.9575%** | **+94.2074%** | **+3.2435 pp** | **-70.0064 pp** | **0.3036** | **-34.9955%** |
+| 20 bps | +21.3200% | +20.8333% | +94.2074% | +0.4867 pp | -72.8873 pp | 0.2833 | -36.0228% |
+
+This is tangible portfolio evidence: 1,253 of 1,254 return sessions are
+invested, average gross exposure is 97.992%, average holdings are 49.993, and
+all 261 weekly decisions execute. Average daily two-sided turnover is 1.8725%
+(approximately 471.9% annualized). The signal itself has one stale-mark
+session and two zero-recovery membership-end exits.
+
+The matched comparator is substantially more conditioned: only two
+rebalances execute, 259 defer, 1,247 sessions use stale marks, and 585
+membership-end exits use zero recovery. The positive signal-minus-matched
+difference is therefore not clean alpha evidence. The signal is profitable
+after all frozen transaction-cost scenarios, but its primary +24.20% return,
+0.304 Sharpe, and -35.00% maximum drawdown compare poorly with SPY's +94.21%.
+R-064 does not justify promotion as a standalone strategy or a leveraged
+variant. It remains a preliminary, current-vintage, non-pristine-PIT,
+price-proxy-conditioned development evaluation with no formal acceptance or
+deployment implication.
+
+R-064 moves shared run looks **63 -> 64**, ARV2 development evaluations
+**10 -> 11**, and the lifetime exposed-cell floor **571 -> 575**.
+Infrastructure remains 23; permanent and confirmatory looks remain zero.

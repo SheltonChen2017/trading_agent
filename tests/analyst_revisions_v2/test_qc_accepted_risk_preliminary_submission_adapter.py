@@ -542,7 +542,8 @@ def _stock_portfolio_aggregate_statistics(
     meta = {
         "schema": stock_portfolio_evaluator.SUMMARY_SCHEMA,
         "contract_id": stock_portfolio_evaluator.CONTRACT_ID,
-        "profile": profile,
+        "profile_id": profile["profile_id"],
+        "profile_sha256": profile["profile_sha256"],
         "package_id": plan.package_id,
         "package_sha256": plan.package_sha256,
         "input_manifest_id": plan.evaluator_manifest_id,
@@ -601,7 +602,13 @@ def _stock_portfolio_aggregate_statistics(
         "trading": False,
         "portfolio_cells": cells,
     }
-    digest = hashlib.sha256(_canonical(meta)).hexdigest()
+    digest_record = {
+        key: value
+        for key, value in meta.items()
+        if key not in {"profile_id", "profile_sha256"}
+    }
+    digest_record["profile"] = profile
+    digest = hashlib.sha256(_canonical(digest_record)).hexdigest()
     metadata = {
         **{key: value for key, value in meta.items() if key != "portfolio_cells"},
         "summary_id": "arv2-stock-portfolio-summary-" + digest[:24],
@@ -686,8 +693,17 @@ def _rehash_stock_portfolio_summary(statistics):
     summary = {
         key: value
         for key, value in metadata.items()
-        if key not in {"summary_id", "summary_sha256"}
+        if key
+        not in {
+            "profile_id",
+            "profile_sha256",
+            "summary_id",
+            "summary_sha256",
+        }
     }
+    summary["profile"] = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        stock_portfolio_evaluator.PROFILE_ID
+    )
     summary["portfolio_cells"] = [
         json.loads(statistics["ARV2_STOCK_PORTFOLIO_COST_" + str(cost)])
         for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS
@@ -741,7 +757,7 @@ def test_regime_profile_allowlist_refuses_unknown_profile():
         adapter._look_accounting(evaluation_profile_id="arv2-stock-ic-unregistered")
 
 
-def test_stock_portfolio_profile_has_one_exact_r062_look_budget(stock_portfolio_plan):
+def test_stock_portfolio_profile_has_one_exact_r063_look_budget(stock_portfolio_plan):
     spec = adapter._run_spec(stock_portfolio_evaluator.PROFILE_ID)
     accounting = adapter._look_accounting(
         evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID
@@ -751,12 +767,12 @@ def test_stock_portfolio_profile_has_one_exact_r062_look_budget(stock_portfolio_
         evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
     )
 
-    assert spec.ledger_entry_id == "R-062"
+    assert spec.ledger_entry_id == "R-063"
     assert spec.cell_count == 4
-    assert accounting["run_level_looks_before"] == 61
-    assert accounting["planned_run_level_looks_after_launch"] == 62
-    assert accounting["arv2_development_evaluations_before"] == 8
-    assert accounting["planned_arv2_development_evaluations_after_launch"] == 9
+    assert accounting["run_level_looks_before"] == 62
+    assert accounting["planned_run_level_looks_after_launch"] == 63
+    assert accounting["arv2_development_evaluations_before"] == 9
+    assert accounting["planned_arv2_development_evaluations_after_launch"] == 10
     assert accounting["lifetime_alpha_cell_floor_before"] == 571
     assert result_accounting["lifetime_alpha_cell_floor_after"] == 575
     assert len(stock_portfolio_plan.expected_custom_statistic_names) == 6
@@ -1925,9 +1941,9 @@ def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(
     assert result_permit.permit_sha256 == recovered_permit.permit_sha256
     receipt = json.loads(result.persisted_path.read_bytes())
     accounting = receipt["look_accounting"]
-    assert accounting["shared_look_ledger_entry_id"] == "R-062"
-    assert accounting["run_level_looks_after"] == 62
-    assert accounting["arv2_development_evaluations_after"] == 9
+    assert accounting["shared_look_ledger_entry_id"] == "R-063"
+    assert accounting["run_level_looks_after"] == 63
+    assert accounting["arv2_development_evaluations_after"] == 10
     assert accounting["lifetime_alpha_cell_floor_after"] == 575
 
 

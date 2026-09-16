@@ -1591,3 +1591,33 @@ confirmation evidence. R-062 is a practical, current-vintage,
 non-pristine-PIT economic diagnostic whose return may remain conditioned on
 price proxies and accepted vendor limitations. Its result will be appended
 without rewriting this prospective rule block.
+
+R-062 created project `36608248`, compiled successfully, and launched
+backtest `fbe0dded7ff5d252fc724c3fd9fa05f1`, but terminated with a runtime
+error after completing the economic computation: its metadata statistic was
+larger than the frozen 4,096-character transport bound. No aggregate result
+was read and no alpha cell was exposed. One bounded technical diagnostic read
+selected only terminal status, error and stack trace. R-062 therefore spends
+shared look **61 -> 62** and ARV2 development evaluation **8 -> 9**, while the
+lifetime cell floor remains **571**. This is a technical failure, not a
+positive or negative portfolio result.
+
+## R-063 — Analyst Revisions V2 same-economics direct-stock compact retry (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-063 is the one-look technical successor to R-062. It preserves every
+economic input and rule, but versions the summary envelope and replaces the
+redundant 1.6-KiB embedded profile body with its exact ID and SHA-256. The
+complete profile is still authenticated by the projection and summary digest,
+and the result validator rehydrates the pinned profile before checking that
+digest. A regression requires at least 1,024 characters of headroom below the
+same 4,096-character ceiling.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **62 -> 63**; ARV2 development evaluations **9 -> 10**. A successful aggregate read exposes the unchanged four cost cells and moves the lifetime alpha-cell floor **571 -> 575**. |
+| **Profile** | `arv2-stock-long-only-2021-2025-r063-v1`, SHA-256 `9f0bf6044dbe181bed69ca76cf6ee0c2e453cbe507d8436d570a95e645aa4afc`; projection SHA-256 `fe5d534c0cd5569177ef2450547bedc89efc4846eb8273f74d94f087ae162801`. |
+| **Unchanged economics** | 2021-2025; exact R-055 score; weekly next-open top decile capped at 50; 1.96% per name and 98% maximum gross; zero-yield residual cash; matched eligible-stock and SPY comparators; 0/5/10/20 bps with 10 bps primary; unchanged missing-price and tangible-evidence rules. |
+| **QC identity** | Private project `9 ARV2_STOCK_R063_2021_2025 - 20260916`; backtest `ARV2 R063 direct stock compact retry e9851c2f`; plan SHA-256 `cff4e61683788a736b9ed33a5a59c26b0b60bf4835f0f9e521b16e40484a366f`. |
+| **Access boundary** | One create/compile/backtest; statistics-free terminal polling; after `Completed.`, one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, order, deployment, broker, paper/live state, or trading action. |
+
+The result will be appended without changing this prospective rule block.

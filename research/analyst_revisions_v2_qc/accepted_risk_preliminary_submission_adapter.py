@@ -349,12 +349,12 @@ _EVALUATION_RUN_SPECS = (
     ),
     _EvaluationRunSpec(
         _PINNED_STOCK_PORTFOLIO_PROFILE_ID,
-        "arv2-eval-stock-portfolio-historical-qc-001",
-        "R-062",
-        61,
+        "arv2-eval-stock-portfolio-historical-qc-002",
+        "R-063",
         62,
-        8,
+        63,
         9,
+        10,
         4,
         571,
         575,
@@ -495,7 +495,7 @@ def _canonical(value: object) -> bytes:
 
 
 def _stock_portfolio_contract_bindings_are_current() -> bool:
-    """Refuse in-memory weakening of the R-062 financial/result contract."""
+    """Refuse in-memory weakening of the R-063 financial/result contract."""
 
     namespace = stock_portfolio_evaluator.__dict__
     if type(namespace) is not dict:
@@ -2889,7 +2889,8 @@ _STOCK_PORTFOLIO_META_FIELDS = frozenset(
     {
         "schema",
         "contract_id",
-        "profile",
+        "profile_id",
+        "profile_sha256",
         "package_id",
         "package_sha256",
         "input_manifest_id",
@@ -3969,8 +3970,9 @@ def _validate_stock_portfolio_aggregate_records(
     if (
         meta.get("schema") != _PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA
         or meta.get("contract_id") != _PINNED_STOCK_PORTFOLIO_CONTRACT_ID
-        or _canonical(meta.get("profile"))
-        != _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES
+        or meta.get("profile_id") != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+        or meta.get("profile_sha256")
+        != _PINNED_STOCK_PORTFOLIO_PROFILE_SHA256
         or meta.get("package_id") != plan.package_id
         or meta.get("package_sha256") != plan.package_sha256
         or meta.get("input_manifest_id") != plan.evaluator_manifest_id
@@ -4405,8 +4407,17 @@ def _validate_stock_portfolio_aggregate_records(
     record = {
         key: value
         for key, value in meta.items()
-        if key not in {"summary_id", "summary_sha256"}
+        if key
+        not in {
+            "profile_id",
+            "profile_sha256",
+            "summary_id",
+            "summary_sha256",
+        }
     }
+    record["profile"] = json.loads(
+        _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES.decode("ascii")
+    )
     record["portfolio_cells"] = cells
     digest = hashlib.sha256(_canonical(record)).hexdigest()
     if (

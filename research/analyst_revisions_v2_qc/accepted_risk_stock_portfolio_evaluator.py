@@ -24,9 +24,9 @@ class AcceptedRiskStockPortfolioError(_base.PreliminaryRatingEvaluationError):
 
 
 PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v1"
-PROFILE_ID = "arv2-stock-long-only-2021-2025-v1"
+PROFILE_ID = "arv2-stock-long-only-2021-2025-r063-v1"
 CONTRACT_ID = "arv2-accepted-risk-stock-portfolio-v1"
-SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v1"
+SUMMARY_SCHEMA = "arv2-accepted-risk-stock-portfolio-summary-v2"
 PORTFOLIO_CELL_SCHEMA = "arv2-accepted-risk-stock-portfolio-cell-v1"
 DECISION_START_SESSION = "2021-01-04"
 DECISION_END_SESSION = "2025-12-29"
@@ -872,6 +872,20 @@ class StockPortfolioEvaluationRuntime(_base.PreliminaryRatingEvaluationRuntime):
     def custom_summary_statistics(self):
         summary = self.aggregate_summary()
         cells = summary.pop("portfolio_cells")
+        profile = summary.pop("profile")
+        if profile != _PROFILE:
+            raise AcceptedRiskStockPortfolioError(
+                "stock portfolio summary profile changed"
+            )
+        # The complete profile is authenticated independently by the QC
+        # projection and remains part of the summary digest.  Repeating its
+        # 1.6 KiB canonical body inside the metadata statistic left the R062
+        # fixture only six bytes below QC's 4 KiB per-statistic ceiling and
+        # caused the real run to refuse after computation.  Carry the exact
+        # identity here; the result validator rehydrates the pinned profile
+        # before checking the digest.
+        summary["profile_id"] = profile["profile_id"]
+        summary["profile_sha256"] = profile["profile_sha256"]
         output = {
             "ARV2_STOCK_PORTFOLIO_META": _canonical(summary).decode("ascii")
         }

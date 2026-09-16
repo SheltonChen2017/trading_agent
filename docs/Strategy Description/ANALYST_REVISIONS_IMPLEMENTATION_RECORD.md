@@ -14671,3 +14671,57 @@ the new evaluator had not yet been pinned; the exact source/import/edge pins
 were added, the isolated guard passed, and this complete rerun is the final
 tree. The complete repository suite was not run under the owner's lane-only
 rule. `git diff --check` was clean before this prospective record.
+
+### 84.4 R-062 terminal disposition: technical transport failure, no result read
+
+R-062 created private QC project `36608248`, compiled as
+`0663b648a048d1a80ec68d3a8f3f0f0f-2610c5e826d8170830e96f285e1feb4e`,
+and launched backtest `fbe0dded7ff5d252fc724c3fd9fa05f1`. After 73
+statistics-free polls, the authenticated terminal state was `Runtime Error`.
+No result-read authority was signed and no aggregate result, statistic,
+return, chart, order, provider row, or security-level outcome was selected.
+One bounded technical diagnostic selected only status, error and stack trace:
+the evaluator reached `custom_summary_statistics` after computation, but the
+`ARV2_STOCK_PORTFOLIO_META` value exceeded the frozen 4,096-character
+per-statistic transport limit.
+
+The defect is a result-envelope capacity error, not evidence for or against
+the portfolio. The local test fixture's metadata was 4,090 characters—only
+six below the limit—because it repeated the complete 1.6-KiB authenticated
+profile; the longer production identifiers crossed the bound. R-062 spends
+shared look **61 -> 62** and ARV2 development evaluation **8 -> 9**, but its
+failed run exposed no result cell, so the lifetime alpha-cell floor remains
+**571**.
+
+### 84.5 Prospective R-063 same-economics compact-result retry
+
+R-063 changes only the aggregate-result representation. The complete frozen
+profile remains authenticated in the projection and in the summary digest;
+the metadata statistic carries its exact `profile_id` and `profile_sha256`,
+and the host validator rehydrates the pinned profile before authenticating the
+digest. The summary schema is versioned from v1 to v2. The stock score,
+universe, dates, top-decile/50-name selection, 1.96% weights, 98% gross target,
+weekly next-open execution, missing-price rules, comparators, cost cases and
+tangible-evidence gate are unchanged. A regression now requires at least
+1,024 characters of headroom below QC's 4,096-character ceiling.
+
+The retry profile is `arv2-stock-long-only-2021-2025-r063-v1`, SHA-256
+`9f0bf6044dbe181bed69ca76cf6ee0c2e453cbe507d8436d570a95e645aa4afc`.
+Its seven-file projection is
+`arv2-preliminary-qc-projection-fe5d534c0cd5569177ef2450`, SHA-256
+`fe5d534c0cd5569177ef2450547bedc89efc4846eb8273f74d94f087ae162801`,
+202,801 bytes. The prospective plan is
+`arv2-preliminary-qc-submission-cff4e61683788a736b9ed33a`, SHA-256
+`cff4e61683788a736b9ed33a5a59c26b0b60bf4835f0f9e521b16e40484a366f`;
+the private QC name is `9 ARV2_STOCK_R063_2021_2025 - 20260916` and the
+backtest name is `ARV2 R063 direct stock compact retry e9851c2f`.
+
+If created, shared looks move **62 -> 63** and ARV2 development evaluations
+**9 -> 10**. A successful separately signed read of the unchanged four cost
+cells moves the lifetime alpha-cell floor **571 -> 575**. The authorized read
+boundary remains exactly six aggregate custom statistics; every raw-data,
+log-collection, chart, order, deployment, broker, paper/live and trading
+surface remains closed. Focused R-063 validation is **249 passed**, the exact
+QC import/authority closure battery is **72 passed**, and the complete
+5,603-test lane result remains applicable to the preceding source/test tree;
+the narrow transport correction will be reviewed with the run record.

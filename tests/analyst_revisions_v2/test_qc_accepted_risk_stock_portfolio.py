@@ -1,4 +1,5 @@
 import hashlib
+import json
 from datetime import date
 from decimal import Decimal, localcontext
 from fractions import Fraction
@@ -427,6 +428,11 @@ def test_completed_stock_portfolio_is_aggregate_only_and_cost_ordered():
         - Decimal(cells[0]["matched_average_cash_weight"])
     ) < Decimal("0.01")
     assert all(len(value) <= 4096 for value in statistics.values())
+    assert len(statistics["ARV2_STOCK_PORTFOLIO_META"]) <= 3072
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    assert "profile" not in metadata
+    assert metadata["profile_id"] == subject.PROFILE_ID
+    assert metadata["profile_sha256"] == subject._PROFILE["profile_sha256"]
 
 
 def test_matched_comparator_freezes_decision_weights_and_leaves_failed_entry_cash():

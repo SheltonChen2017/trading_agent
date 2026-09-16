@@ -59,6 +59,7 @@ TRAIN_SLICE_SOFT_SECONDS = 240
 MAX_TRAIN_SLICE_COUNT = 113
 MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
+STOCK_PORTFOLIO_PROFILE_ID = "arv2-stock-long-only-2021-2025-v1"
 EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
     sorted(
         (
@@ -69,16 +70,37 @@ EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
 )
 
 
+def _stock_portfolio_module():
+    try:
+        import accepted_risk_stock_portfolio_evaluator as module
+    except ImportError:
+        from research.analyst_revisions_v2_qc import (
+            accepted_risk_stock_portfolio_evaluator as module,
+        )
+    return module
+
+
 def expected_custom_summary_statistic_names(evaluation_profile_id=None):
     if evaluation_profile_id is None:
         return EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
-    regime_evaluator.require_regime_profile(evaluation_profile_id)
+    if evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+        stock_portfolio = _stock_portfolio_module()
+        if stock_portfolio.PROFILE_ID != STOCK_PORTFOLIO_PROFILE_ID:
+            _error("stock portfolio profile binding changed")
+        evaluator_names = (
+            stock_portfolio.expected_custom_summary_statistic_names(
+                evaluation_profile_id
+            )
+        )
+    else:
+        regime_evaluator.require_regime_profile(evaluation_profile_id)
+        evaluator_names = regime_evaluator.expected_custom_summary_statistic_names(
+            evaluation_profile_id
+        )
     return tuple(
         sorted(
             (
-                *regime_evaluator.expected_custom_summary_statistic_names(
-                    evaluation_profile_id
-                ),
+                *evaluator_names,
                 RUNTIME_META_STATISTIC,
             )
         )
@@ -765,11 +787,19 @@ class AcceptedRiskPreliminaryQcDriver:
         total_return_normalization,
         evaluation_profile_id=None,
     ):
-        profile = (
-            None
-            if evaluation_profile_id is None
-            else regime_evaluator.require_regime_profile(evaluation_profile_id)
-        )
+        if evaluation_profile_id is None:
+            profile = None
+        elif evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+            stock_portfolio = _stock_portfolio_module()
+            if stock_portfolio.PROFILE_ID != STOCK_PORTFOLIO_PROFILE_ID:
+                _error("stock portfolio profile binding changed")
+            profile = stock_portfolio.require_stock_portfolio_profile(
+                evaluation_profile_id
+            )
+        else:
+            profile = regime_evaluator.require_regime_profile(
+                evaluation_profile_id
+            )
         self._algorithm = algorithm
         self._activation_manifest_key = activation_manifest_key
         self._activation_manifest_sha256 = activation_manifest_sha256
@@ -834,21 +864,32 @@ class AcceptedRiskPreliminaryQcDriver:
             permitted_security_ids=tuple(dict.fromkeys(permitted_ids)),
             permitted_sessions=package.evaluator_input.session_axis,
         )
+        input_security_ids = tuple(
+            sorted(
+                {
+                    item.security_id
+                    for item in package.evaluator_input.memberships
+                }
+            )
+        )
+        named_refusals = tuple(
+            security_id
+            for security_id in input_security_ids
+            if resolution.symbol_for_security(security_id) is None
+        )
         if self._evaluation_profile_id is None:
             runtime = evaluator.PreliminaryRatingEvaluationRuntime(
                 package.evaluator_input
             )
+        elif self._evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+            runtime = _stock_portfolio_module().StockPortfolioEvaluationRuntime(
+                package.evaluator_input,
+                profile_id=self._evaluation_profile_id,
+                package_id=package.package_id,
+                package_sha256=package.package_sha256,
+                named_figi_resolution_refusals=named_refusals,
+            )
         else:
-            input_security_ids = tuple(
-                sorted(
-                    {item.security_id for item in package.evaluator_input.memberships}
-                )
-            )
-            named_refusals = tuple(
-                security_id
-                for security_id in input_security_ids
-                if resolution.symbol_for_security(security_id) is None
-            )
             runtime = regime_evaluator.RegimeRatingEvaluationRuntime(
                 package.evaluator_input,
                 profile_id=self._evaluation_profile_id,
@@ -912,12 +953,22 @@ class AcceptedRiskPreliminaryQcDriver:
         if self._emitted:
             return
         statistics = self._runtime.custom_summary_statistics()
-        expected_evaluator_names = (
-            evaluator.EVALUATOR_CUSTOM_SUMMARY_STATISTIC_NAMES
-            if self._evaluation_profile_id is None
-            else regime_evaluator.expected_custom_summary_statistic_names(
-                self._evaluation_profile_id
+        if self._evaluation_profile_id is None:
+            expected_evaluator_names = evaluator.EVALUATOR_CUSTOM_SUMMARY_STATISTIC_NAMES
+        elif self._evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+            expected_evaluator_names = (
+                _stock_portfolio_module().expected_custom_summary_statistic_names(
+                    self._evaluation_profile_id
+                )
             )
+        else:
+            expected_evaluator_names = (
+                regime_evaluator.expected_custom_summary_statistic_names(
+                    self._evaluation_profile_id
+                )
+            )
+        stock_portfolio = (
+            self._evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID
         )
         if (
             type(statistics) is not dict
@@ -929,9 +980,17 @@ class AcceptedRiskPreliminaryQcDriver:
             "schema": (
                 "arv2-accepted-risk-preliminary-qc-runtime-meta-v1"
                 if self._evaluation_profile_id is None
-                else "arv2-accepted-risk-regime-qc-runtime-meta-v1"
+                else (
+                    "arv2-accepted-risk-stock-portfolio-qc-runtime-meta-v1"
+                    if stock_portfolio
+                    else "arv2-accepted-risk-regime-qc-runtime-meta-v1"
+                )
             ),
-            "status": "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_ONLY_COMPLETED",
+            "status": (
+                "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO_COMPLETED"
+                if stock_portfolio
+                else "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_ONLY_COMPLETED"
+            ),
             "package_id": self._package.package_id,
             "package_sha256": self._package.package_sha256,
             "activation_manifest_sha256": self._package.activation_manifest_sha256,
@@ -945,7 +1004,7 @@ class AcceptedRiskPreliminaryQcDriver:
             "point_in_time": False,
             "formal": False,
             "control_residualized": False,
-            "economic_portfolio": False,
+            "economic_portfolio": stock_portfolio,
             "etf_or_leverage": False,
             "deployment": False,
             "orders": False,
@@ -998,6 +1057,7 @@ __all__ = (
     "LoadedAcceptedRiskPreliminaryPackage",
     "QcTotalReturnOpenHistoryLoader",
     "RUNTIME_META_STATISTIC",
+    "STOCK_PORTFOLIO_PROFILE_ID",
     "MAX_BACKTEST_RUNTIME_SECONDS",
     "MAX_TRAIN_SLICE_COUNT",
     "TRAIN_SLICE_SOFT_SECONDS",

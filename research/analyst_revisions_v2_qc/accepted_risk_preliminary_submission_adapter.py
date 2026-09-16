@@ -38,6 +38,7 @@ from . import accepted_risk_preliminary_rating_evaluator as preliminary_evaluato
 from . import accepted_risk_regime_rating_evaluator as regime_evaluator
 from . import accepted_risk_etf_baseline_evaluator as etf_evaluator
 from . import accepted_risk_etf_baseline_qc_runtime as etf_runtime
+from . import accepted_risk_stock_portfolio_evaluator as stock_portfolio_evaluator
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -145,13 +146,75 @@ _PINNED_ITER_UPLOADS = package_builder.iter_accepted_risk_preliminary_upload_obj
 _PINNED_REQUIRE_PROJECTION = (
     projection_builder.require_accepted_risk_preliminary_qc_projection
 )
+_PINNED_PROJECTION_PROFILE_CALLABLE = projection_builder._profile
+_PINNED_PROJECTION_SOURCE_PATHS_CALLABLE = (
+    projection_builder.project_source_paths_for_profile
+)
+_PINNED_PROJECTION_STOCK_SOURCE_PATHS = tuple(
+    projection_builder.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
+)
 _PINNED_EXPECTED_RESULT_NAMES = tuple(
     preliminary_runtime.EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
 )
 _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE = (
     preliminary_runtime.expected_custom_summary_statistic_names
 )
+_PINNED_MAX_TRAIN_SLICE_COUNT = preliminary_runtime.MAX_TRAIN_SLICE_COUNT
 _PINNED_REQUIRE_REGIME_PROFILE = regime_evaluator.require_regime_profile
+_PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE = (
+    stock_portfolio_evaluator.require_stock_portfolio_profile
+)
+_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE = (
+    stock_portfolio_evaluator.expected_custom_summary_statistic_names
+)
+_PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT = stock_portfolio_evaluator._PROFILE
+_PINNED_STOCK_PORTFOLIO_PROFILE_ID = stock_portfolio_evaluator.PROFILE_ID
+_PINNED_STOCK_PORTFOLIO_CONTRACT_ID = stock_portfolio_evaluator.CONTRACT_ID
+_PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA = stock_portfolio_evaluator.SUMMARY_SCHEMA
+_PINNED_STOCK_PORTFOLIO_CELL_SCHEMA = (
+    stock_portfolio_evaluator.PORTFOLIO_CELL_SCHEMA
+)
+_PINNED_STOCK_PORTFOLIO_EXPECTED_DECISIONS = (
+    stock_portfolio_evaluator.EXPECTED_DECISION_SESSION_COUNT
+)
+_PINNED_STOCK_PORTFOLIO_EXPECTED_RETURNS = (
+    stock_portfolio_evaluator.EXPECTED_RETURN_SESSION_COUNT
+)
+_PINNED_STOCK_PORTFOLIO_MAXIMUM_HOLDINGS = (
+    stock_portfolio_evaluator.MAXIMUM_HOLDINGS
+)
+_PINNED_STOCK_PORTFOLIO_MINIMUM_INVESTED_RETURNS = (
+    stock_portfolio_evaluator.MINIMUM_INVESTED_RETURN_SESSIONS
+)
+_PINNED_STOCK_PORTFOLIO_COSTS = tuple(
+    stock_portfolio_evaluator.COST_BPS_SCENARIOS
+)
+_PINNED_STOCK_PORTFOLIO_PRIMARY_COST = (
+    stock_portfolio_evaluator.PRIMARY_COST_BPS
+)
+_PINNED_STOCK_PORTFOLIO_PROFILE_BYTES = json.dumps(
+    _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE(
+        _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+    ),
+    sort_keys=True,
+    separators=(",", ":"),
+    ensure_ascii=True,
+    allow_nan=False,
+).encode("ascii")
+_PINNED_STOCK_PORTFOLIO_PROFILE_SHA256 = (
+    _PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT["profile_sha256"]
+)
+_PINNED_STOCK_PORTFOLIO_RESULT_NAMES = tuple(
+    sorted(
+        (
+            *_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE(
+                _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+            ),
+            "ARV2_RUNTIME_META",
+        )
+    )
+)
+_PINNED_JSON_DUMPS = json.dumps
 _PINNED_REQUIRE_EXECUTION_SIGNATURE = require_formal_execution_owner_signature
 _PINNED_REQUIRE_RESULT_SIGNATURE = require_formal_result_read_owner_signature
 _PINNED_LOAD_INFRASTRUCTURE_LEDGER = preregistration.load_infrastructure_look_ledger
@@ -284,6 +347,18 @@ _EVALUATION_RUN_SPECS = (
         564,
         571,
     ),
+    _EvaluationRunSpec(
+        _PINNED_STOCK_PORTFOLIO_PROFILE_ID,
+        "arv2-eval-stock-portfolio-historical-qc-001",
+        "R-062",
+        61,
+        62,
+        8,
+        9,
+        4,
+        571,
+        575,
+    ),
 )
 
 
@@ -294,6 +369,9 @@ def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
                 etf_evaluator.require_etf_baseline_profile(
                     evaluation_profile_id
                 )
+            elif evaluation_profile_id == _PINNED_STOCK_PORTFOLIO_PROFILE_ID:
+                if not _stock_portfolio_contract_bindings_are_current():
+                    _error("stock portfolio financial contract changed")
             elif evaluation_profile_id is not None:
                 _PINNED_REQUIRE_REGIME_PROFILE(evaluation_profile_id)
             return spec
@@ -310,6 +388,8 @@ def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]
                 evaluation_profile_id
             )
         )
+    elif evaluation_profile_id == _PINNED_STOCK_PORTFOLIO_PROFILE_ID:
+        names = _PINNED_STOCK_PORTFOLIO_RESULT_NAMES
     else:
         names = tuple(
             _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(evaluation_profile_id)
@@ -412,6 +492,106 @@ def _canonical(value: object) -> bytes:
         raise AcceptedRiskPreliminarySubmissionError(
             "preliminary submission value is not canonical ASCII JSON"
         ) from exc
+
+
+def _stock_portfolio_contract_bindings_are_current() -> bool:
+    """Refuse in-memory weakening of the R-062 financial/result contract."""
+
+    namespace = stock_portfolio_evaluator.__dict__
+    if type(namespace) is not dict:
+        return False
+
+    def exact_json_tree(value: object) -> bool:
+        if type(value) in (str, int, bool) or value is None:
+            return True
+        if type(value) is list:
+            return all(exact_json_tree(item) for item in value)
+        if type(value) is dict:
+            return all(
+                type(key) is str and exact_json_tree(item)
+                for key, item in value.items()
+            )
+        return False
+
+    scalar_bindings = (
+        (stock_portfolio_evaluator.PROFILE_ID, _PINNED_STOCK_PORTFOLIO_PROFILE_ID, str),
+        (stock_portfolio_evaluator.CONTRACT_ID, _PINNED_STOCK_PORTFOLIO_CONTRACT_ID, str),
+        (stock_portfolio_evaluator.SUMMARY_SCHEMA, _PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA, str),
+        (stock_portfolio_evaluator.PORTFOLIO_CELL_SCHEMA, _PINNED_STOCK_PORTFOLIO_CELL_SCHEMA, str),
+        (
+            stock_portfolio_evaluator.EXPECTED_DECISION_SESSION_COUNT,
+            _PINNED_STOCK_PORTFOLIO_EXPECTED_DECISIONS,
+            int,
+        ),
+        (
+            stock_portfolio_evaluator.EXPECTED_RETURN_SESSION_COUNT,
+            _PINNED_STOCK_PORTFOLIO_EXPECTED_RETURNS,
+            int,
+        ),
+        (
+            stock_portfolio_evaluator.MAXIMUM_HOLDINGS,
+            _PINNED_STOCK_PORTFOLIO_MAXIMUM_HOLDINGS,
+            int,
+        ),
+        (
+            stock_portfolio_evaluator.MINIMUM_INVESTED_RETURN_SESSIONS,
+            _PINNED_STOCK_PORTFOLIO_MINIMUM_INVESTED_RETURNS,
+            int,
+        ),
+        (
+            stock_portfolio_evaluator.PRIMARY_COST_BPS,
+            _PINNED_STOCK_PORTFOLIO_PRIMARY_COST,
+            int,
+        ),
+    )
+    if any(type(observed) is not expected_type or observed != expected for (
+        observed, expected, expected_type
+    ) in scalar_bindings):
+        return False
+    costs = stock_portfolio_evaluator.COST_BPS_SCENARIOS
+    if (
+        type(costs) is not tuple
+        or any(type(item) is not int for item in costs)
+        or costs != _PINNED_STOCK_PORTFOLIO_COSTS
+    ):
+        return False
+    stock_source_paths = projection_builder.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
+    if (
+        type(stock_source_paths) is not tuple
+        or any(type(item) is not str for item in stock_source_paths)
+        or stock_source_paths != _PINNED_PROJECTION_STOCK_SOURCE_PATHS
+    ):
+        return False
+    try:
+        profile = namespace.get("_PROFILE")
+        return (
+            namespace.get("require_stock_portfolio_profile")
+            is _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE
+            and namespace.get("expected_custom_summary_statistic_names")
+            is _PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE
+            and projection_builder._profile
+            is _PINNED_PROJECTION_PROFILE_CALLABLE
+            and projection_builder.project_source_paths_for_profile
+            is _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE
+            and type(projection_builder.STOCK_PORTFOLIO_PROFILE_ID) is str
+            and projection_builder.STOCK_PORTFOLIO_PROFILE_ID
+            == _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+            and type(projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256) is str
+            and projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256
+            == _PINNED_STOCK_PORTFOLIO_PROFILE_SHA256
+            and profile is _PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT
+            and exact_json_tree(profile)
+            and _PINNED_JSON_DUMPS(
+                profile,
+                sort_keys=True,
+                separators=(",", ":"),
+                ensure_ascii=True,
+                allow_nan=False,
+            ).encode("ascii")
+            == _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES
+        )
+    except (Exception, RecursionError):
+        return False
 
 
 def _strict_object(payload: bytes, name: str) -> dict[str, object]:
@@ -2702,6 +2882,108 @@ _ETF_PORTFOLIO_FIELDS = frozenset(
         "formal_accept_reject_disposition",
     }
 )
+_STOCK_PORTFOLIO_RUNTIME_META_FIELDS = frozenset(
+    (_REGIME_RUNTIME_META_FIELDS)
+)
+_STOCK_PORTFOLIO_META_FIELDS = frozenset(
+    {
+        "schema",
+        "contract_id",
+        "profile",
+        "package_id",
+        "package_sha256",
+        "input_manifest_id",
+        "input_manifest_sha256",
+        "status",
+        "decision_session_count",
+        "portfolio_return_session_count",
+        "invested_return_session_count",
+        "signal_selected_decision_count",
+        "selected_execution_count",
+        "rebalance_execution_count",
+        "full_target_execution_count",
+        "underfilled_target_execution_count",
+        "matched_rebalance_execution_count",
+        "matched_target_met_execution_count",
+        "matched_underfilled_target_execution_count",
+        "sector_refused_decision_count",
+        "mean_eligible_score_count",
+        "mean_selected_name_count",
+        "mean_executed_target_gross_exposure",
+        "matched_mean_executed_target_gross_exposure",
+        "average_holding_count",
+        "entry_price_refusal_count",
+        "stale_mark_session_count",
+        "deferred_rebalance_count",
+        "membership_end_liquidation_count",
+        "membership_end_zero_recovery_count",
+        "membership_end_entry_refusal_count",
+        "matched_entry_price_refusal_count",
+        "matched_stale_mark_session_count",
+        "matched_deferred_rebalance_count",
+        "matched_membership_end_liquidation_count",
+        "matched_membership_end_zero_recovery_count",
+        "matched_membership_end_entry_refusal_count",
+        "named_figi_resolution_refusal_count",
+        "history_normalization_mode",
+        "history_value_field",
+        "r055_signal_rule_changed",
+        "liquidity_filter_applied",
+        "terminal_payoff_applied",
+        "membership_end_liquidation_is_terminal_payoff",
+        "membership_end_missing_price_policy",
+        "matched_exposure_targeted_to_signal_executed_gross",
+        "current_vintage_non_pristine_pit_input",
+        "raw_provider_rows_in_summary",
+        "raw_security_outcome_rows_in_summary",
+        "raw_price_rows_in_summary",
+        "formal_result",
+        "alpha_claim_authorized",
+        "economic_portfolio_evaluation",
+        "leverage",
+        "deployment",
+        "orders",
+        "trading",
+        "summary_id",
+        "summary_sha256",
+    }
+)
+_STOCK_PORTFOLIO_CELL_FIELDS = frozenset(
+    {
+        "schema",
+        "profile_id",
+        "cost_bps_per_side",
+        "primary_cost_scenario",
+        "status",
+        "return_metric_conditioning",
+        "risk_metrics_are_price_proxy_conditioned",
+        "exposure_underfill_present",
+        "return_session_count",
+        "invested_return_session_count",
+        "cumulative_return",
+        "matched_eligible_stock_cumulative_return",
+        "spy_cumulative_return",
+        "cumulative_return_minus_matched",
+        "cumulative_return_minus_spy",
+        "annualized_arithmetic_return",
+        "annualized_volatility",
+        "zero_rate_sharpe",
+        "zero_rate_sortino",
+        "maximum_drawdown",
+        "average_daily_two_sided_turnover",
+        "average_cash_weight",
+        "matched_annualized_arithmetic_return",
+        "matched_annualized_volatility",
+        "matched_zero_rate_sharpe",
+        "matched_zero_rate_sortino",
+        "matched_maximum_drawdown",
+        "matched_average_daily_two_sided_turnover",
+        "matched_average_cash_weight",
+        "leverage",
+        "orders_submitted",
+        "formal_accept_reject_disposition",
+    }
+)
 _CELL_COUNT_FIELDS = (
     "eligible_score_row_count",
     "accepted_outcome_pair_count",
@@ -2904,7 +3186,7 @@ def _require_runtime_meta(
         or type(runtime_meta.get(slice_field)) is not int
         or not 1
         <= runtime_meta[slice_field]
-        <= preliminary_runtime.MAX_TRAIN_SLICE_COUNT
+        <= _PINNED_MAX_TRAIN_SLICE_COUNT
         or (
             profile is not None
             and (
@@ -3587,6 +3869,553 @@ def _validate_etf_aggregate_records(
         _error("preliminary ETF evaluator summary identity changed")
 
 
+def _validate_stock_portfolio_aggregate_records(
+    records: Mapping[str, dict[str, object]],
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> None:
+    runtime_meta = records.get("ARV2_RUNTIME_META")
+    if (
+        type(runtime_meta) is not dict
+        or set(runtime_meta) != _STOCK_PORTFOLIO_RUNTIME_META_FIELDS
+        or runtime_meta.get("schema")
+        != "arv2-accepted-risk-stock-portfolio-qc-runtime-meta-v1"
+        or runtime_meta.get("status")
+        != "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO_COMPLETED"
+        or runtime_meta.get("evaluation_profile_id")
+        != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+        or runtime_meta.get("evaluation_profile_sha256")
+        != _PINNED_STOCK_PORTFOLIO_PROFILE_SHA256
+        or runtime_meta.get("package_id") != plan.package_id
+        or runtime_meta.get("package_sha256") != plan.package_sha256
+        or runtime_meta.get("activation_manifest_sha256")
+        != plan.activation_manifest_sha256
+        or _safe_name(
+            runtime_meta.get("symbol_resolution_id"),
+            "stock portfolio symbol resolution id",
+            512,
+        )
+        != runtime_meta.get("symbol_resolution_id")
+        or _sha(
+            runtime_meta.get("symbol_resolution_sha256"),
+            "stock portfolio symbol resolution",
+        )
+        != runtime_meta.get("symbol_resolution_sha256")
+        or runtime_meta.get("result_transport")
+        != "aggregate_only_custom_summary_statistics"
+        or runtime_meta.get("host_object_store_export_required") is not False
+        or runtime_meta.get("preliminary") is not True
+        or runtime_meta.get("economic_portfolio") is not True
+        or any(
+            runtime_meta.get(name) is not False
+            for name in (
+                "point_in_time",
+                "formal",
+                "control_residualized",
+                "etf_or_leverage",
+                "deployment",
+                "orders",
+                "trading",
+            )
+        )
+        or any(
+            type(runtime_meta.get(name)) is not int
+            or runtime_meta[name] < 0
+            for name in (
+                "resolved_security_count",
+                "named_security_refusal_count",
+                "runtime_slice_count",
+            )
+        )
+        or runtime_meta["runtime_slice_count"] == 0
+        or runtime_meta["runtime_slice_count"]
+        > _PINNED_MAX_TRAIN_SLICE_COUNT
+        or runtime_meta["resolved_security_count"]
+        + runtime_meta["named_security_refusal_count"]
+        != plan.package.runtime_symbol_binding_count
+    ):
+        _error("preliminary stock-portfolio runtime metadata changed")
+
+    meta = records.get("ARV2_STOCK_PORTFOLIO_META")
+    if type(meta) is not dict or set(meta) != _STOCK_PORTFOLIO_META_FIELDS:
+        _error("preliminary stock-portfolio aggregate metadata changed")
+    count_fields = (
+        "decision_session_count",
+        "portfolio_return_session_count",
+        "invested_return_session_count",
+        "signal_selected_decision_count",
+        "selected_execution_count",
+        "rebalance_execution_count",
+        "full_target_execution_count",
+        "underfilled_target_execution_count",
+        "matched_rebalance_execution_count",
+        "matched_target_met_execution_count",
+        "matched_underfilled_target_execution_count",
+        "sector_refused_decision_count",
+        "entry_price_refusal_count",
+        "stale_mark_session_count",
+        "deferred_rebalance_count",
+        "membership_end_liquidation_count",
+        "membership_end_zero_recovery_count",
+        "membership_end_entry_refusal_count",
+        "matched_entry_price_refusal_count",
+        "matched_stale_mark_session_count",
+        "matched_deferred_rebalance_count",
+        "matched_membership_end_liquidation_count",
+        "matched_membership_end_zero_recovery_count",
+        "matched_membership_end_entry_refusal_count",
+        "named_figi_resolution_refusal_count",
+    )
+    authenticated_manifest = _authenticated_evaluator_manifest(plan)
+    if (
+        meta.get("schema") != _PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA
+        or meta.get("contract_id") != _PINNED_STOCK_PORTFOLIO_CONTRACT_ID
+        or _canonical(meta.get("profile"))
+        != _PINNED_STOCK_PORTFOLIO_PROFILE_BYTES
+        or meta.get("package_id") != plan.package_id
+        or meta.get("package_sha256") != plan.package_sha256
+        or meta.get("input_manifest_id") != plan.evaluator_manifest_id
+        or meta.get("input_manifest_sha256") != plan.evaluator_manifest_sha256
+        or meta.get("input_manifest_id")
+        != authenticated_manifest.get("manifest_id")
+        or meta.get("status")
+        != "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO"
+        or any(
+            type(meta.get(name)) is not int or meta[name] < 0
+            for name in count_fields
+        )
+        or meta["decision_session_count"] == 0
+        or meta["decision_session_count"]
+        != _PINNED_STOCK_PORTFOLIO_EXPECTED_DECISIONS
+        or meta["portfolio_return_session_count"]
+        != _PINNED_STOCK_PORTFOLIO_EXPECTED_RETURNS
+        or meta["invested_return_session_count"]
+        > meta["portfolio_return_session_count"]
+        or meta["signal_selected_decision_count"]
+        > meta["decision_session_count"]
+        or meta["selected_execution_count"]
+        > meta["signal_selected_decision_count"]
+        or meta["selected_execution_count"]
+        > meta["rebalance_execution_count"]
+        or meta["full_target_execution_count"]
+        > meta["selected_execution_count"]
+        or meta["full_target_execution_count"]
+        + meta["underfilled_target_execution_count"]
+        != meta["rebalance_execution_count"]
+        or meta["rebalance_execution_count"]
+        + meta["deferred_rebalance_count"]
+        != meta["decision_session_count"]
+        or meta["matched_target_met_execution_count"]
+        + meta["matched_underfilled_target_execution_count"]
+        != meta["matched_rebalance_execution_count"]
+        or meta["matched_rebalance_execution_count"]
+        + meta["matched_deferred_rebalance_count"]
+        != meta["decision_session_count"]
+        or meta["matched_rebalance_execution_count"]
+        > meta["rebalance_execution_count"]
+        or meta["matched_deferred_rebalance_count"]
+        < meta["deferred_rebalance_count"]
+        or meta["sector_refused_decision_count"]
+        > meta["decision_session_count"]
+        or meta["deferred_rebalance_count"]
+        > meta["decision_session_count"]
+        or meta["matched_deferred_rebalance_count"]
+        > meta["decision_session_count"]
+        or meta["membership_end_zero_recovery_count"]
+        > meta["membership_end_liquidation_count"]
+        or meta["matched_membership_end_zero_recovery_count"]
+        > meta["matched_membership_end_liquidation_count"]
+        or meta["named_figi_resolution_refusal_count"]
+        != runtime_meta["named_security_refusal_count"]
+        or meta.get("history_normalization_mode") != "TOTAL_RETURN"
+        or meta.get("history_value_field") != "open"
+        or meta.get("r055_signal_rule_changed") is not False
+        or meta.get("liquidity_filter_applied") is not False
+        or meta.get("terminal_payoff_applied") is not False
+        or meta.get("membership_end_liquidation_is_terminal_payoff") is not False
+        or meta.get("membership_end_missing_price_policy")
+        != "zero_recovery_conservative_lower_bound"
+        or meta.get("matched_exposure_targeted_to_signal_executed_gross")
+        is not True
+        or meta.get("current_vintage_non_pristine_pit_input") is not True
+        or meta.get("economic_portfolio_evaluation") is not True
+        or any(
+            meta.get(name) is not False
+            for name in (
+                "raw_provider_rows_in_summary",
+                "raw_security_outcome_rows_in_summary",
+                "raw_price_rows_in_summary",
+                "formal_result",
+                "alpha_claim_authorized",
+                "leverage",
+                "deployment",
+                "orders",
+                "trading",
+            )
+        )
+    ):
+        _error("preliminary stock-portfolio aggregate metadata semantics changed")
+    metric_bounds = (
+        ("mean_eligible_score_count", Decimal(0), Decimal(plan.package.runtime_symbol_binding_count)),
+        ("mean_selected_name_count", Decimal(0), Decimal(_PINNED_STOCK_PORTFOLIO_MAXIMUM_HOLDINGS)),
+        ("mean_executed_target_gross_exposure", Decimal(0), Decimal("0.98")),
+        ("matched_mean_executed_target_gross_exposure", Decimal(0), Decimal("0.98")),
+        ("average_holding_count", Decimal(0), Decimal(_PINNED_STOCK_PORTFOLIO_MAXIMUM_HOLDINGS)),
+    )
+    parsed_meta_metrics = {}
+    for name, lower, upper in metric_bounds:
+        parsed = _cell_metric(meta.get(name), "stock portfolio " + name)
+        parsed_meta_metrics[name] = parsed
+        if not lower <= parsed <= upper:
+            _error("preliminary stock-portfolio mean count escaped bounds")
+    signal_mean_gross = parsed_meta_metrics[
+        "mean_executed_target_gross_exposure"
+    ]
+    matched_mean_gross = parsed_meta_metrics[
+        "matched_mean_executed_target_gross_exposure"
+    ]
+    rebalance_count = meta["rebalance_execution_count"]
+    if rebalance_count == 0:
+        invalid_target_means = signal_mean_gross != 0 or matched_mean_gross != 0
+    else:
+        with localcontext(preliminary_evaluator._context()):
+            full_signal_floor = +(
+                Decimal(meta["full_target_execution_count"])
+                * Decimal("0.98")
+                / Decimal(rebalance_count)
+            )
+        invalid_target_means = (
+            signal_mean_gross < full_signal_floor
+            or (meta["selected_execution_count"] == 0) is not (
+                signal_mean_gross == 0
+            )
+            or (
+                meta["underfilled_target_execution_count"] == 0
+                and signal_mean_gross != Decimal("0.98")
+            )
+            or (
+                meta["underfilled_target_execution_count"] > 0
+                and signal_mean_gross == Decimal("0.98")
+            )
+            or (
+                meta["matched_rebalance_execution_count"] == 0
+                and matched_mean_gross != 0
+            )
+        )
+    with localcontext(preliminary_evaluator._context()):
+        signal_target_gross_sum = +(
+            signal_mean_gross * Decimal(rebalance_count)
+        )
+        matched_target_gross_sum = +(
+            matched_mean_gross
+            * Decimal(meta["matched_rebalance_execution_count"])
+        )
+    invalid_target_means = (
+        invalid_target_means
+        or matched_target_gross_sum > signal_target_gross_sum
+    )
+    if invalid_target_means:
+        _error("preliminary stock-portfolio target exposure changed")
+
+    cells = []
+    spy_values = set()
+    signal_by_cost = {}
+    matched_by_cost = {}
+    signal_annual_by_cost = {}
+    matched_annual_by_cost = {}
+    path_invariants = {
+        name: set()
+        for name in (
+            "average_daily_two_sided_turnover",
+            "average_cash_weight",
+            "matched_average_daily_two_sided_turnover",
+            "matched_average_cash_weight",
+        )
+    }
+    if (
+        meta["portfolio_return_session_count"] < 252
+        or meta["invested_return_session_count"]
+        < _PINNED_STOCK_PORTFOLIO_MINIMUM_INVESTED_RETURNS
+    ):
+        expected_status = "INCONCLUSIVE_UNDERFILLED"
+    elif (
+        meta["membership_end_zero_recovery_count"]
+        or meta["matched_membership_end_zero_recovery_count"]
+    ):
+        expected_status = (
+            "PRELIMINARY_DESCRIPTIVE_LOWER_BOUND_WITH_ZERO_RECOVERY"
+        )
+    elif (
+        meta["stale_mark_session_count"]
+        or meta["matched_stale_mark_session_count"]
+    ):
+        expected_status = (
+            "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
+        )
+    elif (
+        meta["underfilled_target_execution_count"]
+        or meta["matched_underfilled_target_execution_count"]
+    ):
+        expected_status = (
+            "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_EXPOSURE_UNDERFILL"
+        )
+    else:
+        expected_status = "PRELIMINARY_DESCRIPTIVE_AVAILABLE"
+    for cost in _PINNED_STOCK_PORTFOLIO_COSTS:
+        cell = records.get("ARV2_STOCK_PORTFOLIO_COST_" + str(cost))
+        if type(cell) is not dict or set(cell) != _STOCK_PORTFOLIO_CELL_FIELDS:
+            _error("preliminary stock-portfolio cell fields changed")
+        if (
+            cell.get("schema")
+            != _PINNED_STOCK_PORTFOLIO_CELL_SCHEMA
+            or cell.get("profile_id") != _PINNED_STOCK_PORTFOLIO_PROFILE_ID
+            or cell.get("cost_bps_per_side") != cost
+            or cell.get("primary_cost_scenario")
+            is not (cost == _PINNED_STOCK_PORTFOLIO_PRIMARY_COST)
+            or cell.get("status") != expected_status
+            or cell.get("return_metric_conditioning")
+            != (
+                "conditioned_on_zero_recovery_lower_bound_and_possible_"
+                "stale_mark_path"
+                if (
+                    meta["membership_end_zero_recovery_count"]
+                    or meta["matched_membership_end_zero_recovery_count"]
+                )
+                else (
+                    "conditioned_on_stale_mark_path"
+                    if (
+                        meta["stale_mark_session_count"]
+                        or meta["matched_stale_mark_session_count"]
+                    )
+                    else "no_price_proxy"
+                )
+            )
+            or cell.get("risk_metrics_are_price_proxy_conditioned")
+            is not (
+                bool(
+                    meta["stale_mark_session_count"]
+                    or meta["membership_end_zero_recovery_count"]
+                    or meta["matched_stale_mark_session_count"]
+                    or meta["matched_membership_end_zero_recovery_count"]
+                )
+            )
+            or cell.get("exposure_underfill_present")
+            is not bool(
+                meta["underfilled_target_execution_count"]
+                or meta["matched_underfilled_target_execution_count"]
+            )
+            or cell.get("return_session_count")
+            != meta["portfolio_return_session_count"]
+            or cell.get("invested_return_session_count")
+            != meta["invested_return_session_count"]
+            or cell.get("leverage") is not False
+            or cell.get("orders_submitted") != 0
+            or cell.get("formal_accept_reject_disposition") is not None
+        ):
+            _error("preliminary stock-portfolio cell semantics changed")
+        decimal_names = (
+            "cumulative_return",
+            "matched_eligible_stock_cumulative_return",
+            "spy_cumulative_return",
+            "cumulative_return_minus_matched",
+            "cumulative_return_minus_spy",
+            "annualized_arithmetic_return",
+            "annualized_volatility",
+            "maximum_drawdown",
+            "average_daily_two_sided_turnover",
+            "average_cash_weight",
+            "matched_annualized_arithmetic_return",
+            "matched_annualized_volatility",
+            "matched_maximum_drawdown",
+            "matched_average_daily_two_sided_turnover",
+            "matched_average_cash_weight",
+        )
+        parsed = {
+            name: _cell_metric(cell.get(name), "stock portfolio " + name)
+            for name in decimal_names
+        }
+        for name in (
+            "zero_rate_sharpe",
+            "zero_rate_sortino",
+            "matched_zero_rate_sharpe",
+            "matched_zero_rate_sortino",
+        ):
+            value = cell.get(name)
+            parsed[name] = (
+                None
+                if value is None
+                else _cell_metric(value, "stock portfolio " + name)
+            )
+        with localcontext(preliminary_evaluator._context()):
+            exact_matched = +(
+                parsed["cumulative_return"]
+                - parsed["matched_eligible_stock_cumulative_return"]
+            )
+            exact_spy = +(
+                parsed["cumulative_return"] - parsed["spy_cumulative_return"]
+            )
+            exact_sharpe = (
+                None
+                if parsed["annualized_volatility"] == 0
+                else +(
+                    parsed["annualized_arithmetic_return"]
+                    / parsed["annualized_volatility"]
+                )
+            )
+            exact_matched_sharpe = (
+                None
+                if parsed["matched_annualized_volatility"] == 0
+                else +(
+                    parsed["matched_annualized_arithmetic_return"]
+                    / parsed["matched_annualized_volatility"]
+                )
+            )
+        if (
+            parsed["cumulative_return"] <= -1
+            or parsed["matched_eligible_stock_cumulative_return"] <= -1
+            or parsed["spy_cumulative_return"] <= -1
+            or parsed["cumulative_return_minus_matched"] != exact_matched
+            or parsed["cumulative_return_minus_spy"] != exact_spy
+            or parsed["zero_rate_sharpe"] != exact_sharpe
+            or parsed["matched_zero_rate_sharpe"] != exact_matched_sharpe
+            or (
+                parsed["zero_rate_sortino"] is None
+                and parsed["annualized_arithmetic_return"] < 0
+            )
+            or (
+                parsed["zero_rate_sortino"] is not None
+                and (
+                    (
+                        parsed["annualized_arithmetic_return"] > 0
+                        and parsed["zero_rate_sortino"] <= 0
+                    )
+                    or (
+                        parsed["annualized_arithmetic_return"] < 0
+                        and parsed["zero_rate_sortino"] >= 0
+                    )
+                    or (
+                        parsed["annualized_arithmetic_return"] == 0
+                        and parsed["zero_rate_sortino"] != 0
+                    )
+                )
+            )
+            or (
+                parsed["matched_zero_rate_sortino"] is None
+                and parsed["matched_annualized_arithmetic_return"] < 0
+            )
+            or (
+                parsed["matched_zero_rate_sortino"] is not None
+                and (
+                    (
+                        parsed["matched_annualized_arithmetic_return"] > 0
+                        and parsed["matched_zero_rate_sortino"] <= 0
+                    )
+                    or (
+                        parsed["matched_annualized_arithmetic_return"] < 0
+                        and parsed["matched_zero_rate_sortino"] >= 0
+                    )
+                    or (
+                        parsed["matched_annualized_arithmetic_return"] == 0
+                        and parsed["matched_zero_rate_sortino"] != 0
+                    )
+                )
+            )
+            or parsed["annualized_volatility"] < 0
+            or parsed["matched_annualized_volatility"] < 0
+            or not -1 <= parsed["maximum_drawdown"] <= 0
+            or not -1 <= parsed["matched_maximum_drawdown"] <= 0
+            or parsed["average_daily_two_sided_turnover"] < 0
+            or parsed["matched_average_daily_two_sided_turnover"] < 0
+            or not 0 <= parsed["average_cash_weight"] <= 1
+            or not 0 <= parsed["matched_average_cash_weight"] <= 1
+        ):
+            _error("preliminary stock-portfolio metric escaped bounds")
+        spy_values.add(cell["spy_cumulative_return"])
+        for name in path_invariants:
+            path_invariants[name].add(cell[name])
+        signal_by_cost[cost] = parsed["cumulative_return"]
+        matched_by_cost[cost] = parsed["matched_eligible_stock_cumulative_return"]
+        signal_annual_by_cost[cost] = parsed["annualized_arithmetic_return"]
+        matched_annual_by_cost[cost] = parsed[
+            "matched_annualized_arithmetic_return"
+        ]
+        cells.append(cell)
+    if len(spy_values) != 1 or any(
+        len(values) != 1 for values in path_invariants.values()
+    ):
+        _error("preliminary stock-portfolio cost ordering changed")
+    signal_turnover = _cell_metric(
+        next(iter(path_invariants["average_daily_two_sided_turnover"])),
+        "stock portfolio average_daily_two_sided_turnover",
+    )
+    matched_turnover = _cell_metric(
+        next(
+            iter(
+                path_invariants[
+                    "matched_average_daily_two_sided_turnover"
+                ]
+            )
+        ),
+        "stock portfolio matched_average_daily_two_sided_turnover",
+    )
+    with localcontext(preliminary_evaluator._context()):
+        for cost in _PINNED_STOCK_PORTFOLIO_COSTS:
+            expected_signal_annual = +(
+                signal_annual_by_cost[0]
+                - Decimal(cost)
+                / Decimal(10000)
+                * signal_turnover
+                * Decimal(252)
+            )
+            expected_matched_annual = +(
+                matched_annual_by_cost[0]
+                - Decimal(cost)
+                / Decimal(10000)
+                * matched_turnover
+                * Decimal(252)
+            )
+            if (
+                abs(
+                    signal_annual_by_cost[cost]
+                    - expected_signal_annual
+                )
+                > Decimal("1e-40")
+                or abs(
+                    matched_annual_by_cost[cost]
+                    - expected_matched_annual
+                )
+                > Decimal("1e-40")
+            ):
+                _error("preliminary stock-portfolio cost arithmetic changed")
+    if (
+        any(
+            signal_by_cost[left] < signal_by_cost[right]
+            or matched_by_cost[left] < matched_by_cost[right]
+            for left, right in zip(
+                _PINNED_STOCK_PORTFOLIO_COSTS,
+                _PINNED_STOCK_PORTFOLIO_COSTS[1:],
+            )
+        )
+    ):
+        _error("preliminary stock-portfolio cost ordering changed")
+
+    summary_id = meta.get("summary_id")
+    summary_sha = meta.get("summary_sha256")
+    if type(summary_id) is not str or type(summary_sha) is not str:
+        _error("preliminary stock-portfolio summary identity is absent")
+    record = {
+        key: value
+        for key, value in meta.items()
+        if key not in {"summary_id", "summary_sha256"}
+    }
+    record["portfolio_cells"] = cells
+    digest = hashlib.sha256(_canonical(record)).hexdigest()
+    if (
+        summary_sha != digest
+        or summary_id != "arv2-stock-portfolio-summary-" + digest[:24]
+    ):
+        _error("preliminary stock-portfolio summary identity changed")
+
+
 def _validate_aggregate_records(
     records: Mapping[str, dict[str, object]],
     plan: AcceptedRiskPreliminarySubmissionPlan,
@@ -3602,6 +4431,9 @@ def _validate_aggregate_records(
         return
     if profile_id == etf_evaluator.PROFILE_ID:
         _validate_etf_aggregate_records(records, plan)
+        return
+    if profile_id == _PINNED_STOCK_PORTFOLIO_PROFILE_ID:
+        _validate_stock_portfolio_aggregate_records(records, plan)
         return
     _validate_regime_aggregate_records(records, plan, profile_id)
 
@@ -3878,8 +4710,19 @@ def _make_action_guard():
         expected = tuple((name, module_globals[name]) for name in names)
 
     def require(_phase: str) -> None:
-        if os.getpid() != authority_pid or any(
-            module_globals.get(name) is not value for name, value in expected
+        def globals_are_current() -> bool:
+            return not any(
+                module_globals.get(name) is not value
+                for name, value in expected
+            )
+
+        if (
+            os.getpid() != authority_pid
+            or not globals_are_current()
+            or not module_globals[
+                "_stock_portfolio_contract_bindings_are_current"
+            ]()
+            or not globals_are_current()
         ):
             _error("preliminary action global binding changed")
 
@@ -4169,9 +5012,30 @@ _seal_action_bindings(
         "_PINNED_REQUIRE_PACKAGE",
         "_PINNED_ITER_UPLOADS",
         "_PINNED_REQUIRE_PROJECTION",
+        "_PINNED_PROJECTION_PROFILE_CALLABLE",
+        "_PINNED_PROJECTION_SOURCE_PATHS_CALLABLE",
+        "_PINNED_PROJECTION_STOCK_SOURCE_PATHS",
         "_PINNED_EXPECTED_RESULT_NAMES",
         "_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE",
+        "_PINNED_MAX_TRAIN_SLICE_COUNT",
         "_PINNED_REQUIRE_REGIME_PROFILE",
+        "_PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE",
+        "_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE",
+        "_PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT",
+        "_PINNED_STOCK_PORTFOLIO_PROFILE_ID",
+        "_PINNED_STOCK_PORTFOLIO_CONTRACT_ID",
+        "_PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA",
+        "_PINNED_STOCK_PORTFOLIO_CELL_SCHEMA",
+        "_PINNED_STOCK_PORTFOLIO_EXPECTED_DECISIONS",
+        "_PINNED_STOCK_PORTFOLIO_EXPECTED_RETURNS",
+        "_PINNED_STOCK_PORTFOLIO_MAXIMUM_HOLDINGS",
+        "_PINNED_STOCK_PORTFOLIO_MINIMUM_INVESTED_RETURNS",
+        "_PINNED_STOCK_PORTFOLIO_COSTS",
+        "_PINNED_STOCK_PORTFOLIO_PRIMARY_COST",
+        "_PINNED_STOCK_PORTFOLIO_PROFILE_BYTES",
+        "_PINNED_STOCK_PORTFOLIO_PROFILE_SHA256",
+        "_PINNED_STOCK_PORTFOLIO_RESULT_NAMES",
+        "_PINNED_JSON_DUMPS",
         "_PINNED_REQUIRE_EXECUTION_SIGNATURE",
         "_PINNED_REQUIRE_RESULT_SIGNATURE",
         "_PINNED_LOAD_INFRASTRUCTURE_LEDGER",
@@ -4236,6 +5100,9 @@ _seal_action_bindings(
         "_ETF_META_FIELDS",
         "_ETF_IC_FIELDS",
         "_ETF_PORTFOLIO_FIELDS",
+        "_STOCK_PORTFOLIO_RUNTIME_META_FIELDS",
+        "_STOCK_PORTFOLIO_META_FIELDS",
+        "_STOCK_PORTFOLIO_CELL_FIELDS",
         "_CELL_COUNT_FIELDS",
         "_REGIME_MISSING_COUNT_FIELDS",
         "_CELL_METRIC_FIELDS",
@@ -4259,6 +5126,7 @@ _seal_action_bindings(
         "_EVALUATION_RUN_SPECS",
         "_error",
         "_canonical",
+        "_stock_portfolio_contract_bindings_are_current",
         "_strict_object",
         "_sha",
         "_safe_name",
@@ -4316,6 +5184,7 @@ _seal_action_bindings(
         "_validate_regime_cell_semantics",
         "_validate_regime_aggregate_records",
         "_validate_etf_aggregate_records",
+        "_validate_stock_portfolio_aggregate_records",
         "_validate_aggregate_records",
         "_result_receipt_path",
         "_result_authority_bound",
@@ -4345,6 +5214,7 @@ _seal_action_bindings(
         "regime_evaluator",
         "etf_evaluator",
         "etf_runtime",
+        "stock_portfolio_evaluator",
         "formal",
         "FormalQcTransport",
         "OwnerSignatureAuthority",

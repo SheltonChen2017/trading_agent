@@ -4,6 +4,8 @@ import hashlib
 import io
 import json
 import sqlite3
+import subprocess
+import sys
 from datetime import date, datetime
 from fractions import Fraction
 from pathlib import Path
@@ -27,6 +29,9 @@ from research.analyst_revisions_v2_qc import (
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_regime_rating_evaluator as regime_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_stock_portfolio_evaluator as stock_portfolio_evaluator,
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_package as package_builder,
@@ -952,6 +957,79 @@ def test_projection_binds_one_exact_regime_profile_into_identity_and_main(monkey
             dataclasses.replace(value, evaluation_profile_sha256="0" * 64)
         )
 
+
+def test_projection_binds_stock_portfolio_profile_and_only_its_extra_module(
+    monkeypatch, tmp_path
+):
+    activation = SimpleNamespace(
+        role="activation_manifest",
+        activation_manifest=True,
+        object_store_key="arv2/preliminary-rating/fixture/transport-manifest.json",
+        content_sha256="f" * 64,
+        byte_count=1234,
+    )
+    package = SimpleNamespace(
+        package_id="arv2-preliminary-qc-package-fixture",
+        package_sha256="e" * 64,
+        upload_objects=(activation,),
+    )
+    monkeypatch.setattr(
+        package_builder,
+        "require_accepted_risk_preliminary_package",
+        lambda value: value,
+    )
+
+    value = projection.build_accepted_risk_preliminary_qc_projection(
+        package,
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
+    )
+    by_name = {item.project_path: item for item in value.source_files}
+
+    assert set(by_name) == {
+        "main.py",
+        *projection.PROJECT_SOURCE_PATHS,
+        "accepted_risk_stock_portfolio_evaluator.py",
+    }
+    assert value.evaluation_profile_id == stock_portfolio_evaluator.PROFILE_ID
+    assert value.evaluation_profile_sha256 == (
+        stock_portfolio_evaluator.require_stock_portfolio_profile(
+            stock_portfolio_evaluator.PROFILE_ID
+        )["profile_sha256"]
+    )
+    assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES
+    assert max(item.byte_count for item in value.source_files) < 60_000
+    main = by_name["main.py"].source_bytes.decode("ascii")
+    assert (
+        f"evaluation_profile_id={stock_portfolio_evaluator.PROFILE_ID!r}"
+        in main
+    )
+    assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
+
+    for name, source in by_name.items():
+        if name != "main.py":
+            (tmp_path / name).write_bytes(source.source_bytes)
+    probe = subprocess.run(
+        (
+            sys.executable,
+            "-I",
+            "-c",
+            (
+                "import sys; "
+                f"sys.path.insert(0, {str(tmp_path)!r}); "
+                "import accepted_risk_preliminary_qc_runtime as runtime; "
+                "names = runtime.expected_custom_summary_statistic_names("
+                f"{stock_portfolio_evaluator.PROFILE_ID!r}); "
+                "assert len(names) == 6; "
+                "assert 'ARV2_RUNTIME_META' in names"
+            ),
+        ),
+        cwd=tmp_path,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert probe.returncode == 0, probe.stderr
+
     with pytest.raises(ValueError, match="exact fixed profile id"):
         projection.build_accepted_risk_preliminary_qc_projection(
             package,
@@ -1547,6 +1625,18 @@ def test_runtime_result_inventory_is_exact_for_each_fixed_regime_profile():
         )
 
 
+def test_runtime_result_inventory_is_exact_for_stock_portfolio_profile():
+    assert runtime.STOCK_PORTFOLIO_PROFILE_ID == stock_portfolio_evaluator.PROFILE_ID
+    expected = runtime.expected_custom_summary_statistic_names(
+        stock_portfolio_evaluator.PROFILE_ID
+    )
+    assert len(expected) == 6
+    assert set(expected) == {
+        *stock_portfolio_evaluator.expected_custom_summary_statistic_names(),
+        runtime.RUNTIME_META_STATISTIC,
+    }
+
+
 def test_driver_initialization_selects_regime_runtime_and_exact_named_refusals(
     monkeypatch,
 ):
@@ -1625,6 +1715,79 @@ def test_driver_initialization_selects_regime_runtime_and_exact_named_refusals(
     assert driver._runtime.__class__ is RegimeRuntime
 
 
+def test_driver_initialization_selects_stock_portfolio_runtime(monkeypatch):
+    evaluator_input = SimpleNamespace(
+        source_lineage_sha256s={"security_master_admission_sha256": "a" * 64},
+        benchmark_security_id="benchmark",
+        memberships=(
+            SimpleNamespace(security_id="security-b"),
+            SimpleNamespace(security_id="security-a"),
+        ),
+        session_axis=("2021-01-04",),
+    )
+    package = SimpleNamespace(
+        package_id="package-one",
+        package_sha256="b" * 64,
+        evaluator_input=evaluator_input,
+        runtime_symbol_bindings=("binding",),
+    )
+
+    class Resolution:
+        def symbol_for_security(self, security_id):
+            return None if security_id == "security-b" else object()
+
+    captured = {}
+
+    class Loader:
+        def __init__(self, _algorithm, **kwargs):
+            captured["loader"] = kwargs
+
+    class StockRuntime:
+        def __init__(self, value, **kwargs):
+            captured["runtime"] = (value, kwargs)
+
+    monkeypatch.setattr(
+        runtime,
+        "load_accepted_risk_preliminary_package",
+        lambda *_args, **_kwargs: package,
+    )
+    monkeypatch.setattr(
+        figi,
+        "resolve_preliminary_qc_figis",
+        lambda *_args, **_kwargs: Resolution(),
+    )
+    monkeypatch.setattr(runtime, "QcTotalReturnOpenHistoryLoader", Loader)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "StockPortfolioEvaluationRuntime",
+        StockRuntime,
+    )
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        SimpleNamespace(composite_figi=object()),
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
+    )
+
+    driver._initialize_in_training()
+
+    assert captured["runtime"] == (
+        evaluator_input,
+        {
+            "profile_id": stock_portfolio_evaluator.PROFILE_ID,
+            "package_id": "package-one",
+            "package_sha256": "b" * 64,
+            "named_figi_resolution_refusals": ("security-b",),
+        },
+    )
+    assert driver._runtime.__class__ is StockRuntime
+
+
 def test_driver_emits_profile_bound_runtime_metadata_without_training_alias():
     profile_id = "arv2-stock-ic-2023-2025"
     profile = regime_evaluator.require_regime_profile(profile_id)
@@ -1663,6 +1826,57 @@ def test_driver_emits_profile_bound_runtime_metadata_without_training_alias():
     assert meta["evaluation_profile_sha256"] == profile["profile_sha256"]
     assert meta["runtime_slice_count"] == 1
     assert "training_slice_count" not in meta
+
+
+def test_driver_emits_stock_portfolio_runtime_metadata():
+    profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        stock_portfolio_evaluator.PROFILE_ID
+    )
+    algorithm = _DriverAlgorithm()
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        algorithm,
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
+    )
+    driver._package = SimpleNamespace(
+        package_id="package-one",
+        package_sha256="b" * 64,
+        activation_manifest_sha256="c" * 64,
+    )
+    driver._resolution = SimpleNamespace(
+        resolution_id="resolution-one",
+        resolution_sha256="d" * 64,
+        resolved_count=1,
+        named_refusal_count=0,
+    )
+    driver._history_loader = object()
+    portfolio_runtime = _DriverRuntime(1)
+    portfolio_runtime.custom_summary_statistics = lambda: {
+        key: "exact"
+        for key in stock_portfolio_evaluator.expected_custom_summary_statistic_names()
+    }
+    driver._runtime = portfolio_runtime
+
+    driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+
+    assert len(algorithm.statistics) == 6
+    meta = json.loads(dict(algorithm.statistics)[runtime.RUNTIME_META_STATISTIC])
+    assert meta["schema"] == (
+        "arv2-accepted-risk-stock-portfolio-qc-runtime-meta-v1"
+    )
+    assert meta["status"] == (
+        "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO_COMPLETED"
+    )
+    assert meta["evaluation_profile_id"] == stock_portfolio_evaluator.PROFILE_ID
+    assert meta["evaluation_profile_sha256"] == profile["profile_sha256"]
+    assert meta["economic_portfolio"] is True
+    assert meta["etf_or_leverage"] is False
 
 
 def test_full_geometry_completes_in_41_unslowed_daily_slices():

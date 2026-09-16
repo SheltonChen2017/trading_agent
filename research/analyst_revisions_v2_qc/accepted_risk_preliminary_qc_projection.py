@@ -13,6 +13,7 @@ from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_preliminary_qc_runtime as runtime_builder
 from . import accepted_risk_regime_rating_evaluator as regime_evaluator
 from . import accepted_risk_etf_baseline_evaluator as etf_evaluator
+from . import accepted_risk_stock_portfolio_evaluator as stock_portfolio_evaluator
 
 
 class AcceptedRiskPreliminaryQcProjectionError(ValueError):
@@ -41,6 +42,16 @@ ETF_PROJECT_SOURCE_PATHS = (
     "accepted_risk_etf_baseline_evaluator.py",
     "accepted_risk_etf_baseline_qc_runtime.py",
 )
+STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS = (
+    *PROJECT_SOURCE_PATHS,
+    "accepted_risk_stock_portfolio_evaluator.py",
+)
+STOCK_PORTFOLIO_PROFILE_ID = stock_portfolio_evaluator.PROFILE_ID
+STOCK_PORTFOLIO_PROFILE_SHA256 = (
+    stock_portfolio_evaluator.require_stock_portfolio_profile(
+        STOCK_PORTFOLIO_PROFILE_ID
+    )["profile_sha256"]
+)
 MAIN_PROJECT_PATH = "main.py"
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
 _FORBIDDEN_IMPORT_ROOTS = {
@@ -64,6 +75,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_preliminary_rating_evaluator",
     "accepted_risk_preliminary_rating_policy",
     "accepted_risk_regime_rating_evaluator",
+    "accepted_risk_stock_portfolio_evaluator",
     "accepted_risk_etf_baseline_evaluator",
     "accepted_risk_etf_baseline_qc_runtime",
     "collections",
@@ -536,16 +548,21 @@ def _profile(evaluation_profile_id):
         return etf_evaluator.require_etf_baseline_profile(
             evaluation_profile_id
         )
+    if evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+        return {
+            "profile_id": STOCK_PORTFOLIO_PROFILE_ID,
+            "profile_sha256": STOCK_PORTFOLIO_PROFILE_SHA256,
+        }
     return regime_evaluator.require_regime_profile(evaluation_profile_id)
 
 
 def project_source_paths_for_profile(evaluation_profile_id):
     _profile(evaluation_profile_id)
-    return (
-        ETF_PROJECT_SOURCE_PATHS
-        if evaluation_profile_id == etf_evaluator.PROFILE_ID
-        else PROJECT_SOURCE_PATHS
-    )
+    if evaluation_profile_id == etf_evaluator.PROFILE_ID:
+        return ETF_PROJECT_SOURCE_PATHS
+    if evaluation_profile_id == STOCK_PORTFOLIO_PROFILE_ID:
+        return STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
+    return PROJECT_SOURCE_PATHS
 
 
 def _validate_source(project_path: str, source: bytes) -> PreliminaryQcSourceFile:

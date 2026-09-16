@@ -272,22 +272,22 @@ COMPARATOR'S +20.96% IS HEAVILY CONDITIONED BY 1,247 STALE-MARK SESSIONS AND
 NOT CLEAN ALPHA EVIDENCE. THE RESULT IS PROFITABLE BUT NOT BENCHMARK-
 COMPETITIVE, REMAINS PRELIMINARY/CURRENT-VINTAGE/NON-PRISTINE-PIT, AND DOES
 NOT UNLOCK LEVERAGE. ACCOUNTING IS 64 SHARED LOOKS, 11 ARV2 DEVELOPMENT
-EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 575-CELL LIFETIME FLOOR. CLAUDE'S
-INDEPENDENT REVIEW OF SECTION 84 AND THE EXACT PUSHED RANGE IS NEXT. CODEX
-THEN COUNTER-REVIEWS EVERY CLAUDE COMMIT AND, USING THE REVIEW AND R-064
-EVIDENCE, EITHER REVISES THE ECONOMIC CONSTRUCTION OR PREREGISTERS THE NEXT
-BOUNDED QC DIAGNOSTIC. PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS,
-TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2 SIGNAL HAS BEEN
-ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.
+EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 575-CELL LIFETIME FLOOR.
 THE INDEPENDENT CLAUDE REVIEW OF THE DIRECT-STOCK RANGE (SECTION 85) ACCEPTS
-ALL FIVE COMMITS AFTER TWO CORRECTIONS. THE MATCHED COMPARATOR IS STRUCTURALLY
+ALL FIVE COMMITS AFTER TWO CORRECTIONS. ITS TEST PROVES THAT THE R-064 MATCHED
+COMPARATOR IS STRUCTURALLY
 FROZEN: ONE HELD NAME WITHOUT A PRICE DEFERS AN ENTIRE REBALANCE, SO A
 UNIVERSE-SIZED SLEEVE STOPS TRADING, AND R-064'S POSITIVE
 SIGNAL-MINUS-MATCHED DIFFERENCE MEASURES TRADING AGAINST NOT TRADING. R-064
-THEREFORE SUPPORTS NEITHER A POSITIVE NOR A NEGATIVE CONCLUSION ABOUT THE
-SCORE'S ECONOMIC VALUE. THE SECOND CORRECTION RESTORES THIS BANNER'S STANDING
-NO-ACCEPTED-SIGNAL ASSERTION, WHICH THE R-064 RECORD COMMIT DELETED AND A
-SHARED GUARD DETECTS.**
+THEREFORE CANNOT ATTRIBUTE ITS RETURN DIFFERENCE TO THE SCORE, ALTHOUGH ITS
+EXACT IMPLEMENTED SLEEVE STILL MATERIALLY UNDERPERFORMS SPY. SECTION 86
+COUNTER-REVIEWS BOTH CLAUDE COMMITS, CORRECTS THE SECTION-85 RECORD, AND
+IMPLEMENTS/PREREGISTERS R-065 AS A NEW ONE-CELL, 10-BPS ATTRIBUTION
+DIAGNOSTIC. R-065 CHANGES ONLY PER-NAME STALE-PRICE REBALANCING: AN UNPRICED
+HELD NAME REMAINS LOCKED WHILE PRICEABLE NAMES CONTINUE TO REBALANCE. IT HAS
+NOT BEEN LAUNCHED AND SPENDS NO LOOK. CLAUDE REVIEW IS NEXT. PAPER OR FUNDED
+DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
+CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -964,20 +964,29 @@ Section 85 is that independent review of section 84 and the exact
 `e45a38a..4e3df32` range. It accepts all five commits after two corrections:
 the matched comparator is structurally frozen, because one held name without a
 price defers an entire rebalance, so R-064's positive signal-minus-matched
-difference measures trading against not trading and the run supports neither a
-positive nor a negative conclusion about the score's economic value; and the
+difference measures trading against not trading and cannot attribute the
+observed difference to the score; and the
 R-064 record commit deleted this banner's standing no-accepted-signal
 assertion, which a shared guard detects and which is restored. Section 85.4
-also assesses every recorded QC interpretation and finds the stock information
-coefficients best supported at H1 and weakest at H60, the opposite of how
-rising magnitude reads. The immediate next step is that Codex counter-reviews
-section 85 and every Claude commit, settles the comparator defect before any
-further economic evaluation, and uses the review plus R-064 evidence
-to choose between a construction revision and the next preregistered QC
-diagnostic. The supplied
-updated strategy remains an assessed proposal rather than an automatic
-replacement of the frozen score. No leverage, deployment, order, broker,
-paper/live, or trading action is authorized by this result or handoff.
+also offers a rough overlap-adjusted interpretation of the stock information
+coefficients; section 86 qualifies that heuristic and corrects its period and
+turnover claims. Section 86 counter-reviews both Claude commits and implements
+R-065, a new preregistered diagnostic that replaces account-wide stale-price
+freezing with per-name locking while leaving the signal, window, schedule,
+holdings cap, exposure, membership-end rule and primary cost unchanged. The
+immediate next step is that Claude reviews section 86 and the exact pushed
+range. After that review and Codex counter-review, the single R-065 QC
+evaluation may launch. In that same owner-authorized round, before reading or
+tuning on any new outcome, Codex may bind and preregister three historical
+constituent diagnostics: SPY holdings as an S&P 500 proxy, QQQ holdings as a
+Nasdaq-100 proxy, and the security-identifier-deduplicated union of both. Those
+three variants may then run without another interim Claude review. They must
+fail closed if their point-in-time constituent snapshots or identifier mapping
+cannot be authenticated; QQQ holdings must not be described as all
+Nasdaq-listed stocks. The supplied updated strategy remains an assessed
+proposal rather than an automatic replacement of the frozen score. Later
+windows, leverage, deployment, orders, broker, paper/live, and trading remain
+closed.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -2630,6 +2639,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-15 | Claude review | `d34bb5f` -> this record commit; no code, test, specification or shared file change; Codex resolves the exact pushed head | Independent review of the fixed-window and ETF range `82897d7..d34bb5f`, including the first unlevered ETF portfolio result | Dispositioned all nine commits (83.2); accepted. Confirmed all six section-77 findings against section 76, including that section 76 overstated a Git author date as immutable proof. Verified rather than accepted: the three fixed windows were frozen in one commit before any ran; each regime profile expects exactly 18 statistics and the cell floor reconciles 516 to 564 to 571 with looks 59 to 61 and development evaluations 6 to 8; and four single-guard mutations over the ETF evaluator constants were all caught. | Complete standing Analyst lane selection at `d34bb5f`, the exact pushed tree because this review changes no source or test file: **5,555 passed, 7 skipped, 0 failed, 35 warnings in 5,803.07 s (1:36:43)**; four-trial ETF mutation matrix, four of four caught; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **1 P2 and 3 P3** (`ARV2R83-001..004`), all documented; no code or test correction was warranted. `ARV2R83-001`: R-061's reported mean ICs of 0.003093, 0.009836 and 0.070551 sit 0.10, 0.16 and 0.65 standard errors from zero once the five-name IC floor and H5/H20/H60 overlap are accounted for, and the sub-50% positive-date shares at H5 and H20 are the same small-sample skew. | Codex counter-reviews this record commit and should settle `ARV2R83-001` before the owner-directed direct-stock implementation; later ETF, leverage, deployment, order and trading gates remain closed. |
 | 2026-09-16 | Codex counter-review, direct-stock implementation, and R-062/R-063/R-064 QC evaluations | `e45a38a` -> `2dcd449`, `7d37ad0`, `d7dcedf`, `b07c90b`, and this record commit | Accept section 83 after prospective record corrections, implement the fixed-score direct-stock portfolio, correct two transport seams, and obtain the first tangible economic stock result | Counter-reviewed Claude's record-only commit; froze the weekly top-decile/capped-50 stock profile; R-062 failed on QC's 4,096-character statistic limit without a result read; R-063 corrected the envelope and completed but its one-use read refused a Decimal-precision mismatch without disclosure; R-064 corrected that exact seam, completed in project `36610457`, and authenticated exactly six aggregate statistics once. | Complete pre-R062 Analyst lane **5,603 passed, 7 skipped, 0 failed in 5,727.62 s**; compact correction **249 focused + 72 closure passed**; exact-arithmetic correction **321 focused passed in 149.71 s** plus a direct evaluator-validator seam replay; final record gate and diff checks green. Complete repository suite not run. R-062..R-064 move shared looks 61 -> 64, development evaluations 8 -> 11, and the cell floor 571 -> 575; infrastructure stays 23. | Counter-review **0 P0/P1/P2 and 5 P3** (`ARV2CR84-001..005`), corrected prospectively. Two implementation P2 transport defects were reproduced and corrected under new prospective run identities. R-064 is tangible and profitable after costs but materially trails SPY; its matched comparator is severely stale/zero-recovery-conditioned. | Make the round's one same-lane push. Claude independently reviews section 84 and the exact range after `e45a38a`; Codex counter-reviews every Claude commit, then uses the review and R-064 evidence to revise the construction or launch the next preregistered QC diagnostic. Leverage, deployment, orders, broker, paper/live, and trading remain closed. |
 | 2026-09-16 | Claude review | `4e3df32` -> this record commit; one lane test correction and one banner restoration; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the direct-stock portfolio range `e45a38a..4e3df32`, including R-064 and an independent assessment of every recorded QC interpretation | Dispositioned all five commits (85.1); accepted after correction. Verified rather than accepted: the 914-line evaluator carries no ordering, trading, deployment or brokerage primitive and no filesystem or network import; the portfolio is genuinely invested at 97.992% gross across 1,253 of 1,254 sessions with all 261 weekly decisions executed; costs are a 2.95 percentage-point drag and not the binding constraint; and look accounting reconciles at 64 shared looks, 11 development evaluations and a 575 cell floor. | Final complete Analyst lane selection on the corrected tree **5,604 passed, 7 skipped, 0 failed, 35 warnings in 5,655.43 s (1:34:15)**; stock-portfolio battery **20 passed**; record gates **75 passed** after the banner restoration against 74 passed and 1 failed on the pushed head; two red/green mutation trials in a scratch export; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **2 P2 and 2 P3** (`ARV2R85-001..004`); two corrected here with red/green evidence. `ARV2R85-001`: deferral is all-or-nothing per account, so one held name without a price freezes the universe-sized matched comparator, reproduced at 4 executions against the sleeve's 261 and matching R-064's reported 2 against 261. `ARV2R85-002`: `4e3df32` deleted the banner's standing no-accepted-signal assertion, turning a shared document-consistency guard red. Section 85.4 records that the stock information coefficients are best supported at H1 and weakest at H60, the opposite of how rising magnitude reads. | Codex counter-reviews this record commit, settles `ARV2R85-001` before any further economic evaluation, and should run the complete standing selection including the root-level shared gates once per round before pushing; later windows, leverage, deployment, orders and trading remain closed. |
+| 2026-09-16 | Codex counter-review and R-065 corrected-comparator candidate | `57d5590` -> `4410ebb` and this record commit | Counter-review Claude's section-85 commits, correct the account-wide comparator freeze under a new preregistered identity, and stop before QC | Accepted `9481971` as valid reproduction evidence and `57d5590` after prospective record correction. R-065 applies per-name stale-position locking symmetrically, lets priceable names rebalance, preserves recovery once, keeps impossible entries in cash, includes locked names in the signal's fifty-name cap, authenticates new partial-rebalance counters, and leaves R-064 immutable. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Focused evaluator/runtime/submission **259 passed in 125.00 s**; import/no-I/O closure **13 passed in 12.56 s**; complete Analyst lane **5,492 passed, 7 skipped, 0 failed, 35 warnings in 5,910.76 s (1:38:30)**; final record gates **75 passed**; compileall and `git diff --check` green. **Zero research looks and zero development evaluations.** | Counter-review: **1 P2 and 8 P3** (`ARV2CR86-001..009`), corrected or qualified prospectively. In-round audit: **1 P2 and 1 P3** (`ARV2D86-001..002`), both corrected with isolated tests. No open scoped defect. | Push this same-lane range exactly once. Claude reviews section 86 and the pushed range; Codex counter-reviews, launches R-065, and in that same round preregisters and runs the SPY-holdings, QQQ-holdings/Nasdaq-100-proxy, and deduplicated-union stock diagnostics. No leverage, deployment, broker, order or trading action. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -15070,3 +15080,126 @@ serialisation and validation path would stop the pattern that cost two
 evaluations in this range. `ARV2R83-001`, `ARV2R74-008`, `ARV2R74-009` and the
 lane-wide `ARV2R50-022` debt remain open. No paper or live deployment, broker
 access, order or trading authority follows from R-064.
+
+## 86. Codex counter-review of section 85 and R-065 corrected-comparator candidate, 2026-09-16
+
+**Range counter-reviewed:** `4e3df32..57d5590`, commits `9481971` and
+`57d5590`, individually and cumulatively at the exact pushed remote head.
+**Disposition: ACCEPTED AFTER CORRECTION.** The test in `9481971` correctly
+reproduces the R-064 comparator freeze, and the banner restoration in
+`57d5590` is correct. The review record incorrectly calls the production
+defect corrected when it only pins the defective behavior; that P2 and eight
+record/interpretation P3s are corrected prospectively below. Commit `4410ebb`
+then implements a new R-065 profile rather than rewriting R-064.
+**Zero research looks and zero development evaluations in this round.** No
+QuantConnect, Massive, Benzinga, Sharadar, provider row, market datum, outcome,
+credential, Object Store object, broker, deployment, order, paper/live state,
+or trading surface was accessed.
+
+### 86.1 Per-commit dispositions
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `9481971` | **Accepted as reproduction evidence; production correction claim superseded** | Its regression accurately proves that one persistently unpriced matched holding leaves the signal at 261 executions but reduces the old comparator to 4 executions, 257 deferrals and 1,236 stale sessions. The commit changes no evaluator behavior. In that fixture, R-065 replaces the old expectation with 261 comparator executions and 257 disclosed partial decisions. |
+| `57d5590` | **Accepted after prospective record correction** | Restoring the standing no-accepted-signal banner is correct and turns the active-document gate green. Section 85's finding status, commit mapping, line-count, period-overlap, heuristic-inference and R-064 interpretation claims are corrected here without silently rewriting the independent review's historical text. |
+
+### 86.2 Counter-review findings
+
+| ID | P | Finding | Disposition |
+|---|---|---|---|
+| `ARV2CR86-001` | P2 | `ARV2R85-001` is marked corrected although `9481971` only adds a test for the unchanged all-or-nothing freeze. The matched comparator therefore remained structurally invalid at `57d5590`. | **Corrected prospectively** by R-065 in `4410ebb`: stale positions lock individually while priceable holdings continue to rebalance. The old R-064 rule and result remain immutable. |
+| `ARV2CR86-002` | P3 | The new test docstring names `ARV2R84-001`; the finding is `ARV2R85-001`. | **Corrected** when the regression became the R-065 positive behavior test. |
+| `ARV2CR86-003` | P3 | Section 85.1 maps commit 5 to `ARV2R85-003, -003`; the correct mapping is `ARV2R85-002` corrected and `ARV2R85-003/-004` documented. | **Corrected here prospectively.** |
+| `ARV2CR86-004` | P3 | The live banner still said section-84 review was next after section 85 had completed it. | **Corrected** in the banner and live section 4. |
+| `ARV2CR86-005` | P3 | The 914-line evaluator count is true at initial commit `2dcd449`, not at the final reviewed tree, where it is 930 lines. | **Qualified here**; line count is not a behavioral guarantee. |
+| `ARV2CR86-006` | P3 | R-059 is not fully disjoint from the 2019-2025 block because it contains 2019 observations also present in R-057; only its pre-2019 portion is disjoint. | **Corrected here prospectively.** |
+| `ARV2CR86-007` | P3 | Section 85.4's overlap-adjusted SE table is a useful heuristic, not identified formal inference: it does not specify a single cell/aggregation or estimate covariance, and it cannot prove “three or four tests” or “about two periods.” H1 outcome measurement also does not itself require daily portfolio turnover. | **Qualified here.** Formal claims remain governed by the frozen HAC/bootstrap machinery; no horizon or cadence changes. |
+| `ARV2CR86-008` | P3 | Saying R-064 supports neither a positive nor negative conclusion is too broad. Its broken comparator prevents score attribution, but the exact implemented sleeve's +24.20% versus SPY +94.21%, 0.304 Sharpe and -35.00% drawdown remain valid adverse evidence about that construction. | **Corrected** in the live handoff and shared result ledger. No claim is made that the seventy-point gap is a pure score effect. |
+| `ARV2CR86-009` | P3 | Four executions/257 deferrals/1,236 stale sessions are not “within rounding” of R-064's integer counts of 2/259/1,247. | **Qualified here:** the fixture reproduces the same mechanism and similar scale, not equal counts. |
+
+### 86.3 R-065 corrected-comparator candidate
+
+R-065 keeps the exact R-055 conservative-censored firm-specific score,
+authenticated package `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`,
+2021-01-04 through 2025-12-31 window, 261 weekly next-open decisions,
+top-decile selection capped at fifty holdings, 1.96% per-name cap, 98% target
+gross, zero-yield cash, named-FIGI refusals, SPY comparison and conservative
+membership-end zero-recovery rule. It changes no signal coefficient,
+threshold, horizon, date, sector rule, or provider input.
+
+The only economic correction is within-membership missing-price execution.
+Each stale held name retains its prior mark and current drifted weight. It is
+excluded from turnover because no trade can occur. Priceable holdings and new
+targets continue to rebalance within the remaining gross budget; a new name
+without an entry price remains cash. When a stale price resumes, the full
+prior-mark-to-current move is booked exactly once. If locked gross is already
+above the requested target, it is preserved and no new budget is assigned.
+The signal's fifty-holding cap includes locked non-selected names, so a locked
+name consumes one slot rather than creating a fifty-first holding. These rules
+apply symmetrically to signal and matched accounts; the matched account remains
+intentionally uncapped because it represents every eligible name.
+
+New aggregate counters disclose partial decisions, the number of stale
+positions deferred, mean locked gross, and locked-gross-over-target decisions
+for both accounts. Account-wide deferral counts must be exactly zero and both
+accounts must execute all 261 decisions. The result validator authenticates
+the new fields, bounds their relations to the return/decision/security census,
+and performs a complete offline launch/read/reload replay.
+
+### 86.4 Prospective identity and result rule
+
+| Field | Frozen R-065 value |
+|---|---|
+| Profile | `arv2-stock-long-only-2021-2025-r065-v1`; SHA-256 `1cbd758a984100c89ed4ccd3fbf682980d93c27c3711bdc244a5579591c92a19` |
+| Projection | `arv2-preliminary-qc-projection-b2a5e4fd70ccc2a719056e66`; SHA-256 `b2a5e4fd70ccc2a719056e6655fde422403ba1097e62f9e01b5d2b7af5885698`; seven files, 207,851 total bytes, 59,100-byte maximum |
+| Evaluation / ledger | `arv2-eval-stock-portfolio-historical-qc-004` / `R-065` |
+| Accounting if launched | Shared looks 64 -> 65; ARV2 development evaluations 11 -> 12; one cell moves the lifetime floor 575 -> 576; infrastructure remains 23; permanent and confirmatory remain zero |
+| Result inventory | Exactly three aggregate statistics: runtime metadata, portfolio metadata, and the primary 10-bps cell. The already-observed R-064 cost ladder is not repeated. |
+| Decision rule | Comparator not executing all 261 decisions or an unreconciled result is a technical failure. Signal-minus-matched <= 0 means no same-window tuning. Signal above matched while both trail SPY routes the next question to a separately preregistered weighting/exposure diagnostic. No leverage before a credible unlevered benchmark gate. |
+
+The profile and shared-ledger rule are frozen in code and
+`docs/research/alpha-result.md` before any project creation, launch, or outcome
+read. R-065 has not been launched and no result exists.
+
+### 86.5 In-round implementation audit
+
+The initial candidate passed its focused evaluator tests, then two independent
+read-only audits found one production P2 and one validator P3 before handoff.
+Both remain recorded rather than disappearing after correction.
+
+| ID | P | Finding | Correction and proof |
+|---|---|---|---|
+| `ARV2D86-001` | P2 | A stale non-selected signal holding was preserved and then all fifty newly desired names could be admitted, producing 51 holdings despite the frozen cap. | **Corrected before commit.** Locked signal names reserve their slots; an impossible pre-existing state above fifty refuses. The exact regression starts with one locked non-selected name and fifty desired names, admits the ranked top 49, excludes the tail, and remains at fifty holdings and no more than 98% gross. |
+| `ARV2D86-002` | P3 | The new stale-position counters initially allowed impossible nonzero values with zero partial decisions and lacked finite census bounds. | **Corrected before commit.** Stale sessions cannot exceed return sessions; per-name deferrals are zero iff partial decisions are zero and cannot exceed partial decisions times the authenticated security census. Isolated negative tests refuse each mutation. |
+
+The resulting exact-Decimal tests also pin the locked drifted weight, remaining-
+gross allocation, exclusion of stale turnover, cumulative recovery exactly
+once, and preservation/disclosure of locked gross above target. This directly
+addresses section 85's broader concern about guards without isolating tests.
+
+### 86.6 Validation and next gate
+
+Focused final-tree evaluator/runtime/submission validation is **259 passed in
+125.00 seconds**. The focused no-external-I/O/import closure is **13 passed in
+12.56 seconds**. Projection reconstruction reproduces the identities in
+86.4. The complete standing lane selection is **5,492 passed, 7 skipped, 0
+failed, 35 warnings in 5,910.76 seconds (1:38:30)**. Python compilation,
+the final record gates, and `git diff --check` are green as recorded in the
+section-5 ledger row. Only documentation and ledger corrections were written
+after the complete lane run; the final record gates and diff check validate the
+exact final documents.
+
+The immediate next step is Claude's independent review of section 86 and the
+exact pushed range after `57d5590`. Codex then counter-reviews every Claude
+commit. After that review cycle the single preregistered R-065 2021-2025 QC
+evaluation may launch. In the same round, before any new outcome is used for
+tuning, Codex may bind, preregister, and then run three owner-directed stock
+universe variants: point-in-time SPY holdings as an S&P 500 proxy,
+point-in-time QQQ holdings as a Nasdaq-100 proxy, and their security-identifier-
+deduplicated union. Exact official index membership is not present in the
+current package, and QQQ holdings are not evidence for all historical
+Nasdaq-listed securities; every variant therefore fails closed unless the QC
+constituent history and exact FIGI/security mapping authenticate. No additional
+interim Claude review is required for those three variants. Later windows,
+actual or synthetic 3x leverage, deployment, broker access, orders, paper/live
+operation and trading remain closed.

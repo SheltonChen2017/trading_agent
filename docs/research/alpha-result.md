@@ -1564,7 +1564,7 @@ then an individual-stock economic implementation and backtest using the
 existing analyst score, with ETFs retained as a backup research path. No
 additional run or look is created by the local correction or that direction.
 
-## R-062 — Analyst Revisions V2 direct-stock economic portfolio (PROSPECTIVE; NOT YET LAUNCHED)
+## R-062 — Analyst Revisions V2 direct-stock economic portfolio (TECHNICAL FAILURE; NO RESULT READ)
 
 R-062 is one accepted-risk `development_evaluation`, evaluation
 `arv2-eval-stock-economic-qc-001`. Commit `2dcd449` freezes the source and
@@ -1602,7 +1602,7 @@ shared look **61 -> 62** and ARV2 development evaluation **8 -> 9**, while the
 lifetime cell floor remains **571**. This is a technical failure, not a
 positive or negative portfolio result.
 
-## R-063 — Analyst Revisions V2 same-economics direct-stock compact retry (PROSPECTIVE; NOT YET LAUNCHED)
+## R-063 — Analyst Revisions V2 same-economics direct-stock compact retry (COMPLETED; RESULT READ REFUSED)
 
 R-063 is the one-look technical successor to R-062. It preserves every
 economic input and rule, but versions the summary envelope and replaces the
@@ -1633,7 +1633,7 @@ financial context. The read permit is consumed and the run will not be read
 again. No return value is reported. R-063 spends shared look **62 -> 63** and
 development evaluation **9 -> 10**; the lifetime cell floor remains **571**.
 
-## R-064 — Analyst Revisions V2 same-economics exact-arithmetic retry (PROSPECTIVE; NOT YET LAUNCHED)
+## R-064 — Analyst Revisions V2 same-economics exact-arithmetic retry (COMPLETED; TANGIBLE RESULT WITH INVALID MATCHED COMPARATOR)
 
 R-064 changes only those two derived fields, calculating both inside the
 existing 50-digit context. The underlying holdings, daily returns, costs,
@@ -1686,3 +1686,36 @@ deployment implication.
 R-064 moves shared run looks **63 -> 64**, ARV2 development evaluations
 **10 -> 11**, and the lifetime exposed-cell floor **571 -> 575**.
 Infrastructure remains 23; permanent and confirmatory looks remain zero.
+
+The invalid matched comparator prevents attributing R-064's return difference
+to the analyst score. It does not erase the adverse evidence for the exact
+implemented construction: that sleeve still returned +24.20% against SPY's
++94.21%, with a 0.304 Sharpe and -35.00% maximum drawdown. R-065 changes only
+within-membership stale-price execution mechanics for both sleeves, correcting
+the comparator so the next diagnostic can separate ranking from construction
+more cleanly.
+
+## R-065 — Analyst Revisions V2 corrected matched-comparator attribution diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-065 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-portfolio-historical-qc-004`. It preserves the exact R-055
+conservative-censored firm-specific score, authenticated package, 2021-2025
+window, weekly next-open schedule, top-decile/capped-50 signal sleeve, 1.96%
+per-name cap, 98% target gross exposure, zero-yield cash, FIGI refusals, SPY,
+and membership-end zero-recovery lower bound. It does not fit or select a new
+signal after seeing R-064.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **64 -> 65**; ARV2 development evaluations **11 -> 12**. A successful aggregate read exposes one primary cell and moves the lifetime alpha-cell floor **575 -> 576**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-2021-2025-r065-v1`, SHA-256 `1cbd758a984100c89ed4ccd3fbf682980d93c27c3711bdc244a5579591c92a19`; projection `arv2-preliminary-qc-projection-b2a5e4fd70ccc2a719056e66`, SHA-256 `b2a5e4fd70ccc2a719056e6655fde422403ba1097e62f9e01b5d2b7af5885698`. |
+| **Only economic correction** | A within-membership held name without a current price retains its prior mark and drifted weight. It books no impossible trade or turnover. Priceable holdings and targets continue to rebalance inside the remaining gross budget; missing new entries stay cash. When a price resumes, the cumulative prior-mark-to-current return is booked once. The same rule applies to signal and matched accounts. |
+| **Diagnostic output** | One 10-bps-per-side primary cell, plus compact runtime and portfolio metadata: signal, corrected all-eligible matched comparator and SPY returns; signal-minus-matched and signal-minus-SPY; risk, drawdown, turnover, cash and explicit per-name stale/partial-rebalance counters. The prior four-cost ladder is not repeated because R-064 already showed costs were not binding. |
+| **QC identity if launched after review** | Private project `11 ARV2_STOCK_R065_2021_2025 - 20260916`; backtest `ARV2 R065 corrected comparator attribution e9851c2f`. |
+| **Frozen decision rule** | If either account does not execute all 261 decisions or the result does not reconcile, classify a technical failure. If signal-minus-matched is non-positive, do not tune this same window. If signal beats matched but both trail SPY, the next separately preregistered question is weighting/exposure, not a silent score change. Leverage remains closed unless an unlevered construction first clears its benchmark gate. |
+| **Access boundary** | At most one reviewed create/compile/backtest and one separately signed read of exactly three aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+This rule block is frozen before project creation, launch, or outcome read.
+This code/review round spends **zero** research looks and does not access QC or
+provider data. Claude review and Codex counter-review are required before the
+one R-065 launch.

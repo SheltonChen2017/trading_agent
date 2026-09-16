@@ -1506,7 +1506,7 @@ look **59 -> 60** and ARV2 development evaluation **6 -> 7**. One bounded
 technical diagnostic read selected only status/error/stack trace and no
 statistics, chart, order, log collection, provider row, or security outcome.
 
-## R-061 — Analyst Revisions V2 same-rule unlevered ETF retry (PREREGISTERED; NOT YET LAUNCHED)
+## R-061 — Analyst Revisions V2 same-rule unlevered ETF retry (COMPLETED; TANGIBLE BUT ECONOMICALLY WEAK)
 
 R-061 changes only QC Slice scheduling: the daily SPY TradeBar is now the sole
 session clock, so constituent-only Slices cannot advance the strict evaluator.
@@ -1522,6 +1522,44 @@ The corrected projection is
 | **Unchanged evidence gate** | Every IC cell must census all 1,253 dates; portfolio availability still requires at least 252 return sessions and 50 invested sessions. |
 | **Access boundary** | One create/compile/backtest, statistics-free polling, then one separately signed read of exactly nine aggregate custom statistics only after `Completed.` |
 
-The owner's direct-run and technical-retry authorization permits R-061 before
-the later client review. Actual and synthetic 3x work remains closed until a
-usable unlevered result exists and a later reviewed milestone opens leverage.
+R-061 reached authenticated `Completed.` in project `36595261`, compile
+`b291aeb27dee2c005bc289635b522295-2f6bfb088f50f8b866262b820d626923`,
+backtest `e09e77390435ac6569d2ada4b4acef9f`. One separately signed read
+authenticated exactly nine statistics under result receipt SHA-256
+`d2e7e4ca4f38b5709c0a9b799df9e967b72e48a37708835c0d1310639c8cfb56`
+and custom-statistics SHA-256
+`ab094aeba34a4efc158a35bc1ac0ce4d98f31d16d57f14b842adcb120ec610ec`.
+
+All three IC cells account for 358 valid and 895 invalid dates. Mean IC is
+0.003093 / 0.009836 / 0.070551 at H5/H20/H60; positive-date shares are
+48.88% / 47.49% / 53.07%. The economic portfolio is invested on 358 of 1,254
+return sessions and holds 94.11% cash on average. Cumulative return is +2.58%
+at zero cost, +0.07% at 5 bps, **-2.38% at the primary 10 bps**, and -7.10%
+at 20 bps, versus SPY +91.50%. Primary-cost Sharpe is -0.194 and maximum
+drawdown is -7.01%.
+
+**Economic interpretation limitation:** a pre-push source-to-blueprint audit
+found that the five-ETF minimum for IC also gates portfolio admission. With
+one to four eligible ETFs, the implementation targets all cash, although
+blueprint section 20.3 does not specify that minimum. This is the historical
+P2 ARV2ETF82-002, so R-061 does not cleanly test the intended portfolio. A
+separately identified local correction removes the IC-count economic gate;
+it has not run in QC and does not rewrite this result.
+All cash earns zero interest, and the exact-prior-session holdings requirement
+is an additional conservative restriction beyond H1 availability. The
+recorded return is authentic for those implemented rules; it must not be
+presented as a definitive failure of the underlying analyst-revision strategy.
+
+The tangible-evidence gate passes, so no further counts-only easing is
+triggered. The result is nevertheless economically unattractive at the frozen
+primary cost and far behind SPY. It is not a formal alpha acceptance or a
+deployment/trading result. Shared run looks are now **61**, ARV2 development
+evaluations **8**, infrastructure looks **23**, and the lifetime exposed-cell
+floor **571**. Actual and synthetic 3x work remains a separately reviewed
+diagnostic after correction of the unlevered portfolio, not a presumed
+improvement to this baseline. A corrected specification/run would be a new
+prospective diagnostic; this record changes neither R-061 nor its accounting.
+The owner's latest next-phase direction is Claude review, Codex counter-review,
+then an individual-stock economic implementation and backtest using the
+existing analyst score, with ETFs retained as a backup research path. No
+additional run or look is created by the local correction or that direction.

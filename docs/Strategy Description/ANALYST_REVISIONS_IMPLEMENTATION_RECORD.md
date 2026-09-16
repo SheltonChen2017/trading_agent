@@ -233,9 +233,9 @@ CURRENT-VINTAGE, NON-PRISTINE-PIT, ACCEPTED-RISK STOCK-IC EVIDENCE, NOT A
 FORMAL/CONFIRMATORY RESULT, ECONOMIC PORTFOLIO RETURN, ETF BACKTEST, OR
 TRADING AUTHORITY. THE CROSS-SECTION MEAN-EXCESS-RETURN FIELDS ARE UNIVERSE
 OUTCOME DIAGNOSTICS AND ARE NOT A SCORE-SORTED PORTFOLIO P&L.
-THE SHARED LEDGER NOW RECORDS 59 RUN-LEVEL LOOKS: 23 ARV2 INFRASTRUCTURE
-LOOKS, 6 ARV2 DEVELOPMENT EVALUATIONS, 0 PERMANENT-FAMILY LOOKS, 0
-CONFIRMATORY LOOKS, AND A LIFETIME ALPHA-CELL FLOOR OF 564. R-056'S
+THE SHARED LEDGER NOW RECORDS 61 RUN-LEVEL LOOKS: 23 ARV2 INFRASTRUCTURE
+LOOKS, 8 ARV2 DEVELOPMENT EVALUATIONS, 0 PERMANENT-FAMILY LOOKS, 0
+CONFIRMATORY LOOKS, AND A LIFETIME ALPHA-CELL FLOOR OF 571. R-056'S
 COUNTS-ONLY RELAXATION WAS CANCELLED UNLAUNCHED AND UNSPENT BECAUSE R-055
 PASSED THE GATE; NO OBSERVED SIGN OR MAGNITUDE SELECTED THAT DECISION.
 THE INDEPENDENT CLAUDE REVIEW OF THE R-054/R-055 RANGE (SECTION 76) ACCEPTS
@@ -254,10 +254,23 @@ AND R-059 (2013-2019). ALL 48 CELLS ARE DESCRIPTIVELY AVAILABLE AND EVERY
 MEAN IC IS POSITIVE; R-059 HAS 1,072 VALID AND 690 INVALID DATES PER CELL,
 WITH ITS VALID IC EVIDENCE BEGINNING 2015-09-29. THESE ARE SMALL,
 REGIME-DEPENDENT STOCK-RANKING ASSOCIATIONS, NOT ECONOMIC PORTFOLIO RETURNS.
-CLAUDE REVIEW AND CODEX COUNTER-REVIEW ARE THE NEXT GATE. ETF CONSTRUCTION
-AND ACTUAL OR SYNTHETIC LEVERAGE REMAIN CLOSED UNTIL THAT GATE. PAPER OR
-FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN CLOSED. NO V2
-SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
+THE OWNER THEN AUTHORIZED THE ETF PHASE BEFORE LATER CLIENT REVIEW.
+SECTIONS 80-82 IMPLEMENT AND RECORD THE UNLEVERED ETF BASELINE: R-060
+FAILED TECHNICALLY BEFORE AN OUTCOME READ; THE SAME-RULE R-061 RETRY
+COMPLETED AND OPENED ITS NINE AGGREGATE STATISTICS ONCE. ITS 358 INVESTED
+SESSIONS PASS THE TANGIBLE-EVIDENCE GATE, BUT THE PRIMARY 10-BPS PORTFOLIO
+RETURN IS -2.38%, VERSUS SPY +91.50%, WITH 94.11% AVERAGE CASH. CLAUDE
+REVIEW OF THE EXACT `9094aea..HEAD` ETF RANGE AND CODEX COUNTER-REVIEW ARE
+THE NEXT GATE. THE PRE-PUSH AUDIT IDENTIFIED A P2: THE IC MINIMUM OF
+FIVE ELIGIBLE ETFS ALSO FORCES THE PORTFOLIO TO CASH, AN EXTRA CONDITION
+ABSENT FROM THE BLUEPRINT'S PORTFOLIO RULE. THIS AND THE ZERO-YIELD CASH
+CONVENTION LIMIT THE HISTORICAL R-061 ECONOMIC CONCLUSION. THE OWNER
+DIRECTS A LOCAL, SEPARATELY IDENTIFIED ADMISSION CORRECTION BEFORE THE
+SINGLE PUSH; AFTER CLAUDE REVIEW AND CODEX COUNTER-REVIEW, THE NEXT
+IMPLEMENTATION IS A DIRECT-STOCK ECONOMIC TEST USING THE EXISTING SIGNAL.
+NO FURTHER ETF OR LEVERAGE RUN IS LAUNCHED IN THIS CLOSING ROUND.
+PAPER OR FUNDED DEPLOYMENT, BROKER ACCESS, ORDERS, AND TRADING REMAIN
+CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -322,7 +335,9 @@ fail closed.
 
 The old ACER V1 documents are archived. The existing code and datasets are
 not discarded; they are assessed below as infrastructure, not as V2
-completion.
+completion. The table retains the formal-path structural state through the
+earlier milestones; the section-82 supersession below records the current
+accepted-risk physical inputs and QC evaluations separately.
 
 | Area | Current repository state | Remaining production/evidence gate | Disposition |
 |---|---|---|---|
@@ -370,16 +385,21 @@ one conservative infrastructure research look; its terminal state is
 ambiguous. Zero ARV2 development evaluations were performed, and the formal
 outcome look remains unspent.
 
-**Section-75 live-state supersession.** The two paragraphs immediately above
+**Section-82 live-state supersession.** The two paragraphs immediately above
 are retained as section-69 historical state and are no longer current. The
 accepted-risk physical chain subsequently captured and authenticated the
 owner-approved Massive/Sharadar inputs, R-053 through R-055 spent three ARV2
 development evaluations, and R-055 produced 32 populated preliminary stock-IC
-cells. The current totals are 56 run-level looks, 23 ARV2 infrastructure
-looks, three ARV2 development evaluations, and a 516-cell lifetime exposure
-floor; permanent and confirmatory looks remain zero. This does not populate
-the formal production registries or transform the preliminary result into a
-formal, ETF, portfolio, deployment, order, or trading result.
+cells. R-057 through R-059 added three fixed-window stock evaluations; R-060
+and R-061 added the failed ETF runtime attempt and its completed retry. The
+current totals are 61 run-level looks, 23 ARV2 infrastructure looks, eight
+ARV2 development evaluations, and a 571-cell lifetime exposure floor;
+permanent and confirmatory looks remain zero. R-061 provides preliminary
+arithmetic ETF-portfolio returns under its implemented rules, including the
+historical five-fund admission mismatch and zero-return cash convention
+detailed in section 82. A local correction does not rewrite that result.
+This does not populate the formal production registries or
+establish formal acceptance, deployment readiness, or trading authority.
 
 ## 3. Milestone ladder
 
@@ -909,11 +929,19 @@ turnover, coverage, and aggregate-result guards. Section 81 records R-060's
 immediate technical runtime failure before any outcome read: a constituent-
 only QC Slice advanced the strict daily evaluator before the same-date equity
 TradeBars arrived; the owner explicitly waives Claude review of section 81
-before its same-rule R-061 retry. The correction makes the SPY daily bar the
-sole session clock. The immediate next step is the exact signed R-061 run and,
-only after authenticated `Completed.`, one aggregate-only read.
-Actual and synthetic leverage remain closed until usable unlevered evidence
-exists and a later reviewed milestone explicitly opens them.
+before its same-rule R-061 retry. Section 82 records R-061's authenticated
+completion and nine-statistic aggregate read. The tangible-evidence gate
+passes, but the primary 10-bps portfolio loses 2.38% while SPY gains 91.50%,
+and average market exposure is only 5.89%. Claude will review section 82 and
+the exact `9094aea..HEAD` ETF range next; Codex then counter-reviews every
+review commit. The owner directs the portfolio-admission correction in this
+closing round, followed by one push, Claude review, and Codex counter-review.
+Only then does the next implementation move toward an individual-stock
+portfolio using the existing signal and accepted-risk data, followed by its
+backtest. The supplied updated strategy is an assessed proposal, not a
+wholesale replacement of the frozen scoring model. No further ETF or
+leveraged run is part of this closing round. No deployment, order, broker,
+paper/live, or trading action is authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -2562,6 +2590,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-15 | Codex counter-review, accepted-risk physical implementation, and first QC development evaluation | `d09fea1` -> `e5b89a2`, `e4d3048`, `9223278`, and this record commit | Accept Claude's whole-lane review after correction, complete the accepted-risk preliminary QC path, reconcile every discovery look, and execute R-053 | Resolved Claude's referred lane findings; built and authenticated the physical Massive/Sharadar inputs, security and firm admissions, compact six-object package, five-file QC runtime, signed one-use submission/result-read adapters, and append-only infrastructure ledger. Corrected QC injected-`__future__`, non-whitelisted-`sqlite3`, and legacy Object Store shard-suffix blockers. R-053 project `36561856`, backtest `f3bd9f3fc3c2627784e93d761382cd04`, reached `Completed.` and returned exactly 34 authenticated aggregate statistics. | Preliminary package/evaluator/runtime/submission **140 passed in 52.03 s**; least-privilege evaluator/runtime **101 passed in 19.85 s**; corrected pre-review path **22 passed, 1 warning in 69.84 s**; compileall exit 0; live compile `BuildSuccess`; terminal `Completed.`; aggregate read 34/34. A wider formal selection reached **358 passed** before its intentionally owner-deferred all-six-fold replay was cancelled; complete repository and full Analyst-lane suites were not run. R-031..R-052 add 22 infrastructure looks; R-053 adds one development evaluation and 32 exposed cells. Totals: 54 runs, 23 infrastructure, 1 development, 0 permanent, 0 confirmatory, cell floor 484. | No open P0/P1/P2. `ARV2CR51-001` P3 documented: 32/32 cells are inferentially inconclusive because the frozen complete-cross-section rule admitted zero dates after zero-MAD sector refusals. No alpha conclusion. | Push this same-lane range exactly once. Claude reviews the whole pushed snapshot; Codex counter-reviews before any new evaluation, later window, ETF/leverage test, deployment, order, or trade. |
 | 2026-09-15 | Claude review | `7bc8098` -> this record commit; three lane test corrections; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the accepted-risk QC evaluation range `d09fea1..7bc8098`, including the first outcome-bearing development evaluation R-053 and the retroactive R-031 to R-052 reconciliation | Dispositioned all 30 commits individually and cumulatively (section 74.2); accepted after correction. Verified rather than accepted: the redirect and proxy boundary reproduced with two loopback servers under hostile proxy environment variables; one-use permits refused reuse, overwrite, symlink, hardlink and a world-writable parent; the rotated owner key id recomputes and the superseded key is absent from the tree; the sequence-2 look ledger retains R-030 byte-identically, hash-chains to its predecessor and carries 23 unique entries with every alpha, order and statistics field false; all four projected modules pass the projection's own validator and twelve escape probes are refused; the pinned result inventory is exactly the 32-cell cross product plus two metadata records; and all 32 discovery attempts are dispositioned in this record. | Final complete Analyst lane selection on the corrected tree **10 failed, 5,397 passed, 7 skipped, 34 warnings in 5,739.56 s (1:35:39)**, every failure reproduced on a pristine export of `7bc8098` and therefore pre-existing; two touched batteries **125 passed**; eight-trial mutation matrix (three caught, three masked by an identified sibling guard, two real gaps corrected) plus five red/green correction trials in a scratch export; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **4 P2 and 7 P3** (`ARV2R74-001..011`); three corrected here with red/green evidence, eight documented or referred. `ARV2R74-001` raises the range's own `ARV2CR51-001` from P3 to P2: the frozen zero-MAD rule plus the complete-cross-section rule are unsatisfiable for an event-driven signal, so R-053's zero valid dates was the only reachable outcome and was determinable before the look was spent. `ARV2R50-022` remains open. | Codex counter-reviews this record commit and both Claude commits, and with the owner settles a satisfiable preregistered normalization before any R-054; later windows, ETF construction, leverage, deployment, orders and trading remain closed. |
 | 2026-09-15 | Claude review | `f950fe8` -> this record commit; one lane test correction; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the R-054/R-055 range `baef134..f950fe8`, including the first tangible preliminary stock-IC evidence | Dispositioned all four commits (76.2); accepted after correction. Confirmed all five section-75 findings against section 74, including that section 74 recorded a red/green proof its own evidence contradicts. Verified rather than accepted: the tangible-evidence gate wording is in git at `2d71cb3` (10:13 PDT), ten minutes before the backtest was created (10:23 PDT) and an hour before the single aggregate read (11:10 PDT), and decides on valid-date counts and non-null availability alone; the v2 rule computes median and MAD from active names only and gives structural zeros exact zero, with contract, manifest, summary and cell schemas all versioned; nine of the ten section-74 failures are fixed; and look accounting reconciles at 56 run looks, 3 development evaluations, 23 infrastructure looks and a 516 alpha-cell floor. | Final complete Analyst lane selection on the corrected tree **5,415 passed, 7 skipped, 0 failed, 35 warnings in 5,768.32 s (1:36:08)**, the first complete green run since the accepted-risk path began; focused three-file reproduction at `f950fe8` **1 failed, 129 passed** before the correction and the object-store battery **72 passed** after; six-trial mutation matrix, six of six caught; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **1 P2 and 3 P3** (`ARV2R76-001..004`); one corrected here with red/green evidence. `ARV2R76-001`: the no-external-I/O closure test was still red at the pushed head on an import edge added by `2d71cb3`, recorded as closed because the complete lane selection was again not run. `ARV2R76-002`: every reported IC is conditioned on price survival. | Codex counter-reviews this record commit; the complete lane selection should be run once per round before a push; the survival conditioning should be settled before later windows and ETF construction; later windows, ETF construction, leverage, deployment, orders and trading remain closed. |
+| 2026-09-15 | Codex ETF baseline implementation and QC evaluation | `9094aea` -> `9164146`, `6d4f101`, `3270a58`, `70e92fd`, and this record commit | Implement and measure the owner-directed unlevered ETF baseline, then correct the admission defect before one push and Claude review | R-060 failed on same-date QC Slice ordering; the isolated SPY-clock correction allowed R-061 to complete and return exactly nine aggregate statistics once. The pre-push audit identified the extra five-ETF portfolio minimum; `70e92fd` separates economic admission from IC sufficiency under a new local-only identity. Historical R-061 and its limitations remain intact. | Validation scope and exact totals are recorded in section 82.4. Two development evaluations; shared look total 61, ARV2 development total 8, infrastructure 23, lifetime exposed-cell floor 571. No additional look for the local correction. | 0 P0, 0 P1, 2 P2 corrected, 5 P3 corrected/disclosed/documented as detailed in section 82.4. R-061's primary net return is -2.38%, but its historical admission mismatch prevents a clean verdict on the intended portfolio. | Push once after fix and suite. Monitor Claude's subsequent review push; counter-review every commit, then build and backtest individual-stock economics with ETFs as a backup. No automatic leveraged run. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -14093,3 +14122,283 @@ launched now. Polling remains statistics-free. Only after exact `Completed.`
 may a separately signed one-use authority read the nine aggregate custom
 statistics. Leverage, deployment, orders, brokerage, paper/live state, and
 trading remain closed.
+
+## 82. R-061 authenticated unlevered ETF result and review handoff, 2026-09-15
+
+R-061 preserved every section-80 economic rule and changed only the QC Slice
+clock corrected in section 81. It reached authenticated `Completed.` and its
+separately signed one-use result permit opened exactly the nine preregistered
+aggregate statistics. No raw provider or constituent row, security-level
+price/outcome, unrestricted log, chart, order, deployment, broker, paper/live,
+or trading surface was selected.
+
+### 82.1 Exact execution and receipt chain
+
+| Artifact | Exact identity |
+|---|---|
+| Package / profile | Package `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`, SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`; profile SHA-256 `eadb6aba26495ceb8d11417364e80a18b9860a2488519ee9c692a7031cfa59dd` |
+| Projection / plan | Projection SHA-256 `1a6d0a13a16d418ca8e50b2ab56d6c910d55fd4ff5de4261d5288ea5646c3b07`; plan `arv2-preliminary-qc-submission-d1e36295672d5259be46a2ac`, SHA-256 `d1e36295672d5259be46a2ac86cff50101a30366b25e33ed4ea6b6a4541da0a3` |
+| Execution | Permit SHA-256 `f5007f541fe5c8762dae29f5dfbb797368455bf076231a7f8bb5bb8f015b468a`; project `36595261`; compile `b291aeb27dee2c005bc289635b522295-2f6bfb088f50f8b866262b820d626923`; backtest `e09e77390435ac6569d2ada4b4acef9f` |
+| Launch / terminal | Launch SHA-256 `4ebb6dd50cba28297584ffa83329182c73167611f9be423ace26f9ab18c7b7d9`; `Completed.` after four statistics-free polls; terminal SHA-256 `df5435798fdb4f6c243ee4f3c5140fac7491237507e2f1225344768a6f71424c` |
+| Aggregate read | Result-authority file SHA-256 `a33a4c8a2f9e1dcbd4c5cc96b8fd8fb8ddc65523e9a76ef0b3e63c83206cd1f9`; result permit SHA-256 `b8bbe5fe342560d92c9b7b8abbfc1f0e083bd7a75a72a455ca0836d247df8d68`; result receipt SHA-256 `d2e7e4ca4f38b5709c0a9b799df9e967b72e48a37708835c0d1310639c8cfb56`; persisted-file SHA-256 `9d1462fe74d98ca73a4fce6828d3dcff29a19f5eff68d80b021d972aca6c5938`; custom-statistics SHA-256 `ab094aeba34a4efc158a35bc1ac0ce4d98f31d16d57f14b842adcb120ec610ec` |
+
+The first local attempt to consume the result authority refused before a
+permit or network call because the transport object was constructed after the
+signature file snapshot. Reconstructing all transport and receipt objects
+first, then loading the same detached signature, passed the unchanged guard.
+This was an unspent local ordering refusal, not a second result read; exactly
+one `backtests/read` selected the aggregate result.
+
+### 82.2 Tangible evidence and ETF IC
+
+The fixed 1,253-date census is exact at every horizon: **358 valid + 895
+invalid**, with 1,914 accepted ETF-outcome pairs and zero missing pairs. All
+three cells are `PRELIMINARY_DESCRIPTIVE_AVAILABLE`.
+
+| Horizon | Mean daily ETF IC | Median daily ETF IC | Positive-IC date share |
+|---:|---:|---:|---:|
+| H5 | 0.003093 | 0.000000 | 48.88% |
+| H20 | 0.009836 | 0.000000 | 47.49% |
+| H60 | 0.070551 | 0.100000 | 53.07% |
+
+This is weak and horizon-sensitive cross-sectional evidence. H5/H20 are
+essentially flat on the typical valid date and win on fewer than half of valid
+dates. H60 is directionally better, but it has the same 358-valid-date count
+and does not by itself establish an investable portfolio.
+
+### 82.3 Unlevered economic result
+
+The portfolio has 1,254 measured return sessions and 358 invested sessions,
+so the frozen tangible-evidence gate passes. The strict pipeline is sparse:
+mean eligible ETFs are 2.801, mean selected ETFs are 0.294, and average cash is
+94.11% (average market exposure 5.89%). Average daily two-sided turnover is
+3.954% of portfolio value, or approximately 996% annualized using 252
+sessions. The arithmetic-mean cost break-even is approximately 5.42 bps per
+side; this is not an exact compounded-return break-even.
+
+The candidate census reconciles exactly: 54 ETFs across 1,253 decision dates
+produce 67,662 candidate-date pairs. There are 3,510 eligible pairs and 64,152
+named refusals:
+
+| Candidate disposition | Count |
+|---|---:|
+| Eligible after every gate | 3,510 |
+| Holdings-to-stock mapping refusal | 34,153 |
+| Liquidity refusal | 13,396 |
+| Missing/stale holdings snapshot refusal | 13,104 |
+| Holdings-completeness refusal | 3,499 |
+
+These counts report the first refusing gate for each candidate and do not
+measure how many would become tradable if that gate alone were eased. There
+are 369 selected ETF slots across the 358 invested decision dates. Most
+invested dates therefore hold only one approximately 20% slot; the other
+dates remain in cash. The resulting 5.89% average exposure is an average
+capital allocation, not the fraction of dates with a position. This run
+has enough observed returns to evaluate its implemented portfolio, unlike
+the earlier counts-underfilled stock run. However, the implementation
+mismatch below prevents using this result as a clean economic verdict on
+the intended blueprint portfolio or the underlying analyst signal.
+
+One material selection detail omitted from section 80's prose is explicit
+in the preregistered source: the five-eligible-ETF minimum controls both IC
+calculation and portfolio admission. Fewer than five eligible funds sets
+the next-open target to all cash, including exits from existing positions.
+With five qualifying funds and distinct scores, the 90th-percentile entry
+rule admits only the highest-ranked new fund, so its initial allocation is
+only 20%. This coupling and the fixed-slot cash residual deserve specific
+review before choosing a subsequent economic experiment. Blueprint section
+20.3 specifies the top five eligible funds and a 20% cap, but does not require
+five eligible funds before investing. The IC minimum's additional economic
+admission condition is therefore a **confirmed P2 implementation mismatch**.
+Any correction must define one-to-four-fund ranking, ties, and incumbent
+handling independently from IC availability and receive a new prospective
+run identity. Documenting it does not retrospectively change the frozen
+R-060/R-061 rule or results.
+
+At `3270a58`, a local, outcome-free reproduction with four otherwise-valid synthetic
+funds and distinct positive scores raises the five-fund refusal; the same
+construction with five funds assigns percentiles 0/25/50/75/100 and selects
+only the highest at 20%. That historical `_decision` branch converts the
+under-five case to an empty target before calling this selector. This
+reproduction verifies the mechanical restriction, not the return of a
+corrected rule, and spends no research look.
+
+Two other economic assumptions matter. Residual cash earns **exactly zero
+interest** in every reported portfolio cell; the simulation includes no
+cash-yield proxy. With average cash of 94.11%, these figures are not a
+realistic interest-bearing account return. Also, the exact-previous-session
+snapshot requirement is an extra conservative baseline restriction:
+blueprint section 17.3's H1 determines when holdings become available, not
+when they expire. The 13,104 snapshot refusals combine missing and stale
+snapshots; the aggregate does not establish the benefit of a particular
+alternative freshness policy. Neither assumption is retrofitted after the
+result. Future diagnostics must freeze cash treatment and holdings
+availability/freshness explicitly.
+
+| Cost per side | Cumulative return | Annualized arithmetic return | Sharpe | Sortino | Maximum drawdown |
+|---:|---:|---:|---:|---:|---:|
+| 0 bps | +2.58% | +0.54% | 0.229 | 0.337 | -5.13% |
+| 5 bps | +0.07% | +0.04% | 0.018 | 0.026 | -5.77% |
+| **10 bps primary** | **-2.38%** | **-0.46%** | **-0.194** | **-0.279** | **-7.01%** |
+| 20 bps | -7.10% | -1.45% | -0.616 | -0.863 | -9.78% |
+
+SPY cumulative total return over the same measurement surface is **+91.50%**.
+The result therefore passes availability but fails to show attractive
+economics under the preregistered primary cost. It is preliminary,
+current-vintage/non-pristine-PIT, not control-residualized, and has no formal
+accept/reject disposition or alpha authorization. Because of the historical
+portfolio-admission mismatch, this is not proof that the intended ETF
+strategy or underlying analyst signal lacks economic value. The earlier
+owner-facing strategy-wide conclusion was too strong and is corrected here.
+Actual and synthetic 3x diagnostics should follow corrected unlevered
+evidence; they must not be described as a remedy for this baseline.
+
+### 82.4 Review notes, validation, and next gate
+
+**Review range:** `9094aea..HEAD` on
+`codex/strategy-analyst-revisions-v2`, same designated worktree. Commit
+`9164146` implements the guarded unlevered baseline; `6d4f101` preregisters
+R-060; `3270a58` records its P2 live-Slice failure, adds the isolated
+constituent-only-Slice regression, and preregisters R-061. `70e92fd`
+separates economic admission from IC sufficiency under a new local-only
+profile while preserving the historical R-061 profile and behavior. This
+record commit updates the lane record and shared result ledger with the
+authenticated R-061 result, methodology findings, correction, and handoff.
+Review should focus on
+the SPY-clock correction, sparse 358/1,253 valid-date geometry, the 94.11%
+cash exposure, the reconciled candidate/refusal census, turnover/cost
+arithmetic, the historical five-fund IC/portfolio coupling and versioned
+correction, exact
+receipt hashes, and the fact that leverage remains unimplemented. A separate
+read-only audit reauthenticated the persisted
+receipt chain and reproduced the nine-statistic inventory, hash, census,
+return, and turnover calculations. A subsequent source-to-blueprint review
+found the methodology mismatch and disclosure gaps below; authentic receipts
+do not establish that the intended portfolio was implemented correctly.
+
+| Commit | Codex pre-push disposition for Claude's independent review |
+|---|---|
+| `9164146` | **Accepted after local correction, pending Claude review:** the executable ETF baseline contained ARV2ETF82-002. Its historical result remains limited; `70e92fd` provides separately identified corrected behavior. |
+| `6d4f101` | **Preregistration retained, disclosure corrected prospectively here:** dates, costs, coverage and ranking rules were frozen before outcomes; the extra five-fund economic minimum and zero-return cash were not stated in its prose. |
+| `3270a58` | **Technical correction accepted:** the SPY-clock fix addresses the observed R-060 failure and its regression exercises the same-date trigger. It deliberately did not change R-060/R-061 economics. |
+| `70e92fd` | **Local correction verified, pending Claude review:** explicit profile selection, corrected sparse admission, unchanged five-pair IC gate, historical runtime pinning, independent profile copies, and behavioral regressions. No new QC run or result read. |
+| This record commit | Records the R-061 chain, accounting, results, historical limitations, correction validation and owner-directed direct-stock next phase in the two relevant documents. No past run is rewritten. |
+
+Validation on Python 3.13.15:
+
+- Full lane command `PYTHONPATH=. pytest -q tests/analyst_revisions_v2`:
+  **5,412 passed, 7 skipped, 35 warnings in 6,153.66 s (1:42:33)**.
+  This process started and collected at `3270a58`; the owner later authorized
+  source correction while it continued. It is not a full-suite run on the
+  final corrected tree. Warnings included Python 3.13 deprecations for
+  `fork()` from a multithreaded process.
+- Corrected production source: ETF evaluator/driver, preliminary QC runtime,
+  submission adapter, whole-QC transitive/no-I/O closure and ML import boundary:
+  **244 passed in 103.55 s**. This selection contained the first 31 ETF cases.
+- Final 33 ETF cases plus active-document and lane-record gates:
+  **108 passed in 15.35 s**; this includes the subsequently added negative-score
+  and all-zero cases. The two selections overlap and must not be summed as
+  distinct tests.
+- Document-only follow-up after recording the complete suite: **75 passed in
+  4.26 s**. Lane source/test compilation succeeded; `git diff --check` was clean.
+  The documentation gate and worktree/branch/status are checked again at handoff.
+- Complete repository suite was **not run**, per the owner's lane-only rule.
+  No new provider/QC input read, upload, compile, backtest or aggregate-result
+  read was needed for the correction; no extra research look was spent.
+
+Findings are **0 P0, 0 P1, 2 P2, 5 P3**. No shared-project behavior was
+changed; the shared result ledger records only the authorized lane runs.
+
+| Finding | Priority | Disposition and evidence |
+|---|---|---|
+| ARV2ETF82-001: same-date QC Slice ordering | P2 | **Corrected in `3270a58`.** R-060 advanced on a constituent-only Slice, then refused the same-date equity Slice. The SPY daily-bar clock and an isolated regression correct the runtime; R-061 completes. |
+| ARV2ETF82-002: IC minimum also gates portfolio admission | P2 | **Corrected locally in `70e92fd`, pending Claude review.** The new profile separates economic targets from the five-fund IC minimum; historical R-060/R-061 retain their exact admission rule and result identity. No corrected market result is claimed. See section 82.5 for singleton/tie semantics and evidence. |
+| ARV2ETF82-003: local result-signature object ordering | P3 | **Operationally corrected.** Constructing transport/receipt objects before loading the unchanged signature avoids the local refusal. No permit or network call was spent by the refused attempt. |
+| ARV2ETF82-004: unstated zero-return cash convention | P3 | **Disclosure corrected in this record.** `_record_portfolio_return` credits only ETF sleeve returns. Cash yield remains unmodelled; a subsequent economic comparison must prospectively specify its treatment. |
+| ARV2ETF82-005: availability lag conflated with snapshot expiry | P3 | **Documented baseline restriction.** Exact-prior-session snapshots were preregistered, but are stricter than blueprint H1 availability. A later correction/diagnostic must distinguish known-as-of availability from a separately specified maximum age. |
+| ARV2ETF82-006: stale live-state summaries | P3 | **Corrected in this record.** The banner and section-2 supersession retained earlier look/evaluation/cell totals and an ETF-closed status. Both now reflect 61 looks, eight ARV2 evaluations, 571 exposed cells, completed R-061, and its historical methodology limitation. |
+| ARV2ETF82-007: profile getter shares mutable nested lists | P3 | **Corrected in `70e92fd`.** The former shallow copy exposed the profile's candidate, horizon and cost lists. The getter now returns an independent canonical copy; a regression mutates all three returned lists and verifies both profiles' stored semantics and hashes remain unchanged. No evidence shows a historical run was altered this way. |
+
+Claude reviews this exact pushed section-82 range next. Codex then
+counter-reviews every Claude commit in the same lane and proceeds under the
+owner's latest sequence in section 82.6. No new ETF run, stock-portfolio run,
+or leveraged run was launched during this closing correction.
+
+### 82.5 Local portfolio-admission correction, no new research look
+
+The corrected local profile is
+`arv2-etf-sector-baseline-2021-2025-admission-v2`, SHA-256
+`f3130293321b3e803578a69b40a230a6608b47353f54b7da5ed9921658c55573`.
+Its profile schema and economic contract are v2. Summary and cell field
+shapes remain v1, but every serialized cell carries the selected profile ID,
+and the summary carries its selected profile/hash and matching contract.
+The runtime requires explicit profile selection: there is no changed default
+financial rule. The QC driver explicitly selects the historical profile;
+projection and submission allowlists refuse the corrected ID. The correction
+is therefore local/review-only until a separately preregistered future run.
+
+Under the corrected profile, an empty eligible set has no targets; a singleton
+has neutral percentile 50 and does not qualify for entry or retention. Two
+or more funds use the unchanged average-rank formula. Distinct two-to-four
+fund sets can admit the highest-ranked fund at the unchanged 20% slot,
+leaving residual cash; no minimum-five economic gate remains. All-equal
+cross-sections are neutral, including all-zero scores. A highest-ranked
+negative score can qualify because the signal is relative; no new
+absolute-positive cutoff was introduced. In a four-fund set with two tied
+top scores, their average-rank
+percentile is 83 1/3: an incumbent clears the 70 exit threshold but a new
+position does not clear the 90 entry threshold. A disqualified or
+below-threshold incumbent exits at the next open, with sell turnover/cost.
+Statistical IC still requires five funds and five accepted outcome pairs;
+under-five dates remain invalid with no invented IC/outcome-pair evidence.
+
+The original profile/hash, dates, 54-fund sleeve, scoring, mapping threshold,
+snapshot freshness, liquidity, caps, drift accounting, costs and zero-yield
+cash convention are preserved. The original profile continues to reproduce
+R-061's under-five cash restriction. Its authentic -2.38% primary result is
+not relabelled as corrected evidence, and the correction is not a promise
+of improved returns or full investment.
+
+Before changing the two economic branches, the new sparse regression
+selection produced **6 failed, 2 passed, 23 deselected in 2.44 s**: failures
+isolated empty-set percentiles, two/three/four-fund admission, tied-incumbent
+retention, and next-open replacement. After the correction, all **31 ETF
+tests passed in 14.81 s**. An internal read-only diff review found no further
+implementation defect and identified a missing negative-score regression;
+negative-score and all-zero cases were added before final validation. This
+internal check is not Claude's independent acceptance. Final validation is
+reported in section 82.4.
+
+### 82.6 Owner-directed sequence and direct-stock proposal assessment
+
+The owner first directed completion of the suite, then correction and one
+push. While the suite was still running, the owner explicitly changed the
+sequence to allow simultaneous correction. The existing suite was allowed
+to finish; focused checks were rerun on the corrected source. Its original
+collection is not represented as full-final-tree validation.
+
+The owner subsequently reaffirmed exactly one push after both the correction
+and suite finish. Claude then reviews that exact snapshot. A thread monitor
+will watch the same lane for Claude's subsequent single review push, not
+mistake Codex's own implementation push for the review, and begin
+commit-by-commit counter-review when it lands. Confirmed lane-specific issues
+are corrected; shared/main issues are documented without unrelated repairs.
+After counter-review, the next implementation and backtest target is an
+**individual-stock economic portfolio**, with **ETFs retained as a backup
+research path**. Actual and synthetic 3x experiments remain separate later
+diagnostics, not a way to rescue an unproven unlevered portfolio.
+
+The owner-supplied `UPDATED_ANALYST_REVISION_IMPLEMENTATION_STRATEGY_V2.md`
+was assessed read-only, not imported wholesale. Direct-stock exposure is a
+reasonable next experiment because prior stock ICs establish ranking
+observations but no investable stock-portfolio return. It does not follow
+that ETF aggregation alone caused R-061's weakness. The first stock test
+should reuse the existing score and accepted-risk inputs, freeze one
+long-only equal-weight construction with SPY and a matched eligible-stock
+benchmark, and state execution timing, costs, cash treatment and missing/
+terminal outcomes before inspecting its returns. The proposed top-decile,
+50-100-name, 2%-cap and 98%-invested requirements must be made mathematically
+consistent rather than introducing another hidden all-cash gate. New raw
+score formulas, hard 20/60-day holding rules, multiple variants and fresh
+frameworks are not adopted by this agreement. The already-examined 2021-2025
+period is a development test, not newly untouched confirmation evidence.

@@ -350,9 +350,11 @@ SHA-256S. SECTION 94 IS THE CODEX COUNTER-REVIEW: `b55ea35` IS ACCEPTED;
 EXECUTION DEFECT WAS FOUND. THE COUNTER-REVIEW REMOVES A FALSE CLAIM THAT
 DAILY-RESET LEVERAGE MUST WIDEN AN EXISTING SPY SHORTFALL, CORRECTS THE
 RUNTIME STATISTIC INVENTORY AND REVIEW COUNTS, RE-STATES CONCENTRATION AS
-EFFECTIVE BREADTH, AND ADDS THE MISSING ROW-CAP ISOLATION TEST. PHYSICAL
-R-083 THROUGH R-090 IDENTITIES MAY NOW BE FROZEN BEFORE LAUNCH. CURRENT
-ACCOUNTING IS 78 SHARED LOOKS, 21 ARV2
+EFFECTIVE BREADTH, AND ADDS THE MISSING ROW-CAP ISOLATION TEST. SECTION 95
+PROSPECTIVELY FREEZES THE EXACT PHYSICAL R-083 THROUGH R-090 IDENTITIES,
+INTERPRETATION RULES, SEQUENCE, AND ACCOUNTING BEFORE ANY EXTERNAL ACTION.
+ALL EIGHT REMAIN UNRUN AND UNSPENT; R-083 IS NEXT. CURRENT ACCOUNTING IS 78
+SHARED LOOKS, 21 ARV2
 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
@@ -1097,12 +1099,14 @@ corrections, three P2s and five P3s, and the eight reviewed profile SHA-256s
 recorded. Section 94 is Codex's counter-review of both Claude commits. It
 accepts the test-only correction and accepts the record after five prospective
 corrections, including removal of a false leverage-direction implication. No
-production execution defect was found. Codex may now freeze physical R-083
-through R-090 submission identities, preregister them, and run them
-sequentially; the owner explicitly waives Claude review of section 94 before
-these already-authorized runs. QQQ remains a Nasdaq-100 holdings proxy, not all Nasdaq-listed
-stocks. No retrospective winner selection, deployment, order, broker,
-paper/live, or trading action is authorized.
+production execution defect was found. Section 95 prospectively freezes the
+physical R-083 through R-090 submission identities and interpretation rules;
+the owner explicitly waives Claude review of section 95 before these
+already-authorized sequential runs. Codex launches R-083 first and proceeds
+only through terminal closure and its one permitted aggregate read. QQQ remains
+a Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks. No retrospective
+winner selection, deployment, order, broker, paper/live, or trading action is
+authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -17296,3 +17300,52 @@ leverage diagnostics run only afterward. Overlapping windows are descriptive,
 not independent evidence; no window may be selected as a winner. No result
 authorizes formal alpha acceptance, deployment, broker access, orders,
 paper/live state, or trading.
+
+## 95. Prospective physical freeze for R-083 through R-090, 2026-09-17
+
+Following the completed section-94 counter-review, Codex derived these eight
+physical plans from the reviewed package and unchanged production closure.
+This section and the matching shared-ledger block are committed before any
+external action. **No project, upload, compile, backtest, terminal inspection,
+or result read has occurred yet; all eight identities are unspent.** The
+common package SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`
+and the common host-closure SHA-256 is
+`f2e114d751775a448017bd30b7d7dea68e3ab794ac5094bb9609ed4a20e49792`.
+
+| Run | Profile SHA-256 | Projection SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|
+| R-083 | `3025fff20f0742b60b5e75af22bc71230608fcc7a3af9b043c0c8865dfe0548e` | `215cb2240321828f8519573717a356d2c1be590f502aa382817df15589d0faee` | `1880250e2bf83c100a77a6101e37c850a58fa38e2d9bb3d91ba92b4b18062f43` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-e2a33caa678ee14a2d7b83de` / `e2a33caa678ee14a2d7b83de345b2bc35ff515c81cbfd12d49d7c9e09b26cfb4` |
+| R-084 | `6dcb9a08790a40407622d5a6ec34e5cd8fab5978d8e4cdc0f1ba16fb984063d7` | `2d011b0a1ab1ba000463db32611468a62b43e1c98fed1ac544cbb29af9b667ea` | `3f559680b795ec7e181618a631fc261941dd0282d0462283a13491c0791dc08d` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-077b7f9fe2ef4eebcc112908` / `077b7f9fe2ef4eebcc11290809e846c6d736fa266fd2b28911d39429c60053d0` |
+| R-085 | `1069bb9717584632cc64a11394ff0cb7bef1d080d4ed0a79ca9eaaf1975596c0` | `f63cc6775c370392bca6a1137620d6587c21229161e64fddb20869da4f7e0d53` | `b921be6ac732312bdd31eb69d97f1acd607b0e03b22c412b83d349e19492cc0c` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-b961c522c05ab0ca6253b4e4` / `b961c522c05ab0ca6253b4e4dd104791685850e13f8634f7b260249e8b06ff2d` |
+| R-086 | `75f0841eeddbba74f4ac618b754a6d31698716bb5baf12d96461c8f10ea18cde` | `9a2990b803405612085a9bfdedb7a973508d3dcc72a1b740113967f89e34eaf5` | `dcf4e7110f75e62c1aa99fd29db0ee5568d9eaf0c0e9b8723dc8e9a5b67e12b9` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-ed5f7cba15734cac805887d7` / `ed5f7cba15734cac805887d70cafde094e15745ee3e27bd501a34c53673dadf0` |
+| R-087 | `a6eeb831372894fd2ba2d95a6a23daefffe86555dd0d93a97a63d977fc27cc05` | `a3130fd85e0864746bf4045140e414f5de911dd5e2bac0e5217e6251866a9c4e` | `7ccd46bc8bebe39b8b46c15aa414836a265d3b492ed5f36cf509fce2d6ad718d` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-0bb219f78c806dafe912840b` / `0bb219f78c806dafe912840bfaba741432d5e495e6ef1f6f502bb56f5c784ce2` |
+| R-088 | `bbc3e88fd66cd8ad93ec1d3e48675c03df75460922e0c21d855dc8aa27ab68e4` | `47653858e49c370c519d1ad002906115657c5b2453c8d357fc7aeca1893c8ab7` | `5b38b95a465467a8f6a0ce4cb803fae8a3d2f8abe083368a28a51615a1f6d564` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-11b9c64a5b645e9679412164` / `11b9c64a5b645e96794121644c4ccf914fc9b690068febe92b31f75cd1483610` |
+| R-089 | `e9ed4d6e1df27c38273958ddfc66b4d8d0adc62c5995bb2f5941d7d3540cc68e` | `bb35ffb605a2825585c6d93387a368f5a21021de5cb438fa4eb8f1748ac11c76` | `1b297af2aedfa084943bdca46ea50237d705a62ef633f205f6033a16f0cf9407` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-11022a9c630bfd0593d74c45` / `11022a9c630bfd0593d74c45dd45ade000f69936546ee7e781df2554ba24efa5` |
+| R-090 | `ed7e3151daf3ae5868695e7753b0bb47119555124efe457cbca5db26a4208584` | `c8e4921fe7ba62d6722ee45147fd24c2c28ddc78ae45387adaa6914b1ae49321` | `67a9f4bd181c978ce2fedc883b0a467d69ea59e55d863e5679df17ca79ecccbc` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-dd65df97f35e2c1327d9e7ab` / `dd65df97f35e2c1327d9e7ab168e8371e9772bdb1bfc784b08da56e29741be70` |
+
+The exact project/backtest names, projection IDs, relative private control
+directories, construction rules, concentration floor, overlap rule, leverage
+scenarios, six-statistic runtime inventory, sequencing, one-use result boundary,
+and accounting transitions are frozen in the matching R-083--R-090 block of
+`docs/research/alpha-result.md`. All eight profile SHA-256 values exactly equal
+the independently reviewed section-93 values. The unlevered names-hash is
+shared across R-083--R-088; the leverage names-hash is shared across
+R-089/R-090. No economic direction is preregistered for leverage.
+
+Freeze validation rebuilt all eight plans after the section-94 commit and
+matched every recorded plan SHA-256 and the common host closure exactly. A
+new direct test pins all eight reviewed profile SHA-256 values. That test plus
+the lane-record and root active-document gates pass **76 tests in 2.11
+seconds**; `compileall` over the lane package/tests exits 0 and
+`git diff --check` is clean. The complete lane suite is not repeated because
+the reviewed production tree is unchanged from Claude's 6,163-pass run; this
+freeze adds only documentation and one exact-identity test.
+
+The next physical action is R-083. One subscribed QC node means each job must
+reach a terminal state and its one permitted aggregate read must close before
+the next job begins. Launching a plan spends its look even if it later refuses.
+Any technical successor needs a fresh committed identity; observed results may
+not choose the retry rule. No formal acceptance, deployment, broker access,
+order, paper/live, or trading authority follows from this freeze or any one
+descriptive result.

@@ -161,6 +161,31 @@ def test_market_cap_projection_inventory_and_profile_hash_are_load_bearing(
     )
 
 
+def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
+    """ARV2R93-006: every reviewed R-083--R-090 profile is an exact pin."""
+
+    assert projection.MARKET_CAP_PROFILE_SHA256S == {
+        evaluator.QQQ_2021_2025_PROFILE_ID:
+            "3025fff20f0742b60b5e75af22bc71230608fcc7a3af9b043c0c8865dfe0548e",
+        evaluator.SPY_2021_2025_PROFILE_ID:
+            "6dcb9a08790a40407622d5a6ec34e5cd8fab5978d8e4cdc0f1ba16fb984063d7",
+        evaluator.QQQ_2019_2023_PROFILE_ID:
+            "1069bb9717584632cc64a11394ff0cb7bef1d080d4ed0a79ca9eaaf1975596c0",
+        evaluator.SPY_2019_2023_PROFILE_ID:
+            "75f0841eeddbba74f4ac618b754a6d31698716bb5baf12d96461c8f10ea18cde",
+        evaluator.QQQ_2023_2025_PROFILE_ID:
+            "a6eeb831372894fd2ba2d95a6a23daefffe86555dd0d93a97a63d977fc27cc05",
+        evaluator.SPY_2023_2025_PROFILE_ID:
+            "bbc3e88fd66cd8ad93ec1d3e48675c03df75460922e0c21d855dc8aa27ab68e4",
+    }
+    assert projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S == {
+        leverage_evaluator.QQQ_2021_2025_PROFILE_ID:
+            "e9ed4d6e1df27c38273958ddfc66b4d8d0adc62c5995bb2f5941d7d3540cc68e",
+        leverage_evaluator.SPY_2021_2025_PROFILE_ID:
+            "ed7e3151daf3ae5868695e7753b0bb47119555124efe457cbca5db26a4208584",
+    }
+
+
 @pytest.mark.parametrize("profile_id", leverage_evaluator.PROFILE_IDS)
 def test_objective_leverage_projection_is_exact_small_and_profile_bound(
     package, profile_id

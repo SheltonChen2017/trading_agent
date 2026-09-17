@@ -2019,3 +2019,38 @@ def test_standalone_breadth_replay_enforces_the_upper_total_envelope_alone():
         match="cannot arise from qualifying buyers",
     ):
         _replay_breadth(forged)
+
+
+def test_standalone_breadth_replay_enforces_the_lower_total_envelope_alone():
+    """The minimum total envelope must refuse independently of sibling guards."""
+    boundary = _build(
+        _event(1, buyer_id="buyer-1"),
+        _event(2, buyer_id="buyer-1", transaction_date=date(2026, 8, 19)),
+        _event(3, buyer_id="buyer-2"),
+        _event(4, buyer_id="buyer-2", transaction_date=date(2026, 8, 19)),
+    ).breadth
+    assert (
+        boundary.buyer_breadth,
+        boundary.date_breadth,
+        boundary.included_event_count,
+    ) == (2, 2, 4)
+
+    # Four admitted events require at least $200,000 in total.  These forged
+    # values preserve buyer/date capacity, the $100,000 pigeonhole minimum for
+    # the largest buyer, concentration, and the $50,000 other-buyer minimum.
+    # Therefore only the lower-total envelope can refuse this shape.
+    impossible_total = Decimal("175000")
+    largest_within_envelope = Decimal("100000")
+    forged = _rehash_breadth(
+        boundary,
+        total_purchase_value_usd=impossible_total,
+        largest_buyer_purchase_value_usd=largest_within_envelope,
+        dollar_breadth=signal_module._dollar_breadth(
+            impossible_total, largest_within_envelope
+        ),
+    )
+    with pytest.raises(
+        signal_module.Form4StockSignalFormulaDiagnosticsError,
+        match="cannot arise from qualifying buyers",
+    ):
+        _replay_breadth(forged)

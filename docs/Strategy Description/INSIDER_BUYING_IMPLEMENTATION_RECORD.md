@@ -1,20 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `94ea25c` AND `4c834e1` AND
-ACCEPTED BOTH ONLY AFTER LANE-SPECIFIC CORRECTION (SECTION 52). THE REVIEW
-CONFIRMED THREE P2 INTEGRITY GAPS: CALLER-ALIASED/ABA-MUTABLE FIXTURE EVENTS,
-IMPOSSIBLE STANDALONE BREADTH CLAIMS, AND RAW-SCORE IDENTITIES OUTSIDE THE
-ATTAINABLE EVENT ENVELOPE. VALIDATED FACTORY-BOUND SNAPSHOTS NOW SEVER CALLER
-ALIASES; REPLAY NOW ENFORCES EVENT/VALUE, BUYER/DATE, CONCENTRATION, AND
-RAW-SCORE ENVELOPES. FIVE P3 REVIEW-PRECISION DEFECTS ARE CORRECTED OR
-RETAINED APPEND-ONLY, INCLUDING THE FINAL SEAL'S LOAD-BEARING STATUS, THE
-772-DIGIT/2-DIGIT-SLACK AGGREGATE DERIVATION, AND THE 50-DIGIT WHOLE-HALF-LIFE
-PROJECTION DESCRIPTION. IB-3A REMAINS SYNTHETIC, OFFLINE, ZERO-LOOK EVIDENCE
-ONLY; `stock_score` IS HARD `None` AND ALL OPERATIONAL AUTHORITIES REMAIN
-FALSE. THE NEXT COHERENT SLICE, IB-3B SYNTHETIC CROSS-SECTIONAL NORMALIZATION,
-IS BLOCKED ON OWNER CHOICES FOR POPULATION, WINSORIZATION, QUANTILES, VARIANCE,
-MINIMUM-N, ZERO-DISPERSION, AND MISSING/INELIGIBLE HANDLING. NO SUCH CHOICE OR
-ANY DATA, OUTCOME, QC, PAPER, LIVE, OR TRADING AUTHORITY IS INFERRED.**
+Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `05a0755` AND `4dbafe0` AND
+ACCEPTED BOTH AFTER P3 CORRECTIONS (SECTION 54). CLAUDE'S ISOLATED UPPER-TOTAL
+ENVELOPE REGRESSION IS CORRECT AND LOAD-BEARING. THE GENERALIZED REVIEW FOUND
+THE SYMMETRIC LOWER-TOTAL ENVELOPE STILL DELETABLE WITH THE SUITE GREEN; AN
+ISOLATED DANGEROUS-DIRECTION REGRESSION NOW PINS IT. SECTION 53'S FINAL-TREE
+177/1,443 COUNTS ARE CORRECTED APPEND-ONLY TO 178/1,444 BEFORE THIS NEW TEST,
+AND THE EXACT TWO-COMMIT REVIEW RANGE IS NOW EXPLICIT. NO P0-P2 FINDING IS
+OPEN. THE OWNER APPROVED THE EXACT BOUNDED SYNTHETIC IB-3B NORMALIZATION POLICY
+RECORDED IN SECTION 54.4, INCLUDING COMPLETE ELIGIBLE-COHORT ACCOUNTING,
+TYPE-7 1%/99% WINSORIZATION, POPULATION VARIANCE, MINIMUM-N AND DISPERSION
+GATES, AND 50-DIGIT DECIMAL ARITHMETIC. RANKING AND SEED SELECTION REMAIN
+DEFERRED. IB-3B IS THE NEXT AUTHORIZED SYNTHETIC/OFFLINE MILESTONE; NO DATA,
+OUTCOME, QC, PAPER, LIVE, OR TRADING AUTHORITY IS INFERRED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -6929,3 +6927,91 @@ broker, operator-database, scheduler, deployment, capital, or trading access.
 
 Codex counter-reviews this review commit. IB-3B is not started; the section
 52.5 owner-decision register stands unchanged.
+
+## 54. Codex counter-review - Claude IB-3A correction review and IB-3B policy gate (2026-09-17)
+
+Codex worked only in `C:\git\customizedAgent\trading_agent_insider` on the
+existing `codex/strategy-insider-buying` branch and did not switch or create a
+branch or worktree. The worktree began clean at
+`4dbafe07c4ac640d6d78478c5a2772ea5d2fdcd9`; local `HEAD`, the tracking ref,
+and a live read-only remote query all resolved to that exact pushed commit.
+The ordered counter-review range is
+`c5aec62df9c368256e583db8363e2b0231fde055..4dbafe07c4ac640d6d78478c5a2772ea5d2fdcd9`:
+two commits, zero merges, one lane test file, and this lane record.
+
+### 54.1 Commit-by-commit dispositions
+
+| Commit | Change | Codex disposition |
+|---|---|---|
+| `05a0755315e1fbf6a5a2253a4b19426a35d575b7` | Add one isolated upper-total-envelope regression | **Accepted after correction.** The constructed three-event/two-buyer/two-date shape satisfies every sibling breadth guard. Neutralizing only `total > N * max` makes this new test the sole failure. Generalizing the same mutation analysis exposed the unpinned symmetric lower-total guard, which this counter-review corrects with a separate test. |
+| `4dbafe07c4ac640d6d78478c5a2772ea5d2fdcd9` | Record Claude's review in section 53 | **Accepted after correction.** The review substance, commit inventory, upper-envelope derivation, randomized oracle, zero-authority boundary, and full-suite shared-failure disposition reproduce. Its final-tree focused/lane counts and singular next-step wording require the append-only precision corrections below. |
+
+### 54.2 Retained P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3A-CCR09 | P3 | **CLOSED in this counter-review** | Generalized instance after `05a0755` | `Form4StockSignalBreadthDiagnostics.__post_init__`; focused IB-3A test module | The lower-total clause `total < N * min` remained deletable with every focused test green. The existing one-event below-minimum case is masked by the minimum-largest-buyer clause, so the necessary fail-closed total envelope had no isolated mutation sensitivity. | Neutralizing only the lower-total clause on the incoming tree produced **178 passed**. A four-event/two-buyer/two-date forgery with total `$175,000` and largest buyer `$100,000` violates only the `$200,000` minimum total; capacity, pigeonhole, per-buyer maximum, concentration, and other-buyer minimum all hold. | Every necessary replay envelope added for the P2 integrity correction must be independently protected; an earlier sibling refusal must not make a claimed guard silently deletable. | Added `test_standalone_breadth_replay_enforces_the_lower_total_envelope_alone`, including a recomputed dollar-breadth value. Production code is unchanged. | Corrected focused suite: **179 passed**. With only the lower-total clause neutralized, exactly the new test fails and the other **178 pass**; the production module restores byte-identically and `git diff --quiet` succeeds. |
+| IB3A-CCR10 | P3 | **CLOSED append-only in this record** | `4dbafe0` | Sections 53.6-53.7 and the current push-log validation row | Section 53.6 correctly says the added test makes the focused file 178, while section 53.7 still reports 177 and the pre-correction lane gate 1,443 as if they were final-tree counts. | The exact incoming head gives **178 focused** and **1,444 passed, 8 skipped** for the lane/boundary gate. Section 53.3's 177/1,443 statements explicitly describe `c5aec62d` and remain correct historical evidence. | Validation must identify the exact tree; mixing reviewed-parent and corrected-final counts makes later reproduction ambiguous. | Retain section 53 unchanged and supersede only its final-tree count claim here: before this counter-review's new test, final focused was 178 and final lane/boundary was 1,444/8. | Both incoming-head counts were rerun exactly. This counter-review's additional regression moves the corrected tree to 179 focused and 1,445/8 lane/boundary. |
+| IB3A-CCR11 | P3 | **CLOSED in this record** | `4dbafe0` | Section 53.8 and the corresponding push-log next-step wording | The handoff says Codex counter-reviews “this review commit” singular even though Claude's review round contains two commits. | `git log --reverse c5aec62d..4dbafe0` returns `05a0755` and `4dbafe0`, zero merges. | The binding lane workflow requires a disposition for every Claude commit, including test-only and record-only commits. | This section names the exact two-commit range and gives each commit its own disposition. | The range and changed-path inventory were mechanically reproduced before review. |
+| IB3A-CR02 | P3 | **OPEN - retained historical evidence precision** | `4c834e1` | Sections 50.4, 51.5, and 52.2 | The transient pre-commit `117 passed, 3 failed` tree is not reconstructible from committed Git objects. | The committed guards remain mutation-verified, but the transient tree is absent. | Historical evidence must distinguish reproducible committed objects from ephemeral development state. | No reconstruction is possible; retain the qualification. | Current committed guards and both isolated total-envelope directions are covered. |
+| IB3A-CR04 | P3 | **OPEN - environment note, no code fix** | `c5aec62d` | IB-3A diagnostics working-copy line endings | This host checks out the diagnostics module as CRLF over an LF blob, so byte-restoration controls must name their working-copy reference. | Both counter-review mutations restored the original working-copy bytes and then produced `git diff --quiet`. | Mutation restoration claims must state the byte reference used on this host. | No production change. | Exact restore checks passed after each mutant. |
+| IBSH-CCR08 | P3 | **OPEN - shared/out of lane; not fixed here** | Pre-existing | Two `research/ml_specs/volatility-discovery-v1*.json` working copies | The shared ML-spec CRLF/LF mismatch causes the known two complete-suite failures and is unrelated to Insider Buying. | The prior exact full run and `git ls-files --eol` identify only those two shared paths. | Owner instruction requires shared/out-of-lane defects to be documented, not fixed on this lane. | No shared file changed. | The final complete-suite disposition is recorded below; neither path is in this round's diff. |
+
+No P0, P1, or P2 finding was found. The execution-safety checklist is out of
+scope: neither Claude commit nor this correction touches proposals, risk,
+brokerage, orders, execution, the operator database, or deployment.
+
+### 54.3 Validation
+
+- Python **3.13.14**, pytest **9.1.1**.
+- Exact incoming head: **178 focused passed**; upper-total deletion mutant:
+  exactly **1 failed, 177 passed**, with only Claude's new regression failing;
+  lane/boundary gate: **1,444 passed, 8 skipped**.
+- Corrected tree: **179 focused passed**; lower-total deletion mutant: exactly
+  **1 failed, 178 passed**, with only the counter-review regression failing;
+  lane/boundary gate: **1,445 passed, 8 skipped**.
+- An initial complete-suite attempt under the short-path `C:\venvs\ta`
+  interpreter stopped during collection with seven missing-optional-dependency
+  errors (`joblib` / `scikit-learn`). The fully provisioned Python installation
+  contains those dependencies; no package was installed or changed.
+- Complete repository suite on the corrected code/test tree, before this final
+  record-only evidence update: **2 failed, 7,674 passed, 15 skipped, 25
+  warnings in 2,864.85s (0:47:44)**. Both failures are exactly the retained
+  `IBSH-CCR08` CRLF/LF mismatches in
+  `research/ml_specs/volatility-discovery-v1.json` and
+  `research/ml_specs/volatility-discovery-v1.review-request.json`; no Insider
+  test failed.
+- Whole-repository compileall, including `research`: **exit 0**.
+- `git diff --check`, exact final status, and commit inventory are rechecked
+  before the local counter-review commit.
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
+security master, outcome, ETF holding, QuantConnect, broker, operator database,
+scheduler, deployment, capital, order, or trading surface was accessed.
+**Research looks: 0.**
+
+### 54.4 Owner-approved synthetic IB-3B policy
+
+After the status explanation, the owner instructed this lane to follow the
+recommended bounded synthetic IB-3B path and start implementation, then
+explicitly approved the following complete synthetic-only policy:
+
+1. The normalization population is the complete synthetically eligible cohort,
+   including structural-zero names.
+2. Ineligible or missing rows remain in the result with named dispositions; an
+   eligible row whose synthetic score is missing refuses the entire cohort.
+3. Winsorization uses the 1st and 99th percentiles with type-7 linear
+   interpolation; ties are value-based.
+4. Variance is population variance with denominator `N`.
+5. A usable cohort requires at least 20 names and at least two distinct
+   post-winsor values.
+6. Zero dispersion produces a named unavailable result; no epsilon or
+   substituted zero is permitted.
+7. Arithmetic uses an isolated 50-digit `Decimal` context with
+   `ROUND_HALF_EVEN` and no final-place quantization.
+8. Ranking and seed selection remain deferred.
+
+This resolves section 52.5's sequence and numerical-policy gates. The next
+authorized action is bounded, fixture-only IB-3B normalization diagnostics.
+The approval grants no canonical score, ranking, seed, real data, provider,
+outcome, QC, paper, live, deployment, or trading authority.

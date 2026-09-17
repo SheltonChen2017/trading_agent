@@ -321,10 +321,22 @@ ONLY THAT ARBITRARY EXPIRY BUT REFUSED BECAUSE THE QC CONSTITUENT ROW WEIGHTS
 DID NOT SUM TO THE 0.95 ETF-REPLICATION FLOOR. THAT WEIGHT-SUM RULE IS NOT A
 VALID MEMBERSHIP-CENSUS REQUIREMENT. R-076 IS SUPERSEDED UNLAUNCHED. FRESH
 R-077/R-078 RETAIN STRICT-PRIOR STATE, EXACT SID MAPPING AND NONEMPTY
-SCORE-CENSUS INTERSECTION, REPLACE REPLICATION-WEIGHT SUMS WITH FROZEN PER-ETF
-POSITIVE-CONSTITUENT COUNT BOUNDS, AND AWAIT THEIR PREREGISTERED RUNS. CURRENT
-ACCOUNTING IS 72 SHARED LOOKS, 19 ARV2 DEVELOPMENT EVALUATIONS, 23
-INFRASTRUCTURE LOOKS, AND A 583-CELL FLOOR.
+SCORE-CENSUS INTERSECTION AND REPLACE REPLICATION-WEIGHT SUMS WITH FROZEN
+PER-ETF POSITIVE-CONSTITUENT COUNT BOUNDS. BOTH COMPLETED. R-077'S QQQ-PROXY
+SLEEVE WAS ONLY 17.64% INVESTED BY CONSTRUCTION AND IS UNINFORMATIVE; R-078'S
+UNION SLEEVE RETURNS +67.61% AT THE PRIMARY COST, +12.90 POINTS VERSUS ITS
+MATCHED COMPARATOR AND -26.59 POINTS VERSUS SPY. SECTION 89 RECORDS THE
+OUTCOME-FREE POINT-IN-TIME MARKET-CAP AND SPY/QQQ/SOXX MEMBERSHIP CANARY:
+R-079 THROUGH R-081 REFUSED AND R-082 COMPLETED A 16-OF-16-SESSION COVERAGE
+ATTESTATION. SECTION 90 IS THE INDEPENDENT CLAUDE REVIEW OF THE WHOLE
+`cf33165..45ae067` RANGE: ALL ELEVEN COMMITS ACCEPTED, NO PRODUCTION DEFECT
+FOUND, A SEVEN-FOR-SEVEN POINT-IN-TIME MUTATION MATRIX, THE LEDGER CHAIN AND
+EVERY HASH RECONCILED, THREE RECORD P2S INCLUDING THIS ROUND'S MISSING PUSH-
+LEDGER ROW AND R-077'S UNDISCLOSED EXPOSURE CEILING, AND AN IMPROVEMENT
+PLAN. THE CORRECTED BROAD-UNIVERSE ATTRIBUTION IS ADVERSE, THE INDEX-UNIVERSE
+SPREADS ARE ONE-SIDED UPPER BOUNDS, AND NO SLEEVE BEATS SPY. CODEX
+COUNTER-REVIEW IS NEXT. CURRENT ACCOUNTING IS 78 SHARED LOOKS, 21 ARV2
+DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1054,10 +1066,12 @@ ignore only those unselectable collections before duplicate storage and
 payload traversal. Section 89 supersedes that historical run instruction. It
 records the bounded outcome-free point-in-time market-cap and SPY/QQQ/SOXX
 membership canary, including R-079 through R-081's distinct technical
-dispositions and R-082's completed 16-of-16-session coverage attestation. The
-immediate next step is that Claude should review section 89 independently and
-review the exact single-pushed snapshot. After Claude's review push, Codex must counter-review
-it before constructing or launching the separately preregistered market-cap-
+dispositions and R-082's completed 16-of-16-session coverage attestation. Section 90
+is that independent Claude review of the whole `cf33165..45ae067` range: all
+eleven commits accepted, no production defect found, three record P2s and an
+improvement plan. The immediate next step is that Codex counter-reviews
+section 90 and the exact pushed range, appends the section-5 row that 88.9
+promised for `cf33165..45ae067`, and only then may construct or launch the separately preregistered market-cap-
 aware QQQ and S&P 500 period diagnostics and the separately labeled 2x/3x
 leverage diagnostics. QQQ remains a Nasdaq-100 proxy, not all Nasdaq-listed
 stocks. Deployment, orders, broker, paper/live, and trading remain closed.
@@ -2715,6 +2729,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-16 | Claude review | `4e3df32` -> this record commit; one lane test correction and one banner restoration; no production module, specification or shared file change; Codex resolves the exact pushed head | Independent review of the direct-stock portfolio range `e45a38a..4e3df32`, including R-064 and an independent assessment of every recorded QC interpretation | Dispositioned all five commits (85.1); accepted after correction. Verified rather than accepted: the 914-line evaluator carries no ordering, trading, deployment or brokerage primitive and no filesystem or network import; the portfolio is genuinely invested at 97.992% gross across 1,253 of 1,254 sessions with all 261 weekly decisions executed; costs are a 2.95 percentage-point drag and not the binding constraint; and look accounting reconciles at 64 shared looks, 11 development evaluations and a 575 cell floor. | Final complete Analyst lane selection on the corrected tree **5,604 passed, 7 skipped, 0 failed, 35 warnings in 5,655.43 s (1:34:15)**; stock-portfolio battery **20 passed**; record gates **75 passed** after the banner restoration against 74 passed and 1 failed on the pushed head; two red/green mutation trials in a scratch export; `git diff --check` clean; Python 3.13.15. **Zero research looks and zero development evaluations by this review**, which made no QuantConnect, Massive or Sharadar call and read no provider row. | Review: 0 P0/P1; **2 P2 and 2 P3** (`ARV2R85-001..004`); two corrected here with red/green evidence. `ARV2R85-001`: deferral is all-or-nothing per account, so one held name without a price freezes the universe-sized matched comparator, reproduced at 4 executions against the sleeve's 261 and matching R-064's reported 2 against 261. `ARV2R85-002`: `4e3df32` deleted the banner's standing no-accepted-signal assertion, turning a shared document-consistency guard red. Section 85.4 records that the stock information coefficients are best supported at H1 and weakest at H60, the opposite of how rising magnitude reads. | Codex counter-reviews this record commit, settles `ARV2R85-001` before any further economic evaluation, and should run the complete standing selection including the root-level shared gates once per round before pushing; later windows, leverage, deployment, orders and trading remain closed. |
 | 2026-09-16 | Codex counter-review and R-065 corrected-comparator candidate | `57d5590` -> `4410ebb` and this record commit | Counter-review Claude's section-85 commits, correct the account-wide comparator freeze under a new preregistered identity, and stop before QC | Accepted `9481971` as valid reproduction evidence and `57d5590` after prospective record correction. R-065 applies per-name stale-position locking symmetrically, lets priceable names rebalance, preserves recovery once, keeps impossible entries in cash, includes locked names in the signal's fifty-name cap, authenticates new partial-rebalance counters, and leaves R-064 immutable. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Focused evaluator/runtime/submission **259 passed in 125.00 s**; import/no-I/O closure **13 passed in 12.56 s**; complete Analyst lane **5,492 passed, 7 skipped, 0 failed, 35 warnings in 5,910.76 s (1:38:30)**; final record gates **75 passed**; compileall and `git diff --check` green. **Zero research looks and zero development evaluations.** | Counter-review: **1 P2 and 8 P3** (`ARV2CR86-001..009`), corrected or qualified prospectively. In-round audit: **1 P2 and 1 P3** (`ARV2D86-001..002`), both corrected with isolated tests. No open scoped defect. | Push this same-lane range exactly once. Claude reviews section 86 and the pushed range; Codex counter-reviews, launches R-065, and in that same round preregisters and runs the SPY-holdings, QQQ-holdings/Nasdaq-100-proxy, and deduplicated-union stock diagnostics. No leverage, deployment, broker, order or trading action. |
 | 2026-09-16 | Independent Claude review of the R-065 corrected comparator | `a45733a` -> `6b8b771` and this record commit | Review `57d5590..a45733a` commit by commit, mutation-test the new partial-rebalance economics, correct lane-specific defects, and stop before QC | `4410ebb` accepted after correction and `a45733a` accepted. The per-position lock, drifted-weight lock, book-once recovery, non-negative gross clamp and marks rebuild are each confirmed by mutation. The frozen fifty-holding cap was pinned by no test and is pinned here. R-065's cost-ladder inheritance and its stated result rule are documented as inference defects, correctable before launch. R-065 was not launched. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Six-trial mutation matrix, four red and two green, each restored byte-identical; stock-portfolio battery **25 passed**; complete standing Analyst lane selection on the exact final tree, including the root-level active-document gate that the lane-only command omits, **5,683 passed, 7 skipped, 0 failed, 35 warnings in 5,764.81 s (1:36:04)**; final record gates **75 passed**; compileall exited 0; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **1 P1, 1 P2 and 4 P3** (`ARV2R87-001..006`); one corrected here with red/green evidence, five documented. The P1 is that narrowing the cost ladder to one cell also deleted the stock path's cross-cell path-invariance, cost-monotonicity and closed-form cost-arithmetic checks, undisclosed; it is correctable before launch. Section 86's `ARV2CR86-001` is confirmed against this reviewer: section 85 called a reproduction test a correction. Four carried-open findings unchanged. | Push this same-lane round exactly once. Codex counter-reviews section 87 and the pushed range, then may launch the single R-065 QC evaluation and, in that same round, the preregistered SPY-holdings, QQQ-holdings and deduplicated-union diagnostics. No leverage, deployment, broker, order or trading action. |
+| 2026-09-17 | Independent Claude review of the R-065 through R-082 range, results interpretation, and improvement plan | `45ae067` -> this record commit; documentation only | Review `cf33165..45ae067` commit by commit, mutation-test the point-in-time constituent logic, verify the ledger chain, reconcile hashes, refusals and accounting, interpret the four completed results, and record an improvement plan | All eleven commits accepted. No lane-specific production defect found and no code changed. Findings are three record omissions, one preregistration-design defect (R-077 preregistered at a quarter of its stated exposure), two process notes, Codex's two carried hardening items confirmed, and two withdrawals of section-87 claims. The corrected broad-universe attribution is adverse (-2.32 pp, a lower bound), the index-universe spreads are one-sided upper bounds (+16.59 / +12.90 pp), every sleeve trails SPY, and the 88.6 leverage gate is unmet. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Seven-trial PIT mutation matrix seven-for-seven red in a byte-restored export; ledger chain sequences 1-6 verified link by link; four profile hashes and seven refusal strings reconciled; accounting closes (14 launched = 78 - 64); complete standing Analyst lane selection on the exact pushed head `45ae067` (this round's exact final code tree; record-only changes) **6,032 passed, 7 skipped, 0 failed, 35 warnings in 5,844.12 s (1:37:24)**, including the root-level active-document gate; record gates re-run on the final bytes **75 passed**; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **3 P2 and 5 P3** (`ARV2R90-001..008`); two record corrections (banner accounting, section-87 withdrawals), six documented. | Push this same-lane round exactly once. Codex counter-reviews section 90 and the pushed range, appends the missing section-5 row for `cf33165..45ae067`, and ships the fresh probe version before any market-cap-aware matrix. No leverage, deployment, broker, order or trading action. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -16522,3 +16537,250 @@ windows. Any 2x/3x stock exposure must remain a separately preregistered
 diagnostic with an objective, point-in-time momentum rule and explicit
 financing, transaction-cost, volatility/drawdown, and no-live-trading bounds;
 it must not be selected retrospectively from winners in these baseline runs.
+
+## 90. Independent Claude review of the R-065 through R-082 range, results interpretation, and improvement plan, 2026-09-17
+
+**Range reviewed:** `cf33165..45ae067`, eleven commits, individually and
+cumulatively at the exact pushed remote head `45ae067`: 31 files,
++16,679/-256. **This round records 3 P2 and 5 P3 (`ARV2R90-001..008`); 2 are corrected here as record corrections and 6 are documented. No production or test code changed.** **Zero research looks and zero development
+evaluations in this round.** No QuantConnect, Massive, Benzinga, Sharadar,
+provider row, market datum, outcome, credential, Object Store object, broker,
+deployment, order, paper/live state, or trading surface was accessed. Every
+number quoted below is read from the lane record, the shared ledger, or the
+committed tree; none is a new observation.
+
+**The code is sound and no lane-specific production defect was found.** This
+review made no production or test code change. Its findings are three record
+omissions, one preregistration-design defect, two process notes, Codex's two
+carried hardening items confirmed, and two withdrawals of this reviewer's own
+section-87 claims. The reasons this range earns that verdict are stated
+mechanically in 90.3: a seven-trial mutation matrix over the point-in-time
+constituent logic is seven-for-seven red, the infrastructure-look ledger
+chain verifies link by link, every pinned profile hash and every stated
+refusal string reconciles with the tree that produced it, and the look
+accounting reconciles to the run.
+
+### 90.1 Per-commit dispositions
+
+| # | Commit | Disposition | Basis |
+|---|---|---|---|
+| 1 | `27c6fd4` Restore R065 cost-ladder integrity checks | **Accepted** | Resolves `ARV2R87-002` in production. `COST_BPS_SCENARIOS = (0, 5, 10, 20)` with the 0-bps anchor; the adapter's cross-cell path-invariance check, closed-form `return(c) = return(0) - c/10000 x turnover x sessions` check at `1e-40`, and cost-monotonicity check are all present at lines 4718--4775. Versioned to `r065-v2` before launch. |
+| 2 | `5477e1e` Preregister R065 through R068 stock diagnostics | **Accepted** | Pre-stated interpretation rules (88.6) are honest and were honoured: R-065's non-positive spread produced no tuning, and the universe runs were kept descriptive with no winner named. Prereg commit #2 precedes the R-065 result commit #3. |
+| 3 | `0707335` Correct constituent intersection after R066 refusal | **Accepted** | The refusal string `exact SID mapped weight is below 99%` exists at `5477e1e` and is absent at HEAD; the replacement exact-SID score-census intersection is the rule the completed runs used. |
+| 4 | `6eb1f4b` Preregister stock-universe successor diagnostics | **Accepted** | Carries the verifier reaper-race fix: `run_signature_verifier` wraps a single-attempt `_once` with exactly one retry on the ECHILD-shaped `ChildProcessError`, fails closed on a second, and never retries typed refusals; three new tests pin exactly those three cases. Retrying is safe because verification is idempotent and spends nothing. `LastUpdate` becomes unread. |
+| 5 | `0863e99` Correct constituent availability to EndTime | **Accepted** | The strictly-prior rule `item[0] < decision_time` on midnight `EndTime` is the conservative boundary and is pinned: mutation M1 (`<=`) is red. |
+| 6 | `ee53ba8` Ignore unselectable constituent collections | **Accepted** | Out-of-window collections are skipped before any payload traversal; mutation M2 is red. |
+| 7 | `5e23ae6` Carry constituent state until superseded | **Accepted** | `prior[-1]` carries the latest strictly-prior snapshot until superseded; the weight-sum guard is gated behind `_require_total_weight`. Records R-072. |
+| 8 | `59818b5` Preregister membership-count stock successors | **Accepted** | Count bounds validate membership shape and are pinned (mutation M5 red). The same preregistration froze the numbers that bounded R-077's exposure at a quarter of its stated target without saying so; `ARV2R90-003`, documented. |
+| 9 | `1afe6ac` Record R077 and R078 stock diagnostics | **Accepted** | Both results reconcile: pinned profile SHA-256s equal the ledger's, the four-cost ladders passed the restored closed-form validator on their one-use reads, and accounting moves by exactly the cells and looks the runs spent. |
+| 10 | `63c2cc0` Record point-in-time market-cap coverage canary | **Accepted** | 11,168 lines. The four new modules make no network, credential, or subprocess use (the one hit is the probe's own forbidden-capability list). Ledger sequences 3--6 verify. Probe strict-prior and before-open guards are pinned (M6, M7 red). `ARV2R90-004`, `-006`, `-007` documented. |
+| 11 | `45ae067` Hand off R082 coverage review | **Accepted** | Documentation only. The handoff is accurate about what it covers and omits what 88.9 promised: the section-5 row (`ARV2R90-001`), a current banner (`ARV2R90-002`), and a restatement of the leverage gate (`ARV2R90-005`). |
+
+### 90.2 Findings
+
+| ID | P | Location | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R90-001` | P2 | Section 5 push ledger | The round has no push-ledger row. Section 88.9 states that "the section-5 handoff row will be appended later in this same round"; the table holds 93 rows, the last is this reviewer's round-1 row, and no row names `45ae067`, `63c2cc0`, R-077, or R-082. The largest push in the lane's history -- eleven commits, fourteen launched runs, four completed results -- is absent from the durable per-push record. | **Documented.** Codex must append the row with its own validation attestations; this reviewer cannot attest Codex's run numbers. |
+| `ARV2R90-002` | P2 | Banner | The banner is stale against its own body. It states 72 shared looks, 19 development evaluations, 23 infrastructure looks and a 583-cell floor; sections 88.18 and 89.5 end at 78, 21, 27 and 591. It says R-077/R-078 "await their preregistered runs" although 88.18 records both completed, and it names neither R-079 through R-082 nor section 89. The last three commits changed the body and not the headline a resumed session reads first. | **Corrected here:** accounting restated to the body's final values, the R-077/R-078 sentence replaced with their results, and the canary and this review added. |
+| `ARV2R90-003` | P2 | Section 88.17 preregistration; `accepted_risk_stock_portfolio_evaluator.py:83,672` | R-077 spent a look on a diagnostic structurally unable to answer its own question, and that was derivable before launch. `STOCK_WEIGHT_CAP = 0.98/50` is a module constant shared by every profile and `top_decile_count = min(50, ceil(n/10))`. The same preregistration froze QQQ's positive-constituent bound at 75--125, which caps the decile at 13 names and gross exposure at 25.5% against a stated 98% target. Observed: 84.95 score-bearing names, nine held, 17.64% gross, 82.36% cash, every one of 261 decisions underfilled. Section 88.17 states no expected count, decile size, or exposure, and no test pins the universe-size-to-exposure relation. Codex's 88.18 disclosure is candid but retrospective. | **Documented.** The construction did exactly what was frozen, so this is not a code defect and no defect-pinning test is offered as a correction. Fix under a fresh profile version, per 90.6 item 1. |
+| `ARV2R90-004` | P3 | Commit `63c2cc0` | For R-079 through R-082 the probe source, preregistration and results all land in one commit, so the append-only history offers no prereg-before-observation ordering for them; only the ledger chain and the QC project ids do. The three stock preregistrations were each committed before their results (#2 to #3, #5 to #7, #8 to #9). | **Documented.** Mitigated by these being outcome-free infrastructure looks. |
+| `ARV2R90-005` | P3 | Section 4 and 89.6 | Both name "the separately labeled 2x/3x leverage diagnostics" as the step after next. That lineage is owner-planned (section 75) and 89.6 constrains it correctly, but 88.6 gates leverage on "an unlevered construction establishes a credible benchmark result", and no completed run has: every sleeve trails capitalization-weighted SPY by 20.86 to 85.71 points. The sequencing sentence should restate the unmet gate rather than imply it is next. | **Documented.** |
+| `ARV2R90-006` | P3 | `pit_market_cap_membership_probe_runtime.py:275-311` | Codex's carried item, confirmed: `_history_items` materializes `tuple(history.items())` before the `MAX_COLLECTIONS_PER_CALL` check and `_bounded_collection_rows` materializes before `MAX_COLLECTION_ROWS`. A changed or hostile provider iterator would consume memory before the correct refusal. | **Documented.** Recipe: `tuple(itertools.islice(iterator, cap + 1))` then refuse on `len > cap`. Belongs in a fresh probe version because R-082's projection hash binds this source. |
+| `ARV2R90-007` | P3 | `pit_market_cap_membership_probe.py:1388-1399,1799-1814` | Codex's carried item, confirmed as naming only: the `*_end_time_local` attestation fields carry the ETF Series collection timestamp, which is the availability clock the corrected contract uses. Semantics are right; the name suggests the superseded row-`EndTime` clock. | **Documented.** Rename in the same fresh version as `ARV2R90-006`. |
+| `ARV2R90-008` | P3 | Section 87.2, this reviewer | Two of section 87's six counter-review points were wrong. `ARV2R87-005` called `ARV2CR86-009` a misattribution because "within rounding" appeared "nowhere in the record"; it appears in section 85.6 in this reviewer's own words. The earlier search had listed the matching line and the display was truncated at 200 characters. `ARV2R87-006` said no second "914" existed; section 85.3 describes the reviewed module as 914 lines when it was 930. Codex's "false alarm" and "partially correct" both stand. | **Corrected here** by withdrawal. Rule recorded: never assert absence from a truncated display; re-grep the exact phrase before writing "nowhere". |
+
+### 90.3 Mechanical verification
+
+- **Point-in-time constituent logic, seven-trial mutation matrix** in a
+  `git archive` export of `45ae067`, each trial restored byte-identical and
+  SHA-256-verified: M1 strict-prior `<` to `<=` **red**; M2 out-of-window
+  skip removed **red**; M3 duplicate-`EndTime` refusal removed **red**; M4
+  exact reverse-SID mapping check removed **red**; M5 positive-constituent
+  count bounds removed **red**; M6 probe `_selected_prior` picks earliest
+  **red**; M7 probe fundamentals before-09:30 check removed **red**. Every
+  lookahead-relevant guard in the new logic is pinned by a test that fails
+  without it.
+- **Infrastructure-look ledger chain**, sequences 1 through 6: every
+  `ledger_hash` equals its filename; every `predecessor_ledger_artifact_sha256`
+  equals the raw SHA-256 of the prior file; every `predecessor_entry_count`
+  matches; every prior entry is retained; sequences 3--6 each add exactly one
+  entry (1, 23, 24, 25, 26, 27), reconciling to the 23-to-27 trail in 89.5.
+  The updated tests pin the same properties and are stronger than before.
+- **Profile identities:** the pinned `profile_sha256` for `r065-v2`,
+  `r072-v3`, `r077-v7` and `r078-v6` each equal the shared ledger's; the four
+  superseded-unlaunched identities remain in `ALL_PROFILE_IDS` immutably.
+- **Refusal provenance:** each stated refusal string exists in the tree that
+  ran it -- the 99%-mapped-weight guard at `5477e1e`, `LastUpdate` handling
+  at `6eb1f4b`, the strictly-prior and `EndTime` rules at `0863e99`, the
+  stale-snapshot rule at `ee53ba8`, the total-weight bound at `5e23ae6`, the
+  count bound at `59818b5` -- and the removed guard is absent at HEAD.
+  `LastUpdate` survives at HEAD only in the probe's forbidden-attribute list.
+- **Accounting:** the body's trail is monotone and closes: 18 identities,
+  four never launched (R-070, R-071, R-074, R-076), **14 launched = 78 - 64
+  shared looks**; development evaluations +10 = the ten stock launches;
+  infrastructure +4 = the four canary launches; cell floor +16 = four
+  completed runs x four cost cells.
+- **Cost arithmetic:** the four completed ladders were read through the
+  restored validator, so each satisfies path invariance, monotonicity and the
+  closed-form relation to `1e-40` by construction of the read.
+- **Closures:** the four new modules contain no network, credential,
+  environment, or subprocess use; credentials remain confined to the
+  pre-existing `formal_qc_transport.py` names. Safe refusal ids are
+  `pit_coverage_refused_<Kind>_<sha256(message)[:16]>`, so no raw message
+  reaches a public receipt. Result reads verify the owner signature and the
+  transport before the one-use permit is built and spent; the residual
+  ambiguity window between permit spend and receipt write is inherent to
+  one-use semantics and fails closed.
+- **Verifier fix:** the `_once`/retry split and its three tests are read
+  and correct; see disposition 4.
+
+### 90.4 Results and interpretation
+
+Four of fourteen launched runs completed. At the primary 10 bps per side:
+
+| Run | Universe (score-census intersection) | Eligible / held | Gross | Signal | Matched EW | SPY | Signal - matched | Signal - SPY | Max DD |
+|---|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| R-065 | all eligible names | ~4,177 / ~50 | 97.99% | +24.20% | +26.52% | +94.21% | **-2.32 pp** | -70.01 pp | -35.00% |
+| R-072 | SPY holdings proxy | not stated / 46.77 | 91.67% | +73.34% | +56.75% | +94.21% | **+16.59 pp** | -20.86 pp | -19.35% |
+| R-077 | QQQ holdings proxy | 84.95 / 9 | **17.64%** | +8.50% | +8.66% | +94.21% | -0.16 pp | -85.71 pp | -12.12% |
+| R-078 | SPY + QQQ union | 473.96 / 47.71 | 93.51% | +67.61% | +54.71% | +94.21% | **+12.90 pp** | -26.59 pp | -20.42% |
+
+The remaining ten: R-066, R-068, R-069, R-073, R-075 refused on their own
+guards before any result read; R-067 completed but its one-use read ended
+ambiguously after the permit was spent and returned nothing; R-079, R-080,
+R-081 refused as canary attempts; R-082 completed a 16-of-16-session
+coverage attestation with no price, return or holding read. Each refusal is
+recorded as a spent look with zero cells, which is the right accounting.
+
+**What changed from R-064.** The signal sleeve is byte-identical to R-064
+(+24.2010%): the account-wide freeze never touched it. The comparator moved
+from +20.96% frozen to +26.52% trading, and the attribution flipped from
++3.24 to -2.32 points. That is the first clean reading of this statistic and
+it is adverse. It is also a lower bound on how adverse: the corrected
+comparator books 893 zero-recovery membership exits against the sleeve's
+zero, and a zero-recovery exit is a total loss booked to the comparator
+alone. The true equal-weight broad-universe return is above +26.52%, and the
+sleeve's true shortfall is larger than 2.32 points.
+
+**Inside index membership the sign reverses.** In the SPY proxy the score
+adds +16.59 points over its own equal-weight comparator; in the union,
++12.90. Both are upper bounds for the same reason in reverse: the comparators
+carry 12 and 14 zero-recovery exits against the sleeves' zero or one, which
+favours the sleeve by an amount the record correctly calls unknown.
+Comparators of this shape are one-sided in whichever direction the
+membership-end policy points.
+
+**The comparator level is externally plausible where it can be checked.** An
+equal-weight S&P 500 exposure over 2021--2025 returned in the region of
++55--60% in general market context (approximate, from public equal-weight
+index products, not a lane measurement); the R-072 comparator's +56.75% sits
+inside that band, which is the first external sanity check the SPY-universe
+construction has passed. The gap from there to capitalization-weighted SPY's
++94.21% is the well-documented mega-cap concentration of that window. It is
+a property of equal-weight construction, not of the score, and it is most of
+why every sleeve trails SPY.
+
+**R-077 is uninformative by construction.** Nine holdings at 1.96% is 17.64%
+gross and 82.36% cash; the -12.12% drawdown through the 2022 bear is the
+signature of a mostly-cash book, not of selection. Scaling the comparator's
++8.66% by the inverse of 17.64% invested is roughly +49%, which is at least in
+the range of equal-weight Nasdaq-100 exposure over the window, so the
+construction is not broken -- it was simply preregistered at a quarter of
+the exposure its question required (`ARV2R90-003`). Signal equal to matched at
+that exposure is neither evidence for nor against the score in that universe.
+
+**Two explanations fit the pattern, and they are separable.** (a) Coverage
+density: the accepted-risk analyst input covers index names densely and the
+broad universe sparsely; sparse-coverage scores are noisier under the v2
+normalization and the 20-row IC floor, so the broad-universe decile selects
+noise while the index-universe decile selects signal. (b) Comparator
+asymmetry: the zero-recovery bias is largest in the broad universe (893) and
+still the sleeve loses, so (b) cannot rescue the broad result; it can only
+inflate the index results. Both point the same way: the score's selection
+value, if any, lives in densely covered large names and is smaller than the
+index tables show.
+
+**What the numbers do not support.** Three universe diagnostics over one
+five-year window are roughly two market regimes and are not independent of
+each other (the union contains both proxies). No overlap-adjusted or
+HAC-based inference is offered here; formal claims remain governed by the
+frozen bootstrap/HAC machinery and none has been run on these portfolios.
+Nothing here selects a universe winner, authorizes score tuning, or meets the
+88.6 gate for leverage: no unlevered construction has established a credible
+benchmark result, because none beats SPY.
+
+### 90.5 Code against results
+
+Every reconciliation attempted holds: pinned profile hashes equal the
+ledger's; the four-cost ladders satisfy the restored closed-form arithmetic
+because the validator that read them enforces it; the refusal strings exist
+in the trees that raised them; the accounting closes to the run; the ledger
+chain verifies; the mutation matrix shows the constituent guards are real.
+The one place code and results disagree is `ARV2R90-003`: the preregistered
+98% target was arithmetically unreachable for the QQQ profile from the
+preregistration's own frozen count bound, and the record disclosed that only
+after the look was spent. A smaller reporting gap: 88.16 omits R-072's average eligible-name count, which 88.18 reports for R-077 (84.95) and R-078 (473.96); the table above marks it as not stated rather than inferring it.
+
+### 90.6 Improvement plan
+
+Each item is a fresh prospective identity; none tunes a same-window result.
+
+1. **Exposure rule for small universes.** Under a new profile version, either
+   renormalize the top-decile weights to the 98% target or set
+   `MAXIMUM_HOLDINGS = min(50, ceil(n/10))` with `cap = target / holdings`.
+   Preregister the expected eligible count, decile size and gross exposure for
+   every universe, and add a test that pins universe size to exposure so the
+   R-077 shape cannot be frozen unnoticed again. Re-run the QQQ proxy only
+   under that version.
+2. **Symmetric exit policy for attribution.** Publish the matched comparator
+   under two exit rules -- zero recovery and last-observed-mark recovery --
+   and apply the same rule to both accounts, so `signal - matched` is
+   bracketed rather than one-sided. This is the single change that would make
+   R-065's -2.32 and R-072's +16.59 comparable statements.
+3. **Separate construction from signal.** Add a capitalization-weighted
+   matched comparator using the ETF constituent weights the runtime already
+   fetches. It directly measures how much of the -20.86 points versus SPY is
+   equal-weight construction, which the interpretation above can only argue.
+4. **Test the coverage hypothesis directly.** Preregister a broad-universe
+   diagnostic whose eligibility rule is analyst-coverage density (minimum
+   contributor count per name at the decision) rather than index membership.
+   If the selection effect follows coverage, explanation (a) holds and the
+   product is a large-cap-only signal; if it does not, the index results are
+   comparator artefacts.
+5. **Turnover.** The sleeves turn over about 375--390% a year, roughly 0.9
+   points a year at 10 bps, on a signal whose information coefficient is
+   strongest at H1 and weakest at H60. Preregister a decile buffer (hold
+   until a name leaves the top two deciles) as a turnover-only variant; it
+   changes no score and no horizon.
+6. **Process.** Append the missing section-5 row; commit preregistrations and
+   results separately for infrastructure runs as is already done for stock
+   runs; derive the banner's accounting from the body by a record gate that
+   asserts the banner counts equal the body's maxima; ship `ARV2R90-006` and
+   `-007` in the fresh probe version before the market-cap-aware matrix; and
+   restate the unmet leverage gate wherever 2x/3x is named as a next step.
+7. **Do not.** Select R-072 as "the universe"; retune the score against any
+   of these windows; or open leverage on the strength of index-universe
+   spreads that are upper bounds on a signal that loses in the broad universe.
+
+### 90.7 Carried-open findings
+
+`ARV2R83-001`, `ARV2R74-008`, `ARV2R74-009` and lane-wide `ARV2R50-022`
+remain open and unchanged. `ARV2R87-002` is closed by `27c6fd4`.
+`ARV2R87-005` and `ARV2R87-006` are withdrawn by `ARV2R90-008`.
+
+### 90.8 Validation
+
+- Seven-trial mutation matrix described in 90.3, restored byte-identical
+  after each trial. Ledger-chain, profile-hash, refusal-provenance and
+  accounting scripts as described, all read-only.
+- Complete standing Analyst lane selection on the exact pushed head
+  `45ae067`, which is this round's exact final code/test tree because this
+  review changed the record only, Python **3.13.15**: **6,032 passed, 7
+  skipped, 0 failed, 35 warnings in 5,844.12 s (1:37:24)**, exit 0. The
+  selection includes `tests/test_active_document_consistency.py`, the
+  root-level shared gate the lane-only command omits.
+- Record gates re-run on the exact final record bytes after this section
+  and its ledger row were written: **75 passed**. Only these two validation
+  sentences and the matching ledger cell were written after the complete
+  selection, and they change no code.
+- `git diff --check` clean. No compileall was needed: no `.py` file changed.

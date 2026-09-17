@@ -1516,3 +1516,22 @@ def test_public_exports_are_explicit_and_package_bound():
         getattr(insider_package, name) is getattr(normalization_module, name)
         for name in EXPECTED_PUBLIC_EXPORTS
     )
+
+
+def test_kernel_context_rounds_half_even_as_the_frozen_policy_states():
+    """Claude review regression (2026-09-17): the frozen policy hash pins the
+    text ``ROUND_HALF_EVEN``, but nothing exercised the kernel context's actual
+    rounding mode, so a ``ROUND_HALF_UP`` context left every focused test
+    green. A 51-digit input that ties exactly at the 50th digit must project
+    to the even neighbour under the policy's own input-projection step."""
+    from decimal import ROUND_HALF_EVEN
+
+    context = normalization_module._new_decimal_context()
+    assert context.rounding == ROUND_HALF_EVEN
+    tie = Decimal("1." + "0" * 49 + "5")
+    assert len(tie.as_tuple().digits) == 51
+    projected = normalization_module._context_value(
+        context, tie, label="rounding-policy tie"
+    )
+    assert projected == Decimal("1." + "0" * 49)
+    assert projected != Decimal("1." + "0" * 48 + "1")

@@ -1,15 +1,4 @@
-"""Cloud-local driver for the owner-accepted ARV2 preliminary rating run.
-
-This module is intentionally flat-importable inside a QuantConnect project.
-It authenticates the activation manifest and every compact input object from
-Object Store, resolves admitted composite FIGIs with an exact QC round trip,
-loads adjusted daily opens through typed ``History[TradeBar]`` requests, and
-advances the aggregate-only evaluator in bounded daily runtime slices.
-
-It is not the frozen formal evaluator.  It emits only compact preliminary
-custom summary statistics and has no order, portfolio, deployment, or Object
-Store result-writing surface.
-"""
+"""Cloud-local, aggregate-only ARV2 preliminary QC driver."""
 
 import dataclasses
 import gzip
@@ -54,8 +43,6 @@ MAX_DECOMPRESSED_OBJECT_BYTES = 192 * 1024 * 1024
 MAX_TOTAL_DECOMPRESSED_BYTES = 768 * 1024 * 1024
 TRAIN_WORK_UNITS_PER_SLICE = 10
 TRAIN_SLICE_SOFT_SECONDS = 240
-# The persisted field retains its original ``training_slice_count`` name for
-# receipt compatibility, but R055 advances it directly from daily OnData.
 MAX_TRAIN_SLICE_COUNT = 113
 MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
@@ -66,8 +53,11 @@ STOCK_UNIVERSE_PROFILE_IDS = (
     "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4",
     "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r075-v6",
     "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5",
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r077-v7",
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r078-v6",
 )
-STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS = STOCK_UNIVERSE_PROFILE_IDS[-2:]
+STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS = STOCK_UNIVERSE_PROFILE_IDS[-4:]
+STOCK_MEMBERSHIP_ONLY_PROFILE_IDS = STOCK_UNIVERSE_PROFILE_IDS[-2:]
 STOCK_PORTFOLIO_PROFILE_IDS = (
     STOCK_PORTFOLIO_PROFILE_ID,
     *STOCK_UNIVERSE_PROFILE_IDS,
@@ -76,7 +66,6 @@ CONSTITUENT_HISTORY_START = datetime(2020, 12, 1)
 CONSTITUENT_HISTORY_END = datetime(2026, 1, 1)
 MINIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("0.95")
 MAXIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("1.05")
-MAXIMUM_CONSTITUENT_SNAPSHOT_AGE = timedelta(days=10)
 EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
     sorted(
         (
@@ -854,7 +843,12 @@ class QcEtfConstituentEligibilityLoader:
             evaluation_profile_id
         )
         state_profiles = stock_portfolio.STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+        membership_profiles = stock_portfolio.MEMBERSHIP_ONLY_PROFILE_IDS
+        count_bounds = stock_portfolio.constituent_positive_count_bounds_for_profile(
+            evaluation_profile_id
+        )
         stateful = evaluation_profile_id in STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+        membership_only = evaluation_profile_id in STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
         if (
             type(state_profiles) is not tuple
             or state_profiles != STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
@@ -862,6 +856,20 @@ class QcEtfConstituentEligibilityLoader:
             or maximum_snapshot_age_days != (None if stateful else 10)
         ):
             _error("constituent-history snapshot age policy changed")
+        if (
+            type(membership_profiles) is not tuple
+            or membership_profiles != STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
+            or type(count_bounds) is not tuple
+            or bool(count_bounds) is not membership_only
+            or any(
+                type(row) is not tuple or len(row) != 3 or row[0] not in tickers
+                or type(row[1]) is not int or type(row[2]) is not int
+                or not 0 < row[1] <= row[2] for row in count_bounds
+            )
+            or membership_only and tuple(sorted(row[0] for row in count_bounds))
+            != tuple(sorted(tickers))
+        ):
+            _error("constituent-history membership shape policy changed")
         if (
             type(tickers) is not tuple
             or not tickers
@@ -910,11 +918,16 @@ class QcEtfConstituentEligibilityLoader:
             if maximum_snapshot_age_days is None
             else timedelta(days=maximum_snapshot_age_days)
         )
+        self._require_total_weight = not membership_only
+        self._count_bounds = {
+            ticker: (minimum, maximum)
+            for ticker, minimum, maximum in count_bounds
+        }
         self._tickers = tickers
         self._universes = dict(constituent_universes)
         self._universe_sids = universe_sids
 
-    def _mapped_snapshot(self, collection_time, constituents):
+    def _mapped_snapshot(self, ticker, collection_time, constituents):
         try:
             rows = tuple(constituents)
         except Exception as exc:
@@ -963,13 +976,13 @@ class QcEtfConstituentEligibilityLoader:
             if reversed_sid != sid or security_id in mapped:
                 _error("constituent-history exact SID mapping changed")
             mapped[security_id] = weight
-        total_weight = sum(weights.values(), Decimal(0))
-        if not (
-            MINIMUM_CONSTITUENT_TOTAL_WEIGHT
-            <= total_weight
-            <= MAXIMUM_CONSTITUENT_TOTAL_WEIGHT
-        ):
-            _error("constituent-history total positive weight escaped bounds")
+        bounds = self._count_bounds.get(ticker)
+        if bounds is not None and not bounds[0] <= len(weights) <= bounds[1]:
+            _error("constituent-history positive constituent count escaped bounds")
+        if self._require_total_weight:
+            total_weight = sum(weights.values(), Decimal(0))
+            if not MINIMUM_CONSTITUENT_TOTAL_WEIGHT <= total_weight <= MAXIMUM_CONSTITUENT_TOTAL_WEIGHT:
+                _error("constituent-history total positive weight escaped bounds")
         if not mapped:
             _error("constituent-history score-census intersection is empty")
         return tuple(sorted(mapped))
@@ -1018,11 +1031,6 @@ class QcEtfConstituentEligibilityLoader:
                     <= collection_time
                     < CONSTITUENT_HISTORY_END
                 ):
-                    # QC can append algorithm-current universe collections to a
-                    # bounded history response.  They are not evidence for this
-                    # evaluation window, so leave their payloads unread and do
-                    # not let duplicate out-of-range timestamps poison the
-                    # authenticated in-range inventory.
                     continue
                 if collection_time in snapshots:
                     _error("constituent-history duplicated a collection EndTime")
@@ -1089,7 +1097,7 @@ class QcEtfConstituentEligibilityLoader:
                 snapshot_key = (ticker, collection_time)
                 if snapshot_key not in selected_snapshots:
                     selected_snapshots[snapshot_key] = self._mapped_snapshot(
-                        collection_time, constituents
+                        ticker, collection_time, constituents
                     )
                 security_ids = selected_snapshots[snapshot_key]
                 eligible.update(security_ids)
@@ -1426,31 +1434,3 @@ class AcceptedRiskPreliminaryQcDriver:
                 self._runtime.abort()
             _error("preliminary QC backtest ended before aggregate completion")
         return True
-
-
-__all__ = (
-    "AcceptedRiskPreliminaryQcDriver",
-    "AcceptedRiskPreliminaryQcRuntimeError",
-    "BENCHMARK_SECURITY_ID",
-    "BENCHMARK_TICKER",
-    "CONSTITUENT_HISTORY_END",
-    "CONSTITUENT_HISTORY_START",
-    "EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES",
-    "LoadedAcceptedRiskPreliminaryPackage",
-    "MAXIMUM_CONSTITUENT_SNAPSHOT_AGE",
-    "MAXIMUM_CONSTITUENT_TOTAL_WEIGHT",
-    "MINIMUM_CONSTITUENT_TOTAL_WEIGHT",
-    "QcEtfConstituentEligibilityLoader",
-    "QcTotalReturnOpenHistoryLoader",
-    "RUNTIME_META_STATISTIC",
-    "STOCK_PORTFOLIO_PROFILE_ID",
-    "STOCK_PORTFOLIO_PROFILE_IDS",
-    "STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
-    "STOCK_UNIVERSE_PROFILE_IDS",
-    "MAX_BACKTEST_RUNTIME_SECONDS",
-    "MAX_TRAIN_SLICE_COUNT",
-    "TRAIN_SLICE_SOFT_SECONDS",
-    "TRAIN_WORK_UNITS_PER_SLICE",
-    "TRANSPORT_MANIFEST_SCHEMA",
-    "load_accepted_risk_preliminary_package",
-)

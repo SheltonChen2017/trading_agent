@@ -40,9 +40,24 @@ NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID = (
 UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID = (
     "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5"
 )
+NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID = (
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r077-v7"
+)
+UNION_MEMBERSHIP_ONLY_PROFILE_ID = (
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r078-v6"
+)
+MEMBERSHIP_ONLY_PROFILE_IDS = (
+    NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+    UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+)
+_MEMBERSHIP_ONLY_POSITIVE_COUNT_BOUNDS = (
+    ("QQQ", 75, 125),
+    ("SPY", 400, 600),
+)
 STATE_UNTIL_SUPERSEDED_PROFILE_IDS = (
     NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
     UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+    *MEMBERSHIP_ONLY_PROFILE_IDS,
 )
 VARIANT_PROFILE_IDS = (
     SP500_PROFILE_ID,
@@ -113,6 +128,27 @@ _UNIVERSE_VARIANT_CONFIGS = (
     ),
     (
         UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        "spy_qqq_holdings_security_id_union",
+        ("SPY", "QQQ"),
+        (
+            "union_of_SPY_and_QQQ_holdings_proxies_not_official_SP500_or_all_"
+            "Nasdaq_listed_membership"
+        ),
+        (
+            "deduplicate_by_authenticated_security_id_union"
+        ),
+    ),
+    (
+        NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        "qqq_holdings_proxy_for_nasdaq_100",
+        ("QQQ",),
+        (
+            "QQQ_holdings_proxy_for_Nasdaq_100_not_all_Nasdaq_listed_stocks"
+        ),
+        None,
+    ),
+    (
+        UNION_MEMBERSHIP_ONLY_PROFILE_ID,
         "spy_qqq_holdings_security_id_union",
         ("SPY", "QQQ"),
         (
@@ -238,8 +274,6 @@ def _profile_record(profile_id):
                     "ignored_before_snapshot_selection"
                 ),
                 "constituent_positive_weight_only": True,
-                "minimum_constituent_total_positive_weight": "0.95",
-                "maximum_constituent_total_positive_weight": "1.05",
                 "constituent_mapping_key": (
                     "exact_QuantConnect_security_identifier"
                 ),
@@ -258,6 +292,34 @@ def _profile_record(profile_id):
                 ),
             }
         )
+        if profile_id in MEMBERSHIP_ONLY_PROFILE_IDS:
+            count_bounds = tuple(
+                row for row in _MEMBERSHIP_ONLY_POSITIVE_COUNT_BOUNDS
+                if row[0] in constituent_etf_tickers
+            )
+            record.update(
+                {
+                    "constituent_total_positive_weight_role": (
+                        "unused_for_membership_validity_or_ETF_replication"
+                    ),
+                    "constituent_weight_completeness_claim": False,
+                    "minimum_positive_constituent_count_by_etf": {
+                        ticker: minimum
+                        for ticker, minimum, _maximum in count_bounds
+                    },
+                    "maximum_positive_constituent_count_by_etf": {
+                        ticker: maximum
+                        for ticker, _minimum, maximum in count_bounds
+                    },
+                }
+            )
+        else:
+            record.update(
+                {
+                    "minimum_constituent_total_positive_weight": "0.95",
+                    "maximum_constituent_total_positive_weight": "1.05",
+                }
+            )
         if profile_id in STATE_UNTIL_SUPERSEDED_PROFILE_IDS:
             record.update(
                 {
@@ -300,6 +362,23 @@ def constituent_etf_tickers_for_profile(profile_id):
     require_stock_portfolio_profile(profile_id)
     variant = _universe_variant_config(profile_id)
     return () if variant is None else tuple(variant[2])
+
+
+def constituent_positive_count_bounds_for_profile(profile_id):
+    """Return exact per-ETF membership-shape bounds for successor profiles."""
+
+    profile = require_stock_portfolio_profile(profile_id)
+    if profile_id not in MEMBERSHIP_ONLY_PROFILE_IDS:
+        return ()
+    tickers = constituent_etf_tickers_for_profile(profile_id)
+    return tuple(
+        (
+            ticker,
+            profile["minimum_positive_constituent_count_by_etf"][ticker],
+            profile["maximum_positive_constituent_count_by_etf"][ticker],
+        )
+        for ticker in sorted(tickers)
+    )
 
 
 def constituent_snapshot_maximum_age_calendar_days_for_profile(profile_id):
@@ -1308,8 +1387,10 @@ __all__ = (
     "EXPECTED_RETURN_SESSION_COUNT",
     "MAXIMUM_HOLDINGS",
     "MEASUREMENT_END_SESSION",
+    "MEMBERSHIP_ONLY_PROFILE_IDS",
     "MINIMUM_INVESTED_RETURN_SESSIONS",
     "NASDAQ100_PROFILE_ID",
+    "NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID",
     "NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID",
     "PORTFOLIO_CELL_SCHEMA",
     "PRIMARY_COST_BPS",
@@ -1322,11 +1403,13 @@ __all__ = (
     "STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
     "TARGET_GROSS_EXPOSURE",
     "UNION_PROFILE_ID",
+    "UNION_MEMBERSHIP_ONLY_PROFILE_ID",
     "UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID",
     "UNIVERSE_PROFILE_IDS",
     "VARIANT_PROFILE_IDS",
     "StockPortfolioEvaluationRuntime",
     "constituent_etf_tickers_for_profile",
+    "constituent_positive_count_bounds_for_profile",
     "constituent_snapshot_maximum_age_calendar_days_for_profile",
     "decision_sessions_for_input",
     "expected_custom_summary_statistic_names",

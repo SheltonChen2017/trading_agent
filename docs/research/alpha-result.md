@@ -2073,3 +2073,41 @@ stocks; the union is an exact-security-ID-deduplicated SPY-plus-QQQ holdings
 proxy. Results cannot select a same-window winner, tune the score, or unlock
 leverage, formal acceptance, deployment, broker access, orders, paper/live
 state or trading.
+
+## R-075 failure and R-077/R-078 membership-census successors — 2026-09-16
+
+R-075 launched once in private project `36636665`, backtest
+`bf4e0fc5a2cfc9d9cd1bab6dab398606`, and reached authenticated `Runtime Error`
+after two statistics-free polls: `constituent-history total positive weight
+escaped bounds`. Its plan, launch and terminal SHA-256 values are
+`64f279da7ea692822e41d473026febabf8136952302e2273d473bd37b73936c2`,
+`710c08529237a6e8c6cfaca39fdd238783e30e8b8c0610734572adca350072f3`,
+and `e0af203a4b1b7f818f4b6cc1e6bc41311da5ad1a6ab601a85532d182567f980b`.
+A bounded exact-run diagnostic selected only identity, status, error and stack.
+No result permit or outcome value exists. R-075 moves looks 71 -> 72 and
+evaluations 18 -> 19, adds zero cells, and leaves the floor at 583. R-076 was
+not launched and is superseded unspent.
+
+The total-weight bound tests approximate ETF replication, but these profiles
+use the payload only to establish point-in-time membership and do not weight
+the portfolio by ETF constituent weight. Fresh R-077/R-078 therefore retain
+positive finite row evidence, strict-prior collection `EndTime`, state until
+superseded, unique SIDs, exact reverse mapping and nonempty score-census
+intersection, but replace the replication-weight sum with preregistered
+membership-shape bounds: QQQ 75-125 positive constituents and SPY 400-600.
+They make no official-index, coverage-completeness or ETF-replication claim.
+
+| Ledger | Profile and SHA-256 | Projection and SHA-256 | Accounting on successful read |
+|---|---|---|---|
+| `R-077`; `arv2-eval-stock-qqq-holdings-intersection-qc-016` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r077-v7`; `981ad7d698d792542bb68aeb31f18faea1e9c35328fb8b599b92849e07d8b9ee` | `arv2-preliminary-qc-projection-300f114d7a2663de82057b71`; `300f114d7a2663de82057b71994b5025cdd024ec3763edff7e23b5f021cad05d`; 7 files, 238,761 total / 59,444 max bytes | looks 72 -> 73; evaluations 19 -> 20; cells 583 -> 587 |
+| `R-078`; `arv2-eval-stock-spy-qqq-intersection-union-qc-017` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r078-v6`; `04400da58aeaee37edba2685bcaaaf1878f88c542bfb342211698e308cf3d87d` | `arv2-preliminary-qc-projection-4d09391c29bdc20d93de40d1`; `4d09391c29bdc20d93de40d1faa35d075301e2ce3afd85ce2d100edce1736ea8`; 7 files, 238,768 total / 59,444 max bytes | looks 73 -> 74; evaluations 20 -> 21; cells 587 -> 591 |
+
+Prospective projects are `23 ARV2_STOCK_R077_QQQ_2021_2025 - 20260916` and
+`24 ARV2_STOCK_R078_SPY_QQQ_2021_2025 - 20260916`; backtests are `ARV2 R077
+QQQ membership-count retry e9851c2f` and `ARV2 R078 SPY QQQ membership-count
+union e9851c2f`. This block is frozen before either project creation, compile,
+launch or outcome read. QQQ remains a Nasdaq-100 holdings proxy, not all
+Nasdaq-listed stocks; the union remains an exact-SID SPY-plus-QQQ holdings
+proxy. Results cannot select a same-window winner, tune any rule, or unlock
+leverage, formal acceptance, deployment, broker access, orders, paper/live
+state or trading.

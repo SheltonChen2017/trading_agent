@@ -313,8 +313,18 @@ THAT NO FROZEN DECISION COULD SELECT. IT IS IMMUTABLY SPENT WITH ZERO NEW
 CELLS. THE CORRECTED SUCCESSORS IGNORE ONLY OUT-OF-WINDOW COLLECTIONS BEFORE
 PAYLOAD TRAVERSAL WHILE RETAINING ALL IN-RANGE, SELECTED-SNAPSHOT AND NO-
 FALLBACK GUARDS. R-070/R-071 WERE NEVER LAUNCHED; FRESH R-072/R-073/R-074
-BIND THE CORRECTION. CURRENT ACCOUNTING IS 69 SHARED LOOKS, 16 ARV2
-DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 579-CELL FLOOR.
+BIND THE CORRECTION. R-072 COMPLETED: ITS SPY-HOLDINGS-PROXY SLEEVE RETURNS
++73.34% AFTER THE PRIMARY COST, +16.59 POINTS VERSUS ITS MATCHED COMPARATOR
+AND -20.86 POINTS VERSUS CAPITALIZATION-WEIGHTED SPY. R-073 REFUSED A
+STALE-SNAPSHOT RULE AND R-074 WAS SUPERSEDED UNLAUNCHED. R-075 THEN REMOVED
+ONLY THAT ARBITRARY EXPIRY BUT REFUSED BECAUSE THE QC CONSTITUENT ROW WEIGHTS
+DID NOT SUM TO THE 0.95 ETF-REPLICATION FLOOR. THAT WEIGHT-SUM RULE IS NOT A
+VALID MEMBERSHIP-CENSUS REQUIREMENT. R-076 IS SUPERSEDED UNLAUNCHED. FRESH
+R-077/R-078 RETAIN STRICT-PRIOR STATE, EXACT SID MAPPING AND NONEMPTY
+SCORE-CENSUS INTERSECTION, REPLACE REPLICATION-WEIGHT SUMS WITH FROZEN PER-ETF
+POSITIVE-CONSTITUENT COUNT BOUNDS, AND AWAIT THEIR PREREGISTERED RUNS. CURRENT
+ACCOUNTING IS 72 SHARED LOOKS, 19 ARV2 DEVELOPMENT EVALUATIONS, 23
+INFRASTRUCTURE LOOKS, AND A 583-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -15946,3 +15956,63 @@ not all Nasdaq-listed stocks; R-076 is the exact-security-ID-deduplicated union
 of the SPY and QQQ holdings proxies. Neither result may select a same-window
 winner, tune the score or unlock leverage, formal acceptance, deployment,
 broker access, orders, paper/live state or trading.
+
+### 88.17 R-075 terminal disposition and membership-census successors
+
+R-075 used the exact preregistered projection from 88.16. Its first detached
+execution-signature check refused before an execution permit, project or look
+existed; the byte-identical retry launched once. Private QC project
+`36636665`, backtest `bf4e0fc5a2cfc9d9cd1bab6dab398606`, reached
+authenticated `Runtime Error` after two statistics-free polls. Its submission
+plan, launch and terminal SHA-256 values are respectively
+`64f279da7ea692822e41d473026febabf8136952302e2273d473bd37b73936c2`,
+`710c08529237a6e8c6cfaca39fdd238783e30e8b8c0610734572adca350072f3`,
+and `e0af203a4b1b7f818f4b6cc1e6bc41311da5ad1a6ab601a85532d182567f980b`.
+A bounded exact-run diagnostic selected only identity, status, error and stack
+for that run: `constituent-history total positive weight escaped bounds`. It
+selected no aggregate result, chart values, orders, unrestricted log stream,
+provider row or security outcome. No result permit exists. R-075 therefore
+spends shared look 71 -> 72 and development evaluation 18 -> 19, adds zero
+cells, and leaves the floor at 583. R-076 was never launched and is
+superseded unspent.
+
+`ARV2D88-009` (**P2, corrected prospectively**) — the 0.95-1.05 total-positive-
+weight bound is evidence that an ETF constituent payload can approximately
+replicate ETF weights; it is not evidence required to establish a point-in-
+time membership census. R-075 showed that conflation can refuse before a
+membership-shape test or score-census intersection; its bounded diagnostic
+did not disclose the row count and therefore establishes no completeness
+claim. The fresh
+profiles do not use constituent weights to size either sleeve and make no ETF-
+replication or weight-completeness claim. They retain positive finite row
+weights solely as authenticated membership evidence and instead require the
+selected collection to contain 75-125 unique positive QQQ constituents and,
+for the union, 400-600 unique positive SPY constituents. Those fixed buffers
+are bound to the profile before either successor launch. Exact collection and
+row `EndTime`, query-window, strict-prior selection, state-until-superseded,
+duplicate-SID refusal, exact reverse mapping, nonempty score-census
+intersection, signal, comparator, return, cost and output rules remain
+unchanged. All six predecessor profile hashes remain exact.
+
+The in-round audit found no P0-P2 implementation defect and identified three
+P3 proof gaps: direct-only union bound tests, absent exact successor hash pins,
+and no old-state behavioral test under the new identities. The successor test
+battery closes each gap before network use by exercising bounds through
+`build_eligibility`, pinning both exact hashes, and proving old strictly-prior
+state remains effective until superseded for both the QQQ and union profiles.
+The exact evaluator/runtime/submission battery is **431 passed in 177.09
+seconds**; focused compilation and `git diff --check` are clean.
+
+| Ledger | Profile identity | Projection identity | Prospective QC identity | Accounting after successful aggregate read |
+|---|---|---|---|---|
+| `R-077`; `arv2-eval-stock-qqq-holdings-intersection-qc-016` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r077-v7`; `981ad7d698d792542bb68aeb31f18faea1e9c35328fb8b599b92849e07d8b9ee` | `arv2-preliminary-qc-projection-300f114d7a2663de82057b71`; `300f114d7a2663de82057b71994b5025cdd024ec3763edff7e23b5f021cad05d`; 7 files, 238,761 total / 59,444 max bytes | Project `23 ARV2_STOCK_R077_QQQ_2021_2025 - 20260916`; backtest `ARV2 R077 QQQ membership-count retry e9851c2f` | looks 72 -> 73; evaluations 19 -> 20; cells 583 -> 587 |
+| `R-078`; `arv2-eval-stock-spy-qqq-intersection-union-qc-017` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r078-v6`; `04400da58aeaee37edba2685bcaaaf1878f88c542bfb342211698e308cf3d87d` | `arv2-preliminary-qc-projection-4d09391c29bdc20d93de40d1`; `4d09391c29bdc20d93de40d1faa35d075301e2ce3afd85ce2d100edce1736ea8`; 7 files, 238,768 total / 59,444 max bytes | Project `24 ARV2_STOCK_R078_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R078 SPY QQQ membership-count union e9851c2f` | looks 73 -> 74; evaluations 20 -> 21; cells 587 -> 591 |
+
+This block is frozen before either R-077 or R-078 project creation, compile,
+launch or outcome read. R-077 remains a QQQ/Nasdaq-100 holdings proxy, not all
+Nasdaq-listed stocks; R-078 remains the exact-security-ID-deduplicated union
+of SPY and QQQ holdings proxies. The count bounds validate membership shape,
+not official index status, coverage completeness or ETF replication. Neither
+result may select a same-window winner, tune any rule or unlock leverage,
+formal acceptance, deployment, broker access, orders, paper/live state or
+trading.

@@ -212,6 +212,8 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
         subject.UNION_PROFILE_ID,
         subject.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
         subject.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        subject.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        subject.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
     )
     assert subject.PROFILE_IDS == subject.ALL_PROFILE_IDS
     assert subject.UNIVERSE_PROFILE_IDS == subject.VARIANT_PROFILE_IDS
@@ -222,6 +224,8 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
         subject.UNION_PROFILE_ID: ("SPY", "QQQ"),
         subject.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID: ("QQQ",),
         subject.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID: ("SPY", "QQQ"),
+        subject.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID: ("QQQ",),
+        subject.UNION_MEMBERSHIP_ONLY_PROFILE_ID: ("SPY", "QQQ"),
     }
     for profile_id in subject.VARIANT_PROFILE_IDS:
         profile = subject.require_stock_portfolio_profile(profile_id)
@@ -250,8 +254,30 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
         assert "constituent_last_update_not_after_collection" not in profile
         assert "maximum_constituent_last_update_age_calendar_days" not in profile
         assert profile["constituent_positive_weight_only"] is True
-        assert profile["minimum_constituent_total_positive_weight"] == "0.95"
-        assert profile["maximum_constituent_total_positive_weight"] == "1.05"
+        count_bounds = subject.constituent_positive_count_bounds_for_profile(
+            profile_id
+        )
+        if profile_id in subject.MEMBERSHIP_ONLY_PROFILE_IDS:
+            assert "minimum_constituent_total_positive_weight" not in profile
+            assert "maximum_constituent_total_positive_weight" not in profile
+            assert profile["constituent_total_positive_weight_role"] == (
+                "unused_for_membership_validity_or_ETF_replication"
+            )
+            assert profile["constituent_weight_completeness_claim"] is False
+            assert profile["minimum_positive_constituent_count_by_etf"] == {
+                ticker: minimum
+                for ticker, minimum, _maximum in count_bounds
+            }
+            assert profile["maximum_positive_constituent_count_by_etf"] == {
+                ticker: maximum
+                for ticker, _minimum, maximum in count_bounds
+            }
+        else:
+            assert count_bounds == ()
+            assert profile["minimum_constituent_total_positive_weight"] == "0.95"
+            assert profile["maximum_constituent_total_positive_weight"] == "1.05"
+            assert "constituent_total_positive_weight_role" not in profile
+            assert "constituent_weight_completeness_claim" not in profile
         assert profile["constituent_mapping_key"] == (
             "exact_QuantConnect_security_identifier"
         )
@@ -301,6 +327,34 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
     assert subject.require_stock_portfolio_profile(
         subject.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID
     )["multi_etf_combination"] == "deduplicate_by_authenticated_security_id_union"
+    assert subject.require_stock_portfolio_profile(
+        subject.UNION_MEMBERSHIP_ONLY_PROFILE_ID
+    )["multi_etf_combination"] == "deduplicate_by_authenticated_security_id_union"
+
+
+def test_successors_do_not_rewrite_any_launched_or_superseded_profile_hash():
+    assert (
+        subject.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        subject.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+    ) == (
+        "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r077-v7",
+        "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r078-v6",
+    )
+    assert {
+        profile_id: subject.require_stock_portfolio_profile(profile_id)[
+            "profile_sha256"
+        ]
+        for profile_id in subject.PROFILE_IDS
+    } == {
+        subject.PROFILE_ID: "39773415f5d936166b3a224a5e26c55e4dc20a7e8052fb65c796f9fd3ce65678",
+        subject.SP500_PROFILE_ID: "6667bdeb213b6eaa7f53f56beba042a0aa82e78a664910c495008a7453184681",
+        subject.NASDAQ100_PROFILE_ID: "2aaee2733ad8c7fcfa4cddcf4ed085ea2a6f082917d16c8ad27bc43de3bc02c2",
+        subject.UNION_PROFILE_ID: "a3f568e6c5be11c13a000206ba248a8430c5586aba4957253d374adff250c931",
+        subject.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID: "71b14b7d5508054f191e7d75114df7dfe680e815fafa52f0a49aa5bc64432667",
+        subject.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID: "3fa2fcb4f21eea414b0ac425f623d1113d8a648538d5e3ac2bde7dc485aab821",
+        subject.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID: "981ad7d698d792542bb68aeb31f18faea1e9c35328fb8b599b92849e07d8b9ee",
+        subject.UNION_MEMBERSHIP_ONLY_PROFILE_ID: "04400da58aeaee37edba2685bcaaaf1878f88c542bfb342211698e308cf3d87d",
+    }
 
 
 def test_non_universe_profile_has_no_constituent_snapshot_age_policy():

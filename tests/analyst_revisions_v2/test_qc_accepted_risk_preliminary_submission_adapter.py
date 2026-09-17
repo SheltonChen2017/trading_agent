@@ -230,8 +230,8 @@ def stock_portfolio_plan(monkeypatch, tmp_path):
 @pytest.fixture(
     params=(
         stock_portfolio_evaluator.SP500_PROFILE_ID,
-        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
-        stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
     )
 )
 def stock_universe_plan(request, monkeypatch, tmp_path):
@@ -779,23 +779,23 @@ _STOCK_UNIVERSE_ACCOUNTING = {
         579,
         583,
     ),
-    stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID: (
-        "arv2-eval-stock-qqq-holdings-intersection-qc-014",
-        "R-075",
-        71,
-        72,
-        18,
-        19,
-        583,
-        587,
-    ),
-    stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID: (
-        "arv2-eval-stock-spy-qqq-intersection-union-qc-015",
-        "R-076",
+    stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID: (
+        "arv2-eval-stock-qqq-holdings-intersection-qc-016",
+        "R-077",
         72,
         73,
         19,
         20,
+        583,
+        587,
+    ),
+    stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID: (
+        "arv2-eval-stock-spy-qqq-intersection-union-qc-017",
+        "R-078",
+        73,
+        74,
+        20,
+        21,
         587,
         591,
     ),
@@ -815,14 +815,15 @@ def test_regime_profile_allowlist_refuses_unknown_profile():
     (
         stock_portfolio_evaluator.NASDAQ100_PROFILE_ID,
         stock_portfolio_evaluator.UNION_PROFILE_ID,
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
     ),
 )
-def test_superseded_unlaunched_stock_universe_profiles_are_not_active_run_specs(
+def test_superseded_stock_universe_profiles_are_not_active_run_specs(
     profile_id,
 ):
-    # They remain loadable for historical receipt/profile authentication, but
-    # cannot accidentally create a fresh submission after their successor was
-    # frozen.
+    # R073 and R075 were spent failures; R074 and R076 were unspent.  All four
+    # remain loadable but cannot create a fresh submission after supersession.
     stock_portfolio_evaluator.require_stock_portfolio_profile(profile_id)
     with pytest.raises(
         adapter.AcceptedRiskPreliminarySubmissionError,
@@ -1644,6 +1645,31 @@ def test_stock_universe_snapshot_age_helper_mutation_refuses_before_network(
     assert not any(stock_universe_plan.control_directory.iterdir())
 
 
+def test_stock_universe_positive_count_helper_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_positive_count_bounds_for_profile",
+        lambda _profile_id: (),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
 def test_stock_universe_state_profile_inventory_mutation_refuses_before_network(
     stock_universe_plan,
     monkeypatch,
@@ -1653,6 +1679,31 @@ def test_stock_universe_state_profile_inventory_mutation_refuses_before_network(
         runtime,
         "STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
         runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS[:-1],
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_membership_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        runtime,
+        "STOCK_MEMBERSHIP_ONLY_PROFILE_IDS",
+        runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS[:-1],
     )
 
     with pytest.raises(

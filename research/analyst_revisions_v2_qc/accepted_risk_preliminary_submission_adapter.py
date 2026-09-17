@@ -184,6 +184,9 @@ _PINNED_RUNTIME_STOCK_UNIVERSE_PROFILE_IDS = tuple(
 _PINNED_RUNTIME_STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS = tuple(
     preliminary_runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
 )
+_PINNED_RUNTIME_STOCK_MEMBERSHIP_ONLY_PROFILE_IDS = tuple(
+    preliminary_runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
+)
 _PINNED_REQUIRE_REGIME_PROFILE = regime_evaluator.require_regime_profile
 _PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE = (
     stock_portfolio_evaluator.require_stock_portfolio_profile
@@ -196,6 +199,9 @@ _PINNED_STOCK_PORTFOLIO_CONSTITUENT_TICKERS_CALLABLE = (
 )
 _PINNED_STOCK_PORTFOLIO_SNAPSHOT_MAXIMUM_AGE_CALLABLE = (
     stock_portfolio_evaluator.constituent_snapshot_maximum_age_calendar_days_for_profile
+)
+_PINNED_STOCK_PORTFOLIO_POSITIVE_COUNT_BOUNDS_CALLABLE = (
+    stock_portfolio_evaluator.constituent_positive_count_bounds_for_profile
 )
 _PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT = stock_portfolio_evaluator._PROFILE
 _PINNED_STOCK_PORTFOLIO_PROFILE_ID = stock_portfolio_evaluator.PROFILE_ID
@@ -210,6 +216,9 @@ _PINNED_STOCK_PORTFOLIO_UNIVERSE_PROFILE_IDS = tuple(
 )
 _PINNED_STOCK_PORTFOLIO_STATE_UNTIL_SUPERSEDED_PROFILE_IDS = tuple(
     stock_portfolio_evaluator.STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+)
+_PINNED_STOCK_PORTFOLIO_MEMBERSHIP_ONLY_PROFILE_IDS = tuple(
+    stock_portfolio_evaluator.MEMBERSHIP_ONLY_PROFILE_IDS
 )
 _PINNED_STOCK_PORTFOLIO_CANONICAL_ROWS_OBJECT = (
     stock_portfolio_evaluator._PROFILE_CANONICAL_ROWS
@@ -447,25 +456,25 @@ _EVALUATION_RUN_SPECS = (
         583,
     ),
     _EvaluationRunSpec(
-        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
-        "arv2-eval-stock-qqq-holdings-intersection-qc-014",
-        "R-075",
-        71,
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        "arv2-eval-stock-qqq-holdings-intersection-qc-016",
+        "R-077",
         72,
-        18,
+        73,
         19,
+        20,
         4,
         583,
         587,
     ),
     _EvaluationRunSpec(
-        stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
-        "arv2-eval-stock-spy-qqq-intersection-union-qc-015",
-        "R-076",
-        72,
+        stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+        "arv2-eval-stock-spy-qqq-intersection-union-qc-017",
+        "R-078",
         73,
-        19,
+        74,
         20,
+        21,
         4,
         587,
         591,
@@ -708,6 +717,8 @@ def _stock_portfolio_contract_bindings_are_current() -> bool:
                 "constituent_snapshot_maximum_age_calendar_days_for_profile"
             )
             is not _PINNED_STOCK_PORTFOLIO_SNAPSHOT_MAXIMUM_AGE_CALLABLE
+            or namespace.get("constituent_positive_count_bounds_for_profile")
+            is not _PINNED_STOCK_PORTFOLIO_POSITIVE_COUNT_BOUNDS_CALLABLE
             or projection_builder._profile
             is not _PINNED_PROJECTION_PROFILE_CALLABLE
             or projection_builder.project_source_paths_for_profile
@@ -738,6 +749,12 @@ def _stock_portfolio_contract_bindings_are_current() -> bool:
             != _PINNED_RUNTIME_STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
             or preliminary_runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
             != _PINNED_STOCK_PORTFOLIO_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+            or type(preliminary_runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS)
+            is not tuple
+            or preliminary_runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
+            != _PINNED_RUNTIME_STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
+            or preliminary_runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
+            != _PINNED_STOCK_PORTFOLIO_MEMBERSHIP_ONLY_PROFILE_IDS
             or type(profile_ids) is not tuple
             or profile_ids != _PINNED_STOCK_PORTFOLIO_PROFILE_IDS
             or namespace.get("ALL_PROFILE_IDS") != profile_ids
@@ -749,6 +766,8 @@ def _stock_portfolio_contract_bindings_are_current() -> bool:
             != _PINNED_STOCK_PORTFOLIO_UNIVERSE_PROFILE_IDS
             or namespace.get("STATE_UNTIL_SUPERSEDED_PROFILE_IDS")
             != _PINNED_STOCK_PORTFOLIO_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+            or namespace.get("MEMBERSHIP_ONLY_PROFILE_IDS")
+            != _PINNED_STOCK_PORTFOLIO_MEMBERSHIP_ONLY_PROFILE_IDS
             or variant_profile_ids != profile_ids[1:]
             or universe_profile_ids != variant_profile_ids
             or (
@@ -759,10 +778,12 @@ def _stock_portfolio_contract_bindings_are_current() -> bool:
                     "NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID"
                 ),
                 namespace.get("UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID"),
+                namespace.get("NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID"),
+                namespace.get("UNION_MEMBERSHIP_ONLY_PROFILE_ID"),
             )
             != variant_profile_ids
             or any(type(item) is not str for item in profile_ids)
-            or len(set(profile_ids)) != 6
+            or len(set(profile_ids)) != 8
             or namespace.get("_PROFILE_CANONICAL_ROWS")
             is not _PINNED_STOCK_PORTFOLIO_CANONICAL_ROWS_OBJECT
             or type(projection_profile_ids) is not tuple
@@ -5391,17 +5412,20 @@ _seal_action_bindings(
         "_PINNED_RUNTIME_STOCK_PORTFOLIO_PROFILE_IDS",
         "_PINNED_RUNTIME_STOCK_UNIVERSE_PROFILE_IDS",
         "_PINNED_RUNTIME_STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
+        "_PINNED_RUNTIME_STOCK_MEMBERSHIP_ONLY_PROFILE_IDS",
         "_PINNED_REQUIRE_REGIME_PROFILE",
         "_PINNED_REQUIRE_STOCK_PORTFOLIO_PROFILE",
         "_PINNED_STOCK_PORTFOLIO_RESULT_NAMES_CALLABLE",
         "_PINNED_STOCK_PORTFOLIO_CONSTITUENT_TICKERS_CALLABLE",
         "_PINNED_STOCK_PORTFOLIO_SNAPSHOT_MAXIMUM_AGE_CALLABLE",
+        "_PINNED_STOCK_PORTFOLIO_POSITIVE_COUNT_BOUNDS_CALLABLE",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_OBJECT",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_ID",
         "_PINNED_STOCK_PORTFOLIO_PROFILE_IDS",
         "_PINNED_STOCK_PORTFOLIO_VARIANT_PROFILE_IDS",
         "_PINNED_STOCK_PORTFOLIO_UNIVERSE_PROFILE_IDS",
         "_PINNED_STOCK_PORTFOLIO_STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
+        "_PINNED_STOCK_PORTFOLIO_MEMBERSHIP_ONLY_PROFILE_IDS",
         "_PINNED_STOCK_PORTFOLIO_CANONICAL_ROWS_OBJECT",
         "_PINNED_STOCK_PORTFOLIO_CONTRACT_ID",
         "_PINNED_STOCK_PORTFOLIO_SUMMARY_SCHEMA",

@@ -616,6 +616,316 @@ def test_constituent_history_refuses_total_positive_weight_outside_bounds():
         loader.build_eligibility(("2021-01-04",))
 
 
+def _membership_only_qqq_fixture(
+    count,
+    *,
+    start=1,
+    label="NASDAQ",
+    total=None,
+    stamp=datetime(2021, 1, 2),
+):
+    total = count if total is None else total
+    rows = [
+        _binding(f"BBG{index:09d}", f"N{index}", total)
+        for index in range(start, start + count)
+    ]
+    symbols = [
+        _Symbol(f"QC {label} {index}", f"N{index}")
+        for index in range(start, start + count)
+    ]
+    constituents = tuple(
+        _constituent(symbol, stamp, "0.012") for symbol in symbols
+    )
+    return rows, symbols, stamp, constituents
+
+
+def test_membership_only_successor_accepts_full_shape_without_weight_sum_claim():
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(75)
+    legacy, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, constituents),)},
+    )
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="total positive weight escaped bounds",
+    ):
+        legacy.build_eligibility(("2021-01-04",))
+
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, constituents),)},
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": tuple(sorted(row["security_id"] for row in rows))
+    }
+
+
+def test_membership_only_successor_refuses_underfilled_positive_sid_shape():
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(74)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, constituents),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="positive constituent count escaped bounds",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+@pytest.mark.parametrize(
+    ("spy_count", "qqq_count", "failing_ticker"),
+    (
+        (400, 75, None),
+        (600, 125, None),
+        (399, 75, "SPY"),
+        (601, 75, "SPY"),
+        (400, 74, "QQQ"),
+        (400, 126, "QQQ"),
+    ),
+)
+def test_union_membership_shape_bounds_apply_to_each_etf_independently(
+    monkeypatch, spy_count, qqq_count, failing_ticker
+):
+    total = spy_count + qqq_count
+    spy_rows, spy_symbols, stamp, spy_constituents = (
+        _membership_only_qqq_fixture(
+            spy_count, start=1, label="SPY", total=total
+        )
+    )
+    qqq_rows, qqq_symbols, _stamp, qqq_constituents = (
+        _membership_only_qqq_fixture(
+            qqq_count, start=701, label="QQQ", total=total
+        )
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+        [*spy_rows, *qqq_rows],
+        [*spy_symbols, *qqq_symbols],
+        {
+            "SPY": ((stamp, spy_constituents),),
+            "QQQ": ((stamp, qqq_constituents),),
+        },
+    )
+    original = loader._mapped_snapshot
+    forwarded_tickers = []
+
+    def recording_snapshot(ticker, collection_time, constituents):
+        forwarded_tickers.append(ticker)
+        return original(ticker, collection_time, constituents)
+
+    monkeypatch.setattr(loader, "_mapped_snapshot", recording_snapshot)
+    if failing_ticker is None:
+        assert loader.build_eligibility(("2021-01-04",)) == {
+            "2021-01-04": tuple(
+                sorted(row["security_id"] for row in [*spy_rows, *qqq_rows])
+            )
+        }
+    else:
+        with pytest.raises(
+            runtime.AcceptedRiskPreliminaryQcRuntimeError,
+            match="positive constituent count escaped bounds",
+        ):
+            loader.build_eligibility(("2021-01-04",))
+    assert forwarded_tickers == (
+        ["SPY"] if failing_ticker == "SPY" else ["SPY", "QQQ"]
+    )
+
+
+def test_r077_carries_an_old_strictly_prior_state_until_superseded():
+    old_stamp = datetime(2020, 12, 1)
+    successor_stamp = datetime(2021, 2, 1)
+    old_rows, old_symbols, _stamp, old_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=1,
+            label="R077 OLD",
+            total=150,
+            stamp=old_stamp,
+        )
+    )
+    new_rows, new_symbols, _stamp, new_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=101,
+            label="R077 NEW",
+            total=150,
+            stamp=successor_stamp,
+        )
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        [*old_rows, *new_rows],
+        [*old_symbols, *new_symbols],
+        {
+            "QQQ": (
+                (old_stamp, old_constituents),
+                (successor_stamp, new_constituents),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-02-01", "2021-02-08")) == {
+        "2021-02-01": tuple(sorted(row["security_id"] for row in old_rows)),
+        "2021-02-08": tuple(sorted(row["security_id"] for row in new_rows)),
+    }
+
+
+def test_r078_carries_each_old_strictly_prior_state_until_it_is_superseded():
+    old_stamp = datetime(2020, 12, 1)
+    spy_successor_stamp = datetime(2021, 2, 1)
+    qqq_successor_stamp = datetime(2021, 2, 8)
+    total = 950
+    old_spy_rows, old_spy_symbols, _stamp, old_spy_constituents = (
+        _membership_only_qqq_fixture(
+            400,
+            start=1,
+            label="R078 SPY OLD",
+            total=total,
+            stamp=old_stamp,
+        )
+    )
+    new_spy_rows, new_spy_symbols, _stamp, new_spy_constituents = (
+        _membership_only_qqq_fixture(
+            400,
+            start=401,
+            label="R078 SPY NEW",
+            total=total,
+            stamp=spy_successor_stamp,
+        )
+    )
+    old_qqq_rows, old_qqq_symbols, _stamp, old_qqq_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=801,
+            label="R078 QQQ OLD",
+            total=total,
+            stamp=old_stamp,
+        )
+    )
+    new_qqq_rows, new_qqq_symbols, _stamp, new_qqq_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=876,
+            label="R078 QQQ NEW",
+            total=total,
+            stamp=qqq_successor_stamp,
+        )
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+        [
+            *old_spy_rows,
+            *new_spy_rows,
+            *old_qqq_rows,
+            *new_qqq_rows,
+        ],
+        [
+            *old_spy_symbols,
+            *new_spy_symbols,
+            *old_qqq_symbols,
+            *new_qqq_symbols,
+        ],
+        {
+            "SPY": (
+                (old_stamp, old_spy_constituents),
+                (spy_successor_stamp, new_spy_constituents),
+            ),
+            "QQQ": (
+                (old_stamp, old_qqq_constituents),
+                (qqq_successor_stamp, new_qqq_constituents),
+            ),
+        },
+    )
+
+    expected_old = tuple(
+        sorted(
+            row["security_id"] for row in [*old_spy_rows, *old_qqq_rows]
+        )
+    )
+    expected_spy_advanced = tuple(
+        sorted(
+            row["security_id"] for row in [*new_spy_rows, *old_qqq_rows]
+        )
+    )
+    expected_both_advanced = tuple(
+        sorted(
+            row["security_id"] for row in [*new_spy_rows, *new_qqq_rows]
+        )
+    )
+    assert loader.build_eligibility(
+        ("2021-02-01", "2021-02-08", "2021-02-15")
+    ) == {
+        "2021-02-01": expected_old,
+        "2021-02-08": expected_spy_advanced,
+        "2021-02-15": expected_both_advanced,
+    }
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        ("nonpositive", "positive constituent count escaped bounds"),
+        ("nonfinite", "weight is not finite"),
+        ("duplicate", "duplicated a QC SID"),
+    ),
+)
+def test_membership_only_successor_preserves_row_and_count_refusals(
+    mutation, message
+):
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(75)
+    changed = list(constituents)
+    if mutation == "nonpositive":
+        changed[-1] = _constituent(symbols[-1], stamp, "0")
+    elif mutation == "nonfinite":
+        changed[-1] = _constituent(symbols[-1], stamp, "NaN")
+    else:
+        changed[-1] = _constituent(symbols[0], stamp, "0.012")
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, tuple(changed)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match=message,
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_membership_only_successor_does_not_read_last_update_metadata():
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(75)
+
+    class HostileLastUpdate:
+        symbol = symbols[-1]
+        end_time = stamp
+        weight = "0.012"
+
+        @property
+        def last_update(self):
+            raise RuntimeError("LastUpdate must remain unread")
+
+    changed = (*constituents[:-1], HostileLastUpdate())
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, changed),)},
+    )
+
+    assert len(loader.build_eligibility(("2021-01-04",))["2021-01-04"]) == 75
+
+
 @pytest.mark.parametrize("last_update", (None, date(2021, 1, 10)))
 def test_constituent_history_accepts_nullable_or_future_last_update_metadata(
     last_update,
@@ -773,9 +1083,9 @@ def test_constituent_history_caches_each_selected_snapshot_and_advances_on_newer
     original = loader._mapped_snapshot
     calls = []
 
-    def counting_snapshot(collection_time, constituents):
+    def counting_snapshot(ticker, collection_time, constituents):
         calls.append(collection_time)
-        return original(collection_time, constituents)
+        return original(ticker, collection_time, constituents)
 
     monkeypatch.setattr(loader, "_mapped_snapshot", counting_snapshot)
 
@@ -804,9 +1114,9 @@ def test_constituent_history_rechecks_selected_snapshot_age_for_each_decision(
     original = loader._mapped_snapshot
     calls = []
 
-    def counting_snapshot(collection_time, constituents):
+    def counting_snapshot(ticker, collection_time, constituents):
         calls.append(collection_time)
-        return original(collection_time, constituents)
+        return original(ticker, collection_time, constituents)
 
     monkeypatch.setattr(loader, "_mapped_snapshot", counting_snapshot)
 
@@ -1225,6 +1535,38 @@ def test_constituent_history_refuses_changed_snapshot_age_policy_exactly(
             resolution=resolution,
             daily_resolution="Daily",
             evaluation_profile_id=profile_id,
+            constituent_universes={"QQQ": universe},
+        )
+
+
+@pytest.mark.parametrize(
+    "hostile_bounds",
+    ((), (("QQQ", 0, 125),), (("SPY", 400, 600),), [("QQQ", 75, 125)]),
+)
+def test_constituent_history_refuses_changed_membership_shape_policy_exactly(
+    monkeypatch, hostile_bounds
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE QQQ", "QQQ"))
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_positive_count_bounds_for_profile",
+        lambda _profile_id: hostile_bounds,
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^constituent-history membership shape policy changed$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=(
+                stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID
+            ),
             constituent_universes={"QQQ": universe},
         )
 
@@ -2722,6 +3064,9 @@ def test_runtime_result_inventory_is_exact_for_stock_portfolio_profile():
     )
     assert runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS == (
         stock_portfolio_evaluator.STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+    )
+    assert runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS == (
+        stock_portfolio_evaluator.MEMBERSHIP_ONLY_PROFILE_IDS
     )
     for profile_id in stock_portfolio_evaluator.PROFILE_IDS:
         expected = runtime.expected_custom_summary_statistic_names(profile_id)

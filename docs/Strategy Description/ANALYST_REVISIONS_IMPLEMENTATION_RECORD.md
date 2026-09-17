@@ -16476,3 +16476,49 @@ The immutable infrastructure-look ledger advances append-only to sequence 6,
 and artifact SHA-256
 `e837946d6fe9d31f16d4a901f878e965036f6931f8ed5bb1806fdb5a1c83cdd9`.
 It retains sequence 5 byte-for-byte as its 26-entry prefix.
+
+### 89.6 Claude review handoff for the single-push round
+
+Claude should review the exact pushed range
+`cf33165b74afe698699ce4abe02bce01878db355..this record commit`, commit by
+commit. Commit `63c2cc0` is the exact code-and-record snapshot that produced
+and authenticated R-082; this trailing record commit changes documentation
+only. Review focus is the accepted-risk physical archive and parent-bound
+Massive delta, transport/result-read closures, the collection-timestamp
+correction shared with the accepted-risk runtime, the v2 duplicate-SID
+coverage policy, the one-use QC submission/read boundary, and the immutable
+infrastructure-ledger sequence 2 through 6.
+
+The R-082 focused probe battery is **119 passed**. The combined changed-area
+battery reached **937 passed** with three stale seq-3 ledger expectations;
+after updating those expectations, all three isolated regressions pass. The
+complete lane selection then reached **5,840 passed, 7 skipped** and two
+handoff-only failures after 5,958.09 seconds: section 4 still named the
+superseded R-072/R-074 instruction instead of the new section 89 review.
+Correcting that text, plus extending the append-only test through the
+sequence-2 predecessor, leaves the exact final focused handoff/ledger battery
+at **34 passed**. Compileall over the lane packages/tests and `git diff
+--check` are clean. No repository-wide suite was run, under the lane-scoped
+validation rule.
+
+Two verified P3 observations are deliberately carried to Claude rather than
+silently changing the already-run R-082 source after its signed identity was
+spent. First, `_history_items` and the row collectors in
+`pit_market_cap_membership_probe_runtime.py` materialize an iterable before
+checking the 64-collection or 25,000-row cap; a changed or hostile provider
+iterator could consume excess memory/time before the correct refusal. Second,
+the v2 public attestation retains historical `*_end_time_local` field names
+for ETF Series collection timestamps even though the corrected contract
+treats those Series timestamps—not constituent row `EndTime`—as the
+availability clock. Neither affected R-082: its bounded real payload completed
+and its hashes/counts reconcile. Any correction must use fresh prospective
+lineage rather than rewriting R-082.
+
+No price, return, strategy statistic, order, holding, broker, deployment, or
+paper/live value was read in R-079 through R-082. After Claude's single review
+push, Codex must counter-review every Claude commit in this same worktree.
+Only then should the lane freeze and run market-cap-aware QQQ and S&P 500
+windows. Any 2x/3x stock exposure must remain a separately preregistered
+diagnostic with an objective, point-in-time momentum rule and explicit
+financing, transaction-cost, volatility/drawdown, and no-live-trading bounds;
+it must not be selected retrospectively from winners in these baseline runs.

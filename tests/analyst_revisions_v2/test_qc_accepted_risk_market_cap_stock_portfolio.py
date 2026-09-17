@@ -589,3 +589,24 @@ def test_module_is_pure_and_does_not_import_old_giant_evaluator():
         "os.environ",
     ):
         assert forbidden not in source
+
+
+def test_locked_gross_above_target_assigns_no_budget_and_never_goes_short():
+    """ARV2R93: locked drifted weight above the target must not create negative targets."""
+
+    runtime = _runtime(_input())
+    runtime._price = lambda _security_id, _position: Decimal(100)
+    desired = ("candidate-00", "candidate-01")
+    decision = subject._Decision(
+        selected=desired,
+        eligible=desired,
+        market_caps={security_id: Decimal(1) for security_id in desired},
+    )
+    locked = {"stale-a": Decimal("0.60"), "stale-b": Decimal("0.50")}
+
+    targets = runtime._targets(
+        subject._Account("selected"), decision, desired, 0, locked
+    )
+
+    assert targets == locked
+    assert all(weight > 0 for weight in targets.values())

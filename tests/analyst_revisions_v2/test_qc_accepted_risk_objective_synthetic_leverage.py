@@ -459,3 +459,24 @@ def test_module_has_no_io_network_order_or_deployment_import_surface():
     assert "ObjectStore" not in source
     assert "MarketOrder" not in source
     assert "SetHoldings" not in source
+
+
+def test_daily_reset_compounds_each_levered_session_not_the_cumulative_underlying():
+    """ARV2R93: isolate the daily-reset semantics from the financing tests."""
+
+    returns = (Decimal("0.10"), Decimal("-0.10"))
+    flags = (True, True)
+    path = subject._apply_daily_reset_leverage(
+        returns,
+        flags,
+        leverage_factor=2,
+        annual_financing_rate=Decimal(0),
+    )
+
+    # A daily reset compounds each levered session: (1.20)(0.80) - 1 = -4%.
+    # Levering the cumulative underlying instead would give 2 x ((1.10)(0.90) - 1) = -2%.
+    assert path.returns == (Decimal("0.20"), Decimal("-0.20"))
+    assert path.cumulative_return == Decimal("-0.04")
+    assert path.cumulative_return_before_financing == Decimal("-0.04")
+    assert path.cumulative_financing_drag == 0
+    assert path.financing_session_count == 2

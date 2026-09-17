@@ -380,3 +380,29 @@ def test_runtime_meta_is_point_in_time_count_only_and_not_etf_or_leverage():
     assert meta["point_in_time_market_cap_uncovered_count"] == 1
     assert "security_id" not in json.dumps(meta)
     assert "market_cap_values" not in json.dumps(meta)
+
+
+def test_history_items_bound_iteration_before_materializing_the_collection_cap():
+    """ARV2R93: the collection cap must bound iteration, not follow materialization."""
+
+    cap = runtime.MAX_COLLECTIONS_PER_CALL
+    pulled = 0
+
+    def oversized_but_finite():
+        nonlocal pulled
+        for _ in range(cap * 4):
+            pulled += 1
+            yield (object(), object())
+
+    class _History:
+        @staticmethod
+        def items():
+            return oversized_but_finite()
+
+    with pytest.raises(
+        runtime.AcceptedRiskMarketCapStockPortfolioQcRuntimeError,
+        match="exceeded the collection cap",
+    ):
+        runtime._history_items(_History(), "ETF constituent")
+
+    assert pulled == cap + 1

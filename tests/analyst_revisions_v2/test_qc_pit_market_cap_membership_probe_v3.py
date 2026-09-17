@@ -227,3 +227,33 @@ def test_v3_emits_collection_availability_names_and_validates_them(monkeypatch):
     assert core.require_reviewed_pit_market_cap_membership_coverage_attestation(
         reviewed_attestation
     ) is reviewed_attestation
+
+
+def test_v3_selected_prior_takes_the_latest_strictly_prior_snapshot():
+    """ARV2R93: pin latest-prior selection directly, independent of any hash pin."""
+
+    cutoff = datetime(2025, 1, 6)
+    inventory = {
+        datetime(2025, 1, 2): ("oldest",),
+        datetime(2025, 1, 4): ("latest-prior",),
+        datetime(2025, 1, 6): ("at-cutoff",),
+        datetime(2025, 1, 8): ("after-cutoff",),
+    }
+
+    key, rows = runtime._selected_prior(inventory, cutoff, "ETF history")
+
+    assert key == datetime(2025, 1, 4)
+    assert rows == ("latest-prior",)
+
+
+def test_v3_selected_prior_refuses_when_only_cutoff_or_later_snapshots_exist():
+    """A collection at the decision cutoff is not prior evidence."""
+
+    cutoff = datetime(2025, 1, 6)
+    inventory = {
+        datetime(2025, 1, 6): ("at-cutoff",),
+        datetime(2025, 1, 8): ("after-cutoff",),
+    }
+
+    with pytest.raises(ValueError, match="has no strictly prior snapshot"):
+        runtime._selected_prior(inventory, cutoff, "ETF history")

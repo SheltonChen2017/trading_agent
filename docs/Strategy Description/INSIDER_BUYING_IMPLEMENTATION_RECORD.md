@@ -168,6 +168,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-14 | Codex counter-review | `4c834e1` -> this counter-review commit | Claude IB-3A review counter-review; next milestone held for owner choice | Fast-forwarded without switching, reviewed `94ea25c` and `4c834e1` in order, reproduced a caller-alias/ABA P2 plus impossible standalone breadth and raw-score identity P2s, corrected them with validated factory-bound snapshots and exact necessary envelopes, pinned the independently load-bearing final seal, and corrected numeric-policy wording without changing formula arithmetic. No later milestone was implemented because the blueprint does not freeze a unique cross-sectional normalization policy. | Focused corrected IB-3A **177 passed**; lane/boundary **1,443 passed, 8 skipped**; complete repository **2 shared-EOL failures, 7,672 passed, 15 skipped**; compileall 0. Deterministic final-seal deletion mutant failed red; 500 valid randomized batches passed independently. No external data or operations; **0 research looks**. | `94ea25c` and `4c834e1` accepted after correction. IB3A-CCR01..CCR08 are closed; Claude's IB3A-CR02 remains open as retained record precision. `IBSH-CCR08` records the two shared/out-of-lane EOL failures without fixing them. The next code slice is an owner choice, not a P0-P3 defect. | Commit and make the round's one push. Owner chooses synthetic IB-3B policy or canonical IB-2 authority work before implementation resumes; Claude reviews this exact pushed counter-review snapshot. |
 | 2026-09-14 | Claude review | `c5aec62d` -> this review record | Review of the single Codex counter-review commit closing the IB-3A gaps (`4c834e11..c5aec62d`): factory-bound snapshots and alias/ABA closure, breadth and raw-score envelopes, the load-bearing final seal, the 772/774 width correction, and the age-10,000 freshness wording | Reproduced every section-52 row independently: derivations for each envelope clause, a 300-batch/1,106-event randomized valid-input oracle with zero refusals, the 772/774 arithmetic, the age-10,000 50-digit projection against a 400-digit oracle, both blob SHA-256s, and the two shared CRLF paths. Ten targeted mutants of the corrections: nine caught, one (the upper-total envelope) survived because the existing case forged total and largest together; an isolating regression now catches it alone. Full detail in section 53. | Focused 177 passed; lane/boundary gate 1,374 + 69 = 1,443 passed, 8 skipped; compileall exit 0; `git diff --check` clean; complete repository suite 2 failed, 7,673 passed, 15 skipped, 25 warnings in 2,616.41s (0:43:36), the only failures being the two shared CRLF working copies recorded as `IBSH-CCR08`; module restored byte-identical after every mutant. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**; 27 authority flags false; `stock_score` None. | Accepted after correction. Findings are in section 53.6. IB-3B not started; the section 52.5 owner-decision register is returned unchanged. | Codex counter-reviews this review commit. No milestone authorized. |
 | 2026-09-17 | Codex counter-review + implementation | `4dbafe0` -> `04f939b` counter-review; `fd0d7f6` IB-3B code snapshot; this record commit follows | Claude IB-3A correction counter-review plus owner-approved synthetic IB-3B normalization diagnostics | Accepted both Claude commits after append-only P3 evidence corrections, then added a sealed caller-declared cohort model, exact IB-3A signal replay, structural-zero inclusion, named exclusions/refusal, Type-7 1%/99% winsorization, population-z diagnostics, and deferred canonical score/rank/seed fields. | Focused IB-3B **37 passed**; combined IB-3A/IB-3B **216 passed**; lane gate **1,473 passed, 8 skipped**; eight intended mutants killed; 10,000 randomized/boundary probes found no false refusal; compile/diff/final checks recorded in section 55. The owner directed that the completed lane gate is sufficient, so the started repository-wide run was interrupted and is not evidence. No external or outcome access; **0 research looks**. | No P0-P2 finding remains. Numerical false-refusal and standalone-seal findings are closed in section 55; one non-blocking P3 lower-variance standalone-identity limitation is retained, while exact parent-result replay remains authoritative. | Commit this record and make the round's single push. Claude reviews every commit after `4dbafe0`. Owner next chooses a separately frozen synthetic ranking/seed milestone or canonical IB-2 authority completion; neither is inferred here. |
+| 2026-09-17 | Claude review | `297a9bc3` -> this review record | Review of the IB-3A counter-review `04f939b1`, the synthetic IB-3B normalization diagnostics `fd0d7f65`, and the record `297a9bc3` (`4dbafe07..297a9bc3`) | Verified policy fidelity to the owner-approved section 54.4 policy constant by constant and clause by clause in the kernel, reproduced the focused and combined counts, both blob SHA-256s, zero authority and hard-None canonical fields, and ran an independent exact-rational oracle over public cohorts plus eighteen targeted mutants covering Codex's eight killed directions and ten more. Full detail in section 56. | Focused 37 + 179 = 216 passed; lane/boundary gate 2 passed in 1.00s; compileall exit 0; `git diff --check` clean; every mutated module restored byte-identical. No complete repository suite was run, per owner direction. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**; 27 authority flags false; score/rank/seed None. | Accepted after correction. Findings are in section 56.8. IB-3B remains synthetic, offline evidence; the section 55.6 owner-decision register is returned unchanged. | Codex counter-reviews this review round. No milestone started or authorized. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -7175,3 +7176,196 @@ shared/out-of-lane findings without fixing them. Do not access providers,
 licensed rows, outcomes, QC, broker, deployment, paper/live, or trading
 surfaces. Update only this lane record, commit on the same branch, and make the
 review round's one push; Codex then counter-reviews every Claude commit.
+
+## 56. Claude review - IB-3A counter-review and synthetic IB-3B normalization diagnostics (2026-09-17)
+
+Reviewer: Claude, in the lane worktree
+`C:\git\customizedAgent\trading_agent_insider` on `codex/strategy-insider-buying`.
+No branch, worktree, fork, or handoff was created or switched to. Range
+reviewed in order: `04f939b1` (counter-review of `05a0755`/`4dbafe0`),
+`fd0d7f65` (IB-3B implementation), `297a9bc3` (record). `4dbafe07` is an
+ancestor of `297a9bc3`; zero merges. The worktree was already at the pushed
+head and clean when this review began, because Codex commits in this same
+checkout.
+
+Authority: the owner's approval of synthetic IB-3B and its eight-point
+numerical policy is recorded in section 54.4 and was confirmed by the owner's
+review instruction for this round. This review checks the implementation
+against that recorded policy exactly and infers nothing beyond it. Per the
+owner's direction, the lane/boundary gate is the validation standard for
+this round; **no complete repository suite was run and none is represented**.
+
+### 56.1 Isolation and scope
+
+The range touches only lane-owned paths: the new IB-3B module and test
+module, the IB-3A test module (additions only, zero deletions), the package
+`__init__` (exports and two resource constants only), and this record.
+Excluding lane-owned prefixes from the changed-path list leaves an empty set.
+No shared or out-of-lane file was changed by this review.
+
+### 56.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `04f939b108000bde1d9b8f42c0856e7efc2ddc33` | Counter-review of `05a0755` and `4dbafe0`; adds the isolated lower-total-envelope regression (IB3A-CCR09) and three record corrections | **Accepted.** The new regression is present and the IB-3A file gives 179 focused. CCR10 is a fair correction: my section 53.7 reported the reviewed-parent counts where the final-tree counts were 178 and 1,444. CCR11 is fair: my round had two commits. |
+| `fd0d7f65733e147b7d953374d9a83ac8c2cf6ce6` | Synthetic IB-3B normalization diagnostics | **Accepted after correction** |
+| `297a9bc39a1d621e19dd495b249e4ce55df17b19` | Record IB-3B implementation and review evidence | **Accepted.** Documentation only; its section-5 ledger row is present. |
+
+### 56.3 Policy fidelity to section 54.4
+
+Every policy element is a pinned module constant and is re-asserted by
+`_require_frozen_policy` and the frozen policy hash: 1st/99th percentiles,
+`type-7-linear-h=(N-1)*p-value-based-ties`, `population-N`, minimum 20
+usable names, minimum 2 distinct post-winsor values, 50-digit precision,
+`ROUND_HALF_EVEN`, `unavailable-no-epsilon-no-substituted-zero`, no final
+quantization, ranking and seed `deferred`. The kernel reads exactly as
+described: project each usable value into an isolated 50-digit context, sort,
+type-7 cutoffs with `position = (N-1)*p`, value-based clipping, a
+minimum-anchored offset mean with a single division and range clamp,
+sequential squared deviations over `N`, context square root, and z only when
+the cohort is available. Structural zeros enter the population; ineligible
+and missing rows are retained with named dispositions and never reach the
+kernel; an eligible row missing its score refuses the whole cohort before any
+numerical work.
+
+### 56.4 Claims reproduced on the exact commit
+
+- Focused IB-3B **37** and IB-3A **179**: combined **216 passed**, as recorded.
+- Lane/boundary gate: the fourteen Insider files plus `test_ml_import_boundary.py`
+  (11), `test_module_hygiene.py`, and `test_active_document_consistency.py` give
+  **1,482 passed, 8 skipped in 330.94s**. Codex's gate substitutes
+  `test_overlay_import_boundary.py` (2 tests, executed separately: **2 passed in 1.00s**)
+  for the ml import-boundary file, and 1,482 - 11 + 2 = 1,473 reproduces the
+  recorded **1,473 passed, 8 skipped** exactly.
+- `compileall` including `research/`: exit 0. `git diff --check`: clean.
+- Both recorded SHA-256 values (`0f7f7267...` source, `cf895af0...` test)
+  recompute exactly from the committed LF blobs.
+- The module imports only `re`, `threading`, `weakref`, `dataclasses`,
+  `decimal`, `enum`, the lane hashing helpers, and the IB-3A module; no
+  network, `float`, `subprocess`, `eval`, `random`, `numpy`, `pandas`, or
+  `statistics` surface.
+- Zero authority: 27 Boolean flags refused unless every one `is False`, both
+  look counters refused unless exact integer zero, and `stock_score`,
+  `ranking`/`rank`, and seed fields refused unless `None` on rows and result.
+
+### 56.5 Independent exact-rational oracle
+
+A deterministic oracle of this reviewer's own construction (seed 20260917)
+built public cohorts through the test helpers, then recomputed type-7
+cutoffs, winsorization, population mean and variance with **exact
+`Fraction` arithmetic**, standard deviation and z at 200-digit `Decimal`,
+rounded the reference to 50 significant digits `ROUND_HALF_EVEN`, and
+measured the module's distance in units of the 50th significant digit.
+
+| Cohort | Outcome | lower | upper | mean | variance | std | winsor | z (max) |
+|---|---|---|---|---|---|---|---|---|
+| N=20 signals | available | 0 | 0 | 0 | 2 | 1 | 0 | 290 |
+| N=19 signals | insufficient cohort, as required | | | | | | | |
+| N=25: 15 signals + 10 structural zeros | available | 0 | 0 | 0 | 1 | 0 | 0 | 23 |
+| N=101: 1 signal + 100 zeros | zero dispersion; cutoffs exact | 0 | 0 | | | | | |
+| N=101: 100 signals + 1 zero | available | 0 | 0 | 4 | 1 | 1 | 0 | 432 |
+| N=20 constant `$50,000` | zero dispersion; cutoffs exact | 0 | 0 | | | | | |
+| N=57 wide range to `$1e9` | available | 0 | 0 | 2 | 0 | 0 | 0 | 1,318 |
+| N=33 + 3 retained excluded rows | available | 0 | 0 | 1 | 6 | 4 | 0 | 122 |
+| N=1,000 random | available | 0 | 0 | 5 | 5 | 3 | 0 | 62,446 |
+| N=20 adjacent Decimals (10 x `50000`, 10 x `50000 + 1e-45`) | zero dispersion; cutoffs exact | 0 | 0 | | | | | |
+| N=30 + one eligible-missing row | refused before any numerical work: `eligible row is missing its synthetic score` | | | | | | | |
+
+Reading: cutoffs and winsorized values are **exact** in every case, and the
+moments agree with exact rational arithmetic to at most six units in the
+50th digit through N=1,000, which is what sequential 50-digit rounding
+predicts. The z column is not a kernel error: a 50-digit mean carries up to
+half an ulp of unavoidable rounding, and `(x - mean) / std` amplifies it for
+names near the mean, so z-scores agree with the exact value to roughly 45
+digits in the worst observed case rather than 50. The policy specifies
+precision, rounding, and operation order, all of which the module follows;
+it does not promise 50 correct digits and forbids final quantization. The
+consequence is recorded as IB3B-CR02 for IB-3C's tie rules. Excluded rows
+never entered the population, and structural zeros always did. This
+corroborates Codex's 10,000-probe claim independently rather than accepting
+it.
+
+### 56.6 Mutation testing
+
+Codex's eight killed directions were re-run on the exact commit together with
+this reviewer's own, one neutralised guard each, focused IB-3B file after
+each, module restored from exact original bytes in a `finally` block.
+
+| Mutant | Guard neutralised or altered | Result on `fd0d7f65` | Caught by / classification |
+|---|---|---|---|
+| C1 | type-7 position uses `N` instead of `N-1` | caught | goldens, fractional-upper-tail, and numeric-boundary cases |
+| C2 | variance denominator `N-1` | caught | goldens, fractional-upper-tail case |
+| C3 | mean anchor zero instead of the sorted minimum | caught | `test_public_cohorts_preserve_exact_moments_at_numeric_boundaries` |
+| C4 | eligible-missing whole-cohort refusal removed | caught | `test_eligible_missing_score_refuses_before_numerical_work` |
+| C5 | final input-seal loop removed after result construction | caught | `test_builder_detaches_caller_alias_and_final_input_seal_is_load_bearing` |
+| C6 | coarse variance cap removed | caught | `test_standalone_available_identity_binds_summary_relationships` |
+| C7 | lower zero-mass guard removed | caught | `test_standalone_available_identity_binds_summary_relationships` |
+| C8 | upper zero-mass guard removed | caught | `test_public_cohorts_preserve_exact_moments_at_numeric_boundaries` |
+| R1 | minimum usable names accepts 19 | caught | minimum-N, retained-exclusion, and standalone-identity cases |
+| R2 | distinct-value `< 2` clause removed, `variance == 0` retained | **survived** | **provably redundant**: one distinct post-winsor value makes every deviation exactly zero, so the sibling `variance == 0` clause yields the same named outcome |
+| R3 | upper winsor clip removed | caught | numeric-boundary and golden cases |
+| R4 | lower winsor clip removed | caught | IB-3A integration, numeric-boundary, and golden cases |
+| R5 | kernel context rounding `ROUND_HALF_UP` | **survived** | **untested policy element**: the frozen hash pins the text `ROUND_HALF_EVEN`, but no test reached a tie at the 50th digit; see IB3B-CR01 and the re-run below |
+| R5 (re-run after IB3B-CR01) | same | **caught in isolation** | `test_kernel_context_rounds_half_even_as_the_frozen_policy_states` |
+| R6 | context precision 49 | caught | goldens, numeric-boundary, fractional-upper-tail cases |
+| R7 | z divides by variance instead of standard deviation | caught | goldens, fractional-upper-tail case |
+| R8 | mean range clamp removed | **survived** | **defence in depth**: with the minimum-anchored offset method the mean can leave `[min, max]` only through a rounding overshoot of the offset sum; no public cohort in the suite reaches it; recorded, not pinned |
+| R9 | quantile interpolation fraction dropped (nearest-lower quantile) | caught | IB-3A integration, numeric-boundary, and golden cases |
+| R10 | structural zeros dropped from the population | caught | alias/seal, zero-authority, and IB-3A integration cases |
+
+Codex's eight killed directions (C1-C8) all reproduce as killed on the exact
+commit. Of this reviewer's ten additional directions, seven were caught, one
+is provably redundant, one is unpinned defence in depth, and one (R5) was a
+genuine gap on a pinned policy element. The working-copy file is LF; anchors
+matched on normalised text, the file was restored from exact original bytes
+after every mutant, and `git diff --quiet HEAD -- research/` confirmed
+identity with `HEAD`.
+
+### 56.7 IB3B-R11 verified
+
+A public N=24 available result was taken, and its identity was forged with
+`population_variance = 1e-40` and the matching 50-digit `standard_deviation`
+(so the `sqrt` consistency check holds), then rehashed.
+
+- **Standalone identity replay accepted the forgery**, exactly the retained
+  limitation Codex recorded: no loose lower plausibility bound exists.
+- **Parent-result replay refused it** with
+  `REFUSED: normalization identity does not replay`, because the result
+  recomputes the kernel from its own retained rows and compares.
+
+The public artifact is the complete result, and its replay is the trust
+boundary; the nested identity is factory-token-gated metadata. IB3B-R11 is
+therefore correctly classified as non-blocking, and its closure by
+parent-result replay is verified rather than assumed.
+
+### 56.8 Findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3B-CR01 | P3 | **FIXED in `d26e2c92`** | `fd0d7f65`; regression in `d26e2c92` | `_new_decimal_context`; frozen policy text | The frozen policy hash pins the text `ROUND_HALF_EVEN`, but the kernel context's actual rounding mode was never exercised: a `ROUND_HALF_UP` context left all 37 focused tests green (mutant R5). The policy identity would stay unchanged while every tie at the 50th digit rounded differently. | Mutant R5 survived on the exact commit with zero failing tests. | A pinned numerical policy element must be enforced by behaviour, not by a string in the hashed payload. | Added `test_kernel_context_rounds_half_even_as_the_frozen_policy_states`: asserts the context's rounding mode and projects a 51-digit input that ties exactly at the 50th digit to the even neighbour through the policy's own input-projection step. No production module changed. | Passes on the unmodified tree (focused 38); with the context set to `ROUND_HALF_UP` it is the **only** failing test; the module was restored byte-identical and confirmed with `git diff --quiet`. |
+| IB3B-CR02 | P3 | **OPEN - consumer caveat, not a defect** | `fd0d7f65` | z-score outputs | A 50-digit *procedure* is not 50-digit *accuracy*. Cutoffs and winsorized values match an exact-rational reference to 0 ulp and the moments to at most 6 ulp, but z-scores of names near the mean diverge by up to 62,446 ulp at N=1,000 (about `6e-46` relative) because `(x - mean) / std` amplifies the unavoidable half-ulp rounding of the mean. | Oracle table in 56.5, seed 20260917. | The module follows the policy's precision, rounding, and operation order exactly; the policy forbids final quantization, so no kernel change is appropriate. | None. Recorded so that the IB-3C ranking and tie rules in section 55.6 do not treat trailing z digits as meaningful: two names whose exact z differ by less than roughly `1e-45` can order either way. | Reproduced deterministically. |
+| IB3B-CR03 | P3 | OPEN - defence in depth, not pinned | `fd0d7f65` | `_context_mean` range clamp | Removing the clamp leaves the suite green (mutant R8). With the minimum-anchored offset method the mean can exceed the maximum only through a rounding overshoot of the offset sum, which no public cohort in the suite reaches. | Mutant R8 survived. | The clamp acts in the safe direction; pinning it needs a constructed overshoot. | None this round. | Recorded. |
+| IB3B-CR04 | P3 | OPEN - record precision | `297a9bc3` | Section 55.4 gate description | The recorded gate names an "overlay-import boundary" test; the file is `test_overlay_import_boundary.py` (2 tests), whereas earlier rounds' gates used `test_ml_import_boundary.py` (11). The 1,473 count reproduces only with that substitution: 1,482 - 11 + 2. | Both files executed. | A gate must be reproducible from its named file set. | None; the reconciliation is recorded in 56.4. | Reconciled exactly. |
+| IB3B-R11 | P3 | **OPEN - accepted non-blocking limitation; closure by parent replay verified** | `fd0d7f65` | Standalone identity lower-variance plausibility | As Codex recorded: a coherent tiny positive variance replays standalone. | This reviewer forged one; standalone replay accepted it and parent-result replay refused it (`normalization identity does not replay`). | The complete result is the public artifact and its replay recomputes the kernel. | None. | Verified in 56.7. |
+| IB3A-CR04 | P3 | OPEN - environment note, carried | `c5aec62d` | IB-3A module working copy | The working copy of `form4_stock_signal_formula_diagnostics.py` is now **mixed** line endings (`i/lf w/mixed`), content-identical to the index; the two new IB-3B files are LF. Byte-restoration controls on this host must name their working-copy reference. | `git ls-files --eol`. | Not a code defect. | None. | `git diff --quiet HEAD -- research/` clean after every mutant. |
+
+### 56.9 Validation
+
+- Focused: IB-3B 37, IB-3A 179, combined 216 passed. Lane/boundary gate:
+  **1,482 passed, 8 skipped** on this reviewer's file set, reconciling to
+  Codex's 1,473 as shown in 56.4. `compileall` exit 0; `git diff --check` clean.
+- Oracle and mutants as in 56.5 and 56.6; every module restored and confirmed
+  identical to `HEAD` with `git diff --quiet`.
+- No complete repository suite was run this round, per owner direction.
+
+No SEC, EDGAR, vendor, QuantConnect, credential, licensed row, outcome,
+broker, operator-database, scheduler, deployment, capital, or trading access.
+**Research looks: 0.** IB-3B remains synthetic, caller-declared, offline
+diagnostic evidence; canonical score, ranking, and seed selection stay
+deferred.
+
+### 56.10 Next step
+
+Codex counter-reviews this review round. The section 55.6 owner-decision
+register (synthetic IB-3C ranking/seed versus canonical IB-2 completion) is
+returned unchanged; nothing is started by inference.

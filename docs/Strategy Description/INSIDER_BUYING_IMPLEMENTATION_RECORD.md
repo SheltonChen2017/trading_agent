@@ -1,18 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `05a0755` AND `4dbafe0` AND
-ACCEPTED BOTH AFTER P3 CORRECTIONS (SECTION 54). CLAUDE'S ISOLATED UPPER-TOTAL
-ENVELOPE REGRESSION IS CORRECT AND LOAD-BEARING. THE GENERALIZED REVIEW FOUND
-THE SYMMETRIC LOWER-TOTAL ENVELOPE STILL DELETABLE WITH THE SUITE GREEN; AN
-ISOLATED DANGEROUS-DIRECTION REGRESSION NOW PINS IT. SECTION 53'S FINAL-TREE
-177/1,443 COUNTS ARE CORRECTED APPEND-ONLY TO 178/1,444 BEFORE THIS NEW TEST,
-AND THE EXACT TWO-COMMIT REVIEW RANGE IS NOW EXPLICIT. NO P0-P2 FINDING IS
-OPEN. THE OWNER APPROVED THE EXACT BOUNDED SYNTHETIC IB-3B NORMALIZATION POLICY
-RECORDED IN SECTION 54.4, INCLUDING COMPLETE ELIGIBLE-COHORT ACCOUNTING,
-TYPE-7 1%/99% WINSORIZATION, POPULATION VARIANCE, MINIMUM-N AND DISPERSION
-GATES, AND 50-DIGIT DECIMAL ARITHMETIC. RANKING AND SEED SELECTION REMAIN
-DEFERRED. IB-3B IS THE NEXT AUTHORIZED SYNTHETIC/OFFLINE MILESTONE; NO DATA,
-OUTCOME, QC, PAPER, LIVE, OR TRADING AUTHORITY IS INFERRED.**
+Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `05a0755` AND `4dbafe0`,
+COMMITTED THE ACCEPTED-AFTER-CORRECTION DISPOSITION AS `04f939b`, AND COMPLETED
+THE OWNER-APPROVED SYNTHETIC/OFFLINE IB-3B NORMALIZATION DIAGNOSTICS IN
+`fd0d7f6` (SECTION 55). THE IMPLEMENTATION RETAINS EVERY DECLARED COHORT ROW,
+REPLAYS POSITIVE SCORES FROM EXACT IB-3A ARTIFACTS, INCLUDES EXPLICIT
+STRUCTURAL ZEROS, REFUSES ELIGIBLE-MISSING SCORES, APPLIES TYPE-7 1%/99%
+WINSORIZATION, AND PRODUCES POPULATION Z-SCORE DIAGNOSTICS UNDER A PINNED
+50-DIGIT DECIMAL POLICY. NUMERICAL BOUNDARY CORRECTIONS WERE VERIFIED BY
+PUBLIC-ARTIFACT REGRESSIONS, EIGHT KILLED MUTANTS, AND 10,000 RANDOMIZED
+ADVERSARIAL PROBES. THE FINAL LANE GATE IS 1,473 PASSED, 8 SKIPPED. NO P0-P2
+FINDING IS OPEN; ONE NON-BLOCKING P3 STANDALONE-IDENTITY LIMITATION IS RETAINED.
+RANKING AND SEED SELECTION REMAIN DEFERRED. NO DATA, OUTCOME, QC, PAPER, LIVE,
+DEPLOYMENT, OR TRADING AUTHORITY IS INFERRED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -167,6 +167,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-10 | Claude review | `8f61557` -> `94ea25c` (test correction) -> this review record | Independent review of the IB-2D counter-review, the bounded synthetic IB-3A formula diagnostics, its aggregate-bound correction, and the record (`9a93d09..8f61557`, 4 commits, 0 merges, 4 lane-owned paths), with adversarial mutation of the owner-named directions | Fast-forwarded to the exact remote tip and dispositioned all four commits. Recomputed the numeric-policy hash, derived the 774-digit aggregate bound from first principles (773 required, slack 1, below the shared 4,096 ceiling), reproduced IB3A-R08 as a real defect (512- and 763-digit totals both exceeded the old 272-digit cap) and its fix against an exact-sum oracle, checked the formulas against an independent direct-exponential oracle, confirmed ambient-context and boundary behavior, and ran 64 targeted mutants plus 10 combined mutants. Twelve survivors were genuine untested guards and are now pinned; thirteen are proven redundant or unreachable. Full detail in section 51. | Pushed tree `8f61557`: complete suite **7,616 passed, 38 skipped, 28 warnings, 0 failed in 485.90s (0:08:05)** (Codex recorded 26 warnings); focused IB-3A **142 passed**; lane/boundary gate **1,416 passed** - every recorded figure reproduces exactly. Final tree: IB-3A **162 passed**; lane/boundary gate **1,436 passed in 11.97s**; complete suite **7,636 passed, 38 skipped, 28 warnings, 0 failed in 440.88s (0:07:20)**; whole-repository compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | All four commits accepted, `17e613d` after a test-only correction. **IB3A-CR01** (P3) fixed in `94ea25c`: twelve guards could be deleted with the file green, most importantly the explicit Decimal `flags=[]`/`traps=[]` that isolate a trapping `DefaultContext` - the IB3A-R06 regression sets every trap to `False`, the harmless direction, so a trapping context provably refused a valid age-one event with the guard removed while all 142 tests passed - and the sealed-event fingerprint comparison, whose own named test forges a new object and is therefore caught by `registered is None`, leaving the in-place equal-valued representation change provably accepted. The other ten are contribution routing, contribution/breadth/identity replay, canonical event order, the result raw-score and stock-key bindings, breadth count-to-inventory binding, the breadth buyer-count bound, and identity count consistency. Thirteen additive tests (20 cases), each mutation-verified; six previously surviving combined pairs are now caught. **IB3A-CR02** (P3, open, record precision): the pre-commit red/green evidence cited for IB3A-R01..R07 is not independently reproducible because those corrections were squashed into `17e613d` before commit, so the final guards were verified by mutation instead. IB3A-N01..N04 are notes (freshness split-vs-direct divergence of 2.4e-48 relative at age 10,000, disclosed by the frozen evaluation string; thirteen classified survivors; the warning delta; the unreachable `_runtime_value` repr fallback). All four section-49 corrections accepted, two being genuine errors of this reviewer. No production module changed; no test removed or weakened. | Codex counter-reviews `94ea25c` and this record commit. `qc_symbol_id`, an official security master, authenticated amendment supersession, an authoritative calendar, and an authorized role taxonomy remain deferred. Full IB-2 and canonical IB-3 remain incomplete; no milestone started. |
 | 2026-09-14 | Codex counter-review | `4c834e1` -> this counter-review commit | Claude IB-3A review counter-review; next milestone held for owner choice | Fast-forwarded without switching, reviewed `94ea25c` and `4c834e1` in order, reproduced a caller-alias/ABA P2 plus impossible standalone breadth and raw-score identity P2s, corrected them with validated factory-bound snapshots and exact necessary envelopes, pinned the independently load-bearing final seal, and corrected numeric-policy wording without changing formula arithmetic. No later milestone was implemented because the blueprint does not freeze a unique cross-sectional normalization policy. | Focused corrected IB-3A **177 passed**; lane/boundary **1,443 passed, 8 skipped**; complete repository **2 shared-EOL failures, 7,672 passed, 15 skipped**; compileall 0. Deterministic final-seal deletion mutant failed red; 500 valid randomized batches passed independently. No external data or operations; **0 research looks**. | `94ea25c` and `4c834e1` accepted after correction. IB3A-CCR01..CCR08 are closed; Claude's IB3A-CR02 remains open as retained record precision. `IBSH-CCR08` records the two shared/out-of-lane EOL failures without fixing them. The next code slice is an owner choice, not a P0-P3 defect. | Commit and make the round's one push. Owner chooses synthetic IB-3B policy or canonical IB-2 authority work before implementation resumes; Claude reviews this exact pushed counter-review snapshot. |
 | 2026-09-14 | Claude review | `c5aec62d` -> this review record | Review of the single Codex counter-review commit closing the IB-3A gaps (`4c834e11..c5aec62d`): factory-bound snapshots and alias/ABA closure, breadth and raw-score envelopes, the load-bearing final seal, the 772/774 width correction, and the age-10,000 freshness wording | Reproduced every section-52 row independently: derivations for each envelope clause, a 300-batch/1,106-event randomized valid-input oracle with zero refusals, the 772/774 arithmetic, the age-10,000 50-digit projection against a 400-digit oracle, both blob SHA-256s, and the two shared CRLF paths. Ten targeted mutants of the corrections: nine caught, one (the upper-total envelope) survived because the existing case forged total and largest together; an isolating regression now catches it alone. Full detail in section 53. | Focused 177 passed; lane/boundary gate 1,374 + 69 = 1,443 passed, 8 skipped; compileall exit 0; `git diff --check` clean; complete repository suite 2 failed, 7,673 passed, 15 skipped, 25 warnings in 2,616.41s (0:43:36), the only failures being the two shared CRLF working copies recorded as `IBSH-CCR08`; module restored byte-identical after every mutant. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**; 27 authority flags false; `stock_score` None. | Accepted after correction. Findings are in section 53.6. IB-3B not started; the section 52.5 owner-decision register is returned unchanged. | Codex counter-reviews this review commit. No milestone authorized. |
+| 2026-09-17 | Codex counter-review + implementation | `4dbafe0` -> `04f939b` counter-review; `fd0d7f6` IB-3B code snapshot; this record commit follows | Claude IB-3A correction counter-review plus owner-approved synthetic IB-3B normalization diagnostics | Accepted both Claude commits after append-only P3 evidence corrections, then added a sealed caller-declared cohort model, exact IB-3A signal replay, structural-zero inclusion, named exclusions/refusal, Type-7 1%/99% winsorization, population-z diagnostics, and deferred canonical score/rank/seed fields. | Focused IB-3B **37 passed**; combined IB-3A/IB-3B **216 passed**; lane gate **1,473 passed, 8 skipped**; eight intended mutants killed; 10,000 randomized/boundary probes found no false refusal; compile/diff/final checks recorded in section 55. The owner directed that the completed lane gate is sufficient, so the started repository-wide run was interrupted and is not evidence. No external or outcome access; **0 research looks**. | No P0-P2 finding remains. Numerical false-refusal and standalone-seal findings are closed in section 55; one non-blocking P3 lower-variance standalone-identity limitation is retained, while exact parent-result replay remains authoritative. | Commit this record and make the round's single push. Claude reviews every commit after `4dbafe0`. Owner next chooses a separately frozen synthetic ranking/seed milestone or canonical IB-2 authority completion; neither is inferred here. |
+
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -7015,3 +7017,161 @@ This resolves section 52.5's sequence and numerical-policy gates. The next
 authorized action is bounded, fixture-only IB-3B normalization diagnostics.
 The approval grants no canonical score, ranking, seed, real data, provider,
 outcome, QC, paper, live, deployment, or trading authority.
+
+## 55. Codex implementation - synthetic IB-3B normalization diagnostics (2026-09-17)
+
+Codex worked only in
+`C:\git\customizedAgent\trading_agent_insider` on the existing
+`codex/strategy-insider-buying` branch. No branch or worktree was created or
+switched. The prior Claude commits were counter-reviewed and committed first
+as `04f939b108000bde1d9b8f42c0856e7efc2ddc33`; the implementation snapshot is
+`fd0d7f6`. Project-wide coordination documents remained frozen.
+
+### 55.1 Scope and authority
+
+This milestone implements only the synthetic, caller-declared, offline IB-3B
+policy approved in section 54.4. It does not claim that its population is the
+canonical market population and it does not produce a canonical stock score,
+rank, or seed selection. All 27 Boolean authority fields remain exact `False`,
+both look counters remain exact integer zero, and every output identifies its
+population as caller-declared and canonical-population verification as false.
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
+security master, outcome, ETF holding, QuantConnect, broker, operator database,
+scheduler, deployment, capital, order, or trading surface was accessed.
+**Research looks: 0.**
+
+### 55.2 Implemented contract
+
+- Added
+  `research/insider_buying/form4_stock_signal_normalization_diagnostics.py`
+  and explicit package exports. The public builder accepts only a nonempty,
+  bounded exact tuple of sealed synthetic observations.
+- Added five named row dispositions: positive IB-3A signal, explicit
+  structural zero, excluded ineligible, excluded missing, and whole-cohort
+  refusal for an eligible row missing its score. Excluded rows remain in the
+  retained result and cannot silently help satisfy minimum `N`.
+- Every positive observation replays an exact factory-bound IB-3A formula
+  artifact before its source is serialized or hashed. Stock keys, source IDs,
+  observation IDs, canonical order, caller aliases, and post-construction
+  mutation are sealed and rechecked.
+- The numerical kernel projects every usable value into an isolated 50-digit
+  `ROUND_HALF_EVEN` context, sorts by value, calculates type-7 linear 1st and
+  99th percentiles, winsorizes by value, and uses denominator `N` for population
+  variance. The stable mean is calculated by summing 50-digit offsets from the
+  sorted minimum, applying one division, and clamping only against the proven
+  input range; squared deviations retain deterministic sequential context
+  reduction. This exact arithmetic order is in the pinned policy payload.
+- Fewer than 20 usable names produces the named insufficient-cohort outcome.
+  Fewer than two distinct post-winsor values or exact zero dispersion produces
+  the named zero-dispersion outcome, with no epsilon and no substituted score.
+- Results retain the complete observation and row inventories, summary
+  statistics, hashes, evaluation session, builder commit, and a hash-bound
+  identity. Nested rows explicitly rely on the parent result for cohort
+  provenance. `stock_score`, `ranking`/`rank`, and seed fields are hard `None`.
+- Bounds are explicit: at most 10,000 rows, 128-character canonical text,
+  1,024 Decimal coefficient digits, and absolute Decimal exponent at most
+  2,048. No network, provider, outcome, execution, or hidden consumer import
+  exists in the module.
+
+The final pinned policy hash is
+`6705744ca9df421f4f96f955a3a4e850570806ac5b1059ad79488f36d14ffd04`.
+
+### 55.3 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3B-R01 | P2 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Identity Type-7 zero-mass checks | Early blanket rules refused every mixed positive/structural-zero zero-dispersion cohort, but a valid N=101 cohort with 100 zeros clips its one positive signal to a zero 99th percentile. Conversely, standalone identities could claim cutoffs and means impossible for their signal/zero counts. | Public N=101 reproduced the false refusal. Forged N=20 and N=101 identities reproduced lower-cutoff, upper-cutoff, and category-mean false acceptance. | Structural-zero mass determines whether each type-7 interpolation endpoint is zero; categorical means also have an exact replayable maximum. | Replaced blanket rules with exact integer type-7 zero-mass boundary checks, a positive-zero-dispersion boundary, a same-context category-count mean cap, and a distinct-value count cap. | Public N=101 cohorts in both heavy-zero and heavy-positive directions pass; isolated lower/upper guard mutants fail their dedicated cases; exact boundaries through N=10,000 and 5,000 randomized zero-mass probes found no false refusal. |
+| IB3B-R02 | P2 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Standalone variance plausibility guards | Tight Bhatia-Davis and endpoint-floor comparisons were mathematically correct for exact arithmetic but unsound against the approved rounded moment algorithm; valid output could differ by one final-place unit. | Public N=32 and N=53 IB-3A-derived cohorts independently reproduced opposite-direction false refusals. | A replay guard must never reject a result emitted by the public kernel. | Removed both tight comparisons. Retained only a deliberately loose upward-rounded `range^2` cap, four times the exact population-variance maximum, to reject gross forgeries without one-ulp sensitivity. | Both former false-refusal cohorts pass; 5,000 randomized cap probes produced zero false refusals; neutralizing the coarse cap makes the gross-variance forgery test fail. |
+| IB3B-R03 | P2 | **CLOSED in `fd0d7f6`** | Pre-commit audit | `_compute_normalization` mean reduction | Raw sequential summation of large, nearly equal 50-digit scores drifted outside the winsorized range. A constant public cohort could receive tiny nonzero variance, and a two-value cohort one ulp apart was refused by its own identity. | Twenty identical `$50,000` IB-3A scores and ten each of `$50,000` and `$50,000 + 1e-45` reproduced the defect. | The 50-digit policy requires stable, deterministic output, not an order-induced violation of `lower <= mean <= upper`. | Replaced raw-value summation with sorted minimum-anchored offset summation in the same isolated context, one division, and a range clamp; bound the method in policy provenance and hash. | Both public regressions pass; changing the anchor back to zero kills the dedicated boundary test; 5,000 randomized centered-mean probes found no false refusal. |
+| IB3B-R04 | P2 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Standalone identity replay | Factory-token replay initially accepted impossible outcome/count/statistic shapes, including N=20 as insufficient, positive variance under a zero-dispersion outcome, over-bound counts, incompatible all-zero availability, excessive distinct counts, and inconsistent mean/cutoff/standard-deviation relationships. | Each shape was constructed with a recomputed identity hash and replayed directly. | A hash alone proves internal serialization, not semantic possibility; nested metadata must still fail closed under replay. | Added exact outcome partitions, count equations and bounds, 50-digit summary validation, cutoff ordering, mean range, `sqrt(variance)` equality, availability gates, all-zero and positive-signal constraints, category/distinct bounds, and the coarse variance cap. | Dedicated standalone identity cases pass; lower/upper zero-mass and coarse-cap deletion mutants are killed. |
+| IB3B-R05 | P2 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Observation, row, and identity constructors | Python integers and `str` subclasses could reach Decimal/string operations before controlled validation; some forged row shapes raised incidental `AttributeError` rather than the contract error. | An integer structural zero, integer normalized z-score, and subclassed version/hash reproduced the uncontrolled paths. | Public and replay surfaces must reject wrong exact types deterministically. | Added exact `Decimal`, `str`, enum, bool, integer, finite-value, and 50-digit derived-output preflights before value-specific operations. | Exact-type dangerous-direction cases now raise `Form4StockSignalNormalizationDiagnosticsError`; focused suite passes. |
+| IB3B-R06 | P2 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Positive-signal source replay | Source serialization/hashing could run before exact IB-3A replay, and the optional source diagnostics ID was not fully bound. | Adversarial source objects and mismatched source IDs reached the wrong layer in early probes. | Untrusted source material must be bounded and authenticated before expensive or implicit behavior. | Preflight and replay the exact IB-3A artifact first, validate the source ID as exact SHA-256 text when supplied, then serialize only the validated artifact payload. | A monkeypatched serialization tripwire proves replay/preflight happens first; mismatch and tamper cases refuse. |
+| IB3B-R07 | P2 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Resource-policy replay | A coherent rebind of row/text/Decimal limits could escape a merely self-consistent hash, and the private kernel initially lacked its own row-count bound. | Rebinding each constant and calling the public/replay surfaces reproduced the gap. | Bounded offline artifacts must not let mutable module constants silently redefine their resource authority. | `_require_frozen_policy` now pins every resource literal and the kernel independently preflights tuple shape and maximum rows. | Parameterized coherent-rebind tests and the over-bound kernel test pass. |
+| IB3B-R08 | P3 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Policy provenance | The first policy payload did not state input projection or moment-reduction order, so numerically different 50-digit implementations could share a policy identity. | Reviewing the payload against the actual operation sequence exposed the omission. | Reproducibility requires the arithmetic sequence, not only precision and rounding mode. | Added exact input-projection, centered moment-reduction, and square-root descriptors to the frozen payload and pinned hash. | Policy-payload/hash assertions pass; coherent policy mutation refuses. |
+| IB3B-R09 | P3 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Deferred canonical fields | Constructor coverage initially mutated only one of three deferred fields on each row/result, allowing sibling clauses to be deleted without an isolated test. | Test sensitivity review identified row score/seed and result ranking/seed gaps. | Every hard-unavailable canonical field must remain load-bearing. | Parameterized all three row fields and all three result fields with non-`None` forgeries. | Every mutation is refused before hash/result replay; focused suite passes. |
+| IB3B-R10 | P3 | **CLOSED in `fd0d7f6`** | Reverse-mutation audit | Constant-cohort shortcut | After the centered mean correction, disabling the special constant shortcut left its regression green; the branch and its policy wording had become redundant. | The shortcut-neutralization mutant passed. | Dead policy branches create false claims of protected behavior. | Removed the shortcut and simplified the frozen reduction descriptor; the centered kernel produces exact constant mean/zero variance directly. | Constant public cohort remains green and the final policy hash is pinned. |
+| IB3B-R11 | P3 | **OPEN - accepted non-blocking nested-identity limitation** | `fd0d7f6` | Standalone identity lower-variance plausibility | A caller with access to the private identity token can coherently claim an extremely small positive variance across a wide range; no loose lower plausibility bound is retained. | Independent audit forged such a standalone identity. Exact parent-result replay recomputes the kernel and rejects it. | Tight lower bounds already caused valid one-ulp false refusals. A factor-slack lower guard is optional hardening, while the identity is nested, factory-token gated, non-authoritative metadata and the complete result is the public artifact. | No code change in this round. Retain the limitation explicitly; do not weaken or bypass parent-result replay. | Full result replay is covered; no P0-P2 remains and the independent audit recommends this item not block IB-3B. |
+| IB3B-R12 | P3 | **REJECTED - not a defect** | Pre-commit audit | Signal row winsorized value | An early hypothesis said a positive raw signal could never have a zero winsorized value. | With more than 99% structural-zero mass, the type-7 99th percentile is exactly zero and the positive outlier legitimately clips to zero. | Rejecting this row would recreate IB3B-R01's valid heavy-zero false refusal. | No positive-winsorized-value guard was added. Added a public N=101 regression that requires the signal row to retain a zero winsorized diagnostic. | The public result is the named zero-dispersion outcome and all parent replay checks pass. |
+| IB3B-R13 | P3 | **CLOSED in `fd0d7f6`** | Pre-commit audit | Nested row provenance | A normalized row alone does not carry cohort policy/session/statistics, which could be mistaken for a standalone scored artifact. | Artifact-topology review traced the row only through its parent inventory and identity. | The intended atomic artifact boundary must be explicit. | Documented the row as nested metadata whose parent result binds policy, session, full inventory, and cohort statistics; canonical score/rank/seed remain absent. | Result replay rebuilds and compares every row and both inventory hashes. |
+
+No P0, P1, or open P2 finding remains. `IB3B-R11` is the only retained open
+lane finding and does not grant any consumer or trading authority.
+
+### 55.4 Validation and mutation evidence
+
+- Focused IB-3B suite: **37 passed**.
+- Combined IB-3A and IB-3B suites: **216 passed**.
+- Complete Insider lane/boundary gate (all `test_insider_buying_*.py` plus
+  active-document, module-hygiene, and overlay-import boundary tests):
+  **1,473 passed, 8 skipped in 300.30s (0:05:00)**.
+- Independent adversarial audit: **5,000** randomized centered-mean/zero-mass
+  cases plus exact type-7 boundaries at N=101, 102, 999, 1,000, 1,001, 9,999,
+  and 10,000; and **5,000** randomized coarse-cap cases. Zero valid public
+  result was refused. Final disposition: no remaining P0-P2 finding.
+- Eight intended reverse mutants were killed and restored: type-7 `(N-1)`,
+  denominator `N`, centered anchor, eligible-missing refusal, post-result input
+  seal, coarse variance cap, lower zero-mass guard, and upper zero-mass guard.
+  A ninth mutation showed the constant shortcut was redundant; that branch was
+  removed rather than falsely counted as protected.
+- Source and test SHA-256 after final mutation restoration were
+  `0f7f726726c83a4de127327233174da9e17353436d2176f7400140cc6f90dcdd`
+  and `cf895af0a8c4827aa3d9cc4a6bfd236caccd118bf33ce870edefb4079597d178`
+  before Git's normal Windows line-ending conversion.
+- Final active-document suite: **69 passed**. Final compileall over the Insider
+  research package and focused test: **exit 0**. `git diff --check`: clean.
+- The owner directed that the completed lane suite is sufficient. A newly
+  started repository-wide run was interrupted immediately and is explicitly
+  **not** represented as validation evidence. The previously retained
+  shared/out-of-lane `IBSH-CCR08` finding was not changed or fixed.
+
+### 55.5 Files and commits
+
+- Counter-review checkpoint: `04f939b108000bde1d9b8f42c0856e7efc2ddc33`.
+- IB-3B implementation: `fd0d7f6`.
+- Added:
+  `research/insider_buying/form4_stock_signal_normalization_diagnostics.py` and
+  `tests/test_insider_buying_form4_stock_signal_normalization_diagnostics.py`.
+- Updated only `research/insider_buying/__init__.py` and this lane record.
+- This record-only commit follows `fd0d7f6`; the complete range receives one
+  push after final local and live-remote checks.
+
+### 55.6 Next bounded step and owner decisions
+
+IB-3B is complete as synthetic diagnostic evidence. The next code milestone is
+not inferred. The owner must choose and freeze one of these paths:
+
+1. a synthetic IB-3C ranking/seed diagnostic, including percentile selection,
+   top-decile rounding, boundary ties, minimum seed count, and continued hard
+   absence of canonical score/outcome/QC authority; or
+2. canonical IB-2 authority completion: authoritative point-in-time security
+   master and durable `qc_symbol_id`, authenticated amendment completeness and
+   supersession, ordinary-equity/manual-exception dictionary, normalized role
+   taxonomy, and authoritative trading-calendar/acceptance-session mapping.
+
+Any later real-data or QC backtest still separately requires provider/data
+scope and entitlement, immutable data vintage/cutoff, outcome and permanent
+look-ID allocation, and explicit QC job/upload/artifact authority. Paper/live,
+broker, capital, scheduler, operator-database, monitoring, and trading authority
+remain later independent approvals.
+
+### 55.7 Copyable Claude review handoff
+
+Claude should fast-forward the same
+`C:\git\customizedAgent\trading_agent_insider` worktree on
+`codex/strategy-insider-buying` without switching branches and review every
+commit in the exact pushed range `4dbafe07..HEAD`. Review `04f939b` as the
+two-commit IB-3A counter-review disposition, `fd0d7f6` as the synthetic IB-3B
+implementation, and the immediately following record commit. Reproduce the
+section 55 ledger, especially the N=20 constant/adjacent-score cases, public
+N=32/N=53 one-ulp variance cases, N=101 heavy-zero and heavy-positive type-7
+boundaries, eligible-missing whole-cohort refusal, exact IB-3A replay,
+standalone cutoff/count/mean/variance guards, caller detachment/final sealing,
+all deferred `None` fields, zero authority, and the eight killed mutations.
+Re-run the 37 focused, 216 combined, and 1,473/8 lane-gate claims. Treat
+`IB3B-R11` as an explicit non-blocking P3 limitation and verify that complete
+parent-result replay closes it. Apply only Insider-lane corrections; document
+shared/out-of-lane findings without fixing them. Do not access providers,
+licensed rows, outcomes, QC, broker, deployment, paper/live, or trading
+surfaces. Update only this lane record, commit on the same branch, and make the
+review round's one push; Codex then counter-reviews every Claude commit.

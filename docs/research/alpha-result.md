@@ -2426,3 +2426,42 @@ and carry this policy explicitly. R-091 through R-098 are reserved as fresh
 technical successors, starting from **79 shared looks, 22 development
 evaluations, 27 infrastructure looks, and a 591-cell floor**. Exact physical
 identities must be committed before any external action.
+
+## R-091 through R-098 — corrected market-cap matrix and leverage diagnostics (PREREGISTERED; UNRUN) — 2026-09-17
+
+These are fresh technical successors after R-083's zero-cell runtime refusal.
+All eight are committed before external action. The common package SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`;
+the common host-closure SHA-256 is
+`7b940f4e3750a1929db388ce12c80113bf6faceea87e03ad23ae579cab29b164`.
+
+| Run | Fixed profile and SHA-256 | Exact private project / backtest | Projection ID / SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|---|
+| R-091 | `arv2-market-cap-stock-qqq-2021-2025-v2` / `71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178` | `39 ARV2_MARKET_CAP_QQQ_R091_2021_2025 - 20260917` / `ARV2 R091 market-cap QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-18fdadac5cb448b213806815` / `18fdadac5cb448b21380681554f991be5cbdead42e06f69c59ef46e99cc6ac6b` | `abec99591d1c2e0996ad0806d366cc9cedf4f679969ea1645cc0edb187ba4c9f` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-351f3e6c8a1625d295eea49a` / `351f3e6c8a1625d295eea49ac18179469ee3f7d8cbaa0e06e125e936978748bd` |
+| R-092 | `arv2-market-cap-stock-spy-2021-2025-v2` / `0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d` | `40 ARV2_MARKET_CAP_SPY_R092_2021_2025 - 20260917` / `ARV2 R092 market-cap SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-932e7d229cbf429a7af231be` / `932e7d229cbf429a7af231bed0583a92c0b1a0937cb15e4012059772518de092` | `3bbf168d3d13403e3437020fcbbfc72b67ef6bad263118acb7080e6b69e1e870` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-a5e6ee4c9ba783ab577cb95c` / `a5e6ee4c9ba783ab577cb95c14c415bbf6be8671b82644f4721585ae06a4a99c` |
+| R-093 | `arv2-market-cap-stock-qqq-2019-2023-v2` / `661d87e282f6c37cc258db7a3e814e5a261369209fc3fc4a96c1769edd71f83d` | `41 ARV2_MARKET_CAP_QQQ_R093_2019_2023 - 20260917` / `ARV2 R093 market-cap QQQ 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-633a2c795eabe6f6a256941a` / `633a2c795eabe6f6a256941a425e0a74903752cb5b4fe034b389faf31186f419` | `7584ee6347ef889bdcb1fc9fb38f6a3aa7ce68ecd31e9476ce80242b81772b90` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-698709a4f82df7539b1e8458` / `698709a4f82df7539b1e84585d6d51b2927f36ec6098dc1805057e859f150076` |
+| R-094 | `arv2-market-cap-stock-spy-2019-2023-v2` / `72a4b469d7f8fa79ea4ea62836b6b43000069b5e0a7dca6941af00124ca68f4a` | `42 ARV2_MARKET_CAP_SPY_R094_2019_2023 - 20260917` / `ARV2 R094 market-cap SPY 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-7ff8241567e40c3f4d562f35` / `7ff8241567e40c3f4d562f35990d39324cefdde0303d799a60f19a77f9cd1454` | `289faa5cda77982131097b496c84a5b82d66a59fc7cc31f602dda1cc3e493a39` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-821f783530f5ab6eaf88e73d` / `821f783530f5ab6eaf88e73d54794a5a290e881a4a8d138c844e51b043b001ad` |
+| R-095 | `arv2-market-cap-stock-qqq-2023-2025-v2` / `da7f4c75b9504c02f209362d2aebf69188d32cf608ac167fd543beb196067f93` | `43 ARV2_MARKET_CAP_QQQ_R095_2023_2025 - 20260917` / `ARV2 R095 market-cap QQQ 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-d81b0ae9587127588edf57e0` / `d81b0ae9587127588edf57e0885327b79017bb89c6ba91f1a873075b9b9a99e8` | `09bf5ff8bca26e6ed0651b6b5e330a720ac29102f3d96006a257f70c017a745a` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-fd1167f40d0a2930d06a2b17` / `fd1167f40d0a2930d06a2b1727de002015139d1efcad29b23b2618dc77d36550` |
+| R-096 | `arv2-market-cap-stock-spy-2023-2025-v2` / `e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3` | `44 ARV2_MARKET_CAP_SPY_R096_2023_2025 - 20260917` / `ARV2 R096 market-cap SPY 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-f14bf8d0971f524918486cc3` / `f14bf8d0971f524918486cc398e1740cc591e36d93b34f71d3e881f2eba5cbdc` | `1f69f61835eab8ddf4af69aaf6b87761a2a489737f008055de55e5ca25883562` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-fda4d07a8cf411cdf0bd52d3` / `fda4d07a8cf411cdf0bd52d3b5dff55f8ab6241010981f8066cec7ac582cfb4c` |
+| R-097 | `arv2-objective-synthetic-leverage-qqq-2021-2025-v2` / `a800d1db535ca22fa1bcfc238fbcfabbb463e21b18cf3fc384b606542878192e` | `45 ARV2_LEVERAGE_QQQ_R097_2021_2025 - 20260917` / `ARV2 R097 synthetic 2x3x QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-c0219bb1e02b54a6e143feed` / `c0219bb1e02b54a6e143feedd02df52c933449c84f0f76f9389a8b9af9dc177a` | `5959a840f122571457dc89825a304da3a93f5e6121c6c4a6585a3557577175d9` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-24013e4ea723a3e4a44155b9` / `24013e4ea723a3e4a44155b96b6000f6032f6946e952fbe6980cd3350e0312a7` |
+| R-098 | `arv2-objective-synthetic-leverage-spy-2021-2025-v2` / `07106d52bed121064659b97173f66d1776adf5e72f0f231600d2b7b53299a014` | `46 ARV2_LEVERAGE_SPY_R098_2021_2025 - 20260917` / `ARV2 R098 synthetic 2x3x SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-bccf6d655077c63d8541a873` / `bccf6d655077c63d8541a8735bd243f0f990f4184b9bdcd3f14da30b83de967f` | `57e2f557101849a91dcab7fa17e2c56028a379d800e03e710db574a6f7fd4ddd` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-0b70a4cee19ddc24c6d8f295` / `0b70a4cee19ddc24c6d8f295c41e6dbbab43f836e018b9e47ca2e40a39802eb3` |
+
+Control directories are respectively
+`artifacts/analyst_revisions_v2/accepted_risk_market_cap_r091_20260917_01`
+through `...r096_20260917_01`, then
+`artifacts/analyst_revisions_v2/accepted_risk_leverage_r097_20260917_01`
+and `...r098_20260917_01`. R-091 through R-096 execute first in order;
+R-097/R-098 follow only after the unlevered sequence. The frozen overlap,
+effective-breadth, zero-recovery, matched-comparator, and no-leverage-direction
+interpretation rules from the R-083--R-090 block carry forward unchanged.
+
+Accounting transitions by launch/result are: R-091 **79 -> 80 / 22 -> 23 /
+591 -> 595**, R-092 **80 -> 81 / 23 -> 24 / 595 -> 599**, R-093 **81 -> 82 /
+24 -> 25 / 599 -> 603**, R-094 **82 -> 83 / 25 -> 26 / 603 -> 607**,
+R-095 **83 -> 84 / 26 -> 27 / 607 -> 611**, R-096 **84 -> 85 / 27 -> 28 /
+611 -> 615**, R-097 **85 -> 86 / 28 -> 29 / 615 -> 619**, and R-098
+**86 -> 87 / 29 -> 30 / 619 -> 623** for shared looks / development
+evaluations / cell floor. Infrastructure looks remain 27. A launch spends its
+look and evaluation even if it refuses; cells accrue only from an authenticated
+aggregate result. No raw rows, identifiers, prices, logs, charts, holdings,
+orders, deployment, broker access, paper/live state, or trading is authorized.

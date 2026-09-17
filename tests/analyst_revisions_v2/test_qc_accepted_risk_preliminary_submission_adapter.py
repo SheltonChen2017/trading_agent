@@ -58,13 +58,13 @@ _EXPECTED_LOOK_ACCOUNTING = {
     "infrastructure_looks_after": 23,
     "authenticated_infrastructure_look_count": 23,
     "infrastructure_look_ledger_id": (
-        "arv2-infrastructure-look-ledger-11987a12b72d06ea612b442e"
+        "arv2-infrastructure-look-ledger-4a726bcdd9b7232f34a1eaf8"
     ),
     "infrastructure_look_ledger_hash": (
-        "11987a12b72d06ea612b442e342ce0b1d2f28c503f0a3b1ca2cf721d8aaa7810"
+        "4a726bcdd9b7232f34a1eaf891f7b8f83334002396aa48720b19abd22391305e"
     ),
     "infrastructure_look_ledger_artifact_sha256": (
-        "b1018c54128b9cea5ff0c960e0c6adeab803b085b9dde359f323246d0f82e802"
+        "e837946d6fe9d31f16d4a901f878e965036f6931f8ed5bb1806fdb5a1c83cdd9"
     ),
     "permanent_looks_before": 0,
     "permanent_looks_after": 0,

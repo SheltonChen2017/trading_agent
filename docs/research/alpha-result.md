@@ -2154,3 +2154,188 @@ absent, and these descriptive same-window results cannot select a winner or
 authorize tuning, leverage, promotion, deployment, broker access, orders,
 paper/live state or trading. Accounting is now **74 shared looks, 21 ARV2
 development evaluations, 23 infrastructure looks and a 591-cell floor**.
+
+## R-079 — Analyst Revisions V2 sampled PIT market-cap and ETF-membership coverage canary (PREREGISTERED; OUTCOME-FREE)
+
+R-079 is the next shared run-level entry if and only if the fresh canary reaches
+`backtests/create`. It is an outcome-free infrastructure diagnostic over
+sixteen preregistered 2025/2026 sessions. It may durably return only aggregate
+fundamental, positive-market-cap, SPY-membership, QQQ-membership and
+SOXX-membership counts plus bounded collection-availability timestamps. It
+cannot read or report prices, returns, statistics, charts, orders, holdings,
+security identifiers, constituent weights, raw market-cap values, or provider
+rows.
+
+The earlier submission identity created QC project `36642921` but refused on
+the platform-created `research.ipynb` before source upload, compile, or
+backtest launch. It therefore has no R-number and consumes no look. The fresh
+retry is project
+`26 ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE_RETRY - 20260917`, backtest
+`ARV2 outcome-free PIT market-cap and ETF-membership coverage retry 1`,
+projection
+`arv2-pit-market-cap-membership-projection-fc7b6963a4b665bcc16999fa`
+(SHA-256
+`fc7b6963a4b665bcc16999fa5543c314a9c284228d9e994c15590b90437c150b`),
+and submission plan
+`arv2-pit-market-cap-membership-probe-plan-b5d4385ef36764121aaf23ae`
+(SHA-256
+`b5d4385ef36764121aaf23ae4df4a4c08bca46a6137f6c8f3b047f207237698f`).
+This block is frozen before permit spend.
+
+Once launched, R-079 moves shared looks **74 -> 75** and infrastructure looks
+**23 -> 24**, even if its terminal state is a named refusal or runtime error.
+ARV2 development evaluations remain **21** and the lifetime alpha-cell floor
+remains **591**. No R-079 result may select a strategy, tune an economic rule,
+or unlock an outcome run, leverage, deployment, broker access, orders,
+paper/live state, or trading.
+
+## R-079 disposition and R-080 outcome-free summary-channel successor — 2026-09-17
+
+R-079 launched once in private QC project `36643367`, backtest
+`a2b58090c188fd040217af6c302751b8`, and reached authenticated `Completed.`
+after one statistics-free poll. Launch and terminal SHA-256 values are
+`334ec5d733f9fb40cb6a32f3d38da23539d64f6a3d6258be9b342c83f70fb300`
+and `ce92a3e69a21808e79fc379885ee8cd344064b68cee5fb6bd2138ec3cf6a4174`.
+The permitted API Object Store export then returned `success:false` before any
+bytes were delivered; a metadata-only check showed that the 798-byte terminal
+pointer exists inside QC. The output permit is consumed. R-079 spends shared
+look **74 -> 75** and infrastructure look **23 -> 24**, but yields no selected
+count, price, return, outcome, order, identifier or raw provider value. Its
+status is completed-run/output-unavailable, not coverage success or failure.
+
+The locally signed project-27 candidate made no permit, network call, project,
+compile, backtest or look and is superseded unspent. Fresh **R-080** is
+preregistered before any external action. It repeats the same sixteen sampled
+sessions under private project `28 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R080
+- 20260917`, backtest `ARV2 R080 outcome-free PIT market-cap and ETF-membership
+summary`, projection
+`arv2-pit-market-cap-membership-projection-6e4128b67ff7604551bf263a`
+(SHA-256
+`6e4128b67ff7604551bf263a7730a02d247af28d0e37fab5fda966b6882e225f`),
+source-set SHA-256
+`d511993d530a2ac223d6d9c02fcb303b58ff7ca86f4ae7bbe76509752190ae13`,
+and submission-plan SHA-256
+`8786f8fb98c52cf4f2292e0b2b7f88c8f0fe774913b642d1340fa8ef7b16ac08`.
+
+On launch, R-080 moves shared looks **75 -> 76** and infrastructure looks **24
+-> 25**; development evaluations remain **21** and the cell floor remains
+**591**. The full receipt remains inside QC. One separately permitted
+`backtests/read` may select only the canonical, at-most-4,096-character
+`ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE` attestation. Success requires all
+sixteen sessions to have positive market-cap coverage plus nonempty and
+market-cap-covered SPY, QQQ and SOXX membership. The attestation may contain
+only aggregate counts, bounded availability extrema, lineage and internal
+object hashes/sizes; all raw rows, identifiers, weights, market-cap values,
+prices, returns, outcomes, orders and full-object export remain forbidden.
+R-080 cannot select a strategy, tune an economic rule, authorize leverage, or
+unlock deployment or trading.
+
+## R-080 disposition and R-081 corrected-timestamp successor — 2026-09-17
+
+R-080 launched once in private QC project `36644379`, backtest
+`3a9dbca993f41ac41177d2c15bb84450`, and reached authenticated `Completed.`
+after two statistics-free polls. Its one permitted `backtests/read` selected
+only a bounded named-refusal attestation, artifact SHA-256
+`0ca3b24f005475d912a8e74283aef112c9f93331991f8d97a8cc1441818bfcf3`:
+`pit_coverage_refused_ValueError_1b17331bb939b176`. The exact reviewed R-080
+runtime maps that digest to `ETF constituent row EndTime differs from
+collection`. No raw row, identifier, weight, market-cap value, price, return,
+outcome, holding or order was selected. R-080 is final and spends shared look
+**75 -> 76** and infrastructure look **24 -> 25**; development evaluations
+remain **21** and the cell floor remains **591**.
+
+That refusal is a runtime-semantics defect, not evidence of absent data. The
+corrected rule treats the unflattened history Series/multi-index collection
+timestamp as the sole availability time and never reads a constituent row's
+separate `EndTime`. Fresh outcome-free **R-081** is preregistered before any
+external action under project
+`29 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R081 - 20260917`, backtest
+`ARV2 R081 outcome-free PIT market-cap and ETF-membership summary retry 1`,
+contract SHA-256
+`32c0583525a2e3cbf677a5ac387b7cd589338146bd0bcaa03da3e0f2200b3525`,
+projection SHA-256
+`17d4cc56a0b3e2a28e442c74c4ff52bea1d57d45fa4cfd17c7da1b93c98887f3`,
+source-set SHA-256
+`db2cb863496f9c629361ad4fae68ab508bbc2fb30d46f1645dfb20582d420c34`,
+and submission-plan SHA-256
+`bfddaa18a7c11c38a6ec1b66f18a6904590b2bb71c67b00bf733525bd00838f8`.
+
+On launch, R-081 moves shared looks **76 -> 77** and infrastructure looks
+**25 -> 26**; development evaluations remain **21** and the cell floor
+remains **591**. It repeats the same sixteen sampled sessions and may select
+only the same bounded aggregate coverage attestation. It is not an alpha
+evaluation and grants no tuning, leverage, deployment or trading authority.
+
+## R-081 disposition and R-082 duplicate-SID coverage successor — 2026-09-17
+
+R-081 launched once in private QC project `36644829`, backtest
+`1cdc40ccd41877743ad907020a6e2e31`, and reached authenticated `Completed.`
+after two statistics-free polls. Its one permitted `backtests/read` selected
+only bounded named refusal
+`pit_coverage_refused_ValueError_bef7b6927d4aa871`, artifact SHA-256
+`4b12471d87f9a7ed918a6a292775e6bc2527deaabc27bda7b3e80c9a2a0af8a1`.
+The exact R-081 runtime resolves it to `fundamental collection duplicated an
+exact SID`. No raw row, identifier, weight, market-cap value, price, return,
+outcome, holding or order was selected. R-081 is final and spends shared look
+**76 -> 77** and infrastructure look **25 -> 26**; development evaluations
+remain **21** and the cell floor remains **591**.
+
+Fresh outcome-free **R-082** freezes a coverage-only duplicate policy before
+external action. Exact fundamental SIDs may collapse only when all repeated
+rows share one of four frozen coverage classes: positive, null, nonpositive,
+or invalid. Conflicting classes named-refuse; ETF duplicates still refuse.
+Duplicate values are neither compared with each other nor emitted, and this
+does not authorize production market-cap value selection. The v2 contract is
+`e402e58ac9073ee198654cdbc88267ff5795fb98ce9210172dbaf176cbc627d4`.
+The private project is
+`30 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R082 - 20260917`; the backtest is
+`ARV2 R082 outcome-free PIT market-cap and ETF-membership summary retry 2`.
+The plan is
+`arv2-pit-market-cap-membership-plan-c68f3356759c1d25abf324f3`
+(semantic SHA-256
+`108e035ecf8204501526de4fe7e8dac9390b004ef8fbb848a55a716a036a5990`,
+artifact SHA-256
+`97afe6f3b66afa2579737e040576f594ad365b5d85d2c72206f7a4d929d1cd6f`);
+the projection SHA-256 is
+`fb892cce42d48e658137843e5690177054c9b58470c7ee1937607b59591d6583`;
+the two-file source set SHA-256 is
+`9c71c5650813c4e9281f8746edd4ff2c658c1883a60f89d779cb75af6e7b812e`;
+the submission-plan SHA-256 is
+`dfdd5f9920bd245c72ed1609f696997f620cd2c4f40e0b62f897aa081b1b1ba9`;
+the review-claim semantic SHA-256 is
+`91d8b3ad867c6d53306b5dc5d308187691b739b245fd68260ac8982b00db2ee8`;
+and the unsigned execution-authority bytes SHA-256 is
+`d4ef0075939479f7b286c72017ee51cae35b16d2ad220aba6298b34330f5d0e9`.
+
+On launch, R-082 moves shared looks **77 -> 78** and infrastructure looks
+**26 -> 27**; development evaluations remain **21** and the cell floor
+remains **591**. It repeats the same sixteen sampled sessions and may select
+only the bounded aggregate v2 coverage attestation. It is not alpha evidence,
+does not authorize production market-cap ranking, and grants no tuning,
+leverage, deployment or trading authority.
+
+## R-082 completed PIT market-cap/membership coverage canary — 2026-09-17
+
+R-082 launched once in private QC project `36645473`, backtest
+`c90394212ee91c89f0428b3533de45d9`, and reached authenticated `Completed.`
+after one statistics-free poll. Its one permitted `backtests/read` selected
+only the 3,137-byte v2 aggregate attestation, artifact SHA-256
+`60e3e3185a301aec3de7b14d5f4ad58cd10dfc4b30c39d387083fea7db74895b`.
+All **16 of 16** sampled sessions passed. The canary processed 1,944,801
+source rows; aggregate fundamentals contained 169,080 rows and 169,078 exact
+SIDs, including two same-class redundant rows that the frozen v2 policy
+collapsed. It observed 74,405 positive-market-cap SIDs. Aggregate positive
+SPY/QQQ/SOXX membership was 8,434, with 8,200 market-cap covered and 234
+uncovered. Per-session member / covered ranges were SPY 501--503 / 494--497,
+QQQ 99--103 / 94--97, SOXX 30 / 24, and combined union 525--528 / 510--514.
+
+No individual SID, constituent weight, market-cap value, raw row, price,
+return, outcome, order, holding or portfolio statistic was emitted or read.
+This is positive physical-coverage evidence for building the later continuous
+point-in-time input; it is not alpha evidence and does not itself authorize a
+market-cap-ranked strategy run. R-082 spends shared look **77 -> 78** and
+infrastructure look **26 -> 27**. The append-only infrastructure ledger is now
+sequence 6, ledger SHA-256
+`4a726bcdd9b7232f34a1eaf891f7b8f83334002396aa48720b19abd22391305e`,
+artifact SHA-256
+`e837946d6fe9d31f16d4a901f878e965036f6931f8ed5bb1806fdb5a1c83cdd9`.

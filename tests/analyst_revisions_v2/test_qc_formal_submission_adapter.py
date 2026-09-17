@@ -1065,6 +1065,7 @@ def test_formal_action_guard_survives_all_exact_downstream_claims(
 ):
     claim_names = (
         "_claim_fundamental_discovery_transport_capability_minter",
+        "_claim_pit_market_cap_membership_probe_transport_capability_minter",
         "_claim_preopen_transport_capability_minter",
         "_claim_preopen_physical_upload_transport_capability_minter",
         "_claim_preopen_prereview_transport_capability_minter",
@@ -1074,6 +1075,8 @@ def test_formal_action_guard_survives_all_exact_downstream_claims(
     for module_name in (
         "research.analyst_revisions_v2_qc."
         "fundamental_universe_discovery_submission_adapter",
+        "research.analyst_revisions_v2_qc."
+        "pit_market_cap_membership_probe_submission_adapter",
         "research.analyst_revisions_v2_qc.preopen_control_submission_adapter",
         "research.analyst_revisions_v2_qc."
         "physical_preopen_submission_adapter",

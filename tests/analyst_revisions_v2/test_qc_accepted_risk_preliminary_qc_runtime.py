@@ -442,6 +442,7 @@ def test_constituent_history_same_decision_midnight_is_not_prior_evidence():
     row = _binding()
     stock = _Symbol("QC STOCK SID", "NOW")
     decision_midnight = datetime(2021, 1, 4)
+    non_authoritative_row_end_time = datetime(2021, 1, 2)
     loader, _algorithm, _universes = _constituent_loader(
         stock_portfolio_evaluator.SP500_PROFILE_ID,
         [row],
@@ -450,7 +451,7 @@ def test_constituent_history_same_decision_midnight_is_not_prior_evidence():
             "SPY": (
                 (
                     decision_midnight,
-                    (_constituent(stock, decision_midnight, "1"),),
+                    (_constituent(stock, non_authoritative_row_end_time, "1"),),
                 ),
             )
         },
@@ -1237,29 +1238,35 @@ def test_constituent_history_refuses_malformed_or_nonfinite_weight(weight, messa
         loader.build_eligibility(("2021-01-04",))
 
 
-def test_constituent_history_refuses_row_endtime_different_from_collection():
+def test_constituent_history_does_not_read_non_authoritative_row_endtime():
+    class HostileEndTime:
+        symbol = _Symbol("QC STOCK SID", "NOW")
+        weight = "1"
+
+        @property
+        def end_time(self):
+            raise AssertionError("row EndTime must remain unread")
+
     row = _binding()
-    stock = _Symbol("QC STOCK SID", "NOW")
+    constituent = HostileEndTime()
     collection = datetime(2021, 1, 2)
     loader, _algorithm, _universes = _constituent_loader(
         stock_portfolio_evaluator.SP500_PROFILE_ID,
         [row],
-        [stock],
+        [constituent.symbol],
         {
             "SPY": (
                 (
                     collection,
-                    (_constituent(stock, datetime(2021, 1, 1), "1"),),
+                    (constituent,),
                 ),
             )
         },
     )
 
-    with pytest.raises(
-        runtime.AcceptedRiskPreliminaryQcRuntimeError,
-        match="EndTime differs from collection",
-    ):
-        loader.build_eligibility(("2021-01-04",))
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
 
 
 @pytest.mark.parametrize(

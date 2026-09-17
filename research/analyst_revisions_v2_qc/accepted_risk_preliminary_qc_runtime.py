@@ -940,20 +940,12 @@ class QcEtfConstituentEligibilityLoader:
         mapped = {}
         for row in rows:
             try:
-                row_end_time = row.end_time
                 sid = str(row.symbol.id)
                 weight_value = row.weight
             except Exception as exc:
                 raise AcceptedRiskPreliminaryQcRuntimeError(
                     "constituent-history row is unreadable"
                 ) from exc
-            if (
-                _constituent_midnight(
-                    row_end_time, "constituent-history row EndTime"
-                )
-                != collection_time
-            ):
-                _error("constituent-history row EndTime differs from collection")
             weight = _constituent_decimal(weight_value, "constituent-history weight")
             if weight is None:
                 continue

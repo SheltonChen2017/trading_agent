@@ -77,7 +77,8 @@ B3_MODULE = PACKAGE / "synthetic_input_transport.py"
 _PINNED_QC_PACKAGE_SOURCES = tuple(
     """
     __init__.py accepted_risk_etf_baseline_evaluator.py
-    accepted_risk_etf_baseline_qc_runtime.py accepted_risk_pair_bridge.py
+    accepted_risk_etf_baseline_qc_runtime.py accepted_risk_massive_delta.py
+    accepted_risk_pair_bridge.py
     accepted_risk_preliminary_package.py
     accepted_risk_preliminary_qc_figi.py
     accepted_risk_preliminary_qc_projection.py
@@ -116,6 +117,9 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     physical_production_evidence_bridge.py physical_production_input_archive.py
     physical_production_session_index.py
     physical_streaming_scoring.py
+    pit_market_cap_membership_probe.py
+    pit_market_cap_membership_probe_runtime.py
+    pit_market_cap_membership_probe_submission_adapter.py
     power_calibration_bridge.py
     power_calibration_runtime.py power_calibration_submission_adapter.py
     power_calibration_worker.py pre_qc_orchestrator.py
@@ -301,6 +305,16 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "accepted_risk_massive_delta.py": tuple(
+        """
+        __future__ dataclasses hashlib os threading weakref collections datetime
+        typing research.analyst_revisions_v2
+        research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        """.split()
+    ),
     "accepted_risk_preliminary_package.py": tuple(
         """
         __future__ dataclasses gzip hashlib json os shutil sqlite3 stat tempfile
@@ -727,6 +741,22 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.physical_production_evidence_bridge
         """.split()
     ),
+    "pit_market_cap_membership_probe.py": tuple(
+        """
+        __future__ ast dataclasses hashlib json re datetime typing
+        data.exchange_calendar
+        """.split()
+    ),
+    "pit_market_cap_membership_probe_submission_adapter.py": tuple(
+        """
+        __future__ dataclasses hashlib json os re stat threading time
+        weakref datetime pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        research.analyst_revisions_v2_qc.pit_market_cap_membership_probe
+        """.split()
+    ),
     "preopen_control_acquisition_io.py": tuple(
         """
         __future__ gzip hashlib io json os stat sys heapq datetime decimal pathlib
@@ -852,6 +882,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "accepted_risk_massive_delta.py": ("import:os",),
     "accepted_risk_preliminary_package.py": (
         "call:__import__",
         "call:compile",
@@ -980,6 +1011,13 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "import:os",
         "import:pathlib",
     ),
+    "pit_market_cap_membership_probe.py": ("call:compile",),
+    "pit_market_cap_membership_probe_submission_adapter.py": (
+        "call:open",
+        "call:read_bytes",
+        "import:os",
+        "import:pathlib",
+    ),
     "preopen_control_acquisition_io.py": (
         "call:open",
         "import:os",
@@ -1048,6 +1086,9 @@ _QC_RUNTIME_IMPORTS = {
         fundamental_universe_discovery_worker
         """.split()
     ),
+    "pit_market_cap_membership_probe_runtime.py": tuple(
+        "hashlib json datetime decimal zoneinfo".split()
+    ),
     "preopen_control_runtime.py": tuple(
         "__future__ gzip hashlib heapq io json datetime itertools zoneinfo "
         "AlgorithmImports preopen_control_worker accepted_risk_qc_symbol_resolution "
@@ -1067,6 +1108,11 @@ _QC_RUNTIME_IO_SURFACE = {
         "call:set_summary_statistic",
     ),
     "fundamental_universe_discovery_runtime.py": (
+        "call:history",
+        "call:read_bytes",
+        "call:save_bytes",
+    ),
+    "pit_market_cap_membership_probe_runtime.py": (
         "call:history",
         "call:read_bytes",
         "call:save_bytes",
@@ -2153,6 +2199,9 @@ research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator accepted_r
 research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_etf_baseline_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_preliminary_qc_figi
 research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_preliminary_qc_runtime
+research.analyst_revisions_v2_qc.accepted_risk_massive_delta research.analyst_revisions_v2
+research.analyst_revisions_v2_qc.accepted_risk_massive_delta research.analyst_revisions_v2.accepted_risk_input_pair
+research.analyst_revisions_v2_qc.accepted_risk_massive_delta research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.accepted_risk_input_pair
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.production_input_pipeline
@@ -2520,6 +2569,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_massive_delta",
         "research.analyst_revisions_v2_qc.accepted_risk_pair_bridge",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_package",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi",
@@ -2574,6 +2624,9 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
             "research.analyst_revisions_v2_qc.physical_production_input_archive",
             "research.analyst_revisions_v2_qc.physical_production_session_index",
             "research.analyst_revisions_v2_qc.physical_streaming_scoring",
+        "research.analyst_revisions_v2_qc.pit_market_cap_membership_probe",
+        "research.analyst_revisions_v2_qc.pit_market_cap_membership_probe_runtime",
+        "research.analyst_revisions_v2_qc.pit_market_cap_membership_probe_submission_adapter",
         "research.analyst_revisions_v2_qc.power_calibration_bridge",
         "research.analyst_revisions_v2_qc.power_calibration_runtime",
         "research.analyst_revisions_v2_qc.power_calibration_submission_adapter",

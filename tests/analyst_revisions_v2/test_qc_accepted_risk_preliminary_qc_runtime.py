@@ -376,12 +376,17 @@ def _constituent_loader(profile_id, rows, symbols, histories):
     return loader, algorithm, universes
 
 
-def _constituent(symbol, stamp, weight, *, last_update=None):
+_DEFAULT_LAST_UPDATE = object()
+
+
+def _constituent(symbol, stamp, weight, *, last_update=_DEFAULT_LAST_UPDATE):
     return SimpleNamespace(
         symbol=symbol,
         end_time=stamp,
         weight=weight,
-        last_update=stamp.date() if last_update is None else last_update,
+        last_update=(
+            stamp.date() if last_update is _DEFAULT_LAST_UPDATE else last_update
+        ),
     )
 
 
@@ -510,6 +515,159 @@ def test_constituent_history_refuses_total_positive_weight_outside_bounds():
         match="total positive weight escaped bounds",
     ):
         loader.build_eligibility(("2021-01-04",))
+
+
+@pytest.mark.parametrize("last_update", (None, date(2021, 1, 10)))
+def test_constituent_history_accepts_nullable_or_future_last_update_metadata(
+    last_update,
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    stamp,
+                    (
+                        _constituent(
+                            stock,
+                            stamp,
+                            "1",
+                            last_update=last_update,
+                        ),
+                    ),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_does_not_validate_unselected_malformed_snapshot():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    selected = datetime(2021, 1, 2)
+    unselected = datetime(2021, 1, 5)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    selected,
+                    (_constituent(stock, selected, "1"),),
+                ),
+                (
+                    unselected,
+                    (_constituent(stock, unselected, "not-a-decimal"),),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_selected_malformed_snapshot_refuses_without_fallback():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    older = datetime(2021, 1, 1)
+    selected = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (older, (_constituent(stock, older, "1"),)),
+                (selected, (_constituent(stock, selected, "not-a-decimal"),)),
+            )
+        },
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="weight is not decimal",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_caches_each_selected_snapshot_and_advances_on_newer_one(
+    monkeypatch,
+):
+    first_row = _binding("BBG000000001", "ONE", 2)
+    second_row = _binding("BBG000000002", "TWO", 2)
+    first = _Symbol("QC ONE", "ONE")
+    second = _Symbol("QC TWO", "TWO")
+    first_stamp = datetime(2021, 1, 2)
+    second_stamp = datetime(2021, 1, 9)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [first_row, second_row],
+        [first, second],
+        {
+            "SPY": (
+                (first_stamp, (_constituent(first, first_stamp, "1"),)),
+                (second_stamp, (_constituent(second, second_stamp, "1"),)),
+            )
+        },
+    )
+    original = loader._mapped_snapshot
+    calls = []
+
+    def counting_snapshot(collection_time, constituents):
+        calls.append(collection_time)
+        return original(collection_time, constituents)
+
+    monkeypatch.setattr(loader, "_mapped_snapshot", counting_snapshot)
+
+    assert loader.build_eligibility(
+        ("2021-01-04", "2021-01-08", "2021-01-11")
+    ) == {
+        "2021-01-04": (first_row["security_id"],),
+        "2021-01-08": (first_row["security_id"],),
+        "2021-01-11": (second_row["security_id"],),
+    }
+    assert calls == [first_stamp, second_stamp]
+
+
+def test_constituent_history_rechecks_selected_snapshot_age_for_each_decision(
+    monkeypatch,
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((stamp, (_constituent(stock, stamp, "1"),)),)},
+    )
+    original = loader._mapped_snapshot
+    calls = []
+
+    def counting_snapshot(collection_time, constituents):
+        calls.append(collection_time)
+        return original(collection_time, constituents)
+
+    monkeypatch.setattr(loader, "_mapped_snapshot", counting_snapshot)
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="prior snapshot is stale",
+    ):
+        loader.build_eligibility(("2021-01-04", "2021-01-13"))
+    assert calls == [stamp]
 
 
 def test_constituent_history_accepts_low_weight_nonempty_score_census_intersection():
@@ -676,20 +834,16 @@ def test_constituent_history_refuses_nonlocal_collection_endtime(
 
 
 @pytest.mark.parametrize(
-    ("last_update", "message"),
+    "last_update",
     (
-        (
-            datetime(2021, 1, 1, tzinfo=timezone.utc),
-            "LastUpdate is timezone-aware",
-        ),
-        (datetime(2021, 1, 1, 12), "LastUpdate is not midnight"),
-        ("2021-01-01", "LastUpdate is not a calendar date"),
-        (date(2021, 1, 3), "LastUpdate is after collection EndTime"),
-        (date(2020, 12, 20), "LastUpdate is stale"),
+        datetime(2021, 1, 1, tzinfo=timezone.utc),
+        datetime(2021, 1, 1, 12),
+        "not-a-calendar-date",
+        date(2020, 12, 20),
     ),
 )
-def test_constituent_history_refuses_invalid_or_stale_last_update(
-    last_update, message
+def test_constituent_history_ignores_non_authoritative_last_update_metadata(
+    last_update,
 ):
     row = _binding()
     stock = _Symbol("QC STOCK SID", "NOW")
@@ -715,8 +869,33 @@ def test_constituent_history_refuses_invalid_or_stale_last_update(
         },
     )
 
-    with pytest.raises(runtime.AcceptedRiskPreliminaryQcRuntimeError, match=message):
-        loader.build_eligibility(("2021-01-04",))
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_does_not_read_last_update_metadata():
+    class HostileLastUpdate:
+        symbol = _Symbol("QC STOCK SID", "NOW")
+        end_time = datetime(2021, 1, 2)
+        weight = "1"
+
+        @property
+        def last_update(self):
+            raise RuntimeError("LastUpdate must remain unread")
+
+    row = _binding()
+    constituent = HostileLastUpdate()
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [constituent.symbol],
+        {"SPY": ((constituent.end_time, (constituent,)),)},
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
 
 
 @pytest.mark.parametrize(
@@ -788,7 +967,6 @@ def test_constituent_history_isolated_series_and_collection_refusals(case, messa
         ("series_traversal", "constituent-history Series traversal failed"),
         ("collection", "constituent-history collection is unreadable"),
         ("row_fields", "constituent-history row is unreadable"),
-        ("row_last_update", "constituent-history row is unreadable"),
         ("reverse_mapping", "constituent-history reverse mapping is unreadable"),
     ),
 )
@@ -829,15 +1007,6 @@ def test_constituent_history_isolates_remaining_reachable_loader_refusals(
     elif case == "row_fields":
         algorithm.histories[id(universe)] = _ConstituentSeries(
             (((universe.symbol, stamp), (SimpleNamespace(),)),)
-        )
-    elif case == "row_last_update":
-        positive_without_last_update = SimpleNamespace(
-            symbol=stock,
-            end_time=stamp,
-            weight="1",
-        )
-        algorithm.histories[id(universe)] = _ConstituentSeries(
-            (((universe.symbol, stamp), (positive_without_last_update,)),)
         )
     else:
         def failed_reverse_mapping(_security_id):

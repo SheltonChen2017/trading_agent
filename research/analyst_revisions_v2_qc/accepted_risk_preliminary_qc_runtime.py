@@ -19,7 +19,7 @@ import json
 import math
 import re
 import time
-from datetime import date, datetime, timedelta
+from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
 from types import MappingProxyType
 
@@ -61,9 +61,9 @@ MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
 STOCK_PORTFOLIO_PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
 STOCK_UNIVERSE_PROFILE_IDS = (
-    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1",
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3",
-    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2",
+    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v2",
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v4",
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r071-v3",
 )
 STOCK_PORTFOLIO_PROFILE_IDS = (
     STOCK_PORTFOLIO_PROFILE_ID,
@@ -818,18 +818,6 @@ def _constituent_decimal(value, name):
     return parsed if parsed > 0 else None
 
 
-def _constituent_last_update(value):
-    if isinstance(value, datetime):
-        if value.tzinfo is not None and value.utcoffset() is not None:
-            _error("constituent-history LastUpdate is timezone-aware")
-        if value.time() != datetime.min.time():
-            _error("constituent-history LastUpdate is not midnight")
-        return datetime(value.year, value.month, value.day)
-    if type(value) is date:
-        return datetime(value.year, value.month, value.day)
-    _error("constituent-history LastUpdate is not a calendar date")
-
-
 def _universe_symbol_sid(value, name):
     try:
         sid = str(value.symbol.id)
@@ -917,7 +905,6 @@ class QcEtfConstituentEligibilityLoader:
             _error("constituent-history collection is empty")
         weights = {}
         mapped = {}
-        last_updates = []
         for row in rows:
             try:
                 row_end_time = row.end_time
@@ -937,16 +924,6 @@ class QcEtfConstituentEligibilityLoader:
             weight = _constituent_decimal(weight_value, "constituent-history weight")
             if weight is None:
                 continue
-            try:
-                last_update_value = row.last_update
-            except Exception as exc:
-                raise AcceptedRiskPreliminaryQcRuntimeError(
-                    "constituent-history row is unreadable"
-                ) from exc
-            last_update = _constituent_last_update(last_update_value)
-            if last_update > collection_time:
-                _error("constituent-history LastUpdate is after collection EndTime")
-            last_updates.append(last_update)
             if type(sid) is not str or not sid or sid in weights:
                 _error("constituent-history collection duplicated a QC SID")
             weights[sid] = weight
@@ -975,7 +952,7 @@ class QcEtfConstituentEligibilityLoader:
             _error("constituent-history total positive weight escaped bounds")
         if not mapped:
             _error("constituent-history score-census intersection is empty")
-        return tuple(sorted(mapped)), min(last_updates)
+        return tuple(sorted(mapped))
 
     def _load_ticker(self, ticker):
         universe = self._universes[ticker]
@@ -1024,9 +1001,7 @@ class QcEtfConstituentEligibilityLoader:
                     _error("constituent-history collection escaped query bounds")
                 if collection_time in snapshots:
                     _error("constituent-history duplicated a collection EndTime")
-                snapshots[collection_time] = self._mapped_snapshot(
-                    collection_time, constituents
-                )
+                snapshots[collection_time] = constituents
         except AcceptedRiskPreliminaryQcRuntimeError:
             raise
         except Exception as exc:
@@ -1065,6 +1040,7 @@ class QcEtfConstituentEligibilityLoader:
         by_ticker = {
             ticker: self._load_ticker(ticker) for ticker in self._tickers
         }
+        selected_snapshots = {}
         result = {}
         for session, decision_time in decision_times:
             eligible = set()
@@ -1078,16 +1054,16 @@ class QcEtfConstituentEligibilityLoader:
                     _error(
                         "constituent-history has no snapshot strictly before decision"
                     )
-                collection_time, snapshot = prior[-1]
-                security_ids, oldest_last_update = snapshot
+                collection_time, constituents = prior[-1]
                 age = decision_time - collection_time
                 if age <= timedelta(0) or age > MAXIMUM_CONSTITUENT_SNAPSHOT_AGE:
                     _error("constituent-history prior snapshot is stale")
-                if (
-                    decision_time - oldest_last_update
-                    > MAXIMUM_CONSTITUENT_SNAPSHOT_AGE
-                ):
-                    _error("constituent-history LastUpdate is stale")
+                snapshot_key = (ticker, collection_time)
+                if snapshot_key not in selected_snapshots:
+                    selected_snapshots[snapshot_key] = self._mapped_snapshot(
+                        collection_time, constituents
+                    )
+                security_ids = selected_snapshots[snapshot_key]
                 eligible.update(security_ids)
             value = tuple(sorted(eligible))
             if not value:

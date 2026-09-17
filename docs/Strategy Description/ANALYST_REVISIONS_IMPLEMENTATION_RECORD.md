@@ -302,8 +302,14 @@ AND PREREGISTER R-069 AS THE SPY SUCCESSOR. R-067 THEN COMPLETED, BUT ITS
 ONE-USE RESULT READ ENDED AMBIGUOUSLY AFTER THE READ PERMIT WAS DURABLY
 SPENT AND BEFORE AN AGGREGATE RECEIPT EXISTED. NO RESULT VALUE WAS RETURNED
 OR RECORDED. R-067 IS IMMUTABLY SPENT WITH ZERO NEW CELLS; R-070 IS ITS
-PREREGISTERED QQQ SUCCESSOR. CURRENT ACCOUNTING IS 67 SHARED LOOKS, 14 ARV2
-DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 579-CELL FLOOR.
+PREREGISTERED QQQ SUCCESSOR. R-068 THEN REFUSED BECAUSE THE RUNTIME
+MISCLASSIFIED NULLABLE `LASTUPDATE` METADATA AS AN AVAILABILITY CLOCK. IT IS
+IMMUTABLY SPENT WITH ZERO NEW CELLS. SECTION 88.14 CORRECTS THE SUCCESSOR
+CONTRACT TO USE STRICTLY PRIOR COLLECTION `ENDTIME` ONLY, LEAVE
+`LASTUPDATE` UNREAD, VALIDATE ONLY SELECTED SNAPSHOTS WITHOUT FALLBACK, AND
+PREREGISTERS R-069, R-070, AND UNION SUCCESSOR R-071. CURRENT ACCOUNTING IS
+68 SHARED LOOKS, 15 ARV2 DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS,
+AND A 579-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1006,8 +1012,9 @@ monotonicity, and closed-form annual cost arithmetic. Section 88 also freezes
 three owner-directed 2021-2025 diagnostics before any new outcome read: point-
 in-time SPY holdings as an S&P 500 proxy, point-in-time QQQ holdings as a
 Nasdaq-100 proxy, and their exact-security-ID-deduplicated union. The
-constituent collection and source-vintage timestamps must be available
-strictly before each weekly decision and no more than ten calendar days old.
+selected constituent collection `EndTime` must be available strictly before
+each weekly decision and no more than ten calendar days old; `LastUpdate` is
+unused nullable metadata rather than an availability clock.
 R-065 completed and the corrected comparator reverses R-064's apparent
 selection advantage: the signal trails matched at all costs. R-066 failed its
 99%-mapping gate before result production. Sections 88.10-88.12 preserve that
@@ -1018,13 +1025,17 @@ reached authenticated `Completed.`, but its one-use result-read permit was
 spent before an aggregate receipt existed and the exact post-permit failure
 phase is not recoverable from local evidence. No statistic or result value was
 persisted or disclosed, so it adds no cells but still consumes its look and
-evaluation. Section 88.13 freezes R-068, R-069 and fresh QQQ successor R-070
-before their launches and adds one bounded local retry only for an exact
-`ChildProcessError` race while verifying an owner signature, before any permit
-is spent. The immediate next step is the preregistered sequential R-068 v2,
-R-069 v1 and R-070 v3 run, with one aggregate-only read per successful run and
-durable accounting. QQQ remains a Nasdaq-100 proxy, not all Nasdaq-listed
-stocks. Later windows, leverage,
+evaluation. Section 88.13 froze R-068, R-069 and fresh QQQ successor R-070
+and added one bounded local retry only for an exact `ChildProcessError` race
+while verifying an owner signature, before any permit is spent. R-068 then
+refused because the runtime treated nullable `LastUpdate` metadata as an
+availability clock. Section 88.14 records that spent run and corrects fresh
+successors to use strictly-prior collection `EndTime` only, leave
+`LastUpdate` unread, validate only selected snapshots without fallback, and
+cache repeated selections. The immediate next step is the preregistered
+sequential R-069 v2, R-070 v4 and union R-071 v3 run, with one aggregate-only
+read per successful run and durable accounting. QQQ remains a Nasdaq-100
+proxy, not all Nasdaq-listed stocks. Later windows, leverage,
 deployment, orders, broker, paper/live, and trading remain closed.
 
 
@@ -15697,3 +15708,70 @@ compile, launch or result read. The three outcomes remain descriptive and
 cannot select a winning same-window universe. No result read may be repeated
 after its one-use permit is spent, and no live, paper, broker, order,
 deployment or trading authority follows from these diagnostics.
+
+### 88.14 R-068 terminal disposition and EndTime-only successor contract
+
+R-068 used its exact preregistered union-intersection v2 projection. Private
+project `36631115`, backtest `204434a6f79f319613e9fc3fcdf3f988`, reached
+authenticated `Runtime Error` after two statistics-free polls. The submission
+plan, launch receipt and terminal receipt SHA-256 values are respectively
+`7d48c36a04fb7980e1359c76d0d8b7c965ba45b5ea2df6c535d7edfe47b17294`,
+`af866fdba83909626447c6b7286b61c356c011213589efa8b438a943115ebe26`,
+and `0e8a64ce0fad273ccd9e49b4657c1b5c5123c33ac5c8b8889eae3c1dccd5d423`.
+A bounded exact-run diagnostic read selected only the terminal error and
+stack: `constituent-history LastUpdate is after collection EndTime`. It read
+no statistics, charts, orders, provider rows or security outcomes. R-068
+therefore consumes look 68 and development evaluation 15 but adds zero cells;
+live accounting is **68 shared looks, 15 development evaluations, 23
+infrastructure looks and a 579-cell floor**.
+
+`ARV2D88-006` (**P2, corrected under fresh prospective identities**) — the
+runtime incorrectly treated `ETFConstituentUniverse.LastUpdate` as a row-level
+availability clock. QuantConnect's LEAN class defines `LastUpdate` as the time
+of the previous ETF-constituent data update and allows it to be null, while
+`EndTime` is when the collection became available to the algorithm. The
+successor contract therefore does not read `LastUpdate`. For every decision it
+selects the latest collection `EndTime` strictly before New York decision-date
+midnight and requires that collection to be no more than ten calendar days
+old. It inventories collection keys, universe identity, bounds and duplicate
+`EndTime` values across the returned Series, but fully validates and caches
+only snapshots actually selected by a decision. A malformed selected snapshot
+refuses without falling back to an older one; an unselected later snapshot
+cannot poison an earlier decision. Row `EndTime` equality, exact SID
+uniqueness and reverse mapping, total positive weight 0.95-1.05, and a
+nonempty exact score-census intersection remain fail closed.
+
+The source semantics were checked against QuantConnect's official [US ETF
+Constituents documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-etf-constituents)
+and the official [LEAN `ETFConstituentUniverse` class
+source](https://www.lean.io/docs/v2/lean-engine/class-reference/ETFConstituentUniverse_8cs_source.html).
+
+Isolated tests prove that production never reads even hostile `LastUpdate`
+metadata, selected-snapshot cache reuse, advancement when a newer snapshot
+becomes prior evidence, per-decision age enforcement, unselected malformed
+snapshot isolation, and selected-malformed refusal without fallback. The
+focused runtime/evaluator/submission battery is **381 passed in 152.17
+seconds** before the two extra cache/age regressions and **5 passed** for the
+new EndTime-selection cases after them. The exact three-file battery is rerun
+before launch.
+
+R-069 and R-070 supersede their unlaunched LastUpdate-reading profiles under
+new versions. R-071 is the fresh union successor to spent R-068. All preserve
+R-065's signal, portfolio, comparator, price, terminal, cost and output rules.
+The QQQ run remains a historical Nasdaq-100 holdings proxy, explicitly not all
+Nasdaq-listed stocks; SPY remains an S&P 500 holdings proxy, not official
+index membership.
+
+| Ledger | Profile SHA-256 | Projection SHA-256 | Prospective QC identity | Accounting after successful aggregate read |
+|---|---|---|---|---|
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v2`; `83deb4aeb655c0fdfd4714e53e427a3df560c8f5caea40933ae6d76df8beae12` | `arv2-preliminary-qc-projection-38c2b264f42596481b232c06`; `38c2b264f42596481b232c06b445eb6533f08b691cc83b316ce68f6916e4898d`; 7 files, 232,168 total / 59,100 max bytes | Project `15 ARV2_STOCK_R069_SPY_2021_2025 - 20260916`; backtest `ARV2 R069 SPY EndTime retry e9851c2f` | looks 68 -> 69; evaluations 15 -> 16; cells 579 -> 583 |
+| `R-070`; `arv2-eval-stock-qqq-holdings-intersection-qc-009` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v4`; `733d22be608aa13b55f5b218d6cf45484b9b2271a1812b59e3d9217de8e78979` | `arv2-preliminary-qc-projection-f751279256dbeeaf95723f63`; `f751279256dbeeaf95723f63ba7b74c7a0d7f8e1715cd5578f297000fdcd0e4e`; 7 files, 232,457 total / 59,100 max bytes | Project `16 ARV2_STOCK_R070_QQQ_2021_2025 - 20260916`; backtest `ARV2 R070 QQQ EndTime retry e9851c2f` | looks 69 -> 70; evaluations 16 -> 17; cells 583 -> 587 |
+| `R-071`; `arv2-eval-stock-spy-qqq-intersection-union-qc-010` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r071-v3`; `1f262bbef386d8291afc38e50a6706d4e80020702296b3423b4f2075a1858f87` | `arv2-preliminary-qc-projection-7fc71f66821ee3195bfa3738`; `7fc71f66821ee3195bfa37388a41906a6012b66a78b99ee4a143966e341af0d8`; 7 files, 232,464 total / 59,100 max bytes | Project `17 ARV2_STOCK_R071_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R071 SPY QQQ EndTime union retry e9851c2f` | looks 70 -> 71; evaluations 17 -> 18; cells 587 -> 591 |
+
+This block is frozen before any R-069, R-070 or R-071 project creation,
+compile, launch or outcome read. Each successful run may receive exactly one
+separately signed read of its six aggregate statistics. The three runs are
+descriptive same-window construction diagnostics, not a winner-selection
+exercise; no same-window score or universe tuning, leverage, formal
+acceptance, deployment, broker access, order, paper/live state or trading is
+authorized by their outcomes.

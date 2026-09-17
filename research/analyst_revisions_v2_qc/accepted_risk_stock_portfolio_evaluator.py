@@ -26,13 +26,13 @@ class AcceptedRiskStockPortfolioError(_base.PreliminaryRatingEvaluationError):
 PROFILE_SCHEMA = "arv2-accepted-risk-stock-portfolio-profile-v2"
 PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
 SP500_PROFILE_ID = (
-    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1"
+    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v2"
 )
 NASDAQ100_PROFILE_ID = (
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3"
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v4"
 )
 UNION_PROFILE_ID = (
-    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2"
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r071-v3"
 )
 VARIANT_PROFILE_IDS = (
     SP500_PROFILE_ID,
@@ -198,9 +198,11 @@ def _profile_record(profile_id):
                     "midnight_America_New_York"
                 ),
                 "maximum_constituent_snapshot_age_calendar_days": 10,
-                "constituent_last_update_required": True,
-                "constituent_last_update_not_after_collection": True,
-                "maximum_constituent_last_update_age_calendar_days": 10,
+                "constituent_availability_clock": "collection_EndTime_only",
+                "constituent_last_update_role": (
+                    "unused_nullable_metadata_not_an_availability_clock"
+                ),
+                "constituent_last_update_read": False,
                 "constituent_positive_weight_only": True,
                 "minimum_constituent_total_positive_weight": "0.95",
                 "maximum_constituent_total_positive_weight": "1.05",

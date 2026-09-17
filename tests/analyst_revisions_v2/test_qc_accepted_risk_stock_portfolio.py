@@ -235,11 +235,14 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
             "America_New_York"
         )
         assert profile["maximum_constituent_snapshot_age_calendar_days"] == 10
-        assert profile["constituent_last_update_required"] is True
-        assert profile["constituent_last_update_not_after_collection"] is True
-        assert profile[
-            "maximum_constituent_last_update_age_calendar_days"
-        ] == 10
+        assert profile["constituent_availability_clock"] == "collection_EndTime_only"
+        assert profile["constituent_last_update_role"] == (
+            "unused_nullable_metadata_not_an_availability_clock"
+        )
+        assert profile["constituent_last_update_read"] is False
+        assert "constituent_last_update_required" not in profile
+        assert "constituent_last_update_not_after_collection" not in profile
+        assert "maximum_constituent_last_update_age_calendar_days" not in profile
         assert profile["constituent_positive_weight_only"] is True
         assert profile["minimum_constituent_total_positive_weight"] == "0.95"
         assert profile["maximum_constituent_total_positive_weight"] == "1.05"

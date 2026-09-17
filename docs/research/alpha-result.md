@@ -1919,3 +1919,48 @@ before any of those three project creations or outcome reads. They remain
 descriptive diagnostics, not a winner-selection exercise; leverage, formal
 acceptance, deployment, broker access, orders, paper/live state and trading
 remain closed.
+
+## R-068 disposition and EndTime-only R-069/R-070/R-071 successors — 2026-09-16
+
+R-068 used its exact preregistered union-intersection v2 projection in private
+project `36631115`, backtest `204434a6f79f319613e9fc3fcdf3f988`. It reached
+authenticated `Runtime Error` after two statistics-free polls. Its plan,
+launch and terminal SHA-256 values are respectively
+`7d48c36a04fb7980e1359c76d0d8b7c965ba45b5ea2df6c535d7edfe47b17294`,
+`af866fdba83909626447c6b7286b61c356c011213589efa8b438a943115ebe26`,
+and `0e8a64ce0fad273ccd9e49b4657c1b5c5123c33ac5c8b8889eae3c1dccd5d423`.
+A bounded exact-run diagnostic read selected only the terminal error and
+stack, not statistics, charts, orders, provider rows or security outcomes:
+`constituent-history LastUpdate is after collection EndTime`. R-068 consumes
+shared look **67 -> 68** and development evaluation **14 -> 15**, but adds
+zero cells; live accounting is **68 shared looks, 15 development evaluations,
+23 infrastructure looks and a 579-cell floor**.
+
+The failure exposed a timestamp-semantics defect. QuantConnect's LEAN class
+defines collection `EndTime` as the availability time and nullable
+`LastUpdate` as the previous constituent-data update. The corrected successor
+contract never reads `LastUpdate`. It selects the latest collection `EndTime`
+strictly before each decision, applies the ten-calendar-day age limit to that
+collection per decision, and fully validates/caches only snapshots actually
+selected. A malformed selected snapshot refuses without fallback; an
+unselected future snapshot cannot poison an earlier decision. Exact
+row/collection `EndTime`, SID uniqueness and reverse mapping, total positive
+weight 0.95-1.05, and nonempty score-census intersection guards all remain.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v2`; `83deb4aeb655c0fdfd4714e53e427a3df560c8f5caea40933ae6d76df8beae12` | `arv2-preliminary-qc-projection-38c2b264f42596481b232c06`; `38c2b264f42596481b232c06b445eb6533f08b691cc83b316ce68f6916e4898d`; 7 files, 232,168 total / 59,100 max bytes | looks 68 -> 69; evaluations 15 -> 16; cells 579 -> 583 |
+| `R-070`; `arv2-eval-stock-qqq-holdings-intersection-qc-009` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v4`; `733d22be608aa13b55f5b218d6cf45484b9b2271a1812b59e3d9217de8e78979` | `arv2-preliminary-qc-projection-f751279256dbeeaf95723f63`; `f751279256dbeeaf95723f63ba7b74c7a0d7f8e1715cd5578f297000fdcd0e4e`; 7 files, 232,457 total / 59,100 max bytes | looks 69 -> 70; evaluations 16 -> 17; cells 583 -> 587 |
+| `R-071`; `arv2-eval-stock-spy-qqq-intersection-union-qc-010` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r071-v3`; `1f262bbef386d8291afc38e50a6706d4e80020702296b3423b4f2075a1858f87` | `arv2-preliminary-qc-projection-7fc71f66821ee3195bfa3738`; `7fc71f66821ee3195bfa37388a41906a6012b66a78b99ee4a143966e341af0d8`; 7 files, 232,464 total / 59,100 max bytes | looks 70 -> 71; evaluations 17 -> 18; cells 587 -> 591 |
+
+R-069 is a historical SPY/S&P 500 holdings proxy, not official index
+membership. R-070 is a QQQ/Nasdaq-100 holdings proxy, explicitly not all
+Nasdaq-listed stocks. R-071 is their exact-SID-deduplicated union. Their
+private projects are prospectively `15 ARV2_STOCK_R069_SPY_2021_2025 -
+20260916`, `16 ARV2_STOCK_R070_QQQ_2021_2025 - 20260916`, and `17
+ARV2_STOCK_R071_SPY_QQQ_2021_2025 - 20260916`; their backtests are `ARV2 R069
+SPY EndTime retry e9851c2f`, `ARV2 R070 QQQ EndTime retry e9851c2f`, and
+`ARV2 R071 SPY QQQ EndTime union retry e9851c2f`. This block is frozen before
+any of those project creations, launches or outcome reads. The diagnostics
+cannot select a same-window winner or unlock leverage, formal acceptance,
+deployment, broker access, orders, paper/live state or trading.

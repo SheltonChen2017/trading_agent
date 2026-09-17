@@ -1720,6 +1720,31 @@ def test_stock_universe_membership_profile_inventory_mutation_refuses_before_net
     assert not any(stock_universe_plan.control_directory.iterdir())
 
 
+def test_stock_universe_evaluator_membership_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "MEMBERSHIP_ONLY_PROFILE_IDS",
+        stock_portfolio_evaluator.MEMBERSHIP_ONLY_PROFILE_IDS[:-1],
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="^preliminary action global binding changed$",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
 def test_regime_expected_result_inventory_guard_is_isolated(monkeypatch):
     monkeypatch.setattr(
         adapter,

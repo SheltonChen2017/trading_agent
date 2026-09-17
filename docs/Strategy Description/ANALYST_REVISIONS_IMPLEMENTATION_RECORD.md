@@ -16016,3 +16016,119 @@ not official index status, coverage completeness or ETF replication. Neither
 result may select a same-window winner, tune any rule or unlock leverage,
 formal acceptance, deployment, broker access, orders, paper/live state or
 trading.
+
+### 88.18 R-077/R-078 authenticated results and guard-isolation closure
+
+R-077 used the exact preregistered QQQ membership-census projection from
+88.17. Its first detached execution-signature check refused before an
+execution permit, project or look existed; the byte-identical retry launched
+once. Private QC project `36638005`, backtest
+`06584e75d6e90fa25018ae71e1d85468`, reached authenticated `Completed.`
+after 79 statistics-free polls. Its submission-plan, launch and terminal
+SHA-256 values are respectively
+`20a97595436eb59ea8550e012aed496eb0f892ef861ea32dc4375813258ac54f`,
+`ead94e41c3623cb640b21787d657fa322b905d230bc9834fb057e1e56ecda4fe`,
+and `7bedb4c776915f66779350644488b02a95ff4c79746457438f11c3e26670d53b`.
+The first detached result-signature check refused before a result permit or
+remote read; the exact result-only retry performed the sole signed
+`backtests/read`. Aggregate receipt
+`arv2-preliminary-qc-result-f63f62550fbf36d6d4ee7d7b`, SHA-256
+`f63f62550fbf36d6d4ee7d7b9a0e9e284ec3b1798e1420e238401a0f33e64dc3`,
+binds result-permit SHA-256
+`6363e453b117a17cbb95da28ee981e2a06ff55c8dbb7aeeaaae765cf7a06c4a4`
+and custom-statistics SHA-256
+`acd4489ad395a812ed2231895334f780330b14760bd8a6ee7103ff8fbe966d13`.
+
+| R-077 cost per side | Signal cumulative | Matched cumulative | SPY cumulative | Signal minus matched | Signal minus SPY | Signal maximum drawdown |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +9.0656% | +8.8625% | +94.2074% | +0.2031 pp | -85.1417 pp | -12.0150% |
+| 5 bps | +8.7829% | +8.7594% | +94.2074% | +0.0235 pp | -85.4244 pp | -12.0691% |
+| **10 bps primary** | **+8.5010%** | **+8.6564%** | **+94.2074%** | **-0.1554 pp** | **-85.7064 pp** | **-12.1231%** |
+| 20 bps | +7.9392% | +8.4507% | +94.2074% | -0.5115 pp | -86.2681 pp | -12.2312% |
+
+The QQQ proxy averaged 84.95 score-bearing eligible names and nine selected
+and held names. Because the frozen broad-universe rule retained a 1.96%
+per-name weight rather than renormalizing the smaller top decile, mean gross
+exposure was only 17.64% and average cash was 82.3571%. All 261 decisions
+executed and all 261 were underfilled relative to the nominal 98% target.
+At ten basis points, annualized arithmetic return was 1.7583%, zero-rate
+Sharpe 0.3608 and Sortino 0.5019; simple annualized two-sided turnover was
+about 104.34%. The matched comparator executed all 261 decisions at the same
+17.64% gross, so the small signal-minus-matched result is interpretable at
+that low exposure. It had one stale-position deferral, 11 stale-mark sessions
+and three membership-end zero recoveries, however, so the lower-bound exit
+policy directionally favors the signal by an unknown amount. R-077 therefore
+shows no economically convincing QQQ-proxy selection edge at the primary
+cost and does not test a fully invested QQQ-stock portfolio.
+
+R-078 then used its exact preregistered SPY-plus-QQQ union projection. The
+first detached execution-signature check refused before a permit, project or
+look; its byte-identical retry launched once. Private project `36639211`,
+backtest `ecf704c925215b2196e7a8511546d27b`, reached authenticated
+`Completed.` after 77 statistics-free polls. The plan, launch and terminal
+SHA-256 values are respectively
+`0d0ed5bef8d0ca28c6fac37552099c15a4074eabc6f3341eaff915bfbd88d135`,
+`b34506894b9719f8ccd6c3ca661b2f1da485550f5ccca9ec487424e049b02320`,
+and `972a1ea11dd3dee1cf467b4988487533dec1fc91bc334ccc02031ccf5b5fed83`.
+Its first result-signature check also refused before a permit or read; the
+exact result-only retry performed the sole signed read. Aggregate receipt
+`arv2-preliminary-qc-result-b1cbfc9c01ed67e0006b2aab`, SHA-256
+`b1cbfc9c01ed67e0006b2aaba9a0157d301021911414b490e1e0d0ec5b032fec`,
+binds result-permit SHA-256
+`65c4841412571dd2df430fef12dd8052d543e46c304f967940a1702866a1c6a0`
+and custom-statistics SHA-256
+`256c08c7d823d3cd53861708bcc9f93a33cdb0876f6fa84ba0b890536d82f905`.
+
+| R-078 cost per side | Signal cumulative | Matched cumulative | SPY cumulative | Signal minus matched | Signal minus SPY | Signal maximum drawdown |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +70.9113% | +55.8818% | +94.2074% | +15.0295 pp | -23.2960 pp | -20.3325% |
+| 5 bps | +69.2545% | +55.2942% | +94.2074% | +13.9602 pp | -24.9529 pp | -20.3785% |
+| **10 bps primary** | **+67.6135%** | **+54.7088%** | **+94.2074%** | **+12.9048 pp** | **-26.5938 pp** | **-20.4245%** |
+| 20 bps | +64.3790% | +53.5444% | +94.2074% | +10.8346 pp | -29.8284 pp | -20.5992% |
+
+The union averaged 473.96 eligible names, 47.71 selected names, 47.71 held
+names, 93.5098% gross exposure and 6.4878% cash. It executed all 261 weekly
+decisions; all remained nominally underfilled because the frozen 1.96%
+per-name cap did not always reach fifty names. At ten basis points,
+annualized arithmetic return was 11.8511%, volatility 17.1483%, zero-rate
+Sharpe 0.6911, Sortino 0.9903 and simple annualized two-sided turnover about
+391.86%. The matched comparator also executed all 261 decisions at identical
+gross exposure. It had 15 partial decisions, 16 stale-position deferrals, 62
+stale-mark sessions and 14 membership-end zero recoveries, versus one, one,
+three and zero for the signal. R-078 is tangible positive selection evidence
+inside the historical SPY-plus-QQQ holdings proxy at the primary cost, but
+the zero-recovery asymmetry can overstate the +12.9048-point spread by an
+unknown amount. It trails capitalization-weighted SPY by 26.5938 points and
+is weaker than R-072's +16.5895-point SPY-proxy matched spread. These
+same-window diagnostics do not select a winner or authorize tuning.
+
+Each result read selected exactly six aggregate statistics once and selected
+no raw provider row, unrestricted log, chart or order. Both inputs remain
+current-vintage/non-pristine point-in-time approximations; the ETF holdings
+sets remain historical proxies rather than official index membership, and no
+terminal-payoff splice was applied. Neither result is a formal alpha,
+promotion, leverage, deployment, broker, paper/live, order or trading result.
+Live accounting is now **74 shared looks, 21 ARV2 development evaluations,
+23 infrastructure looks and a 591-cell floor**.
+
+`ARV2D88-010` (**P3, corrected**) — the evaluator-side
+`MEMBERSHIP_ONLY_PROFILE_IDS` comparisons in the runtime loader and
+submission preflight had no direct isolating tests. Two regressions now mutate
+only that evaluator inventory and prove the runtime refuses before History I/O
+and the adapter refuses before any network event or control-file write. The
+focused evaluator/runtime/submission battery is **435 passed in 158.27
+seconds**. Removing only the runtime comparison makes its new test red with
+the exact refusal absent; removing only the adapter comparison makes all three
+profile cases red by reaching the later signature gate. Restoration returns
+all four parametrized cases green. No production behavior changed.
+
+The owner-requested market-cap-aware 2025/2026 SPY, QQQ and SPY+QQQ+SOXX
+matrix cannot be honestly launched from the present compact package: its
+signal/session boundary is `2025-12-31`, the existing fundamental discovery
+forbids `market_cap`, and SOXX has no authenticated membership geometry. The
+next bounded milestone is therefore an outcome-free coverage receipt for
+strict-prior point-in-time market cap plus SPY/QQQ/SOXX membership counts,
+followed by a parent-bound 2026 Massive delta and one separately
+preregistered six-child matrix. No R-number, cutoff, project or result
+authority is assigned here before that coverage contract is implemented and
+validated.

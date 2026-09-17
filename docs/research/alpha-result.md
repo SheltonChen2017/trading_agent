@@ -2111,3 +2111,46 @@ Nasdaq-listed stocks; the union remains an exact-SID SPY-plus-QQQ holdings
 proxy. Results cannot select a same-window winner, tune any rule, or unlock
 leverage, formal acceptance, deployment, broker access, orders, paper/live
 state or trading.
+
+## R-077/R-078 authenticated stock-universe results — 2026-09-16
+
+Both exact preregistered membership-census successors completed in private
+QC projects and received one separately signed aggregate-only result read.
+R-077 used project `36638005`, backtest
+`06584e75d6e90fa25018ae71e1d85468`; aggregate receipt SHA-256 is
+`f63f62550fbf36d6d4ee7d7b9a0e9e284ec3b1798e1420e238401a0f33e64dc3`.
+R-078 used project `36639211`, backtest
+`ecf704c925215b2196e7a8511546d27b`; aggregate receipt SHA-256 is
+`b1cbfc9c01ed67e0006b2aaba9a0157d301021911414b490e1e0d0ec5b032fec`.
+Each read selected exactly six custom aggregate statistics and no provider
+row, unrestricted log, chart or order.
+
+| Run / cost per side | Signal | Matched | SPY | Signal minus matched | Signal minus SPY | Maximum drawdown |
+|---|---:|---:|---:|---:|---:|---:|
+| R-077 / 0 bps | +9.0656% | +8.8625% | +94.2074% | +0.2031 pp | -85.1417 pp | -12.0150% |
+| R-077 / 5 bps | +8.7829% | +8.7594% | +94.2074% | +0.0235 pp | -85.4244 pp | -12.0691% |
+| **R-077 / 10 bps primary** | **+8.5010%** | **+8.6564%** | **+94.2074%** | **-0.1554 pp** | **-85.7064 pp** | **-12.1231%** |
+| R-077 / 20 bps | +7.9392% | +8.4507% | +94.2074% | -0.5115 pp | -86.2681 pp | -12.2312% |
+| R-078 / 0 bps | +70.9113% | +55.8818% | +94.2074% | +15.0295 pp | -23.2960 pp | -20.3325% |
+| R-078 / 5 bps | +69.2545% | +55.2942% | +94.2074% | +13.9602 pp | -24.9529 pp | -20.3785% |
+| **R-078 / 10 bps primary** | **+67.6135%** | **+54.7088%** | **+94.2074%** | **+12.9048 pp** | **-26.5938 pp** | **-20.4245%** |
+| R-078 / 20 bps | +64.3790% | +53.5444% | +94.2074% | +10.8346 pp | -29.8284 pp | -20.5992% |
+
+R-077 averaged nine holdings and only 17.64% gross exposure because its
+top-decile selection retained the frozen 1.96%-per-name cap; 82.36% average
+cash dominates its absolute result. Its matched comparator had the same gross
+exposure and the primary-cost spread is negative, so the run provides no
+convincing QQQ-proxy selection edge. R-078 averaged 47.71 holdings and 93.51%
+gross exposure. Its +12.9048-point primary-cost matched spread is tangible
+positive selection evidence inside the SPY-plus-QQQ holdings proxy, but it
+still trails SPY and is weaker than R-072's SPY-only matched spread.
+
+The matched QQQ and union accounts record respectively three and fourteen
+membership-end zero recoveries, versus zero for each signal account; that
+lower-bound asymmetry can overstate the apparent selection spread by an
+unknown amount. Inputs remain current-vintage/non-pristine-PIT, ETF holdings
+are proxies rather than official memberships, the terminal-payoff splice is
+absent, and these descriptive same-window results cannot select a winner or
+authorize tuning, leverage, promotion, deployment, broker access, orders,
+paper/live state or trading. Accounting is now **74 shared looks, 21 ARV2
+development evaluations, 23 infrastructure looks and a 591-cell floor**.

@@ -1571,6 +1571,36 @@ def test_constituent_history_refuses_changed_membership_shape_policy_exactly(
         )
 
 
+def test_constituent_history_refuses_changed_evaluator_membership_inventory_exactly(
+    monkeypatch,
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE QQQ", "QQQ"))
+    algorithm = _ConstituentHistoryAlgorithm({})
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "MEMBERSHIP_ONLY_PROFILE_IDS",
+        stock_portfolio_evaluator.MEMBERSHIP_ONLY_PROFILE_IDS[:-1],
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^constituent-history membership shape policy changed$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            algorithm,
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=(
+                stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID
+            ),
+            constituent_universes={"QQQ": universe},
+        )
+    assert algorithm.calls == []
+
+
 def test_constituent_history_refuses_an_unreadable_resolution_inventory_exactly(
     monkeypatch,
 ):

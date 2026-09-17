@@ -318,6 +318,10 @@ _PINNED_MARKET_CAP_CONSTITUENT_TICKERS_CALLABLE = (
     market_cap_evaluator.constituent_etf_tickers_for_profile
 )
 _PINNED_MARKET_CAP_PROFILE_IDS = tuple(market_cap_evaluator.PROFILE_IDS)
+_PINNED_MARKET_CAP_V1_PROFILE_IDS = tuple(market_cap_evaluator.V1_PROFILE_IDS)
+_PINNED_MARKET_CAP_ALL_PROFILE_IDS = tuple(
+    market_cap_evaluator.ALL_PROFILE_IDS
+)
 _PINNED_MARKET_CAP_QQQ_PROFILE_IDS = tuple(
     market_cap_evaluator.QQQ_PROFILE_IDS
 )
@@ -398,6 +402,8 @@ _PINNED_LEVERAGE_RESULT_NAMES_CALLABLE = (
     leverage_evaluator.expected_custom_summary_statistic_names
 )
 _PINNED_LEVERAGE_PROFILE_IDS = tuple(leverage_evaluator.PROFILE_IDS)
+_PINNED_LEVERAGE_V1_PROFILE_IDS = tuple(leverage_evaluator.V1_PROFILE_IDS)
+_PINNED_LEVERAGE_ALL_PROFILE_IDS = tuple(leverage_evaluator.ALL_PROFILE_IDS)
 _PINNED_LEVERAGE_PROFILE_CANONICAL_OBJECT = leverage_evaluator._PROFILE_CANONICAL
 _PINNED_LEVERAGE_PROFILE_CANONICAL_ROWS = tuple(
     sorted(_PINNED_LEVERAGE_PROFILE_CANONICAL_OBJECT.items())
@@ -777,6 +783,102 @@ _EVALUATION_RUN_SPECS = (
         86,
         28,
         29,
+        4,
+        619,
+        623,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
+        "arv2-eval-market-cap-stock-qqq-2021-2025-qc-026",
+        "R-091",
+        79,
+        80,
+        22,
+        23,
+        4,
+        591,
+        595,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.SPY_2021_2025_V2_PROFILE_ID,
+        "arv2-eval-market-cap-stock-spy-2021-2025-qc-027",
+        "R-092",
+        80,
+        81,
+        23,
+        24,
+        4,
+        595,
+        599,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.QQQ_2019_2023_V2_PROFILE_ID,
+        "arv2-eval-market-cap-stock-qqq-2019-2023-qc-028",
+        "R-093",
+        81,
+        82,
+        24,
+        25,
+        4,
+        599,
+        603,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.SPY_2019_2023_V2_PROFILE_ID,
+        "arv2-eval-market-cap-stock-spy-2019-2023-qc-029",
+        "R-094",
+        82,
+        83,
+        25,
+        26,
+        4,
+        603,
+        607,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.QQQ_2023_2025_V2_PROFILE_ID,
+        "arv2-eval-market-cap-stock-qqq-2023-2025-qc-030",
+        "R-095",
+        83,
+        84,
+        26,
+        27,
+        4,
+        607,
+        611,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID,
+        "arv2-eval-market-cap-stock-spy-2023-2025-qc-031",
+        "R-096",
+        84,
+        85,
+        27,
+        28,
+        4,
+        611,
+        615,
+    ),
+    _EvaluationRunSpec(
+        leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
+        "arv2-eval-objective-synthetic-leverage-qqq-2021-2025-qc-032",
+        "R-097",
+        85,
+        86,
+        28,
+        29,
+        4,
+        615,
+        619,
+    ),
+    _EvaluationRunSpec(
+        leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID,
+        "arv2-eval-objective-synthetic-leverage-spy-2021-2025-qc-033",
+        "R-098",
+        86,
+        87,
+        29,
+        30,
         4,
         619,
         623,
@@ -1289,7 +1391,12 @@ def _market_cap_contract_bindings_are_current() -> bool:
             is not _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE
             or type(profile_ids) is not tuple
             or profile_ids != _PINNED_MARKET_CAP_PROFILE_IDS
-            or namespace.get("ALL_PROFILE_IDS") != profile_ids
+            or namespace.get("V1_PROFILE_IDS")
+            != _PINNED_MARKET_CAP_V1_PROFILE_IDS
+            or namespace.get("ALL_PROFILE_IDS")
+            != _PINNED_MARKET_CAP_ALL_PROFILE_IDS
+            or namespace.get("ALL_PROFILE_IDS")
+            != namespace.get("V1_PROFILE_IDS") + profile_ids
             or len(profile_ids) != 6
             or any(type(item) is not str for item in profile_ids)
             or len(set(profile_ids)) != len(profile_ids)
@@ -1427,6 +1534,12 @@ def _leverage_contract_bindings_are_current() -> bool:
             != _PINNED_LEVERAGE_BASE_SOURCE_SHA256
             or type(profile_ids) is not tuple
             or profile_ids != _PINNED_LEVERAGE_PROFILE_IDS
+            or namespace.get("V1_PROFILE_IDS")
+            != _PINNED_LEVERAGE_V1_PROFILE_IDS
+            or namespace.get("ALL_PROFILE_IDS")
+            != _PINNED_LEVERAGE_ALL_PROFILE_IDS
+            or namespace.get("ALL_PROFILE_IDS")
+            != namespace.get("V1_PROFILE_IDS") + profile_ids
             or len(profile_ids) != 2
             or any(type(item) is not str for item in profile_ids)
             or len(set(profile_ids)) != len(profile_ids)
@@ -7460,6 +7573,8 @@ _seal_action_bindings(
         "_PINNED_MARKET_CAP_RESULT_NAMES_CALLABLE",
         "_PINNED_MARKET_CAP_CONSTITUENT_TICKERS_CALLABLE",
         "_PINNED_MARKET_CAP_PROFILE_IDS",
+        "_PINNED_MARKET_CAP_V1_PROFILE_IDS",
+        "_PINNED_MARKET_CAP_ALL_PROFILE_IDS",
         "_PINNED_MARKET_CAP_QQQ_PROFILE_IDS",
         "_PINNED_MARKET_CAP_SPY_PROFILE_IDS",
         "_PINNED_MARKET_CAP_PROFILE_CANONICAL_OBJECT",
@@ -7483,6 +7598,8 @@ _seal_action_bindings(
         "_PINNED_REQUIRE_LEVERAGE_PROFILE",
         "_PINNED_LEVERAGE_RESULT_NAMES_CALLABLE",
         "_PINNED_LEVERAGE_PROFILE_IDS",
+        "_PINNED_LEVERAGE_V1_PROFILE_IDS",
+        "_PINNED_LEVERAGE_ALL_PROFILE_IDS",
         "_PINNED_LEVERAGE_PROFILE_CANONICAL_OBJECT",
         "_PINNED_LEVERAGE_PROFILE_CANONICAL_ROWS",
         "_PINNED_LEVERAGE_CONTRACT_ID",

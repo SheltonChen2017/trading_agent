@@ -1081,7 +1081,7 @@ class QcPitMarketCapEligibilityLoader:
                 )
             )
             if not start <= observed < end:
-                _error(name + " collection escaped request bounds")
+                continue
             if observed in result:
                 _error(name + " duplicated a collection time")
             rows = _collection_rows(raw_rows, name)

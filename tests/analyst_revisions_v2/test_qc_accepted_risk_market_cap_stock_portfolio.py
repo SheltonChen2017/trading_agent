@@ -188,25 +188,25 @@ def _complete(
     return runtime
 
 
-def test_six_exact_profiles_cover_both_proxies_and_fixed_periods():
+def test_successor_profiles_preserve_periods_and_superseded_identities():
     assert subject.PROFILE_IDS == (
-        subject.QQQ_2021_2025_PROFILE_ID,
-        subject.SPY_2021_2025_PROFILE_ID,
-        subject.QQQ_2019_2023_PROFILE_ID,
-        subject.SPY_2019_2023_PROFILE_ID,
-        subject.QQQ_2023_2025_PROFILE_ID,
-        subject.SPY_2023_2025_PROFILE_ID,
+        subject.QQQ_2021_2025_V2_PROFILE_ID,
+        subject.SPY_2021_2025_V2_PROFILE_ID,
+        subject.QQQ_2019_2023_V2_PROFILE_ID,
+        subject.SPY_2019_2023_V2_PROFILE_ID,
+        subject.QQQ_2023_2025_V2_PROFILE_ID,
+        subject.SPY_2023_2025_V2_PROFILE_ID,
     )
-    assert subject.ALL_PROFILE_IDS == subject.PROFILE_IDS
+    assert subject.ALL_PROFILE_IDS == subject.V1_PROFILE_IDS + subject.PROFILE_IDS
     assert subject.QQQ_PROFILE_IDS == subject.PROFILE_IDS[::2]
     assert subject.SPY_PROFILE_IDS == subject.PROFILE_IDS[1::2]
     expected = {
-        subject.QQQ_2021_2025_PROFILE_ID: ("QQQ", 1_255, 261),
-        subject.SPY_2021_2025_PROFILE_ID: ("SPY", 1_255, 261),
-        subject.QQQ_2019_2023_PROFILE_ID: ("QQQ", 1_258, 261),
-        subject.SPY_2019_2023_PROFILE_ID: ("SPY", 1_258, 261),
-        subject.QQQ_2023_2025_PROFILE_ID: ("QQQ", 752, 157),
-        subject.SPY_2023_2025_PROFILE_ID: ("SPY", 752, 157),
+        subject.QQQ_2021_2025_V2_PROFILE_ID: ("QQQ", 1_255, 261),
+        subject.SPY_2021_2025_V2_PROFILE_ID: ("SPY", 1_255, 261),
+        subject.QQQ_2019_2023_V2_PROFILE_ID: ("QQQ", 1_258, 261),
+        subject.SPY_2019_2023_V2_PROFILE_ID: ("SPY", 1_258, 261),
+        subject.QQQ_2023_2025_V2_PROFILE_ID: ("QQQ", 752, 157),
+        subject.SPY_2023_2025_V2_PROFILE_ID: ("SPY", 752, 157),
     }
     for profile_id, (ticker, sessions, decisions) in expected.items():
         profile = subject.require_profile(profile_id)
@@ -218,10 +218,17 @@ def test_six_exact_profiles_cover_both_proxies_and_fixed_periods():
         assert profile["target_gross_exposure"] == "0.98"
         assert profile["execution_timing"] == "next_authenticated_session_open"
         assert profile["cost_bps_per_side"] == [0, 5, 10, 20]
+        assert profile["history_collection_window_policy"] == (
+            subject.OUT_OF_WINDOW_COLLECTION_POLICY
+        )
         assert profile["leverage"] is False
         assert subject.constituent_etf_tickers_for_profile(profile_id) == (
             ticker,
         )
+    assert all(
+        "history_collection_window_policy" not in subject.require_profile(profile_id)
+        for profile_id in subject.V1_PROFILE_IDS
+    )
 
 
 def test_profiles_are_detached_and_unknown_profile_refuses():

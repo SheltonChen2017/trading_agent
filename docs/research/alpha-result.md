@@ -2399,3 +2399,30 @@ choose a retry rule. Exactly one bounded aggregate result read is allowed per
 run. No raw provider row, security identifier, price row, log, chart, holding,
 order, deployment, broker state, paper/live state, or trading action is
 authorized.
+
+## R-083 disposition; R-084 through R-090 superseded unspent — 2026-09-17
+
+R-083 launched once in private project `36664366`, backtest
+`087f91701ac3fb19d9ab6433a03227e6`, and reached authenticated `Runtime Error`
+after two statistics-free polls. No aggregate result was read and no economic
+cell was emitted. One separately authorized, no-redirect technical diagnostic
+selected only the terminal error and stack frame: `PIT fundamentals history
+collection escaped request bounds`. No raw provider row, identifier, price,
+return, chart, order, holding, deployment, broker state, paper/live state, or
+trading action was selected.
+
+R-083 is final: shared looks **78 -> 79**, ARV2 development evaluations
+**21 -> 22**, infrastructure looks unchanged at **27**, and lifetime cell
+floor unchanged at **591**. A local signature revalidation refusal before
+network access spent no look. R-084 through R-090 did not launch and spend
+nothing; their physical plans are superseded unspent because the bounded
+runtime correction changes their projected-source and host-closure identities.
+
+The prospective correction validates each history collection's shape,
+universe identity, and timestamp, then ignores only collections outside the
+exact request interval before traversing their rows. In-window PIT and
+financial rules are unchanged. Fresh v2 profiles preserve the old v1 records
+and carry this policy explicitly. R-091 through R-098 are reserved as fresh
+technical successors, starting from **79 shared looks, 22 development
+evaluations, 27 infrastructure looks, and a 591-cell floor**. Exact physical
+identities must be committed before any external action.

@@ -41,11 +41,11 @@ TRAIN_SLICE_SOFT_SECONDS = market_cap_runtime.TRAIN_SLICE_SOFT_SECONDS
 MAX_TRAIN_SLICE_COUNT = market_cap_runtime.MAX_TRAIN_SLICE_COUNT
 
 _BASE_PROFILE_BY_LEVERAGE = {
-    leverage_evaluator.QQQ_2021_2025_PROFILE_ID: (
-        market_cap_evaluator.QQQ_2021_2025_PROFILE_ID
+    leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID: (
+        market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID
     ),
-    leverage_evaluator.SPY_2021_2025_PROFILE_ID: (
-        market_cap_evaluator.SPY_2021_2025_PROFILE_ID
+    leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID: (
+        market_cap_evaluator.SPY_2021_2025_V2_PROFILE_ID
     ),
 }
 

@@ -260,7 +260,7 @@ def market_cap_plan_2021(monkeypatch, tmp_path):
     return _build_plan(
         monkeypatch,
         tmp_path,
-        market_cap_evaluator.QQQ_2021_2025_PROFILE_ID,
+        market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
     )
 
 
@@ -274,7 +274,7 @@ def leverage_plan_qqq(monkeypatch, tmp_path):
     return _build_plan(
         monkeypatch,
         tmp_path,
-        leverage_evaluator.QQQ_2021_2025_PROFILE_ID,
+        leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
     )
 
 
@@ -1344,32 +1344,32 @@ _STOCK_UNIVERSE_ACCOUNTING = {
 }
 
 _MARKET_CAP_ACCOUNTING = {
-    market_cap_evaluator.QQQ_2021_2025_PROFILE_ID: (
-        "R-083", 78, 79, 21, 22, 591, 595
+    market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID: (
+        "R-091", 79, 80, 22, 23, 591, 595
     ),
-    market_cap_evaluator.SPY_2021_2025_PROFILE_ID: (
-        "R-084", 79, 80, 22, 23, 595, 599
+    market_cap_evaluator.SPY_2021_2025_V2_PROFILE_ID: (
+        "R-092", 80, 81, 23, 24, 595, 599
     ),
-    market_cap_evaluator.QQQ_2019_2023_PROFILE_ID: (
-        "R-085", 80, 81, 23, 24, 599, 603
+    market_cap_evaluator.QQQ_2019_2023_V2_PROFILE_ID: (
+        "R-093", 81, 82, 24, 25, 599, 603
     ),
-    market_cap_evaluator.SPY_2019_2023_PROFILE_ID: (
-        "R-086", 81, 82, 24, 25, 603, 607
+    market_cap_evaluator.SPY_2019_2023_V2_PROFILE_ID: (
+        "R-094", 82, 83, 25, 26, 603, 607
     ),
-    market_cap_evaluator.QQQ_2023_2025_PROFILE_ID: (
-        "R-087", 82, 83, 25, 26, 607, 611
+    market_cap_evaluator.QQQ_2023_2025_V2_PROFILE_ID: (
+        "R-095", 83, 84, 26, 27, 607, 611
     ),
-    market_cap_evaluator.SPY_2023_2025_PROFILE_ID: (
-        "R-088", 83, 84, 26, 27, 611, 615
+    market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID: (
+        "R-096", 84, 85, 27, 28, 611, 615
     ),
 }
 
 _LEVERAGE_ACCOUNTING = {
-    leverage_evaluator.QQQ_2021_2025_PROFILE_ID: (
-        "R-089", 84, 85, 27, 28, 615, 619
+    leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID: (
+        "R-097", 85, 86, 28, 29, 615, 619
     ),
-    leverage_evaluator.SPY_2021_2025_PROFILE_ID: (
-        "R-090", 85, 86, 28, 29, 619, 623
+    leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID: (
+        "R-098", 86, 87, 29, 30, 619, 623
     ),
 }
 
@@ -3476,7 +3476,7 @@ def test_market_cap_offline_launch_and_result_read_are_exact(
         market_cap_plan_2021.expected_custom_statistic_names
     )
     persisted = json.loads(result.persisted_path.read_bytes())
-    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-083"
+    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-091"
     assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == 595
     assert adapter.require_accepted_risk_preliminary_aggregate_result(
         result,
@@ -3513,7 +3513,7 @@ def test_leverage_offline_launch_and_result_read_are_exact(
         leverage_plan_qqq.expected_custom_statistic_names
     )
     persisted = json.loads(result.persisted_path.read_bytes())
-    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-089"
+    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-097"
     assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == 619
     assert adapter.require_accepted_risk_preliminary_aggregate_result(
         result,

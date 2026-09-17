@@ -94,7 +94,7 @@ def test_market_cap_projection_is_exact_small_and_profile_bound(
 
 
 def test_market_cap_main_defers_every_history_work_unit_until_callbacks(package):
-    profile_id = evaluator.QQQ_2021_2025_PROFILE_ID
+    profile_id = evaluator.QQQ_2021_2025_V2_PROFILE_ID
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=profile_id,
@@ -126,7 +126,7 @@ def test_market_cap_callback_calendar_has_explicit_completion_headroom(package):
 
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
-        evaluation_profile_id=evaluator.SPY_2021_2025_PROFILE_ID,
+        evaluation_profile_id=evaluator.SPY_2021_2025_V2_PROFILE_ID,
     )
     main = next(
         item.source_bytes.decode("ascii")
@@ -142,7 +142,7 @@ def test_market_cap_projection_inventory_and_profile_hash_are_load_bearing(
 ):
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
-        evaluation_profile_id=evaluator.SPY_2023_2025_PROFILE_ID,
+        evaluation_profile_id=evaluator.SPY_2023_2025_V2_PROFILE_ID,
     )
     with pytest.raises(
         projection.AcceptedRiskPreliminaryQcProjectionError,
@@ -164,7 +164,10 @@ def test_market_cap_projection_inventory_and_profile_hash_are_load_bearing(
 def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
     """ARV2R93-006: every reviewed R-083--R-090 profile is an exact pin."""
 
-    assert projection.MARKET_CAP_PROFILE_SHA256S == {
+    assert {
+        profile_id: evaluator.require_profile(profile_id)["profile_sha256"]
+        for profile_id in evaluator.V1_PROFILE_IDS
+    } == {
         evaluator.QQQ_2021_2025_PROFILE_ID:
             "3025fff20f0742b60b5e75af22bc71230608fcc7a3af9b043c0c8865dfe0548e",
         evaluator.SPY_2021_2025_PROFILE_ID:
@@ -178,11 +181,36 @@ def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
         evaluator.SPY_2023_2025_PROFILE_ID:
             "bbc3e88fd66cd8ad93ec1d3e48675c03df75460922e0c21d855dc8aa27ab68e4",
     }
-    assert projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S == {
+    assert {
+        profile_id: leverage_evaluator.require_profile(profile_id)[
+            "profile_sha256"
+        ]
+        for profile_id in leverage_evaluator.V1_PROFILE_IDS
+    } == {
         leverage_evaluator.QQQ_2021_2025_PROFILE_ID:
             "e9ed4d6e1df27c38273958ddfc66b4d8d0adc62c5995bb2f5941d7d3540cc68e",
         leverage_evaluator.SPY_2021_2025_PROFILE_ID:
             "ed7e3151daf3ae5868695e7753b0bb47119555124efe457cbca5db26a4208584",
+    }
+    assert projection.MARKET_CAP_PROFILE_SHA256S == {
+        evaluator.QQQ_2021_2025_V2_PROFILE_ID:
+            "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178",
+        evaluator.SPY_2021_2025_V2_PROFILE_ID:
+            "0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d",
+        evaluator.QQQ_2019_2023_V2_PROFILE_ID:
+            "661d87e282f6c37cc258db7a3e814e5a261369209fc3fc4a96c1769edd71f83d",
+        evaluator.SPY_2019_2023_V2_PROFILE_ID:
+            "72a4b469d7f8fa79ea4ea62836b6b43000069b5e0a7dca6941af00124ca68f4a",
+        evaluator.QQQ_2023_2025_V2_PROFILE_ID:
+            "da7f4c75b9504c02f209362d2aebf69188d32cf608ac167fd543beb196067f93",
+        evaluator.SPY_2023_2025_V2_PROFILE_ID:
+            "e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3",
+    }
+    assert projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S == {
+        leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID:
+            "a800d1db535ca22fa1bcfc238fbcfabbb463e21b18cf3fc384b606542878192e",
+        leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID:
+            "07106d52bed121064659b97173f66d1776adf5e72f0f231600d2b7b53299a014",
     }
 
 
@@ -213,7 +241,7 @@ def test_objective_leverage_projection_is_exact_small_and_profile_bound(
             by_name[name].byte_count
             for name in projection.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
         )
-        == 237_925
+        == 240_505
     )
     assert max(item.byte_count for item in value.source_files) < 60_000
     assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES
@@ -243,7 +271,7 @@ def test_objective_leverage_main_defers_work_until_daily_callbacks(package):
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=(
-            leverage_evaluator.QQQ_2021_2025_PROFILE_ID
+            leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID
         ),
     )
     main = next(
@@ -266,7 +294,7 @@ def test_objective_leverage_main_defers_work_until_daily_callbacks(package):
 
 
 def test_objective_leverage_projection_hash_is_load_bearing(package):
-    profile_id = leverage_evaluator.SPY_2021_2025_PROFILE_ID
+    profile_id = leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=profile_id,
@@ -293,7 +321,7 @@ def test_objective_leverage_projection_hash_is_load_bearing(package):
 def test_objective_leverage_flat_source_set_imports_in_isolation(
     package, tmp_path
 ):
-    profile_id = leverage_evaluator.QQQ_2021_2025_PROFILE_ID
+    profile_id = leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=profile_id,

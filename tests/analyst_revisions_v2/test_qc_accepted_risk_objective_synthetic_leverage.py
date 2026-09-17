@@ -153,7 +153,7 @@ def _history_loader(value, *, daily_growth=Decimal("1.0001")):
     return load
 
 
-def _complete(profile_id=subject.QQQ_2021_2025_PROFILE_ID):
+def _complete(profile_id=subject.QQQ_2021_2025_V2_PROFILE_ID):
     value = _input()
     runtime = subject.ObjectiveSyntheticLeverageEvaluationRuntime(
         value,
@@ -169,19 +169,20 @@ def _complete(profile_id=subject.QQQ_2021_2025_PROFILE_ID):
     return runtime
 
 
-def test_two_profiles_pin_exact_base_lineage_and_objective_rule():
+def test_two_successor_profiles_pin_exact_base_lineage_and_objective_rule():
     assert subject.PROFILE_IDS == (
-        subject.QQQ_2021_2025_PROFILE_ID,
-        subject.SPY_2021_2025_PROFILE_ID,
+        subject.QQQ_2021_2025_V2_PROFILE_ID,
+        subject.SPY_2021_2025_V2_PROFILE_ID,
     )
+    assert subject.ALL_PROFILE_IDS == subject.V1_PROFILE_IDS + subject.PROFILE_IDS
     expected = {
-        subject.QQQ_2021_2025_PROFILE_ID: (
-            market.QQQ_2021_2025_PROFILE_ID,
-            "3025fff20f0742b60b5e75af22bc71230608fcc7a3af9b043c0c8865dfe0548e",
+        subject.QQQ_2021_2025_V2_PROFILE_ID: (
+            market.QQQ_2021_2025_V2_PROFILE_ID,
+            "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178",
         ),
-        subject.SPY_2021_2025_PROFILE_ID: (
-            market.SPY_2021_2025_PROFILE_ID,
-            "6dcb9a08790a40407622d5a6ec34e5cd8fab5978d8e4cdc0f1ba16fb984063d7",
+        subject.SPY_2021_2025_V2_PROFILE_ID: (
+            market.SPY_2021_2025_V2_PROFILE_ID,
+            "0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d",
         ),
     }
     for profile_id, (base_id, base_sha) in expected.items():
@@ -205,6 +206,11 @@ def test_two_profiles_pin_exact_base_lineage_and_objective_rule():
         assert "without_hindsight_or_security_override" in profile[
             "signal_and_selection"
         ]
+    assert all(
+        subject.require_profile(profile_id)["base_evaluator_source_sha256"]
+        == subject.V1_BASE_EVALUATOR_SOURCE_SHA256
+        for profile_id in subject.V1_PROFILE_IDS
+    )
 
 
 def test_base_evaluator_source_bytes_and_profile_hashes_are_still_exact():
@@ -217,6 +223,15 @@ def test_base_evaluator_source_bytes_and_profile_hashes_are_still_exact():
         assert base_profile["profile_sha256"] == profile[
             "base_profile_sha256"
         ]
+
+
+def test_preserved_v1_profile_emits_its_historical_source_identity():
+    runtime = _complete(subject.QQQ_2021_2025_PROFILE_ID)
+    meta = json.loads(runtime.custom_summary_statistics()["ARV2_LEVERAGE_META"])
+
+    assert meta["base_evaluator_source_sha256"] == (
+        subject.V1_BASE_EVALUATOR_SOURCE_SHA256
+    )
 
 
 def test_scenarios_and_custom_stat_inventory_are_fixed():
@@ -236,7 +251,7 @@ def test_scenarios_and_custom_stat_inventory_are_fixed():
         ),
     )
     assert subject.expected_custom_summary_statistic_names(
-        subject.QQQ_2021_2025_PROFILE_ID
+        subject.QQQ_2021_2025_V2_PROFILE_ID
     ) == (
         "ARV2_LEVERAGE_L2_ADVERSE",
         "ARV2_LEVERAGE_L2_PRIMARY",
@@ -408,7 +423,7 @@ def test_custom_summary_is_compact_aggregate_only_and_has_no_capabilities():
     runtime = _complete()
     output = runtime.custom_summary_statistics()
     assert tuple(output) == subject.expected_custom_summary_statistic_names(
-        subject.QQQ_2021_2025_PROFILE_ID
+        subject.QQQ_2021_2025_V2_PROFILE_ID
     )
     assert all(len(key) <= 64 and len(value) <= 4096 for key, value in output.items())
     joined = json.dumps(output, sort_keys=True)

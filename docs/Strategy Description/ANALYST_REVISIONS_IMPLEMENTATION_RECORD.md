@@ -1108,6 +1108,16 @@ a Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks. No retrospective
 winner selection, deployment, order, broker, paper/live, or trading action is
 authorized.
 
+Section 96 records R-083's terminal technical refusal, zero-cell disposition,
+and the bounded out-of-window-collection correction. The owner explicitly
+waives Claude review of section 96 until this same-round authorized retry
+sequence is complete. The exact next step is to commit fresh R-091 through
+R-098 physical identities before external action, then run the six unlevered
+market-cap successors sequentially before either leverage diagnostic. R-084
+through R-090 are superseded unspent. No observed economic value selected the
+correction, and no result authorizes retrospective winner selection,
+deployment, orders, broker access, paper/live state, or trading.
+
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -17349,3 +17359,46 @@ Any technical successor needs a fresh committed identity; observed results may
 not choose the retry rule. No formal acceptance, deployment, broker access,
 order, paper/live, or trading authority follows from this freeze or any one
 descriptive result.
+
+## 96. R-083 runtime refusal and bounded technical successor, 2026-09-17
+
+R-083 launched exactly once in private QC project `36664366`, backtest
+`087f91701ac3fb19d9ab6433a03227e6`, and reached authenticated terminal status
+`Runtime Error` after two statistics-free polls. It produced no aggregate
+result and no economic cell. One owner-authorized, secure, no-redirect
+technical diagnostic selected only the terminal error and stack frame; it
+identified `PIT fundamentals history collection escaped request bounds` in
+the market-cap runtime. No provider row, identifier, price, return, chart,
+order, holding, deployment, broker state, paper/live state, or trading action
+was read. The earlier local detached-signature revalidation refusal occurred
+before network access and spent no look.
+
+The failure is an interface-shape issue, not an economic result. QC may return
+an otherwise well-formed unflattened history collection immediately outside
+the explicit request interval. Such a collection cannot be selected by any
+decision in that interval. The corrected runtime therefore still validates
+the collection item shape, universe identity, and collection time, but skips
+an out-of-window collection before duplicate checking or row traversal. All
+in-window strict-prior, pre-open, exact-SID, market-cap, membership, row-cap,
+source-row-cap, and carry rules are unchanged. A hostile-payload regression
+proves the skipped rows are never traversed while the in-window collection is
+still used and counted.
+
+R-083 is final and spends shared looks **78 -> 79** and ARV2 development
+evaluations **21 -> 22**. Infrastructure looks remain **27**, and the cell
+floor remains **591**. R-084 through R-090 never launched and spend nothing;
+their physical plans are superseded unspent because this runtime correction
+changes the projected source and host closure. Their v1 profile records and
+SHA-256 identities remain queryable as historical records.
+
+Fresh active v2 identities preserve the six unlevered economic contracts and
+the two objective-leverage contracts while adding the exact collection-window
+policy. The preserved v1 leverage summaries emit their historical base-source
+identity rather than the v2 source identity. R-091 through R-098 will be the
+fresh sequence: six unlevered market-cap diagnostics first, then the two
+synthetic-leverage diagnostics. Their accounting starts from 79 shared looks,
+22 development evaluations, 27 infrastructure looks, and a 591-cell floor.
+The owner's same-round direction expressly authorizes bounded technical
+correction and retry after this completed counter-review; independent review
+of the resulting run round remains deferred until after results. No observed
+economic value selected this correction.

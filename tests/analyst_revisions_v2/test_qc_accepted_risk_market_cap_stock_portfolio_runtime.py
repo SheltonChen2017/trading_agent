@@ -29,7 +29,7 @@ RUNTIME_PATH = (
     / "analyst_revisions_v2_qc"
     / "accepted_risk_market_cap_stock_portfolio_qc_runtime.py"
 )
-PROFILE_ID = evaluator.QQQ_2023_2025_PROFILE_ID
+PROFILE_ID = evaluator.QQQ_2023_2025_V2_PROFILE_ID
 
 
 class _Universe:
@@ -195,6 +195,47 @@ def test_incremental_pit_loader_selects_latest_preopen_cap_and_discloses_uncover
     assert loader.covered_count == 1
     assert loader.uncovered_count == 1
     assert all(call[3] is False for call in algorithm.calls)
+
+
+def test_out_of_window_collection_is_ignored_before_traversing_rows():
+    fundamentals, constituents = _valid_rows()
+    loader, algorithm, rows, _symbols = _loader(
+        fundamental_rows=fundamentals,
+        constituent_rows=constituents,
+    )
+    bounded_history = algorithm.history
+    traversed = False
+
+    class _HostileRows:
+        def __iter__(self):
+            nonlocal traversed
+            traversed = True
+            raise AssertionError("out-of-window rows were traversed")
+
+    def history(universe, start, end, *, flatten):
+        if universe is loader._fundamental_universe:
+            algorithm.calls.append((universe, start, end, flatten))
+            return _Series(
+                {
+                    (universe.symbol, end): _HostileRows(),
+                    (
+                        universe.symbol,
+                        datetime(2025, 1, 6, 8),
+                    ): fundamentals[datetime(2025, 1, 6, 8)],
+                }
+            )
+        return bounded_history(universe, start, end, flatten=flatten)
+
+    algorithm.history = history
+    loader.advance()
+    loader.advance()
+
+    assert traversed is False
+    assert loader.require_completed_market_caps() == {
+        "2025-01-06": {rows[0]["security_id"]: Decimal("300.25")}
+    }
+    assert loader.fetched_source_row_count == 4
+    assert len(algorithm.calls) == 2
 
 
 def test_later_empty_fundamental_and_etf_chunks_use_contiguous_carry():

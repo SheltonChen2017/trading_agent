@@ -49,8 +49,18 @@ QQQ_2019_2023_PROFILE_ID = "arv2-market-cap-stock-qqq-2019-2023-v1"
 SPY_2019_2023_PROFILE_ID = "arv2-market-cap-stock-spy-2019-2023-v1"
 QQQ_2023_2025_PROFILE_ID = "arv2-market-cap-stock-qqq-2023-2025-v1"
 SPY_2023_2025_PROFILE_ID = "arv2-market-cap-stock-spy-2023-2025-v1"
+QQQ_2021_2025_V2_PROFILE_ID = "arv2-market-cap-stock-qqq-2021-2025-v2"
+SPY_2021_2025_V2_PROFILE_ID = "arv2-market-cap-stock-spy-2021-2025-v2"
+QQQ_2019_2023_V2_PROFILE_ID = "arv2-market-cap-stock-qqq-2019-2023-v2"
+SPY_2019_2023_V2_PROFILE_ID = "arv2-market-cap-stock-spy-2019-2023-v2"
+QQQ_2023_2025_V2_PROFILE_ID = "arv2-market-cap-stock-qqq-2023-2025-v2"
+SPY_2023_2025_V2_PROFILE_ID = "arv2-market-cap-stock-spy-2023-2025-v2"
+OUT_OF_WINDOW_COLLECTION_POLICY = (
+    "ignore_only_after_validating_collection_shape_identity_and_time_"
+    "and_before_traversing_rows"
+)
 
-_PROFILE_ROWS = (
+_V1_PROFILE_ROWS = (
     (
         QQQ_2021_2025_PROFILE_ID,
         "QQQ",
@@ -106,10 +116,22 @@ _PROFILE_ROWS = (
         "SPY_holdings_proxy_not_official_SP500_index_membership",
     ),
 )
-PROFILE_IDS = tuple(row[0] for row in _PROFILE_ROWS)
-ALL_PROFILE_IDS = PROFILE_IDS
-QQQ_PROFILE_IDS = tuple(row[0] for row in _PROFILE_ROWS if row[1] == "QQQ")
-SPY_PROFILE_IDS = tuple(row[0] for row in _PROFILE_ROWS if row[1] == "SPY")
+V1_PROFILE_IDS = tuple(row[0] for row in _V1_PROFILE_ROWS)
+PROFILE_IDS = (
+    QQQ_2021_2025_V2_PROFILE_ID,
+    SPY_2021_2025_V2_PROFILE_ID,
+    QQQ_2019_2023_V2_PROFILE_ID,
+    SPY_2019_2023_V2_PROFILE_ID,
+    QQQ_2023_2025_V2_PROFILE_ID,
+    SPY_2023_2025_V2_PROFILE_ID,
+)
+_PROFILE_ROWS = tuple((*row, None) for row in _V1_PROFILE_ROWS) + tuple(
+    (successor_id, *row[1:], OUT_OF_WINDOW_COLLECTION_POLICY)
+    for successor_id, row in zip(PROFILE_IDS, _V1_PROFILE_ROWS, strict=True)
+)
+ALL_PROFILE_IDS = V1_PROFILE_IDS + PROFILE_IDS
+QQQ_PROFILE_IDS = PROFILE_IDS[::2]
+SPY_PROFILE_IDS = PROFILE_IDS[1::2]
 
 
 def _canonical(value):
@@ -143,6 +165,7 @@ def _build_profile(row):
         expected_session_count,
         expected_decision_session_count,
         disclaimer,
+        out_of_window_collection_policy,
     ) = row
     record = {
         "schema": PROFILE_SCHEMA,
@@ -205,6 +228,10 @@ def _build_profile(row):
         "orders": False,
         "trading": False,
     }
+    if out_of_window_collection_policy is not None:
+        record["history_collection_window_policy"] = (
+            out_of_window_collection_policy
+        )
     return {**record, "profile_sha256": _sha(record)}
 
 
@@ -1268,16 +1295,24 @@ __all__ = (
     "PRIMARY_SOURCE_VIEW_ID",
     "PROFILE_IDS",
     "PROFILE_SCHEMA",
+    "OUT_OF_WINDOW_COLLECTION_POLICY",
     "QQQ_PROFILE_IDS",
     "QQQ_2019_2023_PROFILE_ID",
+    "QQQ_2019_2023_V2_PROFILE_ID",
     "QQQ_2021_2025_PROFILE_ID",
+    "QQQ_2021_2025_V2_PROFILE_ID",
     "QQQ_2023_2025_PROFILE_ID",
+    "QQQ_2023_2025_V2_PROFILE_ID",
     "SPY_2019_2023_PROFILE_ID",
+    "SPY_2019_2023_V2_PROFILE_ID",
     "SPY_2021_2025_PROFILE_ID",
+    "SPY_2021_2025_V2_PROFILE_ID",
     "SPY_2023_2025_PROFILE_ID",
+    "SPY_2023_2025_V2_PROFILE_ID",
     "SPY_PROFILE_IDS",
     "SUMMARY_SCHEMA",
     "TARGET_GROSS_EXPOSURE",
+    "V1_PROFILE_IDS",
     "constituent_etf_tickers_for_profile",
     "decision_sessions_for_input",
     "expected_custom_summary_statistic_names",

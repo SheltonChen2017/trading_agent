@@ -38,6 +38,9 @@ CONTRACT_ID = "arv2-objective-synthetic-leverage-v1"
 SUMMARY_SCHEMA = "arv2-objective-synthetic-leverage-summary-v1"
 CELL_SCHEMA = "arv2-objective-synthetic-leverage-cell-v1"
 BASE_EVALUATOR_SOURCE_SHA256 = (
+    "0f320134b96e651593bfb98d29a1b8da3987d6192eb83f5a6025a21bdecb5905"
+)
+V1_BASE_EVALUATOR_SOURCE_SHA256 = (
     "8edb2b55955567a2b809124106bab8bdcb84b610d9fc0c8635fdd92d1a21e831"
 )
 
@@ -47,7 +50,15 @@ QQQ_2021_2025_PROFILE_ID = (
 SPY_2021_2025_PROFILE_ID = (
     "arv2-objective-synthetic-leverage-spy-2021-2025-v1"
 )
-PROFILE_IDS = (QQQ_2021_2025_PROFILE_ID, SPY_2021_2025_PROFILE_ID)
+QQQ_2021_2025_V2_PROFILE_ID = (
+    "arv2-objective-synthetic-leverage-qqq-2021-2025-v2"
+)
+SPY_2021_2025_V2_PROFILE_ID = (
+    "arv2-objective-synthetic-leverage-spy-2021-2025-v2"
+)
+V1_PROFILE_IDS = (QQQ_2021_2025_PROFILE_ID, SPY_2021_2025_PROFILE_ID)
+PROFILE_IDS = (QQQ_2021_2025_V2_PROFILE_ID, SPY_2021_2025_V2_PROFILE_ID)
+ALL_PROFILE_IDS = V1_PROFILE_IDS + PROFILE_IDS
 LEVERAGE_FACTORS = (2, 3)
 PRIMARY_SCENARIO_ID = "primary-6pct-financing-10bps"
 ADVERSE_SCENARIO_ID = "adverse-10pct-financing-20bps"
@@ -62,11 +73,25 @@ _PROFILE_ROWS = (
         QQQ_2021_2025_PROFILE_ID,
         _market.QQQ_2021_2025_PROFILE_ID,
         "3025fff20f0742b60b5e75af22bc71230608fcc7a3af9b043c0c8865dfe0548e",
+        V1_BASE_EVALUATOR_SOURCE_SHA256,
     ),
     (
         SPY_2021_2025_PROFILE_ID,
         _market.SPY_2021_2025_PROFILE_ID,
         "6dcb9a08790a40407622d5a6ec34e5cd8fab5978d8e4cdc0f1ba16fb984063d7",
+        V1_BASE_EVALUATOR_SOURCE_SHA256,
+    ),
+    (
+        QQQ_2021_2025_V2_PROFILE_ID,
+        _market.QQQ_2021_2025_V2_PROFILE_ID,
+        "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178",
+        BASE_EVALUATOR_SOURCE_SHA256,
+    ),
+    (
+        SPY_2021_2025_V2_PROFILE_ID,
+        _market.SPY_2021_2025_V2_PROFILE_ID,
+        "0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d",
+        BASE_EVALUATOR_SOURCE_SHA256,
     ),
 )
 
@@ -94,7 +119,12 @@ def _decimal_text(value):
 
 
 def _build_profile(row):
-    profile_id, base_profile_id, expected_base_profile_sha256 = row
+    (
+        profile_id,
+        base_profile_id,
+        expected_base_profile_sha256,
+        base_evaluator_source_sha256,
+    ) = row
     base_profile = _market.require_profile(base_profile_id)
     if base_profile["profile_sha256"] != expected_base_profile_sha256:
         raise ObjectiveSyntheticLeverageEvaluationError(
@@ -107,7 +137,7 @@ def _build_profile(row):
         "base_contract_id": _market.CONTRACT_ID,
         "base_profile_id": base_profile_id,
         "base_profile_sha256": expected_base_profile_sha256,
-        "base_evaluator_source_sha256": BASE_EVALUATOR_SOURCE_SHA256,
+        "base_evaluator_source_sha256": base_evaluator_source_sha256,
         "universe_proxy_ticker": base_profile["universe_proxy_ticker"],
         "evaluation_start_session": base_profile[
             "evaluation_start_session"
@@ -556,7 +586,9 @@ class ObjectiveSyntheticLeverageEvaluationRuntime(
             "base_contract_id": _market.CONTRACT_ID,
             "base_profile_id": self._profile["profile_id"],
             "base_profile_sha256": self._profile["profile_sha256"],
-            "base_evaluator_source_sha256": BASE_EVALUATOR_SOURCE_SHA256,
+            "base_evaluator_source_sha256": self._leverage_profile[
+                "base_evaluator_source_sha256"
+            ],
             "decision_session_count": self._decision_session_count,
             "return_session_count": return_count,
             "selected_base_aggregates": self._account_aggregates(
@@ -636,6 +668,7 @@ class ObjectiveSyntheticLeverageEvaluationRuntime(
 
 __all__ = (
     "ADVERSE_SCENARIO_ID",
+    "ALL_PROFILE_IDS",
     "ANNUALIZATION_SESSIONS",
     "BASE_EVALUATOR_SOURCE_SHA256",
     "CELL_SCHEMA",
@@ -647,9 +680,13 @@ __all__ = (
     "PROFILE_IDS",
     "PROFILE_SCHEMA",
     "QQQ_2021_2025_PROFILE_ID",
+    "QQQ_2021_2025_V2_PROFILE_ID",
     "SCENARIOS",
     "SPY_2021_2025_PROFILE_ID",
+    "SPY_2021_2025_V2_PROFILE_ID",
     "SUMMARY_SCHEMA",
+    "V1_BASE_EVALUATOR_SOURCE_SHA256",
+    "V1_PROFILE_IDS",
     "expected_custom_summary_statistic_names",
     "require_profile",
 )

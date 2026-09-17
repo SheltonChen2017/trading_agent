@@ -406,3 +406,24 @@ def test_history_items_bound_iteration_before_materializing_the_collection_cap()
         runtime._history_items(_History(), "ETF constituent")
 
     assert pulled == cap + 1
+
+
+def test_collection_rows_bound_iteration_before_materializing_the_row_cap():
+    """ARV2CR94: the row cap must stop traversal before full materialization."""
+
+    cap = runtime.MAX_COLLECTION_ROWS
+    pulled = 0
+
+    def oversized_but_finite():
+        nonlocal pulled
+        for _ in range(cap + 17):
+            pulled += 1
+            yield object()
+
+    with pytest.raises(
+        runtime.AcceptedRiskMarketCapStockPortfolioQcRuntimeError,
+        match="collection row bound changed",
+    ):
+        runtime._collection_rows(oversized_but_finite(), "Fundamental")
+
+    assert pulled == cap + 1

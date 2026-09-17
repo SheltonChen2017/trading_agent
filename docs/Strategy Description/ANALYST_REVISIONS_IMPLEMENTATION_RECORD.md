@@ -345,8 +345,14 @@ THE NO-SHORT GROSS CLAMP, THE ISLICE BOUND AND THE DAILY-RESET SEMANTICS
 INDEPENDENTLY OF ANY SOURCE-HASH PIN; NO PRODUCTION LINE CHANGED. IT ALSO
 CORRECTS SECTION 90'S SEVEN-FOR-SEVEN MUTATION CLAIM TO FIVE BEHAVIOURAL
 CATCHES AND TWO HASH-PIN CASCADES, AND RECORDS THE EIGHT REVIEWED PROFILE
-SHA-256S. CODEX COUNTER-REVIEWS SECTION 93 AND ONLY THEN FREEZES ANY
-PHYSICAL RUN IDENTITY. CURRENT ACCOUNTING IS 78 SHARED LOOKS, 21 ARV2
+SHA-256S. SECTION 94 IS THE CODEX COUNTER-REVIEW: `b55ea35` IS ACCEPTED;
+`df767d3` IS ACCEPTED AFTER PROSPECTIVE RECORD CORRECTIONS. NO PRODUCTION
+EXECUTION DEFECT WAS FOUND. THE COUNTER-REVIEW REMOVES A FALSE CLAIM THAT
+DAILY-RESET LEVERAGE MUST WIDEN AN EXISTING SPY SHORTFALL, CORRECTS THE
+RUNTIME STATISTIC INVENTORY AND REVIEW COUNTS, RE-STATES CONCENTRATION AS
+EFFECTIVE BREADTH, AND ADDS THE MISSING ROW-CAP ISOLATION TEST. PHYSICAL
+R-083 THROUGH R-090 IDENTITIES MAY NOW BE FROZEN BEFORE LAUNCH. CURRENT
+ACCOUNTING IS 78 SHARED LOOKS, 21 ARV2
 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
@@ -1088,12 +1094,15 @@ for six separately identified point-in-time market-cap-aware QQQ/SPY windows
 and two objective 2x/3x synthetic-leverage diagnostics. Section 93 is that
 independent Claude review: all seven commits accepted, four after test-only
 corrections, three P2s and five P3s, and the eight reviewed profile SHA-256s
-recorded. The immediate next step is that Codex counter-reviews section 93
-and the exact pushed range in this same worktree. Only after that chain may Codex
-freeze physical R-083 through R-090 submission identities, preregister them,
-and run them sequentially. QQQ remains a Nasdaq-100 holdings proxy, not all
-Nasdaq-listed stocks. No retrospective winner selection, deployment, order,
-broker, paper/live, or trading action is authorized.
+recorded. Section 94 is Codex's counter-review of both Claude commits. It
+accepts the test-only correction and accepts the record after five prospective
+corrections, including removal of a false leverage-direction implication. No
+production execution defect was found. Codex may now freeze physical R-083
+through R-090 submission identities, preregister them, and run them
+sequentially; the owner explicitly waives Claude review of section 94 before
+these already-authorized runs. QQQ remains a Nasdaq-100 holdings proxy, not all Nasdaq-listed
+stocks. No retrospective winner selection, deployment, order, broker,
+paper/live, or trading action is authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -2752,6 +2761,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-17 | Codex counter-review, corrected-comparator stock diagnostics, and point-in-time market-cap coverage canary | `cf33165` -> `27c6fd4`, `5477e1e`, `0707335`, `6eb1f4b`, `0863e99`, `ee53ba8`, `5e23ae6`, `59818b5`, `1afe6ac`, `63c2cc0`, and `45ae067` | Counter-review section 87, restore the four-cell cost-ladder integrity contract, run the corrected broad/SPY/QQQ/union stock diagnostics under prospective identities, and establish an outcome-free sampled point-in-time market-cap plus SPY/QQQ/SOXX membership prerequisite | R-065, R-072, R-077, and R-078 returned authenticated economic ladders; the other stock identities refused, were superseded unlaunched, or completed without a recoverable result exactly as sections 88.9--88.18 record. R-079 through R-081 exposed bounded channel/timestamp/duplicate-shape issues; fresh R-082 completed all 16 sampled sessions and authenticated only aggregate coverage counts and bounded availability timestamps. No raw provider row, security identifier, market-cap value, order, deployment, broker, paper/live state, or trade was selected. | Focused batteries and exact final handoff checks are recorded in sections 88.18 and 89.6. The complete lane selection reached **5,840 passed, 7 skipped** plus two handoff-only failures on the pre-correction record; the exact final focused handoff/ledger battery passed **34**, `compileall` and `git diff --check` were clean. The independently reviewed unchanged code/test tree subsequently passed **6,032 passed, 7 skipped, 0 failed** in section 90. | Counter-review/implementation findings and run dispositions remain in sections 88--89. Claude subsequently accepted all eleven commits and recorded three P2 and five P3 in section 90; section 91 qualifies that review. Accounting closes at **78 shared looks, 21 development evaluations, 27 infrastructure looks, and a 591-cell floor**. | This row is appended prospectively to close `ARV2R90-001`; it was not present before the `45ae067` push. Continue under sections 91 and later; no retrospective preregistration claim is made. |
 | 2026-09-17 | Codex counter-review and unrun market-cap/leverage implementation | `a547363` -> `a176415`, `fd5d7b5`, `dcc3c66`, `2db729c`, `4a96bd3`, `3349e4a`, and this record commit | Counter-review section 90; harden fresh probe lineage; implement six point-in-time market-cap-weighted QQQ/SPY period profiles plus two objective 2x/3x synthetic-leverage profiles; stop before physical preregistration or QC | The unlevered candidate preserves the R-055 score, selects the top decile capped at 50, and market-cap weights both selected and matched sleeves to 98% gross over 2019-2023, 2021-2025, and 2023-2025. The leverage candidate applies objective daily-reset 2x/3x transformations to the unchanged 2021-2025 selected/matched paths under fixed 6%/10-bps primary and 10%/20-bps adverse scenarios. Three P3 audit observations were corrected before handoff; exact details and review map are in section 92. No QC, provider, credential, market-data, result, broker, deployment, order, paper/live or trading action occurred. | Settled focused integration **421 passed in 230.58 s**; independent corrected-leverage audit **37 passed in 24.20 s**; complete standing Analyst lane at committed candidate `3349e4a`, including the root active-document gate, **6,037 passed, 7 skipped, 0 failed, 35 warnings in 6,342.28 s (1:45:42)**; compileall exit 0; final record gates and diff/status checks run after this row. **Zero research looks and zero development evaluations.** | Counter-review: section 91. Implementation audit: **0 P0/P1/P2; 4 P3** (`ARV2D92-001..004`), three corrected and one size-headroom observation documented/pinned. Accounting remains **78 shared looks, 21 development evaluations, 27 infrastructure looks, and a 591-cell floor**. | Push this exact same-lane range once. Claude reviews section 92 and the entire pushed range; Codex counter-reviews every Claude commit, then freezes and commits the exact R-083--R-090 physical preregistrations before sequential QC launch. No retrospective winner selection or trading authority. |
 | 2026-09-17 | Independent Claude review of the market-cap and objective synthetic-leverage review candidate | `51928d1` -> `b55ea35` and this record commit | Review `a547363..51928d1` commit by commit with failing-test-named mutation trials, re-verify section 90's mutation claim, pin inherited guards behaviourally, and record the reviewed-candidate identity | All seven commits accepted, four after test-only corrections; no production line changed. Section 90's seven-for-seven claim corrected to five behavioural catches and two hash-pin cascades. Four inherited guards pinned independently of hash pins: latest-prior selection, the no-short gross clamp, the islice bound, and daily-reset semantics. Eight reviewed profile SHAs recorded. No R-083 through R-090 project, look or result exists. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Section-90 matrix re-run (5 behavioural, 2 hash-only); 13 new trials (LM1-5, MC1-4, MR1-4) with named failing tests; touched test files **55 passed**; complete standing Analyst lane selection on the exact final code tree (`51928d1` + `b55ea35`) **6,163 passed, 7 skipped, 0 failed, 35 warnings in 5,972.59 s (1:39:32)**, including the root-level gates; record gates re-run on the final bytes **75 passed**; compileall exit 0; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **3 P2 and 5 P3** (`ARV2R93-001..008`); 7 corrected (4 in `b55ea35`, 3 by record restatement), 1 documented. Section 91's `ARV2CR91-011` confirmed and extended. | Push this same-lane round exactly once. Codex counter-reviews section 93 and the pushed range in this same worktree; only then may it freeze R-083 through R-090 identities, pin all eight profile SHAs, and launch. No leverage, deployment, broker, order or trading action. |
+| 2026-09-17 | Codex counter-review of the market-cap/leverage candidate review | `51928d1` -> `b55ea35`, `df767d3`, and this counter-review commit | Dispose both Claude commits, independently mutation-check the new guards, correct interpretation/bookkeeping before launch, and close the review gate without accessing QC | `b55ea35` accepted; `df767d3` accepted after five prospective record corrections. No production execution defect found. A false deterministic leverage-direction claim is withdrawn; the complete leverage statistic inventory is six while economic accounting remains four cells; section-91 dispositions and concentration wording are corrected; and the sibling row-materialization guard gains an isolated test. No R-083 through R-090 project, look, or result exists at this counter-review point. | Four touched Claude files **55 passed**; six of six guard-specific mutations red; the added row-cap test green and red under exact guard removal; all eight profile hashes reproduce; Claude's exact production tree already passed **6,163 passed, 7 skipped, 0 failed**. Focused final-tree and record gates are recorded in section 94. | Counter-review: **1 P2 and 4 P3** (`ARV2CR94-001..005`), corrected prospectively or by test. Accounting remains **78 shared looks, 21 development evaluations, 27 infrastructure looks, and a 591-cell floor**. | Freeze and commit exact R-083 through R-090 physical identities next, then launch six unlevered jobs followed by two objective synthetic-leverage jobs sequentially. No deployment, broker, order, paper/live, or trading action. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -17216,3 +17226,73 @@ remain open and unchanged. `ARV2R90-001`, `-006` and `-007` are closed by
   sentences and the matching ledger cell were written after the complete
   selection, and they change no code.
 - `git diff --check` clean.
+
+## 94. Codex counter-review of the section-93 Claude review, 2026-09-17
+
+**Range counter-reviewed:** `51928d1..df767d3`, two commits, individually and
+cumulatively on the same lane branch and in this same worktree. **Disposition:
+`b55ea35` accepted; `df767d3` accepted after the prospective record
+corrections below.** No production execution defect was found. This
+counter-review records **1 P2 and 4 P3 (`ARV2CR94-001..005`)**. One P3 is
+corrected by a new behavioral test; the other four items correct interpretation
+or bookkeeping prospectively without rewriting section 93 as historical
+evidence.
+
+No QuantConnect, provider, credential, Object Store, outcome, broker,
+deployment, order, paper/live, or trading surface was accessed. R-083 through
+R-090 remain unlaunched and unspent at this point. Accounting therefore remains
+**78 shared looks, 21 ARV2 development evaluations, 27 infrastructure looks,
+and a 591-cell floor**.
+
+### 94.1 Per-commit dispositions
+
+| Commit | Disposition | Counter-review basis |
+|---|---|---|
+| `b55ea35` | **Accepted** | The five added tests are behavioral rather than source-hash assertions. Six independent mutations across latest-prior choice, strict cutoff, remaining-gross clamp, collection traversal bound, and daily-reset compounding each make their intended named test red. Production bytes are unchanged. |
+| `df767d3` | **Accepted after record correction** | The seven implementation commits are correctly dispositioned, all eight profile SHA-256 values reproduce, source size and accounting reconcile, and no production defect is introduced. Five prospective record issues are corrected below before any physical freeze or result read. |
+
+### 94.2 Findings and corrections
+
+| ID | P | Finding | Disposition |
+|---|---|---|---|
+| `ARV2CR94-001` | P2 | Section 93.6 item 3 and `ARV2R93-008` say that daily-reset 2x/3x leverage of a sleeve that trails SPY unlevered will trail levered SPY by more. That is not implied. Counterexample with no financing: a flat selected sleeve versus SPY returns `+50%,-30%` trails by 5 points unlevered, but leads by 20 points at daily-reset 2x and by 75 points at daily-reset 3x. Daily resetting can widen, narrow, or reverse a relative cumulative-return gap. | **Corrected prospectively.** R-089/R-090 interpretation will compare selected and matched paths under the same factor/scenario and report the actual arithmetic. It freezes no expected direction and treats neither reversal nor amplification as validation by itself. |
+| `ARV2CR94-002` | P3 | Section 93.3 says the leverage job emits exactly five statistics. The pure leverage evaluator emits five, but the complete QC job emits six: four result cells, `ARV2_LEVERAGE_META`, and `ARV2_RUNTIME_META`. | **Corrected prospectively.** Six authenticated statistic names are expected; research accounting remains four economic cells per leverage look. |
+| `ARV2CR94-003` | P3 | Section 93.1 describes section 91's twelve findings as nine confirmed, two partially correct, and one extended. Section 93.4 correctly enumerates ten confirmed, one partially correct, and one confirmed-and-extended. The second partial item was the separate `ARV2R90-005` disposition. | **Corrected prospectively** to 10 confirmed, 1 partially correct, and 1 confirmed-and-extended for the twelve `ARV2CR91` findings. |
+| `ARV2CR94-004` | P3 | `b55ea35` isolates `_history_items()`'s collection cap, but the sibling `_collection_rows()` guard still lacked a test proving traversal stops at `MAX_COLLECTION_ROWS + 1`. | **Corrected in this counter-review.** The new finite-generator test passes on the committed guard and is red when `islice(cap + 1)` is replaced by full materialization: 25,001 expected pulls versus 25,017 observed. |
+| `ARV2CR94-005` | P3 | Section 93.6 says a cap-weighted top decile is mega-cap dominated by construction and that inverse-HHI effective holdings below ten means the spread is attributable to at most a handful of names. Neither follows mechanically. | **Corrected prospectively.** The frozen disclosure is effective breadth: inverse HHI below 10 is reported as a concentrated result with fewer than ten equally weighted holdings' worth of effective diversification. It does not assert the literal number of contributors or predict which capitalization tier dominates. |
+
+### 94.3 Independent reconciliation
+
+- The eight profile SHA-256 values in section 93.5 reproduce exactly from the
+  current evaluator records. The test-only and documentation-only review
+  commits do not change their values.
+- `b55ea35`'s four touched files pass **55 tests**. An independent mutation
+  pass made **6 of 6** intended guard-specific tests red; no trial relied on a
+  projection or profile hash.
+- The added row-cap isolation test is green on the real tree and red under its
+  exact full-materialization mutation.
+- The four corrected guard files on the exact counter-review tree pass **56
+  tests in 40.41 seconds**. The lane-record plus root active-document gates
+  pass **75 tests**; `compileall` over the lane package/tests exits 0 and
+  `git diff --check` is clean.
+- The complete standing lane selection is not repeated here because Claude
+  already ran it on the exact unchanged production tree plus `b55ea35`:
+  **6,163 passed, 7 skipped, 0 failed**. The only new executable byte is one
+  test, not production or projected QC source. Focused final-tree and record
+  gates are run before the physical freeze commit.
+- The adapter's prospective sequence still reconciles: R-083 through R-090
+  each consume one shared look, one development evaluation, and four economic
+  cells when launched, ending at **86 shared looks, 29 ARV2 development
+  evaluations, 27 infrastructure looks, and a 623-cell floor** after all eight.
+
+### 94.4 Next gate
+
+The review chain for the software candidate is complete. Codex may now derive
+and commit the exact R-083 through R-090 profile, projection, source-set,
+host-closure, statistic-inventory, project/backtest, control-directory, and
+submission-plan identities before any external action. The six unlevered
+market-cap diagnostics run sequentially first; the two objective synthetic
+leverage diagnostics run only afterward. Overlapping windows are descriptive,
+not independent evidence; no window may be selected as a winner. No result
+authorizes formal alpha acceptance, deployment, broker access, orders,
+paper/live state, or trading.

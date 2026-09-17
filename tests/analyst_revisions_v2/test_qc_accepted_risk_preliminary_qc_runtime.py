@@ -499,6 +499,105 @@ def test_constituent_history_refuses_missing_or_stale_prior_snapshot(items, mess
         loader.build_eligibility(("2021-01-04",))
 
 
+def test_legacy_qqq_profile_retains_the_ten_day_snapshot_expiry():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_PROFILE_ID,
+        [row],
+        [stock],
+        {"QQQ": ((stamp, (_constituent(stock, stamp, "1"),)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="prior snapshot is stale",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_state_until_superseded_qqq_profile_accepts_old_latest_prior_snapshot():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [row],
+        [stock],
+        {"QQQ": ((stamp, (_constituent(stock, stamp, "1"),)),)},
+    )
+
+    assert loader.build_eligibility(("2021-01-04", "2021-02-01")) == {
+        "2021-01-04": (row["security_id"],),
+        "2021-02-01": (row["security_id"],),
+    }
+
+
+def test_state_until_superseded_qqq_profile_advances_only_on_strictly_prior_state():
+    first_row = _binding("BBG000000001", "ONE", 2)
+    second_row = _binding("BBG000000002", "TWO", 2)
+    first = _Symbol("QC ONE", "ONE")
+    second = _Symbol("QC TWO", "TWO")
+    old = datetime(2020, 12, 1)
+    same_day = datetime(2021, 2, 1)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [first_row, second_row],
+        [first, second],
+        {
+            "QQQ": (
+                (old, (_constituent(first, old, "1"),)),
+                (same_day, (_constituent(second, same_day, "1"),)),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-02-01", "2021-02-08")) == {
+        "2021-02-01": (first_row["security_id"],),
+        "2021-02-08": (second_row["security_id"],),
+    }
+
+
+def test_state_until_superseded_union_requires_a_valid_prior_state_for_each_etf():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": ((stamp, (_constituent(stock, stamp, "1"),)),),
+            "QQQ": (),
+        },
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="contains no authenticated snapshots",
+    ):
+        loader.build_eligibility(("2021-02-01",))
+
+
+def test_state_until_superseded_profile_still_refuses_malformed_selected_state():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [row],
+        [stock],
+        {"QQQ": ((stamp, (_constituent(stock, stamp, "not-a-decimal"),)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="weight is not decimal",
+    ):
+        loader.build_eligibility(("2021-02-01",))
+
+
 def test_constituent_history_refuses_total_positive_weight_outside_bounds():
     row = _binding()
     stock = _Symbol("QC STOCK SID", "NOW")
@@ -1090,6 +1189,43 @@ def test_constituent_history_refuses_an_unreadable_universe_symbol_exactly():
             daily_resolution="Daily",
             evaluation_profile_id=stock_portfolio_evaluator.SP500_PROFILE_ID,
             constituent_universes={"SPY": SimpleNamespace()},
+        )
+
+
+@pytest.mark.parametrize(
+    ("profile_id", "hostile_age_policy"),
+    (
+        (stock_portfolio_evaluator.NASDAQ100_PROFILE_ID, None),
+        (
+            stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+            10,
+        ),
+        (stock_portfolio_evaluator.NASDAQ100_PROFILE_ID, True),
+    ),
+)
+def test_constituent_history_refuses_changed_snapshot_age_policy_exactly(
+    monkeypatch, profile_id, hostile_age_policy
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE QQQ", "QQQ"))
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_snapshot_maximum_age_calendar_days_for_profile",
+        lambda _profile_id: hostile_age_policy,
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^constituent-history snapshot age policy changed$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=profile_id,
+            constituent_universes={"QQQ": universe},
         )
 
 
@@ -2583,6 +2719,9 @@ def test_runtime_result_inventory_is_exact_for_stock_portfolio_profile():
     )
     assert runtime.STOCK_UNIVERSE_PROFILE_IDS == (
         stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS
+    )
+    assert runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS == (
+        stock_portfolio_evaluator.STATE_UNTIL_SUPERSEDED_PROFILE_IDS
     )
     for profile_id in stock_portfolio_evaluator.PROFILE_IDS:
         expected = runtime.expected_custom_summary_statistic_names(profile_id)

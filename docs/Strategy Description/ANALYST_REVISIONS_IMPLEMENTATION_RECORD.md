@@ -15839,3 +15839,110 @@ not official index membership. Each successful run receives at most one
 separately signed aggregate-only read. No outcome may select a same-window
 winner or unlock leverage, formal acceptance, deployment, broker access,
 orders, paper/live state or trading.
+
+### 88.16 R-072 result, R-073 terminal disposition, and R-075/R-076 successors
+
+R-072 used the exact preregistered SPY-intersection projection from 88.15. A
+detached execution-signature check first refused before an execution permit,
+project or look existed; the byte-identical retry launched once. Private QC
+project `36633844`, backtest `e1d3a802a65dad1abd1c07d66bc52722`, reached
+authenticated `Completed.` after 64 statistics-free polls. Its submission
+plan, launch and terminal SHA-256 values are respectively
+`bd0632ac8c2293dab9ac4adbee8582a2dda3ebbcddba547b3a33e6cabd338e82`,
+`735bbc75e668ced652cb73629b1883dce330099f3aea5c89038f92f0a0ac1927`,
+and `4ce7d3e1ec806d85fbd2b6d4d4b1412dcf81eb5b2cabc36bf1c8b1aeb4303236`.
+The first detached result-signature check likewise refused before a result
+permit or remote read; the exact retry performed the sole signed
+`backtests/read`. Aggregate receipt
+`arv2-preliminary-qc-result-aa3380cee5b0d233b5ed5c01`, SHA-256
+`aa3380cee5b0d233b5ed5c01b4db37cbc42e9a25aee1e795708528ac0b4d24cf`,
+binds result-permit SHA-256
+`a2c2626c602c3955353d3302cf379619d075dff36a54438f70305d144b47c1bd`
+and custom-statistics SHA-256
+`a2abd4b76eb6735b235c70e49f42a798550103115c6f5180d86278f18d899c79`.
+It selected exactly six aggregate statistics once and selected no provider
+row, unrestricted log, chart or order.
+
+| Cost per side | Signal cumulative | Matched cumulative | SPY cumulative | Signal minus matched | Signal minus SPY | Signal maximum drawdown |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +76.5951% | +57.8850% | +94.2074% | +18.7101 pp | -17.6122 pp | -19.2593% |
+| 5 bps | +74.9613% | +57.3180% | +94.2074% | +17.6433 pp | -19.2460 pp | -19.3048% |
+| **10 bps primary** | **+73.3425%** | **+56.7530%** | **+94.2074%** | **+16.5895 pp** | **-20.8649 pp** | **-19.3502%** |
+| 20 bps | +70.1494% | +55.6291% | +94.2074% | +14.5203 pp | -24.0580 pp | -19.4410% |
+
+At ten basis points per side, annualized arithmetic return is 12.3544% and
+zero-rate Sharpe is 0.7667. The signal executes 261/261 weekly decisions,
+averages 91.6700% executed gross, 46.77 selected names, 46.77 held names,
+8.3281% cash and 1.48344% daily two-sided turnover (about 373.83% under the
+simple 252-session annualization). It has one partial rebalance, three
+stale-mark sessions, one stale-position deferral and zero zero-recovery
+membership ends. The corrected matched comparator also executes 261/261 with
+the identical gross target; it has 15 partial decisions, 60 stale-mark
+sessions, 16 stale-position deferrals and 12 zero-recovery membership ends.
+All 261 signal decisions underfill the 98% target because the selected
+SPY-intersection census cannot always supply fifty names.
+
+R-072 is tangible positive selection evidence *within the historical SPY
+holdings proxy*: the signal exceeds its matched equal-exposure comparator by
+16.5895 percentage points at the primary cost. It still trails capitalization-
+weighted SPY by 20.8649 points. Compared with broad-universe R-065, whose
+signal-minus-matched return is -2.3219 points, the restricted-universe
+construction is materially different. This is a descriptive accepted-risk
+result, not a same-window winner selection or formal alpha claim: the signal
+input remains current-vintage/non-pristine-PIT, the SPY holdings set is a
+proxy rather than official S&P 500 membership, target exposure is underfilled,
+and the terminal-payoff splice is absent.
+
+R-073 used its exact preregistered QQQ projection. Its first local execution-
+signature check refused before a permit or look; the exact retry launched
+once. Private project `36635211`, backtest
+`c8295621931bcdca7e332179b3ae891a`, reached authenticated `Runtime Error`
+after two statistics-free polls. The plan, launch and terminal SHA-256 values
+are respectively
+`5120a91755b43b9e4aae7b32ad9c82962c5bc9dfb586ebe17d08614f98c60e12`,
+`a2b67edf7febbd16ba949ea74c58b41f361f5a4820edc05edccc6813784a5b49`,
+and `c1368a9e0615c6c66171f7e926956aa111c2e1e0aefa82909fc40a8261409619`.
+A bounded exact-run diagnostic selected only its error and stack, no result,
+statistics, chart, order, log stream, provider row or security outcome:
+`constituent-history prior snapshot is stale`. No result permit exists. R-073
+therefore spends shared look 70 -> 71 and development evaluation 17 -> 18,
+adds zero cells, and leaves the floor at 583. R-074 was never launched and is
+superseded unspent.
+
+`ARV2D88-008` (**P2, corrected prospectively**) — the ten-calendar-day
+snapshot-expiry rule conflated absence of a newer holdings file with expiry of
+the latest authenticated full holdings state. Collection `EndTime` still
+establishes point-in-time availability and every decision still selects the
+latest collection strictly before its midnight, so carrying that state only
+until a strictly later collection supersedes it introduces no lookahead. No
+authoritative QuantConnect field or documentation gives the full snapshot an
+expiry. The official [US ETF Constituents dataset
+page](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/quantconnect/us-etf-constituents)
+describes daily delivery and possible delay of up to one week, but does not
+turn non-delivery into a membership exit. The fresh profiles therefore remove
+only the arbitrary age expiry. They retain exact universe/index/`EndTime`
+shape, query bounds, strict-prior selection, no-prior refusal, selected-state
+validation without fallback, total positive weight 0.95-1.05, SID uniqueness,
+exact reverse mapping and nonempty score-census intersection. Legacy R-072,
+R-073 and R-074 retain the ten-day rule byte-for-byte for reproducibility.
+
+The focused evaluator/runtime/submission battery is **404 passed in 159.27
+seconds**. It separately proves that legacy R-073 refuses the old state, fresh
+R-075 accepts it, R-075 advances only after a strictly later `EndTime`, a
+same-day collection is not prior evidence, malformed selected state still
+refuses, and union R-076 requires a valid prior state for both ETFs. It also
+pins the profile-bound age-policy helper and successor inventory before any
+network call.
+
+| Ledger | Profile identity | Projection identity | Prospective QC identity | Accounting after successful aggregate read |
+|---|---|---|---|---|
+| `R-075`; `arv2-eval-stock-qqq-holdings-intersection-qc-014` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r075-v6`; `71b14b7d5508054f191e7d75114df7dfe680e815fafa52f0a49aa5bc64432667` | `arv2-preliminary-qc-projection-c7e6b9c750f167015a81227d`; `c7e6b9c750f167015a81227da89c3034833c00350f4ed104cd4f39305e5c11fc`; 7 files, 236,355 total / 59,872 max bytes | Project `21 ARV2_STOCK_R075_QQQ_2021_2025 - 20260916`; backtest `ARV2 R075 QQQ carried-state retry e9851c2f` | looks 71 -> 72; evaluations 18 -> 19; cells 583 -> 587 |
+| `R-076`; `arv2-eval-stock-spy-qqq-intersection-union-qc-015` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5`; `3fa2fcb4f21eea414b0ac425f623d1113d8a648538d5e3ac2bde7dc485aab821` | `arv2-preliminary-qc-projection-699a1b0c706a99e53e067b04`; `699a1b0c706a99e53e067b04aab247c2f197fe686ccece1a8e616bf39f82bc3a`; 7 files, 236,362 total / 59,872 max bytes | Project `22 ARV2_STOCK_R076_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R076 SPY QQQ carried-state union retry e9851c2f` | looks 72 -> 73; evaluations 19 -> 20; cells 587 -> 591 |
+
+This block, including both exact projection identities and the interpretation
+rule, is frozen before either R-075 or R-076 project creation, launch or
+outcome read. R-075 is a historical QQQ/Nasdaq-100 holdings proxy, explicitly
+not all Nasdaq-listed stocks; R-076 is the exact-security-ID-deduplicated union
+of the SPY and QQQ holdings proxies. Neither result may select a same-window
+winner, tune the score or unlock leverage, formal acceptance, deployment,
+broker access, orders, paper/live state or trading.

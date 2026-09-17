@@ -34,10 +34,21 @@ NASDAQ100_PROFILE_ID = (
 UNION_PROFILE_ID = (
     "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4"
 )
+NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID = (
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r075-v6"
+)
+UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID = (
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5"
+)
+STATE_UNTIL_SUPERSEDED_PROFILE_IDS = (
+    NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+    UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+)
 VARIANT_PROFILE_IDS = (
     SP500_PROFILE_ID,
     NASDAQ100_PROFILE_ID,
     UNION_PROFILE_ID,
+    *STATE_UNTIL_SUPERSEDED_PROFILE_IDS,
 )
 UNIVERSE_PROFILE_IDS = VARIANT_PROFILE_IDS
 ALL_PROFILE_IDS = (PROFILE_ID, *VARIANT_PROFILE_IDS)
@@ -81,6 +92,27 @@ _UNIVERSE_VARIANT_CONFIGS = (
     ),
     (
         UNION_PROFILE_ID,
+        "spy_qqq_holdings_security_id_union",
+        ("SPY", "QQQ"),
+        (
+            "union_of_SPY_and_QQQ_holdings_proxies_not_official_SP500_or_all_"
+            "Nasdaq_listed_membership"
+        ),
+        (
+            "deduplicate_by_authenticated_security_id_union"
+        ),
+    ),
+    (
+        NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        "qqq_holdings_proxy_for_nasdaq_100",
+        ("QQQ",),
+        (
+            "QQQ_holdings_proxy_for_Nasdaq_100_not_all_Nasdaq_listed_stocks"
+        ),
+        None,
+    ),
+    (
+        UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
         "spy_qqq_holdings_security_id_union",
         ("SPY", "QQQ"),
         (
@@ -197,7 +229,6 @@ def _profile_record(profile_id):
                     "latest_collection_EndTime_strictly_before_decision_"
                     "midnight_America_New_York"
                 ),
-                "maximum_constituent_snapshot_age_calendar_days": 10,
                 "constituent_availability_clock": "collection_EndTime_only",
                 "constituent_last_update_role": (
                     "unused_nullable_metadata_not_an_availability_clock"
@@ -227,6 +258,20 @@ def _profile_record(profile_id):
                 ),
             }
         )
+        if profile_id in STATE_UNTIL_SUPERSEDED_PROFILE_IDS:
+            record.update(
+                {
+                    "constituent_snapshot_state_rule": (
+                        "effective_from_collection_EndTime_until_superseded_by_"
+                        "a_strictly_later_collection_EndTime"
+                    ),
+                    "constituent_snapshot_expiry_rule": (
+                        "no_age_expiry_without_authoritative_source_expiry"
+                    ),
+                }
+            )
+        else:
+            record["maximum_constituent_snapshot_age_calendar_days"] = 10
     digest = _sha(record)
     return {**record, "profile_sha256": digest}
 
@@ -255,6 +300,17 @@ def constituent_etf_tickers_for_profile(profile_id):
     require_stock_portfolio_profile(profile_id)
     variant = _universe_variant_config(profile_id)
     return () if variant is None else tuple(variant[2])
+
+
+def constituent_snapshot_maximum_age_calendar_days_for_profile(profile_id):
+    """Return the exact profile-bound age ceiling, or ``None`` for state data."""
+
+    require_stock_portfolio_profile(profile_id)
+    if profile_id not in UNIVERSE_PROFILE_IDS:
+        raise AcceptedRiskStockPortfolioError(
+            "stock portfolio profile has no constituent snapshot policy"
+        )
+    return None if profile_id in STATE_UNTIL_SUPERSEDED_PROFILE_IDS else 10
 
 
 def decision_sessions_for_input(value):
@@ -1254,6 +1310,7 @@ __all__ = (
     "MEASUREMENT_END_SESSION",
     "MINIMUM_INVESTED_RETURN_SESSIONS",
     "NASDAQ100_PROFILE_ID",
+    "NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID",
     "PORTFOLIO_CELL_SCHEMA",
     "PRIMARY_COST_BPS",
     "PROFILE_ID",
@@ -1262,12 +1319,15 @@ __all__ = (
     "SP500_PROFILE_ID",
     "STOCK_WEIGHT_CAP",
     "SUMMARY_SCHEMA",
+    "STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
     "TARGET_GROSS_EXPOSURE",
     "UNION_PROFILE_ID",
+    "UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID",
     "UNIVERSE_PROFILE_IDS",
     "VARIANT_PROFILE_IDS",
     "StockPortfolioEvaluationRuntime",
     "constituent_etf_tickers_for_profile",
+    "constituent_snapshot_maximum_age_calendar_days_for_profile",
     "decision_sessions_for_input",
     "expected_custom_summary_statistic_names",
     "require_stock_portfolio_profile",

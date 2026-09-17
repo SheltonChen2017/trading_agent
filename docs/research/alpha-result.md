@@ -2006,3 +2006,70 @@ block is frozen before any creation, launch or outcome read. QQQ remains a
 Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks. No result may select
 a same-window winner or unlock leverage, formal acceptance, deployment,
 broker access, orders, paper/live state or trading.
+
+## R-072 result, R-073 disposition, and R-075/R-076 successors — 2026-09-16
+
+R-072 completed in private QC project `36633844`, backtest
+`e1d3a802a65dad1abd1c07d66bc52722`, after 64 statistics-free polls. Plan,
+launch and terminal SHA-256 values are
+`bd0632ac8c2293dab9ac4adbee8582a2dda3ebbcddba547b3a33e6cabd338e82`,
+`735bbc75e668ced652cb73629b1883dce330099f3aea5c89038f92f0a0ac1927`,
+and `4ce7d3e1ec806d85fbd2b6d4d4b1412dcf81eb5b2cabc36bf1c8b1aeb4303236`.
+One signed read authenticated exactly six aggregate statistics. Aggregate
+receipt SHA-256 is
+`aa3380cee5b0d233b5ed5c01b4db37cbc42e9a25aee1e795708528ac0b4d24cf`;
+custom-statistics SHA-256 is
+`a2abd4b76eb6735b235c70e49f42a798550103115c6f5180d86278f18d899c79`.
+No raw provider row, unrestricted log, chart or order was selected.
+
+| Cost per side | Signal | Matched | SPY | Signal minus matched | Signal minus SPY | Maximum drawdown |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +76.5951% | +57.8850% | +94.2074% | +18.7101 pp | -17.6122 pp | -19.2593% |
+| 5 bps | +74.9613% | +57.3180% | +94.2074% | +17.6433 pp | -19.2460 pp | -19.3048% |
+| **10 bps primary** | **+73.3425%** | **+56.7530%** | **+94.2074%** | **+16.5895 pp** | **-20.8649 pp** | **-19.3502%** |
+| 20 bps | +70.1494% | +55.6291% | +94.2074% | +14.5203 pp | -24.0580 pp | -19.4410% |
+
+At the primary cost the signal's annualized arithmetic return is 12.3544%,
+zero-rate Sharpe is 0.7667, average cash is 8.3281%, and daily two-sided
+turnover is 1.48344% (about 373.83% under a simple 252-session
+annualization). It executes all 261 decisions at 91.6700% mean gross and
+about 46.77 holdings. The matched comparator also executes all 261. R-072 is
+positive selection evidence relative to that matched SPY-holdings-proxy
+universe (+16.5895 points at 10 bps), but it trails capitalization-weighted
+SPY by 20.8649 points. It remains preliminary, current-vintage/non-pristine-
+PIT, exposure-underfilled, without a terminal-payoff splice, and is not a
+formal alpha or promotion result.
+
+R-073 launched once in project `36635211`, backtest
+`c8295621931bcdca7e332179b3ae891a`, and reached authenticated `Runtime Error`
+after two polls: `constituent-history prior snapshot is stale`. Plan, launch
+and terminal SHA-256 values are
+`5120a91755b43b9e4aae7b32ad9c82962c5bc9dfb586ebe17d08614f98c60e12`,
+`a2b67edf7febbd16ba949ea74c58b41f361f5a4820edc05edccc6813784a5b49`,
+and `c1368a9e0615c6c66171f7e926956aa111c2e1e0aefa82909fc40a8261409619`.
+A bounded diagnostic selected only the error and stack. No result permit or
+outcome value exists. R-073 moves looks 70 -> 71 and evaluations 17 -> 18,
+adds zero cells, and leaves the floor at 583. R-074 was never launched and is
+superseded unspent.
+
+The failure showed that the ten-day rule treated absence of a newer full
+holdings file as expiration of the latest authenticated holdings state. The
+fresh profiles instead keep each strictly-prior collection-`EndTime` state
+effective only until a later collection supersedes it. This changes no signal
+or portfolio rule and retains every no-lookahead, identity, selected-state,
+weight and mapping guard. The correction is frozen before either successor
+launch:
+
+| Ledger | Profile and SHA-256 | Projection and SHA-256 | Accounting on successful read |
+|---|---|---|---|
+| `R-075`; `arv2-eval-stock-qqq-holdings-intersection-qc-014` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r075-v6`; `71b14b7d5508054f191e7d75114df7dfe680e815fafa52f0a49aa5bc64432667` | `arv2-preliminary-qc-projection-c7e6b9c750f167015a81227d`; `c7e6b9c750f167015a81227da89c3034833c00350f4ed104cd4f39305e5c11fc`; 7 files, 236,355 total / 59,872 max bytes | looks 71 -> 72; evaluations 18 -> 19; cells 583 -> 587 |
+| `R-076`; `arv2-eval-stock-spy-qqq-intersection-union-qc-015` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5`; `3fa2fcb4f21eea414b0ac425f623d1113d8a648538d5e3ac2bde7dc485aab821` | `arv2-preliminary-qc-projection-699a1b0c706a99e53e067b04`; `699a1b0c706a99e53e067b04aab247c2f197fe686ccece1a8e616bf39f82bc3a`; 7 files, 236,362 total / 59,872 max bytes | looks 72 -> 73; evaluations 19 -> 20; cells 587 -> 591 |
+
+Prospective projects are `21 ARV2_STOCK_R075_QQQ_2021_2025 - 20260916` and
+`22 ARV2_STOCK_R076_SPY_QQQ_2021_2025 - 20260916`; backtests are `ARV2 R075
+QQQ carried-state retry e9851c2f` and `ARV2 R076 SPY QQQ carried-state union
+retry e9851c2f`. QQQ is a Nasdaq-100 holdings proxy, not all Nasdaq-listed
+stocks; the union is an exact-security-ID-deduplicated SPY-plus-QQQ holdings
+proxy. Results cannot select a same-window winner, tune the score, or unlock
+leverage, formal acceptance, deployment, broker access, orders, paper/live
+state or trading.

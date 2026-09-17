@@ -210,6 +210,8 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
         subject.SP500_PROFILE_ID,
         subject.NASDAQ100_PROFILE_ID,
         subject.UNION_PROFILE_ID,
+        subject.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        subject.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
     )
     assert subject.PROFILE_IDS == subject.ALL_PROFILE_IDS
     assert subject.UNIVERSE_PROFILE_IDS == subject.VARIANT_PROFILE_IDS
@@ -218,6 +220,8 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
         subject.SP500_PROFILE_ID: ("SPY",),
         subject.NASDAQ100_PROFILE_ID: ("QQQ",),
         subject.UNION_PROFILE_ID: ("SPY", "QQQ"),
+        subject.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID: ("QQQ",),
+        subject.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID: ("SPY", "QQQ"),
     }
     for profile_id in subject.VARIANT_PROFILE_IDS:
         profile = subject.require_stock_portfolio_profile(profile_id)
@@ -234,7 +238,6 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
             "latest_collection_EndTime_strictly_before_decision_midnight_"
             "America_New_York"
         )
-        assert profile["maximum_constituent_snapshot_age_calendar_days"] == 10
         assert profile["constituent_availability_clock"] == "collection_EndTime_only"
         assert profile["constituent_last_update_role"] == (
             "unused_nullable_metadata_not_an_availability_clock"
@@ -269,12 +272,45 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
         assert profile["cost_bps_per_side"] == [0, 5, 10, 20]
         assert profile["target_gross_exposure"] == "0.98"
         assert profile["leverage"] is False
+        maximum_age = (
+            subject.constituent_snapshot_maximum_age_calendar_days_for_profile(
+                profile_id
+            )
+        )
+        if profile_id in subject.STATE_UNTIL_SUPERSEDED_PROFILE_IDS:
+            assert maximum_age is None
+            assert "maximum_constituent_snapshot_age_calendar_days" not in profile
+            assert profile["constituent_snapshot_state_rule"] == (
+                "effective_from_collection_EndTime_until_superseded_by_a_"
+                "strictly_later_collection_EndTime"
+            )
+            assert profile["constituent_snapshot_expiry_rule"] == (
+                "no_age_expiry_without_authoritative_source_expiry"
+            )
+        else:
+            assert maximum_age == 10
+            assert profile["maximum_constituent_snapshot_age_calendar_days"] == 10
+            assert "constituent_snapshot_state_rule" not in profile
+            assert "constituent_snapshot_expiry_rule" not in profile
     assert "not_all_Nasdaq_listed" in subject.require_stock_portfolio_profile(
         subject.NASDAQ100_PROFILE_ID
     )["universe_scope_disclaimer"]
     assert subject.require_stock_portfolio_profile(subject.UNION_PROFILE_ID)[
         "multi_etf_combination"
     ] == "deduplicate_by_authenticated_security_id_union"
+    assert subject.require_stock_portfolio_profile(
+        subject.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID
+    )["multi_etf_combination"] == "deduplicate_by_authenticated_security_id_union"
+
+
+def test_non_universe_profile_has_no_constituent_snapshot_age_policy():
+    with pytest.raises(
+        subject.AcceptedRiskStockPortfolioError,
+        match="has no constituent snapshot policy",
+    ):
+        subject.constituent_snapshot_maximum_age_calendar_days_for_profile(
+            subject.PROFILE_ID
+        )
 
 
 def test_decision_session_helper_refuses_a_missing_authenticated_axis():

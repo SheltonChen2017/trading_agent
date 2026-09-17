@@ -64,7 +64,10 @@ STOCK_UNIVERSE_PROFILE_IDS = (
     "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r072-v3",
     "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r073-v5",
     "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4",
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r075-v6",
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5",
 )
+STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS = STOCK_UNIVERSE_PROFILE_IDS[-2:]
 STOCK_PORTFOLIO_PROFILE_IDS = (
     STOCK_PORTFOLIO_PROFILE_ID,
     *STOCK_UNIVERSE_PROFILE_IDS,
@@ -847,6 +850,18 @@ class QcEtfConstituentEligibilityLoader:
         tickers = stock_portfolio.constituent_etf_tickers_for_profile(
             evaluation_profile_id
         )
+        maximum_snapshot_age_days = stock_portfolio.constituent_snapshot_maximum_age_calendar_days_for_profile(
+            evaluation_profile_id
+        )
+        state_profiles = stock_portfolio.STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+        stateful = evaluation_profile_id in STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+        if (
+            type(state_profiles) is not tuple
+            or state_profiles != STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+            or type(maximum_snapshot_age_days) is not (type(None) if stateful else int)
+            or maximum_snapshot_age_days != (None if stateful else 10)
+        ):
+            _error("constituent-history snapshot age policy changed")
         if (
             type(tickers) is not tuple
             or not tickers
@@ -890,6 +905,11 @@ class QcEtfConstituentEligibilityLoader:
         self._resolution = authenticated
         self._security_by_sid = security_by_sid
         self._daily_resolution = daily_resolution
+        self._maximum_snapshot_age = (
+            None
+            if maximum_snapshot_age_days is None
+            else timedelta(days=maximum_snapshot_age_days)
+        )
         self._tickers = tickers
         self._universes = dict(constituent_universes)
         self._universe_sids = universe_sids
@@ -1061,7 +1081,10 @@ class QcEtfConstituentEligibilityLoader:
                     )
                 collection_time, constituents = prior[-1]
                 age = decision_time - collection_time
-                if age <= timedelta(0) or age > MAXIMUM_CONSTITUENT_SNAPSHOT_AGE:
+                if age <= timedelta(0) or (
+                    self._maximum_snapshot_age is not None
+                    and age > self._maximum_snapshot_age
+                ):
                     _error("constituent-history prior snapshot is stale")
                 snapshot_key = (ticker, collection_time)
                 if snapshot_key not in selected_snapshots:
@@ -1422,6 +1445,7 @@ __all__ = (
     "RUNTIME_META_STATISTIC",
     "STOCK_PORTFOLIO_PROFILE_ID",
     "STOCK_PORTFOLIO_PROFILE_IDS",
+    "STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
     "STOCK_UNIVERSE_PROFILE_IDS",
     "MAX_BACKTEST_RUNTIME_SECONDS",
     "MAX_TRAIN_SLICE_COUNT",

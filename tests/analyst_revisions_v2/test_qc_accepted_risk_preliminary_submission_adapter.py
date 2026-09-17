@@ -227,7 +227,13 @@ def stock_portfolio_plan(monkeypatch, tmp_path):
     )
 
 
-@pytest.fixture(params=stock_portfolio_evaluator.VARIANT_PROFILE_IDS)
+@pytest.fixture(
+    params=(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+    )
+)
 def stock_universe_plan(request, monkeypatch, tmp_path):
     return _build_plan(monkeypatch, tmp_path, request.param)
 
@@ -773,23 +779,23 @@ _STOCK_UNIVERSE_ACCOUNTING = {
         579,
         583,
     ),
-    stock_portfolio_evaluator.NASDAQ100_PROFILE_ID: (
-        "arv2-eval-stock-qqq-holdings-intersection-qc-012",
-        "R-073",
-        70,
-        71,
-        17,
-        18,
-        583,
-        587,
-    ),
-    stock_portfolio_evaluator.UNION_PROFILE_ID: (
-        "arv2-eval-stock-spy-qqq-intersection-union-qc-013",
-        "R-074",
+    stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID: (
+        "arv2-eval-stock-qqq-holdings-intersection-qc-014",
+        "R-075",
         71,
         72,
         18,
         19,
+        583,
+        587,
+    ),
+    stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID: (
+        "arv2-eval-stock-spy-qqq-intersection-union-qc-015",
+        "R-076",
+        72,
+        73,
+        19,
+        20,
         587,
         591,
     ),
@@ -802,6 +808,27 @@ def test_regime_profile_allowlist_refuses_unknown_profile():
         match="evaluation profile is not allowlisted",
     ):
         adapter._look_accounting(evaluation_profile_id="arv2-stock-ic-unregistered")
+
+
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        stock_portfolio_evaluator.NASDAQ100_PROFILE_ID,
+        stock_portfolio_evaluator.UNION_PROFILE_ID,
+    ),
+)
+def test_superseded_unlaunched_stock_universe_profiles_are_not_active_run_specs(
+    profile_id,
+):
+    # They remain loadable for historical receipt/profile authentication, but
+    # cannot accidentally create a fresh submission after their successor was
+    # frozen.
+    stock_portfolio_evaluator.require_stock_portfolio_profile(profile_id)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="evaluation profile is not allowlisted",
+    ):
+        adapter._run_spec(profile_id)
 
 
 def test_stock_portfolio_profile_has_one_exact_r065_look_budget(stock_portfolio_plan):
@@ -1576,6 +1603,56 @@ def test_stock_universe_runtime_profile_inventory_mutation_refuses_before_networ
         "STOCK_PORTFOLIO_PROFILE_IDS",
         runtime.STOCK_PORTFOLIO_PROFILE_IDS
         + ("arv2-unrelated-stock-profile",),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_snapshot_age_helper_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_snapshot_maximum_age_calendar_days_for_profile",
+        lambda _profile_id: None,
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_state_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        runtime,
+        "STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
+        runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS[:-1],
     )
 
     with pytest.raises(

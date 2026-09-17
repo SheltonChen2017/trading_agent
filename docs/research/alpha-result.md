@@ -2499,3 +2499,36 @@ infrastructure looks, and a 591-cell floor**. Exact physical identities must
 be committed before external action. No raw provider row, identifier, price,
 return, log, chart, holding, order, deployment, broker state, paper/live state,
 or trading action was selected.
+
+## R-099 through R-106 — clock-gated market-cap matrix and leverage diagnostics (PREREGISTERED; UNRUN) — 2026-09-17
+
+These are the fresh technical successors to R-091. All eight are frozen before
+external action. Common package SHA-256:
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+Common host-closure SHA-256:
+`c725e9c80da75deb4e7389f1cc63cd31134f1b0551675b3163003b35bf5043f3`.
+
+| Run | Fixed profile | Exact private project / backtest | Projection SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|---|
+| R-099 | `arv2-market-cap-stock-qqq-2021-2025-v2` | `47 ARV2_MARKET_CAP_QQQ_R099_2021_2025 - 20260917` / `ARV2 R099 market-cap QQQ 2021-2025 e9851c2f` | `b4aaa521d24568ba294edb9f60b3e1a5756560c82e645894671e34376d009e71` | `bf2fccbf4fd968a53bbc4aed71c2cbab507f89a999258b4d3e50a18b6a744f2b` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-4e7956cfb620dea10a014894` / `4e7956cfb620dea10a014894b6835b159d1216fa5cee5b5718171b1cb7de438d` |
+| R-100 | `arv2-market-cap-stock-spy-2021-2025-v2` | `48 ARV2_MARKET_CAP_SPY_R100_2021_2025 - 20260917` / `ARV2 R100 market-cap SPY 2021-2025 e9851c2f` | `082f3711b9fc91e13e91337c8b5de2593c5ffd36828f42725371d8733121c2d3` | `47c09bd8372440660f100f74396236201b06bcef94c0ec915e5a8bc4ddf88f34` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-cbab031cf694c4e8a9a95a5f` / `cbab031cf694c4e8a9a95a5f8242df679ec6657cb9bf80cee172aec7a74f04d6` |
+| R-101 | `arv2-market-cap-stock-qqq-2019-2023-v2` | `49 ARV2_MARKET_CAP_QQQ_R101_2019_2023 - 20260917` / `ARV2 R101 market-cap QQQ 2019-2023 e9851c2f` | `681f0a9c4703d89aa20d3a968db1343896392308e85f1900ee85e143ef6e2de2` | `eba5ccad36b7565623b256623555138e1b17374b64cf7115568b55b0d9a24271` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-ee0f64f0b4f38e279b8213cc` / `ee0f64f0b4f38e279b8213cc063e285d440b46275735f2e84be35c07db205fb6` |
+| R-102 | `arv2-market-cap-stock-spy-2019-2023-v2` | `50 ARV2_MARKET_CAP_SPY_R102_2019_2023 - 20260917` / `ARV2 R102 market-cap SPY 2019-2023 e9851c2f` | `a85cbef7ae4bd87a7d6b02c53113e613849108c666402b6104b1da59bfd10dd8` | `4ed43740c6ddb91a94612ff2bc9bb812444e37a5eef305cd8fcf291b2692da10` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-dca5b01e7b033570acd4635c` / `dca5b01e7b033570acd4635cf280999710e16e1e9cb9429946fec7c41bfa3930` |
+| R-103 | `arv2-market-cap-stock-qqq-2023-2025-v2` | `51 ARV2_MARKET_CAP_QQQ_R103_2023_2025 - 20260917` / `ARV2 R103 market-cap QQQ 2023-2025 e9851c2f` | `66151b78ad5d86b317163534b12c4b559c4241e451b63386eae8eec9203e7edf` | `ac5fd5856319985da041704d8d0996c8021ee0c47a93a9ebcca10aebff317914` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-47a38e7697e5a34b7c6b6a75` / `47a38e7697e5a34b7c6b6a75030609500b9d249b66658e016e9272b7f57d5f8f` |
+| R-104 | `arv2-market-cap-stock-spy-2023-2025-v2` | `52 ARV2_MARKET_CAP_SPY_R104_2023_2025 - 20260917` / `ARV2 R104 market-cap SPY 2023-2025 e9851c2f` | `1af40154411f1268b351476a750aab91d478191e0a9f3812c3c87a7dff7c921a` | `e2a04227f1aa03e510b2aff2d6fea648d2dd9d7b8e5a6fd8b94cb59ad2d90b90` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-55bcd6e85ca87a42b8b33b30` / `55bcd6e85ca87a42b8b33b302a751bd525e588e1ea8e98fe91272c1c3edac1ab` |
+| R-105 | `arv2-objective-synthetic-leverage-qqq-2021-2025-v2` | `53 ARV2_LEVERAGE_QQQ_R105_2021_2025 - 20260917` / `ARV2 R105 synthetic 2x3x QQQ 2021-2025 e9851c2f` | `cfe7ef21c3ed87fda713878ef652e6cbbc916b33ce5e4b2c96ffbde7145aaaba` | `3c1ee7562d23be4761ef82f42bd1fd74adb73f71bde2ee0487eec90970dcd400` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-ce5d859fe95202480034b30e` / `ce5d859fe95202480034b30e0de7b416ba40c7d3e2bf67236360b1bc96213fbe` |
+| R-106 | `arv2-objective-synthetic-leverage-spy-2021-2025-v2` | `54 ARV2_LEVERAGE_SPY_R106_2021_2025 - 20260917` / `ARV2 R106 synthetic 2x3x SPY 2021-2025 e9851c2f` | `3cab3fe5711943d8162ba54858cf7cf59487c33f6eedba6a8cab74b0f49c9af1` | `1ca9f6cc4c37271df191c5deb6d6dc8074a9814bd602212448e76387699951a7` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-1f14645f77aa7fdaa75f635f` / `1f14645f77aa7fdaa75f635f1413c91011b4a7f5f6d061a94a47ba63dd77a102` |
+
+Control directories are `accepted_risk_market_cap_r099_20260917_01`
+through `...r104_20260917_01`, then `accepted_risk_leverage_r105_20260917_01`
+and `...r106_20260917_01`, all below the private lane artifact root. Execution
+is sequential: six unlevered runs first, then two leverage runs. Accounting
+transitions are R-099 **80 -> 81 / 23 -> 24 / 591 -> 595**, R-100 **81 -> 82 /
+24 -> 25 / 595 -> 599**, R-101 **82 -> 83 / 25 -> 26 / 599 -> 603**, R-102
+**83 -> 84 / 26 -> 27 / 603 -> 607**, R-103 **84 -> 85 / 27 -> 28 / 607 ->
+611**, R-104 **85 -> 86 / 28 -> 29 / 611 -> 615**, R-105 **86 -> 87 / 29 ->
+30 / 615 -> 619**, and R-106 **87 -> 88 / 30 -> 31 / 619 -> 623**, for
+shared looks / development evaluations / cell floor. Infrastructure looks stay
+27. A launch spends its look even on refusal; cells accrue only from an
+authenticated aggregate. No raw inputs, logs, charts, holdings, orders,
+deployment, broker state, paper/live state, or trading action is authorized.

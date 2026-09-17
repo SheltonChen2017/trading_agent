@@ -356,8 +356,9 @@ INTERPRETATION RULES, SEQUENCE, AND ACCOUNTING BEFORE ANY EXTERNAL ACTION.
 SECTION 96 CLOSES R-083 AS A ZERO-CELL TECHNICAL REFUSAL; R-084 THROUGH R-090
 ARE SUPERSEDED UNSPENT. SECTION 97 FREEZES R-091 THROUGH R-098. SECTION 98
 CLOSES R-091 AS A ZERO-CELL FUTURE-HISTORY REFUSAL, SUPERSEDES R-092 THROUGH
-R-098 UNSPENT, AND ADDS BOUNDED SIMULATED-CLOCK GATES. R-099 THROUGH R-106
-ARE RESERVED BUT HAVE NO PHYSICAL IDENTITIES YET. CURRENT ACCOUNTING IS 80
+R-098 UNSPENT, AND ADDS BOUNDED SIMULATED-CLOCK GATES. SECTION 99 FREEZES THE
+EXACT PHYSICAL R-099 THROUGH R-106 IDENTITIES ON THAT CORRECTED CLOSURE; R-099
+IS NEXT. CURRENT ACCOUNTING IS 80
 SHARED LOOKS, 23 ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A
 591-CELL FLOOR.
 PAPER OR FUNDED
@@ -1128,11 +1129,12 @@ future-history refusal and supersedes R-092 through R-098 unspent. It adds
 bounded simulated-clock gates for PIT chunks and fixed-range price History,
 without changing an economic rule. The owner explicitly waives Claude review
 of section 98 until this same-round authorized QC sequence is complete. The
-exact next step is to commit fresh
-R-099 through R-106 physical identities, then launch R-099; the six unlevered
-jobs remain sequential and precede both leverage jobs. Each terminal
-disposition and bounded aggregate read, if available, must close before the
-next job.
+physical identities for R-099 through R-106 are frozen in section 99. The
+owner explicitly waives Claude review of section 99 before this already
+authorized same-round QC sequence. The exact next step is to launch R-099;
+the six unlevered jobs remain sequential and precede both leverage jobs. Each
+terminal disposition and bounded aggregate read, if available, must close
+before the next job.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -17508,3 +17510,38 @@ physical identities must be committed before external action. The complete
 lane run started on the now-obsolete pre-correction tree was deliberately
 cancelled at **2,642 passed, 7 skipped**; it is neither final validation nor a
 failure. No observed economic value selected this correction.
+
+## 99. Prospective physical freeze for R-099 through R-106, 2026-09-17
+
+Following R-091's zero-cell technical disposition, the eight v2 profiles are
+rebound exactly once from the superseded R-091--R-098 registry entries to
+R-099--R-106 and their current accounting. No economic rule or profile byte
+changes. These exact plans are derived from the clock-gated closure and this
+section is committed before any project, upload, compile, backtest, terminal
+inspection, or result read. The common package SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`;
+the common host-closure SHA-256 is
+`c725e9c80da75deb4e7389f1cc63cd31134f1b0551675b3163003b35bf5043f3`.
+
+| Run | Profile SHA-256 | Projection SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|
+| R-099 | `71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178` | `b4aaa521d24568ba294edb9f60b3e1a5756560c82e645894671e34376d009e71` | `bf2fccbf4fd968a53bbc4aed71c2cbab507f89a999258b4d3e50a18b6a744f2b` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-4e7956cfb620dea10a014894` / `4e7956cfb620dea10a014894b6835b159d1216fa5cee5b5718171b1cb7de438d` |
+| R-100 | `0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d` | `082f3711b9fc91e13e91337c8b5de2593c5ffd36828f42725371d8733121c2d3` | `47c09bd8372440660f100f74396236201b06bcef94c0ec915e5a8bc4ddf88f34` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-cbab031cf694c4e8a9a95a5f` / `cbab031cf694c4e8a9a95a5f8242df679ec6657cb9bf80cee172aec7a74f04d6` |
+| R-101 | `661d87e282f6c37cc258db7a3e814e5a261369209fc3fc4a96c1769edd71f83d` | `681f0a9c4703d89aa20d3a968db1343896392308e85f1900ee85e143ef6e2de2` | `eba5ccad36b7565623b256623555138e1b17374b64cf7115568b55b0d9a24271` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-ee0f64f0b4f38e279b8213cc` / `ee0f64f0b4f38e279b8213cc063e285d440b46275735f2e84be35c07db205fb6` |
+| R-102 | `72a4b469d7f8fa79ea4ea62836b6b43000069b5e0a7dca6941af00124ca68f4a` | `a85cbef7ae4bd87a7d6b02c53113e613849108c666402b6104b1da59bfd10dd8` | `4ed43740c6ddb91a94612ff2bc9bb812444e37a5eef305cd8fcf291b2692da10` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-dca5b01e7b033570acd4635c` / `dca5b01e7b033570acd4635cf280999710e16e1e9cb9429946fec7c41bfa3930` |
+| R-103 | `da7f4c75b9504c02f209362d2aebf69188d32cf608ac167fd543beb196067f93` | `66151b78ad5d86b317163534b12c4b559c4241e451b63386eae8eec9203e7edf` | `ac5fd5856319985da041704d8d0996c8021ee0c47a93a9ebcca10aebff317914` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-47a38e7697e5a34b7c6b6a75` / `47a38e7697e5a34b7c6b6a75030609500b9d249b66658e016e9272b7f57d5f8f` |
+| R-104 | `e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3` | `1af40154411f1268b351476a750aab91d478191e0a9f3812c3c87a7dff7c921a` | `e2a04227f1aa03e510b2aff2d6fea648d2dd9d7b8e5a6fd8b94cb59ad2d90b90` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-55bcd6e85ca87a42b8b33b30` / `55bcd6e85ca87a42b8b33b302a751bd525e588e1ea8e98fe91272c1c3edac1ab` |
+| R-105 | `a800d1db535ca22fa1bcfc238fbcfabbb463e21b18cf3fc384b606542878192e` | `cfe7ef21c3ed87fda713878ef652e6cbbc916b33ce5e4b2c96ffbde7145aaaba` | `3c1ee7562d23be4761ef82f42bd1fd74adb73f71bde2ee0487eec90970dcd400` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-ce5d859fe95202480034b30e` / `ce5d859fe95202480034b30e0de7b416ba40c7d3e2bf67236360b1bc96213fbe` |
+| R-106 | `07106d52bed121064659b97173f66d1776adf5e72f0f231600d2b7b53299a014` | `3cab3fe5711943d8162ba54858cf7cf59487c33f6eedba6a8cab74b0f49c9af1` | `1ca9f6cc4c37271df191c5deb6d6dc8074a9814bd602212448e76387699951a7` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-1f14645f77aa7fdaa75f635f` / `1f14645f77aa7fdaa75f635f1413c91011b4a7f5f6d061a94a47ba63dd77a102` |
+
+Private projects are numbered 47 through 54 with names and control paths
+frozen in the matching shared-ledger block. R-099 through R-104 are the six
+unlevered QQQ/SPY profiles in 2021--2025, 2019--2023, and 2023--2025 order.
+R-105/R-106 are the separate objective synthetic 2x/3x diagnostics and remain
+last. One subscribed QC node requires sequential execution. Accounting begins
+at **80 shared looks, 23 ARV2 development evaluations, 27 infrastructure
+looks, and a 591-cell floor**. Completing all eight authenticated results
+would end at **88 / 31 / 27 / 623**. A launch spends its look and development
+evaluation even if it refuses; four cells accrue only on an authenticated
+aggregate result. No result authorizes formal alpha acceptance, deployment,
+broker access, orders, paper/live state, or trading.

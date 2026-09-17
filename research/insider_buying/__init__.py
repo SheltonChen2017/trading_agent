@@ -18,6 +18,9 @@ IB-2D adds exhaustive provisional lot diagnostics and an exact USD 50,000
 comparison while retaining every downstream authority gate as false.
 IB-3A adds synthetic-only event-size, freshness, raw-score, and breadth
 equation diagnostics; it does not consume IB-2D or expose a canonical score.
+IB-3B adds an exhaustive caller-declared synthetic cohort plus frozen
+winsorization and population-z-score diagnostics while keeping canonical
+scores, ranks, seeds, outcomes, and every operational authority unavailable.
 """
 
 from research.insider_buying.contracts import (
@@ -153,6 +156,33 @@ from research.insider_buying.form4_stock_signal_formula_diagnostics import (
     Form4StockSignalFormulaIdentity,
     build_form4_stock_signal_fixture_event,
     build_form4_stock_signal_formula_diagnostics,
+)
+from research.insider_buying.form4_stock_signal_normalization_diagnostics import (
+    FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_PRECISION,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_ROUNDING,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_DIAGNOSTICS_VERSION,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_FINAL_QUANTIZATION,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_LOWER_QUANTILE,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_MINIMUM_DISTINCT_VALUES,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_MINIMUM_USABLE_NAMES,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_POLICY_HASH,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_QUANTILE_METHOD,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_RANKING_POLICY,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_SEED_POLICY,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_UPPER_QUANTILE,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_VARIANCE_DENOMINATOR,
+    FORM4_STOCK_SIGNAL_NORMALIZATION_ZERO_DISPERSION_POLICY,
+    MAX_FORM4_STOCK_SIGNAL_NORMALIZATION_ROWS,
+    MAX_FORM4_STOCK_SIGNAL_NORMALIZATION_TEXT_CHARACTERS,
+    Form4StockSignalNormalizationDiagnostics,
+    Form4StockSignalNormalizationDiagnosticsError,
+    Form4StockSignalNormalizationDisposition,
+    Form4StockSignalNormalizationIdentity,
+    Form4StockSignalNormalizationObservation,
+    Form4StockSignalNormalizationOutcome,
+    Form4StockSignalNormalizedDiagnosticRow,
+    build_form4_stock_signal_normalization_diagnostics,
+    build_form4_stock_signal_normalization_observation,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -369,4 +399,29 @@ __all__ = [
     "Form4StockSignalFormulaIdentity",
     "build_form4_stock_signal_fixture_event",
     "build_form4_stock_signal_formula_diagnostics",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_PRECISION",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_ROUNDING",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_DIAGNOSTICS_VERSION",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_FINAL_QUANTIZATION",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_LOWER_QUANTILE",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_MINIMUM_DISTINCT_VALUES",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_MINIMUM_USABLE_NAMES",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_POLICY_HASH",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_QUANTILE_METHOD",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_RANKING_POLICY",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_SEED_POLICY",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_UPPER_QUANTILE",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_VARIANCE_DENOMINATOR",
+    "FORM4_STOCK_SIGNAL_NORMALIZATION_ZERO_DISPERSION_POLICY",
+    "MAX_FORM4_STOCK_SIGNAL_NORMALIZATION_ROWS",
+    "MAX_FORM4_STOCK_SIGNAL_NORMALIZATION_TEXT_CHARACTERS",
+    "Form4StockSignalNormalizationDiagnostics",
+    "Form4StockSignalNormalizationDiagnosticsError",
+    "Form4StockSignalNormalizationDisposition",
+    "Form4StockSignalNormalizationIdentity",
+    "Form4StockSignalNormalizationObservation",
+    "Form4StockSignalNormalizationOutcome",
+    "Form4StockSignalNormalizedDiagnosticRow",
+    "build_form4_stock_signal_normalization_diagnostics",
+    "build_form4_stock_signal_normalization_observation",
 ]

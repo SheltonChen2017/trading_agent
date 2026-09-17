@@ -2465,3 +2465,37 @@ evaluations / cell floor. Infrastructure looks remain 27. A launch spends its
 look and evaluation even if it refuses; cells accrue only from an authenticated
 aggregate result. No raw rows, identifiers, prices, logs, charts, holdings,
 orders, deployment, broker access, paper/live state, or trading is authorized.
+
+## R-091 disposition; R-092 through R-098 superseded unspent — 2026-09-17
+
+R-091 launched once in private project `36669747`, backtest
+`9118721aa50cb6f5ac60eb1fbaa02fe9`, and reached authenticated
+`Runtime Error` after 48 statistics-free polls. No aggregate statistic or
+economic cell was emitted or read. The one bounded technical diagnostic
+selected only `SPY lacks a market-cap portfolio adjusted open` and its stack
+frame. The prefixed `2025-08-28 16:00:00` is the simulated failure time, not
+the absent observation's date.
+
+The driver had requested the fixed price range through `2026-03-30` before
+the QC simulated clock reached that date. The resulting cache was necessarily
+incomplete, and the evaluator correctly refused it. Counter-audit also found
+that an immature PIT fundamentals or ETF-membership chunk could otherwise look
+like a legitimate no-update interval and carry older state forward. The
+prospective correction gates every PIT chunk through its final decision date,
+then separately waits until the algorithm date is strictly later than the
+exact price-History request end. It permits at most four bounded work units per
+daily callback under the existing 240-second soft bound. It neither fills nor
+imputes a price and changes no economic rule. The longest profile's
+all-resolved worst case needs at most 349 post-maturity evaluator units; the
+frozen remaining calendar provides 456.
+
+R-091 is final: shared looks **79 -> 80**, ARV2 development evaluations
+**22 -> 23**, infrastructure looks unchanged at **27**, and cell floor
+unchanged at **591**. R-092 through R-098 did not launch and spend nothing;
+their plans are superseded unspent because projected-source and host-closure
+identities change. R-099 through R-106 are reserved in the same profile order,
+starting from **80 shared looks, 23 development evaluations, 27
+infrastructure looks, and a 591-cell floor**. Exact physical identities must
+be committed before external action. No raw provider row, identifier, price,
+return, log, chart, holding, order, deployment, broker state, paper/live state,
+or trading action was selected.

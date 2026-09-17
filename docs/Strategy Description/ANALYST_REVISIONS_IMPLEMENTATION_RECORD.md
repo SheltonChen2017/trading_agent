@@ -353,9 +353,13 @@ RUNTIME STATISTIC INVENTORY AND REVIEW COUNTS, RE-STATES CONCENTRATION AS
 EFFECTIVE BREADTH, AND ADDS THE MISSING ROW-CAP ISOLATION TEST. SECTION 95
 PROSPECTIVELY FREEZES THE EXACT PHYSICAL R-083 THROUGH R-090 IDENTITIES,
 INTERPRETATION RULES, SEQUENCE, AND ACCOUNTING BEFORE ANY EXTERNAL ACTION.
-ALL EIGHT REMAIN UNRUN AND UNSPENT; R-083 IS NEXT. CURRENT ACCOUNTING IS 78
-SHARED LOOKS, 21 ARV2
-DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR.
+SECTION 96 CLOSES R-083 AS A ZERO-CELL TECHNICAL REFUSAL; R-084 THROUGH R-090
+ARE SUPERSEDED UNSPENT. SECTION 97 FREEZES R-091 THROUGH R-098. SECTION 98
+CLOSES R-091 AS A ZERO-CELL FUTURE-HISTORY REFUSAL, SUPERSEDES R-092 THROUGH
+R-098 UNSPENT, AND ADDS BOUNDED SIMULATED-CLOCK GATES. R-099 THROUGH R-106
+ARE RESERVED BUT HAVE NO PHYSICAL IDENTITIES YET. CURRENT ACCOUNTING IS 80
+SHARED LOOKS, 23 ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A
+591-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1119,11 +1123,16 @@ correction, and no result authorizes retrospective winner selection,
 deployment, orders, broker access, paper/live state, or trading.
 
 Section 97 prospectively freezes the fresh R-091 through R-098 physical
-identities on the corrected closure. The owner explicitly waives Claude review
-of section 97 until this same-round authorized QC sequence is complete. The
-exact next step is R-091, followed sequentially by the remaining five
-unlevered jobs; the two leverage jobs remain last. Each terminal disposition
-and bounded aggregate read, if available, must close before the next job.
+identities on the corrected closure. Section 98 records R-091's zero-cell
+future-history refusal and supersedes R-092 through R-098 unspent. It adds
+bounded simulated-clock gates for PIT chunks and fixed-range price History,
+without changing an economic rule. The owner explicitly waives Claude review
+of section 98 until this same-round authorized QC sequence is complete. The
+exact next step is to commit fresh
+R-099 through R-106 physical identities, then launch R-099; the six unlevered
+jobs remain sequential and precede both leverage jobs. Each terminal
+disposition and bounded aggregate read, if available, must close before the
+next job.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -17443,3 +17452,59 @@ Overlap and concentration disclosures from section 95 remain unchanged. A
 technical failure requires another fresh prospective identity. No result
 authorizes formal alpha acceptance, retrospective winner selection,
 deployment, broker access, orders, paper/live state, or trading.
+
+## 98. R-091 future-history refusal and bounded clock gate, 2026-09-17
+
+R-091 launched once in private QC project `36669747`,
+`39 ARV2_MARKET_CAP_QQQ_R091_2021_2025 - 20260917`, backtest
+`9118721aa50cb6f5ac60eb1fbaa02fe9`, and reached authenticated
+`Runtime Error` after 48 statistics-free polls. It emitted no aggregate
+result and no economic cell. One owner-authorized, secure, no-redirect
+technical diagnostic selected only the terminal error and stack frame:
+`SPY lacks a market-cap portfolio adjusted open`. The displayed
+`2025-08-28 16:00:00` was QC's simulated failure time, not an identified
+missing-price session. No provider row, identifier, price, return, chart,
+holding, order, deployment, broker state, paper/live state, or trading action
+was selected.
+
+The failure was deterministic clock ordering rather than evidence of a SPY
+data gap. The multi-stage driver began fixed-range price History while QC's
+simulated clock was still earlier than the authenticated request end,
+`2026-03-30`. QC cannot return data from later than the algorithm's current
+simulated time, so the otherwise valid history cache was necessarily
+incomplete. The evaluator correctly refused that incomplete cache. A
+counter-audit then established the same prospective hazard one stage earlier:
+an immature point-in-time fundamentals or ETF-membership chunk could return
+no update and make the accepted contiguous-carry rule propagate an older
+state. R-091 emitted no result, so neither incomplete input became economic
+evidence. No carry, fill-forward, session deletion, price substitution, or
+economic rule is introduced by the correction.
+
+The technical successor first keeps each six-decision PIT chunk closed through
+its last decision date; its two calls may begin only on a later algorithm date.
+It separately keeps price History closed until the algorithm date is strictly
+after the exact first price request's end session. Once mature, one daily
+callback may perform at most four already-bounded work units, stopping before
+another unit when the existing 240-second soft bound is reached. The
+1,024-callback and twelve-hour bounds remain. For the longest 2021--2025
+profile, an all-resolved worst case has at most 97 price batches, one
+signal-seed callback, and 251 scoring callbacks: 349 evaluator work units. The frozen
+2026-03-31 through 2026-09-11 callback interval has 114 sessions and therefore
+456 work-unit capacity. A direct regression proves zero history calls at the
+PIT cutoff, two calls only after maturity, a renewed stop at the next immature
+chunk, zero price calls at the price cutoff, exactly four after price maturity,
+and one before a synthetic soft-time exhaustion. This correction changes execution scheduling only; the v2 profile
+bytes, R-055 scores, PIT membership/caps, no-fill TOTAL_RETURN opens, portfolio
+arithmetic, costs, comparator, result inventory, and leverage arithmetic are
+unchanged.
+
+R-091 is final and spends shared looks **79 -> 80** and ARV2 development
+evaluations **22 -> 23**. Infrastructure looks remain **27** and the cell
+floor remains **591**. R-092 through R-098 never launched and are superseded
+unspent because the projected source, host closure, and plans change.
+R-099 through R-106 are reserved as fresh technical successors: the same six
+unlevered profiles first, then the same two synthetic-leverage profiles. Their
+physical identities must be committed before external action. The complete
+lane run started on the now-obsolete pre-correction tree was deliberately
+cancelled at **2,642 passed, 7 skipped**; it is neither final validation nor a
+failure. No observed economic value selected this correction.

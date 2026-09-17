@@ -1,5 +1,3 @@
-"""Standalone cloud runtime for point-in-time market-cap stock portfolios."""
-
 import dataclasses
 import gzip
 import hashlib
@@ -30,7 +28,7 @@ except ImportError:
 
 
 class AcceptedRiskMarketCapStockPortfolioQcRuntimeError(ValueError):
-    """The package, PIT inputs, history, or runtime state is inexact."""
+    pass
 
 
 TRANSPORT_MANIFEST_SCHEMA = (
@@ -44,13 +42,11 @@ MAX_TOTAL_UPLOAD_BYTES = 44 * 1024 * 1024
 MAX_TRANSPORT_OBJECT_COUNT = 95
 MAX_DECOMPRESSED_OBJECT_BYTES = 192 * 1024 * 1024
 MAX_TOTAL_DECOMPRESSED_BYTES = 768 * 1024 * 1024
-TRAIN_WORK_UNITS_PER_SLICE = 1
+TRAIN_WORK_UNITS_PER_SLICE = 4
 TRAIN_SLICE_SOFT_SECONDS = 240
 MAX_TRAIN_SLICE_COUNT = 1024
 MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
-# Six weekly decisions keep the first 45-day lookback comfortably below the
-# 64-collection cap while reducing continuous five-year QC history round trips.
 HISTORY_CHUNK_DECISION_COUNT = 6
 HISTORY_LOOKBACK_CALENDAR_DAYS = 45
 MAX_HISTORY_CHUNKS = 128
@@ -388,8 +384,6 @@ def load_accepted_risk_preliminary_package(
     activation_manifest_sha256,
     activation_manifest_byte_count,
 ):
-    """Read and authenticate the compact package entirely inside QC."""
-
     if algorithm is None:
         _error("preliminary QC algorithm is unavailable")
     key = activation_manifest_key
@@ -450,7 +444,6 @@ def load_accepted_risk_preliminary_package(
             "preliminary evaluator input did not authenticate"
         ) from exc
     binding_rows = tuple(by_role["runtime_symbol_bindings"])
-    # The resolver performs the exact row schema/hash/inventory authentication.
     try:
         if any(type(item) is not dict for item in binding_rows):
             _error("preliminary runtime symbol binding row changed")
@@ -498,8 +491,6 @@ def _symbol_identity(symbol, name):
 
 
 class QcTotalReturnOpenHistoryLoader:
-    """Typed, no-fill, adjusted-open QC History adapter with O(1) reverse map."""
-
     def __init__(
         self,
         algorithm,
@@ -612,8 +603,6 @@ class QcTotalReturnOpenHistoryLoader:
             else:
                 symbol = self._resolution.symbol_for_security(security_id)
                 if symbol is None:
-                    # One authenticated named refusal means no observation, not
-                    # a caller-selected deletion or an invented market row.
                     if self._resolution.refusal_reason(security_id) is None:
                         _error("preliminary History request has an unknown security")
                     continue
@@ -901,8 +890,6 @@ def _positive_constituent_sids(rows):
 
 
 class QcPitMarketCapEligibilityLoader:
-    """Incremental, one-history-call work units for PIT caps and membership."""
-
     def __init__(
         self,
         algorithm,
@@ -1225,8 +1212,6 @@ class QcPitMarketCapEligibilityLoader:
 
 
 class AcceptedRiskMarketCapStockPortfolioQcDriver:
-    """Bounded state machine for package, PIT inputs, prices, and summary."""
-
     def __init__(
         self,
         algorithm,
@@ -1388,17 +1373,44 @@ class AcceptedRiskMarketCapStockPortfolioQcDriver:
         self._runtime_slice_count += 1
         if self._runtime_slice_count > MAX_TRAIN_SLICE_COUNT:
             _error("market-cap evaluation exceeded runtime-slice census")
-        if self._package is None:
-            self._initialize()
-            return None
-        if not self._pit_loader.completed:
-            return self._pit_loader.advance()
-        if self._runtime is None:
-            self._initialize_evaluator()
-            return None
-        progress = self._runtime.run_callback(self._history_loader)
-        if self.completed:
-            self.emit_completed_summary()
+        progress = None
+        for _ in range(maximum_work_units):
+            current = monotonic()
+            if (
+                type(current) not in (int, float)
+                or not math.isfinite(current)
+                or current < started
+            ):
+                _error("market-cap runtime monotonic clock changed")
+            if current - started >= soft_seconds:
+                break
+            if self._package is None:
+                self._initialize()
+            elif (
+                not self._pit_loader.completed
+                and self._algorithm.time.date()
+                <= self._pit_loader._chunks[
+                    self._pit_loader._chunk_index
+                ][-1].date()
+            ):
+                break
+            elif not self._pit_loader.completed:
+                progress = self._pit_loader.advance()
+            elif self._runtime is None:
+                self._initialize_evaluator()
+            elif (
+                self._runtime.phase is evaluator.RuntimePhase.HISTORY
+                and self._algorithm.time.date()
+                <= datetime.fromisoformat(
+                    self._runtime._history_request(0).end_session
+                ).date()
+            ):
+                break
+            else:
+                progress = self._runtime.run_callback(self._history_loader)
+                if self.completed:
+                    self.emit_completed_summary()
+                    break
         return progress
 
     def emit_completed_summary(self):

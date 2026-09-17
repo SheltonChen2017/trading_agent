@@ -123,6 +123,22 @@ def test_market_cap_callback_calendar_has_explicit_completion_headroom(package):
     )
     assert len(sessions) == 676
     assert len(sessions) > 600
+    mature_sessions = trading_sessions(
+        date(2026, 3, 31), date(*projection.MARKET_CAP_ALGORITHM_END)
+    )
+    assert len(mature_sessions) == 114
+    maximum_all_resolved_price_batches = (
+        6_151 + 1 + 64 - 1
+    ) // 64
+    required_post_maturity_work_units = (
+        maximum_all_resolved_price_batches
+        + 1
+        + (1_255 + 5 - 1) // 5
+    )
+    assert maximum_all_resolved_price_batches == 97
+    assert required_post_maturity_work_units == 349
+    assert len(mature_sessions) * runtime.TRAIN_WORK_UNITS_PER_SLICE == 456
+    assert 456 >= required_post_maturity_work_units
 
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
@@ -241,7 +257,7 @@ def test_objective_leverage_projection_is_exact_small_and_profile_bound(
             by_name[name].byte_count
             for name in projection.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
         )
-        == 240_505
+        == 240_697
     )
     assert max(item.byte_count for item in value.source_files) < 60_000
     assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES

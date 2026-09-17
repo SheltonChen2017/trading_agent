@@ -423,6 +423,99 @@ def test_runtime_meta_is_point_in_time_count_only_and_not_etf_or_leverage():
     assert "market_cap_values" not in json.dumps(meta)
 
 
+def _history_phase_driver(current_time):
+    calls = []
+
+    class _HistoryRuntime:
+        phase = rating_evaluator.RuntimePhase.HISTORY
+
+        @staticmethod
+        def _history_request(_index):
+            return SimpleNamespace(end_session="2026-03-30")
+
+        @staticmethod
+        def run_callback(loader):
+            calls.append(loader)
+            return len(calls)
+
+    driver = object.__new__(
+        runtime.AcceptedRiskMarketCapStockPortfolioQcDriver
+    )
+    driver._algorithm = SimpleNamespace(time=current_time)
+    driver._package = object()
+    driver._pit_loader = SimpleNamespace(completed=True)
+    driver._runtime = _HistoryRuntime()
+    driver._history_loader = object()
+    driver._emitted = False
+    driver._runtime_slice_count = 0
+    driver._runtime_started_monotonic = None
+    return driver, calls
+
+
+def test_driver_waits_for_complete_history_then_uses_bounded_work_units():
+    driver, calls = _history_phase_driver(datetime(2026, 3, 30, 16))
+
+    assert driver.advance_training_slice(monotonic=lambda: 0) is None
+    assert calls == []
+
+    driver._algorithm.time = datetime(2026, 3, 31)
+    assert driver.advance_training_slice(monotonic=lambda: 0) == 4
+    assert len(calls) == runtime.TRAIN_WORK_UNITS_PER_SLICE == 4
+
+
+def test_driver_waits_for_each_point_in_time_chunk_before_history_calls():
+    driver, history_calls = _history_phase_driver(datetime(2025, 1, 6, 16))
+    pit_calls = []
+
+    class _PitLoader:
+        _chunks = (
+            (datetime(2025, 1, 6),),
+            (datetime(2025, 2, 17),),
+        )
+        _chunk_index = 0
+        _stage = "fundamental"
+
+        @property
+        def completed(self):
+            return self._chunk_index == len(self._chunks)
+
+        def advance(self):
+            pit_calls.append((self._chunk_index, self._stage))
+            if self._stage == "fundamental":
+                self._stage = "constituent"
+            else:
+                self._stage = "fundamental"
+                self._chunk_index += 1
+            return self._chunk_index, self._stage
+
+    driver._pit_loader = _PitLoader()
+
+    assert driver.advance_training_slice(monotonic=lambda: 0) is None
+    assert pit_calls == []
+
+    driver._algorithm.time = datetime(2025, 1, 7)
+    assert driver.advance_training_slice(monotonic=lambda: 0) == (
+        1,
+        "fundamental",
+    )
+    assert pit_calls == [(0, "fundamental"), (0, "constituent")]
+    assert history_calls == []
+
+    driver._algorithm.time = datetime(2025, 2, 18)
+    driver.advance_training_slice(monotonic=lambda: 0)
+    assert pit_calls[-2:] == [(1, "fundamental"), (1, "constituent")]
+    assert driver._pit_loader.completed is True
+    assert history_calls == []
+
+
+def test_driver_soft_time_bound_stops_additional_work_units():
+    driver, calls = _history_phase_driver(datetime(2026, 3, 31))
+    clock = iter((0, 0, runtime.TRAIN_SLICE_SOFT_SECONDS))
+
+    assert driver.advance_training_slice(monotonic=lambda: next(clock)) == 1
+    assert len(calls) == 1
+
+
 def test_history_items_bound_iteration_before_materializing_the_collection_cap():
     """ARV2R93: the collection cap must bound iteration, not follow materialization."""
 

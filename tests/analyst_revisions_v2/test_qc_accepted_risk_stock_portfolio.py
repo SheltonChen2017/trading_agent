@@ -240,6 +240,9 @@ def test_universe_variant_profiles_freeze_point_in_time_constituent_semantics():
             "unused_nullable_metadata_not_an_availability_clock"
         )
         assert profile["constituent_last_update_read"] is False
+        assert profile["constituent_out_of_query_range_collections"] == (
+            "ignored_before_snapshot_selection"
+        )
         assert "constituent_last_update_required" not in profile
         assert "constituent_last_update_not_after_collection" not in profile
         assert "maximum_constituent_last_update_age_calendar_days" not in profile

@@ -307,9 +307,14 @@ MISCLASSIFIED NULLABLE `LASTUPDATE` METADATA AS AN AVAILABILITY CLOCK. IT IS
 IMMUTABLY SPENT WITH ZERO NEW CELLS. SECTION 88.14 CORRECTS THE SUCCESSOR
 CONTRACT TO USE STRICTLY PRIOR COLLECTION `ENDTIME` ONLY, LEAVE
 `LASTUPDATE` UNREAD, VALIDATE ONLY SELECTED SNAPSHOTS WITHOUT FALLBACK, AND
-PREREGISTERS R-069, R-070, AND UNION SUCCESSOR R-071. CURRENT ACCOUNTING IS
-68 SHARED LOOKS, 15 ARV2 DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS,
-AND A 579-CELL FLOOR.
+PREREGISTERS R-069, R-070, AND UNION SUCCESSOR R-071. SECTION 88.15
+SUPERSEDES THAT LIVE HANDOFF: R-069 REFUSED AN OUT-OF-QUERY-WINDOW COLLECTION
+THAT NO FROZEN DECISION COULD SELECT. IT IS IMMUTABLY SPENT WITH ZERO NEW
+CELLS. THE CORRECTED SUCCESSORS IGNORE ONLY OUT-OF-WINDOW COLLECTIONS BEFORE
+PAYLOAD TRAVERSAL WHILE RETAINING ALL IN-RANGE, SELECTED-SNAPSHOT AND NO-
+FALLBACK GUARDS. R-070/R-071 WERE NEVER LAUNCHED; FRESH R-072/R-073/R-074
+BIND THE CORRECTION. CURRENT ACCOUNTING IS 69 SHARED LOOKS, 16 ARV2
+DEVELOPMENT EVALUATIONS, 23 INFRASTRUCTURE LOOKS, AND A 579-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1032,10 +1037,14 @@ refused because the runtime treated nullable `LastUpdate` metadata as an
 availability clock. Section 88.14 records that spent run and corrects fresh
 successors to use strictly-prior collection `EndTime` only, leave
 `LastUpdate` unread, validate only selected snapshots without fallback, and
-cache repeated selections. The immediate next step is the preregistered
-sequential R-069 v2, R-070 v4 and union R-071 v3 run, with one aggregate-only
-read per successful run and durable accounting. QQQ remains a Nasdaq-100
-proxy, not all Nasdaq-listed stocks. Later windows, leverage,
+cache repeated selections. R-069 then refused because QC returned an
+out-of-query-window collection before any selected snapshot was evaluated.
+Section 88.15 records the spent run and corrects the fresh successors to
+ignore only those unselectable collections before duplicate storage and
+payload traversal. The immediate next step is the preregistered sequential
+R-072 v3, R-073 v5 and union R-074 v4 run, with one aggregate-only read per
+successful run and durable accounting. QQQ remains a Nasdaq-100 proxy, not
+all Nasdaq-listed stocks. Later windows, leverage,
 deployment, orders, broker, paper/live, and trading remain closed.
 
 
@@ -15775,3 +15784,58 @@ descriptive same-window construction diagnostics, not a winner-selection
 exercise; no same-window score or universe tuning, leverage, formal
 acceptance, deployment, broker access, order, paper/live state or trading is
 authorized by their outcomes.
+
+### 88.15 R-069 terminal disposition and query-window successors
+
+R-069 used its exact preregistered SPY EndTime-only projection. The first
+local execution-signature verification refused before a permit, project or
+look existed; an exact resumable retry authenticated the same plan and
+launched once. Private project `36633442`, backtest
+`9ca1e406f63145b969cca4d1034dbc02`, reached authenticated `Runtime Error`
+after two statistics-free polls. The submission-plan, launch-receipt and
+terminal-receipt SHA-256 values are respectively
+`ce8ed24649a8060e2a690967e08afafd530136a6a6f37af1d028ff19b31ea367`,
+`e65e2a9abe4ee4a7598884cb506d858721e18bace5c814e1e43e6fc1f1408386`,
+and `69545bccb68e3daeb13461fd04dfba7c86a2eb2279fe575563c75f993b8ebfd9`.
+A bounded exact-run diagnostic read selected only its error and stack:
+`constituent-history collection escaped query bounds`. It selected no result
+statistics, charts, orders, provider rows or security outcomes. R-069
+consumes look 69 and development evaluation 16 but adds zero cells. Live
+accounting is **69 shared looks, 16 development evaluations, 23
+infrastructure looks and a 579-cell floor**.
+
+`ARV2D88-007` (**P2, corrected under fresh prospective identities**) — QC's
+unflattened ETF-universe Series contained at least one collection outside the
+explicit 2020-12-01 through 2026-01-01 history request. Such a collection
+cannot be selected by any frozen 2021-2025 decision, yet the global bounds
+guard rejected it before selection. The successor loader still validates
+every Series item/index shape, exact universe identity and collection
+`EndTime` type. It then ignores an out-of-query-window collection before
+duplicate storage or row-payload traversal. At least one in-range collection
+is still mandatory; each decision still selects the latest strictly-prior
+in-range `EndTime`, applies the ten-day age rule, fully validates its selected
+snapshot and refuses without fallback. Hostile duplicated out-of-range
+payloads remain unread. An all-out-of-range response refuses as no
+authenticated snapshots, and a malformed selected in-range snapshot still
+refuses. The exact three-file runtime/evaluator/submission battery is **387
+passed in 154.96 seconds**.
+
+R-070 and R-071 were never launched and are prospectively superseded. R-072
+is the fresh SPY successor to spent R-069; R-073 and R-074 are fresh QQQ and
+union identities that bind the same corrected shared runtime. All other
+signal, comparator, portfolio, price, terminal, cost, output and no-tuning
+rules remain unchanged.
+
+| Ledger | Profile SHA-256 | Projection SHA-256 | Prospective QC identity | Accounting after successful aggregate read |
+|---|---|---|---|---|
+| `R-072`; `arv2-eval-stock-spy-holdings-intersection-qc-011` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r072-v3`; `6667bdeb213b6eaa7f53f56beba042a0aa82e78a664910c495008a7453184681` | `arv2-preliminary-qc-projection-4c2707b03e02f8d24fade31e`; `4c2707b03e02f8d24fade31e898604590250d1f11389cde5fbbf059d92c4f25f`; 7 files, 232,624 total / 59,100 max bytes | Project `18 ARV2_STOCK_R072_SPY_2021_2025 - 20260916`; backtest `ARV2 R072 SPY query-window retry e9851c2f` | looks 69 -> 70; evaluations 16 -> 17; cells 579 -> 583 |
+| `R-073`; `arv2-eval-stock-qqq-holdings-intersection-qc-012` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r073-v5`; `2aaee2733ad8c7fcfa4cddcf4ed085ea2a6f082917d16c8ad27bc43de3bc02c2` | `arv2-preliminary-qc-projection-04992d775f0ed55e07a1f3c0`; `04992d775f0ed55e07a1f3c01fc2459a2b37c62447da5b0e13cd1d64084c3161`; 7 files, 232,913 total / 59,100 max bytes | Project `19 ARV2_STOCK_R073_QQQ_2021_2025 - 20260916`; backtest `ARV2 R073 QQQ query-window retry e9851c2f` | looks 70 -> 71; evaluations 17 -> 18; cells 583 -> 587 |
+| `R-074`; `arv2-eval-stock-spy-qqq-intersection-union-qc-013` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4`; `a3f568e6c5be11c13a000206ba248a8430c5586aba4957253d374adff250c931` | `arv2-preliminary-qc-projection-231586bf20e5cd7cf57ec006`; `231586bf20e5cd7cf57ec006b11789c964a59bb0030bde3970fc098919a85e28`; 7 files, 232,920 total / 59,100 max bytes | Project `20 ARV2_STOCK_R074_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R074 SPY QQQ query-window union retry e9851c2f` | looks 71 -> 72; evaluations 18 -> 19; cells 587 -> 591 |
+
+This block is frozen before any R-072, R-073 or R-074 project creation,
+compile, launch or outcome read. R-073 is still a QQQ/Nasdaq-100 holdings
+proxy, not all Nasdaq-listed stocks; R-072 is a SPY/S&P 500 holdings proxy,
+not official index membership. Each successful run receives at most one
+separately signed aggregate-only read. No outcome may select a same-window
+winner or unlock leverage, formal acceptance, deployment, broker access,
+orders, paper/live state or trading.

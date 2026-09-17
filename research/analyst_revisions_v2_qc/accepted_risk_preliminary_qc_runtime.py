@@ -61,9 +61,9 @@ MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
 STOCK_PORTFOLIO_PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
 STOCK_UNIVERSE_PROFILE_IDS = (
-    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v2",
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v4",
-    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r071-v3",
+    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r072-v3",
+    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r073-v5",
+    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4",
 )
 STOCK_PORTFOLIO_PROFILE_IDS = (
     STOCK_PORTFOLIO_PROFILE_ID,
@@ -998,7 +998,12 @@ class QcEtfConstituentEligibilityLoader:
                     <= collection_time
                     < CONSTITUENT_HISTORY_END
                 ):
-                    _error("constituent-history collection escaped query bounds")
+                    # QC can append algorithm-current universe collections to a
+                    # bounded history response.  They are not evidence for this
+                    # evaluation window, so leave their payloads unread and do
+                    # not let duplicate out-of-range timestamps poison the
+                    # authenticated in-range inventory.
+                    continue
                 if collection_time in snapshots:
                     _error("constituent-history duplicated a collection EndTime")
                 snapshots[collection_time] = constituents

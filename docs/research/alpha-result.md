@@ -1964,3 +1964,45 @@ SPY EndTime retry e9851c2f`, `ARV2 R070 QQQ EndTime retry e9851c2f`, and
 any of those project creations, launches or outcome reads. The diagnostics
 cannot select a same-window winner or unlock leverage, formal acceptance,
 deployment, broker access, orders, paper/live state or trading.
+
+## R-069 disposition and query-window R-072/R-073/R-074 successors — 2026-09-16
+
+R-069 used its exact preregistered SPY EndTime-only projection. A local
+signature check first refused before any permit, project or look; the exact
+resumable retry launched once. Private project `36633442`, backtest
+`9ca1e406f63145b969cca4d1034dbc02`, reached authenticated `Runtime Error`
+after two statistics-free polls. Its plan, launch and terminal SHA-256 values
+are respectively
+`ce8ed24649a8060e2a690967e08afafd530136a6a6f37af1d028ff19b31ea367`,
+`e65e2a9abe4ee4a7598884cb506d858721e18bace5c814e1e43e6fc1f1408386`,
+and `69545bccb68e3daeb13461fd04dfba7c86a2eb2279fe575563c75f993b8ebfd9`.
+A bounded exact-run diagnostic selected only the error and stack, not result
+statistics, charts, orders, provider rows or security outcomes:
+`constituent-history collection escaped query bounds`. R-069 consumes shared
+look **68 -> 69** and development evaluation **15 -> 16**, adds zero cells,
+and leaves the floor at **579**.
+
+The unflattened QC ETF-universe Series contained at least one collection
+outside the explicit history request. No frozen 2021-2025 decision can select
+such a collection. The corrected successor loader still authenticates the
+Series/index shape, universe identity and collection `EndTime` type, then
+ignores out-of-window collections before duplicate storage or row-payload
+traversal. It still requires in-range history and fully validates the latest
+strictly-prior selected snapshot without fallback. R-070 and R-071 were never
+launched and are superseded by fresh identities that bind this correction.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-072`; `arv2-eval-stock-spy-holdings-intersection-qc-011` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r072-v3`; `6667bdeb213b6eaa7f53f56beba042a0aa82e78a664910c495008a7453184681` | `arv2-preliminary-qc-projection-4c2707b03e02f8d24fade31e`; `4c2707b03e02f8d24fade31e898604590250d1f11389cde5fbbf059d92c4f25f`; 7 files, 232,624 total / 59,100 max bytes | looks 69 -> 70; evaluations 16 -> 17; cells 579 -> 583 |
+| `R-073`; `arv2-eval-stock-qqq-holdings-intersection-qc-012` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r073-v5`; `2aaee2733ad8c7fcfa4cddcf4ed085ea2a6f082917d16c8ad27bc43de3bc02c2` | `arv2-preliminary-qc-projection-04992d775f0ed55e07a1f3c0`; `04992d775f0ed55e07a1f3c01fc2459a2b37c62447da5b0e13cd1d64084c3161`; 7 files, 232,913 total / 59,100 max bytes | looks 70 -> 71; evaluations 17 -> 18; cells 583 -> 587 |
+| `R-074`; `arv2-eval-stock-spy-qqq-intersection-union-qc-013` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4`; `a3f568e6c5be11c13a000206ba248a8430c5586aba4957253d374adff250c931` | `arv2-preliminary-qc-projection-231586bf20e5cd7cf57ec006`; `231586bf20e5cd7cf57ec006b11789c964a59bb0030bde3970fc098919a85e28`; 7 files, 232,920 total / 59,100 max bytes | looks 71 -> 72; evaluations 18 -> 19; cells 587 -> 591 |
+
+Their prospective private projects are `18 ARV2_STOCK_R072_SPY_2021_2025 -
+20260916`, `19 ARV2_STOCK_R073_QQQ_2021_2025 - 20260916`, and `20
+ARV2_STOCK_R074_SPY_QQQ_2021_2025 - 20260916`; their backtests are `ARV2 R072
+SPY query-window retry e9851c2f`, `ARV2 R073 QQQ query-window retry
+e9851c2f`, and `ARV2 R074 SPY QQQ query-window union retry e9851c2f`. This
+block is frozen before any creation, launch or outcome read. QQQ remains a
+Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks. No result may select
+a same-window winner or unlock leverage, formal acceptance, deployment,
+broker access, orders, paper/live state or trading.

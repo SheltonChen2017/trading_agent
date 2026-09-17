@@ -7,7 +7,7 @@ import re
 import sqlite3
 import subprocess
 import sys
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from fractions import Fraction
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
@@ -578,7 +578,56 @@ def test_constituent_history_does_not_validate_unselected_malformed_snapshot():
     }
 
 
-def test_constituent_history_selected_malformed_snapshot_refuses_without_fallback():
+def test_constituent_history_ignores_out_of_range_hostile_duplicate_collections():
+    class HostileCollection:
+        def __iter__(self):
+            raise AssertionError("out-of-range collection payload must remain unread")
+
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    selected = datetime(2021, 1, 2)
+    outside = runtime.CONSTITUENT_HISTORY_END + timedelta(days=1)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (selected, (_constituent(stock, selected, "1"),)),
+                (outside, HostileCollection()),
+                (outside, HostileCollection()),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_only_out_of_range_collections_refuses_as_empty():
+    class HostileCollection:
+        def __iter__(self):
+            raise AssertionError("out-of-range collection payload must remain unread")
+
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    outside = runtime.CONSTITUENT_HISTORY_END + timedelta(days=1)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((outside, HostileCollection()),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="no authenticated snapshots",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_selected_in_range_malformed_refuses_without_fallback():
     row = _binding()
     stock = _Symbol("QC STOCK SID", "NOW")
     older = datetime(2021, 1, 1)
@@ -909,7 +958,6 @@ def test_constituent_history_does_not_read_last_update_metadata():
         ("duplicate_collection", "duplicated a collection EndTime"),
         ("duplicate_sid", "duplicated a QC SID"),
         ("empty_collection", "collection is empty"),
-        ("query_bounds", "collection escaped query bounds"),
     ),
 )
 def test_constituent_history_isolated_series_and_collection_refusals(case, message):
@@ -928,9 +976,6 @@ def test_constituent_history_isolated_series_and_collection_refusals(case, messa
         items = ((stamp, constituents),)
     elif case == "empty_collection":
         items = ((stamp, ()),)
-    elif case == "query_bounds":
-        outside = datetime(2020, 11, 30)
-        items = ((outside, (_constituent(stock, outside, "1"),)),)
     loader, algorithm, universes = _constituent_loader(
         stock_portfolio_evaluator.SP500_PROFILE_ID,
         [row],

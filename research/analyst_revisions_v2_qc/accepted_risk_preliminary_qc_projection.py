@@ -14,6 +14,18 @@ from . import accepted_risk_preliminary_qc_runtime as runtime_builder
 from . import accepted_risk_regime_rating_evaluator as regime_evaluator
 from . import accepted_risk_etf_baseline_evaluator as etf_evaluator
 from . import accepted_risk_stock_portfolio_evaluator as stock_portfolio_evaluator
+from . import (
+    accepted_risk_market_cap_stock_portfolio_evaluator as market_cap_evaluator,
+)
+from . import (
+    accepted_risk_market_cap_stock_portfolio_qc_runtime as market_cap_runtime,
+)
+from . import (
+    accepted_risk_objective_synthetic_leverage_evaluator as leverage_evaluator,
+)
+from . import (
+    accepted_risk_objective_synthetic_leverage_qc_runtime as leverage_runtime,
+)
 
 
 class AcceptedRiskPreliminaryQcProjectionError(ValueError):
@@ -26,6 +38,8 @@ MAX_SOURCE_FILE_BYTES = 60_000
 MAX_TOTAL_SOURCE_BYTES = 260_000
 ALGORITHM_START = (2026, 4, 1)
 ALGORITHM_END = (2026, 9, 11)
+MARKET_CAP_ALGORITHM_START = (2024, 1, 2)
+MARKET_CAP_ALGORITHM_END = ALGORITHM_END
 PROJECT_SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
     "accepted_risk_preliminary_rating_evaluator.py",
@@ -46,6 +60,18 @@ STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS = (
     *PROJECT_SOURCE_PATHS,
     "accepted_risk_stock_portfolio_evaluator.py",
 )
+MARKET_CAP_PROJECT_SOURCE_PATHS = (
+    "accepted_risk_preliminary_rating_policy.py",
+    "accepted_risk_preliminary_rating_evaluator.py",
+    "accepted_risk_preliminary_qc_figi.py",
+    "accepted_risk_market_cap_stock_portfolio_evaluator.py",
+    "accepted_risk_market_cap_stock_portfolio_qc_runtime.py",
+)
+OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS = (
+    *MARKET_CAP_PROJECT_SOURCE_PATHS,
+    "accepted_risk_objective_synthetic_leverage_evaluator.py",
+    "accepted_risk_objective_synthetic_leverage_qc_runtime.py",
+)
 STOCK_PORTFOLIO_PROFILE_ID = stock_portfolio_evaluator.PROFILE_ID
 STOCK_PORTFOLIO_PROFILE_IDS = stock_portfolio_evaluator.PROFILE_IDS
 STOCK_UNIVERSE_PROFILE_IDS = stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS
@@ -58,6 +84,20 @@ STOCK_PORTFOLIO_PROFILE_SHA256S = {
 STOCK_PORTFOLIO_PROFILE_SHA256 = (
     STOCK_PORTFOLIO_PROFILE_SHA256S[STOCK_PORTFOLIO_PROFILE_ID]
 )
+MARKET_CAP_PROFILE_IDS = market_cap_evaluator.PROFILE_IDS
+MARKET_CAP_PROFILE_SHA256S = {
+    profile_id: market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+        profile_id
+    )["profile_sha256"]
+    for profile_id in MARKET_CAP_PROFILE_IDS
+}
+OBJECTIVE_LEVERAGE_PROFILE_IDS = leverage_evaluator.PROFILE_IDS
+OBJECTIVE_LEVERAGE_PROFILE_SHA256S = {
+    profile_id: leverage_evaluator.require_profile(profile_id)[
+        "profile_sha256"
+    ]
+    for profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS
+}
 MAIN_PROJECT_PATH = "main.py"
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
 _FORBIDDEN_IMPORT_ROOTS = {
@@ -82,6 +122,10 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_preliminary_rating_policy",
     "accepted_risk_regime_rating_evaluator",
     "accepted_risk_stock_portfolio_evaluator",
+    "accepted_risk_market_cap_stock_portfolio_evaluator",
+    "accepted_risk_market_cap_stock_portfolio_qc_runtime",
+    "accepted_risk_objective_synthetic_leverage_evaluator",
+    "accepted_risk_objective_synthetic_leverage_qc_runtime",
     "accepted_risk_etf_baseline_evaluator",
     "accepted_risk_etf_baseline_qc_runtime",
     "collections",
@@ -94,6 +138,7 @@ _ALLOWED_IMPORT_MODULES = {
     "gzip",
     "hashlib",
     "io",
+    "itertools",
     "json",
     "math",
     "re",
@@ -101,6 +146,7 @@ _ALLOWED_IMPORT_MODULES = {
     "time",
     "types",
     "typing",
+    "zoneinfo",
 }
 _FORBIDDEN_DYNAMIC_CALLS = {
     "compile",
@@ -418,6 +464,20 @@ def _main_source(
             activation_sha256=activation_sha256,
             activation_bytes=activation_bytes,
         )
+    if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
+        return _objective_leverage_main_source(
+            activation_key=activation_key,
+            activation_sha256=activation_sha256,
+            activation_bytes=activation_bytes,
+            evaluation_profile_id=evaluation_profile_id,
+        )
+    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+        return _market_cap_stock_main_source(
+            activation_key=activation_key,
+            activation_sha256=activation_sha256,
+            activation_bytes=activation_bytes,
+            evaluation_profile_id=evaluation_profile_id,
+        )
     if evaluation_profile_id in STOCK_UNIVERSE_PROFILE_IDS:
         return _stock_universe_main_source(
             activation_key=activation_key,
@@ -458,6 +518,177 @@ class ARV2AcceptedRiskPreliminaryAlgorithm(QCAlgorithm):
             total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
             evaluation_profile_id={evaluation_profile_id!r},
         )
+
+    def on_data(self, _data):
+        if not self._arv2_driver.completed:
+            self._arv2_advance_training_slice()
+
+    def _arv2_advance_training_slice(self):
+        self._arv2_driver.advance_training_slice(
+            maximum_work_units=TRAIN_WORK_UNITS_PER_SLICE,
+            soft_seconds=TRAIN_SLICE_SOFT_SECONDS,
+        )
+
+    def on_end_of_algorithm(self):
+        self._arv2_driver.require_completed_at_end()
+'''
+    return source.encode("ascii")
+
+
+def _objective_leverage_main_source(
+    *,
+    activation_key: str,
+    activation_sha256: str,
+    activation_bytes: int,
+    evaluation_profile_id: str,
+) -> bytes:
+    tickers = leverage_runtime.constituent_etf_tickers_for_profile(
+        evaluation_profile_id
+    )
+    if (
+        evaluation_profile_id not in OBJECTIVE_LEVERAGE_PROFILE_IDS
+        or type(tickers) is not tuple
+        or len(tickers) != 1
+        or tickers[0] not in ("QQQ", "SPY")
+    ):
+        raise AcceptedRiskPreliminaryQcProjectionError(
+            "objective leverage QC main profile binding changed"
+        )
+    source = f'''from AlgorithmImports import *
+from accepted_risk_objective_synthetic_leverage_qc_runtime import (
+    AcceptedRiskObjectiveSyntheticLeverageQcDriver,
+    TRAIN_SLICE_SOFT_SECONDS,
+    TRAIN_WORK_UNITS_PER_SLICE,
+)
+
+
+class ARV2AcceptedRiskObjectiveSyntheticLeverageAlgorithm(QCAlgorithm):
+    def initialize(self):
+        self.set_time_zone("America/New_York")
+        self.settings.daily_precise_end_time = True
+        self.set_start_date({MARKET_CAP_ALGORITHM_START[0]}, {MARKET_CAP_ALGORITHM_START[1]}, {MARKET_CAP_ALGORITHM_START[2]})
+        self.set_end_date({MARKET_CAP_ALGORITHM_END[0]}, {MARKET_CAP_ALGORITHM_END[1]}, {MARKET_CAP_ALGORITHM_END[2]})
+        self.universe_settings.asynchronous = False
+        self.universe_settings.resolution = Resolution.DAILY
+        benchmark = self.add_equity(
+            "SPY",
+            Resolution.DAILY,
+            fill_forward=False,
+            leverage=1,
+            extended_market_hours=False,
+            data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+        ).symbol
+        self._arv2_fundamental_universe = self.AddUniverse(lambda fundamentals: [])
+        self._arv2_constituent_universes = {{}}
+        for ticker in {tickers!r}:
+            symbol = Symbol.create(ticker, SecurityType.EQUITY, Market.USA)
+            self._arv2_constituent_universes[ticker] = self.add_universe(
+                self.universe.etf(
+                    symbol,
+                    self.universe_settings,
+                    self._arv2_empty_constituent_selection,
+                )
+            )
+        self._arv2_driver = AcceptedRiskObjectiveSyntheticLeverageQcDriver(
+            self,
+            activation_manifest_key={activation_key!r},
+            activation_manifest_sha256={activation_sha256!r},
+            activation_manifest_byte_count={activation_bytes},
+            benchmark_symbol=benchmark,
+            trade_bar_type=TradeBar,
+            daily_resolution=Resolution.DAILY,
+            total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
+            evaluation_profile_id={evaluation_profile_id!r},
+            fundamental_universe=self._arv2_fundamental_universe,
+            constituent_universes=self._arv2_constituent_universes,
+        )
+
+    def _arv2_empty_constituent_selection(self, _constituents):
+        return []
+
+    def on_data(self, _data):
+        if not self._arv2_driver.completed:
+            self._arv2_driver.advance_training_slice(
+                maximum_work_units=TRAIN_WORK_UNITS_PER_SLICE,
+                soft_seconds=TRAIN_SLICE_SOFT_SECONDS,
+            )
+
+    def on_end_of_algorithm(self):
+        self._arv2_driver.require_completed_at_end()
+'''
+    return source.encode("ascii")
+
+
+def _market_cap_stock_main_source(
+    *,
+    activation_key: str,
+    activation_sha256: str,
+    activation_bytes: int,
+    evaluation_profile_id: str,
+) -> bytes:
+    tickers = market_cap_evaluator.constituent_etf_tickers_for_profile(
+        evaluation_profile_id
+    )
+    if (
+        evaluation_profile_id not in MARKET_CAP_PROFILE_IDS
+        or type(tickers) is not tuple
+        or len(tickers) != 1
+        or tickers[0] not in ("QQQ", "SPY")
+    ):
+        raise AcceptedRiskPreliminaryQcProjectionError(
+            "market-cap QC main profile binding changed"
+        )
+    source = f'''from AlgorithmImports import *
+from accepted_risk_market_cap_stock_portfolio_qc_runtime import (
+    AcceptedRiskMarketCapStockPortfolioQcDriver,
+    TRAIN_SLICE_SOFT_SECONDS,
+    TRAIN_WORK_UNITS_PER_SLICE,
+)
+
+
+class ARV2AcceptedRiskMarketCapStockPortfolioAlgorithm(QCAlgorithm):
+    def initialize(self):
+        self.set_time_zone("America/New_York")
+        self.settings.daily_precise_end_time = True
+        self.set_start_date({MARKET_CAP_ALGORITHM_START[0]}, {MARKET_CAP_ALGORITHM_START[1]}, {MARKET_CAP_ALGORITHM_START[2]})
+        self.set_end_date({MARKET_CAP_ALGORITHM_END[0]}, {MARKET_CAP_ALGORITHM_END[1]}, {MARKET_CAP_ALGORITHM_END[2]})
+        self.universe_settings.asynchronous = False
+        self.universe_settings.resolution = Resolution.DAILY
+        benchmark = self.add_equity(
+            "SPY",
+            Resolution.DAILY,
+            fill_forward=False,
+            leverage=1,
+            extended_market_hours=False,
+            data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+        ).symbol
+        self._arv2_fundamental_universe = self.AddUniverse(lambda fundamentals: [])
+        self._arv2_constituent_universes = {{}}
+        for ticker in {tickers!r}:
+            symbol = Symbol.create(ticker, SecurityType.EQUITY, Market.USA)
+            self._arv2_constituent_universes[ticker] = self.add_universe(
+                self.universe.etf(
+                    symbol,
+                    self.universe_settings,
+                    self._arv2_empty_constituent_selection,
+                )
+            )
+        self._arv2_driver = AcceptedRiskMarketCapStockPortfolioQcDriver(
+            self,
+            activation_manifest_key={activation_key!r},
+            activation_manifest_sha256={activation_sha256!r},
+            activation_manifest_byte_count={activation_bytes},
+            benchmark_symbol=benchmark,
+            trade_bar_type=TradeBar,
+            daily_resolution=Resolution.DAILY,
+            total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
+            evaluation_profile_id={evaluation_profile_id!r},
+            fundamental_universe=self._arv2_fundamental_universe,
+            constituent_universes=self._arv2_constituent_universes,
+        )
+
+    def _arv2_empty_constituent_selection(self, _constituents):
+        return []
 
     def on_data(self, _data):
         if not self._arv2_driver.completed:
@@ -652,6 +883,12 @@ def _profile(evaluation_profile_id):
         return etf_evaluator.require_etf_baseline_profile(
             evaluation_profile_id
         )
+    if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
+        return leverage_evaluator.require_profile(evaluation_profile_id)
+    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+        return market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+            evaluation_profile_id
+        )
     if evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
         return {
             "profile_id": evaluation_profile_id,
@@ -666,9 +903,30 @@ def project_source_paths_for_profile(evaluation_profile_id):
     _profile(evaluation_profile_id)
     if evaluation_profile_id == etf_evaluator.PROFILE_ID:
         return ETF_PROJECT_SOURCE_PATHS
+    if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
+        return OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
+    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+        return MARKET_CAP_PROJECT_SOURCE_PATHS
     if evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
         return STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
     return PROJECT_SOURCE_PATHS
+
+
+def _runtime_slice_bounds(evaluation_profile_id):
+    if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
+        return (
+            leverage_runtime.TRAIN_WORK_UNITS_PER_SLICE,
+            leverage_runtime.MAX_TRAIN_SLICE_COUNT,
+        )
+    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+        return (
+            market_cap_runtime.TRAIN_WORK_UNITS_PER_SLICE,
+            market_cap_runtime.MAX_TRAIN_SLICE_COUNT,
+        )
+    return (
+        runtime_builder.TRAIN_WORK_UNITS_PER_SLICE,
+        runtime_builder.MAX_TRAIN_SLICE_COUNT,
+    )
 
 
 def _validate_source(project_path: str, source: bytes) -> PreliminaryQcSourceFile:
@@ -756,6 +1014,9 @@ def build_accepted_risk_preliminary_qc_projection(
         raise AcceptedRiskPreliminaryQcProjectionError(
             "preliminary QC source set exceeds reviewed total size"
         )
+    train_work_units_per_slice, maximum_train_slice_count = (
+        _runtime_slice_bounds(evaluation_profile_id)
+    )
     semantic = {
         "schema": PROJECTION_SCHEMA,
         "projection_id": None,
@@ -771,8 +1032,8 @@ def build_accepted_risk_preliminary_qc_projection(
         ),
         "source_files": [item.to_record() for item in files],
         "total_source_byte_count": total,
-        "train_work_units_per_slice": runtime_builder.TRAIN_WORK_UNITS_PER_SLICE,
-        "maximum_train_slice_count": runtime_builder.MAX_TRAIN_SLICE_COUNT,
+        "train_work_units_per_slice": train_work_units_per_slice,
+        "maximum_train_slice_count": maximum_train_slice_count,
         "preliminary": True,
         "formal": False,
         "outcome_result_transport": "aggregate_only_custom_summary_statistics",
@@ -793,8 +1054,8 @@ def build_accepted_risk_preliminary_qc_projection(
         None if profile is None else profile["profile_sha256"],
         tuple(files),
         total,
-        runtime_builder.TRAIN_WORK_UNITS_PER_SLICE,
-        runtime_builder.MAX_TRAIN_SLICE_COUNT,
+        train_work_units_per_slice,
+        maximum_train_slice_count,
         True,
         False,
         "aggregate_only_custom_summary_statistics",
@@ -814,6 +1075,9 @@ def require_accepted_risk_preliminary_qc_projection(
         )
     profile = _profile(value.evaluation_profile_id)
     source_paths = project_source_paths_for_profile(value.evaluation_profile_id)
+    train_work_units_per_slice, maximum_train_slice_count = (
+        _runtime_slice_bounds(value.evaluation_profile_id)
+    )
     if (
         value.schema != PROJECTION_SCHEMA
         or type(value.source_files) is not tuple
@@ -826,9 +1090,9 @@ def require_accepted_risk_preliminary_qc_projection(
         != (None if profile is None else profile["profile_sha256"])
         or value.total_source_byte_count > MAX_TOTAL_SOURCE_BYTES
         or value.train_work_units_per_slice
-        != runtime_builder.TRAIN_WORK_UNITS_PER_SLICE
+        != train_work_units_per_slice
         or type(value.train_work_units_per_slice) is not int
-        or value.maximum_train_slice_count != runtime_builder.MAX_TRAIN_SLICE_COUNT
+        or value.maximum_train_slice_count != maximum_train_slice_count
         or type(value.maximum_train_slice_count) is not int
         or value.preliminary is not True
         or value.formal is not False

@@ -198,6 +198,7 @@ def test_incremental_pit_loader_selects_latest_preopen_cap_and_discloses_uncover
 
 
 def test_later_empty_fundamental_and_etf_chunks_use_contiguous_carry():
+    assert runtime.HISTORY_CHUNK_DECISION_COUNT == 6
     _, rows, symbols = _resolution()
     decisions = (
         "2025-01-06",
@@ -205,6 +206,8 @@ def test_later_empty_fundamental_and_etf_chunks_use_contiguous_carry():
         "2025-01-21",
         "2025-01-27",
         "2025-02-03",
+        "2025-02-10",
+        "2025-02-18",
     )
     fundamentals = {
         datetime(2025, 1, 6, 8): [
@@ -230,12 +233,13 @@ def test_later_empty_fundamental_and_etf_chunks_use_contiguous_carry():
         assert len(algorithm.calls) == expected_calls
     first_start, first_end = algorithm.calls[0][1:3]
     later_start, later_end = algorithm.calls[2][1:3]
+    assert (first_end - first_start).days <= 82
     assert later_start == first_end
     assert later_end - later_start < first_end - first_start
     assert max(fundamentals) < later_start
     assert max(constituents) < later_start
     assert algorithm.returned_collection_counts[2:] == [0, 0]
-    assert loader.require_completed_market_caps()["2025-02-03"] == {
+    assert loader.require_completed_market_caps()["2025-02-18"] == {
         rows[0]["security_id"]: Decimal("400")
     }
 

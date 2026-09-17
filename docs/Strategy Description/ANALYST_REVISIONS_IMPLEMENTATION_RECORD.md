@@ -334,8 +334,13 @@ FOUND, A SEVEN-FOR-SEVEN POINT-IN-TIME MUTATION MATRIX, THE LEDGER CHAIN AND
 EVERY HASH RECONCILED, THREE RECORD P2S INCLUDING THIS ROUND'S MISSING PUSH-
 LEDGER ROW AND R-077'S UNDISCLOSED EXPOSURE CEILING, AND AN IMPROVEMENT
 PLAN. THE CORRECTED BROAD-UNIVERSE ATTRIBUTION IS ADVERSE, THE INDEX-UNIVERSE
-SPREADS ARE ONE-SIDED UPPER BOUNDS, AND NO SLEEVE BEATS SPY. CODEX
-COUNTER-REVIEW IS NEXT. CURRENT ACCOUNTING IS 78 SHARED LOOKS, 21 ARV2
+SPREADS ARE ONE-SIDED UPPER BOUNDS, AND NO SLEEVE BEATS SPY. SECTION 91
+ACCEPTS THAT REVIEW AFTER PROSPECTIVE RECORD CORRECTION. SECTION 92 ADDS THE
+UNRUN, REVIEW-CANDIDATE SOFTWARE FOR SIX POINT-IN-TIME MARKET-CAP-WEIGHTED
+QQQ/SPY WINDOWS AND TWO SEPARATE OBJECTIVE 2X/3X SYNTHETIC-LEVERAGE
+DIAGNOSTICS. NO R-083 THROUGH R-090 QC PROJECT OR LOOK EXISTS YET; CLAUDE
+REVIEWS THIS CANDIDATE BEFORE CODEX COUNTER-REVIEWS AND FREEZES ANY PHYSICAL
+RUN IDENTITY. CURRENT ACCOUNTING IS 78 SHARED LOOKS, 21 ARV2
 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
@@ -1072,14 +1077,15 @@ Section 90 is that independent Claude review of the whole
 P3s, and an improvement plan. Section 91 counter-reviews Claude's sole
 record-only commit. It confirms seven findings, qualifies the retrospectively
 rewritten leverage gate, and records counter-review findings without changing
-the already-run source. The owner explicitly waives Claude review of section
-91 before this round's next implementation: construct and run separately
-preregistered point-in-time market-cap-aware QQQ and S&P 500 period
-diagnostics, then objective, separately labeled 2x/3x diagnostic
-sensitivities. QQQ remains a
-Nasdaq-100 proxy, not all Nasdaq-listed stocks. No retrospective winner
-selection, deployment, order, broker, paper/live, or trading action is
-authorized.
+the already-run source. Section 92 implements the unrun software candidate
+for six separately identified point-in-time market-cap-aware QQQ/SPY windows
+and two objective 2x/3x synthetic-leverage diagnostics. Claude must review
+section 92 and its one-push commit range independently; Codex must then
+counter-review it in this same worktree. Only after that chain may Codex
+freeze physical R-083 through R-090 submission identities, preregister them,
+and run them sequentially. QQQ remains a Nasdaq-100 holdings proxy, not all
+Nasdaq-listed stocks. No retrospective winner selection, deployment, order,
+broker, paper/live, or trading action is authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -16837,3 +16843,174 @@ remain open and unchanged. `ARV2R87-002` is closed by `27c6fd4`.
 The exact final section-90 record passes the lane-record and root active-document gates: **75 passed**. `compileall` over the lane packages and tests exits zero, and `git diff --check` is clean. The full standing lane selection is not repeated for this documentation-only counter-review because Claude ran it on the unchanged exact code/test tree; the complete selection will run once on this round's final market-cap/leverage implementation tree before the single push.
 
 The next action follows the owner's explicit order: first construct and run fresh point-in-time market-cap-aware QQQ and SPY diagnostics over prospectively fixed periods; then construct objective, separately labeled 2x/3x sensitivities without choosing historical winners. The market-cap inputs, full-exposure rule, matched comparators, windows, costs, financing, and result gates must be frozen before each outcome read. No action in this sequence authorizes deployment, broker access, orders, paper/live state, or trading.
+
+## 92. Codex market-cap and objective synthetic-leverage review candidate, 2026-09-17
+
+**Review range for Claude:**
+`a54736366514ae177ecfec88e2daab48bf694e22..4a96bd3` plus the documentation
+commit that contains this section and the final validation row. The exact
+remote range must be taken from the one push at the end of this round; no
+intermediate push was made. This range first counter-reviews Claude's
+section-90 record and then implements, without running, the software needed
+for the owner's next QQQ/SPY market-cap matrix and separate objective 2x/3x
+synthetic-leverage diagnostics.
+
+No QuantConnect project, compile, backtest, result read, provider request,
+credential read, market-data observation, broker action, deployment, order,
+paper/live state, or trade occurred in this implementation round. There are
+**zero new research looks, zero new development evaluations, and zero new
+alpha cells**. Accounting remains **78 shared looks, 21 ARV2 development
+evaluations, 27 infrastructure looks, and a 591-cell floor**. R-083 through
+R-090 are prospective adapter/accounting identities only; they are not yet
+preregistered physical submission plans and none has been spent.
+
+### 92.1 Per-commit disposition and review map
+
+| Commit | Disposition for Claude | What to review |
+|---|---|---|
+| `a176415` | Codex counter-review candidate | Accepts Claude's `a547363` record after the twelve prospective corrections in section 91; appends the missing section-5 row prospectively rather than backdating it. |
+| `fd5d7b5` | Fresh probe-hardening candidate | Corrects the fresh-lineage cap-before-materialization and availability-field naming items from `ARV2R90-006/-007`, adds a direct post-open fundamental refusal independent of template hashes for `ARV2CR91-011`, and extends the ledger-link evidence named by `ARV2CR91-012`. It does not alter spent R-082 bytes. |
+| `dcc3c66` | Market-cap evaluator candidate | Adds six pure, no-I/O market-cap-weighted portfolio profiles: QQQ and SPY holdings proxies over 2019-2023, 2021-2025, and 2023-2025. |
+| `2db729c` | Incremental QC runtime candidate | Adds bounded callback-driven point-in-time Fundamental market-cap and one-ETF constituent-history collection, exact-SID joins, strict pre-open/strict-prior clocks, deterministic carry, and aggregate-only runtime metadata. |
+| `4a96bd3` | Projection, result boundary, and leverage candidate | Projects the market-cap runtime into bounded QC source sets; adds two objective synthetic-leverage profiles; and adds strict R-083 through R-090 result validation, accounting, offline-read, mutation, import-closure, and compact-envelope tests. |
+
+Claude should review the commits individually and cumulatively. In
+particular, review the new market-cap runtime's one-history-call-per-callback
+discipline, the exact profile/source pins in the submission adapter, the
+selected/matched symmetry, and the leverage financing/cost arithmetic. The
+old R-054 through R-082 branches remain present and are exercised by the
+same adapter test file; this range must not be accepted merely because the
+new paths pass.
+
+### 92.2 Unlevered market-cap construction
+
+The six profiles preserve the exact R-055 firm-specific score and select the
+top decile, capped at fifty names, on the first authenticated session of each
+ISO week. QQQ means the strictly prior point-in-time **QQQ holdings proxy for
+Nasdaq-100**, not all Nasdaq listings. SPY means the strictly prior
+point-in-time **SPY holdings proxy for S&P 500**, not official index
+membership. Each selected sleeve and its score-bearing eligible matched
+comparator are independently weighted in proportion to exact, strictly
+positive point-in-time market capitalization and renormalized to 98% gross.
+This fixes R-077's unreachable-exposure construction without using ETF row
+weights, whose completeness R-075 did not establish.
+
+Every profile retains the 0/5/10/20-bps per-side ladder with 10 bps primary,
+next-authenticated-open execution, total-return adjusted opens, per-name
+missing-price deferral, symmetric eligibility-exit sensitivity, and the same
+no-order/no-trading boundary. Aggregate concentration evidence includes
+invested-weight HHI and inverse HHI, excluding cash. The matched comparator
+uses the same membership, market-cap, timing, cost, and missing-price rules;
+only score selection differs.
+
+The runtime requests unflattened all-US Fundamental history plus exactly one
+QQQ or SPY constituent universe. It accepts a Fundamental collection only
+before 09:30 New York time and an ETF membership collection only when its
+collection timestamp is strictly prior to the decision midnight. It joins
+exact security identifiers, admits only exact positive Decimal market caps,
+collapses only exact-value duplicate Fundamental rows, refuses conflicting
+duplicates, and carries the latest authenticated state until superseded. Six
+decision sessions are processed per bounded chunk; a five-year profile uses
+44 chunks and a three-year profile 27. Work begins only from QC callbacks,
+not `initialize`, and the rendered algorithm supplies 676 market-session
+callbacks. The row, collection, slice, source-file, and total-source bounds
+remain fail closed.
+
+### 92.3 Objective 2x/3x diagnostic
+
+The two leverage profiles are QQQ-proxy and SPY-proxy 2021-2025. They do not
+choose historical winners or add a security. They reuse the exact corresponding
+market-cap profile's signal, selected securities, matched comparator, daily
+return streams, and already-deducted transaction costs. Each applies a
+portfolio-level daily reset at 2x and 3x under two prospectively fixed
+scenarios:
+
+- primary: underlying 10-bps-per-side cost stream and 6% annual financing;
+- adverse: underlying 20-bps-per-side cost stream and 10% annual financing.
+
+Financing is the exact disclosed scenario
+`(L - 1) * annual_rate / 252` on each session that began invested. Its
+notional is one full base-portfolio unit; it deliberately does **not** net the
+base sleeve's 2% cash or any underfill. That makes it a conservative synthetic
+scenario, not a prediction of a broker's precise debit. Entry begins financing
+on the following interval; an interval begun invested remains charged through
+an exit. Transaction costs are not deducted a second time. Selected and
+matched paths receive identical leverage, financing, and cost treatment; SPY
+receives identical leverage/financing only as context. Any pre- or
+post-financing daily return at or below -100% refuses instead of silently
+continuing through wipeout.
+
+The result is synthetic only. It does not model margin calls, borrow
+availability, security-level financing, taxes, market impact, broker
+liquidation, or an actual leveraged product. It authorizes no deployment,
+orders, paper/live state, or trading. Evaluator-only access disclosures are
+scoped under `evaluator_io`; the separate runtime metadata truthfully reports
+the QC history activity, avoiding a claim that the end-to-end run performs no
+Object Store or provider-facing work.
+
+### 92.4 Submission and result boundary
+
+The projection contains only the exact profile-specific modules plus generated
+`main.py`. The leverage projection is 240,523 bytes total, with a 59,732-byte
+largest file, below the frozen 260,000-byte total and 60,000-byte per-file
+bounds. The market-cap runtime therefore has only 268 bytes of per-file
+headroom; that is an explicit review concern, and the exact size/import
+closure is pinned rather than treated as informal headroom.
+
+The adapter has prospective accounting for six four-cell market-cap runs
+(R-083 through R-088) and two four-cell leverage runs (R-089/R-090). A later
+physical run may use those numbers only after Claude review, Codex
+counter-review, a committed project-specific preregistration, and a freshly
+derived exact plan on the then-current code closure. The verifier requires
+the exact profile/runtime/source lineage, count reconciliation, four-cell
+inventory, concentration arithmetic, cost path invariance and monotonicity,
+Sharpe/Sortino consistency, leverage scenario grid, financing arithmetic,
+no-double-cost disclosure, scenario ordering, summary digest, and one-use
+aggregate receipt. Raw security identifiers, prices, provider rows, logs,
+charts, orders, and unrestricted result fields remain outside the read.
+
+### 92.5 In-round findings
+
+| ID | P | Finding | Disposition |
+|---|---|---|---|
+| `ARV2D92-001` | P3 | The first leverage draft charged a binary full-NAV financing debit but described it only through the formula, allowing a reader to mistake it for net risky-exposure financing. | **Corrected before commit.** The profile now binds the one-full-base-unit, no-cash/underfill-netting rule and a focused test pins it. |
+| `ARV2D92-002` | P3 | The pure evaluator emitted unqualified `provider_access/network_access/object_store_access: false` fields even though the enclosing QC runtime necessarily reads the package and history. | **Corrected before commit.** The nested `evaluator_io` object scopes those statements to the pure evaluator; runtime metadata carries physical history counts. |
+| `ARV2D92-003` | P3 | The wipeout test reached only the pre-financing `<= -1` branch and did not isolate financing alone crossing the boundary. | **Corrected before commit.** A `-0.4999`, invested, 2x, 6%-rate case is above -1 before financing and below -1 only after the debit. |
+| `ARV2D92-004` | P3 | The market-cap runtime is 59,732 bytes, close to QC's 60,000-byte reviewed limit. | **Documented and pinned.** Projection tests authenticate the exact flat source inventory, enforce both size bounds, and compile each file raw and under the QC prelude. Future edits must preserve headroom or split the module under fresh review. |
+
+An independent settled-tree audit found **0 P0, 0 P1, and 0 P2** leverage
+defects and confirmed all three corrected P3s above. No economic result exists
+yet, so this section makes no return, drawdown, alpha, benchmark, or strategy
+selection claim.
+
+### 92.6 Validation before the complete lane run
+
+- Combined evaluator, incremental runtime, projection, submission-adapter,
+  Object Store read-contract, and leverage battery on the settled tree:
+  **421 passed in 230.58 seconds**.
+- Independent settled-tree leverage/evaluator/runtime/projection/import-closure
+  audit after the three P3 corrections: **37 passed in 24.20 seconds**.
+- The complete submission-adapter file independently passed **284 tests**
+  before the final P3 wording/test corrections; the 421-test settled-tree run
+  includes that entire file after those corrections.
+- `compileall` over the lane packages/tests exits zero; every rendered source
+  compiles raw and after both supported QC preludes; `git diff --check` is
+  clean.
+
+The complete standing Analyst lane selection is run once on the committed
+review-candidate tree before the single push. Its exact result, the final
+record gates, and the section-5 push row are appended after that run; only
+documentation evidence may change afterward.
+
+### 92.7 Next gate
+
+Claude independently reviews the exact one-push snapshot. Codex then
+counter-reviews every Claude commit in this same worktree. Only after that
+counter-review may Codex freeze project/backtest names and exact submission
+plan hashes, commit the shared-ledger preregistrations, and launch the six
+unlevered market-cap profiles followed by the two separately labeled
+synthetic-leverage profiles. With one subscribed QC node, physical jobs run
+sequentially even though local validation can run in parallel. Any technical
+failure gets a fresh prospective identity; observed economic results may not
+select a retry rule. No result in this sequence grants formal acceptance,
+deployment, broker access, orders, paper/live state, or trading authority.

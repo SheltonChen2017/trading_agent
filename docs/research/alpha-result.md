@@ -2808,3 +2808,52 @@ Each projection is 259,810 bytes. R-117 must close and authenticate at most
 one aggregate read before R-118 launches. Planned accounting is R-117 **84 ->
 85 looks / 27 -> 28 development evaluations / 599 -> 603 cells**, then R-118
 **85 -> 86 / 28 -> 29 / 603 -> 607**. No outcome has yet been selected.
+
+## R-117 and R-118 — corrected sector-neutral bounded tilt (AUTHENTICATED; TANGIBLE PRELIMINARY) — 2026-09-18
+
+Both preregistered V4 runs reached authenticated terminal `Completed.` and
+each consumed exactly one aggregate-only result read selecting the nine
+expected custom statistics. No raw provider row, security identifier, price
+series, return series, log, chart, holding, or order was selected.
+
+| Run | Private QC identity | Result receipt | 10-bps selected | 10-bps matched | Selected - matched | SPY reference | Selected - SPY |
+|---|---|---|---:|---:|---:|---:|---:|
+| R-117 QQQ holdings proxy | project `36703035`; backtest `b58922a90d5c361212525375325a119b` | `arv2-preliminary-qc-result-4cf76e6155b6b13bce661a52`; SHA-256 `4cf76e6155b6b13bce661a523a096ddcd2ca753b9c593e37ec2d6415bc580f9c` | +115.3069% | +114.3127% | **+0.9942 pp** | +95.6663% | +19.6405 pp |
+| R-118 SPY holdings proxy | project `36704537`; backtest `ee3820c9459206957e6e824e5bfbb597` | `arv2-preliminary-qc-result-2d032398e9155c1a79727e98`; SHA-256 `2d032398e9155c1a79727e98c03534edc269020c6e1fae03169db4583c406704` | +89.5224% | +88.7752% | **+0.7471 pp** | +95.6663% | -6.1440 pp |
+
+R-117 terminal SHA-256 is
+`4811287d41a935db0b5e975fba5a20351b1c6fd5509ed7621badca7fe3c23b25`
+and its selected-statistics SHA-256 is
+`32458947e2b645f124293691f51e4a0d50561423818380219846a62d7f630725`.
+R-118 terminal SHA-256 is
+`21d91a79580e11f9fa1a10c741e8193b78cd2abf017bc7633367b7f648fad4ed`
+and its selected-statistics SHA-256 is
+`6c372c160e32119d6b808e7815299ae7291834c7e1c70c18e4fea21ee25de963`.
+
+At 10 basis points per side, R-117 reports 18.2303% annualized arithmetic
+return, 23.7224% annualized volatility, 0.7685 zero-rate Sharpe, 1.0880
+Sortino, and -35.5455% maximum drawdown. R-118 reports 14.2417%, 16.6788%,
+0.8539, 1.2175, and -25.0061%, respectively. Mean cash is approximately 2%
+for both; maximum one-way active share is 2.4382% for R-117 and 3.3106% for
+R-118.
+
+The bounded overlay added about 0.99 percentage point to its matched
+QQQ-holdings proxy and 0.75 percentage point to its matched SPY-holdings proxy
+over five years after modeled primary cost. R-117 did not include an actual
+QQQ ETF total-return comparator, so its selected-minus-SPY field is not a QQQ
+hurdle. R-118 lagged its SPY reference. These are modest, preliminary,
+single-window results and do not authorize leverage, paper/live use, or
+trading.
+
+The common SPY reference is bound to raw-observation SHA-256
+`8c10999f1754960868d7ca201c63fde386aab7a14e5c8ed6015696be01c7fe78`
+and return-path SHA-256
+`8c9c9296977070c78423bb35f8a3fb5f7538f62892b23d721703757d7b403762`.
+Its +95.6663% differs from the earlier +94.2074% data vintage; only comparisons
+inside one bound envelope share a basis. R-117 reports two partial rebalance
+decisions and 22 stale-mark sessions; R-118 reports five and 47. The recorded
+outputs preserve those conservative exceptions rather than hiding them.
+
+R-117 and R-118 close accounting at **86 shared looks, 29 ARV2 development
+evaluations, 27 infrastructure looks, and 607 cells**. No deployment, broker,
+paper/live, funded-account, or trading authority follows.

@@ -18271,3 +18271,47 @@ A launch spends a look and evaluation even on a technical refusal; cells accrue
 only after an authenticated result read. No raw row, identifier, price, return
 series, log, chart, holding, order, deployment, broker, paper/live, or trading
 access is authorized or selected by this freeze.
+
+## 109. R-117 and R-118 authenticated bounded-tilt results, 2026-09-18
+
+R-117 and R-118 each reached terminal `Completed.` and each consumed exactly
+one previously authorized aggregate-only result read. No raw provider row,
+security identifier, price series, log, chart, holding, or order was selected.
+The two runs close the preregistered accounting at **86 shared looks, 29
+development evaluations, 27 infrastructure looks, and 607 cells**.
+
+| Run | Private QC identity | Aggregate identity | 10-bps selected | 10-bps matched | Selected - matched | SPY reference | Selected - SPY |
+|---|---|---|---:|---:|---:|---:|---:|
+| R-117 QQQ holdings proxy | project `36703035`; backtest `b58922a90d5c361212525375325a119b` | `arv2-preliminary-qc-result-4cf76e6155b6b13bce661a52`; SHA-256 `4cf76e6155b6b13bce661a523a096ddcd2ca753b9c593e37ec2d6415bc580f9c` | +115.3069% | +114.3127% | **+0.9942 pp** | +95.6663% | +19.6405 pp |
+| R-118 SPY holdings proxy | project `36704537`; backtest `ee3820c9459206957e6e824e5bfbb597` | `arv2-preliminary-qc-result-2d032398e9155c1a79727e98`; SHA-256 `2d032398e9155c1a79727e98c03534edc269020c6e1fae03169db4583c406704` | +89.5224% | +88.7752% | **+0.7471 pp** | +95.6663% | -6.1440 pp |
+
+At 10 basis points per side, R-117 reports 18.2303% annualized arithmetic
+return, 23.7224% annualized volatility, 0.7685 zero-rate Sharpe, 1.0880
+Sortino, and -35.5455% maximum drawdown. R-118 reports 14.2417%, 16.6788%,
+0.8539, 1.2175, and -25.0061%, respectively. Mean cash is approximately 2%
+for both. Maximum one-way active share is only 2.4382% for R-117 and 3.3106%
+for R-118, so these results describe a deliberately small overlay rather than
+a concentrated analyst-revision portfolio.
+
+The direct conclusion is modest: the frozen bounded overlay added about one
+percentage point to its matched QQQ-holdings proxy and 0.75 percentage point
+to its matched SPY-holdings proxy over five years after the modeled primary
+cost. R-117 does **not** contain an actual QQQ ETF total-return comparator,
+so it is not evidence that the sleeve beat QQQ itself. R-118 did not beat its
+SPY reference. Neither single overlapping historical window is confirmation,
+and neither authorizes leverage, paper/live use, or trading.
+
+The SPY reference path in these two envelopes is bound to raw-observation
+SHA-256 `8c10999f1754960868d7ca201c63fde386aab7a14e5c8ed6015696be01c7fe78`
+and return-path SHA-256
+`8c9c9296977070c78423bb35f8a3fb5f7538f62892b23d721703757d7b403762`.
+Its +95.6663% value differs from the earlier +94.2074% vintage. The digest
+makes that drift explicit; selected-minus-matched remains internally aligned,
+but cross-run selected-minus-SPY comparisons must not mix the two vintages.
+
+Both selected and matched accounts report conservative execution exceptions:
+R-117 has two partial rebalance decisions and 22 stale-mark sessions; R-118
+has five and 47. The recorded results remain the immutable outputs of those
+rules. They motivate, but do not themselves validate, the separately bounded
+order-level successor that will expose actual simulated order completion,
+coverage, freshness, fees, and an actual QQQ comparator.

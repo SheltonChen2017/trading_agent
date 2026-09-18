@@ -1,4 +1,5 @@
 import hashlib
+import json
 from datetime import date
 from decimal import Decimal
 from fractions import Fraction
@@ -527,10 +528,37 @@ def test_complete_result_has_four_costs_full_exposure_and_concentration_metrics(
         Decimal("-0.00196"),
     ]
     statistics = runtime.custom_summary_statistics()
-    assert tuple(statistics) == subject.expected_custom_summary_statistic_names(
-        subject.QQQ_2021_2025_PROFILE_ID
+    expected_names = (
+        "ARV2_STOCK_PORTFOLIO_COST_0",
+        "ARV2_STOCK_PORTFOLIO_COST_10",
+        "ARV2_STOCK_PORTFOLIO_COST_20",
+        "ARV2_STOCK_PORTFOLIO_COST_5",
+        subject.MATCHED_AGGREGATES_STATISTIC_NAME,
+        subject.META_STATISTIC_NAME,
+        subject.SELECTED_AGGREGATES_STATISTIC_NAME,
     )
-    assert all(len(value) <= 4096 for value in statistics.values())
+    assert tuple(statistics) == expected_names
+    assert subject.expected_custom_summary_statistic_names(
+        subject.QQQ_2021_2025_PROFILE_ID
+    ) == expected_names
+    assert all(len(value) <= 3_072 for value in statistics.values())
+
+    wire_summary = json.loads(statistics[subject.META_STATISTIC_NAME])
+    profile_id = wire_summary.pop("profile_id")
+    profile_sha256 = wire_summary.pop("profile_sha256")
+    wire_summary["profile"] = subject.require_profile(profile_id)
+    assert wire_summary["profile"]["profile_sha256"] == profile_sha256
+    wire_summary["selected_aggregates"] = json.loads(
+        statistics[subject.SELECTED_AGGREGATES_STATISTIC_NAME]
+    )
+    wire_summary["matched_aggregates"] = json.loads(
+        statistics[subject.MATCHED_AGGREGATES_STATISTIC_NAME]
+    )
+    wire_summary["portfolio_cells"] = [
+        json.loads(statistics["ARV2_STOCK_PORTFOLIO_COST_" + str(cost)])
+        for cost in subject.COST_BPS_SCENARIOS
+    ]
+    assert wire_summary == summary
     assert all(cell["leverage"] is False for cell in summary["portfolio_cells"])
 
 
@@ -566,6 +594,19 @@ def test_missing_eligibility_exit_uses_symmetric_zero_recovery():
     assert summary["portfolio_cells"][0]["status"] == (
         "PRELIMINARY_DESCRIPTIVE_ZERO_RECOVERY_SENSITIVITY"
     )
+
+
+def test_custom_summary_refuses_oversized_split_account_fragment(monkeypatch):
+    runtime = _complete(_input())
+    summary = runtime.aggregate_summary()
+    summary["selected_aggregates"]["average_holding_count"] = "1" * 4_097
+    monkeypatch.setattr(runtime, "aggregate_summary", lambda: summary)
+
+    with pytest.raises(
+        subject.MarketCapStockPortfolioEvaluationError,
+        match="market-cap stock custom summary exceeded compact bound",
+    ):
+        runtime.custom_summary_statistics()
 
 
 def test_missing_price_inside_eligibility_defers_only_stale_holding():

@@ -38,6 +38,9 @@ CONTRACT_ID = "arv2-objective-synthetic-leverage-v1"
 SUMMARY_SCHEMA = "arv2-objective-synthetic-leverage-summary-v1"
 CELL_SCHEMA = "arv2-objective-synthetic-leverage-cell-v1"
 BASE_EVALUATOR_SOURCE_SHA256 = (
+    "52d46cf0e8f89a02b5630d70ef7e5e9aa4cabc5a8fdc80b4cd7d6ba1da4f55d9"
+)
+V2_BASE_EVALUATOR_SOURCE_SHA256 = (
     "0f320134b96e651593bfb98d29a1b8da3987d6192eb83f5a6025a21bdecb5905"
 )
 V1_BASE_EVALUATOR_SOURCE_SHA256 = (
@@ -56,9 +59,16 @@ QQQ_2021_2025_V2_PROFILE_ID = (
 SPY_2021_2025_V2_PROFILE_ID = (
     "arv2-objective-synthetic-leverage-spy-2021-2025-v2"
 )
+QQQ_2021_2025_V3_PROFILE_ID = (
+    "arv2-objective-synthetic-leverage-qqq-2021-2025-v3"
+)
+SPY_2021_2025_V3_PROFILE_ID = (
+    "arv2-objective-synthetic-leverage-spy-2021-2025-v3"
+)
 V1_PROFILE_IDS = (QQQ_2021_2025_PROFILE_ID, SPY_2021_2025_PROFILE_ID)
-PROFILE_IDS = (QQQ_2021_2025_V2_PROFILE_ID, SPY_2021_2025_V2_PROFILE_ID)
-ALL_PROFILE_IDS = V1_PROFILE_IDS + PROFILE_IDS
+V2_PROFILE_IDS = (QQQ_2021_2025_V2_PROFILE_ID, SPY_2021_2025_V2_PROFILE_ID)
+PROFILE_IDS = (QQQ_2021_2025_V3_PROFILE_ID, SPY_2021_2025_V3_PROFILE_ID)
+ALL_PROFILE_IDS = V1_PROFILE_IDS + V2_PROFILE_IDS + PROFILE_IDS
 LEVERAGE_FACTORS = (2, 3)
 PRIMARY_SCENARIO_ID = "primary-6pct-financing-10bps"
 ADVERSE_SCENARIO_ID = "adverse-10pct-financing-20bps"
@@ -67,6 +77,13 @@ SCENARIOS = (
     (ADVERSE_SCENARIO_ID, Decimal("0.10"), 20, False),
 )
 ANNUALIZATION_SESSIONS = Decimal(252)
+META_STATISTIC_NAME = "ARV2_LEVERAGE_META"
+SELECTED_BASE_AGGREGATES_STATISTIC_NAME = (
+    "ARV2_LEVERAGE_SELECTED_BASE_AGGREGATES"
+)
+MATCHED_BASE_AGGREGATES_STATISTIC_NAME = (
+    "ARV2_LEVERAGE_MATCHED_BASE_AGGREGATES"
+)
 
 _PROFILE_ROWS = (
     (
@@ -85,10 +102,22 @@ _PROFILE_ROWS = (
         QQQ_2021_2025_V2_PROFILE_ID,
         _market.QQQ_2021_2025_V2_PROFILE_ID,
         "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178",
-        BASE_EVALUATOR_SOURCE_SHA256,
+        V2_BASE_EVALUATOR_SOURCE_SHA256,
     ),
     (
         SPY_2021_2025_V2_PROFILE_ID,
+        _market.SPY_2021_2025_V2_PROFILE_ID,
+        "0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d",
+        V2_BASE_EVALUATOR_SOURCE_SHA256,
+    ),
+    (
+        QQQ_2021_2025_V3_PROFILE_ID,
+        _market.QQQ_2021_2025_V2_PROFILE_ID,
+        "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178",
+        BASE_EVALUATOR_SOURCE_SHA256,
+    ),
+    (
+        SPY_2021_2025_V3_PROFILE_ID,
         _market.SPY_2021_2025_V2_PROFILE_ID,
         "0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d",
         BASE_EVALUATOR_SOURCE_SHA256,
@@ -222,7 +251,9 @@ def expected_custom_summary_statistic_names(profile_id):
     return tuple(
         sorted(
             (
-                "ARV2_LEVERAGE_META",
+                META_STATISTIC_NAME,
+                SELECTED_BASE_AGGREGATES_STATISTIC_NAME,
+                MATCHED_BASE_AGGREGATES_STATISTIC_NAME,
                 "ARV2_LEVERAGE_L2_PRIMARY",
                 "ARV2_LEVERAGE_L2_ADVERSE",
                 "ARV2_LEVERAGE_L3_PRIMARY",
@@ -630,6 +661,8 @@ class ObjectiveSyntheticLeverageEvaluationRuntime(
         summary = self.aggregate_summary()
         cells = summary.pop("cells")
         profile = summary.pop("profile")
+        selected_base_aggregates = summary.pop("selected_base_aggregates")
+        matched_base_aggregates = summary.pop("matched_base_aggregates")
         if profile != require_profile(self._leverage_profile["profile_id"]):
             raise ObjectiveSyntheticLeverageEvaluationError(
                 "synthetic leverage summary profile changed"
@@ -637,7 +670,13 @@ class ObjectiveSyntheticLeverageEvaluationRuntime(
         summary["profile_id"] = profile["profile_id"]
         summary["profile_sha256"] = profile["profile_sha256"]
         output = {
-            "ARV2_LEVERAGE_META": _canonical(summary).decode("ascii")
+            META_STATISTIC_NAME: _canonical(summary).decode("ascii"),
+            SELECTED_BASE_AGGREGATES_STATISTIC_NAME: _canonical(
+                selected_base_aggregates
+            ).decode("ascii"),
+            MATCHED_BASE_AGGREGATES_STATISTIC_NAME: _canonical(
+                matched_base_aggregates
+            ).decode("ascii"),
         }
         for cell in cells:
             suffix = (
@@ -656,9 +695,19 @@ class ObjectiveSyntheticLeverageEvaluationRuntime(
             raise ObjectiveSyntheticLeverageEvaluationError(
                 "synthetic leverage custom summary inventory changed"
             )
-        if any(
-            len(key) > 64 or len(value) > 4096
-            for key, value in output.items()
+        fragments = (
+            META_STATISTIC_NAME,
+            SELECTED_BASE_AGGREGATES_STATISTIC_NAME,
+            MATCHED_BASE_AGGREGATES_STATISTIC_NAME,
+        )
+        if (
+            any(len(key) > 64 for key in output)
+            or any(len(output[name]) > 3072 for name in fragments)
+            or any(
+                len(value) > 4096
+                for name, value in output.items()
+                if name not in fragments
+            )
         ):
             raise ObjectiveSyntheticLeverageEvaluationError(
                 "synthetic leverage custom summary exceeded compact bound"
@@ -674,6 +723,8 @@ __all__ = (
     "CELL_SCHEMA",
     "CONTRACT_ID",
     "LEVERAGE_FACTORS",
+    "MATCHED_BASE_AGGREGATES_STATISTIC_NAME",
+    "META_STATISTIC_NAME",
     "ObjectiveSyntheticLeverageEvaluationError",
     "ObjectiveSyntheticLeverageEvaluationRuntime",
     "PRIMARY_SCENARIO_ID",
@@ -681,12 +732,17 @@ __all__ = (
     "PROFILE_SCHEMA",
     "QQQ_2021_2025_PROFILE_ID",
     "QQQ_2021_2025_V2_PROFILE_ID",
+    "QQQ_2021_2025_V3_PROFILE_ID",
     "SCENARIOS",
     "SPY_2021_2025_PROFILE_ID",
     "SPY_2021_2025_V2_PROFILE_ID",
+    "SPY_2021_2025_V3_PROFILE_ID",
+    "SELECTED_BASE_AGGREGATES_STATISTIC_NAME",
     "SUMMARY_SCHEMA",
     "V1_BASE_EVALUATOR_SOURCE_SHA256",
     "V1_PROFILE_IDS",
+    "V2_BASE_EVALUATOR_SOURCE_SHA256",
+    "V2_PROFILE_IDS",
     "expected_custom_summary_statistic_names",
     "require_profile",
 )

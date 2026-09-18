@@ -42,6 +42,13 @@ COST_BPS_SCENARIOS = (0, 5, PRIMARY_COST_BPS, 20)
 ANNUALIZATION_SESSIONS = Decimal("252")
 MINIMUM_INVESTED_RETURN_SESSIONS = 50
 MAXIMUM_MARKET_CAP_TEXT_LENGTH = 64
+META_STATISTIC_NAME = "ARV2_STOCK_PORTFOLIO_META"
+SELECTED_AGGREGATES_STATISTIC_NAME = (
+    "ARV2_STOCK_PORTFOLIO_SELECTED_AGGREGATES"
+)
+MATCHED_AGGREGATES_STATISTIC_NAME = (
+    "ARV2_STOCK_PORTFOLIO_MATCHED_AGGREGATES"
+)
 
 QQQ_2021_2025_PROFILE_ID = "arv2-market-cap-stock-qqq-2021-2025-v1"
 SPY_2021_2025_PROFILE_ID = "arv2-market-cap-stock-spy-2021-2025-v1"
@@ -320,7 +327,9 @@ def expected_custom_summary_statistic_names(profile_id):
     return tuple(
         sorted(
             (
-                "ARV2_STOCK_PORTFOLIO_META",
+                META_STATISTIC_NAME,
+                SELECTED_AGGREGATES_STATISTIC_NAME,
+                MATCHED_AGGREGATES_STATISTIC_NAME,
                 *(
                     "ARV2_STOCK_PORTFOLIO_COST_" + str(cost)
                     for cost in COST_BPS_SCENARIOS
@@ -1248,6 +1257,8 @@ class MarketCapStockPortfolioEvaluationRuntime(
         summary = self.aggregate_summary()
         cells = summary.pop("portfolio_cells")
         profile = summary.pop("profile")
+        selected_aggregates = summary.pop("selected_aggregates")
+        matched_aggregates = summary.pop("matched_aggregates")
         expected_profile = require_market_cap_stock_portfolio_profile(
             self._profile["profile_id"]
         )
@@ -1258,7 +1269,13 @@ class MarketCapStockPortfolioEvaluationRuntime(
         summary["profile_id"] = profile["profile_id"]
         summary["profile_sha256"] = profile["profile_sha256"]
         output = {
-            "ARV2_STOCK_PORTFOLIO_META": _canonical(summary).decode("ascii")
+            META_STATISTIC_NAME: _canonical(summary).decode("ascii"),
+            SELECTED_AGGREGATES_STATISTIC_NAME: _canonical(
+                selected_aggregates
+            ).decode("ascii"),
+            MATCHED_AGGREGATES_STATISTIC_NAME: _canonical(
+                matched_aggregates
+            ).decode("ascii"),
         }
         for cell in cells:
             output[
@@ -1287,6 +1304,8 @@ __all__ = (
     "CONTRACT_ID",
     "COST_BPS_SCENARIOS",
     "MAXIMUM_HOLDINGS",
+    "MATCHED_AGGREGATES_STATISTIC_NAME",
+    "META_STATISTIC_NAME",
     "MarketCapStockPortfolioEvaluationError",
     "MarketCapStockPortfolioEvaluationRuntime",
     "PORTFOLIO_CELL_SCHEMA",
@@ -1310,6 +1329,7 @@ __all__ = (
     "SPY_2023_2025_PROFILE_ID",
     "SPY_2023_2025_V2_PROFILE_ID",
     "SPY_PROFILE_IDS",
+    "SELECTED_AGGREGATES_STATISTIC_NAME",
     "SUMMARY_SCHEMA",
     "TARGET_GROSS_EXPOSURE",
     "V1_PROFILE_IDS",

@@ -358,9 +358,12 @@ ARE SUPERSEDED UNSPENT. SECTION 97 FREEZES R-091 THROUGH R-098. SECTION 98
 CLOSES R-091 AS A ZERO-CELL FUTURE-HISTORY REFUSAL, SUPERSEDES R-092 THROUGH
 R-098 UNSPENT, AND ADDS BOUNDED SIMULATED-CLOCK GATES. SECTION 99 FREEZES THE
 EXACT PHYSICAL R-099 THROUGH R-106 IDENTITIES ON THAT CORRECTED CLOSURE; R-099
-IS NEXT. CURRENT ACCOUNTING IS 80
-SHARED LOOKS, 23 ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A
-591-CELL FLOOR.
+THEN REACHED A ZERO-CELL COMPACT-TRANSPORT REFUSAL. SECTION 100 RECORDS THE
+LOSSLESS ACCOUNT-AGGREGATE WIRE SPLIT, SUPERSEDES R-100 THROUGH R-106 UNSPENT,
+AND RESERVES R-107 THROUGH R-114. CURRENT ACCOUNTING IS 81 SHARED LOOKS, 24
+ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR.
+THE EXACT NEXT STEP IS TO FREEZE THE PHYSICAL R-107 THROUGH R-114 IDENTITIES,
+THEN LAUNCH R-107.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -17544,4 +17547,61 @@ looks, and a 591-cell floor**. Completing all eight authenticated results
 would end at **88 / 31 / 27 / 623**. A launch spends its look and development
 evaluation even if it refuses; four cells accrue only on an authenticated
 aggregate result. No result authorizes formal alpha acceptance, deployment,
+broker access, orders, paper/live state, or trading.
+
+## 100. R-099 compact-transport refusal and lossless split, 2026-09-17
+
+R-099 launched once in private QC project `36673484`,
+`47 ARV2_MARKET_CAP_QQQ_R099_2021_2025 - 20260917`, backtest
+`5150223203bd90ad8a0de4ac1ec1a3b6`, and reached authenticated
+`Runtime Error` after 69 statistics-free status polls. It emitted no
+authenticated aggregate result and no economic cell was read. One bounded,
+no-redirect technical diagnostic selected only terminal status, error text,
+and stack frame. The exact terminal reason was `market-cap stock custom
+summary exceeded compact bound` at simulated `2026-07-28 16:00:00`. No raw
+provider row, identifier, price, return, chart, holding, order, deployment,
+broker state, paper/live state, or trading action was selected.
+
+The computation itself reached summary construction. The refusal was a QC
+wire-representation limit: each custom-statistic value may contain at most
+4,096 characters. The logical market-cap summary placed both exact 21-field
+account aggregates in `ARV2_STOCK_PORTFOLIO_META`; a production-shaped local
+reproduction reached 4,105 characters. The correction leaves
+`aggregate_summary()`, every economic field, every Decimal string, and the
+full logical-summary digest unchanged. It removes only those two dictionaries
+from wire META and transports them as exact canonical
+`ARV2_STOCK_PORTFOLIO_SELECTED_AGGREGATES` and
+`ARV2_STOCK_PORTFOLIO_MATCHED_AGGREGATES` objects. The host requires the exact
+expanded inventory, validates both objects with the existing role-specific
+guards, rehydrates them, and verifies the original full-summary identity.
+Focused regressions prove all seven evaluator statistics remain at or below
+3,072 characters, the rehydrated logical summary is byte-equivalent, either
+missing fragment refuses, unexpected fragment fields refuse, and mutations
+cannot bypass semantic or digest validation.
+
+The same lossless split is applied prospectively to the synthetic-leverage
+wire envelope before any leverage run: its fixture META was already 4,079
+characters and a production package identity would predictably exceed the QC
+limit. Historical leverage profiles remain preserved; fresh profile identities
+bind the new exact base-evaluator source. This is a transport correction, not
+a leverage, selection, weighting, cost, financing, or period change.
+
+Codex's counter-review found and corrected one P2 accounting defect before the
+successor freeze: the submission adapter still emitted a hand-copied
+infrastructure total of 23 although the authenticated append-only ledger holds
+27 entries. The adapter now derives the count from that authenticated payload
+and requires its entry count, actual entry length, and reported total to agree.
+Counter-review also added red/green isolation for both new compact-bound
+refusals; deleting either guard now fails its evaluator test instead of relying
+only on normal-size fixture assertions.
+
+R-099 is final and spends shared looks **80 -> 81** and ARV2 development
+evaluations **23 -> 24**. Infrastructure looks remain **27** and the lifetime
+cell floor remains **591**. R-100 through R-106 never launched and are
+superseded unspent because the projected sources, result-name inventories,
+host closure, and plans change. R-107 through R-114 are reserved as fresh
+technical successors in the same order: six unlevered QQQ/SPY windows, then
+QQQ/SPY objective synthetic leverage. Their exact physical identities must be
+committed before external action. No observed economic value selected this
+correction, and no result authorizes formal alpha acceptance, deployment,
 broker access, orders, paper/live state, or trading.

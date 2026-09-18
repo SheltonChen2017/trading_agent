@@ -153,7 +153,7 @@ def _history_loader(value, *, daily_growth=Decimal("1.0001")):
     return load
 
 
-def _complete(profile_id=subject.QQQ_2021_2025_V2_PROFILE_ID):
+def _complete(profile_id=subject.QQQ_2021_2025_V3_PROFILE_ID):
     value = _input()
     runtime = subject.ObjectiveSyntheticLeverageEvaluationRuntime(
         value,
@@ -169,18 +169,24 @@ def _complete(profile_id=subject.QQQ_2021_2025_V2_PROFILE_ID):
     return runtime
 
 
-def test_two_successor_profiles_pin_exact_base_lineage_and_objective_rule():
+def test_two_v3_profiles_pin_exact_base_lineage_and_objective_rule():
     assert subject.PROFILE_IDS == (
+        subject.QQQ_2021_2025_V3_PROFILE_ID,
+        subject.SPY_2021_2025_V3_PROFILE_ID,
+    )
+    assert subject.V2_PROFILE_IDS == (
         subject.QQQ_2021_2025_V2_PROFILE_ID,
         subject.SPY_2021_2025_V2_PROFILE_ID,
     )
-    assert subject.ALL_PROFILE_IDS == subject.V1_PROFILE_IDS + subject.PROFILE_IDS
+    assert subject.ALL_PROFILE_IDS == (
+        subject.V1_PROFILE_IDS + subject.V2_PROFILE_IDS + subject.PROFILE_IDS
+    )
     expected = {
-        subject.QQQ_2021_2025_V2_PROFILE_ID: (
+        subject.QQQ_2021_2025_V3_PROFILE_ID: (
             market.QQQ_2021_2025_V2_PROFILE_ID,
             "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178",
         ),
-        subject.SPY_2021_2025_V2_PROFILE_ID: (
+        subject.SPY_2021_2025_V3_PROFILE_ID: (
             market.SPY_2021_2025_V2_PROFILE_ID,
             "0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d",
         ),
@@ -211,6 +217,11 @@ def test_two_successor_profiles_pin_exact_base_lineage_and_objective_rule():
         == subject.V1_BASE_EVALUATOR_SOURCE_SHA256
         for profile_id in subject.V1_PROFILE_IDS
     )
+    assert all(
+        subject.require_profile(profile_id)["base_evaluator_source_sha256"]
+        == subject.V2_BASE_EVALUATOR_SOURCE_SHA256
+        for profile_id in subject.V2_PROFILE_IDS
+    )
 
 
 def test_base_evaluator_source_bytes_and_profile_hashes_are_still_exact():
@@ -225,13 +236,28 @@ def test_base_evaluator_source_bytes_and_profile_hashes_are_still_exact():
         ]
 
 
-def test_preserved_v1_profile_emits_its_historical_source_identity():
-    runtime = _complete(subject.QQQ_2021_2025_PROFILE_ID)
-    meta = json.loads(runtime.custom_summary_statistics()["ARV2_LEVERAGE_META"])
-
-    assert meta["base_evaluator_source_sha256"] == (
-        subject.V1_BASE_EVALUATOR_SOURCE_SHA256
+@pytest.mark.parametrize(
+    ("profile_id", "source_sha256"),
+    (
+        (
+            subject.QQQ_2021_2025_PROFILE_ID,
+            subject.V1_BASE_EVALUATOR_SOURCE_SHA256,
+        ),
+        (
+            subject.QQQ_2021_2025_V2_PROFILE_ID,
+            subject.V2_BASE_EVALUATOR_SOURCE_SHA256,
+        ),
+    ),
+)
+def test_preserved_profile_emits_its_historical_source_identity(
+    profile_id, source_sha256
+):
+    runtime = _complete(profile_id)
+    meta = json.loads(
+        runtime.custom_summary_statistics()[subject.META_STATISTIC_NAME]
     )
+
+    assert meta["base_evaluator_source_sha256"] == source_sha256
 
 
 def test_scenarios_and_custom_stat_inventory_are_fixed():
@@ -251,13 +277,15 @@ def test_scenarios_and_custom_stat_inventory_are_fixed():
         ),
     )
     assert subject.expected_custom_summary_statistic_names(
-        subject.QQQ_2021_2025_V2_PROFILE_ID
+        subject.QQQ_2021_2025_V3_PROFILE_ID
     ) == (
         "ARV2_LEVERAGE_L2_ADVERSE",
         "ARV2_LEVERAGE_L2_PRIMARY",
         "ARV2_LEVERAGE_L3_ADVERSE",
         "ARV2_LEVERAGE_L3_PRIMARY",
-        "ARV2_LEVERAGE_META",
+        subject.MATCHED_BASE_AGGREGATES_STATISTIC_NAME,
+        subject.META_STATISTIC_NAME,
+        subject.SELECTED_BASE_AGGREGATES_STATISTIC_NAME,
     )
     with pytest.raises(
         subject.ObjectiveSyntheticLeverageEvaluationError,
@@ -421,17 +449,52 @@ def test_runtime_emits_four_exact_cells_with_identical_comparator_treatment(
 
 def test_custom_summary_is_compact_aggregate_only_and_has_no_capabilities():
     runtime = _complete()
+    summary = runtime.aggregate_summary()
     output = runtime.custom_summary_statistics()
     assert tuple(output) == subject.expected_custom_summary_statistic_names(
-        subject.QQQ_2021_2025_V2_PROFILE_ID
+        subject.QQQ_2021_2025_V3_PROFILE_ID
     )
-    assert all(len(key) <= 64 and len(value) <= 4096 for key, value in output.items())
+    fragment_names = (
+        subject.META_STATISTIC_NAME,
+        subject.SELECTED_BASE_AGGREGATES_STATISTIC_NAME,
+        subject.MATCHED_BASE_AGGREGATES_STATISTIC_NAME,
+    )
+    cell_names = tuple(name for name in output if name not in fragment_names)
+    assert all(len(key) <= 64 for key in output)
+    assert all(len(output[name]) <= 3_072 for name in fragment_names)
+    assert all(len(output[name]) <= 4_096 for name in cell_names)
     joined = json.dumps(output, sort_keys=True)
     assert "perm-security" not in joined
     assert "benchmark-SPY-permanent-id" not in joined
     assert "firm-" not in joined
     assert "event-" not in joined
-    meta = json.loads(output["ARV2_LEVERAGE_META"])
+    meta = json.loads(output[subject.META_STATISTIC_NAME])
+    assert "selected_base_aggregates" not in meta
+    assert "matched_base_aggregates" not in meta
+    wire_summary = dict(meta)
+    profile_id = wire_summary.pop("profile_id")
+    profile_sha256 = wire_summary.pop("profile_sha256")
+    wire_summary["profile"] = subject.require_profile(profile_id)
+    assert wire_summary["profile"]["profile_sha256"] == profile_sha256
+    wire_summary["selected_base_aggregates"] = json.loads(
+        output[subject.SELECTED_BASE_AGGREGATES_STATISTIC_NAME]
+    )
+    wire_summary["matched_base_aggregates"] = json.loads(
+        output[subject.MATCHED_BASE_AGGREGATES_STATISTIC_NAME]
+    )
+    wire_summary["cells"] = [
+        json.loads(
+            output[
+                "ARV2_LEVERAGE_L"
+                + str(leverage_factor)
+                + "_"
+                + ("PRIMARY" if primary else "ADVERSE")
+            ]
+        )
+        for leverage_factor in subject.LEVERAGE_FACTORS
+        for _scenario_id, _rate, _cost, primary in subject.SCENARIOS
+    ]
+    assert wire_summary == summary
     assert meta["raw_security_ids_in_summary"] is False
     assert meta["raw_price_rows_in_summary"] is False
     assert meta["raw_provider_rows_in_summary"] is False
@@ -443,6 +506,21 @@ def test_custom_summary_is_compact_aggregate_only_and_has_no_capabilities():
     assert meta["orders"] is False
     assert meta["deployment"] is False
     assert meta["trading"] is False
+
+
+def test_custom_summary_refuses_oversized_split_account_fragment(monkeypatch):
+    runtime = _complete()
+    summary = runtime.aggregate_summary()
+    summary["selected_base_aggregates"]["average_holding_count"] = (
+        "1" * 3_073
+    )
+    monkeypatch.setattr(runtime, "aggregate_summary", lambda: summary)
+
+    with pytest.raises(
+        subject.ObjectiveSyntheticLeverageEvaluationError,
+        match="synthetic leverage custom summary exceeded compact bound",
+    ):
+        runtime.custom_summary_statistics()
 
 
 def test_module_has_no_io_network_order_or_deployment_import_surface():

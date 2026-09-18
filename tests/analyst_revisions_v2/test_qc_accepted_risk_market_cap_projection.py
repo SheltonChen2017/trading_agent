@@ -222,11 +222,22 @@ def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
         evaluator.SPY_2023_2025_V2_PROFILE_ID:
             "e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3",
     }
-    assert projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S == {
+    assert {
+        profile_id: leverage_evaluator.require_profile(profile_id)[
+            "profile_sha256"
+        ]
+        for profile_id in leverage_evaluator.V2_PROFILE_IDS
+    } == {
         leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID:
             "a800d1db535ca22fa1bcfc238fbcfabbb463e21b18cf3fc384b606542878192e",
         leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID:
             "07106d52bed121064659b97173f66d1776adf5e72f0f231600d2b7b53299a014",
+    }
+    assert projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S == {
+        leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID:
+            "b89cae4bdd9c8caa21f0ee8658097550794f5c63ca71ff30d546cf14356abb23",
+        leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID:
+            "b89ffdb06b56ca5024667e2d6e510026f65d47b00f5bbb0c1f9ba2286d01becc",
     }
 
 
@@ -257,7 +268,7 @@ def test_objective_leverage_projection_is_exact_small_and_profile_bound(
             by_name[name].byte_count
             for name in projection.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
         )
-        == 240_697
+        == 243_663
     )
     assert max(item.byte_count for item in value.source_files) < 60_000
     assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES
@@ -287,7 +298,7 @@ def test_objective_leverage_main_defers_work_until_daily_callbacks(package):
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=(
-            leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID
+            leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID
         ),
     )
     main = next(
@@ -310,7 +321,7 @@ def test_objective_leverage_main_defers_work_until_daily_callbacks(package):
 
 
 def test_objective_leverage_projection_hash_is_load_bearing(package):
-    profile_id = leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID
+    profile_id = leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=profile_id,
@@ -337,7 +348,7 @@ def test_objective_leverage_projection_hash_is_load_bearing(package):
 def test_objective_leverage_flat_source_set_imports_in_isolation(
     package, tmp_path
 ):
-    profile_id = leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID
+    profile_id = leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=profile_id,
@@ -358,7 +369,7 @@ def test_objective_leverage_flat_source_set_imports_in_isolation(
                 "as runtime; "
                 "names = runtime.expected_custom_summary_statistic_names("
                 f"{profile_id!r}); "
-                "assert len(names) == 6; "
+                "assert len(names) == 8; "
                 "assert 'ARV2_RUNTIME_META' in names; "
                 "assert 'accepted_risk_preliminary_qc_runtime' "
                 "not in sys.modules; "

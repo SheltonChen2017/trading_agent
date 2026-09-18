@@ -35,7 +35,7 @@ class _Algorithm:
         self.summary[key] = value
 
 
-def _driver(profile_id=evaluator.QQQ_2021_2025_V2_PROFILE_ID):
+def _driver(profile_id=evaluator.QQQ_2021_2025_V3_PROFILE_ID):
     ticker = evaluator.require_profile(profile_id)["universe_proxy_ticker"]
     return runtime.AcceptedRiskObjectiveSyntheticLeverageQcDriver(
         _Algorithm(),
@@ -80,11 +80,11 @@ def test_wrapper_is_compact_standalone_and_adds_no_capability_import():
 
 def test_exact_leverage_to_base_profile_mapping_and_tickers():
     expected = {
-        evaluator.QQQ_2021_2025_V2_PROFILE_ID: (
+        evaluator.QQQ_2021_2025_V3_PROFILE_ID: (
             market.QQQ_2021_2025_V2_PROFILE_ID,
             ("QQQ",),
         ),
-        evaluator.SPY_2021_2025_V2_PROFILE_ID: (
+        evaluator.SPY_2021_2025_V3_PROFILE_ID: (
             market.SPY_2021_2025_V2_PROFILE_ID,
             ("SPY",),
         ),
@@ -122,7 +122,7 @@ def test_driver_rejects_constituent_inventory_for_other_base_profile():
             trade_bar_type=object,
             daily_resolution=object(),
             total_return_normalization=object(),
-            evaluation_profile_id=evaluator.QQQ_2021_2025_V2_PROFILE_ID,
+            evaluation_profile_id=evaluator.QQQ_2021_2025_V3_PROFILE_ID,
             fundamental_universe=object(),
             constituent_universes={"SPY": object()},
         )

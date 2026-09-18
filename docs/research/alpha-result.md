@@ -2532,3 +2532,41 @@ shared looks / development evaluations / cell floor. Infrastructure looks stay
 27. A launch spends its look even on refusal; cells accrue only from an
 authenticated aggregate. No raw inputs, logs, charts, holdings, orders,
 deployment, broker state, paper/live state, or trading action is authorized.
+
+## R-099 disposition; R-100 through R-106 superseded unspent — 2026-09-17
+
+R-099 launched once in private project `36673484`, backtest
+`5150223203bd90ad8a0de4ac1ec1a3b6`, and reached authenticated
+`Runtime Error` after 69 statistics-free polls. No aggregate result or
+economic cell was emitted or read. A single bounded, no-redirect technical
+diagnostic selected only terminal status, error text, and stack frame. The
+reason was `market-cap stock custom summary exceeded compact bound` at
+simulated `2026-07-28 16:00:00`. Computation reached summary construction;
+the refusal was the 4,096-character QC limit on each custom-statistic value,
+not an observed portfolio outcome.
+
+The lossless technical correction leaves the complete logical summary,
+economics, Decimal strings, and summary digest unchanged. It transports the
+selected and matched 21-field account aggregates as two separate exact
+canonical statistics, rehydrates them on the host, and then applies the
+existing semantic and full-summary identity checks. Direct tests keep every
+market-cap statistic at or below 3,072 characters. The same split is applied
+prospectively to the unrun leverage envelope, whose fixture META was already
+4,079 characters before its production package identity. Historical leverage
+profiles are retained and fresh identities bind the changed exact base source.
+
+Before the successor freeze, counter-review corrected the adapter's stale
+hand-copied infrastructure count of 23. Look accounting now derives 27 from
+the authenticated ledger and refuses disagreement among its declared count,
+actual entries, and total. Direct red/green tests also isolate both compact
+result-size guards.
+
+R-099 spends shared looks **80 -> 81** and ARV2 development evaluations
+**23 -> 24**. Infrastructure looks remain **27** and the lifetime cell floor
+remains **591**. R-100 through R-106 never launched and are superseded unspent.
+R-107 through R-114 are reserved in the same sequence, starting from
+**81 shared looks, 24 development evaluations, 27 infrastructure looks, and
+591 cells**. Their exact physical identities must be committed before any
+external action. No raw row, identifier, price, return, log, chart, holding,
+order, deployment, broker state, paper/live state, or trading action was
+selected or authorized.

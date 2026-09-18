@@ -66,9 +66,9 @@ _EXPECTED_LOOK_ACCOUNTING = {
     "lifetime_alpha_cell_floor_before": 484,
     "lifetime_alpha_cell_floor_after": 484,
     "aggregate_result_authenticated": False,
-    "infrastructure_looks_before": 23,
-    "infrastructure_looks_after": 23,
-    "authenticated_infrastructure_look_count": 23,
+    "infrastructure_looks_before": 27,
+    "infrastructure_looks_after": 27,
+    "authenticated_infrastructure_look_count": 27,
     "infrastructure_look_ledger_id": (
         "arv2-infrastructure-look-ledger-4a726bcdd9b7232f34a1eaf8"
     ),
@@ -102,6 +102,28 @@ def _look_accounting_at(stage):
         result["lifetime_alpha_cell_floor_after"] = 516
         result["aggregate_result_authenticated"] = True
     return result
+
+
+def test_look_accounting_derives_the_authenticated_infrastructure_total(
+    monkeypatch,
+):
+    binding = adapter._PINNED_INFRASTRUCTURE_LEDGER
+    ledger = json.loads(binding.payload)
+    ledger["append_only_contract"]["entry_count"] += 1
+    ledger["entries"].append({"synthetic_isolation_entry": True})
+    ledger["totals"]["infrastructure_research_looks_spent"] += 1
+    changed_binding = dataclasses.replace(binding, payload=_canonical(ledger))
+    monkeypatch.setattr(
+        adapter,
+        "_PINNED_REQUIRE_INFRASTRUCTURE_LEDGER",
+        lambda _binding: changed_binding,
+    )
+
+    accounting = adapter._look_accounting()
+
+    assert accounting["infrastructure_looks_before"] == 28
+    assert accounting["infrastructure_looks_after"] == 28
+    assert accounting["authenticated_infrastructure_look_count"] == 28
 
 
 def _canonical(value):
@@ -274,7 +296,7 @@ def leverage_plan_qqq(monkeypatch, tmp_path):
     return _build_plan(
         monkeypatch,
         tmp_path,
-        leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
+        leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
     )
 
 
@@ -878,6 +900,12 @@ def _market_cap_aggregate_statistics(plan):
         "summary_id": "arv2-market-cap-stock-summary-" + digest[:24],
         "summary_sha256": digest,
     }
+    statistics[
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("selected_aggregates")).decode("ascii")
+    statistics[
+        market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("matched_aggregates")).decode("ascii")
     statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
         "ascii"
     )
@@ -1102,6 +1130,12 @@ def _leverage_aggregate_statistics(plan):
         "summary_id": "arv2-objective-leverage-summary-" + digest[:24],
         "summary_sha256": digest,
     }
+    statistics[
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("selected_base_aggregates")).decode("ascii")
+    statistics[
+        leverage_evaluator.MATCHED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("matched_base_aggregates")).decode("ascii")
     statistics["ARV2_LEVERAGE_META"] = _canonical(metadata).decode("ascii")
     runtime_meta = {
         "schema": leverage_runtime.RUNTIME_META_SCHEMA,
@@ -1230,6 +1264,16 @@ def _rehash_market_cap_summary(statistics):
         }
     }
     summary["profile"] = profile
+    summary["selected_aggregates"] = json.loads(
+        statistics[
+            market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    summary["matched_aggregates"] = json.loads(
+        statistics[
+            market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
+        ]
+    )
     summary["portfolio_cells"] = [
         json.loads(statistics["ARV2_STOCK_PORTFOLIO_COST_" + str(cost)])
         for cost in market_cap_evaluator.COST_BPS_SCENARIOS
@@ -1257,6 +1301,16 @@ def _rehash_leverage_summary(statistics):
     }
     summary["profile"] = leverage_evaluator.require_profile(
         metadata["profile_id"]
+    )
+    summary["selected_base_aggregates"] = json.loads(
+        statistics[
+            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    summary["matched_base_aggregates"] = json.loads(
+        statistics[
+            leverage_evaluator.MATCHED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
     )
     summary["cells"] = [
         json.loads(
@@ -1345,31 +1399,31 @@ _STOCK_UNIVERSE_ACCOUNTING = {
 
 _MARKET_CAP_ACCOUNTING = {
     market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID: (
-        "R-099", 80, 81, 23, 24, 591, 595
+        "R-107", 81, 82, 24, 25, 591, 595
     ),
     market_cap_evaluator.SPY_2021_2025_V2_PROFILE_ID: (
-        "R-100", 81, 82, 24, 25, 595, 599
+        "R-108", 82, 83, 25, 26, 595, 599
     ),
     market_cap_evaluator.QQQ_2019_2023_V2_PROFILE_ID: (
-        "R-101", 82, 83, 25, 26, 599, 603
+        "R-109", 83, 84, 26, 27, 599, 603
     ),
     market_cap_evaluator.SPY_2019_2023_V2_PROFILE_ID: (
-        "R-102", 83, 84, 26, 27, 603, 607
+        "R-110", 84, 85, 27, 28, 603, 607
     ),
     market_cap_evaluator.QQQ_2023_2025_V2_PROFILE_ID: (
-        "R-103", 84, 85, 27, 28, 607, 611
+        "R-111", 85, 86, 28, 29, 607, 611
     ),
     market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID: (
-        "R-104", 85, 86, 28, 29, 611, 615
+        "R-112", 86, 87, 29, 30, 611, 615
     ),
 }
 
 _LEVERAGE_ACCOUNTING = {
-    leverage_evaluator.QQQ_2021_2025_V2_PROFILE_ID: (
-        "R-105", 86, 87, 29, 30, 615, 619
+    leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID: (
+        "R-113", 87, 88, 30, 31, 615, 619
     ),
-    leverage_evaluator.SPY_2021_2025_V2_PROFILE_ID: (
-        "R-106", 87, 88, 30, 31, 619, 623
+    leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID: (
+        "R-114", 88, 89, 31, 32, 619, 623
     ),
 }
 
@@ -1407,7 +1461,9 @@ def test_each_market_cap_profile_has_exact_run_spec_and_result_inventory(
         "ARV2_STOCK_PORTFOLIO_COST_10",
         "ARV2_STOCK_PORTFOLIO_COST_20",
         "ARV2_STOCK_PORTFOLIO_COST_5",
+        "ARV2_STOCK_PORTFOLIO_MATCHED_AGGREGATES",
         "ARV2_STOCK_PORTFOLIO_META",
+        "ARV2_STOCK_PORTFOLIO_SELECTED_AGGREGATES",
     )
     assert tuple(item.project_path for item in market_cap_plan.source_files) == (
         tuple(
@@ -1424,6 +1480,59 @@ def test_each_market_cap_profile_accepts_exact_bounded_aggregate(
 ):
     statistics = _market_cap_aggregate_statistics(market_cap_plan)
     _validate_statistics(market_cap_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    "statistic_name",
+    (
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME,
+        market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME,
+    ),
+)
+def test_market_cap_split_account_statistic_is_required(
+    market_cap_plan_2021, statistic_name
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    statistics.pop(statistic_name)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate result inventory changed",
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+def test_market_cap_split_account_fields_are_exact(market_cap_plan_2021):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    selected = json.loads(
+        statistics[market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME]
+    )
+    selected["unexpected"] = 0
+    statistics[
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="account aggregate fields changed",
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+def test_market_cap_unrehashened_split_account_mutation_refuses_identity(
+    market_cap_plan_2021,
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    selected = json.loads(
+        statistics[market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME]
+    )
+    selected["maximum_position_weight"] = "0.99"
+    statistics[
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="summary identity changed",
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
 
 
 def test_market_cap_census_accepts_context_rounded_nonterminating_mean(
@@ -1501,11 +1610,17 @@ def test_market_cap_account_guards_refuse_rehashed_mutations(
     market_cap_plan_2021, account_name, field, value, message
 ):
     statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
-    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
-    metadata[account_name][field] = value
-    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
-        "ascii"
-    )
+    statistic_name = {
+        "selected_aggregates": (
+            market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+        ),
+        "matched_aggregates": (
+            market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
+        ),
+    }[account_name]
+    account = json.loads(statistics[statistic_name])
+    account[field] = value
+    statistics[statistic_name] = _canonical(account).decode("ascii")
     _rehash_market_cap_summary(statistics)
     with pytest.raises(
         adapter.AcceptedRiskPreliminarySubmissionError,
@@ -1558,6 +1673,15 @@ def test_market_cap_cell_arithmetic_and_path_guards_are_isolated(
         ("MINIMUM_INVESTED_RETURN_SESSIONS", 0),
         ("COST_BPS_SCENARIOS", (10,)),
         ("TARGET_GROSS_EXPOSURE", Decimal("1")),
+        ("META_STATISTIC_NAME", "ARV2_MUTATED_META"),
+        (
+            "SELECTED_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_SELECTED",
+        ),
+        (
+            "MATCHED_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_MATCHED",
+        ),
     ),
 )
 def test_market_cap_contract_mutation_refuses_before_network(
@@ -1607,7 +1731,9 @@ def test_each_leverage_profile_has_exact_run_spec_and_result_inventory(
         "ARV2_LEVERAGE_L2_PRIMARY",
         "ARV2_LEVERAGE_L3_ADVERSE",
         "ARV2_LEVERAGE_L3_PRIMARY",
+        "ARV2_LEVERAGE_MATCHED_BASE_AGGREGATES",
         "ARV2_LEVERAGE_META",
+        "ARV2_LEVERAGE_SELECTED_BASE_AGGREGATES",
         "ARV2_RUNTIME_META",
     )
     assert tuple(item.project_path for item in leverage_plan.source_files) == (
@@ -1625,6 +1751,63 @@ def test_each_leverage_profile_accepts_exact_bounded_aggregate(leverage_plan):
         leverage_plan,
         _leverage_aggregate_statistics(leverage_plan),
     )
+
+
+@pytest.mark.parametrize(
+    "statistic_name",
+    (
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME,
+        leverage_evaluator.MATCHED_BASE_AGGREGATES_STATISTIC_NAME,
+    ),
+)
+def test_leverage_split_account_statistic_is_required(
+    leverage_plan_qqq, statistic_name
+):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    statistics.pop(statistic_name)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate result inventory changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+def test_leverage_split_account_fields_are_exact(leverage_plan_qqq):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    selected = json.loads(
+        statistics[
+            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    selected["unexpected"] = 0
+    statistics[
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="account aggregate fields changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+def test_leverage_unrehashened_split_account_mutation_refuses_identity(
+    leverage_plan_qqq,
+):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    selected = json.loads(
+        statistics[
+            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    selected["maximum_position_weight"] = "0.99"
+    statistics[
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="summary identity changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
 
 
 @pytest.mark.parametrize(
@@ -1742,6 +1925,15 @@ def test_leverage_cell_guards_are_isolated(
         ("LEVERAGE_FACTORS", (2,)),
         ("SCENARIOS", (leverage_evaluator.SCENARIOS[0],)),
         ("BASE_EVALUATOR_SOURCE_SHA256", "f" * 64),
+        ("META_STATISTIC_NAME", "ARV2_MUTATED_META"),
+        (
+            "SELECTED_BASE_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_SELECTED",
+        ),
+        (
+            "MATCHED_BASE_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_MATCHED",
+        ),
     ),
 )
 def test_leverage_contract_mutation_refuses_before_network(
@@ -3476,7 +3668,7 @@ def test_market_cap_offline_launch_and_result_read_are_exact(
         market_cap_plan_2021.expected_custom_statistic_names
     )
     persisted = json.loads(result.persisted_path.read_bytes())
-    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-099"
+    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-107"
     assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == 595
     assert adapter.require_accepted_risk_preliminary_aggregate_result(
         result,
@@ -3513,7 +3705,7 @@ def test_leverage_offline_launch_and_result_read_are_exact(
         leverage_plan_qqq.expected_custom_statistic_names
     )
     persisted = json.loads(result.persisted_path.read_bytes())
-    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-105"
+    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-113"
     assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == 619
     assert adapter.require_accepted_risk_preliminary_aggregate_result(
         result,

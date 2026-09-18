@@ -918,7 +918,7 @@ def _make_reviewed_pin_operations():
             ),
         )
 
-    def run_signature_verifier(
+    def run_signature_verifier_once(
         authority_payload: bytes,
         allowed_signers: bytes,
         signature: bytes,
@@ -1110,12 +1110,12 @@ def _make_reviewed_pin_operations():
         except child_process_error as exc:
             # Another process-wide SIGCHLD policy or waiter may already have
             # reaped this child.  The numeric PID is no longer ours to signal;
-            # it can be reused immediately by an unrelated process.
+            # it can be reused immediately by an unrelated process.  Let the
+            # bounded wrapper distinguish this exact transient from every
+            # cryptographic or verifier-integrity refusal.
             pid = None
             reaped = True
-            raise error_type(
-                "detached owner signature verifier was unavailable"
-            ) from exc
+            raise
         except os_error as exc:
             raise error_type(
                 "detached owner signature verifier was unavailable"
@@ -1141,6 +1141,36 @@ def _make_reviewed_pin_operations():
             or returncode != 0
         ):
             raise error_type("detached owner signature verification failed")
+
+    def run_signature_verifier(
+        authority_payload: bytes,
+        allowed_signers: bytes,
+        signature: bytes,
+        namespace: str,
+    ) -> None:
+        # Verification is a local, read-only operation.  A process-wide
+        # SIGCHLD waiter can race this module and reap an otherwise valid
+        # verifier child.  Retry that exact ECHILD-shaped condition once with
+        # the same authenticated bytes and a fresh child.  Timeouts, spawn
+        # errors, malformed input, nonzero verification, and all typed
+        # integrity refusals remain single-attempt failures.
+        attempts_remaining = 2
+        while attempts_remaining:
+            attempts_remaining -= 1
+            try:
+                run_signature_verifier_once(
+                    authority_payload,
+                    allowed_signers,
+                    signature,
+                    namespace,
+                )
+                return
+            except child_process_error as exc:
+                if attempts_remaining:
+                    continue
+                raise error_type(
+                    "detached owner signature verifier was unavailable"
+                ) from exc
 
     def require_trusted_verifier_unchanged(before: _VerifierSnapshot) -> None:
         if snapshot_trusted_verifier() != before:

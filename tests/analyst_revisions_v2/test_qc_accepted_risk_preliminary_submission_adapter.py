@@ -4,6 +4,7 @@ import hashlib
 import json
 import shutil
 import types
+from decimal import Decimal
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -23,6 +24,21 @@ from research.analyst_revisions_v2_qc import (
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_regime_rating_evaluator as regime_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_stock_portfolio_evaluator as stock_portfolio_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_market_cap_stock_portfolio_evaluator as market_cap_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_market_cap_stock_portfolio_qc_runtime as market_cap_runtime,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_objective_synthetic_leverage_evaluator as leverage_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_objective_synthetic_leverage_qc_runtime as leverage_runtime,
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_submission_adapter as adapter,
@@ -50,17 +66,17 @@ _EXPECTED_LOOK_ACCOUNTING = {
     "lifetime_alpha_cell_floor_before": 484,
     "lifetime_alpha_cell_floor_after": 484,
     "aggregate_result_authenticated": False,
-    "infrastructure_looks_before": 23,
-    "infrastructure_looks_after": 23,
-    "authenticated_infrastructure_look_count": 23,
+    "infrastructure_looks_before": 27,
+    "infrastructure_looks_after": 27,
+    "authenticated_infrastructure_look_count": 27,
     "infrastructure_look_ledger_id": (
-        "arv2-infrastructure-look-ledger-11987a12b72d06ea612b442e"
+        "arv2-infrastructure-look-ledger-4a726bcdd9b7232f34a1eaf8"
     ),
     "infrastructure_look_ledger_hash": (
-        "11987a12b72d06ea612b442e342ce0b1d2f28c503f0a3b1ca2cf721d8aaa7810"
+        "4a726bcdd9b7232f34a1eaf891f7b8f83334002396aa48720b19abd22391305e"
     ),
     "infrastructure_look_ledger_artifact_sha256": (
-        "b1018c54128b9cea5ff0c960e0c6adeab803b085b9dde359f323246d0f82e802"
+        "e837946d6fe9d31f16d4a901f878e965036f6931f8ed5bb1806fdb5a1c83cdd9"
     ),
     "permanent_looks_before": 0,
     "permanent_looks_after": 0,
@@ -86,6 +102,28 @@ def _look_accounting_at(stage):
         result["lifetime_alpha_cell_floor_after"] = 516
         result["aggregate_result_authenticated"] = True
     return result
+
+
+def test_look_accounting_derives_the_authenticated_infrastructure_total(
+    monkeypatch,
+):
+    binding = adapter._PINNED_INFRASTRUCTURE_LEDGER
+    ledger = json.loads(binding.payload)
+    ledger["append_only_contract"]["entry_count"] += 1
+    ledger["entries"].append({"synthetic_isolation_entry": True})
+    ledger["totals"]["infrastructure_research_looks_spent"] += 1
+    changed_binding = dataclasses.replace(binding, payload=_canonical(ledger))
+    monkeypatch.setattr(
+        adapter,
+        "_PINNED_REQUIRE_INFRASTRUCTURE_LEDGER",
+        lambda _binding: changed_binding,
+    )
+
+    accounting = adapter._look_accounting()
+
+    assert accounting["infrastructure_looks_before"] == 28
+    assert accounting["infrastructure_looks_after"] == 28
+    assert accounting["authenticated_infrastructure_look_count"] == 28
 
 
 def _canonical(value):
@@ -212,6 +250,54 @@ def plan(monkeypatch, tmp_path):
 @pytest.fixture(params=regime_evaluator.REGIME_PROFILE_IDS)
 def regime_plan(request, monkeypatch, tmp_path):
     return _build_plan(monkeypatch, tmp_path, request.param)
+
+
+@pytest.fixture
+def stock_portfolio_plan(monkeypatch, tmp_path):
+    return _build_plan(
+        monkeypatch,
+        tmp_path,
+        stock_portfolio_evaluator.PROFILE_ID,
+    )
+
+
+@pytest.fixture(
+    params=(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+    )
+)
+def stock_universe_plan(request, monkeypatch, tmp_path):
+    return _build_plan(monkeypatch, tmp_path, request.param)
+
+
+@pytest.fixture(params=market_cap_evaluator.PROFILE_IDS)
+def market_cap_plan(request, monkeypatch, tmp_path):
+    return _build_plan(monkeypatch, tmp_path, request.param)
+
+
+@pytest.fixture
+def market_cap_plan_2021(monkeypatch, tmp_path):
+    return _build_plan(
+        monkeypatch,
+        tmp_path,
+        market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
+    )
+
+
+@pytest.fixture(params=leverage_evaluator.PROFILE_IDS)
+def leverage_plan(request, monkeypatch, tmp_path):
+    return _build_plan(monkeypatch, tmp_path, request.param)
+
+
+@pytest.fixture
+def leverage_plan_qqq(monkeypatch, tmp_path):
+    return _build_plan(
+        monkeypatch,
+        tmp_path,
+        leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
+    )
 
 
 def _aggregate_statistics(plan):
@@ -437,6 +523,662 @@ def _regime_aggregate_statistics(plan):
     return statistics
 
 
+def _stock_portfolio_aggregate_statistics(
+    plan, *, proxy=False, zero_recovery=False
+):
+    profile_id = plan.projection.evaluation_profile_id
+    profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        profile_id
+    )
+    status = (
+        "PRELIMINARY_DESCRIPTIVE_LOWER_BOUND_WITH_ZERO_RECOVERY"
+        if zero_recovery
+        else (
+            "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
+            if proxy
+            else (
+                "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_EXPOSURE_UNDERFILL"
+            )
+        )
+    )
+    conditioning = (
+        "conditioned_on_zero_recovery_lower_bound_and_possible_stale_mark_path"
+        if zero_recovery
+        else (
+            "conditioned_on_stale_mark_path" if proxy else "no_price_proxy"
+        )
+    )
+    signal_returns = {0: "0.10", 5: "0.09", 10: "0.08", 20: "0.06"}
+    matched_returns = {0: "0.05", 5: "0.04", 10: "0.03", 20: "0.01"}
+    signal_annual = {
+        0: "0.02",
+        5: "0.01496",
+        10: "0.00992",
+        20: "-0.00016",
+    }
+    matched_annual = {
+        0: "0.009",
+        5: "0.00522",
+        10: "0.00144",
+        20: "-0.00612",
+    }
+    cells = []
+    statistics = {}
+    for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS:
+        signal_return = signal_returns[cost]
+        matched_return = matched_returns[cost]
+        cell = {
+            "schema": stock_portfolio_evaluator.PORTFOLIO_CELL_SCHEMA,
+            "profile_id": profile_id,
+            "cost_bps_per_side": cost,
+            "primary_cost_scenario": cost == 10,
+            "status": status,
+            "return_metric_conditioning": conditioning,
+            "risk_metrics_are_price_proxy_conditioned": bool(
+                proxy or zero_recovery
+            ),
+            "exposure_underfill_present": True,
+            "return_session_count": 1254,
+            "invested_return_session_count": 1000,
+            "cumulative_return": signal_return,
+            "matched_eligible_stock_cumulative_return": matched_return,
+            "spy_cumulative_return": "0.20",
+            "cumulative_return_minus_matched": str(
+                Decimal(signal_return) - Decimal(matched_return)
+            ),
+            "cumulative_return_minus_spy": str(
+                Decimal(signal_return) - Decimal("0.20")
+            ),
+            "annualized_arithmetic_return": signal_annual[cost],
+            "annualized_volatility": "0.10",
+            "zero_rate_sharpe": str(Decimal(signal_annual[cost]) / Decimal("0.10")),
+            "zero_rate_sortino": "-0.30" if cost == 20 else "0.30",
+            "maximum_drawdown": "-0.08",
+            "average_daily_two_sided_turnover": "0.04",
+            "average_cash_weight": "0.02",
+            "matched_annualized_arithmetic_return": matched_annual[cost],
+            "matched_annualized_volatility": "0.09",
+            "matched_zero_rate_sharpe": str(
+                Decimal(matched_annual[cost]) / Decimal("0.09")
+            ),
+            "matched_zero_rate_sortino": "-0.16" if cost == 20 else "0.16",
+            "matched_maximum_drawdown": "-0.07",
+            "matched_average_daily_two_sided_turnover": "0.03",
+            "matched_average_cash_weight": "0",
+            "leverage": False,
+            "orders_submitted": 0,
+            "formal_accept_reject_disposition": None,
+        }
+        statistics[
+            "ARV2_STOCK_PORTFOLIO_COST_" + str(cost)
+        ] = _canonical(cell).decode("ascii")
+        cells.append(cell)
+    meta = {
+        "schema": stock_portfolio_evaluator.SUMMARY_SCHEMA,
+        "contract_id": stock_portfolio_evaluator.CONTRACT_ID,
+        "profile_id": profile["profile_id"],
+        "profile_sha256": profile["profile_sha256"],
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "input_manifest_id": plan.evaluator_manifest_id,
+        "input_manifest_sha256": plan.evaluator_manifest_sha256,
+        "status": "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO",
+        "decision_session_count": 261,
+        "portfolio_return_session_count": 1254,
+        "invested_return_session_count": 1000,
+        "signal_selected_decision_count": 261,
+        "selected_execution_count": 261,
+        "rebalance_execution_count": 261,
+        "full_target_execution_count": 0,
+        "underfilled_target_execution_count": 261,
+        "matched_rebalance_execution_count": 261,
+        "matched_target_met_execution_count": 261,
+        "matched_underfilled_target_execution_count": 0,
+        "sector_refused_decision_count": 1,
+        "mean_eligible_score_count": "1",
+        "mean_selected_name_count": "1",
+        "mean_executed_target_gross_exposure": "0.0196",
+        "matched_mean_executed_target_gross_exposure": "0.0196",
+        "average_holding_count": "1",
+        "entry_price_refusal_count": 0,
+        "stale_mark_session_count": int(proxy),
+        "deferred_rebalance_count": 0,
+        "partial_rebalance_decision_count": int(proxy),
+        "stale_position_deferral_count": int(proxy),
+        "mean_locked_gross_at_partial_decisions": "0.005" if proxy else "0",
+        "locked_exposure_over_target_count": 0,
+        "membership_end_liquidation_count": int(zero_recovery),
+        "membership_end_zero_recovery_count": int(zero_recovery),
+        "membership_end_entry_refusal_count": 0,
+        "matched_entry_price_refusal_count": 0,
+        "matched_stale_mark_session_count": 0,
+        "matched_deferred_rebalance_count": 0,
+        "matched_partial_rebalance_decision_count": 0,
+        "matched_stale_position_deferral_count": 0,
+        "matched_mean_locked_gross_at_partial_decisions": "0",
+        "matched_locked_exposure_over_target_count": 0,
+        "matched_membership_end_liquidation_count": 0,
+        "matched_membership_end_zero_recovery_count": 0,
+        "matched_membership_end_entry_refusal_count": 0,
+        "named_figi_resolution_refusal_count": 0,
+        "history_normalization_mode": "TOTAL_RETURN",
+        "history_value_field": "open",
+        "r055_signal_rule_changed": False,
+        "liquidity_filter_applied": False,
+        "terminal_payoff_applied": False,
+        "membership_end_liquidation_is_terminal_payoff": False,
+        "membership_end_missing_price_policy": (
+            "zero_recovery_conservative_lower_bound"
+        ),
+        "matched_exposure_targeted_to_signal_executed_gross": True,
+        "current_vintage_non_pristine_pit_input": True,
+        "raw_provider_rows_in_summary": False,
+        "raw_security_outcome_rows_in_summary": False,
+        "raw_price_rows_in_summary": False,
+        "formal_result": False,
+        "alpha_claim_authorized": False,
+        "economic_portfolio_evaluation": True,
+        "leverage": False,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+        "portfolio_cells": cells,
+    }
+    digest_record = {
+        key: value
+        for key, value in meta.items()
+        if key not in {"profile_id", "profile_sha256"}
+    }
+    digest_record["profile"] = profile
+    digest = hashlib.sha256(_canonical(digest_record)).hexdigest()
+    metadata = {
+        **{key: value for key, value in meta.items() if key != "portfolio_cells"},
+        "summary_id": "arv2-stock-portfolio-summary-" + digest[:24],
+        "summary_sha256": digest,
+    }
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    runtime_meta = {
+        "schema": "arv2-accepted-risk-stock-portfolio-qc-runtime-meta-v1",
+        "status": "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO_COMPLETED",
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
+        "symbol_resolution_id": "resolution-one",
+        "symbol_resolution_sha256": "e" * 64,
+        "resolved_security_count": 1,
+        "named_security_refusal_count": 0,
+        "result_transport": "aggregate_only_custom_summary_statistics",
+        "host_object_store_export_required": False,
+        "preliminary": True,
+        "point_in_time": False,
+        "formal": False,
+        "control_residualized": False,
+        "economic_portfolio": True,
+        "etf_or_leverage": False,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+        "evaluation_profile_id": profile_id,
+        "evaluation_profile_sha256": profile["profile_sha256"],
+        "runtime_slice_count": 1,
+    }
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    assert tuple(sorted(statistics)) == plan.expected_custom_statistic_names
+    assert all(len(value) <= 4096 for value in statistics.values())
+    return statistics
+
+
+def _market_cap_aggregate_statistics(plan):
+    profile_id = plan.projection.evaluation_profile_id
+    profile = market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+        profile_id
+    )
+    decisions = profile["expected_decision_session_count"]
+    returns = profile["expected_return_session_count"]
+    resolved = plan.package.runtime_symbol_binding_count
+    assert resolved == 1
+    history_calls = 2 * (
+        (
+            decisions
+            + market_cap_runtime.HISTORY_CHUNK_DECISION_COUNT
+            - 1
+        )
+        // market_cap_runtime.HISTORY_CHUNK_DECISION_COUNT
+    )
+    signal_cumulative = {0: "0.20", 5: "0.19", 10: "0.18", 20: "0.16"}
+    matched_cumulative = {0: "0.10", 5: "0.09", 10: "0.08", 20: "0.06"}
+    signal_annual = {}
+    matched_annual = {}
+    with evaluator.localcontext(evaluator._context()):
+        for cost in market_cap_evaluator.COST_BPS_SCENARIOS:
+            signal_annual[cost] = evaluator._decimal_text(
+                +(
+                    Decimal("0.10")
+                    - Decimal(cost)
+                    / Decimal(10000)
+                    * Decimal("0.001")
+                    * market_cap_evaluator.ANNUALIZATION_SESSIONS
+                )
+            )
+            matched_annual[cost] = evaluator._decimal_text(
+                +(
+                    Decimal("0.09")
+                    - Decimal(cost)
+                    / Decimal(10000)
+                    * Decimal("0.002")
+                    * market_cap_evaluator.ANNUALIZATION_SESSIONS
+                )
+            )
+
+    account = {
+        "rebalance_execution_count": decisions,
+        "full_target_execution_count": decisions,
+        "underfilled_target_execution_count": 0,
+        "locked_exposure_over_target_count": 0,
+        "mean_executed_gross_exposure": "0.98",
+        "minimum_executed_gross_exposure": "0.98",
+        "maximum_executed_gross_exposure": "0.98",
+        "mean_maximum_position_weight": "0.98",
+        "maximum_position_weight": "0.98",
+        "mean_invested_weight_hhi": "1",
+        "mean_effective_holding_count": "1",
+        "average_holding_count": "1",
+        "average_daily_two_sided_turnover": "0.001",
+        "average_cash_weight": "0.02",
+        "entry_price_refusal_count": 0,
+        "stale_mark_session_count": 0,
+        "partial_rebalance_decision_count": 0,
+        "stale_position_deferral_count": 0,
+        "selection_exit_deferral_count": 0,
+        "eligibility_exit_liquidation_count": 0,
+        "eligibility_exit_zero_recovery_count": 0,
+    }
+    matched_account = dict(account)
+    matched_account["average_daily_two_sided_turnover"] = "0.002"
+    statistics = {}
+    cells = []
+    for cost in market_cap_evaluator.COST_BPS_SCENARIOS:
+        with evaluator.localcontext(evaluator._context()):
+            signal_sharpe = evaluator._decimal_text(
+                +(Decimal(signal_annual[cost]) / Decimal("0.2"))
+            )
+            matched_sharpe = evaluator._decimal_text(
+                +(Decimal(matched_annual[cost]) / Decimal("0.3"))
+            )
+        signal_return = signal_cumulative[cost]
+        matched_return = matched_cumulative[cost]
+        cell = {
+            "schema": market_cap_evaluator.PORTFOLIO_CELL_SCHEMA,
+            "profile_id": profile_id,
+            "cost_bps_per_side": cost,
+            "primary_cost_scenario": cost == 10,
+            "status": "PRELIMINARY_DESCRIPTIVE_AVAILABLE",
+            "return_session_count": returns,
+            "invested_return_session_count": returns - 1,
+            "return_metric_conditioning": (
+                "zero_recovery_for_missing_eligibility_exits_and_stale_mark_"
+                "carry_with_trade_deferral_within_eligibility"
+            ),
+            "risk_metrics_are_price_proxy_conditioned": False,
+            "exposure_underfill_present": False,
+            "cumulative_return": signal_return,
+            "matched_eligible_stock_cumulative_return": matched_return,
+            "spy_cumulative_return": "0.30",
+            "cumulative_return_minus_matched": evaluator._decimal_text(
+                Decimal(signal_return) - Decimal(matched_return)
+            ),
+            "cumulative_return_minus_spy": evaluator._decimal_text(
+                Decimal(signal_return) - Decimal("0.30")
+            ),
+            "annualized_arithmetic_return": signal_annual[cost],
+            "annualized_volatility": "0.2",
+            "zero_rate_sharpe": signal_sharpe,
+            "zero_rate_sortino": "1",
+            "maximum_drawdown": "-0.1",
+            "average_daily_two_sided_turnover": "0.001",
+            "average_cash_weight": "0.02",
+            "matched_annualized_arithmetic_return": matched_annual[cost],
+            "matched_annualized_volatility": "0.3",
+            "matched_zero_rate_sharpe": matched_sharpe,
+            "matched_zero_rate_sortino": "1",
+            "matched_maximum_drawdown": "-0.15",
+            "matched_average_daily_two_sided_turnover": "0.002",
+            "matched_average_cash_weight": "0.02",
+            "leverage": False,
+            "orders_submitted": 0,
+            "formal_accept_reject_disposition": None,
+        }
+        statistics[
+            "ARV2_STOCK_PORTFOLIO_COST_" + str(cost)
+        ] = _canonical(cell).decode("ascii")
+        cells.append(cell)
+    summary = {
+        "schema": market_cap_evaluator.SUMMARY_SCHEMA,
+        "contract_id": market_cap_evaluator.CONTRACT_ID,
+        "profile": profile,
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "input_manifest_id": plan.evaluator_manifest_id,
+        "input_manifest_sha256": plan.evaluator_manifest_sha256,
+        "status": "PRELIMINARY_ACCEPTED_RISK_MARKET_CAP_STOCK_PORTFOLIO",
+        "decision_session_count": decisions,
+        "portfolio_return_session_count": returns,
+        "mean_point_in_time_eligible_count": "1",
+        "mean_eligible_score_count": "1",
+        "mean_selected_name_count": "1",
+        "eligible_without_R055_score_count": 0,
+        "sector_refused_decision_count": 0,
+        "named_figi_resolution_refusal_count": 0,
+        "selected_aggregates": account,
+        "matched_aggregates": matched_account,
+        "r055_signal_rule_changed": False,
+        "point_in_time_market_cap_weighting": True,
+        "selected_and_matched_target_same_gross": True,
+        "market_cap_values_in_summary": False,
+        "raw_security_ids_in_summary": False,
+        "raw_price_rows_in_summary": False,
+        "formal_result": False,
+        "alpha_claim_authorized": False,
+        "economic_portfolio_evaluation": True,
+        "leverage": False,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+        "portfolio_cells": cells,
+    }
+    digest = hashlib.sha256(_canonical(summary)).hexdigest()
+    metadata = {
+        **{
+            key: value
+            for key, value in summary.items()
+            if key not in {"profile", "portfolio_cells"}
+        },
+        "profile_id": profile_id,
+        "profile_sha256": profile["profile_sha256"],
+        "summary_id": "arv2-market-cap-stock-summary-" + digest[:24],
+        "summary_sha256": digest,
+    }
+    statistics[
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("selected_aggregates")).decode("ascii")
+    statistics[
+        market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("matched_aggregates")).decode("ascii")
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    runtime_meta = {
+        "schema": (
+            "arv2-accepted-risk-market-cap-stock-portfolio-qc-runtime-meta-v1"
+        ),
+        "status": (
+            "PRELIMINARY_ACCEPTED_RISK_MARKET_CAP_STOCK_PORTFOLIO_COMPLETED"
+        ),
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
+        "symbol_resolution_id": "resolution-one",
+        "symbol_resolution_sha256": "e" * 64,
+        "resolved_security_count": resolved,
+        "named_security_refusal_count": 0,
+        "evaluation_profile_id": profile_id,
+        "evaluation_profile_sha256": profile["profile_sha256"],
+        "runtime_slice_count": history_calls + 2,
+        "point_in_time_history_call_count": history_calls,
+        "point_in_time_fetched_source_row_count": decisions * 2,
+        "point_in_time_eligible_score_bearing_count": decisions,
+        "point_in_time_market_cap_covered_count": decisions,
+        "point_in_time_market_cap_uncovered_count": 0,
+        "result_transport": "aggregate_only_custom_summary_statistics",
+        "host_object_store_export_required": False,
+        "preliminary": True,
+        "point_in_time": True,
+        "formal": False,
+        "control_residualized": False,
+        "economic_portfolio": True,
+        "etf_or_leverage": False,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+    }
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    assert tuple(sorted(statistics)) == plan.expected_custom_statistic_names
+    return statistics
+
+
+def _leverage_aggregate_statistics(plan):
+    profile_id = plan.projection.evaluation_profile_id
+    profile = leverage_evaluator.require_profile(profile_id)
+    base_profile = market_cap_evaluator.require_profile(
+        profile["base_profile_id"]
+    )
+    decisions = base_profile["expected_decision_session_count"]
+    returns = profile["expected_return_session_count"]
+    resolved = plan.package.runtime_symbol_binding_count
+    assert resolved == 1
+    history_calls = 2 * (
+        (
+            decisions
+            + market_cap_runtime.HISTORY_CHUNK_DECISION_COUNT
+            - 1
+        )
+        // market_cap_runtime.HISTORY_CHUNK_DECISION_COUNT
+    )
+    account = {
+        "rebalance_execution_count": decisions,
+        "full_target_execution_count": decisions,
+        "underfilled_target_execution_count": 0,
+        "locked_exposure_over_target_count": 0,
+        "mean_executed_gross_exposure": "0.98",
+        "minimum_executed_gross_exposure": "0.98",
+        "maximum_executed_gross_exposure": "0.98",
+        "mean_maximum_position_weight": "0.98",
+        "maximum_position_weight": "0.98",
+        "mean_invested_weight_hhi": "1",
+        "mean_effective_holding_count": "1",
+        "average_holding_count": "1",
+        "average_daily_two_sided_turnover": "0.001",
+        "average_cash_weight": "0.02",
+        "entry_price_refusal_count": 0,
+        "stale_mark_session_count": 0,
+        "partial_rebalance_decision_count": 0,
+        "stale_position_deferral_count": 0,
+        "selection_exit_deferral_count": 0,
+        "eligibility_exit_liquidation_count": 0,
+        "eligibility_exit_zero_recovery_count": 0,
+    }
+    matched_account = dict(account)
+    matched_account["average_daily_two_sided_turnover"] = "0.002"
+    path_values = {
+        (2, True): (("0.28", "0.32"), ("0.18", "0.22"), ("0.38", "0.42")),
+        (2, False): (("0.22", "0.30"), ("0.12", "0.20"), ("0.34", "0.42")),
+        (3, True): (("0.45", "0.52"), ("0.32", "0.38"), ("0.65", "0.72")),
+        (3, False): (("0.35", "0.48"), ("0.22", "0.34"), ("0.57", "0.72")),
+    }
+    annuals = {
+        (2, True): ("0.10", "0.07", "0.12"),
+        (2, False): ("0.08", "0.05", "0.10"),
+        (3, True): ("0.15", "0.10", "0.18"),
+        (3, False): ("0.11", "0.07", "0.14"),
+    }
+    volatilities = ("0.20", "0.25", "0.22")
+    drawdowns = ("-0.20", "-0.25", "-0.22")
+    cells = []
+    statistics = {}
+    for leverage_factor in leverage_evaluator.LEVERAGE_FACTORS:
+        for scenario_id, rate, cost, primary in leverage_evaluator.SCENARIOS:
+            cell = {
+                "schema": leverage_evaluator.CELL_SCHEMA,
+                "profile_id": profile_id,
+                "base_profile_id": profile["base_profile_id"],
+                "scenario_id": scenario_id,
+                "primary_scenario": primary,
+                "leverage_factor": leverage_factor,
+                "annual_financing_rate": leverage_evaluator._decimal_text(rate),
+                "underlying_cost_bps_per_side": cost,
+                "underlying_cost_is_already_in_base_return": True,
+                "second_transaction_cost_deduction": False,
+                "status": "PRELIMINARY_DESCRIPTIVE_AVAILABLE",
+                "return_session_count": returns,
+            }
+            values = path_values[(leverage_factor, primary)]
+            for index, prefix in enumerate(
+                ("selected_", "matched_", "synthetic_spy_")
+            ):
+                cumulative, before = map(Decimal, values[index])
+                annual = Decimal(annuals[(leverage_factor, primary)][index])
+                volatility = Decimal(volatilities[index])
+                financing_count = returns - 1
+                with evaluator.localcontext(evaluator._context()):
+                    debit = +(
+                        (Decimal(leverage_factor) - Decimal(1))
+                        * rate
+                        / Decimal(252)
+                        * Decimal(financing_count)
+                    )
+                    drag = +(before - cumulative)
+                    sharpe = +(annual / volatility)
+                cell.update(
+                    {
+                        prefix + "cumulative_return": evaluator._decimal_text(cumulative),
+                        prefix + "cumulative_return_before_financing": evaluator._decimal_text(before),
+                        prefix + "cumulative_financing_drag": evaluator._decimal_text(drag),
+                        prefix + "arithmetic_financing_debit": evaluator._decimal_text(debit),
+                        prefix + "annualized_arithmetic_return": evaluator._decimal_text(annual),
+                        prefix + "annualized_volatility": evaluator._decimal_text(volatility),
+                        prefix + "zero_rate_sharpe": evaluator._decimal_text(sharpe),
+                        prefix + "zero_rate_sortino": "1",
+                        prefix + "maximum_drawdown": drawdowns[index],
+                        prefix + "financing_session_count": financing_count,
+                    }
+                )
+            with evaluator.localcontext(evaluator._context()):
+                selected = Decimal(cell["selected_cumulative_return"])
+                matched = Decimal(cell["matched_cumulative_return"])
+                spy = Decimal(cell["synthetic_spy_cumulative_return"])
+                selected_minus_matched = +(selected - matched)
+                selected_minus_spy = +(selected - spy)
+            cell.update(
+                {
+                    "selected_minus_matched_cumulative_return": evaluator._decimal_text(selected_minus_matched),
+                    "selected_minus_synthetic_spy_cumulative_return": evaluator._decimal_text(selected_minus_spy),
+                    "portfolio_level_daily_reset": True,
+                    "synthetic_only": True,
+                    "margin_calls_modeled": False,
+                    "borrow_availability_modeled": False,
+                    "security_level_financing_modeled": False,
+                    "broker_liquidation_modeled": False,
+                    "orders_submitted": 0,
+                    "formal_accept_reject_disposition": None,
+                }
+            )
+            suffix = "PRIMARY" if primary else "ADVERSE"
+            statistics[
+                "ARV2_LEVERAGE_L" + str(leverage_factor) + "_" + suffix
+            ] = _canonical(cell).decode("ascii")
+            cells.append(cell)
+    summary = {
+        "schema": leverage_evaluator.SUMMARY_SCHEMA,
+        "contract_id": leverage_evaluator.CONTRACT_ID,
+        "profile": profile,
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "input_manifest_id": plan.evaluator_manifest_id,
+        "input_manifest_sha256": plan.evaluator_manifest_sha256,
+        "status": "PRELIMINARY_OBJECTIVE_SYNTHETIC_LEVERAGE",
+        "base_contract_id": market_cap_evaluator.CONTRACT_ID,
+        "base_profile_id": profile["base_profile_id"],
+        "base_profile_sha256": profile["base_profile_sha256"],
+        "base_evaluator_source_sha256": leverage_evaluator.BASE_EVALUATOR_SOURCE_SHA256,
+        "decision_session_count": decisions,
+        "return_session_count": returns,
+        "selected_base_aggregates": account,
+        "matched_base_aggregates": matched_account,
+        "r055_signal_rule_changed": False,
+        "base_security_selection_changed": False,
+        "point_in_time_membership_and_market_cap_weighting": True,
+        "matched_comparator_levered_identically": True,
+        "raw_security_ids_in_summary": False,
+        "raw_price_rows_in_summary": False,
+        "raw_provider_rows_in_summary": False,
+        "synthetic_only": True,
+        "formal_result": False,
+        "alpha_claim_authorized": False,
+        "evaluator_io": {
+            "provider": False,
+            "network": False,
+            "object_store": False,
+        },
+        "margin_calls_modeled": False,
+        "borrow_availability_modeled": False,
+        "orders": False,
+        "deployment": False,
+        "trading": False,
+        "cells": cells,
+    }
+    digest = hashlib.sha256(_canonical(summary)).hexdigest()
+    metadata = {
+        **{
+            key: value
+            for key, value in summary.items()
+            if key not in {"profile", "cells"}
+        },
+        "profile_id": profile_id,
+        "profile_sha256": profile["profile_sha256"],
+        "summary_id": "arv2-objective-leverage-summary-" + digest[:24],
+        "summary_sha256": digest,
+    }
+    statistics[
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("selected_base_aggregates")).decode("ascii")
+    statistics[
+        leverage_evaluator.MATCHED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(metadata.pop("matched_base_aggregates")).decode("ascii")
+    statistics["ARV2_LEVERAGE_META"] = _canonical(metadata).decode("ascii")
+    runtime_meta = {
+        "schema": leverage_runtime.RUNTIME_META_SCHEMA,
+        "status": leverage_runtime.RUNTIME_COMPLETED_STATUS,
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
+        "symbol_resolution_id": "resolution-one",
+        "symbol_resolution_sha256": "e" * 64,
+        "resolved_security_count": resolved,
+        "named_security_refusal_count": 0,
+        "evaluation_profile_id": profile_id,
+        "evaluation_profile_sha256": profile["profile_sha256"],
+        "base_market_cap_profile_id": profile["base_profile_id"],
+        "base_market_cap_profile_sha256": profile["base_profile_sha256"],
+        "runtime_slice_count": history_calls + 2,
+        "point_in_time_history_call_count": history_calls,
+        "point_in_time_fetched_source_row_count": decisions * 2,
+        "point_in_time_eligible_score_bearing_count": decisions,
+        "point_in_time_market_cap_covered_count": decisions,
+        "point_in_time_market_cap_uncovered_count": 0,
+        "leverage_factors": [2, 3],
+        "scenario_ids": [row[0] for row in leverage_evaluator.SCENARIOS],
+        "result_transport": "aggregate_only_custom_summary_statistics",
+        "host_object_store_export_required": False,
+        "preliminary": True,
+        "point_in_time": True,
+        "formal": False,
+        "control_residualized": False,
+        "economic_portfolio": True,
+        "etf_or_leverage": True,
+        "synthetic_leverage": True,
+        "margin_calls_modeled": False,
+        "borrow_availability_modeled": False,
+        "deployment": False,
+        "orders": False,
+        "trading": False,
+    }
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    assert tuple(sorted(statistics)) == plan.expected_custom_statistic_names
+    return statistics
+
+
 def _rehash_preliminary_summary(statistics):
     metadata = json.loads(statistics["ARV2_PRELIMINARY_META"])
     cells = []
@@ -477,6 +1219,119 @@ def _rehash_regime_summary(plan, statistics):
     statistics[meta_name] = _canonical(metadata).decode("ascii")
 
 
+def _rehash_stock_portfolio_summary(statistics):
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    summary = {
+        key: value
+        for key, value in metadata.items()
+        if key
+        not in {
+            "profile_id",
+            "profile_sha256",
+            "summary_id",
+            "summary_sha256",
+        }
+    }
+    summary["profile"] = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        metadata["profile_id"]
+    )
+    summary["portfolio_cells"] = [
+        json.loads(statistics["ARV2_STOCK_PORTFOLIO_COST_" + str(cost)])
+        for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS
+    ]
+    digest = hashlib.sha256(_canonical(summary)).hexdigest()
+    metadata["summary_id"] = "arv2-stock-portfolio-summary-" + digest[:24]
+    metadata["summary_sha256"] = digest
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+
+
+def _rehash_market_cap_summary(statistics):
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    profile = market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+        metadata["profile_id"]
+    )
+    summary = {
+        key: value
+        for key, value in metadata.items()
+        if key
+        not in {
+            "profile_id",
+            "profile_sha256",
+            "summary_id",
+            "summary_sha256",
+        }
+    }
+    summary["profile"] = profile
+    summary["selected_aggregates"] = json.loads(
+        statistics[
+            market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    summary["matched_aggregates"] = json.loads(
+        statistics[
+            market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    summary["portfolio_cells"] = [
+        json.loads(statistics["ARV2_STOCK_PORTFOLIO_COST_" + str(cost)])
+        for cost in market_cap_evaluator.COST_BPS_SCENARIOS
+    ]
+    digest = hashlib.sha256(_canonical(summary)).hexdigest()
+    metadata["summary_id"] = "arv2-market-cap-stock-summary-" + digest[:24]
+    metadata["summary_sha256"] = digest
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+
+
+def _rehash_leverage_summary(statistics):
+    metadata = json.loads(statistics["ARV2_LEVERAGE_META"])
+    summary = {
+        key: value
+        for key, value in metadata.items()
+        if key
+        not in {
+            "profile_id",
+            "profile_sha256",
+            "summary_id",
+            "summary_sha256",
+        }
+    }
+    summary["profile"] = leverage_evaluator.require_profile(
+        metadata["profile_id"]
+    )
+    summary["selected_base_aggregates"] = json.loads(
+        statistics[
+            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    summary["matched_base_aggregates"] = json.loads(
+        statistics[
+            leverage_evaluator.MATCHED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    summary["cells"] = [
+        json.loads(
+            statistics[
+                "ARV2_LEVERAGE_L"
+                + str(leverage_factor)
+                + "_"
+                + ("PRIMARY" if primary else "ADVERSE")
+            ]
+        )
+        for leverage_factor in leverage_evaluator.LEVERAGE_FACTORS
+        for _scenario_id, _rate, _cost, primary in leverage_evaluator.SCENARIOS
+    ]
+    digest = hashlib.sha256(_canonical(summary)).hexdigest()
+    metadata["summary_id"] = (
+        "arv2-objective-leverage-summary-" + digest[:24]
+    )
+    metadata["summary_sha256"] = digest
+    statistics["ARV2_LEVERAGE_META"] = _canonical(metadata).decode("ascii")
+
+
 def _mutate_first_cell(statistics, mutation):
     name = next(key for key in sorted(statistics) if key.startswith("ARV2_IC_"))
     cell = json.loads(statistics[name])
@@ -509,6 +1364,596 @@ _REGIME_ACCOUNTING = {
     "arv2-stock-ic-2013-2019": ("R-059", 58, 59, 5, 6, 548, 564),
 }
 
+_STOCK_UNIVERSE_ACCOUNTING = {
+    stock_portfolio_evaluator.SP500_PROFILE_ID: (
+        "arv2-eval-stock-spy-holdings-intersection-qc-011",
+        "R-072",
+        69,
+        70,
+        16,
+        17,
+        579,
+        583,
+    ),
+    stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID: (
+        "arv2-eval-stock-qqq-holdings-intersection-qc-016",
+        "R-077",
+        72,
+        73,
+        19,
+        20,
+        583,
+        587,
+    ),
+    stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID: (
+        "arv2-eval-stock-spy-qqq-intersection-union-qc-017",
+        "R-078",
+        73,
+        74,
+        20,
+        21,
+        587,
+        591,
+    ),
+}
+
+_MARKET_CAP_ACCOUNTING = {
+    market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID: (
+        "R-107", 81, 82, 24, 25, 591, 595
+    ),
+    market_cap_evaluator.SPY_2021_2025_V2_PROFILE_ID: (
+        "R-108", 82, 83, 25, 26, 595, 599
+    ),
+    market_cap_evaluator.QQQ_2019_2023_V2_PROFILE_ID: (
+        "R-109", 83, 84, 26, 27, 599, 603
+    ),
+    market_cap_evaluator.SPY_2019_2023_V2_PROFILE_ID: (
+        "R-110", 84, 85, 27, 28, 603, 607
+    ),
+    market_cap_evaluator.QQQ_2023_2025_V2_PROFILE_ID: (
+        "R-111", 85, 86, 28, 29, 607, 611
+    ),
+    market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID: (
+        "R-112", 86, 87, 29, 30, 611, 615
+    ),
+}
+
+_LEVERAGE_ACCOUNTING = {
+    leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID: (
+        "R-113", 87, 88, 30, 31, 615, 619
+    ),
+    leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID: (
+        "R-114", 88, 89, 31, 32, 619, 623
+    ),
+}
+
+
+def test_each_market_cap_profile_has_exact_run_spec_and_result_inventory(
+    market_cap_plan,
+):
+    profile_id = market_cap_plan.evaluation_profile_id
+    expected = _MARKET_CAP_ACCOUNTING[profile_id]
+    spec = adapter._run_spec(profile_id)
+    reservation = adapter._look_accounting(evaluation_profile_id=profile_id)
+    result = adapter._look_accounting(
+        stage="result", evaluation_profile_id=profile_id
+    )
+    profile = market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+        profile_id
+    )
+
+    assert spec.ledger_entry_id == expected[0]
+    assert spec.cell_count == 4
+    assert reservation["run_level_looks_before"] == expected[1]
+    assert reservation["planned_run_level_looks_after_launch"] == expected[2]
+    assert reservation["arv2_development_evaluations_before"] == expected[3]
+    assert reservation[
+        "planned_arv2_development_evaluations_after_launch"
+    ] == expected[4]
+    assert reservation["lifetime_alpha_cell_floor_before"] == expected[5]
+    assert result["lifetime_alpha_cell_floor_after"] == expected[6]
+    assert market_cap_plan.evaluation_profile_sha256 == profile[
+        "profile_sha256"
+    ]
+    assert market_cap_plan.expected_custom_statistic_names == (
+        "ARV2_RUNTIME_META",
+        "ARV2_STOCK_PORTFOLIO_COST_0",
+        "ARV2_STOCK_PORTFOLIO_COST_10",
+        "ARV2_STOCK_PORTFOLIO_COST_20",
+        "ARV2_STOCK_PORTFOLIO_COST_5",
+        "ARV2_STOCK_PORTFOLIO_MATCHED_AGGREGATES",
+        "ARV2_STOCK_PORTFOLIO_META",
+        "ARV2_STOCK_PORTFOLIO_SELECTED_AGGREGATES",
+    )
+    assert tuple(item.project_path for item in market_cap_plan.source_files) == (
+        tuple(
+            sorted(
+                projection_builder.MARKET_CAP_PROJECT_SOURCE_PATHS
+                + ("main.py",)
+            )
+        )
+    )
+
+
+def test_each_market_cap_profile_accepts_exact_bounded_aggregate(
+    market_cap_plan,
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    _validate_statistics(market_cap_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    "statistic_name",
+    (
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME,
+        market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME,
+    ),
+)
+def test_market_cap_split_account_statistic_is_required(
+    market_cap_plan_2021, statistic_name
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    statistics.pop(statistic_name)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate result inventory changed",
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+def test_market_cap_split_account_fields_are_exact(market_cap_plan_2021):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    selected = json.loads(
+        statistics[market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME]
+    )
+    selected["unexpected"] = 0
+    statistics[
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="account aggregate fields changed",
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+def test_market_cap_unrehashened_split_account_mutation_refuses_identity(
+    market_cap_plan_2021,
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    selected = json.loads(
+        statistics[market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME]
+    )
+    selected["maximum_position_weight"] = "0.99"
+    statistics[
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="summary identity changed",
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+def test_market_cap_census_accepts_context_rounded_nonterminating_mean(
+    market_cap_plan_2021,
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    decisions = metadata["decision_session_count"]
+    with evaluator.localcontext(evaluator._context()):
+        metadata["mean_selected_name_count"] = evaluator._decimal_text(
+            +(Decimal(130) / Decimal(decisions))
+        )
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    _rehash_market_cap_summary(statistics)
+
+    _validate_statistics(market_cap_plan_2021, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        ("point_in_time_history_call_count", 1, "runtime metadata changed"),
+        (
+            "point_in_time_fetched_source_row_count",
+            market_cap_runtime.MAX_TOTAL_SOURCE_ROWS + 1,
+            "runtime metadata changed",
+        ),
+        (
+            "point_in_time_market_cap_uncovered_count",
+            1,
+            "runtime metadata changed",
+        ),
+    ),
+)
+def test_market_cap_runtime_count_guards_are_isolated(
+    market_cap_plan_2021, field, value, message
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+    runtime_meta[field] = value
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+@pytest.mark.parametrize(
+    ("account_name", "field", "value", "message"),
+    (
+        (
+            "selected_aggregates",
+            "mean_invested_weight_hhi",
+            "1.1",
+            "account metric escaped bounds",
+        ),
+        (
+            "selected_aggregates",
+            "mean_effective_holding_count",
+            "51",
+            "account metric escaped bounds",
+        ),
+        (
+            "matched_aggregates",
+            "selection_exit_deferral_count",
+            1,
+            "account count semantics changed",
+        ),
+    ),
+)
+def test_market_cap_account_guards_refuse_rehashed_mutations(
+    market_cap_plan_2021, account_name, field, value, message
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    statistic_name = {
+        "selected_aggregates": (
+            market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+        ),
+        "matched_aggregates": (
+            market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
+        ),
+    }[account_name]
+    account = json.loads(statistics[statistic_name])
+    account[field] = value
+    statistics[statistic_name] = _canonical(account).decode("ascii")
+    _rehash_market_cap_summary(statistics)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        ("difference", "portfolio metric escaped bounds"),
+        ("annual_cost", "cost arithmetic changed"),
+        ("nonmonotone", "cost monotonicity changed"),
+        ("path", "cost path invariance changed"),
+        ("sortino", "portfolio metric escaped bounds"),
+    ),
+)
+def test_market_cap_cell_arithmetic_and_path_guards_are_isolated(
+    market_cap_plan_2021, mutation, message
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan_2021)
+    name = "ARV2_STOCK_PORTFOLIO_COST_20"
+    cell = json.loads(statistics[name])
+    if mutation == "difference":
+        cell["cumulative_return_minus_spy"] = "0"
+    elif mutation == "annual_cost":
+        cell["annualized_arithmetic_return"] = "0.099"
+        cell["zero_rate_sharpe"] = "0.495"
+    elif mutation == "nonmonotone":
+        cell["cumulative_return"] = "0.21"
+        cell["cumulative_return_minus_matched"] = "0.15"
+        cell["cumulative_return_minus_spy"] = "-0.09"
+    elif mutation == "path":
+        cell["average_cash_weight"] = "0.03"
+    else:
+        cell["zero_rate_sortino"] = "-1"
+    statistics[name] = _canonical(cell).decode("ascii")
+    _rehash_market_cap_summary(statistics)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(market_cap_plan_2021, statistics)
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    (
+        ("MINIMUM_INVESTED_RETURN_SESSIONS", 0),
+        ("COST_BPS_SCENARIOS", (10,)),
+        ("TARGET_GROSS_EXPOSURE", Decimal("1")),
+        ("META_STATISTIC_NAME", "ARV2_MUTATED_META"),
+        (
+            "SELECTED_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_SELECTED",
+        ),
+        (
+            "MATCHED_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_MATCHED",
+        ),
+    ),
+)
+def test_market_cap_contract_mutation_refuses_before_network(
+    market_cap_plan_2021, monkeypatch, name, value
+):
+    backend = _Backend(market_cap_plan_2021)
+    monkeypatch.setattr(market_cap_evaluator, name, value)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=market_cap_plan_2021,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-17T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(market_cap_plan_2021.control_directory.iterdir())
+
+
+def test_each_leverage_profile_has_exact_run_spec_and_result_inventory(
+    leverage_plan,
+):
+    profile_id = leverage_plan.evaluation_profile_id
+    expected = _LEVERAGE_ACCOUNTING[profile_id]
+    spec = adapter._run_spec(profile_id)
+    reservation = adapter._look_accounting(evaluation_profile_id=profile_id)
+    result = adapter._look_accounting(
+        stage="result", evaluation_profile_id=profile_id
+    )
+    profile = leverage_evaluator.require_profile(profile_id)
+
+    assert spec.ledger_entry_id == expected[0]
+    assert spec.cell_count == 4
+    assert reservation["run_level_looks_before"] == expected[1]
+    assert reservation["planned_run_level_looks_after_launch"] == expected[2]
+    assert reservation["arv2_development_evaluations_before"] == expected[3]
+    assert reservation[
+        "planned_arv2_development_evaluations_after_launch"
+    ] == expected[4]
+    assert reservation["lifetime_alpha_cell_floor_before"] == expected[5]
+    assert result["lifetime_alpha_cell_floor_after"] == expected[6]
+    assert leverage_plan.evaluation_profile_sha256 == profile["profile_sha256"]
+    assert leverage_plan.expected_custom_statistic_names == (
+        "ARV2_LEVERAGE_L2_ADVERSE",
+        "ARV2_LEVERAGE_L2_PRIMARY",
+        "ARV2_LEVERAGE_L3_ADVERSE",
+        "ARV2_LEVERAGE_L3_PRIMARY",
+        "ARV2_LEVERAGE_MATCHED_BASE_AGGREGATES",
+        "ARV2_LEVERAGE_META",
+        "ARV2_LEVERAGE_SELECTED_BASE_AGGREGATES",
+        "ARV2_RUNTIME_META",
+    )
+    assert tuple(item.project_path for item in leverage_plan.source_files) == (
+        tuple(
+            sorted(
+                projection_builder.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
+                + ("main.py",)
+            )
+        )
+    )
+
+
+def test_each_leverage_profile_accepts_exact_bounded_aggregate(leverage_plan):
+    _validate_statistics(
+        leverage_plan,
+        _leverage_aggregate_statistics(leverage_plan),
+    )
+
+
+@pytest.mark.parametrize(
+    "statistic_name",
+    (
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME,
+        leverage_evaluator.MATCHED_BASE_AGGREGATES_STATISTIC_NAME,
+    ),
+)
+def test_leverage_split_account_statistic_is_required(
+    leverage_plan_qqq, statistic_name
+):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    statistics.pop(statistic_name)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate result inventory changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+def test_leverage_split_account_fields_are_exact(leverage_plan_qqq):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    selected = json.loads(
+        statistics[
+            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    selected["unexpected"] = 0
+    statistics[
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="account aggregate fields changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+def test_leverage_unrehashened_split_account_mutation_refuses_identity(
+    leverage_plan_qqq,
+):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    selected = json.loads(
+        statistics[
+            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+        ]
+    )
+    selected["maximum_position_weight"] = "0.99"
+    statistics[
+        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(selected).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="summary identity changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("leverage_factors", [2]),
+        ("scenario_ids", [leverage_evaluator.PRIMARY_SCENARIO_ID]),
+        ("base_market_cap_profile_sha256", "f" * 64),
+        ("synthetic_leverage", False),
+    ),
+)
+def test_leverage_runtime_metadata_guards_are_isolated(
+    leverage_plan_qqq, field, value
+):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+    runtime_meta[field] = value
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="objective leverage runtime metadata changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("base_evaluator_source_sha256", "f" * 64),
+        ("base_security_selection_changed", True),
+        ("matched_comparator_levered_identically", False),
+        ("evaluator_io", {"provider": True}),
+    ),
+)
+def test_leverage_summary_lineage_and_disclosures_are_isolated(
+    leverage_plan_qqq, field, value
+):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    metadata = json.loads(statistics["ARV2_LEVERAGE_META"])
+    metadata[field] = value
+    statistics["ARV2_LEVERAGE_META"] = _canonical(metadata).decode("ascii")
+    _rehash_leverage_summary(statistics)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="objective leverage aggregate semantics changed",
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        ("debit", "path arithmetic changed"),
+        ("drag", "path arithmetic changed"),
+        ("sortino", "path arithmetic changed"),
+        ("drawdown", "path arithmetic changed"),
+        ("difference", "relative return changed"),
+        ("double_cost", "cell semantics changed"),
+        ("daily_reset", "cell semantics changed"),
+        ("financing_count", "path census invariance changed"),
+        ("scenario_monotonicity", "scenario monotonicity changed"),
+        ("spy_underlying_path", "underlying path changed"),
+    ),
+)
+def test_leverage_cell_guards_are_isolated(
+    leverage_plan_qqq, mutation, message
+):
+    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
+    name = "ARV2_LEVERAGE_L2_ADVERSE"
+    cell = json.loads(statistics[name])
+    if mutation == "debit":
+        cell["matched_arithmetic_financing_debit"] = "0"
+    elif mutation == "drag":
+        cell["selected_cumulative_financing_drag"] = "0"
+    elif mutation == "sortino":
+        cell["selected_zero_rate_sortino"] = "-1"
+    elif mutation == "drawdown":
+        cell["selected_maximum_drawdown"] = "-1.1"
+    elif mutation == "difference":
+        cell["selected_minus_matched_cumulative_return"] = "0"
+    elif mutation == "double_cost":
+        cell["second_transaction_cost_deduction"] = True
+    elif mutation == "daily_reset":
+        cell["portfolio_level_daily_reset"] = False
+    elif mutation == "financing_count":
+        count = cell["selected_financing_session_count"] - 1
+        rate = Decimal(cell["annual_financing_rate"])
+        with evaluator.localcontext(evaluator._context()):
+            debit = +(rate / Decimal(252) * Decimal(count))
+        cell["selected_financing_session_count"] = count
+        cell["selected_arithmetic_financing_debit"] = evaluator._decimal_text(
+            debit
+        )
+    elif mutation == "scenario_monotonicity":
+        cell["selected_cumulative_return"] = "0.31"
+        cell["selected_cumulative_return_before_financing"] = "0.31"
+        cell["selected_cumulative_financing_drag"] = "0"
+        cell["selected_minus_matched_cumulative_return"] = "0.19"
+        cell["selected_minus_synthetic_spy_cumulative_return"] = "-0.03"
+    else:
+        cell["synthetic_spy_cumulative_return_before_financing"] = "0.43"
+        cell["synthetic_spy_cumulative_financing_drag"] = "0.09"
+    statistics[name] = _canonical(cell).decode("ascii")
+    _rehash_leverage_summary(statistics)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(leverage_plan_qqq, statistics)
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    (
+        ("LEVERAGE_FACTORS", (2,)),
+        ("SCENARIOS", (leverage_evaluator.SCENARIOS[0],)),
+        ("BASE_EVALUATOR_SOURCE_SHA256", "f" * 64),
+        ("META_STATISTIC_NAME", "ARV2_MUTATED_META"),
+        (
+            "SELECTED_BASE_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_SELECTED",
+        ),
+        (
+            "MATCHED_BASE_AGGREGATES_STATISTIC_NAME",
+            "ARV2_MUTATED_MATCHED",
+        ),
+    ),
+)
+def test_leverage_contract_mutation_refuses_before_network(
+    leverage_plan_qqq, monkeypatch, name, value
+):
+    backend = _Backend(leverage_plan_qqq)
+    monkeypatch.setattr(leverage_evaluator, name, value)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="objective leverage financial contract changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=leverage_plan_qqq,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-17T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(leverage_plan_qqq.control_directory.iterdir())
+
 
 def test_regime_profile_allowlist_refuses_unknown_profile():
     with pytest.raises(
@@ -516,6 +1961,941 @@ def test_regime_profile_allowlist_refuses_unknown_profile():
         match="evaluation profile is not allowlisted",
     ):
         adapter._look_accounting(evaluation_profile_id="arv2-stock-ic-unregistered")
+
+
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        stock_portfolio_evaluator.NASDAQ100_PROFILE_ID,
+        stock_portfolio_evaluator.UNION_PROFILE_ID,
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+    ),
+)
+def test_superseded_stock_universe_profiles_are_not_active_run_specs(
+    profile_id,
+):
+    # R073 and R075 were spent failures; R074 and R076 were unspent.  All four
+    # remain loadable but cannot create a fresh submission after supersession.
+    stock_portfolio_evaluator.require_stock_portfolio_profile(profile_id)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="evaluation profile is not allowlisted",
+    ):
+        adapter._run_spec(profile_id)
+
+
+def test_stock_portfolio_profile_has_one_exact_r065_look_budget(stock_portfolio_plan):
+    spec = adapter._run_spec(stock_portfolio_evaluator.PROFILE_ID)
+    accounting = adapter._look_accounting(
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID
+    )
+    result_accounting = adapter._look_accounting(
+        stage="result",
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
+    )
+
+    assert spec.ledger_entry_id == "R-065"
+    assert spec.cell_count == 4
+    assert accounting["run_level_looks_before"] == 64
+    assert accounting["planned_run_level_looks_after_launch"] == 65
+    assert accounting["arv2_development_evaluations_before"] == 11
+    assert accounting["planned_arv2_development_evaluations_after_launch"] == 12
+    assert accounting["lifetime_alpha_cell_floor_before"] == 575
+    assert result_accounting["lifetime_alpha_cell_floor_after"] == 579
+    assert stock_portfolio_plan.expected_custom_statistic_names == (
+        "ARV2_RUNTIME_META",
+        "ARV2_STOCK_PORTFOLIO_COST_0",
+        "ARV2_STOCK_PORTFOLIO_COST_10",
+        "ARV2_STOCK_PORTFOLIO_COST_20",
+        "ARV2_STOCK_PORTFOLIO_COST_5",
+        "ARV2_STOCK_PORTFOLIO_META",
+    )
+
+
+def test_each_stock_universe_profile_has_its_exact_four_cell_run_spec(
+    stock_universe_plan,
+):
+    profile_id = stock_universe_plan.projection.evaluation_profile_id
+    (
+        evaluation_id,
+        ledger_entry_id,
+        looks_before,
+        looks_after,
+        evaluations_before,
+        evaluations_after,
+        floor_before,
+        floor_after,
+    ) = _STOCK_UNIVERSE_ACCOUNTING[profile_id]
+    spec = adapter._run_spec(profile_id)
+    reservation = adapter._look_accounting(evaluation_profile_id=profile_id)
+    result = adapter._look_accounting(
+        stage="result", evaluation_profile_id=profile_id
+    )
+    profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        profile_id
+    )
+
+    assert spec.evaluation_id == evaluation_id
+    assert spec.ledger_entry_id == ledger_entry_id
+    assert spec.cell_count == 4
+    assert reservation["run_level_looks_before"] == looks_before
+    assert reservation["planned_run_level_looks_after_launch"] == looks_after
+    assert reservation["arv2_development_evaluations_before"] == (
+        evaluations_before
+    )
+    assert reservation[
+        "planned_arv2_development_evaluations_after_launch"
+    ] == evaluations_after
+    assert reservation["lifetime_alpha_cell_floor_before"] == floor_before
+    assert result["lifetime_alpha_cell_floor_after"] == floor_after
+    assert stock_universe_plan.evaluation_profile_id == profile_id
+    assert stock_universe_plan.evaluation_profile_sha256 == profile[
+        "profile_sha256"
+    ]
+    assert stock_universe_plan.expected_custom_statistic_names == (
+        "ARV2_RUNTIME_META",
+        "ARV2_STOCK_PORTFOLIO_COST_0",
+        "ARV2_STOCK_PORTFOLIO_COST_10",
+        "ARV2_STOCK_PORTFOLIO_COST_20",
+        "ARV2_STOCK_PORTFOLIO_COST_5",
+        "ARV2_STOCK_PORTFOLIO_META",
+    )
+    assert tuple(
+        item.project_path for item in stock_universe_plan.source_files
+    ) == tuple(
+        sorted(
+            projection_builder.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
+            + ("main.py",)
+        )
+    )
+
+
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1",
+        "arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1",
+        "arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1",
+        "arv2-stock-long-only-spy-holdings-proxy-2021-2025-r069-v1",
+        "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2",
+        "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2",
+        "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1",
+        "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3",
+        "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v2",
+        "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v4",
+        "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r071-v3",
+    ),
+)
+def test_stock_shaped_profile_outside_exact_active_allowlist_refuses(profile_id):
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="evaluation profile is not allowlisted",
+    ):
+        adapter._run_spec(profile_id)
+
+
+def test_each_stock_universe_result_binds_exact_profile_and_hash(
+    stock_universe_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_universe_plan)
+    profile_id = stock_universe_plan.evaluation_profile_id
+    profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        profile_id
+    )
+
+    _validate_statistics(stock_universe_plan, statistics)
+
+    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    cells = {
+        json.loads(statistics[name])["profile_id"]
+        for name in statistics
+        if name.startswith("ARV2_STOCK_PORTFOLIO_COST_")
+    }
+    assert runtime_meta["evaluation_profile_id"] == profile_id
+    assert runtime_meta["evaluation_profile_sha256"] == profile[
+        "profile_sha256"
+    ]
+    assert metadata["profile_id"] == profile_id
+    assert metadata["profile_sha256"] == profile["profile_sha256"]
+    assert cells == {profile_id}
+
+
+@pytest.mark.parametrize(
+    ("target", "message"),
+    (
+        ("runtime_profile_id", "stock-portfolio runtime metadata changed"),
+        ("runtime_profile_sha256", "stock-portfolio runtime metadata changed"),
+        ("metadata_profile_id", "aggregate metadata semantics changed"),
+        ("metadata_profile_sha256", "aggregate metadata semantics changed"),
+        ("cell_profile_id", "stock-portfolio cell semantics changed"),
+    ),
+)
+def test_each_stock_universe_result_refuses_r065_profile_substitution(
+    stock_universe_plan,
+    target,
+    message,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_universe_plan)
+    r065 = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        stock_portfolio_evaluator.PROFILE_ID
+    )
+    if target.startswith("runtime_"):
+        runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+        key = (
+            "evaluation_profile_id"
+            if target.endswith("_id")
+            else "evaluation_profile_sha256"
+        )
+        runtime_meta[key] = (
+            r065["profile_id"]
+            if key.endswith("_id")
+            else r065["profile_sha256"]
+        )
+        statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode(
+            "ascii"
+        )
+    elif target.startswith("metadata_"):
+        metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+        key = "profile_id" if target.endswith("_id") else "profile_sha256"
+        metadata[key] = r065[key]
+        statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+            "ascii"
+        )
+    else:
+        name = "ARV2_STOCK_PORTFOLIO_COST_10"
+        cell = json.loads(statistics[name])
+        cell["profile_id"] = r065["profile_id"]
+        statistics[name] = _canonical(cell).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(stock_universe_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("proxy", "zero_recovery"),
+    ((False, False), (True, False), (False, True)),
+)
+def test_stock_portfolio_aggregate_validator_accepts_only_disclosed_price_status(
+    stock_portfolio_plan, proxy, zero_recovery
+):
+    statistics = _stock_portfolio_aggregate_statistics(
+        stock_portfolio_plan,
+        proxy=proxy,
+        zero_recovery=zero_recovery,
+    )
+
+    _validate_statistics(stock_portfolio_plan, statistics)
+
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata["terminal_payoff_applied"] = True
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio aggregate metadata semantics changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+def test_stock_portfolio_validator_refuses_cost_or_proxy_status_relabel(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(
+        stock_portfolio_plan, proxy=True
+    )
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_10"
+    cell = json.loads(statistics[cell_name])
+    cell["status"] = "PRELIMINARY_DESCRIPTIVE_AVAILABLE"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cell semantics changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("portfolio_return_session_count", 1253),
+        ("named_figi_resolution_refusal_count", 1),
+        ("membership_end_zero_recovery_count", 1),
+    ),
+)
+def test_stock_portfolio_validator_isolates_geometry_and_refusal_guards(
+    stock_portfolio_plan, field, value
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata[field] = value
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio aggregate metadata semantics changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("return_metric_conditioning", "no_price_proxy"),
+        ("risk_metrics_are_price_proxy_conditioned", False),
+    ),
+)
+def test_stock_portfolio_validator_isolates_price_conditioning_guards(
+    stock_portfolio_plan, field, value
+):
+    statistics = _stock_portfolio_aggregate_statistics(
+        stock_portfolio_plan, zero_recovery=True
+    )
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_10"
+    cell = json.loads(statistics[cell_name])
+    cell[field] = value
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cell semantics changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+def test_stock_portfolio_validator_refuses_rehashed_false_sharpe(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_10"
+    cell = json.loads(statistics[cell_name])
+    cell["zero_rate_sharpe"] = "999"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio metric escaped bounds",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+def test_stock_portfolio_validator_refuses_rehashed_wrong_sortino_sign(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_10"
+    cell = json.loads(statistics[cell_name])
+    cell["zero_rate_sortino"] = "-1"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio metric escaped bounds",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+def test_stock_portfolio_validator_refuses_negative_return_with_null_sortino(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_10"
+    cell = json.loads(statistics[cell_name])
+    cell["annualized_arithmetic_return"] = "-0.02"
+    cell["zero_rate_sharpe"] = "-0.2"
+    cell["zero_rate_sortino"] = None
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio metric escaped bounds",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+def test_stock_portfolio_validator_accepts_matched_only_partial_rebalance(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata["matched_stale_mark_session_count"] = 1
+    metadata["matched_partial_rebalance_decision_count"] = 1
+    metadata["matched_stale_position_deferral_count"] = 1
+    metadata["matched_mean_locked_gross_at_partial_decisions"] = "0.005"
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS:
+        name = "ARV2_STOCK_PORTFOLIO_COST_" + str(cost)
+        cell = json.loads(statistics[name])
+        cell["status"] = (
+            "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
+        )
+        cell["return_metric_conditioning"] = "conditioned_on_stale_mark_path"
+        cell["risk_metrics_are_price_proxy_conditioned"] = True
+        statistics[name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    _validate_statistics(stock_portfolio_plan, statistics)
+
+
+def test_stock_portfolio_validator_accepts_disclosed_locked_gross_over_target(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata["matched_target_met_execution_count"] = 260
+    metadata["matched_stale_mark_session_count"] = 1
+    metadata["matched_partial_rebalance_decision_count"] = 1
+    metadata["matched_stale_position_deferral_count"] = 1
+    metadata["matched_mean_locked_gross_at_partial_decisions"] = "0.5"
+    metadata["matched_locked_exposure_over_target_count"] = 1
+    metadata["matched_mean_executed_target_gross_exposure"] = "0.02"
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    for cost in stock_portfolio_evaluator.COST_BPS_SCENARIOS:
+        cell_name = "ARV2_STOCK_PORTFOLIO_COST_" + str(cost)
+        cell = json.loads(statistics[cell_name])
+        cell["status"] = (
+            "PRELIMINARY_DESCRIPTIVE_AVAILABLE_WITH_STALE_MARK_PROXY"
+        )
+        cell["return_metric_conditioning"] = "conditioned_on_stale_mark_path"
+        cell["risk_metrics_are_price_proxy_conditioned"] = True
+        statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("updates", "message"),
+    (
+        (
+            {
+                "selected_execution_count": 261,
+                "rebalance_execution_count": 260,
+                "underfilled_target_execution_count": 260,
+            },
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {
+                "full_target_execution_count": 261,
+                "underfilled_target_execution_count": 0,
+                "mean_executed_target_gross_exposure": "0",
+                "matched_mean_executed_target_gross_exposure": "0",
+            },
+            "target exposure changed",
+        ),
+        (
+            {"matched_mean_executed_target_gross_exposure": "0.98"},
+            "target exposure changed",
+        ),
+        (
+            {"mean_executed_target_gross_exposure": "0.98"},
+            "target exposure changed",
+        ),
+    ),
+)
+def test_stock_portfolio_validator_refuses_rehashed_impossible_execution_census(
+    stock_portfolio_plan, updates, message
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata.update(updates)
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("updates", "message"),
+    (
+        (
+            {
+                "partial_rebalance_decision_count": 0,
+                "stale_position_deferral_count": 1,
+                "mean_locked_gross_at_partial_decisions": "0.005",
+            },
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {"stale_mark_session_count": 1255},
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {
+                "partial_rebalance_decision_count": 1,
+                "stale_mark_session_count": 1,
+                "stale_position_deferral_count": 2,
+                "mean_locked_gross_at_partial_decisions": "0.005",
+            },
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {
+                "matched_partial_rebalance_decision_count": 1,
+                "matched_stale_position_deferral_count": 0,
+                "matched_mean_locked_gross_at_partial_decisions": "0.005",
+            },
+            "aggregate metadata semantics changed",
+        ),
+        (
+            {
+                "locked_exposure_over_target_count": 1,
+                "partial_rebalance_decision_count": 0,
+            },
+            "aggregate metadata semantics changed",
+        ),
+    ),
+)
+def test_stock_portfolio_validator_isolates_partial_rebalance_invariants(
+    stock_portfolio_plan,
+    updates,
+    message,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    metadata = json.loads(statistics["ARV2_STOCK_PORTFOLIO_META"])
+    metadata.update(updates)
+    statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
+        "ascii"
+    )
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("spy_cumulative_return", "0.21"),
+        ("average_daily_two_sided_turnover", "0.05"),
+        ("average_cash_weight", "0.03"),
+        ("matched_average_daily_two_sided_turnover", "0.04"),
+        ("matched_average_cash_weight", "0.01"),
+    ),
+)
+def test_stock_portfolio_validator_refuses_cross_cell_path_mutation(
+    stock_portfolio_plan, field, value
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_20"
+    cell = json.loads(statistics[cell_name])
+    cell[field] = value
+    if field == "spy_cumulative_return":
+        cell["cumulative_return_minus_spy"] = "-0.15"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cost path invariance changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize("account", ("signal", "matched"))
+def test_stock_portfolio_validator_refuses_nonmonotone_cost_return(
+    stock_portfolio_plan, account
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_20"
+    cell = json.loads(statistics[cell_name])
+    if account == "signal":
+        cell["cumulative_return"] = "0.081"
+        cell["cumulative_return_minus_matched"] = "0.071"
+        cell["cumulative_return_minus_spy"] = "-0.119"
+    else:
+        cell["matched_eligible_stock_cumulative_return"] = "0.031"
+        cell["cumulative_return_minus_matched"] = "0.029"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cost monotonicity changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize("account", ("signal", "matched"))
+def test_stock_portfolio_validator_refuses_wrong_closed_form_cost_arithmetic(
+    stock_portfolio_plan, account
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    cell_name = "ARV2_STOCK_PORTFOLIO_COST_20"
+    cell = json.loads(statistics[cell_name])
+    if account == "signal":
+        cell["annualized_arithmetic_return"] = "0.03"
+        cell["annualized_volatility"] = "0.10"
+        cell["zero_rate_sharpe"] = "0.3"
+        cell["zero_rate_sortino"] = "0.3"
+    else:
+        cell["matched_annualized_arithmetic_return"] = "0.03"
+        cell["matched_annualized_volatility"] = "0.10"
+        cell["matched_zero_rate_sharpe"] = "0.3"
+        cell["matched_zero_rate_sortino"] = "0.3"
+    statistics[cell_name] = _canonical(cell).decode("ascii")
+    _rehash_stock_portfolio_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio cost arithmetic changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+def test_stock_portfolio_runtime_slice_ceiling_is_isolated(
+    stock_portfolio_plan,
+):
+    statistics = _stock_portfolio_aggregate_statistics(stock_portfolio_plan)
+    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
+    runtime_meta["runtime_slice_count"] = runtime.MAX_TRAIN_SLICE_COUNT + 1
+    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="stock-portfolio runtime metadata changed",
+    ):
+        _validate_statistics(stock_portfolio_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    (
+        ("MINIMUM_INVESTED_RETURN_SESSIONS", 0),
+        ("COST_BPS_SCENARIOS", (10,)),
+        ("ANNUALIZATION_SESSIONS", Decimal("251")),
+    ),
+)
+def test_stock_contract_constant_mutation_refuses_before_network(
+    stock_portfolio_plan, monkeypatch, name, value
+):
+    backend = _Backend(stock_portfolio_plan)
+    monkeypatch.setattr(stock_portfolio_evaluator, name, value)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_portfolio_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_portfolio_plan.control_directory.iterdir())
+
+
+def test_stock_contract_real_action_guard_accepts_clean_six_name_inventory(
+    stock_portfolio_plan,
+):
+    cells = dict(
+        zip(
+            adapter.execute_accepted_risk_preliminary_submission_once.__code__.co_freevars,
+            adapter.execute_accepted_risk_preliminary_submission_once.__closure__ or (),
+            strict=True,
+        )
+    )
+
+    cells["action_guard"].cell_contents("stock-clean-preflight")
+
+    assert adapter._expected_result_names(stock_portfolio_evaluator.PROFILE_ID) == (
+        stock_portfolio_plan.expected_custom_statistic_names
+    )
+    assert "ARV2_RUNTIME_META" in stock_portfolio_plan.expected_custom_statistic_names
+    assert len(stock_portfolio_plan.expected_custom_statistic_names) == 6
+
+
+def test_stock_contract_callable_reentry_refuses_before_side_effect(
+    stock_portfolio_plan, monkeypatch
+):
+    backend = _Backend(stock_portfolio_plan)
+    original = adapter._validate_stock_portfolio_aggregate_records
+    called = False
+
+    def hostile_names(_profile_id):
+        nonlocal called
+        called = True
+        monkeypatch.setattr(
+            adapter,
+            "_validate_stock_portfolio_aggregate_records",
+            lambda *_args, **_kwargs: None,
+        )
+        return adapter._PINNED_STOCK_PORTFOLIO_RESULT_NAMES
+
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "expected_custom_summary_statistic_names",
+        hostile_names,
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_portfolio_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert called is False
+    assert adapter._validate_stock_portfolio_aggregate_records is original
+    assert backend.events == []
+    assert not any(stock_portfolio_plan.control_directory.iterdir())
+
+
+def test_stock_projection_hostile_source_tuple_refuses_before_iteration(
+    stock_portfolio_plan, monkeypatch
+):
+    backend = _Backend(stock_portfolio_plan)
+    original_metric = adapter._cell_metric
+    iterations = []
+
+    class HostileTuple(tuple):
+        def __iter__(self):
+            iterations.append(True)
+            monkeypatch.setattr(
+                adapter,
+                "_cell_metric",
+                lambda *_args, **_kwargs: Decimal(0),
+            )
+            return super().__iter__()
+
+    monkeypatch.setattr(
+        projection_builder,
+        "STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS",
+        HostileTuple(
+            projection_builder.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
+        ),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_portfolio_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert iterations == []
+    assert adapter._cell_metric is original_metric
+    assert backend.events == []
+    assert not any(stock_portfolio_plan.control_directory.iterdir())
+
+
+@pytest.mark.parametrize("mutation", ("profile_ids", "profile_hash"))
+def test_stock_universe_projection_identity_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+    mutation,
+):
+    backend = _Backend(stock_universe_plan)
+    profile_id = stock_universe_plan.evaluation_profile_id
+    if mutation == "profile_ids":
+        monkeypatch.setattr(
+            projection_builder,
+            "STOCK_PORTFOLIO_PROFILE_IDS",
+            projection_builder.STOCK_PORTFOLIO_PROFILE_IDS
+            + ("arv2-unrelated-stock-profile",),
+        )
+    else:
+        hashes = dict(projection_builder.STOCK_PORTFOLIO_PROFILE_SHA256S)
+        hashes[profile_id] = "0" * 64
+        monkeypatch.setattr(
+            projection_builder,
+            "STOCK_PORTFOLIO_PROFILE_SHA256S",
+            hashes,
+        )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_runtime_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        runtime,
+        "STOCK_PORTFOLIO_PROFILE_IDS",
+        runtime.STOCK_PORTFOLIO_PROFILE_IDS
+        + ("arv2-unrelated-stock-profile",),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_snapshot_age_helper_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_snapshot_maximum_age_calendar_days_for_profile",
+        lambda _profile_id: None,
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_positive_count_helper_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_positive_count_bounds_for_profile",
+        lambda _profile_id: (),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_state_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        runtime,
+        "STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS",
+        runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS[:-1],
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_membership_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        runtime,
+        "STOCK_MEMBERSHIP_ONLY_PROFILE_IDS",
+        runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS[:-1],
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
+
+
+def test_stock_universe_evaluator_membership_profile_inventory_mutation_refuses_before_network(
+    stock_universe_plan,
+    monkeypatch,
+):
+    backend = _Backend(stock_universe_plan)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "MEMBERSHIP_ONLY_PROFILE_IDS",
+        stock_portfolio_evaluator.MEMBERSHIP_ONLY_PROFILE_IDS[:-1],
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="^preliminary action global binding changed$",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=stock_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-16T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(stock_universe_plan.control_directory.iterdir())
 
 
 def test_regime_expected_result_inventory_guard_is_isolated(monkeypatch):
@@ -1010,11 +3390,17 @@ class _Backend:
         self.objects = {}
         self.compile_state = "BuildSuccess"
         self.terminal_status = "Completed."
-        self.statistics = (
-            _aggregate_statistics(plan)
-            if plan.projection.evaluation_profile_id is None
-            else _regime_aggregate_statistics(plan)
-        )
+        profile_id = plan.projection.evaluation_profile_id
+        if profile_id is None:
+            self.statistics = _aggregate_statistics(plan)
+        elif profile_id in leverage_evaluator.PROFILE_IDS:
+            self.statistics = _leverage_aggregate_statistics(plan)
+        elif profile_id in market_cap_evaluator.PROFILE_IDS:
+            self.statistics = _market_cap_aggregate_statistics(plan)
+        elif profile_id in stock_portfolio_evaluator.PROFILE_IDS:
+            self.statistics = _stock_portfolio_aggregate_statistics(plan)
+        else:
+            self.statistics = _regime_aggregate_statistics(plan)
         self.extra_initial_source = None
         self.backtest_inventory = None
 
@@ -1255,6 +3641,171 @@ def test_offline_exact_submission_status_and_single_aggregate_read(plan):
         terminal=terminal,
         result_permit=result_permit,
     ) is result
+
+
+def test_market_cap_offline_launch_and_result_read_are_exact(
+    market_cap_plan_2021,
+):
+    signature = _offline_signature()
+    backend = _Backend(market_cap_plan_2021)
+    permit, launch = _execute(market_cap_plan_2021, backend, signature)
+    terminal = _complete(
+        market_cap_plan_2021, backend, signature, permit, launch
+    )
+    result_permit, result = _read(
+        market_cap_plan_2021,
+        backend,
+        signature,
+        permit,
+        launch,
+        terminal,
+    )
+
+    assert terminal.terminal_status == "Completed."
+    assert backend.events.count("backtests/create") == 1
+    assert backend.events.count("backtests/read") == 1
+    assert tuple(name for name, _value in result.custom_statistics) == (
+        market_cap_plan_2021.expected_custom_statistic_names
+    )
+    persisted = json.loads(result.persisted_path.read_bytes())
+    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-107"
+    assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == 595
+    assert adapter.require_accepted_risk_preliminary_aggregate_result(
+        result,
+        plan=market_cap_plan_2021,
+        execution_permit=permit,
+        launch=launch,
+        terminal=terminal,
+        result_permit=result_permit,
+    ) is result
+
+
+def test_leverage_offline_launch_and_result_read_are_exact(
+    leverage_plan_qqq,
+):
+    signature = _offline_signature()
+    backend = _Backend(leverage_plan_qqq)
+    permit, launch = _execute(leverage_plan_qqq, backend, signature)
+    terminal = _complete(
+        leverage_plan_qqq, backend, signature, permit, launch
+    )
+    result_permit, result = _read(
+        leverage_plan_qqq,
+        backend,
+        signature,
+        permit,
+        launch,
+        terminal,
+    )
+
+    assert terminal.terminal_status == "Completed."
+    assert backend.events.count("backtests/create") == 1
+    assert backend.events.count("backtests/read") == 1
+    assert tuple(name for name, _value in result.custom_statistics) == (
+        leverage_plan_qqq.expected_custom_statistic_names
+    )
+    persisted = json.loads(result.persisted_path.read_bytes())
+    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-113"
+    assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == 619
+    assert adapter.require_accepted_risk_preliminary_aggregate_result(
+        result,
+        plan=leverage_plan_qqq,
+        execution_permit=permit,
+        launch=launch,
+        terminal=terminal,
+        result_permit=result_permit,
+    ) is result
+
+
+def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(
+    stock_portfolio_plan,
+):
+    signature = _offline_signature()
+    backend = _Backend(stock_portfolio_plan)
+
+    permit, launch = _execute(stock_portfolio_plan, backend, signature)
+    terminal = _complete(
+        stock_portfolio_plan, backend, signature, permit, launch
+    )
+    result_permit, result = _read(
+        stock_portfolio_plan,
+        backend,
+        signature,
+        permit,
+        launch,
+        terminal,
+    )
+    recovered_permit = adapter.load_accepted_risk_preliminary_result_read_permit(
+        plan=stock_portfolio_plan,
+        execution_permit=permit,
+        launch=launch,
+        terminal=terminal,
+    )
+    recovered_result = adapter.load_accepted_risk_preliminary_aggregate_result(
+        plan=stock_portfolio_plan,
+        execution_permit=permit,
+        launch=launch,
+        terminal=terminal,
+        result_permit=recovered_permit,
+    )
+
+    assert terminal.terminal_status == "Completed."
+    assert backend.events.count("backtests/create") == 1
+    assert backend.events.count("backtests/read") == 1
+    assert len(result.custom_statistics) == 6
+    assert result.custom_statistics == recovered_result.custom_statistics
+    assert result_permit.permit_sha256 == recovered_permit.permit_sha256
+    receipt = json.loads(result.persisted_path.read_bytes())
+    accounting = receipt["look_accounting"]
+    assert accounting["shared_look_ledger_entry_id"] == "R-065"
+    assert accounting["run_level_looks_after"] == 65
+    assert accounting["arv2_development_evaluations_after"] == 12
+    assert accounting["lifetime_alpha_cell_floor_after"] == 579
+
+
+def test_each_stock_universe_offline_result_uses_stock_parser_and_run_spec(
+    stock_universe_plan,
+):
+    signature = _offline_signature()
+    backend = _Backend(stock_universe_plan)
+    profile_id = stock_universe_plan.evaluation_profile_id
+    expected = _STOCK_UNIVERSE_ACCOUNTING[profile_id]
+
+    permit, launch = _execute(stock_universe_plan, backend, signature)
+    terminal = _complete(
+        stock_universe_plan, backend, signature, permit, launch
+    )
+    _result_permit, result = _read(
+        stock_universe_plan,
+        backend,
+        signature,
+        permit,
+        launch,
+        terminal,
+    )
+
+    assert backend.events.count("backtests/create") == 1
+    assert backend.events.count("backtests/read") == 1
+    assert len(result.custom_statistics) == 6
+    receipt = json.loads(result.persisted_path.read_bytes())
+    persisted_statistics = dict(receipt["custom_statistics"])
+    persisted_runtime = json.loads(persisted_statistics["ARV2_RUNTIME_META"])
+    persisted_meta = json.loads(
+        persisted_statistics["ARV2_STOCK_PORTFOLIO_META"]
+    )
+    assert persisted_runtime["evaluation_profile_id"] == profile_id
+    assert persisted_runtime["evaluation_profile_sha256"] == (
+        stock_universe_plan.evaluation_profile_sha256
+    )
+    assert persisted_meta["profile_id"] == profile_id
+    assert persisted_meta["profile_sha256"] == (
+        stock_universe_plan.evaluation_profile_sha256
+    )
+    accounting = receipt["look_accounting"]
+    assert accounting["shared_look_ledger_entry_id"] == expected[1]
+    assert accounting["run_level_looks_after"] == expected[3]
+    assert accounting["arv2_development_evaluations_after"] == expected[5]
+    assert accounting["lifetime_alpha_cell_floor_after"] == expected[7]
 
 
 def test_regime_offline_submission_reads_only_its_eighteen_statistics(regime_plan):

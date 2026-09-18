@@ -213,6 +213,7 @@ def _make_formal_action_global_binding_guard():
         "_seal_formal_action_global_bindings",
         "_require_formal_action_global_bindings",
         "_claim_fundamental_discovery_transport_capability_minter",
+        "_claim_pit_market_cap_membership_probe_transport_capability_minter",
         "_claim_preopen_transport_capability_minter",
         "_claim_preopen_physical_upload_transport_capability_minter",
         "_claim_preopen_prereview_transport_capability_minter",
@@ -1086,6 +1087,33 @@ def _make_downstream_transport_minter_claims(
             "_claim_fundamental_discovery_transport_capability_minter",
         ),
         (
+            "pit_market_cap_membership_probe",
+            "research.analyst_revisions_v2_qc."
+            "pit_market_cap_membership_probe_submission_adapter",
+            "pit_market_cap_membership_probe_submission_adapter.py",
+            (
+                (
+                    "submission",
+                    (
+                        "_execute_pit_market_cap_membership_probe_submission_once_impl",
+                    ),
+                ),
+                (
+                    "status",
+                    (
+                        "_inspect_pit_market_cap_membership_probe_terminal_status_impl",
+                    ),
+                ),
+                (
+                    "result_read",
+                    (
+                        "_read_pit_market_cap_membership_probe_receipt_once_impl",
+                    ),
+                ),
+            ),
+            "_claim_pit_market_cap_membership_probe_transport_capability_minter",
+        ),
+        (
             "preopen",
             "research.analyst_revisions_v2_qc."
             "preopen_control_submission_adapter",
@@ -1460,6 +1488,7 @@ def _make_downstream_transport_minter_claims(
 
     return (
         make_claim("fundamental"),
+        make_claim("pit_market_cap_membership_probe"),
         make_claim("preopen"),
         make_claim("preopen_physical_upload"),
         make_claim("preopen_prereview"),
@@ -8843,6 +8872,7 @@ del _seal_formal_pre_spend_io_authority
 globals().pop("_claim_adapter_capability_minter", None)
 (
     _claim_fundamental_discovery_transport_capability_minter,
+    _claim_pit_market_cap_membership_probe_transport_capability_minter,
     _claim_preopen_transport_capability_minter,
     _claim_preopen_physical_upload_transport_capability_minter,
     _claim_preopen_prereview_transport_capability_minter,

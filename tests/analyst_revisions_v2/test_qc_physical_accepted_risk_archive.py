@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import dataclasses
 import hashlib
+import inspect
 import json
 import os
 import re
@@ -2893,3 +2894,106 @@ def test_iterator_refuses_leaf_replacement_between_yields(tmp_path):
         match=_exact("accepted-risk archive named leaf identity changed"),
     ):
         next(rows)
+
+
+def test_authenticated_semantic_fold_reconstructs_every_exact_row(tmp_path):
+    _capture, archive = _build(tmp_path)
+    expected = tuple(iter_physical_accepted_risk_rows(archive))
+    observed = []
+
+    def visit(item):
+        assert type(item) is physical_module._AuthenticatedAcceptedRiskSemanticRow
+        assert type(item.row) is c1_module.AcceptedRiskSourceRow
+        assert item.canonical_record_bytes == canonical_json_bytes(
+            item.row.to_record()
+        )
+        with pytest.raises(dataclasses.FrozenInstanceError):
+            item.canonical_record_bytes = b"changed\n"
+        observed.append(item)
+
+    result = physical_module._fold_authenticated_physical_accepted_risk_rows(
+        archive, visit
+    )
+
+    assert result is None
+    assert [item.row.to_record() for item in observed] == [
+        row.to_record() for row in expected
+    ]
+    assert len(observed) == archive.source_row_count
+
+
+def test_authenticated_semantic_fold_refuses_non_none_visitor_result(tmp_path):
+    _capture, archive = _build(tmp_path)
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "authenticated semantic fold visitor must return None"
+        ),
+    ):
+        physical_module._fold_authenticated_physical_accepted_risk_rows(
+            archive, lambda _item: False
+        )
+
+
+def test_authenticated_semantic_fold_seals_row_methods_between_callbacks(
+    tmp_path, monkeypatch
+):
+    _capture, archive = _build(tmp_path)
+    callbacks = 0
+
+    def visit(_item):
+        nonlocal callbacks
+        callbacks += 1
+        monkeypatch.setattr(
+            c1_module.AcceptedRiskSourceRow,
+            "to_record",
+            lambda _row: {},
+        )
+
+    with pytest.raises(
+        PhysicalAcceptedRiskArchiveError,
+        match=_exact(
+            "authenticated semantic fold dependency binding changed"
+        ),
+    ):
+        physical_module._fold_authenticated_physical_accepted_risk_rows(
+            archive, visit
+        )
+    assert callbacks == 1
+
+
+def test_authenticated_semantic_fold_terminally_refuses_archive_mutation(
+    tmp_path,
+):
+    _capture, archive = _build(tmp_path)
+    original = archive.result_access
+    callbacks = 0
+
+    def visit(_item):
+        nonlocal callbacks
+        callbacks += 1
+        if callbacks == archive.source_row_count:
+            object.__setattr__(archive, "result_access", True)
+
+    try:
+        with pytest.raises(
+            PhysicalAcceptedRiskArchiveError,
+            match=_exact(
+                "accepted-risk archive capability or risk classification changed"
+            ),
+        ):
+            physical_module._fold_authenticated_physical_accepted_risk_rows(
+                archive, visit
+            )
+    finally:
+        object.__setattr__(archive, "result_access", original)
+    assert callbacks == archive.source_row_count
+
+
+def test_authenticated_semantic_fold_never_rederives_provider_semantics():
+    source = inspect.getsource(
+        physical_module._make_authenticated_physical_accepted_risk_fold
+    )
+    assert "_PINNED_DERIVE_SOURCE_ROW" not in source
+    assert "_derive_source_row" not in source

@@ -197,7 +197,7 @@ PERMANENT_LOOK_AUTHORITY_PATH = (
 INFRASTRUCTURE_LOOK_LEDGER_SCHEMA = "arv2-infrastructure-look-ledger-v1"
 INFRASTRUCTURE_LOOK_LEDGER_ID_PREFIX = "arv2-infrastructure-look-ledger-"
 INFRASTRUCTURE_LOOK_LEDGER_HASH = (
-    "11987a12b72d06ea612b442e342ce0b1d2f28c503f0a3b1ca2cf721d8aaa7810"
+    "4a726bcdd9b7232f34a1eaf891f7b8f83334002396aa48720b19abd22391305e"
 )
 INFRASTRUCTURE_LOOK_LEDGER_FILENAME = (
     f"arv2_infrastructure_look_ledger.{INFRASTRUCTURE_LOOK_LEDGER_HASH}.json"
@@ -206,11 +206,11 @@ INFRASTRUCTURE_LOOK_LEDGER_PATH = (
     Path(__file__).resolve().parent / "specs" / INFRASTRUCTURE_LOOK_LEDGER_FILENAME
 )
 INFRASTRUCTURE_LOOK_LEDGER_ARTIFACT_SHA256 = (
-    "b1018c54128b9cea5ff0c960e0c6adeab803b085b9dde359f323246d0f82e802"
+    "e837946d6fe9d31f16d4a901f878e965036f6931f8ed5bb1806fdb5a1c83cdd9"
 )
 INFRASTRUCTURE_LOOK_LEDGER_MAX_BYTES = 64 * 1024
 INFRASTRUCTURE_LOOK_OWNER_DECISION_ID = (
-    "arv2-owner-discovery-look-reconciliation-20260914"
+    "arv2-owner-r082-infrastructure-look-accounting-20260917"
 )
 _DISCOVERY_RECONCILIATION_ARTIFACT_SHA256 = (
     "67071bcafa3ec65912983ba0c0834a5980ffaac63c0c2c75bb2f4c3720460a15"
@@ -532,6 +532,407 @@ def _reconciled_discovery_infrastructure_entries() -> list[dict[str, object]]:
     return entries
 
 
+def _r079_infrastructure_look_entry() -> dict[str, object]:
+    """Project the spent canary without claiming an aggregate output value."""
+
+    return {
+        "accounting_id": "arv2-infrastructure-look-pit-market-cap-membership-r079",
+        "operation_id": "arv2-qc-pit-market-cap-membership-coverage-r079",
+        "shared_look_ledger_entry_id": "R-079",
+        "look_class": (
+            "outcome_free_qc_pit_market_cap_membership_coverage_"
+            "infrastructure_research_look"
+        ),
+        "status": "Completed.",
+        "phase": "LOCKED_OUTPUT_READ_AMBIGUITY_NO_VALUES_INSPECTED",
+        "started_at_utc": "2026-09-17T07:00:00Z",
+        "finished_at_utc": None,
+        "project_id": 36643367,
+        "project_name": (
+            "26 ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE_RETRY - 20260917"
+        ),
+        "backtest_id": "a2b58090c188fd040217af6c302751b8",
+        "backtest_name": (
+            "ARV2 outcome-free PIT market-cap and ETF-membership coverage retry 1"
+        ),
+        "compile_id": (
+            "b59b398bbf9998e5d0f8e0d89de890b0-"
+            "9111c260885b3d38dbcf7442a7cd54ab"
+        ),
+        "plan_sha256": (
+            "b5d4385ef36764121aaf23ae4df4a4c08bca46a6137f6c8f3b047f207237698f"
+        ),
+        "projection_sha256": (
+            "fc7b6963a4b665bcc16999fa5543c314a9c284228d9e994c15590b90437c150b"
+        ),
+        "project_source_set_sha256": (
+            "d4a7b47ded6928e836c877fc00a1c310bcdad682e80ed1c347c4438d10f173f1"
+        ),
+        "launch_receipt_artifact_sha256": (
+            "cf76f4a0093a8c13086eb502c447e58ca5b5dca28a8fb7c2f933758c2ad78752"
+        ),
+        "launch_receipt_sha256": (
+            "334ec5d733f9fb40cb6a32f3d38da23539d64f6a3d6258be9b342c83f70fb300"
+        ),
+        "terminal_status_receipt_artifact_sha256": (
+            "b6cb6c10707ee401823da0f74e0ade5ecf32c976ba944430dd293a939ab854ea"
+        ),
+        "terminal_status_receipt_sha256": (
+            "ce92a3e69a21808e79fc379885ee8cd344064b68cee5fb6bd2138ec3cf6a4174"
+        ),
+        "output_read_permit_artifact_sha256": (
+            "ddf28ef22c2c1a9bbe91ea63cfec2eb285ba500773481eadd53d481c3a01e272"
+        ),
+        "output_read_permit_sha256": (
+            "7ec1c1ec41cc40043f8169e91ccc76ca9d02a5452681b77b452284963f46aa5f"
+        ),
+        "compile_state": "BuildSuccess",
+        "compile_submission_count": 1,
+        "backtest_submission_count": 1,
+        "conservative_research_look_count": 1,
+        "spent_before_submission": True,
+        "same_entry_retry_permitted": False,
+        "later_fresh_attempt_requires_new_authority_and_ledger_entry": True,
+        "organization_binding_authenticated": True,
+        "backtest_terminal_status_accessed": True,
+        "include_statistics": False,
+        "backtest_detail_endpoint_called": False,
+        "performance_statistics_inspected": False,
+        "result_values_inspected": False,
+        "output_read_permit_spent": True,
+        "output_read_outcome_ambiguous": True,
+        "terminal_pointer_value_inspected": False,
+        "content_addressed_output_value_inspected": False,
+        "aggregate_output_values_inspected": False,
+        "price_or_return_values_accessed": False,
+        "outcomes_accessed": False,
+        "raw_input_values_retained_or_disclosed": False,
+        "orders_permitted": False,
+        "development_evaluation_consumed": False,
+        "permanent_family_look_consumed": False,
+        "confirmatory_alpha_consumed": False,
+        "error": (
+            "output read became ambiguous after permit spend; no output object "
+            "value was inspected"
+        ),
+    }
+
+
+def _r080_infrastructure_look_entry() -> dict[str, object]:
+    """Project the bounded named-refusal attestation without outcome access."""
+
+    return {
+        "accounting_id": "arv2-infrastructure-look-pit-market-cap-membership-r080",
+        "operation_id": "arv2-qc-pit-market-cap-membership-summary-r080",
+        "shared_look_ledger_entry_id": "R-080",
+        "look_class": (
+            "outcome_free_qc_pit_market_cap_membership_coverage_"
+            "infrastructure_research_look"
+        ),
+        "status": "Completed.",
+        "phase": "COMPLETED_NAMED_REFUSAL_ATTESTATION_RECONCILED",
+        "started_at_utc": "2026-09-17T07:54:14Z",
+        "finished_at_utc": None,
+        "project_id": 36644379,
+        "project_name": (
+            "28 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R080 - 20260917"
+        ),
+        "backtest_id": "3a9dbca993f41ac41177d2c15bb84450",
+        "backtest_name": (
+            "ARV2 R080 outcome-free PIT market-cap and ETF-membership summary"
+        ),
+        "compile_id": (
+            "e91fc5cd71eb0d7fdeb69bed5c00dfd2-"
+            "357decf66161ed3141fc9657f453c5df"
+        ),
+        "plan_sha256": (
+            "8786f8fb98c52cf4f2292e0b2b7f88c8f0fe774913b642d1340fa8ef7b16ac08"
+        ),
+        "projection_sha256": (
+            "6e4128b67ff7604551bf263a7730a02d247af28d0e37fab5fda966b6882e225f"
+        ),
+        "project_source_set_sha256": (
+            "d511993d530a2ac223d6d9c02fcb303b58ff7ca86f4ae7bbe76509752190ae13"
+        ),
+        "submission_permit_artifact_sha256": (
+            "df8752ce6730c9e5cf0ce1f8dc0d2f5cd1c5dde46bd3d1ac623b79bede055038"
+        ),
+        "submission_permit_sha256": (
+            "148f14a30e170f742e73baf7f46f8a4e7a0e41378bf10a1477d282ada1ad8d81"
+        ),
+        "launch_receipt_artifact_sha256": (
+            "9acada7c62c63b973a52dfa9ad98565c634f0176e6403a902ac96037b439e70a"
+        ),
+        "launch_receipt_sha256": (
+            "1b1bdc49a29cb3274f574d5b6c9d9e147ca31908dbfd7ea98ac8d638d2eba6e0"
+        ),
+        "terminal_status_receipt_artifact_sha256": (
+            "df7c98a7e7b8c35ae028d35ef08b26fed131c8cf51970a55fa0657ecab4f9759"
+        ),
+        "terminal_status_receipt_sha256": (
+            "c1e802860139040d3c4a2a89ee6d9635f90a8bd70b1bacf90f069cddf79d87b2"
+        ),
+        "output_read_permit_artifact_sha256": (
+            "8038446dc52596700d83eee96e2d0335047cdf0ec0776a76215a0410e67906ae"
+        ),
+        "output_read_permit_sha256": (
+            "684f21fcbdf62494e99e74ee8a8e229f3c088fd61b5353d48aa40c9027cc66ec"
+        ),
+        "attestation_artifact_sha256": (
+            "0ca3b24f005475d912a8e74283aef112c9f93331991f8d97a8cc1441818bfcf3"
+        ),
+        "attestation_schema": (
+            "arv2-qc-pit-market-cap-membership-coverage-attestation-v1"
+        ),
+        "attestation_status": "named_refusal",
+        "attestation_safe_reason": (
+            "pit_coverage_refused_ValueError_1b17331bb939b176"
+        ),
+        "compile_state": "BuildSuccess",
+        "compile_submission_count": 1,
+        "backtest_submission_count": 1,
+        "conservative_research_look_count": 1,
+        "spent_before_submission": True,
+        "same_entry_retry_permitted": False,
+        "later_fresh_attempt_requires_new_authority_and_ledger_entry": True,
+        "organization_binding_authenticated": True,
+        "backtest_terminal_status_accessed": True,
+        "include_statistics": False,
+        "backtests_read": True,
+        "maximum_backtests_read_calls": 1,
+        "selected_summary_statistic": (
+            "ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE"
+        ),
+        "bounded_attestation_selected": True,
+        "aggregate_coverage_counts_inspected": False,
+        "object_store_export_performed": False,
+        "full_receipt_or_pointer_exported": False,
+        "performance_statistics_inspected": False,
+        "price_or_return_values_accessed": False,
+        "outcomes_accessed": False,
+        "raw_input_values_retained_or_disclosed": False,
+        "security_identifiers_retained_or_disclosed": False,
+        "constituent_weights_retained_or_disclosed": False,
+        "market_cap_values_retained_or_disclosed": False,
+        "orders_permitted": False,
+        "development_evaluation_consumed": False,
+        "permanent_family_look_consumed": False,
+        "confirmatory_alpha_consumed": False,
+    }
+
+
+def _r081_infrastructure_look_entry() -> dict[str, object]:
+    """Project the second bounded named refusal without outcome access."""
+
+    return {
+        "accounting_id": "arv2-infrastructure-look-pit-market-cap-membership-r081",
+        "operation_id": "arv2-qc-pit-market-cap-membership-summary-r081",
+        "shared_look_ledger_entry_id": "R-081",
+        "look_class": (
+            "outcome_free_qc_pit_market_cap_membership_coverage_"
+            "infrastructure_research_look"
+        ),
+        "status": "Completed.",
+        "phase": "COMPLETED_NAMED_REFUSAL_ATTESTATION_RECONCILED",
+        "started_at_utc": "2026-09-17T08:13:05Z",
+        "finished_at_utc": None,
+        "project_id": 36644829,
+        "project_name": (
+            "29 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R081 - 20260917"
+        ),
+        "backtest_id": "1cdc40ccd41877743ad907020a6e2e31",
+        "backtest_name": (
+            "ARV2 R081 outcome-free PIT market-cap and ETF-membership summary retry 1"
+        ),
+        "compile_id": (
+            "0371095ee1bc3fbf7f5149ea6a9510b0-"
+            "326f53ae48b19268d987c227d49100d8"
+        ),
+        "plan_sha256": (
+            "bfddaa18a7c11c38a6ec1b66f18a6904590b2bb71c67b00bf733525bd00838f8"
+        ),
+        "projection_sha256": (
+            "17d4cc56a0b3e2a28e442c74c4ff52bea1d57d45fa4cfd17c7da1b93c98887f3"
+        ),
+        "project_source_set_sha256": (
+            "db2cb863496f9c629361ad4fae68ab508bbc2fb30d46f1645dfb20582d420c34"
+        ),
+        "submission_permit_artifact_sha256": (
+            "7546f222dd9c64888cf0bda5ce8fb7b73bbfe8bc1f5ff1b230980c70688e09dc"
+        ),
+        "submission_permit_sha256": (
+            "23cf8385c3692f82ea847d77b22d32e302a21bfb26e058f36258e6a3a785fed2"
+        ),
+        "launch_receipt_artifact_sha256": (
+            "43507b6f28a5757e5ba48c4a852ec5796b9138b66e347c6a0f188ea00c73b444"
+        ),
+        "launch_receipt_sha256": (
+            "abb700387adfa61ffe46fb32eacf05dba4ee8b21b6ccc3926bf73b603733a8a8"
+        ),
+        "terminal_status_receipt_artifact_sha256": (
+            "2024e8a319fc9f4c459d153400210b78cde9c82c4fe772caf50def070106e5c2"
+        ),
+        "terminal_status_receipt_sha256": (
+            "cc95bf29b46abb0dee68fde6130636ac0243ff0d5474faa19d1484abbcb19ff6"
+        ),
+        "output_read_permit_artifact_sha256": (
+            "3feafb0a2b2b94a90e08ae9a0c7a668998aa56bdf1c639efc1db9ffc79b03543"
+        ),
+        "output_read_permit_sha256": (
+            "56442d4aafac600a9ef537b4ea7be1fc648c7a39e4b98a02f3427930849107d8"
+        ),
+        "attestation_artifact_sha256": (
+            "4b12471d87f9a7ed918a6a292775e6bc2527deaabc27bda7b3e80c9a2a0af8a1"
+        ),
+        "attestation_schema": (
+            "arv2-qc-pit-market-cap-membership-coverage-attestation-v1"
+        ),
+        "attestation_status": "named_refusal",
+        "attestation_safe_reason": (
+            "pit_coverage_refused_ValueError_bef7b6927d4aa871"
+        ),
+        "compile_state": "BuildSuccess",
+        "compile_submission_count": 1,
+        "backtest_submission_count": 1,
+        "conservative_research_look_count": 1,
+        "spent_before_submission": True,
+        "same_entry_retry_permitted": False,
+        "later_fresh_attempt_requires_new_authority_and_ledger_entry": True,
+        "organization_binding_authenticated": True,
+        "backtest_terminal_status_accessed": True,
+        "include_statistics": False,
+        "backtests_read": True,
+        "maximum_backtests_read_calls": 1,
+        "selected_summary_statistic": (
+            "ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE"
+        ),
+        "bounded_attestation_selected": True,
+        "aggregate_coverage_counts_inspected": False,
+        "object_store_export_performed": False,
+        "full_receipt_or_pointer_exported": False,
+        "performance_statistics_inspected": False,
+        "price_or_return_values_accessed": False,
+        "outcomes_accessed": False,
+        "raw_input_values_retained_or_disclosed": False,
+        "security_identifiers_retained_or_disclosed": False,
+        "constituent_weights_retained_or_disclosed": False,
+        "market_cap_values_retained_or_disclosed": False,
+        "orders_permitted": False,
+        "development_evaluation_consumed": False,
+        "permanent_family_look_consumed": False,
+        "confirmatory_alpha_consumed": False,
+    }
+
+
+def _r082_infrastructure_look_entry() -> dict[str, object]:
+    """Project the bounded successful v2 coverage attestation without outcomes."""
+
+    return {
+        "accounting_id": "arv2-infrastructure-look-pit-market-cap-membership-r082",
+        "operation_id": "arv2-qc-pit-market-cap-membership-summary-r082",
+        "shared_look_ledger_entry_id": "R-082",
+        "look_class": (
+            "outcome_free_qc_pit_market_cap_membership_coverage_"
+            "infrastructure_research_look"
+        ),
+        "status": "Completed.",
+        "phase": "COMPLETED_BOUNDED_COVERAGE_ATTESTATION_RECONCILED",
+        "started_at_utc": "2026-09-17T08:42:55Z",
+        "finished_at_utc": None,
+        "project_id": 36645473,
+        "project_name": (
+            "30 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R082 - 20260917"
+        ),
+        "backtest_id": "c90394212ee91c89f0428b3533de45d9",
+        "backtest_name": (
+            "ARV2 R082 outcome-free PIT market-cap and ETF-membership summary retry 2"
+        ),
+        "compile_id": (
+            "6f80f0c464f878f69df94fd5ef798366-"
+            "c31cece9580ac7be5ea7293a9100cd3e"
+        ),
+        "plan_sha256": (
+            "dfdd5f9920bd245c72ed1609f696997f620cd2c4f40e0b62f897aa081b1b1ba9"
+        ),
+        "projection_sha256": (
+            "fb892cce42d48e658137843e5690177054c9b58470c7ee1937607b59591d6583"
+        ),
+        "project_source_set_sha256": (
+            "9c71c5650813c4e9281f8746edd4ff2c658c1883a60f89d779cb75af6e7b812e"
+        ),
+        "submission_permit_artifact_sha256": (
+            "5b192cf286bc7320e66d43ae93559c89a95ef8ee2fbf06e2951b84b82d57d35b"
+        ),
+        "submission_permit_sha256": (
+            "c5ade4b694282d477e9fbf4bc1b313bffd6fff17df770c5f5ab3ca53a05d0990"
+        ),
+        "launch_receipt_artifact_sha256": (
+            "3c7fc06f4f2933c72de9cad05205efb386ad0a03bf9ccaa8a977a1d9f8e7d7e9"
+        ),
+        "launch_receipt_sha256": (
+            "c6a9173748ffe3691d2dc1840ea8784c54a9ec05bace8f00d5c53e19a266f6ab"
+        ),
+        "terminal_status_receipt_artifact_sha256": (
+            "a9e82a7c3285ce8381c49eaf37e12f977d3354fa3eb93e00ade28e0d3aa25799"
+        ),
+        "terminal_status_receipt_sha256": (
+            "b5971e3bed4879bb3b5460a68719d1b1333c7afc117d4d105e8068297473c832"
+        ),
+        "output_read_permit_artifact_sha256": (
+            "e6b66a5f359be2aecef449884b8c69deab66109fc790c9cdf837a80d9c2fdb62"
+        ),
+        "output_read_permit_sha256": (
+            "fb7f4fc95b2bab6ab58290cbdbe12504cdeca1341e6573a47167cdf5d4032f25"
+        ),
+        "attestation_artifact_sha256": (
+            "60e3e3185a301aec3de7b14d5f4ad58cd10dfc4b30c39d387083fea7db74895b"
+        ),
+        "attestation_receipt_sha256": (
+            "86e52b8653290d5aa583ef0b1e1aa4fb0949a3d37ec41c13f311f6c524b6e45f"
+        ),
+        "attestation_schema": (
+            "arv2-qc-pit-market-cap-membership-coverage-attestation-v2"
+        ),
+        "attestation_status": "completed",
+        "decision_session_count": 16,
+        "passed_session_count": 16,
+        "history_call_count": 16,
+        "fetched_source_row_count": 1_944_801,
+        "fundamental_duplicate_exact_sid_count": 2,
+        "fundamental_duplicate_exact_sid_row_count": 2,
+        "compile_state": "BuildSuccess",
+        "compile_submission_count": 1,
+        "backtest_submission_count": 1,
+        "conservative_research_look_count": 1,
+        "spent_before_submission": True,
+        "same_entry_retry_permitted": False,
+        "later_fresh_attempt_requires_new_authority_and_ledger_entry": True,
+        "organization_binding_authenticated": True,
+        "backtest_terminal_status_accessed": True,
+        "include_statistics": False,
+        "backtests_read": True,
+        "maximum_backtests_read_calls": 1,
+        "selected_summary_statistic": (
+            "ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE"
+        ),
+        "bounded_attestation_selected": True,
+        "aggregate_coverage_counts_inspected": True,
+        "object_store_export_performed": False,
+        "full_receipt_or_pointer_exported": False,
+        "performance_statistics_inspected": False,
+        "price_or_return_values_accessed": False,
+        "outcomes_accessed": False,
+        "raw_input_values_retained_or_disclosed": False,
+        "security_identifiers_retained_or_disclosed": False,
+        "constituent_weights_retained_or_disclosed": False,
+        "market_cap_values_retained_or_disclosed": False,
+        "orders_permitted": False,
+        "development_evaluation_consumed": False,
+        "permanent_family_look_consumed": False,
+        "confirmatory_alpha_consumed": False,
+    }
+
+
 def _infrastructure_look_ledger_seed() -> dict[str, object]:
     """Return the owner-confirmed accounting record without its identity."""
 
@@ -544,12 +945,12 @@ def _infrastructure_look_ledger_seed() -> dict[str, object]:
         ),
         "ledger_id": None,
         "ledger_hash": None,
-        "ledger_sequence": 2,
+        "ledger_sequence": 6,
         "append_only_contract": {
-            "entry_count": 23,
-            "predecessor_entry_count": 1,
+            "entry_count": 27,
+            "predecessor_entry_count": 26,
             "predecessor_ledger_artifact_sha256": (
-                "9502bc3b1662b5f2838d42d4adf6c8c91141395b89c9ba77edcd31542bd7d14f"
+                "d268f6e678c6d506fbccf5b675d0c8ca99e4484c059479bc159febe0733c240c"
             ),
             "successor_must_retain_every_prior_entry": True,
         },
@@ -557,8 +958,17 @@ def _infrastructure_look_ledger_seed() -> dict[str, object]:
             "decision_id": INFRASTRUCTURE_LOOK_OWNER_DECISION_ID,
             "b5c_consumed_one_infrastructure_research_look": True,
             "discovery_backtests_counted_conservatively": 22,
+            "r079_counted_conservatively_after_backtest_launch": True,
+            "r079_output_read_ambiguity_did_not_unspend_look": True,
+            "r080_counted_after_backtest_launch": True,
+            "r080_bounded_named_refusal_read_did_not_change_look_class": True,
+            "r081_counted_after_backtest_launch": True,
+            "r081_bounded_named_refusal_read_did_not_change_look_class": True,
+            "r082_counted_after_backtest_launch": True,
+            "r082_bounded_success_read_did_not_change_look_class": True,
             "each_launch_retained_as_a_distinct_non_overwriting_look": True,
             "development_family_permanent_and_alpha_counts_remain_unchanged": True,
+            "external_arv2_development_evaluation_total_remains_21": True,
             "ambiguous_submission_is_spent_and_nonretryable": True,
             "this_accounting_artifact_grants_no_access_or_action_authority": True,
         },
@@ -641,9 +1051,15 @@ def _infrastructure_look_ledger_seed() -> dict[str, object]:
                 ),
             }
         ]
-        + _reconciled_discovery_infrastructure_entries(),
+        + _reconciled_discovery_infrastructure_entries()
+        + [
+            _r079_infrastructure_look_entry(),
+            _r080_infrastructure_look_entry(),
+            _r081_infrastructure_look_entry(),
+            _r082_infrastructure_look_entry(),
+        ],
         "totals": {
-            "infrastructure_research_looks_spent": 23,
+            "infrastructure_research_looks_spent": 27,
             "development_evaluations_spent": 0,
             "permanent_family_looks_spent": 0,
             "confirmatory_alpha_spent": False,

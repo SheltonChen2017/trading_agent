@@ -1129,6 +1129,7 @@ def _build_transport_capability_authority():
                 adapter_key
                 not in {
                     "fundamental",
+                    "pit_market_cap_membership_probe",
                     "preopen",
                     "preopen_physical_upload",
                     "preopen_prereview",

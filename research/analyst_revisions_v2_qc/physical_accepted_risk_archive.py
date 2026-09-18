@@ -35,9 +35,11 @@ from research.analyst_revisions_v2.accepted_risk_input_pair import (
     AcceptedRiskSourceRow,
     BreakdownDimension,
     CapturePageBinding,
+    CaptureRowLocator,
     InputView,
     MassiveSourceRole,
     RowDisposition,
+    ViewEligibility,
 )
 from research.analyst_revisions_v2.canonical import (
     CanonicalEvidenceError,
@@ -75,6 +77,10 @@ _PINNED_CAPTURE_PAGE_TYPE = CapturePageBinding
 _PINNED_SOURCE_ROW_POST_INIT = AcceptedRiskSourceRow.__post_init__
 _PINNED_SOURCE_ROW_TO_RECORD = AcceptedRiskSourceRow.to_record
 _PINNED_SOURCE_ROW_TYPE = AcceptedRiskSourceRow
+_PINNED_CAPTURE_ROW_LOCATOR_POST_INIT = CaptureRowLocator.__post_init__
+_PINNED_CAPTURE_ROW_LOCATOR_TYPE = CaptureRowLocator
+_PINNED_VIEW_ELIGIBILITY_POST_INIT = ViewEligibility.__post_init__
+_PINNED_VIEW_ELIGIBILITY_TYPE = ViewEligibility
 _PINNED_SOURCE_ROLE_TYPE = MassiveSourceRole
 _PINNED_INPUT_VIEW_TYPE = InputView
 _PINNED_ROW_DISPOSITION_TYPE = RowDisposition
@@ -326,6 +332,12 @@ def _require_dependency_bindings() -> None:
             or AcceptedRiskSourceRow.__post_init__
             is not _PINNED_SOURCE_ROW_POST_INIT
             or AcceptedRiskSourceRow.to_record is not _PINNED_SOURCE_ROW_TO_RECORD
+            or CaptureRowLocator is not _PINNED_CAPTURE_ROW_LOCATOR_TYPE
+            or CaptureRowLocator.__post_init__
+            is not _PINNED_CAPTURE_ROW_LOCATOR_POST_INIT
+            or ViewEligibility is not _PINNED_VIEW_ELIGIBILITY_TYPE
+            or ViewEligibility.__post_init__
+            is not _PINNED_VIEW_ELIGIBILITY_POST_INIT
             or MassiveSourceRole is not _PINNED_SOURCE_ROLE_TYPE
             or InputView is not _PINNED_INPUT_VIEW_TYPE
             or RowDisposition is not _PINNED_ROW_DISPOSITION_TYPE
@@ -475,6 +487,20 @@ class _PinnedArchiveLeaf:
     expected_byte_count: int
     expected_sha256: str
     name: str
+
+
+@dataclasses.dataclass(frozen=True, slots=True)
+class _AuthenticatedAcceptedRiskSemanticRow:
+    """One source-linked semantic row exposed only during a total fold.
+
+    ``canonical_record_bytes`` is the exact LF-terminated canonical form of
+    ``row.to_record()``.  The wrapper is not independently forge-proof; its
+    authority exists only while it is supplied by the authenticated fold and
+    only if that fold subsequently returns successfully.
+    """
+
+    row: AcceptedRiskSourceRow
+    canonical_record_bytes: bytes
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -4989,6 +5015,649 @@ def iter_physical_accepted_risk_rows(
             os.close(source_fd)
     finally:
         os.close(root_fd)
+
+
+def _make_authenticated_physical_accepted_risk_fold() -> Callable[
+    [
+        PhysicalAcceptedRiskArchive,
+        Callable[[_AuthenticatedAcceptedRiskSemanticRow], None],
+    ],
+    None,
+]:
+    """Seal the fast semantic fold over the exact helpers it is allowed to use."""
+
+    require_archive = require_physical_accepted_risk_archive
+    archive_seed_from_value = _archive_seed_from_value
+    canonical_bytes = _PINNED_CANONICAL_JSON_BYTES
+    sha256 = _PINNED_SHA256_BYTES
+    decode = _PINNED_DECODE_UTF8
+    strict_loads = _PINNED_STRICT_JSON_LOADS
+    parse_date_value = _PINNED_PARSE_DATE
+    parse_timestamp_value = _PINNED_PARSE_UTC_TIMESTAMP
+    require_dependencies = _require_dependency_bindings
+    open_directory = _open_private_directory
+    open_child_directory = _open_private_child_directory
+    require_reopened_directory = _require_reopened_directory_identity
+    require_child_identity = _require_pinned_child_identity
+    require_inventory = _require_inventory
+    pin_leaf_identities = _pin_archive_leaf_identities
+    require_leaf_identities = _require_archive_leaf_identities
+    require_manifest = _require_exact_archive_manifest_bytes
+    read_regular = _read_private_regular_at
+    directory_identity = _directory_identity
+    archive_fingerprint = _archive_fingerprint
+    archive_topology = _archive_topology
+    preflight_archive = _preflight_archive_shape
+    source_row_type = _PINNED_SOURCE_ROW_TYPE
+    source_row_init = _PINNED_SOURCE_ROW_TYPE.__init__
+    source_row_post_init = _PINNED_SOURCE_ROW_POST_INIT
+    source_row_to_record = _PINNED_SOURCE_ROW_TO_RECORD
+    locator_type = _PINNED_CAPTURE_ROW_LOCATOR_TYPE
+    locator_init = _PINNED_CAPTURE_ROW_LOCATOR_TYPE.__init__
+    locator_post_init = _PINNED_CAPTURE_ROW_LOCATOR_POST_INIT
+    locator_to_record = _PINNED_CAPTURE_ROW_LOCATOR_TYPE.to_record
+    view_type = _PINNED_VIEW_ELIGIBILITY_TYPE
+    view_init = _PINNED_VIEW_ELIGIBILITY_TYPE.__init__
+    view_post_init = _PINNED_VIEW_ELIGIBILITY_POST_INIT
+    view_to_record = _PINNED_VIEW_ELIGIBILITY_TYPE.to_record
+    wrapper_type = _AuthenticatedAcceptedRiskSemanticRow
+    wrapper_init = _AuthenticatedAcceptedRiskSemanticRow.__init__
+    wrapper_setattr = _AuthenticatedAcceptedRiskSemanticRow.__setattr__
+    role_type = _PINNED_SOURCE_ROLE_TYPE
+    input_view_type = _PINNED_INPUT_VIEW_TYPE
+    disposition_type = _PINNED_ROW_DISPOSITION_TYPE
+    role_order = _ROLE_ORDER
+    dispositions = tuple(disposition_type)
+    current_view = input_view_type.CURRENT_ROW
+    censored_view = input_view_type.CONSERVATIVE_CENSORED
+    max_capture_page_bytes = _PINNED_MAX_CAPTURE_PAGE_BYTES
+    max_bridge_row_bytes = _PINNED_MAX_BRIDGE_ROW_BYTES
+    max_semantic_row_bytes = MAX_SEMANTIC_ROW_BYTES
+    max_semantic_shard_bytes = MAX_DERIVED_SHARD_BYTES
+    authorities = _AUTHORITIES
+    authority_lock = _AUTHORITY_LOCK
+    getpid = os.getpid
+    close = os.close
+
+    semantic_row_keys = tuple(
+        sorted(
+            (
+                "locator",
+                "provider_event_id",
+                "event_date",
+                "event_year",
+                "raw_event_time",
+                "normalized_last_updated_at",
+                "last_updated_calendar_date",
+                "clock_interpretation",
+                "action_label",
+                "firm_label",
+                "current_restated_security_label",
+                "raw_row_sha256",
+                "current_view",
+                "censored_view",
+            )
+        )
+    )
+    locator_keys = tuple(
+        sorted(
+            (
+                "capture_id",
+                "source_role",
+                "page_number",
+                "provider_rows_sha256",
+                "row_offset",
+                "raw_row_sha256",
+            )
+        )
+    )
+    view_keys = tuple(
+        sorted(
+            (
+                "view",
+                "included",
+                "disposition",
+                "eligible_session",
+                "eligible_at",
+                "decision_cutoff_at",
+                "event_clock_not_after_cutoff",
+                "last_updated_not_after_cutoff",
+            )
+        )
+    )
+
+    def require_fold_seal() -> None:
+        """Refuse class-method mutation before another callback can observe it."""
+
+        if (
+            source_row_type.__init__ is not source_row_init
+            or source_row_type.__post_init__ is not source_row_post_init
+            or source_row_type.to_record is not source_row_to_record
+            or locator_type.__init__ is not locator_init
+            or locator_type.__post_init__ is not locator_post_init
+            or locator_type.to_record is not locator_to_record
+            or view_type.__init__ is not view_init
+            or view_type.__post_init__ is not view_post_init
+            or view_type.to_record is not view_to_record
+            or wrapper_type.__init__ is not wrapper_init
+            or wrapper_type.__setattr__ is not wrapper_setattr
+            or tuple(disposition_type) != dispositions
+            or tuple(role_type) != role_order
+            or current_view is not input_view_type.CURRENT_ROW
+            or censored_view is not input_view_type.CONSERVATIVE_CENSORED
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "authenticated semantic fold dependency binding changed"
+            )
+
+    def exact_object(
+        candidate: object, keys: tuple[str, ...], name: str
+    ) -> dict[str, Any]:
+        if type(candidate) is not dict or tuple(sorted(candidate)) != keys:
+            raise PhysicalAcceptedRiskArchiveError(
+                f"{name} has unknown or missing fields"
+            )
+        return candidate
+
+    def optional_exact_string(candidate: object, name: str) -> str | None:
+        if type(candidate) not in (str, type(None)):
+            raise PhysicalAcceptedRiskArchiveError(
+                f"{name} changed scalar type"
+            )
+        return candidate
+
+    def parse_disposition(candidate: object) -> RowDisposition:
+        if type(candidate) is not str:
+            raise PhysicalAcceptedRiskArchiveError(
+                "semantic view disposition changed scalar type"
+            )
+        matches = tuple(item for item in dispositions if item.value == candidate)
+        if len(matches) != 1:
+            raise PhysicalAcceptedRiskArchiveError(
+                "semantic view disposition is not canonical"
+            )
+        return matches[0]
+
+    def parse_view(
+        candidate: object, expected_view: InputView
+    ) -> ViewEligibility:
+        raw = exact_object(candidate, view_keys, "accepted-risk semantic view")
+        if type(raw["view"]) is not str or raw["view"] != expected_view.value:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic view label changed"
+            )
+        if type(raw["included"]) is not bool:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic view inclusion changed scalar type"
+            )
+        strings = tuple(
+            optional_exact_string(raw[name], f"semantic view {name}")
+            for name in (
+                "eligible_session",
+                "eligible_at",
+                "decision_cutoff_at",
+            )
+        )
+        booleans = tuple(
+            raw[name]
+            for name in (
+                "event_clock_not_after_cutoff",
+                "last_updated_not_after_cutoff",
+            )
+        )
+        if any(type(item) not in (bool, type(None)) for item in booleans):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic view clock flag changed scalar type"
+            )
+        try:
+            return view_type(
+                view=expected_view,
+                included=raw["included"],
+                disposition=parse_disposition(raw["disposition"]),
+                eligible_session=strings[0],
+                eligible_at=strings[1],
+                decision_cutoff_at=strings[2],
+                event_clock_not_after_cutoff=booleans[0],
+                last_updated_not_after_cutoff=booleans[1],
+            )
+        except (AcceptedRiskInputError, CanonicalEvidenceError) as exc:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic view did not reauthenticate"
+            ) from exc
+
+    def provider_rows(payload: bytes) -> Iterator[bytes]:
+        if type(payload) is not bytes or (
+            payload and (not payload.endswith(b"\n") or b"\r" in payload)
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "provider rows are not exact LF-terminated bytes"
+            )
+        start = 0
+        while start < len(payload):
+            end = payload.find(b"\n", start)
+            if end < 0:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "provider row page lost its LF terminator"
+                )
+            raw = payload[start : end + 1]
+            if len(raw) > max_bridge_row_bytes or len(raw) == 1:
+                raise PhysicalAcceptedRiskArchiveCapacityError(
+                    "provider row exceeds the fixed per-row byte bound"
+                )
+            try:
+                parsed = strict_loads(
+                    decode(raw[:-1], "folded Massive provider row"),
+                    "folded Massive provider row",
+                )
+            except CanonicalEvidenceError as exc:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "provider row is not strict JSON"
+                ) from exc
+            if type(parsed) is not dict:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "provider row is not a JSON object"
+                )
+            yield raw
+            start = end + 1
+
+    def semantic_rows(payload: bytes) -> Iterator[bytes]:
+        if type(payload) is not bytes or (
+            payload and (not payload.endswith(b"\n") or b"\r" in payload)
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "semantic rows are not exact LF-terminated bytes"
+            )
+        start = 0
+        while start < len(payload):
+            end = payload.find(b"\n", start)
+            if end < 0:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "semantic row page lost its LF terminator"
+                )
+            raw = payload[start : end + 1]
+            if len(raw) > max_semantic_row_bytes or len(raw) == 1:
+                raise PhysicalAcceptedRiskArchiveCapacityError(
+                    "semantic row exceeds the fixed per-row byte bound"
+                )
+            yield raw
+            start = end + 1
+
+    def reconstruct(
+        *,
+        archive: PhysicalAcceptedRiskArchive,
+        descriptor: AcceptedRiskShardDescriptor,
+        row_offset: int,
+        source_row_bytes: bytes,
+        semantic_row_bytes: bytes,
+    ) -> _AuthenticatedAcceptedRiskSemanticRow:
+        try:
+            parsed = strict_loads(
+                decode(
+                    semantic_row_bytes[:-1],
+                    "folded accepted-risk semantic row",
+                ),
+                "folded accepted-risk semantic row",
+            )
+        except CanonicalEvidenceError as exc:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic row is not strict JSON"
+            ) from exc
+        raw = exact_object(
+            parsed, semantic_row_keys, "accepted-risk semantic row"
+        )
+        locator_raw = exact_object(
+            raw["locator"], locator_keys, "accepted-risk semantic locator"
+        )
+        raw_row_sha256 = sha256(source_row_bytes)
+        if (
+            type(locator_raw["capture_id"]) is not str
+            or locator_raw["capture_id"] != archive.capture_id
+            or type(locator_raw["source_role"]) is not str
+            or locator_raw["source_role"] != descriptor.source_role.value
+            or type(locator_raw["page_number"]) is not int
+            or locator_raw["page_number"] != descriptor.page_number
+            or type(locator_raw["provider_rows_sha256"]) is not str
+            or locator_raw["provider_rows_sha256"] != descriptor.source_sha256
+            or type(locator_raw["row_offset"]) is not int
+            or locator_raw["row_offset"] != row_offset
+            or type(locator_raw["raw_row_sha256"]) is not str
+            or locator_raw["raw_row_sha256"] != raw_row_sha256
+            or type(raw["raw_row_sha256"]) is not str
+            or raw["raw_row_sha256"] != raw_row_sha256
+        ):
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic locator does not match its source row"
+            )
+        provider_event_id = optional_exact_string(
+            raw["provider_event_id"], "semantic provider_event_id"
+        )
+        event_date = optional_exact_string(
+            raw["event_date"], "semantic event_date"
+        )
+        if type(raw["event_year"]) not in (int, type(None)):
+            raise PhysicalAcceptedRiskArchiveError(
+                "semantic event_year changed scalar type"
+            )
+        raw_event_time = optional_exact_string(
+            raw["raw_event_time"], "semantic raw_event_time"
+        )
+        normalized_last_updated_at = optional_exact_string(
+            raw["normalized_last_updated_at"],
+            "semantic normalized_last_updated_at",
+        )
+        last_updated_calendar_date = optional_exact_string(
+            raw["last_updated_calendar_date"],
+            "semantic last_updated_calendar_date",
+        )
+        for name in (
+            "clock_interpretation",
+            "action_label",
+            "firm_label",
+            "current_restated_security_label",
+        ):
+            if type(raw[name]) is not str:
+                raise PhysicalAcceptedRiskArchiveError(
+                    f"semantic {name} changed scalar type"
+                )
+        if event_date is not None:
+            try:
+                parsed_event_date = parse_date_value(
+                    event_date, "semantic event_date"
+                )
+            except CanonicalEvidenceError as exc:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "semantic event_date is invalid"
+                ) from exc
+            if raw["event_year"] != parsed_event_date.year:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "semantic event date and year disagree"
+                )
+        elif raw["event_year"] is not None:
+            raise PhysicalAcceptedRiskArchiveError(
+                "semantic event date and year are not jointly absent"
+            )
+        for candidate, name in (
+            (normalized_last_updated_at, "normalized_last_updated_at"),
+        ):
+            if candidate is not None:
+                try:
+                    parse_timestamp_value(candidate, f"semantic {name}")
+                except CanonicalEvidenceError as exc:
+                    raise PhysicalAcceptedRiskArchiveError(
+                        f"semantic {name} is invalid"
+                    ) from exc
+        if last_updated_calendar_date is not None:
+            try:
+                parse_date_value(
+                    last_updated_calendar_date,
+                    "semantic last_updated_calendar_date",
+                )
+            except CanonicalEvidenceError as exc:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "semantic last_updated_calendar_date is invalid"
+                ) from exc
+        try:
+            locator = locator_type(
+                capture_id=archive.capture_id,
+                source_role=descriptor.source_role,
+                page_number=descriptor.page_number,
+                provider_rows_sha256=descriptor.source_sha256,
+                row_offset=row_offset,
+                raw_row_sha256=raw_row_sha256,
+            )
+            row = source_row_type(
+                locator=locator,
+                raw_row_bytes=source_row_bytes,
+                provider_event_id=provider_event_id,
+                event_date=event_date,
+                event_year=raw["event_year"],
+                raw_event_time=raw_event_time,
+                normalized_last_updated_at=normalized_last_updated_at,
+                last_updated_calendar_date=last_updated_calendar_date,
+                clock_interpretation=raw["clock_interpretation"],
+                action_label=raw["action_label"],
+                firm_label=raw["firm_label"],
+                current_restated_security_label=raw[
+                    "current_restated_security_label"
+                ],
+                current_view=parse_view(raw["current_view"], current_view),
+                censored_view=parse_view(raw["censored_view"], censored_view),
+            )
+        except (AcceptedRiskInputError, CanonicalEvidenceError) as exc:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic row did not reauthenticate"
+            ) from exc
+        canonical_record = canonical_bytes(source_row_to_record(row))
+        if canonical_record != semantic_row_bytes:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk semantic row is not its canonical source-linked record"
+            )
+        return wrapper_type(
+            row=row,
+            canonical_record_bytes=canonical_record,
+        )
+
+    def fold_authenticated_physical_accepted_risk_rows(
+        value: PhysicalAcceptedRiskArchive,
+        visit_row: Callable[[_AuthenticatedAcceptedRiskSemanticRow], None],
+    ) -> None:
+        """Visit the fast source-linked row projection as one total operation.
+
+        Every source and semantic shard is fully read and authenticated before
+        the first callback for that shard.  Callback observations are
+        provisional: callers must publish or otherwise trust accumulated state
+        only after this function returns, because terminal reauthentication can
+        still refuse the complete fold.  This API intentionally does not yield.
+        """
+
+        require_fold_seal()
+        require_dependencies()
+        if not callable(visit_row):
+            raise PhysicalAcceptedRiskArchiveError(
+                "authenticated semantic fold visitor must be callable"
+            )
+        archive = require_archive(value)
+        archive_seed = archive_seed_from_value(archive)
+        expected_manifest = canonical_bytes(
+            {
+                **archive_seed,
+                "archive_id": archive.archive_id,
+                "archive_sha256": archive.archive_sha256,
+            }
+        )
+        with authority_lock:
+            physical_authority = authorities.get(id(archive))
+        if physical_authority is None or physical_authority[0]() is not archive:
+            raise PhysicalAcceptedRiskArchiveError(
+                "accepted-risk archive is not current builder authority"
+            )
+        expected_fingerprint = physical_authority[1]
+        expected_topology = physical_authority[2]
+        expected_directories = physical_authority[3]
+        expected_pid = physical_authority[4]
+        root_fd = open_directory(
+            archive.archive_path, "accepted-risk archive"
+        )
+        source_fd: int | None = None
+        rows_fd: int | None = None
+        observed_rows = 0
+        role_counts = {role: 0 for role in role_order}
+        current_included = 0
+        censored_included = 0
+        disagreements = 0
+        try:
+            require_reopened_directory(
+                archive.archive_path,
+                root_fd,
+                name="accepted-risk archive",
+                private_final=True,
+            )
+            source_fd = open_child_directory(root_fd, SOURCE_DIRECTORY)
+            rows_fd = open_child_directory(root_fd, ROW_DIRECTORY)
+            if (
+                directory_identity(os.fstat(root_fd)),
+                directory_identity(os.fstat(source_fd)),
+                directory_identity(os.fstat(rows_fd)),
+            ) != expected_directories:
+                raise PhysicalAcceptedRiskArchiveError(
+                    "accepted-risk archive physical directory authority changed"
+                )
+            require_child_identity(
+                root_fd,
+                SOURCE_DIRECTORY,
+                source_fd,
+                "accepted-risk source directory",
+            )
+            require_child_identity(
+                root_fd,
+                ROW_DIRECTORY,
+                rows_fd,
+                "accepted-risk row directory",
+            )
+            require_inventory(root_fd, source_fd, rows_fd, archive)
+            leaf_identities = pin_leaf_identities(
+                root_fd, source_fd, rows_fd, archive
+            )
+            for descriptor in archive.shards:
+                require_leaf_identities(
+                    root_fd, source_fd, rows_fd, leaf_identities
+                )
+                filename = Path(descriptor.source_relative_path).name
+                source_bytes = read_regular(
+                    source_fd,
+                    filename,
+                    maximum_bytes=max_capture_page_bytes,
+                    name="accepted-risk source shard",
+                )
+                semantic_bytes = read_regular(
+                    rows_fd,
+                    Path(descriptor.semantic_relative_path).name,
+                    maximum_bytes=max_semantic_shard_bytes,
+                    name="accepted-risk semantic shard",
+                )
+                if (
+                    len(source_bytes) != descriptor.source_byte_count
+                    or sha256(source_bytes) != descriptor.source_sha256
+                ):
+                    raise PhysicalAcceptedRiskArchiveError(
+                        "accepted-risk source shard changed before semantic fold"
+                    )
+                if (
+                    len(semantic_bytes) != descriptor.semantic_byte_count
+                    or sha256(semantic_bytes) != descriptor.semantic_sha256
+                ):
+                    raise PhysicalAcceptedRiskArchiveError(
+                        "accepted-risk semantic shard changed before semantic fold"
+                    )
+                require_leaf_identities(
+                    root_fd, source_fd, rows_fd, leaf_identities
+                )
+                source_items = provider_rows(source_bytes)
+                semantic_items = semantic_rows(semantic_bytes)
+                row_offset = 0
+                end = object()
+                while True:
+                    source_item = next(source_items, end)
+                    semantic_item = next(semantic_items, end)
+                    if source_item is end or semantic_item is end:
+                        if source_item is not semantic_item:
+                            raise PhysicalAcceptedRiskArchiveError(
+                                "accepted-risk source and semantic row counts diverged"
+                            )
+                        break
+                    item = reconstruct(
+                        archive=archive,
+                        descriptor=descriptor,
+                        row_offset=row_offset,
+                        source_row_bytes=source_item,
+                        semantic_row_bytes=semantic_item,
+                    )
+                    observed_rows += 1
+                    role_counts[descriptor.source_role] += 1
+                    current_flag = item.row.current_view.included
+                    censored_flag = item.row.censored_view.included
+                    current_included += int(current_flag)
+                    censored_included += int(censored_flag)
+                    disagreements += int(current_flag != censored_flag)
+                    if visit_row(item) is not None:
+                        raise PhysicalAcceptedRiskArchiveError(
+                            "authenticated semantic fold visitor must return None"
+                        )
+                    require_fold_seal()
+                    row_offset += 1
+                if row_offset != descriptor.row_count:
+                    raise PhysicalAcceptedRiskArchiveError(
+                        "accepted-risk semantic fold shard census changed"
+                    )
+                require_leaf_identities(
+                    root_fd, source_fd, rows_fd, leaf_identities
+                )
+            if (
+                observed_rows != archive.source_row_count
+                or tuple((role, role_counts[role]) for role in role_order)
+                != archive.role_row_counts
+                or current_included != archive.current_included_count
+                or censored_included != archive.censored_included_count
+                or disagreements != archive.disagreement_count
+            ):
+                raise PhysicalAcceptedRiskArchiveError(
+                    "accepted-risk semantic fold terminal census changed"
+                )
+            preflight_archive(archive)
+            with authority_lock:
+                terminal_authority = authorities.get(id(archive))
+            if (
+                terminal_authority is None
+                or terminal_authority[0]() is not archive
+                or terminal_authority[1] != expected_fingerprint
+                or terminal_authority[2] != expected_topology
+                or terminal_authority[3] != expected_directories
+                or terminal_authority[4] != expected_pid
+                or expected_pid != getpid()
+                or archive_fingerprint(archive) != expected_fingerprint
+                or archive_topology(archive) != expected_topology
+            ):
+                raise PhysicalAcceptedRiskArchiveError(
+                    "accepted-risk archive changed during semantic fold"
+                )
+            require_inventory(root_fd, source_fd, rows_fd, archive)
+            require_leaf_identities(
+                root_fd, source_fd, rows_fd, leaf_identities
+            )
+            require_manifest(root_fd, expected_manifest)
+            require_child_identity(
+                root_fd,
+                SOURCE_DIRECTORY,
+                source_fd,
+                "accepted-risk source directory",
+            )
+            require_child_identity(
+                root_fd,
+                ROW_DIRECTORY,
+                rows_fd,
+                "accepted-risk row directory",
+            )
+            require_reopened_directory(
+                archive.archive_path,
+                root_fd,
+                name="accepted-risk archive",
+                private_final=True,
+            )
+            require_fold_seal()
+            require_dependencies()
+        finally:
+            if rows_fd is not None:
+                close(rows_fd)
+            if source_fd is not None:
+                close(source_fd)
+            close(root_fd)
+
+    return fold_authenticated_physical_accepted_risk_rows
+
+
+_fold_authenticated_physical_accepted_risk_rows = (
+    _make_authenticated_physical_accepted_risk_fold()
+)
 
 
 def _within_repository_artifacts(path: Path, *, permit_root: bool) -> bool:

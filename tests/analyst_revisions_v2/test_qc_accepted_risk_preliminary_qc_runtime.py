@@ -3,8 +3,11 @@ import gzip
 import hashlib
 import io
 import json
+import re
 import sqlite3
-from datetime import date, datetime
+import subprocess
+import sys
+from datetime import date, datetime, timedelta, timezone
 from fractions import Fraction
 from pathlib import Path
 from types import MappingProxyType, SimpleNamespace
@@ -27,6 +30,9 @@ from research.analyst_revisions_v2_qc import (
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_regime_rating_evaluator as regime_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_stock_portfolio_evaluator as stock_portfolio_evaluator,
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_package as package_builder,
@@ -323,6 +329,1381 @@ class _TradeBars:
 
     def items(self):
         return list(self._pairs)
+
+
+class _ConstituentSeries:
+    def __init__(self, items):
+        self._items = tuple(items)
+
+    def items(self):
+        return iter(self._items)
+
+
+class _ConstituentHistoryAlgorithm:
+    def __init__(self, histories):
+        self.histories = dict(histories)
+        self.calls = []
+
+    def history(self, universe, start, end, *, flatten):
+        self.calls.append((universe, start, end, flatten))
+        return self.histories[id(universe)]
+
+
+def _constituent_loader(profile_id, rows, symbols, histories):
+    benchmark = _Symbol("QC BENCHMARK SID", "SPY")
+    resolution = _resolved(rows, symbols, benchmark)
+    universes = {}
+    by_ticker = {}
+    for ticker, items in histories.items():
+        universe = SimpleNamespace(
+            symbol=_Symbol("QC UNIVERSE " + ticker, ticker)
+        )
+        universes[ticker] = universe
+        by_ticker[id(universe)] = _ConstituentSeries(
+            (
+                ((universe.symbol, stamp), constituents)
+                for stamp, constituents in items
+            )
+        )
+    algorithm = _ConstituentHistoryAlgorithm(by_ticker)
+    loader = runtime.QcEtfConstituentEligibilityLoader(
+        algorithm,
+        resolution=resolution,
+        daily_resolution="Daily",
+        evaluation_profile_id=profile_id,
+        constituent_universes=universes,
+    )
+    return loader, algorithm, universes
+
+
+_DEFAULT_LAST_UPDATE = object()
+
+
+def _constituent(symbol, stamp, weight, *, last_update=_DEFAULT_LAST_UPDATE):
+    return SimpleNamespace(
+        symbol=symbol,
+        end_time=stamp,
+        weight=weight,
+        last_update=(
+            stamp.date() if last_update is _DEFAULT_LAST_UPDATE else last_update
+        ),
+    )
+
+
+def test_constituent_history_accepts_saturday_endtime_and_deduplicates_union():
+    rows = [
+        _binding("BBG000000001", "ONE", 3),
+        _binding("BBG000000002", "TWO", 3),
+        _binding("BBG000000003", "THR", 3),
+    ]
+    one = _Symbol("QC ONE", "ONE")
+    two = _Symbol("QC TWO", "TWO")
+    three = _Symbol("QC THREE", "THR")
+    # QC daily universe data for Friday is stamped at its Saturday EndTime.
+    saturday = datetime(2021, 1, 2)
+    loader, algorithm, universes = _constituent_loader(
+        stock_portfolio_evaluator.UNION_PROFILE_ID,
+        rows,
+        [one, two, three],
+        {
+            "SPY": (
+                (saturday, (_constituent(one, saturday, "0.5", last_update=date(2021, 1, 1)),
+                            _constituent(two, saturday, "0.5", last_update=date(2021, 1, 1)))),
+            ),
+            "QQQ": (
+                (saturday, (_constituent(two, saturday, "0.5", last_update=date(2021, 1, 1)),
+                            _constituent(three, saturday, "0.5", last_update=date(2021, 1, 1)))),
+            ),
+        },
+    )
+
+    observed = loader.build_eligibility(("2021-01-04",))
+
+    assert observed == {
+        "2021-01-04": tuple(sorted(row["security_id"] for row in rows))
+    }
+    assert algorithm.calls == [
+        (
+            universes["SPY"],
+            runtime.CONSTITUENT_HISTORY_START,
+            runtime.CONSTITUENT_HISTORY_END,
+            False,
+        ),
+        (
+            universes["QQQ"],
+            runtime.CONSTITUENT_HISTORY_START,
+            runtime.CONSTITUENT_HISTORY_END,
+            False,
+        ),
+    ]
+
+
+def test_constituent_history_same_decision_midnight_is_not_prior_evidence():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    decision_midnight = datetime(2021, 1, 4)
+    non_authoritative_row_end_time = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    decision_midnight,
+                    (_constituent(stock, non_authoritative_row_end_time, "1"),),
+                ),
+            )
+        },
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="strictly before decision",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+@pytest.mark.parametrize(
+    ("items", "message"),
+    (
+        ((), "no authenticated snapshots"),
+        (
+            (
+                (
+                    datetime(2020, 12, 20),
+                    "ROW",
+                ),
+            ),
+            "prior snapshot is stale",
+        ),
+    ),
+)
+def test_constituent_history_refuses_missing_or_stale_prior_snapshot(items, message):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    normalized = tuple(
+        (
+            stamp,
+            (_constituent(stock, stamp, "1"),) if rows == "ROW" else rows,
+        )
+        for stamp, rows in items
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": normalized},
+    )
+
+    with pytest.raises(runtime.AcceptedRiskPreliminaryQcRuntimeError, match=message):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_legacy_qqq_profile_retains_the_ten_day_snapshot_expiry():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_PROFILE_ID,
+        [row],
+        [stock],
+        {"QQQ": ((stamp, (_constituent(stock, stamp, "1"),)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="prior snapshot is stale",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_state_until_superseded_qqq_profile_accepts_old_latest_prior_snapshot():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [row],
+        [stock],
+        {"QQQ": ((stamp, (_constituent(stock, stamp, "1"),)),)},
+    )
+
+    assert loader.build_eligibility(("2021-01-04", "2021-02-01")) == {
+        "2021-01-04": (row["security_id"],),
+        "2021-02-01": (row["security_id"],),
+    }
+
+
+def test_state_until_superseded_qqq_profile_advances_only_on_strictly_prior_state():
+    first_row = _binding("BBG000000001", "ONE", 2)
+    second_row = _binding("BBG000000002", "TWO", 2)
+    first = _Symbol("QC ONE", "ONE")
+    second = _Symbol("QC TWO", "TWO")
+    old = datetime(2020, 12, 1)
+    same_day = datetime(2021, 2, 1)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [first_row, second_row],
+        [first, second],
+        {
+            "QQQ": (
+                (old, (_constituent(first, old, "1"),)),
+                (same_day, (_constituent(second, same_day, "1"),)),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-02-01", "2021-02-08")) == {
+        "2021-02-01": (first_row["security_id"],),
+        "2021-02-08": (second_row["security_id"],),
+    }
+
+
+def test_state_until_superseded_union_requires_a_valid_prior_state_for_each_etf():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.UNION_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": ((stamp, (_constituent(stock, stamp, "1"),)),),
+            "QQQ": (),
+        },
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="contains no authenticated snapshots",
+    ):
+        loader.build_eligibility(("2021-02-01",))
+
+
+def test_state_until_superseded_profile_still_refuses_malformed_selected_state():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2020, 12, 20)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        [row],
+        [stock],
+        {"QQQ": ((stamp, (_constituent(stock, stamp, "not-a-decimal"),)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="weight is not decimal",
+    ):
+        loader.build_eligibility(("2021-02-01",))
+
+
+def test_constituent_history_refuses_total_positive_weight_outside_bounds():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((stamp, (_constituent(stock, stamp, "0.90"),)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="total positive weight escaped bounds",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def _membership_only_qqq_fixture(
+    count,
+    *,
+    start=1,
+    label="NASDAQ",
+    total=None,
+    stamp=datetime(2021, 1, 2),
+):
+    total = count if total is None else total
+    rows = [
+        _binding(f"BBG{index:09d}", f"N{index}", total)
+        for index in range(start, start + count)
+    ]
+    symbols = [
+        _Symbol(f"QC {label} {index}", f"N{index}")
+        for index in range(start, start + count)
+    ]
+    constituents = tuple(
+        _constituent(symbol, stamp, "0.012") for symbol in symbols
+    )
+    return rows, symbols, stamp, constituents
+
+
+def test_membership_only_successor_accepts_full_shape_without_weight_sum_claim():
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(75)
+    legacy, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, constituents),)},
+    )
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="total positive weight escaped bounds",
+    ):
+        legacy.build_eligibility(("2021-01-04",))
+
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, constituents),)},
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": tuple(sorted(row["security_id"] for row in rows))
+    }
+
+
+def test_membership_only_successor_refuses_underfilled_positive_sid_shape():
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(74)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, constituents),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="positive constituent count escaped bounds",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+@pytest.mark.parametrize(
+    ("spy_count", "qqq_count", "failing_ticker"),
+    (
+        (400, 75, None),
+        (600, 125, None),
+        (399, 75, "SPY"),
+        (601, 75, "SPY"),
+        (400, 74, "QQQ"),
+        (400, 126, "QQQ"),
+    ),
+)
+def test_union_membership_shape_bounds_apply_to_each_etf_independently(
+    monkeypatch, spy_count, qqq_count, failing_ticker
+):
+    total = spy_count + qqq_count
+    spy_rows, spy_symbols, stamp, spy_constituents = (
+        _membership_only_qqq_fixture(
+            spy_count, start=1, label="SPY", total=total
+        )
+    )
+    qqq_rows, qqq_symbols, _stamp, qqq_constituents = (
+        _membership_only_qqq_fixture(
+            qqq_count, start=701, label="QQQ", total=total
+        )
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+        [*spy_rows, *qqq_rows],
+        [*spy_symbols, *qqq_symbols],
+        {
+            "SPY": ((stamp, spy_constituents),),
+            "QQQ": ((stamp, qqq_constituents),),
+        },
+    )
+    original = loader._mapped_snapshot
+    forwarded_tickers = []
+
+    def recording_snapshot(ticker, collection_time, constituents):
+        forwarded_tickers.append(ticker)
+        return original(ticker, collection_time, constituents)
+
+    monkeypatch.setattr(loader, "_mapped_snapshot", recording_snapshot)
+    if failing_ticker is None:
+        assert loader.build_eligibility(("2021-01-04",)) == {
+            "2021-01-04": tuple(
+                sorted(row["security_id"] for row in [*spy_rows, *qqq_rows])
+            )
+        }
+    else:
+        with pytest.raises(
+            runtime.AcceptedRiskPreliminaryQcRuntimeError,
+            match="positive constituent count escaped bounds",
+        ):
+            loader.build_eligibility(("2021-01-04",))
+    assert forwarded_tickers == (
+        ["SPY"] if failing_ticker == "SPY" else ["SPY", "QQQ"]
+    )
+
+
+def test_r077_carries_an_old_strictly_prior_state_until_superseded():
+    old_stamp = datetime(2020, 12, 1)
+    successor_stamp = datetime(2021, 2, 1)
+    old_rows, old_symbols, _stamp, old_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=1,
+            label="R077 OLD",
+            total=150,
+            stamp=old_stamp,
+        )
+    )
+    new_rows, new_symbols, _stamp, new_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=101,
+            label="R077 NEW",
+            total=150,
+            stamp=successor_stamp,
+        )
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        [*old_rows, *new_rows],
+        [*old_symbols, *new_symbols],
+        {
+            "QQQ": (
+                (old_stamp, old_constituents),
+                (successor_stamp, new_constituents),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-02-01", "2021-02-08")) == {
+        "2021-02-01": tuple(sorted(row["security_id"] for row in old_rows)),
+        "2021-02-08": tuple(sorted(row["security_id"] for row in new_rows)),
+    }
+
+
+def test_r078_carries_each_old_strictly_prior_state_until_it_is_superseded():
+    old_stamp = datetime(2020, 12, 1)
+    spy_successor_stamp = datetime(2021, 2, 1)
+    qqq_successor_stamp = datetime(2021, 2, 8)
+    total = 950
+    old_spy_rows, old_spy_symbols, _stamp, old_spy_constituents = (
+        _membership_only_qqq_fixture(
+            400,
+            start=1,
+            label="R078 SPY OLD",
+            total=total,
+            stamp=old_stamp,
+        )
+    )
+    new_spy_rows, new_spy_symbols, _stamp, new_spy_constituents = (
+        _membership_only_qqq_fixture(
+            400,
+            start=401,
+            label="R078 SPY NEW",
+            total=total,
+            stamp=spy_successor_stamp,
+        )
+    )
+    old_qqq_rows, old_qqq_symbols, _stamp, old_qqq_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=801,
+            label="R078 QQQ OLD",
+            total=total,
+            stamp=old_stamp,
+        )
+    )
+    new_qqq_rows, new_qqq_symbols, _stamp, new_qqq_constituents = (
+        _membership_only_qqq_fixture(
+            75,
+            start=876,
+            label="R078 QQQ NEW",
+            total=total,
+            stamp=qqq_successor_stamp,
+        )
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.UNION_MEMBERSHIP_ONLY_PROFILE_ID,
+        [
+            *old_spy_rows,
+            *new_spy_rows,
+            *old_qqq_rows,
+            *new_qqq_rows,
+        ],
+        [
+            *old_spy_symbols,
+            *new_spy_symbols,
+            *old_qqq_symbols,
+            *new_qqq_symbols,
+        ],
+        {
+            "SPY": (
+                (old_stamp, old_spy_constituents),
+                (spy_successor_stamp, new_spy_constituents),
+            ),
+            "QQQ": (
+                (old_stamp, old_qqq_constituents),
+                (qqq_successor_stamp, new_qqq_constituents),
+            ),
+        },
+    )
+
+    expected_old = tuple(
+        sorted(
+            row["security_id"] for row in [*old_spy_rows, *old_qqq_rows]
+        )
+    )
+    expected_spy_advanced = tuple(
+        sorted(
+            row["security_id"] for row in [*new_spy_rows, *old_qqq_rows]
+        )
+    )
+    expected_both_advanced = tuple(
+        sorted(
+            row["security_id"] for row in [*new_spy_rows, *new_qqq_rows]
+        )
+    )
+    assert loader.build_eligibility(
+        ("2021-02-01", "2021-02-08", "2021-02-15")
+    ) == {
+        "2021-02-01": expected_old,
+        "2021-02-08": expected_spy_advanced,
+        "2021-02-15": expected_both_advanced,
+    }
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        ("nonpositive", "positive constituent count escaped bounds"),
+        ("nonfinite", "weight is not finite"),
+        ("duplicate", "duplicated a QC SID"),
+    ),
+)
+def test_membership_only_successor_preserves_row_and_count_refusals(
+    mutation, message
+):
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(75)
+    changed = list(constituents)
+    if mutation == "nonpositive":
+        changed[-1] = _constituent(symbols[-1], stamp, "0")
+    elif mutation == "nonfinite":
+        changed[-1] = _constituent(symbols[-1], stamp, "NaN")
+    else:
+        changed[-1] = _constituent(symbols[0], stamp, "0.012")
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, tuple(changed)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match=message,
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_membership_only_successor_does_not_read_last_update_metadata():
+    rows, symbols, stamp, constituents = _membership_only_qqq_fixture(75)
+
+    class HostileLastUpdate:
+        symbol = symbols[-1]
+        end_time = stamp
+        weight = "0.012"
+
+        @property
+        def last_update(self):
+            raise RuntimeError("LastUpdate must remain unread")
+
+    changed = (*constituents[:-1], HostileLastUpdate())
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID,
+        rows,
+        symbols,
+        {"QQQ": ((stamp, changed),)},
+    )
+
+    assert len(loader.build_eligibility(("2021-01-04",))["2021-01-04"]) == 75
+
+
+@pytest.mark.parametrize("last_update", (None, date(2021, 1, 10)))
+def test_constituent_history_accepts_nullable_or_future_last_update_metadata(
+    last_update,
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    stamp,
+                    (
+                        _constituent(
+                            stock,
+                            stamp,
+                            "1",
+                            last_update=last_update,
+                        ),
+                    ),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_does_not_validate_unselected_malformed_snapshot():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    selected = datetime(2021, 1, 2)
+    unselected = datetime(2021, 1, 5)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    selected,
+                    (_constituent(stock, selected, "1"),),
+                ),
+                (
+                    unselected,
+                    (_constituent(stock, unselected, "not-a-decimal"),),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_ignores_out_of_range_hostile_duplicate_collections():
+    class HostileCollection:
+        def __iter__(self):
+            raise AssertionError("out-of-range collection payload must remain unread")
+
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    selected = datetime(2021, 1, 2)
+    outside = runtime.CONSTITUENT_HISTORY_END + timedelta(days=1)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (selected, (_constituent(stock, selected, "1"),)),
+                (outside, HostileCollection()),
+                (outside, HostileCollection()),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_only_out_of_range_collections_refuses_as_empty():
+    class HostileCollection:
+        def __iter__(self):
+            raise AssertionError("out-of-range collection payload must remain unread")
+
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    outside = runtime.CONSTITUENT_HISTORY_END + timedelta(days=1)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((outside, HostileCollection()),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="no authenticated snapshots",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_selected_in_range_malformed_refuses_without_fallback():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    older = datetime(2021, 1, 1)
+    selected = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (older, (_constituent(stock, older, "1"),)),
+                (selected, (_constituent(stock, selected, "not-a-decimal"),)),
+            )
+        },
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="weight is not decimal",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_caches_each_selected_snapshot_and_advances_on_newer_one(
+    monkeypatch,
+):
+    first_row = _binding("BBG000000001", "ONE", 2)
+    second_row = _binding("BBG000000002", "TWO", 2)
+    first = _Symbol("QC ONE", "ONE")
+    second = _Symbol("QC TWO", "TWO")
+    first_stamp = datetime(2021, 1, 2)
+    second_stamp = datetime(2021, 1, 9)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [first_row, second_row],
+        [first, second],
+        {
+            "SPY": (
+                (first_stamp, (_constituent(first, first_stamp, "1"),)),
+                (second_stamp, (_constituent(second, second_stamp, "1"),)),
+            )
+        },
+    )
+    original = loader._mapped_snapshot
+    calls = []
+
+    def counting_snapshot(ticker, collection_time, constituents):
+        calls.append(collection_time)
+        return original(ticker, collection_time, constituents)
+
+    monkeypatch.setattr(loader, "_mapped_snapshot", counting_snapshot)
+
+    assert loader.build_eligibility(
+        ("2021-01-04", "2021-01-08", "2021-01-11")
+    ) == {
+        "2021-01-04": (first_row["security_id"],),
+        "2021-01-08": (first_row["security_id"],),
+        "2021-01-11": (second_row["security_id"],),
+    }
+    assert calls == [first_stamp, second_stamp]
+
+
+def test_constituent_history_rechecks_selected_snapshot_age_for_each_decision(
+    monkeypatch,
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((stamp, (_constituent(stock, stamp, "1"),)),)},
+    )
+    original = loader._mapped_snapshot
+    calls = []
+
+    def counting_snapshot(ticker, collection_time, constituents):
+        calls.append(collection_time)
+        return original(ticker, collection_time, constituents)
+
+    monkeypatch.setattr(loader, "_mapped_snapshot", counting_snapshot)
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="prior snapshot is stale",
+    ):
+        loader.build_eligibility(("2021-01-04", "2021-01-13"))
+    assert calls == [stamp]
+
+
+def test_constituent_history_accepts_low_weight_nonempty_score_census_intersection():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    unknown = _Symbol("QC UNMAPPED SID", "UNKNOWN")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    stamp,
+                    (
+                        _constituent(stock, stamp, "0.02"),
+                        _constituent(unknown, stamp, "0.98"),
+                    ),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_refuses_empty_score_census_intersection():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    unknown = _Symbol("QC UNMAPPED SID", "UNKNOWN")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((stamp, (_constituent(unknown, stamp, "1"),)),)},
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="score-census intersection is empty",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_excludes_nullable_zero_and_negative_weights():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    excluded = (
+        SimpleNamespace(
+            symbol=_Symbol("QC NULL SID", "NULL"),
+            end_time=stamp,
+            weight=None,
+        ),
+        _constituent(
+            _Symbol("QC ZERO SID", "ZERO"),
+            stamp,
+            "0",
+            last_update="ignored-invalid-LastUpdate",
+        ),
+        _constituent(
+            _Symbol("QC NEGATIVE SID", "NEG"),
+            stamp,
+            "-0.25",
+            last_update=datetime(2021, 1, 1, tzinfo=timezone.utc),
+        ),
+    )
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (stamp, (_constituent(stock, stamp, "1"), *excluded)),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+@pytest.mark.parametrize(
+    ("weight", "message"),
+    (
+        ("not-a-decimal", "weight is not decimal"),
+        ("NaN", "weight is not finite"),
+        ("Infinity", "weight is not finite"),
+        ("-Infinity", "weight is not finite"),
+    ),
+)
+def test_constituent_history_refuses_malformed_or_nonfinite_weight(weight, message):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((stamp, (_constituent(stock, stamp, weight),)),)},
+    )
+
+    with pytest.raises(runtime.AcceptedRiskPreliminaryQcRuntimeError, match=message):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_does_not_read_non_authoritative_row_endtime():
+    class HostileEndTime:
+        symbol = _Symbol("QC STOCK SID", "NOW")
+        weight = "1"
+
+        @property
+        def end_time(self):
+            raise AssertionError("row EndTime must remain unread")
+
+    row = _binding()
+    constituent = HostileEndTime()
+    collection = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [constituent.symbol],
+        {
+            "SPY": (
+                (
+                    collection,
+                    (constituent,),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+@pytest.mark.parametrize(
+    ("collection", "message"),
+    (
+        (
+            datetime(2021, 1, 2, tzinfo=timezone.utc),
+            "collection EndTime is timezone-aware",
+        ),
+        (
+            datetime(2021, 1, 2, 12),
+            "collection EndTime is not a daily midnight",
+        ),
+    ),
+)
+def test_constituent_history_refuses_nonlocal_collection_endtime(
+    collection, message
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((collection, (_constituent(stock, collection, "1"),)),)},
+    )
+
+    with pytest.raises(runtime.AcceptedRiskPreliminaryQcRuntimeError, match=message):
+        loader.build_eligibility(("2021-01-04",))
+
+
+@pytest.mark.parametrize(
+    "last_update",
+    (
+        datetime(2021, 1, 1, tzinfo=timezone.utc),
+        datetime(2021, 1, 1, 12),
+        "not-a-calendar-date",
+        date(2020, 12, 20),
+    ),
+)
+def test_constituent_history_ignores_non_authoritative_last_update_metadata(
+    last_update,
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    collection = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {
+            "SPY": (
+                (
+                    collection,
+                    (
+                        _constituent(
+                            stock,
+                            collection,
+                            "1",
+                            last_update=last_update,
+                        ),
+                    ),
+                ),
+            )
+        },
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+def test_constituent_history_does_not_read_last_update_metadata():
+    class HostileLastUpdate:
+        symbol = _Symbol("QC STOCK SID", "NOW")
+        end_time = datetime(2021, 1, 2)
+        weight = "1"
+
+        @property
+        def last_update(self):
+            raise RuntimeError("LastUpdate must remain unread")
+
+    row = _binding()
+    constituent = HostileLastUpdate()
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [constituent.symbol],
+        {"SPY": ((constituent.end_time, (constituent,)),)},
+    )
+
+    assert loader.build_eligibility(("2021-01-04",)) == {
+        "2021-01-04": (row["security_id"],)
+    }
+
+
+@pytest.mark.parametrize(
+    ("case", "message"),
+    (
+        ("item_shape", "Series item shape changed"),
+        ("index_shape", "Series index shape changed"),
+        ("universe", "Series universe changed"),
+        ("universe_unreadable", "Series universe is unreadable"),
+        ("nonseries", "not a Series-like object"),
+        ("duplicate_collection", "duplicated a collection EndTime"),
+        ("duplicate_sid", "duplicated a QC SID"),
+        ("empty_collection", "collection is empty"),
+    ),
+)
+def test_constituent_history_isolated_series_and_collection_refusals(case, message):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    constituents = (_constituent(stock, stamp, "1"),)
+    items = ((stamp, constituents),)
+    if case == "duplicate_collection":
+        items = (items[0], items[0])
+    elif case == "duplicate_sid":
+        constituents = (
+            _constituent(stock, stamp, "0.5"),
+            _constituent(stock, stamp, "0.5"),
+        )
+        items = ((stamp, constituents),)
+    elif case == "empty_collection":
+        items = ((stamp, ()),)
+    loader, algorithm, universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": items},
+    )
+    if case == "item_shape":
+        raw_items = ("not-a-pair",)
+    elif case == "index_shape":
+        raw_items = (("not-a-multi-index", constituents),)
+    elif case == "universe":
+        raw_items = (((_Symbol("WRONG UNIVERSE", "WRONG"), stamp), constituents),)
+    elif case == "universe_unreadable":
+        raw_items = (((SimpleNamespace(), stamp), constituents),)
+    else:
+        raw_items = None
+    if case == "nonseries":
+        algorithm.histories[id(universes["SPY"])] = SimpleNamespace(items=None)
+    elif raw_items is not None:
+        algorithm.histories[id(universes["SPY"])] = _ConstituentSeries(raw_items)
+
+    with pytest.raises(runtime.AcceptedRiskPreliminaryQcRuntimeError, match=message):
+        loader.build_eligibility(("2021-01-04",))
+
+
+@pytest.mark.parametrize(
+    ("case", "message"),
+    (
+        (
+            "non_datetime_collection",
+            "constituent-history collection EndTime is not a datetime",
+        ),
+        ("history_call", "constituent-history call failed"),
+        ("series_traversal", "constituent-history Series traversal failed"),
+        ("collection", "constituent-history collection is unreadable"),
+        ("row_fields", "constituent-history row is unreadable"),
+        ("reverse_mapping", "constituent-history reverse mapping is unreadable"),
+    ),
+)
+def test_constituent_history_isolates_remaining_reachable_loader_refusals(
+    monkeypatch, case, message
+):
+    class UnreadableIterable:
+        def __iter__(self):
+            raise RuntimeError("hostile iterable detail must be redacted")
+
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    stamp = datetime(2021, 1, 2)
+    loader, algorithm, universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        [row],
+        [stock],
+        {"SPY": ((stamp, (_constituent(stock, stamp, "1"),)),)},
+    )
+    universe = universes["SPY"]
+    if case == "non_datetime_collection":
+        algorithm.histories[id(universe)] = _ConstituentSeries(
+            (((universe.symbol, "2021-01-02"), (_constituent(stock, stamp, "1"),)),)
+        )
+    elif case == "history_call":
+        def failed_history(*_args, **_kwargs):
+            raise RuntimeError("hostile history detail must be redacted")
+
+        monkeypatch.setattr(algorithm, "history", failed_history)
+    elif case == "series_traversal":
+        algorithm.histories[id(universe)] = SimpleNamespace(
+            items=lambda: UnreadableIterable()
+        )
+    elif case == "collection":
+        algorithm.histories[id(universe)] = _ConstituentSeries(
+            (((universe.symbol, stamp), UnreadableIterable()),)
+        )
+    elif case == "row_fields":
+        algorithm.histories[id(universe)] = _ConstituentSeries(
+            (((universe.symbol, stamp), (SimpleNamespace(),)),)
+        )
+    else:
+        def failed_reverse_mapping(_security_id):
+            raise RuntimeError("hostile reverse detail must be redacted")
+
+        monkeypatch.setattr(
+            figi,
+            "require_preliminary_qc_figi_resolution",
+            lambda value: value,
+        )
+        loader._resolution = SimpleNamespace(
+            symbol_for_security=failed_reverse_mapping
+        )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^" + re.escape(message) + "$",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_refuses_an_unreadable_universe_symbol_exactly():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^"
+        + re.escape("constituent-history SPY universe symbol is unreadable")
+        + "$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=stock_portfolio_evaluator.SP500_PROFILE_ID,
+            constituent_universes={"SPY": SimpleNamespace()},
+        )
+
+
+@pytest.mark.parametrize(
+    ("profile_id", "hostile_age_policy"),
+    (
+        (stock_portfolio_evaluator.NASDAQ100_PROFILE_ID, None),
+        (
+            stock_portfolio_evaluator.NASDAQ100_STATE_UNTIL_SUPERSEDED_PROFILE_ID,
+            10,
+        ),
+        (stock_portfolio_evaluator.NASDAQ100_PROFILE_ID, True),
+    ),
+)
+def test_constituent_history_refuses_changed_snapshot_age_policy_exactly(
+    monkeypatch, profile_id, hostile_age_policy
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE QQQ", "QQQ"))
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_snapshot_maximum_age_calendar_days_for_profile",
+        lambda _profile_id: hostile_age_policy,
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^constituent-history snapshot age policy changed$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=profile_id,
+            constituent_universes={"QQQ": universe},
+        )
+
+
+@pytest.mark.parametrize(
+    "hostile_bounds",
+    ((), (("QQQ", 0, 125),), (("SPY", 400, 600),), [("QQQ", 75, 125)]),
+)
+def test_constituent_history_refuses_changed_membership_shape_policy_exactly(
+    monkeypatch, hostile_bounds
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE QQQ", "QQQ"))
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "constituent_positive_count_bounds_for_profile",
+        lambda _profile_id: hostile_bounds,
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^constituent-history membership shape policy changed$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=(
+                stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID
+            ),
+            constituent_universes={"QQQ": universe},
+        )
+
+
+def test_constituent_history_refuses_changed_evaluator_membership_inventory_exactly(
+    monkeypatch,
+):
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE QQQ", "QQQ"))
+    algorithm = _ConstituentHistoryAlgorithm({})
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "MEMBERSHIP_ONLY_PROFILE_IDS",
+        stock_portfolio_evaluator.MEMBERSHIP_ONLY_PROFILE_IDS[:-1],
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^constituent-history membership shape policy changed$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            algorithm,
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=(
+                stock_portfolio_evaluator.NASDAQ100_MEMBERSHIP_ONLY_PROFILE_ID
+            ),
+            constituent_universes={"QQQ": universe},
+        )
+    assert algorithm.calls == []
+
+
+def test_constituent_history_refuses_an_unreadable_resolution_inventory_exactly(
+    monkeypatch,
+):
+    monkeypatch.setattr(
+        figi,
+        "require_preliminary_qc_figi_resolution",
+        lambda value: value,
+    )
+    resolution = SimpleNamespace(resolved=(object(),), resolved_count=1)
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE SPY", "SPY"))
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^"
+        + re.escape("constituent-history resolution inventory is unreadable")
+        + "$",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=stock_portfolio_evaluator.SP500_PROFILE_ID,
+            constituent_universes={"SPY": universe},
+        )
+
+
+def test_constituent_history_refuses_inconsistent_resolution_inventory(monkeypatch):
+    monkeypatch.setattr(
+        figi,
+        "require_preliminary_qc_figi_resolution",
+        lambda value: value,
+    )
+    universe = SimpleNamespace(symbol=_Symbol("QC UNIVERSE SPY", "SPY"))
+    resolution = SimpleNamespace(
+        resolved=(
+            {"qc_security_id": "QC STOCK SID", "security_id": "security-a"},
+        ),
+        resolved_count=2,
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="resolution inventory changed",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=stock_portfolio_evaluator.SP500_PROFILE_ID,
+            constituent_universes={"SPY": universe},
+        )
+
+
+def test_constituent_history_refuses_exact_sid_reverse_binding_change():
+    rows = [
+        _binding("BBG000000001", "ONE", 2),
+        _binding("BBG000000002", "TWO", 2),
+    ]
+    one = _Symbol("QC ONE", "ONE")
+    two = _Symbol("QC TWO", "TWO")
+    stamp = datetime(2021, 1, 2)
+    loader, _algorithm, _universes = _constituent_loader(
+        stock_portfolio_evaluator.SP500_PROFILE_ID,
+        rows,
+        [one, two],
+        {"SPY": ((stamp, (_constituent(one, stamp, "1"),)),)},
+    )
+    loader._security_by_sid["QC ONE"] = rows[1]["security_id"]
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="exact SID mapping changed",
+    ):
+        loader.build_eligibility(("2021-01-04",))
+
+
+def test_constituent_history_refuses_colliding_universe_sid_inventory():
+    row = _binding()
+    stock = _Symbol("QC STOCK SID", "NOW")
+    resolution = _resolved([row], [stock])
+    shared = _Symbol("QC SHARED UNIVERSE", "ETF")
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="universe SID inventory collided",
+    ):
+        runtime.QcEtfConstituentEligibilityLoader(
+            SimpleNamespace(),
+            resolution=resolution,
+            daily_resolution="Daily",
+            evaluation_profile_id=stock_portfolio_evaluator.UNION_PROFILE_ID,
+            constituent_universes={
+                "SPY": SimpleNamespace(symbol=shared),
+                "QQQ": SimpleNamespace(symbol=shared),
+            },
+        )
 
 
 def _request(ids):
@@ -908,7 +2289,9 @@ def test_projection_is_six_small_flat_files_and_compiles_after_qc_prelude(monkey
     assert "order(" not in main.lower()
 
 
-def test_projection_binds_one_exact_regime_profile_into_identity_and_main(monkeypatch):
+def test_projection_binds_one_exact_regime_profile_into_identity_and_main(
+    monkeypatch, tmp_path
+):
     activation = SimpleNamespace(
         role="activation_manifest",
         activation_manifest=True,
@@ -944,6 +2327,31 @@ def test_projection_binds_one_exact_regime_profile_into_identity_and_main(monkey
     assert f"evaluation_profile_id={profile_id!r}" in main
     assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
 
+    for item in value.source_files:
+        if item.project_path != "main.py":
+            (tmp_path / item.project_path).write_bytes(item.source_bytes)
+    probe = subprocess.run(
+        (
+            sys.executable,
+            "-I",
+            "-c",
+            (
+                "import sys; "
+                f"sys.path.insert(0, {str(tmp_path)!r}); "
+                "import accepted_risk_preliminary_qc_runtime as runtime; "
+                "names = runtime.expected_custom_summary_statistic_names("
+                f"{profile_id!r}); "
+                "assert len(names) == 18; "
+                "assert 'accepted_risk_stock_portfolio_evaluator' not in sys.modules"
+            ),
+        ),
+        cwd=tmp_path,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert probe.returncode == 0, probe.stderr
+
     with pytest.raises(
         projection.AcceptedRiskPreliminaryQcProjectionError,
         match="disclosure or inventory changed",
@@ -952,11 +2360,147 @@ def test_projection_binds_one_exact_regime_profile_into_identity_and_main(monkey
             dataclasses.replace(value, evaluation_profile_sha256="0" * 64)
         )
 
+
+def test_projection_binds_stock_portfolio_profile_and_only_its_extra_module(
+    monkeypatch, tmp_path
+):
+    activation = SimpleNamespace(
+        role="activation_manifest",
+        activation_manifest=True,
+        object_store_key="arv2/preliminary-rating/fixture/transport-manifest.json",
+        content_sha256="f" * 64,
+        byte_count=1234,
+    )
+    package = SimpleNamespace(
+        package_id="arv2-preliminary-qc-package-fixture",
+        package_sha256="e" * 64,
+        upload_objects=(activation,),
+    )
+    monkeypatch.setattr(
+        package_builder,
+        "require_accepted_risk_preliminary_package",
+        lambda value: value,
+    )
+
+    value = projection.build_accepted_risk_preliminary_qc_projection(
+        package,
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
+    )
+    by_name = {item.project_path: item for item in value.source_files}
+
+    assert set(by_name) == {
+        "main.py",
+        *projection.PROJECT_SOURCE_PATHS,
+        "accepted_risk_stock_portfolio_evaluator.py",
+    }
+    assert value.evaluation_profile_id == stock_portfolio_evaluator.PROFILE_ID
+    assert value.evaluation_profile_sha256 == (
+        stock_portfolio_evaluator.require_stock_portfolio_profile(
+            stock_portfolio_evaluator.PROFILE_ID
+        )["profile_sha256"]
+    )
+    assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES
+    assert max(item.byte_count for item in value.source_files) < 60_000
+    main = by_name["main.py"].source_bytes.decode("ascii")
+    assert (
+        f"evaluation_profile_id={stock_portfolio_evaluator.PROFILE_ID!r}"
+        in main
+    )
+    assert "self.universe.etf(" not in main
+    assert "constituent_universes=" not in main
+    assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
+
+    for name, source in by_name.items():
+        if name != "main.py":
+            (tmp_path / name).write_bytes(source.source_bytes)
+    probe = subprocess.run(
+        (
+            sys.executable,
+            "-I",
+            "-c",
+            (
+                "import sys; "
+                f"sys.path.insert(0, {str(tmp_path)!r}); "
+                "import accepted_risk_preliminary_qc_runtime as runtime; "
+                "names = runtime.expected_custom_summary_statistic_names("
+                f"{stock_portfolio_evaluator.PROFILE_ID!r}); "
+                    "assert len(names) == 6; "
+                "assert 'ARV2_RUNTIME_META' in names"
+            ),
+        ),
+        cwd=tmp_path,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    assert probe.returncode == 0, probe.stderr
+
     with pytest.raises(ValueError, match="exact fixed profile id"):
         projection.build_accepted_risk_preliminary_qc_projection(
             package,
             evaluation_profile_id="arv2-stock-ic-owner-supplied-window",
         )
+
+
+def test_projection_binds_each_stock_universe_variant_and_only_needed_etfs(
+    monkeypatch,
+):
+    activation = SimpleNamespace(
+        role="activation_manifest",
+        activation_manifest=True,
+        object_store_key="arv2/preliminary-rating/fixture/transport-manifest.json",
+        content_sha256="f" * 64,
+        byte_count=1234,
+    )
+    package = SimpleNamespace(
+        package_id="arv2-preliminary-qc-package-fixture",
+        package_sha256="e" * 64,
+        upload_objects=(activation,),
+    )
+    monkeypatch.setattr(
+        package_builder,
+        "require_accepted_risk_preliminary_package",
+        lambda value: value,
+    )
+
+    assert projection.STOCK_PORTFOLIO_PROFILE_IDS == (
+        stock_portfolio_evaluator.PROFILE_IDS
+    )
+    assert projection.STOCK_UNIVERSE_PROFILE_IDS == (
+        stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS
+    )
+    for profile_id in stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS:
+        tickers = stock_portfolio_evaluator.constituent_etf_tickers_for_profile(
+            profile_id
+        )
+        value = projection.build_accepted_risk_preliminary_qc_projection(
+            package,
+            evaluation_profile_id=profile_id,
+        )
+        by_name = {item.project_path: item for item in value.source_files}
+        main = by_name["main.py"].source_bytes.decode("ascii")
+
+        assert set(by_name) == {
+            "main.py",
+            *projection.STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS,
+        }
+        assert (
+            by_name["accepted_risk_preliminary_qc_runtime.py"].byte_count
+            < projection.MAX_SOURCE_FILE_BYTES
+        )
+        assert value.evaluation_profile_sha256 == (
+            projection.STOCK_PORTFOLIO_PROFILE_SHA256S[profile_id]
+        )
+        assert f"evaluation_profile_id={profile_id!r}" in main
+        assert "constituent_universes=self._arv2_constituent_universes" in main
+        assert "def _arv2_empty_constituent_selection" in main
+        assert "return []" in main
+        assert f"for ticker in {tickers!r}" in main
+        assert main.count("self.universe.etf(") == 1
+        assert main.count("self.add_equity(") == (
+            2 if "QQQ" in tickers else 1
+        )
+        assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
 
 
 def test_projection_refuses_cross_profile_main_substitution(monkeypatch):
@@ -1547,6 +3091,159 @@ def test_runtime_result_inventory_is_exact_for_each_fixed_regime_profile():
         )
 
 
+def test_runtime_result_inventory_is_exact_for_stock_portfolio_profile():
+    assert runtime.STOCK_PORTFOLIO_PROFILE_ID == stock_portfolio_evaluator.PROFILE_ID
+    assert runtime.STOCK_PORTFOLIO_PROFILE_IDS == (
+        stock_portfolio_evaluator.PROFILE_IDS
+    )
+    assert runtime.STOCK_UNIVERSE_PROFILE_IDS == (
+        stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS
+    )
+    assert runtime.STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS == (
+        stock_portfolio_evaluator.STATE_UNTIL_SUPERSEDED_PROFILE_IDS
+    )
+    assert runtime.STOCK_MEMBERSHIP_ONLY_PROFILE_IDS == (
+        stock_portfolio_evaluator.MEMBERSHIP_ONLY_PROFILE_IDS
+    )
+    for profile_id in stock_portfolio_evaluator.PROFILE_IDS:
+        expected = runtime.expected_custom_summary_statistic_names(profile_id)
+        assert len(expected) == 6
+        assert set(expected) == {
+            *stock_portfolio_evaluator.expected_custom_summary_statistic_names(
+                profile_id
+            ),
+            runtime.RUNTIME_META_STATISTIC,
+        }
+
+
+def _construct_driver_for_profile(profile_id, constituent_universes=None):
+    return runtime.AcceptedRiskPreliminaryQcDriver(
+        SimpleNamespace(composite_figi=object()),
+        activation_manifest_key=(
+            "arv2/preliminary-rating/test/transport-manifest.json"
+        ),
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=profile_id,
+        constituent_universes=constituent_universes,
+    )
+
+
+@pytest.mark.parametrize(
+    "constituent_universes",
+    (
+        None,
+        {"QQQ": object()},
+        {"SPY": object(), "QQQ": object()},
+    ),
+)
+def test_driver_refuses_missing_wrong_or_extra_variant_universes_exactly(
+    constituent_universes,
+):
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^"
+        + re.escape("constituent-history driver universe inventory changed")
+        + "$",
+    ):
+        _construct_driver_for_profile(
+            stock_portfolio_evaluator.SP500_PROFILE_ID,
+            constituent_universes,
+        )
+
+
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        stock_portfolio_evaluator.PROFILE_ID,
+        regime_evaluator.REGIME_PROFILE_IDS[0],
+    ),
+)
+def test_driver_refuses_constituent_injection_into_non_universe_profiles_exactly(
+    profile_id,
+):
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^"
+        + re.escape("non-universe profile received constituent universes")
+        + "$",
+    ):
+        _construct_driver_for_profile(profile_id, {"SPY": object()})
+
+
+@pytest.mark.parametrize(
+    "entrypoint", ("result_inventory", "driver", "initialization")
+)
+def test_runtime_stock_profile_inventory_binding_guard_is_directly_reachable(
+    monkeypatch, entrypoint
+):
+    driver = None
+    if entrypoint == "initialization":
+        driver = _construct_driver_for_profile(
+            stock_portfolio_evaluator.SP500_PROFILE_ID,
+            {"SPY": object()},
+        )
+        evaluator_input = SimpleNamespace(
+            source_lineage_sha256s={
+                "security_master_admission_sha256": "a" * 64
+            },
+            benchmark_security_id="benchmark",
+            memberships=(SimpleNamespace(security_id="security-a"),),
+            session_axis=("2021-01-04",),
+        )
+        package = SimpleNamespace(
+            package_id="package-one",
+            package_sha256="b" * 64,
+            evaluator_input=evaluator_input,
+            runtime_symbol_bindings=("binding",),
+        )
+        resolution = SimpleNamespace(
+            symbol_for_security=lambda _security_id: object()
+        )
+        monkeypatch.setattr(
+            runtime,
+            "load_accepted_risk_preliminary_package",
+            lambda *_args, **_kwargs: package,
+        )
+        monkeypatch.setattr(
+            figi,
+            "resolve_preliminary_qc_figis",
+            lambda *_args, **_kwargs: resolution,
+        )
+        monkeypatch.setattr(
+            runtime,
+            "QcTotalReturnOpenHistoryLoader",
+            lambda *_args, **_kwargs: object(),
+        )
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "PROFILE_IDS",
+        (*stock_portfolio_evaluator.PROFILE_IDS, "arv2-unregistered-profile"),
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskPreliminaryQcRuntimeError,
+        match="^"
+        + re.escape("stock portfolio profile inventory binding changed")
+        + "$",
+    ):
+        if entrypoint == "result_inventory":
+            runtime.expected_custom_summary_statistic_names(
+                stock_portfolio_evaluator.SP500_PROFILE_ID
+            )
+        elif entrypoint == "driver":
+            _construct_driver_for_profile(
+                stock_portfolio_evaluator.SP500_PROFILE_ID,
+                {"SPY": object()},
+            )
+        else:
+            driver._initialize_in_training()
+
+
 def test_driver_initialization_selects_regime_runtime_and_exact_named_refusals(
     monkeypatch,
 ):
@@ -1625,6 +3322,178 @@ def test_driver_initialization_selects_regime_runtime_and_exact_named_refusals(
     assert driver._runtime.__class__ is RegimeRuntime
 
 
+def test_driver_initialization_selects_stock_portfolio_runtime(monkeypatch):
+    evaluator_input = SimpleNamespace(
+        source_lineage_sha256s={"security_master_admission_sha256": "a" * 64},
+        benchmark_security_id="benchmark",
+        memberships=(
+            SimpleNamespace(security_id="security-b"),
+            SimpleNamespace(security_id="security-a"),
+        ),
+        session_axis=("2021-01-04",),
+    )
+    package = SimpleNamespace(
+        package_id="package-one",
+        package_sha256="b" * 64,
+        evaluator_input=evaluator_input,
+        runtime_symbol_bindings=("binding",),
+    )
+
+    class Resolution:
+        def symbol_for_security(self, security_id):
+            return None if security_id == "security-b" else object()
+
+    captured = {}
+
+    class Loader:
+        def __init__(self, _algorithm, **kwargs):
+            captured["loader"] = kwargs
+
+    class StockRuntime:
+        def __init__(self, value, **kwargs):
+            captured["runtime"] = (value, kwargs)
+
+    monkeypatch.setattr(
+        runtime,
+        "load_accepted_risk_preliminary_package",
+        lambda *_args, **_kwargs: package,
+    )
+    monkeypatch.setattr(
+        figi,
+        "resolve_preliminary_qc_figis",
+        lambda *_args, **_kwargs: Resolution(),
+    )
+    monkeypatch.setattr(runtime, "QcTotalReturnOpenHistoryLoader", Loader)
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "StockPortfolioEvaluationRuntime",
+        StockRuntime,
+    )
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        SimpleNamespace(composite_figi=object()),
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
+    )
+
+    driver._initialize_in_training()
+
+    assert captured["runtime"] == (
+        evaluator_input,
+        {
+            "profile_id": stock_portfolio_evaluator.PROFILE_ID,
+            "package_id": "package-one",
+            "package_sha256": "b" * 64,
+            "named_figi_resolution_refusals": ("security-b",),
+        },
+    )
+    assert driver._runtime.__class__ is StockRuntime
+
+
+def test_driver_initialization_loads_exact_variant_eligibility_before_runtime(
+    monkeypatch,
+):
+    evaluator_input = SimpleNamespace(
+        source_lineage_sha256s={"security_master_admission_sha256": "a" * 64},
+        benchmark_security_id="benchmark",
+        memberships=(SimpleNamespace(security_id="security-a"),),
+        session_axis=("2021-01-04",),
+    )
+    package = SimpleNamespace(
+        package_id="package-one",
+        package_sha256="b" * 64,
+        evaluator_input=evaluator_input,
+        runtime_symbol_bindings=("binding",),
+    )
+
+    class Resolution:
+        def symbol_for_security(self, _security_id):
+            return object()
+
+    captured = {}
+
+    class PriceLoader:
+        def __init__(self, _algorithm, **kwargs):
+            captured["price_loader"] = kwargs
+
+    class ConstituentLoader:
+        def __init__(self, _algorithm, **kwargs):
+            captured["constituent_loader"] = kwargs
+
+        def build_eligibility(self, decision_sessions):
+            captured["decision_sessions"] = decision_sessions
+            return {"2021-01-04": ("security-a",)}
+
+    class StockRuntime:
+        def __init__(self, value, **kwargs):
+            captured["runtime"] = (value, kwargs)
+
+    monkeypatch.setattr(
+        runtime,
+        "load_accepted_risk_preliminary_package",
+        lambda *_args, **_kwargs: package,
+    )
+    monkeypatch.setattr(
+        figi,
+        "resolve_preliminary_qc_figis",
+        lambda *_args, **_kwargs: Resolution(),
+    )
+    monkeypatch.setattr(runtime, "QcTotalReturnOpenHistoryLoader", PriceLoader)
+    monkeypatch.setattr(
+        runtime, "QcEtfConstituentEligibilityLoader", ConstituentLoader
+    )
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "decision_sessions_for_input",
+        lambda _value: ("2021-01-04",),
+    )
+    monkeypatch.setattr(
+        stock_portfolio_evaluator,
+        "StockPortfolioEvaluationRuntime",
+        StockRuntime,
+    )
+    universe = object()
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        SimpleNamespace(composite_figi=object()),
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=stock_portfolio_evaluator.SP500_PROFILE_ID,
+        constituent_universes={"SPY": universe},
+    )
+
+    driver._initialize_in_training()
+
+    assert captured["constituent_loader"] == {
+        "resolution": driver._resolution,
+        "daily_resolution": "Daily",
+        "evaluation_profile_id": stock_portfolio_evaluator.SP500_PROFILE_ID,
+        "constituent_universes": {"SPY": universe},
+    }
+    assert captured["decision_sessions"] == ("2021-01-04",)
+    assert captured["runtime"] == (
+        evaluator_input,
+        {
+            "profile_id": stock_portfolio_evaluator.SP500_PROFILE_ID,
+            "package_id": "package-one",
+            "package_sha256": "b" * 64,
+            "named_figi_resolution_refusals": (),
+            "eligible_security_ids_by_decision_session": {
+                "2021-01-04": ("security-a",)
+            },
+        },
+    )
+
+
 def test_driver_emits_profile_bound_runtime_metadata_without_training_alias():
     profile_id = "arv2-stock-ic-2023-2025"
     profile = regime_evaluator.require_regime_profile(profile_id)
@@ -1663,6 +3532,57 @@ def test_driver_emits_profile_bound_runtime_metadata_without_training_alias():
     assert meta["evaluation_profile_sha256"] == profile["profile_sha256"]
     assert meta["runtime_slice_count"] == 1
     assert "training_slice_count" not in meta
+
+
+def test_driver_emits_stock_portfolio_runtime_metadata():
+    profile = stock_portfolio_evaluator.require_stock_portfolio_profile(
+        stock_portfolio_evaluator.PROFILE_ID
+    )
+    algorithm = _DriverAlgorithm()
+    driver = runtime.AcceptedRiskPreliminaryQcDriver(
+        algorithm,
+        activation_manifest_key="arv2/preliminary-rating/test/transport-manifest.json",
+        activation_manifest_sha256="a" * 64,
+        activation_manifest_byte_count=1,
+        benchmark_symbol=object(),
+        trade_bar_type="TradeBar",
+        daily_resolution="Daily",
+        total_return_normalization="TotalReturn",
+        evaluation_profile_id=stock_portfolio_evaluator.PROFILE_ID,
+    )
+    driver._package = SimpleNamespace(
+        package_id="package-one",
+        package_sha256="b" * 64,
+        activation_manifest_sha256="c" * 64,
+    )
+    driver._resolution = SimpleNamespace(
+        resolution_id="resolution-one",
+        resolution_sha256="d" * 64,
+        resolved_count=1,
+        named_refusal_count=0,
+    )
+    driver._history_loader = object()
+    portfolio_runtime = _DriverRuntime(1)
+    portfolio_runtime.custom_summary_statistics = lambda: {
+        key: "exact"
+        for key in stock_portfolio_evaluator.expected_custom_summary_statistic_names()
+    }
+    driver._runtime = portfolio_runtime
+
+    driver.advance_training_slice(maximum_work_units=10, monotonic=lambda: 0)
+
+    assert len(algorithm.statistics) == 6
+    meta = json.loads(dict(algorithm.statistics)[runtime.RUNTIME_META_STATISTIC])
+    assert meta["schema"] == (
+        "arv2-accepted-risk-stock-portfolio-qc-runtime-meta-v1"
+    )
+    assert meta["status"] == (
+        "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO_COMPLETED"
+    )
+    assert meta["evaluation_profile_id"] == stock_portfolio_evaluator.PROFILE_ID
+    assert meta["evaluation_profile_sha256"] == profile["profile_sha256"]
+    assert meta["economic_portfolio"] is True
+    assert meta["etf_or_leverage"] is False
 
 
 def test_full_geometry_completes_in_41_unslowed_daily_slices():

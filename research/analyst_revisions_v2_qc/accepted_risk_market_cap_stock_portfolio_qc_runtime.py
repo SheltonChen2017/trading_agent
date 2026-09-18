@@ -1,8 +1,7 @@
-"""Cloud-local, aggregate-only ARV2 preliminary QC driver."""
-
 import dataclasses
 import gzip
 import hashlib
+import itertools
 import io
 import json
 import math
@@ -10,24 +9,26 @@ import re
 import time
 from datetime import datetime, timedelta
 from decimal import Decimal, InvalidOperation
-from types import MappingProxyType
+from zoneinfo import ZoneInfo
 
 try:
     import accepted_risk_preliminary_rating_evaluator as evaluator
     import accepted_risk_preliminary_qc_figi as figi_authority
-    import accepted_risk_regime_rating_evaluator as regime_evaluator
+    import accepted_risk_market_cap_stock_portfolio_evaluator as market_cap_evaluator
 except ImportError:
     from research.analyst_revisions_v2_qc import (
         accepted_risk_preliminary_rating_evaluator as evaluator,
     )
-    from research.analyst_revisions_v2_qc import accepted_risk_preliminary_qc_figi as figi_authority
     from research.analyst_revisions_v2_qc import (
-        accepted_risk_regime_rating_evaluator as regime_evaluator,
+        accepted_risk_preliminary_qc_figi as figi_authority,
+    )
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_market_cap_stock_portfolio_evaluator as market_cap_evaluator,
     )
 
 
-class AcceptedRiskPreliminaryQcRuntimeError(ValueError):
-    """The cloud package, QC identity, history, or runtime state is inexact."""
+class AcceptedRiskMarketCapStockPortfolioQcRuntimeError(ValueError):
+    pass
 
 
 TRANSPORT_MANIFEST_SCHEMA = (
@@ -41,81 +42,29 @@ MAX_TOTAL_UPLOAD_BYTES = 44 * 1024 * 1024
 MAX_TRANSPORT_OBJECT_COUNT = 95
 MAX_DECOMPRESSED_OBJECT_BYTES = 192 * 1024 * 1024
 MAX_TOTAL_DECOMPRESSED_BYTES = 768 * 1024 * 1024
-TRAIN_WORK_UNITS_PER_SLICE = 10
+TRAIN_WORK_UNITS_PER_SLICE = 4
 TRAIN_SLICE_SOFT_SECONDS = 240
-MAX_TRAIN_SLICE_COUNT = 113
+MAX_TRAIN_SLICE_COUNT = 1024
 MAX_BACKTEST_RUNTIME_SECONDS = 12 * 60 * 60
 RUNTIME_META_STATISTIC = "ARV2_RUNTIME_META"
-STOCK_PORTFOLIO_PROFILE_ID = "arv2-stock-long-only-2021-2025-r065-v2"
-STOCK_UNIVERSE_PROFILE_IDS = (
-    "arv2-stock-long-only-spy-holdings-intersection-2021-2025-r072-v3",
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r073-v5",
-    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4",
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r075-v6",
-    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5",
-    "arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r077-v7",
-    "arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r078-v6",
-)
-STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS = STOCK_UNIVERSE_PROFILE_IDS[-4:]
-STOCK_MEMBERSHIP_ONLY_PROFILE_IDS = STOCK_UNIVERSE_PROFILE_IDS[-2:]
-STOCK_PORTFOLIO_PROFILE_IDS = (
-    STOCK_PORTFOLIO_PROFILE_ID,
-    *STOCK_UNIVERSE_PROFILE_IDS,
-)
-CONSTITUENT_HISTORY_START = datetime(2020, 12, 1)
-CONSTITUENT_HISTORY_END = datetime(2026, 1, 1)
-MINIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("0.95")
-MAXIMUM_CONSTITUENT_TOTAL_WEIGHT = Decimal("1.05")
-EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES = tuple(
-    sorted(
-        (
-            *evaluator.EVALUATOR_CUSTOM_SUMMARY_STATISTIC_NAMES,
-            RUNTIME_META_STATISTIC,
-        )
+HISTORY_CHUNK_DECISION_COUNT = 6
+HISTORY_LOOKBACK_CALENDAR_DAYS = 45
+MAX_HISTORY_CHUNKS = 128
+MAX_COLLECTIONS_PER_CALL = 64
+MAX_COLLECTION_ROWS = 25_000
+MAX_TOTAL_SOURCE_ROWS = 20_000_000
+NEW_YORK = ZoneInfo("America/New_York")
+PROFILE_IDS = market_cap_evaluator.PROFILE_IDS
+
+
+def expected_custom_summary_statistic_names(evaluation_profile_id):
+    if market_cap_evaluator.PROFILE_IDS != PROFILE_IDS:
+        _error("market-cap profile inventory binding changed")
+    names = market_cap_evaluator.expected_custom_summary_statistic_names(
+        evaluation_profile_id
     )
-)
+    return tuple(sorted((*names, RUNTIME_META_STATISTIC)))
 
-
-def _stock_portfolio_module():
-    try:
-        import accepted_risk_stock_portfolio_evaluator as module
-    except ImportError:
-        from research.analyst_revisions_v2_qc import (
-            accepted_risk_stock_portfolio_evaluator as module,
-        )
-    return module
-
-
-def expected_custom_summary_statistic_names(evaluation_profile_id=None):
-    if evaluation_profile_id is None:
-        return EXPECTED_CUSTOM_SUMMARY_STATISTIC_NAMES
-    if (
-        type(evaluation_profile_id) is str
-        and evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS
-    ):
-        stock_portfolio = _stock_portfolio_module()
-        if stock_portfolio.PROFILE_IDS != STOCK_PORTFOLIO_PROFILE_IDS:
-            _error("stock portfolio profile inventory binding changed")
-        if stock_portfolio.PROFILE_ID != STOCK_PORTFOLIO_PROFILE_ID:
-            _error("stock portfolio profile binding changed")
-        evaluator_names = (
-            stock_portfolio.expected_custom_summary_statistic_names(
-                evaluation_profile_id
-            )
-        )
-    else:
-        regime_evaluator.require_regime_profile(evaluation_profile_id)
-        evaluator_names = regime_evaluator.expected_custom_summary_statistic_names(
-            evaluation_profile_id
-        )
-    return tuple(
-        sorted(
-            (
-                *evaluator_names,
-                RUNTIME_META_STATISTIC,
-            )
-        )
-    )
 
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
 _SAFE = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:/-]{0,1023}\Z")
@@ -182,7 +131,7 @@ _EXPECTED_CLAIMS = {
 
 
 def _error(message):
-    raise AcceptedRiskPreliminaryQcRuntimeError(message)
+    raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(message)
 
 
 def _canonical(value):
@@ -195,7 +144,7 @@ def _canonical(value):
             allow_nan=False,
         ).encode("ascii")
     except (TypeError, ValueError, UnicodeEncodeError) as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             "preliminary QC value is not canonical ASCII JSON"
         ) from exc
 
@@ -224,7 +173,7 @@ def _json(payload, name):
         text = payload.decode("ascii")
         return json.loads(text, object_pairs_hook=_object_pairs)
     except (UnicodeDecodeError, json.JSONDecodeError, RecursionError) as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             name + " is not strict ASCII JSON"
         ) from exc
 
@@ -253,7 +202,7 @@ def _read_object(store, key, expected_sha256, maximum_bytes):
     try:
         contains = store.contains_key(key)
     except Exception as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             "preliminary Object Store existence check failed"
         ) from exc
     if type(contains) is not bool or not contains:
@@ -261,7 +210,7 @@ def _read_object(store, key, expected_sha256, maximum_bytes):
     try:
         payload = bytes(store.read_bytes(key))
     except Exception as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             "preliminary Object Store object read failed"
         ) from exc
     if (
@@ -402,7 +351,7 @@ def _gzip_rows(payload, expected_count, role):
             raw = stream.read(MAX_DECOMPRESSED_OBJECT_BYTES + 1)
             extra = stream.read(1)
     except (OSError, EOFError) as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             "preliminary " + role + " object is not valid gzip"
         ) from exc
     if len(raw) > MAX_DECOMPRESSED_OBJECT_BYTES or extra:
@@ -435,8 +384,6 @@ def load_accepted_risk_preliminary_package(
     activation_manifest_sha256,
     activation_manifest_byte_count,
 ):
-    """Read and authenticate the compact package entirely inside QC."""
-
     if algorithm is None:
         _error("preliminary QC algorithm is unavailable")
     key = activation_manifest_key
@@ -493,16 +440,15 @@ def load_accepted_risk_preliminary_package(
             tuple(by_role["contributions"]),
         )
     except Exception as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             "preliminary evaluator input did not authenticate"
         ) from exc
     binding_rows = tuple(by_role["runtime_symbol_bindings"])
-    # The resolver performs the exact row schema/hash/inventory authentication.
     try:
         if any(type(item) is not dict for item in binding_rows):
             _error("preliminary runtime symbol binding row changed")
     except TypeError as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             "preliminary runtime symbol binding inventory is unreadable"
         ) from exc
     if (
@@ -528,7 +474,7 @@ def _symbol_identity(symbol, name):
         security_type = str(symbol.security_type)
         market = str(symbol_id.market)
     except Exception as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
             name + " symbol identity is unreadable"
         ) from exc
     if (
@@ -545,8 +491,6 @@ def _symbol_identity(symbol, name):
 
 
 class QcTotalReturnOpenHistoryLoader:
-    """Typed, no-fill, adjusted-open QC History adapter with O(1) reverse map."""
-
     def __init__(
         self,
         algorithm,
@@ -637,7 +581,7 @@ class QcTotalReturnOpenHistoryLoader:
             start = datetime.strptime(request.start_session, "%Y-%m-%d")
             end = datetime.strptime(request.end_session, "%Y-%m-%d")
         except ValueError as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
                 "preliminary History request session is invalid"
             ) from exc
         if (
@@ -659,15 +603,13 @@ class QcTotalReturnOpenHistoryLoader:
             else:
                 symbol = self._resolution.symbol_for_security(security_id)
                 if symbol is None:
-                    # One authenticated named refusal means no observation, not
-                    # a caller-selected deletion or an invented market row.
                     if self._resolution.refusal_reason(security_id) is None:
                         _error("preliminary History request has an unknown security")
                     continue
                 try:
                     sid = str(symbol.id)
                 except Exception as exc:
-                    raise AcceptedRiskPreliminaryQcRuntimeError(
+                    raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
                         "preliminary History request symbol became unreadable"
                     ) from exc
             if sid in requested_by_sid:
@@ -697,7 +639,7 @@ class QcTotalReturnOpenHistoryLoader:
                     dictionary_session = dictionary_time.date().isoformat()
                     items_method = dictionary.items
                 except Exception as exc:
-                    raise AcceptedRiskPreliminaryQcRuntimeError(
+                    raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
                         "preliminary typed History returned a non-dictionary batch"
                     ) from exc
                 if (
@@ -712,7 +654,7 @@ class QcTotalReturnOpenHistoryLoader:
                 try:
                     items = tuple(items_method())
                 except Exception as exc:
-                    raise AcceptedRiskPreliminaryQcRuntimeError(
+                    raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
                         "preliminary typed History dictionary is unreadable"
                     ) from exc
                 if not items or any(
@@ -728,7 +670,7 @@ class QcTotalReturnOpenHistoryLoader:
                         observed_open = bar.open
                         session = observed_time.date().isoformat()
                     except Exception as exc:
-                        raise AcceptedRiskPreliminaryQcRuntimeError(
+                        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
                             "preliminary typed History bar is unreadable"
                         ) from exc
                     if key_sid != observed_sid or observed_sid in dictionary_sids:
@@ -758,7 +700,7 @@ class QcTotalReturnOpenHistoryLoader:
                     try:
                         adjusted_open = Decimal(str(observed_open))
                     except (InvalidOperation, ValueError) as exc:
-                        raise AcceptedRiskPreliminaryQcRuntimeError(
+                        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
                             "preliminary typed History open is not decimal"
                         ) from exc
                     if not adjusted_open.is_finite() or adjusted_open <= 0:
@@ -771,339 +713,505 @@ class QcTotalReturnOpenHistoryLoader:
                             adjusted_open,
                         )
                     )
-        except AcceptedRiskPreliminaryQcRuntimeError:
+        except AcceptedRiskMarketCapStockPortfolioQcRuntimeError:
             raise
         except Exception as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
                 "preliminary typed TOTAL_RETURN History call failed"
             ) from exc
         finally:
             figi_authority.require_preliminary_qc_figi_resolution(self._resolution)
         return tuple(sorted(rows, key=lambda item: (item.security_id, item.session)))
 
-
-def _constituent_midnight(value, name):
-    if not isinstance(value, datetime):
-        _error(name + " is not a datetime")
+def _universe_sid(value, name):
     try:
-        aware = value.tzinfo is not None and value.utcoffset() is not None
-        clock = (value.hour, value.minute, value.second, value.microsecond)
-        normalized = datetime(value.year, value.month, value.day)
-    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(name + " is unreadable") from exc
-    if aware:
-        _error(name + " is timezone-aware")
-    if clock != (0, 0, 0, 0):
-        _error(name + " is not a daily midnight EndTime")
-    return normalized
-
-
-def _constituent_decimal(value, name):
-    if value is None:
-        return None
-    try:
-        parsed = Decimal(str(value))
-    except (InvalidOperation, ValueError) as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(name + " is not decimal") from exc
-    if not parsed.is_finite():
-        _error(name + " is not finite")
-    return parsed if parsed > 0 else None
-
-
-def _universe_symbol_sid(value, name):
-    try:
-        sid = str(value.symbol.id)
+        identifier = value.symbol.id
+        sid = str(identifier)
     except Exception as exc:
-        raise AcceptedRiskPreliminaryQcRuntimeError(name + " symbol is unreadable") from exc
-    if type(sid) is not str or not sid:
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+            name + " symbol is unreadable"
+        ) from exc
+    if identifier is None or type(sid) is not str or not sid:
         _error(name + " symbol identity changed")
     return sid
 
 
-class QcEtfConstituentEligibilityLoader:
+def _row_sid(value, name):
+    try:
+        identifier = value.symbol.id
+        sid = str(identifier)
+    except Exception as exc:
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+            name + " SID is unreadable"
+        ) from exc
+    if identifier is None or type(sid) is not str or not sid:
+        _error(name + " SID changed")
+    return sid
+
+
+def _local_collection_time(value, name):
+    if not isinstance(value, datetime):
+        _error(name + " is not datetime")
+    try:
+        if value.tzinfo is None or value.utcoffset() is None:
+            result = value
+        else:
+            result = value.astimezone(NEW_YORK).replace(tzinfo=None)
+    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+            name + " is unreadable"
+        ) from exc
+    if result.time() >= datetime.min.replace(hour=9, minute=30).time():
+        _error(name + " was not observed before open")
+    return result
+
+
+def _constituent_collection_time(value, name):
+    if not isinstance(value, datetime):
+        _error(name + " is not datetime")
+    try:
+        aware = value.tzinfo is not None and value.utcoffset() is not None
+        clock = (value.hour, value.minute, value.second, value.microsecond)
+        result = datetime(value.year, value.month, value.day)
+    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+            name + " is unreadable"
+        ) from exc
+    if aware:
+        _error(name + " is timezone-aware")
+    if clock != (0, 0, 0, 0):
+        _error(name + " is not midnight")
+    return result
+
+
+def _history_items(history, name):
+    try:
+        items = tuple(
+            itertools.islice(
+                iter(history.items()), MAX_COLLECTIONS_PER_CALL + 1
+            )
+        )
+    except AttributeError as exc:
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+            name + " is not Series-like"
+        ) from exc
+    except Exception as exc:
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+            name + " traversal failed"
+        ) from exc
+    if len(items) > MAX_COLLECTIONS_PER_CALL:
+        _error(name + " exceeded the collection cap")
+    return items
+
+
+def _collection_rows(rows, name):
+    try:
+        result = tuple(
+            itertools.islice(iter(rows), MAX_COLLECTION_ROWS + 1)
+        )
+    except Exception as exc:
+        raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+            name + " collection is unreadable"
+        ) from exc
+    if len(result) > MAX_COLLECTION_ROWS:
+        _error(name + " collection row bound changed")
+    return result
+
+
+def _positive_market_caps(rows):
+    members = _collection_rows(rows, "fundamental")
+    if not members:
+        _error("fundamental collection is empty")
+    observed = {}
+    for row in members:
+        sid = _row_sid(row, "fundamental row")
+        try:
+            raw = row.market_cap
+        except AttributeError:
+            raw = None
+        if raw is None:
+            classified = ("null", None)
+        else:
+            try:
+                value = Decimal(str(raw))
+            except (InvalidOperation, ValueError, TypeError):
+                classified = ("invalid", None)
+            else:
+                if not value.is_finite():
+                    classified = ("invalid", None)
+                elif value <= 0:
+                    classified = ("nonpositive", value)
+                else:
+                    classified = ("positive", value)
+        prior = observed.get(sid)
+        if prior is not None:
+            if prior != classified:
+                _error("fundamental duplicate SID value or class conflicts")
+            continue
+        observed[sid] = classified
+    return {
+        sid: item[1]
+        for sid, item in observed.items()
+        if item[0] == "positive"
+    }
+
+
+def _positive_constituent_sids(rows):
+    members = _collection_rows(rows, "ETF constituent")
+    if not members:
+        _error("ETF constituent collection is empty")
+    result = set()
+    for row in members:
+        try:
+            raw = row.weight
+        except AttributeError as exc:
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                "ETF constituent weight is unreadable"
+            ) from exc
+        if raw is None:
+            continue
+        try:
+            weight = Decimal(str(raw))
+        except (InvalidOperation, ValueError, TypeError) as exc:
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                "ETF constituent weight is not decimal"
+            ) from exc
+        if not weight.is_finite():
+            _error("ETF constituent weight is not finite")
+        if weight <= 0:
+            continue
+        sid = _row_sid(row, "ETF constituent row")
+        if sid in result:
+            _error("ETF constituent collection duplicated a positive SID")
+        result.add(sid)
+    if not result:
+        _error("ETF constituent collection has no positive members")
+    return frozenset(result)
+
+
+class QcPitMarketCapEligibilityLoader:
     def __init__(
         self,
         algorithm,
         *,
         resolution,
-        daily_resolution,
-        evaluation_profile_id,
+        decision_sessions,
+        input_security_ids,
+        fundamental_universe,
         constituent_universes,
+        evaluation_profile_id,
     ):
-        stock_portfolio = _stock_portfolio_module()
-        if (
-            type(evaluation_profile_id) is not str
-            or evaluation_profile_id not in stock_portfolio.UNIVERSE_PROFILE_IDS
-        ):
-            _error("constituent-history profile binding changed")
-        tickers = stock_portfolio.constituent_etf_tickers_for_profile(
+        profile = market_cap_evaluator.require_market_cap_stock_portfolio_profile(
             evaluation_profile_id
         )
-        maximum_snapshot_age_days = stock_portfolio.constituent_snapshot_maximum_age_calendar_days_for_profile(
+        tickers = market_cap_evaluator.constituent_etf_tickers_for_profile(
             evaluation_profile_id
         )
-        state_profiles = stock_portfolio.STATE_UNTIL_SUPERSEDED_PROFILE_IDS
-        membership_profiles = stock_portfolio.MEMBERSHIP_ONLY_PROFILE_IDS
-        count_bounds = stock_portfolio.constituent_positive_count_bounds_for_profile(
-            evaluation_profile_id
-        )
-        stateful = evaluation_profile_id in STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
-        membership_only = evaluation_profile_id in STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
         if (
-            type(state_profiles) is not tuple
-            or state_profiles != STOCK_STATE_UNTIL_SUPERSEDED_PROFILE_IDS
-            or type(maximum_snapshot_age_days) is not (type(None) if stateful else int)
-            or maximum_snapshot_age_days != (None if stateful else 10)
-        ):
-            _error("constituent-history snapshot age policy changed")
-        if (
-            type(membership_profiles) is not tuple
-            or membership_profiles != STOCK_MEMBERSHIP_ONLY_PROFILE_IDS
-            or type(count_bounds) is not tuple
-            or bool(count_bounds) is not membership_only
-            or any(
-                type(row) is not tuple or len(row) != 3 or row[0] not in tickers
-                or type(row[1]) is not int or type(row[2]) is not int
-                or not 0 < row[1] <= row[2] for row in count_bounds
-            )
-            or membership_only and tuple(sorted(row[0] for row in count_bounds))
-            != tuple(sorted(tickers))
-        ):
-            _error("constituent-history membership shape policy changed")
-        if (
-            type(tickers) is not tuple
-            or not tickers
-            or tuple(sorted(set(tickers))) != tuple(sorted(tickers))
-            or any(ticker not in ("SPY", "QQQ") for ticker in tickers)
+            market_cap_evaluator.PROFILE_IDS != PROFILE_IDS
+            or type(tickers) is not tuple
+            or len(tickers) != 1
+            or tickers[0] != profile["universe_proxy_ticker"]
             or type(constituent_universes) is not dict
-            or tuple(sorted(constituent_universes)) != tuple(sorted(tickers))
+            or tuple(constituent_universes) != tickers
         ):
-            _error("constituent-history universe inventory changed")
-        authenticated = figi_authority.require_preliminary_qc_figi_resolution(resolution)
-        universe_sids = {
-            ticker: _universe_symbol_sid(
-                constituent_universes[ticker],
-                "constituent-history " + ticker + " universe",
-            )
-            for ticker in tickers
-        }
-        if len(set(universe_sids.values())) != len(universe_sids):
-            _error("constituent-history universe SID inventory collided")
+            _error("PIT market-cap ETF universe inventory changed")
+        if (
+            type(decision_sessions) is not tuple
+            or not decision_sessions
+            or tuple(sorted(set(decision_sessions))) != decision_sessions
+            or any(type(item) is not str for item in decision_sessions)
+            or type(input_security_ids) is not tuple
+            or not input_security_ids
+            or tuple(sorted(set(input_security_ids))) != input_security_ids
+        ):
+            _error("PIT market-cap decision or security inventory changed")
+        parsed = []
+        try:
+            for session in decision_sessions:
+                value = datetime.strptime(session, "%Y-%m-%d")
+                if value.strftime("%Y-%m-%d") != session:
+                    _error("PIT market-cap decision session is not canonical")
+                parsed.append(value)
+        except ValueError as exc:
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                "PIT market-cap decision session is invalid"
+            ) from exc
+        authenticated = figi_authority.require_preliminary_qc_figi_resolution(
+            resolution
+        )
         try:
             security_by_sid = {
                 item["qc_security_id"]: item["security_id"]
                 for item in authenticated.resolved
             }
         except Exception as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
-                "constituent-history resolution inventory is unreadable"
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                "PIT market-cap resolution inventory is unreadable"
             ) from exc
         if (
             len(security_by_sid) != authenticated.resolved_count
-            or any(
-                type(sid) is not str
-                or not sid
-                or type(security_id) is not str
-                or not security_id
-                for sid, security_id in security_by_sid.items()
-            )
+            or len(set(security_by_sid.values())) != len(security_by_sid)
+            or not set(security_by_sid.values()).issubset(input_security_ids)
         ):
-            _error("constituent-history resolution inventory changed")
+            _error("PIT market-cap resolution inventory changed")
+        fundamental_sid = _universe_sid(
+            fundamental_universe, "PIT fundamental universe"
+        )
+        constituent_sids = {
+            ticker: _universe_sid(
+                constituent_universes[ticker],
+                "PIT " + ticker + " constituent universe",
+            )
+            for ticker in tickers
+        }
+        if fundamental_sid in constituent_sids.values():
+            _error("PIT universe SID inventory collided")
+        chunks = tuple(
+            tuple(parsed[index : index + HISTORY_CHUNK_DECISION_COUNT])
+            for index in range(0, len(parsed), HISTORY_CHUNK_DECISION_COUNT)
+        )
+        if not chunks or len(chunks) > MAX_HISTORY_CHUNKS:
+            _error("PIT market-cap history chunk geometry changed")
         self._algorithm = algorithm
         self._resolution = authenticated
+        self._decision_sessions = decision_sessions
         self._security_by_sid = security_by_sid
-        self._daily_resolution = daily_resolution
-        self._maximum_snapshot_age = (
-            None
-            if maximum_snapshot_age_days is None
-            else timedelta(days=maximum_snapshot_age_days)
-        )
-        self._require_total_weight = not membership_only
-        self._count_bounds = {
-            ticker: (minimum, maximum)
-            for ticker, minimum, maximum in count_bounds
-        }
+        self._fundamental_universe = fundamental_universe
+        self._fundamental_sid = fundamental_sid
         self._tickers = tickers
-        self._universes = dict(constituent_universes)
-        self._universe_sids = universe_sids
+        self._constituent_universes = dict(constituent_universes)
+        self._constituent_sids = constituent_sids
+        self._chunks = chunks
+        self._chunk_index = 0
+        self._stage = "fundamental"
+        self._fundamentals = None
+        self._last_fundamental_state = None
+        self._last_constituent_state = {ticker: None for ticker in tickers}
+        self._market_caps = {}
+        self._history_call_count = 0
+        self._fetched_source_row_count = 0
+        self._eligible_score_bearing_count = 0
+        self._covered_count = 0
+        self._uncovered_count = 0
 
-    def _mapped_snapshot(self, ticker, collection_time, constituents):
-        try:
-            rows = tuple(constituents)
-        except Exception as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
-                "constituent-history collection is unreadable"
-            ) from exc
-        if not rows:
-            _error("constituent-history collection is empty")
-        weights = {}
-        mapped = {}
-        for row in rows:
-            try:
-                sid = str(row.symbol.id)
-                weight_value = row.weight
-            except Exception as exc:
-                raise AcceptedRiskPreliminaryQcRuntimeError(
-                    "constituent-history row is unreadable"
-                ) from exc
-            weight = _constituent_decimal(weight_value, "constituent-history weight")
-            if weight is None:
-                continue
-            if type(sid) is not str or not sid or sid in weights:
-                _error("constituent-history collection duplicated a QC SID")
-            weights[sid] = weight
-            security_id = self._security_by_sid.get(sid)
-            if security_id is None:
-                continue
-            if type(security_id) is not str or not security_id:
-                _error("constituent-history reverse mapping changed")
-            try:
-                reversed_sid = str(
-                    self._resolution.symbol_for_security(security_id).id
-                )
-            except Exception as exc:
-                raise AcceptedRiskPreliminaryQcRuntimeError(
-                    "constituent-history reverse mapping is unreadable"
-                ) from exc
-            if reversed_sid != sid or security_id in mapped:
-                _error("constituent-history exact SID mapping changed")
-            mapped[security_id] = weight
-        bounds = self._count_bounds.get(ticker)
-        if bounds is not None and not bounds[0] <= len(weights) <= bounds[1]:
-            _error("constituent-history positive constituent count escaped bounds")
-        if self._require_total_weight:
-            total_weight = sum(weights.values(), Decimal(0))
-            if not MINIMUM_CONSTITUENT_TOTAL_WEIGHT <= total_weight <= MAXIMUM_CONSTITUENT_TOTAL_WEIGHT:
-                _error("constituent-history total positive weight escaped bounds")
-        if not mapped:
-            _error("constituent-history score-census intersection is empty")
-        return tuple(sorted(mapped))
+    @property
+    def completed(self):
+        return self._chunk_index == len(self._chunks)
 
-    def _load_ticker(self, ticker):
-        universe = self._universes[ticker]
+    @property
+    def history_call_count(self):
+        return self._history_call_count
+
+    @property
+    def eligible_score_bearing_count(self):
+        return self._eligible_score_bearing_count
+
+    @property
+    def covered_count(self):
+        return self._covered_count
+
+    @property
+    def uncovered_count(self):
+        return self._uncovered_count
+
+    @property
+    def fetched_source_row_count(self):
+        return self._fetched_source_row_count
+
+    def _request_bounds(self):
+        chunk = self._chunks[self._chunk_index]
+        start = (
+            chunk[0] - timedelta(days=HISTORY_LOOKBACK_CALENDAR_DAYS)
+            if self._chunk_index == 0
+            else self._chunks[self._chunk_index - 1][-1]
+            + timedelta(days=1)
+        )
+        return (
+            start,
+            chunk[-1] + timedelta(days=1),
+        )
+
+    def _inventory(self, universe, expected_sid, name, *, fundamental):
+        start, end = self._request_bounds()
         try:
             history = self._algorithm.history(
-                universe,
-                CONSTITUENT_HISTORY_START,
-                CONSTITUENT_HISTORY_END,
-                flatten=False,
+                universe, start, end, flatten=False
             )
-            if history is None or not callable(history.items):
-                _error("constituent-history result is not a Series-like object")
-            items = history.items()
-        except AcceptedRiskPreliminaryQcRuntimeError:
-            raise
         except Exception as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
-                "constituent-history call failed"
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                name + " call failed"
             ) from exc
-        snapshots = {}
-        try:
-            for item in items:
-                if type(item) is not tuple or len(item) != 2:
-                    _error("constituent-history Series item shape changed")
-                key, constituents = item
-                if type(key) is not tuple or len(key) != 2:
-                    _error("constituent-history Series index shape changed")
-                universe_symbol, raw_collection_time = key
-                try:
-                    collection_universe_sid = str(universe_symbol.id)
-                except Exception as exc:
-                    raise AcceptedRiskPreliminaryQcRuntimeError(
-                        "constituent-history Series universe is unreadable"
-                    ) from exc
-                if collection_universe_sid != self._universe_sids[ticker]:
-                    _error("constituent-history Series universe changed")
-                collection_time = _constituent_midnight(
-                    raw_collection_time,
-                    "constituent-history collection EndTime",
-                )
-                if not (
-                    CONSTITUENT_HISTORY_START
-                    <= collection_time
-                    < CONSTITUENT_HISTORY_END
-                ):
-                    continue
-                if collection_time in snapshots:
-                    _error("constituent-history duplicated a collection EndTime")
-                snapshots[collection_time] = constituents
-        except AcceptedRiskPreliminaryQcRuntimeError:
-            raise
-        except Exception as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
-                "constituent-history Series traversal failed"
-            ) from exc
-        if not snapshots:
-            _error("constituent-history contains no authenticated snapshots")
-        return tuple(sorted(snapshots.items()))
-
-    @staticmethod
-    def _decision_times(decision_sessions):
-        if (
-            type(decision_sessions) is not tuple
-            or not decision_sessions
-            or any(type(session) is not str for session in decision_sessions)
-            or tuple(sorted(set(decision_sessions))) != decision_sessions
-        ):
-            _error("constituent-history decision-session inventory changed")
-        parsed = []
-        try:
-            for session in decision_sessions:
-                value = datetime.strptime(session, "%Y-%m-%d")
-                if value.strftime("%Y-%m-%d") != session:
-                    _error("constituent-history decision session is not canonical")
-                parsed.append((session, value))
-        except ValueError as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
-                "constituent-history decision session is invalid"
-            ) from exc
-        return tuple(parsed)
-
-    def build_eligibility(self, decision_sessions):
-        decision_times = self._decision_times(decision_sessions)
-        figi_authority.require_preliminary_qc_figi_resolution(self._resolution)
-        by_ticker = {
-            ticker: self._load_ticker(ticker) for ticker in self._tickers
-        }
-        selected_snapshots = {}
+        self._history_call_count += 1
         result = {}
-        for session, decision_time in decision_times:
-            eligible = set()
-            for ticker in self._tickers:
-                prior = tuple(
-                    item
-                    for item in by_ticker[ticker]
-                    if item[0] < decision_time
+        fetched = 0
+        for item in _history_items(history, name):
+            if type(item) is not tuple or len(item) != 2:
+                _error(name + " item shape changed")
+            key, raw_rows = item
+            if type(key) is not tuple or len(key) != 2:
+                _error(name + " index shape changed")
+            universe_symbol, raw_time = key
+            try:
+                observed_sid = str(universe_symbol.id)
+            except Exception as exc:
+                raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                    name + " universe SID is unreadable"
+                ) from exc
+            if observed_sid != expected_sid:
+                _error(name + " universe identity changed")
+            observed = (
+                _local_collection_time(raw_time, name + " collection")
+                if fundamental
+                else _constituent_collection_time(
+                    raw_time, name + " collection"
                 )
-                if not prior:
-                    _error(
-                        "constituent-history has no snapshot strictly before decision"
-                    )
-                collection_time, constituents = prior[-1]
-                age = decision_time - collection_time
-                if age <= timedelta(0) or (
-                    self._maximum_snapshot_age is not None
-                    and age > self._maximum_snapshot_age
-                ):
-                    _error("constituent-history prior snapshot is stale")
-                snapshot_key = (ticker, collection_time)
-                if snapshot_key not in selected_snapshots:
-                    selected_snapshots[snapshot_key] = self._mapped_snapshot(
-                        ticker, collection_time, constituents
-                    )
-                security_ids = selected_snapshots[snapshot_key]
-                eligible.update(security_ids)
-            value = tuple(sorted(eligible))
-            if not value:
-                _error("constituent-history decision eligibility is empty")
-            result[session] = value
-        figi_authority.require_preliminary_qc_figi_resolution(self._resolution)
+            )
+            if not start <= observed < end:
+                continue
+            if observed in result:
+                _error(name + " duplicated a collection time")
+            rows = _collection_rows(raw_rows, name)
+            result[observed] = rows
+            fetched += len(rows)
+        self._fetched_source_row_count += fetched
+        if self._fetched_source_row_count > MAX_TOTAL_SOURCE_ROWS:
+            _error("PIT market-cap total source-row cap exceeded")
+        prior_state = (
+            self._last_fundamental_state
+            if fundamental
+            else self._last_constituent_state[self._tickers[0]]
+        )
+        if not result and prior_state is None:
+            _error(name + " contains no bounded collection")
         return result
 
+    @staticmethod
+    def _latest(inventory, cutoff, name):
+        prior = tuple(key for key in inventory if key < cutoff)
+        if not prior:
+            _error(name + " has no strictly prior collection")
+        key = max(prior)
+        return key, inventory[key]
 
-class AcceptedRiskPreliminaryQcDriver:
-    """Resumeless state machine advanced in bounded QC runtime slices."""
+    def _finish_chunk(self, constituents):
+        chunk = self._chunks[self._chunk_index]
+        fundamental_cache = {}
+        constituent_cache = {}
+        ticker = self._tickers[0]
+        for decision in chunk:
+            session = decision.strftime("%Y-%m-%d")
+            decision_open = decision.replace(hour=9, minute=30)
+            available_fundamentals = dict(self._fundamentals)
+            fundamental_state = self._last_fundamental_state
+            if (
+                fundamental_state is not None
+                and fundamental_state[0] not in available_fundamentals
+            ):
+                available_fundamentals[fundamental_state[0]] = (
+                    fundamental_state[1]
+                )
+            fundamental_time, fundamental_rows = self._latest(
+                available_fundamentals,
+                decision_open,
+                "PIT fundamentals",
+            )
+            if (
+                fundamental_state is None
+                or fundamental_time > fundamental_state[0]
+            ):
+                self._last_fundamental_state = (
+                    fundamental_time,
+                    fundamental_rows,
+                )
+            if fundamental_time not in fundamental_cache:
+                fundamental_cache[fundamental_time] = _positive_market_caps(
+                    fundamental_rows
+                )
+            caps_by_sid = fundamental_cache[fundamental_time]
+            available = dict(constituents)
+            state = self._last_constituent_state[ticker]
+            if state is not None and state[0] not in available:
+                available[state[0]] = state[1]
+            collection_time, rows = self._latest(
+                available,
+                decision,
+                "PIT ETF constituents",
+            )
+            if state is None or collection_time > state[0]:
+                self._last_constituent_state[ticker] = (
+                    collection_time,
+                    rows,
+                )
+            if collection_time not in constituent_cache:
+                constituent_cache[collection_time] = (
+                    _positive_constituent_sids(rows)
+                )
+            member_sids = constituent_cache[collection_time]
+            score_bearing = tuple(
+                sid for sid in sorted(member_sids)
+                if sid in self._security_by_sid
+            )
+            covered = {}
+            for sid in score_bearing:
+                market_cap = caps_by_sid.get(sid)
+                if market_cap is None:
+                    continue
+                security_id = self._security_by_sid[sid]
+                if security_id in covered:
+                    _error("PIT market-cap internal security identity collided")
+                covered[security_id] = market_cap
+            uncovered = len(score_bearing) - len(covered)
+            if not covered:
+                _error("PIT market-cap covered eligibility is empty")
+            self._eligible_score_bearing_count += len(score_bearing)
+            self._covered_count += len(covered)
+            self._uncovered_count += uncovered
+            self._market_caps[session] = dict(sorted(covered.items()))
+        self._fundamentals = None
+        self._chunk_index += 1
+        self._stage = "fundamental"
 
+    def advance(self):
+        if self.completed:
+            return None
+        figi_authority.require_preliminary_qc_figi_resolution(self._resolution)
+        if self._stage == "fundamental":
+            self._fundamentals = self._inventory(
+                self._fundamental_universe,
+                self._fundamental_sid,
+                "PIT fundamentals history",
+                fundamental=True,
+            )
+            self._stage = "constituent"
+        else:
+            ticker = self._tickers[0]
+            constituents = self._inventory(
+                self._constituent_universes[ticker],
+                self._constituent_sids[ticker],
+                "PIT " + ticker + " constituent history",
+                fundamental=False,
+            )
+            self._finish_chunk(constituents)
+        figi_authority.require_preliminary_qc_figi_resolution(self._resolution)
+        return self._chunk_index, self._stage
+
+    def require_completed_market_caps(self):
+        if (
+            not self.completed
+            or self._fundamentals is not None
+            or set(self._market_caps) != set(self._decision_sessions)
+            or self._covered_count + self._uncovered_count
+            != self._eligible_score_bearing_count
+        ):
+            _error("PIT market-cap eligibility is incomplete")
+        return {
+            session: dict(self._market_caps[session])
+            for session in self._decision_sessions
+        }
+
+
+class AcceptedRiskMarketCapStockPortfolioQcDriver:
     def __init__(
         self,
         algorithm,
@@ -1115,48 +1223,23 @@ class AcceptedRiskPreliminaryQcDriver:
         trade_bar_type,
         daily_resolution,
         total_return_normalization,
-        evaluation_profile_id=None,
-        constituent_universes=None,
+        evaluation_profile_id,
+        fundamental_universe,
+        constituent_universes,
     ):
-        if evaluation_profile_id is None:
-            profile = None
-        elif (
-            type(evaluation_profile_id) is str
-            and evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS
-        ):
-            stock_portfolio = _stock_portfolio_module()
-            if stock_portfolio.PROFILE_IDS != STOCK_PORTFOLIO_PROFILE_IDS:
-                _error("stock portfolio profile inventory binding changed")
-            if stock_portfolio.PROFILE_ID != STOCK_PORTFOLIO_PROFILE_ID:
-                _error("stock portfolio profile binding changed")
-            profile = stock_portfolio.require_stock_portfolio_profile(
-                evaluation_profile_id
-            )
-        else:
-            profile = regime_evaluator.require_regime_profile(
-                evaluation_profile_id
-            )
-        required_constituent_tickers = (
-            ()
-            if profile is None
-            else stock_portfolio.constituent_etf_tickers_for_profile(
-                evaluation_profile_id
-            )
-            if evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS
-            else ()
+        profile = market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+            evaluation_profile_id
         )
-        if required_constituent_tickers:
-            if (
-                type(constituent_universes) is not dict
-                or tuple(sorted(constituent_universes))
-                != tuple(sorted(required_constituent_tickers))
-            ):
-                _error("constituent-history driver universe inventory changed")
-            frozen_constituent_universes = dict(constituent_universes)
-        else:
-            if constituent_universes is not None:
-                _error("non-universe profile received constituent universes")
-            frozen_constituent_universes = None
+        tickers = market_cap_evaluator.constituent_etf_tickers_for_profile(
+            evaluation_profile_id
+        )
+        if (
+            market_cap_evaluator.PROFILE_IDS != PROFILE_IDS
+            or type(constituent_universes) is not dict
+            or tuple(constituent_universes) != tickers
+            or fundamental_universe is None
+        ):
+            _error("market-cap driver universe inventory changed")
         self._algorithm = algorithm
         self._activation_manifest_key = activation_manifest_key
         self._activation_manifest_sha256 = activation_manifest_sha256
@@ -1166,16 +1249,16 @@ class AcceptedRiskPreliminaryQcDriver:
         self._daily_resolution = daily_resolution
         self._total_return_normalization = total_return_normalization
         self._evaluation_profile_id = evaluation_profile_id
-        self._evaluation_profile_sha256 = (
-            None if profile is None else profile["profile_sha256"]
-        )
-        self._constituent_universes = frozen_constituent_universes
+        self._evaluation_profile_sha256 = profile["profile_sha256"]
+        self._fundamental_universe = fundamental_universe
+        self._constituent_universes = dict(constituent_universes)
         self._package = None
         self._resolution = None
         self._history_loader = None
+        self._pit_loader = None
         self._runtime = None
         self._emitted = False
-        self._training_slice_count = 0
+        self._runtime_slice_count = 0
         self._runtime_started_monotonic = None
 
     @property
@@ -1185,9 +1268,9 @@ class AcceptedRiskPreliminaryQcDriver:
             and self._runtime.phase is evaluator.RuntimePhase.COMPLETED
         )
 
-    def _initialize_in_training(self):
+    def _initialize(self):
         if self._package is not None:
-            _error("preliminary QC package initialized more than once")
+            _error("market-cap package initialized more than once")
         package = load_accepted_risk_preliminary_package(
             self._algorithm,
             activation_manifest_key=self._activation_manifest_key,
@@ -1205,12 +1288,18 @@ class AcceptedRiskPreliminaryQcDriver:
                 benchmark_symbol=self._benchmark_symbol,
             )
         except Exception as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
-                "preliminary QC composite-FIGI inventory did not resolve"
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                "market-cap QC composite-FIGI inventory did not resolve"
             ) from exc
+        input_security_ids = tuple(
+            sorted({
+                item.security_id
+                for item in package.evaluator_input.memberships
+            })
+        )
         permitted_ids = (
             package.evaluator_input.benchmark_security_id,
-            *tuple(item.security_id for item in package.evaluator_input.memberships),
+            *input_security_ids,
         )
         history_loader = QcTotalReturnOpenHistoryLoader(
             self._algorithm,
@@ -1222,61 +1311,40 @@ class AcceptedRiskPreliminaryQcDriver:
             permitted_security_ids=tuple(dict.fromkeys(permitted_ids)),
             permitted_sessions=package.evaluator_input.session_axis,
         )
-        input_security_ids = tuple(
-            sorted(
-                {
-                    item.security_id
-                    for item in package.evaluator_input.memberships
-                }
-            )
-        )
         named_refusals = tuple(
             security_id
             for security_id in input_security_ids
             if resolution.symbol_for_security(security_id) is None
         )
-        if self._evaluation_profile_id is None:
-            runtime = evaluator.PreliminaryRatingEvaluationRuntime(
-                package.evaluator_input
-            )
-        elif self._evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
-            stock_portfolio = _stock_portfolio_module()
-            if stock_portfolio.PROFILE_IDS != STOCK_PORTFOLIO_PROFILE_IDS:
-                _error("stock portfolio profile inventory binding changed")
-            runtime_kwargs = {
-                "profile_id": self._evaluation_profile_id,
-                "package_id": package.package_id,
-                "package_sha256": package.package_sha256,
-                "named_figi_resolution_refusals": named_refusals,
-            }
-            if self._evaluation_profile_id in stock_portfolio.UNIVERSE_PROFILE_IDS:
-                constituent_loader = QcEtfConstituentEligibilityLoader(
-                    self._algorithm,
-                    resolution=resolution,
-                    daily_resolution=self._daily_resolution,
-                    evaluation_profile_id=self._evaluation_profile_id,
-                    constituent_universes=self._constituent_universes,
-                )
-                decision_sessions = stock_portfolio.decision_sessions_for_input(
-                    package.evaluator_input
-                )
-                runtime_kwargs["eligible_security_ids_by_decision_session"] = (
-                    constituent_loader.build_eligibility(decision_sessions)
-                )
-            runtime = stock_portfolio.StockPortfolioEvaluationRuntime(
-                package.evaluator_input,
-                **runtime_kwargs,
-            )
-        else:
-            runtime = regime_evaluator.RegimeRatingEvaluationRuntime(
-                package.evaluator_input,
-                profile_id=self._evaluation_profile_id,
-                named_figi_resolution_refusals=named_refusals,
-            )
+        decisions = market_cap_evaluator.decision_sessions_for_input(
+            package.evaluator_input,
+            self._evaluation_profile_id,
+        )
+        pit_loader = QcPitMarketCapEligibilityLoader(
+            self._algorithm,
+            resolution=resolution,
+            decision_sessions=decisions,
+            input_security_ids=input_security_ids,
+            fundamental_universe=self._fundamental_universe,
+            constituent_universes=self._constituent_universes,
+            evaluation_profile_id=self._evaluation_profile_id,
+        )
         self._package = package
         self._resolution = resolution
         self._history_loader = history_loader
-        self._runtime = runtime
+        self._pit_loader = pit_loader
+        self._named_refusals = named_refusals
+
+    def _initialize_evaluator(self):
+        maps = self._pit_loader.require_completed_market_caps()
+        self._runtime = market_cap_evaluator.MarketCapStockPortfolioEvaluationRuntime(
+            self._package.evaluator_input,
+            profile_id=self._evaluation_profile_id,
+            package_id=self._package.package_id,
+            package_sha256=self._package.package_sha256,
+            named_figi_resolution_refusals=self._named_refusals,
+            eligibility_market_caps_by_decision_session=maps,
+        )
 
     def advance_training_slice(
         self,
@@ -1286,116 +1354,126 @@ class AcceptedRiskPreliminaryQcDriver:
         monotonic=time.monotonic,
     ):
         if (
-            type(maximum_work_units) is not int
-            or not 1 <= maximum_work_units <= TRAIN_WORK_UNITS_PER_SLICE
+            maximum_work_units != TRAIN_WORK_UNITS_PER_SLICE
+            or type(maximum_work_units) is not int
             or type(soft_seconds) is not int
             or not 1 <= soft_seconds <= TRAIN_SLICE_SOFT_SECONDS
             or not callable(monotonic)
         ):
-            _error("preliminary runtime slice bound changed")
+            _error("market-cap runtime slice bound changed")
         if self.completed:
             return None
         started = monotonic()
         if type(started) not in (int, float) or not math.isfinite(started):
-            _error("preliminary Train monotonic clock changed")
+            _error("market-cap runtime monotonic clock changed")
         if self._runtime_started_monotonic is None:
             self._runtime_started_monotonic = started
-        if (
-            started - self._runtime_started_monotonic
-            > MAX_BACKTEST_RUNTIME_SECONDS
-        ):
-            _error("preliminary evaluation exceeded twelve-hour backtest bound")
-        self._training_slice_count += 1
-        if self._training_slice_count > MAX_TRAIN_SLICE_COUNT:
-            _error("preliminary evaluation exceeded deterministic runtime-slice census")
-        work = 0
-        if self._runtime is None:
-            self._initialize_in_training()
-            work += 1
+        if started - self._runtime_started_monotonic > MAX_BACKTEST_RUNTIME_SECONDS:
+            _error("market-cap evaluation exceeded twelve-hour bound")
+        self._runtime_slice_count += 1
+        if self._runtime_slice_count > MAX_TRAIN_SLICE_COUNT:
+            _error("market-cap evaluation exceeded runtime-slice census")
         progress = None
-        while work < maximum_work_units and not self.completed:
-            now = monotonic()
-            if type(now) not in (int, float) or not math.isfinite(now) or now < started:
-                _error("preliminary Train monotonic clock changed")
-            if work and now - started >= soft_seconds:
+        for _ in range(maximum_work_units):
+            current = monotonic()
+            if (
+                type(current) not in (int, float)
+                or not math.isfinite(current)
+                or current < started
+            ):
+                _error("market-cap runtime monotonic clock changed")
+            if current - started >= soft_seconds:
                 break
-            progress = self._runtime.run_callback(self._history_loader)
-            work += 1
-        if self.completed:
-            self.emit_completed_summary()
+            if self._package is None:
+                self._initialize()
+            elif (
+                not self._pit_loader.completed
+                and self._algorithm.time.date()
+                <= self._pit_loader._chunks[
+                    self._pit_loader._chunk_index
+                ][-1].date()
+            ):
+                break
+            elif not self._pit_loader.completed:
+                progress = self._pit_loader.advance()
+            elif self._runtime is None:
+                self._initialize_evaluator()
+            elif (
+                self._runtime.phase is evaluator.RuntimePhase.HISTORY
+                and self._algorithm.time.date()
+                <= datetime.fromisoformat(
+                    self._runtime._history_request(0).end_session
+                ).date()
+            ):
+                break
+            else:
+                progress = self._runtime.run_callback(self._history_loader)
+                if self.completed:
+                    self.emit_completed_summary()
+                    break
         return progress
 
     def emit_completed_summary(self):
         if not self.completed:
-            _error("preliminary custom summary requested before completion")
+            _error("market-cap custom summary requested before completion")
         if self._emitted:
             return
         statistics = self._runtime.custom_summary_statistics()
-        if self._evaluation_profile_id is None:
-            expected_evaluator_names = evaluator.EVALUATOR_CUSTOM_SUMMARY_STATISTIC_NAMES
-        elif self._evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
-            expected_evaluator_names = (
-                _stock_portfolio_module().expected_custom_summary_statistic_names(
-                    self._evaluation_profile_id
-                )
-            )
-        else:
-            expected_evaluator_names = (
-                regime_evaluator.expected_custom_summary_statistic_names(
-                    self._evaluation_profile_id
-                )
-            )
-        stock_portfolio = (
-            type(self._evaluation_profile_id) is str
-            and self._evaluation_profile_id
-            in STOCK_PORTFOLIO_PROFILE_IDS
+        expected = market_cap_evaluator.expected_custom_summary_statistic_names(
+            self._evaluation_profile_id
         )
-        if (
-            type(statistics) is not dict
-            or tuple(sorted(statistics))
-            != expected_evaluator_names
-        ):
-            _error("preliminary evaluator custom summary inventory changed")
+        if type(statistics) is not dict or tuple(sorted(statistics)) != expected:
+            _error("market-cap evaluator custom summary inventory changed")
         meta = {
             "schema": (
-                "arv2-accepted-risk-preliminary-qc-runtime-meta-v1"
-                if self._evaluation_profile_id is None
-                else (
-                    "arv2-accepted-risk-stock-portfolio-qc-runtime-meta-v1"
-                    if stock_portfolio
-                    else "arv2-accepted-risk-regime-qc-runtime-meta-v1"
-                )
+                "arv2-accepted-risk-market-cap-stock-portfolio-"
+                "qc-runtime-meta-v1"
             ),
             "status": (
-                "PRELIMINARY_ACCEPTED_RISK_STOCK_PORTFOLIO_COMPLETED"
-                if stock_portfolio
-                else "PRELIMINARY_ACCEPTED_RISK_STOCK_IC_ONLY_COMPLETED"
+                "PRELIMINARY_ACCEPTED_RISK_MARKET_CAP_"
+                "STOCK_PORTFOLIO_COMPLETED"
             ),
             "package_id": self._package.package_id,
             "package_sha256": self._package.package_sha256,
-            "activation_manifest_sha256": self._package.activation_manifest_sha256,
+            "activation_manifest_sha256": (
+                self._package.activation_manifest_sha256
+            ),
             "symbol_resolution_id": self._resolution.resolution_id,
             "symbol_resolution_sha256": self._resolution.resolution_sha256,
             "resolved_security_count": self._resolution.resolved_count,
-            "named_security_refusal_count": self._resolution.named_refusal_count,
+            "named_security_refusal_count": (
+                self._resolution.named_refusal_count
+            ),
+            "evaluation_profile_id": self._evaluation_profile_id,
+            "evaluation_profile_sha256": self._evaluation_profile_sha256,
+            "runtime_slice_count": self._runtime_slice_count,
+            "point_in_time_history_call_count": (
+                self._pit_loader.history_call_count
+            ),
+            "point_in_time_fetched_source_row_count": (
+                self._pit_loader.fetched_source_row_count
+            ),
+            "point_in_time_eligible_score_bearing_count": (
+                self._pit_loader.eligible_score_bearing_count
+            ),
+            "point_in_time_market_cap_covered_count": (
+                self._pit_loader.covered_count
+            ),
+            "point_in_time_market_cap_uncovered_count": (
+                self._pit_loader.uncovered_count
+            ),
             "result_transport": "aggregate_only_custom_summary_statistics",
             "host_object_store_export_required": False,
             "preliminary": True,
-            "point_in_time": False,
+            "point_in_time": True,
             "formal": False,
             "control_residualized": False,
-            "economic_portfolio": stock_portfolio,
+            "economic_portfolio": True,
             "etf_or_leverage": False,
             "deployment": False,
             "orders": False,
             "trading": False,
         }
-        if self._evaluation_profile_id is None:
-            meta["training_slice_count"] = self._training_slice_count
-        else:
-            meta["evaluation_profile_id"] = self._evaluation_profile_id
-            meta["evaluation_profile_sha256"] = self._evaluation_profile_sha256
-            meta["runtime_slice_count"] = self._training_slice_count
         statistics[RUNTIME_META_STATISTIC] = _canonical(meta).decode("ascii")
         if (
             tuple(sorted(statistics))
@@ -1410,13 +1488,13 @@ class AcceptedRiskPreliminaryQcDriver:
                 for key, value in statistics.items()
             )
         ):
-            _error("preliminary custom summary transport exceeded bound")
+            _error("market-cap custom summary transport exceeded bound")
         try:
             for key, value in sorted(statistics.items()):
                 self._algorithm.set_summary_statistic(key, value)
         except Exception as exc:
-            raise AcceptedRiskPreliminaryQcRuntimeError(
-                "preliminary custom summary statistic emission failed"
+            raise AcceptedRiskMarketCapStockPortfolioQcRuntimeError(
+                "market-cap custom summary emission failed"
             ) from exc
         self._emitted = True
 
@@ -1424,5 +1502,23 @@ class AcceptedRiskPreliminaryQcDriver:
         if not self.completed or not self._emitted:
             if self._runtime is not None:
                 self._runtime.abort()
-            _error("preliminary QC backtest ended before aggregate completion")
+            _error("market-cap QC backtest ended before aggregate completion")
         return True
+
+
+__all__ = (
+    "AcceptedRiskMarketCapStockPortfolioQcDriver",
+    "AcceptedRiskMarketCapStockPortfolioQcRuntimeError",
+    "HISTORY_CHUNK_DECISION_COUNT",
+    "MAX_COLLECTIONS_PER_CALL",
+    "MAX_COLLECTION_ROWS",
+    "MAX_TRAIN_SLICE_COUNT",
+    "PROFILE_IDS",
+    "QcPitMarketCapEligibilityLoader",
+    "QcTotalReturnOpenHistoryLoader",
+    "RUNTIME_META_STATISTIC",
+    "TRAIN_SLICE_SOFT_SECONDS",
+    "TRAIN_WORK_UNITS_PER_SLICE",
+    "expected_custom_summary_statistic_names",
+    "load_accepted_risk_preliminary_package",
+)

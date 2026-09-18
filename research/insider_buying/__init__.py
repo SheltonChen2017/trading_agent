@@ -25,6 +25,8 @@ IB-3C adds exact-value diagnostic ranking, top-decile cutoff ties, and a
 two-positive-seed availability gate while retaining the same zero authority.
 IB-3D preserves that selection and applies a separate, caller-declared buyer-
 breadth gate, atomically refusing fewer than two cluster-qualified stocks.
+The canonical IB-2 source policy freezes an owner-supplied, offline 82-quarter
+input requirement while keeping every real artifact and authority unbound.
 """
 
 from research.insider_buying.contracts import (
@@ -270,6 +272,15 @@ from research.insider_buying.sec_edgar_acceptance_snapshot import (
     build_sec_edgar_acceptance_snapshot,
     load_sec_edgar_acceptance_snapshot,
 )
+from research.insider_buying.sec_owner_supplied_source_policy import (
+    CANONICAL_IB2_REQUIRED_PERIODS,
+    CANONICAL_IB2_SOURCE_MODE,
+    CANONICAL_IB2_SOURCE_POLICY,
+    CANONICAL_IB2_SOURCE_POLICY_SHA256,
+    CANONICAL_IB2_SOURCE_POLICY_VERSION,
+    CanonicalIb2SourcePolicy,
+    CanonicalIb2SourcePolicyError,
+)
 from research.insider_buying.preregistration import (
     FIXED_STRATEGY_LANE_IDS,
     INSIDER_BUYING_BLUEPRINT_SHA256,
@@ -284,7 +295,14 @@ from research.insider_buying.preregistration import (
 
 __all__ = [
     "ALLOWED_SEC_TABLES",
+    "CANONICAL_IB2_REQUIRED_PERIODS",
+    "CANONICAL_IB2_SOURCE_MODE",
+    "CANONICAL_IB2_SOURCE_POLICY",
+    "CANONICAL_IB2_SOURCE_POLICY_SHA256",
+    "CANONICAL_IB2_SOURCE_POLICY_VERSION",
     "CANONICAL_SPEC",
+    "CanonicalIb2SourcePolicy",
+    "CanonicalIb2SourcePolicyError",
     "ClassificationOutcome",
     "EDGAR_ACCEPTANCE_SNAPSHOT_CONTRACT_VERSION",
     "EDGAR_ACCEPTANCE_SNAPSHOT_KIND",

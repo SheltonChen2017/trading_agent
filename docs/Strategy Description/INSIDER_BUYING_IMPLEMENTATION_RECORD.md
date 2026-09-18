@@ -1,18 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `05a0755` AND `4dbafe0`,
-COMMITTED THE ACCEPTED-AFTER-CORRECTION DISPOSITION AS `04f939b`, AND COMPLETED
-THE OWNER-APPROVED SYNTHETIC/OFFLINE IB-3B NORMALIZATION DIAGNOSTICS IN
-`fd0d7f6` (SECTION 55). THE IMPLEMENTATION RETAINS EVERY DECLARED COHORT ROW,
-REPLAYS POSITIVE SCORES FROM EXACT IB-3A ARTIFACTS, INCLUDES EXPLICIT
-STRUCTURAL ZEROS, REFUSES ELIGIBLE-MISSING SCORES, APPLIES TYPE-7 1%/99%
-WINSORIZATION, AND PRODUCES POPULATION Z-SCORE DIAGNOSTICS UNDER A PINNED
-50-DIGIT DECIMAL POLICY. NUMERICAL BOUNDARY CORRECTIONS WERE VERIFIED BY
-PUBLIC-ARTIFACT REGRESSIONS, EIGHT KILLED MUTANTS, AND 10,000 RANDOMIZED
-ADVERSARIAL PROBES. THE FINAL LANE GATE IS 1,473 PASSED, 8 SKIPPED. NO P0-P2
-FINDING IS OPEN; ONE NON-BLOCKING P3 STANDALONE-IDENTITY LIMITATION IS RETAINED.
-RANKING AND SEED SELECTION REMAIN DEFERRED. NO DATA, OUTCOME, QC, PAPER, LIVE,
-DEPLOYMENT, OR TRADING AUTHORITY IS INFERRED.**
+Status: **CODEX SYNCHRONIZED THE DESIGNATED LANE THROUGH CLAUDE REVIEW HEAD
+`31b3fcc`, COUNTER-REVIEWED BOTH CLAUDE COMMITS `d26e2c9` AND `31b3fcc`, AND
+ACCEPTED EACH ONLY AFTER CORRECTION. THE COUNTER-REVIEW FOUND THAT THE
+REVIEWED ROUNDING REGRESSION DID NOT CLOSE RUNTIME POLICY-IDENTITY DRIFT:
+MUTABLE DECIMAL ROUNDING ALIASES AND, IN IB-3A, COHERENT CONSTANT-PLUS-HASH
+REBINDING COULD CHANGE NUMERICAL BEHAVIOUR WHILE THE FROZEN-POLICY GUARD
+PASSED. `be54897` CLOSES THAT P2 IN BOTH IB-3A AND IB-3B, INCLUDING THE
+VARIANCE-CAP ROUNDING MODE, AND ADDS RED/GREEN COVERAGE. THE CORRECTED FOCUSED
+TOTAL IS 222 PASSED; THE CURRENT MACOS LANE GATES ARE 1,487 PASSED WITH THE
+OVERLAY BOUNDARY AND 1,496 PASSED WITH THE ML BOUNDARY. APPEND-ONLY
+CORRECTIONS TO CLAUDE'S COUNTS, ORACLE TABLE, AND Z-ORDERING WORDING ARE IN
+SECTION 57. SYNTHETIC IB-3C SCOPING HAS BEGUN, BUT EXECUTABLE RANKING/SEED
+SELECTION REMAINS BLOCKED UNTIL THE OWNER FREEZES ITS PERCENTILE, INTEGER
+ROUNDING, CUTOFF-TIE, AND MINIMUM-SEED POLICY. NO DATA, PROVIDER, OUTCOME, QC,
+PAPER, LIVE, DEPLOYMENT, OR TRADING AUTHORITY IS INFERRED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -169,6 +171,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-14 | Claude review | `c5aec62d` -> this review record | Review of the single Codex counter-review commit closing the IB-3A gaps (`4c834e11..c5aec62d`): factory-bound snapshots and alias/ABA closure, breadth and raw-score envelopes, the load-bearing final seal, the 772/774 width correction, and the age-10,000 freshness wording | Reproduced every section-52 row independently: derivations for each envelope clause, a 300-batch/1,106-event randomized valid-input oracle with zero refusals, the 772/774 arithmetic, the age-10,000 50-digit projection against a 400-digit oracle, both blob SHA-256s, and the two shared CRLF paths. Ten targeted mutants of the corrections: nine caught, one (the upper-total envelope) survived because the existing case forged total and largest together; an isolating regression now catches it alone. Full detail in section 53. | Focused 177 passed; lane/boundary gate 1,374 + 69 = 1,443 passed, 8 skipped; compileall exit 0; `git diff --check` clean; complete repository suite 2 failed, 7,673 passed, 15 skipped, 25 warnings in 2,616.41s (0:43:36), the only failures being the two shared CRLF working copies recorded as `IBSH-CCR08`; module restored byte-identical after every mutant. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**; 27 authority flags false; `stock_score` None. | Accepted after correction. Findings are in section 53.6. IB-3B not started; the section 52.5 owner-decision register is returned unchanged. | Codex counter-reviews this review commit. No milestone authorized. |
 | 2026-09-17 | Codex counter-review + implementation | `4dbafe0` -> `04f939b` counter-review; `fd0d7f6` IB-3B code snapshot; this record commit follows | Claude IB-3A correction counter-review plus owner-approved synthetic IB-3B normalization diagnostics | Accepted both Claude commits after append-only P3 evidence corrections, then added a sealed caller-declared cohort model, exact IB-3A signal replay, structural-zero inclusion, named exclusions/refusal, Type-7 1%/99% winsorization, population-z diagnostics, and deferred canonical score/rank/seed fields. | Focused IB-3B **37 passed**; combined IB-3A/IB-3B **216 passed**; lane gate **1,473 passed, 8 skipped**; eight intended mutants killed; 10,000 randomized/boundary probes found no false refusal; compile/diff/final checks recorded in section 55. The owner directed that the completed lane gate is sufficient, so the started repository-wide run was interrupted and is not evidence. No external or outcome access; **0 research looks**. | No P0-P2 finding remains. Numerical false-refusal and standalone-seal findings are closed in section 55; one non-blocking P3 lower-variance standalone-identity limitation is retained, while exact parent-result replay remains authoritative. | Commit this record and make the round's single push. Claude reviews every commit after `4dbafe0`. Owner next chooses a separately frozen synthetic ranking/seed milestone or canonical IB-2 authority completion; neither is inferred here. |
 | 2026-09-17 | Claude review | `297a9bc3` -> this review record | Review of the IB-3A counter-review `04f939b1`, the synthetic IB-3B normalization diagnostics `fd0d7f65`, and the record `297a9bc3` (`4dbafe07..297a9bc3`) | Verified policy fidelity to the owner-approved section 54.4 policy constant by constant and clause by clause in the kernel, reproduced the focused and combined counts, both blob SHA-256s, zero authority and hard-None canonical fields, and ran an independent exact-rational oracle over public cohorts plus eighteen targeted mutants covering Codex's eight killed directions and ten more. Full detail in section 56. | Focused 37 + 179 = 216 passed; lane/boundary gate 2 passed in 1.00s; compileall exit 0; `git diff --check` clean; every mutated module restored byte-identical. No complete repository suite was run, per owner direction. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**; 27 authority flags false; score/rank/seed None. | Accepted after correction. Findings are in section 56.8. IB-3B remains synthetic, offline evidence; the section 55.6 owner-decision register is returned unchanged. | Codex counter-reviews this review round. No milestone started or authorized. |
+| 2026-09-17 | Codex counter-review | `31b3fcc` -> `be54897` correction snapshot; this record commit follows | Counter-review of Claude commits `d26e2c9` and `31b3fcc`; synthetic IB-3C policy-gate scoping | Accepted both Claude commits after correction. Closed runtime decimal-policy identity drift in IB-3A/IB-3B, pinned the upstream and local policy hashes, removed mutable rounding aliases, and corrected the review evidence append-only. Began IB-3C definition-of-done and policy scoping without creating an executable ranking/seed artifact. | Pre-fix runtime probes accepted HALF_UP alias rebinding with unchanged policy hashes and changed both exact ties. Corrected focused: IB-3A **181**, IB-3B **41**, combined **222 passed**. Current macOS lane gates: **1,487 passed** with overlay boundary and **1,496 passed** with ML boundary; whole-tree compileall exit 0; final record/diff/status checks follow in section 57. No external or outcome access; **0 research looks**. | `IB3B-CCR01` P2 closed in `be54897`; record P3s `IB3B-CCR02` through `IB3B-CCR05` corrected or scoped in section 57. `IB3B-R11` and `IB3B-CR03` remain non-blocking as recorded. One analogous Analyst-lane P3 is documented only and not fixed here. | Commit this lane record and make exactly one push for the round. Executable IB-3C remains owner-blocked pending an exact policy freeze; canonical IB-2 remains unavailable without separately granted data authorities. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -7369,3 +7372,124 @@ deferred.
 Codex counter-reviews this review round. The section 55.6 owner-decision
 register (synthetic IB-3C ranking/seed versus canonical IB-2 completion) is
 returned unchanged; nothing is started by inference.
+
+## 57. Codex counter-review of Claude IB-3B review and IB-3C policy gate (2026-09-17)
+
+Codex worked only in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on the existing `codex/strategy-insider-buying` branch. The worktree was
+fast-forwarded from local `4c834e1` to remote review head `31b3fcc`; no branch,
+worktree, fork, or merge was created. The two newly synchronized Claude
+commits were reviewed in order:
+
+1. `d26e2c92dd7fc1a596da7e630b17635554537d7a`, the IB-3B rounding
+   regression; and
+2. `31b3fcc9f2ff986ae6f69dc6a7d442dbb4704450`, Claude's review record.
+
+Project-wide coordination documents remained frozen. This lane record alone
+was updated as the branch-local handoff.
+
+### 57.1 Commit dispositions
+
+| Commit | Change | Codex disposition |
+|---|---|---|
+| `d26e2c92dd7fc1a596da7e630b17635554537d7a` | Adds a real 51-digit HALF_EVEN tie regression to IB-3B | **Accepted after correction in `be54897`.** The test correctly detects a source edit from HALF_EVEN to HALF_UP, but the production module still consumed a mutable imported decimal alias. Runtime alias rebinding changed the kernel while the frozen-policy guard and policy hash remained green. |
+| `31b3fcc9f2ff986ae6f69dc6a7d442dbb4704450` | Records Claude's independent IB-3B review | **Accepted after append-only correction.** The review found a useful test-sensitivity gap and correctly verified the main artifact boundaries, but overstated runtime closure and contained stale counts, one false oracle row, and unsupported z-ordering wording. Historical section 56 is retained; this section supersedes only the affected claims. |
+
+### 57.2 P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3B-CCR01 | P2 | **CLOSED in `be54897`** | `d26e2c9`, generalized across IB-3A/IB-3B | Both decimal-context factories, IB-3A frozen-policy guard, and IB-3B variance cap | The reviewed test did not freeze runtime behaviour. Rebinding the imported `ROUND_HALF_EVEN` alias to `ROUND_HALF_UP` left each guard and recorded hash unchanged but changed an exact 51-digit tie. IB-3A also accepted coherent policy-constant plus recomputed-hash rebinding. IB-3B's imported `ROUND_CEILING` cap mode had the same binding class. | Before correction, direct probes printed IB-3A breadth `0.10000000000000000000000000000000000000000000000001` and IB-3B projection `1.0000000000000000000000000000000000000000000000001`; both guards returned normally and both payload hashes still matched. | Frozen numerical identity must fail closed under the lane's established coherent-rebind threat model; a test-only correction could otherwise leave a policy hash naming arithmetic the runtime did not perform. | Removed mutable rounding aliases; descriptor factories validate the public descriptors and construct from hard literals; the variance cap uses literal `ROUND_CEILING`; IB-3A now pins every module-owned numeric/formula/resource literal and its expected hash; IB-3B pins both its expected hash and the upstream IB-3A hash. Added alias-rebind, coherent-rebind, direct-context, exact-tie, and ceiling-cap regressions. | The original alias exploit now leaves both kernels at HALF_EVEN; coherent rounding-plus-hash rebinding refuses in both modules. Focused IB-3A/IB-3B is 181/41, 222 combined. |
+| IB3B-CCR02 | P3 | **CORRECTED in this section** | `31b3fcc` | Sections 5, 56.4, and 56.9 | Final-tree counts and gate labels were stale. After `d26e2c9`, the reviewed tree was 38 IB-3B plus 179 IB-3A = 217, not 37 + 179 = 216. The tree has 15 Insider test files, not 14. The two-test result in the push ledger was only `test_overlay_import_boundary.py`, not the whole lane gate. | Exact test collection and final-tree replay; `find` returns 15 matching Insider files. | Review evidence must distinguish the reviewed final tree, platform skips, and the two alternative boundary files. | Append-only correction: the corresponding Windows expectations advance from 1,482/8 to **1,483 passed, 8 skipped** for the ML-boundary set and from 1,473/8 to **1,474 passed, 8 skipped** for the overlay-boundary set. They are arithmetic corrections, not new Windows executions. On the current macOS corrected tree the exact sets give 1,496 and 1,487 passed respectively. | Both macOS commands passed; the 9-test difference equals 11 ML-boundary tests minus 2 overlay-boundary tests. |
+| IB3B-CCR03 | P3 | **CORRECTED in this section** | `31b3fcc` | Section 56.5 oracle table | The N=20 adjacent-value row incorrectly reported zero dispersion. The public cohort with ten values at `50000` and ten at `50000 + 1e-45` is available, retains two distinct post-winsor values, and has positive variance. The seeded oracle generator was not committed, so its other table rows are not independently reconstructible from the seed alone. | Public-helper replay gives outcome `available`, distinct count 2, population variance `5E-101`, and standard deviation `7.0710678118654752440084436210484903928483593768847E-51`. | A false exact-arithmetic claim and non-durable generator cannot remain unqualified evidence. | This row supersedes the adjacent-value row in 56.5. The remaining oracle table is retained as historical reviewer evidence, explicitly not a durable reproduction artifact. | Public replay and the committed adjacent-score regression agree. |
+| IB3B-CCR04 | P3 | **CORRECTED in this section** | `31b3fcc` | `IB3B-CR02` in section 56.8 | The claim that sufficiently close exact z values can “order either way” is mathematically unsupported. With one shared mean and positive standard deviation, subtraction/division and HALF_EVEN rounding are monotone: two values may collapse to a deterministic tie but cannot reverse order. The approximate `1e-45` threshold was not formally derived. | Direct review of the frozen transform and its shared positive denominator. | IB-3C tie policy should not be based on an alleged reversal that the kernel cannot produce. | Retain the useful trailing-digit caveat, but replace the consequence with: close values can collapse to the same diagnostic z value, so IB-3C must freeze a deterministic exact-value cutoff/tie rule and must not treat trailing displayed digits as extra authority. No universal `1e-45` cutoff is claimed. | Formula-order review; no production change required. |
+| IB3B-CCR05 | P3 | **CORRECTED / HOST-SCOPED** | `31b3fcc` | Status header and `IB3A-CR04` | The header said only one retained P3 despite multiple section-56 P3 caveats. The carried mixed-line-ending note was specific to Claude's Windows working copy, not a content defect or a current cross-host state. | Current `git ls-files --eol` reports `i/lf w/lf` for both modules and both focused tests. | Current status must summarize open items accurately, while historical host evidence remains immutable. | Updated the current header and scoped `IB3A-CR04` to its observed Windows host. No line-ending rewrite or shared-file change was made for that note. | Current-host EOL inventory and clean diff checks. |
+| IB3B-CCR06 | P3 | **OPEN - OUT OF LANE; DOCUMENTED ONLY** | Generalized search from `d26e2c9` | Analyst Revisions V2 decimal-context tests | Analogous HALF_UP mutations left the separate Analyst lane's focused stock-control and stock-signal tests green. | The generalized audit reported 28/28 and 58/58 passing under those mutants. | The issue is not owned by the Insider lane. The standing workflow requires documentation without cross-lane modification. | None here. Route to the Analyst Revisions V2 lane for independent reproduction and disposition. | No Analyst file was edited. |
+
+No P0 or P1 finding was found. `IB3B-R11` remains the explicit non-blocking
+standalone-identity limitation whose public-parent replay closes the trust
+boundary. `IB3B-CR03` remains a non-blocking defence-in-depth test-sensitivity
+note. Neither grants downstream authority.
+
+### 57.3 Red/green verification and final code evidence
+
+The material P2 received direct red/green verification:
+
+- **Red, exact pre-correction tree:** assigning each module's imported
+  `ROUND_HALF_EVEN` global to `ROUND_HALF_UP` left `_require_frozen_policy()`
+  and the recorded payload hash green. The IB-3A breadth tie rounded upward to
+  the value ending `...00001`; the IB-3B input projection rounded upward to
+  the value ending `...0001`.
+- **Green, `be54897`:** applying the same runtime alias assignments has no
+  effect; the contexts remain `ROUND_HALF_EVEN`, the IB-3A tie ends `...00000`,
+  and the IB-3B tie ends `...0000`. Coherently rebinding the declared rounding
+  string plus its recomputed hash now raises the named frozen-policy error in
+  both modules. A rebound former ceiling alias also cannot change the
+  upward-rounded variance cap.
+
+Validation on the corrected code tree:
+
+- IB-3A focused: **181 passed**.
+- IB-3B focused: **41 passed**.
+- Combined focused: **222 passed**.
+- All 15 `test_insider_buying_*.py` files plus active-document,
+  module-hygiene, and overlay-import boundary: **1,487 passed**.
+- The same lane set with `test_ml_import_boundary.py` in place of the overlay
+  boundary: **1,496 passed**.
+- Whole-tree `compileall`, including `research`: **exit 0**.
+- `git diff --check`: clean before the record update; record-sensitive and
+  exact final status checks are repeated before the single push.
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
+security master, outcome, ETF holding, QuantConnect, broker, operator database,
+scheduler, deployment, capital, order, or trading surface was accessed.
+**Research looks: 0.** All existing authority flags remain false and canonical
+score, rank, and seed outputs remain unavailable.
+
+### 57.4 IB-3C scoping begun; executable milestone remains policy-gated
+
+The governing blueprint supplies the high-level diagnostic intention: a
+positive 30-day stock score, the top 10% of eligible stocks as seeds, a
+cluster-gated comparison, and at least two seed stocks. It does not freeze the
+integer top-decile rule, percentile convention, cutoff-tie treatment, or what
+to do when fewer than two positive names survive. Section 55.6 therefore
+correctly requires an owner decision before executable IB-3C selection code.
+
+Canonical IB-2 completion cannot be substituted: no point-in-time security
+master, authenticated amendment completion, role taxonomy, trading calendar,
+or provider/data authority was granted. The only presently safe prospective
+path is a synthetic, fixture-only IB-3C diagnostic. Codex has begun its
+definition-of-done and recommends, but has **not implemented or treated as
+approved**, this exact candidate policy:
+
+1. rank by the exact winsorized IB-3B diagnostic value, whose ordering is
+   equivalent to the shared-population z transform without relying on its
+   trailing rounded digits;
+2. use every usable eligible name, including explicit structural zeros, as
+   the percentile denominator;
+3. select the strict empirical percentile above 0.90, equivalent in an
+   untied cohort to `ceil(N / 10)` names;
+4. include every exact cutoff tie and never split a tie by stock identity;
+5. permit only positive `INCLUDE_SIGNAL` rows to become diagnostic seeds; and
+6. require at least two selected positive signals, otherwise return a named
+   unavailable result.
+
+Once frozen, IB-3C's bounded definition of done is: consume only an exact,
+fully replayed `AVAILABLE` IB-3B parent; retain every row and exclusion; define
+its own version and policy hash without changing IB-3B's deferred fields; bind
+the complete parent identity, policy, evaluation session, builder commit, and
+output inventory; preserve deterministic order, caller detachment,
+factory-only construction, final seals, exact Decimal arithmetic, resource
+bounds, zero looks, false authority, and hard-unavailable canonical fields;
+and cover N=20/21/29/30 rounding, cutoff ties, structural zeros, fewer than two
+positive signals, unavailable parents, near-equal values, permutation,
+tamper, construction, mutation, authority, bounds, exports, and forbidden
+imports.
+
+No IB-3C production or test file was created in this round because choosing
+those six methodology clauses would exceed the instruction to avoid inferred
+authority and material research-policy decisions. The next executable action
+is owner confirmation or revision of that exact candidate policy. After this
+record is committed, the round receives exactly one push; Claude then reviews
+the pushed counter-review correction on this same branch.

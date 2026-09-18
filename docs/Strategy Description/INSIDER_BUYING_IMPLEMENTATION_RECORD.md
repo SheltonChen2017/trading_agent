@@ -1,19 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
 Status: **CODEX COUNTER-REVIEWED CLAUDE COMMIT `226c4c1` AND ACCEPTED IT
-AFTER APPEND-ONLY P3 CORRECTION `IBPAPER-CCR01` (SECTION 69). CLAUDE'S
-SEVEN COMMIT DISPOSITIONS, 14-OF-14 CURRENT-GATE MUTATION RESULT, AUTHORITY
-ANALYSIS, COUNTS, AND CROSS-BRANCH `IBSH-CR01` FINDING REPRODUCE. ITS CLAIM
-THAT THIS WAS THE LANE'S FIRST NEW-GUARD MUTATION SWEEP WITH ZERO SURVIVORS
-IS HISTORICALLY FALSE: SECTION 28 ALREADY RECORDS 8 CAUGHT AND 0 SURVIVED.
-NO CODE CORRECTION WAS REQUIRED. `IBSH-CR01` REMAINS OPEN AND OUT OF LANE:
-THE OWNER-COORDINATED AMENDMENT TO THREE SHARED DOCUMENTS EXISTS ONLY ON
-THIS LANE, WHILE `main` AND THE ANALYST, SHORT-INTEREST, AND TARGET-PRICE
-LANES CARRY NONE OF IT. NO NEXT IMPLEMENTATION MILESTONE OR PUSH IS
-AUTHORIZED PENDING OWNER DIRECTION ON COMMON PROPAGATION AND THE SEPARATE
-CANONICAL IB-2 SOURCE-MODE/CUTOFF GATE. NO DATA, PROVIDER, OUTCOME,
-RESEARCH-LOOK, QC-JOB, PAPER, LIVE, DEPLOYMENT, CAPITAL, BROKER, ORDER, OR
-TRADING AUTHORITY IS GRANTED.**
+AFTER APPEND-ONLY P3 CORRECTION `IBPAPER-CCR01` IN LOCAL COMMIT `b2879e7`
+(SECTION 69). CODEX HAS NOW CLARIFIED THAT THE INSIDER-ONLY PAPER
+AMENDMENT NEED NOT PROPAGATE INTO THE OTHER THREE LANE BRANCHES;
+`IBSH-CR01` IS NON-BLOCKING AND WILL BE RECONCILED ONCE WHEN THIS LANE IS
+INTEGRATED INTO `main`. THE OWNER ALSO APPROVED THE RECOMMENDED LOW-AUTHORITY
+CANONICAL IB-2 SOURCE DIRECTION (SECTION 70): AN OWNER-SUPPLIED, IMMUTABLE,
+OFFLINE 82-QUARTER CORPUS FROM 2006Q1 THROUGH 2026Q2 WITH MATCHING FORM 4/4-A
+ACCESSION METADATA AND XML ARTIFACTS. THE CUTOFF IS THE INCLUSIVE SEC
+FILING-QUARTER BOUNDARY, NOT AN INVENTED GLOBAL EDGAR ACCEPTANCE TIMESTAMP.
+THE NEXT BOUNDED MILESTONE IS A PURE SOURCE-POLICY FREEZE WITH SYNTHETIC
+TESTS. NO REAL MANIFEST OR ARTIFACT WAS SUPPLIED, AND NO DATA, NETWORK, SEC,
+PROVIDER, OUTCOME, RESEARCH-LOOK, QC-JOB, PAPER, LIVE, DEPLOYMENT, CAPITAL,
+BROKER, ORDER, OR TRADING AUTHORITY IS GRANTED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -9151,6 +9151,88 @@ IB-4, backtest, historical validation, QC parity, or operational milestone may
 start, and no push is authorized. This counter-review record is committed and
 held locally so that the eventual authorized implementation and this review
 can leave in one combined push.
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
+security master, outcome, ETF holding, QuantConnect job/upload/processing,
+broker, operator database, scheduler, paper deployment, capital, order, live,
+or trading surface was accessed or changed. Authorized outcome looks: **0**.
+Consumed outcome looks: **0**. Research looks: **0**.
+
+## 70. Owner-selected canonical IB-2 source direction (2026-09-18)
+
+After section 69 identified one shared coordination item and one lane source
+decision, the owner said:
+
+> what does this have to with other 3 lanes? for the other one i'll follow
+> your recommendation
+
+The first sentence asks why an Insider-only paper-sequencing decision concerns
+the other lanes. It does not change their strategy logic, paper gates, or
+implementation. The only relationship is mechanical: each branch carries a
+copy of the shared coordination documents, so a later merge must retain the
+Insider-only clause. Under the owner's fixed-worktree rule this lane will not
+write or switch to the Analyst, Short-Interest, or Target-Price branches.
+`IBSH-CR01` remains a factually correct observation of branch divergence, but
+it is **non-blocking and scope-dispositioned for one-time reconciliation when
+this Insider lane is integrated into `main`**, not a reason to propagate the
+exception through the other lane branches now.
+
+The phrase “the other one” unambiguously refers to the second of section
+69.4's two listed decisions: the canonical IB-2 source-mode/input freeze. The
+approved recommendation is interpreted narrowly as authority to freeze and
+synthetically test this exact offline policy:
+
+1. Source mode is `owner_supplied_immutable_offline_snapshot`; repository code
+   performs no discovery, download, or external retrieval.
+2. Bulk coverage is exactly the **82 contiguous SEC filing-quarter packages**
+   from **2006Q1 through 2026Q2**, inclusive. The corresponding filing-date
+   envelope is 2006-01-01 through 2026-06-30, partitioned by
+   `SUBMISSION.FILING_DATE`. Missing, duplicate, reordered, earlier, or later
+   quarters fail closed.
+3. This period label is the source-corpus cutoff. It is **not** a corpus-wide
+   EDGAR acceptance timestamp. Public availability remains accession-specific;
+   transaction time, bulk-publication time, and retrieval time never become
+   signal time or an eligibility cutoff.
+4. Each quarter requires exactly one immutable raw ZIP and its hash/size-bound
+   parsed identity. Every Form 4 and Form 4/A accession in the parsed
+   `SUBMISSION` inventory requires exactly one matching acceptance-metadata
+   artifact and one complete primary ownership-XML artifact. Missing, extra,
+   duplicate, conflicting, or cross-accession matches fail closed. Forms 3
+   and 5 remain retained context and are not canonical signal candidates.
+5. SHA-256 and exact byte size bind every package, member, metadata artifact,
+   XML artifact, and canonical ordered inventory. Storage policy is
+   content-addressed, atomic, immutable, portable, and no-overwrite; an exact
+   retry is idempotent, conflicting content is refused, and any later revision
+   creates a new evidence epoch rather than mutating the old one.
+6. Matching artifacts do not by themselves authenticate which original a
+   Form 4/A corrects or prove amendment completeness. Every as-filed version
+   stays retained; no original/amendment pair may be counted simultaneously;
+   unresolved, missing-original, ambiguous, branching, cyclic, cross-issuer,
+   or temporally reversed families remain quarantined. Authenticated
+   supersession stays unavailable until a separately reviewed linkage and
+   completeness manifest freezes the replacement rule.
+7. External retrieval remains unauthorized and the current request budget is
+   exact zero. A future separately authorized retriever would require an
+   identifying contact, an internal ceiling no greater than five requests per
+   second, accession caching, backoff/checkpointing, and no requests from a
+   backtest. Those future rules grant no current network permission.
+
+The immediate bounded milestone is therefore a lane-owned, pure
+`INSETF-IB2-CANONICAL-SOURCE-POLICY-v1` contract and synthetic dangerous-
+direction tests. It binds the policy above but has no filesystem or network
+surface and no real source-manifest ID, source-manifest SHA-256, official
+schema/profile authentication, amendment-link/completeness identity,
+title-exception dictionary, normalized-role taxonomy, official point-in-time
+security master, durable `qc_symbol_id`, or calendar/session-map identity.
+Those values remain explicitly unbound and their associated verification and
+authority flags remain false.
+
+This approval does not enlarge the existing IB-1E 16-quarter/256-XML/64-MiB
+boundary or the IB-2C 4,096-security structural mapping. Full 82-quarter
+processing requires a later reviewed streaming/content-addressed manifest
+boundary and supplied artifacts. The shared security-master/calendar audit
+also remains a separately scoped common action; approving the source mode
+does not authorize access to it.
 
 No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
 security master, outcome, ETF holding, QuantConnect job/upload/processing,

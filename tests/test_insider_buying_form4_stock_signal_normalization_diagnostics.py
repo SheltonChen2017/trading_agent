@@ -1162,6 +1162,36 @@ def test_standalone_available_identity_binds_summary_relationships():
         )
 
 
+def test_nested_identity_forgery_is_closed_by_exact_parent_replay():
+    observations = (_zero(0),) + tuple(
+        _signal(index, Decimal(50_000 * (index + 1)))
+        for index in range(1, 24)
+    )
+    result = _build(*observations)
+    forged_variance = Decimal("1e-40")
+    forged_identity = _rehash_identity(
+        result.identity,
+        population_variance=forged_variance,
+        standard_deviation=(
+            normalization_module._new_decimal_context().sqrt(forged_variance)
+        ),
+    )
+
+    type(forged_identity).__post_init__(
+        forged_identity,
+        normalization_module._IDENTITY_FACTORY_TOKEN,
+    )
+    forged_result = _forge(result, identity=forged_identity)
+    with pytest.raises(
+        normalization_module.Form4StockSignalNormalizationDiagnosticsError,
+        match="normalization identity does not replay",
+    ):
+        type(forged_result).__post_init__(
+            forged_result,
+            normalization_module._RESULT_FACTORY_TOKEN,
+        )
+
+
 def test_standalone_row_refuses_impossible_numeric_shapes():
     result = _build(*_zero_cohort())
     row = result.rows[0]
@@ -1568,3 +1598,27 @@ def test_kernel_context_rounds_half_even_as_the_frozen_policy_states(monkeypatch
                 match="decimal context",
             ):
                 normalization_module._new_decimal_context()
+
+
+@pytest.mark.parametrize(
+    ("anomalous_offset_sum", "expected"),
+    (
+        (Decimal("-2"), Decimal("1")),
+        (Decimal("4"), Decimal("2")),
+    ),
+)
+def test_context_mean_clamps_anomalous_reduction_to_input_range(
+    monkeypatch,
+    anomalous_offset_sum,
+    expected,
+):
+    monkeypatch.setattr(
+        normalization_module,
+        "_context_sum",
+        lambda _context, _offsets: anomalous_offset_sum,
+    )
+
+    assert normalization_module._context_mean(
+        normalization_module._new_decimal_context(),
+        (Decimal("1"), Decimal("2")),
+    ) == expected

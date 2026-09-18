@@ -1273,3 +1273,17 @@ def test_row_replay_binds_the_breadth_gate_to_its_exact_breadth():
         match="buyer-breadth gate is inconsistent",
     ):
         _replay_row(forged)
+
+    qualified = _signal_row(_build(*_available_case()))
+    assert qualified.meets_minimum_buyer_breadth is True
+    demoted = _forge(
+        qualified,
+        meets_minimum_buyer_breadth=False,
+        cluster_qualified_candidate=False,
+        diagnostic_cluster_seed_selected=False,
+    )
+    with pytest.raises(
+        cluster_module.Form4StockSignalBuyerClusterDiagnosticsError,
+        match="buyer-breadth gate is inconsistent",
+    ):
+        _replay_row(demoted)

@@ -54,6 +54,10 @@ class _DateSubclass(date):
     pass
 
 
+class _FractionSubclass(Fraction):
+    pass
+
+
 class _TupleSubclass(tuple):
     pass
 
@@ -130,11 +134,44 @@ def test_upstream_ib0_horizon_drift_refuses_instead_of_redefining_gate() -> None
 
 
 @pytest.mark.parametrize(
+    "mutated_value",
+    [
+        _TupleSubclass(CANDIDATE_PRIMARY_HORIZONS_TRADING_DAYS),
+        (5.0, 20.0, 60.0),
+    ],
+)
+def test_upstream_ib0_horizon_exact_types_refuse(
+    mutated_value: object,
+) -> None:
+    original = CANONICAL_SPEC.primary_horizons_trading_days
+    try:
+        object.__setattr__(
+            CANONICAL_SPEC,
+            "primary_horizons_trading_days",
+            mutated_value,
+        )
+        with pytest.raises(
+            InsiderBuyingPreregistrationError,
+            match="IB-0 primary horizons drifted",
+        ):
+            InsiderBuyingResearchGate()
+    finally:
+        object.__setattr__(
+            CANONICAL_SPEC,
+            "primary_horizons_trading_days",
+            original,
+        )
+
+
+@pytest.mark.parametrize(
     ("field_name", "mutated_value"),
     [
         ("version", "INSETF-IB0-v2"),
+        ("version", _StringSubclass(IB0_CONTRACT_VERSION)),
         ("outcomes_authorized", True),
+        ("outcomes_authorized", 0),
         ("authorized_outcome_looks", 1),
+        ("authorized_outcome_looks", False),
     ],
 )
 def test_upstream_ib0_version_or_outcome_authority_drift_refuses(
@@ -413,9 +450,29 @@ def test_semantic_hash_binds_each_paper_promotion_field(
         },
         {"fixed_lane_ids": _TupleSubclass(FIXED_STRATEGY_LANE_IDS)},
         {"version": "INSETF-IB1I-RESEARCH-GATE-v1"},
+        {
+            "version": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.version
+            )
+        },
         {"blueprint_path": "docs/Strategy Description/other.pdf"},
         {"blueprint_sha256": "0" * 64},
         {"ib0_contract_version": "INSETF-IB0-v2"},
+        {
+            "blueprint_path": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.blueprint_path
+            )
+        },
+        {
+            "blueprint_sha256": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.blueprint_sha256
+            )
+        },
+        {
+            "ib0_contract_version": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.ib0_contract_version
+            )
+        },
         {"multiplicity_directive_commit": "0" * 40},
         {"shared_family_directive_commit": "0" * 40},
         {
@@ -483,13 +540,28 @@ def test_semantic_hash_binds_each_paper_promotion_field(
             )
         },
         {"assigned_lane_id": "short-interest"},
+        {
+            "assigned_lane_id": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.assigned_lane_id
+            )
+        },
         {"shared_two_sided_fwer": Fraction(1, 15)},
         {"permanent_lane_alpha_maximum": Fraction(1, 60)},
         {"within_lane_confirmatory_alpha_ceiling": Fraction(1, 60)},
         {"permanent_lane_alpha_maximum": 0.0125},
+        {"shared_two_sided_fwer": _FractionSubclass(1, 20)},
+        {"permanent_lane_alpha_maximum": _FractionSubclass(1, 80)},
+        {
+            "within_lane_confirmatory_alpha_ceiling": _FractionSubclass(
+                1, 80
+            )
+        },
         {"slot_transfer_authorized": True},
         {"slot_redistribution_authorized": True},
         {"denominator_recomputation_authorized": True},
+        {"slot_transfer_authorized": 0},
+        {"slot_redistribution_authorized": 0},
+        {"denominator_recomputation_authorized": 0},
         {"unused_slot_disposition": "expires"},
         {"withdrawn_slot_disposition": "expires"},
         {"candidate_primary_horizons_trading_days": (5, 20)},
@@ -517,6 +589,9 @@ def test_semantic_hash_binds_each_paper_promotion_field(
         {"shared_research_cutoff": date(2027, 9, 1)},
         {"shared_holdout_start": date(2027, 8, 31)},
         {"shared_holdout_end": date(2029, 9, 1)},
+        {"shared_research_cutoff": _DateSubclass(2027, 8, 31)},
+        {"shared_holdout_start": _DateSubclass(2027, 9, 1)},
+        {"shared_holdout_end": _DateSubclass(2029, 8, 31)},
         {"shared_holdout_access_authorized": True},
         {"shared_holdout_access_authorized": 0},
         {"shared_holdout_role": "final_holdout_only"},
@@ -548,18 +623,39 @@ def test_semantic_hash_binds_each_paper_promotion_field(
         {"paper_promotion_prerequisites_confer_deployment_authority": True},
         {"paper_promotion_prerequisites_confer_deployment_authority": 0},
         {"valid_stock_level_null_closes_canonical_family": False},
+        {"valid_stock_level_null_closes_canonical_family": 1},
         {"post_result_tuning_or_rerun_authorized": True},
+        {"post_result_tuning_or_rerun_authorized": 0},
         {"later_hypothesis_requires_separate_preregistered_family": False},
+        {"later_hypothesis_requires_separate_preregistered_family": 1},
         {
             "later_family_requires_owner_authorized_permanent_look_budget": (
                 False
             )
         },
+        {
+            "later_family_requires_owner_authorized_permanent_look_budget": 1
+        },
         {"later_family_can_retroactively_rescue_canonical_result": True},
+        {"later_family_can_retroactively_rescue_canonical_result": 0},
         {"etf_can_rescue_valid_stock_null": True},
+        {"etf_can_rescue_valid_stock_null": 0},
         {"qc_can_rescue_valid_stock_null": True},
+        {"qc_can_rescue_valid_stock_null": 0},
         {"future_qc_stage": "IB-6"},
         {"future_qc_input_contract": "call_vendor_from_backtest"},
+        {
+            "future_qc_stage": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.future_qc_stage
+            )
+        },
+        {
+            "future_qc_input_contract": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.future_qc_input_contract
+            )
+        },
+        {"authorized_outcome_looks": False},
+        {"consumed_outcome_looks": False},
     ],
 )
 def test_multiplicity_allocation_holdout_and_null_mutations_refuse(

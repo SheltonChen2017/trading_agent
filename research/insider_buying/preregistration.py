@@ -212,6 +212,7 @@ class InsiderBuyingResearchGate:
         if (
             type(self.ib0_contract_version) is not str
             or self.ib0_contract_version != IB0_CONTRACT_VERSION
+            or type(CANONICAL_SPEC.version) is not str
             or CANONICAL_SPEC.version != IB0_CONTRACT_VERSION
         ):
             raise InsiderBuyingPreregistrationError(
@@ -368,8 +369,14 @@ class InsiderBuyingResearchGate:
             raise InsiderBuyingPreregistrationError(
                 "REFUSED: blueprint candidate horizons changed"
             )
-        if CANONICAL_SPEC.primary_horizons_trading_days != (
-            CANDIDATE_PRIMARY_HORIZONS_TRADING_DAYS
+        if (
+            type(CANONICAL_SPEC.primary_horizons_trading_days) is not tuple
+            or any(
+                type(horizon) is not int
+                for horizon in CANONICAL_SPEC.primary_horizons_trading_days
+            )
+            or CANONICAL_SPEC.primary_horizons_trading_days
+            != CANDIDATE_PRIMARY_HORIZONS_TRADING_DAYS
         ):
             raise InsiderBuyingPreregistrationError(
                 "REFUSED: IB-0 primary horizons drifted from the IB-1I gate"

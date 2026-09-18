@@ -33,6 +33,9 @@ MAXIMUM_ONE_WAY_ACTIVE_SHARE = Decimal("0.05") * TARGET_GROSS_EXPOSURE
 MAXIMUM_HHI_MULTIPLE = Decimal("1.44")
 TILT_ENABLED = "TILT_ENABLED"
 TILT_UNDERFILLED = "TILT_UNDERFILLED"
+RESERVED_STRUCTURAL_ZERO_SECTOR_ID = (
+    "arv2-structural-zero-unmapped-unscored"
+)
 TILT_AGGREGATES_SCHEMA = (
     "arv2-market-cap-stock-portfolio-tilt-aggregates-v2"
 )
@@ -270,7 +273,7 @@ def _sector_mapping(value, security_ids):
     return dict(sorted(value.items()))
 
 
-def sector_map_from_memberships(market_caps, memberships):
+def sector_map_from_memberships(market_caps, memberships, arm_scores=None):
     security_ids = _positive_decimal_map(
         market_caps, "benchmark sector market cap"
     )
@@ -283,7 +286,7 @@ def sector_map_from_memberships(market_caps, memberships):
     relevant = tuple(
         item for item in memberships if item.security_id in market_caps
     )
-    if len(relevant) != len(security_ids):
+    if arm_scores is None and len(relevant) != len(security_ids):
         raise BoundedBenchmarkTiltError(
             "benchmark tilt membership mapping is not exhaustive"
         )
@@ -291,6 +294,24 @@ def sector_map_from_memberships(market_caps, memberships):
     if len(mapping) != len(relevant):
         raise BoundedBenchmarkTiltError(
             "benchmark tilt membership mapping is not one-to-one"
+        )
+    if arm_scores is not None:
+        if type(arm_scores) is not dict:
+            raise BoundedBenchmarkTiltError(
+                "benchmark tilt R055 score map must be an exact dict"
+            )
+        missing = set(security_ids) - set(mapping)
+        if missing & set(arm_scores):
+            raise BoundedBenchmarkTiltError(
+                "benchmark tilt scored security lacks membership mapping"
+            )
+        if missing and RESERVED_STRUCTURAL_ZERO_SECTOR_ID in mapping.values():
+            raise BoundedBenchmarkTiltError(
+                "benchmark tilt reserved structural-zero sector collision"
+            )
+        mapping.update(
+            (security_id, RESERVED_STRUCTURAL_ZERO_SECTOR_ID)
+            for security_id in sorted(missing)
         )
     return _sector_mapping(mapping, security_ids)
 
@@ -1015,6 +1036,26 @@ def profile_fields():
     }
 
 
+def profile_fields_v4():
+    """Return detached V4 fields for the one membership-gap correction."""
+
+    fields = profile_fields()
+    fields.update(
+        {
+            "sector_mapping_rule": (
+                "exact_membership_sector_for_mapped_names_and_reserved_"
+                "structural_zero_sector_only_for_unscored_unmapped_"
+                "eligible_names_which_keep_exact_benchmark_weight_and_"
+                "cannot_donate_or_receive_scored_unmapped_refuses"
+            ),
+            "reserved_structural_zero_sector_id": (
+                RESERVED_STRUCTURAL_ZERO_SECTOR_ID
+            ),
+        }
+    )
+    return fields
+
+
 @dataclasses.dataclass
 class TiltCensus:
     decision_count: int = 0
@@ -1180,6 +1221,7 @@ __all__ = (
     "MINIMUM_TILT_POSITIVE_SCORE_COUNT",
     "MINIMUM_TILT_RANKED_NAME_COUNT",
     "PORTFOLIO_WEIGHT_QUANTUM",
+    "RESERVED_STRUCTURAL_ZERO_SECTOR_ID",
     "TARGET_GROSS_EXPOSURE",
     "TILT_AGGREGATES_SCHEMA",
     "TILT_ENABLED",
@@ -1194,5 +1236,6 @@ __all__ = (
     "build_benchmark_tilt",
     "executable_selected_target",
     "profile_fields",
+    "profile_fields_v4",
     "sector_map_from_memberships",
 )

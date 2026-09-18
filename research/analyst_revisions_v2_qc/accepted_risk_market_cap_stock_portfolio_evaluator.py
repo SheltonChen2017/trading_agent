@@ -75,6 +75,8 @@ QQQ_2023_2025_V2_PROFILE_ID = "arv2-market-cap-stock-qqq-2023-2025-v2"
 SPY_2023_2025_V2_PROFILE_ID = "arv2-market-cap-stock-spy-2023-2025-v2"
 QQQ_2021_2025_V3_PROFILE_ID = "arv2-market-cap-stock-qqq-2021-2025-v3"
 SPY_2021_2025_V3_PROFILE_ID = "arv2-market-cap-stock-spy-2021-2025-v3"
+QQQ_2021_2025_V4_PROFILE_ID = "arv2-market-cap-stock-qqq-2021-2025-v4"
+SPY_2021_2025_V4_PROFILE_ID = "arv2-market-cap-stock-spy-2021-2025-v4"
 OUT_OF_WINDOW_COLLECTION_POLICY = (
     "ignore_only_after_validating_collection_shape_identity_and_time_"
     "and_before_traversing_rows"
@@ -145,10 +147,15 @@ V2_PROFILE_IDS = (
     QQQ_2023_2025_V2_PROFILE_ID,
     SPY_2023_2025_V2_PROFILE_ID,
 )
-PROFILE_IDS = (
+V3_PROFILE_IDS = (
     QQQ_2021_2025_V3_PROFILE_ID,
     SPY_2021_2025_V3_PROFILE_ID,
 )
+PROFILE_IDS = (
+    QQQ_2021_2025_V4_PROFILE_ID,
+    SPY_2021_2025_V4_PROFILE_ID,
+)
+TILT_PROFILE_IDS = V3_PROFILE_IDS + PROFILE_IDS
 _PROFILE_ROWS = tuple((*row, None) for row in _V1_PROFILE_ROWS) + tuple(
     (successor_id, *row[1:], OUT_OF_WINDOW_COLLECTION_POLICY)
     for successor_id, row in zip(
@@ -157,10 +164,15 @@ _PROFILE_ROWS = tuple((*row, None) for row in _V1_PROFILE_ROWS) + tuple(
 ) + tuple(
     (successor_id, *row[1:], OUT_OF_WINDOW_COLLECTION_POLICY)
     for successor_id, row in zip(
+        V3_PROFILE_IDS, _V1_PROFILE_ROWS[:2], strict=True
+    )
+) + tuple(
+    (successor_id, *row[1:], OUT_OF_WINDOW_COLLECTION_POLICY)
+    for successor_id, row in zip(
         PROFILE_IDS, _V1_PROFILE_ROWS[:2], strict=True
     )
 )
-ALL_PROFILE_IDS = V1_PROFILE_IDS + V2_PROFILE_IDS + PROFILE_IDS
+ALL_PROFILE_IDS = V1_PROFILE_IDS + V2_PROFILE_IDS + TILT_PROFILE_IDS
 QQQ_PROFILE_IDS = PROFILE_IDS[::2]
 SPY_PROFILE_IDS = PROFILE_IDS[1::2]
 
@@ -263,8 +275,10 @@ def _build_profile(row):
         record["history_collection_window_policy"] = (
             out_of_window_collection_policy
         )
-    if profile_id in PROFILE_IDS:
+    if profile_id in V3_PROFILE_IDS:
         record.update(_tilt.profile_fields())
+    elif profile_id in PROFILE_IDS:
+        record.update(_tilt.profile_fields_v4())
     return {**record, "profile_sha256": _sha(record)}
 
 
@@ -352,7 +366,7 @@ def expected_custom_summary_statistic_names(profile_id):
     require_market_cap_stock_portfolio_profile(profile_id)
     tilt_names = (
         (TILT_AGGREGATES_STATISTIC_NAME,)
-        if profile_id in PROFILE_IDS
+        if profile_id in TILT_PROFILE_IDS
         else ()
     )
     return tuple(
@@ -381,9 +395,19 @@ class _Decision:
     sector_by_security_id: dict | None = None
 
 
-def _build_benchmark_tilt(market_caps, arm_scores, memberships):
+def _build_benchmark_tilt(
+    market_caps, arm_scores, memberships, *, permit_structural_zero_sector
+):
     try:
-        sectors = _tilt.sector_map_from_memberships(market_caps, memberships)
+        sectors = (
+            _tilt.sector_map_from_memberships(
+                market_caps, memberships, arm_scores
+            )
+            if permit_structural_zero_sector
+            else _tilt.sector_map_from_memberships(
+                market_caps, memberships
+            )
+        )
         return _tilt.build_benchmark_tilt(market_caps, arm_scores, sectors), sectors
     except _tilt.BoundedBenchmarkTiltError as exc:
         raise MarketCapStockPortfolioEvaluationError(str(exc)) from exc
@@ -723,7 +747,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
         axis = (PRIMARY_SOURCE_VIEW_ID, PRIMARY_SCORE_ARM)
         arm_scores = scores[axis]
         caps = self._market_caps[session]
-        if self._profile["profile_id"] in PROFILE_IDS:
+        if self._profile["profile_id"] in TILT_PROFILE_IDS:
             eligible = tuple(
                 sorted(
                     security_id
@@ -736,7 +760,12 @@ class MarketCapStockPortfolioEvaluationRuntime(
                 security_id: caps[security_id] for security_id in eligible
             }
             tilt, sectors = _build_benchmark_tilt(
-                eligible_caps, arm_scores, memberships
+                eligible_caps,
+                arm_scores,
+                memberships,
+                permit_structural_zero_sector=(
+                    self._profile["profile_id"] in PROFILE_IDS
+                ),
             )
             selected = eligible
             decision = _Decision(
@@ -794,7 +823,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
             security_id in arm_scores for security_id in eligible
         )
         self._selected_name_count_sum += len(selected)
-        if self._profile["profile_id"] in PROFILE_IDS:
+        if self._profile["profile_id"] in TILT_PROFILE_IDS:
             self._eligible_without_score_count += sum(
                 security_id not in arm_scores
                 for security_id in caps
@@ -1082,7 +1111,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
                 raise MarketCapStockPortfolioEvaluationError(
                     "SPY lacks a market-cap portfolio adjusted open"
                 )
-            if self._profile["profile_id"] in PROFILE_IDS:
+            if self._profile["profile_id"] in TILT_PROFILE_IDS:
                 benchmark_observations.append(
                     (sessions[position], current_benchmark)
                 )
@@ -1113,7 +1142,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
                 "market-cap return-session geometry changed"
             )
         benchmark_binding = None
-        if self._profile["profile_id"] in PROFILE_IDS:
+        if self._profile["profile_id"] in TILT_PROFILE_IDS:
             try:
                 benchmark_binding = _tilt.build_benchmark_series_binding(
                     tuple(benchmark_observations),
@@ -1340,12 +1369,12 @@ class MarketCapStockPortfolioEvaluationRuntime(
             "selected_aggregates": _tilt.account_aggregates(
                 selected,
                 return_count,
-                self._profile["profile_id"] in PROFILE_IDS,
+                self._profile["profile_id"] in TILT_PROFILE_IDS,
             ),
             "matched_aggregates": _tilt.account_aggregates(
                 matched,
                 return_count,
-                self._profile["profile_id"] in PROFILE_IDS,
+                self._profile["profile_id"] in TILT_PROFILE_IDS,
             ),
             "r055_signal_rule_changed": False,
             "point_in_time_market_cap_weighting": True,
@@ -1362,7 +1391,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
             "trading": False,
             "portfolio_cells": cells,
         }
-        if self._profile["profile_id"] in PROFILE_IDS:
+        if self._profile["profile_id"] in TILT_PROFILE_IDS:
             if type(benchmark_binding) is not _tilt.BenchmarkSeriesBinding:
                 raise MarketCapStockPortfolioEvaluationError(
                     "prospective benchmark series binding changed"
@@ -1408,7 +1437,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
                 matched_aggregates
             ).decode("ascii"),
         }
-        if self._profile["profile_id"] in PROFILE_IDS:
+        if self._profile["profile_id"] in TILT_PROFILE_IDS:
             if type(tilt_aggregates) is not dict:
                 raise MarketCapStockPortfolioEvaluationError(
                     "benchmark tilt aggregate fragment changed"
@@ -1472,6 +1501,7 @@ __all__ = (
     "QQQ_2021_2025_PROFILE_ID",
     "QQQ_2021_2025_V2_PROFILE_ID",
     "QQQ_2021_2025_V3_PROFILE_ID",
+    "QQQ_2021_2025_V4_PROFILE_ID",
     "QQQ_2023_2025_PROFILE_ID",
     "QQQ_2023_2025_V2_PROFILE_ID",
     "SPY_2019_2023_PROFILE_ID",
@@ -1479,6 +1509,7 @@ __all__ = (
     "SPY_2021_2025_PROFILE_ID",
     "SPY_2021_2025_V2_PROFILE_ID",
     "SPY_2021_2025_V3_PROFILE_ID",
+    "SPY_2021_2025_V4_PROFILE_ID",
     "SPY_2023_2025_PROFILE_ID",
     "SPY_2023_2025_V2_PROFILE_ID",
     "SPY_PROFILE_IDS",
@@ -1489,8 +1520,10 @@ __all__ = (
     "TILT_AGGREGATES_STATISTIC_NAME",
     "TILT_ENABLED",
     "TILT_UNDERFILLED",
+    "TILT_PROFILE_IDS",
     "V1_PROFILE_IDS",
     "V2_PROFILE_IDS",
+    "V3_PROFILE_IDS",
     "constituent_etf_tickers_for_profile",
     "decision_sessions_for_input",
     "expected_custom_summary_statistic_names",

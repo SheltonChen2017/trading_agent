@@ -800,7 +800,7 @@ def _stock_portfolio_aggregate_statistics(
 
 def _market_cap_aggregate_statistics(plan):
     profile_id = plan.projection.evaluation_profile_id
-    tilt_profile = profile_id in market_cap_evaluator.PROFILE_IDS
+    tilt_profile = profile_id in market_cap_evaluator.TILT_PROFILE_IDS
     profile = market_cap_evaluator.require_market_cap_stock_portfolio_profile(
         profile_id
     )
@@ -1392,7 +1392,7 @@ def _rehash_market_cap_summary(statistics):
             market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
         ]
     )
-    if metadata["profile_id"] in market_cap_evaluator.PROFILE_IDS:
+    if metadata["profile_id"] in market_cap_evaluator.TILT_PROFILE_IDS:
         summary["tilt_aggregates"] = json.loads(
             statistics[market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME]
         )
@@ -1544,6 +1544,12 @@ _MARKET_CAP_ACCOUNTING = {
     market_cap_evaluator.SPY_2021_2025_V3_PROFILE_ID: (
         "R-116", 84, 85, 27, 28, 603, 607
     ),
+    market_cap_evaluator.QQQ_2021_2025_V4_PROFILE_ID: (
+        "R-117", 84, 85, 27, 28, 599, 603
+    ),
+    market_cap_evaluator.SPY_2021_2025_V4_PROFILE_ID: (
+        "R-118", 85, 86, 28, 29, 603, 607
+    ),
 }
 
 _LEVERAGE_ACCOUNTING = {
@@ -1593,6 +1599,12 @@ def test_each_market_cap_profile_has_exact_run_spec_and_result_inventory(
     assert profile["portfolio_weight_quantum"] == format(
         market_cap_evaluator.PORTFOLIO_WEIGHT_QUANTUM,
         "f",
+    )
+    assert profile["sector_mapping_rule"].startswith(
+        "exact_membership_sector_for_mapped_names"
+    )
+    assert profile["sector_mapping_rule"].endswith(
+        "cannot_donate_or_receive_scored_unmapped_refuses"
     )
     assert market_cap_plan.expected_custom_statistic_names == (
         "ARV2_RUNTIME_META",
@@ -3949,6 +3961,8 @@ def test_market_cap_offline_launch_and_result_read_are_exact(
         market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID,
         leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
         leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID,
+        market_cap_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
+        market_cap_evaluator.SPY_2021_2025_V3_PROFILE_ID,
     ),
 )
 def test_each_r109_through_r114_fresh_execution_is_explicitly_superseded(
@@ -3963,6 +3977,25 @@ def test_each_r109_through_r114_fresh_execution_is_explicitly_superseded(
         match="profile is superseded and cannot launch",
     ):
         adapter._require_fresh_launch_profile(superseded_plan)
+
+
+@pytest.mark.parametrize("profile_id", market_cap_evaluator.V3_PROFILE_IDS)
+def test_r115_r116_historical_validation_remains_exact(
+    profile_id, monkeypatch, tmp_path
+):
+    plan = _build_plan(
+        monkeypatch,
+        tmp_path,
+        profile_id,
+        allow_superseded_projection_for_execution_test=True,
+    )
+    statistics = _market_cap_aggregate_statistics(plan)
+
+    _validate_statistics(plan, statistics)
+
+    assert plan.evaluation_profile_sha256 == (
+        market_cap_evaluator.require_profile(profile_id)["profile_sha256"]
+    )
 
 
 @pytest.mark.parametrize(

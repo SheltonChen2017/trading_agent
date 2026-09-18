@@ -224,39 +224,122 @@ def test_two_v3_profiles_pin_exact_base_lineage_and_objective_rule():
     )
 
 
-def test_base_evaluator_source_bytes_and_profile_hashes_are_still_exact():
-    assert hashlib.sha256(Path(market.__file__).read_bytes()).hexdigest() == (
-        subject.BASE_EVALUATOR_SOURCE_SHA256
-    )
-    for leverage_id in subject.PROFILE_IDS:
+def test_historical_profile_and_base_identities_are_still_exact():
+    expected_profile_sha256s = {
+        subject.QQQ_2021_2025_PROFILE_ID: (
+            "e9ed4d6e1df27c38273958ddfc66b4d8d0adc62c5995bb2f5941d7d3540cc68e",
+            market.QQQ_2021_2025_PROFILE_ID,
+        ),
+        subject.SPY_2021_2025_PROFILE_ID: (
+            "ed7e3151daf3ae5868695e7753b0bb47119555124efe457cbca5db26a4208584",
+            market.SPY_2021_2025_PROFILE_ID,
+        ),
+        subject.QQQ_2021_2025_V2_PROFILE_ID: (
+            "a800d1db535ca22fa1bcfc238fbcfabbb463e21b18cf3fc384b606542878192e",
+            market.QQQ_2021_2025_V2_PROFILE_ID,
+        ),
+        subject.SPY_2021_2025_V2_PROFILE_ID: (
+            "07106d52bed121064659b97173f66d1776adf5e72f0f231600d2b7b53299a014",
+            market.SPY_2021_2025_V2_PROFILE_ID,
+        ),
+        subject.QQQ_2021_2025_V3_PROFILE_ID: (
+            "b89cae4bdd9c8caa21f0ee8658097550794f5c63ca71ff30d546cf14356abb23",
+            market.QQQ_2021_2025_V2_PROFILE_ID,
+        ),
+        subject.SPY_2021_2025_V3_PROFILE_ID: (
+            "b89ffdb06b56ca5024667e2d6e510026f65d47b00f5bbb0c1f9ba2286d01becc",
+            market.SPY_2021_2025_V2_PROFILE_ID,
+        ),
+    }
+    assert tuple(expected_profile_sha256s) == subject.ALL_PROFILE_IDS
+    for leverage_id, (leverage_sha256, base_id) in (
+        expected_profile_sha256s.items()
+    ):
         profile = subject.require_profile(leverage_id)
+        assert profile["profile_sha256"] == leverage_sha256
+        assert profile["base_profile_id"] == base_id
         base_profile = market.require_profile(profile["base_profile_id"])
         assert base_profile["profile_sha256"] == profile[
             "base_profile_sha256"
         ]
 
 
+def test_historical_profile_refuses_non_none_benchmark_binding(monkeypatch):
+    value = _input()
+    runtime = subject.ObjectiveSyntheticLeverageEvaluationRuntime(
+        value,
+        profile_id=subject.QQQ_2021_2025_V3_PROFILE_ID,
+        package_id="arv2-test-package",
+        package_sha256="a" * 64,
+        named_figi_resolution_refusals=(),
+        eligibility_market_caps_by_decision_session=_caps(
+            value, subject.QQQ_2021_2025_V3_PROFILE_ID
+        ),
+    )
+    runtime._decisions = {
+        value.session_axis[position]: object()
+        for position in runtime._decision_positions
+    }
+    monkeypatch.setattr(runtime, "_benchmark_returns", lambda: ())
+    monkeypatch.setattr(
+        runtime,
+        "_simulate",
+        lambda: (object(), object(), Decimal(1), 0, object()),
+    )
+
+    with pytest.raises(
+        subject.ObjectiveSyntheticLeverageEvaluationError,
+        match="historical synthetic leverage base acquired a benchmark series binding",
+    ):
+        runtime._build_summary()
+    assert runtime._starting_invested_flags is None
+
+
 @pytest.mark.parametrize(
-    ("profile_id", "source_sha256"),
+    ("profile_id", "source_sha256", "summary_sha256"),
     (
         (
             subject.QQQ_2021_2025_PROFILE_ID,
             subject.V1_BASE_EVALUATOR_SOURCE_SHA256,
+            "45ceaacd6ad64f077b68e38265f794f672ffcd3a01ec2539b6c80078e5be632b",
+        ),
+        (
+            subject.SPY_2021_2025_PROFILE_ID,
+            subject.V1_BASE_EVALUATOR_SOURCE_SHA256,
+            "e9c7a6b64df94c3a040e333ad39aa76f4bacd9cac5ce8e40ee9a5ebfa56f3975",
         ),
         (
             subject.QQQ_2021_2025_V2_PROFILE_ID,
             subject.V2_BASE_EVALUATOR_SOURCE_SHA256,
+            "4eebfd1ec65b76e0d6857586a749554b9305d25aee86c0e3e1b77011209e8a29",
+        ),
+        (
+            subject.SPY_2021_2025_V2_PROFILE_ID,
+            subject.V2_BASE_EVALUATOR_SOURCE_SHA256,
+            "86512a861d48c2369ede72e088af3d1a115d3d232765cb38701e78cc24d6ce8c",
+        ),
+        (
+            subject.QQQ_2021_2025_V3_PROFILE_ID,
+            subject.BASE_EVALUATOR_SOURCE_SHA256,
+            "6fcba3bccd438d7505a60305a5eae1abe68d53ca7fe96603f17bbb08affa4f7c",
+        ),
+        (
+            subject.SPY_2021_2025_V3_PROFILE_ID,
+            subject.BASE_EVALUATOR_SOURCE_SHA256,
+            "1f65d4b0c9dcccb78b93da882449fba0351eea2b9566ffb4ae1894f77fce68c4",
         ),
     ),
 )
-def test_preserved_profile_emits_its_historical_source_identity(
-    profile_id, source_sha256
+def test_preserved_profile_emits_its_historical_source_and_summary_identity(
+    profile_id, source_sha256, summary_sha256
 ):
     runtime = _complete(profile_id)
+    summary = runtime.aggregate_summary()
     meta = json.loads(
         runtime.custom_summary_statistics()[subject.META_STATISTIC_NAME]
     )
 
+    assert summary["summary_sha256"] == summary_sha256
     assert meta["base_evaluator_source_sha256"] == source_sha256
 
 

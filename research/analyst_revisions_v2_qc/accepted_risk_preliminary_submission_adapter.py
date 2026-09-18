@@ -311,6 +311,9 @@ _PINNED_PROJECTION_MARKET_CAP_V1_PROFILE_IDS = tuple(
 _PINNED_PROJECTION_MARKET_CAP_V2_PROFILE_IDS = tuple(
     projection_builder.MARKET_CAP_V2_PROFILE_IDS
 )
+_PINNED_PROJECTION_MARKET_CAP_V3_PROFILE_IDS = tuple(
+    projection_builder.MARKET_CAP_V3_PROFILE_IDS
+)
 _PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_IDS = tuple(
     projection_builder.MARKET_CAP_ALL_PROFILE_IDS
 )
@@ -341,6 +344,10 @@ _PINNED_MARKET_CAP_CONSTITUENT_TICKERS_CALLABLE = (
 _PINNED_MARKET_CAP_PROFILE_IDS = tuple(market_cap_evaluator.PROFILE_IDS)
 _PINNED_MARKET_CAP_V1_PROFILE_IDS = tuple(market_cap_evaluator.V1_PROFILE_IDS)
 _PINNED_MARKET_CAP_V2_PROFILE_IDS = tuple(market_cap_evaluator.V2_PROFILE_IDS)
+_PINNED_MARKET_CAP_V3_PROFILE_IDS = tuple(market_cap_evaluator.V3_PROFILE_IDS)
+_PINNED_MARKET_CAP_TILT_PROFILE_IDS = tuple(
+    market_cap_evaluator.TILT_PROFILE_IDS
+)
 _PINNED_MARKET_CAP_ALL_PROFILE_IDS = tuple(
     market_cap_evaluator.ALL_PROFILE_IDS
 )
@@ -976,6 +983,30 @@ _EVALUATION_RUN_SPECS = (
         603,
         607,
     ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.QQQ_2021_2025_V4_PROFILE_ID,
+        "arv2-eval-bounded-tilt-stock-qqq-2021-2025-qc-052",
+        "R-117",
+        84,
+        85,
+        27,
+        28,
+        4,
+        599,
+        603,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.SPY_2021_2025_V4_PROFILE_ID,
+        "arv2-eval-bounded-tilt-stock-spy-2021-2025-qc-053",
+        "R-118",
+        85,
+        86,
+        28,
+        29,
+        4,
+        603,
+        607,
+    ),
 )
 
 _SUPERSEDED_UNSPENT_PROFILE_IDS = (
@@ -1050,7 +1081,7 @@ def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]
     non_cell_statistic_count = (
         (
             5
-            if evaluation_profile_id in _PINNED_MARKET_CAP_PROFILE_IDS
+            if evaluation_profile_id in _PINNED_MARKET_CAP_TILT_PROFILE_IDS
             else 4
         )
         if evaluation_profile_id in split_account_profiles
@@ -1587,6 +1618,8 @@ def _market_cap_contract_bindings_are_current() -> bool:
         profile_ids = namespace.get("PROFILE_IDS")
         v1_profile_ids = namespace.get("V1_PROFILE_IDS")
         v2_profile_ids = namespace.get("V2_PROFILE_IDS")
+        v3_profile_ids = namespace.get("V3_PROFILE_IDS")
+        tilt_profile_ids = namespace.get("TILT_PROFILE_IDS")
         all_profile_ids = namespace.get("ALL_PROFILE_IDS")
         qqq_profile_ids = namespace.get("QQQ_PROFILE_IDS")
         spy_profile_ids = namespace.get("SPY_PROFILE_IDS")
@@ -1594,6 +1627,7 @@ def _market_cap_contract_bindings_are_current() -> bool:
         projection_profile_ids = projection_builder.MARKET_CAP_PROFILE_IDS
         projection_v1_profile_ids = projection_builder.MARKET_CAP_V1_PROFILE_IDS
         projection_v2_profile_ids = projection_builder.MARKET_CAP_V2_PROFILE_IDS
+        projection_v3_profile_ids = projection_builder.MARKET_CAP_V3_PROFILE_IDS
         projection_all_profile_ids = projection_builder.MARKET_CAP_ALL_PROFILE_IDS
         superseded_profile_ids = (
             projection_builder.SUPERSEDED_UNSPENT_PROFILE_IDS
@@ -1624,10 +1658,15 @@ def _market_cap_contract_bindings_are_current() -> bool:
             or profile_ids != _PINNED_MARKET_CAP_PROFILE_IDS
             or v1_profile_ids != _PINNED_MARKET_CAP_V1_PROFILE_IDS
             or v2_profile_ids != _PINNED_MARKET_CAP_V2_PROFILE_IDS
+            or v3_profile_ids != _PINNED_MARKET_CAP_V3_PROFILE_IDS
+            or tilt_profile_ids != _PINNED_MARKET_CAP_TILT_PROFILE_IDS
             or all_profile_ids != _PINNED_MARKET_CAP_ALL_PROFILE_IDS
-            or all_profile_ids != v1_profile_ids + v2_profile_ids + profile_ids
+            or tilt_profile_ids != v3_profile_ids + profile_ids
+            or all_profile_ids
+            != v1_profile_ids + v2_profile_ids + tilt_profile_ids
             or len(v1_profile_ids) != 6
             or len(v2_profile_ids) != 6
+            or len(v3_profile_ids) != 2
             or len(profile_ids) != 2
             or any(type(item) is not str for item in all_profile_ids)
             or len(set(all_profile_ids)) != len(all_profile_ids)
@@ -1661,6 +1700,9 @@ def _market_cap_contract_bindings_are_current() -> bool:
             or projection_v2_profile_ids
             != _PINNED_PROJECTION_MARKET_CAP_V2_PROFILE_IDS
             or projection_v2_profile_ids != v2_profile_ids
+            or projection_v3_profile_ids
+            != _PINNED_PROJECTION_MARKET_CAP_V3_PROFILE_IDS
+            or projection_v3_profile_ids != v3_profile_ids
             or projection_all_profile_ids
             != _PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_IDS
             or projection_all_profile_ids != all_profile_ids
@@ -6385,7 +6427,7 @@ def _validate_market_cap_aggregate_records(
         _market_cap_profile_binding(profile_id)
     )
     profile = json.loads(profile_bytes.decode("ascii"))
-    tilt_profile = profile_id in _PINNED_MARKET_CAP_PROFILE_IDS
+    tilt_profile = profile_id in _PINNED_MARKET_CAP_TILT_PROFILE_IDS
     if (
         plan.evaluation_profile_id != profile_id
         or plan.evaluation_profile_sha256 != profile_sha256
@@ -8044,6 +8086,7 @@ _seal_action_bindings(
         "_PINNED_PROJECTION_MARKET_CAP_PROFILE_IDS",
         "_PINNED_PROJECTION_MARKET_CAP_V1_PROFILE_IDS",
         "_PINNED_PROJECTION_MARKET_CAP_V2_PROFILE_IDS",
+        "_PINNED_PROJECTION_MARKET_CAP_V3_PROFILE_IDS",
         "_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_IDS",
         "_PINNED_PROJECTION_SUPERSEDED_UNSPENT_PROFILE_IDS",
         "_PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256S_OBJECT",
@@ -8096,6 +8139,8 @@ _seal_action_bindings(
         "_PINNED_MARKET_CAP_PROFILE_IDS",
         "_PINNED_MARKET_CAP_V1_PROFILE_IDS",
         "_PINNED_MARKET_CAP_V2_PROFILE_IDS",
+        "_PINNED_MARKET_CAP_V3_PROFILE_IDS",
+        "_PINNED_MARKET_CAP_TILT_PROFILE_IDS",
         "_PINNED_MARKET_CAP_ALL_PROFILE_IDS",
         "_PINNED_MARKET_CAP_QQQ_PROFILE_IDS",
         "_PINNED_MARKET_CAP_SPY_PROFILE_IDS",

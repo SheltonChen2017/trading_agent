@@ -1,3 +1,4 @@
+import dataclasses
 import hashlib
 import json
 from datetime import date
@@ -252,14 +253,21 @@ def test_successor_profiles_preserve_periods_and_superseded_identities():
         subject.QQQ_2023_2025_V2_PROFILE_ID,
         subject.SPY_2023_2025_V2_PROFILE_ID,
     )
-    assert subject.PROFILE_IDS == (
+    assert subject.V3_PROFILE_IDS == (
         subject.QQQ_2021_2025_V3_PROFILE_ID,
         subject.SPY_2021_2025_V3_PROFILE_ID,
+    )
+    assert subject.PROFILE_IDS == (
+        subject.QQQ_2021_2025_V4_PROFILE_ID,
+        subject.SPY_2021_2025_V4_PROFILE_ID,
+    )
+    assert subject.TILT_PROFILE_IDS == (
+        subject.V3_PROFILE_IDS + subject.PROFILE_IDS
     )
     assert subject.ALL_PROFILE_IDS == (
         subject.V1_PROFILE_IDS
         + subject.V2_PROFILE_IDS
-        + subject.PROFILE_IDS
+        + subject.TILT_PROFILE_IDS
     )
     assert subject.QQQ_PROFILE_IDS == subject.PROFILE_IDS[::2]
     assert subject.SPY_PROFILE_IDS == subject.PROFILE_IDS[1::2]
@@ -330,6 +338,17 @@ def test_successor_profiles_preserve_periods_and_superseded_identities():
         == historical_names
         for profile_id in subject.V1_PROFILE_IDS
     )
+    assert {
+        profile_id: subject.require_profile(profile_id)["profile_sha256"]
+        for profile_id in subject.V3_PROFILE_IDS
+    } == {
+        subject.QQQ_2021_2025_V3_PROFILE_ID: (
+            "9efa7e09241f0f20772260e4e6852bb8a71c46cdc77264cfd10e2b569a4b1b00"
+        ),
+        subject.SPY_2021_2025_V3_PROFILE_ID: (
+            "8ac07f9fe48d2d6448d4adeb5b2f53c364bad8d4ee3eacd8a23a40a509eb8e38"
+        ),
+    }
     for profile_id in subject.PROFILE_IDS:
         profile = subject.require_profile(profile_id)
         assert profile["selection"].startswith(
@@ -343,7 +362,13 @@ def test_successor_profiles_preserve_periods_and_superseded_identities():
             "exact_selected_weight_equals_benchmark_weight"
         )
         assert profile["sector_mapping_rule"].startswith(
-            "exhaustive_exact_security_to_sector_mapping"
+            "exact_membership_sector_for_mapped_names"
+        )
+        assert profile["reserved_structural_zero_sector_id"] == (
+            tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
+        )
+        assert profile["sector_mapping_rule"].endswith(
+            "cannot_donate_or_receive_scored_unmapped_refuses"
         )
         assert profile["sector_neutral_execution_rule"] == (
             "execute_each_tradable_name_at_its_exact_frozen_target_preserve_"
@@ -1302,6 +1327,112 @@ def test_v3_runtime_uses_membership_sectors_and_refuses_mapping_gaps():
             value.memberships[:-1],
             {axis: scores},
             {axis: 0},
+        )
+
+
+def test_v4_fills_only_the_real_unscored_membership_gap_as_structural_zero():
+    value = _input(41, sector_count=2)
+    profile_id = subject.QQQ_2021_2025_V4_PROFILE_ID
+    first = subject.decision_sessions_for_input(value, profile_id)[0]
+    position = value.session_axis.index(first)
+    axis = (subject.PRIMARY_SOURCE_VIEW_ID, subject.PRIMARY_SCORE_ARM)
+    scores = {
+        f"perm-security-{index:02d}": Decimal(
+            index - 20 if index < 20 else index - 19
+        )
+        for index in range(40)
+    }
+    gap_security_id = "perm-security-40"
+    mapped_memberships = value.memberships[:-1]
+    runtime = _runtime(value, profile_id=profile_id)
+
+    runtime._after_score_cross_section(
+        position,
+        mapped_memberships,
+        {axis: scores},
+        {axis: 0},
+    )
+
+    decision = runtime._decisions[first]
+    assert decision.sector_by_security_id[gap_security_id] == (
+        tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
+    )
+    assert decision.selected_weights[gap_security_id] == (
+        decision.benchmark_weights[gap_security_id]
+    )
+    assert sum(
+        decision.selected_weights[security_id]
+        - decision.benchmark_weights[security_id]
+        for security_id in decision.selected
+        if decision.sector_by_security_id[security_id]
+        == tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
+    ) == 0
+    assert decision.sector_by_security_id["perm-security-00"] == (
+        value.memberships[0].sector_id
+    )
+
+    scored_gap = _runtime(value, profile_id=profile_id)
+    with pytest.raises(
+        subject.MarketCapStockPortfolioEvaluationError,
+        match="scored security lacks membership mapping",
+    ):
+        scored_gap._after_score_cross_section(
+            position,
+            mapped_memberships,
+            {axis: {**scores, gap_security_id: Decimal(0)}},
+            {axis: 0},
+        )
+
+    historical_v3 = _runtime(
+        value,
+        profile_id=subject.QQQ_2021_2025_V3_PROFILE_ID,
+    )
+    with pytest.raises(
+        subject.MarketCapStockPortfolioEvaluationError,
+        match="membership mapping is not exhaustive",
+    ):
+        historical_v3._after_score_cross_section(
+            position,
+            mapped_memberships,
+            {axis: scores},
+            {axis: 0},
+        )
+
+
+def test_v4_reserved_structural_zero_sector_collision_refuses_directly():
+    source_memberships = _input(2).memberships
+    memberships = (
+        dataclasses.replace(
+            source_memberships[0],
+            sector_id=tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID,
+        ),
+    )
+
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="reserved structural-zero sector collision",
+    ):
+        tilt.sector_map_from_memberships(
+            {
+                source_memberships[0].security_id: Decimal(1),
+                source_memberships[1].security_id: Decimal(1),
+            },
+            memberships,
+            {},
+        )
+
+
+def test_v4_sector_map_refuses_non_dict_score_map_at_its_own_guard():
+    memberships = _input(1).memberships
+
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="R055 score map must be an exact dict",
+    ):
+        tilt.sector_map_from_memberships(
+            {memberships[0].security_id: Decimal(1)},
+            memberships,
+            (),
         )
 
 

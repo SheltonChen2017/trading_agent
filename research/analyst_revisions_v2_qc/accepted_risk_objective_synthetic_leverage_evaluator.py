@@ -576,10 +576,21 @@ class ObjectiveSyntheticLeverageEvaluationRuntime(
             )
         self._starting_invested_flags = {"selected": [], "matched": []}
         benchmark_returns = self._benchmark_returns()
-        selected, matched, _benchmark_wealth, return_count = self._simulate()
+        (
+            selected,
+            matched,
+            _benchmark_wealth,
+            return_count,
+            benchmark_binding,
+        ) = self._simulate()
         selected_flags = tuple(self._starting_invested_flags["selected"])
         matched_flags = tuple(self._starting_invested_flags["matched"])
         self._starting_invested_flags = None
+        if benchmark_binding is not None:
+            raise ObjectiveSyntheticLeverageEvaluationError(
+                "historical synthetic leverage base acquired a benchmark "
+                "series binding"
+            )
         if not (
             len(benchmark_returns)
             == len(selected_flags)
@@ -622,11 +633,11 @@ class ObjectiveSyntheticLeverageEvaluationRuntime(
             ],
             "decision_session_count": self._decision_session_count,
             "return_session_count": return_count,
-            "selected_base_aggregates": self._account_aggregates(
-                selected, return_count
+            "selected_base_aggregates": _market._tilt.account_aggregates(
+                selected, return_count, False
             ),
-            "matched_base_aggregates": self._account_aggregates(
-                matched, return_count
+            "matched_base_aggregates": _market._tilt.account_aggregates(
+                matched, return_count, False
             ),
             "r055_signal_rule_changed": False,
             "base_security_selection_changed": False,

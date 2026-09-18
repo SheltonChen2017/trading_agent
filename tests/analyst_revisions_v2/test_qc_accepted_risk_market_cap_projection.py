@@ -2,6 +2,7 @@
 
 import dataclasses
 from datetime import date
+import hashlib
 import subprocess
 import sys
 from types import SimpleNamespace
@@ -70,7 +71,10 @@ def test_market_cap_projection_is_exact_small_and_profile_bound(
     assert "accepted_risk_stock_portfolio_evaluator.py" not in by_name
     assert "accepted_risk_market_cap_stock_portfolio_tilt.py" in by_name
     assert max(item.byte_count for item in value.source_files) < 60_000
-    assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES
+    assert (
+        value.total_source_byte_count + 4_096
+        <= projection.MAX_MARKET_CAP_TOTAL_SOURCE_BYTES
+    )
     assert value.evaluation_profile_sha256 == (
         projection.MARKET_CAP_PROFILE_SHA256S[profile_id]
     )
@@ -89,6 +93,56 @@ def test_market_cap_projection_is_exact_small_and_profile_bound(
     assert "fundamental_universe=self._arv2_fundamental_universe" in main
     assert "constituent_universes=self._arv2_constituent_universes" in main
     assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
+
+
+def test_historical_market_cap_projection_keeps_original_total_size_cap(package):
+    value = projection.build_accepted_risk_preliminary_qc_projection(
+        package,
+        evaluation_profile_id=evaluator.QQQ_2021_2025_PROFILE_ID,
+    )
+    required_padding = (
+        projection.MAX_TOTAL_SOURCE_BYTES
+        + 1
+        - value.total_source_byte_count
+    )
+    assert required_padding > 0
+    target = next(
+        item for item in value.source_files if item.project_path != "main.py"
+    )
+    padded = projection._validate_source(
+        target.project_path,
+        target.source_bytes + b"\n#" + b"x" * (required_padding - 2),
+    )
+    source_files = tuple(
+        padded if item is target else item for item in value.source_files
+    )
+    candidate = dataclasses.replace(
+        value,
+        projection_id="",
+        projection_sha256="",
+        source_files=source_files,
+        total_source_byte_count=sum(item.byte_count for item in source_files),
+    )
+    semantic = candidate.to_record()
+    semantic["projection_id"] = None
+    semantic["projection_sha256"] = None
+    digest = hashlib.sha256(projection._canonical(semantic)).hexdigest()
+    candidate = dataclasses.replace(
+        candidate,
+        projection_id="arv2-preliminary-qc-projection-" + digest[:24],
+        projection_sha256=digest,
+    )
+
+    assert candidate.total_source_byte_count == projection.MAX_TOTAL_SOURCE_BYTES + 1
+    assert (
+        candidate.total_source_byte_count
+        < projection.MAX_MARKET_CAP_TOTAL_SOURCE_BYTES
+    )
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_preliminary_qc_projection(candidate)
 
 
 def test_market_cap_main_defers_every_history_work_unit_until_callbacks(package):
@@ -179,6 +233,7 @@ def test_market_cap_projection_inventory_and_profile_hash_are_load_bearing(
     assert projection.MARKET_CAP_PROFILE_IDS == evaluator.PROFILE_IDS
     assert projection.MARKET_CAP_V1_PROFILE_IDS == evaluator.V1_PROFILE_IDS
     assert projection.MARKET_CAP_V2_PROFILE_IDS == evaluator.V2_PROFILE_IDS
+    assert projection.MARKET_CAP_V3_PROFILE_IDS == evaluator.V3_PROFILE_IDS
     assert projection.MARKET_CAP_ALL_PROFILE_IDS == evaluator.ALL_PROFILE_IDS
     assert set(projection.MARKET_CAP_PROFILE_SHA256S) == set(
         evaluator.PROFILE_IDS
@@ -242,6 +297,17 @@ def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
         for profile_id in evaluator.PROFILE_IDS
     }
     assert {
+        profile_id: projection.MARKET_CAP_ALL_PROFILE_SHA256S[profile_id]
+        for profile_id in evaluator.V3_PROFILE_IDS
+    } == {
+        evaluator.QQQ_2021_2025_V3_PROFILE_ID: (
+            "9efa7e09241f0f20772260e4e6852bb8a71c46cdc77264cfd10e2b569a4b1b00"
+        ),
+        evaluator.SPY_2021_2025_V3_PROFILE_ID: (
+            "8ac07f9fe48d2d6448d4adeb5b2f53c364bad8d4ee3eacd8a23a40a509eb8e38"
+        ),
+    }
+    assert {
         profile_id: leverage_evaluator.require_profile(profile_id)[
             "profile_sha256"
         ]
@@ -263,7 +329,7 @@ def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
 @pytest.mark.parametrize(
     ("profile_id", "expected_count", "expect_tilt"),
     (
-        (evaluator.QQQ_2021_2025_V3_PROFILE_ID, 9, True),
+        (evaluator.QQQ_2021_2025_V4_PROFILE_ID, 9, True),
         (evaluator.QQQ_2021_2025_V2_PROFILE_ID, 8, False),
     ),
 )

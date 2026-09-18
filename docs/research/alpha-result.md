@@ -2747,3 +2747,43 @@ looks remain 27. A launch spends one look/evaluation even on technical
 failure; cells accrue only after authenticated result read. No raw rows,
 identifiers, prices, returns, logs, charts, holdings, orders, deployment,
 broker, paper/live, or trading access is authorized.
+
+## R-115 terminal technical failure; R-116 superseded unspent — 2026-09-18
+
+R-115 launched once in private project `36700291`, backtest
+`71335e98ebdc333a7291cc4d8a33033d`, and reached authenticated `Runtime Error`
+after 64 statistics-free polls. Terminal receipt
+`arv2-preliminary-qc-terminal-0468412659f8dbd15f945f35`, SHA-256
+`0468412659f8dbd15f945f3512fa887984aab465f61b99cfeed9374b76b941b3`,
+records no selected result value. No result authority, result-read permit,
+aggregate, or economic cell exists.
+
+One bounded diagnostic selected only status, error, and stack. The exact
+refusal was `benchmark tilt membership mapping is not exhaustive`: the full
+cap-eligible point-in-time proxy includes structural-zero names outside the
+analyst package's sector-labelled security census. The prospective V4
+correction may assign a deterministic reserved sector only to an unmapped
+name that also has no R-055 score; that name stays at exact benchmark weight
+and cannot transfer weight. Mapped/scored names still require exact sectors,
+and scored-but-unmapped names refuse. This changes no observed economic value
+because none was emitted.
+
+R-115 moves accounting to **84 shared looks, 27 development evaluations, 27
+infrastructure looks, and 599 cells**. R-116 created no project/backtest and
+is superseded unspent. Fresh R-117/R-118 successors will move accounting
+**84 -> 85 / 27 -> 28 / 599 -> 603**, then **85 -> 86 / 28 -> 29 / 603 ->
+607**, if their result reads authenticate. No raw row, identifier, price,
+return, statistic, log, chart, holding, order, deployment, broker, paper/live,
+or trading access occurred.
+
+The prospective V4 implementation assigns the reserved structural-zero
+sector only to an unscored, unmapped eligible name; it preserves that name's
+exact benchmark weight and refuses any scored mapping gap. Active V4 profile
+SHA-256s are `40626bc6fa7391a0660d93fc553b288d3f1db8c5a1704d784597560a93c44be1`
+(QQQ) and `73629240645c04164b81d646ba982b9d8d767ea6d09c1b90e3276291bafa517d`
+(SPY). The fresh V4 projection ceiling is 268,000 bytes with at least 4,096
+bytes tested headroom; historical V1--V3 projections retain 260,000 bytes.
+Independent prelaunch audit accepted the corrected implementation with zero
+open findings after one P2 cap-scope correction and two P3 guard-isolation
+tests; its final combined rerun was **414 passed**. This records no additional
+research look or outcome.

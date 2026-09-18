@@ -1180,6 +1180,16 @@ R-115, close it through one authenticated aggregate read, and only then
 launch R-116 sequentially on the single subscribed node. No leverage,
 deployment, broker, order, paper/live, or trading action follows.
 
+Section 107 records R-115's zero-cell technical refusal, the bounded
+structural-zero sector correction, and the unrelated historical-leverage
+compatibility debt exposed by the interrupted lane suite. The owner explicitly
+waives Claude review of section 107 before this already directed same-round
+correction and QC sequence. The exact next step is to commit and prospectively
+freeze fresh R-117 QQQ and R-118 SPY V4 identities, then launch and close them
+sequentially with at most one authenticated aggregate read each. R-116 remains
+unlaunched, superseded, and unspent. No leverage, deployment, broker, order,
+paper/live, or trading action follows.
+
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -18114,3 +18124,100 @@ technical refusal; cells accrue only after an authenticated aggregate read.
 No raw input row, security identifier, price, return series, log, chart,
 holding, order, deployment, broker state, paper/live state, or trading action
 is authorized or selected by this freeze.
+
+## 107. R-115 terminal technical failure and bounded sector-map correction, 2026-09-18
+
+R-115 launched exactly once in private QC project `36700291`, backtest
+`71335e98ebdc333a7291cc4d8a33033d`. After 64 statistics-free polls it
+reached authenticated terminal status `Runtime Error`. Terminal receipt
+`arv2-preliminary-qc-terminal-0468412659f8dbd15f945f35`, SHA-256
+`0468412659f8dbd15f945f3512fa887984aab465f61b99cfeed9374b76b941b3`,
+binds the exact project/backtest, says `include_statistics=false`, and says
+`result_values_selected=false`. No result authority or result-read permit was
+created and no economic aggregate or cell was selected.
+
+One separately authorized bounded technical diagnostic selected only terminal
+status, error text, and stack trace. At algorithm clock `2026-06-25 16:00:00`
+the exact refusal was `benchmark tilt membership mapping is not exhaustive`
+while constructing a decision. The cap-weighted point-in-time eligible proxy
+correctly includes names with no analyst contribution; the inherited package
+membership tuple contains sector labels only for the package's analyst-data
+security census. The first V3 implementation incorrectly required those two
+censuses to be identical, contradicting its own rule that analyst coverage is
+not an admission gate.
+
+The correction is prospective and cannot select an observed return because
+R-115 emitted none. A cap-eligible name absent from the package membership map
+may enter one deterministic reserved structural-zero sector only if it also
+has no R-055 arm score. Such a name retains its exact benchmark weight and can
+neither donate nor receive tilt weight. Every mapped or scored name still
+requires its exact package sector, and any scored-but-unmapped name named-
+refuses. Thus all actual transfers remain within proven point-in-time sector;
+the reserved label is bookkeeping for unchanged structural-zero weights, not
+an inferred industry classification.
+
+R-115 spends accounting **83 -> 84 shared looks and 26 -> 27 development
+evaluations**. Infrastructure looks remain **27** and the lifetime cell floor
+remains **599**. R-116 never created a project or backtest and is superseded
+unspent because corrected source and profile identity will change. Fresh
+R-117/R-118 V4 profiles must be committed before external action. Their
+prospective accounting is R-117 **84 -> 85 / 27 -> 28 / 599 -> 603**, then
+R-118 **85 -> 86 / 28 -> 29 / 603 -> 607**.
+
+The first complete-lane run was deliberately interrupted after **3,501
+passed, 7 skipped, and 7 failed** once all seven failures were isolated to a
+separate historical synthetic-leverage private-ABI compatibility break. The
+bounded-tilt base evaluator now returns a fifth benchmark-binding value and
+moved a legacy account-aggregate helper; the unlaunched, superseded leverage
+evaluator still unpacked four values and called the removed method. In-memory
+compatibility shims reproduced byte-identical summary SHA-256s for all six
+historical leverage profiles. The narrow permanent repair will keep every
+historical profile/source hash unchanged, require the fifth legacy binding to
+be `None`, and call the unchanged legacy aggregate helper directly. It does
+not reopen R-109--R-114, whose public projection and execution guards remain
+named refusals before network with zero backend events.
+
+No raw provider row, security identifier, price, return, statistic, log,
+chart, holding, order, deployment, broker state, paper/live state, or trade
+was selected by the failed run or its diagnostic. No leverage, formal
+acceptance, or live-use gate is opened.
+
+### 107.1 Permanent V4 correction and historical compatibility
+
+Fresh V4 profiles preserve every V3 byte and add only the prospective
+membership-gap rule above. Their profile SHA-256s are:
+
+- QQQ: `40626bc6fa7391a0660d93fc553b288d3f1db8c5a1704d784597560a93c44be1`
+- SPY: `73629240645c04164b81d646ba982b9d8d767ea6d09c1b90e3276291bafa517d`
+
+The market-cap source projection now permits at most 268,000 bytes only for
+these two fresh V4 profiles and proves at least 4,096 bytes of headroom. The
+historical V1--V3 profiles retain their original 260,000-byte ceiling. R-115
+and R-116 are explicit pre-network supersessions, but their exact historical
+aggregate validators remain available.
+
+The historical synthetic-leverage compatibility repair consumes the fifth
+base return only when it is exactly `None` and delegates legacy aggregate
+arithmetic directly to the unchanged helper. All six frozen leverage profile
+and base identities remain exact, and their deterministic summary SHA-256s
+are byte-identical to the pristine `1f47eb3` outputs. This is compatibility
+maintenance only; no leverage profile is reopened for execution.
+
+### 107.2 Independent prelaunch audit and validation
+
+The independent audit found one P2 before commit: the first projection-cap
+implementation applied 268,000 bytes to historical V1--V3 profiles as well
+as V4. The correction scopes the allowance to V4; an exact, internally
+rehashed 260,001-byte V1 candidate now refuses even though it is below the V4
+ceiling. The audit also found two P3 isolation gaps for the reserved-sector
+collision and non-dict V4 score-map guards. Direct named-refusal tests now
+cover both. Final audit disposition after correction is **accepted, 0 open
+P0/P1/P2/P3**.
+
+Combined evaluator/runtime/projection/adapter/leverage/document validation
+was **510 passed** before the final audit corrections; the projection and
+public-supersession correction focus then passed **85**, and the two new V4
+guard tests plus the existing real-gap test passed **3**. `compileall` and
+`git diff --check` are clean. The independent auditor's final combined rerun
+after all corrections was **414 passed in 297.57 seconds**. The complete lane
+suite must still finish green before the round's one push.

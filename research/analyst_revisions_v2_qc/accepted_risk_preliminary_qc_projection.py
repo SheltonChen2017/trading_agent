@@ -36,6 +36,7 @@ PROJECTION_SCHEMA = "arv2-accepted-risk-preliminary-qc-source-projection-v2"
 SOURCE_SCHEMA = "arv2-accepted-risk-preliminary-qc-source-file-v1"
 MAX_SOURCE_FILE_BYTES = 60_000
 MAX_TOTAL_SOURCE_BYTES = 260_000
+MAX_MARKET_CAP_TOTAL_SOURCE_BYTES = 268_000
 ALGORITHM_START = (2026, 4, 1)
 ALGORITHM_END = (2026, 9, 11)
 MARKET_CAP_ALGORITHM_START = (2024, 1, 2)
@@ -94,6 +95,7 @@ STOCK_PORTFOLIO_PROFILE_SHA256 = (
 )
 MARKET_CAP_V1_PROFILE_IDS = market_cap_evaluator.V1_PROFILE_IDS
 MARKET_CAP_V2_PROFILE_IDS = market_cap_evaluator.V2_PROFILE_IDS
+MARKET_CAP_V3_PROFILE_IDS = market_cap_evaluator.V3_PROFILE_IDS
 MARKET_CAP_PROFILE_IDS = market_cap_evaluator.PROFILE_IDS
 MARKET_CAP_ALL_PROFILE_IDS = market_cap_evaluator.ALL_PROFILE_IDS
 MARKET_CAP_PROFILE_SHA256S = {
@@ -122,6 +124,8 @@ SUPERSEDED_UNSPENT_PROFILE_IDS = (
     market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID,
     leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
     leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID,
+    market_cap_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
+    market_cap_evaluator.SPY_2021_2025_V3_PROFILE_ID,
 )
 MAIN_PROJECT_PATH = "main.py"
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
@@ -938,6 +942,14 @@ def project_source_paths_for_profile(evaluation_profile_id):
     return PROJECT_SOURCE_PATHS
 
 
+def _total_source_byte_limit(evaluation_profile_id):
+    return (
+        MAX_MARKET_CAP_TOTAL_SOURCE_BYTES
+        if evaluation_profile_id in MARKET_CAP_PROFILE_IDS
+        else MAX_TOTAL_SOURCE_BYTES
+    )
+
+
 def _runtime_slice_bounds(evaluation_profile_id):
     if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
         return (
@@ -1040,7 +1052,7 @@ def build_accepted_risk_preliminary_qc_projection(
     )
     files.sort(key=lambda item: item.project_path)
     total = sum(item.byte_count for item in files)
-    if total > MAX_TOTAL_SOURCE_BYTES:
+    if total > _total_source_byte_limit(evaluation_profile_id):
         raise AcceptedRiskPreliminaryQcProjectionError(
             "preliminary QC source set exceeds reviewed total size"
         )
@@ -1129,7 +1141,8 @@ def require_accepted_risk_preliminary_qc_projection(
         != sum(item.byte_count for item in value.source_files)
         or value.evaluation_profile_sha256
         != (None if profile is None else profile["profile_sha256"])
-        or value.total_source_byte_count > MAX_TOTAL_SOURCE_BYTES
+        or value.total_source_byte_count
+        > _total_source_byte_limit(value.evaluation_profile_id)
         or value.train_work_units_per_slice
         != train_work_units_per_slice
         or type(value.train_work_units_per_slice) is not int

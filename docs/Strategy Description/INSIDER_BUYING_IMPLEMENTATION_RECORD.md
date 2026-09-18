@@ -1,20 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE REVIEW COMMIT `0b1c3b8` (SECTION 59).
-THE SUBSTANTIVE ACCEPTANCE OF `be54897` IS RETAINED; `0b1c3b8` IS ACCEPTED
-AFTER APPEND-ONLY RECORD CORRECTION. CLAUDE'S `Context` AND EXACT-HELPER
-REBIND PROBES ARE REPRODUCIBLE, BUT THEY SUBSTITUTE EXECUTABLE CALLABLES
-INSIDE THE RUNNING PROCESS RATHER THAN COHERENTLY REBINDING DECLARED POLICY
-CONSTANTS. THE FROZEN-POLICY GUARDS COVER THE REVIEWED COMMIT'S DECLARED
-DESCRIPTORS, CONSTANTS, HASHES, AND ROUNDING BINDINGS; GIT COMMIT REVIEW IS
-THE CODE-INTEGRITY BOUNDARY. ARBITRARY SAME-PROCESS CALLABLE REPLACEMENT IS
-NOT CLAIMED AS A GUARANTEE. THE NEW THREAT-SCOPE ITEM IS CANONICALLY
-`IB3B-CR05` AND IS CLOSED BY THAT SCOPE CORRECTION; SECTION 58'S DUPLICATE
-`IB3B-CR04`, FALSE `IB3B-N01`, MUTANT TOTAL, LEDGER/DISPOSITION FORMAT,
-VERIFICATION OVERCLAIM, AND WARNING-HISTORY WORDING ARE CORRECTED IN SECTION
-59. NO PRODUCTION OR TEST CHANGE WAS REQUIRED. IB-3C REMAINS POLICY-GATED
-AND UNIMPLEMENTED PENDING OWNER APPROVAL OF SECTION 57.4. NO DATA, PROVIDER,
-OUTCOME, QC, PAPER, LIVE, DEPLOYMENT, OR TRADING AUTHORITY IS INFERRED.**
+Status: **THE SECTION-59 COUNTER-REVIEW `a99fb37` IS CLAUDE-REVIEWED AND
+ACCEPTED (SECTION 60). ALL SEVEN FINDINGS IT RAISED AGAINST SECTION 58 WERE
+INDEPENDENTLY VERIFIED AND ARE CORRECT, INCLUDING TWO FACTUAL ERRORS BY THIS
+REVIEWER: THE WITHDRAWN `IB3B-N01` WAS BACKWARDS BECAUSE THE COMMITTED
+REGRESSIONS DO REBIND EACH CONSTANT TOGETHER WITH A RECOMPUTED POLICY HASH,
+AND `IB3B-CR04` REUSED AN ID ALREADY ASSIGNED IN SECTION 56. THE
+POLICY-VERSUS-CODE-INTEGRITY BOUNDARY IN 59.2 IS ACCEPTED AS SOUND AND
+CLOSES `IB3B-CR05`. `a99fb37` IS RECORD-ONLY: ITS CODE TREE IS BYTE-IDENTICAL
+TO `17ef474`, ALREADY VALIDATED AT 7,696 PASSED. SECTION 59.4'S FIGURES
+REPRODUCE (222 FOCUSED; 312, 1,487 AND 1,496 GATES; 15 INSIDER FILES). ONE
+OWNER-FACING ITEM IS OPEN AS `IB3C-CR01`: THE GATED SIX-CLAUSE IB-3C POLICY
+IS ALREADY IMPLEMENTED IN UNCOMMITTED WORKING-TREE FILES WHILE THE PUSHED
+RECORD STATES IT IS NOT CREATED PENDING APPROVAL. IB-3C REMAINS POLICY-GATED
+AND ABSENT FROM EVERY PUSHED COMMIT. NO DATA, PROVIDER, OUTCOME, QC, PAPER,
+LIVE, DEPLOYMENT, OR TRADING AUTHORITY IS INFERRED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -174,6 +174,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-17 | Codex counter-review | `31b3fcc` -> `be54897` correction snapshot; this record commit follows | Counter-review of Claude commits `d26e2c9` and `31b3fcc`; synthetic IB-3C policy-gate scoping | Accepted both Claude commits after correction. Closed runtime decimal-policy identity drift in IB-3A/IB-3B, pinned the upstream and local policy hashes, removed mutable rounding aliases, and corrected the review evidence append-only. Began IB-3C definition-of-done and policy scoping without creating an executable ranking/seed artifact. | Pre-fix runtime probes accepted HALF_UP alias rebinding with unchanged policy hashes and changed both exact ties. Corrected focused: IB-3A **181**, IB-3B **41**, combined **222 passed**. Current macOS lane gates: **1,487 passed** with overlay boundary and **1,496 passed** with ML boundary; whole-tree compileall exit 0; final record/diff/status checks follow in section 57. No external or outcome access; **0 research looks**. | `IB3B-CCR01` P2 closed in `be54897`; record P3s `IB3B-CCR02` through `IB3B-CCR05` corrected or scoped in section 57. `IB3B-R11` and `IB3B-CR03` remain non-blocking as recorded. One analogous Analyst-lane P3 is documented only and not fixed here. | Commit this lane record and make exactly one push for the round. Executable IB-3C remains owner-blocked pending an exact policy freeze; canonical IB-2 remains unavailable without separately granted data authorities. |
 | 2026-09-18 | Claude review | `17ef474` -> this review record | Independent review of the IB-3 policy-identity correction and the section-57 counter-review (`31b3fcc..17ef474`, 2 commits, 0 merges, 5 lane-owned paths) | Verified the remote tip and clean worktree, then reviewed both commits. Reproduced the IB3B-CCR01 P2 red/green across the pre- and post-correction trees, confirmed a faithful reintroduction of the defect is caught in both modules, recomputed both policy hashes against their pinned literals, verified every section-57 correction to section 56 including the z-monotonicity claim over 4,000 probes, and ran 19 targeted plus 3 combined mutants. No genuine test-sensitivity gap was found, the first such round in this lane, so no code correction was made. Full detail in section 58. | Pushed tree `17ef474`: complete suite **7,696 passed, 38 skipped, 28 warnings, 0 failed in 623.87s (0:10:23)**; IB-3A **181**, IB-3B **41**, combined **222**; lane plus overlay boundary **1,487**; lane plus ML boundary **1,496**; 15 Insider files; compileall exit **0**; `git diff --check` clean. Both policy hashes recompute to their pinned literals. 27 authority flags false and both look counters zero on every IB-3A object; `stock_score` hard `None`; IB-3B ranking/seed `deferred`. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | Both commits accepted; `17ef474` with one open finding. **IB3B-CR04** (P3, open): the coherent-rebind threat model is closed for the rounding alias but not for `Context` or the exact-arithmetic helpers, which reproduce the same exploit with the frozen-policy guard green; recommend scoping the claim or generalizing the defence, deliberately not half-fixed here. IB3B-N01 notes that the coherent-rebind regression mostly exercises the incoherent case although the coherent property still holds by direct probe; IB3B-N02 is the constant 28-versus-26 warning delta. Of 7 mutation survivors, 2 were this reviewer's own unfaithful mutants and 5 are mutually redundant layers whose combination is caught. No production or test file changed. | Codex counter-reviews this record commit and dispositions `IB3B-CR04`. IB-3C remains policy-gated and unapproved. Full IB-2 and canonical IB-3 remain incomplete; no milestone started. |
 | 2026-09-18 | Codex counter-review | `0b1c3b8` -> this record commit | Counter-review of Claude's IB-3 policy-identity review; IB-3C authorization gate | Accepted `0b1c3b8` after append-only correction. Reproduced the callable-substitution probes, defined the bounded policy-versus-code-integrity threat model, assigned the new item a unique stable ID, and corrected six review-record defects. No production or test file changed. | Direct probes reproduced HALF_UP `Context`, `ln(3)` helper substitution, green guards, and unchanged hashes. Focused IB-3A/IB-3B and lane/document gates are re-run on the final record tree in section 59; compileall/diff/status checks follow. No external or outcome access; **0 research looks**. | `IB3B-CCR07` through `IB3B-CCR13` are closed in section 59. The callable probes are valid evidence of arbitrary in-process code substitution, not a policy-constant fail-open under the now-explicit boundary. No P0-P2 finding remains. | Commit this record and make the round's one push. Stop the one-shot Claude-push monitor. Await owner approval or revision of the exact six-clause synthetic IB-3C policy before executable milestone work. |
+| 2026-09-18 | Claude review | `a99fb37` -> this review record | Independent review of the section-59 counter-review (`0b1c3b8..a99fb37`, 1 commit, 0 merges, 1 lane-owned path) | Verified the remote tip, then reviewed the single record-only commit. Confirmed its code tree is byte-identical to `17ef474`, so the 7,696-pass validation carries. Independently checked all seven findings raised against section 58 and accepted every one, including two factual errors by this reviewer. Re-measured section 59.4's figures in a read-only export isolated from concurrent uncommitted work. Full detail in section 60. | Code tree identical to `17ef474` (0 non-record paths differ), previously validated at **7,696 passed, 38 skipped, 28 warnings, 0 failed**. Re-measured on the exported pushed head: IB-3A plus IB-3B focused **222 passed**; the 312 set **309 passed, 3 skipped** where the 3 skips are the export's `no mainline ref available` git dependence; lane plus overlay **1,484 passed, 3 skipped**; lane plus ML **1,493 passed, 3 skipped**; 15 Insider files. The 1,487 and 1,496 figures reproduced exactly in a clean worktree last round at this identical tree. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | `a99fb37` **accepted**. All of `IB3B-CCR07` through `IB3B-CCR13` verified correct and accepted: the threat boundary in 59.2 is sound and adopts one of the two remedies section 58 offered; `IB3B-CR04` did duplicate the section-56 ID and is renamed `IB3B-CR05`; the withdrawn `IB3B-N01` was factually backwards; the mutant total is 16 targeted plus 3 combined equals 19; `accepted after one open finding` is not an allowed disposition and the ten-column ledger is mandatory; 58.1 contradicted 58.3 on out-of-lane verification; and the warning delta is not constant across this lane's history. New **IB3C-CR01** (P3, open, owner-facing): the six gated IB-3C clauses are already implemented in uncommitted working-tree files. No production or test file changed. | Codex counter-reviews this record commit. The owner decides `IB3C-CR01` and whether to approve or revise section 57.4. Full IB-2 and canonical IB-3 remain incomplete; no milestone started. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -7764,3 +7765,104 @@ After final validation, Codex commits this record and makes exactly one push.
 That completes the one Claude-push event for which the monitor was armed, so
 the monitor is stopped. The next executable action is owner approval or
 revision of section 57.4.
+
+
+## 60. Claude review - the section-59 counter-review (2026-09-18 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying` (owner's Mac, Python 3.13.15, pytest 9.1.1).
+No branch, worktree, fork, or handoff was created or switched to. The remote
+tip was verified as `a99fb3771641f76b41b7ec7500e4c6019b9d7bfb` with the local
+branch exact at it. The reviewed range `0b1c3b8..a99fb37` contains one commit,
+zero merges, and one lane-owned path.
+
+Measurement note. At review time the shared worktree also held Codex's
+uncommitted next-milestone work, including a modified package `__init__.py`,
+so any run in the worktree would have measured that work rather than the
+pushed head. All figures below were therefore taken from a read-only
+`git archive` export of `a99fb37`. Nothing in the worktree was modified,
+staged, or removed.
+
+### 60.1 Commit disposition
+
+| Commit | Change | Disposition |
+|---|---|---|
+| `a99fb3771641f76b41b7ec7500e4c6019b9d7bfb` | Section 59 counter-review of Claude review commit `0b1c3b8` | **Accepted.** Record-only. Its code tree is byte-identical to `17ef474`, so last round's complete-suite validation carries unchanged. Every finding it raises against section 58 was independently checked and is correct, and its recorded figures reproduce. No defect was found. |
+
+### 60.2 Every section-59 finding verified
+
+All seven are correct and are accepted without reservation. Two of them are
+factual errors by this reviewer, and the corrections are adopted.
+
+| Finding | Independent verification |
+|---|---|
+| `IB3B-CCR07` policy-versus-code-integrity boundary | **Sound; accepted.** Section 58 offered two remedies, scoping the claim or generalizing the defence, and 59.2 takes the first. The line drawn is principled rather than convenient: a rounding mode is a declared policy descriptor that appears in the hashed payload, whereas `Context`, `localcontext` and the exact-arithmetic helpers are executable implementation dependencies. Payload-affecting callables such as `decimal_text` remain covered, because substituting one changes the recomputed payload hash and a coherent substitution is caught by the pinned literal. Arbitrary same-process replacement genuinely has no finite self-verifying anchor, since the guard itself is replaceable. `IB3B-CR05` is correctly closed by that scope correction. |
+| `IB3B-CCR08` duplicate finding ID | **Confirmed.** `IB3B-CR04` was already assigned in section 56.8 to the overlay-boundary gate-description issue. Section 58 reused it. The rename to `IB3B-CR05` is correct. |
+| `IB3B-CCR09` `IB3B-N01` was backwards | **Confirmed; the note is rightly withdrawn.** Reading the complete test body rather than its tail shows the loop patches each of the 24 constants and, inside the same `monkeypatch.context()`, also patches `FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH` to `hash_payload(_numeric_policy_payload())`. That is precisely the coherent constant-plus-hash case, and IB-3B does the same for seven values. Section 58 asserted the opposite from a partial reading. |
+| `IB3B-CCR10` mutant arithmetic | **Confirmed.** The harness defined 16 targeted mutants and 3 combined cases, so the durable claim is 16 plus 3 equals 19 total. Section 58 wrote "nineteen targeted" and "19 targeted plus 3 combined", which implies 22 and does not reconcile with its own enumeration of 9 caught and 7 surviving singles. |
+| `IB3B-CCR11` disposition vocabulary and ledger shape | **Confirmed against the governing process.** `GENERAL_CODE_REVIEW_INSTRUCTIONS.md` permits only `accepted`, `accepted after correction`, or `rejected`, and prescribes the ten-column ledger as the minimum shape. Section 58 used neither. This review adopts both. |
+| `IB3B-CCR12` internal contradiction | **Confirmed.** Section 58.1 claimed every section-57 correction was independently verified while 58.3 stated that out-of-lane `IB3B-CCR06` was not. Scoping the claim to in-lane corrections is the correct repair. |
+| `IB3B-CCR13` warning history | **Confirmed.** The record contains runs at 25, 26 and 28 warnings, so "constant across every round in this lane" is false. Scoping the observation to the recent applicable Mac runs is correct. |
+
+### 60.3 Recorded figures reproduced
+
+Measured on the exported pushed head, isolated from the concurrent
+uncommitted work:
+
+- IB-3A plus IB-3B focused: **222 passed**, exactly as recorded.
+- The 312 set: **309 passed, 3 skipped**, totalling the recorded 312. The three
+  skips are `no mainline ref available` in `test_active_document_consistency.py`
+  and are an artifact of the export not being a Git repository, not a defect.
+- Lane plus overlay boundary: **1,484 passed, 3 skipped** (1,487 collected);
+  lane plus ML boundary: **1,493 passed, 3 skipped** (1,496 collected). Both
+  reproduced exactly as 1,487 and 1,496 passed in a clean worktree last round
+  at this identical code tree.
+- Fifteen Insider test files.
+- Non-record paths differing between `17ef474` and `a99fb37`: **zero**, so the
+  complete-suite result of **7,696 passed, 38 skipped, 28 warnings, 0 failed**
+  carries to this commit without a re-run.
+
+Authority is unchanged and was not re-litigated: no IB-3C file exists in any
+pushed commit, `stock_score` remains hard `None`, and IB-3B ranking and seed
+selection remain `deferred`.
+
+### 60.4 Findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3C-CR01 | P3 | **OPEN - owner-facing governance observation** | Not in `a99fb37`; observed in the shared working tree | `research/insider_buying/form4_stock_signal_seed_diagnostics.py`, its test file, and `research/insider_buying/__init__.py` | Section 59.5 states that Codex "cannot lawfully invent percentile, integer-rounding, cutoff-tie, positivity, or minimum-seed semantics" and that "no executable IB-3C file is created" pending owner approval of section 57.4. That is true of every pushed commit. It is not true of the working tree, which holds 1,232 uncommitted module lines and 775 uncommitted test lines encoding those exact clauses, with the package modified to export them. The owner holds this gate, so approving 57.4 "as proposed" would be ratifying an existing implementation rather than specifying the policy independently. | Read-only inspection shows `FORM4_STOCK_SIGNAL_SEED_COUNT_POLICY = "ceil(N/10)"`, top fraction numerator 1 and denominator 10, `FORM4_STOCK_SIGNAL_SEED_MINIMUM_POSITIVE_SEEDS = 2`, plus tie, eligibility, denominator and ranking-value policies. These map one-to-one onto the six clauses of section 57.4. | The gate is an owner decision. A reviewer who observes that the gated artifact already exists must surface it rather than let the record's "not created" stand unqualified as a description of the lane's state. | None by this reviewer. The files are Codex's uncommitted work and were neither modified, staged, nor removed. Recommend that the next record state plainly that a candidate implementation exists uncommitted, so the approval decision is made with that knowledge. | Working-tree inspection only; `git status` confirms this reviewer changed no tracked file. |
+
+No P0, P1, or P2 finding. The pushed commit itself contains no defect.
+`IB3B-R11`, `IB3B-CR03` and out-of-lane `IB3B-CCR06` retain their earlier
+dispositions.
+
+### 60.5 Quality rating
+
+**10 / 10** for this counter-review. It is the strongest in the lane's
+history. It reproduced the reviewer's own probes before ruling on them,
+resolved the threat-model question with a principled boundary rather than by
+accepting or dismissing the finding wholesale, and caught six genuine record
+defects including two substantive factual errors, one of which arose from this
+reviewer reading only part of a test body before characterizing it. Every
+correction was verifiable from the repository, and it correctly declined to
+invent the gated IB-3C semantics.
+
+The single point against the round is not in the commit but around it, and is
+recorded as `IB3C-CR01`.
+
+### 60.6 Authority, residual gates, and next step
+
+Every authority gate remains closed. No official security master,
+`qc_symbol_id`, authenticated amendment supersession, trading calendar, role
+taxonomy, canonical filtering, deduplication, authorized aggregation,
+operative `$50,000` gate, canonical score, rank, seed, outcome, ETF, QC,
+deployment, capital, broker, or trading capability exists in any pushed
+commit. Full IB-2 and canonical IB-3 remain incomplete.
+
+IB-3C remains policy-gated. This review does not approve section 57.4, and it
+notes under `IB3C-CR01` that a candidate implementation already exists
+uncommitted, which the owner should weigh when deciding.
+
+Review commits on this lane: this record commit only. Next authorized step:
+Codex counter-reviews it; the owner decides `IB3C-CR01` and the section-57.4
+policy. No milestone was started and none is authorized by this review.

@@ -299,14 +299,35 @@ _PINNED_STOCK_PORTFOLIO_RESULT_NAMES = (
 _PINNED_PROJECTION_MARKET_CAP_SOURCE_PATHS = tuple(
     projection_builder.MARKET_CAP_PROJECT_SOURCE_PATHS
 )
+_PINNED_PROJECTION_MARKET_CAP_LEGACY_SOURCE_PATHS = tuple(
+    projection_builder.MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS
+)
 _PINNED_PROJECTION_MARKET_CAP_PROFILE_IDS = tuple(
     projection_builder.MARKET_CAP_PROFILE_IDS
+)
+_PINNED_PROJECTION_MARKET_CAP_V1_PROFILE_IDS = tuple(
+    projection_builder.MARKET_CAP_V1_PROFILE_IDS
+)
+_PINNED_PROJECTION_MARKET_CAP_V2_PROFILE_IDS = tuple(
+    projection_builder.MARKET_CAP_V2_PROFILE_IDS
+)
+_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_IDS = tuple(
+    projection_builder.MARKET_CAP_ALL_PROFILE_IDS
+)
+_PINNED_PROJECTION_SUPERSEDED_UNSPENT_PROFILE_IDS = tuple(
+    projection_builder.SUPERSEDED_UNSPENT_PROFILE_IDS
 )
 _PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256S_OBJECT = (
     projection_builder.MARKET_CAP_PROFILE_SHA256S
 )
 _PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256_ROWS = tuple(
     sorted(_PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256S_OBJECT.items())
+)
+_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_SHA256S_OBJECT = (
+    projection_builder.MARKET_CAP_ALL_PROFILE_SHA256S
+)
+_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_SHA256_ROWS = tuple(
+    sorted(_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_SHA256S_OBJECT.items())
 )
 _PINNED_REQUIRE_MARKET_CAP_PROFILE = (
     market_cap_evaluator.require_market_cap_stock_portfolio_profile
@@ -319,6 +340,7 @@ _PINNED_MARKET_CAP_CONSTITUENT_TICKERS_CALLABLE = (
 )
 _PINNED_MARKET_CAP_PROFILE_IDS = tuple(market_cap_evaluator.PROFILE_IDS)
 _PINNED_MARKET_CAP_V1_PROFILE_IDS = tuple(market_cap_evaluator.V1_PROFILE_IDS)
+_PINNED_MARKET_CAP_V2_PROFILE_IDS = tuple(market_cap_evaluator.V2_PROFILE_IDS)
 _PINNED_MARKET_CAP_ALL_PROFILE_IDS = tuple(
     market_cap_evaluator.ALL_PROFILE_IDS
 )
@@ -346,8 +368,38 @@ _PINNED_MARKET_CAP_SELECTED_AGGREGATES_STATISTIC_NAME = (
 _PINNED_MARKET_CAP_MATCHED_AGGREGATES_STATISTIC_NAME = (
     market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
 )
+_PINNED_MARKET_CAP_TILT_AGGREGATES_STATISTIC_NAME = (
+    market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME
+)
+_PINNED_MARKET_CAP_TILT_AGGREGATES_SCHEMA = (
+    market_cap_evaluator.TILT_AGGREGATES_SCHEMA
+)
 _PINNED_MARKET_CAP_MAXIMUM_HOLDINGS = market_cap_evaluator.MAXIMUM_HOLDINGS
 _PINNED_MARKET_CAP_TARGET_GROSS = market_cap_evaluator.TARGET_GROSS_EXPOSURE
+_PINNED_MARKET_CAP_PORTFOLIO_WEIGHT_QUANTUM = (
+    market_cap_evaluator.PORTFOLIO_WEIGHT_QUANTUM
+)
+_PINNED_MARKET_CAP_MINIMUM_TILT_RANKED_NAMES = (
+    market_cap_evaluator.MINIMUM_TILT_RANKED_NAME_COUNT
+)
+_PINNED_MARKET_CAP_MINIMUM_TILT_POSITIVE_SCORES = (
+    market_cap_evaluator.MINIMUM_TILT_POSITIVE_SCORE_COUNT
+)
+_PINNED_MARKET_CAP_MINIMUM_TILT_NEGATIVE_SCORES = (
+    market_cap_evaluator.MINIMUM_TILT_NEGATIVE_SCORE_COUNT
+)
+_PINNED_MARKET_CAP_MAXIMUM_RELATIVE_TILT = (
+    market_cap_evaluator.MAXIMUM_RELATIVE_TILT
+)
+_PINNED_MARKET_CAP_MAXIMUM_ABSOLUTE_OVERWEIGHT = (
+    market_cap_evaluator.MAXIMUM_ABSOLUTE_OVERWEIGHT
+)
+_PINNED_MARKET_CAP_MAXIMUM_ONE_WAY_ACTIVE_SHARE = (
+    market_cap_evaluator.MAXIMUM_ONE_WAY_ACTIVE_SHARE
+)
+_PINNED_MARKET_CAP_MAXIMUM_HHI_MULTIPLE = (
+    market_cap_evaluator.MAXIMUM_HHI_MULTIPLE
+)
 _PINNED_MARKET_CAP_MINIMUM_INVESTED_RETURNS = (
     market_cap_evaluator.MINIMUM_INVESTED_RETURN_SESSIONS
 )
@@ -392,7 +444,7 @@ _PINNED_MARKET_CAP_PROFILE_BINDINGS = tuple(
             )
         ),
     )
-    for profile_id in _PINNED_MARKET_CAP_PROFILE_IDS
+    for profile_id in _PINNED_MARKET_CAP_ALL_PROFILE_IDS
 )
 _PINNED_PROJECTION_LEVERAGE_SOURCE_PATHS = tuple(
     projection_builder.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
@@ -900,7 +952,42 @@ _EVALUATION_RUN_SPECS = (
         619,
         623,
     ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
+        "arv2-eval-bounded-tilt-stock-qqq-2021-2025-qc-050",
+        "R-115",
+        83,
+        84,
+        26,
+        27,
+        4,
+        599,
+        603,
+    ),
+    _EvaluationRunSpec(
+        market_cap_evaluator.SPY_2021_2025_V3_PROFILE_ID,
+        "arv2-eval-bounded-tilt-stock-spy-2021-2025-qc-051",
+        "R-116",
+        84,
+        85,
+        27,
+        28,
+        4,
+        603,
+        607,
+    ),
 )
+
+_SUPERSEDED_UNSPENT_PROFILE_IDS = (
+    _PINNED_PROJECTION_SUPERSEDED_UNSPENT_PROFILE_IDS
+)
+
+
+def _require_fresh_launch_profile(plan):
+    profile_id = plan.projection.evaluation_profile_id
+    if profile_id in _SUPERSEDED_UNSPENT_PROFILE_IDS:
+        _error("preliminary evaluation profile is superseded and cannot launch")
+    return plan
 
 
 def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
@@ -915,11 +1002,15 @@ def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
             elif evaluation_profile_id in _PINNED_STOCK_PORTFOLIO_PROFILE_IDS:
                 if not _stock_portfolio_contract_bindings_are_current():
                     _error("stock portfolio financial contract changed")
-            elif evaluation_profile_id in _PINNED_MARKET_CAP_PROFILE_IDS:
+            elif evaluation_profile_id in _PINNED_MARKET_CAP_ALL_PROFILE_IDS:
                 if not _market_cap_contract_bindings_are_current():
                     _error("market-cap stock portfolio financial contract changed")
             elif evaluation_profile_id in _PINNED_LEVERAGE_PROFILE_IDS:
-                if not _leverage_contract_bindings_are_current():
+                if (
+                    evaluation_profile_id
+                    not in _SUPERSEDED_UNSPENT_PROFILE_IDS
+                    and not _leverage_contract_bindings_are_current()
+                ):
                     _error("objective leverage financial contract changed")
             elif evaluation_profile_id is not None:
                 _PINNED_REQUIRE_REGIME_PROFILE(evaluation_profile_id)
@@ -941,7 +1032,7 @@ def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]
         _profile_bytes, _profile_sha256, names = (
             _stock_portfolio_profile_binding(evaluation_profile_id)
         )
-    elif evaluation_profile_id in _PINNED_MARKET_CAP_PROFILE_IDS:
+    elif evaluation_profile_id in _PINNED_MARKET_CAP_ALL_PROFILE_IDS:
         _profile_bytes, _profile_sha256, names = (
             _market_cap_profile_binding(evaluation_profile_id)
         )
@@ -954,10 +1045,16 @@ def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]
             _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(evaluation_profile_id)
         )
     split_account_profiles = (
-        _PINNED_MARKET_CAP_PROFILE_IDS + _PINNED_LEVERAGE_PROFILE_IDS
+        _PINNED_MARKET_CAP_ALL_PROFILE_IDS + _PINNED_LEVERAGE_PROFILE_IDS
     )
     non_cell_statistic_count = (
-        4 if evaluation_profile_id in split_account_profiles else 2
+        (
+            5
+            if evaluation_profile_id in _PINNED_MARKET_CAP_PROFILE_IDS
+            else 4
+        )
+        if evaluation_profile_id in split_account_profiles
+        else 2
     )
     if (
         type(names) is not tuple
@@ -1359,7 +1456,7 @@ def _stock_portfolio_contract_bindings_are_current() -> bool:
 
 
 def _market_cap_contract_bindings_are_current() -> bool:
-    """Refuse in-memory weakening of the six exact market-cap contracts."""
+    """Refuse weakening of active tilt or preserved market-cap contracts."""
 
     namespace = market_cap_evaluator.__dict__
     runtime_namespace = market_cap_runtime.__dict__
@@ -1384,7 +1481,32 @@ def _market_cap_contract_bindings_are_current() -> bool:
             _PINNED_MARKET_CAP_MATCHED_AGGREGATES_STATISTIC_NAME,
             str,
         ),
+        (
+            market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME,
+            _PINNED_MARKET_CAP_TILT_AGGREGATES_STATISTIC_NAME,
+            str,
+        ),
+        (
+            market_cap_evaluator.TILT_AGGREGATES_SCHEMA,
+            _PINNED_MARKET_CAP_TILT_AGGREGATES_SCHEMA,
+            str,
+        ),
         (market_cap_evaluator.MAXIMUM_HOLDINGS, _PINNED_MARKET_CAP_MAXIMUM_HOLDINGS, int),
+        (
+            market_cap_evaluator.MINIMUM_TILT_RANKED_NAME_COUNT,
+            _PINNED_MARKET_CAP_MINIMUM_TILT_RANKED_NAMES,
+            int,
+        ),
+        (
+            market_cap_evaluator.MINIMUM_TILT_POSITIVE_SCORE_COUNT,
+            _PINNED_MARKET_CAP_MINIMUM_TILT_POSITIVE_SCORES,
+            int,
+        ),
+        (
+            market_cap_evaluator.MINIMUM_TILT_NEGATIVE_SCORE_COUNT,
+            _PINNED_MARKET_CAP_MINIMUM_TILT_NEGATIVE_SCORES,
+            int,
+        ),
         (
             market_cap_evaluator.MINIMUM_INVESTED_RETURN_SESSIONS,
             _PINNED_MARKET_CAP_MINIMUM_INVESTED_RETURNS,
@@ -1424,9 +1546,34 @@ def _market_cap_contract_bindings_are_current() -> bool:
             Decimal("0.98"),
         ),
         (
+            market_cap_evaluator.PORTFOLIO_WEIGHT_QUANTUM,
+            _PINNED_MARKET_CAP_PORTFOLIO_WEIGHT_QUANTUM,
+            Decimal("1e-48"),
+        ),
+        (
             market_cap_evaluator.ANNUALIZATION_SESSIONS,
             _PINNED_MARKET_CAP_ANNUALIZATION_SESSIONS,
             Decimal("252"),
+        ),
+        (
+            market_cap_evaluator.MAXIMUM_RELATIVE_TILT,
+            _PINNED_MARKET_CAP_MAXIMUM_RELATIVE_TILT,
+            Decimal("0.20"),
+        ),
+        (
+            market_cap_evaluator.MAXIMUM_ABSOLUTE_OVERWEIGHT,
+            _PINNED_MARKET_CAP_MAXIMUM_ABSOLUTE_OVERWEIGHT,
+            Decimal("0.00490"),
+        ),
+        (
+            market_cap_evaluator.MAXIMUM_ONE_WAY_ACTIVE_SHARE,
+            _PINNED_MARKET_CAP_MAXIMUM_ONE_WAY_ACTIVE_SHARE,
+            Decimal("0.0490"),
+        ),
+        (
+            market_cap_evaluator.MAXIMUM_HHI_MULTIPLE,
+            _PINNED_MARKET_CAP_MAXIMUM_HHI_MULTIPLE,
+            Decimal("1.44"),
         ),
     )
     if any(
@@ -1438,12 +1585,27 @@ def _market_cap_contract_bindings_are_current() -> bool:
         return False
     try:
         profile_ids = namespace.get("PROFILE_IDS")
+        v1_profile_ids = namespace.get("V1_PROFILE_IDS")
+        v2_profile_ids = namespace.get("V2_PROFILE_IDS")
+        all_profile_ids = namespace.get("ALL_PROFILE_IDS")
         qqq_profile_ids = namespace.get("QQQ_PROFILE_IDS")
         spy_profile_ids = namespace.get("SPY_PROFILE_IDS")
         canonical_profiles = namespace.get("_PROFILE_CANONICAL")
         projection_profile_ids = projection_builder.MARKET_CAP_PROFILE_IDS
+        projection_v1_profile_ids = projection_builder.MARKET_CAP_V1_PROFILE_IDS
+        projection_v2_profile_ids = projection_builder.MARKET_CAP_V2_PROFILE_IDS
+        projection_all_profile_ids = projection_builder.MARKET_CAP_ALL_PROFILE_IDS
+        superseded_profile_ids = (
+            projection_builder.SUPERSEDED_UNSPENT_PROFILE_IDS
+        )
         projection_hashes = projection_builder.MARKET_CAP_PROFILE_SHA256S
+        projection_all_hashes = (
+            projection_builder.MARKET_CAP_ALL_PROFILE_SHA256S
+        )
         source_paths = projection_builder.MARKET_CAP_PROJECT_SOURCE_PATHS
+        legacy_source_paths = (
+            projection_builder.MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS
+        )
         costs = namespace.get("COST_BPS_SCENARIOS")
         if (
             namespace.get("require_market_cap_stock_portfolio_profile")
@@ -1460,15 +1622,15 @@ def _market_cap_contract_bindings_are_current() -> bool:
             is not _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE
             or type(profile_ids) is not tuple
             or profile_ids != _PINNED_MARKET_CAP_PROFILE_IDS
-            or namespace.get("V1_PROFILE_IDS")
-            != _PINNED_MARKET_CAP_V1_PROFILE_IDS
-            or namespace.get("ALL_PROFILE_IDS")
-            != _PINNED_MARKET_CAP_ALL_PROFILE_IDS
-            or namespace.get("ALL_PROFILE_IDS")
-            != namespace.get("V1_PROFILE_IDS") + profile_ids
-            or len(profile_ids) != 6
-            or any(type(item) is not str for item in profile_ids)
-            or len(set(profile_ids)) != len(profile_ids)
+            or v1_profile_ids != _PINNED_MARKET_CAP_V1_PROFILE_IDS
+            or v2_profile_ids != _PINNED_MARKET_CAP_V2_PROFILE_IDS
+            or all_profile_ids != _PINNED_MARKET_CAP_ALL_PROFILE_IDS
+            or all_profile_ids != v1_profile_ids + v2_profile_ids + profile_ids
+            or len(v1_profile_ids) != 6
+            or len(v2_profile_ids) != 6
+            or len(profile_ids) != 2
+            or any(type(item) is not str for item in all_profile_ids)
+            or len(set(all_profile_ids)) != len(all_profile_ids)
             or type(qqq_profile_ids) is not tuple
             or qqq_profile_ids != _PINNED_MARKET_CAP_QQQ_PROFILE_IDS
             or type(spy_profile_ids) is not tuple
@@ -1493,14 +1655,39 @@ def _market_cap_contract_bindings_are_current() -> bool:
             or projection_profile_ids
             != _PINNED_PROJECTION_MARKET_CAP_PROFILE_IDS
             or projection_profile_ids != profile_ids
+            or projection_v1_profile_ids
+            != _PINNED_PROJECTION_MARKET_CAP_V1_PROFILE_IDS
+            or projection_v1_profile_ids != v1_profile_ids
+            or projection_v2_profile_ids
+            != _PINNED_PROJECTION_MARKET_CAP_V2_PROFILE_IDS
+            or projection_v2_profile_ids != v2_profile_ids
+            or projection_all_profile_ids
+            != _PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_IDS
+            or projection_all_profile_ids != all_profile_ids
+            or type(superseded_profile_ids) is not tuple
+            or superseded_profile_ids
+            != _PINNED_PROJECTION_SUPERSEDED_UNSPENT_PROFILE_IDS
+            or superseded_profile_ids
+            != _SUPERSEDED_UNSPENT_PROFILE_IDS
             or type(projection_hashes) is not dict
             or projection_hashes
             is not _PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256S_OBJECT
             or tuple(sorted(projection_hashes.items()))
             != _PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256_ROWS
+            or set(projection_hashes) != set(profile_ids)
+            or type(projection_all_hashes) is not dict
+            or projection_all_hashes
+            is not _PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_SHA256S_OBJECT
+            or tuple(sorted(projection_all_hashes.items()))
+            != _PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_SHA256_ROWS
+            or set(projection_all_hashes) != set(all_profile_ids)
             or type(source_paths) is not tuple
             or any(type(item) is not str for item in source_paths)
             or source_paths != _PINNED_PROJECTION_MARKET_CAP_SOURCE_PATHS
+            or type(legacy_source_paths) is not tuple
+            or any(type(item) is not str for item in legacy_source_paths)
+            or legacy_source_paths
+            != _PINNED_PROJECTION_MARKET_CAP_LEGACY_SOURCE_PATHS
             or type(runtime_namespace.get("PROFILE_IDS")) is not tuple
             or runtime_namespace.get("PROFILE_IDS")
             != _PINNED_MARKET_CAP_RUNTIME_PROFILE_IDS
@@ -1527,7 +1714,7 @@ def _market_cap_contract_bindings_are_current() -> bool:
                 or observed_profile.get("profile_id") != profile_id
                 or observed_profile.get("profile_sha256")
                 != expected_profile_sha256
-                or projection_hashes.get(profile_id)
+                or projection_all_hashes.get(profile_id)
                 != expected_profile_sha256
                 or _PINNED_PROJECTION_PROFILE_CALLABLE(profile_id)
                 != observed_profile
@@ -2280,22 +2467,6 @@ def build_accepted_risk_preliminary_submission_plan(
     if (
         projection.package_id != package.package_id
         or projection.package_sha256 != package.package_sha256
-        or len(projection.source_files)
-        != len(
-            projection_builder.project_source_paths_for_profile(
-                projection.evaluation_profile_id
-            )
-        )
-        + 1
-        or tuple(item.project_path for item in projection.source_files)
-        != tuple(
-            sorted(
-                projection_builder.project_source_paths_for_profile(
-                    projection.evaluation_profile_id
-                )
-                + ("main.py",)
-            )
-        )
     ):
         _error("preliminary package and profile-bound projection are not exact peers")
     uploads = _upload_entries(package)
@@ -3286,6 +3457,7 @@ def _execute_accepted_risk_preliminary_submission_once_impl(
     minter, signature_verifier, transport_verifier, register_launch,
 ):
     plan = require_accepted_risk_preliminary_submission_plan(plan)
+    _require_fresh_launch_profile(plan)
     signature = signature_verifier(owner_signature, _execution_authority(plan))
     persist_accepted_risk_preliminary_submission_plan(plan)
     transport_verifier(client)
@@ -4228,6 +4400,21 @@ _MARKET_CAP_META_FIELDS = frozenset(
         "summary_sha256",
     }
 )
+_MARKET_CAP_TILT_META_FIELDS = frozenset(
+    {
+        *_MARKET_CAP_META_FIELDS,
+        "analyst_revisions_role",
+        "benchmark_logical_id",
+        "benchmark_history_normalization_mode",
+        "benchmark_history_observation",
+        "benchmark_raw_observation_sha256",
+        "benchmark_return_path_sha256",
+        "benchmark_observation_count",
+        "benchmark_return_interval_count",
+        "benchmark_first_used_session",
+        "benchmark_last_used_session",
+    }
+)
 _MARKET_CAP_ACCOUNT_FIELDS = frozenset(
     {
         "rebalance_execution_count",
@@ -4251,6 +4438,37 @@ _MARKET_CAP_ACCOUNT_FIELDS = frozenset(
         "selection_exit_deferral_count",
         "eligibility_exit_liquidation_count",
         "eligibility_exit_zero_recovery_count",
+    }
+)
+_MARKET_CAP_TILT_ACCOUNT_FIELDS = frozenset(
+    {
+        *_MARKET_CAP_ACCOUNT_FIELDS,
+        "locked_sector_over_target_count",
+        "sector_target_underfill_count",
+    }
+)
+_MARKET_CAP_TILT_FIELDS = frozenset(
+    {
+        "schema",
+        "decision_session_count",
+        "tilt_enabled_decision_count",
+        "tilt_underfilled_decision_count",
+        "minimum_ranked_nonzero_score_count",
+        "minimum_positive_score_count",
+        "minimum_negative_score_count",
+        "minimum_tilted_name_count_when_enabled",
+        "minimum_point_in_time_sector_count",
+        "maximum_one_way_active_share",
+        "maximum_overweight",
+        "maximum_hhi_ratio_to_benchmark",
+        "minimum_weight_ratio_to_benchmark_when_enabled",
+        "maximum_weight_ratio_to_benchmark_when_enabled",
+        "maximum_absolute_sector_active_weight",
+        "underfilled_exact_benchmark",
+        "missing_or_zero_score_exact_benchmark",
+        "sector_mapping_exhaustive",
+        "sector_neutrality_exact",
+        "sector_neutrality_scope",
     }
 )
 _MARKET_CAP_CELL_FIELDS = _STOCK_PORTFOLIO_CELL_FIELDS
@@ -5898,8 +6116,20 @@ def _validate_market_cap_account_aggregate(
     decision_count: int,
     return_count: int,
     runtime_security_count: int,
+    selected_full_universe: bool = False,
+    sector_neutral: bool = False,
 ) -> dict[str, Decimal]:
-    if type(value) is not dict or set(value) != _MARKET_CAP_ACCOUNT_FIELDS:
+    if (
+        type(selected_full_universe) is not bool
+        or type(sector_neutral) is not bool
+    ):
+        _error("preliminary market-cap selected breadth mode changed")
+    expected_fields = (
+        _MARKET_CAP_TILT_ACCOUNT_FIELDS
+        if sector_neutral
+        else _MARKET_CAP_ACCOUNT_FIELDS
+    )
+    if type(value) is not dict or set(value) != expected_fields:
         _error("preliminary market-cap account aggregate fields changed")
     integer_fields = (
         "rebalance_execution_count",
@@ -5913,6 +6143,14 @@ def _validate_market_cap_account_aggregate(
         "selection_exit_deferral_count",
         "eligibility_exit_liquidation_count",
         "eligibility_exit_zero_recovery_count",
+        *(
+            (
+                "locked_sector_over_target_count",
+                "sector_target_underfill_count",
+            )
+            if sector_neutral
+            else ()
+        ),
     )
     if any(
         type(value.get(name)) is not int or value[name] < 0
@@ -5947,6 +6185,15 @@ def _validate_market_cap_account_aggregate(
         > return_count * runtime_security_count
         or value["eligibility_exit_zero_recovery_count"]
         > return_count * runtime_security_count
+        or (
+            sector_neutral
+            and (
+                value["locked_sector_over_target_count"]
+                > decision_count * runtime_security_count
+                or value["sector_target_underfill_count"]
+                > decision_count * runtime_security_count
+            )
+        )
     ):
         _error("preliminary market-cap account count semantics changed")
     decimal_fields = (
@@ -5967,7 +6214,7 @@ def _validate_market_cap_account_aggregate(
     }
     maximum_names = (
         Decimal(_PINNED_MARKET_CAP_MAXIMUM_HOLDINGS)
-        if role == "selected"
+        if role == "selected" and not selected_full_universe
         else Decimal(runtime_security_count)
     )
     unit_interval = (
@@ -6018,6 +6265,117 @@ def _validate_market_cap_account_aggregate(
     return parsed
 
 
+def _validate_market_cap_tilt_aggregate(
+    value: object,
+    *,
+    decision_count: int,
+    runtime_security_count: int,
+) -> dict[str, Decimal]:
+    if type(value) is not dict or set(value) != _MARKET_CAP_TILT_FIELDS:
+        _error("preliminary market-cap tilt aggregate fields changed")
+    count_fields = (
+        "decision_session_count",
+        "tilt_enabled_decision_count",
+        "tilt_underfilled_decision_count",
+        "minimum_ranked_nonzero_score_count",
+        "minimum_positive_score_count",
+        "minimum_negative_score_count",
+        "minimum_tilted_name_count_when_enabled",
+        "minimum_point_in_time_sector_count",
+    )
+    if any(
+        type(value.get(name)) is not int or value[name] < 0
+        for name in count_fields
+    ):
+        _error("preliminary market-cap tilt aggregate count changed")
+    enabled = value["tilt_enabled_decision_count"]
+    underfilled = value["tilt_underfilled_decision_count"]
+    ranked = value["minimum_ranked_nonzero_score_count"]
+    positive = value["minimum_positive_score_count"]
+    negative = value["minimum_negative_score_count"]
+    tilted = value["minimum_tilted_name_count_when_enabled"]
+    sector_count = value["minimum_point_in_time_sector_count"]
+    if (
+        value.get("schema") != _PINNED_MARKET_CAP_TILT_AGGREGATES_SCHEMA
+        or value["decision_session_count"] != decision_count
+        or enabled + underfilled != decision_count
+        or ranked > runtime_security_count
+        or positive > runtime_security_count
+        or negative > runtime_security_count
+        or tilted > runtime_security_count
+        or not 0 < sector_count <= runtime_security_count
+        or positive + negative > ranked
+        or (
+            underfilled == 0
+            and (
+                ranked < _PINNED_MARKET_CAP_MINIMUM_TILT_RANKED_NAMES
+                or positive
+                < _PINNED_MARKET_CAP_MINIMUM_TILT_POSITIVE_SCORES
+                or negative
+                < _PINNED_MARKET_CAP_MINIMUM_TILT_NEGATIVE_SCORES
+            )
+        )
+        or (
+            enabled == 0
+            and tilted != 0
+        )
+        or (
+            enabled > 0
+            and tilted < _PINNED_MARKET_CAP_MINIMUM_TILT_RANKED_NAMES
+        )
+        or value.get("underfilled_exact_benchmark") is not True
+        or value.get("missing_or_zero_score_exact_benchmark") is not True
+        or value.get("sector_mapping_exhaustive") is not True
+        or value.get("sector_neutrality_exact") is not True
+        or value.get("sector_neutrality_scope") != "frozen_target"
+    ):
+        _error("preliminary market-cap tilt aggregate count semantics changed")
+    decimal_fields = (
+        "maximum_one_way_active_share",
+        "maximum_overweight",
+        "maximum_hhi_ratio_to_benchmark",
+        "minimum_weight_ratio_to_benchmark_when_enabled",
+        "maximum_weight_ratio_to_benchmark_when_enabled",
+        "maximum_absolute_sector_active_weight",
+    )
+    parsed = {
+        name: _cell_metric(value.get(name), "market-cap tilt " + name)
+        for name in decimal_fields
+    }
+    active_share = parsed["maximum_one_way_active_share"]
+    maximum_overweight = parsed["maximum_overweight"]
+    hhi_ratio = parsed["maximum_hhi_ratio_to_benchmark"]
+    minimum_ratio = parsed[
+        "minimum_weight_ratio_to_benchmark_when_enabled"
+    ]
+    maximum_ratio = parsed[
+        "maximum_weight_ratio_to_benchmark_when_enabled"
+    ]
+    maximum_sector_active_weight = parsed[
+        "maximum_absolute_sector_active_weight"
+    ]
+    if enabled == 0:
+        if any(metric != 0 for metric in parsed.values()):
+            _error("preliminary market-cap tilt fallback metrics changed")
+    elif (
+        not 0 < active_share <= _PINNED_MARKET_CAP_MAXIMUM_ONE_WAY_ACTIVE_SHARE
+        or not 0
+        < maximum_overweight
+        <= _PINNED_MARKET_CAP_MAXIMUM_ABSOLUTE_OVERWEIGHT
+        or not 0 < hhi_ratio <= _PINNED_MARKET_CAP_MAXIMUM_HHI_MULTIPLE
+        or not Decimal(1) - _PINNED_MARKET_CAP_MAXIMUM_RELATIVE_TILT
+        <= minimum_ratio
+        < Decimal(1)
+        or not Decimal(1)
+        < maximum_ratio
+        <= Decimal(1) + _PINNED_MARKET_CAP_MAXIMUM_RELATIVE_TILT
+        or minimum_ratio >= maximum_ratio
+        or maximum_sector_active_weight != 0
+    ):
+        _error("preliminary market-cap tilt aggregate metric escaped bounds")
+    return parsed
+
+
 def _validate_market_cap_aggregate_records(
     records: Mapping[str, dict[str, object]],
     plan: AcceptedRiskPreliminarySubmissionPlan,
@@ -6027,6 +6385,7 @@ def _validate_market_cap_aggregate_records(
         _market_cap_profile_binding(profile_id)
     )
     profile = json.loads(profile_bytes.decode("ascii"))
+    tilt_profile = profile_id in _PINNED_MARKET_CAP_PROFILE_IDS
     if (
         plan.evaluation_profile_id != profile_id
         or plan.evaluation_profile_sha256 != profile_sha256
@@ -6123,7 +6482,12 @@ def _validate_market_cap_aggregate_records(
         _error("preliminary market-cap runtime metadata changed")
 
     meta = records.get(_PINNED_MARKET_CAP_META_STATISTIC_NAME)
-    if type(meta) is not dict or set(meta) != _MARKET_CAP_META_FIELDS:
+    expected_meta_fields = (
+        _MARKET_CAP_TILT_META_FIELDS
+        if tilt_profile
+        else _MARKET_CAP_META_FIELDS
+    )
+    if type(meta) is not dict or set(meta) != expected_meta_fields:
         _error("preliminary market-cap aggregate metadata changed")
     authenticated_manifest = _authenticated_evaluator_manifest(plan)
     count_fields = (
@@ -6161,6 +6525,37 @@ def _validate_market_cap_aggregate_records(
         or meta.get("point_in_time_market_cap_weighting") is not True
         or meta.get("selected_and_matched_target_same_gross") is not True
         or meta.get("economic_portfolio_evaluation") is not True
+        or (
+            tilt_profile
+            and (
+                meta.get("analyst_revisions_role")
+                != "bounded_helper_overlay_not_an_admission_gate"
+                or meta.get("benchmark_logical_id") != "SPY"
+                or meta.get("benchmark_history_normalization_mode")
+                != "total_return"
+                or meta.get("benchmark_history_observation")
+                != "session_open"
+                or _sha(
+                    meta.get("benchmark_raw_observation_sha256"),
+                    "market-cap raw benchmark observations",
+                )
+                != meta.get("benchmark_raw_observation_sha256")
+                or _sha(
+                    meta.get("benchmark_return_path_sha256"),
+                    "market-cap benchmark return path",
+                )
+                != meta.get("benchmark_return_path_sha256")
+                or type(meta.get("benchmark_observation_count")) is not int
+                or meta.get("benchmark_observation_count") != 1_254
+                or type(meta.get("benchmark_return_interval_count"))
+                is not int
+                or meta.get("benchmark_return_interval_count") != 1_253
+                or meta.get("benchmark_first_used_session")
+                != "2021-01-05"
+                or meta.get("benchmark_last_used_session")
+                != "2025-12-31"
+            )
+        )
         or any(
             meta.get(name) is not False
             for name in (
@@ -6202,7 +6597,11 @@ def _validate_market_cap_aggregate_records(
         or not Decimal(0) <= mean_score <= mean_point_in_time
         or not Decimal(0)
         <= mean_selected
-        <= Decimal(_PINNED_MARKET_CAP_MAXIMUM_HOLDINGS)
+        <= Decimal(
+            runtime_meta["resolved_security_count"]
+            if tilt_profile
+            else _PINNED_MARKET_CAP_MAXIMUM_HOLDINGS
+        )
         or abs(
             point_total
             - Decimal(runtime_meta["point_in_time_market_cap_covered_count"])
@@ -6215,7 +6614,14 @@ def _validate_market_cap_aggregate_records(
         )
         > census_tolerance
         or abs(selected_total - selected_integral) > census_tolerance
-        or selected_total > score_total + census_tolerance
+        or (
+            tilt_profile
+            and abs(selected_total - point_total) > census_tolerance
+        )
+        or (
+            not tilt_profile
+            and selected_total > score_total + census_tolerance
+        )
     ):
         _error("preliminary market-cap eligibility census changed")
 
@@ -6231,6 +6637,8 @@ def _validate_market_cap_aggregate_records(
         decision_count=expected_decisions,
         return_count=meta["portfolio_return_session_count"],
         runtime_security_count=runtime_meta["resolved_security_count"],
+        selected_full_universe=tilt_profile,
+        sector_neutral=tilt_profile,
     )
     matched = _validate_market_cap_account_aggregate(
         matched_raw,
@@ -6238,7 +6646,18 @@ def _validate_market_cap_aggregate_records(
         decision_count=expected_decisions,
         return_count=meta["portfolio_return_session_count"],
         runtime_security_count=runtime_meta["resolved_security_count"],
+        sector_neutral=tilt_profile,
     )
+    tilt_raw = None
+    if tilt_profile:
+        tilt_raw = records.get(
+            _PINNED_MARKET_CAP_TILT_AGGREGATES_STATISTIC_NAME
+        )
+        _validate_market_cap_tilt_aggregate(
+            tilt_raw,
+            decision_count=expected_decisions,
+            runtime_security_count=runtime_meta["resolved_security_count"],
+        )
     if (
         selected_raw["eligibility_exit_zero_recovery_count"]
         or matched_raw["eligibility_exit_zero_recovery_count"]
@@ -6527,6 +6946,8 @@ def _validate_market_cap_aggregate_records(
     record["profile"] = profile
     record["selected_aggregates"] = selected_raw
     record["matched_aggregates"] = matched_raw
+    if tilt_profile:
+        record["tilt_aggregates"] = tilt_raw
     record["portfolio_cells"] = cells
     digest = hashlib.sha256(_canonical(record)).hexdigest()
     if (
@@ -7025,7 +7446,7 @@ def _validate_aggregate_records(
     if profile_id in _PINNED_STOCK_PORTFOLIO_PROFILE_IDS:
         _validate_stock_portfolio_aggregate_records(records, plan)
         return
-    if profile_id in _PINNED_MARKET_CAP_PROFILE_IDS:
+    if profile_id in _PINNED_MARKET_CAP_ALL_PROFILE_IDS:
         _validate_market_cap_aggregate_records(records, plan)
         return
     if profile_id in _PINNED_LEVERAGE_PROFILE_IDS:
@@ -7619,9 +8040,16 @@ _seal_action_bindings(
         "_PINNED_PROJECTION_STOCK_PROFILE_SHA256S_OBJECT",
         "_PINNED_PROJECTION_STOCK_PROFILE_SHA256_ROWS",
         "_PINNED_PROJECTION_MARKET_CAP_SOURCE_PATHS",
+        "_PINNED_PROJECTION_MARKET_CAP_LEGACY_SOURCE_PATHS",
         "_PINNED_PROJECTION_MARKET_CAP_PROFILE_IDS",
+        "_PINNED_PROJECTION_MARKET_CAP_V1_PROFILE_IDS",
+        "_PINNED_PROJECTION_MARKET_CAP_V2_PROFILE_IDS",
+        "_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_IDS",
+        "_PINNED_PROJECTION_SUPERSEDED_UNSPENT_PROFILE_IDS",
         "_PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256S_OBJECT",
         "_PINNED_PROJECTION_MARKET_CAP_PROFILE_SHA256_ROWS",
+        "_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_SHA256S_OBJECT",
+        "_PINNED_PROJECTION_MARKET_CAP_ALL_PROFILE_SHA256_ROWS",
         "_PINNED_PROJECTION_LEVERAGE_SOURCE_PATHS",
         "_PINNED_PROJECTION_LEVERAGE_PROFILE_IDS",
         "_PINNED_PROJECTION_LEVERAGE_PROFILE_SHA256S_OBJECT",
@@ -7667,6 +8095,7 @@ _seal_action_bindings(
         "_PINNED_MARKET_CAP_CONSTITUENT_TICKERS_CALLABLE",
         "_PINNED_MARKET_CAP_PROFILE_IDS",
         "_PINNED_MARKET_CAP_V1_PROFILE_IDS",
+        "_PINNED_MARKET_CAP_V2_PROFILE_IDS",
         "_PINNED_MARKET_CAP_ALL_PROFILE_IDS",
         "_PINNED_MARKET_CAP_QQQ_PROFILE_IDS",
         "_PINNED_MARKET_CAP_SPY_PROFILE_IDS",
@@ -7678,8 +8107,18 @@ _seal_action_bindings(
         "_PINNED_MARKET_CAP_META_STATISTIC_NAME",
         "_PINNED_MARKET_CAP_SELECTED_AGGREGATES_STATISTIC_NAME",
         "_PINNED_MARKET_CAP_MATCHED_AGGREGATES_STATISTIC_NAME",
+        "_PINNED_MARKET_CAP_TILT_AGGREGATES_STATISTIC_NAME",
+        "_PINNED_MARKET_CAP_TILT_AGGREGATES_SCHEMA",
         "_PINNED_MARKET_CAP_MAXIMUM_HOLDINGS",
         "_PINNED_MARKET_CAP_TARGET_GROSS",
+        "_PINNED_MARKET_CAP_PORTFOLIO_WEIGHT_QUANTUM",
+        "_PINNED_MARKET_CAP_MINIMUM_TILT_RANKED_NAMES",
+        "_PINNED_MARKET_CAP_MINIMUM_TILT_POSITIVE_SCORES",
+        "_PINNED_MARKET_CAP_MINIMUM_TILT_NEGATIVE_SCORES",
+        "_PINNED_MARKET_CAP_MAXIMUM_RELATIVE_TILT",
+        "_PINNED_MARKET_CAP_MAXIMUM_ABSOLUTE_OVERWEIGHT",
+        "_PINNED_MARKET_CAP_MAXIMUM_ONE_WAY_ACTIVE_SHARE",
+        "_PINNED_MARKET_CAP_MAXIMUM_HHI_MULTIPLE",
         "_PINNED_MARKET_CAP_MINIMUM_INVESTED_RETURNS",
         "_PINNED_MARKET_CAP_COSTS",
         "_PINNED_MARKET_CAP_PRIMARY_COST",
@@ -7791,7 +8230,10 @@ _seal_action_bindings(
         "_STOCK_PORTFOLIO_CELL_FIELDS",
         "_MARKET_CAP_RUNTIME_META_FIELDS",
         "_MARKET_CAP_META_FIELDS",
+        "_MARKET_CAP_TILT_META_FIELDS",
         "_MARKET_CAP_ACCOUNT_FIELDS",
+        "_MARKET_CAP_TILT_ACCOUNT_FIELDS",
+        "_MARKET_CAP_TILT_FIELDS",
         "_MARKET_CAP_CELL_FIELDS",
         "_LEVERAGE_RUNTIME_META_FIELDS",
         "_LEVERAGE_META_FIELDS",
@@ -7819,6 +8261,8 @@ _seal_action_bindings(
         "AcceptedRiskPreliminaryAggregateResult",
         "_EvaluationRunSpec",
         "_EVALUATION_RUN_SPECS",
+        "_SUPERSEDED_UNSPENT_PROFILE_IDS",
+        "_require_fresh_launch_profile",
         "_stock_portfolio_profile_binding",
         "_market_cap_profile_binding",
         "_leverage_profile_binding",
@@ -7886,6 +8330,7 @@ _seal_action_bindings(
         "_validate_etf_aggregate_records",
         "_validate_stock_portfolio_aggregate_records",
         "_validate_market_cap_account_aggregate",
+        "_validate_market_cap_tilt_aggregate",
         "_validate_market_cap_aggregate_records",
         "_validate_leverage_path",
         "_validate_leverage_aggregate_records",

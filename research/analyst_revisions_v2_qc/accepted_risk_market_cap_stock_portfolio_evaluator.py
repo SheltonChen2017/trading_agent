@@ -1,12 +1,4 @@
-"""Pure market-cap-weighted portfolio arithmetic on the exact R055 score.
-
-This module deliberately keeps point-in-time universe construction outside the
-evaluator.  Its caller supplies one exhaustive, decision-date map from exact
-security identifiers to strictly positive point-in-time market caps.  The
-runtime subclasses the reviewed R055 evaluator only to receive its unchanged
-censored, firm-specific score cross-section; it performs no provider or
-network I/O and emits aggregate-only results.
-"""
+"""Pure market-cap portfolio arithmetic over the unchanged R055 score."""
 
 import dataclasses
 import hashlib
@@ -17,9 +9,13 @@ from decimal import Decimal, localcontext
 
 try:
     import accepted_risk_preliminary_rating_evaluator as _base
+    import accepted_risk_market_cap_stock_portfolio_tilt as _tilt
 except ImportError:
     from research.analyst_revisions_v2_qc import (
         accepted_risk_preliminary_rating_evaluator as _base,
+    )
+    from research.analyst_revisions_v2_qc import (
+        accepted_risk_market_cap_stock_portfolio_tilt as _tilt,
     )
 
 
@@ -36,18 +32,33 @@ PORTFOLIO_CELL_SCHEMA = "arv2-market-cap-stock-portfolio-cell-v1"
 PRIMARY_SOURCE_VIEW_ID = _base.SOURCE_VIEW_IDS[1]
 PRIMARY_SCORE_ARM = "firm_specific"
 MAXIMUM_HOLDINGS = 50
-TARGET_GROSS_EXPOSURE = Decimal("0.98")
+TARGET_GROSS_EXPOSURE = _tilt.TARGET_GROSS_EXPOSURE
+PORTFOLIO_WEIGHT_QUANTUM = _tilt.PORTFOLIO_WEIGHT_QUANTUM
 PRIMARY_COST_BPS = 10
 COST_BPS_SCENARIOS = (0, 5, PRIMARY_COST_BPS, 20)
 ANNUALIZATION_SESSIONS = Decimal("252")
 MINIMUM_INVESTED_RETURN_SESSIONS = 50
 MAXIMUM_MARKET_CAP_TEXT_LENGTH = 64
+MINIMUM_TILT_RANKED_NAME_COUNT = _tilt.MINIMUM_TILT_RANKED_NAME_COUNT
+MINIMUM_TILT_POSITIVE_SCORE_COUNT = _tilt.MINIMUM_TILT_POSITIVE_SCORE_COUNT
+MINIMUM_TILT_NEGATIVE_SCORE_COUNT = _tilt.MINIMUM_TILT_NEGATIVE_SCORE_COUNT
+MAXIMUM_RELATIVE_TILT = _tilt.MAXIMUM_RELATIVE_TILT
+MAXIMUM_ABSOLUTE_OVERWEIGHT = _tilt.MAXIMUM_ABSOLUTE_OVERWEIGHT
+MAXIMUM_ONE_WAY_ACTIVE_SHARE = _tilt.MAXIMUM_ONE_WAY_ACTIVE_SHARE
+MAXIMUM_HHI_MULTIPLE = _tilt.MAXIMUM_HHI_MULTIPLE
+TILT_ENABLED = _tilt.TILT_ENABLED
+TILT_UNDERFILLED = _tilt.TILT_UNDERFILLED
+TILT_AGGREGATES_SCHEMA = _tilt.TILT_AGGREGATES_SCHEMA
+BENCHMARK_LOGICAL_ID = "SPY"
 META_STATISTIC_NAME = "ARV2_STOCK_PORTFOLIO_META"
 SELECTED_AGGREGATES_STATISTIC_NAME = (
     "ARV2_STOCK_PORTFOLIO_SELECTED_AGGREGATES"
 )
 MATCHED_AGGREGATES_STATISTIC_NAME = (
     "ARV2_STOCK_PORTFOLIO_MATCHED_AGGREGATES"
+)
+TILT_AGGREGATES_STATISTIC_NAME = (
+    "ARV2_STOCK_PORTFOLIO_TILT_AGGREGATES"
 )
 
 QQQ_2021_2025_PROFILE_ID = "arv2-market-cap-stock-qqq-2021-2025-v1"
@@ -62,6 +73,8 @@ QQQ_2019_2023_V2_PROFILE_ID = "arv2-market-cap-stock-qqq-2019-2023-v2"
 SPY_2019_2023_V2_PROFILE_ID = "arv2-market-cap-stock-spy-2019-2023-v2"
 QQQ_2023_2025_V2_PROFILE_ID = "arv2-market-cap-stock-qqq-2023-2025-v2"
 SPY_2023_2025_V2_PROFILE_ID = "arv2-market-cap-stock-spy-2023-2025-v2"
+QQQ_2021_2025_V3_PROFILE_ID = "arv2-market-cap-stock-qqq-2021-2025-v3"
+SPY_2021_2025_V3_PROFILE_ID = "arv2-market-cap-stock-spy-2021-2025-v3"
 OUT_OF_WINDOW_COLLECTION_POLICY = (
     "ignore_only_after_validating_collection_shape_identity_and_time_"
     "and_before_traversing_rows"
@@ -124,7 +137,7 @@ _V1_PROFILE_ROWS = (
     ),
 )
 V1_PROFILE_IDS = tuple(row[0] for row in _V1_PROFILE_ROWS)
-PROFILE_IDS = (
+V2_PROFILE_IDS = (
     QQQ_2021_2025_V2_PROFILE_ID,
     SPY_2021_2025_V2_PROFILE_ID,
     QQQ_2019_2023_V2_PROFILE_ID,
@@ -132,11 +145,22 @@ PROFILE_IDS = (
     QQQ_2023_2025_V2_PROFILE_ID,
     SPY_2023_2025_V2_PROFILE_ID,
 )
+PROFILE_IDS = (
+    QQQ_2021_2025_V3_PROFILE_ID,
+    SPY_2021_2025_V3_PROFILE_ID,
+)
 _PROFILE_ROWS = tuple((*row, None) for row in _V1_PROFILE_ROWS) + tuple(
     (successor_id, *row[1:], OUT_OF_WINDOW_COLLECTION_POLICY)
-    for successor_id, row in zip(PROFILE_IDS, _V1_PROFILE_ROWS, strict=True)
+    for successor_id, row in zip(
+        V2_PROFILE_IDS, _V1_PROFILE_ROWS, strict=True
+    )
+) + tuple(
+    (successor_id, *row[1:], OUT_OF_WINDOW_COLLECTION_POLICY)
+    for successor_id, row in zip(
+        PROFILE_IDS, _V1_PROFILE_ROWS[:2], strict=True
+    )
 )
-ALL_PROFILE_IDS = V1_PROFILE_IDS + PROFILE_IDS
+ALL_PROFILE_IDS = V1_PROFILE_IDS + V2_PROFILE_IDS + PROFILE_IDS
 QQQ_PROFILE_IDS = PROFILE_IDS[::2]
 SPY_PROFILE_IDS = PROFILE_IDS[1::2]
 
@@ -239,6 +263,8 @@ def _build_profile(row):
         record["history_collection_window_policy"] = (
             out_of_window_collection_policy
         )
+    if profile_id in PROFILE_IDS:
+        record.update(_tilt.profile_fields())
     return {**record, "profile_sha256": _sha(record)}
 
 
@@ -324,12 +350,18 @@ def decision_sessions_for_input(value, profile_id):
 
 def expected_custom_summary_statistic_names(profile_id):
     require_market_cap_stock_portfolio_profile(profile_id)
+    tilt_names = (
+        (TILT_AGGREGATES_STATISTIC_NAME,)
+        if profile_id in PROFILE_IDS
+        else ()
+    )
     return tuple(
         sorted(
             (
                 META_STATISTIC_NAME,
                 SELECTED_AGGREGATES_STATISTIC_NAME,
                 MATCHED_AGGREGATES_STATISTIC_NAME,
+                *tilt_names,
                 *(
                     "ARV2_STOCK_PORTFOLIO_COST_" + str(cost)
                     for cost in COST_BPS_SCENARIOS
@@ -344,6 +376,17 @@ class _Decision:
     selected: tuple
     eligible: tuple
     market_caps: dict
+    selected_weights: dict | None = None
+    benchmark_weights: dict | None = None
+    sector_by_security_id: dict | None = None
+
+
+def _build_benchmark_tilt(market_caps, arm_scores, memberships):
+    try:
+        sectors = _tilt.sector_map_from_memberships(market_caps, memberships)
+        return _tilt.build_benchmark_tilt(market_caps, arm_scores, sectors), sectors
+    except _tilt.BoundedBenchmarkTiltError as exc:
+        raise MarketCapStockPortfolioEvaluationError(str(exc)) from exc
 
 
 @dataclasses.dataclass
@@ -373,6 +416,8 @@ class _Account:
     full_target_execution_count: int = 0
     underfilled_target_execution_count: int = 0
     locked_exposure_over_target_count: int = 0
+    locked_sector_over_target_count: int = 0
+    sector_target_underfill_count: int = 0
     entry_price_refusal_count: int = 0
     stale_mark_session_count: int = 0
     partial_rebalance_decision_count: int = 0
@@ -489,6 +534,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
         self._eligible_score_count_sum = 0
         self._selected_name_count_sum = 0
         self._eligible_without_score_count = 0
+        self._tilt_census = _tilt.TiltCensus()
         super().__init__(value, scratch_directory=scratch_directory)
 
         input_security_ids = {
@@ -671,47 +717,94 @@ class MarketCapStockPortfolioEvaluationRuntime(
     def _after_score_cross_section(
         self, position, memberships, scores, sector_refused
     ):
-        del memberships
         if position not in self._decision_positions:
             return
         session = self._input.session_axis[position]
         axis = (PRIMARY_SOURCE_VIEW_ID, PRIMARY_SCORE_ARM)
         arm_scores = scores[axis]
         caps = self._market_caps[session]
-        eligible = tuple(
-            sorted(
+        if self._profile["profile_id"] in PROFILE_IDS:
+            eligible = tuple(
+                sorted(
+                    security_id
+                    for security_id in caps
+                    if security_id
+                    not in self._named_figi_resolution_refusals
+                )
+            )
+            eligible_caps = {
+                security_id: caps[security_id] for security_id in eligible
+            }
+            tilt, sectors = _build_benchmark_tilt(
+                eligible_caps, arm_scores, memberships
+            )
+            selected = eligible
+            decision = _Decision(
+                selected=selected,
+                eligible=eligible,
+                market_caps=eligible_caps,
+                selected_weights=tilt.selected_weights,
+                benchmark_weights=tilt.benchmark_weights,
+                sector_by_security_id=sectors,
+            )
+            try:
+                self._tilt_census.observe(tilt)
+            except _tilt.BoundedBenchmarkTiltError as exc:
+                raise MarketCapStockPortfolioEvaluationError(str(exc)) from exc
+        else:
+            eligible = tuple(
+                sorted(
+                    security_id
+                    for security_id in caps
+                    if security_id in arm_scores
+                    and security_id
+                    not in self._named_figi_resolution_refusals
+                )
+            )
+            ranked = tuple(
+                sorted(
+                    (
+                        (security_id, arm_scores[security_id])
+                        for security_id in eligible
+                    ),
+                    key=lambda item: (-item[1], item[0]),
+                )
+            )
+            selected_count = min(
+                MAXIMUM_HOLDINGS,
+                (len(ranked) + 9) // 10,
+            )
+            selected = tuple(
                 security_id
-                for security_id in caps
-                if security_id in arm_scores
-                and security_id not in self._named_figi_resolution_refusals
+                for security_id, _score in ranked[:selected_count]
             )
-        )
-        ranked = tuple(
-            sorted(
-                ((security_id, arm_scores[security_id]) for security_id in eligible),
-                key=lambda item: (-item[1], item[0]),
+            decision = _Decision(
+                selected=selected,
+                eligible=eligible,
+                market_caps={
+                    security_id: caps[security_id]
+                    for security_id in eligible
+                },
             )
-        )
-        selected_count = min(
-            MAXIMUM_HOLDINGS,
-            (len(ranked) + 9) // 10,
-        )
-        selected = tuple(
-            security_id
-            for security_id, _score in ranked[:selected_count]
-        )
         self._decision_session_count += 1
         if sector_refused[axis]:
             self._sector_refused_decision_count += 1
         self._point_in_time_eligible_count_sum += len(caps)
-        self._eligible_score_count_sum += len(eligible)
-        self._selected_name_count_sum += len(selected)
-        self._eligible_without_score_count += len(set(caps) - set(eligible))
-        self._decisions[session] = _Decision(
-            selected=selected,
-            eligible=eligible,
-            market_caps={security_id: caps[security_id] for security_id in eligible},
+        self._eligible_score_count_sum += sum(
+            security_id in arm_scores for security_id in eligible
         )
+        self._selected_name_count_sum += len(selected)
+        if self._profile["profile_id"] in PROFILE_IDS:
+            self._eligible_without_score_count += sum(
+                security_id not in arm_scores
+                for security_id in caps
+                if security_id not in self._named_figi_resolution_refusals
+            )
+        else:
+            self._eligible_without_score_count += len(
+                set(caps) - set(eligible)
+            )
+        self._decisions[session] = decision
 
     def _price(self, security_id, position):
         security_position = self._history_security_positions.get(security_id)
@@ -729,6 +822,43 @@ class MarketCapStockPortfolioEvaluationRuntime(
         )
 
     def _targets(self, account, decision, desired, position, locked):
+        if decision.sector_by_security_id is not None:
+            frozen_weights = (
+                decision.selected_weights
+                if account.role == "selected"
+                else decision.benchmark_weights
+            )
+            if frozen_weights is None or account.role not in (
+                "selected", "matched"
+            ):
+                raise MarketCapStockPortfolioEvaluationError(
+                    "sector-neutral frozen target changed"
+                )
+            tradable = []
+            for security_id in sorted(desired):
+                if security_id in locked:
+                    continue
+                if self._price(security_id, position) is None:
+                    account.entry_price_refusal_count += 1
+                    continue
+                tradable.append(security_id)
+            try:
+                target = _tilt.executable_selected_target(
+                    frozen_weights,
+                    decision.sector_by_security_id,
+                    desired,
+                    tuple(tradable),
+                    locked,
+                )
+            except _tilt.BoundedBenchmarkTiltError as exc:
+                raise MarketCapStockPortfolioEvaluationError(str(exc)) from exc
+            account.locked_sector_over_target_count += (
+                target.locked_sector_over_target_count
+            )
+            account.sector_target_underfill_count += (
+                target.sector_target_underfill_count
+            )
+            return target.weights
         with localcontext(_base._context()):
             locked_gross = +_base._stable_sum(locked.values())
             remaining = +max(
@@ -945,11 +1075,16 @@ class MarketCapStockPortfolioEvaluationRuntime(
                 "SPY lacks the first market-cap execution adjusted open"
             )
         benchmark_wealth = Decimal(1)
+        benchmark_observations = []
         for position in range(first_execution, end + 1):
             current_benchmark = self._price(benchmark, position)
             if current_benchmark is None:
                 raise MarketCapStockPortfolioEvaluationError(
                     "SPY lacks a market-cap portfolio adjusted open"
+                )
+            if self._profile["profile_id"] in PROFILE_IDS:
+                benchmark_observations.append(
+                    (sessions[position], current_benchmark)
                 )
             if position != first_execution:
                 with localcontext(_base._context()):
@@ -977,71 +1112,42 @@ class MarketCapStockPortfolioEvaluationRuntime(
             raise MarketCapStockPortfolioEvaluationError(
                 "market-cap return-session geometry changed"
             )
-        return selected, matched, benchmark_wealth, return_count
+        benchmark_binding = None
+        if self._profile["profile_id"] in PROFILE_IDS:
+            try:
+                benchmark_binding = _tilt.build_benchmark_series_binding(
+                    tuple(benchmark_observations),
+                    sessions[first_execution : end + 1],
+                    logical_benchmark_id=BENCHMARK_LOGICAL_ID,
+                )
+            except _tilt.BoundedBenchmarkTiltError as exc:
+                raise MarketCapStockPortfolioEvaluationError(str(exc)) from exc
+            if (
+                benchmark_binding.observation_count != return_count
+                or benchmark_binding.return_interval_count
+                != return_count - 1
+            ):
+                raise MarketCapStockPortfolioEvaluationError(
+                    "benchmark used-series geometry changed"
+                )
+        return (
+            selected,
+            matched,
+            benchmark_wealth,
+            return_count,
+            benchmark_binding,
+        )
 
-    @staticmethod
-    def _account_aggregates(account, return_count):
-        with localcontext(_base._context()):
-            average_holdings = +(
-                Decimal(account.holding_count_sum) / Decimal(return_count)
+    def _tilt_aggregates(self):
+        try:
+            value = self._tilt_census.aggregates()
+        except _tilt.BoundedBenchmarkTiltError as exc:
+            raise MarketCapStockPortfolioEvaluationError(str(exc)) from exc
+        if value["decision_session_count"] != self._decision_session_count:
+            raise MarketCapStockPortfolioEvaluationError(
+                "benchmark tilt decision census changed"
             )
-            average_turnover = +(
-                account.turnover_sum / Decimal(return_count)
-            )
-            average_cash = +(
-                account.cash_weight_sum / Decimal(return_count)
-            )
-        return {
-            "rebalance_execution_count": account.rebalance_execution_count,
-            "full_target_execution_count": account.full_target_execution_count,
-            "underfilled_target_execution_count": (
-                account.underfilled_target_execution_count
-            ),
-            "locked_exposure_over_target_count": (
-                account.locked_exposure_over_target_count
-            ),
-            "mean_executed_gross_exposure": _decimal_text(
-                _mean_or_zero(account.executed_gross_observations)
-            ),
-            "minimum_executed_gross_exposure": _decimal_text(
-                _minimum_or_zero(account.executed_gross_observations)
-            ),
-            "maximum_executed_gross_exposure": _decimal_text(
-                _maximum_or_zero(account.executed_gross_observations)
-            ),
-            "mean_maximum_position_weight": _decimal_text(
-                _mean_or_zero(account.maximum_weight_observations)
-            ),
-            "maximum_position_weight": _decimal_text(
-                _maximum_or_zero(account.maximum_weight_observations)
-            ),
-            "mean_invested_weight_hhi": _decimal_text(
-                _mean_or_zero(account.hhi_observations)
-            ),
-            "mean_effective_holding_count": _decimal_text(
-                _mean_or_zero(account.effective_holding_observations)
-            ),
-            "average_holding_count": _decimal_text(average_holdings),
-            "average_daily_two_sided_turnover": _decimal_text(average_turnover),
-            "average_cash_weight": _decimal_text(average_cash),
-            "entry_price_refusal_count": account.entry_price_refusal_count,
-            "stale_mark_session_count": account.stale_mark_session_count,
-            "partial_rebalance_decision_count": (
-                account.partial_rebalance_decision_count
-            ),
-            "stale_position_deferral_count": (
-                account.stale_position_deferral_count
-            ),
-            "selection_exit_deferral_count": (
-                account.selection_exit_deferral_count
-            ),
-            "eligibility_exit_liquidation_count": (
-                account.eligibility_exit_liquidation_count
-            ),
-            "eligibility_exit_zero_recovery_count": (
-                account.eligibility_exit_zero_recovery_count
-            ),
-        }
+        return value
 
     @staticmethod
     def _cell_status(selected, matched, return_count):
@@ -1179,7 +1285,13 @@ class MarketCapStockPortfolioEvaluationRuntime(
             raise MarketCapStockPortfolioEvaluationError(
                 "market-cap R055 decision-score census is not exhaustive"
             )
-        selected, matched, benchmark_wealth, return_count = self._simulate()
+        (
+            selected,
+            matched,
+            benchmark_wealth,
+            return_count,
+            benchmark_binding,
+        ) = self._simulate()
         cells = [
             self._cell(
                 cost, selected, matched, benchmark_wealth, return_count
@@ -1225,11 +1337,15 @@ class MarketCapStockPortfolioEvaluationRuntime(
             "named_figi_resolution_refusal_count": len(
                 self._named_figi_resolution_refusals
             ),
-            "selected_aggregates": self._account_aggregates(
-                selected, return_count
+            "selected_aggregates": _tilt.account_aggregates(
+                selected,
+                return_count,
+                self._profile["profile_id"] in PROFILE_IDS,
             ),
-            "matched_aggregates": self._account_aggregates(
-                matched, return_count
+            "matched_aggregates": _tilt.account_aggregates(
+                matched,
+                return_count,
+                self._profile["profile_id"] in PROFILE_IDS,
             ),
             "r055_signal_rule_changed": False,
             "point_in_time_market_cap_weighting": True,
@@ -1246,6 +1362,20 @@ class MarketCapStockPortfolioEvaluationRuntime(
             "trading": False,
             "portfolio_cells": cells,
         }
+        if self._profile["profile_id"] in PROFILE_IDS:
+            if type(benchmark_binding) is not _tilt.BenchmarkSeriesBinding:
+                raise MarketCapStockPortfolioEvaluationError(
+                    "prospective benchmark series binding changed"
+                )
+            record["analyst_revisions_role"] = (
+                "bounded_helper_overlay_not_an_admission_gate"
+            )
+            record["tilt_aggregates"] = self._tilt_aggregates()
+            record.update(benchmark_binding.summary_fields())
+        elif benchmark_binding is not None:
+            raise MarketCapStockPortfolioEvaluationError(
+                "historical summary acquired a benchmark series binding"
+            )
         digest = _sha(record)
         return {
             **record,
@@ -1259,6 +1389,7 @@ class MarketCapStockPortfolioEvaluationRuntime(
         profile = summary.pop("profile")
         selected_aggregates = summary.pop("selected_aggregates")
         matched_aggregates = summary.pop("matched_aggregates")
+        tilt_aggregates = summary.pop("tilt_aggregates", None)
         expected_profile = require_market_cap_stock_portfolio_profile(
             self._profile["profile_id"]
         )
@@ -1277,6 +1408,18 @@ class MarketCapStockPortfolioEvaluationRuntime(
                 matched_aggregates
             ).decode("ascii"),
         }
+        if self._profile["profile_id"] in PROFILE_IDS:
+            if type(tilt_aggregates) is not dict:
+                raise MarketCapStockPortfolioEvaluationError(
+                    "benchmark tilt aggregate fragment changed"
+                )
+            output[TILT_AGGREGATES_STATISTIC_NAME] = _canonical(
+                tilt_aggregates
+            ).decode("ascii")
+        elif tilt_aggregates is not None:
+            raise MarketCapStockPortfolioEvaluationError(
+                "historical market-cap summary acquired tilt fields"
+            )
         for cell in cells:
             output[
                 "ARV2_STOCK_PORTFOLIO_COST_"
@@ -1304,11 +1447,19 @@ __all__ = (
     "CONTRACT_ID",
     "COST_BPS_SCENARIOS",
     "MAXIMUM_HOLDINGS",
+    "MAXIMUM_ABSOLUTE_OVERWEIGHT",
+    "MAXIMUM_HHI_MULTIPLE",
+    "MAXIMUM_ONE_WAY_ACTIVE_SHARE",
+    "MAXIMUM_RELATIVE_TILT",
     "MATCHED_AGGREGATES_STATISTIC_NAME",
     "META_STATISTIC_NAME",
+    "MINIMUM_TILT_NEGATIVE_SCORE_COUNT",
+    "MINIMUM_TILT_POSITIVE_SCORE_COUNT",
+    "MINIMUM_TILT_RANKED_NAME_COUNT",
     "MarketCapStockPortfolioEvaluationError",
     "MarketCapStockPortfolioEvaluationRuntime",
     "PORTFOLIO_CELL_SCHEMA",
+    "PORTFOLIO_WEIGHT_QUANTUM",
     "PRIMARY_COST_BPS",
     "PRIMARY_SCORE_ARM",
     "PRIMARY_SOURCE_VIEW_ID",
@@ -1320,19 +1471,26 @@ __all__ = (
     "QQQ_2019_2023_V2_PROFILE_ID",
     "QQQ_2021_2025_PROFILE_ID",
     "QQQ_2021_2025_V2_PROFILE_ID",
+    "QQQ_2021_2025_V3_PROFILE_ID",
     "QQQ_2023_2025_PROFILE_ID",
     "QQQ_2023_2025_V2_PROFILE_ID",
     "SPY_2019_2023_PROFILE_ID",
     "SPY_2019_2023_V2_PROFILE_ID",
     "SPY_2021_2025_PROFILE_ID",
     "SPY_2021_2025_V2_PROFILE_ID",
+    "SPY_2021_2025_V3_PROFILE_ID",
     "SPY_2023_2025_PROFILE_ID",
     "SPY_2023_2025_V2_PROFILE_ID",
     "SPY_PROFILE_IDS",
     "SELECTED_AGGREGATES_STATISTIC_NAME",
     "SUMMARY_SCHEMA",
     "TARGET_GROSS_EXPOSURE",
+    "TILT_AGGREGATES_SCHEMA",
+    "TILT_AGGREGATES_STATISTIC_NAME",
+    "TILT_ENABLED",
+    "TILT_UNDERFILLED",
     "V1_PROFILE_IDS",
+    "V2_PROFILE_IDS",
     "constituent_etf_tickers_for_profile",
     "decision_sessions_for_input",
     "expected_custom_summary_statistic_names",

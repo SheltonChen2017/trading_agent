@@ -24,9 +24,6 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_objective_synthetic_leverage_evaluator as leverage_evaluator,
 )
-from research.analyst_revisions_v2_qc import (
-    accepted_risk_objective_synthetic_leverage_qc_runtime as leverage_runtime,
-)
 
 
 @pytest.fixture
@@ -71,6 +68,7 @@ def test_market_cap_projection_is_exact_small_and_profile_bound(
     assert "accepted_risk_preliminary_qc_runtime.py" not in by_name
     assert "accepted_risk_regime_rating_evaluator.py" not in by_name
     assert "accepted_risk_stock_portfolio_evaluator.py" not in by_name
+    assert "accepted_risk_market_cap_stock_portfolio_tilt.py" in by_name
     assert max(item.byte_count for item in value.source_files) < 60_000
     assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES
     assert value.evaluation_profile_sha256 == (
@@ -158,7 +156,14 @@ def test_market_cap_projection_inventory_and_profile_hash_are_load_bearing(
 ):
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
-        evaluation_profile_id=evaluator.SPY_2023_2025_V2_PROFILE_ID,
+        evaluation_profile_id=evaluator.SPY_2021_2025_V2_PROFILE_ID,
+    )
+    assert tuple(item.project_path for item in value.source_files) == tuple(
+        sorted((*projection.MARKET_CAP_PROJECT_SOURCE_PATHS, "main.py"))
+    )
+    assert any(
+        item.project_path == "accepted_risk_market_cap_stock_portfolio_tilt.py"
+        for item in value.source_files
     )
     with pytest.raises(
         projection.AcceptedRiskPreliminaryQcProjectionError,
@@ -172,8 +177,14 @@ def test_market_cap_projection_inventory_and_profile_hash_are_load_bearing(
         )
 
     assert projection.MARKET_CAP_PROFILE_IDS == evaluator.PROFILE_IDS
+    assert projection.MARKET_CAP_V1_PROFILE_IDS == evaluator.V1_PROFILE_IDS
+    assert projection.MARKET_CAP_V2_PROFILE_IDS == evaluator.V2_PROFILE_IDS
+    assert projection.MARKET_CAP_ALL_PROFILE_IDS == evaluator.ALL_PROFILE_IDS
     assert set(projection.MARKET_CAP_PROFILE_SHA256S) == set(
         evaluator.PROFILE_IDS
+    )
+    assert set(projection.MARKET_CAP_ALL_PROFILE_SHA256S) == set(
+        evaluator.ALL_PROFILE_IDS
     )
 
 
@@ -208,7 +219,7 @@ def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
         leverage_evaluator.SPY_2021_2025_PROFILE_ID:
             "ed7e3151daf3ae5868695e7753b0bb47119555124efe457cbca5db26a4208584",
     }
-    assert projection.MARKET_CAP_PROFILE_SHA256S == {
+    expected_v2_market_cap_hashes = {
         evaluator.QQQ_2021_2025_V2_PROFILE_ID:
             "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178",
         evaluator.SPY_2021_2025_V2_PROFILE_ID:
@@ -221,6 +232,14 @@ def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
             "da7f4c75b9504c02f209362d2aebf69188d32cf608ac167fd543beb196067f93",
         evaluator.SPY_2023_2025_V2_PROFILE_ID:
             "e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3",
+    }
+    assert {
+        profile_id: projection.MARKET_CAP_ALL_PROFILE_SHA256S[profile_id]
+        for profile_id in evaluator.V2_PROFILE_IDS
+    } == expected_v2_market_cap_hashes
+    assert projection.MARKET_CAP_PROFILE_SHA256S == {
+        profile_id: evaluator.require_profile(profile_id)["profile_sha256"]
+        for profile_id in evaluator.PROFILE_IDS
     }
     assert {
         profile_id: leverage_evaluator.require_profile(profile_id)[
@@ -241,114 +260,16 @@ def test_all_eight_reviewed_profile_sha256s_are_frozen_before_launch():
     }
 
 
-@pytest.mark.parametrize("profile_id", leverage_evaluator.PROFILE_IDS)
-def test_objective_leverage_projection_is_exact_small_and_profile_bound(
-    package, profile_id
+@pytest.mark.parametrize(
+    ("profile_id", "expected_count", "expect_tilt"),
+    (
+        (evaluator.QQQ_2021_2025_V3_PROFILE_ID, 9, True),
+        (evaluator.QQQ_2021_2025_V2_PROFILE_ID, 8, False),
+    ),
+)
+def test_current_and_preserved_market_cap_source_sets_import_in_isolation(
+    package, tmp_path, profile_id, expected_count, expect_tilt
 ):
-    value = projection.build_accepted_risk_preliminary_qc_projection(
-        package,
-        evaluation_profile_id=profile_id,
-    )
-    by_name = {item.project_path: item for item in value.source_files}
-    main = by_name["main.py"].source_bytes.decode("ascii")
-    tickers = leverage_runtime.constituent_etf_tickers_for_profile(
-        profile_id
-    )
-
-    assert tuple(sorted(by_name)) == tuple(
-        sorted(
-            (*projection.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS, "main.py")
-        )
-    )
-    assert "accepted_risk_preliminary_qc_runtime.py" not in by_name
-    assert "accepted_risk_regime_rating_evaluator.py" not in by_name
-    assert "accepted_risk_stock_portfolio_evaluator.py" not in by_name
-    assert (
-        sum(
-            by_name[name].byte_count
-            for name in projection.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
-        )
-        == 243_663
-    )
-    assert max(item.byte_count for item in value.source_files) < 60_000
-    assert value.total_source_byte_count < projection.MAX_TOTAL_SOURCE_BYTES
-    assert value.evaluation_profile_sha256 == (
-        projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S[profile_id]
-    )
-    assert value.train_work_units_per_slice == (
-        leverage_runtime.TRAIN_WORK_UNITS_PER_SLICE
-    )
-    assert value.maximum_train_slice_count == (
-        leverage_runtime.MAX_TRAIN_SLICE_COUNT
-    )
-    assert f"evaluation_profile_id={profile_id!r}" in main
-    assert f"for ticker in {tickers!r}" in main
-    assert (
-        "from accepted_risk_objective_synthetic_leverage_qc_runtime import ("
-        in main
-    )
-    assert "AcceptedRiskObjectiveSyntheticLeverageQcDriver(" in main
-    assert "self._arv2_fundamental_universe = self.AddUniverse(" in main
-    assert main.count("self.universe.etf(") == 1
-    assert main.count("Symbol.create(") == 1
-    assert projection.require_accepted_risk_preliminary_qc_projection(value) is value
-
-
-def test_objective_leverage_main_defers_work_until_daily_callbacks(package):
-    value = projection.build_accepted_risk_preliminary_qc_projection(
-        package,
-        evaluation_profile_id=(
-            leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID
-        ),
-    )
-    main = next(
-        item.source_bytes.decode("ascii")
-        for item in value.source_files
-        if item.project_path == "main.py"
-    )
-    initialize = main.split("def initialize", 1)[1].split(
-        "def _arv2_empty_constituent_selection", 1
-    )[0]
-
-    assert ".history(" not in initialize
-    assert "advance_training_slice(" not in initialize
-    assert "def on_data" in main
-    assert "self._arv2_driver.advance_training_slice(" in main
-    assert "maximum_work_units=TRAIN_WORK_UNITS_PER_SLICE" in main
-    assert "soft_seconds=TRAIN_SLICE_SOFT_SECONDS" in main
-    assert "set_start_date(2024, 1, 2)" in main
-    assert "set_end_date(2026, 9, 11)" in main
-
-
-def test_objective_leverage_projection_hash_is_load_bearing(package):
-    profile_id = leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID
-    value = projection.build_accepted_risk_preliminary_qc_projection(
-        package,
-        evaluation_profile_id=profile_id,
-    )
-
-    assert projection.OBJECTIVE_LEVERAGE_PROFILE_IDS == (
-        leverage_evaluator.PROFILE_IDS
-    )
-    assert set(projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S) == set(
-        leverage_evaluator.PROFILE_IDS
-    )
-    with pytest.raises(
-        projection.AcceptedRiskPreliminaryQcProjectionError,
-        match="disclosure or inventory changed",
-    ):
-        projection.require_accepted_risk_preliminary_qc_projection(
-            dataclasses.replace(
-                value,
-                evaluation_profile_sha256="0" * 64,
-            )
-        )
-
-
-def test_objective_leverage_flat_source_set_imports_in_isolation(
-    package, tmp_path
-):
-    profile_id = leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID
     value = projection.build_accepted_risk_preliminary_qc_projection(
         package,
         evaluation_profile_id=profile_id,
@@ -365,12 +286,15 @@ def test_objective_leverage_flat_source_set_imports_in_isolation(
             (
                 "import sys; "
                 f"sys.path.insert(0, {str(tmp_path)!r}); "
-                "import accepted_risk_objective_synthetic_leverage_qc_runtime "
+                "import accepted_risk_market_cap_stock_portfolio_qc_runtime "
                 "as runtime; "
                 "names = runtime.expected_custom_summary_statistic_names("
                 f"{profile_id!r}); "
-                "assert len(names) == 8; "
-                "assert 'ARV2_RUNTIME_META' in names; "
+                f"assert len(names) == {expected_count}; "
+                "assert ('ARV2_STOCK_PORTFOLIO_TILT_AGGREGATES' in names) "
+                f"is {expect_tilt!r}; "
+                "assert 'accepted_risk_market_cap_stock_portfolio_tilt' "
+                "in sys.modules; "
                 "assert 'accepted_risk_preliminary_qc_runtime' "
                 "not in sys.modules; "
                 "assert 'accepted_risk_regime_rating_evaluator' "
@@ -383,3 +307,44 @@ def test_objective_leverage_flat_source_set_imports_in_isolation(
         text=True,
     )
     assert probe.returncode == 0, probe.stderr
+
+
+@pytest.mark.parametrize(
+    "profile_id", projection.SUPERSEDED_UNSPENT_PROFILE_IDS
+)
+def test_each_r109_through_r114_fresh_projection_refuses_by_name(
+    package, profile_id
+):
+    with pytest.raises(
+        projection.AcceptedRiskPreliminaryQcProjectionError,
+        match="profile is superseded and cannot be projected",
+    ):
+        projection.build_accepted_risk_preliminary_qc_projection(
+            package,
+            evaluation_profile_id=profile_id,
+        )
+
+
+def test_superseded_objective_leverage_profiles_remain_loadable_and_frozen():
+    assert projection.OBJECTIVE_LEVERAGE_PROFILE_IDS == (
+        leverage_evaluator.PROFILE_IDS
+    )
+    assert set(projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S) == set(
+        leverage_evaluator.PROFILE_IDS
+    )
+    assert projection.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS == (
+        *projection.MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS,
+        "accepted_risk_objective_synthetic_leverage_evaluator.py",
+        "accepted_risk_objective_synthetic_leverage_qc_runtime.py",
+    )
+    assert "accepted_risk_market_cap_stock_portfolio_tilt.py" not in (
+        projection.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
+    )
+    for profile_id in leverage_evaluator.PROFILE_IDS:
+        profile = leverage_evaluator.require_profile(profile_id)
+        assert profile["profile_sha256"] == (
+            projection.OBJECTIVE_LEVERAGE_PROFILE_SHA256S[profile_id]
+        )
+        assert profile["base_evaluator_source_sha256"] == (
+            leverage_evaluator.BASE_EVALUATOR_SOURCE_SHA256
+        )

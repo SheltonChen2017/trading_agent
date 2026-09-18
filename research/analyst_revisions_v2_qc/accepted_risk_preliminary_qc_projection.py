@@ -60,15 +60,23 @@ STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS = (
     *PROJECT_SOURCE_PATHS,
     "accepted_risk_stock_portfolio_evaluator.py",
 )
-MARKET_CAP_PROJECT_SOURCE_PATHS = (
+# Inventory compatibility for persisted V1/V2 projections whose own evaluator
+# bytes predate the tilt-helper import.  Fresh projectable market-cap profiles
+# always use the helper-inclusive closure below.
+MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
     "accepted_risk_preliminary_rating_evaluator.py",
     "accepted_risk_preliminary_qc_figi.py",
     "accepted_risk_market_cap_stock_portfolio_evaluator.py",
     "accepted_risk_market_cap_stock_portfolio_qc_runtime.py",
 )
+MARKET_CAP_PROJECT_SOURCE_PATHS = (
+    *MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS[:3],
+    "accepted_risk_market_cap_stock_portfolio_tilt.py",
+    *MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS[3:],
+)
 OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS = (
-    *MARKET_CAP_PROJECT_SOURCE_PATHS,
+    *MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS,
     "accepted_risk_objective_synthetic_leverage_evaluator.py",
     "accepted_risk_objective_synthetic_leverage_qc_runtime.py",
 )
@@ -84,12 +92,21 @@ STOCK_PORTFOLIO_PROFILE_SHA256S = {
 STOCK_PORTFOLIO_PROFILE_SHA256 = (
     STOCK_PORTFOLIO_PROFILE_SHA256S[STOCK_PORTFOLIO_PROFILE_ID]
 )
+MARKET_CAP_V1_PROFILE_IDS = market_cap_evaluator.V1_PROFILE_IDS
+MARKET_CAP_V2_PROFILE_IDS = market_cap_evaluator.V2_PROFILE_IDS
 MARKET_CAP_PROFILE_IDS = market_cap_evaluator.PROFILE_IDS
+MARKET_CAP_ALL_PROFILE_IDS = market_cap_evaluator.ALL_PROFILE_IDS
 MARKET_CAP_PROFILE_SHA256S = {
     profile_id: market_cap_evaluator.require_market_cap_stock_portfolio_profile(
         profile_id
     )["profile_sha256"]
     for profile_id in MARKET_CAP_PROFILE_IDS
+}
+MARKET_CAP_ALL_PROFILE_SHA256S = {
+    profile_id: market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+        profile_id
+    )["profile_sha256"]
+    for profile_id in MARKET_CAP_ALL_PROFILE_IDS
 }
 OBJECTIVE_LEVERAGE_PROFILE_IDS = leverage_evaluator.PROFILE_IDS
 OBJECTIVE_LEVERAGE_PROFILE_SHA256S = {
@@ -98,6 +115,14 @@ OBJECTIVE_LEVERAGE_PROFILE_SHA256S = {
     ]
     for profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS
 }
+SUPERSEDED_UNSPENT_PROFILE_IDS = (
+    market_cap_evaluator.QQQ_2019_2023_V2_PROFILE_ID,
+    market_cap_evaluator.SPY_2019_2023_V2_PROFILE_ID,
+    market_cap_evaluator.QQQ_2023_2025_V2_PROFILE_ID,
+    market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID,
+    leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
+    leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID,
+)
 MAIN_PROJECT_PATH = "main.py"
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
 _FORBIDDEN_IMPORT_ROOTS = {
@@ -123,6 +148,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_regime_rating_evaluator",
     "accepted_risk_stock_portfolio_evaluator",
     "accepted_risk_market_cap_stock_portfolio_evaluator",
+    "accepted_risk_market_cap_stock_portfolio_tilt",
     "accepted_risk_market_cap_stock_portfolio_qc_runtime",
     "accepted_risk_objective_synthetic_leverage_evaluator",
     "accepted_risk_objective_synthetic_leverage_qc_runtime",
@@ -471,7 +497,7 @@ def _main_source(
             activation_bytes=activation_bytes,
             evaluation_profile_id=evaluation_profile_id,
         )
-    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+    if evaluation_profile_id in MARKET_CAP_ALL_PROFILE_IDS:
         return _market_cap_stock_main_source(
             activation_key=activation_key,
             activation_sha256=activation_sha256,
@@ -630,7 +656,7 @@ def _market_cap_stock_main_source(
         evaluation_profile_id
     )
     if (
-        evaluation_profile_id not in MARKET_CAP_PROFILE_IDS
+        evaluation_profile_id not in MARKET_CAP_ALL_PROFILE_IDS
         or type(tickers) is not tuple
         or len(tickers) != 1
         or tickers[0] not in ("QQQ", "SPY")
@@ -885,7 +911,7 @@ def _profile(evaluation_profile_id):
         )
     if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
         return leverage_evaluator.require_profile(evaluation_profile_id)
-    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+    if evaluation_profile_id in MARKET_CAP_ALL_PROFILE_IDS:
         return market_cap_evaluator.require_market_cap_stock_portfolio_profile(
             evaluation_profile_id
         )
@@ -905,7 +931,7 @@ def project_source_paths_for_profile(evaluation_profile_id):
         return ETF_PROJECT_SOURCE_PATHS
     if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
         return OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
-    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+    if evaluation_profile_id in MARKET_CAP_ALL_PROFILE_IDS:
         return MARKET_CAP_PROJECT_SOURCE_PATHS
     if evaluation_profile_id in STOCK_PORTFOLIO_PROFILE_IDS:
         return STOCK_PORTFOLIO_PROJECT_SOURCE_PATHS
@@ -918,7 +944,7 @@ def _runtime_slice_bounds(evaluation_profile_id):
             leverage_runtime.TRAIN_WORK_UNITS_PER_SLICE,
             leverage_runtime.MAX_TRAIN_SLICE_COUNT,
         )
-    if evaluation_profile_id in MARKET_CAP_PROFILE_IDS:
+    if evaluation_profile_id in MARKET_CAP_ALL_PROFILE_IDS:
         return (
             market_cap_runtime.TRAIN_WORK_UNITS_PER_SLICE,
             market_cap_runtime.MAX_TRAIN_SLICE_COUNT,
@@ -976,6 +1002,10 @@ def build_accepted_risk_preliminary_qc_projection(
     """Bind the compact activation to an exact flat QC source set."""
 
     package = package_builder.require_accepted_risk_preliminary_package(package)
+    if evaluation_profile_id in SUPERSEDED_UNSPENT_PROFILE_IDS:
+        raise AcceptedRiskPreliminaryQcProjectionError(
+            "preliminary QC profile is superseded and cannot be projected"
+        )
     profile = _profile(evaluation_profile_id)
     activation = package.upload_objects[-1]
     if (
@@ -1075,15 +1105,26 @@ def require_accepted_risk_preliminary_qc_projection(
         )
     profile = _profile(value.evaluation_profile_id)
     source_paths = project_source_paths_for_profile(value.evaluation_profile_id)
+    accepted_source_path_sets = (source_paths,)
+    if value.evaluation_profile_id in (
+        MARKET_CAP_V1_PROFILE_IDS + MARKET_CAP_V2_PROFILE_IDS
+    ):
+        accepted_source_path_sets += (MARKET_CAP_LEGACY_PROJECT_SOURCE_PATHS,)
+    observed_source_paths = tuple(
+        item.project_path
+        for item in value.source_files
+        if item.project_path != MAIN_PROJECT_PATH
+    )
     train_work_units_per_slice, maximum_train_slice_count = (
         _runtime_slice_bounds(value.evaluation_profile_id)
     )
     if (
         value.schema != PROJECTION_SCHEMA
         or type(value.source_files) is not tuple
-        or len(value.source_files) != len(source_paths) + 1
+        or observed_source_paths
+        not in tuple(tuple(sorted(paths)) for paths in accepted_source_path_sets)
         or tuple(item.project_path for item in value.source_files)
-        != tuple(sorted((*source_paths, MAIN_PROJECT_PATH)))
+        != tuple(sorted((*observed_source_paths, MAIN_PROJECT_PATH)))
         or value.total_source_byte_count
         != sum(item.byte_count for item in value.source_files)
         or value.evaluation_profile_sha256

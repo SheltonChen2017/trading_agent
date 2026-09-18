@@ -1,7 +1,7 @@
 import hashlib
 import json
 from datetime import date
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from fractions import Fraction
 
 import pytest
@@ -9,6 +9,9 @@ import pytest
 from data.exchange_calendar import trading_sessions
 from research.analyst_revisions_v2_qc import (
     accepted_risk_market_cap_stock_portfolio_evaluator as subject,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_market_cap_stock_portfolio_tilt as tilt,
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_rating_evaluator as base,
@@ -24,7 +27,7 @@ def _sessions():
     )
 
 
-def _input():
+def _input(security_count=20, *, sector_count=1):
     sessions = _sessions()
     session_rows = tuple(
         {
@@ -39,9 +42,13 @@ def _input():
             security_id=f"perm-security-{index:02d}",
             first_session_index=0,
             last_session_index_exclusive=len(sessions),
-            sector_id="sector-technology",
+            sector_id=(
+                "sector-technology"
+                if sector_count == 1
+                else f"sector-{index % sector_count:02d}"
+            ),
         )
-        for index in range(20)
+        for index in range(security_count)
     )
     contributions = []
     contribution_sessions = tuple(
@@ -56,8 +63,14 @@ def _input():
     )
     for view in base.SOURCE_VIEW_IDS:
         for contribution_session in contribution_sessions:
-            for index in range(20):
-                delta = Fraction(index - 10 if index < 10 else index - 9, 10)
+            for index in range(security_count):
+                midpoint = security_count // 2
+                delta = Fraction(
+                    index - midpoint
+                    if index < midpoint
+                    else index - midpoint + 1,
+                    10,
+                )
                 contributions.append(
                     base.build_contribution_record(
                         source_view_id=view,
@@ -68,7 +81,9 @@ def _input():
                             f"event-{contribution_session}-{index:02d}"
                         ),
                         rating_action=(
-                            "downgrades" if index < 10 else "upgrades"
+                            "downgrades"
+                            if index < midpoint
+                            else "upgrades"
                         ),
                         firm_delta=delta,
                         global_delta=delta / 2,
@@ -137,10 +152,17 @@ def _runtime(
     )
 
 
-def _history_loader(value, *, omissions=frozenset(), opening_jump=False):
+def _history_loader(
+    value,
+    *,
+    omissions=frozenset(),
+    opening_jump=False,
+    price_overrides=None,
+):
     positions = {
         session: index for index, session in enumerate(value.session_axis)
     }
+    price_overrides = {} if price_overrides is None else price_overrides
 
     def load(request):
         rows = []
@@ -157,6 +179,9 @@ def _history_loader(value, *, omissions=frozenset(), opening_jump=False):
                     and session > "2021-01-04"
                 ):
                     price = Decimal(200)
+                price = price_overrides.get(
+                    (security_id, session), price
+                )
                 rows.append(
                     base.TotalReturnOpenObservation(
                         base.HISTORY_OBSERVATION_SCHEMA,
@@ -177,20 +202,49 @@ def _complete(
     caps=_DEFAULT_CAPS,
     omissions=frozenset(),
     opening_jump=False,
+    price_overrides=None,
 ):
     runtime = _runtime(value, profile_id=profile_id, caps=caps)
     loader = _history_loader(
         value,
         omissions=omissions,
         opening_jump=opening_jump,
+        price_overrides=price_overrides,
     )
     while runtime.phase is not base.RuntimePhase.COMPLETED:
         runtime.run_callback(loader)
     return runtime
 
 
+def _tilt_case(negative_count, positive_count, *, zero_count=0, missing_count=0):
+    market_caps = {}
+    scores = {}
+    for index in range(negative_count):
+        security_id = f"negative-{index:03d}"
+        market_caps[security_id] = Decimal(index + 1)
+        scores[security_id] = Decimal(index - negative_count)
+    for index in range(positive_count):
+        security_id = f"positive-{index:03d}"
+        market_caps[security_id] = Decimal(positive_count - index)
+        scores[security_id] = Decimal(index + 1)
+    for index in range(zero_count):
+        security_id = f"zero-{index:03d}"
+        market_caps[security_id] = Decimal(index + 1)
+        scores[security_id] = Decimal(0)
+    for index in range(missing_count):
+        market_caps[f"missing-{index:03d}"] = Decimal(index + 1)
+    return market_caps, scores
+
+
+def _sector_map(market_caps, sector_count=2):
+    return {
+        security_id: f"sector-{index % sector_count:02d}"
+        for index, security_id in enumerate(sorted(market_caps))
+    }
+
+
 def test_successor_profiles_preserve_periods_and_superseded_identities():
-    assert subject.PROFILE_IDS == (
+    assert subject.V2_PROFILE_IDS == (
         subject.QQQ_2021_2025_V2_PROFILE_ID,
         subject.SPY_2021_2025_V2_PROFILE_ID,
         subject.QQQ_2019_2023_V2_PROFILE_ID,
@@ -198,7 +252,15 @@ def test_successor_profiles_preserve_periods_and_superseded_identities():
         subject.QQQ_2023_2025_V2_PROFILE_ID,
         subject.SPY_2023_2025_V2_PROFILE_ID,
     )
-    assert subject.ALL_PROFILE_IDS == subject.V1_PROFILE_IDS + subject.PROFILE_IDS
+    assert subject.PROFILE_IDS == (
+        subject.QQQ_2021_2025_V3_PROFILE_ID,
+        subject.SPY_2021_2025_V3_PROFILE_ID,
+    )
+    assert subject.ALL_PROFILE_IDS == (
+        subject.V1_PROFILE_IDS
+        + subject.V2_PROFILE_IDS
+        + subject.PROFILE_IDS
+    )
     assert subject.QQQ_PROFILE_IDS == subject.PROFILE_IDS[::2]
     assert subject.SPY_PROFILE_IDS == subject.PROFILE_IDS[1::2]
     expected = {
@@ -209,10 +271,40 @@ def test_successor_profiles_preserve_periods_and_superseded_identities():
         subject.QQQ_2023_2025_V2_PROFILE_ID: ("QQQ", 752, 157),
         subject.SPY_2023_2025_V2_PROFILE_ID: ("SPY", 752, 157),
     }
+    historical_hashes = {
+        subject.QQQ_2021_2025_V2_PROFILE_ID: (
+            "71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178"
+        ),
+        subject.SPY_2021_2025_V2_PROFILE_ID: (
+            "0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d"
+        ),
+        subject.QQQ_2019_2023_V2_PROFILE_ID: (
+            "661d87e282f6c37cc258db7a3e814e5a261369209fc3fc4a96c1769edd71f83d"
+        ),
+        subject.SPY_2019_2023_V2_PROFILE_ID: (
+            "72a4b469d7f8fa79ea4ea62836b6b43000069b5e0a7dca6941af00124ca68f4a"
+        ),
+        subject.QQQ_2023_2025_V2_PROFILE_ID: (
+            "da7f4c75b9504c02f209362d2aebf69188d32cf608ac167fd543beb196067f93"
+        ),
+        subject.SPY_2023_2025_V2_PROFILE_ID: (
+            "e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3"
+        ),
+    }
+    historical_names = (
+        "ARV2_STOCK_PORTFOLIO_COST_0",
+        "ARV2_STOCK_PORTFOLIO_COST_10",
+        "ARV2_STOCK_PORTFOLIO_COST_20",
+        "ARV2_STOCK_PORTFOLIO_COST_5",
+        subject.MATCHED_AGGREGATES_STATISTIC_NAME,
+        subject.META_STATISTIC_NAME,
+        subject.SELECTED_AGGREGATES_STATISTIC_NAME,
+    )
     for profile_id, (ticker, sessions, decisions) in expected.items():
         profile = subject.require_profile(profile_id)
         digest = profile.pop("profile_sha256")
         assert subject._sha(profile) == digest
+        assert digest == historical_hashes[profile_id]
         assert profile["expected_session_count"] == sessions
         assert profile["expected_decision_session_count"] == decisions
         assert profile["r055_score_rule"] == "exact_unchanged_R055_cross_section"
@@ -226,10 +318,47 @@ def test_successor_profiles_preserve_periods_and_superseded_identities():
         assert subject.constituent_etf_tickers_for_profile(profile_id) == (
             ticker,
         )
+        assert subject.expected_custom_summary_statistic_names(
+            profile_id
+        ) == historical_names
     assert all(
         "history_collection_window_policy" not in subject.require_profile(profile_id)
         for profile_id in subject.V1_PROFILE_IDS
     )
+    assert all(
+        subject.expected_custom_summary_statistic_names(profile_id)
+        == historical_names
+        for profile_id in subject.V1_PROFILE_IDS
+    )
+    for profile_id in subject.PROFILE_IDS:
+        profile = subject.require_profile(profile_id)
+        assert profile["selection"].startswith(
+            "full_point_in_time_eligible_benchmark"
+        )
+        assert profile["matched_comparator"].startswith(
+            "same_full_point_in_time_eligible_benchmark"
+        )
+        assert profile["maximum_holdings"] is None
+        assert profile["sector_neutrality_rule"].startswith(
+            "exact_selected_weight_equals_benchmark_weight"
+        )
+        assert profile["sector_mapping_rule"].startswith(
+            "exhaustive_exact_security_to_sector_mapping"
+        )
+        assert profile["sector_neutral_execution_rule"] == (
+            "execute_each_tradable_name_at_its_exact_frozen_target_preserve_"
+            "each_locked_weight_never_redistribute_missing_or_locked_budget_"
+            "and_count_sector_target_underfill_for_missing_or_below_frozen_"
+            "locks_or_sector_gross_under_and_locked_sector_over_target_for_"
+            "above_frozen_locks_or_sector_gross_over"
+        )
+        assert profile["portfolio_weight_quantum"] == format(
+            subject.PORTFOLIO_WEIGHT_QUANTUM, "f"
+        )
+        assert len(subject.expected_custom_summary_statistic_names(profile_id)) == 8
+        assert subject.TILT_AGGREGATES_STATISTIC_NAME in (
+            subject.expected_custom_summary_statistic_names(profile_id)
+        )
 
 
 def test_profiles_are_detached_and_unknown_profile_refuses():
@@ -243,6 +372,776 @@ def test_profiles_are_detached_and_unknown_profile_refuses():
         match="exact fixed profile",
     ):
         subject.require_profile("unknown")
+
+
+def test_average_rank_tilts_use_exact_midranks_for_ties():
+    result = tilt.average_rank_tilts(
+        {
+            "d": Decimal(2),
+            "b": Decimal(-1),
+            "a": Decimal(-2),
+            "c": Decimal(-1),
+        }
+    )
+
+    assert result == {
+        "a": Decimal(-1),
+        "b": Decimal(0),
+        "c": Decimal(0),
+        "d": Decimal(1),
+    }
+
+
+@pytest.mark.parametrize(
+    ("negative_count", "positive_count", "expected_status"),
+    (
+        (19, 20, tilt.TILT_UNDERFILLED),
+        (20, 19, tilt.TILT_UNDERFILLED),
+        (21, 19, tilt.TILT_UNDERFILLED),
+        (19, 21, tilt.TILT_UNDERFILLED),
+        (20, 20, tilt.TILT_ENABLED),
+    ),
+)
+def test_tilt_breadth_and_score_sign_boundaries(
+    negative_count, positive_count, expected_status
+):
+    caps, scores = _tilt_case(negative_count, positive_count)
+
+    result = tilt.build_benchmark_tilt(caps, scores, _sector_map(caps))
+
+    assert result.status == expected_status
+    assert result.ranked_nonzero_score_count == negative_count + positive_count
+    assert result.negative_score_count == negative_count
+    assert result.positive_score_count == positive_count
+    if expected_status == tilt.TILT_UNDERFILLED:
+        assert result.selected_weights == result.benchmark_weights
+        assert result.tilted_name_count == 0
+        assert result.one_way_active_share == 0
+    else:
+        assert result.tilted_name_count >= 40
+
+
+def test_missing_and_zero_scores_remain_exact_benchmark_weights():
+    caps, scores = _tilt_case(21, 21, zero_count=2, missing_count=2)
+
+    result = tilt.build_benchmark_tilt(caps, scores, _sector_map(caps))
+
+    assert result.status == tilt.TILT_ENABLED
+    for security_id in (
+        "zero-000",
+        "zero-001",
+        "missing-000",
+        "missing-001",
+    ):
+        assert (
+            result.selected_weights[security_id]
+            == result.benchmark_weights[security_id]
+        )
+        assert security_id not in result.rank_tilts
+
+
+def test_breadth_confirmed_scores_fall_back_when_sectors_cannot_cross_fund():
+    caps, scores = _tilt_case(20, 20)
+    sectors = {
+        security_id: (
+            "sector-negative"
+            if security_id.startswith("negative-")
+            else "sector-positive"
+        )
+        for security_id in caps
+    }
+
+    result = tilt.build_benchmark_tilt(caps, scores, sectors)
+
+    assert result.ranked_nonzero_score_count == 40
+    assert result.positive_score_count == 20
+    assert result.negative_score_count == 20
+    assert result.status == tilt.TILT_UNDERFILLED
+    assert result.selected_weights == result.benchmark_weights
+
+
+def test_enabled_tilt_obeys_every_frozen_bound_and_exact_conservation():
+    caps, scores = _tilt_case(20, 20)
+
+    sectors = _sector_map(caps)
+    result = tilt.build_benchmark_tilt(caps, scores, sectors)
+    with localcontext(base._context()):
+        active = {
+            security_id: +(
+                result.selected_weights[security_id]
+                - result.benchmark_weights[security_id]
+            )
+            for security_id in result.selected_weights
+        }
+        overweights = tuple(value for value in active.values() if value > 0)
+        underweights = tuple(-value for value in active.values() if value < 0)
+        benchmark_hhi = +base._stable_sum(
+            (weight / subject.TARGET_GROSS_EXPOSURE) ** 2
+            for weight in result.benchmark_weights.values()
+        )
+        selected_hhi = +base._stable_sum(
+            (weight / subject.TARGET_GROSS_EXPOSURE) ** 2
+            for weight in result.selected_weights.values()
+        )
+        active_imbalance = +base._stable_sum(active.values())
+        overweight_total = +base._stable_sum(overweights)
+        underweight_total = +base._stable_sum(underweights)
+        observed_one_way = +(
+            base._stable_sum(abs(value) for value in active.values())
+            / Decimal(2)
+        )
+        relative_bounds_hold = all(
+            Decimal("0.8") * result.benchmark_weights[security_id]
+            <= result.selected_weights[security_id]
+            <= Decimal("1.2") * result.benchmark_weights[security_id]
+            for security_id in result.selected_weights
+        )
+        hhi_bound = +(Decimal("1.44") * benchmark_hhi)
+        observed_hhi_ratio = +(selected_hhi / benchmark_hhi)
+
+    assert result.status == tilt.TILT_ENABLED
+    assert base._stable_sum(result.benchmark_weights.values()) == Decimal("0.98")
+    assert base._stable_sum(result.selected_weights.values()) == Decimal("0.98")
+    assert abs(active_imbalance) <= Decimal("1e-48")
+    assert abs(overweight_total - underweight_total) <= Decimal("1e-48")
+    assert result.one_way_active_share == observed_one_way
+    assert result.one_way_active_share <= Decimal("0.049")
+    assert result.maximum_overweight == max(overweights)
+    assert result.maximum_overweight <= Decimal("0.0049")
+    assert result.tilted_name_count >= 40
+    assert relative_bounds_hold
+    assert selected_hhi <= hhi_bound
+    assert result.hhi_ratio_to_benchmark == observed_hhi_ratio
+    assert result.sector_count == 2
+    assert result.maximum_absolute_sector_active_weight == 0
+    for sector_id in sorted(set(sectors.values())):
+        members = tuple(
+            security_id
+            for security_id in result.selected_weights
+            if sectors[security_id] == sector_id
+        )
+        assert base._stable_sum(
+            result.selected_weights[security_id]
+            for security_id in members
+        ) == base._stable_sum(
+            result.benchmark_weights[security_id]
+            for security_id in members
+        )
+
+
+def test_tilt_is_deterministic_across_cap_score_and_tie_insertion_order():
+    caps, scores = _tilt_case(22, 22, zero_count=1, missing_count=1)
+    scores["negative-000"] = scores["negative-001"]
+    scores["positive-020"] = scores["positive-021"]
+
+    sectors = _sector_map(caps, 4)
+    first = tilt.build_benchmark_tilt(caps, scores, sectors)
+    second = tilt.build_benchmark_tilt(
+        dict(reversed(tuple(caps.items()))),
+        dict(reversed(tuple(scores.items()))),
+        dict(reversed(tuple(sectors.items()))),
+    )
+    residual = tilt.bounded_pro_rata(
+        Decimal("0.1"),
+        {"c": Decimal("0.2"), "a": Decimal("0.2"), "b": Decimal("0.2")},
+    )
+
+    assert first == second
+    assert tuple(first.selected_weights) == tuple(sorted(first.selected_weights))
+    assert tuple(residual) == ("a", "b", "c")
+    assert base._stable_sum(residual.values()) == Decimal("0.1")
+    assert all(Decimal(0) <= residual[key] <= Decimal("0.2") for key in residual)
+
+
+@pytest.mark.parametrize(
+    "bad_score",
+    (1, 1.0, Decimal("NaN"), Decimal("Infinity")),
+)
+def test_tilt_refuses_non_exact_or_nonfinite_scores(bad_score):
+    caps, scores = _tilt_case(20, 20)
+    scores["negative-000"] = bad_score
+
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="score must be exact finite Decimal",
+    ):
+        tilt.build_benchmark_tilt(caps, scores, _sector_map(caps))
+
+
+def test_tilt_refuses_nonexhaustive_or_invalid_sector_mapping():
+    caps, scores = _tilt_case(20, 20)
+    valid = _sector_map(caps)
+    missing = dict(valid)
+    missing.pop(min(missing))
+    extra = {**valid, "outside-universe": "sector-00"}
+    invalid = dict(valid)
+    invalid[min(invalid)] = ""
+
+    for mapping, message in (
+        (None, "must be an exact dict"),
+        (missing, "is not exhaustive"),
+        (extra, "is not exhaustive"),
+        (invalid, "mapping changed"),
+    ):
+        with pytest.raises(tilt.BoundedBenchmarkTiltError, match=message):
+            tilt.build_benchmark_tilt(caps, scores, mapping)
+
+
+def test_membership_sector_mapping_is_exhaustive_and_one_to_one():
+    value = _input()
+    caps = {
+        item.security_id: Decimal(index + 1)
+        for index, item in enumerate(value.memberships)
+    }
+
+    mapping = tilt.sector_map_from_memberships(caps, value.memberships)
+
+    assert mapping == {
+        security_id: "sector-technology" for security_id in sorted(caps)
+    }
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="membership mapping is not exhaustive",
+    ):
+        tilt.sector_map_from_memberships(caps, value.memberships[:-1])
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="membership mapping is not one-to-one",
+    ):
+        tilt.sector_map_from_memberships(
+            caps, (*value.memberships[:-1], value.memberships[0])
+        )
+
+
+def test_tilt_census_binds_enabled_underfilled_and_zero_enabled_minima():
+    enabled_caps, enabled_scores = _tilt_case(20, 20)
+    underfilled_caps, underfilled_scores = _tilt_case(19, 20)
+    enabled = tilt.build_benchmark_tilt(
+        enabled_caps, enabled_scores, _sector_map(enabled_caps)
+    )
+    underfilled = tilt.build_benchmark_tilt(
+        underfilled_caps,
+        underfilled_scores,
+        _sector_map(underfilled_caps),
+    )
+    census = tilt.TiltCensus()
+    census.observe(enabled)
+    census.observe(underfilled)
+
+    aggregate = census.aggregates()
+
+    assert aggregate["decision_session_count"] == 2
+    assert aggregate["tilt_enabled_decision_count"] == 1
+    assert aggregate["tilt_underfilled_decision_count"] == 1
+    assert aggregate["minimum_tilted_name_count_when_enabled"] >= 40
+    assert Decimal(aggregate["maximum_one_way_active_share"]) <= Decimal(
+        "0.049"
+    )
+    assert aggregate["minimum_point_in_time_sector_count"] == 2
+    assert aggregate["sector_mapping_exhaustive"] is True
+    assert aggregate["sector_neutrality_exact"] is True
+    assert aggregate["sector_neutrality_scope"] == "frozen_target"
+    assert aggregate["maximum_absolute_sector_active_weight"] == "0"
+    only_underfilled = tilt.TiltCensus()
+    only_underfilled.observe(underfilled)
+    underfilled_aggregate = only_underfilled.aggregates()
+    assert underfilled_aggregate["minimum_tilted_name_count_when_enabled"] == 0
+    assert underfilled_aggregate["maximum_one_way_active_share"] == "0"
+    assert (
+        underfilled_aggregate[
+            "minimum_weight_ratio_to_benchmark_when_enabled"
+        ]
+        == "0"
+    )
+
+
+def test_executable_tilt_target_never_redistributes_missing_or_locked_budget():
+    caps, scores = _tilt_case(20, 20)
+    sectors = _sector_map(caps)
+    construction = tilt.build_benchmark_tilt(
+        caps, scores, sectors
+    )
+    desired = tuple(construction.selected_weights)
+    locked_id = desired[0]
+    missing_id = desired[1]
+    locked = {
+        locked_id: construction.selected_weights[locked_id]
+    }
+    tradable = tuple(
+        security_id
+        for security_id in desired
+        if security_id not in (locked_id, missing_id)
+    )
+
+    execution = tilt.executable_selected_target(
+        construction.selected_weights,
+        sectors,
+        desired,
+        tradable,
+        locked,
+    )
+    targets = execution.weights
+
+    assert targets[locked_id] == construction.selected_weights[locked_id]
+    assert missing_id not in targets
+    with localcontext(base._context()):
+        expected_executed_gross = +(
+            Decimal("0.98") - construction.selected_weights[missing_id]
+        )
+    assert base._stable_sum(targets.values()) == expected_executed_gross
+    assert execution.locked_sector_over_target_count == 0
+    assert execution.sector_target_underfill_count == 1
+    assert all(
+        targets[security_id] == construction.selected_weights[security_id]
+        for security_id in tradable
+    )
+    over_target_lock = {locked_id: Decimal("0.99")}
+    over_target = tilt.executable_selected_target(
+        construction.selected_weights,
+        sectors,
+        desired,
+        tuple(item for item in desired if item != locked_id),
+        over_target_lock,
+    )
+    assert over_target.weights[locked_id] == Decimal("0.99")
+    assert over_target.locked_sector_over_target_count == 1
+    blocked_sector = sectors[locked_id]
+    underfilled = tilt.executable_selected_target(
+        construction.selected_weights,
+        sectors,
+        desired,
+        tuple(
+            security_id for security_id in desired
+            if sectors[security_id] != blocked_sector
+        ),
+        {},
+    )
+    assert underfilled.locked_sector_over_target_count == 0
+    assert underfilled.sector_target_underfill_count == 1
+
+
+def test_execution_counters_survive_exact_sector_gross_cancellation():
+    caps, scores = _tilt_case(20, 20)
+    sectors = _sector_map(caps)
+    construction = tilt.build_benchmark_tilt(caps, scores, sectors)
+    desired = tuple(construction.selected_weights)
+    locked_id = desired[0]
+    locked_sector = sectors[locked_id]
+    missing_id = next(
+        security_id
+        for security_id in desired
+        if security_id != locked_id
+        and sectors[security_id] == locked_sector
+    )
+    with localcontext(base._context()):
+        cancellation_weight = +(
+            construction.selected_weights[locked_id]
+            + construction.selected_weights[missing_id]
+        )
+    locked = {locked_id: cancellation_weight}
+    tradable = tuple(
+        security_id
+        for security_id in desired
+        if security_id not in (locked_id, missing_id)
+    )
+
+    execution = tilt.executable_selected_target(
+        construction.selected_weights,
+        sectors,
+        desired,
+        tradable,
+        locked,
+    )
+
+    assert base._stable_sum(execution.weights.values()) == Decimal("0.98")
+    assert execution.weights[locked_id] == locked[locked_id]
+    assert missing_id not in execution.weights
+    assert execution.locked_sector_over_target_count == 1
+    assert execution.sector_target_underfill_count == 1
+
+
+def test_40_name_missing_price_reproduction_keeps_frozen_execution_bounds():
+    caps, scores = _tilt_case(20, 20)
+    sectors = _sector_map(caps)
+    construction = tilt.build_benchmark_tilt(caps, scores, sectors)
+    desired = tuple(construction.selected_weights)
+    tradable = (
+        "negative-001",
+        "positive-008",
+        "positive-013",
+        "positive-017",
+    )
+    selected_execution = tilt.executable_selected_target(
+        construction.selected_weights,
+        sectors,
+        desired,
+        tradable,
+        {},
+    )
+    matched_execution = tilt.executable_selected_target(
+        construction.benchmark_weights,
+        sectors,
+        desired,
+        tradable,
+        {},
+    )
+    reproduced_id = "negative-001"
+    reproduced_sector = sectors[reproduced_id]
+    sector_members = tuple(
+        security_id
+        for security_id in desired
+        if sectors[security_id] == reproduced_sector
+    )
+    tradable_sector_members = tuple(
+        security_id
+        for security_id in tradable
+        if sectors[security_id] == reproduced_sector
+    )
+    with localcontext(base._context()):
+        old_selected = +(
+            base._stable_sum(
+                construction.selected_weights[security_id]
+                for security_id in sector_members
+            )
+            * construction.selected_weights[reproduced_id]
+            / base._stable_sum(
+                construction.selected_weights[security_id]
+                for security_id in tradable_sector_members
+            )
+        )
+        old_matched = +(
+            base._stable_sum(
+                construction.benchmark_weights[security_id]
+                for security_id in sector_members
+            )
+            * construction.benchmark_weights[reproduced_id]
+            / base._stable_sum(
+                construction.benchmark_weights[security_id]
+                for security_id in tradable_sector_members
+            )
+        )
+        old_relative_ratio = +(old_selected / old_matched)
+        executed_active_share = +(
+            base._stable_sum(
+                abs(
+                    selected_execution.weights[security_id]
+                    - matched_execution.weights[security_id]
+                )
+                for security_id in tradable
+            )
+            / Decimal(2)
+        )
+        executed_ratios = tuple(
+            +(
+                selected_execution.weights[security_id]
+                / matched_execution.weights[security_id]
+            )
+            for security_id in tradable
+        )
+
+    assert old_relative_ratio < Decimal("0.8")
+    assert all(
+        selected_execution.weights[security_id]
+        == construction.selected_weights[security_id]
+        and matched_execution.weights[security_id]
+        == construction.benchmark_weights[security_id]
+        for security_id in tradable
+    )
+    assert Decimal("0.8") <= min(executed_ratios)
+    assert max(executed_ratios) <= Decimal("1.2")
+    assert executed_active_share <= Decimal("0.049")
+    assert selected_execution.locked_sector_over_target_count == 0
+    assert selected_execution.sector_target_underfill_count == 2
+    assert matched_execution.locked_sector_over_target_count == 0
+    assert matched_execution.sector_target_underfill_count == 2
+
+
+def test_v3_matched_comparator_stays_exact_cap_weighted_and_score_independent():
+    runtime = _runtime(_input())
+    runtime._price = lambda _security_id, _position: Decimal(100)
+    caps, scores = _tilt_case(20, 20)
+    sectors = _sector_map(caps)
+    first = tilt.build_benchmark_tilt(caps, scores, sectors)
+    reversed_scores = {
+        security_id: -score for security_id, score in scores.items()
+    }
+    second = tilt.build_benchmark_tilt(caps, reversed_scores, sectors)
+    desired = tuple(first.selected_weights)
+    first_decision = subject._Decision(
+        selected=desired,
+        eligible=desired,
+        market_caps=caps,
+        selected_weights=first.selected_weights,
+        benchmark_weights=first.benchmark_weights,
+        sector_by_security_id=sectors,
+    )
+    second_decision = subject._Decision(
+        selected=desired,
+        eligible=desired,
+        market_caps=caps,
+        selected_weights=second.selected_weights,
+        benchmark_weights=second.benchmark_weights,
+        sector_by_security_id=sectors,
+    )
+
+    first_matched = runtime._targets(
+        subject._Account("matched"), first_decision, desired, 0, {}
+    )
+    second_matched = runtime._targets(
+        subject._Account("matched"), second_decision, desired, 0, {}
+    )
+    first_selected = runtime._targets(
+        subject._Account("selected"), first_decision, desired, 0, {}
+    )
+
+    assert first_matched == first.benchmark_weights
+    assert second_matched == first_matched
+    assert first_selected == first.selected_weights
+    assert first_selected != first_matched
+
+
+def test_v3_runtime_counts_sector_execution_exceptions():
+    runtime = _runtime(_input())
+    caps, scores = _tilt_case(20, 20)
+    sectors = _sector_map(caps)
+    construction = tilt.build_benchmark_tilt(caps, scores, sectors)
+    desired = tuple(construction.selected_weights)
+    decision = subject._Decision(
+        selected=desired,
+        eligible=desired,
+        market_caps=caps,
+        selected_weights=construction.selected_weights,
+        benchmark_weights=construction.benchmark_weights,
+        sector_by_security_id=sectors,
+    )
+    locked_id = desired[0]
+    runtime._price = lambda _security_id, _position: Decimal(100)
+    locked_account = subject._Account("selected")
+
+    runtime._targets(
+        locked_account,
+        decision,
+        desired,
+        0,
+        {locked_id: Decimal("0.99")},
+    )
+
+    assert locked_account.locked_sector_over_target_count == 1
+    assert locked_account.sector_target_underfill_count == 0
+    locked_aggregate = tilt.account_aggregates(
+        locked_account, 1, sector_neutral=True
+    )
+    assert locked_aggregate["locked_sector_over_target_count"] == 1
+    blocked_sector = sectors[locked_id]
+    runtime._price = lambda security_id, _position: (
+        None if sectors[security_id] == blocked_sector else Decimal(100)
+    )
+    missing_account = subject._Account("selected")
+
+    runtime._targets(
+        missing_account, decision, desired, 0, {}
+    )
+
+    assert missing_account.locked_sector_over_target_count == 0
+    assert missing_account.sector_target_underfill_count == 1
+
+
+def test_benchmark_binding_is_order_invariant_and_decimal_canonical():
+    sessions = (
+        "2021-01-05",
+        "2021-01-06",
+        "2021-01-07",
+        "2021-01-08",
+    )
+    observations = tuple(
+        zip(
+            sessions,
+            (
+                Decimal("100"),
+                Decimal("110"),
+                Decimal("121"),
+                Decimal("133.1"),
+            ),
+            strict=True,
+        )
+    )
+    canonical_equivalents = tuple(
+        zip(
+            sessions,
+            (
+                Decimal("1E2"),
+                Decimal("110.0"),
+                Decimal("121.00"),
+                Decimal("133.100"),
+            ),
+            strict=True,
+        )
+    )
+
+    first = tilt.build_benchmark_series_binding(
+        observations,
+        sessions,
+        logical_benchmark_id="SPY",
+    )
+    reversed_input = tilt.build_benchmark_series_binding(
+        tuple(reversed(observations)),
+        sessions,
+        logical_benchmark_id="SPY",
+    )
+    equivalent = tilt.build_benchmark_series_binding(
+        canonical_equivalents,
+        sessions,
+        logical_benchmark_id="SPY",
+    )
+
+    assert first == reversed_input == equivalent
+    assert first.observation_count == 4
+    assert first.return_interval_count == 3
+    assert first.first_used_session == sessions[0]
+    assert first.last_used_session == sessions[-1]
+    assert set(first.summary_fields()) == tilt.BENCHMARK_SERIES_META_FIELDS
+
+
+def test_benchmark_raw_and_scale_invariant_path_digests_bind_distinct_domains():
+    sessions = (
+        "2021-01-05",
+        "2021-01-06",
+        "2021-01-07",
+        "2021-01-08",
+    )
+    values = (
+        Decimal("100"),
+        Decimal("110"),
+        Decimal("121"),
+        Decimal("133.1"),
+    )
+
+    def binding(bound_sessions, bound_values):
+        return tilt.build_benchmark_series_binding(
+            tuple(zip(bound_sessions, bound_values, strict=True)),
+            bound_sessions,
+            logical_benchmark_id="SPY",
+        )
+
+    original = binding(sessions, values)
+    rescaled = binding(
+        sessions, tuple(value * Decimal(3) for value in values)
+    )
+    interior_changed = binding(
+        sessions,
+        (values[0], Decimal("112"), values[2], values[3]),
+    )
+    changed_sessions = (
+        sessions[0],
+        sessions[1],
+        "2021-01-07a",
+        sessions[3],
+    )
+    session_changed = binding(changed_sessions, values)
+
+    assert original.raw_observation_sha256 != rescaled.raw_observation_sha256
+    assert original.return_path_sha256 == rescaled.return_path_sha256
+    assert (
+        original.raw_observation_sha256
+        != interior_changed.raw_observation_sha256
+    )
+    assert original.return_path_sha256 != interior_changed.return_path_sha256
+    assert original.raw_observation_sha256 != session_changed.raw_observation_sha256
+    assert original.return_path_sha256 != session_changed.return_path_sha256
+
+
+def test_benchmark_binding_refuses_missing_duplicate_or_changed_used_sessions():
+    sessions = ("2021-01-05", "2021-01-06", "2021-01-07")
+    observations = tuple(
+        (session, Decimal(index + 100))
+        for index, session in enumerate(sessions)
+    )
+
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="incomplete or changed",
+    ):
+        tilt.build_benchmark_series_binding(
+            observations[:-1], sessions, logical_benchmark_id="SPY"
+        )
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="duplicated",
+    ):
+        tilt.build_benchmark_series_binding(
+            (observations[0], observations[0], observations[2]),
+            sessions,
+            logical_benchmark_id="SPY",
+        )
+    with pytest.raises(
+        tilt.BoundedBenchmarkTiltError,
+        match="incomplete or changed",
+    ):
+        tilt.build_benchmark_series_binding(
+            (
+                observations[0],
+                ("2021-01-06a", observations[1][1]),
+                observations[2],
+            ),
+            sessions,
+            logical_benchmark_id="SPY",
+        )
+
+
+def test_v3_summary_binds_only_used_benchmark_window_and_keeps_prices_private():
+    value = _input()
+    profile_id = subject.QQQ_2021_2025_V3_PROFILE_ID
+    baseline_runtime = _complete(value, profile_id=profile_id)
+    baseline = baseline_runtime.aggregate_summary()
+    profile = subject.require_profile(profile_id)
+    end_position = value.session_axis.index(profile["evaluation_end_session"])
+    h60_session = value.session_axis[end_position + max(base.HORIZONS)]
+    changed_runtime = _complete(
+        value,
+        profile_id=profile_id,
+        price_overrides={
+            (
+                value.benchmark_security_id,
+                profile["evaluation_start_session"],
+            ): Decimal("200"),
+            (value.benchmark_security_id, h60_session): Decimal("300"),
+        },
+    )
+    changed = changed_runtime.aggregate_summary()
+    binding_fields = tilt.BENCHMARK_SERIES_META_FIELDS
+
+    assert baseline["benchmark_logical_id"] == "SPY"
+    assert baseline["benchmark_history_normalization_mode"] == "total_return"
+    assert baseline["benchmark_history_observation"] == "session_open"
+    assert baseline["benchmark_first_used_session"] == "2021-01-05"
+    assert baseline["benchmark_last_used_session"] == "2025-12-31"
+    assert baseline["benchmark_observation_count"] == 1_254
+    assert baseline["benchmark_return_interval_count"] == 1_253
+    assert {
+        field: baseline[field] for field in binding_fields
+    } == {
+        field: changed[field] for field in binding_fields
+    }
+    assert baseline["summary_sha256"] == changed["summary_sha256"]
+    assert baseline["raw_price_rows_in_summary"] is False
+    assert baseline["tilt_aggregates"]["decision_session_count"] == 261
+    for name in ("selected_aggregates", "matched_aggregates"):
+        assert baseline[name]["locked_sector_over_target_count"] == 0
+        assert baseline[name]["sector_target_underfill_count"] == 0
+    assert (
+        baseline["tilt_aggregates"]["tilt_enabled_decision_count"]
+        + baseline["tilt_aggregates"]["tilt_underfilled_decision_count"]
+        == 261
+    )
+    statistics = baseline_runtime.custom_summary_statistics()
+    assert len(statistics) == 8
+    assert tuple(statistics) == subject.expected_custom_summary_statistic_names(
+        profile_id
+    )
+    wire_meta = json.loads(statistics[subject.META_STATISTIC_NAME])
+    assert binding_fields.issubset(wire_meta)
+    assert "benchmark_first_adjusted_open" not in wire_meta
+    assert "benchmark_last_adjusted_open" not in wire_meta
 
 
 def test_decision_schedule_and_history_request_bind_each_fixed_window():
@@ -348,6 +1247,62 @@ def test_runtime_reuses_r055_state_scoring_without_overriding_it():
     )
     assert subject.PRIMARY_SOURCE_VIEW_ID == base.SOURCE_VIEW_IDS[1]
     assert subject.PRIMARY_SCORE_ARM == "firm_specific"
+
+
+def test_v3_runtime_uses_membership_sectors_and_refuses_mapping_gaps():
+    value = _input(40, sector_count=2)
+    profile_id = subject.QQQ_2021_2025_V3_PROFILE_ID
+    runtime = _runtime(value, profile_id=profile_id)
+    first = subject.decision_sessions_for_input(value, profile_id)[0]
+    position = value.session_axis.index(first)
+    axis = (subject.PRIMARY_SOURCE_VIEW_ID, subject.PRIMARY_SCORE_ARM)
+    scores = {
+        f"perm-security-{index:02d}": Decimal(
+            index - 20 if index < 20 else index - 19
+        )
+        for index in range(40)
+    }
+
+    runtime._after_score_cross_section(
+        position,
+        value.memberships,
+        {axis: scores},
+        {axis: 0},
+    )
+
+    decision = runtime._decisions[first]
+    assert decision.sector_by_security_id == {
+        item.security_id: item.sector_id for item in value.memberships
+    }
+    for sector_id in ("sector-00", "sector-01"):
+        members = tuple(
+            security_id
+            for security_id in decision.selected
+            if decision.sector_by_security_id[security_id] == sector_id
+        )
+        assert base._stable_sum(
+            decision.selected_weights[security_id]
+            for security_id in members
+        ) == base._stable_sum(
+            decision.benchmark_weights[security_id]
+            for security_id in members
+        )
+    aggregate = runtime._tilt_census.aggregates()
+    assert aggregate["tilt_enabled_decision_count"] == 1
+    assert aggregate["minimum_point_in_time_sector_count"] == 2
+    assert aggregate["maximum_absolute_sector_active_weight"] == "0"
+
+    refused = _runtime(value, profile_id=profile_id)
+    with pytest.raises(
+        subject.MarketCapStockPortfolioEvaluationError,
+        match="membership mapping is not exhaustive",
+    ):
+        refused._after_score_cross_section(
+            position,
+            value.memberships[:-1],
+            {axis: scores},
+            {axis: 0},
+        )
 
 
 def test_small_universe_selected_and_matched_books_each_reach_exact_98_percent():
@@ -493,6 +1448,9 @@ def test_stale_selected_holdings_preserve_the_fifty_name_cap():
 def test_complete_result_has_four_costs_full_exposure_and_concentration_metrics():
     runtime = _complete(_input())
     summary = runtime.aggregate_summary()
+    assert summary["summary_sha256"] == (
+        "9ff45344ba9998999ffb9812574c908d3d764cd481313015507bc1171342d9cb"
+    )
     assert summary["r055_signal_rule_changed"] is False
     assert summary["decision_session_count"] == 261
     assert summary["portfolio_return_session_count"] == 1_254
@@ -560,6 +1518,25 @@ def test_complete_result_has_four_costs_full_exposure_and_concentration_metrics(
     ]
     assert wire_summary == summary
     assert all(cell["leverage"] is False for cell in summary["portfolio_cells"])
+
+
+def test_v2_fixture_result_and_seven_statistic_shape_are_unchanged():
+    runtime = _complete(
+        _input(), profile_id=subject.QQQ_2021_2025_V2_PROFILE_ID
+    )
+
+    summary = runtime.aggregate_summary()
+    statistics = runtime.custom_summary_statistics()
+
+    assert summary["summary_sha256"] == (
+        "c733a50c482d35b65df319291e48920fd5ce68dff72096a87d802a5b307905cf"
+    )
+    assert tuple(statistics) == subject.expected_custom_summary_statistic_names(
+        subject.QQQ_2021_2025_V2_PROFILE_ID
+    )
+    assert len(statistics) == 7
+    assert "tilt_aggregates" not in summary
+    assert not tilt.BENCHMARK_SERIES_META_FIELDS.intersection(summary)
 
 
 def test_first_decision_executes_at_next_open_not_same_open():

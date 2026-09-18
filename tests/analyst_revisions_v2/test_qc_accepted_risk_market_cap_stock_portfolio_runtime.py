@@ -173,6 +173,80 @@ def test_runtime_is_standalone_compact_and_uses_only_fresh_dependencies():
     compile("QC_PRELUDE_SENTINEL = True\n" + text, RUNTIME_PATH.name, "exec")
 
 
+def test_runtime_active_and_historical_statistic_inventories_are_exact():
+    assert runtime.PROFILE_IDS == evaluator.PROFILE_IDS
+    for profile_id in evaluator.PROFILE_IDS:
+        names = runtime.expected_custom_summary_statistic_names(profile_id)
+        assert len(names) == 9
+        assert evaluator.TILT_AGGREGATES_STATISTIC_NAME in names
+    for profile_id in evaluator.V1_PROFILE_IDS + evaluator.V2_PROFILE_IDS:
+        names = runtime.expected_custom_summary_statistic_names(profile_id)
+        assert len(names) == 8
+        assert evaluator.TILT_AGGREGATES_STATISTIC_NAME not in names
+
+
+def test_total_return_loader_matches_legacy_on_one_synthetic_fixture():
+    """The copied current loader stays value-equivalent without legacy QC source."""
+
+    row = preliminary_fixtures._binding()
+    stock = preliminary_fixtures._Symbol("QC STOCK SID", "NOW")
+    benchmark = preliminary_fixtures._Symbol("QC BENCHMARK SID", "SPY")
+    resolution = preliminary_fixtures._resolved([row], [stock], benchmark)
+    stock_bar = SimpleNamespace(
+        symbol=stock,
+        time=datetime(2021, 1, 4),
+        open="100.25",
+    )
+    benchmark_bar = SimpleNamespace(
+        symbol=benchmark,
+        time=datetime(2021, 1, 4),
+        open="300.5",
+    )
+    history = preliminary_fixtures._GenericHistory(
+        [
+            preliminary_fixtures._TradeBars(
+                datetime(2021, 1, 4, 16),
+                ((stock, stock_bar), (benchmark, benchmark_bar)),
+            )
+        ]
+    )
+    algorithm = SimpleNamespace(history=history)
+    kwargs = {
+        "resolution": resolution,
+        "benchmark_symbol": benchmark,
+        "trade_bar_type": "TradeBar",
+        "daily_resolution": "Daily",
+        "total_return_normalization": "TotalReturn",
+        "permitted_security_ids": (
+            runtime.BENCHMARK_SECURITY_ID,
+            row["security_id"],
+        ),
+        "permitted_sessions": ("2021-01-04", "2021-01-05"),
+    }
+    legacy = preliminary_fixtures.runtime.QcTotalReturnOpenHistoryLoader(
+        algorithm,
+        **kwargs,
+    )
+    current = runtime.QcTotalReturnOpenHistoryLoader(algorithm, **kwargs)
+    request = preliminary_fixtures._request(
+        (runtime.BENCHMARK_SECURITY_ID, row["security_id"])
+    )
+
+    legacy_rows = legacy(request)
+    current_rows = current(request)
+    normalized = lambda rows: tuple(
+        (
+            item.schema,
+            item.security_id,
+            item.session,
+            str(item.adjusted_open),
+        )
+        for item in rows
+    )
+    assert normalized(current_rows) == normalized(legacy_rows)
+    assert len(history.calls) == 2
+
+
 def test_incremental_pit_loader_selects_latest_preopen_cap_and_discloses_uncovered():
     fundamentals, constituents = _valid_rows()
     loader, algorithm, rows, _symbols = _loader(

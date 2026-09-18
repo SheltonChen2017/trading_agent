@@ -194,7 +194,41 @@ def _offline_action(function, *, result=False):
     return _replace_closure(function, **replacements)
 
 
-def _build_plan(monkeypatch, tmp_path, evaluation_profile_id=None):
+def _legacy_market_cap_projection_inventory(value):
+    source_files = tuple(
+        item
+        for item in value.source_files
+        if item.project_path
+        != "accepted_risk_market_cap_stock_portfolio_tilt.py"
+    )
+    provisional = dataclasses.replace(
+        value,
+        projection_id="",
+        projection_sha256="",
+        source_files=source_files,
+        total_source_byte_count=sum(item.byte_count for item in source_files),
+    )
+    semantic = provisional.to_record()
+    semantic["projection_id"] = None
+    semantic["projection_sha256"] = None
+    digest = hashlib.sha256(_canonical(semantic)).hexdigest()
+    return projection_builder.require_accepted_risk_preliminary_qc_projection(
+        dataclasses.replace(
+            provisional,
+            projection_id="arv2-preliminary-qc-projection-" + digest[:24],
+            projection_sha256=digest,
+        )
+    )
+
+
+def _build_plan(
+    monkeypatch,
+    tmp_path,
+    evaluation_profile_id=None,
+    *,
+    legacy_market_cap_inventory=False,
+    allow_superseded_projection_for_execution_test=False,
+):
     root = (tmp_path / (evaluation_profile_id or "legacy-r055")).resolve()
     root.mkdir()
     root.chmod(0o700)
@@ -227,10 +261,29 @@ def _build_plan(monkeypatch, tmp_path, evaluation_profile_id=None):
         source_disposition_sha256="d" * 64,
         contribution_census={"accepted": 1},
     )
-    projection = projection_builder.build_accepted_risk_preliminary_qc_projection(
-        package,
-        evaluation_profile_id=evaluation_profile_id,
-    )
+    superseded = projection_builder.SUPERSEDED_UNSPENT_PROFILE_IDS
+    if allow_superseded_projection_for_execution_test:
+        monkeypatch.setattr(
+            projection_builder,
+            "SUPERSEDED_UNSPENT_PROFILE_IDS",
+            (),
+        )
+    try:
+        projection = (
+            projection_builder.build_accepted_risk_preliminary_qc_projection(
+                package,
+                evaluation_profile_id=evaluation_profile_id,
+            )
+        )
+    finally:
+        if allow_superseded_projection_for_execution_test:
+            monkeypatch.setattr(
+                projection_builder,
+                "SUPERSEDED_UNSPENT_PROFILE_IDS",
+                superseded,
+            )
+    if legacy_market_cap_inventory:
+        projection = _legacy_market_cap_projection_inventory(projection)
     return adapter.build_accepted_risk_preliminary_submission_plan(
         package=package,
         projection=projection,
@@ -283,6 +336,21 @@ def market_cap_plan_2021(monkeypatch, tmp_path):
         monkeypatch,
         tmp_path,
         market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
+    )
+
+
+@pytest.fixture(
+    params=(
+        market_cap_evaluator.QQQ_2021_2025_V2_PROFILE_ID,
+        market_cap_evaluator.SPY_2021_2025_V2_PROFILE_ID,
+    )
+)
+def spent_market_cap_plan(request, monkeypatch, tmp_path):
+    return _build_plan(
+        monkeypatch,
+        tmp_path,
+        request.param,
+        legacy_market_cap_inventory=True,
     )
 
 
@@ -732,6 +800,7 @@ def _stock_portfolio_aggregate_statistics(
 
 def _market_cap_aggregate_statistics(plan):
     profile_id = plan.projection.evaluation_profile_id
+    tilt_profile = profile_id in market_cap_evaluator.PROFILE_IDS
     profile = market_cap_evaluator.require_market_cap_stock_portfolio_profile(
         profile_id
     )
@@ -795,6 +864,11 @@ def _market_cap_aggregate_statistics(plan):
         "eligibility_exit_liquidation_count": 0,
         "eligibility_exit_zero_recovery_count": 0,
     }
+    if tilt_profile:
+        account.update(
+            locked_sector_over_target_count=0,
+            sector_target_underfill_count=0,
+        )
     matched_account = dict(account)
     matched_account["average_daily_two_sided_turnover"] = "0.002"
     statistics = {}
@@ -888,6 +962,45 @@ def _market_cap_aggregate_statistics(plan):
         "trading": False,
         "portfolio_cells": cells,
     }
+    if tilt_profile:
+        summary.update(
+            {
+                "analyst_revisions_role": (
+                    "bounded_helper_overlay_not_an_admission_gate"
+                ),
+                "benchmark_logical_id": "SPY",
+                "benchmark_history_normalization_mode": "total_return",
+                "benchmark_history_observation": "session_open",
+                "benchmark_first_used_session": "2021-01-05",
+                "benchmark_last_used_session": "2025-12-31",
+                "benchmark_observation_count": 1_254,
+                "benchmark_return_interval_count": 1_253,
+                "benchmark_raw_observation_sha256": "1" * 64,
+                "benchmark_return_path_sha256": "2" * 64,
+                "tilt_aggregates": {
+                    "schema": market_cap_evaluator.TILT_AGGREGATES_SCHEMA,
+                    "decision_session_count": decisions,
+                    "tilt_enabled_decision_count": 0,
+                    "tilt_underfilled_decision_count": decisions,
+                    "minimum_ranked_nonzero_score_count": 1,
+                    "minimum_positive_score_count": 1,
+                    "minimum_negative_score_count": 0,
+                    "minimum_tilted_name_count_when_enabled": 0,
+                    "minimum_point_in_time_sector_count": 1,
+                    "maximum_one_way_active_share": "0",
+                    "maximum_overweight": "0",
+                    "maximum_hhi_ratio_to_benchmark": "0",
+                    "minimum_weight_ratio_to_benchmark_when_enabled": "0",
+                    "maximum_weight_ratio_to_benchmark_when_enabled": "0",
+                    "maximum_absolute_sector_active_weight": "0",
+                    "underfilled_exact_benchmark": True,
+                    "missing_or_zero_score_exact_benchmark": True,
+                    "sector_mapping_exhaustive": True,
+                    "sector_neutrality_exact": True,
+                    "sector_neutrality_scope": "frozen_target",
+                },
+            }
+        )
     digest = hashlib.sha256(_canonical(summary)).hexdigest()
     metadata = {
         **{
@@ -906,6 +1019,10 @@ def _market_cap_aggregate_statistics(plan):
     statistics[
         market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
     ] = _canonical(metadata.pop("matched_aggregates")).decode("ascii")
+    if tilt_profile:
+        statistics[
+            market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME
+        ] = _canonical(metadata.pop("tilt_aggregates")).decode("ascii")
     statistics["ARV2_STOCK_PORTFOLIO_META"] = _canonical(metadata).decode(
         "ascii"
     )
@@ -945,6 +1062,7 @@ def _market_cap_aggregate_statistics(plan):
     }
     statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
     assert tuple(sorted(statistics)) == plan.expected_custom_statistic_names
+    assert all(0 < len(value) <= 4_096 for value in statistics.values())
     return statistics
 
 
@@ -1274,6 +1392,10 @@ def _rehash_market_cap_summary(statistics):
             market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME
         ]
     )
+    if metadata["profile_id"] in market_cap_evaluator.PROFILE_IDS:
+        summary["tilt_aggregates"] = json.loads(
+            statistics[market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME]
+        )
     summary["portfolio_cells"] = [
         json.loads(statistics["ARV2_STOCK_PORTFOLIO_COST_" + str(cost)])
         for cost in market_cap_evaluator.COST_BPS_SCENARIOS
@@ -1416,6 +1538,12 @@ _MARKET_CAP_ACCOUNTING = {
     market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID: (
         "R-112", 86, 87, 29, 30, 611, 615
     ),
+    market_cap_evaluator.QQQ_2021_2025_V3_PROFILE_ID: (
+        "R-115", 83, 84, 26, 27, 599, 603
+    ),
+    market_cap_evaluator.SPY_2021_2025_V3_PROFILE_ID: (
+        "R-116", 84, 85, 27, 28, 603, 607
+    ),
 }
 
 _LEVERAGE_ACCOUNTING = {
@@ -1455,6 +1583,17 @@ def test_each_market_cap_profile_has_exact_run_spec_and_result_inventory(
     assert market_cap_plan.evaluation_profile_sha256 == profile[
         "profile_sha256"
     ]
+    assert profile["sector_neutral_execution_rule"] == (
+        "execute_each_tradable_name_at_its_exact_frozen_target_preserve_"
+        "each_locked_weight_never_redistribute_missing_or_locked_budget_"
+        "and_count_sector_target_underfill_for_missing_or_below_frozen_"
+        "locks_or_sector_gross_under_and_locked_sector_over_target_for_"
+        "above_frozen_locks_or_sector_gross_over"
+    )
+    assert profile["portfolio_weight_quantum"] == format(
+        market_cap_evaluator.PORTFOLIO_WEIGHT_QUANTUM,
+        "f",
+    )
     assert market_cap_plan.expected_custom_statistic_names == (
         "ARV2_RUNTIME_META",
         "ARV2_STOCK_PORTFOLIO_COST_0",
@@ -1464,6 +1603,7 @@ def test_each_market_cap_profile_has_exact_run_spec_and_result_inventory(
         "ARV2_STOCK_PORTFOLIO_MATCHED_AGGREGATES",
         "ARV2_STOCK_PORTFOLIO_META",
         "ARV2_STOCK_PORTFOLIO_SELECTED_AGGREGATES",
+        "ARV2_STOCK_PORTFOLIO_TILT_AGGREGATES",
     )
     assert tuple(item.project_path for item in market_cap_plan.source_files) == (
         tuple(
@@ -1480,6 +1620,279 @@ def test_each_market_cap_profile_accepts_exact_bounded_aggregate(
 ):
     statistics = _market_cap_aggregate_statistics(market_cap_plan)
     _validate_statistics(market_cap_plan, statistics)
+
+
+def test_r107_r108_historical_market_cap_result_read_path_remains_exact(
+    spent_market_cap_plan,
+):
+    assert all(
+        item.project_path
+        != "accepted_risk_market_cap_stock_portfolio_tilt.py"
+        for item in spent_market_cap_plan.source_files
+    )
+    assert adapter.require_accepted_risk_preliminary_submission_plan(
+        spent_market_cap_plan
+    ) is spent_market_cap_plan
+    assert len(spent_market_cap_plan.expected_custom_statistic_names) == 8
+    assert (
+        market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME
+        not in spent_market_cap_plan.expected_custom_statistic_names
+    )
+    historical = _market_cap_aggregate_statistics(spent_market_cap_plan)
+    for statistic_name in (
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME,
+        market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME,
+    ):
+        account = json.loads(historical[statistic_name])
+        assert "locked_sector_over_target_count" not in account
+        assert "sector_target_underfill_count" not in account
+    _validate_statistics(
+        spent_market_cap_plan,
+        historical,
+    )
+
+
+def test_market_cap_tilt_statistic_is_required(market_cap_plan):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    statistics.pop(market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate result inventory changed",
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+def test_market_cap_tilt_fields_are_exact(market_cap_plan):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    tilt = json.loads(
+        statistics[market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME]
+    )
+    tilt["unexpected"] = 0
+    statistics[
+        market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME
+    ] = _canonical(tilt).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="tilt aggregate fields changed",
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+def test_market_cap_rehashed_tilt_count_tampering_is_refused(
+    market_cap_plan,
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    name = market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME
+    tilt = json.loads(statistics[name])
+    tilt["tilt_underfilled_decision_count"] -= 1
+    statistics[name] = _canonical(tilt).decode("ascii")
+    _rehash_market_cap_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="tilt aggregate count semantics changed",
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        (
+            "sector_neutrality_exact",
+            False,
+            "tilt aggregate count semantics changed",
+        ),
+        (
+            "sector_mapping_exhaustive",
+            False,
+            "tilt aggregate count semantics changed",
+        ),
+        (
+            "sector_neutrality_scope",
+            "executed_portfolio",
+            "tilt aggregate count semantics changed",
+        ),
+        (
+            "maximum_absolute_sector_active_weight",
+            "0.0001",
+            "tilt fallback metrics changed",
+        ),
+    ),
+)
+def test_market_cap_rehashed_sector_neutrality_tampering_is_refused(
+    market_cap_plan, field, value, message
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    name = market_cap_evaluator.TILT_AGGREGATES_STATISTIC_NAME
+    tilt = json.loads(statistics[name])
+    tilt[field] = value
+    statistics[name] = _canonical(tilt).decode("ascii")
+    _rehash_market_cap_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+def test_market_cap_enabled_tilt_cap_tampering_is_refused_in_isolation():
+    value = {
+        "schema": market_cap_evaluator.TILT_AGGREGATES_SCHEMA,
+        "decision_session_count": 1,
+        "tilt_enabled_decision_count": 1,
+        "tilt_underfilled_decision_count": 0,
+        "minimum_ranked_nonzero_score_count": 40,
+        "minimum_positive_score_count": 20,
+        "minimum_negative_score_count": 20,
+        "minimum_tilted_name_count_when_enabled": 40,
+        "minimum_point_in_time_sector_count": 2,
+        "maximum_one_way_active_share": "0.0491",
+        "maximum_overweight": "0.0049",
+        "maximum_hhi_ratio_to_benchmark": "1.1",
+        "minimum_weight_ratio_to_benchmark_when_enabled": "0.8",
+        "maximum_weight_ratio_to_benchmark_when_enabled": "1.2",
+        "maximum_absolute_sector_active_weight": "0",
+        "underfilled_exact_benchmark": True,
+        "missing_or_zero_score_exact_benchmark": True,
+        "sector_mapping_exhaustive": True,
+        "sector_neutrality_exact": True,
+        "sector_neutrality_scope": "frozen_target",
+    }
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="tilt aggregate metric escaped bounds",
+    ):
+        adapter._validate_market_cap_tilt_aggregate(
+            value,
+            decision_count=1,
+            runtime_security_count=40,
+        )
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    (
+        (
+            "benchmark_raw_observation_sha256",
+            "not-a-digest",
+            "is not an exact SHA-256",
+        ),
+        (
+            "benchmark_observation_count",
+            1_253,
+            "aggregate metadata semantics changed",
+        ),
+        (
+            "benchmark_first_used_session",
+            "2021-01-04",
+            "aggregate metadata semantics changed",
+        ),
+        (
+            "benchmark_last_used_session",
+            "2025-12-30",
+            "aggregate metadata semantics changed",
+        ),
+    ),
+)
+def test_market_cap_benchmark_lineage_guards_are_isolated(
+    market_cap_plan, field, value, message
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    metadata = json.loads(statistics[market_cap_evaluator.META_STATISTIC_NAME])
+    metadata[field] = value
+    statistics[market_cap_evaluator.META_STATISTIC_NAME] = _canonical(
+        metadata
+    ).decode("ascii")
+    _rehash_market_cap_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+def test_market_cap_benchmark_digest_is_bound_by_summary_identity(
+    market_cap_plan,
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    metadata = json.loads(statistics[market_cap_evaluator.META_STATISTIC_NAME])
+    metadata["benchmark_return_path_sha256"] = "3" * 64
+    statistics[market_cap_evaluator.META_STATISTIC_NAME] = _canonical(
+        metadata
+    ).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="summary identity changed",
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+def test_market_cap_benchmark_lineage_field_is_required(market_cap_plan):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    metadata = json.loads(statistics[market_cap_evaluator.META_STATISTIC_NAME])
+    del metadata["benchmark_raw_observation_sha256"]
+    statistics[market_cap_evaluator.META_STATISTIC_NAME] = _canonical(
+        metadata
+    ).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="aggregate metadata changed",
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+def test_market_cap_v3_selected_breadth_is_not_capped_at_fifty():
+    value = {
+        "rebalance_execution_count": 1,
+        "full_target_execution_count": 1,
+        "underfilled_target_execution_count": 0,
+        "locked_exposure_over_target_count": 0,
+        "mean_executed_gross_exposure": "0.98",
+        "minimum_executed_gross_exposure": "0.98",
+        "maximum_executed_gross_exposure": "0.98",
+        "mean_maximum_position_weight": "0.02",
+        "maximum_position_weight": "0.02",
+        "mean_invested_weight_hhi": "0.02",
+        "mean_effective_holding_count": "51",
+        "average_holding_count": "51",
+        "average_daily_two_sided_turnover": "0.001",
+        "average_cash_weight": "0.02",
+        "entry_price_refusal_count": 0,
+        "stale_mark_session_count": 0,
+        "partial_rebalance_decision_count": 0,
+        "stale_position_deferral_count": 0,
+        "selection_exit_deferral_count": 0,
+        "eligibility_exit_liquidation_count": 0,
+        "eligibility_exit_zero_recovery_count": 0,
+    }
+    adapter._validate_market_cap_account_aggregate(
+        value,
+        role="selected",
+        decision_count=1,
+        return_count=1,
+        runtime_security_count=60,
+        selected_full_universe=True,
+    )
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="account metric escaped bounds",
+    ):
+        adapter._validate_market_cap_account_aggregate(
+            value,
+            role="selected",
+            decision_count=1,
+            return_count=1,
+            runtime_security_count=60,
+            selected_full_universe=False,
+        )
 
 
 @pytest.mark.parametrize(
@@ -1515,6 +1928,72 @@ def test_market_cap_split_account_fields_are_exact(market_cap_plan_2021):
         match="account aggregate fields changed",
     ):
         _validate_statistics(market_cap_plan_2021, statistics)
+
+
+@pytest.mark.parametrize(
+    "statistic_name",
+    (
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME,
+        market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME,
+    ),
+)
+def test_market_cap_v3_sector_execution_counters_are_required(
+    market_cap_plan, statistic_name
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    account = json.loads(statistics[statistic_name])
+    del account["sector_target_underfill_count"]
+    statistics[statistic_name] = _canonical(account).decode("ascii")
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="account aggregate fields changed",
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    "field",
+    ("locked_sector_over_target_count", "sector_target_underfill_count"),
+)
+def test_market_cap_v3_sector_execution_counter_bounds_are_enforced(
+    market_cap_plan, field
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    name = market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME
+    account = json.loads(statistics[name])
+    account[field] = (
+        market_cap_evaluator.require_market_cap_stock_portfolio_profile(
+            market_cap_plan.evaluation_profile_id
+        )["expected_decision_session_count"]
+        * market_cap_plan.package.runtime_symbol_binding_count
+        + 1
+    )
+    statistics[name] = _canonical(account).decode("ascii")
+    _rehash_market_cap_summary(statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="account count semantics changed",
+    ):
+        _validate_statistics(market_cap_plan, statistics)
+
+
+def test_market_cap_v3_sector_under_and_over_counts_may_cooccur(
+    market_cap_plan,
+):
+    statistics = _market_cap_aggregate_statistics(market_cap_plan)
+    for name in (
+        market_cap_evaluator.SELECTED_AGGREGATES_STATISTIC_NAME,
+        market_cap_evaluator.MATCHED_AGGREGATES_STATISTIC_NAME,
+    ):
+        account = json.loads(statistics[name])
+        account["locked_sector_over_target_count"] = 1
+        account["sector_target_underfill_count"] = 1
+        statistics[name] = _canonical(account).decode("ascii")
+    _rehash_market_cap_summary(statistics)
+
+    _validate_statistics(market_cap_plan, statistics)
 
 
 def test_market_cap_unrehashened_split_account_mutation_refuses_identity(
@@ -1673,6 +2152,7 @@ def test_market_cap_cell_arithmetic_and_path_guards_are_isolated(
         ("MINIMUM_INVESTED_RETURN_SESSIONS", 0),
         ("COST_BPS_SCENARIOS", (10,)),
         ("TARGET_GROSS_EXPOSURE", Decimal("1")),
+        ("PORTFOLIO_WEIGHT_QUANTUM", Decimal("1e-30")),
         ("META_STATISTIC_NAME", "ARV2_MUTATED_META"),
         (
             "SELECTED_AGGREGATES_STATISTIC_NAME",
@@ -1703,256 +2183,36 @@ def test_market_cap_contract_mutation_refuses_before_network(
     assert not any(market_cap_plan_2021.control_directory.iterdir())
 
 
-def test_each_leverage_profile_has_exact_run_spec_and_result_inventory(
-    leverage_plan,
+@pytest.mark.parametrize("profile_id", leverage_evaluator.PROFILE_IDS)
+def test_superseded_leverage_profiles_remain_loadable_with_frozen_identity(
+    profile_id,
 ):
-    profile_id = leverage_plan.evaluation_profile_id
-    expected = _LEVERAGE_ACCOUNTING[profile_id]
-    spec = adapter._run_spec(profile_id)
-    reservation = adapter._look_accounting(evaluation_profile_id=profile_id)
-    result = adapter._look_accounting(
-        stage="result", evaluation_profile_id=profile_id
-    )
     profile = leverage_evaluator.require_profile(profile_id)
+    spec = adapter._run_spec(profile_id)
 
-    assert spec.ledger_entry_id == expected[0]
-    assert spec.cell_count == 4
-    assert reservation["run_level_looks_before"] == expected[1]
-    assert reservation["planned_run_level_looks_after_launch"] == expected[2]
-    assert reservation["arv2_development_evaluations_before"] == expected[3]
-    assert reservation[
-        "planned_arv2_development_evaluations_after_launch"
-    ] == expected[4]
-    assert reservation["lifetime_alpha_cell_floor_before"] == expected[5]
-    assert result["lifetime_alpha_cell_floor_after"] == expected[6]
-    assert leverage_plan.evaluation_profile_sha256 == profile["profile_sha256"]
-    assert leverage_plan.expected_custom_statistic_names == (
-        "ARV2_LEVERAGE_L2_ADVERSE",
-        "ARV2_LEVERAGE_L2_PRIMARY",
-        "ARV2_LEVERAGE_L3_ADVERSE",
-        "ARV2_LEVERAGE_L3_PRIMARY",
-        "ARV2_LEVERAGE_MATCHED_BASE_AGGREGATES",
-        "ARV2_LEVERAGE_META",
-        "ARV2_LEVERAGE_SELECTED_BASE_AGGREGATES",
-        "ARV2_RUNTIME_META",
+    assert profile["profile_id"] == profile_id
+    assert profile["profile_sha256"] == (
+        projection_builder.OBJECTIVE_LEVERAGE_PROFILE_SHA256S[profile_id]
     )
-    assert tuple(item.project_path for item in leverage_plan.source_files) == (
-        tuple(
-            sorted(
-                projection_builder.OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS
-                + ("main.py",)
+    assert profile["base_evaluator_source_sha256"] == (
+        leverage_evaluator.BASE_EVALUATOR_SOURCE_SHA256
+    )
+    assert spec.ledger_entry_id in {"R-113", "R-114"}
+    assert leverage_evaluator.expected_custom_summary_statistic_names(
+        profile_id
+    ) == tuple(
+        sorted(
+            (
+                "ARV2_LEVERAGE_L2_ADVERSE",
+                "ARV2_LEVERAGE_L2_PRIMARY",
+                "ARV2_LEVERAGE_L3_ADVERSE",
+                "ARV2_LEVERAGE_L3_PRIMARY",
+                "ARV2_LEVERAGE_MATCHED_BASE_AGGREGATES",
+                "ARV2_LEVERAGE_META",
+                "ARV2_LEVERAGE_SELECTED_BASE_AGGREGATES",
             )
         )
     )
-
-
-def test_each_leverage_profile_accepts_exact_bounded_aggregate(leverage_plan):
-    _validate_statistics(
-        leverage_plan,
-        _leverage_aggregate_statistics(leverage_plan),
-    )
-
-
-@pytest.mark.parametrize(
-    "statistic_name",
-    (
-        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME,
-        leverage_evaluator.MATCHED_BASE_AGGREGATES_STATISTIC_NAME,
-    ),
-)
-def test_leverage_split_account_statistic_is_required(
-    leverage_plan_qqq, statistic_name
-):
-    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
-    statistics.pop(statistic_name)
-    with pytest.raises(
-        adapter.AcceptedRiskPreliminarySubmissionError,
-        match="aggregate result inventory changed",
-    ):
-        _validate_statistics(leverage_plan_qqq, statistics)
-
-
-def test_leverage_split_account_fields_are_exact(leverage_plan_qqq):
-    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
-    selected = json.loads(
-        statistics[
-            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
-        ]
-    )
-    selected["unexpected"] = 0
-    statistics[
-        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
-    ] = _canonical(selected).decode("ascii")
-    with pytest.raises(
-        adapter.AcceptedRiskPreliminarySubmissionError,
-        match="account aggregate fields changed",
-    ):
-        _validate_statistics(leverage_plan_qqq, statistics)
-
-
-def test_leverage_unrehashened_split_account_mutation_refuses_identity(
-    leverage_plan_qqq,
-):
-    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
-    selected = json.loads(
-        statistics[
-            leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
-        ]
-    )
-    selected["maximum_position_weight"] = "0.99"
-    statistics[
-        leverage_evaluator.SELECTED_BASE_AGGREGATES_STATISTIC_NAME
-    ] = _canonical(selected).decode("ascii")
-    with pytest.raises(
-        adapter.AcceptedRiskPreliminarySubmissionError,
-        match="summary identity changed",
-    ):
-        _validate_statistics(leverage_plan_qqq, statistics)
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    (
-        ("leverage_factors", [2]),
-        ("scenario_ids", [leverage_evaluator.PRIMARY_SCENARIO_ID]),
-        ("base_market_cap_profile_sha256", "f" * 64),
-        ("synthetic_leverage", False),
-    ),
-)
-def test_leverage_runtime_metadata_guards_are_isolated(
-    leverage_plan_qqq, field, value
-):
-    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
-    runtime_meta = json.loads(statistics["ARV2_RUNTIME_META"])
-    runtime_meta[field] = value
-    statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
-    with pytest.raises(
-        adapter.AcceptedRiskPreliminarySubmissionError,
-        match="objective leverage runtime metadata changed",
-    ):
-        _validate_statistics(leverage_plan_qqq, statistics)
-
-
-@pytest.mark.parametrize(
-    ("field", "value"),
-    (
-        ("base_evaluator_source_sha256", "f" * 64),
-        ("base_security_selection_changed", True),
-        ("matched_comparator_levered_identically", False),
-        ("evaluator_io", {"provider": True}),
-    ),
-)
-def test_leverage_summary_lineage_and_disclosures_are_isolated(
-    leverage_plan_qqq, field, value
-):
-    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
-    metadata = json.loads(statistics["ARV2_LEVERAGE_META"])
-    metadata[field] = value
-    statistics["ARV2_LEVERAGE_META"] = _canonical(metadata).decode("ascii")
-    _rehash_leverage_summary(statistics)
-    with pytest.raises(
-        adapter.AcceptedRiskPreliminarySubmissionError,
-        match="objective leverage aggregate semantics changed",
-    ):
-        _validate_statistics(leverage_plan_qqq, statistics)
-
-
-@pytest.mark.parametrize(
-    ("mutation", "message"),
-    (
-        ("debit", "path arithmetic changed"),
-        ("drag", "path arithmetic changed"),
-        ("sortino", "path arithmetic changed"),
-        ("drawdown", "path arithmetic changed"),
-        ("difference", "relative return changed"),
-        ("double_cost", "cell semantics changed"),
-        ("daily_reset", "cell semantics changed"),
-        ("financing_count", "path census invariance changed"),
-        ("scenario_monotonicity", "scenario monotonicity changed"),
-        ("spy_underlying_path", "underlying path changed"),
-    ),
-)
-def test_leverage_cell_guards_are_isolated(
-    leverage_plan_qqq, mutation, message
-):
-    statistics = _leverage_aggregate_statistics(leverage_plan_qqq)
-    name = "ARV2_LEVERAGE_L2_ADVERSE"
-    cell = json.loads(statistics[name])
-    if mutation == "debit":
-        cell["matched_arithmetic_financing_debit"] = "0"
-    elif mutation == "drag":
-        cell["selected_cumulative_financing_drag"] = "0"
-    elif mutation == "sortino":
-        cell["selected_zero_rate_sortino"] = "-1"
-    elif mutation == "drawdown":
-        cell["selected_maximum_drawdown"] = "-1.1"
-    elif mutation == "difference":
-        cell["selected_minus_matched_cumulative_return"] = "0"
-    elif mutation == "double_cost":
-        cell["second_transaction_cost_deduction"] = True
-    elif mutation == "daily_reset":
-        cell["portfolio_level_daily_reset"] = False
-    elif mutation == "financing_count":
-        count = cell["selected_financing_session_count"] - 1
-        rate = Decimal(cell["annual_financing_rate"])
-        with evaluator.localcontext(evaluator._context()):
-            debit = +(rate / Decimal(252) * Decimal(count))
-        cell["selected_financing_session_count"] = count
-        cell["selected_arithmetic_financing_debit"] = evaluator._decimal_text(
-            debit
-        )
-    elif mutation == "scenario_monotonicity":
-        cell["selected_cumulative_return"] = "0.31"
-        cell["selected_cumulative_return_before_financing"] = "0.31"
-        cell["selected_cumulative_financing_drag"] = "0"
-        cell["selected_minus_matched_cumulative_return"] = "0.19"
-        cell["selected_minus_synthetic_spy_cumulative_return"] = "-0.03"
-    else:
-        cell["synthetic_spy_cumulative_return_before_financing"] = "0.43"
-        cell["synthetic_spy_cumulative_financing_drag"] = "0.09"
-    statistics[name] = _canonical(cell).decode("ascii")
-    _rehash_leverage_summary(statistics)
-    with pytest.raises(
-        adapter.AcceptedRiskPreliminarySubmissionError,
-        match=message,
-    ):
-        _validate_statistics(leverage_plan_qqq, statistics)
-
-
-@pytest.mark.parametrize(
-    ("name", "value"),
-    (
-        ("LEVERAGE_FACTORS", (2,)),
-        ("SCENARIOS", (leverage_evaluator.SCENARIOS[0],)),
-        ("BASE_EVALUATOR_SOURCE_SHA256", "f" * 64),
-        ("META_STATISTIC_NAME", "ARV2_MUTATED_META"),
-        (
-            "SELECTED_BASE_AGGREGATES_STATISTIC_NAME",
-            "ARV2_MUTATED_SELECTED",
-        ),
-        (
-            "MATCHED_BASE_AGGREGATES_STATISTIC_NAME",
-            "ARV2_MUTATED_MATCHED",
-        ),
-    ),
-)
-def test_leverage_contract_mutation_refuses_before_network(
-    leverage_plan_qqq, monkeypatch, name, value
-):
-    backend = _Backend(leverage_plan_qqq)
-    monkeypatch.setattr(leverage_evaluator, name, value)
-    with pytest.raises(
-        adapter.AcceptedRiskPreliminarySubmissionError,
-        match="objective leverage financial contract changed",
-    ):
-        adapter.execute_accepted_risk_preliminary_submission_once(
-            plan=leverage_plan_qqq,
-            owner_signature=None,
-            client=_client(backend),
-            started_at_utc="2026-09-17T20:00:00Z",
-        )
-    assert backend.events == []
-    assert not any(leverage_plan_qqq.control_directory.iterdir())
 
 
 def test_regime_profile_allowlist_refuses_unknown_profile():
@@ -3395,7 +3655,7 @@ class _Backend:
             self.statistics = _aggregate_statistics(plan)
         elif profile_id in leverage_evaluator.PROFILE_IDS:
             self.statistics = _leverage_aggregate_statistics(plan)
-        elif profile_id in market_cap_evaluator.PROFILE_IDS:
+        elif profile_id in market_cap_evaluator.ALL_PROFILE_IDS:
             self.statistics = _market_cap_aggregate_statistics(plan)
         elif profile_id in stock_portfolio_evaluator.PROFILE_IDS:
             self.statistics = _stock_portfolio_aggregate_statistics(plan)
@@ -3680,41 +3940,64 @@ def test_market_cap_offline_launch_and_result_read_are_exact(
     ) is result
 
 
-def test_leverage_offline_launch_and_result_read_are_exact(
-    leverage_plan_qqq,
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        market_cap_evaluator.QQQ_2019_2023_V2_PROFILE_ID,
+        market_cap_evaluator.SPY_2019_2023_V2_PROFILE_ID,
+        market_cap_evaluator.QQQ_2023_2025_V2_PROFILE_ID,
+        market_cap_evaluator.SPY_2023_2025_V2_PROFILE_ID,
+        leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
+        leverage_evaluator.SPY_2021_2025_V3_PROFILE_ID,
+    ),
+)
+def test_each_r109_through_r114_fresh_execution_is_explicitly_superseded(
+    profile_id,
 ):
-    signature = _offline_signature()
-    backend = _Backend(leverage_plan_qqq)
-    permit, launch = _execute(leverage_plan_qqq, backend, signature)
-    terminal = _complete(
-        leverage_plan_qqq, backend, signature, permit, launch
-    )
-    result_permit, result = _read(
-        leverage_plan_qqq,
-        backend,
-        signature,
-        permit,
-        launch,
-        terminal,
+    superseded_plan = SimpleNamespace(
+        projection=SimpleNamespace(evaluation_profile_id=profile_id)
     )
 
-    assert terminal.terminal_status == "Completed."
-    assert backend.events.count("backtests/create") == 1
-    assert backend.events.count("backtests/read") == 1
-    assert tuple(name for name, _value in result.custom_statistics) == (
-        leverage_plan_qqq.expected_custom_statistic_names
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="profile is superseded and cannot launch",
+    ):
+        adapter._require_fresh_launch_profile(superseded_plan)
+
+
+@pytest.mark.parametrize(
+    "profile_id",
+    projection_builder.SUPERSEDED_UNSPENT_PROFILE_IDS,
+)
+def test_each_r109_through_r114_public_execution_refuses_before_network(
+    profile_id,
+    monkeypatch,
+    tmp_path,
+):
+    superseded_plan = _build_plan(
+        monkeypatch,
+        tmp_path,
+        profile_id,
+        allow_superseded_projection_for_execution_test=True,
     )
-    persisted = json.loads(result.persisted_path.read_bytes())
-    assert persisted["look_accounting"]["shared_look_ledger_entry_id"] == "R-113"
-    assert persisted["look_accounting"]["lifetime_alpha_cell_floor_after"] == 619
-    assert adapter.require_accepted_risk_preliminary_aggregate_result(
-        result,
-        plan=leverage_plan_qqq,
-        execution_permit=permit,
-        launch=launch,
-        terminal=terminal,
-        result_permit=result_permit,
-    ) is result
+    backend = _Backend(superseded_plan)
+    action = _offline_action(
+        adapter.execute_accepted_risk_preliminary_submission_once
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="profile is superseded and cannot launch",
+    ):
+        action(
+            plan=superseded_plan,
+            owner_signature=_offline_signature(),
+            client=_client(backend),
+            started_at_utc="2026-09-18T20:00:00Z",
+        )
+
+    assert backend.events == []
+    assert not any(superseded_plan.control_directory.iterdir())
 
 
 def test_stock_portfolio_offline_launch_result_read_and_reload_are_exact(

@@ -26,8 +26,12 @@ from research.insider_buying import preregistration
 from research.insider_buying.preregistration import (
     CANDIDATE_PRIMARY_HORIZONS_TRADING_DAYS,
     IB0_CONTRACT_VERSION,
+    INSIDER_PAPER_PILOT_DURATION_TRADING_DAYS,
+    INSIDER_PAPER_PROMOTION_SEQUENCE,
+    INSIDER_SHARED_HOLDOUT_ROLE,
     INSIDER_BUYING_BLUEPRINT_PATH,
     MULTIPLICITY_DIRECTIVE_COMMIT,
+    PAPER_PROMOTION_DIRECTIVE_COMMIT,
     SHARED_FAMILY_DIRECTIVE_COMMIT,
 )
 
@@ -43,6 +47,10 @@ BLUEPRINT_PATH = (
 
 
 class _StringSubclass(str):
+    pass
+
+
+class _DateSubclass(date):
     pass
 
 
@@ -138,7 +146,7 @@ def test_upstream_ib0_version_or_outcome_authority_drift_refuses(
         object.__setattr__(CANONICAL_SPEC, field_name, original)
 
 
-def test_shared_holdout_is_reserved_and_inaccessible() -> None:
+def test_shared_holdout_is_reserved_inaccessible_and_prospective() -> None:
     gate = INSIDER_BUYING_RESEARCH_GATE
 
     assert gate.shared_research_cutoff == date(2027, 8, 31)
@@ -146,6 +154,34 @@ def test_shared_holdout_is_reserved_and_inaccessible() -> None:
     assert gate.shared_holdout_end == date(2029, 8, 31)
     assert gate.shared_research_cutoff < gate.shared_holdout_start
     assert gate.shared_holdout_access_authorized is False
+    assert gate.shared_holdout_role == INSIDER_SHARED_HOLDOUT_ROLE
+    assert gate.shared_holdout_role == "long_term_prospective_validation"
+
+
+def test_paper_promotion_boundary_is_accelerated_but_zero_authority() -> None:
+    gate = INSIDER_BUYING_RESEARCH_GATE
+
+    assert gate.shared_holdout_completion_required_for_paper_promotion is False
+    assert gate.paper_promotion_sequence == INSIDER_PAPER_PROMOTION_SEQUENCE
+    assert gate.paper_promotion_sequence == (
+        "independently_reviewed_historical_validation",
+        "independently_reviewed_qc_parity",
+        "separate_owner_paper_deployment_authority",
+        "60_trading_day_paper_pilot",
+    )
+    assert gate.paper_pilot_duration_trading_days == (
+        INSIDER_PAPER_PILOT_DURATION_TRADING_DAYS
+    )
+    assert type(gate.paper_pilot_duration_trading_days) is int
+    assert gate.paper_pilot_duration_trading_days == 60
+    assert (
+        gate.paper_promotion_prerequisites_confer_deployment_authority
+        is False
+    )
+    assert gate.paper_trading_authorized is False
+    assert gate.deployment_authorized is False
+    assert gate.live_trading_authorized is False
+    assert gate.trading_authority is False
 
 
 def test_stock_null_cannot_be_rescued_by_etf_or_qc_work() -> None:
@@ -204,14 +240,19 @@ def test_gate_is_frozen_and_payload_calls_are_isolated() -> None:
     assert first is not second
     family = first["family_multiplicity"]
     allocation = first["within_lane_allocation"]
+    paper = first["insider_paper_promotion"]
     assert isinstance(family, dict)
     assert isinstance(allocation, dict)
+    assert isinstance(paper, dict)
     fixed_lane_ids = family["fixed_lane_ids"]
     permanent_look_ids = allocation["permanent_look_ids"]
+    paper_sequence = paper["ordered_sequence"]
     assert isinstance(fixed_lane_ids, list)
     assert isinstance(permanent_look_ids, list)
+    assert isinstance(paper_sequence, list)
     fixed_lane_ids.append("forged")
     permanent_look_ids.append("forged-look")
+    paper_sequence.append("forged-step")
     assert gate.to_payload() == second
     with pytest.raises(FrozenInstanceError):
         gate.assigned_lane_id = "forged"  # type: ignore[misc]
@@ -221,6 +262,8 @@ def test_payload_and_semantic_hash_are_canonical_and_pinned() -> None:
     gate = INSIDER_BUYING_RESEARCH_GATE
     payload = gate.to_payload()
 
+    assert gate.version == "INSETF-IB1I-RESEARCH-GATE-v2"
+    assert payload["schema"] == "insider-buying-four-family-research-gate-v2"
     family = payload["family_multiplicity"]
     assert family["shared_two_sided_fwer"] == {  # type: ignore[index]
         "numerator": 1,
@@ -229,9 +272,16 @@ def test_payload_and_semantic_hash_are_canonical_and_pinned() -> None:
     assert family[  # type: ignore[index]
         "permanent_lane_alpha_maximum"
     ] == {"numerator": 1, "denominator": 80}
+    paper = payload["insider_paper_promotion"]
+    assert paper == {
+        "shared_holdout_completion_required": False,
+        "ordered_sequence": list(INSIDER_PAPER_PROMOTION_SEQUENCE),
+        "paper_pilot_duration_trading_days": 60,
+        "prerequisites_confer_deployment_authority": False,
+    }
     assert gate.semantic_sha256 == INSIDER_BUYING_RESEARCH_GATE_SHA256
     assert INSIDER_BUYING_RESEARCH_GATE_SHA256 == (
-        "f532eaf38fbdd6f3f00a4286a723ba1aa69c58f9862a596a840bd0e6d998c392"
+        "cb3d8009539ffdba2a383eb949964dc9686fdd64a71c36eb102cc69160b47a8f"
     )
 
 
@@ -250,6 +300,15 @@ def test_gate_is_bound_to_the_exact_governing_blueprint() -> None:
 def test_gate_is_bound_to_immutable_shared_directive_commits() -> None:
     action_plan = REPO_ROOT / "docs" / "ACTION_PLAN_2026-08-20.md"
     direction = REPO_ROOT / "docs" / "THREE_STRATEGY_PROJECT_DIRECTION.md"
+    workflow = (
+        REPO_ROOT
+        / "docs"
+        / "Strategy Description"
+        / "THREE_STRATEGY_PARALLEL_WORKFLOW.md"
+    )
+    action_text = " ".join(action_plan.read_text(encoding="utf-8").split())
+    direction_text = " ".join(direction.read_text(encoding="utf-8").split())
+    workflow_text = " ".join(workflow.read_text(encoding="utf-8").split())
 
     assert MULTIPLICITY_DIRECTIVE_COMMIT == (
         "6b12102b9710efb838e41cefd94cfcecd3ab592d"
@@ -257,17 +316,37 @@ def test_gate_is_bound_to_immutable_shared_directive_commits() -> None:
     assert SHARED_FAMILY_DIRECTIVE_COMMIT == (
         "ba01e98f9d3c8746c70182818a27a2d49a9c0fe7"
     )
-    assert "Owner multiplicity amendment, 2026-08-30" in action_plan.read_text(
-        encoding="utf-8"
+    assert PAPER_PROMOTION_DIRECTIVE_COMMIT == (
+        "6204643eb9b4f464eb66248ba271ef2fe5e4b74c"
     )
+    assert "Owner multiplicity amendment, 2026-08-30" in action_text
     assert "Owner-coordinated shared-family amendment, 2026-08-29" in (
-        direction.read_text(encoding="utf-8")
+        direction_text
     )
+    assert "Owner-coordinated Insider paper-stage amendment, 2026-09-18" in (
+        direction_text
+    )
+    assert (
+        "shared final holdout is no longer a prerequisite for paper promotion"
+        in direction_text
+    )
+    assert "60-trading-day paper pilot" in direction_text
+    assert "grants neither continued paper operation nor live promotion" in (
+        direction_text
+    )
+    assert "does not govern Insider Buying paper promotion" in workflow_text
+    assert "preserves step 5 for the common portfolio evaluation" in workflow_text
+    assert "grants no paper deployment authority" in workflow_text
+    assert "This sequencing entry grants no data" in action_text
     assert INSIDER_BUYING_RESEARCH_GATE.multiplicity_directive_effective_date == (
         date(2026, 8, 30)
     )
     assert INSIDER_BUYING_RESEARCH_GATE.shared_family_directive_effective_date == (
         date(2026, 8, 29)
+    )
+    assert (
+        INSIDER_BUYING_RESEARCH_GATE.paper_promotion_directive_effective_date
+        == date(2026, 9, 18)
     )
 
 
@@ -292,6 +371,31 @@ def test_semantic_hash_binds_unallocated_cell_and_look_inventories(
 
 
 @pytest.mark.parametrize(
+    ("field_name", "forged_value"),
+    [
+        ("paper_promotion_directive_id", "forged-directive"),
+        ("paper_promotion_directive_path", "docs/forged.md"),
+        ("paper_promotion_directive_commit", "0" * 40),
+        ("paper_promotion_directive_effective_date", date(2026, 9, 19)),
+        ("shared_holdout_access_authorized", True),
+        ("shared_holdout_role", "forged_role"),
+        ("shared_holdout_completion_required_for_paper_promotion", True),
+        ("paper_promotion_sequence", INSIDER_PAPER_PROMOTION_SEQUENCE[:-1]),
+        ("paper_pilot_duration_trading_days", 59),
+        ("paper_promotion_prerequisites_confer_deployment_authority", True),
+    ],
+)
+def test_semantic_hash_binds_each_paper_promotion_field(
+    field_name: str,
+    forged_value: object,
+) -> None:
+    forged = copy.copy(INSIDER_BUYING_RESEARCH_GATE)
+    object.__setattr__(forged, field_name, forged_value)
+
+    assert forged.semantic_sha256 != INSIDER_BUYING_RESEARCH_GATE_SHA256
+
+
+@pytest.mark.parametrize(
     "changes",
     [
         {"fixed_lane_ids": FIXED_STRATEGY_LANE_IDS[:-1]},
@@ -303,12 +407,76 @@ def test_semantic_hash_binds_unallocated_cell_and_look_inventories(
                 "target-price-revisions",
             )
         },
-        {"version": "INSETF-IB1I-RESEARCH-GATE-v2"},
+        {"version": "INSETF-IB1I-RESEARCH-GATE-v1"},
         {"blueprint_path": "docs/Strategy Description/other.pdf"},
         {"blueprint_sha256": "0" * 64},
         {"ib0_contract_version": "INSETF-IB0-v2"},
         {"multiplicity_directive_commit": "0" * 40},
         {"shared_family_directive_commit": "0" * 40},
+        {
+            "multiplicity_directive_id": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.multiplicity_directive_id
+            )
+        },
+        {
+            "multiplicity_directive_path": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.multiplicity_directive_path
+            )
+        },
+        {
+            "multiplicity_directive_commit": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.multiplicity_directive_commit
+            )
+        },
+        {
+            "multiplicity_directive_effective_date": _DateSubclass(
+                2026, 8, 30
+            )
+        },
+        {
+            "shared_family_directive_id": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.shared_family_directive_id
+            )
+        },
+        {
+            "shared_family_directive_path": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.shared_family_directive_path
+            )
+        },
+        {
+            "shared_family_directive_commit": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.shared_family_directive_commit
+            )
+        },
+        {
+            "shared_family_directive_effective_date": _DateSubclass(
+                2026, 8, 29
+            )
+        },
+        {"paper_promotion_directive_id": "forged"},
+        {"paper_promotion_directive_path": "docs/forged.md"},
+        {"paper_promotion_directive_commit": "0" * 40},
+        {"paper_promotion_directive_effective_date": date(2026, 9, 19)},
+        {
+            "paper_promotion_directive_id": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.paper_promotion_directive_id
+            )
+        },
+        {
+            "paper_promotion_directive_path": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.paper_promotion_directive_path
+            )
+        },
+        {
+            "paper_promotion_directive_commit": _StringSubclass(
+                INSIDER_BUYING_RESEARCH_GATE.paper_promotion_directive_commit
+            )
+        },
+        {
+            "paper_promotion_directive_effective_date": _DateSubclass(
+                2026, 9, 18
+            )
+        },
         {"assigned_lane_id": "short-interest"},
         {"shared_two_sided_fwer": Fraction(1, 15)},
         {"permanent_lane_alpha_maximum": Fraction(1, 60)},
@@ -338,6 +506,30 @@ def test_semantic_hash_binds_unallocated_cell_and_look_inventories(
         {"shared_holdout_start": date(2027, 8, 31)},
         {"shared_holdout_end": date(2029, 9, 1)},
         {"shared_holdout_access_authorized": True},
+        {"shared_holdout_access_authorized": 0},
+        {"shared_holdout_role": "final_holdout_only"},
+        {"shared_holdout_role": _StringSubclass(INSIDER_SHARED_HOLDOUT_ROLE)},
+        {"shared_holdout_completion_required_for_paper_promotion": True},
+        {"shared_holdout_completion_required_for_paper_promotion": 0},
+        {"paper_promotion_sequence": INSIDER_PAPER_PROMOTION_SEQUENCE[:-1]},
+        {
+            "paper_promotion_sequence": tuple(
+                reversed(INSIDER_PAPER_PROMOTION_SEQUENCE)
+            )
+        },
+        {"paper_promotion_sequence": list(INSIDER_PAPER_PROMOTION_SEQUENCE)},
+        {
+            "paper_promotion_sequence": (
+                _StringSubclass(INSIDER_PAPER_PROMOTION_SEQUENCE[0]),
+                *INSIDER_PAPER_PROMOTION_SEQUENCE[1:],
+            )
+        },
+        {"paper_pilot_duration_trading_days": 59},
+        {"paper_pilot_duration_trading_days": 61},
+        {"paper_pilot_duration_trading_days": 60.0},
+        {"paper_pilot_duration_trading_days": True},
+        {"paper_promotion_prerequisites_confer_deployment_authority": True},
+        {"paper_promotion_prerequisites_confer_deployment_authority": 0},
         {"valid_stock_level_null_closes_canonical_family": False},
         {"post_result_tuning_or_rerun_authorized": True},
         {"later_hypothesis_requires_separate_preregistered_family": False},

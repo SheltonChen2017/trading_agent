@@ -1,10 +1,12 @@
 """Zero-authority research gate for the Insider Buying lane.
 
-IB-1I records the owner-directed four-strategy multiplicity ceiling and the
-shared final-holdout boundary before any outcome can be inspected.  It does
-not choose a confirmatory horizon, cell, or permanent look: those allocations
-remain an explicit owner decision.  This module has no data acquisition,
-outcome, QuantConnect, broker, deployment, or execution surface.
+IB-1I records the owner-directed four-strategy multiplicity ceiling, the
+shared final-holdout boundary, and the later Insider-only paper-promotion
+sequence before any outcome can be inspected.  It does not choose a
+confirmatory horizon, cell, or permanent look: those allocations remain an
+explicit owner decision.  Paper-promotion prerequisites grant no paper or
+deployment authority.  This module has no data acquisition, outcome,
+QuantConnect, broker, deployment, or execution surface.
 """
 from __future__ import annotations
 
@@ -17,7 +19,7 @@ from data.hashing import canonical_json, hash_bytes
 from research.insider_buying.contracts import CANONICAL_SPEC, ContractError
 
 
-INSIDER_BUYING_RESEARCH_GATE_VERSION = "INSETF-IB1I-RESEARCH-GATE-v1"
+INSIDER_BUYING_RESEARCH_GATE_VERSION = "INSETF-IB1I-RESEARCH-GATE-v2"
 INSIDER_BUYING_BLUEPRINT_PATH = (
     "docs/Strategy Description/INSIDER_BUYING_ETF_STRATEGY_BLUEPRINT.pdf"
 )
@@ -38,6 +40,14 @@ SHARED_FAMILY_DIRECTIVE_COMMIT = (
     "ba01e98f9d3c8746c70182818a27a2d49a9c0fe7"
 )
 SHARED_FAMILY_DIRECTIVE_EFFECTIVE_DATE = date(2026, 8, 29)
+PAPER_PROMOTION_DIRECTIVE_ID = (
+    "owner-insider-paper-promotion-amendment-2026-09-18"
+)
+PAPER_PROMOTION_DIRECTIVE_PATH = "docs/THREE_STRATEGY_PROJECT_DIRECTION.md"
+PAPER_PROMOTION_DIRECTIVE_COMMIT = (
+    "6204643eb9b4f464eb66248ba271ef2fe5e4b74c"
+)
+PAPER_PROMOTION_DIRECTIVE_EFFECTIVE_DATE = date(2026, 9, 18)
 FIXED_STRATEGY_LANE_IDS = (
     "analyst-revisions-v2",
     "insider-buying",
@@ -52,6 +62,14 @@ PERMANENT_LANE_ALPHA_MAXIMUM = Fraction(1, 80)
 SHARED_RESEARCH_CUTOFF = date(2027, 8, 31)
 SHARED_HOLDOUT_START = date(2027, 9, 1)
 SHARED_HOLDOUT_END = date(2029, 8, 31)
+INSIDER_SHARED_HOLDOUT_ROLE = "long_term_prospective_validation"
+INSIDER_PAPER_PROMOTION_SEQUENCE = (
+    "independently_reviewed_historical_validation",
+    "independently_reviewed_qc_parity",
+    "separate_owner_paper_deployment_authority",
+    "60_trading_day_paper_pilot",
+)
+INSIDER_PAPER_PILOT_DURATION_TRADING_DAYS = 60
 FUTURE_QC_STAGE = "IB-7"
 FUTURE_QC_INPUT_CONTRACT = (
     "independently_reviewed_immutable_precomputed_or_custom_signals_only"
@@ -101,6 +119,12 @@ class InsiderBuyingResearchGate:
     shared_family_directive_effective_date: date = (
         SHARED_FAMILY_DIRECTIVE_EFFECTIVE_DATE
     )
+    paper_promotion_directive_id: str = PAPER_PROMOTION_DIRECTIVE_ID
+    paper_promotion_directive_path: str = PAPER_PROMOTION_DIRECTIVE_PATH
+    paper_promotion_directive_commit: str = PAPER_PROMOTION_DIRECTIVE_COMMIT
+    paper_promotion_directive_effective_date: date = (
+        PAPER_PROMOTION_DIRECTIVE_EFFECTIVE_DATE
+    )
     fixed_lane_ids: tuple[str, ...] = FIXED_STRATEGY_LANE_IDS
     assigned_lane_id: str = INSIDER_BUYING_LANE_ID
     shared_two_sided_fwer: Fraction = SHARED_TWO_SIDED_FWER
@@ -129,6 +153,13 @@ class InsiderBuyingResearchGate:
     shared_holdout_start: date = SHARED_HOLDOUT_START
     shared_holdout_end: date = SHARED_HOLDOUT_END
     shared_holdout_access_authorized: bool = False
+    shared_holdout_role: str = INSIDER_SHARED_HOLDOUT_ROLE
+    shared_holdout_completion_required_for_paper_promotion: bool = False
+    paper_promotion_sequence: tuple[str, ...] = INSIDER_PAPER_PROMOTION_SEQUENCE
+    paper_pilot_duration_trading_days: int = (
+        INSIDER_PAPER_PILOT_DURATION_TRADING_DAYS
+    )
+    paper_promotion_prerequisites_confer_deployment_authority: bool = False
     valid_stock_level_null_closes_canonical_family: bool = True
     post_result_tuning_or_rerun_authorized: bool = False
     later_hypothesis_requires_separate_preregistered_family: bool = True
@@ -217,6 +248,21 @@ class InsiderBuyingResearchGate:
                 self.shared_family_directive_commit,
                 SHARED_FAMILY_DIRECTIVE_COMMIT,
             ),
+            (
+                "paper_promotion_directive_id",
+                self.paper_promotion_directive_id,
+                PAPER_PROMOTION_DIRECTIVE_ID,
+            ),
+            (
+                "paper_promotion_directive_path",
+                self.paper_promotion_directive_path,
+                PAPER_PROMOTION_DIRECTIVE_PATH,
+            ),
+            (
+                "paper_promotion_directive_commit",
+                self.paper_promotion_directive_commit,
+                PAPER_PROMOTION_DIRECTIVE_COMMIT,
+            ),
         ):
             if type(value) is not str or value != expected:
                 raise InsiderBuyingPreregistrationError(
@@ -232,6 +278,11 @@ class InsiderBuyingResearchGate:
                 "shared_family_directive_effective_date",
                 self.shared_family_directive_effective_date,
                 SHARED_FAMILY_DIRECTIVE_EFFECTIVE_DATE,
+            ),
+            (
+                "paper_promotion_directive_effective_date",
+                self.paper_promotion_directive_effective_date,
+                PAPER_PROMOTION_DIRECTIVE_EFFECTIVE_DATE,
             ),
         ):
             if type(value) is not date or value != expected:
@@ -375,6 +426,52 @@ class InsiderBuyingResearchGate:
             raise InsiderBuyingPreregistrationError(
                 "REFUSED: the shared final holdout is unavailable to this lane"
             )
+        if (
+            type(self.shared_holdout_role) is not str
+            or self.shared_holdout_role != INSIDER_SHARED_HOLDOUT_ROLE
+        ):
+            raise InsiderBuyingPreregistrationError(
+                "REFUSED: the shared holdout must remain long-term prospective validation"
+            )
+        if (
+            type(
+                self.shared_holdout_completion_required_for_paper_promotion
+            )
+            is not bool
+            or self.shared_holdout_completion_required_for_paper_promotion
+        ):
+            raise InsiderBuyingPreregistrationError(
+                "REFUSED: final-holdout completion cannot gate Insider paper promotion"
+            )
+        if (
+            type(self.paper_promotion_sequence) is not tuple
+            or any(
+                type(step) is not str
+                for step in self.paper_promotion_sequence
+            )
+            or self.paper_promotion_sequence != INSIDER_PAPER_PROMOTION_SEQUENCE
+        ):
+            raise InsiderBuyingPreregistrationError(
+                "REFUSED: Insider paper-promotion sequence changed"
+            )
+        if (
+            type(self.paper_pilot_duration_trading_days) is not int
+            or self.paper_pilot_duration_trading_days
+            != INSIDER_PAPER_PILOT_DURATION_TRADING_DAYS
+        ):
+            raise InsiderBuyingPreregistrationError(
+                "REFUSED: Insider paper pilot must remain exactly 60 trading days"
+            )
+        if (
+            type(
+                self.paper_promotion_prerequisites_confer_deployment_authority
+            )
+            is not bool
+            or self.paper_promotion_prerequisites_confer_deployment_authority
+        ):
+            raise InsiderBuyingPreregistrationError(
+                "REFUSED: paper-promotion prerequisites confer no deployment authority"
+            )
         for field_name in (
             "valid_stock_level_null_closes_canonical_family",
             "later_hypothesis_requires_separate_preregistered_family",
@@ -447,7 +544,7 @@ class InsiderBuyingResearchGate:
         """Return a fresh canonical-JSON-safe representation of the gate."""
 
         return {
-            "schema": "insider-buying-four-family-research-gate-v1",
+            "schema": "insider-buying-four-family-research-gate-v2",
             "version": self.version,
             "governing_blueprint": {
                 "path": self.blueprint_path,
@@ -469,6 +566,14 @@ class InsiderBuyingResearchGate:
                     "source_commit": self.multiplicity_directive_commit,
                     "effective_date": (
                         self.multiplicity_directive_effective_date.isoformat()
+                    ),
+                },
+                {
+                    "directive_id": self.paper_promotion_directive_id,
+                    "path": self.paper_promotion_directive_path,
+                    "source_commit": self.paper_promotion_directive_commit,
+                    "effective_date": (
+                        self.paper_promotion_directive_effective_date.isoformat()
                     ),
                 },
             ],
@@ -519,6 +624,19 @@ class InsiderBuyingResearchGate:
                 "reserved_end": self.shared_holdout_end.isoformat(),
                 "lane_access_authorized": (
                     self.shared_holdout_access_authorized
+                ),
+                "role": self.shared_holdout_role,
+            },
+            "insider_paper_promotion": {
+                "shared_holdout_completion_required": (
+                    self.shared_holdout_completion_required_for_paper_promotion
+                ),
+                "ordered_sequence": list(self.paper_promotion_sequence),
+                "paper_pilot_duration_trading_days": (
+                    self.paper_pilot_duration_trading_days
+                ),
+                "prerequisites_confer_deployment_authority": (
+                    self.paper_promotion_prerequisites_confer_deployment_authority
                 ),
             },
             "stock_first_gate": {

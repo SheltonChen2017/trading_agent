@@ -181,5 +181,19 @@ research gates, the owner should schedule a fourth integration milestone that:
 4. runs one final untouched out-of-sample portfolio evaluation; and
 5. only then considers a separately approved QuantConnect paper deployment.
 
+**Owner-directed Insider paper-stage exception, 2026-09-18:** section 6 step
+5 does not govern Insider Buying paper promotion. This exception preserves
+step 5 for the common portfolio evaluation, every other lane, and the later
+combined-autopilot decision. For Insider Buying only, independently reviewed
+historical validation and QC parity may be followed by a separately
+owner-authorized 60-trading-day paper pilot before the 2027-09-01 through
+2029-08-31 final holdout is complete. The holdout remains sealed for tuning
+and the common evaluation and remains long-term prospective validation; any
+pilot overlap requires a separate owner-approved sealed-overlap protocol.
+This sequencing exception grants no paper deployment authority and no data,
+provider, outcome, research-look, QuantConnect job/upload/processing, broker,
+capital, live, order, or trading authority. Pilot completion grants neither
+continued paper operation nor live promotion.
+
 Until that milestone exists, each branch owns only one strategy and no branch
 may create the combined autopilot.

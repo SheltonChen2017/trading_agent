@@ -367,13 +367,15 @@ IS 83 SHARED LOOKS, 26 ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS,
 AND A 599-CELL FLOOR. R-109 THROUGH R-114 REMAIN UNLAUNCHED AND UNSPENT.
 SECTION 104 IS THE INDEPENDENT CLAUDE REVIEW OF `df767d3..1d83668`, TAKEN
 FROM AN EXPORT OF THE PUSHED HEAD WHILE CODEX EDITED THIS WORKTREE: ALL
-ELEVEN COMMITS ACCEPTED, NO CODE CHANGED, EVERY REFUSAL-DRIVEN CORRECTION
-AND THE TRANSPORT SPLIT BEHAVIOURALLY PINNED, ALL EIGHT FROZEN PROFILE
-HASHES RECONCILED. ONE P2 IS OPEN: R-107/R-108 REPORT SPY AT 95.67% FOR
-THE SAME 1,254-RETURN WINDOW THAT EVERY PRIOR RUN REPORTED AT 94.21%,
-UNEXPLAINED IN THE RECORD AND UNDIAGNOSABLE FROM RECEIPTS, TO BE RESOLVED
-BEFORE R-109. THE OWNER'S 2026-09-18 INSTRUCTION LIFTED THE REVIEW
-DEFERRAL. CODEX COUNTER-REVIEW IS NEXT.
+ELEVEN COMMITS ACCEPTED AND NO CODE CHANGED. SECTION 105 COUNTER-REVIEWS
+THAT RECORD, CONFIRMS THE BENCHMARK-VINTAGE ISSUE BUT LIMITS ITS REMEDY TO
+PROSPECTIVE VALUE-FREE DIGESTS, AND RECORDS THE CORRECTIONS TO THE NEW
+BOUNDED-TILT IMPLEMENTATION. SECTION 106 FREEZES R-115/R-116 AS FRESH
+2021--2025 QQQ/SPY PROXY DIAGNOSTICS: THE R-055 FIRM-SPECIFIC REVISION SCORE
+IS A SECTOR-NEUTRAL, BREADTH-CONFIRMED, STRICTLY BOUNDED OVERLAY ON EACH
+POINT-IN-TIME MARKET-CAP BENCHMARK, NEVER AN ADMISSION GATE. R-109 THROUGH
+R-114 ARE SUPERSEDED UNLAUNCHED AND UNSPENT. R-115 IS NEXT; R-116 MAY LAUNCH
+ONLY AFTER R-115 CLOSES AND ITS ONE AUTHENTICATED AGGREGATE READ SUCCEEDS.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1166,16 +1168,17 @@ remaining unlevered windows and only then the leverage diagnostics.
 Section 103 records R-108's completed, tangible SPY 2021--2025 market-cap
 diagnostic. The owner directs Codex to commit and push this completed round,
 defers Claude review, and then begin one identically specified bounded-tilt
-QQQ/SPY pair. R-109 through R-114 remain unlaunched and unspent. The owner
-explicitly waives Claude review of section 103 before this push and the next
-implementation; review is deferred rather than cancelled. The owner's 2026-09-18
-instruction to review now supersedes that deferral. Section 104 is that
-independent Claude review of `df767d3..1d83668`: all eleven commits
-accepted, no code changed, one open P2 on the SPY benchmark basis. The
-immediate next step is that Codex counter-reviews section 104 and the exact
-pushed range in this same worktree; the bounded-tilt implementation may
-continue, and the record should explain the SPY basis before R-109
-launches.
+QQQ/SPY pair. Section 104 is that independent Claude review of
+`df767d3..1d83668`; all eleven commits are accepted and no code changed.
+Section 105 is Codex's counter-review and the corrected bounded-tilt
+implementation at `18762e5`. Section 106 prospectively freezes the exact
+R-115 QQQ and R-116 SPY physical identities before external action, and
+Claude reviews section 106 and this exact pushed round after Codex records
+both dispositions and makes the owner-directed single push. R-109 through
+R-114 are superseded unlaunched and unspent. The exact next step is to launch
+R-115, close it through one authenticated aggregate read, and only then
+launch R-116 sequentially on the single subscribed node. No leverage,
+deployment, broker, order, paper/live, or trading action follows.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -17942,3 +17945,172 @@ remain open and unchanged. `ARV2R93-006` is closed by `2f405b2`.
   and its ledger row were written: **75 passed**. `git diff --check` on the
   record is clean. Codex's three uncommitted working files were left
   untouched and are not part of this commit.
+
+## 105. Codex counter-review of section 104 and bounded-tilt implementation, 2026-09-18
+
+**Counter-reviewed commit:** `1f47eb3`, the section-104 documentation-only
+review commit on top of `1d83668`. **Disposition: accepted after prospective
+qualification.** Claude changed no production or test byte. Every per-commit
+acceptance, the five behavioural mutations, the eight profile-hash
+reconciliations, and the owner-directed cleanup description reproduce. The
+underlying SPY-series-vintage issue in `ARV2R104-001` is real, but neither the
+historical data nor the old receipts retain the raw series needed to
+reconstruct the earlier vintage. The remedy is therefore prospective; it
+does not claim a retroactive comparison that cannot be performed.
+
+At the counter-review point, accounting remains **83 shared looks, 26 ARV2
+development evaluations, 27 infrastructure looks, and a 599-cell floor**.
+No QC, provider, credential, outcome, broker, deployment, order, paper/live,
+or trading surface was accessed during counter-review or implementation.
+
+### 105.1 Per-commit disposition
+
+| Commit | Disposition | Basis |
+|---|---|---|
+| `1f47eb3` Record the independent Claude review of the R-083 through R-108 range | **Accepted after prospective qualification** | The review evidence and all eleven underlying commit dispositions reproduce. The correction is to the remedy and interpretation, not to the reviewed code: legacy series cannot be recovered from receipts; raw benchmark values must not be exported merely to diagnose provenance; and several concentration phrases overstate what inverse HHI proves. |
+
+### 105.2 Section-104 finding dispositions
+
+| Finding | Counter-review disposition |
+|---|---|
+| `ARV2R104-001` P2 | **Confirmed, prospectively corrected.** The affected legacy results are R-064, R-065, R-072, R-077, R-078, R-107, and R-108, not every integer-labelled run in the broad `R-064 through R-078` phrase. Their aggregate receipts do not contain either underlying SPY series, so the old 94.2074% and later 95.67% bases cannot be diagnosed retroactively. R-115/R-116 instead emit two value-free V3 provenance bindings over the economically used window: an exact raw adjusted-open observation digest and a scale-invariant used-return-path digest. They bind the logical benchmark ID, normalization, observation mode, actual first/last used sessions, counts, and exact Decimal canonicalization. They do **not** emit first/last raw opens. Selected-minus-matched within one run remains internally comparable because one loader supplies both accounts; that does not immunize either account from constituent-data vintage changes. |
+| `ARV2R104-002` P3 | **Confirmed; carried to any future leverage successor.** R-113/R-114 are superseded unspent. This unlevered milestone does not pretend to close a leverage-only base-receipt binding requirement. |
+| `ARV2R104-003` P3 | **Closed for R-115/R-116.** Section 106 preregisters eligible-count, effective-breadth, and gross-exposure ranges before either run. The old R-109 through R-114 identities are superseded unspent. Gross exposure is not mechanically moot: stale locks and unavailable prices can make executed exposure differ from the exact frozen 98% target. |
+| `ARV2R104-004` P3 | **Confirmed after wording correction.** R-107's 3.26 inverse-HHI is a concentrated result, not literally proof of a three-name book; its mean selected count was 8.80. R-108's 10.76 inverse-HHI is above, not “at”, the frozen `<10` concentration-disclosure threshold. |
+| `ARV2R104-005` P3 | **Confirmed.** Daily-reset leverage is path-dependent; compare selected and matched under the same factor/scenario without predicting gap direction. The other section-94 count, statistic-inventory, guard-isolation, and concentration qualifications remain correct. |
+| `ARV2R104-006` P3 | **Confirmed and closed.** The live pointer now names sections 105 and 106 and the exact next sequential action. |
+
+### 105.3 Bounded-tilt implementation and in-round findings
+
+Commit `18762e5` implements the owner's common QQQ/SPY construction. The full
+point-in-time proxy universe is the market-cap benchmark at exact frozen 98%
+gross. The existing R-055 firm-specific analyst-revision score is a bounded
+overlay, never an admission gate. Missing or exact-zero scores retain exact
+benchmark weights. A tilt is permitted only with at least 40 ranked, 20
+strictly positive, and 20 strictly negative names. Transfers are confined to
+the exact point-in-time sector: every frozen selected-sector gross equals its
+benchmark-sector gross. Global one-way active share is at most 4.9%; every
+name stays within 0.8x--1.2x its benchmark weight; absolute overweight is at
+most 0.0049; selected HHI is at most 1.44x benchmark HHI. If breadth or
+sector cross-funding cannot satisfy the complete rule, the selected portfolio
+is the exact benchmark and the diagnostic says `TILT_UNDERFILLED`.
+
+The implementation audit found and corrected the following before any QC
+action:
+
+| ID | P | Finding | Correction and isolated proof |
+|---|---:|---|---|
+| `ARV2D105-001` | P1 | The first candidate ranked scores within sector but transferred weight globally, so the stated sector-neutral rule was false. | Replaced it with exact within-sector donor/receiver transfers; deterministic and randomized tests require exact sector conservation. |
+| `ARV2D105-002` | P2 | Decimal summation order could leave a `1e-50` conservation residue. | Canonical ordering plus a fixed `1e-48` allocation quantum makes exact gross and sector conservation deterministic. |
+| `ARV2D105-003` | P2 | The new helper was absent from the active seven-file QC source closure. | Added the helper to projection topology and identity tests; both V3 flat projections import in isolation and remain below the source cap. |
+| `ARV2D105-004` | P2 | A strict adjacent-observation `zip` used unequal full/tail lengths and would refuse any multi-observation benchmark series. | Pair equal `ordered[:-1]` and `ordered[1:]`; an isolated multi-observation test is red under the old expression. |
+| `ARV2D105-005` | P2 | The R-109--R-114 supersession backstop was tested only through a private helper; deleting its public execution call left the test green. | A public-path test constructs all six old plans under a scoped projection-only bypass, restores the real guard, invokes the public action, and proves named refusal, zero backend events, and zero control artifacts. |
+| `ARV2D105-006` | P1 | The first executable missing-price path renormalized the remaining sector. One absent name could expand a frozen 4.9% tilt to 9.555% while both exception counters stayed zero. | Execution never redistributes unavailable or locked budget: tradable names keep their exact frozen targets, missing budget stays cash, and stale locks keep actual weights. A 40-name reproduction preserves all frozen per-name and active-share bounds. A cancellation case proves sector underfill and locked-sector overtarget can both increment when net gross remains 98%; zero counters therefore implies exact per-name execution. |
+
+### 105.4 Benchmark binding, geometry, and validation
+
+The V3 META binds **1,254 economically used benchmark observations** and
+**1,253 benchmark price-return intervals**. The portfolio still reports
+**1,254 return sessions** because its first session includes the existing
+execution convention; those are different quantities and are not conflated.
+The raw-observation digest detects value and vintage drift; the
+scale-invariant return-path digest distinguishes a harmless common rescaling
+from a changed economic path. Only logical identifiers, modes, used endpoint
+dates, counts, and digests leave the runtime. No raw benchmark price is part
+of an aggregate receipt.
+
+Final pre-QC validation on the implementation bytes: evaluator/projection/
+runtime/adapter suite **395 passed in 245.20 seconds**; direct evaluator
+suite **51 passed**; public supersession/profile focus **8 passed**; 500
+randomized frozen-target and conservative-execution trials passed; both flat
+projections build and import; `compileall` exits 0; `git diff --check` is
+clean. Independent final audit disposition: **accepted after correction,
+0 P0, 0 open P1, 0 open P2, 0 P3**. The complete Analyst lane selection is
+running separately and must finish green before the round's only push.
+
+### 105.5 Next gate
+
+Derive and commit the exact R-115/R-116 plans from `18762e5` before any
+external action. Then launch R-115 QQQ, reach terminal closure, and perform
+its one authenticated nine-statistic aggregate read. Only after that tangible
+closure may R-116 SPY launch on the single subscribed node. Neither run
+authorizes winner selection, leverage, formal acceptance, deployment, broker
+access, orders, paper/live state, or trading.
+
+## 106. Prospective physical freeze for R-115 and R-116, 2026-09-18
+
+These exact plans are derived from committed implementation `18762e5` and
+are frozen before any project creation, upload, compile, backtest, terminal
+status, or result action. Common accepted-risk package SHA-256:
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+Common host-closure ID / SHA-256:
+`arv2-preliminary-qc-host-closure-880f59420a7e544ebb58675a` /
+`880f59420a7e544ebb58675ab76ca2a40d975864a082489de91f8233e0d8578c`
+over 138 host sources. Expected custom-statistic names SHA-256 / count:
+`f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f`
+/ 9.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|---|
+| R-115 | `arv2-market-cap-stock-qqq-2021-2025-v3` / `9efa7e09241f0f20772260e4e6852bb8a71c46cdc77264cfd10e2b569a4b1b00` | `63 ARV2_BOUNDED_TILT_QQQ_R115_2021_2025 - 20260918` / `ARV2 R115 bounded-tilt QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-9a0e032ec3ff82f9460cfcbd` / `9a0e032ec3ff82f9460cfcbd2a2405cca6ab526b32c891debc3a08fbc48ac359` | `75ce6368243c08cfb6bce9b4ed43130eeb6947092a41b98bd9918ff082f8a831` | `f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f` / 9 | `arv2-preliminary-qc-submission-21e34eaadc8638d8613958b0` / `21e34eaadc8638d8613958b00280d655a022737091b6f759197e1c3696cb58cc` |
+| R-116 | `arv2-market-cap-stock-spy-2021-2025-v3` / `8ac07f9fe48d2d6448d4adeb5b2f53c364bad8d4ee3eacd8a23a40a509eb8e38` | `64 ARV2_BOUNDED_TILT_SPY_R116_2021_2025 - 20260918` / `ARV2 R116 bounded-tilt SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-4eb39a51d842203d91d191de` / `4eb39a51d842203d91d191deb929c396a26a9a03bfc35de0a2b60416f3235516` | `53b226cff014c6533b85f11422af802f4fc2c3b8c065f88aee674b9100b9436f` | `f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f` / 9 | `arv2-preliminary-qc-submission-deb002cc0a33890211973d8e` / `deb002cc0a33890211973d8e4d6d36652cba708c5ed3c5aafbcedfc720a482b3` |
+
+Control directories are
+`artifacts/analyst_revisions_v2/accepted_risk_bounded_tilt_r115_20260918_01`
+and `.../accepted_risk_bounded_tilt_r116_20260918_01`. R-109 through R-114
+remain unlaunched and unspent and are now superseded: changed source closure
+and V3 identity cause all six old profiles to named-refuse before transport.
+Their historical plan/result validators remain available.
+
+### 106.1 Frozen economic and execution rule
+
+For both profiles, the point-in-time eligible proxy universe market-cap
+portfolio is the matched benchmark at exact frozen 98% gross. The R-055
+firm-specific analyst-revision score supplies only the bounded overlay
+described in 105.3; it never admits or excludes a stock. Every transfer is
+within the exact point-in-time sector, and every frozen selected-sector total
+equals its matched-sector total. The frozen active-share, per-name ratio,
+absolute-overweight, HHI, breadth, structural-zero, deterministic Decimal,
+and exact-benchmark fallback rules are identical across QQQ and SPY.
+
+Execution scope is explicitly `frozen_target`. Tradable names execute their
+exact frozen targets. Missing-price budget remains cash and a stale locked
+position retains its actual weight; neither is redistributed. A missing name
+or below-target lock increments `sector_target_underfill_count`; an
+above-target lock increments `locked_sector_over_target_count`; both may be
+nonzero for the same sector even when aggregate gross cancels exactly.
+
+### 106.2 Pre-observation diagnostic ranges
+
+These broad ranges are frozen before either result and are not return
+predictions or winner-selection criteria.
+
+| Run | Mean eligible names | Mean effective breadth | Frozen gross | Interpretation |
+|---|---:|---:|---:|---|
+| R-115 QQQ proxy | 60--110 | at least 8 and no greater than eligible count | exactly 98% | Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks and not an official historical index-membership claim |
+| R-116 SPY proxy | 350--550 | at least 35 and no greater than eligible count | exactly 98% | S&P-500 holdings proxy, not an official historical index-membership claim |
+
+Executed gross may differ from 98% only through the two named conservative
+execution exceptions. No exception is silently rescaled away.
+
+### 106.3 Benchmark provenance and interpretation gate
+
+Each nine-statistic envelope binds the logical SPY benchmark ID, total-return
+normalization, session-open observation, actual economically used first/last
+sessions, 1,254 used observations, 1,253 return intervals, exact Decimal
+canonicalization, the raw-observation digest, and the scale-invariant
+return-path digest. No raw adjusted-open value is emitted.
+
+The primary economic comparison is selected minus matched at 10 basis points
+per side. The complete 0/5/10/20-bps ladder, SPY reference, risk metrics,
+breadth, bound diagnostics, benchmark digests, and execution-exception
+counters are reported without selecting a winner. R-115 must close and its
+one aggregate read authenticate before R-116 launches. Accounting is R-115
+**83 -> 84 shared looks / 26 -> 27 development evaluations / 599 -> 603
+cells**, then R-116 **84 -> 85 / 27 -> 28 / 603 -> 607**. Infrastructure
+looks remain **27**. A launch spends its look and evaluation even on a
+technical refusal; cells accrue only after an authenticated aggregate read.
+
+No raw input row, security identifier, price, return series, log, chart,
+holding, order, deployment, broker state, paper/live state, or trading action
+is authorized or selected by this freeze.

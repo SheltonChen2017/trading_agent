@@ -2686,3 +2686,64 @@ infrastructure looks, and 599 cells**. R-109 through R-114 stay unlaunched and
 unspent. The owner directs a push of this completed round before one common
 bounded benchmark-tilt QQQ/SPY implementation. No deployment, broker, order,
 paper/live, or trading authority follows.
+
+## R-115 and R-116 — sector-neutral bounded analyst-revision tilt (PREREGISTERED; UNRUN) — 2026-09-18
+
+These exact identities were derived from committed source `18762e5` before
+any external action. Common accepted-risk package SHA-256:
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+Common host-closure ID / SHA-256:
+`arv2-preliminary-qc-host-closure-880f59420a7e544ebb58675a` /
+`880f59420a7e544ebb58675ab76ca2a40d975864a082489de91f8233e0d8578c`.
+Expected statistic-names SHA-256 / count:
+`f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f`
+/ 9.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256 | Source-set SHA-256 | Plan ID / SHA-256 |
+|---|---|---|---|---|---|
+| R-115 | `arv2-market-cap-stock-qqq-2021-2025-v3` / `9efa7e09241f0f20772260e4e6852bb8a71c46cdc77264cfd10e2b569a4b1b00` | `63 ARV2_BOUNDED_TILT_QQQ_R115_2021_2025 - 20260918` / `ARV2 R115 bounded-tilt QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-9a0e032ec3ff82f9460cfcbd` / `9a0e032ec3ff82f9460cfcbd2a2405cca6ab526b32c891debc3a08fbc48ac359` | `75ce6368243c08cfb6bce9b4ed43130eeb6947092a41b98bd9918ff082f8a831` | `arv2-preliminary-qc-submission-21e34eaadc8638d8613958b0` / `21e34eaadc8638d8613958b00280d655a022737091b6f759197e1c3696cb58cc` |
+| R-116 | `arv2-market-cap-stock-spy-2021-2025-v3` / `8ac07f9fe48d2d6448d4adeb5b2f53c364bad8d4ee3eacd8a23a40a509eb8e38` | `64 ARV2_BOUNDED_TILT_SPY_R116_2021_2025 - 20260918` / `ARV2 R116 bounded-tilt SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-4eb39a51d842203d91d191de` / `4eb39a51d842203d91d191deb929c396a26a9a03bfc35de0a2b60416f3235516` | `53b226cff014c6533b85f11422af802f4fc2c3b8c065f88aee674b9100b9436f` | `arv2-preliminary-qc-submission-deb002cc0a33890211973d8e` / `deb002cc0a33890211973d8e4d6d36652cba708c5ed3c5aafbcedfc720a482b3` |
+
+Control directories are
+`accepted_risk_bounded_tilt_r115_20260918_01` and
+`accepted_risk_bounded_tilt_r116_20260918_01` below the private lane artifact
+root. R-109 through R-114 are superseded unlaunched and unspent; changed
+source/V3 identities named-refuse them before network while their historical
+validators remain available.
+
+The matched account is the full point-in-time eligible proxy universe at
+market-cap weights and exact frozen 98% gross. The R-055 firm-specific
+analyst-revision score is only a bounded overlay, never an admission gate.
+Missing/zero score means exact benchmark weight. A tilt requires at least 40
+ranked, 20 positive, and 20 negative names; all transfers stay within exact
+point-in-time sector. One-way active share is at most 4.9%, each name remains
+within 0.8x--1.2x benchmark weight, absolute overweight is at most 0.0049,
+and selected HHI is at most 1.44x benchmark HHI. Infeasible breadth or sector
+cross-funding yields exact benchmark / `TILT_UNDERFILLED`. Execution does not
+redistribute unavailable or stale-locked budget.
+
+Pre-observation diagnostic ranges are mean eligible count **60--110** and
+effective breadth **>=8** for R-115, and **350--550** / **>=35** for R-116;
+breadth cannot exceed eligible count. Frozen gross is exactly 98%. Executed
+gross may differ only through named missing-price sector underfill or
+above-target stale-lock exceptions. These are broad diagnostics, not return
+predictions. QQQ and SPY are point-in-time holdings proxies, not claims of
+official historical index membership; QQQ is not all Nasdaq-listed stocks.
+
+Each aggregate binds benchmark logical ID, total-return normalization,
+session-open observation, actual used first/last sessions, **1,254** used
+benchmark observations, **1,253** benchmark return intervals, exact Decimal
+canonicalization, a raw-observation digest, and a scale-invariant return-path
+digest. No raw benchmark price is emitted. The primary comparison is selected
+minus matched at 10 bps per side; the full 0/5/10/20-bps ladder, SPY reference,
+risk, breadth, bound, provenance, and execution-exception diagnostics are
+reported without winner selection.
+
+R-115 must terminally close and its single nine-statistic aggregate read must
+authenticate before R-116 launches on the one subscribed node. Accounting is
+R-115 **83 -> 84 looks / 26 -> 27 development evaluations / 599 -> 603
+cells**, then R-116 **84 -> 85 / 27 -> 28 / 603 -> 607**. Infrastructure
+looks remain 27. A launch spends one look/evaluation even on technical
+failure; cells accrue only after authenticated result read. No raw rows,
+identifiers, prices, returns, logs, charts, holdings, orders, deployment,
+broker, paper/live, or trading access is authorized.

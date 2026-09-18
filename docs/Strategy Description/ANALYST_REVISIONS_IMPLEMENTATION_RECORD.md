@@ -365,6 +365,15 @@ IDENTITIES. SECTION 102 RECORDS R-107'S AUTHENTICATED TANGIBLE RESULT.
 SECTION 103 RECORDS R-108'S AUTHENTICATED TANGIBLE RESULT. ACCOUNTING
 IS 83 SHARED LOOKS, 26 ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS,
 AND A 599-CELL FLOOR. R-109 THROUGH R-114 REMAIN UNLAUNCHED AND UNSPENT.
+SECTION 104 IS THE INDEPENDENT CLAUDE REVIEW OF `df767d3..1d83668`, TAKEN
+FROM AN EXPORT OF THE PUSHED HEAD WHILE CODEX EDITED THIS WORKTREE: ALL
+ELEVEN COMMITS ACCEPTED, NO CODE CHANGED, EVERY REFUSAL-DRIVEN CORRECTION
+AND THE TRANSPORT SPLIT BEHAVIOURALLY PINNED, ALL EIGHT FROZEN PROFILE
+HASHES RECONCILED. ONE P2 IS OPEN: R-107/R-108 REPORT SPY AT 95.67% FOR
+THE SAME 1,254-RETURN WINDOW THAT EVERY PRIOR RUN REPORTED AT 94.21%,
+UNEXPLAINED IN THE RECORD AND UNDIAGNOSABLE FROM RECEIPTS, TO BE RESOLVED
+BEFORE R-109. THE OWNER'S 2026-09-18 INSTRUCTION LIFTED THE REVIEW
+DEFERRAL. CODEX COUNTER-REVIEW IS NEXT.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1159,9 +1168,14 @@ diagnostic. The owner directs Codex to commit and push this completed round,
 defers Claude review, and then begin one identically specified bounded-tilt
 QQQ/SPY pair. R-109 through R-114 remain unlaunched and unspent. The owner
 explicitly waives Claude review of section 103 before this push and the next
-implementation; review is deferred rather than cancelled. The exact next step
-is lane validation and the round's single push, followed by the bounded-tilt
-implementation without an intervening Claude review.
+implementation; review is deferred rather than cancelled. The owner's 2026-09-18
+instruction to review now supersedes that deferral. Section 104 is that
+independent Claude review of `df767d3..1d83668`: all eleven commits
+accepted, no code changed, one open P2 on the SPY benchmark basis. The
+immediate next step is that Codex counter-reviews section 104 and the exact
+pushed range in this same worktree; the bounded-tilt implementation may
+continue, and the record should explain the SPY basis before R-109
+launches.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -2822,6 +2836,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-17 | Independent Claude review of the market-cap and objective synthetic-leverage review candidate | `51928d1` -> `b55ea35` and this record commit | Review `a547363..51928d1` commit by commit with failing-test-named mutation trials, re-verify section 90's mutation claim, pin inherited guards behaviourally, and record the reviewed-candidate identity | All seven commits accepted, four after test-only corrections; no production line changed. Section 90's seven-for-seven claim corrected to five behavioural catches and two hash-pin cascades. Four inherited guards pinned independently of hash pins: latest-prior selection, the no-short gross clamp, the islice bound, and daily-reset semantics. Eight reviewed profile SHAs recorded. No R-083 through R-090 project, look or result exists. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Section-90 matrix re-run (5 behavioural, 2 hash-only); 13 new trials (LM1-5, MC1-4, MR1-4) with named failing tests; touched test files **55 passed**; complete standing Analyst lane selection on the exact final code tree (`51928d1` + `b55ea35`) **6,163 passed, 7 skipped, 0 failed, 35 warnings in 5,972.59 s (1:39:32)**, including the root-level gates; record gates re-run on the final bytes **75 passed**; compileall exit 0; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **3 P2 and 5 P3** (`ARV2R93-001..008`); 7 corrected (4 in `b55ea35`, 3 by record restatement), 1 documented. Section 91's `ARV2CR91-011` confirmed and extended. | Push this same-lane round exactly once. Codex counter-reviews section 93 and the pushed range in this same worktree; only then may it freeze R-083 through R-090 identities, pin all eight profile SHAs, and launch. No leverage, deployment, broker, order or trading action. |
 | 2026-09-17 | Codex counter-review of the market-cap/leverage candidate review | `51928d1` -> `b55ea35`, `df767d3`, and this counter-review commit | Dispose both Claude commits, independently mutation-check the new guards, correct interpretation/bookkeeping before launch, and close the review gate without accessing QC | `b55ea35` accepted; `df767d3` accepted after five prospective record corrections. No production execution defect found. A false deterministic leverage-direction claim is withdrawn; the complete leverage statistic inventory is six while economic accounting remains four cells; section-91 dispositions and concentration wording are corrected; and the sibling row-materialization guard gains an isolated test. No R-083 through R-090 project, look, or result exists at this counter-review point. | Four touched Claude files **55 passed**; six of six guard-specific mutations red; the added row-cap test green and red under exact guard removal; all eight profile hashes reproduce; Claude's exact production tree already passed **6,163 passed, 7 skipped, 0 failed**. Focused final-tree and record gates are recorded in section 94. | Counter-review: **1 P2 and 4 P3** (`ARV2CR94-001..005`), corrected prospectively or by test. Accounting remains **78 shared looks, 21 development evaluations, 27 infrastructure looks, and a 591-cell floor**. | Freeze and commit exact R-083 through R-090 physical identities next, then launch six unlevered jobs followed by two objective synthetic-leverage jobs sequentially. No deployment, broker, order, paper/live, or trading action. |
 | 2026-09-17 | Codex prospective QC corrections, R-107/R-108 results, and failed-project cleanup | `e3cbc9d` -> `808d2e4`, `d4c4e20`, `49962a6`, `fa564ff`, `01673d8`, `42a70d7`, `2f405b2`, `105e438`, `24c68a3`, and this record commit | Freeze each fresh physical successor before access; correct three technical refusal classes without selecting economic values; authenticate the first tangible QQQ and SPY market-cap results; then close the round for one push | R-083 refused bounded history shape, R-091 refused future-clock history, and R-099 refused the QC statistic-size boundary; each spent one look/evaluation, emitted zero cells, and was superseded under a fresh prospective identity. The corrections bound history shape to observed QC semantics, gate history on simulated time, split oversized account aggregates losslessly, derive infrastructure accounting from the authenticated ledger, and isolate compact-bound guards. R-107 and R-108 then completed and each exposed its exact eight-statistic authenticated aggregate once. R-107 QQQ selected returned **66.41%** at 10 bps versus **114.31%** matched and **95.67%** SPY; R-108 SPY selected returned **108.38%** versus **88.77%** matched and **95.67%** SPY. At owner direction, only the three unintended-runtime-error projects were moved to QC's recoverable Recycle Bin; successful, intentional-refusal, active, ambiguous, and unrelated projects were preserved. | Focused market-cap/leverage/projection/adapter validation **363 passed in 232.98 s**; complete standing Analyst lane **5,998 passed, 7 skipped, 0 failed, 35 warnings in 6,655.96 s (1:50:55)**; final record gate, compileall, diff, branch, remote-tip, and clean-status gates run after this row. QC access was bounded to preregistered status/result operations plus the later statistics-disabled cleanup inventory; no raw row, log, chart, holding, order, deployment, broker, paper/live state, or trade was selected. Accounting closes at **83 shared looks, 26 development evaluations, 27 infrastructure looks, and a 599-cell floor**. | The section-94 counter-review findings were closed before launch. Three technical refusal classes were corrected prospectively; the stale infrastructure-total P2 was corrected; compact-bound guards gained isolated tests; the pre-push audit found only the missing row and imprecise old cell-accrual wording, both corrected here. No open scoped P0-P2 is known at handoff. | Make exactly one push to the existing lane. Per explicit owner direction, Claude review is deferred rather than cancelled; next implement one identical, preregistered bounded benchmark-tilt rule for fresh QQQ and SPY 2021--2025 diagnostics before either result is read. R-109--R-114 remain unlaunched and unspent. No formal acceptance, deployment, broker, order, paper/live, or trading authority. |
+| 2026-09-18 | Independent Claude review of the R-083 through R-108 range | `1d83668` -> this record commit; documentation only | Review `df767d3..1d83668` commit by commit from an export of the pushed head while Codex edited this worktree; mutation-test the three refusal-driven corrections and the transport split with failing-test capture; reconcile the R-107 through R-114 freeze to code | All eleven commits accepted and no code changed. Clock gates, out-of-window skip and the digest-bound transport split are each pinned by a named behavioural test; all eight frozen profile SHA-256s reconcile; refusal strings exist at their commits; the owner-directed cleanup moved exactly three superseded projects to the Recycle Bin with value-free reads. One P2 documented: R-107/R-108's SPY 95.67% versus every prior run's 94.2074% on the same 1,254-return window, unexplained and undiagnosable from receipts, geometry/formula/stitching/keying excluded at `1d83668`. Section 94's five qualifications confirmed. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Five mutation trials (CG1, CG2, OW1, FR1, FR2) red with named tests in a byte-restored export; freeze-table reconciliation 8/8; complete selection not re-run to completion (owner-directed push at 40%, no failures; no code changed; Codex's run on the same head **5,998 passed, 7 skipped, 0 failed** per section 103); record gates on the final bytes **75 passed**; compileall exit 0; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **1 P2 and 5 P3** (`ARV2R104-001..006`); 2 corrected by record restatement, 4 documented. | Push this same-lane round exactly once. Codex counter-reviews section 104 and the pushed range in this same worktree; explain the SPY benchmark basis and bind a benchmark-series digest before R-109. No leverage, deployment, broker, order or trading action. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -17784,3 +17799,146 @@ R-107/R-108 projects, active work, unrelated projects, two ambiguous
 zero-backtest diagnostics, and pre-existing Recycle Bin contents were
 preserved. The cleanup selected no result statistic, log, raw row, order,
 deployment, or portfolio value and consumed no research look.
+
+## 104. Independent Claude review of the R-083 through R-108 range, 2026-09-18
+
+**Range reviewed:** `df767d3..1d83668`, eleven commits, individually and
+cumulatively at the exact pushed remote head `1d83668`: 13 files,
++2,014/-154. **This round records 1 P2 and 5 P3 (`ARV2R104-001..006`); 2 are corrected here by record restatement and 4 are documented. No production or test code changed.** **Zero research looks and zero development
+evaluations in this round.** No QuantConnect, Massive, Benzinga, Sharadar,
+provider row, market datum, outcome, credential, Object Store object, broker,
+deployment, order, paper/live state, or trading surface was accessed. Every
+number below is read from the committed tree at `1d83668`, the lane record,
+the shared ledger, or a test run on this Mac. The owner's 2026-09-18
+instruction to review now supersedes the deferral recorded in section 4;
+review was deferred, not cancelled, and this section discharges it.
+
+**Working method note.** Codex was editing this worktree during the review:
+the market-cap evaluator, the projection, and later the submission adapter
+carried uncommitted changes. Every code fact below was therefore taken from
+a `git archive` export of `1d83668`, every test and mutation trial ran in
+that export, and the uncommitted work was not read or reviewed. The complete
+lane selection also ran in the export rather than the worktree, because the
+worktree could not have validated the pushed head.
+
+**All eleven commits are accepted and no code changed.** Each of the three
+refusal-driven corrections in this range is behaviourally pinned by a test
+named for it, the transport split is digest-bound and pinned, all eight
+frozen R-107 through R-114 profile identities reconcile to the tree's pinned
+profiles, and every refusal string exists in the tree that raised it. One
+substantive item is documented for resolution before R-109: the lane now
+carries two different SPY figures for the same frozen window and does not
+say so.
+
+### 104.1 Per-commit dispositions
+
+| # | Commit | Disposition | Basis |
+|---|---|---|---|
+| 1 | `e3cbc9d` Counter-review market-cap and leverage candidate | **Accepted** | Accepts `b55ea35` and `df767d3`, appends the round row, and raises five qualifications of section 93 that are all correct; answered in 104.4 and corrected in `ARV2R104-005`. |
+| 2 | `808d2e4` Preregister R083 through R090 QC plans | **Accepted** | Prospective identities and rules committed before launch; the R-083 refusal string `escaped request bounds` exists at this commit. |
+| 3 | `d4c4e20` Correct QC market-cap history window handling | **Accepted** | Replaces a refusal on an out-of-window collection with a skip before any traversal, matching the rule accepted in 88.15. Mutation OW1 (skip removed) is red through `test_out_of_window_collection_is_ignored_before_traversing_rows`. Profiles re-versioned to v2. |
+| 4 | `49962a6` Preregister R091 through R098 QC successors | **Accepted** | Fresh identities after the R-083 refusal; nothing rewritten. |
+| 5 | `fa564ff` Gate QC history on simulated time | **Accepted** | Section 98's diagnosis holds: R-091 refused at simulated 2025-08-28 because the history cache was necessarily incomplete, which is the correct fail-closed direction. Both gates are pinned: CG1 (chunk gate `<=` to `<`) is red through `test_driver_waits_for_each_point_in_time_chunk_before_history_calls`; CG2 (history gate) through `test_driver_waits_for_complete_history_then_uses_bounded_work_units`. |
+| 6 | `01673d8` Freeze clock-gated QC successor plans | **Accepted** | Fresh identities; the R-099 refusal string `summary exceeded compact bound` exists at this commit. |
+| 7 | `42a70d7` Split bounded QC aggregate transport | **Accepted** | The 21-field selected and matched aggregates move to their own statistics and META keeps `summary_sha256` over the logical record; the adapter re-inserts profile, both aggregates and the cells before recomputing. FR1 (selected aggregate not re-bound) is red through eight `test_each_market_cap_profile_accepts_exact_bounded_aggregate[...]` cases; FR2 (identity check disabled) through `test_market_cap_unrehashened_split_account_mutation_refuses_identity`. The leverage inventory now also carries the base aggregates; see `ARV2R104-002`. |
+| 8 | `2f405b2` Freeze R107 through R114 QC plans | **Accepted** | All eight frozen profile SHA-256s equal the tree's pinned profiles (six market-cap v2, two leverage v3), which closes `ARV2R93-006`'s remedy. 42 hashes frozen before launch. |
+| 9 | `105e438` Record R107 tangible QQQ result | **Accepted** | Result and accounting reconcile. The SPY figure is the subject of `ARV2R104-001`; the concentration wording of `-004`. |
+| 10 | `24c68a3` Record R108 SPY market-cap result | **Accepted** | Result and accounting reconcile; `ARV2R104-001` applies equally. |
+| 11 | `1d83668` Record R107 R108 results and QC cleanup | **Accepted** | The cleanup was owner-directed, used value-free reads, and moved exactly the three superseded `Runtime Error` projects (R-083, R-091, R-099) to QC's recoverable Recycle Bin. |
+
+### 104.2 Findings
+
+| ID | P | Location | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R104-001` | P2 | Sections 101--103; shared ledger R-107/R-108; `accepted_risk_market_cap_stock_portfolio_qc_runtime.py` | R-107 and R-108 report SPY at **95.67%** for 2021-01-04 through 2025-12-31; every prior run on that window (R-064 through R-078) reported **94.2074%**. The record does not mention the change. Read at `1d83668`, the two evaluators agree on everything that could explain it: the same 1,255-session axis with 1,254 returns (`expected_return_session_count = expected_session_count - 1`), the same loop from `first_execution = start + 1`, the same daily compounding, history requests that cover the full window per security in one call so no cross-request stitching exists, the same total-return normalization and session-open observation, and the same `bar.time.date()` session key. What remains is a data-vintage or as-of dependence the lane has not characterized, and it cannot be diagnosed from receipts because the runtime META carries no benchmark-series digest. Consequences: "selected minus SPY" is not on a common basis across the lane (R-108's +12.71 points would be +14.17 on the earlier basis), and R-109 through R-114 would inherit the same undisclosed basis. The attribution statistic, selected minus matched, is unaffected because both accounts use one loader. | **Documented; resolve before R-109.** Recipe: bind a benchmark-series SHA-256 plus first and last adjusted opens into the runtime META for every profile; run one bounded, value-free comparison of the two loaders' SPY series; and state the basis in 102, 103 and the ledger. Binding the digest changes projected source, so it belongs in the next fresh profile version, not in the frozen R-109 through R-114 bytes. |
+| `ARV2R104-002` | P3 | `accepted_risk_preliminary_submission_adapter.py`, leverage result validation | The leverage job now emits `SELECTED_BASE_AGGREGATES` and `MATCHED_BASE_AGGREGATES`. The adapter validates them with the same account-aggregate validator as the market-cap run -- fields and counts -- but does not compare them to the referenced market-cap run's persisted aggregates, so a leverage job whose in-job base recomputation drifted from R-107/R-108 would pass. | **Documented.** Bind the base run's receipt SHA-256 into the leverage META and refuse on inequality of the base aggregates. |
+| `ARV2R104-003` | P3 | Section 101 | `ARV2R90-003`'s remedy asked every preregistration to state expected eligible count, selected count and gross exposure. Section 101 freezes 42 hashes but no expected counts or breadth. Exposure is moot for these profiles because weights renormalize to 98%, but the eligible and effective-holdings expectations that would have flagged R-107's 3.26 effective names before launch were not pre-stated. | **Documented.** Pre-state eligible-count and effective-breadth ranges for R-109 through R-114 before launch. |
+| `ARV2R104-004` | P3 | Section 102 | The frozen disclosure from `ARV2CR94-005` reports inverse HHI below 10 "as a concentrated result". Section 102 gives the numbers (3.26 effective holdings, 48.30% mean largest position, 77.68% maximum) and calls the sleeve "much more concentrated", but does not apply the frozen label. | **Documented.** Use the frozen wording so the rule is visibly applied. |
+| `ARV2R104-005` | P3 | Section 93, this reviewer | Section 94's five qualifications are all correct. The claim that a daily-reset 2x or 3x of a sleeve that trails SPY unlevered must trail levered SPY by more is false; daily resetting is path-dependent and Codex's `+50%,-30%` counterexample reverses the gap. The leverage job emits six statistics, not five, because the runtime adds `ARV2_RUNTIME_META`. Section 93.1's tally of section 91's findings (9/2/1) disagreed with 93.4's correct 10/1/1. The sibling `_collection_rows` bound was left unpinned; Codex pinned it. And "mega-cap dominated by construction" was stated as mechanical when it is a disclosure rule about effective breadth. | **Corrected here** by restatement. The leverage interpretation rule is now: compare selected and matched under the same factor and scenario and report the observed gap; predict no direction. |
+| `ARV2R104-006` | P3 | Section 4 | The live block still says the bounded-tilt implementation proceeds "without an intervening Claude review" and defers review of section 103. The owner's 2026-09-18 instruction lifted the deferral. | **Corrected here** in the section-4 pointer. |
+
+### 104.3 Mechanical verification
+
+All trials ran in the `git archive` export of `1d83668`, each restored
+byte-identical and SHA-256-verified. Failing tests are named; a trial counts
+as a behavioural catch only when a test written for the guard is among them.
+
+- **Market-cap runtime:** CG1 chunk clock gate `<=` to `<` -- red,
+  `test_driver_waits_for_each_point_in_time_chunk_before_history_calls`; CG2
+  history clock gate `<=` to `<` -- red,
+  `test_driver_waits_for_complete_history_then_uses_bounded_work_units`; OW1
+  out-of-window skip removed -- red,
+  `test_out_of_window_collection_is_ignored_before_traversing_rows`.
+- **Submission adapter, transport split:** FR1 selected aggregates not
+  re-bound into the digest -- red, eight
+  `test_each_market_cap_profile_accepts_exact_bounded_aggregate[...]` cases;
+  FR2 summary-identity refusal disabled -- red,
+  `test_market_cap_unrehashened_split_account_mutation_refuses_identity`.
+  Codex's `test_collection_rows_bound_iteration_before_materializing_the_row_cap`
+  from `ARV2CR94-004` is present at `1d83668`.
+- **Identity:** the R-107 through R-114 freeze table's eight profile
+  SHA-256s equal the tree's pinned profiles one for one.
+- **Refusal provenance:** `escaped request bounds` exists at `808d2e4`
+  (R-083) and `summary exceeded compact bound` at `01673d8` (R-099); both
+  strings survive at HEAD in their corrected paths.
+- **Benchmark basis (`ARV2R104-001`):** verified at `1d83668` that the stock
+  and market-cap evaluators share axis length, return count, loop bounds,
+  compounding, per-security single-request history, normalization,
+  observation and session keying; the runtime META has no benchmark-series
+  digest.
+- `compileall` over the lane packages and tests in the export exits 0.
+
+### 104.4 Response to section 94's counter-review
+
+`ARV2CR94-001` through `-005`: all confirmed; see `ARV2R104-005`.
+
+### 104.5 Results, read on the record's own terms
+
+- **R-107, QQQ proxy, cap-weighted:** selected +66.41% against matched
+  +114.31% at 10 bps, -47.90 points; 3.26 effective holdings with a 48.30%
+  mean largest position and a -67.89% drawdown. Under the frozen disclosure
+  this is a concentrated result; it is evidence against the selected ranking
+  in this construction and says little about the score, because a
+  three-name book is a bet on three names.
+- **R-108, SPY proxy, cap-weighted:** selected +108.38% against matched
+  +88.77%, +19.61 points, and +12.71 points against SPY on the 95.67% basis
+  (+14.17 on the 94.21% basis). The first sleeve in the lane to exceed the
+  benchmark's cumulative return, at higher volatility (21.58% against
+  16.64%), a lower Sharpe than the matched portfolio (0.792 against 0.851),
+  and a deeper drawdown. Effective breadth 10.76, at the frozen floor.
+- Both are single windows of roughly two regimes, both are current-vintage,
+  and the same-window rule in 88.6 still forbids selecting either as a
+  winner. Nothing here meets any gate for leverage, acceptance, or use.
+
+### 104.6 Improvement plan
+
+1. Benchmark-series digest in META and one value-free loader comparison
+   before R-109 (`ARV2R104-001`).
+2. Leverage META binds the base run's receipt and refuses on base-aggregate
+   inequality (`-002`).
+3. Pre-state eligible-count and effective-breadth ranges for every remaining
+   run (`-003`), and apply the frozen concentration label verbatim (`-004`).
+4. Keep the working rule this round forced: when the implementer is editing
+   the worktree, the reviewer reads and validates only an export of the
+   pushed head.
+
+### 104.7 Carried-open findings
+
+`ARV2R83-001`, `ARV2R74-008`, `ARV2R74-009` and lane-wide `ARV2R50-022`
+remain open and unchanged. `ARV2R93-006` is closed by `2f405b2`.
+
+### 104.8 Validation
+
+- Mutation trials as itemized in 104.3, restored byte-identical after each.
+- `compileall` in the export: exit 0.
+- Complete lane selection: **not re-run to completion for this push.** No
+  production or test code changed in this round, so the pushed head
+  `1d83668` is the exact code tree; Codex's complete standing selection on
+  that head is recorded in section 103 and its ledger row as **5,998 passed,
+  7 skipped, 0 failed**. This reviewer's own complete selection in the
+  export of `1d83668` was at 40% with no failures when the owner directed
+  the push on 2026-09-18; its final count is not recorded here.
+- Record gates re-run on the exact final record bytes after this section
+  and its ledger row were written: **75 passed**. `git diff --check` on the
+  record is clean. Codex's three uncommitted working files were left
+  untouched and are not part of this commit.

@@ -1,21 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE IB-1I v2 PAPER-STAGE GATE AMENDMENT AND ITS RECORDS ARE
-CLAUDE-REVIEWED AND ACCEPTED (SECTION 68). ALL SEVEN COMMITS IN
-`5f6a074..c256069` ARE ACCEPTED WITH NO CODE CORRECTION REQUIRED. THE GATE
-CORRECTLY ENCODES THE OWNER SCHEDULING DECISION WITHOUT GRANTING AUTHORITY:
-THE FINAL HOLDOUT REMAINS SEALED AND ITS ROLE PINNED, BOTH LOOK COUNTERS
-REMAIN EXACT ZERO, THE PROMOTION SEQUENCE STILL REQUIRES A SEPARATE OWNER
-DEPLOYMENT AUTHORITY BEFORE ANY PILOT, THE PILOT IS PINNED AT EXACTLY 60
-TRADING DAYS, AND EVERY ESCALATION OF EVERY NEW FIELD IS REFUSED. THE GATE
-AND PAYLOAD SCHEMA BOTH ADVANCE TO v2. FOURTEEN MUTATION DIRECTIONS ON THE
-NEW GUARDS WERE ALL CAUGHT WITH NO SURVIVORS. RECORDED COUNTS REPRODUCE
-EXACTLY (199, 268, 1,726) AND THE COMPLETE SUITE IS **7,924 PASSED, 38
-SKIPPED, 0 FAILED**. `IB3D-CCR01` IS ACCEPTED AGAINST THIS REVIEWER. ONE
-COORDINATION ITEM IS OPEN AS `IBSH-CR01`: THE OWNER-COORDINATED AMENDMENT TO
-THREE SHARED DOCUMENTS EXISTS ONLY ON THIS LANE, AND `main` AND THE OTHER
-THREE LANES CARRY NONE OF IT. NO DATA, PROVIDER, OUTCOME, QC, PAPER, LIVE,
-DEPLOYMENT, CAPITAL, BROKER, OR TRADING AUTHORITY IS GRANTED.**
+Status: **CODEX COUNTER-REVIEWED CLAUDE COMMIT `226c4c1` AND ACCEPTED IT
+AFTER APPEND-ONLY P3 CORRECTION `IBPAPER-CCR01` (SECTION 69). CLAUDE'S
+SEVEN COMMIT DISPOSITIONS, 14-OF-14 CURRENT-GATE MUTATION RESULT, AUTHORITY
+ANALYSIS, COUNTS, AND CROSS-BRANCH `IBSH-CR01` FINDING REPRODUCE. ITS CLAIM
+THAT THIS WAS THE LANE'S FIRST NEW-GUARD MUTATION SWEEP WITH ZERO SURVIVORS
+IS HISTORICALLY FALSE: SECTION 28 ALREADY RECORDS 8 CAUGHT AND 0 SURVIVED.
+NO CODE CORRECTION WAS REQUIRED. `IBSH-CR01` REMAINS OPEN AND OUT OF LANE:
+THE OWNER-COORDINATED AMENDMENT TO THREE SHARED DOCUMENTS EXISTS ONLY ON
+THIS LANE, WHILE `main` AND THE ANALYST, SHORT-INTEREST, AND TARGET-PRICE
+LANES CARRY NONE OF IT. NO NEXT IMPLEMENTATION MILESTONE OR PUSH IS
+AUTHORIZED PENDING OWNER DIRECTION ON COMMON PROPAGATION AND THE SEPARATE
+CANONICAL IB-2 SOURCE-MODE/CUTOFF GATE. NO DATA, PROVIDER, OUTCOME,
+RESEARCH-LOOK, QC-JOB, PAPER, LIVE, DEPLOYMENT, CAPITAL, BROKER, ORDER, OR
+TRADING AUTHORITY IS GRANTED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -183,6 +181,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-18 | Claude review | `83427c5` -> `fc6638b` (test correction) -> this review record | Independent review of the owner-approved synthetic IB-3D buyer-cluster diagnostic and its record (`e7c7507..83427c5`, 2 commits, 0 merges, 4 lane-owned paths) | Verified the remote tip and clean worktree, checked each of the eight approved clauses against the quoted owner text with direct probes, confirmed the three section-63 corrections against section 62 including the owner validation direction recorded in 55.4, and ran 16 mutation directions on the pushed tree. Two load-bearing row guards were untested and are now pinned. Full detail in section 65. | Pushed tree `83427c5`: complete suite **7,842 passed, 38 skipped, 28 warnings, 0 failed in 641.46s**; IB-3D **73**, IB-3A/B/C/D **368**, lane plus both boundaries **1,644** - all exact. Final tree: IB-3D **75**; lane plus both boundaries **1,646**; complete suite **7,844 passed, 38 skipped, 28 warnings, 0 failed in 635.90s**; compileall exit **0**; `git diff --check` clean. The IB-3D policy hash recomputes and pins the upstream IB-3C and IB-3A hashes. 27 frozen authority flags false plus `canonical_population_verified` false; both look counters zero. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | Both commits accepted, `276d8ec` after a test-only correction. **IB3D-CR01** (P3) fixed in `fc6638b`: the row-level bindings of `cluster_qualified_candidate` and `meets_minimum_buyer_breadth` could each be deleted with the focused file green, though both are load-bearing and reachable by forging a row; two additive tests pin them, each mutation-verified. Mutation result: 16 directions, 10 caught on the pushed tree, 6 survivors comprising one redundant pair whose combined removal is caught, two guards proven unreachable after full parent replay, and the two genuine gaps now fixed. `IB3C-CCR02`, `IB3C-CCR03` and `IB3C-CCR04` are all accepted against this reviewer. Scope note: the quoted owner approval is not independently verifiable here; only its one-for-one match with the implementation is. | Codex counter-reviews `fc6638b` and this record commit. Canonical IB-2 and IB-3 remain incomplete; no milestone started by this review. |
 | 2026-09-18 | Codex counter-review + owner-coordination implementation | `5f6a074` -> `69a665b` (this record commit follows) | Claude IB-3D counter-review plus Insider paper-promotion sequencing gate | Accepted both Claude commits after the section-66 test/record corrections, recorded the owner's common coordination amendment, corrected the shared workflow conflict, and upgraded the zero-authority IB-1I gate to v2. Final-holdout completion is no longer an Insider paper prerequisite; the holdout remains sealed long-term prospective validation. The enforced sequence is reviewed historical validation, reviewed QC parity, separate paper-deployment authority, then an exact 60-trading-day pilot. | Focused preregistration **199 passed**; preregistration plus active documents **268 passed**; final lane/boundary gate before this record **1,726 passed**. Red/green includes seven core policy weakenings; one workflow conflict; **13 of 71** provenance/access cases; **7 of 76** tuple cases; **27 of 106** remaining exact-type cases; and three upstream same-valued drift probes, all restored green. No external or outcome access; **0 research looks**. | `IBPAPER-DOC01` P2, `IBPAPER-REC01` and `IBPAPER-REC02` P3, and `IB1I-V2-R01` through `IB1I-V2-R05` P3 are closed in section 67. No P0/P1 finding. Commits `6204643`, `aabe3ee`, `a9e2b40`, and `69a665b` await Claude's independent disposition. | Commit this record, rerun record-sensitive and final integrity checks, and make the round's one push. Claude reviews every commit in `5f6a074..PUSHED_HEAD`; Codex then counter-reviews every Claude commit. Canonical IB-2 still waits for an exact owner source-mode/cutoff decision; no data or operational action is inferred. |
 | 2026-09-18 | Claude review | `c256069` -> this review record | Independent review of the IB-3D counter-review and the owner-coordinated Insider paper-stage gate amendment (`5f6a074..c256069`, 7 commits, 0 merges, 8 paths including three shared documents) | Verified the remote tip and clean worktree, then reviewed all seven commits. Concentrated on the authority surface: probed the IB-1I v2 gate for holdout sealing, look counters, promotion sequencing and every field escalation; confirmed the pinned directive commit exists and is the commit that made the amendment; ran 14 mutation directions on the new guards; and checked whether the shared-document amendment reached the other lanes. Full detail in section 68. | Complete repository suite **7,924 passed, 38 skipped, 28 warnings, 0 failed in 573.91s (0:09:33)**. Recorded counts reproduce exactly: preregistration **199**, plus active-document **268**, lane plus both boundaries **1,726**. Mutation: **14 directions, 14 caught, 0 survivors**. Gate probes: holdout access `False` and escalation refused, holdout role pinned, both look counters `0`, no permanent look IDs, promotion sequence retains `separate_owner_paper_deployment_authority` before the pilot, pilot pinned at 60 trading days, prerequisites confer no deployment authority, and all seven attempted escalations refused. Gate version and payload schema both advance to v2. compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | All seven commits **accepted**; no code correction required. `IB3D-CCR01` is accepted against this reviewer: the breadth-gate pin in `fc6638b` covered only the promotion direction while section 65 described both, and `526ecc6` closed the demotion direction. New **IBSH-CR01** (P3, open, coordination): the owner-coordinated 2026-09-18 amendment to `ACTION_PLAN_2026-08-20.md`, `THREE_STRATEGY_PROJECT_DIRECTION.md` and `THREE_STRATEGY_PARALLEL_WORKFLOW.md` exists only on this lane; `main` and the analyst, short-interest and target-price lanes carry none of the three, which is the divergence the freeze rule exists to prevent. Documented, not fixed, because propagation is a cross-lane owner action. | Codex counter-reviews this record commit. The owner decides how to propagate the shared amendment. Paper promotion still requires separately authorized deployment; canonical IB-2 and IB-3 remain incomplete. |
+| 2026-09-18 | Codex counter-review | `226c4c1` -> this counter-review record | Counter-review of Claude's review of the IB-1I v2 paper-stage gate amendment | Reviewed the sole linear record-only Claude commit, reproduced every commit disposition and authority claim, verified its current-gate mutation evidence and cross-branch coordination finding, and corrected one historical novelty overclaim append-only. No production or test file changed, and no later milestone was started because owner decisions still block it. | Preregistration **199 passed**; preregistration plus active documents **268 passed**; record plus active documents **70 passed**; lane plus both import boundaries **1,726 passed**. The seven-commit reviewed range has zero merges and eight paths; hashes, semantic hash, compilation, diff, ancestry, and clean-status checks reproduce. Claude's complete-suite result remains **7,924 passed, 38 skipped, 0 failed**; Codex verified the current collection total is 7,962 but did not repeat that nine-minute run. No external or outcome access; **0 research looks**. | `226c4c1` **accepted after append-only correction**. `IBPAPER-CCR01` P3 is closed in section 69: section 68's “first round” claim conflicts with section 28's earlier **8 caught, 0 survived** sweep. `IBSH-CR01` P3 is accepted and remains open, shared/out of lane; no P0-P2 finding. | Hold this committed counter-review locally. The owner decides coordinated propagation of the shared amendment and separately freezes canonical IB-2 source mode/cutoff plus any common security-master/calendar audit. No milestone or push is authorized before then. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -9071,3 +9070,90 @@ Review commits on this lane: this record commit only. Next authorized step:
 Codex counter-reviews it, and the owner decides how to propagate the shared
 amendment recorded as `IBSH-CR01`. No milestone was started and none is
 authorized by this review.
+
+## 69. Codex counter-review of the paper-stage gate review (2026-09-18)
+
+Codex continued only in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. The Claude-push monitor detected exact
+remote head `226c4c171392e8f941966d00c8b6fb9d359bf883` after baseline
+`c256069783a116c655d66133fc83e59263ad09ae` and was then deleted. The incoming
+range contains one linear commit, zero merges, and one changed path: this lane
+record. Local `HEAD` and the remote lane head matched and the worktree was
+clean before this counter-review edit.
+
+### 69.1 Commit disposition
+
+| Commit | Change | Codex disposition |
+|---|---|---|
+| `226c4c171392e8f941966d00c8b6fb9d359bf883` | Claude section-68 review, mutable status, and append-only push ledger row | **Accepted after append-only correction.** The seven underlying commit dispositions, current-gate authority analysis, 14-of-14 mutation result, validation counts, hashes, and cross-branch coordination finding reproduce. `IBPAPER-CCR01` corrects one historical novelty overclaim below; no code correction is required. |
+
+### 69.2 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBPAPER-CCR01 | P3 | **CLOSED in this record commit** | `226c4c1` | Section 68.3, final paragraph | Claude calls the 14-of-14 result “the first round in this lane where a mutation sweep of new guards found no survivor at all.” The current result is valid, but the historical novelty claim is false. | Section 28.7 already records an eight-mutant dangerous-direction sweep “over the new guards” with **8 caught, 0 survived**; section 28.6 likewise says every added guard was mutation-proven at 8 of 8. | Mutation evidence and chronology must remain distinguishable. The false novelty does not affect gate behavior, but it is a durable record error in the current lane and therefore must be corrected append-only. | Preserve section 68 as review history and correct its claim in the mutable status, push ledger, and this section. The accurate statement is that all 14 current IB-1I v2 directions were caught with zero survivors; it was not the lane's first zero-survivor new-guard sweep. | Direct comparison of sections 28.6-28.7 and 68.3. Final record and active-document checks pass below. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN - accepted and retained; not fixed here** | `226c4c1` review of `6204643` and `aabe3ee` | Three shared coordination documents across remote branches | The owner-approved amendment is present on the Insider lane but absent from `origin/main` and the Analyst, Short-Interest, and Target-Price lanes. That creates the exact cross-branch divergence the common-baseline rule is intended to prevent. | After a fresh remote fetch, direct blob inspection found the amendment absent from all three named documents on each of the four other refs and present on this lane. | The finding is correct, but changing another branch or propagating shared documents from this lane would violate the owner's fixed worktree/branch rule. This is a coordinated owner action, not a lane-local defect. | No file outside this lane record changed. Recommend one dedicated common-coordination propagation of the identical amendment to `main` and the other three lanes. | Cross-ref inspection of all three documents on `origin/main`, `origin/codex/strategy-analyst-revisions-v2`, `origin/codex/strategy-short-interest`, and `origin/codex/strategy-target-price-revisions`. |
+
+There is no P0, P1, or P2 finding. No other P3 finding was identified. The
+section-68 description of `IB3D-CCR01`, every per-commit disposition, the
+zero-authority gate behavior, and the shorter-but-still-gated paper sequence
+are accepted.
+
+### 69.3 Independent validation
+
+Codex and two independent read-only audits reproduced the material claims on
+Python 3.13.15 and pytest 9.1.1:
+
+- `tests/test_insider_buying_preregistration.py`: **199 passed**;
+- preregistration plus active-document consistency: **268 passed**;
+- lane record plus active-document consistency: **70 passed**;
+- all Insider tests plus active-document, module-hygiene, overlay-import, and
+  ML-import boundaries: **1,726 passed**;
+- complete-suite collection: **7,962 tests**, arithmetically consistent with
+  Claude's exact-tree **7,924 passed plus 38 skipped** result;
+- reviewed Codex range `5f6a074..c256069`: seven commits, zero merges, eight
+  paths; incoming Claude range `c256069..226c4c1`: one commit, zero merges,
+  one record path;
+- preregistration module, preregistration-test, shared-workflow, and gate
+  semantic SHA-256 values reproduce exactly;
+- scoped compilation: exit **0**; and
+- ancestry, `git show --check`, range and worktree `git diff --check`, branch,
+  remote, and pre-edit status checks: clean.
+
+Codex did not repeat Claude's approximately nine-minute complete-suite run for
+this record-only commit. The owner-directed recurring lane/boundary suite is
+the required counter-review gate; the current collection total independently
+accounts for every reported pass and skip. No production or test correction
+was made, so no material red/green cycle applies. The P3 record correction is
+verified by the cited historical text and the post-edit record checks.
+
+### 69.4 Owner gates and next action
+
+The amendment itself is approved and accepted. Two owner-coordination gates
+still prevent a next implementation milestone and this round's push:
+
+1. **Shared propagation.** Direct one common-coordination operation to place
+   the identical amendment on `main` and the Analyst, Short-Interest, and
+   Target-Price lanes. It must not be implemented by switching or writing
+   another branch from this Insider worktree.
+2. **Canonical IB-2 input/authority freeze.** Supply an exact SEC/Form 4 source
+   mode and cutoff plus immutable cache/hash, fair-access, authenticated
+   amendment, title-exception, and role-taxonomy rules. The lower-authority
+   recommendation remains an owner-supplied immutable **2006Q1-2026Q2**
+   snapshot with matching Form 4/4-A accession artifacts, rather than live
+   retrieval. Completing canonical IB-2 also requires a separately authorized
+   read-only common audit of point-in-time security-master/`qc_symbol_id` and
+   trading-calendar entitlement and semantics.
+
+Until the owner supplies those decisions, no canonical IB-2, invented IB-3E,
+IB-4, backtest, historical validation, QC parity, or operational milestone may
+start, and no push is authorized. This counter-review record is committed and
+held locally so that the eventual authorized implementation and this review
+can leave in one combined push.
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
+security master, outcome, ETF holding, QuantConnect job/upload/processing,
+broker, operator database, scheduler, paper deployment, capital, order, live,
+or trading surface was accessed or changed. Authorized outcome looks: **0**.
+Consumed outcome looks: **0**. Research looks: **0**.

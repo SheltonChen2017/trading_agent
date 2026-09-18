@@ -23,6 +23,8 @@ winsorization and population-z-score diagnostics while keeping canonical
 scores, ranks, seeds, outcomes, and every operational authority unavailable.
 IB-3C adds exact-value diagnostic ranking, top-decile cutoff ties, and a
 two-positive-seed availability gate while retaining the same zero authority.
+IB-3D preserves that selection and applies a separate, caller-declared buyer-
+breadth gate, atomically refusing fewer than two cluster-qualified stocks.
 """
 
 from research.insider_buying.contracts import (
@@ -207,6 +209,24 @@ from research.insider_buying.form4_stock_signal_seed_diagnostics import (
     Form4StockSignalSeedIdentity,
     Form4StockSignalSeedOutcome,
     build_form4_stock_signal_seed_diagnostics,
+)
+from research.insider_buying.form4_stock_signal_buyer_cluster_diagnostics import (
+    FORM4_STOCK_SIGNAL_BUYER_CLUSTER_BUYER_ID_POLICY,
+    FORM4_STOCK_SIGNAL_BUYER_CLUSTER_DIAGNOSTICS_VERSION,
+    FORM4_STOCK_SIGNAL_BUYER_CLUSTER_MINIMUM_BUYER_BREADTH,
+    FORM4_STOCK_SIGNAL_BUYER_CLUSTER_MINIMUM_QUALIFIED_SEEDS,
+    FORM4_STOCK_SIGNAL_BUYER_CLUSTER_POLICY_HASH,
+    FORM4_STOCK_SIGNAL_BUYER_CLUSTER_SELECTION_POLICY,
+    FORM4_STOCK_SIGNAL_BUYER_CLUSTER_SOURCE_POLICY,
+    MAX_FORM4_STOCK_SIGNAL_BUYER_CLUSTER_ROWS,
+    MAX_FORM4_STOCK_SIGNAL_BUYER_CLUSTER_SOURCE_EVENTS,
+    MAX_FORM4_STOCK_SIGNAL_BUYER_CLUSTER_TEXT_CHARACTERS,
+    Form4StockSignalBuyerClusterDiagnosticRow,
+    Form4StockSignalBuyerClusterDiagnostics,
+    Form4StockSignalBuyerClusterDiagnosticsError,
+    Form4StockSignalBuyerClusterIdentity,
+    Form4StockSignalBuyerClusterOutcome,
+    build_form4_stock_signal_buyer_cluster_diagnostics,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -468,4 +488,20 @@ __all__ = [
     "Form4StockSignalSeedIdentity",
     "Form4StockSignalSeedOutcome",
     "build_form4_stock_signal_seed_diagnostics",
+    "FORM4_STOCK_SIGNAL_BUYER_CLUSTER_BUYER_ID_POLICY",
+    "FORM4_STOCK_SIGNAL_BUYER_CLUSTER_DIAGNOSTICS_VERSION",
+    "FORM4_STOCK_SIGNAL_BUYER_CLUSTER_MINIMUM_BUYER_BREADTH",
+    "FORM4_STOCK_SIGNAL_BUYER_CLUSTER_MINIMUM_QUALIFIED_SEEDS",
+    "FORM4_STOCK_SIGNAL_BUYER_CLUSTER_POLICY_HASH",
+    "FORM4_STOCK_SIGNAL_BUYER_CLUSTER_SELECTION_POLICY",
+    "FORM4_STOCK_SIGNAL_BUYER_CLUSTER_SOURCE_POLICY",
+    "MAX_FORM4_STOCK_SIGNAL_BUYER_CLUSTER_ROWS",
+    "MAX_FORM4_STOCK_SIGNAL_BUYER_CLUSTER_SOURCE_EVENTS",
+    "MAX_FORM4_STOCK_SIGNAL_BUYER_CLUSTER_TEXT_CHARACTERS",
+    "Form4StockSignalBuyerClusterDiagnosticRow",
+    "Form4StockSignalBuyerClusterDiagnostics",
+    "Form4StockSignalBuyerClusterDiagnosticsError",
+    "Form4StockSignalBuyerClusterIdentity",
+    "Form4StockSignalBuyerClusterOutcome",
+    "build_form4_stock_signal_buyer_cluster_diagnostics",
 ]

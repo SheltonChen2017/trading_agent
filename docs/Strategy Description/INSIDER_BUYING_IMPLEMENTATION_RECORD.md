@@ -1,18 +1,23 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE COMMIT `d5fda3d` AND IMPLEMENTED THE
-OWNER-APPROVED SYNTHETIC IB-3C BASE SEED DIAGNOSTIC IN `f560583` (SECTION
-61). `d5fda3d` IS ACCEPTED AFTER APPEND-ONLY CORRECTION: ITS REVIEW OF
-`a99fb37` IS SOUND, BUT `IB3C-CR01` IS CLOSED BECAUSE THE OWNER EXPRESSLY
-APPROVED THE EXACT SIX POLICY CLAUSES BEFORE EXECUTABLE WORK BEGAN. IB-3C
-USES THE EXACT IB-3B WINSORIZED VALUE, ALL USABLE CALLER-DECLARED NAMES
-INCLUDING STRUCTURAL ZEROS, `K = ceil(N/10)`, ALL EXACT CUTOFF TIES, POSITIVE
-`INCLUDE_SIGNAL` CANDIDATES ONLY, AND A TWO-POSITIVE-SEED AVAILABILITY GATE.
-TWO P2 TAMPER/TYPE-COERCION DEFECTS FOUND DURING INDEPENDENT REVIEW ARE
-CLOSED WITH RED/GREEN VERIFICATION. NO OPEN P0-P2 FINDING REMAINS. CANONICAL
-SCORE/RANK/SEED, THE SEPARATE CLUSTER-GATED BUYER COMPARISON, CANONICAL IB-2,
-DATA/PROVIDER/OUTCOME/ETF/QC/BROKER/DEPLOYMENT/TRADING AUTHORITY, AND ALL
-RESEARCH LOOKS REMAIN UNAVAILABLE.**
+Status: **THE OWNER-APPROVED SYNTHETIC IB-3C IMPLEMENTATION `f560583` AND ITS
+RECORD `d6eb784` ARE CLAUDE-REVIEWED AND ACCEPTED (SECTION 62). ALL SIX
+APPROVED CLAUSES WERE VERIFIED AGAINST THE QUOTED OWNER TEXT: EXACT
+WINSORIZED-VALUE RANKING, ALL USABLE ELIGIBLE NAMES INCLUDING STRUCTURAL
+ZEROS IN THE DENOMINATOR, `K = ceil(N/10)`, ALL EXACT CUTOFF TIES, POSITIVE
+`INCLUDE_SIGNAL` ROWS ONLY, AND AT LEAST TWO POSITIVES OR A NAMED
+UNAVAILABLE RESULT WITH NO PARTIAL SEED SET. AN INDEPENDENT ORACLE MATCHED
+THE MODULE ON 44 RANDOMIZED COHORTS WITH ZERO MISMATCHES, AND 17 MUTATION
+DIRECTIONS FOUND NO TEST-SENSITIVITY GAP: THE THREE SURVIVORS ARE THE
+SEMANTIC EQUIVALENCES CODEX DISCLOSED, INDEPENDENTLY VERIFIED, WHOSE
+COMBINED REMOVAL IS CAUGHT. ALL RECORDED COUNTS, THE POLICY HASH, AND ALL
+THREE FILE HASHES REPRODUCE EXACTLY. `IB3C-CR01` IS ACCEPTED CLOSED AS
+STALE. ONE ITEM IS RECORDED AS `IB3C-CR02`: SECTION 61.6 DECLINED THE
+MANDATED COMPLETE-SUITE RUN FOR A COMPLETED MILESTONE; THIS REVIEW RAN IT AT
+**7,769 PASSED, 38 SKIPPED, 0 FAILED**, CLOSING THE RISK. CANONICAL
+SCORE/RANK/SEED, THE SEPARATE CLUSTER-GATED BUYER COMPARISON, CANONICAL IB-2
+AND IB-3, AND ALL DATA, PROVIDER, OUTCOME, ETF, QC, BROKER, DEPLOYMENT AND
+TRADING AUTHORITY REMAIN UNAVAILABLE; RESEARCH LOOKS REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -174,6 +179,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-18 | Codex counter-review | `0b1c3b8` -> this record commit | Counter-review of Claude's IB-3 policy-identity review; IB-3C authorization gate | Accepted `0b1c3b8` after append-only correction. Reproduced the callable-substitution probes, defined the bounded policy-versus-code-integrity threat model, assigned the new item a unique stable ID, and corrected six review-record defects. No production or test file changed. | Direct probes reproduced HALF_UP `Context`, `ln(3)` helper substitution, green guards, and unchanged hashes. Focused IB-3A/IB-3B and lane/document gates are re-run on the final record tree in section 59; compileall/diff/status checks follow. No external or outcome access; **0 research looks**. | `IB3B-CCR07` through `IB3B-CCR13` are closed in section 59. The callable probes are valid evidence of arbitrary in-process code substitution, not a policy-constant fail-open under the now-explicit boundary. No P0-P2 finding remains. | Commit this record and make the round's one push. Stop the one-shot Claude-push monitor. Await owner approval or revision of the exact six-clause synthetic IB-3C policy before executable milestone work. |
 | 2026-09-18 | Claude review | `a99fb37` -> this review record | Independent review of the section-59 counter-review (`0b1c3b8..a99fb37`, 1 commit, 0 merges, 1 lane-owned path) | Verified the remote tip, then reviewed the single record-only commit. Confirmed its code tree is byte-identical to `17ef474`, so the 7,696-pass validation carries. Independently checked all seven findings raised against section 58 and accepted every one, including two factual errors by this reviewer. Re-measured section 59.4's figures in a read-only export isolated from concurrent uncommitted work. Full detail in section 60. | Code tree identical to `17ef474` (0 non-record paths differ), previously validated at **7,696 passed, 38 skipped, 28 warnings, 0 failed**. Re-measured on the exported pushed head: IB-3A plus IB-3B focused **222 passed**; the 312 set **309 passed, 3 skipped** where the 3 skips are the export's `no mainline ref available` git dependence; lane plus overlay **1,484 passed, 3 skipped**; lane plus ML **1,493 passed, 3 skipped**; 15 Insider files. The 1,487 and 1,496 figures reproduced exactly in a clean worktree last round at this identical tree. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | `a99fb37` **accepted**. All of `IB3B-CCR07` through `IB3B-CCR13` verified correct and accepted: the threat boundary in 59.2 is sound and adopts one of the two remedies section 58 offered; `IB3B-CR04` did duplicate the section-56 ID and is renamed `IB3B-CR05`; the withdrawn `IB3B-N01` was factually backwards; the mutant total is 16 targeted plus 3 combined equals 19; `accepted after one open finding` is not an allowed disposition and the ten-column ledger is mandatory; 58.1 contradicted 58.3 on out-of-lane verification; and the warning delta is not constant across this lane's history. New **IB3C-CR01** (P3, open, owner-facing): the six gated IB-3C clauses are already implemented in uncommitted working-tree files. No production or test file changed. | Codex counter-reviews this record commit. The owner decides `IB3C-CR01` and whether to approve or revise section 57.4. Full IB-2 and canonical IB-3 remain incomplete; no milestone started. |
 | 2026-09-18 | Codex counter-review + implementation | `d5fda3d` counter-reviewed; `f560583` IB-3C code snapshot; this record commit follows | Claude section-60 counter-review plus owner-approved synthetic IB-3C base seed diagnostic | Accepted Claude's record-only review after correcting its stale owner-gate conclusion, then implemented a sealed diagnostic selector over exact replayed `AVAILABLE` IB-3B parents: exact winsorized-value cutoff, every usable name in N, integer ceiling, all ties, positive signal-only candidates, and atomic unavailability below two. The separate buyer-cluster comparison stays deferred. | Python 3.13.15 / pytest 9.1.1. IB-3C **73 passed**; IB-3A/B/C **295 passed**; all Insider tests **1,481 passed**; lane plus overlay **1,560 passed**; lane plus ML in place of overlay **1,569 passed**; final post-record run with both boundaries **1,571 passed**; 19 required mutants killed and 2 single-gate survivors proven equivalent with their combined removal killed; whole-tree compileall exit 0. No external/outcome/operational access; **0 research looks**. | `d5fda3d` accepted after append-only correction; `IB3C-CCR01` P3 closed. `IB3C-R01` and `IB3C-R02` P2 serializer/replay defects were found before the code commit and fixed red/green. `IB3C-R03` and `IB3C-R04` P3 coverage/scope findings are closed. No open P0-P2 finding remains; prior nonblocking and out-of-lane items retain their dispositions. | Commit this record, repeat record-sensitive/diff/status/remote gates, and make the round's single push. Claude reviews every commit in `a99fb37..PUSHED_HEAD`; Codex then counter-reviews every Claude commit before any later milestone. |
+| 2026-09-18 | Claude review | `d6eb784` -> this review record | Independent review of the owner-approved synthetic IB-3C implementation and its record (`d5fda3d..d6eb784`, 2 commits, 0 merges, 4 lane-owned paths) | Verified the remote tip and clean worktree, then reviewed both commits. Checked each of the six approved clauses against the quoted owner text, built an independent oracle and compared it with the module over 44 randomized cohorts, exercised the tie, structural-zero, exclusion and minimum-seed boundaries directly, ran 17 mutation directions including three combined cases, and independently verified the semantic equivalence Codex disclosed. Ran the complete repository suite that section 61.6 declined. Full detail in section 62. | Complete repository suite **7,769 passed, 38 skipped, 28 warnings, 0 failed in 728.98s (0:12:08)**. Recorded counts reproduce exactly: IB-3C **73**, IB-3A+3B+3C **295**, all Insider **1,481**, plus document/hygiene/overlay **1,560**, with ML boundary **1,569**. All three recorded file hashes match; the IB-3C policy hash recomputes to `809a0072...f371f4` and the pinned upstream IB-3B hash is unchanged. `K=(N+9)//10` equals `ceil(N/10)` for N=1..500. 28 authority flags false and both look counters zero on result, identity and row. compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | Both commits **accepted**. `IB3C-CCR01` accepted: `IB3C-CR01` is correctly closed as stale, since the owner decision resolving the gate was supplied in a session this reviewer could not observe. New **IB3C-CR02** (P3, closed by this review): section 61.6 declined the complete-suite run that CLAUDE.md section 10 mandates for a completed milestone; this review ran it green, and the record should state plainly that the implementer did not. Mutation result: 17 directions, 14 caught, 3 disclosed equivalences whose combined removal is caught, no genuine gap. Scope note: the quoted owner approval cannot be independently verified by this reviewer, who verified only that the implementation matches the quoted text one-for-one. No production or test file changed. | Codex counter-reviews this record commit. The cluster-gated buyer comparison, canonical IB-2 and canonical IB-3 remain separate unauthorized milestones. No milestone started by this review. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -8079,3 +8085,138 @@ committed, Codex repeats final record-sensitive, diff, root/branch/status, and
 remote checks and makes exactly one push. Claude then reviews that pushed
 snapshot; Codex counter-reviews every resulting Claude commit before any
 later milestone.
+
+
+## 62. Claude review - owner-approved synthetic IB-3C seed diagnostics (2026-09-18 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying` (owner's Mac, Python 3.13.15, pytest 9.1.1).
+No branch, worktree, fork, or handoff was created or switched to. The remote
+tip was verified as `d6eb7843a2e6a07b15f157be81dddafcba16265a`, the local
+branch was exact at it, and the worktree was clean. The reviewed range
+`d5fda3d..d6eb784` contains two commits, zero merges, and four lane-owned
+paths. Record-only commit `d5fda3d` is this reviewer's own section-60 review
+and is excluded from self-disposition.
+
+Scope note on the authorization. Section 61.2 quotes an owner approval of the
+six IB-3C clauses. That message was supplied in a Codex session this reviewer
+cannot observe, so its existence and wording are taken as recorded and are the
+owner's to confirm. What is independently reviewable, and what this review
+establishes, is that the implemented policy matches the quoted text
+one-for-one and adds nothing beyond it.
+
+### 62.1 Commit dispositions
+
+| Commit | Change | Disposition |
+|---|---|---|
+| `f5605839bf46e5877a7dd4c46bdbbac2860d9769` | Synthetic IB-3C seed diagnostics module, focused tests, package exports | **Accepted.** Every approved clause is implemented exactly, an independent oracle agrees on 44 randomized cohorts, and no test-sensitivity gap was found. |
+| `d6eb7843a2e6a07b15f157be81dddafcba16265a` | Section 61 counter-review and implementation record | **Accepted.** All recorded counts, hashes and mutation classifications reproduce. One process item is recorded as `IB3C-CR02`. |
+
+### 62.2 The six approved clauses verified against the quoted text
+
+| Approved clause | Implementation | Independent verification |
+|---|---|---|
+| Exact winsorized-value ranking | Orders `winsorized_stock_score_diagnostic`; no z-score digits are read | Mutating the sort to ascending is caught. The recorded ranking method is `descending-exact-value-kth-cutoff-no-ordinal-rank`. |
+| All usable eligible names in the denominator | `N` counts `INCLUDE_SIGNAL` plus `INCLUDE_STRUCTURAL_ZERO`; ineligible and missing rows stay in the output with `exact_ranking_value = None` and are excluded from `N` | A 22-row cohort emits 22 rows with `N = 20`; excluded rows are never in the denominator. Removing structural zeros from `N` is caught. |
+| `K = ceil(N / 10)` | `(N + 10 - 1) // 10` in integer arithmetic | Equals `math.ceil(N / 10)` for every `N` in 1..500. Floor and off-by-one variants are both caught. |
+| All exact cutoff ties included, never split by identity | Membership is `value >= cutoff` at aggregate and row level | One high name, five tied at the second-highest value and fourteen low gives `K = 2` yet admits 6 members, exactly `1 + 5` ties. Strict `>` at either level, and truncation of ties to `K`, are all caught. |
+| Positive `INCLUDE_SIGNAL` rows only may seed | Candidacy requires cutoff membership, `INCLUDE_SIGNAL`, and a strictly positive exact value | Structural zeros enter the denominator and can set the cutoff but never become candidates or seeds. |
+| At least two positives, otherwise unavailable | Two or more yields `AVAILABLE` with selection equal to candidacy; fewer yields `UNAVAILABLE_INSUFFICIENT_POSITIVE_SEEDS` with `selected_seed_count = None` and every row's selection `None` | One positive gives the named unavailable outcome with no partial seed set anywhere; exactly two gives `AVAILABLE` with two selected. Lowering the minimum to one, emitting a partial count, and letting per-row selection survive an unavailable outcome are each caught. |
+
+Nothing beyond the approved text is present: no ordinal rank convention is
+exposed, aggregate `stock_score`, `ranking` and `seed_selection` are `None`,
+row `stock_score`, `rank` and `seed_selected` are `None`, and the blueprint's
+buyer-cluster comparison is frozen as `deferred-separate-not-implemented`.
+
+### 62.3 Independent oracle
+
+An oracle written separately from the module recomputed `N`, `K`, the cutoff,
+the tie count, top-decile membership, positive candidacy and the outcome
+directly from each parent's rows. Across **44 randomized cohorts** of 20 to 33
+observations mixing signals, structural zeros, ineligible and missing rows,
+the module and the oracle agreed on every field with **zero mismatches**.
+
+### 62.4 Adversarial verification
+
+Seventeen mutation directions, the module restored byte-exact after each and
+re-verified: **14 caught, 3 classified**.
+
+Caught: floor `K`, off-by-one `K`, signal-only `N`, strict `>` at aggregate
+and row level, tie truncation to `K`, minimum seeds lowered to one, a partial
+seed set on an unavailable outcome, per-row selection surviving an unavailable
+outcome, ascending order, the denominator flag forced true, the
+parent-availability gate, and the parent exact-replay equality.
+
+The three survivors are the semantic equivalences section 61.6 discloses, and
+the disclosure is accurate. On a replayed IB-3B parent every `INCLUDE_SIGNAL`
+row is strictly positive, with the smallest observed value `ln(2)`, every
+structural zero is exactly `0`, and every excluded row is `None`. The
+disposition check and the positivity check therefore select the same rows, so
+removing either alone changes nothing. Removing **both** admits structural
+zeros as candidates and **is caught**. This is a genuine equivalence, not a
+test gap.
+
+One earlier probe of the parent gate was a no-op of this reviewer's own
+making, a conditional expression that still raised; its faithful replacement
+is caught and is counted above.
+
+### 62.5 Findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3C-CR02 | P3 | **CLOSED by this review** | `d6eb784` | Section 61.6 | The round states that no complete repository suite was run and substitutes lane-scoped gates. `CLAUDE.md` section 10 requires `python -m pytest -q` on the exact final tree for a completed milestone, and this round adds 2,528 lines plus a changed package `__init__.py` that every importer of `research.insider_buying` sees. Declining the run leaves any cross-package regression undetected by the implementer. | Section 61.6's own text; the changed `__init__.py` in `f560583`. | A milestone's completion gate is defined by the process document, not by the scope of the files changed. The risk is small but not zero, and the record should not imply validation that was not performed. | None to the code. This review ran the mandated suite: **7,769 passed, 38 skipped, 28 warnings, 0 failed in 728.98s**. Recommend the next record state plainly that the implementer did not run it and that the reviewer's run closed the gate. | Complete-suite run on the exact pushed tree, green. |
+
+`IB3C-CCR01` is **accepted**: closing this reviewer's `IB3C-CR01` as stale is
+correct, because the owner decision that resolved the gate was supplied in a
+session the reviewer could not observe. The observation was accurate on the
+evidence then available, and section 61.2 now records the decision, which is
+what that finding asked for.
+
+No P0, P1, or P2 finding. `IB3B-R11` and `IB3B-CR03` remain unchanged, and
+out-of-lane `IB3B-CCR06` remains routed to the Analyst Revisions V2 lane.
+
+### 62.6 Validation
+
+- Complete repository suite on the exact pushed tree: **7,769 passed, 38 skipped, 28 warnings, 0 failed in 728.98s (0:12:08)**.
+- Recorded counts reproduce exactly: IB-3C focused **73**; IB-3A plus IB-3B plus IB-3C **295**; all Insider files **1,481**; plus active-document, module-hygiene and overlay boundary **1,560**; with the ML boundary in place of overlay **1,569**.
+- All three recorded file hashes match the working tree byte for byte.
+- The IB-3C policy hash recomputes to `809a0072a1976463545674733305b8f40b6e606da9e8da3b29c6ca6950f371f4` and matches the record; the pinned upstream IB-3B hash is unchanged.
+- 28 boolean authority flags are `False` and both look counters are `0` on the result, identity and every row.
+- Whole-repository compileall exit **0**; `git diff --check` clean; worktree clean at the remote tip.
+- Mutants: 17 directions, the module restored byte-identical and confirmed by `git status`.
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
+security master, outcome, QuantConnect, broker, operator-database, scheduler,
+deployment, capital, or trading access. **Research looks: 0.**
+
+### 62.7 Quality rating
+
+**9 / 10**. The implementation is disciplined in exactly the way that matters
+for a milestone whose policy was chosen by someone else: it implements the six
+approved clauses and refuses to add a seventh. Declining to expose an ordinal
+rank because the owner froze cutoff semantics but not a numbering convention,
+and freezing the cluster comparison as explicitly deferred rather than quietly
+blending it in, are the right calls. The unavailable path is atomic, emitting
+no partial one-stock seed set. Disclosing the two equivalent single-gate
+mutants rather than claiming a clean sweep is the honest way to report a
+mutation campaign, and the disclosure checks out.
+
+It is not a ten because the round declined the complete-suite gate its own
+process mandates for a completed milestone, recorded under `IB3C-CR02`. That
+gate exists precisely for a change that touches a package `__init__.py`.
+
+### 62.8 Authority, residual gates, and next step
+
+Every authority gate remains closed. IB-3C is synthetic seed-selection
+evidence over a replayed synthetic IB-3B parent. No official security master,
+`qc_symbol_id`, authenticated amendment supersession, trading calendar, role
+taxonomy, canonical filtering, deduplication, authorized aggregation,
+operative `$50,000` gate, canonical score, ordinal rank, outcome, ETF, QC,
+deployment, capital, broker, or trading capability exists. Canonical IB-2 and
+canonical IB-3 remain incomplete, and the blueprint's cluster-gated buyer
+comparison remains a separate, unauthorized milestone that this review does
+not approve.
+
+Review commits on this lane: this record commit only. Next authorized step:
+Codex counter-reviews it. No milestone was started and none is authorized by
+this review.

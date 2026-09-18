@@ -21,6 +21,8 @@ equation diagnostics; it does not consume IB-2D or expose a canonical score.
 IB-3B adds an exhaustive caller-declared synthetic cohort plus frozen
 winsorization and population-z-score diagnostics while keeping canonical
 scores, ranks, seeds, outcomes, and every operational authority unavailable.
+IB-3C adds exact-value diagnostic ranking, top-decile cutoff ties, and a
+two-positive-seed availability gate while retaining the same zero authority.
 """
 
 from research.insider_buying.contracts import (
@@ -183,6 +185,28 @@ from research.insider_buying.form4_stock_signal_normalization_diagnostics import
     Form4StockSignalNormalizedDiagnosticRow,
     build_form4_stock_signal_normalization_diagnostics,
     build_form4_stock_signal_normalization_observation,
+)
+from research.insider_buying.form4_stock_signal_seed_diagnostics import (
+    FORM4_STOCK_SIGNAL_SEED_CLUSTER_COMPARISON_POLICY,
+    FORM4_STOCK_SIGNAL_SEED_COUNT_POLICY,
+    FORM4_STOCK_SIGNAL_SEED_DENOMINATOR_POLICY,
+    FORM4_STOCK_SIGNAL_SEED_DIAGNOSTICS_VERSION,
+    FORM4_STOCK_SIGNAL_SEED_ELIGIBILITY_POLICY,
+    FORM4_STOCK_SIGNAL_SEED_MINIMUM_POSITIVE_SEEDS,
+    FORM4_STOCK_SIGNAL_SEED_POLICY_HASH,
+    FORM4_STOCK_SIGNAL_SEED_RANKING_METHOD,
+    FORM4_STOCK_SIGNAL_SEED_RANKING_VALUE,
+    FORM4_STOCK_SIGNAL_SEED_TIE_POLICY,
+    FORM4_STOCK_SIGNAL_SEED_TOP_FRACTION_DENOMINATOR,
+    FORM4_STOCK_SIGNAL_SEED_TOP_FRACTION_NUMERATOR,
+    MAX_FORM4_STOCK_SIGNAL_SEED_ROWS,
+    MAX_FORM4_STOCK_SIGNAL_SEED_TEXT_CHARACTERS,
+    Form4StockSignalSeedDiagnosticRow,
+    Form4StockSignalSeedDiagnostics,
+    Form4StockSignalSeedDiagnosticsError,
+    Form4StockSignalSeedIdentity,
+    Form4StockSignalSeedOutcome,
+    build_form4_stock_signal_seed_diagnostics,
 )
 from research.insider_buying.sec_bulk_snapshot import (
     ALLOWED_SEC_TABLES,
@@ -424,4 +448,24 @@ __all__ = [
     "Form4StockSignalNormalizedDiagnosticRow",
     "build_form4_stock_signal_normalization_diagnostics",
     "build_form4_stock_signal_normalization_observation",
+    "FORM4_STOCK_SIGNAL_SEED_CLUSTER_COMPARISON_POLICY",
+    "FORM4_STOCK_SIGNAL_SEED_COUNT_POLICY",
+    "FORM4_STOCK_SIGNAL_SEED_DENOMINATOR_POLICY",
+    "FORM4_STOCK_SIGNAL_SEED_DIAGNOSTICS_VERSION",
+    "FORM4_STOCK_SIGNAL_SEED_ELIGIBILITY_POLICY",
+    "FORM4_STOCK_SIGNAL_SEED_MINIMUM_POSITIVE_SEEDS",
+    "FORM4_STOCK_SIGNAL_SEED_POLICY_HASH",
+    "FORM4_STOCK_SIGNAL_SEED_RANKING_METHOD",
+    "FORM4_STOCK_SIGNAL_SEED_RANKING_VALUE",
+    "FORM4_STOCK_SIGNAL_SEED_TIE_POLICY",
+    "FORM4_STOCK_SIGNAL_SEED_TOP_FRACTION_DENOMINATOR",
+    "FORM4_STOCK_SIGNAL_SEED_TOP_FRACTION_NUMERATOR",
+    "MAX_FORM4_STOCK_SIGNAL_SEED_ROWS",
+    "MAX_FORM4_STOCK_SIGNAL_SEED_TEXT_CHARACTERS",
+    "Form4StockSignalSeedDiagnosticRow",
+    "Form4StockSignalSeedDiagnostics",
+    "Form4StockSignalSeedDiagnosticsError",
+    "Form4StockSignalSeedIdentity",
+    "Form4StockSignalSeedOutcome",
+    "build_form4_stock_signal_seed_diagnostics",
 ]

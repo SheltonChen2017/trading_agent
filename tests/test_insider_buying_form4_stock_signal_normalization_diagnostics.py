@@ -1417,13 +1417,16 @@ def test_frozen_policy_guard_and_text_bounds_are_load_bearing(monkeypatch):
 @pytest.mark.parametrize(
     ("constant_name", "replacement"),
     (
+        ("FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_PRECISION", 51),
+        ("FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_ROUNDING", "ROUND_HALF_UP"),
         ("MAX_FORM4_STOCK_SIGNAL_NORMALIZATION_ROWS", 10_001),
         ("MAX_FORM4_STOCK_SIGNAL_NORMALIZATION_TEXT_CHARACTERS", 129),
         ("_MAX_NORMALIZATION_DECIMAL_DIGITS", 1_025),
         ("_MAX_NORMALIZATION_DECIMAL_ABS_EXPONENT", 2_049),
+        ("FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH", "0" * 64),
     ),
 )
-def test_frozen_policy_refuses_coherent_resource_rebinding(
+def test_frozen_policy_refuses_coherent_policy_rebinding(
     monkeypatch,
     constant_name,
     replacement,
@@ -1518,13 +1521,26 @@ def test_public_exports_are_explicit_and_package_bound():
     )
 
 
-def test_kernel_context_rounds_half_even_as_the_frozen_policy_states():
+def test_kernel_context_rounds_half_even_as_the_frozen_policy_states(monkeypatch):
     """Claude review regression (2026-09-17): the frozen policy hash pins the
     text ``ROUND_HALF_EVEN``, but nothing exercised the kernel context's actual
-    rounding mode, so a ``ROUND_HALF_UP`` context left every focused test
-    green. A 51-digit input that ties exactly at the 50th digit must project
-    to the even neighbour under the policy's own input-projection step."""
-    from decimal import ROUND_HALF_EVEN
+    rounding mode. Rebinding the former module-level decimal alias must not
+    alter a 51-digit tie under the policy's own input-projection step."""
+    from decimal import ROUND_FLOOR, ROUND_HALF_EVEN, ROUND_HALF_UP
+
+    monkeypatch.setattr(
+        normalization_module,
+        "ROUND_HALF_EVEN",
+        ROUND_HALF_UP,
+        raising=False,
+    )
+    monkeypatch.setattr(
+        normalization_module,
+        "ROUND_CEILING",
+        ROUND_FLOOR,
+        raising=False,
+    )
+    normalization_module._require_frozen_policy()
 
     context = normalization_module._new_decimal_context()
     assert context.rounding == ROUND_HALF_EVEN
@@ -1535,3 +1551,20 @@ def test_kernel_context_rounds_half_even_as_the_frozen_policy_states():
     )
     assert projected == Decimal("1." + "0" * 49)
     assert projected != Decimal("1." + "0" * 48 + "1")
+
+    variance_cap_input = Decimal("1." + "0" * 49 + "1")
+    assert normalization_module._coarse_population_variance_cap(
+        Decimal("0"), variance_cap_input
+    ) == Decimal("1." + "0" * 48 + "3")
+
+    for constant_name, replacement in (
+        ("FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_PRECISION", 51),
+        ("FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_ROUNDING", "ROUND_HALF_UP"),
+    ):
+        with monkeypatch.context() as patch:
+            patch.setattr(normalization_module, constant_name, replacement)
+            with pytest.raises(
+                normalization_module.Form4StockSignalNormalizationDiagnosticsError,
+                match="decimal context",
+            ):
+                normalization_module._new_decimal_context()

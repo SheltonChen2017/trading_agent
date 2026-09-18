@@ -13,13 +13,7 @@ import re
 import threading
 import weakref
 from dataclasses import InitVar, dataclass
-from decimal import (
-    Context,
-    Decimal,
-    DecimalException,
-    ROUND_CEILING,
-    ROUND_HALF_EVEN,
-)
+from decimal import Context, Decimal, DecimalException
 from enum import Enum
 
 from data.financial_primitives import decimal_text
@@ -165,9 +159,17 @@ FORM4_STOCK_SIGNAL_NORMALIZATION_POLICY_HASH = hash_payload(_policy_payload())
 
 
 def _new_decimal_context() -> Context:
+    if (
+        FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_PRECISION != 50
+        or FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_ROUNDING
+        != "ROUND_HALF_EVEN"
+    ):
+        raise Form4StockSignalNormalizationDiagnosticsError(
+            "REFUSED: frozen IB-3B decimal context is inconsistent"
+        )
     return Context(
-        prec=FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_PRECISION,
-        rounding=ROUND_HALF_EVEN,
+        prec=50,
+        rounding="ROUND_HALF_EVEN",
         Emin=-999_999,
         Emax=999_999,
         capitals=1,
@@ -211,6 +213,16 @@ def _require_frozen_policy() -> None:
         )
         or _NORMALIZATION_STANDARD_DEVIATION_EVALUATION
         != "context.sqrt-population-variance"
+        or FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH
+        != (
+            "a514e5d9548fe4b7a9cc010767ff06e5"
+            "0ee3831b5225fd4ddc38d95ec4c1f11d"
+        )
+        or FORM4_STOCK_SIGNAL_NORMALIZATION_POLICY_HASH
+        != (
+            "6705744ca9df421f4f96f955a3a4e850"
+            "570806ac5b1059ad79488f36d14ffd04"
+        )
         or hash_payload(_policy_payload())
         != FORM4_STOCK_SIGNAL_NORMALIZATION_POLICY_HASH
     ):
@@ -327,8 +339,8 @@ def _coarse_population_variance_cap(
     """Return range squared, a rounding-safe cap four times the exact maximum."""
 
     context = Context(
-        prec=FORM4_STOCK_SIGNAL_NORMALIZATION_DECIMAL_PRECISION,
-        rounding=ROUND_CEILING,
+        prec=50,
+        rounding="ROUND_CEILING",
         Emin=-999_999,
         Emax=999_999,
         capitals=1,

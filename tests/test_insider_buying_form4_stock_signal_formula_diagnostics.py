@@ -2054,3 +2054,104 @@ def test_standalone_breadth_replay_enforces_the_lower_total_envelope_alone():
         match="cannot arise from qualifying buyers",
     ):
         _replay_breadth(forged)
+
+
+def test_ib3a_frozen_policy_refuses_coherent_policy_rebinding(monkeypatch):
+    rebindings = (
+        (
+            "FORM4_STOCK_SIGNAL_FORMULA_DIAGNOSTICS_VERSION",
+            "INSETF-IB3A-FORM4-STOCK-SIGNAL-FORMULA-DIAGNOSTICS-v2",
+        ),
+        ("FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD", Decimal("50001")),
+        ("FORM4_STOCK_SIGNAL_HALF_LIFE_TRADING_DAYS", 21),
+        ("FORM4_STOCK_SIGNAL_LOOKBACK_TRADING_DAYS", 31),
+        ("FORM4_STOCK_SIGNAL_DECIMAL_PRECISION", 51),
+        ("FORM4_STOCK_SIGNAL_DECIMAL_ROUNDING", "ROUND_HALF_UP"),
+        ("FORM4_STOCK_SIGNAL_SIZE_FORMULA", "changed"),
+        ("FORM4_STOCK_SIGNAL_FRESHNESS_FORMULA", "changed"),
+        ("FORM4_STOCK_SIGNAL_FRESHNESS_EVALUATION", "changed"),
+        ("FORM4_STOCK_SIGNAL_EVENT_SCORE_FORMULA", "changed"),
+        ("FORM4_STOCK_SIGNAL_RAW_SCORE_FORMULA", "changed"),
+        ("FORM4_STOCK_SIGNAL_DOLLAR_BREADTH_FORMULA", "changed"),
+        ("MAX_FORM4_STOCK_SIGNAL_EVENTS", 10_001),
+        ("MAX_FORM4_STOCK_SIGNAL_ROLES_PER_EVENT", 17),
+        ("MAX_FORM4_STOCK_SIGNAL_TEXT_CHARACTERS", 129),
+        ("MAX_FORM4_STOCK_SIGNAL_AGE_TRADING_DAYS", 10_001),
+        ("MAX_FORM4_STOCK_SIGNAL_PROJECTION_NODES", 4_000_001),
+        ("MAX_FORM4_STOCK_SIGNAL_PROJECTION_DEPTH", 33),
+        ("_MAX_FORM4_STOCK_SIGNAL_DECIMAL_DIGITS", 257),
+        ("_MAX_FORM4_STOCK_SIGNAL_DECIMAL_ABS_EXPONENT", 257),
+        ("_MAX_FORM4_STOCK_SIGNAL_AGGREGATE_DECIMAL_DIGITS", 775),
+        ("_MAX_FORM4_STOCK_SIGNAL_DERIVED_DECIMAL_ABS_EXPONENT", 1_025),
+        ("_MAX_FORM4_STOCK_SIGNAL_DECIMAL_TEXT_CHARACTERS", 2_049),
+        ("_MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD", Decimal("1")),
+    )
+    for constant_name, replacement in rebindings:
+        with monkeypatch.context() as patch:
+            patch.setattr(signal_module, constant_name, replacement)
+            patch.setattr(
+                signal_module,
+                "FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH",
+                hash_payload(signal_module._numeric_policy_payload()),
+            )
+            with pytest.raises(
+                signal_module.Form4StockSignalFormulaDiagnosticsError,
+                match="frozen",
+            ):
+                signal_module._require_frozen_policy()
+
+    for constant_name, replacement in (
+        ("FORM4_STOCK_SIGNAL_DECIMAL_PRECISION", 51),
+        ("FORM4_STOCK_SIGNAL_DECIMAL_ROUNDING", "ROUND_HALF_UP"),
+    ):
+        with monkeypatch.context() as patch:
+            patch.setattr(signal_module, constant_name, replacement)
+            with pytest.raises(
+                signal_module.Form4StockSignalFormulaDiagnosticsError,
+                match="decimal context",
+            ):
+                signal_module._new_decimal_context()
+
+    with monkeypatch.context() as patch:
+        patch.setattr(
+            signal_module,
+            "FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH",
+            "0" * 64,
+        )
+        with pytest.raises(
+            signal_module.Form4StockSignalFormulaDiagnosticsError,
+            match="frozen",
+        ):
+            signal_module._require_frozen_policy()
+
+
+def test_ib3a_kernel_context_rounds_half_even_as_the_frozen_policy_states(
+    monkeypatch,
+):
+    """Counter-review regression: IB-3A's pinned rounding is behavioral.
+
+    The ratio reaches an exact tie at the 51st significant digit through the
+    formula path used by the dollar-breadth diagnostic.  Rebinding the former
+    module-level decimal alias must not change the frozen kernel.
+    """
+    from decimal import ROUND_HALF_EVEN, ROUND_HALF_UP
+
+    monkeypatch.setattr(
+        signal_module,
+        "ROUND_HALF_EVEN",
+        ROUND_HALF_UP,
+        raising=False,
+    )
+    signal_module._require_frozen_policy()
+
+    total = Decimal("1e51")
+    numerator = Decimal("1" + "0" * 49 + "5")
+    largest = signal_module.exact_decimal_subtract(
+        total,
+        numerator,
+        name="rounding-policy largest buyer",
+    )
+    result = signal_module._dollar_breadth(total, largest)
+    assert result == Decimal("0.1" + "0" * 49)
+    assert result != Decimal("0.1" + "0" * 48 + "1")
+    assert signal_module._new_decimal_context().rounding == ROUND_HALF_EVEN

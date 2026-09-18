@@ -14,7 +14,7 @@ import weakref
 from collections import defaultdict
 from dataclasses import InitVar, dataclass, fields
 from datetime import date
-from decimal import Context, Decimal, DecimalException, ROUND_HALF_EVEN, localcontext
+from decimal import Context, Decimal, DecimalException, localcontext
 
 from data.financial_primitives import (
     decimal_text,
@@ -145,9 +145,16 @@ FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH = hash_payload(_numeric_policy_payload())
 
 
 def _new_decimal_context() -> Context:
+    if (
+        FORM4_STOCK_SIGNAL_DECIMAL_PRECISION != 50
+        or FORM4_STOCK_SIGNAL_DECIMAL_ROUNDING != "ROUND_HALF_EVEN"
+    ):
+        raise Form4StockSignalFormulaDiagnosticsError(
+            "REFUSED: frozen IB-3A decimal context is inconsistent"
+        )
     return Context(
-        prec=FORM4_STOCK_SIGNAL_DECIMAL_PRECISION,
-        rounding=ROUND_HALF_EVEN,
+        prec=50,
+        rounding="ROUND_HALF_EVEN",
         Emin=-999_999,
         Emax=999_999,
         capitals=1,
@@ -159,7 +166,49 @@ def _new_decimal_context() -> Context:
 
 def _require_frozen_policy() -> None:
     if (
-        CANONICAL_SPEC.minimum_purchase_value_usd
+        FORM4_STOCK_SIGNAL_FORMULA_DIAGNOSTICS_VERSION
+        != "INSETF-IB3A-FORM4-STOCK-SIGNAL-FORMULA-DIAGNOSTICS-v1"
+        or FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD != Decimal("50000")
+        or FORM4_STOCK_SIGNAL_HALF_LIFE_TRADING_DAYS != 20
+        or FORM4_STOCK_SIGNAL_LOOKBACK_TRADING_DAYS != 30
+        or FORM4_STOCK_SIGNAL_DECIMAL_PRECISION != 50
+        or FORM4_STOCK_SIGNAL_DECIMAL_ROUNDING != "ROUND_HALF_EVEN"
+        or FORM4_STOCK_SIGNAL_SIZE_FORMULA
+        != "ln(1 + purchase_value_usd / 50000)"
+        or FORM4_STOCK_SIGNAL_FRESHNESS_FORMULA
+        != "exp(-ln(2) * age_trading_days / 20)"
+        or FORM4_STOCK_SIGNAL_FRESHNESS_EVALUATION
+        != "50-digit whole- and fractional-half-life projection"
+        or FORM4_STOCK_SIGNAL_EVENT_SCORE_FORMULA != "event_size * freshness"
+        or FORM4_STOCK_SIGNAL_RAW_SCORE_FORMULA
+        != (
+            "sum(event_score for value >= 50000 and "
+            "0 <= age_trading_days <= 30)"
+        )
+        or FORM4_STOCK_SIGNAL_DOLLAR_BREADTH_FORMULA
+        != (
+            "(total_purchase_value - largest_buyer_purchase_value) "
+            "/ total_purchase_value"
+        )
+        or MAX_FORM4_STOCK_SIGNAL_EVENTS != 10_000
+        or MAX_FORM4_STOCK_SIGNAL_ROLES_PER_EVENT != 16
+        or MAX_FORM4_STOCK_SIGNAL_TEXT_CHARACTERS != 128
+        or MAX_FORM4_STOCK_SIGNAL_AGE_TRADING_DAYS != 10_000
+        or MAX_FORM4_STOCK_SIGNAL_PROJECTION_NODES != 4_000_000
+        or MAX_FORM4_STOCK_SIGNAL_PROJECTION_DEPTH != 32
+        or _MAX_FORM4_STOCK_SIGNAL_DECIMAL_DIGITS != 256
+        or _MAX_FORM4_STOCK_SIGNAL_DECIMAL_ABS_EXPONENT != 256
+        or _MAX_FORM4_STOCK_SIGNAL_AGGREGATE_DECIMAL_DIGITS != 774
+        or _MAX_FORM4_STOCK_SIGNAL_DERIVED_DECIMAL_ABS_EXPONENT != 1_024
+        or _MAX_FORM4_STOCK_SIGNAL_DECIMAL_TEXT_CHARACTERS != 2_048
+        or _MAX_FORM4_STOCK_SIGNAL_PURCHASE_VALUE_USD
+        != Decimal((0, (9,) * 256, 256))
+        or FORM4_STOCK_SIGNAL_NUMERIC_POLICY_HASH
+        != (
+            "a514e5d9548fe4b7a9cc010767ff06e5"
+            "0ee3831b5225fd4ddc38d95ec4c1f11d"
+        )
+        or CANONICAL_SPEC.minimum_purchase_value_usd
         != FORM4_STOCK_SIGNAL_MINIMUM_PURCHASE_VALUE_USD
         or CANONICAL_SPEC.decay_half_life_trading_days
         != FORM4_STOCK_SIGNAL_HALF_LIFE_TRADING_DAYS

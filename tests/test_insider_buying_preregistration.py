@@ -54,6 +54,10 @@ class _DateSubclass(date):
     pass
 
 
+class _TupleSubclass(tuple):
+    pass
+
+
 def test_four_lane_family_uses_exact_owner_directed_arithmetic() -> None:
     gate = INSIDER_BUYING_RESEARCH_GATE
 
@@ -407,6 +411,7 @@ def test_semantic_hash_binds_each_paper_promotion_field(
                 "target-price-revisions",
             )
         },
+        {"fixed_lane_ids": _TupleSubclass(FIXED_STRATEGY_LANE_IDS)},
         {"version": "INSETF-IB1I-RESEARCH-GATE-v1"},
         {"blueprint_path": "docs/Strategy Description/other.pdf"},
         {"blueprint_sha256": "0" * 64},
@@ -490,6 +495,11 @@ def test_semantic_hash_binds_each_paper_promotion_field(
         {"candidate_primary_horizons_trading_days": (5, 20)},
         {"candidate_primary_horizons_trading_days": (5.0, 20.0, 60.0)},
         {
+            "candidate_primary_horizons_trading_days": _TupleSubclass(
+                CANDIDATE_PRIMARY_HORIZONS_TRADING_DAYS
+            )
+        },
+        {
             "confirmatory_alpha_allocations": (
                 ("ib-stock-primary-5d", Fraction(1, 80)),
                 ("ib-stock-primary-20d", Fraction(1, 80)),
@@ -499,6 +509,8 @@ def test_semantic_hash_binds_each_paper_promotion_field(
         {"permanent_look_ids": ("ib-look-stock-primary-001",)},
         {"confirmatory_alpha_allocations": []},
         {"permanent_look_ids": []},
+        {"confirmatory_alpha_allocations": _TupleSubclass(())},
+        {"permanent_look_ids": _TupleSubclass(())},
         {"allocation_state": "owner_decision_required"},
         {"authorized_outcome_looks": 1},
         {"consumed_outcome_looks": 1},
@@ -518,6 +530,11 @@ def test_semantic_hash_binds_each_paper_promotion_field(
             )
         },
         {"paper_promotion_sequence": list(INSIDER_PAPER_PROMOTION_SEQUENCE)},
+        {
+            "paper_promotion_sequence": _TupleSubclass(
+                INSIDER_PAPER_PROMOTION_SEQUENCE
+            )
+        },
         {
             "paper_promotion_sequence": (
                 _StringSubclass(INSIDER_PAPER_PROMOTION_SEQUENCE[0]),

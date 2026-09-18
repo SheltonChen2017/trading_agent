@@ -361,8 +361,9 @@ EXACT PHYSICAL R-099 THROUGH R-106 IDENTITIES ON THAT CORRECTED CLOSURE; R-099
 THEN REACHED A ZERO-CELL COMPACT-TRANSPORT REFUSAL. SECTION 100 RECORDS THE
 LOSSLESS ACCOUNT-AGGREGATE WIRE SPLIT, SUPERSEDES R-100 THROUGH R-106 UNSPENT,
 AND RESERVES R-107 THROUGH R-114. SECTION 101 FREEZES THEIR EXACT PHYSICAL
-IDENTITIES. CURRENT ACCOUNTING IS 81 SHARED LOOKS, 24 ARV2 DEVELOPMENT
-EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR. R-107 IS NEXT.
+IDENTITIES. SECTION 102 RECORDS R-107'S AUTHENTICATED TANGIBLE RESULT. CURRENT
+ACCOUNTING IS 82 SHARED LOOKS, 25 ARV2 DEVELOPMENT EVALUATIONS, 27
+INFRASTRUCTURE LOOKS, AND A 595-CELL FLOOR. R-108 IS NEXT.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1145,6 +1146,12 @@ explicitly waives another Claude review of section 101 before the already
 directed same-round QC testing. The exact next step is to launch R-107. No
 later run proceeds unless R-107 produces a tangible authenticated aggregate;
 thereafter all jobs remain sequential on the one subscribed node.
+
+Section 102 records R-107's completed, tangible QQQ 2021--2025 market-cap
+diagnostic. Its prerequisite gate is satisfied. The owner explicitly waives
+another Claude review of section 102 before the already directed same-round
+QC sequence. The exact next step is R-108, followed sequentially by the
+remaining unlevered windows and only then the leverage diagnostics.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -17655,3 +17662,44 @@ on failure; cells accrue only from an authenticated aggregate. Exactly one
 aggregate read is allowed after a completed run. No raw inputs, logs, charts,
 holdings, orders, deployment, broker access, paper/live state, or trading is
 authorized.
+
+## 102. R-107 tangible QQQ 2021--2025 market-cap result, 2026-09-17
+
+R-107 completed in private QC project `36681064`, backtest
+`c21434bbcbca52aa4d7e105e5612892b`, after 19 statistics-free polls. The sole
+bounded result read authenticated aggregate receipt
+`arv2-preliminary-qc-result-58e924566071b88a7f46b704`, SHA-256
+`58e924566071b88a7f46b704463221aea869a8df06989321dd2c0173aeb049ff`.
+It selected exactly the eight preregistered custom statistics and no logs,
+charts, orders, raw provider rows, or other result fields.
+
+The result is tangible and therefore satisfies the owner's gate for the later
+period and leverage diagnostics. At the primary 10-basis-point-per-side cost,
+the selected sleeve returned **66.41%** cumulatively versus **114.31%** for the
+matched point-in-time QQQ-eligible market-cap portfolio and **95.67%** for SPY.
+The selected-minus-matched and selected-minus-SPY gaps were **-47.90** and
+**-29.25 percentage points**. Selected annualized arithmetic return was
+**16.34%**, annualized volatility **34.91%**, zero-rate Sharpe **0.468**,
+Sortino **0.659**, and maximum drawdown **-67.89%**. The matched comparator's
+annualized return, volatility, Sharpe, and drawdown were **18.12%**, **23.64%**,
+**0.766**, and **-35.34%**. Average cash was about **2.00%** in both paths, so
+cash drag does not explain the shortfall. The selected path's average daily
+two-sided turnover was **2.683%** versus **0.789%** matched.
+
+The zero-cost selected return was **72.09%** and the 5/10/20-bps results were
+**69.23% / 66.41% / 60.92%**, so costs matter but do not account for the
+selection deficit. The construction averaged 82.64 point-in-time eligible
+names, 82.63 scored names, and 8.80 selected names. Market-cap weighting made
+the selected sleeve much more concentrated than that raw count suggests:
+mean effective holdings were **3.26**, mean largest position **48.30%**, and
+the observed maximum position **77.68%**. The matched path had 12.63 effective
+holdings, a 16.86% mean largest position, and a 22.45% maximum. This first
+window is evidence against the selected ranking in this construction, not a
+formal accept/reject result; it is price-proxy conditioned and QQQ is a
+point-in-time Nasdaq-100 proxy rather than all Nasdaq-listed stocks.
+
+R-107 moves accounting to **82 shared looks, 25 ARV2 development evaluations,
+27 infrastructure looks, and a 595-cell floor**. R-108 is next. The remaining
+unlevered runs stay ahead of R-113/R-114, and every run remains sequential on
+the one subscribed node. No aggregate result authorizes formal acceptance,
+deployment, broker access, orders, paper/live state, or trading.

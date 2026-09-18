@@ -2611,3 +2611,41 @@ evaluation even on technical failure; cells accrue only after one
 authenticated aggregate read. No raw row, identifier, price, log, chart,
 holding, order, deployment, broker state, paper/live state, or trading action
 is authorized.
+
+## R-107 — QQQ 2021--2025 market-cap diagnostic (AUTHENTICATED; TANGIBLE) — 2026-09-17
+
+Private project `36681064`, backtest
+`c21434bbcbca52aa4d7e105e5612892b`, completed after 19 statistics-free
+polls. One bounded read authenticated result receipt
+`arv2-preliminary-qc-result-58e924566071b88a7f46b704`, SHA-256
+`58e924566071b88a7f46b704463221aea869a8df06989321dd2c0173aeb049ff`.
+Exactly eight preregistered aggregate statistics were selected; logs, charts,
+orders and raw provider rows were not selected.
+
+| Cost per side | Selected cumulative | Matched cumulative | Selected - matched | SPY cumulative | Selected - SPY |
+|---:|---:|---:|---:|---:|---:|
+| 0 bps | 72.09% | 116.44% | -44.35 pp | 95.67% | -23.58 pp |
+| 5 bps | 69.23% | 115.37% | -46.15 pp | 95.67% | -26.44 pp |
+| 10 bps | 66.41% | 114.31% | -47.90 pp | 95.67% | -29.25 pp |
+| 20 bps | 60.92% | 112.21% | -51.29 pp | 95.67% | -34.74 pp |
+
+At the primary 10-bps cost, selected annualized arithmetic return was 16.34%,
+annualized volatility 34.91%, Sharpe 0.468, Sortino 0.659, maximum drawdown
+-67.89%, average cash 2.00%, and average daily two-sided turnover 2.683%.
+Matched annualized return was 18.12%, volatility 23.64%, Sharpe 0.766,
+drawdown -35.34%, cash 2.00%, and daily turnover 0.789%. Costs do not explain
+the negative selection gap, and neither does cash.
+
+The profile averaged 82.64 point-in-time eligible names, 82.63 scored names,
+and 8.80 selected names. Selected effective breadth averaged only 3.26: the
+mean largest position was 48.30% and the observed maximum was 77.68%. Matched
+effective breadth was 12.63, with a 16.86% mean largest position and 22.45%
+maximum. This is preliminary evidence against the ranking under this exact
+market-cap QQQ-proxy construction; it is not a formal disposition, remains
+price-proxy conditioned, and QQQ is not all Nasdaq-listed stocks.
+
+The owner's tangible-result prerequisite is satisfied. R-107 moves accounting
+to **82 shared looks, 25 development evaluations, 27 infrastructure looks,
+and 595 cells**. R-108 is next; the remaining unlevered windows precede both
+synthetic-leverage runs. No deployment, broker, order, paper/live, or trading
+authority follows.

@@ -2787,3 +2787,24 @@ Independent prelaunch audit accepted the corrected implementation with zero
 open findings after one P2 cap-scope correction and two P3 guard-isolation
 tests; its final combined rerun was **414 passed**. This records no additional
 research look or outcome.
+
+## R-117 and R-118 — corrected sector-neutral bounded tilt (PREREGISTERED; UNRUN) — 2026-09-18
+
+The exact V4 plans were derived from committed correction `bbd146b` before
+external action. Common package SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`;
+common host-closure SHA-256 is
+`1a49740d46a2e78fcd165ed5bb3b6eeeb7afbbc6195a2f559a9ab4409d0c4cbd`
+over 138 sources; expected statistic-names SHA-256 / count is
+`f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f`
+/ 9.
+
+| Run | Profile SHA-256 | Project / backtest | Projection SHA-256 | Source-set SHA-256 | Plan SHA-256 |
+|---|---|---|---|---|---|
+| R-117 QQQ | `40626bc6fa7391a0660d93fc553b288d3f1db8c5a1704d784597560a93c44be1` | `65 ARV2_BOUNDED_TILT_QQQ_R117_2021_2025 - 20260918` / `ARV2 R117 bounded-tilt QQQ 2021-2025 e9851c2f` | `9282078935951665f11d4dbb35e1acb3cf483c8c0343d5f21bc7cb0ec17427bb` | `9597182483e25ef95ac1cb3b16de6cd0c1274e39336ae48f7c0b3476364cdde8` | `01c401e5f454590352a066eb4882f601a3be8233dced87be71c05c678f3cdf80` |
+| R-118 SPY | `73629240645c04164b81d646ba982b9d8d767ea6d09c1b90e3276291bafa517d` | `66 ARV2_BOUNDED_TILT_SPY_R118_2021_2025 - 20260918` / `ARV2 R118 bounded-tilt SPY 2021-2025 e9851c2f` | `e2ed50ee4a31f1f1569d30d41bdbde7f13b384cd4f161f83ed09b0a0d4f2423a` | `a1eaaa3948d570270516ce2844385f3cf6b66bc0348d619fb5bb9a57a0169057` | `f813898c486e9b70176ab5cdbe6142b28cf6a8b7cd89c20217344b07e8481772` |
+
+Each projection is 259,810 bytes. R-117 must close and authenticate at most
+one aggregate read before R-118 launches. Planned accounting is R-117 **84 ->
+85 looks / 27 -> 28 development evaluations / 599 -> 603 cells**, then R-118
+**85 -> 86 / 28 -> 29 / 603 -> 607**. No outcome has yet been selected.

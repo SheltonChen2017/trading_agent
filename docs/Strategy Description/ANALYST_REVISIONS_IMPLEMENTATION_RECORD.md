@@ -1190,6 +1190,14 @@ sequentially with at most one authenticated aggregate read each. R-116 remains
 unlaunched, superseded, and unspent. No leverage, deployment, broker, order,
 paper/live, or trading action follows.
 
+Section 108 freezes the exact R-117/R-118 identities from committed correction
+`bbd146b`. The owner explicitly waives Claude review of section 108 before the
+already directed same-round QC sequence. The exact next step is to sign and
+launch R-117 once, close it through statistics-free terminal status and at most
+one authenticated aggregate read, and launch R-118 only if R-117 produces a
+tangible authenticated aggregate. No leverage, deployment, broker, order,
+paper/live, or trading action follows.
+
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -18221,3 +18229,45 @@ guard tests plus the existing real-gap test passed **3**. `compileall` and
 `git diff --check` are clean. The independent auditor's final combined rerun
 after all corrections was **414 passed in 297.57 seconds**. The complete lane
 suite must still finish green before the round's one push.
+
+## 108. Prospective physical freeze for R-117 and R-118, 2026-09-18
+
+These exact plans are derived from committed correction `bbd146b` before any
+project creation, upload, compile, backtest, terminal-status poll, or result
+read. Common accepted-risk package SHA-256:
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+Common host-closure ID / SHA-256:
+`arv2-preliminary-qc-host-closure-1a49740d46a2e78fcd165ed5` /
+`1a49740d46a2e78fcd165ed5bb3b6eeeb7afbbc6195a2f559a9ab4409d0c4cbd`
+over 138 host sources. Expected custom-statistic names SHA-256 / count:
+`f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f`
+/ 9. Each projection contains 259,810 source bytes, leaving 8,190 bytes
+below the V4-only 268,000-byte ceiling.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256 | Source-set SHA-256 | Plan ID / SHA-256 |
+|---|---|---|---|---|---|
+| R-117 | `arv2-market-cap-stock-qqq-2021-2025-v4` / `40626bc6fa7391a0660d93fc553b288d3f1db8c5a1704d784597560a93c44be1` | `65 ARV2_BOUNDED_TILT_QQQ_R117_2021_2025 - 20260918` / `ARV2 R117 bounded-tilt QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-9282078935951665f11d4dbb` / `9282078935951665f11d4dbb35e1acb3cf483c8c0343d5f21bc7cb0ec17427bb` | `9597182483e25ef95ac1cb3b16de6cd0c1274e39336ae48f7c0b3476364cdde8` | `arv2-preliminary-qc-submission-01c401e5f454590352a066eb` / `01c401e5f454590352a066eb4882f601a3be8233dced87be71c05c678f3cdf80` |
+| R-118 | `arv2-market-cap-stock-spy-2021-2025-v4` / `73629240645c04164b81d646ba982b9d8d767ea6d09c1b90e3276291bafa517d` | `66 ARV2_BOUNDED_TILT_SPY_R118_2021_2025 - 20260918` / `ARV2 R118 bounded-tilt SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-e2ed50ee4a31f1f1569d30d4` / `e2ed50ee4a31f1f1569d30d41bdbde7f13b384cd4f161f83ed09b0a0d4f2423a` | `a1eaaa3948d570270516ce2844385f3cf6b66bc0348d619fb5bb9a57a0169057` | `arv2-preliminary-qc-submission-f813898c486e9b70176ab5cd` / `f813898c486e9b70176ab5cdbe6142b28cf6a8b7cd89c20217344b07e8481772` |
+
+Control directories are
+`artifacts/analyst_revisions_v2/accepted_risk_bounded_tilt_r117_20260918_01`
+and `.../accepted_risk_bounded_tilt_r118_20260918_01`. Both exact canonical
+plans, execution-authority candidates, and the reviewed `allowed_signers`
+bytes are persisted privately. Neither authority is signed yet.
+
+The economic, cost, portfolio, benchmark-lineage, result-inventory, and
+conservative frozen-target execution rules remain those in section 106. The
+only V4 economic-boundary correction is section 107's structural-zero sector:
+an unscored, unmapped eligible name stays at exact benchmark weight and cannot
+donate or receive, while any scored mapping gap refuses. The primary result is
+still selected minus matched at 10 basis points per side, with the complete
+frozen ladder and all diagnostics reported without winner selection.
+
+R-117 must terminally close and its single aggregate read authenticate before
+R-118 may launch on the one subscribed node. Accounting is R-117 **84 -> 85
+shared looks / 27 -> 28 development evaluations / 599 -> 603 cells**, then
+R-118 **85 -> 86 / 28 -> 29 / 603 -> 607**. Infrastructure looks remain 27.
+A launch spends a look and evaluation even on a technical refusal; cells accrue
+only after an authenticated result read. No raw row, identifier, price, return
+series, log, chart, holding, order, deployment, broker, paper/live, or trading
+access is authorized or selected by this freeze.

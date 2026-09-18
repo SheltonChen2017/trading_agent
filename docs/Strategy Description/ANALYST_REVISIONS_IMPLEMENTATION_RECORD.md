@@ -360,10 +360,9 @@ R-098 UNSPENT, AND ADDS BOUNDED SIMULATED-CLOCK GATES. SECTION 99 FREEZES THE
 EXACT PHYSICAL R-099 THROUGH R-106 IDENTITIES ON THAT CORRECTED CLOSURE; R-099
 THEN REACHED A ZERO-CELL COMPACT-TRANSPORT REFUSAL. SECTION 100 RECORDS THE
 LOSSLESS ACCOUNT-AGGREGATE WIRE SPLIT, SUPERSEDES R-100 THROUGH R-106 UNSPENT,
-AND RESERVES R-107 THROUGH R-114. CURRENT ACCOUNTING IS 81 SHARED LOOKS, 24
-ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR.
-THE EXACT NEXT STEP IS TO FREEZE THE PHYSICAL R-107 THROUGH R-114 IDENTITIES,
-THEN LAUNCH R-107.
+AND RESERVES R-107 THROUGH R-114. SECTION 101 FREEZES THEIR EXACT PHYSICAL
+IDENTITIES. CURRENT ACCOUNTING IS 81 SHARED LOOKS, 24 ARV2 DEVELOPMENT
+EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 591-CELL FLOOR. R-107 IS NEXT.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1138,6 +1137,14 @@ authorized same-round QC sequence. The exact next step is to launch R-099;
 the six unlevered jobs remain sequential and precede both leverage jobs. Each
 terminal disposition and bounded aggregate read, if available, must close
 before the next job.
+
+Section 100 records R-099's zero-cell compact-transport refusal, the lossless
+split-account wire correction, and Codex's counter-review corrections. Section
+101 freezes the fresh R-107 through R-114 physical identities. The owner
+explicitly waives another Claude review of section 101 before the already
+directed same-round QC testing. The exact next step is to launch R-107. No
+later run proceeds unless R-107 produces a tangible authenticated aggregate;
+thereafter all jobs remain sequential on the one subscribed node.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -17605,3 +17612,46 @@ QQQ/SPY objective synthetic leverage. Their exact physical identities must be
 committed before external action. No observed economic value selected this
 correction, and no result authorizes formal alpha acceptance, deployment,
 broker access, orders, paper/live state, or trading.
+
+## 101. Prospective physical freeze for R-107 through R-114, 2026-09-17
+
+After the section-100 transport correction and counter-review, Codex derived
+these eight plans from committed source `42a70d7`. All eight are unspent, and
+this freeze is committed before any project creation, upload, compile,
+backtest, status inspection, or result read. The common package SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`;
+the common host-closure SHA-256 is
+`83b9ea687e427042d32b3ecfc818648d0b6a17976537ed97c01dae8636f79e52`.
+
+| Run | Profile SHA-256 | Projection SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|
+| R-107 | `71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178` | `f36adb56604326e16faaddfbac2cb71f5efb95ca996d5fb828c4c8a2b4871cef` | `c7c191d70e9d657b6800743f216cf7850b3102e96eb1456e4c32ac9a3f68bd3a` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-eadda4e4740d365653ba06f4` / `eadda4e4740d365653ba06f42714c4453732ccd5e7221a086694e3fd749e2e06` |
+| R-108 | `0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d` | `a04a415ca15f4f21fcbdad687993201c4f2c58c4abbfef72b59beabd56aced99` | `81dfee62a7255db347a856aab9f03a71ceebeff8cc975b91c3bdbc96c52ace43` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-fd2b13a23ffedbbf10d7793c` / `fd2b13a23ffedbbf10d7793c3018ae8f179b1c15bfb72366411474dc56845c33` |
+| R-109 | `661d87e282f6c37cc258db7a3e814e5a261369209fc3fc4a96c1769edd71f83d` | `2c9640d0f3922cb4f7267796d6db57eaba71d236310a62f8947a34d6da62c0ad` | `41a698afa9147ece3a156c7bbf422b1785a7af06007592537a439ae20812ec45` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-de216f4b8e4cbfe7a27f75f9` / `de216f4b8e4cbfe7a27f75f94d363f0878d1323cb6ae8dea7b37b1ee7739eedc` |
+| R-110 | `72a4b469d7f8fa79ea4ea62836b6b43000069b5e0a7dca6941af00124ca68f4a` | `a6ae308fe12fccc29e045af8933d51901ca991ae4773cb726d7b729a7c626b57` | `8971a4f3135506d0b267f4464ef0d9099af44748f95dc06164ed54669718a45e` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-a5d38b3ee76d6175e4ff7fe7` / `a5d38b3ee76d6175e4ff7fe72102a7963cc0cc954457e0f2e7f5f78d96152033` |
+| R-111 | `da7f4c75b9504c02f209362d2aebf69188d32cf608ac167fd543beb196067f93` | `0753f411be2df3978b5b57a949e1f459dca56db8368183bcebf91e6bafab391c` | `3e20a45171a31a26877f7a6457d74d0c77d9ef90ab22fe125d2fd95cf4fd68a9` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-424d9cdedac79722bd81ebb4` / `424d9cdedac79722bd81ebb4be391a64056d086cc20f0ded2bc8df1ae2edd067` |
+| R-112 | `e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3` | `764e182dc5a5a74396e0fae7cdfd0887b7815ab31ff4d186261506a0a0e34faf` | `40b7de4d536b10bcd167e9d661cb5b5f26b6df2e10cd0585e84058399b22b2bf` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-2cdb3f970f775ea1a912fe8e` / `2cdb3f970f775ea1a912fe8eff5749969bb12fa4cead76e39c08383e1e4a512b` |
+| R-113 | `b89cae4bdd9c8caa21f0ee8658097550794f5c63ca71ff30d546cf14356abb23` | `52907f340a720ec888edeb144a1d5b3e8e0cd95a3910402f3f74d30872aaad6b` | `c4355c7403af700218847381dc7ce49d4cc747b7ea0256df6ab920587be2ade4` | `5650cc7e2eb2a24c2ea9473247d642ecbf4979a7bd1551f60cc18a6a2ec94795` / 8 | `arv2-preliminary-qc-submission-792aa49935732f52ea569b79` / `792aa49935732f52ea569b79f22531e8666fdd2d363ace9a46e1142d3a624dae` |
+| R-114 | `b89ffdb06b56ca5024667e2d6e510026f65d47b00f5bbb0c1f9ba2286d01becc` | `d632fa55f2944af89dee416e0f452e90a7e3ecad2d4644781a0fe7bd1e25322b` | `e1b106a37df7ed176829199ae4a9d8e598997145b0c70a42b545cc88665af9aa` | `5650cc7e2eb2a24c2ea9473247d642ecbf4979a7bd1551f60cc18a6a2ec94795` / 8 | `arv2-preliminary-qc-submission-5c7657556d6e0c80a66933ac` / `5c7657556d6e0c80a66933acfb7a9b254943128c9c16167711d62c18eb7f9c5d` |
+
+Private projects are numbered 55 through 62. Control directories are
+`accepted_risk_market_cap_r107_20260917_01` through
+`accepted_risk_market_cap_r112_20260917_01`, followed by
+`accepted_risk_leverage_r113_20260917_01` and
+`accepted_risk_leverage_r114_20260917_01`, under the private lane artifact
+root. Exact project/backtest names and period/profile mappings are repeated in
+the shared ledger. R-107 must produce a tangible authenticated result before
+R-108 through R-114 proceed. Thereafter one subscribed QC node requires
+sequential execution.
+
+Accounting transitions are R-107 **81 -> 82 / 24 -> 25 / 591 -> 595**,
+R-108 **82 -> 83 / 25 -> 26 / 595 -> 599**, R-109 **83 -> 84 / 26 -> 27 /
+599 -> 603**, R-110 **84 -> 85 / 27 -> 28 / 603 -> 607**, R-111 **85 -> 86 /
+28 -> 29 / 607 -> 611**, R-112 **86 -> 87 / 29 -> 30 / 611 -> 615**,
+R-113 **87 -> 88 / 30 -> 31 / 615 -> 619**, and R-114 **88 -> 89 / 31 -> 32 /
+619 -> 623**, for shared looks / development evaluations / cell floor.
+Infrastructure looks remain 27. A launch spends its look and evaluation even
+on failure; cells accrue only from an authenticated aggregate. Exactly one
+aggregate read is allowed after a completed run. No raw inputs, logs, charts,
+holdings, orders, deployment, broker access, paper/live state, or trading is
+authorized.

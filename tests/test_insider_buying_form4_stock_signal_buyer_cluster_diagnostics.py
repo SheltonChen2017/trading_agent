@@ -1212,3 +1212,64 @@ def test_module_import_boundary_is_offline_and_dependency_bounded():
         and node.func.id in {"__import__", "eval", "exec", "float", "open"}
         for node in ast.walk(tree)
     )
+
+
+# --- Claude review addition (2026-09-18): row guards that survived mutation ---
+
+
+def _replay_row(row) -> None:
+    type(row).__post_init__(row, cluster_module._ROW_FACTORY_TOKEN)
+
+
+def _signal_row(result):
+    return next(row for row in result.rows if row.buyer_breadth is not None)
+
+
+def test_row_replay_binds_cluster_candidacy_to_its_own_inputs():
+    """The candidacy flag must be recomputed, not trusted.
+
+    A forged row can otherwise claim qualification while its own base
+    selection and breadth gate say the opposite.
+    """
+    seed, sources = _available_case()
+    row = _signal_row(_build(seed, sources))
+    assert row.cluster_qualified_candidate is True
+
+    forged = _forge(row, cluster_qualified_candidate=False)
+    with pytest.raises(
+        cluster_module.Form4StockSignalBuyerClusterDiagnosticsError,
+        match="buyer-cluster candidacy is inconsistent",
+    ):
+        _replay_row(forged)
+
+    seed, sources = _one_candidate_case()
+    ungated = next(
+        row
+        for row in _build(seed, sources).rows
+        if row.buyer_breadth == 1
+    )
+    assert ungated.cluster_qualified_candidate is False
+    promoted = _forge(ungated, cluster_qualified_candidate=True)
+    with pytest.raises(
+        cluster_module.Form4StockSignalBuyerClusterDiagnosticsError,
+        match="buyer-cluster candidacy is inconsistent",
+    ):
+        _replay_row(promoted)
+
+
+def test_row_replay_binds_the_breadth_gate_to_its_exact_breadth():
+    seed, sources = _one_candidate_case()
+    result = _build(seed, sources)
+    ungated = next(row for row in result.rows if row.buyer_breadth == 1)
+    assert ungated.meets_minimum_buyer_breadth is False
+
+    forged = _forge(
+        ungated,
+        meets_minimum_buyer_breadth=True,
+        cluster_qualified_candidate=ungated.base_diagnostic_seed_selected,
+    )
+    with pytest.raises(
+        cluster_module.Form4StockSignalBuyerClusterDiagnosticsError,
+        match="buyer-breadth gate is inconsistent",
+    ):
+        _replay_row(forged)

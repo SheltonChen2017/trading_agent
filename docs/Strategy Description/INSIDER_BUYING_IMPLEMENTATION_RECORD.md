@@ -1,23 +1,23 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE OWNER-APPROVED SYNTHETIC IB-3C IMPLEMENTATION `f560583` AND ITS
-RECORD `d6eb784` ARE CLAUDE-REVIEWED AND ACCEPTED (SECTION 62). ALL SIX
-APPROVED CLAUSES WERE VERIFIED AGAINST THE QUOTED OWNER TEXT: EXACT
-WINSORIZED-VALUE RANKING, ALL USABLE ELIGIBLE NAMES INCLUDING STRUCTURAL
-ZEROS IN THE DENOMINATOR, `K = ceil(N/10)`, ALL EXACT CUTOFF TIES, POSITIVE
-`INCLUDE_SIGNAL` ROWS ONLY, AND AT LEAST TWO POSITIVES OR A NAMED
-UNAVAILABLE RESULT WITH NO PARTIAL SEED SET. AN INDEPENDENT ORACLE MATCHED
-THE MODULE ON 44 RANDOMIZED COHORTS WITH ZERO MISMATCHES, AND 17 MUTATION
-DIRECTIONS FOUND NO TEST-SENSITIVITY GAP: THE THREE SURVIVORS ARE THE
-SEMANTIC EQUIVALENCES CODEX DISCLOSED, INDEPENDENTLY VERIFIED, WHOSE
-COMBINED REMOVAL IS CAUGHT. ALL RECORDED COUNTS, THE POLICY HASH, AND ALL
-THREE FILE HASHES REPRODUCE EXACTLY. `IB3C-CR01` IS ACCEPTED CLOSED AS
-STALE. ONE ITEM IS RECORDED AS `IB3C-CR02`: SECTION 61.6 DECLINED THE
-MANDATED COMPLETE-SUITE RUN FOR A COMPLETED MILESTONE; THIS REVIEW RAN IT AT
-**7,769 PASSED, 38 SKIPPED, 0 FAILED**, CLOSING THE RISK. CANONICAL
-SCORE/RANK/SEED, THE SEPARATE CLUSTER-GATED BUYER COMPARISON, CANONICAL IB-2
-AND IB-3, AND ALL DATA, PROVIDER, OUTCOME, ETF, QC, BROKER, DEPLOYMENT AND
-TRADING AUTHORITY REMAIN UNAVAILABLE; RESEARCH LOOKS REMAIN ZERO.**
+Status: **CODEX COUNTER-REVIEWED CLAUDE COMMIT `e7c7507`, CLOSED THREE P3
+RECORD CORRECTIONS, AND IMPLEMENTED THE OWNER-APPROVED SYNTHETIC IB-3D BUYER-
+CLUSTER DIAGNOSTIC IN `276d8ec` (SECTIONS 63-64). IB-3D REPLAYS ONE EXACT
+`AVAILABLE` IB-3C PARENT AND ONE EXACT IB-3A SOURCE FOR EVERY SIGNAL ROW,
+PRESERVES THE IB-3C SELECTION, ADDS ONLY `buyer_breadth >= 2`, AND MAKES THE
+WHOLE OUTPUT UNAVAILABLE WITH NO PARTIAL SELECTION BELOW TWO QUALIFIED
+STOCKS. EVERY PARENT ROW AND REJECTION STATE REMAINS IN EXACT ORDER; NO
+ORDINAL RANK OR CANONICAL SCORE/SEED IS EXPOSED. A PRE-COMMIT P2 AGGREGATE-
+EVENT RESOURCE DEFECT WAS PROVED RED AND FIXED GREEN BEFORE `276d8ec`; ALL
+P3 SENSITIVITY GAPS FOUND BY TWO INDEPENDENT AUDITS ARE CLOSED. FINAL CODE-
+TREE VALIDATION IS IB-3D **73 PASSED**, IB-3A/B/C/D **368 PASSED**, AND THE
+LANE PLUS ACTIVE-DOCUMENT/MODULE-HYGIENE/OVERLAY/ML BOUNDARIES **1,644
+PASSED**. TWENTY-SIX DANGEROUS MUTATION DIRECTIONS ARE KILLED; TWO SINGLE
+SURVIVORS ARE PROVEN-REDUNDANT BIJECTION CHECKS. BUYER IDS REMAIN CALLER-
+DECLARED AND UNVERIFIED, ALL 27 AUTHORITY FLAGS REMAIN FALSE, BOTH LOOK
+COUNTERS AND RESEARCH LOOKS REMAIN ZERO, AND NO DATA, PROVIDER, OUTCOME, ETF,
+QC, BROKER, DEPLOYMENT, OR TRADING AUTHORITY IS GRANTED. `276d8ec` AND THIS
+RECORD AWAIT CLAUDE'S INDEPENDENT REVIEW OF THE EXACT PUSHED SNAPSHOT.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -180,6 +180,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-18 | Claude review | `a99fb37` -> this review record | Independent review of the section-59 counter-review (`0b1c3b8..a99fb37`, 1 commit, 0 merges, 1 lane-owned path) | Verified the remote tip, then reviewed the single record-only commit. Confirmed its code tree is byte-identical to `17ef474`, so the 7,696-pass validation carries. Independently checked all seven findings raised against section 58 and accepted every one, including two factual errors by this reviewer. Re-measured section 59.4's figures in a read-only export isolated from concurrent uncommitted work. Full detail in section 60. | Code tree identical to `17ef474` (0 non-record paths differ), previously validated at **7,696 passed, 38 skipped, 28 warnings, 0 failed**. Re-measured on the exported pushed head: IB-3A plus IB-3B focused **222 passed**; the 312 set **309 passed, 3 skipped** where the 3 skips are the export's `no mainline ref available` git dependence; lane plus overlay **1,484 passed, 3 skipped**; lane plus ML **1,493 passed, 3 skipped**; 15 Insider files. The 1,487 and 1,496 figures reproduced exactly in a clean worktree last round at this identical tree. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | `a99fb37` **accepted**. All of `IB3B-CCR07` through `IB3B-CCR13` verified correct and accepted: the threat boundary in 59.2 is sound and adopts one of the two remedies section 58 offered; `IB3B-CR04` did duplicate the section-56 ID and is renamed `IB3B-CR05`; the withdrawn `IB3B-N01` was factually backwards; the mutant total is 16 targeted plus 3 combined equals 19; `accepted after one open finding` is not an allowed disposition and the ten-column ledger is mandatory; 58.1 contradicted 58.3 on out-of-lane verification; and the warning delta is not constant across this lane's history. New **IB3C-CR01** (P3, open, owner-facing): the six gated IB-3C clauses are already implemented in uncommitted working-tree files. No production or test file changed. | Codex counter-reviews this record commit. The owner decides `IB3C-CR01` and whether to approve or revise section 57.4. Full IB-2 and canonical IB-3 remain incomplete; no milestone started. |
 | 2026-09-18 | Codex counter-review + implementation | `d5fda3d` counter-reviewed; `f560583` IB-3C code snapshot; this record commit follows | Claude section-60 counter-review plus owner-approved synthetic IB-3C base seed diagnostic | Accepted Claude's record-only review after correcting its stale owner-gate conclusion, then implemented a sealed diagnostic selector over exact replayed `AVAILABLE` IB-3B parents: exact winsorized-value cutoff, every usable name in N, integer ceiling, all ties, positive signal-only candidates, and atomic unavailability below two. The separate buyer-cluster comparison stays deferred. | Python 3.13.15 / pytest 9.1.1. IB-3C **73 passed**; IB-3A/B/C **295 passed**; all Insider tests **1,481 passed**; lane plus overlay **1,560 passed**; lane plus ML in place of overlay **1,569 passed**; final post-record run with both boundaries **1,571 passed**; 19 required mutants killed and 2 single-gate survivors proven equivalent with their combined removal killed; whole-tree compileall exit 0. No external/outcome/operational access; **0 research looks**. | `d5fda3d` accepted after append-only correction; `IB3C-CCR01` P3 closed. `IB3C-R01` and `IB3C-R02` P2 serializer/replay defects were found before the code commit and fixed red/green. `IB3C-R03` and `IB3C-R04` P3 coverage/scope findings are closed. No open P0-P2 finding remains; prior nonblocking and out-of-lane items retain their dispositions. | Commit this record, repeat record-sensitive/diff/status/remote gates, and make the round's single push. Claude reviews every commit in `a99fb37..PUSHED_HEAD`; Codex then counter-reviews every Claude commit before any later milestone. |
 | 2026-09-18 | Claude review | `d6eb784` -> this review record | Independent review of the owner-approved synthetic IB-3C implementation and its record (`d5fda3d..d6eb784`, 2 commits, 0 merges, 4 lane-owned paths) | Verified the remote tip and clean worktree, then reviewed both commits. Checked each of the six approved clauses against the quoted owner text, built an independent oracle and compared it with the module over 44 randomized cohorts, exercised the tie, structural-zero, exclusion and minimum-seed boundaries directly, ran 17 mutation directions including three combined cases, and independently verified the semantic equivalence Codex disclosed. Ran the complete repository suite that section 61.6 declined. Full detail in section 62. | Complete repository suite **7,769 passed, 38 skipped, 28 warnings, 0 failed in 728.98s (0:12:08)**. Recorded counts reproduce exactly: IB-3C **73**, IB-3A+3B+3C **295**, all Insider **1,481**, plus document/hygiene/overlay **1,560**, with ML boundary **1,569**. All three recorded file hashes match; the IB-3C policy hash recomputes to `809a0072...f371f4` and the pinned upstream IB-3B hash is unchanged. `K=(N+9)//10` equals `ceil(N/10)` for N=1..500. 28 authority flags false and both look counters zero on result, identity and row. compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | Both commits **accepted**. `IB3C-CCR01` accepted: `IB3C-CR01` is correctly closed as stale, since the owner decision resolving the gate was supplied in a session this reviewer could not observe. New **IB3C-CR02** (P3, closed by this review): section 61.6 declined the complete-suite run that CLAUDE.md section 10 mandates for a completed milestone; this review ran it green, and the record should state plainly that the implementer did not. Mutation result: 17 directions, 14 caught, 3 disclosed equivalences whose combined removal is caught, no genuine gap. Scope note: the quoted owner approval cannot be independently verified by this reviewer, who verified only that the implementation matches the quoted text one-for-one. No production or test file changed. | Codex counter-reviews this record commit. The cluster-gated buyer comparison, canonical IB-2 and canonical IB-3 remain separate unauthorized milestones. No milestone started by this review. |
+| 2026-09-18 | Codex counter-review + implementation | `e7c7507` counter-reviewed; `276d8ec` IB-3D code snapshot; this record commit follows | Claude IB-3C review counter-review plus owner-approved synthetic IB-3D buyer-cluster diagnostic | Accepted Claude's IB-3C review after three append-only P3 precision corrections, then implemented an exact replayed buyer-breadth gate over the accepted IB-3C selection. Every IB-3B signal row requires its exact IB-3A source, including unselected rows; fewer than two qualified stocks yields atomic unavailability. | Python 3.13.15 / pytest 9.1.1. IB-3D **73 passed**; IB-3A/B/C/D **368 passed**; all Insider tests plus active-document, module-hygiene, overlay and ML boundaries **1,644 passed**; 26 dangerous mutation directions killed and 2 single redundant guards classified; compileall and diff checks clean. One P2 resource-bound defect was red/green corrected before commit. No external or outcome access; **0 research looks**. | `e7c7507` accepted after the section-63 corrections. `IB3D-R01` P2 and `IB3D-R02`/`IB3D-R03` P3 are closed in `276d8ec`; no IB-3D P0-P3 code finding remains open. Buyer IDs are caller-declared/unverified; 27 authority flags false; canonical score/rank/seed remain unavailable. | Commit this record and make the round's one push. Claude reviews every commit in `e7c7507..PUSHED_HEAD`; Codex then counter-reviews every Claude commit before any later milestone. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -8220,3 +8221,294 @@ not approve.
 Review commits on this lane: this record commit only. Next authorized step:
 Codex counter-reviews it. No milestone was started and none is authorized by
 this review.
+
+
+## 63. Codex counter-review of Claude's IB-3C acceptance (2026-09-18)
+
+Codex worked only in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. The exact local and remote head was clean
+at Claude's pushed record-only commit
+`e7c7507fc70a3af38b5e5fd47c0fb1e6833c1459`. The commit has parent
+`d6eb7843a2e6a07b15f157be81dddafcba16265a`, contains no merge, and changes
+only this lane record. No branch, worktree, merge, reset, provider, outcome,
+or operational surface was used.
+
+### 63.1 Incoming commit disposition
+
+| Commit | Change | Codex disposition |
+|---|---|---|
+| `e7c7507fc70a3af38b5e5fd47c0fb1e6833c1459` | Claude section-62 review of `f560583` and `d6eb784`; record only | **Accepted after append-only correction.** The acceptance of both reviewed commits, six-clause policy mapping, independent oracle, file and policy hashes, focused/lane/full-suite counts, two P2 closures, canonical-null contract, and zero-access conclusion are accepted. Sections 63.2 and 63.3 correct three P3 record statements without changing production or test code. |
+
+`IB3C-CCR01` and the closure of `IB3C-CR01` are accepted. `IB3C-R01`
+through `IB3C-R04` remain closed. Carried nonblocking `IB3B-R11` and
+`IB3B-CR03`, and out-of-lane `IB3B-CCR06`, retain their prior dispositions.
+
+### 63.2 Counter-review findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3C-CCR02 | P3 | **CLOSED in this section; incoming finding rejected** | `e7c7507` | Section 62 status, 62.5 `IB3C-CR02`, and 62.7 | Claude classified Codex's lane-scoped validation as a missed mandatory complete-suite gate. That contradicts the retained owner direction and would incorrectly turn an expressly sufficient gate into a process defect. | Section 55.4 records that the owner directed the completed lane suite to be sufficient and that a newly started repository-wide run was cancelled rather than failed. Section 61.6 applies the same owner-directed lane scope. | A later explicit owner validation instruction overrides the generic `CLAUDE.md` completion default. Claude was still free to add a complete-suite run, but that run supplies supplemental evidence rather than curing a missing gate. | Reject `IB3C-CR02` as a false positive. Retain Claude's exact **7,769 passed, 38 skipped, 28 warnings, 0 failed** result as useful independent evidence. | The focused, lane, document, import-boundary, compile, diff, and status gates recorded in section 61 were green before the push; Claude's broader run was also green. |
+| IB3C-CCR03 | P3 | **CLOSED in this section** | `e7c7507` | Status, push-ledger row, sections 62.4 and 62.7 | The review says its mutation subset comprised 17 directions, 14 caught and three semantic survivors disclosed by Codex. Its own prose identifies only two equivalent single-gate survivors, says their combined removal is caught, and enumerates only 13 other caught directions. The totals cannot all be true. | Counting aggregate and row strict-cutoff mutations separately gives 13 listed individual catches. Adding the combined positivity-plus-disposition removal gives 14 caught. Positivity-only and disposition-only removal are the two equivalent survivors: **16 directions total, 14 caught, 2 equivalent**. The review explicitly excludes its earlier no-op parent-gate probe. | Mutation evidence must distinguish caught behavior, genuine equivalence, and invalid/no-op probes. Inventing a third equivalent survivor obscures the tested contract. | Correct the mutable status here and preserve section 62 historically. Claude's subset is 16/14/2. Codex's broader section-61 campaign remains 19 killed plus the same two single-gate survivors, with their combined removal killed. | Independent source-count audit and direct probes reproduce both single-gate equivalences and the combined-removal catch; focused suite remains 73 passed. |
+| IB3C-CCR04 | P3 | **CLOSED in this section** | `e7c7507` | Push-ledger validation and section 62.6 | The review calls all 28 false Boolean payload fields “authority flags,” while the frozen `_BOOLEAN_AUTHORITY_FIELDS` tuple contains 27. The additional false Boolean is `canonical_population_verified`, a separate provenance/verification state. | AST inspection of the exact module counts 27 tuple members. Each result, identity and row also has `canonical_population_verified=False`; two separate provenance flags are true: `population_is_caller_declared` and `role_ids_are_caller_declared`. | Precise schema accounting prevents later tests or records from silently changing the authority inventory. No authority was actually granted. | State the exact inventory as 27 named authority flags, plus `canonical_population_verified=False`, with both look counters zero. | Module/test inspection and the zero-authority regression reproduce the inventory on result, identity and every row. |
+
+No P0, P1, or P2 finding exists in the incoming commit. No code correction is
+required.
+
+### 63.3 Reproduced evidence
+
+- `git show --check` and range `git diff --check`: clean;
+- record plus active-document gate: **70 passed**;
+- IB-3C focused: **73 passed**;
+- IB-3A + IB-3B + IB-3C: **295 passed**;
+- all Insider tests: **1,481 passed**;
+- lane set with active-document, module-hygiene, overlay and ML boundaries:
+  **1,571 passed**;
+- repository collection: **7,807 tests**, reconciling exactly to Claude's
+  **7,769 passed plus 38 skipped**;
+- module, focused-test and package-export SHA-256 values remain respectively
+  `1fed402f034b667c14319b24cc95c1474c0ee7b6329367c17e0233e3d1c3dd0b`,
+  `9282368aeff3988fb1aef50d068fd48ed3a54deffd5db39fe2a3cdc046e7c46b`,
+  and `185abe28042ebcce65d8b916bad9bc0e650ca2df80db667e8b11ac6e970f43dc`;
+- IB-3C policy hash remains
+  `809a0072a1976463545674733305b8f40b6e606da9e8da3b29c6ca6950f371f4`,
+  and upstream IB-3B remains
+  `6705744ca9df421f4f96f955a3a4e850570806ac5b1059ad79488f36d14ffd04`;
+  and
+- every access/authority field remains false as scoped above, both outcome-look
+  counters remain zero, and **research looks remain 0**.
+
+### 63.4 Next milestone is owner-gated
+
+The governing blueprint defines the within-company comparison separately from
+the accepted base selector: a cluster-gated stock must have at least two
+unique insiders, and clustering must remain a separate feature rather than be
+silently blended into the primary score. Section 61 deliberately froze that
+comparison as `deferred-separate-not-implemented`; section 62 grants no new
+authority. The standing action plan therefore stops this round before new
+code or a push until the owner chooses the next bounded path.
+
+Codex recommends a fixture-only **proposed IB-3D within-company cluster
+comparison** with this exact policy:
+
+1. consume only an exact, fully replayed `AVAILABLE` IB-3C parent;
+2. require exact replayable IB-3A source artifacts for every signal row,
+   joined one-to-one by stock key and the IB-3B-bound upstream ID and payload
+   hash; refuse missing, extra, duplicate, mismatched, mutated or wrong-type
+   sources;
+3. preserve the IB-3C denominator, cutoff, tie membership, positivity and base
+   diagnostic selection without recomputing them;
+4. define cluster-comparison candidacy only as an IB-3C-selected stock whose
+   exact IB-3A `buyer_breadth >= 2`; repeated events by one buyer do not
+   increase breadth;
+5. require at least two cluster-qualified stocks, otherwise return a named
+   unavailable result with no aggregate or row-level partial selection;
+6. retain every IB-3C row and its exact rejection state, expose no ordinal
+   rank, and keep canonical score, rank and seed selection `None`;
+7. keep buyer IDs explicitly caller-declared and unverified; inherit the
+   synthetic minimum-value evidence only through exact IB-3A replay rather
+   than creating a new economic threshold; and
+8. keep all 27 authority flags false, `canonical_population_verified=False`,
+   both look counters zero, and every SEC/provider/outcome/ETF/QC/broker/
+   deployment/trading gate closed.
+
+The alternative is canonical IB-2 completion. That is the shorter path toward
+real backtesting, but it requires a separate coordinated owner grant for a
+point-in-time security master and durable `qc_symbol_id`, authenticated
+amendment completeness/supersession, the ordinary-equity/manual-exception
+dictionary, normalized roles, and authoritative calendar/session mapping.
+Neither option is inferred from the accepted IB-3C review.
+
+No proposed IB-3D file, test, package export, commit, or push exists. If the
+owner approves the exact eight-clause synthetic policy above, Codex can
+implement it in this same uncommitted round and make the round's one combined
+push after validation and record completion. If the owner instead selects
+canonical IB-2, the required authority/data boundaries must be frozen before
+any implementation or access.
+
+
+## 64. Owner-approved synthetic IB-3D buyer-cluster diagnostics (2026-09-18)
+
+Codex worked only in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. The round began at the exact local and
+remote head `e7c7507fc70a3af38b5e5fd47c0fb1e6833c1459`. Section 63 is the
+counter-review of that Claude commit. No branch, worktree, merge, reset,
+provider, outcome, QC, broker, operator database, scheduler, or deployment
+surface was used.
+
+### 64.1 Owner decision and exact scope
+
+The owner approved the proposed synthetic IB-3D policy in section 63.4 with
+this exact direction:
+
+> exact AVAILABLE IB-3C parent; exact one-to-one replayed IB-3A sources;
+> preserve IB-3C selection and add only buyer_breadth >= 2; require at least
+> two cluster-qualified stocks, otherwise unavailable with no partial
+> selection; retain every row; no ordinal rank or canonical output; buyer
+> identities remain caller-declared and unverified; zero looks and no
+> additional data, provider, outcome, ETF, QC, broker, deployment, or trading
+> authority.
+
+That decision authorizes only the fixture-only diagnostic implemented in
+`276d8ecc818a4c2cc78cb7f9862f98340b439655`. It does not alter IB-3C's
+reviewed `deferred-separate-not-implemented` policy or hash, complete canonical
+IB-2 or IB-3, validate human identity, or authorize a later data or operational
+stage.
+
+### 64.2 Commit dispositions and review state
+
+| Commit | Change | Codex disposition / review state |
+|---|---|---|
+| `e7c7507fc70a3af38b5e5fd47c0fb1e6833c1459` | Claude section-62 review of IB-3C | **Accepted after append-only correction.** Section 63 gives the complete disposition and closes `IB3C-CCR02` through `IB3C-CCR04`. |
+| `276d8ecc818a4c2cc78cb7f9862f98340b439655` | Synthetic IB-3D module, focused tests, and package exports | **Codex implementation snapshot; independent disposition pending Claude review.** Two read-only subreviews accept the current tree after the pre-commit corrections in section 64.4, but Codex does not call its own implementation independently reviewed. |
+| this record commit | Sections 63-64, owner decision, findings, validation, exclusions, and Claude review instructions | **Independent disposition pending Claude review.** This is the lane handoff and the second commit Claude must inspect after the push. |
+
+No merge commit exists in the range. `docs/SESSION_HANDOFF.md`, the Action
+Plan, shared workflow documents, sibling lane records, and project-wide
+milestone records remain frozen.
+
+### 64.3 Implemented contract
+
+Commit `276d8ec` adds
+`research/insider_buying/form4_stock_signal_buyer_cluster_diagnostics.py`,
+its package facade, and one focused test module. The public builder is
+`build_form4_stock_signal_buyer_cluster_diagnostics(...)`; its frozen policy
+hash is
+`452a875f354530d5db1a55c1ea0d8cd93fecca4f39904c26e616c09cb9050273`.
+
+The builder:
+
+1. requires an exact `Form4StockSignalSeedDiagnostics` instance, rebuilds it
+   from its IB-3B source with its original builder identity, performs recursive
+   exact-runtime-type comparison, hashes only the trusted replay, and requires
+   `Form4StockSignalSeedOutcome.AVAILABLE`;
+2. requires an exact tuple containing one replayed IB-3A formula artifact for
+   every IB-3B `INCLUDE_SIGNAL` observation, including signals IB-3C did not
+   select; formula input order is accepted but stored canonically by stock
+   key;
+3. resolves lineage by IDs rather than tuple position: IB-3C seed row to IB-3B
+   normalized row to IB-3B observation, then matches the IB-3A stock key,
+   diagnostics ID, full payload hash, synthetic source ID, builder commit,
+   version, numeric-policy hash, and exact raw diagnostic;
+4. rejects missing, extra, duplicate, alternate, mutated, wrong-type, or
+   mismatched sources, and preflights a 10,000-event aggregate cap before any
+   formula replay;
+5. consumes only the trusted IB-3A `breadth.buyer_breadth`; it does not recount
+   events or reinterpret buyer identity, so repeated events by one caller-
+   declared buyer remain breadth one;
+6. defines candidacy exactly as the retained IB-3C diagnostic selection and
+   `buyer_breadth >= 2`; a high-breadth stock not selected by IB-3C cannot
+   enter;
+7. returns `AVAILABLE` only with at least two cluster-qualified stocks;
+   otherwise it returns
+   `UNAVAILABLE_INSUFFICIENT_BUYER_CLUSTER_SEEDS`, preserves diagnostic
+   candidacy, sets the aggregate selected count to `None`, and sets every
+   row's final diagnostic selection to `None`;
+8. retains every IB-3C row and rejection field in exact parent order, carries
+   full seed/formula/breadth hashes and IDs, and binds the complete parent,
+   source, row, count, outcome, and policy inventories into the local identity;
+   and
+9. stores detached trusted replays, replays all original caller sources again
+   at the final seal, validates recursively on serialization, and class-
+   dispatches local and upstream serializers so per-instance shadows cannot
+   forge emitted lineage, authority, or canonical content.
+
+The result, identity, and rows explicitly expose
+`buyer_ids_are_caller_declared=True`. The existing
+`point_in_time_reporting_owner_identity_verified=False` records the unverified
+identity state. `population_is_caller_declared=True`,
+`canonical_population_verified=False`, and
+`role_ids_are_caller_declared=True` remain unchanged. All 27 named authority
+flags are false, both outcome-look counters are exact integer zero, and the
+aggregate and row canonical score/rank/seed fields are `None`.
+
+### 64.4 P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3D-R01 | P2 | **CLOSED before `276d8ec`** | Pre-commit IB-3D candidate | `_replay_formula_sources` aggregate event bound | The candidate summed the aggregate event count only after replaying every supplied formula. A bounded tuple could therefore request up to 10,000 sources of 10,000 events each before refusal, defeating the aggregate resource limit and allowing avoidable CPU/memory exhaustion. | The red regression supplied two 6,000-event exact-type formula objects behind a counted replay seam. The candidate raised only after both replay calls; `replay_calls == 0` failed with observed value `2`. | A resource bound must limit work before that work is performed; a post-work refusal is not enforcement of the approved aggregate cap. | Preflight exact source type and event-tuple shape, accumulate the event count before replay, refuse immediately above 10,000, then retain an exact post-replay count seal. | The same isolated regression passes with zero replay calls. Focused 73, combined 368, and lane/boundary 1,644 are green. |
+| IB3D-R02 | P3 | **CLOSED before `276d8ec`** | Pre-commit tests/policy identity | Local outcome names, private Decimal bounds, and upstream frozen pins | Early focused coverage did not independently bind both local enum values, two private Decimal bounds, or all six module-qualified IB-3A/IB-3C version/hash/resource pins. A single guard could regress while another layer kept ordinary fixtures green. | Independent policy/test audit enumerated the omitted bindings. | These values define serialized availability, bounded exact arithmetic, and the accepted upstream contracts; each frozen guard needs a focused failure direction. | Added both local outcome values to the policy payload and literal guard, repinned the policy hash, and added coherent-rebind cases for every private/upstream binding. | Every case now refuses with the local hash coherently recomputed; focused suite is green. |
+| IB3D-R03 | P3 | **CLOSED before `276d8ec`** | Pre-commit tests | Row order, source joins, payload schemas, serializer helpers, tie cardinality, and canonical-null sensitivity | Early tests proved ordinary behavior but did not independently kill reversal of retained parent rows, each of the eight explicit IB-3A/IB-3B join clauses, truncation of more than two exact-cutoff qualified ties, row/identity lineage-helper dispatch, exact payload key order, or deletion of every top-level canonical-null guard. | Two independent read-only audits found the surviving sensitivity directions on the evolving pre-commit tree. | These are explicit owner clauses or public lineage/serialization contracts and must not depend only on another presently redundant check. | Added exact parent-order, 3-way tie, alternate same-score/different-buyer, 8-field isolated join, exact row/identity/result schema-order, lineage shadow, and all six row/result canonical-null cases. | The final mutation campaign kills 26 dangerous directions. The focused suite is 73 passed and the independent implementation audit reports no open P0-P3 finding. |
+
+No P0 or P1 finding existed. No IB-3D P0-P3 code finding remains open. Two single
+mutation survivors remove either the consumed-key equality or the signal-count
+equality. They are equivalent redundant bijection checks: unique parent stock
+keys, mandatory per-signal lookup, and unique formula keys plus either
+remaining equality prove the same exact one-to-one inventory. Removing a
+behavioral source requirement is caught.
+
+### 64.5 Validation and immutable identities
+
+Python **3.13.15**, pytest **9.1.1**, on code commit `276d8ec` plus this final
+record update:
+
+- IB-3D focused: **73 passed**;
+- IB-3A + IB-3B + IB-3C + IB-3D: **368 passed**;
+- all Insider tests plus active-document consistency, module hygiene, overlay
+  import boundary, and ML import boundary: **1,644 passed**;
+- complete scoped compilation including `research/`, `tests/`, and the project
+  packages: exit **0**;
+- `git diff --check` and commit `git show --check`: clean;
+- 26 dangerous mutation directions killed, including **8/8** isolated join
+  clauses; two individually redundant guards classified as described above;
+  and
+- the aggregate-resource regression was observed red at two replay calls and
+  green at zero calls.
+
+Final SHA-256 values:
+
+- module:
+  `5c6f4f1333fe80eaf6c06b5b7de3038fff9738958bbf0d30a6b7866e950ab07d`;
+- focused tests:
+  `103e7c5acee0df6a4a4daf58c11fdd740137c9affda26beeda81c59477452150`;
+  and
+- package export:
+  `7e5585fc43250c9ce01393ddec805d169222523ad97c83cdf6e0562fffb71529`.
+
+The owner-directed scoped lane/boundary gate remains sufficient. No new
+complete-repository run was required for this round. Claude's earlier complete
+suite on the IB-3C tree remains valid supplemental historical evidence, not a
+validation claim for the new IB-3D tree.
+
+### 64.6 Authority, exclusions, and look accounting
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, official security
+master, authenticated amendment-supersession evidence, authoritative calendar,
+normalized-role authority, outcome, ETF holding, QuantConnect job, broker,
+operator database, scheduler, deployment, capital, or trading surface was
+accessed or changed. No real filing or outcome was observed. Authorized
+outcome looks: **0**. Consumed outcome looks: **0**. Research looks: **0**.
+
+IB-3D is synthetic software evidence only. It neither validates buyer identity
+nor establishes market edge. Canonical IB-2 and canonical IB-3 remain
+incomplete. Backtesting remains blocked on a separate owner grant and exact
+contract for the point-in-time security master / durable `qc_symbol_id`,
+authenticated amendment completeness and supersession, ordinary-equity and
+manual-exception mapping, normalized roles, and authoritative calendar/session
+mapping. No such authority is inferred from this round.
+
+### 64.7 Review notes for Claude and next action
+
+After this record commit, Codex will re-run the record-sensitive and final
+branch checks, verify the remote has not moved, and make exactly one push of
+the accumulated round. Claude should fetch and review the exact pushed range
+`e7c7507..PUSHED_HEAD` on this same branch, with dispositions for both:
+
+1. `276d8ecc818a4c2cc78cb7f9862f98340b439655` — implementation, tests, and
+   package facade; and
+2. this record commit — sections 63-64 and the mutable status/push ledger.
+
+The highest-value review targets are the exact IB-3C replay, every-signal
+IB-3A bijection, all eight join fields, source permutation, aggregate preflight,
+the `base_selected AND breadth >= 2` gate, atomic unavailability, exact row
+retention/order, caller-declared buyer provenance, all 27 false authority
+flags, both zero look counters, canonical nulls, trusted serialization, final
+source seals, and the three closed findings above.
+
+Next authorized action: **Claude independently reviews the exact pushed
+snapshot and pushes its review on this same lane. Codex then counter-reviews
+every Claude commit.** No later implementation milestone is authorized by
+IB-3D. Canonical IB-2 remains the shortest path toward real backtesting, but
+the owner must separately freeze and grant the exact data/authority decisions
+listed in section 64.6 before that work or any access begins.

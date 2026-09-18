@@ -1,23 +1,21 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **THE OWNER-APPROVED SYNTHETIC IB-3D BUYER-CLUSTER DIAGNOSTIC
-`276d8ec` AND ITS RECORD `83427c5` ARE CLAUDE-REVIEWED AND ACCEPTED,
-`276d8ec` AFTER A TEST-ONLY CORRECTION (SECTION 65). ALL EIGHT APPROVED
-CLAUSES VERIFY AGAINST THE QUOTED OWNER TEXT, INCLUDING THAT REPEATED EVENTS
-BY ONE BUYER GIVE BREADTH 1 AND FAIL THE GATE, THAT A BREADTH-QUALIFIED BUT
-UNSELECTED STOCK IS NEVER A CANDIDATE, AND THAT FEWER THAN TWO QUALIFIED
-STOCKS YIELD AN ATOMIC UNAVAILABLE RESULT WITH NO PARTIAL SELECTION.
-CORRECTION `fc6638b` PINS TWO LOAD-BEARING ROW GUARDS THAT WERE UNTESTED ON
-THE PUSHED TREE. ALL THREE SECTION-63 CORRECTIONS AGAINST SECTION 62 ARE
-ACCEPTED: `IB3C-CR02` WAS A FALSE POSITIVE BECAUSE SECTION 55.4 RECORDS AN
-OWNER DIRECTION THAT THE LANE SUITE IS SUFFICIENT, THE MUTATION COUNT IS
-RESTATED, AND THE FROZEN AUTHORITY TUPLE IS 27 PLUS A SEPARATE
-`canonical_population_verified`. RECORDED COUNTS REPRODUCE EXACTLY (73, 368,
-1,644) AND THE COMPLETE SUITE IS **7,842 PASSED** ON THE PUSHED TREE AND
-**7,844 PASSED** ON THE FINAL TREE. CANONICAL IB-2 AND IB-3, CANONICAL
-SCORE/RANK/SEED, AND ALL DATA, PROVIDER, OUTCOME, ETF, QC, BROKER,
-DEPLOYMENT AND TRADING AUTHORITY REMAIN UNAVAILABLE; RESEARCH LOOKS ARE
-ZERO.**
+Status: **CODEX COUNTER-REVIEWED BOTH CLAUDE IB-3D COMMITS `fc6638b` AND
+`5f6a074` AND ACCEPTED THEM AFTER TEST-ONLY CORRECTION `526ecc6` (SECTION
+66). CLAUDE'S TWO ORIGINAL ROW-GUARD PINS ARE VALID, BUT ITS CLAIM THAT THE
+EXACT BUYER-BREADTH BINDING WAS PINNED IN BOTH DIRECTIONS WAS OVERBROAD: THE
+QUALIFIED-ROW DEMOTION DIRECTION SURVIVED UNTIL `526ecc6` ADDED THE SYMMETRIC
+REGRESSION. THE SAME COMMIT CLOSES THE TWO CARRIED CURRENT-LANE P3 ITEMS:
+THE FROZEN IB-3B MEAN RANGE CLAMP IS NOW MUTATION-PINNED IN BOTH DIRECTIONS,
+AND THE NESTED-IDENTITY LIMITATION IS CLOSED AS DESIGNED BY A LOAD-BEARING
+EXACT-PARENT-REPLAY REGRESSION. NO PRODUCTION MODULE CHANGED. FINAL FOCUSED
+COUNTS ARE IB-3B **44 PASSED**, IB-3D **75 PASSED**, AND IB-3A/B/C/D **373
+PASSED**; FINAL LANE/BOUNDARY AND RECORD GATES ARE IN SECTION 66. CANONICAL
+IB-2 AND IB-3, CANONICAL SCORE/RANK/SEED, AND ALL DATA, PROVIDER, OUTCOME,
+ETF, QC, BROKER, DEPLOYMENT AND TRADING AUTHORITY REMAIN UNAVAILABLE;
+RESEARCH LOOKS ARE ZERO. NO LATER IMPLEMENTATION MILESTONE IS AUTHORIZED,
+SO THIS COUNTER-REVIEW CHECKPOINT REMAINS LOCAL AND UNPUSHED PENDING THE
+OWNER'S CANONICAL IB-2 DECISION.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -8650,3 +8648,107 @@ canonical IB-3 remain incomplete.
 Review commits on this lane: test correction `fc6638b` and this record commit.
 Next authorized step: Codex counter-reviews both. No milestone was started and
 none is authorized by this review.
+
+
+## 66. Codex counter-review of Claude's IB-3D review (2026-09-18)
+
+Codex worked only in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. The exact received local and remote head
+was clean at `5f6a074d6e053e26557370219ad6411bac676f42`. Its ordered Claude range
+after Codex's pushed `83427c5` snapshot contains two commits, zero merges, and
+two lane-owned paths. The one-shot branch monitor was deleted before review so
+no duplicate counter-review could start.
+
+### 66.1 Commit dispositions
+
+| Commit | Change | Codex disposition |
+|---|---|---|
+| `fc6638bc0ff57334b83fc807620fcccf0b1a0ee4` | Two additive IB-3D row-replay guard tests | **Accepted after correction.** Both additions are valid and independently mutation-sensitive. The candidacy binding is pinned for promotion and demotion, but the exact breadth-gate binding covered promotion only. `526ecc6` adds the missing qualified-row demotion direction. |
+| `5f6a074d6e053e26557370219ad6411bac676f42` | Section-65 Claude review and mutable status | **Accepted after append-only correction.** The commit range, eight-clause mapping, incoming/final counts, policy and authority inventories, section-63 dispositions, zero-access conclusion, and two genuine original test gaps reproduce. Section 65.3 and `IB3D-CR01` overstate the breadth pin as bidirectional; this section preserves that history and corrects it. |
+
+Correction commit `526ecc69ca120518b7c8f0fcf7d712e68d0768b2` is a
+Codex test-only counter-review snapshot. It changes no production module and
+awaits Claude's independent review when the next authorized combined round is
+eventually pushed.
+
+### 66.2 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB3D-CCR01 | P3 | **CLOSED in `526ecc6`** | `fc6638b`, recorded in `5f6a074` | `test_row_replay_binds_the_breadth_gate_to_its_exact_breadth`; section 65.3 and `IB3D-CR01` | Claude pinned `meets_minimum_buyer_breadth=False -> True` on a breadth-one row but not `True -> False` on a breadth-qualified row. A one-way weakened validator could therefore accept false demotion while all 75 focused tests stayed green, contradicting the record's bidirectional claim. | The prior file has only the breadth-one promotion forge. Under a validator that still rejects false promotion but accepts demotion, that prior file passes. | Exact Boolean replay bindings must be sensitive in both dangerous directions, and the standing lane rule requires a verified current-lane finding to be fixed. | Added a qualified-row demotion with its dependent candidate and diagnostic selection also demoted; replay must fail at the exact breadth-gate guard. | The isolated one-way mutant fails the new case because it reaches the later row-ID refusal instead of the required breadth-gate refusal; the restored tree passes. |
+| IB3B-CR03 | P3 | **CLOSED in `526ecc6`** | Carried from `31b3fcc` | `_context_mean` frozen range clamp | Removing the policy-hashed lower/upper clamp left the focused suite green. A natural public-input overshoot is not known under the frozen context, but the explicitly frozen defence had no mutation sensitivity. | Direct anomalous offset reductions produce unclamped means below and above the ordered input range. | Removing the clamp would alter the frozen numerical procedure and cascade into IB-3C/IB-3D policy identity; retaining it requires a load-bearing test. | Added a two-case private-helper regression that injects negative and positive reduction overshoot and requires exact clamping to the lower and upper inputs. | Replacing the clamp with `return mean` makes both cases red with observed `0` and `3` instead of `1` and `2`; restored cases pass. No public behavior changed. |
+| IB3B-R11 | P3 | **CLOSED AS DESIGNED in `526ecc6`; not a production defect** | Carried from `fd0d7f6` | Nested IB-3B identity and exact parent replay | A private-token forged nested identity can claim an extremely small positive variance and pass standalone construction. A lower-variance guard would add an arbitrary acceptance policy and earlier tight bounds already rejected valid rounded output. The complete result, not the nested identity, is the atomic public trust boundary. | A rehashed N=24 identity with variance `1e-40` and its matching square root passes standalone. The same identity inserted into its parent result is refused because the parent recomputes the exact identity from retained observations and rows. | The safe closure is to pin the documented atomic boundary, not invent a new numerical threshold or weaken exact parent replay. | Added a characterization regression requiring standalone acceptance followed by exact parent refusal with `normalization identity does not replay`. | Deleting the final parent identity comparison makes the regression red with `DID NOT RAISE`; exact restoration passes. |
+
+There is no incoming or resulting P0, P1, or P2 finding. Out-of-lane
+`IB3B-CCR06` remains documented for the Analyst Revisions V2 lane and was not
+touched here.
+
+### 66.3 Independent red/green evidence
+
+Codex independently reproduced Claude's two material `fc6638b` claims in
+temporary exact exports: each row guard could be deleted on `83427c5` with the
+old **73-test** focused file green, while each new Claude test turns its target
+mutant red. The additional counter-review directions above were then proved:
+
+- one-way breadth-gate weakening: **1 failed as expected**, restored **1
+  passed**;
+- mean-clamp removal: **2 failed as expected**, restored **2 passed**; and
+- parent identity-comparison removal: **1 failed as expected**, restored **1
+  passed**.
+
+All temporary mutations were isolated outside the lane worktree. The tracked
+production modules remained byte-unchanged.
+
+### 66.4 Validation and immutable test identities
+
+Python **3.13.15**, pytest **9.1.1**, on correction commit `526ecc6` plus this
+final record update:
+
+- IB-3B focused: **44 passed**;
+- IB-3D focused: **75 passed**;
+- IB-3A + IB-3B + IB-3C + IB-3D: **373 passed**;
+- final lane plus active-document, module-hygiene, overlay and ML boundaries:
+  **1,649 passed**;
+- final record plus active-document gate: **70 passed**;
+- scoped whole-tree compilation: exit **0**; and
+- commit/range `git show --check`, `git diff --check`, branch and status checks:
+  clean except for this intentionally local record commit before it is made.
+
+Final focused-test SHA-256 values:
+
+- IB-3B normalization tests:
+  `1044b3c06eaff4a3a2c2c73efecba3f36f2c21a0c50c56d27b4cd57e4016f950`;
+  and
+- IB-3D buyer-cluster tests:
+  `635a2b75ce07c198215eb98ae9138511bf8069a48c245a02f441800e398121cf`.
+
+The owner-directed lane/boundary suite remains the sufficient recurring gate.
+Claude's two complete-suite runs in section 65 are accepted evidence for its
+exact trees; no new complete-repository run is claimed for this test-only
+counter-review tree.
+
+### 66.5 Authority, owner gate, and next action
+
+No SEC, EDGAR, vendor, provider, credential, licensed row, real filing,
+official security master, outcome, ETF holding, QuantConnect job, broker,
+operator database, scheduler, deployment, capital, or trading surface was
+accessed or changed. Authorized outcome looks: **0**. Consumed outcome looks:
+**0**. Research looks: **0**.
+
+The next canonical path is IB-2 completion, not an invented IB-3E. It remains
+owner-gated on an exact point-in-time security master and durable
+`qc_symbol_id`; authenticated amendment completeness and supersession;
+ordinary-equity/manual-exception mapping; normalized roles; authoritative
+calendar and acceptance-to-session mapping; and an explicit source mode and
+cutoff. Shared QC security-master/calendar entitlement and semantics require
+one owner-coordinated common/main-line audit rather than a lane-local access.
+The Insider-specific SEC/EDGAR scope must separately freeze its cutoff,
+immutable cache/hash rules, fair-access limits, amendment rules, title
+exceptions, and role taxonomy.
+
+Until the owner supplies that decision, no implementation milestone and no
+push is authorized. This local counter-review checkpoint is intentionally
+held on the existing lane. After an owner decision, Codex implements exactly
+the authorized bounded slice, updates this lane record, and makes the one
+combined push for Claude to review.

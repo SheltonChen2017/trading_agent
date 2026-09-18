@@ -2649,3 +2649,40 @@ to **82 shared looks, 25 development evaluations, 27 infrastructure looks,
 and 595 cells**. R-108 is next; the remaining unlevered windows precede both
 synthetic-leverage runs. No deployment, broker, order, paper/live, or trading
 authority follows.
+
+## R-108 — SPY 2021--2025 market-cap diagnostic (AUTHENTICATED; TANGIBLE) — 2026-09-17
+
+Private project `36682033`, backtest
+`df4bc6f06e1e2bee0237c9b8296b502c`, completed after 63 statistics-free
+polls. One bounded read authenticated result receipt
+`arv2-preliminary-qc-result-e01efc5b388bdb3ccd280c86`, SHA-256
+`e01efc5b388bdb3ccd280c8670fc8d7e0c6f1f5ff14f444be3376dc390fbf8ff`.
+Exactly eight preregistered aggregate statistics were selected; logs, charts,
+orders and raw provider rows were not selected.
+
+| Cost per side | Selected cumulative | Matched cumulative | Selected - matched | SPY cumulative | Selected - SPY |
+|---:|---:|---:|---:|---:|---:|
+| 0 bps | 113.96% | 90.56% | +23.40 pp | 95.67% | +18.29 pp |
+| 5 bps | 111.15% | 89.66% | +21.49 pp | 95.67% | +15.49 pp |
+| 10 bps | 108.38% | 88.77% | +19.61 pp | 95.67% | +12.71 pp |
+| 20 bps | 102.94% | 87.01% | +15.94 pp | 95.67% | +7.28 pp |
+
+At 10 bps, selected annualized arithmetic return was 17.09%, volatility
+21.58%, Sharpe 0.792, Sortino 1.110, drawdown -29.99%, cash 2.00%, and average
+daily two-sided turnover 2.111%. Matched return was 14.16%, volatility 16.64%,
+Sharpe 0.851, drawdown -24.88%, cash 2.00%, and turnover 0.751%. Selection adds
+return across every frozen cost case but does not improve matched Sharpe or
+drawdown.
+
+The profile averaged 459.53 point-in-time eligible names, 459.52 scored names,
+and 46.52 selected names. Selected effective breadth averaged 10.76, mean
+largest position was 24.34%, and maximum position was 41.87%; matched values
+were 57.74, 7.21%, and 8.63%. The result is promising preliminary evidence for
+the broad SPY-universe construction, not formal acceptance, and remains
+price-proxy conditioned.
+
+R-108 moves accounting to **83 shared looks, 26 development evaluations, 27
+infrastructure looks, and 599 cells**. R-109 through R-114 stay unlaunched and
+unspent. The owner directs a push of this completed round before one common
+bounded benchmark-tilt QQQ/SPY implementation. No deployment, broker, order,
+paper/live, or trading authority follows.

@@ -361,9 +361,10 @@ EXACT PHYSICAL R-099 THROUGH R-106 IDENTITIES ON THAT CORRECTED CLOSURE; R-099
 THEN REACHED A ZERO-CELL COMPACT-TRANSPORT REFUSAL. SECTION 100 RECORDS THE
 LOSSLESS ACCOUNT-AGGREGATE WIRE SPLIT, SUPERSEDES R-100 THROUGH R-106 UNSPENT,
 AND RESERVES R-107 THROUGH R-114. SECTION 101 FREEZES THEIR EXACT PHYSICAL
-IDENTITIES. SECTION 102 RECORDS R-107'S AUTHENTICATED TANGIBLE RESULT. CURRENT
-ACCOUNTING IS 82 SHARED LOOKS, 25 ARV2 DEVELOPMENT EVALUATIONS, 27
-INFRASTRUCTURE LOOKS, AND A 595-CELL FLOOR. R-108 IS NEXT.
+IDENTITIES. SECTION 102 RECORDS R-107'S AUTHENTICATED TANGIBLE RESULT.
+SECTION 103 RECORDS R-108'S AUTHENTICATED TANGIBLE RESULT. ACCOUNTING
+IS 83 SHARED LOOKS, 26 ARV2 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS,
+AND A 599-CELL FLOOR. R-109 THROUGH R-114 REMAIN UNLAUNCHED AND UNSPENT.
 PAPER OR FUNDED
 DEPLOYMENT, BROKER ACCESS, ORDERS, TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN
 CLOSED. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1152,6 +1153,15 @@ diagnostic. Its prerequisite gate is satisfied. The owner explicitly waives
 another Claude review of section 102 before the already directed same-round
 QC sequence. The exact next step is R-108, followed sequentially by the
 remaining unlevered windows and only then the leverage diagnostics.
+
+Section 103 records R-108's completed, tangible SPY 2021--2025 market-cap
+diagnostic. The owner directs Codex to commit and push this completed round,
+defers Claude review, and then begin one identically specified bounded-tilt
+QQQ/SPY pair. R-109 through R-114 remain unlaunched and unspent. The owner
+explicitly waives Claude review of section 103 before this push and the next
+implementation; review is deferred rather than cancelled. The exact next step
+is lane validation and the round's single push, followed by the bounded-tilt
+implementation without an intervening Claude review.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -17703,3 +17713,50 @@ R-107 moves accounting to **82 shared looks, 25 ARV2 development evaluations,
 unlevered runs stay ahead of R-113/R-114, and every run remains sequential on
 the one subscribed node. No aggregate result authorizes formal acceptance,
 deployment, broker access, orders, paper/live state, or trading.
+
+## 103. R-108 tangible SPY 2021--2025 market-cap result, 2026-09-17
+
+R-108 completed in private QC project `36682033`, backtest
+`df4bc6f06e1e2bee0237c9b8296b502c`, after 63 statistics-free polls. The sole
+bounded result read authenticated aggregate receipt
+`arv2-preliminary-qc-result-e01efc5b388bdb3ccd280c86`, SHA-256
+`e01efc5b388bdb3ccd280c8670fc8d7e0c6f1f5ff14f444be3376dc390fbf8ff`.
+It selected exactly the eight preregistered statistics and no logs, charts,
+orders, raw provider rows, or other result fields.
+
+At the primary 10-basis-point-per-side cost, the selected sleeve returned
+**108.38%** cumulatively versus **88.77%** for the matched point-in-time
+SPY-eligible market-cap portfolio and **95.67%** for SPY. The selected-minus-
+matched and selected-minus-SPY gaps were **+19.61** and **+12.71 percentage
+points**. Selected annualized arithmetic return was **17.09%**, annualized
+volatility **21.58%**, zero-rate Sharpe **0.792**, Sortino **1.110**, and
+maximum drawdown **-29.99%**. Matched annualized return, volatility, Sharpe,
+and drawdown were **14.16%**, **16.64%**, **0.851**, and **-24.88%**. Thus the
+selected sleeve adds cumulative and arithmetic return, but does not beat the
+matched portfolio on Sharpe or drawdown. Average cash was about **2.00%** in
+both paths. Selected average daily two-sided turnover was **2.111%** versus
+**0.751%** matched.
+
+The result remains positive across the frozen cost ladder. Selected returns
+at 0/5/10/20 bps were **113.96% / 111.15% / 108.38% / 102.94%**; the
+corresponding selected-minus-SPY gaps were **+18.29 / +15.49 / +12.71 /
++7.28 percentage points**, and selected-minus-matched gaps were **+23.40 /
++21.49 / +19.61 / +15.94 points**. Costs reduce but do not explain the
+advantage.
+
+The construction averaged 459.53 point-in-time eligible names, 459.52 scored
+names, and 46.52 selected names. Market-cap weighting still concentrated the
+selected sleeve: mean effective holdings were **10.76**, mean largest position
+**24.34%**, and maximum position **41.87%**, versus 57.74 effective holdings,
+7.21% mean largest position, and 8.63% maximum matched. This is promising
+preliminary evidence that analyst-revision selection added return in the broad
+SPY universe, but it is not formal acceptance and its risk profile remains
+inferior to matched on the reported Sharpe/drawdown measures.
+
+R-108 moves accounting to **83 shared looks, 26 ARV2 development evaluations,
+27 infrastructure looks, and a 599-cell floor**. R-109 through R-114 remain
+unlaunched and unspent. Per owner direction, Codex closes and pushes this
+round, then implements one common bounded benchmark-tilt rule for fresh QQQ
+and SPY 2021--2025 profiles before either new result is viewed. No aggregate
+result authorizes formal acceptance, deployment, broker access, orders,
+paper/live state, or trading.

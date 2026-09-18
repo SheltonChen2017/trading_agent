@@ -1,7 +1,8 @@
 # Project direction — three strategies developed in parallel
 
 Status: **OWNER-DIRECTED MAIN-LINE COORDINATION RECORD, 2026-08-26;
-OWNER-COORDINATED FOURTH-FAMILY AMENDMENT, 2026-08-29.**
+OWNER-COORDINATED FOURTH-FAMILY AMENDMENT, 2026-08-29;
+OWNER-COORDINATED INSIDER PAPER-STAGE AMENDMENT, 2026-09-18.**
 
 This document states the direction of the project while the strategy-research
 work is split across three long-lived branches. It coordinates the lanes; it
@@ -21,6 +22,21 @@ independently accepted at `1507777`, was accepted by Codex counter-review at
 current approval. It grants no credential, provider, licensed-row, outcome,
 research-look, QuantConnect, QC-processing, broker, paper/live, deployment, or
 trading authority.
+
+**Owner-coordinated Insider paper-stage amendment, 2026-09-18:** for the
+Insider Buying lane only, completion of the **2027-09-01 through 2029-08-31**
+shared final holdout is no longer a prerequisite for paper promotion.
+Independently reviewed historical validation and QC parity remain
+prerequisites. After those prerequisites, a separately authorized paper
+deployment may begin only as a **60-trading-day paper pilot**. The shared
+period remains long-term prospective validation, stays unavailable for
+tuning or the common four-family evaluation under the current gate, and is
+not opened by this scheduling amendment. A future paper pilot that could
+overlap the reserved period requires a separate owner-approved sealed-overlap
+protocol. Pilot completion grants neither continued paper operation nor live
+promotion. This amendment grants no data, provider, credential, licensed-row,
+outcome, research-look, QuantConnect job/upload/processing, account, broker,
+deployment, capital, live, order, or trading authority.
 
 The exact shared baseline is
 `c9dcdb647914acbfcefce187a138f52fcdad0c68`, descended from `origin/main` at

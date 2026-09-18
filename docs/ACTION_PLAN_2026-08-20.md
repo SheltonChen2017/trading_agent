@@ -52,6 +52,18 @@ record. Shadow, paper, restricted-live canary, and bounded unattended
 operation are separate future promotion decisions; no stage authorizes the
 next.
 
+**Owner-directed Insider paper-stage sequencing amendment, 2026-09-18:** for
+Insider Buying only, completion of the 2027-09-01 through 2029-08-31 final
+holdout no longer blocks paper promotion. Independently reviewed historical
+validation and QC parity remain prerequisites; the next operational evidence
+stage is a separately authorized 60-trading-day paper pilot. The reserved
+period remains long-term prospective validation and unavailable under the
+current zero-access gate. Exact scope and the unchanged authority boundaries
+are recorded in `docs/THREE_STRATEGY_PROJECT_DIRECTION.md` and the Insider
+lane record. This sequencing entry grants no data, provider, outcome,
+research-look, QuantConnect job/upload/processing, account, broker,
+deployment, capital, live, order, or trading authority.
+
 **Current bounded status, 2026-08-30:** under the owner's approval of the
 recorded proposals, the fixed-slot v2.2 PDF and TPR-0A snapshot at `bb8dfb6`
 remain the zero-access frozen candidate. The reviewed-spec registry is empty,

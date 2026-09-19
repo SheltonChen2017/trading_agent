@@ -373,8 +373,9 @@ SECTION 110 IMPLEMENTS THE SEPARATELY BOUNDED QQQ SIMULATED-ORDER AND
 SIX-UNIVERSE GATE DIAGNOSTICS. SECTION 111 PROSPECTIVELY FREEZES R-119/R-120;
 SECTION 112 CLOSES R-119 AS A ZERO-CELL TECHNICAL FAILURE, SUPERSEDES R-120
 UNLAUNCHED AND UNSPENT, AND CORRECTS NON-SESSION FUNDAMENTAL-AVAILABILITY AGE
-IN BOTH NEW RUNTIMES. FRESH ORDER SUCCESSORS R-121/R-122 ARE NEXT; THE
-SIX-UNIVERSE PAIR MOVES TO R-123/R-124. ONLY BACKTEST-SIMULATED
+IN BOTH NEW RUNTIMES. SECTION 113 FREEZES THE FRESH R-121/R-122 ORDER
+SUCCESSORS; R-121 IS NEXT AND R-122 IS STRICTLY SEQUENTIAL. THE SIX-UNIVERSE
+PAIR MOVES TO R-123/R-124. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1225,6 +1226,16 @@ launch them sequentially. The unpreregistered six-universe pair moves to
 R-123/R-124 and remains contingent on two authenticated order-run cells. No
 paper/live deployment, funded account, broker credential, or real trading
 action is authorized.
+
+Section 113 prospectively freezes the exact corrected R-121/R-122 private-QC
+identities from committed source `0baa9f9` before external action. The owner
+explicitly waives an additional Claude review of section 113 before the
+already directed same-round sequential QC actions. The exact next step is to
+sign and launch R-121 once, close it through statistics-free terminal status
+and at most one authenticated aggregate read, and only then launch R-122 if
+R-121 authenticated its one economic cell. No raw provider row, raw order or
+fill, log, chart, paper/live deployment, funded account, broker credential, or
+real trading action is authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18562,3 +18573,44 @@ preregistered six-universe run numbers move to R-123/R-124. Those runs remain
 contingent on two authenticated order-run aggregate cells and require a later
 joint physical freeze. No deployment, broker, paper/live, funded-account,
 real-order, or trading authority follows.
+
+## 113. Prospective physical freeze for corrected R-121 and R-122, 2026-09-18
+
+The corrected order source was committed at `0baa9f9` before either identity
+was derived. No external action or outcome access occurred during derivation.
+Accounting remains **87 shared looks, 30 ARV2 development evaluations, 27
+infrastructure looks, and 607 cells**. The common authenticated package ID,
+SHA-256, and lineage remain
+`arv2-preliminary-qc-package-7803b84f0841f9685a4951de`,
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`,
+and `54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+The six-entry upload inventory SHA-256 remains
+`50ece4910fab01c6c04c10c0b979fa62856ec53b684dbc955fb48ad020b5f741`
+with activation last. Expected statistic names and inventory SHA-256 remain
+`ARV2_ORDER_LEVEL_AGGREGATES`, `ARV2_ORDER_LEVEL_META`, and
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256; exact source inventory | Plan ID / SHA-256; unsigned execution authority |
+|---|---|---|---|---|
+| R-121 | `arv2-qqq-order-level-tilt-2026-cutoff-v1` / `f2418eafc7777a6a814d8c73fd4563f5e552aa3c9cc1f2fa8b1cd98a338c5a7f` | `69 ARV2_QQQ_ORDER_R121_2026_YTD - 20260918` / `ARV2 R121 QQQ order-level 2026 YTD 7803b84f` | `arv2-order-level-qc-projection-8de56ffcd17937b35d5fdaa3` / `8de56ffcd17937b35d5fdaa3d3ae2521082e6ad506eac75c4b67cf7cdf40c6ef`; `82adba43422f4df78c7a53e52964f473ba10d1734715ff807993543dd9f48189` | `arv2-order-level-plan-fa14e323fca96b51a42c4df6` / `fa14e323fca96b51a42c4df65d2201699a117620c8a395078104bd8f8b87019a`; `arv2-order-level-execution-authority-ff4261a648e05980d7b64f00` / `ff4261a648e05980d7b64f005e54b8854a13094a0caee9339555a78e07fb1f8f` |
+| R-122 | `arv2-qqq-order-level-tilt-2025-cutoff-v1` / `8a2d1ffbcf2fc6bd7a85931f390e58e77feac1bf26b9b840ba9cd727439df2b1` | `70 ARV2_QQQ_ORDER_R122_2025_NOW - 20260918` / `ARV2 R122 QQQ order-level 2025-now 7803b84f` | `arv2-order-level-qc-projection-58eff6df2808f9eaed1b1f75` / `58eff6df2808f9eaed1b1f7564828f970c9c180bd258b66913126f7ebeb8fe03`; `34787c0f167b955679d50c2d3fd7e09c6246d1b13ead6b5e43b0d515ea80ab98` | `arv2-order-level-plan-cb9c26389c563fab942d6764` / `cb9c26389c563fab942d6764b56a646ca3537bfcf3c2a71349f40ba67d8fb5df`; `arv2-order-level-execution-authority-2ace00bb95cf12b89014c6e4` / `2ace00bb95cf12b89014c6e4d9398a7184077d8e0befc87604e215f7331e3a12` |
+
+Each projection has ten files and 267,581 bytes. R-121 retains 39 decisions,
+178 observations, and 177 return intervals from 2026-01-02 through the final
+2026-09-17 execution/mark. R-122 retains 91 decisions, 428 observations, and
+427 intervals from 2025-01-02 through 2026-09-17. Both retain the exact
+section-111 economic, execution, benchmark, cost, one-use, and result-access
+semantics; only the corrected source/projection/plan authority changed.
+
+R-121 spends **87 -> 88 looks / 30 -> 31 evaluations** and an authenticated
+aggregate adds **607 -> 608 cells**. R-122 may launch only after that cell and
+then spends **88 -> 89 / 31 -> 32**, with an authenticated aggregate adding
+**608 -> 609 cells**. Infrastructure looks remain 27. A technical failure
+spends the run/evaluation but adds no cell and invalidates the fixed successor
+accounting. The six-universe R-123/R-124 pair remains unpreregistered until
+both order results authenticate.
+
+No result sign or winner is expected. No raw provider/security row, raw order,
+fill, holding, price, return, log, chart, standard statistic, deployment,
+broker, paper/live, funded-account, real-order, or trading access is
+authorized.

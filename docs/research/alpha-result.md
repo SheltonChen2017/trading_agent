@@ -2923,3 +2923,31 @@ fundamentals, retains exact-session constituent evidence, and also closes the
 same latent defect in the unrun six-universe runtime. Fresh R-121/R-122 order
 successors require new committed identities and accounting; the unpreregistered
 six-universe pair moves to R-123/R-124.
+
+## R-121 and R-122 — corrected QQQ bounded-tilt simulated order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+These successors were derived from committed correction `0baa9f9` before any
+external action. Common package SHA-256 / lineage SHA-256:
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Expected two-statistic inventory SHA-256:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-121 | `f2418eafc7777a6a814d8c73fd4563f5e552aa3c9cc1f2fa8b1cd98a338c5a7f` | `69 ARV2_QQQ_ORDER_R121_2026_YTD - 20260918` / `ARV2 R121 QQQ order-level 2026 YTD 7803b84f` | `8de56ffcd17937b35d5fdaa3d3ae2521082e6ad506eac75c4b67cf7cdf40c6ef`; `82adba43422f4df78c7a53e52964f473ba10d1734715ff807993543dd9f48189` | `fa14e323fca96b51a42c4df65d2201699a117620c8a395078104bd8f8b87019a`; `ff4261a648e05980d7b64f005e54b8854a13094a0caee9339555a78e07fb1f8f` |
+| R-122 | `8a2d1ffbcf2fc6bd7a85931f390e58e77feac1bf26b9b840ba9cd727439df2b1` | `70 ARV2_QQQ_ORDER_R122_2025_NOW - 20260918` / `ARV2 R122 QQQ order-level 2025-now 7803b84f` | `58eff6df2808f9eaed1b1f7564828f970c9c180bd258b66913126f7ebeb8fe03`; `34787c0f167b955679d50c2d3fd7e09c6246d1b13ead6b5e43b0d515ea80ab98` | `cb9c26389c563fab942d6764b56a646ca3537bfcf3c2a71349f40ba67d8fb5df`; `2ace00bb95cf12b89014c6e4d9398a7184077d8e0befc87604e215f7331e3a12` |
+
+R-121 uses the 2026-01-02 through 2026-09-17 window; R-122 uses
+2025-01-02 through 2026-09-17. Both preserve the section-111 QQQ PIT proxy,
+bounded sector-neutral R-055 tilt, weekly after-close decision, next-session
+whole-share market-on-open simulation, RAW prices, exact engine fees, zero
+slippage, 10-basis-point modeled-cost check, 98% target gross, and
+execution-matched QQQ hurdle. No expected sign or winner was selected.
+
+Starting accounting is **87 shared looks, 30 ARV2 development evaluations, 27
+infrastructure looks, and 607 cells**. R-121 launch moves to **88 / 31** and
+an authenticated aggregate to 608 cells. Only then may R-122 launch, moving to
+**89 / 32**, with its authenticated aggregate moving to 609 cells. A technical
+failure adds no cell and requires fresh successor accounting. No raw result,
+order/fill, or paper/live/trading access is authorized.

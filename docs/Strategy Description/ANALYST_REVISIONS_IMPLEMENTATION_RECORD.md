@@ -1349,6 +1349,14 @@ identity or QC action until this source is committed, validated, and separately
 preregistered. R-132 requires R-131's authenticated aggregate cell. No
 paper/live, funded, deployment, broker, or trading action is authorized.
 
+Claude will review section 126 with this round's final single pushed snapshot.
+The corrected V6 source at `5a430a9` now has locally authenticated, exact
+R-131/R-132 physical identities. Complete the lane suite, then sign and
+launch only R-131 once; R-132 remains contingent on one authenticated
+R-131 aggregate cell. Terminal status polling must not select statistics,
+and the result needs a distinct one-use aggregate-only signed authority.
+Neither an order-level return nor trading authority exists yet.
+
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -19281,3 +19289,39 @@ one-use plans from that commit, record them prospectively, then execute only
 R-131 under a fresh signed authority. R-132 is contingent on one
 authenticated R-131 aggregate cell; a technical failure spends a look but
 adds no cell. No six-universe or leverage run follows by inference.
+
+## 126. R-131/R-132 exact physical plan preregistration, 2026-09-18
+
+The corrected V6 source is committed at `5a430a9` before physical
+derivation. Its first local snapshot `0136ebf` was never physically
+preregistered or run; section 125 records its independently caught
+premarket-clock correction. The exact input-package SHA-256 remains
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+the two-statistic inventory SHA-256 is
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+Both source projections have exactly ten files and 281,585 bytes, with a
+6,415-byte margin to the prospectively declared 288,000-byte total cap;
+the largest file is below the unchanged 64,000-byte per-file cap. The
+distinct private control directories are `0700`, the locally authenticated
+plans and unsigned authority candidates `0600`; no QC operation has
+occurred under these identities.
+
+| Run | Exact profile SHA-256 | Private project / backtest name | Projection SHA-256; source-inventory SHA-256 | Plan SHA-256; unsigned execution-authority SHA-256 |
+|---|---|---|---|---|
+| R-131 (2026 YTD) | `9d80f749ee84114397054d2305d316564d741179c36738dfcb300a7230569135` | `79 ARV2_QQQ_PREOPEN_ORDER_R131_2026_YTD - 20260918` / `ARV2 R131 QQQ preopen order 2026 YTD 7803b84f` | `4f06f82cf4bc44163700c8df561e8b3cc1e48eb50042842d5ed1cb9dcae89266`; `898c39efc8f14ec803e2249c5dd1d6d5257b4199971ba3b627634a47853eafa9` | `4c11ea59741bca071a00b3377e1edd769eaf1fb899ef4575d8fcd23e23be350b`; `a10010fcb002a1baa58955e92cf9aa281267fa640c389d6d71be28b382eca818` |
+| R-132 (2025-now; contingent) | `f2f3afb724dee0de0143e1d8432cd75ae86609669f8fb10d86427139d28b57c1` | `80 ARV2_QQQ_PREOPEN_ORDER_R132_2025_NOW - 20260918` / `ARV2 R132 QQQ preopen order 2025-now 7803b84f` | `915258fd6daca4b7fdad7875dfe2bad7f0397e000f01db874d2d953aed9b5ebb`; `6dbf89009a40470e75ed5076410a4c0256a62595fc32d9e28709ec10d2e1bc61` | `9077315f43518cecc9e3e6ef8116e61c6d87966dca8e0c6def1f7450ed6e9aa8`; `0edda2bdbb8684d82fff3ffa89de2122c0187fc04f93b20f7dffec9b3645332c` |
+
+Neither result sign, relative winner, nor leverage decision is preselected.
+Starting accounting is **92 shared looks, 35 ARV2 development evaluations,
+27 infrastructure looks, 607 cells**. R-131 one-use launch spends **92 ->
+93 / 35 -> 36**; only a separately authenticated aggregate result adds
+**607 -> 608 cells**. R-132 may then spend **93 -> 94 / 36 -> 37** and add at
+most one cell. If R-131 terminates without an authenticated aggregate,
+R-132's contingency and fixed starting accounting fail and it stays
+unlaunched/unspent. No raw provider rows, raw QC orders/fills/logs/charts,
+paper/live, funded, deployment, brokerage, or trading action is authorized.
+The exact next step after the final complete lane-suite gate is to sign and
+launch R-131 once, poll statistics-free terminal status, and, only if
+`Completed.`, use a separate one-use result-read authority for its exact
+two aggregate custom statistics. A technical refusal is zero cells, not a
+negative return.

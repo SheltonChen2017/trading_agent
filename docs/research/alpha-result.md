@@ -3229,3 +3229,33 @@ starting accounting and first-cell contingency no longer hold. A new source
 version and separately preregistered run must correct/test the order-event
 race and validate next-session MOO timing. Do not retry R-129 or interpret
 its terminal failure as evidence for or against analyst revisions.
+
+## R-131 and R-132 — V6 preopen QQQ residual-proxy order diagnostics (PREREGISTERED; UNLAUNCHED) — 2026-09-18
+
+The corrected V6 source was committed at `5a430a9` before physical plan
+derivation. Its distinct stock-plus-unjoined-QQQ ETF proxy keeps the R-129
+80% identity-coverage floor, unchanged bounded analyst-revision tilt,
+98%-gross target and 10-bps-per-side modeled fee. It buffers synchronous
+order callbacks until exact ticket identity is known, then submits the
+frozen prior-close plan on the authenticated next session no later than
+09:27 New York time. QQQ extended-hours minute bars advance the backtest
+preopen clock; a late callback still refuses. This is a new source and
+numbered run, not a rerun of R-129. Input package SHA-256 remains
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; unsigned execution-authority SHA-256 |
+|---|---|---|---|---|
+| R-131 | `9d80f749ee84114397054d2305d316564d741179c36738dfcb300a7230569135` | `79 ARV2_QQQ_PREOPEN_ORDER_R131_2026_YTD - 20260918` / `ARV2 R131 QQQ preopen order 2026 YTD 7803b84f` | `4f06f82cf4bc44163700c8df561e8b3cc1e48eb50042842d5ed1cb9dcae89266`; `898c39efc8f14ec803e2249c5dd1d6d5257b4199971ba3b627634a47853eafa9` | `4c11ea59741bca071a00b3377e1edd769eaf1fb899ef4575d8fcd23e23be350b`; `a10010fcb002a1baa58955e92cf9aa281267fa640c389d6d71be28b382eca818` |
+| R-132 (contingent) | `f2f3afb724dee0de0143e1d8432cd75ae86609669f8fb10d86427139d28b57c1` | `80 ARV2_QQQ_PREOPEN_ORDER_R132_2025_NOW - 20260918` / `ARV2 R132 QQQ preopen order 2025-now 7803b84f` | `915258fd6daca4b7fdad7875dfe2bad7f0397e000f01db874d2d953aed9b5ebb`; `6dbf89009a40470e75ed5076410a4c0256a62595fc32d9e28709ec10d2e1bc61` | `9077315f43518cecc9e3e6ef8116e61c6d87966dca8e0c6def1f7450ed6e9aa8`; `0edda2bdbb8684d82fff3ffa89de2122c0187fc04f93b20f7dffec9b3645332c` |
+
+R-131 covers 2026-01-02 through the 2026-09-17 final execution date;
+R-132 covers 2025-01-02 through that same final session. Starting
+accounting: **92 shared looks, 35 ARV2 development evaluations, 27
+infrastructure looks, 607 cells**. R-131 launch spends **92 -> 93 / 35 ->
+36**, and only a separate one-time authenticated aggregate adds **607 ->
+608 cells**. R-132 may launch only after that cell, spending **93 -> 94 /
+36 -> 37** and adding at most one cell. If R-131 refuses technically,
+R-132 stays unlaunched and unspent. Neither a result sign nor a winner is
+chosen in advance; no six-universe, leverage, paper/live, funded, broker,
+deployment, or trading authority follows. No QC operation has yet occurred
+for either new run.

@@ -8,6 +8,21 @@ import pytest
 from research.analyst_revisions_v2_qc import accepted_risk_order_level_core as core
 
 
+@pytest.mark.parametrize(
+    ("numeric", "name"),
+    (
+        ("0", "New"), ("1", "Submitted"), ("2", "PartiallyFilled"),
+        ("3", "Filled"), ("5", "Canceled"), ("6", "None"),
+        ("7", "Invalid"), ("8", "CancelPending"),
+        ("9", "UpdateSubmitted"),
+    ),
+)
+def test_documented_qc_numeric_order_status_spellings_are_exact(numeric, name):
+    assert core.qc_order_status_text(numeric, numeric=True) == name
+    assert core.qc_order_status_text(numeric, numeric=False) == numeric
+    assert core.qc_order_status_text("OrderStatus." + name, numeric=True) == name
+
+
 def _plan(
     *,
     rebalance_id="rebalance-2026-01-05",

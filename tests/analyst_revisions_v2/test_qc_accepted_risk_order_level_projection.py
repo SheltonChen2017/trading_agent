@@ -255,6 +255,35 @@ def test_v6_preopen_schedule_is_load_bearing_and_legacy_main_is_stable(
     assert v6_main != v5_main
 
 
+def test_v7_status_codec_keeps_v6_preopen_schedule_and_distinct_profile(
+    delta_package,
+):
+    v7 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package,
+        profile_id=runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    v6 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package,
+        profile_id=runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    v7_main = next(
+        item.source_bytes for item in v7.source_files
+        if item.project_path == "main.py"
+    )
+    v6_main = next(
+        item.source_bytes for item in v6.source_files
+        if item.project_path == "main.py"
+    )
+    assert v7.profile_sha256 != v6.profile_sha256
+    assert v7_main.count(b"self.schedule.on(") == v6_main.count(b"self.schedule.on(") == 2
+    assert b"before_market_open(qqq_benchmark, 10)" in v7_main
+    assert v7_main.count(b"extended_market_hours=True") == 1
+    assert b"numeric_status=True" in next(
+        item.source_bytes for item in v7.source_files
+        if item.project_path == projection.RUNTIME_PROJECT_PATH
+    )
+
+
 def test_projection_disclosure_is_load_bearing(delta_package):
     value = projection.build_accepted_risk_order_level_qc_projection(
         delta_package,

@@ -30,6 +30,24 @@ CANCELED = "Canceled"
 INVALID = "Invalid"
 TERMINAL_STATUSES = frozenset({FILLED, CANCELED, INVALID})
 FILL_STATUSES = frozenset({PARTIALLY_FILLED, FILLED})
+QC_NUMERIC_ORDER_STATUSES = {
+    "0": "New", "1": "Submitted", "2": PARTIALLY_FILLED,
+    "3": FILLED, "5": CANCELED, "6": "None", "7": INVALID,
+    "8": "CancelPending", "9": "UpdateSubmitted",
+}
+
+
+def qc_order_status_text(value, *, numeric=False):
+    """Normalize only the pinned LEAN OrderStatus integer spellings."""
+
+    text = str(value)
+    if not numeric:
+        return text.rsplit(".", 1)[-1]
+    if value is None:
+        return ""
+    if text.startswith("OrderStatus."):
+        text = text[len("OrderStatus."):]
+    return QC_NUMERIC_ORDER_STATUSES.get(text, text)
 
 
 def weekly_decision_axis(

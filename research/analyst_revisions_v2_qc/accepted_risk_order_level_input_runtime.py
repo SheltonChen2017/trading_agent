@@ -530,6 +530,41 @@ def positive_constituent_weights(rows, decimal_parser, error_type):
     return result
 
 
+def same_session_positive_raw_price(security, session, decimal_parser, error_type):
+    """Read a fresh QC reference mark without substituting stale data."""
+
+    try:
+        observed = security.get_last_data().end_time
+        if not isinstance(observed, datetime) or observed.date().isoformat() != session:
+            return None
+        return decimal_parser(
+            security.price, "order-level RAW reference price", positive=True
+        )
+    except (AttributeError, error_type):
+        return None
+
+
+def current_whole_share_quantities(
+    security_ids, security_for_id, portfolio, decimal_parser, error_type,
+):
+    """Read only exact whole-share QC holdings for the selected securities."""
+
+    quantities = {}
+    for security_id in sorted(security_ids):
+        symbol, _security = security_for_id(security_id)
+        value = decimal_parser(
+            portfolio[symbol].quantity,
+            "order-level holding quantity",
+            nonnegative=True,
+        )
+        integral = value.to_integral_value()
+        if value != integral:
+            raise error_type("order-level holding quantity is not a whole share")
+        if integral:
+            quantities[security_id] = int(integral)
+    return quantities
+
+
 __all__ = (
     "AcceptedRiskOrderLevelInputRuntimeError",
     "LoadedAcceptedRiskPreliminaryPackage",
@@ -539,7 +574,10 @@ __all__ = (
     "load_accepted_risk_preliminary_package",
     "local_collection_time",
     "positive_constituent_sids",
+    "positive_constituent_weights",
     "positive_market_caps",
+    "same_session_positive_raw_price",
+    "current_whole_share_quantities",
     "row_sid",
     "universe_sid",
 )

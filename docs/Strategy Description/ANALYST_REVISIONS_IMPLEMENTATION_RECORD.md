@@ -1356,9 +1356,11 @@ error/stack diagnosis are zero result cells. R-132's contingency failed and
 it is superseded unlaunched. The owner changed recurring validation timing:
 use focused checks during implementation/QC diagnosis, then run the complete
 Analyst V2 lane suite once on the final settled tree before the single push.
-Claude will review section 127 with this round's final single pushed snapshot.
-The next QC action requires a newly versioned, tested source and exact
-prospectively recorded physical plan; neither R-131 nor R-132 may be retried.
+Section 128 prospectively versions the QC status boundary, preserving the
+V4--V6 profiles and their spent plans. Claude will review section 128 with
+this round's final single pushed snapshot. The next QC action requires an
+exact, prospectively recorded R-133 physical plan derived from the committed
+V7 source; neither R-131 nor R-132 may be retried.
 No order-level return or paper/live, funded, deployment, broker, or trading
 authority exists yet.
 
@@ -19374,3 +19376,43 @@ first-cell contingency and fixed starting accounting did not hold. This
 technical refusal provides no return or analyst-signal verdict. `ARV2D127-001`
 is a lane-specific P2 status-normalization/test gap, pending prospective
 correction. No six-universe or leverage run follows by inference.
+
+## 128. Prospective V7 exact QC order-status normalization, 2026-09-18
+
+`ARV2D127-001` is corrected prospectively, **not by retrying R-131**. The
+new V7 2026/2025 profile SHA-256 values are respectively
+`a2429a1f19645f6aa937d73108f6660b52e2aab2230e39cb68a2e180b58bf826`
+and `48bb918df24a01507e0e8d79fc1a340f02215bb847ebc37a3cd8ac440dfa2f8c`.
+Only V7 maps QC's documented exact numeric OrderStatus spellings
+`0,1,2,3,5,6,7,8,9` to the corresponding existing named lifecycle states;
+`4`, unknown values, and malformed numeric spellings remain explicit
+refusals. Tests isolate synchronous numeric Submitted/filled/invalid
+replay, unknown and malformed refusal, a numeric-stringifying enum-like
+object, and the old V6 numeric refusal. V4--V6 profile hashes and
+normalization behavior are unchanged. The economic construction remains
+the V6 point-in-time QQQ-weight stock core plus neutral overlapping QQQ
+residual proxy, 80% exact resolved-weight floor, R055 analyst-revision
+tilt, 98%-gross target, whole shares, and 10-bps-per-side modeled fee.
+
+Two existing QC reference-price/portfolio-quantity readers were moved
+without intended behavior change into the already projected order-input
+module so the runtime remains below its **64,000-byte per-file cap**. The
+settled runtime source occupies **63,979 bytes**; the 21-byte margin is a
+P3 reviewability/development constraint, not permission to expand the cap
+silently. An independent read-only audit found no P0--P2 defect, verified
+the enum mapping and legacy profile separation. Direct helper-boundary
+tests now isolate fresh/stale/missing/invalid QC marks and exact whole-share
+versus negative/fractional holdings. The five relevant delta/order/core/
+projection/submission/runtime modules passed **333 focused tests** on the
+settled V7 source; targeted compilation and `git diff --check` are clean.
+
+This is a source/test candidate only; it has no new physical project,
+signature, QC run, result, or look. Accounting remains **93 shared looks,
+36 development evaluations, 27 infrastructure looks, 607 cells**. Commit
+the V7 source/test snapshot first, derive and locally authenticate a
+distinct R-133 2026-YTD physical projection/one-use plan, and record its
+exact identities and look accounting before launch. A 2025-now R-134 plan
+may be preregistered at the same time but stays contingent on R-133's
+authenticated usable aggregate cell. No outcome is preselected. Neither
+six-universe nor leveraged tests are opened by this correction; no
+paper/live, deployment, broker, funded account, or trading authority follows.

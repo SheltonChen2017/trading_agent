@@ -90,6 +90,8 @@ PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2026-cutoff-v5",
     "arv2-qqq-order-level-tilt-2025-cutoff-v6",
     "arv2-qqq-order-level-tilt-2026-cutoff-v6",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v7",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v7",
 )
 PROXY_PROFILE_IDS = PROFILE_IDS[2:]
 _PINNED_PROFILE_CENSUS = (
@@ -99,6 +101,8 @@ _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[3], "2026-01-05", 39, 178, 177),
     (PROFILE_IDS[4], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[5], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[6], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[7], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200

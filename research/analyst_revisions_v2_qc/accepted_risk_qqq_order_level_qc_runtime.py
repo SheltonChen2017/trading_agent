@@ -57,9 +57,15 @@ PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v5"
 PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v6"
 PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v6"
 PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v6"
+NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v7"
+NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v7"
+NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v7"
+NUMERIC_PREOPEN_PROXY_PROFILE_IDS = (
+    NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
+)
 PREOPEN_PROXY_PROFILE_IDS = (
     PREOPEN_PROXY_PROFILE_2025_ID, PREOPEN_PROXY_PROFILE_2026_ID,
-)
+) + NUMERIC_PREOPEN_PROXY_PROFILE_IDS
 PROXY_PROFILE_IDS = (
     PROXY_PROFILE_2025_ID, PROXY_PROFILE_2026_ID,
 ) + PREOPEN_PROXY_PROFILE_IDS
@@ -147,7 +153,7 @@ _execution_matched_qqq_path = _benchmark.execution_matched_qqq_path
 _path_metrics = _benchmark.path_metrics
 
 
-def _profile(profile_id, start_session, *, proxy=False, preopen=False):
+def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_status=False):
     if (
         _benchmark.QQQ_TICKER != QQQ_TICKER
         or _benchmark.TARGET_GROSS_EXPOSURE
@@ -163,6 +169,7 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False):
     start = datetime.strptime(start_session, "%Y-%m-%d")
     record = {
         "schema": (
+            NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA if numeric_status else
             PREOPEN_PROXY_PROFILE_SCHEMA if preopen else
             PROXY_PROFILE_SCHEMA if proxy else PROFILE_SCHEMA
         ),
@@ -251,6 +258,8 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False):
         record["synchronous_order_event_rule"] = (
             "stage_until_exact_returned_ticket_then_replay_once"
         )
+    if numeric_status:
+        record["qc_order_status_codec"] = "exact_LEAN_numeric_0_1_2_3_5_6_7_8_9"
     return {**record, "profile_sha256": _sha(record)}
 
 
@@ -270,6 +279,12 @@ _PROFILES = {
     PREOPEN_PROXY_PROFILE_2026_ID: _profile(
         PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02",
         proxy=True, preopen=True,
+    ),
+    NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID: _profile(
+        NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True, preopen=True, numeric_status=True,
+    ),
+    NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID: _profile(
+        NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True, preopen=True, numeric_status=True,
     ),
 }
 
@@ -316,6 +331,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._profile = require_qqq_order_level_profile(profile_id)
         self._proxy_weight_mode = profile_id in PROXY_PROFILE_IDS
         self._preopen_mode = profile_id in PREOPEN_PROXY_PROFILE_IDS
+        self._numeric_order_status_mode = profile_id in NUMERIC_PREOPEN_PROXY_PROFILE_IDS
         self._authority_benchmark_symbol = authority_benchmark_symbol
         self._qqq_benchmark_symbol = qqq_benchmark_symbol
         self._qqq_constituent_universe = qqq_constituent_universe
@@ -370,16 +386,13 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     def _portfolio_equity(self):
         return _decimal(
-            self._algorithm.portfolio.total_portfolio_value,
-            "QC total portfolio value",
+            self._algorithm.portfolio.total_portfolio_value, "QC total portfolio value",
             positive=True,
         )
 
     def _portfolio_cash(self):
         return _decimal(
-            self._algorithm.portfolio.cash,
-            "QC portfolio cash",
-            nonnegative=True,
+            self._algorithm.portfolio.cash, "QC portfolio cash", nonnegative=True,
         )
 
     def _observe_strategy_account(self, session):
@@ -401,8 +414,8 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
     @staticmethod
     def _decision_axis(axis, start_session):
         return _orders.weekly_decision_axis(
-            axis, start_session, DECISION_CUTOFF_SESSION,
-            FINAL_EXECUTION_SESSION, AcceptedRiskQqqOrderLevelQcRuntimeError,
+            axis, start_session, DECISION_CUTOFF_SESSION, FINAL_EXECUTION_SESSION,
+            AcceptedRiskQqqOrderLevelQcRuntimeError,
         )
 
     def initialize(self):
@@ -594,12 +607,6 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             AcceptedRiskQqqOrderLevelQcRuntimeError,
         )
 
-    @staticmethod
-    def _positive_constituent_weights(rows):
-        return _input.positive_constituent_weights(
-            rows, _decimal, AcceptedRiskQqqOrderLevelQcRuntimeError
-        )
-
     def _resolved_qqq_weights(
         self,
         session,
@@ -661,8 +668,8 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level PIT QQQ constituent snapshot is not the immediately prior authenticated session"
             )
-        constituent_weights = self._positive_constituent_weights(
-            constituent_rows
+        constituent_weights = _input.positive_constituent_weights(
+            constituent_rows, _decimal, AcceptedRiskQqqOrderLevelQcRuntimeError
         )
         return self._resolved_qqq_weights(
             session,
@@ -696,40 +703,16 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     def _positive_price(self, security_id, decision_session):
         _symbol, security = self._security(security_id)
-        try:
-            last_data = security.get_last_data()
-            observed = last_data.end_time
-            if (
-                not isinstance(observed, datetime)
-                or observed.date().isoformat() != decision_session
-            ):
-                return None
-            price = _decimal(
-                security.price,
-                "order-level RAW reference price",
-                positive=True,
-            )
-        except (AttributeError, AcceptedRiskQqqOrderLevelQcRuntimeError):
-            return None
-        return price
+        return _input.same_session_positive_raw_price(
+            security, decision_session, _decimal,
+            AcceptedRiskQqqOrderLevelQcRuntimeError,
+        )
 
     def _current_quantities(self, security_ids):
-        quantities = {}
-        for security_id in sorted(security_ids):
-            symbol, _security = self._security(security_id)
-            value = _decimal(
-                self._algorithm.portfolio[symbol].quantity,
-                "order-level holding quantity",
-                nonnegative=True,
-            )
-            integral = value.to_integral_value()
-            if value != integral:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    "order-level holding quantity is not a whole share"
-                )
-            if integral:
-                quantities[security_id] = int(integral)
-        return quantities
+        return _input.current_whole_share_quantities(
+            security_ids, self._security, self._algorithm.portfolio,
+            _decimal, AcceptedRiskQqqOrderLevelQcRuntimeError,
+        )
 
     def _close_open_plan(self):
         if self._open_plan is None:
@@ -843,7 +826,9 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 if (
                     event.order_id != staged_id
                     or str(event.id) != staged_event_id
-                    or self._status_text(event.status) != staged_status
+                    or _orders.qc_order_status_text(
+                        event.status, numeric=self._numeric_order_status_mode
+                    ) != staged_status
                 ):
                     raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                         "synchronous QC event changed before replay"
@@ -1059,11 +1044,6 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._benchmark_open_observations = open_observations
         return result
 
-    @staticmethod
-    def _status_text(value):
-        text = str(value)
-        return text.rsplit(".", 1)[-1]
-
     def on_order_event(self, event):
         if self._open_plan is None:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
@@ -1072,7 +1052,9 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         try:
             order_id = event.order_id
             event_id = event.id
-            status = self._status_text(event.status)
+            status = _orders.qc_order_status_text(
+                event.status, numeric=self._numeric_order_status_mode
+            )
         except Exception as exc:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level QC event is unreadable"

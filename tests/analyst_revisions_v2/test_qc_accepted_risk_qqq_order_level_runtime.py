@@ -187,6 +187,55 @@ def _outcome(function, *args):
         return ("refusal", str(exc))
 
 
+def test_extracted_reference_price_requires_fresh_positive_finite_mark():
+    symbol = _Symbol("A-SID", "A")
+    read_price = lambda security: input_runtime.same_session_positive_raw_price(
+        security, "2026-01-02", runtime._decimal,
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+    )
+    assert read_price(_Security(symbol, "100")) == Decimal("100")
+    assert read_price(_Security(
+        symbol, "100", datetime.fromisoformat("2026-01-01T16:00:00")
+    )) is None
+    missing = _Security(symbol, "100")
+    missing.last_data = None
+    assert read_price(missing) is None
+    assert read_price(_Security(symbol, "NaN")) is None
+    assert read_price(_Security(symbol, "-1")) is None
+
+
+@pytest.mark.parametrize(
+    ("shares", "message"),
+    ((Decimal("-1"), "outside its finite bound"), (Decimal("1.5"), "whole share")),
+)
+def test_extracted_current_quantities_refuse_negative_or_fractional_shares(
+    shares, message,
+):
+    symbol = _Symbol("A-SID", "A")
+    portfolio = _Portfolio()
+    portfolio.quantities["A-SID"] = shares
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError, match=message
+    ):
+        input_runtime.current_whole_share_quantities(
+            {"a"}, lambda security_id: (symbol, None), portfolio,
+            runtime._decimal, runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        )
+
+
+def test_extracted_current_quantities_keep_only_positive_whole_shares():
+    a = _Symbol("A-SID", "A")
+    b = _Symbol("B-SID", "B")
+    portfolio = _Portfolio()
+    portfolio.quantities.update({"A-SID": Decimal("4"), "B-SID": Decimal("0")})
+    symbols = {"a": a, "b": b}
+    assert input_runtime.current_whole_share_quantities(
+        {"b", "a"}, lambda security_id: (symbols[security_id], None),
+        portfolio, runtime._decimal,
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+    ) == {"a": 4}
+
+
 def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
     assert runtime.PROFILE_IDS == (
         "arv2-qqq-order-level-tilt-2025-cutoff-v4",
@@ -195,6 +244,8 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         "arv2-qqq-order-level-tilt-2026-cutoff-v5",
         "arv2-qqq-order-level-tilt-2025-cutoff-v6",
         "arv2-qqq-order-level-tilt-2026-cutoff-v6",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v7",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v7",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -254,15 +305,29 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         runtime.PREOPEN_PROXY_PROFILE_2026_ID: (
             "9d80f749ee84114397054d2305d316564d741179c36738dfcb300a7230569135"
         ),
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID: (
+            "48bb918df24a01507e0e8d79fc1a340f02215bb847ebc37a3cd8ac440dfa2f8c"
+        ),
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID: (
+            "a2429a1f19645f6aa937d73108f6660b52e2aab2230e39cb68a2e180b58bf826"
+        ),
     }
     for profile_id in runtime.PROXY_PROFILE_IDS:
         profile = runtime.require_qqq_order_level_profile(profile_id)
         assert profile["profile_sha256"] == expected_proxy_digests[profile_id]
         assert profile["schema"] == (
-            runtime.PREOPEN_PROXY_PROFILE_SCHEMA
+            runtime.NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA
+            if profile_id in runtime.NUMERIC_PREOPEN_PROXY_PROFILE_IDS
+            else runtime.PREOPEN_PROXY_PROFILE_SCHEMA
             if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS
             else runtime.PROXY_PROFILE_SCHEMA
         )
+        if profile_id in runtime.NUMERIC_PREOPEN_PROXY_PROFILE_IDS:
+            assert profile["qc_order_status_codec"] == (
+                "exact_LEAN_numeric_0_1_2_3_5_6_7_8_9"
+            )
+        else:
+            assert "qc_order_status_codec" not in profile
         if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS:
             assert profile["execution_submission_timing"] == (
                 "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
@@ -1657,6 +1722,87 @@ def test_moo_submission_replays_synchronous_matching_qc_event(status):
     assert summary["invalid_order_count"] == (status == "Invalid")
     assert summary["filled_order_count"] == (status == "Filled")
     assert summary["fee_mismatch"] is False
+
+
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    (("1", None), ("3", "Filled"), ("7", "Invalid")),
+)
+def test_v7_replays_only_documented_numeric_qc_order_statuses(status, expected):
+    class NumericStatusAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            event = SimpleNamespace(order_id=ticket.order_id, id=7, status=status)
+            if status == "3":
+                event.fill_quantity = quantity
+                event.fill_price = Decimal("100")
+                event.order_fee = _order_fee("9.8")
+            self.runtime.on_order_event(event)
+            return ticket
+
+    algorithm = NumericStatusAlgorithm()
+    value = _runtime(algorithm, runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID)
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._submit_plan(_single_buy_plan())
+    assert value._submitted_order_count == 1
+    assert tuple(event.status for event in value._open_plan_events) == (
+        () if expected is None else (expected,)
+    )
+
+
+@pytest.mark.parametrize("status", ("4", "10", "03", "1.0", "Filledish", None))
+def test_v7_refuses_unknown_or_malformed_numeric_qc_order_status(status):
+    class UnknownStatusAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            self.runtime.on_order_event(
+                SimpleNamespace(order_id=ticket.order_id, id=7, status=status)
+            )
+            return ticket
+
+    algorithm = UnknownStatusAlgorithm()
+    value = _runtime(algorithm, runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID)
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="order-level QC event status is unsupported",
+    ):
+        value._submit_plan(_single_buy_plan())
+    assert value._open_plan_events == []
+
+
+def test_v6_numeric_qc_status_remains_uninterpreted():
+    algorithm = _Algorithm()
+    value = _runtime(algorithm, runtime.PREOPEN_PROXY_PROFILE_2026_ID)
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._submit_plan(_single_buy_plan())
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="order-level QC event status is unsupported",
+    ):
+        value.on_order_event(SimpleNamespace(order_id=1, id=7, status="3"))
+
+
+def test_v7_accepts_enum_like_numeric_status_without_pythonnet_import():
+    class NumericEnumLike:
+        def __str__(self):
+            return "3"
+
+    value = _runtime(profile_id=runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID)
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._submit_plan(_single_buy_plan())
+    value.on_order_event(SimpleNamespace(
+        order_id=1, id=7, status=NumericEnumLike(),
+        fill_quantity=98, fill_price=Decimal("100"),
+        order_fee=_order_fee("9.8"),
+    ))
+    assert tuple(item.status for item in value._open_plan_events) == ("Filled",)
 
 
 @pytest.mark.parametrize(

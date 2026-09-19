@@ -202,6 +202,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         runtime.PROXY_PROFILE_2026_ID: (39, 178),
         runtime.PREOPEN_PROXY_PROFILE_2025_ID: (91, 428),
         runtime.PREOPEN_PROXY_PROFILE_2026_ID: (39, 178),
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID: (91, 428),
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
@@ -281,6 +283,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             runtime.PROXY_PROFILE_2026_ID: "2026-01-05",
             runtime.PREOPEN_PROXY_PROFILE_2025_ID: "2025-01-03",
             runtime.PREOPEN_PROXY_PROFILE_2026_ID: "2026-01-05",
+            runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID: "2025-01-03",
+            runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -468,6 +472,8 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
         runtime.PROXY_PROFILE_2026_ID,
         runtime.PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
     ),
 )
 def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
@@ -504,6 +510,8 @@ def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
     (
         runtime.PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
     ),
 )
 def test_preopen_result_cannot_shift_first_execution_session(
@@ -937,12 +945,16 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.PROXY_PROFILE_2026_ID,
         runtime.PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
     )
     assert adapter.PROXY_PROFILE_IDS == runtime.PROXY_PROFILE_IDS == (
         runtime.PROXY_PROFILE_2025_ID,
         runtime.PROXY_PROFILE_2026_ID,
         runtime.PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
     )
     bindings = adapter._PINNED_RUNTIME_PROFILE_BINDINGS
     assert tuple(binding[0] for binding in bindings) == adapter.PROFILE_IDS
@@ -954,6 +966,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
     )
     assert bindings[4][3:7] == ("2025-01-03", 91, 428, 427)
     assert bindings[5][3:7] == ("2026-01-05", 39, 178, 177)
+    assert bindings[6][3:7] == ("2025-01-03", 91, 428, 427)
+    assert bindings[7][3:7] == ("2026-01-05", 39, 178, 177)
     assert runtime.PROXY_SUMMARY_SCHEMA == "arv2-qqq-order-level-tilt-summary-v7"
 
 

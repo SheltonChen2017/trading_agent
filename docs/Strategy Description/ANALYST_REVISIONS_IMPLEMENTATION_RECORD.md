@@ -1349,13 +1349,18 @@ identity or QC action until this source is committed, validated, and separately
 preregistered. R-132 requires R-131's authenticated aggregate cell. No
 paper/live, funded, deployment, broker, or trading action is authorized.
 
-Claude will review section 126 with this round's final single pushed snapshot.
-The corrected V6 source at `5a430a9` now has locally authenticated, exact
-R-131/R-132 physical identities. Complete the lane suite, then sign and
-launch only R-131 once; R-132 remains contingent on one authenticated
-R-131 aggregate cell. Terminal status polling must not select statistics,
-and the result needs a distinct one-use aggregate-only signed authority.
-Neither an order-level return nor trading authority exists yet.
+Section 126's exact R-131/R-132 physical plans were frozen and R-131 launched
+once, as recorded in section 127. Its first 09:20 order event refused on the
+QC status representation; the statistics-disabled terminal and bounded
+error/stack diagnosis are zero result cells. R-132's contingency failed and
+it is superseded unlaunched. The owner changed recurring validation timing:
+use focused checks during implementation/QC diagnosis, then run the complete
+Analyst V2 lane suite once on the final settled tree before the single push.
+Claude will review section 127 with this round's final single pushed snapshot.
+The next QC action requires a newly versioned, tested source and exact
+prospectively recorded physical plan; neither R-131 nor R-132 may be retried.
+No order-level return or paper/live, funded, deployment, broker, or trading
+authority exists yet.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -19325,3 +19330,47 @@ launch R-131 once, poll statistics-free terminal status, and, only if
 `Completed.`, use a separate one-use result-read authority for its exact
 two aggregate custom statistics. A technical refusal is zero cells, not a
 negative return.
+
+## 127. R-131 numeric-status technical refusal and focused-validation override, 2026-09-18
+
+The owner directed that the complete Analyst V2 suite run **once immediately
+before the round's single push**, not at every intermediate implementation or
+QC step. The in-progress full selection on source `5a430a9` was deliberately
+interrupted at **1,479 passed, 4 skipped, 0 reported failures** in 999.47 s;
+this is **cancelled, not failed or complete**. The five directly relevant
+delta-package/order-core/projection/runtime/submission test modules passed
+**302/302**; the lane-record and active-document gates passed **75/75**.
+Future interim QC corrections use focused tests; the final settled source and
+record get one complete lane selection before the final push. The whole
+repository suite remains outside this lane round.
+
+The exact R-131 signed authority matched the physical plan committed at
+`14b728c`. Its one-use private submission created QC project `36718956`,
+backtest `1ff7bfae8aea579e3176652e26041891`, and launch receipt SHA-256
+`f4f5232f06c921ae7c67339a57debb84709bb1494b22f82371726707875c7fb6`.
+The first statistics-disabled poll authenticated terminal `Runtime Error`,
+receipt SHA-256
+`272c5a48c4ce95cc0940d21fc326b411ba83d0ec7d9a8fa751f96ca18475f9a7`.
+One bounded diagnosis selected only the exact run's status/error/stack fields:
+at simulated `2026-01-05 09:20:00`, a synchronously staged order event was
+replayed after ticket registration, then refused as `order-level QC event
+status is unsupported`. No order, fill, raw log, chart, provider/security
+row, aggregate statistic, price, or return was selected. The staging/ticket
+race corrected after R-129 held, as did the next-session preopen callback;
+the new failure is status normalization. [QC's own enum discussion](https://www.quantconnect.com/forum/discussion/2872/print-enum-name/)
+documents Python `str(order_event.Status)` yielding a numeric enum value,
+whereas the lane accepted only exact status names. The specific R-131 event
+value was not read, so numeric formatting is a strongly supported diagnosis,
+not a claim that its particular raw status was observed. The [LEAN enum](https://github.com/QuantConnect/Lean/blob/master/Common/Orders/OrderTypes.cs)
+assigns New=0, Submitted=1, PartiallyFilled=2, Filled=3, Canceled=5,
+None=6, Invalid=7, CancelPending=8, UpdateSubmitted=9 (no 4). Any
+normalization fix must pin only those meanings and isolate unknown-value
+refusal in focused tests before a fresh physical plan; R-131 is not retried.
+
+R-131 spends **92 -> 93 shared looks / 35 -> 36 ARV2 development
+evaluations**, adds **zero** cells, and leaves **607 cells / 27
+infrastructure looks**. R-132 is superseded unlaunched/unspent because its
+first-cell contingency and fixed starting accounting did not hold. This
+technical refusal provides no return or analyst-signal verdict. `ARV2D127-001`
+is a lane-specific P2 status-normalization/test gap, pending prospective
+correction. No six-universe or leverage run follows by inference.

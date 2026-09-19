@@ -3259,3 +3259,29 @@ R-132 stays unlaunched and unspent. Neither a result sign nor a winner is
 chosen in advance; no six-universe, leverage, paper/live, funded, broker,
 deployment, or trading authority follows. No QC operation has yet occurred
 for either new run.
+
+## R-131 — preopen QQQ residual-proxy simulated-order diagnostic (TERMINAL STATUS-NORMALIZATION REFUSAL; ZERO CELLS) — 2026-09-18
+
+The signed, prospectively frozen R-131 plan created private QC project
+`36718956` and backtest `1ff7bfae8aea579e3176652e26041891` from the
+V6 source committed at `5a430a9`; the launch receipt SHA-256 is
+`f4f5232f06c921ae7c67339a57debb84709bb1494b22f82371726707875c7fb6`.
+The first statistics-disabled poll authenticated terminal `Runtime Error`,
+receipt SHA-256
+`272c5a48c4ce95cc0940d21fc326b411ba83d0ec7d9a8fa751f96ca18475f9a7`.
+One bounded exact-run diagnostic selected only status/error/stack. At
+`2026-01-05 09:20:00` simulated time, replay of an event emitted synchronously
+during MOO submission refused: `order-level QC event status is unsupported`.
+No aggregate statistic, raw order/fill/log, provider/security row, price,
+return, or alpha cell was read. QuantConnect documentation establishes that
+Python may stringify its order-status enum numerically, but the specific
+event value was not selected; this is a strongly supported diagnosis, not
+an observed-status claim.
+
+R-131 spends **92 -> 93 shared looks / 35 -> 36 ARV2 development
+evaluations** and adds **zero cells**, leaving **607 cells / 27
+infrastructure looks**. R-132 is superseded unlaunched/unspent because its
+authenticated-first-cell contingency and fixed starting accounting did not
+hold. A fresh numbered, preregistered source/plan must isolate the status
+boundary before any further QC execution. This terminal refusal is not an
+analyst-signal return estimate.

@@ -2951,3 +2951,28 @@ an authenticated aggregate to 608 cells. Only then may R-122 launch, moving to
 **89 / 32**, with its authenticated aggregate moving to 609 cells. A technical
 failure adds no cell and requires fresh successor accounting. No raw result,
 order/fill, or paper/live/trading access is authorized.
+
+## R-121 — corrected QQQ 2026 simulated-order diagnostic (TERMINAL COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-121 created private project `36714714` and backtest
+`72cdee2ca23378f8f36bbaae9df739d3`, then reached authenticated `Runtime
+Error` on its first statistics-free poll. Terminal receipt
+`arv2-order-level-terminal-6d0fe804193067cb7a05d5fd`, SHA-256
+`6d0fe804193067cb7a05d5fd9be77a7735bb4dd1ba14e3df37ba7410b708f652`,
+contains no statistic. No result-read authority or result read exists.
+
+A bounded diagnostic selected only terminal status and error/stack fields.
+The exact refusal was `order-level PIT QQQ market-cap constituent-weight
+coverage is below 99 percent` on 2026-01-02. It occurred before any simulated
+order or economic output and is not strategy evidence. R-121 spends **87 ->
+88 shared looks / 30 -> 31 development evaluations**, adds zero cells, and
+leaves **607 cells / 27 infrastructure looks**. R-122 created no project or
+backtest and is superseded unlaunched/unspent.
+
+The prospective successor versions the profile and lowers this outcome-free
+data-admission floor to 95%, while retaining exact achieved coverage and its
+path digest in the authenticated aggregate; below 95% still refuses. Covered
+market caps renormalize to 98% gross, so the result remains an accepted-risk
+QQQ proxy rather than pristine QQQ replication. Fresh
+R-123/R-124 order runs require committed identities and accounting. The
+unpreregistered six-universe pair moves to R-125/R-126.

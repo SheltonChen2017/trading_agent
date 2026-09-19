@@ -374,8 +374,10 @@ SIX-UNIVERSE GATE DIAGNOSTICS. SECTION 111 PROSPECTIVELY FREEZES R-119/R-120;
 SECTION 112 CLOSES R-119 AS A ZERO-CELL TECHNICAL FAILURE, SUPERSEDES R-120
 UNLAUNCHED AND UNSPENT, AND CORRECTS NON-SESSION FUNDAMENTAL-AVAILABILITY AGE
 IN BOTH NEW RUNTIMES. SECTION 113 FREEZES THE FRESH R-121/R-122 ORDER
-SUCCESSORS; R-121 IS NEXT AND R-122 IS STRICTLY SEQUENTIAL. THE SIX-UNIVERSE
-PAIR MOVES TO R-123/R-124. ONLY BACKTEST-SIMULATED
+SUCCESSORS. SECTION 114 CLOSES R-121 AS A ZERO-CELL 99%-COVERAGE REFUSAL,
+SUPERSEDES R-122 UNLAUNCHED AND UNSPENT, AND VERSIONS A PROSPECTIVE 95%
+COVERAGE SUCCESSOR. FRESH ORDER RUNS R-123/R-124 ARE NEXT; THE SIX-UNIVERSE
+PAIR MOVES TO R-125/R-126. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1236,6 +1238,16 @@ and at most one authenticated aggregate read, and only then launch R-122 if
 R-121 authenticated its one economic cell. No raw provider row, raw order or
 fill, log, chart, paper/live deployment, funded account, broker credential, or
 real trading action is authorized.
+
+Section 114 records R-121's authenticated zero-cell 99%-coverage refusal and
+the versioned 95%-coverage successor rule. R-122 is superseded unlaunched and
+unspent. The owner explicitly waives an additional Claude review of section
+114 before the already directed same-round successor work. The exact next
+step is to commit the versioned rule, derive and jointly preregister fresh
+R-123/R-124 order identities, then launch them sequentially. The unpreregistered
+six-universe pair moves to R-125/R-126 and remains contingent on two
+authenticated order-run cells. No paper/live deployment, funded account,
+broker credential, or real trading action is authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18614,3 +18626,58 @@ No result sign or winner is expected. No raw provider/security row, raw order,
 fill, holding, price, return, log, chart, standard statistic, deployment,
 broker, paper/live, funded-account, real-order, or trading access is
 authorized.
+
+## 114. R-121 terminal coverage refusal and versioned 95-percent successor, 2026-09-18
+
+R-121 created private QC project `36714714` and backtest
+`72cdee2ca23378f8f36bbaae9df739d3`, then reached authenticated terminal
+`Runtime Error` on its first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-6d0fe804193067cb7a05d5fd`, SHA-256
+`6d0fe804193067cb7a05d5fd9be77a7735bb4dd1ba14e3df37ba7410b708f652`,
+contains no statistic. No result-read authority or aggregate read exists and
+no economic cell accrued. One bounded diagnostic selected only status and
+error/stack fields; no statistic, chart, order, fill, holding, price, return,
+or provider/security row was selected.
+
+The holiday-availability correction passed its first boundary. The next exact
+refusal was `order-level PIT QQQ market-cap constituent-weight coverage is
+below 99 percent` on 2026-01-02. Thus at least one current QQQ constituent
+weight lacked the joined security/master-market-cap coverage needed by this
+proxy. This is a data-coverage refusal before any simulated order or economic
+result, not evidence for or against the strategy.
+
+The 99% threshold was a conservative implementation choice rather than an
+observed return gate. A fresh successor prospectively lowers it to **95%**, the
+same minimum already required for the total reported positive constituent
+weight. The exact achieved minimum, mean, member-count coverage, and coverage-
+path digest remain authenticated aggregate fields. Below 95% still refuses;
+there is no imputation or hidden row drop: uncovered names are excluded and
+their exact weight is disclosed, while covered names' market caps are
+transparently renormalized to the frozen 98% gross target. This remains an
+accepted-risk proxy rather than pristine QQQ replication. Because this changes
+data admission rather than fixing an implementation typo, the
+profiles are versioned to schema V2 and IDs ending in `cutoff-v2`, and the
+aggregate schema advances to V4.
+
+The new 2025 / 2026 profile SHA-256s are
+`6d4b7c4fe50ca93a32fcdd113a3fcba607897f0e83e00c073f0fc0c9198826e8`
+and `e79316b50d9a53f04418d971357278bca2dd5db43eea33e28da25cda785163dc`.
+Exact-boundary runtime tests accept 95% and refuse 94%; the result parser
+independently refuses a self-consistent aggregate below the frozen floor and
+refuses result-declared required floors on either side of the exact 95% pin. The
+order-focused package/core/runtime/projection/submission selection passed
+**252 tests**.
+
+| ID | P | Disposition |
+|---|---:|---|
+| `ARV2D114-001` | Design | **Versioned prospectively.** The 99% admission floor was an outcome-free conservative choice, not a frozen economic rule. The V2/V4 successor admits at least 95% covered QQQ weight, reports exact achieved coverage and its path digest, and discloses that covered caps are renormalized to 98% gross; it is not pristine QQQ replication. |
+| `ARV2D114-002` | P3 | **Corrected.** The first successor tests isolated achieved coverage below 95% but did not distinguish the result parser's exact required-floor pin. Independent 0.94 and 0.96 mutations now both refuse. |
+
+R-121 moves accounting to **88 shared looks, 31 ARV2 development evaluations,
+27 infrastructure looks, and 607 cells**. R-122 created no project/backtest
+and is superseded unlaunched and unspent. The changed profile/source bytes
+invalidate section-113 projections, plans, and unsigned authorities. Fresh
+order successors take R-123/R-124; the never-preregistered six-universe pair
+moves to R-125/R-126. All require fresh committed physical identities. No
+deployment, broker, paper/live, funded-account, real-order, or trading
+authority follows.

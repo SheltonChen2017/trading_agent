@@ -84,8 +84,8 @@ EXECUTION_AUTHORITY_SCHEMA = "arv2-order-level-qc-execution-authority-v1"
 RESULT_READ_AUTHORITY_SCHEMA = "arv2-order-level-qc-result-read-authority-v1"
 
 PROFILE_IDS = (
-    "arv2-qqq-order-level-tilt-2025-cutoff-v1",
-    "arv2-qqq-order-level-tilt-2026-cutoff-v1",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v2",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v2",
 )
 _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[0], "2025-01-03", 91, 428, 427),
@@ -3227,7 +3227,7 @@ def _parse_result(response, plan, launch):
         > aggregates["orders_with_any_fill_count_sum"]
         or aggregates["orders_with_any_fill_count_sum"]
         > aggregates["submitted_order_count"]
-        or floor != Decimal("0.99")
+        or floor != Decimal("0.95")
         or minimum_covered_weight < floor
         or not modeled_fee_is_exact
         or actual_fee < 0

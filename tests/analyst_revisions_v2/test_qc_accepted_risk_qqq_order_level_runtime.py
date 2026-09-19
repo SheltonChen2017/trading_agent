@@ -193,8 +193,8 @@ def _outcome(function, *args):
 
 def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
     assert runtime.PROFILE_IDS == (
-        "arv2-qqq-order-level-tilt-2025-cutoff-v1",
-        "arv2-qqq-order-level-tilt-2026-cutoff-v1",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v2",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v2",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -202,10 +202,10 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
     }
     expected_digests = {
         runtime.PROFILE_2025_ID: (
-            "8a2d1ffbcf2fc6bd7a85931f390e58e77feac1bf26b9b840ba9cd727439df2b1"
+            "6d4b7c4fe50ca93a32fcdd113a3fcba607897f0e83e00c073f0fc0c9198826e8"
         ),
         runtime.PROFILE_2026_ID: (
-            "f2418eafc7777a6a814d8c73fd4563f5e552aa3c9cc1f2fa8b1cd98a338c5a7f"
+            "e79316b50d9a53f04418d971357278bca2dd5db43eea33e28da25cda785163dc"
         ),
     }
     for profile_id in runtime.PROFILE_IDS:
@@ -226,7 +226,7 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         )
         assert profile[
             "minimum_cap_covered_constituent_weight_ratio"
-        ] == "0.99"
+        ] == "0.95"
         assert profile["minimum_positive_constituent_weight_total"] == "0.95"
         assert profile["maximum_positive_constituent_weight_total"] == "1.05"
         assert profile["maximum_fundamental_snapshot_age_sessions"] == 1
@@ -746,14 +746,14 @@ def test_missing_price_skips_whole_rebalance_without_renormalizing_target(monkey
     assert algorithm.orders == []
 
 
-def test_constituent_weight_coverage_keeps_99_percent_and_refuses_98_percent():
+def test_constituent_weight_coverage_keeps_95_percent_and_refuses_94_percent():
     a = _Symbol("A-SID", "A")
     b = _Symbol("B-SID", "B")
     accepted = _runtime()
     accepted._resolution = _Resolution({"a": a, "b": b})
     result = accepted._covered_market_caps(
         "2026-01-02",
-        {"A-SID": Decimal("0.99"), "B-SID": Decimal("0.01")},
+        {"A-SID": Decimal("0.95"), "B-SID": Decimal("0.05")},
         {"A-SID": Decimal("100")},
         fundamental_age_sessions=0,
         constituent_age_sessions=1,
@@ -768,7 +768,7 @@ def test_constituent_weight_coverage_keeps_99_percent_and_refuses_98_percent():
             "resolved_member_count_ratio": "1",
             "cap_covered_member_count_ratio": "0.5",
             "resolved_constituent_weight_ratio": "1",
-            "cap_covered_constituent_weight_ratio": "0.99",
+            "cap_covered_constituent_weight_ratio": "0.95",
             "positive_constituent_weight_total": "1",
             "fundamental_snapshot_age_sessions": 0,
             "constituent_snapshot_age_sessions": 1,
@@ -779,11 +779,11 @@ def test_constituent_weight_coverage_keeps_99_percent_and_refuses_98_percent():
     refused._resolution = _Resolution({"a": a, "b": b})
     with pytest.raises(
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
-        match="constituent-weight coverage is below 99 percent",
+        match="constituent-weight coverage is below 95 percent",
     ):
         refused._covered_market_caps(
             "2026-01-02",
-            {"A-SID": Decimal("0.98"), "B-SID": Decimal("0.02")},
+            {"A-SID": Decimal("0.94"), "B-SID": Decimal("0.06")},
             {"A-SID": Decimal("100")},
             fundamental_age_sessions=0,
             constituent_age_sessions=1,

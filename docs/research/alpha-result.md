@@ -3099,3 +3099,32 @@ aggregate path digest bind future data-vintage comparisons. The V4 profile
 and V6 aggregate schemas, strict-prior and 95%-coverage tests, and exact
 parser guard are implemented; no V4 outcome exists yet. Fresh R-127/R-128
 one-use physical identities must be committed before any QC action.
+
+## R-127 and R-128 — PIT QQQ ETF-weight simulated-order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+The separate V4/V6 source was committed at `f86fe44` before physical
+derivation. Common immutable package SHA-256:
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+exact two-statistic inventory SHA-256:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-127 | `190637eb9145c4b3a9e844cb42eb84d24bb5b318afc56957f98bf9d413d8a3b6` | `75 ARV2_QQQ_ETF_WEIGHT_ORDER_R127_2026_YTD - 20260918` / `ARV2 R127 QQQ ETF-weight order 2026 YTD 7803b84f` | `697cfb357e9d87cad322d4eaa94f2ffd00a93d2490e899cf2a9eb5c6a382a734`; `d1b14807f0598922d880824eb8d6c0397ed247e72278dc2bf661278a7fe12634` | `187d2f1fa9746560f4d7b0a7b8a8ecff971d9bc22e03d31a0a84bc8eca50c61d`; `644c1f2ef219feb88ee3a10fd3b7d405e5c823b1a235c3ab908ffb5f54e9d673` |
+| R-128 | `43ea09abd2b6eb9aef23cfb05ec7cb0c19c50451fb41ac78c3aeeac8bd60e518` | `76 ARV2_QQQ_ETF_WEIGHT_ORDER_R128_2025_NOW - 20260918` / `ARV2 R128 QQQ ETF-weight order 2025-now 7803b84f` | `42d9ec0e68f44b58f7bbf7e9f92daa43adf29f43812fdd2dc661dbe9b3b73628`; `bcca83e45bf7d304ff12a71ed58375b0a03d6a4e266eb31aea21d840fee8bd3b` | `ea2ba2877aa4aefa3f5bc16d9c8e7e24136b128078ad94b85a529d7d6a12df70`; `7cb305b18b1931cacbf3fa5e0446e4709f72d00f1f17054b82e66a395a2a873e` |
+
+R-127 covers 2026-01-02 through 2026-09-17; R-128 covers 2025-01-02
+through 2026-09-17. Both retain the bounded revision tilt, 98%-gross core,
+whole-share simulated next-open execution, 10-basis-point fee check, and
+execution-matched QQQ hurdle, but use point-in-time ETF holdings weights
+rather than missing market caps. Minimum FIGI-resolved reported weight is
+95%, so absolute resolved notional can be 90.25% at the minimum reported
+total. No expected sign or winner was selected. This is a separate
+preliminary economic construction, not a retry of R-125.
+
+Starting accounting: **90 shared looks, 33 ARV2 development evaluations, 27
+infrastructure looks, 607 cells**. R-127 launch spends **90 -> 91 / 33 -> 34**
+and only one authenticated aggregate adds **607 -> 608 cells**. Only then may
+R-128 launch, spending **91 -> 92 / 34 -> 35**, with its aggregate adding
+**608 -> 609 cells**. A technical failure adds no cell and requires fresh
+accounting. No raw row, order/fill, or paper/live/trading access is authorized.

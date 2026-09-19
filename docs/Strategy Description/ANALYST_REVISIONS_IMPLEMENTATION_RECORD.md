@@ -379,13 +379,13 @@ SUPERSEDES R-122 UNLAUNCHED AND UNSPENT, AND VERSIONS A PROSPECTIVE 95%
 COVERAGE SUCCESSOR. SECTION 115 FREEZES THE EXACT R-123/R-124 PHYSICAL
 IDENTITIES. SECTION 116 CLOSES R-123 AS A ZERO-CELL 95%-COVERAGE REFUSAL,
 SUPERSEDES R-124 UNLAUNCHED, AND VERSIONS A 90%-FLOOR DIAGNOSTIC WITH AN EXACT
-RATIO ON REFUSAL. FRESH ORDER RUNS R-125/R-126 ARE NEXT; THE SIX-UNIVERSE
-PAIR MOVES TO R-127/R-128. SECTION 117 FREEZES THE EXACT R-125/R-126 PHYSICAL
+RATIO ON REFUSAL. SECTION 117 FREEZES THE EXACT R-125/R-126 PHYSICAL
 IDENTITIES. SECTION 118 CLOSES R-125 AS A ZERO-CELL MEASURED 85.9214%
 CAP-COVERAGE REFUSAL AND SUPERSEDES R-126 UNLAUNCHED. A SEPARATE
-ETF-HOLDINGS-WEIGHT CONSTRUCTION IS IN DEVELOPMENT; IT IS NOT A RETRY OF THE
+ETF-HOLDINGS-WEIGHT CONSTRUCTION IS NOT A RETRY OF THE
 MARKET-CAP EXPERIMENT. SECTION 119 IMPLEMENTS ITS V4/V6 BACKTEST-ONLY
-CANDIDATE. ONLY BACKTEST-SIMULATED
+CANDIDATE. SECTION 120 FREEZES R-127/R-128 EXACT PHYSICAL IDENTITIES BEFORE
+EITHER QC ACTION. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1291,6 +1291,13 @@ this same-round backtesting. The exact next step is to commit the reviewed
 source and tests, derive and preregister R-127/R-128 from that committed tree,
 then launch R-127 once. R-128 requires R-127's authenticated aggregate cell;
 no 90%-market-cap-floor retry is authorized.
+
+Section 120 commits those R-127/R-128 physical identities before either QC
+action. The owner explicitly waives an additional Claude review of section
+120 for this same-round test. Sign and launch R-127 once, inspect terminal
+status without statistics, and read at most its exact two-statistic aggregate
+under a separately signed authority if `Completed.`. Launch R-128 only after
+that result authenticates one cell.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18943,3 +18950,38 @@ R-128 is strictly contingent on that cell. R-129/R-130 six-universe runs are
 not preregistered. No provider data or QC outcome was read while constructing
 this candidate; no deployment, broker, paper/live, funded-account, real-order,
 or trading authority follows.
+
+## 120. Prospective physical freeze for R-127 and R-128, 2026-09-18
+
+The separate V4 ETF-weight source was committed at `f86fe44` before these
+identities were derived. No QC action or outcome access occurred during
+derivation. Starting accounting is **90 shared looks, 33 ARV2 development
+evaluations, 27 infrastructure looks, and 607 cells**. Immutable package
+SHA-256 / lineage SHA-256 are unchanged at
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Both projections have ten files and 266,301 bytes. Upload inventory SHA-256:
+`50ece4910fab01c6c04c10c0b979fa62856ec53b684dbc955fb48ad020b5f741`;
+two-statistic inventory SHA-256:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256; source inventory SHA-256 | Plan ID / SHA-256; unsigned execution authority ID / SHA-256 |
+|---|---|---|---|---|
+| R-127 | `arv2-qqq-order-level-tilt-2026-cutoff-v4` / `190637eb9145c4b3a9e844cb42eb84d24bb5b318afc56957f98bf9d413d8a3b6` | `75 ARV2_QQQ_ETF_WEIGHT_ORDER_R127_2026_YTD - 20260918` / `ARV2 R127 QQQ ETF-weight order 2026 YTD 7803b84f` | `arv2-order-level-qc-projection-697cfb357e9d87cad322d4ea` / `697cfb357e9d87cad322d4eaa94f2ffd00a93d2490e899cf2a9eb5c6a382a734`; `d1b14807f0598922d880824eb8d6c0397ed247e72278dc2bf661278a7fe12634` | `arv2-order-level-plan-187d2f1fa9746560f4d7b0a7` / `187d2f1fa9746560f4d7b0a7b8a8ecff971d9bc22e03d31a0a84bc8eca50c61d`; `arv2-order-level-execution-authority-644c1f2ef219feb88ee3a10f` / `644c1f2ef219feb88ee3a10fd3b7d405e5c823b1a235c3ab908ffb5f54e9d673` |
+| R-128 | `arv2-qqq-order-level-tilt-2025-cutoff-v4` / `43ea09abd2b6eb9aef23cfb05ec7cb0c19c50451fb41ac78c3aeeac8bd60e518` | `76 ARV2_QQQ_ETF_WEIGHT_ORDER_R128_2025_NOW - 20260918` / `ARV2 R128 QQQ ETF-weight order 2025-now 7803b84f` | `arv2-order-level-qc-projection-42d9ec0e68f44b58f7bbf7e9` / `42d9ec0e68f44b58f7bbf7e9f92daa43adf29f43812fdd2dc661dbe9b3b73628`; `bcca83e45bf7d304ff12a71ed58375b0a03d6a4e266eb31aea21d840fee8bd3b` | `arv2-order-level-plan-ea2ba2877aa4aefa3f5bc16d` / `ea2ba2877aa4aefa3f5bc16d9c8e7e24136b128078ad94b85a529d7d6a12df70`; `arv2-order-level-execution-authority-7cb305b18b1931cacbf3fa5e` / `7cb305b18b1931cacbf3fa5e0446e4709f72d00f1f17054b82e66a395a2a873e` |
+
+R-127 has 39 decisions, 178 observations, and 177 return intervals over
+2026-01-02 through the final 2026-09-17 execution/mark. R-128 has 91
+decisions, 428 observations, and 427 intervals over 2025-01-02 through
+2026-09-17. Both preserve the section-111 order/cost/benchmark model but use
+section-119's new PIT QQQ holdings-weight core; they are not market-cap
+successors or direct economic reruns. Neither has a selected sign or winner.
+
+R-127 launch spends **90 -> 91 looks / 33 -> 34 evaluations**. Only an
+authenticated aggregate adds **607 -> 608 cells**. R-128 may launch only
+after that cell, then spends **91 -> 92 / 34 -> 35**; its aggregate adds
+**608 -> 609 cells**. Infrastructure looks remain 27. A technical failure
+adds no cell and invalidates R-128's fixed accounting. R-129/R-130 six-
+universe runs remain unpreregistered. No raw result, provider/security row,
+log, order, fill, chart, holding, price, return, paper/live deployment,
+broker, funded account, real order, or trading access is authorized.

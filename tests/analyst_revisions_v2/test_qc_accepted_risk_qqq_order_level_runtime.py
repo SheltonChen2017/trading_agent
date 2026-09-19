@@ -2,6 +2,7 @@ import hashlib
 import json
 from datetime import datetime, timezone
 from decimal import Decimal, localcontext
+from enum import Enum
 from types import SimpleNamespace
 
 import pytest
@@ -124,7 +125,7 @@ class _Algorithm:
         self.summary_statistics[key] = value
 
 
-def _runtime(algorithm=None, profile_id=runtime.PROFILE_2026_ID):
+def _runtime(algorithm=None, profile_id=runtime.PROFILE_2026_ID, order_status_enum=None):
     algorithm = algorithm or _Algorithm()
     return runtime.AcceptedRiskQqqOrderLevelQcRuntime(
         algorithm,
@@ -142,6 +143,7 @@ def _runtime(algorithm=None, profile_id=runtime.PROFILE_2026_ID):
         total_return_normalization="TotalReturn",
         fee_model_factory=lambda: "ten-bps",
         slippage_model_factory=lambda: "zero",
+        order_status_enum=order_status_enum,
     )
 
 
@@ -246,6 +248,8 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         "arv2-qqq-order-level-tilt-2026-cutoff-v6",
         "arv2-qqq-order-level-tilt-2025-cutoff-v7",
         "arv2-qqq-order-level-tilt-2026-cutoff-v7",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v8",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v8",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -311,18 +315,31 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID: (
             "a2429a1f19645f6aa937d73108f6660b52e2aab2230e39cb68a2e180b58bf826"
         ),
+        runtime.ENUM_PREOPEN_PROXY_PROFILE_2025_ID: (
+            "b8446593bedb571f644fc6033835408b755b8684f4857aeeeafd2b8e1a82e780"
+        ),
+        runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID: (
+            "55d4790ed611b33607dcdca96934237a4ed49ae1ae5d2b42f5a2b20bc570f4e2"
+        ),
     }
     for profile_id in runtime.PROXY_PROFILE_IDS:
         profile = runtime.require_qqq_order_level_profile(profile_id)
         assert profile["profile_sha256"] == expected_proxy_digests[profile_id]
         assert profile["schema"] == (
+            runtime.ENUM_PREOPEN_PROXY_PROFILE_SCHEMA
+            if profile_id in runtime.ENUM_PREOPEN_PROXY_PROFILE_IDS
+            else
             runtime.NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA
             if profile_id in runtime.NUMERIC_PREOPEN_PROXY_PROFILE_IDS
             else runtime.PREOPEN_PROXY_PROFILE_SCHEMA
             if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS
             else runtime.PROXY_PROFILE_SCHEMA
         )
-        if profile_id in runtime.NUMERIC_PREOPEN_PROXY_PROFILE_IDS:
+        if profile_id in runtime.ENUM_PREOPEN_PROXY_PROFILE_IDS:
+            assert profile["qc_order_status_codec"] == (
+                "direct_documented_LEAN_OrderStatus_enum_members"
+            )
+        elif profile_id in runtime.NUMERIC_PREOPEN_PROXY_PROFILE_IDS:
             assert profile["qc_order_status_codec"] == (
                 "exact_LEAN_numeric_0_1_2_3_5_6_7_8_9"
             )
@@ -1403,6 +1420,7 @@ def test_first_decision_uses_exact_prior_session_qqq_holdings_only():
     }
     assert calls == [universe]
     assert value._pit_history_call_count == 1
+    assert value._pit_source_row_count == 4
     assert value._pit_coverage_records[0][
         "constituent_snapshot_age_sessions"
     ] == 1
@@ -1803,6 +1821,159 @@ def test_v7_accepts_enum_like_numeric_status_without_pythonnet_import():
         order_fee=_order_fee("9.8"),
     ))
     assert tuple(item.status for item in value._open_plan_events) == ("Filled",)
+
+
+class _OpaqueOrderStatus(Enum):
+    NEW = object()
+    SUBMITTED = object()
+    PARTIALLY_FILLED = object()
+    FILLED = object()
+    CANCELED = object()
+    NONE = object()
+    INVALID = object()
+    CANCEL_PENDING = object()
+    UPDATE_SUBMITTED = object()
+    FUTURE = object()
+
+    def __str__(self):
+        return "opaque-not-a-status-name-or-number"
+
+
+@pytest.mark.parametrize(
+    ("status", "expected"),
+    (
+        (_OpaqueOrderStatus.SUBMITTED, None),
+        (_OpaqueOrderStatus.FILLED, "Filled"),
+        (_OpaqueOrderStatus.INVALID, "Invalid"),
+    ),
+)
+def test_v8_replays_direct_enum_members_despite_opaque_string(status, expected):
+    class SynchronousAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            event = SimpleNamespace(order_id=ticket.order_id, id=7, status=status)
+            if status is _OpaqueOrderStatus.FILLED:
+                event.fill_quantity = quantity
+                event.fill_price = Decimal("100")
+                event.order_fee = _order_fee("9.8")
+            self.runtime.on_order_event(event)
+            return ticket
+
+    algorithm = SynchronousAlgorithm()
+    value = _runtime(
+        algorithm, runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+        order_status_enum=_OpaqueOrderStatus,
+    )
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._submit_plan(_single_buy_plan())
+    assert value._submitted_order_count == 1
+    assert tuple(item.status for item in value._open_plan_events) == (
+        () if expected is None else (expected,)
+    )
+
+
+def test_v8_missing_enum_member_refuses_before_submission():
+    class Missing:
+        SUBMITTED = _OpaqueOrderStatus.SUBMITTED
+
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="QC OrderStatus enum is missing a documented member",
+    ):
+        _runtime(
+            profile_id=runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+            order_status_enum=Missing,
+        )
+
+
+def test_v8_aliased_enum_member_refuses_before_submission():
+    class Aliased:
+        NEW = _OpaqueOrderStatus.NEW
+        SUBMITTED = _OpaqueOrderStatus.SUBMITTED
+        PARTIALLY_FILLED = _OpaqueOrderStatus.PARTIALLY_FILLED
+        FILLED = _OpaqueOrderStatus.FILLED
+        CANCELED = _OpaqueOrderStatus.CANCELED
+        NONE = _OpaqueOrderStatus.NONE
+        INVALID = _OpaqueOrderStatus.FILLED
+        CANCEL_PENDING = _OpaqueOrderStatus.CANCEL_PENDING
+        UPDATE_SUBMITTED = _OpaqueOrderStatus.UPDATE_SUBMITTED
+
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="QC OrderStatus enum members are aliased",
+    ):
+        _runtime(
+            profile_id=runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+            order_status_enum=Aliased,
+        )
+
+
+@pytest.mark.parametrize("status", ("Submitted", "3", 1, None, _OpaqueOrderStatus.FUTURE))
+def test_v8_unknown_status_refuses_without_coercing_text(status):
+    class SynchronousAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            self.runtime.on_order_event(
+                SimpleNamespace(order_id=ticket.order_id, id=7, status=status)
+            )
+            return ticket
+
+    algorithm = SynchronousAlgorithm()
+    value = _runtime(
+        algorithm, runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+        order_status_enum=_OpaqueOrderStatus,
+    )
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="order-level QC event status is unsupported",
+    ) as exc:
+        value._submit_plan(_single_buy_plan())
+    assert "status=3" not in str(exc.value)
+    assert "Submitted" not in str(exc.value)
+    assert "opaque-not-a-status-name-or-number" not in str(exc.value)
+    assert value._open_plan_events == []
+
+
+@pytest.mark.parametrize(
+    "token", ("secret-QQQ-order-123", "S" * 40, "FutureStatus", "AAPL", "SECRET123"),
+)
+def test_v8_unknown_enum_diagnostic_is_bounded_and_sanitized(token):
+    class StatusWithDiagnostic(Enum):
+        NEW = object()
+        SUBMITTED = object()
+        PARTIALLY_FILLED = object()
+        FILLED = object()
+        CANCELED = object()
+        NONE = object()
+        INVALID = object()
+        CANCEL_PENDING = object()
+        UPDATE_SUBMITTED = object()
+        FUTURE = object()
+
+        def __str__(self):
+            return token
+
+    value = _runtime(
+        profile_id=runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+        order_status_enum=StatusWithDiagnostic,
+    )
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._submit_plan(_single_buy_plan())
+    with pytest.raises(runtime.AcceptedRiskQqqOrderLevelQcRuntimeError) as exc:
+        value.on_order_event(SimpleNamespace(
+            order_id=1, id=7, status=StatusWithDiagnostic.FUTURE,
+        ))
+    message = str(exc.value)
+    assert "type=StatusWithDiagnostic" in message
+    assert "status=" not in message
+    assert token not in message
 
 
 @pytest.mark.parametrize(
@@ -2236,6 +2407,33 @@ def test_compact_collection_caps_match_reviewed_runtime():
     assert _outcome(
         input_runtime.history_items, history_over_cap, "fixture"
     ) == _outcome(reviewed_input._history_items, history_over_cap, "fixture")
+
+
+def test_extracted_pit_history_parser_preserves_count_and_refusal_boundaries():
+    symbol = _Symbol("U-SID")
+    universe = SimpleNamespace(symbol=symbol)
+    stamp = datetime(2026, 1, 3)
+    rows = (SimpleNamespace(symbol=_Symbol("A-SID")),)
+    start, end = datetime(2026, 1, 1), datetime(2026, 1, 4)
+
+    def parse(items):
+        series = SimpleNamespace(items=lambda: iter(items))
+        return input_runtime.indexed_constituent_history(
+            series, universe, start, end, "fixture",
+            runtime._symbol_sid, runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        )
+
+    assert parse((((symbol, stamp), rows),)) == ({datetime(2026, 1, 2): rows}, 1)
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="history universe identity changed",
+    ):
+        parse((((_Symbol("FOREIGN"), stamp), rows),))
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="duplicated a collection time",
+    ):
+        parse((((symbol, stamp), rows), ((symbol, stamp), rows)))
 
 
 def test_compact_transport_claim_refusal_matches_reviewed_loader():

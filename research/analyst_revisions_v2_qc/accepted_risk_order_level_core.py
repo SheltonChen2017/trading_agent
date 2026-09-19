@@ -9,6 +9,7 @@ backtest fill events to aggregate diagnostics.  It cannot submit an order.
 import dataclasses
 import hashlib
 import json
+import re
 from datetime import datetime
 from decimal import ROUND_FLOOR, Decimal, InvalidOperation, localcontext
 
@@ -35,6 +36,52 @@ QC_NUMERIC_ORDER_STATUSES = {
     "3": FILLED, "5": CANCELED, "6": "None", "7": INVALID,
     "8": "CancelPending", "9": "UpdateSubmitted",
 }
+
+
+def require_qc_order_status_enum_members(enum):
+    """Bind the documented Python LEAN enum members, not their string forms."""
+
+    try:
+        members = (
+            (enum.NEW, "New"), (enum.SUBMITTED, "Submitted"),
+            (enum.PARTIALLY_FILLED, PARTIALLY_FILLED), (enum.FILLED, FILLED),
+            (enum.CANCELED, CANCELED), (enum.NONE, "None"),
+            (enum.INVALID, INVALID), (enum.CANCEL_PENDING, "CancelPending"),
+            (enum.UPDATE_SUBMITTED, "UpdateSubmitted"),
+        )
+    except (AttributeError, TypeError) as exc:
+        raise OrderLevelBacktestError(
+            "QC OrderStatus enum is missing a documented member"
+        ) from exc
+    if any(type(member) is not type(members[0][0]) for member, _ in members):
+        raise OrderLevelBacktestError("QC OrderStatus enum member type changed")
+    if any(
+        member == prior
+        for index, (member, _) in enumerate(members)
+        for prior, _ in members[:index]
+    ):
+        raise OrderLevelBacktestError("QC OrderStatus enum members are aliased")
+    return members
+
+
+def qc_order_status_enum_text(value, members):
+    """Compare enum values directly; unknown or differently typed values refuse."""
+
+    if type(value) is not type(members[0][0]):
+        return None
+    for member, status in members:
+        if value == member:
+            return status
+    return None
+
+
+def qc_order_status_enum_diagnostic(value):
+    """Expose only a bounded type hint, never an arbitrary event value."""
+
+    kind = type(value).__name__
+    if not re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,31}", kind):
+        kind = "other"
+    return " (type=" + kind + ")"
 
 
 def qc_order_status_text(value, *, numeric=False):

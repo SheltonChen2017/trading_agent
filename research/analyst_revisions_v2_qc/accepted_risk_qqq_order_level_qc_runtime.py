@@ -6,9 +6,7 @@ sector-neutral QQQ benchmark tilt, and submits whole-share market-on-open
 orders in a QuantConnect *backtest*.  It has no live, paper, deployment,
 broker-credential, or funded-account mode.
 
-This file intentionally has no ``__future__`` import: QuantConnect injects a
-source prelude, so a future import here would no longer be first and would
-make the cloud project fail to compile.
+No ``__future__`` import: QC injects a source prelude before this file.
 """
 
 import hashlib
@@ -60,12 +58,18 @@ PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v6"
 NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v7"
 NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v7"
 NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v7"
+ENUM_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v8"
+ENUM_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v8"
+ENUM_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v8"
+ENUM_PREOPEN_PROXY_PROFILE_IDS = (
+    ENUM_PREOPEN_PROXY_PROFILE_2025_ID, ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+)
 NUMERIC_PREOPEN_PROXY_PROFILE_IDS = (
     NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
 )
 PREOPEN_PROXY_PROFILE_IDS = (
     PREOPEN_PROXY_PROFILE_2025_ID, PREOPEN_PROXY_PROFILE_2026_ID,
-) + NUMERIC_PREOPEN_PROXY_PROFILE_IDS
+) + NUMERIC_PREOPEN_PROXY_PROFILE_IDS + ENUM_PREOPEN_PROXY_PROFILE_IDS
 PROXY_PROFILE_IDS = (
     PROXY_PROFILE_2025_ID, PROXY_PROFILE_2026_ID,
 ) + PREOPEN_PROXY_PROFILE_IDS
@@ -153,7 +157,7 @@ _execution_matched_qqq_path = _benchmark.execution_matched_qqq_path
 _path_metrics = _benchmark.path_metrics
 
 
-def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_status=False):
+def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_status=False, enum_status=False):
     if (
         _benchmark.QQQ_TICKER != QQQ_TICKER
         or _benchmark.TARGET_GROSS_EXPOSURE
@@ -169,6 +173,7 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
     start = datetime.strptime(start_session, "%Y-%m-%d")
     record = {
         "schema": (
+            ENUM_PREOPEN_PROXY_PROFILE_SCHEMA if enum_status else
             NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA if numeric_status else
             PREOPEN_PROXY_PROFILE_SCHEMA if preopen else
             PROXY_PROFILE_SCHEMA if proxy else PROFILE_SCHEMA
@@ -181,9 +186,7 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
         "start_day": start.day,
         "decision_cutoff_session": DECISION_CUTOFF_SESSION,
         "final_execution_session": FINAL_EXECUTION_SESSION,
-        "decision_schedule": (
-            "first_authenticated_session_of_each_ISO_week_plus_exact_cutoff"
-        ),
+        "decision_schedule": "first_authenticated_session_of_each_ISO_week_plus_exact_cutoff",
         "decision_timing": "after_QQQ_market_close",
         "execution_timing": "next_authenticated_session_market_on_open",
         "starting_cash": _decimal_text(STARTING_CASH),
@@ -195,47 +198,27 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
             if proxy else
             "QQQ_PIT_holdings_weight_benchmark_plus_frozen_sector_neutral_tilt"
         ),
-        "target_weight_basis": (
-            PROXY_TARGET_WEIGHT_BASIS if proxy else TARGET_WEIGHT_BASIS
-        ),
+        "target_weight_basis": PROXY_TARGET_WEIGHT_BASIS if proxy else TARGET_WEIGHT_BASIS,
         "price_normalization": "RAW",
         "resolution": "MINUTE",
         "benchmark_price_normalization": "TOTAL_RETURN",
-        "benchmark_observation": (
-            "EXECUTION_MATCHED_FIRST_MOO_OPEN_THEN_SESSION_CLOSE"
-        ),
-        "benchmark_target_gross_exposure": _decimal_text(
-            _tilt.TARGET_GROSS_EXPOSURE
-        ),
-        "benchmark_entry_fee_bps_per_side": (
-            _orders.MODELED_FEE_BPS_PER_SIDE
-        ),
+        "benchmark_observation": "EXECUTION_MATCHED_FIRST_MOO_OPEN_THEN_SESSION_CLOSE",
+        "benchmark_target_gross_exposure": _decimal_text(_tilt.TARGET_GROSS_EXPOSURE),
+        "benchmark_entry_fee_bps_per_side": _orders.MODELED_FEE_BPS_PER_SIDE,
         "calendar_benchmark_observation": "SESSION_CLOSE_CONTEXT_ONLY",
         "minimum_resolved_constituent_weight_ratio": _decimal_text(
             MINIMUM_PROXY_RESOLVED_CONSTITUENT_WEIGHT_RATIO
             if proxy else MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
         ),
-        "minimum_positive_constituent_weight_total": _decimal_text(
-            MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
-        ),
-        "maximum_positive_constituent_weight_total": _decimal_text(
-            MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
-        ),
-        "exact_constituent_snapshot_age_sessions": (
-            EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS
-        ),
-        "constituent_source_session_rule": (
-            "QC_daily_Series_collection_EndTime_minus_one_calendar_day"
-        ),
+        "minimum_positive_constituent_weight_total": _decimal_text(MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL),
+        "maximum_positive_constituent_weight_total": _decimal_text(MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL),
+        "exact_constituent_snapshot_age_sessions": EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS,
+        "constituent_source_session_rule": "QC_daily_Series_collection_EndTime_minus_one_calendar_day",
         "reference_price_freshness": "exact_decision_session_last_data_end_time",
         "order_type": "MARKET_ON_OPEN",
         "fee_bps_per_side": _orders.MODELED_FEE_BPS_PER_SIDE,
-        "lifecycle_modeled_fee_basis": (
-            "actual_fill_price_times_filled_quantity"
-        ),
-        "engine_fee_model_basis": (
-            "current_minute_trade_bar_open_times_full_order_quantity_at_fee_assessment"
-        ),
+        "lifecycle_modeled_fee_basis": "actual_fill_price_times_filled_quantity",
+        "engine_fee_model_basis": "current_minute_trade_bar_open_times_full_order_quantity_at_fee_assessment",
         "slippage_model": "zero",
         "backtest_only": True,
         "simulated_order_submission": True,
@@ -250,41 +233,39 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
         record["qqq_proxy_security_id"] = QQQ_PROXY_SECURITY_ID
         record["qqq_proxy_overlap_disclosure"] = QQQ_PROXY_OVERLAP_DISCLOSURE
     if preopen:
-        record["execution_submission_timing"] = (
-            "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
-        )
+        record["execution_submission_timing"] = "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
         record["preopen_timekeeper"] = "QQQ_extended_hours_minute_bars"
         record["latest_accepted_submission_clock"] = "09:27_New_York"
-        record["synchronous_order_event_rule"] = (
-            "stage_until_exact_returned_ticket_then_replay_once"
-        )
+        record["synchronous_order_event_rule"] = "stage_until_exact_returned_ticket_then_replay_once"
     if numeric_status:
         record["qc_order_status_codec"] = "exact_LEAN_numeric_0_1_2_3_5_6_7_8_9"
+    if enum_status:
+        record["qc_order_status_codec"] = "direct_documented_LEAN_OrderStatus_enum_members"
     return {**record, "profile_sha256": _sha(record)}
 
 
 _PROFILES = {
     PROFILE_2025_ID: _profile(PROFILE_2025_ID, "2025-01-02"),
     PROFILE_2026_ID: _profile(PROFILE_2026_ID, "2026-01-02"),
-    PROXY_PROFILE_2025_ID: _profile(
-        PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True
-    ),
-    PROXY_PROFILE_2026_ID: _profile(
-        PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True
-    ),
-    PREOPEN_PROXY_PROFILE_2025_ID: _profile(
-        PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02",
-        proxy=True, preopen=True,
-    ),
-    PREOPEN_PROXY_PROFILE_2026_ID: _profile(
-        PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02",
-        proxy=True, preopen=True,
-    ),
+    PROXY_PROFILE_2025_ID: _profile(PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True),
+    PROXY_PROFILE_2026_ID: _profile(PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True),
+    PREOPEN_PROXY_PROFILE_2025_ID: _profile(PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True, preopen=True),
+    PREOPEN_PROXY_PROFILE_2026_ID: _profile(PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True, preopen=True),
     NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID: _profile(
-        NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True, preopen=True, numeric_status=True,
+        NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02",
+        proxy=True, preopen=True, numeric_status=True,
     ),
     NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID: _profile(
-        NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True, preopen=True, numeric_status=True,
+        NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02",
+        proxy=True, preopen=True, numeric_status=True,
+    ),
+    ENUM_PREOPEN_PROXY_PROFILE_2025_ID: _profile(
+        ENUM_PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02",
+        proxy=True, preopen=True, enum_status=True,
+    ),
+    ENUM_PREOPEN_PROXY_PROFILE_2026_ID: _profile(
+        ENUM_PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02",
+        proxy=True, preopen=True, enum_status=True,
     ),
 }
 
@@ -323,6 +304,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         total_return_normalization,
         fee_model_factory,
         slippage_model_factory,
+        order_status_enum=None,
     ):
         self._algorithm = algorithm
         self._activation_manifest_key = activation_manifest_key
@@ -332,6 +314,14 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._proxy_weight_mode = profile_id in PROXY_PROFILE_IDS
         self._preopen_mode = profile_id in PREOPEN_PROXY_PROFILE_IDS
         self._numeric_order_status_mode = profile_id in NUMERIC_PREOPEN_PROXY_PROFILE_IDS
+        self._enum_order_status_mode = profile_id in ENUM_PREOPEN_PROXY_PROFILE_IDS
+        try:
+            self._order_status_enum_members = (
+                _orders.require_qc_order_status_enum_members(order_status_enum)
+                if self._enum_order_status_mode else None
+            )
+        except _orders.OrderLevelBacktestError as exc:
+            raise AcceptedRiskQqqOrderLevelQcRuntimeError(str(exc)) from exc
         self._authority_benchmark_symbol = authority_benchmark_symbol
         self._qqq_benchmark_symbol = qqq_benchmark_symbol
         self._qqq_constituent_universe = qqq_constituent_universe
@@ -383,6 +373,15 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
     def _backtest_flag(self):
         # The projection firewall permits this one read and no live-mode write.
         return self._algorithm.live_mode
+
+    def _order_status_text(self, value):
+        if self._enum_order_status_mode:
+            return _orders.qc_order_status_enum_text(
+                value, self._order_status_enum_members
+            )
+        return _orders.qc_order_status_text(
+            value, numeric=self._numeric_order_status_mode
+        )
 
     def _portfolio_equity(self):
         return _decimal(
@@ -564,35 +563,11 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 name + " history call failed"
             ) from exc
         self._pit_history_call_count += 1
-        expected_sid = _input.universe_sid(universe, name)
-        result = {}
-        for item in _input.history_items(history, name):
-            if type(item) is not tuple or len(item) != 2:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    name + " history item shape changed"
-                )
-            key, raw_rows = item
-            if type(key) is not tuple or len(key) != 2:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    name + " history index shape changed"
-                )
-            universe_symbol, raw_time = key
-            if _symbol_sid(universe_symbol, name) != expected_sid:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    name + " history universe identity changed"
-                )
-            observed = _input.constituent_collection_time(
-                raw_time, name + " collection"
-            )
-            if not start <= observed < end:
-                continue
-            if observed in result:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    name + " duplicated a collection time"
-                )
-            rows = _input.collection_rows(raw_rows, name)
-            result[observed] = rows
-            self._pit_source_row_count += len(rows)
+        result, row_count = _input.indexed_constituent_history(
+            history, universe, start, end, name, _symbol_sid,
+            AcceptedRiskQqqOrderLevelQcRuntimeError,
+        )
+        self._pit_source_row_count += row_count
         return result
 
     @staticmethod
@@ -791,9 +766,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                     "order-level nested MOO submission is unsupported"
                 )
-            # LEAN may synchronously call OnOrderEvent before returning the
-            # ticket. Buffer only during this call; never trust its events
-            # until the returned ticket binds them to this exact intent.
+            # Authenticate synchronous events against the returned ticket.
             self._pending_submission_events = []
             self._pending_submission_event_keys = set()
             try:
@@ -826,9 +799,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 if (
                     event.order_id != staged_id
                     or str(event.id) != staged_event_id
-                    or _orders.qc_order_status_text(
-                        event.status, numeric=self._numeric_order_status_mode
-                    ) != staged_status
+                    or self._order_status_text(event.status) != staged_status
                 ):
                     raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                         "synchronous QC event changed before replay"
@@ -1052,9 +1023,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         try:
             order_id = event.order_id
             event_id = event.id
-            status = _orders.qc_order_status_text(
-                event.status, numeric=self._numeric_order_status_mode
-            )
+            status = self._order_status_text(event.status)
         except Exception as exc:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level QC event is unreadable"
@@ -1147,6 +1116,11 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         else:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level QC event status is unsupported"
+                + (
+                    _orders.qc_order_status_enum_diagnostic(
+                        event.status
+                    ) if self._enum_order_status_mode else ""
+                )
             )
         core_event = _orders.FillEvent(
             event_id="qc-event-" + str(order_id) + "-" + str(event_id),
@@ -1241,25 +1215,17 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         summary = {
             "schema": PROXY_SUMMARY_SCHEMA if self._proxy_weight_mode else SUMMARY_SCHEMA,
             "score_source_view_id": _score.PRIMARY_SOURCE_VIEW_ID,
-            "target_weight_basis": (
-                PROXY_TARGET_WEIGHT_BASIS if self._proxy_weight_mode
-                else TARGET_WEIGHT_BASIS
-            ),
+            "target_weight_basis": PROXY_TARGET_WEIGHT_BASIS if self._proxy_weight_mode else TARGET_WEIGHT_BASIS,
             "decision_count": self._decision_count,
             "completed_rebalance_count": len(self._lifecycle_records),
             "submitted_order_count": self._submitted_order_count,
-            "skipped_unpriced_decision_count": (
-                self._skipped_unpriced_decision_count
-            ),
+            "skipped_unpriced_decision_count": self._skipped_unpriced_decision_count,
             "tilt_enabled_count": self._tilt_enabled_count,
             "tilt_underfilled_count": self._tilt_underfilled_count,
             "mean_tilted_name_count": _decimal_text(
-                Decimal(self._tilted_name_count_sum)
-                / Decimal(self._decision_count)
+                Decimal(self._tilted_name_count_sum) / Decimal(self._decision_count)
             ),
-            "mean_one_way_active_share": _decimal_text(
-                self._one_way_active_share_sum / Decimal(self._decision_count)
-            ),
+            "mean_one_way_active_share": _decimal_text(self._one_way_active_share_sum / Decimal(self._decision_count)),
             "pit_history_call_count": self._pit_history_call_count,
             "pit_source_row_count": self._pit_source_row_count,
             "named_figi_refusal_count": self._resolution.named_refusal_count,
@@ -1267,49 +1233,34 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "modeled_fee_amount": _decimal_text(fee),
             "actual_engine_fee_amount": _decimal_text(actual_engine_fee),
             "actual_engine_fee_effective_bps_per_side": _decimal_text(
-                Decimal(0)
-                if filled_notional == 0
-                else actual_engine_fee / filled_notional * Decimal(10_000)
+                Decimal(0) if filled_notional == 0 else actual_engine_fee / filled_notional * Decimal(10_000)
             ),
-            "modeled_minus_actual_fee_amount": _decimal_text(
-                fee - actual_engine_fee
-            ),
+            "modeled_minus_actual_fee_amount": _decimal_text(fee - actual_engine_fee),
             "fee_mismatch": fee_mismatch,
-            "lifecycle_modeled_fee_basis": (
-                "actual_fill_price_times_filled_quantity"
-            ),
-            "engine_fee_model_basis": (
-                "current_minute_trade_bar_open_times_full_order_quantity_at_fee_assessment"
-            ),
+            "lifecycle_modeled_fee_basis": "actual_fill_price_times_filled_quantity",
+            "engine_fee_model_basis": "current_minute_trade_bar_open_times_full_order_quantity_at_fee_assessment",
             "total_filled_notional": _decimal_text(filled_notional),
             "filled_order_count_sum": filled_order_count,
             "canceled_order_count_sum": canceled_order_count,
             "invalid_order_count_sum": invalid_order_count,
             "orders_with_any_fill_count_sum": orders_with_any_fill_count,
-            "mean_reference_mark_target_weight_l1_error": _decimal_text(
-                mean_target_error
-            ),
-            "maximum_reference_mark_target_weight_l1_error": _decimal_text(
-                maximum_target_error
-            ),
+            "mean_reference_mark_target_weight_l1_error": _decimal_text(mean_target_error),
+            "maximum_reference_mark_target_weight_l1_error": _decimal_text(maximum_target_error),
             "execution_failure": execution_failure,
             "run_valid": run_valid,
             **coverage_stats,
             "maximum_positive_constituent_weight_total": _decimal_text(
                 max(coverage_values["positive_constituent_weight_total"])
             ),
-            "minimum_required_positive_constituent_weight_total": (
-                _decimal_text(MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL)
+            "minimum_required_positive_constituent_weight_total": _decimal_text(
+                MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
             ),
-            "maximum_allowed_positive_constituent_weight_total": (
-                _decimal_text(MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL)
+            "maximum_allowed_positive_constituent_weight_total": _decimal_text(
+                MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
             ),
-            "minimum_required_resolved_constituent_weight_ratio": (
-                _decimal_text(
-                    MINIMUM_PROXY_RESOLVED_CONSTITUENT_WEIGHT_RATIO
-                    if self._proxy_weight_mode
-                    else MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
-                )
+            "minimum_required_resolved_constituent_weight_ratio": _decimal_text(
+                MINIMUM_PROXY_RESOLVED_CONSTITUENT_WEIGHT_RATIO if self._proxy_weight_mode
+                else MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
             ),
             "maximum_constituent_snapshot_age_sessions": max(
                 row["constituent_snapshot_age_sessions"]
@@ -1317,25 +1268,17 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             ),
             "pit_coverage_path_sha256": _sha(
                 {
-                    "schema": (
-                        PROXY_COVERAGE_PATH_SCHEMA if self._proxy_weight_mode
-                        else COVERAGE_PATH_SCHEMA
-                    ),
+                    "schema": PROXY_COVERAGE_PATH_SCHEMA if self._proxy_weight_mode else COVERAGE_PATH_SCHEMA,
                     "records": self._pit_coverage_records,
                 }
             ),
             "pit_target_weight_path_sha256": _sha(
                 {
-                    "schema": (
-                        PROXY_TARGET_WEIGHT_PATH_SCHEMA if self._proxy_weight_mode
-                        else TARGET_WEIGHT_PATH_SCHEMA
-                    ),
+                    "schema": PROXY_TARGET_WEIGHT_PATH_SCHEMA if self._proxy_weight_mode else TARGET_WEIGHT_PATH_SCHEMA,
                     "records": [
                         {
                             "session": row["session"],
-                            "pit_constituent_weight_map_sha256": (
-                                row["pit_constituent_weight_map_sha256"]
-                            ),
+                            "pit_constituent_weight_map_sha256": row["pit_constituent_weight_map_sha256"],
                         }
                         for row in self._pit_coverage_records
                     ],
@@ -1344,12 +1287,8 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "starting_equity": _decimal_text(STARTING_CASH),
             "ending_equity": _decimal_text(self._portfolio_equity()),
             "strategy_total_return": _decimal_text(strategy_return),
-            "strategy_maximum_drawdown": _decimal_text(
-                strategy_metrics["maximum_drawdown"]
-            ),
-            "strategy_annualized_volatility": _decimal_text(
-                strategy_metrics["annualized_volatility"]
-            ),
+            "strategy_maximum_drawdown": _decimal_text(strategy_metrics["maximum_drawdown"]),
+            "strategy_annualized_volatility": _decimal_text(strategy_metrics["annualized_volatility"]),
             "strategy_zero_rate_sharpe": (
                 None
                 if strategy_metrics["zero_rate_sharpe"] is None
@@ -1369,47 +1308,25 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "QQQ_total_return": _decimal_text(qqq_return),
             "QQQ_normalization_mode": binding["normalization_mode"],
             "QQQ_observation": binding["observation"],
-            "QQQ_first_execution_session": binding[
-                "first_execution_session"
-            ],
-            "QQQ_target_gross_exposure": binding[
-                "target_gross_exposure"
-            ],
-            "QQQ_entry_fee_bps_per_side": binding[
-                "entry_fee_bps_per_side"
-            ],
-            "QQQ_maximum_drawdown": _decimal_text(
-                qqq_metrics["maximum_drawdown"]
-            ),
-            "QQQ_annualized_volatility": _decimal_text(
-                qqq_metrics["annualized_volatility"]
-            ),
+            "QQQ_first_execution_session": binding["first_execution_session"],
+            "QQQ_target_gross_exposure": binding["target_gross_exposure"],
+            "QQQ_entry_fee_bps_per_side": binding["entry_fee_bps_per_side"],
+            "QQQ_maximum_drawdown": _decimal_text(qqq_metrics["maximum_drawdown"]),
+            "QQQ_annualized_volatility": _decimal_text(qqq_metrics["annualized_volatility"]),
             "QQQ_zero_rate_sharpe": (
                 None
                 if qqq_metrics["zero_rate_sharpe"] is None
                 else _decimal_text(qqq_metrics["zero_rate_sharpe"])
             ),
-            "strategy_minus_QQQ_total_return": _decimal_text(
-                strategy_return - qqq_return
-            ),
+            "strategy_minus_QQQ_total_return": _decimal_text(strategy_return - qqq_return),
             "QQQ_observation_count": binding["observation_count"],
             "QQQ_return_interval_count": binding["return_interval_count"],
-            "QQQ_raw_observation_sha256": binding[
-                "raw_observation_sha256"
-            ],
+            "QQQ_raw_observation_sha256": binding["raw_observation_sha256"],
             "QQQ_return_path_sha256": binding["return_path_sha256"],
-            "QQQ_calendar_close_total_return": _decimal_text(
-                calendar_qqq_return
-            ),
-            "QQQ_calendar_close_observation_count": calendar_binding[
-                "observation_count"
-            ],
-            "QQQ_calendar_close_raw_observation_sha256": calendar_binding[
-                "raw_observation_sha256"
-            ],
-            "QQQ_calendar_close_return_path_sha256": calendar_binding[
-                "return_path_sha256"
-            ],
+            "QQQ_calendar_close_total_return": _decimal_text(calendar_qqq_return),
+            "QQQ_calendar_close_observation_count": calendar_binding["observation_count"],
+            "QQQ_calendar_close_raw_observation_sha256": calendar_binding["raw_observation_sha256"],
+            "QQQ_calendar_close_return_path_sha256": calendar_binding["return_path_sha256"],
             "order_lifecycle_sha256": lifecycle_digest,
             "raw_order_rows_in_summary": False,
             "raw_security_rows_in_summary": False,

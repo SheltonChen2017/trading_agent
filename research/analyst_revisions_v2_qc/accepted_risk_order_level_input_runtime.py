@@ -438,6 +438,32 @@ def collection_rows(rows, name):
     return result
 
 
+def indexed_constituent_history(history, universe, start, end, name, symbol_sid, error_type):
+    """Parse one bounded PIT collection response without order capability."""
+
+    expected_sid = universe_sid(universe, name)
+    result = {}
+    row_count = 0
+    for item in history_items(history, name):
+        if type(item) is not tuple or len(item) != 2:
+            raise error_type(name + " history item shape changed")
+        key, raw_rows = item
+        if type(key) is not tuple or len(key) != 2:
+            raise error_type(name + " history index shape changed")
+        universe_symbol, raw_time = key
+        if symbol_sid(universe_symbol, name) != expected_sid:
+            raise error_type(name + " history universe identity changed")
+        observed = constituent_collection_time(raw_time, name + " collection")
+        if not start <= observed < end:
+            continue
+        if observed in result:
+            raise error_type(name + " duplicated a collection time")
+        rows = collection_rows(raw_rows, name)
+        result[observed] = rows
+        row_count += len(rows)
+    return result, row_count
+
+
 def positive_market_caps(rows):
     members = collection_rows(rows, "fundamental")
     if not members:

@@ -89,7 +89,7 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     )
     assert value.profile_sha256 == profile["profile_sha256"]
     assert (
-        value.total_source_byte_count + 4_096
+        value.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
         <= projection.MAX_TOTAL_SOURCE_BYTES
     )
     assert max(item.byte_count for item in value.source_files) <= (
@@ -198,9 +198,20 @@ def test_execution_matched_source_closure_keeps_review_margin(
     )
     assert value.total_source_byte_count > 256_000
     assert (
-        value.total_source_byte_count + 4_096
+        value.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
         <= projection.MAX_TOTAL_SOURCE_BYTES
     )
+    monkeypatch.setattr(
+        projection, "MAX_TOTAL_SOURCE_BYTES",
+        value.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=runtime.PROFILE_IDS[0],
+        )
     monkeypatch.setattr(projection, "MAX_TOTAL_SOURCE_BYTES", 256_000)
     with pytest.raises(
         projection.AcceptedRiskOrderLevelQcProjectionError,
@@ -220,7 +231,10 @@ def test_proxy_projection_keeps_file_and_total_margin_and_raw_executable_qqq(
         profile_id=runtime.PROXY_PROFILE_2026_ID,
     )
     assert max(item.byte_count for item in value.source_files) <= 64_000
-    assert value.total_source_byte_count + 4_096 <= projection.MAX_TOTAL_SOURCE_BYTES
+    assert (
+        value.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_TOTAL_SOURCE_BYTES
+    )
     main = next(item.source_bytes for item in value.source_files if item.project_path == "main.py")
     assert b"data_normalization_mode=DataNormalizationMode.RAW" in main
     assert b"data_normalization_mode=DataNormalizationMode.TOTAL_RETURN" in main
@@ -281,6 +295,34 @@ def test_v7_status_codec_keeps_v6_preopen_schedule_and_distinct_profile(
     assert b"numeric_status=True" in next(
         item.source_bytes for item in v7.source_files
         if item.project_path == projection.RUNTIME_PROJECT_PATH
+    )
+
+
+def test_v8_injects_qc_order_status_enum_only_for_new_profile(delta_package):
+    v8 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    v7 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=runtime.NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    v8_main = next(
+        item.source_bytes for item in v8.source_files
+        if item.project_path == "main.py"
+    )
+    v7_main = next(
+        item.source_bytes for item in v7.source_files
+        if item.project_path == "main.py"
+    )
+    assert v8.profile_sha256 != v7.profile_sha256
+    assert b"order_status_enum=OrderStatus," in v8_main
+    assert b"order_status_enum=" not in v7_main
+    assert v8_main.count(b"extended_market_hours=True") == 1
+    assert v8_main.count(b"self.schedule.on(") == 2
+    assert max(item.byte_count for item in v8.source_files) <= 64_000
+    assert projection.MIN_REVIEW_MARGIN_BYTES == 2_048
+    assert (
+        v8.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_TOTAL_SOURCE_BYTES
     )
 
 

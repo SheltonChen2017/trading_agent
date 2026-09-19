@@ -35,10 +35,11 @@ MAIN_PROJECT_PATH = "main.py"
 RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_qc_runtime.py"
 MAX_SOURCE_FILE_BYTES = 64_000
 # The fixed ten-file closure includes the ETF-residual accounting and
-# synchronous order-event authentication. The prospectively versioned V6
-# preopen source retains at least 4,096 bytes of review margin. No additional
-# source path is admitted; the per-file 64,000-byte boundary is unchanged.
+# synchronous order-event authentication. V8's direct QC enum boundary adds
+# source bytes, so a prospective 2,048-byte aggregate review margin remains
+# while the ten-file, 64,000-byte/file, and 288,000-byte total caps stay fixed.
 MAX_TOTAL_SOURCE_BYTES = 288_000
+MIN_REVIEW_MARGIN_BYTES = 2_048
 
 PROJECT_SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
@@ -551,6 +552,11 @@ def _main_source(
         == "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
         else ""
     )
+    enum_status_source = (
+        "            order_status_enum=OrderStatus,\n"
+        if profile["profile_id"] in runtime_builder.ENUM_PREOPEN_PROXY_PROFILE_IDS
+        else ""
+    )
     source = f'''from AlgorithmImports import *
 from decimal import Decimal
 from accepted_risk_qqq_order_level_qc_runtime import (
@@ -622,7 +628,7 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
             fee_model_factory=lambda: Arv2TenBpsFeeModel(),
             slippage_model_factory=lambda: NullSlippageModel(),
-        )
+{enum_status_source}        )
         self._arv2_driver.initialize()
         self.schedule.on(
             self.date_rules.every_day(qqq_benchmark),
@@ -689,7 +695,7 @@ def build_accepted_risk_order_level_qc_projection(
     )
     files.sort(key=lambda item: item.project_path)
     total = sum(item.byte_count for item in files)
-    if total > MAX_TOTAL_SOURCE_BYTES:
+    if total + MIN_REVIEW_MARGIN_BYTES > MAX_TOTAL_SOURCE_BYTES:
         raise AcceptedRiskOrderLevelQcProjectionError(
             "order-level QC source set exceeds reviewed total size"
         )

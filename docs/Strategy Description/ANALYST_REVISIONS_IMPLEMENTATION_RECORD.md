@@ -1360,9 +1360,13 @@ Section 128 prospectively versions the QC status boundary, preserving the
 V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
 physical plan from committed V7 source; section 130 records its zero-cell
 terminal refusal. Claude will review section 130 with this round's final
-single pushed snapshot. The next QC action requires a freshly versioned,
-tested enum-identity source and a distinct physical R-135 plan; R-131,
+single pushed snapshot. The owner explicitly waives Claude review of
+section 131 before this continuing QC correction round's R-135 diagnostic;
+the next QC action requires committing the prospective V8 source/tests and
+freezing a distinct physical R-135 plan. R-131,
 R-132, R-133 and R-134 may not be retried or silently launched.
+Claude's independent review follows the final single pushed snapshot, after
+focused interim and full final-tree checks.
 No order-level return or paper/live, funded, deployment, broker, or trading
 authority exists yet.
 
@@ -19486,3 +19490,56 @@ is a lane-specific P2 status-boundary defect, pending a fresh V8 source and
 physical R-135 plan. This technical failure is neither a positive nor a
 negative analyst-revision return estimate, and grants no leverage,
 six-universe, paper/live, broker, funded, or trading action.
+
+## 131. Prospective V8 direct-enum order-status correction, 2026-09-18
+
+`ARV2D130-001` (P2) is corrected in a **new source version**, not by
+replaying either technical refusal. V7's string and exact-numeric spelling
+paths were insufficient at R-131 and R-133; neither run exposed the actual
+status value. Only V8 receives QC's `OrderStatus` class from the generated
+`main.py` and compares `event.status` directly against its nine documented
+members. It requires their exact common type and pairwise distinctness before
+submission. Missing or aliased constants, a differently typed or unknown
+status, and a changed synchronous callback refuse; the unsupported-status
+diagnostic reports only a bounded type name and never stringifies the event
+value. V4--V7 profile IDs, hashes, and prior behavior remain pinned.
+The V8 2025/2026 profile SHA-256 values are respectively
+`b8446593bedb571f644fc6033835408b755b8684f4857aeeeafd2b8e1a82e780`
+and `55d4790ed611b33607dcdca96934237a4ed49ae1ae5d2b42f5a2b20bc570f4e2`.
+The score, PIT QQQ weight basis, 80% exactly resolved-weight floor, unscored
+overlapping QQQ residual, 98%-gross target, whole-share MOO timing, fee,
+window, and aggregate inventory are unchanged. This local correction does
+not prove QC's actual wrapper representation; only a fresh one-use cloud
+run can do that.
+
+The ten-file source bundle remains under the unchanged **64,000-byte/file**
+and **288,000-byte total** hard limits. The new enum boundary increased the
+closure, so V8 prospectively enforces a **2,048-byte review buffer** rather
+than V6/V7's 4,096-byte buffer. The fixed source measures **285,397 bytes**
+total, 2,603 below the hard cap and 555 beyond the new minimum buffer;
+the largest file is **63,002 bytes**, 998 below its file cap. An off-by-one
+test refuses a bundle with only 2,047 bytes of remaining room. Moving an
+existing PIT collection parser into the already projected input module
+preserved its row/count and foreign-SID/duplicate-time refusals, now directly
+tested. A bounded formatting compaction of roughly eighty profile/summary
+lines is a P3 reviewability cost, explicitly disclosed rather than silently
+claiming a pure extraction. No source path or capability was added.
+
+The three focused runtime/projection/submission modules passed **277 tests**;
+targeted compilation and `git diff --check` were clean. An in-process
+mutation back to V7's string codec made all three V8 synchronous
+Submitted/Filled/Invalid cases red and restoring V8 made them green.
+An independent read-only audit found no P0--P2 defect and independently
+verified the old profile hashes, projection/firewall, direct enum boundary,
+type-only diagnostic, margin guard, and parser test. The full lane suite is
+reserved for the final settled tree immediately before the round's single
+push, per the owner's rule; the repository-wide suite is excluded. No QC,
+provider, credential, signature, aggregate, price, return, result cell,
+or new research look was used by this source-only correction. Accounting
+remains **94 shared looks, 37 ARV2 development evaluations, 27
+infrastructure looks, 607 cells**. Commit this source/test snapshot first;
+derive an exact physical R-135 2026-YTD plan from that commit, preregister
+its one-use authority, then launch only that run. A 2025-now R-136 may be
+preregistered but may launch only after an authenticated usable R-135
+aggregate. No six-universe, leverage, paper/live, broker, funded, or
+trading authority follows.

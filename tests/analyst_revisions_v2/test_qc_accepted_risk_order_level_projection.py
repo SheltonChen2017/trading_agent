@@ -119,6 +119,9 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     assert "parameters.security.price" not in main
     assert "price * quantity * MODELED_FEE_RATE_PER_SIDE" in main
     assert "self.set_cash(STARTING_CASH)" in main
+    assert "AddUniverse" not in main
+    assert "fundamental_universe" not in main
+    assert "qqq_constituent_universe=qqq_constituent_universe" in main
     assert "trade_bar_type=TradeBar" in main
     assert "daily_resolution=Resolution.DAILY" in main
     assert (

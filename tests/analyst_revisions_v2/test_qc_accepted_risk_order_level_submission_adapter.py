@@ -212,7 +212,7 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         "tilt_underfilled_count": 0,
         "mean_tilted_name_count": "2",
         "mean_one_way_active_share": "0.01",
-        "pit_history_call_count": 2 * decision_count,
+        "pit_history_call_count": decision_count,
         "pit_source_row_count": 20,
         "named_figi_refusal_count": 0,
         "modeled_fee_bps_per_side": 10,
@@ -239,22 +239,20 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         "coverage_decision_count": decision_count,
         "positive_weight_member_count_sum": 100,
         "resolved_positive_weight_member_count_sum": 100,
-        "cap_covered_positive_weight_member_count_sum": 99,
         "mean_resolved_member_count_ratio": "1",
-        "mean_cap_covered_member_count_ratio": "0.99",
         "mean_resolved_constituent_weight_ratio": "1",
-        "mean_cap_covered_constituent_weight_ratio": "0.995",
         "minimum_resolved_member_count_ratio": "1",
-        "minimum_cap_covered_member_count_ratio": "0.99",
         "minimum_resolved_constituent_weight_ratio": "1",
-        "minimum_cap_covered_constituent_weight_ratio": "0.995",
-        "minimum_required_cap_covered_constituent_weight_ratio": "0.9",
+        "minimum_required_resolved_constituent_weight_ratio": "0.95",
+        "target_weight_basis": (
+            "pit_qqq_reported_positive_holdings_weights_resolved_renormalized"
+        ),
+        "pit_target_weight_path_sha256": "9" * 64,
         "mean_positive_constituent_weight_total": "1",
         "minimum_positive_constituent_weight_total": "1",
         "maximum_positive_constituent_weight_total": "1",
         "minimum_required_positive_constituent_weight_total": "0.95",
         "maximum_allowed_positive_constituent_weight_total": "1.05",
-        "maximum_fundamental_snapshot_age_sessions": 0,
         "maximum_constituent_snapshot_age_sessions": 1,
         "pit_coverage_path_sha256": "5" * 64,
         "starting_equity": "1000000",
@@ -2749,9 +2747,6 @@ def test_result_refuses_raw_or_live_result_disclosures(
     "aggregate_update",
     (
         {"canceled_order_count_sum": 1},
-        {"minimum_cap_covered_constituent_weight_ratio": "0.89"},
-        {"minimum_required_cap_covered_constituent_weight_ratio": "0.89"},
-        {"minimum_required_cap_covered_constituent_weight_ratio": "0.91"},
         {"maximum_constituent_snapshot_age_sessions": 2},
         {"fee_mismatch": True},
         {"actual_engine_fee_effective_bps_per_side": "11"},
@@ -2774,6 +2769,181 @@ def test_result_refuses_inconsistent_execution_or_coverage_claims(
     with pytest.raises(
         adapter.AcceptedRiskOrderLevelSubmissionError,
         match="execution or coverage invariant changed",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_result_accepts_exact_pit_etf_weight_coverage_floor(tmp_path):
+    plan = _plan(tmp_path)
+    statistics = _statistics(
+        plan,
+        aggregate_update={
+            "minimum_resolved_constituent_weight_ratio": "0.95",
+        },
+    )
+    launch, response = _result_response(plan, statistics)
+
+    assert adapter._parse_result(response, plan, launch) == tuple(
+        sorted(statistics.items())
+    )
+
+
+@pytest.mark.parametrize("required_floor", ("0.94", "0.96"))
+def test_result_refuses_changed_exact_pit_etf_weight_coverage_floor(
+    tmp_path, required_floor
+):
+    plan = _plan(tmp_path)
+    launch, response = _result_response(
+        plan,
+        _statistics(
+            plan,
+            aggregate_update={
+                "minimum_required_resolved_constituent_weight_ratio": (
+                    required_floor
+                )
+            },
+        ),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate execution or coverage invariant changed",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_result_refuses_undercovered_pit_etf_weights(tmp_path):
+    plan = _plan(tmp_path)
+    launch, response = _result_response(
+        plan,
+        _statistics(
+            plan,
+            aggregate_update={
+                "minimum_resolved_constituent_weight_ratio": "0.94"
+            },
+        ),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate execution or coverage invariant changed",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_result_refuses_two_pit_history_calls_per_decision(tmp_path):
+    plan = _plan(tmp_path)
+    launch, response = _result_response(
+        plan,
+        _statistics(plan, aggregate_update={"pit_history_call_count": 182}),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate execution or coverage invariant changed",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_result_refuses_non_pit_etf_weight_target_basis(tmp_path):
+    plan = _plan(tmp_path)
+    launch, response = _result_response(
+        plan,
+        _statistics(
+            plan,
+            aggregate_update={
+                "target_weight_basis": "point_in_time_market_cap_proxy"
+            },
+        ),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate schema or safety flags changed",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_result_refuses_superseded_cap_coverage_field(tmp_path):
+    plan = _plan(tmp_path)
+    launch, response = _result_response(
+        plan,
+        _statistics(
+            plan,
+            aggregate_update={"cap_covered_positive_weight_member_count_sum": 99},
+        ),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate field inventory changed",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+@pytest.mark.parametrize(
+    ("aggregate_update", "message"),
+    (
+        (
+            {"pit_target_weight_path_sha256": "g" * 64},
+            "order-level aggregate pit_target_weight_path_sha256 "
+            "is not an exact SHA-256",
+        ),
+        (
+            {"pit_target_weight_path_sha256": None},
+            "order-level aggregate pit_target_weight_path_sha256 "
+            "is not an exact SHA-256",
+        ),
+    ),
+)
+def test_result_refuses_unverifiable_pit_target_weight_path_digest(
+    tmp_path, aggregate_update, message
+):
+    plan = _plan(tmp_path)
+    launch, response = _result_response(
+        plan, _statistics(plan, aggregate_update=aggregate_update)
+    )
+
+    with pytest.raises(adapter.AcceptedRiskOrderLevelSubmissionError) as exc:
+        adapter._parse_result(response, plan, launch)
+    assert str(exc.value) == message
+
+
+def test_result_refuses_missing_pit_target_weight_path_digest(tmp_path):
+    plan = _plan(tmp_path)
+    statistics = _statistics(plan)
+    aggregates = json.loads(statistics[runtime.AGGREGATES_STATISTIC_NAME])
+    aggregates.pop("pit_target_weight_path_sha256")
+    meta = json.loads(statistics[runtime.META_STATISTIC_NAME])
+    meta["aggregates_sha256"] = hashlib.sha256(_canonical(aggregates)).hexdigest()
+    statistics[runtime.AGGREGATES_STATISTIC_NAME] = _canonical(
+        aggregates
+    ).decode("ascii")
+    statistics[runtime.META_STATISTIC_NAME] = _canonical(meta).decode("ascii")
+    launch, response = _result_response(plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate field inventory changed",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_result_refuses_reused_coverage_digest_as_target_weight_digest(
+    tmp_path,
+):
+    plan = _plan(tmp_path)
+    launch, response = _result_response(
+        plan,
+        _statistics(
+            plan,
+            aggregate_update={"pit_target_weight_path_sha256": "5" * 64},
+        ),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate execution or coverage invariant changed",
     ):
         adapter._parse_result(response, plan, launch)
 
@@ -2812,15 +2982,13 @@ def test_result_refuses_inconsistent_execution_or_coverage_claims(
         {
             "mean_resolved_member_count_ratio": "0.5",
             "minimum_resolved_member_count_ratio": "0.75",
-            "mean_cap_covered_member_count_ratio": "0.5",
-            "minimum_cap_covered_member_count_ratio": "0.5",
         },
         {
             "decision_count": 1,
             "completed_rebalance_count": 1,
             "coverage_decision_count": 1,
             "tilt_enabled_count": 1,
-            "pit_history_call_count": 2,
+            "pit_history_call_count": 1,
         },
         {"mean_tilted_name_count": "-1"},
         {"mean_one_way_active_share": "1.01"},

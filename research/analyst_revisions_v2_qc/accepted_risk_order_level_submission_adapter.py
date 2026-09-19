@@ -84,8 +84,8 @@ EXECUTION_AUTHORITY_SCHEMA = "arv2-order-level-qc-execution-authority-v1"
 RESULT_READ_AUTHORITY_SCHEMA = "arv2-order-level-qc-result-read-authority-v1"
 
 PROFILE_IDS = (
-    "arv2-qqq-order-level-tilt-2025-cutoff-v3",
-    "arv2-qqq-order-level-tilt-2026-cutoff-v3",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v4",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v4",
 )
 _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[0], "2025-01-03", 91, 428, 427),
@@ -290,22 +290,17 @@ _AGGREGATE_FIELDS = frozenset(
         "execution_failure", "run_valid", "coverage_decision_count",
         "positive_weight_member_count_sum",
         "resolved_positive_weight_member_count_sum",
-        "cap_covered_positive_weight_member_count_sum",
         "mean_resolved_member_count_ratio",
-        "mean_cap_covered_member_count_ratio",
         "mean_resolved_constituent_weight_ratio",
-        "mean_cap_covered_constituent_weight_ratio",
         "minimum_resolved_member_count_ratio",
-        "minimum_cap_covered_member_count_ratio",
         "minimum_resolved_constituent_weight_ratio",
-        "minimum_cap_covered_constituent_weight_ratio",
-        "minimum_required_cap_covered_constituent_weight_ratio",
+        "minimum_required_resolved_constituent_weight_ratio",
+        "target_weight_basis", "pit_target_weight_path_sha256",
         "mean_positive_constituent_weight_total",
         "minimum_positive_constituent_weight_total",
         "maximum_positive_constituent_weight_total",
         "minimum_required_positive_constituent_weight_total",
         "maximum_allowed_positive_constituent_weight_total",
-        "maximum_fundamental_snapshot_age_sessions",
         "maximum_constituent_snapshot_age_sessions",
         "pit_coverage_path_sha256", "starting_equity",
         "ending_equity", "strategy_total_return",
@@ -2928,8 +2923,6 @@ def _parse_result(response, plan, launch):
         "orders_with_any_fill_count_sum", "coverage_decision_count",
         "positive_weight_member_count_sum",
         "resolved_positive_weight_member_count_sum",
-        "cap_covered_positive_weight_member_count_sum",
-        "maximum_fundamental_snapshot_age_sessions",
         "maximum_constituent_snapshot_age_sessions",
     )
     if (
@@ -2955,6 +2948,8 @@ def _parse_result(response, plan, launch):
             "and_session_close_marks"
         )
         or aggregates.get("QQQ_entry_fee_bps_per_side") != 10
+        or aggregates.get("target_weight_basis")
+        != "pit_qqq_reported_positive_holdings_weights_resolved_renormalized"
         or aggregates.get("raw_order_rows_in_summary") is not False
         or aggregates.get("raw_security_rows_in_summary") is not False
         or aggregates.get("backtest_only") is not True
@@ -2983,14 +2978,10 @@ def _parse_result(response, plan, launch):
         "mean_reference_mark_target_weight_l1_error",
         "maximum_reference_mark_target_weight_l1_error",
         "mean_resolved_member_count_ratio",
-        "mean_cap_covered_member_count_ratio",
         "mean_resolved_constituent_weight_ratio",
-        "mean_cap_covered_constituent_weight_ratio",
         "minimum_resolved_member_count_ratio",
-        "minimum_cap_covered_member_count_ratio",
         "minimum_resolved_constituent_weight_ratio",
-        "minimum_cap_covered_constituent_weight_ratio",
-        "minimum_required_cap_covered_constituent_weight_ratio",
+        "minimum_required_resolved_constituent_weight_ratio",
         "actual_engine_fee_amount",
         "actual_engine_fee_effective_bps_per_side",
         "modeled_minus_actual_fee_amount",
@@ -3012,7 +3003,7 @@ def _parse_result(response, plan, launch):
     for name in (
         "strategy_equity_path_sha256", "QQQ_raw_observation_sha256",
         "QQQ_return_path_sha256", "order_lifecycle_sha256",
-        "pit_coverage_path_sha256",
+        "pit_coverage_path_sha256", "pit_target_weight_path_sha256",
         "QQQ_calendar_close_raw_observation_sha256",
         "QQQ_calendar_close_return_path_sha256",
     ):
@@ -3031,11 +3022,11 @@ def _parse_result(response, plan, launch):
         == aggregates["decision_count"]
     )
     floor = _result_decimal(
-        aggregates["minimum_required_cap_covered_constituent_weight_ratio"],
+        aggregates["minimum_required_resolved_constituent_weight_ratio"],
         "order-level aggregate minimum coverage floor",
     )
     minimum_covered_weight = _result_decimal(
-        aggregates["minimum_cap_covered_constituent_weight_ratio"],
+        aggregates["minimum_resolved_constituent_weight_ratio"],
         "order-level aggregate minimum covered weight",
     )
     modeled_fee = _result_decimal(
@@ -3153,13 +3144,9 @@ def _parse_result(response, plan, launch):
     )
     ratio_names = (
         "mean_resolved_member_count_ratio",
-        "mean_cap_covered_member_count_ratio",
         "mean_resolved_constituent_weight_ratio",
-        "mean_cap_covered_constituent_weight_ratio",
         "minimum_resolved_member_count_ratio",
-        "minimum_cap_covered_member_count_ratio",
         "minimum_resolved_constituent_weight_ratio",
-        "minimum_cap_covered_constituent_weight_ratio",
     )
     minimum_mean_ratio_pairs = (
         (
@@ -3167,16 +3154,8 @@ def _parse_result(response, plan, launch):
             "mean_resolved_member_count_ratio",
         ),
         (
-            "minimum_cap_covered_member_count_ratio",
-            "mean_cap_covered_member_count_ratio",
-        ),
-        (
             "minimum_resolved_constituent_weight_ratio",
             "mean_resolved_constituent_weight_ratio",
-        ),
-        (
-            "minimum_cap_covered_constituent_weight_ratio",
-            "mean_cap_covered_constituent_weight_ratio",
         ),
     )
     with localcontext() as arithmetic_context:
@@ -3216,19 +3195,19 @@ def _parse_result(response, plan, launch):
         + aggregates["tilt_underfilled_count"]
         != aggregates["decision_count"]
         or aggregates["pit_history_call_count"]
-        != 2 * aggregates["decision_count"]
+        != aggregates["decision_count"]
         or aggregates["coverage_decision_count"]
         != aggregates["decision_count"]
         or aggregates["resolved_positive_weight_member_count_sum"]
         > aggregates["positive_weight_member_count_sum"]
-        or aggregates["cap_covered_positive_weight_member_count_sum"]
-        > aggregates["resolved_positive_weight_member_count_sum"]
         or aggregates["filled_order_count_sum"]
         > aggregates["orders_with_any_fill_count_sum"]
         or aggregates["orders_with_any_fill_count_sum"]
         > aggregates["submitted_order_count"]
-        or floor != Decimal("0.90")
+        or floor != Decimal("0.95")
         or minimum_covered_weight < floor
+        or aggregates["pit_target_weight_path_sha256"]
+        == aggregates["pit_coverage_path_sha256"]
         or not modeled_fee_is_exact
         or actual_fee < 0
         or actual_effective_bps < 0
@@ -3289,25 +3268,8 @@ def _parse_result(response, plan, launch):
             )
             for minimum_name, mean_name in minimum_mean_ratio_pairs
         )
-        or _result_decimal(
-            aggregates["mean_cap_covered_member_count_ratio"],
-            "order-level aggregate mean cap-covered member ratio",
-        )
-        > _result_decimal(
-            aggregates["mean_resolved_member_count_ratio"],
-            "order-level aggregate mean resolved member ratio",
-        )
-        or _result_decimal(
-            aggregates["mean_cap_covered_constituent_weight_ratio"],
-            "order-level aggregate mean cap-covered constituent ratio",
-        )
-        > _result_decimal(
-            aggregates["mean_resolved_constituent_weight_ratio"],
-            "order-level aggregate mean resolved constituent ratio",
-        )
         or total_filled_notional < 0
         or modeled_fee < 0
-        or aggregates["maximum_fundamental_snapshot_age_sessions"] > 1
         or aggregates["maximum_constituent_snapshot_age_sessions"] != 1
     ):
         _error("order-level aggregate execution or coverage invariant changed")

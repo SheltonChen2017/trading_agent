@@ -48,9 +48,9 @@ class AcceptedRiskQqqOrderLevelQcRuntimeError(ValueError):
     """The fixed order profile or simulated QC boundary was refused."""
 
 
-PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v3"
-PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v3"
-PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v3"
+PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v4"
+PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v4"
+PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v4"
 PROFILE_IDS = (PROFILE_2025_ID, PROFILE_2026_ID)
 DECISION_CUTOFF_SESSION = "2026-09-16"
 FINAL_EXECUTION_SESSION = "2026-09-17"
@@ -58,14 +58,19 @@ STARTING_CASH = Decimal("1000000")
 META_STATISTIC_NAME = "ARV2_ORDER_LEVEL_META"
 AGGREGATES_STATISTIC_NAME = "ARV2_ORDER_LEVEL_AGGREGATES"
 MAXIMUM_STATISTIC_BYTES = 4096
-SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v5"
+SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v6"
 QQQ_TICKER = "QQQ"
 PIT_LOOKBACK_CALENDAR_DAYS = 45
-MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO = Decimal("0.90")
+MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO = Decimal("0.95")
 MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL = Decimal("0.95")
 MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL = Decimal("1.05")
-MAXIMUM_FUNDAMENTAL_SNAPSHOT_AGE_SESSIONS = 1
 EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS = 1
+TARGET_WEIGHT_BASIS = (
+    "pit_qqq_reported_positive_holdings_weights_resolved_renormalized"
+)
+COVERAGE_PATH_SCHEMA = "arv2-order-level-pit-coverage-path-v2"
+TARGET_WEIGHT_MAP_SCHEMA = "arv2-order-level-pit-target-weight-map-v1"
+TARGET_WEIGHT_PATH_SCHEMA = "arv2-order-level-pit-target-weight-path-v1"
 IGNORED_ORDER_STATUSES = frozenset(
     {"New", "Submitted", "UpdateSubmitted", "CancelPending", "None"}
 )
@@ -178,7 +183,8 @@ def _profile(profile_id, start_session):
         "target_gross_exposure": _decimal_text(_tilt.TARGET_GROSS_EXPOSURE),
         "signal": "exact_unchanged_R055_primary_view_firm_specific",
         "score_source_view_id": _score.PRIMARY_SOURCE_VIEW_ID,
-        "portfolio": "QQQ_market_cap_benchmark_plus_frozen_sector_neutral_tilt",
+        "portfolio": "QQQ_PIT_holdings_weight_benchmark_plus_frozen_sector_neutral_tilt",
+        "target_weight_basis": TARGET_WEIGHT_BASIS,
         "price_normalization": "RAW",
         "resolution": "MINUTE",
         "benchmark_price_normalization": "TOTAL_RETURN",
@@ -192,17 +198,14 @@ def _profile(profile_id, start_session):
             _orders.MODELED_FEE_BPS_PER_SIDE
         ),
         "calendar_benchmark_observation": "SESSION_CLOSE_CONTEXT_ONLY",
-        "minimum_cap_covered_constituent_weight_ratio": _decimal_text(
-            MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO
+        "minimum_resolved_constituent_weight_ratio": _decimal_text(
+            MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
         ),
         "minimum_positive_constituent_weight_total": _decimal_text(
             MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
         ),
         "maximum_positive_constituent_weight_total": _decimal_text(
             MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
-        ),
-        "maximum_fundamental_snapshot_age_sessions": (
-            MAXIMUM_FUNDAMENTAL_SNAPSHOT_AGE_SESSIONS
         ),
         "exact_constituent_snapshot_age_sessions": (
             EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS
@@ -264,7 +267,6 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         profile_id,
         authority_benchmark_symbol,
         qqq_benchmark_symbol,
-        fundamental_universe,
         qqq_constituent_universe,
         minute_resolution,
         raw_normalization,
@@ -281,7 +283,6 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._profile = require_qqq_order_level_profile(profile_id)
         self._authority_benchmark_symbol = authority_benchmark_symbol
         self._qqq_benchmark_symbol = qqq_benchmark_symbol
-        self._fundamental_universe = fundamental_universe
         self._qqq_constituent_universe = qqq_constituent_universe
         self._minute_resolution = minute_resolution
         self._raw_normalization = raw_normalization
@@ -402,8 +403,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             )
         _orders.validate_backtest_initialize(live_mode=self._backtest_flag())
         if (
-            self._fundamental_universe is None
-            or self._qqq_constituent_universe is None
+            self._qqq_constituent_universe is None
             or self._authority_benchmark_symbol is None
             or self._qqq_benchmark_symbol is None
             or self._trade_bar_type is None
@@ -521,7 +521,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             accepted[sid] = symbol
         return [accepted[sid] for sid in sorted(accepted)]
 
-    def _history_inventory(self, universe, start, end, name, *, fundamental):
+    def _history_inventory(self, universe, start, end, name):
         try:
             history = self._algorithm.history(
                 universe, start, end, flatten=False
@@ -548,12 +548,8 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                     name + " history universe identity changed"
                 )
-            observed = (
-                _input.local_collection_time(raw_time, name + " collection")
-                if fundamental
-                else _input.constituent_collection_time(
-                    raw_time, name + " collection"
-                )
+            observed = _input.constituent_collection_time(
+                raw_time, name + " collection"
             )
             if not start <= observed < end:
                 continue
@@ -576,9 +572,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         key = max(prior)
         return key, inventory[key]
 
-    def _snapshot_age_sessions(
-        self, observed, decision_session, name, *, permit_non_session=False
-    ):
+    def _snapshot_age_sessions(self, observed, decision_session, name):
         if not isinstance(observed, datetime):
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 name + " collection time changed type"
@@ -590,22 +584,12 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 name + " collection is outside the authenticated session axis"
             ) from exc
-        observed_session = observed_date
-        if observed_session not in self._session_positions:
-            sessions = tuple(self._session_positions)
-            if (
-                permit_non_session is not True
-                or not sessions
-                or observed_date < sessions[0]
-                or observed_date > sessions[-1]
-            ):
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    name + " collection is outside the authenticated session axis"
-                )
-            observed_session = next(
-                session for session in sessions if session >= observed_date
-            )
-        observed_position = self._session_positions[observed_session]
+        try:
+            observed_position = self._session_positions[observed_date]
+        except KeyError as exc:
+            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                name + " collection is outside the authenticated session axis"
+            ) from exc
         age = decision_position - observed_position
         if age < 0:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
@@ -647,13 +631,11 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             )
         return result
 
-    def _covered_market_caps(
+    def _resolved_qqq_weights(
         self,
         session,
         constituent_weights,
-        caps_by_sid,
         *,
-        fundamental_age_sessions,
         constituent_age_sessions,
     ):
         if (
@@ -671,22 +653,22 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level PIT QQQ constituent weights are unavailable"
             )
-        security_by_sid = {
-            row["qc_security_id"]: row["security_id"]
-            for row in self._resolution.resolved
-        }
+        security_by_sid = {}
+        for row in self._resolution.resolved:
+            sid = row["qc_security_id"]
+            security_id = row["security_id"]
+            if sid in security_by_sid:
+                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                    "order-level PIT QQQ FIGI resolution duplicated a QC SID"
+                )
+            security_by_sid[sid] = security_id
         resolved_sids = set(constituent_weights) & set(security_by_sid)
-        covered_sids = resolved_sids & set(caps_by_sid)
         total_weight = sum(constituent_weights.values(), Decimal(0))
         resolved_weight = sum(
             (constituent_weights[sid] for sid in resolved_sids), Decimal(0)
         )
-        covered_weight = sum(
-            (constituent_weights[sid] for sid in covered_sids), Decimal(0)
-        )
         member_count = len(constituent_weights)
         resolved_count = len(resolved_sids)
-        covered_count = len(covered_sids)
         if total_weight <= 0:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level PIT QQQ constituent weights are unavailable"
@@ -700,109 +682,85 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 "order-level PIT QQQ positive constituent weight total is outside 0.95 to 1.05"
             )
         resolved_weight_ratio = resolved_weight / total_weight
-        covered_weight_ratio = covered_weight / total_weight
-        record = {
-            "session": session,
-            "positive_weight_member_count": member_count,
-            "resolved_positive_weight_member_count": resolved_count,
-            "cap_covered_positive_weight_member_count": covered_count,
-            "resolved_member_count_ratio": _decimal_text(
-                Decimal(resolved_count) / Decimal(member_count)
-            ),
-            "cap_covered_member_count_ratio": _decimal_text(
-                Decimal(covered_count) / Decimal(member_count)
-            ),
-            "resolved_constituent_weight_ratio": _decimal_text(
-                resolved_weight_ratio
-            ),
-            "cap_covered_constituent_weight_ratio": _decimal_text(
-                covered_weight_ratio
-            ),
-            "positive_constituent_weight_total": _decimal_text(total_weight),
-            "fundamental_snapshot_age_sessions": fundamental_age_sessions,
-            "constituent_snapshot_age_sessions": constituent_age_sessions,
-        }
-        if any(row["session"] == session for row in self._pit_coverage_records):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT coverage session is duplicated"
-            )
-        if (
-            covered_weight_ratio
-            < MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO
-        ):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ market-cap constituent-weight coverage is below 90 percent: "
-                + _decimal_text(covered_weight_ratio)
-            )
         result = {}
-        for sid in sorted(covered_sids):
+        for sid in sorted(resolved_sids):
             security_id = security_by_sid[sid]
             if security_id in result:
                 raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                     "order-level PIT QQQ FIGI resolution is not one-to-one"
                 )
-            result[security_id] = caps_by_sid[sid]
+            result[security_id] = constituent_weights[sid]
+        weight_map_sha256 = _sha(
+            {
+                "schema": TARGET_WEIGHT_MAP_SCHEMA,
+                "positive_weights_by_qc_sid": {
+                    sid: _decimal_text(constituent_weights[sid])
+                    for sid in sorted(constituent_weights)
+                },
+                "resolved_weights_by_security_id": {
+                    security_id: _decimal_text(result[security_id])
+                    for security_id in sorted(result)
+                },
+            }
+        )
+        record = {
+            "session": session,
+            "positive_weight_member_count": member_count,
+            "resolved_positive_weight_member_count": resolved_count,
+            "resolved_member_count_ratio": _decimal_text(
+                Decimal(resolved_count) / Decimal(member_count)
+            ),
+            "resolved_constituent_weight_ratio": _decimal_text(
+                resolved_weight_ratio
+            ),
+            "positive_constituent_weight_total": _decimal_text(total_weight),
+            "constituent_snapshot_age_sessions": constituent_age_sessions,
+            "pit_constituent_weight_map_sha256": weight_map_sha256,
+        }
+        if any(row["session"] == session for row in self._pit_coverage_records):
+            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                "order-level PIT coverage session is duplicated"
+            )
+        if resolved_weight_ratio < MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO:
+            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                "order-level PIT QQQ resolved constituent-weight coverage is below 95 percent: "
+                + _decimal_text(resolved_weight_ratio)
+            )
         if not result:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ market-cap coverage is empty"
+                "order-level PIT QQQ resolved constituent-weight coverage is empty"
             )
         self._pit_coverage_records.append(record)
         return result
 
-    def _pit_market_caps(self, session):
+    def _pit_benchmark_measures(self, session):
         decision = datetime.strptime(session, "%Y-%m-%d")
         start = decision - timedelta(days=PIT_LOOKBACK_CALENDAR_DAYS)
         end = decision + timedelta(days=1)
-        fundamentals = self._history_inventory(
-            self._fundamental_universe,
-            start,
-            end,
-            "order-level PIT fundamentals",
-            fundamental=True,
-        )
         constituents = self._history_inventory(
             self._qqq_constituent_universe,
             start,
             end,
             "order-level PIT QQQ constituents",
-            fundamental=False,
-        )
-        fundamental_time, fundamental_rows = self._latest(
-            fundamentals,
-            decision.replace(hour=9, minute=30),
-            "order-level PIT fundamentals",
         )
         constituent_time, constituent_rows = self._latest(
             constituents,
             decision,
             "order-level PIT QQQ constituents",
         )
-        fundamental_age = self._snapshot_age_sessions(
-            fundamental_time,
-            session,
-            "order-level PIT fundamentals",
-            permit_non_session=True,
-        )
         constituent_age = self._snapshot_age_sessions(
             constituent_time, session, "order-level PIT QQQ constituents"
         )
-        if fundamental_age > MAXIMUM_FUNDAMENTAL_SNAPSHOT_AGE_SESSIONS:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT fundamental snapshot exceeds one authenticated session"
-            )
         if constituent_age != EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level PIT QQQ constituent snapshot is not the immediately prior authenticated session"
             )
-        caps_by_sid = _input.positive_market_caps(fundamental_rows)
         constituent_weights = self._positive_constituent_weights(
             constituent_rows
         )
-        return self._covered_market_caps(
+        return self._resolved_qqq_weights(
             session,
             constituent_weights,
-            caps_by_sid,
-            fundamental_age_sessions=fundamental_age,
             constituent_age_sessions=constituent_age,
         )
 
@@ -962,23 +920,25 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         snapshot = self._score_runtime.score(
             self._session_positions[session]
         )
-        market_caps = self._pit_market_caps(session)
+        benchmark_measures = self._pit_benchmark_measures(session)
         scores = {
             security_id: score
             for security_id, score in (
                 snapshot.primary_view_firm_specific_scores.items()
             )
-            if security_id in market_caps
+            if security_id in benchmark_measures
         }
         try:
             sectors = _tilt.sector_map_from_memberships(
-                market_caps,
+                benchmark_measures,
                 snapshot.memberships,
                 scores,
             )
         except _tilt.BoundedBenchmarkTiltError as exc:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(str(exc)) from exc
-        tilt = _tilt.build_benchmark_tilt(market_caps, scores, sectors)
+        tilt = _tilt.build_benchmark_tilt(
+            benchmark_measures, scores, sectors
+        )
         if tilt.status == _tilt.TILT_ENABLED:
             self._tilt_enabled_count += 1
         elif tilt.status == _tilt.TILT_UNDERFILLED:
@@ -1303,9 +1263,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         )
         coverage_decimal_fields = (
             "resolved_member_count_ratio",
-            "cap_covered_member_count_ratio",
             "resolved_constituent_weight_ratio",
-            "cap_covered_constituent_weight_ratio",
             "positive_constituent_weight_total",
         )
         coverage_values = {
@@ -1317,11 +1275,11 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         coverage_count_fields = (
             "positive_weight_member_count",
             "resolved_positive_weight_member_count",
-            "cap_covered_positive_weight_member_count",
         )
         return {
             "schema": SUMMARY_SCHEMA,
             "score_source_view_id": _score.PRIMARY_SOURCE_VIEW_ID,
+            "target_weight_basis": TARGET_WEIGHT_BASIS,
             "decision_count": self._decision_count,
             "completed_rebalance_count": len(self._lifecycle_records),
             "submitted_order_count": self._submitted_order_count,
@@ -1400,14 +1358,10 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "maximum_allowed_positive_constituent_weight_total": (
                 _decimal_text(MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL)
             ),
-            "minimum_required_cap_covered_constituent_weight_ratio": (
+            "minimum_required_resolved_constituent_weight_ratio": (
                 _decimal_text(
-                    MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO
+                    MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
                 )
-            ),
-            "maximum_fundamental_snapshot_age_sessions": max(
-                row["fundamental_snapshot_age_sessions"]
-                for row in self._pit_coverage_records
             ),
             "maximum_constituent_snapshot_age_sessions": max(
                 row["constituent_snapshot_age_sessions"]
@@ -1415,8 +1369,22 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             ),
             "pit_coverage_path_sha256": _sha(
                 {
-                    "schema": "arv2-order-level-pit-coverage-path-v1",
+                    "schema": COVERAGE_PATH_SCHEMA,
                     "records": self._pit_coverage_records,
+                }
+            ),
+            "pit_target_weight_path_sha256": _sha(
+                {
+                    "schema": TARGET_WEIGHT_PATH_SCHEMA,
+                    "records": [
+                        {
+                            "session": row["session"],
+                            "pit_constituent_weight_map_sha256": (
+                                row["pit_constituent_weight_map_sha256"]
+                            ),
+                        }
+                        for row in self._pit_coverage_records
+                    ],
                 }
             ),
             "starting_equity": _decimal_text(STARTING_CASH),
@@ -1564,7 +1532,7 @@ __all__ = (
     "AcceptedRiskQqqOrderLevelQcRuntimeError",
     "DECISION_CUTOFF_SESSION",
     "FINAL_EXECUTION_SESSION",
-    "MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO",
+    "MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO",
     "MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL",
     "MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL",
     "META_STATISTIC_NAME",

@@ -381,7 +381,11 @@ IDENTITIES. SECTION 116 CLOSES R-123 AS A ZERO-CELL 95%-COVERAGE REFUSAL,
 SUPERSEDES R-124 UNLAUNCHED, AND VERSIONS A 90%-FLOOR DIAGNOSTIC WITH AN EXACT
 RATIO ON REFUSAL. FRESH ORDER RUNS R-125/R-126 ARE NEXT; THE SIX-UNIVERSE
 PAIR MOVES TO R-127/R-128. SECTION 117 FREEZES THE EXACT R-125/R-126 PHYSICAL
-IDENTITIES. ONLY BACKTEST-SIMULATED
+IDENTITIES. SECTION 118 CLOSES R-125 AS A ZERO-CELL MEASURED 85.9214%
+CAP-COVERAGE REFUSAL AND SUPERSEDES R-126 UNLAUNCHED. A SEPARATE
+ETF-HOLDINGS-WEIGHT CONSTRUCTION IS IN DEVELOPMENT; IT IS NOT A RETRY OF THE
+MARKET-CAP EXPERIMENT. SECTION 119 IMPLEMENTS ITS V4/V6 BACKTEST-ONLY
+CANDIDATE. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1272,6 +1276,21 @@ Section 117 commits the exact R-125/R-126 physical identities and accounting
 before either launch. The owner explicitly waives an additional Claude review
 of section 117 before these same-round QC actions. R-125 is next and R-126 is
 strictly contingent on R-125's authenticated aggregate cell.
+
+Section 118 closes R-125 as a measured zero-cell cap-coverage refusal and
+supersedes R-126 unlaunched. The owner explicitly waives an additional Claude
+review of section 118 before the separately versioned ETF-holdings-weight
+candidate is developed in this same round. Commit and test that candidate,
+then preregister a fresh one-use look from its committed source; do not
+reduce the market-cap admission floor again. This is a new economic
+construction, not a technical retry or continuation of R-125's result.
+
+Section 119 implements the separate V4/V6 ETF-weight order candidate. The
+owner explicitly waives an additional Claude review of section 119 before
+this same-round backtesting. The exact next step is to commit the reviewed
+source and tests, derive and preregister R-127/R-128 from that committed tree,
+then launch R-127 once. R-128 requires R-127's authenticated aggregate cell;
+no 90%-market-cap-floor retry is authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18830,3 +18849,97 @@ remain unpreregistered until both order cells authenticate. No raw result,
 provider/security row, log, order, fill, chart, holding, price, return,
 paper/live deployment, broker, funded account, real order, or trading access
 is authorized.
+
+## 118. R-125 measured cap-coverage refusal and separate ETF-weight experiment, 2026-09-18
+
+R-125 created private project `36715111` and backtest
+`322314199b7a45edb3c95a8dbda05f95`, then reached authenticated `Runtime
+Error` on its first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-8f75c54c8ef367cb15c2370f`, SHA-256
+`8f75c54c8ef367cb15c2370fcf01e0113e793ece2db8e873834ae29a55ac98e0`,
+contains no statistic. No aggregate read or result-read authority exists. A
+bounded diagnostic selected only status and error/stack fields, not a raw
+provider/security row, statistic, chart, order, fill, holding, price, or
+return. The exact refusal was `order-level PIT QQQ market-cap constituent-weight
+coverage is below 90 percent: 0.8592140785921407859214078592` on
+2026-01-02. This is **85.9214% of the reported positive weight**, not a
+strategy return and not evidence for or against analyst revisions.
+
+R-125 spends **89 -> 90 shared looks / 32 -> 33 ARV2 development evaluations**
+and adds zero cells, leaving **607 cells / 27 infrastructure looks**. R-126
+created no project/backtest and is superseded unlaunched and unspent. The
+market-cap QQQ proxy is stopped: its observed cap join is materially below
+the already exploratory 90% floor. No further blind floor reduction is
+planned.
+
+A separately versioned candidate may instead use **the ETF's own point-in-
+time constituent weights** as positive benchmark measures. It must retain
+the authenticated prior-session source, exact FIGI/QC-SID mapping, a measured
+and enforced resolved-weight ratio, the bounded sector-neutral analyst-
+revision tilt, and a digest of the actual holdings-weight path. It is a new
+economic construction rather than a retry of R-125 or the owner's ordinary
+market-cap proposal. Because the admitted FIGI map is still based on a
+current-snapshot identity authority, any result remains preliminary and
+cannot be described as exact QQQ replication or live-ready. The code/tests
+and physical identities will be recorded only after they are complete and
+committed. Fresh order run numbers are R-127/R-128; the never-preregistered
+six-universe pair moves to R-129/R-130. No deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.
+
+## 119. Separate V4/V6 QQQ PIT holdings-weight order candidate, 2026-09-18
+
+The new profile IDs end in `cutoff-v4`, schema
+`arv2-qqq-order-level-tilt-profile-v4`; the aggregate schema is
+`arv2-qqq-order-level-tilt-summary-v6`. Profile SHA-256s for 2025 and 2026
+are respectively
+`43ea09abd2b6eb9aef23cfb05ec7cb0c19c50451fb41ac78c3aeeac8bd60e518`
+and `190637eb9145c4b3a9e844cb42eb84d24bb5b318afc56957f98bf9d413d8a3b6`.
+The projected QC algorithm no longer constructs a fundamental universe or
+calls fundamental history. One strictly prior QQQ ETF constituent-history
+collection per decision supplies reported positive weights. Daily Series
+EndTime is normalized to the source session and required to be the
+immediately prior authenticated trading session. Positive reported weight
+total remains within 0.95--1.05; exact QC SID to admitted FIGI security ID
+resolution must cover at least **95% of reported positive weight**, with an
+exact scalar ratio on refusal. At the 0.95 reported-total lower bound this
+permits **90.25% absolute resolved notional**. It remains a preliminary
+proxy, not pristine QQQ membership or live-ready evidence.
+
+Resolved PIT ETF weights are the benchmark measure passed to the existing
+bounded sector-neutral R-055 analyst-revision tilt; the 98% gross target,
+weekly after-close scoring, next-session whole-share market-on-open simulated
+orders, exact engine-fee/model comparison, and execution-matched QQQ hurdle
+remain. This is an economic construction change from cap-weighted R-125,
+not a technical rerun or an outcome-selected winner. The aggregate explicitly
+labels `pit_qqq_reported_positive_holdings_weights_resolved_renormalized` as
+its target-weight basis. A per-decision hash of the full positive and resolved
+weight maps enters the versioned coverage path, and a distinct aggregate
+target-weight-path digest binds the sequence without exposing raw weights or
+identifiers. The result parser rejects obsolete cap/fundamental fields and
+requires the exact V6 inventory, 95% floor, one PIT history call per decision,
+the basis label, both path digests, and the prior execution invariants.
+
+An isolated behavioral test proves 80/20 PIT ETF weights yield a 78.4%/19.6%
+98%-gross core, rather than an opposite cap-like weighting. A distinct
+same-day 20/80 collection is excluded when a prior 80/20 collection exists;
+same-day-only refuses. In-memory weakening of strict `< cutoff` to `<=`
+turned both PIT tests red and was restored. The combined order package/core/
+runtime/projection/submission selection passed **265 tests**, active-document
+and lane-record checks passed **95**, compilation and `git diff --check` were
+clean. Both projections are 266,271 total source bytes, and the largest file
+is 62,209/64,000 bytes. Independent read-only audit found no remaining P0--P3
+commit blocker.
+
+| ID | P | Disposition |
+|---|---:|---|
+| `ARV2D119-001` | P2 | **Corrected before commit.** The first V4 PIT test supplied only a prior collection, so the strict-prior guard was not isolated. Distinct prior, same-day and future snapshots plus same-day-only refusal now turn the `<`→`<=` mutant red. |
+| `ARV2D119-002` | P3 | **Documented only.** Generic tilt-helper locals still use `market_caps` for positive benchmark measures. The V4 caller and profile use truthful ETF-weight labels, and a behavioral test pins the result; renaming the shared helper would broaden scope and invalidate other lineages. |
+
+R-127/R-128 need new committed physical projections, one-use plans and
+separately signed execution/result-read authorities. Starting accounting is
+**90 shared looks, 33 ARV2 development evaluations, 27 infrastructure looks,
+and 607 cells**. R-127 may add one cell only on an authenticated aggregate;
+R-128 is strictly contingent on that cell. R-129/R-130 six-universe runs are
+not preregistered. No provider data or QC outcome was read while constructing
+this candidate; no deployment, broker, paper/live, funded-account, real-order,
+or trading authority follows.

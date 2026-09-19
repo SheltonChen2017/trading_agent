@@ -134,7 +134,6 @@ def _runtime(algorithm=None, profile_id=runtime.PROFILE_2026_ID):
         profile_id=profile_id,
         authority_benchmark_symbol=_Symbol("SPY-SID", "SPY"),
         qqq_benchmark_symbol=_Symbol("QQQ-SID", "QQQ"),
-        fundamental_universe=SimpleNamespace(symbol=_Symbol("FUND-SID")),
         qqq_constituent_universe=SimpleNamespace(symbol=_Symbol("QQQU-SID")),
         minute_resolution="Minute",
         raw_normalization="Raw",
@@ -151,14 +150,11 @@ def _coverage_record(session="2026-01-02"):
         "session": session,
         "positive_weight_member_count": 100,
         "resolved_positive_weight_member_count": 100,
-        "cap_covered_positive_weight_member_count": 99,
         "resolved_member_count_ratio": "1",
-        "cap_covered_member_count_ratio": "0.99",
         "resolved_constituent_weight_ratio": "1",
-        "cap_covered_constituent_weight_ratio": "0.995",
         "positive_constituent_weight_total": "1",
-        "fundamental_snapshot_age_sessions": 0,
         "constituent_snapshot_age_sessions": 1,
+        "pit_constituent_weight_map_sha256": "f" * 64,
     }
 
 
@@ -193,8 +189,8 @@ def _outcome(function, *args):
 
 def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
     assert runtime.PROFILE_IDS == (
-        "arv2-qqq-order-level-tilt-2025-cutoff-v3",
-        "arv2-qqq-order-level-tilt-2026-cutoff-v3",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v4",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v4",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -202,10 +198,10 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
     }
     expected_digests = {
         runtime.PROFILE_2025_ID: (
-            "564aa98ce9b78fa582a1ca586f03c8a78fee927da6e8b167e55512908209a79d"
+            "43ea09abd2b6eb9aef23cfb05ec7cb0c19c50451fb41ac78c3aeeac8bd60e518"
         ),
         runtime.PROFILE_2026_ID: (
-            "6348a47e0fd8806dc5222b98f9ff7923e357adc46ae7c0a6a92e4efed1643158"
+            "190637eb9145c4b3a9e844cb42eb84d24bb5b318afc56957f98bf9d413d8a3b6"
         ),
     }
     for profile_id in runtime.PROFILE_IDS:
@@ -224,12 +220,10 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         assert profile["calendar_benchmark_observation"] == (
             "SESSION_CLOSE_CONTEXT_ONLY"
         )
-        assert profile[
-            "minimum_cap_covered_constituent_weight_ratio"
-        ] == "0.9"
+        assert profile["minimum_resolved_constituent_weight_ratio"] == "0.95"
+        assert profile["target_weight_basis"] == runtime.TARGET_WEIGHT_BASIS
         assert profile["minimum_positive_constituent_weight_total"] == "0.95"
         assert profile["maximum_positive_constituent_weight_total"] == "1.05"
-        assert profile["maximum_fundamental_snapshot_age_sessions"] == 1
         assert profile["exact_constituent_snapshot_age_sessions"] == 1
         assert profile["constituent_source_session_rule"] == (
             "QC_daily_Series_collection_EndTime_minus_one_calendar_day"
@@ -358,8 +352,8 @@ def test_aggregate_binds_execution_matched_and_calendar_qqq_paths():
             **_coverage_record(sessions[1]),
             "resolved_positive_weight_member_count": 99,
             "resolved_member_count_ratio": "0.99",
-            "cap_covered_constituent_weight_ratio": "0.99",
-            "fundamental_snapshot_age_sessions": 1,
+            "resolved_constituent_weight_ratio": "0.99",
+            "pit_constituent_weight_map_sha256": "e" * 64,
         },
     ]
     value._strategy_equity_observations = {
@@ -433,17 +427,26 @@ def test_aggregate_binds_execution_matched_and_calendar_qqq_paths():
     assert result["run_valid"] is True
     assert result["coverage_decision_count"] == 2
     assert result["positive_weight_member_count_sum"] == 200
-    assert result[
-        "mean_cap_covered_constituent_weight_ratio"
-    ] == "0.9925"
+    assert result["target_weight_basis"] == runtime.TARGET_WEIGHT_BASIS
+    assert result["mean_resolved_constituent_weight_ratio"] == "0.995"
     assert result["mean_positive_constituent_weight_total"] == "1"
     assert result["minimum_positive_constituent_weight_total"] == "1"
     assert result["maximum_positive_constituent_weight_total"] == "1"
-    assert result[
-        "minimum_cap_covered_constituent_weight_ratio"
-    ] == "0.99"
-    assert result["maximum_fundamental_snapshot_age_sessions"] == 1
+    assert result["minimum_resolved_constituent_weight_ratio"] == "0.99"
     assert result["maximum_constituent_snapshot_age_sessions"] == 1
+    assert len(result["pit_coverage_path_sha256"]) == 64
+    assert len(result["pit_target_weight_path_sha256"]) == 64
+    original_path_digest = result["pit_target_weight_path_sha256"]
+    value._pit_coverage_records[1]["pit_constituent_weight_map_sha256"] = (
+        "d" * 64
+    )
+    changed_weight_path = value._aggregate_record()
+    assert changed_weight_path["pit_target_weight_path_sha256"] != (
+        original_path_digest
+    )
+    value._pit_coverage_records[1]["pit_constituent_weight_map_sha256"] = (
+        "e" * 64
+    )
     assert len(runtime._canonical(result)) <= runtime.MAXIMUM_STATISTIC_BYTES
 
     value._lifecycle_records[0] = {
@@ -671,10 +674,10 @@ def test_unscored_unmapped_qqq_member_remains_at_exact_benchmark_weight(monkeypa
             sector_by_security_id={"a": "sector", "b": "sector"},
         )
     )
-    value._pit_market_caps = lambda _session: {
-        "a": Decimal("10"),
-        "b": Decimal("20"),
-        "unscored": Decimal("30"),
+    value._pit_benchmark_measures = lambda _session: {
+        "a": Decimal("0.10"),
+        "b": Decimal("0.20"),
+        "unscored": Decimal("0.30"),
     }
     value._positive_price = (
         lambda _security_id, _session: Decimal("100")
@@ -696,6 +699,7 @@ def test_unscored_unmapped_qqq_member_remains_at_exact_benchmark_weight(monkeypa
         tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
     )
     assert "unscored" in result.selected_weights
+    assert result.benchmark_weights["unscored"] == Decimal("0.49")
     assert result.selected_weights["unscored"] == result.benchmark_weights["unscored"]
 
 
@@ -719,9 +723,9 @@ def test_missing_price_skips_whole_rebalance_without_renormalizing_target(monkey
             sector_by_security_id={"a": "sector"},
         )
     )
-    value._pit_market_caps = lambda _session: {
-        "a": Decimal("10"),
-        "unpriced": Decimal("30"),
+    value._pit_benchmark_measures = lambda _session: {
+        "a": Decimal("0.10"),
+        "unpriced": Decimal("0.30"),
     }
     value._positive_price = lambda security_id, _session: (
         None if security_id == "unpriced" else Decimal("100")
@@ -737,7 +741,9 @@ def test_missing_price_skips_whole_rebalance_without_renormalizing_target(monkey
     monkeypatch.setattr(runtime._tilt, "build_benchmark_tilt", build)
     assert value.on_after_close() is True
 
-    assert captured["caps"] == {"a": Decimal("10"), "unpriced": Decimal("30")}
+    assert captured["caps"] == {
+        "a": Decimal("0.10"), "unpriced": Decimal("0.30")
+    }
     assert captured["result"].selected_weights["unpriced"] == (
         captured["result"].benchmark_weights["unpriced"]
     )
@@ -746,46 +752,40 @@ def test_missing_price_skips_whole_rebalance_without_renormalizing_target(monkey
     assert algorithm.orders == []
 
 
-def test_constituent_weight_coverage_keeps_90_percent_and_refuses_89_percent():
+def test_constituent_weight_resolution_keeps_95_percent_and_refuses_94_percent():
     a = _Symbol("A-SID", "A")
-    b = _Symbol("B-SID", "B")
     accepted = _runtime()
-    accepted._resolution = _Resolution({"a": a, "b": b})
-    result = accepted._covered_market_caps(
+    accepted._resolution = _Resolution({"a": a})
+    result = accepted._resolved_qqq_weights(
         "2026-01-02",
-        {"A-SID": Decimal("0.90"), "B-SID": Decimal("0.10")},
-        {"A-SID": Decimal("100")},
-        fundamental_age_sessions=0,
+        {"A-SID": Decimal("0.95"), "B-SID": Decimal("0.05")},
         constituent_age_sessions=1,
     )
-    assert result == {"a": Decimal("100")}
-    assert accepted._pit_coverage_records == [
+    assert result == {"a": Decimal("0.95")}
+    record = accepted._pit_coverage_records[0]
+    assert record["positive_weight_member_count"] == 2
+    assert record["resolved_positive_weight_member_count"] == 1
+    assert record["resolved_member_count_ratio"] == "0.5"
+    assert record["resolved_constituent_weight_ratio"] == "0.95"
+    assert record["positive_constituent_weight_total"] == "1"
+    assert record["constituent_snapshot_age_sessions"] == 1
+    assert record["pit_constituent_weight_map_sha256"] == runtime._sha(
         {
-            "session": "2026-01-02",
-            "positive_weight_member_count": 2,
-            "resolved_positive_weight_member_count": 2,
-            "cap_covered_positive_weight_member_count": 1,
-            "resolved_member_count_ratio": "1",
-            "cap_covered_member_count_ratio": "0.5",
-            "resolved_constituent_weight_ratio": "1",
-            "cap_covered_constituent_weight_ratio": "0.9",
-            "positive_constituent_weight_total": "1",
-            "fundamental_snapshot_age_sessions": 0,
-            "constituent_snapshot_age_sessions": 1,
+            "schema": runtime.TARGET_WEIGHT_MAP_SCHEMA,
+            "positive_weights_by_qc_sid": {"A-SID": "0.95", "B-SID": "0.05"},
+            "resolved_weights_by_security_id": {"a": "0.95"},
         }
-    ]
+    )
 
     refused = _runtime()
-    refused._resolution = _Resolution({"a": a, "b": b})
+    refused._resolution = _Resolution({"a": a})
     with pytest.raises(
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
-        match="constituent-weight coverage is below 90 percent: 0.89",
+        match="resolved constituent-weight coverage is below 95 percent: 0.94",
     ):
-        refused._covered_market_caps(
+        refused._resolved_qqq_weights(
             "2026-01-02",
-            {"A-SID": Decimal("0.89"), "B-SID": Decimal("0.11")},
-            {"A-SID": Decimal("100")},
-            fundamental_age_sessions=0,
+            {"A-SID": Decimal("0.94"), "B-SID": Decimal("0.06")},
             constituent_age_sessions=1,
         )
     assert refused._pit_coverage_records == []
@@ -796,11 +796,9 @@ def test_constituent_weight_coverage_keeps_90_percent_and_refuses_89_percent():
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
         match="positive constituent weight total is outside 0.95 to 1.05",
     ):
-        truncated._covered_market_caps(
+        truncated._resolved_qqq_weights(
             "2026-01-02",
             {"A-SID": Decimal("0.10")},
-            {"A-SID": Decimal("100")},
-            fundamental_age_sessions=0,
             constituent_age_sessions=1,
         )
     assert truncated._pit_coverage_records == []
@@ -811,16 +809,141 @@ def test_positive_constituent_weight_total_accepts_exact_boundaries(total_weight
     a = _Symbol("A-SID", "A")
     value = _runtime()
     value._resolution = _Resolution({"a": a})
-    assert value._covered_market_caps(
+    assert value._resolved_qqq_weights(
         "2026-01-02",
         {"A-SID": total_weight},
-        {"A-SID": Decimal("100")},
-        fundamental_age_sessions=1,
         constituent_age_sessions=1,
-    ) == {"a": Decimal("100")}
+    ) == {"a": total_weight}
     assert value._pit_coverage_records[0][
         "positive_constituent_weight_total"
     ] == str(total_weight)
+
+
+def test_pit_weight_map_digest_binds_weights_without_emitting_raw_rows():
+    a = _Symbol("A-SID", "A")
+    b = _Symbol("B-SID", "B")
+    first = _runtime()
+    first._resolution = _Resolution({"a": a, "b": b})
+    second = _runtime()
+    second._resolution = _Resolution({"a": a, "b": b})
+    first_measures = first._resolved_qqq_weights(
+        "2026-01-02",
+        {"A-SID": Decimal("0.80"), "B-SID": Decimal("0.20")},
+        constituent_age_sessions=1,
+    )
+    second_measures = second._resolved_qqq_weights(
+        "2026-01-02",
+        {"A-SID": Decimal("0.20"), "B-SID": Decimal("0.80")},
+        constituent_age_sessions=1,
+    )
+    assert first_measures == {"a": Decimal("0.80"), "b": Decimal("0.20")}
+    assert second_measures == {"a": Decimal("0.20"), "b": Decimal("0.80")}
+    assert first._pit_coverage_records[0][
+        "pit_constituent_weight_map_sha256"
+    ] != second._pit_coverage_records[0]["pit_constituent_weight_map_sha256"]
+    assert "A-SID" not in json.dumps(first._pit_coverage_records)
+    assert "0.80" not in json.dumps(first._pit_coverage_records)
+
+
+def test_order_tilt_base_uses_pit_holdings_weights_not_opposite_cap_like_values(
+    monkeypatch,
+):
+    algorithm = _Algorithm("2026-01-05")
+    a = _Symbol("A-SID", "A")
+    b = _Symbol("B-SID", "B")
+    value = _runtime(algorithm)
+    value._initialized = True
+    value._decision_set = frozenset({"2026-01-05"})
+    value._session_positions = {"2026-01-02": 0, "2026-01-05": 1}
+    value._resolution = _Resolution({"a": a, "b": b})
+    value._score_runtime = SimpleNamespace(
+        score=lambda _position: SimpleNamespace(
+            memberships=tuple(
+                evaluator.SecurityMembership(
+                    security_id, 0, 2, "sector", Decimal(1), security_id * 64
+                )
+                for security_id in ("a", "b")
+            ),
+            primary_view_firm_specific_scores={
+                "a": Decimal("1"),
+                "b": Decimal("-1"),
+            },
+        )
+    )
+    constituents = {
+        datetime.fromisoformat("2026-01-02T00:00:00"): (
+            SimpleNamespace(symbol=a, weight=Decimal("0.80")),
+            SimpleNamespace(symbol=b, weight=Decimal("0.20")),
+        )
+    }
+    history_universes = []
+
+    def history(universe, *_args):
+        history_universes.append(universe)
+        return constituents
+
+    value._history_inventory = history
+    value._build_plan = lambda *_args: None
+    captured = {}
+    original = tilt.build_benchmark_tilt
+
+    def build(measures, scores, sectors):
+        captured["measures"] = dict(measures)
+        captured["tilt"] = original(measures, scores, sectors)
+        return captured["tilt"]
+
+    monkeypatch.setattr(runtime._tilt, "build_benchmark_tilt", build)
+    assert value.on_after_close() is True
+    assert history_universes == [value._qqq_constituent_universe]
+    assert captured["measures"] == {
+        "a": Decimal("0.80"), "b": Decimal("0.20")
+    }
+    assert captured["tilt"].benchmark_weights == {
+        "a": Decimal("0.784"), "b": Decimal("0.196")
+    }
+    # A cap-like 20/80 value pair would invert these weights; no such input
+    # is fetched or admitted into the order runtime's target construction.
+    assert captured["tilt"].benchmark_weights["a"] != Decimal("0.196")
+
+
+def test_pit_weight_resolution_refuses_non_unique_security_identity():
+    value = _runtime()
+    value._resolution = SimpleNamespace(
+        resolved=(
+            {"qc_security_id": "A-SID", "security_id": "same"},
+            {"qc_security_id": "B-SID", "security_id": "same"},
+        )
+    )
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="FIGI resolution is not one-to-one",
+    ):
+        value._resolved_qqq_weights(
+            "2026-01-02",
+            {"A-SID": Decimal("0.50"), "B-SID": Decimal("0.50")},
+            constituent_age_sessions=1,
+        )
+    assert value._pit_coverage_records == []
+
+
+def test_pit_weight_resolution_refuses_duplicate_qc_sid_binding():
+    value = _runtime()
+    value._resolution = SimpleNamespace(
+        resolved=(
+            {"qc_security_id": "A-SID", "security_id": "a"},
+            {"qc_security_id": "A-SID", "security_id": "b"},
+        )
+    )
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="FIGI resolution duplicated a QC SID",
+    ):
+        value._resolved_qqq_weights(
+            "2026-01-02",
+            {"A-SID": Decimal("1")},
+            constituent_age_sessions=1,
+        )
+    assert value._pit_coverage_records == []
 
 
 def test_pit_snapshots_use_authenticated_session_age_across_weekend():
@@ -832,11 +955,6 @@ def test_pit_snapshots_use_authenticated_session_age_across_weekend():
         "2026-01-02": 1,
         "2026-01-05": 2,
     }
-    fundamentals = {
-        datetime.fromisoformat("2026-01-02T08:00:00"): (
-            SimpleNamespace(symbol=a, market_cap=Decimal("100")),
-        )
-    }
     # QC daily universe data for Friday is keyed by its Saturday EndTime.
     constituents = {
         input_runtime.constituent_collection_time(
@@ -846,53 +964,99 @@ def test_pit_snapshots_use_authenticated_session_age_across_weekend():
             SimpleNamespace(symbol=a, weight=Decimal("1")),
         )
     }
-    value._history_inventory = lambda *_args, fundamental, **_kwargs: (
-        fundamentals if fundamental else constituents
-    )
+    value._history_inventory = lambda *_args: constituents
 
-    assert value._pit_market_caps("2026-01-05") == {
-        "a": Decimal("100")
+    assert value._pit_benchmark_measures("2026-01-05") == {
+        "a": Decimal("1")
     }
-    assert value._pit_coverage_records[0][
-        "fundamental_snapshot_age_sessions"
-    ] == 1
     assert value._pit_coverage_records[0][
         "constituent_snapshot_age_sessions"
     ] == 1
 
 
-def test_first_decision_maps_holiday_fundamental_collection_to_next_session():
+def test_first_decision_uses_exact_prior_session_qqq_holdings_only():
     a = _Symbol("A-SID", "A")
-    value = _runtime(_Algorithm("2026-01-02"))
-    value._resolution = _Resolution({"a": a})
+    b = _Symbol("B-SID", "B")
+    algorithm = _Algorithm("2026-01-02")
+    value = _runtime(algorithm)
+    value._resolution = _Resolution({"a": a, "b": b})
     value._session_positions = {
         "2025-12-30": 0,
         "2025-12-31": 1,
         "2026-01-02": 2,
     }
-    fundamentals = {
-        datetime.fromisoformat("2026-01-01T08:00:00"): (
-            SimpleNamespace(symbol=a, market_cap=Decimal("100")),
-        )
-    }
-    constituents = {
-        datetime.fromisoformat("2025-12-31T00:00:00"): (
-            SimpleNamespace(symbol=a, weight=Decimal("1")),
-        )
-    }
-    value._history_inventory = lambda *_args, fundamental, **_kwargs: (
-        fundamentals if fundamental else constituents
+    universe = value._qqq_constituent_universe
+    # QC Series keys are EndTime: Jan 1 represents the Dec 31 source
+    # session, while Jan 3 represents the Jan 2 decision session itself.
+    prior = (
+        SimpleNamespace(symbol=a, weight=Decimal("0.80")),
+        SimpleNamespace(symbol=b, weight=Decimal("0.20")),
     )
-
-    assert value._pit_market_caps("2026-01-02") == {
-        "a": Decimal("100")
+    same_day = (
+        SimpleNamespace(symbol=a, weight=Decimal("0.20")),
+        SimpleNamespace(symbol=b, weight=Decimal("0.80")),
+    )
+    history = {
+        (universe.symbol, datetime.fromisoformat("2026-01-01T00:00:00")): prior,
+        (universe.symbol, datetime.fromisoformat("2026-01-03T00:00:00")): (
+            same_day
+        ),
+        (universe.symbol, datetime.fromisoformat("2026-01-06T00:00:00")): (
+            same_day
+        ),
     }
-    assert value._pit_coverage_records[0][
-        "fundamental_snapshot_age_sessions"
-    ] == 0
+    calls = []
+
+    def load_history(requested_universe, *_args, **_kwargs):
+        calls.append(requested_universe)
+        return history
+
+    algorithm.history = load_history
+
+    assert value._pit_benchmark_measures("2026-01-02") == {
+        "a": Decimal("0.80"),
+        "b": Decimal("0.20"),
+    }
+    assert calls == [universe]
+    assert value._pit_history_call_count == 1
     assert value._pit_coverage_records[0][
         "constituent_snapshot_age_sessions"
     ] == 1
+
+    # The same-day EndTime-normalized snapshot cannot start a first decision.
+    no_prior = _runtime(_Algorithm("2026-01-02"))
+    no_prior._resolution = _Resolution({"a": a, "b": b})
+    no_prior._session_positions = dict(value._session_positions)
+    same_day_only = {
+        (no_prior._qqq_constituent_universe.symbol,
+         datetime.fromisoformat("2026-01-03T00:00:00")): same_day,
+    }
+    no_prior._algorithm.history = lambda *_args, **_kwargs: same_day_only
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="has no strictly prior collection",
+    ):
+        no_prior._pit_benchmark_measures("2026-01-02")
+    assert no_prior._pit_coverage_records == []
+
+
+def test_latest_collection_excludes_same_day_even_when_it_is_newer():
+    prior = datetime.fromisoformat("2025-12-31T00:00:00")
+    same_day = datetime.fromisoformat("2026-01-02T00:00:00")
+    cutoff = same_day
+    inventory = {prior: "prior-80-20", same_day: "same-day-20-80"}
+    assert runtime.AcceptedRiskQqqOrderLevelQcRuntime._latest(
+        inventory, cutoff, "order-level PIT QQQ constituents"
+    ) == (prior, "prior-80-20")
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="has no strictly prior collection",
+    ):
+        runtime.AcceptedRiskQqqOrderLevelQcRuntime._latest(
+            {same_day: "same-day-20-80"},
+            cutoff,
+            "order-level PIT QQQ constituents",
+        )
 
 
 def test_non_session_constituent_source_date_still_refuses():
@@ -903,28 +1067,21 @@ def test_non_session_constituent_source_date_still_refuses():
         "2025-12-31": 0,
         "2026-01-02": 1,
     }
-    fundamentals = {
-        datetime.fromisoformat("2026-01-01T08:00:00"): (
-            SimpleNamespace(symbol=a, market_cap=Decimal("100")),
-        )
-    }
     constituents = {
         datetime.fromisoformat("2026-01-01T00:00:00"): (
             SimpleNamespace(symbol=a, weight=Decimal("1")),
         )
     }
-    value._history_inventory = lambda *_args, fundamental, **_kwargs: (
-        fundamentals if fundamental else constituents
-    )
+    value._history_inventory = lambda *_args: constituents
 
     with pytest.raises(
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
         match="constituents collection is outside the authenticated session axis",
     ):
-        value._pit_market_caps("2026-01-02")
+        value._pit_benchmark_measures("2026-01-02")
 
 
-def test_non_session_fundamental_mapping_refuses_outside_or_after_axis():
+def test_non_session_constituent_mapping_refuses_outside_or_after_axis():
     value = _runtime(_Algorithm("2026-01-02"))
     value._session_positions = {
         "2025-12-31": 0,
@@ -938,18 +1095,25 @@ def test_non_session_fundamental_mapping_refuses_outside_or_after_axis():
         value._snapshot_age_sessions(
             datetime.fromisoformat("2025-12-30T08:00:00"),
             "2026-01-02",
-            "order-level PIT fundamentals",
-            permit_non_session=True,
+            "order-level PIT QQQ constituents",
+        )
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="outside the authenticated session axis",
+    ):
+        value._snapshot_age_sessions(
+            datetime.fromisoformat("2026-01-03T08:00:00"),
+            "2026-01-02",
+            "order-level PIT QQQ constituents",
         )
     with pytest.raises(
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
         match="collection is after its decision session",
     ):
         value._snapshot_age_sessions(
-            datetime.fromisoformat("2026-01-03T08:00:00"),
+            datetime.fromisoformat("2026-01-05T00:00:00"),
             "2026-01-02",
-            "order-level PIT fundamentals",
-            permit_non_session=True,
+            "order-level PIT QQQ constituents",
         )
 
 
@@ -962,28 +1126,21 @@ def test_pit_snapshots_refuse_more_than_exact_authenticated_session_age():
         "2026-01-02": 1,
         "2026-01-05": 2,
     }
-    fundamentals = {
-        datetime.fromisoformat("2026-01-02T08:00:00"): (
-            SimpleNamespace(symbol=a, market_cap=Decimal("100")),
-        )
-    }
     stale_constituents = {
         datetime.fromisoformat("2025-12-31T00:00:00"): (
             SimpleNamespace(symbol=a, weight=Decimal("1")),
         )
     }
-    value._history_inventory = lambda *_args, fundamental, **_kwargs: (
-        fundamentals if fundamental else stale_constituents
-    )
+    value._history_inventory = lambda *_args: stale_constituents
 
     with pytest.raises(
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
         match="not the immediately prior authenticated session",
     ):
-        value._pit_market_caps("2026-01-05")
+        value._pit_benchmark_measures("2026-01-05")
 
 
-def test_pit_fundamental_snapshot_refuses_more_than_one_authenticated_session():
+def test_unresolved_reported_holdings_are_not_silently_renormalized_before_gate():
     a = _Symbol("A-SID", "A")
     value = _runtime(_Algorithm("2026-01-05"))
     value._resolution = _Resolution({"a": a})
@@ -992,25 +1149,19 @@ def test_pit_fundamental_snapshot_refuses_more_than_one_authenticated_session():
         "2026-01-02": 1,
         "2026-01-05": 2,
     }
-    stale_fundamentals = {
-        datetime.fromisoformat("2025-12-31T08:00:00"): (
-            SimpleNamespace(symbol=a, market_cap=Decimal("100")),
-        )
-    }
     constituents = {
         datetime.fromisoformat("2026-01-02T00:00:00"): (
-            SimpleNamespace(symbol=a, weight=Decimal("1")),
+            SimpleNamespace(symbol=a, weight=Decimal("0.949")),
+            SimpleNamespace(symbol=_Symbol("B-SID"), weight=Decimal("0.051")),
         )
     }
-    value._history_inventory = lambda *_args, fundamental, **_kwargs: (
-        stale_fundamentals if fundamental else constituents
-    )
+    value._history_inventory = lambda *_args: constituents
 
     with pytest.raises(
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
-        match="fundamental snapshot exceeds one authenticated session",
+        match="resolved constituent-weight coverage is below 95 percent: 0.949",
     ):
-        value._pit_market_caps("2026-01-05")
+        value._pit_benchmark_measures("2026-01-05")
 
 
 @pytest.mark.parametrize("last_data", ("stale", "missing"))

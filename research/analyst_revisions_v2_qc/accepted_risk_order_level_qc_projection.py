@@ -588,7 +588,6 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
         ).symbol
         self.set_benchmark(qqq_benchmark)
-        fundamental_universe = self.AddUniverse(lambda fundamentals: [])
         qqq_constituent_universe = self.add_universe(
             self.universe.etf(
                 qqq_benchmark,
@@ -604,7 +603,6 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             profile_id={profile['profile_id']!r},
             authority_benchmark_symbol=authority_benchmark,
             qqq_benchmark_symbol=qqq_benchmark,
-            fundamental_universe=fundamental_universe,
             qqq_constituent_universe=qqq_constituent_universe,
             minute_resolution=Resolution.MINUTE,
             raw_normalization=DataNormalizationMode.RAW,

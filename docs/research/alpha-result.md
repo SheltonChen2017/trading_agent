@@ -3058,3 +3058,44 @@ Starting accounting is **89 shared looks, 32 ARV2 development evaluations,
 and an authenticated aggregate to 608 cells. Only then may R-126 launch,
 moving to **91 / 34**, with an authenticated aggregate to 609 cells. A
 technical failure adds no cell and requires a fresh successor.
+
+## R-125 — 90%-coverage QQQ simulated-order diagnostic (TERMINAL MEASURED COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-125 created private project `36715111` and backtest
+`322314199b7a45edb3c95a8dbda05f95`, then reached `Runtime Error` on the
+first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-8f75c54c8ef367cb15c2370f`, SHA-256
+`8f75c54c8ef367cb15c2370fcf01e0113e793ece2db8e873834ae29a55ac98e0`,
+contains no statistic. A bounded diagnostic selected only status/error/stack;
+no provider/security row, statistic, chart, order, fill, holding, price, or
+return was read. The first 2026-01-02 decision refused because exact cap-
+covered QQQ reported weight was **0.8592140785921407859214078592**, below
+the frozen 90% floor. No simulated order or economic output occurred. This
+measures missing cap-join coverage, not signal performance.
+
+R-125 spends **89 -> 90 shared looks / 32 -> 33 development evaluations**,
+adds zero cells, and leaves **607 cells / 27 infrastructure looks**. R-126
+created no project/backtest and is superseded unlaunched/unspent. The cap-
+weighted proxy will not lower its floor again blindly. A separate,
+prospectively versioned ETF-holdings-weight core plus bounded revision tilt
+would be a new economic construction with its own look/accounting; any such
+result remains preliminary because of current-snapshot FIGI identity and
+reported-weight coverage. Fresh order numbers R-127/R-128, six-universe
+numbers R-129/R-130, remain unpreregistered.
+
+## Separate V4 QQQ PIT ETF-weight order candidate (IMPLEMENTED; NOT YET PREREGISTERED OR RUN) — 2026-09-18
+
+R-125's 85.9214% cap-join coverage stopped the market-cap QQQ proxy; no
+further cap-floor reduction follows. V4 is a different economic construction:
+the QQQ ETF's own strictly prior, point-in-time positive constituent weights
+form the 98%-gross benchmark core, with the same bounded sector-neutral
+analyst-revision tilt. It omits the fundamental market-cap history call and
+requires at least 95% FIGI-resolved weight out of the reported positive
+total, which itself may be 95% of notional. Its minimum absolute resolved
+notional is therefore 90.25%, with uncovered weight excluded and the rest
+renormalized. This is preliminary accepted-risk evidence, not a pristine QQQ
+or live-ready result. A per-decision full-weight-map digest and a distinct
+aggregate path digest bind future data-vintage comparisons. The V4 profile
+and V6 aggregate schemas, strict-prior and 95%-coverage tests, and exact
+parser guard are implemented; no V4 outcome exists yet. Fresh R-127/R-128
+one-use physical identities must be committed before any QC action.

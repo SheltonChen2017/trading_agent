@@ -380,7 +380,8 @@ COVERAGE SUCCESSOR. SECTION 115 FREEZES THE EXACT R-123/R-124 PHYSICAL
 IDENTITIES. SECTION 116 CLOSES R-123 AS A ZERO-CELL 95%-COVERAGE REFUSAL,
 SUPERSEDES R-124 UNLAUNCHED, AND VERSIONS A 90%-FLOOR DIAGNOSTIC WITH AN EXACT
 RATIO ON REFUSAL. FRESH ORDER RUNS R-125/R-126 ARE NEXT; THE SIX-UNIVERSE
-PAIR MOVES TO R-127/R-128. ONLY BACKTEST-SIMULATED
+PAIR MOVES TO R-127/R-128. SECTION 117 FREEZES THE EXACT R-125/R-126 PHYSICAL
+IDENTITIES. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1266,6 +1267,11 @@ R-125/R-126 identities; R-126 remains contingent on R-125's authenticated
 aggregate. The six-universe runs move to R-127/R-128. If the new 90% floor
 still refuses, its bounded error will state the exact achieved ratio rather
 than prompting another blind percentage change.
+
+Section 117 commits the exact R-125/R-126 physical identities and accounting
+before either launch. The owner explicitly waives an additional Claude review
+of section 117 before these same-round QC actions. R-125 is next and R-126 is
+strictly contingent on R-125's authenticated aggregate cell.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18786,3 +18792,41 @@ and `6348a47e0fd8806dc5222b98f9ff7923e357adc46ae7c0a6a92e4efed1643158`.
 Fresh order successors take R-125/R-126; the never-preregistered six-universe
 pair moves to R-127/R-128. No paper/live deployment, funded account, broker,
 real order, or trading authority follows.
+
+## 117. Prospective physical freeze for R-125 and R-126, 2026-09-18
+
+The V3/V5 order source was committed at `91a5240` before either identity was
+derived. No QC action or outcome read occurred during derivation. Starting
+accounting remains **89 shared looks, 32 ARV2 development evaluations, 27
+infrastructure looks, and 607 cells**. The immutable package SHA-256 /
+lineage SHA-256 remain
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Both projections have ten files and 267,637 source bytes. The six-entry
+upload-inventory SHA-256 remains
+`50ece4910fab01c6c04c10c0b979fa62856ec53b684dbc955fb48ad020b5f741`;
+the two-statistic inventory SHA-256 remains
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256; source inventory SHA-256 | Plan ID / SHA-256; unsigned execution authority ID / SHA-256 |
+|---|---|---|---|---|
+| R-125 | `arv2-qqq-order-level-tilt-2026-cutoff-v3` / `6348a47e0fd8806dc5222b98f9ff7923e357adc46ae7c0a6a92e4efed1643158` | `73 ARV2_QQQ_ORDER_R125_2026_YTD - 20260918` / `ARV2 R125 QQQ order-level 2026 YTD 7803b84f` | `arv2-order-level-qc-projection-46d6e1789a7269ed0c4e9ac6` / `46d6e1789a7269ed0c4e9ac6ba4d7399ddff6e64f8e6a2cf39e0b111c7ab713c`; `19579eada5b8322af74f996436df0b79919d489613144c9e69689b7f019aa2ae` | `arv2-order-level-plan-ddc6f0d070e8ad4f8d8e3934` / `ddc6f0d070e8ad4f8d8e3934e253984a7263ee252732214eedf99846d5ea75f3`; `arv2-order-level-execution-authority-3ed7651579b06a4080dfe967` / `3ed7651579b06a4080dfe967c04768677aa9c91f30053299b5871c7a12280b85` |
+| R-126 | `arv2-qqq-order-level-tilt-2025-cutoff-v3` / `564aa98ce9b78fa582a1ca586f03c8a78fee927da6e8b167e55512908209a79d` | `74 ARV2_QQQ_ORDER_R126_2025_NOW - 20260918` / `ARV2 R126 QQQ order-level 2025-now 7803b84f` | `arv2-order-level-qc-projection-0c4b83ecb7761954f922448f` / `0c4b83ecb7761954f922448f0c5a464ca4bb2e72bf7cbbd57b72a57f75d18628`; `ca19a8a6c5f9d5613250dc6578fdf2dffa8865071eacbc8fc2a4525219a352f2` | `arv2-order-level-plan-ea5c4a9c6d5e2863bfaf6806` / `ea5c4a9c6d5e2863bfaf6806d9bdfd6de68edd7dae92ec5d470b1f5e763912b1`; `arv2-order-level-execution-authority-79cc0c486b3b0bdf2ff59f86` / `79cc0c486b3b0bdf2ff59f86cd9cf7cbe060fb9b2909e2fc654a34d02bca2e22` |
+
+R-125 covers 2026-01-02 through the final 2026-09-17 execution/mark with
+39 decisions, 178 observations, and 177 return intervals. R-126 covers
+2025-01-02 through 2026-09-17 with 91 decisions, 428 observations, and 427
+intervals. Both preserve the section-111 economic, cost, one-use,
+simulated-order, and separately signed aggregate-read semantics, subject to
+the section-116 V3 coverage caveat. Neither run has a preselected return sign
+or winner.
+
+R-125 launch spends **89 -> 90 looks / 32 -> 33 evaluations**. Only an
+authenticated aggregate adds **607 -> 608 cells**. R-126 may launch only after
+that cell, then spends **90 -> 91 / 33 -> 34**; its authenticated aggregate
+adds **608 -> 609 cells**. Infrastructure looks remain 27. A technical
+failure adds no cell and invalidates R-126's fixed accounting. R-127/R-128
+remain unpreregistered until both order cells authenticate. No raw result,
+provider/security row, log, order, fill, chart, holding, price, return,
+paper/live deployment, broker, funded account, real order, or trading access
+is authorized.

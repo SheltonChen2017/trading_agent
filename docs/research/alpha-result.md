@@ -3032,3 +3032,29 @@ notional, so absolute covered weight may be as low as **85.5%**. This is a
 preliminary diagnostic, not a formal or live-ready coverage claim.
 Fresh R-125/R-126 order runs require committed identities and accounting; the
 unpreregistered six-universe pair moves to R-127/R-128.
+
+## R-125 and R-126 — 90%-coverage QQQ simulated-order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+The V3/V5 order source was committed at `91a5240` before physical derivation.
+Common immutable package SHA-256:
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+expected two-statistic inventory SHA-256:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-125 | `6348a47e0fd8806dc5222b98f9ff7923e357adc46ae7c0a6a92e4efed1643158` | `73 ARV2_QQQ_ORDER_R125_2026_YTD - 20260918` / `ARV2 R125 QQQ order-level 2026 YTD 7803b84f` | `46d6e1789a7269ed0c4e9ac6ba4d7399ddff6e64f8e6a2cf39e0b111c7ab713c`; `19579eada5b8322af74f996436df0b79919d489613144c9e69689b7f019aa2ae` | `ddc6f0d070e8ad4f8d8e3934e253984a7263ee252732214eedf99846d5ea75f3`; `3ed7651579b06a4080dfe967c04768677aa9c91f30053299b5871c7a12280b85` |
+| R-126 | `564aa98ce9b78fa582a1ca586f03c8a78fee927da6e8b167e55512908209a79d` | `74 ARV2_QQQ_ORDER_R126_2025_NOW - 20260918` / `ARV2 R126 QQQ order-level 2025-now 7803b84f` | `0c4b83ecb7761954f922448f0c5a464ca4bb2e72bf7cbbd57b72a57f75d18628`; `ca19a8a6c5f9d5613250dc6578fdf2dffa8865071eacbc8fc2a4525219a352f2` | `ea5c4a9c6d5e2863bfaf6806d9bdfd6de68edd7dae92ec5d470b1f5e763912b1`; `79cc0c486b3b0bdf2ff59f86cd9cf7cbe060fb9b2909e2fc654a34d02bca2e22` |
+
+R-125 covers 2026-01-02 through 2026-09-17. R-126 covers 2025-01-02
+through 2026-09-17 and is strictly sequential. The frozen 90% floor is of
+reported positive constituent weight, so absolute covered notional can be
+85.5%; this is an exploratory QQQ holdings proxy, not pristine QQQ. Exact
+coverage and path digest remain aggregate fields; a sub-90% refusal now
+includes the exact ratio. No result sign or winner was selected.
+
+Starting accounting is **89 shared looks, 32 ARV2 development evaluations,
+27 infrastructure looks, and 607 cells**. R-125 launch moves to **90 / 33**
+and an authenticated aggregate to 608 cells. Only then may R-126 launch,
+moving to **91 / 34**, with an authenticated aggregate to 609 cells. A
+technical failure adds no cell and requires a fresh successor.

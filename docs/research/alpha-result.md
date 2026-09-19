@@ -2857,3 +2857,42 @@ outputs preserve those conservative exceptions rather than hiding them.
 R-117 and R-118 close accounting at **86 shared looks, 29 ARV2 development
 evaluations, 27 infrastructure looks, and 607 cells**. No deployment, broker,
 paper/live, funded-account, or trading authority follows.
+
+## R-119 and R-120 — QQQ bounded-tilt simulated order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+No external action or outcome access occurred before this entry. Both physical
+identities were reconstructed from committed implementation `9dc044a`. Common
+delta package ID / SHA-256 / lineage SHA-256:
+`arv2-preliminary-qc-package-7803b84f0841f9685a4951de` /
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Expected aggregate-statistic inventory SHA-256 / count:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`
+/ 2.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256; source SHA-256 | Plan ID / SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-119 | `arv2-qqq-order-level-tilt-2026-cutoff-v1` / `f2418eafc7777a6a814d8c73fd4563f5e552aa3c9cc1f2fa8b1cd98a338c5a7f` | `67 ARV2_QQQ_ORDER_R119_2026_YTD - 20260918` / `ARV2 R119 QQQ order-level 2026 YTD 7803b84f` | `arv2-order-level-qc-projection-6774b3c7f8394a68e46c86e2` / `6774b3c7f8394a68e46c86e207a5e74f533f981b09d3dfd6ee0562bb72d6d024`; `c4cb758f4943df06dd2284276d59a3049b7ca3663c866fc52b1d0834e2fe39e4` | `arv2-order-level-plan-b0e00b70cb866c4a858b2eef` / `b0e00b70cb866c4a858b2eefb901f5d25b327e81cd80904e89dac1a3229e7287`; `6d3b5922fcd5074550fbeb4fe869d08882bc640ef621ef4e72b8aba9a92a79f9` |
+| R-120 | `arv2-qqq-order-level-tilt-2025-cutoff-v1` / `8a2d1ffbcf2fc6bd7a85931f390e58e77feac1bf26b9b840ba9cd727439df2b1` | `68 ARV2_QQQ_ORDER_R120_2025_NOW - 20260918` / `ARV2 R120 QQQ order-level 2025-now 7803b84f` | `arv2-order-level-qc-projection-ba032031df5c1e611961253f` / `ba032031df5c1e611961253f6c98a5250e1306a04f0b321938732c4fee2e6336`; `b4f84254bc609372145d58418450cfa3b93981e8df3a18bc08a3fff9d9284707` | `arv2-order-level-plan-344657ab3d9d871868405d91` / `344657ab3d9d871868405d9143ca9e23989e2dac120c3f08afb67b13aff6bcbc`; `99058ce096accd2ffcc60876686bf67df5088220e363b419cfde90427392b88b` |
+
+R-119 freezes 2026-01-02 through 2026-09-17, with first simulated
+market-on-open execution on 2026-01-05, 39 weekly decisions, 178 observations,
+and 177 return intervals. R-120 freezes 2025-01-02 through 2026-09-17, with
+first execution on 2025-01-03, 91 decisions, 428 observations, and 427
+intervals. Both stop new decisions on 2026-09-16. The selected account is the
+QQQ point-in-time holdings proxy plus the unchanged bounded sector-neutral
+R-055 tilt; its primary hurdle is an execution-matched 98%-QQQ / 2%-cash
+account entering at the same first open. Both use RAW prices, whole-share
+market-on-open simulation, exact QC fees, zero slippage, and the frozen
+10-basis-point-per-side modeled-cost check. No expected sign or winner was
+selected.
+
+R-119 launch moves accounting **86 -> 87 shared looks / 29 -> 30 development
+evaluations**, and an authenticated aggregate adds one cell **607 -> 608**.
+R-120 is sequential and, only on that authenticated baseline, moves **87 ->
+88 / 30 -> 31 / 608 -> 609**. Infrastructure looks remain 27. A technical
+failure still spends its look/evaluation and adds no cell; missing R-119 cell
+requires a fresh successor accounting entry before R-120. No raw provider or
+security row, raw order/fill, holding, price, return, log, chart, standard
+statistic, deployment, broker, paper/live, funded-account, or real-trading
+access is authorized.

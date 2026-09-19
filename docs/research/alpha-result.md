@@ -3285,3 +3285,27 @@ authenticated-first-cell contingency and fixed starting accounting did not
 hold. A fresh numbered, preregistered source/plan must isolate the status
 boundary before any further QC execution. This terminal refusal is not an
 analyst-signal return estimate.
+
+## R-133 and R-134 — V7 numeric-status preopen QQQ order diagnostics (PREREGISTERED; UNLAUNCHED) — 2026-09-18
+
+The new source/tests at `99f4fe5` version only the exact QC order-status
+normalization. It keeps the previous point-in-time QQQ-weight stock core,
+neutral overlapping QQQ ETF residual, 80% identity-weight floor, bounded
+analyst-revision tilt, 98% gross, and 10-bps-per-side modeled fee. The
+unchanged input package is SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`.
+The exact private identities are frozen in lane-record section 129:
+
+| Run | Private project / backtest | Profile SHA-256 | Projection SHA-256; plan SHA-256 |
+|---|---|---|---|
+| R-133, 2026 YTD | `81 ARV2_QQQ_NUMERIC_ORDER_R133_2026_YTD - 20260918` / `ARV2 R133 QQQ numeric order 2026 YTD 7803b84f` | `a2429a1f19645f6aa937d73108f6660b52e2aab2230e39cb68a2e180b58bf826` | `8f9cacbef0ef4698096cc7e22c8bd4a2991878a3d42387db3d015d8952e41f50`; `7e08bcd5881e38b643333ec4be89a0bbfdd8086fae79ef37240c69401c4224d0` |
+| R-134, 2025-now contingent | `82 ARV2_QQQ_NUMERIC_ORDER_R134_2025_NOW - 20260918` / `ARV2 R134 QQQ numeric order 2025-now 7803b84f` | `48bb918df24a01507e0e8d79fc1a340f02215bb847ebc37a3cd8ac440dfa2f8c` | `fac8c6f47c0e4495ecdfe5a450e507bbd353a45906a982037a236ed8e4d26a5f`; `ebfef7a6b4f72ec66fdf5fb4ecc3a84544f9cadf296afc5f5b55df7a9ddaafae` |
+
+Each projected source has ten files and 283,576 bytes. Starting count is
+**93 shared looks, 36 development evaluations, 27 infrastructure looks,
+607 cells**. A single R-133 launch spends **93 -> 94 / 36 -> 37** and adds
+a cell only upon a separately authorized, authenticated aggregate read.
+R-134 can spend **94 -> 95 / 37 -> 38** only after an authenticated usable
+R-133 result (`run_valid` true); a technical or execution-invalid R-133
+ends the pair with R-134 unspent. Neither run has a preselected return or
+leverage decision. No QC action has yet occurred under these identities.

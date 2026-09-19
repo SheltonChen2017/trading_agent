@@ -1357,10 +1357,11 @@ it is superseded unlaunched. The owner changed recurring validation timing:
 use focused checks during implementation/QC diagnosis, then run the complete
 Analyst V2 lane suite once on the final settled tree before the single push.
 Section 128 prospectively versions the QC status boundary, preserving the
-V4--V6 profiles and their spent plans. Claude will review section 128 with
-this round's final single pushed snapshot. The next QC action requires an
-exact, prospectively recorded R-133 physical plan derived from the committed
-V7 source; neither R-131 nor R-132 may be retried.
+V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
+physical plan from committed V7 source. Claude will review section 129 with
+this round's final single pushed snapshot. The next authorized QC action is
+one signed R-133 launch after its physical record is committed; neither
+R-131 nor R-132 may be retried.
 No order-level return or paper/live, funded, deployment, broker, or trading
 authority exists yet.
 
@@ -19416,3 +19417,40 @@ may be preregistered at the same time but stays contingent on R-133's
 authenticated usable aggregate cell. No outcome is preselected. Neither
 six-universe nor leveraged tests are opened by this correction; no
 paper/live, deployment, broker, funded account, or trading authority follows.
+
+## 129. R-133/R-134 exact V7 physical plan preregistration, 2026-09-18
+
+V7 source/tests were committed at `99f4fe5` before either private physical
+derivation. The immutable delta-package SHA-256 remains
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+the expected two-statistic inventory SHA-256 remains
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+Each projected QC source has exactly ten files, 283,576 bytes in total
+(4,424 below the prospectively fixed 288,000-byte cap); the largest file
+is 63,979 bytes (21 below its 64,000-byte cap). These tight margins are
+disclosed, not silently raised. The two distinct control directories are
+0700; their locally reloaded/authenticated plans and unsigned authority
+candidates are 0600. No QC operation has occurred under these identities.
+
+| Run | Exact profile SHA-256 | Private project / backtest | Projection SHA-256; source-inventory SHA-256 | Plan SHA-256; unsigned execution-authority SHA-256 |
+|---|---|---|---|---|
+| R-133 (2026 YTD) | `a2429a1f19645f6aa937d73108f6660b52e2aab2230e39cb68a2e180b58bf826` | `81 ARV2_QQQ_NUMERIC_ORDER_R133_2026_YTD - 20260918` / `ARV2 R133 QQQ numeric order 2026 YTD 7803b84f` | `8f9cacbef0ef4698096cc7e22c8bd4a2991878a3d42387db3d015d8952e41f50`; `8535b702c4919019144eb0372e80a2b3817807d43fe1f2eb5c1a26bc5ebcf577` | `7e08bcd5881e38b643333ec4be89a0bbfdd8086fae79ef37240c69401c4224d0`; `8d0586a8470a63eb6f311ebfa86992cb90c485b288005e120fa43e6295829adc` |
+| R-134 (contingent 2025-now) | `48bb918df24a01507e0e8d79fc1a340f02215bb847ebc37a3cd8ac440dfa2f8c` | `82 ARV2_QQQ_NUMERIC_ORDER_R134_2025_NOW - 20260918` / `ARV2 R134 QQQ numeric order 2025-now 7803b84f` | `fac8c6f47c0e4495ecdfe5a450e507bbd353a45906a982037a236ed8e4d26a5f`; `dc5889678eed56b78d4d2de840ef6daccfad4913b1a19701de142aafbc943e24` | `ebfef7a6b4f72ec66fdf5fb4ecc3a84544f9cadf296afc5f5b55df7a9ddaafae`; `2091ad6b8916006c1eb2032ae0ec904a43be08ae3b8bff2395ec60e7318bb52f` |
+
+R-133 retains the 2026-01-02 decision start and 2026-09-17 final
+execution/mark (39 decisions, 178 observations, 177 return intervals);
+R-134 starts its decisions 2025-01-02 and shares the final session (91
+decisions, 428 observations, 427 return intervals). The status codec,
+not signal, weights, fee, coverage floor, or result field inventory, is
+the prospective difference from R-131. Neither sign nor favorable window
+is selected. Starting accounting is **93 shared looks, 36 ARV2 development
+evaluations, 27 infrastructure looks, 607 cells**. One R-133 launch spends
+**93 -> 94 / 36 -> 37**, and only its separately authenticated aggregate
+adds **607 -> 608 cells**. R-134 may launch only after R-133 produces an
+authenticated, usable order-level aggregate (`run_valid` true, no fee
+mismatch); it then spends **94 -> 95 / 37 -> 38** and adds at most one cell.
+Technical refusal or invalid execution leaves R-134 unlaunched/unspent and
+requires a distinct next plan. Terminal inspection excludes statistics;
+the two aggregate custom statistics need a separate result-read signature.
+No raw provider/security rows, orders/fills/logs/charts, deployment,
+paper/live, funded, broker, or trading action is authorized.

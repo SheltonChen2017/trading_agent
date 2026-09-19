@@ -2976,3 +2976,30 @@ market caps renormalize to 98% gross, so the result remains an accepted-risk
 QQQ proxy rather than pristine QQQ replication. Fresh
 R-123/R-124 order runs require committed identities and accounting. The
 unpreregistered six-universe pair moves to R-125/R-126.
+
+## R-123 and R-124 — versioned 95%-coverage QQQ simulated-order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+The V2-profile / V4-summary source was committed at `70b8e65` before physical
+identity derivation. Both runs use immutable package SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`
+and expected two-statistic inventory SHA-256
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-123 | `e79316b50d9a53f04418d971357278bca2dd5db43eea33e28da25cda785163dc` | `71 ARV2_QQQ_ORDER_R123_2026_YTD - 20260918` / `ARV2 R123 QQQ order-level 2026 YTD 7803b84f` | `5b131125e51007be32e2bd4d6adf52fe8ed277bcb07dd2cfdc7f2386cfb92b92`; `80aca057fcdfc3e0a5167cb311a29afd5895698708227da8c0f876f0950a8035` | `88bddb88428a50e221bfa527899fb7386256b4c33fef77d29252928bc4b42067`; `bed1fedd6eb1b61790bd6554b53b20c818b5b817df9f896748b6f58a848e4ea6` |
+| R-124 | `6d4b7c4fe50ca93a32fcdd113a3fcba607897f0e83e00c073f0fc0c9198826e8` | `72 ARV2_QQQ_ORDER_R124_2025_NOW - 20260918` / `ARV2 R124 QQQ order-level 2025-now 7803b84f` | `cf307d99646612ab3c443aac04a8ff610a2a331aa705359e7ac63110e2b16b00`; `f3ba0611d11b00f9c48dd5bf6dc0f698e2a179c11095d2f8d02daa117dfaa3a6` | `2e7906f9a17b1ad1f815574116c983af112df3597269efa10fabe68dd2a23a00`; `a7550739c93ecf4c742ddf12a242922098fefeab4f85118a80f438b6504db120` |
+
+R-123 covers 2026-01-02 through 2026-09-17. R-124 covers 2025-01-02
+through 2026-09-17 and is strictly sequential. The frozen 95%-coverage rule
+excludes uncovered names, discloses exact missing weight and path digest, and
+renormalizes covered market caps to 98% gross; these are accepted-risk QQQ
+proxies rather than pristine QQQ replication. No expected sign or winner was
+selected.
+
+Starting accounting is **88 shared looks, 31 ARV2 development evaluations, 27
+infrastructure looks, and 607 cells**. R-123 launch moves to **89 / 32** and an
+authenticated aggregate to 608 cells. Only then may R-124 launch, moving to
+**90 / 33**, with its aggregate moving to 609 cells. A technical failure adds
+no cell and requires a fresh successor. No raw result, order/fill, or
+paper/live/trading access is authorized.

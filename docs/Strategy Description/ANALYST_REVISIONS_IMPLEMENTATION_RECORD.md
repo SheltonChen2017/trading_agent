@@ -377,7 +377,8 @@ IN BOTH NEW RUNTIMES. SECTION 113 FREEZES THE FRESH R-121/R-122 ORDER
 SUCCESSORS. SECTION 114 CLOSES R-121 AS A ZERO-CELL 99%-COVERAGE REFUSAL,
 SUPERSEDES R-122 UNLAUNCHED AND UNSPENT, AND VERSIONS A PROSPECTIVE 95%
 COVERAGE SUCCESSOR. FRESH ORDER RUNS R-123/R-124 ARE NEXT; THE SIX-UNIVERSE
-PAIR MOVES TO R-125/R-126. ONLY BACKTEST-SIMULATED
+PAIR MOVES TO R-125/R-126. SECTION 115 FREEZES THE EXACT R-123/R-124 PHYSICAL
+IDENTITIES; R-123 IS NEXT AND R-124 IS STRICTLY SEQUENTIAL. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1248,6 +1249,13 @@ R-123/R-124 order identities, then launch them sequentially. The unpreregistered
 six-universe pair moves to R-125/R-126 and remains contingent on two
 authenticated order-run cells. No paper/live deployment, funded account,
 broker credential, or real trading action is authorized.
+
+Section 115 commits the exact R-123/R-124 physical projections, plans, private
+project/backtest names, one-use execution-authority candidates, and accounting
+before either successor is launched; the owner explicitly waives an additional
+Claude review of section 115 before this same-round backtesting. R-123 is next.
+R-124 may launch only after R-123 reaches `Completed.` and its one aggregate
+cell authenticates.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18681,3 +18689,43 @@ order successors take R-123/R-124; the never-preregistered six-universe pair
 moves to R-125/R-126. All require fresh committed physical identities. No
 deployment, broker, paper/live, funded-account, real-order, or trading
 authority follows.
+
+## 115. Prospective physical freeze for R-123 and R-124, 2026-09-18
+
+The versioned 95%-coverage successor was committed at `70b8e65` before these
+identities were derived. No QC action or outcome access occurred during
+derivation. Starting accounting remains **88 shared looks, 31 ARV2 development
+evaluations, 27 infrastructure looks, and 607 cells**. The common immutable
+package ID / SHA-256 / lineage SHA-256 remain
+`arv2-preliminary-qc-package-7803b84f0841f9685a4951de` /
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Both projections contain ten files and 267,581 bytes. The six-entry upload
+inventory SHA-256 remains
+`50ece4910fab01c6c04c10c0b979fa62856ec53b684dbc955fb48ad020b5f741`;
+the exact two-statistic inventory SHA-256 remains
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256; source inventory SHA-256 | Plan ID / SHA-256; unsigned execution authority ID / SHA-256 |
+|---|---|---|---|---|
+| R-123 | `arv2-qqq-order-level-tilt-2026-cutoff-v2` / `e79316b50d9a53f04418d971357278bca2dd5db43eea33e28da25cda785163dc` | `71 ARV2_QQQ_ORDER_R123_2026_YTD - 20260918` / `ARV2 R123 QQQ order-level 2026 YTD 7803b84f` | `arv2-order-level-qc-projection-5b131125e51007be32e2bd4d` / `5b131125e51007be32e2bd4d6adf52fe8ed277bcb07dd2cfdc7f2386cfb92b92`; `80aca057fcdfc3e0a5167cb311a29afd5895698708227da8c0f876f0950a8035` | `arv2-order-level-plan-88bddb88428a50e221bfa527` / `88bddb88428a50e221bfa527899fb7386256b4c33fef77d29252928bc4b42067`; `arv2-order-level-execution-authority-bed1fedd6eb1b61790bd6554` / `bed1fedd6eb1b61790bd6554b53b20c818b5b817df9f896748b6f58a848e4ea6` |
+| R-124 | `arv2-qqq-order-level-tilt-2025-cutoff-v2` / `6d4b7c4fe50ca93a32fcdd113a3fcba607897f0e83e00c073f0fc0c9198826e8` | `72 ARV2_QQQ_ORDER_R124_2025_NOW - 20260918` / `ARV2 R124 QQQ order-level 2025-now 7803b84f` | `arv2-order-level-qc-projection-cf307d99646612ab3c443aac` / `cf307d99646612ab3c443aac04a8ff610a2a331aa705359e7ac63110e2b16b00`; `f3ba0611d11b00f9c48dd5bf6dc0f698e2a179c11095d2f8d02daa117dfaa3a6` | `arv2-order-level-plan-2e7906f9a17b1ad1f8155741` / `2e7906f9a17b1ad1f815574116c983af112df3597269efa10fabe68dd2a23a00`; `arv2-order-level-execution-authority-a7550739c93ecf4c742ddf12` / `a7550739c93ecf4c742ddf12a242922098fefeab4f85118a80f438b6504db120` |
+
+R-123 retains 39 decisions, 178 observations, and 177 return intervals from
+2026-01-02 through the final 2026-09-17 execution/mark. R-124 retains 91
+decisions, 428 observations, and 427 intervals from 2025-01-02 through
+2026-09-17. Both retain the section-111 economic and simulated whole-share
+market-on-open execution rules, the section-114 95%-coverage proxy disclosure,
+10-basis-point modeled-cost verification, one-use submission, and separately
+signed aggregate-result read.
+
+R-123 launch spends **88 -> 89 looks / 31 -> 32 evaluations**; only an
+authenticated aggregate adds **607 -> 608 cells**. R-124 may launch only after
+that cell and then spends **89 -> 90 / 32 -> 33**; its authenticated aggregate
+adds **608 -> 609 cells**. Infrastructure looks remain 27. A technical failure
+spends the run/evaluation, adds no cell, and invalidates R-124's fixed starting
+accounting. R-125/R-126 remain unpreregistered until both order cells exist.
+
+No result sign or winner is expected. No raw provider/security row, raw order,
+fill, holding, price, return, log, chart, standard statistic, deployment,
+broker, paper/live, funded-account, real-order, or trading access is authorized.

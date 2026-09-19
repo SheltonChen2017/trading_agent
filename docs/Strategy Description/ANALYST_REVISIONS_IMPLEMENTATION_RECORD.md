@@ -1361,9 +1361,10 @@ V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
 physical plan from committed V7 source; section 130 records its zero-cell
 terminal refusal. Claude will review section 130 with this round's final
 single pushed snapshot. The owner explicitly waives Claude review of
-section 132 before this continuing QC correction round's R-135 diagnostic;
-the next QC action is to sign and launch only the exactly frozen physical
-R-135 plan from committed V8 source. R-131,
+section 133 before this continuing QC correction round's next diagnostic;
+section 132 froze R-135 and section 133 records its zero-cell technical
+refusal. The next action is a prospectively versioned, cash-only preopen
+state reconciliation with distinct source and physical plan. R-131,
 R-132, R-133 and R-134 may not be retried or silently launched.
 Claude's independent review follows the final single pushed snapshot, after
 focused interim and full final-tree checks.
@@ -19583,3 +19584,45 @@ First inspect only statistics-disabled terminal status; only `Completed.`
 allows a separate one-use signature/read of the exact two aggregate custom
 statistics. Raw provider/security rows, QC orders/fills/logs/charts, paper,
 live, deployment, broker, funded accounts, or real trading remain excluded.
+
+## 133. R-135 overnight-account technical refusal, 2026-09-18
+
+The exactly signed R-135 plan frozen at `1e6a4a6` launched once after one
+local **prelaunch** path error: a relative path was refused by the exact
+absolute-plan loader before a launch control or QC call was made. Its
+corrected absolute-path invocation did not change any source, candidate,
+signature, plan, or endpoint and created private QC project `36720078`,
+backtest `995f7d8ff103fe2a705c5b56ad6eecac`, and launch receipt SHA-256
+`6f860889d3e514b0e6c5d72950a6b4766be5011ca418683f88115e396cde2ced`.
+The first statistics-disabled status poll authenticated terminal `Runtime
+Error`, receipt SHA-256
+`24dbab553a0c120ba8fb98499052af8958b1d72bcc65c743c52a45669e1b208b`.
+One bounded exact-run `backtests/read` diagnosis selected only the run's
+status, error and stacktrace: at simulated `2026-02-10 09:20:00`, the
+preopen guard refused `order-level overnight account changed after the
+decision`. No aggregate, statistic, provider/security row, raw order, fill,
+unrestricted log, chart, account quantity/cash value, price, or return was
+selected or persisted. The direct V8 status comparison survived the first
+event, but this run still produced **no economic result**.
+
+The guard compares both cash and held whole-share quantities between the
+previous close and next-session preopen; the bounded error does **not** say
+which changed. [QC documents](https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/corporate-actions)
+that RAW-mode dividends credit cash, while splits can adjust holdings at
+midnight in backtests. That mechanism is plausible, not observed for this
+specific run. `ARV2D133-001` (P2) is the lane-specific operational defect:
+the frozen prior-close target may remain valid after a known-at-preopen
+cash-only change, but the current rule stops instead of rebuilding order
+quantities from the actual safe cash balance. Correct prospectively under
+a new profile with frozen prior-close weights/reference marks, unchanged
+whole-share holdings, no fresh score or future input, and named refusal
+for quantity drift; do not bypass the guard or replay R-135. An independent
+audit and focused regression must cover the new path before physical freeze.
+
+R-135 spends **94 -> 95 shared looks / 37 -> 38 ARV2 development
+evaluations** and adds **zero cells**, leaving **607 cells / 27
+infrastructure looks**. R-136 is superseded unlaunched/unspent because its
+first usable-cell contingency and fixed starting accounting failed.
+The next fresh 2026/2025 diagnostic pair needs distinct one-use plans
+and signatures. No signal verdict, leverage, six-universe, paper/live,
+broker, funded, or trading authority follows.

@@ -3358,3 +3358,27 @@ sign nor winner is selected, and no six-universe or leveraged run follows
 by inference. Statistics-disabled terminal inspection precedes any result
 read; raw QC orders, fills, logs, charts, provider/security rows, prices,
 and unrestricted outcomes remain outside this authority.
+
+## R-135 — V8 direct-enum 2026-YTD QQQ simulated-order diagnostic (OVERNIGHT-ACCOUNT TECHNICAL REFUSAL; ZERO CELLS) — 2026-09-18
+
+The exact source/plan at `6585d80` / `1e6a4a6` created private QC project
+`36720078`, backtest `995f7d8ff103fe2a705c5b56ad6eecac`, and launch
+receipt SHA-256
+`6f860889d3e514b0e6c5d72950a6b4766be5011ca418683f88115e396cde2ced`.
+The first statistics-disabled status poll authenticated `Runtime Error`,
+terminal receipt SHA-256
+`24dbab553a0c120ba8fb98499052af8958b1d72bcc65c743c52a45669e1b208b`.
+One bounded diagnostic selected only status/error/stacktrace for that run;
+at simulated `2026-02-10 09:20:00`, the prior-close versus preopen account
+guard refused `order-level overnight account changed after the decision`.
+It did not reveal whether cash, share quantity, or both changed, and did
+not select any aggregate statistic, raw account value, security/provider
+row, order/fill/log/chart, price, or return. This is not an alpha estimate.
+
+R-135 spends **94 -> 95 shared looks / 37 -> 38 development evaluations**
+and adds **zero cells**, leaving **607 cells / 27 infrastructure looks**.
+R-136 is superseded unlaunched/unspent because its contingent first usable
+aggregate was not produced. A cash-only known-at-preopen replan with frozen
+decision weights and a quantity-drift refusal is a prospective software
+candidate, not a reinterpretation or retry of R-135. No 2025-now,
+six-universe, or leveraged result follows.

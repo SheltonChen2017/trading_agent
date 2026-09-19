@@ -1329,6 +1329,15 @@ two-statistic aggregate under a separately signed authority if `Completed.`.
 R-130 remains contingent on that authenticated cell. Do not infer a result
 from a technical refusal or launch unpreregistered six-universe work.
 
+Claude will review section 124 with this round's final single pushed snapshot.
+Section 124 records R-129's authenticated zero-cell technical refusal and
+supersedes the preceding R-130 launch instruction. Correct the lane-specific
+reentrant order-event handler and likely Friday-after-close MOO timing only
+in a distinct, tested, prospectively committed source; freeze new physical
+plans and one-use authorities before any successor QC action. Do not read
+R-129 as a return, retry its spent action, launch R-130, or infer any
+deployment or trading authority.
+
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -19155,3 +19164,48 @@ six-universe diagnostics remain unpreregistered. No raw result, provider
 row, security identifier, unrestricted log, order, fill, chart, holding,
 price, return, paper/live deployment, broker, funded account, real order,
 or trading access is authorized by these unsigned candidates.
+
+## 124. R-129 first-session order-event refusal, 2026-09-18
+
+The exact committed R-129 source at `920a4e7` passed the complete Analyst V2
+selection: **6,497 passed, 8 skipped, 0 failed, 35 warnings in 6,073.93 s**.
+The owner execution signature verified locally against the pinned R-129
+authority. Its one-use private QC submission created project `36718112`,
+compile `5fbb4de8a1a22fa36b101a68aeb43acd-6d8adeeb3b32a64b7a9e8be7068e946a`,
+and backtest `20a204b3921f9ddb20cd34b2bf99d03f`. The first
+statistics-disabled status poll authenticated `Runtime Error` in terminal
+receipt `arv2-order-level-terminal-7c406102639c92d9b9382f85`, SHA-256
+`7c406102639c92d9b9382f853692dfd1c5a92f53b69860474281d3e575242195`.
+One bounded technical diagnosis selected only status/error/stack fields and
+found, at algorithm clock `2026-01-02 16:00:00`, `order-level event references
+an unknown QC order` in `on_order_event`. It did not select an aggregate,
+statistic, raw provider/security row, chart, unrestricted log, order, fill,
+holding, price, or return. **There is no economic result or analyst-signal
+verdict.**
+
+The lane runtime called `market_on_open_order` before registering the
+returned ticket ID; its tests only delivered callbacks after return. A
+synchronous callback in the call therefore reaches the exact unknown-order
+guard. This is a verified lane-specific test/handler defect. The selected
+diagnostic does **not** establish the event status or reason. The first
+decision was Friday after close; [QC's MOO documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/trading-and-orders/order-types/market-on-open-orders)
+states that MOO orders placed after the market closes for the weekend are
+invalid. That is a separate likely scheduling issue, not an observed Invalid
+event and not a license to infer a return. Correct both only in a freshly
+versioned and physically preregistered successor with an isolating
+reentrant-event test and next-session preopen submission test; do not replay
+R-129 or relax its coverage floor in place.
+
+R-129 spent **91 -> 92 shared looks / 34 -> 35 ARV2 development evaluations**
+and added zero cells, leaving **607 cells / 27 infrastructure looks**.
+R-130 created no project/backtest and is superseded unlaunched/unspent because
+its authenticated-first-cell contingency and fixed starting accounting did
+not hold. R-131/R-132 and any six-universe pair remain unpreregistered.
+`ARV2D124-001` is the P2 reentrant callback and missing isolating test,
+correction pending a fresh source version. `ARV2D124-002` is the P2 likely
+Friday-after-close MOO timing problem, requiring prospective validation.
+`ARV2D124-003` is a documented P3 only: V7's mean QQQ-proxy ratio is
+recomputed as one minus the rounded mean resolved ratio, differing from
+the direct mean of recorded proxy ratios at the last Decimal digit in a
+crafted example. It has no order, return, or admission effect on R-129 and
+must not mutate this frozen source.

@@ -3204,3 +3204,28 @@ adds **607 -> 608 cells**. Only then may R-130 launch, spending
 **92 -> 93 / 35 -> 36** and adding at most one authenticated cell. A
 technical failure adds zero cells and invalidates R-130's fixed accounting.
 No six-universe look is preregistered.
+
+## R-129 — QQQ residual-proxy simulated-order diagnostic (TERMINAL ORDER-EVENT REFUSAL; ZERO CELLS) — 2026-09-18
+
+The prospectively frozen source at `920a4e7` passed the complete Analyst V2
+suite (6,497 passed, 8 skipped). One signed submission created private QC
+project `36718112`, compile
+`5fbb4de8a1a22fa36b101a68aeb43acd-6d8adeeb3b32a64b7a9e8be7068e946a`,
+and backtest `20a204b3921f9ddb20cd34b2bf99d03f`. The first
+statistics-disabled poll authenticated `Runtime Error`; terminal receipt
+`arv2-order-level-terminal-7c406102639c92d9b9382f85`, SHA-256
+`7c406102639c92d9b9382f853692dfd1c5a92f53b69860474281d3e575242195`.
+A bounded technical diagnostic selected only status/error/stack and found
+`order-level event references an unknown QC order` at the first Friday
+after-close decision (2026-01-02 16:00). A callback could occur before the
+MOO call returns its ticket and registers its ID; the existing tests did not
+cover that reentrancy. The diagnostic does not show the event status or why
+QC sent it. There was no aggregate, return, fill, price, or alpha cell.
+
+R-129 spends **91 -> 92 shared looks / 34 -> 35 ARV2 development
+evaluations**, adds **zero** cells, and leaves **607 cells / 27
+infrastructure looks**. R-130 is superseded unlaunched/unspent; its fixed
+starting accounting and first-cell contingency no longer hold. A new source
+version and separately preregistered run must correct/test the order-event
+race and validate next-session MOO timing. Do not retry R-129 or interpret
+its terminal failure as evidence for or against analyst revisions.

@@ -1361,12 +1361,12 @@ V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
 physical plan from committed V7 source; section 130 records its zero-cell
 terminal refusal. Claude will review section 130 with this round's final
 single pushed snapshot. The owner explicitly waives Claude review of
-section 134 before this continuing QC correction round's next diagnostic;
-section 133 records R-135's zero-cell technical refusal and section 134
-versions a cash-increase-only preopen reconciliation. The next action is to
-commit and physically pin the distinct V9 source and one-use plan before any
-new QC submission. R-131 through R-136 may not be retried or silently
-launched.
+section 135 before this continuing QC correction round's next diagnostic;
+section 133 records R-135's zero-cell technical refusal, section 134
+versions a cash-increase-only preopen reconciliation, and section 135 pins
+its distinct physical R-137 and contingent R-138 plans. The next action is
+one exact signed R-137 submission followed by statistics-disabled terminal
+inspection. R-131 through R-136 may not be retried or silently launched.
 Claude's independent review follows the final single pushed snapshot, after
 focused interim and full final-tree checks.
 No order-level return or paper/live, funded, deployment, broker, or trading
@@ -19678,13 +19678,51 @@ replan and the full-census guard each made its intended test red. All ten
 old V4--V8 profile SHA pins stayed green. Targeted Python compilation and
 `git diff --check` passed. An independent read-only audit found no P0--P2
 defect; its P3 request for the four additional census-boundary cases was
-corrected by the direct tests before source freeze. The exact physical size
-and source commit must be recorded before a plan is frozen. No QC action or
-look follows from this source
-candidate alone. Starting accounting remains **95 shared looks, 38 ARV2
-development evaluations, 27 infrastructure looks, 607 cells**; R-136 is
-unlaunched and superseded. Commit the source/test snapshot, derive a distinct
-R-137 2026-YTD physical plan, then preregister and authenticate its one-use
-authority before launch. A 2025-now R-138 is contingent on an authenticated
-usable R-137 aggregate. No six-universe, leverage, paper/live, funded,
-broker, deployment, or trading authority follows.
+corrected by the direct tests before source freeze. This exact source/test
+snapshot was committed at `f0fa9eb`; the physical projection below then
+measured **285,676 bytes** (2,324 below the total hard cap and 276 beyond
+the reserved 2,048), with a **62,555-byte** largest file. No QC action or
+look followed from this source-only commit. Starting accounting remains
+**95 shared looks, 38 ARV2 development evaluations, 27 infrastructure looks,
+607 cells**. R-136 is unlaunched and superseded. The distinct R-137/R-138
+physical plans and contingencies are recorded in section 135. No six-universe,
+leverage, paper/live, funded, broker, deployment, or trading authority follows.
+
+## 135. Exact V9 physical R-137/R-138 preregistration, 2026-09-18
+
+The exact V9 source/test snapshot was committed at `f0fa9eb` before these
+private physical derivations. The immutable delta-package SHA-256 and
+reconstructed lineage SHA-256 remain respectively
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`
+and `54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+The locally bound organization ID was read only into the plan builder, not
+printed or recorded. Both new control directories are 0700 and the persisted,
+reloaded/authenticated plans and unsigned authority candidates are 0600.
+The ten-file physical source is **285,676 bytes**, largest file **62,555**:
+2,324 below the 288,000-byte hard total cap and 276 beyond the unchanged
+2,048-byte buffer. No QC submission, provider read, outcome read, or research
+look occurred during this derivation.
+
+| Run | Profile SHA-256 | Private project / backtest | Projection SHA-256; source-inventory SHA-256 | Plan SHA-256; unsigned execution-authority record SHA-256 |
+|---|---|---|---|---|
+| R-137 (2026 YTD) | `7ae450b57fba5ac89e7afe10bd21254e229c65bd34cdf1b8b3df1ea092984d7c` | `85 ARV2_QQQ_CASH_ORDER_R137_2026_YTD - 20260918` / `ARV2 R137 QQQ cash order 2026 YTD 7803b84f` | `f7b2a98620f07279727e4538972de51cdd7752757886e4d1d51385e63a6a3317`; `1a67ed8a8e3abd15d1a0fdb0ec9977254a7eac9a87a883e6cffa8f38ec57394f` | `adcf191ce1a9e465735cc5352311741ab9198de288b837ce164a78ed7ba85e1b`; `bc3b00d1ece6c10011c1d3baa77187a6de7c82a9375049b8159e510914ecfeac` |
+| R-138 (contingent 2025-now) | `85918b9e02cb57ac448ab511821e38f5a52c3239d870ee31a7d76b89f9035cdf` | `86 ARV2_QQQ_CASH_ORDER_R138_2025_NOW - 20260918` / `ARV2 R138 QQQ cash order 2025-now 7803b84f` | `d900e4fcac7530aaac747bcfbed6fd721ed0a62f74255bef78f373fe4153cc0a`; `4c0a561ed7c0bdd6fee63862b71ee6a593b8011b24fde13c9e028271611d4b71` | `9731683f7ff102195bcbde58b81099022f8a10ca7a2af5d24240916fc5f985b7`; `2a6c999a9c23655adeb0c524cd88d2a8cbfe1ab1d0f4c862382807fe5f3740dd` |
+
+R-137 retains 2026-01-02 as the first decision and 2026-09-17 as the
+last execution/mark: 39 decisions, 178 observations, 177 return intervals.
+R-138 starts 2025-01-02 and shares the last execution/mark: 91 decisions,
+428 observations, 427 intervals. Neither score, PIT QQQ weights, neutral
+residual, resolved-weight floor, gross exposure, fee, result field inventory,
+nor result sign is changed or preselected. The V9 difference from R-135 is
+only the prospective, fail-closed cash-increase replan/full-census rule.
+Starting accounting is **95 shared looks, 38 ARV2 development evaluations,
+27 infrastructure looks, 607 cells**. One signed R-137 launch spends
+**95 -> 96 / 38 -> 39** and adds a cell only on a separate exact two-statistic
+authenticated usable result read. R-138 may launch only after that aggregate
+has `run_valid` true and no fee mismatch; it would spend **96 -> 97 / 39 ->
+40** and add at most one cell. A technical refusal or execution-invalid
+R-137 supersedes R-138 unlaunched/unspent. Inspect only statistics-disabled
+terminal status first; `Completed.` alone permits a separately signed
+aggregate read. Raw provider/security rows, QC orders/fills/logs/charts,
+paper/live, deployment, broker credentials, funded account, and trading
+remain excluded.

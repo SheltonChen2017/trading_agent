@@ -96,6 +96,8 @@ PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2026-cutoff-v8",
     "arv2-qqq-order-level-tilt-2025-cutoff-v9",
     "arv2-qqq-order-level-tilt-2026-cutoff-v9",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v10",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v10",
 )
 PROXY_PROFILE_IDS = PROFILE_IDS[2:]
 _PINNED_PROFILE_CENSUS = (
@@ -111,17 +113,33 @@ _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[9], "2026-01-05", 39, 178, 177),
     (PROFILE_IDS[10], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[11], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[12], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[13], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200
 MAX_CONTROL_BYTES = 1024 * 1024
 MAX_STATISTIC_BYTES = 4096
+MAX_TICKET_STATISTIC_BYTES = 8192
+_TICKET_STATISTIC_PROFILE_IDS = tuple(runtime_builder.TICKET_PROFILE_IDS)
 MAX_COMPILE_POLLS = 120
 MAX_STATUS_POLLS = 1_440
 COMPILE_POLL_SECONDS = 2
 STATUS_POLL_SECONDS = 30
 DEFAULT_NOTEBOOK = "research.ipynb"
 RECOVERED_LAUNCH_INITIAL_STATUS = "RECOVERED_BY_STATISTICS_FREE_LIST"
+
+
+def _maximum_statistic_bytes(
+    profile_id,
+    _ticket_ids=_TICKET_STATISTIC_PROFILE_IDS,
+    _legacy_limit=MAX_STATISTIC_BYTES,
+    _ticket_limit=MAX_TICKET_STATISTIC_BYTES,
+):
+    # V10 retains the exact aggregate instead of trimming decimals or hashes.
+    return (
+        _ticket_limit if profile_id in _ticket_ids else _legacy_limit
+    )
 
 EXECUTION_ENDPOINT_BUDGET_NAMES = frozenset(
     {
@@ -2542,7 +2560,7 @@ def _make_result_read_authority_operations(
     meta_fields = tuple(sorted(_META_FIELDS))
     legacy_aggregate_fields = tuple(sorted(_AGGREGATE_FIELDS))
     proxy_aggregate_fields = tuple(sorted(_PROXY_AGGREGATE_FIELDS))
-    maximum_statistic_bytes = MAX_STATISTIC_BYTES
+    statistic_limit = _maximum_statistic_bytes
 
     def candidate(
         *, plan, execution_authority, launch_control, launch, terminal
@@ -2569,6 +2587,7 @@ def _make_result_read_authority_operations(
             proxy_aggregate_fields if plan.profile_id in PROXY_PROFILE_IDS
             else legacy_aggregate_fields
         )
+        maximum_statistic_bytes = statistic_limit(plan.profile_id)
         record = {
             "status": "requires_separate_exact_owner_ed25519_signature",
             "plan_id": plan.plan_id,
@@ -2894,7 +2913,7 @@ def _parse_result(response, plan, launch):
                 "order-level custom result is not ASCII JSON"
             ) from None
         payload = value.encode("ascii")
-        if len(payload) > MAX_STATISTIC_BYTES:
+        if len(payload) > _maximum_statistic_bytes(plan.profile_id):
             _error("order-level custom result value exceeded its exact bound")
         parsed[name] = _strict_object(payload, "order-level custom statistic")
         pairs.append((name, value))
@@ -3136,8 +3155,8 @@ def _parse_result(response, plan, launch):
             aggregates["minimum_resolved_constituent_weight_ratio"],
             "order-level aggregate minimum resolved ratio",
         )
-        # Every statistic is capped at 4,096 bytes; this precision makes the
-        # two decimal complements exact rather than default-context rounded.
+        # This precision exceeds even V10's 8,192-byte transport cap, keeping
+        # decimal complements exact rather than default-context rounded.
         with localcontext() as ratio_context:
             ratio_context.prec = MAX_STATISTIC_BYTES * 4
             ratios_conserve = (

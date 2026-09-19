@@ -5,6 +5,7 @@ import hashlib
 import json
 import os
 import traceback
+from decimal import Decimal, localcontext
 from pathlib import Path
 from types import FunctionType, SimpleNamespace
 
@@ -208,6 +209,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID: (39, 178),
         runtime.CASH_PREOPEN_PROXY_PROFILE_2025_ID: (91, 428),
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID: (39, 178),
+        runtime.TICKET_PROFILE_2025_ID: (91, 428),
+        runtime.TICKET_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
@@ -293,6 +296,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID: "2026-01-05",
             runtime.CASH_PREOPEN_PROXY_PROFILE_2025_ID: "2025-01-03",
             runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID: "2026-01-05",
+            runtime.TICKET_PROFILE_2025_ID: "2025-01-03",
+            runtime.TICKET_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -358,6 +363,32 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         runtime.META_STATISTIC_NAME: _canonical(meta).decode("ascii"),
         runtime.AGGREGATES_STATISTIC_NAME: _canonical(aggregate).decode("ascii"),
     }
+
+
+def _high_precision_statistics(plan):
+    """Keep the full schema and hashes with production-like decimal lengths."""
+
+    minimum_resolved = "0.8" + "5" * 99
+    with localcontext() as context:
+        context.prec = 256
+        maximum_proxy = format(Decimal(1) - Decimal(minimum_resolved), "f")
+    return _statistics(
+        plan,
+        aggregate_update={
+            "minimum_resolved_member_count_ratio": "0." + "9" * 100,
+            "minimum_resolved_constituent_weight_ratio": minimum_resolved,
+            "maximum_qqq_proxy_constituent_weight_ratio": maximum_proxy,
+            "mean_one_way_active_share": "0." + "2" * 100,
+            "strategy_annualized_volatility": "0." + "2" * 100,
+            "QQQ_annualized_volatility": "0." + "1" * 100,
+            "strategy_zero_rate_sharpe": "0." + "5" * 100,
+            "QQQ_zero_rate_sharpe": "0." + "4" * 100,
+            "mean_tilted_name_count": "1." + "2" * 100,
+            "maximum_reference_mark_target_weight_l1_error": (
+                "0." + "2" * 100
+            ),
+        },
+    )
 
 
 def _result_response(plan, statistics):
@@ -474,6 +505,49 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
     assert all("DO NOT SELECT" not in value for _name, value in pairs)
 
 
+def test_v10_result_parser_accepts_complete_high_precision_aggregate(tmp_path):
+    plan = _plan(tmp_path, runtime.TICKET_PROFILE_2026_ID)
+    statistics = _high_precision_statistics(plan)
+    aggregate_bytes = statistics[runtime.AGGREGATES_STATISTIC_NAME].encode("ascii")
+    assert 4764 <= len(aggregate_bytes) <= adapter.MAX_TICKET_STATISTIC_BYTES
+    launch, response = _result_response(plan, statistics)
+
+    assert adapter._parse_result(response, plan, launch) == tuple(
+        sorted(statistics.items())
+    )
+
+
+def test_legacy_result_parser_retains_4096_byte_bound(tmp_path):
+    plan = _plan(tmp_path, runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID)
+    statistics = _high_precision_statistics(plan)
+    aggregate_bytes = statistics[runtime.AGGREGATES_STATISTIC_NAME].encode("ascii")
+    assert adapter.MAX_STATISTIC_BYTES < len(aggregate_bytes) <= (
+        adapter.MAX_TICKET_STATISTIC_BYTES
+    )
+    launch, response = _result_response(plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="^order-level custom result value exceeded its exact bound$",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_v10_result_parser_refuses_more_than_8192_bytes(tmp_path):
+    plan = _plan(tmp_path, runtime.TICKET_PROFILE_2026_ID)
+    statistics = _high_precision_statistics(plan)
+    statistics[runtime.AGGREGATES_STATISTIC_NAME] = "x" * (
+        adapter.MAX_TICKET_STATISTIC_BYTES + 1
+    )
+    launch, response = _result_response(plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="^order-level custom result value exceeded its exact bound$",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
 @pytest.mark.parametrize(
     "profile_id",
     (
@@ -486,6 +560,8 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
         runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.TICKET_PROFILE_2025_ID,
+        runtime.TICKET_PROFILE_2026_ID,
     ),
 )
 def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
@@ -528,6 +604,8 @@ def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
         runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.TICKET_PROFILE_2025_ID,
+        runtime.TICKET_PROFILE_2026_ID,
     ),
 )
 def test_preopen_result_cannot_shift_first_execution_session(
@@ -967,6 +1045,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.TICKET_PROFILE_2025_ID,
+        runtime.TICKET_PROFILE_2026_ID,
     )
     assert adapter.PROXY_PROFILE_IDS == runtime.PROXY_PROFILE_IDS == (
         runtime.PROXY_PROFILE_2025_ID,
@@ -979,6 +1059,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2025_ID,
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+        runtime.TICKET_PROFILE_2025_ID,
+        runtime.TICKET_PROFILE_2026_ID,
     )
     bindings = adapter._PINNED_RUNTIME_PROFILE_BINDINGS
     assert tuple(binding[0] for binding in bindings) == adapter.PROFILE_IDS
@@ -1750,6 +1832,36 @@ def test_result_read_authority_refuses_each_invalid_owner_signature(
             receipt_bytes=payload,
             owner_signature=signature,
         )
+
+
+@pytest.mark.parametrize(
+    ("profile_id", "expected_limit"),
+    (
+        (runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID, 4096),
+        (runtime.TICKET_PROFILE_2026_ID, 8192),
+    ),
+)
+def test_result_read_authority_binds_profile_specific_statistic_limit(
+    tmp_path, monkeypatch, profile_id, expected_limit
+):
+    plan = _plan(tmp_path, profile_id)
+    monkeypatch.setattr(
+        adapter, "require_order_level_submission_plan", lambda value: value
+    )
+    execution_authority = _execution_authority(plan, monkeypatch)
+    control, launch = _persisted_launch(plan, execution_authority)
+    terminal = _persisted_terminal(plan, launch)
+    render, _load, _require = _test_result_operations()
+
+    candidate = json.loads(render(
+        plan=plan,
+        execution_authority=execution_authority,
+        launch_control=control,
+        launch=launch,
+        terminal=terminal,
+    ))
+
+    assert candidate["maximum_custom_statistic_bytes_each"] == expected_limit
 
 
 def test_result_read_signature_binds_only_aggregate_inventory_and_exact_run(

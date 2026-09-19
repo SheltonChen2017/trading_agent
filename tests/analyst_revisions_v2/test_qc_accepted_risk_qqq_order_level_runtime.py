@@ -258,6 +258,8 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         "arv2-qqq-order-level-tilt-2026-cutoff-v8",
         "arv2-qqq-order-level-tilt-2025-cutoff-v9",
         "arv2-qqq-order-level-tilt-2026-cutoff-v9",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v10",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v10",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -335,11 +337,20 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID: (
             "7ae450b57fba5ac89e7afe10bd21254e229c65bd34cdf1b8b3df1ea092984d7c"
         ),
+        runtime.TICKET_PROFILE_2025_ID: (
+            "af9d210ef7707c59c78df6227a353f08e18f189a92f10d5f02b5a49b13aef592"
+        ),
+        runtime.TICKET_PROFILE_2026_ID: (
+            "aae67464b63312ff553bc3a60088cd1dd7fff9e56281b9aa8aa11717828e8da0"
+        ),
     }
     for profile_id in runtime.PROXY_PROFILE_IDS:
         profile = runtime.require_qqq_order_level_profile(profile_id)
         assert profile["profile_sha256"] == expected_proxy_digests[profile_id]
         assert profile["schema"] == (
+            runtime.TICKET_PROFILE_SCHEMA
+            if profile_id in runtime.TICKET_PROFILE_IDS
+            else
             runtime.CASH_PREOPEN_PROXY_PROFILE_SCHEMA
             if profile_id in runtime.CASH_PREOPEN_PROXY_PROFILE_IDS
             else
@@ -1017,6 +1028,48 @@ def test_end_callback_emits_exact_bounded_meta_and_aggregate_statistics():
         "aggregate_only_custom_summary_statistics"
     )
     assert value._completed is True
+
+
+@pytest.mark.parametrize("aggregate_bytes", (4764, 8192, 8193))
+def test_v10_end_callback_reads_8192_byte_main_level_transport_override(
+    monkeypatch, aggregate_bytes
+):
+    algorithm = _Algorithm("2026-09-17")
+    value = _runtime(
+        algorithm, runtime.TICKET_PROFILE_2026_ID,
+        order_status_enum=_OpaqueOrderStatus,
+    )
+    value._initialized = True
+    value._decision_sessions = ("2026-09-16",)
+    value._decision_count = 1
+    value._package = SimpleNamespace(
+        package_id="package-fixture",
+        package_sha256="b" * 64,
+        activation_manifest_sha256="c" * 64,
+    )
+    value._resolution = SimpleNamespace(
+        resolution_id="resolution-fixture",
+        resolution_sha256="a" * 64,
+    )
+    value._close_open_plan = lambda: None
+    aggregate = {"value": "x" * (aggregate_bytes - len(b'{"value":""}'))}
+    assert len(runtime._canonical(aggregate)) == aggregate_bytes
+    value._aggregate_record = lambda: aggregate
+    monkeypatch.setattr(runtime, "MAXIMUM_STATISTIC_BYTES", 8192)
+
+    if aggregate_bytes > 8192:
+        with pytest.raises(
+            runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+            match="^order-level aggregate transport exceeded its exact bound$",
+        ):
+            value.on_end_of_algorithm()
+        assert algorithm.summary_statistics == {}
+    else:
+        value.on_end_of_algorithm()
+        assert len(algorithm.summary_statistics[
+            runtime.AGGREGATES_STATISTIC_NAME
+        ].encode("ascii")) == aggregate_bytes
+        assert value._completed is True
 
 
 def test_total_return_history_includes_dividend_when_raw_prices_are_flat():
@@ -1732,6 +1785,45 @@ def _single_buy_plan():
         reference_prices={"a": Decimal("100")},
         target_weights={"a": Decimal("0.98")},
     )
+
+
+def test_ticket_identity_callback_is_staged_until_registration():
+    class ReentrantTicket:
+        runtime = None
+        fired = False
+
+        @property
+        def order_id(self):
+            if not self.fired:
+                self.fired = True
+                self.runtime.on_order_event(SimpleNamespace(
+                    order_id=1, id=7, status=_OpaqueOrderStatus.FILLED,
+                    fill_quantity=98, fill_price=Decimal("100"),
+                    order_fee=_order_fee("9.8"),
+                ))
+            return 1
+
+    class ReentrantAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            self.orders.append((symbol.value, quantity, tag))
+            ticket = ReentrantTicket()
+            ticket.runtime = self.runtime
+            return ticket
+
+    algorithm = ReentrantAlgorithm()
+    value = _runtime(
+        algorithm, runtime.TICKET_PROFILE_2026_ID,
+        order_status_enum=_OpaqueOrderStatus,
+    )
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._submit_plan(_single_buy_plan())
+    assert value._submitted_order_count == 1
+    assert tuple(item.status for item in value._open_plan_events) == ("Filled",)
+    assert value._pending_submission_events is None
+    assert value._pending_submission_event_keys is None
 
 
 @pytest.mark.parametrize("status", ("Invalid", "Filled"))

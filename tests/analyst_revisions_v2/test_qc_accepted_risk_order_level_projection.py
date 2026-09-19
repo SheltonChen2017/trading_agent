@@ -111,6 +111,12 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     assert f"set_start_date({start[0]}, {start[1]}, {start[2]})" in main
     assert "set_end_date(2026, 9, 17)" in main
     assert "market_on_open_order" not in main
+    transport_override = (
+        "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 8192"
+    )
+    assert (transport_override in main) is (
+        profile_id in runtime.TICKET_PROFILE_IDS
+    )
     assert "self.schedule.on(" in main
     assert "self.time_rules.after_market_close(" in main
     if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS:
@@ -489,12 +495,19 @@ def test_qc_prelude_compilation_and_future_import_regression():
         )
 
 
+@pytest.mark.parametrize(
+    ("profile_id", "statistic_limit"),
+    (
+        (runtime.PROFILE_IDS[0], 4096),
+        (runtime.TICKET_PROFILE_2026_ID, 8192),
+    ),
+)
 def test_generated_main_imports_from_exact_flat_qc_projection(
-    tmp_path: Path, delta_package
+    tmp_path: Path, delta_package, profile_id, statistic_limit
 ):
     value = projection.build_accepted_risk_order_level_qc_projection(
         delta_package,
-        profile_id=runtime.PROFILE_IDS[0],
+        profile_id=profile_id,
     )
     for item in value.source_files:
         (tmp_path / item.project_path).write_bytes(item.source_bytes)
@@ -511,7 +524,9 @@ def test_generated_main_imports_from_exact_flat_qc_projection(
                 "import sys;"
                 f"sys.path.insert(0, {str(tmp_path)!r});"
                 "import main;"
-                "assert main.ARV2QqqOrderLevelAlgorithm"
+                "assert main.ARV2QqqOrderLevelAlgorithm;"
+                "import accepted_risk_qqq_order_level_qc_runtime as runtime;"
+                f"assert runtime.MAXIMUM_STATISTIC_BYTES == {statistic_limit}"
             ),
         ],
         cwd=tmp_path,

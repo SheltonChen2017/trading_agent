@@ -1,7 +1,4 @@
-"""Backtest-only ARV2 QQQ tilt runtime with simulated orders.
-
-No ``__future__`` import: QC injects a source prelude.
-"""
+"""Backtest-only ARV2 QQQ tilt; QC supplies the source prelude."""
 
 import hashlib
 import json
@@ -51,9 +48,15 @@ ENUM_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v8"
 CASH_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v9"
 CASH_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v9"
 CASH_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v9"
+TICKET_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v10"
+TICKET_PROFILE_IDS = (
+    "arv2-qqq-order-level-tilt-2025-cutoff-v10",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v10",
+)
+TICKET_PROFILE_2025_ID, TICKET_PROFILE_2026_ID = TICKET_PROFILE_IDS
 CASH_PREOPEN_PROXY_PROFILE_IDS = (
     CASH_PREOPEN_PROXY_PROFILE_2025_ID, CASH_PREOPEN_PROXY_PROFILE_2026_ID,
-)
+) + TICKET_PROFILE_IDS
 ENUM_PREOPEN_PROXY_PROFILE_IDS = (
     ENUM_PREOPEN_PROXY_PROFILE_2025_ID, ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
 ) + CASH_PREOPEN_PROXY_PROFILE_IDS
@@ -77,6 +80,7 @@ SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v6"
 PROXY_SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v7"
 QQQ_TICKER = "QQQ"
 QQQ_PROXY_SECURITY_ID = "arv2-qqq-etf-unjoined-weight-proxy"
+_PROXY_ID = QQQ_PROXY_SECURITY_ID
 QQQ_PROXY_OVERLAP_DISCLOSURE = (
     "QQQ ETF proxy overlaps the resolved stock core; this is not exact QQQ replication"
 )
@@ -166,6 +170,7 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
     start = datetime.strptime(start_session, "%Y-%m-%d")
     record = {
         "schema": (
+            TICKET_PROFILE_SCHEMA if profile_id in TICKET_PROFILE_IDS else
             CASH_PREOPEN_PROXY_PROFILE_SCHEMA if cash_replan else
             ENUM_PREOPEN_PROXY_PROFILE_SCHEMA if enum_status else
             NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA if numeric_status else
@@ -224,7 +229,7 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
         "trading": False,
     }
     if proxy:
-        record["qqq_proxy_security_id"] = QQQ_PROXY_SECURITY_ID
+        record["qqq_proxy_security_id"] = _PROXY_ID
         record["qqq_proxy_overlap_disclosure"] = QQQ_PROXY_OVERLAP_DISCLOSURE
     if preopen:
         record["execution_submission_timing"] = "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
@@ -467,8 +472,6 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._decision_set = frozenset(decisions)
         self._initialized = True
         if self._proxy_weight_mode:
-            # The ETF position is executable, unlike the legacy contextual
-            # QQQ benchmark. Explicit history requests still use TOTAL_RETURN.
             try:
                 qqq_security = self._algorithm.securities[self._qqq_benchmark_symbol]
             except KeyError as exc:
@@ -593,7 +596,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             ),
             error_type=_Refusal,
             proxy_security_id=(
-                QQQ_PROXY_SECURITY_ID if self._proxy_weight_mode else None
+                _PROXY_ID if self._proxy_weight_mode else None
             ),
             qqq_sid=(
                 _symbol_sid(self._qqq_benchmark_symbol, "order-level QQQ ETF proxy")
@@ -639,7 +642,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         )
 
     def _security(self, security_id):
-        if security_id == QQQ_PROXY_SECURITY_ID and self._proxy_weight_mode:
+        if security_id == _PROXY_ID and self._proxy_weight_mode:
             symbol = self._qqq_benchmark_symbol
         else:
             symbol = self._resolution.symbol_for_security(security_id)
@@ -679,7 +682,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         expected = {
             _symbol_sid(
                 self._qqq_benchmark_symbol
-                if security_id == QQQ_PROXY_SECURITY_ID else
+                if security_id == _PROXY_ID else
                 self._resolution.symbol_for_security(security_id),
                 "order-level frozen holding",
             ): quantity
@@ -752,7 +755,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         target_ids = set(target_weights)
         tracked = set(target_ids)
         if self._proxy_weight_mode:
-            tracked.add(QQQ_PROXY_SECURITY_ID)
+            tracked.add(_PROXY_ID)
         for row in self._resolution.resolved:
             sid = row["qc_security_id"]
             if sid in self._configured_security_ids:
@@ -791,7 +794,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             symbol = (
                 self._qqq_benchmark_symbol
                 if self._proxy_weight_mode
-                and intent.security_id == QQQ_PROXY_SECURITY_ID
+                and intent.security_id == _PROXY_ID
                 else self._resolution.symbol_for_security(intent.security_id)
             )
             if symbol is None:
@@ -807,7 +810,6 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 raise _Refusal(
                     "order-level nested MOO submission is unsupported"
                 )
-            # Authenticate synchronous events against the returned ticket.
             self._pending_submission_events = []
             self._pending_submission_event_keys = set()
             try:
@@ -816,26 +818,26 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                     quantity,
                     tag=intent.client_order_id,
                 )
+                try:
+                    order_id = ticket.order_id
+                except Exception as exc:
+                    raise _Refusal(
+                        "order-level MOO ticket is unreadable"
+                    ) from exc
+                if type(order_id) is not int or order_id < 0 or order_id in self._open_order_ids:
+                    raise _Refusal(
+                        "order-level MOO ticket identity changed"
+                    )
+                if any(item[0] != order_id for item in self._pending_submission_events):
+                    raise _Refusal(
+                        "synchronous QC event does not match returned MOO ticket"
+                    )
+                self._open_order_ids[order_id] = intent
+                self._submitted_order_count += 1
                 staged = tuple(self._pending_submission_events)
             finally:
                 self._pending_submission_events = None
                 self._pending_submission_event_keys = None
-            try:
-                order_id = ticket.order_id
-            except Exception as exc:
-                raise _Refusal(
-                    "order-level MOO ticket is unreadable"
-                ) from exc
-            if type(order_id) is not int or order_id < 0 or order_id in self._open_order_ids:
-                raise _Refusal(
-                    "order-level MOO ticket identity changed"
-                )
-            if any(item[0] != order_id for item in staged):
-                raise _Refusal(
-                    "synchronous QC event does not match returned MOO ticket"
-                )
-            self._open_order_ids[order_id] = intent
-            self._submitted_order_count += 1
             for staged_id, staged_event_id, staged_status, event in staged:
                 if (
                     event.order_id != staged_id
@@ -877,7 +879,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             stock_measures = {
                 security_id: weight
                 for security_id, weight in benchmark_measures.items()
-                if security_id != QQQ_PROXY_SECURITY_ID
+                if security_id != _PROXY_ID
             }
         else:
             stock_measures = benchmark_measures
@@ -894,8 +896,8 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 snapshot.memberships,
                 scores,
             )
-            if self._proxy_weight_mode and QQQ_PROXY_SECURITY_ID in benchmark_measures:
-                sectors[QQQ_PROXY_SECURITY_ID] = (
+            if self._proxy_weight_mode and _PROXY_ID in benchmark_measures:
+                sectors[_PROXY_ID] = (
                     _tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
                 )
         except _tilt.BoundedBenchmarkTiltError as exc:

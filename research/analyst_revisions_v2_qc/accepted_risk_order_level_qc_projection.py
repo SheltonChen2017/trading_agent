@@ -557,9 +557,20 @@ def _main_source(
         if profile["profile_id"] in runtime_builder.ENUM_PREOPEN_PROXY_PROFILE_IDS
         else ""
     )
+    # The V10 cloud diagnostic measured 4,764 canonical aggregate bytes.
+    # Raise only this profile's generated-main guard; do not modify the
+    # shared runtime file, quantize decimals, truncate digests, or rekey JSON.
+    statistic_transport_source = (
+        "# V10: 4764 exact aggregate bytes exceed the local 4096-byte guard.\n"
+        "import accepted_risk_qqq_order_level_qc_runtime as _arv2_runtime_module\n"
+        "\n"
+        "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 8192\n"
+        if profile["profile_id"] in runtime_builder.TICKET_PROFILE_IDS
+        else ""
+    )
     source = f'''from AlgorithmImports import *
 from decimal import Decimal
-from accepted_risk_qqq_order_level_qc_runtime import (
+{statistic_transport_source}from accepted_risk_qqq_order_level_qc_runtime import (
     AcceptedRiskQqqOrderLevelQcRuntime,
     STARTING_CASH,
 )

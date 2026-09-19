@@ -219,6 +219,7 @@ def _make_formal_action_global_binding_guard():
         "_claim_preopen_prereview_transport_capability_minter",
         "_claim_power_calibration_transport_capability_minter",
         "_claim_accepted_risk_preliminary_transport_capability_minter",
+        "_claim_accepted_risk_order_level_transport_capability_minter",
     )
     os_external_names = (
         "close", "fstat", "fsync", "getpid", "open", "read",
@@ -1206,6 +1207,30 @@ def _make_downstream_transport_minter_claims(
             ),
             "_claim_accepted_risk_preliminary_transport_capability_minter",
         ),
+        (
+            "accepted_risk_order_level",
+            "research.analyst_revisions_v2_qc."
+            "accepted_risk_order_level_submission_adapter",
+            "accepted_risk_order_level_submission_adapter.py",
+            (
+                (
+                    "submission",
+                    ("_execute_order_level_submission_once_impl",),
+                ),
+                (
+                    "status",
+                    (
+                        "_inspect_order_level_terminal_status_impl",
+                        "_recover_order_level_launch_receipt_once_impl",
+                    ),
+                ),
+                (
+                    "result_read",
+                    ("_read_order_level_aggregate_result_once_impl",),
+                ),
+            ),
+            "_claim_accepted_risk_order_level_transport_capability_minter",
+        ),
     )
 
     def make_claim(adapter_key: str):
@@ -1494,6 +1519,7 @@ def _make_downstream_transport_minter_claims(
         make_claim("preopen_prereview"),
         make_claim("power"),
         make_claim("accepted_risk_preliminary"),
+        make_claim("accepted_risk_order_level"),
     )
 
 
@@ -8878,6 +8904,7 @@ globals().pop("_claim_adapter_capability_minter", None)
     _claim_preopen_prereview_transport_capability_minter,
     _claim_power_calibration_transport_capability_minter,
     _claim_accepted_risk_preliminary_transport_capability_minter,
+    _claim_accepted_risk_order_level_transport_capability_minter,
 ) = _make_downstream_transport_minter_claims(
     _mint_transport_capability,
     _register_downstream_transport_capability_minter,

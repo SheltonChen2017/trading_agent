@@ -1071,6 +1071,7 @@ def test_formal_action_guard_survives_all_exact_downstream_claims(
         "_claim_preopen_prereview_transport_capability_minter",
         "_claim_power_calibration_transport_capability_minter",
         "_claim_accepted_risk_preliminary_transport_capability_minter",
+        "_claim_accepted_risk_order_level_transport_capability_minter",
     )
     for module_name in (
         "research.analyst_revisions_v2_qc."
@@ -1085,6 +1086,8 @@ def test_formal_action_guard_survives_all_exact_downstream_claims(
         "research.analyst_revisions_v2_qc.power_calibration_submission_adapter",
         "research.analyst_revisions_v2_qc."
         "accepted_risk_preliminary_submission_adapter",
+        "research.analyst_revisions_v2_qc."
+        "accepted_risk_order_level_submission_adapter",
     ):
         importlib.import_module(module_name)
     assert all(name not in vars(adapter) for name in claim_names)

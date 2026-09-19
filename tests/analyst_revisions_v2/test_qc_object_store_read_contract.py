@@ -76,13 +76,20 @@ B3_MODULE = PACKAGE / "synthetic_input_transport.py"
 # I/O.
 _PINNED_QC_PACKAGE_SOURCES = tuple(
     """
-    __init__.py accepted_risk_etf_baseline_evaluator.py
+    __init__.py accepted_risk_delta_order_package.py
+    accepted_risk_etf_baseline_evaluator.py
     accepted_risk_etf_baseline_qc_runtime.py
     accepted_risk_market_cap_stock_portfolio_evaluator.py
     accepted_risk_market_cap_stock_portfolio_qc_runtime.py
+    accepted_risk_market_cap_stock_portfolio_tilt.py
     accepted_risk_massive_delta.py
     accepted_risk_objective_synthetic_leverage_evaluator.py
     accepted_risk_objective_synthetic_leverage_qc_runtime.py
+    accepted_risk_order_level_benchmark.py
+    accepted_risk_order_level_core.py
+    accepted_risk_order_level_input_runtime.py
+    accepted_risk_order_level_qc_projection.py
+    accepted_risk_order_level_submission_adapter.py
     accepted_risk_pair_bridge.py
     accepted_risk_preliminary_package.py
     accepted_risk_preliminary_qc_figi.py
@@ -93,8 +100,13 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_preliminary_submission_adapter.py
     accepted_risk_preopen_terminal_authority.py
     accepted_risk_qc_symbol_resolution.py
+    accepted_risk_qqq_order_level_qc_runtime.py
     accepted_risk_regime_rating_evaluator.py
     accepted_risk_security_master_admission.py
+    accepted_risk_sequential_r055_score.py
+    accepted_risk_six_universe_gate.py
+    accepted_risk_six_universe_gate_evaluator.py
+    accepted_risk_six_universe_gate_qc_runtime.py
     accepted_risk_stock_portfolio_evaluator.py
     accepted_risk_terminal_disposition.py event_study.py
     firm_ontology_candidate_builder.py firm_ontology_owner_decision.py
@@ -142,6 +154,12 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
 
 _ZERO_EXTERNAL_IO_IMPORTS = {
     "__init__.py": (),
+    "accepted_risk_order_level_benchmark.py": tuple(
+        "hashlib json decimal".split()
+    ),
+    "accepted_risk_order_level_core.py": tuple(
+        "dataclasses hashlib json decimal".split()
+    ),
     "accepted_risk_etf_baseline_evaluator.py": tuple(
         """
         dataclasses hashlib json re decimal fractions types
@@ -180,6 +198,27 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
         """.split()
     ),
+    "accepted_risk_sequential_r055_score.py": tuple(
+        """
+        dataclasses collections decimal accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        """.split()
+    ),
+    "accepted_risk_six_universe_gate.py": tuple(
+        "dataclasses hashlib json decimal".split()
+    ),
+    "accepted_risk_six_universe_gate_evaluator.py": tuple(
+        """
+        dataclasses hashlib json datetime decimal enum
+        accepted_risk_preliminary_rating_evaluator
+        accepted_risk_sequential_r055_score accepted_risk_six_universe_gate
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate
+        """.split()
+    ),
     "accepted_risk_stock_portfolio_evaluator.py": tuple(
         """
         dataclasses hashlib json datetime decimal
@@ -192,6 +231,15 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
         """
         dataclasses hashlib json collections datetime decimal
         accepted_risk_preliminary_rating_evaluator
+        accepted_risk_market_cap_stock_portfolio_tilt
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt
+        """.split()
+    ),
+    "accepted_risk_market_cap_stock_portfolio_tilt.py": tuple(
+        """
+        dataclasses hashlib json decimal accepted_risk_preliminary_rating_evaluator
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
         """.split()
@@ -328,6 +376,18 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "accepted_risk_delta_order_package.py": tuple(
+        """
+        __future__ dataclasses hashlib json shutil tempfile datetime pathlib
+        typing data.exchange_calendar research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.global_benchmark_contract
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_massive_delta
+        research.analyst_revisions_v2_qc.production_evidence_composer
+        """.split()
+    ),
     "accepted_risk_massive_delta.py": tuple(
         """
         __future__ dataclasses hashlib os threading weakref collections datetime
@@ -355,6 +415,30 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.production_evidence_composer
         """.split()
     ),
+    "accepted_risk_order_level_qc_projection.py": tuple(
+        """
+        __future__ ast dataclasses hashlib json re pathlib
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime
+        """.split()
+    ),
+    "accepted_risk_order_level_submission_adapter.py": tuple(
+        """
+        __future__ dataclasses hashlib json os re stat time types datetime decimal
+        pathlib typing research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        """.split()
+    ),
     "accepted_risk_preliminary_qc_projection.py": tuple(
         """
         __future__ dataclasses ast hashlib json re pathlib
@@ -368,6 +452,9 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator
         research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime
         """.split()
     ),
     "accepted_risk_preliminary_submission_adapter.py": tuple(
@@ -388,6 +475,9 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator
         research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime
         research.analyst_revisions_v2_qc.formal_submission_adapter
         research.analyst_revisions_v2_qc.formal_qc_transport
         research.analyst_revisions_v2_qc.owner_signature_authority
@@ -919,7 +1009,18 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "accepted_risk_delta_order_package.py": ("import:pathlib",),
     "accepted_risk_massive_delta.py": ("import:os",),
+    "accepted_risk_order_level_qc_projection.py": (
+        "call:compile",
+        "call:read_bytes",
+        "import:pathlib",
+    ),
+    "accepted_risk_order_level_submission_adapter.py": (
+        "call:open",
+        "import:os",
+        "import:pathlib",
+    ),
     "accepted_risk_preliminary_package.py": (
         "call:__import__",
         "call:compile",
@@ -1094,6 +1195,43 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
 }
 
 _QC_RUNTIME_IMPORTS = {
+    "accepted_risk_order_level_input_runtime.py": tuple(
+        """
+        dataclasses gzip hashlib io itertools json re datetime decimal zoneinfo
+        accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        """.split()
+    ),
+    "accepted_risk_qqq_order_level_qc_runtime.py": tuple(
+        """
+        hashlib json datetime decimal accepted_risk_order_level_benchmark
+        accepted_risk_market_cap_stock_portfolio_tilt accepted_risk_order_level_core
+        accepted_risk_order_level_input_runtime
+        accepted_risk_preliminary_qc_figi accepted_risk_sequential_r055_score
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_benchmark
+        research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_core
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score
+        """.split()
+    ),
+    "accepted_risk_six_universe_gate_qc_runtime.py": tuple(
+        """
+        hashlib itertools json math time datetime decimal
+        accepted_risk_order_level_input_runtime accepted_risk_preliminary_qc_figi
+        accepted_risk_preliminary_rating_evaluator accepted_risk_six_universe_gate
+        accepted_risk_six_universe_gate_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator
+        """.split()
+    ),
     "accepted_risk_market_cap_stock_portfolio_qc_runtime.py": tuple(
         """
         dataclasses gzip hashlib itertools io json math re time datetime
@@ -1161,6 +1299,20 @@ _QC_RUNTIME_IMPORTS = {
     )
 }
 _QC_RUNTIME_IO_SURFACE = {
+    "accepted_risk_order_level_input_runtime.py": (
+        "call:contains_key",
+        "call:read_bytes",
+    ),
+    "accepted_risk_qqq_order_level_qc_runtime.py": (
+        "call:history",
+        "call:open",
+        "call:set_summary_statistic",
+    ),
+    "accepted_risk_six_universe_gate_qc_runtime.py": (
+        "call:history",
+        "call:open",
+        "call:set_summary_statistic",
+    ),
     "accepted_risk_market_cap_stock_portfolio_qc_runtime.py": (
         "call:contains_key",
         "call:history",
@@ -2275,14 +2427,18 @@ def _resolved_imports(
 _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
     tuple(line.split())
     for line in """
+research.analyst_revisions_v2_qc.accepted_risk_delta_order_package research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_delta_order_package research.analyst_revisions_v2.global_benchmark_contract
 research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_etf_baseline_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_preliminary_qc_figi
 research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime accepted_risk_preliminary_qc_runtime
+research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_evaluator accepted_risk_market_cap_stock_portfolio_tilt
 research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_evaluator accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime accepted_risk_market_cap_stock_portfolio_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime accepted_risk_preliminary_qc_figi
 research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_massive_delta research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.accepted_risk_massive_delta research.analyst_revisions_v2.accepted_risk_input_pair
 research.analyst_revisions_v2_qc.accepted_risk_massive_delta research.analyst_revisions_v2.canonical
@@ -2290,6 +2446,9 @@ research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_eval
 research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime accepted_risk_market_cap_stock_portfolio_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime accepted_risk_market_cap_stock_portfolio_qc_runtime
 research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime accepted_risk_objective_synthetic_leverage_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_order_level_qc_projection research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_order_level_submission_adapter research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.accepted_risk_input_pair
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.accepted_risk_pair_bridge research.analyst_revisions_v2.production_input_pipeline
@@ -2306,9 +2465,24 @@ research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator acce
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter research.analyst_revisions_v2.preregistration
 research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime accepted_risk_market_cap_stock_portfolio_tilt
+research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime accepted_risk_order_level_benchmark
+research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime accepted_risk_order_level_core
+research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime accepted_risk_order_level_input_runtime
+research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime accepted_risk_preliminary_qc_figi
+research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime accepted_risk_sequential_r055_score
 research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_security_master_admission research.analyst_revisions_v2
 research.analyst_revisions_v2_qc.accepted_risk_security_master_admission research.analyst_revisions_v2.canonical
+research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator accepted_risk_sequential_r055_score
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator accepted_risk_six_universe_gate
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_order_level_input_runtime
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_preliminary_qc_figi
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_preliminary_rating_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_six_universe_gate
+research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_six_universe_gate_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2
@@ -2455,6 +2629,14 @@ _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
             "accepted_risk_preliminary_rating_evaluator",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_evaluator",
+            "accepted_risk_market_cap_stock_portfolio_tilt",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime",
             "accepted_risk_market_cap_stock_portfolio_evaluator",
         ),
@@ -2481,6 +2663,70 @@ _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
         (
             "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime",
             "accepted_risk_objective_synthetic_leverage_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
+            "accepted_risk_order_level_benchmark",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
+            "accepted_risk_market_cap_stock_portfolio_tilt",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
+            "accepted_risk_order_level_core",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
+            "accepted_risk_order_level_input_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
+            "accepted_risk_sequential_r055_score",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator",
+            "accepted_risk_sequential_r055_score",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator",
+            "accepted_risk_six_universe_gate",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
+            "accepted_risk_order_level_input_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
+            "accepted_risk_preliminary_rating_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
+            "accepted_risk_six_universe_gate",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
+            "accepted_risk_six_universe_gate_evaluator",
         ),
         (
             "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime",
@@ -2687,13 +2933,20 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
     assert reached == (
         "data.exchange_calendar",
         "research.analyst_revisions_v2_qc",
+        "research.analyst_revisions_v2_qc.accepted_risk_delta_order_package",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt",
         "research.analyst_revisions_v2_qc.accepted_risk_massive_delta",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_order_level_benchmark",
+        "research.analyst_revisions_v2_qc.accepted_risk_order_level_core",
+        "research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_order_level_qc_projection",
+        "research.analyst_revisions_v2_qc.accepted_risk_order_level_submission_adapter",
         "research.analyst_revisions_v2_qc.accepted_risk_pair_bridge",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_package",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi",
@@ -2704,8 +2957,13 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_submission_adapter",
         "research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority",
         "research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution",
+        "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_security_master_admission",
+        "research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
         "research.analyst_revisions_v2_qc.event_study",

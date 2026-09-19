@@ -41,11 +41,23 @@ from research.analyst_revisions_v2_qc import (
     accepted_risk_objective_synthetic_leverage_qc_runtime as leverage_runtime,
 )
 from research.analyst_revisions_v2_qc import (
+    accepted_risk_six_universe_gate as six_universe_gate,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_six_universe_gate_evaluator as six_universe_evaluator,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_six_universe_gate_qc_runtime as six_universe_runtime,
+)
+from research.analyst_revisions_v2_qc import (
     accepted_risk_preliminary_submission_adapter as adapter,
 )
 from research.analyst_revisions_v2_qc import formal_qc_transport as transport_module
 from research.analyst_revisions_v2_qc.owner_signature_authority import (
     OwnerSignatureAuthority,
+)
+from tests.analyst_revisions_v2 import (
+    test_qc_accepted_risk_six_universe_gate_evaluator as six_evaluator_fixtures,
 )
 
 
@@ -89,6 +101,8 @@ _EXPECTED_LOOK_ACCOUNTING = {
     "technical_corrected_rerun_requires_new_ledger_entry": True,
     "retry_may_overwrite_shared_ledger_entry": False,
 }
+
+_PINNED_BUILD_SIX_EVALUATOR_INPUT = evaluator.load_preliminary_rating_input
 
 
 def _look_accounting_at(stage):
@@ -366,6 +380,11 @@ def leverage_plan_qqq(monkeypatch, tmp_path):
         tmp_path,
         leverage_evaluator.QQQ_2021_2025_V3_PROFILE_ID,
     )
+
+
+@pytest.fixture(params=six_universe_evaluator.PROFILE_IDS)
+def six_universe_plan(request, monkeypatch, tmp_path):
+    return _build_plan(monkeypatch, tmp_path, request.param)
 
 
 def _aggregate_statistics(plan):
@@ -1295,6 +1314,216 @@ def _leverage_aggregate_statistics(plan):
     statistics["ARV2_RUNTIME_META"] = _canonical(runtime_meta).decode("ascii")
     assert tuple(sorted(statistics)) == plan.expected_custom_statistic_names
     return statistics
+
+
+def _six_universe_aggregate_statistics(plan):
+    profile = six_universe_evaluator.require_profile(
+        plan.evaluation_profile_id
+    ).to_record()
+    slot_count_per_sleeve = profile["slot_count_per_sleeve"]
+
+    def account(role, salt):
+        return {
+            "schema": six_universe_evaluator.ACCOUNT_SCHEMA,
+            "role": role,
+            "cost_bps_per_side": 10,
+            "cumulative_return": "0.1",
+            "annualized_arithmetic_return": "0.02",
+            "annualized_volatility": "0.1",
+            "zero_rate_sharpe": "0.2",
+            "maximum_drawdown": "-0.1",
+            "average_daily_two_sided_turnover": "0.01",
+            "annualized_two_sided_turnover": "2.52",
+            "average_cash_weight": "0.02",
+            "mean_holding_count": "10",
+            "mean_target_effective_holdings": "9",
+            "maximum_target_weight": "0.098",
+            "return_session_count": 1_254,
+            "invested_return_session_count": 1_253,
+            "rebalance_count": 261,
+            "full_target_count": 261,
+            "underfilled_target_count": 0,
+            "locked_over_target_count": 0,
+            "entry_price_refusal_count": 0,
+            "stale_mark_session_count": 0,
+            "stale_position_deferral_count": 0,
+            "eligibility_exit_zero_recovery_count": 0,
+            "return_metric_conditioning": (
+                "per_name_stale_mark_carry_and_eligibility_exit_zero_recovery"
+            ),
+            "equity_return_path_sha256": salt * 64,
+            "raw_price_rows_in_output": False,
+            "raw_security_ids_in_output": False,
+        }
+
+    signal = account("signal", "1")
+    matched = account("matched", "2")
+    basket = account("six_etf_basket", "3")
+    basket.update(
+        {
+            "mean_holding_count": "6",
+            "mean_target_effective_holdings": "6",
+            "maximum_target_weight": "0.164",
+        }
+    )
+    sleeves = {
+        "schema": six_universe_evaluator.SLEEVE_SCHEMA,
+        "universes": [
+            {
+                "universe_id": universe_id,
+                "decision_count": 261,
+                "coverage_valid_count": 261,
+                "signal_full_etf_fallback_count": 0,
+                "signal_partial_etf_fallback_count": 0,
+                "matched_full_etf_fallback_count": 0,
+                "mean_positive_score_count": "20",
+                "mean_signal_stock_count": str(slot_count_per_sleeve),
+                "mean_matched_stock_count": str(slot_count_per_sleeve),
+                "minimum_mapping_ratio": "0.95",
+                "minimum_cap_weight_coverage_ratio": "0.995",
+            }
+            for universe_id in six_universe_gate.UNIVERSE_IDS
+        ],
+    }
+    series = {
+        "schema": six_universe_evaluator.SERIES_SCHEMA,
+        "series": [
+            {
+                "universe_id": universe_id,
+                "normalization_mode": "TOTAL_RETURN",
+                "observation": "session_open",
+                "expected_session_count": 1_255,
+                "observation_count": 1_255,
+                "raw_observation_sha256": format(index + 4, "x") * 64,
+                "used_return_path_sha256": format(index + 10, "x") * 64,
+            }
+            for index, universe_id in enumerate(six_universe_gate.UNIVERSE_IDS)
+        ],
+    }
+    fragments = {
+        "signal": signal,
+        "matched": matched,
+        "six_etf_basket": basket,
+        "sleeves": sleeves,
+        "series": series,
+    }
+    fragment_digest = hashlib.sha256(
+        _canonical(
+            {
+                "schema": "arv2-six-universe-result-fragments-v1",
+                **fragments,
+            }
+        )
+    ).hexdigest()
+    pit_calls = 308
+    meta = {
+        "schema": six_universe_evaluator.SUMMARY_SCHEMA,
+        "status": "PRELIMINARY_ACCEPTED_RISK_SIX_UNIVERSE_GATE_COMPLETED",
+        "profile_id": profile["profile_id"],
+        "profile_sha256": profile["profile_sha256"],
+        "gate_profile_id": profile["gate_profile_id"],
+        "gate_profile_sha256": profile["gate_profile_sha256"],
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "input_manifest_id": plan.evaluator_manifest_id,
+        "input_manifest_sha256": plan.evaluator_manifest_sha256,
+        "symbol_resolution_id": "resolution-one",
+        "symbol_resolution_sha256": "e" * 64,
+        "construction_path_sha256": "f" * 64,
+        "result_fragments_sha256": fragment_digest,
+        "decision_session_count": 261,
+        "price_history_batch_count": 1,
+        "pit_history_call_count": pit_calls,
+        "pit_source_row_count": 1_000,
+        "analyst_source_view": six_universe_gate.SOURCE_VIEW_ID,
+        "point_in_time_etf_membership_and_market_cap": True,
+        "point_in_time_analyst_archive": False,
+        "current_vintage_identity_basis": True,
+        "aggregate_only": True,
+        "raw_rows_in_output": False,
+        "orders": False,
+        "deployment": False,
+        "trading": False,
+    }
+    digest = hashlib.sha256(
+        _canonical({"profile": profile, "meta": meta, **fragments})
+    ).hexdigest()
+    meta["summary_id"] = "arv2-six-universe-summary-" + digest[:24]
+    meta["summary_sha256"] = digest
+    runtime = {
+        "schema": "arv2-six-universe-qc-runtime-meta-v1",
+        "profile_id": profile["profile_id"],
+        "profile_sha256": profile["profile_sha256"],
+        "package_id": plan.package_id,
+        "package_sha256": plan.package_sha256,
+        "symbol_resolution_id": "resolution-one",
+        "symbol_resolution_sha256": "e" * 64,
+        "runtime_slice_count": 160,
+        "pit_history_call_count": pit_calls,
+        "pit_source_row_count": 1_000,
+        "price_history_call_count": 1,
+        "result_transport": "aggregate_only_custom_summary_statistics",
+        "host_object_store_export_required": False,
+        "backtest_only": True,
+        "orders": False,
+        "deployment": False,
+        "trading": False,
+    }
+    records = {
+        six_universe_evaluator.META_STATISTIC_NAME: meta,
+        six_universe_evaluator.SIGNAL_STATISTIC_NAME: signal,
+        six_universe_evaluator.MATCHED_STATISTIC_NAME: matched,
+        six_universe_evaluator.ETF_BASKET_STATISTIC_NAME: basket,
+        six_universe_evaluator.SLEEVES_STATISTIC_NAME: sleeves,
+        six_universe_evaluator.SERIES_STATISTIC_NAME: series,
+        six_universe_runtime.RUNTIME_META_STATISTIC_NAME: runtime,
+    }
+    statistics = {
+        name: _canonical(value).decode("ascii")
+        for name, value in records.items()
+    }
+    assert tuple(sorted(statistics)) == plan.expected_custom_statistic_names
+    return statistics
+
+
+def _rehash_six_universe_summary(plan, statistics):
+    metadata = json.loads(
+        statistics[six_universe_evaluator.META_STATISTIC_NAME]
+    )
+    profile = six_universe_evaluator.require_profile(
+        plan.evaluation_profile_id
+    ).to_record()
+    fragments = {
+        "signal": json.loads(statistics[six_universe_evaluator.SIGNAL_STATISTIC_NAME]),
+        "matched": json.loads(statistics[six_universe_evaluator.MATCHED_STATISTIC_NAME]),
+        "six_etf_basket": json.loads(
+            statistics[six_universe_evaluator.ETF_BASKET_STATISTIC_NAME]
+        ),
+        "sleeves": json.loads(statistics[six_universe_evaluator.SLEEVES_STATISTIC_NAME]),
+        "series": json.loads(statistics[six_universe_evaluator.SERIES_STATISTIC_NAME]),
+    }
+    fragment_digest = hashlib.sha256(
+        _canonical(
+            {
+                "schema": "arv2-six-universe-result-fragments-v1",
+                **fragments,
+            }
+        )
+    ).hexdigest()
+    metadata["result_fragments_sha256"] = fragment_digest
+    summary_meta = {
+        key: value
+        for key, value in metadata.items()
+        if key not in {"summary_id", "summary_sha256"}
+    }
+    digest = hashlib.sha256(
+        _canonical({"profile": profile, "meta": summary_meta, **fragments})
+    ).hexdigest()
+    metadata["summary_id"] = "arv2-six-universe-summary-" + digest[:24]
+    metadata["summary_sha256"] = digest
+    statistics[six_universe_evaluator.META_STATISTIC_NAME] = _canonical(
+        metadata
+    ).decode("ascii")
 
 
 def _rehash_preliminary_summary(statistics):
@@ -3650,6 +3879,295 @@ def _reachable_local_python_paths(root, initial_paths):
     return {str(path.relative_to(root)) for path in observed}
 
 
+def test_six_universe_projection_is_exact_and_qc_prelude_safe(six_universe_plan):
+    projection = six_universe_plan.projection
+    assert tuple(
+        item.project_path
+        for item in projection.source_files
+        if item.project_path != "main.py"
+    ) == tuple(sorted(projection_builder.SIX_UNIVERSE_PROJECT_SOURCE_PATHS))
+    assert projection.evaluation_profile_id in six_universe_evaluator.PROFILE_IDS
+    assert projection.train_work_units_per_slice == (
+        six_universe_runtime.TRAIN_WORK_UNITS_PER_SLICE
+    )
+    assert projection.maximum_train_slice_count == (
+        six_universe_runtime.MAXIMUM_TRAIN_SLICE_COUNT
+    )
+    for source in projection.source_files:
+        text = source.source_bytes.decode("ascii")
+        assert "from __future__ import" not in text
+        compile("QC_PRELUDE_SENTINEL = True\n" + text, source.project_path, "exec")
+        compile(
+            "from AlgorithmImports import *\n" + text,
+            source.project_path,
+            "exec",
+        )
+    main = next(
+        item.source_bytes.decode("ascii")
+        for item in projection.source_files
+        if item.project_path == "main.py"
+    )
+    assert "AcceptedRiskSixUniverseGateQcDriver" in main
+    assert "('SPY', 'QQQ', 'SOXX', 'XLV', 'REMX', 'XLE')" in main
+    assert "profile_id=" + repr(projection.evaluation_profile_id) in main
+
+
+def test_six_universe_profiles_have_exact_run_specs_and_result_inventory(
+    six_universe_plan,
+):
+    profile_id = six_universe_plan.evaluation_profile_id
+    expected = {
+        six_universe_evaluator.TOP10_PRIMARY_PROFILE.profile_id: (
+            "R-121", 88, 89, 31, 32, 609, 612
+        ),
+        six_universe_evaluator.TOP5_SENSITIVITY_PROFILE.profile_id: (
+            "R-122", 89, 90, 32, 33, 612, 615
+        ),
+    }[profile_id]
+    spec = adapter._run_spec(profile_id)
+    assert (
+        spec.ledger_entry_id,
+        spec.run_level_looks_before,
+        spec.run_level_looks_after,
+        spec.development_evaluations_before,
+        spec.development_evaluations_after,
+        spec.lifetime_alpha_cell_floor_before,
+        spec.lifetime_alpha_cell_floor_after,
+    ) == expected
+    assert spec.cell_count == 3
+    assert six_universe_plan.expected_custom_statistic_names == tuple(
+        sorted(
+            (
+                *six_universe_evaluator.expected_custom_summary_statistic_names(
+                    profile_id
+                ),
+                six_universe_runtime.RUNTIME_META_STATISTIC_NAME,
+            )
+        )
+    )
+    assert len(six_universe_plan.expected_custom_statistic_names) == 7
+    for stage in ("reservation", "launch", "result"):
+        accounting = adapter._look_accounting(
+            stage=stage, evaluation_profile_id=profile_id
+        )
+        assert accounting["planned_maximum_preliminary_ic_cell_count"] == 3
+        assert accounting["emitted_preliminary_ic_cell_count"] == (
+            3 if stage == "result" else 0
+        )
+
+
+def test_six_universe_exact_seven_aggregate_statistics_validate(
+    six_universe_plan,
+):
+    statistics = _six_universe_aggregate_statistics(six_universe_plan)
+    _validate_statistics(six_universe_plan, statistics)
+
+
+def test_six_universe_evaluator_account_output_validates_in_host(
+    six_universe_plan, monkeypatch,
+):
+    monkeypatch.setattr(
+        evaluator,
+        "load_preliminary_rating_input",
+        _PINNED_BUILD_SIX_EVALUATOR_INPUT,
+    )
+    profile = six_universe_evaluator.require_profile(
+        six_universe_plan.evaluation_profile_id
+    )
+    runtime = six_evaluator_fixtures._complete(
+        six_evaluator_fixtures.fixtures._input(20),
+        profile=profile,
+    )
+    statistics = runtime.custom_summary_statistics()
+    assert tuple(
+        json.loads(statistics[name])["role"]
+        for name in (
+            six_universe_evaluator.SIGNAL_STATISTIC_NAME,
+            six_universe_evaluator.MATCHED_STATISTIC_NAME,
+            six_universe_evaluator.ETF_BASKET_STATISTIC_NAME,
+        )
+    ) == ("signal", "matched", "six_etf_basket")
+    meta = json.loads(statistics[six_universe_evaluator.META_STATISTIC_NAME])
+    expected_pit_calls = (
+        (
+            six_universe_evaluator.EXPECTED_DECISION_SESSION_COUNT
+            + six_universe_runtime.HISTORY_CHUNK_DECISION_COUNT
+            - 1
+        )
+        // six_universe_runtime.HISTORY_CHUNK_DECISION_COUNT
+    ) * (1 + len(six_universe_gate.UNIVERSE_IDS))
+    meta.update(
+        {
+            "package_id": six_universe_plan.package_id,
+            "package_sha256": six_universe_plan.package_sha256,
+            "input_manifest_id": six_universe_plan.evaluator_manifest_id,
+            "input_manifest_sha256": six_universe_plan.evaluator_manifest_sha256,
+            "pit_history_call_count": expected_pit_calls,
+        }
+    )
+    statistics[six_universe_evaluator.META_STATISTIC_NAME] = _canonical(
+        meta
+    ).decode("ascii")
+    statistics[six_universe_runtime.RUNTIME_META_STATISTIC_NAME] = _canonical(
+        {
+            "schema": "arv2-six-universe-qc-runtime-meta-v1",
+            "profile_id": profile.profile_id,
+            "profile_sha256": profile.profile_sha256,
+            "package_id": six_universe_plan.package_id,
+            "package_sha256": six_universe_plan.package_sha256,
+            "symbol_resolution_id": meta["symbol_resolution_id"],
+            "symbol_resolution_sha256": meta["symbol_resolution_sha256"],
+            "runtime_slice_count": 1,
+            "pit_history_call_count": expected_pit_calls,
+            "pit_source_row_count": meta["pit_source_row_count"],
+            "price_history_call_count": meta["price_history_batch_count"],
+            "result_transport": "aggregate_only_custom_summary_statistics",
+            "host_object_store_export_required": False,
+            "backtest_only": True,
+            "orders": False,
+            "deployment": False,
+            "trading": False,
+        }
+    ).decode("ascii")
+    _rehash_six_universe_summary(six_universe_plan, statistics)
+
+    _validate_statistics(six_universe_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("statistic_name", "field", "value", "message"),
+    (
+        (
+            six_universe_runtime.RUNTIME_META_STATISTIC_NAME,
+            "orders",
+            True,
+            "runtime semantics changed",
+        ),
+        (
+            six_universe_evaluator.SERIES_STATISTIC_NAME,
+            "observation_count",
+            1_254,
+            "series semantics changed",
+        ),
+        (
+            six_universe_evaluator.SIGNAL_STATISTIC_NAME,
+            "invested_return_session_count",
+            49,
+            "account count invariants changed",
+        ),
+    ),
+)
+def test_six_universe_dangerous_aggregate_mutations_are_refused(
+    six_universe_plan, statistic_name, field, value, message
+):
+    statistics = _six_universe_aggregate_statistics(six_universe_plan)
+    record = json.loads(statistics[statistic_name])
+    if statistic_name == six_universe_evaluator.SERIES_STATISTIC_NAME:
+        record["series"][0][field] = value
+    else:
+        record[field] = value
+    statistics[statistic_name] = _canonical(record).decode("ascii")
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(six_universe_plan, statistics)
+
+
+def test_six_universe_top5_sleeve_slot_count_is_profile_bound(
+    six_universe_plan,
+):
+    if (
+        six_universe_plan.evaluation_profile_id
+        != six_universe_evaluator.TOP5_SENSITIVITY_PROFILE.profile_id
+    ):
+        pytest.skip("top-five profile only")
+    statistics = _six_universe_aggregate_statistics(six_universe_plan)
+    sleeves = json.loads(statistics[six_universe_evaluator.SLEEVES_STATISTIC_NAME])
+    sleeves["universes"][0]["mean_signal_stock_count"] = "10"
+    statistics[six_universe_evaluator.SLEEVES_STATISTIC_NAME] = _canonical(
+        sleeves
+    ).decode("ascii")
+    _rehash_six_universe_summary(six_universe_plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="sleeve metric escaped bounds",
+    ):
+        _validate_statistics(six_universe_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("statistic_name", "field", "value", "message"),
+    (
+        (
+            six_universe_evaluator.SIGNAL_STATISTIC_NAME,
+            "annualized_two_sided_turnover",
+            "999",
+            "turnover arithmetic changed",
+        ),
+        (
+            six_universe_evaluator.SIGNAL_STATISTIC_NAME,
+            "zero_rate_sharpe",
+            "999",
+            "Sharpe arithmetic changed",
+        ),
+        (
+            six_universe_evaluator.ETF_BASKET_STATISTIC_NAME,
+            None,
+            None,
+            "ETF basket completeness changed",
+        ),
+    ),
+)
+def test_six_universe_rehashed_economic_identity_mutations_are_refused(
+    six_universe_plan, statistic_name, field, value, message
+):
+    statistics = _six_universe_aggregate_statistics(six_universe_plan)
+    account = json.loads(statistics[statistic_name])
+    if field is None:
+        account["full_target_count"] = 0
+        account["underfilled_target_count"] = 261
+    else:
+        account[field] = value
+    statistics[statistic_name] = _canonical(account).decode("ascii")
+    _rehash_six_universe_summary(six_universe_plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match=message,
+    ):
+        _validate_statistics(six_universe_plan, statistics)
+
+
+@pytest.mark.parametrize(
+    ("name", "value"),
+    (
+        ("PRIMARY_COST_BPS_PER_SIDE", 11),
+        ("MODELED_COST_RATE_PER_SIDE", Decimal("0.002")),
+        ("ANNUALIZATION_SESSIONS", Decimal("251")),
+        ("GATE_SCORE_QUANTUM", Decimal("1e-47")),
+    ),
+)
+def test_six_universe_financial_contract_mutation_refuses_pre_network(
+    six_universe_plan, monkeypatch, name, value
+):
+    backend = _Backend(six_universe_plan)
+    monkeypatch.setattr(six_universe_evaluator, name, value)
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="action global binding changed",
+    ):
+        adapter.execute_accepted_risk_preliminary_submission_once(
+            plan=six_universe_plan,
+            owner_signature=None,
+            client=_client(backend),
+            started_at_utc="2026-09-18T20:00:00Z",
+        )
+    assert backend.events == []
+    assert not any(six_universe_plan.control_directory.iterdir())
+
+
 class _Backend:
     def __init__(self, plan):
         self.plan = plan
@@ -3665,6 +4183,8 @@ class _Backend:
         profile_id = plan.projection.evaluation_profile_id
         if profile_id is None:
             self.statistics = _aggregate_statistics(plan)
+        elif profile_id in six_universe_evaluator.PROFILE_IDS:
+            self.statistics = _six_universe_aggregate_statistics(plan)
         elif profile_id in leverage_evaluator.PROFILE_IDS:
             self.statistics = _leverage_aggregate_statistics(plan)
         elif profile_id in market_cap_evaluator.ALL_PROFILE_IDS:
@@ -3875,6 +4395,44 @@ def _read(plan, backend, signature, permit, launch, terminal):
         client=_client(backend),
         started_at_utc="2026-09-14T21:00:00Z",
     )
+
+
+def test_six_universe_signed_path_reads_exactly_seven_aggregates_once(
+    six_universe_plan,
+):
+    signature = _offline_signature()
+    backend = _Backend(six_universe_plan)
+    permit, launch = _execute(six_universe_plan, backend, signature)
+    terminal = _complete(
+        six_universe_plan, backend, signature, permit, launch
+    )
+    authority = json.loads(
+        adapter.render_accepted_risk_preliminary_result_read_authority_candidate(
+            plan=six_universe_plan,
+            permit=permit,
+            launch=launch,
+            terminal=terminal,
+        )
+    )
+    assert authority["expected_custom_statistic_names"] == list(
+        six_universe_plan.expected_custom_statistic_names
+    )
+    result_permit, result = _read(
+        six_universe_plan,
+        backend,
+        signature,
+        permit,
+        launch,
+        terminal,
+    )
+    assert result_permit.plan_sha256 == six_universe_plan.plan_sha256
+    assert tuple(name for name, _value in result.custom_statistics) == (
+        six_universe_plan.expected_custom_statistic_names
+    )
+    assert backend.events.count("backtests/read") == 1
+    persisted = result.persisted_path.read_text()
+    assert "RAW_PRICE" not in persisted
+    assert "RAW_ORDER" not in persisted
 
 
 def test_offline_exact_submission_status_and_single_aggregate_read(plan):

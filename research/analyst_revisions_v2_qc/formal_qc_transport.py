@@ -1135,6 +1135,7 @@ def _build_transport_capability_authority():
                     "preopen_prereview",
                     "power",
                     "accepted_risk_preliminary",
+                    "accepted_risk_order_level",
                 }
                 or any(
                     key == adapter_key

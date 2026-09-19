@@ -51,6 +51,13 @@ from . import (
 from . import (
     accepted_risk_objective_synthetic_leverage_qc_runtime as leverage_runtime,
 )
+from . import accepted_risk_six_universe_gate as six_universe_gate
+from . import (
+    accepted_risk_six_universe_gate_evaluator as six_universe_evaluator,
+)
+from . import (
+    accepted_risk_six_universe_gate_qc_runtime as six_universe_runtime,
+)
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -544,6 +551,104 @@ _PINNED_LEVERAGE_PROFILE_BINDINGS = tuple(
     )
     for profile_id in _PINNED_LEVERAGE_PROFILE_IDS
 )
+_PINNED_PROJECTION_SIX_UNIVERSE_SOURCE_PATHS = tuple(
+    projection_builder.SIX_UNIVERSE_PROJECT_SOURCE_PATHS
+)
+_PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_IDS = tuple(
+    projection_builder.SIX_UNIVERSE_PROFILE_IDS
+)
+_PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_SHA256S_OBJECT = (
+    projection_builder.SIX_UNIVERSE_PROFILE_SHA256S
+)
+_PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_SHA256_ROWS = tuple(
+    sorted(_PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_SHA256S_OBJECT.items())
+)
+_PINNED_REQUIRE_SIX_UNIVERSE_PROFILE = six_universe_evaluator.require_profile
+_PINNED_SIX_UNIVERSE_RESULT_NAMES_CALLABLE = (
+    six_universe_evaluator.expected_custom_summary_statistic_names
+)
+_PINNED_SIX_UNIVERSE_PROFILE_IDS = tuple(six_universe_evaluator.PROFILE_IDS)
+_PINNED_SIX_UNIVERSE_PROFILE_BINDINGS = tuple(
+    (
+        profile_id,
+        json.dumps(
+            _PINNED_REQUIRE_SIX_UNIVERSE_PROFILE(profile_id).to_record(),
+            sort_keys=True,
+            separators=(",", ":"),
+            ensure_ascii=True,
+            allow_nan=False,
+        ).encode("ascii"),
+        _PINNED_REQUIRE_SIX_UNIVERSE_PROFILE(profile_id).profile_sha256,
+        tuple(
+            sorted(
+                (
+                    *_PINNED_SIX_UNIVERSE_RESULT_NAMES_CALLABLE(profile_id),
+                    six_universe_runtime.RUNTIME_META_STATISTIC_NAME,
+                )
+            )
+        ),
+    )
+    for profile_id in _PINNED_SIX_UNIVERSE_PROFILE_IDS
+)
+_PINNED_SIX_UNIVERSE_PROFILE_SCHEMA = six_universe_evaluator.PROFILE_SCHEMA
+_PINNED_SIX_UNIVERSE_SUMMARY_SCHEMA = six_universe_evaluator.SUMMARY_SCHEMA
+_PINNED_SIX_UNIVERSE_ACCOUNT_SCHEMA = six_universe_evaluator.ACCOUNT_SCHEMA
+_PINNED_SIX_UNIVERSE_SLEEVE_SCHEMA = six_universe_evaluator.SLEEVE_SCHEMA
+_PINNED_SIX_UNIVERSE_SERIES_SCHEMA = six_universe_evaluator.SERIES_SCHEMA
+_PINNED_SIX_UNIVERSE_STATISTIC_NAMES = (
+    six_universe_evaluator.META_STATISTIC_NAME,
+    six_universe_evaluator.SIGNAL_STATISTIC_NAME,
+    six_universe_evaluator.MATCHED_STATISTIC_NAME,
+    six_universe_evaluator.ETF_BASKET_STATISTIC_NAME,
+    six_universe_evaluator.SLEEVES_STATISTIC_NAME,
+    six_universe_evaluator.SERIES_STATISTIC_NAME,
+    six_universe_runtime.RUNTIME_META_STATISTIC_NAME,
+)
+_PINNED_SIX_UNIVERSE_DECISION_START = (
+    six_universe_evaluator.DECISION_START_SESSION
+)
+_PINNED_SIX_UNIVERSE_EVALUATION_END = (
+    six_universe_evaluator.EVALUATION_END_SESSION
+)
+_PINNED_SIX_UNIVERSE_EXPECTED_SESSIONS = (
+    six_universe_evaluator.EXPECTED_SESSION_COUNT
+)
+_PINNED_SIX_UNIVERSE_EXPECTED_RETURNS = (
+    six_universe_evaluator.EXPECTED_RETURN_SESSION_COUNT
+)
+_PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS = (
+    six_universe_evaluator.EXPECTED_DECISION_SESSION_COUNT
+)
+_PINNED_SIX_UNIVERSE_PRIMARY_COST = (
+    six_universe_evaluator.PRIMARY_COST_BPS_PER_SIDE
+)
+_PINNED_SIX_UNIVERSE_MODELED_COST_RATE = (
+    six_universe_evaluator.MODELED_COST_RATE_PER_SIDE
+)
+_PINNED_SIX_UNIVERSE_ANNUALIZATION_SESSIONS = (
+    six_universe_evaluator.ANNUALIZATION_SESSIONS
+)
+_PINNED_SIX_UNIVERSE_GATE_SCORE_QUANTUM = (
+    six_universe_evaluator.GATE_SCORE_QUANTUM
+)
+_PINNED_SIX_UNIVERSE_MINIMUM_INVESTED_RETURNS = (
+    six_universe_evaluator.MINIMUM_INVESTED_RETURN_SESSIONS
+)
+_PINNED_SIX_UNIVERSE_TARGET_GROSS = six_universe_gate.TARGET_GROSS_EXPOSURE
+_PINNED_SIX_UNIVERSE_IDS = tuple(six_universe_gate.UNIVERSE_IDS)
+_PINNED_SIX_UNIVERSE_SOURCE_VIEW = six_universe_gate.SOURCE_VIEW_ID
+_PINNED_SIX_UNIVERSE_RUNTIME_MAX_TRAIN_SLICES = (
+    six_universe_runtime.MAXIMUM_TRAIN_SLICE_COUNT
+)
+_PINNED_SIX_UNIVERSE_RUNTIME_WORK_UNITS = (
+    six_universe_runtime.TRAIN_WORK_UNITS_PER_SLICE
+)
+_PINNED_SIX_UNIVERSE_RUNTIME_HISTORY_CHUNK_DECISIONS = (
+    six_universe_runtime.HISTORY_CHUNK_DECISION_COUNT
+)
+_PINNED_SIX_UNIVERSE_RUNTIME_MAX_SOURCE_ROWS = (
+    six_universe_runtime.MAXIMUM_TOTAL_SOURCE_ROWS
+)
 _PINNED_JSON_DUMPS = json.dumps
 _PINNED_REQUIRE_EXECUTION_SIGNATURE = require_formal_execution_owner_signature
 _PINNED_REQUIRE_RESULT_SIGNATURE = require_formal_result_read_owner_signature
@@ -652,6 +757,20 @@ def _leverage_profile_binding(
         if candidate_profile_id == profile_id:
             return profile_bytes, profile_sha256, result_names
     _error("objective leverage profile is not allowlisted")
+
+
+def _six_universe_profile_binding(
+    profile_id: str,
+) -> tuple[bytes, str, tuple[str, ...]]:
+    for (
+        candidate_profile_id,
+        profile_bytes,
+        profile_sha256,
+        result_names,
+    ) in _PINNED_SIX_UNIVERSE_PROFILE_BINDINGS:
+        if candidate_profile_id == profile_id:
+            return profile_bytes, profile_sha256, result_names
+    _error("six-universe profile is not allowlisted")
 
 
 # The R-058/R-059 baselines are conditional ledger successors.  The host
@@ -1007,6 +1126,30 @@ _EVALUATION_RUN_SPECS = (
         603,
         607,
     ),
+    _EvaluationRunSpec(
+        six_universe_evaluator.TOP10_PRIMARY_PROFILE.profile_id,
+        "arv2-eval-six-universe-gate-top10-2021-2025-qc-056",
+        "R-121",
+        88,
+        89,
+        31,
+        32,
+        3,
+        609,
+        612,
+    ),
+    _EvaluationRunSpec(
+        six_universe_evaluator.TOP5_SENSITIVITY_PROFILE.profile_id,
+        "arv2-eval-six-universe-gate-top5-2021-2025-qc-057",
+        "R-122",
+        89,
+        90,
+        32,
+        33,
+        3,
+        612,
+        615,
+    ),
 )
 
 _SUPERSEDED_UNSPENT_PROFILE_IDS = (
@@ -1043,6 +1186,9 @@ def _run_spec(evaluation_profile_id: str | None) -> _EvaluationRunSpec:
                     and not _leverage_contract_bindings_are_current()
                 ):
                     _error("objective leverage financial contract changed")
+            elif evaluation_profile_id in _PINNED_SIX_UNIVERSE_PROFILE_IDS:
+                if not _six_universe_contract_bindings_are_current():
+                    _error("six-universe financial contract changed")
             elif evaluation_profile_id is not None:
                 _PINNED_REQUIRE_REGIME_PROFILE(evaluation_profile_id)
             return spec
@@ -1071,6 +1217,10 @@ def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]
         _profile_bytes, _profile_sha256, names = (
             _leverage_profile_binding(evaluation_profile_id)
         )
+    elif evaluation_profile_id in _PINNED_SIX_UNIVERSE_PROFILE_IDS:
+        _profile_bytes, _profile_sha256, names = (
+            _six_universe_profile_binding(evaluation_profile_id)
+        )
     else:
         names = tuple(
             _PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE(evaluation_profile_id)
@@ -1078,21 +1228,29 @@ def _expected_result_names(evaluation_profile_id: str | None) -> tuple[str, ...]
     split_account_profiles = (
         _PINNED_MARKET_CAP_ALL_PROFILE_IDS + _PINNED_LEVERAGE_PROFILE_IDS
     )
-    non_cell_statistic_count = (
-        (
+    if evaluation_profile_id in _PINNED_SIX_UNIVERSE_PROFILE_IDS:
+        non_cell_statistic_count = 4
+    elif evaluation_profile_id in split_account_profiles:
+        non_cell_statistic_count = (
             5
             if evaluation_profile_id in _PINNED_MARKET_CAP_TILT_PROFILE_IDS
             else 4
         )
-        if evaluation_profile_id in split_account_profiles
-        else 2
-    )
+    else:
+        non_cell_statistic_count = 2
     if (
         type(names) is not tuple
         or len(names) != spec.cell_count + non_cell_statistic_count
         or names != tuple(sorted(names))
         or len(set(names)) != len(names)
-        or "ARV2_RUNTIME_META" not in names
+        or (
+            (
+                six_universe_runtime.RUNTIME_META_STATISTIC_NAME
+                if evaluation_profile_id in _PINNED_SIX_UNIVERSE_PROFILE_IDS
+                else "ARV2_RUNTIME_META"
+            )
+            not in names
+        )
     ):
         _error("preliminary expected result inventory changed")
     return names
@@ -1986,6 +2144,212 @@ def _leverage_contract_bindings_are_current() -> bool:
             ):
                 return False
         return _market_cap_contract_bindings_are_current()
+    except (Exception, RecursionError):
+        return False
+
+
+def _six_universe_contract_bindings_are_current() -> bool:
+    """Refuse drift in either frozen six-universe diagnostic profile."""
+
+    evaluator_namespace = six_universe_evaluator.__dict__
+    runtime_namespace = six_universe_runtime.__dict__
+    gate_namespace = six_universe_gate.__dict__
+    if any(
+        type(item) is not dict
+        for item in (evaluator_namespace, runtime_namespace, gate_namespace)
+    ):
+        return False
+    try:
+        profile_ids = evaluator_namespace.get("PROFILE_IDS")
+        projection_profile_ids = projection_builder.SIX_UNIVERSE_PROFILE_IDS
+        projection_hashes = projection_builder.SIX_UNIVERSE_PROFILE_SHA256S
+        source_paths = projection_builder.SIX_UNIVERSE_PROJECT_SOURCE_PATHS
+        scalar_bindings = (
+            (
+                evaluator_namespace.get("PROFILE_SCHEMA"),
+                _PINNED_SIX_UNIVERSE_PROFILE_SCHEMA,
+                str,
+            ),
+            (
+                evaluator_namespace.get("SUMMARY_SCHEMA"),
+                _PINNED_SIX_UNIVERSE_SUMMARY_SCHEMA,
+                str,
+            ),
+            (
+                evaluator_namespace.get("ACCOUNT_SCHEMA"),
+                _PINNED_SIX_UNIVERSE_ACCOUNT_SCHEMA,
+                str,
+            ),
+            (
+                evaluator_namespace.get("SLEEVE_SCHEMA"),
+                _PINNED_SIX_UNIVERSE_SLEEVE_SCHEMA,
+                str,
+            ),
+            (
+                evaluator_namespace.get("SERIES_SCHEMA"),
+                _PINNED_SIX_UNIVERSE_SERIES_SCHEMA,
+                str,
+            ),
+            (
+                evaluator_namespace.get("DECISION_START_SESSION"),
+                _PINNED_SIX_UNIVERSE_DECISION_START,
+                str,
+            ),
+            (
+                evaluator_namespace.get("EVALUATION_END_SESSION"),
+                _PINNED_SIX_UNIVERSE_EVALUATION_END,
+                str,
+            ),
+            (
+                evaluator_namespace.get("EXPECTED_SESSION_COUNT"),
+                _PINNED_SIX_UNIVERSE_EXPECTED_SESSIONS,
+                int,
+            ),
+            (
+                evaluator_namespace.get("EXPECTED_RETURN_SESSION_COUNT"),
+                _PINNED_SIX_UNIVERSE_EXPECTED_RETURNS,
+                int,
+            ),
+            (
+                evaluator_namespace.get("EXPECTED_DECISION_SESSION_COUNT"),
+                _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS,
+                int,
+            ),
+            (
+                evaluator_namespace.get("PRIMARY_COST_BPS_PER_SIDE"),
+                _PINNED_SIX_UNIVERSE_PRIMARY_COST,
+                int,
+            ),
+            (
+                evaluator_namespace.get("MODELED_COST_RATE_PER_SIDE"),
+                _PINNED_SIX_UNIVERSE_MODELED_COST_RATE,
+                Decimal,
+            ),
+            (
+                evaluator_namespace.get("ANNUALIZATION_SESSIONS"),
+                _PINNED_SIX_UNIVERSE_ANNUALIZATION_SESSIONS,
+                Decimal,
+            ),
+            (
+                evaluator_namespace.get("GATE_SCORE_QUANTUM"),
+                _PINNED_SIX_UNIVERSE_GATE_SCORE_QUANTUM,
+                Decimal,
+            ),
+            (
+                evaluator_namespace.get("MINIMUM_INVESTED_RETURN_SESSIONS"),
+                _PINNED_SIX_UNIVERSE_MINIMUM_INVESTED_RETURNS,
+                int,
+            ),
+            (
+                runtime_namespace.get("MAXIMUM_TRAIN_SLICE_COUNT"),
+                _PINNED_SIX_UNIVERSE_RUNTIME_MAX_TRAIN_SLICES,
+                int,
+            ),
+            (
+                runtime_namespace.get("TRAIN_WORK_UNITS_PER_SLICE"),
+                _PINNED_SIX_UNIVERSE_RUNTIME_WORK_UNITS,
+                int,
+            ),
+            (
+                runtime_namespace.get("HISTORY_CHUNK_DECISION_COUNT"),
+                _PINNED_SIX_UNIVERSE_RUNTIME_HISTORY_CHUNK_DECISIONS,
+                int,
+            ),
+            (
+                runtime_namespace.get("MAXIMUM_TOTAL_SOURCE_ROWS"),
+                _PINNED_SIX_UNIVERSE_RUNTIME_MAX_SOURCE_ROWS,
+                int,
+            ),
+        )
+        if any(
+            type(observed) is not expected_type or observed != expected
+            for observed, expected, expected_type in scalar_bindings
+        ):
+            return False
+        observed_statistic_names = (
+            evaluator_namespace.get("META_STATISTIC_NAME"),
+            evaluator_namespace.get("SIGNAL_STATISTIC_NAME"),
+            evaluator_namespace.get("MATCHED_STATISTIC_NAME"),
+            evaluator_namespace.get("ETF_BASKET_STATISTIC_NAME"),
+            evaluator_namespace.get("SLEEVES_STATISTIC_NAME"),
+            evaluator_namespace.get("SERIES_STATISTIC_NAME"),
+            runtime_namespace.get("RUNTIME_META_STATISTIC_NAME"),
+        )
+        if (
+            observed_statistic_names != _PINNED_SIX_UNIVERSE_STATISTIC_NAMES
+            or type(profile_ids) is not tuple
+            or profile_ids != _PINNED_SIX_UNIVERSE_PROFILE_IDS
+            or len(profile_ids) != 2
+            or len(set(profile_ids)) != 2
+            or any(type(item) is not str for item in profile_ids)
+            or type(projection_profile_ids) is not tuple
+            or projection_profile_ids
+            != _PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_IDS
+            or projection_profile_ids != profile_ids
+            or type(projection_hashes) is not dict
+            or projection_hashes
+            is not _PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_SHA256S_OBJECT
+            or tuple(sorted(projection_hashes.items()))
+            != _PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_SHA256_ROWS
+            or type(source_paths) is not tuple
+            or source_paths != _PINNED_PROJECTION_SIX_UNIVERSE_SOURCE_PATHS
+            or any(type(item) is not str for item in source_paths)
+            or evaluator_namespace.get("require_profile")
+            is not _PINNED_REQUIRE_SIX_UNIVERSE_PROFILE
+            or evaluator_namespace.get("expected_custom_summary_statistic_names")
+            is not _PINNED_SIX_UNIVERSE_RESULT_NAMES_CALLABLE
+            or projection_builder._profile
+            is not _PINNED_PROJECTION_PROFILE_CALLABLE
+            or projection_builder.project_source_paths_for_profile
+            is not _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE
+            or gate_namespace.get("UNIVERSE_IDS")
+            != _PINNED_SIX_UNIVERSE_IDS
+            or gate_namespace.get("TARGET_GROSS_EXPOSURE")
+            != _PINNED_SIX_UNIVERSE_TARGET_GROSS
+            or type(gate_namespace.get("TARGET_GROSS_EXPOSURE")) is not Decimal
+        ):
+            return False
+        for (
+            profile_id,
+            expected_profile_bytes,
+            expected_profile_sha256,
+            expected_result_names,
+        ) in _PINNED_SIX_UNIVERSE_PROFILE_BINDINGS:
+            observed_profile = _PINNED_REQUIRE_SIX_UNIVERSE_PROFILE(profile_id)
+            observed_record = observed_profile.to_record()
+            if (
+                type(observed_record) is not dict
+                or _PINNED_JSON_DUMPS(
+                    observed_record,
+                    sort_keys=True,
+                    separators=(",", ":"),
+                    ensure_ascii=True,
+                    allow_nan=False,
+                ).encode("ascii")
+                != expected_profile_bytes
+                or observed_profile.profile_id != profile_id
+                or observed_profile.profile_sha256
+                != expected_profile_sha256
+                or projection_hashes.get(profile_id)
+                != expected_profile_sha256
+                or _PINNED_PROJECTION_PROFILE_CALLABLE(profile_id)
+                != observed_record
+                or _PINNED_PROJECTION_SOURCE_PATHS_CALLABLE(profile_id)
+                != _PINNED_PROJECTION_SIX_UNIVERSE_SOURCE_PATHS
+                or tuple(
+                    sorted(
+                        (
+                            *_PINNED_SIX_UNIVERSE_RESULT_NAMES_CALLABLE(
+                                profile_id
+                            ),
+                            _PINNED_SIX_UNIVERSE_STATISTIC_NAMES[-1],
+                        )
+                    )
+                )
+                != expected_result_names
+            ):
+                return False
+        return True
     except (Exception, RecursionError):
         return False
 
@@ -4632,6 +4996,120 @@ _LEVERAGE_CELL_FIELDS = frozenset(
         "broker_liquidation_modeled",
         "orders_submitted",
         "formal_accept_reject_disposition",
+    }
+)
+_SIX_UNIVERSE_META_FIELDS = frozenset(
+    {
+        "schema",
+        "status",
+        "profile_id",
+        "profile_sha256",
+        "gate_profile_id",
+        "gate_profile_sha256",
+        "package_id",
+        "package_sha256",
+        "input_manifest_id",
+        "input_manifest_sha256",
+        "symbol_resolution_id",
+        "symbol_resolution_sha256",
+        "construction_path_sha256",
+        "result_fragments_sha256",
+        "decision_session_count",
+        "price_history_batch_count",
+        "pit_history_call_count",
+        "pit_source_row_count",
+        "analyst_source_view",
+        "point_in_time_etf_membership_and_market_cap",
+        "point_in_time_analyst_archive",
+        "current_vintage_identity_basis",
+        "aggregate_only",
+        "raw_rows_in_output",
+        "orders",
+        "deployment",
+        "trading",
+        "summary_id",
+        "summary_sha256",
+    }
+)
+_SIX_UNIVERSE_ACCOUNT_FIELDS = frozenset(
+    {
+        "schema",
+        "role",
+        "cost_bps_per_side",
+        "cumulative_return",
+        "annualized_arithmetic_return",
+        "annualized_volatility",
+        "zero_rate_sharpe",
+        "maximum_drawdown",
+        "average_daily_two_sided_turnover",
+        "annualized_two_sided_turnover",
+        "average_cash_weight",
+        "mean_holding_count",
+        "mean_target_effective_holdings",
+        "maximum_target_weight",
+        "return_session_count",
+        "invested_return_session_count",
+        "rebalance_count",
+        "full_target_count",
+        "underfilled_target_count",
+        "locked_over_target_count",
+        "entry_price_refusal_count",
+        "stale_mark_session_count",
+        "stale_position_deferral_count",
+        "eligibility_exit_zero_recovery_count",
+        "return_metric_conditioning",
+        "equity_return_path_sha256",
+        "raw_price_rows_in_output",
+        "raw_security_ids_in_output",
+    }
+)
+_SIX_UNIVERSE_SLEEVES_FIELDS = frozenset({"schema", "universes"})
+_SIX_UNIVERSE_SLEEVE_FIELDS = frozenset(
+    {
+        "universe_id",
+        "decision_count",
+        "coverage_valid_count",
+        "signal_full_etf_fallback_count",
+        "signal_partial_etf_fallback_count",
+        "matched_full_etf_fallback_count",
+        "mean_positive_score_count",
+        "mean_signal_stock_count",
+        "mean_matched_stock_count",
+        "minimum_mapping_ratio",
+        "minimum_cap_weight_coverage_ratio",
+    }
+)
+_SIX_UNIVERSE_SERIES_FIELDS = frozenset({"schema", "series"})
+_SIX_UNIVERSE_SERIES_ROW_FIELDS = frozenset(
+    {
+        "universe_id",
+        "normalization_mode",
+        "observation",
+        "expected_session_count",
+        "observation_count",
+        "raw_observation_sha256",
+        "used_return_path_sha256",
+    }
+)
+_SIX_UNIVERSE_RUNTIME_FIELDS = frozenset(
+    {
+        "schema",
+        "profile_id",
+        "profile_sha256",
+        "package_id",
+        "package_sha256",
+        "symbol_resolution_id",
+        "symbol_resolution_sha256",
+        "runtime_slice_count",
+        "pit_history_call_count",
+        "pit_source_row_count",
+        "price_history_call_count",
+        "result_transport",
+        "host_object_store_export_required",
+        "backtest_only",
+        "orders",
+        "deployment",
+        "trading",
     }
 )
 _CELL_COUNT_FIELDS = (
@@ -7469,6 +7947,416 @@ def _validate_leverage_aggregate_records(
         _error("preliminary objective leverage summary identity changed")
 
 
+def _validate_six_universe_account_aggregate(
+    value: object,
+    *,
+    role: str,
+    annualization_sessions: Decimal,
+) -> dict[str, object]:
+    if type(value) is not dict or set(value) != _SIX_UNIVERSE_ACCOUNT_FIELDS:
+        _error("preliminary six-universe account fields changed")
+    if (
+        value.get("schema") != _PINNED_SIX_UNIVERSE_ACCOUNT_SCHEMA
+        or value.get("role") != role
+        or value.get("cost_bps_per_side")
+        != _PINNED_SIX_UNIVERSE_PRIMARY_COST
+        or value.get("return_session_count")
+        != _PINNED_SIX_UNIVERSE_EXPECTED_RETURNS
+        or value.get("return_metric_conditioning")
+        != "per_name_stale_mark_carry_and_eligibility_exit_zero_recovery"
+        or value.get("raw_price_rows_in_output") is not False
+        or value.get("raw_security_ids_in_output") is not False
+    ):
+        _error("preliminary six-universe account semantics changed")
+    count_fields = (
+        "invested_return_session_count",
+        "rebalance_count",
+        "full_target_count",
+        "underfilled_target_count",
+        "locked_over_target_count",
+        "entry_price_refusal_count",
+        "stale_mark_session_count",
+        "stale_position_deferral_count",
+        "eligibility_exit_zero_recovery_count",
+    )
+    if any(
+        type(value.get(field)) is not int
+        or value[field] < 0
+        or value[field] > _PINNED_SIX_UNIVERSE_EXPECTED_RETURNS
+        for field in count_fields
+    ):
+        _error("preliminary six-universe account count changed")
+    if (
+        value["rebalance_count"] > _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS
+        or value["full_target_count"]
+        + value["underfilled_target_count"]
+        + value["locked_over_target_count"]
+        != value["rebalance_count"]
+        or value["invested_return_session_count"]
+        < _PINNED_SIX_UNIVERSE_MINIMUM_INVESTED_RETURNS
+    ):
+        _error("preliminary six-universe account count invariants changed")
+    decimal_fields = (
+        "cumulative_return",
+        "annualized_arithmetic_return",
+        "maximum_drawdown",
+        "average_daily_two_sided_turnover",
+        "annualized_two_sided_turnover",
+        "average_cash_weight",
+        "mean_holding_count",
+        "mean_target_effective_holdings",
+        "maximum_target_weight",
+    )
+    metrics = {
+        field: _cell_metric(
+            value.get(field), "six-universe " + role + " " + field
+        )
+        for field in decimal_fields
+    }
+    nullable = {}
+    for field in ("annualized_volatility", "zero_rate_sharpe"):
+        raw = value.get(field)
+        nullable[field] = (
+            None
+            if raw is None
+            else _cell_metric(raw, "six-universe " + role + " " + field)
+        )
+    if (
+        metrics["cumulative_return"] <= -1
+        or not -1 <= metrics["maximum_drawdown"] <= 0
+        or metrics["average_daily_two_sided_turnover"] < 0
+        or metrics["annualized_two_sided_turnover"] < 0
+        or not 0 <= metrics["average_cash_weight"] <= 1
+        or metrics["mean_holding_count"] < 0
+        or metrics["mean_target_effective_holdings"] < 0
+        or not 0 <= metrics["maximum_target_weight"] <= 1
+        or (
+            nullable["annualized_volatility"] is not None
+            and nullable["annualized_volatility"] < 0
+        )
+    ):
+        _error("preliminary six-universe account metric escaped bounds")
+    with localcontext() as context:
+        context.prec = 96
+        expected_annual_turnover = +(
+            metrics["average_daily_two_sided_turnover"]
+            * annualization_sessions
+        )
+    if metrics["annualized_two_sided_turnover"] != expected_annual_turnover:
+        _error("preliminary six-universe account turnover arithmetic changed")
+    volatility = nullable["annualized_volatility"]
+    sharpe = nullable["zero_rate_sharpe"]
+    if volatility is None:
+        _error("preliminary six-universe account volatility is absent")
+    if volatility == 0:
+        if sharpe is not None:
+            _error("preliminary six-universe account Sharpe arithmetic changed")
+    else:
+        with localcontext() as context:
+            context.prec = 96
+            expected_sharpe = +(metrics["annualized_arithmetic_return"] / volatility)
+        if sharpe != expected_sharpe:
+            _error("preliminary six-universe account Sharpe arithmetic changed")
+    _sha(value.get("equity_return_path_sha256"), "six-universe return path")
+    return value
+
+
+def _validate_six_universe_aggregate_records(
+    records: Mapping[str, dict[str, object]],
+    plan: AcceptedRiskPreliminarySubmissionPlan,
+) -> None:
+    profile_id = plan.projection.evaluation_profile_id
+    profile_bytes, profile_sha256, _result_names = (
+        _six_universe_profile_binding(profile_id)
+    )
+    profile = _strict_object(profile_bytes, "six-universe frozen profile")
+    annualization_sessions = _cell_metric(
+        profile.get("annualization_sessions"),
+        "six-universe profile annualization sessions",
+    )
+    slot_count_per_sleeve = profile.get("slot_count_per_sleeve")
+    if (
+        annualization_sessions != _PINNED_SIX_UNIVERSE_ANNUALIZATION_SESSIONS
+        or type(slot_count_per_sleeve) is not int
+        or slot_count_per_sleeve < 1
+    ):
+        _error("preliminary six-universe profile economics changed")
+    (
+        meta_name,
+        signal_name,
+        matched_name,
+        basket_name,
+        sleeves_name,
+        series_name,
+        runtime_name,
+    ) = _PINNED_SIX_UNIVERSE_STATISTIC_NAMES
+    meta = records.get(meta_name)
+    signal = records.get(signal_name)
+    matched = records.get(matched_name)
+    basket = records.get(basket_name)
+    sleeves = records.get(sleeves_name)
+    series = records.get(series_name)
+    runtime = records.get(runtime_name)
+    if type(meta) is not dict or set(meta) != _SIX_UNIVERSE_META_FIELDS:
+        _error("preliminary six-universe metadata fields changed")
+    if (
+        meta.get("schema") != _PINNED_SIX_UNIVERSE_SUMMARY_SCHEMA
+        or meta.get("status")
+        != "PRELIMINARY_ACCEPTED_RISK_SIX_UNIVERSE_GATE_COMPLETED"
+        or meta.get("profile_id") != profile_id
+        or meta.get("profile_sha256") != profile_sha256
+        or meta.get("gate_profile_id") != profile.get("gate_profile_id")
+        or meta.get("gate_profile_sha256")
+        != profile.get("gate_profile_sha256")
+        or meta.get("package_id") != plan.package_id
+        or meta.get("package_sha256") != plan.package_sha256
+        or meta.get("input_manifest_id") != plan.evaluator_manifest_id
+        or meta.get("input_manifest_sha256")
+        != plan.evaluator_manifest_sha256
+        or meta.get("decision_session_count")
+        != _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS
+        or meta.get("analyst_source_view")
+        != _PINNED_SIX_UNIVERSE_SOURCE_VIEW
+        or meta.get("point_in_time_etf_membership_and_market_cap") is not True
+        or meta.get("point_in_time_analyst_archive") is not False
+        or meta.get("current_vintage_identity_basis") is not True
+        or meta.get("aggregate_only") is not True
+        or meta.get("raw_rows_in_output") is not False
+        or meta.get("orders") is not False
+        or meta.get("deployment") is not False
+        or meta.get("trading") is not False
+    ):
+        _error("preliminary six-universe metadata semantics changed")
+    count_fields = (
+        "price_history_batch_count",
+        "pit_history_call_count",
+        "pit_source_row_count",
+    )
+    if any(
+        type(meta.get(field)) is not int or meta[field] < 0
+        for field in count_fields
+    ) or (
+        meta["price_history_batch_count"] < 1
+        or meta["price_history_batch_count"]
+        > plan.package.runtime_symbol_binding_count + len(_PINNED_SIX_UNIVERSE_IDS)
+        or meta["pit_source_row_count"]
+        > _PINNED_SIX_UNIVERSE_RUNTIME_MAX_SOURCE_ROWS
+    ):
+        _error("preliminary six-universe metadata count changed")
+    expected_pit_calls = (
+        (
+            _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS
+            + _PINNED_SIX_UNIVERSE_RUNTIME_HISTORY_CHUNK_DECISIONS
+            - 1
+        )
+        // _PINNED_SIX_UNIVERSE_RUNTIME_HISTORY_CHUNK_DECISIONS
+    ) * (1 + len(_PINNED_SIX_UNIVERSE_IDS))
+    if meta["pit_history_call_count"] != expected_pit_calls:
+        _error("preliminary six-universe PIT call census changed")
+    for field in (
+        "symbol_resolution_sha256",
+        "construction_path_sha256",
+        "result_fragments_sha256",
+        "summary_sha256",
+    ):
+        _sha(meta.get(field), "six-universe " + field)
+    _safe_name(
+        meta.get("symbol_resolution_id"),
+        "six-universe symbol resolution id",
+        512,
+    )
+
+    signal = _validate_six_universe_account_aggregate(
+        signal,
+        role="signal",
+        annualization_sessions=annualization_sessions,
+    )
+    matched = _validate_six_universe_account_aggregate(
+        matched,
+        role="matched",
+        annualization_sessions=annualization_sessions,
+    )
+    basket = _validate_six_universe_account_aggregate(
+        basket,
+        role="six_etf_basket",
+        annualization_sessions=annualization_sessions,
+    )
+    if (
+        basket["invested_return_session_count"]
+        != _PINNED_SIX_UNIVERSE_EXPECTED_RETURNS - 1
+        or basket["rebalance_count"]
+        != _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS
+        or basket["full_target_count"]
+        != _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS
+        or any(
+            basket[field] != 0
+            for field in (
+                "underfilled_target_count",
+                "locked_over_target_count",
+                "entry_price_refusal_count",
+                "stale_mark_session_count",
+                "stale_position_deferral_count",
+                "eligibility_exit_zero_recovery_count",
+            )
+        )
+    ):
+        _error("preliminary six-universe ETF basket completeness changed")
+
+    if type(sleeves) is not dict or set(sleeves) != _SIX_UNIVERSE_SLEEVES_FIELDS:
+        _error("preliminary six-universe sleeve fields changed")
+    sleeve_rows = sleeves.get("universes")
+    if (
+        sleeves.get("schema") != _PINNED_SIX_UNIVERSE_SLEEVE_SCHEMA
+        or type(sleeve_rows) is not list
+        or len(sleeve_rows) != len(_PINNED_SIX_UNIVERSE_IDS)
+        or tuple(
+            item.get("universe_id") if type(item) is dict else None
+            for item in sleeve_rows
+        )
+        != _PINNED_SIX_UNIVERSE_IDS
+    ):
+        _error("preliminary six-universe sleeve inventory changed")
+    for row in sleeve_rows:
+        if type(row) is not dict or set(row) != _SIX_UNIVERSE_SLEEVE_FIELDS:
+            _error("preliminary six-universe sleeve row fields changed")
+        integer_fields = (
+            "decision_count",
+            "coverage_valid_count",
+            "signal_full_etf_fallback_count",
+            "signal_partial_etf_fallback_count",
+            "matched_full_etf_fallback_count",
+        )
+        if any(
+            type(row.get(field)) is not int
+            or row[field] < 0
+            or row[field] > _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS
+            for field in integer_fields
+        ) or row["decision_count"] != _PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS:
+            _error("preliminary six-universe sleeve count changed")
+        metric_fields = (
+            "mean_positive_score_count",
+            "mean_signal_stock_count",
+            "mean_matched_stock_count",
+            "minimum_mapping_ratio",
+            "minimum_cap_weight_coverage_ratio",
+        )
+        values = {
+            field: _cell_metric(
+                row.get(field), "six-universe sleeve " + field
+            )
+            for field in metric_fields
+        }
+        if (
+            any(values[field] < 0 for field in metric_fields[:3])
+            or values["mean_signal_stock_count"]
+            > Decimal(slot_count_per_sleeve)
+            or values["mean_matched_stock_count"]
+            > Decimal(slot_count_per_sleeve)
+            or not 0 <= values["minimum_mapping_ratio"] <= 1
+            or not 0 <= values["minimum_cap_weight_coverage_ratio"] <= 1
+            or row["signal_full_etf_fallback_count"]
+            + row["signal_partial_etf_fallback_count"]
+            > row["decision_count"]
+        ):
+            _error("preliminary six-universe sleeve metric escaped bounds")
+
+    if type(series) is not dict or set(series) != _SIX_UNIVERSE_SERIES_FIELDS:
+        _error("preliminary six-universe series fields changed")
+    series_rows = series.get("series")
+    if (
+        series.get("schema") != _PINNED_SIX_UNIVERSE_SERIES_SCHEMA
+        or type(series_rows) is not list
+        or len(series_rows) != len(_PINNED_SIX_UNIVERSE_IDS)
+        or tuple(
+            item.get("universe_id") if type(item) is dict else None
+            for item in series_rows
+        )
+        != _PINNED_SIX_UNIVERSE_IDS
+    ):
+        _error("preliminary six-universe series inventory changed")
+    for row in series_rows:
+        if (
+            type(row) is not dict
+            or set(row) != _SIX_UNIVERSE_SERIES_ROW_FIELDS
+            or row.get("normalization_mode") != "TOTAL_RETURN"
+            or row.get("observation") != "session_open"
+            or row.get("expected_session_count")
+            != _PINNED_SIX_UNIVERSE_EXPECTED_SESSIONS
+            or row.get("observation_count")
+            != _PINNED_SIX_UNIVERSE_EXPECTED_SESSIONS
+        ):
+            _error("preliminary six-universe series semantics changed")
+        _sha(row.get("raw_observation_sha256"), "six-universe raw series")
+        _sha(row.get("used_return_path_sha256"), "six-universe used series")
+
+    if type(runtime) is not dict or set(runtime) != _SIX_UNIVERSE_RUNTIME_FIELDS:
+        _error("preliminary six-universe runtime fields changed")
+    if (
+        runtime.get("schema") != "arv2-six-universe-qc-runtime-meta-v1"
+        or runtime.get("profile_id") != profile_id
+        or runtime.get("profile_sha256") != profile_sha256
+        or runtime.get("package_id") != plan.package_id
+        or runtime.get("package_sha256") != plan.package_sha256
+        or runtime.get("symbol_resolution_id")
+        != meta.get("symbol_resolution_id")
+        or runtime.get("symbol_resolution_sha256")
+        != meta.get("symbol_resolution_sha256")
+        or runtime.get("pit_history_call_count")
+        != meta.get("pit_history_call_count")
+        or runtime.get("pit_source_row_count")
+        != meta.get("pit_source_row_count")
+        or runtime.get("price_history_call_count")
+        != meta.get("price_history_batch_count")
+        or runtime.get("result_transport")
+        != "aggregate_only_custom_summary_statistics"
+        or runtime.get("host_object_store_export_required") is not False
+        or runtime.get("backtest_only") is not True
+        or runtime.get("orders") is not False
+        or runtime.get("deployment") is not False
+        or runtime.get("trading") is not False
+        or type(runtime.get("runtime_slice_count")) is not int
+        or not 1
+        <= runtime["runtime_slice_count"]
+        <= _PINNED_SIX_UNIVERSE_RUNTIME_MAX_TRAIN_SLICES
+    ):
+        _error("preliminary six-universe runtime semantics changed")
+
+    fragments = {
+        "signal": signal,
+        "matched": matched,
+        "six_etf_basket": basket,
+        "sleeves": sleeves,
+        "series": series,
+    }
+    fragment_digest = hashlib.sha256(
+        _canonical(
+            {
+                "schema": "arv2-six-universe-result-fragments-v1",
+                **fragments,
+            }
+        )
+    ).hexdigest()
+    if meta.get("result_fragments_sha256") != fragment_digest:
+        _error("preliminary six-universe result fragments changed")
+    summary_id = meta.get("summary_id")
+    summary_sha = meta.get("summary_sha256")
+    if type(summary_id) is not str or type(summary_sha) is not str:
+        _error("preliminary six-universe summary identity is absent")
+    summary_meta = {
+        key: value
+        for key, value in meta.items()
+        if key not in {"summary_id", "summary_sha256"}
+    }
+    digest = hashlib.sha256(
+        _canonical({"profile": profile, "meta": summary_meta, **fragments})
+    ).hexdigest()
+    if (
+        summary_sha != digest
+        or summary_id != "arv2-six-universe-summary-" + digest[:24]
+    ):
+        _error("preliminary six-universe summary identity changed")
+
+
 def _validate_aggregate_records(
     records: Mapping[str, dict[str, object]],
     plan: AcceptedRiskPreliminarySubmissionPlan,
@@ -7493,6 +8381,9 @@ def _validate_aggregate_records(
         return
     if profile_id in _PINNED_LEVERAGE_PROFILE_IDS:
         _validate_leverage_aggregate_records(records, plan)
+        return
+    if profile_id in _PINNED_SIX_UNIVERSE_PROFILE_IDS:
+        _validate_six_universe_aggregate_records(records, plan)
         return
     _validate_regime_aggregate_records(records, plan, profile_id)
 
@@ -7783,6 +8674,9 @@ def _make_action_guard():
             ]()
             or not module_globals[
                 "_market_cap_contract_bindings_are_current"
+            ]()
+            or not module_globals[
+                "_six_universe_contract_bindings_are_current"
             ]()
             or not globals_are_current()
         ):
@@ -8097,6 +8991,10 @@ _seal_action_bindings(
         "_PINNED_PROJECTION_LEVERAGE_PROFILE_IDS",
         "_PINNED_PROJECTION_LEVERAGE_PROFILE_SHA256S_OBJECT",
         "_PINNED_PROJECTION_LEVERAGE_PROFILE_SHA256_ROWS",
+        "_PINNED_PROJECTION_SIX_UNIVERSE_SOURCE_PATHS",
+        "_PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_IDS",
+        "_PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_SHA256S_OBJECT",
+        "_PINNED_PROJECTION_SIX_UNIVERSE_PROFILE_SHA256_ROWS",
         "_PINNED_EXPECTED_RESULT_NAMES",
         "_PINNED_EXPECTED_RESULT_NAMES_FOR_PROFILE",
         "_PINNED_MAX_TRAIN_SLICE_COUNT",
@@ -8205,6 +9103,33 @@ _seal_action_bindings(
         "_PINNED_LEVERAGE_RUNTIME_STATUS",
         "_PINNED_LEVERAGE_RUNTIME_MAX_TRAIN_SLICES",
         "_PINNED_LEVERAGE_PROFILE_BINDINGS",
+        "_PINNED_REQUIRE_SIX_UNIVERSE_PROFILE",
+        "_PINNED_SIX_UNIVERSE_RESULT_NAMES_CALLABLE",
+        "_PINNED_SIX_UNIVERSE_PROFILE_IDS",
+        "_PINNED_SIX_UNIVERSE_PROFILE_BINDINGS",
+        "_PINNED_SIX_UNIVERSE_PROFILE_SCHEMA",
+        "_PINNED_SIX_UNIVERSE_SUMMARY_SCHEMA",
+        "_PINNED_SIX_UNIVERSE_ACCOUNT_SCHEMA",
+        "_PINNED_SIX_UNIVERSE_SLEEVE_SCHEMA",
+        "_PINNED_SIX_UNIVERSE_SERIES_SCHEMA",
+        "_PINNED_SIX_UNIVERSE_STATISTIC_NAMES",
+        "_PINNED_SIX_UNIVERSE_DECISION_START",
+        "_PINNED_SIX_UNIVERSE_EVALUATION_END",
+        "_PINNED_SIX_UNIVERSE_EXPECTED_SESSIONS",
+        "_PINNED_SIX_UNIVERSE_EXPECTED_RETURNS",
+        "_PINNED_SIX_UNIVERSE_EXPECTED_DECISIONS",
+        "_PINNED_SIX_UNIVERSE_PRIMARY_COST",
+        "_PINNED_SIX_UNIVERSE_MODELED_COST_RATE",
+        "_PINNED_SIX_UNIVERSE_ANNUALIZATION_SESSIONS",
+        "_PINNED_SIX_UNIVERSE_GATE_SCORE_QUANTUM",
+        "_PINNED_SIX_UNIVERSE_MINIMUM_INVESTED_RETURNS",
+        "_PINNED_SIX_UNIVERSE_TARGET_GROSS",
+        "_PINNED_SIX_UNIVERSE_IDS",
+        "_PINNED_SIX_UNIVERSE_SOURCE_VIEW",
+        "_PINNED_SIX_UNIVERSE_RUNTIME_MAX_TRAIN_SLICES",
+        "_PINNED_SIX_UNIVERSE_RUNTIME_WORK_UNITS",
+        "_PINNED_SIX_UNIVERSE_RUNTIME_HISTORY_CHUNK_DECISIONS",
+        "_PINNED_SIX_UNIVERSE_RUNTIME_MAX_SOURCE_ROWS",
         "_PINNED_JSON_DUMPS",
         "_PINNED_REQUIRE_EXECUTION_SIGNATURE",
         "_PINNED_REQUIRE_RESULT_SIGNATURE",
@@ -8285,6 +9210,13 @@ _seal_action_bindings(
         "_LEVERAGE_PATH_PREFIXES",
         "_LEVERAGE_PATH_SUFFIXES",
         "_LEVERAGE_CELL_FIELDS",
+        "_SIX_UNIVERSE_META_FIELDS",
+        "_SIX_UNIVERSE_ACCOUNT_FIELDS",
+        "_SIX_UNIVERSE_SLEEVES_FIELDS",
+        "_SIX_UNIVERSE_SLEEVE_FIELDS",
+        "_SIX_UNIVERSE_SERIES_FIELDS",
+        "_SIX_UNIVERSE_SERIES_ROW_FIELDS",
+        "_SIX_UNIVERSE_RUNTIME_FIELDS",
         "_CELL_COUNT_FIELDS",
         "_REGIME_MISSING_COUNT_FIELDS",
         "_CELL_METRIC_FIELDS",
@@ -8311,11 +9243,13 @@ _seal_action_bindings(
         "_stock_portfolio_profile_binding",
         "_market_cap_profile_binding",
         "_leverage_profile_binding",
+        "_six_universe_profile_binding",
         "_error",
         "_canonical",
         "_stock_portfolio_contract_bindings_are_current",
         "_market_cap_contract_bindings_are_current",
         "_leverage_contract_bindings_are_current",
+        "_six_universe_contract_bindings_are_current",
         "_strict_object",
         "_sha",
         "_safe_name",
@@ -8379,6 +9313,8 @@ _seal_action_bindings(
         "_validate_market_cap_aggregate_records",
         "_validate_leverage_path",
         "_validate_leverage_aggregate_records",
+        "_validate_six_universe_account_aggregate",
+        "_validate_six_universe_aggregate_records",
         "_validate_aggregate_records",
         "_result_receipt_path",
         "_result_authority_bound",
@@ -8413,6 +9349,9 @@ _seal_action_bindings(
         "market_cap_runtime",
         "leverage_evaluator",
         "leverage_runtime",
+        "six_universe_gate",
+        "six_universe_evaluator",
+        "six_universe_runtime",
         "formal",
         "FormalQcTransport",
         "OwnerSignatureAuthority",

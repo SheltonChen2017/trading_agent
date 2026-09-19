@@ -26,6 +26,13 @@ from . import (
 from . import (
     accepted_risk_objective_synthetic_leverage_qc_runtime as leverage_runtime,
 )
+from . import accepted_risk_six_universe_gate as six_universe_gate
+from . import (
+    accepted_risk_six_universe_gate_evaluator as six_universe_evaluator,
+)
+from . import (
+    accepted_risk_six_universe_gate_qc_runtime as six_universe_runtime,
+)
 
 
 class AcceptedRiskPreliminaryQcProjectionError(ValueError):
@@ -81,6 +88,16 @@ OBJECTIVE_LEVERAGE_PROJECT_SOURCE_PATHS = (
     "accepted_risk_objective_synthetic_leverage_evaluator.py",
     "accepted_risk_objective_synthetic_leverage_qc_runtime.py",
 )
+SIX_UNIVERSE_PROJECT_SOURCE_PATHS = (
+    "accepted_risk_preliminary_rating_policy.py",
+    "accepted_risk_preliminary_rating_evaluator.py",
+    "accepted_risk_preliminary_qc_figi.py",
+    "accepted_risk_order_level_input_runtime.py",
+    "accepted_risk_sequential_r055_score.py",
+    "accepted_risk_six_universe_gate.py",
+    "accepted_risk_six_universe_gate_evaluator.py",
+    "accepted_risk_six_universe_gate_qc_runtime.py",
+)
 STOCK_PORTFOLIO_PROFILE_ID = stock_portfolio_evaluator.PROFILE_ID
 STOCK_PORTFOLIO_PROFILE_IDS = stock_portfolio_evaluator.PROFILE_IDS
 STOCK_UNIVERSE_PROFILE_IDS = stock_portfolio_evaluator.UNIVERSE_PROFILE_IDS
@@ -116,6 +133,13 @@ OBJECTIVE_LEVERAGE_PROFILE_SHA256S = {
         "profile_sha256"
     ]
     for profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS
+}
+SIX_UNIVERSE_PROFILE_IDS = six_universe_evaluator.PROFILE_IDS
+SIX_UNIVERSE_PROFILE_SHA256S = {
+    profile_id: six_universe_evaluator.require_profile(
+        profile_id
+    ).profile_sha256
+    for profile_id in SIX_UNIVERSE_PROFILE_IDS
 }
 SUPERSEDED_UNSPENT_PROFILE_IDS = (
     market_cap_evaluator.QQQ_2019_2023_V2_PROFILE_ID,
@@ -156,6 +180,11 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_market_cap_stock_portfolio_qc_runtime",
     "accepted_risk_objective_synthetic_leverage_evaluator",
     "accepted_risk_objective_synthetic_leverage_qc_runtime",
+    "accepted_risk_order_level_input_runtime",
+    "accepted_risk_sequential_r055_score",
+    "accepted_risk_six_universe_gate",
+    "accepted_risk_six_universe_gate_evaluator",
+    "accepted_risk_six_universe_gate_qc_runtime",
     "accepted_risk_etf_baseline_evaluator",
     "accepted_risk_etf_baseline_qc_runtime",
     "collections",
@@ -488,6 +517,13 @@ def _main_source(
     activation_bytes: int,
     evaluation_profile_id: str | None,
 ) -> bytes:
+    if evaluation_profile_id in SIX_UNIVERSE_PROFILE_IDS:
+        return _six_universe_main_source(
+            activation_key=activation_key,
+            activation_sha256=activation_sha256,
+            activation_bytes=activation_bytes,
+            evaluation_profile_id=evaluation_profile_id,
+        )
     if evaluation_profile_id == etf_evaluator.PROFILE_ID:
         return _etf_main_source(
             activation_key=activation_key,
@@ -558,6 +594,90 @@ class ARV2AcceptedRiskPreliminaryAlgorithm(QCAlgorithm):
             maximum_work_units=TRAIN_WORK_UNITS_PER_SLICE,
             soft_seconds=TRAIN_SLICE_SOFT_SECONDS,
         )
+
+    def on_end_of_algorithm(self):
+        self._arv2_driver.require_completed_at_end()
+'''
+    return source.encode("ascii")
+
+
+def _six_universe_main_source(
+    *,
+    activation_key: str,
+    activation_sha256: str,
+    activation_bytes: int,
+    evaluation_profile_id: str,
+) -> bytes:
+    profile = six_universe_evaluator.require_profile(evaluation_profile_id)
+    tickers = tuple(item.etf_ticker for item in six_universe_gate.UNIVERSE_SPECS)
+    if (
+        evaluation_profile_id not in SIX_UNIVERSE_PROFILE_IDS
+        or profile.profile_id != evaluation_profile_id
+        or tickers != ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
+    ):
+        raise AcceptedRiskPreliminaryQcProjectionError(
+            "six-universe QC main profile binding changed"
+        )
+    source = f'''from AlgorithmImports import *
+from accepted_risk_six_universe_gate_qc_runtime import (
+    AcceptedRiskSixUniverseGateQcDriver,
+    TRAIN_SLICE_SOFT_SECONDS,
+    TRAIN_WORK_UNITS_PER_SLICE,
+)
+
+
+class ARV2AcceptedRiskSixUniverseGateAlgorithm(QCAlgorithm):
+    def initialize(self):
+        self.set_time_zone("America/New_York")
+        self.settings.daily_precise_end_time = True
+        self.set_start_date({MARKET_CAP_ALGORITHM_START[0]}, {MARKET_CAP_ALGORITHM_START[1]}, {MARKET_CAP_ALGORITHM_START[2]})
+        self.set_end_date({MARKET_CAP_ALGORITHM_END[0]}, {MARKET_CAP_ALGORITHM_END[1]}, {MARKET_CAP_ALGORITHM_END[2]})
+        self.universe_settings.asynchronous = False
+        self.universe_settings.resolution = Resolution.DAILY
+        self._arv2_etf_symbols = {{}}
+        for ticker in {tickers!r}:
+            self._arv2_etf_symbols[ticker] = self.add_equity(
+                ticker,
+                Resolution.DAILY,
+                fill_forward=False,
+                leverage=1,
+                extended_market_hours=False,
+                data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+            ).symbol
+        self._arv2_fundamental_universe = self.AddUniverse(lambda fundamentals: [])
+        self._arv2_constituent_universes = {{}}
+        for ticker in {tickers!r}:
+            self._arv2_constituent_universes[ticker] = self.add_universe(
+                self.universe.etf(
+                    self._arv2_etf_symbols[ticker],
+                    self.universe_settings,
+                    self._arv2_empty_constituent_selection,
+                )
+            )
+        self._arv2_driver = AcceptedRiskSixUniverseGateQcDriver(
+            self,
+            activation_manifest_key={activation_key!r},
+            activation_manifest_sha256={activation_sha256!r},
+            activation_manifest_byte_count={activation_bytes},
+            benchmark_symbol=self._arv2_etf_symbols["SPY"],
+            etf_symbols=self._arv2_etf_symbols,
+            profile_id={evaluation_profile_id!r},
+            fundamental_universe=self._arv2_fundamental_universe,
+            constituent_universes=self._arv2_constituent_universes,
+            trade_bar_type=TradeBar,
+            daily_resolution=Resolution.DAILY,
+            total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
+        )
+
+    def _arv2_empty_constituent_selection(self, _constituents):
+        return []
+
+    def on_data(self, _data):
+        if not self._arv2_driver.completed:
+            self._arv2_driver.advance_training_slice(
+                maximum_work_units=TRAIN_WORK_UNITS_PER_SLICE,
+                soft_seconds=TRAIN_SLICE_SOFT_SECONDS,
+            )
 
     def on_end_of_algorithm(self):
         self._arv2_driver.require_completed_at_end()
@@ -909,6 +1029,10 @@ class ARV2AcceptedRiskEtfBaselineAlgorithm(QCAlgorithm):
 def _profile(evaluation_profile_id):
     if evaluation_profile_id is None:
         return None
+    if evaluation_profile_id in SIX_UNIVERSE_PROFILE_IDS:
+        return six_universe_evaluator.require_profile(
+            evaluation_profile_id
+        ).to_record()
     if evaluation_profile_id == etf_evaluator.PROFILE_ID:
         return etf_evaluator.require_etf_baseline_profile(
             evaluation_profile_id
@@ -931,6 +1055,8 @@ def _profile(evaluation_profile_id):
 
 def project_source_paths_for_profile(evaluation_profile_id):
     _profile(evaluation_profile_id)
+    if evaluation_profile_id in SIX_UNIVERSE_PROFILE_IDS:
+        return SIX_UNIVERSE_PROJECT_SOURCE_PATHS
     if evaluation_profile_id == etf_evaluator.PROFILE_ID:
         return ETF_PROJECT_SOURCE_PATHS
     if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
@@ -951,6 +1077,11 @@ def _total_source_byte_limit(evaluation_profile_id):
 
 
 def _runtime_slice_bounds(evaluation_profile_id):
+    if evaluation_profile_id in SIX_UNIVERSE_PROFILE_IDS:
+        return (
+            six_universe_runtime.TRAIN_WORK_UNITS_PER_SLICE,
+            six_universe_runtime.MAXIMUM_TRAIN_SLICE_COUNT,
+        )
     if evaluation_profile_id in OBJECTIVE_LEVERAGE_PROFILE_IDS:
         return (
             leverage_runtime.TRAIN_WORK_UNITS_PER_SLICE,

@@ -2896,3 +2896,30 @@ requires a fresh successor accounting entry before R-120. No raw provider or
 security row, raw order/fill, holding, price, return, log, chart, standard
 statistic, deployment, broker, paper/live, funded-account, or real-trading
 access is authorized.
+
+## R-119 — QQQ bounded-tilt 2026 simulated-order diagnostic (TERMINAL TECHNICAL FAILURE; ZERO CELLS) — 2026-09-18
+
+R-119 created private project `36714332` and backtest
+`d025d903f859e4825e657d8cbb268d3f`, then reached authenticated `Runtime
+Error` on its first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-7b5ef3f33095183afc1c489a`, SHA-256
+`7b5ef3f33095183afc1c489acd6bfa29d6b4b58e1dbb92358e81cc347e341baa`,
+contains no statistic. No result-read authority or result read exists.
+
+A separately bounded diagnostic selected only terminal status and error/stack
+fields. It read no statistic, chart, order, fill, holding, price, return, or
+provider/security row. The error was `order-level PIT fundamentals collection
+is outside the authenticated session axis` on the first 2026-01-02 decision:
+a legitimate 2026-01-01 holiday fundamental-availability collection was not
+itself an exchange-session key. This is a technical refusal before simulated
+orders or economic output, not positive or negative strategy evidence.
+
+R-119 spends **86 -> 87 shared looks** and **29 -> 30 ARV2 development
+evaluations** but adds zero cells, leaving **607 cells** and 27 infrastructure
+looks. R-120 created no project or backtest and is superseded unlaunched and
+unspent because its fixed 608-cell baseline and source identities are no
+longer true. The correction permits non-session availability mapping only for
+fundamentals, retains exact-session constituent evidence, and also closes the
+same latent defect in the unrun six-universe runtime. Fresh R-121/R-122 order
+successors require new committed identities and accounting; the unpreregistered
+six-universe pair moves to R-123/R-124.

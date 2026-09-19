@@ -293,17 +293,30 @@ class SixUniversePitSnapshotLoader:
         key = max(prior)
         return key, inventory[key]
 
-    def _age(self, observed, decision_session, name):
-        observed_session = observed.date().isoformat()
+    def _age(
+        self, observed, decision_session, name, *, permit_non_session=False
+    ):
+        observed_date = observed.date().isoformat()
         try:
-            result = (
-                self._session_positions[decision_session]
-                - self._session_positions[observed_session]
-            )
+            decision_position = self._session_positions[decision_session]
         except KeyError as exc:
             raise AcceptedRiskSixUniverseGateQcRuntimeError(
                 name + " collection escaped the authenticated session axis"
             ) from exc
+        observed_session = observed_date
+        if observed_session not in self._session_positions:
+            sessions = tuple(self._session_positions)
+            if (
+                permit_non_session is not True
+                or not sessions
+                or observed_date < sessions[0]
+                or observed_date > sessions[-1]
+            ):
+                _error(name + " collection escaped the authenticated session axis")
+            observed_session = next(
+                session for session in sessions if session >= observed_date
+            )
+        result = decision_position - self._session_positions[observed_session]
         if result < 0:
             _error(name + " collection is after its decision")
         return result
@@ -368,7 +381,10 @@ class SixUniversePitSnapshotLoader:
                 "six-universe PIT fundamentals",
             )
             if self._age(
-                fundamental_time, session, "six-universe PIT fundamentals"
+                fundamental_time,
+                session,
+                "six-universe PIT fundamentals",
+                permit_non_session=True,
             ) > MAXIMUM_FUNDAMENTAL_SNAPSHOT_AGE_SESSIONS:
                 _error("six-universe fundamental snapshot is too old")
             if (

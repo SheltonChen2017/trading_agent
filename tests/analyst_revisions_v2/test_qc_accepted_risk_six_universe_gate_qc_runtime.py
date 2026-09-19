@@ -150,6 +150,71 @@ def test_pit_loader_advances_one_bounded_stage_and_retains_unresolved_rows():
         assert unresolved.firm_specific_score is None
 
 
+def test_first_decision_maps_holiday_fundamental_collection_to_next_session():
+    loader, _algorithm = _pit_loader(
+        constituent_stamp=datetime(2026, 1, 1),
+        decision_sessions=("2026-01-02",),
+        session_axis=("2025-12-31", "2026-01-02"),
+        fundamental_collections=(
+            (datetime(2026, 1, 1, 8), "200", "100"),
+        ),
+    )
+
+    for _ in range(7):
+        loader.advance()
+
+    snapshot = loader.require_completed_snapshots()[0]
+    assert snapshot.session == "2026-01-02"
+    assert loader._age(
+        datetime(2026, 1, 1, 8),
+        "2026-01-02",
+        "six-universe PIT fundamentals",
+        permit_non_session=True,
+    ) == 0
+
+
+def test_non_session_constituent_source_date_still_refuses():
+    loader, _algorithm = _pit_loader(
+        # Sunday EndTime normalizes to Saturday, which cannot be treated as
+        # authenticated Friday constituent evidence.
+        constituent_stamp=datetime(2025, 1, 5)
+    )
+    for _ in range(6):
+        loader.advance()
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseGateQcRuntimeError,
+        match="constituents collection escaped the authenticated session axis",
+    ):
+        loader.advance()
+
+
+def test_non_session_fundamental_mapping_refuses_outside_or_after_axis():
+    loader, _algorithm = _pit_loader(
+        decision_sessions=("2026-01-02",),
+        session_axis=("2025-12-31", "2026-01-02", "2026-01-05"),
+    )
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseGateQcRuntimeError,
+        match="escaped the authenticated session axis",
+    ):
+        loader._age(
+            datetime(2025, 12, 30, 8),
+            "2026-01-02",
+            "six-universe PIT fundamentals",
+            permit_non_session=True,
+        )
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseGateQcRuntimeError,
+        match="collection is after its decision",
+    ):
+        loader._age(
+            datetime(2026, 1, 3, 8),
+            "2026-01-02",
+            "six-universe PIT fundamentals",
+            permit_non_session=True,
+        )
+
+
 def test_pit_loader_refuses_a_same_decision_constituent_state():
     loader, _algorithm = _pit_loader(
         # QC daily EndTime normalizes back one day to the decision itself,

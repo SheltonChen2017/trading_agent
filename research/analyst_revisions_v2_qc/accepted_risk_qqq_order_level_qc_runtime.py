@@ -576,19 +576,36 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         key = max(prior)
         return key, inventory[key]
 
-    def _snapshot_age_sessions(self, observed, decision_session, name):
+    def _snapshot_age_sessions(
+        self, observed, decision_session, name, *, permit_non_session=False
+    ):
         if not isinstance(observed, datetime):
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 name + " collection time changed type"
             )
-        observed_session = observed.date().isoformat()
+        observed_date = observed.date().isoformat()
         try:
             decision_position = self._session_positions[decision_session]
-            observed_position = self._session_positions[observed_session]
         except (KeyError, TypeError) as exc:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 name + " collection is outside the authenticated session axis"
             ) from exc
+        observed_session = observed_date
+        if observed_session not in self._session_positions:
+            sessions = tuple(self._session_positions)
+            if (
+                permit_non_session is not True
+                or not sessions
+                or observed_date < sessions[0]
+                or observed_date > sessions[-1]
+            ):
+                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                    name + " collection is outside the authenticated session axis"
+                )
+            observed_session = next(
+                session for session in sessions if session >= observed_date
+            )
+        observed_position = self._session_positions[observed_session]
         age = decision_position - observed_position
         if age < 0:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
@@ -760,7 +777,10 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "order-level PIT QQQ constituents",
         )
         fundamental_age = self._snapshot_age_sessions(
-            fundamental_time, session, "order-level PIT fundamentals"
+            fundamental_time,
+            session,
+            "order-level PIT fundamentals",
+            permit_non_session=True,
         )
         constituent_age = self._snapshot_age_sessions(
             constituent_time, session, "order-level PIT QQQ constituents"

@@ -371,7 +371,10 @@ COMPLETED WITH AUTHENTICATED RESULTS. ACCOUNTING IS 86 SHARED LOOKS, 29 ARV2
 DEVELOPMENT EVALUATIONS, 27 INFRASTRUCTURE LOOKS, AND A 607-CELL FLOOR.
 SECTION 110 IMPLEMENTS THE SEPARATELY BOUNDED QQQ SIMULATED-ORDER AND
 SIX-UNIVERSE GATE DIAGNOSTICS. SECTION 111 PROSPECTIVELY FREEZES R-119/R-120;
-R-119 IS NEXT AND R-120 IS STRICTLY SEQUENTIAL. ONLY BACKTEST-SIMULATED
+SECTION 112 CLOSES R-119 AS A ZERO-CELL TECHNICAL FAILURE, SUPERSEDES R-120
+UNLAUNCHED AND UNSPENT, AND CORRECTS NON-SESSION FUNDAMENTAL-AVAILABILITY AGE
+IN BOTH NEW RUNTIMES. FRESH ORDER SUCCESSORS R-121/R-122 ARE NEXT; THE
+SIX-UNIVERSE PAIR MOVES TO R-123/R-124. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1211,6 +1214,17 @@ and at most one authenticated aggregate read, and only then disposition R-120
 under its separately signed authority. No raw provider row, raw order or fill,
 log, chart, paper/live deployment, funded account, broker credential, or real
 trading action is authorized.
+
+Section 112 records R-119's authenticated zero-cell technical failure and the
+corrected fundamental-availability session mapping. R-120 is superseded
+unlaunched and unspent. The owner explicitly waives an additional Claude
+review of section 112 before the already directed same-round successor work.
+The exact next step is to commit the correction, derive and jointly
+preregister fresh R-121/R-122 order-run identities from that commit, then
+launch them sequentially. The unpreregistered six-universe pair moves to
+R-123/R-124 and remains contingent on two authenticated order-run cells. No
+paper/live deployment, funded account, broker credential, or real trading
+action is authorized.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18499,3 +18513,52 @@ No raw provider row, security row, order, fill, holding, price, return, log,
 chart, standard statistic, deployment, broker, paper/live, funded-account, or
 real-trading access is authorized. R-121/R-122 remain unpreregistered and may
 be frozen only after the order sequence closes with actual accounting.
+
+## 112. R-119 terminal technical failure and non-session availability correction, 2026-09-18
+
+R-119 created private QC project `36714332` and backtest
+`d025d903f859e4825e657d8cbb268d3f`, then reached authenticated terminal
+`Runtime Error` on the first statistics-free poll. Terminal receipt
+`arv2-order-level-terminal-7b5ef3f33095183afc1c489a`, SHA-256
+`7b5ef3f33095183afc1c489acd6bfa29d6b4b58e1dbb92358e81cc347e341baa`,
+contains no statistic. No result-read authority or aggregate read exists and
+no economic cell accrued. One bounded diagnostic selected only status and the
+terminal error/stack fields; it selected no statistic, chart, order, fill,
+holding, price, return, or provider/security row.
+
+The exact error was `order-level PIT fundamentals collection is outside the
+authenticated session axis` on 2026-01-02. The runtime treated every
+fundamental availability date as though it had to be an exchange session.
+QuantConnect supplied a legitimate 2026-01-01 holiday collection before the
+first 2026-01-02 decision, so an exact session-key lookup refused before any
+simulated order or economic result.
+
+The correction maps only a non-session **fundamental availability** date to
+the first authenticated exchange session on or after that date when counting
+session age. Dates outside the authenticated axis and dates after the decision
+still refuse. Constituent collections do not receive this relaxation: their
+QC daily EndTime has already been normalized to its claimed source session,
+which must remain an exact authenticated exchange session. The identical
+latent rule in the unrun six-universe loader is corrected prospectively.
+Holiday-first-session acceptance and non-session constituent refusal are
+isolated in both runtimes; the focused behavioral selection passed **54
+tests**.
+
+| ID | P | Disposition |
+|---|---:|---|
+| `ARV2D112-001` | P2 | **Corrected.** Exact-key age counting failed closed on a legitimate holiday fundamental availability timestamp and blocked the order milestone; the fundamental-only next-session mapping is behaviorally isolated in both runtimes. No unsafe or economic result escaped. |
+| `ARV2D112-002` | P3 | **Corrected.** Initial regressions did not independently distinguish next-session mapping from prior-session mapping or pin both boundary refusals; exact age zero, before-axis, after-decision, and non-session-constituent cases are now isolated. |
+| `ARV2D112-003` | P3 | **Documented only.** The projected order runtime is 63,361 bytes against its 64,000-byte per-file cap, leaving 639 bytes of headroom. The current projection remains valid; a later material extension should split the module rather than consume that margin. |
+
+This is a technical implementation correction to the already frozen freshness
+rule, so the order profile IDs and SHA-256s remain unchanged. The changed
+source bytes invalidate both section-111 projections/plans and every
+uncommitted six-universe projection. R-120 therefore remains unlaunched,
+superseded, and unspent. R-119 moves accounting to **87 shared looks, 30 ARV2
+development evaluations, 27 infrastructure looks, and 607 cells**.
+
+Fresh order successors take R-121/R-122. The previously anticipated but never
+preregistered six-universe run numbers move to R-123/R-124. Those runs remain
+contingent on two authenticated order-run aggregate cells and require a later
+joint physical freeze. No deployment, broker, paper/live, funded-account,
+real-order, or trading authority follows.

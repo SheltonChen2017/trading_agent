@@ -861,6 +861,98 @@ def test_pit_snapshots_use_authenticated_session_age_across_weekend():
     ] == 1
 
 
+def test_first_decision_maps_holiday_fundamental_collection_to_next_session():
+    a = _Symbol("A-SID", "A")
+    value = _runtime(_Algorithm("2026-01-02"))
+    value._resolution = _Resolution({"a": a})
+    value._session_positions = {
+        "2025-12-30": 0,
+        "2025-12-31": 1,
+        "2026-01-02": 2,
+    }
+    fundamentals = {
+        datetime.fromisoformat("2026-01-01T08:00:00"): (
+            SimpleNamespace(symbol=a, market_cap=Decimal("100")),
+        )
+    }
+    constituents = {
+        datetime.fromisoformat("2025-12-31T00:00:00"): (
+            SimpleNamespace(symbol=a, weight=Decimal("1")),
+        )
+    }
+    value._history_inventory = lambda *_args, fundamental, **_kwargs: (
+        fundamentals if fundamental else constituents
+    )
+
+    assert value._pit_market_caps("2026-01-02") == {
+        "a": Decimal("100")
+    }
+    assert value._pit_coverage_records[0][
+        "fundamental_snapshot_age_sessions"
+    ] == 0
+    assert value._pit_coverage_records[0][
+        "constituent_snapshot_age_sessions"
+    ] == 1
+
+
+def test_non_session_constituent_source_date_still_refuses():
+    a = _Symbol("A-SID", "A")
+    value = _runtime(_Algorithm("2026-01-02"))
+    value._resolution = _Resolution({"a": a})
+    value._session_positions = {
+        "2025-12-31": 0,
+        "2026-01-02": 1,
+    }
+    fundamentals = {
+        datetime.fromisoformat("2026-01-01T08:00:00"): (
+            SimpleNamespace(symbol=a, market_cap=Decimal("100")),
+        )
+    }
+    constituents = {
+        datetime.fromisoformat("2026-01-01T00:00:00"): (
+            SimpleNamespace(symbol=a, weight=Decimal("1")),
+        )
+    }
+    value._history_inventory = lambda *_args, fundamental, **_kwargs: (
+        fundamentals if fundamental else constituents
+    )
+
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="constituents collection is outside the authenticated session axis",
+    ):
+        value._pit_market_caps("2026-01-02")
+
+
+def test_non_session_fundamental_mapping_refuses_outside_or_after_axis():
+    value = _runtime(_Algorithm("2026-01-02"))
+    value._session_positions = {
+        "2025-12-31": 0,
+        "2026-01-02": 1,
+        "2026-01-05": 2,
+    }
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="outside the authenticated session axis",
+    ):
+        value._snapshot_age_sessions(
+            datetime.fromisoformat("2025-12-30T08:00:00"),
+            "2026-01-02",
+            "order-level PIT fundamentals",
+            permit_non_session=True,
+        )
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="collection is after its decision session",
+    ):
+        value._snapshot_age_sessions(
+            datetime.fromisoformat("2026-01-03T08:00:00"),
+            "2026-01-02",
+            "order-level PIT fundamentals",
+            permit_non_session=True,
+        )
+
+
 def test_pit_snapshots_refuse_more_than_exact_authenticated_session_age():
     a = _Symbol("A-SID", "A")
     value = _runtime(_Algorithm("2026-01-05"))

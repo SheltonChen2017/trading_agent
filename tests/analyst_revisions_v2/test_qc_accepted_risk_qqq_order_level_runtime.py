@@ -249,10 +249,10 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
             "af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a"
         ),
         runtime.PREOPEN_PROXY_PROFILE_2025_ID: (
-            "7856a889365e6961eca1b2af4c5b23f622ddc875f07877f4bbeb552ae3a2b706"
+            "f2f3afb724dee0de0143e1d8432cd75ae86609669f8fb10d86427139d28b57c1"
         ),
         runtime.PREOPEN_PROXY_PROFILE_2026_ID: (
-            "61bf358fdda206e6602182c728df49f58be78e5228b4505424f2454ffac13464"
+            "9d80f749ee84114397054d2305d316564d741179c36738dfcb300a7230569135"
         ),
     }
     for profile_id in runtime.PROXY_PROFILE_IDS:
@@ -269,6 +269,12 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
             )
             assert profile["synchronous_order_event_rule"] == (
                 "stage_until_exact_returned_ticket_then_replay_once"
+            )
+            assert profile["preopen_timekeeper"] == (
+                "QQQ_extended_hours_minute_bars"
+            )
+            assert profile["latest_accepted_submission_clock"] == (
+                "09:27_New_York"
             )
         assert profile["target_weight_basis"] == runtime.PROXY_TARGET_WEIGHT_BASIS
         assert profile["minimum_resolved_constituent_weight_ratio"] == "0.8"
@@ -424,15 +430,15 @@ def _ready_v6_decision(session, next_session):
 
 
 @pytest.mark.parametrize(
-    "decision,execution",
+    "decision,execution,clock",
     (
-        ("2026-01-02", "2026-01-05"),  # Friday to Monday
-        ("2026-01-16", "2026-01-20"),  # Monday market holiday
-        ("2026-09-16", "2026-09-17"),  # Exact final decision
+        ("2026-01-02", "2026-01-05", "09:20"),  # Friday to Monday
+        ("2026-01-16", "2026-01-20", "09:21"),  # Monday market holiday
+        ("2026-09-16", "2026-09-17", "09:27"),  # Last permissible submission
     ),
 )
 def test_v6_decides_after_close_but_submits_only_on_next_axis_preopen(
-    decision, execution,
+    decision, execution, clock,
 ):
     algorithm, value = _ready_v6_decision(decision, execution)
     assert value.on_before_open() is False
@@ -441,7 +447,7 @@ def test_v6_decides_after_close_but_submits_only_on_next_axis_preopen(
     assert value._pending_preopen[0] == execution
     assert value._pending_preopen[1].rebalance_id.endswith(decision)
 
-    algorithm.time = datetime.fromisoformat(execution + "T09:20:00")
+    algorithm.time = datetime.fromisoformat(execution + "T" + clock + ":00")
     assert value.on_before_open() is True
     assert algorithm.orders
     assert value._pending_preopen is None
@@ -458,7 +464,7 @@ def test_v6_missed_or_early_preopen_refuses_without_order_submission():
     assert value.on_after_close() is True
     algorithm.time = datetime.fromisoformat("2026-01-02T09:20:00")
     assert value.on_before_open() is False
-    algorithm.time = datetime.fromisoformat("2026-01-05T09:21:00")
+    algorithm.time = datetime.fromisoformat("2026-01-05T09:28:00")
     with pytest.raises(
         runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
         match="preopen callback missed its exact next session",

@@ -1341,7 +1341,8 @@ deployment or trading authority.
 Claude will review section 125 with this round's final single pushed snapshot.
 The V6 successor stages synchronous order callbacks until the returned QC
 ticket authenticates their identity and submits the frozen prior-close plan
-only at 09:20 New York time on the exact next authenticated session. The
+only from 09:20 through 09:27 New York time on the exact next authenticated
+session, using a QQQ extended-hours minute timekeeper. The
 original 80% resolved-weight floor, neutral overlapping QQQ residual, score,
 98%-gross target, and fee model are unchanged. R-131/R-132 have no physical
 identity or QC action until this source is committed, validated, and separately
@@ -19224,8 +19225,8 @@ must not mutate this frozen source.
 
 This is new source and a new candidate, **not a retry** of R-129. Its V6
 2026/2025 profiles have exact SHA-256 values
-`61bf358fdda206e6602182c728df49f58be78e5228b4505424f2454ffac13464`
-and `7856a889365e6961eca1b2af4c5b23f622ddc875f07877f4bbeb552ae3a2b706`,
+`9d80f749ee84114397054d2305d316564d741179c36738dfcb300a7230569135`
+and `f2f3afb724dee0de0143e1d8432cd75ae86609669f8fb10d86427139d28b57c1`,
 respectively. The V5/V7 economic construction remains: immediate-prior
 point-in-time QQQ holdings, at least 80% exactly FIGI/SID-resolved reported
 weight, all unjoined weight in one unscored but overlapping QQQ ETF proxy,
@@ -19242,11 +19243,24 @@ ticket, duplicate, overflow, and mutated identity/status refuse; no unknown
 order event is silently ignored. `ARV2D124-002` (P2) is corrected
 prospectively: after-close decisions produce a pending plan for the exact
 next session in the authenticated axis. The projection schedules submission
-at 09:20 New York time, ten minutes before QQQ's regular open, and the
-runtime refuses a missed/duplicate callback, live mode, or an overnight
+ten minutes before QQQ's regular open, and the runtime accepts only a
+09:20--09:27 callback, refusing a missed/duplicate callback, live mode, or an overnight
 cash/quantity change. This avoids Friday-after-close MOO submission without
 assuming the R-129 callback's unseen status. The V4/V5 profiles stay pinned,
 and `ARV2D124-003` remains a documented non-gating P3 precision observation.
+
+An independent prelaunch audit of local commit `0136ebf` found
+`ARV2D125-001` (P2): a regular-hours-only QQQ minute subscription could
+defer a 09:20 backtest scheduled event until the first 09:31 bar, where the
+original exact-clock guard would refuse. [QC's scheduled-event timing guide](https://www.quantconnect.com/docs/v2/writing-algorithms/scheduled-events)
+explicitly warns of this behavior. The prospective correction enables
+extended hours on the QQQ timekeeping subscription for V6 alone, leaves
+explicit TOTAL_RETURN benchmark history and V4/V5 subscriptions unchanged,
+and allows a bounded bar-arrival delay through 09:27 while refusing the
+09:28 boundary or a later regular-session callback. This correction changes
+V6 profile and projected source SHAs before any physical plan or QC run.
+Extended-hours QQQ minute bars make an early callback plausible; they do
+not guarantee one every day, so a late callback still refuses with no order.
 
 The fixed projected ten-file source remains below 64,000 bytes per file;
 the reviewed total closure cap expands prospectively from 278,000 to 288,000
@@ -19254,9 +19268,12 @@ bytes to accommodate isolated reentrant and preopen guards while retaining
 at least 4,096 bytes of margin. The changed source cannot authenticate an
 old physical projection, and spent R-129/never-launched R-130 identities
 remain historical. Focused projection/runtime/core/submission tests:
-**265 passed** before the final new V6 isolating tests; the exact complete
-lane-suite result and active-document check will be recorded after their
-final execution. No QC action, aggregate, return, or new look belongs to
+**267 passed** before the independent prelaunch timing correction; its
+follow-on focused and complete lane-suite results and active-document check
+will be recorded after their final execution. A complete suite on the
+superseded `0136ebf` source was deliberately interrupted at 1,152 passed,
+4 skipped, 0 failed so the corrected source can receive the final run;
+it is **cancelled, not a failed suite**. No QC action, aggregate, return, or new look belongs to
 this source-only stage. Accounting remains **92 shared looks, 35 ARV2
 development evaluations, 27 infrastructure looks, 607 cells**. Next:
 commit this source and tests, derive physical R-131/R-132 projections and

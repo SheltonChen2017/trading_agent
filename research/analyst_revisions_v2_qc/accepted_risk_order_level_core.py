@@ -182,7 +182,7 @@ def require_next_session_preopen(
     if (
         actual_time.date().isoformat() != expected
         or actual_time.hour != 9
-        or actual_time.minute != 20
+        or not 20 <= actual_time.minute <= 27
     ):
         raise error_type(
             "order-level preopen callback missed its exact next session"

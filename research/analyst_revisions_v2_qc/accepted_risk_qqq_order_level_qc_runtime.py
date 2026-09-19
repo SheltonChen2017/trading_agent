@@ -246,6 +246,8 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False):
         record["execution_submission_timing"] = (
             "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
         )
+        record["preopen_timekeeper"] = "QQQ_extended_hours_minute_bars"
+        record["latest_accepted_submission_clock"] = "09:27_New_York"
         record["synchronous_order_event_rule"] = (
             "stage_until_exact_returned_ticket_then_replay_once"
         )

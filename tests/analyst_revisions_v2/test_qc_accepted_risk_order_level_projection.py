@@ -116,8 +116,10 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS:
         assert "self.time_rules.before_market_open(qqq_benchmark, 10)" in main
         assert "self._arv2_driver.on_before_open" in main
+        assert main.count("extended_market_hours=True") == 1
     else:
         assert "before_market_open" not in main
+        assert "extended_market_hours=True" not in main
     assert "class Arv2TenBpsFeeModel(FeeModel):" in main
     assert "parameters.order.absolute_quantity" in main
     assert "parameters.security.open" in main
@@ -248,6 +250,8 @@ def test_v6_preopen_schedule_is_load_bearing_and_legacy_main_is_stable(
     assert v5_main.count(b"self.schedule.on(") == 1
     assert b"before_market_open(qqq_benchmark, 10)" in v6_main
     assert b"before_market_open" not in v5_main
+    assert v6_main.count(b"extended_market_hours=True") == 1
+    assert b"extended_market_hours=True" not in v5_main
     assert v6_main != v5_main
 
 

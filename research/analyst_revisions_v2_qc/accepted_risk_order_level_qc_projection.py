@@ -595,7 +595,7 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             Resolution.MINUTE,
             fill_forward=False,
             leverage=1,
-            extended_market_hours=False,
+            extended_market_hours={"True" if profile['profile_id'] in runtime_builder.PREOPEN_PROXY_PROFILE_IDS else "False"},
             data_normalization_mode=DataNormalizationMode.{"RAW" if profile['profile_id'] in runtime_builder.PROXY_PROFILE_IDS else "TOTAL_RETURN"},
         ).symbol
         self.set_benchmark(qqq_benchmark)

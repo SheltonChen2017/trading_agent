@@ -54,7 +54,10 @@ def test_next_session_preopen_requires_exact_clock_and_unchanged_account():
         "error_type": ValueError,
     }
     assert core.require_next_session_preopen(**kwargs) is None
-    for clock in ("2026-01-02T09:20:00", "2026-01-05T09:21:00"):
+    assert core.require_next_session_preopen(
+        **{**kwargs, "actual_time": datetime.fromisoformat("2026-01-05T09:27:00")}
+    ) is None
+    for clock in ("2026-01-02T09:20:00", "2026-01-05T09:28:00"):
         with pytest.raises(ValueError, match="missed its exact next session"):
             core.require_next_session_preopen(
                 **{**kwargs, "actual_time": datetime.fromisoformat(clock)}

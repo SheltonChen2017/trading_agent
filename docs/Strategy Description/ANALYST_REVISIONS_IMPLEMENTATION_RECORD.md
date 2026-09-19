@@ -1361,12 +1361,14 @@ V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
 physical plan from committed V7 source; section 130 records its zero-cell
 terminal refusal. Claude will review section 130 with this round's final
 single pushed snapshot. The owner explicitly waives Claude review of
-section 135 before this continuing QC correction round's next diagnostic;
+section 136 before this continuing QC correction round's next diagnostic;
 section 133 records R-135's zero-cell technical refusal, section 134
 versions a cash-increase-only preopen reconciliation, and section 135 pins
-its distinct physical R-137 and contingent R-138 plans. The next action is
-one exact signed R-137 submission followed by statistics-disabled terminal
-inspection. R-131 through R-136 may not be retried or silently launched.
+its distinct physical R-137 and contingent R-138 plans. Section 136 records
+R-137's zero-cell unknown-order refusal; R-138 remains unlaunched. The next
+action is a local, isolated order-event lifecycle correction and independent
+audit before considering a new prospective physical plan. R-131 through
+R-138 may not be retried or silently launched.
 Claude's independent review follows the final single pushed snapshot, after
 focused interim and full final-tree checks.
 No order-level return or paper/live, funded, deployment, broker, or trading
@@ -19726,3 +19728,47 @@ terminal status first; `Completed.` alone permits a separately signed
 aggregate read. Raw provider/security rows, QC orders/fills/logs/charts,
 paper/live, deployment, broker credentials, funded account, and trading
 remain excluded.
+
+## 136. R-137 unknown-order technical refusal, 2026-09-18
+
+The exactly signed V9 R-137 one-use plan frozen at `950cdbc` created the
+private QC project `36720686` and backtest
+`b52ad152aa4964de4f8adfe472a252b2`; its launch-control SHA-256 is
+`6102dcf18d8d076af31e39f816cbe51caef892f763480f61b21ccc86dddc20ec`
+and launch-receipt SHA-256 is
+`0892eaf8c4796f3b48b289651e34165a786de82ed5fe839220345465ac872e0e`.
+The first statistics-disabled poll authenticated `Runtime Error`, terminal
+receipt SHA-256
+`ab8f29ede56b4f4bc7c3cffefba84845695a1745e78601b0fac8c254f5cde7ed`.
+One bounded exact-run `backtests/read` diagnosis selected only status and
+redacted error/stack material: `order-level event references an unknown QC
+order`, in the V9 order-event runtime. It did not retain a simulated timestamp,
+raw order ID, tag, fill, price, security/provider row, account value, log stream,
+chart, aggregate statistic, or return. The message establishes only that a
+well-formed event was absent from the **current** rebalance's MOO ticket map;
+it does not identify whether this was a late previous-ticket event, a
+LEAN-generated economic order, or a callback in the staging-to-registration
+interval. No second diagnostic read or QC run is justified by that ambiguity
+alone.
+
+An independent source audit found a concrete local P2 callback gap
+(`ARV2D136-001`): `_submit_plan` clears the synchronous-event staging buffer
+before reading the returned ticket's order ID and registering it in the open
+map. An event delivered in that interval can be rejected as unknown. This
+is a **possible**, not proven, explanation of R-137. [QC order-event
+documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/trading-and-orders/order-events)
+also establishes that the handler receives all order events; [QC corporate
+actions](https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/corporate-actions)
+allow engine-initiated delisting liquidation. Ignoring every unknown event
+would therefore risk omitting economic cash/share changes. Before another
+QC launch, close the local staging gap under a new profile, test the precise
+ticket-property reentrancy and prior/external-ID paths, and retain fixed,
+value-free named refusals for events not authenticated to an active strategy
+order. Do not infer alpha, a dividend cause, or a delisting cause.
+
+R-137 spends **95 -> 96 shared looks / 38 -> 39 ARV2 development
+evaluations**, adds **zero cells**, and leaves **607 cells / 27 infrastructure
+looks**. R-138 is superseded unlaunched/unspent because its first usable-cell
+contingency failed. There is no successful order-level return result in this
+sequence and no authority for a same-plan retry, six-universe/leverage run,
+paper/live deployment, broker action, funded order, or real trading.

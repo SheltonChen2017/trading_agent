@@ -3382,3 +3382,27 @@ aggregate was not produced. A cash-only known-at-preopen replan with frozen
 decision weights and a quantity-drift refusal is a prospective software
 candidate, not a reinterpretation or retry of R-135. No 2025-now,
 six-universe, or leveraged result follows.
+
+## R-137 — V9 cash-reconciled 2026-YTD QQQ simulated-order diagnostic (UNKNOWN-ORDER TECHNICAL REFUSAL; ZERO CELLS) — 2026-09-18
+
+The distinct signed V9 source/plan at `f0fa9eb` / `950cdbc` created private
+project `36720686`, backtest `b52ad152aa4964de4f8adfe472a252b2`, and
+launch receipt SHA-256
+`0892eaf8c4796f3b48b289651e34165a786de82ed5fe839220345465ac872e0e`.
+The first statistics-disabled terminal check authenticated `Runtime Error`,
+terminal receipt SHA-256
+`ab8f29ede56b4f4bc7c3cffefba84845695a1745e78601b0fac8c254f5cde7ed`.
+One bounded exact-run diagnosis selected only status and a redacted
+`order-level event references an unknown QC order` error/stack. It did not
+select or retain any result aggregate, raw order/fill/log/chart, account
+quantity/cash, security/provider row, price, return, or signal verdict.
+An internal staging-to-ticket-registration callback gap is a plausible local
+defect, but the error does not distinguish it from a late previous-ticket
+or engine-generated order. See lane-record section 136; no speculative
+economic interpretation is permitted.
+
+R-137 spends **95 -> 96 shared looks / 38 -> 39 ARV2 development
+evaluations** and adds **zero cells**, leaving **607 cells / 27 infrastructure
+looks**. R-138 is superseded unlaunched/unspent because the first usable
+aggregate was not produced. No order-level, 2025-now, six-universe, or
+leveraged result follows this technical refusal.

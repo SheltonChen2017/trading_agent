@@ -3003,3 +3003,32 @@ authenticated aggregate to 608 cells. Only then may R-124 launch, moving to
 **90 / 33**, with its aggregate moving to 609 cells. A technical failure adds
 no cell and requires a fresh successor. No raw result, order/fill, or
 paper/live/trading access is authorized.
+
+## R-123 — versioned 95%-coverage QQQ simulated-order diagnostic (TERMINAL COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-123 created private project `36714951` and backtest
+`7fb5cfba0fdb6ebe27c3a71376c239e6`, then reached `Runtime Error` on its
+first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-4b202bb06eabfb5e7689957a`, SHA-256
+`4b202bb06eabfb5e7689957a51e15719cbc3b31491991340d2608725cc16f3ae`,
+contains no statistic. No aggregate read or result-read authority exists. A
+bounded diagnostic selected only status/error/stack; no statistic, chart,
+order, fill, holding, price, return, or provider/security row was selected.
+
+The exact refusal was `order-level PIT QQQ market-cap constituent-weight
+coverage is below 95 percent` on 2026-01-02. The achieved ratio was not
+exposed by the failed V2 profile. No simulated order or economic output
+occurred; it is not signal evidence. R-123 spends **88 -> 89 shared looks / 31
+-> 32 development evaluations**, adds zero cells, and leaves **607 cells / 27
+infrastructure looks**. R-124 created no project or backtest and is
+superseded unlaunched/unspent.
+
+A prospective V3-profile/V5-summary successor sets a 90% cap-covered QQQ
+weight floor with exact ratio on refusal; below 90% still refuses. Above it,
+uncovered names are excluded and covered caps renormalize to 98% gross. This
+remains an accepted-risk QQQ proxy rather than pristine QQQ replication: 90%
+is relative to reported positive constituent weight, which can be 95% of
+notional, so absolute covered weight may be as low as **85.5%**. This is a
+preliminary diagnostic, not a formal or live-ready coverage claim.
+Fresh R-125/R-126 order runs require committed identities and accounting; the
+unpreregistered six-universe pair moves to R-127/R-128.

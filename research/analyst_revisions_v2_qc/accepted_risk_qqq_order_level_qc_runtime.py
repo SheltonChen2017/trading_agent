@@ -48,9 +48,9 @@ class AcceptedRiskQqqOrderLevelQcRuntimeError(ValueError):
     """The fixed order profile or simulated QC boundary was refused."""
 
 
-PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v2"
-PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v2"
-PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v2"
+PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v3"
+PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v3"
+PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v3"
 PROFILE_IDS = (PROFILE_2025_ID, PROFILE_2026_ID)
 DECISION_CUTOFF_SESSION = "2026-09-16"
 FINAL_EXECUTION_SESSION = "2026-09-17"
@@ -58,10 +58,10 @@ STARTING_CASH = Decimal("1000000")
 META_STATISTIC_NAME = "ARV2_ORDER_LEVEL_META"
 AGGREGATES_STATISTIC_NAME = "ARV2_ORDER_LEVEL_AGGREGATES"
 MAXIMUM_STATISTIC_BYTES = 4096
-SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v4"
+SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v5"
 QQQ_TICKER = "QQQ"
 PIT_LOOKBACK_CALENDAR_DAYS = 45
-MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO = Decimal("0.95")
+MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO = Decimal("0.90")
 MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL = Decimal("0.95")
 MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL = Decimal("1.05")
 MAXIMUM_FUNDAMENTAL_SNAPSHOT_AGE_SESSIONS = 1
@@ -731,7 +731,8 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             < MINIMUM_CAP_COVERED_CONSTITUENT_WEIGHT_RATIO
         ):
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ market-cap constituent-weight coverage is below 95 percent"
+                "order-level PIT QQQ market-cap constituent-weight coverage is below 90 percent: "
+                + _decimal_text(covered_weight_ratio)
             )
         result = {}
         for sid in sorted(covered_sids):

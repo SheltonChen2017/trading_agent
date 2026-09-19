@@ -1358,10 +1358,11 @@ use focused checks during implementation/QC diagnosis, then run the complete
 Analyst V2 lane suite once on the final settled tree before the single push.
 Section 128 prospectively versions the QC status boundary, preserving the
 V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
-physical plan from committed V7 source. Claude will review section 129 with
-this round's final single pushed snapshot. The next authorized QC action is
-one signed R-133 launch after its physical record is committed; neither
-R-131 nor R-132 may be retried.
+physical plan from committed V7 source; section 130 records its zero-cell
+terminal refusal. Claude will review section 130 with this round's final
+single pushed snapshot. The next QC action requires a freshly versioned,
+tested enum-identity source and a distinct physical R-135 plan; R-131,
+R-132, R-133 and R-134 may not be retried or silently launched.
 No order-level return or paper/live, funded, deployment, broker, or trading
 authority exists yet.
 
@@ -19454,3 +19455,34 @@ requires a distinct next plan. Terminal inspection excludes statistics;
 the two aggregate custom statistics need a separate result-read signature.
 No raw provider/security rows, orders/fills/logs/charts, deployment,
 paper/live, funded, broker, or trading action is authorized.
+
+## 130. R-133 first-event refusal after numeric normalization, 2026-09-18
+
+The exact signed R-133 execution authority was authenticated against the
+physical plan committed at `aca883d`. Its one-use private submission
+created QC project `36719419`, backtest
+`b66d1843e8d001da8ec83a1ffaaa03e4`, launch receipt SHA-256
+`30c033a2d5074da833a2236f198caff9eea7444557ae9281075afe71eaca2d1e`.
+The first statistics-disabled poll authenticated terminal `Runtime Error`,
+receipt SHA-256
+`7bb7057a2ade74236c1e0021901457401b78b20ca3c7b054f23e9f6a07e68b7d`.
+One bounded exact-run diagnosis selected only status/error/stack. At
+simulated `2026-01-05 09:20:00`, replay of a synchronous MOO order event
+again refused as `order-level QC event status is unsupported`, now in V7
+runtime line 1148. No raw event value, order, fill, log stream, chart,
+provider/security row, aggregate statistic, price, or return was selected.
+The exact numeric-string theory supporting V7 was therefore **insufficient**;
+the event's actual status representation remains unobserved. The safe
+prospective correction compares the QC `OrderStatus` enum values supplied
+by the projected algorithm directly against their named constants, rather
+than guessing another `str()` format, and isolates that route in focused
+tests. R-133 itself is spent and cannot be retried.
+
+R-133 spends **93 -> 94 shared looks / 36 -> 37 ARV2 development
+evaluations** and adds **zero** cells, leaving **607 cells / 27
+infrastructure looks**. R-134 is superseded unlaunched/unspent because its
+first usable-cell contingency and fixed accounting failed. `ARV2D130-001`
+is a lane-specific P2 status-boundary defect, pending a fresh V8 source and
+physical R-135 plan. This technical failure is neither a positive nor a
+negative analyst-revision return estimate, and grants no leverage,
+six-universe, paper/live, broker, funded, or trading action.

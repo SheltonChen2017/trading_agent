@@ -3309,3 +3309,26 @@ R-134 can spend **94 -> 95 / 37 -> 38** only after an authenticated usable
 R-133 result (`run_valid` true); a technical or execution-invalid R-133
 ends the pair with R-134 unspent. Neither run has a preselected return or
 leverage decision. No QC action has yet occurred under these identities.
+
+## R-133 — V7 preopen QQQ order diagnostic (TERMINAL STATUS REFUSAL; ZERO CELLS) — 2026-09-18
+
+One signed submission from the exact plan at `aca883d` created private QC
+project `36719419` and backtest `b66d1843e8d001da8ec83a1ffaaa03e4`.
+The launch receipt SHA-256 is
+`30c033a2d5074da833a2236f198caff9eea7444557ae9281075afe71eaca2d1e`.
+The first statistics-disabled poll authenticated terminal `Runtime Error`,
+receipt SHA-256
+`7bb7057a2ade74236c1e0021901457401b78b20ca3c7b054f23e9f6a07e68b7d`.
+One bounded error/stack diagnosis found the same `order-level QC event
+status is unsupported` at simulated `2026-01-05 09:20:00`, during
+replay of the first synchronous MOO event. The event status value itself
+was not selected. No aggregate, raw order/fill/log, chart, provider row,
+price, return, or signal verdict was obtained. V7's exact numeric string
+mapping was not sufficient; a new enum-identity source and plan are
+required, not an R-133 replay.
+
+R-133 spends **93 -> 94 shared looks / 36 -> 37 development evaluations**
+and adds **zero cells**, leaving **607 cells / 27 infrastructure looks**.
+R-134 is superseded unlaunched/unspent because its contingent first usable
+aggregate was not produced. No 2025-now, six-universe, or leveraged run
+has followed this terminal refusal.

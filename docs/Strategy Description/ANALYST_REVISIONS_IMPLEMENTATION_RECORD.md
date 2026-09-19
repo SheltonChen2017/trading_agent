@@ -1361,9 +1361,9 @@ V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
 physical plan from committed V7 source; section 130 records its zero-cell
 terminal refusal. Claude will review section 130 with this round's final
 single pushed snapshot. The owner explicitly waives Claude review of
-section 131 before this continuing QC correction round's R-135 diagnostic;
-the next QC action requires committing the prospective V8 source/tests and
-freezing a distinct physical R-135 plan. R-131,
+section 132 before this continuing QC correction round's R-135 diagnostic;
+the next QC action is to sign and launch only the exactly frozen physical
+R-135 plan from committed V8 source. R-131,
 R-132, R-133 and R-134 may not be retried or silently launched.
 Claude's independent review follows the final single pushed snapshot, after
 focused interim and full final-tree checks.
@@ -19543,3 +19543,43 @@ its one-use authority, then launch only that run. A 2025-now R-136 may be
 preregistered but may launch only after an authenticated usable R-135
 aggregate. No six-universe, leverage, paper/live, broker, funded, or
 trading authority follows.
+
+## 132. Exact V8 physical R-135/R-136 preregistration, 2026-09-18
+
+The V8 source/tests and section-131 record were committed at `6585d80`
+before either private physical plan was derived. The locally authenticated
+immutable input-package SHA-256 and lineage SHA-256 are respectively
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`
+and `54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+The host-local organization ID matched the earlier signed plan by its hash,
+without recording or printing the ID. Both private control directories are
+0700; their plans and unsigned authority candidates are 0600, locally
+reloaded and authenticated. Each exact QC projection has ten files and
+285,427 bytes total; its largest file is 63,002 bytes, below the unchanged
+64,000/file and 288,000 total caps and above the enforced 2,048-byte
+remaining-size buffer. The two-statistic inventory is unchanged from
+section 129. No QC action occurred under these identities before this
+preregistration.
+
+| Run | Profile SHA-256 | Private project / backtest | Projection SHA-256; source-inventory SHA-256 | Plan SHA-256; unsigned authority record SHA-256 |
+|---|---|---|---|---|
+| R-135 (2026 YTD) | `55d4790ed611b33607dcdca96934237a4ed49ae1ae5d2b42f5a2b20bc570f4e2` | `83 ARV2_QQQ_ENUM_ORDER_R135_2026_YTD - 20260918` / `ARV2 R135 QQQ enum order 2026 YTD 7803b84f` | `2387089176cb2ba8e1cc351bf6d748ca7cd2a4c2d207e617b5db11cf7ad7beee`; `e45f54e5fe2fc55543e1f37268b176e72adccc654682fa44b5c6021b1b1bef76` | `b581183d7f1104a73cad046f66cf433c7f673f68a6c93edf34ae823a40ad0175`; `424ecc02e9353471bb611bde888389dfee7b790f257e4e57d843a7e055525bb5` |
+| R-136 (contingent 2025-now) | `b8446593bedb571f644fc6033835408b755b8684f4857aeeeafd2b8e1a82e780` | `84 ARV2_QQQ_ENUM_ORDER_R136_2025_NOW - 20260918` / `ARV2 R136 QQQ enum order 2025-now 7803b84f` | `8e3d532ad1ca50fcda9f68a5294649dc85d0290fb3ed063f067ed409e585cb32`; `8e1a5f108f5a397cab32541cebd6971579b49b532492c632ec0812416b20db97` | `093f463841c413afa1e48a5f664ccc50cf56e5d49e510120e6208c710f41f63c`; `da4d1836348220ce389f2dfb08783e6d2d29077e830ff620aac2464087bbf11e` |
+
+R-135 retains the 2026-01-02 decision through 2026-09-17 final
+execution/mark: 39 decisions, 178 observations, 177 return intervals.
+R-136 would use 2025-01-02 through the same cutoff: 91 decisions, 428
+observations, 427 return intervals. The only prospective change from
+R-133 is the exact enum-status boundary and its source-closure buffer;
+neither result sign, relative winner, nor leverage decision is selected.
+Starting accounting is **94 shared looks, 37 development evaluations,
+27 infrastructure looks, 607 cells**. One R-135 one-use launch spends
+**94 -> 95 / 37 -> 38**; only a separately signed, authenticated usable
+aggregate adds **607 -> 608 cells**. R-136 may launch only after that
+usable aggregate (`run_valid` true and no fee mismatch), then spends
+**95 -> 96 / 38 -> 39** and can add at most one further cell. A technical
+refusal or execution-invalid result supersedes R-136 unlaunched/unspent.
+First inspect only statistics-disabled terminal status; only `Completed.`
+allows a separate one-use signature/read of the exact two aggregate custom
+statistics. Raw provider/security rows, QC orders/fills/logs/charts, paper,
+live, deployment, broker, funded accounts, or real trading remain excluded.

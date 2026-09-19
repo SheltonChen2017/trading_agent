@@ -3332,3 +3332,29 @@ and adds **zero cells**, leaving **607 cells / 27 infrastructure looks**.
 R-134 is superseded unlaunched/unspent because its contingent first usable
 aggregate was not produced. No 2025-now, six-universe, or leveraged run
 has followed this terminal refusal.
+
+## R-135 and R-136 — V8 direct-enum QQQ simulated-order diagnostics (PREREGISTERED; UNLAUNCHED) — 2026-09-18
+
+The prospective source at `6585d80` compares the QC `OrderStatus` members
+directly and preserves the previous signal, PIT QQQ weights/residual,
+80% resolved-weight floor, 98% gross, MOO schedule, and modeled 10-bps
+per-side fee. The same authenticated immutable input package has SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`.
+Exact private project names, profile/projection/source/plan/authority hashes
+and the conditional order are frozen in lane-record section 132, before
+any new QC action. R-135 is the 2026-YTD one-use plan; R-136 is 2025-now
+and is contingent on an authenticated usable R-135 aggregate (`run_valid`
+true and no fee mismatch). The technical status refused by R-133 was not
+observed, so V8 remains a hypothesis to validate in QC, not a completed
+return estimate.
+
+Starting accounting is **94 shared looks, 37 ARV2 development evaluations,
+27 infrastructure looks, 607 cells**. R-135 launch spends **94 -> 95 /
+37 -> 38**; only its separately signed exact two-statistic aggregate can
+add **607 -> 608 cells**. Only then can R-136 launch, spending **95 -> 96 /
+38 -> 39** and adding at most one further cell. A technical refusal or
+execution-invalid R-135 leaves R-136 unlaunched/unspent. Neither result
+sign nor winner is selected, and no six-universe or leveraged run follows
+by inference. Statistics-disabled terminal inspection precedes any result
+read; raw QC orders, fills, logs, charts, provider/security rows, prices,
+and unrestricted outcomes remain outside this authority.

@@ -1338,6 +1338,16 @@ plans and one-use authorities before any successor QC action. Do not read
 R-129 as a return, retry its spent action, launch R-130, or infer any
 deployment or trading authority.
 
+Claude will review section 125 with this round's final single pushed snapshot.
+The V6 successor stages synchronous order callbacks until the returned QC
+ticket authenticates their identity and submits the frozen prior-close plan
+only at 09:20 New York time on the exact next authenticated session. The
+original 80% resolved-weight floor, neutral overlapping QQQ residual, score,
+98%-gross target, and fee model are unchanged. R-131/R-132 have no physical
+identity or QC action until this source is committed, validated, and separately
+preregistered. R-132 requires R-131's authenticated aggregate cell. No
+paper/live, funded, deployment, broker, or trading action is authorized.
+
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
 
@@ -19209,3 +19219,48 @@ recomputed as one minus the rounded mean resolved ratio, differing from
 the direct mean of recorded proxy ratios at the last Decimal digit in a
 crafted example. It has no order, return, or admission effect on R-129 and
 must not mutate this frozen source.
+
+## 125. Prospective V6 next-session preopen order diagnostic, 2026-09-18
+
+This is new source and a new candidate, **not a retry** of R-129. Its V6
+2026/2025 profiles have exact SHA-256 values
+`61bf358fdda206e6602182c728df49f58be78e5228b4505424f2454ffac13464`
+and `7856a889365e6961eca1b2af4c5b23f622ddc875f07877f4bbeb552ae3a2b706`,
+respectively. The V5/V7 economic construction remains: immediate-prior
+point-in-time QQQ holdings, at least 80% exactly FIGI/SID-resolved reported
+weight, all unjoined weight in one unscored but overlapping QQQ ETF proxy,
+unchanged R055 primary signal and bounded sector-neutral tilt, 98% gross,
+whole shares, and a 10-bps-per-side modeled fee. Neither sign nor favorable
+window is selected. The 2026 decision span is January 2 to September 16;
+the authenticated final execution session remains September 17. The V7
+aggregate field inventory and result parser are unchanged.
+
+`ARV2D124-001` (P2) is corrected in this prospectively versioned source:
+bounded callbacks delivered synchronously inside `market_on_open_order` are
+staged, then matched to the exact returned ticket and replayed once. Wrong
+ticket, duplicate, overflow, and mutated identity/status refuse; no unknown
+order event is silently ignored. `ARV2D124-002` (P2) is corrected
+prospectively: after-close decisions produce a pending plan for the exact
+next session in the authenticated axis. The projection schedules submission
+at 09:20 New York time, ten minutes before QQQ's regular open, and the
+runtime refuses a missed/duplicate callback, live mode, or an overnight
+cash/quantity change. This avoids Friday-after-close MOO submission without
+assuming the R-129 callback's unseen status. The V4/V5 profiles stay pinned,
+and `ARV2D124-003` remains a documented non-gating P3 precision observation.
+
+The fixed projected ten-file source remains below 64,000 bytes per file;
+the reviewed total closure cap expands prospectively from 278,000 to 288,000
+bytes to accommodate isolated reentrant and preopen guards while retaining
+at least 4,096 bytes of margin. The changed source cannot authenticate an
+old physical projection, and spent R-129/never-launched R-130 identities
+remain historical. Focused projection/runtime/core/submission tests:
+**265 passed** before the final new V6 isolating tests; the exact complete
+lane-suite result and active-document check will be recorded after their
+final execution. No QC action, aggregate, return, or new look belongs to
+this source-only stage. Accounting remains **92 shared looks, 35 ARV2
+development evaluations, 27 infrastructure looks, 607 cells**. Next:
+commit this source and tests, derive physical R-131/R-132 projections and
+one-use plans from that commit, record them prospectively, then execute only
+R-131 under a fresh signed authority. R-132 is contingent on one
+authenticated R-131 aggregate cell; a technical failure spends a look but
+adds no cell. No six-universe or leverage run follows by inference.

@@ -113,6 +113,11 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     assert "market_on_open_order" not in main
     assert "self.schedule.on(" in main
     assert "self.time_rules.after_market_close(" in main
+    if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS:
+        assert "self.time_rules.before_market_open(qqq_benchmark, 10)" in main
+        assert "self._arv2_driver.on_before_open" in main
+    else:
+        assert "before_market_open" not in main
     assert "class Arv2TenBpsFeeModel(FeeModel):" in main
     assert "parameters.order.absolute_quantity" in main
     assert "parameters.security.open" in main
@@ -218,6 +223,32 @@ def test_proxy_projection_keeps_file_and_total_margin_and_raw_executable_qqq(
     assert b"data_normalization_mode=DataNormalizationMode.RAW" in main
     assert b"data_normalization_mode=DataNormalizationMode.TOTAL_RETURN" in main
     assert b"self.set_benchmark(qqq_benchmark)" in main
+
+
+def test_v6_preopen_schedule_is_load_bearing_and_legacy_main_is_stable(
+    delta_package,
+):
+    v6 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package,
+        profile_id=runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    v5 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package,
+        profile_id=runtime.PROXY_PROFILE_2026_ID,
+    )
+    v6_main = next(
+        item.source_bytes for item in v6.source_files
+        if item.project_path == "main.py"
+    )
+    v5_main = next(
+        item.source_bytes for item in v5.source_files
+        if item.project_path == "main.py"
+    )
+    assert v6_main.count(b"self.schedule.on(") == 2
+    assert v5_main.count(b"self.schedule.on(") == 1
+    assert b"before_market_open(qqq_benchmark, 10)" in v6_main
+    assert b"before_market_open" not in v5_main
+    assert v6_main != v5_main
 
 
 def test_projection_disclosure_is_load_bearing(delta_package):

@@ -34,9 +34,11 @@ SOURCE_SCHEMA = "arv2-order-level-qc-source-file-v1"
 MAIN_PROJECT_PATH = "main.py"
 RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_qc_runtime.py"
 MAX_SOURCE_FILE_BYTES = 64_000
-# The fixed ten-file closure now includes the ETF-residual accounting helper.
-# Keep at least 4,096 bytes of review margin; no additional source is admitted.
-MAX_TOTAL_SOURCE_BYTES = 278_000
+# The fixed ten-file closure includes the ETF-residual accounting and
+# synchronous order-event authentication. The prospectively versioned V6
+# preopen source retains at least 4,096 bytes of review margin. No additional
+# source path is admitted; the per-file 64,000-byte boundary is unchanged.
+MAX_TOTAL_SOURCE_BYTES = 288_000
 
 PROJECT_SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
@@ -539,6 +541,16 @@ def _main_source(
         int(part)
         for part in delta_package_builder.FINAL_EXECUTION_SESSION.split("-")
     )
+    preopen_schedule_source = (
+        "\n        self.schedule.on(\n"
+        "            self.date_rules.every_day(qqq_benchmark),\n"
+        "            self.time_rules.before_market_open(qqq_benchmark, 10),\n"
+        "            self._arv2_driver.on_before_open,\n"
+        "        )"
+        if profile.get("execution_submission_timing")
+        == "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
+        else ""
+    )
     source = f'''from AlgorithmImports import *
 from decimal import Decimal
 from accepted_risk_qqq_order_level_qc_runtime import (
@@ -616,7 +628,7 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             self.date_rules.every_day(qqq_benchmark),
             self.time_rules.after_market_close(qqq_benchmark, 0),
             self._arv2_driver.on_after_close,
-        )
+        ){preopen_schedule_source}
 
     def _arv2_accept_qqq_constituents(self, constituents):
         if not hasattr(self, "_arv2_driver"):

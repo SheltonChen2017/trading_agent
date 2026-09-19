@@ -200,6 +200,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         runtime.PROFILE_2026_ID: (39, 178),
         runtime.PROXY_PROFILE_2025_ID: (91, 428),
         runtime.PROXY_PROFILE_2026_ID: (39, 178),
+        runtime.PREOPEN_PROXY_PROFILE_2025_ID: (91, 428),
+        runtime.PREOPEN_PROXY_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
@@ -277,6 +279,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             runtime.PROFILE_2026_ID: "2026-01-05",
             runtime.PROXY_PROFILE_2025_ID: "2025-01-03",
             runtime.PROXY_PROFILE_2026_ID: "2026-01-05",
+            runtime.PREOPEN_PROXY_PROFILE_2025_ID: "2025-01-03",
+            runtime.PREOPEN_PROXY_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -458,8 +462,18 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
     assert all("DO NOT SELECT" not in value for _name, value in pairs)
 
 
-def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(tmp_path):
-    plan = _plan(tmp_path, runtime.PROXY_PROFILE_2026_ID)
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        runtime.PROXY_PROFILE_2026_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+    ),
+)
+def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
+    tmp_path, profile_id
+):
+    plan = _plan(tmp_path, profile_id)
     statistics = _statistics(plan)
     assert len(statistics[runtime.AGGREGATES_STATISTIC_NAME].encode("ascii")) <= 4096
     launch, response = _result_response(plan, statistics)
@@ -483,6 +497,32 @@ def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
         )
         with pytest.raises(adapter.AcceptedRiskOrderLevelSubmissionError):
             adapter._parse_result(response, plan, launch)
+
+
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        runtime.PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+    ),
+)
+def test_preopen_result_cannot_shift_first_execution_session(
+    tmp_path, profile_id
+):
+    plan = _plan(tmp_path, profile_id)
+    launch, response = _result_response(
+        plan,
+        _statistics(
+            plan,
+            aggregate_update={"QQQ_first_execution_session": "2025-01-06"},
+        ),
+    )
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="order-level aggregate execution or coverage invariant changed",
+    ):
+        adapter._parse_result(response, plan, launch)
 
 
 @pytest.mark.parametrize(
@@ -889,8 +929,40 @@ def test_pinned_profile_census_matches_authenticated_package_session_axis():
         assert len(expected_sessions) - 1 == return_interval_count
 
 
+def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
+    assert adapter.PROFILE_IDS == runtime.PROFILE_IDS == (
+        runtime.PROFILE_2025_ID,
+        runtime.PROFILE_2026_ID,
+        runtime.PROXY_PROFILE_2025_ID,
+        runtime.PROXY_PROFILE_2026_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    assert adapter.PROXY_PROFILE_IDS == runtime.PROXY_PROFILE_IDS == (
+        runtime.PROXY_PROFILE_2025_ID,
+        runtime.PROXY_PROFILE_2026_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2025_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    bindings = adapter._PINNED_RUNTIME_PROFILE_BINDINGS
+    assert tuple(binding[0] for binding in bindings) == adapter.PROFILE_IDS
+    assert tuple(binding[1] for binding in bindings[:4]) == (
+        "43ea09abd2b6eb9aef23cfb05ec7cb0c19c50451fb41ac78c3aeeac8bd60e518",
+        "190637eb9145c4b3a9e844cb42eb84d24bb5b318afc56957f98bf9d413d8a3b6",
+        "c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d",
+        "af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a",
+    )
+    assert bindings[4][3:7] == ("2025-01-03", 91, 428, 427)
+    assert bindings[5][3:7] == ("2026-01-05", 39, 178, 177)
+    assert runtime.PROXY_SUMMARY_SCHEMA == "arv2-qqq-order-level-tilt-summary-v7"
+
+
+@pytest.mark.parametrize(
+    "profile_id",
+    (runtime.PROFILE_2025_ID, runtime.PREOPEN_PROXY_PROFILE_2026_ID),
+)
 def test_submission_plan_persists_and_reloads_against_exact_inputs(
-    tmp_path, monkeypatch
+    tmp_path, monkeypatch, profile_id
 ):
     lineage = {"schema": delta_package_builder.LINEAGE_SCHEMA, "fixture": True}
     lineage_sha = hashlib.sha256(canonical_json_bytes(lineage)).hexdigest()
@@ -932,7 +1004,7 @@ def test_submission_plan_persists_and_reloads_against_exact_inputs(
         lambda value: value,
     )
     projection = projection_builder.build_accepted_risk_order_level_qc_projection(
-        delta, profile_id=runtime.PROFILE_2025_ID
+        delta, profile_id=profile_id
     )
     monkeypatch.setattr(adapter, "_PINNED_REQUIRE_PACKAGE", lambda value: value)
     monkeypatch.setattr(adapter, "_PINNED_REQUIRE_PROJECTION", lambda value: value)
@@ -975,7 +1047,7 @@ def test_submission_plan_persists_and_reloads_against_exact_inputs(
     assert require_authority(value=authority, plan=loaded) is authority
 
 
-def test_only_two_exact_profiles_are_allowlisted(tmp_path, monkeypatch):
+def test_unreviewed_profile_is_not_allowlisted(tmp_path, monkeypatch):
     lineage = {}
     lineage_sha256 = hashlib.sha256(canonical_json_bytes(lineage)).hexdigest()
     package = SimpleNamespace(

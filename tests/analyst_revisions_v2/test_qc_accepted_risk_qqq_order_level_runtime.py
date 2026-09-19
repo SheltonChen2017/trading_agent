@@ -193,6 +193,8 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         "arv2-qqq-order-level-tilt-2026-cutoff-v4",
         "arv2-qqq-order-level-tilt-2025-cutoff-v5",
         "arv2-qqq-order-level-tilt-2026-cutoff-v5",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v6",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v6",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -239,9 +241,35 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
             runtime.META_STATISTIC_NAME,
         )
 
+    expected_proxy_digests = {
+        runtime.PROXY_PROFILE_2025_ID: (
+            "c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d"
+        ),
+        runtime.PROXY_PROFILE_2026_ID: (
+            "af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a"
+        ),
+        runtime.PREOPEN_PROXY_PROFILE_2025_ID: (
+            "7856a889365e6961eca1b2af4c5b23f622ddc875f07877f4bbeb552ae3a2b706"
+        ),
+        runtime.PREOPEN_PROXY_PROFILE_2026_ID: (
+            "61bf358fdda206e6602182c728df49f58be78e5228b4505424f2454ffac13464"
+        ),
+    }
     for profile_id in runtime.PROXY_PROFILE_IDS:
         profile = runtime.require_qqq_order_level_profile(profile_id)
-        assert profile["schema"] == runtime.PROXY_PROFILE_SCHEMA
+        assert profile["profile_sha256"] == expected_proxy_digests[profile_id]
+        assert profile["schema"] == (
+            runtime.PREOPEN_PROXY_PROFILE_SCHEMA
+            if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS
+            else runtime.PROXY_PROFILE_SCHEMA
+        )
+        if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS:
+            assert profile["execution_submission_timing"] == (
+                "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
+            )
+            assert profile["synchronous_order_event_rule"] == (
+                "stage_until_exact_returned_ticket_then_replay_once"
+            )
         assert profile["target_weight_basis"] == runtime.PROXY_TARGET_WEIGHT_BASIS
         assert profile["minimum_resolved_constituent_weight_ratio"] == "0.8"
         assert profile["qqq_proxy_security_id"] == runtime.QQQ_PROXY_SECURITY_ID
@@ -371,6 +399,100 @@ def test_proxy_is_unscored_neutral_and_98_percent_gross(monkeypatch):
         runtime.QQQ_PROXY_SECURITY_ID: Decimal("0.1372"),
     }
     assert sum(selected.values(), Decimal(0)) == Decimal("0.98")
+
+
+def _ready_v6_decision(session, next_session):
+    algorithm = _Algorithm(session)
+    security = _Symbol("A-SID", "A")
+    value = _runtime(algorithm, runtime.PREOPEN_PROXY_PROFILE_2026_ID)
+    value._initialized = True
+    value._decision_set = frozenset({session})
+    value._session_axis = (session, next_session)
+    value._session_positions = {session: 0, next_session: 1}
+    value._resolution = _Resolution({"a": security})
+    value._score_runtime = SimpleNamespace(score=lambda _position: SimpleNamespace(
+        memberships=(evaluator.SecurityMembership(
+            "a", 0, 2, "sector", Decimal(1), "a" * 64,
+        ),),
+        primary_view_firm_specific_scores={"a": Decimal(1)},
+    ))
+    value._pit_benchmark_measures = lambda _session: {
+        "a": Decimal("0.86"),
+        runtime.QQQ_PROXY_SECURITY_ID: Decimal("0.14"),
+    }
+    return algorithm, value
+
+
+@pytest.mark.parametrize(
+    "decision,execution",
+    (
+        ("2026-01-02", "2026-01-05"),  # Friday to Monday
+        ("2026-01-16", "2026-01-20"),  # Monday market holiday
+        ("2026-09-16", "2026-09-17"),  # Exact final decision
+    ),
+)
+def test_v6_decides_after_close_but_submits_only_on_next_axis_preopen(
+    decision, execution,
+):
+    algorithm, value = _ready_v6_decision(decision, execution)
+    assert value.on_before_open() is False
+    assert value.on_after_close() is True
+    assert not algorithm.orders
+    assert value._pending_preopen[0] == execution
+    assert value._pending_preopen[1].rebalance_id.endswith(decision)
+
+    algorithm.time = datetime.fromisoformat(execution + "T09:20:00")
+    assert value.on_before_open() is True
+    assert algorithm.orders
+    assert value._pending_preopen is None
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="preopen submission was duplicated",
+    ):
+        value.on_before_open()
+    assert len(algorithm.orders) == value._submitted_order_count
+
+
+def test_v6_missed_or_early_preopen_refuses_without_order_submission():
+    algorithm, value = _ready_v6_decision("2026-01-02", "2026-01-05")
+    assert value.on_after_close() is True
+    algorithm.time = datetime.fromisoformat("2026-01-02T09:20:00")
+    assert value.on_before_open() is False
+    algorithm.time = datetime.fromisoformat("2026-01-05T09:21:00")
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="preopen callback missed its exact next session",
+    ):
+        value.on_before_open()
+    assert not algorithm.orders
+    algorithm.time = datetime.fromisoformat("2026-01-05T16:00:00")
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="next-session preopen callback was missed",
+    ):
+        value.on_after_close()
+
+
+@pytest.mark.parametrize("mutation", ("cash", "quantity", "live"))
+def test_v6_preopen_refuses_overnight_state_change_or_live_mode(mutation):
+    algorithm, value = _ready_v6_decision("2026-01-02", "2026-01-05")
+    assert value.on_after_close() is True
+    algorithm.time = datetime.fromisoformat("2026-01-05T09:20:00")
+    if mutation == "cash":
+        algorithm.portfolio.cash -= Decimal(1)
+    elif mutation == "quantity":
+        algorithm.portfolio.quantities["A-SID"] = 1
+    else:
+        algorithm.live_mode = True
+    with pytest.raises(
+        ValueError,
+        match=(
+            "backtest-only" if mutation == "live" else
+            "overnight account changed"
+        ),
+    ):
+        value.on_before_open()
+    assert not algorithm.orders
 
 
 def test_proxy_still_requires_the_exact_prior_authenticated_session():
@@ -1488,6 +1610,127 @@ def test_qc_event_identity_includes_order_id_for_same_per_order_event_id():
     )
     value._close_open_plan()
     assert value._lifecycle_records[0]["fill_event_count"] == 2
+
+
+def _single_buy_plan():
+    return orders.plan_rebalance(
+        rebalance_id="synchronous-qc-event",
+        starting_cash=Decimal("10000"),
+        current_quantities={},
+        reference_prices={"a": Decimal("100")},
+        target_weights={"a": Decimal("0.98")},
+    )
+
+
+@pytest.mark.parametrize("status", ("Invalid", "Filled"))
+def test_moo_submission_replays_synchronous_matching_qc_event(status):
+    class SynchronousAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            event = SimpleNamespace(order_id=ticket.order_id, id=7, status=status)
+            if status == "Filled":
+                event.fill_quantity = quantity
+                event.fill_price = Decimal("100")
+                event.order_fee = _order_fee("9.8")
+            self.runtime.on_order_event(event)
+            return ticket
+
+    algorithm = SynchronousAlgorithm()
+    value = _runtime(algorithm, runtime.PROXY_PROFILE_2026_ID)
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._submit_plan(_single_buy_plan())
+    assert value._submitted_order_count == 1
+    assert tuple(event.event_id for event in value._open_plan_events) == (
+        "qc-event-1-7",
+    )
+    value._close_open_plan()
+    summary = value._lifecycle_records[0]
+    assert summary["invalid_order_count"] == (status == "Invalid")
+    assert summary["filled_order_count"] == (status == "Filled")
+    assert summary["fee_mismatch"] is False
+
+
+@pytest.mark.parametrize(
+    ("callback_ids", "message"),
+    (
+        ((2,), "synchronous QC event does not match returned MOO ticket"),
+        ((1, 1), "duplicate synchronous QC event"),
+    ),
+)
+def test_moo_submission_refuses_unrelated_or_duplicate_synchronous_event(
+    callback_ids, message
+):
+    class HostileAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            for order_id in callback_ids:
+                self.runtime.on_order_event(
+                    SimpleNamespace(order_id=order_id, id=7, status="Invalid")
+                )
+            return ticket
+
+    algorithm = HostileAlgorithm()
+    value = _runtime(algorithm, runtime.PROXY_PROFILE_2026_ID)
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    with pytest.raises(runtime.AcceptedRiskQqqOrderLevelQcRuntimeError, match=message):
+        value._submit_plan(_single_buy_plan())
+    assert value._open_plan_events == []
+    assert value._pending_submission_events is None
+
+
+def test_moo_submission_refuses_synchronous_event_buffer_overflow():
+    class FloodAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            for event_id in range(runtime.MAX_SYNCHRONOUS_ORDER_EVENTS + 1):
+                self.runtime.on_order_event(
+                    SimpleNamespace(order_id=ticket.order_id, id=event_id, status="New")
+                )
+            return ticket
+
+    algorithm = FloodAlgorithm()
+    value = _runtime(algorithm, runtime.PROXY_PROFILE_2026_ID)
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="synchronous QC event buffer exceeded",
+    ):
+        value._submit_plan(_single_buy_plan())
+    assert value._open_plan_events == []
+    assert value._pending_submission_events is None
+
+
+def test_moo_submission_refuses_mutated_synchronous_event_before_replay():
+    class MutatingAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            event = SimpleNamespace(order_id=ticket.order_id, id=7, status="Invalid")
+            self.runtime.on_order_event(event)
+            event.status = "Canceled"
+            return ticket
+
+    algorithm = MutatingAlgorithm()
+    value = _runtime(algorithm, runtime.PROXY_PROFILE_2026_ID)
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="synchronous QC event changed before replay",
+    ):
+        value._submit_plan(_single_buy_plan())
+    assert value._open_plan_events == []
+    assert value._pending_submission_events is None
 
 
 @pytest.mark.parametrize(

@@ -1,5 +1,6 @@
 import dataclasses
 import json
+from datetime import datetime
 from decimal import Decimal
 
 import pytest
@@ -40,6 +41,58 @@ def _plan(
             else target_weights
         ),
     )
+
+
+def test_next_session_preopen_requires_exact_clock_and_unchanged_account():
+    kwargs = {
+        "expected": "2026-01-05",
+        "actual_time": datetime.fromisoformat("2026-01-05T09:20:00"),
+        "planned_cash": Decimal("200"),
+        "observed_cash": Decimal("200"),
+        "planned_quantities": {"stock": 1},
+        "observed_quantities": {"stock": 1},
+        "error_type": ValueError,
+    }
+    assert core.require_next_session_preopen(**kwargs) is None
+    for clock in ("2026-01-02T09:20:00", "2026-01-05T09:21:00"):
+        with pytest.raises(ValueError, match="missed its exact next session"):
+            core.require_next_session_preopen(
+                **{**kwargs, "actual_time": datetime.fromisoformat(clock)}
+            )
+    for changed in (
+        {"observed_cash": Decimal("199")},
+        {"observed_quantities": {"stock": 2}},
+    ):
+        with pytest.raises(ValueError, match="overnight account changed"):
+            core.require_next_session_preopen(**{**kwargs, **changed})
+
+
+def test_aggregate_coverage_statistics_preserves_exact_proxy_decimal_census():
+    rows = ({
+        "resolved_member_count_ratio": "0.5",
+        "resolved_constituent_weight_ratio": "0.86",
+        "positive_constituent_weight_total": "1",
+        "qqq_proxy_constituent_weight_ratio": "0.14",
+        "positive_weight_member_count": 100,
+        "resolved_positive_weight_member_count": 50,
+    },)
+    values, stats = core.coverage_statistics(rows, True)
+    assert values["resolved_constituent_weight_ratio"] == (Decimal("0.86"),)
+    assert stats == {
+        "coverage_decision_count": 1,
+        "positive_weight_member_count_sum": 100,
+        "resolved_positive_weight_member_count_sum": 50,
+        "mean_resolved_member_count_ratio": "0.5",
+        "mean_resolved_constituent_weight_ratio": "0.86",
+        "mean_positive_constituent_weight_total": "1",
+        "mean_qqq_proxy_constituent_weight_ratio": "0.14",
+        "minimum_resolved_member_count_ratio": "0.5",
+        "minimum_resolved_constituent_weight_ratio": "0.86",
+        "minimum_positive_constituent_weight_total": "1",
+        "minimum_qqq_proxy_constituent_weight_ratio": "0.14",
+    }
+    _, legacy = core.coverage_statistics(rows, False)
+    assert "mean_qqq_proxy_constituent_weight_ratio" not in legacy
 
 
 def _sell(plan):
@@ -92,6 +145,25 @@ def _terminal_events(plan):
         _event(intent, event_id=f"event-{intent.ordinal}")
         for intent in plan.intents
     )
+
+
+def test_lifecycle_census_preserves_fee_count_failure_and_digest():
+    plan = _plan()
+    record = core.summarize_order_lifecycle(
+        plan, _terminal_events(plan)
+    ).to_record()
+    one = core.aggregate_lifecycle_records((record,), len(plan.intents))
+    assert one["fee"] == Decimal(record["modeled_fee_amount"])
+    assert one["actual_fee"] == Decimal(record["actual_engine_fee_amount"])
+    assert one["filled"] == len(plan.intents)
+    assert one["execution_failure"] is False
+    assert one["fee_mismatch"] is False
+    assert len(one["digest"]) == 64
+    invalid = {**record, "invalid_order_count": 1}
+    two = core.aggregate_lifecycle_records((invalid,), len(plan.intents))
+    assert two["invalid"] == 1
+    assert two["execution_failure"] is True
+    assert two["digest"] != one["digest"]
 
 
 def _assert_refusal(expected, function, *args, **kwargs):

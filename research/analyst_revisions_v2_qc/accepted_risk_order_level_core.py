@@ -9,7 +9,8 @@ backtest fill events to aggregate diagnostics.  It cannot submit an order.
 import dataclasses
 import hashlib
 import json
-from decimal import ROUND_FLOOR, Decimal, localcontext
+from datetime import datetime
+from decimal import ROUND_FLOOR, Decimal, InvalidOperation, localcontext
 
 
 class OrderLevelBacktestError(ValueError):
@@ -29,6 +30,201 @@ CANCELED = "Canceled"
 INVALID = "Invalid"
 TERMINAL_STATUSES = frozenset({FILLED, CANCELED, INVALID})
 FILL_STATUSES = frozenset({PARTIALLY_FILLED, FILLED})
+
+
+def weekly_decision_axis(
+    axis, start_session, cutoff_session, final_session, error_type,
+):
+    """Select first authenticated session per ISO week and the exact cutoff."""
+
+    if (
+        type(axis) is not tuple
+        or tuple(sorted(set(axis))) != axis
+        or any(type(item) is not str for item in axis)
+    ):
+        raise error_type("order-level authenticated session axis changed")
+    try:
+        start = axis.index(start_session)
+        cutoff = axis.index(cutoff_session)
+        final = axis.index(final_session)
+    except ValueError as exc:
+        raise error_type(
+            "order-level profile escaped the authenticated session axis"
+        ) from exc
+    if not start < cutoff < final or final != cutoff + 1:
+        raise error_type(
+            "order-level cutoff lacks its exact next execution session"
+        )
+    decisions = []
+    prior_week = None
+    for session in axis[start : cutoff + 1]:
+        parsed = datetime.strptime(session, "%Y-%m-%d")
+        week = (parsed.isocalendar().year, parsed.isocalendar().week)
+        if week != prior_week:
+            decisions.append(session)
+            prior_week = week
+    if decisions[-1] != cutoff_session:
+        decisions.append(cutoff_session)
+    if tuple(sorted(set(decisions))) != tuple(decisions):
+        raise error_type("order-level decision schedule changed")
+    return tuple(decisions), start, cutoff, final
+
+
+def exact_decimal(value, name, error_type, *, positive=False, nonnegative=False):
+    """Normalize a QC boundary number before it enters exact order arithmetic."""
+
+    try:
+        result = Decimal(str(value))
+    except (InvalidOperation, TypeError, ValueError) as exc:
+        raise error_type(name + " is not decimal") from exc
+    if (
+        not result.is_finite()
+        or (positive and result <= 0)
+        or (nonnegative and result < 0)
+    ):
+        raise error_type(name + " is outside its finite bound")
+    return result
+
+
+def symbol_sid(symbol, name, error_type):
+    """Read an exact QC symbol identity without trusting a repr or ticker."""
+
+    try:
+        value = str(symbol.id)
+    except Exception as exc:
+        raise error_type(name + " symbol identity is unreadable") from exc
+    if type(value) is not str or not value:
+        raise error_type(name + " symbol identity changed")
+    return value
+
+
+def strictly_prior_collection(inventory, cutoff, name, error_type):
+    prior = tuple(item for item in inventory if item < cutoff)
+    if not prior:
+        raise error_type(name + " has no strictly prior collection")
+    key = max(prior)
+    return key, inventory[key]
+
+
+def authenticated_session_age(
+    positions, observed, decision_session, name, error_type,
+):
+    if not isinstance(observed, datetime):
+        raise error_type(name + " collection time changed type")
+    observed_date = observed.date().isoformat()
+    try:
+        decision_position = positions[decision_session]
+    except (KeyError, TypeError) as exc:
+        raise error_type(
+            name + " collection is outside the authenticated session axis"
+        ) from exc
+    try:
+        observed_position = positions[observed_date]
+    except KeyError as exc:
+        raise error_type(
+            name + " collection is outside the authenticated session axis"
+        ) from exc
+    age = decision_position - observed_position
+    if age < 0:
+        raise error_type(name + " collection is after its decision session")
+    return age
+
+
+def aggregate_lifecycle_records(records, submitted_order_count):
+    """Aggregate only authenticated lifecycle summaries; retain no order rows."""
+
+    fee = sum((Decimal(row["modeled_fee_amount"]) for row in records), Decimal(0))
+    filled_notional = sum(
+        (Decimal(row["total_filled_notional"]) for row in records), Decimal(0)
+    )
+    actual_fee = sum(
+        (Decimal(row["actual_engine_fee_amount"]) for row in records),
+        Decimal(0),
+    )
+    target_errors = tuple(Decimal(row["target_weight_l1_error"]) for row in records)
+    filled = sum(row["filled_order_count"] for row in records)
+    canceled = sum(row["canceled_order_count"] for row in records)
+    invalid = sum(row["invalid_order_count"] for row in records)
+    mismatch = any(row["fee_mismatch"] for row in records)
+    return {
+        "digest": _sha256({
+            "schema": "arv2-order-level-lifecycle-census-v1",
+            "records": records,
+        }),
+        "fee": fee,
+        "filled_notional": filled_notional,
+        "actual_fee": actual_fee,
+        "filled": filled,
+        "canceled": canceled,
+        "invalid": invalid,
+        "orders_with_any_fill": sum(
+            row["orders_with_any_fill_count"] for row in records
+        ),
+        "mean_target_error": (
+            Decimal(0) if not target_errors
+            else sum(target_errors, Decimal(0)) / Decimal(len(target_errors))
+        ),
+        "maximum_target_error": max(target_errors, default=Decimal(0)),
+        "execution_failure": (
+            canceled != 0 or invalid != 0
+            or filled != submitted_order_count or mismatch
+        ),
+        "fee_mismatch": mismatch,
+    }
+
+
+def require_next_session_preopen(
+    *, expected, actual_time, planned_cash, observed_cash,
+    planned_quantities, observed_quantities, error_type,
+):
+    """Refuse a callback that cannot execute the frozen prior-close plan."""
+
+    if (
+        actual_time.date().isoformat() != expected
+        or actual_time.hour != 9
+        or actual_time.minute != 20
+    ):
+        raise error_type(
+            "order-level preopen callback missed its exact next session"
+        )
+    if planned_cash != observed_cash or planned_quantities != observed_quantities:
+        raise error_type(
+            "order-level overnight account changed after the decision"
+        )
+
+
+def coverage_statistics(records, proxy_mode):
+    """Compute the aggregate-only coverage census from frozen decision rows."""
+
+    decimal_fields = (
+        "resolved_member_count_ratio",
+        "resolved_constituent_weight_ratio",
+        "positive_constituent_weight_total",
+    ) + (("qqq_proxy_constituent_weight_ratio",) if proxy_mode else ())
+    values = {
+        name: tuple(Decimal(row[name]) for row in records)
+        for name in decimal_fields
+    }
+    return values, {
+        "coverage_decision_count": len(records),
+        **{
+            name + "_sum": sum(row[name] for row in records)
+            for name in (
+                "positive_weight_member_count",
+                "resolved_positive_weight_member_count",
+            )
+        },
+        **{
+            "mean_" + name: _decimal_text(
+                sum(values[name], Decimal(0)) / Decimal(len(values[name]))
+            )
+            for name in decimal_fields
+        },
+        **{
+            "minimum_" + name: _decimal_text(min(values[name]))
+            for name in decimal_fields
+        },
+    }
 
 # Distinct messages are part of the fail-closed surface and each is exercised
 # directly by the focused test module.

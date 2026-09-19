@@ -292,7 +292,7 @@ def test_v7_status_codec_keeps_v6_preopen_schedule_and_distinct_profile(
     assert v7_main.count(b"self.schedule.on(") == v6_main.count(b"self.schedule.on(") == 2
     assert b"before_market_open(qqq_benchmark, 10)" in v7_main
     assert v7_main.count(b"extended_market_hours=True") == 1
-    assert b"numeric_status=True" in next(
+    assert b"numeric_status=profile_id in NUMERIC_PREOPEN_PROXY_PROFILE_IDS" in next(
         item.source_bytes for item in v7.source_files
         if item.project_path == projection.RUNTIME_PROJECT_PATH
     )
@@ -322,6 +322,27 @@ def test_v8_injects_qc_order_status_enum_only_for_new_profile(delta_package):
     assert projection.MIN_REVIEW_MARGIN_BYTES == 2_048
     assert (
         v8.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_TOTAL_SOURCE_BYTES
+    )
+
+
+def test_v9_cash_replan_profile_retains_direct_enum_and_review_margin(delta_package):
+    v9 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    v8 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
+    )
+    main = next(
+        item.source_bytes for item in v9.source_files
+        if item.project_path == "main.py"
+    )
+    assert v9.profile_sha256 != v8.profile_sha256
+    assert b"order_status_enum=OrderStatus," in main
+    assert b"before_market_open(qqq_benchmark, 10)" in main
+    assert max(item.byte_count for item in v9.source_files) <= 64_000
+    assert (
+        v9.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
         <= projection.MAX_TOTAL_SOURCE_BYTES
     )
 

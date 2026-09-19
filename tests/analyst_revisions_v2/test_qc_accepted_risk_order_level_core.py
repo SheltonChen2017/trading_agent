@@ -85,6 +85,36 @@ def test_next_session_preopen_requires_exact_clock_and_unchanged_account():
             core.require_next_session_preopen(**{**kwargs, **changed})
 
 
+def test_v9_preopen_allows_only_exact_cash_credit_with_unchanged_holdings():
+    kwargs = {
+        "expected": "2026-02-10",
+        "actual_time": datetime.fromisoformat("2026-02-10T09:20:00"),
+        "planned_cash": Decimal("200"),
+        "observed_cash": Decimal("201"),
+        "planned_quantities": {"stock": 1},
+        "observed_quantities": {"stock": 1},
+        "error_type": ValueError,
+        "cash_increase_replan": True,
+    }
+    assert core.require_next_session_preopen(**kwargs) is True
+    assert core.require_next_session_preopen(
+        **{**kwargs, "observed_cash": Decimal("200")}
+    ) is None
+    for observed in (Decimal("199"), Decimal("NaN"), Decimal("-1"), 201):
+        with pytest.raises(ValueError, match="overnight cash decreased or is invalid"):
+            core.require_next_session_preopen(
+                **{**kwargs, "observed_cash": observed}
+            )
+    with pytest.raises(ValueError, match="overnight holdings changed"):
+        core.require_next_session_preopen(
+            **{**kwargs, "observed_quantities": {"stock": 2}}
+        )
+    with pytest.raises(ValueError, match="missed its exact next session"):
+        core.require_next_session_preopen(
+            **{**kwargs, "actual_time": datetime.fromisoformat("2026-02-10T09:28:00")}
+        )
+
+
 def test_aggregate_coverage_statistics_preserves_exact_proxy_decimal_census():
     rows = ({
         "resolved_member_count_ratio": "0.5",

@@ -1361,11 +1361,12 @@ V4--V6 profiles and their spent plans. Section 129 freezes the exact R-133
 physical plan from committed V7 source; section 130 records its zero-cell
 terminal refusal. Claude will review section 130 with this round's final
 single pushed snapshot. The owner explicitly waives Claude review of
-section 133 before this continuing QC correction round's next diagnostic;
-section 132 froze R-135 and section 133 records its zero-cell technical
-refusal. The next action is a prospectively versioned, cash-only preopen
-state reconciliation with distinct source and physical plan. R-131,
-R-132, R-133 and R-134 may not be retried or silently launched.
+section 134 before this continuing QC correction round's next diagnostic;
+section 133 records R-135's zero-cell technical refusal and section 134
+versions a cash-increase-only preopen reconciliation. The next action is to
+commit and physically pin the distinct V9 source and one-use plan before any
+new QC submission. R-131 through R-136 may not be retried or silently
+launched.
 Claude's independent review follows the final single pushed snapshot, after
 focused interim and full final-tree checks.
 No order-level return or paper/live, funded, deployment, broker, or trading
@@ -19626,3 +19627,64 @@ first usable-cell contingency and fixed starting accounting failed.
 The next fresh 2026/2025 diagnostic pair needs distinct one-use plans
 and signatures. No signal verdict, leverage, six-universe, paper/live,
 broker, funded, or trading authority follows.
+
+## 134. Prospective V9 preopen cash-only reconciliation candidate, 2026-09-18
+
+`ARV2D133-001` (P2) is corrected prospectively under new 2025/2026 V9
+profiles, not by retrying R-135. When the exact next-session 09:20--09:27
+callback sees an increased, finite nonnegative cash balance, V9 first
+requires an unchanged complete portfolio holdings census. It enumerates
+every QC holding, authenticates the key and holding's symbol SID, checks
+exact nonnegative whole-share quantities including non-`invested` sub-lot
+positions, and compares the complete nonzero SID-to-quantity map with the
+prior-close plan. An unexpected spin-off or other holding, a changed count,
+an unreadable or inconsistent inventory, a cash decrease, and a changed
+tracked quantity each refuse before a simulated order. This follows the
+[QC-documented symbol-to-holding portfolio interface](https://www.quantconnect.com/docs/v2/writing-algorithms/portfolio/key-concepts)
+and its [Python `portfolio.items()` example](https://www.quantconnect.com/docs/v2/writing-algorithms/universes/crypto).
+
+Only after those checks does V9 rebuild whole-share intents using the
+observed cash, the exact frozen prior-close target weights and RAW reference
+prices, and the same rebalance ID; it neither refreshes a score nor reads a
+new market price. The lifecycle ledger therefore starts at observed cash
+instead of silently dropping the credit. A cash-only overnight change is a
+plausible RAW dividend mechanism, **not** a diagnosed cause of R-135; the
+bounded error did not disclose which account component changed. The stale
+prior-close price on an ex-dividend morning remains a preliminary sizing
+limitation: cash credited for a dividend while shares are still valued at
+their pre-dividend price can double-count value in the sizing estimate. A
+later buying-power or fee/lifecycle refusal must be recorded, not interpreted
+as alpha. No split-adjusted holding drift is normalized by
+this version. Older V4--V8 profile rules and hashes remain pinned. The V9
+2025/2026 profile SHA-256 values are respectively
+`85918b9e02cb57ac448ab511821e38f5a52c3239d870ee31a7d76b89f9035cdf`
+and `7ae450b57fba5ac89e7afe10bd21254e229c65bd34cdf1b8b3df1ea092984d7c`.
+
+The fixture-projected ten-file source is **285,646 bytes**, at most **62,555
+bytes per file**: below the unchanged 64,000-byte per-file and 288,000-byte
+total hard caps, with **2,354 bytes remaining**, 306 beyond the fixed
+2,048-byte review buffer. The exact authenticated activation-key length must
+be rechecked in the physical projection before any launch. Repeated
+exception-class references were consolidated under an alias of the **same
+public class**, and the fixed-profile table was
+expressed from the exact pinned profile census; neither change modifies an
+old profile hash. These are bounded source-size/reviewability concessions,
+not permission to raise a limit. Focused core/runtime/projection/submission
+tests passed **341** cases, including cash increase/decrease, split-view
+inventory quantities, unexpected holdings, malformed inventory, key/holding
+SID disagreement, duplicate SID, and fractional/negative holdings, and
+synchronous enum-event/lifecycle accounting; separately removing the cash
+replan and the full-census guard each made its intended test red. All ten
+old V4--V8 profile SHA pins stayed green. Targeted Python compilation and
+`git diff --check` passed. An independent read-only audit found no P0--P2
+defect; its P3 request for the four additional census-boundary cases was
+corrected by the direct tests before source freeze. The exact physical size
+and source commit must be recorded before a plan is frozen. No QC action or
+look follows from this source
+candidate alone. Starting accounting remains **95 shared looks, 38 ARV2
+development evaluations, 27 infrastructure looks, 607 cells**; R-136 is
+unlaunched and superseded. Commit the source/test snapshot, derive a distinct
+R-137 2026-YTD physical plan, then preregister and authenticate its one-use
+authority before launch. A 2025-now R-138 is contingent on an authenticated
+usable R-137 aggregate. No six-universe, leverage, paper/live, funded,
+broker, deployment, or trading authority follows.

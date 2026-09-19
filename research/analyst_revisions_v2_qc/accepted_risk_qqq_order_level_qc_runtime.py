@@ -1,12 +1,6 @@
-"""Backtest-only QQQ bounded-tilt runtime with simulated QC orders.
+"""Backtest-only ARV2 QQQ tilt runtime with simulated orders.
 
-The runtime consumes the authenticated accepted-risk input package, advances
-the unchanged R055 score only through simulated time, constructs the frozen
-sector-neutral QQQ benchmark tilt, and submits whole-share market-on-open
-orders in a QuantConnect *backtest*.  It has no live, paper, deployment,
-broker-credential, or funded-account mode.
-
-No ``__future__`` import: QC injects a source prelude before this file.
+No ``__future__`` import: QC injects a source prelude.
 """
 
 import hashlib
@@ -24,26 +18,19 @@ try:
 except ImportError:
     from research.analyst_revisions_v2_qc import (
         accepted_risk_order_level_benchmark as _benchmark,
-    )
-    from research.analyst_revisions_v2_qc import (
         accepted_risk_market_cap_stock_portfolio_tilt as _tilt,
-    )
-    from research.analyst_revisions_v2_qc import (
         accepted_risk_order_level_core as _orders,
-    )
-    from research.analyst_revisions_v2_qc import (
         accepted_risk_order_level_input_runtime as _input,
-    )
-    from research.analyst_revisions_v2_qc import (
         accepted_risk_preliminary_qc_figi as _figi,
-    )
-    from research.analyst_revisions_v2_qc import (
         accepted_risk_sequential_r055_score as _score,
     )
 
 
 class AcceptedRiskQqqOrderLevelQcRuntimeError(ValueError):
     """The fixed order profile or simulated QC boundary was refused."""
+
+
+_Refusal = AcceptedRiskQqqOrderLevelQcRuntimeError
 
 
 PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v4"
@@ -61,9 +48,15 @@ NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v
 ENUM_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v8"
 ENUM_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v8"
 ENUM_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v8"
+CASH_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v9"
+CASH_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v9"
+CASH_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v9"
+CASH_PREOPEN_PROXY_PROFILE_IDS = (
+    CASH_PREOPEN_PROXY_PROFILE_2025_ID, CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+)
 ENUM_PREOPEN_PROXY_PROFILE_IDS = (
     ENUM_PREOPEN_PROXY_PROFILE_2025_ID, ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
-)
+) + CASH_PREOPEN_PROXY_PROFILE_IDS
 NUMERIC_PREOPEN_PROXY_PROFILE_IDS = (
     NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID,
 )
@@ -115,7 +108,7 @@ def _canonical(value):
     try:
         return _orders._canonical(value)
     except (TypeError, ValueError, UnicodeEncodeError) as exc:
-        raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+        raise _Refusal(
             "order-level value is not canonical ASCII JSON"
         ) from exc
 
@@ -126,7 +119,7 @@ def _sha(value):
 
 def _decimal_text(value):
     if type(value) is not Decimal or not value.is_finite():
-        raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+        raise _Refusal(
             "order-level aggregate is not an exact finite Decimal"
         )
     return _orders._decimal_text(value)
@@ -134,14 +127,14 @@ def _decimal_text(value):
 
 def _decimal(value, name, *, positive=False, nonnegative=False):
     return _orders.exact_decimal(
-        value, name, AcceptedRiskQqqOrderLevelQcRuntimeError,
+        value, name, _Refusal,
         positive=positive, nonnegative=nonnegative,
     )
 
 
 def _symbol_sid(symbol, name):
     return _orders.symbol_sid(
-        symbol, name, AcceptedRiskQqqOrderLevelQcRuntimeError
+        symbol, name, _Refusal
     )
 
 
@@ -157,7 +150,7 @@ _execution_matched_qqq_path = _benchmark.execution_matched_qqq_path
 _path_metrics = _benchmark.path_metrics
 
 
-def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_status=False, enum_status=False):
+def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_status=False, enum_status=False, cash_replan=False):
     if (
         _benchmark.QQQ_TICKER != QQQ_TICKER
         or _benchmark.TARGET_GROSS_EXPOSURE
@@ -167,12 +160,13 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
         or _benchmark.ENTRY_FEE_BPS_PER_SIDE
         != _orders.MODELED_FEE_BPS_PER_SIDE
     ):
-        raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+        raise _Refusal(
             "execution-matched QQQ benchmark constants changed"
         )
     start = datetime.strptime(start_session, "%Y-%m-%d")
     record = {
         "schema": (
+            CASH_PREOPEN_PROXY_PROFILE_SCHEMA if cash_replan else
             ENUM_PREOPEN_PROXY_PROFILE_SCHEMA if enum_status else
             NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA if numeric_status else
             PREOPEN_PROXY_PROFILE_SCHEMA if preopen else
@@ -241,38 +235,30 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
         record["qc_order_status_codec"] = "exact_LEAN_numeric_0_1_2_3_5_6_7_8_9"
     if enum_status:
         record["qc_order_status_codec"] = "direct_documented_LEAN_OrderStatus_enum_members"
+    if cash_replan:
+        record["overnight_cash_rule"] = (
+            "increase_only_replan_frozen_prior_close_targets_and_RAW_prices"
+        )
     return {**record, "profile_sha256": _sha(record)}
 
 
 _PROFILES = {
-    PROFILE_2025_ID: _profile(PROFILE_2025_ID, "2025-01-02"),
-    PROFILE_2026_ID: _profile(PROFILE_2026_ID, "2026-01-02"),
-    PROXY_PROFILE_2025_ID: _profile(PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True),
-    PROXY_PROFILE_2026_ID: _profile(PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True),
-    PREOPEN_PROXY_PROFILE_2025_ID: _profile(PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True, preopen=True),
-    PREOPEN_PROXY_PROFILE_2026_ID: _profile(PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True, preopen=True),
-    NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID: _profile(
-        NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02",
-        proxy=True, preopen=True, numeric_status=True,
-    ),
-    NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID: _profile(
-        NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02",
-        proxy=True, preopen=True, numeric_status=True,
-    ),
-    ENUM_PREOPEN_PROXY_PROFILE_2025_ID: _profile(
-        ENUM_PREOPEN_PROXY_PROFILE_2025_ID, "2025-01-02",
-        proxy=True, preopen=True, enum_status=True,
-    ),
-    ENUM_PREOPEN_PROXY_PROFILE_2026_ID: _profile(
-        ENUM_PREOPEN_PROXY_PROFILE_2026_ID, "2026-01-02",
-        proxy=True, preopen=True, enum_status=True,
-    ),
+    profile_id: _profile(
+        profile_id,
+        "2025-01-02" if "2025-cutoff" in profile_id else "2026-01-02",
+        proxy=profile_id in PROXY_PROFILE_IDS,
+        preopen=profile_id in PREOPEN_PROXY_PROFILE_IDS,
+        numeric_status=profile_id in NUMERIC_PREOPEN_PROXY_PROFILE_IDS,
+        enum_status=profile_id in ENUM_PREOPEN_PROXY_PROFILE_IDS,
+        cash_replan=profile_id in CASH_PREOPEN_PROXY_PROFILE_IDS,
+    )
+    for profile_id in PROFILE_IDS
 }
 
 
 def require_qqq_order_level_profile(profile_id):
     if type(profile_id) is not str or profile_id not in _PROFILES:
-        raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+        raise _Refusal(
             "QQQ order-level profile is not an exact fixed profile"
         )
     return json.loads(_canonical(_PROFILES[profile_id]).decode("ascii"))
@@ -315,13 +301,14 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._preopen_mode = profile_id in PREOPEN_PROXY_PROFILE_IDS
         self._numeric_order_status_mode = profile_id in NUMERIC_PREOPEN_PROXY_PROFILE_IDS
         self._enum_order_status_mode = profile_id in ENUM_PREOPEN_PROXY_PROFILE_IDS
+        self._cash_replan_mode = profile_id in CASH_PREOPEN_PROXY_PROFILE_IDS
         try:
             self._order_status_enum_members = (
                 _orders.require_qc_order_status_enum_members(order_status_enum)
                 if self._enum_order_status_mode else None
             )
         except _orders.OrderLevelBacktestError as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(str(exc)) from exc
+            raise _Refusal(str(exc)) from exc
         self._authority_benchmark_symbol = authority_benchmark_symbol
         self._qqq_benchmark_symbol = qqq_benchmark_symbol
         self._qqq_constituent_universe = qqq_constituent_universe
@@ -371,7 +358,6 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         return self._completed
 
     def _backtest_flag(self):
-        # The projection firewall permits this one read and no live-mode write.
         return self._algorithm.live_mode
 
     def _order_status_text(self, value):
@@ -396,7 +382,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     def _observe_strategy_account(self, session):
         if session in self._strategy_equity_observations:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level strategy account session is duplicated"
             )
         equity = self._portfolio_equity()
@@ -414,12 +400,12 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
     def _decision_axis(axis, start_session):
         return _orders.weekly_decision_axis(
             axis, start_session, DECISION_CUTOFF_SESSION, FINAL_EXECUTION_SESSION,
-            AcceptedRiskQqqOrderLevelQcRuntimeError,
+            _Refusal,
         )
 
     def initialize(self):
         if self._initialized:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level runtime initialized more than once"
             )
         _orders.validate_backtest_initialize(live_mode=self._backtest_flag())
@@ -433,11 +419,11 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             or not callable(self._fee_model_factory)
             or not callable(self._slippage_model_factory)
         ):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QC dependency inventory changed"
             )
         if self._portfolio_equity() != STARTING_CASH:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level starting equity is not exact one million dollars"
             )
         package = _input.load_accepted_risk_preliminary_package(
@@ -457,7 +443,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 benchmark_symbol=self._authority_benchmark_symbol,
             )
         except Exception as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level composite-FIGI inventory did not resolve"
             ) from exc
         decisions, start, _cutoff, _final = self._decision_axis(
@@ -486,14 +472,14 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             try:
                 qqq_security = self._algorithm.securities[self._qqq_benchmark_symbol]
             except KeyError as exc:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QQQ ETF proxy security is unavailable"
                 ) from exc
             self.configure_security(qqq_security)
 
     def configure_security(self, security):
         if not self._initialized:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level security arrived before initialization"
             )
         sid = _symbol_sid(security.symbol, "order-level configured")
@@ -507,7 +493,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         try:
             added = tuple(changes.added_securities)
         except Exception as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level security changes are unreadable"
             ) from exc
         for security in added:
@@ -523,7 +509,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     def accept_qqq_constituents(self, constituents):
         if not self._initialized:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "QQQ constituents arrived before initialization"
             )
         rows = _input.collection_rows(constituents, "order-level QQQ constituents")
@@ -536,7 +522,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 )
                 symbol = row.symbol
             except AttributeError as exc:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QQQ constituent row is unreadable"
                 ) from exc
             if weight <= 0:
@@ -547,7 +533,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             except Exception:
                 continue
             if sid in accepted:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QQQ constituent SID is duplicated"
                 )
             accepted[sid] = symbol
@@ -559,13 +545,13 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 universe, start, end, flatten=False
             )
         except Exception as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 name + " history call failed"
             ) from exc
         self._pit_history_call_count += 1
         result, row_count = _input.indexed_constituent_history(
             history, universe, start, end, name, _symbol_sid,
-            AcceptedRiskQqqOrderLevelQcRuntimeError,
+            _Refusal,
         )
         self._pit_source_row_count += row_count
         return result
@@ -573,13 +559,13 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
     @staticmethod
     def _latest(inventory, cutoff, name):
         return _orders.strictly_prior_collection(
-            inventory, cutoff, name, AcceptedRiskQqqOrderLevelQcRuntimeError
+            inventory, cutoff, name, _Refusal
         )
 
     def _snapshot_age_sessions(self, observed, decision_session, name):
         return _orders.authenticated_session_age(
             self._session_positions, observed, decision_session, name,
-            AcceptedRiskQqqOrderLevelQcRuntimeError,
+            _Refusal,
         )
 
     def _resolved_qqq_weights(
@@ -605,7 +591,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 PROXY_TARGET_WEIGHT_MAP_SCHEMA if self._proxy_weight_mode
                 else TARGET_WEIGHT_MAP_SCHEMA
             ),
-            error_type=AcceptedRiskQqqOrderLevelQcRuntimeError,
+            error_type=_Refusal,
             proxy_security_id=(
                 QQQ_PROXY_SECURITY_ID if self._proxy_weight_mode else None
             ),
@@ -615,7 +601,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             ),
         )
         if any(row["session"] == session for row in self._pit_coverage_records):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level PIT coverage session is duplicated"
             )
         self._pit_coverage_records.append(record)
@@ -640,11 +626,11 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             constituent_time, session, "order-level PIT QQQ constituents"
         )
         if constituent_age != EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level PIT QQQ constituent snapshot is not the immediately prior authenticated session"
             )
         constituent_weights = _input.positive_constituent_weights(
-            constituent_rows, _decimal, AcceptedRiskQqqOrderLevelQcRuntimeError
+            constituent_rows, _decimal, _Refusal
         )
         return self._resolved_qqq_weights(
             session,
@@ -658,7 +644,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         else:
             symbol = self._resolution.symbol_for_security(security_id)
         if symbol is None:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level target lacks an exact FIGI resolution"
             )
         try:
@@ -680,20 +666,75 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         _symbol, security = self._security(security_id)
         return _input.same_session_positive_raw_price(
             security, decision_session, _decimal,
-            AcceptedRiskQqqOrderLevelQcRuntimeError,
+            _Refusal,
         )
 
     def _current_quantities(self, security_ids):
         return _input.current_whole_share_quantities(
             security_ids, self._security, self._algorithm.portfolio,
-            _decimal, AcceptedRiskQqqOrderLevelQcRuntimeError,
+            _decimal, _Refusal,
         )
+
+    def _verify_preopen_holding_census(self, plan):
+        expected = {
+            _symbol_sid(
+                self._qqq_benchmark_symbol
+                if security_id == QQQ_PROXY_SECURITY_ID else
+                self._resolution.symbol_for_security(security_id),
+                "order-level frozen holding",
+            ): quantity
+            for security_id, quantity in plan.starting_quantities
+        }
+        try:
+            holdings = tuple(self._algorithm.portfolio.items())
+        except Exception as exc:
+            raise _Refusal(
+                "order-level complete preopen holdings are unreadable"
+            ) from exc
+        observed = {}
+        for item in holdings:
+            try:
+                symbol, holding = item
+            except (TypeError, ValueError) as exc:
+                raise _Refusal(
+                    "order-level complete preopen holdings are unreadable"
+                ) from exc
+            try:
+                sid = _symbol_sid(symbol, "order-level preopen holding key")
+                if sid != _symbol_sid(
+                    holding.symbol, "order-level preopen holding"
+                ):
+                    raise _Refusal(
+                        "order-level preopen holding identity changed"
+                    )
+                quantity = _decimal(
+                    holding.quantity, "order-level preopen holding quantity",
+                    nonnegative=True,
+                )
+                if quantity != quantity.to_integral_value():
+                    raise _Refusal(
+                        "order-level preopen holding is not a whole share"
+                    )
+                if quantity:
+                    if sid in observed:
+                        raise _Refusal(
+                            "order-level preopen holding SID is duplicated"
+                        )
+                    observed[sid] = int(quantity)
+            except AttributeError as exc:
+                raise _Refusal(
+                    "order-level complete preopen holdings are unreadable"
+                ) from exc
+        if observed != expected:
+            raise _Refusal(
+                "order-level complete overnight holdings changed"
+            )
 
     def _close_open_plan(self):
         if self._open_plan is None:
             return
         if self._pending_submission_events is not None:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level rebalance closed during MOO submission"
             )
         ordered = tuple(self._open_plan_events)
@@ -754,7 +795,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 else self._resolution.symbol_for_security(intent.security_id)
             )
             if symbol is None:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level intent lost its FIGI resolution"
                 )
             quantity = (
@@ -763,7 +804,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 else intent.quantity
             )
             if self._pending_submission_events is not None:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level nested MOO submission is unsupported"
                 )
             # Authenticate synchronous events against the returned ticket.
@@ -782,15 +823,15 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             try:
                 order_id = ticket.order_id
             except Exception as exc:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level MOO ticket is unreadable"
                 ) from exc
             if type(order_id) is not int or order_id < 0 or order_id in self._open_order_ids:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level MOO ticket identity changed"
                 )
             if any(item[0] != order_id for item in staged):
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "synchronous QC event does not match returned MOO ticket"
                 )
             self._open_order_ids[order_id] = intent
@@ -801,14 +842,14 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                     or str(event.id) != staged_event_id
                     or self._order_status_text(event.status) != staged_status
                 ):
-                    raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                    raise _Refusal(
                         "synchronous QC event changed before replay"
                     )
                 self.on_order_event(event)
 
     def on_after_close(self):
         if not self._initialized or self._completed:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level after-close callback escaped runtime state"
             )
         session = self._algorithm.time.date().isoformat()
@@ -816,7 +857,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             self._pending_preopen is not None
             and self._pending_preopen[0] <= session
         ):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level next-session preopen callback was missed"
             )
         if (
@@ -858,7 +899,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                     _tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
                 )
         except _tilt.BoundedBenchmarkTiltError as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(str(exc)) from exc
+            raise _Refusal(str(exc)) from exc
         tilt = _tilt.build_benchmark_tilt(
             benchmark_measures, scores, sectors
         )
@@ -867,7 +908,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         elif tilt.status == _tilt.TILT_UNDERFILLED:
             self._tilt_underfilled_count += 1
         else:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QQQ tilt status changed"
             )
         self._tilted_name_count_sum += tilt.tilted_name_count
@@ -882,7 +923,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                     or next_position >= len(self._session_axis)
                     or self._session_axis[next_position] > FINAL_EXECUTION_SESSION
                 ):
-                    raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                    raise _Refusal(
                         "order-level next authenticated execution is unavailable"
                     )
                 self._pending_preopen = (self._session_axis[next_position], plan)
@@ -892,13 +933,13 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     def on_before_open(self):
         if not self._preopen_mode or not self._initialized or self._completed:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level preopen callback escaped its V6 runtime state"
             )
         _orders.validate_backtest_initialize(live_mode=self._backtest_flag())
         session = self._algorithm.time.date().isoformat()
         if session in self._submitted_preopen_sessions:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level preopen submission was duplicated"
             )
         if self._pending_preopen is None:
@@ -906,27 +947,36 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         expected, plan = self._pending_preopen
         if session < expected:
             return False
-        _orders.require_next_session_preopen(
+        observed_cash = self._portfolio_cash()
+        observed_quantities = self._current_quantities(
+            set(dict(plan.target_quantities))
+        )
+        replan = _orders.require_next_session_preopen(
             expected=expected,
             actual_time=self._algorithm.time,
             planned_cash=plan.starting_cash,
-            observed_cash=self._portfolio_cash(),
+            observed_cash=observed_cash,
             planned_quantities=dict(plan.starting_quantities),
-            observed_quantities=self._current_quantities(
-                set(dict(plan.target_quantities))
-            ),
-            error_type=AcceptedRiskQqqOrderLevelQcRuntimeError,
+            observed_quantities=observed_quantities,
+            error_type=_Refusal,
+            cash_increase_replan=self._cash_replan_mode,
         )
+        if self._cash_replan_mode:
+            self._verify_preopen_holding_census(plan)
+        if replan:
+            plan = _orders.plan_rebalance(
+                rebalance_id=plan.rebalance_id,
+                starting_cash=observed_cash,
+                current_quantities=observed_quantities,
+                reference_prices=dict(plan.reference_prices),
+                target_weights=dict(plan.target_weights),
+            )
         self._pending_preopen = None
         self._submitted_preopen_sessions.add(session)
         self._submit_plan(plan)
         return True
 
     def on_data(self, data):
-        if not self._initialized or self._completed:
-            return
-        # Order decisions are scheduled after close; QQQ total return is read
-        # independently with an explicit per-request normalization at the end.
         return None
 
     def _load_qqq_total_return_observations(self, expected_sessions):
@@ -943,7 +993,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 data_normalization_mode=self._total_return_normalization,
             )
         except Exception as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QQQ TOTAL_RETURN history call failed"
             ) from exc
         observations = {}
@@ -954,7 +1004,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         try:
             dictionaries = tuple(history)
         except Exception as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QQQ TOTAL_RETURN history is unreadable"
             ) from exc
         for dictionary in dictionaries:
@@ -962,11 +1012,11 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 dictionary_session = dictionary.time.date().isoformat()
                 items = tuple(dictionary.items())
             except Exception as exc:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QQQ TOTAL_RETURN batch is unreadable"
                 ) from exc
             if dictionary_session not in expected_sessions or len(items) != 1:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QQQ TOTAL_RETURN batch shape changed"
                 )
             symbol, bar = items[0]
@@ -978,14 +1028,14 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 or bar.time.date().isoformat() != dictionary_session
                 or dictionary_session in observations
             ):
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QQQ TOTAL_RETURN identity changed"
                 )
             try:
                 raw_open = bar.open
                 raw_close = bar.close
             except AttributeError as exc:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QQQ TOTAL_RETURN bar lacks exact OHLC input"
                 ) from exc
             open_observations[dictionary_session] = _decimal(
@@ -1004,12 +1054,12 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             if session in observations
         )
         if len(result) != len(expected_sessions):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QQQ TOTAL_RETURN history is incomplete"
             )
         self._benchmark_observations = dict(result)
         if set(open_observations) != set(expected_sessions):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QQQ TOTAL_RETURN open history is incomplete"
             )
         self._benchmark_open_observations = open_observations
@@ -1017,7 +1067,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     def on_order_event(self, event):
         if self._open_plan is None:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level event arrived without an open rebalance"
             )
         try:
@@ -1025,25 +1075,25 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             event_id = event.id
             status = self._order_status_text(event.status)
         except Exception as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QC event is unreadable"
             ) from exc
         if type(order_id) is not int or order_id < 0:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QC event order identity changed"
             )
         if type(event_id) not in (int, str) or str(event_id) == "":
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QC event identity changed"
             )
         event_key = (order_id, str(event_id))
         if self._pending_submission_events is not None:
             if event_key in self._pending_submission_event_keys:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "duplicate synchronous QC event"
                 )
             if len(self._pending_submission_events) >= MAX_SYNCHRONOUS_ORDER_EVENTS:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "synchronous QC event buffer exceeded"
                 )
             self._pending_submission_event_keys.add(event_key)
@@ -1053,7 +1103,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             return
         intent = self._open_order_ids.get(order_id)
         if intent is None:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level event references an unknown QC order"
             )
         if status in IGNORED_ORDER_STATUSES:
@@ -1061,7 +1111,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         if status in _orders.FILL_STATUSES:
             quantity = event.fill_quantity
             if type(quantity) not in (int, float, Decimal):
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level fill quantity changed type"
                 )
             signed_quantity = _decimal(
@@ -1072,7 +1122,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 (intent.side == "SELL" and signed_quantity >= 0)
                 or (intent.side == "BUY" and signed_quantity <= 0)
             ):
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level fill quantity sign disagrees with order side"
                 )
             absolute = _decimal(
@@ -1082,7 +1132,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             )
             integral = absolute.to_integral_value()
             if absolute != integral:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level fill quantity is not a whole share"
                 )
             fill_quantity = int(integral)
@@ -1096,7 +1146,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 raw_fee_amount = fee_value.amount
                 fee_currency = fee_value.currency
             except AttributeError as exc:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QC fill fee is unreadable"
                 ) from exc
             engine_fee_amount = _decimal(
@@ -1105,7 +1155,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 nonnegative=True,
             )
             if type(fee_currency) is not str or fee_currency != "USD":
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                raise _Refusal(
                     "order-level QC fill fee currency is not exact USD"
                 )
         elif status in {_orders.CANCELED, _orders.INVALID}:
@@ -1114,7 +1164,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             engine_fee_amount = None
             fee_currency = None
         else:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level QC event status is unsupported"
                 + (
                     _orders.qc_order_status_enum_diagnostic(
@@ -1154,7 +1204,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 expected_sessions.index(first_decision_session) + 1
             ]
         except (IndexError, ValueError) as exc:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level first QQQ execution session is unavailable"
             ) from exc
         qqq_path, binding = _execution_matched_qqq_path(
@@ -1164,7 +1214,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             first_execution_session=first_execution_session,
         )
         if set(self._strategy_equity_observations) != set(expected_sessions):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level strategy equity path is incomplete"
             )
         strategy_observations = tuple(
@@ -1193,7 +1243,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             self._decision_count <= 0
             or len(self._pit_coverage_records) != self._decision_count
         ):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level PIT coverage path is incomplete"
             )
         filled_order_count = lifecycle["filled"]
@@ -1352,20 +1402,20 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     def on_end_of_algorithm(self):
         if not self._initialized or self._completed:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level end callback escaped runtime state"
             )
         if self._pending_preopen is not None:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level pending preopen submission remained at end"
             )
         if self._algorithm.time.date().isoformat() != FINAL_EXECUTION_SESSION:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level backtest ended outside the exact final session"
             )
         self._close_open_plan()
         if self._decision_count != len(self._decision_sessions):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level decision schedule did not complete"
             )
         aggregates = self._aggregate_record()
@@ -1407,7 +1457,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 for key, value in statistics.items()
             )
         ):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+            raise _Refusal(
                 "order-level aggregate transport exceeded its exact bound"
             )
         for key, value in sorted(statistics.items()):

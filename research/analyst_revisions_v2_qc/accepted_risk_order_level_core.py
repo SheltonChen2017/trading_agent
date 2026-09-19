@@ -241,6 +241,7 @@ def aggregate_lifecycle_records(records, submitted_order_count):
 def require_next_session_preopen(
     *, expected, actual_time, planned_cash, observed_cash,
     planned_quantities, observed_quantities, error_type,
+    cash_increase_replan=False,
 ):
     """Refuse a callback that cannot execute the frozen prior-close plan."""
 
@@ -252,6 +253,23 @@ def require_next_session_preopen(
         raise error_type(
             "order-level preopen callback missed its exact next session"
         )
+    if cash_increase_replan:
+        if planned_quantities != observed_quantities:
+            raise error_type(
+                "order-level overnight holdings changed after the decision"
+            )
+        if (
+            type(planned_cash) is not Decimal
+            or not planned_cash.is_finite()
+            or planned_cash < 0
+            or type(observed_cash) is not Decimal
+            or not observed_cash.is_finite()
+            or observed_cash < planned_cash
+        ):
+            raise error_type(
+                "order-level overnight cash decreased or is invalid"
+            )
+        return True if observed_cash != planned_cash else None
     if planned_cash != observed_cash or planned_quantities != observed_quantities:
         raise error_type(
             "order-level overnight account changed after the decision"

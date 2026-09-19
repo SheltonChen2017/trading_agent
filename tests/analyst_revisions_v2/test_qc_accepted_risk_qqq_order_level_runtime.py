@@ -78,6 +78,12 @@ class _Portfolio:
     def __getitem__(self, symbol):
         return SimpleNamespace(quantity=self.quantities.get(str(symbol.id), 0))
 
+    def items(self):
+        return tuple(
+            (_Symbol(sid), SimpleNamespace(symbol=_Symbol(sid), quantity=qty))
+            for sid, qty in self.quantities.items()
+        )
+
 
 class _Resolution:
     def __init__(self, by_security):
@@ -250,6 +256,8 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         "arv2-qqq-order-level-tilt-2026-cutoff-v7",
         "arv2-qqq-order-level-tilt-2025-cutoff-v8",
         "arv2-qqq-order-level-tilt-2026-cutoff-v8",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v9",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v9",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -321,11 +329,20 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         runtime.ENUM_PREOPEN_PROXY_PROFILE_2026_ID: (
             "55d4790ed611b33607dcdca96934237a4ed49ae1ae5d2b42f5a2b20bc570f4e2"
         ),
+        runtime.CASH_PREOPEN_PROXY_PROFILE_2025_ID: (
+            "85918b9e02cb57ac448ab511821e38f5a52c3239d870ee31a7d76b89f9035cdf"
+        ),
+        runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID: (
+            "7ae450b57fba5ac89e7afe10bd21254e229c65bd34cdf1b8b3df1ea092984d7c"
+        ),
     }
     for profile_id in runtime.PROXY_PROFILE_IDS:
         profile = runtime.require_qqq_order_level_profile(profile_id)
         assert profile["profile_sha256"] == expected_proxy_digests[profile_id]
         assert profile["schema"] == (
+            runtime.CASH_PREOPEN_PROXY_PROFILE_SCHEMA
+            if profile_id in runtime.CASH_PREOPEN_PROXY_PROFILE_IDS
+            else
             runtime.ENUM_PREOPEN_PROXY_PROFILE_SCHEMA
             if profile_id in runtime.ENUM_PREOPEN_PROXY_PROFILE_IDS
             else
@@ -489,10 +506,16 @@ def test_proxy_is_unscored_neutral_and_98_percent_gross(monkeypatch):
     assert sum(selected.values(), Decimal(0)) == Decimal("0.98")
 
 
-def _ready_v6_decision(session, next_session):
-    algorithm = _Algorithm(session)
+def _ready_v6_decision(
+    session, next_session, profile_id=None, order_status_enum=None,
+    algorithm=None,
+):
+    algorithm = algorithm or _Algorithm(session)
     security = _Symbol("A-SID", "A")
-    value = _runtime(algorithm, runtime.PREOPEN_PROXY_PROFILE_2026_ID)
+    value = _runtime(
+        algorithm, profile_id or runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+        order_status_enum=order_status_enum,
+    )
     value._initialized = True
     value._decision_set = frozenset({session})
     value._session_axis = (session, next_session)
@@ -1837,6 +1860,126 @@ class _OpaqueOrderStatus(Enum):
 
     def __str__(self):
         return "opaque-not-a-status-name-or-number"
+
+
+@pytest.mark.parametrize("starting_quantity", (0, 1))
+def test_v9_cash_credit_replans_once_from_frozen_inputs_and_replays_fills(
+    starting_quantity,
+):
+    class SynchronousAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            ticket = super().market_on_open_order(symbol, quantity, tag=tag)
+            self.runtime.on_order_event(SimpleNamespace(
+                order_id=ticket.order_id, id=ticket.order_id,
+                status=_OpaqueOrderStatus.FILLED,
+                fill_quantity=quantity, fill_price=Decimal("100"),
+                order_fee=_order_fee(str(abs(quantity) * Decimal("0.1"))),
+            ))
+            return ticket
+
+    algorithm = SynchronousAlgorithm("2026-02-09")
+    algorithm, value = _ready_v6_decision(
+        "2026-02-09", "2026-02-10",
+        runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+        _OpaqueOrderStatus, algorithm=algorithm,
+    )
+    algorithm.runtime = value
+    if starting_quantity:
+        algorithm.portfolio.quantities["A-SID"] = starting_quantity
+    assert value.on_after_close() is True
+    frozen = value._pending_preopen[1]
+    assert frozen.starting_cash == Decimal("1000000")
+    algorithm.time = datetime.fromisoformat("2026-02-10T09:20:00")
+    algorithm.portfolio.cash = Decimal("1100000")
+    assert value.on_before_open() is True
+    submitted = value._open_plan
+    assert submitted.starting_cash == Decimal("1100000")
+    assert submitted.plan_sha256 != frozen.plan_sha256
+    assert submitted.target_weights == frozen.target_weights
+    assert submitted.reference_prices == frozen.reference_prices
+    assert submitted.starting_quantities == frozen.starting_quantities
+    assert dict(submitted.starting_quantities).get("a", 0) == starting_quantity
+    assert len(algorithm.orders) == len(submitted.intents)
+    assert len(value._open_plan_events) == len(submitted.intents)
+    value._close_open_plan()
+    assert Decimal(value._lifecycle_records[-1]["final_cash"]) == (
+        submitted.starting_cash
+        - sum(
+            Decimal(abs(quantity)) * Decimal("100.1")
+            for _symbol, quantity, _tag in algorithm.orders
+        )
+    )
+    with pytest.raises(ValueError, match="preopen submission was duplicated"):
+        value.on_before_open()
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        ("cash_down", "overnight cash decreased or is invalid"),
+        ("cash_nan", "QC portfolio cash"),
+        ("quantity", "overnight holdings changed"),
+        ("unexpected_holding", "complete overnight holdings changed"),
+        ("split_view", "complete overnight holdings changed"),
+        ("malformed_inventory", "complete preopen holdings are unreadable"),
+        ("mismatched_symbol", "preopen holding identity changed"),
+        ("duplicate_sid", "preopen holding SID is duplicated"),
+        ("fractional", "preopen holding is not a whole share"),
+        ("negative", "preopen holding quantity is outside its finite bound"),
+    ),
+)
+def test_v9_preopen_refuses_unexplained_state_before_any_order(mutation, message):
+    algorithm, value = _ready_v6_decision(
+        "2026-02-09", "2026-02-10",
+        runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
+        _OpaqueOrderStatus,
+    )
+    if mutation == "split_view":
+        algorithm.portfolio.quantities["A-SID"] = 1
+    assert value.on_after_close() is True
+    algorithm.time = datetime.fromisoformat("2026-02-10T09:20:00")
+    if mutation == "cash_down":
+        algorithm.portfolio.cash -= Decimal(1)
+    elif mutation == "cash_nan":
+        algorithm.portfolio.cash = Decimal("NaN")
+    elif mutation == "quantity":
+        algorithm.portfolio.quantities["A-SID"] = 1
+    elif mutation == "unexpected_holding":
+        algorithm.portfolio.cash += Decimal(1)
+        algorithm.portfolio.quantities["SPINOFF-SID"] = 1
+    elif mutation == "split_view":
+        algorithm.portfolio.cash += Decimal(1)
+        symbol = _Symbol("A-SID", "A")
+        algorithm.portfolio.items = lambda: ((
+            symbol, SimpleNamespace(symbol=symbol, quantity=2),
+        ),)
+    elif mutation in {"mismatched_symbol", "duplicate_sid", "fractional", "negative"}:
+        algorithm.portfolio.cash += Decimal(1)
+        symbol = _Symbol("A-SID", "A")
+        other = _Symbol("B-SID", "B")
+        quantity = (
+            Decimal("0.5") if mutation == "fractional" else
+            Decimal("-1") if mutation == "negative" else Decimal(1)
+        )
+        row = (
+            symbol,
+            SimpleNamespace(
+                symbol=other if mutation == "mismatched_symbol" else symbol,
+                quantity=quantity,
+            ),
+        )
+        algorithm.portfolio.items = lambda: (
+            (row, row) if mutation == "duplicate_sid" else (row,)
+        )
+    else:
+        algorithm.portfolio.cash += Decimal(1)
+        algorithm.portfolio.items = lambda: ("malformed",)
+    with pytest.raises(ValueError, match=message):
+        value.on_before_open()
+    assert not algorithm.orders
+    assert value._pending_preopen is not None
 
 
 @pytest.mark.parametrize(

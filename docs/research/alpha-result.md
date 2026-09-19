@@ -3180,3 +3180,27 @@ accounting remains **91 shared looks, 34 development evaluations, 27
 infrastructure looks, 607 cells**. Fresh R-129/R-130 project/plan/authority
 identities must be committed before a launch; R-130 depends on R-129's first
 authenticated aggregate cell. Six-universe work remains unpreregistered.
+
+## R-129 and R-130 — prospectively frozen QQQ residual-proxy simulated-order runs (UNLAUNCHED) — 2026-09-18
+
+The separate V5/V7 source was committed at `9e2dff1` before either physical
+identity was derived. Immutable input-package SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+two-statistic inventory SHA-256
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+Both exact projections have ten files and 273,393 bytes. Neither has a
+preselected sign or winner; their QQQ ETF residual overlaps mapped stocks.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source-inventory SHA-256 | Plan SHA-256; unsigned execution-authority SHA-256 |
+|---|---|---|---|---|
+| R-129 | `af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a` | `77 ARV2_QQQ_RESIDUAL_ORDER_R129_2026_YTD - 20260918` / `ARV2 R129 QQQ residual order 2026 YTD 7803b84f` | `628abd19f0aa86b1e9d34583cfde670d10199604196166e7079db826b547f824`; `400c90c56c2ff85fd62ca7de7541887df6ecb6331a4b4564e8a438a480c51306` | `53fd49e6fb52bdf7ca18d0bcfd413ce16a6df0a330045dab8771d51234237cd0`; `afd1f5985b535be1fe1ab5dbf153e69776ab0ba27891b07fa061ae025ba3f6df` |
+| R-130 | `c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d` | `78 ARV2_QQQ_RESIDUAL_ORDER_R130_2025_NOW - 20260918` / `ARV2 R130 QQQ residual order 2025-now 7803b84f` | `6c55f86c9d1d560790244b5e07c3b403d3063f11717566cd6aabc26c200fa235`; `84017d5273c370373d0e3962ef957ba762db229bbaf4ecd397c0fce44e40e3c5` | `b7642655b48481a7692166a829cc7a3286efb832b1a3e8f0caf5c329e51978c6`; `545ef39d4aa9795ebf2ea1f2660ad2ec4539c584b58ff6d7e7d813b2fc454e99` |
+
+R-129 spans 2026-01-02--2026-09-17; R-130 spans
+2025-01-02--2026-09-17. Starting accounting is **91 shared looks, 34
+development evaluations, 27 infrastructure looks, 607 cells**. R-129
+launch spends **91 -> 92 / 34 -> 35** and only its authenticated aggregate
+adds **607 -> 608 cells**. Only then may R-130 launch, spending
+**92 -> 93 / 35 -> 36** and adding at most one authenticated cell. A
+technical failure adds zero cells and invalidates R-130's fixed accounting.
+No six-universe look is preregistered.

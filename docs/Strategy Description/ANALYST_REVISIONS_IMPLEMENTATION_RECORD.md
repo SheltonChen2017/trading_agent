@@ -388,7 +388,8 @@ CANDIDATE. SECTION 120 FREEZES R-127/R-128 EXACT PHYSICAL IDENTITIES BEFORE
 EITHER QC ACTION. SECTION 121 CLOSES R-127 AS A ZERO-CELL 86.1814%-RESOLVED-
 WEIGHT IDENTITY REFUSAL AND SUPERSEDES R-128 UNLAUNCHED.
 SECTION 122 BUILDS A SEPARATE NEUTRAL-QQQ RESIDUAL V5/V7 CANDIDATE WITHOUT
-ALTERING R-127'S FROZEN RULE OR CLAIMING SIGNAL ALPHA. ONLY BACKTEST-SIMULATED
+ALTERING R-127'S FROZEN RULE OR CLAIMING SIGNAL ALPHA. SECTION 123 FREEZES
+R-129/R-130 EXACT PHYSICAL IDENTITIES BEFORE QC ACTION. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1319,6 +1320,14 @@ then derive and record one-use R-129/R-130 physical identities before any
 new QC launch. R-130 requires R-129's authenticated aggregate cell. A final
 complete lane suite and exact source/diff/status checks precede the single
 push; no real order or deployment authority follows.
+
+Claude will review section 123 with this round's final single pushed snapshot.
+Section 123 prospectively records the exact committed-source physical
+R-129/R-130 plans and unsigned authority candidates. Sign and launch R-129
+once, inspect terminal status without statistics, and read only its exact
+two-statistic aggregate under a separately signed authority if `Completed.`.
+R-130 remains contingent on that authenticated cell. Do not infer a result
+from a technical refusal or launch unpreregistered six-universe work.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -19084,7 +19093,7 @@ unbalanced proxy ratios, unbound authority inventory, or extra raw identifiers.
 
 The pure weight-accounting extraction and constituent parsing preserve the
 old V4 profile hashes and leave a readable projected runtime. The fixed ten-
-file V5 projection is **273,348 / 278,000 bytes**, with a 4,652-byte total
+file physical V5 projection is **273,393 / 278,000 bytes**, with a 4,607-byte total
 review margin; the largest file is **62,879 / 64,000 bytes**. Local focused,
 projection, submission, import-boundary and lifecycle tests passed **221**;
 an independent read-only audit separately passed **210** focused tests,
@@ -19110,3 +19119,39 @@ are derived and recorded, and the final tests pass. The six-universe pair
 would move to R-131/R-132 if the first order cell is tangible; it remains
 unpreregistered. No paper/live, funded, broker, real-order, or trading
 authority follows.
+
+## 123. Prospective physical freeze for R-129 and R-130, 2026-09-18
+
+The distinct V5/V7 source and section-122 record were committed at `9e2dff1`
+before these physical identities were derived. The local derivation read the
+already authenticated immutable input package without emitting provider rows;
+it made no QC/network call and read no price, return, order, or outcome. The
+package SHA-256 / delta lineage SHA-256 remain
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Each exact physical projection has ten files and 273,393 source bytes; the
+two-statistic inventory SHA-256 is
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+The host-local organization ID was compared by SHA-256 with the previous
+signed plan without printing or recording its value.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256; source-inventory SHA-256 | Plan ID / SHA-256; unsigned execution-authority ID / SHA-256 |
+|---|---|---|---|---|
+| R-129 | `arv2-qqq-order-level-tilt-2026-cutoff-v5` / `af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a` | `77 ARV2_QQQ_RESIDUAL_ORDER_R129_2026_YTD - 20260918` / `ARV2 R129 QQQ residual order 2026 YTD 7803b84f` | `arv2-order-level-qc-projection-628abd19f0aa86b1e9d34583` / `628abd19f0aa86b1e9d34583cfde670d10199604196166e7079db826b547f824`; `400c90c56c2ff85fd62ca7de7541887df6ecb6331a4b4564e8a438a480c51306` | `arv2-order-level-plan-53fd49e6fb52bdf7ca18d0bc` / `53fd49e6fb52bdf7ca18d0bcfd413ce16a6df0a330045dab8771d51234237cd0`; `arv2-order-level-execution-authority-afd1f5985b535be1fe1ab5db` / `afd1f5985b535be1fe1ab5dbf153e69776ab0ba27891b07fa061ae025ba3f6df` |
+| R-130 | `arv2-qqq-order-level-tilt-2025-cutoff-v5` / `c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d` | `78 ARV2_QQQ_RESIDUAL_ORDER_R130_2025_NOW - 20260918` / `ARV2 R130 QQQ residual order 2025-now 7803b84f` | `arv2-order-level-qc-projection-6c55f86c9d1d560790244b5e` / `6c55f86c9d1d560790244b5e07c3b403d3063f11717566cd6aabc26c200fa235`; `84017d5273c370373d0e3962ef957ba762db229bbaf4ecd397c0fce44e40e3c5` | `arv2-order-level-plan-b7642655b48481a7692166a8` / `b7642655b48481a7692166a829cc7a3286efb832b1a3e8f0caf5c329e51978c6`; `arv2-order-level-execution-authority-545ef39d4aa9795ebf2ea1f2` / `545ef39d4aa9795ebf2ea1f2660ad2ec4539c584b58ff6d7e7d813b2fc454e99` |
+
+R-129 spans the 2026-01-02 decision through the 2026-09-17 final
+execution/mark: 39 decisions, 178 observations, 177 return intervals.
+R-130 spans 2025-01-02 through 2026-09-17: 91 decisions, 428 observations,
+427 return intervals. Both retain the section-122 residual-proxy overlap
+disclosure and have no preselected sign or winner. Starting accounting is
+**91 shared looks, 34 ARV2 development evaluations, 27 infrastructure looks,
+607 cells**. R-129 launch spends **91 -> 92 / 34 -> 35**; only an
+authenticated aggregate adds **607 -> 608 cells**. R-130 may launch only
+after that cell, then spends **92 -> 93 / 35 -> 36**, and only its
+authenticated aggregate adds **608 -> 609 cells**. A technical refusal
+adds no cell and invalidates R-130's fixed starting accounting. R-131/R-132
+six-universe diagnostics remain unpreregistered. No raw result, provider
+row, security identifier, unrestricted log, order, fill, chart, holding,
+price, return, paper/live deployment, broker, funded account, real order,
+or trading access is authorized by these unsigned candidates.

@@ -34,10 +34,9 @@ SOURCE_SCHEMA = "arv2-order-level-qc-source-file-v1"
 MAIN_PROJECT_PATH = "main.py"
 RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_qc_runtime.py"
 MAX_SOURCE_FILE_BYTES = 64_000
-# The execution-matched QQQ hurdle adds adjusted-open lineage and a second
-# digested contextual path to the exact ten-file closure.  These caps
-# retain at least one 4,096-byte review margin without admitting another file.
-MAX_TOTAL_SOURCE_BYTES = 272_000
+# The fixed ten-file closure now includes the ETF-residual accounting helper.
+# Keep at least 4,096 bytes of review margin; no additional source is admitted.
+MAX_TOTAL_SOURCE_BYTES = 278_000
 
 PROJECT_SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
@@ -585,7 +584,7 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             fill_forward=False,
             leverage=1,
             extended_market_hours=False,
-            data_normalization_mode=DataNormalizationMode.TOTAL_RETURN,
+            data_normalization_mode=DataNormalizationMode.{"RAW" if profile['profile_id'] in runtime_builder.PROXY_PROFILE_IDS else "TOTAL_RETURN"},
         ).symbol
         self.set_benchmark(qqq_benchmark)
         qqq_constituent_universe = self.add_universe(

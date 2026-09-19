@@ -51,7 +51,11 @@ class AcceptedRiskQqqOrderLevelQcRuntimeError(ValueError):
 PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v4"
 PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v4"
 PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v4"
-PROFILE_IDS = (PROFILE_2025_ID, PROFILE_2026_ID)
+PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v5"
+PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v5"
+PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v5"
+PROXY_PROFILE_IDS = (PROXY_PROFILE_2025_ID, PROXY_PROFILE_2026_ID)
+PROFILE_IDS = (PROFILE_2025_ID, PROFILE_2026_ID) + PROXY_PROFILE_IDS
 DECISION_CUTOFF_SESSION = "2026-09-16"
 FINAL_EXECUTION_SESSION = "2026-09-17"
 STARTING_CASH = Decimal("1000000")
@@ -59,18 +63,30 @@ META_STATISTIC_NAME = "ARV2_ORDER_LEVEL_META"
 AGGREGATES_STATISTIC_NAME = "ARV2_ORDER_LEVEL_AGGREGATES"
 MAXIMUM_STATISTIC_BYTES = 4096
 SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v6"
+PROXY_SUMMARY_SCHEMA = "arv2-qqq-order-level-tilt-summary-v7"
 QQQ_TICKER = "QQQ"
+QQQ_PROXY_SECURITY_ID = "arv2-qqq-etf-unjoined-weight-proxy"
+QQQ_PROXY_OVERLAP_DISCLOSURE = (
+    "QQQ ETF proxy overlaps the resolved stock core; this is not exact QQQ replication"
+)
 PIT_LOOKBACK_CALENDAR_DAYS = 45
 MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO = Decimal("0.95")
+MINIMUM_PROXY_RESOLVED_CONSTITUENT_WEIGHT_RATIO = Decimal("0.80")
 MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL = Decimal("0.95")
 MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL = Decimal("1.05")
 EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS = 1
 TARGET_WEIGHT_BASIS = (
     "pit_qqq_reported_positive_holdings_weights_resolved_renormalized"
 )
+PROXY_TARGET_WEIGHT_BASIS = (
+    "pit_qqq_reported_positive_holdings_weights_resolved_plus_unjoined_qqq_etf_proxy"
+)
 COVERAGE_PATH_SCHEMA = "arv2-order-level-pit-coverage-path-v2"
+PROXY_COVERAGE_PATH_SCHEMA = "arv2-order-level-pit-coverage-path-v3"
 TARGET_WEIGHT_MAP_SCHEMA = "arv2-order-level-pit-target-weight-map-v1"
+PROXY_TARGET_WEIGHT_MAP_SCHEMA = "arv2-order-level-pit-target-weight-map-v2"
 TARGET_WEIGHT_PATH_SCHEMA = "arv2-order-level-pit-target-weight-path-v1"
+PROXY_TARGET_WEIGHT_PATH_SCHEMA = "arv2-order-level-pit-target-weight-path-v2"
 IGNORED_ORDER_STATUSES = frozenset(
     {"New", "Submitted", "UpdateSubmitted", "CancelPending", "None"}
 )
@@ -150,7 +166,7 @@ _execution_matched_qqq_path = _benchmark.execution_matched_qqq_path
 _path_metrics = _benchmark.path_metrics
 
 
-def _profile(profile_id, start_session):
+def _profile(profile_id, start_session, *, proxy=False):
     if (
         _benchmark.QQQ_TICKER != QQQ_TICKER
         or _benchmark.TARGET_GROSS_EXPOSURE
@@ -165,7 +181,7 @@ def _profile(profile_id, start_session):
         )
     start = datetime.strptime(start_session, "%Y-%m-%d")
     record = {
-        "schema": PROFILE_SCHEMA,
+        "schema": PROXY_PROFILE_SCHEMA if proxy else PROFILE_SCHEMA,
         "profile_id": profile_id,
         "universe_proxy_ticker": QQQ_TICKER,
         "evaluation_start_session": start_session,
@@ -183,8 +199,14 @@ def _profile(profile_id, start_session):
         "target_gross_exposure": _decimal_text(_tilt.TARGET_GROSS_EXPOSURE),
         "signal": "exact_unchanged_R055_primary_view_firm_specific",
         "score_source_view_id": _score.PRIMARY_SOURCE_VIEW_ID,
-        "portfolio": "QQQ_PIT_holdings_weight_benchmark_plus_frozen_sector_neutral_tilt",
-        "target_weight_basis": TARGET_WEIGHT_BASIS,
+        "portfolio": (
+            "QQQ_PIT_holdings_weight_stock_core_plus_unjoined_QQQ_ETF_proxy_plus_frozen_sector_neutral_tilt"
+            if proxy else
+            "QQQ_PIT_holdings_weight_benchmark_plus_frozen_sector_neutral_tilt"
+        ),
+        "target_weight_basis": (
+            PROXY_TARGET_WEIGHT_BASIS if proxy else TARGET_WEIGHT_BASIS
+        ),
         "price_normalization": "RAW",
         "resolution": "MINUTE",
         "benchmark_price_normalization": "TOTAL_RETURN",
@@ -199,7 +221,8 @@ def _profile(profile_id, start_session):
         ),
         "calendar_benchmark_observation": "SESSION_CLOSE_CONTEXT_ONLY",
         "minimum_resolved_constituent_weight_ratio": _decimal_text(
-            MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
+            MINIMUM_PROXY_RESOLVED_CONSTITUENT_WEIGHT_RATIO
+            if proxy else MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
         ),
         "minimum_positive_constituent_weight_total": _decimal_text(
             MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
@@ -232,12 +255,21 @@ def _profile(profile_id, start_session):
         "broker_credentials": False,
         "trading": False,
     }
+    if proxy:
+        record["qqq_proxy_security_id"] = QQQ_PROXY_SECURITY_ID
+        record["qqq_proxy_overlap_disclosure"] = QQQ_PROXY_OVERLAP_DISCLOSURE
     return {**record, "profile_sha256": _sha(record)}
 
 
 _PROFILES = {
     PROFILE_2025_ID: _profile(PROFILE_2025_ID, "2025-01-02"),
     PROFILE_2026_ID: _profile(PROFILE_2026_ID, "2026-01-02"),
+    PROXY_PROFILE_2025_ID: _profile(
+        PROXY_PROFILE_2025_ID, "2025-01-02", proxy=True
+    ),
+    PROXY_PROFILE_2026_ID: _profile(
+        PROXY_PROFILE_2026_ID, "2026-01-02", proxy=True
+    ),
 }
 
 
@@ -281,6 +313,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._activation_manifest_sha256 = activation_manifest_sha256
         self._activation_manifest_byte_count = activation_manifest_byte_count
         self._profile = require_qqq_order_level_profile(profile_id)
+        self._proxy_weight_mode = profile_id in PROXY_PROFILE_IDS
         self._authority_benchmark_symbol = authority_benchmark_symbol
         self._qqq_benchmark_symbol = qqq_benchmark_symbol
         self._qqq_constituent_universe = qqq_constituent_universe
@@ -458,6 +491,16 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         self._decision_sessions = decisions
         self._decision_set = frozenset(decisions)
         self._initialized = True
+        if self._proxy_weight_mode:
+            # The ETF position is executable, unlike the legacy contextual
+            # QQQ benchmark. Explicit history requests still use TOTAL_RETURN.
+            try:
+                qqq_security = self._algorithm.securities[self._qqq_benchmark_symbol]
+            except KeyError as exc:
+                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
+                    "order-level QQQ ETF proxy security is unavailable"
+                ) from exc
+            self.configure_security(qqq_security)
 
     def configure_security(self, security):
         if not self._initialized:
@@ -599,37 +642,9 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
 
     @staticmethod
     def _positive_constituent_weights(rows):
-        members = _input.collection_rows(
-            rows, "order-level PIT QQQ constituent weights"
+        return _input.positive_constituent_weights(
+            rows, _decimal, AcceptedRiskQqqOrderLevelQcRuntimeError
         )
-        positive_sids = _input.positive_constituent_sids(members)
-        result = {}
-        for row in members:
-            try:
-                raw_weight = row.weight
-            except AttributeError as exc:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    "order-level PIT QQQ constituent weight is unreadable"
-                ) from exc
-            if raw_weight is None:
-                continue
-            weight = _decimal(
-                raw_weight,
-                "order-level PIT QQQ constituent weight",
-            )
-            if weight <= 0:
-                continue
-            sid = _input.row_sid(row, "order-level PIT QQQ constituent")
-            if sid not in positive_sids:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    "order-level PIT QQQ positive member identity changed"
-                )
-            result[sid] = weight
-        if set(result) != set(positive_sids):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ constituent weights are unavailable"
-            )
-        return result
 
     def _resolved_qqq_weights(
         self,
@@ -638,97 +653,34 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         *,
         constituent_age_sessions,
     ):
-        if (
-            type(constituent_weights) is not dict
-            or not constituent_weights
-            or any(
-                type(sid) is not str
-                or not sid
-                or type(weight) is not Decimal
-                or not weight.is_finite()
-                or weight <= 0
-                for sid, weight in constituent_weights.items()
-            )
-        ):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ constituent weights are unavailable"
-            )
-        security_by_sid = {}
-        for row in self._resolution.resolved:
-            sid = row["qc_security_id"]
-            security_id = row["security_id"]
-            if sid in security_by_sid:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    "order-level PIT QQQ FIGI resolution duplicated a QC SID"
-                )
-            security_by_sid[sid] = security_id
-        resolved_sids = set(constituent_weights) & set(security_by_sid)
-        total_weight = sum(constituent_weights.values(), Decimal(0))
-        resolved_weight = sum(
-            (constituent_weights[sid] for sid in resolved_sids), Decimal(0)
-        )
-        member_count = len(constituent_weights)
-        resolved_count = len(resolved_sids)
-        if total_weight <= 0:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ constituent weights are unavailable"
-            )
-        if not (
-            MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
-            <= total_weight
-            <= MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL
-        ):
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ positive constituent weight total is outside 0.95 to 1.05"
-            )
-        resolved_weight_ratio = resolved_weight / total_weight
-        result = {}
-        for sid in sorted(resolved_sids):
-            security_id = security_by_sid[sid]
-            if security_id in result:
-                raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                    "order-level PIT QQQ FIGI resolution is not one-to-one"
-                )
-            result[security_id] = constituent_weights[sid]
-        weight_map_sha256 = _sha(
-            {
-                "schema": TARGET_WEIGHT_MAP_SCHEMA,
-                "positive_weights_by_qc_sid": {
-                    sid: _decimal_text(constituent_weights[sid])
-                    for sid in sorted(constituent_weights)
-                },
-                "resolved_weights_by_security_id": {
-                    security_id: _decimal_text(result[security_id])
-                    for security_id in sorted(result)
-                },
-            }
-        )
-        record = {
-            "session": session,
-            "positive_weight_member_count": member_count,
-            "resolved_positive_weight_member_count": resolved_count,
-            "resolved_member_count_ratio": _decimal_text(
-                Decimal(resolved_count) / Decimal(member_count)
+        result, record = _benchmark.resolved_qqq_holdings_weight_core(
+            constituent_weights,
+            self._resolution.resolved,
+            session=session,
+            constituent_age_sessions=constituent_age_sessions,
+            minimum_total=MINIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL,
+            maximum_total=MAXIMUM_POSITIVE_CONSTITUENT_WEIGHT_TOTAL,
+            minimum_resolved_ratio=(
+                MINIMUM_PROXY_RESOLVED_CONSTITUENT_WEIGHT_RATIO
+                if self._proxy_weight_mode
+                else MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
             ),
-            "resolved_constituent_weight_ratio": _decimal_text(
-                resolved_weight_ratio
+            weight_map_schema=(
+                PROXY_TARGET_WEIGHT_MAP_SCHEMA if self._proxy_weight_mode
+                else TARGET_WEIGHT_MAP_SCHEMA
             ),
-            "positive_constituent_weight_total": _decimal_text(total_weight),
-            "constituent_snapshot_age_sessions": constituent_age_sessions,
-            "pit_constituent_weight_map_sha256": weight_map_sha256,
-        }
+            error_type=AcceptedRiskQqqOrderLevelQcRuntimeError,
+            proxy_security_id=(
+                QQQ_PROXY_SECURITY_ID if self._proxy_weight_mode else None
+            ),
+            qqq_sid=(
+                _symbol_sid(self._qqq_benchmark_symbol, "order-level QQQ ETF proxy")
+                if self._proxy_weight_mode else None
+            ),
+        )
         if any(row["session"] == session for row in self._pit_coverage_records):
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level PIT coverage session is duplicated"
-            )
-        if resolved_weight_ratio < MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ resolved constituent-weight coverage is below 95 percent: "
-                + _decimal_text(resolved_weight_ratio)
-            )
-        if not result:
-            raise AcceptedRiskQqqOrderLevelQcRuntimeError(
-                "order-level PIT QQQ resolved constituent-weight coverage is empty"
             )
         self._pit_coverage_records.append(record)
         return result
@@ -765,7 +717,10 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
         )
 
     def _security(self, security_id):
-        symbol = self._resolution.symbol_for_security(security_id)
+        if security_id == QQQ_PROXY_SECURITY_ID and self._proxy_weight_mode:
+            symbol = self._qqq_benchmark_symbol
+        else:
+            symbol = self._resolution.symbol_for_security(security_id)
         if symbol is None:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                 "order-level target lacks an exact FIGI resolution"
@@ -839,6 +794,8 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
     def _build_plan(self, session, target_weights):
         target_ids = set(target_weights)
         tracked = set(target_ids)
+        if self._proxy_weight_mode:
+            tracked.add(QQQ_PROXY_SECURITY_ID)
         for row in self._resolution.resolved:
             sid = row["qc_security_id"]
             if sid in self._configured_security_ids:
@@ -874,7 +831,12 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
                 candidate_plan=plan,
                 registered_plan=registered,
             )
-            symbol = self._resolution.symbol_for_security(intent.security_id)
+            symbol = (
+                self._qqq_benchmark_symbol
+                if self._proxy_weight_mode
+                and intent.security_id == QQQ_PROXY_SECURITY_ID
+                else self._resolution.symbol_for_security(intent.security_id)
+            )
             if symbol is None:
                 raise AcceptedRiskQqqOrderLevelQcRuntimeError(
                     "order-level intent lost its FIGI resolution"
@@ -921,19 +883,31 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             self._session_positions[session]
         )
         benchmark_measures = self._pit_benchmark_measures(session)
+        if self._proxy_weight_mode:
+            stock_measures = {
+                security_id: weight
+                for security_id, weight in benchmark_measures.items()
+                if security_id != QQQ_PROXY_SECURITY_ID
+            }
+        else:
+            stock_measures = benchmark_measures
         scores = {
             security_id: score
             for security_id, score in (
                 snapshot.primary_view_firm_specific_scores.items()
             )
-            if security_id in benchmark_measures
+            if security_id in stock_measures
         }
         try:
             sectors = _tilt.sector_map_from_memberships(
-                benchmark_measures,
+                stock_measures,
                 snapshot.memberships,
                 scores,
             )
+            if self._proxy_weight_mode and QQQ_PROXY_SECURITY_ID in benchmark_measures:
+                sectors[QQQ_PROXY_SECURITY_ID] = (
+                    _tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
+                )
         except _tilt.BoundedBenchmarkTiltError as exc:
             raise AcceptedRiskQqqOrderLevelQcRuntimeError(str(exc)) from exc
         tilt = _tilt.build_benchmark_tilt(
@@ -1265,7 +1239,7 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "resolved_member_count_ratio",
             "resolved_constituent_weight_ratio",
             "positive_constituent_weight_total",
-        )
+        ) + (("qqq_proxy_constituent_weight_ratio",) if self._proxy_weight_mode else ())
         coverage_values = {
             name: tuple(
                 Decimal(row[name]) for row in self._pit_coverage_records
@@ -1276,10 +1250,13 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "positive_weight_member_count",
             "resolved_positive_weight_member_count",
         )
-        return {
-            "schema": SUMMARY_SCHEMA,
+        summary = {
+            "schema": PROXY_SUMMARY_SCHEMA if self._proxy_weight_mode else SUMMARY_SCHEMA,
             "score_source_view_id": _score.PRIMARY_SOURCE_VIEW_ID,
-            "target_weight_basis": TARGET_WEIGHT_BASIS,
+            "target_weight_basis": (
+                PROXY_TARGET_WEIGHT_BASIS if self._proxy_weight_mode
+                else TARGET_WEIGHT_BASIS
+            ),
             "decision_count": self._decision_count,
             "completed_rebalance_count": len(self._lifecycle_records),
             "submitted_order_count": self._submitted_order_count,
@@ -1360,7 +1337,9 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             ),
             "minimum_required_resolved_constituent_weight_ratio": (
                 _decimal_text(
-                    MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
+                    MINIMUM_PROXY_RESOLVED_CONSTITUENT_WEIGHT_RATIO
+                    if self._proxy_weight_mode
+                    else MINIMUM_RESOLVED_CONSTITUENT_WEIGHT_RATIO
                 )
             ),
             "maximum_constituent_snapshot_age_sessions": max(
@@ -1369,13 +1348,19 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             ),
             "pit_coverage_path_sha256": _sha(
                 {
-                    "schema": COVERAGE_PATH_SCHEMA,
+                    "schema": (
+                        PROXY_COVERAGE_PATH_SCHEMA if self._proxy_weight_mode
+                        else COVERAGE_PATH_SCHEMA
+                    ),
                     "records": self._pit_coverage_records,
                 }
             ),
             "pit_target_weight_path_sha256": _sha(
                 {
-                    "schema": TARGET_WEIGHT_PATH_SCHEMA,
+                    "schema": (
+                        PROXY_TARGET_WEIGHT_PATH_SCHEMA if self._proxy_weight_mode
+                        else TARGET_WEIGHT_PATH_SCHEMA
+                    ),
                     "records": [
                         {
                             "session": row["session"],
@@ -1464,6 +1449,20 @@ class AcceptedRiskQqqOrderLevelQcRuntime:
             "live_orders": False,
             "trading": False,
         }
+        if self._proxy_weight_mode:
+            summary.update({
+                "qqq_proxy_overlap_disclosure": QQQ_PROXY_OVERLAP_DISCLOSURE,
+                "mean_qqq_proxy_constituent_weight_ratio": _decimal_text(
+                    Decimal(1) - Decimal(summary["mean_resolved_constituent_weight_ratio"])
+                ),
+                "minimum_qqq_proxy_constituent_weight_ratio": _decimal_text(
+                    Decimal(1) - max(coverage_values["resolved_constituent_weight_ratio"])
+                ),
+                "maximum_qqq_proxy_constituent_weight_ratio": _decimal_text(
+                    Decimal(1) - Decimal(summary["minimum_resolved_constituent_weight_ratio"])
+                ),
+            })
+        return summary
 
     def on_end_of_algorithm(self):
         if not self._initialized or self._completed:

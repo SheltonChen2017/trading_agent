@@ -198,6 +198,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
     decision_count, observation_count = {
         runtime.PROFILE_2025_ID: (91, 428),
         runtime.PROFILE_2026_ID: (39, 178),
+        runtime.PROXY_PROFILE_2025_ID: (91, 428),
+        runtime.PROXY_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
@@ -273,6 +275,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         "QQQ_first_execution_session": {
             runtime.PROFILE_2025_ID: "2025-01-03",
             runtime.PROFILE_2026_ID: "2026-01-05",
+            runtime.PROXY_PROFILE_2025_ID: "2025-01-03",
+            runtime.PROXY_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -296,6 +300,18 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         "live_orders": False,
         "trading": False,
     }
+    if plan.profile_id in runtime.PROXY_PROFILE_IDS:
+        aggregate.update({
+            "schema": runtime.PROXY_SUMMARY_SCHEMA,
+            "target_weight_basis": runtime.PROXY_TARGET_WEIGHT_BASIS,
+            "minimum_required_resolved_constituent_weight_ratio": "0.8",
+            "mean_resolved_constituent_weight_ratio": "0.86",
+            "minimum_resolved_constituent_weight_ratio": "0.86",
+            "qqq_proxy_overlap_disclosure": runtime.QQQ_PROXY_OVERLAP_DISCLOSURE,
+            "mean_qqq_proxy_constituent_weight_ratio": "0.14",
+            "minimum_qqq_proxy_constituent_weight_ratio": "0.14",
+            "maximum_qqq_proxy_constituent_weight_ratio": "0.14",
+        })
     if aggregate_update:
         aggregate.update(aggregate_update)
     meta = {
@@ -440,6 +456,33 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
         runtime.META_STATISTIC_NAME,
     )
     assert all("DO NOT SELECT" not in value for _name, value in pairs)
+
+
+def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(tmp_path):
+    plan = _plan(tmp_path, runtime.PROXY_PROFILE_2026_ID)
+    statistics = _statistics(plan)
+    assert len(statistics[runtime.AGGREGATES_STATISTIC_NAME].encode("ascii")) <= 4096
+    launch, response = _result_response(plan, statistics)
+    assert adapter._parse_result(response, plan, launch) == tuple(
+        sorted(statistics.items())
+    )
+    for update in (
+        {"qqq_proxy_overlap_disclosure": "exact QQQ replication"},
+        {"maximum_qqq_proxy_constituent_weight_ratio": "0.21"},
+        {"mean_qqq_proxy_constituent_weight_ratio": "0.13"},
+        {
+            "mean_qqq_proxy_constituent_weight_ratio": "0.14000000000000000000000000001",
+            "maximum_qqq_proxy_constituent_weight_ratio": "0.14000000000000000000000000001",
+        },
+        {"minimum_required_resolved_constituent_weight_ratio": "0.95"},
+        {"target_weight_basis": runtime.TARGET_WEIGHT_BASIS},
+        {"raw_security_rows": []},
+    ):
+        launch, response = _result_response(
+            plan, _statistics(plan, aggregate_update=update)
+        )
+        with pytest.raises(adapter.AcceptedRiskOrderLevelSubmissionError):
+            adapter._parse_result(response, plan, launch)
 
 
 @pytest.mark.parametrize(

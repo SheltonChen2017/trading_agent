@@ -3128,3 +3128,55 @@ and only one authenticated aggregate adds **607 -> 608 cells**. Only then may
 R-128 launch, spending **91 -> 92 / 34 -> 35**, with its aggregate adding
 **608 -> 609 cells**. A technical failure adds no cell and requires fresh
 accounting. No raw row, order/fill, or paper/live/trading access is authorized.
+
+## R-127 — PIT QQQ ETF-weight order diagnostic (TERMINAL IDENTITY-COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-127 created private project `36715522` and backtest
+`6f06b0abd1dda90f813fd85ec2161dd6`; the first statistics-free status poll
+returned `Runtime Error`. Terminal receipt
+`arv2-order-level-terminal-9f57dc2ed110f41bd021edf2`, SHA-256
+`9f57dc2ed110f41bd021edf2b18dbf0f7ad6ab497c3565276b8e0ac87328fac5`,
+contains no statistic. A bounded diagnostic selected status/error/stack only;
+no provider/security row, aggregate, chart, order, fill, holding, price, or
+return was read. The first 2026-01-02 decision refused because the exact
+FIGI-resolved QC SID coverage of reported positive QQQ weight was
+`0.8618138186181381861813818618`, below the prospectively frozen 95% floor.
+The reported positive weight total had passed its 0.95--1.05 check. No
+simulated order or economic result occurred. **86.1814% is an identity-join
+coverage ratio, not a backtest return or an alpha estimate.**
+
+R-127 spends **90 -> 91 shared looks / 33 -> 34 development evaluations**,
+adds zero cells, and leaves **607 cells / 27 infrastructure looks**. R-128
+created no project/backtest and is superseded unlaunched/unspent. No subsequent
+six-universe diagnostic is preregistered. A read-only audit found no proven
+implementation defect; the aggregate cannot partition the missing 13.8186%
+weight among absent admission, named FIGI refusal, and SID mismatch. R-125's
+earlier cap join was only 0.2600 percentage points lower on the same decision.
+Do not weaken the spent R-127 guard or call an unrun successor a return. Any
+neutral-QQQ residual proxy or mapping census is a separately versioned,
+prospectively committed and authorized diagnostic.
+
+## V5/V7 neutral-QQQ residual simulated-order candidate (IMPLEMENTED; UNRUN) — 2026-09-18
+
+The next prospectively versioned construction holds exactly resolved QQQ
+constituent stocks at their reported immediately prior ETF weights and puts
+all unjoined reported weight into one unscored QQQ ETF position. Positive
+reported total remains 0.95--1.05 and exactly resolved stocks must represent
+at least 80% of that total; below the floor the run refuses with the exact
+ratio. The full reported weight is normalized to 98% gross. Only exactly
+resolved stocks can receive the unchanged bounded sector-neutral analyst
+revision tilt. This is an economically distinct proxy, **not a rerun of
+R-127** or exact QQQ replication: QQQ overlaps the stock holdings, so a
+portfolio-minus-QQQ difference cannot isolate analyst signal alpha.
+
+2026 profile SHA-256 `af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a`;
+2025 profile SHA-256 `c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d`.
+V7 separately authenticates residual-weight ratios, path digests, overlap
+disclosure, simulated order/fee lifecycle, and exact aggregate field inventory.
+The local focused/import-boundary battery passed 221 tests, the independent
+audit passed 210, and the projected ten-file source fits its per-file and
+fixed-closure limits. No QC run or economic cell exists under V5 yet. Starting
+accounting remains **91 shared looks, 34 development evaluations, 27
+infrastructure looks, 607 cells**. Fresh R-129/R-130 project/plan/authority
+identities must be committed before a launch; R-130 depends on R-129's first
+authenticated aggregate cell. Six-universe work remains unpreregistered.

@@ -191,6 +191,8 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
     assert runtime.PROFILE_IDS == (
         "arv2-qqq-order-level-tilt-2025-cutoff-v4",
         "arv2-qqq-order-level-tilt-2026-cutoff-v4",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v5",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v5",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -204,7 +206,7 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
             "190637eb9145c4b3a9e844cb42eb84d24bb5b318afc56957f98bf9d413d8a3b6"
         ),
     }
-    for profile_id in runtime.PROFILE_IDS:
+    for profile_id in runtime.PROFILE_IDS[:2]:
         profile = runtime.require_qqq_order_level_profile(profile_id)
         assert profile["evaluation_start_session"] == expected_starts[profile_id]
         assert profile["profile_sha256"] == expected_digests[profile_id]
@@ -236,6 +238,159 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
             runtime.AGGREGATES_STATISTIC_NAME,
             runtime.META_STATISTIC_NAME,
         )
+
+    for profile_id in runtime.PROXY_PROFILE_IDS:
+        profile = runtime.require_qqq_order_level_profile(profile_id)
+        assert profile["schema"] == runtime.PROXY_PROFILE_SCHEMA
+        assert profile["target_weight_basis"] == runtime.PROXY_TARGET_WEIGHT_BASIS
+        assert profile["minimum_resolved_constituent_weight_ratio"] == "0.8"
+        assert profile["qqq_proxy_security_id"] == runtime.QQQ_PROXY_SECURITY_ID
+        assert profile["qqq_proxy_overlap_disclosure"] == (
+            runtime.QQQ_PROXY_OVERLAP_DISCLOSURE
+        )
+        assert profile["target_gross_exposure"] == "0.98"
+        assert profile["backtest_only"] is True
+        assert profile["live_orders"] is False
+
+
+def test_proxy_core_keeps_86_percent_stock_and_all_14_percent_unjoined_weight():
+    a = _Symbol("A-SID", "A")
+    value = _runtime(profile_id=runtime.PROXY_PROFILE_2026_ID)
+    value._resolution = _Resolution({"a": a})
+    measures = value._resolved_qqq_weights(
+        "2026-01-02",
+        {"A-SID": Decimal("0.86"), "B-SID": Decimal("0.14")},
+        constituent_age_sessions=1,
+    )
+    assert measures == {
+        "a": Decimal("0.86"),
+        runtime.QQQ_PROXY_SECURITY_ID: Decimal("0.14"),
+    }
+    assert sum(measures.values(), Decimal(0)) == Decimal(1)
+    assert value._pit_coverage_records[0]["resolved_constituent_weight_ratio"] == "0.86"
+    assert value._pit_coverage_records[0]["qqq_proxy_constituent_weight_ratio"] == "0.14"
+    assert value._pit_coverage_records[0]["qqq_proxy_reported_weight"] == "0.14"
+    assert value._pit_coverage_records[0]["pit_constituent_weight_map_sha256"] == runtime._sha({
+        "schema": runtime.PROXY_TARGET_WEIGHT_MAP_SCHEMA,
+        "positive_weights_by_qc_sid": {"A-SID": "0.86", "B-SID": "0.14"},
+        "resolved_weights_by_security_id": {"a": "0.86"},
+        "qqq_proxy_security_id": runtime.QQQ_PROXY_SECURITY_ID,
+        "unjoined_qqq_proxy_weight": "0.14",
+    })
+    assert "A-SID" not in json.dumps(value._pit_coverage_records)
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="below 95 percent: 0.86",
+    ):
+        legacy = _runtime()
+        legacy._resolution = _Resolution({"a": a})
+        legacy._resolved_qqq_weights(
+            "2026-01-02",
+            {"A-SID": Decimal("0.86"), "B-SID": Decimal("0.14")},
+            constituent_age_sessions=1,
+        )
+
+
+def test_proxy_stock_coverage_floor_is_bounded_by_reported_input_weight():
+    a = _Symbol("A-SID", "A")
+    accepted = _runtime(profile_id=runtime.PROXY_PROFILE_2026_ID)
+    accepted._resolution = _Resolution({"a": a})
+    assert accepted._resolved_qqq_weights(
+        "2026-01-02",
+        {"A-SID": Decimal("0.76"), "B-SID": Decimal("0.19")},
+        constituent_age_sessions=1,
+    ) == {"a": Decimal("0.76"), runtime.QQQ_PROXY_SECURITY_ID: Decimal("0.19")}
+    refused = _runtime(profile_id=runtime.PROXY_PROFILE_2026_ID)
+    refused._resolution = _Resolution({"a": a})
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="below 80 percent: 0.799",
+    ):
+        refused._resolved_qqq_weights(
+            "2026-01-02",
+            {"A-SID": Decimal("0.799"), "B-SID": Decimal("0.201")},
+            constituent_age_sessions=1,
+        )
+    assert refused._pit_coverage_records == []
+
+
+@pytest.mark.parametrize("collision", ("security_id", "qc_security_id"))
+def test_proxy_identity_cannot_collide_with_exact_figi_stock(collision):
+    value = _runtime(profile_id=runtime.PROXY_PROFILE_2026_ID)
+    row = {"security_id": "a", "qc_security_id": "A-SID"}
+    if collision == "security_id":
+        row["security_id"] = runtime.QQQ_PROXY_SECURITY_ID
+    else:
+        row["qc_security_id"] = "QQQ-SID"
+    value._resolution = SimpleNamespace(resolved=(row,))
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="QQQ ETF proxy .* collides",
+    ):
+        value._resolved_qqq_weights(
+            "2026-01-02", {"A-SID": Decimal(1)},
+            constituent_age_sessions=1,
+        )
+
+
+def test_proxy_is_unscored_neutral_and_98_percent_gross(monkeypatch):
+    algorithm = _Algorithm("2026-01-05")
+    a = _Symbol("A-SID", "A")
+    value = _runtime(algorithm, runtime.PROXY_PROFILE_2026_ID)
+    value._initialized = True
+    value._decision_set = frozenset({"2026-01-05"})
+    value._session_positions = {"2026-01-02": 0, "2026-01-05": 1}
+    value._resolution = _Resolution({"a": a})
+    value._score_runtime = SimpleNamespace(score=lambda _position: SimpleNamespace(
+        memberships=(evaluator.SecurityMembership(
+            "a", 0, 2, "sector", Decimal(1), "a" * 64,
+        ),),
+        primary_view_firm_specific_scores={
+            "a": Decimal(1), runtime.QQQ_PROXY_SECURITY_ID: Decimal(999),
+        },
+    ))
+    value._history_inventory = lambda *_args: {
+        datetime.fromisoformat("2026-01-02T00:00:00"): (
+            SimpleNamespace(symbol=a, weight=Decimal("0.86")),
+            SimpleNamespace(symbol=_Symbol("B-SID"), weight=Decimal("0.14")),
+        )
+    }
+    selected = {}
+    value._build_plan = lambda _session, weights: selected.update(weights)
+    original = tilt.build_benchmark_tilt
+    def capture(measures, scores, sectors):
+        assert runtime.QQQ_PROXY_SECURITY_ID not in scores
+        assert sectors[runtime.QQQ_PROXY_SECURITY_ID] == (
+            tilt.RESERVED_STRUCTURAL_ZERO_SECTOR_ID
+        )
+        return original(measures, scores, sectors)
+    monkeypatch.setattr(runtime._tilt, "build_benchmark_tilt", capture)
+    assert value.on_after_close() is True
+    assert selected == {
+        "a": Decimal("0.8428"),
+        runtime.QQQ_PROXY_SECURITY_ID: Decimal("0.1372"),
+    }
+    assert sum(selected.values(), Decimal(0)) == Decimal("0.98")
+
+
+def test_proxy_still_requires_the_exact_prior_authenticated_session():
+    value = _runtime(_Algorithm("2026-01-05"), runtime.PROXY_PROFILE_2026_ID)
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._session_positions = {
+        "2025-12-31": 0, "2026-01-02": 1, "2026-01-05": 2,
+    }
+    value._history_inventory = lambda *_args: {
+        datetime.fromisoformat("2025-12-31T00:00:00"): (
+            SimpleNamespace(symbol=_Symbol("A-SID"), weight=Decimal("0.86")),
+            SimpleNamespace(symbol=_Symbol("B-SID"), weight=Decimal("0.14")),
+        )
+    }
+    with pytest.raises(
+        runtime.AcceptedRiskQqqOrderLevelQcRuntimeError,
+        match="not the immediately prior authenticated session",
+    ):
+        value._pit_benchmark_measures("2026-01-05")
+    assert value._pit_coverage_records == []
 
 
 def test_decision_axis_is_weekly_plus_exact_cutoff_and_next_open():
@@ -470,6 +625,42 @@ def test_aggregate_binds_execution_matched_and_calendar_qqq_paths():
     assert mismatched["fee_mismatch"] is True
     assert mismatched["execution_failure"] is True
     assert mismatched["run_valid"] is False
+
+
+def test_proxy_v7_aggregate_binds_weight_path_ratios_without_raw_ids():
+    sessions = ("2026-01-02", "2026-09-17")
+    value = _runtime(profile_id=runtime.PROXY_PROFILE_2026_ID)
+    value._package = SimpleNamespace(
+        evaluator_input=SimpleNamespace(session_axis=sessions)
+    )
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+    value._resolved_qqq_weights(
+        sessions[0],
+        {"A-SID": Decimal("0.86"), "B-SID": Decimal("0.14")},
+        constituent_age_sessions=1,
+    )
+    value._decision_count = 1
+    value._decision_sessions = sessions[:1]
+    value._submitted_order_count = 1
+    value._lifecycle_records = [_lifecycle_record()]
+    value._strategy_equity_observations = {session: Decimal("1000000") for session in sessions}
+    value._gross_exposure_observations = {session: Decimal("0.98") for session in sessions}
+    value._cash_weight_observations = {session: Decimal("0.02") for session in sessions}
+    qqq = ((sessions[0], Decimal("100")), (sessions[1], Decimal("101")))
+    value._load_qqq_total_return_observations = lambda expected: qqq if expected == sessions else ()
+    value._benchmark_open_observations = {session: Decimal("100") for session in sessions}
+    summary = value._aggregate_record()
+    assert summary["schema"] == runtime.PROXY_SUMMARY_SCHEMA
+    assert summary["target_weight_basis"] == runtime.PROXY_TARGET_WEIGHT_BASIS
+    assert summary["minimum_required_resolved_constituent_weight_ratio"] == "0.8"
+    assert summary["mean_resolved_constituent_weight_ratio"] == "0.86"
+    assert summary["mean_qqq_proxy_constituent_weight_ratio"] == "0.14"
+    assert summary["maximum_qqq_proxy_constituent_weight_ratio"] == "0.14"
+    assert summary["qqq_proxy_overlap_disclosure"] == runtime.QQQ_PROXY_OVERLAP_DISCLOSURE
+    assert summary["QQQ_normalization_mode"] == "TOTAL_RETURN"
+    assert "A-SID" not in json.dumps(summary)
+    assert runtime.QQQ_PROXY_SECURITY_ID not in json.dumps(summary)
+    assert len(runtime._canonical(summary)) <= runtime.MAXIMUM_STATISTIC_BYTES
 
 
 def test_aggregate_marks_canceled_or_incomplete_execution_invalid():
@@ -1217,6 +1408,49 @@ def test_runtime_submits_every_sell_before_buy_and_rechecks_live_mode():
     with pytest.raises(orders.OrderLevelBacktestError, match="backtest-only"):
         blocked._submit_plan(plan)
     assert blocked_algorithm.orders == []
+
+
+def test_proxy_uses_existing_qqq_security_for_moo_and_fee_lifecycle():
+    algorithm = _Algorithm("2026-01-05")
+    a = _Symbol("A-SID", "A")
+    b = _Symbol("B-SID", "B")
+    value = _runtime(algorithm, runtime.PROXY_PROFILE_2026_ID)
+    value._initialized = True
+    value._resolution = _Resolution({"a": a, "b": b})
+    qqq = value._qqq_benchmark_symbol
+    algorithm.securities[qqq] = _Security(qqq, price="100", end_time=algorithm.time)
+    value.configure_security(algorithm.securities[qqq])
+    assert algorithm.securities[qqq].models == [
+        ("normalization", "Raw"), ("fee", "ten-bps"), ("slippage", "zero"),
+    ]
+    value._security("b")
+    algorithm.portfolio.quantities["B-SID"] = 10
+    algorithm.portfolio.cash = Decimal("999000")
+    proxy_id = runtime.QQQ_PROXY_SECURITY_ID
+    plan = value._build_plan(
+        "2026-01-05", {"a": Decimal("0.8428"), proxy_id: Decimal("0.1372")}
+    )
+    assert plan is not None
+    assert {intent.security_id for intent in plan.intents} == {"a", "b", proxy_id}
+    value._submit_plan(plan)
+    assert algorithm.orders[0][0:2] == ("B", -10)
+    assert {ticker for ticker, _quantity, _tag in algorithm.orders[1:]} == {"A", "QQQ"}
+    assert value._resolution.symbol_for_security(proxy_id) is None
+    for order_id, (ticker, quantity, _tag) in enumerate(algorithm.orders, 1):
+        value.on_order_event(SimpleNamespace(
+            order_id=order_id,
+            id=1,
+            status="Filled",
+            fill_quantity=quantity,
+            fill_price=Decimal("100"),
+            order_fee=_order_fee(str(abs(quantity) * Decimal("0.1"))),
+        ))
+    value._close_open_plan()
+    summary = value._lifecycle_records[0]
+    assert summary["fill_event_count"] == 3
+    assert summary["filled_order_count"] == 3
+    assert summary["fee_mismatch"] is False
+    assert value._submitted_order_count == 3
 
 
 def test_qc_event_identity_includes_order_id_for_same_per_order_event_id():

@@ -385,7 +385,10 @@ CAP-COVERAGE REFUSAL AND SUPERSEDES R-126 UNLAUNCHED. A SEPARATE
 ETF-HOLDINGS-WEIGHT CONSTRUCTION IS NOT A RETRY OF THE
 MARKET-CAP EXPERIMENT. SECTION 119 IMPLEMENTS ITS V4/V6 BACKTEST-ONLY
 CANDIDATE. SECTION 120 FREEZES R-127/R-128 EXACT PHYSICAL IDENTITIES BEFORE
-EITHER QC ACTION. ONLY BACKTEST-SIMULATED
+EITHER QC ACTION. SECTION 121 CLOSES R-127 AS A ZERO-CELL 86.1814%-RESOLVED-
+WEIGHT IDENTITY REFUSAL AND SUPERSEDES R-128 UNLAUNCHED.
+SECTION 122 BUILDS A SEPARATE NEUTRAL-QQQ RESIDUAL V5/V7 CANDIDATE WITHOUT
+ALTERING R-127'S FROZEN RULE OR CLAIMING SIGNAL ALPHA. ONLY BACKTEST-SIMULATED
 MARKET-ON-OPEN ORDERS ARE IN SCOPE. REAL ORDERS, PAPER OR FUNDED DEPLOYMENT,
 BROKER ACCESS, LIVE TRADING, AND FORMAL ALPHA ACCEPTANCE REMAIN CLOSED. NO V2
 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE.**
@@ -1298,6 +1301,24 @@ action. The owner explicitly waives an additional Claude review of section
 status without statistics, and read at most its exact two-statistic aggregate
 under a separately signed authority if `Completed.`. Launch R-128 only after
 that result authenticates one cell.
+
+Claude will review section 121 with this round's final single pushed snapshot.
+Section 121 supersedes the preceding launch instruction: R-127 reached an
+authenticated zero-cell identity-coverage refusal on its first decision, so
+R-128 is unlaunched and unspent. The exact next step is to diagnose the
+unjoined QQQ weight without relaxing the frozen R-127 guard or attributing an
+unobserved return to this run. Any residual-QQQ or alternative construction
+requires a separately versioned, prospectively committed and preregistered
+candidate; the six-universe runs remain contingent on tangible order-level
+evidence. No real order, paper/live, funded, broker or deployment action follows.
+
+Claude will review section 122 with this round's final single pushed snapshot.
+Section 122 implements the distinct V5/V7 stock-plus-neutral-QQQ residual
+candidate without reopening R-127. Commit and verify its exact source/tests,
+then derive and record one-use R-129/R-130 physical identities before any
+new QC launch. R-130 requires R-129's authenticated aggregate cell. A final
+complete lane suite and exact source/diff/status checks precede the single
+push; no real order or deployment authority follows.
 
 
 ## 4A. Independent Claude review, corrections, and Codex counter-review, 2026-08-27
@@ -18985,3 +19006,107 @@ adds no cell and invalidates R-128's fixed accounting. R-129/R-130 six-
 universe runs remain unpreregistered. No raw result, provider/security row,
 log, order, fill, chart, holding, price, return, paper/live deployment,
 broker, funded account, real order, or trading access is authorized.
+
+## 121. R-127 measured identity-coverage refusal, 2026-09-18
+
+The one-use R-127 action created private project `36715522` and backtest
+`6f06b0abd1dda90f813fd85ec2161dd6`. Its first statistics-free terminal
+status poll returned `Runtime Error`. Terminal receipt
+`arv2-order-level-terminal-9f57dc2ed110f41bd021edf2`, SHA-256
+`9f57dc2ed110f41bd021edf2b18dbf0f7ad6ab497c3565276b8e0ac87328fac5`,
+contains no statistic. A bounded diagnosis selected only status/error/stack;
+no aggregate, raw provider/security row, chart, order, fill, holding, price,
+return, or unrestricted log was read. The 2026-01-02 first decision refused:
+`order-level PIT QQQ resolved constituent-weight coverage is below 95 percent:
+0.8618138186181381861813818618`. Thus **86.1814% of reported positive QQQ
+holdings weight** matched the exact frozen FIGI/QC-SID map, not a strategy
+return. No simulated order or economic cell accrued. The reported positive
+weight total had already passed its 0.95--1.05 invariant; the first-session
+deficit is in the identity join, not the ETF holdings' total-weight check.
+
+R-127 spends **90 -> 91 shared looks / 33 -> 34 ARV2 development
+evaluations**, leaves **607 cells / 27 infrastructure looks**, and supplies
+no evidence for or against the signal. R-128 created no project/backtest and
+is superseded unlaunched and unspent because its fixed starting accounting
+and authenticated-first-cell contingency failed. The six-universe pair
+R-129/R-130 was never preregistered or launched and its numbering is no longer
+reserved. No in-place package, admission, profile, projection, or plan pin
+is changed, and the 95% R-127 guard is not silently weakened.
+
+A read-only code and existing-aggregate audit found no established code defect.
+R-125's additional cap join covered 85.9214% of the same first-session
+reported weight, only **0.2600 percentage points** less than R-127's
+identity-only join. The pinned input contains 6,151 admitted binding rows;
+an earlier authenticated QC aggregate reported 1,038 named FIGI refusals
+among them, but it did not attribute the missing QQQ weight to those reasons.
+Current receipts cannot distinguish absent source bindings, named QC FIGI
+refusals, and SID representation mismatches within the unjoined 13.8186%.
+A future aggregate-only, prospectively authorized join census could separate
+these causes without emitting identifiers; alternatively a newly versioned
+economic candidate could hold the unmatched reported weight in a neutral QQQ
+ETF proxy and tilt only exactly resolved stocks. Neither is a correction to
+the R-127 outcome, pristine QQQ replication, or current formal/live authority.
+
+## 122. Separate V5/V7 neutral-QQQ residual order candidate, 2026-09-18
+
+The new 2025/2026 profile IDs end in `cutoff-v5`, with schema
+`arv2-qqq-order-level-tilt-profile-v5`; the aggregate schema is
+`arv2-qqq-order-level-tilt-summary-v7`. Their SHA-256s are respectively
+`c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d`
+and `af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a`.
+The previously frozen V4 profile SHA-256s remain unchanged. This is a new
+economic construction, not a retry, reinterpretation, or relaxation of R-127.
+
+The immediately prior authenticated QQQ ETF holdings collection still must
+report positive weight total in **0.95--1.05**. Exact FIGI/QC-SID resolution
+retains each mapped stock's original reported weight; the entire remaining
+reported weight is assigned to one unscored QQQ ETF position. The resolved
+stock weight must be at least **80% of reported positive weight** (at least
+76% of notional at the 0.95 source-total lower bound), or the candidate
+refuses with its exact ratio. The 98%-gross target is normalized over both
+stocks and QQQ. Analyst revisions can tilt only mapped stocks; the QQQ proxy
+is in a neutral structural-zero sector. Its orders, whole-share fills, model
+and actual fee accounting use the same simulated market-on-open lifecycle.
+The QQQ ETF's own execution subscription is RAW; a distinct explicit
+TOTAL_RETURN history request supplies the execution-matched QQQ hurdle.
+
+Holding QQQ alongside its resolved constituent stocks creates intentional
+overlap. This portfolio is **not exact QQQ replication**: any selected-minus-
+QQQ gap mixes a bounded analyst tilt with the proxy's tracking/overlap effect
+and cannot on its own establish signal alpha. A truly matched un-tilted
+stock-plus-QQQ proxy comparator would be needed for isolated attribution.
+The V7 aggregate labels its target basis
+`pit_qqq_reported_positive_holdings_weights_resolved_plus_unjoined_qqq_etf_proxy`,
+discloses the overlap, reports min/mean/max ETF proxy and exact-mapping
+ratios, and binds the complete constituent and target-weight paths with
+versioned digests. The parser rejects a V4/V6 aggregate under a V5 plan,
+unbalanced proxy ratios, unbound authority inventory, or extra raw identifiers.
+
+The pure weight-accounting extraction and constituent parsing preserve the
+old V4 profile hashes and leave a readable projected runtime. The fixed ten-
+file V5 projection is **273,348 / 278,000 bytes**, with a 4,652-byte total
+review margin; the largest file is **62,879 / 64,000 bytes**. Local focused,
+projection, submission, import-boundary and lifecycle tests passed **221**;
+an independent read-only audit separately passed **210** focused tests,
+checked both old profile hashes and the source limits, and found no open
+P0--P3 defect. Compilation and `git diff --check` were clean. An earlier
+superseded-tree lane suite was interrupted at 1,377 passed / 4 skipped with
+zero reported failures because implementation changed underneath it; the
+complete final-tree lane selection remains required before the one push.
+
+| ID | P | Status and verification |
+|---|---:|---|
+| `ARV2D122-001` | P2 | **Corrected.** An initial V7 parser compared complementary Decimal ratios under the ambient 28-digit context and could round an inconsistent long decimal to exactly one. A high-precision bounded comparison and an isolating >28-digit mismatch regression refuse it. |
+| `ARV2D122-002` | P2 | **Corrected.** Moving the result-authority field inventory into dynamic candidate lookup defeated a closure/rebinding test. Both V4 and V5 inventories are captured at authority construction; the existing negative rebinding test is green again. |
+| `ARV2D122-003` | P2 | **Corrected test gap.** The novel QQQ proxy had pure-weight tests but no exact MOO/fee lifecycle test. A synthetic plan now sells an old stock and buys both a mapped stock and the QQQ proxy, then authenticates all three fills and fee matching. |
+| `ARV2D122-004` | P3 | **Avoided.** A source-size compaction draft rendered large dictionaries as single lines. It was discarded for a small pure-helper extraction and a versioned fixed-closure total-size bound; the source remains reviewable. |
+
+No QC or provider action, economic read, or new research look occurred while
+building this candidate. The starting accounting remains **91 shared looks,
+34 ARV2 development evaluations, 27 infrastructure looks, and 607 cells**.
+Fresh prospective 2026 / 2025-to-cutoff order runs may take R-129/R-130 only
+after this source is committed, physical projections and one-use authorities
+are derived and recorded, and the final tests pass. The six-universe pair
+would move to R-131/R-132 if the first order cell is tangible; it remains
+unpreregistered. No paper/live, funded, broker, real-order, or trading
+authority follows.

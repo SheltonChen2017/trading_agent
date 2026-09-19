@@ -86,10 +86,15 @@ RESULT_READ_AUTHORITY_SCHEMA = "arv2-order-level-qc-result-read-authority-v1"
 PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2025-cutoff-v4",
     "arv2-qqq-order-level-tilt-2026-cutoff-v4",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v5",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v5",
 )
+PROXY_PROFILE_IDS = PROFILE_IDS[2:]
 _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[0], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[1], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[2], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[3], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200
@@ -150,6 +155,7 @@ _PINNED_RUNTIME_PROFILE_IDS = tuple(runtime_builder.PROFILE_IDS)
 _PINNED_META_STATISTIC_NAME = runtime_builder.META_STATISTIC_NAME
 _PINNED_AGGREGATES_STATISTIC_NAME = runtime_builder.AGGREGATES_STATISTIC_NAME
 _PINNED_RUNTIME_SUMMARY_SCHEMA = runtime_builder.SUMMARY_SCHEMA
+_PINNED_PROXY_SUMMARY_SCHEMA = runtime_builder.PROXY_SUMMARY_SCHEMA
 _PINNED_REQUIRE_TRANSPORT = formal._require_concrete_transport
 _PINNED_TRANSPORT_CALL = formal._transport_call
 
@@ -323,6 +329,12 @@ _AGGREGATE_FIELDS = frozenset(
         "simulated_orders", "live_orders", "trading",
     }
 )
+_PROXY_AGGREGATE_FIELDS = _AGGREGATE_FIELDS | frozenset({
+    "qqq_proxy_overlap_disclosure",
+    "mean_qqq_proxy_constituent_weight_ratio",
+    "minimum_qqq_proxy_constituent_weight_ratio",
+    "maximum_qqq_proxy_constituent_weight_ratio",
+})
 
 
 def _error(message: str) -> NoReturn:
@@ -2512,7 +2524,8 @@ def _make_result_read_authority_operations(
     schema = RESULT_READ_AUTHORITY_SCHEMA
     prefix = "arv2-order-level-result-read-authority-"
     meta_fields = tuple(sorted(_META_FIELDS))
-    aggregate_fields = tuple(sorted(_AGGREGATE_FIELDS))
+    legacy_aggregate_fields = tuple(sorted(_AGGREGATE_FIELDS))
+    proxy_aggregate_fields = tuple(sorted(_PROXY_AGGREGATE_FIELDS))
     maximum_statistic_bytes = MAX_STATISTIC_BYTES
 
     def candidate(
@@ -2536,6 +2549,10 @@ def _make_result_read_authority_operations(
             or type(terminal) is not terminal_type
         ):
             raise error_type("order-level result authority context changed")
+        aggregate_fields = (
+            proxy_aggregate_fields if plan.profile_id in PROXY_PROFILE_IDS
+            else legacy_aggregate_fields
+        )
         record = {
             "status": "requires_separate_exact_owner_ed25519_signature",
             "plan_id": plan.plan_id,
@@ -2867,6 +2884,7 @@ def _parse_result(response, plan, launch):
         pairs.append((name, value))
     meta = parsed[_PINNED_META_STATISTIC_NAME]
     aggregates = parsed[_PINNED_AGGREGATES_STATISTIC_NAME]
+    proxy_mode = plan.profile_id in PROXY_PROFILE_IDS
     activation_entry = (
         plan.upload_entries[-1]
         if type(plan.upload_entries) is tuple and plan.upload_entries
@@ -2874,7 +2892,9 @@ def _parse_result(response, plan, launch):
     )
     if set(meta) != _META_FIELDS:
         _error("order-level aggregate META field inventory changed")
-    if set(aggregates) != _AGGREGATE_FIELDS:
+    if set(aggregates) != (
+        _PROXY_AGGREGATE_FIELDS if proxy_mode else _AGGREGATE_FIELDS
+    ):
         _error("order-level aggregate field inventory changed")
     if (
         meta.get("schema") != "arv2-qqq-order-level-tilt-runtime-meta-v1"
@@ -2926,7 +2946,10 @@ def _parse_result(response, plan, launch):
         "maximum_constituent_snapshot_age_sessions",
     )
     if (
-        aggregates.get("schema") != _PINNED_RUNTIME_SUMMARY_SCHEMA
+        aggregates.get("schema") != (
+            _PINNED_PROXY_SUMMARY_SCHEMA if proxy_mode
+            else _PINNED_RUNTIME_SUMMARY_SCHEMA
+        )
         or aggregates.get("score_source_view_id") != score_source_view_id
         or any(
             type(aggregates.get(name)) is not int
@@ -2949,7 +2972,10 @@ def _parse_result(response, plan, launch):
         )
         or aggregates.get("QQQ_entry_fee_bps_per_side") != 10
         or aggregates.get("target_weight_basis")
-        != "pit_qqq_reported_positive_holdings_weights_resolved_renormalized"
+        != (
+            runtime_builder.PROXY_TARGET_WEIGHT_BASIS if proxy_mode
+            else runtime_builder.TARGET_WEIGHT_BASIS
+        )
         or aggregates.get("raw_order_rows_in_summary") is not False
         or aggregates.get("raw_security_rows_in_summary") is not False
         or aggregates.get("backtest_only") is not True
@@ -2990,7 +3016,11 @@ def _parse_result(response, plan, launch):
         "maximum_positive_constituent_weight_total",
         "minimum_required_positive_constituent_weight_total",
         "maximum_allowed_positive_constituent_weight_total",
-    ):
+    ) + ((
+        "mean_qqq_proxy_constituent_weight_ratio",
+        "minimum_qqq_proxy_constituent_weight_ratio",
+        "maximum_qqq_proxy_constituent_weight_ratio",
+    ) if proxy_mode else ()):
         _result_decimal(
             aggregates.get(name), "order-level aggregate " + name
         )
@@ -3069,6 +3099,43 @@ def _parse_result(response, plan, launch):
         aggregates["maximum_allowed_positive_constituent_weight_total"],
         "order-level aggregate allowed maximum constituent weight total",
     )
+    if proxy_mode:
+        proxy_minimum = _result_decimal(
+            aggregates["minimum_qqq_proxy_constituent_weight_ratio"],
+            "order-level aggregate minimum QQQ proxy ratio",
+        )
+        proxy_mean = _result_decimal(
+            aggregates["mean_qqq_proxy_constituent_weight_ratio"],
+            "order-level aggregate mean QQQ proxy ratio",
+        )
+        proxy_maximum = _result_decimal(
+            aggregates["maximum_qqq_proxy_constituent_weight_ratio"],
+            "order-level aggregate maximum QQQ proxy ratio",
+        )
+        mean_resolved = _result_decimal(
+            aggregates["mean_resolved_constituent_weight_ratio"],
+            "order-level aggregate mean resolved ratio",
+        )
+        minimum_resolved = _result_decimal(
+            aggregates["minimum_resolved_constituent_weight_ratio"],
+            "order-level aggregate minimum resolved ratio",
+        )
+        # Every statistic is capped at 4,096 bytes; this precision makes the
+        # two decimal complements exact rather than default-context rounded.
+        with localcontext() as ratio_context:
+            ratio_context.prec = MAX_STATISTIC_BYTES * 4
+            ratios_conserve = (
+                proxy_mean + mean_resolved == Decimal(1)
+                and proxy_maximum + minimum_resolved == Decimal(1)
+            )
+        if (
+            aggregates["qqq_proxy_overlap_disclosure"]
+            != runtime_builder.QQQ_PROXY_OVERLAP_DISCLOSURE
+            or not Decimal(0) <= proxy_minimum <= proxy_mean <= proxy_maximum
+            <= Decimal("0.20")
+            or not ratios_conserve
+        ):
+            _error("order-level QQQ ETF proxy accounting changed")
     benchmark_target_gross = _result_decimal(
         aggregates["QQQ_target_gross_exposure"],
         "order-level aggregate QQQ target gross exposure",
@@ -3204,7 +3271,7 @@ def _parse_result(response, plan, launch):
         > aggregates["orders_with_any_fill_count_sum"]
         or aggregates["orders_with_any_fill_count_sum"]
         > aggregates["submitted_order_count"]
-        or floor != Decimal("0.95")
+        or floor != (Decimal("0.80") if proxy_mode else Decimal("0.95"))
         or minimum_covered_weight < floor
         or aggregates["pit_target_weight_path_sha256"]
         == aggregates["pit_coverage_path_sha256"]

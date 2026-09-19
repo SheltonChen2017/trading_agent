@@ -503,6 +503,33 @@ def positive_constituent_sids(rows):
     return frozenset(result)
 
 
+def positive_constituent_weights(rows, decimal_parser, error_type):
+    members = collection_rows(rows, "order-level PIT QQQ constituent weights")
+    positive_sids = positive_constituent_sids(members)
+    result = {}
+    for row in members:
+        try:
+            raw_weight = row.weight
+        except AttributeError as exc:
+            raise error_type(
+                "order-level PIT QQQ constituent weight is unreadable"
+            ) from exc
+        if raw_weight is None:
+            continue
+        weight = decimal_parser(raw_weight, "order-level PIT QQQ constituent weight")
+        if weight <= 0:
+            continue
+        sid = row_sid(row, "order-level PIT QQQ constituent")
+        if sid not in positive_sids:
+            raise error_type(
+                "order-level PIT QQQ positive member identity changed"
+            )
+        result[sid] = weight
+    if set(result) != set(positive_sids):
+        raise error_type("order-level PIT QQQ constituent weights are unavailable")
+    return result
+
+
 __all__ = (
     "AcceptedRiskOrderLevelInputRuntimeError",
     "LoadedAcceptedRiskPreliminaryPackage",

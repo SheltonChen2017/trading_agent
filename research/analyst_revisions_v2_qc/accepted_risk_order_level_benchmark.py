@@ -51,6 +51,136 @@ def _decimal_text(value):
     return text.rstrip("0").rstrip(".") if "." in text else text
 
 
+def resolved_qqq_holdings_weight_core(
+    constituent_weights,
+    resolved_rows,
+    *,
+    session,
+    constituent_age_sessions,
+    minimum_total,
+    maximum_total,
+    minimum_resolved_ratio,
+    weight_map_schema,
+    error_type,
+    proxy_security_id=None,
+    qqq_sid=None,
+):
+    """Bind prior QQQ weights to exact FIGI stocks and an optional ETF residual.
+
+    The ETF residual intentionally overlaps the stock core: it is an
+    executable proxy for unjoined reported weight, not exact replication.
+    """
+    proxy_mode = proxy_security_id is not None
+    if (
+        type(constituent_weights) is not dict
+        or not constituent_weights
+        or any(
+            type(sid) is not str or not sid
+            or type(weight) is not Decimal or not weight.is_finite()
+            or weight <= 0
+            for sid, weight in constituent_weights.items()
+        )
+    ):
+        raise error_type("order-level PIT QQQ constituent weights are unavailable")
+    security_by_sid = {}
+    for row in resolved_rows:
+        sid = row["qc_security_id"]
+        security_id = row["security_id"]
+        if proxy_mode and sid == qqq_sid:
+            raise error_type(
+                "order-level QQQ ETF proxy QC SID collides with a FIGI stock"
+            )
+        if proxy_mode and security_id == proxy_security_id:
+            raise error_type(
+                "order-level QQQ ETF proxy security id collides with a FIGI stock"
+            )
+        if sid in security_by_sid:
+            raise error_type("order-level PIT QQQ FIGI resolution duplicated a QC SID")
+        security_by_sid[sid] = security_id
+    resolved_sids = set(constituent_weights) & set(security_by_sid)
+    # The newer proxy requires exact conservation independent of row order.
+    with localcontext() as context:
+        if proxy_mode:
+            context.prec = 100
+        total_weight = sum(
+            (constituent_weights[sid] for sid in (
+                sorted(constituent_weights) if proxy_mode else constituent_weights
+            )), Decimal(0)
+        )
+        resolved_weight = sum(
+            (constituent_weights[sid] for sid in (
+                sorted(resolved_sids) if proxy_mode else resolved_sids
+            )), Decimal(0)
+        )
+        if total_weight <= 0:
+            raise error_type("order-level PIT QQQ constituent weights are unavailable")
+        if not minimum_total <= total_weight <= maximum_total:
+            raise error_type(
+                "order-level PIT QQQ positive constituent weight total is outside 0.95 to 1.05"
+            )
+        resolved_ratio = resolved_weight / total_weight
+        proxy_weight = total_weight - resolved_weight
+        result = {}
+        for sid in sorted(resolved_sids):
+            security_id = security_by_sid[sid]
+            if security_id in result:
+                raise error_type("order-level PIT QQQ FIGI resolution is not one-to-one")
+            result[security_id] = constituent_weights[sid]
+        if proxy_mode and proxy_weight > 0:
+            result[proxy_security_id] = proxy_weight
+        if proxy_mode and sum(result.values(), Decimal(0)) != total_weight:
+            raise error_type(
+                "order-level QQQ ETF proxy failed full reported-weight conservation"
+            )
+        map_payload = {
+            "schema": weight_map_schema,
+            "positive_weights_by_qc_sid": {
+                sid: _decimal_text(constituent_weights[sid])
+                for sid in sorted(constituent_weights)
+            },
+            "resolved_weights_by_security_id": {
+                security_id: _decimal_text(result[security_id])
+                for security_id in sorted(result)
+                if security_id != proxy_security_id
+            },
+        }
+        if proxy_mode:
+            map_payload.update({
+                "qqq_proxy_security_id": proxy_security_id,
+                "unjoined_qqq_proxy_weight": _decimal_text(proxy_weight),
+            })
+        member_count = len(constituent_weights)
+        resolved_count = len(resolved_sids)
+        record = {
+            "session": session,
+            "positive_weight_member_count": member_count,
+            "resolved_positive_weight_member_count": resolved_count,
+            "resolved_member_count_ratio": _decimal_text(
+                Decimal(resolved_count) / Decimal(member_count)
+            ),
+            "resolved_constituent_weight_ratio": _decimal_text(resolved_ratio),
+            "positive_constituent_weight_total": _decimal_text(total_weight),
+            "constituent_snapshot_age_sessions": constituent_age_sessions,
+            "pit_constituent_weight_map_sha256": _sha(map_payload),
+        }
+        if proxy_mode:
+            record["qqq_proxy_constituent_weight_ratio"] = _decimal_text(
+                Decimal(1) - resolved_ratio
+            )
+            record["qqq_proxy_reported_weight"] = _decimal_text(proxy_weight)
+        if resolved_ratio < minimum_resolved_ratio:
+            floor_percent = "80" if proxy_mode else "95"
+            raise error_type(
+                "order-level PIT QQQ resolved constituent-weight coverage is below "
+                + floor_percent + " percent: " + _decimal_text(resolved_ratio)
+            )
+        if not result:
+            raise error_type(
+                "order-level PIT QQQ resolved constituent-weight coverage is empty"
+            )
+    return result, record
+
+
 def benchmark_total_return(observations):
     if (
         type(observations) is not tuple

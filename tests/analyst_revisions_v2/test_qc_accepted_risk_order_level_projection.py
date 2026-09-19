@@ -205,6 +205,21 @@ def test_execution_matched_source_closure_keeps_review_margin(
         )
 
 
+def test_proxy_projection_keeps_file_and_total_margin_and_raw_executable_qqq(
+    delta_package,
+):
+    value = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package,
+        profile_id=runtime.PROXY_PROFILE_2026_ID,
+    )
+    assert max(item.byte_count for item in value.source_files) <= 64_000
+    assert value.total_source_byte_count + 4_096 <= projection.MAX_TOTAL_SOURCE_BYTES
+    main = next(item.source_bytes for item in value.source_files if item.project_path == "main.py")
+    assert b"data_normalization_mode=DataNormalizationMode.RAW" in main
+    assert b"data_normalization_mode=DataNormalizationMode.TOTAL_RETURN" in main
+    assert b"self.set_benchmark(qqq_benchmark)" in main
+
+
 def test_projection_disclosure_is_load_bearing(delta_package):
     value = projection.build_accepted_risk_order_level_qc_projection(
         delta_package,

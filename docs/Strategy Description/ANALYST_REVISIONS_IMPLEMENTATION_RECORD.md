@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–151 retain the milestone, review, preregistration, QC
+strategy. Sections 1–152 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -30,7 +30,8 @@ the two record omissions, and preregisters the immutable V14/R-169 successor.
 V14 does not change the order economics: it computes the three proxy
 complements under one explicit exact Decimal context and carries bounded,
 redacted evidence for any decision skipped because a same-session price is
-unavailable.
+unavailable. Section 152 records the first R-169 control's pre-network local
+ordering refusal and freezes its `_02` replacement.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -446,9 +447,11 @@ diagnostic evidence only; it creates no authenticated result cell.
 The three-attempt V12/V13 sequence for this 2026-YTD order-level goal is
 exhausted: R-166, R-167, and R-168. Section 150 is Claude's independent review
 of `1f47eb3..e38894a`; section 151 completes Codex's counter-review and freezes
-the separately versioned V14/R-169 successor. The owner explicitly waives
-Claude review of section 151 before this one R-169 attempt. The immediate next
-step is the one signed R-169 attempt using the exact section-151 plan. It may compute proxy
+the separately versioned V14/R-169 successor. Section 152 records the first
+control's local pre-network ordering refusal and its replacement. The owner
+explicitly waives Claude review of section 152 before this one R-169 attempt.
+The immediate next step is the one signed R-169 attempt using the exact
+section-152 `_02` plan. It may compute proxy
 complements independently of ambient Decimal precision and report bounded,
 redacted evidence identifying which session/security caused an unpriced
 decision. It must not relabel a skipped decision complete. Only the resulting
@@ -19755,3 +19758,42 @@ the bounded-evidence preimages and omissions, the V14 result-authority field
 inventory, the 8,192-byte transport ceiling, and the no-I/O closure. The
 immediate next action is to commit this prospective source and plan, sign the
 exact execution-authority payload, and launch R-169 once.
+
+## 152. R-169 pre-network control refusal and replacement, 2026-09-21
+
+The exact section-151 `_01` execution-authority payload was signed and
+verified, but the local transport integrity guard refused with
+`transport capability authority changed` before the adapter's first
+authenticated QuantConnect request. The cause is reproduced and is not a V14
+strategy or cloud defect: the administrative organization lookup used
+`QuantConnectClient` after `formal_qc_transport` had sealed Python's shared
+`urllib.request` namespace. That lookup initializes the process-global
+`urllib.request._opener`; the sealed transport correctly detected the changed
+external binding before credential acquisition or capability use.
+
+The `_01` one-use launch control is spent and will not be reused. No project,
+upload, compile, `backtests/create`, status poll, result read, statistic,
+price, return, order, provider/security row, research look, development
+evaluation, or cell resulted. Administrative `projects/read` calls used to
+resolve the single organization binding selected only that binding and exact
+project-name absence; they are not outcome reads or research looks.
+
+The correction changes no source, profile, projection, input, project name,
+backtest name, or economics. The organization binding is resolved before the
+sealed transport module is imported, so its stable initialized `urllib`
+namespace is what the formal boundary pins. The replacement `_02` control has
+the same V14 projection and these fresh exact identities:
+
+| Field | Frozen replacement |
+| --- | --- |
+| Control directory | `accepted_risk_order_level_r169_20260921_02` |
+| Plan | `arv2-order-level-plan-6af92e6be592a04d1265d88b`; SHA-256 `6af92e6be592a04d1265d88bd45b9b9acae79870748ab260693f3ad0751a2f33` |
+| Execution-authority payload SHA-256 | `0a1a3fa3508e2dca2694e672337129eb8e1d9c7b48f130a8d3f1aab3687374b0` |
+| Projection / profile | `382f2adc94b86a4d2394d065f812218f175340ae5960b1b5d96dbe6377ab0206` / `bfb77eacdaddb8566b649165eb4986ca038658bbc23d5eb95641f4cea13d0776` |
+| Private QC project / backtest | `90 ARV2_QQQ_CAUSE_ORDER_R169_2026_YTD - 20260921` / `ARV2 R169 QQQ cause order 2026 YTD 7803b84f` |
+
+Because `_01` never reached QuantConnect through the formal execution
+capability, `_02` remains R-169 attempt 1 under the standing three-attempt
+rule. The owner explicitly waived another Claude review before this same-round
+backtest. The next action is to commit this operational correction, sign only
+the exact `_02` payload, and launch it once.

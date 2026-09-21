@@ -41,6 +41,9 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_v16_qc_runtime as v16_runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v17_qc_runtime as v17_runtime,
+)
 
 
 def _exact(message: str) -> str:
@@ -97,6 +100,7 @@ def delta_package(monkeypatch):
         + v14_runtime.DIAGNOSTIC_PROFILE_IDS
         + v15_runtime.ACCOUNT_PROFILE_IDS
         + v16_runtime.EXPOSURE_PROFILE_IDS
+        + v17_runtime.SKIP_PROFILE_IDS
     ),
 )
 def test_projection_is_exact_profile_bound_and_backtest_only(
@@ -149,6 +153,7 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
             + v14_runtime.DIAGNOSTIC_PROFILE_IDS
             + v15_runtime.ACCOUNT_PROFILE_IDS
             + v16_runtime.EXPOSURE_PROFILE_IDS
+            + v17_runtime.SKIP_PROFILE_IDS
         )
     )
     assert "self.schedule.on(" in main
@@ -160,6 +165,7 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
         + v14_runtime.DIAGNOSTIC_PROFILE_IDS
         + v15_runtime.ACCOUNT_PROFILE_IDS
         + v16_runtime.EXPOSURE_PROFILE_IDS
+        + v17_runtime.SKIP_PROFILE_IDS
     ):
         assert "self.time_rules.before_market_open(qqq_benchmark, 10)" in main
         assert "self._arv2_driver.on_before_open" in main
@@ -938,6 +944,155 @@ def test_v16_total_cap_is_profile_specific_and_load_bearing(
     assert projection.require_accepted_risk_order_level_qc_projection(v15) is v15
 
 
+def test_v17_adds_only_skip_runtime_to_exact_v16_closure(delta_package):
+    v17 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v17_runtime.SKIP_PROFILE_2025_ID,
+    )
+    v16 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v16_runtime.EXPOSURE_PROFILE_2025_ID,
+    )
+    v17_by_path = {item.project_path: item for item in v17.source_files}
+    v16_by_path = {item.project_path: item for item in v16.source_files}
+
+    assert set(v17_by_path) == set(v16_by_path) | {
+        projection.V17_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v16_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v17_by_path[path] == v16_by_path[path]
+    main = v17_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v17_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV17QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert b"profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v17'" in main
+    assert b"set_start_date(2025, 1, 2)" in main
+    # The generated main differs from V16's only in the version token, so the
+    # V17 closure grows by exactly the V17 source file.
+    v16_main = v16_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert len(main) == len(v16_main)
+    v17_source = v17_by_path[projection.V17_RUNTIME_PROJECT_PATH]
+    assert (
+        v17.total_source_byte_count
+        == v16.total_source_byte_count + v17_source.byte_count
+    )
+    assert v17_source.byte_count <= projection.MAX_SOURCE_FILE_BYTES
+    assert (
+        v17.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_SKIP_TOTAL_SOURCE_BYTES
+    )
+    assert projection.MAX_SKIP_TOTAL_SOURCE_BYTES == 400_000
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v17.total_source_byte_count + (72 - fixture_key_length)
+    assert production_total == 370_919 + v17_source.byte_count
+    assert (
+        projection.MAX_SKIP_TOTAL_SOURCE_BYTES - production_total
+        >= projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert (
+        projection.MAX_SKIP_TOTAL_SOURCE_BYTES - 5_000 - production_total
+        < projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert v17.profile_sha256 == projection._require_profile(
+        v17_runtime.SKIP_PROFILE_2025_ID
+    )["profile_sha256"]
+
+
+def test_v17_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v16 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v16_runtime.EXPOSURE_PROFILE_2026_ID,
+    )
+    v17 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v17_runtime.SKIP_PROFILE_2026_ID,
+    )
+    assert (
+        projection._maximum_total_source_bytes(v16.profile_id)
+        == projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        projection._maximum_total_source_bytes(v17.profile_id)
+        == projection.MAX_SKIP_TOTAL_SOURCE_BYTES
+    )
+    # The V16 ceiling would refuse the larger V17 closure on its own.
+    assert (
+        v17.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        > projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_SKIP_TOTAL_SOURCE_BYTES",
+        v17.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v17_runtime.SKIP_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v17)
+    assert projection.require_accepted_risk_order_level_qc_projection(v16) is v16
+
+
+def test_firewall_allows_only_exact_v17_read_only_engine_order_lookup():
+    accepted = (
+        "from accepted_risk_qqq_order_level_v17_qc_runtime import (\n"
+        "    AcceptedRiskQqqOrderLevelV17QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime,\n"
+        "    STARTING_CASH,\n"
+        ")\n"
+        "class Algorithm:\n"
+        "    def initialize(self):\n"
+        "        self._arv2_driver = AcceptedRiskQqqOrderLevelQcRuntime(\n"
+        "            self, profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v17',\n"
+        "        )\n"
+        "    def on_order_event(self, event):\n"
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._driver.on_order_event(event, engine_order=engine_order)\n"
+    )
+    projection._audit_cloud_capabilities(accepted, projection.MAIN_PROJECT_PATH)
+    for refused in (
+        accepted.replace("cutoff-v17", "cutoff-v16"),
+        accepted.replace("V17QcRuntime", "V16QcRuntime"),
+        accepted.replace("cutoff-v17", "cutoff-v20"),
+        accepted.replace(
+            "accepted_risk_qqq_order_level_v17_qc_runtime",
+            "accepted_risk_qqq_order_level_v20_qc_runtime",
+        ).replace("V17QcRuntime", "V20QcRuntime"),
+    ):
+        with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+            projection._audit_cloud_capabilities(
+                refused, projection.MAIN_PROJECT_PATH,
+            )
+
+
+def test_firewall_refuses_algorithm_log_calls_in_versioned_runtime_sources():
+    """A cloud runtime that logs is refused; the lane never ships log calls."""
+
+    source = (
+        "class Runtime:\n"
+        "    def _pit_benchmark_measures(self, session):\n"
+        "        self._algorithm.log('PIT FALLBACK ' + session)\n"
+        "        return {}\n"
+    )
+    with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+        projection._audit_cloud_capabilities(
+            source, projection.V17_RUNTIME_PROJECT_PATH,
+        )
+    v17_source = (
+        Path(projection.__file__).resolve().parent
+        / projection.V17_RUNTIME_PROJECT_PATH
+    ).read_bytes()
+    projection._validate_source(projection.V17_RUNTIME_PROJECT_PATH, v17_source)
+
+
 @pytest.mark.parametrize(
     "enum_type",
     (
@@ -1411,6 +1566,7 @@ def test_qc_prelude_compilation_and_future_import_regression():
         (v14_runtime.DIAGNOSTIC_PROFILE_2026_ID, 8192),
         (v15_runtime.ACCOUNT_PROFILE_2026_ID, 8192),
         (v16_runtime.EXPOSURE_PROFILE_2026_ID, 8192),
+        (v17_runtime.SKIP_PROFILE_2026_ID, 8192),
     ),
 )
 def test_generated_main_imports_from_exact_flat_qc_projection(

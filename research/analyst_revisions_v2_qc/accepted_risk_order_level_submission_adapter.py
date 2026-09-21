@@ -98,6 +98,8 @@ PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2026-cutoff-v9",
     "arv2-qqq-order-level-tilt-2025-cutoff-v10",
     "arv2-qqq-order-level-tilt-2026-cutoff-v10",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v11",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v11",
 )
 PROXY_PROFILE_IDS = PROFILE_IDS[2:]
 _PINNED_PROFILE_CENSUS = (
@@ -115,13 +117,18 @@ _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[11], "2026-01-05", 39, 178, 177),
     (PROFILE_IDS[12], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[13], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[14], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[15], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200
 MAX_CONTROL_BYTES = 1024 * 1024
 MAX_STATISTIC_BYTES = 4096
 MAX_TICKET_STATISTIC_BYTES = 8192
-_TICKET_STATISTIC_PROFILE_IDS = tuple(runtime_builder.TICKET_PROFILE_IDS)
+_TICKET_STATISTIC_PROFILE_IDS = (
+    tuple(runtime_builder.TICKET_PROFILE_IDS)
+    + tuple(runtime_builder.REFLECTED_TICKET_PROFILE_IDS)
+)
 MAX_COMPILE_POLLS = 120
 MAX_STATUS_POLLS = 1_440
 COMPILE_POLL_SECONDS = 2
@@ -136,7 +143,7 @@ def _maximum_statistic_bytes(
     _legacy_limit=MAX_STATISTIC_BYTES,
     _ticket_limit=MAX_TICKET_STATISTIC_BYTES,
 ):
-    # V10 retains the exact aggregate instead of trimming decimals or hashes.
+    # V10+ retain the exact aggregate instead of trimming decimals or hashes.
     return (
         _ticket_limit if profile_id in _ticket_ids else _legacy_limit
     )

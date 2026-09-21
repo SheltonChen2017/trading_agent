@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–142 retain the milestone, review, preregistration, QC
+strategy. Sections 1–143 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-137 include sequential
@@ -22,8 +22,13 @@ edits. Section 142 records the completed QC 81 current-source comparison,
 the byte-bound and stored-text digest faults, and the separately reconciled
 R-152–R-165 runs. R-164 and R-165 have verified `Completed.` terminal
 states, but no source-bound, authenticated result cell or formal alpha verdict.
-Use focused checks during development; run the complete lane suite only
-immediately before a push or on the owner's explicit request. Real orders,
+Section 143 records a local-only V11 exact CLR-enum bridge that addresses the
+owner-observed Python.NET class-member failure without accepting arbitrary
+status text; it has not been committed, independently reviewed, projected to
+QC, or run.
+Codex uses focused checks during development and QC work; Claude runs the
+complete lane suite during independent review unless the owner explicitly
+asks Codex to run it. Real orders,
 paper/live deployment, funded accounts, broker access, and trading remain
 unauthorized.**
 
@@ -439,12 +444,17 @@ authenticate the historical source of any of those runs. Local V10 already
 has an 8,192-byte generated-main override and a result parser that hashes
 canonical aggregate bytes; its new focused regression distinguishes that
 digest from a JSON-quoted string digest. QC 81's broader status, cash,
-delisting, and third-statistic changes are not silently ported. The owner's
-V11 enum-bridge successor must also preserve V10's exact 2,048-byte required
-source margin; §142 records that the current projection has no discretionary
-growth above it. The owner's current sequence explicitly calls for a
+delisting, and third-statistic changes are not silently ported. Section 143
+records the local-only V11 exact CLR-enum bridge and its distinct profile
+identities. Its 287,727-byte prospective source stays within the new
+290,000-byte cap with 2,273 bytes of total headroom, including the required
+2,048-byte review margin. It remains uncommitted, unaudited in QC, and
+unlaunched. The owner explicitly waives Claude review of section 143 before
+this round's subsequent order-based tests; Claude reviews the final cumulative
+snapshot. The owner's current sequence explicitly calls for a
 correction commit/push, subsequent order-based tests without an intervening
-Claude review, then a full lane suite and final results push. That two-push
+Claude review, then focused completion checks and a final results push. Claude
+runs the complete lane suite during the later independent review. That two-push
 exception applies only to this owner-directed round. Authenticate the
 prospective source, complete independent audit, then
 freeze a distinct physical one-use plan before any new QC launch or signed
@@ -457,11 +467,19 @@ are not retry permissions. No authenticated order-level return estimate,
 formal alpha acceptance, leverage, six-universe expansion, real order,
 paper/live deployment, funded-account, broker, or trading authority follows.
 
-During development and QC diagnosis, use only relevant focused checks.
-The complete Analyst V2 lane suite runs only immediately before the round's
-final results push or when the owner explicitly requests it. Claude will review
-section 142 and the final cumulative pushed snapshot; no intermediate
+During development and QC diagnosis, Codex uses only relevant focused checks.
+Claude runs the complete Analyst V2 lane suite during independent review;
+Codex runs it only if the owner explicitly requests it. Claude will review
+sections 142–143 and the final cumulative pushed snapshot; no intermediate
 unreviewed QC experiment becomes accepted evidence merely by completing.
+Each distinct backtest candidate has a hard maximum of three QC attempts.
+A compile failure, runtime error, or any other unsuccessful terminal run each
+counts as one attempt. After the third failure Codex makes no further code
+change or relaunch for that candidate and invokes QuantConnect's Mia directly
+when its authenticated browser interface is controllable; otherwise Codex
+stops and lets the owner use Mia. Any Mia-completed source must then be
+retrieved, compared with the local candidate, and documented; only verified
+lane-specific corrections may be ported.
 
 Historical review-timing exceptions are recorded here so this live handoff
 can stay short. Each was limited to the named same-round work, not a standing
@@ -481,7 +499,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–142
+findings, outcomes, and per-run accounting remain in numbered sections 1–143
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -19157,3 +19175,95 @@ pin the exact statistic-name inventory and source/version/plan/run receipts
 replace those checks. No new QC launch, outcome/statistic/detailed-result
 read, paper/live deployment, broker access, funded order, or trading was
 performed by this source audit.
+
+## 143. V11 exact CLR order-status bridge (LOCAL ONLY), 2026-09-20
+
+The owner-observed R-133 diagnostic established the actual compatibility
+fault behind the remaining local status risk: Python.NET can raise
+`TypeError` when Python performs class-level attribute access on QC's CLR
+`OrderStatus` type. The frozen numeric/name table was already correct, but
+V8 through V10 still passed that CLR type into
+`require_qc_order_status_enum_members`, whose `enum.NEW`, `enum.FILLED`, and
+other class-member reads may therefore fail before an order event can be
+interpreted. That is an adapter incompatibility, not evidence that QC
+returned an unknown status and not an economic result.
+
+The local-only V11 successor avoids those class-member reads in generated
+`main.py`. It uses .NET `System.Enum.GetNames/GetValues` and
+`System.Convert.ToInt32` once during initialization, and accepts only this
+exact nine-entry ordered map:
+
+| CLR name | Numeric value |
+| --- | ---: |
+| `New` | 0 |
+| `Submitted` | 1 |
+| `PartiallyFilled` | 2 |
+| `Filled` | 3 |
+| `Canceled` | 5 |
+| `None` | 6 |
+| `Invalid` | 7 |
+| `CancelPending` | 8 |
+| `UpdateSubmitted` | 9 |
+
+Initialization refuses a missing or extra name, reordered pair, wrong or
+duplicate number, alias, mixed CLR type, non-string name, non-integer
+conversion, or hostile reflection call. Accepted values are exposed through
+a small local class with the exact legacy member names, so the existing core
+continues to compare event values by exact type and direct enum equality.
+Arbitrary strings, numeric stand-ins, title-casing, and broad `str(value)`
+normalization remain refused. This deliberately does **not** port QC 81's
+permissive status-string codec.
+
+The new identities are:
+
+| Evaluation window | V11 profile ID | Profile SHA-256 |
+| --- | --- | --- |
+| 2025 cutoff | `arv2-qqq-order-level-tilt-2025-cutoff-v11` | `4f2213e70d19479f7757141727aa7c977a2f6210014094e4c9ac9c6dd3871917` |
+| 2026 cutoff | `arv2-qqq-order-level-tilt-2026-cutoff-v11` | `980759a4a5e996b21349ee53e9a5b6343e1a8b9914006907fec29de8e77c2307` |
+
+V4 through V10 remain separately addressable with their existing schemas,
+profile IDs, hashes, and generated-main behavior; in particular, V10 still
+uses its direct `OrderStatus` binding and receives no `System` reflection
+import. Only V11 declares the exact reflection codec. The prospective total
+source cap is **290,000 bytes**, not a claimed QC platform limit. Rendered
+with the production-shaped 72-byte activation key, V11 is **287,727 bytes**,
+leaving **2,273 bytes** of total headroom and therefore **225 bytes** beyond
+the required 2,048-byte review margin. The shorter-key test fixture renders
+at 287,697 bytes. No safety guard, Decimal precision, digest, statistic field,
+or canonical schema was removed to make the bridge fit.
+
+An internal read-only audit found two P3 isolation gaps before freeze. The
+first draft compared the zipped reflection pairs without separately requiring
+both CLR arrays to have exactly nine entries, so an extra name beyond an exact
+nine-entry prefix could be ignored. The bridge now requires both lengths to
+equal the expected table, and isolated extra-name-only and extra-value-only
+cases refuse. The first draft also exercised the 8,192-byte result transport
+boundary only through V10. The boundary, raw-ASCII digest, and signed
+result-read limit cases now run independently against both V10 and V11.
+Four further mutation-backed cases isolate exact string-name type, exact
+converted-integer type, homogeneous Python wrapper type, and pairwise alias
+equality: each goes red when only its named predicate is removed.
+The same audit recorded one P3 review-boundary observation: the shared
+290,000-byte total cap is a safe-direction 2,000-byte relaxation for V4
+through V10 even though V11 is the profile that needs it. The older profile
+identities, hashes, and generated-main behavior remain pinned; this round
+documents that scope rather than adding a second cap selector to the already
+size-constrained projector.
+
+After those corrections, the focused projection, submission-adapter, core,
+and order-runtime selection is **387 passed**. Its regressions distinguish V11
+from V10, exercise the exact reflection map and dangerous failure cases,
+preserve exact event-type comparison, constrain the new `System.Enum` import
+to generated V11 `main.py`, and pin the new source budget. This is focused
+local validation, not the complete lane suite, an independent Claude review,
+or a QC compatibility result.
+
+No QC source upload, compile, backtest, result/statistic read, project
+mutation, provider/outcome access, research look, development evaluation,
+or authenticated result cell occurred for V11. The next bounded sequence is
+to complete the exact-source audit, commit the local candidate, freeze a
+distinct physical R-166 one-use plan and owner signature, and only then
+consider its separately authorized QC action. R-164/R-165 and every earlier
+profile or signature are not retry authority for V11. Real orders,
+paper/live deployment, funded accounts, broker access, and trading remain
+unauthorized.

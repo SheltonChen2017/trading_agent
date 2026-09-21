@@ -211,6 +211,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID: (39, 178),
         runtime.TICKET_PROFILE_2025_ID: (91, 428),
         runtime.TICKET_PROFILE_2026_ID: (39, 178),
+        runtime.REFLECTED_TICKET_PROFILE_2025_ID: (91, 428),
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
@@ -298,6 +300,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID: "2026-01-05",
             runtime.TICKET_PROFILE_2025_ID: "2025-01-03",
             runtime.TICKET_PROFILE_2026_ID: "2026-01-05",
+            runtime.REFLECTED_TICKET_PROFILE_2025_ID: "2025-01-03",
+            runtime.REFLECTED_TICKET_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -505,8 +509,17 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
     assert all("DO NOT SELECT" not in value for _name, value in pairs)
 
 
-def test_v10_result_parser_accepts_complete_high_precision_aggregate(tmp_path):
-    plan = _plan(tmp_path, runtime.TICKET_PROFILE_2026_ID)
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        runtime.TICKET_PROFILE_2026_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+    ),
+)
+def test_ticket_result_parser_accepts_complete_high_precision_aggregate(
+    tmp_path, profile_id
+):
+    plan = _plan(tmp_path, profile_id)
     statistics = _high_precision_statistics(plan)
     aggregate_bytes = statistics[runtime.AGGREGATES_STATISTIC_NAME].encode("ascii")
     assert 4764 <= len(aggregate_bytes) <= adapter.MAX_TICKET_STATISTIC_BYTES
@@ -517,8 +530,17 @@ def test_v10_result_parser_accepts_complete_high_precision_aggregate(tmp_path):
     )
 
 
-def test_v10_result_hashes_stored_aggregate_text_not_json_quoted_string(tmp_path):
-    plan = _plan(tmp_path, runtime.TICKET_PROFILE_2026_ID)
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        runtime.TICKET_PROFILE_2026_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+    ),
+)
+def test_ticket_result_hashes_stored_aggregate_text_not_json_quoted_string(
+    tmp_path, profile_id
+):
+    plan = _plan(tmp_path, profile_id)
     statistics = _high_precision_statistics(plan)
     stored_text = statistics[runtime.AGGREGATES_STATISTIC_NAME]
     stored_bytes = stored_text.encode("ascii")
@@ -563,8 +585,15 @@ def test_legacy_result_parser_retains_4096_byte_bound(tmp_path):
         adapter._parse_result(response, plan, launch)
 
 
-def test_v10_result_parser_refuses_more_than_8192_bytes(tmp_path):
-    plan = _plan(tmp_path, runtime.TICKET_PROFILE_2026_ID)
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        runtime.TICKET_PROFILE_2026_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+    ),
+)
+def test_ticket_result_parser_refuses_more_than_8192_bytes(tmp_path, profile_id):
+    plan = _plan(tmp_path, profile_id)
     statistics = _high_precision_statistics(plan)
     statistics[runtime.AGGREGATES_STATISTIC_NAME] = "x" * (
         adapter.MAX_TICKET_STATISTIC_BYTES + 1
@@ -592,6 +621,8 @@ def test_v10_result_parser_refuses_more_than_8192_bytes(tmp_path):
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.TICKET_PROFILE_2025_ID,
         runtime.TICKET_PROFILE_2026_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2025_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID,
     ),
 )
 def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
@@ -636,6 +667,8 @@ def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.TICKET_PROFILE_2025_ID,
         runtime.TICKET_PROFILE_2026_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2025_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID,
     ),
 )
 def test_preopen_result_cannot_shift_first_execution_session(
@@ -1077,6 +1110,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.TICKET_PROFILE_2025_ID,
         runtime.TICKET_PROFILE_2026_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2025_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID,
     )
     assert adapter.PROXY_PROFILE_IDS == runtime.PROXY_PROFILE_IDS == (
         runtime.PROXY_PROFILE_2025_ID,
@@ -1091,6 +1126,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID,
         runtime.TICKET_PROFILE_2025_ID,
         runtime.TICKET_PROFILE_2026_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2025_ID,
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID,
     )
     bindings = adapter._PINNED_RUNTIME_PROFILE_BINDINGS
     assert tuple(binding[0] for binding in bindings) == adapter.PROFILE_IDS
@@ -1869,6 +1906,7 @@ def test_result_read_authority_refuses_each_invalid_owner_signature(
     (
         (runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID, 4096),
         (runtime.TICKET_PROFILE_2026_ID, 8192),
+        (runtime.REFLECTED_TICKET_PROFILE_2026_ID, 8192),
     ),
 )
 def test_result_read_authority_binds_profile_specific_statistic_limit(

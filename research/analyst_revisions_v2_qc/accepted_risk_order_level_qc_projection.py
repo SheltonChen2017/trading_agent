@@ -36,9 +36,10 @@ RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_qc_runtime.py"
 MAX_SOURCE_FILE_BYTES = 64_000
 # The fixed ten-file closure includes the ETF-residual accounting and
 # synchronous order-event authentication. V8's direct QC enum boundary adds
-# source bytes, so a prospective 2,048-byte aggregate review margin remains
-# while the ten-file, 64,000-byte/file, and 288,000-byte total caps stay fixed.
-MAX_TOTAL_SOURCE_BYTES = 288_000
+# source bytes. V11 adds an exact CLR-enum reflection bridge; 290,000 is the
+# smallest round-number successor that retains the prospective 2,048-byte
+# aggregate review margin without weakening the 64,000-byte per-file cap.
+MAX_TOTAL_SOURCE_BYTES = 290_000
 MIN_REVIEW_MARGIN_BYTES = 2_048
 
 PROJECT_SOURCE_PATHS = (
@@ -175,6 +176,17 @@ def _normalized(value: str) -> str:
     return value.casefold().replace("_", "")
 
 
+def _approved_system_enum_import(node: ast.ImportFrom, project_path: str) -> bool:
+    return (
+        project_path == MAIN_PROJECT_PATH
+        and node.module == "System"
+        and tuple((item.name, item.asname) for item in node.names) == (
+            ("Convert", "_Arv2DotNetConvert"),
+            ("Enum", "_Arv2DotNetEnum"),
+        )
+    )
+
+
 def _is_self_algorithm(value: ast.AST) -> bool:
     return (
         isinstance(value, ast.Attribute)
@@ -243,6 +255,12 @@ def _audit_cloud_capabilities(text: str, project_path: str) -> None:
             continue
         if isinstance(node, ast.ImportFrom):
             module = node.module or ""
+            if module == "System":
+                if not _approved_system_enum_import(node, project_path):
+                    raise AcceptedRiskOrderLevelQcProjectionError(
+                        "order-level QC source imports a forbidden capability"
+                    )
+                continue
             root = module.split(".", 1)[0]
             imported = {_normalized(item.name) for item in node.names}
             if (
@@ -553,8 +571,55 @@ def _main_source(
         else ""
     )
     enum_status_source = (
-        "            order_status_enum=OrderStatus,\n"
+        "            order_status_enum=_arv2_reflected_order_status(OrderStatus),\n"
+        if profile["profile_id"] in runtime_builder.REFLECTED_TICKET_PROFILE_IDS
+        else "            order_status_enum=OrderStatus,\n"
         if profile["profile_id"] in runtime_builder.ENUM_PREOPEN_PROXY_PROFILE_IDS
+        else ""
+    )
+    reflected_status_source = (
+        '''from System import Convert as _Arv2DotNetConvert, Enum as _Arv2DotNetEnum
+
+
+def _arv2_reflected_order_status(enum_type):
+    refusal = "QC OrderStatus reflected map changed"
+    try:
+        names = tuple(_Arv2DotNetEnum.GetNames(enum_type))
+        values = tuple(_Arv2DotNetEnum.GetValues(enum_type))
+        numbers = tuple(_Arv2DotNetConvert.ToInt32(value) for value in values)
+        reflected_type = values[0].GetType()
+        same_type = all(value.GetType() == reflected_type for value in values)
+    except Exception as exc:
+        raise RuntimeError(refusal) from exc
+    expected = (
+        ("New", 0), ("Submitted", 1), ("PartiallyFilled", 2),
+        ("Filled", 3), ("Canceled", 5), ("None", 6), ("Invalid", 7),
+        ("CancelPending", 8), ("UpdateSubmitted", 9),
+    )
+    if (
+        len(names) != len(expected)
+        or len(values) != len(expected)
+        or any(type(name) is not str for name in names)
+        or any(type(number) is not int for number in numbers)
+        or tuple(zip(names, numbers)) != expected
+        or not same_type
+        or any(type(value) is not type(values[0]) for value in values)
+        or any(
+            value == prior
+            for index, value in enumerate(values)
+            for prior in values[:index]
+        )
+    ):
+        raise RuntimeError(refusal)
+
+    class ReflectedOrderStatus:
+        NEW, SUBMITTED, PARTIALLY_FILLED, FILLED, CANCELED, NONE, INVALID, CANCEL_PENDING, UPDATE_SUBMITTED = values
+
+    return ReflectedOrderStatus
+
+
+'''
+        if profile["profile_id"] in runtime_builder.REFLECTED_TICKET_PROFILE_IDS
         else ""
     )
     # The V10 cloud diagnostic measured 4,764 canonical aggregate bytes.
@@ -565,12 +630,15 @@ def _main_source(
         "import accepted_risk_qqq_order_level_qc_runtime as _arv2_runtime_module\n"
         "\n"
         "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 8192\n"
-        if profile["profile_id"] in runtime_builder.TICKET_PROFILE_IDS
+        if profile["profile_id"] in (
+            runtime_builder.TICKET_PROFILE_IDS
+            + runtime_builder.REFLECTED_TICKET_PROFILE_IDS
+        )
         else ""
     )
     source = f'''from AlgorithmImports import *
 from decimal import Decimal
-{statistic_transport_source}from accepted_risk_qqq_order_level_qc_runtime import (
+{reflected_status_source}{statistic_transport_source}from accepted_risk_qqq_order_level_qc_runtime import (
     AcceptedRiskQqqOrderLevelQcRuntime,
     STARTING_CASH,
 )

@@ -31,32 +31,38 @@ _Refusal = AcceptedRiskQqqOrderLevelQcRuntimeError
 
 
 PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v4"
-PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v4"
-PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v4"
 PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v5"
-PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v5"
-PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v5"
 PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v6"
-PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v6"
-PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v6"
 NUMERIC_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v7"
-NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v7"
-NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v7"
 ENUM_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v8"
-ENUM_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v8"
-ENUM_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v8"
 CASH_PREOPEN_PROXY_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v9"
-CASH_PREOPEN_PROXY_PROFILE_2025_ID = "arv2-qqq-order-level-tilt-2025-cutoff-v9"
-CASH_PREOPEN_PROXY_PROFILE_2026_ID = "arv2-qqq-order-level-tilt-2026-cutoff-v9"
 TICKET_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v10"
-TICKET_PROFILE_IDS = (
-    "arv2-qqq-order-level-tilt-2025-cutoff-v10",
-    "arv2-qqq-order-level-tilt-2026-cutoff-v10",
-)
+REFLECTED_TICKET_PROFILE_SCHEMA = "arv2-qqq-order-level-tilt-profile-v11"
+
+
+def _profile_ids(version):
+    return tuple(
+        "arv2-qqq-order-level-tilt-" + str(year) + "-cutoff-v" + str(version)
+        for year in (2025, 2026)
+    )
+
+
+PROFILE_2025_ID, PROFILE_2026_ID = _profile_ids(4)
+PROXY_PROFILE_2025_ID, PROXY_PROFILE_2026_ID = _profile_ids(5)
+PREOPEN_PROXY_PROFILE_2025_ID, PREOPEN_PROXY_PROFILE_2026_ID = _profile_ids(6)
+NUMERIC_PREOPEN_PROXY_PROFILE_2025_ID, NUMERIC_PREOPEN_PROXY_PROFILE_2026_ID = _profile_ids(7)
+ENUM_PREOPEN_PROXY_PROFILE_2025_ID, ENUM_PREOPEN_PROXY_PROFILE_2026_ID = _profile_ids(8)
+CASH_PREOPEN_PROXY_PROFILE_2025_ID, CASH_PREOPEN_PROXY_PROFILE_2026_ID = _profile_ids(9)
+TICKET_PROFILE_IDS = _profile_ids(10)
 TICKET_PROFILE_2025_ID, TICKET_PROFILE_2026_ID = TICKET_PROFILE_IDS
+REFLECTED_TICKET_PROFILE_IDS = _profile_ids(11)
+(
+    REFLECTED_TICKET_PROFILE_2025_ID,
+    REFLECTED_TICKET_PROFILE_2026_ID,
+) = REFLECTED_TICKET_PROFILE_IDS
 CASH_PREOPEN_PROXY_PROFILE_IDS = (
     CASH_PREOPEN_PROXY_PROFILE_2025_ID, CASH_PREOPEN_PROXY_PROFILE_2026_ID,
-) + TICKET_PROFILE_IDS
+) + TICKET_PROFILE_IDS + REFLECTED_TICKET_PROFILE_IDS
 ENUM_PREOPEN_PROXY_PROFILE_IDS = (
     ENUM_PREOPEN_PROXY_PROFILE_2025_ID, ENUM_PREOPEN_PROXY_PROFILE_2026_ID,
 ) + CASH_PREOPEN_PROXY_PROFILE_IDS
@@ -154,7 +160,7 @@ _execution_matched_qqq_path = _benchmark.execution_matched_qqq_path
 _path_metrics = _benchmark.path_metrics
 
 
-def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_status=False, enum_status=False, cash_replan=False):
+def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_status=False, enum_status=False, cash_replan=False, reflected_status=False):
     if (
         _benchmark.QQQ_TICKER != QQQ_TICKER
         or _benchmark.TARGET_GROSS_EXPOSURE
@@ -170,6 +176,7 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
     start = datetime.strptime(start_session, "%Y-%m-%d")
     record = {
         "schema": (
+            REFLECTED_TICKET_PROFILE_SCHEMA if reflected_status else
             TICKET_PROFILE_SCHEMA if profile_id in TICKET_PROFILE_IDS else
             CASH_PREOPEN_PROXY_PROFILE_SCHEMA if cash_replan else
             ENUM_PREOPEN_PROXY_PROFILE_SCHEMA if enum_status else
@@ -238,7 +245,11 @@ def _profile(profile_id, start_session, *, proxy=False, preopen=False, numeric_s
         record["synchronous_order_event_rule"] = "stage_until_exact_returned_ticket_then_replay_once"
     if numeric_status:
         record["qc_order_status_codec"] = "exact_LEAN_numeric_0_1_2_3_5_6_7_8_9"
-    if enum_status:
+    if reflected_status:
+        record["qc_order_status_codec"] = (
+            "exact_System.Enum_reflection_name_numeric_type_and_value_map"
+        )
+    elif enum_status:
         record["qc_order_status_codec"] = "direct_documented_LEAN_OrderStatus_enum_members"
     if cash_replan:
         record["overnight_cash_rule"] = (
@@ -256,6 +267,7 @@ _PROFILES = {
         numeric_status=profile_id in NUMERIC_PREOPEN_PROXY_PROFILE_IDS,
         enum_status=profile_id in ENUM_PREOPEN_PROXY_PROFILE_IDS,
         cash_replan=profile_id in CASH_PREOPEN_PROXY_PROFILE_IDS,
+        reflected_status=profile_id in REFLECTED_TICKET_PROFILE_IDS,
     )
     for profile_id in PROFILE_IDS
 }

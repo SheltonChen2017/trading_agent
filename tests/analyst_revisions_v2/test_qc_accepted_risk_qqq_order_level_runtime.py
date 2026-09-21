@@ -260,6 +260,8 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         "arv2-qqq-order-level-tilt-2026-cutoff-v9",
         "arv2-qqq-order-level-tilt-2025-cutoff-v10",
         "arv2-qqq-order-level-tilt-2026-cutoff-v10",
+        "arv2-qqq-order-level-tilt-2025-cutoff-v11",
+        "arv2-qqq-order-level-tilt-2026-cutoff-v11",
     )
     expected_starts = {
         runtime.PROFILE_2025_ID: "2025-01-02",
@@ -343,12 +345,20 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
         runtime.TICKET_PROFILE_2026_ID: (
             "aae67464b63312ff553bc3a60088cd1dd7fff9e56281b9aa8aa11717828e8da0"
         ),
+        runtime.REFLECTED_TICKET_PROFILE_2025_ID: (
+            "4f2213e70d19479f7757141727aa7c977a2f6210014094e4c9ac9c6dd3871917"
+        ),
+        runtime.REFLECTED_TICKET_PROFILE_2026_ID: (
+            "980759a4a5e996b21349ee53e9a5b6343e1a8b9914006907fec29de8e77c2307"
+        ),
     }
     for profile_id in runtime.PROXY_PROFILE_IDS:
         profile = runtime.require_qqq_order_level_profile(profile_id)
         assert profile["profile_sha256"] == expected_proxy_digests[profile_id]
         assert profile["schema"] == (
-            runtime.TICKET_PROFILE_SCHEMA
+            runtime.REFLECTED_TICKET_PROFILE_SCHEMA
+            if profile_id in runtime.REFLECTED_TICKET_PROFILE_IDS
+            else runtime.TICKET_PROFILE_SCHEMA
             if profile_id in runtime.TICKET_PROFILE_IDS
             else
             runtime.CASH_PREOPEN_PROXY_PROFILE_SCHEMA
@@ -363,7 +373,11 @@ def test_fixed_profiles_are_exact_backtest_only_and_transport_is_bounded():
             if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS
             else runtime.PROXY_PROFILE_SCHEMA
         )
-        if profile_id in runtime.ENUM_PREOPEN_PROXY_PROFILE_IDS:
+        if profile_id in runtime.REFLECTED_TICKET_PROFILE_IDS:
+            assert profile["qc_order_status_codec"] == (
+                "exact_System.Enum_reflection_name_numeric_type_and_value_map"
+            )
+        elif profile_id in runtime.ENUM_PREOPEN_PROXY_PROFILE_IDS:
             assert profile["qc_order_status_codec"] == (
                 "direct_documented_LEAN_OrderStatus_enum_members"
             )

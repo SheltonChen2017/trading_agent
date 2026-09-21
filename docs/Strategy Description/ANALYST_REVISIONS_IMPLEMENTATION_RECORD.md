@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–159 retain the milestone, review, preregistration, QC
+strategy. Sections 1–160 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -49,6 +49,9 @@ cell. Section 157 freezes the separately versioned V16/R-171 correction and
 its exact production plan before any new cloud launch. Section 158 records
 R-171 `Completed.` and freezes its one-use aggregate-only result authority;
 section 159 records the accepted one-use read and first valid V16 result cell.
+Section 160 freezes the unchanged V16 2025-now profile, exact production
+projection, plan, private project identity, execution authority, result gate,
+and attempt accounting before any R-172 cloud mutation.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -475,14 +478,19 @@ proven exposure-complement defect that invalidated it before any result
 authority was rendered. Section 157 freezes the separately versioned V16/R-171
 producer correction and exact preregistration. Section 158 records the
 authenticated completed run and separate result authority; section 159 records
-its accepted one-use read. The immediate next step is to freeze the unchanged
-V16 2025-now profile as a fresh R-172 plan before any new cloud access. V15 and
-R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
+its accepted one-use read. Section 160 freezes the unchanged V16 2025-now
+profile as the fresh R-172 production plan, and the owner explicitly waives
+Claude review of section 160 before this same-round launch. The immediate next step is to
+commit that preregistration, sign only its exact execution-authority payload,
+launch attempt 1 once, and inspect only statistics-disabled terminal status.
+Only authenticated `Completed.` may be followed by a separately rendered,
+committed, signed, and consumed one-use aggregate-only result authority. V15
+and R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
 diagnostic may be relabelled. By directing Codex to counter-review the landed
 review and continue directly with backtesting in this round, the owner
-explicitly waives Claude review of section 159 before that separately
-preregistered 2025-now run; Claude will independently review the resulting
-pushed snapshot. R-138 remains unlaunched/unspent.
+explicitly waives further Claude review before this separately preregistered 2025-now
+run; Claude will independently review the resulting pushed snapshot. R-138
+remains unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
@@ -20186,3 +20194,54 @@ diagnostic is 2025-now. It requires a fresh R-172 production plan, authority,
 project, result rule and attempt budget committed before launch; no parameter
 tuning, winner selection, six-universe expansion, leverage, deployment,
 broker, paper/live, funded-account, real-order, or trading authority follows.
+
+## 160. R-172 unchanged-V16 2025-now order-level preregistration, 2026-09-21
+
+R-172 changes no strategy rule and selects no result sign. It applies the
+already reviewed V16 producer and the previously frozen 2025 cutoff profile
+to the longer **2025-01-02 through 2026-09-16** evidence window. The score,
+point-in-time QQQ membership, sector-neutral breadth-confirmed tilt, 98% gross
+exposure, market-on-open execution, 10-bps-per-side modeled fee,
+forced-delisting retirement, terminal-account reconciliation, and exact mean
+exposure complement are unchanged from R-171. The 2025 V16 profile is
+`arv2-qqq-order-level-tilt-2025-cutoff-v16`, SHA-256
+`0ac38709a0666a105e571953bdeb94304439c0c82fe3c3b647edb363b1c0b135`;
+the V16 runtime source remains SHA-256
+`998cb19bfe7d48c37ec1dfb901399080ef206831df62a42cb339a464a638877e`.
+
+The real accepted-risk package deterministically builds **16 source files /
+370,919 bytes**. Its exact prospective identities are:
+
+| Field | Frozen R-172 identity |
+| --- | --- |
+| Control directory | `accepted_risk_order_level_r172_20260921_01` |
+| Projection | `arv2-order-level-qc-projection-75027faaf39434a4e7a2fe5b`; SHA-256 `75027faaf39434a4e7a2fe5b1744feb857370d275e3f43531148283ac771f7ba` |
+| Plan | `arv2-order-level-plan-518e67942e1f549926512616`; SHA-256 `518e67942e1f549926512616ab0bc05596038751c2ba78b15da4c539581b777d` |
+| Execution-authority payload | SHA-256 `1cb87ed31e2d9c6cd45e76b0d06812fda5764885e9d5039d6a7ca259ca6642c0` |
+| Private QC project | `93 ARV2_QQQ_EXPOSURE_ORDER_R172_2025_NOW - 20260921` |
+| Backtest | `ARV2 R172 QQQ exposure order 2025 now 7803b84f` |
+
+A fresh administrative project inventory, performed before importing the
+sealed formal transport, resolved the same one organization and verified that
+the exact project name is absent. It selected no result, statistic, log,
+chart, order, price, return, provider row, or signal outcome and is not a
+research look.
+
+The plan permits exactly one simulated-market-on-open, backtest-only
+submission plus statistics-disabled terminal polling. It permits no result
+read, standard statistic, raw row/order/fill/log/chart, paper/live deployment,
+broker credential, funded account, real order, or trading. Only terminal
+`Completed.` may be followed by a separately rendered, committed and signed
+one-use authority for the exact custom statistics
+`ARV2_ORDER_LEVEL_AGGREGATES` and `ARV2_ORDER_LEVEL_META`; formal admission
+still requires parser acceptance and `run_valid=true`.
+
+Attempt 1 will spend **129 -> 130 shared looks / 72 -> 73 ARV2 development
+evaluations**. It can add at most one authenticated cell (**608 -> 609**) only
+after that separate read succeeds; infrastructure looks remain **27**. A
+compile failure, runtime failure, or other unsuccessful terminal run counts
+against the standing three-attempt maximum for this distinct candidate. The
+owner has directed same-round continuation without an intervening Claude
+review; Claude will review the resulting pushed snapshot. The next action is
+to commit this preregistration, sign only the exact execution payload under
+`arv2-formal-qc-execution-v1`, launch once, and inspect only terminal status.

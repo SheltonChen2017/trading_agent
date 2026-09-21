@@ -3806,3 +3806,29 @@ R-171 closes accounting at **129 shared looks / 72 ARV2 development
 evaluations / 27 infrastructure looks / 608 authenticated cells**. No
 production acceptance, leverage, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
+
+## R-172 — V16 2025-now QQQ order run (PREREGISTERED; UNLAUNCHED) — 2026-09-21
+
+R-172 is the unchanged-profile longer-window diagnostic that follows the valid
+R-171 2026-YTD cell. It keeps the exact V16 strategy economics and uses profile
+`arv2-qqq-order-level-tilt-2025-cutoff-v16`, SHA-256
+`0ac38709a0666a105e571953bdeb94304439c0c82fe3c3b647edb363b1c0b135`,
+for **2025-01-02 through 2026-09-16**. No return sign or winner is selected.
+
+The production projection contains **16 files / 370,919 bytes**, SHA-256
+`75027faaf39434a4e7a2fe5b1744feb857370d275e3f43531148283ac771f7ba`.
+Plan SHA-256
+`518e67942e1f549926512616ab0bc05596038751c2ba78b15da4c539581b777d`
+and execution-authority payload SHA-256
+`1cb87ed31e2d9c6cd45e76b0d06812fda5764885e9d5039d6a7ca259ca6642c0`
+name private project `93 ARV2_QQQ_EXPOSURE_ORDER_R172_2025_NOW - 20260921`
+and backtest `ARV2 R172 QQQ exposure order 2025 now 7803b84f`.
+
+One backtest submission and statistics-disabled terminal polling are
+permitted. A result read is not. Only authenticated `Completed.` may be
+followed by a separately committed and signed one-use read of the two exact
+custom statistics; parser acceptance and `run_valid=true` remain mandatory.
+Attempt 1 would spend **129 -> 130 shared looks / 72 -> 73 ARV2 development
+evaluations** and could add at most one authenticated cell (**608 -> 609**).
+No parameter tuning, leverage, six-universe expansion, live/paper deployment,
+broker, funded-account, real-order, or trading authority follows.

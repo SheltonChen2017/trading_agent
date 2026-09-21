@@ -3625,3 +3625,49 @@ and zero cells**: cumulative accounting remains **126 / 69 / 27 / 607**.
 The input remains current-vintage and non-pristine-PIT under the owner's
 accepted-risk decision; no live, broker, funded-order, deployment, or trading
 authority follows.
+
+## R-169 — V14 deterministic-proxy 2026-YTD order run (COMPLETED; FORMAL RESULT READ REFUSED; DIAGNOSTIC ONLY) — 2026-09-21
+
+The exact committed/signed V14 profile SHA-256
+`bfb77eacdaddb8566b649165eb4986ca038658bbc23d5eb95641f4cea13d0776`,
+projection SHA-256
+`382f2adc94b86a4d2394d065f812218f175340ae5960b1b5d96dbe6377ab0206`,
+replacement plan SHA-256
+`6af92e6be592a04d1265d88bd45b9b9acae79870748ab260693f3ad0751a2f33`,
+and signed execution-authority payload SHA-256
+`0a1a3fa3508e2dca2694e672337129eb8e1d9c7b48f130a8d3f1aab3687374b0`
+from lane-record section 152 created private QC project `36788090` and backtest
+`3767aed670b800f9bd78eb83f2d9545d`. The launch receipt SHA-256 is
+`cb173267833f5f2cd42f7576687d9f5501c26384c1df308de10e5aac753a1b45`;
+the first statistics-disabled terminal poll authenticated `Completed.` with
+receipt SHA-256
+`3b73a95f0cfe2ba1b2d16619a47c9d05a5e9a8418825f7acc5642f86943330b0`.
+
+The separately signed one-use result authority selected only the two exact
+custom statistics and was consumed once. The formal reader refused
+`order-level aggregate execution or coverage invariant changed` and persisted
+no result receipt or formal cell. Two bounded aggregate-only diagnostics
+isolated the refusal without another QC run, research look, development
+evaluation, or cell. The summary v9 / META v3 aggregate has SHA-256
+`c96f9a4f1dbc5a8c9022ad69e128be727e438e39b3ec40f58d4d7f8430d4d0c3`
+and `run_valid=false`: **39 decisions, 38 completed rebalances, one
+skipped-unpriced decision, 2,455 submitted/final-filled strategy orders, and
+one separately authenticated forced-delisting fill**.
+
+Diagnostic figures only: the custom path ended at **$1,168,510.983845**
+while the exact terminal QC account value was **$1,168,243.410845**, a
+**$267.573** mismatch. The custom return was **+16.8510983845%** versus
+execution-matched QQQ **+15.6282845052%**, a **+1.2228138793 pp** spread;
+strategy/QQQ maximum drawdown was **-11.2506256828% / -11.5012219385%**
+and zero-rate Sharpe was **1.2123298 / 1.1131428**. Modeled and engine fees
+matched at **$3,570.426155**. One 2026-08-10 skipped record maps under the
+current snapshot only to EA; that is not point-in-time identity proof.
+
+R-169 spends **126 -> 127 shared looks / 69 -> 70 ARV2 development
+evaluations**, adds **zero cells**, and leaves **27 infrastructure looks /
+607 authenticated cells**. It is a completed engine diagnostic, not an
+authenticated alpha result. A separately versioned V15 successor may address
+the exact delisting/account-reconciliation causes prospectively; R-169 itself
+will not be reread or relabelled. No leverage, six-universe expansion,
+deployment, broker, paper/live, funded-account, real-order, or trading
+authority follows.

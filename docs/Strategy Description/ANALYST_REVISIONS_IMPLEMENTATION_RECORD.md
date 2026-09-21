@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–153 retain the milestone, review, preregistration, QC
+strategy. Sections 1–154 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -33,7 +33,14 @@ redacted evidence for any decision skipped because a same-session price is
 unavailable. Section 152 records the first R-169 control's pre-network local
 ordering refusal and freezes its `_02` replacement. Section 153 records that
 replacement's authenticated `Completed.` terminal state and freezes the
-separate aggregate-only result-read authority; no result has yet been read.
+separate aggregate-only result-read authority. Section 154 records its spent
+formal read: the reader refused a $267.573 terminal-account mismatch and the
+aggregate remained invalid because one delisted target caused one skipped
+decision. V15 is the prospective, separately versioned successor: it retires
+only a target backed by the exact forced-delisting ledger and zero holdings,
+and replaces the final path observation with one frozen terminal QC account
+snapshot before computing metrics. R-169 remains diagnostic only and adds no
+formal result cell.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -451,21 +458,25 @@ exhausted: R-166, R-167, and R-168. Section 150 is Claude's independent review
 of `1f47eb3..e38894a`; section 151 completes Codex's counter-review and freezes
 the separately versioned V14/R-169 successor. Section 152 records the first
 control's local pre-network ordering refusal and its replacement. Section 153
-records the authenticated completed run and its separate read authority. The
-owner explicitly waives Claude review of section 153 before the one R-169
-result read. The immediate next step is to sign and consume only the exact
-section-153 aggregate-only authority once. It may compute proxy
-complements independently of ambient Decimal precision and report bounded,
-redacted evidence identifying which session/security caused an unpriced
-decision. It must not relabel a skipped decision complete. Only the resulting
-evidence can justify a later explicit economic rule. R-138 remains
+records the authenticated completed run and its separate read authority.
+Section 154 records the consumed read and its refusal; V14 correctly exposed
+one retired-name candidate and a separate terminal-account/path mismatch but
+could not admit a result. The immediate next step is to freeze the exact
+V15/R-170 source, plan, execution authority, project name and result rule,
+then launch at most three attempts under the standing machine rule. V15 must
+not relabel the R-169 result, must retire a target only after exact forced-exit
+and zero-holding authentication, and must compute its final path from one
+frozen QC terminal account snapshot. By directing Codex to counter-review the
+landed review and continue directly with backtesting in this round, the owner
+explicitly waives Claude review of section 154 before this exact R-170 launch;
+Claude will independently review the resulting pushed snapshot. R-138 remains
 unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
-trading authority follows from R-168 or the R-169 preregistration. The only
-economic figures in section 148 came from a bounded diagnostic aggregate read
-and must retain that label.
+trading authority follows from R-168 or R-169. The economic figures in
+sections 148 and 154 came from bounded diagnostic aggregate reads and must
+retain that label.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -19833,3 +19844,88 @@ single read. The next action is to commit this terminal state and authority,
 sign the exact payload under `arv2-formal-qc-result-read-v1`, and consume it
 once. Formal admission still requires both parser acceptance and
 `run_valid=true`.
+
+## 154. R-169 result refusal and immutable V15 account successor, 2026-09-21
+
+The separately signed one-use result authority from section 153 was consumed
+once. The formal reader selected only the two named custom statistics and
+refused `order-level aggregate execution or coverage invariant changed`; it
+persisted no formal result receipt. The result control is spent and R-169 will
+not be read again. Two bounded aggregate-only diagnostics, with no additional
+QC run or result read, isolated the refusal without selecting standard QC
+statistics, raw logs, orders, charts, prices, provider/security rows, or
+deployment state.
+
+The V14 aggregate is summary v9 / META v3, aggregate SHA-256
+`c96f9a4f1dbc5a8c9022ad69e128be727e438e39b3ec40f58d4d7f8430d4d0c3`,
+and has `run_valid=false`. It reports **39 decisions, 38 completed
+rebalances, one skipped-unpriced decision, 2,455 submitted/final-filled
+strategy orders, and one separately authenticated forced-delisting fill**.
+Its custom path reports ending equity **$1,168,510.983845** while QC's exact
+terminal portfolio value is **$1,168,243.410845**, a **$267.573** difference.
+Consequently the emitted `strategy_total_return` is not exactly reconcilable
+to the emitted ending equity. The bounded skip evidence retains the one
+2026-08-10 decision and one redacted security digest. The lane's current
+snapshot-only symbol resolution maps that digest to EA, but that mapping is
+not point-in-time identity proof and is not promoted into the formal result.
+
+Diagnostic economics remain non-cell evidence only: custom return
+**+16.8510983845%**, execution-matched QQQ **+15.6282845052%**, spread
+**+1.2228138793 percentage points**, strategy/QQQ maximum drawdown
+**-11.2506256828% / -11.5012219385%**, and zero-rate Sharpe
+**1.2123298 / 1.1131428**. Modeled/engine fees agree at
+**$3,570.426155**. R-169 therefore remains a completed engine diagnostic,
+not a valid alpha cell or an accepted signal. Accounting closes at **127
+shared looks / 70 ARV2 development evaluations / 27 infrastructure looks /
+607 authenticated cells**.
+
+The prospective correction is V15 at commit `7dd0443`; V14 remains
+byte-identical at SHA-256
+`356aea91b861687e35b9d09c65f0f729bf8509bcec791c9f3fbc4a80ebc24001`.
+V15 makes only two versioned economic/accounting changes:
+
+1. a target is transferred to the structural QQQ proxy only when the exact
+   V12 forced-delisting ledger authenticates that same round-tripped security,
+   LEAN still marks it delisted, and the account holds exactly zero shares;
+   every other unpriced target retains the whole-decision skip; and
+2. after all order lifecycles close, one exact terminal QC equity/holdings/
+   cash snapshot replaces the already-recorded final-session observation
+   before path metrics are computed. The first observation must remain exact
+   $1,000,000 and holdings plus cash must equal terminal equity.
+
+The original target map is validated before any retirement, preventing a bad
+weight from disappearing into QQQ. Retirement evidence is committed only if
+the inherited planner completes; the reader requires forced-exit/retirement
+conservation, exact empty-path identity, bounded retired weight, and exact
+terminal adjustment arithmetic. A deterministic 32,768-digit local Decimal
+context makes the final exposure split independent of hostile ambient Decimal
+settings, and the terminal equity is frozen after its one account read.
+
+The exact 2026 V15 profile is
+`arv2-qqq-order-level-tilt-2026-cutoff-v15`, SHA-256
+`13303b1940e3442f01d93020e62c43e196c88ec297ddace97a0f4dc024a14e7a`.
+Its runtime source SHA-256 is
+`5470b32ea2aa612419a4adad8a2f25dd34308945f84dc61023a3f65f7fa836d1`.
+The exact fifteen-file production projection contains **362,488 bytes** under
+the V15-only 365,000-byte ceiling and has projection ID
+`arv2-order-level-qc-projection-7c7b6ded4c2a1d1e1269e8fa`, SHA-256
+`7c7b6ded4c2a1d1e1269e8fa47093a5742bb5a991beea7c9d2935a04d077aea6`.
+The schemas advance to profile v15 and summary v10; META remains v3.
+
+An independent pre-commit audit found no P0/P1 and found three P2s in the
+initial uncommitted draft: retired weights bypassed predecessor validation,
+terminal arithmetic depended on ambient Decimal state, and the reader did not
+bind positive retirements to a nonempty forced-exit ledger. It also found four
+P3 proof/atomicity issues: staged retirement evidence survived a later plan
+skip, the V14 immutability test was tautological, duplicate V15 test
+parameters existed, and aggregate construction reread terminal equity. All
+seven were corrected before `7dd0443` and have direct regressions. The focused
+V15 runtime, projection, submission, and whole-package no-I/O selection passes
+**463 tests in 79.22 seconds**; focused compileall and `git diff --check` pass.
+Per owner rule, Codex did **not** run the full lane suite.
+
+The next action is a fresh R-170 preregistration and no cloud access before
+its exact source, plan, authority payload, private project name, read rule and
+attempt budget are committed. No leverage, six-universe expansion,
+paper/live deployment, broker, funded account, real order, or trading
+authority follows.

@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–152 retain the milestone, review, preregistration, QC
+strategy. Sections 1–153 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -31,7 +31,9 @@ V14 does not change the order economics: it computes the three proxy
 complements under one explicit exact Decimal context and carries bounded,
 redacted evidence for any decision skipped because a same-session price is
 unavailable. Section 152 records the first R-169 control's pre-network local
-ordering refusal and freezes its `_02` replacement.
+ordering refusal and freezes its `_02` replacement. Section 153 records that
+replacement's authenticated `Completed.` terminal state and freezes the
+separate aggregate-only result-read authority; no result has yet been read.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -448,10 +450,11 @@ The three-attempt V12/V13 sequence for this 2026-YTD order-level goal is
 exhausted: R-166, R-167, and R-168. Section 150 is Claude's independent review
 of `1f47eb3..e38894a`; section 151 completes Codex's counter-review and freezes
 the separately versioned V14/R-169 successor. Section 152 records the first
-control's local pre-network ordering refusal and its replacement. The owner
-explicitly waives Claude review of section 152 before this one R-169 attempt.
-The immediate next step is the one signed R-169 attempt using the exact
-section-152 `_02` plan. It may compute proxy
+control's local pre-network ordering refusal and its replacement. Section 153
+records the authenticated completed run and its separate read authority. The
+owner explicitly waives Claude review of section 153 before the one R-169
+result read. The immediate next step is to sign and consume only the exact
+section-153 aggregate-only authority once. It may compute proxy
 complements independently of ambient Decimal precision and report bounded,
 redacted evidence identifying which session/security caused an unpriced
 decision. It must not relabel a skipped decision complete. Only the resulting
@@ -19797,3 +19800,36 @@ capability, `_02` remains R-169 attempt 1 under the standing three-attempt
 rule. The owner explicitly waived another Claude review before this same-round
 backtest. The next action is to commit this operational correction, sign only
 the exact `_02` payload, and launch it once.
+
+## 153. R-169 completed terminal state and result-read freeze, 2026-09-21
+
+The committed `_02` plan was signed and launched once. Private QC project
+`36788090` compiled the exact fourteen-file projection as
+`48533593cedc07756ae0a7a9662a10de-3cbb5d18d38d25ca73c051b98c60f3ff`
+and created backtest `3767aed670b800f9bd78eb83f2d9545d`.
+The launch-control SHA-256 is
+`a36c7d9bec5c2121222b1d4d47f022e3403339a791730de7c75d8b22315a2da3`;
+the launch-receipt SHA-256 is
+`cb173267833f5f2cd42f7576687d9f5501c26384c1df308de10e5aac753a1b45`.
+The first statistics-disabled poll authenticated terminal `Completed.` in
+receipt SHA-256
+`3b73a95f0cfe2ba1b2d16619a47c9d05a5e9a8418825f7acc5642f86943330b0`.
+No result, statistic, price, return, order, log, chart, or provider/security
+row was selected by the launch or terminal-status path.
+
+R-169 spends **126 -> 127 shared looks / 69 -> 70 ARV2 development
+evaluations**. Infrastructure looks remain **27** and the authenticated-cell
+floor remains **607** until and unless the separately authorized reader
+accepts a valid aggregate.
+
+The exact aggregate-only result-read payload has SHA-256
+`b7f0df6179b7fdee51ea4a3b94f0fa20ac8796f4d42765a8d89b464c91cdda93`.
+It permits one `backtests/read` call for only the two named custom statistics,
+with the V14 META-v3 and summary-v9 field inventories. It excludes standard
+QC statistics, raw logs/orders/charts, raw provider or security rows,
+deployment, broker access, paper/live state, funded accounts, and trading.
+The owner explicitly waived another Claude review before this same-round
+single read. The next action is to commit this terminal state and authority,
+sign the exact payload under `arv2-formal-qc-result-read-v1`, and consume it
+once. Formal admission still requires both parser acceptance and
+`run_valid=true`.

@@ -3807,7 +3807,7 @@ evaluations / 27 infrastructure looks / 608 authenticated cells**. No
 production acceptance, leverage, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
 
-## R-172 — V16 2025-now QQQ order run (TWO RUNTIME ERRORS; FINAL ATTEMPT PREREGISTERED) — 2026-09-21
+## R-172 — V16 2025-now QQQ order run (THREE RUNTIME ERRORS; MIA DIAGNOSIS REQUIRED) — 2026-09-21
 
 R-172 is the unchanged-profile longer-window diagnostic that follows the valid
 R-171 2026-YTD cell. It keeps the exact V16 strategy economics and uses profile
@@ -3870,3 +3870,18 @@ It names private project
 `ARV2 R172A3 QQQ exposure order 2025 now 7803b84f`. A third failure exhausts
 this candidate's launch budget and requires Mia or owner diagnosis rather than
 a fourth relaunch.
+
+Attempt 3 compiled the same source in project `36790168` and created backtest
+`4d357d28e8c69ba197d6977f0fe7afeb`. Its first statistics-disabled terminal
+poll authenticated `Runtime Error`; terminal-receipt SHA-256 is
+`63457a059da07e874072d2629735d0a5d39708e6d103ce220ecd50c8971cccad`.
+No result, statistic, error log, order/fill, chart, return, or signal outcome
+was read. R-172 closes at **132 shared looks / 75 ARV2 development evaluations
+/ 27 infrastructure looks / 608 authenticated cells** and zero new cells.
+
+The three-attempt budget is exhausted. Codex attempted the standing Mia
+recovery path, but the authenticated native QuantConnect browser was
+unavailable while the Mac was locked and the controllable browser was logged
+out. No fourth run is permitted. This is a technical runtime refusal, not an
+economic strategy result; Mia diagnosis and prospective correction are
+required before any successor launch.

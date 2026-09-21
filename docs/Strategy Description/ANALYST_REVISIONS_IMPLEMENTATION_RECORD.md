@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–162 retain the milestone, review, preregistration, QC
+strategy. Sections 1–163 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -57,6 +57,9 @@ state, with no result or log read, and freezes the unchanged-source attempt-2
 replacement before another launch.
 Section 162 records attempt 2's identical terminal refusal and freezes the
 unchanged-source third and final permitted attempt before launch.
+Section 163 records the third identical refusal, exhausts the R-172 launch
+budget, and hands the existing project to Mia diagnosis; Codex could not open
+that authenticated assistant because the Mac was locked.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -484,14 +487,16 @@ authority was rendered. Section 157 freezes the separately versioned V16/R-171
 producer correction and exact preregistration. Section 158 records the
 authenticated completed run and separate result authority; section 159 records
 its accepted one-use read. Section 160 freezes the unchanged V16 2025-now
-profile as the fresh R-172 production plan. Sections 161–162 record two
+profile as the fresh R-172 production plan. Sections 161–163 record three
 byte-identical attempts ending in the same statistics-disabled `Runtime Error`
-without reading an error log or result, then freeze the same-source `_03` plan
-as the third and final permitted attempt. The owner explicitly waives Claude
-review of section 162 before this same-round final attempt. The immediate next
-step is to sign only the exact `_03` execution-authority payload, launch
-attempt 3 once, and inspect only statistics-disabled terminal status. Only
-authenticated `Completed.` may be followed by a separately
+without reading an error log or result. The R-172 launch budget is exhausted;
+there must be no fourth attempt. The owner explicitly waives Claude review of
+section 163 before the standing Mia recovery step. The immediate next step is
+for the owner to unlock the Mac, after which Codex can ask Mia to diagnose the
+existing attempt-3 project `36790168`; alternatively the owner may run Mia and
+return its findings and corrections. Only a prospectively documented,
+corrected successor may launch after diagnosis. Only authenticated
+`Completed.` may be followed by a separately
 rendered, committed, signed, and consumed one-use aggregate-only result
 authority. V15
 and R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
@@ -20343,3 +20348,40 @@ only if its authenticated interface is directly controllable, otherwise stop
 for the owner. The owner explicitly waives another Claude review before this
 same-round final attempt. The next action is to commit this record and exact
 plan, sign only the `_03` payload, and launch once.
+
+## 163. R-172 three-attempt exhaustion and Mia handoff, 2026-09-21
+
+Attempt 3 compiled the same 16-file projection in private project `36790168`
+as `47bb15275563c268fb6b92746cdabfda-928a7a9d87654efed977e240dc9398c6`
+and created backtest `4d357d28e8c69ba197d6977f0fe7afeb`. Launch-control
+SHA-256 is
+`a0ec98778316aebcea1d0f11b9272163f5584f0f0c56db403c0328e41aabd4ba`;
+launch-receipt SHA-256 is
+`b2319e5a8574f08db139af989764710ef31edaf4fee7313f1d26aa7e4e15bedb`.
+The first statistics-disabled poll authenticated the third `Runtime Error`,
+with terminal-receipt SHA-256
+`63457a059da07e874072d2629735d0a5d39708e6d103ce220ecd50c8971cccad`.
+No result, statistic, raw error log, order/fill, chart, price,
+provider/security row, return, or signal outcome was selected. Attempt 3
+spends **131 -> 132 shared looks / 74 -> 75 ARV2 development evaluations**,
+adds zero cells, and closes at **27 infrastructure looks / 608 authenticated
+cells**.
+
+The machine-wide three-attempt limit is exhausted for this distinct candidate;
+Codex must not launch a fourth copy. In accordance with the owner's recovery
+rule, Codex attempted to open project `36790168` in QuantConnect's built-in Mia
+assistant. The authenticated native browser could not be controlled because
+the Mac was locked, while the controllable in-app browser was logged out. No
+login, credential, result, log, code, or assistant message was transmitted or
+read. Mia is therefore unavailable to Codex until the owner unlocks the Mac,
+or the owner may run Mia directly and return its exact diagnosis and cloud
+changes.
+
+The three identical terminal outcomes establish only a deterministic runtime
+failure for this 2025-now construction; they provide no economic evidence and
+must not be interpreted as a negative strategy result. The next permitted
+action is Mia diagnosis of the existing attempt-3 project, followed by local
+comparison and documentation of any correction. Only then may a fresh,
+prospectively versioned candidate receive a new launch budget. No result read,
+parameter tuning, leverage, six-universe expansion, deployment, broker,
+paper/live, funded-account, real-order, or trading authority follows.

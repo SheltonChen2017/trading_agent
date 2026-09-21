@@ -517,6 +517,36 @@ def test_v10_result_parser_accepts_complete_high_precision_aggregate(tmp_path):
     )
 
 
+def test_v10_result_hashes_stored_aggregate_text_not_json_quoted_string(tmp_path):
+    plan = _plan(tmp_path, runtime.TICKET_PROFILE_2026_ID)
+    statistics = _high_precision_statistics(plan)
+    stored_text = statistics[runtime.AGGREGATES_STATISTIC_NAME]
+    stored_bytes = stored_text.encode("ascii")
+    meta = json.loads(statistics[runtime.META_STATISTIC_NAME])
+    assert len(stored_bytes) >= 4764
+    assert meta["aggregates_sha256"] == hashlib.sha256(stored_bytes).hexdigest()
+    assert meta["aggregates_sha256"] != hashlib.sha256(
+        _canonical(stored_text)
+    ).hexdigest()
+
+    launch, response = _result_response(plan, statistics)
+    assert adapter._parse_result(response, plan, launch) == tuple(
+        sorted(statistics.items())
+    )
+
+    aggregate = json.loads(stored_text)
+    aggregate["order_lifecycle_sha256"] = "a" * 64
+    statistics[runtime.AGGREGATES_STATISTIC_NAME] = _canonical(aggregate).decode(
+        "ascii"
+    )
+    launch, response = _result_response(plan, statistics)
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="^order-level aggregate digest changed$",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
 def test_legacy_result_parser_retains_4096_byte_bound(tmp_path):
     plan = _plan(tmp_path, runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID)
     statistics = _high_precision_statistics(plan)

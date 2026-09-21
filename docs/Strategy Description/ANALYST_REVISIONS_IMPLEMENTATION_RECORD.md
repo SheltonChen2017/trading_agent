@@ -1,20 +1,31 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–136 retain the milestone, review, preregistration, QC
+strategy. Sections 1–142 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-137 include sequential
 order-level diagnostics and technical or coverage refusals; the latest,
 R-137, produced zero economic cells, and contingent R-138 was not launched.
 No completed order-level return or formal alpha verdict follows from these
-attempts. The owner is currently debugging the QC project and has paused
-Codex's local code and QC actions pending the finding. Once supplied,
-document the exact error and its disposition before any new prospective
-source or physical plan. Use focused checks during development; run the
-complete lane suite only immediately before a push or on the owner's
-explicit request. Real orders, paper/live deployment, funded accounts,
-broker access, and trading remain unauthorized.**
+attempts. Section 137 records the owner's later cloud diagnosis and a
+separate `Completed.` status, neither of which is an authenticated order-level
+aggregate or a return estimate. Section 138 records eight recoverably
+recycled failed-only QC projects, with the owner-edited R-133 and the
+completed-run project preserved. A new order-based run needs a distinct
+prospective plan, and existing-project reuse is blocked by QC's
+`codeRunning=True` flag and the current signed fresh-project path. Section
+139 records a focused-tested local V10 successor, not a new QC result;
+section 140 records the owner's R-133 enum-diagnostic correction. Section 141
+records the read-only QC 79 source comparison and accepted/rejected cloud
+edits. Section 142 records the completed QC 81 current-source comparison,
+the byte-bound and stored-text digest faults, and the separately reconciled
+R-152–R-165 runs. R-164 and R-165 have verified `Completed.` terminal
+states, but no source-bound, authenticated result cell or formal alpha verdict.
+Use focused checks during development; run the complete lane suite only
+immediately before a push or on the owner's explicit request. Real orders,
+paper/live deployment, funded accounts, broker access, and trading remain
+unauthorized.**
 
 Branch: `codex/strategy-analyst-revisions-v2`
 
@@ -412,27 +423,44 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-The owner is debugging QuantConnect independently. Codex has paused local
-code changes and QC actions and will wait for the owner's finding. On receipt,
-record the exact observed error, source/run identity and evidence limits in
-the lane record; add a shared-look ledger entry only if an actual QC run or
-result read requires one. Do not import Mia's edited cloud source into a
-preregistered lane result without authenticating its identity.
+The owner's later cloud diagnosis and current source readback are recorded in
+section 137; the cleanup and reuse gate are in section 138. The `Completed.`
+status on the separate cloud run is not an
+authenticated aggregate result or an authorization to treat its reported
+metrics as a lane cell. The local order-event/transport correction at
+`fb3bc47` is committed and focused-tested but unreviewed and unlaunched;
+section 139 records its exact scope. The owner's enum-introspection finding
+is recorded in section 140 and does not change the pinned order-status map.
+The exact current QC 79 source comparison and non-ported shims are recorded
+in section 141. Section 142 records the owner-completed QC 81 source
+comparison, its sequential byte-bound and digest repairs, and the separate
+R-152–R-165 run inventory. The current cloud source is mutable and does not
+authenticate the historical source of any of those runs. Local V10 already
+has an 8,192-byte generated-main override and a result parser that hashes
+canonical aggregate bytes; its new focused regression distinguishes that
+digest from a JSON-quoted string digest. QC 81's broader status, cash,
+delisting, and third-statistic changes are not silently ported. The owner's
+V11 enum-bridge successor must also preserve V10's exact 2,048-byte required
+source margin; §142 records that the current projection has no discretionary
+growth above it. The owner's current sequence explicitly calls for a
+correction commit/push, subsequent order-based tests without an intervening
+Claude review, then a full lane suite and final results push. That two-push
+exception applies only to this owner-directed round. Authenticate the
+prospective source, complete independent audit, then
+freeze a distinct physical one-use plan before any new QC launch or signed
+aggregate read. Do not import manual cloud shims merely because a cloud run
+completed.
 
-Section 136 is the latest numbered record: R-137 stopped with an
-unknown-order technical refusal and **zero economic cells**. R-138 remains
-unlaunched and unspent. R-131 through R-138 are not retry permissions.
-The paused local order-event correction candidate is uncommitted, unreviewed,
-and unlaunched. A fresh QC attempt requires a distinct source version,
-focused regression evidence, independent audit, physical preregistration,
-and the exact authority/one-use gates. No order-level return estimate,
+R-137 stopped with an unknown-order technical refusal and **zero economic
+cells**; contingent R-138 remains unlaunched and unspent. R-131 through R-138
+are not retry permissions. No authenticated order-level return estimate,
 formal alpha acceptance, leverage, six-universe expansion, real order,
 paper/live deployment, funded-account, broker, or trading authority follows.
 
 During development and QC diagnosis, use only relevant focused checks.
 The complete Analyst V2 lane suite runs only immediately before the round's
-single push or when the owner explicitly requests it. Claude will review
-section 136 and the final cumulative pushed snapshot; no intermediate
+final results push or when the owner explicitly requests it. Claude will review
+section 142 and the final cumulative pushed snapshot; no intermediate
 unreviewed QC experiment becomes accepted evidence merely by completing.
 
 Historical review-timing exceptions are recorded here so this live handoff
@@ -448,11 +476,12 @@ waiver of independent review or a new launch authorization:
 | 121–125 and 130 | Deferred review of these sections to the single final pushed snapshot. | Still pending. |
 
 The owner explicitly waives Claude review of section 136 only before the
-continuing bounded QC-correction round; the current owner-led debugging
-pauses Codex QC action. That narrow interim waiver does not cancel Claude's
+continuing bounded QC-correction round; existing-project reuse is now
+blocked by the project-running flag and the current fresh-project contract.
+That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–136
+findings, outcomes, and per-run accounting remain in numbered sections 1–142
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -18853,3 +18882,278 @@ looks**. R-138 is superseded unlaunched/unspent because its first usable-cell
 contingency failed. There is no successful order-level return result in this
 sequence and no authority for a same-plan retry, six-universe/leverage run,
 paper/live deployment, broker action, funded order, or real trading.
+
+## 137. Owner cloud diagnosis, transport bound, and look reconciliation, 2026-09-19
+
+After section 136, the owner investigated the separate QC project `36718956`.
+The owner reported that its backtest `e3219152633f0139c2f0209dc447fd99`
+failed because the order-level aggregate custom statistic was **4,764 bytes**
+while the local runtime guarded it at **4,096 bytes**. This is a local
+transport-bound refusal, not evidence that QC itself limits a custom
+statistic to 4,096 bytes, and not an analyst-signal return estimate. The
+owner then reported raising that guard to **8,192 bytes** in cloud
+`main.py`; the later backtest `94e317bafa1edc27b353da4cd83d5098` has
+terminal status `Completed.`. A read-only observation of the **current**
+cloud `main.py` has SHA-256
+`56b871b3d951ef05649d804c389ae68bab305a96d91462d86ab16e7e4bbe41d8`.
+That present-tense source readback does not prove the exact source bytes
+executed by either historical backtest, nor that the 8,192-byte change was
+the only cloud edit. Other manual cloud shims are present and are deliberately
+**not** ported into the lane by inference. No separately signed,
+lane-authenticated two-statistic aggregate, order/fill receipt, or return
+cell has been admitted from the `Completed.` run. Its status is a useful
+technical diagnostic only; section 136's zero-cell R-137 disposition remains
+unchanged.
+
+The read-only QC inventory identified **13 distinct backtests after the
+latest shared-ledger row**. The active `docs/research/alpha-result.md` ledger
+now records their exact IDs as R-139–R-151 and conservatively counts each as
+one development evaluation, not a valid alpha cell: **96 -> 109 shared
+looks, 39 -> 52 ARV2 development evaluations, 27 infrastructure looks and
+607 authenticated cells unchanged**. No retrospective per-run source
+authentication or outcome-gate approval is implied.
+
+The owner-designated cleanup candidates are QC project IDs `36714332`,
+`36714714`, `36714951`, `36715111`, `36715522`, `36718112`, `36719419`,
+`36720078`, and `36720686`. These are a **candidate inventory**, not a
+deletion record: verify each project's current name, runs, and retention
+need before the owner-authorized recoverable cleanup; retain the diagnostic
+project `36718956`. No project deletion is claimed here.
+
+The selected next diagnostic remains an **order-based simulated QC
+backtest**, not a mark-only substitute, paper account, or live order. Before
+another launch, the local 8,192-byte transport successor must be tested and
+audited with its distinct source/profile/version and exact aggregate field
+inventory; authenticate cloud-versus-local bytes and each run's source
+lineage prospectively; then commit and physically preregister a fresh
+one-use plan. The
+superseded R-138 plan and the manually edited `Completed.` run grant no retry
+or result-read authority. Continue to exclude raw provider/security rows,
+QC orders/fills/logs/charts, deployment, broker, paper/live, funded-account,
+real-order, and trading access.
+
+## 138. Eight failed-only QC projects recoverably recycled; existing-project reuse remains closed, 2026-09-19
+
+The owner directed a QC cleanup before the final lane validation and push,
+with failed runs corrected in an existing project where safe. Fresh read-only
+preflight checked exact ID/name/owner/organization, `codeRunning=False`, and
+one terminal `Runtime Error` backtest for each of eight standalone projects.
+The QC `projects/delete` endpoint moved exactly these eight IDs to the
+**recoverable Recycle Bin**; a post-read verified each same project ID under
+`Recycle Bin/...`: `36714332` (R-119), `36714714` (R-121), `36714951`
+(R-123), `36715111` (R-125), `36715522` (R-127), `36718112` (R-129),
+`36720078` (R-135), and `36720686` (R-137). None was permanently purged.
+QuantConnect [documents 30-day recovery](https://www.quantconnect.com/docs/v2/cloud-platform/projects/getting-started).
+Project `36719419` (R-133) was **not** touched because its project-level
+`codeRunning=True` and the owner is editing it. Project `36718956` contains
+the completed owner-assisted run and was preserved.
+
+The existing project `36718956` also reports `codeRunning=True` despite
+its latest backtest having `Completed.` status. QC's
+[Read Project API](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/project-management/read-project)
+does not equate a terminal backtest with an idle project; the current lane
+private-owner guard requires `codeRunning=False`, and the signed order-level
+adapter currently creates a fresh project and refuses an exact existing-name
+collision. Backtest-list status alone is not atomic proof that this project
+can be overwritten. Do not bypass the flag, reuse an old signature/one-use
+plan, or create a replacement project contrary to the owner's stated
+existing-project preference. A fresh exact source/profile/plan/result
+identity and an explicit resolution of the reuse-versus-new-project choice
+are prerequisites to the next QC launch. This cleanup did not create any
+new research look or change the shared look accounting.
+
+## 139. V10 exact-aggregate transport and ticket-stage successor (LOCAL ONLY), 2026-09-19
+
+Commit `fb3bc47` carries the lane-specific successor to R-137's technical
+refusals. It stages synchronous QC MOO callbacks until the returned ticket
+identity has been registered, with exact order-ID checks and fail-closed
+replay. Only V10's generated `main.py` raises the order runtime's own
+`MAXIMUM_STATISTIC_BYTES` from 4,096 to 8,192; the imported runtime file
+retains its 4,096 default and older profiles retain their exact cap and
+hashes. The V10 result parser and separately signed result-read candidate
+bind the matching 8,192-byte cap. Neither exact decimal precision nor
+aggregate fields/digests are reduced to fit. A complete high-precision
+4,880-byte fixture passes V10, is refused by V9, and an 8,193-byte value is
+refused; the generated main import observes the V10-only override. These
+local changes reproduce only the owner's measured transport-bound repair,
+not the cloud status, dividend, delisting, or finalization shims.
+
+Focused order-level projection/submission/runtime selection: **312 passed**;
+lane-record and root active-document gates: **75 passed** after the section
+138 handoff correction. Targeted compilation and diff check were clean at
+the code commit. The complete lane suite is reserved for immediately before
+the round's single push. No QC compile/backtest/result read, new alpha cell,
+or new look was caused by `fb3bc47`. A distinct prospective signed plan and
+project decision remain prerequisites; do not reinterpret R-151's mutable
+cloud project as V10 source provenance.
+
+## 140. Owner R-133 QC enum introspection correction (DIAGNOSTIC ONLY), 2026-09-19
+
+The owner reports that two notebook attempts to enumerate `OrderStatus`
+with Python class-level `getattr` raised `TypeError` under Python.NET. A
+subsequent diagnostic using .NET `System.Enum.GetNames/GetValues` completed
+and returned exactly nine members: `New=0`, `Submitted=1`,
+`PartiallyFilled=2`, `Filled=3`, `Canceled=5`, `None=6`, `Invalid=7`,
+`CancelPending=8`, `UpdateSubmitted=9`; this engine has no status 4. The
+owner retained the notebook cell as evidence. Local source inspection
+confirms that `accepted_risk_order_level_core.py`'s
+`QC_NUMERIC_ORDER_STATUSES` matches all nine reported numeric/name pairs,
+including `Canceled=5`. No algorithm mapping change is indicated. This
+corrects the **enum-inspection diagnostic**, not R-133's original terminal
+`Runtime Error`, and does not establish a completed or usable R-133
+backtest. No new backtest identity, outcome read, research cell, or project
+mutation by Codex is claimed; the owner is editing R-133's project, which
+remains excluded from cleanup.
+
+## 141. QC 79 current-source audit and selective local port (SOURCE ONLY), 2026-09-19
+
+At the owner's request, Codex read **only the current ten source files** of
+private QC project `36718956` (`79 ARV2_QQQ_PREOPEN_ORDER_R131_2026_YTD -
+20260918`) and compared them with the original R-131 projection and the
+local V10 successor at `fb3bc47`. No result, log, chart, order, provider row,
+backtest launch, or project edit was involved. The current cloud source has
+ten files / **287,452 bytes**; a previously recorded source-inventory SHA-256
+(its serialization method was not retained, so it is **not comparable** to
+the explicit two-project manifest in §142) is
+`5badaae44b5d7ef739eb1118ee206c50d0fd73ad444e62a96a189b32e2593851`.
+The current cloud `main.py` is 9,512 bytes / SHA-256
+`56b871b3d951ef05649d804c389ae68bab305a96d91462d86ab16e7e4bbe41d8`;
+the original generated R-131 `main.py` was 3,995 bytes / SHA-256
+`74a2aa64d656972b3189d2dc93057bd4efd3398542a789dd051689d9c464d26f`.
+The cloud runtime remains the original R-131 runtime, not V10. Its core has
+one additional diagnostic that interpolates raw planned/observed cash and
+quantity changes into an error; that disclosure is **not** ported.
+
+| Current QC 79 `main.py` edit | Local disposition |
+| --- | --- |
+| Raise its own aggregate statistic guard from 4,096 to 8,192 bytes | **Ported selectively** in `fb3bc47`: only V10's generated main gets the 8,192 override; parser and separate result authority bind the same cap. Older profiles keep 4,096. No decimal, digest, or schema truncation. |
+| Convert arbitrary status text to a title-cased canonical form | **Not ported.** It patches old R-131 status handling and weakens the V10 exact enum boundary. The owner's separate Python.NET enum-access observation remains an unverified V10 compatibility risk; its nine-value numeric map is correct, but direct class-member access has not been proven in QC. |
+| Subtract observed dividend cash only inside the pre-open equality check | **Not ported.** It can make the check pass while planned cash and order sizing remain inconsistent with the actual portfolio. V10's existing cash-increase replan and holdings census are the lane's current rule. |
+| Finalize at final-session after-close +5 minutes and suppress a later duplicate engine end callback | **Candidate only.** This could avoid a final-date engine-callback mismatch, but no exact-session/complete-order/idempotency proof exists yet. The current local finalization guard remains unchanged. |
+| Ignore events tagged `Liquidate from delisting` | **Rejected for formal evidence.** Such an engine liquidation changes the account; suppressing it would omit a real fill from the order ledger. The local unknown-order refusal remains. A separate forced-exit accounting policy would require a new profile and tests. |
+
+The `Completed.` state of R-151 does not authenticate its historical source
+bytes, nor validate the cloud shims as strategy economics. Project 79 was not
+modified by this audit; QC 81 was still under owner edit and was not touched
+at that time. The
+source read adds **zero** research looks/cells. Focused V10 ticket-property
+regressions were added locally to pin unreadable/mismatched ticket identity
+and staging cleanup; the runtime test file passed **114 tests**. Those tests
+do not establish QuantConnect compatibility or a new backtest result.
+
+## 142. QC 81 source comparison, sequential statistic repairs, and owner-run reconciliation, 2026-09-20
+
+After the owner reported R-133's QC project fixed, Codex read only the
+**current source** of private project `36719419` (`81
+ARV2_QQQ_NUMERIC_ORDER_R133_2026_YTD - 20260918`) and a statistics-disabled
+inventory of its backtest IDs and terminal states. This source was compared
+with current project 79 (§141) and the local V10 projection at `fb3bc47`;
+it was not copied wholesale, uploaded, or run by Codex. QC 81 currently has
+**12 source files**, including a newly split
+`accepted_risk_qqq_order_level_qc_summary.py` and `mia.ipynb`, versus the
+local V10 ten-file projection. A comparable inventory was constructed as
+follows.
+
+For a **new, reproducible cross-project inventory**, each source record is
+`{"path": name, "byte_count": len(UTF-8 bytes), "sha256": SHA-256(UTF-8
+bytes)}`; the records are sorted by `path`, serialized as ASCII JSON with
+sorted keys and no spaces, and SHA-256 hashed. Two stable read passes gave
+QC 79: **10 files / 287,452 source bytes / 1,440 manifest bytes / digest
+`6a00837266b98e863ed0cf5ff2e42ed4579bbd46fc51cdd668b196893275f4a4`**;
+QC 81: **12 files / 301,736 source bytes / 1,705 manifest bytes / digest
+`556d3fc58ad47bb6fac00743801ff42a8df0fbb2ea65774ef7fbf3685198f6cd`**.
+The older QC 79 digest in §141 is preserved as historical documentation,
+but its unrecorded serialization makes it unsuitable for this comparison.
+
+Selected present-tense cloud file readbacks are:
+
+| QC 81 file | Bytes | SHA-256 |
+| --- | ---: | --- |
+| `main.py` | 3,995 | `0d94133f5ff52a437ce88f58ce004d1f264121c94de55479dc1180fb12e62c97` |
+| `accepted_risk_qqq_order_level_qc_runtime.py` | 53,712 | `5ec8b72452dff509304e2cccd620c8c926ba748df338718983a83e112ddbc3c7` |
+| `accepted_risk_order_level_core.py` | 35,131 | `dd83261468d606a48f10d78c9cc2c6d48626ad5751b8e1225b93fad788ed696b` |
+| `accepted_risk_qqq_order_level_qc_summary.py` | 21,095 | `6654ce7e60cf5cefa0d30764ca54d3a7ee56bff15cf17160b916eda322dae99e` |
+| `mia.ipynb` | 4,013 | `e0a4a600040398fe826e621119bdf98a7d2329d89b9e1257c6c955bdfad238b3` |
+
+These are **current mutable project bytes**, not immutable source receipts
+for R-152–R-165. In particular, two `Completed.` run statuses do not prove
+which intermediate cloud edits each run executed, that its stored custom
+statistics render in full in the results viewer, or that its account
+economics conform to the frozen local strategy.
+
+The owner's diagnostic identified two **sequential** lane-specific faults.
+First, a canonical aggregate payload measured **4,764 ASCII bytes**, while
+the runtime's own `MAXIMUM_STATISTIC_BYTES` refused values above **4,096**;
+this was a self-imposed transport guard, not a measured QC platform maximum.
+The owner raised the current QC 81 runtime constant to **8,192**, with
+notebook boundary checks accepting 4,764 and 8,192 inclusive and refusing
+8,193. Local V10 independently accommodates 8,192 only in its generated
+`main.py` and matching result authority; older profiles and the imported
+runtime's 4,096 default remain unchanged (§139). It does not reduce Decimal
+precision, truncate digests, or delete schema fields to fit.
+
+Passing that first guard exposed a previously unreachable check in QC 81's
+split summary module: `_sha(aggregates)` hashes the canonical JSON text of
+the aggregate object, but `_sha(stored[AGGREGATES_STATISTIC_NAME])` first
+JSON-quotes and escapes the stored **string**. The two byte sequences differ,
+so the equality was unsatisfiable even for intact output. The current cloud
+summary instead checks
+`hashlib.sha256(stored[AGGREGATES_STATISTIC_NAME].encode("ascii")).hexdigest()`
+against the meta digest; its `hashlib` binding follows that module's runtime
+binding idiom. The prior per-key stored-text read-back check was unchanged.
+Local V10 has **no** corresponding split summary module or unsatisfiable
+producer-side stored-string comparison: its strict result parser admits
+only exact canonical ASCII JSON bytes and compares the metadata digest with
+SHA-256 of those aggregate bytes. A focused local regression now accepts a
+high-precision aggregate above 4,764 bytes, distinguishes the correct raw
+ASCII digest from the JSON-quoted-string digest, and refuses tampering. This
+is a narrow proof of the local parser invariant, not a claim that QC 81's
+additional module was imported or that a historical run used V10.
+
+The source comparison also found **substantive non-ports**. QC 81 adds a
+third `AUDIT` custom statistic, while local V10 binds exactly the two
+`META` and `AGGREGATES` names and their signed inventory; accepting a third
+would change the result contract. QC 81's broad status-string conversion
+accepts more Python/.NET values than the local exact-enum policy, even though
+the pinned nine numeric values match the owner's reflection diagnostic in
+§140. Its altered overnight-cash tolerance, engine-liquidation quantity
+adjustments, delisted-intent removal/re-freezing, and extra FIGI/SID lookup
+would change accounting or identity policy and need independent economic,
+source, and regression review. They are **not** transplanted on the strength
+of `Completed.` alone. The local class-member `getattr`/Python.NET
+compatibility concern remains open; a safe bridge should authenticate the
+exact nine .NET enum names/values and type before admitting an event, not
+normalize arbitrary text. It also cannot be appended without a source-budget
+decision: the exact current local V10 projected 2026 source, rendered with a
+72-byte activation key, is **285,952 bytes**, leaving exactly the enforced
+**2,048-byte required margin** below the 288,000-byte cap and therefore
+**zero discretionary growth above that margin**. Value-free inspection found
+the same 72-byte activation-key length in both current QC projects. A V11
+enum bridge must preserve the margin through a reviewed refactor or safe
+source split; it must not trim guards or silently overrun the projection cap.
+Project 79's dividend, finalization, and delisting shims remain disposed as
+in §141.
+
+The statistics-disabled inventory verified **14 additional** QC 81 runs
+after R-133: R-152–R-163 are `Runtime Error`; R-164
+`bdf6f0e7806e88a81735094266295104` and R-165
+`e6102250174c63e01960de58f24e158b` are `Completed.`. The active shared
+ledger records every exact ID and conservatively charges **109 -> 123
+shared looks / 52 -> 66 ARV2 development evaluations**, with **27
+infrastructure looks and 607 authenticated cells unchanged**. The owner
+reports that both completed runs showed 16.824% net profit, 2,456 filled
+orders and no runtime/mismatch errors. Codex verified their terminal states,
+**not** those statistics, fills, logs, aggregate read-back, or historical
+source binding; these remain owner-observed diagnostics, not formal alpha
+cells. The source/inventory reads themselves spent no additional looks.
+
+Prevention rule for the next candidate: test measured full-size canonical
+payloads at 4,764, 8,192, and 8,193 bytes; test the producer's stored ASCII
+text against its raw-byte SHA-256 as well as the consumer's canonical parser;
+show red/green refusal for a double-encoded digest and a tampered aggregate;
+exercise downstream checks after an earlier refusal has been fixed; and
+pin the exact statistic-name inventory and source/version/plan/run receipts
+**prospectively**. A green compile or one `Completed.` cloud status cannot
+replace those checks. No new QC launch, outcome/statistic/detailed-result
+read, paper/live deployment, broker access, funded order, or trading was
+performed by this source audit.

@@ -3406,3 +3406,91 @@ evaluations** and adds **zero cells**, leaving **607 cells / 27 infrastructure
 looks**. R-138 is superseded unlaunched/unspent because the first usable
 aggregate was not produced. No order-level, 2025-now, six-universe, or
 leveraged result follows this technical refusal.
+
+## R-139–R-151 — owner-assisted QC order-debug runs in the existing R-131 project (RECONCILED; NO AUTHENTICATED RESULT CELL) — 2026-09-19
+
+An inventory-only check of private project `36718956` (`79
+ARV2_QQQ_PREOPEN_ORDER_R131_2026_YTD - 20260918`) found the already-recorded
+R-131 run plus **13 additional** 2026-09-19 backtests. These are separate
+research looks, not retries of R-131 and not retrospective authorizations of
+its signed source. In creation order, the additional exact run IDs and
+terminal states are:
+
+| Record | QC backtest ID | Terminal state |
+| --- | --- | --- |
+| R-139 | `7f539f16c8eaccba4fea6bc56b439404` | Runtime Error |
+| R-140 | `e8811688dd90e3a4a5c1bf520f9f0697` | Runtime Error |
+| R-141 | `e560fc6ca3ceabeb085f972d38c7a4b1` | Runtime Error |
+| R-142 | `6d51d70afa04e2c5f1d3a85183cc099f` | Runtime Error |
+| R-143 | `af275bfd2630f819b953569d3449bf63` | Runtime Error |
+| R-144 | `bbddb96b80a553c8eb5c5dfec3caf953` | Runtime Error |
+| R-145 | `7b108aa1bfadb441fb2da0f21f95dfab` | Runtime Error |
+| R-146 | `64059d74b526debb2277e57774080278` | Runtime Error |
+| R-147 | `fa37decc2fc18953a2f135e0aa840743` | Runtime Error |
+| R-148 | `1c7cba85b1ef27c8df3f33c17f056cda` | Runtime Error |
+| R-149 | `d3e36cdedae5000b540a27cd6e1788ab` | Runtime Error |
+| R-150 | `e3219152633f0139c2f0209dc447fd99` | Runtime Error |
+| R-151 | `94e317bafa1edc27b353da4cd83d5098` | Completed. |
+
+The owner reports that R-150 measured a 4,764-byte exact aggregate against
+the order runtime's self-imposed 4,096-byte statistic limit, and R-151
+completed after a cloud `main.py` patch raised that limit to 8,192. The
+metadata check verifies the two terminal states and the *current mutable*
+cloud source patch, not source provenance for either historical run. The owner
+reported R-151 net profit 16.824%, Sharpe 0.76, Sortino 1.011, drawdown
+11.6%, 2,456 orders, and $3,570.65 fees. No authenticated aggregate/result
+readback, full stored-statistic rendering, source-bound execution receipt, or
+formal outcome gate supports an ARV2 result claim yet; those figures are
+owner-observed diagnostics only. The cloud source also contains distinct
+status, dividend, delisting, and finalization shims that are **not** accepted
+as lane corrections by this accounting entry.
+
+Conservatively count all 13 as development evaluations: **96 -> 109 shared
+looks; 39 -> 52 ARV2 development evaluations; 27 infrastructure looks and
+607 authenticated cells unchanged.** R-138 remains unspent. A new order-based
+test needs a prospective, distinct source/plan/authority and result identity;
+neither a mutable cloud project nor this accounting supplies one retroactively.
+
+## R-152–R-165 — owner-assisted QC 81 order-debug runs (RECONCILED; NO AUTHENTICATED RESULT CELL) — 2026-09-20
+
+The owner edited private QC project `36719419` (`81
+ARV2_QQQ_NUMERIC_ORDER_R133_2026_YTD - 20260918`) in the browser. A
+statistics-disabled backtest inventory found its previously recorded R-133
+run plus **14 distinct later runs**. These are not R-133 retries under its
+one-use authority and cannot be retrospectively promoted to V10 results.
+In QC creation order:
+
+| Record | Exact backtest ID | Terminal metadata |
+| --- | --- | --- |
+| R-152 | `0b152a5fb681c02a128aa81468c319cd` | Runtime Error |
+| R-153 | `894a7fccb76766a6b80a13b0dbf08337` | Runtime Error |
+| R-154 | `205036a5dd527b70c451158929ab8d54` | Runtime Error |
+| R-155 | `6ec22972549f14943e488ba5147adfaf` | Runtime Error |
+| R-156 | `752500b061cb4ce58d9294b80ed1855a` | Runtime Error |
+| R-157 | `4ef2cb19391841523f40aaa458f2d856` | Runtime Error |
+| R-158 | `9b94d0b688de4edb38b3e6a4ed84fa4d` | Runtime Error |
+| R-159 | `179c3cd39c2e73b9cf1c1748e5f9cd39` | Runtime Error |
+| R-160 | `0bf3fce8fca9eb55a4f3be21d1daf4c3` | Runtime Error |
+| R-161 | `82b769fa2295a4ba9fa809931f6d22db` | Runtime Error |
+| R-162 | `a1ae2ff42a4a5a4bb6853c14facd9be1` | Runtime Error |
+| R-163 | `a68cc96d57b82c40e191d7c0bdaca847` | Runtime Error |
+| R-164 | `bdf6f0e7806e88a81735094266295104` | Completed. |
+| R-165 | `e6102250174c63e01960de58f24e158b` | Completed. |
+
+The owner reports that R-163 exposed a 4,764-byte aggregate against the
+runtime's own 4,096-byte statistic cap; raising it to 8,192 let execution
+reach a second bug. The cloud `accepted_risk_qqq_order_level_qc_summary.py`
+had compared `_sha(aggregates)` with `_sha(stored_aggregate_text)`, which
+JSON-quotes the text and makes the equality impossible. Its corrected
+read-back compares the meta digest with SHA-256 of the stored text's exact
+ASCII bytes. The owner reports two later runs with identical 16.824% net
+profit, 2,456 filled orders, and no runtime/mismatch log entries. Our
+read-only check independently verifies **only terminal identities/statuses**,
+not those values, all-fill state, complete stored-statistic readback, or
+historical source bytes. The mutable QC 81 source contains other substantive
+cash/delisting changes; a `Completed.` state is not a formal alpha gate.
+
+Count all 14 conservatively as development evaluations: **109 -> 123 shared
+looks; 52 -> 66 ARV2 development evaluations; 27 infrastructure looks and
+607 authenticated cells unchanged**. No new provider, broker, paper/live,
+funded-account, real-order, or trading authority follows.

@@ -1066,9 +1066,19 @@ def test_v10_end_callback_reads_8192_byte_main_level_transport_override(
         assert algorithm.summary_statistics == {}
     else:
         value.on_end_of_algorithm()
-        assert len(algorithm.summary_statistics[
+        stored_text = algorithm.summary_statistics[
             runtime.AGGREGATES_STATISTIC_NAME
-        ].encode("ascii")) == aggregate_bytes
+        ]
+        assert len(stored_text.encode("ascii")) == aggregate_bytes
+        stored_meta = json.loads(
+            algorithm.summary_statistics[runtime.META_STATISTIC_NAME]
+        )
+        assert stored_meta["aggregates_sha256"] == hashlib.sha256(
+            stored_text.encode("ascii")
+        ).hexdigest()
+        assert stored_meta["aggregates_sha256"] != hashlib.sha256(
+            runtime._canonical(stored_text)
+        ).hexdigest()
         assert value._completed is True
 
 
@@ -1824,6 +1834,69 @@ def test_ticket_identity_callback_is_staged_until_registration():
     assert tuple(item.status for item in value._open_plan_events) == ("Filled",)
     assert value._pending_submission_events is None
     assert value._pending_submission_event_keys is None
+
+
+@pytest.mark.parametrize(
+    ("ticket_read_raises", "callback_order_id", "message"),
+    (
+        (True, 1, "order-level MOO ticket is unreadable"),
+        (False, 2, "synchronous QC event does not match returned MOO ticket"),
+    ),
+)
+def test_v10_ticket_read_failure_discards_staged_callback_without_replay(
+    ticket_read_raises, callback_order_id, message
+):
+    class TrackedEvent:
+        order_id = callback_order_id
+        id = 7
+
+        def __init__(self):
+            self.status_reads = 0
+
+        @property
+        def status(self):
+            self.status_reads += 1
+            return _OpaqueOrderStatus.INVALID
+
+    event = TrackedEvent()
+
+    class ReentrantTicket:
+        runtime = None
+
+        @property
+        def order_id(self):
+            self.runtime.on_order_event(event)
+            if ticket_read_raises:
+                raise RuntimeError("hostile ticket order ID")
+            return 1
+
+    class ReentrantAlgorithm(_Algorithm):
+        runtime = None
+
+        def market_on_open_order(self, symbol, quantity, *, tag):
+            self.orders.append((symbol.value, quantity, tag))
+            ticket = ReentrantTicket()
+            ticket.runtime = self.runtime
+            return ticket
+
+    algorithm = ReentrantAlgorithm()
+    value = _runtime(
+        algorithm, runtime.TICKET_PROFILE_2026_ID,
+        order_status_enum=_OpaqueOrderStatus,
+    )
+    algorithm.runtime = value
+    value._resolution = _Resolution({"a": _Symbol("A-SID", "A")})
+
+    with pytest.raises(runtime.AcceptedRiskQqqOrderLevelQcRuntimeError, match=message):
+        value._submit_plan(_single_buy_plan())
+
+    assert event.status_reads == 1
+    assert value._pending_submission_events is None
+    assert value._pending_submission_event_keys is None
+    assert value._open_order_ids == {}
+    assert value._open_plan_events == []
+    assert value._submitted_order_count == 0
+    assert value._lifecycle_records == []
 
 
 @pytest.mark.parametrize("status", ("Invalid", "Filled"))

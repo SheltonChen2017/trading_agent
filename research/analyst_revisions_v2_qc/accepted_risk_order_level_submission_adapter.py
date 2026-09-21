@@ -37,6 +37,7 @@ from . import accepted_risk_qqq_order_level_qc_runtime as runtime_builder
 from . import accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime_builder
 from . import accepted_risk_qqq_order_level_v13_qc_runtime as v13_runtime_builder
 from . import accepted_risk_qqq_order_level_v14_qc_runtime as v14_runtime_builder
+from . import accepted_risk_qqq_order_level_v15_qc_runtime as v15_runtime_builder
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -110,14 +111,18 @@ PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2026-cutoff-v13",
     "arv2-qqq-order-level-tilt-2025-cutoff-v14",
     "arv2-qqq-order-level-tilt-2026-cutoff-v14",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v15",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v15",
 )
 PROXY_PROFILE_IDS = PROFILE_IDS[2:]
 ROLLOVER_PROFILE_IDS = tuple(v13_runtime_builder.ROLLOVER_PROFILE_IDS)
 DIAGNOSTIC_PROFILE_IDS = tuple(v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS)
+ACCOUNT_PROFILE_IDS = tuple(v15_runtime_builder.ACCOUNT_PROFILE_IDS)
 FORCED_EXIT_PROFILE_IDS = (
     tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS)
     + ROLLOVER_PROFILE_IDS
     + DIAGNOSTIC_PROFILE_IDS
+    + ACCOUNT_PROFILE_IDS
 )
 _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[0], "2025-01-03", 91, 428, 427),
@@ -142,6 +147,8 @@ _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[19], "2026-01-05", 39, 178, 177),
     (PROFILE_IDS[20], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[21], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[22], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[23], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200
@@ -218,6 +225,7 @@ _PINNED_REQUIRE_LEGACY_PROFILE = runtime_builder.require_qqq_order_level_profile
 _PINNED_REQUIRE_V12_PROFILE = v12_runtime_builder.require_qqq_order_level_profile
 _PINNED_REQUIRE_V13_PROFILE = v13_runtime_builder.require_qqq_order_level_profile
 _PINNED_REQUIRE_V14_PROFILE = v14_runtime_builder.require_qqq_order_level_profile
+_PINNED_REQUIRE_V15_PROFILE = v15_runtime_builder.require_qqq_order_level_profile
 _PINNED_EXPECTED_LEGACY_NAMES = (
     runtime_builder.expected_custom_summary_statistic_names
 )
@@ -230,11 +238,15 @@ _PINNED_EXPECTED_V13_NAMES = (
 _PINNED_EXPECTED_V14_NAMES = (
     v14_runtime_builder.expected_custom_summary_statistic_names
 )
+_PINNED_EXPECTED_V15_NAMES = (
+    v15_runtime_builder.expected_custom_summary_statistic_names
+)
 _PINNED_RUNTIME_PROFILE_IDS = (
     tuple(runtime_builder.PROFILE_IDS)
     + tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS)
     + tuple(v13_runtime_builder.ROLLOVER_PROFILE_IDS)
     + tuple(v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS)
+    + tuple(v15_runtime_builder.ACCOUNT_PROFILE_IDS)
 )
 _PINNED_META_STATISTIC_NAME = runtime_builder.META_STATISTIC_NAME
 _PINNED_AGGREGATES_STATISTIC_NAME = runtime_builder.AGGREGATES_STATISTIC_NAME
@@ -245,6 +257,10 @@ _PINNED_RUNTIME_SUMMARY_SCHEMA = runtime_builder.SUMMARY_SCHEMA
 _PINNED_PROXY_SUMMARY_SCHEMA = runtime_builder.PROXY_SUMMARY_SCHEMA
 _PINNED_FORCED_EXIT_SUMMARY_SCHEMA = v12_runtime_builder.FORCED_EXIT_SUMMARY_SCHEMA
 _PINNED_DIAGNOSTIC_SUMMARY_SCHEMA = v14_runtime_builder.DIAGNOSTIC_SUMMARY_SCHEMA
+_PINNED_ACCOUNT_SUMMARY_SCHEMA = v15_runtime_builder.ACCOUNT_SUMMARY_SCHEMA
+_PINNED_RETIRED_TARGET_PATH_SCHEMA = (
+    v15_runtime_builder.RETIRED_TARGET_PATH_SCHEMA
+)
 _PINNED_EXACT_COMPLEMENT_POLICY = v14_runtime_builder.EXACT_COMPLEMENT_POLICY
 _PINNED_EXACT_COMPLEMENT_DECIMAL_PRECISION = (
     v14_runtime_builder.EXACT_COMPLEMENT_DECIMAL_PRECISION
@@ -276,16 +292,20 @@ _PINNED_TRANSPORT_CALL = formal._transport_call
 
 def _pinned_require_profile(
     profile_id,
+    _v15_ids=ACCOUNT_PROFILE_IDS,
     _v14_ids=DIAGNOSTIC_PROFILE_IDS,
     _v13_ids=ROLLOVER_PROFILE_IDS,
     _v12_ids=tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS),
+    _v15_requirer=_PINNED_REQUIRE_V15_PROFILE,
     _v14_requirer=_PINNED_REQUIRE_V14_PROFILE,
     _v13_requirer=_PINNED_REQUIRE_V13_PROFILE,
     _v12_requirer=_PINNED_REQUIRE_V12_PROFILE,
     _legacy_requirer=_PINNED_REQUIRE_LEGACY_PROFILE,
 ):
     return (
-        _v14_requirer(profile_id)
+        _v15_requirer(profile_id)
+        if profile_id in _v15_ids
+        else _v14_requirer(profile_id)
         if profile_id in _v14_ids
         else _v13_requirer(profile_id)
         if profile_id in _v13_ids
@@ -297,16 +317,20 @@ def _pinned_require_profile(
 
 def _pinned_expected_names(
     profile_id,
+    _v15_ids=ACCOUNT_PROFILE_IDS,
     _v14_ids=DIAGNOSTIC_PROFILE_IDS,
     _v13_ids=ROLLOVER_PROFILE_IDS,
     _v12_ids=tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS),
+    _v15_names=_PINNED_EXPECTED_V15_NAMES,
     _v14_names=_PINNED_EXPECTED_V14_NAMES,
     _v13_names=_PINNED_EXPECTED_V13_NAMES,
     _v12_names=_PINNED_EXPECTED_V12_NAMES,
     _legacy_names=_PINNED_EXPECTED_LEGACY_NAMES,
 ):
     return (
-        _v14_names(profile_id)
+        _v15_names(profile_id)
+        if profile_id in _v15_ids
+        else _v14_names(profile_id)
         if profile_id in _v14_ids
         else _v13_names(profile_id)
         if profile_id in _v13_ids
@@ -504,6 +528,15 @@ _DIAGNOSTIC_AGGREGATE_FIELDS = _FORCED_EXIT_AGGREGATE_FIELDS | frozenset({
     "qqq_proxy_complement_policy",
     "skipped_unpriced_decision_evidence_policy",
     "skipped_unpriced_decision_evidence",
+})
+_ACCOUNT_AGGREGATE_FIELDS = _DIAGNOSTIC_AGGREGATE_FIELDS | frozenset({
+    "delisted_zero_holding_target_retirement_count",
+    "delisted_zero_holding_target_retirement_decision_count",
+    "delisted_zero_holding_target_retired_weight_total",
+    "delisted_zero_holding_target_path_sha256",
+    "terminal_account_observation_adjustment",
+    "terminal_account_observation_prior_equity",
+    "terminal_account_observation_equity",
 })
 _FORCED_DELISTING_FIELDS = frozenset({
     "schema", "order_count", "event_count", "fill_event_count",
@@ -2731,6 +2764,7 @@ def _make_result_read_authority_operations(
     diagnostic_aggregate_fields = tuple(
         sorted(_DIAGNOSTIC_AGGREGATE_FIELDS)
     )
+    account_aggregate_fields = tuple(sorted(_ACCOUNT_AGGREGATE_FIELDS))
     statistic_limit = _maximum_statistic_bytes
 
     def candidate(
@@ -2755,7 +2789,9 @@ def _make_result_read_authority_operations(
         ):
             raise error_type("order-level result authority context changed")
         aggregate_fields = (
-            diagnostic_aggregate_fields
+            account_aggregate_fields
+            if plan.profile_id in ACCOUNT_PROFILE_IDS
+            else diagnostic_aggregate_fields
             if plan.profile_id in DIAGNOSTIC_PROFILE_IDS
             else forced_exit_aggregate_fields
             if plan.profile_id in FORCED_EXIT_PROFILE_IDS
@@ -3096,7 +3132,10 @@ def _parse_result(response, plan, launch):
     meta = parsed[_PINNED_META_STATISTIC_NAME]
     aggregates = parsed[_PINNED_AGGREGATES_STATISTIC_NAME]
     proxy_mode = plan.profile_id in PROXY_PROFILE_IDS
-    diagnostic_mode = plan.profile_id in DIAGNOSTIC_PROFILE_IDS
+    account_mode = plan.profile_id in ACCOUNT_PROFILE_IDS
+    diagnostic_mode = (
+        plan.profile_id in DIAGNOSTIC_PROFILE_IDS or account_mode
+    )
     forced_exit_mode = (
         plan.profile_id in FORCED_EXIT_PROFILE_IDS
     )
@@ -3108,7 +3147,9 @@ def _parse_result(response, plan, launch):
     if set(meta) != _META_FIELDS:
         _error("order-level aggregate META field inventory changed")
     expected_aggregate_fields = (
-        _DIAGNOSTIC_AGGREGATE_FIELDS
+        _ACCOUNT_AGGREGATE_FIELDS
+        if account_mode
+        else _DIAGNOSTIC_AGGREGATE_FIELDS
         if diagnostic_mode
         else _FORCED_EXIT_AGGREGATE_FIELDS
         if forced_exit_mode
@@ -3174,10 +3215,17 @@ def _parse_result(response, plan, launch):
     ) + (
         ("forced_exit_invalidated_pending_rebalance_count",)
         if forced_exit_mode else ()
+    ) + (
+        (
+            "delisted_zero_holding_target_retirement_count",
+            "delisted_zero_holding_target_retirement_decision_count",
+        )
+        if account_mode else ()
     )
     if (
         aggregates.get("schema") != (
-            _PINNED_DIAGNOSTIC_SUMMARY_SCHEMA if diagnostic_mode
+            _PINNED_ACCOUNT_SUMMARY_SCHEMA if account_mode
+            else _PINNED_DIAGNOSTIC_SUMMARY_SCHEMA if diagnostic_mode
             else _PINNED_FORCED_EXIT_SUMMARY_SCHEMA if forced_exit_mode
             else _PINNED_PROXY_SUMMARY_SCHEMA if proxy_mode
             else _PINNED_RUNTIME_SUMMARY_SCHEMA
@@ -3370,6 +3418,53 @@ def _parse_result(response, plan, launch):
             })).hexdigest()
         ):
             _error("order-level skipped-unpriced evidence changed")
+    if account_mode:
+        retirement_count = aggregates[
+            "delisted_zero_holding_target_retirement_count"
+        ]
+        retirement_decision_count = aggregates[
+            "delisted_zero_holding_target_retirement_decision_count"
+        ]
+        retired_weight_total = _result_decimal(
+            aggregates["delisted_zero_holding_target_retired_weight_total"],
+            "order-level aggregate retired delisted target weight total",
+        )
+        retirement_path_sha256 = _sha(
+            aggregates["delisted_zero_holding_target_path_sha256"],
+            "order-level aggregate retired delisted target path digest",
+        )
+        if (
+            retirement_decision_count > retirement_count
+            or retirement_decision_count > aggregates["decision_count"]
+            or retirement_count > (
+                forced_delisting["order_count"]
+                * aggregates["decision_count"]
+            )
+            or retired_weight_total < 0
+            or retired_weight_total > (
+                Decimal("0.98") * Decimal(retirement_decision_count)
+            )
+            or (
+                retirement_count == 0
+                and (
+                    retirement_decision_count != 0
+                    or retired_weight_total != 0
+                    or retirement_path_sha256
+                    != hashlib.sha256(_canonical({
+                        "schema": _PINNED_RETIRED_TARGET_PATH_SCHEMA,
+                        "records": [],
+                    })).hexdigest()
+                )
+            )
+            or (
+                retirement_count > 0
+                and (
+                    retirement_decision_count == 0
+                    or retired_weight_total <= 0
+                )
+            )
+        ):
+            _error("order-level retired delisted target accounting changed")
     for name in (
         "mean_tilted_name_count", "mean_one_way_active_share",
         "modeled_fee_amount", "total_filled_notional", "starting_equity",
@@ -3543,6 +3638,27 @@ def _parse_result(response, plan, launch):
         aggregates["strategy_total_return"],
         "order-level aggregate strategy total return",
     )
+    if account_mode:
+        terminal_prior_equity = _result_decimal(
+            aggregates["terminal_account_observation_prior_equity"],
+            "order-level aggregate terminal prior equity",
+        )
+        terminal_observation_equity = _result_decimal(
+            aggregates["terminal_account_observation_equity"],
+            "order-level aggregate terminal observation equity",
+        )
+        terminal_adjustment = _result_decimal(
+            aggregates["terminal_account_observation_adjustment"],
+            "order-level aggregate terminal observation adjustment",
+        )
+        terminal_reconciliation_is_exact = (
+            terminal_prior_equity > 0
+            and terminal_observation_equity == ending_equity
+            and terminal_adjustment
+            == terminal_observation_equity - terminal_prior_equity
+        )
+    else:
+        terminal_reconciliation_is_exact = True
     qqq_total_return = _result_decimal(
         aggregates["QQQ_total_return"],
         "order-level aggregate QQQ total return",
@@ -3677,6 +3793,7 @@ def _parse_result(response, plan, launch):
         or benchmark_target_gross != Decimal("0.98")
         or starting_equity != Decimal("1000000")
         or ending_equity <= 0
+        or not terminal_reconciliation_is_exact
         or not strategy_return_is_exact
         or strategy_total_return <= Decimal(-1)
         or qqq_total_return <= Decimal(-1)

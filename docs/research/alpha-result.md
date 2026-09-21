@@ -3525,3 +3525,66 @@ only that exact engine event. R-166 spends **123 -> 124 shared looks / 66 ->
 67 ARV2 development evaluations** and adds **zero cells**, leaving **607
 authenticated cells / 27 infrastructure looks**. No paper/live deployment,
 funded account, real order, broker access, or trading authority follows.
+
+## R-167 — V12 exact-delisting 2026-YTD order run (END-CLOCK TECHNICAL REFUSAL; ZERO CELLS) — 2026-09-20
+
+Attempt 2 used exact committed/signed V12 profile SHA-256
+`15c52dcaafae36d7ab8785e95809781a14427c09288ddc7c5c0c859c8b1a2058`,
+projection SHA-256
+`2cedebfbc4cca2e7e5678850eda325d34f69add392a81ed22ad25a9d2fa1d88e`,
+and plan SHA-256
+`591fc6be31dce399ea84f7dce8f115d247fa2ed421cdd68e085cb41c59f4a9a7`.
+Private project `36783362` launched backtest
+`485c228a25d1bbc30804c4b401710ca0`; launch receipt
+`a04447f57085c23b16366f418153962888503b689825b6f20ae8eccff2a627c0`
+and terminal receipt
+`7664b137141915d5b1e2c2a76aff6e8073c4c4ca42042260a32caba1446342d2`
+bind `Runtime Error`. A bounded error-only read selected
+`order-level backtest ended outside the exact final session` at simulated
+`2026-09-18 00:00:00`; it selected no statistic or economic value. R-167
+spends **124 -> 125 shared looks / 67 -> 68 development evaluations**, adds
+**zero cells**, and leaves **27 infrastructure looks / 607 authenticated
+cells**.
+
+## R-168 — V13 rollover 2026-YTD order run (COMPLETED; FORMAL RESULT READ REFUSED; DIAGNOSTIC ONLY) — 2026-09-20
+
+Attempt 3/final used exact committed/signed V13 profile SHA-256
+`1f2778f9e98ffab7c2030b5cab8080248b2d561420cc4c9d769de89fa46e6fa1`,
+projection SHA-256
+`d1362c0a4095da7f8136bee08e04a04ce1b474fd4de0f3e5035885ae2539f13e`,
+and plan SHA-256
+`66c10c53cf84248642afba7462f7c69cda1243417286512ee124bf69e9ef8ba5`.
+Private project `36783836` launched backtest
+`d71155d2fde0f857a18081ad0fda80ea`; launch receipt
+`a78cd92fa50baa013c66e52072d7306d35ea84a6df1fb27cd7b8084a354d9572`
+and terminal receipt
+`1e0ee288239b92d106911ce91ead1142e6d3ec03b5ef524e1049e97812dd9b9b`
+bind `Completed.` after two statistics-disabled polls.
+
+The separately signed one-use formal read, control SHA-256
+`194ed2b87a01d87553422abc18612b4c5f13b880525c5947bb5623bd607094a1`,
+was consumed but refused `order-level QQQ ETF proxy accounting changed` and
+persisted no formal result receipt. The producer rounded one proxy-complement
+field under ambient Decimal precision while retaining its paired resolved
+field at 100 digits; the exact consumer correctly rejected their non-exact
+sum. Bounded diagnostic reads verified the expected two-statistic/profile
+identity and selected only aggregate fields. They are not additional runs,
+looks, evaluations, or cells.
+
+Diagnostic figures only: ending equity **$1,168,243.410845** from $1,000,000
+(QC-style net profit **+16.8243%**); custom strategy path **+16.8511%** versus
+execution-matched QQQ **+15.6283%**, a **+1.2228 pp** spread; maximum drawdown
+**-11.2506%** versus **-11.5012%**; zero-rate Sharpe **1.2123** versus
+**1.1131**. All 2,455 strategy orders filled with no cancel/invalid, and one
+separate exact engine-forced delisting fill was accounted. Modeled and engine
+fees both equal **$3,570.426155**.
+
+The aggregate is nevertheless `run_valid=false`: 39 decisions, 38 completed
+lifecycle records, zero forced-pending invalidations, and the runtime's sole
+successful path for that difference prove exactly one skipped-unpriced
+decision. The forced delisting may explain it, but the redacted record cannot
+establish causation. Therefore R-168 is not an authenticated alpha cell or a
+valid formal result. It spends **125 -> 126 shared looks / 68 -> 69 ARV2
+development evaluations**, adds **zero cells**, and leaves **27 infrastructure
+looks / 607 authenticated cells**. No fourth launch, leverage, deployment,
+broker, paper/live, funded-order, or trading authority follows.

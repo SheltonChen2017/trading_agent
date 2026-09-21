@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–163 retain the milestone, review, preregistration, QC
+strategy. Sections 1–164 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -60,6 +60,9 @@ unchanged-source third and final permitted attempt before launch.
 Section 163 records the third identical refusal, exhausts the R-172 launch
 budget, and hands the existing project to Mia diagnosis; Codex could not open
 that authenticated assistant because the Mac was locked.
+Section 164 is the durable Claude review handoff for the complete
+counter-review, V15/V16 corrections, R-169 through R-172 execution evidence,
+focused validation, and the open Mia blocker.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -491,11 +494,13 @@ profile as the fresh R-172 production plan. Sections 161–163 record three
 byte-identical attempts ending in the same statistics-disabled `Runtime Error`
 without reading an error log or result. The R-172 launch budget is exhausted;
 there must be no fourth attempt. The owner explicitly waives Claude review of
-section 163 before the standing Mia recovery step. The immediate next step is
-for the owner to unlock the Mac, after which Codex can ask Mia to diagnose the
-existing attempt-3 project `36790168`; alternatively the owner may run Mia and
-return its findings and corrections. Only a prospectively documented,
-corrected successor may launch after diagnosis. Only authenticated
+section 163 before the standing Mia recovery step. Section 164 freezes the
+round's review handoff; Claude must review section 164 and the exact pushed
+range after the one allowed push. Operationally, the owner must unlock the
+Mac, after which Codex can ask Mia to diagnose the existing attempt-3 project
+`36790168`; alternatively the owner may run Mia and return its findings and
+corrections. Only a prospectively documented, corrected successor may launch
+after diagnosis. Only authenticated
 `Completed.` may be followed by a separately
 rendered, committed, signed, and consumed one-use aggregate-only result
 authority. V15
@@ -2211,6 +2216,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-20 | Independent Claude review of the bounded-tilt, order-level and six-universe range R-115 through R-168 | `e38894a` -> `9a30606`, `221951a` and this record commit | Review all thirty-eight unreviewed commits `1f47eb3..e38894a` from an export of the pushed head; sweep the new order-level family for real-order, broker, live and credential surfaces; mutation-test the live boundary, order rules, tilt bounds, six-universe gate and forced-exit accounting with failing-test capture; record findings and an improvement plan | All thirty-eight commits accepted, three after test-only corrections; no production line changed. The whole-package no-I/O closure test was red at the pushed head because three V12/V13 modules were never registered; registered and green in `221951a`, the closure holds. The single order-placing call is behind a backtest-only guard that is red under mutation through three named tests; no live endpoint or credential surface exists in the new code. Eleven of fourteen trials are behavioural catches; one gap (execution-session adjacency) is pinned in `9a30606`; four tilt-verifier survivals are one structural fact -- the 4.9% active-share cap is unreachable by construction. Three further P2s documented: no push-ledger row for the thirty-three 09-18/09-19 commits; the 2026 Massive delta archive `1678b925…` (743 rows) has no recorded capture, authorization or lineage; the banner's standing no-accepted-signal assertion was deleted a second time (restored). No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Fourteen mutation trials with named failing tests in a byte-restored export; `9a30606` test file **46 passed**; compileall in the export exit 0; complete selection on the pushed head in the export **6,944 passed, 11 skipped, 2 failed** (one export artifact, one genuine closure failure corrected in `221951a`); corrected files in isolation **72** and **46 passed**; record gates on the final bytes **75 passed**; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **4 P2 and 5 P3** (`ARV2R150-001..009`); 3 corrected (two in `9a30606` and `221951a`, one by record restoration), 6 documented. Codex's `ARV2D148-001/-002` confirmed open. | Push this same-lane round exactly once. Codex counter-reviews section 150 and the pushed range in this same worktree; appends the thirty-three-commit ledger row; records the delta-archive capture event; and does not launch a fourth order-level attempt, the six-universe gate, or any leverage run before that counter-review. No deployment, broker, order or trading action. |
 | 2026-09-21 | Codex retrospective push-ledger reconciliation | `1f47eb3` -> the exact 33-commit range `18762e5..fb3bc47` | Close `ARV2R150-001` without rewriting the omitted historical rows | This append-only row names the full omitted range: R-115/R-116 construction and preregistration; corrected R-117/R-118 bounded-tilt runs; the order-level and six-universe implementation; R-119 through R-138 prospective successors and recorded refusals; the condensed handoff; and the V10 transport/ticket successor. It does not include the later `98b4123..e38894a` range, which already has its own 2026-09-20 Codex row. | The contemporaneous focused validations and QC identities remain in sections 105--146 and the shared result ledger. This is a documentation reconciliation only: no new test, QC action, provider access, result read, look, evaluation, or cell is claimed. Claude subsequently reviewed all 33 commits inside `1f47eb3..e38894a` in section 150. | `ARV2R150-001` corrected. No historical claim or counter is changed. | Preserve this row as the durable non-self-referential inventory of the omitted pushed commits. |
 | 2026-09-21 | Codex retrospective Massive delta-capture lineage reconciliation | 2026-09-17 physical capture -> `arv2-physical-accepted-risk-1678b925bc78e8b3f4fdf291` | Close `ARV2R150-002` by recording the already-used 2026 delta input lineage | Under the owner's standing authorization to use the configured Massive subscriptions for this lane's accepted-risk inputs and QC backtesting, the capture requested 2026-01-01 through 2026-09-16 after that final close. It ran from `2026-09-17T05:18:36.493365Z` through `2026-09-17T05:18:48.773522Z` over `massive_https_bearer_default_session`: 75,110 source rows (51,331 ratings, 14,991 earnings, 8,788 guidance), yielding 75,108 current-view and 73,832 censored-view rows with 1,276 disagreements. The archive SHA-256 is `1678b925bc78e8b3f4fdf2911e3e426327fb8a1307463d1ff2bd43f279a1cc77`; source manifest `3384e9745c3093eb203997d4a98057ae2d066180add5e0367c4c3687a50d83ea`; pair artifact `arv2-accepted-risk-pair-0452a4811db397068b0dbd4c`, artifact SHA-256 `696265dad63c8f67560bc9c8ffed46907ce75faf5e8ff2353b1cbcc25561ce57`, content SHA-256 `0452a4811db397068b0dbd4c0e22db92c1597bcfcef93559e71647ee87228ea8`. The later order package authenticates 743 delta contributions in addition to 12,244 parent contributions. | Manifest identities, counts, timestamps, role totals, accepted-risk pair lineage, and the package's 743-contribution pin were re-read locally without exposing licensed rows. This retrospective correction performs no provider call and no outcome/result read; it adds **zero looks, zero development evaluations, zero infrastructure looks, and zero cells**. | `ARV2R150-002` corrected. The input is current-vintage/non-pristine-PIT under the owner's recorded accepted-risk decision; the archive's post-materialization capabilities are all closed and do not erase the provider access used for capture. | Keep the capture event mirrored in `docs/research/alpha-result.md`; no research conclusion, live authority, or trading authority follows. |
+| 2026-09-21 | Codex counter-review, V15/V16 implementation, and order-level QC | `87dd82f` -> this record commit | Accept Claude section 150; correct R-169 account/delisting and exposure-complement evidence admission prospectively; run R-169--R-172 under exact signed controls | Claude's three commits were accepted. R-169 completed but its formal read refused; R-170 completed but its known-incompatible read was withheld; immutable V16 produced one valid R-171 2026-YTD cell. R-172's 2025-now source compiled three times and ended `Runtime Error` three times; no result or raw log was read, the attempt cap is exhausted, and Mia is required. | Focused V16 selection **464 passed in 82.89 s**; independent R-172 prelaunch audit 0 P0/P1/P2; post-failure split/census selection **47 passed in 1.82 s**; final active-document gate **76 passed**; focused compileall and diff checks clean. Per owner rule, no full lane suite. Accounting closes at **132 shared looks, 75 development evaluations, 27 infrastructure looks, 608 authenticated cells**. | Claude counter-review corrections closed; V15 and V16 evidence defects corrected prospectively; open P2 `ARV2D163-001` blocks R-172 pending exact Mia diagnosis; open P3 `ARV2D163-002` records missing 2025 corporate-action path coverage. | Push this same-lane range exactly once. Claude reviews it. No fourth R-172 launch; owner unlocks the authenticated Mac browser so Codex can invoke Mia on project `36790168`, or returns Mia's exact diagnosis and changes. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -20385,3 +20391,105 @@ comparison and documentation of any correction. Only then may a fresh,
 prospectively versioned candidate receive a new launch budget. No result read,
 parameter tuning, leverage, six-universe expansion, deployment, broker,
 paper/live, funded-account, real-order, or trading authority follows.
+
+## 164. Claude review handoff: counter-review, V15/V16, and R-169--R-172, 2026-09-21
+
+**Review range:** `87dd82f..this record commit`, comprising the sixteen
+already committed Codex commits below plus this documentation handoff. The
+work stayed on `codex/strategy-analyst-revisions-v2` in the designated
+worktree. Exactly one push is permitted after the final focused gates; no push
+has occurred during this round before that point.
+
+### 164.1 Counter-review disposition
+
+Claude commits `9a30606` (execution-session adjacency regression), `221951a`
+(V12/V13 whole-package no-I/O closure registration), and `87dd82f` (section
+150 review record) are **accepted**. The behavioral tests reproduce, their
+recorded findings agree with the reviewed diff, and no additional correction
+to those commits was required. Section 151 contains the commit-by-commit
+counter-review. The two documentation omissions identified by Claude -- the
+thirty-three-commit push-ledger gap and the 2026 Massive delta-capture lineage
+-- are closed prospectively without rewriting history.
+
+### 164.2 Commits for independent review
+
+| Commit | Disposition requested / review focus |
+| --- | --- |
+| `f358fe0` | Counter-review acceptance and exact R-169 diagnostic preregistration. |
+| `f895615`, `891a0b5` | R-169 pre-network control replacement, launch and terminal authority. |
+| `7dd0443`, `ae2a0e0` | Immutable V15 target-retirement/account-reconciliation successor and R-169 formal refusal record. |
+| `6c32c8c`, `5539d13` | Exact production R-170 preregistration and result-read withholding after the independently proven exposure-complement defect. |
+| `323829f` | Immutable V16 exact-complement producer; verify no strategy-economic change from V15. |
+| `bee02a2`, `7b9e18b`, `ba81230` | R-171 preregistration, authenticated `Completed.`, separate result authority, and accepted one-use 2026-YTD cell. |
+| `42820b2`, `3e3ae0e` | R-172 2025-now exact plan and post-commit handoff correction. |
+| `830162c`, `318bd76`, `06d47db` | Three byte-identical R-172 attempts, each a statistics-disabled `Runtime Error`, zero result cells, and the required Mia stop. |
+| this record commit | Section 164, the append-only push-ledger row, final focused validation, and exact next action. |
+
+### 164.3 QC dispositions and accounting
+
+- **R-169:** engine `Completed.`, formal read refused; diagnostic only, zero
+  cells. It exposed one delisted-target skip and a $267.573 terminal-account
+  mismatch.
+- **R-170:** engine `Completed.`, result read deliberately withheld after a
+  local proof that independently rounded mean exposure fields could never pass
+  the exact consumer; zero cells.
+- **R-171:** engine `Completed.` and the separate one-use formal reader
+  accepted `run_valid=true`. The 2026-YTD strategy returned
+  **+16.8327901165%** after the frozen cost versus execution-matched QQQ
+  **+15.6282845052%** (**+1.2045056113 pp**), while trailing calendar-close
+  QQQ **+17.1809759916%** by about **0.3482 pp**. This is one valid diagnostic
+  cell, not production acceptance.
+- **R-172:** three exact-source 2025-now launches compiled and each terminated
+  `Runtime Error` on its first statistics-disabled poll. No result, statistic,
+  raw error log, order/fill, chart, price, provider/security row, return, or
+  signal outcome was read. Its launch budget is exhausted; no fourth run is
+  allowed. The attempt-3 project for Mia is `36790168`, backtest
+  `4d357d28e8c69ba197d6977f0fe7afeb`.
+
+Accounting closes at **132 shared looks / 75 ARV2 development evaluations /
+27 infrastructure looks / 608 authenticated cells**.
+
+### 164.4 Findings and validation
+
+| ID | Pri | Status | Finding |
+| --- | --- | --- | --- |
+| `ARV2CR151-001` | P3 | **Corrected** | The missing push-ledger row identified by Claude is appended without a retrospective preregistration claim. |
+| `ARV2CR151-002` | P3 | **Corrected** | The previously omitted Massive 2026 delta-capture identity, authorization, counts and lineage are recorded in this lane record and the shared ledger. |
+| `ARV2D154-001` | P2 | **Corrected prospectively** | V14 did not reconcile a delisted target and terminal account; V15 adds exact forced-exit-backed retirement and terminal-account observation. |
+| `ARV2D156-001` | P2 | **Corrected prospectively** | V15 emitted independently rounded mean exposure fields; V16 derives cash as the exact complement of emitted gross exposure. |
+| `ARV2D163-001` | P2 | **Open; blocks R-172** | The unchanged V16 2025-now construction reproducibly ends in `Runtime Error`. Three attempts are exhausted and the formal gate exposes no raw log. Mia diagnosis is required before any corrected successor. |
+| `ARV2D163-002` | P3 | **Documented; open** | V12--V16 behavioral fixtures default to the 2026 profile; the 2025 profile has identity/hash coverage but no production-shaped multi-session corporate-action path. This proof gap can hide a valid fail-closed refusal until cloud runtime. |
+
+The settled focused V16 runtime/projection/submission/no-I/O selection passed
+**464 tests in 82.89 seconds**; an independent read-only audit found 0 P0/P1/P2
+and its one P3 callback-test gap was closed before launch. The R-172
+independent prelaunch audit reproduced the profile, 16-file/370,919-byte
+projection, six upload objects, plan, authority and all inventory hashes with
+0 P0/P1/P2. The final active-document/lane-record gate passes **76 tests**;
+focused compileall and `git diff --check` are clean. Per the owner's standing
+rule, Codex did **not** run the full lane suite; Claude runs it during review.
+
+A post-failure, local-only static audit ranks an overnight 2025 corporate
+action -- especially a split while a prior-close plan is pending -- as the
+highest-likelihood cause. The frozen preopen census deliberately requires
+planned quantities to equal observed quantities, and the existing split-view
+test proves that such a change raises `complete overnight holdings changed`.
+That remains a hypothesis, not a diagnosis: the current split fixture covers
+an inter-plan change rather than a pending production plan, and no cloud log
+was read. The focused split/census plus complete V15/V16 selection passes **47
+tests in 1.82 seconds**. Mia must identify the exact stack before any policy or
+code change; a confirmed split fix should authenticate split data and replan
+adjusted quantities/prices, not weaken the complete-holdings census.
+
+### 164.5 Exact next action
+
+After this record and append-only ledger row are committed, verify the exact
+worktree root, branch, clean status and remote target, then push this same-lane
+range exactly once. Claude independently reviews the pushed range. R-172
+cannot be relaunched: the owner must unlock the authenticated Mac browser so
+Codex can invoke Mia on project `36790168`, or run Mia directly and return its
+diagnosis and exact cloud changes. Codex then retrieves and compares any Mia
+source, documents the root cause, ports only verified lane-specific fixes, and
+creates a prospectively versioned successor. No full-suite run, fourth R-172
+attempt, result read, leverage, six-universe expansion, paper/live deployment,
+broker, funded-account, real-order, or trading action is authorized here.

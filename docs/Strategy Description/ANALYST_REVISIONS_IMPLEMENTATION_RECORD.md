@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–158 retain the milestone, review, preregistration, QC
+strategy. Sections 1–159 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -48,7 +48,7 @@ complement producer/consumer defect. V15 is immutable and R-170 adds no result
 cell. Section 157 freezes the separately versioned V16/R-171 correction and
 its exact production plan before any new cloud launch. Section 158 records
 R-171 `Completed.` and freezes its one-use aggregate-only result authority;
-no R-171 result has yet been read.
+section 159 records the accepted one-use read and first valid V16 result cell.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -474,14 +474,15 @@ plan; section 156 records its completed engine state and the independently
 proven exposure-complement defect that invalidated it before any result
 authority was rendered. Section 157 freezes the separately versioned V16/R-171
 producer correction and exact preregistration. Section 158 records the
-authenticated completed run and separate result authority. The immediate next
-step is to sign and consume that exact aggregate-only authority once. V15 and
+authenticated completed run and separate result authority; section 159 records
+its accepted one-use read. The immediate next step is to freeze the unchanged
+V16 2025-now profile as a fresh R-172 plan before any new cloud access. V15 and
 R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
 diagnostic may be relabelled. By directing Codex to counter-review the landed
 review and continue directly with backtesting in this round, the owner
-explicitly waives Claude review of section 158 before this one exact result
-read; Claude will independently review the resulting pushed snapshot. R-138
-remains unlaunched/unspent.
+explicitly waives Claude review of section 159 before that separately
+preregistered 2025-now run; Claude will independently review the resulting
+pushed snapshot. R-138 remains unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
@@ -20139,3 +20140,49 @@ next action is to commit this exact terminal/result authority, sign only its
 payload under `arv2-formal-qc-result-read-v1`, and consume it once. No retry,
 later period, six-universe expansion, leverage, deployment, broker,
 paper/live, funded-account, real-order, or trading authority follows.
+
+## 159. R-171 accepted order-level 2026-YTD result, 2026-09-21
+
+The exact section-158 result authority was signed and consumed once. The
+formal parser accepted both custom statistics and `run_valid=true`; result-
+control SHA-256 is
+`4ffd3aca02ea514f645868c78ac92bc8e3fa33bed1faee5f00a9f8b2cf33a0da`,
+result-receipt SHA-256 is
+`eb8cf09adf5fb446953003eb45be06d9840418577eeac077e480b96c2b8bd746`,
+custom-statistics SHA-256 is
+`78df4b71a38c057d73dd373fbf9d25e0b07086465e3f24d13e836bc2a103bb2c`,
+and aggregate SHA-256 is
+`7c0bebf2c127553f79a8e38bc87d548424781d36cc962b6a1f05b6ace105d0ab`.
+The one-use control is spent and no second read is permitted.
+
+The v11 aggregate reports all **39 decisions**, with **21 tilt-enabled / 18
+tilt-underfilled**, zero skipped-unpriced decisions, and **2,517 submitted /
+2,517 filled / zero canceled / zero invalid** strategy orders. One exact
+forced-delisting-backed target with weight
+`0.002309044463768410739379022648` was retired to structural QQQ. Modeled and
+engine fees agree exactly at **$3,646.285835** on **$3,646,285.835** filled
+notional. Mean gross/cash exposure is exact-complement
+**96.2794589008% / 3.7205410992%**; mean tilted-name count is **28.8718** and
+mean one-way active share is **1.05527%**. The terminal QC-account adjustment
+is **-$267.573**, and ending equity reconciles exactly to
+**$1,168,327.901165**.
+
+After the frozen 10-bps-per-side fee, strategy total return is
+**+16.8327901165%** versus execution-matched QQQ **+15.6282845052%**, a
+**+1.2045056113 percentage-point** spread. Strategy/QQQ maximum drawdown is
+**-11.2506256828% / -11.5012219385%** and zero-rate Sharpe is
+**1.2115638963 / 1.1131428101**. For interpretation, the separately emitted
+calendar-close QQQ total return is **+17.1809759916%**; the strategy trails
+that buy-and-hold timing basis by about **0.3482 percentage points**. The
+positive matched spread is therefore valid evidence for this frozen execution
+comparison, not a claim that the strategy beat every QQQ investment timing or
+that the edge will persist.
+
+R-171 closes accounting at **129 shared looks / 72 ARV2 development
+evaluations / 27 infrastructure looks / 608 authenticated cells**. It is one
+valid 2026-YTD cell, not an accepted production signal or leverage gate. Under
+the owner's earlier explicit order-level plan, the next unchanged-profile
+diagnostic is 2025-now. It requires a fresh R-172 production plan, authority,
+project, result rule and attempt budget committed before launch; no parameter
+tuning, winner selection, six-universe expansion, leverage, deployment,
+broker, paper/live, funded-account, real-order, or trading authority follows.

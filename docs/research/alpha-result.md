@@ -3728,7 +3728,7 @@ separately versioned, preregistered successor may correct the producer; no
 later-period, six-universe, leverage, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
 
-## R-171 — V16 exact-complement 2026-YTD QQQ order run (COMPLETED; RESULT AUTHORITY FROZEN; UNREAD) — 2026-09-21
+## R-171 — V16 exact-complement 2026-YTD QQQ order run (AUTHENTICATED VALID RESULT; ONE CELL) — 2026-09-21
 
 V16 preserves V15's score, PIT QQQ universe, sector-neutral tilt, 98% gross,
 market-on-open schedule, modeled 10-bps-per-side fee, forced-delisting target
@@ -3770,12 +3770,39 @@ and terminal receipt SHA-256
 bind `Completed.` after two statistics-disabled polls. No compile or runtime
 retry occurred.
 
-The separate unread one-use result authority has payload SHA-256
+The separate one-use result authority had payload SHA-256
 `0aee21eba46c1a0e539427d7e3d54243d04571a6d3833cd548f9d36731a75bb1`
 and permits only one `backtests/read` selecting the two named custom ARV2
-statistics. No outcome has yet been selected. The launch spends **128 -> 129
+statistics. Before its read, no outcome had been selected. The launch spends **128 -> 129
 shared looks / 71 -> 72 ARV2 development evaluations**; accounting remains
 **27 infrastructure looks / 607 authenticated cells** until the exact parser
 and `run_valid` gate both pass. No later period, six-universe expansion,
 leverage, live/paper deployment, broker, funded-account, real-order, or
 trading authority follows.
+
+That one-use authority was signed and consumed once. The parser accepted the
+two custom statistics and `run_valid=true`; result receipt SHA-256 is
+`eb8cf09adf5fb446953003eb45be06d9840418577eeac077e480b96c2b8bd746`,
+custom-statistics SHA-256 is
+`78df4b71a38c057d73dd373fbf9d25e0b07086465e3f24d13e836bc2a103bb2c`,
+and aggregate SHA-256 is
+`7c0bebf2c127553f79a8e38bc87d548424781d36cc962b6a1f05b6ace105d0ab`.
+
+The authenticated 2026-YTD cell has **39 decisions, zero skipped decisions,
+2,517 submitted and filled orders, zero cancellations/invalids, $3,646.285835
+modeled and engine fees, and $1,168,327.901165 ending equity**. After the
+frozen 10-bps-per-side cost, the strategy returned **+16.8327901165%** versus
+execution-matched QQQ **+15.6282845052%**, a **+1.2045056113 pp** spread.
+Maximum drawdown was **-11.2506256828%** versus **-11.5012219385%** and
+zero-rate Sharpe was **1.2115638963** versus **1.1131428101**. Mean gross
+exposure was **96.2794589008%** and mean one-way active share only
+**1.0552727757%**.
+
+QQQ's separately emitted calendar-close return was **+17.1809759916%**, so
+the strategy trails that buy-and-hold timing basis by about **0.3482 pp**.
+This cell supports a positive spread only on the preregistered execution-
+matched comparison, not a universal QQQ-beating or persistent-alpha claim.
+R-171 closes accounting at **129 shared looks / 72 ARV2 development
+evaluations / 27 infrastructure looks / 608 authenticated cells**. No
+production acceptance, leverage, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.

@@ -476,8 +476,20 @@ def _derive_contributions(
     firm_admission: OwnerWaivedAcceptedRiskFirmAdmission,
     global_contract: GlobalBenchmarkContract,
     spool_path: Path,
+    maximum_eligible_session: str | None = None,
 ) -> tuple[tuple[dict[str, object], ...], str, dict[str, int]]:
     session_index = {session: index for index, session in enumerate(sessions)}
+    cutoff_session = (
+        evaluator.PRIMARY_WINDOW["end_session"]
+        if maximum_eligible_session is None
+        else maximum_eligible_session
+    )
+    if (
+        type(cutoff_session) is not str
+        or cutoff_session not in session_index
+    ):
+        _refuse("preliminary contribution cutoff escaped its session axis")
+    cutoff_position = session_index[cutoff_session]
     by_firm_label: dict[tuple[str, str], list[object]] = defaultdict(list)
     for mapping in firm_admission.mappings:
         by_firm_label[(mapping.provider_firm_id, mapping.raw_label)].append(mapping)
@@ -561,9 +573,7 @@ def _derive_contributions(
                         if not eligibility.included:
                             continue
                         position = session_index.get(eligibility.eligible_session)
-                        if position is None or position > session_index[
-                            evaluator.PRIMARY_WINDOW["end_session"]
-                        ]:
+                        if position is None or position > cutoff_position:
                             continue
                         view_id = _VIEW_IDS[view]
                         _insert_candidate(

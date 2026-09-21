@@ -1065,15 +1065,19 @@ def test_formal_action_guard_survives_all_exact_downstream_claims(
 ):
     claim_names = (
         "_claim_fundamental_discovery_transport_capability_minter",
+        "_claim_pit_market_cap_membership_probe_transport_capability_minter",
         "_claim_preopen_transport_capability_minter",
         "_claim_preopen_physical_upload_transport_capability_minter",
         "_claim_preopen_prereview_transport_capability_minter",
         "_claim_power_calibration_transport_capability_minter",
         "_claim_accepted_risk_preliminary_transport_capability_minter",
+        "_claim_accepted_risk_order_level_transport_capability_minter",
     )
     for module_name in (
         "research.analyst_revisions_v2_qc."
         "fundamental_universe_discovery_submission_adapter",
+        "research.analyst_revisions_v2_qc."
+        "pit_market_cap_membership_probe_submission_adapter",
         "research.analyst_revisions_v2_qc.preopen_control_submission_adapter",
         "research.analyst_revisions_v2_qc."
         "physical_preopen_submission_adapter",
@@ -1082,6 +1086,8 @@ def test_formal_action_guard_survives_all_exact_downstream_claims(
         "research.analyst_revisions_v2_qc.power_calibration_submission_adapter",
         "research.analyst_revisions_v2_qc."
         "accepted_risk_preliminary_submission_adapter",
+        "research.analyst_revisions_v2_qc."
+        "accepted_risk_order_level_submission_adapter",
     ):
         importlib.import_module(module_name)
     assert all(name not in vars(adapter) for name in claim_names)

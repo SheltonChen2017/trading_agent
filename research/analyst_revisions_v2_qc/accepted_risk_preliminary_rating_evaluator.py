@@ -1151,8 +1151,27 @@ class PreliminaryRatingEvaluationRuntime:
                     )
         return memberships, scores, sector_refused
 
+    def _after_score_cross_section(
+        self,
+        position: int,
+        memberships: tuple[SecurityMembership, ...],
+        scores: dict[tuple[str, str], dict[str, Decimal]],
+        sector_refused: defaultdict[tuple[str, str], int],
+    ) -> None:
+        """Allow a profile-specific aggregate evaluator to retain a score view.
+
+        The base IC-only runtime intentionally has no side effect here.  A
+        subclass may retain bounded aggregate portfolio inputs, but must not
+        change the score cross-section or apply contributions a second time.
+        """
+
+        return None
+
     def _score_session(self, position: int) -> None:
-        _memberships, scores, sector_refused = self._score_cross_section(position)
+        memberships, scores, sector_refused = self._score_cross_section(position)
+        self._after_score_cross_section(
+            position, memberships, scores, sector_refused
+        )
         session = self._input.session_axis[position]
         outcome_sessions = tuple(
             self._input.session_axis[position + horizon] for horizon in HORIZONS

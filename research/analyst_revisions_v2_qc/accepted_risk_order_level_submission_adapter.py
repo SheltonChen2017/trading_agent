@@ -30,9 +30,11 @@ from typing import Callable, Mapping, NoReturn
 from research.analyst_revisions_v2.canonical import canonical_json_bytes
 
 from . import accepted_risk_delta_order_package as delta_package_builder
+from . import accepted_risk_order_level_forced_exit as forced_exit_builder
 from . import accepted_risk_order_level_qc_projection as projection_builder
 from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_qqq_order_level_qc_runtime as runtime_builder
+from . import accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime_builder
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -100,8 +102,11 @@ PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2026-cutoff-v10",
     "arv2-qqq-order-level-tilt-2025-cutoff-v11",
     "arv2-qqq-order-level-tilt-2026-cutoff-v11",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v12",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v12",
 )
 PROXY_PROFILE_IDS = PROFILE_IDS[2:]
+FORCED_EXIT_PROFILE_IDS = PROFILE_IDS[-2:]
 _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[0], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[1], "2026-01-05", 39, 178, 177),
@@ -119,6 +124,8 @@ _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[13], "2026-01-05", 39, 178, 177),
     (PROFILE_IDS[14], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[15], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[16], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[17], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200
@@ -128,6 +135,7 @@ MAX_TICKET_STATISTIC_BYTES = 8192
 _TICKET_STATISTIC_PROFILE_IDS = (
     tuple(runtime_builder.TICKET_PROFILE_IDS)
     + tuple(runtime_builder.REFLECTED_TICKET_PROFILE_IDS)
+    + FORCED_EXIT_PROFILE_IDS
 )
 MAX_COMPILE_POLLS = 120
 MAX_STATUS_POLLS = 1_440
@@ -190,15 +198,61 @@ _PINNED_ITER_UPLOADS = package_builder.iter_accepted_risk_preliminary_upload_obj
 _PINNED_REQUIRE_PROJECTION = (
     projection_builder.require_accepted_risk_order_level_qc_projection
 )
-_PINNED_REQUIRE_PROFILE = runtime_builder.require_qqq_order_level_profile
-_PINNED_EXPECTED_NAMES = runtime_builder.expected_custom_summary_statistic_names
-_PINNED_RUNTIME_PROFILE_IDS = tuple(runtime_builder.PROFILE_IDS)
+_PINNED_REQUIRE_LEGACY_PROFILE = runtime_builder.require_qqq_order_level_profile
+_PINNED_REQUIRE_V12_PROFILE = v12_runtime_builder.require_qqq_order_level_profile
+_PINNED_EXPECTED_LEGACY_NAMES = (
+    runtime_builder.expected_custom_summary_statistic_names
+)
+_PINNED_EXPECTED_V12_NAMES = (
+    v12_runtime_builder.expected_custom_summary_statistic_names
+)
+_PINNED_RUNTIME_PROFILE_IDS = (
+    tuple(runtime_builder.PROFILE_IDS)
+    + tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS)
+)
 _PINNED_META_STATISTIC_NAME = runtime_builder.META_STATISTIC_NAME
 _PINNED_AGGREGATES_STATISTIC_NAME = runtime_builder.AGGREGATES_STATISTIC_NAME
+_PINNED_LEGACY_META_SCHEMA = "arv2-qqq-order-level-tilt-runtime-meta-v1"
+_PINNED_FORCED_EXIT_META_SCHEMA = "arv2-qqq-order-level-tilt-runtime-meta-v2"
 _PINNED_RUNTIME_SUMMARY_SCHEMA = runtime_builder.SUMMARY_SCHEMA
 _PINNED_PROXY_SUMMARY_SCHEMA = runtime_builder.PROXY_SUMMARY_SCHEMA
+_PINNED_FORCED_EXIT_SUMMARY_SCHEMA = v12_runtime_builder.FORCED_EXIT_SUMMARY_SCHEMA
+_PINNED_FORCED_DELISTING_SUMMARY_SCHEMA = (
+    forced_exit_builder.FORCED_DELISTING_SUMMARY_SCHEMA
+)
 _PINNED_REQUIRE_TRANSPORT = formal._require_concrete_transport
 _PINNED_TRANSPORT_CALL = formal._transport_call
+
+
+def _pinned_require_profile(
+    profile_id,
+    _v12_ids=FORCED_EXIT_PROFILE_IDS,
+    _v12_requirer=_PINNED_REQUIRE_V12_PROFILE,
+    _legacy_requirer=_PINNED_REQUIRE_LEGACY_PROFILE,
+):
+    return (
+        _v12_requirer(profile_id)
+        if profile_id in _v12_ids
+        else _legacy_requirer(profile_id)
+    )
+
+
+def _pinned_expected_names(
+    profile_id,
+    _v12_ids=FORCED_EXIT_PROFILE_IDS,
+    _v12_names=_PINNED_EXPECTED_V12_NAMES,
+    _legacy_names=_PINNED_EXPECTED_LEGACY_NAMES,
+):
+    return (
+        _v12_names(profile_id)
+        if profile_id in _v12_ids
+        else _legacy_names(profile_id)
+    )
+
+
+# Retain the reviewed mutation surface name; action closures bind the exact
+# combined dispatcher above and therefore remain independent of rebinding.
+_PINNED_EXPECTED_NAMES = _pinned_expected_names
 
 
 def _make_exact_order_transport_operations():
@@ -290,14 +344,14 @@ def _capture_runtime_profile_bindings():
     bindings = []
     for census in _PINNED_PROFILE_CENSUS:
         profile_id = census[0]
-        profile = _PINNED_REQUIRE_PROFILE(profile_id)
+        profile = _pinned_require_profile(profile_id)
         bindings.append(
             (
                 profile_id,
                 profile["profile_sha256"],
                 profile["score_source_view_id"],
                 *census[1:],
-                tuple(_PINNED_EXPECTED_NAMES(profile_id)),
+                tuple(_pinned_expected_names(profile_id)),
             )
         )
     return tuple(bindings)
@@ -375,6 +429,16 @@ _PROXY_AGGREGATE_FIELDS = _AGGREGATE_FIELDS | frozenset({
     "mean_qqq_proxy_constituent_weight_ratio",
     "minimum_qqq_proxy_constituent_weight_ratio",
     "maximum_qqq_proxy_constituent_weight_ratio",
+})
+_FORCED_EXIT_AGGREGATE_FIELDS = _PROXY_AGGREGATE_FIELDS | frozenset({
+    "engine_forced_delisting",
+    "forced_exit_invalidated_pending_rebalance_count",
+})
+_FORCED_DELISTING_FIELDS = frozenset({
+    "schema", "order_count", "event_count", "fill_event_count",
+    "terminal_order_count", "absolute_filled_quantity", "filled_notional",
+    "actual_engine_fee_amount", "accounting_complete", "ledger_sha256",
+    "raw_order_rows_in_summary", "raw_security_rows_in_summary",
 })
 
 
@@ -2567,6 +2631,9 @@ def _make_result_read_authority_operations(
     meta_fields = tuple(sorted(_META_FIELDS))
     legacy_aggregate_fields = tuple(sorted(_AGGREGATE_FIELDS))
     proxy_aggregate_fields = tuple(sorted(_PROXY_AGGREGATE_FIELDS))
+    forced_exit_aggregate_fields = tuple(
+        sorted(_FORCED_EXIT_AGGREGATE_FIELDS)
+    )
     statistic_limit = _maximum_statistic_bytes
 
     def candidate(
@@ -2591,7 +2658,10 @@ def _make_result_read_authority_operations(
         ):
             raise error_type("order-level result authority context changed")
         aggregate_fields = (
-            proxy_aggregate_fields if plan.profile_id in PROXY_PROFILE_IDS
+            forced_exit_aggregate_fields
+            if plan.profile_id in FORCED_EXIT_PROFILE_IDS
+            else proxy_aggregate_fields
+            if plan.profile_id in PROXY_PROFILE_IDS
             else legacy_aggregate_fields
         )
         maximum_statistic_bytes = statistic_limit(plan.profile_id)
@@ -2927,6 +2997,9 @@ def _parse_result(response, plan, launch):
     meta = parsed[_PINNED_META_STATISTIC_NAME]
     aggregates = parsed[_PINNED_AGGREGATES_STATISTIC_NAME]
     proxy_mode = plan.profile_id in PROXY_PROFILE_IDS
+    forced_exit_mode = (
+        plan.profile_id in FORCED_EXIT_PROFILE_IDS
+    )
     activation_entry = (
         plan.upload_entries[-1]
         if type(plan.upload_entries) is tuple and plan.upload_entries
@@ -2934,12 +3007,20 @@ def _parse_result(response, plan, launch):
     )
     if set(meta) != _META_FIELDS:
         _error("order-level aggregate META field inventory changed")
-    if set(aggregates) != (
-        _PROXY_AGGREGATE_FIELDS if proxy_mode else _AGGREGATE_FIELDS
-    ):
+    expected_aggregate_fields = (
+        _FORCED_EXIT_AGGREGATE_FIELDS
+        if forced_exit_mode
+        else _PROXY_AGGREGATE_FIELDS
+        if proxy_mode
+        else _AGGREGATE_FIELDS
+    )
+    if set(aggregates) != expected_aggregate_fields:
         _error("order-level aggregate field inventory changed")
     if (
-        meta.get("schema") != "arv2-qqq-order-level-tilt-runtime-meta-v1"
+        meta.get("schema") != (
+            _PINNED_FORCED_EXIT_META_SCHEMA
+            if forced_exit_mode else _PINNED_LEGACY_META_SCHEMA
+        )
         or meta.get("profile_id") != plan.profile_id
         or meta.get("profile_sha256") != plan.profile_sha256
         or plan.profile_sha256 != expected_profile_sha256
@@ -2986,10 +3067,14 @@ def _parse_result(response, plan, launch):
         "positive_weight_member_count_sum",
         "resolved_positive_weight_member_count_sum",
         "maximum_constituent_snapshot_age_sessions",
+    ) + (
+        ("forced_exit_invalidated_pending_rebalance_count",)
+        if forced_exit_mode else ()
     )
     if (
         aggregates.get("schema") != (
-            _PINNED_PROXY_SUMMARY_SCHEMA if proxy_mode
+            _PINNED_FORCED_EXIT_SUMMARY_SCHEMA if forced_exit_mode
+            else _PINNED_PROXY_SUMMARY_SCHEMA if proxy_mode
             else _PINNED_RUNTIME_SUMMARY_SCHEMA
         )
         or aggregates.get("score_source_view_id") != score_source_view_id
@@ -3034,6 +3119,54 @@ def _parse_result(response, plan, launch):
         or type(aggregates.get("fee_mismatch")) is not bool
     ):
         _error("order-level aggregate schema or safety flags changed")
+    forced_delisting = (
+        aggregates.get("engine_forced_delisting")
+        if forced_exit_mode else None
+    )
+    if forced_exit_mode:
+        if (
+            type(forced_delisting) is not dict
+            or set(forced_delisting) != _FORCED_DELISTING_FIELDS
+            or forced_delisting.get("schema")
+            != _PINNED_FORCED_DELISTING_SUMMARY_SCHEMA
+            or any(
+                type(forced_delisting.get(name)) is not int
+                or forced_delisting[name] < 0
+                for name in (
+                    "order_count", "event_count", "fill_event_count",
+                    "terminal_order_count", "absolute_filled_quantity",
+                )
+            )
+            or forced_delisting.get("accounting_complete") is not True
+            or forced_delisting.get("raw_order_rows_in_summary") is not False
+            or forced_delisting.get("raw_security_rows_in_summary") is not False
+        ):
+            _error("order-level forced delisting summary changed")
+        _sha(
+            forced_delisting.get("ledger_sha256"),
+            "order-level forced delisting ledger digest",
+        )
+        forced_delisting_notional = _result_decimal(
+            forced_delisting.get("filled_notional"),
+            "order-level forced delisting filled notional",
+        )
+        forced_delisting_fee = _result_decimal(
+            forced_delisting.get("actual_engine_fee_amount"),
+            "order-level forced delisting actual engine fee",
+        )
+        if (
+            forced_delisting["order_count"]
+            != forced_delisting["event_count"]
+            or forced_delisting["event_count"]
+            != forced_delisting["fill_event_count"]
+            or forced_delisting["fill_event_count"]
+            != forced_delisting["terminal_order_count"]
+            or forced_delisting_notional < 0
+            or forced_delisting_fee != 0
+            or aggregates["forced_exit_invalidated_pending_rebalance_count"]
+            > forced_delisting["order_count"]
+        ):
+            _error("order-level forced delisting accounting changed")
     for name in (
         "mean_tilted_name_count", "mean_one_way_active_share",
         "modeled_fee_amount", "total_filled_notional", "starting_equity",
@@ -3086,12 +3219,22 @@ def _parse_result(response, plan, launch):
         or aggregates["filled_order_count_sum"]
         != aggregates["submitted_order_count"]
         or aggregates["fee_mismatch"]
+        or (
+            forced_exit_mode
+            and forced_delisting["accounting_complete"] is not True
+        )
     )
     run_valid = (
         not execution_failure
         and aggregates["skipped_unpriced_decision_count"] == 0
-        and aggregates["completed_rebalance_count"]
-        == aggregates["decision_count"]
+        and (
+            aggregates["completed_rebalance_count"]
+            + (
+                aggregates["forced_exit_invalidated_pending_rebalance_count"]
+                if forced_exit_mode else 0
+            )
+            == aggregates["decision_count"]
+        )
     )
     floor = _result_decimal(
         aggregates["minimum_required_resolved_constituent_weight_ratio"],

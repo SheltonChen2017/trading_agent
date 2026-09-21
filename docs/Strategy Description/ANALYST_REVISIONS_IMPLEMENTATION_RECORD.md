@@ -1,31 +1,18 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–143 retain the milestone, review, preregistration, QC
+strategy. Sections 1–145 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
-preliminary bounded-tilt results. R-119 through R-137 include sequential
-order-level diagnostics and technical or coverage refusals; the latest,
-R-137, produced zero economic cells, and contingent R-138 was not launched.
-No completed order-level return or formal alpha verdict follows from these
-attempts. Section 137 records the owner's later cloud diagnosis and a
-separate `Completed.` status, neither of which is an authenticated order-level
-aggregate or a return estimate. Section 138 records eight recoverably
-recycled failed-only QC projects, with the owner-edited R-133 and the
-completed-run project preserved. A new order-based run needs a distinct
-prospective plan, and existing-project reuse is blocked by QC's
-`codeRunning=True` flag and the current signed fresh-project path. Section
-139 records a focused-tested local V10 successor, not a new QC result;
-section 140 records the owner's R-133 enum-diagnostic correction. Section 141
-records the read-only QC 79 source comparison and accepted/rejected cloud
-edits. Section 142 records the completed QC 81 current-source comparison,
-the byte-bound and stored-text digest faults, and the separately reconciled
-R-152–R-165 runs. R-164 and R-165 have verified `Completed.` terminal
-states, but no source-bound, authenticated result cell or formal alpha verdict.
-Section 143 records a local-only V11 exact CLR-enum bridge that addresses the
-owner-observed Python.NET class-member failure without accepting arbitrary
-status text; it has not been committed, independently reviewed, projected to
-QC, or run.
+preliminary bounded-tilt results. R-119 through R-166 include sequential
+order-level diagnostics and technical or coverage refusals; R-166 used exact
+committed/signed V11 source, produced zero economic cells, and identified
+LEAN's engine-created delisting liquidation as the remaining unmodelled order.
+R-164/R-165 are mutable-cloud diagnostics, not source-bound result cells.
+Section 145 records the independently focused-audited, local V12 successor;
+it has not yet been uploaded, compiled, run, or read. Contingent R-138 remains
+unlaunched and unspent. No authenticated completed order-level return or
+formal alpha verdict follows yet.
 Codex uses focused checks during development and QC work; Claude runs the
 complete lane suite during independent review unless the owner explicitly
 asks Codex to run it. Real orders,
@@ -428,49 +415,36 @@ claims. Neither category is permitted to overwrite the other.
 
 ## 4. Exact next step
 
-The owner's later cloud diagnosis and current source readback are recorded in
-section 137; the cleanup and reuse gate are in section 138. The `Completed.`
-status on the separate cloud run is not an
-authenticated aggregate result or an authorization to treat its reported
-metrics as a lane cell. The local order-event/transport correction at
-`fb3bc47` is committed and focused-tested but unreviewed and unlaunched;
-section 139 records its exact scope. The owner's enum-introspection finding
-is recorded in section 140 and does not change the pinned order-status map.
-The exact current QC 79 source comparison and non-ported shims are recorded
-in section 141. Section 142 records the owner-completed QC 81 source
-comparison, its sequential byte-bound and digest repairs, and the separate
-R-152–R-165 run inventory. The current cloud source is mutable and does not
-authenticate the historical source of any of those runs. Local V10 already
-has an 8,192-byte generated-main override and a result parser that hashes
-canonical aggregate bytes; its new focused regression distinguishes that
-digest from a JSON-quoted string digest. QC 81's broader status, cash,
-delisting, and third-statistic changes are not silently ported. Section 143
-records the local-only V11 exact CLR-enum bridge and its distinct profile
-identities. Its 287,727-byte prospective source stays within the new
-290,000-byte cap with 2,273 bytes of total headroom, including the required
-2,048-byte review margin. It remains uncommitted, unaudited in QC, and
-unlaunched. The owner explicitly waives Claude review of section 143 before
-this round's subsequent order-based tests; Claude reviews the final cumulative
-snapshot. The owner's current sequence explicitly calls for a
-correction commit/push, subsequent order-based tests without an intervening
-Claude review, then focused completion checks and a final results push. Claude
-runs the complete lane suite during the later independent review. That two-push
-exception applies only to this owner-directed round. Authenticate the
-prospective source, complete independent audit, then
-freeze a distinct physical one-use plan before any new QC launch or signed
-aggregate read. Do not import manual cloud shims merely because a cloud run
-completed.
+Sections 137–142 retain the owner-assisted cloud diagnoses, project cleanup,
+and mutable QC 79/81 source comparisons. Their `Completed.` statuses do not
+authenticate historical source or create lane result cells. Section 143
+records committed V11's exact CLR-enum bridge. Section 144 records R-166: its
+prospectively signed V11 source reached simulated 2026-08-05, then correctly
+refused LEAN's unmodelled engine-created delisting order. It spent one
+development look and produced **zero economic cells**. Section 145 records the
+distinct V12 successor, which authenticates only LEAN's exact direct
+delisting liquidation and separately accounts for it; every other unknown
+order still refuses. V4–V11 remain byte-identical, and independent focused
+audit found no P0–P3 issue on V12's settled tree.
 
-R-137 stopped with an unknown-order technical refusal and **zero economic
-cells**; contingent R-138 remains unlaunched and unspent. R-131 through R-138
-are not retry permissions. No authenticated order-level return estimate,
-formal alpha acceptance, leverage, six-universe expansion, real order,
-paper/live deployment, funded-account, broker, or trading authority follows.
+The owner explicitly waives Claude review of section 145 before this bounded
+correction and next order-based QC attempt; Claude reviews the cumulative
+pushed snapshot afterward. The exact next step after section 145 is to commit the audited V12
+source locally, freeze and sign a distinct R-167 one-use plan, launch it as
+attempt 2 of the three-attempt limit, inspect terminal status without
+statistics, and—only if `Completed.`—use a separate signature for the exact
+two-statistic aggregate read. Record the run before the round's single push.
+Do not copy QC 81's broad status/cash/delisting shims or third statistic.
+
+R-131 through R-166 are not retry permissions, and contingent R-138 remains
+unlaunched/unspent. No authenticated order-level return estimate, formal
+alpha acceptance, leverage, six-universe expansion, real order, paper/live
+deployment, funded-account, broker, or trading authority follows yet.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude will review
-sections 142–143 and the final cumulative pushed snapshot; no intermediate
+sections 142–145 and the final cumulative pushed snapshot; no intermediate
 unreviewed QC experiment becomes accepted evidence merely by completing.
 Each distinct backtest candidate has a hard maximum of three QC attempts.
 A compile failure, runtime error, or any other unsuccessful terminal run each
@@ -499,7 +473,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–143
+findings, outcomes, and per-run accounting remain in numbered sections 1–145
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -19267,3 +19241,66 @@ consider its separately authorized QC action. R-164/R-165 and every earlier
 profile or signature are not retry authority for V11. Real orders,
 paper/live deployment, funded accounts, broker access, and trading remain
 unauthorized.
+
+## 144. R-166 V11 QC refusal identifies an unmodelled LEAN delisting order, 2026-09-20
+
+The exact V11 source at `5db458c` was projected and signed prospectively as
+plan SHA-256
+`04948a1bd611b69756e786d3e64512af6718bffe7b4cf38aaddcb5042afda0a0`.
+Private QC project `36781246` launched backtest
+`c0f2d36774cc33a52b8788fcd93c1f16`; its first statistics-disabled terminal
+read authenticated `Runtime Error`. One bounded error-only diagnosis selected
+`order-level event references an unknown QC order` at simulated 2026-08-05.
+It selected no statistic, return, price, account value, provider/security row,
+raw order/fill/log/chart, or signal verdict. The active shared ledger records
+R-166 as one development look and zero cells.
+
+The refusal is expected under V11's strategy-order-only ledger, but current
+LEAN source makes its narrow cause reproducible. On a delisting notification,
+`BrokerageTransactionHandler.HandleDelistingNotification` creates a new
+full-liquidation `MarketOrder`, tags both order and direct event exactly
+`Liquidate from delisting`, assigns the security's current price and exact
+order quantity, sets `Filled`, and invokes the normal event handler. The event
+uses `OrderFee.Zero`; LEAN defines that as exact amount zero in
+`Currencies.NullCurrency`, whose exact code is `QCC`, **not USD**. Therefore a
+generic unknown-order bypass or an exact-zero-USD assumption would both be
+wrong. The prospective correction must authenticate the retrieved engine
+order, canonical/configured/delisted SID, exact tag/message/status/quantity,
+post-fill zero holding, and zero-QCC fee, while every other unknown order
+continues to refuse.
+
+## 145. V12 exact engine-delisting accounting successor (LOCAL ONLY), 2026-09-20
+
+V12 leaves the reviewed V4--V11 runtime byte-identical (SHA-256
+`3d49f49068c51db24b9b9d0d0c773280acebc2da847af42078c0427f2495594b`)
+and adds a separate wrapper plus a pure forced-exit ledger. The wrapper accepts
+only the exact LEAN shape documented in §144, retrieves the matching engine
+order through one generated-main `transactions.get_order_by_id` read, requires
+a complete terminal active plan when one exists, invalidates an entire frozen
+pending rebalance rather than rewriting it, and accounts the engine fill in a
+separate redacted ledger. It neither hides the forced exit inside the strategy
+order ledger nor adds long-lived holdings equality that would reject a
+legitimate split. Every arbitrary unknown order remains the V11 refusal.
+
+The pure ledger derives every reported count, quantity, notional, and fee from
+one-to-one sorted hash-bound order/event commitments. Its exact
+coefficient/exponent arithmetic is independent of ambient Python Decimal
+precision and is bounded to CLR `System.Decimal`; rehashed but semantically
+impossible ledgers refuse. V12 still emits exactly the two `META` and
+`AGGREGATES` statistics under the 8,192-byte limit. Its META schema is v2 and
+its aggregate schema is v8, adding only nested `engine_forced_delisting` and
+`forced_exit_invalidated_pending_rebalance_count`; the result reader pins and
+recomputes the same accounting. A combined-tree review caught and corrected
+an initial v1/v2 META-parser mismatch before any QC launch.
+
+The fixed profiles are `arv2-qqq-order-level-tilt-2025-cutoff-v12` / SHA-256
+`c92169a8fd0d2925fad971aa51aa643b1a028c9f48aab61dc227ac90dd49d53d`
+and `arv2-qqq-order-level-tilt-2026-cutoff-v12` / SHA-256
+`15c52dcaafae36d7ab8785e95809781a14427c09288ddc7c5c0c859c8b1a2058`.
+The V12-only source ceiling is 325,000 bytes: the settled fixture closure is
+322,447, its production-shaped equivalent is 322,477, and the remaining
+review margin is 2,523 bytes. The legacy ceiling remains 290,000. Focused
+helper/runtime/projection/submission validation passed; no complete lane suite
+was run under the owner's standing rule. At this section's snapshot V12 is
+local only: no V12 upload, compile, backtest, result read, new look/cell,
+paper/live deployment, funded account, real order, or trading occurred.

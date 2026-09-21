@@ -23,6 +23,7 @@ from research.analyst_revisions_v2.canonical import canonical_json_bytes
 from . import accepted_risk_delta_order_package as delta_package_builder
 from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_qqq_order_level_qc_runtime as runtime_builder
+from . import accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime_builder
 
 
 class AcceptedRiskOrderLevelQcProjectionError(ValueError):
@@ -33,6 +34,8 @@ PROJECTION_SCHEMA = "arv2-order-level-qc-source-projection-v1"
 SOURCE_SCHEMA = "arv2-order-level-qc-source-file-v1"
 MAIN_PROJECT_PATH = "main.py"
 RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_qc_runtime.py"
+V12_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v12_qc_runtime.py"
+FORCED_EXIT_PROJECT_PATH = "accepted_risk_order_level_forced_exit.py"
 MAX_SOURCE_FILE_BYTES = 64_000
 # The fixed ten-file closure includes the ETF-residual accounting and
 # synchronous order-event authentication. V8's direct QC enum boundary adds
@@ -40,6 +43,11 @@ MAX_SOURCE_FILE_BYTES = 64_000
 # smallest round-number successor that retains the prospective 2,048-byte
 # aggregate review margin without weakening the 64,000-byte per-file cap.
 MAX_TOTAL_SOURCE_BYTES = 290_000
+# V12 is the first profile whose exact closure contains the separately audited
+# forced-exit state machine.  Its measured production closure remains below
+# 322,952 bytes; 325,000 is the smallest 5,000-byte round ceiling that keeps
+# the prospective 2,048-byte review margin.  Legacy profiles retain 290,000.
+MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES = 325_000
 MIN_REVIEW_MARGIN_BYTES = 2_048
 
 PROJECT_SOURCE_PATHS = (
@@ -54,10 +62,37 @@ PROJECT_SOURCE_PATHS = (
     RUNTIME_PROJECT_PATH,
 )
 
+
+def _project_source_paths(profile_id: str) -> tuple[str, ...]:
+    return PROJECT_SOURCE_PATHS + (
+        (FORCED_EXIT_PROJECT_PATH, V12_RUNTIME_PROJECT_PATH)
+        if profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        else ()
+    )
+
+
+def _maximum_total_source_bytes(profile_id: str) -> int:
+    return (
+        MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES
+        if profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        else MAX_TOTAL_SOURCE_BYTES
+    )
+
+
+def _require_profile(profile_id: str) -> dict[str, object]:
+    if profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS:
+        return v12_runtime_builder.require_qqq_order_level_profile(profile_id)
+    return runtime_builder.require_qqq_order_level_profile(profile_id)
+
+
+def _all_profile_ids() -> tuple[str, ...]:
+    return runtime_builder.PROFILE_IDS + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
 _ALLOWED_IMPORT_MODULES = {
     "AlgorithmImports",
     "accepted_risk_order_level_core",
+    "accepted_risk_order_level_forced_exit",
     "accepted_risk_order_level_benchmark",
     "accepted_risk_market_cap_stock_portfolio_tilt",
     "accepted_risk_order_level_input_runtime",
@@ -65,6 +100,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_preliminary_rating_evaluator",
     "accepted_risk_preliminary_rating_policy",
     "accepted_risk_qqq_order_level_qc_runtime",
+    "accepted_risk_qqq_order_level_v12_qc_runtime",
     "accepted_risk_sequential_r055_score",
     "collections",
     "collections.abc",
@@ -223,6 +259,100 @@ def _approved_fee_order_read(node: ast.Attribute, project_path: str) -> bool:
     )
 
 
+def _approved_forced_exit_order_lookup(
+    node: ast.Attribute,
+    parents: dict[ast.AST, ast.AST],
+    project_path: str,
+    v12_main: bool,
+) -> bool:
+    """Admit one V12-only, read-only engine-order authentication call."""
+
+    if project_path != MAIN_PROJECT_PATH or not v12_main:
+        return False
+    name = _normalized(node.attr)
+    if name == "transactions":
+        transactions = node
+        order_lookup = parents.get(node)
+    elif name == "getorderbyid":
+        order_lookup = node
+        transactions = node.value
+    else:
+        return False
+    call = parents.get(order_lookup)
+    assignment = parents.get(call)
+    return (
+        isinstance(transactions, ast.Attribute)
+        and _normalized(transactions.attr) == "transactions"
+        and isinstance(transactions.value, ast.Name)
+        and transactions.value.id == "self"
+        and isinstance(order_lookup, ast.Attribute)
+        and _normalized(order_lookup.attr) == "getorderbyid"
+        and order_lookup.value is transactions
+        and isinstance(call, ast.Call)
+        and call.func is order_lookup
+        and len(call.args) == 1
+        and isinstance(call.args[0], ast.Attribute)
+        and call.args[0].attr == "order_id"
+        and isinstance(call.args[0].value, ast.Name)
+        and call.args[0].value.id == "event"
+        and not call.keywords
+        and isinstance(assignment, ast.Assign)
+        and len(assignment.targets) == 1
+        and isinstance(assignment.targets[0], ast.Name)
+        and assignment.targets[0].id == "engine_order"
+    )
+
+
+def _is_exact_v12_main(tree: ast.Module, project_path: str) -> bool:
+    """Bind the narrow lookup exception to an exact V12 generated-main shape."""
+
+    if project_path != MAIN_PROJECT_PATH:
+        return False
+    expected_import = (
+        (
+            "AcceptedRiskQqqOrderLevelV12QcRuntime",
+            "AcceptedRiskQqqOrderLevelQcRuntime",
+        ),
+        ("STARTING_CASH", None),
+    )
+    imports = tuple(
+        tuple((item.name, item.asname) for item in node.names)
+        for node in tree.body
+        if isinstance(node, ast.ImportFrom)
+        and node.module == "accepted_risk_qqq_order_level_v12_qc_runtime"
+    )
+    driver_initializers = []
+    for node in ast.walk(tree):
+        if not isinstance(node, ast.Assign) or len(node.targets) != 1:
+            continue
+        target = node.targets[0]
+        call = node.value
+        if not (
+            isinstance(target, ast.Attribute)
+            and target.attr == "_arv2_driver"
+            and isinstance(target.value, ast.Name)
+            and target.value.id == "self"
+            and isinstance(call, ast.Call)
+            and isinstance(call.func, ast.Name)
+            and call.func.id == "AcceptedRiskQqqOrderLevelQcRuntime"
+        ):
+            continue
+        profile_keywords = tuple(
+            keyword.value
+            for keyword in call.keywords
+            if keyword.arg == "profile_id"
+        )
+        driver_initializers.append(profile_keywords)
+    return (
+        imports == (expected_import,)
+        and len(driver_initializers) == 1
+        and len(driver_initializers[0]) == 1
+        and isinstance(driver_initializers[0][0], ast.Constant)
+        and driver_initializers[0][0].value
+        in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+    )
+
+
 def _audit_cloud_capabilities(text: str, project_path: str) -> None:
     """Reject every cloud capability except one direct simulated MOO call."""
 
@@ -237,6 +367,7 @@ def _audit_cloud_capabilities(text: str, project_path: str) -> None:
         for parent in ast.walk(tree)
         for child in ast.iter_child_nodes(parent)
     }
+    v12_main = _is_exact_v12_main(tree, project_path)
     locally_defined = {
         _normalized(node.name)
         for node in ast.walk(tree)
@@ -312,6 +443,13 @@ def _audit_cloud_capabilities(text: str, project_path: str) -> None:
                 node, project_path
             ):
                 pass
+            elif name in {"transactions", "getorderbyid"}:
+                if not _approved_forced_exit_order_lookup(
+                    node, parents, project_path, v12_main
+                ):
+                    raise AcceptedRiskOrderLevelQcProjectionError(
+                        "engine order lookup is permitted only as V12's exact generated-main authentication call"
+                    )
             elif name in (
                 _FORBIDDEN_ORDER_CALLS
                 | _FORBIDDEN_OPERATION_CALLS
@@ -524,6 +662,9 @@ def _main_source(
 ) -> bytes:
     """Render the thin QC entry after the runtime interface is authenticated."""
 
+    v12_profile = profile.get("profile_id") in (
+        v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+    )
     try:
         start = tuple(
             int(part) for part in profile["evaluation_start_session"].split("-")
@@ -534,7 +675,7 @@ def _main_source(
         ) from exc
     if (
         len(start) != 3
-        or profile.get("profile_id") not in runtime_builder.PROFILE_IDS
+        or profile.get("profile_id") not in _all_profile_ids()
         or profile.get("decision_cutoff_session")
         != delta_package_builder.DELTA_DECISION_END_SESSION
         or profile.get("final_execution_session")
@@ -572,7 +713,10 @@ def _main_source(
     )
     enum_status_source = (
         "            order_status_enum=_arv2_reflected_order_status(OrderStatus),\n"
-        if profile["profile_id"] in runtime_builder.REFLECTED_TICKET_PROFILE_IDS
+        if profile["profile_id"] in (
+            runtime_builder.REFLECTED_TICKET_PROFILE_IDS
+            + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        )
         else "            order_status_enum=OrderStatus,\n"
         if profile["profile_id"] in runtime_builder.ENUM_PREOPEN_PROXY_PROFILE_IDS
         else ""
@@ -619,7 +763,10 @@ def _arv2_reflected_order_status(enum_type):
 
 
 '''
-        if profile["profile_id"] in runtime_builder.REFLECTED_TICKET_PROFILE_IDS
+        if profile["profile_id"] in (
+            runtime_builder.REFLECTED_TICKET_PROFILE_IDS
+            + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        )
         else ""
     )
     # The V10 cloud diagnostic measured 4,764 canonical aggregate bytes.
@@ -633,13 +780,32 @@ def _arv2_reflected_order_status(enum_type):
         if profile["profile_id"] in (
             runtime_builder.TICKET_PROFILE_IDS
             + runtime_builder.REFLECTED_TICKET_PROFILE_IDS
+            + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
         )
         else ""
     )
+    order_event_source = (
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._arv2_driver.on_order_event(\n"
+        "            event, engine_order=engine_order,\n"
+        "        )"
+        if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        else "        self._arv2_driver.on_order_event(event)"
+    )
+    runtime_import_module = (
+        "accepted_risk_qqq_order_level_v12_qc_runtime"
+        if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        else "accepted_risk_qqq_order_level_qc_runtime"
+    )
+    runtime_import_binding = (
+        "AcceptedRiskQqqOrderLevelV12QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        else "AcceptedRiskQqqOrderLevelQcRuntime"
+    )
     source = f'''from AlgorithmImports import *
 from decimal import Decimal
-{reflected_status_source}{statistic_transport_source}from accepted_risk_qqq_order_level_qc_runtime import (
-    AcceptedRiskQqqOrderLevelQcRuntime,
+{reflected_status_source}{statistic_transport_source}from {runtime_import_module} import (
+    {runtime_import_binding},
     STARTING_CASH,
 )
 from accepted_risk_order_level_core import MODELED_FEE_RATE_PER_SIDE
@@ -680,8 +846,8 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             Resolution.MINUTE,
             fill_forward=False,
             leverage=1,
-            extended_market_hours={"True" if profile['profile_id'] in runtime_builder.PREOPEN_PROXY_PROFILE_IDS else "False"},
-            data_normalization_mode=DataNormalizationMode.{"RAW" if profile['profile_id'] in runtime_builder.PROXY_PROFILE_IDS else "TOTAL_RETURN"},
+            extended_market_hours={"True" if profile['profile_id'] in runtime_builder.PREOPEN_PROXY_PROFILE_IDS or v12_profile else "False"},
+            data_normalization_mode=DataNormalizationMode.{"RAW" if profile['profile_id'] in runtime_builder.PROXY_PROFILE_IDS or v12_profile else "TOTAL_RETURN"},
         ).symbol
         self.set_benchmark(qqq_benchmark)
         qqq_constituent_universe = self.add_universe(
@@ -727,7 +893,7 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
         self._arv2_driver.on_securities_changed(changes)
 
     def on_order_event(self, event):
-        self._arv2_driver.on_order_event(event)
+{order_event_source}
 
     def on_end_of_algorithm(self):
         self._arv2_driver.on_end_of_algorithm()
@@ -741,7 +907,7 @@ def build_accepted_risk_order_level_qc_projection(
     profile_id: str,
 ) -> AcceptedRiskOrderLevelQcProjection:
     delta_package, package = _require_delta_package(delta_package)
-    profile = runtime_builder.require_qqq_order_level_profile(profile_id)
+    profile = _require_profile(profile_id)
     activation = package.upload_objects[-1]
     if (
         activation.role != "activation_manifest"
@@ -753,7 +919,8 @@ def build_accepted_risk_order_level_qc_projection(
         )
     root = Path(__file__).resolve().parent
     files = []
-    for project_path in PROJECT_SOURCE_PATHS:
+    source_paths = _project_source_paths(profile["profile_id"])
+    for project_path in source_paths:
         try:
             source = (root / project_path).read_bytes()
         except OSError as exc:
@@ -774,7 +941,10 @@ def build_accepted_risk_order_level_qc_projection(
     )
     files.sort(key=lambda item: item.project_path)
     total = sum(item.byte_count for item in files)
-    if total + MIN_REVIEW_MARGIN_BYTES > MAX_TOTAL_SOURCE_BYTES:
+    if (
+        total + MIN_REVIEW_MARGIN_BYTES
+        > _maximum_total_source_bytes(profile["profile_id"])
+    ):
         raise AcceptedRiskOrderLevelQcProjectionError(
             "order-level QC source set exceeds reviewed total size"
         )
@@ -842,16 +1012,23 @@ def require_accepted_risk_order_level_qc_projection(
         raise AcceptedRiskOrderLevelQcProjectionError(
             "order-level QC projection type changed"
         )
-    profile = runtime_builder.require_qqq_order_level_profile(value.profile_id)
+    profile = _require_profile(value.profile_id)
+    source_paths = _project_source_paths(value.profile_id)
+    maximum_total_source_bytes = _maximum_total_source_bytes(value.profile_id)
     observed_paths = tuple(item.project_path for item in value.source_files)
     if (
         value.schema != PROJECTION_SCHEMA
         or type(value.source_files) is not tuple
-        or observed_paths != tuple(sorted((*PROJECT_SOURCE_PATHS, MAIN_PROJECT_PATH)))
+        or observed_paths != tuple(sorted((*source_paths, MAIN_PROJECT_PATH)))
         or value.profile_sha256 != profile["profile_sha256"]
         or value.total_source_byte_count
         != sum(item.byte_count for item in value.source_files)
-        or value.total_source_byte_count > MAX_TOTAL_SOURCE_BYTES
+        or (
+            value.total_source_byte_count + MIN_REVIEW_MARGIN_BYTES
+            > maximum_total_source_bytes
+            if value.profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+            else value.total_source_byte_count > maximum_total_source_bytes
+        )
         or value.preliminary is not True
         or value.formal is not False
         or value.backtest_only is not True

@@ -3494,3 +3494,34 @@ Count all 14 conservatively as development evaluations: **109 -> 123 shared
 looks; 52 -> 66 ARV2 development evaluations; 27 infrastructure looks and
 607 authenticated cells unchanged**. No new provider, broker, paper/live,
 funded-account, real-order, or trading authority follows.
+
+## R-166 — V11 reflected-enum 2026-YTD QQQ simulated-order diagnostic (ENGINE DELISTING REFUSAL; ZERO CELLS) — 2026-09-20
+
+The exact source/profile/plan at `5db458c` used V11 profile SHA-256
+`980759a4a5e996b21349ee53e9a5b6343e1a8b9914006907fec29de8e77c2307`,
+projection SHA-256
+`c7510f5864f9ffb68c924a3a82ba069180d2efd1ae4fd6dd5cd1f6729d0a101d`,
+and signed plan SHA-256
+`04948a1bd611b69756e786d3e64512af6718bffe7b4cf38aaddcb5042afda0a0`.
+It created private QC project `36781246` (`87
+ARV2_QQQ_CLR_ORDER_R166_2026_YTD - 20260920`) and backtest
+`c0f2d36774cc33a52b8788fcd93c1f16` (`ARV2 R166 QQQ CLR order 2026 YTD
+7803b84f`). The launch receipt SHA-256 is
+`f720f07dc22f16d8604656f57c67627c4f2eac6cf4d9dc8edf49ebfda3412e95`.
+The first statistics-disabled terminal poll authenticated `Runtime Error`;
+terminal receipt SHA-256 is
+`65ff1d208cccbeb0e0c004a2c4b56c43c434310779b26fa427d9838445683d8e`.
+
+One bounded error-only diagnosis selected the exact refusal
+`order-level event references an unknown QC order` at simulated
+2026-08-05. It selected no aggregate statistic, return, price, account value,
+raw order/fill/log/chart, security/provider row, or signal verdict. Source
+review against LEAN's direct delisting path identifies a prospective narrow
+cause: the engine creates its own full-liquidation market order and direct
+`Filled` event tagged `Liquidate from delisting`, outside the strategy's
+registered order-ID ledger. V11 correctly refused that unmodelled account
+change; a distinct source/profile may authenticate and separately account for
+only that exact engine event. R-166 spends **123 -> 124 shared looks / 66 ->
+67 ARV2 development evaluations** and adds **zero cells**, leaving **607
+authenticated cells / 27 infrastructure looks**. No paper/live deployment,
+funded account, real order, broker access, or trading authority follows.

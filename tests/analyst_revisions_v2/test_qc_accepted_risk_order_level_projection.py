@@ -26,6 +26,9 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_qc_runtime as runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime,
+)
 
 
 def _exact(message: str) -> str:
@@ -73,7 +76,9 @@ def delta_package(monkeypatch):
     )
 
 
-@pytest.mark.parametrize("profile_id", runtime.PROFILE_IDS)
+@pytest.mark.parametrize(
+    "profile_id", runtime.PROFILE_IDS + v12_runtime.FORCED_EXIT_PROFILE_IDS,
+)
 def test_projection_is_exact_profile_bound_and_backtest_only(
     delta_package, profile_id
 ):
@@ -82,16 +87,16 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
         profile_id=profile_id,
     )
     by_path = {item.project_path: item for item in value.source_files}
-    profile = runtime.require_qqq_order_level_profile(profile_id)
+    profile = projection._require_profile(profile_id)
     main = by_path["main.py"].source_bytes.decode("ascii")
 
     assert tuple(sorted(by_path)) == tuple(
-        sorted((*projection.PROJECT_SOURCE_PATHS, "main.py"))
+        sorted((*projection._project_source_paths(profile_id), "main.py"))
     )
     assert value.profile_sha256 == profile["profile_sha256"]
     assert (
         value.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
-        <= projection.MAX_TOTAL_SOURCE_BYTES
+        <= projection._maximum_total_source_bytes(profile_id)
     )
     assert max(item.byte_count for item in value.source_files) <= (
         projection.MAX_SOURCE_FILE_BYTES
@@ -119,11 +124,15 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
         profile_id in (
             runtime.TICKET_PROFILE_IDS
             + runtime.REFLECTED_TICKET_PROFILE_IDS
+            + v12_runtime.FORCED_EXIT_PROFILE_IDS
         )
     )
     assert "self.schedule.on(" in main
     assert "self.time_rules.after_market_close(" in main
-    if profile_id in runtime.PREOPEN_PROXY_PROFILE_IDS:
+    if profile_id in (
+        runtime.PREOPEN_PROXY_PROFILE_IDS
+        + v12_runtime.FORCED_EXIT_PROFILE_IDS
+    ):
         assert "self.time_rules.before_market_open(qqq_benchmark, 10)" in main
         assert "self._arv2_driver.on_before_open" in main
         assert main.count("extended_market_hours=True") == 1
@@ -498,6 +507,8 @@ def test_v11_reflects_exact_clr_enum_without_changing_v10(delta_package):
     assert v11.profile_sha256 != v10.profile_sha256
     assert b"from System import Convert as _Arv2DotNetConvert" in main
     assert b"order_status_enum=_arv2_reflected_order_status(OrderStatus)" in main
+    assert b"get_order_by_id" not in main
+    assert b"self._arv2_driver.on_order_event(event)" in main
     assert b"from System import" not in v10_main
     assert b"order_status_enum=OrderStatus," in v10_main
     assert projection.MAX_TOTAL_SOURCE_BYTES == 290_000
@@ -522,6 +533,77 @@ def test_v11_reflects_exact_clr_enum_without_changing_v10(delta_package):
     ) == "Filled"
     assert runtime._orders.qc_order_status_enum_text("Filled", members) is None
     assert runtime._orders.qc_order_status_enum_text(3, members) is None
+
+
+def test_v12_adds_only_forced_exit_source_and_retains_exact_v11_bridge(
+    delta_package,
+):
+    v12 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
+    )
+    v11 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+    )
+    v12_by_path = {item.project_path: item for item in v12.source_files}
+    v11_paths = tuple(item.project_path for item in v11.source_files)
+    assert projection.FORCED_EXIT_PROJECT_PATH in v12_by_path
+    assert projection.FORCED_EXIT_PROJECT_PATH not in v11_paths
+    assert set(v12_by_path) == set(v11_paths) | {
+        projection.FORCED_EXIT_PROJECT_PATH,
+        projection.V12_RUNTIME_PROJECT_PATH,
+    }
+    main = v12_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert b"from System import Convert as _Arv2DotNetConvert" in main
+    assert b"order_status_enum=_arv2_reflected_order_status(OrderStatus)" in main
+    assert b"engine_order = self.transactions.get_order_by_id(event.order_id)" in main
+    assert b"event, engine_order=engine_order" in main
+    bridge = _v11_bridge(main.decode("ascii"))
+    reflected = bridge(_reflected_type())
+    assert reflected.FILLED.number == 3
+    assert (
+        v12.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES
+    )
+    assert projection.MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES == 325_000
+    assert v12.total_source_byte_count == 322_447
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v12.total_source_byte_count + (72 - fixture_key_length)
+    assert production_total == 322_477
+    assert (
+        projection.MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES - production_total
+    ) == 2_523
+
+
+def test_v12_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    legacy = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+    )
+    v12 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
+    )
+    assert projection._maximum_total_source_bytes(legacy.profile_id) == 290_000
+    assert (
+        projection._maximum_total_source_bytes(v12.profile_id)
+        == projection.MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES",
+        v12.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
+        )
+    assert (
+        projection.require_accepted_risk_order_level_qc_projection(legacy)
+        is legacy
+    )
 
 
 @pytest.mark.parametrize(
@@ -722,6 +804,66 @@ def test_firewall_rejects_locally_defined_non_moo_order_wrapper():
         projection._audit_cloud_capabilities(source, "fixture.py")
 
 
+def test_firewall_allows_only_exact_v12_read_only_engine_order_lookup():
+    accepted = (
+        "from accepted_risk_qqq_order_level_v12_qc_runtime import (\n"
+        "    AcceptedRiskQqqOrderLevelV12QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime,\n"
+        "    STARTING_CASH,\n"
+        ")\n"
+        "class Algorithm:\n"
+        "    def initialize(self):\n"
+        "        self._arv2_driver = AcceptedRiskQqqOrderLevelQcRuntime(\n"
+        "            self, profile_id='arv2-qqq-order-level-tilt-2026-cutoff-v12',\n"
+        "        )\n"
+        "    def on_order_event(self, event):\n"
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._driver.on_order_event(event, engine_order=engine_order)\n"
+    )
+    projection._audit_cloud_capabilities(
+        accepted, projection.MAIN_PROJECT_PATH
+    )
+    refused = (
+        (accepted, projection.RUNTIME_PROJECT_PATH),
+        (accepted.replace("event.order_id)", "event.other_id)"), projection.MAIN_PROJECT_PATH),
+        (accepted.replace("get_order_by_id", "cancel_order"), projection.MAIN_PROJECT_PATH),
+        (accepted.replace(".transactions", ".brokerage"), projection.MAIN_PROJECT_PATH),
+        (accepted.replace("engine_order =", "other_order ="), projection.MAIN_PROJECT_PATH),
+        (
+            accepted.replace(
+                "arv2-qqq-order-level-tilt-2026-cutoff-v12",
+                runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+            ),
+            projection.MAIN_PROJECT_PATH,
+        ),
+        (
+            accepted.replace(
+                "accepted_risk_qqq_order_level_v12_qc_runtime",
+                "accepted_risk_qqq_order_level_qc_runtime",
+            ),
+            projection.MAIN_PROJECT_PATH,
+        ),
+        (
+            accepted.replace(
+                "get_order_by_id(event.order_id)",
+                "get_order_by_id(event.order_id, include_tag=True)",
+            ),
+            projection.MAIN_PROJECT_PATH,
+        ),
+        (
+            "class Algorithm:\n"
+            "    def on_order_event(self, event):\n"
+            "        lookup = self.transactions.get_order_by_id\n"
+            "        engine_order = lookup(event.order_id)\n",
+            projection.MAIN_PROJECT_PATH,
+        ),
+    )
+    for source, path in refused:
+        with pytest.raises(
+            projection.AcceptedRiskOrderLevelQcProjectionError
+        ):
+            projection._audit_cloud_capabilities(source, path)
+
+
 def test_firewall_rejects_live_write_and_paper_broker_deploy_references():
     cases = (
         "def f(self):\n    self._algorithm.live_mode = False\n",
@@ -812,6 +954,7 @@ def test_qc_prelude_compilation_and_future_import_regression():
         (runtime.PROFILE_IDS[0], 4096),
         (runtime.TICKET_PROFILE_2026_ID, 8192),
         (runtime.REFLECTED_TICKET_PROFILE_2026_ID, 8192),
+        (v12_runtime.FORCED_EXIT_PROFILE_2026_ID, 8192),
     ),
 )
 def test_generated_main_imports_from_exact_flat_qc_projection(

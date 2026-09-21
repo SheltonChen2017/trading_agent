@@ -27,6 +27,9 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_qc_runtime as runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime,
+)
 from research.analyst_revisions_v2_qc import formal_qc_transport
 
 
@@ -40,8 +43,24 @@ def _canonical(value):
     ).encode("ascii")
 
 
+def _profile(profile_id):
+    return (
+        v12_runtime.require_qqq_order_level_profile(profile_id)
+        if profile_id in v12_runtime.FORCED_EXIT_PROFILE_IDS
+        else runtime.require_qqq_order_level_profile(profile_id)
+    )
+
+
+def _expected_names(profile_id):
+    return (
+        v12_runtime.expected_custom_summary_statistic_names(profile_id)
+        if profile_id in v12_runtime.FORCED_EXIT_PROFILE_IDS
+        else runtime.expected_custom_summary_statistic_names(profile_id)
+    )
+
+
 def _plan(tmp_path: Path, profile_id=runtime.PROFILE_2025_ID):
-    profile = runtime.require_qqq_order_level_profile(profile_id)
+    profile = _profile(profile_id)
     activation_entry = adapter.OrderLevelUploadEntry(
         adapter.UPLOAD_SCHEMA,
         "activation_manifest",
@@ -52,7 +71,7 @@ def _plan(tmp_path: Path, profile_id=runtime.PROFILE_2025_ID):
         "0" * 32,
         True,
     )
-    expected_names = runtime.expected_custom_summary_statistic_names(profile_id)
+    expected_names = _expected_names(profile_id)
     return SimpleNamespace(
         plan_id="arv2-order-level-plan-test",
         plan_sha256="a" * 64,
@@ -213,12 +232,12 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         runtime.TICKET_PROFILE_2026_ID: (39, 178),
         runtime.REFLECTED_TICKET_PROFILE_2025_ID: (91, 428),
         runtime.REFLECTED_TICKET_PROFILE_2026_ID: (39, 178),
+        v12_runtime.FORCED_EXIT_PROFILE_2025_ID: (91, 428),
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
-        "score_source_view_id": runtime.require_qqq_order_level_profile(
-            plan.profile_id
-        )["score_source_view_id"],
+        "score_source_view_id": _profile(plan.profile_id)["score_source_view_id"],
         "decision_count": decision_count,
         "completed_rebalance_count": decision_count,
         "submitted_order_count": 2,
@@ -302,6 +321,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             runtime.TICKET_PROFILE_2026_ID: "2026-01-05",
             runtime.REFLECTED_TICKET_PROFILE_2025_ID: "2025-01-03",
             runtime.REFLECTED_TICKET_PROFILE_2026_ID: "2026-01-05",
+            v12_runtime.FORCED_EXIT_PROFILE_2025_ID: "2025-01-03",
+            v12_runtime.FORCED_EXIT_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -325,7 +346,9 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         "live_orders": False,
         "trading": False,
     }
-    if plan.profile_id in runtime.PROXY_PROFILE_IDS:
+    if plan.profile_id in (
+        runtime.PROXY_PROFILE_IDS + v12_runtime.FORCED_EXIT_PROFILE_IDS
+    ):
         aggregate.update({
             "schema": runtime.PROXY_SUMMARY_SCHEMA,
             "target_weight_basis": runtime.PROXY_TARGET_WEIGHT_BASIS,
@@ -337,10 +360,33 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             "minimum_qqq_proxy_constituent_weight_ratio": "0.14",
             "maximum_qqq_proxy_constituent_weight_ratio": "0.14",
         })
+    if plan.profile_id in v12_runtime.FORCED_EXIT_PROFILE_IDS:
+        aggregate.update({
+            "schema": v12_runtime.FORCED_EXIT_SUMMARY_SCHEMA,
+            "engine_forced_delisting": {
+                "schema": "arv2-order-level-forced-delisting-summary-v1",
+                "order_count": 0,
+                "event_count": 0,
+                "fill_event_count": 0,
+                "terminal_order_count": 0,
+                "absolute_filled_quantity": 0,
+                "filled_notional": "0",
+                "actual_engine_fee_amount": "0",
+                "accounting_complete": True,
+                "ledger_sha256": "e" * 64,
+                "raw_order_rows_in_summary": False,
+                "raw_security_rows_in_summary": False,
+            },
+            "forced_exit_invalidated_pending_rebalance_count": 0,
+        })
     if aggregate_update:
         aggregate.update(aggregate_update)
     meta = {
-        "schema": "arv2-qqq-order-level-tilt-runtime-meta-v1",
+        "schema": (
+            "arv2-qqq-order-level-tilt-runtime-meta-v2"
+            if plan.profile_id in v12_runtime.FORCED_EXIT_PROFILE_IDS
+            else "arv2-qqq-order-level-tilt-runtime-meta-v1"
+        ),
         "profile_id": plan.profile_id,
         "profile_sha256": plan.profile_sha256,
         "package_id": plan.package_id,
@@ -348,9 +394,7 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         "activation_manifest_sha256": "5" * 64,
         "symbol_resolution_id": "resolution-one",
         "symbol_resolution_sha256": "6" * 64,
-        "score_source_view_id": runtime.require_qqq_order_level_profile(
-            plan.profile_id
-        )["score_source_view_id"],
+        "score_source_view_id": _profile(plan.profile_id)["score_source_view_id"],
         "aggregates_sha256": hashlib.sha256(_canonical(aggregate)).hexdigest(),
         "result_transport": "aggregate_only_custom_summary_statistics",
         "backtest_only": True,
@@ -514,6 +558,7 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
     (
         runtime.TICKET_PROFILE_2026_ID,
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
     ),
 )
 def test_ticket_result_parser_accepts_complete_high_precision_aggregate(
@@ -535,6 +580,7 @@ def test_ticket_result_parser_accepts_complete_high_precision_aggregate(
     (
         runtime.TICKET_PROFILE_2026_ID,
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
     ),
 )
 def test_ticket_result_hashes_stored_aggregate_text_not_json_quoted_string(
@@ -590,6 +636,7 @@ def test_legacy_result_parser_retains_4096_byte_bound(tmp_path):
     (
         runtime.TICKET_PROFILE_2026_ID,
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
     ),
 )
 def test_ticket_result_parser_refuses_more_than_8192_bytes(tmp_path, profile_id):
@@ -603,6 +650,90 @@ def test_ticket_result_parser_refuses_more_than_8192_bytes(tmp_path, profile_id)
     with pytest.raises(
         adapter.AcceptedRiskOrderLevelSubmissionError,
         match="^order-level custom result value exceeded its exact bound$",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+def test_v12_result_parser_accepts_exact_nested_forced_exit_summary(tmp_path):
+    plan = _plan(tmp_path, v12_runtime.FORCED_EXIT_PROFILE_2026_ID)
+    statistics = _statistics(plan)
+    launch, response = _result_response(plan, statistics)
+
+    assert adapter._parse_result(response, plan, launch) == tuple(
+        sorted(statistics.items())
+    )
+
+
+def test_v12_result_parser_requires_v12_meta_schema(tmp_path):
+    plan = _plan(tmp_path, v12_runtime.FORCED_EXIT_PROFILE_2026_ID)
+    statistics = _statistics(plan, meta_update={
+        "schema": "arv2-qqq-order-level-tilt-runtime-meta-v1",
+    })
+    launch, response = _result_response(plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="^order-level aggregate runtime lineage changed$",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
+@pytest.mark.parametrize(
+    ("mutation", "message"),
+    (
+        ("extra", "order-level forced delisting summary changed"),
+        ("schema", "order-level forced delisting summary changed"),
+        ("incomplete", "order-level forced delisting summary changed"),
+        ("bool_count", "order-level forced delisting summary changed"),
+        ("negative_count", "order-level forced delisting summary changed"),
+        ("raw_rows", "order-level forced delisting summary changed"),
+        (
+            "digest",
+            "order-level forced delisting ledger digest is not an exact SHA-256",
+        ),
+        ("count", "order-level forced delisting accounting changed"),
+        ("notional", "order-level forced delisting accounting changed"),
+        ("fee", "order-level forced delisting accounting changed"),
+        ("invalidation", "order-level forced delisting accounting changed"),
+    ),
+)
+def test_v12_result_parser_isolates_forced_exit_guards(
+    tmp_path, mutation, message,
+):
+    plan = _plan(tmp_path, v12_runtime.FORCED_EXIT_PROFILE_2026_ID)
+    statistics = _statistics(plan)
+    aggregates = json.loads(statistics[runtime.AGGREGATES_STATISTIC_NAME])
+    forced = aggregates["engine_forced_delisting"]
+    if mutation == "extra":
+        forced["raw_events"] = []
+    elif mutation == "schema":
+        forced["schema"] = "arv2-order-level-forced-delisting-summary-v0"
+    elif mutation == "incomplete":
+        forced["accounting_complete"] = False
+    elif mutation == "bool_count":
+        forced["order_count"] = False
+    elif mutation == "negative_count":
+        forced["absolute_filled_quantity"] = -1
+    elif mutation == "raw_rows":
+        forced["raw_order_rows_in_summary"] = True
+    elif mutation == "digest":
+        forced["ledger_sha256"] = "g" * 64
+    elif mutation == "count":
+        forced["event_count"] = 1
+    elif mutation == "notional":
+        forced["filled_notional"] = "-1"
+    elif mutation == "fee":
+        forced["actual_engine_fee_amount"] = "1"
+    else:
+        aggregates["forced_exit_invalidated_pending_rebalance_count"] = 1
+    statistics[runtime.AGGREGATES_STATISTIC_NAME] = _canonical(
+        aggregates
+    ).decode("ascii")
+    launch, response = _result_response(plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="^" + message + "$",
     ):
         adapter._parse_result(response, plan, launch)
 
@@ -623,6 +754,8 @@ def test_ticket_result_parser_refuses_more_than_8192_bytes(tmp_path, profile_id)
         runtime.TICKET_PROFILE_2026_ID,
         runtime.REFLECTED_TICKET_PROFILE_2025_ID,
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2025_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
     ),
 )
 def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
@@ -630,7 +763,9 @@ def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
 ):
     plan = _plan(tmp_path, profile_id)
     statistics = _statistics(plan)
-    assert len(statistics[runtime.AGGREGATES_STATISTIC_NAME].encode("ascii")) <= 4096
+    assert len(
+        statistics[runtime.AGGREGATES_STATISTIC_NAME].encode("ascii")
+    ) <= adapter._maximum_statistic_bytes(profile_id)
     launch, response = _result_response(plan, statistics)
     assert adapter._parse_result(response, plan, launch) == tuple(
         sorted(statistics.items())
@@ -669,6 +804,8 @@ def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
         runtime.TICKET_PROFILE_2026_ID,
         runtime.REFLECTED_TICKET_PROFILE_2025_ID,
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2025_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
     ),
 )
 def test_preopen_result_cannot_shift_first_execution_session(
@@ -1074,7 +1211,7 @@ def test_pinned_profile_census_matches_authenticated_package_session_axis():
             return_interval_count,
             _expected_names,
         ) = binding
-        start = runtime.require_qqq_order_level_profile(profile_id)[
+        start = _profile(profile_id)[
             "evaluation_start_session"
         ]
         expected_sessions = tuple(
@@ -1095,7 +1232,9 @@ def test_pinned_profile_census_matches_authenticated_package_session_axis():
 
 
 def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
-    assert adapter.PROFILE_IDS == runtime.PROFILE_IDS == (
+    assert adapter.PROFILE_IDS == (
+        runtime.PROFILE_IDS + v12_runtime.FORCED_EXIT_PROFILE_IDS
+    ) == (
         runtime.PROFILE_2025_ID,
         runtime.PROFILE_2026_ID,
         runtime.PROXY_PROFILE_2025_ID,
@@ -1112,8 +1251,12 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.TICKET_PROFILE_2026_ID,
         runtime.REFLECTED_TICKET_PROFILE_2025_ID,
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2025_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
     )
-    assert adapter.PROXY_PROFILE_IDS == runtime.PROXY_PROFILE_IDS == (
+    assert adapter.PROXY_PROFILE_IDS == (
+        runtime.PROXY_PROFILE_IDS + v12_runtime.FORCED_EXIT_PROFILE_IDS
+    ) == (
         runtime.PROXY_PROFILE_2025_ID,
         runtime.PROXY_PROFILE_2026_ID,
         runtime.PREOPEN_PROXY_PROFILE_2025_ID,
@@ -1128,6 +1271,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.TICKET_PROFILE_2026_ID,
         runtime.REFLECTED_TICKET_PROFILE_2025_ID,
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2025_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
     )
     bindings = adapter._PINNED_RUNTIME_PROFILE_BINDINGS
     assert tuple(binding[0] for binding in bindings) == adapter.PROFILE_IDS
@@ -1148,7 +1293,11 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
 
 @pytest.mark.parametrize(
     "profile_id",
-    (runtime.PROFILE_2025_ID, runtime.PREOPEN_PROXY_PROFILE_2026_ID),
+    (
+        runtime.PROFILE_2025_ID,
+        runtime.PREOPEN_PROXY_PROFILE_2026_ID,
+        v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
+    ),
 )
 def test_submission_plan_persists_and_reloads_against_exact_inputs(
     tmp_path, monkeypatch, profile_id
@@ -1907,6 +2056,7 @@ def test_result_read_authority_refuses_each_invalid_owner_signature(
         (runtime.CASH_PREOPEN_PROXY_PROFILE_2026_ID, 4096),
         (runtime.TICKET_PROFILE_2026_ID, 8192),
         (runtime.REFLECTED_TICKET_PROFILE_2026_ID, 8192),
+        (v12_runtime.FORCED_EXIT_PROFILE_2026_ID, 8192),
     ),
 )
 def test_result_read_authority_binds_profile_specific_statistic_limit(

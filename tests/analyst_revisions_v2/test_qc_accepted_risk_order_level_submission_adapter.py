@@ -39,6 +39,9 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_v15_qc_runtime as v15_runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v16_qc_runtime as v16_runtime,
+)
 from research.analyst_revisions_v2_qc import formal_qc_transport
 
 
@@ -54,7 +57,9 @@ def _canonical(value):
 
 def _profile(profile_id):
     return (
-        v15_runtime.require_qqq_order_level_profile(profile_id)
+        v16_runtime.require_qqq_order_level_profile(profile_id)
+        if profile_id in v16_runtime.EXPOSURE_PROFILE_IDS
+        else v15_runtime.require_qqq_order_level_profile(profile_id)
         if profile_id in v15_runtime.ACCOUNT_PROFILE_IDS
         else v14_runtime.require_qqq_order_level_profile(profile_id)
         if profile_id in v14_runtime.DIAGNOSTIC_PROFILE_IDS
@@ -68,7 +73,9 @@ def _profile(profile_id):
 
 def _expected_names(profile_id):
     return (
-        v15_runtime.expected_custom_summary_statistic_names(profile_id)
+        v16_runtime.expected_custom_summary_statistic_names(profile_id)
+        if profile_id in v16_runtime.EXPOSURE_PROFILE_IDS
+        else v15_runtime.expected_custom_summary_statistic_names(profile_id)
         if profile_id in v15_runtime.ACCOUNT_PROFILE_IDS
         else v14_runtime.expected_custom_summary_statistic_names(profile_id)
         if profile_id in v14_runtime.DIAGNOSTIC_PROFILE_IDS
@@ -261,6 +268,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         v14_runtime.DIAGNOSTIC_PROFILE_2026_ID: (39, 178),
         v15_runtime.ACCOUNT_PROFILE_2025_ID: (91, 428),
         v15_runtime.ACCOUNT_PROFILE_2026_ID: (39, 178),
+        v16_runtime.EXPOSURE_PROFILE_2025_ID: (91, 428),
+        v16_runtime.EXPOSURE_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
@@ -356,6 +365,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             v14_runtime.DIAGNOSTIC_PROFILE_2026_ID: "2026-01-05",
             v15_runtime.ACCOUNT_PROFILE_2025_ID: "2025-01-03",
             v15_runtime.ACCOUNT_PROFILE_2026_ID: "2026-01-05",
+            v16_runtime.EXPOSURE_PROFILE_2025_ID: "2025-01-03",
+            v16_runtime.EXPOSURE_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -385,6 +396,7 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         + v13_runtime.ROLLOVER_PROFILE_IDS
         + v14_runtime.DIAGNOSTIC_PROFILE_IDS
         + v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
     ):
         aggregate.update({
             "schema": runtime.PROXY_SUMMARY_SCHEMA,
@@ -419,6 +431,7 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
     if plan.profile_id in (
         v14_runtime.DIAGNOSTIC_PROFILE_IDS
         + v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
     ):
         aggregate.update({
             "schema": v14_runtime.DIAGNOSTIC_SUMMARY_SCHEMA,
@@ -438,9 +451,16 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
                 })).hexdigest(),
             },
         })
-    if plan.profile_id in v15_runtime.ACCOUNT_PROFILE_IDS:
+    if plan.profile_id in (
+        v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
+    ):
         aggregate.update({
-            "schema": v15_runtime.ACCOUNT_SUMMARY_SCHEMA,
+            "schema": (
+                v16_runtime.EXPOSURE_SUMMARY_SCHEMA
+                if plan.profile_id in v16_runtime.EXPOSURE_PROFILE_IDS
+                else v15_runtime.ACCOUNT_SUMMARY_SCHEMA
+            ),
             "delisted_zero_holding_target_retirement_count": 0,
             "delisted_zero_holding_target_retirement_decision_count": 0,
             "delisted_zero_holding_target_retired_weight_total": "0",
@@ -462,6 +482,7 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             if plan.profile_id in (
                 v14_runtime.DIAGNOSTIC_PROFILE_IDS
                 + v15_runtime.ACCOUNT_PROFILE_IDS
+                + v16_runtime.EXPOSURE_PROFILE_IDS
             )
             else "arv2-qqq-order-level-tilt-runtime-meta-v2"
             if plan.profile_id in adapter.FORCED_EXIT_PROFILE_IDS
@@ -882,6 +903,33 @@ def test_v15_result_parser_requires_v3_meta_schema(tmp_path):
         adapter._parse_result(response, plan, launch)
 
 
+def test_v16_parser_accepts_r169_exact_complement_and_refuses_old_pair(
+    tmp_path,
+):
+    plan = _plan(tmp_path, v16_runtime.EXPOSURE_PROFILE_2026_ID)
+    gross = "0.9627929226578532739058666438"
+    corrected_cash = "0.0372070773421467260941333562"
+    corrected = _statistics(plan, aggregate_update={
+        "mean_gross_exposure": gross,
+        "mean_cash_weight": corrected_cash,
+    })
+    launch, response = _result_response(plan, corrected)
+    assert adapter._parse_result(response, plan, launch) == tuple(
+        sorted(corrected.items())
+    )
+
+    predecessor = _statistics(plan, aggregate_update={
+        "mean_gross_exposure": gross,
+        "mean_cash_weight": "0.03720707734214672609413335543",
+    })
+    launch, response = _result_response(plan, predecessor)
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="^order-level aggregate execution or coverage invariant changed$",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
 @pytest.mark.parametrize(
     ("mutation", "message"),
     (
@@ -1126,6 +1174,8 @@ def test_v15_result_parser_refuses_each_account_reconciliation_mutation(
         v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
         v15_runtime.ACCOUNT_PROFILE_2025_ID,
         v15_runtime.ACCOUNT_PROFILE_2026_ID,
+        v16_runtime.EXPOSURE_PROFILE_2025_ID,
+        v16_runtime.EXPOSURE_PROFILE_2026_ID,
     ),
 )
 def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
@@ -1612,6 +1662,7 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         + v13_runtime.ROLLOVER_PROFILE_IDS
         + v14_runtime.DIAGNOSTIC_PROFILE_IDS
         + v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
     ) == (
         runtime.PROFILE_2025_ID,
         runtime.PROFILE_2026_ID,
@@ -1637,6 +1688,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
         v15_runtime.ACCOUNT_PROFILE_2025_ID,
         v15_runtime.ACCOUNT_PROFILE_2026_ID,
+        v16_runtime.EXPOSURE_PROFILE_2025_ID,
+        v16_runtime.EXPOSURE_PROFILE_2026_ID,
     )
     assert adapter.PROXY_PROFILE_IDS == (
         runtime.PROXY_PROFILE_IDS
@@ -1644,6 +1697,7 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         + v13_runtime.ROLLOVER_PROFILE_IDS
         + v14_runtime.DIAGNOSTIC_PROFILE_IDS
         + v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
     ) == (
         runtime.PROXY_PROFILE_2025_ID,
         runtime.PROXY_PROFILE_2026_ID,
@@ -1667,6 +1721,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
         v15_runtime.ACCOUNT_PROFILE_2025_ID,
         v15_runtime.ACCOUNT_PROFILE_2026_ID,
+        v16_runtime.EXPOSURE_PROFILE_2025_ID,
+        v16_runtime.EXPOSURE_PROFILE_2026_ID,
     )
     bindings = adapter._PINNED_RUNTIME_PROFILE_BINDINGS
     assert tuple(binding[0] for binding in bindings) == adapter.PROFILE_IDS
@@ -1682,11 +1738,13 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
     assert bindings[7][3:7] == ("2026-01-05", 39, 178, 177)
     assert bindings[8][3:7] == ("2025-01-03", 91, 428, 427)
     assert bindings[9][3:7] == ("2026-01-05", 39, 178, 177)
-    assert tuple(binding[1] for binding in bindings[-4:]) == (
+    assert tuple(binding[1] for binding in bindings[-6:]) == (
         "d1367ac6dd6a7446632b381496ff02be8e602f02373b31ff6c81e9d704298200",
         "bfb77eacdaddb8566b649165eb4986ca038658bbc23d5eb95641f4cea13d0776",
         "884b61e586dd2265845e751675d3e2eaa452a4d04f3635206acd552455e81738",
         "13303b1940e3442f01d93020e62c43e196c88ec297ddace97a0f4dc024a14e7a",
+        "0ac38709a0666a105e571953bdeb94304439c0c82fe3c3b647edb363b1c0b135",
+        "f23417c65cd80daee2440350ca0598728a896816bd5f5d4412c9352f6ab45f3b",
     )
     assert adapter.ROLLOVER_PROFILE_IDS == v13_runtime.ROLLOVER_PROFILE_IDS
     assert adapter.FORCED_EXIT_PROFILE_IDS == (
@@ -1694,9 +1752,11 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         + v13_runtime.ROLLOVER_PROFILE_IDS
         + v14_runtime.DIAGNOSTIC_PROFILE_IDS
         + v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
     )
     assert adapter.DIAGNOSTIC_PROFILE_IDS == v14_runtime.DIAGNOSTIC_PROFILE_IDS
     assert adapter.ACCOUNT_PROFILE_IDS == v15_runtime.ACCOUNT_PROFILE_IDS
+    assert adapter.EXPOSURE_PROFILE_IDS == v16_runtime.EXPOSURE_PROFILE_IDS
     assert adapter._PINNED_FORCED_EXIT_SUMMARY_SCHEMA == (
         v12_runtime.FORCED_EXIT_SUMMARY_SCHEMA
     )
@@ -1705,6 +1765,9 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
     )
     assert adapter._PINNED_ACCOUNT_SUMMARY_SCHEMA == (
         v15_runtime.ACCOUNT_SUMMARY_SCHEMA
+    )
+    assert adapter._PINNED_EXPOSURE_SUMMARY_SCHEMA == (
+        v16_runtime.EXPOSURE_SUMMARY_SCHEMA
     )
     assert runtime.PROXY_SUMMARY_SCHEMA == "arv2-qqq-order-level-tilt-summary-v7"
 
@@ -2481,6 +2544,7 @@ def test_result_read_authority_refuses_each_invalid_owner_signature(
         (v13_runtime.ROLLOVER_PROFILE_2026_ID, 8192),
         (v14_runtime.DIAGNOSTIC_PROFILE_2026_ID, 8192),
         (v15_runtime.ACCOUNT_PROFILE_2026_ID, 8192),
+        (v16_runtime.EXPOSURE_PROFILE_2026_ID, 8192),
     ),
 )
 def test_result_read_authority_binds_profile_specific_statistic_limit(
@@ -2534,10 +2598,17 @@ def test_v14_result_read_authority_binds_diagnostic_field_inventory(
     ).hexdigest()
 
 
-def test_v15_result_read_authority_binds_account_field_inventory(
-    tmp_path, monkeypatch,
+@pytest.mark.parametrize(
+    "profile_id",
+    (
+        v15_runtime.ACCOUNT_PROFILE_2026_ID,
+        v16_runtime.EXPOSURE_PROFILE_2026_ID,
+    ),
+)
+def test_account_result_read_authority_binds_account_field_inventory(
+    tmp_path, monkeypatch, profile_id,
 ):
-    plan = _plan(tmp_path, v15_runtime.ACCOUNT_PROFILE_2026_ID)
+    plan = _plan(tmp_path, profile_id)
     monkeypatch.setattr(
         adapter, "require_order_level_submission_plan", lambda value: value
     )

@@ -3885,3 +3885,69 @@ unavailable while the Mac was locked and the controllable browser was logged
 out. No fourth run is permitted. This is a technical runtime refusal, not an
 economic strategy result; Mia diagnosis and prospective correction are
 required before any successor launch.
+
+## R-172 addendum — fifteen owner-directed Mia launches in the reused attempt-3 project (NOT ADMISSIBLE; COUNTED) — 2026-09-21
+
+After the three byte-identical R-172 refusals, QuantConnect's built-in
+assistant Mia, at the owner's direction, launched **fifteen further
+backtests inside the reused attempt-3 project `36790168`** between 18:02:22
+and 22:04:26 QC time: four diagnostics, then successive "V17" through "V20"
+relaxations of the frozen census (date-keyed acceptance of served snapshot
+ages 2, 3, 5, 10 and 15; re-basing a frozen plan from a rounded split factor;
+rescaling a percent-scaled weight snapshot by 100). Only the sixteenth
+backtest in the project, `c88fb1b2cf91a714242d898078322b5b`, completed. The
+owner read a standard statistic (about 39.2% annualized) from it. Every Mia
+file and the modified `main.py` are refused by the lane's source firewall,
+the project was reused, and the source traded on stale and rescaled inputs,
+so that run is **NOT ADMISSIBLE** and creates no cell. This session read no
+statistic from it. Each launch is a QC launch and is counted: **132 -> 147
+shared looks / 75 -> 90 ARV2 development evaluations / 27 infrastructure
+looks / 608 authenticated cells**. Section 166 of the lane record holds the
+per-backtest chronology and the root cause: the V12 exact age-1 point-in-time
+constituent census refused deterministically at the first 2025 decision
+because the backtest serving path withheld the 2025-01-04 stamp.
+
+## R-173 — V17 fail-closed-skip 2025-now QQQ order run (DIAGNOSTIC LAUNCH; TERMINAL COMPOSITION REFUSAL; ZERO CELLS) — 2026-09-21
+
+R-173 is the owner-authorized diagnostic launch of the lane's immutable V17
+successor (`accepted_risk_qqq_order_level_v17_qc_runtime.py`, SHA-256
+`8049d90e5e04b3d80d61f106441e60e3de98eaf863cd3e569342d6186a6910e5`,
+committed at `5223ba8`; V16 blob unchanged
+`998cb19bfe7d48c37ec1dfb901399080ef206831df62a42cb339a464a638877e`) on
+profile `arv2-qqq-order-level-tilt-2025-cutoff-v17`, SHA-256
+`60af112e42e4bbdfe8949c360359399138cc94a6b24968db59026d9c874fb6b6`, window
+**2025-01-02 through 2026-09-16**. V17 changes no strategy economics: a
+stale point-in-time snapshot, an out-of-band positive weight total, or
+overnight holdings drift before the frozen preopen execution becomes a
+counted, recorded no-order skip with `run_valid=false`, instead of a whole-run
+refusal or any relaxation. No return sign or winner is selected.
+
+The launch used the plain repository client from the Windows host, not the
+POSIX-only signed protocol, so it is a diagnostic and not a formal cell.
+Fresh private project `96 ARV2_QQQ_SKIP_ORDER_R173_A1_2025_NOW - 20260921`
+(`36809007`); 17 files / 394,221 bytes (the 15 frozen R-172 modules
+byte-identical, V17, and a generated `main.py` differing from the frozen
+R-172 main only by the V17 binding and profile id), every file re-read and
+hash-verified after upload (content-manifest SHA-256
+`689738523c9ec7de7ca3aa5dc4d18cfa21828d916139fe976886cbfc98f288ae`);
+compile `a4ba2fd8811c6ccea4215fcf0d3b6d88-561c6ae42ece50278d631e92b3900012`
+`BuildSuccess`; backtest `ARV2 R173A1 QQQ skip order 2025 now 8049d90e`, id
+`0d4ff088d0b0ea144e9c0d27de3926d7`, created 23:10:06 UTC. Status-only
+polling (0.312, 0.885, terminal) reached `Runtime Error` at
+**2026-09-18 00:00:00**: `order-level terminal account composition changed`
+in V15's `_replace_terminal_account_observation`. The run therefore passed
+the entire 2025-now decision schedule under V17 and refused at the untouched
+V15 terminal identity `holdings + cash == equity`; the refusal carries no
+values and no statistic, chart, order, log, price, provider row or return
+was read.
+
+R-173 spends **147 -> 148 shared looks / 90 -> 91 ARV2 development
+evaluations**, keeps **27 infrastructure looks / 608 authenticated cells**,
+and uses one of the V17 candidate's three launches. No second attempt is
+made from this session; the next launch requires an owner-directed,
+preregistered successor that reports the terminal residual in a bounded way
+(`ARV2R166-009`), and a formal V17 cell also requires adapter registration
+(`ARV2R166-006`) and a Mac launch through the signed protocol. No result
+read, parameter tuning, leverage, six-universe expansion, deployment,
+broker, paper/live, funded-account, real-order, or trading authority
+follows.

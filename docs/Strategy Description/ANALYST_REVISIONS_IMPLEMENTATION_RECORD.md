@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–164 retain the milestone, review, preregistration, QC
+strategy. Sections 1–165 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -14,6 +14,10 @@ because exactly one of 39 decisions was skipped for a missing price. Its
 bounded aggregate read is therefore a diagnostic result, not an authenticated
 result cell or formal alpha verdict. R-164/R-165 remain mutable-cloud
 diagnostics. Contingent R-138 remains unlaunched and unspent.
+Section 166 records Claude's review of the Mia-modified project, the
+immutable fail-closed V17 successor committed at `5223ba8`, and the
+R-173 diagnostic launch that ran the whole 2025-now schedule and refused
+at the untouched V15 terminal composition identity; no cell was added.
 Codex uses focused checks during development and QC work; Claude runs the
 complete lane suite during independent review unless the owner explicitly
 asks Codex to run it. Section 150 is the independent Claude review of
@@ -168,7 +172,7 @@ exhaustive lifecycle-to-named-refusal builder now exists. The status envelope
 and exact result reader are implemented but have not been used. B5D and the
 section-69 candidate were accepted in section 70. The order-level lineage
 through V16 and the R-169 through R-172 execution evidence are accepted in
-section 165 with no code correction, pending Codex counter-review; no
+section 165 with no code correction, pending Codex counter-review; section 166 adds the immutable V17 fail-closed decision-skip successor as a candidate pending Codex counter-review and records the R-173 diagnostic refusal; no
 wording above grants physical access or makes a pristine-PIT claim.
 
 The production source, firm-ontology, security-master, classification, cost,
@@ -501,7 +505,7 @@ without reading an error log or result. The R-172 launch budget is exhausted;
 there must be no fourth attempt. The owner explicitly waives Claude review of
 section 163 before the standing Mia recovery step. Section 164 freezes the
 round's review handoff; Claude must review section 164 and the exact pushed
-range after the one allowed push. Section 165 completes that review and accepts the exact pushed snapshot with no code correction; Codex must counter-review section 165 and this record commit before any later milestone, and R-172 remains blocked on Mia. Operationally, the owner must unlock the
+range after the one allowed push. Section 165 completes that review and accepts the exact pushed snapshot with no code correction; Codex must counter-review section 165 and that record commit before any later milestone. Section 166 completes the owner-requested Mia-code review: Mia's four files are documented and rejected, the lane's immutable V17 fail-closed successor is committed at `5223ba8`, and the R-173 diagnostic launch ran the whole 2025-now schedule under V17 and refused at the V15 terminal account composition identity; Codex must counter-review section 166 and both commits before any further launch, no second R-173 attempt is authorised from this session, and R-172 is closed as diagnosed. Operationally, the owner must unlock the
 Mac, after which Codex can ask Mia to diagnose the existing attempt-3 project
 `36790168`; alternatively the owner may run Mia and return its findings and
 corrections. Only a prospectively documented, corrected successor may launch
@@ -2224,6 +2228,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-21 | Codex retrospective Massive delta-capture lineage reconciliation | 2026-09-17 physical capture -> `arv2-physical-accepted-risk-1678b925bc78e8b3f4fdf291` | Close `ARV2R150-002` by recording the already-used 2026 delta input lineage | Under the owner's standing authorization to use the configured Massive subscriptions for this lane's accepted-risk inputs and QC backtesting, the capture requested 2026-01-01 through 2026-09-16 after that final close. It ran from `2026-09-17T05:18:36.493365Z` through `2026-09-17T05:18:48.773522Z` over `massive_https_bearer_default_session`: 75,110 source rows (51,331 ratings, 14,991 earnings, 8,788 guidance), yielding 75,108 current-view and 73,832 censored-view rows with 1,276 disagreements. The archive SHA-256 is `1678b925bc78e8b3f4fdf2911e3e426327fb8a1307463d1ff2bd43f279a1cc77`; source manifest `3384e9745c3093eb203997d4a98057ae2d066180add5e0367c4c3687a50d83ea`; pair artifact `arv2-accepted-risk-pair-0452a4811db397068b0dbd4c`, artifact SHA-256 `696265dad63c8f67560bc9c8ffed46907ce75faf5e8ff2353b1cbcc25561ce57`, content SHA-256 `0452a4811db397068b0dbd4c0e22db92c1597bcfcef93559e71647ee87228ea8`. The later order package authenticates 743 delta contributions in addition to 12,244 parent contributions. | Manifest identities, counts, timestamps, role totals, accepted-risk pair lineage, and the package's 743-contribution pin were re-read locally without exposing licensed rows. This retrospective correction performs no provider call and no outcome/result read; it adds **zero looks, zero development evaluations, zero infrastructure looks, and zero cells**. | `ARV2R150-002` corrected. The input is current-vintage/non-pristine-PIT under the owner's recorded accepted-risk decision; the archive's post-materialization capabilities are all closed and do not erase the provider access used for capture. | Keep the capture event mirrored in `docs/research/alpha-result.md`; no research conclusion, live authority, or trading authority follows. |
 | 2026-09-21 | Codex counter-review, V15/V16 implementation, and order-level QC | `87dd82f` -> this record commit | Accept Claude section 150; correct R-169 account/delisting and exposure-complement evidence admission prospectively; run R-169--R-172 under exact signed controls | Claude's three commits were accepted. R-169 completed but its formal read refused; R-170 completed but its known-incompatible read was withheld; immutable V16 produced one valid R-171 2026-YTD cell. R-172's 2025-now source compiled three times and ended `Runtime Error` three times; no result or raw log was read, the attempt cap is exhausted, and Mia is required. | Focused V16 selection **464 passed in 82.89 s**; independent R-172 prelaunch audit 0 P0/P1/P2; post-failure split/census selection **47 passed in 1.82 s**; final active-document gate **76 passed**; focused compileall and diff checks clean. Per owner rule, no full lane suite. Accounting closes at **132 shared looks, 75 development evaluations, 27 infrastructure looks, 608 authenticated cells**. | Claude counter-review corrections closed; V15 and V16 evidence defects corrected prospectively; open P2 `ARV2D163-001` blocks R-172 pending exact Mia diagnosis; open P3 `ARV2D163-002` records missing 2025 corporate-action path coverage. | Push this same-lane range exactly once. Claude reviews it. No fourth R-172 launch; owner unlocks the authenticated Mac browser so Codex can invoke Mia on project `36790168`, or returns Mia's exact diagnosis and changes. |
 | 2026-09-21 | Claude review and live-state update | `8ba0213` -> this commit | Independent review of the section-151 counter-review, V14 through V16, and R-169 through R-172 (`87dd82f..8ba0213`, seventeen commits) | Synced the lane worktree by fast-forward from a clean tree on this Windows host and reviewed the range commit by commit and cumulatively (section 165); accepted with no code correction, so this push is record-only and the implementation tree at `323829f` is unchanged. Verified rather than accepted: V14/V15/V16 runtime blob SHA-256s reproduce the record's byte-identity claims; R-171 and R-169 arithmetic reconciles exactly at 40 digits (ending equity, spread, calendar shortfall, the $267.573 gap, the exact mean complement, 10 bps per fill); look accounting closes 126/69/27/607 to 132/75/27/608; the shared ledger is append-only across the range; frozen blobs, gates and the 45-module core closure unchanged; the V15-to-V16 diff shows only representation and profile-gate changes, no economic rule; section 151's dispositions of the other session's three commits confirmed against their diffs. | Real-tree collectable subset on `8ba0213` **408 failed, 3764 passed, 76 skipped, 77 errors in 5982.43s (1:39:42)** with 56 files uncollectable (`ARV2R165-001`); the retained failure tail is the Sharadar adapter's own POSIX precondition refusal plus `ARV2R165-004`, and the range changed no module whose tests collect here except the record-gate test. Active-document and lane-record gates **76 passed**; compileall exit 0; `git diff --check` clean. Execution evidence for this range's code was obtained in a scratch worktree with two local, uncommitted accommodations (a fail-closed `_flock` helper where `fcntl` is absent; the adapter's own `O_NOFOLLOW` conditional idiom applied to `register_at_fork`), under which the standing selection collects 7,108 tests with zero errors: focused V14/V15/V16/projection/adapter batteries **301 passed, 132 failed**, every failure in a named host class (three CRLF immutability hashes, 67 CRLF projection size-guard refusals, 62 POSIX adapter permission semantics) and none a defect in the range; mutation matrix on the V15 and V16 batteries: six of seven invariant mutations killed by distinctly named tests (the R-169 complement counterexample, LEAN `is_delisted`, zero-share reappearance, terminal composition, starting cash, target gross-sum), and the seventh (`gross` bound) proven equivalent because the V14 helper refuses the same input one call later. Zero research looks and zero development evaluations; no provider, credential, licensed row, production input, price, return, outcome, broker, operator database, QuantConnect, Object Store, deployment, order or trading access. | 0 P0, 0 P1. `ARV2R165-001` (P2, documented): the standing lane suite cannot be collected or passed on a Windows host: `fcntl` imported at module level in the protocol, `os.register_at_fork` hard-pinned in the adapter's sealing snapshot, and two CRLF classes (raw-byte immutability hashes in the V14 to V16 tests; the projection's size guard); 56 test files fail at import and every complete-suite figure since section 74 was Mac-only. Resolved by owner decision the same day: development has moved to the Mac and the physical layer is POSIX-only by design; no port is scheduled, the exact diffs are recorded for optional later use, and this Windows session verifies physical-layer ranges by source reading, blob-hash reproduction, arithmetic and scratch execution. `ARV2R165-002` (P2, documented): R-171's +1.2045 pp is measured against the QQQ ETF from a portfolio that is a QQQ replica with about 2% active share on 21 of 39 weeks; the tilt would need roughly +80% relative return to explain it, so the spread is replica-versus-ETF tracking until a tilt-off control run exists. `ARV2R165-003` (P3): `ARV2D163-002` confirmed; the 2025 profile has no behavioural split path in the V15/V16 batteries. `ARV2R165-004` (P3, documented): one research-core preregistration test fails on Windows because the 137-character look-ledger filenames exceed the 260-character path limit under pytest while the lineage capture's isolation discards the system `core.longpaths`; proven red/green, not in this range (passes at `5246a41`, fails at `87dd82f`), fail-closed, one-line `-c core.longpaths=true` fix handed to Codex. `ARV2CR28-008` remains out of lane. | Codex counter-reviews this record commit. R-172's diagnosis is with QuantConnect's Mia at the owner's direction; any fix must land as a versioned successor leaving V16 byte-identical, and this session verifies it when asked. No fourth R-172 attempt, result read, leverage, six-universe expansion, deployment, broker, funded-account, real-order or trading action is authorised. |
+| 2026-09-21 | Claude Mia-code review, V17 successor, R-173 diagnostic launch, and live-state update | `3243ae1` -> `5223ba8` -> this commit | Owner-requested review of the Mia-modified project `36790168`, root cause of the three R-172 refusals, the lane's immutable fail-closed V17 successor, one owner-authorized diagnostic QC launch, and section 166 | Retrieved the 21-file project (15 modules byte-identical to the frozen R-172 projection; `main.py` differs only by the V20 binding and profile id; four Mia runtime files and a notebook), reconstructed the frozen R-172 `main.py` (5,938 bytes; sizes sum to 370,919), and read the sixteen backtests' status and error text only. Root cause: the V12 exact age-1 point-in-time census refused deterministically at the first 2025 decision because the backtest serving path withheld the 2025-01-04 stamp; the later 2025 conditions (age 3, the ORLY split drift, the October stall, the percent-scaled 2025-11-01 stamp) are all V16 refusals by design. Mia's V17 through V20 (date allowlists to age 15, split re-basing, weight rescale by 100) and her `main.py` are all refused by the lane firewall and are not ported; the owner-reported 39.2% is NOT ADMISSIBLE. Implemented `accepted_risk_qqq_order_level_v17_qc_runtime.py` (SHA-256 `8049d90e...10e5`; V16 blob unchanged `998cb19b...877e`): stale snapshot, out-of-band weight total and overnight holdings drift become counted, recorded no-order skips with `run_valid=false`; projection and closure pins register the V17 family and a 400,000-byte ceiling. Launched R-173 (project `36809007`, backtest `0d4ff088...`, 17 files / 394,221 bytes hash-verified after upload): the run passed the whole 2025-now schedule and refused at V15's terminal account composition identity at 2026-09-18 00:00. | LF scratch worktree: V17 battery **32 passed**; V16 plus projection batteries **127 passed, 11 failed** (all the isolated-subprocess `tzdata` host class, `ARV2R166-008`); adapter profile-list subset **15 passed**; mutation matrix **8 of 8 killed**. Real tree at `5223ba8`: closure pins **5 passed**; `compileall` exit 0; `git diff --check` clean; V17 and adapter batteries uncollectable through the `fcntl` chain (`ARV2R165-001`). Active-document and lane-record gates **76 passed**. QC access: administrative reads (project list, files, backtest status/error), one fresh project, one compile, one backtest, status-only polling; no standard statistic, chart, order, log, price, provider row or return read. Looks: 132/75/27/608 -> 148/91/27/608 (fifteen owner-directed Mia launches counted, plus R-173). | 0 P0. `ARV2R166-001` (P1): deterministic refusal retried three times; retry rule should stop after identical refusals. `ARV2R166-002` (P1): Mia's changes weaken the census and are firewall-refused; not ported. `ARV2R166-003`/`-004` (P2): fifteen unaccounted launches in a reused project; direct project edits bypass every control. `ARV2R166-006` (P2): formal adapter lacks V17 registration (exact rules listed). `ARV2R166-009` (P2): R-173 refused at the V15 terminal composition identity; residual unobservable. `ARV2R166-005`/`-007`/`-008`/`-010` (P3): scratch persistence of list rows (deleted unread); comparator entry versus a skipped first decision; `tzdata` host class; aggregate transport margin unmeasured in production. | Codex counter-reviews section 166, `5223ba8` and this commit. No second R-173 attempt from this session; a successor for `ARV2R166-009` must be preregistered and owner-directed; a formal V17 cell needs `ARV2R166-006` and a Mac launch. No fourth R-172 attempt, result read, leverage, six-universe expansion, deployment, broker, funded-account, real-order or trading action is authorised. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -20640,3 +20645,336 @@ successor when asked. No fourth R-172 attempt, result read, leverage,
 six-universe expansion, paper/live deployment, broker, funded-account,
 real-order, or trading action is authorised. `ARV2CR28-008` remains out of
 lane and unfixed.
+
+## 166. Mia-modified project review, R-172 root cause, immutable V17 fail-closed successor, and the R-173 diagnostic launch, 2026-09-21
+
+### 166.1 Owner request, authority, and method
+
+The owner reported that, after Codex's three byte-identical R-172 attempts,
+QuantConnect's built-in assistant Mia changed the code inside the reused
+attempt-3 project `95 ARV2_QQQ_EXPOSURE_ORDER_R172_A3_2025_NOW - 20260921`
+(project `36790168`) until a run completed, and that the owner read a
+`39.2%` annual return from that run. The owner asked this session to (1)
+retrieve the project's code, (2) compare it with the local lane code, (3)
+apply the corrections needed to meet the project's safety standard, (4) run
+the revised code in QC, and (5) document what made the three attempts fail
+and how to correct them, as the same review round as section 165; Codex
+counter-reviews both commits afterwards.
+
+Authority and boundaries used: the owner's same-day authorization of QC
+access from this Windows host (credentials in the process environment,
+never printed, logged, or written); every QC launch is a look; fresh project
+per launch; V16 stays byte-identical; only the two custom aggregates may be
+read; no QC standard statistic is read by this session. The formal signed
+one-use protocol is POSIX-only (`ARV2R165-001`, owner decision 2026-09-21),
+so step 4 from this host is an owner-authorized **diagnostic** launch through
+the plain repository client, not a formal cell. Everything below is
+reproducible from the committed tree at `5223ba8` plus the QC identifiers
+recorded here.
+
+### 166.2 What was retrieved from project 36790168 (step 1)
+
+The project holds **21 files / 423,903 bytes**:
+
+| Class | Files | Bytes | SHA-256 (first 16 hex) | Disposition |
+|---|---|---|---|---|
+| Fifteen frozen lane modules | the R-172 projection's 15 source modules | 364,981 | every one equals the `8ba0213` LF blob (for example V16 `998cb19bfe7d48c3`, V15 `5470b32ea2aa6124`, base runtime `3d49f49068c51db2`) | byte-identical to the frozen R-172 projection |
+| `main.py` | 1 | 6,014 | `8c1b290fc20f9559` | modified: a unused `datetime` import line added; the import/binding switched from `AcceptedRiskQqqOrderLevelV16QcRuntime` to `AcceptedRiskQqqOrderLevelV20QcRuntime`; `profile_id` switched from `...-2025-cutoff-v16` to `...-2025-cutoff-v20`; nothing else |
+| Mia runtime files | `..._v17_qc_runtime.py`, `..._v18_...`, `..._v19_...`, `..._v20_...` | 6,604 / 10,455 / 9,139 / 12,060 | `4e318c9e1a5209f7` / `c91a080ca185ef2b` / `0a8d9071c5006c37` / `50d4db6e7d749e7d` | not in the lane; reviewed in 166.4 and rejected |
+| `mia.ipynb` | 1 | 14,650 | `3ec81372b4b5a9fa` | 21 research cells (universe history, session axis, split events, weight sums); no stored outputs, so its claims are not verifiable from the notebook itself |
+
+The frozen R-172 `main.py` was reconstructed from the committed projection
+generator with the V16 2025 profile and the activation values Mia's copy
+preserved: **5,938 bytes**, SHA-256 prefix `e2fd1bc38e77c965`. The fifteen
+module sizes plus 5,938 equal the record's **370,919 bytes**, so the
+retrieved project is the frozen projection plus Mia's additions. The
+projection SHA-256 `75027faa...` itself is not reproducible on this host
+because the delta-package identities it hashes are not committed.
+
+The reused project carries **sixteen backtests**: Codex's attempt 3 and
+**fifteen Mia launches** (times are QC-reported, 2026-09-21):
+
+| # | Backtest | Name | Created | Terminal (error text only) |
+|---|---|---|---|---|
+| 1 | `4d357d28...` | ARV2 R172A3 (Codex attempt 3) | 11:15:21 | `Runtime Error` 2025-01-06 16:00: PIT QQQ constituent snapshot is not the immediately prior authenticated session (`_pit_benchmark_measures`, base runtime line 644, from `on_after_close` line 889) |
+| 2 | `c257aed7...` | PIT Diagnostics Short Window | 18:02:22 | same refusal through a `main.py` wrapper |
+| 3 | `2c3a6623...` | PIT Diagnostics Run 2 | 18:09:13 | diagnostic raise: session 2025-01-06, raw_collection_count=27, served stamps tail `2024-12-25, 12-27, 12-28, 12-31, 2025-01-01, 2025-01-03` |
+| 4 | `32e09950...` | PIT widened-window probe | 18:59:37 | same 27 stamps with a widened window |
+| 5 | `c24fd4f3...` | universe history edge probe | 19:08:40 | `Runtime Error` 2025-04-02 00:00: backtest ended outside the exact final clock (V16 end gate; a truncated-window probe) |
+| 6 | `6530349a...` | V17 PIT Fallback | 19:47:09 | `Runtime Error` 2025-02-24 16:00: same snapshot refusal (Mia V17 line 160) |
+| 7 | `1e61d7e6...` | V18 PIT Fallback Depth | 19:52:02 | `Runtime Error` 2025-06-10 09:20: overnight holdings changed after the decision (`require_next_session_preopen`, core line 258) |
+| 8 | `bcf97e44...` | v19 split rebase | 20:18:00 | `Runtime Error` 2025-06-10 09:20: split multiple is not an exact integer of at least 2 (Mia V19) |
+| 9 | `6f812d86...` | v19 split rebase diagnostics | 20:35:42 | same |
+| 10 | `0e307783...` | v19 refusal numbers in message | 20:41:01 | same, now self-describing: `ORLY planned=3 observed=44` |
+| 11 | `8adb839d...` | v19 split factor rebase | 20:50:51 | `Runtime Error` 2025-10-13 16:00: snapshot refusal (Mia V18 line 165) |
+| 12 | `2e7a7d83...` | v18 oct13 verified-depths | 21:03:30 | `Runtime Error` 2025-10-13: expected snapshot 2025-10-10, served 2025-10-06, age 5 |
+| 13 | `02639e6d...` | v19 oct13 depth5 | 21:08:44 | `Runtime Error` 2025-10-20: expected 2025-10-17, served 2025-10-06, age 10 |
+| 14 | `3cd5e5b6...` | v19 oct13-27 stall window | 21:18:11 | `Runtime Error` 2025-11-03 16:00: positive constituent weight total is outside 0.95 to 1.05 (`resolved_qqq_holdings_weight_core`, benchmark line 118) |
+| 15 | `316c42ca...` | v20 weight-repair rerun | 21:35:15 | `Runtime Error` 2026-09-18 00:00: QQQ order-level V16 profile is not an exact fixed profile (V16 end gate, line 83/92/206) |
+| 16 | `c88fb1b2...` | V20 terminal-gate fix rerun | 22:04:26 | `Completed.` (the run whose standard statistic the owner read) |
+
+Two administrative observations. First, the R-166 project `36781246` that
+showed a 17:29:52 modification in section 165's connectivity probe was
+re-checked: all ten of its files are still byte-identical to the frozen
+`8ba0213` modules and its only backtest is the original R-166 run, so the
+timestamp was a metadata re-save, not a content change. Second, this
+session's retrieval script wrote the project's backtest list to a scratch
+file after stripping only the nested statistics objects; the list rows also
+carry top-level summary-shaped numeric fields. Only status, name, creation
+time and error text were ever displayed; the scratch file was deleted
+unread and no such field was read, but the mistake is recorded as
+`ARV2R166-005` so future retrievals project fields before persisting.
+
+### 166.3 Root cause of the three identical R-172 failures (step 2)
+
+All three attempts refused at the **first weekly decision of the 2025
+profile, 2025-01-06 16:00**, in the base runtime's
+`_pit_benchmark_measures`, with the message `order-level PIT QQQ constituent
+snapshot is not the immediately prior authenticated session`. The rule that
+fired is the V12 point-in-time census: the latest strictly-prior QQQ
+constituent collection must be exactly **one authenticated session old**
+(`EXACT_CONSTITUENT_SNAPSHOT_AGE_SESSIONS = 1`, with the profile's
+`constituent_source_session_rule` mapping each stored stamp to the prior
+calendar day). Mia's diagnostic run 3 exposed the served inventory: the
+backtest universe-history path returned stamps ending `2024-12-31,
+2025-01-01, 2025-01-03`. The stamp `2025-01-04`, which carries session
+2025-01-03's holdings, was absent from the backtest serving path, so the
+latest served stamp `2025-01-03` carried session 2025-01-02, the snapshot
+was age 2, and V16 refused.
+
+Consequences of that mechanism:
+
+- The failure was **deterministic**: byte-identical source, profile and
+  window produced the same served inventory and the same refusal on every
+  attempt. Attempts 2 and 3 could never have differed; the retry rule was
+  designed for engine or transport failures, not for a guard refusal on a
+  fixed input (`ARV2R166-001`).
+- R-171 (the same V16 on the 2026 window) completed because none of its 39
+  decision sessions met a withheld stamp. The 2025 window contains several.
+- Mia's conclusion that "the algorithm has no issue, the problem is data
+  integrity in QC" is correct for this refusal and for three of the later
+  ones: the V12 through V16 guards did exactly what they were designed to
+  do and failed closed on served data that did not meet the frozen rule.
+  Whether the withheld stamps are a QC backtest-serving defect or a data
+  gap is Mia's research-environment claim (her notebook says the research
+  path serves `2025-01-04`); this session cannot verify it and does not
+  rely on it.
+
+Mia's successive relaxations then uncovered the **other conditions the
+2025-now window contains**, each of which V16 also refuses by design:
+
+| Session | Condition (from the recorded refusals) | Frozen V16 rule that fires |
+|---|---|---|
+| 2025-02-24 | served snapshot age 3 (two consecutive withheld stamps) | exact age 1 |
+| 2025-06-10 09:20 | frozen 2025-06-09 plan cannot execute: ORLY's 15-for-1 split took effect between the after-close decision and the preopen execution; LEAN re-based holdings with the recorded seven-digit factor `0.0666667`, and `3 / 0.0666667 = 44.99998` truncates to **44** shares (`planned=3 observed=44`) | overnight holdings changed after the decision |
+| 2025-10-13, 10-20, 10-27 | constituent stream stalled at the 2025-10-06 stamp: served ages 5, 10, 15 | exact age 1 |
+| 2025-11-03 | stamp 2025-11-01 carries positive weights summing to about `0.010001` (one hundredth of the healthy `1.0001`) | positive weight total inside 0.95 to 1.05 |
+| 2026-09-18 00:00 | the terminal profile gate of V16 names V16's own profile family; every subclass that leaves its own profile in `self._profile` must repeat the end callback with its own gate (exactly what V16 did against V15) | V16 `expected_custom_summary_statistic_names` |
+
+The last row is the established successor idiom, not a defect. The split row
+is a corporate action plus LEAN's rounded factor, not a data-integrity gap.
+The remaining rows are served-data conditions in the backtest path.
+
+### 166.4 Mia's corrections and why they are not ported (steps 2 and 3)
+
+| Mia file | What it does | Disposition |
+|---|---|---|
+| V17 | date-keyed allowlist of two `(decision, expected snapshot)` pairs accepting a served age-2 collection and logging `PIT FALLBACK` | **rejected**: post-hoc, look-tuned exception list; trades on a stale weight vector |
+| V18 | extends the allowlist to five pairs with accepted ages 2, 3, 5, 10 and 15 | **rejected**: the same, now accepting weights up to fifteen sessions old; "member-identical" is not weight-identical and the replica's economics are its weights |
+| V19 | records `SPLIT_OCCURRED` events and re-bases the frozen plan by the event's seven-digit factor (quantities divided and floored, reference prices multiplied) | **rejected**: re-derives a frozen plan from a rounded provider factor and inexact prices; the frozen-plan discipline is the execution guarantee, so the fail-closed alternative is to drop that execution |
+| V20 | rescales every constituent weight by exactly 100 when the total falls inside the band divided by 100; repeats the end callback with V20's gate | **rescale rejected** as a transformation of a corrupt snapshot (Mia's own note: the neighbouring 2025-10-28 to 10-31 stamps rescale to about 0.9695 with roughly 3% of weight missing, so the defect is not a pure scale error); **the end-callback repetition is the correct idiom** and the lane's V17 does the same with its own gate |
+
+Two further facts settle the disposition independently of the economics.
+Every Mia file calls `self._algorithm.log(...)`, which the lane's source
+firewall classifies as a forbidden operational capability, and Mia's
+`main.py` imports an unregistered runtime, so **all five files are refused by
+`_audit_cloud_capabilities`** (verified with the committed projection module
+against the retrieved bytes; the lane's V17 passes). The files ran only
+because they were written straight into the project, bypassing the
+projection, the firewall, the fresh-project rule and the launch budget. The
+owner-reported `39.2%` from backtest `c88fb1b2...` is therefore an
+unreviewed standard statistic from firewall-refused source that traded on
+stale and rescaled inputs in a reused project; its `PENDING_REVIEW`
+classification from earlier today becomes **NOT ADMISSIBLE**, it creates no
+cell, and this session did not read it. Mia's file names `v17` through `v20`
+also collide with lane numbering; the lane successor below is the lane's
+V17, and Mia's files remain "project-36790168 files".
+
+### 166.5 The lane's immutable V17 successor (step 3)
+
+`research/analyst_revisions_v2_qc/accepted_risk_qqq_order_level_v17_qc_runtime.py`
+(23,302 bytes, SHA-256
+`8049d90e5e04b3d80d61f106441e60e3de98eaf863cd3e569342d6186a6910e5`,
+committed at `5223ba8`) subclasses V16, whose committed blob remains
+`998cb19bfe7d48c37ec1dfb901399080ef206831df62a42cb339a464a638877e`. It
+applies the project's standing rule that stale, missing or corrupt input is
+equivalent to no input:
+
+- **Stale snapshot (age != 1)** or **positive weight total outside the fixed
+  band**: the decision is skipped with no order, holdings are carried, the
+  account is still observed, the prior plan is still closed, the sequential
+  score still advances to the same position, and a record with the decision
+  session, the expected and served snapshot sessions and the served age (or
+  the member count and exact total) is appended. No snapshot is aged past
+  the policy and no weight is rescaled.
+- **Overnight holdings drift at the preopen**: after repeating every
+  inherited preopen gate in its inherited order (state, live mode,
+  duplicate, exact clock 09:20 to 09:27, cash not decreased), the frozen
+  plan is dropped without orders and a record with the decision and
+  execution sessions, the drifted-name count and a redacted path digest is
+  appended. No plan is re-based.
+- The conditions are detected by explicit pre-checks that reuse the
+  inherited helpers and constants (`_pit_verdict`), never by catching a
+  refusal; the inherited benchmark core, coverage recording and preopen
+  guard still run for every executed decision, and every other refusal still
+  ends the run. The inherited decision path receives its measures through a
+  one-shot prefetch; any other request for measures refuses.
+- The aggregate (schema `arv2-qqq-order-level-tilt-summary-v12`) adds
+  `scheduled_decision_count`, the three skip counts,
+  `maximum_served_stale_snapshot_age_sessions`,
+  `first_scheduled_decision_session`, `first_executed_decision_session`,
+  `first_scheduled_decision_executed`, `schedule_complete`, and a bounded
+  evidence block (four retained records plus a path digest over all of
+  them), and **sets `run_valid` false whenever any skip occurred**, following
+  the V14 precedent for skipped-unpriced decisions. The end callback repeats
+  V16's with V17's profile gate and counts skipped decisions toward the
+  schedule.
+- Profiles `arv2-qqq-order-level-tilt-2025-cutoff-v17` (SHA-256
+  `60af112e42e4bbdfe8949c360359399138cc94a6b24968db59026d9c874fb6b6`) and
+  `...-2026-cutoff-v17` (`def21cb138fdec25af88398c9e0d2e5f7f43da6a3eff64d1bf6c74653fb5e68a`)
+  are exact V16 extensions plus `decision_skip_policy` and
+  `maximum_retained_skipped_decisions`.
+- The projection registers the V17 closure (V16 closure plus the one file),
+  the generated-main binding, and a profile-bound ceiling of 400,000 bytes
+  (production closure 394,221 bytes; the V16 ceiling of 375,000 would refuse
+  it, proven load-bearing). The whole-package closure pins gain the module.
+
+Two consequences are stated rather than hidden. The 2025 window's first
+scheduled decision (2025-01-06) is skipped, so the strategy is uninvested
+for its first week while the inherited execution-matched QQQ comparator
+still enters at the first scheduled execution; the aggregate discloses
+`first_scheduled_decision_executed=false` and a preregistered successor may
+align the comparator (`ARV2R166-007`). And a 2025-now V17 run is
+`run_valid=false` by construction, so it can only ever be a diagnostic
+aggregate, never a formal cell, until the owner preregisters a different
+policy.
+
+Deliberately not implemented: registration of V17 in the formal submission
+adapter and signed protocol. Those modules are POSIX-only on this host and
+untestable here, and a formal V17 cell needs a Mac launch anyway. The exact
+recomputation rules the adapter must add are listed under `ARV2R166-006`.
+
+### 166.6 Validation
+
+- New battery `tests/analyst_revisions_v2/test_qc_accepted_risk_qqq_order_level_v17_runtime.py`
+  (32 tests): profile extension and V16 immutability, single inherited
+  history call, stale and out-of-band skips with exact records, closed band
+  edges shared with the inherited core, other PIT refusals still fatal,
+  prefetch one-shot, inherited callback gates, drift skip with redacted
+  digest, every inherited preopen refusal preserved on the drift path,
+  early callback, unchanged-holdings execution through the inherited replan
+  path, plan-identity validation, aggregate completeness and bounds
+  (`run_valid`, evidence retention, census and evidence-count refusals,
+  predecessor-schema refusal, comparator disclosure), and the end callback
+  (V17 gate, skip-aware schedule, transport refusal emitting nothing, the
+  inherited state gates). Projection tests gain the V17 closure, ceiling,
+  generated-main firewall (refusing V16 and Mia-style V20 bindings) and a
+  test that a runtime source with `self._algorithm.log` is refused.
+- **Mutation matrix, eight of eight killed** by distinctly named tests:
+  accepting an age-2 snapshot; `run_valid` ignoring skips; dropping the cash
+  refusal on the drift path; keeping the frozen plan pending after a drift
+  skip; widening the band pre-check to 0.90; the end callback ignoring
+  skipped decisions; the skip path not advancing the sequential score; and a
+  late-clock drift becoming a skip. The source was restored byte-for-byte
+  after each mutation.
+- LF-normalized guarded scratch worktree (the same accommodation as section
+  165): V17 battery **32 passed**; V16 battery plus projection battery
+  **127 passed, 11 failed**, every failure the same host class: the generated
+  main is imported in an isolated `-I` subprocess that cannot see the
+  user-site `tzdata` package and this host has no system zoneinfo database
+  (`ZoneInfoNotFoundError: America/New_York`) for the ten parametrized
+  generated-main cases and the MOO fee case (`ARV2R166-008`); adapter
+  profile-list subset **15 passed**.
+- Real lane tree at `5223ba8`: whole-package closure pins **5 passed**;
+  `compileall` exit 0; `git diff --check` clean; the V17 battery and the
+  adapter battery are uncollectable through the `fcntl` import chain
+  (`ARV2R165-001`), and the three edited pre-existing files were re-normalized
+  to LF after the CRLF working copy produced mixed endings.
+- Every Mia file was also passed through the committed firewall
+  (`_audit_cloud_capabilities`): all four runtimes refused for the log calls
+  and `main.py` refused for its binding; the lane's V17 source passes.
+
+### 166.7 R-173 diagnostic launch (step 4)
+
+| Field | Value |
+|---|---|
+| Kind | owner-authorized diagnostic launch, plain repository client, Windows host; not the signed one-use protocol |
+| Project | `96 ARV2_QQQ_SKIP_ORDER_R173_A1_2025_NOW - 20260921`, id `36809007`, fresh (name verified absent first) |
+| Source | 17 files / 394,221 bytes: the 15 frozen modules (each byte-identical to the R-172 projection), lane V17, and a generated `main.py` (5,938 bytes, SHA-256 `6560cc2b875fc147472395957da195e11b7ca3700f4c0aaba1b0f6bf3633b7c0`) that differs from the frozen R-172 main only in the two V17 binding lines and the profile id; upload content-manifest SHA-256 `689738523c9ec7de7ca3aa5dc4d18cfa21828d916139fe976886cbfc98f288ae`; every file re-read from QC and hash-verified before compiling; default notebook removed |
+| Profile | `arv2-qqq-order-level-tilt-2025-cutoff-v17`, SHA-256 `60af112e...fb6b6`, window 2025-01-02 through 2026-09-16 |
+| Compile | `a4ba2fd8811c6ccea4215fcf0d3b6d88-561c6ae42ece50278d631e92b3900012`, `BuildSuccess` at 23:10:04 UTC |
+| Backtest | `ARV2 R173A1 QQQ skip order 2025 now 8049d90e`, id `0d4ff088d0b0ea144e9c0d27de3926d7`, created 23:10:06 UTC |
+| Polling | status fields only (`status`, `completed`, `progress`, `error`), one poll per minute: 0.312 at 23:11:06, 0.885 at 23:12:07, terminal at 23:13:08 |
+| Terminal | `Runtime Error` at **2026-09-18 00:00:00**: `order-level terminal account composition changed` in V15's `_replace_terminal_account_observation` (V15 line 340), reached from V17's `on_end_of_algorithm` (line 504) and `main.py` line 148 |
+| Read | no statistic, chart, order, log, price, provider row or return; the error text above is the only content selected |
+
+Interpretation. V17 carried the run through the **entire 2025-01-02 to
+2026-09-17 schedule**: every condition that stopped Mia's V17 through V19
+iterations (the January and February stale snapshots, the June split drift,
+the October stall, the November weight total) was passed as a counted skip
+or an inherited execution, and the run reached the terminal callback. It
+then refused at a **V15 policy check that V17 did not touch**: the QC account
+identity `total_holdings_value + cash == total_portfolio_value` at the
+next-day-midnight end clock. That identity held for R-170 and R-171 on the
+2026 window and fails for the 2025-now terminal state. The refusal
+deliberately carries no numbers, so the discrepancy's size and sign are
+unobservable from this launch, and this session did not read the run's
+standard statistics to find out. Candidate mechanisms are recorded as
+hypotheses only: LEAN's cached `TotalPortfolioValue` versus a freshly summed
+`TotalHoldingsValue` around post-market QQQ minute bars at the rollover
+clock; unsettled cash; or a terminal holding whose signed and absolute
+values differ. None is a finding.
+
+R-173 spends one launch of the V17 candidate's three-attempt budget and adds
+no cell. No second attempt is made from this session: the next launch needs
+a preregistered successor that surfaces the terminal residual in a bounded
+way (for example, as V15 already does for the terminal adjustment), and the
+owner's direction.
+
+### 166.8 Look accounting
+
+Section 165 closed at **132 shared looks / 75 ARV2 development evaluations /
+27 infrastructure looks / 608 authenticated cells**. Mia's fifteen launches
+in project `36790168` (rows 2 through 16 of the table in 166.2) were
+owner-directed QC launches and are counted now: **147 / 90 / 27 / 608**.
+R-173 adds one: **148 shared looks / 91 ARV2 development evaluations / 27
+infrastructure looks / 608 authenticated cells**. The owner's read of
+backtest `c88fb1b2...`'s standard statistic is recorded as an owner-side
+read of an inadmissible run; it creates no cell and changes no count beyond
+its launch. Both entries are appended to `docs/research/alpha-result.md`.
+
+### 166.9 Findings ledger
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| `ARV2R166-001` | P1 | The three R-172 attempts were byte-identical inputs to a deterministic guard refusal at the first 2025 decision; the three-attempt rule spent two looks that could not have produced a different outcome. | Documented. The lane's retry rule should distinguish an engine or transport failure from a deterministic runtime refusal (identical error text at the same clock ends the candidate after one attempt). The protocol is POSIX-only here; handed to Codex. |
+| `ARV2R166-002` | P1 | Mia's V17 through V20 accept stale snapshots by date allowlist (ages up to 15), rescale weights by 100, and re-base frozen plans from a rounded split factor; all four files and Mia's `main.py` are refused by the lane's firewall. The owner-reported `39.2%` is from that source in a reused project. | Documented; not ported; classified NOT ADMISSIBLE. The lane's V17 replaces every relaxation with a counted, fail-closed skip. |
+| `ARV2R166-003` | P2 | Fifteen QC launches occurred in the reused attempt-3 project outside the lane's accounting and fresh-project rule. | Counted now (166.8); documented. |
+| `ARV2R166-004` | P2 | Source written directly into a QC project bypasses the projection, the firewall, the fresh-project rule and the launch budget; a completed run from such a project is not lane evidence. | Documented as a standing rule: a project whose files were edited outside the projection is never a launch source and never a result source. |
+| `ARV2R166-005` | P3 | This session's retrieval persisted backtest-list rows carrying summary-shaped fields to a scratch file (deleted unread). | Documented; future retrievals project fields before persisting. |
+| `ARV2R166-006` | P2 | The formal adapter and signed protocol do not know the V17 profile family, so a formal V17 cell cannot be parsed or admitted yet. | Documented, deliberately not fixed here (POSIX-only, untestable on this host). Required adapter rules: register the two V17 ids and census rows, pin `SKIP_SUMMARY_SCHEMA`, require `scheduled_decision_count == expected_decision_count`, `decision_count + stale + weight skips == scheduled_decision_count`, `pit_history_call_count == decision_count + stale + weight skips`, `completed_rebalance_count + forced_exit_invalidated + overnight_drift_skipped == decision_count`, recompute `run_valid` with all three skip counts required to be zero, and keep `coverage_decision_count == decision_count`. |
+| `ARV2R166-007` | P3 | A skipped first decision leaves the strategy uninvested while the execution-matched QQQ comparator enters at the first scheduled execution; disclosed by `first_scheduled_decision_executed`. | Documented; a preregistered successor may align the comparator to the first executed decision. |
+| `ARV2R166-008` | P3 | Ten generated-main import tests and the MOO fee test fail on this host because their isolated `-I` subprocess cannot load `tzdata` and Windows has no system zoneinfo database. | Host class, same family as `ARV2R165-001`; not a defect in the range. |
+| `ARV2R166-009` | P2 | R-173 refused at V15's terminal account composition identity for the 2025-now terminal state; the refusal carries no values, so the residual is unobservable and unexplained. | Documented; next launch requires a preregistered successor that reports the residual in a bounded way, plus owner direction. |
+| `ARV2R166-010` | P3 | The V17 aggregate adds at most about 1.5 KB to the V16 aggregate against the 8,192-byte transport; the fixture V16 aggregate is 5,322 bytes and the production V16 aggregate is estimated near 6 KB, so the margin is real but unmeasured in production because R-173 refused before emitting. | Documented; verify on the first completed V17 run. |
+
+### 166.10 Next gate
+
+Codex counter-reviews section 166 and the two commits (`5223ba8` and this
+record commit). R-172 is closed as diagnosed: no fourth attempt. The V17
+candidate has spent one of three launches; a second launch requires the
+owner's direction and a preregistered successor for `ARV2R166-009`. A formal
+V17 cell additionally requires `ARV2R166-006` and a Mac launch through the
+signed protocol. No result read, leverage, six-universe expansion,
+paper/live deployment, broker, funded-account, real-order or trading action
+is authorised, and `ARV2CR28-008` remains out of lane.

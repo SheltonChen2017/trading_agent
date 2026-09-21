@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–161 retain the milestone, review, preregistration, QC
+strategy. Sections 1–162 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -55,6 +55,8 @@ and attempt accounting before any R-172 cloud mutation.
 Section 161 records attempt 1's statistics-disabled `Runtime Error` terminal
 state, with no result or log read, and freezes the unchanged-source attempt-2
 replacement before another launch.
+Section 162 records attempt 2's identical terminal refusal and freezes the
+unchanged-source third and final permitted attempt before launch.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -482,13 +484,14 @@ authority was rendered. Section 157 freezes the separately versioned V16/R-171
 producer correction and exact preregistration. Section 158 records the
 authenticated completed run and separate result authority; section 159 records
 its accepted one-use read. Section 160 freezes the unchanged V16 2025-now
-profile as the fresh R-172 production plan. Section 161 records attempt 1's
-statistics-disabled `Runtime Error` without reading the error log or any
-result, then freezes the same-source `_02` plan as attempt 2. The owner
-explicitly waives Claude review of section 161 before this same-round retry.
-The immediate next step is to sign only the exact `_02` execution-authority
-payload, launch attempt 2 once, and inspect only statistics-disabled terminal
-status. Only authenticated `Completed.` may be followed by a separately
+profile as the fresh R-172 production plan. Sections 161–162 record two
+byte-identical attempts ending in the same statistics-disabled `Runtime Error`
+without reading an error log or result, then freeze the same-source `_03` plan
+as the third and final permitted attempt. The owner explicitly waives Claude
+review of section 162 before this same-round final attempt. The immediate next
+step is to sign only the exact `_03` execution-authority payload, launch
+attempt 3 once, and inspect only statistics-disabled terminal status. Only
+authenticated `Completed.` may be followed by a separately
 rendered, committed, signed, and consumed one-use aggregate-only result
 authority. V15
 and R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
@@ -20298,3 +20301,45 @@ the owner. The owner explicitly waives another Claude review before this
 same-round attempt. The next action is to commit this failure record and
 replacement plan, sign only its exact payload under
 `arv2-formal-qc-execution-v1`, and launch attempt 2 once.
+
+## 162. R-172 attempt-2 repeated runtime refusal and final attempt, 2026-09-21
+
+Attempt 2 compiled the unchanged 16-file projection in private project
+`36790123` as
+`831179f12df8e90a8426e1e4e97076eb-928a7a9d87654efed977e240dc9398c6`
+and created backtest `525305bda2dad7b145646f909ff63246`. Launch-control
+SHA-256 is
+`96d3b5972cf71e1f3646576aa8219bfb76a2e9e5b888c2ebfb598d5fa2ec6260`;
+launch-receipt SHA-256 is
+`a86f18a0d2f3768d96ce5d4c7734e8637c15700c0e4238074b69cb8238769848`.
+The first statistics-disabled poll again authenticated `Runtime Error`, with
+terminal-receipt SHA-256
+`6a7c278cc58b297fd3682c7c2461346053a8a3b5c1bfc4121a5919f743048e47`.
+No result, statistic, raw error log, order/fill, chart, price,
+provider/security row, return, or signal outcome was selected. The identical
+terminal state on byte-identical source establishes a repeatable failure, not
+a completed 2025-now result. Attempt 2 spends **130 -> 131 shared looks / 73
+-> 74 ARV2 development evaluations**, adds zero cells, and leaves **27
+infrastructure looks / 608 authenticated cells**.
+
+Under the owner's standing three-attempt rule, one final unchanged-source
+attempt remains. Its frozen identities are:
+
+| Field | Frozen R-172 attempt-3 identity |
+| --- | --- |
+| Control directory | `accepted_risk_order_level_r172_20260921_03` |
+| Profile | `arv2-qqq-order-level-tilt-2025-cutoff-v16`; SHA-256 `0ac38709a0666a105e571953bdeb94304439c0c82fe3c3b647edb363b1c0b135` |
+| Projection | `arv2-order-level-qc-projection-75027faaf39434a4e7a2fe5b`; SHA-256 `75027faaf39434a4e7a2fe5b1744feb857370d275e3f43531148283ac771f7ba` |
+| Plan | `arv2-order-level-plan-5a1411714f2732ea36746227`; SHA-256 `5a1411714f2732ea367462277ff280aee01a62c9ed5fa82b7834bd1315254ad3` |
+| Execution-authority payload | SHA-256 `9a87500a595b04588f19332b3bb0c8c88b0ddfb9c0cdc97922d220f1c478d89b` |
+| Private QC project | `95 ARV2_QQQ_EXPOSURE_ORDER_R172_A3_2025_NOW - 20260921` |
+| Backtest | `ARV2 R172A3 QQQ exposure order 2025 now 7803b84f` |
+
+Attempt 3 will spend **131 -> 132 shared looks / 74 -> 75 ARV2 development
+evaluations** and can add at most one cell (**608 -> 609**) only after a
+separate successful result authority. If it fails, this candidate's launch
+budget is exhausted: Codex must not make a fourth attempt and must invoke Mia
+only if its authenticated interface is directly controllable, otherwise stop
+for the owner. The owner explicitly waives another Claude review before this
+same-round final attempt. The next action is to commit this record and exact
+plan, sign only the `_03` payload, and launch once.

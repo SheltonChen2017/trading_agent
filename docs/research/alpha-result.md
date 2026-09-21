@@ -3807,7 +3807,7 @@ evaluations / 27 infrastructure looks / 608 authenticated cells**. No
 production acceptance, leverage, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
 
-## R-172 — V16 2025-now QQQ order run (ATTEMPT 1 RUNTIME ERROR; ATTEMPT 2 PREREGISTERED) — 2026-09-21
+## R-172 — V16 2025-now QQQ order run (TWO RUNTIME ERRORS; FINAL ATTEMPT PREREGISTERED) — 2026-09-21
 
 R-172 is the unchanged-profile longer-window diagnostic that follows the valid
 R-171 2026-YTD cell. It keeps the exact V16 strategy economics and uses profile
@@ -3852,3 +3852,21 @@ It names private project
 **130 -> 131 shared looks / 73 -> 74 ARV2 development evaluations** and could
 add at most one cell (**608 -> 609**) only after a separate aggregate-only
 authority succeeds.
+
+Attempt 2 compiled the same 16 source files in project `36790123` and launched
+backtest `525305bda2dad7b145646f909ff63246`. It again reached `Runtime Error`
+on the first statistics-disabled poll; terminal-receipt SHA-256 is
+`6a7c278cc58b297fd3682c7c2461346053a8a3b5c1bfc4121a5919f743048e47`.
+No result, statistic, error log, raw row, order/fill, chart, return, or signal
+outcome was read. Accounting becomes **131 shared looks / 74 ARV2 development
+evaluations / 27 infrastructure looks / 608 authenticated cells**.
+
+The third and final allowed attempt remains byte-identical. Its plan SHA-256 is
+`5a1411714f2732ea367462277ff280aee01a62c9ed5fa82b7834bd1315254ad3`;
+execution-authority payload SHA-256 is
+`9a87500a595b04588f19332b3bb0c8c88b0ddfb9c0cdc97922d220f1c478d89b`.
+It names private project
+`95 ARV2_QQQ_EXPOSURE_ORDER_R172_A3_2025_NOW - 20260921` and backtest
+`ARV2 R172A3 QQQ exposure order 2025 now 7803b84f`. A third failure exhausts
+this candidate's launch budget and requires Mia or owner diagnosis rather than
+a fourth relaunch.

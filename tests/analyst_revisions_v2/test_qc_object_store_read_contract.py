@@ -85,13 +85,12 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_massive_delta.py
     accepted_risk_objective_synthetic_leverage_evaluator.py
     accepted_risk_objective_synthetic_leverage_qc_runtime.py
-    accepted_risk_order_level_benchmark.py
-    accepted_risk_order_level_core.py
+    accepted_risk_order_level_benchmark.py accepted_risk_order_level_core.py
+    accepted_risk_order_level_forced_exit.py
     accepted_risk_order_level_input_runtime.py
     accepted_risk_order_level_qc_projection.py
     accepted_risk_order_level_submission_adapter.py
-    accepted_risk_pair_bridge.py
-    accepted_risk_preliminary_package.py
+    accepted_risk_pair_bridge.py accepted_risk_preliminary_package.py
     accepted_risk_preliminary_qc_figi.py
     accepted_risk_preliminary_qc_projection.py
     accepted_risk_preliminary_qc_runtime.py
@@ -101,21 +100,21 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_preopen_terminal_authority.py
     accepted_risk_qc_symbol_resolution.py
     accepted_risk_qqq_order_level_qc_runtime.py
+    accepted_risk_qqq_order_level_v12_qc_runtime.py
+    accepted_risk_qqq_order_level_v13_qc_runtime.py
     accepted_risk_regime_rating_evaluator.py
     accepted_risk_security_master_admission.py
-    accepted_risk_sequential_r055_score.py
-    accepted_risk_six_universe_gate.py
+    accepted_risk_sequential_r055_score.py accepted_risk_six_universe_gate.py
     accepted_risk_six_universe_gate_evaluator.py
     accepted_risk_six_universe_gate_qc_runtime.py
     accepted_risk_stock_portfolio_evaluator.py
     accepted_risk_terminal_disposition.py event_study.py
     firm_ontology_candidate_builder.py firm_ontology_owner_decision.py
-    firm_ontology_proposal_generator.py
-    formal_cloud_evaluator.py
+    firm_ontology_proposal_generator.py formal_cloud_evaluator.py
     formal_economic_execution_definition.py formal_evaluation.py
-    formal_evaluation_bridge.py formal_input_bundle.py formal_input_composer.py
-    formal_qc_transport.py formal_report_contract.py formal_run_protocol.py
-    formal_runtime_projection.py
+    formal_evaluation_bridge.py formal_input_bundle.py
+    formal_input_composer.py formal_qc_transport.py formal_report_contract.py
+    formal_run_protocol.py formal_runtime_projection.py
     formal_streaming_bridge.py formal_streaming_input.py
     formal_submission_adapter.py formal_terminal_disposition_builder.py
     fundamental_universe_discovery.py
@@ -123,32 +122,30 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     fundamental_universe_discovery_submission_adapter.py
     fundamental_universe_discovery_worker.py global_input_bundle.py
     global_input_schema.py historical_preopen_input_adapter.py
-    in_qc_preopen_terminal_stream.py
-    lean_source_assembly.py object_store_read_contract.py
-    owner_signature_authority.py physical_accepted_risk_archive.py
+    in_qc_preopen_terminal_stream.py lean_source_assembly.py
+    object_store_read_contract.py owner_signature_authority.py
+    physical_accepted_risk_archive.py
     physical_firm_ontology_candidate_archive.py
     physical_firm_ontology_review_packet.py
     physical_historical_preopen_bridge.py physical_preopen_seed_archive.py
     physical_preopen_submission_adapter.py
     physical_production_evidence_acquisition.py
-    physical_production_evidence_bridge.py physical_production_input_archive.py
-    physical_production_session_index.py
-    physical_streaming_scoring.py
-    pit_market_cap_membership_probe.py
+    physical_production_evidence_bridge.py
+    physical_production_input_archive.py physical_production_session_index.py
+    physical_streaming_scoring.py pit_market_cap_membership_probe.py
     pit_market_cap_membership_probe_runtime.py
     pit_market_cap_membership_probe_runtime_v3.py
     pit_market_cap_membership_probe_submission_adapter.py
-    pit_market_cap_membership_probe_v3.py
-    power_calibration_bridge.py
+    pit_market_cap_membership_probe_v3.py power_calibration_bridge.py
     power_calibration_runtime.py power_calibration_submission_adapter.py
     power_calibration_worker.py pre_qc_orchestrator.py
     preopen_control_acquisition_io.py preopen_control_prereview_downloader.py
     preopen_control_runtime.py preopen_control_stage.py
     preopen_control_submission_adapter.py preopen_control_worker.py
     preopen_quality_worker.py preopen_terminal_semantics.py
-    production_evidence_acquisition_io.py
-    production_evidence_composer.py refusal_smoke_projection.py run_contract.py
-    runtime_shard_projection.py synthetic_input_transport.py
+    production_evidence_acquisition_io.py production_evidence_composer.py
+    refusal_smoke_projection.py run_contract.py runtime_shard_projection.py
+    synthetic_input_transport.py
     """.split()
 )
 
@@ -158,6 +155,11 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
         "hashlib json decimal".split()
     ),
     "accepted_risk_order_level_core.py": tuple(
+        """
+        dataclasses hashlib json re datetime decimal
+        """.split()
+    ),
+    "accepted_risk_order_level_forced_exit.py": tuple(
         "dataclasses hashlib json decimal".split()
     ),
     "accepted_risk_etf_baseline_evaluator.py": tuple(
@@ -423,17 +425,22 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v13_qc_runtime
         """.split()
     ),
     "accepted_risk_order_level_submission_adapter.py": tuple(
         """
-        __future__ dataclasses hashlib json os re stat time types datetime decimal
-        pathlib typing research.analyst_revisions_v2.canonical
+        __future__ dataclasses hashlib json os re stat time types datetime
+        decimal pathlib typing research.analyst_revisions_v2.canonical
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_forced_exit
         research.analyst_revisions_v2_qc.accepted_risk_order_level_qc_projection
         research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v13_qc_runtime
         research.analyst_revisions_v2_qc.formal_submission_adapter
         research.analyst_revisions_v2_qc.formal_qc_transport
         research.analyst_revisions_v2_qc.owner_signature_authority
@@ -1218,6 +1225,22 @@ _QC_RUNTIME_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score
         """.split()
     ),
+    "accepted_risk_qqq_order_level_v12_qc_runtime.py": tuple(
+        """
+        decimal accepted_risk_order_level_core accepted_risk_order_level_forced_exit
+        accepted_risk_qqq_order_level_qc_runtime research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_core
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_forced_exit
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime
+        """.split()
+    ),
+    "accepted_risk_qqq_order_level_v13_qc_runtime.py": tuple(
+        """
+        datetime accepted_risk_qqq_order_level_v12_qc_runtime
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime
+        """.split()
+    ),
     "accepted_risk_six_universe_gate_qc_runtime.py": tuple(
         """
         hashlib itertools json math time datetime decimal
@@ -1306,6 +1329,12 @@ _QC_RUNTIME_IO_SURFACE = {
     "accepted_risk_qqq_order_level_qc_runtime.py": (
         "call:history",
         "call:open",
+        "call:set_summary_statistic",
+    ),
+    "accepted_risk_qqq_order_level_v12_qc_runtime.py": (
+        "call:set_summary_statistic",
+    ),
+    "accepted_risk_qqq_order_level_v13_qc_runtime.py": (
         "call:set_summary_statistic",
     ),
     "accepted_risk_six_universe_gate_qc_runtime.py": (
@@ -2944,6 +2973,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_benchmark",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_core",
+        "research.analyst_revisions_v2_qc.accepted_risk_order_level_forced_exit",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_submission_adapter",
@@ -2958,6 +2988,8 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_preopen_terminal_authority",
         "research.analyst_revisions_v2_qc.accepted_risk_qc_symbol_resolution",
         "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v13_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_security_master_admission",
         "research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score",

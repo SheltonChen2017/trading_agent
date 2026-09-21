@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–149 retain the milestone, review, preregistration, QC
+strategy. Sections 1–151 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -25,6 +25,12 @@ the pushed head because three V12/V13 modules were never registered
 (registered and green), the missing thirty-three-commit push-ledger row,
 the unrecorded 2026 delta-archive capture, and this banner's deleted
 standing assertion, restored below.
+Section 151 accepts those three Claude commits after counter-review, closes
+the two record omissions, and preregisters the immutable V14/R-169 successor.
+V14 does not change the order economics: it computes the three proxy
+complements under one explicit exact Decimal context and carries bounded,
+redacted evidence for any decision skipped because a same-session price is
+unavailable.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -437,23 +443,23 @@ QC engine completed the exact V13 run, but its formal reader refused and the
 run's own evidence-validity gate was false. The selected aggregate is useful
 diagnostic evidence only; it creates no authenticated result cell.
 
-The three-attempt sequence for this 2026-YTD order-level goal is exhausted:
-R-166, R-167, and R-168. No fourth launch may be inferred from R-168's engine
-completion. Section 150 is that independent Claude review of `1f47eb3..e38894a`. The
-immediate next step is that Codex counter-reviews section 150 and the exact
-pushed range in this same worktree.
-After Codex counter-review,
-a separately versioned and preregistered successor may (1) compute proxy
-complements independently of ambient Decimal precision and (2) add bounded,
+The three-attempt V12/V13 sequence for this 2026-YTD order-level goal is
+exhausted: R-166, R-167, and R-168. Section 150 is Claude's independent review
+of `1f47eb3..e38894a`; section 151 completes Codex's counter-review and freezes
+the separately versioned V14/R-169 successor. The owner explicitly waives
+Claude review of section 151 before this one R-169 attempt. The immediate next
+step is the one signed R-169 attempt using the exact section-151 plan. It may compute proxy
+complements independently of ambient Decimal precision and report bounded,
 redacted evidence identifying which session/security caused an unpriced
-decision. Only that evidence can justify a later explicit economic rule; a
-skipped decision must not simply be relabelled complete. R-138 remains
+decision. It must not relabel a skipped decision complete. Only the resulting
+evidence can justify a later explicit economic rule. R-138 remains
 unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
-trading authority follows from R-168. The only economic figures in section
-148 came from a bounded diagnostic aggregate read and must retain that label.
+trading authority follows from R-168 or the R-169 preregistration. The only
+economic figures in section 148 came from a bounded diagnostic aggregate read
+and must retain that label.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -2152,6 +2158,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-18 | Independent Claude review of the R-083 through R-108 range | `1d83668` -> this record commit; documentation only | Review `df767d3..1d83668` commit by commit from an export of the pushed head while Codex edited this worktree; mutation-test the three refusal-driven corrections and the transport split with failing-test capture; reconcile the R-107 through R-114 freeze to code | All eleven commits accepted and no code changed. Clock gates, out-of-window skip and the digest-bound transport split are each pinned by a named behavioural test; all eight frozen profile SHA-256s reconcile; refusal strings exist at their commits; the owner-directed cleanup moved exactly three superseded projects to the Recycle Bin with value-free reads. One P2 documented: R-107/R-108's SPY 95.67% versus every prior run's 94.2074% on the same 1,254-return window, unexplained and undiagnosable from receipts, geometry/formula/stitching/keying excluded at `1d83668`. Section 94's five qualifications confirmed. No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Five mutation trials (CG1, CG2, OW1, FR1, FR2) red with named tests in a byte-restored export; freeze-table reconciliation 8/8; complete selection not re-run to completion (owner-directed push at 40%, no failures; no code changed; Codex's run on the same head **5,998 passed, 7 skipped, 0 failed** per section 103); record gates on the final bytes **75 passed**; compileall exit 0; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **1 P2 and 5 P3** (`ARV2R104-001..006`); 2 corrected by record restatement, 4 documented. | Push this same-lane round exactly once. Codex counter-reviews section 104 and the pushed range in this same worktree; explain the SPY benchmark basis and bind a benchmark-series digest before R-109. No leverage, deployment, broker, order or trading action. |
 | 2026-09-20 | Codex implementation and QC diagnostics | `98b4123` -> `5db458c`, `4e91a3b`, `7f03de5`, and this record commit | Build the exact CLR-status, engine-delisting, and end-clock successors; exhaust the three-attempt 2026-YTD order-level sequence; record R-167/R-168 | V11 authenticates LEAN's exact nine-value order-status enum through CLR reflection. V12 separately authenticates and accounts for one exact engine-created delisting liquidation. V13 admits only LEAN's exact next-calendar-day-midnight end callback. R-167 refused at that callback; R-168 then completed the exact source-bound QC engine run. Its formal one-use reader refused a producer precision mismatch and its aggregate was `run_valid=false` because exactly one decision was skipped unpriced; bounded metrics remain diagnostic, not a formal cell. | Focused forced-exit/projection/submission/V12/V13 selection **414 passed in 29.83 s** on Python 3.13.15; V13 final isolated file **17 passed in 1.68 s**; record/accounting gates **103 passed**; focused compileall exited 0. Per owner rule, Codex did **not** run the full lane suite; Claude does so in review. Accounting closes at **126 shared looks, 69 ARV2 development evaluations, 27 infrastructure looks, 607 authenticated cells**. | Internal audit: 0 P0, 0 P1; open P2 `ARV2D148-001` (ambient-precision proxy complement blocks formal parse) and `ARV2D148-002` (one skipped-unpriced decision makes the run invalid). No used profile is mutated and no fourth QC attempt is launched. | Push the exact same-lane range once. Claude reviews every commit and runs the complete lane suite; Codex counter-reviews before any prospective successor or further QC launch. |
 | 2026-09-20 | Independent Claude review of the bounded-tilt, order-level and six-universe range R-115 through R-168 | `e38894a` -> `9a30606`, `221951a` and this record commit | Review all thirty-eight unreviewed commits `1f47eb3..e38894a` from an export of the pushed head; sweep the new order-level family for real-order, broker, live and credential surfaces; mutation-test the live boundary, order rules, tilt bounds, six-universe gate and forced-exit accounting with failing-test capture; record findings and an improvement plan | All thirty-eight commits accepted, three after test-only corrections; no production line changed. The whole-package no-I/O closure test was red at the pushed head because three V12/V13 modules were never registered; registered and green in `221951a`, the closure holds. The single order-placing call is behind a backtest-only guard that is red under mutation through three named tests; no live endpoint or credential surface exists in the new code. Eleven of fourteen trials are behavioural catches; one gap (execution-session adjacency) is pinned in `9a30606`; four tilt-verifier survivals are one structural fact -- the 4.9% active-share cap is unreachable by construction. Three further P2s documented: no push-ledger row for the thirty-three 09-18/09-19 commits; the 2026 Massive delta archive `1678b925…` (743 rows) has no recorded capture, authorization or lineage; the banner's standing no-accepted-signal assertion was deleted a second time (restored). No QC, provider, credential, outcome, broker, order, deployment, paper/live or trading surface was accessed. | Fourteen mutation trials with named failing tests in a byte-restored export; `9a30606` test file **46 passed**; compileall in the export exit 0; complete selection on the pushed head in the export **6,944 passed, 11 skipped, 2 failed** (one export artifact, one genuine closure failure corrected in `221951a`); corrected files in isolation **72** and **46 passed**; record gates on the final bytes **75 passed**; `git diff --check` clean; Python **3.13.15**. **Zero research looks and zero development evaluations.** | Review: **4 P2 and 5 P3** (`ARV2R150-001..009`); 3 corrected (two in `9a30606` and `221951a`, one by record restoration), 6 documented. Codex's `ARV2D148-001/-002` confirmed open. | Push this same-lane round exactly once. Codex counter-reviews section 150 and the pushed range in this same worktree; appends the thirty-three-commit ledger row; records the delta-archive capture event; and does not launch a fourth order-level attempt, the six-universe gate, or any leverage run before that counter-review. No deployment, broker, order or trading action. |
+| 2026-09-21 | Codex retrospective push-ledger reconciliation | `1f47eb3` -> the exact 33-commit range `18762e5..fb3bc47` | Close `ARV2R150-001` without rewriting the omitted historical rows | This append-only row names the full omitted range: R-115/R-116 construction and preregistration; corrected R-117/R-118 bounded-tilt runs; the order-level and six-universe implementation; R-119 through R-138 prospective successors and recorded refusals; the condensed handoff; and the V10 transport/ticket successor. It does not include the later `98b4123..e38894a` range, which already has its own 2026-09-20 Codex row. | The contemporaneous focused validations and QC identities remain in sections 105--146 and the shared result ledger. This is a documentation reconciliation only: no new test, QC action, provider access, result read, look, evaluation, or cell is claimed. Claude subsequently reviewed all 33 commits inside `1f47eb3..e38894a` in section 150. | `ARV2R150-001` corrected. No historical claim or counter is changed. | Preserve this row as the durable non-self-referential inventory of the omitted pushed commits. |
+| 2026-09-21 | Codex retrospective Massive delta-capture lineage reconciliation | 2026-09-17 physical capture -> `arv2-physical-accepted-risk-1678b925bc78e8b3f4fdf291` | Close `ARV2R150-002` by recording the already-used 2026 delta input lineage | Under the owner's standing authorization to use the configured Massive subscriptions for this lane's accepted-risk inputs and QC backtesting, the capture requested 2026-01-01 through 2026-09-16 after that final close. It ran from `2026-09-17T05:18:36.493365Z` through `2026-09-17T05:18:48.773522Z` over `massive_https_bearer_default_session`: 75,110 source rows (51,331 ratings, 14,991 earnings, 8,788 guidance), yielding 75,108 current-view and 73,832 censored-view rows with 1,276 disagreements. The archive SHA-256 is `1678b925bc78e8b3f4fdf2911e3e426327fb8a1307463d1ff2bd43f279a1cc77`; source manifest `3384e9745c3093eb203997d4a98057ae2d066180add5e0367c4c3687a50d83ea`; pair artifact `arv2-accepted-risk-pair-0452a4811db397068b0dbd4c`, artifact SHA-256 `696265dad63c8f67560bc9c8ffed46907ce75faf5e8ff2353b1cbcc25561ce57`, content SHA-256 `0452a4811db397068b0dbd4c0e22db92c1597bcfcef93559e71647ee87228ea8`. The later order package authenticates 743 delta contributions in addition to 12,244 parent contributions. | Manifest identities, counts, timestamps, role totals, accepted-risk pair lineage, and the package's 743-contribution pin were re-read locally without exposing licensed rows. This retrospective correction performs no provider call and no outcome/result read; it adds **zero looks, zero development evaluations, zero infrastructure looks, and zero cells**. | `ARV2R150-002` corrected. The input is current-vintage/non-pristine-PIT under the owner's recorded accepted-risk decision; the archive's post-materialization capabilities are all closed and do not erase the provider access used for capture. | Keep the capture event mirrored in `docs/research/alpha-result.md`; no research conclusion, live authority, or trading authority follows. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -19646,3 +19654,104 @@ section-4 rewrite. `ARV2R104-002` remains carried to any leverage successor.
   not re-run after the two test-only commits; the code tree is unchanged.
 - Record gates re-run on the exact final record bytes after this section
   and its ledger row were written: **75 passed**. `git diff --check` clean.
+
+## 151. Codex counter-review, V14 cause evidence, and R-169 preregistration, 2026-09-21
+
+Codex counter-reviewed all three Claude commits at the exact pushed head
+`87dd82f` in this lane and accepts each one:
+
+| Commit | Disposition | Independent basis |
+| --- | --- | --- |
+| `9a30606` | **Accepted.** | The new direct adjacency regression reaches the intended core guard. Removing the exact-next-session comparison makes that named test red; the restored core file passes 46 tests. |
+| `221951a` | **Accepted.** | The source inventory, import pins, I/O surface, and transitive closure now include the V12/V13/forced-exit modules. The closure is red at the reviewed parent and 72 of 72 tests pass after this correction. |
+| `87dd82f` | **Accepted.** | Section 150 accurately inventories and dispositions the 38-commit range, preserves the no-result status of R-168, and changes no production source. Its two lane-owned record omissions are corrected below. |
+
+`ARV2R150-001` is closed by the append-only 33-commit row in section 5.
+`ARV2R150-002` is closed by the retrospective Massive delta-capture row in
+section 5 and its matching shared-ledger entry. The live-banner guard now
+scopes its assertion to the banner itself, so historical quoted text cannot
+satisfy it. These corrections add no provider access, result read, look,
+evaluation, or cell.
+
+### 151.1 Immutable V14 successor
+
+V14 leaves the executed V13 source byte-identical at SHA-256
+`c7a12b200ac7c5e3bca360c1751464442c8eb5ac535292a1df13cb39580ca6c5`.
+It inherits the V13 order construction, timing, fee, residual-proxy,
+delisting, and validity rules. It changes only two evidence paths:
+
+1. all three QQQ-proxy complements are computed from the emitted resolved
+   ratios under an explicit local 32,768-digit Decimal context with
+   `Inexact` and `Rounded` trapped; and
+2. a skipped-unpriced decision adds a bounded diagnostic object: at most four
+   decision records and four SHA-256 security identities per retained record,
+   with full omitted paths committed by SHA-256. Raw security identities are
+   not transported. A skip still leaves `run_valid=false` and does not become
+   a completed rebalance.
+
+The 2026 profile is
+`arv2-qqq-order-level-tilt-2026-cutoff-v14`, SHA-256
+`bfb77eacdaddb8566b649165eb4986ca038658bbc23d5eb95641f4cea13d0776`.
+The result schemas advance to summary v9 and META v3. The exact fourteen-file
+QC projection contains 344,215 source bytes under a V14-only 350,000-byte
+ceiling and has projection ID
+`arv2-order-level-qc-projection-382f2adc94b86a4d2394d065`, SHA-256
+`382f2adc94b86a4d2394d065f812218f175340ae5960b1b5d96dbe6377ab0206`.
+Older profile inventories and ceilings are unchanged.
+
+The formal reader authenticates the fresh profile, META and summary schemas,
+the exact-complement policy, count conservation, chronological retained
+sessions, bounded inventories, unique well-formed security digests, and every
+path digest whose complete preimage is present. The aggregate remains bound
+to META by its canonical SHA-256. The whole-package no-I/O closure registers
+V14; its only runtime I/O surface is the existing bounded
+`set_summary_statistic` call.
+
+### 151.2 Prospective R-169 identity and decision rule
+
+R-169 is a fresh V14 candidate, not a fourth attempt under the exhausted
+V12/V13 identity. It is the same order-based 2026-YTD diagnostic and changes
+no economic rule. Its exact prospective controls are:
+
+| Field | Frozen value |
+| --- | --- |
+| Input package / lineage | `7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` / `54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129` |
+| Projection / profile | `382f2adc94b86a4d2394d065f812218f175340ae5960b1b5d96dbe6377ab0206` / `bfb77eacdaddb8566b649165eb4986ca038658bbc23d5eb95641f4cea13d0776` |
+| Plan | `arv2-order-level-plan-3bd52e39affcbae3b40a5c1f`; SHA-256 `3bd52e39affcbae3b40a5c1f595158f12bf9888465afba73a3d5c78a5d34be89` |
+| Execution-authority payload SHA-256 | `42814b7b9b137f77546e25082f1e464824af22444fb944ee75c439d74c5b2a38` |
+| Private QC project | `90 ARV2_QQQ_CAUSE_ORDER_R169_2026_YTD - 20260921` |
+| Backtest | `ARV2 R169 QQQ cause order 2026 YTD 7803b84f` |
+| Attempt budget | One attempt now; at most three unsuccessful V14 attempts under the standing machine rule. |
+
+Terminal state is inspected without statistics. Only an authenticated
+`Completed.` run may receive a separately signed, one-use, aggregate-only
+result read. Formal admission additionally requires the V14 reader to accept
+the exact complement arithmetic and requires the aggregate's own
+`run_valid=true`. If a skip remains, the result is diagnostic only, adds no
+formal cell, and the bounded cause evidence may be used to design a separately
+versioned prospective economic rule; no rule is relaxed inside R-169. No raw
+provider row, raw log/order/chart, standard QC statistic, live/paper/funded
+deployment, broker access, or trading is authorized.
+
+The owner directed Codex to continue with backtesting immediately after this
+counter-review. That direction is the narrow same-round review-timing waiver
+for R-169; Claude will review this implementation and the recorded outcome
+after the round's single push.
+
+### 151.3 Focused validation and review notes
+
+The V14 runtime, projection, adapter, no-I/O closure, lane-record, and active-
+document selection passes **489 tests in 77.33 seconds** on Python 3.13.15.
+The direct V14 guard file passes **18 tests**. Two reverse mutations are red:
+forcing the end-clock predicate true fails all six invalid-clock cases, and
+hashing only a retained security prefix fails the exact digest-preimage test.
+An independent audit found no P0, P1, or P2 defect; its two P3 test-isolation
+observations are corrected by those tests. Focused `compileall` exits 0 and
+`git diff --check` is clean. Per the owner rule, Codex did **not** run the full
+lane suite; Claude owns that gate.
+
+Claude's later review should inspect the exact-complement source operands,
+the bounded-evidence preimages and omissions, the V14 result-authority field
+inventory, the 8,192-byte transport ceiling, and the no-I/O closure. The
+immediate next action is to commit this prospective source and plan, sign the
+exact execution-authority payload, and launch R-169 once.

@@ -102,6 +102,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_qqq_order_level_qc_runtime.py
     accepted_risk_qqq_order_level_v12_qc_runtime.py
     accepted_risk_qqq_order_level_v13_qc_runtime.py
+    accepted_risk_qqq_order_level_v14_qc_runtime.py
     accepted_risk_regime_rating_evaluator.py
     accepted_risk_security_master_admission.py
     accepted_risk_sequential_r055_score.py accepted_risk_six_universe_gate.py
@@ -427,6 +428,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v13_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v14_qc_runtime
         """.split()
     ),
     "accepted_risk_order_level_submission_adapter.py": tuple(
@@ -441,6 +443,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v13_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v14_qc_runtime
         research.analyst_revisions_v2_qc.formal_submission_adapter
         research.analyst_revisions_v2_qc.formal_qc_transport
         research.analyst_revisions_v2_qc.owner_signature_authority
@@ -1241,6 +1244,13 @@ _QC_RUNTIME_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime
         """.split()
     ),
+    "accepted_risk_qqq_order_level_v14_qc_runtime.py": tuple(
+        """
+        decimal accepted_risk_qqq_order_level_v13_qc_runtime
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v13_qc_runtime
+        """.split()
+    ),
     "accepted_risk_six_universe_gate_qc_runtime.py": tuple(
         """
         hashlib itertools json math time datetime decimal
@@ -1335,6 +1345,9 @@ _QC_RUNTIME_IO_SURFACE = {
         "call:set_summary_statistic",
     ),
     "accepted_risk_qqq_order_level_v13_qc_runtime.py": (
+        "call:set_summary_statistic",
+    ),
+    "accepted_risk_qqq_order_level_v14_qc_runtime.py": (
         "call:set_summary_statistic",
     ),
     "accepted_risk_six_universe_gate_qc_runtime.py": (
@@ -2990,6 +3003,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v12_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v13_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v14_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_regime_rating_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_security_master_admission",
         "research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score",

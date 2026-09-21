@@ -3588,3 +3588,40 @@ valid formal result. It spends **125 -> 126 shared looks / 68 -> 69 ARV2
 development evaluations**, adds **zero cells**, and leaves **27 infrastructure
 looks / 607 authenticated cells**. No fourth launch, leverage, deployment,
 broker, paper/live, funded-order, or trading authority follows.
+
+## ARV2 2026 Massive delta-input capture — retrospective lineage record (NO RESULT LOOK) — 2026-09-17
+
+This entry closes the documentation omission identified as `ARV2R150-002`;
+it does not create a new run or retrospectively change any result. Under the
+owner's standing authorization to use the configured Massive subscriptions
+for this lane's accepted-risk inputs and QuantConnect backtesting, the
+physical capture requested events from **2026-01-01 through 2026-09-16**
+after the final requested close. It started at
+`2026-09-17T05:18:36.493365Z`, completed at
+`2026-09-17T05:18:48.773522Z`, and used the
+`massive_https_bearer_default_session` transport.
+
+The resulting archive is
+`arv2-physical-accepted-risk-1678b925bc78e8b3f4fdf291`, SHA-256
+`1678b925bc78e8b3f4fdf2911e3e426327fb8a1307463d1ff2bd43f279a1cc77`.
+Its source manifest SHA-256 is
+`3384e9745c3093eb203997d4a98057ae2d066180add5e0367c4c3687a50d83ea`.
+The capture contains **75,110** source rows: 51,331 analyst ratings, 14,991
+earnings records, and 8,788 corporate-guidance records. Derivation admitted
+75,108 current-view rows and 73,832 censored-view rows, with 1,276
+disagreements. The accepted-risk pair is
+`arv2-accepted-risk-pair-0452a4811db397068b0dbd4c`, artifact SHA-256
+`696265dad63c8f67560bc9c8ffed46907ce75faf5e8ff2353b1cbcc25561ce57`,
+content SHA-256
+`0452a4811db397068b0dbd4c0e22db92c1597bcfcef93559e71647ee87228ea8`.
+The later order package authenticates **743 delta contributions** alongside
+12,244 parent contributions.
+
+This is input-acquisition lineage, not an outcome read. The retrospective
+recording itself made no provider call, selected no licensed row, and read no
+price, return, aggregate, order, log, or result. It therefore adds **zero
+shared looks, zero ARV2 development evaluations, zero infrastructure looks,
+and zero cells**: cumulative accounting remains **126 / 69 / 27 / 607**.
+The input remains current-vintage and non-pristine-PIT under the owner's
+accepted-risk decision; no live, broker, funded-order, deployment, or trading
+authority follows.

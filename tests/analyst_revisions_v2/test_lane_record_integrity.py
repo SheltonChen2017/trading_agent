@@ -76,6 +76,19 @@ def test_session_push_ledger_is_one_contiguous_gfm_table() -> None:
     )
 
 
+def test_live_banner_retains_the_no_accepted_signal_assertion() -> None:
+    """Historical quotations must not satisfy the live safety banner gate."""
+
+    text = RECORD.read_text(encoding="utf-8")
+    banner = text.split("\nBranch: `codex/strategy-analyst-revisions-v2`", 1)[0]
+    normalized = " ".join(banner.split())
+
+    assert (
+        "NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE."
+        in normalized
+    )
+
+
 def test_exact_next_step_references_the_latest_numbered_section() -> None:
     """A new review section must not leave the live handoff one round behind."""
 

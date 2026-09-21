@@ -33,6 +33,9 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_v13_qc_runtime as v13_runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v14_qc_runtime as v14_runtime,
+)
 from research.analyst_revisions_v2_qc import formal_qc_transport
 
 
@@ -48,7 +51,9 @@ def _canonical(value):
 
 def _profile(profile_id):
     return (
-        v13_runtime.require_qqq_order_level_profile(profile_id)
+        v14_runtime.require_qqq_order_level_profile(profile_id)
+        if profile_id in v14_runtime.DIAGNOSTIC_PROFILE_IDS
+        else v13_runtime.require_qqq_order_level_profile(profile_id)
         if profile_id in v13_runtime.ROLLOVER_PROFILE_IDS
         else v12_runtime.require_qqq_order_level_profile(profile_id)
         if profile_id in v12_runtime.FORCED_EXIT_PROFILE_IDS
@@ -58,7 +63,9 @@ def _profile(profile_id):
 
 def _expected_names(profile_id):
     return (
-        v13_runtime.expected_custom_summary_statistic_names(profile_id)
+        v14_runtime.expected_custom_summary_statistic_names(profile_id)
+        if profile_id in v14_runtime.DIAGNOSTIC_PROFILE_IDS
+        else v13_runtime.expected_custom_summary_statistic_names(profile_id)
         if profile_id in v13_runtime.ROLLOVER_PROFILE_IDS
         else v12_runtime.expected_custom_summary_statistic_names(profile_id)
         if profile_id in v12_runtime.FORCED_EXIT_PROFILE_IDS
@@ -243,6 +250,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID: (39, 178),
         v13_runtime.ROLLOVER_PROFILE_2025_ID: (91, 428),
         v13_runtime.ROLLOVER_PROFILE_2026_ID: (39, 178),
+        v14_runtime.DIAGNOSTIC_PROFILE_2025_ID: (91, 428),
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID: (39, 178),
     }[plan.profile_id]
     aggregate = {
         "schema": runtime.SUMMARY_SCHEMA,
@@ -334,6 +343,8 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             v12_runtime.FORCED_EXIT_PROFILE_2026_ID: "2026-01-05",
             v13_runtime.ROLLOVER_PROFILE_2025_ID: "2025-01-03",
             v13_runtime.ROLLOVER_PROFILE_2026_ID: "2026-01-05",
+            v14_runtime.DIAGNOSTIC_PROFILE_2025_ID: "2025-01-03",
+            v14_runtime.DIAGNOSTIC_PROFILE_2026_ID: "2026-01-05",
         }[plan.profile_id],
         "QQQ_target_gross_exposure": "0.98",
         "QQQ_entry_fee_bps_per_side": 10,
@@ -361,6 +372,7 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
         runtime.PROXY_PROFILE_IDS
         + v12_runtime.FORCED_EXIT_PROFILE_IDS
         + v13_runtime.ROLLOVER_PROFILE_IDS
+        + v14_runtime.DIAGNOSTIC_PROFILE_IDS
     ):
         aggregate.update({
             "schema": runtime.PROXY_SUMMARY_SCHEMA,
@@ -392,11 +404,32 @@ def _statistics(plan, *, meta_update=None, aggregate_update=None):
             },
             "forced_exit_invalidated_pending_rebalance_count": 0,
         })
+    if plan.profile_id in v14_runtime.DIAGNOSTIC_PROFILE_IDS:
+        aggregate.update({
+            "schema": v14_runtime.DIAGNOSTIC_SUMMARY_SCHEMA,
+            "qqq_proxy_complement_policy": v14_runtime.EXACT_COMPLEMENT_POLICY,
+            "skipped_unpriced_decision_evidence_policy": (
+                v14_runtime.SKIPPED_UNPRICED_EVIDENCE_POLICY
+            ),
+            "skipped_unpriced_decision_evidence": {
+                "schema": v14_runtime.SKIPPED_UNPRICED_EVIDENCE_SCHEMA,
+                "skipped_decision_count": 0,
+                "retained_decision_count": 0,
+                "omitted_decision_count": 0,
+                "records": [],
+                "path_sha256": hashlib.sha256(_canonical({
+                    "schema": v14_runtime.SKIPPED_UNPRICED_PATH_SCHEMA,
+                    "records": [],
+                })).hexdigest(),
+            },
+        })
     if aggregate_update:
         aggregate.update(aggregate_update)
     meta = {
         "schema": (
-            "arv2-qqq-order-level-tilt-runtime-meta-v2"
+            "arv2-qqq-order-level-tilt-runtime-meta-v3"
+            if plan.profile_id in v14_runtime.DIAGNOSTIC_PROFILE_IDS
+            else "arv2-qqq-order-level-tilt-runtime-meta-v2"
             if plan.profile_id in adapter.FORCED_EXIT_PROFILE_IDS
             else "arv2-qqq-order-level-tilt-runtime-meta-v1"
         ),
@@ -450,6 +483,48 @@ def _high_precision_statistics(plan):
             ),
         },
     )
+
+
+def _v14_skipped_statistics(plan):
+    statistics = _statistics(plan)
+    aggregate = json.loads(statistics[runtime.AGGREGATES_STATISTIC_NAME])
+    security_sha256s = ["1" * 64, "2" * 64]
+    full_records = [{
+        "decision_session": "2026-08-03",
+        "missing_security_sha256s": security_sha256s,
+    }]
+    aggregate.update({
+        "completed_rebalance_count": aggregate["decision_count"] - 1,
+        "skipped_unpriced_decision_count": 1,
+        "run_valid": False,
+        "skipped_unpriced_decision_evidence": {
+            "schema": v14_runtime.SKIPPED_UNPRICED_EVIDENCE_SCHEMA,
+            "skipped_decision_count": 1,
+            "retained_decision_count": 1,
+            "omitted_decision_count": 0,
+            "records": [{
+                "decision_session": "2026-08-03",
+                "missing_security_count": 2,
+                "retained_missing_security_sha256s": security_sha256s,
+                "omitted_missing_security_count": 0,
+                "missing_security_path_sha256": hashlib.sha256(_canonical({
+                    "schema": v14_runtime.MISSING_SECURITY_PATH_SCHEMA,
+                    "security_sha256s": security_sha256s,
+                })).hexdigest(),
+            }],
+            "path_sha256": hashlib.sha256(_canonical({
+                "schema": v14_runtime.SKIPPED_UNPRICED_PATH_SCHEMA,
+                "records": full_records,
+            })).hexdigest(),
+        },
+    })
+    meta = json.loads(statistics[runtime.META_STATISTIC_NAME])
+    meta["aggregates_sha256"] = hashlib.sha256(_canonical(aggregate)).hexdigest()
+    statistics[runtime.AGGREGATES_STATISTIC_NAME] = _canonical(aggregate).decode(
+        "ascii"
+    )
+    statistics[runtime.META_STATISTIC_NAME] = _canonical(meta).decode("ascii")
+    return statistics
 
 
 def _result_response(plan, statistics):
@@ -573,6 +648,7 @@ def test_result_parser_selects_only_exact_two_aggregate_statistics(tmp_path):
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_ticket_result_parser_accepts_complete_high_precision_aggregate(
@@ -596,6 +672,7 @@ def test_ticket_result_parser_accepts_complete_high_precision_aggregate(
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_ticket_result_hashes_stored_aggregate_text_not_json_quoted_string(
@@ -653,6 +730,7 @@ def test_legacy_result_parser_retains_4096_byte_bound(tmp_path):
         runtime.REFLECTED_TICKET_PROFILE_2026_ID,
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_ticket_result_parser_refuses_more_than_8192_bytes(tmp_path, profile_id):
@@ -675,6 +753,7 @@ def test_ticket_result_parser_refuses_more_than_8192_bytes(tmp_path, profile_id)
     (
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_versioned_result_parser_accepts_exact_nested_forced_exit_summary(
@@ -694,6 +773,7 @@ def test_versioned_result_parser_accepts_exact_nested_forced_exit_summary(
     (
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_versioned_result_parser_requires_v2_meta_schema(tmp_path, profile_id):
@@ -734,6 +814,7 @@ def test_versioned_result_parser_requires_v2_meta_schema(tmp_path, profile_id):
     (
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_versioned_result_parser_isolates_forced_exit_guards(
@@ -777,6 +858,66 @@ def test_versioned_result_parser_isolates_forced_exit_guards(
         adapter._parse_result(response, plan, launch)
 
 
+def test_v14_result_parser_authenticates_bounded_skipped_unpriced_evidence(
+    tmp_path,
+):
+    plan = _plan(tmp_path, v14_runtime.DIAGNOSTIC_PROFILE_2026_ID)
+    statistics = _v14_skipped_statistics(plan)
+    launch, response = _result_response(plan, statistics)
+
+    assert adapter._parse_result(response, plan, launch) == tuple(
+        sorted(statistics.items())
+    )
+
+
+@pytest.mark.parametrize(
+    "mutation",
+    (
+        "policy", "extra", "bad_session", "unsorted_hashes",
+        "non_string_hash", "missing_path", "path", "count", "omitted_count",
+    ),
+)
+def test_v14_result_parser_refuses_each_skipped_unpriced_evidence_mutation(
+    tmp_path, mutation,
+):
+    plan = _plan(tmp_path, v14_runtime.DIAGNOSTIC_PROFILE_2026_ID)
+    statistics = _v14_skipped_statistics(plan)
+    aggregate = json.loads(statistics[runtime.AGGREGATES_STATISTIC_NAME])
+    evidence = aggregate["skipped_unpriced_decision_evidence"]
+    record = evidence["records"][0]
+    if mutation == "policy":
+        aggregate["skipped_unpriced_decision_evidence_policy"] = "changed"
+    elif mutation == "extra":
+        evidence["raw_security_ids"] = []
+    elif mutation == "bad_session":
+        record["decision_session"] = "2026-02-30"
+    elif mutation == "unsorted_hashes":
+        record["retained_missing_security_sha256s"].reverse()
+    elif mutation == "non_string_hash":
+        record["retained_missing_security_sha256s"][0] = 1
+    elif mutation == "missing_path":
+        record["missing_security_path_sha256"] = "0" * 64
+    elif mutation == "path":
+        evidence["path_sha256"] = "0" * 64
+    elif mutation == "count":
+        evidence["skipped_decision_count"] = 2
+    else:
+        record["omitted_missing_security_count"] = 1
+    meta = json.loads(statistics[runtime.META_STATISTIC_NAME])
+    meta["aggregates_sha256"] = hashlib.sha256(_canonical(aggregate)).hexdigest()
+    statistics[runtime.AGGREGATES_STATISTIC_NAME] = _canonical(aggregate).decode(
+        "ascii"
+    )
+    statistics[runtime.META_STATISTIC_NAME] = _canonical(meta).decode("ascii")
+    launch, response = _result_response(plan, statistics)
+
+    with pytest.raises(
+        adapter.AcceptedRiskOrderLevelSubmissionError,
+        match="^order-level skipped-unpriced",
+    ):
+        adapter._parse_result(response, plan, launch)
+
+
 @pytest.mark.parametrize(
     "profile_id",
     (
@@ -797,6 +938,8 @@ def test_versioned_result_parser_isolates_forced_exit_guards(
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2025_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2025_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
@@ -849,6 +992,8 @@ def test_proxy_result_parser_requires_full_weight_ratios_and_overlap_disclosure(
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2025_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2025_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_preopen_result_cannot_shift_first_execution_session(
@@ -1279,6 +1424,7 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.PROFILE_IDS
         + v12_runtime.FORCED_EXIT_PROFILE_IDS
         + v13_runtime.ROLLOVER_PROFILE_IDS
+        + v14_runtime.DIAGNOSTIC_PROFILE_IDS
     ) == (
         runtime.PROFILE_2025_ID,
         runtime.PROFILE_2026_ID,
@@ -1300,11 +1446,14 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2025_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2025_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     )
     assert adapter.PROXY_PROFILE_IDS == (
         runtime.PROXY_PROFILE_IDS
         + v12_runtime.FORCED_EXIT_PROFILE_IDS
         + v13_runtime.ROLLOVER_PROFILE_IDS
+        + v14_runtime.DIAGNOSTIC_PROFILE_IDS
     ) == (
         runtime.PROXY_PROFILE_2025_ID,
         runtime.PROXY_PROFILE_2026_ID,
@@ -1324,6 +1473,8 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2025_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2025_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     )
     bindings = adapter._PINNED_RUNTIME_PROFILE_BINDINGS
     assert tuple(binding[0] for binding in bindings) == adapter.PROFILE_IDS
@@ -1339,17 +1490,24 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
     assert bindings[7][3:7] == ("2026-01-05", 39, 178, 177)
     assert bindings[8][3:7] == ("2025-01-03", 91, 428, 427)
     assert bindings[9][3:7] == ("2026-01-05", 39, 178, 177)
-    assert tuple(binding[1] for binding in bindings[-2:]) == (
+    assert tuple(binding[1] for binding in bindings[-4:]) == (
         "af9956518f5bb59512c8519766ffa018fee790a502cdb40279d69c32e4a86c4a",
         "1f2778f9e98ffab7c2030b5cab8080248b2d561420cc4c9d769de89fa46e6fa1",
+        "d1367ac6dd6a7446632b381496ff02be8e602f02373b31ff6c81e9d704298200",
+        "bfb77eacdaddb8566b649165eb4986ca038658bbc23d5eb95641f4cea13d0776",
     )
     assert adapter.ROLLOVER_PROFILE_IDS == v13_runtime.ROLLOVER_PROFILE_IDS
     assert adapter.FORCED_EXIT_PROFILE_IDS == (
         v12_runtime.FORCED_EXIT_PROFILE_IDS
         + v13_runtime.ROLLOVER_PROFILE_IDS
+        + v14_runtime.DIAGNOSTIC_PROFILE_IDS
     )
+    assert adapter.DIAGNOSTIC_PROFILE_IDS == v14_runtime.DIAGNOSTIC_PROFILE_IDS
     assert adapter._PINNED_FORCED_EXIT_SUMMARY_SCHEMA == (
         v12_runtime.FORCED_EXIT_SUMMARY_SCHEMA
+    )
+    assert adapter._PINNED_DIAGNOSTIC_SUMMARY_SCHEMA == (
+        v14_runtime.DIAGNOSTIC_SUMMARY_SCHEMA
     )
     assert runtime.PROXY_SUMMARY_SCHEMA == "arv2-qqq-order-level-tilt-summary-v7"
 
@@ -1361,6 +1519,7 @@ def test_preopen_profile_extension_keeps_old_bindings_and_proxy_result_gate():
         runtime.PREOPEN_PROXY_PROFILE_2026_ID,
         v12_runtime.FORCED_EXIT_PROFILE_2026_ID,
         v13_runtime.ROLLOVER_PROFILE_2026_ID,
+        v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
     ),
 )
 def test_submission_plan_persists_and_reloads_against_exact_inputs(
@@ -2122,6 +2281,7 @@ def test_result_read_authority_refuses_each_invalid_owner_signature(
         (runtime.REFLECTED_TICKET_PROFILE_2026_ID, 8192),
         (v12_runtime.FORCED_EXIT_PROFILE_2026_ID, 8192),
         (v13_runtime.ROLLOVER_PROFILE_2026_ID, 8192),
+        (v14_runtime.DIAGNOSTIC_PROFILE_2026_ID, 8192),
     ),
 )
 def test_result_read_authority_binds_profile_specific_statistic_limit(
@@ -2145,6 +2305,34 @@ def test_result_read_authority_binds_profile_specific_statistic_limit(
     ))
 
     assert candidate["maximum_custom_statistic_bytes_each"] == expected_limit
+
+
+def test_v14_result_read_authority_binds_diagnostic_field_inventory(
+    tmp_path, monkeypatch,
+):
+    plan = _plan(tmp_path, v14_runtime.DIAGNOSTIC_PROFILE_2026_ID)
+    monkeypatch.setattr(
+        adapter, "require_order_level_submission_plan", lambda value: value
+    )
+    execution_authority = _execution_authority(plan, monkeypatch)
+    control, launch = _persisted_launch(plan, execution_authority)
+    terminal = _persisted_terminal(plan, launch)
+    render, _load, _require = _test_result_operations()
+
+    candidate = json.loads(render(
+        plan=plan,
+        execution_authority=execution_authority,
+        launch_control=control,
+        launch=launch,
+        terminal=terminal,
+    ))
+
+    assert candidate["aggregate_field_inventory_sha256"] == hashlib.sha256(
+        _canonical(sorted(adapter._DIAGNOSTIC_AGGREGATE_FIELDS))
+    ).hexdigest()
+    assert candidate["aggregate_field_inventory_sha256"] != hashlib.sha256(
+        _canonical(sorted(adapter._FORCED_EXIT_AGGREGATE_FIELDS))
+    ).hexdigest()
 
 
 def test_result_read_signature_binds_only_aggregate_inventory_and_exact_run(

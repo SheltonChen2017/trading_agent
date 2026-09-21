@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–157 retain the milestone, review, preregistration, QC
+strategy. Sections 1–158 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -46,7 +46,9 @@ Section 156 records its authenticated `Completed.` terminal state and withholds
 the result read after a local proof established an unresolved exposure-
 complement producer/consumer defect. V15 is immutable and R-170 adds no result
 cell. Section 157 freezes the separately versioned V16/R-171 correction and
-its exact production plan before any new cloud launch.
+its exact production plan before any new cloud launch. Section 158 records
+R-171 `Completed.` and freezes its one-use aggregate-only result authority;
+no R-171 result has yet been read.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -470,15 +472,16 @@ one retired-name candidate and a separate terminal-account/path mismatch but
 could not admit a result. Section 155 freezes the exact V15/R-170 source and
 plan; section 156 records its completed engine state and the independently
 proven exposure-complement defect that invalidated it before any result
-authority was rendered. The immediate next step is a separately versioned
-V16/R-171 producer correction and fresh preregistration. Section 157 completes
-both; the immediate next step is to sign its exact authority and launch R-171
-attempt 1. V15 and R-170 must remain immutable, no R-170 aggregate may be read,
-and no R-169 diagnostic may be relabelled. By directing Codex to counter-review
-the landed review and continue directly with backtesting in this round, the
-owner explicitly waives Claude review of section 157 before its exact R-171
-authority is signed and launched; Claude will independently review the
-resulting pushed snapshot. R-138 remains unlaunched/unspent.
+authority was rendered. Section 157 freezes the separately versioned V16/R-171
+producer correction and exact preregistration. Section 158 records the
+authenticated completed run and separate result authority. The immediate next
+step is to sign and consume that exact aggregate-only authority once. V15 and
+R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
+diagnostic may be relabelled. By directing Codex to counter-review the landed
+review and continue directly with backtesting in this round, the owner
+explicitly waives Claude review of section 158 before this one exact result
+read; Claude will independently review the resulting pushed snapshot. R-138
+remains unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
@@ -20097,3 +20100,42 @@ explicitly waives Claude review of section 157 before this exact same-round
 launch. No outcome sign is selected, and no later period, six-universe,
 leverage, deployment, broker, paper/live, funded-account, real-order, or
 trading authority follows by inference.
+
+## 158. R-171 completed terminal state and one-use result authority, 2026-09-21
+
+The exact section-157 authority was signed and consumed once. Private QC
+project `36789750` compiled the exact sixteen-file production projection as
+`f2554122cb81735ffcc8cdc10b8374b3-f8500bb47d618a293586c668247cd8e1`
+and created backtest `1be162ae07a4d63c4f167be6dfe404f8`. The launch-control
+SHA-256 is
+`f6dc66290643dbf4d10c43a0afcaf0398b383b02fc8228065a05c474afb3658f`
+and launch-receipt SHA-256 is
+`8b37d72445bc83464836dc68926d2379b8c404a0e8de6cee3875b8718bf36355`.
+The second statistics-disabled poll authenticated `Completed.` with terminal
+receipt SHA-256
+`85f8e5c7e43b1fd1c756e7f26a78558d80e2a0b9de2c40b0771ca0ec4a8e0a09`.
+No compile or runtime retry occurred.
+
+No result has been accessed. The separately rendered result-read authority is
+`arv2-order-level-result-read-authority-0f0bcd755313ed5d10f6ff91`, canonical
+SHA-256
+`0f0bcd755313ed5d10f6ff91583f5fa98237dfaeb6c0beb1daddbf4cf4ade79b`,
+and payload SHA-256
+`0aee21eba46c1a0e539427d7e3d54243d04571a6d3833cd548f9d36731a75bb1`.
+It permits exactly one `backtests/read` call and selection only of
+`ARV2_ORDER_LEVEL_AGGREGATES` and `ARV2_ORDER_LEVEL_META`. Aggregate-field
+inventory SHA-256 is
+`b053844d8a0dc2a879211ab45c793c618eaa37f972aa7a4b559ffd0777ae9a00`;
+META inventory SHA-256 remains
+`65ca9519c8a3c1ae66316ba19df64af7d6f1bfad38e6a49969b4123ab8e6ff5a`.
+Standard QC statistics, raw provider/security rows, logs, orders, fills,
+charts and deployment state remain unauthorized.
+
+The R-171 launch spends **128 -> 129 shared looks / 71 -> 72 ARV2
+development evaluations**. Until the separate read both passes the exact
+parser and reports `run_valid=true`, accounting remains **27 infrastructure
+looks / 607 authenticated cells** and no return or signal claim exists. The
+next action is to commit this exact terminal/result authority, sign only its
+payload under `arv2-formal-qc-result-read-v1`, and consume it once. No retry,
+later period, six-universe expansion, leverage, deployment, broker,
+paper/live, funded-account, real-order, or trading authority follows.

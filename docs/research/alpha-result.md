@@ -3697,8 +3697,8 @@ aggregate-only result authority; formal admission requires parser acceptance
 and `run_valid=true`.
 
 At preregistration, R-170 attempt 1 was to spend **127 -> 128 shared looks /
-70 -> 71 ARV2 development evaluations** and could add at most one authenticated result cell
-(**607 -> 608**). The result sign is not selected. A failed attempt counts
+70 -> 71 ARV2 development evaluations** and could add at most one
+authenticated result cell (**607 -> 608**). The result sign is not selected. A failed attempt counts
 against the standing three-attempt maximum for this distinct candidate. No
 later period, six-universe expansion, leverage, live/paper deployment,
 broker, funded-account, real-order, or trading authority follows.
@@ -3728,7 +3728,7 @@ separately versioned, preregistered successor may correct the producer; no
 later-period, six-universe, leverage, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
 
-## R-171 — V16 exact-complement 2026-YTD QQQ order run (PREREGISTERED; UNLAUNCHED) — 2026-09-21
+## R-171 — V16 exact-complement 2026-YTD QQQ order run (COMPLETED; RESULT AUTHORITY FROZEN; UNREAD) — 2026-09-21
 
 V16 preserves V15's score, PIT QQQ universe, sector-neutral tilt, 98% gross,
 market-on-open schedule, modeled 10-bps-per-side fee, forced-delisting target
@@ -3759,3 +3759,23 @@ spend **128 -> 129 shared looks / 71 -> 72 ARV2 development evaluations** and
 can add at most one cell (**607 -> 608**). The result sign is not selected.
 No later period, six-universe expansion, leverage, live/paper deployment,
 broker, funded-account, real-order, or trading authority follows.
+
+The exact authority launched once. Private project `36789750` compiled as
+`f2554122cb81735ffcc8cdc10b8374b3-f8500bb47d618a293586c668247cd8e1`
+and created backtest `1be162ae07a4d63c4f167be6dfe404f8`. Launch receipt
+SHA-256
+`8b37d72445bc83464836dc68926d2379b8c404a0e8de6cee3875b8718bf36355`
+and terminal receipt SHA-256
+`85f8e5c7e43b1fd1c756e7f26a78558d80e2a0b9de2c40b0771ca0ec4a8e0a09`
+bind `Completed.` after two statistics-disabled polls. No compile or runtime
+retry occurred.
+
+The separate unread one-use result authority has payload SHA-256
+`0aee21eba46c1a0e539427d7e3d54243d04571a6d3833cd548f9d36731a75bb1`
+and permits only one `backtests/read` selecting the two named custom ARV2
+statistics. No outcome has yet been selected. The launch spends **128 -> 129
+shared looks / 71 -> 72 ARV2 development evaluations**; accounting remains
+**27 infrastructure looks / 607 authenticated cells** until the exact parser
+and `run_valid` gate both pass. No later period, six-universe expansion,
+leverage, live/paper deployment, broker, funded-account, real-order, or
+trading authority follows.

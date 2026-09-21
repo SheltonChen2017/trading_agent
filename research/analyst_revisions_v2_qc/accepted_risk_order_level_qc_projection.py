@@ -24,6 +24,7 @@ from . import accepted_risk_delta_order_package as delta_package_builder
 from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_qqq_order_level_qc_runtime as runtime_builder
 from . import accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime_builder
+from . import accepted_risk_qqq_order_level_v13_qc_runtime as v13_runtime_builder
 
 
 class AcceptedRiskOrderLevelQcProjectionError(ValueError):
@@ -35,6 +36,7 @@ SOURCE_SCHEMA = "arv2-order-level-qc-source-file-v1"
 MAIN_PROJECT_PATH = "main.py"
 RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_qc_runtime.py"
 V12_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v12_qc_runtime.py"
+V13_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v13_qc_runtime.py"
 FORCED_EXIT_PROJECT_PATH = "accepted_risk_order_level_forced_exit.py"
 MAX_SOURCE_FILE_BYTES = 64_000
 # The fixed ten-file closure includes the ETF-residual accounting and
@@ -48,7 +50,16 @@ MAX_TOTAL_SOURCE_BYTES = 290_000
 # 322,952 bytes; 325,000 is the smallest 5,000-byte round ceiling that keeps
 # the prospective 2,048-byte review margin.  Legacy profiles retain 290,000.
 MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES = 325_000
+# V13 adds only the separately versioned end-callback rollover wrapper to the
+# exact V12 source closure.  Its measured production closure is 329,308 bytes;
+# 335,000 is the smallest 5,000-byte round ceiling retaining the prospective
+# 2,048-byte margin.  V12 and legacy profiles keep their narrower ceilings.
+MAX_ROLLOVER_TOTAL_SOURCE_BYTES = 335_000
 MIN_REVIEW_MARGIN_BYTES = 2_048
+_ENGINE_ORDER_PROFILE_IDS = (
+    v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+    + v13_runtime_builder.ROLLOVER_PROFILE_IDS
+)
 
 PROJECT_SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
@@ -64,6 +75,12 @@ PROJECT_SOURCE_PATHS = (
 
 
 def _project_source_paths(profile_id: str) -> tuple[str, ...]:
+    if profile_id in v13_runtime_builder.ROLLOVER_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+        )
     return PROJECT_SOURCE_PATHS + (
         (FORCED_EXIT_PROJECT_PATH, V12_RUNTIME_PROJECT_PATH)
         if profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
@@ -72,6 +89,8 @@ def _project_source_paths(profile_id: str) -> tuple[str, ...]:
 
 
 def _maximum_total_source_bytes(profile_id: str) -> int:
+    if profile_id in v13_runtime_builder.ROLLOVER_PROFILE_IDS:
+        return MAX_ROLLOVER_TOTAL_SOURCE_BYTES
     return (
         MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES
         if profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
@@ -80,13 +99,19 @@ def _maximum_total_source_bytes(profile_id: str) -> int:
 
 
 def _require_profile(profile_id: str) -> dict[str, object]:
+    if profile_id in v13_runtime_builder.ROLLOVER_PROFILE_IDS:
+        return v13_runtime_builder.require_qqq_order_level_profile(profile_id)
     if profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS:
         return v12_runtime_builder.require_qqq_order_level_profile(profile_id)
     return runtime_builder.require_qqq_order_level_profile(profile_id)
 
 
 def _all_profile_ids() -> tuple[str, ...]:
-    return runtime_builder.PROFILE_IDS + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+    return (
+        runtime_builder.PROFILE_IDS
+        + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        + v13_runtime_builder.ROLLOVER_PROFILE_IDS
+    )
 
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
 _ALLOWED_IMPORT_MODULES = {
@@ -101,6 +126,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_preliminary_rating_policy",
     "accepted_risk_qqq_order_level_qc_runtime",
     "accepted_risk_qqq_order_level_v12_qc_runtime",
+    "accepted_risk_qqq_order_level_v13_qc_runtime",
     "accepted_risk_sequential_r055_score",
     "collections",
     "collections.abc",
@@ -263,11 +289,11 @@ def _approved_forced_exit_order_lookup(
     node: ast.Attribute,
     parents: dict[ast.AST, ast.AST],
     project_path: str,
-    v12_main: bool,
+    forced_exit_main: bool,
 ) -> bool:
-    """Admit one V12-only, read-only engine-order authentication call."""
+    """Admit one versioned, read-only engine-order authentication call."""
 
-    if project_path != MAIN_PROJECT_PATH or not v12_main:
+    if project_path != MAIN_PROJECT_PATH or not forced_exit_main:
         return False
     name = _normalized(node.attr)
     if name == "transactions":
@@ -303,23 +329,36 @@ def _approved_forced_exit_order_lookup(
     )
 
 
-def _is_exact_v12_main(tree: ast.Module, project_path: str) -> bool:
-    """Bind the narrow lookup exception to an exact V12 generated-main shape."""
+def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
+    """Bind the lookup exception to an exact V12-or-V13 generated main."""
 
     if project_path != MAIN_PROJECT_PATH:
         return False
-    expected_import = (
-        (
+    allowed_imports = {
+        "accepted_risk_qqq_order_level_v12_qc_runtime": (
             "AcceptedRiskQqqOrderLevelV12QcRuntime",
-            "AcceptedRiskQqqOrderLevelQcRuntime",
+            v12_runtime_builder.FORCED_EXIT_PROFILE_IDS,
         ),
-        ("STARTING_CASH", None),
-    )
+        "accepted_risk_qqq_order_level_v13_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV13QcRuntime",
+            v13_runtime_builder.ROLLOVER_PROFILE_IDS,
+        ),
+    }
     imports = tuple(
-        tuple((item.name, item.asname) for item in node.names)
+        (
+            node.module,
+            tuple((item.name, item.asname) for item in node.names),
+        )
         for node in tree.body
-        if isinstance(node, ast.ImportFrom)
-        and node.module == "accepted_risk_qqq_order_level_v12_qc_runtime"
+        if isinstance(node, ast.ImportFrom) and node.module in allowed_imports
+    )
+    if len(imports) != 1:
+        return False
+    imported_module, imported_names = imports[0]
+    runtime_name, profile_ids = allowed_imports[imported_module]
+    expected_names = (
+        (runtime_name, "AcceptedRiskQqqOrderLevelQcRuntime"),
+        ("STARTING_CASH", None),
     )
     driver_initializers = []
     for node in ast.walk(tree):
@@ -344,12 +383,11 @@ def _is_exact_v12_main(tree: ast.Module, project_path: str) -> bool:
         )
         driver_initializers.append(profile_keywords)
     return (
-        imports == (expected_import,)
+        imported_names == expected_names
         and len(driver_initializers) == 1
         and len(driver_initializers[0]) == 1
         and isinstance(driver_initializers[0][0], ast.Constant)
-        and driver_initializers[0][0].value
-        in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        and driver_initializers[0][0].value in profile_ids
     )
 
 
@@ -367,7 +405,7 @@ def _audit_cloud_capabilities(text: str, project_path: str) -> None:
         for parent in ast.walk(tree)
         for child in ast.iter_child_nodes(parent)
     }
-    v12_main = _is_exact_v12_main(tree, project_path)
+    forced_exit_main = _is_exact_forced_exit_main(tree, project_path)
     locally_defined = {
         _normalized(node.name)
         for node in ast.walk(tree)
@@ -445,10 +483,10 @@ def _audit_cloud_capabilities(text: str, project_path: str) -> None:
                 pass
             elif name in {"transactions", "getorderbyid"}:
                 if not _approved_forced_exit_order_lookup(
-                    node, parents, project_path, v12_main
+                    node, parents, project_path, forced_exit_main
                 ):
                     raise AcceptedRiskOrderLevelQcProjectionError(
-                        "engine order lookup is permitted only as V12's exact generated-main authentication call"
+                        "engine order lookup is permitted only as the versioned forced-exit generated-main authentication call"
                     )
             elif name in (
                 _FORBIDDEN_ORDER_CALLS
@@ -662,9 +700,7 @@ def _main_source(
 ) -> bytes:
     """Render the thin QC entry after the runtime interface is authenticated."""
 
-    v12_profile = profile.get("profile_id") in (
-        v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
-    )
+    engine_order_profile = profile.get("profile_id") in _ENGINE_ORDER_PROFILE_IDS
     try:
         start = tuple(
             int(part) for part in profile["evaluation_start_session"].split("-")
@@ -715,7 +751,7 @@ def _main_source(
         "            order_status_enum=_arv2_reflected_order_status(OrderStatus),\n"
         if profile["profile_id"] in (
             runtime_builder.REFLECTED_TICKET_PROFILE_IDS
-            + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+            + _ENGINE_ORDER_PROFILE_IDS
         )
         else "            order_status_enum=OrderStatus,\n"
         if profile["profile_id"] in runtime_builder.ENUM_PREOPEN_PROXY_PROFILE_IDS
@@ -765,7 +801,7 @@ def _arv2_reflected_order_status(enum_type):
 '''
         if profile["profile_id"] in (
             runtime_builder.REFLECTED_TICKET_PROFILE_IDS
-            + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+            + _ENGINE_ORDER_PROFILE_IDS
         )
         else ""
     )
@@ -780,7 +816,7 @@ def _arv2_reflected_order_status(enum_type):
         if profile["profile_id"] in (
             runtime_builder.TICKET_PROFILE_IDS
             + runtime_builder.REFLECTED_TICKET_PROFILE_IDS
-            + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+            + _ENGINE_ORDER_PROFILE_IDS
         )
         else ""
     )
@@ -789,16 +825,20 @@ def _arv2_reflected_order_status(enum_type):
         "        self._arv2_driver.on_order_event(\n"
         "            event, engine_order=engine_order,\n"
         "        )"
-        if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+        if profile["profile_id"] in _ENGINE_ORDER_PROFILE_IDS
         else "        self._arv2_driver.on_order_event(event)"
     )
     runtime_import_module = (
-        "accepted_risk_qqq_order_level_v12_qc_runtime"
+        "accepted_risk_qqq_order_level_v13_qc_runtime"
+        if profile["profile_id"] in v13_runtime_builder.ROLLOVER_PROFILE_IDS
+        else "accepted_risk_qqq_order_level_v12_qc_runtime"
         if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
         else "accepted_risk_qqq_order_level_qc_runtime"
     )
     runtime_import_binding = (
-        "AcceptedRiskQqqOrderLevelV12QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        "AcceptedRiskQqqOrderLevelV13QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v13_runtime_builder.ROLLOVER_PROFILE_IDS
+        else "AcceptedRiskQqqOrderLevelV12QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
         if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
         else "AcceptedRiskQqqOrderLevelQcRuntime"
     )
@@ -846,8 +886,8 @@ class ARV2QqqOrderLevelAlgorithm(QCAlgorithm):
             Resolution.MINUTE,
             fill_forward=False,
             leverage=1,
-            extended_market_hours={"True" if profile['profile_id'] in runtime_builder.PREOPEN_PROXY_PROFILE_IDS or v12_profile else "False"},
-            data_normalization_mode=DataNormalizationMode.{"RAW" if profile['profile_id'] in runtime_builder.PROXY_PROFILE_IDS or v12_profile else "TOTAL_RETURN"},
+            extended_market_hours={"True" if profile['profile_id'] in runtime_builder.PREOPEN_PROXY_PROFILE_IDS or engine_order_profile else "False"},
+            data_normalization_mode=DataNormalizationMode.{"RAW" if profile['profile_id'] in runtime_builder.PROXY_PROFILE_IDS or engine_order_profile else "TOTAL_RETURN"},
         ).symbol
         self.set_benchmark(qqq_benchmark)
         qqq_constituent_universe = self.add_universe(
@@ -1026,7 +1066,7 @@ def require_accepted_risk_order_level_qc_projection(
         or (
             value.total_source_byte_count + MIN_REVIEW_MARGIN_BYTES
             > maximum_total_source_bytes
-            if value.profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
+            if value.profile_id in _ENGINE_ORDER_PROFILE_IDS
             else value.total_source_byte_count > maximum_total_source_bytes
         )
         or value.preliminary is not True

@@ -35,6 +35,7 @@ from . import accepted_risk_order_level_qc_projection as projection_builder
 from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_qqq_order_level_qc_runtime as runtime_builder
 from . import accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime_builder
+from . import accepted_risk_qqq_order_level_v13_qc_runtime as v13_runtime_builder
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -104,9 +105,14 @@ PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2026-cutoff-v11",
     "arv2-qqq-order-level-tilt-2025-cutoff-v12",
     "arv2-qqq-order-level-tilt-2026-cutoff-v12",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v13",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v13",
 )
 PROXY_PROFILE_IDS = PROFILE_IDS[2:]
-FORCED_EXIT_PROFILE_IDS = PROFILE_IDS[-2:]
+ROLLOVER_PROFILE_IDS = tuple(v13_runtime_builder.ROLLOVER_PROFILE_IDS)
+FORCED_EXIT_PROFILE_IDS = (
+    tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS) + ROLLOVER_PROFILE_IDS
+)
 _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[0], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[1], "2026-01-05", 39, 178, 177),
@@ -126,6 +132,8 @@ _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[15], "2026-01-05", 39, 178, 177),
     (PROFILE_IDS[16], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[17], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[18], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[19], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200
@@ -200,15 +208,20 @@ _PINNED_REQUIRE_PROJECTION = (
 )
 _PINNED_REQUIRE_LEGACY_PROFILE = runtime_builder.require_qqq_order_level_profile
 _PINNED_REQUIRE_V12_PROFILE = v12_runtime_builder.require_qqq_order_level_profile
+_PINNED_REQUIRE_V13_PROFILE = v13_runtime_builder.require_qqq_order_level_profile
 _PINNED_EXPECTED_LEGACY_NAMES = (
     runtime_builder.expected_custom_summary_statistic_names
 )
 _PINNED_EXPECTED_V12_NAMES = (
     v12_runtime_builder.expected_custom_summary_statistic_names
 )
+_PINNED_EXPECTED_V13_NAMES = (
+    v13_runtime_builder.expected_custom_summary_statistic_names
+)
 _PINNED_RUNTIME_PROFILE_IDS = (
     tuple(runtime_builder.PROFILE_IDS)
     + tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS)
+    + tuple(v13_runtime_builder.ROLLOVER_PROFILE_IDS)
 )
 _PINNED_META_STATISTIC_NAME = runtime_builder.META_STATISTIC_NAME
 _PINNED_AGGREGATES_STATISTIC_NAME = runtime_builder.AGGREGATES_STATISTIC_NAME
@@ -226,12 +239,16 @@ _PINNED_TRANSPORT_CALL = formal._transport_call
 
 def _pinned_require_profile(
     profile_id,
-    _v12_ids=FORCED_EXIT_PROFILE_IDS,
+    _v13_ids=ROLLOVER_PROFILE_IDS,
+    _v12_ids=tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS),
+    _v13_requirer=_PINNED_REQUIRE_V13_PROFILE,
     _v12_requirer=_PINNED_REQUIRE_V12_PROFILE,
     _legacy_requirer=_PINNED_REQUIRE_LEGACY_PROFILE,
 ):
     return (
-        _v12_requirer(profile_id)
+        _v13_requirer(profile_id)
+        if profile_id in _v13_ids
+        else _v12_requirer(profile_id)
         if profile_id in _v12_ids
         else _legacy_requirer(profile_id)
     )
@@ -239,12 +256,16 @@ def _pinned_require_profile(
 
 def _pinned_expected_names(
     profile_id,
-    _v12_ids=FORCED_EXIT_PROFILE_IDS,
+    _v13_ids=ROLLOVER_PROFILE_IDS,
+    _v12_ids=tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS),
+    _v13_names=_PINNED_EXPECTED_V13_NAMES,
     _v12_names=_PINNED_EXPECTED_V12_NAMES,
     _legacy_names=_PINNED_EXPECTED_LEGACY_NAMES,
 ):
     return (
-        _v12_names(profile_id)
+        _v13_names(profile_id)
+        if profile_id in _v13_ids
+        else _v12_names(profile_id)
         if profile_id in _v12_ids
         else _legacy_names(profile_id)
     )

@@ -480,9 +480,10 @@ producer correction and exact preregistration. Section 158 records the
 authenticated completed run and separate result authority; section 159 records
 its accepted one-use read. Section 160 freezes the unchanged V16 2025-now
 profile as the fresh R-172 production plan, and the owner explicitly waives
-Claude review of section 160 before this same-round launch. The immediate next step is to
-commit that preregistration, sign only its exact execution-authority payload,
-launch attempt 1 once, and inspect only statistics-disabled terminal status.
+Claude review of section 160 before this same-round launch. The preregistration
+is committed at `42820b2`. The immediate next step is to sign only its exact
+execution-authority payload, launch attempt 1 once, and inspect only
+statistics-disabled terminal status.
 Only authenticated `Completed.` may be followed by a separately rendered,
 committed, signed, and consumed one-use aggregate-only result authority. V15
 and R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
@@ -20242,6 +20243,7 @@ after that separate read succeeds; infrastructure looks remain **27**. A
 compile failure, runtime failure, or other unsuccessful terminal run counts
 against the standing three-attempt maximum for this distinct candidate. The
 owner has directed same-round continuation without an intervening Claude
-review; Claude will review the resulting pushed snapshot. The next action is
-to commit this preregistration, sign only the exact execution payload under
-`arv2-formal-qc-execution-v1`, launch once, and inspect only terminal status.
+review; Claude will review the resulting pushed snapshot. The preregistration
+is committed at `42820b2`; the next action is to sign only the exact execution
+payload under `arv2-formal-qc-execution-v1`, launch once, and inspect only
+terminal status.

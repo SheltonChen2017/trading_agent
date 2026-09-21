@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–156 retain the milestone, review, preregistration, QC
+strategy. Sections 1–157 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -45,7 +45,8 @@ label and freezes the exact production V15/R-170 plan before any cloud launch.
 Section 156 records its authenticated `Completed.` terminal state and withholds
 the result read after a local proof established an unresolved exposure-
 complement producer/consumer defect. V15 is immutable and R-170 adds no result
-cell.
+cell. Section 157 freezes the separately versioned V16/R-171 correction and
+its exact production plan before any new cloud launch.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -470,17 +471,18 @@ could not admit a result. Section 155 freezes the exact V15/R-170 source and
 plan; section 156 records its completed engine state and the independently
 proven exposure-complement defect that invalidated it before any result
 authority was rendered. The immediate next step is a separately versioned
-V16/R-171 producer correction and fresh preregistration. V15 and R-170 must
-remain immutable, no R-170 aggregate may be read, and no R-169 diagnostic may
-be relabelled. By directing Codex to counter-review the landed review and
-continue directly with backtesting in this round, the owner explicitly waives
-Claude review of section 156 before that exact successor is built and
-launched; Claude will independently review the resulting pushed snapshot.
-R-138 remains unlaunched/unspent.
+V16/R-171 producer correction and fresh preregistration. Section 157 completes
+both; the immediate next step is to sign its exact authority and launch R-171
+attempt 1. V15 and R-170 must remain immutable, no R-170 aggregate may be read,
+and no R-169 diagnostic may be relabelled. By directing Codex to counter-review
+the landed review and continue directly with backtesting in this round, the
+owner explicitly waives Claude review of section 157 before its exact R-171
+authority is signed and launched; Claude will independently review the
+resulting pushed snapshot. R-138 remains unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
-trading authority follows from R-168 or R-169. The economic figures in
+trading authority follows from R-168, R-169, or R-170. The economic figures in
 sections 148 and 154 came from bounded diagnostic aggregate reads and must
 retain that label.
 
@@ -20036,3 +20038,62 @@ projection, plan, authority, project name, result rule and attempt budget must
 be committed before cloud access. No later period, six-universe expansion,
 leverage, deployment, broker, paper/live, funded-account, real-order, or
 trading authority follows.
+
+## 157. Immutable V16/R-171 exact-complement preregistration, 2026-09-21
+
+Commit `323829f` adds V16 without changing the used V15 source; V15 remains
+byte-identical at SHA-256
+`5470b32ea2aa612419a4adad8a2f25dd34308945f84dc61023a3f65f7fa836d1`.
+V16 preserves every V15 universe, score, tilt, target, order, fee, schedule,
+delisting-retirement and terminal-account rule. It changes only the result
+representation: the emitted `mean_gross_exposure` remains authoritative and
+the emitted `mean_cash_weight` is its exact unit complement under the existing
+bounded 32,768-digit local Decimal discipline. The summary schema advances to
+v11 and the profile schema to v16; META remains v3.
+
+The exact R-169 counterexample is a direct regression through the real V15
+aggregate chain: V16 keeps gross
+`0.9627929226578532739058666438`, replaces independently rounded cash
+`0.03720707734214672609413335543` with exact complement
+`0.0372070773421467260941333562`, and changes no other economic field. The
+test is stable under hostile ambient Decimal traps. New callback tests also
+bind the emitted V16 profile/hash, summary schema, aggregate digest,
+completion flag, and fail-atomic oversized-statistic refusal. An independent
+read-only audit found **0 P0 / 0 P1 / 0 P2**; its one P3 callback-proof gap was
+closed before commit. The final focused runtime, projection, adapter and
+whole-package no-I/O selection passes **464 tests in 82.89 seconds**;
+focused compileall and `git diff --check` pass. Per owner rule, no full lane
+suite was run.
+
+The real accepted-risk package builds exactly **16 source files / 370,919
+bytes**, leaving **4,081 bytes** under the V16-only 375,000-byte ceiling. The
+fresh administrative project inventory resolved the same one organization
+and verified the project name below is absent before the formal transport was
+imported. It selected no outcome or research evidence. R-171 is frozen as:
+
+| Field | Frozen R-171 identity |
+| --- | --- |
+| Control directory | `accepted_risk_order_level_r171_20260921_01` |
+| Runtime source | SHA-256 `998cb19bfe7d48c37ec1dfb901399080ef206831df62a42cb339a464a638877e` |
+| Profile | `arv2-qqq-order-level-tilt-2026-cutoff-v16`; SHA-256 `f23417c65cd80daee2440350ca0598728a896816bd5f5d4412c9352f6ab45f3b` |
+| Projection | `arv2-order-level-qc-projection-02cb808a55899c42d2e5efd8`; SHA-256 `02cb808a55899c42d2e5efd8f07798ac12fcbfb205093b2a563e0d95a8ebe95d` |
+| Plan | `arv2-order-level-plan-dc4dea12a5db7484f4848a8c`; SHA-256 `dc4dea12a5db7484f4848a8c97232090bef388a64d260778e1bd881ff7afe290` |
+| Execution-authority payload | SHA-256 `9eac5d89d30458df8cf0de8e5202e810a7f2a0b8c4a61fe52303a83811fea430` |
+| Private QC project | `92 ARV2_QQQ_EXPOSURE_ORDER_R171_2026_YTD - 20260921` |
+| Backtest | `ARV2 R171 QQQ exposure order 2026 YTD 7803b84f` |
+
+The plan permits one simulated-market-on-open, backtest-only submission and
+statistics-disabled terminal polling. It permits no result read, standard
+statistic, raw row/order/fill/log/chart, live/paper deployment, broker
+credential, funded or real order. Only terminal `Completed.` may be followed
+by a separately rendered, committed and signed one-use authority for the two
+exact custom statistics. Parser acceptance and `run_valid=true` are both
+required for a cell.
+
+R-171 attempt 1 will spend **128 -> 129 shared looks / 71 -> 72 ARV2
+development evaluations** and can add at most one cell (**607 -> 608**). The
+standing three-attempt maximum applies to this distinct candidate. The owner
+explicitly waives Claude review of section 157 before this exact same-round
+launch. No outcome sign is selected, and no later period, six-universe,
+leverage, deployment, broker, paper/live, funded-account, real-order, or
+trading authority follows by inference.

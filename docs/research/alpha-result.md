@@ -3727,3 +3727,35 @@ evaluations**, adds **zero cells**, and leaves **27 infrastructure looks /
 separately versioned, preregistered successor may correct the producer; no
 later-period, six-universe, leverage, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
+
+## R-171 — V16 exact-complement 2026-YTD QQQ order run (PREREGISTERED; UNLAUNCHED) — 2026-09-21
+
+V16 preserves V15's score, PIT QQQ universe, sector-neutral tilt, 98% gross,
+market-on-open schedule, modeled 10-bps-per-side fee, forced-delisting target
+retirement, and terminal-account reconciliation. It changes only the emitted
+mean exposure representation: cash is the deterministic exact complement of
+the already-emitted gross mean. The exact R-169 counterexample is green
+through the real predecessor aggregate and formal parser, with no other
+economic field changed.
+
+The immutable V16 runtime source SHA-256 is
+`998cb19bfe7d48c37ec1dfb901399080ef206831df62a42cb339a464a638877e`;
+2026 profile SHA-256 is
+`f23417c65cd80daee2440350ca0598728a896816bd5f5d4412c9352f6ab45f3b`;
+the 16-file production projection SHA-256 is
+`02cb808a55899c42d2e5efd8f07798ac12fcbfb205093b2a563e0d95a8ebe95d`.
+Plan SHA-256
+`dc4dea12a5db7484f4848a8c97232090bef388a64d260778e1bd881ff7afe290`
+and execution-authority payload SHA-256
+`9eac5d89d30458df8cf0de8e5202e810a7f2a0b8c4a61fe52303a83811fea430`
+name private project `92 ARV2_QQQ_EXPOSURE_ORDER_R171_2026_YTD - 20260921`
+and backtest `ARV2 R171 QQQ exposure order 2026 YTD 7803b84f`.
+
+One simulated-order submission may precede statistics-disabled terminal
+inspection. A terminal `Completed.` run may receive only a separately
+committed and signed one-use read of the two named custom statistics; parser
+acceptance and `run_valid=true` are both required for a cell. Attempt 1 will
+spend **128 -> 129 shared looks / 71 -> 72 ARV2 development evaluations** and
+can add at most one cell (**607 -> 608**). The result sign is not selected.
+No later period, six-universe expansion, leverage, live/paper deployment,
+broker, funded-account, real-order, or trading authority follows.

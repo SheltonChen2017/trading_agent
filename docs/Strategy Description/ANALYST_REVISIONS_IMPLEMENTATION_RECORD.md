@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–155 retain the milestone, review, preregistration, QC
+strategy. Sections 1–156 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -42,6 +42,10 @@ and replaces the final path observation with one frozen terminal QC account
 snapshot before computing metrics. R-169 remains diagnostic only and adds no
 formal result cell. Section 155 corrects a fixture-versus-production projection
 label and freezes the exact production V15/R-170 plan before any cloud launch.
+Section 156 records its authenticated `Completed.` terminal state and withholds
+the result read after a local proof established an unresolved exposure-
+complement producer/consumer defect. V15 is immutable and R-170 adds no result
+cell.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -462,17 +466,17 @@ control's local pre-network ordering refusal and its replacement. Section 153
 records the authenticated completed run and its separate read authority.
 Section 154 records the consumed read and its refusal; V14 correctly exposed
 one retired-name candidate and a separate terminal-account/path mismatch but
-could not admit a result. Section 155 freezes the exact V15/R-170 source,
-plan, execution authority, project name and result rule. The immediate next
-step is to sign that section-155 authority and launch attempt 1, with at most
-three attempts under the standing machine rule. V15 must
-not relabel the R-169 result, must retire a target only after exact forced-exit
-and zero-holding authentication, and must compute its final path from one
-frozen QC terminal account snapshot. By directing Codex to counter-review the
-landed review and continue directly with backtesting in this round, the owner
-explicitly waives Claude review of section 155 before this exact R-170 launch;
-Claude will independently review the resulting pushed snapshot. R-138 remains
-unlaunched/unspent.
+could not admit a result. Section 155 freezes the exact V15/R-170 source and
+plan; section 156 records its completed engine state and the independently
+proven exposure-complement defect that invalidated it before any result
+authority was rendered. The immediate next step is a separately versioned
+V16/R-171 producer correction and fresh preregistration. V15 and R-170 must
+remain immutable, no R-170 aggregate may be read, and no R-169 diagnostic may
+be relabelled. By directing Codex to counter-review the landed review and
+continue directly with backtesting in this round, the owner explicitly waives
+Claude review of section 156 before that exact successor is built and
+launched; Claude will independently review the resulting pushed snapshot.
+R-138 remains unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
@@ -19980,3 +19984,55 @@ explicitly waives Claude review of section 155 before this exact same-round
 launch. No result sign or winner is preselected, and no later period,
 six-universe, leverage, deployment, broker, paper/live, funded-account,
 real-order, or trading authority follows by inference.
+
+## 156. R-170 completed engine run and pre-result exposure refusal, 2026-09-21
+
+The exact section-155 authority was signed and consumed once. Private QC
+project `36789122` compiled the exact fifteen-file production projection as
+`bf9ab29a19d4bd2b1c71485a1ac8092e-032b4c0ea9d101b9534eeb3399fc8235`
+and created backtest `12961d9259f40e31ec618e4e832352cd`. The launch-control
+SHA-256 is
+`a90b77d1f4e8d66141b3c84fdd27c8cdcd45634fe49d0ca5359309c319a05a17`
+and launch-receipt SHA-256 is
+`be6b80d15c48f692aef706b735119abca7a1212160468b018ebcb1f9f62f9476`.
+The first statistics-disabled poll authenticated `Completed.` with terminal
+receipt SHA-256
+`33552261979f5be02db2bf62aa803c9f44fd7ba42d173c3d21ff88497fb3adb6`.
+No compile or runtime retry was made.
+
+Before any R-170 result authority was rendered, the independent prelaunch
+audit found a third R-169 refusal cause not addressed by V15. R-169 emitted
+mean gross exposure `0.9627929226578532739058666438` and mean cash weight
+`0.03720707734214672609413335543`; under the reader's deterministic high-
+precision check they total
+`0.99999999999999999999999999923`, not exact one. The base producer averages
+the gross and cash paths independently under ambient Decimal precision, while
+the consumer correctly requires their emitted means to be exact complements.
+V15 makes the final observation pair exact but still inherits those two
+independent mean calculations.
+
+A local red/green-style compatibility proof injected the exact R-169 pair into
+an otherwise valid V15 account-profile aggregate and reproduced
+`order-level aggregate execution or coverage invariant changed`. Existing
+V15 tests had stubbed the parent aggregate and proved only the terminal pair,
+so they did not exercise this producer/consumer boundary. This is a P2
+evidence-admission defect: it cannot cause real orders or false formal
+acceptance, but it can make an otherwise valid completed run formally
+unreadable.
+
+Because the defect was established before result access, Codex deliberately
+did **not** render, sign, or consume an R-170 result authority. No custom or
+standard statistic, result aggregate, raw order/fill/log/chart, price,
+provider/security row, return, or signal verdict was selected. R-170 spends
+**127 -> 128 shared looks / 70 -> 71 ARV2 development evaluations**, adds
+**zero cells**, and leaves **27 infrastructure looks / 607 authenticated
+cells**. V15 and this cloud run are immutable.
+
+The only admissible next candidate is a separately versioned V16/R-171 that
+emits one deterministic mean exposure and derives the paired mean as its exact
+complement, with an end-to-end producer/parser regression using the R-169
+counterexample and the real parent aggregate. Its exact source, profile,
+projection, plan, authority, project name, result rule and attempt budget must
+be committed before cloud access. No later period, six-universe expansion,
+leverage, deployment, broker, paper/live, funded-account, real-order, or
+trading authority follows.

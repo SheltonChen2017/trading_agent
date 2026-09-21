@@ -3672,7 +3672,7 @@ will not be reread or relabelled. No leverage, six-universe expansion,
 deployment, broker, paper/live, funded-account, real-order, or trading
 authority follows.
 
-## R-170 — V15 account-reconciled 2026-YTD QQQ order run (PREREGISTERED; UNLAUNCHED) — 2026-09-21
+## R-170 — V15 account-reconciled 2026-YTD QQQ order run (COMPLETED; RESULT READ WITHHELD; ZERO CELLS) — 2026-09-21
 
 The exact production V15 profile SHA-256 is
 `13303b1940e3442f01d93020e62c43e196c88ec297ddace97a0f4dc024a14e7a`.
@@ -3696,9 +3696,34 @@ is permitted before statistics-disabled terminal inspection. Only a terminal
 aggregate-only result authority; formal admission requires parser acceptance
 and `run_valid=true`.
 
-R-170 attempt 1 will spend **127 -> 128 shared looks / 70 -> 71 ARV2
-development evaluations** and can add at most one authenticated result cell
+At preregistration, R-170 attempt 1 was to spend **127 -> 128 shared looks /
+70 -> 71 ARV2 development evaluations** and could add at most one authenticated result cell
 (**607 -> 608**). The result sign is not selected. A failed attempt counts
 against the standing three-attempt maximum for this distinct candidate. No
 later period, six-universe expansion, leverage, live/paper deployment,
 broker, funded-account, real-order, or trading authority follows.
+
+The exact authority launched once. Private project `36789122` compiled as
+`bf9ab29a19d4bd2b1c71485a1ac8092e-032b4c0ea9d101b9534eeb3399fc8235`
+and created backtest `12961d9259f40e31ec618e4e832352cd`. Launch receipt
+SHA-256
+`be6b80d15c48f692aef706b735119abca7a1212160468b018ebcb1f9f62f9476`
+and terminal receipt SHA-256
+`33552261979f5be02db2bf62aa803c9f44fd7ba42d173c3d21ff88497fb3adb6`
+bind `Completed.` after the first statistics-disabled poll.
+
+Before any result authority or aggregate read, a local compatibility proof
+established that V15 still inherits independent rounding of mean gross and
+cash exposure. The exact R-169 counterexample totals
+`0.99999999999999999999999999923`, while the formal consumer requires exact
+one. V15 corrected its terminal pair but not the independently averaged
+means. The R-170 result read was therefore withheld rather than spending a
+known-incompatible formal gate. No statistic, aggregate, return, order/fill,
+log/chart, price, provider/security row, or signal verdict was selected.
+
+R-170 spends **127 -> 128 shared looks / 70 -> 71 ARV2 development
+evaluations**, adds **zero cells**, and leaves **27 infrastructure looks /
+607 authenticated cells**. V15 and the cloud run remain immutable. Only a
+separately versioned, preregistered successor may correct the producer; no
+later-period, six-universe, leverage, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.

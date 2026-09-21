@@ -3671,3 +3671,34 @@ the exact delisting/account-reconciliation causes prospectively; R-169 itself
 will not be reread or relabelled. No leverage, six-universe expansion,
 deployment, broker, paper/live, funded-account, real-order, or trading
 authority follows.
+
+## R-170 — V15 account-reconciled 2026-YTD QQQ order run (PREREGISTERED; UNLAUNCHED) — 2026-09-21
+
+The exact production V15 profile SHA-256 is
+`13303b1940e3442f01d93020e62c43e196c88ec297ddace97a0f4dc024a14e7a`.
+The real accepted-risk package builds a 15-file, 362,488-byte projection with
+SHA-256
+`9453674a2ea882ae7e8b86e5141e7119e1454201e1f7b5085798bbed3a022efe`,
+distinct from the shorter deterministic-fixture projection recorded in the
+tests. The signed plan will have SHA-256
+`2e95705c5d3d1eb12467a4526e15bfb36a905da6ece54aa4dbed39c5da14c58e`
+and execution-authority payload SHA-256
+`9276d57089874a0070789e65fada750f79a250f1605ab2852a466669dc518b94`.
+It names private project `91 ARV2_QQQ_ACCOUNT_ORDER_R170_2026_YTD -
+20260921` and backtest `ARV2 R170 QQQ account order 2026 YTD 7803b84f`.
+
+V15 preserves V14's score, tilt, PIT QQQ universe, 98% gross exposure,
+market-on-open schedule, and modeled 10-bps-per-side cost. It prospectively
+changes only authenticated delisted-target retirement and final account/path
+reconciliation, as specified in lane-record sections 154–155. One submission
+is permitted before statistics-disabled terminal inspection. Only a terminal
+`Completed.` run may receive a separately committed and signed one-use
+aggregate-only result authority; formal admission requires parser acceptance
+and `run_valid=true`.
+
+R-170 attempt 1 will spend **127 -> 128 shared looks / 70 -> 71 ARV2
+development evaluations** and can add at most one authenticated result cell
+(**607 -> 608**). The result sign is not selected. A failed attempt counts
+against the standing three-attempt maximum for this distinct candidate. No
+later period, six-universe expansion, leverage, live/paper deployment,
+broker, funded-account, real-order, or trading authority follows.

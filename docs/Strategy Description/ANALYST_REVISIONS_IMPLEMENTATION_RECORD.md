@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–154 retain the milestone, review, preregistration, QC
+strategy. Sections 1–155 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -40,7 +40,8 @@ decision. V15 is the prospective, separately versioned successor: it retires
 only a target backed by the exact forced-delisting ledger and zero holdings,
 and replaces the final path observation with one frozen terminal QC account
 snapshot before computing metrics. R-169 remains diagnostic only and adds no
-formal result cell.
+formal result cell. Section 155 corrects a fixture-versus-production projection
+label and freezes the exact production V15/R-170 plan before any cloud launch.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -461,14 +462,15 @@ control's local pre-network ordering refusal and its replacement. Section 153
 records the authenticated completed run and its separate read authority.
 Section 154 records the consumed read and its refusal; V14 correctly exposed
 one retired-name candidate and a separate terminal-account/path mismatch but
-could not admit a result. The immediate next step is to freeze the exact
-V15/R-170 source, plan, execution authority, project name and result rule,
-then launch at most three attempts under the standing machine rule. V15 must
+could not admit a result. Section 155 freezes the exact V15/R-170 source,
+plan, execution authority, project name and result rule. The immediate next
+step is to sign that section-155 authority and launch attempt 1, with at most
+three attempts under the standing machine rule. V15 must
 not relabel the R-169 result, must retire a target only after exact forced-exit
 and zero-holding authentication, and must compute its final path from one
 frozen QC terminal account snapshot. By directing Codex to counter-review the
 landed review and continue directly with backtesting in this round, the owner
-explicitly waives Claude review of section 154 before this exact R-170 launch;
+explicitly waives Claude review of section 155 before this exact R-170 launch;
 Claude will independently review the resulting pushed snapshot. R-138 remains
 unlaunched/unspent.
 
@@ -19906,10 +19908,13 @@ The exact 2026 V15 profile is
 `13303b1940e3442f01d93020e62c43e196c88ec297ddace97a0f4dc024a14e7a`.
 Its runtime source SHA-256 is
 `5470b32ea2aa612419a4adad8a2f25dd34308945f84dc61023a3f65f7fa836d1`.
-The exact fifteen-file production projection contains **362,488 bytes** under
-the V15-only 365,000-byte ceiling and has projection ID
+The deterministic test-fixture projection contains **362,458 bytes** and has
+projection ID
 `arv2-order-level-qc-projection-7c7b6ded4c2a1d1e1269e8fa`, SHA-256
 `7c7b6ded4c2a1d1e1269e8fa47093a5742bb5a991beea7c9d2935a04d077aea6`.
+Its shorter fixture Object Store key explains the exact 30-byte difference
+from the production projection; section 155 freezes that separate production
+identity. Both remain under the V15-only 365,000-byte ceiling.
 The schemas advance to profile v15 and summary v10; META remains v3.
 
 An independent pre-commit audit found no P0/P1 and found three P2s in the
@@ -19929,3 +19934,49 @@ its exact source, plan, authority payload, private project name, read rule and
 attempt budget are committed. No leverage, six-universe expansion,
 paper/live deployment, broker, funded account, real order, or trading
 authority follows.
+
+## 155. R-170 exact production V15 preregistration, 2026-09-21
+
+A prelaunch audit found one P2 documentation/lineage error before any R-170
+cloud mutation: section 154 had called the deterministic fixture projection
+SHA-256 `7c7b6ded...` the production identity. The source and tests were
+correct, but a launch under that label would not have matched the physical
+accepted-risk package. Section 154 now identifies it as the fixture hash. A
+fresh administrative `projects/read`, performed before importing the sealed
+formal transport, resolved the same one organization and verified that the
+exact prospective project name below does not exist. It selected no result,
+statistic, log, chart, order, price, return, provider row, or signal outcome
+and is not a research look.
+
+The real persisted delta package produces exactly **15 source files / 362,488
+bytes**, leaving **2,512 bytes** under the V15-only 365,000-byte ceiling. Its
+immutable production plan is:
+
+| Field | Frozen R-170 identity |
+| --- | --- |
+| Control directory | `accepted_risk_order_level_r170_20260921_01` |
+| Profile | `arv2-qqq-order-level-tilt-2026-cutoff-v15`; SHA-256 `13303b1940e3442f01d93020e62c43e196c88ec297ddace97a0f4dc024a14e7a` |
+| Projection | `arv2-order-level-qc-projection-9453674a2ea882ae7e8b86e5`; SHA-256 `9453674a2ea882ae7e8b86e5141e7119e1454201e1f7b5085798bbed3a022efe` |
+| Plan | `arv2-order-level-plan-2e95705c5d3d1eb12467a452`; SHA-256 `2e95705c5d3d1eb12467a4526e15bfb36a905da6ece54aa4dbed39c5da14c58e` |
+| Execution-authority payload | SHA-256 `9276d57089874a0070789e65fada750f79a250f1605ab2852a466669dc518b94` |
+| Private QC project | `91 ARV2_QQQ_ACCOUNT_ORDER_R170_2026_YTD - 20260921` |
+| Backtest | `ARV2 R170 QQQ account order 2026 YTD 7803b84f` |
+
+The plan permits one simulated-market-on-open, backtest-only submission and
+statistics-disabled terminal polling. It does not authorize live/paper
+deployment, broker credentials, funded or real orders, raw orders/logs/charts,
+or any result read. A terminal `Completed.` state may be followed only by a
+separately rendered, committed, and signed one-use authority naming the exact
+two custom statistics `ARV2_ORDER_LEVEL_AGGREGATES` and
+`ARV2_ORDER_LEVEL_META`; standard QC statistics and raw rows remain excluded.
+Formal admission requires both parser acceptance and `run_valid=true`.
+
+Attempt 1 will spend **127 -> 128 shared looks / 70 -> 71 ARV2 development
+evaluations**. It can add at most one authenticated cell (**607 -> 608**) only
+after that separate read succeeds. A compile/runtime/refusal counts against
+the standing three-attempt maximum for this distinct candidate; after a third
+failure Codex stops and uses Mia only if directly controllable. The owner
+explicitly waives Claude review of section 155 before this exact same-round
+launch. No result sign or winner is preselected, and no later period,
+six-universe, leverage, deployment, broker, paper/live, funded-account,
+real-order, or trading authority follows by inference.

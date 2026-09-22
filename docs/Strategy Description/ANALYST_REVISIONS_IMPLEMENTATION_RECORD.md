@@ -530,24 +530,32 @@ preregistration, then records its first-attempt `Completed.` diagnostic. The
 owner explicitly waived Claude review of section 169 before that one bounded
 run. The first bounded result read retained no value because the ad hoc reader
 named one field incorrectly; one aggregate-only recovery read was therefore
-used and the result remains diagnostic with zero authenticated cells. The
-exact next step is to finish focused checks, commit the result record, and make
-the round's one same-lane push; Claude will review section 169 and that exact
-pushed snapshot independently. No retry is authorized merely because the
-return is unfavourable. V15 and R-170 remain immutable, no R-170 aggregate may
-be read, no R-169 diagnostic may be relabelled, and R-138 remains
-unlaunched/unspent.
+used and the result remains diagnostic with zero authenticated cells. Section
+170 implements and physically freezes the six-universe order family, then
+records all three permitted R-177 attempts. A1 and A2 exposed and
+prospectively corrected distinct recording and fresh-input handling defects.
+The final A3 used the corrected v2 profile and summary but refused on
+2023-07-03 because one constituent callback had no positive weight. No
+attempt produced an authenticated result, and the three-attempt budget is
+exhausted. R-178 and R-179 remain uncreated and unlaunched. The exact next
+step is to commit this terminal record and make the round's one same-lane
+push; Claude will review section 170 and that exact pushed snapshot
+independently. Separately, the owner must use Mia in the existing R-177
+project because the authenticated computer-use surface is locked; no Codex
+A4 change or relaunch is permitted. V15 and R-170 remain immutable, no R-170
+aggregate may be read, no R-169 diagnostic may be relabelled, and R-138
+remains unlaunched/unspent.
 
-No formal order-level result, alpha acceptance, leverage, six-universe
-expansion, real order, paper/live deployment, funded-account, broker, or
-trading authority follows from R-168, R-169, or R-170. The economic figures in
-sections 148, 154, and 167 came from bounded diagnostic aggregate reads and must
-retain that label.
+No formal order-level result, alpha acceptance, leverage, real order,
+paper/live deployment, funded-account, broker, or trading authority follows
+from R-168 through R-177. The economic figures in sections 148, 154, and 167
+came from bounded diagnostic aggregate reads and must retain that label;
+R-177 produced no economic result.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude will review
-sections 142–145 and the final cumulative pushed snapshot; no intermediate
+section 170 and the final cumulative pushed snapshot; no intermediate
 unreviewed QC experiment becomes accepted evidence merely by completing.
 Each distinct backtest candidate has a hard maximum of three QC attempts.
 A compile failure, runtime error, or any other unsuccessful terminal run each
@@ -577,7 +585,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–164
+findings, outcomes, and per-run accounting remain in numbered sections 1–170
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -21570,7 +21578,7 @@ cell requires reviewed adapter registration, a prospectively complete
 schedule, and a newly preregistered one-read result path; this diagnostic
 cannot be upgraded retroactively.
 
-## 170. Owner-directed six-universe order family (IN PROGRESS; R-177 A1/A2 DIAGNOSED; FINAL A3 PHYSICALLY FROZEN), 2026-09-22
+## 170. Owner-directed six-universe order family (BLOCKED AFTER THREE R-177 ATTEMPTS; MIA HANDOFF REQUIRED), 2026-09-22
 
 ### 170.1 Owner direction and deferred tilt-off control
 
@@ -21907,3 +21915,38 @@ their first attempts, advancing the cumulative counts to **160 / 103** and
 **161 / 104**. The A2 table in section 170.8 is retained as its prospective
 historical freeze but is superseded for every later mutation by this v2 A3
 freeze.
+
+### 170.10 R-177 A3 terminal refusal and mandatory stop
+
+The final A3 repaired the existing project in place to the exact v2 source,
+re-read all 13 files byte-for-byte, and compiled successfully. Backtest
+`d516663f39f13eb01d2d892528d76723` entered progress and reached 2023-07-03,
+then terminated `Runtime Error`: one six-universe constituent collection had
+no positive weight. The error path is `_snapshot` before target construction;
+the retained diagnostic does not identify which of the six ETF callbacks
+provided the empty/nonpositive collection. A single terminal diagnostic read
+retained only status, error, and stack. No custom or standard performance
+statistic, chart, raw provider or price row, order, or outcome aggregate was
+read, and no return result exists.
+
+R-177 A3 spends **158 -> 159 shared looks / 101 -> 102 ARV2 development
+evaluations**. Infrastructure looks remain 27 and authenticated cells remain
+608. R-177 has now used all three permitted attempts: A1 refused its
+internally inconsistent Decimal recording bound; A2 refused an unavailable
+fresh fundamental snapshot; A3 refused an empty/nonpositive constituent
+callback. All three compiled; none produced an authenticated result cell.
+Under the standing three-attempt rule, Codex makes **no A4 code change,
+compile, or launch**. R-178 and R-179 remain uncreated and unlaunched because
+the matched family may not proceed past an invalid signal role.
+
+The authenticated QuantConnect Mia UI was checked after the third failure,
+as required by the recovery rule. It is not controllable from this session:
+the Mac is locked, the computer-use surface cannot unlock it, and the in-app
+browser has no QC tab. Mia therefore requires an owner-side handoff. The next
+step is for the owner to open project
+`100 ARV2_SIX_GATE_SIGNAL_R177_A1_2021_2025 - 20260922` in QuantConnect and
+ask Mia to diagnose the exact 2023-07-03 constituent callback without
+changing the signal economics or launching an unaccounted run. If Mia edits
+or completes a run, Codex must retrieve the exact cloud source, compare it
+with committed A3, document every delta and its effect, and port only a
+verified lane-specific successor before any later candidate is considered.

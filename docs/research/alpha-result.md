@@ -3951,3 +3951,71 @@ preregistered successor that reports the terminal residual in a bounded way
 read, parameter tuning, leverage, six-universe expansion, deployment,
 broker, paper/live, funded-account, real-order, or trading authority
 follows.
+
+## R-173 addendum — five owner-directed Mia launches in the reused R-173 project (NOT ADMISSIBLE; COUNTED) — 2026-09-21
+
+After R-173 refused at V15's terminal identity, Mia, at the owner's
+direction, launched **five further backtests inside the reused R-173 project
+`36809007`** between 23:28:58 UTC on 2026-09-21 and 00:10:08 UTC on
+2026-09-22: a rerun, a settled-plus-unsettled cash override, two diagnostic
+runs that wrote the terminal account totals to the Object Store, and a
+final run whose `v18` file rebuilds equity as holdings plus cash so the
+identity holds by construction. Only the last, `7589e6599edba5f78e4d8266e4cb8515`,
+completed. Its diagnosis (a six-picodollar decimal-to-double residual with
+unsettled cash at zero) is correct and is confirmed in section 167 of the
+lane record; its fix is a tautology and its `main.py` diagnostics are
+firewall-refused, so that run is **NOT ADMISSIBLE** and creates no cell.
+This session read no statistic from it. Each launch is counted: **148 -> 153
+shared looks / 91 -> 96 ARV2 development evaluations / 27 infrastructure
+looks / 608 authenticated cells**.
+
+## R-174 — V18 bounded-boundary 2025-now QQQ order run (DIAGNOSTIC LAUNCH; COMPLETED; run_valid=false BY CONSTRUCTION; ZERO CELLS) — 2026-09-21
+
+R-174 is the owner-authorized diagnostic launch of the lane's immutable V18
+successor (`accepted_risk_qqq_order_level_v18_qc_runtime.py`, SHA-256
+`40d3832163db238a0a716277b93500fb38214d46b1c54b2611337426331c3bc1`,
+committed at `90a68ee`; V17 `8049d90e...10e5` and V16 `998cb19b...877e`
+unchanged) on profile `arv2-qqq-order-level-tilt-2025-cutoff-v18`, SHA-256
+`a1b263e741fc952c0e7912a79f782ad9869051e72770f08b8e67e57b350e37d2`, window
+**2025-01-02 through 2026-09-16**. V18 changes no strategy economics: it
+judges V15's terminal identity `holdings + cash == equity` against a
+1E-8-dollar bound derived from LEAN's decimal-to-double boundary below
+2**24 dollars, keeps the engine's equity authoritative, reports the
+residual, and still refuses any larger residual. No return sign or winner is
+selected.
+
+Plain repository client from the Windows host (diagnostic, not the signed
+protocol). Fresh private project `97 ARV2_QQQ_BOUNDARY_ORDER_R174_A1_2025_NOW - 20260921`
+(`36811274`); 18 files / 407,068 bytes hash-verified after upload
+(content-manifest SHA-256
+`756dfce3d723da5a5c182cd215023cce8441504289ececb59c84f3056078cbbb`); compile
+`6782dadac0ef5db6495a539c3925b8b5-37cf59d5e5ecccaa801aa115f07812b3`
+`BuildSuccess`; backtest `ARV2 R174A1 QQQ boundary order 2025 now 40d38321`,
+id `dade3f38e4caf179e305ca79db452cf3`, created 00:32:03 UTC on 2026-09-22,
+`Completed.` at 00:33:04 UTC. The two custom statistics were read once
+(meta SHA-256 `6d7cd74239368b6811789c75759dcb1f9c02de83ea74ed6324b8d14bf51fdcff`,
+aggregate SHA-256 `20506a337f757dca704b4fa41b059436972df22736fe767d6e6d48d8b23c8e0b`,
+reproduced from the meta's `aggregates_sha256`); nothing else was read.
+
+The v13 aggregate reports a terminal composition residual of exactly
+`0.000000000006` dollars within the `0.00000001` tolerance, terminal
+adjustment `-319.507`, **91 scheduled / 85 executed decisions / 84 completed
+rebalances**, **5 stale-snapshot skips (maximum age 15), 1 weight-total
+skip, 1 overnight-drift skip**, 67 tilt-enabled / 18 tilt-underfilled,
+**5,065 submitted / 5,065 filled / zero canceled or invalid**, modeled and
+engine fees agreeing at **$5,957.590315**, one delisted target retired to
+structural QQQ, and `run_valid=false` because the schedule is incomplete by
+design. Diagnostic figures only: strategy **+39.3399891603%** versus
+execution-matched QQQ **+39.5907114055%** (**-0.2507 pp**), calendar-close
+QQQ +41.3578%, drawdown -22.0166% / -22.3374%, zero-rate Sharpe 1.0007 /
+1.0049, mean gross exposure 96.7557%. The aggregate is 8,002 bytes of the
+8,192-byte transport (`ARV2R167-006`).
+
+R-174 spends **153 -> 154 shared looks / 96 -> 97 ARV2 development
+evaluations**, keeps **27 infrastructure looks / 608 authenticated cells**,
+and uses one of the V18 candidate's three launches. No second attempt is
+needed. A formal V18 cell requires adapter registration (`ARV2R167-007`), a
+transport-margin resolution (`ARV2R167-006`), and a Mac launch through the
+signed protocol. No result read beyond the two custom aggregates, parameter
+tuning, leverage, six-universe expansion, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.

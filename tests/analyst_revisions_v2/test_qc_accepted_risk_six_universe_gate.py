@@ -113,6 +113,18 @@ def test_profiles_freeze_source_view_universes_and_distinct_top_counts():
         == "16dbb321cf013cfdbf9ea2ec6af7888db080b293b72d58d027228377b68b8124"
     )
     assert subject.TOP10_PRIMARY_PROFILE != subject.TOP5_SENSITIVITY_PROFILE
+    assert (
+        subject.TOP10_CAP95_EXPLORATORY_PROFILE
+        .minimum_market_cap_weight_coverage_ratio
+        == Decimal("0.95")
+    )
+    assert subject.TOP10_CAP95_EXPLORATORY_PROFILE.profile_sha256 == (
+        "e68c13ef1682028709404d03493addf65d35bc23bbca0600f10ce54d1bfb2b84"
+    )
+    assert subject.TOP10_CAP95_EXPLORATORY_PROFILE.profile_sha256 not in {
+        subject.TOP10_PRIMARY_PROFILE.profile_sha256,
+        subject.TOP5_SENSITIVITY_PROFILE.profile_sha256,
+    }
     assert sum(subject.SLEEVE_BUDGETS, Decimal(0)) == Decimal("0.98")
     assert len(set(subject.SLEEVE_BUDGETS[:-1])) == 1
     assert subject.SLEEVE_BUDGETS[-1] - subject.SLEEVE_BUDGETS[0] == Decimal(
@@ -305,6 +317,70 @@ def test_coverage_exact_boundaries_are_inclusive():
     )
     assert upper.sleeves[0].coverage.total_reported_weight == Decimal("1.05")
     assert upper.sleeves[0].coverage.valid is True
+
+
+def test_cap95_variation_changes_only_the_cap_coverage_boundary():
+    snapshots = _snapshots(missing_caps=frozenset({19}))
+    primary = subject.build_six_universe_construction(
+        snapshots, subject.TOP10_PRIMARY_PROFILE
+    )
+    relaxed = subject.build_six_universe_construction(
+        snapshots, subject.TOP10_CAP95_EXPLORATORY_PROFILE
+    )
+    assert primary.sleeves[0].coverage.cap_weight_coverage_ratio == Decimal("0.95")
+    assert primary.sleeves[0].coverage.valid is False
+    assert primary.sleeves[0].signal_security_ids == ()
+    assert relaxed.sleeves[0].coverage.valid is True
+    assert len(relaxed.sleeves[0].signal_security_ids) == 10
+    assert len(relaxed.sleeves[0].matched_security_ids) == 10
+    assert sum(item.weight for item in relaxed.signal_weights) == Decimal("0.98")
+    assert (
+        relaxed.profile.to_record()["minimum_market_cap_weight_coverage_ratio"]
+        == "0.95"
+    )
+    assert (
+        primary.profile.to_record()["minimum_market_cap_weight_coverage_ratio"]
+        == "0.99"
+    )
+
+
+def test_cap95_variation_still_refuses_below_boundary_and_other_gates():
+    snapshots = _snapshots()
+    cap_rows = list(_rows("SPY", missing_caps=frozenset({19})))
+    cap_rows[19] = dataclasses.replace(
+        cap_rows[19], reported_weight=Decimal("0.051")
+    )
+    cap_rows[18] = dataclasses.replace(
+        cap_rows[18], reported_weight=Decimal("0.049")
+    )
+    cases = (
+        (tuple(cap_rows), "MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM"),
+        (
+            _rows("SPY", missing_names=frozenset({0, 1, 2})),
+            "SID_NAME_MAPPING_BELOW_MINIMUM",
+        ),
+        (
+            _rows("SPY", reported_weight=Decimal("0.047")),
+            "TOTAL_REPORTED_WEIGHT_OUT_OF_RANGE",
+        ),
+    )
+    for rows, reason in cases:
+        result = subject.build_six_universe_construction(
+            _replace_snapshot(snapshots, "SPY", rows),
+            subject.TOP10_CAP95_EXPLORATORY_PROFILE,
+        )
+        assert reason in result.sleeves[0].coverage.refusal_reasons
+        assert result.sleeves[0].signal_security_ids == ()
+        assert result.sleeves[0].matched_security_ids == ()
+        assert result.sleeves[0].signal_etf_fallback_weight == result.sleeves[0].budget
+        assert result.sleeves[1].coverage.valid is True
+
+    score_floor = subject.build_six_universe_construction(
+        _snapshots(positive_count=4),
+        subject.TOP10_CAP95_EXPLORATORY_PROFILE,
+    )
+    assert all(sleeve.coverage.valid for sleeve in score_floor.sleeves)
+    assert all(sleeve.signal_security_ids == () for sleeve in score_floor.sleeves)
 
 
 def test_repeating_coverage_ratio_uses_the_frozen_96_digit_recording_domain():

@@ -31,6 +31,7 @@ MINIMUM_TOTAL_REPORTED_WEIGHT = Decimal("0.95")
 MAXIMUM_TOTAL_REPORTED_WEIGHT = Decimal("1.05")
 MINIMUM_SID_NAME_MAPPING_RATIO = Decimal("0.90")
 MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO = Decimal("0.99")
+CAP95_MARKET_CAP_WEIGHT_COVERAGE_RATIO = Decimal("0.95")
 SOURCE_VIEW_ID = "conservative_censored_current_vintage_non_pristine_pit"
 SCORE_ARM_ID = "firm_specific"
 PROFILE_SCHEMA = "arv2-six-universe-gate-profile-v1"
@@ -158,7 +159,11 @@ def _sleeve_budgets() -> tuple[Decimal, ...]:
 SLEEVE_BUDGETS = _sleeve_budgets()
 
 
-def _profile_semantic(label: str, slot_count: int) -> dict[str, object]:
+def _profile_semantic(
+    label: str,
+    slot_count: int,
+    minimum_market_cap_weight_coverage_ratio: Decimal,
+) -> dict[str, object]:
     return {
         "schema": PROFILE_SCHEMA,
         "label": label,
@@ -189,7 +194,7 @@ def _profile_semantic(label: str, slot_count: int) -> dict[str, object]:
             MINIMUM_SID_NAME_MAPPING_RATIO
         ),
         "minimum_market_cap_weight_coverage_ratio": _decimal_text(
-            MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO
+            minimum_market_cap_weight_coverage_ratio
         ),
         "signal_rank_rule": "strictly_positive_score_desc_then_security_id",
         "matched_rank_rule": (
@@ -215,9 +220,14 @@ class GateProfile:
     profile_sha256: str
     label: str
     slot_count: int
+    minimum_market_cap_weight_coverage_ratio: Decimal
 
     def to_record(self) -> dict[str, object]:
-        semantic = _profile_semantic(self.label, self.slot_count)
+        semantic = _profile_semantic(
+            self.label,
+            self.slot_count,
+            self.minimum_market_cap_weight_coverage_ratio,
+        )
         if _sha256(semantic) != self.profile_sha256:
             raise SixUniverseGateError("six-universe profile authority changed")
         return {
@@ -227,20 +237,46 @@ class GateProfile:
         }
 
 
-def _build_profile(label: str, slot_count: int) -> GateProfile:
-    semantic = _profile_semantic(label, slot_count)
+def _build_profile(
+    label: str,
+    slot_count: int,
+    *,
+    minimum_market_cap_weight_coverage_ratio: Decimal = (
+        MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO
+    ),
+) -> GateProfile:
+    semantic = _profile_semantic(
+        label,
+        slot_count,
+        minimum_market_cap_weight_coverage_ratio,
+    )
     digest = _sha256(semantic)
     return GateProfile(
         profile_id=f"arv2-six-universe-gate-{label}-{digest[:24]}",
         profile_sha256=digest,
         label=label,
         slot_count=slot_count,
+        minimum_market_cap_weight_coverage_ratio=(
+            minimum_market_cap_weight_coverage_ratio
+        ),
     )
 
 
 TOP10_PRIMARY_PROFILE = _build_profile("top10-primary-v1", 10)
 TOP5_SENSITIVITY_PROFILE = _build_profile("top5-sensitivity-v1", 5)
-PROFILES = (TOP10_PRIMARY_PROFILE, TOP5_SENSITIVITY_PROFILE)
+# Offline exploratory constructor only; the QC order path still pins primary.
+TOP10_CAP95_EXPLORATORY_PROFILE = _build_profile(
+    "top10-cap95-exploratory-v1",
+    10,
+    minimum_market_cap_weight_coverage_ratio=(
+        CAP95_MARKET_CAP_WEIGHT_COVERAGE_RATIO
+    ),
+)
+PROFILES = (
+    TOP10_PRIMARY_PROFILE,
+    TOP5_SENSITIVITY_PROFILE,
+    TOP10_CAP95_EXPLORATORY_PROFILE,
+)
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -419,7 +455,10 @@ def _validated_constituents(
     return tuple(result)
 
 
-def _coverage(rows: tuple[UniverseConstituent, ...]) -> CoverageAssessment:
+def _coverage(
+    rows: tuple[UniverseConstituent, ...],
+    profile: GateProfile,
+) -> CoverageAssessment:
     total_weight = _sum(row.reported_weight for row in rows)
     mapped = tuple(
         row
@@ -444,7 +483,7 @@ def _coverage(rows: tuple[UniverseConstituent, ...]) -> CoverageAssessment:
         reasons.append("TOTAL_REPORTED_WEIGHT_OUT_OF_RANGE")
     if mapping_ratio < MINIMUM_SID_NAME_MAPPING_RATIO:
         reasons.append("SID_NAME_MAPPING_BELOW_MINIMUM")
-    if cap_ratio < MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO:
+    if cap_ratio < profile.minimum_market_cap_weight_coverage_ratio:
         reasons.append("MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM")
     return CoverageAssessment(
         member_count=len(rows),
@@ -518,7 +557,7 @@ def _raw_sleeve(
     Decimal,
 ]:
     rows = _validated_constituents(snapshot)
-    coverage = _coverage(rows)
+    coverage = _coverage(rows, profile)
     signal_ids, matched_ids, positive_count = _selected_ids(
         rows,
         coverage,
@@ -688,6 +727,7 @@ def build_six_universe_construction(
 
 
 __all__ = (
+    "CAP95_MARKET_CAP_WEIGHT_COVERAGE_RATIO",
     "CONSTRUCTION_SCHEMA",
     "DIRECT_STOCK_WEIGHT_CAP",
     "GateProfile",
@@ -706,6 +746,7 @@ __all__ = (
     "SleeveConstruction",
     "TARGET_GROSS_EXPOSURE",
     "TOP10_PRIMARY_PROFILE",
+    "TOP10_CAP95_EXPLORATORY_PROFILE",
     "TOP5_SENSITIVITY_PROFILE",
     "UNIVERSE_IDS",
     "UNIVERSE_SPECS",

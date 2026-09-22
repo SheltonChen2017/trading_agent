@@ -21993,3 +21993,122 @@ destructive scope. The cleanup read no result statistic, log, chart, raw row,
 holding, order, deployment, broker, paper/live, or portfolio value. It created
 no research look, development evaluation, infrastructure look, or result
 cell, and changed no strategy source or economic rule.
+
+## 172. Post-R-177 diagnostic and offline cap-95 exploration, 2026-09-22
+
+The owner requested a loosened six-universe coverage variation after seeing
+the QC diagnostic. This section introduces an **offline** constructor/evaluator
+candidate, not an R-177 A4, QC launch, or formal result. Because the 95% choice
+follows an observed diagnostic, any later run is a new exploratory evidence
+epoch, not independent confirmation or a rescue of the prior invalid run.
+
+### 172.1 Preserved QC project: later launches and selection diagnosis
+
+A read-only, statistics-disabled inventory of private project `36823601`
+found twelve terminal backtests: the three R-177 attempts in 170.8-170.10
+and nine later QC/Mia launches not yet reconciled into the lane look ledger.
+The additional IDs are:
+
+| Terminal state | Additional backtest IDs |
+|---|---|
+| `Completed.` | `4f5a57ae3ab11bfc8c1e99a0f42dcc24`, `d43244b7e95c3b4820b9a7c71f7d5ef3`, `04ff274f622641a0e4499d8512325a24` |
+| `Runtime Error` | `866be9f453cbe55ae4a4ea17381b85f5`, `98a200dcce8438bcaad2fb97bdedbf12`, `4f2f8499eee532b9fe02f328e4894980`, `7cca37faf2999d229027a6907557d7a2`, `8e49867d1bac164a8d553c6792b02407`, `e75d54492a9c431820c8f8743510387f` |
+
+The owner-requested read of latest completed run
+`04ff274f622641a0e4499d8512325a24` retained only
+`ARV2_SIX_GATE_ORDER_META` and `ARV2_SIX_GATE_ORDER_AGGREGATES`. The
+canonical aggregate SHA-256 matches the meta digest. Its own flags are
+`run_valid=false` and `execution_failure=true`: 261 decisions, 2,247
+submitted orders, 2,238 filled and 9 invalid. The account path reports
+$1,000,000 to $2,066,757.7148760401, but this is diagnostic, not an
+authenticated analyst-selection advantage. The meta names old signal-v2
+profile `07a17589...96bc`; the exact backtest-time source-file inventory is
+unproven. The current 17-file QC project differs from committed A3, so its
+present bytes cannot be attributed to any earlier run. Its present `main.py`
+replays healthy constituents as a new callback while the runtime stamps the
+receipt as the current session, potentially bypassing the five-session
+freshness bound. This is an unresolved P1 source/freshness concern, not a
+proven cause of the aggregate's low stock count; no cloud file was changed.
+
+The custom per-sleeve table isolates the immediate gate failures. Reasons
+may overlap on the same weekly decision:
+
+| Sleeve | Cap-weight coverage below 99% | SID/name mapping below 90% | Weight total outside 95%-105% | Stock-selection outcome |
+|---|---:|---:|---:|---|
+| SPY | 261/261 | 3/261 | 0 | 261 own-ETF fallbacks |
+| QQQ | 261/261 | 261/261 | 1/261 | 261 own-ETF fallbacks |
+| SOXX | 261/261 | 261/261 | 0 | 261 own-ETF fallbacks |
+| XLV | 261/261 | 16/261 | 0 | 261 own-ETF fallbacks |
+| REMX | 261/261 | 261/261 | 261/261 | 261 own-ETF fallbacks |
+| XLE | 130/261 | 7/261 | 0 | 130 coverage fallbacks, 30 positive-score-floor fallbacks, 101 partial-stock decisions |
+
+XLE's 687 selected-stock slots are summed over decisions, not distinct
+issuers. The other five sleeves selected zero stocks despite nonzero
+positive-score candidate counts. The duplicate-stock cap was not the
+limiting factor. The aggregate does not reveal whether the cap gaps arose
+from provider omissions, FIGI/SID joins, stale/unavailable fundamentals,
+or another upstream cause. No licensed raw row, price, order, chart, log,
+standard QC statistic, or additional outcome family was retained. No R-178
+or R-179 comparator project was found in the accessible QC inventory. The
+nine post-A3 launches and their source identities require reconciliation
+before a current look/evaluation total can be claimed; 170.10's 159/102 is
+not an all-machine count. No formal cell is added here.
+
+### 172.2 Distinct 95% constructor/evaluator candidate, synthetic only
+
+The variation changes **only** the minimum fraction of reported ETF
+constituent weight with mapped identity and positive point-in-time market
+cap, from 99% to **95%**. Section 114's outcome-free QQQ coverage successor
+supplies a design precedent for 95%, but this choice follows an observed
+R-177 diagnostic and is explicitly exploratory. The 95%-105% total-weight
+band, 90% mapped-member floor, strictly-prior cap input, five-positive-score
+minimum, top-ten rank, count-matched role, own-ETF fallback, equal six-sleeve
+98% gross target, 9.8% duplicate cap, and cost/timing assumptions remain
+unchanged. Uncovered names stay ineligible; no absent cap, score, identity,
+or weight is imputed.
+
+The new gate profile is
+`arv2-six-universe-gate-top10-cap95-exploratory-v1-e68c13ef1682028709404d03`
+with SHA-256 `e68c13ef1682028709404d03493addf65d35bc23bbca0600f10ce54d1bfb2b84`.
+The pure-evaluator profile is
+`arv2-six-universe-evaluation-top10-cap95-exploratory-v1-c12682c59956559803aee497`
+with SHA-256 `c12682c59956559803aee4975a5d8767463ee1a642da2b173bee366e9923463e`.
+The pre-existing top-ten gate profile SHA-256 remains
+`600ba939174f67b47345117279ab88818b479a0ba543d6ac4487f0dad99338f1`,
+and the top-five remains
+`16dbb321cf013cfdbf9ea2ec6af7888db080b293b72d58d027228377b68b8124`.
+Their historical source projections remain identified by their original
+commits and section 170; newly generated source bytes are not that freeze.
+
+Synthetic fixtures prove exact 95% inclusion, 94.9% refusal, unchanged
+mapping/weight/five-score refusals, both signal and matched selection,
+conserved 98% gross, distinct hashes, and old-profile golden behavior. The
+variation is **not wired to the order-target builder, order QC runtime,
+order source projector, or any QC project**. Loosening this one gate cannot admit QQQ,
+SOXX, or REMX while their independent mapping failures persist; REMX also
+fails total weight. SPY, XLV, and XLE may gain stock decisions, but the
+retained aggregate has no achieved cap-ratio distribution or intersecting
+reason census, so no count is forecast.
+
+### 172.3 Validation, blockers, and next bounded step
+
+The four portable gate/evaluator/order-target/runtime suites passed **81
+tests** on the final code tree. The projector suite could not collect on
+this Windows host because its existing formal-run import requires POSIX
+`fcntl`; no projector code changed. An attempt with bundled Python 3.12
+also failed during test setup because the available NumPy wheel targets
+Python 3.13, so the project Python 3.13 environment was used for the passing
+focused tests. Apart from the read-only QC inventory and the two custom
+diagnostics recorded in 172.1, no additional provider/outcome read occurred.
+No full lane suite, QC compile, backtest, deployment, or trading action
+occurred in this variation stage.
+
+Next: reconcile the nine later QC runs and their physical source identities;
+diagnose the cap/mapping/weight failures without exposing licensed rows; and
+decide whether to finish a separately versioned order-runtime/projector
+candidate. Before any QC launch, the owner must approve a distinct
+exploratory run, its exact source/profile and result-read inventory, its
+matched-comparator plan, and prospective look accounting. R-177's three-
+attempt budget is not reopened; R-178/R-179 remain unlaunched under their
+old frozen family. This candidate confers no paper/live, broker, funded,
+deployment, or trading authority.

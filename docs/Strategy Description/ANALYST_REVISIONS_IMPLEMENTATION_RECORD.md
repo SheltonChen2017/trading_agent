@@ -28,7 +28,10 @@ safe re-read of the Mia-edited R-172 project, the prospective V19 correction,
 and R-175: the exact V19 order-based diagnostic completed, authenticated its
 two custom aggregates, corrected the executed-decision census from 85 covered
 to 84 actually submitted decisions, and retained `run_valid=false`; no cell
-was added.
+was added. Section 171 records the owner's later cleanup direction: six
+failed-only QC projects were moved to the recoverable Recycle Bin, while
+R-177, completed or mixed-status projects, and the two ambiguous zero-backtest
+diagnostics were preserved.
 Codex uses focused checks during development and QC work; Claude runs the
 complete lane suite during independent review unless the owner explicitly
 asks Codex to run it. Section 150 is the independent Claude review of
@@ -537,12 +540,13 @@ prospectively corrected distinct recording and fresh-input handling defects.
 The final A3 used the corrected v2 profile and summary but refused on
 2023-07-03 because one constituent callback had no positive weight. No
 attempt produced an authenticated result, and the three-attempt budget is
-exhausted. R-178 and R-179 remain uncreated and unlaunched. The exact next
-step is to commit this terminal record and make the round's one same-lane
-push; Claude will review section 170 and that exact pushed snapshot
-independently. Separately, the owner must use Mia in the existing R-177
-project because the authenticated computer-use surface is locked; no Codex
-A4 change or relaunch is permitted. V15 and R-170 remain immutable, no R-170
+exhausted. R-178 and R-179 remain uncreated and unlaunched. Section 171 then
+records the owner-directed failed-project cleanup. The exact next step is to
+commit this terminal record and make the round's one same-lane push. Claude
+will review section 171 independently together with section 170 and that
+exact pushed snapshot.
+Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
+change or relaunch is permitted. V15 and R-170 remain immutable, no R-170
 aggregate may be read, no R-169 diagnostic may be relabelled, and R-138
 remains unlaunched/unspent.
 
@@ -2258,6 +2262,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-21 | Claude review of Mia's terminal diagnosis, V18 successor, R-174 diagnostic launch, and live-state update | `d48b5dd` -> `90a68ee` -> this commit | Owner-directed follow-up to section 166: retrieval of the Mia-edited R-173 project `36809007`, confirmation of the decimal-to-double boundary root cause, the lane's immutable bounded-boundary V18 successor, one owner-authorized diagnostic launch, and section 167 | Retrieved 18 files (the 17 R-173 files byte-identical; Mia's 3,432-byte `v18` and a 7,196-byte diagnostic `main.py`) and six backtests' status and error text only. Confirmed from the code that every runtime money read crosses LEAN's decimal-to-double boundary, so V15's exact terminal identity was ill-posed (`ARV2R167-001`); rejected Mia's fix, which rebuilds equity from its components and redefines cash, and her firewall-refused diagnostics that left `arv2/diag/composition.txt` in the Object Store. Implemented `accepted_risk_qqq_order_level_v18_qc_runtime.py` (SHA-256 `40d38321...3bc1`; V17 blob unchanged `8049d90e...10e5`; V16 unchanged): the engine's equity stays authoritative, the identity is judged against a derived 1E-8-dollar bound below 2**24 dollars, the residual is reported, larger residuals and larger equity refuse; projection and closure pins register the V18 family and a 410,000-byte ceiling. Launched R-174 (project `36811274`, backtest `dade3f38...`, 18 files / 407,068 bytes hash-verified): `Completed.`; the two custom aggregates were read once and reproduce the six-picodollar residual, 91 scheduled / 85 executed decisions, 7 skips, `run_valid=false` by construction, and an 8,002-byte aggregate against the 8,192-byte transport. Section 166.5's first-decision statement is corrected (`ARV2R167-008`). | LF scratch worktree at `d48b5dd` plus the round's files: V18 and V17 batteries **59 passed**; projection, V18, V17 and V16 batteries **161 passed, 11 failed** (all the isolated-subprocess `tzdata` host class); adapter profile-list subset **15 passed**; mutation matrix **7 of 7 killed**. Real tree at `90a68ee`: closure pins **5 passed**; `compileall` exit 0; `git diff --check` clean; runtime batteries uncollectable through the `fcntl` chain (`ARV2R165-001`). Active-document and lane-record gates **76 passed**. QC access: administrative reads, one fresh project, one compile, one backtest, status-only polling, one read of the two custom statistics; no standard statistic, chart, order, log, price, provider row or return read; no Object Store write or delete. Looks: 148/91/27/608 -> 154/97/27/608 (five owner-directed Mia launches counted, plus R-174). | 0 P0. `ARV2R167-001` (P1, lane-wide): money reads cross a float boundary; exact sum identities are ill-posed; V18 bounds the terminal one. `ARV2R167-002` (P1): Mia's tautological fix and forbidden diagnostics, not ported. `ARV2R167-003`/`-004` (P2): five unaccounted launches; an Object Store diagnostic file for the owner to delete. `ARV2R167-006` (P2): aggregate transport margin is 190 bytes; the next successor must raise or trim before adding a field. `ARV2R167-007` (P2): adapter lacks V17 and V18 registration. `ARV2R167-005`/`-008` (P3): `tzdata` host class; section 166.5 erratum. | Codex counter-reviews sections 166 and 167 and their four commits. No second R-174 attempt is needed; any further 2025-now run is a preregistered successor that also resolves `ARV2R167-006`; a formal V18 cell needs `ARV2R167-007` and a Mac launch. No result read beyond the two custom aggregates, leverage, six-universe expansion, deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-09-21 | Codex counter-review, V19 successor, and R-175 diagnostic | `0132031` -> this record commit | Counter-review Claude's five commits, independently re-read the Mia-edited R-172 project, correct verified V17/V18 evidence defects prospectively, and start the next order-based QC round | All five commits accepted, four after prospective/documentation correction. V19 (`f79ea5c7...cb68`) preserves economics while fixing context-sensitive residual magnitude, complete finite holding-drift census, actual-submission evidence, forced-exit-invalidated accounting, all-skipped refusal, and the 16,384-byte transport. R-175 used fresh project `36819225`, exact 19-file/427,396-byte source, `BuildSuccess`, and one launch; it completed and authenticated only the two custom aggregates. The corrected census is 91 scheduled / 85 covered / 84 submitted / 84 completed with seven skips, so `run_valid=false` and zero cells; diagnostic return +39.339989% versus +39.590711% execution-matched QQQ. | Focused pushed-head baseline **231 passed**; final V19 runtime/projection/closure audit **190 passed**; narrower changed-behavior selection **18 passed**; lane-record gate **7 passed**; `compileall` and diff checks clean. No complete lane suite by owner rule. QC access: one hardened source upload/readback, compile, backtest, statistics-disabled polling, and one bounded two-statistic read; no standard statistic, chart, order, log, provider row, price, Object Store mutation, broker, deployment, real order, or trading access. Accounting closes **155 / 98 / 27 / 608**. | 0 open P0-P2 after correction. `ARV2CR168-001..009` record three V17 census/evidence defects, the V18 ambient-context defect, one wording correction, three prelaunch V19 test/audit corrections, and the discarded default-opener administrative read. | Push this same-lane round exactly once. Claude independently reviews section 168 and R-175. Any formal successor requires reviewed V19 adapter registration and a prospectively valid schedule; R-175 cannot be upgraded retroactively. |
 | 2026-09-22 | Codex SPY order diagnostic | `2201c5e` -> this record commit (source freeze `13bf582`) | Build the dedicated SPY-holdings order adapter and run R-176 once for the owner-requested 2025-now S&P 500 comparison | Added the universe-bound benchmark helper, SPY V1 runtime, projection/closure registration, and isolated tests without changing immutable QQQ V19. Fresh QC project `36820512` reproduced the 21-file source manifest, compiled, and completed R-176 A1. Diagnostic result: +29.556355% after modeled costs versus +30.937335% execution-matched SPY, with slightly smaller drawdown and higher Sharpe; six skips make `run_valid=false` and zero cells. | Focused code battery **197 passed**; after the result-record navigation correction, lane-record gate **7 passed**; `py_compile` and `git diff --check` clean. No full lane suite by owner rule. One launch spent **155 -> 156 shared looks / 98 -> 99 development evaluations / 27 infrastructure looks / 608 cells**. | Independent in-round audit: 0 P0-P3 before launch. `ARV2D169-001` (P3, documented): the first result reader hand-copied an internal field name and retained no values; one aggregate-only recovery read used the emitted schema name, so the run remains diagnostic and cannot become a formal cell. | Push this same-lane round exactly once. Claude reviews section 169, the SPY adapter, R-176, and the documented reader deviation. No retry, leverage, deployment, broker, live/paper/funded order, or trading action follows. |
+| 2026-09-22 | Codex owner-directed QC cleanup | `bd4ad8a` -> this record commit | Move failed-only QC projects except R-177 to the recoverable Recycle Bin and push once | A statistics-disabled inventory and immediate preflight identified six privately owned, idle projects containing only terminal `Runtime Error` runs. Each same ID was post-read under a `Recycle Bin/`-prefixed name ending in its exact original name. R-177 remained unchanged; completed, mixed-status, active, unrelated, and two ambiguous zero-backtest diagnostics were preserved. No strategy source or economics changed. | Active-document and lane-record gates **76 passed**; `git diff --check` clean. No full lane suite by owner rule. Cleanup read no statistic, log, chart, row, holding, order, or portfolio value and added **zero research looks, development evaluations, infrastructure looks, or cells**. | No code finding. The two zero-backtest diagnostics were deliberately not reclassified as failed; nothing was permanently purged. | Make exactly one same-lane push. Claude independently reviews section 171 together with section 170 and the exact pushed snapshot. R-177 remains preserved for owner-side Mia work; no A4 launch is permitted. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -21950,3 +21955,41 @@ changing the signal economics or launching an unaccounted run. If Mia edits
 or completes a run, Codex must retrieve the exact cloud source, compare it
 with committed A3, document every delta and its effect, and port only a
 verified lane-specific successor before any later candidate is considered.
+
+## 171. Owner-directed failed-project cleanup; R-177 preserved, 2026-09-22
+
+The owner directed removal of every failed QuantConnect project except R-177
+and requested the round's single push. A statistics-disabled inventory first
+resolved every active ARV2 project by exact project ID and name. Immediately
+before mutation, each cleanup target was re-read and required to be privately
+owned, Python, idle (`codeRunning=False`), and to contain only terminal
+`Runtime Error` backtests. The QC `projects/delete` endpoint then moved exactly
+these six projects to the **recoverable Recycle Bin**:
+
+| Project ID | Original private project name |
+|---:|---|
+| `36418640` | `1 ARV2_B5B_REFUSAL_SMOKE - 20260911` |
+| `36700291` | `63 ARV2_BOUNDED_TILT_QQQ_R115_2021_2025 - 20260918` |
+| `36781246` | `87 ARV2_QQQ_CLR_ORDER_R166_2026_YTD - 20260920` |
+| `36783362` | `88 ARV2_QQQ_DELIST_ORDER_R167_2026_YTD - 20260920` |
+| `36790040` | `93 ARV2_QQQ_EXPOSURE_ORDER_R172_2025_NOW - 20260921` |
+| `36790123` | `94 ARV2_QQQ_EXPOSURE_ORDER_R172_A2_2025_NOW - 20260921` |
+
+For each target, a post-delete read proved that the same project ID remained
+under a `Recycle Bin/`-prefixed name ending in the exact original name.
+Nothing was permanently purged. R-177
+project `36823601`, exact name
+`100 ARV2_SIX_GATE_SIGNAL_R177_A1_2021_2025 - 20260922`, was explicitly
+excluded from deletion and an after-cleanup read proved its ID and name were
+unchanged. Projects containing any `Completed.` run, projects with mixed
+terminal statuses, active work, and unrelated projects were not touched.
+
+The two zero-backtest diagnostics, project `36561231` (the R-053 compile-only
+diagnostic) and project `36642921` (the first PIT-coverage submission
+refusal), were also preserved. Neither has a terminal failed backtest; the
+existing lane record classifies them as ambiguous zero-backtest diagnostics,
+so expanding “failed” to include them would have exceeded the resolved
+destructive scope. The cleanup read no result statistic, log, chart, raw row,
+holding, order, deployment, broker, paper/live, or portfolio value. It created
+no research look, development evaluation, infrastructure look, or result
+cell, and changed no strategy source or economic rule.

@@ -40,7 +40,7 @@ def test_projection_is_exact_role_specific_and_capability_bounded(
     )
     record = value.to_record()
     assert value.role == role
-    assert value.profile_id == "arv2-six-universe-order-" + role + "-v1"
+    assert value.profile_id == "arv2-six-universe-order-" + role + "-v2"
     assert value.package_sha256 == delta.EXPECTED_DELTA_PACKAGE_SHA256
     assert value.package_lineage_sha256 == delta.EXPECTED_DELTA_LINEAGE_SHA256
     assert value.total_source_byte_count == sum(

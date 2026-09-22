@@ -1,3 +1,4 @@
+import dataclasses
 import hashlib
 from datetime import datetime
 from decimal import Decimal
@@ -41,6 +42,11 @@ def test_profiles_bind_every_physical_role_and_their_own_identity():
         assert profile["role"] == role
         assert profile["decision_count"] == 261
         assert profile["target_gross_exposure"] == "0.98"
+        assert profile["fundamental_snapshot_maximum_age_sessions"] == 1
+        assert profile["fundamental_snapshot_unavailable_rule"] == (
+            "empty_market_cap_map_forces_existing_own_etf_coverage_fallback"
+        )
+        assert profile["constituent_snapshot_maximum_age_sessions"] == 5
         assert profile["backtest_only"] is True
         assert profile["live_orders"] is False
         assert profile["trading"] is False
@@ -56,6 +62,7 @@ def test_profile_refuses_unfrozen_role(role):
 
 
 def test_custom_statistic_inventory_is_exact_and_bounded():
+    assert subject.SUMMARY_SCHEMA == "arv2-six-universe-order-summary-v2"
     assert subject.expected_custom_summary_statistic_names(
         targets.ROLE_SIGNAL
     ) == (
@@ -486,6 +493,8 @@ def test_worst_authorized_aggregate_shape_fits_transport_bound():
     driver._active_dynamic_sids = set()
     driver._maximum_active_dynamic_security_count = 128
     driver._removed_dynamic_security_count = 999
+    driver._fundamental_snapshot_unavailable_sessions = ["s0001"]
+    driver._decision_set = frozenset({"s0001"})
     driver._sleeve_diagnostics = subject._empty_sleeve_diagnostics()
     for item in driver._sleeve_diagnostics.values():
         item["decision_count"] = 261
@@ -522,6 +531,13 @@ def test_worst_authorized_aggregate_shape_fits_transport_bound():
     aggregate = driver._aggregate()
 
     assert len(subject._canonical(aggregate)) <= subject.MAXIMUM_STATISTIC_BYTES
+    assert aggregate["fundamental_snapshot_unavailable_decision_count"] == 1
+    assert aggregate[
+        "fundamental_snapshot_unavailable_session_sha256"
+    ] == subject._sha({
+        "schema": "arv2-six-universe-order-fundamental-fallback-sessions-v1",
+        "sessions": ("s0001",),
+    })
 
 
 def test_snapshot_boundary_uses_only_strictly_prior_collection():
@@ -562,6 +578,83 @@ def test_snapshot_boundary_refuses_future_only_or_stale_collection():
             "test collection",
             maximum_age_sessions=1,
         )
+
+
+def test_unavailable_fundamentals_become_empty_caps_not_stale_cap_use():
+    driver = _bare_driver()
+    driver._fundamental_snapshot_unavailable_sessions = []
+    driver._security_by_sid = {}
+    driver._label_by_sid = {}
+    driver._etf_symbols = {}
+    driver._constituent_caches = {}
+    for spec in targets._gate.UNIVERSE_SPECS:
+        sid = f"SID-{spec.universe_id}"
+        driver._security_by_sid[sid] = f"security-{spec.universe_id}"
+        driver._label_by_sid[sid] = f"Company {spec.universe_id}"
+        driver._etf_symbols[spec.etf_ticker] = _Symbol(
+            f"ETF-{spec.etf_ticker}"
+        )
+        driver._constituent_caches[spec.etf_ticker] = {
+            "2021-01-05": ((sid, Decimal("1")),),
+        }
+    driver._fundamental_cache = {
+        "2021-01-04": tuple(
+            (
+                f"SID-{spec.universe_id}",
+                "positive",
+                Decimal(999 - index),
+            )
+            for index, spec in enumerate(targets._gate.UNIVERSE_SPECS)
+        ),
+    }
+
+    snapshot = driver._snapshot("2021-01-06")
+
+    assert driver._fundamental_snapshot_unavailable_sessions == [
+        "2021-01-06"
+    ]
+    assert all(
+        row.pit_market_cap is None
+        for universe in snapshot.universes
+        for row in universe.constituents
+    )
+    enriched = tuple(
+        dataclasses.replace(
+            universe,
+            constituents=tuple(
+                dataclasses.replace(row, firm_specific_score=Decimal("1"))
+                for row in universe.constituents
+            ),
+        )
+        for universe in snapshot.universes
+    )
+    construction = targets._gate.build_six_universe_construction(
+        enriched,
+        targets.ORDER_GATE_PROFILE,
+    )
+    assert all(not sleeve.coverage.valid for sleeve in construction.sleeves)
+    assert all(
+        sleeve.coverage.refusal_reasons
+        == ("MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM",)
+        for sleeve in construction.sleeves
+    )
+    assert all(
+        sleeve.signal_etf_fallback_weight == sleeve.budget
+        and sleeve.matched_etf_fallback_weight == sleeve.budget
+        for sleeve in construction.sleeves
+    )
+    assert construction.signal_weights == construction.matched_weights
+    assert {
+        item.security_id: item.weight for item in construction.signal_weights
+    } == {
+        item.security_id: item.weight
+        for item in construction.etf_basket_weights
+    }
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcRuntimeError,
+        match="fundamental fallback session repeated",
+    ):
+        driver._snapshot("2021-01-06")
 
 
 def test_runtime_source_is_qc_prelude_safe():

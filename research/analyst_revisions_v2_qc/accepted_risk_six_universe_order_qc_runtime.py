@@ -54,8 +54,8 @@ class AcceptedRiskSixUniverseOrderQcRuntimeError(ValueError):
     """The physical order run or one of its exact authorities was refused."""
 
 
-PROFILE_SCHEMA = "arv2-six-universe-order-profile-v1"
-SUMMARY_SCHEMA = "arv2-six-universe-order-summary-v1"
+PROFILE_SCHEMA = "arv2-six-universe-order-profile-v2"
+SUMMARY_SCHEMA = "arv2-six-universe-order-summary-v2"
 META_SCHEMA = "arv2-six-universe-order-runtime-meta-v1"
 META_STATISTIC_NAME = "ARV2_SIX_GATE_ORDER_META"
 AGGREGATES_STATISTIC_NAME = "ARV2_SIX_GATE_ORDER_AGGREGATES"
@@ -144,7 +144,7 @@ def _symbol_sid(symbol, name):
 def _profile(role):
     if role not in _targets.ROLES or type(role) is not str:
         _error("six-universe order role is not frozen")
-    profile_id = "arv2-six-universe-order-" + role + "-v1"
+    profile_id = "arv2-six-universe-order-" + role + "-v2"
     seed = {
         "schema": PROFILE_SCHEMA,
         "profile_id": profile_id,
@@ -166,6 +166,15 @@ def _profile(role):
         "dynamic_subscription_resolution": "minute_bounded_to_targets_and_exits",
         "dynamic_subscription_extended_market_hours": False,
         "seed_initial_prices": True,
+        "fundamental_snapshot_maximum_age_sessions": (
+            MAXIMUM_FUNDAMENTAL_SNAPSHOT_AGE_SESSIONS
+        ),
+        "fundamental_snapshot_unavailable_rule": (
+            "empty_market_cap_map_forces_existing_own_etf_coverage_fallback"
+        ),
+        "constituent_snapshot_maximum_age_sessions": (
+            MAXIMUM_CONSTITUENT_SNAPSHOT_AGE_SESSIONS
+        ),
         "overnight_holding_drift_rule": (
             "replan_only_when_each_changed_holding_has_same_session_split"
         ),
@@ -393,6 +402,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
         self._decision_target_sha256s = []
         self._fallback_counts = {}
         self._sleeve_diagnostics = {}
+        self._fundamental_snapshot_unavailable_sessions = []
         self._split_records_by_session = {}
         self._forced_ledger = _forced.empty_forced_delisting_ledger()
         self._emitted = False
@@ -662,10 +672,18 @@ class AcceptedRiskSixUniverseOrderQcDriver:
         )
 
     def _strictly_prior_rows(
-        self, cache, session, name, *, maximum_age_sessions
+        self,
+        cache,
+        session,
+        name,
+        *,
+        maximum_age_sessions,
+        unavailable_as_empty=False,
     ):
         keys = tuple(key for key in cache if key < session)
         if not keys:
+            if unavailable_as_empty is True:
+                return None, ()
             _error(name + " has no strictly prior collection")
         observed = max(keys)
         try:
@@ -677,7 +695,11 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             raise AcceptedRiskSixUniverseOrderQcRuntimeError(
                 name + " escaped the authenticated session axis"
             ) from exc
-        if age < 1 or age > maximum_age_sessions:
+        if age < 1:
+            _error(name + " is not within its frozen age bound")
+        if age > maximum_age_sessions:
+            if unavailable_as_empty is True:
+                return None, ()
             _error(name + " is not within its frozen age bound")
         return observed, cache[observed]
 
@@ -689,7 +711,12 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             maximum_age_sessions=(
                 MAXIMUM_FUNDAMENTAL_SNAPSHOT_AGE_SESSIONS
             ),
+            unavailable_as_empty=True,
         )
+        if _fundamental_session is None:
+            if session in self._fundamental_snapshot_unavailable_sessions:
+                _error("six-universe fundamental fallback session repeated")
+            self._fundamental_snapshot_unavailable_sessions.append(session)
         caps = {
             sid: value
             for sid, classification, value in fundamental_rows
@@ -1329,6 +1356,20 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             maximum_gross = max(gross)
         forced = _forced.forced_delisting_summary(self._forced_ledger)
         sleeve_diagnostics = self._frozen_sleeve_diagnostics()
+        fundamental_unavailable_sessions = tuple(
+            self._fundamental_snapshot_unavailable_sessions
+        )
+        if (
+            fundamental_unavailable_sessions
+            != tuple(sorted(fundamental_unavailable_sessions))
+            or len(set(fundamental_unavailable_sessions))
+            != len(fundamental_unavailable_sessions)
+            or any(
+                session not in self._decision_set
+                for session in fundamental_unavailable_sessions
+            )
+        ):
+            _error("six-universe fundamental fallback path changed")
         run_valid = (
             executor["run_valid"] is True
             and executor["decision_count"] == EXPECTED_DECISION_COUNT
@@ -1379,6 +1420,15 @@ class AcceptedRiskSixUniverseOrderQcDriver:
                 self._removed_dynamic_security_count
             ),
             "pit_callback_source_row_count": self._source_row_count,
+            "fundamental_snapshot_unavailable_decision_count": len(
+                fundamental_unavailable_sessions
+            ),
+            "fundamental_snapshot_unavailable_session_sha256": _sha({
+                "schema": (
+                    "arv2-six-universe-order-fundamental-fallback-sessions-v1"
+                ),
+                "sessions": fundamental_unavailable_sessions,
+            }),
             "run_valid": run_valid,
             "preliminary": True,
             "formal": False,

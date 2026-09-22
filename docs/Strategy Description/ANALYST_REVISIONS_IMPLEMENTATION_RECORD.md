@@ -21570,7 +21570,7 @@ cell requires reviewed adapter registration, a prospectively complete
 schedule, and a newly preregistered one-read result path; this diagnostic
 cannot be upgraded retroactively.
 
-## 170. Owner-directed six-universe order family (IN PROGRESS; R-177 A1 DIAGNOSED; A2 PHYSICALLY FROZEN), 2026-09-22
+## 170. Owner-directed six-universe order family (IN PROGRESS; R-177 A1/A2 DIAGNOSED; FINAL A3 PHYSICALLY FROZEN), 2026-09-22
 
 ### 170.1 Owner direction and deferred tilt-off control
 
@@ -21848,3 +21848,62 @@ the final A3 rather than replaying identical bytes. R-178 and R-179 then
 advance the cumulative counts to **159 / 102** and **160 / 103** respectively
 if launched. Their section-170.7 A1 projection rows are superseded by this
 corrected prospective freeze before either project is created.
+
+### 170.9 R-177 A2 runtime diagnosis and final A3 freeze
+
+R-177 A2 repaired the existing project in place, re-read the corrected exact
+13-file / 372,751-byte projection, and compiled successfully. Backtest
+`c6c8358fa74131d0245a076af57fbfdf` then reached terminal `Runtime Error` at
+1% on 2021-11-29: the latest strictly-prior fundamental collection was not
+within the frozen one-session age bound. One diagnostic result read retained
+only the error and stack; it read no custom or standard performance statistic,
+chart, raw row, order, or outcome aggregate. R-177 A2 spends **157 -> 158
+shared looks / 100 -> 101 development evaluations**, with 27 infrastructure
+looks and 608 authenticated cells unchanged. It is the second failed R-177
+attempt and creates no result cell.
+
+The final A3 does **not** loosen the point-in-time age rule and does not skip a
+decision. When no strictly-prior fundamental collection exists within the
+unchanged maximum age of one session, the runtime now constructs an empty
+market-cap map. The existing gate consequently gives every sleeve the exact
+`MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM` reason and routes its complete
+budget to its own ETF. Signal, matched, and six-ETF target maps are therefore
+identical for that decision. Stale caps never enter either signal coverage or
+the matched market-cap rank; constituent snapshots retain their independent
+five-session bound and still refuse when stale. This preserves the complete
+261-decision cadence while using the already-preregistered invalid-coverage
+fallback rather than inventing a new stale-data exception.
+
+The runtime records both the fallback-decision count and a canonical session-
+path digest. Because that changes a physical policy and the aggregate shape,
+the order profile and summary schemas advance prospectively to v2; no v1
+identity is reused. The focused battery is **75 passed**. Its integrated
+regression gives the stale cache the exact six live constituent SIDs with
+hostile positive caps, proves all resulting caps are `None`, proves the sole
+coverage reason and exact ETF maps, and turns red if stale rows are admitted.
+The worst populated aggregate is 7,021 bytes against the 8,192-byte bound.
+An independent read-only audit reports 0 P0, 0 P1, 0 P2, and 0 P3 and gives GO
+for the final A3. No full lane suite was run.
+
+R-177 A3 is the candidate's **third and final permitted attempt**. It must
+reuse the existing project and has the exact backtest name
+`ARV2 R177A3 six gate signal 2021 2025 f4c077f7`. Before that launch, the
+common runtime is 60,993 bytes with SHA-256 `1349c348...1071`; the corrected
+gate remains 25,310 bytes with SHA-256 `528a47f9...1b68`. The final physical
+identities inherited prospectively by the still-unlaunched R-178 and R-179
+are:
+
+| Candidate / attempt | Exact project / backtest | Final profile | Final projection / source manifest |
+|---|---|---|---|
+| `R-177`, `A3` | existing `100 ARV2_SIX_GATE_SIGNAL_R177_A1_2021_2025 - 20260922` / `ARV2 R177A3 six gate signal 2021 2025 f4c077f7` | `arv2-six-universe-order-signal-v2`; `07a17589...96bc` | `arv2-six-universe-order-qc-projection-f4c077f7a71afe568aca3edb`; `f4c077f7...5f29`; 13 files / 374,790 bytes; source manifest `0e0efc0a...8034`; unchanged `main.py` `fc7ea724...1cc3` |
+| `R-178`, `A1` | `101 ARV2_SIX_GATE_MATCHED_R178_A1_2021_2025 - 20260922` / `ARV2 R178A1 six gate matched 2021 2025 e0bb70db` | `arv2-six-universe-order-matched-v2`; `2446e420...60a4` | `arv2-six-universe-order-qc-projection-e0bb70db66ab23c9972acb28`; `e0bb70db...b2a3`; 13 files / 374,791 bytes; source manifest `01a94484...1b49`; unchanged `main.py` `fa1b83e3...3b56` |
+| `R-179`, `A1` | `102 ARV2_SIX_GATE_ETF_R179_A1_2021_2025 - 20260922` / `ARV2 R179A1 six gate ETF basket 2021 2025 6e5e389f` | `arv2-six-universe-order-six_etf_basket-v2`; `b41c5bfe...1b14` | `arv2-six-universe-order-qc-projection-6e5e389f4989524857b37aab`; `6e5e389f...8fe0`; 13 files / 374,798 bytes; source manifest `fa030b15...a07bc`; unchanged `main.py` `89f59da3...c0f5` |
+
+An R-177 A3 launch advances accounting **158 -> 159 shared looks / 101 ->
+102 development evaluations**. If A3 does not complete with authenticated
+custom statistics and `run_valid=true`, R-177 stops and R-178/R-179 do not
+launch in this round. If it does, R-178 and R-179 may proceed sequentially on
+their first attempts, advancing the cumulative counts to **160 / 103** and
+**161 / 104**. The A2 table in section 170.8 is retained as its prospective
+historical freeze but is superseded for every later mutation by this v2 A3
+freeze.

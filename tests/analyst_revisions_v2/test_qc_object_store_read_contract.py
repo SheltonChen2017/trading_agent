@@ -90,6 +90,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_order_level_input_runtime.py
     accepted_risk_order_level_qc_projection.py
     accepted_risk_order_level_submission_adapter.py
+    accepted_risk_order_level_universe_benchmark.py
     accepted_risk_pair_bridge.py accepted_risk_preliminary_package.py
     accepted_risk_preliminary_qc_figi.py
     accepted_risk_preliminary_qc_projection.py
@@ -113,6 +114,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_sequential_r055_score.py accepted_risk_six_universe_gate.py
     accepted_risk_six_universe_gate_evaluator.py
     accepted_risk_six_universe_gate_qc_runtime.py
+    accepted_risk_spy_order_level_v1_qc_runtime.py
     accepted_risk_stock_portfolio_evaluator.py
     accepted_risk_terminal_disposition.py event_study.py
     firm_ontology_candidate_builder.py firm_ontology_owner_decision.py
@@ -159,6 +161,9 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
     "__init__.py": (),
     "accepted_risk_order_level_benchmark.py": tuple(
         "hashlib json decimal".split()
+    ),
+    "accepted_risk_order_level_universe_benchmark.py": tuple(
+        "hashlib json re decimal".split()
     ),
     "accepted_risk_order_level_core.py": tuple(
         """
@@ -439,6 +444,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v17_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v18_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v19_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime
         """.split()
     ),
     "accepted_risk_order_level_submission_adapter.py": tuple(
@@ -1298,6 +1304,15 @@ _QC_RUNTIME_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v18_qc_runtime
         """.split()
     ),
+    "accepted_risk_spy_order_level_v1_qc_runtime.py": tuple(
+        """
+        datetime decimal accepted_risk_order_level_universe_benchmark
+        accepted_risk_qqq_order_level_v19_qc_runtime
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_universe_benchmark
+        research.analyst_revisions_v2_qc.accepted_risk_qqq_order_level_v19_qc_runtime
+        """.split()
+    ),
     "accepted_risk_six_universe_gate_qc_runtime.py": tuple(
         """
         hashlib itertools json math time datetime decimal
@@ -1410,6 +1425,11 @@ _QC_RUNTIME_IO_SURFACE = {
         "call:set_summary_statistic",
     ),
     "accepted_risk_qqq_order_level_v19_qc_runtime.py": (
+        "call:set_summary_statistic",
+    ),
+    "accepted_risk_spy_order_level_v1_qc_runtime.py": (
+        "call:history",
+        "call:open",
         "call:set_summary_statistic",
     ),
     "accepted_risk_six_universe_gate_qc_runtime.py": (
@@ -2587,6 +2607,8 @@ research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime acce
 research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_six_universe_gate
 research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime accepted_risk_six_universe_gate_evaluator
+research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime accepted_risk_order_level_universe_benchmark
+research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime accepted_risk_qqq_order_level_v19_qc_runtime
 research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator accepted_risk_preliminary_rating_evaluator
 research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition research.analyst_revisions_v2.canonical
 research.analyst_revisions_v2_qc.firm_ontology_candidate_builder research.analyst_revisions_v2
@@ -2833,6 +2855,14 @@ _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
             "accepted_risk_six_universe_gate_evaluator",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
+            "accepted_risk_order_level_universe_benchmark",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
+            "accepted_risk_qqq_order_level_v19_qc_runtime",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_runtime",
             "accepted_risk_preliminary_rating_evaluator",
         ),
@@ -3052,6 +3082,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_submission_adapter",
+        "research.analyst_revisions_v2_qc.accepted_risk_order_level_universe_benchmark",
         "research.analyst_revisions_v2_qc.accepted_risk_pair_bridge",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_package",
         "research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi",
@@ -3077,6 +3108,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
         "research.analyst_revisions_v2_qc.event_study",

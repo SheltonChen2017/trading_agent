@@ -50,6 +50,9 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_v19_qc_runtime as v19_runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_spy_order_level_v1_qc_runtime as spy_runtime,
+)
 
 
 def _exact(message: str) -> str:
@@ -109,6 +112,7 @@ def delta_package(monkeypatch):
         + v17_runtime.SKIP_PROFILE_IDS
         + v18_runtime.BOUNDARY_PROFILE_IDS
         + v19_runtime.SUCCESSOR_PROFILE_IDS
+        + spy_runtime.SUCCESSOR_PROFILE_IDS
     ),
 )
 def test_projection_is_exact_profile_bound_and_backtest_only(
@@ -156,7 +160,10 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
         "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 16384"
     )
     assert (successor_transport_override in main) is (
-        profile_id in v19_runtime.SUCCESSOR_PROFILE_IDS
+        profile_id in (
+            v19_runtime.SUCCESSOR_PROFILE_IDS
+            + spy_runtime.SUCCESSOR_PROFILE_IDS
+        )
     )
     assert (legacy_transport_override in main) is (
         profile_id in (
@@ -183,8 +190,16 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
         + v17_runtime.SKIP_PROFILE_IDS
         + v18_runtime.BOUNDARY_PROFILE_IDS
         + v19_runtime.SUCCESSOR_PROFILE_IDS
+        + spy_runtime.SUCCESSOR_PROFILE_IDS
     ):
-        assert "self.time_rules.before_market_open(qqq_benchmark, 10)" in main
+        benchmark_name = (
+            "spy_benchmark"
+            if profile_id in spy_runtime.SUCCESSOR_PROFILE_IDS
+            else "qqq_benchmark"
+        )
+        assert (
+            f"self.time_rules.before_market_open({benchmark_name}, 10)" in main
+        )
         assert "self._arv2_driver.on_before_open" in main
         assert main.count("extended_market_hours=True") == 1
     else:
@@ -198,7 +213,12 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     assert "self.set_cash(STARTING_CASH)" in main
     assert "AddUniverse" not in main
     assert "fundamental_universe" not in main
-    assert "qqq_constituent_universe=qqq_constituent_universe" in main
+    if profile_id in spy_runtime.SUCCESSOR_PROFILE_IDS:
+        assert "spy_constituent_universe=spy_constituent_universe" in main
+        assert "authority_benchmark_symbol=spy_benchmark" in main
+        assert "spy_benchmark_symbol=spy_benchmark" in main
+    else:
+        assert "qqq_constituent_universe=qqq_constituent_universe" in main
     assert "trade_bar_type=TradeBar" in main
     assert "daily_resolution=Resolution.DAILY" in main
     assert (
@@ -1267,6 +1287,113 @@ def test_v19_total_cap_is_profile_specific_and_load_bearing(
     assert projection.require_accepted_risk_order_level_qc_projection(v18) is v18
 
 
+def test_spy_v1_adds_only_ticker_bound_adapter_to_exact_v19_closure(
+    delta_package,
+):
+    spy = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    spy_by_path = {item.project_path: item for item in spy.source_files}
+    v19_by_path = {item.project_path: item for item in v19.source_files}
+
+    assert set(spy_by_path) == set(v19_by_path) | {
+        projection.UNIVERSE_BENCHMARK_PROJECT_PATH,
+        projection.SPY_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v19_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert spy_by_path[path] == v19_by_path[path]
+    assert spy.profile_sha256 == projection._require_profile(
+        spy_runtime.SUCCESSOR_PROFILE_2025_ID
+    )["profile_sha256"]
+    assert projection.require_accepted_risk_order_level_qc_projection(spy) is spy
+
+
+def test_spy_v1_generated_main_has_one_raw_spy_and_no_qqq_equity(
+    delta_package,
+):
+    value = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    main = next(
+        item.source_bytes.decode("ascii")
+        for item in value.source_files
+        if item.project_path == projection.MAIN_PROJECT_PATH
+    )
+
+    assert main.count("self.add_equity(") == 1
+    assert main.count('"SPY"') == 1
+    assert '"QQQ"' not in main
+    assert "Resolution.MINUTE" in main
+    assert "data_normalization_mode=DataNormalizationMode.RAW" in main
+    assert "spy_benchmark = self.add_equity(" in main
+    assert "authority_benchmark_symbol=spy_benchmark" in main
+    assert "spy_benchmark_symbol=spy_benchmark" in main
+    assert "self.set_benchmark(spy_benchmark)" in main
+    assert "self.universe.etf(\n                spy_benchmark," in main
+    assert "self.date_rules.every_day(spy_benchmark)" in main
+    assert "self.time_rules.after_market_close(spy_benchmark, 0)" in main
+    assert "self.time_rules.before_market_open(spy_benchmark, 10)" in main
+    assert "self._arv2_accept_spy_constituents" in main
+    assert "accept_spy_constituents(constituents)" in main
+    assert "AcceptedRiskSpyOrderLevelQcRuntime(" in main
+    assert "qqq_benchmark = self.add_equity(" not in main
+    assert "qqq_constituent_universe=" not in main
+
+
+def test_spy_v1_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2026_ID,
+    )
+    spy = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2026_ID,
+    )
+    assert projection._maximum_total_source_bytes(v19.profile_id) == (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    assert projection._maximum_total_source_bytes(spy.profile_id) == (
+        projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        spy.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = spy.total_source_byte_count + (72 - fixture_key_length)
+    assert (
+        projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES - production_total
+        >= projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert (
+        projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
+        - 5_000
+        - production_total
+        < projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES",
+        spy.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(spy)
+    assert projection.require_accepted_risk_order_level_qc_projection(v19) is v19
+
+
 def test_firewall_allows_only_exact_v18_read_only_engine_order_lookup():
     accepted = (
         "from accepted_risk_qqq_order_level_v18_qc_runtime import (\n"
@@ -1798,6 +1925,7 @@ def test_qc_prelude_compilation_and_future_import_regression():
         (v17_runtime.SKIP_PROFILE_2026_ID, 8192),
         (v18_runtime.BOUNDARY_PROFILE_2026_ID, 8192),
         (v19_runtime.SUCCESSOR_PROFILE_2026_ID, 16384),
+        (spy_runtime.SUCCESSOR_PROFILE_2026_ID, 16384),
     ),
 )
 def test_generated_main_imports_from_exact_flat_qc_projection(
@@ -1826,8 +1954,12 @@ def test_generated_main_imports_from_exact_flat_qc_projection(
                 "import sys;"
                 f"sys.path.insert(0, {str(tmp_path)!r});"
                 "import main;"
-                "assert main.ARV2QqqOrderLevelAlgorithm;"
-                "import accepted_risk_qqq_order_level_qc_runtime as runtime;"
+                + (
+                    "assert main.ARV2SpyOrderLevelAlgorithm;"
+                    if profile_id in spy_runtime.SUCCESSOR_PROFILE_IDS
+                    else "assert main.ARV2QqqOrderLevelAlgorithm;"
+                )
+                + "import accepted_risk_qqq_order_level_qc_runtime as runtime;"
                 f"assert runtime.MAXIMUM_STATISTIC_BYTES == {statistic_limit}"
             ),
         ],

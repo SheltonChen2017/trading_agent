@@ -525,18 +525,17 @@ and freezes exact R-175 identities before network mutation; the owner
 explicitly waives interim Claude review of section 168 until its one
 preregistered run is recorded, after which Claude reviews the pushed round.
 R-175 is now recorded as `Completed.` with `run_valid=false` and zero cells.
-The exact next step is to finish focused post-result validation, make the
-round's one push, and hand section 168 and the exact pushed snapshot to Claude
-for independent review. Only authenticated
-`Completed.` may be followed by a separately
-rendered, committed, signed, and consumed one-use aggregate-only result
-authority. V15
-and R-170 must remain immutable, no R-170 aggregate may be read, and no R-169
-diagnostic may be relabelled. By directing Codex to counter-review the landed
-review and continue directly with backtesting in this round, the owner
-explicitly waives further Claude review before this separately preregistered
-2025-now retry; Claude will independently review the resulting pushed
-snapshot. R-138 remains unlaunched/unspent.
+Section 169 freezes the dedicated SPY order adapter and exact R-176
+preregistration. The owner explicitly waives Claude review of section 169
+before this one bounded diagnostic. Codex must commit the exact preregistered
+source locally, launch only R-176 A1, consume only its two named aggregate
+statistics after authenticated `Completed.`, record the result, run focused
+checks, and make the round's one same-lane push; Claude will independently
+review section 169 and that exact pushed snapshot. This exception defers
+review only until that snapshot; it does not convert a diagnostic into a
+formal result or authorize a retry because the return is unfavourable. V15 and
+R-170 remain immutable, no R-170 aggregate may be read, no R-169 diagnostic
+may be relabelled, and R-138 remains unlaunched/unspent.
 
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
@@ -21423,3 +21422,85 @@ reviews section 168, V19, and R-175. A future formal result needs a separately
 reviewed profile/adapter registration and a candidate capable of
 `run_valid=true`; this diagnostic cannot be upgraded retroactively. No
 complete lane suite is run by Codex.
+
+## 169. Dedicated SPY order adapter and R-176 preregistration, 2026-09-21
+
+### 169.1 Owner-directed comparison
+
+The owner asked for the S&P 500 analogue after R-175 showed that the small
+analyst-revision tilt was essentially neutral inside QQQ during the 2025-2026
+AI-led window. R-176 changes **only the universe**: it keeps R-175's 98% gross
+market-cap base, frozen sector-neutral analyst-revision tilt, weekly
+prior-close decision and next-session market-on-open execution,
+10-basis-point fee per side, zero slippage, and 2025-to-latest closed window.
+The universe is point-in-time SPY ETF holdings, explicitly **not** official
+historical S&P 500 index membership. This is a tilt test, not the materially
+different top-decile gate used by R-108.
+
+Merely substituting SPY for QQQ in the generated main was rejected: it would
+have run SPY economics through QQQ profile names, proxy identities, benchmark
+digests, and aggregate keys. The dedicated SPY V1 adapter instead reuses
+immutable V19 only as an order-mechanics layer. A new pure universe-bound
+benchmark helper owns SPY coverage maps and raw/path digests; the adapter owns
+SPY profiles, public constructor/callbacks, benchmark entry, meta, aggregate,
+and statistic names. The predecessor's opaque proxy token remains internal,
+is disclosed as compatibility state, and is refused if it appears in an
+authenticated plaintext payload. The generated main creates exactly one
+minute/RAW SPY subscription and reuses that symbol for FIGI authority, ETF
+holdings universe, benchmark, and both schedules; it creates no QQQ security.
+
+The two SPY profiles are
+`arv2-spy-order-level-tilt-2025-cutoff-v1` and
+`...-2026-cutoff-v1`, with SHA-256s
+`207256f60903bf96de5c95d1e7833905b8b423e4d13e130232ae4d579bf6d6e9`
+and `7943e61bb47b25977ce6a21009030f920df387de3be2fec75ff2effeea4dd454`.
+The 2025 profile pins the disclosure
+`SPY_holdings_proxy_not_official_SP500_index_membership`.
+
+### 169.2 Focused proof and independent in-round audit
+
+The pure helper reproduces the legacy QQQ helper byte semantics when supplied
+the legacy ticker/schema/prefix, while its SPY mode emits only SPY-bound keys
+and digests. The runtime tests isolate SPY coverage/proxy translation,
+SPY-only profile/meta/aggregate payloads, meta-to-aggregate hashing, and the
+16,384-byte transport. A distinct skipped-first-decision fixture proves that
+the execution-matched SPY comparator enters on the session after the first
+**actually submitted** decision rather than after the first scheduled one.
+The source projection pins the exact closure and its 475,000-byte
+profile-specific ceiling; the exhaustive no-I/O closure registers both new
+modules. Immutable V19 and its predecessors are unchanged.
+
+The focused helper/runtime/projection/object-store battery is **197 passed**;
+the independent in-round audit found **0 P0, P1, P2, or P3 defects** after the
+skipped-first-decision test was added. `py_compile` and `git diff --check` are
+clean. No complete lane suite was run, per the owner and machine-wide rule.
+
+### 169.3 Exact R-176 preregistration
+
+R-176 is one fresh, private, order-based diagnostic. It compares the SPY
+holdings-weight replica plus the unchanged bounded analyst-revision tilt with
+an execution-matched SPY ETF on the same session path. No sign, return,
+parameter, universe, or winner may be selected after launch. Because SPY V1
+is not registered in the signed formal adapter, even a complete valid run is
+diagnostic and adds no formal authenticated cell.
+
+| Field | Frozen before network mutation |
+|---|---|
+| Candidate | `R-176`, attempt `A1` of at most three; retry only after a distinct compile/runtime correction, never because of return sign |
+| Project | `99 ARV2_SPY_V1_ORDER_R176_A1_2025_NOW - 20260921` (must be absent before create) |
+| Backtest | `ARV2 R176A1 SPY V1 order 2025 now eaabfb25` |
+| Profile/window | `arv2-spy-order-level-tilt-2025-cutoff-v1`; decisions 2025-01-02 through 2026-09-16; final execution/mark 2026-09-17; profile SHA-256 `207256f6...d6e9` |
+| Package | `arv2-preliminary-qc-package-7803b84f0841f9685a4951de`; SHA-256 `7803b84f...4e1f`; lineage `54723703...b129`; reuse the already-present activation object and make no Object Store mutation |
+| Projection | `arv2-order-level-qc-projection-30fd090a232c850b06bfcbc7`; SHA-256 `30fd090a232c850b06bfcbc7e406f10ac4264ce98df74bf3e5e0128aba19cd92` |
+| Source | 21 files / 472,782 bytes; canonical `arv2-qc-source-content-manifest-v1` SHA-256 `48573d2628bc3011a85ef3b4aeb6143368f772541c93a2d19e9e6cbe9c93c787`; `main.py` `a6bd7a34...b2ea9`; SPY runtime `eaabfb25...35981`; generic helper `b01033d9...d4509` |
+| Economics | 98% target gross; point-in-time SPY ETF holdings-weight stock core plus SPY residual proxy; unchanged sector-neutral revision tilt; weekly next-session MOO; 10 bps per side; zero slippage; no leverage |
+| Cloud proof | Hardened redirect-refusing transport; prove exact name absent; create fresh private project; upload and re-read all paths/bytes/hashes/manifest before compile |
+| Terminal/result read | Poll `backtests/list` with `includeStatistics:false`; after exact `Completed.`, retain only `ARV2_SPY_ORDER_LEVEL_META` and `ARV2_SPY_ORDER_LEVEL_AGGREGATES`, authenticate canonical/profile/package/hash bindings, and discard standard statistics, charts, orders, logs, and raw values |
+| Authority exclusions | Backtest-only simulated MOO orders. No broker, paper/live/funded deployment, real order, trading, leverage, provider read, or Object Store write |
+
+If `backtests/create` succeeds, R-176 spends one shared research look and one
+ARV2 development evaluation: **155 -> 156 shared looks / 98 -> 99 ARV2
+development evaluations / 27 infrastructure looks / 608 authenticated
+cells**. A failed candidate may use at most three QC attempts under the
+machine-wide rule; a completed diagnostic is not retried merely because
+`run_valid=false` or its return is disappointing.

@@ -1,4 +1,4 @@
-"""Exact, backtest-only QC source projection for QQQ order-level runs.
+"""Exact, backtest-only QC source projection for ETF order-level runs.
 
 The projected runtime may submit simulated ``MarketOnOpenOrder`` requests
 inside a QuantConnect backtest.  The source firewall rejects every other
@@ -31,6 +31,7 @@ from . import accepted_risk_qqq_order_level_v16_qc_runtime as v16_runtime_builde
 from . import accepted_risk_qqq_order_level_v17_qc_runtime as v17_runtime_builder
 from . import accepted_risk_qqq_order_level_v18_qc_runtime as v18_runtime_builder
 from . import accepted_risk_qqq_order_level_v19_qc_runtime as v19_runtime_builder
+from . import accepted_risk_spy_order_level_v1_qc_runtime as spy_runtime_builder
 
 
 class AcceptedRiskOrderLevelQcProjectionError(ValueError):
@@ -49,6 +50,10 @@ V16_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v16_qc_runtime.py"
 V17_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v17_qc_runtime.py"
 V18_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v18_qc_runtime.py"
 V19_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v19_qc_runtime.py"
+UNIVERSE_BENCHMARK_PROJECT_PATH = (
+    "accepted_risk_order_level_universe_benchmark.py"
+)
+SPY_RUNTIME_PROJECT_PATH = "accepted_risk_spy_order_level_v1_qc_runtime.py"
 FORCED_EXIT_PROJECT_PATH = "accepted_risk_order_level_forced_exit.py"
 MAX_SOURCE_FILE_BYTES = 64_000
 # The fixed ten-file closure includes the ETF-residual accounting and
@@ -92,6 +97,11 @@ MAX_BOUNDARY_TOTAL_SOURCE_BYTES = 410_000
 # closure.  Its exact production size is pinned by focused projection tests;
 # 430,000 is the smallest 5,000-byte ceiling retaining the review margin.
 MAX_SUCCESSOR_TOTAL_SOURCE_BYTES = 430_000
+# SPY V1 adds only a ticker-bound benchmark helper and semantic adapter to the
+# exact V19 engine closure.  The focused projection test pins the production
+# size and proves this profile-specific ceiling retains the review margin;
+# every QQQ profile keeps its narrower predecessor ceiling.
+MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES = 475_000
 MIN_REVIEW_MARGIN_BYTES = 2_048
 _ENGINE_ORDER_PROFILE_IDS = (
     v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
@@ -102,6 +112,7 @@ _ENGINE_ORDER_PROFILE_IDS = (
     + v17_runtime_builder.SKIP_PROFILE_IDS
     + v18_runtime_builder.BOUNDARY_PROFILE_IDS
     + v19_runtime_builder.SUCCESSOR_PROFILE_IDS
+    + spy_runtime_builder.SUCCESSOR_PROFILE_IDS
 )
 
 PROJECT_SOURCE_PATHS = (
@@ -118,6 +129,20 @@ PROJECT_SOURCE_PATHS = (
 
 
 def _project_source_paths(profile_id: str) -> tuple[str, ...]:
+    if profile_id in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+            V16_RUNTIME_PROJECT_PATH,
+            V17_RUNTIME_PROJECT_PATH,
+            V18_RUNTIME_PROJECT_PATH,
+            V19_RUNTIME_PROJECT_PATH,
+            UNIVERSE_BENCHMARK_PROJECT_PATH,
+            SPY_RUNTIME_PROJECT_PATH,
+        )
     if profile_id in v19_runtime_builder.SUCCESSOR_PROFILE_IDS:
         return PROJECT_SOURCE_PATHS + (
             FORCED_EXIT_PROJECT_PATH,
@@ -189,6 +214,8 @@ def _project_source_paths(profile_id: str) -> tuple[str, ...]:
 
 
 def _maximum_total_source_bytes(profile_id: str) -> int:
+    if profile_id in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
     if profile_id in v19_runtime_builder.SUCCESSOR_PROFILE_IDS:
         return MAX_SUCCESSOR_TOTAL_SOURCE_BYTES
     if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
@@ -211,6 +238,8 @@ def _maximum_total_source_bytes(profile_id: str) -> int:
 
 
 def _require_profile(profile_id: str) -> dict[str, object]:
+    if profile_id in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return spy_runtime_builder.require_spy_order_level_profile(profile_id)
     if profile_id in v19_runtime_builder.SUCCESSOR_PROFILE_IDS:
         return v19_runtime_builder.require_qqq_order_level_profile(profile_id)
     if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
@@ -241,6 +270,7 @@ def _all_profile_ids() -> tuple[str, ...]:
         + v17_runtime_builder.SKIP_PROFILE_IDS
         + v18_runtime_builder.BOUNDARY_PROFILE_IDS
         + v19_runtime_builder.SUCCESSOR_PROFILE_IDS
+        + spy_runtime_builder.SUCCESSOR_PROFILE_IDS
     )
 
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
@@ -249,6 +279,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_order_level_core",
     "accepted_risk_order_level_forced_exit",
     "accepted_risk_order_level_benchmark",
+    "accepted_risk_order_level_universe_benchmark",
     "accepted_risk_market_cap_stock_portfolio_tilt",
     "accepted_risk_order_level_input_runtime",
     "accepted_risk_preliminary_qc_figi",
@@ -263,6 +294,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_qqq_order_level_v17_qc_runtime",
     "accepted_risk_qqq_order_level_v18_qc_runtime",
     "accepted_risk_qqq_order_level_v19_qc_runtime",
+    "accepted_risk_spy_order_level_v1_qc_runtime",
     "accepted_risk_sequential_r055_score",
     "collections",
     "collections.abc",
@@ -503,6 +535,10 @@ def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
             "AcceptedRiskQqqOrderLevelV19QcRuntime",
             v19_runtime_builder.SUCCESSOR_PROFILE_IDS,
         ),
+        "accepted_risk_spy_order_level_v1_qc_runtime": (
+            "AcceptedRiskSpyOrderLevelV1QcRuntime",
+            spy_runtime_builder.SUCCESSOR_PROFILE_IDS,
+        ),
     }
     imports = tuple(
         (
@@ -516,8 +552,13 @@ def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
         return False
     imported_module, imported_names = imports[0]
     runtime_name, profile_ids = allowed_imports[imported_module]
+    runtime_binding = (
+        "AcceptedRiskSpyOrderLevelQcRuntime"
+        if imported_module == "accepted_risk_spy_order_level_v1_qc_runtime"
+        else "AcceptedRiskQqqOrderLevelQcRuntime"
+    )
     expected_names = (
-        (runtime_name, "AcceptedRiskQqqOrderLevelQcRuntime"),
+        (runtime_name, runtime_binding),
         ("STARTING_CASH", None),
     )
     driver_initializers = []
@@ -533,7 +574,7 @@ def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
             and target.value.id == "self"
             and isinstance(call, ast.Call)
             and isinstance(call.func, ast.Name)
-            and call.func.id == "AcceptedRiskQqqOrderLevelQcRuntime"
+            and call.func.id == runtime_binding
         ):
             continue
         profile_keywords = tuple(
@@ -851,6 +892,203 @@ def _require_delta_package(value):
     return value, package
 
 
+def _spy_main_source(
+    *,
+    activation_manifest_key: str,
+    activation_manifest_sha256: str,
+    activation_manifest_byte_count: int,
+    profile: dict[str, object],
+) -> bytes:
+    """Render the dedicated SPY entry without a second SPY subscription."""
+
+    try:
+        start = tuple(
+            int(part) for part in profile["evaluation_start_session"].split("-")
+        )
+    except (AttributeError, KeyError, TypeError, ValueError) as exc:
+        raise AcceptedRiskOrderLevelQcProjectionError(
+            "SPY order-level profile start session changed"
+        ) from exc
+    if (
+        len(start) != 3
+        or profile.get("profile_id")
+        not in spy_runtime_builder.SUCCESSOR_PROFILE_IDS
+        or profile.get("universe_proxy_ticker") != "SPY"
+        or profile.get("decision_cutoff_session")
+        != delta_package_builder.DELTA_DECISION_END_SESSION
+        or profile.get("final_execution_session")
+        != delta_package_builder.FINAL_EXECUTION_SESSION
+        or profile.get("backtest_only") is not True
+        or profile.get("simulated_order_submission") is not True
+        or any(
+            profile.get(field) is not False
+            for field in (
+                "live_orders",
+                "paper_orders",
+                "funded_orders",
+                "deployment",
+                "broker_credentials",
+                "trading",
+            )
+        )
+    ):
+        raise AcceptedRiskOrderLevelQcProjectionError(
+            "SPY order-level profile capability, universe, or date binding changed"
+        )
+    end = tuple(
+        int(part)
+        for part in delta_package_builder.FINAL_EXECUTION_SESSION.split("-")
+    )
+    preopen_schedule_source = (
+        "\n        self.schedule.on(\n"
+        "            self.date_rules.every_day(spy_benchmark),\n"
+        "            self.time_rules.before_market_open(spy_benchmark, 10),\n"
+        "            self._arv2_driver.on_before_open,\n"
+        "        )"
+        if profile.get("execution_submission_timing")
+        == "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
+        else ""
+    )
+    reflected_status_source = '''from System import Convert as _Arv2DotNetConvert, Enum as _Arv2DotNetEnum
+
+
+def _arv2_reflected_order_status(enum_type):
+    refusal = "QC OrderStatus reflected map changed"
+    try:
+        names = tuple(_Arv2DotNetEnum.GetNames(enum_type))
+        values = tuple(_Arv2DotNetEnum.GetValues(enum_type))
+        numbers = tuple(_Arv2DotNetConvert.ToInt32(value) for value in values)
+        reflected_type = values[0].GetType()
+        same_type = all(value.GetType() == reflected_type for value in values)
+    except Exception as exc:
+        raise RuntimeError(refusal) from exc
+    expected = (
+        ("New", 0), ("Submitted", 1), ("PartiallyFilled", 2),
+        ("Filled", 3), ("Canceled", 5), ("None", 6), ("Invalid", 7),
+        ("CancelPending", 8), ("UpdateSubmitted", 9),
+    )
+    if (
+        len(names) != len(expected)
+        or len(values) != len(expected)
+        or any(type(name) is not str for name in names)
+        or any(type(number) is not int for number in numbers)
+        or tuple(zip(names, numbers)) != expected
+        or not same_type
+        or any(type(value) is not type(values[0]) for value in values)
+        or any(
+            value == prior
+            for index, value in enumerate(values)
+            for prior in values[:index]
+        )
+    ):
+        raise RuntimeError(refusal)
+
+    class ReflectedOrderStatus:
+        NEW, SUBMITTED, PARTIALLY_FILLED, FILLED, CANCELED, NONE, INVALID, CANCEL_PENDING, UPDATE_SUBMITTED = values
+
+    return ReflectedOrderStatus
+
+
+'''
+    source = f'''from AlgorithmImports import *
+from decimal import Decimal
+{reflected_status_source}# Bind the dedicated SPY profile's declared statistic transport.
+import accepted_risk_qqq_order_level_qc_runtime as _arv2_runtime_module
+
+_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 16384
+from accepted_risk_spy_order_level_v1_qc_runtime import (
+    AcceptedRiskSpyOrderLevelV1QcRuntime as AcceptedRiskSpyOrderLevelQcRuntime,
+    STARTING_CASH,
+)
+from accepted_risk_order_level_core import MODELED_FEE_RATE_PER_SIDE
+
+
+class Arv2TenBpsFeeModel(FeeModel):
+    def get_order_fee(self, parameters):
+        price = Decimal(str(parameters.security.open))
+        quantity = abs(Decimal(str(parameters.order.absolute_quantity)))
+        if not price.is_finite() or price <= 0 or not quantity.is_finite():
+            raise RuntimeError("ARV2 fee input is invalid")
+        return OrderFee(CashAmount(
+            price * quantity * MODELED_FEE_RATE_PER_SIDE,
+            "USD",
+        ))
+
+
+class ARV2SpyOrderLevelAlgorithm(QCAlgorithm):
+    def initialize(self):
+        self.set_time_zone("America/New_York")
+        self.settings.daily_precise_end_time = True
+        self.set_start_date({start[0]}, {start[1]}, {start[2]})
+        self.set_end_date({end[0]}, {end[1]}, {end[2]})
+        self.set_cash(STARTING_CASH)
+        self.universe_settings.asynchronous = False
+        self.universe_settings.resolution = Resolution.MINUTE
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.RAW
+        spy_benchmark = self.add_equity(
+            "SPY",
+            Resolution.MINUTE,
+            fill_forward=False,
+            leverage=1,
+            extended_market_hours=True,
+            data_normalization_mode=DataNormalizationMode.RAW,
+        ).symbol
+        self.set_benchmark(spy_benchmark)
+        spy_constituent_universe = self.add_universe(
+            self.universe.etf(
+                spy_benchmark,
+                self.universe_settings,
+                self._arv2_accept_spy_constituents,
+            )
+        )
+        self._arv2_driver = AcceptedRiskSpyOrderLevelQcRuntime(
+            self,
+            activation_manifest_key={activation_manifest_key!r},
+            activation_manifest_sha256={activation_manifest_sha256!r},
+            activation_manifest_byte_count={activation_manifest_byte_count},
+            profile_id={profile['profile_id']!r},
+            authority_benchmark_symbol=spy_benchmark,
+            spy_benchmark_symbol=spy_benchmark,
+            spy_constituent_universe=spy_constituent_universe,
+            minute_resolution=Resolution.MINUTE,
+            raw_normalization=DataNormalizationMode.RAW,
+            trade_bar_type=TradeBar,
+            daily_resolution=Resolution.DAILY,
+            total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
+            fee_model_factory=lambda: Arv2TenBpsFeeModel(),
+            slippage_model_factory=lambda: NullSlippageModel(),
+            order_status_enum=_arv2_reflected_order_status(OrderStatus),
+        )
+        self._arv2_driver.initialize()
+        self.schedule.on(
+            self.date_rules.every_day(spy_benchmark),
+            self.time_rules.after_market_close(spy_benchmark, 0),
+            self._arv2_driver.on_after_close,
+        ){preopen_schedule_source}
+
+    def _arv2_accept_spy_constituents(self, constituents):
+        if not hasattr(self, "_arv2_driver"):
+            return []
+        return self._arv2_driver.accept_spy_constituents(constituents)
+
+    def on_data(self, data):
+        self._arv2_driver.on_data(data)
+
+    def on_securities_changed(self, changes):
+        self._arv2_driver.on_securities_changed(changes)
+
+    def on_order_event(self, event):
+        engine_order = self.transactions.get_order_by_id(event.order_id)
+        self._arv2_driver.on_order_event(
+            event, engine_order=engine_order,
+        )
+
+    def on_end_of_algorithm(self):
+        self._arv2_driver.on_end_of_algorithm()
+'''
+    return source.encode("ascii")
+
+
 def _main_source(
     *,
     activation_manifest_key: str,
@@ -859,6 +1097,14 @@ def _main_source(
     profile: dict[str, object],
 ) -> bytes:
     """Render the thin QC entry after the runtime interface is authenticated."""
+
+    if profile.get("profile_id") in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return _spy_main_source(
+            activation_manifest_key=activation_manifest_key,
+            activation_manifest_sha256=activation_manifest_sha256,
+            activation_manifest_byte_count=activation_manifest_byte_count,
+            profile=profile,
+        )
 
     engine_order_profile = profile.get("profile_id") in _ENGINE_ORDER_PROFILE_IDS
     try:

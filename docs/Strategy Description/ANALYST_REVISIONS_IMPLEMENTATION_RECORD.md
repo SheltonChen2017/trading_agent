@@ -25,7 +25,10 @@ reconciled terminal state, a six-picodollar reported residual, and
 `run_valid=false` by construction; no cell was added. Section 168 is Codex's
 counter-review of Claude's five-commit `3243ae1..0132031` range, an independent
 safe re-read of the Mia-edited R-172 project, the prospective V19 correction,
-and the exact preregistration for the next 2025-now order-based diagnostic.
+and R-175: the exact V19 order-based diagnostic completed, authenticated its
+two custom aggregates, corrected the executed-decision census from 85 covered
+to 84 actually submitted decisions, and retained `run_valid=false`; no cell
+was added.
 Codex uses focused checks during development and QC work; Claude runs the
 complete lane suite during independent review unless the owner explicitly
 asks Codex to run it. Section 150 is the independent Claude review of
@@ -521,10 +524,10 @@ project, corrects the V17/V18 evidence defects prospectively in immutable V19,
 and freezes exact R-175 identities before network mutation; the owner
 explicitly waives interim Claude review of section 168 until its one
 preregistered run is recorded, after which Claude reviews the pushed round.
-The exact next step is to commit section 168 and its V19 source locally,
-launch that one preregistered order-based diagnostic, record only its permitted
-terminal/custom aggregate evidence, then make the round's one push for Claude
-review. Only authenticated
+R-175 is now recorded as `Completed.` with `run_valid=false` and zero cells.
+The exact next step is to finish focused post-result validation, make the
+round's one push, and hand section 168 and the exact pushed snapshot to Claude
+for independent review. Only authenticated
 `Completed.` may be followed by a separately
 rendered, committed, signed, and consumed one-use aggregate-only result
 authority. V15
@@ -2245,6 +2248,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-21 | Claude review and live-state update | `8ba0213` -> this commit | Independent review of the section-151 counter-review, V14 through V16, and R-169 through R-172 (`87dd82f..8ba0213`, seventeen commits) | Synced the lane worktree by fast-forward from a clean tree on this Windows host and reviewed the range commit by commit and cumulatively (section 165); accepted with no code correction, so this push is record-only and the implementation tree at `323829f` is unchanged. Verified rather than accepted: V14/V15/V16 runtime blob SHA-256s reproduce the record's byte-identity claims; R-171 and R-169 arithmetic reconciles exactly at 40 digits (ending equity, spread, calendar shortfall, the $267.573 gap, the exact mean complement, 10 bps per fill); look accounting closes 126/69/27/607 to 132/75/27/608; the shared ledger is append-only across the range; frozen blobs, gates and the 45-module core closure unchanged; the V15-to-V16 diff shows only representation and profile-gate changes, no economic rule; section 151's dispositions of the other session's three commits confirmed against their diffs. | Real-tree collectable subset on `8ba0213` **408 failed, 3764 passed, 76 skipped, 77 errors in 5982.43s (1:39:42)** with 56 files uncollectable (`ARV2R165-001`); the retained failure tail is the Sharadar adapter's own POSIX precondition refusal plus `ARV2R165-004`, and the range changed no module whose tests collect here except the record-gate test. Active-document and lane-record gates **76 passed**; compileall exit 0; `git diff --check` clean. Execution evidence for this range's code was obtained in a scratch worktree with two local, uncommitted accommodations (a fail-closed `_flock` helper where `fcntl` is absent; the adapter's own `O_NOFOLLOW` conditional idiom applied to `register_at_fork`), under which the standing selection collects 7,108 tests with zero errors: focused V14/V15/V16/projection/adapter batteries **301 passed, 132 failed**, every failure in a named host class (three CRLF immutability hashes, 67 CRLF projection size-guard refusals, 62 POSIX adapter permission semantics) and none a defect in the range; mutation matrix on the V15 and V16 batteries: six of seven invariant mutations killed by distinctly named tests (the R-169 complement counterexample, LEAN `is_delisted`, zero-share reappearance, terminal composition, starting cash, target gross-sum), and the seventh (`gross` bound) proven equivalent because the V14 helper refuses the same input one call later. Zero research looks and zero development evaluations; no provider, credential, licensed row, production input, price, return, outcome, broker, operator database, QuantConnect, Object Store, deployment, order or trading access. | 0 P0, 0 P1. `ARV2R165-001` (P2, documented): the standing lane suite cannot be collected or passed on a Windows host: `fcntl` imported at module level in the protocol, `os.register_at_fork` hard-pinned in the adapter's sealing snapshot, and two CRLF classes (raw-byte immutability hashes in the V14 to V16 tests; the projection's size guard); 56 test files fail at import and every complete-suite figure since section 74 was Mac-only. Resolved by owner decision the same day: development has moved to the Mac and the physical layer is POSIX-only by design; no port is scheduled, the exact diffs are recorded for optional later use, and this Windows session verifies physical-layer ranges by source reading, blob-hash reproduction, arithmetic and scratch execution. `ARV2R165-002` (P2, documented): R-171's +1.2045 pp is measured against the QQQ ETF from a portfolio that is a QQQ replica with about 2% active share on 21 of 39 weeks; the tilt would need roughly +80% relative return to explain it, so the spread is replica-versus-ETF tracking until a tilt-off control run exists. `ARV2R165-003` (P3): `ARV2D163-002` confirmed; the 2025 profile has no behavioural split path in the V15/V16 batteries. `ARV2R165-004` (P3, documented): one research-core preregistration test fails on Windows because the 137-character look-ledger filenames exceed the 260-character path limit under pytest while the lineage capture's isolation discards the system `core.longpaths`; proven red/green, not in this range (passes at `5246a41`, fails at `87dd82f`), fail-closed, one-line `-c core.longpaths=true` fix handed to Codex. `ARV2CR28-008` remains out of lane. | Codex counter-reviews this record commit. R-172's diagnosis is with QuantConnect's Mia at the owner's direction; any fix must land as a versioned successor leaving V16 byte-identical, and this session verifies it when asked. No fourth R-172 attempt, result read, leverage, six-universe expansion, deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-09-21 | Claude Mia-code review, V17 successor, R-173 diagnostic launch, and live-state update | `3243ae1` -> `5223ba8` -> this commit | Owner-requested review of the Mia-modified project `36790168`, root cause of the three R-172 refusals, the lane's immutable fail-closed V17 successor, one owner-authorized diagnostic QC launch, and section 166 | Retrieved the 21-file project (15 modules byte-identical to the frozen R-172 projection; `main.py` differs only by the V20 binding and profile id; four Mia runtime files and a notebook), reconstructed the frozen R-172 `main.py` (5,938 bytes; sizes sum to 370,919), and read the sixteen backtests' status and error text only. Root cause: the V12 exact age-1 point-in-time census refused deterministically at the first 2025 decision because the backtest serving path withheld the 2025-01-04 stamp; the later 2025 conditions (age 3, the ORLY split drift, the October stall, the percent-scaled 2025-11-01 stamp) are all V16 refusals by design. Mia's V17 through V20 (date allowlists to age 15, split re-basing, weight rescale by 100) and her `main.py` are all refused by the lane firewall and are not ported; the owner-reported 39.2% is NOT ADMISSIBLE. Implemented `accepted_risk_qqq_order_level_v17_qc_runtime.py` (SHA-256 `8049d90e...10e5`; V16 blob unchanged `998cb19b...877e`): stale snapshot, out-of-band weight total and overnight holdings drift become counted, recorded no-order skips with `run_valid=false`; projection and closure pins register the V17 family and a 400,000-byte ceiling. Launched R-173 (project `36809007`, backtest `0d4ff088...`, 17 files / 394,221 bytes hash-verified after upload): the run passed the whole 2025-now schedule and refused at V15's terminal account composition identity at 2026-09-18 00:00. | LF scratch worktree: V17 battery **32 passed**; V16 plus projection batteries **127 passed, 11 failed** (all the isolated-subprocess `tzdata` host class, `ARV2R166-008`); adapter profile-list subset **15 passed**; mutation matrix **8 of 8 killed**. Real tree at `5223ba8`: closure pins **5 passed**; `compileall` exit 0; `git diff --check` clean; V17 and adapter batteries uncollectable through the `fcntl` chain (`ARV2R165-001`). Active-document and lane-record gates **76 passed**. QC access: administrative reads (project list, files, backtest status/error), one fresh project, one compile, one backtest, status-only polling; no standard statistic, chart, order, log, price, provider row or return read. Looks: 132/75/27/608 -> 148/91/27/608 (fifteen owner-directed Mia launches counted, plus R-173). | 0 P0. `ARV2R166-001` (P1): deterministic refusal retried three times; retry rule should stop after identical refusals. `ARV2R166-002` (P1): Mia's changes weaken the census and are firewall-refused; not ported. `ARV2R166-003`/`-004` (P2): fifteen unaccounted launches in a reused project; direct project edits bypass every control. `ARV2R166-006` (P2): formal adapter lacks V17 registration (exact rules listed). `ARV2R166-009` (P2): R-173 refused at the V15 terminal composition identity; residual unobservable. `ARV2R166-005`/`-007`/`-008`/`-010` (P3): scratch persistence of list rows (deleted unread); comparator entry versus a skipped first decision; `tzdata` host class; aggregate transport margin unmeasured in production. | Codex counter-reviews section 166, `5223ba8` and this commit. No second R-173 attempt from this session; a successor for `ARV2R166-009` must be preregistered and owner-directed; a formal V17 cell needs `ARV2R166-006` and a Mac launch. No fourth R-172 attempt, result read, leverage, six-universe expansion, deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-09-21 | Claude review of Mia's terminal diagnosis, V18 successor, R-174 diagnostic launch, and live-state update | `d48b5dd` -> `90a68ee` -> this commit | Owner-directed follow-up to section 166: retrieval of the Mia-edited R-173 project `36809007`, confirmation of the decimal-to-double boundary root cause, the lane's immutable bounded-boundary V18 successor, one owner-authorized diagnostic launch, and section 167 | Retrieved 18 files (the 17 R-173 files byte-identical; Mia's 3,432-byte `v18` and a 7,196-byte diagnostic `main.py`) and six backtests' status and error text only. Confirmed from the code that every runtime money read crosses LEAN's decimal-to-double boundary, so V15's exact terminal identity was ill-posed (`ARV2R167-001`); rejected Mia's fix, which rebuilds equity from its components and redefines cash, and her firewall-refused diagnostics that left `arv2/diag/composition.txt` in the Object Store. Implemented `accepted_risk_qqq_order_level_v18_qc_runtime.py` (SHA-256 `40d38321...3bc1`; V17 blob unchanged `8049d90e...10e5`; V16 unchanged): the engine's equity stays authoritative, the identity is judged against a derived 1E-8-dollar bound below 2**24 dollars, the residual is reported, larger residuals and larger equity refuse; projection and closure pins register the V18 family and a 410,000-byte ceiling. Launched R-174 (project `36811274`, backtest `dade3f38...`, 18 files / 407,068 bytes hash-verified): `Completed.`; the two custom aggregates were read once and reproduce the six-picodollar residual, 91 scheduled / 85 executed decisions, 7 skips, `run_valid=false` by construction, and an 8,002-byte aggregate against the 8,192-byte transport. Section 166.5's first-decision statement is corrected (`ARV2R167-008`). | LF scratch worktree at `d48b5dd` plus the round's files: V18 and V17 batteries **59 passed**; projection, V18, V17 and V16 batteries **161 passed, 11 failed** (all the isolated-subprocess `tzdata` host class); adapter profile-list subset **15 passed**; mutation matrix **7 of 7 killed**. Real tree at `90a68ee`: closure pins **5 passed**; `compileall` exit 0; `git diff --check` clean; runtime batteries uncollectable through the `fcntl` chain (`ARV2R165-001`). Active-document and lane-record gates **76 passed**. QC access: administrative reads, one fresh project, one compile, one backtest, status-only polling, one read of the two custom statistics; no standard statistic, chart, order, log, price, provider row or return read; no Object Store write or delete. Looks: 148/91/27/608 -> 154/97/27/608 (five owner-directed Mia launches counted, plus R-174). | 0 P0. `ARV2R167-001` (P1, lane-wide): money reads cross a float boundary; exact sum identities are ill-posed; V18 bounds the terminal one. `ARV2R167-002` (P1): Mia's tautological fix and forbidden diagnostics, not ported. `ARV2R167-003`/`-004` (P2): five unaccounted launches; an Object Store diagnostic file for the owner to delete. `ARV2R167-006` (P2): aggregate transport margin is 190 bytes; the next successor must raise or trim before adding a field. `ARV2R167-007` (P2): adapter lacks V17 and V18 registration. `ARV2R167-005`/`-008` (P3): `tzdata` host class; section 166.5 erratum. | Codex counter-reviews sections 166 and 167 and their four commits. No second R-174 attempt is needed; any further 2025-now run is a preregistered successor that also resolves `ARV2R167-006`; a formal V18 cell needs `ARV2R167-007` and a Mac launch. No result read beyond the two custom aggregates, leverage, six-universe expansion, deployment, broker, funded-account, real-order or trading action is authorised. |
+| 2026-09-21 | Codex counter-review, V19 successor, and R-175 diagnostic | `0132031` -> this record commit | Counter-review Claude's five commits, independently re-read the Mia-edited R-172 project, correct verified V17/V18 evidence defects prospectively, and start the next order-based QC round | All five commits accepted, four after prospective/documentation correction. V19 (`f79ea5c7...cb68`) preserves economics while fixing context-sensitive residual magnitude, complete finite holding-drift census, actual-submission evidence, forced-exit-invalidated accounting, all-skipped refusal, and the 16,384-byte transport. R-175 used fresh project `36819225`, exact 19-file/427,396-byte source, `BuildSuccess`, and one launch; it completed and authenticated only the two custom aggregates. The corrected census is 91 scheduled / 85 covered / 84 submitted / 84 completed with seven skips, so `run_valid=false` and zero cells; diagnostic return +39.339989% versus +39.590711% execution-matched QQQ. | Focused pushed-head baseline **231 passed**; final V19 runtime/projection/closure audit **190 passed**; narrower changed-behavior selection **18 passed**; lane-record gate **7 passed**; `compileall` and diff checks clean. No complete lane suite by owner rule. QC access: one hardened source upload/readback, compile, backtest, statistics-disabled polling, and one bounded two-statistic read; no standard statistic, chart, order, log, provider row, price, Object Store mutation, broker, deployment, real order, or trading access. Accounting closes **155 / 98 / 27 / 608**. | 0 open P0-P2 after correction. `ARV2CR168-001..009` record three V17 census/evidence defects, the V18 ambient-context defect, one wording correction, three prelaunch V19 test/audit corrections, and the discarded default-opener administrative read. | Push this same-lane round exactly once. Claude independently reviews section 168 and R-175. Any formal successor requires reviewed V19 adapter registration and a prospectively valid schedule; R-175 cannot be upgraded retroactively. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -21334,7 +21338,8 @@ earlier runtime remain byte-identical.
 At the reviewed pushed head, the V17, V18, projection, and closure selection
 was **231 passed**. The final V19 runtime/projection/closure audit selection,
 including the independent-audit corrections above, is **190 passed in
-89.73 s**; the narrower changed-behavior selection is **18 passed**.
+84.77 s** on the final tree (the independent audit separately reproduced the
+same 190 in 89.73 s); the narrower changed-behavior selection is **18 passed**.
 `compileall` and `git diff --check` are clean.
 Per the owner and machine-wide rule, Codex does not run the complete lane
 suite; Claude performs that suite during independent review.
@@ -21367,10 +21372,54 @@ ARV2 development evaluation: **154 -> 155 shared looks / 97 -> 98 ARV2
 development evaluations / 27 infrastructure looks / 608 authenticated
 cells**. A completed `run_valid=false` diagnostic still adds zero cells.
 
-### 168.7 Next gate
+### 168.7 R-175 execution and result
 
-Commit the exact counter-review, V19 source/tests/projection, and this
-preregistration locally; then launch R-175 once. Record its terminal state and,
-only if `Completed.`, its two authenticated custom aggregates. Run focused
-post-result checks, update the push ledger and shared result ledger, and make
-the round's one same-lane push. No complete lane suite is run by Codex.
+The preregistered source was committed locally at `18602cb` before any cloud
+mutation. The hardened transport proved the exact project name absent, then
+created and populated the fresh private project. Cloud readback matched all
+19 paths, 427,396 bytes, every per-file hash, and manifest
+`7b677a04...c5b`. No Object Store call was made.
+
+| Field | Observed result |
+|---|---|
+| Project | `98 ARV2_QQQ_V19_ORDER_R175_A1_2025_NOW - 20260921`, id `36819225`, fresh |
+| Compile | `f9c2b9fbc5b3d8774042245a1aa1de56-831b6afe70ee37d73780cd28cd47b46f`, `BuildSuccess` |
+| Backtest | `ARV2 R175A1 QQQ V19 order 2025 now f79ea5c7`, id `43867152786330f353bc485be3cbea5e` |
+| Terminal | `Completed.` after statistics-disabled status polling; one launch, no retry |
+| Bounded read | Exactly `ARV2_ORDER_LEVEL_META` and `ARV2_ORDER_LEVEL_AGGREGATES`; 995 and 8,138 bytes; text SHA-256s `4567037c2a784eea968961e3837e375180affb8e1370a70a07d08e4b78bd2ced` and `dbe1d9ae0c94c7781f885566a2bf9a03793732a003626c04ec248002cdf76be3`; canonical aggregate hash reproduces the meta binding |
+| Identity | Profile `...2025-cutoff-v19` / `a27018fb...fb2f`; package `arv2-preliminary-qc-package-7803b84f0841f9685a4951de` / `7803b84f...4e1f`; aggregate schema `arv2-qqq-order-level-tilt-summary-v14` |
+
+V19 reports **91 scheduled decisions**, 85 PIT-covered decisions, **84 actually
+submitted decisions**, 84 completed rebalances, 5 stale-snapshot skips, 1
+weight-total skip, and 1 overnight-drift skip. The new identity reconciles:
+84 submitted decision sessions plus the one drift-skipped execution equals
+85 covered decisions; no unpriced decision or forced-exit-invalidated pending
+plan occurred. The first scheduled/actual decision is 2025-01-02. All **5,065
+submitted orders filled**, with zero canceled/invalid orders; modeled and
+engine fees both equal **$5,957.590315** on $5,957,590.315 filled notional.
+The terminal composition residual is exactly `0.000000000006` dollars within
+the `0.00000001` bound.
+
+The diagnostic economics are byte-for-byte consistent with R-174's path:
+strategy total return **+39.3399891603%** versus execution-matched QQQ
+**+39.5907114055%**, a **-0.2507222452 percentage-point** spread; calendar-
+close QQQ is +41.3578190228%. Maximum drawdown is -22.0165793444% versus
+-22.3373534133%; zero-rate Sharpe 1.000707 versus 1.004856; mean gross
+exposure 96.7557%, mean one-way active share 1.5407%, and mean tilted-name
+count 45.05. These are diagnostic figures only. Seven scheduled decisions did
+not follow the original complete schedule, so `schedule_complete=false` and
+`run_valid=false`; R-175 adds no authenticated cell and is not evidence for or
+against the tilt's alpha.
+
+R-175 spends **154 -> 155 shared looks / 97 -> 98 ARV2 development
+evaluations**, with **27 infrastructure looks / 608 authenticated cells**
+unchanged. It used attempt one only; attempts two and three are unnecessary.
+
+### 168.8 Next gate
+
+Run the focused post-result checks, update the push ledger and shared result
+ledger, and make the round's one same-lane push. Claude then independently
+reviews section 168, V19, and R-175. A future formal result needs a separately
+reviewed profile/adapter registration and a candidate capable of
+`run_valid=true`; this diagnostic cannot be upgraded retroactively. No
+complete lane suite is run by Codex.

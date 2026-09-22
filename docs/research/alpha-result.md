@@ -4019,3 +4019,42 @@ transport-margin resolution (`ARV2R167-006`), and a Mac launch through the
 signed protocol. No result read beyond the two custom aggregates, parameter
 tuning, leverage, six-universe expansion, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
+
+## R-175 — V19 corrected-evidence 2025-now QQQ order run (DIAGNOSTIC; COMPLETED; run_valid=false; ZERO CELLS) — 2026-09-21
+
+R-175 is the preregistered order-based diagnostic of immutable V19, SHA-256
+`f79ea5c77753ccce6a14e21c67fc619d7923ae8ed3a11f78cb3cab35258fcb68`,
+on the unchanged 2025-01-02 through 2026-09-16 window. V19 changes no strategy
+economics. It makes the terminal residual comparison context-independent,
+turns complete-census holding drift into the declared counted no-order skip,
+records actually submitted decisions, reconciles forced-exit-invalidated
+plans, explicitly refuses an all-skipped path, and raises only its exact
+profile's custom-statistic bound to 16,384 bytes.
+
+Fresh private project `98 ARV2_QQQ_V19_ORDER_R175_A1_2025_NOW - 20260921`
+(`36819225`), 19 files / 427,396 bytes, was read back byte-for-byte with
+manifest SHA-256
+`7b677a04469eda4e0e7fea9a27fa11d974b7fdafee7596434c84cc164c6b8c5b`.
+Compile `f9c2b9fbc5b3d8774042245a1aa1de56-831b6afe70ee37d73780cd28cd47b46f`
+was `BuildSuccess`; backtest `ARV2 R175A1 QQQ V19 order 2025 now f79ea5c7`,
+id `43867152786330f353bc485be3cbea5e`, completed on attempt one. One bounded
+read retained only the two custom statistics: 995-byte meta SHA-256
+`4567037c2a784eea968961e3837e375180affb8e1370a70a07d08e4b78bd2ced`
+and 8,138-byte aggregate SHA-256
+`dbe1d9ae0c94c7781f885566a2bf9a03793732a003626c04ec248002cdf76be3`.
+
+The corrected census reports 91 scheduled, 85 covered, **84 actually
+submitted**, and 84 completed decisions; 5 stale, 1 weight-total, and 1
+overnight-drift skip; 5,065 submitted and filled orders with zero
+canceled/invalid; modeled and engine fees both $5,957.590315. Strategy return
+is **+39.3399891603%** versus execution-matched QQQ **+39.5907114055%**
+(-0.2507222452 percentage points), with drawdown -22.0166% versus -22.3374%
+and zero-rate Sharpe 1.0007 versus 1.0049. The unchanged six-picodollar
+terminal residual is within the 1E-8-dollar bound. Because the seven skipped
+scheduled decisions make `schedule_complete=false` and `run_valid=false`,
+these remain diagnostic figures and add **zero cells**.
+
+R-175 spends **154 -> 155 shared looks / 97 -> 98 ARV2 development
+evaluations**, keeping **27 infrastructure looks / 608 authenticated cells**.
+No retry is needed. No formal acceptance, leverage, deployment, broker,
+paper/live, funded-account, real-order, or trading authority follows.

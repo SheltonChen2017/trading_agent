@@ -20,7 +20,12 @@ R-173 diagnostic launch that ran the whole 2025-now schedule and refused
 at the untouched V15 terminal composition identity; no cell was added.
 Section 167 records the review of Mia's terminal-identity diagnosis, the
 immutable bounded-boundary V18 successor committed at `90a68ee`, and the
-R-174 diagnostic launch; R-174 completed the whole 2025-now schedule with a reconciled terminal state, a six-picodollar reported residual, and `run_valid=false` by construction; no cell was added.
+R-174 diagnostic launch; R-174 completed the whole 2025-now schedule with a
+reconciled terminal state, a six-picodollar reported residual, and
+`run_valid=false` by construction; no cell was added. Section 168 is Codex's
+counter-review of Claude's five-commit `3243ae1..0132031` range, an independent
+safe re-read of the Mia-edited R-172 project, the prospective V19 correction,
+and the exact preregistration for the next 2025-now order-based diagnostic.
 Codex uses focused checks during development and QC work; Claude runs the
 complete lane suite during independent review unless the owner explicitly
 asks Codex to run it. Section 150 is the independent Claude review of
@@ -507,12 +512,19 @@ byte-identical attempts ending in the same statistics-disabled `Runtime Error`
 without reading an error log or result. The R-172 launch budget is exhausted;
 there must be no fourth attempt. The owner explicitly waives Claude review of
 section 163 before the standing Mia recovery step. Section 164 freezes the
-round's review handoff; Claude must review section 164 and the exact pushed
-range after the one allowed push. Section 165 completes that review and accepts the exact pushed snapshot with no code correction; Codex must counter-review section 165 and that record commit before any later milestone. Section 166 completes the owner-requested Mia-code review: Mia's four files are documented and rejected, the lane's immutable V17 fail-closed successor is committed at `5223ba8`, and the R-173 diagnostic launch ran the whole 2025-now schedule under V17 and refused at the V15 terminal account composition identity; Codex must counter-review section 166 and both of its commits. Section 167 completes the owner-directed follow-up: Mia's terminal diagnosis is confirmed and her tautological fix rejected, the lane's immutable V18 bounded-boundary successor is committed at `90a68ee`, and the R-174 diagnostic launch is recorded; Codex must counter-review section 167 and its two commits before any further launch, R-172 is closed as diagnosed, and no second R-174 attempt is needed because the run completed; any further 2025-now run is a preregistered successor that also resolves the 190-byte aggregate transport margin (`ARV2R167-006`). Operationally, the owner must unlock the
-Mac, after which Codex can ask Mia to diagnose the existing attempt-3 project
-`36790168`; alternatively the owner may run Mia and return its findings and
-corrections. Only a prospectively documented, corrected successor may launch
-after diagnosis. Only authenticated
+round's review handoff. Section 165 completes Claude's review and accepts that
+exact pushed snapshot with no code correction. Sections 166 and 167 record
+Claude's Mia-code review, immutable V17/V18 successors, and the completed
+R-173/R-174 diagnostics. Section 168 completes Codex's counter-review of all
+five Claude commits, independently reauthenticates the current Mia-edited
+project, corrects the V17/V18 evidence defects prospectively in immutable V19,
+and freezes exact R-175 identities before network mutation; the owner
+explicitly waives interim Claude review of section 168 until its one
+preregistered run is recorded, after which Claude reviews the pushed round.
+The exact next step is to commit section 168 and its V19 source locally,
+launch that one preregistered order-based diagnostic, record only its permitted
+terminal/custom aggregate evidence, then make the round's one push for Claude
+review. Only authenticated
 `Completed.` may be followed by a separately
 rendered, committed, signed, and consumed one-use aggregate-only result
 authority. V15
@@ -526,7 +538,7 @@ snapshot. R-138 remains unlaunched/unspent.
 No formal order-level result, alpha acceptance, leverage, six-universe
 expansion, real order, paper/live deployment, funded-account, broker, or
 trading authority follows from R-168, R-169, or R-170. The economic figures in
-sections 148 and 154 came from bounded diagnostic aggregate reads and must
+sections 148, 154, and 167 came from bounded diagnostic aggregate reads and must
 retain that label.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
@@ -20657,8 +20669,9 @@ lane and unfixed.
 The owner reported that, after Codex's three byte-identical R-172 attempts,
 QuantConnect's built-in assistant Mia changed the code inside the reused
 attempt-3 project `95 ARV2_QQQ_EXPOSURE_ORDER_R172_A3_2025_NOW - 20260921`
-(project `36790168`) until a run completed, and that the owner read a
-`39.2%` annual return from that run. The owner asked this session to (1)
+(project `36790168`) until a run completed, and that the owner read an
+unlabelled `39.2%` standard statistic from that run. The owner asked this
+session to (1)
 retrieve the project's code, (2) compare it with the local lane code, (3)
 apply the corrections needed to meet the project's safety standard, (4) run
 the revised code in QC, and (5) document what made the three attempts fail
@@ -21216,3 +21229,148 @@ through the signed protocol. No result read beyond the two custom
 aggregates, leverage, six-universe expansion, paper/live deployment, broker,
 funded-account, real-order or trading action is authorised, and
 `ARV2CR28-008` remains out of lane.
+
+## 168. Codex counter-review, independent Mia-project retrieval, immutable V19 successor, and R-175 preregistration, 2026-09-21
+
+### 168.1 Owner request, reviewed range, and dispositions
+
+The owner asked Codex to counter-review Claude's completed review, retrieve
+the source from the Mia-edited R-172 QuantConnect project, incorporate only
+verified lane corrections from both sources, and start the next round of
+backtesting. The exact reviewed range is `3243ae1..0132031`, five commits on
+the same lane:
+
+| Commit | Disposition | Counter-review basis |
+|---|---|---|
+| `3243ae1` | **Accepted.** | The independent review of the earlier V14--V16/R-169--R-172 range is evidence-consistent; its Windows-host limitations and result caveat remain documented. |
+| `5223ba8` | **Accepted after prospective correction.** | V17's fail-closed skip design is sound, but its tracked-name-only preopen comparison did not implement the complete-census promise, an all-skipped window could not emit the described invalid aggregate, and first-executed evidence came from coverage rather than actual submission. V17 remains immutable; V19 corrects these boundaries. |
+| `d48b5dd` | **Accepted after documentation correction.** | The R-172/Mia diagnosis and R-173 evidence reproduce. The owner-read `39.2%` had no retained label, so this record and the shared ledger now call it an unlabelled standard statistic, not an annualized return. |
+| `90a68ee` | **Accepted after prospective correction.** | V18 correctly preserves engine equity and bounds the float-boundary residual, but Python `abs(Decimal)` obeys the ambient Decimal context. At precision 3 with `ROUND_DOWN`, `1.00000001E-8` becomes `1.00E-8` and passes the `1E-8` check. V19 uses context-independent `copy_abs()`. |
+| `0132031` | **Accepted after correction.** | R-174's source/run/result evidence and accounting reconcile. The section-167 claim that the residual check ignored a hostile ambient context was too broad; its test did not isolate the just-over-bound case. V19 adds that red/green proof. |
+
+No frozen V16, V17, or V18 byte was changed. These are lane-specific
+evidence/runtime defects and are corrected only by the versioned V19
+successor.
+
+### 168.2 Independent read of the current Mia-edited R-172 project
+
+Codex independently re-read private project `36790168`, exact name
+`95 ARV2_QQQ_EXPOSURE_ORDER_R172_A3_2025_NOW - 20260921`. The authoritative
+replay used the lane's redirect-refusing, response-bounded HTTPS transport
+and only `files/read`; it read no backtest result, standard statistic, chart,
+order, log, provider row, price, return, or Object Store value and made no
+cloud mutation. The current project is exactly **21 files / 423,903 bytes**:
+
+- the reconstructed frozen R-172 baseline is 16 files / 370,919 bytes,
+  projection SHA-256
+  `75027faaf39434a4e7a2fe5b1744feb857370d275e3f43531148283ac771f7ba`,
+  with all fifteen non-main modules byte-identical to the local closure;
+- cloud `main.py` is 6,014 bytes, SHA-256
+  `8c1b290fc20f95591f456e1c0a651a6eb88114ea2dfe8f3ea72a770ec42324b8`,
+  differing from the reconstructed main only by its Mia V20 import/binding
+  and profile id;
+- the cloud-only Mia runtimes V17/V18/V19/V20 have byte counts
+  6,604 / 10,455 / 9,139 / 12,060 and SHA-256 prefixes
+  `4e318c9e`, `c91a080c`, `0a8d9071`, and `50d4db6e`; `mia.ipynb` is
+  14,650 bytes, prefix `3ec81372`.
+
+This exactly reproduces Claude's section-166 inventory, so there was no
+post-review cloud edit to import. The Mia runtime files remain
+firewall-refused and were **not copied**: they relax stale-snapshot ages,
+re-base holdings after a split, and rescale percent-shaped weights. Their
+useful diagnoses were instead applied prospectively without those economic
+relaxations. An initial administrative re-read in this session used the
+repository client's default opener before the hardened replay; no redirect
+was reported, its response was discarded as authority, and every identity
+above comes from the safe replay (`ARV2CR168-009`).
+
+### 168.3 V19: prospective evidence correction with unchanged economics
+
+`research/analyst_revisions_v2_qc/accepted_risk_qqq_order_level_v19_qc_runtime.py`
+is the immutable V19 candidate, **20,337 bytes**, SHA-256
+`f79ea5c77753ccce6a14e21c67fc619d7923ae8ed3a11f78cb3cab35258fcb68`.
+It subclasses V18 and changes no universe, score, tilt, target exposure,
+sizing, order type/timing, fee, benchmark, or return rule. It makes only
+these prospective evidence corrections:
+
+1. compare the terminal composition residual with `Decimal.copy_abs()`, so
+   the inclusive `1E-8` boundary is independent of ambient precision;
+2. inspect the complete finite nonzero holding census before V17's
+   whole-share partial read, so a tracked or untracked integer, fractional,
+   or signed drift becomes the same counted no-order skip while malformed or
+   non-finite input still refuses;
+3. record executed decision sessions only after the inherited preopen
+   submission returns successfully, and reconcile executed, unpriced,
+   drift-skipped, and forced-exit-invalidated decisions exactly;
+4. refuse an all-skipped window explicitly before terminal observation or
+   output instead of fabricating coverage; and
+5. bind this profile family to a 16,384-byte per-statistic transport, with
+   the 16,384/16,385 boundary isolated by a test.
+
+Profiles `arv2-qqq-order-level-tilt-2025-cutoff-v19` and
+`...-2026-cutoff-v19` have SHA-256s
+`a27018fbf8e0df77240988890a43702a19d561a7d90e24a840b5c0c220f1fb2f`
+and `4c32ec5f90c7c5abe6f23c909a2ea3c2745dd3377b1650991c9559aef1e44195`.
+The source projection, firewall, generated main, profile-specific 430,000-byte
+ceiling, and whole-package no-I/O closure register V19. V17/V18 and every
+earlier runtime remain byte-identical.
+
+### 168.4 Counter-review findings
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| `ARV2CR168-001` | P2 | V17 compared only plan-tracked names before delegating to the predecessor's fatal complete census; a new nonzero holding therefore aborted instead of producing the declared drift skip. | Corrected prospectively in V19; isolated integer, fractional, signed, and tracked-fraction cases. |
+| `ARV2CR168-002` | P2 | An all-skipped schedule reached the predecessor's nonempty-coverage guard before V17 could emit its promised invalid aggregate. | V19 explicitly refuses the unsupported all-skipped aggregate before terminal mutation/output. |
+| `ARV2CR168-003` | P3 | V17's first-executed field used the first PIT-coverage row, so a skipped first decision could be labelled executed. | V19 records only actually submitted decision sessions. |
+| `ARV2CR168-004` | P2 | V18's `abs(residual)` comparison can round a just-over-bound Decimal down under a hostile ambient context. | V19 uses `copy_abs()`; red/green boundary test added. |
+| `ARV2CR168-005` | P3 | The owner-read Mia statistic was described as annualized without retaining the statistic label. | Corrected to “unlabelled standard statistic” in both durable records. |
+| `ARV2CR168-006` | P2 | The first V19 draft still let a fractional tracked/untracked holding hit the inherited whole-share refusal before the new drift census. | Corrected before preregistration: finite complete census now runs first. |
+| `ARV2CR168-007` | P2 | The first V19 executed-session identity omitted a pending plan invalidated by a forced-delisting event, an inherited valid non-execution path. | Corrected before preregistration and isolated by test. |
+| `ARV2CR168-008` | P3 | A 16,384-byte declaration without a 16,384/16,385 test would repeat the guard-without-isolation weakness identified by Claude. | Inclusive boundary now directly tested. |
+| `ARV2CR168-009` | P3 | The first administrative Mia-project read used the default QC opener rather than the redirect-refusing transport. | Response not used as authority; exact read repeated through the hardened transport. Future QC calls in this round use only the hardened transport. |
+
+### 168.5 Focused validation before freezing R-175
+
+At the reviewed pushed head, the V17, V18, projection, and closure selection
+was **231 passed**. The final V19 runtime/projection/closure audit selection,
+including the independent-audit corrections above, is **190 passed in
+89.73 s**; the narrower changed-behavior selection is **18 passed**.
+`compileall` and `git diff --check` are clean.
+Per the owner and machine-wide rule, Codex does not run the complete lane
+suite; Claude performs that suite during independent review.
+
+### 168.6 Exact R-175 preregistration
+
+R-175 is one fresh, private, order-based **diagnostic** of the frozen V19
+candidate over the unchanged 2025 window. It does not select a return sign,
+parameter, or winner and cannot add a formal cell: V19 is not registered in
+the signed formal adapter, and the known V17 skip policy is expected to keep
+this window `run_valid=false`. Its purpose is to prove that the corrected
+runtime completes and emits internally reconciled evidence.
+
+| Field | Frozen before network mutation |
+|---|---|
+| Candidate | `R-175`, attempt `A1` of at most three; a deterministic same-clock guard refusal ends this candidate after one rather than spending identical retries |
+| Project | `98 ARV2_QQQ_V19_ORDER_R175_A1_2025_NOW - 20260921` (must be absent before create) |
+| Backtest | `ARV2 R175A1 QQQ V19 order 2025 now f79ea5c7` |
+| Profile/window | `arv2-qqq-order-level-tilt-2025-cutoff-v19`; 2025-01-02 through 2026-09-16; profile SHA-256 `a27018fb...fb2f` |
+| Package | `arv2-preliminary-qc-package-7803b84f0841f9685a4951de`; SHA-256 `7803b84f...4e1f`; lineage `54723703...129`; use the already-present activation object, no Object Store mutation |
+| Projection | `arv2-order-level-qc-projection-06c4b17888a76dcae2aac401`; SHA-256 `06c4b17888a76dcae2aac40183b94dd795186b7db20bd7f552bd118bb512e47c` |
+| Source | 19 files / 427,396 bytes; content-manifest SHA-256 `7b677a04469eda4e0e7fea9a27fa11d974b7fdafee7596434c84cc164c6b8c5b`; generated `main.py` SHA-256 `f4e8d7d5...d79eb`; V19 SHA-256 `f79ea5c7...cb68` |
+| Cloud proof | Upload through hardened redirect-refusing transport; delete only QC's default notebook; re-read all files and require exact path, byte, per-file SHA-256, manifest, projection, and total-size identity before compile |
+| Terminal polling | `backtests/list` with `includeStatistics:false`; retain only exact id/name/status; never index returned summary-shaped values |
+| Result read | Only after exact `Completed.`: one `backtests/read`, immediately retain only `ARV2_ORDER_LEVEL_META` and `ARV2_ORDER_LEVEL_AGGREGATES`; authenticate canonical ASCII, profile/package identities, V14 aggregate schema, and the meta-bound aggregate SHA-256; discard every standard statistic, chart, order, log, and raw value |
+| Authority exclusions | Backtest only; simulated MOO orders only. No broker, paper/live/funded deployment, real order, trading, leverage, six-universe expansion, or provider read |
+
+If `backtests/create` succeeds, R-175 spends one shared research look and one
+ARV2 development evaluation: **154 -> 155 shared looks / 97 -> 98 ARV2
+development evaluations / 27 infrastructure looks / 608 authenticated
+cells**. A completed `run_valid=false` diagnostic still adds zero cells.
+
+### 168.7 Next gate
+
+Commit the exact counter-review, V19 source/tests/projection, and this
+preregistration locally; then launch R-175 once. Record its terminal state and,
+only if `Completed.`, its two authenticated custom aggregates. Run focused
+post-result checks, update the push ledger and shared result ledger, and make
+the round's one same-lane push. No complete lane suite is run by Codex.

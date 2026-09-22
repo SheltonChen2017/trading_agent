@@ -3896,7 +3896,7 @@ relaxations of the frozen census (date-keyed acceptance of served snapshot
 ages 2, 3, 5, 10 and 15; re-basing a frozen plan from a rounded split factor;
 rescaling a percent-scaled weight snapshot by 100). Only the sixteenth
 backtest in the project, `c88fb1b2cf91a714242d898078322b5b`, completed. The
-owner read a standard statistic (about 39.2% annualized) from it. Every Mia
+owner read an unlabelled standard statistic (about 39.2%) from it. Every Mia
 file and the modified `main.py` are refused by the lane's source firewall,
 the project was reused, and the source traded on stale and rescaled inputs,
 so that run is **NOT ADMISSIBLE** and creates no cell. This session read no

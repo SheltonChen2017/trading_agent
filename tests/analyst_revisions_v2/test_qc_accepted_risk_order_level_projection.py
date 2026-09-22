@@ -47,6 +47,9 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_v18_qc_runtime as v18_runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v19_qc_runtime as v19_runtime,
+)
 
 
 def _exact(message: str) -> str:
@@ -105,6 +108,7 @@ def delta_package(monkeypatch):
         + v16_runtime.EXPOSURE_PROFILE_IDS
         + v17_runtime.SKIP_PROFILE_IDS
         + v18_runtime.BOUNDARY_PROFILE_IDS
+        + v19_runtime.SUCCESSOR_PROFILE_IDS
     ),
 )
 def test_projection_is_exact_profile_bound_and_backtest_only(
@@ -145,10 +149,16 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     assert f"set_start_date({start[0]}, {start[1]}, {start[2]})" in main
     assert "set_end_date(2026, 9, 17)" in main
     assert "market_on_open_order" not in main
-    transport_override = (
+    legacy_transport_override = (
         "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 8192"
     )
-    assert (transport_override in main) is (
+    successor_transport_override = (
+        "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 16384"
+    )
+    assert (successor_transport_override in main) is (
+        profile_id in v19_runtime.SUCCESSOR_PROFILE_IDS
+    )
+    assert (legacy_transport_override in main) is (
         profile_id in (
             runtime.TICKET_PROFILE_IDS
             + runtime.REFLECTED_TICKET_PROFILE_IDS
@@ -172,6 +182,7 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
         + v16_runtime.EXPOSURE_PROFILE_IDS
         + v17_runtime.SKIP_PROFILE_IDS
         + v18_runtime.BOUNDARY_PROFILE_IDS
+        + v19_runtime.SUCCESSOR_PROFILE_IDS
     ):
         assert "self.time_rules.before_market_open(qqq_benchmark, 10)" in main
         assert "self._arv2_driver.on_before_open" in main
@@ -1167,6 +1178,95 @@ def test_v18_total_cap_is_profile_specific_and_load_bearing(
     assert projection.require_accepted_risk_order_level_qc_projection(v17) is v17
 
 
+def test_v19_adds_only_successor_runtime_to_exact_v18_closure(delta_package):
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    v18 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v18_runtime.BOUNDARY_PROFILE_2025_ID,
+    )
+    v19_by_path = {item.project_path: item for item in v19.source_files}
+    v18_by_path = {item.project_path: item for item in v18.source_files}
+
+    assert set(v19_by_path) == set(v18_by_path) | {
+        projection.V19_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v18_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v19_by_path[path] == v18_by_path[path]
+    main = v19_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v19_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV19QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert b"MAXIMUM_STATISTIC_BYTES = 16384" in main
+    assert b"profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v19'" in main
+    v19_source = v19_by_path[projection.V19_RUNTIME_PROJECT_PATH]
+    main_delta = len(main) - len(
+        v18_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    )
+    assert (
+        v19.total_source_byte_count
+        == v18.total_source_byte_count + v19_source.byte_count + main_delta
+    )
+    assert v19_source.byte_count <= projection.MAX_SOURCE_FILE_BYTES
+    assert projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES == 430_000
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v19.total_source_byte_count + (72 - fixture_key_length)
+    assert (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES - production_total
+        >= projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES - 5_000 - production_total
+        < projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert v19.profile_sha256 == projection._require_profile(
+        v19_runtime.SUCCESSOR_PROFILE_2025_ID
+    )["profile_sha256"]
+
+
+def test_v19_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v18 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v18_runtime.BOUNDARY_PROFILE_2026_ID,
+    )
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2026_ID,
+    )
+    assert projection._maximum_total_source_bytes(v18.profile_id) == (
+        projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES
+    )
+    assert projection._maximum_total_source_bytes(v19.profile_id) == (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        v19.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        > projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_SUCCESSOR_TOTAL_SOURCE_BYTES",
+        v19.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v19)
+    assert projection.require_accepted_risk_order_level_qc_projection(v18) is v18
+
+
 def test_firewall_allows_only_exact_v18_read_only_engine_order_lookup():
     accepted = (
         "from accepted_risk_qqq_order_level_v18_qc_runtime import (\n"
@@ -1697,6 +1797,7 @@ def test_qc_prelude_compilation_and_future_import_regression():
         (v16_runtime.EXPOSURE_PROFILE_2026_ID, 8192),
         (v17_runtime.SKIP_PROFILE_2026_ID, 8192),
         (v18_runtime.BOUNDARY_PROFILE_2026_ID, 8192),
+        (v19_runtime.SUCCESSOR_PROFILE_2026_ID, 16384),
     ),
 )
 def test_generated_main_imports_from_exact_flat_qc_projection(

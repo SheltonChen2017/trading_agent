@@ -21569,3 +21569,229 @@ independently reviews section 169, the SPY adapter, R-176, and
 cell requires reviewed adapter registration, a prospectively complete
 schedule, and a newly preregistered one-read result path; this diagnostic
 cannot be upgraded retroactively.
+
+## 170. Owner-directed six-universe order family (IMPLEMENTED; PHYSICALLY FROZEN; UNLAUNCHED), 2026-09-22
+
+### 170.1 Owner direction and deferred tilt-off control
+
+After reviewing R-176, the owner chose to defer the proposed SPY/QQQ
+tilt-off controls and proceed to the more differentiated six-universe
+analyst-revision gate. Tilt-off is **deferred, not cancelled**: it remains the
+clean way to isolate a small analyst-revision overlay from tracking, cash,
+coverage, and execution effects, but it does not answer the owner's present
+question about whether analyst revisions can select a concentrated group of
+stocks across distinct economic sleeves. No result from R-175 or R-176 is
+relabelled, and no unfavourable result is discarded by this sequencing
+decision.
+
+Sections 170.6-170.7 now record the completed local implementation, focused
+validation, and prospective physical source freeze. They still record no
+project creation, compile, backtest, status poll, result read, research look,
+development evaluation, or authenticated cell. No result exists at this
+point; the exact physical identities below precede the first QC mutation.
+
+### 170.2 Reused six-universe economics
+
+The new family must preserve the reviewed construction in section 110 rather
+than select a new rule after observing results:
+
+- Six separately budgeted sleeves use point-in-time ETF-holdings proxies for
+  `SPY`, `QQQ`, `SOXX`, `XLV`, `REMX`, and `XLE`.
+- The sleeves split a frozen **98% gross exposure** equally under the existing
+  exact Decimal residual rule; the remaining 2% is cash. Budget may not move
+  between sleeves.
+- The primary signal ranks the unchanged R-055 `firm_specific` score strictly
+  descending, admits only strictly positive scores, and uses permanent
+  security identity as the deterministic tie-break. It takes at most ten
+  stocks per sleeve.
+- Five through nine available positive-score names produce a partial stock
+  sleeve with that sleeve's own ETF filling the unused slots. Fewer than five
+  positives, or a frozen coverage failure, produces full own-ETF fallback.
+- A stock present in more than one sleeve is aggregated in frozen universe
+  order and capped at **9.8%** of the total portfolio; excess returns to each
+  contributing sleeve's own ETF. It is never reassigned to another sleeve.
+- The count-matched comparator selects the same number of stocks in each
+  sleeve by point-in-time market capitalization, using the same tie-break,
+  fallback, duplicate-cap, gross-exposure, and no-cross-sleeve-transfer rules.
+- The third role is the actual equal-budget six-ETF basket using the same six
+  exact sleeve budgets.
+
+The common historical period remains **2021-01-04 through 2025-12-31**, with
+261 weekly decisions, 1,255 sessions, and 1,254 return intervals. The new
+order family will use prior-close decisions and authenticated next-session
+whole-share market-on-open execution, RAW execution prices, sells before
+buys, zero slippage, engine-reported fees, and the frozen modeled-cost check
+of **10 basis points per side**. Those order mechanics are the intended new
+execution layer; the legacy six-universe evaluator remains immutable and
+explicitly `orders=False`.
+
+The reviewed top-five construction remains an **unspent sensitivity**. It is
+not part of R-177 through R-179, receives no run number or launch identity in
+this section, and may be frozen only prospectively after the primary family,
+without choosing whether to run it from the primary return sign.
+
+### 170.3 Three-role order-based family
+
+The primary top-ten test is a matched three-role family so the stock-selection
+effect is not inferred from an unmatched ETF comparison. Each role receives a
+fresh candidate and at most three QuantConnect attempts. A byte-identical
+deterministic refusal is not repeated merely to consume the remaining budget;
+any correction requires a prospectively versioned source and identity.
+
+| Candidate placeholder | Physical role | Frozen economic purpose | Identities before launch |
+|---|---|---|---|
+| `R-177` | Top-ten analyst-revision signal | Execute the six-sleeve positive-score gate, including per-sleeve fallback and the aggregate 9.8% duplicate cap | Frozen prospectively in 170.7; no launch yet |
+| `R-178` | Count-matched market-cap comparator | Execute the same six sleeves, stock counts, fallbacks, cap, exposure, schedule, and costs, replacing only the within-sleeve ranking with point-in-time market cap | Frozen prospectively in 170.7; no launch yet |
+| `R-179` | Equal-budget six-ETF basket | Execute the six sleeve ETFs at the exact common budgets, schedule, and cost convention | Frozen prospectively in 170.7; no launch yet |
+
+The family begins from the recorded post-R-176 baseline of **156 shared
+research looks, 99 ARV2 development evaluations, 27 infrastructure looks,
+and 608 authenticated cells**. This draft does not spend or reserve a look,
+evaluation, or cell. Before any external action, the exact accounting effect
+and result-cell inventory for each role must be committed with its complete
+physical identities. A compile failure, runtime error, or other unsuccessful
+terminal run counts toward that role's maximum of three attempts. After a
+third failure, that role stops under the standing Mia recovery rule.
+
+### 170.4 Success and interpretation rule
+
+`Completed.` alone is not economic success. A usable role must authenticate
+its exact source and custom-statistic inventory, reconcile its scheduled
+decisions, submitted and terminal orders, gross exposure, engine and modeled
+fees, fallback and coverage counts, and finish with its prospectively frozen
+validity flag true. If one role is absent or invalid, the three-role family is
+incomplete and no clean relative-return claim is made.
+
+If all three roles are valid, the primary interpretation is fixed before any
+result:
+
+- `R-177 minus R-178` estimates the contribution of analyst-revision ranking
+  relative to a count- and construction-matched market-cap selection.
+- `R-177 minus R-179` compares the stock-selection implementation with the
+  directly investable equal-budget ETF fallback basket, but mixes selection
+  with stock-versus-ETF implementation effects and is therefore secondary.
+- Absolute return, drawdown, volatility, Sharpe, exposure, turnover, fees,
+  fallback frequency, and per-sleeve breadth are reported for all roles
+  without selecting a winner or changing a rule after observation.
+
+No positive return sign, benchmark victory, or leverage gate is expected or
+required for a technically valid run. Conversely, a positive spread in one
+historical window does not establish persistence, production acceptance, or
+live-trading readiness.
+
+### 170.5 Accepted-risk limitations and next gate
+
+This family remains preliminary accepted-risk research. Massive/Benzinga
+history is used under the owner's accepted current-vintage limitation: vendor
+corrections overwrite records, no complete revision/deletion archive exists,
+and the analyst archive is not pristine point-in-time history. Security
+identity remains current-vintage rather than a complete survivorship-free
+security master. ETF membership and market-cap histories are point-in-time
+proxies, not official historical index membership. Missing constituent
+identity or coverage may force the named own-ETF fallback; a missing exact-day
+execution close refuses rather than use a stale security mark. These
+limitations must remain visible beside every result and prevent promotion to
+formal, paper, or live evidence.
+
+The next gate is the sequential physical R-177, R-178, and R-179 QC family
+under the exact freeze in 170.7, beginning with R-177 A1. No leverage, top-five
+sensitivity run, provider-data expansion, broker access, paper/live or funded
+deployment, real order, trading, or production acceptance is authorized by
+this draft.
+
+### 170.6 Compact order successor and pre-network proof
+
+The implementation now composes four small boundaries instead of extending
+the earlier universe-specific order runtimes: an immutable streaming target
+builder, a universe-neutral simulated-MOO executor, one six-universe QC
+driver, and one host-only source projector. The target builder reproduces the
+reviewed 261-decision construction path for all three roles without future
+snapshots. The executor composes the existing order core, re-reads the exact
+QC live-mode flag before every intent, pins the reflected LEAN status map
+including `Canceled=5`, buffers synchronous events, and closes every submitted
+lifecycle. The QC driver freezes daily fundamental and ETF-holdings callback
+objects to primitive SID/value rows at receipt time, permits only strictly
+prior snapshots under the frozen one-session/five-session age bounds, performs
+one batched RAW-close history request over the complete target-and-holdings
+census per decision, and binds each close to its dictionary key, payload
+symbol, payload session, and requested session. It emits only aggregate
+account, construction, execution, fee, fallback, exposure, and forced-
+delisting evidence. The account and gross-exposure paths must contain all
+1,255 authenticated sessions and emit separate path digests; six fixed
+per-sleeve records reconcile coverage, breadth, fallback, and duplicate-cap
+behavior.
+
+This callback architecture is an order implementation of the frozen
+construction, not a new signal. It begins LEAN on 2020-11-01 only to seed
+strictly-prior point-in-time caches; account-return observations, decisions,
+and the claimed period remain exactly 2021-01-04 through 2025-12-31. Universe
+callbacks select no securities. Only frozen targets and positions awaiting
+exit are subscribed at minute/RAW resolution. Their active census is capped
+at 128; a dynamic subscription is removed only after the prior lifecycle is
+terminal and the name has zero holdings and zero open orders. Split-induced
+overnight quantity drift may replan only when every changed name has a same-
+session `SplitOccurred` record and its exact factor explains the observed
+whole-share quantity; all other drift remains a counted refusal. Only
+simulated next-session MOO orders are available. Executor target-weight L1
+errors are explicitly prior-close-reference-mark diagnostics, not realized
+next-open tracking errors. The statistic transport
+bound is 8,192 bytes per value, avoiding
+the previously diagnosed unsatisfiable 4,096-byte self-imposed bound without
+compression or lossy fields.
+
+Focused proof at the physical freeze is **71 passed** across the four new test
+files, plus **101 passed** across the unchanged six-universe constructor,
+evaluator, PIT-runtime, and order-core dependencies. The focused tests include
+exact three-role path parity, callback streaming, fallback/cap behavior,
+whole-share sell-before-buy planning, the reflected status map, synchronous
+event replay, live-mode rechecking immediately before submission, split-only
+replanning, lifecycle and fee accounting, immutable PIT callback rows,
+conflicting-repeat refusal, strictly-prior cache selection, RAW bar identity,
+exact account paths, per-sleeve reconciliation, bounded-subscription cleanup,
+aggregate math, exact source closure, prelude compilation, and capability-
+expansion refusals. A deliberately populated aggregate transport rehearsal was
+6,852 bytes against the 8,192-byte bound. All four projected sources compile
+both raw and beneath the QC prelude; no complete lane suite was run, under the
+owner rule.
+
+### 170.7 Prospective physical freeze for R-177 through R-179
+
+The common immutable input remains
+`arv2-preliminary-qc-package-7803b84f0841f9685a4951de`, package SHA-256
+`7803b84f...4e1f`, lineage `54723703...b129`, and activation object
+`arv2/preliminary-rating/73643a2cc47b5ed07cd79498/transport-manifest.json`
+with SHA-256 `69b663c3...8a41` and 4,015 bytes. That activation already exists in
+private QC Object Store; this family makes no Object Store mutation. Every
+role projects the same 13-file source closure. The only byte difference is
+the role-bound `main.py`.
+
+| Candidate | Exact private project / backtest | Profile | Projection / source manifest |
+|---|---|---|---|
+| `R-177`, `A1` | `100 ARV2_SIX_GATE_SIGNAL_R177_A1_2021_2025 - 20260922` / `ARV2 R177A1 six gate signal 2021 2025 a963d8a6` | `arv2-six-universe-order-signal-v1`; `2545372a...430d` | `arv2-six-universe-order-qc-projection-89ac1f8aee6f3f3e57f4931b`; `89ac1f8a...0e7d`; 13 files / 372,136 bytes; source manifest `57b22541...30a1`; `main.py` `fc7ea724...1cc3` |
+| `R-178`, `A1` | `101 ARV2_SIX_GATE_MATCHED_R178_A1_2021_2025 - 20260922` / `ARV2 R178A1 six gate matched 2021 2025 a963d8a6` | `arv2-six-universe-order-matched-v1`; `3aa33ce4...3280` | `arv2-six-universe-order-qc-projection-aa40fbafc127dfe65262ebf8`; `aa40fbaf...af6c`; 13 files / 372,137 bytes; source manifest `ba16da4f...7cf1`; `main.py` `fa1b83e3...3b56` |
+| `R-179`, `A1` | `102 ARV2_SIX_GATE_ETF_R179_A1_2021_2025 - 20260922` / `ARV2 R179A1 six gate ETF basket 2021 2025 a963d8a6` | `arv2-six-universe-order-six_etf_basket-v1`; `d79cc3a7...cc7d` | `arv2-six-universe-order-qc-projection-2754e5deb71a6935b8cadbda`; `2754e5de...2a9c`; 13 files / 372,144 bytes; source manifest `6fdd6431...ad28`; `main.py` `89f59da3...c0f5` |
+
+Each source-manifest digest is SHA-256 over canonical ASCII JSON with schema
+`arv2-six-universe-order-source-manifest-v1` and the ordered projected-file
+records. The common projected runtime is `a963d8a6...94d2`, target builder
+`80490da1...ad1a`, executor `e2f4b550...5fb7`, and projector
+`55e219dc...7bc5`. A hardened redirect-refusing
+credential check and value-free `projects/read` proved all three exact project
+names absent before this freeze. For each role the permitted sequence is:
+create one fresh private project; remove only QC's default paths; upload and
+byte-for-byte re-read all 13 frozen files; compile; launch at most one A1
+backtest; poll terminal status without statistics; and, only after exact
+`Completed.`, read once and retain only `ARV2_SIX_GATE_ORDER_META` and
+`ARV2_SIX_GATE_ORDER_AGGREGATES`. Raw provider rows, price rows, orders,
+charts, logs, standard QC statistics, broker access, deployment, paper/live,
+funded, and real trading remain excluded.
+
+If each `backtests/create` succeeds, accounting advances prospectively as
+follows: R-177 **156 -> 157 shared looks / 99 -> 100 development
+evaluations**; R-178 **157 -> 158 / 100 -> 101**; and R-179 **158 -> 159 /
+101 -> 102**. Infrastructure looks remain 27 and authenticated cells remain
+608 because this order family is diagnostic and is not registered in the
+formal adapter. Each candidate has a maximum of three attempts under the
+standing rule, but a completed run is never repeated because of its return
+sign. If A1 fails, any A2 must bind a distinct diagnosed correction and a new
+source/projection identity before launch.

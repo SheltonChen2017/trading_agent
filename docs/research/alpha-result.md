@@ -4058,3 +4058,48 @@ R-175 spends **154 -> 155 shared looks / 97 -> 98 ARV2 development
 evaluations**, keeping **27 infrastructure looks / 608 authenticated cells**.
 No retry is needed. No formal acceptance, leverage, deployment, broker,
 paper/live, funded-account, real-order, or trading authority follows.
+
+## R-176 — SPY V1 2025-now order run (DIAGNOSTIC; COMPLETED; run_valid=false; ZERO CELLS) — 2026-09-22
+
+R-176 is the preregistered S&P 500 analogue of R-175: a point-in-time SPY ETF
+holdings-weight stock core plus the same bounded sector-neutral
+analyst-revision tilt, 98% target gross, weekly next-session market-on-open
+execution, 10 basis points per side, zero slippage, and no leverage from
+2025-01-02 through the 2026-09-17 final execution/mark. SPY holdings are a
+proxy and are not official historical S&P 500 index membership. This is not
+the top-decile analyst-revision gate used by R-108.
+
+Fresh private project `99 ARV2_SPY_V1_ORDER_R176_A1_2025_NOW - 20260921`
+(`36820512`) was created only after its exact name was proven absent. All 21
+files / 472,782 bytes were re-read byte-for-byte with source-manifest SHA-256
+`48573d2628bc3011a85ef3b4aeb6143368f772541c93a2d19e9e6cbe9c93c787`.
+Compile `86d0353b2b1a738c54da4f78698b89a6-e83974a1b5b11f8efcc53e69ac169372`
+was `BuildSuccess`; backtest `ARV2 R176A1 SPY V1 order 2025 now eaabfb25`,
+id `b3f07edc5d2c306a180f73a222b157c6`, completed on attempt one. The retained
+custom statistics are a 1,024-byte meta object (text SHA-256
+`d32040dae4e1f3d5fe63b663a7ea14c5931bda3de10c4e980030dc57e2505ac2`)
+and an 8,983-byte aggregate (text and canonical SHA-256
+`a62d3c5b48c55cb6dac18c6e1ad6f68bd98d97b71e890409626dd9008ba808c2`).
+
+The census reports 91 scheduled, 89 covered, **85 submitted**, and 85
+completed decisions; 2 stale-snapshot, 2 unpriced-decision, and 2
+overnight-drift skips; **10,750 submitted and filled orders** with zero
+canceled/invalid; and modeled/engine fees agreeing at **$3,919.4976805**.
+Strategy return is **+29.5563554266%** after costs versus execution-matched
+SPY **+30.9373349673%**, a **-1.3809795408 percentage-point** spread;
+calendar-close SPY is +32.3173234811%. Drawdown was -17.5147% versus
+-18.3796%, zero-rate Sharpe 1.0534 versus 1.0333, mean gross exposure 93.1996%,
+mean active share 1.8144%, and mean tilted-name count 244.72. The small tilt
+did not add absolute return in this window, although the diagnostic risk
+figures improved slightly.
+
+`schedule_complete=false` and `run_valid=false`, so the result creates zero
+cells. The first bounded result read retained no values because its ad hoc
+field list used an internal attribute-derived name rather than the emitted
+`forced_exit_invalidated_pending_rebalance_count`; one aggregate-only recovery
+read retained the exact two custom statistics. That deviation is
+`ARV2D169-001` (P3) and keeps R-176 diagnostic rather than formally
+preregistered evidence. R-176 spends **155 -> 156 shared looks / 98 -> 99
+ARV2 development evaluations**, with **27 infrastructure looks / 608 cells**
+unchanged. No retry, acceptance, leverage, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.

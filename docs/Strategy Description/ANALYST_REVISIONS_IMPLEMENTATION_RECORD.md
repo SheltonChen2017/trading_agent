@@ -21570,7 +21570,7 @@ cell requires reviewed adapter registration, a prospectively complete
 schedule, and a newly preregistered one-read result path; this diagnostic
 cannot be upgraded retroactively.
 
-## 170. Owner-directed six-universe order family (IMPLEMENTED; PHYSICALLY FROZEN; UNLAUNCHED), 2026-09-22
+## 170. Owner-directed six-universe order family (IN PROGRESS; R-177 A1 DIAGNOSED; A2 PHYSICALLY FROZEN), 2026-09-22
 
 ### 170.1 Owner direction and deferred tilt-off control
 
@@ -21795,3 +21795,56 @@ formal adapter. Each candidate has a maximum of three attempts under the
 standing rule, but a completed run is never repeated because of its return
 sign. If A1 fails, any A2 must bind a distinct diagnosed correction and a new
 source/projection identity before launch.
+
+### 170.8 R-177 A1 runtime diagnosis and prospective A2 correction
+
+R-177 A1 created the exact private project named in section 170.7, uploaded
+and re-read the exact 13-file / 372,136-byte projection, and compiled it
+successfully on the first compile. The resulting backtest
+`f3618cc09fb9aa4370398542be783f2f` reached terminal `Runtime Error` at 1%
+on 2021-01-04. One diagnostic result read retained only its error and stack;
+no performance statistic, chart, raw row, order, or outcome aggregate was
+read. The error was `record Decimal escaped the canonical Decimal bound` at
+the first construction record's membership `mapping_ratio`.
+
+The failure is deterministic and reproduced locally without QC or outcomes.
+The constructor computes coverage ratios under an explicitly pinned
+96-digit Decimal context. A normal ratio such as 30/31 therefore has 96
+digits and exponent -96, while `_require_decimal` admitted at most 64 digits
+and exponent -48. The economic calculation succeeded and the recorder then
+refused its own output. The A2 correction aligns only the finite canonical
+recording domain with the already-frozen 96-digit arithmetic domain: at most
+96 digits and exponent in [-96, 96]. It does not change an input, threshold,
+ranking, selected name, weight, cost, schedule, order rule, or result gate.
+A focused regression proves the exact repeating ratio records and that
+exponent -97 still refuses. The constructor, streaming target, projector,
+and QC-runtime batteries are **74 passed** after the correction; no full lane
+suite was run.
+
+R-177 A1 spends **156 -> 157 shared looks / 99 -> 100 ARV2 development
+evaluations**; infrastructure looks remain 27 and authenticated cells remain
+608. It is a failed diagnostic attempt and creates no result cell. R-177 has
+two attempts left. The exact same private project must be repaired in place;
+a duplicate project is prohibited. Its A2 backtest name is prospectively
+frozen as `ARV2 R177A2 six gate signal 2021 2025 9a46e01a`.
+
+The correction changes the common `accepted_risk_six_universe_gate.py` to
+25,310 bytes, SHA-256 `528a47f9...1b68`. It leaves all three role profiles,
+the common runtime `a963d8a6...94d2`, target builder `80490da1...ad1a`,
+executor `e2f4b550...5fb7`, role-specific `main.py` files, immutable input,
+and activation object unchanged. Before another QC mutation, the corrected
+physical projections are:
+
+| Candidate / attempt | Exact project / corrected backtest | Corrected projection / source manifest |
+|---|---|---|
+| `R-177`, `A2` | existing `100 ARV2_SIX_GATE_SIGNAL_R177_A1_2021_2025 - 20260922` / `ARV2 R177A2 six gate signal 2021 2025 9a46e01a` | `arv2-six-universe-order-qc-projection-9a46e01a2e767558cba557ef`; `9a46e01a...53e8`; 13 files / 372,751 bytes; source manifest `8a241c86...a319` |
+| `R-178`, `A1` | `101 ARV2_SIX_GATE_MATCHED_R178_A1_2021_2025 - 20260922` / `ARV2 R178A1 six gate matched 2021 2025 3fbb83a8` | `arv2-six-universe-order-qc-projection-3fbb83a8715cb1918e66fc10`; `3fbb83a8...9ef0`; 13 files / 372,752 bytes; source manifest `0700a746...e21f` |
+| `R-179`, `A1` | `102 ARV2_SIX_GATE_ETF_R179_A1_2021_2025 - 20260922` / `ARV2 R179A1 six gate ETF basket 2021 2025 4a11656f` | `arv2-six-universe-order-qc-projection-4a11656fcda9a7ba08f866a7`; `4a11656f...695c`; 13 files / 372,759 bytes; source manifest `782bfb49...480f` |
+
+If R-177 A2 launches, accounting advances **157 -> 158 / 100 -> 101**.
+Only an exact `Completed.` run with both authenticated custom statistics and
+`run_valid=true` permits R-178. If A2 fails, diagnose and prospectively bind
+the final A3 rather than replaying identical bytes. R-178 and R-179 then
+advance the cumulative counts to **159 / 102** and **160 / 103** respectively
+if launched. Their section-170.7 A1 projection rows are superseded by this
+corrected prospective freeze before either project is created.

@@ -307,6 +307,16 @@ def test_coverage_exact_boundaries_are_inclusive():
     assert upper.sleeves[0].coverage.valid is True
 
 
+def test_repeating_coverage_ratio_uses_the_frozen_96_digit_recording_domain():
+    ratio = subject._ratio(Decimal(30), Decimal(31))
+    assert len(ratio.as_tuple().digits) == subject.DECIMAL_MAXIMUM_DIGITS
+    assert ratio.as_tuple().exponent == subject.DECIMAL_MINIMUM_EXPONENT
+    assert subject._decimal_text(ratio) == format(ratio, "f")
+
+    with pytest.raises(subject.SixUniverseGateError, match="canonical Decimal"):
+        subject._require_decimal(Decimal("1e-97"), "too-small ratio")
+
+
 def test_cap_weight_coverage_counts_only_mapped_usable_constituents():
     rows = list(
         _rows(

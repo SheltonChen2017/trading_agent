@@ -39,6 +39,15 @@ DECIMAL_RESIDUAL_RULE = (
     "floor_each_nominal_equal_sleeve_to_1e-24_and_assign_the_residual_"
     "to_the_final_frozen_sleeve"
 )
+# Coverage ratios are deliberately evaluated under a 96-digit Decimal
+# context below.  Their canonical recorder must accept that same finite
+# domain: ordinary member-count ratios such as 30/31 use all 96 digits and
+# an exponent of -96.  The former 64-digit / -48 floor contradicted the
+# arithmetic contract and made a normal point-in-time snapshot impossible
+# to record after it had already passed the economic gates.
+DECIMAL_MAXIMUM_DIGITS = 96
+DECIMAL_MINIMUM_EXPONENT = -96
+DECIMAL_MAXIMUM_EXPONENT = 96
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -92,7 +101,12 @@ def _require_decimal(
     if type(value) is not Decimal or not value.is_finite():
         raise SixUniverseGateError(f"{name} must be an exact finite Decimal")
     decimal_tuple = value.as_tuple()
-    if len(decimal_tuple.digits) > 64 or not -48 <= decimal_tuple.exponent <= 48:
+    if (
+        len(decimal_tuple.digits) > DECIMAL_MAXIMUM_DIGITS
+        or not DECIMAL_MINIMUM_EXPONENT
+        <= decimal_tuple.exponent
+        <= DECIMAL_MAXIMUM_EXPONENT
+    ):
         raise SixUniverseGateError(f"{name} escaped the canonical Decimal bound")
     if positive and value <= 0:
         raise SixUniverseGateError(f"{name} must be strictly positive")

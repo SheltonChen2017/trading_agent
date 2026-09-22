@@ -29,6 +29,7 @@ from . import accepted_risk_qqq_order_level_v14_qc_runtime as v14_runtime_builde
 from . import accepted_risk_qqq_order_level_v15_qc_runtime as v15_runtime_builder
 from . import accepted_risk_qqq_order_level_v16_qc_runtime as v16_runtime_builder
 from . import accepted_risk_qqq_order_level_v17_qc_runtime as v17_runtime_builder
+from . import accepted_risk_qqq_order_level_v18_qc_runtime as v18_runtime_builder
 
 
 class AcceptedRiskOrderLevelQcProjectionError(ValueError):
@@ -45,6 +46,7 @@ V14_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v14_qc_runtime.py"
 V15_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v15_qc_runtime.py"
 V16_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v16_qc_runtime.py"
 V17_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v17_qc_runtime.py"
+V18_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v18_qc_runtime.py"
 FORCED_EXIT_PROJECT_PATH = "accepted_risk_order_level_forced_exit.py"
 MAX_SOURCE_FILE_BYTES = 64_000
 # The fixed ten-file closure includes the ETF-residual accounting and
@@ -80,6 +82,10 @@ MAX_EXPOSURE_TOTAL_SOURCE_BYTES = 375_000
 # closure.  Its exact production size is pinned by focused projection tests;
 # 400,000 is the smallest 5,000-byte round ceiling retaining the margin.
 MAX_SKIP_TOTAL_SOURCE_BYTES = 400_000
+# V18 adds one bounded terminal-composition wrapper to the immutable V17
+# closure.  Its exact production size is pinned by focused projection tests;
+# 410,000 is the smallest 5,000-byte round ceiling retaining the margin.
+MAX_BOUNDARY_TOTAL_SOURCE_BYTES = 410_000
 MIN_REVIEW_MARGIN_BYTES = 2_048
 _ENGINE_ORDER_PROFILE_IDS = (
     v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
@@ -88,6 +94,7 @@ _ENGINE_ORDER_PROFILE_IDS = (
     + v15_runtime_builder.ACCOUNT_PROFILE_IDS
     + v16_runtime_builder.EXPOSURE_PROFILE_IDS
     + v17_runtime_builder.SKIP_PROFILE_IDS
+    + v18_runtime_builder.BOUNDARY_PROFILE_IDS
 )
 
 PROJECT_SOURCE_PATHS = (
@@ -104,6 +111,17 @@ PROJECT_SOURCE_PATHS = (
 
 
 def _project_source_paths(profile_id: str) -> tuple[str, ...]:
+    if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+            V16_RUNTIME_PROJECT_PATH,
+            V17_RUNTIME_PROJECT_PATH,
+            V18_RUNTIME_PROJECT_PATH,
+        )
     if profile_id in v17_runtime_builder.SKIP_PROFILE_IDS:
         return PROJECT_SOURCE_PATHS + (
             FORCED_EXIT_PROJECT_PATH,
@@ -152,6 +170,8 @@ def _project_source_paths(profile_id: str) -> tuple[str, ...]:
 
 
 def _maximum_total_source_bytes(profile_id: str) -> int:
+    if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
+        return MAX_BOUNDARY_TOTAL_SOURCE_BYTES
     if profile_id in v17_runtime_builder.SKIP_PROFILE_IDS:
         return MAX_SKIP_TOTAL_SOURCE_BYTES
     if profile_id in v16_runtime_builder.EXPOSURE_PROFILE_IDS:
@@ -170,6 +190,8 @@ def _maximum_total_source_bytes(profile_id: str) -> int:
 
 
 def _require_profile(profile_id: str) -> dict[str, object]:
+    if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
+        return v18_runtime_builder.require_qqq_order_level_profile(profile_id)
     if profile_id in v17_runtime_builder.SKIP_PROFILE_IDS:
         return v17_runtime_builder.require_qqq_order_level_profile(profile_id)
     if profile_id in v16_runtime_builder.EXPOSURE_PROFILE_IDS:
@@ -194,6 +216,7 @@ def _all_profile_ids() -> tuple[str, ...]:
         + v15_runtime_builder.ACCOUNT_PROFILE_IDS
         + v16_runtime_builder.EXPOSURE_PROFILE_IDS
         + v17_runtime_builder.SKIP_PROFILE_IDS
+        + v18_runtime_builder.BOUNDARY_PROFILE_IDS
     )
 
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
@@ -214,6 +237,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_qqq_order_level_v15_qc_runtime",
     "accepted_risk_qqq_order_level_v16_qc_runtime",
     "accepted_risk_qqq_order_level_v17_qc_runtime",
+    "accepted_risk_qqq_order_level_v18_qc_runtime",
     "accepted_risk_sequential_r055_score",
     "collections",
     "collections.abc",
@@ -445,6 +469,10 @@ def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
         "accepted_risk_qqq_order_level_v17_qc_runtime": (
             "AcceptedRiskQqqOrderLevelV17QcRuntime",
             v17_runtime_builder.SKIP_PROFILE_IDS,
+        ),
+        "accepted_risk_qqq_order_level_v18_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV18QcRuntime",
+            v18_runtime_builder.BOUNDARY_PROFILE_IDS,
         ),
     }
     imports = tuple(
@@ -932,6 +960,9 @@ def _arv2_reflected_order_status(enum_type):
         else "        self._arv2_driver.on_order_event(event)"
     )
     runtime_import_module = (
+        "accepted_risk_qqq_order_level_v18_qc_runtime"
+        if profile["profile_id"] in v18_runtime_builder.BOUNDARY_PROFILE_IDS
+        else
         "accepted_risk_qqq_order_level_v17_qc_runtime"
         if profile["profile_id"] in v17_runtime_builder.SKIP_PROFILE_IDS
         else
@@ -950,6 +981,9 @@ def _arv2_reflected_order_status(enum_type):
         else "accepted_risk_qqq_order_level_qc_runtime"
     )
     runtime_import_binding = (
+        "AcceptedRiskQqqOrderLevelV18QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v18_runtime_builder.BOUNDARY_PROFILE_IDS
+        else
         "AcceptedRiskQqqOrderLevelV17QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
         if profile["profile_id"] in v17_runtime_builder.SKIP_PROFILE_IDS
         else

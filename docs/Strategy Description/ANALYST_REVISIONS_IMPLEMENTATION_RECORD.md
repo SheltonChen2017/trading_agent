@@ -22112,3 +22112,75 @@ matched-comparator plan, and prospective look accounting. R-177's three-
 attempt budget is not reopened; R-178/R-179 remain unlaunched under their
 old frozen family. This candidate confers no paper/live, broker, funded,
 deployment, or trading authority.
+
+## 173. Prospective R-180 counts-only six-universe QC diagnosis, 2026-09-22
+
+The owner directed a diagnostic run before easing the stock-selection gates.
+This is a **new exploratory infrastructure diagnostic**, not R-177 A4, an
+economic performance backtest, an R-178/R-179 launch, or confirmation of an
+analyst edge. R-177's three-attempt cap remains exhausted. The nine additional
+QC/Mia launches in section 172.1 are each conservatively a prior research
+look, but their run-time source identities and classification remain
+unreconciled; no precise all-machine look total is asserted here.
+
+The new diagnostic freezes the same 261 weekly decisions from 2021-01-04
+through 2025-12-29, with 2025-12-31 as the end and 2020-11-01 as a cache
+warm-up start. It uses the exact accepted-risk package from section 170.7 and
+only the six existing ETF/fundamental QC callbacks. It retains each callback's
+original session, requires strictly prior fundamentals within one session and
+ETF constituents within five sessions, and does not replay a stale collection
+as a newly dated callback. Missing, stale, empty, and all-nonpositive
+collections are counted rather than interpreted as selected stocks. Only
+aggregate counts and coarse coverage-ratio bins leave QC; no licensed row,
+security identifier, score, price, return, holding, order, chart, or log is
+exported. It makes no order or price-history call. This outcome-free input
+diagnosis is the documented exception to the default order-based strategy
+backtesting rule; any subsequent economic run must be order-based.
+
+The profile is `arv2-six-universe-coverage-counts-v1`, SHA-256
+`bd7a4e55c737535789941862378444b01cc9f2a4e673c3884c53e4b4cc4b0229`.
+The nine-file / 228,530-byte source projection is
+`arv2-six-universe-coverage-qc-projection-5175dca39d77cb5c2f13c6e`,
+SHA-256 `5175dca39d77cb5c2f13c6e2cfbff4f1e9379bd439baffecbc6336c0045f8efa`.
+The exact private project is `103 ARV2 SIX COVERAGE R180 2021 2025`; its A1
+backtest name is `ARV2 R180 A1 coverage counts 2021 2025 5175dca3`.
+The allowed result-read inventory is precisely `ARV2_SIX_COVERAGE_META`
+and `ARV2_SIX_COVERAGE_{SPY,QQQ,SOXX,XLV,REMX,XLE}`, each canonical ASCII
+JSON at most 8,192 bytes. Each sleeve reports whole-period and per-year
+counts: available/missing/stale snapshots; unmatched FIGI, missing name and
+missing point-in-time cap classes; mapping and cap-coverage histograms; total
+reported-weight bands; and joint passes under the original 99% and
+exploratory 95% cap floors while the 90% mapping and 95%-105% weight-total
+requirements remain fixed. A digest-bound meta record authenticates the six
+sleeve summaries. The result reader discards unrelated QC statistics,
+portfolio fields, orders, charts, and logs without retaining or reporting
+their values.
+
+The owner approved this exact projection/profile and one counts-only QC
+launch on 2026-09-22. A successful `backtests/create` spends **one additional
+infrastructure research look**, zero alpha/development evaluations and zero
+formal cells; a compile failure consumes A1 under the standing three-attempt
+rule but not a run look. No identical-byte retry follows a failure. The
+diagnostic has no matched return comparator because it observes no returns.
+If the counts support a gate change, a separately versioned exploratory
+order-based signal must be compared with a count-matched market-cap role and
+the six-ETF basket on the same sessions, costs and exposure; none of those
+economic runs is authorized or launched by R-180.
+
+One lane-specific compatibility defect in the received `785aaf2` was also
+corrected: the preliminary submission adapter expected exactly two
+six-universe profile IDs after the offline 95% profile made three, so legacy
+R-121/R-122 submission currentness refused. It now authenticates all three
+profile IDs while still allowlisting only R-121/R-122 for submission; the 95%
+profile cannot inherit an old run slot. A red/green regression and focused
+adapter tests pin that distinction. No shared, frozen strategy-spec, or
+project-wide behavior was changed.
+
+Prospective local proof before the QC launch: the counts runtime, exact source
+projection and bounded submission tests pass **20/20**; the focused adapter
+six-universe selection passes **32, with one skip**. The projector compiles
+all source beneath the QC prelude and rejects outcome, network, and order
+capability expansion. This is software proof only; QC completion and the
+actual six-sleeve census remain to be observed and recorded below before
+choosing an eased economic profile. No complete lane suite was run under the
+owner's standing rule.

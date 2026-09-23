@@ -2279,8 +2279,8 @@ def _six_universe_contract_bindings_are_current() -> bool:
             observed_statistic_names != _PINNED_SIX_UNIVERSE_STATISTIC_NAMES
             or type(profile_ids) is not tuple
             or profile_ids != _PINNED_SIX_UNIVERSE_PROFILE_IDS
-            or len(profile_ids) != 3
-            or len(set(profile_ids)) != 3
+            or len(profile_ids) != 4
+            or len(set(profile_ids)) != 4
             or any(type(item) is not str for item in profile_ids)
             or type(projection_profile_ids) is not tuple
             or projection_profile_ids

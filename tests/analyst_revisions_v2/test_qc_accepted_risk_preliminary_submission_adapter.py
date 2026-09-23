@@ -3922,6 +3922,7 @@ def test_exploratory_six_universe_profile_preserves_legacy_submission_specs():
         six_universe_evaluator.TOP10_PRIMARY_PROFILE.profile_id,
         six_universe_evaluator.TOP5_SENSITIVITY_PROFILE.profile_id,
         six_universe_evaluator.TOP10_CAP95_EXPLORATORY_PROFILE.profile_id,
+        six_universe_evaluator.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id,
     )
     assert adapter._six_universe_contract_bindings_are_current()
     assert (
@@ -3942,6 +3943,13 @@ def test_exploratory_six_universe_profile_preserves_legacy_submission_specs():
     ):
         adapter._run_spec(
             six_universe_evaluator.TOP10_CAP95_EXPLORATORY_PROFILE.profile_id
+        )
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="not allowlisted",
+    ):
+        adapter._run_spec(
+            six_universe_evaluator.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id
         )
 
 

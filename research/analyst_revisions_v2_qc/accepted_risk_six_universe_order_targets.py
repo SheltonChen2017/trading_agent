@@ -48,6 +48,8 @@ CONSTRUCTION_PATH_SCHEMA = "arv2-six-universe-construction-path-v1"
 
 ORDER_GATE_PROFILE = _gate.TOP10_PRIMARY_PROFILE
 ORDER_EVALUATION_PROFILE = _evaluation.TOP10_PRIMARY_PROFILE
+ORDER_CAP90_GATE_PROFILE = _gate.TOP10_CAP90_EXPLORATORY_PROFILE
+ORDER_CAP90_EVALUATION_PROFILE = _evaluation.TOP10_CAP90_EXPLORATORY_PROFILE
 
 
 def _canonical(value: object) -> bytes:
@@ -225,7 +227,7 @@ def _role_weights(construction, role):
     )
 
 
-def _sleeve_diagnostic(sleeve, role):
+def _sleeve_diagnostic(sleeve, role, gate_profile):
     if role == ROLE_SIGNAL:
         selected_ids = sleeve.signal_security_ids
         stock_weights = sleeve.signal_stock_weights
@@ -245,7 +247,7 @@ def _sleeve_diagnostic(sleeve, role):
 
     with localcontext() as context:
         context.prec = 96
-        slot_weight = +(sleeve.budget / Decimal(ORDER_GATE_PROFILE.slot_count))
+        slot_weight = +(sleeve.budget / Decimal(gate_profile.slot_count))
         ordinary_fallback = +(
             sleeve.budget - slot_weight * Decimal(len(selected_ids))
         )
@@ -263,7 +265,7 @@ def _sleeve_diagnostic(sleeve, role):
         status = "POSITIVE_SCORE_FLOOR_FALLBACK"
     elif duplicate_excess > 0:
         status = "DUPLICATE_CAP_ETF_FALLBACK"
-    elif len(selected_ids) < ORDER_GATE_PROFILE.slot_count:
+    elif len(selected_ids) < gate_profile.slot_count:
         status = "PARTIAL_STOCK_SLOTS_WITH_ETF_FALLBACK"
     else:
         status = "FULL_STOCK_SLOTS"
@@ -275,7 +277,7 @@ def _sleeve_diagnostic(sleeve, role):
         coverage_valid=sleeve.coverage.valid,
         coverage_refusal_reasons=tuple(sleeve.coverage.refusal_reasons),
         positive_score_count=sleeve.positive_score_count,
-        slot_count=ORDER_GATE_PROFILE.slot_count,
+        slot_count=gate_profile.slot_count,
         selected_security_ids=tuple(selected_ids),
         post_cap_stock_target_count=len(stock_weights),
         etf_target_weight=etf_weight,
@@ -284,7 +286,7 @@ def _sleeve_diagnostic(sleeve, role):
     )
 
 
-def _decision_target(session, role, construction):
+def _decision_target(session, role, construction, gate_profile):
     construction_record = construction.to_record()
     weights = tuple(_role_weights(construction, role))
     if (
@@ -297,7 +299,8 @@ def _decision_target(session, role, construction):
             "six-universe order target map changed"
         )
     sleeves = tuple(
-        _sleeve_diagnostic(sleeve, role) for sleeve in construction.sleeves
+        _sleeve_diagnostic(sleeve, role, gate_profile)
+        for sleeve in construction.sleeves
     )
     seed = {
         "schema": DECISION_TARGET_SCHEMA,
@@ -341,9 +344,26 @@ class SixUniverseOrderTargetBuilder:
             raise SixUniverseOrderTargetsError(
                 "six-universe order targets require exact preliminary input"
             )
-        if profile is not ORDER_EVALUATION_PROFILE:
+        if profile is ORDER_EVALUATION_PROFILE:
+            expected_gate_profile = ORDER_GATE_PROFILE
+        elif profile is ORDER_CAP90_EVALUATION_PROFILE:
+            expected_gate_profile = ORDER_CAP90_GATE_PROFILE
+        elif profile is _evaluation.TOP5_SENSITIVITY_PROFILE:
             raise SixUniverseOrderTargetsError(
                 "six-universe order target profile is not frozen top-ten"
+            )
+        else:
+            raise SixUniverseOrderTargetsError(
+                "six-universe order target profile is not an approved top-ten order profile"
+            )
+        profile.to_record()
+        if (
+            profile.gate_profile is not expected_gate_profile
+            or profile.gate_score_quantum
+            != ORDER_EVALUATION_PROFILE.gate_score_quantum
+        ):
+            raise SixUniverseOrderTargetsError(
+                "six-universe order target profile binding changed"
             )
         self._role = _require_role(role)
         self._profile = profile
@@ -442,7 +462,9 @@ class SixUniverseOrderTargetBuilder:
                     "six-universe order ETF security identity changed through time"
                 )
             construction_record = construction.to_record()
-            result = _decision_target(session, self._role, construction)
+            result = _decision_target(
+                session, self._role, construction, self._profile.gate_profile
+            )
         except Exception:
             self._failed = True
             raise
@@ -496,14 +518,15 @@ def build_six_universe_order_target_path(
     decision_snapshots,
     *,
     role,
+    profile=ORDER_EVALUATION_PROFILE,
 ):
-    """Convenience wrapper for the complete frozen top-ten target path."""
+    """Build one explicitly selected, approved top-ten target path."""
 
     if type(decision_snapshots) is not tuple:
         raise SixUniverseOrderTargetsError(
             "six-universe order target snapshot census changed"
         )
-    builder = SixUniverseOrderTargetBuilder(value, role=role)
+    builder = SixUniverseOrderTargetBuilder(value, role=role, profile=profile)
     if (
         len(decision_snapshots) != len(builder._sessions)
         or any(
@@ -523,6 +546,8 @@ def build_six_universe_order_target_path(
 
 __all__ = (
     "DECISION_TARGET_SCHEMA",
+    "ORDER_CAP90_EVALUATION_PROFILE",
+    "ORDER_CAP90_GATE_PROFILE",
     "ORDER_EVALUATION_PROFILE",
     "ORDER_GATE_PROFILE",
     "ROLE_MATCHED",

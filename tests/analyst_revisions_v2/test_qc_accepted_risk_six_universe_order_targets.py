@@ -39,6 +39,28 @@ def _weight_rows(weights):
     )
 
 
+def _cap90_spy_snapshots(value):
+    snapshots = gate_fixtures._snapshots(value)
+    result = []
+    for snapshot in snapshots:
+        spy = snapshot.universes[0]
+        rows = tuple(
+            dataclasses.replace(row, pit_market_cap=None)
+            if index < 2 else row
+            for index, row in enumerate(spy.constituents)
+        )
+        result.append(
+            dataclasses.replace(
+                snapshot,
+                universes=(
+                    dataclasses.replace(spy, constituents=rows),
+                    *snapshot.universes[1:],
+                ),
+            )
+        )
+    return tuple(result)
+
+
 @pytest.mark.parametrize(
     ("role", "attribute"),
     (
@@ -76,6 +98,100 @@ def test_all_roles_are_exactly_parity_bound_to_the_frozen_evaluator(
     assert record["decision_count"] == 261
     assert record["target_path_sha256"] == path.target_path_sha256
     json.dumps(record, allow_nan=False).encode("ascii")
+
+
+def test_default_order_path_retains_the_preexisting_r177_identity():
+    value = input_fixtures._input(20)
+    path = subject.build_six_universe_order_target_path(
+        value,
+        gate_fixtures._snapshots(value),
+        role=subject.ROLE_SIGNAL,
+    )
+    assert path.evaluation_profile_id == evaluator.TOP10_PRIMARY_PROFILE.profile_id
+    assert path.gate_profile_id == gate.TOP10_PRIMARY_PROFILE.profile_id
+    assert path.target_path_sha256 == (
+        "dbdc3144536b766e339fe0d62db6444ebd8c66ff47c36ab49622640784c66e33"
+    )
+
+
+@pytest.mark.parametrize(
+    "role",
+    (subject.ROLE_SIGNAL, subject.ROLE_MATCHED, subject.ROLE_SIX_ETF_BASKET),
+)
+def test_cap90_order_variant_is_explicit_and_preserves_matched_role_economics(role):
+    value = input_fixtures._input(20)
+    first = _cap90_spy_snapshots(value)[0]
+    default = subject.SixUniverseOrderTargetBuilder(
+        value, role=role
+    ).build(first.session, first)
+    cap90 = subject.SixUniverseOrderTargetBuilder(
+        value,
+        role=role,
+        profile=subject.ORDER_CAP90_EVALUATION_PROFILE,
+    ).build(first.session, first)
+
+    assert default.sleeves[0].coverage_valid is False
+    if role == subject.ROLE_SIX_ETF_BASKET:
+        assert default.sleeves[0].selection_status == "SIX_ETF_BASKET"
+    else:
+        assert default.sleeves[0].selection_status == "COVERAGE_FALLBACK"
+    assert cap90.sleeves[0].coverage_valid is True
+    assert cap90.construction_sha256 != default.construction_sha256
+    assert cap90.sleeves[0].slot_count == 10
+    assert sum((item.weight for item in cap90.target_weights), Decimal(0)) == (
+        gate.TARGET_GROSS_EXPOSURE
+    )
+    if role == subject.ROLE_SIX_ETF_BASKET:
+        assert cap90.target_weights == default.target_weights
+    else:
+        assert cap90.sleeves[0].selected_security_ids
+        assert cap90.sleeves[0].selection_status != "COVERAGE_FALLBACK"
+
+
+def test_cap90_order_signal_and_matched_select_equal_spy_stock_counts():
+    value = input_fixtures._input(20)
+    first = _cap90_spy_snapshots(value)[0]
+    decisions = {
+        role: subject.SixUniverseOrderTargetBuilder(
+            value,
+            role=role,
+            profile=subject.ORDER_CAP90_EVALUATION_PROFILE,
+        ).build(first.session, first)
+        for role in (subject.ROLE_SIGNAL, subject.ROLE_MATCHED)
+    }
+    signal, matched = (decisions[role].sleeves[0] for role in decisions)
+    assert len(signal.selected_security_ids) == len(matched.selected_security_ids)
+    assert signal.post_cap_stock_target_count == matched.post_cap_stock_target_count
+    assert signal.etf_target_weight == matched.etf_target_weight
+
+
+def test_cap90_order_path_binds_distinct_profile_and_refuses_unapproved_variants():
+    value = input_fixtures._input(20)
+    snapshots = _cap90_spy_snapshots(value)
+    path = subject.build_six_universe_order_target_path(
+        value,
+        snapshots,
+        role=subject.ROLE_SIGNAL,
+        profile=subject.ORDER_CAP90_EVALUATION_PROFILE,
+    )
+    assert path.evaluation_profile_id == (
+        evaluator.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id
+    )
+    assert path.gate_profile_id == gate.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id
+    assert path.decisions[0].sleeves[0].coverage_valid is True
+    assert path.to_record()["target_path_sha256"] == path.target_path_sha256
+
+    for unapproved in (
+        evaluator.TOP10_CAP95_EXPLORATORY_PROFILE,
+        dataclasses.replace(evaluator.TOP10_CAP90_EXPLORATORY_PROFILE),
+    ):
+        with pytest.raises(
+            subject.SixUniverseOrderTargetsError,
+            match="not an approved top-ten order profile",
+        ):
+            subject.SixUniverseOrderTargetBuilder(
+                value, role=subject.ROLE_SIGNAL, profile=unapproved
+            )
 
 
 def test_streaming_builder_needs_only_the_next_snapshot_and_advances_monotonically():

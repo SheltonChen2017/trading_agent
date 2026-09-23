@@ -106,6 +106,7 @@ def test_profiles_freeze_window_timing_cost_and_distinct_gate_profiles():
         subject.TOP10_PRIMARY_PROFILE.profile_id,
         subject.TOP5_SENSITIVITY_PROFILE.profile_id,
         subject.TOP10_CAP95_EXPLORATORY_PROFILE.profile_id,
+        subject.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id,
     )
     assert subject.TOP10_PRIMARY_PROFILE.gate_profile is gate.TOP10_PRIMARY_PROFILE
     assert subject.TOP5_SENSITIVITY_PROFILE.gate_profile is gate.TOP5_SENSITIVITY_PROFILE
@@ -124,6 +125,16 @@ def test_profiles_freeze_window_timing_cost_and_distinct_gate_profiles():
         subject.TOP10_PRIMARY_PROFILE.profile_sha256,
         subject.TOP5_SENSITIVITY_PROFILE.profile_sha256,
     }
+    assert subject.TOP10_CAP90_EXPLORATORY_PROFILE.gate_profile is (
+        gate.TOP10_CAP90_EXPLORATORY_PROFILE
+    )
+    assert subject.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id == (
+        "arv2-six-universe-evaluation-top10-cap90-exploratory-v1-"
+        "1ad57bdbfbf9b6eb781b190c"
+    )
+    assert subject.TOP10_CAP90_EXPLORATORY_PROFILE.profile_sha256 == (
+        "1ad57bdbfbf9b6eb781b190cc96f919519d3e36344edc290f3f472294aa68183"
+    )
     assert subject.TOP10_PRIMARY_PROFILE.profile_sha256 != (
         subject.TOP5_SENSITIVITY_PROFILE.profile_sha256
     )
@@ -167,6 +178,27 @@ def test_cap95_evaluator_binds_distinct_profile_without_changing_full_coverage()
     )
     assert exploratory._profile.to_record()["gate_profile_sha256"] == (
         gate.TOP10_CAP95_EXPLORATORY_PROFILE.profile_sha256
+    )
+
+
+def test_cap90_evaluator_binds_distinct_exploratory_gate_without_changing_older_profiles():
+    value = fixtures._input(20)
+    cap90 = _runtime(value, profile=subject.TOP10_CAP90_EXPLORATORY_PROFILE)
+    primary = _runtime(value, profile=subject.TOP10_PRIMARY_PROFILE)
+    cap95 = _runtime(value, profile=subject.TOP10_CAP95_EXPLORATORY_PROFILE)
+    assert cap90._profile.gate_profile is gate.TOP10_CAP90_EXPLORATORY_PROFILE
+    assert cap90._construction_path_sha256 not in {
+        primary._construction_path_sha256,
+        cap95._construction_path_sha256,
+    }
+    assert cap90._profile.to_record()["gate_profile_sha256"] == (
+        gate.TOP10_CAP90_EXPLORATORY_PROFILE.profile_sha256
+    )
+    assert cap90._profile.to_record()["orders"] is False
+    assert cap90._profile.to_record()["cost_bps_per_side"] == 10
+    assert subject.TOP10_PRIMARY_PROFILE.profile_sha256 == primary._profile.profile_sha256
+    assert subject.TOP10_CAP95_EXPLORATORY_PROFILE.profile_sha256 == (
+        cap95._profile.profile_sha256
     )
 
 

@@ -22317,3 +22317,81 @@ problems are resolved. This is a coverage/inclusion variation, not a claim
 of positive return or a formal outcome. Any order-based QC economic test
 still requires its own exact source/profile/result-read and matched
 market-cap plus six-ETF-basket plan under section 172.3.
+
+## 174. Codex R-180 counter-review and cap-90 exploratory construction, 2026-09-23
+
+This is the review handoff for the single unpushed lane series after
+`785aaf2`; the exact implementation range is `785aaf2..25ef304`, followed
+by this record-only HEAD commit. Work remained in the designated
+`codex/strategy-analyst-revisions-v2` worktree. The received `785aaf2`
+cap-95 variation is **accepted after correction**: its isolated gate and
+evaluator behavior passed, but adding its third profile made the submission
+adapter's hard-coded two-profile currentness check refuse legacy R-121/R-122;
+`47b7181` corrected that and kept the new profile out of the old run
+allowlist. Per-commit disposition for Claude's next review:
+
+| Commit | Disposition and change to inspect |
+| --- | --- |
+| `47b7181` | Review candidate: preregistered counts-only R-180 projection and exact read inventory; no outcome capability. |
+| `38e998f` | Review candidate: ported Mia's end-clock change into the exact nine-file projection after A1 failed; no economic rule change. |
+| `fd2f5c5` | Review candidate: recorded the one corroborated seven-statistic read and narrowed the imported-read prior-time exception to one exact R-180 identity. |
+| `25ef304` | Review candidate: added only an explicit cap-90 exploratory gate/evaluator/order-target option; the R-177 default profile and golden target-path SHA remain unchanged. |
+| Record-only HEAD | Review this section and section 173.3; it does not change executable code. |
+
+The R-180 read found **261** weekly decisions in each sleeve. Joint
+coverage under the already measured cap-95 floor was SPY 0, QQQ 0,
+SOXX 0, XLV 236, REMX 0, and XLE 245. SPY's cap coverage was in the
+90–95% band on 252 decisions, while its mapping and reported-weight gates
+passed on 258 and 261 decisions; hence the prospective cap-90 joint-pass
+count is only bounded at **249–252**, not observed. QQQ and SOXX had zero
+90%-mapping passes; REMX had zero reported-weight passes. The exact
+year-by-year counts, source caveat, aggregate digests, and four R-180
+infrastructure looks are in section 173. No return, price, order, raw
+provider row, or alpha statistic was read for R-180. Changing the cap floor
+after these counts makes the cap-90 candidate **exploratory/development**, not
+independent confirmation.
+
+The new `top10-cap90-exploratory-v1` profile changes only the minimum
+market-cap-weight coverage from 99% to 90%; the 90% SID/name mapping,
+95–105% total reported weight, five-positive-score floor, six sleeve
+budgets, stock cap, score rule, and ETF fallback remain. Gate SHA-256 is
+`278d334f9e6364bf4e3c181d35b1b5fb9b48fc37db9ab66e97f841221cdc62b6`;
+evaluator SHA-256 is
+`1ad57bdbfbf9b6eb781b190cc96f919519d3e36344edc290f3f472294aa68183`.
+The order-target builder accepts this exact option for signal, count-matched
+market-cap, and six-ETF roles, but defaults to the original R-177 identity.
+It does **not** silently authorize an old submission slot or make a QC
+order run launchable. Adding the cap-90 profile to the current gate source
+changes a freshly generated R-180 projection identity; the historical
+corrected `3d91e1c9...` projection is anchored by `38e998f` and must not be
+replaced retroactively by a projection built from this later tree.
+
+Findings ledger (retain resolved items):
+
+| ID | Severity | Status and evidence |
+| --- | --- | --- |
+| ARV2CR174-001 | P2 | Resolved. The post-Mia imported-result reader initially accepted any caller-supplied pre-run timestamp after a cloud re-save. `fd2f5c5` pins the sole exception to the committed R-180 candidate, projection, project, run, snapshot, and observed timestamp; changed-identity tests refuse before `backtests/read`. The earlier read has a prior committed nine-file observation but no historical QC snapshot-source byte proof. |
+| ARV2CR174-002 | P2 | Open, pre-launch integration: the order QC runtime and projector still bind the original 99% gate/profile, so the new cap-90 target builder alone cannot execute the candidate in QC. A separately versioned runtime/projector and exact source/profile/result inventory are required. |
+| ARV2CR174-003 | P2 | Open, pre-launch data-path blocker: the R-177 order runtime still refuses an empty or all-nonpositive constituent collection; R-180 counted two such REMX decisions. A versioned, explicitly flagged **own-ETF fallback** must preserve that absence without inventing constituent rows or replaying stale holdings. The old R-177 refusal must remain unchanged. |
+| ARV2CR174-004 | P3 | Documented only. The imported read is corroborated by project source timing recorded before a later byte-identical re-save, not by direct historical snapshot-source retrieval. It must not be reused as formal outcome provenance. |
+| ARV2CR174-005 | P3 | Documented only. The cap-90 floor was selected after viewing coverage counts; later economic results require a separate exploratory look and matched comparators, not a confirmation claim. |
+
+Focused validation: the five changed test files passed **428, skipped 1**
+before the final reader-pinning correction; on the final code tree the gate,
+evaluator, order-target, submission-reader, and selected adapter regression
+passed **79/79**. Changed production modules compiled; `git diff --check`
+was clean, and the active-document gate passed **69/69**. The cap-90 boundary
+tests were red before implementation and green
+afterwards; the original R-177 target-path golden SHA remained green. No full
+lane or repository suite was run, per owner direction. The read-only audit's
+duplicate test run was cancelled, not counted as completed validation.
+
+Excluded: no cap-90 QC upload, compile, backtest, outcome read, leverage,
+broker, deployment, live/paper/funded order, or shared-file change. The QC
+project's reported non-owner write collaborator was observed and disclosed;
+no permission was changed. Next: independently review this exact pushed
+snapshot; then Codex counter-reviews every review commit, versions the
+missing-collection fallback and order runtime/projector, and requests the
+exact economic QC source/profile/result-read authority before a separate
+order-based 2021–2025 exploratory run with both matched comparators. R-177's
+three-attempt budget is not reopened; R-178/R-179 remain unlaunched.

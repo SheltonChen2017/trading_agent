@@ -58,7 +58,12 @@ def test_projection_closes_exact_nine_file_counts_only_source(loaded_delta):
         if item.project_path == subject.MAIN_PROJECT_PATH
     )
     assert "set_start_date(2020, 11, 1)" in main
-    assert "set_end_date(2025, 12, 31)" in main
+    # QC invokes OnEndOfAlgorithm at the following midnight. Ending on the
+    # prior trading day preserves the diagnostic's 2025-12-31 end-clock pin;
+    # the final weekly coverage decision was already made on 2025-12-29.
+    assert subject.ALGORITHM_END == (2025, 12, 30)
+    assert "set_end_date(2025, 12, 30)" in main
+    assert "set_end_date(2025, 12, 31)" not in main
     assert "after_market_close(benchmark, 0)" in main
     assert "market_on_open_order" not in main
     assert "on_order_event" not in main

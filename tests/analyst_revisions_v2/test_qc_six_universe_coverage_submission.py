@@ -108,6 +108,7 @@ class FakeQc:
         self.corrupt_readback = False
         self.statistics = _statistics(plan, projection)
         self.compile_reads = 0
+        self.file_modified = "2026-09-23 06:52:43"
 
     def __call__(self, url, body, headers, timeout):
         assert url.startswith("https://www.quantconnect.com/api/v2/")
@@ -130,7 +131,8 @@ class FakeQc:
         elif endpoint == "files/read":
             response["files"] = [
                 {"projectId": 123, "name": name,
-                 "content": content + ("CORRUPT" if self.corrupt_readback and name == "main.py" else "")}
+                 "content": content + ("CORRUPT" if self.corrupt_readback and name == "main.py" else ""),
+                 "modified": self.file_modified}
                 for name, content in self.files.items()
             ]
         elif endpoint == "files/delete":
@@ -154,12 +156,14 @@ class FakeQc:
             response.update(count=1, backtests=[{
                 "projectId": 123, "backtestId": "backtest-1",
                 "name": self.plan.backtest_name, "status": self.status,
+                "created": "2026-09-23 06:52:46", "snapshotId": 987,
                 "sharpeRatio": 999,
             }])
         elif endpoint == "backtests/read":
             response["backtest"] = {
                 "projectId": 123, "backtestId": "backtest-1",
                 "name": self.plan.backtest_name, "status": self.status,
+                "snapshotId": 987,
                 "statistics": {"Sharpe Ratio": "DO-NOT-RETAIN", **self.statistics},
                 "orders": [{"secret": "DO-NOT-RETAIN"}],
                 "logs": ["DO-NOT-RETAIN"],
@@ -221,6 +225,64 @@ def test_source_readback_change_stops_before_compile(monkeypatch, tmp_path, proj
         subject.prepare_and_launch_once(plan, projection, api)
     assert not any(path == "compile/create" for path, _ in fake.calls)
     assert (plan.control_directory / "COVERAGE_DIAGNOSTIC-A1-claim.json").exists()
+
+
+def test_mia_completed_import_reads_only_counts_once_after_source_attestation(
+    monkeypatch, tmp_path, projection,
+):
+    plan = _plan(tmp_path, projection)
+    fake = FakeQc(plan, projection)
+    fake.project = {
+        "projectId": 123, "name": plan.project_name,
+        "organizationId": plan.organization_id, "language": "Py",
+        "owner": True, "collaborators": [{"owner": True}],
+    }
+    fake.files = {
+        item.project_path: item.source_bytes.decode("ascii")
+        for item in projection.source_files
+    }
+    api = _client(monkeypatch, fake)
+    result = subject.read_imported_counts_once(
+        plan, projection, project_id=123, backtest_id="backtest-1",
+        snapshot_id=987, api=api,
+    )
+    assert result["sleeves"]["SPY"]["totals"]["decision_count"] == 261
+    assert "DO-NOT-RETAIN" not in repr(result)
+    assert sum(endpoint == "backtests/read" for endpoint, _ in fake.calls) == 1
+    with pytest.raises(subject.CoverageQcSubmissionError, match="already spent"):
+        subject.read_imported_counts_once(
+            plan, projection, project_id=123, backtest_id="backtest-1",
+            snapshot_id=987, api=api,
+        )
+    assert sum(endpoint == "backtests/read" for endpoint, _ in fake.calls) == 1
+
+
+@pytest.mark.parametrize("defect", ["source", "late_source"])
+def test_mia_completed_import_refuses_unproven_source_before_result_read(
+    monkeypatch, tmp_path, projection, defect,
+):
+    plan = _plan(tmp_path, projection)
+    fake = FakeQc(plan, projection)
+    fake.project = {
+        "projectId": 123, "name": plan.project_name,
+        "organizationId": plan.organization_id, "language": "Py",
+        "owner": True, "collaborators": [{"owner": True}],
+    }
+    fake.files = {
+        item.project_path: item.source_bytes.decode("ascii")
+        for item in projection.source_files
+    }
+    if defect == "source":
+        fake.files["main.py"] += "# changed\n"
+    else:
+        fake.file_modified = "2026-09-23 06:52:47"
+    api = _client(monkeypatch, fake)
+    with pytest.raises(subject.CoverageQcSubmissionError, match="source"):
+        subject.read_imported_counts_once(
+            plan, projection, project_id=123, backtest_id="backtest-1",
+            snapshot_id=987, api=api,
+        )
+    assert not any(endpoint == "backtests/read" for endpoint, _ in fake.calls)
 
 
 def test_unknown_custom_statistic_is_refused_after_one_read(monkeypatch, tmp_path, projection):

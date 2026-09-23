@@ -28,7 +28,7 @@ MAIN_PROJECT_PATH = "main.py"
 MAXIMUM_SOURCE_FILE_BYTES = 64 * 1024
 MAXIMUM_TOTAL_SOURCE_BYTES = 320 * 1024
 ALGORITHM_START = (2020, 11, 1)
-ALGORITHM_END = (2025, 12, 31)
+ALGORITHM_END = (2025, 12, 30)
 _SOURCE_PATHS = (
     "accepted_risk_preliminary_rating_policy.py",
     "accepted_risk_preliminary_rating_evaluator.py",
@@ -180,6 +180,11 @@ class ARV2SixUniverseCoverageDiagnostic(QCAlgorithm):
         self.set_time_zone("America/New_York")
         self.settings.daily_precise_end_time = True
         self.set_start_date({ALGORITHM_START[0]}, {ALGORITHM_START[1]}, {ALGORITHM_START[2]})
+        # The engine trades through the end of the end date and then fires
+        # on_end_of_algorithm with the clock at 00:00 of the following day.
+        # The frozen coverage census pins on_end_of_algorithm to the session
+        # 2025-12-31 (EVALUATION_END_SESSION), so the end date must be the
+        # prior trading day, 2025-12-30, to land the termination clock on it.
         self.set_end_date({ALGORITHM_END[0]}, {ALGORITHM_END[1]}, {ALGORITHM_END[2]})
         self.universe_settings.asynchronous = False
         self.universe_settings.resolution = Resolution.DAILY

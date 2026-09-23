@@ -15,6 +15,7 @@ import re
 import stat
 import time
 from dataclasses import dataclass, field
+from datetime import datetime
 from pathlib import Path
 
 from research.quantconnect import API_BASE, QuantConnectClient
@@ -514,6 +515,11 @@ def read_counts_once(plan: CoverageQcPlan, launch: dict, api: QuantConnectClient
     response = _post(api, "backtests/read", {
         "projectId": launch["project_id"], "backtestId": launch["backtest_id"],
     })
+    return _parse_counts_response(response, plan, launch)
+
+
+def _parse_counts_response(response: dict, plan: CoverageQcPlan, launch: dict) -> dict:
+    """Retain only the seven schema- and digest-bound coverage statistics."""
     backtest = response.get("backtest")
     if type(backtest) is not dict or (
         backtest.get("projectId") != launch["project_id"]
@@ -599,8 +605,109 @@ def read_counts_once(plan: CoverageQcPlan, launch: dict, api: QuantConnectClient
     return {"meta": meta, "sleeves": dict(zip(_TICKERS, sleeves))}
 
 
+def read_imported_counts_once(
+    plan: CoverageQcPlan, projection: source_builder.SixUniverseCoverageQcProjection,
+    *, project_id: int, backtest_id: str, snapshot_id: int,
+    api: QuantConnectClient,
+) -> dict:
+    """Read a Mia-completed run once after attesting its current project source.
+
+    QC's file API does not expose historical snapshot contents. The exact
+    current source must match the frozen projection and every file must have
+    been last modified before this run was created. This is a bounded timing
+    attestation, not a claim of historical snapshot byte access.
+    """
+    preview = preview_plan(plan, projection)
+    _client(api)
+    if (
+        type(project_id) is not int or project_id <= 0
+        or type(backtest_id) is not str or not _ID.fullmatch(backtest_id)
+        or type(snapshot_id) is not int or snapshot_id <= 0
+    ):
+        _fail("coverage imported run identity changed")
+    project = _post(api, "projects/read", {"projectId": project_id})
+    if _project(project, plan) != project_id:
+        _fail("coverage imported project identity changed")
+    owner = project["projects"][0]
+    collaborators = owner.get("collaborators")
+    if (
+        owner.get("owner") is not True
+        or type(collaborators) is not list or len(collaborators) > 2
+        or any(type(item) is not dict for item in collaborators)
+        or sum(item.get("owner") is True for item in collaborators) != 1
+    ):
+        _fail("coverage imported project collaborator inventory changed")
+    readback = _post(api, "files/read", {"projectId": project_id}).get("files")
+    if type(readback) is not list or len(readback) != len(projection.source_files):
+        _fail("coverage imported source inventory changed")
+    observed = {}
+    modified = []
+    for item in readback:
+        if (
+            type(item) is not dict or item.get("projectId") != project_id
+            or type(item.get("name")) is not str
+            or type(item.get("content")) is not str
+            or item["name"] in observed
+        ):
+            _fail("coverage imported source identity changed")
+        observed[item["name"]] = item["content"]
+        try:
+            stamp = datetime.fromisoformat(item["modified"])
+        except (KeyError, TypeError, ValueError):
+            _fail("coverage imported source modification time changed")
+        if stamp.tzinfo is not None:
+            _fail("coverage imported source time basis changed")
+        modified.append(stamp)
+    if set(observed) != {item.project_path for item in projection.source_files}:
+        _fail("coverage imported source paths changed")
+    for item in projection.source_files:
+        if observed[item.project_path] != item.source_bytes.decode("ascii"):
+            _fail("coverage imported source bytes changed")
+    listing = _post(api, "backtests/list", {
+        "projectId": project_id, "includeStatistics": False,
+    })
+    rows = listing.get("backtests")
+    if type(rows) is not list or listing.get("count", len(rows)) != len(rows):
+        _fail("coverage imported run inventory changed")
+    matches = [row for row in rows if type(row) is dict and row.get("backtestId") == backtest_id]
+    if len(matches) != 1:
+        _fail("coverage imported run is absent")
+    run = matches[0]
+    try:
+        created = datetime.fromisoformat(run["created"])
+    except (KeyError, TypeError, ValueError):
+        _fail("coverage imported run creation time changed")
+    if (
+        created.tzinfo is not None
+        or max(modified) > created
+        or run.get("projectId") != project_id
+        or run.get("name") != plan.backtest_name
+        or run.get("status") != "Completed."
+        or run.get("snapshotId") != snapshot_id
+    ):
+        _fail("coverage imported run did not match frozen source and terminal identity")
+    _write_once(_path(plan, "import-result-read-claim"), {
+        "candidate_id": plan.candidate_id, "project_id": project_id,
+        "backtest_id": backtest_id, "snapshot_id": snapshot_id,
+        "projection_sha256": preview["projection_sha256"],
+    })
+    response = _post(api, "backtests/read", {
+        "projectId": project_id, "backtestId": backtest_id,
+    })
+    backtest = response.get("backtest")
+    if type(backtest) is not dict or backtest.get("snapshotId") != snapshot_id:
+        _fail("coverage imported result snapshot changed")
+    launch = {
+        "project_id": project_id, "backtest_id": backtest_id,
+        "backtest_name": plan.backtest_name,
+        "profile_id": preview["profile_id"],
+        "profile_sha256": preview["profile_sha256"],
+    }
+    return _parse_counts_response(response, plan, launch)
+
+
 __all__ = (
     "CoverageQcPlan", "CoverageQcSubmissionError", "preview_plan",
     "prepare_and_launch_once", "poll_status_once", "production_client",
-    "read_counts_once",
+    "read_counts_once", "read_imported_counts_once",
 )

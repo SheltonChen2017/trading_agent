@@ -22184,3 +22184,70 @@ capability expansion. This is software proof only; QC completion and the
 actual six-sleeve census remain to be observed and recorded below before
 choosing an eased economic profile. No complete lane suite was run under the
 owner's standing rule.
+
+### 173.1 R-180 A1 terminal status (no result read)
+
+The exact nine-file source was uploaded to new private QC project `36854638`
+and byte-for-byte re-read, compiled, and launched once as backtest
+`ca74d0514d72e49af83dacb4530d219d`. The A1 terminal status is **Runtime
+Error**. The exact seven count statistics were not read and no coverage or
+economic conclusion can be drawn from A1. This spends one QC attempt and one
+infrastructure research look; two attempts remain, but an identical-byte
+relaunch is prohibited. The result reader's one-use claim remains unspent.
+The terminal status was obtained with `backtests/list` and
+`includeStatistics=false`; no log, raw row, order, chart, standard statistic,
+or result body was inspected. A redacted terminal-error read has been
+requested from the owner as a narrower additional diagnostic authority
+before any A2 source change or launch.
+
+### 173.2 Mia end-clock correction and local reconciliation
+
+The owner reported that QC's Mia assistant fixed R-180 in the preserved
+project `36854638`. A value-free `projects/read`, `files/read`, and
+`backtests/list` inventory found three later **Completed.** runs:
+`e06501daa3b345f95e65191404bad495` (snapshot `36854955`),
+`3d9e18970ac9c59f87c955a29b027414` (snapshot `36855564`), and
+`2af50aacf72be8725f537d2a40740533` (snapshot `36856156`). Each is
+conservatively an additional infrastructure research look, zero alpha looks
+and zero economic cells; the original A1 `Runtime Error` is a fourth R-180
+infrastructure look. No statistics, orders, charts, logs, raw rows, or
+performance fields were retained from this inventory.
+
+The current cloud source differs from the original approved nine-file
+projection in **main.py only**. Mia changed `set_end_date(2025, 12, 31)` to
+`set_end_date(2025, 12, 30)` and added a five-line explanation: QC's end
+callback sees midnight of the following day, while the diagnostic runtime
+requires the frozen `2025-12-31` end-clock. The final weekly diagnostic
+decision is `2025-12-29`; therefore ending the engine on December 30 does
+not remove a decision. The first A1 error/stack remains uninspected, so this
+mechanism is supported by Mia's exact one-file diff and subsequent completed
+runs, not by an independent read of that error text. Three completed statuses
+alone do **not** authenticate their seven count records or imply a valid gate
+decision.
+
+A focused regression was red against the original generated `main.py` and
+green after porting Mia's exact main-source change into the local projector.
+All **nine** freshly projected local files now byte-match the current QC
+project files. The new projection SHA-256 is
+`3d91e1c9c6138a9642154bf1e96124933e5c9c934f538d31413b77a1d0e76876`;
+the profile and eight imported runtime/source files are unchanged. Focused
+R-180 runtime, projection, and submission tests pass **20/20**. The latest
+cloud file modification time is `2026-09-23 06:52:43`, three seconds before
+the latest completed run's creation time `06:52:46`, and no later source
+modification was observed. This is a project-source timing attestation, not
+a QC historical snapshot-source read. The precise count-result inventory
+for that corrected run is awaiting separate owner confirmation; no result
+read or gate easing has occurred yet.
+
+The current project metadata reports the owner and one non-owner collaborator
+with write access. The initial project-create check allowed no non-owner
+collaborator; the later addition was not made by this Codex round. No names,
+email addresses, or collaborator identifiers were retained, and no permission
+was changed. The owner has been informed rather than treating the current
+project as owner-only. A focused one-use imported-result reader is prepared:
+it requires the exact nine source files, source modification no later than
+the selected run's creation, exact completed run and snapshot identities,
+and the seven schema-/digest-bound count statistics. A historical snapshot
+source read is not available through this verified API path, so the timing
+attestation's limitation is explicit. Three additional focused reader tests
+bring the R-180 focused selection to **23 passed**; no complete lane suite ran.

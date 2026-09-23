@@ -22251,3 +22251,69 @@ and the seven schema-/digest-bound count statistics. A historical snapshot
 source read is not available through this verified API path, so the timing
 attestation's limitation is explicit. Three additional focused reader tests
 bring the R-180 focused selection to **23 passed**; no complete lane suite ran.
+
+### 173.3 One Mia count read with prior-time corroboration and gate implication
+
+The owner approved a counts-only read of one Mia-completed R-180 run. The
+selected run was `2af50aacf72be8725f537d2a40740533`, snapshot `36856156`.
+Before the single `backtests/read`, all nine current cloud source files again
+byte-matched the local corrected projection. Eight files had been re-saved
+byte-identically at `2026-09-23 07:24:38`, after this run's creation. The
+earlier nine-file match with modification time `06:52:43`, before this run's
+`06:52:46` creation, had already been recorded in commit `38e998f` at
+`07:08:14` UTC, before the later re-save. The one-use reader accepted that
+explicit prior timing attestation, and the claim is now spent. This is
+stronger than relying on the current working project alone, but still not a
+historical QC snapshot-source read. No source or QC run was changed for this
+result read. After review, the reader's prior-time exception was restricted
+to this exact candidate, corrected projection, project, run, snapshot, and
+committed timestamp; arbitrary caller-supplied older times are now refused.
+The prior committed observation corroborates, but does not cryptographically
+prove, the source contents of the historical QC run snapshot.
+
+The seven expected `ARV2_SIX_COVERAGE_*` canonical statistics passed exact
+schema, profile/package/activation, six-sleeve digest, aggregate digest,
+decision-census, source-row-bound, and no-price/no-order flags. The profile
+SHA-256 is `bd7a4e55c737535789941862378444b01cc9f2a4e673c3884c53e4b4cc4b0229`,
+aggregate SHA-256 is `b9411ee86bd029345e022d40fe90471c9cd6ee01f56f86436dfcfa0df1b15fd6`,
+and coverage-path SHA-256 is
+`60df485d266195f254286f389976e1f68aadb9972f46a5617850d581d7d81d1b`.
+The callback source-row count is 10,562,898. Standard QC statistics,
+returns, charts, logs, orders, raw provider rows, and identifiers were not
+retained or reported. The single read consumed no new run look or alpha
+evaluation.
+
+| Sleeve | Measurable / 261 | Cap >=99% | Cap >=95% | Mapping >=90% | Joint original | Joint cap95 | Weight in 95–105% |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| SPY | 261 | 0 | 0 | 258 | 0 | 0 | 261 |
+| QQQ | 259 | 0 | 0 | 0 | 0 | 0 | 258 |
+| SOXX | 261 | 0 | 0 | 0 | 0 | 0 | 261 |
+| XLV | 261 | 0 | 252 | 245 | 0 | 236 | 261 |
+| REMX | 258 | 0 | 0 | 0 | 0 | 0 | 0 |
+| XLE | 261 | 131 | 252 | 254 | 131 | 245 | 261 |
+
+The annual joint-cap95 counts for XLV are 35, 51, 51, 51, and 48 across
+2021–2025; XLE has 44, 51, 51, 51, and 48. XLE's original joint-99 counts
+are 20, 14, 50, 47, and 0. The other four sleeves have zero joint passes
+under both already measured floors in every year.
+
+All six sleeves have nine decisions with stale fundamental callbacks; the
+strictly-prior freshness rule was not eased. SPY's other 252 cap ratios are
+in the 90–95% band, while its mapping and weight gates pass on 258 and 261
+decisions respectively. A 90% cap floor with the mapping floor unchanged
+would therefore admit **at least 249 and at most 252** SPY coverage decisions;
+this is an intersection bound from the counts, not a measured joint pass
+count. XLV and XLE already have 236 and 245 joint passes at 95%. QQQ and
+SOXX have **zero** 90%-mapping passes, so lowering only the cap floor cannot
+admit either sleeve; REMX additionally has zero weight-band passes, with 257
+of 258 measurable total weights below 95%. No amount of cap-only easing
+should be described as a repair for those separate deficiencies.
+
+Next candidate: a separately named **offline cap-90 exploratory profile**
+with the 90% mapping and 95–105% total-weight requirements held fixed. It
+would allow SPY/XLV/XLE stock decisions while leaving QQQ/SOXX/REMX on
+their existing ETF fallback unless their independent mapping/weight
+problems are resolved. This is a coverage/inclusion variation, not a claim
+of positive return or a formal outcome. Any order-based QC economic test
+still requires its own exact source/profile/result-read and matched
+market-cap plus six-ETF-basket plan under section 172.3.

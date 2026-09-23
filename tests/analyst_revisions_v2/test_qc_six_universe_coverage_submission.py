@@ -285,6 +285,53 @@ def test_mia_completed_import_refuses_unproven_source_before_result_read(
     assert not any(endpoint == "backtests/read" for endpoint, _ in fake.calls)
 
 
+def test_mia_import_refuses_unpinned_prior_source_time_after_identical_resave(
+    monkeypatch, tmp_path, projection,
+):
+    plan = _plan(tmp_path, projection)
+    fake = FakeQc(plan, projection)
+    fake.project = {
+        "projectId": 123, "name": plan.project_name,
+        "organizationId": plan.organization_id, "language": "Py",
+        "owner": True, "collaborators": [{"owner": True}],
+    }
+    fake.files = {
+        item.project_path: item.source_bytes.decode("ascii")
+        for item in projection.source_files
+    }
+    fake.file_modified = "2026-09-23 07:24:38"
+    api = _client(monkeypatch, fake)
+    with pytest.raises(
+        subject.CoverageQcSubmissionError,
+        match="pinned prior attestation",
+    ):
+        subject.read_imported_counts_once(
+            plan, projection, project_id=123, backtest_id="backtest-1",
+            snapshot_id=987, api=api,
+            prior_source_modified_at="2026-09-23 06:52:43",
+        )
+    assert not any(endpoint == "backtests/read" for endpoint, _ in fake.calls)
+
+
+def test_only_the_committed_r180_prior_source_observation_is_recognized():
+    identity = (
+        "R180_MIA_RECONCILED_COUNTS",
+        "3d91e1c9c6138a9642154bf1e96124933e5c9c934f538d31413b77a1d0e76876",
+        36854638,
+        "2af50aacf72be8725f537d2a40740533",
+        36856156,
+        "2026-09-23 06:52:43",
+    )
+    assert subject._has_pinned_prior_source_attestation(*identity)
+    for index, changed in enumerate((
+        "ANOTHER_CANDIDATE", "a" * 64, 36854639,
+        "another-backtest", 36856157, "2026-09-23 06:52:42",
+    )):
+        corrupted = list(identity)
+        corrupted[index] = changed
+        assert not subject._has_pinned_prior_source_attestation(*corrupted)
+
+
 def test_unknown_custom_statistic_is_refused_after_one_read(monkeypatch, tmp_path, projection):
     plan = _plan(tmp_path, projection)
     fake = FakeQc(plan, projection)

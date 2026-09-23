@@ -38,6 +38,24 @@ _DEFAULT_FILES = frozenset({"main.py", "research.ipynb"})
 _TICKERS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
 _MAX_FILE = source_builder.MAXIMUM_SOURCE_FILE_BYTES
 _MAX_TOTAL_WITH_MARGIN = source_builder.MAXIMUM_TOTAL_SOURCE_BYTES
+_R180_PRIOR_SOURCE_ATTESTATION = (
+    "R180_MIA_RECONCILED_COUNTS",
+    "3d91e1c9c6138a9642154bf1e96124933e5c9c934f538d31413b77a1d0e76876",
+    36854638,
+    "2af50aacf72be8725f537d2a40740533",
+    36856156,
+    "2026-09-23 06:52:43",
+)
+
+
+def _has_pinned_prior_source_attestation(
+    candidate_id: str, projection_sha256: str, project_id: int,
+    backtest_id: str, snapshot_id: int, prior_source_modified_at: str | None,
+) -> bool:
+    return (
+        candidate_id, projection_sha256, project_id, backtest_id,
+        snapshot_id, prior_source_modified_at,
+    ) == _R180_PRIOR_SOURCE_ATTESTATION
 
 
 @dataclass(frozen=True)
@@ -608,14 +626,15 @@ def _parse_counts_response(response: dict, plan: CoverageQcPlan, launch: dict) -
 def read_imported_counts_once(
     plan: CoverageQcPlan, projection: source_builder.SixUniverseCoverageQcProjection,
     *, project_id: int, backtest_id: str, snapshot_id: int,
-    api: QuantConnectClient,
+    api: QuantConnectClient, prior_source_modified_at: str | None = None,
 ) -> dict:
     """Read a Mia-completed run once after attesting its current project source.
 
     QC's file API does not expose historical snapshot contents. The exact
-    current source must match the frozen projection and every file must have
-    been last modified before this run was created. This is a bounded timing
-    attestation, not a claim of historical snapshot byte access.
+    current source must match the frozen projection. Normally every file must
+    have been last modified before the run was created. If QC later re-saved
+    byte-identical files, only the one committed R-180 prior observation may
+    be supplied. Neither route claims historical snapshot byte access.
     """
     preview = preview_plan(plan, projection)
     _client(api)
@@ -679,13 +698,30 @@ def read_imported_counts_once(
         _fail("coverage imported run creation time changed")
     if (
         created.tzinfo is not None
-        or max(modified) > created
         or run.get("projectId") != project_id
         or run.get("name") != plan.backtest_name
         or run.get("status") != "Completed."
         or run.get("snapshotId") != snapshot_id
     ):
         _fail("coverage imported run did not match frozen source and terminal identity")
+    if max(modified) > created:
+        if not _has_pinned_prior_source_attestation(
+            plan.candidate_id,
+            preview["projection_sha256"],
+            project_id,
+            backtest_id,
+            snapshot_id,
+            prior_source_modified_at,
+        ):
+            _fail("coverage imported source lacks the pinned prior attestation")
+        try:
+            prior = datetime.fromisoformat(prior_source_modified_at)
+        except (TypeError, ValueError):
+            _fail("coverage imported source lacks a prior timing attestation")
+        if prior.tzinfo is not None or prior > created or prior >= max(modified):
+            _fail("coverage imported source prior timing attestation changed")
+    elif prior_source_modified_at is not None:
+        _fail("coverage imported source supplied an unnecessary prior attestation")
     _write_once(_path(plan, "import-result-read-claim"), {
         "candidate_id": plan.candidate_id, "project_id": project_id,
         "backtest_id": backtest_id, "snapshot_id": snapshot_id,

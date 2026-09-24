@@ -1,7 +1,7 @@
 """One-use, host-only QC submission for the exploratory cap-90 order family.
 
 This module never acts on import.  A1 creates one private project per role;
-later corrected attempts require a separately reviewed in-place continuation.
+the narrowly pinned R181 A2 repairs that same project in place.
 Only two bounded custom statistics may be retained from a completed run.
 """
 
@@ -36,6 +36,17 @@ _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]*\Z")
 _PATH = re.compile(r"[A-Za-z0-9][A-Za-z0-9._/-]*\.py\Z")
 _CUSTOM = tuple(sorted((runtime.META_STATISTIC_NAME, runtime.AGGREGATES_STATISTIC_NAME)))
 _DEFAULT_FILES = frozenset(("main.py", "research.ipynb"))
+_QC_MAXIMUM_FILE_CHARACTERS = 64_000
+_R181_A2_PROJECT_ID = 36_891_750
+_R181_A2_PROJECT_NAME = "104 ARV2 SIX CAP90 SIGNAL R181 2021 2025"
+_R181_A2_PROJECTION_SHA256 = "b68661ec2f90f98eb47e09242b8b9d4cd8ed21101667f355afba0a4a48461c29"
+_R181_A1_PROJECTION_SHA256 = "947fd40922e2503a118e54bde8c0475cd9504fa0d2d212ccdc40e36f6fc72dc0"
+_R181_A1_CLAIM_SHA256 = "bcef1a218cd15cd22b9f470b5cdbba9e08b3bb555b74edfd09c5a961329983ff"
+_R181_A1_FAILED_RUNTIME = (1, "334359b90efed75da5f0ada1d5e6b256f4a6bd0aee7eb39c0f90182a021ffc8b")
+_R181_A1_DEFAULT_MAIN = (406, "215476644fd846a1488ca4c45876ed21c9c736faa79b31a59fcaaa1643aac608")
+_R181_A2_RUNTIME = (56_398, "66cbc2966972467d3d38511e541c984d3932ad1dca2bcf05ccf69830307349b1")
+_R181_RUNTIME_PATH = "accepted_risk_six_universe_order_qc_runtime.py"
+_R181_TARGETS_PATH = "accepted_risk_six_universe_order_targets.py"
 _META_FIELDS = frozenset({
     "schema", "role", "profile_id", "profile_sha256", "package_id",
     "package_sha256", "activation_manifest_sha256", "symbol_resolution_id",
@@ -135,13 +146,13 @@ def _post(api: QuantConnectClient, endpoint: str, payload: dict) -> dict:
     return response
 
 
-def preview(plan: Cap90QcPlan, projection: object) -> dict:
-    """Validate the exact role, profile, and 13-file source without I/O."""
+def _preview_exact(plan: Cap90QcPlan, projection: object, *, attempt: int) -> dict:
+    """Validate one exact attempt's role, profile, and projected source."""
     if type(plan) is not Cap90QcPlan or (
         type(plan.candidate_id) is not str
         or plan.candidate_id not in _ROLES
         or type(plan.attempt) is not int
-        or plan.attempt != 1
+        or plan.attempt != attempt
         or plan.role != _ROLES[plan.candidate_id]
         or type(plan.project_name) is not str
         or not _SAFE.fullmatch(plan.project_name)
@@ -158,7 +169,7 @@ def preview(plan: Cap90QcPlan, projection: object) -> dict:
             plan.package_sha256, plan.activation_manifest_sha256,
         ))
     ):
-        _fail("cap-90 plan identity is not an exact A1 role")
+        _fail("cap-90 plan identity is not an exact attempt role")
     profile = runtime.require_six_universe_order_profile(
         plan.role, variant=runtime.CAP90_VARIANT,
     )
@@ -192,6 +203,8 @@ def preview(plan: Cap90QcPlan, projection: object) -> dict:
             source.decode("ascii")
         except UnicodeError:
             _fail("cap-90 projected source is not ASCII")
+        if len(source) > _QC_MAXIMUM_FILE_CHARACTERS:
+            _fail("cap-90 projected source exceeds QC's 64000-character file cap")
         paths.append(path)
     if (
         len(set(paths)) != 13 or "main.py" not in paths
@@ -212,6 +225,27 @@ def preview(plan: Cap90QcPlan, projection: object) -> dict:
     }
 
 
+def preview(plan: Cap90QcPlan, projection: object) -> dict:
+    """Validate the original A1 source without I/O."""
+    return _preview_exact(plan, projection, attempt=1)
+
+
+def preview_a2(plan: Cap90QcPlan, projection: object) -> dict:
+    """Bind only R181's diagnosed in-place 64,000-character repair."""
+    identity = _preview_exact(plan, projection, attempt=2)
+    if (
+        plan.candidate_id != "R181"
+        or plan.project_name != _R181_A2_PROJECT_NAME
+        or plan.projection_sha256 != _R181_A2_PROJECTION_SHA256
+        or plan.backtest_name != (
+            "ARV2 R181A2 six cap90 signal 2021 2025 "
+            + _R181_A2_PROJECTION_SHA256[:8]
+        )
+    ):
+        _fail("cap-90 R181 A2 correction is not the frozen source and run")
+    return identity
+
+
 def _control_path(plan: Cap90QcPlan, name: str) -> Path:
     root = plan.control_directory
     try:
@@ -225,7 +259,9 @@ def _control_path(plan: Cap90QcPlan, name: str) -> Path:
         hasattr(os, "getuid") and info.st_uid != os.getuid()
     ):
         _fail("cap-90 control directory is not private")
-    return root / (plan.candidate_id + "-A1-" + name + ".json")
+    if type(plan.attempt) is not int or plan.attempt not in (1, 2):
+        _fail("cap-90 attempt control path is unsupported")
+    return root / (plan.candidate_id + "-A" + str(plan.attempt) + "-" + name + ".json")
 
 
 def _write_once(path: Path, value: dict) -> None:
@@ -287,6 +323,7 @@ def _launch_matches_plan(plan: Cap90QcPlan, launch: dict) -> None:
         or launch.get("backtest_name") != plan.backtest_name
         or launch.get("projection_sha256") != plan.projection_sha256
         or launch.get("profile_sha256") != plan.profile_sha256
+        or (plan.attempt == 2 and launch.get("attempt") != 2)
     ):
         _fail("cap-90 launch and frozen plan identity differ")
 
@@ -295,15 +332,205 @@ def _require_prior_valid_role(plan: Cap90QcPlan) -> None:
     prior = {"R182": "R181", "R183": "R182"}.get(plan.candidate_id)
     if prior is None:
         return
-    prior_path = plan.control_directory / (prior + "-A1-result-valid.json")
+    # R181 A1 never compiled or launched: the authenticated R181 result can
+    # only come from the separately frozen A2 correction in the same project.
+    prior_attempt = 2 if prior == "R181" else 1
+    prior_path = plan.control_directory / (prior + "-A" + str(prior_attempt) + "-result-valid.json")
     prior_result = _read_control(prior_path)
     if (
         prior_result.get("candidate_id") != prior
         or prior_result.get("run_valid") is not True
         or type(prior_result.get("aggregate_sha256")) is not str
         or not _HEX.fullmatch(prior_result["aggregate_sha256"])
+        or (prior == "R181" and (
+            prior_result.get("attempt") != 2
+            or prior_result.get("projection_sha256") != _R181_A2_PROJECTION_SHA256
+        ))
     ):
         _fail("cap-90 preceding matched role is not authenticated valid")
+
+
+def _r181_a1_claim(plan: Cap90QcPlan, projection: object) -> dict:
+    """Reconcile A2 against the exact locally spent A1 claim, not a caller story."""
+    path = plan.control_directory / "R181-A1-claim.json"
+    try:
+        raw = path.read_bytes()
+    except OSError:
+        _fail("cap-90 R181 A1 claim is unavailable")
+    if hashlib.sha256(raw).hexdigest() != _R181_A1_CLAIM_SHA256:
+        _fail("cap-90 R181 A1 claim bytes changed")
+    claim = _read_control(path)
+    old_files = claim.get("source_files")
+    if (
+        claim.get("candidate_id") != "R181"
+        or claim.get("role") != "signal"
+        or claim.get("projection_sha256") != _R181_A1_PROJECTION_SHA256
+        or claim.get("profile_sha256") != plan.profile_sha256
+        or claim.get("profile_id") != projection.profile_id
+        or type(old_files) is not list or len(old_files) != 13
+        or any(type(row) is not list or len(row) != 3 for row in old_files)
+    ):
+        _fail("cap-90 R181 A1 claim identity changed")
+    old = {row[0]: (row[2], row[1]) for row in old_files}
+    new = {item.project_path: (item.byte_count, item.content_sha256) for item in projection.source_files}
+    if (
+        len(old) != 13 or set(old) != set(new)
+        or old[_R181_RUNTIME_PATH] != (67_316, "84e4d69135ff13f592e071574d22b30255088f4df22bd11f33943c652d81a46a")
+        or new[_R181_RUNTIME_PATH] != _R181_A2_RUNTIME
+        or any(new[path] != prior for path, prior in old.items() if path != _R181_RUNTIME_PATH)
+    ):
+        _fail("cap-90 R181 A2 changes more than the diagnosed runtime projection")
+    for name in ("launch", "terminal", "result-read-claim", "result-valid"):
+        if (plan.control_directory / ("R181-A1-" + name + ".json")).exists():
+            _fail("cap-90 R181 A1 already progressed beyond the diagnosed upload failure")
+    return old
+
+
+def _r181_residual_files(response: dict, old: dict) -> None:
+    """Authenticate all 12 A1 residue files, including the 1-byte failure."""
+    files = response.get("files")
+    if type(files) is not list or len(files) != 12:
+        _fail("cap-90 R181 A1 residual file inventory changed")
+    seen = set()
+    for item in files:
+        if (
+            type(item) is not dict
+            or item.get("projectId") != _R181_A2_PROJECT_ID
+            or type(item.get("name")) is not str
+            or type(item.get("content")) is not str
+            or item["name"] in seen
+        ):
+            _fail("cap-90 R181 A1 residual file identity changed")
+        path = item["name"]
+        seen.add(path)
+        try:
+            raw = item["content"].encode("ascii")
+        except UnicodeError:
+            _fail("cap-90 R181 A1 residual file is not ASCII")
+        expected = (
+            _R181_A1_FAILED_RUNTIME if path == _R181_RUNTIME_PATH
+            else _R181_A1_DEFAULT_MAIN if path == "main.py"
+            else old.get(path)
+        )
+        if expected is None or (len(raw), hashlib.sha256(raw).hexdigest()) != expected:
+            _fail("cap-90 R181 A1 residual file bytes changed")
+    if seen != set(old) - {_R181_TARGETS_PATH}:
+        _fail("cap-90 R181 A1 residual paths changed")
+
+
+def launch_r181_a2(plan: Cap90QcPlan, projection: object, api: QuantConnectClient) -> dict:
+    """One-use in-place A2: exact A1 residue, repair, byte-check, compile, run."""
+    identity = preview_a2(plan, projection)
+    _client(api)
+    if _control_path(plan, "claim").exists():
+        _fail("cap-90 R181 A2 was already claimed")
+    old = _r181_a1_claim(plan, projection)
+    _post(api, "authenticate", {})
+    verified = _post(api, "projects/read", {"projectId": _R181_A2_PROJECT_ID})
+    if _project(verified, plan) != _R181_A2_PROJECT_ID:
+        _fail("cap-90 R181 A2 existing project identity changed")
+    project = verified["projects"][0]
+    collaborators = project.get("collaborators")
+    if (
+        project.get("owner") is not True or project.get("codeRunning") is not False
+        or type(collaborators) is not list or len(collaborators) > 1
+        or any(type(item) is not dict or item.get("owner") is not True for item in collaborators)
+    ):
+        _fail("cap-90 R181 A2 project is not private and idle")
+    listing = _post(api, "backtests/list", {
+        "projectId": _R181_A2_PROJECT_ID, "includeStatistics": False,
+    })
+    if listing.get("backtests") != [] or listing.get("count") != 0:
+        _fail("cap-90 R181 A2 project has an unexpected prior backtest")
+    _r181_residual_files(_post(api, "files/read", {
+        "projectId": _R181_A2_PROJECT_ID,
+    }), old)
+    _write_once(_control_path(plan, "claim"), {
+        **identity,
+        "attempt": 2,
+        "project_id": _R181_A2_PROJECT_ID,
+        "a1_claim_sha256": _R181_A1_CLAIM_SHA256,
+    })
+    source = {item.project_path: item.source_bytes.decode("ascii") for item in projection.source_files}
+    _post(api, "files/update", {
+        "projectId": _R181_A2_PROJECT_ID, "name": _R181_RUNTIME_PATH,
+        "content": source[_R181_RUNTIME_PATH],
+    })
+    _post(api, "files/create", {
+        "projectId": _R181_A2_PROJECT_ID, "name": _R181_TARGETS_PATH,
+        "content": source[_R181_TARGETS_PATH],
+    })
+    _post(api, "files/update", {
+        "projectId": _R181_A2_PROJECT_ID, "name": "main.py",
+        "content": source["main.py"],
+    })
+    readback = _post(api, "files/read", {"projectId": _R181_A2_PROJECT_ID}).get("files")
+    if type(readback) is not list or len(readback) != 13:
+        _fail("cap-90 R181 A2 uploaded file inventory changed")
+    observed = {}
+    for item in readback:
+        if (
+            type(item) is not dict or item.get("projectId") != _R181_A2_PROJECT_ID
+            or type(item.get("name")) is not str or type(item.get("content")) is not str
+            or item["name"] in observed
+        ):
+            _fail("cap-90 R181 A2 uploaded file identity changed")
+        observed[item["name"]] = item["content"]
+    if set(observed) != set(source):
+        _fail("cap-90 R181 A2 uploaded paths changed")
+    for item in projection.source_files:
+        try:
+            raw = observed[item.project_path].encode("ascii")
+        except UnicodeError:
+            _fail("cap-90 R181 A2 uploaded source is not ASCII")
+        if raw != item.source_bytes:
+            _fail("cap-90 R181 A2 uploaded source bytes changed")
+    started = _post(api, "compile/create", {"projectId": _R181_A2_PROJECT_ID})
+    compile_id = started.get("compileId")
+    if type(compile_id) is not str or not _ID.fullmatch(compile_id):
+        _fail("cap-90 R181 A2 compile identity changed")
+    for poll in range(120):
+        state = _post(api, "compile/read", {
+            "projectId": _R181_A2_PROJECT_ID, "compileId": compile_id,
+        })
+        if state.get("compileId") != compile_id or state.get("state") not in {
+            "InQueue", "Building", "BuildSuccess", "BuildError",
+        }:
+            _fail("cap-90 R181 A2 compile state changed")
+        if state["state"] in {"BuildSuccess", "BuildError"}:
+            break
+        if poll < 119:
+            time.sleep(2)
+    else:
+        _fail("cap-90 R181 A2 compile poll exhausted; attempt remains spent")
+    if state["state"] == "BuildError":
+        _write_once(_control_path(plan, "terminal"), {
+            "candidate_id": "R181", "status": "BuildError",
+            "project_id": _R181_A2_PROJECT_ID, "compile_id": compile_id,
+        })
+        _fail("cap-90 R181 A2 compile failed; attempt was consumed")
+    launched = _post(api, "backtests/create", {
+        "projectId": _R181_A2_PROJECT_ID, "compileId": compile_id,
+        "backtestName": plan.backtest_name,
+    }).get("backtest")
+    if type(launched) is not dict or (
+        type(launched.get("backtestId")) is not str
+        or not _ID.fullmatch(launched["backtestId"])
+        or launched.get("projectId") != _R181_A2_PROJECT_ID
+        or launched.get("name") != plan.backtest_name
+        or launched.get("status") not in {"In Queue...", "In Progress..."}
+    ):
+        _fail("cap-90 R181 A2 backtest launch identity changed")
+    receipt = {
+        "candidate_id": "R181", "attempt": 2, "role": "signal",
+        "project_id": _R181_A2_PROJECT_ID, "project_name": plan.project_name,
+        "compile_id": compile_id, "backtest_id": launched["backtestId"],
+        "backtest_name": plan.backtest_name,
+        "projection_sha256": plan.projection_sha256,
+        "profile_id": identity["profile_id"], "profile_sha256": plan.profile_sha256,
+    }
+    _write_once(_control_path(plan, "launch"), receipt)
+    return receipt
 
 
 def launch_a1(plan: Cap90QcPlan, projection: object, api: QuantConnectClient) -> dict:
@@ -706,14 +933,20 @@ def read_aggregates_once(plan: Cap90QcPlan, launch: dict, api: QuantConnectClien
     selected_aggregate = _project_aggregate(aggregate)
     valid = aggregate["run_valid"] is True
     if valid:
-        _write_once(_control_path(plan, "result-valid"), {
+        valid_receipt = {
             "candidate_id": plan.candidate_id, "run_valid": True,
             "aggregate_sha256": meta["aggregate_sha256"],
-        })
+        }
+        if plan.attempt == 2:
+            valid_receipt.update({
+                "attempt": 2, "projection_sha256": plan.projection_sha256,
+            })
+        _write_once(_control_path(plan, "result-valid"), valid_receipt)
     return {"meta": meta, "aggregates": selected_aggregate, "run_valid": valid}
 
 
 __all__ = (
-    "Cap90QcPlan", "Cap90QcSubmissionError", "launch_a1", "poll_status",
-    "preview", "production_client", "read_aggregates_once",
+    "Cap90QcPlan", "Cap90QcSubmissionError", "launch_a1", "launch_r181_a2",
+    "poll_status", "preview", "preview_a2", "production_client",
+    "read_aggregates_once",
 )

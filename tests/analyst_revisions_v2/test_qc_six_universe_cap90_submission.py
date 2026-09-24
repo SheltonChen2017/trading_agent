@@ -496,3 +496,240 @@ def test_default_qc_client_is_refused_even_with_offline_credentials():
     )
     with pytest.raises(subject.Cap90QcSubmissionError):
         subject._client(client)
+
+
+def _a2_plan(tmp_path, projection):
+    return dataclasses.replace(
+        _plan(tmp_path, projection),
+        attempt=2,
+        project_name=subject._R181_A2_PROJECT_NAME,
+        backtest_name="ARV2 R181A2 six cap90 signal 2021 2025 b68661ec",
+    )
+
+
+def _a2_residue(monkeypatch, plan, projection):
+    old_files = []
+    for item in projection.source_files:
+        if item.project_path == subject._R181_RUNTIME_PATH:
+            old_files.append([
+                item.project_path,
+                "84e4d69135ff13f592e071574d22b30255088f4df22bd11f33943c652d81a46a",
+                67316,
+            ])
+        else:
+            old_files.append([item.project_path, item.content_sha256, item.byte_count])
+    claim = {
+        "candidate_id": "R181", "role": "signal",
+        "profile_id": projection.profile_id,
+        "profile_sha256": projection.profile_sha256,
+        "projection_sha256": subject._R181_A1_PROJECTION_SHA256,
+        "source_files": old_files,
+    }
+    raw = subject._canonical(claim)
+    monkeypatch.setattr(subject, "_R181_A1_CLAIM_SHA256", hashlib.sha256(raw).hexdigest())
+    subject._write_once(
+        subject._control_path(dataclasses.replace(plan, attempt=1), "claim"),
+        claim,
+    )
+    default_main = "#" * 406
+    monkeypatch.setattr(subject, "_R181_A1_DEFAULT_MAIN", (
+        len(default_main), hashlib.sha256(default_main.encode("ascii")).hexdigest(),
+    ))
+    uploaded = {
+        item.project_path: item.source_bytes.decode("ascii")
+        for item in projection.source_files
+        if item.project_path not in {
+            subject._R181_RUNTIME_PATH, subject._R181_TARGETS_PATH, "main.py",
+        }
+    }
+    uploaded[subject._R181_RUNTIME_PATH] = "#"
+    uploaded["main.py"] = default_main
+    return uploaded
+
+
+def _fake_a2_qc(monkeypatch, plan, projection, uploaded, *, defect=None):
+    calls = []
+    launched = False
+    file_reads = 0
+
+    def post(_api, endpoint, payload):
+        nonlocal launched, file_reads
+        calls.append((endpoint, payload))
+        if endpoint == "authenticate":
+            return {"success": True}
+        if endpoint == "projects/read":
+            row = _project_row(plan, subject._R181_A2_PROJECT_ID)
+            if defect == "public":
+                row["collaborators"].append({"owner": False})
+            return {"success": True, "projects": [row]}
+        if endpoint == "backtests/list":
+            assert payload["includeStatistics"] is False
+            if defect == "prior_run":
+                return {"success": True, "count": 1, "backtests": [{"backtestId": "other"}]}
+            if not launched:
+                return {"success": True, "count": 0, "backtests": []}
+            return {"success": True, "count": 1, "backtests": [{
+                "projectId": subject._R181_A2_PROJECT_ID,
+                "backtestId": "run-a2", "name": plan.backtest_name,
+                "status": "Completed.",
+            }]}
+        if endpoint == "files/read":
+            file_reads += 1
+            return {"success": True, "files": [{
+                "projectId": subject._R181_A2_PROJECT_ID,
+                "name": path,
+                "content": content + ("#" if defect == "bad_readback" and file_reads == 2 and path == "main.py" else ""),
+            } for path, content in uploaded.items()]}
+        if endpoint in {"files/create", "files/update"}:
+            uploaded[payload["name"]] = payload["content"]
+            return {"success": True}
+        if endpoint == "compile/create":
+            return {"success": True, "compileId": "compile-a2"}
+        if endpoint == "compile/read":
+            return {"success": True, "compileId": "compile-a2", "state": (
+                "BuildError" if defect == "compile_error" else "BuildSuccess"
+            )}
+        if endpoint == "backtests/create":
+            launched = True
+            return {"success": True, "backtest": {
+                "projectId": subject._R181_A2_PROJECT_ID,
+                "backtestId": "run-a2", "name": plan.backtest_name,
+                "status": "In Queue...",
+            }}
+        if endpoint == "backtests/read":
+            receipt = subject._read_control(subject._control_path(plan, "launch"))
+            return {"success": True, "backtest": {
+                "projectId": subject._R181_A2_PROJECT_ID,
+                "backtestId": "run-a2", "name": plan.backtest_name,
+                "status": "Completed.",
+                "statistics": _statistics(plan, receipt),
+                "orders": {"not-retained": True},
+            }}
+        raise AssertionError("unexpected endpoint " + endpoint)
+
+    monkeypatch.setattr(subject, "_client", lambda _api: None)
+    monkeypatch.setattr(subject, "_post", post)
+    return calls
+
+
+def test_r181_a2_resumes_same_project_and_authenticates_completed_result(
+    monkeypatch, projections, tmp_path,
+):
+    value = projections["R181"]
+    plan = _a2_plan(tmp_path, value)
+    uploaded = _a2_residue(monkeypatch, plan, value)
+    calls = _fake_a2_qc(monkeypatch, plan, value, uploaded)
+
+    receipt = subject.launch_r181_a2(plan, value, object())
+    assert receipt["attempt"] == 2
+    assert receipt["project_id"] == subject._R181_A2_PROJECT_ID
+    assert [endpoint for endpoint, _ in calls].count("backtests/create") == 1
+    assert [endpoint for endpoint, _ in calls].count("compile/create") == 1
+    assert [endpoint for endpoint, _ in calls if endpoint in {"files/create", "files/update"}] == [
+        "files/update", "files/create", "files/update",
+    ]
+    assert not any(endpoint in {"projects/create", "files/delete"} for endpoint, _ in calls)
+    assert subject.poll_status(plan, receipt, object()) == "Completed."
+    result = subject.read_aggregates_once(plan, receipt, object())
+    assert result["run_valid"] is True
+    valid = subject._read_control(subject._control_path(plan, "result-valid"))
+    assert valid["attempt"] == 2
+    assert valid["projection_sha256"] == value.projection_sha256
+    assert [endpoint for endpoint, _ in calls].count("backtests/read") == 1
+    before = len(calls)
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_r181_a2(plan, value, object())
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_a1(plan, value, object())
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.read_aggregates_once(plan, receipt, object())
+    assert len(calls) == before
+
+
+@pytest.mark.parametrize("defect", (
+    "runtime", "main", "missing_file", "extra_file", "public", "prior_run",
+))
+def test_r181_a2_refuses_changed_residue_or_project_before_claim_or_mutation(
+    monkeypatch, projections, tmp_path, defect,
+):
+    value = projections["R181"]
+    plan = _a2_plan(tmp_path, value)
+    uploaded = _a2_residue(monkeypatch, plan, value)
+    if defect == "runtime":
+        uploaded[subject._R181_RUNTIME_PATH] = "!"
+    elif defect == "main":
+        uploaded["main.py"] += "#"
+    elif defect == "missing_file":
+        uploaded.pop("accepted_risk_preliminary_rating_policy.py")
+    elif defect == "extra_file":
+        uploaded["unexpected.py"] = "#"
+    calls = _fake_a2_qc(monkeypatch, plan, value, uploaded, defect=defect)
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_r181_a2(plan, value, object())
+    assert not subject._control_path(plan, "claim").exists()
+    assert not any(endpoint in {
+        "projects/create", "files/create", "files/update", "compile/create", "backtests/create",
+    } for endpoint, _ in calls)
+
+
+@pytest.mark.parametrize("defect", ("bad_readback", "compile_error"))
+def test_r181_a2_claim_remains_spent_after_upload_or_compile_failure(
+    monkeypatch, projections, tmp_path, defect,
+):
+    value = projections["R181"]
+    plan = _a2_plan(tmp_path, value)
+    uploaded = _a2_residue(monkeypatch, plan, value)
+    calls = _fake_a2_qc(monkeypatch, plan, value, uploaded, defect=defect)
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_r181_a2(plan, value, object())
+    assert subject._control_path(plan, "claim").exists()
+    assert not any(endpoint == "backtests/create" for endpoint, _ in calls)
+    assert not any(endpoint == "projects/create" for endpoint, _ in calls)
+    if defect == "compile_error":
+        assert subject._read_control(subject._control_path(plan, "terminal"))["status"] == "BuildError"
+    else:
+        assert not any(endpoint == "compile/create" for endpoint, _ in calls)
+    before = len(calls)
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_r181_a2(plan, value, object())
+    assert len(calls) == before
+
+
+def test_r181_a2_refuses_a1_claim_mutation_before_qc_access(
+    monkeypatch, projections, tmp_path,
+):
+    value = projections["R181"]
+    plan = _a2_plan(tmp_path, value)
+    uploaded = _a2_residue(monkeypatch, plan, value)
+    calls = _fake_a2_qc(monkeypatch, plan, value, uploaded)
+    monkeypatch.setattr(subject, "_R181_A1_CLAIM_SHA256", "0" * 64)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="claim bytes changed"):
+        subject.launch_r181_a2(plan, value, object())
+    assert calls == []
+
+
+def test_r181_a2_pins_new_runtime_bytes_not_only_claimed_projection_digest(
+    monkeypatch, projections, tmp_path,
+):
+    value = projections["R181"]
+    plan = _a2_plan(tmp_path, value)
+    uploaded = _a2_residue(monkeypatch, plan, value)
+    calls = _fake_a2_qc(monkeypatch, plan, value, uploaded)
+    items = []
+    for item in value.source_files:
+        if item.project_path == subject._R181_RUNTIME_PATH:
+            changed = item.source_bytes + b"#"
+            item = dataclasses.replace(
+                item, source_bytes=changed, byte_count=len(changed),
+                content_sha256=hashlib.sha256(changed).hexdigest(),
+            )
+        items.append(item)
+    altered = dataclasses.replace(
+        value, source_files=tuple(items),
+        total_source_byte_count=value.total_source_byte_count + 1,
+    )
+    # The object still advertises the original projection digest. Only the
+    # independent A2 per-file pin catches this split-view source.
+    with pytest.raises(subject.Cap90QcSubmissionError, match="changes more"):
+        subject.launch_r181_a2(plan, altered, object())
+    assert calls == []

@@ -2286,6 +2286,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-22 | Codex SPY order diagnostic | `2201c5e` -> this record commit (source freeze `13bf582`) | Build the dedicated SPY-holdings order adapter and run R-176 once for the owner-requested 2025-now S&P 500 comparison | Added the universe-bound benchmark helper, SPY V1 runtime, projection/closure registration, and isolated tests without changing immutable QQQ V19. Fresh QC project `36820512` reproduced the 21-file source manifest, compiled, and completed R-176 A1. Diagnostic result: +29.556355% after modeled costs versus +30.937335% execution-matched SPY, with slightly smaller drawdown and higher Sharpe; six skips make `run_valid=false` and zero cells. | Focused code battery **197 passed**; after the result-record navigation correction, lane-record gate **7 passed**; `py_compile` and `git diff --check` clean. No full lane suite by owner rule. One launch spent **155 -> 156 shared looks / 98 -> 99 development evaluations / 27 infrastructure looks / 608 cells**. | Independent in-round audit: 0 P0-P3 before launch. `ARV2D169-001` (P3, documented): the first result reader hand-copied an internal field name and retained no values; one aggregate-only recovery read used the emitted schema name, so the run remains diagnostic and cannot become a formal cell. | Push this same-lane round exactly once. Claude reviews section 169, the SPY adapter, R-176, and the documented reader deviation. No retry, leverage, deployment, broker, live/paper/funded order, or trading action follows. |
 | 2026-09-22 | Codex owner-directed QC cleanup | `bd4ad8a` -> this record commit | Move failed-only QC projects except R-177 to the recoverable Recycle Bin and push once | A statistics-disabled inventory and immediate preflight identified six privately owned, idle projects containing only terminal `Runtime Error` runs. Each same ID was post-read under a `Recycle Bin/`-prefixed name ending in its exact original name. R-177 remained unchanged; completed, mixed-status, active, unrelated, and two ambiguous zero-backtest diagnostics were preserved. No strategy source or economics changed. | Active-document and lane-record gates **76 passed**; `git diff --check` clean. No full lane suite by owner rule. Cleanup read no statistic, log, chart, row, holding, order, or portfolio value and added **zero research looks, development evaluations, infrastructure looks, or cells**. | No code finding. The two zero-backtest diagnostics were deliberately not reclassified as failed; nothing was permanently purged. | Make exactly one same-lane push. Claude independently reviews section 171 together with section 170 and the exact pushed snapshot. R-177 remains preserved for owner-side Mia work; no A4 launch is permitted. |
 | 2026-09-24 | Claude independent review of the V14–V19/SPY order-level, six-universe order, R-180 coverage, and cap-90 R-181 range | `b2df5ea` -> `2bd3368` -> `865ae3b` -> this record commit | Section 178: forty-four commits `87dd82f..b2df5ea` individually disposed (38 accepted, 6 accepted after correction, 0 rejected); Mia provenance handling reviewed against the owner's clarification; zero QC calls | Registered eight new package modules in the whole-package closure test (`2bd3368`, test-only, 72 passed) and pinned the cap-90 per-file 64,000-character check (`865ae3b`, test-only, red with the check removed); rewrote the stale section-4 pointer and appended this row | Standing lane selection in a byte-faithful export, closure and projection files, record gates, `compileall`, `git diff --check`; results in 178.7. 0 looks, 0 evaluations, 0 cells | 0 P0, 0 P1, 3 P2, 5 P3 (`ARV2R178-001` through `-008`); `ARV2R178-002/-003/-004` corrected, `-001` open before any launch | Single push of the three Claude commits; Codex counter-reviews section 178, closes or waives `ARV2R178-001`, diagnoses the 22 invalid orders before R-181 A3 |
+| 2026-09-24 | Codex counter-review and exploratory order-based QC | `6f498cb` -> this record commit (`ef776d7`, `cf057af` precede it) | Section 179: accept Claude's three commits after lane corrections, diagnose R-181 A2, freeze and run the final A3 bridge, matched R-182 A1, and separate revision-weight tilt R-184 A1 | The A2 count-only read isolated 22 insufficient-buying-power pre-open BUY refusals. The owner chose a prospective research-only 2x order-admission bridge with the same 98% target and validity gates, and waived detached signatures for these three named exploratory runs only. R-181 A3 completed valid at +96.63%; R-182 A1 completed valid at +123.62%; R-184 A1 completed valid at +125.76%. R-181 minus matched is -26.99 pp; tilt minus matched is +2.14 pp, both exploratory in one window. Three sleeves remained ETF fallbacks. | Focused exact-tree checks, compilation, diff, QC upload/compile, status-only polls, and one bounded custom-statistic read per completed run; exact figures and caveats in 179.1-179.4. Three launches spent three shared research looks and three ARV2 development evaluations; A2 diagnostic spent none. No full lane suite by Codex under owner rule. The earlier A2 diagnostic transiently inspected paginated order rows but retained only redacted counts; no raw order/provider/price/log row was retained or printed, and no broker, live/paper/funded order, or trading access occurred. | `ARV2CR179-001/-004` corrected; `-002` closed by valid A3 predecessor binding; `-003` diagnosed and addressed prospectively, not retroactively proven causal. `ARV2D179-005` documents that the matched stock-count/fallback policy remains score-dependent, so R-184 isolates only within-stock weight tilt and is not a pure no-analyst baseline. | Push this lane once regardless of candidate success, as owner directed. Claude independently reviews the exact pushed range; no leverage, R-183, live/paper, or formal alpha claim follows by inference. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -23002,7 +23003,7 @@ or trading. Local O_EXCL claims, source/project identity checks, three-attempt
 limits, and result-validity gates remain in force. The bridge must be used
 identically by signal and matched roles before any attribution claim.
 
-**Next family, unlaunched.** A separate local V4 candidate holds the exact
+**Next family, at this prelaunch freeze.** A separate local V4 candidate holds the exact
 R-182 cap-selected stock identities and the same six-sleeve, 98%-gross and
 9.8%-duplicate-cap rules, then applies a bounded analyst-revision *weight*
 tilt within each sleeve. Zero/missing scores are neutral, not a selection
@@ -23010,8 +23011,9 @@ gate. Its pure target builder, role/profile-bound runtime, and separate QC
 projection have focused tests and no QC project or launch. This is a
 development candidate, not an authenticated R-182-relative result. It must
 be re-pinned to the final valid signal execution policy before a comparison.
-R-182 itself is still unlaunched, as is the ETF basket; the section-175
-predecessor-validity gate remains operative.
+R-182 and the ETF basket were both unlaunched at this freeze; the section-175
+predecessor-validity gate remained operative. The later R-182 launch and its
+authenticated result are recorded in section 179.3 below.
 
 ### 179.1 Prospective final R-181 attempt: order-admission bridge
 
@@ -23116,17 +23118,123 @@ It inherits the R-182 bridge's observed cash, gross, zero-invalid-order,
 and target-tracking gates and uses the owner's narrow exploratory signature
 waiver, one-use O_EXCL claim, exact source/project checks, and one aggregate
 result read. R-183 remains the separate signed ETF-basket candidate; its
-`106` project identity is not reused. No R-184 launch or result is claimed
-here before the predecessor gates clear.
+`106` project identity is not reused. This paragraph is the prelaunch
+freeze; the later R-184 launch and authenticated result are recorded in
+section 179.4, after both predecessor gates cleared.
 
-**Validation so far.** The changed/new diagnostic, launcher, projection,
+### 179.3 Authenticated R-182 A1 matched-role result
+
+After R-181 A3 authenticated `run_valid=true`, the separate matched-role
+project `36909823`, `105 ARV2 SIX CAP90 MATCHED R182 2021 2025`, compiled
+and launched A1 backtest `71ec4931f19d6c663345e9549335b911`. Its exact
+fourteen-file projection SHA-256 was
+`186cb2bb3dbd2a37358c9c0b2dbfa86e1e685203dba33795eb192f74faa9feeb`,
+with matched profile SHA-256
+`b419d3f2b149a1509ef09bd0a5bf607bea8c25a3363cbc8a9dc04a40910f9c0c`.
+The job reached `Completed.`, and its one permitted canonical custom
+META/AGGREGATES read authenticated `run_valid=true`. It is R-182's **first
+of at most three** allowed QC attempts, one additional shared research look,
+and one additional ARV2 development evaluation. No raw order, price,
+provider, log, or standard QC statistic is used as result evidence.
+
+The preliminary R-182 matched-role cumulative return was
+`1.236191666261345` (+123.62%), maximum drawdown approximately −21.22%,
+annualized volatility approximately 20.32%, and zero-rate Sharpe approximately
+0.898. All 6,314 submitted orders filled, with zero invalid and zero canceled;
+all 261 scheduled rebalances executed. Observed mean/max end-day gross
+exposure was `0.976794`/`0.984978`; minimum daily-close cash was
+`15832.95614`, and minimum observed order-event cash was
+`5026.196966345001`. Mean/max prior-close-reference target-weight L1
+errors were `0.00483844`/`0.0104821`, within the prospective 2%/5% bounds.
+The authenticated baseline stock-target path SHA-256 is
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`;
+the R-184 reader must bind its reported baseline path to these exact bytes.
+
+On this exploratory, same-window bridge basis, R-181 A3's +96.628735468236%
+minus R-182 A1's +123.6191666261345% is **−26.9904311578985 percentage
+points**. Thus the analyst-revision *selection gate* lagged the count-matched
+market-cap stock selection in this run; R-181's positive absolute return is
+not evidence of incremental selection value. The comparison is not a formal
+alpha verdict: the 90% coverage floor and execution bridge are later,
+separately versioned exploratory choices. The six-universe construction is
+also not six equally clean stock sleeves: QQQ, SOXX, and REMX used own-ETF
+fallback throughout; SPY and XLV were mostly stock sleeves, while XLE mixed
+stock selection with fallback. The spread therefore measures this particular
+whole-portfolio policy, not analyst skill across all six stock universes.
+Neither this result nor the valid R-181 predecessor authorizes R-183,
+leverage, paper/live operation, deployment, or trading. R-184 remains a
+separate prospectively frozen weight-tilt test, not a reinterpretation of
+R-181's selection-gate return.
+
+### 179.4 Authenticated R-184 A1 revision-weight tilt result
+
+The separately versioned, private QC project `36910292`,
+`107 ARV2 SIX CAP90 TILT R184 2021 2025`, compiled and launched backtest
+`3c5f5a6cf78fa341a80160782488131c` using the frozen sixteen-file
+projection SHA-256
+`8fdb1e051c1e9620c1a126dd9d2bd09c1eb298d9dd8ae1d4e7d07ada61af9afc`
+and profile SHA-256
+`e0c77820c37b394a88ab7cfc95370b1ce6218c0860ee264fc52bad9b93ada9b2`.
+This was A1, the first of at most three allowed attempts. It reached
+`Completed.`, and one canonical custom META/AGGREGATES read authenticated
+`run_valid=true`, including exact equality of its
+`matched_baseline_target_path_sha256` to R-182's
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`.
+The run spent one additional shared research look and one additional ARV2
+development evaluation. No standard QC statistic, order row, provider row,
+price row, or raw log is used as result evidence.
+
+Over 2021-01-04 through 2025-12-31, the preliminary after-modeled-cost
+cumulative return was `1.2575741336207897` (+125.76%), against R-182's
+`1.236191666261345` (+123.62%): a **+2.13824673594447 percentage-point**
+R-184-minus-R-182 difference. Maximum drawdown was approximately -21.21%,
+annualized volatility approximately 20.33%, and zero-rate Sharpe
+approximately 0.907. All 6,313 submitted orders filled, with zero invalid
+and zero canceled, and all 261 scheduled rebalances completed. Actual
+engine/model fees both report `35550.8810995` under the same 10-bps-per-side
+model used by R-182 (`34955.3652829`); the positive cumulative spread is
+after those modeled costs, not before. Mean/max end-day gross exposure was
+`0.976827`/`0.984978`; minimum daily-close cash was `15832.95614`, and
+minimum observed post-order-event cash was `2909.81059609`. Mean/max
+prior-close-reference target-weight L1 errors were
+`0.00478661`/`0.01058282`, within the preregistered 2%/5% bounds.
+
+`ARV2D179-005` (P3, documented interpretation): R-184 holds R-182's
+selected stock identities, counts, ETF fallbacks and six sleeve budgets
+fixed, then changes only within-sleeve stock weights. Thus this pair tests
+the *incremental weight tilt*, not a score-free market-cap strategy. R-182's
+stock-count and fallback policy still depends on positive R055 score
+coverage; calling it an entirely analyst-independent comparator would be
+incorrect. Moreover, QQQ, SOXX, and REMX were own-ETF fallbacks on every
+decision, so this tilt could act only in SPY, XLV, and the stock-selected
+part of XLE. The +2.14 pp is a single-window, whole-portfolio exploratory
+observation, not six independent universe replications, statistical
+confirmation, a formal alpha verdict, or a reason to lever or deploy.
+
+### 179.5 Final round validation and Claude review handoff
+
+Claude's pushed `2bd3368`, `865ae3b`, and `6f498cb` were counter-reviewed
+one by one with dispositions in the opening of section 179. The implementation
+commits are `ef776d7` (R-181 bridge, R-184 candidate, and source/test pins)
+and `cf057af` (valid R-181 receipt, R-182 target-path gate, and R-184
+one-use submission). This record update is the final commit of the round;
+the exact pushed range is `6f498cb..HEAD`. Review should focus on the
+research-only 2x order-admission policy versus the unchanged 98% target,
+observed cash rather than continuous intraday cash, the A3 predecessor gate,
+R-182's stock-target-path digest, R-184's identity/count preservation,
+the exact exploratory signature-waiver scope, and the score-dependent
+baseline caveat.
+
+**Validation.** The changed/new diagnostic, launcher, projection,
 runtime, closure, lane-record, and active-document test selection produced
 277 passed in 57.10 seconds on Python 3.13.15; targeted red/green tests
 isolate literal and reflected order capabilities, the non-runtime file
 ceiling, signed-launch refusal, and count-only pagination.
-`compileall` and `git diff --check` are clean; the two active-record gate
-files separately pass 76/76. The complete lane and repository suites were
-not run by Codex, per the owner's rule. The final focused checks, exact
-source/record identities, per-commit range, and push ledger will be updated
-before this round's single push; this section does not assert a completed
-QC successor or an authorized trading result.
+The final bridge/tilt/closure/record/active-document focused selection
+passed **288/288** in 58.43 seconds. `compileall` and `git diff --check`
+are clean before the final record commit; the active-record gates will be
+rerun on the final tree. The complete lane and repository suites were not
+run by Codex, per the owner's rule; Claude owns the complete lane suite.
+R-181 A1/A2/A3, R-182 A1, and R-184 A1 used three, one, and one of their
+respective maximum-three attempt slots. No R-181 A4 or R-183 basket run
+occurred. There was one final push of the existing lane branch, as directed.

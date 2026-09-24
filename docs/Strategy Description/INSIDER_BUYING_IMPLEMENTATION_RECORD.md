@@ -3,10 +3,11 @@
 Status: **CLAUDE REVIEWED THE SYNTHETIC-FIRST NONCANONICAL SEC PILOT CONTRACT
 THROUGH PUSHED COMMIT `4d0cbf3b`; CODEX COUNTER-REVIEWED IT IN SECTION 76
 AND COMMITTED THE RECORD CORRECTIONS LOCALLY. THE CONTRACT REMAINS PURE AND
-ZERO-I/O. BY THE OWNER'S LATER, EXACT ZIP-DOWNLOAD REQUEST, ALL 82 PUBLIC
-SEC QUARTERLY FORM 3/4/5 ZIPS FROM 2006Q1 THROUGH 2026Q2 WERE SAVED IN THE
-LANE'S GIT-IGNORED `artifacts/` FOLDER; SECTION 77 RECORDS THEIR HASH-BOUND
-LOCAL MANIFEST AND VALIDATION. THIS ZIP-ONLY INTAKE DOES NOT SUPPLY THE
+ZERO-I/O. BY THE OWNER'S LATER, EXACT ZIP-DOWNLOAD AND DIRECT-GIT TRANSFER
+REQUESTS, ALL 82 PUBLIC SEC QUARTERLY FORM 3/4/5 ZIPS FROM 2006Q1 THROUGH
+2026Q2 AND THEIR PROVENANCE MANIFEST ARE TRACKED AS ORIGINAL BYTES IN THE
+LANE'S OTHERWISE IGNORED `artifacts/` FOLDER; SECTION 77 RECORDS THEIR
+VALIDATION AND NARROW TRACKING EXCEPTION. THIS ZIP-ONLY INTAKE DOES NOT SUPPLY THE
 MATCHING FORM 4/4-A PRIMARY XML OR ACCEPTANCE METADATA, COMPLETE THE OFFLINE
 PILOT, OR ESTABLISH CANONICAL IB-2 COMPLETENESS. NO OUTCOME, QC, PAPER, LIVE,
 DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK
@@ -10049,7 +10050,9 @@ and the bounded pilot round is complete, make at most one combined push.
 
 After section 76, the owner asked to download all 82 quarterly files into the
 Insider project folder and explicitly chose the configured Git contact identity
-for identifying SEC requests. This later, exact authorization lifted section
+for identifying SEC requests. The owner then asked to push the ZIPs and chose
+ordinary Git, not Git LFS, after being told that this permanently adds about
+0.92 GB to repository history. This later, exact authorization lifted section
 70's zero-request budget **only for the public quarterly Form 3/4/5 ZIPs**. It
 did not authorize retrieval of per-accession original XML, acceptance metadata,
 outcomes, prices, ETF holdings, security-master rows, QuantConnect work, or any
@@ -10067,16 +10070,19 @@ Python's `zipfile -t` CRC test: **82 passed, 0 failed**; no partial download
 remains. Exact compressed total: **921,904,566 bytes (879.2 MiB)**. No ZIP
 was extracted or parsed for a filing, and no pilot runner was invoked.
 
-The raw ZIPs and the 82-row provenance CSV are local to
-`artifacts/sec_insider/raw/`, which `.gitignore` excludes. The manifest is
+The raw ZIPs and the 82-row provenance CSV are at
+`artifacts/sec_insider/raw/`. Although `.gitignore` excludes the rest of
+`artifacts/`, this exact public SEC source set is force-added to ordinary Git,
+not Git LFS. A nested `.gitattributes` disables text conversion for both the
+ZIPs and manifest to preserve their exact bytes across platforms. The manifest is
 `insider_quarterly_zip_manifest_2006q1_2026q2.csv`, SHA-256
 `dc254e4e023bf9990028e085450fc4a5c1c2ae22e1d562f2efc4ada532f9f76d`.
 It records each official source URL, filename, exact byte size, SHA-256,
 capture commit `a4192546b168470ff1e9c421d8bd53531a1b3c05`, and the local
 file last-write UTC. That timestamp is explicitly labeled a **local
-filesystem observation, not an SEC-attested retrieval time**. Neither the
-ZIPs nor their manifest is committed or pushed; transferring this work to
-another machine requires an approved artifact-transfer path, not `git pull`.
+filesystem observation, not an SEC-attested retrieval time**. Once the lane
+branch is pushed, a normal Git fetch/checkout can transfer these files to
+another machine; the receiver should verify the recorded hashes after checkout.
 
 This is a ZIP-only operational intake, not a research look or an authentic
 complete 82-quarter canonical source snapshot. Every Form 4/4-A accession
@@ -10086,3 +10092,17 @@ can be assessed. The bounded 2–4-quarter offline pilot still needs a selected
 matching XML/metadata bundle and its exact provenance; no real-format
 compatibility, eligibility, signal, or return result is claimed. Authorized
 outcome looks **0**, consumed outcome looks **0**, research looks **0**.
+
+Before the single branch push, the staged set was checked as exactly the 82
+expected original ZIPs, this manifest, its nested byte-preserving
+`.gitattributes`, the narrow `.gitignore` comment, and this lane record: **86
+paths**. All 82 staged ordinary Git blobs had the same Git object ID as their
+unfiltered working-file bytes and the exact size recorded in the manifest;
+the manifest's staged bytes also matched its recorded SHA-256. No Git LFS
+pointer or filter was present. The Insider lane gate (nineteen Insider test
+files plus the active-document, module-hygiene, overlay-import, and ML-import
+boundaries) passed **2,074** with **8 skipped** in **340.76 seconds**. The
+focused implementation-record and active-document checks passed **70** in
+**2.21 seconds** before this validation paragraph; the final record-only edit
+is rechecked before commit. No complete repository suite or real-file pilot
+was run.

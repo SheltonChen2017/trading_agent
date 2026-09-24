@@ -188,6 +188,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-18 | Codex counter-review + implementation | `226c4c1` reviewed; `b2879e7` counter-review; `2b4c0b9` owner decision; `5f823c1` policy snapshot; this record commit follows | Claude paper-gate-review counter-review plus owner-approved canonical IB-2 source-policy freeze | Accepted Claude's record-only review after one append-only P3 correction, scope-dispositioned its shared observation for later main integration, recorded the owner's low-authority source choice, and implemented a pure 99-field future-evidence policy with seven package exports and synthetic dangerous-direction tests. No corpus, manifest, parser expansion, cache, retriever, or canonical IB-2 result was created. | Python 3.13.15 / pytest 9.1.1. Focused policy **240 passed**; policy plus preregistration/hygiene/import boundaries **460 passed**; exact recurring lane/boundary gate **1,966 passed**. Two material constructor weaknesses were demonstrated red, corrected, and restored green. Independent mutation audit: all 27 coherent constant-plus-field changes refused, and **0 of 99** field changes survived even when the public computed hash name was rebound. Policy SHA-256 `eec42a1e...e7dbe`; compileall, staged diff, commit, ancestry, and final status checks are recorded in section 71. No external or outcome access; **0 research looks**. | `226c4c1` accepted after correction; `IBPAPER-CCR01` P3 closed. `IB2SRC-R01` and `IB2SRC-R02` P2 closed red/green before `5f823c1`. `IBSH-CR01` P3 remains open but non-blocking and out of lane for one-time main integration. No open P0-P2 finding remains. | Make this round's single push. Claude reviews every commit in `226c4c1..PUSHED_HEAD`; Codex then counter-reviews every Claude commit. Actual source artifacts, a scalable manifest boundary, authenticated amendments, official security/calendar identity, outcomes, QC, deployment, and trading remain separately gated. |
 | 2026-09-24 | Claude review | `07ba33e` -> `b758514` (test correction) -> this review record | Independent review of the Codex counter-review, the owner-selected canonical IB-2 source direction, and the pure source-policy freeze (`226c4c1..07ba33e`, 4 commits, 0 merges, 4 lane-owned paths); owner pilot decision | Verified the remote tip and clean worktree, then dispositioned all four commits: three accepted, `5f823c1` accepted after a test-only correction. Mapped all seven section-70 clauses to the contract, confirmed purity, zero authority, 99 categorized fields, the literal hash and the blueprint hash, and ran 20 faithful mutants in a read-only export. Recorded the owner's 2026-09-24 approval of the five-point recommendation: the policy is confirmed, a non-canonical real-data pilot on owner-supplied files is authorized, the shared audit is authorized as a separate common action, and synthetic milestones are paused. | Complete suite on `07ba33e` **8,164 passed, 38 skipped, 28 warnings, 0 failed in 520.80s**. Recorded counts reproduce exactly: **240**, **460**, **1,966**. Hash `eec42a1e...7dbe` recomputed independently. Mutation with bytecode caching disabled: **19 of 20 caught** on the pushed tree, **20 of 20** after `b758514`. Final tree: focused **240 passed**; lane gate **1,966 passed**; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, real filing, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB2SRC-CR01` P3 closed in `b758514` (last-period endpoint check unpinned). `IB2SRC-CR02` P3 closed (this reviewer's section-58.4 novelty claim, same error as `IBPAPER-CCR01`). `IB2SRC-CR03` P3 open (earlier Claude mutation harnesses did not disable bytecode caching). `IBPILOT-R01` P2 open (IB-1C flat-JSON metadata versus real SEC formats). `IBPILOT-R02` P3 open (IB-1E contiguity and 256-XML cap; corrects this reviewer's pilot suggestion). `IBSH-CR01` retained. | Codex counter-reviews `b758514` and this record, then designs the non-canonical pilot, settling `IBPILOT-R01`/`R02` on synthetic fixtures before the owner supplies files. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-24 | Codex counter-review + implementation | `922a35b..23c8634` reviewed; `23c8634` -> `6f1ffbc` implementation snapshot (this record commit follows) | Claude canonical-source-policy counter-review plus synthetic-first noncanonical SEC pilot contracts | Accepted `b758514`; accepted `922a35b` after the two append-only section-73 P3 corrections. Added a pure zero-I/O pilot manifest, raw accession-candidate inventory, exact verbatim artifact identities, explicitly derived flat IB-1C byte/profile identities, source-backed cross-period amendment lineage, named operational accounting, exact manifest-derived resources and stage binding, and a sealed zero-authority report. `IBPILOT-R01` and `IBPILOT-R02` close as design items without reading a real file or changing IB-1A through IB-1E. | Python 3.13.15 / pytest 9.1.1. Focused pilot contracts **115 passed**; related IB-1A-through-IB-1E set **551 passed, 7 skipped**; recurring lane gate only **2,073 passed, 8 skipped**; final targeted mutation audit **115 baseline, 0 material survivors**; compileall exit **0**; staged diff clean. No complete repository suite was run, per owner direction. No real file, network, provider, outcome, QC, broker, operator, scheduler, or trading access; authorized/consumed outcome looks and research looks all **0**. | Section 73 closes `IB2SRC-CCR01/02`. Pre-commit adversarial review found and corrected `IBPILOT-REV01` through `IBPILOT-REV15` plus `IBPILOT-R03`; section 74 retains every disposition. No open P0-P2 remains in the lane-owned diff. `IB2SRC-CR03` and out-of-lane `IBSH-CR01` remain non-blocking. | Commit this record and make the round's single push. Claude reviews every commit in `922a35b..PUSHED_HEAD`. Only after acceptance may the owner-supplied external-file pilot run; new IB-3E diagnostics remain paused. |
+| 2026-09-24 | Claude review | `390d4e88` -> this review record | Review of the canonical-source counter-review `23c86348`, the synthetic-first noncanonical SEC pilot contracts `6f1ffbc5`, and the record `390d4e88` (`922a35b2..390d4e88`); every earlier commit since `31b3fcc` already carries a Claude disposition in sections 58-72 | Verified isolation, the owner authorization in 72.5, zero I/O at the import level, and zero authority; reproduced the focused 115 and the lane gate; ran an independent identity/determinism probe and a bytecode-safe targeted mutation sweep per IB2SRC-CR03. Full detail in section 75, including the required 1-10 rating. | Focused 115 passed on the reviewed commit and 116 after the added regression; lane gate 2,074 passed, 8 skipped in 353.11s (2,073 recorded plus the one added regression); compileall exit 0; `git diff --check` clean; module restored byte-identical after every mutant; no complete repository suite run, per owner direction. No SEC/provider, credential, licensed row, real filing, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | Accepted after a test-only correction (`cb443356`); design, isolation, zero I/O, and zero authority verified; one sole guard was untested (`IBPILOT-CR01`). Findings are in section 75.7. No real file was read; real-format compatibility remains unmeasured. | Codex counter-reviews this review round. Next bounded action is the authorized offline pilot on owner-supplied files; nothing started by inference. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -9786,3 +9787,189 @@ stage identities, and operational counts remain unmeasured until that run.
 The separately authorized shared security-master/calendar audit still has no
 named venue or executor and is not performed from this lane. New IB-3E or
 other synthetic diagnostics remain paused until the pilot reports.
+
+## 75. Claude review - canonical-source counter-review and the synthetic-first noncanonical SEC pilot contracts (2026-09-24 UTC)
+
+Reviewer: Claude, in the lane worktree
+`C:\git\customizedAgent\trading_agent_insider` on `codex/strategy-insider-buying`.
+No branch, worktree, fork, or handoff was created or switched to. The
+worktree was already at the pushed head `390d4e88` and clean when this review
+began, because Codex commits in this same checkout.
+
+Range: this reviewer's last push was `31b3fcc` (2026-09-17). Of the 29
+commits since, all through `922a35b2` carry Claude review dispositions in
+sections 58, 60, 62, 65, 68, and 72 and are not re-reviewed. The unreviewed
+range is therefore `922a35b2..390d4e88`: `23c86348` (counter-review),
+`6f1ffbc5` (pilot contracts), `390d4e88` (record). `922a35b2` is an ancestor
+of `390d4e88`; zero merges. The three frozen coordination documents changed
+in `6204643e`/`aabe3eed`, inside the owner-coordination round dispositioned
+in section 68, and are untouched in this range.
+
+Authority: section 72.5 records the owner's approval of a bounded pilot whose
+design must settle `IBPILOT-R01`/`IBPILOT-R02` on synthetic fixtures before
+any real file is read, with no download or discovery. `6f1ffbc5` is exactly
+that step and reads nothing. Per the owner's standing direction the lane gate
+is the validation standard; **no complete repository suite was run and none is
+represented**.
+
+### 75.1 Isolation and scope
+
+`23c86348` and `390d4e88` touch only this record. `6f1ffbc5` adds one
+lane-owned module, one lane-owned test module, and package exports. Excluding
+lane-owned prefixes from the range's changed-path list leaves an empty set.
+This review changed one lane-owned test module (`cb443356`) and this
+record; no shared or out-of-lane file was changed.
+
+### 75.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `23c86348` | Counter-review of `b758514`/`922a35b`; two P3 record corrections | **Accepted.** Both corrections are fair: the prior review omitted the process's required 1-10 rating, and its ledger shorthand on stale bytecode overstated the audited evidence. This review adopts both: it carries a rating, and its mutation runs disable bytecode. |
+| `6f1ffbc5` | Synthetic-first noncanonical SEC pilot contracts | **Accepted after a test-only correction (`cb443356`); design, isolation, zero I/O, and zero authority verified; one sole guard was untested (`IBPILOT-CR01`)** |
+| `390d4e88` | Record the pilot milestone | **Accepted after documentation note.** Its section-5 row is present; two precision items are recorded in 75.7. |
+
+### 75.3 Claims reproduced on the exact commit
+
+- Focused pilot-contract suite: **115 passed** (recorded 115).
+- Lane gate over the nineteen Insider files plus active-document,
+  module-hygiene, overlay-import, and ML-import boundaries: **2,074 passed, 8 skipped in 353.11s (2,073 recorded plus the one added regression)**
+  (recorded 2,073 passed, 8 skipped).
+- `compileall` including `research/`: exit 0. `git diff --check`: clean.
+- Zero I/O at the import level: the module imports only `re`, `dataclasses`,
+  `datetime`, `enum`, `typing`, and the lane hashing helpers; no `open`,
+  `Path`, `os`, `io`, `zipfile`, `socket`, `urllib`, `subprocess`, `float`,
+  `eval`, or clock access appears anywhere in it. `datetime.fromisoformat`
+  is the only temporal call, applied to caller-supplied text.
+- Zero authority: the report's authority object carries only Boolean flags
+  defaulting to `False` and refused if not `False`, plus integer look
+  counters; the projection additionally refuses any verbatim-IB-1C,
+  direct-ingest, official-profile, or canonical-evidence claim.
+
+### 75.4 Design read against the authorization
+
+The contract keeps verbatim SEC artifact identities separate from the derived
+flat IB-1C projection, binds the projection's exact bytes as canonical JSON
+plus one terminal LF with its own hash, size, serialization and profile
+versions, and refuses any claim that those bytes are verbatim SEC bytes or
+authorized direct IB-1C input. Intake is two to four sorted contiguous
+quarters with exactly one bounded ZIP each, at most 256 XML sources of at
+most 2 MiB and 64 MiB in total. Amendment lineage must be source-backed and
+resolve to an earlier, same-issuer, in-manifest original. The operational
+report accounts for every input as accepted, refused, or quarantined with
+named reasons; `COMPATIBLE` requires all five stages and every input
+accepted, `NOT_RUN` requires nothing processed. Nothing in the module reads a
+file, so real-format compatibility is, as the record says, unmeasured.
+
+### 75.5 Independent probe
+
+A read-only probe script (kept outside the repository) imported the module
+through the test helpers, with `research/` first confirmed identical to
+`HEAD`. Results on `390d4e88`:
+
+- Two independent builds of the fixture manifest produce the same
+  `manifest_id` and identical payloads (determinism).
+- The projection's derived bytes equal `canonical_json(flat_payload)` plus
+  exactly one terminal LF, and their SHA-256 matches the recorded hash.
+- The projection's verbatim-IB-1C, direct-ingest, official-profile, and
+  canonical-evidence claims are all `False`.
+- The operational report's authority object (`authority`) exposes 25 Boolean
+  flags, all `False`, and three integer look counters (`authorized_outcome_looks`,
+  `consumed_outcome_looks`, `research_looks`), all `0`.
+- Dangerous inputs on the unmodified module, each refused with a named
+  reason: naive, fractional, and `Z`-suffixed `accepted_at` ("must include
+  seconds and an explicit offset"); a missing Form 4/A link marked
+  `source_backed=True`, both through the constructor and through a forged
+  instance that bypasses it ("source_backed must match the exact reviewed
+  transform"); an exact duplicate field and a conflicting duplicate
+  `accepted_at` ("duplicate names"); and a case-colliding field name
+  ("field name has invalid syntax"). A valid whole-second offset acceptance is
+  accepted as the control.
+
+### 75.6 Mutation testing (bytecode-safe)
+
+Per `IB2SRC-CR03`, every run used `python -B` with `PYTHONDONTWRITEBYTECODE=1`
+and purged the module's `__pycache__` entries before each mutant, so a
+same-size sub-second rewrite could not execute stale bytecode. One
+neutralised guard per mutant; the module was restored from exact original
+bytes in a `finally` block and confirmed identical to `HEAD`.
+
+Eighteen mutants, each neutralising one guard, against the focused suite.
+First pass on the reviewed commit (115 tests): **15 caught, 3 survived**.
+Second pass after the regression in `cb443356` (116 tests): **16 caught,
+2 survived**.
+
+| Mutant | Guard neutralised | Result | Catching test (or classification) |
+|---|---|---|---|
+| A1 | zero-authority loop (`if value is not False`) | caught | `test_manifest_outer_scope_flags_fail_closed[...]` |
+| A2 | verbatim IB-1C claim may be `True` | caught | `test_derived_projection_cannot_claim_verbatim_ib1c_bytes`, `test_projection_outer_scope_flags_fail_closed[direct_ib1c_v1_verbatim_claim-True]` |
+| A3 | official-profile / canonical-evidence may be `True` | caught | `test_projection_outer_scope_flags_fail_closed[canonical_evidence-True]`, `[official_sec_profile_verified-True]` |
+| T1 | naive or sub-second `accepted_at` allowed (line 659) | survived | **Provably redundant.** `_ACCEPTED_AT_RE` (line 646) admits only `YYYY-MM-DDTHH:MM:SS[+-]HH:MM`, so a naive, fractional, or `Z` value never reaches line 659. Verified under the mutant: all three refused with "explicit offset"; the regex guard itself is tested (`Z` and fractional cases). Defence-in-depth, not a gap. |
+| L1 | amendment may target another issuer | caught | `test_form4a_target_must_share_the_amendment_issuer` |
+| L2 | original may be accepted at/after the amendment | caught | `test_form4a_requires_original_acceptance_before_amendment[...]` |
+| L3 | unavailable link may claim `source_backed` (line 717) | survived | **Provably redundant.** `PilotFieldDerivation.__post_init__` (lines 490-494) forces `source_backed == (transform is not MISSING_ORIGINAL_UNAVAILABLE)`, and `_copy_field_derivation` rebuilds every field through that constructor, so a forged instance is re-validated. Verified under the mutant: constructor path and forged-instance path both refused with "source_backed must match the exact reviewed transform". Defence-in-depth, not a gap. |
+| U1 | duplicate candidate accessions across periods | caught | `test_candidate_and_projection_accessions_are_globally_unique` |
+| U2 | duplicate projection accessions | caught | same |
+| U3 | case-colliding artifact paths | caught | `test_case_colliding_paths_fail_closed` |
+| U4 | duplicate / case-colliding field names (line 592) | survived on `390d4e88`; caught after `cb443356` | **Genuine gap, fixed by test.** Under the mutant an exact duplicate field and a conflicting duplicate `accepted_at` were both ACCEPTED (eight fields, later value wins in `flat_payload()`); no sibling guard exists because the missing/extras check is set-based. Now caught only by `test_duplicate_projection_field_names_fail_closed`. The case-fold clause is unreachable (`_FIELD_RE` is lowercase-only), which the test documents. See `IBPILOT-CR01`. |
+| U5 | duplicate compatibility reasons | caught | `test_report_requires_named_resources_and_consistent_compatibility` |
+| B1 | XML source count cap removed | caught | `test_xml_count_and_total_byte_limits_fail_closed` |
+| B2 | per-XML byte cap removed | caught | `test_xml_per_file_limit_is_exact` |
+| B3 | total XML cap raised 1024x | caught | `test_xml_count_and_total_byte_limits_fail_closed` |
+| Z1 | candidate ZIP binding removed | caught | `test_candidate_upstream_date_year_and_issuer_lineage_are_exact` |
+| S1 | `COMPATIBLE` without full stages / all accepted | caught | `test_report_requires_named_resources_and_consistent_compatibility` |
+| S2 | `NOT_RUN` with processed inputs | caught | `test_compatibility_stage_semantics_and_stage_hash_are_exact` |
+
+Directions not mutated this round and therefore not claimed: the
+per-artifact hash/size identity checks, the retrieval-order and filing-day
+window checks, the primary-URL/accession-URL bindings, and the
+report-level resource measurements. The section-74.5 statement that every
+individual survivor is "independently enforced" was true for T1 and L3 and
+false for U4.
+
+### 75.7 Findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBPILOT-CR01 | P2 | FIXED (test only) | `6f1ffbc5` -> `cb443356` | `research/insider_buying/sec_noncanonical_pilot_contracts.py` line 592 (duplicate-field-name guard); `tests/test_insider_buying_sec_noncanonical_pilot_contracts.py` | The duplicate-name guard is the projection's only defence against a repeated field: the missing/extras check is set-based and `flat_payload()` builds a dict, so with the guard removed a projection carrying a second `accepted_at` with a conflicting value was accepted with eight fields and the later value won silently. No test exercised the guard, so a refactor could drop it unnoticed. | Bytecode-safe mutant U4: 115 passed on `390d4e88`. Direct probe under the mutant: exact duplicate ACCEPTED, conflicting duplicate ACCEPTED, payload `accepted_at` equal to the later value, field count 8. Under the unmodified module both are refused with "duplicate names". | A sole guard with no test is a latent defect in a contract whose purpose is exact field identity; the module itself is correct. | Added `test_duplicate_projection_field_names_fail_closed` covering an exact duplicate, a conflicting duplicate, and the lowercase-only field syntax that makes case collision unreachable. No module change. | Passes on the original; under mutant U4 it is the only failing test; sweep now 16 of 18 caught; focused suite 116 passed. |
+| IBPILOT-CR02 | P3 | OPEN - record precision | `390d4e88` | Section 74.5 mutation audit | The audit is summarised as "every material guard caught, zero meaningful survivor" and every survivor as "independently enforced", with no mutant count, no list of directions, and no named survivors. The independent-enforcement claim was false for the duplicate-field-name guard (`IBPILOT-CR01`), and the sweep cannot be reproduced from the record. Earlier rounds recorded exact counts and per-mutant catching tests. | Section 74.5 text; this review's U4 result. | Mutation evidence must be reproducible from the record, and an unenforced survivor must not be described as enforced. | None to the code; 75.6 supplies counted, named evidence for the guards it exercised and states which directions it did not cover. | 75.6 table. |
+| IBPILOT-CR03 | P3 | OPEN - record precision | `390d4e88` | Section 74.5 "related existing IB-1A through IB-1E plus pilot suites: 551 passed, 7 skipped" | The figure names no file set, so it cannot be rerun as stated; the lane gate (2,073/8) and focused pilot suite (115) are reproducible, this intermediate figure is not. | Section 74.5 text; no file list appears anywhere in section 74. | A validation count is evidence only when its inputs are named. | None; the reproducible gate and focused counts stand. | Both reproducible figures reproduced exactly in 75.3. |
+
+### 75.8 Implementation-quality rating
+
+Per the review process (mandatory 1-10 rating), `6f1ffbc5` rates **8 of
+10** for implementation quality. Strengths: zero I/O at the import level with
+an AST test enforcing it, 132 explicit refusal sites, exact-type and
+frozen-copy handling that re-validates forged instances, deterministic
+identity confirmed independently, and zero authority enforced at both the
+projection and report levels with every material authority, lineage, bounds,
+binding, and compatibility mutant caught. Deductions: one sole guard
+(duplicate field names) had no test and would have let a conflicting
+duplicate field win silently if lost (`IBPILOT-CR01`, fixed by test), and the
+milestone record described the mutation audit in terms that were not
+reproducible and, for that guard, not true (`IBPILOT-CR02`). The synthetic
+fixtures prove contract behaviour only; nothing here is evidence about real
+SEC files or about market edge.
+
+### 75.9 Validation
+
+- Focused suite 115 passed on `390d4e88` and **116 passed** after the
+  regression in `cb443356`; lane gate on the final code tree **2,074 passed, 8 skipped in 353.11s (2,073 recorded plus the one added regression)**;
+  `compileall` (including `research/`) exit 0; `git diff --check` clean;
+  probe and mutants as above; record and active-document checks on the
+  final tree as recorded in the section-5 row; no complete repository suite
+  run, per owner direction.
+
+No SEC, EDGAR, network, vendor, provider, credential, licensed row, real
+filing, security master, outcome, ETF holding, QuantConnect, broker,
+operator-database, scheduler, deployment, capital, order, live, or trading
+surface was accessed. Authorized outcome looks **0**, consumed outcome looks
+**0**, research looks **0**. No owner-supplied file exists in or near the
+repository as far as this review can see, and none was read.
+
+### 75.10 Next step
+
+Codex counter-reviews this review round. The next bounded action remains the
+already-authorized offline pilot on owner-supplied files kept outside the
+repository, through a reviewed adapter that invokes the unchanged IB-1A to
+IB-1E stages; nothing is started by inference, and the shared
+security-master/calendar audit still has no named venue or executor.

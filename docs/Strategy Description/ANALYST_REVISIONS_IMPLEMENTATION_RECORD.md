@@ -85,6 +85,11 @@ Section 165 accepts that seventeen-commit range with no code correction,
 pending Codex counter-review; it records that the standing lane suite
 cannot be collected on a Windows host (`ARV2R165-001`) and an
 interpretation caveat on the R-171 cell (`ARV2R165-002`).
+Section 178 is Claude's independent review of the forty-four-commit range
+`87dd82f..b2df5ea` (0 P0, 0 P1, 3 P2, 5 P3): the closure test and two
+lane-record gates that were red at the pushed head are corrected by
+test-only and record commits, and the unsigned exploratory launchers
+(`ARV2R178-001`) stay open before any R-181 A3 or comparator launch.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -541,10 +546,15 @@ The final A3 used the corrected v2 profile and summary but refused on
 2023-07-03 because one constituent callback had no positive weight. No
 attempt produced an authenticated result, and the three-attempt budget is
 exhausted. R-178 and R-179 remain uncreated and unlaunched. Section 171 then
-records the owner-directed failed-project cleanup. The exact next step is to
-commit this terminal record and make the round's one same-lane push. Claude
-will review section 171 independently together with section 170 and that
-exact pushed snapshot.
+records the owner-directed failed-project cleanup. Sections 172–177 then
+record the post-R-177 diagnostic, the R-180 counts-only coverage read, the
+cap-90 R-181 family, its A1 upload refusal, and its A2 invalid execution
+(22 `Invalid` orders, `run_valid=false`). Section 178 is Claude's
+independent review of the exact pushed range `87dd82f..b2df5ea`, with the
+test-only corrections `2bd3368` and `865ae3b`. The immediate next step is
+that Codex counter-reviews section 178 and the exact pushed range, closes or
+explicitly waives `ARV2R178-001` before any R-181 A3 or comparator launch,
+and diagnoses the 22 invalid orders before spending the last R-181 attempt.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. V15 and R-170 remain immutable, no R-170
 aggregate may be read, no R-169 diagnostic may be relabelled, and R-138
@@ -589,7 +599,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–170
+findings, outcomes, and per-run accounting remain in numbered sections 1–178
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -2263,6 +2273,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-21 | Codex counter-review, V19 successor, and R-175 diagnostic | `0132031` -> this record commit | Counter-review Claude's five commits, independently re-read the Mia-edited R-172 project, correct verified V17/V18 evidence defects prospectively, and start the next order-based QC round | All five commits accepted, four after prospective/documentation correction. V19 (`f79ea5c7...cb68`) preserves economics while fixing context-sensitive residual magnitude, complete finite holding-drift census, actual-submission evidence, forced-exit-invalidated accounting, all-skipped refusal, and the 16,384-byte transport. R-175 used fresh project `36819225`, exact 19-file/427,396-byte source, `BuildSuccess`, and one launch; it completed and authenticated only the two custom aggregates. The corrected census is 91 scheduled / 85 covered / 84 submitted / 84 completed with seven skips, so `run_valid=false` and zero cells; diagnostic return +39.339989% versus +39.590711% execution-matched QQQ. | Focused pushed-head baseline **231 passed**; final V19 runtime/projection/closure audit **190 passed**; narrower changed-behavior selection **18 passed**; lane-record gate **7 passed**; `compileall` and diff checks clean. No complete lane suite by owner rule. QC access: one hardened source upload/readback, compile, backtest, statistics-disabled polling, and one bounded two-statistic read; no standard statistic, chart, order, log, provider row, price, Object Store mutation, broker, deployment, real order, or trading access. Accounting closes **155 / 98 / 27 / 608**. | 0 open P0-P2 after correction. `ARV2CR168-001..009` record three V17 census/evidence defects, the V18 ambient-context defect, one wording correction, three prelaunch V19 test/audit corrections, and the discarded default-opener administrative read. | Push this same-lane round exactly once. Claude independently reviews section 168 and R-175. Any formal successor requires reviewed V19 adapter registration and a prospectively valid schedule; R-175 cannot be upgraded retroactively. |
 | 2026-09-22 | Codex SPY order diagnostic | `2201c5e` -> this record commit (source freeze `13bf582`) | Build the dedicated SPY-holdings order adapter and run R-176 once for the owner-requested 2025-now S&P 500 comparison | Added the universe-bound benchmark helper, SPY V1 runtime, projection/closure registration, and isolated tests without changing immutable QQQ V19. Fresh QC project `36820512` reproduced the 21-file source manifest, compiled, and completed R-176 A1. Diagnostic result: +29.556355% after modeled costs versus +30.937335% execution-matched SPY, with slightly smaller drawdown and higher Sharpe; six skips make `run_valid=false` and zero cells. | Focused code battery **197 passed**; after the result-record navigation correction, lane-record gate **7 passed**; `py_compile` and `git diff --check` clean. No full lane suite by owner rule. One launch spent **155 -> 156 shared looks / 98 -> 99 development evaluations / 27 infrastructure looks / 608 cells**. | Independent in-round audit: 0 P0-P3 before launch. `ARV2D169-001` (P3, documented): the first result reader hand-copied an internal field name and retained no values; one aggregate-only recovery read used the emitted schema name, so the run remains diagnostic and cannot become a formal cell. | Push this same-lane round exactly once. Claude reviews section 169, the SPY adapter, R-176, and the documented reader deviation. No retry, leverage, deployment, broker, live/paper/funded order, or trading action follows. |
 | 2026-09-22 | Codex owner-directed QC cleanup | `bd4ad8a` -> this record commit | Move failed-only QC projects except R-177 to the recoverable Recycle Bin and push once | A statistics-disabled inventory and immediate preflight identified six privately owned, idle projects containing only terminal `Runtime Error` runs. Each same ID was post-read under a `Recycle Bin/`-prefixed name ending in its exact original name. R-177 remained unchanged; completed, mixed-status, active, unrelated, and two ambiguous zero-backtest diagnostics were preserved. No strategy source or economics changed. | Active-document and lane-record gates **76 passed**; `git diff --check` clean. No full lane suite by owner rule. Cleanup read no statistic, log, chart, row, holding, order, or portfolio value and added **zero research looks, development evaluations, infrastructure looks, or cells**. | No code finding. The two zero-backtest diagnostics were deliberately not reclassified as failed; nothing was permanently purged. | Make exactly one same-lane push. Claude independently reviews section 171 together with section 170 and the exact pushed snapshot. R-177 remains preserved for owner-side Mia work; no A4 launch is permitted. |
+| 2026-09-24 | Claude independent review of the V14–V19/SPY order-level, six-universe order, R-180 coverage, and cap-90 R-181 range | `b2df5ea` -> `2bd3368` -> `865ae3b` -> this record commit | Section 178: forty-four commits `87dd82f..b2df5ea` individually disposed (38 accepted, 6 accepted after correction, 0 rejected); Mia provenance handling reviewed against the owner's clarification; zero QC calls | Registered eight new package modules in the whole-package closure test (`2bd3368`, test-only, 72 passed) and pinned the cap-90 per-file 64,000-character check (`865ae3b`, test-only, red with the check removed); rewrote the stale section-4 pointer and appended this row | Standing lane selection in a byte-faithful export, closure and projection files, record gates, `compileall`, `git diff --check`; results in 178.7. 0 looks, 0 evaluations, 0 cells | 0 P0, 0 P1, 3 P2, 5 P3 (`ARV2R178-001` through `-008`); `ARV2R178-002/-003/-004` corrected, `-001` open before any launch | Single push of the three Claude commits; Codex counter-reviews section 178, closes or waives `ARV2R178-001`, diagnoses the 22 invalid orders before R-181 A3 |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -22652,3 +22663,246 @@ Next: Claude reviews this exact pushed snapshot and, if directed by the
 owner, diagnoses the 22 rejected orders in QC. Codex counter-reviews any
 Claude lane commit and prospectively versions a proven A3 correction before
 spending the last R-181 attempt; no comparator runs until `run_valid=true`.
+
+## 178. Independent Claude review of the V14–V19/SPY order-level, six-universe order, R-180 coverage, and cap-90 R-181 range, 2026-09-24
+
+**Range reviewed:** `87dd82f..b2df5ea`, forty-four commits, individually
+disposed in 178.1, plus the three Claude lane commits of this round
+(`2bd3368`, `865ae3b`, and this record commit). Codex's section 177 frames
+the handoff as `dec7e13..HEAD`; the owner's instruction was to review every
+commit since Claude's last push, so the range also covers the seventeen
+commits already reviewed on the Windows host in section 165, the five
+owner-directed Claude commits `3243ae1`, `5223ba8`, `d48b5dd`, `90a68ee`,
+and `0132031` that Codex counter-reviewed in section 168, and Codex's own
+sections 168–177. Those earlier reviews stand; this section re-disposes the
+commits only where its own checks add or change something.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect endpoint was called.
+Every R-180 count and every R-181 figure quoted below is read from this
+record, not from QC.
+
+**Mia provenance.** The owner clarified during the round that Mia is
+QuantConnect's built-in assistant, that Codex pulled Mia-edited project
+source back into the lane, and that the owner used Mia to repair failed
+cloud attempts. The record handles that provenance adequately: sections
+167, 168, and 173.2 retrieve the cloud files, compare them byte-for-byte
+with the committed candidate, port only the diffed change behind a
+red/green regression, and never promote a Mia-completed status to
+evidence. No change to that handling is requested.
+
+**Verdict.** Thirty-eight commits are accepted; six are accepted after
+correction (`d89fc21`, `47b7181`, `3dd0fba`, `2d34786`, `785aaf2`,
+`b2df5ea`); none is rejected. **0 P0, 0 P1, 3 P2, 5 P3.** Two of the three
+P2 items were red gates at the pushed head and are corrected in this round
+(`2bd3368` and this record commit); the third, the unsigned exploratory
+launchers, is documented with a concrete plan and should be closed before
+R-181 A3 or either comparator launches. No production line changed in this
+round: both Claude code commits are test-only.
+
+### 178.1 Per-commit dispositions
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `f358fe0` | Codex counter-review of section 150; R-169 diagnostics; V14 runtime and projection changes | accepted | Reviewed in section 165; V14–V16 remain registered in the closure; no new finding. |
+| `f895615` | Record: R-169 pre-network control replacement | accepted | Record only; reviewed in section 165. |
+| `891a0b5` | Record: R-169 completed terminal authority | accepted | Record only; reviewed in section 165. |
+| `7dd0443` | V15 exact account-reconciled QQQ order successor | accepted | Reviewed in section 165; superseded by V16 without result read (section 156). |
+| `ae2a0e0` | Record: R-169 refusal and V15 successor | accepted | Record only. |
+| `6c32c8c` | Record: production V15 R-170 preregistration | accepted | Record only. |
+| `5539d13` | Record: R-170 completed pre-result refusal | accepted | Record only. |
+| `323829f` | V16 exact exposure-complement order successor | accepted | Mutation `V16m` (mean cash no longer the exact complement of gross) is red on three named tests; see 178.3. |
+| `bee02a2` | Record: R-171 preregistration | accepted | Record only. |
+| `7b9e18b` | Record: R-171 completion and result authority | accepted | Record only. |
+| `ba81230` | Record: valid R-171 order result | accepted | Record only; interpretation caveat `ARV2R165-002` still applies. |
+| `42820b2` | Record: V16 2025-now R-172 preregistration | accepted | Record only. |
+| `3e3ae0e` | Record: R-172 preregistration handoff | accepted | Record only. |
+| `830162c` | Record: R-172 refusal, attempt two | accepted | Record only. |
+| `318bd76` | Record: R-172 second refusal, final attempt | accepted | Record only. |
+| `06d47db` | Record: R-172 attempts exhausted | accepted | Record only. |
+| `8ba0213` | Record: Claude handoff and R-172 Mia blocker | accepted | Record only. |
+| `3243ae1` | Windows-host Claude review of V14–V16 and R-169–R-172 (section 165) | accepted | Counter-reviewed by Codex in section 168; its two findings are carried in 178.6. |
+| `5223ba8` | Owner-directed Claude V17 fail-closed decision-skip successor | accepted | Mutation `V17m` (skipped decisions no longer recorded) is red on seven named tests; V17 registered in the closure. |
+| `d48b5dd` | Record: Mia-code review, R-172 root cause, V17, R-173 launch | accepted | Record only; byte-identity retrieval documented. |
+| `90a68ee` | Owner-directed Claude V18 bounded-boundary successor | accepted | Counter-reviewed in section 168; V18 registered in the closure; no new finding. |
+| `0132031` | Record: Mia's terminal diagnosis, V18, R-174 launch | accepted | Record only. |
+| `18602cb` | Codex counter-review of sections 165–167, V19 successor, R-175 preregistration | accepted | V19 registered in the closure; its counter-review dispositions are consistent with the code. |
+| `2201c5e` | Record: completed R-175 V19 diagnostic | accepted | Record only. |
+| `13bf582` | SPY order-level V1 runtime and universe benchmark | accepted | Registered in the closure; no forbidden capability in the projected source. |
+| `964af07` | Record: R-176 SPY diagnostic | accepted | Record only. |
+| `d89fc21` | Six-universe order family: streaming targets, simulated-MOO executor, QC runtime, projector | accepted after correction | Four new package modules were not registered in the whole-package closure test, which was red at the pushed head (`ARV2R178-002`, corrected in `2bd3368`). Live-mode guards: `SG2` and `SG3` red; `SG1` green but redundant (`ARV2R178-006`). Test dependency on an untracked artifact (`ARV2R178-005`). |
+| `5edb7fe` | Align the six-universe Decimal recording bound with the 96-digit context | accepted | The A1 cause in section 170.8 matches the change; exponent −97 still refuses per its test. |
+| `1814b75` | Route missing fundamentals to the frozen own-ETF fallback | accepted | The A2 cause in section 170.9 matches; the one-session age rule is not loosened. |
+| `bd4ad8a` | Record: R-177 attempts exhausted | accepted | Record only; the executing launch path for R-177 A1–A3 is not in the tree (`ARV2R178-007`). |
+| `7fbf45a` | Record: owner-directed QC cleanup | accepted | Record only; last commit at which section 4 and the ledger were current. |
+| `785aaf2` | Exploratory cap-95 six-universe coverage profile; section 172 | accepted after correction | Added section 172 without updating section 4, turning two lane-record gates red (`ARV2R178-003`, corrected in this record commit); Codex's own `47b7181` corrected the adapter currentness refusal it caused. |
+| `47b7181` | R-180 counts-only coverage diagnostic runtime, projection, and launcher; section 173 | accepted after correction | Three new modules unregistered in the closure (`ARV2R178-002`, corrected in `2bd3368`); launcher has no owner-signed permit (`ARV2R178-001`); artifact dependency (`ARV2R178-005`). |
+| `38e998f` | Port Mia's one-line end-clock fix into the coverage projection | accepted | One-file diff, byte-matched against the cloud project, red/green regression; no economic rule changed. |
+| `fd2f5c5` | R-180 seven-statistic read; imported-read exception narrowed to one exact identity | accepted | The narrowing answers `ARV2CR174-001`; the prior-time exception is bound to one candidate, project, run, snapshot, and committed timestamp. |
+| `25ef304` | Exploratory cap-90 gate/evaluator/order-target option | accepted | Default R-177 identity and golden target-path SHA unchanged per its tests. |
+| `dec7e13` | Record: R-180 findings and cap-90 handoff (section 174) | accepted | Record only; pushed without a ledger row and with section 4 stale (see `ARV2R178-003`); `ARV2CR174-002/-003` rows never updated after section 175 (`ARV2R178-008`). |
+| `0a2b6c0` | Freeze the cap-90 six-universe order family and QC source identities (section 175) | accepted | Versioned runtime/projector for the cap-90 variant; explicit own-ETF fallback for an unavailable constituent collection is stated in section 175. |
+| `3dd0fba` | One-use private QC launcher for the cap-90 family | accepted after correction | Unregistered in the closure (`ARV2R178-002`, corrected in `2bd3368`); no owner-signed permit before `backtests/create` (`ARV2R178-001`); artifact dependency (`ARV2R178-005`). |
+| `c67252d` | Limit cap-90 result retention to comparison diagnostics | accepted | Retains only the META and AGGREGATES statistics; unrelated QC fields discarded. |
+| `a228570` | Record: reconcile post-A3 QC launch count without an outcome claim | accepted | Record only; correctly declines a cumulative ledger-total claim while section 172.1's nine launches are unreconciled. |
+| `2d34786` | Version cap-90 QC source under the 64,000-character file limit | accepted after correction | The normalized-runtime check is pinned (`SZ2` red); the per-file inventory check was not (`SZ1` green) — `ARV2R178-004`, corrected in `865ae3b`. The 80 KiB raw-byte bound is operative and pinned (`SZ3` red). |
+| `a2e6784` | Resume R-181 in place with exact A1 residue attestation | accepted | In-place A2 authenticates the idle project, zero-backtest census, and A1 claim before mutating; one-use claims are `O_EXCL`. |
+| `b2df5ea` | Record: R-181 invalid execution and Claude review handoff (sections 176.2–177) | accepted after correction | Record only; pushed with the two record gates red and without a ledger row (`ARV2R178-003`, corrected in this record commit). Its findings `ARV2D177-001/-002/-003` are carried in 178.6. |
+
+### 178.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R178-001` | P2 | `47b7181`, `3dd0fba` | The two exploratory launchers `six_universe_coverage_submission.py` and `six_universe_cap90_submission.py` create projects, upload files, compile, and call `backtests/create` behind local `O_EXCL` one-use control files only. Neither references `owner_signature_authority` or the sealed verifier (0 references each, against 62 in the order-level adapter and 48 in the preliminary adapter). R-180's launch, its three Mia completions, and R-181 A2 therefore spent research looks on chat approvals recorded in prose, not on a verifiable one-use owner-signed permit. The record states the signed-permit requirement for the production evidence path, so this is a control-consistency gap, not a breach of a written rule. | Documented, open. Not corrected by the reviewer: wiring a signed one-use claim into a host-only launcher that runs with live credentials against the existing R-181 project state cannot be exercised or proven here. Plan item 1 in 178.5. |
+| `ARV2R178-002` | P2 | `d89fc21`, `47b7181`, `3dd0fba` | The whole-package closure test was red at the pushed head: `test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned` failed (1 failed, 71 passed in an export of `b2df5ea`) because eight new package modules were never added to `_PINNED_QC_PACKAGE_SOURCES`, the projected-sibling pairs, the reached tuple, or the boundary-edge pin. The walkers found no forbidden import or I/O in the new modules once registered; the two launchers sit in the host-only adapter surface and the two runtimes in the QC-runtime surface. | Corrected in `2bd3368` (test-only; 72 passed). Sixteen sibling pairs added; reached tuple 110 → 118 modules; boundary edges 178 → 196. |
+| `ARV2R178-003` | P2 | `785aaf2`, persisting through `47b7181`, `dec7e13`, `0a2b6c0`, `2d34786`, `b2df5ea` | Two lane-record gates were red at the pushed head: `test_exact_next_step_references_the_latest_numbered_section` and `test_exact_next_step_names_review_or_owner_waiver_of_latest_section`. The live section 4 is byte-identical to its `7fbf45a` version and still names section 171 while sections 172–177 were appended; the gates pass against the `7fbf45a` record and fail against the `785aaf2` record. Separately, the origin branch advanced three times (`785aaf2`, `dec7e13`, `b2df5ea`) with no section-5 row, against the ledger's own "append one row before every push" rule; the last row still ends at `bd4ad8a`. | Corrected in this record commit: section 4 rewritten to name section 178 and the next step; this round's ledger row appended. Earlier rows are not inserted retroactively, per "never rewrite earlier rows"; Codex may append catch-up rows for the three pushes. Plan item 4. |
+| `ARV2R178-004` | P3 | `2d34786` | The cap-90 per-file inventory check (projection line 518, every projected file at most 64,000 characters) was unpinned: replacing its condition with `False` left the projection test file green (26 passed), while the normalized-runtime check at line 276 is pinned by `test_cap90_ast_normalization_refuses_qc_file_limit`. With the pinned inputs the check is unreachable, but it is the only guard against a grown gate, executor, or target builder failing at QC's `files/create` rather than locally. | Corrected in `865ae3b` (test-only): `test_cap90_projection_refuses_any_oversized_projected_file` keeps the runtime normalization at the real ceiling and proves the per-file check refuses on its own; red with the check removed (1 failed, 26 passed), green restored (27 passed). |
+| `ARV2R178-005` | P3 | `d89fc21`, `47b7181`, `3dd0fba` | Four test files (`test_qc_accepted_risk_six_universe_order_qc_projection.py`, `test_qc_six_universe_coverage_projection.py`, `test_qc_six_universe_coverage_submission.py`, `test_qc_six_universe_cap90_submission.py`) load the delta package from `artifacts/analyst_revisions_v2/accepted_risk_delta_order_package_20260918_01/`, which is under the gitignored `artifacts/` directory (six files, 2.6 MB, untracked). In any tree without that local directory — a fresh clone, the Windows host of section 165, or a `git archive` export — sixteen projection tests error rather than skip, so the pushed bytes alone cannot prove the frozen projection identities. | Documented. Plan item 3: track the package under an immutable path or make the fixture skip with an explicit reason naming the missing artifact. |
+| `ARV2R178-006` | P3 | `d89fc21` | The six-universe runtime's own `initialize` live-mode guard (`if self._algorithm.live_mode is not False`) is unpinned: mutation `SG1` was green. It is redundant by construction: the executor constructed a few lines later re-reads `live_mode` and calls `validate_backtest_initialize`, which `SG3` proves red (`test_executor_refuses_live_or_non_boolean_mode[True|0|None]`), and the pre-submit re-check is pinned by `SG2` (`test_executor_rechecks_live_mode_immediately_before_submission`). | Documented only; no test added because the executor's refusal already forces the property. |
+| `ARV2R178-007` | P3 | `bd4ad8a` (record); `d89fc21`, `5edb7fe`, `1814b75` shipped no launcher | Sections 170.7–170.10 record three R-177 launches with exact project, backtest, and projection identities, but no committed module names the R-177 project or launches the six-universe order projection: no adapter imports it, and the only launchers in the tree are the R-180 coverage and R-181–R-183 cap-90 modules added later. The three spent looks rest on recorded hashes with no reproducible launch path. | Documented. Plan item 6: any further launch of this family must go through a committed launcher (the cap-90 module already does). |
+| `ARV2R178-008` | P3 | `dec7e13` | The section-174 ledger rows `ARV2CR174-002` (cap-90 runtime/projector not versioned) and `ARV2CR174-003` (empty or all-nonpositive constituent collection refused) still read "Open" although section 175 (`0a2b6c0`) states both were addressed: a versioned cap-90 runtime/projector and an explicit own-ETF fallback for an unavailable constituent collection. No later row closes them with the evidence. | Documented; Codex should close both rows in its counter-review with the exact test names, or say why they stay open. |
+
+Checked and withdrawn before recording: the 80 KiB raw-byte bound at
+projection line 239 was suspected redundant beside the 64,000-character
+ceiling. It is not: it bounds raw bytes before AST normalization (the raw
+cap-90 runtime is 67,316 characters and only its normalized form is under
+64,000), and `SZ3` proves it pinned by
+`test_projection_source_file_bound_is_inclusive_and_finite`.
+
+### 178.3 Mechanical verification
+
+All mutation trials ran in `git archive` exports of `b2df5ea` under the
+session scratchpad, with the local `artifacts/` package copied in where
+the tests need it; the worktree was never mutated. Every trial ran without
+`-x`, with `-rf`, and the failing test names were captured so a red result
+counts only when a guard-specific test fails.
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| Closure at pushed head | none (export of `b2df5ea`) | **red**: 1 failed, 71 passed | `test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned` |
+| Closure after `2bd3368` | none | green: 72 passed | — |
+| `SG1` | six-universe runtime `initialize` live guard disabled | green: 0 failed | — (redundant; `ARV2R178-006`) |
+| `SG2` | executor pre-submit `validate_backtest_pre_submit` replaced by a no-op | red | `test_executor_rechecks_live_mode_immediately_before_submission` |
+| `SG3` | executor `validate_backtest_initialize` removed | red | `test_executor_refuses_live_or_non_boolean_mode[True]`, `[0]`, `[None]` |
+| `V16m` | V16 `mean_cash_weight` regressed to the prior cash text | red: 3 failed, 302 passed | `test_r169_real_v15_aggregate_is_corrected_without_other_economic…`, `test_r169_complement_is_independent_of_hostile_ambient_decimal_c…`, `test_v16_end_callback_binds_profile_digest_and_exact_complement` |
+| `V17m` | V17 skipped-decision records no longer appended | red: 7 failed, 25 passed | `test_stale_snapshot_skips_the_decision_without_orders_or_aging`, `test_percent_scaled_weights_skip_the_decision_without_rescaling`, `test_overnight_holdings_drift_skips_the_frozen_execution`, `test_any_skip_invalidates_the…` and three more |
+| `SZ1` | cap-90 per-file 64,000-character check removed | green: 26 passed → pinned by `865ae3b`; red afterwards: 1 failed, 26 passed | `test_cap90_projection_refuses_any_oversized_projected_file` |
+| `SZ2` | normalized-runtime 64,000-character check removed | red: 1 failed, 25 passed | `test_cap90_ast_normalization_refuses_qc_file_limit` |
+| `SZ3` | 80 KiB raw-byte source bound removed | red: 1 failed, 25 passed | `test_projection_source_file_bound_is_inclusive_and_finite` |
+| Record gates at pushed head | none | **red**: 2 failed, 74 passed (`test_lane_record_integrity.py` + active-document gate) | the two exact-next-step gates named in `ARV2R178-003` |
+| Record gates by history | record file as of `7fbf45a` / `785aaf2` | 7 passed / 2 failed | same two gates |
+
+Static checks: the two launchers assert `api._transport is _bounded_transport`
+and post only to the allow-listed `projects/*`, `files/*`, `compile/*`, and
+`backtests/*` endpoints; neither contains `owner_signature`,
+`signature_verifier`, or `ssh-keygen`. The six-universe runtime's only
+order call is `market_on_open_order` behind the executor; the projector's
+forbidden-call list still refuses `liquidate`, `market_order`,
+`set_holdings`, and `stop_market_order`. The runtime constructs the executor
+with `current_live_mode=lambda: self._algorithm.live_mode` so the
+pre-submit re-check reads the live flag, not a cached value.
+
+### 178.4 Results, read on the record's own terms
+
+- **R-180 (section 173.3)** is a counts-only input diagnosis with no
+  returns, so it can inform inclusion rules but not edge. Its census is
+  internally consistent: SPY has 0 joint passes at the 95% cap floor but
+  252 decisions in the 90–95% band with mapping and weight gates passing on
+  258 and 261, so a 90% floor can admit at most 249–252 SPY decisions — a
+  bound, not an observation. XLV (236) and XLE (245) already pass at 95%.
+  QQQ and SOXX have zero 90%-mapping passes and REMX has zero weight-band
+  passes, so cap easing cannot admit them; Codex says this plainly.
+  Choosing the 90% floor after seeing these counts makes the cap-90 family
+  exploratory, exactly as `ARV2CR174-005` records.
+- **R-181 A2 (section 176.2)** completed at QC with 261 of 261 rebalances,
+  6,289 submitted orders, 6,267 fills, and 22 `Invalid` orders
+  (6,289 − 6,267 = 22, consistent). Its preregistered gate makes
+  `execution_failure=true` and `run_valid=false` authoritative, so the
+  account path (+94.019% cumulative, −22.28% maximum drawdown, 20.50%
+  annualized) is a diagnostic number that cannot enter any comparison. The
+  22 rejections are 0.35% of submissions; even if every one proved benign,
+  the gate was frozen before the run and must not be relaxed after seeing
+  a favourable path. No comparator has run, so no relative claim exists,
+  and the family is incomplete by its own section-175 rule.
+- **Accounting.** Section 175 correctly makes no cumulative ledger-total
+  claim while the nine section-172.1 Mia/QC launches on the R-177 project
+  remain unreconciled. The last reconciled totals are 159 shared looks,
+  102 development evaluations, 27 infrastructure looks, and 608 cells after
+  R-177 A3 (section 170.10); since then the record itemises at least four
+  R-180 infrastructure looks, at least nine unclassified R-177-project
+  launches, and one R-181 A2 shared look plus one development evaluation.
+  Reconciling these into one table is plan item 5.
+- **Consistency checks that passed.** The R-181 A2 order counts reconcile;
+  the R-180 sleeve table's measurable counts never exceed 261 and REMX's
+  257-of-258 sub-95% weights match its zero weight-band passes; the A1
+  and A2 causes recorded in 170.8–170.9 match the two code changes
+  `5edb7fe` and `1814b75`; the cap-90 runtime size history (67,316 raw →
+  under 64,000 normalized) matches `ARV2D177-001` and `2d34786`.
+
+### 178.5 Improvement plan
+
+1. **Owner-signed launch permits for the exploratory launchers**
+   (`ARV2R178-001`). Before R-181 A3, R-182, or R-183, require a verified
+   one-use owner-signed permit through the existing `run_signature_verifier`
+   path in both launchers, or record an explicit owner waiver for
+   exploratory diagnostic launches in this record. Either choice closes the
+   gap; leaving it implicit does not.
+2. **Diagnose the 22 `Invalid` orders before spending the last R-181
+   attempt** (`ARV2D177-002`). One bounded, owner-approved read of the QC
+   orders endpoint (or a Mia diagnosis) should classify the rejection
+   reason — buying-power at the open, delisting, zero whole-share
+   quantity, or price band — and the A3 source must bind that diagnosed
+   correction prospectively. Identical bytes must not be relaunched.
+3. **Make the projection tests self-contained** (`ARV2R178-005`). Either
+   commit the 2.6 MB delta package under an immutable, hash-named path or
+   have the module-scoped fixture `pytest.skip` with a reason naming the
+   missing artifact. Errors on a fresh clone hide whether the frozen
+   identities still hold.
+4. **Run the record gates before every push and append the ledger row**
+   (`ARV2R178-003`). The two gates take under a second; three pushes went
+   out red. Codex may append catch-up rows for `785aaf2`, `dec7e13`, and
+   `b2df5ea`.
+5. **Reconcile the accounting** (178.4). Publish one table from the last
+   reconciled totals through R-181 A2, classifying the nine R-177-project
+   launches or stating they remain unclassifiable and why.
+6. **Committed launch path for every family** (`ARV2R178-007`). The cap-90
+   launcher already satisfies this; no further R-177-family launch should
+   occur outside a committed, tested module.
+7. **Register new package modules in the same commit** (`ARV2R178-002`).
+   The closure test fails loudly on an unregistered module, which is the
+   right behaviour, but only if it is run; add it to the focused selection
+   whenever `research/analyst_revisions_v2_qc/` gains a file.
+8. **Close or justify the section-174 rows** (`ARV2R178-008`).
+
+### 178.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R178-001` | P2 | Open; plan item 1. |
+| `ARV2D177-002` | P2 | Open; 22 `Invalid` orders, `run_valid=false`; plan item 2. |
+| `ARV2D177-003` | P3 | Open as recorded by Codex. |
+| `ARV2CR174-002`, `ARV2CR174-003` | P2 | Recorded "Open"; apparently addressed by section 175 (`ARV2R178-008`). |
+| `ARV2R165-001` | P3 | Open; `ARV2R178-005` is one concrete cause of the Windows-host suite failure. |
+| `ARV2R165-002` | P3 | Open interpretation caveat on the R-171 cell. |
+| `ARV2R178-005`, `-006`, `-007`, `-008` | P3 | Documented this round. |
+
+### 178.7 Validation
+
+Run on the exact final tree of this round (`865ae3b` plus this record
+commit) with `~/.venvs/trading_agent-py313/bin/python` (3.13.15):
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, run in a byte-faithful export of the tracked tree at `2bd3368` with the local `artifacts/analyst_revisions_v2` directory copied in | **7,383 passed, 3 failed, 11 skipped, 35 warnings in 1:44:05.** All three failures are export or ordering artifacts, each re-run green on the final tree below: `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` shells to `git check-attr` and there is no `.git` in an export; the two exact-next-step record gates ran against the pushed record before this commit's section-4 rewrite. The eleven skips are the standing host-capability skips (Windows-only junctions, symlink creation, POSIX-versus-ACL permission bits, no mainline ref). |
+| Export failure re-run in the real checkout | `test_dataset_and_import_firewall.py` | 173 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` in the worktree | 76 passed |
+| Changed test file on the final tree | `test_qc_accepted_risk_six_universe_order_qc_projection.py` in the worktree | 27 passed (26 before `865ae3b`) |
+| Whole-package closure | `test_qc_object_store_read_contract.py` | 72 passed after `2bd3368`; 1 failed, 71 passed in an export of `b2df5ea` |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this record commit | clean; three Claude commits ahead of `b2df5ea`, published in this round's single push |
+
+Not exercised here: no QuantConnect endpoint, result read, or launcher was
+run, so the R-180 counts and the R-181 A2 figures are taken from sections
+173.3 and 176.2 exactly as recorded, and the launchers' live behaviour
+against the private projects is attested only by their tests.

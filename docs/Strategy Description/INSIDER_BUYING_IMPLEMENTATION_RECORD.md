@@ -9586,3 +9586,56 @@ upload/processing/job/backtest, broker, operator database, scheduler, paper
 deployment, capital, order, live, or trading surface was accessed or changed
 by this review. Authorized outcome looks: **0**. Consumed outcome looks:
 **0**. Research looks: **0**.
+
+## 73. Codex counter-review - Claude canonical-source-policy review (2026-09-24 UTC)
+
+Reviewer: Codex, in the dedicated lane worktree on
+`codex/strategy-insider-buying`. The exact pushed and fetched review head was
+`922a35b2d976b15da4bcfa78c85c054273405b4f`; its parent review correction is
+`b758514595ce8c1e60b2dc31acf9cbb4b2fbdc0c`, and both follow the reviewed
+Codex head `07ba33ecf18782f995bd23d7cfc94d8caafe73d6`. The branch matched its
+tracking ref and the worktree was clean before review. No branch or worktree
+was created or switched.
+
+### 73.1 Commit dispositions
+
+| Commit | Disposition | Counter-review evidence |
+|---|---|---|
+| `b758514` | **Accepted.** | The 11-line test-only change symmetrically pins the final required-quarter endpoint. The focused case and all 240 source-policy tests pass. Independently deleting the final-endpoint guard makes the named case fail for the expected reason while the semantic fingerprint still refuses later, proving the new assertion reaches the guard it names. A generalized search found no second required-period endpoint implementation. |
+| `922a35b` | **Accepted after append-only P3 correction in this section.** | The four-commit range, zero-merge topology, four changed paths, all four dispositions, 82-quarter endpoints, 99-field category split, both recorded hashes, and the 240-test focused result reproduce. Two documentation defects are corrected below; neither changes code, policy, authority, or the pilot decision. |
+
+Implementation quality of the reviewed Claude round: **9/10**. Its technical
+review, mutation correction, source-policy mapping, and pilot-readiness
+findings are strong and independently reproducible. The deduction is for the
+two P3 record defects below, not for product behavior.
+
+### 73.2 Retained P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB2SRC-CCR01 | P3 | **CLOSED in this record commit** | `922a35b` | Section 72 | The review omitted the required honest 1-10 implementation-quality rating. | `docs/process/CODE_REVIEW_AND_SESSION_HANDOFF_PROCESS.md`, step 9, requires the rating; section 72 has none. | A required review disposition is incomplete without it, even though code behavior is unaffected. | The 9/10 assessment is recorded in section 73.1 without rewriting history. | Direct comparison of the process requirement and sections 72-73. |
+| IB2SRC-CCR02 | P3 | **CLOSED in this record commit** | `922a35b` | Push-ledger row for section 72 versus `IB2SRC-CR03` | The short ledger row says earlier Claude mutation harnesses did not disable bytecode caching, while the detailed finding says earlier sessions were not checked or re-audited. The categorical shorthand overstates the evidence. | Section 72.3 reproduces one stale-bytecode false result in the current review; section 72.4 explicitly limits the audit. | Mutation evidence must state exactly what was observed so later reviewers do not discard sound evidence or trust unaudited evidence. | Clarification: section 72 proved the current harness needed cache suppression. Pre-section-72 Claude mutation evidence carries that methodology caveat where same-size sub-second rewrites were possible, but earlier sessions were not independently re-audited. | The corrected statement is consistent with both sections 72.3 and 72.4. |
+| IB2SRC-CR03 | P3, reviewer methodology | **OPEN, non-blocking; clarified** | Pre-section-72 Claude mutation evidence | Scratch mutation harnesses | Earlier evidence has the bounded stale-bytecode caveat described above; it is not declared invalid wholesale. | `IB2SRC-CCR02`. | Retain the caveat and use bytecode-disabled, cache-purged mutation runs going forward. | No repository-code change. | This counter-review's mutation was in memory under `python -B` with cache writing disabled. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | The Insider-only paper clause still needs one coordinated reconciliation when the lane integrates into `main`. | Sections 68-72. | It is outside this lane's permitted edit scope. | None here. | This range changes only lane-owned files. |
+
+There is no P0, P1, or new P2 finding. The existing pilot-design items
+`IBPILOT-R01` and `IBPILOT-R02` are not defects in either reviewed commit and
+proceed to the separately bounded design milestone.
+
+### 73.3 Reproduction and authority accounting
+
+- Focused final-endpoint case: **1 passed**.
+- Complete source-policy module: **240 passed**.
+- Lane-record plus active-document checks: **70 passed**.
+- Policy SHA-256:
+  `eec42a1e34b6200e0e195a6702307a5c716c10c40dbfd8e9e8095846c79e7dbe`.
+- Blueprint SHA-256:
+  `f8834e13bb22d63a1a5a055a24cc2638ecb2e535b733c1fdd1741a28c65db88c`.
+- `git diff --check` for both reviewed commits is clean. The worktree remained
+  unchanged during reproduction.
+
+No SEC, network, provider, credential, licensed row, real filing, security
+master, outcome, ETF holding, QuantConnect, broker, operator database,
+scheduler, deployment, capital, order, live, or trading surface was accessed.
+Authorized outcome looks: **0**. Consumed outcome looks: **0**. Research
+looks: **0**.

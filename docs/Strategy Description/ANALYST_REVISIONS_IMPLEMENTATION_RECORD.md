@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–166 retain the milestone, review, preregistration, QC
+strategy. Sections 1–179 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -32,6 +32,12 @@ was added. Section 171 records the owner's later cleanup direction: six
 failed-only QC projects were moved to the recoverable Recycle Bin, while
 R-177, completed or mixed-status projects, and the two ambiguous zero-backtest
 diagnostics were preserved.
+Section 180 is Claude's independent review of `0132031..c599301`: all
+twenty-eight commits accepted, the cap-90 admission bridge, matched role and
+tilt reviewed, the shared look ledger reconciled from a QC census to
+173 / 116 / 32 / 611 with two previously unrecorded launches counted, and
+a record gate added; the three valid cap-90 reads are exploratory cells,
+not formal alpha evidence.
 Codex uses focused checks during development and QC work; Claude runs the
 complete lane suite during independent review unless the owner explicitly
 asks Codex to run it. Section 150 is the independent Claude review of
@@ -193,7 +199,7 @@ exhaustive lifecycle-to-named-refusal builder now exists. The status envelope
 and exact result reader are implemented but have not been used. B5D and the
 section-69 candidate were accepted in section 70. The order-level lineage
 through V16 and the R-169 through R-172 execution evidence are accepted in
-section 165 with no code correction, pending Codex counter-review; section 166 adds the immutable V17 fail-closed decision-skip successor as a candidate pending Codex counter-review and records the R-173 diagnostic refusal; section 167 adds the immutable V18 bounded-boundary successor as a candidate pending Codex counter-review and records the R-174 diagnostic outcome; no
+section 165 with no code correction, pending Codex counter-review; section 166 adds the immutable V17 fail-closed decision-skip successor as a candidate pending Codex counter-review and records the R-173 diagnostic refusal; section 180 reconciles the shared look ledger and reviews the cap-90 bridge, matched and tilt runs as exploratory cells; section 167 adds the immutable V18 bounded-boundary successor as a candidate pending Codex counter-review and records the R-174 diagnostic outcome; no
 wording above grants physical access or makes a pristine-PIT claim.
 
 The production source, firm-ontology, security-master, classification, cost,
@@ -553,8 +559,7 @@ record the post-R-177 diagnostic, the R-180 counts-only coverage read, the
 cap-90 R-181 family, its A1 upload refusal, and its A2 invalid execution
 (22 `Invalid` orders, `run_valid=false`). Section 178 is Claude's
 independent review of the exact pushed range `87dd82f..b2df5ea`, with the
-test-only corrections `2bd3368` and `865ae3b`. Claude will review section 179
-after Codex's single final push; it records Codex's counter-review of all
+test-only corrections `2bd3368` and `865ae3b`. Section 179 records Codex's counter-review of all
 three Claude commits and bounded, redacted R-181 A2
 order diagnostics: all 22 invalid orders were buys rejected before 09:30 New
 York time for insufficient buying power. R-181 remains invalid, its A3 attempt
@@ -568,7 +573,12 @@ existing A2-valid predecessor pin must be prospectively changed to the actual
 authenticated A3 result if valid; an invalid A2 cannot yield a clean matched
 spread. The separately versioned tilt candidate is local and unlaunched.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
-change or relaunch is permitted. V15 and R-170 remain immutable, no R-170
+change or relaunch is permitted. Section 180 is Claude's independent review of
+`0132031..c599301`: every commit accepted, the shared look ledger reconciled
+from a QC census to 173 / 116 / 32 / 611 with the unrecorded R-182 rerun and
+fifth R-180 launch counted, and a new ledger gate; Codex must counter-review
+section 180 and its two commits and confirm or correct the exploratory-cell
+classification before any further launch. V15 and R-170 remain immutable, no R-170
 aggregate may be read, no R-169 diagnostic may be relabelled, and R-138
 remains unlaunched/unspent.
 
@@ -2287,6 +2297,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-22 | Codex owner-directed QC cleanup | `bd4ad8a` -> this record commit | Move failed-only QC projects except R-177 to the recoverable Recycle Bin and push once | A statistics-disabled inventory and immediate preflight identified six privately owned, idle projects containing only terminal `Runtime Error` runs. Each same ID was post-read under a `Recycle Bin/`-prefixed name ending in its exact original name. R-177 remained unchanged; completed, mixed-status, active, unrelated, and two ambiguous zero-backtest diagnostics were preserved. No strategy source or economics changed. | Active-document and lane-record gates **76 passed**; `git diff --check` clean. No full lane suite by owner rule. Cleanup read no statistic, log, chart, row, holding, order, or portfolio value and added **zero research looks, development evaluations, infrastructure looks, or cells**. | No code finding. The two zero-backtest diagnostics were deliberately not reclassified as failed; nothing was permanently purged. | Make exactly one same-lane push. Claude independently reviews section 171 together with section 170 and the exact pushed snapshot. R-177 remains preserved for owner-side Mia work; no A4 launch is permitted. |
 | 2026-09-24 | Claude independent review of the V14–V19/SPY order-level, six-universe order, R-180 coverage, and cap-90 R-181 range | `b2df5ea` -> `2bd3368` -> `865ae3b` -> this record commit | Section 178: forty-four commits `87dd82f..b2df5ea` individually disposed (38 accepted, 6 accepted after correction, 0 rejected); Mia provenance handling reviewed against the owner's clarification; zero QC calls | Registered eight new package modules in the whole-package closure test (`2bd3368`, test-only, 72 passed) and pinned the cap-90 per-file 64,000-character check (`865ae3b`, test-only, red with the check removed); rewrote the stale section-4 pointer and appended this row | Standing lane selection in a byte-faithful export, closure and projection files, record gates, `compileall`, `git diff --check`; results in 178.7. 0 looks, 0 evaluations, 0 cells | 0 P0, 0 P1, 3 P2, 5 P3 (`ARV2R178-001` through `-008`); `ARV2R178-002/-003/-004` corrected, `-001` open before any launch | Single push of the three Claude commits; Codex counter-reviews section 178, closes or waives `ARV2R178-001`, diagnoses the 22 invalid orders before R-181 A3 |
 | 2026-09-24 | Codex counter-review and exploratory order-based QC | `6f498cb` -> this record commit (`ef776d7`, `cf057af` precede it) | Section 179: accept Claude's three commits after lane corrections, diagnose R-181 A2, freeze and run the final A3 bridge, matched R-182 A1, and separate revision-weight tilt R-184 A1 | The A2 count-only read isolated 22 insufficient-buying-power pre-open BUY refusals. The owner chose a prospective research-only 2x order-admission bridge with the same 98% target and validity gates, and waived detached signatures for these three named exploratory runs only. R-181 A3 completed valid at +96.63%; R-182 A1 completed valid at +123.62%; R-184 A1 completed valid at +125.76%. R-181 minus matched is -26.99 pp; tilt minus matched is +2.14 pp, both exploratory in one window. Three sleeves remained ETF fallbacks. | Focused exact-tree checks, compilation, diff, QC upload/compile, status-only polls, and one bounded custom-statistic read per completed run; exact figures and caveats in 179.1-179.4. Three launches spent three shared research looks and three ARV2 development evaluations; A2 diagnostic spent none. No full lane suite by Codex under owner rule. The earlier A2 diagnostic transiently inspected paginated order rows but retained only redacted counts; no raw order/provider/price/log row was retained or printed, and no broker, live/paper/funded order, or trading access occurred. | `ARV2CR179-001/-004` corrected; `-002` closed by valid A3 predecessor binding; `-003` diagnosed and addressed prospectively, not retroactively proven causal. `ARV2D179-005` documents that the matched stock-count/fallback policy remains score-dependent, so R-184 isolates only within-stock weight tilt and is not a pure no-analyst baseline. | Push this lane once regardless of candidate success, as owner directed. Claude independently reviews the exact pushed range; no leverage, R-183, live/paper, or formal alpha claim follows by inference. |
+| 2026-09-24 | Claude independent review of `0132031..c599301` and shared look-ledger reconciliation | `c599301` -> `1a21d57` -> this record commit | Review of the twenty-eight commits pushed since `0132031` (V19, R-175, SPY V1, R-176, six-universe order family, R-177, R-180, cap-90 R-181 through R-184, section 178 and Codex's section 179), with Codex's `ef776d7`, `cf057af` and `c599301` reviewed for the first time, and a QC-census reconciliation of the look ledger (section 180) | Synced the lane clone by fast-forward from a clean tree on this Windows host. Section 178's per-commit dispositions confirmed; the admission bridge, R-182 predecessor gate, R-184 receipt chain and bounded tilt reviewed and accepted; section 179's spread arithmetic reproduced exactly. An administrative QC census (zero looks) of nine projects and thirty-one backtests found two unrecorded launches (an R-182 "rerun" and a fifth R-180 run) and that the shared look ledger ends at R-176. Appended the five missing ledger entries, reconciled the totals from 159/102/27/608 to **173/116/32/611**, and added the record gate `test_shared_look_ledger_names_every_launched_candidate` (red at `c599301`, green with the entries). No production line changed. | Real tree at `c599301`: `compileall` exit 0; `git diff --check` clean; record gates **78 passed** (76 before this round's two tests); closure pins **6 passed**; the range's collectable test files **275 passed** with ten files uncollectable through the `fcntl` chain (`ARV2R165-001`). Guarded LF scratch worktree: those ten files **45 passed, 13 failed, 119 skipped**, the thirteen failures all in the R-181 A2 order-diagnostic reader's one-use claim path, which requires POSIX `0o700`/`0o600` modes and `O_DIRECTORY`/`dir_fd` opens that this NTFS host cannot satisfy (the same class as the adapter's permission semantics in section 165). Mutation matrix on the bridge and tilt batteries **six of six non-equivalent mutations killed**, three survivors proven equivalent or redundant (`ARV2R180-005`, `-006`). QC access: administrative census and evidence-project source reads only; no launch, statistic, chart, order, log, price, provider row or return read. | 0 P0, 0 P1. `ARV2R180-001` (P2, corrected): shared ledger missing five launched candidates and unreconciled totals. `ARV2R180-002` (P2, counted): unrecorded R-182 rerun plus an owner-side Mia notebook with standard statistics. `ARV2R180-004` (P2, classified): three valid cap-90 reads counted as exploratory cells. `ARV2R180-003`/`-005`/`-006`/`-007`/`-008`/`-009`/`-010` (P3): fifth R-180 launch; bridge cash flags always true behind the nonnegative read; tilt conservation check redundant; owner authorization for the A2 order reads not quoted; host test class; stale "first of three" wording; post-launch re-saves of evidence projects. | Codex counter-reviews section 180 and its two commits and confirms or corrects the cell classification with a reason. R-181 is exhausted, R-182 has used two of three slots, R-183 stays signed and unlaunched. No fourth R-181 attempt, R-178/R-179 launch, levered target, six-universe expansion beyond cap-90, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
+
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -23238,3 +23250,188 @@ run by Codex, per the owner's rule; Claude owns the complete lane suite.
 R-181 A1/A2/A3, R-182 A1, and R-184 A1 used three, one, and one of their
 respective maximum-three attempt slots. No R-181 A4 or R-183 basket run
 occurred. There was one final push of the existing lane branch, as directed.
+
+## 180. Independent Claude review of `0132031..c599301`: V19/SPY successors, the six-universe order family, cap-90 R-181 through R-184, and the shared look-ledger reconciliation, 2026-09-24
+
+### 180.1 Range, method and disposition summary
+
+**Range reviewed:** the twenty-eight commits pushed after this session's
+`0132031`, from `18602cb` (Codex counter-review and V19) to `c599301`
+(section 179's results), taken by fast-forward into the lane clone on this
+Windows host with a clean tree. Twenty-five of them were already disposed
+commit by commit by the other Claude session in section 178 (`6f498cb`) and
+counter-reviewed by Codex in section 179; those dispositions stand and are
+re-stated below only where this session's own checks add something. The
+three commits no Claude had reviewed are Codex's `ef776d7`, `cf057af` and
+`c599301`, and they are reviewed here individually and cumulatively.
+
+**Owner-authorized QC access, zero looks.** One administrative census
+(project list plus `backtests/list` reduced in process to id, name, status
+and creation time) and one source read of the three cap-90 projects were
+used to reconcile the look ledger; no `backtests/create`, no statistic, chart,
+order, log, price, provider row or return was read. Credentials were never
+printed.
+
+**Verdict.** All twenty-eight commits are accepted; `c599301` and the
+range's record chain are accepted after the two record corrections in this
+round (`ARV2R180-001`, `ARV2R180-002`). **0 P0, 0 P1, 4 P2, 6 P3.** No
+production line changed in this round: this session adds one lane-record gate
+and the five missing shared-ledger entries, and reconciles the look totals.
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `18602cb` .. `b2df5ea` (22 commits) | V19, R-175, SPY V1, R-176, the six-universe order family, R-177, cleanup, cap-95/cap-90 exploration, R-180, R-181 A1/A2 | accepted | Section 178's per-commit dispositions confirmed by this session's checks: V16/V17/V18 blobs unchanged (`998cb19b...`, `8049d90e...`, `40d38321...`); V19 changes only the residual-magnitude context, the drift census, the executed-decision session rule, the all-skipped refusal and the 16,384-byte transport (which closes `ARV2R167-006`); 275 tests of the range's twenty-one collectable test files pass on the real tree. |
+| `2bd3368`, `865ae3b`, `6f498cb` | the other Claude session's closure-pin and ceiling corrections and section 178 | accepted | Whole-package closure pins **6 passed** on the real tree at `c599301`; section 178's findings agree with this session's reading; its plan item on unsigned launchers was resolved by the owner's explicit, narrowly scoped waiver recorded in section 179. |
+| `ef776d7` | R-181 admission bridge, R-184 tilt candidate, launcher pins and tests | accepted | Reviewed in 180.3: the bridge is an admission permission with the 98% target and fail-closed gates intact; the tilt is a bounded within-sleeve weight transfer. Mutation matrix 180.5: six of six non-equivalent mutations killed. |
+| `cf057af` | valid R-181 A3 receipt, R-182 predecessor gate, R-184 one-use launcher | accepted | The cap-90 launcher admits R-182 only after a `run_valid=true` predecessor whose projection and profile digests are the A3 values (`f75725c3...`, `9e1b93c3...`), closing `ARV2CR179-002`; the tilt launcher binds R-182's claim, launch, terminal, result-read and result-valid receipts, the waiver id, and the target-path digest. |
+| `c599301` | section 179.3 and 179.4 results and the round's ledger row | accepted after correction | Arithmetic reproduces exactly: `0.96628735468236 - 1.236191666261345 = -0.269904311578985` and `1.2575741336207897 - 1.236191666261345 = 0.0213824673594447`. The shared look ledger had no entry for any candidate after R-176 and two launches were unrecorded (180.2). |
+
+### 180.2 Shared look-ledger reconciliation from a QC census
+
+`docs/research/alpha-result.md` ends at R-176. Sections 170 through 179
+record R-177 (three attempts plus nine later launches), R-180 (one attempt
+plus later Mia launches), R-181 (A1 refusal, A2, A3), R-182 and R-184 only in
+the lane record, and section 178.4 states that the cumulative totals were
+last reconciled at **159 / 102 / 27 / 608** after R-177 A3. A 2026-09-24
+administrative census of every ARV2 project numbered 96 and above (nine
+projects, thirty-one backtests) reconciles the ledger:
+
+| Project | Backtests found | Record | Difference |
+|---|---|---|---|
+| `96` R-173 (`36809007`) | 6 | 6 (section 167) | none |
+| `97` R-174 (`36811274`) | 1 | 1 | none |
+| `98` R-175 (`36819225`) | 1 | 1 | none |
+| `99` R-176 (`36820512`) | 1 | 1 | none |
+| `100` R-177 (`36823601`) | 12 | 3 attempts + 9 later launches (172.1) | none |
+| `103` R-180 (`36854638`) | 5 | A1 + 3 Mia completions (173.2) | **one unrecorded**: `06bdcc2a5c4a2b395e35bc1f5dadf75e`, QC default-named, `Completed.`, 2026-09-23 19:29:20 UTC |
+| `104` R-181 (`36891750`) | 2 | A2, A3 (A1 created no backtest) | none |
+| `105` R-182 (`36909823`) | 2 | A1 (179.3) | **one unrecorded**: `78d6532ef3b02744f0188145c5d46686`, `ARV2 R182A1 ... 186cb2bb rerun`, `Completed.`, 2026-09-24 18:09:39 UTC; a `mia.ipynb` saved 18:47:09 UTC embeds QC standard statistics for the run |
+| `107` R-184 (`36910292`) | 1 | 1 | none |
+
+Source integrity of the three evidence projects: the thirteen shared files
+are byte-identical across `104`, `105` and `107` and the bridge runtime
+matches the recorded `60b0e300...`; `104` and `105` differ only in `main.py`
+(`role='signal'` versus `role='matched'`, one line); `107` adds the two tilt
+files; the totals equal the recorded 394,268, 394,269 and 422,728 projection
+bytes. All files of `104` and `105` were re-saved after their launches
+(18:10:51 and 18:47:09 UTC) with unchanged content, which is owner or Mia
+activity in evidence projects (`ARV2R180-010`).
+
+Reconciled accounting, with this session's classification made explicit for
+Codex to confirm:
+
+| Step | Shared looks | ARV2 development evaluations | Infrastructure looks | Authenticated cells |
+|---|---|---|---|---|
+| Last reconciled (after R-177 A3, section 170.10) | 159 | 102 | 27 | 608 |
+| Nine later launches in the R-177 project (172.1), each a QC launch of the family's source | +9 = 168 | +9 = 111 | 27 | 608 |
+| R-180: A1, three Mia completions, one unrecorded launch; counts-only, no return | 168 | 111 | +5 = 32 | 608 |
+| R-181 A2 and A3; the valid A3 read as one exploratory cell | +2 = 170 | +2 = 113 | 32 | +1 = 609 |
+| R-182 A1 and the unrecorded rerun; the valid A1 read as one exploratory cell | +2 = 172 | +2 = 115 | 32 | +1 = 610 |
+| R-184 A1; the valid read as one exploratory cell | +1 = 173 | +1 = 116 | 32 | +1 = 611 |
+| **Closing totals** | **173** | **116** | **32** | **611** |
+
+The three cells are exploratory: the cap-90 floor was chosen after the
+R-180 counts, the runs used the research-only admission bridge, and their
+launches used the owner's narrow signature waiver. They are admissible as
+matched-comparison predecessors and as multiplicity-counted outcome looks,
+not as formal alpha evidence. Five shared-ledger entries (R-177, R-180,
+R-181, R-182, R-184) are appended in this round with these figures, and a
+new lane-record gate,
+`test_shared_look_ledger_names_every_launched_candidate`, requires a ledger
+heading for every candidate whose record section names a backtest identity;
+it was **red at `c599301`** (missing `177, 180, 181, 182, 184`) and is green
+with the entries.
+
+### 180.3 The admission bridge, the matched role and the tilt
+
+**Bridge (`ef776d7`).** `BridgeAdmissionMixin` sets every configured
+security's buying-power leverage to two and requires the effective model to
+report exactly two before any order; the target stays 98% gross and
+long-only. Validity is fail-closed at three layers: the inherited cash read
+refuses a negative balance outright at every daily observation and every
+order-event boundary; the end-day observation refuses gross exposure above
+one; and the aggregate's `run_valid` additionally requires zero invalid or
+canceled orders, all orders filled, mean target-weight L1 error at most 2%
+and single at most 5% against prior-close reference marks. The record
+states honestly that cash is observed at boundaries, not continuously. This
+session's reading: the permission changes LEAN's admission arithmetic for
+the pre-open sell/buy overlap and cannot lever the realized portfolio past
+the gates; the owner chose it explicitly in section 179. The standing
+"no leverage" boundary in the lane's next-gate language should be read as
+"no levered target", and this round keeps it so.
+
+**R-182 predecessor and R-184 chain (`cf057af`).** The cap-90 launcher's
+predecessor check binds R-182 to a valid R-181 result whose projection and
+profile digests are the A3 values, so the invalid A2 cannot open the matched
+role; the tilt launcher requires R-182's claim, launch, terminal, result-read
+and result-valid receipts with the waiver id and reads the baseline target
+path digest from the result-valid receipt, and the tilt runtime emits that
+digest for the reader to match. Both are consistent with the record.
+
+**Tilt (`ef776d7`).** `tilt_matched_weights` rebuilds the cap-90
+construction from the same point-in-time snapshots and refuses if its digest
+differs, then transfers weight only between scored stocks inside a sleeve,
+capped at 20% of each stock's own baseline, with tied mid-ranks centered,
+zero or missing scores neutral, the aggregate 9.8% stock cap preserved, and
+the sleeve sum and the 98% gross re-checked. Scores are the R055
+firm-specific scores at the decision session, the same point-in-time source
+as the QQQ lineage. The +2.14 pp single-window observation is labelled
+correctly in section 179.4.
+
+### 180.4 Validation on this host
+
+- Real lane tree at `c599301`: `compileall` exit 0; `git diff --check`
+  clean; record and active-document gates **76 passed** (78 with the two
+  tests added here, after the ledger entries); whole-package closure pins
+  **6 passed**; the range's twenty-one collectable test files **275 passed,
+  10 files uncollectable** through the `fcntl` import chain
+  (`ARV2R165-001` class: the four launchers and diagnostic, the four
+  six-universe projections, V19 and SPY V1).
+- Guarded LF scratch worktree at `c599301` (the section-165 accommodation):
+  those ten files **45 passed, 13 failed, 119 skipped**, the thirteen failures all in the R-181 A2 order-diagnostic reader's one-use claim path, which requires POSIX `0o700`/`0o600` modes and `O_DIRECTORY`/`dir_fd` opens that this NTFS host cannot satisfy (the same class as the adapter's permission semantics in section 165), the skips being the four module-scoped
+  fixtures that skip when the gitignored delta package is absent
+  (`ARV2R178-005`, as Codex corrected).
+- Mutation matrix (180.5) on the bridge and tilt batteries in that
+  worktree, source restored byte for byte afterwards.
+
+### 180.5 Mutation matrix
+
+| Trial | Production change | Result | Named failing test |
+|---|---|---|---|
+| B1 | end-day gross above one no longer refused at observation | killed | `test_bridge_observes_nonnegative_daily_cash_and_at_most_one_gross` |
+| B2 | `run_valid` ignores the bridge gates | killed | `test_bridge_aggregate_gates_actual_tracking_not_just_order_status` |
+| B3 | mean tracking bound widened from 2% to 20% | killed | same test |
+| B4 | effective 2x model check removed | killed | `test_bridge_refuses_an_effective_one_x_model_even_if_setter_returns` |
+| B5 | negative order-event cash accepted by the flag | survived, **equivalent**: the inherited `_portfolio_cash` read refuses a negative balance (`nonnegative=True`) at every event boundary before the flag is computed | see `ARV2R180-005` |
+| B6 | daily cash minimum removed from `run_valid` | survived, **equivalent**: same read refuses first at every daily observation | see `ARV2R180-005` |
+| T1 | per-stock change bound widened from 20% to 50% | killed | `test_tilt_is_separate_from_frozen_r181_r182_roles_and_profiles` |
+| T2 | sleeve-budget conservation check removed | survived, **redundant by construction**: every transfer moves the same amount off a donor and onto a receiver | see `ARV2R180-006` |
+| T3 | exact-zero scores treated as scored names | killed | `test_structural_zero_scores_do_not_donate_to_one_positive_name` |
+
+### 180.6 Findings ledger
+
+| ID | Severity | Finding | Disposition |
+|---|---|---|---|
+| `ARV2R180-001` | P2 | The shared look ledger had no entry for R-177, R-180, R-181, R-182 or R-184 (nineteen launches recorded only in lane-record prose), and the cumulative totals were left unreconciled since R-177 A3. | Corrected: five entries appended; totals reconciled to 173 / 116 / 32 / 611 from a QC census; a new record gate refuses a launched candidate without a ledger heading (red at `c599301`, green now). |
+| `ARV2R180-002` | P2 | The R-182 project holds a second, unrecorded `Completed.` launch (`78d6532e...`, "rerun", 18:09:39 UTC) and a Mia notebook whose text embeds QC standard statistics for the run. | Counted (one shared look, one development evaluation, R-182's second attempt slot, conservatively); not read by the lane and not evidence; the owner-side standard-statistic read is documented as in sections 166 and 167. Section 179.3's "first of at most three" is superseded. |
+| `ARV2R180-003` | P3 | The R-180 project holds a fifth, unrecorded `Completed.` launch (`06bdcc2a...`, QC default-named, 2026-09-23 19:29:20 UTC). | Counted as one infrastructure look; not read; not evidence. |
+| `ARV2R180-004` | P2 | The three `run_valid=true` cap-90 results (R-181 A3, R-182 A1, R-184 A1) were recorded without a cell classification. | Classified here as three exploratory authenticated cells (608 to 611) because each was a valid outcome read; Codex should confirm or state the lane's contrary rule. |
+| `ARV2R180-005` | P3 | The bridge aggregate's `daily_cash_nonnegative` and `order_event_cash_nonnegative` flags can never be false: the inherited cash read refuses a negative balance first. | Documented; the fail-closed property holds through the read, and the flags are disclosures, not independent gates. No test added because the read's refusal is already pinned by the base battery. |
+| `ARV2R180-006` | P3 | The tilt's sleeve-budget conservation check is redundant by construction and unpinned (T2 survived). | Documented; it guards future edits to the transfer loop and costs nothing. |
+| `ARV2R180-007` | P3 | Section 179's A2 order-endpoint diagnosis made about 131 `backtests/orders/read` calls behind a caller flag `owner_authorized=True`, but the record does not quote the owner's authorization for that broader read. | Documented; Codex should cite the owner's direction or classify the read. |
+| `ARV2R180-008` | P3 | Ten of the range's test files are uncollectable on this host (`fcntl` chain) and forty of their tests skip for the absent delta package. | Host class (`ARV2R165-001`, `ARV2R178-005`); not a defect in the range. |
+| `ARV2R180-009` | P3 | Section 179.3 states R-182 A1 is "first of at most three" attempts; with the unrecorded rerun the candidate has used two. | Documented in `ARV2R180-002`; no rewrite of section 179. |
+| `ARV2R180-010` | P3 | The R-181 and R-182 evidence projects were re-saved after their launches (18:10:51 and 18:47:09 UTC), content unchanged. | Documented; `ARV2R166-004` restated: no edits in evidence projects; a launched project's bytes are proven only by the pre-launch verification the launcher records. |
+
+### 180.7 Next gate
+
+Codex counter-reviews section 180 and its two commits (the gate and ledger
+commit and this record commit). The reconciled totals **173 shared looks /
+116 ARV2 development evaluations / 32 infrastructure looks / 611
+authenticated cells** are the lane's current census unless Codex corrects a
+classification with its reason. R-181's three attempts and R-182's second
+slot are spent; R-184 has two slots left; R-183 remains signed and unlaunched.
+No fourth R-181 attempt, R-178/R-179 launch, leverage beyond the recorded
+research-only admission bridge, six-universe expansion beyond the cap-90
+family, paper/live deployment, broker, funded-account, real-order or trading
+action is authorised. `ARV2CR28-008` remains out of lane.

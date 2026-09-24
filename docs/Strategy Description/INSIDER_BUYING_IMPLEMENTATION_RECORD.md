@@ -1,22 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `b758514` AND `922a35b` IN
-SECTION 73. `b758514` IS ACCEPTED; `922a35b` IS ACCEPTED AFTER TWO APPEND-ONLY
-P3 RECORD CORRECTIONS (`IB2SRC-CCR01` AND `IB2SRC-CCR02`). CODEX THEN
-IMPLEMENTED THE SYNTHETIC-FIRST,
-`INSETF-IB2-NONCANONICAL-SEC-PILOT-CONTRACTS-v1` DESIGN IN `6f1ffbc` AND
-SECTION 74. THE PURE ZERO-I/O CONTRACT DEFINES EXACT CALLER-LISTED VERBATIM
-ARTIFACT AND RAW-CANDIDATE IDENTITIES, EXPLICITLY DERIVED AND HASH-BOUND FLAT
-IB-1C PROJECTIONS, CONTIGUOUS BOUNDED INTAKE, SOURCE-BACKED CROSS-PERIOD
-AMENDMENT LINEAGE, NAMED ACCEPT/REFUSE/QUARANTINE ACCOUNTING,
-MANIFEST-DERIVED RESOURCES, STAGE IDENTITIES, AND A SEALED ZERO-AUTHORITY
-OPERATIONAL REPORT. `IBPILOT-R01` AND `IBPILOT-R02` ARE CLOSED AS
-PILOT-DESIGN ITEMS ONLY; REAL-FORMAT COMPATIBILITY HAS NOT BEEN MEASURED, NO
-REAL FILE HAS BEEN READ, AND CANONICAL IB-2 REMAINS INCOMPLETE. THE CODE AND
-RECORD AWAIT CLAUDE REVIEW OF THE EXACT PUSHED RANGE. NO NETWORK, SEC,
-PROVIDER, CREDENTIAL, LICENSED ROW, REAL FILING, OUTCOME, QC, PAPER, LIVE,
-DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK
-COUNTERS REMAIN ZERO.**
+Status: **CLAUDE REVIEWED THE SYNTHETIC-FIRST NONCANONICAL SEC PILOT CONTRACT
+THROUGH PUSHED COMMIT `4d0cbf3b`, ADDING THE DUPLICATE-FIELD REGRESSION IN
+`cb443356`. CODEX COUNTER-REVIEWED BOTH CLAUDE COMMITS IN SECTION 76 AND
+ACCEPTED THE REVIEW AFTER APPEND-ONLY P3 RECORD CORRECTIONS. THE CONTRACT
+REMAINS PURE, ZERO-I/O, AND ZERO-AUTHORITY. `IBPILOT-R01` AND `IBPILOT-R02`
+ARE CLOSED AS DESIGN ITEMS ONLY; REAL-FORMAT COMPATIBILITY IS UNMEASURED,
+CANONICAL IB-2 IS INCOMPLETE, AND THE OWNER CONFIRMED THAT THE EXACT OFFLINE
+PILOT FILES DO NOT YET EXIST. THE PILOT RUNNER AND REAL-FILE RUN WAIT FOR
+OWNER-SUPPLIED FILES AND PROVENANCE. NO SEC, PROVIDER, CREDENTIAL, LICENSED
+ROW, REAL FILING, OUTCOME, QC, PAPER, LIVE, DEPLOYMENT, BROKER, CAPITAL,
+ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK COUNTERS REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -189,6 +183,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-24 | Claude review | `07ba33e` -> `b758514` (test correction) -> this review record | Independent review of the Codex counter-review, the owner-selected canonical IB-2 source direction, and the pure source-policy freeze (`226c4c1..07ba33e`, 4 commits, 0 merges, 4 lane-owned paths); owner pilot decision | Verified the remote tip and clean worktree, then dispositioned all four commits: three accepted, `5f823c1` accepted after a test-only correction. Mapped all seven section-70 clauses to the contract, confirmed purity, zero authority, 99 categorized fields, the literal hash and the blueprint hash, and ran 20 faithful mutants in a read-only export. Recorded the owner's 2026-09-24 approval of the five-point recommendation: the policy is confirmed, a non-canonical real-data pilot on owner-supplied files is authorized, the shared audit is authorized as a separate common action, and synthetic milestones are paused. | Complete suite on `07ba33e` **8,164 passed, 38 skipped, 28 warnings, 0 failed in 520.80s**. Recorded counts reproduce exactly: **240**, **460**, **1,966**. Hash `eec42a1e...7dbe` recomputed independently. Mutation with bytecode caching disabled: **19 of 20 caught** on the pushed tree, **20 of 20** after `b758514`. Final tree: focused **240 passed**; lane gate **1,966 passed**; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, real filing, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB2SRC-CR01` P3 closed in `b758514` (last-period endpoint check unpinned). `IB2SRC-CR02` P3 closed (this reviewer's section-58.4 novelty claim, same error as `IBPAPER-CCR01`). `IB2SRC-CR03` P3 open (earlier Claude mutation harnesses did not disable bytecode caching). `IBPILOT-R01` P2 open (IB-1C flat-JSON metadata versus real SEC formats). `IBPILOT-R02` P3 open (IB-1E contiguity and 256-XML cap; corrects this reviewer's pilot suggestion). `IBSH-CR01` retained. | Codex counter-reviews `b758514` and this record, then designs the non-canonical pilot, settling `IBPILOT-R01`/`R02` on synthetic fixtures before the owner supplies files. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-24 | Codex counter-review + implementation | `922a35b..23c8634` reviewed; `23c8634` -> `6f1ffbc` implementation snapshot (this record commit follows) | Claude canonical-source-policy counter-review plus synthetic-first noncanonical SEC pilot contracts | Accepted `b758514`; accepted `922a35b` after the two append-only section-73 P3 corrections. Added a pure zero-I/O pilot manifest, raw accession-candidate inventory, exact verbatim artifact identities, explicitly derived flat IB-1C byte/profile identities, source-backed cross-period amendment lineage, named operational accounting, exact manifest-derived resources and stage binding, and a sealed zero-authority report. `IBPILOT-R01` and `IBPILOT-R02` close as design items without reading a real file or changing IB-1A through IB-1E. | Python 3.13.15 / pytest 9.1.1. Focused pilot contracts **115 passed**; related IB-1A-through-IB-1E set **551 passed, 7 skipped**; recurring lane gate only **2,073 passed, 8 skipped**; final targeted mutation audit **115 baseline, 0 material survivors**; compileall exit **0**; staged diff clean. No complete repository suite was run, per owner direction. No real file, network, provider, outcome, QC, broker, operator, scheduler, or trading access; authorized/consumed outcome looks and research looks all **0**. | Section 73 closes `IB2SRC-CCR01/02`. Pre-commit adversarial review found and corrected `IBPILOT-REV01` through `IBPILOT-REV15` plus `IBPILOT-R03`; section 74 retains every disposition. No open P0-P2 remains in the lane-owned diff. `IB2SRC-CR03` and out-of-lane `IBSH-CR01` remain non-blocking. | Commit this record and make the round's single push. Claude reviews every commit in `922a35b..PUSHED_HEAD`. Only after acceptance may the owner-supplied external-file pilot run; new IB-3E diagnostics remain paused. |
 | 2026-09-24 | Claude review | `390d4e88` -> this review record | Review of the canonical-source counter-review `23c86348`, the synthetic-first noncanonical SEC pilot contracts `6f1ffbc5`, and the record `390d4e88` (`922a35b2..390d4e88`); every earlier commit since `31b3fcc` already carries a Claude disposition in sections 58-72 | Verified isolation, the owner authorization in 72.5, zero I/O at the import level, and zero authority; reproduced the focused 115 and the lane gate; ran an independent identity/determinism probe and a bytecode-safe targeted mutation sweep per IB2SRC-CR03. Full detail in section 75, including the required 1-10 rating. | Focused 115 passed on the reviewed commit and 116 after the added regression; lane gate 2,074 passed, 8 skipped in 353.11s (2,073 recorded plus the one added regression); compileall exit 0; `git diff --check` clean; module restored byte-identical after every mutant; no complete repository suite run, per owner direction. No SEC/provider, credential, licensed row, real filing, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | Accepted after a test-only correction (`cb443356`); design, isolation, zero I/O, and zero authority verified; one sole guard was untested (`IBPILOT-CR01`). Findings are in section 75.7. No real file was read; real-format compatibility remains unmeasured. | Codex counter-reviews this review round. Next bounded action is the authorized offline pilot on owner-supplied files; nothing started by inference. |
+| 2026-09-24 | Codex counter-review | `390d4e88..4d0cbf3b` (two Claude commits) -> this local-only record commit | Counter-review the duplicate-field regression `cb443356` and Claude's section-75 review `4d0cbf3b`; no next implementation because the owner confirmed the required offline files do not yet exist | Accepted the test-only correction after independently making its sole guard fail in memory, and accepted Claude's review after section-76 P3 record corrections. Clarified the review's severity, final-tree validation counts, historical mutation evidence, and current handoff status. No product code or test changed in this counter-review. | Python 3.13.14 / pytest 9.1.1. Focused pilot suite **116 passed**; recurring Insider lane gate **2,074 passed, 8 skipped in 402.02s**; in-memory duplicate-guard mutant **1 failed, 115 passed** with only the added regression failing; final record/active-document checks and compileall are recorded in section 76. No complete repository suite run, per owner direction; no SEC, real filing, outcome, QC, broker, or trading access; **0 looks**. | `cb443356` accepted; `4d0cbf3b` accepted after the section-76 P3 corrections. No open lane-owned P0-P2. `IBSH-CR01` remains shared/out of lane and unfixed. | Hold the counter-review commit locally while the offline pilot lacks owner-supplied files and provenance. No pilot runner, real-file run, or push is started; when inputs arrive, complete the authorized bounded pilot and make at most one combined push. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -9973,3 +9968,79 @@ already-authorized offline pilot on owner-supplied files kept outside the
 repository, through a reviewed adapter that invokes the unchanged IB-1A to
 IB-1E stages; nothing is started by inference, and the shared
 security-master/calendar audit still has no named venue or executor.
+
+## 76. Codex counter-review of Claude's pilot-contract review (2026-09-24 UTC)
+
+### 76.1 Exact snapshot and per-commit dispositions
+
+The published base was `390d4e8858a4901d942294a2bd17bf54134139b1`.
+The live remote, local branch, and tracking ref all resolved to
+`4d0cbf3bec873ccf73352e4efe2aa4adbfdfa470` before review. The worktree
+was clean on `codex/strategy-insider-buying`; no fetch, branch switch, merge,
+or rebase was needed. The exact linear Claude range contains two commits and
+zero merges. Its only changed paths are the lane-owned pilot test module and
+this implementation record.
+
+| Claude commit | Disposition | Independent basis |
+|---|---|---|
+| `cb4433569fb11f0dc0833b86b613c9627d7865a5` | **Accepted.** | The added test reaches the sole duplicate-field-name guard. On the unchanged code, all 116 focused tests pass. With only that guard neutralized in memory, exactly the added test fails and the other 115 pass. No source file was edited by the mutant. The test checks exact and conflicting duplicates; the separately invalid mixed-case name is correctly refused by the lowercase field grammar. |
+| `4d0cbf3bec873ccf73352e4efe2aa4adbfdfa470` | **Accepted after P3 record corrections.** | Section 75 dispositions all three preceding Codex commits, retains its findings and mutation directions, records a genuine 8/10 rating, and preserves zero authority. Section 76 corrects its severity and validation wording without rewriting the historical review. |
+
+### 76.2 Retained P0-P3 finding ledger and generalized search
+
+| ID | Priority | Status | Commit/location | Issue and impact | Evidence and reason for correction | Correction and verification |
+|---|---|---|---|---|---|---|
+| `IBPILOT-CCR01` | P3 | Closed | `4d0cbf3b`, section 75.7 `IBPILOT-CR01` | Claude rated a missing test for a correct production guard P2. This is weak test sensitivity, which the review severity guide explicitly places at P3; no current fail-open behavior or milestone definition-of-done failure was shown. | The guard at `sec_noncanonical_pilot_contracts.py:592` rejects duplicate names and the new test passes. The in-memory neutralization makes only that test fail. The finding and test are valid; only the P2 classification was partially correct. | Current classification is P3. Retain Claude's original P2 row as historical review evidence and retain its regression unchanged. |
+| `IBPILOT-CCR02` | P3 | Closed | `4d0cbf3b`, record status | The top handoff still said Claude review was awaited after section 75 had recorded its completion. That would send the next agent to the wrong step. | The same-lane handoff process requires the current status to describe the final reviewed tree. | Updated the top status to name the pushed Claude head, this counter-review, and the offline-file blocker. |
+| `IBPILOT-CCR03` | P3 | Closed | `4d0cbf3b`, sections 75.3 and 75.9 | The heading “on the exact commit” included the 2,074-test count from after `cb443356`, while `390d4e88` had 2,073. Section 75.9 also referred to separate record/active-document checks in the section-5 row although that row gave no separate count. | Mixing pre- and post-correction counts and implying an unlisted check makes validation hard to reproduce. | The exact sequence is: pushed base 115 focused and 2,073 lane passes/8 skips; after `cb443356`, 116 focused and 2,074 lane passes/8 skips. The section-5 row records the combined lane gate, not a separate record/active-document count. This counter-review runs and records those focused document checks separately below. |
+| `IBPILOT-CR02` | P3 | Closed by supersession | `390d4e88`, section 74.5; Claude section 75.6 | The old mutation shorthand did not name directions and incorrectly called every survivor independently enforced. | Claude's 18-direction table shows U4 was a genuine surviving coverage gap; the new test catches it. | Section 75.6 is the operative mutation evidence: 15/18 caught before the regression, 16/18 after it, with T1/L3 justified as redundant. The section-74.5 shorthand is historical and superseded. |
+| `IBPILOT-CR03` | P3 | Closed by withdrawing unsupported evidence | `390d4e88`, section 74.5 | The intermediate 551-pass/7-skip figure lacks its exact test-file set. | The figure cannot be independently rerun as written. | Do not use that intermediate count as current verification. The named focused suite and the nineteen-file plus four-boundary lane gate above are the reproducible controls; the historical count remains visible but superseded. |
+
+The generalized uniqueness survey covered candidate and projection
+accessions, artifact paths, compatibility reasons, and resource names; their
+guards already have direct tests. No further production defect surfaced.
+`IBSH-CR01` remains a shared, out-of-lane P3 coordination observation and is
+not corrected here. No open lane-owned P0-P2 finding remains. Claude's review
+quality is **8/10**: it found and pinned a sole guard, but required the P3
+record corrections above.
+
+### 76.3 Validation and authority
+
+Python **3.13.14**, pytest **9.1.1**. The unchanged production code and added
+regression pass the focused pilot suite: **116 passed**. The recurring lane
+gate (nineteen `test_insider_buying*.py` files plus active-document,
+module-hygiene, overlay-import, and ML-import boundaries) passed **2,074**
+with **8 skipped** in **402.02 seconds**. An in-memory neutralization of only
+the duplicate-name condition yielded **1 failed, 115 passed**, with
+`test_duplicate_projection_field_names_fail_closed` the sole failure;
+the module on disk remained unchanged. No complete repository suite was run,
+per owner direction. After this record edit, the implementation-record and
+active-document checks passed **70** tests. Repository `compileall`, including
+`research/`, exited **0**; `git diff --check` was clean. The pre-commit branch
+remained `codex/strategy-insider-buying` at published `4d0cbf3b`, with only
+this lane record modified.
+
+No SEC, EDGAR, provider, credential, licensed row, real filing, security
+master, outcome, ETF holding, QuantConnect, broker, operator database,
+trading scheduler, paper/live deployment, capital, order, or trading surface
+was accessed. Authorized outcome looks **0**, consumed outcome looks **0**,
+research looks **0**.
+
+### 76.4 Owner input and next bounded step
+
+The owner confirmed during this counter-review that the pilot ZIPs and
+matching Form 4 XML/metadata do **not yet exist as an owner-supplied offline
+bundle**. The approved pilot requires exact files and provenance outside the
+repository: two through four contiguous quarterly Form 3/4/5 ZIPs, a bounded
+selection of matching complete primary Form 4/4-A XML and acceptance metadata,
+and each artifact's exact source URL and UTC retrieval time. Byte hashes and
+sizes must bind the unchanged files. The next bounded action is to prepare and
+review the offline adapter/runner against that supplied bundle, then invoke
+the existing IB-1A through IB-1E stages with a hash-bound operational report.
+No real-format compatibility or canonical 82-quarter completeness can be claimed before it
+runs. The paused IB-3E diagnostics, separate shared security-master/calendar
+audit, outcomes, QC, paper, live, and trading remain beyond this round.
+
+This counter-review is committed locally. The same-lane workflow holds the
+push while the required pilot inputs are absent; after the bundle is supplied
+and the bounded pilot round is complete, make at most one combined push.

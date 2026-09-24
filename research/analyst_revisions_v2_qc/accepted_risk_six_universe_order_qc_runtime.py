@@ -57,6 +57,9 @@ class AcceptedRiskSixUniverseOrderQcRuntimeError(ValueError):
 PROFILE_SCHEMA = "arv2-six-universe-order-profile-v2"
 SUMMARY_SCHEMA = "arv2-six-universe-order-summary-v2"
 META_SCHEMA = "arv2-six-universe-order-runtime-meta-v1"
+CAP90_VARIANT = "cap90_exploratory_v1"
+CAP90_PROFILE_SCHEMA = "arv2-six-universe-order-profile-v3"
+CAP90_SUMMARY_SCHEMA = "arv2-six-universe-order-summary-v3"
 META_STATISTIC_NAME = "ARV2_SIX_GATE_ORDER_META"
 AGGREGATES_STATISTIC_NAME = "ARV2_SIX_GATE_ORDER_AGGREGATES"
 MAXIMUM_STATISTIC_BYTES = 8192
@@ -202,14 +205,47 @@ def _profile(role):
 _PROFILES = {role: _profile(role) for role in _targets.ROLES}
 
 
-def require_six_universe_order_profile(role):
+def _cap90_profile(role):
+    # Derive a new identity without changing a byte of the R-177 v2 seed.
+    seed = {
+        key: value for key, value in _PROFILES[role].items()
+        if key != "profile_sha256"
+    }
+    seed.update({
+        "schema": CAP90_PROFILE_SCHEMA,
+        "profile_id": "arv2-six-universe-order-" + role + "-cap90-exploratory-v3",
+        "gate_profile_id": _targets.ORDER_CAP90_GATE_PROFILE.profile_id,
+        "gate_profile_sha256": _targets.ORDER_CAP90_GATE_PROFILE.profile_sha256,
+        "evaluation_profile_id": _targets.ORDER_CAP90_EVALUATION_PROFILE.profile_id,
+        "evaluation_profile_sha256": (
+            _targets.ORDER_CAP90_EVALUATION_PROFILE.profile_sha256
+        ),
+        "constituent_collection_unavailable_rule": (
+            "no_strictly_prior_or_over_age_or_zero_positive_collection"
+            "_uses_actual_empty_tuple_and_full_own_etf_fallback"
+        ),
+        "terminal_clock_rule": (
+            "2026-01-01_00:00_new_york_after_exact_2025-12-31"
+            "_account_observation"
+        ),
+    })
+    return {**seed, "profile_sha256": _sha(seed)}
+
+
+_CAP90_PROFILES = {role: _cap90_profile(role) for role in _targets.ROLES}
+
+
+def require_six_universe_order_profile(role, *, variant="r177"):
     if type(role) is not str or role not in _PROFILES:
         _error("six-universe order role is not frozen")
-    return json.loads(_canonical(_PROFILES[role]).decode("ascii"))
+    if type(variant) is not str or variant not in ("r177", CAP90_VARIANT):
+        _error("six-universe order variant is not frozen")
+    profiles = _PROFILES if variant == "r177" else _CAP90_PROFILES
+    return json.loads(_canonical(profiles[role]).decode("ascii"))
 
 
-def expected_custom_summary_statistic_names(role):
-    require_six_universe_order_profile(role)
+def expected_custom_summary_statistic_names(role, *, variant="r177"):
+    require_six_universe_order_profile(role, variant=variant)
     return tuple(sorted((META_STATISTIC_NAME, AGGREGATES_STATISTIC_NAME)))
 
 
@@ -348,12 +384,16 @@ class AcceptedRiskSixUniverseOrderQcDriver:
         order_status_enum,
         order_status_to_int,
         split_occurred_type,
+        variant="r177",
     ):
         self._algorithm = algorithm
         self._activation_manifest_key = activation_manifest_key
         self._activation_manifest_sha256 = activation_manifest_sha256
         self._activation_manifest_byte_count = activation_manifest_byte_count
-        self._profile = require_six_universe_order_profile(role)
+        self._profile = require_six_universe_order_profile(
+            role, variant=variant
+        )
+        self._variant = variant
         self._role = role
         self._benchmark_symbol = benchmark_symbol
         self._etf_symbols = dict(etf_symbols) if type(etf_symbols) is dict else None
@@ -403,6 +443,8 @@ class AcceptedRiskSixUniverseOrderQcDriver:
         self._fallback_counts = {}
         self._sleeve_diagnostics = {}
         self._fundamental_snapshot_unavailable_sessions = []
+        self._constituent_collection_unavailable_path = []
+        self._pending_unavailable_universe_ids = ()
         self._split_records_by_session = {}
         self._forced_ledger = _forced.empty_forced_delisting_ledger()
         self._emitted = False
@@ -520,6 +562,11 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             _error("six-universe ETF security identity collided")
         self._target_builder = _targets.SixUniverseOrderTargetBuilder(
             package.evaluator_input,
+            profile=(
+                _targets.ORDER_CAP90_EVALUATION_PROFILE
+                if self._variant == CAP90_VARIANT
+                else _targets.ORDER_EVALUATION_PROFILE
+            ),
             role=self._role,
         )
         self._sleeve_diagnostics = _empty_sleeve_diagnostics()
@@ -627,7 +674,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             if sid in observed and observed[sid] != weight:
                 _error(name + " duplicate SID value conflicts")
             observed[sid] = weight
-        if not observed:
+        if not observed and self._variant != CAP90_VARIANT:
             _error(name + " collection is empty")
         return tuple(sorted(observed.items()))
 
@@ -704,6 +751,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
         return observed, cache[observed]
 
     def _snapshot(self, session):
+        self._pending_unavailable_universe_ids = ()
         _fundamental_session, fundamental_rows = self._strictly_prior_rows(
             self._fundamental_cache,
             session,
@@ -723,6 +771,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             if classification == "positive"
         }
         universes = []
+        unavailable_ids = []
         for spec in _gate.UNIVERSE_SPECS:
             ticker = spec.etf_ticker
             _observed, rows = self._strictly_prior_rows(
@@ -732,6 +781,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
                 maximum_age_sessions=(
                     MAXIMUM_CONSTITUENT_SNAPSHOT_AGE_SESSIONS
                 ),
+                unavailable_as_empty=(self._variant == CAP90_VARIANT),
             )
             constituents = []
             seen = set()
@@ -762,7 +812,9 @@ class AcceptedRiskSixUniverseOrderQcDriver:
                     firm_specific_score=None,
                 ))
             if not constituents:
-                _error("six-universe constituent collection has no positive weight")
+                if self._variant != CAP90_VARIANT:
+                    _error("six-universe constituent collection has no positive weight")
+                unavailable_ids.append(spec.universe_id)
             etf_symbol = self._etf_symbols[ticker]
             universes.append(_gate.UniverseSnapshot(
                 universe_id=spec.universe_id,
@@ -773,6 +825,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
                 ),
                 constituents=tuple(constituents),
             ))
+        self._pending_unavailable_universe_ids = tuple(unavailable_ids)
         return _evaluation.PitDecisionSnapshot(session, tuple(universes))
 
     def _symbol_for_security(self, security_id):
@@ -1292,7 +1345,20 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             return False
         if self._target_builder.next_required_session != session:
             _error("six-universe target schedule lost synchronization")
-        target = self._target_builder.build(session, self._snapshot(session))
+        snapshot = self._snapshot(session)
+        if self._variant == CAP90_VARIANT:
+            unavailable_ids = self._pending_unavailable_universe_ids
+            target = self._target_builder.build(
+                session,
+                snapshot,
+                unavailable_universe_ids=unavailable_ids,
+            )
+            if unavailable_ids:
+                self._constituent_collection_unavailable_path.append(
+                    (session, unavailable_ids)
+                )
+        else:
+            target = self._target_builder.build(session, snapshot)
         target_weights = {
             item.security_id: item.weight for item in target.target_weights
         }
@@ -1370,6 +1436,45 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             )
         ):
             _error("six-universe fundamental fallback path changed")
+        constituent_unavailable = tuple(
+            self._constituent_collection_unavailable_path
+        )
+        if self._variant == CAP90_VARIANT:
+            if (
+                len(constituent_unavailable) > EXPECTED_DECISION_COUNT
+                or tuple(session for session, _ids in constituent_unavailable)
+                != tuple(sorted(session for session, _ids in constituent_unavailable))
+                or len({session for session, _ids in constituent_unavailable})
+                != len(constituent_unavailable)
+                or any(
+                    session not in self._decision_set
+                    or type(ids) is not tuple
+                    or not ids
+                    or ids != tuple(
+                        spec.universe_id
+                        for spec in _gate.UNIVERSE_SPECS
+                        if spec.universe_id in ids
+                    )
+                    for session, ids in constituent_unavailable
+                )
+            ):
+                _error("six-universe constituent fallback path changed")
+            unavailable_counts = {
+                spec.universe_id: sum(
+                    spec.universe_id in ids
+                    for _session, ids in constituent_unavailable
+                )
+                for spec in _gate.UNIVERSE_SPECS
+            }
+            if any(
+                self._sleeve_diagnostics[universe_id][
+                    "coverage_refusal_reason_counts"
+                ].get("CONSTITUENT_COLLECTION_UNAVAILABLE", 0) != count
+                for universe_id, count in unavailable_counts.items()
+            ):
+                _error("six-universe constituent fallback count changed")
+        elif constituent_unavailable:
+            _error("R-177 constituent fallback path changed")
         run_valid = (
             executor["run_valid"] is True
             and executor["decision_count"] == EXPECTED_DECISION_COUNT
@@ -1382,8 +1487,12 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             == EXPECTED_DECISION_COUNT * len(_gate.UNIVERSE_IDS)
             and forced["accounting_complete"] is True
         )
-        return {
-            "schema": SUMMARY_SCHEMA,
+        aggregate = {
+            "schema": (
+                CAP90_SUMMARY_SCHEMA
+                if self._variant == CAP90_VARIANT
+                else SUMMARY_SCHEMA
+            ),
             "role": self._role,
             "profile_id": self._profile["profile_id"],
             "profile_sha256": self._profile["profile_sha256"],
@@ -1439,12 +1548,45 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             "deployment": False,
             "trading": False,
         }
+        if self._variant == CAP90_VARIANT:
+            aggregate.update({
+                "constituent_collection_unavailable_decision_count": (
+                    len(constituent_unavailable)
+                ),
+                "constituent_collection_unavailable_universe_counts": (
+                    unavailable_counts
+                ),
+                "constituent_collection_unavailable_path_sha256": _sha({
+                    "schema": (
+                        "arv2-six-universe-order-constituent-unavailable-path-v1"
+                    ),
+                    "records": constituent_unavailable,
+                }),
+            })
+        return aggregate
 
     def on_end_of_algorithm(self):
         if not self._initialized or self._completed:
             _error("six-universe order runtime ended in an invalid state")
         session = self._algorithm.time.date().isoformat()
-        if session == EVALUATION_END_SESSION:
+        if self._variant == CAP90_VARIANT:
+            end_clock = self._algorithm.time
+            if (
+                end_clock.year != 2026
+                or end_clock.month != 1
+                or end_clock.day != 1
+                or end_clock.hour != 0
+                or end_clock.minute != 0
+                or end_clock.second != 0
+                or end_clock.microsecond != 0
+            ):
+                _error("six-universe cap-90 terminal clock is not the next midnight")
+            if (
+                EVALUATION_END_SESSION not in self._account_observations
+                or EVALUATION_END_SESSION not in self._gross_exposure_observations
+            ):
+                _error("six-universe final account observation is missing")
+        elif session == EVALUATION_END_SESSION:
             self._observe_account(session)
         aggregate = self._aggregate()
         meta = {
@@ -1459,7 +1601,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             ),
             "symbol_resolution_id": self._resolution.resolution_id,
             "symbol_resolution_sha256": self._resolution.resolution_sha256,
-            "aggregate_schema": SUMMARY_SCHEMA,
+            "aggregate_schema": aggregate["schema"],
             "aggregate_sha256": _sha(aggregate),
             "result_transport": "two_bounded_custom_summary_statistics",
             "raw_provider_rows": False,
@@ -1475,7 +1617,7 @@ class AcceptedRiskSixUniverseOrderQcDriver:
             AGGREGATES_STATISTIC_NAME: _canonical(aggregate).decode("ascii"),
         }
         if tuple(sorted(statistics)) != expected_custom_summary_statistic_names(
-            self._role
+            self._role, variant=self._variant
         ):
             _error("six-universe order statistic inventory changed")
         if any(
@@ -1500,6 +1642,9 @@ __all__ = (
     "AGGREGATES_STATISTIC_NAME",
     "AcceptedRiskSixUniverseOrderQcDriver",
     "AcceptedRiskSixUniverseOrderQcRuntimeError",
+    "CAP90_PROFILE_SCHEMA",
+    "CAP90_SUMMARY_SCHEMA",
+    "CAP90_VARIANT",
     "EVALUATION_END_SESSION",
     "EVALUATION_START_SESSION",
     "EXPECTED_DECISION_COUNT",

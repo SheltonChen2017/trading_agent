@@ -55,10 +55,52 @@ def test_profiles_bind_every_physical_role_and_their_own_identity():
     assert len(set(observed)) == 3
 
 
+def test_cap90_profiles_bind_all_three_roles_without_mutating_r177():
+    for role in targets.ROLES:
+        legacy = subject.require_six_universe_order_profile(role)
+        cap90 = subject.require_six_universe_order_profile(
+            role, variant=subject.CAP90_VARIANT
+        )
+        assert legacy["schema"] == subject.PROFILE_SCHEMA
+        assert "constituent_collection_unavailable_rule" not in legacy
+        assert cap90["schema"] == subject.CAP90_PROFILE_SCHEMA
+        assert cap90["profile_id"] == (
+            f"arv2-six-universe-order-{role}-cap90-exploratory-v3"
+        )
+        assert cap90["gate_profile_sha256"] == (
+            targets.ORDER_CAP90_GATE_PROFILE.profile_sha256
+        )
+        assert cap90["evaluation_profile_sha256"] == (
+            targets.ORDER_CAP90_EVALUATION_PROFILE.profile_sha256
+        )
+        assert cap90["decision_count"] == legacy["decision_count"] == 261
+        assert cap90["evaluation_session_count"] == (
+            legacy["evaluation_session_count"]
+        ) == 1255
+        assert cap90["constituent_collection_unavailable_rule"] == (
+            "no_strictly_prior_or_over_age_or_zero_positive_collection"
+            "_uses_actual_empty_tuple_and_full_own_etf_fallback"
+        )
+        assert cap90["terminal_clock_rule"].startswith("2026-01-01_00:00")
+        digest = cap90.pop("profile_sha256")
+        assert hashlib.sha256(subject._canonical(cap90)).hexdigest() == digest
+
+
 @pytest.mark.parametrize("role", [None, "", "top5", True])
 def test_profile_refuses_unfrozen_role(role):
     with pytest.raises(subject.AcceptedRiskSixUniverseOrderQcRuntimeError):
         subject.require_six_universe_order_profile(role)
+
+
+@pytest.mark.parametrize("variant", [None, "", "cap95", True])
+def test_profile_refuses_unfrozen_variant(variant):
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcRuntimeError,
+        match="variant is not frozen",
+    ):
+        subject.require_six_universe_order_profile(
+            targets.ROLE_SIGNAL, variant=variant
+        )
 
 
 def test_custom_statistic_inventory_is_exact_and_bounded():
@@ -107,6 +149,8 @@ def test_population_metrics_refuses_duplicate_or_nonpositive_path():
 
 def _bare_driver():
     value = object.__new__(subject.AcceptedRiskSixUniverseOrderQcDriver)
+    value._variant = "r177"
+    value._constituent_collection_unavailable_path = []
     value._session_positions = {
         "2021-01-04": 0,
         "2021-01-05": 1,
@@ -147,6 +191,17 @@ def test_callback_rows_freeze_primitives_and_refuse_conflicting_sid():
     )
     constituent.weight = Decimal("0.9")
     assert constituent_frozen == (("SID-A", Decimal("0.2")),)
+
+
+def test_only_explicit_cap90_can_freeze_an_actual_empty_collection():
+    driver = _bare_driver()
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcRuntimeError,
+        match="collection is empty",
+    ):
+        driver._freeze_constituent_rows((), "constituent test")
+    driver._variant = subject.CAP90_VARIANT
+    assert driver._freeze_constituent_rows((), "constituent test") == ()
 
 
 def test_same_session_callback_replay_is_idempotent_but_conflict_refuses():
@@ -538,6 +593,66 @@ def test_worst_authorized_aggregate_shape_fits_transport_bound():
         "schema": "arv2-six-universe-order-fundamental-fallback-sessions-v1",
         "sessions": ("s0001",),
     })
+    driver._variant = subject.CAP90_VARIANT
+    driver._profile = subject.require_six_universe_order_profile(
+        targets.ROLE_SIGNAL, variant=subject.CAP90_VARIANT
+    )
+    driver._constituent_collection_unavailable_path = [
+        ("s0001", ("REMX",))
+    ]
+    driver._sleeve_diagnostics["REMX"]["coverage_refusal_reason_counts"][
+        "CONSTITUENT_COLLECTION_UNAVAILABLE"
+    ] = 1
+    cap90_aggregate = driver._aggregate()
+    assert cap90_aggregate["schema"] == subject.CAP90_SUMMARY_SCHEMA
+    assert cap90_aggregate[
+        "constituent_collection_unavailable_decision_count"
+    ] == 1
+    assert cap90_aggregate[
+        "constituent_collection_unavailable_universe_counts"
+    ]["REMX"] == 1
+    assert len(subject._canonical(cap90_aggregate)) <= (
+        subject.MAXIMUM_STATISTIC_BYTES
+    )
+
+
+@pytest.mark.parametrize(
+    ("unavailable_ids", "reported_count", "refusal"),
+    (
+        (("REMX",), 0, "constituent fallback count changed"),
+        (("XLE", "REMX"), 1, "constituent fallback path changed"),
+    ),
+)
+def test_cap90_terminal_constituent_fallback_census_refuses_mismatch(
+    unavailable_ids, reported_count, refusal
+):
+    driver = _bare_driver()
+    driver._variant = subject.CAP90_VARIANT
+    driver._target_builder = SimpleNamespace(complete_path=lambda: object())
+    driver._executor = SimpleNamespace(terminal_aggregate=lambda: {})
+    driver._evaluation_sessions = ("2021-01-04", "2021-01-05")
+    driver._account_observations = {
+        session: Decimal("1000000") for session in driver._evaluation_sessions
+    }
+    driver._gross_exposure_observations = {
+        session: Decimal("0.98") for session in driver._evaluation_sessions
+    }
+    driver._forced_ledger = forced.empty_forced_delisting_ledger()
+    driver._fundamental_snapshot_unavailable_sessions = []
+    driver._decision_set = frozenset({"2021-01-04"})
+    driver._constituent_collection_unavailable_path = [
+        ("2021-01-04", unavailable_ids)
+    ]
+    driver._sleeve_diagnostics = subject._empty_sleeve_diagnostics()
+    for record in driver._sleeve_diagnostics.values():
+        record["decision_count"] = subject.EXPECTED_DECISION_COUNT
+    if reported_count:
+        driver._sleeve_diagnostics["REMX"]["coverage_refusal_reason_counts"][
+            "CONSTITUENT_COLLECTION_UNAVAILABLE"
+        ] = reported_count
+
+    with pytest.raises(subject.AcceptedRiskSixUniverseOrderQcRuntimeError, match=refusal):
+        driver._aggregate()
 
 
 def test_snapshot_boundary_uses_only_strictly_prior_collection():
@@ -655,6 +770,140 @@ def test_unavailable_fundamentals_become_empty_caps_not_stale_cap_use():
         match="fundamental fallback session repeated",
     ):
         driver._snapshot("2021-01-06")
+
+
+def _cap90_snapshot_driver():
+    driver = _bare_driver()
+    driver._variant = subject.CAP90_VARIANT
+    driver._fundamental_snapshot_unavailable_sessions = []
+    driver._security_by_sid = {}
+    driver._label_by_sid = {}
+    driver._etf_symbols = {}
+    driver._constituent_caches = {}
+    driver._fundamental_cache = {
+        "2021-01-05": tuple(
+            (f"SID-{spec.universe_id}", "positive", Decimal("100"))
+            for spec in targets._gate.UNIVERSE_SPECS
+        )
+    }
+    for spec in targets._gate.UNIVERSE_SPECS:
+        sid = f"SID-{spec.universe_id}"
+        driver._security_by_sid[sid] = f"security-{spec.universe_id}"
+        driver._label_by_sid[sid] = f"Company {spec.universe_id}"
+        driver._etf_symbols[spec.etf_ticker] = _Symbol(
+            f"ETF-{spec.etf_ticker}"
+        )
+        driver._constituent_caches[spec.etf_ticker] = {
+            "2021-01-05": ((sid, Decimal("1")),),
+        }
+    return driver
+
+
+def test_cap90_snapshot_flags_only_actual_zero_positive_collections():
+    driver = _cap90_snapshot_driver()
+    driver._constituent_caches["QQQ"]["2021-01-05"] = (
+        ("SID-QQQ", Decimal("0")),
+    )
+    driver._constituent_caches["REMX"]["2021-01-05"] = ()
+    snapshot = driver._snapshot("2021-01-06")
+    assert driver._pending_unavailable_universe_ids == ("QQQ", "REMX")
+    rows = {row.universe_id: row.constituents for row in snapshot.universes}
+    assert rows["QQQ"] == rows["REMX"] == ()
+    assert len(rows["SPY"]) == 1
+
+
+def test_cap90_snapshot_flags_no_prior_and_stale_without_replaying_rows():
+    driver = _cap90_snapshot_driver()
+    driver._constituent_caches["QQQ"] = {"2021-01-07": (
+        ("SID-QQQ", Decimal("1")),
+    )}
+    driver._constituent_caches["REMX"] = {"2021-01-04": (
+        ("SID-REMX", Decimal("1")),
+    )}
+    driver._session_positions = {
+        "2021-01-04": 0,
+        "2021-01-05": 6,
+        "2021-01-06": 7,
+        "2021-01-07": 8,
+    }
+    snapshot = driver._snapshot("2021-01-06")
+    rows = {row.universe_id: row.constituents for row in snapshot.universes}
+    assert driver._pending_unavailable_universe_ids == ("QQQ", "REMX")
+    assert rows["QQQ"] == rows["REMX"] == ()
+    assert len(rows["SPY"]) == 1
+    driver._variant = "r177"
+    with pytest.raises(subject.AcceptedRiskSixUniverseOrderQcRuntimeError):
+        driver._snapshot("2021-01-06")
+
+
+def test_only_cap90_passes_exact_unavailable_flags_to_order_targets():
+    class _ReachedBuilder(Exception):
+        pass
+
+    for variant, expected_kwargs in (
+        ("r177", {}),
+        (subject.CAP90_VARIANT, {"unavailable_universe_ids": ("REMX",)}),
+    ):
+        driver = _bare_driver()
+        driver._variant = variant
+        driver._initialized = True
+        driver._completed = False
+        driver._algorithm = SimpleNamespace(time=datetime(2021, 1, 6, 16))
+        driver._decision_set = frozenset({"2021-01-06"})
+        driver._observe_account = lambda _session: None
+
+        def snapshot(_session):
+            driver._pending_unavailable_universe_ids = ("REMX",)
+            return "exact-snapshot"
+
+        driver._snapshot = snapshot
+        seen = []
+
+        def build(*args, **kwargs):
+            seen.append((args, kwargs))
+            raise _ReachedBuilder()
+
+        driver._target_builder = SimpleNamespace(
+            next_required_session="2021-01-06", build=build
+        )
+        with pytest.raises(_ReachedBuilder):
+            driver.on_after_close()
+        assert seen == [
+            (("2021-01-06", "exact-snapshot"), expected_kwargs)
+        ]
+        assert driver._constituent_collection_unavailable_path == []
+
+
+def test_cap90_terminal_clock_requires_prior_final_account_observation():
+    driver = _bare_driver()
+    driver._variant = subject.CAP90_VARIANT
+    driver._initialized = True
+    driver._completed = False
+    driver._account_observations = {"2025-12-31": Decimal("1000000")}
+    driver._gross_exposure_observations = {
+        "2025-12-31": Decimal("0.98")
+    }
+    driver._algorithm = SimpleNamespace(time=datetime(2025, 12, 31, 0, 0))
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcRuntimeError,
+        match="next midnight",
+    ):
+        driver.on_end_of_algorithm()
+    driver._algorithm.time = datetime(2026, 1, 1, 0, 0)
+    del driver._account_observations["2025-12-31"]
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcRuntimeError,
+        match="final account observation",
+    ):
+        driver.on_end_of_algorithm()
+
+    class _ReachedAggregate(Exception):
+        pass
+
+    driver._account_observations["2025-12-31"] = Decimal("1000000")
+    driver._aggregate = lambda: (_ for _ in ()).throw(_ReachedAggregate())
+    with pytest.raises(_ReachedAggregate):
+        driver.on_end_of_algorithm()
 
 
 def test_runtime_source_is_qc_prelude_safe():

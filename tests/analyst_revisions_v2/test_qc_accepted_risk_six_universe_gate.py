@@ -83,6 +83,71 @@ def _gross(weights):
     return sum((item.weight for item in weights), Decimal(0))
 
 
+def test_cap90_explicit_empty_collection_is_only_own_etf_fallback():
+    snapshots = _replace_snapshot(_snapshots(), "REMX", ())
+    result = subject.build_six_universe_construction(
+        snapshots,
+        subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+        unavailable_universe_ids=("REMX",),
+    )
+    remx = result.sleeves[4]
+    assert remx.coverage.to_record() == {
+        "member_count": 0,
+        "mapped_member_count": 0,
+        "total_reported_weight": "0",
+        "cap_covered_reported_weight": "0",
+        "mapping_ratio": "0",
+        "cap_weight_coverage_ratio": "0",
+        "valid": False,
+        "refusal_reasons": ["CONSTITUENT_COLLECTION_UNAVAILABLE"],
+    }
+    assert remx.positive_score_count == 0
+    assert remx.signal_security_ids == remx.matched_security_ids == ()
+    assert remx.signal_stock_weights == remx.matched_stock_weights == ()
+    assert remx.signal_etf_fallback_weight == remx.matched_etf_fallback_weight == (
+        subject.SLEEVE_BUDGETS[4]
+    )
+    assert _gross(result.signal_weights) == Decimal("0.98")
+    assert _gross(result.matched_weights) == Decimal("0.98")
+    assert _gross(result.etf_basket_weights) == Decimal("0.98")
+    assert any(item.asset_kind == "stock" for item in result.signal_weights)
+    assert result.to_record()["construction_sha256"]
+
+
+@pytest.mark.parametrize(
+    "unavailable_universe_ids",
+    (None, ["REMX"], ("OTHER",), ("REMX", "REMX"), ("XLE", "REMX"), (1,)),
+)
+def test_cap90_unavailable_flags_require_exact_canonical_tuple(unavailable_universe_ids):
+    snapshots = _replace_snapshot(_snapshots(), "REMX", ())
+    with pytest.raises(subject.SixUniverseGateError, match="unavailable universe"):
+        subject.build_six_universe_construction(
+            snapshots,
+            subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+            unavailable_universe_ids=unavailable_universe_ids,
+        )
+
+
+def test_unavailable_flag_never_licenses_nonempty_or_legacy_empty_collection():
+    snapshots = _snapshots()
+    with pytest.raises(subject.SixUniverseGateError, match="flagged.*nonempty"):
+        subject.build_six_universe_construction(
+            snapshots,
+            subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+            unavailable_universe_ids=("REMX",),
+        )
+    empty = _replace_snapshot(snapshots, "REMX", ())
+    for profile, flags in (
+        (subject.TOP10_CAP90_EXPLORATORY_PROFILE, ()),
+        (subject.TOP10_PRIMARY_PROFILE, ()),
+        (subject.TOP10_PRIMARY_PROFILE, ("REMX",)),
+    ):
+        with pytest.raises(subject.SixUniverseGateError):
+            subject.build_six_universe_construction(
+                empty, profile, unavailable_universe_ids=flags
+            )
+
+
 def test_profiles_freeze_source_view_universes_and_distinct_top_counts():
     assert subject.UNIVERSE_IDS == (
         "SPY",

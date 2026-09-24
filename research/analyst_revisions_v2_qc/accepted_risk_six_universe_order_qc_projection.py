@@ -22,9 +22,10 @@ class AcceptedRiskSixUniverseOrderQcProjectionError(ValueError):
 
 
 PROJECTION_SCHEMA = "arv2-six-universe-order-qc-projection-v1"
+CAP90_PROJECTION_SCHEMA = "arv2-six-universe-order-qc-projection-cap90-v2"
 SOURCE_FILE_SCHEMA = "arv2-six-universe-order-qc-source-file-v1"
 MAIN_PROJECT_PATH = "main.py"
-MAXIMUM_SOURCE_FILE_BYTES = 64 * 1024
+MAXIMUM_SOURCE_FILE_BYTES = 80 * 1024
 MAXIMUM_TOTAL_SOURCE_BYTES = 448 * 1024
 MINIMUM_REVIEW_MARGIN_BYTES = 32 * 1024
 ALGORITHM_START = (2020, 11, 1)
@@ -169,6 +170,7 @@ class AcceptedRiskSixUniverseOrderQcProjection:
     projection_id: str
     projection_sha256: str
     role: str
+    variant: str
     profile_id: str
     profile_sha256: str
     package_id: str
@@ -191,7 +193,7 @@ class AcceptedRiskSixUniverseOrderQcProjection:
     trading: bool
 
     def to_record(self):
-        return {
+        record = {
             "schema": self.schema,
             "projection_id": self.projection_id,
             "projection_sha256": self.projection_sha256,
@@ -217,6 +219,11 @@ class AcceptedRiskSixUniverseOrderQcProjection:
             "deployment": self.deployment,
             "trading": self.trading,
         }
+        # The R-177 record shape remains unchanged.  This field is part of
+        # the distinct exploratory projection's authenticated semantics only.
+        if self.variant == _runtime.CAP90_VARIANT:
+            record["variant"] = self.variant
+        return record
 
 
 def _source_file(project_path, source):
@@ -238,8 +245,11 @@ def _source_file(project_path, source):
     )
 
 
-def _main_source(*, activation, profile):
+def _main_source(*, activation, profile, variant):
     tickers = _gate_tickers()
+    variant_line = (
+        "" if variant == "r177" else f"            variant={variant!r},\n"
+    )
     reflected = '''from System import Convert as _Arv2DotNetConvert, Enum as _Arv2DotNetEnum
 
 
@@ -346,7 +356,7 @@ class ARV2SixUniverseOrderAlgorithm(QCAlgorithm):
             benchmark_symbol=self._arv2_etf_symbols["SPY"],
             etf_symbols=self._arv2_etf_symbols,
             role={profile['role']!r},
-            fundamental_universe=self._arv2_fundamental_universe,
+{variant_line}            fundamental_universe=self._arv2_fundamental_universe,
             constituent_universes=self._arv2_constituent_universes,
             trade_bar_type=TradeBar,
             minute_resolution=Resolution.MINUTE,
@@ -412,7 +422,13 @@ def build_accepted_risk_six_universe_order_qc_projection(
     delta_package,
     *,
     role,
+    variant="r177",
 ):
+    if (
+        type(variant) is not str
+        or variant not in ("r177", _runtime.CAP90_VARIANT)
+    ):
+        _error("six-universe order projection variant is not frozen")
     if type(delta_package) is not _delta.AcceptedRiskDeltaOrderPackage:
         _error("six-universe order projection requires the exact delta package")
     if (
@@ -427,7 +443,9 @@ def build_accepted_risk_six_universe_order_qc_projection(
         delta_package.package
     )
     try:
-        profile = _runtime.require_six_universe_order_profile(role)
+        profile = _runtime.require_six_universe_order_profile(
+            role, variant=variant
+        )
     except _runtime.AcceptedRiskSixUniverseOrderQcRuntimeError as exc:
         raise AcceptedRiskSixUniverseOrderQcProjectionError(str(exc)) from exc
     activation = package.upload_objects[-1]
@@ -450,15 +468,22 @@ def build_accepted_risk_six_universe_order_qc_projection(
     files.append(
         _source_file(
             MAIN_PROJECT_PATH,
-            _main_source(activation=activation, profile=profile),
+            _main_source(
+                activation=activation,
+                profile=profile,
+                variant=variant,
+            ),
         )
     )
     files.sort(key=lambda item: item.project_path)
     total = sum(item.byte_count for item in files)
     if total + MINIMUM_REVIEW_MARGIN_BYTES > MAXIMUM_TOTAL_SOURCE_BYTES:
         _error("six-universe projected source set exceeded its reviewed bound")
+    projection_schema = (
+        PROJECTION_SCHEMA if variant == "r177" else CAP90_PROJECTION_SCHEMA
+    )
     semantic = {
-        "schema": PROJECTION_SCHEMA,
+        "schema": projection_schema,
         "role": role,
         "profile_id": profile["profile_id"],
         "profile_sha256": profile["profile_sha256"],
@@ -481,12 +506,15 @@ def build_accepted_risk_six_universe_order_qc_projection(
         "deployment": False,
         "trading": False,
     }
+    if variant == _runtime.CAP90_VARIANT:
+        semantic["variant"] = variant
     digest = hashlib.sha256(_canonical(semantic)).hexdigest()
     value = AcceptedRiskSixUniverseOrderQcProjection(
-        PROJECTION_SCHEMA,
+        projection_schema,
         "arv2-six-universe-order-qc-projection-" + digest[:24],
         digest,
         role,
+        variant,
         profile["profile_id"],
         profile["profile_sha256"],
         package.package_id,
@@ -518,6 +546,7 @@ __all__ = (
     "AcceptedRiskSixUniverseOrderQcProjectionError",
     "ALGORITHM_END",
     "ALGORITHM_START",
+    "CAP90_PROJECTION_SCHEMA",
     "MAIN_PROJECT_PATH",
     "MAXIMUM_SOURCE_FILE_BYTES",
     "MAXIMUM_TOTAL_SOURCE_BYTES",

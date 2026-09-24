@@ -37,6 +37,7 @@ SOURCE_VIEW_ID = "conservative_censored_current_vintage_non_pristine_pit"
 SCORE_ARM_ID = "firm_specific"
 PROFILE_SCHEMA = "arv2-six-universe-gate-profile-v1"
 CONSTRUCTION_SCHEMA = "arv2-six-universe-gate-construction-v1"
+UNAVAILABLE_COLLECTION_REASON = "CONSTITUENT_COLLECTION_UNAVAILABLE"
 DECIMAL_RESIDUAL_RULE = (
     "floor_each_nominal_equal_sleeve_to_1e-24_and_assign_the_residual_"
     "to_the_final_frozen_sleeve"
@@ -433,8 +434,12 @@ def _validate_profile(value: object) -> GateProfile:
 
 def _validated_constituents(
     snapshot: UniverseSnapshot,
+    *,
+    allow_empty: bool = False,
 ) -> tuple[UniverseConstituent, ...]:
-    if type(snapshot.constituents) is not tuple or not snapshot.constituents:
+    if type(snapshot.constituents) is not tuple or (
+        not snapshot.constituents and not allow_empty
+    ):
         raise SixUniverseGateError("universe constituents must be a nonempty tuple")
     seen: set[str] = set()
     result = []
@@ -555,6 +560,8 @@ def _raw_sleeve(
     snapshot: UniverseSnapshot,
     budget: Decimal,
     profile: GateProfile,
+    *,
+    unavailable: bool = False,
 ) -> tuple[
     CoverageAssessment,
     int,
@@ -565,8 +572,26 @@ def _raw_sleeve(
     Decimal,
     Decimal,
 ]:
-    rows = _validated_constituents(snapshot)
-    coverage = _coverage(rows, profile)
+    rows = _validated_constituents(snapshot, allow_empty=unavailable)
+    if unavailable:
+        if rows:
+            raise SixUniverseGateError(
+                "unavailable universe flagged with nonempty constituents"
+            )
+        # A known unavailable collection is an invalid sleeve, not a zero-
+        # weight synthetic constituent or a replay of an earlier snapshot.
+        coverage = CoverageAssessment(
+            member_count=0,
+            mapped_member_count=0,
+            total_reported_weight=Decimal(0),
+            cap_covered_reported_weight=Decimal(0),
+            mapping_ratio=Decimal(0),
+            cap_weight_coverage_ratio=Decimal(0),
+            valid=False,
+            refusal_reasons=(UNAVAILABLE_COLLECTION_REASON,),
+        )
+    else:
+        coverage = _coverage(rows, profile)
     signal_ids, matched_ids, positive_count = _selected_ids(
         rows,
         coverage,
@@ -651,10 +676,34 @@ def _apply_duplicate_cap(
 def build_six_universe_construction(
     snapshots: tuple[UniverseSnapshot, ...],
     profile: GateProfile,
+    *,
+    unavailable_universe_ids: tuple[str, ...] = (),
 ) -> SixUniverseConstruction:
-    """Build the frozen score-gated, size-matched, and ETF-basket targets."""
+    """Build targets; opt-in cap-90 absence spends only the affected ETF sleeve.
+
+    An unavailable collection must be explicitly named and represented by
+    an actual empty tuple.  The default/old profile still refuses emptiness.
+    """
 
     profile = _validate_profile(profile)
+    if (
+        type(unavailable_universe_ids) is not tuple
+        or any(
+            type(item) is not str or item not in UNIVERSE_IDS
+            for item in unavailable_universe_ids
+        )
+        or unavailable_universe_ids
+        != tuple(
+            item for item in UNIVERSE_IDS if item in unavailable_universe_ids
+        )
+        or (
+            unavailable_universe_ids
+            and profile is not TOP10_CAP90_EXPLORATORY_PROFILE
+        )
+    ):
+        raise SixUniverseGateError(
+            "unavailable universe IDs require exact cap-90 canonical tuple"
+        )
     if type(snapshots) is not tuple or len(snapshots) != len(UNIVERSE_SPECS):
         raise SixUniverseGateError("exactly six universe snapshots are required")
     by_id = {}
@@ -680,7 +729,12 @@ def build_six_universe_construction(
         snapshot = by_id[spec.universe_id]
         if snapshot.etf_ticker != spec.etf_ticker:
             raise SixUniverseGateError("universe ETF ticker changed")
-        rows = _validated_constituents(snapshot)
+        unavailable = spec.universe_id in unavailable_universe_ids
+        rows = _validated_constituents(snapshot, allow_empty=unavailable)
+        if unavailable and rows:
+            raise SixUniverseGateError(
+                "unavailable universe flagged with nonempty constituents"
+            )
         member_security_ids.update(
             row.security_id for row in rows if row.security_id is not None
         )
@@ -691,7 +745,12 @@ def build_six_universe_construction(
     raw_sleeves = tuple(
         (
             snapshot,
-            _raw_sleeve(snapshot, SLEEVE_BUDGETS[index], profile),
+            _raw_sleeve(
+                snapshot,
+                SLEEVE_BUDGETS[index],
+                profile,
+                unavailable=snapshot.universe_id in unavailable_universe_ids,
+            ),
         )
         for index, snapshot in enumerate(ordered)
     )
@@ -758,6 +817,7 @@ __all__ = (
     "TOP10_PRIMARY_PROFILE",
     "TOP10_CAP95_EXPLORATORY_PROFILE",
     "TOP10_CAP90_EXPLORATORY_PROFILE",
+    "UNAVAILABLE_COLLECTION_REASON",
     "TOP5_SENSITIVITY_PROFILE",
     "UNIVERSE_IDS",
     "UNIVERSE_SPECS",

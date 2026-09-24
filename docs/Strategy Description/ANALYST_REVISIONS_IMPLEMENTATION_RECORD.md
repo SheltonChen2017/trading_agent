@@ -22395,3 +22395,71 @@ missing-collection fallback and order runtime/projector, and requests the
 exact economic QC source/profile/result-read authority before a separate
 order-based 2021–2025 exploratory run with both matched comparators. R-177's
 three-attempt budget is not reopened; R-178/R-179 remain unlaunched.
+
+## 175. Prospective cap-90 six-universe order family R-181–R-183, 2026-09-23
+
+This is a new **exploratory/development** family, not a retry of exhausted
+R-177 and not formal confirmation. It follows the owner-directed R-180
+counts-only diagnosis. The cap-90 threshold was chosen after inspecting those
+coverage counts, so no resulting return may be presented as an independent
+out-of-sample discovery. The common immutable input is package
+`arv2-preliminary-qc-package-7803b84f0841f9685a4951de`, SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`,
+lineage `54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`,
+and existing private Object Store activation manifest SHA-256
+`69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41`.
+No input/object-store mutation is planned.
+
+The economic rules are frozen at 2021-01-04 through 2025-12-31: 261 weekly
+decisions and 1,255 sessions; six equal-budget sleeves of point-in-time ETF
+holdings (`SPY`, `QQQ`, `SOXX`, `XLV`, `REMX`, `XLE`); 98% target gross; top
+ten strictly positive R-055 firm-specific revision scores per sleeve, with
+five-positive floor, deterministic identity tie-break, 9.8% aggregate
+duplicate cap, and own-ETF residual/fallback. Only the minimum cap-weight
+coverage is 90%, with the existing 90% identity-mapping and 95–105% reported
+weight gates unchanged. A genuinely unavailable strictly-prior constituent
+collection is explicitly marked and yields a full own-ETF fallback for that
+sleeve; no synthetic row or stale holdings replay is permitted. The matched
+role selects the same stock count per sleeve by point-in-time market cap;
+the third role holds the equal-budget six-ETF basket. Each is an order-based
+QC backtest with next-session whole-share MOO, sells before buys, RAW
+execution prices, zero modeled slippage, engine fees, and the frozen 10-bps
+per-side modeled-cost check. No leverage or new parameter search is in this
+family. All three roles share the same source closure except role-bound
+`main.py` and profile identity.
+
+| Candidate | Exact private project and A1 backtest name | Exact profile SHA-256 | Exact 13-file projection SHA-256 / bytes |
+| --- | --- | --- | --- |
+| R-181 signal | `104 ARV2 SIX CAP90 SIGNAL R181 2021 2025` / `ARV2 R181A1 six cap90 signal 2021 2025 947fd409` | `d27c558b71d20694e803a244e89f3feb79ba5084971c8d6d8eefa7cf8ecf09f0` | `947fd40922e2503a118e54bde8c0475cd9504fa0d2d212ccdc40e36f6fc72dc0` / 386,534 |
+| R-182 matched | `105 ARV2 SIX CAP90 MATCHED R182 2021 2025` / `ARV2 R182A1 six cap90 matched 2021 2025 3cc3a6ad` | `ab8e53adb828c5bb8cad23150d87f1ab87964887dc45e2e783a822cd754ce57a` | `3cc3a6adb71f6167322c8cfec62eb3c6ee97dbcdd2dc040bbbcfcad6d26e8698` / 386,535 |
+| R-183 basket | `106 ARV2 SIX CAP90 ETF R183 2021 2025` / `ARV2 R183A1 six cap90 ETF basket 2021 2025 f7540792` | `8d6f58c2a4ac427c7f81487d5ad00c901b4822a530bb0b6e9d729160819b4c1c` | `f754079248236305dbddeb177df7c7621748eed10eee7a965a90ac8fff7f9c70` / 386,542 |
+
+Each candidate has its own maximum three-attempt budget under the standing
+machine rule. A1 uses one fresh private project, exact 13-file upload and
+byte readback, compile, then one `backtests/create`; any diagnosed A2/A3
+correction must be prospectively versioned and use that candidate's same
+project rather than create a junk duplicate. A byte-identical deterministic
+failure is not repeated. R-182 launches only after R-181 is `Completed.` with
+authenticated `run_valid=true`, and R-183 only after both predecessors are
+valid. A terminal status alone is not a result. Polling reads only status
+with `includeStatistics=false`. After exact `Completed.`, one bounded result
+read may retain only canonical custom `ARV2_SIX_GATE_ORDER_META` and
+`ARV2_SIX_GATE_ORDER_AGGREGATES`, with exact schema/profile/package/source
+binding, raw-ASCII aggregate digest, and `run_valid` reconciliation. QC's
+standard statistics, charts, logs, raw provider/price rows, individual
+orders, and all unrelated fields are excluded; no paper/live/funded orders,
+broker, deployment, or trading authority is granted. A result that is not
+authenticated valid ends the comparative family without a clean spread.
+
+One successful `backtests/create` spends one shared exploratory research
+look and one ARV2 development evaluation for that role; three launched A1s
+would spend three each, zero infrastructure looks, and zero formal cells.
+Because section 172.1 identifies nine later Mia/QC launches whose physical
+source and look effects have not yet been reconciled, this record makes **no
+new cumulative ledger-total claim**. The primary comparison, only if all
+roles are valid, is R-181 minus count-matched R-182; R-181 minus the
+six-ETF R-183 is secondary and mixes stock-versus-ETF effects. Report each
+role's absolute return, drawdown, risk, fees, exposure, breadth, and fallback
+without choosing rules after seeing results. QC project names were confirmed
+absent by a bounded value-free project-list read before this freeze; no QC
+project, compile, backtest, or economic result read had yet occurred.

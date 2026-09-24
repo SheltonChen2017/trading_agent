@@ -399,8 +399,13 @@ class SixUniverseOrderTargetBuilder:
     def decisions(self):
         return tuple(self._decisions)
 
-    def build(self, session, snapshot):
-        """Build the next target from exactly one contemporaneous snapshot."""
+    def build(self, session, snapshot, *, unavailable_universe_ids=()):
+        """Build the next target from one contemporaneous snapshot.
+
+        Only the explicit cap-90 route can name a collection as unavailable;
+        that universe must carry the actual empty constituent tuple.  The
+        default R-177 route and unflagged empty collections still refuse.
+        """
 
         if self._failed:
             raise SixUniverseOrderTargetsError(
@@ -449,7 +454,9 @@ class SixUniverseOrderTargetBuilder:
                     dataclasses.replace(universe, constituents=tuple(rows))
                 )
             construction = _gate.build_six_universe_construction(
-                tuple(enriched), self._profile.gate_profile
+                tuple(enriched),
+                self._profile.gate_profile,
+                unavailable_universe_ids=unavailable_universe_ids,
             )
             current_etfs = tuple(
                 (sleeve.universe_id, sleeve.etf_security_id)

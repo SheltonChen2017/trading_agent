@@ -1,4 +1,5 @@
 import ast
+import hashlib
 from pathlib import Path
 
 import pytest
@@ -11,6 +12,9 @@ from research.analyst_revisions_v2_qc import (
 )
 from research.analyst_revisions_v2_qc import (
     accepted_risk_six_universe_order_targets as targets,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_six_universe_order_qc_runtime as runtime,
 )
 
 
@@ -70,6 +74,20 @@ def test_projection_is_exact_role_specific_and_capability_bounded(
         for item in value.source_files
         if item.project_path == subject.MAIN_PROJECT_PATH
     ).decode("ascii")
+    historical_main_sha256s = {
+        targets.ROLE_SIGNAL: (
+            "fc7ea724c6bc05ab942a7338bbb7e6d5039a9b75c185c3b612939c7706961cc3"
+        ),
+        targets.ROLE_MATCHED: (
+            "fa1b83e386ad998f368ace18150a38f7df75b32324f0ee7eb079e8b13d803b56"
+        ),
+        targets.ROLE_SIX_ETF_BASKET: (
+            "89f59da3628561b198b3eb8ccb10d0660855bbecbe0899834b53b48ce41ac0f5"
+        ),
+    }
+    assert hashlib.sha256(main.encode("ascii")).hexdigest() == (
+        historical_main_sha256s[role]
+    )
     assert "role=" + repr(role) in main
     assert "market_on_open_order" not in main
     assert "before_market_open(benchmark, 10)" in main
@@ -125,6 +143,77 @@ def test_projection_refuses_unfrozen_role(loaded_delta):
             loaded_delta,
             role="top5",
         )
+
+
+@pytest.mark.parametrize("role", targets.ROLES)
+def test_cap90_projection_binds_new_profile_and_runtime_selection(
+    loaded_delta, role
+):
+    old = subject.build_accepted_risk_six_universe_order_qc_projection(
+        loaded_delta,
+        role=role,
+    )
+    value = subject.build_accepted_risk_six_universe_order_qc_projection(
+        loaded_delta,
+        role=role,
+        variant=runtime.CAP90_VARIANT,
+    )
+    record = value.to_record()
+    assert old.schema == subject.PROJECTION_SCHEMA
+    assert "variant" not in old.to_record()
+    assert value.schema == subject.CAP90_PROJECTION_SCHEMA
+    assert record["variant"] == runtime.CAP90_VARIANT
+    assert value.profile_id == (
+        "arv2-six-universe-order-" + role + "-cap90-exploratory-v3"
+    )
+    assert value.profile_sha256 == runtime.require_six_universe_order_profile(
+        role, variant=runtime.CAP90_VARIANT
+    )["profile_sha256"]
+    assert value.projection_sha256 != old.projection_sha256
+    assert value.package_sha256 == old.package_sha256
+    assert value.package_lineage_sha256 == old.package_lineage_sha256
+    assert [item.project_path for item in value.source_files] == [
+        item.project_path for item in old.source_files
+    ]
+    main = next(
+        item.source_bytes.decode("ascii")
+        for item in value.source_files
+        if item.project_path == subject.MAIN_PROJECT_PATH
+    )
+    old_main = next(
+        item.source_bytes.decode("ascii")
+        for item in old.source_files
+        if item.project_path == subject.MAIN_PROJECT_PATH
+    )
+    assert "role=" + repr(role) in main
+    assert "variant=" + repr(runtime.CAP90_VARIANT) in main
+    assert "variant=" not in old_main
+    assert "market_on_open_order" not in main
+    # An order run needs the final Dec 31 account mark.  R-180's earlier
+    # Dec 30 endpoint was safe only for its counts-only Dec 29 decision.
+    assert "set_end_date(2025, 12, 31)" in main
+    assert record["backtest_only"] is True
+    assert record["live_orders"] is False
+    assert record["paper_orders"] is False
+    assert record["funded_orders"] is False
+
+
+@pytest.mark.parametrize("variant", ["", "cap95", "r177 ", None, 1])
+def test_projection_refuses_unfrozen_variant(loaded_delta, variant):
+    with pytest.raises(subject.AcceptedRiskSixUniverseOrderQcProjectionError):
+        subject.build_accepted_risk_six_universe_order_qc_projection(
+            loaded_delta,
+            role=targets.ROLE_SIGNAL,
+            variant=variant,
+        )
+
+
+def test_projection_source_file_bound_is_inclusive_and_finite():
+    exact = b"#" + b"x" * (subject.MAXIMUM_SOURCE_FILE_BYTES - 2) + b"\n"
+    item = subject._source_file("boundary.py", exact)
+    assert item.byte_count == subject.MAXIMUM_SOURCE_FILE_BYTES
+    with pytest.raises(subject.AcceptedRiskSixUniverseOrderQcProjectionError):
+        subject._source_file("boundary.py", exact + b"#")
 
 
 def test_projection_source_is_qc_prelude_safe():

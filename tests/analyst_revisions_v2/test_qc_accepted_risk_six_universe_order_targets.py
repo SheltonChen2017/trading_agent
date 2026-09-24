@@ -62,6 +62,73 @@ def _cap90_spy_snapshots(value):
 
 
 @pytest.mark.parametrize(
+    "role",
+    (subject.ROLE_SIGNAL, subject.ROLE_MATCHED, subject.ROLE_SIX_ETF_BASKET),
+)
+def test_cap90_explicit_unavailable_collection_preserves_own_etf_target(role):
+    value = input_fixtures._input(20)
+    first = gate_fixtures._snapshots(value)[0]
+    unavailable = dataclasses.replace(
+        first,
+        universes=tuple(
+            dataclasses.replace(universe, constituents=())
+            if universe.universe_id == "REMX"
+            else universe
+            for universe in first.universes
+        ),
+    )
+    builder = subject.SixUniverseOrderTargetBuilder(
+        value,
+        role=role,
+        profile=subject.ORDER_CAP90_EVALUATION_PROFILE,
+    )
+    decision = builder.build(
+        first.session, unavailable, unavailable_universe_ids=("REMX",)
+    )
+    remx = decision.sleeves[4]
+    assert remx.coverage_refusal_reasons == ("CONSTITUENT_COLLECTION_UNAVAILABLE",)
+    assert remx.coverage_valid is False
+    assert remx.selected_security_ids == ()
+    assert remx.post_cap_stock_target_count == 0
+    assert remx.etf_target_weight == gate.SLEEVE_BUDGETS[4]
+    assert remx.selection_status == (
+        "SIX_ETF_BASKET" if role == subject.ROLE_SIX_ETF_BASKET
+        else "COVERAGE_FALLBACK"
+    )
+    assert sum((item.weight for item in decision.target_weights), Decimal(0)) == (
+        gate.TARGET_GROSS_EXPOSURE
+    )
+    assert decision.to_record()["target_sha256"] == decision.target_sha256
+
+
+def test_order_target_default_still_refuses_unflagged_empty_collection():
+    value = input_fixtures._input(20)
+    first = gate_fixtures._snapshots(value)[0]
+    empty = dataclasses.replace(
+        first,
+        universes=tuple(
+            dataclasses.replace(universe, constituents=())
+            if universe.universe_id == "REMX"
+            else universe
+            for universe in first.universes
+        ),
+    )
+    for profile, flags in (
+        (subject.ORDER_EVALUATION_PROFILE, ()),
+        (subject.ORDER_EVALUATION_PROFILE, ("REMX",)),
+        (subject.ORDER_CAP90_EVALUATION_PROFILE, ()),
+    ):
+        builder = subject.SixUniverseOrderTargetBuilder(
+            value, role=subject.ROLE_SIGNAL, profile=profile
+        )
+        with pytest.raises(gate.SixUniverseGateError):
+            builder.build(
+                first.session, empty, unavailable_universe_ids=flags
+            )
+        assert builder.next_required_session is None
+
+
+@pytest.mark.parametrize(
     ("role", "attribute"),
     (
         (subject.ROLE_SIGNAL, "signal_weights"),

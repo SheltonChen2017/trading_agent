@@ -189,6 +189,58 @@ def test_review_sentence_classifier_requires_agent_and_accepts_verb_forms() -> N
     assert not any(_names_review_by_agent(sentence) for sentence in rejected)
 
 
+SHARED_LOOK_LEDGER = RECORD.parents[1] / "research" / "alpha-result.md"
+_CANDIDATE_ID = re.compile(r"\bR-(\d{3})\b")
+_RECORDED_BACKTEST = re.compile(r"backtest\s+`[0-9a-f]{32}`")
+_SECTION_HEADING = re.compile(r"(?m)^(#{2,3} .*)$")
+
+
+def _launched_candidates(record: str) -> dict[str, str]:
+    """Candidates whose own record section names a QC backtest identity."""
+
+    parts = _SECTION_HEADING.split(record)
+    launched: dict[str, str] = {}
+    for heading, body in zip(parts[1::2], parts[2::2]):
+        if _RECORDED_BACKTEST.search(body):
+            for candidate in _CANDIDATE_ID.findall(heading):
+                launched.setdefault(candidate, heading.strip())
+    return launched
+
+
+def test_shared_look_ledger_names_every_launched_candidate() -> None:
+    # The shared ledger is the cross-lane look census; a candidate whose
+    # record section names a launched backtest must have a ledger heading,
+    # alone or combined with others, so no launch is counted only in prose.
+    record = RECORD.read_text(encoding="utf-8")
+    ledger = SHARED_LOOK_LEDGER.read_text(encoding="utf-8")
+    ledger_candidates = {
+        candidate
+        for line in ledger.splitlines()
+        if line.startswith("## ")
+        for candidate in _CANDIDATE_ID.findall(line)
+    }
+    launched = _launched_candidates(record)
+    assert launched, "no launched candidate found in the record"
+    missing = {
+        candidate: heading
+        for candidate, heading in launched.items()
+        if candidate not in ledger_candidates
+    }
+    assert not missing, (
+        "launched candidates without a shared look-ledger heading: "
+        f"{sorted(missing)!r} (first named in {sorted(missing.values())[:3]!r})"
+    )
+
+
+def test_launched_candidate_classifier_requires_a_backtest_identity() -> None:
+    record = (
+        "## 1. R-900 preregistration\n\nNo launch yet.\n\n"
+        "## 2. R-901 completed run\n\nbacktest `" + "a" * 32 + "` reached Completed.\n\n"
+        "### 2.1 R-902 attempt\n\nCompiled and launched backtest `" + "b" * 32 + "`.\n"
+    )
+    assert sorted(_launched_candidates(record)) == ["901", "902"]
+
+
 def test_owner_review_waiver_classifier_is_exact_and_section_shaped() -> None:
     accepted = (
         "The owner explicitly waives an additional Claude review of section 68.",

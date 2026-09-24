@@ -4103,3 +4103,124 @@ preregistered evidence. R-176 spends **155 -> 156 shared looks / 98 -> 99
 ARV2 development evaluations**, with **27 infrastructure looks / 608 cells**
 unchanged. No retry, acceptance, leverage, deployment, broker, paper/live,
 funded-account, real-order, or trading authority follows.
+
+## R-177 — six-universe order family, three refused attempts plus nine later QC/Mia launches (RETROACTIVELY RECONCILED FROM THE LANE RECORD AND A QC CENSUS; ZERO CELLS) — 2026-09-24
+
+This entry is written by the Claude review of section 180 because the lane
+record (sections 170 through 172) recorded these launches without appending
+them here. R-177 is the owner-directed six-universe order family (six sleeves,
+98% long-only target, own-ETF fallback) in private project
+`100 ARV2_SIX_GATE_SIGNAL_R177_A1_2021_2025 - 20260922` (`36823601`). Codex's
+three permitted attempts all ended in `Runtime Error`:
+`f3618cc09fb9aa4370398542be783f2f` (A1), `c6c8358fa74131d0245a076af57fbfdf`
+(A2) and `d516663f39f13eb01d2d892528d76723` (A3); A1 and A2 exposed recording
+and fresh-input defects corrected prospectively, and A3 refused on 2023-07-03
+because one constituent callback had no positive weight. The attempt budget is
+exhausted; R-178 and R-179 were never created. Nine later launches in the
+same project by QC's Mia assistant or the owner (six `Runtime Error`, three
+`Completed.`: `04ff274f622641a0e4499d8512325a24`,
+`d43244b7e95c3b4820b9a7c71f7d5ef3`, `4f5a57ae3ab11bfc8c1e99a0f42dcc24`) are
+recorded in section 172.1; the owner-requested aggregate read of
+`04ff274f...` reported `run_valid=false` with 261 decisions and nine invalid
+orders, and its source is unproven. A 2026-09-24 administrative census of the
+project confirms exactly twelve backtests. Accounting: the three attempts
+spent **156 -> 159 shared looks / 99 -> 102 ARV2 development evaluations**
+(sections 170.8 through 170.10), and the nine later launches are counted
+here conservatively as **159 -> 168 shared looks / 102 -> 111 ARV2
+development evaluations**; infrastructure looks 27 and authenticated cells
+608 unchanged. No result is admissible and no cell was added.
+
+## R-180 — six-universe counts-only PIT coverage diagnostic, one Codex launch plus four later QC/Mia launches (RETROACTIVELY RECONCILED; INFRASTRUCTURE LOOKS; ZERO CELLS) — 2026-09-24
+
+Written by the section-180 review. R-180 is the prospective counts-only
+coverage diagnostic of section 173 in private project
+`103 ARV2 SIX COVERAGE R180 2021 2025` (`36854638`). Codex's A1
+`ca74d0514d72e49af83dacb4530d219d` refused at the end clock; Mia's one-file
+end-date correction was ported into the local projector (`38e998f`), and
+three later Mia-completed runs (`e06501daa3b345f95e65191404bad495`,
+`3d9e18970ac9c59f87c955a29b027414`, `2af50aacf72be8725f537d2a40740533`) were
+recorded in section 173.2, the last one read once for its seven canonical
+count statistics under an owner-approved, prior-time-corroborated exception
+(section 173.3). A 2026-09-24 administrative census finds a **fifth** launch
+the record does not know, `06bdcc2a5c4a2b395e35bc1f5dadf75e`, a QC
+default-named `Completed.` run created 2026-09-23 19:29:20 UTC (section
+180, `ARV2R180-003`); it was not read and is not evidence. Accounting: the
+five launches are counts-only diagnostics with no return and are counted as
+**27 -> 32 infrastructure looks**, zero ARV2 development evaluations and
+zero cells; shared research looks unchanged at 168.
+
+## R-181 — cap-90 six-universe signal-role order run, A1 upload refusal, A2 invalid, A3 valid under the owner's 2x admission bridge and signature waiver (EXPLORATORY; run_valid=true ON A3; ONE EXPLORATORY CELL) — 2026-09-24
+
+Written by the section-180 review. R-181 is the exploratory cap-90 signal
+role of sections 175 through 179 in private project
+`104 ARV2 SIX CAP90 SIGNAL R181 2021 2025` (`36891750`); the 90% coverage
+floor was chosen after the R-180 counts, so the family is exploratory
+(`ARV2CR174-005`). A1 refused before compile at QC's 64,000-character file
+limit and created no backtest. A2 `a74626d4d6ce7360ae95d2e1d7930910`
+completed with `run_valid=false` (6,289 submitted, 6,267 filled, 22 invalid
+pre-open buys for insufficient buying power, diagnosed by a bounded
+count-only order read). A3 `188e14446c4c33dcb045854da64e51c7`, under the
+owner-chosen research-only 2x order-admission bridge (98% target unchanged;
+cash, gross-exposure and tracking gates) and the owner's exploratory
+signature waiver, completed `run_valid=true`: cumulative return
+`0.96628735468236` (+96.63%), 6,315 orders all filled, minimum daily-close
+cash `15832.95614`, maximum end-day gross `0.9849784912822988`. Bridge
+runtime SHA-256
+`60b0e300393c1356e21de310fdfce1ff029632d77e6bf62efd7bb053de55b5ab`; A3
+projection SHA-256
+`f75725c37cb5e66f7db4070fcf89a05d5efe29cda60b6fc75086615d622cce0d`. The
+2026-09-24 census confirms exactly two backtests in the project. Accounting:
+A2 and A3 spend **168 -> 170 shared looks / 111 -> 113 ARV2 development
+evaluations**; the valid A3 read is counted as **608 -> 609 authenticated
+cells**, labelled exploratory (post-hoc cap floor, bridge, waived signature)
+and admissible only as a matched-comparison predecessor, never as a formal
+alpha result. The three-attempt budget is exhausted.
+
+## R-182 — cap-90 count-matched market-cap role, A1 valid plus one unrecorded rerun (EXPLORATORY; run_valid=true ON A1; ONE EXPLORATORY CELL) — 2026-09-24
+
+Written by the section-180 review. R-182 is the matched role in private
+project `105 ARV2 SIX CAP90 MATCHED R182 2021 2025` (`36909823`), launched
+only after R-181 A3 authenticated valid. A1
+`71ec4931f19d6c663345e9549335b911` completed `run_valid=true` under the
+same bridge policy: cumulative return `1.236191666261345` (+123.62%), 6,314
+orders all filled, baseline stock-target path SHA-256
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`;
+projection SHA-256
+`186cb2bb3dbd2a37358c9c0b2dbfa86e1e685203dba33795eb192f74faa9feeb`. The
+exploratory same-window comparison R-181 A3 minus R-182 A1 is
+**-26.9904311578985 percentage points**; three of six sleeves were own-ETF
+fallbacks throughout, so this measures the whole-portfolio policy, not
+analyst skill per universe. The 2026-09-24 census finds a **second, unrecorded
+launch** in the project, `78d6532ef3b02744f0188145c5d46686`
+(`ARV2 R182A1 ... 186cb2bb rerun`, `Completed.`, created 2026-09-24 18:09:39
+UTC), and a Mia research notebook saved at 18:47:09 UTC whose text embeds QC
+standard statistics for this run (section 180, `ARV2R180-002`); the rerun was
+not read by the lane and is not evidence, and it consumes R-182's second
+attempt slot conservatively. Accounting: A1 and the rerun spend **170 -> 172
+shared looks / 113 -> 115 ARV2 development evaluations**; the valid A1 read
+is **609 -> 610 authenticated cells**, exploratory.
+
+## R-184 — cap-90 matched-stock revision-weight tilt, A1 valid (EXPLORATORY; run_valid=true; ONE EXPLORATORY CELL) — 2026-09-24
+
+Written by the section-180 review. R-184 holds R-182's exact selected stock
+identities, counts, ETF fallbacks and six sleeve budgets and redistributes
+weight within each sleeve by analyst-revision rank, bounded to 20% of each
+stock's baseline weight, zero or missing scores neutral. Private project
+`107 ARV2 SIX CAP90 TILT R184 2021 2025` (`36910292`), A1
+`3c5f5a6cf78fa341a80160782488131c`, completed `run_valid=true` with its
+`matched_baseline_target_path_sha256` equal to R-182's `b825663b...cadbc`:
+cumulative return `1.2575741336207897` (+125.76%), **+2.13824673594447
+percentage points** over R-182 A1 after modeled costs; 6,313 orders all
+filled. Projection SHA-256
+`8fdb1e051c1e9620c1a126dd9d2bd09c1eb298d9dd8ae1d4e7d07ada61af9afc`, runtime
+SHA-256 `d6cd9f963e4754e134d1a6116ee300711ad7e28bc0e4b95f15e241d7e22f1489`,
+target builder SHA-256
+`b063c5bca9e4aa13e2deff66726cc4b6c12c405845921c1ee39bbe653f266506`. The
+tilt could act only in SPY, XLV and the stock-selected part of XLE, and the
+matched baseline still depends on positive R055 score coverage
+(`ARV2D179-005`), so this is a single-window exploratory observation, not
+statistical confirmation. The census confirms exactly one backtest.
+Accounting: **172 -> 173 shared looks / 115 -> 116 ARV2 development
+evaluations / 32 infrastructure looks / 610 -> 611 authenticated cells**.
+No R-183 basket run, leverage, deployment, broker, paper/live,
+funded-account, real-order or trading authority follows.

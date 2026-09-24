@@ -22463,3 +22463,19 @@ role's absolute return, drawdown, risk, fees, exposure, breadth, and fallback
 without choosing rules after seeing results. QC project names were confirmed
 absent by a bounded value-free project-list read before this freeze; no QC
 project, compile, backtest, or economic result read had yet occurred.
+
+After this prospective freeze, a second value-free `backtests/list` inventory
+confirmed the same twelve terminal R-177 runs in project `36823601`: frozen
+A1/A2/A3 plus exactly the nine distinct later IDs in section 172.1, with six
+`Runtime Error` and three `Completed.` statuses. The nine later runs have
+distinct QC snapshot IDs, but the project's current eighteen files were all
+modified after the newest run was created; current source bytes cannot prove
+any historical run's content. Conservatively, those nine are **at least nine
+additional shared research looks**, zero authenticated formal cells; their
+development-versus-infrastructure classification is unresolved. Their precise
+source/economic identities remain unreconciled, so the cumulative ledger
+remains intentionally open and
+no later `Completed.` status is promoted to valid R-177 evidence. This does
+not substitute for R-181's fresh upload/readback and independent validity
+checks. The inventory read retained no statistics, logs, orders, charts, raw
+rows, or outcome aggregate.

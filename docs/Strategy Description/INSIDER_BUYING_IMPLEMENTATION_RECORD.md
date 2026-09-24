@@ -1,16 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
 Status: **CLAUDE REVIEWED THE SYNTHETIC-FIRST NONCANONICAL SEC PILOT CONTRACT
-THROUGH PUSHED COMMIT `4d0cbf3b`, ADDING THE DUPLICATE-FIELD REGRESSION IN
-`cb443356`. CODEX COUNTER-REVIEWED BOTH CLAUDE COMMITS IN SECTION 76 AND
-ACCEPTED THE REVIEW AFTER APPEND-ONLY P3 RECORD CORRECTIONS. THE CONTRACT
-REMAINS PURE, ZERO-I/O, AND ZERO-AUTHORITY. `IBPILOT-R01` AND `IBPILOT-R02`
-ARE CLOSED AS DESIGN ITEMS ONLY; REAL-FORMAT COMPATIBILITY IS UNMEASURED,
-CANONICAL IB-2 IS INCOMPLETE, AND THE OWNER CONFIRMED THAT THE EXACT OFFLINE
-PILOT FILES DO NOT YET EXIST. THE PILOT RUNNER AND REAL-FILE RUN WAIT FOR
-OWNER-SUPPLIED FILES AND PROVENANCE. NO SEC, PROVIDER, CREDENTIAL, LICENSED
-ROW, REAL FILING, OUTCOME, QC, PAPER, LIVE, DEPLOYMENT, BROKER, CAPITAL,
-ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK COUNTERS REMAIN ZERO.**
+THROUGH PUSHED COMMIT `4d0cbf3b`; CODEX COUNTER-REVIEWED IT IN SECTION 76
+AND COMMITTED THE RECORD CORRECTIONS LOCALLY. THE CONTRACT REMAINS PURE AND
+ZERO-I/O. BY THE OWNER'S LATER, EXACT ZIP-DOWNLOAD REQUEST, ALL 82 PUBLIC
+SEC QUARTERLY FORM 3/4/5 ZIPS FROM 2006Q1 THROUGH 2026Q2 WERE SAVED IN THE
+LANE'S GIT-IGNORED `artifacts/` FOLDER; SECTION 77 RECORDS THEIR HASH-BOUND
+LOCAL MANIFEST AND VALIDATION. THIS ZIP-ONLY INTAKE DOES NOT SUPPLY THE
+MATCHING FORM 4/4-A PRIMARY XML OR ACCEPTANCE METADATA, COMPLETE THE OFFLINE
+PILOT, OR ESTABLISH CANONICAL IB-2 COMPLETENESS. NO OUTCOME, QC, PAPER, LIVE,
+DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK
+COUNTERS REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -10044,3 +10044,45 @@ audit, outcomes, QC, paper, live, and trading remain beyond this round.
 This counter-review is committed locally. The same-lane workflow holds the
 push while the required pilot inputs are absent; after the bundle is supplied
 and the bounded pilot round is complete, make at most one combined push.
+
+## 77. Owner-authorized local intake of the 82 SEC quarterly ZIPs (2026-09-24 UTC)
+
+After section 76, the owner asked to download all 82 quarterly files into the
+Insider project folder and explicitly chose the configured Git contact identity
+for identifying SEC requests. This later, exact authorization lifted section
+70's zero-request budget **only for the public quarterly Form 3/4/5 ZIPs**. It
+did not authorize retrieval of per-accession original XML, acceptance metadata,
+outcomes, prices, ETF holdings, security-master rows, QuantConnect work, or any
+trading surface. The download used a one-off shell operation, not repository
+code; the source-policy and pilot-contract modules were not changed.
+
+The official [SEC Insider Transactions Data Sets index](https://www.sec.gov/data-research/sec-markets-data/insider-transactions-data-sets)
+was checked for exactly one HTTPS SEC ZIP link for each contiguous quarter from
+2006Q1 through 2026Q2. The request client identified itself using the owner's
+chosen configured Git identity; the address is not stored in this record or
+the manifest. Downloads were sequential with a 300 ms inter-request pause,
+below the lane's five-requests-per-second ceiling. Each file was moved to its
+final path without overwriting an existing file. All 82 ZIPs were checked with
+Python's `zipfile -t` CRC test: **82 passed, 0 failed**; no partial download
+remains. Exact compressed total: **921,904,566 bytes (879.2 MiB)**. No ZIP
+was extracted or parsed for a filing, and no pilot runner was invoked.
+
+The raw ZIPs and the 82-row provenance CSV are local to
+`artifacts/sec_insider/raw/`, which `.gitignore` excludes. The manifest is
+`insider_quarterly_zip_manifest_2006q1_2026q2.csv`, SHA-256
+`dc254e4e023bf9990028e085450fc4a5c1c2ae22e1d562f2efc4ada532f9f76d`.
+It records each official source URL, filename, exact byte size, SHA-256,
+capture commit `a4192546b168470ff1e9c421d8bd53531a1b3c05`, and the local
+file last-write UTC. That timestamp is explicitly labeled a **local
+filesystem observation, not an SEC-attested retrieval time**. Neither the
+ZIPs nor their manifest is committed or pushed; transferring this work to
+another machine requires an approved artifact-transfer path, not `git pull`.
+
+This is a ZIP-only operational intake, not a research look or an authentic
+complete 82-quarter canonical source snapshot. Every Form 4/4-A accession
+still needs its separate complete primary ownership XML and matching acceptance
+metadata under section 70's immutable binding before canonical completeness
+can be assessed. The bounded 2–4-quarter offline pilot still needs a selected
+matching XML/metadata bundle and its exact provenance; no real-format
+compatibility, eligibility, signal, or return result is claimed. Authorized
+outcome looks **0**, consumed outcome looks **0**, research looks **0**.

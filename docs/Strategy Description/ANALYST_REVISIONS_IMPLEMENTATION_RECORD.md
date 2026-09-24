@@ -22556,3 +22556,99 @@ section-176 residual inventory, and then performs one exact 13-file readback,
 compile, and at most one `backtests/create`. The exact new identities above
 must be committed before that mutation. No backtest/result read has yet been
 made under these repaired identities.
+
+### 176.2 R-181 A2 launch and invalid-execution receipt
+
+The one-use in-place A2 control authenticated the private, idle project
+`36891750`, its zero-backtest census, the exact A1 claim, and all twelve
+residual file bytes before mutation. It updated only the normalized runtime
+and default `main.py`, created only the missing order-target module, then
+re-read all thirteen exact projected files byte-for-byte. Compile succeeded
+as `a6d3fbf80788eb9bc54f6ef0d2920395-c0b1828e0dd9ccf19d4432f3239f4d09`.
+The one A2 backtest is `a74626d4d6ce7360ae95d2e1d7930910`, named
+`ARV2 R181A2 six cap90 signal 2021 2025 b68661ec`, in the same project.
+The first status-only poll reported `In Progress...`; a later status-only poll
+reported exact `Completed.`. The one authorized, bounded custom-statistic
+read then authenticated the projection/profile/package binding and the raw
+ASCII aggregate digest
+`1376e1096b63e2189b0c44eccd54935391cf0e830ae736fd13b9fa20f604cc78`.
+That one-use result-read claim is spent. No QC standard statistic, chart,
+log, individual order, or raw provider/price row was read.
+
+The aggregate reports 1,255 account observations from 2021-01-04 through
+2025-12-31, 261 of 261 rebalances completed, 6,289 submitted orders,
+6,267 fills, **22 Invalid orders**, zero cancellations, and matched modeled
+and engine fees of $27,799.316036. Its own `execution_failure=true` and
+`run_valid=false` are authoritative. The account path ended at
+$1,940,191.56306544 from $1,000,000 (+94.019156306544% cumulative), with
+−22.28223858263% maximum drawdown and 20.49949479769% annualized
+volatility; these are **diagnostic effects of an execution-invalid run**, not
+accepted strategy performance or evidence of alpha. The bounded aggregate
+does not identify the rejected orders' reason or class, so no root cause is
+claimed. QC `Completed.` means only that the algorithm reached termination;
+it does not override the execution-validity gate.
+
+This successful `backtests/create` spends **one new exploratory shared
+research look and one ARV2 development evaluation**, zero formal cells. The
+pre-compile A1 upload failure remains zero-look. R-182 and R-183 are blocked
+by section 175's explicit predecessor-validity condition. R-181 has only one
+remaining allowed submission attempt (A3); a speculative economic or
+execution-policy change is not justified by the aggregate alone. Diagnosis
+needs separately authorized cause evidence, or owner-side Mia, before a
+prospective A3 source and test can be frozen. QC's orders endpoint has no
+server-side invalid-status filter: extracting the 22 rejection reasons would
+transiently read about 6,289 individual order records in roughly 64 pages,
+then discard all symbols, dates, IDs, prices, and raw messages while retaining
+only bounded reason-category counts. That broader read is **not** covered by
+section 175's aggregate-only authority and has not occurred. A filtered-log
+query is narrower but cannot prove absence or enumerate the 22 because this
+runtime does not log order-event messages. The earlier nine-run ledger
+classification remains open.
+
+## 177. Codex R-181 launch handoff for Claude, 2026-09-23
+
+Review the exact lane range `dec7e13..HEAD` after this record-only commit. The
+owner requested a review and then a single push, so Codex stopped before a
+speculative A3 or either comparator run. The branch and worktree remained
+`codex/strategy-analyst-revisions-v2` and the designated Analyst Revisions
+v2 checkout. This is an exploratory execution diagnostic, **not** a successful
+stock-selection result.
+
+| Commit | Disposition and review focus |
+| --- | --- |
+| `0a2b6c0` | Candidate: freezes the cap-90 three-role order family, including unavailable-collection own-ETF fallback. Check profile/source bindings and that R-177 defaults remain unchanged. |
+| `3dd0fba` | Candidate: one-use private QC launcher and exact project/source/result controls. Check claim ordering and bounded API reads. |
+| `c67252d` | Candidate correction: result reader retains only comparison diagnostics instead of full custom payload. Check authenticated digest/profile and valid-run gate. |
+| `a228570` | Record-only: nine post-A3 R-177 launches are conservatively counted without promoting any outcome. |
+| `2d34786` | Candidate correction after A1: QC's 64,000-character file ceiling is pinned; cap-90 runtime is AST-equivalently normalized below it. Check byte identities and unchanged R-177 projection. |
+| `a2e6784` | Candidate correction: A2 reuses exact A1 project residue, changes only the three incomplete paths, verifies all thirteen source files, and launches once. |
+| Record-only HEAD | Sections 176.2–177: terminal A2 invalid result, exclusions, and next gate. No executable change. |
+
+Findings and status:
+
+| ID | Severity | Disposition |
+| --- | --- | --- |
+| `ARV2D177-001` | P2 | Corrected before A2. A1's 67,316-character runtime crossed QC's already documented 64,000-character `files/create` limit. The one-byte failed-upload residue and zero-backtest census were authenticated. The v3 cap-90 projection is 56,398 characters for that module and preserves its AST. A1 spent one attempt but zero looks. |
+| `ARV2D177-002` | P2 | Open. A2 completed at QC but 22 of 6,289 submitted orders were `Invalid`; authenticated `execution_failure=true`, `run_valid=false`. The aggregate cannot identify rejection reasons. The +94.019% account path is diagnostic only. R-182/R-183 must not launch. Do not assume a buying-power cause or relax validity after seeing returns. |
+| `ARV2D177-003` | P3 | Documented only. QC has no invalid-status server filter on `backtests/orders/read`; diagnosis would require a separately authorized transient read of roughly 64 order pages, or owner-side Claude/Mia inspection. The current result-read claim is spent; no log/order result read occurred here. |
+
+QC evidence: private project `36891750`, one A2 compile
+`a6d3fbf80788eb9bc54f6ef0d2920395-c0b1828e0dd9ccf19d4432f3239f4d09`,
+one A2 backtest `a74626d4d6ce7360ae95d2e1d7930910`, exact
+`Completed.` status, and one allowed custom META/AGGREGATES read. The result
+has 6,267 fills, 22 invalid orders, zero cancellations, 261/261 completed
+rebalances, and equal modeled/engine fees. It spends one shared exploratory
+look and one ARV2 development evaluation, zero formal cells. No new QC
+project was created for A2. R-181 has one attempt left under the three-
+attempt rule; R-182/R-183 have zero launches and zero looks.
+
+Validation on the final code tree: **161 passed** across cap-90 submission,
+six-universe order projection/runtime, and active-document tests;
+`git diff --check` clean. The full lane/repository suite was not run, per
+the owner's standing Claude-only rule. Excluded: additional result reads,
+logs, individual orders, raw provider/price rows, A3, R-182/R-183,
+leverage, broker/paper/live/funded orders, deployment, and shared-file edits.
+Next: Claude reviews this exact pushed snapshot and, if directed by the
+owner, diagnoses the 22 rejected orders in QC. Codex counter-reviews any
+Claude lane commit and prospectively versions a proven A3 correction before
+spending the last R-181 attempt; no comparator runs until `run_valid=true`.

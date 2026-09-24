@@ -1,16 +1,24 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE COMMIT `226c4c1` AND ACCEPTED IT
-AFTER APPEND-ONLY P3 CORRECTION `IBPAPER-CCR01` IN `b2879e7`. THE OWNER'S
-CANONICAL IB-2 SOURCE DIRECTION IS RECORDED IN `2b4c0b9`, AND THE PURE,
-ZERO-ACCESS `INSETF-IB2-CANONICAL-SOURCE-POLICY-v1` CONTRACT IS IMPLEMENTED
-IN `5f823c1`, VALIDATED, AND PENDING CLAUDE REVIEW (SECTION 71). IT SPECIFIES
-REQUIRED FUTURE EVIDENCE; NO 82-QUARTER CORPUS, SOURCE MANIFEST, ACCESSION
-ARTIFACT, OFFICIAL IDENTITY/TAXONOMY/SECURITY-MASTER/CALENDAR INPUT, OR
-REAL-DATA VERIFICATION EXISTS. `IBSH-CR01` REMAINS A NON-BLOCKING
-MAIN-INTEGRATION ITEM; IT DOES NOT CHANGE THE OTHER LANE BRANCHES. ALL DATA,
-NETWORK, SEC, PROVIDER, OUTCOME, QC, DEPLOYMENT, BROKER, CAPITAL, ORDER, AND
-TRADING AUTHORITIES REMAIN FALSE, AND ALL LOOK COUNTERS REMAIN ZERO.**
+Status: **CLAUDE REVIEWED THE FOUR CODEX COMMITS IN `226c4c1..07ba33e`
+(SECTION 72). `b2879e7`, `2b4c0b9`, AND `07ba33e` ARE ACCEPTED; `5f823c1` IS
+ACCEPTED AFTER TEST-ONLY P3 CORRECTION `IB2SRC-CR01` IN `b758514`. THE PURE
+`INSETF-IB2-CANONICAL-SOURCE-POLICY-v1` CONTRACT MATCHES ALL SEVEN SECTION-70
+CLAUSES, PERFORMS NO I/O, AND GRANTS NOTHING. ITS HASH AND EVERY RECORDED
+COUNT REPRODUCE, AND THE COMPLETE SUITE ON `07ba33e` IS **8,164 PASSED, 38
+SKIPPED, 0 FAILED**. ON 2026-09-24 THE OWNER CONFIRMED THE EXACT-82-QUARTER
+CANONICAL DEFINITION AND FUTURE-ONLY RETRIEVAL LIMITS; AUTHORIZED A SMALL,
+NON-CANONICAL REAL-DATA PILOT ON OWNER-SUPPLIED SEC FILES THROUGH THE
+EXISTING IB-1A TO IB-1E BOUNDARIES WITH ZERO RESEARCH LOOKS; AUTHORIZED THE
+SHARED SECURITY-MASTER AND TRADING-CALENDAR AUDIT AS A SEPARATE COMMON ACTION;
+AND PAUSED NEW SYNTHETIC DIAGNOSTIC MILESTONES UNTIL THE PILOT REPORTS. TWO
+PILOT-READINESS FINDINGS ARE OPEN: `IBPILOT-R01` (P2, IB-1C ACCEPTS ONLY FLAT
+JSON METADATA, WHICH NO STANDARD SEC ARTIFACT PROVIDES VERBATIM) AND
+`IBPILOT-R02` (P3, IB-1E NEEDS CONTIGUOUS PERIODS AND CAPS XML AT 256). NO
+FILES HAVE BEEN SUPPLIED AND CANONICAL IB-2 IS NOT COMPLETE. CODE STILL HAS
+NO NETWORK OR SEC ACCESS, AND EVERY OUTCOME, QC, PAPER, LIVE, DEPLOYMENT,
+BROKER, CAPITAL, ORDER, AND TRADING AUTHORITY REMAINS FALSE; ALL LOOK COUNTERS
+REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -180,6 +188,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-18 | Claude review | `c256069` -> this review record | Independent review of the IB-3D counter-review and the owner-coordinated Insider paper-stage gate amendment (`5f6a074..c256069`, 7 commits, 0 merges, 8 paths including three shared documents) | Verified the remote tip and clean worktree, then reviewed all seven commits. Concentrated on the authority surface: probed the IB-1I v2 gate for holdout sealing, look counters, promotion sequencing and every field escalation; confirmed the pinned directive commit exists and is the commit that made the amendment; ran 14 mutation directions on the new guards; and checked whether the shared-document amendment reached the other lanes. Full detail in section 68. | Complete repository suite **7,924 passed, 38 skipped, 28 warnings, 0 failed in 573.91s (0:09:33)**. Recorded counts reproduce exactly: preregistration **199**, plus active-document **268**, lane plus both boundaries **1,726**. Mutation: **14 directions, 14 caught, 0 survivors**. Gate probes: holdout access `False` and escalation refused, holdout role pinned, both look counters `0`, no permanent look IDs, promotion sequence retains `separate_owner_paper_deployment_authority` before the pilot, pilot pinned at 60 trading days, prerequisites confer no deployment authority, and all seven attempted escalations refused. Gate version and payload schema both advance to v2. compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC/provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | All seven commits **accepted**; no code correction required. `IB3D-CCR01` is accepted against this reviewer: the breadth-gate pin in `fc6638b` covered only the promotion direction while section 65 described both, and `526ecc6` closed the demotion direction. New **IBSH-CR01** (P3, open, coordination): the owner-coordinated 2026-09-18 amendment to `ACTION_PLAN_2026-08-20.md`, `THREE_STRATEGY_PROJECT_DIRECTION.md` and `THREE_STRATEGY_PARALLEL_WORKFLOW.md` exists only on this lane; `main` and the analyst, short-interest and target-price lanes carry none of the three, which is the divergence the freeze rule exists to prevent. Documented, not fixed, because propagation is a cross-lane owner action. | Codex counter-reviews this record commit. The owner decides how to propagate the shared amendment. Paper promotion still requires separately authorized deployment; canonical IB-2 and IB-3 remain incomplete. |
 | 2026-09-18 | Codex counter-review | `226c4c1` -> this counter-review record | Counter-review of Claude's review of the IB-1I v2 paper-stage gate amendment | Reviewed the sole linear record-only Claude commit, reproduced every commit disposition and authority claim, verified its current-gate mutation evidence and cross-branch coordination finding, and corrected one historical novelty overclaim append-only. No production or test file changed, and no later milestone was started because owner decisions still block it. | Preregistration **199 passed**; preregistration plus active documents **268 passed**; record plus active documents **70 passed**; lane plus both import boundaries **1,726 passed**. The seven-commit reviewed range has zero merges and eight paths; hashes, semantic hash, compilation, diff, ancestry, and clean-status checks reproduce. Claude's complete-suite result remains **7,924 passed, 38 skipped, 0 failed**; Codex verified the current collection total is 7,962 but did not repeat that nine-minute run. No external or outcome access; **0 research looks**. | `226c4c1` **accepted after append-only correction**. `IBPAPER-CCR01` P3 is closed in section 69: section 68's “first round” claim conflicts with section 28's earlier **8 caught, 0 survived** sweep. `IBSH-CR01` P3 is accepted and remains open, shared/out of lane; no P0-P2 finding. | Hold this committed counter-review locally. The owner decides coordinated propagation of the shared amendment and separately freezes canonical IB-2 source mode/cutoff plus any common security-master/calendar audit. No milestone or push is authorized before then. |
 | 2026-09-18 | Codex counter-review + implementation | `226c4c1` reviewed; `b2879e7` counter-review; `2b4c0b9` owner decision; `5f823c1` policy snapshot; this record commit follows | Claude paper-gate-review counter-review plus owner-approved canonical IB-2 source-policy freeze | Accepted Claude's record-only review after one append-only P3 correction, scope-dispositioned its shared observation for later main integration, recorded the owner's low-authority source choice, and implemented a pure 99-field future-evidence policy with seven package exports and synthetic dangerous-direction tests. No corpus, manifest, parser expansion, cache, retriever, or canonical IB-2 result was created. | Python 3.13.15 / pytest 9.1.1. Focused policy **240 passed**; policy plus preregistration/hygiene/import boundaries **460 passed**; exact recurring lane/boundary gate **1,966 passed**. Two material constructor weaknesses were demonstrated red, corrected, and restored green. Independent mutation audit: all 27 coherent constant-plus-field changes refused, and **0 of 99** field changes survived even when the public computed hash name was rebound. Policy SHA-256 `eec42a1e...e7dbe`; compileall, staged diff, commit, ancestry, and final status checks are recorded in section 71. No external or outcome access; **0 research looks**. | `226c4c1` accepted after correction; `IBPAPER-CCR01` P3 closed. `IB2SRC-R01` and `IB2SRC-R02` P2 closed red/green before `5f823c1`. `IBSH-CR01` P3 remains open but non-blocking and out of lane for one-time main integration. No open P0-P2 finding remains. | Make this round's single push. Claude reviews every commit in `226c4c1..PUSHED_HEAD`; Codex then counter-reviews every Claude commit. Actual source artifacts, a scalable manifest boundary, authenticated amendments, official security/calendar identity, outcomes, QC, deployment, and trading remain separately gated. |
+| 2026-09-24 | Claude review | `07ba33e` -> `b758514` (test correction) -> this review record | Independent review of the Codex counter-review, the owner-selected canonical IB-2 source direction, and the pure source-policy freeze (`226c4c1..07ba33e`, 4 commits, 0 merges, 4 lane-owned paths); owner pilot decision | Verified the remote tip and clean worktree, then dispositioned all four commits: three accepted, `5f823c1` accepted after a test-only correction. Mapped all seven section-70 clauses to the contract, confirmed purity, zero authority, 99 categorized fields, the literal hash and the blueprint hash, and ran 20 faithful mutants in a read-only export. Recorded the owner's 2026-09-24 approval of the five-point recommendation: the policy is confirmed, a non-canonical real-data pilot on owner-supplied files is authorized, the shared audit is authorized as a separate common action, and synthetic milestones are paused. | Complete suite on `07ba33e` **8,164 passed, 38 skipped, 28 warnings, 0 failed in 520.80s**. Recorded counts reproduce exactly: **240**, **460**, **1,966**. Hash `eec42a1e...7dbe` recomputed independently. Mutation with bytecode caching disabled: **19 of 20 caught** on the pushed tree, **20 of 20** after `b758514`. Final tree: focused **240 passed**; lane gate **1,966 passed**; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, real filing, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB2SRC-CR01` P3 closed in `b758514` (last-period endpoint check unpinned). `IB2SRC-CR02` P3 closed (this reviewer's section-58.4 novelty claim, same error as `IBPAPER-CCR01`). `IB2SRC-CR03` P3 open (earlier Claude mutation harnesses did not disable bytecode caching). `IBPILOT-R01` P2 open (IB-1C flat-JSON metadata versus real SEC formats). `IBPILOT-R02` P3 open (IB-1E contiguity and 256-XML cap; corrects this reviewer's pilot suggestion). `IBSH-CR01` retained. | Codex counter-reviews `b758514` and this record, then designs the non-canonical pilot, settling `IBPILOT-R01`/`R02` on synthetic fixtures before the owner supplies files. No outcome, QC, paper, or trading step is inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -9393,3 +9402,187 @@ The next authorized action is this round's single push followed by Claude's
 independent review of every commit in `226c4c1..PUSHED_HEAD`. Codex then
 counter-reviews every Claude commit before any later milestone. No real-data,
 provider, outcome, QC, deployment, broker, or trading step is inferred.
+
+## 72. Claude review - canonical IB-2 source-policy freeze and the owner's pilot decision (2026-09-24 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying` (owner's Mac, Python 3.13.15, pytest 9.1.1).
+No branch, worktree, fork, or handoff was created or switched to. After
+`git fetch`, the local branch and the remote tip were both exactly
+`07ba33ecf18782f995bd23d7cfc94d8caafe73d6`, and the worktree was clean. The
+reviewed range `226c4c1..07ba33e` contains four commits, zero merges, and
+four paths: this record, `research/insider_buying/__init__.py`, the new
+`research/insider_buying/sec_owner_supplied_source_policy.py`, and its test
+module. Mutation work ran in a read-only `git archive` export of `07ba33e`,
+never in the worktree.
+
+### 72.1 Commit dispositions
+
+| Commit | Change | Disposition |
+|---|---|---|
+| `b2879e7` | Section 69, counter-review of section 68 | **Accepted.** `IBPAPER-CCR01` is correct: section 28.7 records 8 caught and 0 survived over new guards. This reviewer made the same false novelty claim earlier, in section 58.4; it is corrected here as `IB2SRC-CR02`. |
+| `2b4c0b9` | Section 70, the owner-selected source direction | **Accepted.** The seven clauses agree with the existing IB-1A to IB-1E contracts (Form 4/4-A accession types, quarter packages from 2006, `FILING_DATE` partitioning). This reviewer cannot verify quotations taken from Codex sessions. On 2026-09-24, however, the owner confirmed both open policy points directly in this session (72.5). The pinned directive commit is correct: `2b4c0b9` adds section 70, which its parent lacks. |
+| `5f823c1` | Pure source-policy contract, 240 tests, seven package exports | **Accepted after correction.** The contract is faithful to section 70, pure, and grants nothing (72.2). One test gap: the last-period endpoint cross-check could be deleted without any test failing (`IB2SRC-CR01`). It is pinned in `b758514`. |
+| `07ba33e` | Section 71, status, and push-ledger row | **Accepted.** Every count, hash, and field category reproduces (72.3). |
+
+### 72.2 Contract review
+
+Each section-70 clause maps to the contract as follows. Nothing in the
+contract goes beyond section 70.
+
+| Section-70 clause | Where the contract binds it |
+|---|---|
+| 1. Owner-supplied offline source | `source_mode`; network, SEC, and provider access `False`; current request budget exactly `0` |
+| 2. Exactly 82 quarters, 2006Q1-2026Q2 | `required_periods` compared with a freshly generated tuple, plus count 82, both endpoints, the filing-date envelope, `partition_field`, and the coverage-policy string |
+| 3. Period label is not an acceptance cutoff | `global_acceptance_cutoff_utc` must be exactly `None`; availability is per accession |
+| 4. Accession evidence | One raw ZIP per quarter; accession types `4`, `4/A`; context types `3`, `5`; two required per-accession artifacts; coverage-policy string; Forms 3 and 5 never candidates |
+| 5. Integrity and storage | SHA-256; seven hash-bound objects; exact byte sizes; ordered manifest; content-addressed no-overwrite cache; idempotent retry; conflict refusal; new epoch for any revision |
+| 6. Amendments | Every as-filed version retained; no simultaneous counting; seven quarantine reasons; authenticated supersession `False` |
+| 7. Retrieval | Budget exactly `0`; future ceiling 5 requests per second; contact, cache, and backoff required; backtest requests `False` |
+
+Other properties verified directly:
+
+- The module imports only `__future__`, `dataclasses`, `datetime`, and
+  `data.hashing`. Construction, serialization, and hashing open no file.
+- The 99 fields split 19 strings, 3 dates, 5 integers, 6 tuples, 10
+  required-true flags, 16 unbound identities, and 40 required-false flags.
+  Every real identity is `None`, all 40 verification and authority flags are
+  `False`, and both look counters are `0`.
+- Construction checks exact type and value per category, then compares the
+  canonical payload with the inline literal fingerprint. Rebinding a declared
+  constant together with its field is refused (the `IB2SRC-R02` fix; mutant
+  M14 below).
+- Independent recomputation of `sha256(canonical_json(payload) + "\n")` gives
+  `eec42a1e34b6200e0e195a6702307a5c716c10c40dbfd8e9e8095846c79e7dbe`. The
+  governing PDF recomputes to
+  `f8834e13bb22d63a1a5a055a24cc2638ecb2e535b733c1fdd1741a28c65db88c`.
+
+Forward note for the first consumer (not a finding; none exists yet). The
+constructor is the only enforcement point. `copy.copy` plus
+`object.__setattr__`, or a subclass that overrides `__post_init__`, yields an
+object that never ran the checks. That is arbitrary code substitution,
+outside the section 59.2 threat model, and the existing forged-field test
+shows such an object's `semantic_sha256` changes. The future manifest boundary
+should therefore require `type(policy) is CanonicalIb2SourcePolicy` and
+`policy.semantic_sha256 == CANONICAL_IB2_SOURCE_POLICY_SHA256`, not trust the
+instance.
+
+The owner-authorized pilot in 72.5 is non-canonical and does not touch this
+contract. `real_artifact_read_authorized` and every other canonical flag stay
+`False`, and no pilot result is canonical evidence.
+
+### 72.3 Validation and mutation evidence
+
+- Complete repository suite on the exact pushed tree `07ba33e`: **8,164
+  passed, 38 skipped, 28 warnings, 0 failed in 520.80s (0:08:40)**. Against
+  section 68's 7,924 passed plus 38 skipped, the increase is exactly the 240
+  new tests.
+- Recorded counts reproduce exactly: focused source-policy suite **240**;
+  source-policy, preregistration, module-hygiene, overlay-import, and
+  ML-import set **460**; recurring lane gate (every
+  `tests/test_insider_buying*.py`, active-document consistency, module
+  hygiene, overlay import boundary, ML import boundary) **1,966**.
+- Mutation: 20 faithful mutants covering every guard category, including
+  reintroductions of `IB2SRC-R01` (M06, fresh period re-derivation removed)
+  and `IB2SRC-R02` (M14, literal fingerprint disabled). On the pushed tree:
+  **19 caught, 1 survived**. The survivor was M09, deletion of the
+  last-period endpoint cross-check. After `b758514`, M09 is caught, M08 and
+  M14 are still caught, and the module was restored byte-identical after every
+  run. Final: **20 of 20 caught**.
+- Harness correction during this round. The first run also reported M10
+  (acceptance-cutoff guard removed) as surviving, but a direct run showed it
+  caught. M08, M09, and M10 each shrink the module by exactly 40 bytes, and
+  consecutive runs finished within one second. Python validates cached
+  bytecode by source size and whole-second modification time, so M10 had
+  executed M09's stale bytecode. Every result above comes from a rerun with
+  `python -B`, `PYTHONDONTWRITEBYTECODE=1`, and a cache purge before each
+  mutant. `IB2SRC-CR03` records what this means for earlier evidence.
+- Final-tree checks after `b758514` and this record commit are listed in the
+  push-ledger row.
+
+### 72.4 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB2SRC-CR01 | P3 | **CLOSED in `b758514`** | `5f823c1` | `tests/test_insider_buying_sec_owner_supplied_source_policy.py`, `test_period_count_and_endpoints_reject_matching_constant_drift` | The test pins count drift and first-endpoint drift but not last-endpoint drift. Deleting `or self.required_periods[-1] != self.last_period` passed all 240 tests, because the literal fingerprint then caught the coherent drift under a different message. The named guard was defence in depth that no test held. | Mutant M09 survived on the pushed tree with bytecode caching disabled. | A guard that can be deleted silently does not stay load-bearing, and its first-endpoint twin was already pinned. | Extend the test with a coherent `last_period="2026Q3"` drift that must raise the coverage refusal. Test-only; no production change. | Green on the real module (240 passed). M09 now fails the test; M08 and M14 remain caught; module byte-identical after the harness. |
+| IB2SRC-CR02 | P3 | **CLOSED in this record commit** | `0b1c3b8` | Section 58.4, final paragraph | This reviewer wrote that section 58 was "the first round in this lane where a mutation sweep of the new guards found no untested guard". That is false for the same reason as `IBPAPER-CCR01`. | Section 28.7 records an eight-mutant sweep over new guards with 8 caught and 0 survived. | Mutation chronology in the durable record must be accurate. Policy behavior is unaffected. | Section 58 is preserved as history; this row corrects it append-only. | Direct comparison of sections 28.7 and 58.4. |
+| IB2SRC-CR03 | P3, reviewer methodology | **OPEN, non-blocking** | Claude mutation evidence recorded before this section | Claude mutation harnesses (scratch scripts, not repository code) | Every harness this reviewer ran before this round rewrote the module and ran pytest per mutant with bytecode caching enabled (checked for every harness in the current review session; earlier sessions not checked). When two consecutive mutants leave the module the same size and are written within one second, the second runs the first's stale bytecode. A false "survived" is visible and gets investigated, as M10 was here. A false "caught" is not visible, so earlier "N of N caught" results carry this caveat. The risk is limited to runs that finished within one second. | The M10 misreport in 72.3 and its reproduced cause. | Evidence should state exactly what it proves. | This round's results use `python -B`, `PYTHONDONTWRITEBYTECODE=1`, and a cache purge. Both agents' harnesses should do the same. Earlier rounds were not re-audited. | 72.3. |
+| IBPILOT-R01 | P2 | **OPEN; pilot-design item, not a defect in the reviewed commits** | Pre-existing IB-1C and IB-1E design | `sec_edgar_acceptance_snapshot.py` (`_parse_exact_metadata_object`, `MAX_SOURCE_JSON_NESTING_DEPTH = 1`); `form4_multi_period_amendment_evidence.py` | IB-1C accepts only a strict, single-level JSON object whose keys exactly match a caller-declared profile, bound to a `www.sec.gov` or `data.sec.gov` URL. To this reviewer's knowledge no standard SEC per-accession artifact has that shape. The EDGAR accession `index.json` nests a directory listing, the `data.sec.gov/submissions/CIK##########.json` document is one nested per-filer object with parallel arrays, and the complete-submission SGML header that carries `<ACCEPTANCE-DATETIME>` is not JSON. IB-1E also reparses an asserted original-accession link and a primary-document SHA-256 from those bytes, and SEC metadata does not carry either field. Verbatim SEC metadata therefore cannot enter IB-1C unchanged. A flattened projection bound to an SEC URL would present derived bytes as if they had been captured verbatim. | Code reading. The only metadata URL in the tests is fictional (`https://data.sec.gov/submissions/0000123456-metadata.json`). Section 14.3 says the repository supplies no official profile. A search of this record found no decision on real metadata format. The SEC formats above were not checked against live content, because no access is authorized. | The pilot exists to test real-format compatibility honestly. Its most likely early result is this mismatch, and the design must settle it before any file is read. | None by the reviewer, because this needs a design decision. Either (a) supply no metadata sources, so every accession takes IB-1C's documented `FILING_DATE_FALLBACK` tier and the pilot stops before IB-1E link evidence, or (b) first add a separately reviewed derivation step that keeps the verbatim SEC bytes and their hash and labels the flat projection, including any computed XML hash, as derived. No amendment link may be asserted without a source. | Code, fixture, and record sweep as cited. |
+| IBPILOT-R02 | P3 | **OPEN; corrects this reviewer's chat recommendation** | Pre-existing IB-1E limits | `form4_multi_period_amendment_evidence.py` (`MAX_FORM4_EVIDENCE_XML_SOURCES = 256`, 64 MiB XML cap, contiguity check) | This reviewer told the owner that the existing stages "already handle up to 16 quarters" and suggested "one early quarter and the rest recent" plus "matching Form 4 XML". IB-1E composes only two or more *contiguous* IB-1C periods, so an early quarter cannot be composed with recent ones. It also caps XML at 256 documents and 64 MiB in total, against tens of thousands of Form 4 accessions per quarter. | Module constants and the contiguity guard. | The owner should supply files that the boundaries can actually take. | Supply one contiguous block of recent quarters for IB-1A to IB-1C, with at most a bounded sample of Form 4 XML. Optionally add one early quarter processed through IB-1A to IB-1C on its own. Full-quarter XML coverage needs the later reviewed streaming boundary that section 70 already requires. | Code reading. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination-document copies across branches | Unchanged from 71.4: reconcile the Insider-only paper clause once, when this lane integrates into `main`. | Section 70. | Out of lane. | None here. | Current range changes no shared document. |
+
+There is no P0 or P1 finding. `IBPILOT-R01` is the only P2 finding, and it
+blocks only the pilot's exact-acceptance and link-evidence stages, not any
+reviewed commit.
+
+### 72.5 Owner decisions in this review session (2026-09-24)
+
+The owner asked "what is your recommended course of action?". This reviewer
+recommended five points, summarized here from the chat:
+
+1. Claude reviews the four pending commits.
+2. Both policy questions are answered yes. Exactly 82 quarters remains the
+   canonical corpus definition, because a silently missing quarter would bias
+   every signal. The future retrieval limits are future-only constraints and
+   grant no current permission.
+3. A small, explicitly non-canonical real-data pilot. The owner supplies
+   roughly four quarters of the SEC's quarterly Form 3/4/5 files plus
+   matching Form 4 XML documents, and they run through the existing IB-1A to
+   IB-1E stages. Filings are not returns, so the pilot uses zero research
+   looks and opens no outcome. It is recorded as non-canonical.
+4. The shared security-master and trading-calendar audit starts in
+   parallel.
+5. New synthetic diagnostic milestones pause until the pilot reports.
+
+The owner replied:
+
+> Yes. i authorize you to proceed
+
+and later, during this review:
+
+> push when done
+
+This reviewer records that approval as follows, reading it as narrowly as
+the recommendation allows.
+
+- **Policy (point 2).** Section 70 and the `5f823c1` contract stand
+  unchanged. Nothing new is authorized.
+- **Pilot (point 3).** Codex may design and implement a bounded pilot
+  milestone that reads owner-supplied real SEC files offline through the
+  existing boundaries, with only the reviewed changes the pilot needs.
+  Repository code still performs no download, discovery, or network access,
+  and the owner sources the files. The pilot is non-canonical. It sets no
+  canonical-policy flag, does not count toward the 82-quarter corpus, and
+  opens no outcome, return, price, ETF holding, QuantConnect, paper, live,
+  deployment, broker, capital, order, or trading surface. Its output is
+  operational evidence only: acceptance, refusal, and quarantine counts with
+  reasons, format-compatibility results, and resource measurements, all
+  hash-bound. Research looks remain `0`. The design must settle `IBPILOT-R01`
+  and `IBPILOT-R02` before any file is read. Reviewer recommendation, not
+  owner wording: keep supplied files and derived snapshots outside the
+  repository, and record only hashes, sizes, counts, and reasons here.
+- **Shared audit (point 4).** Approved to start as a separately scoped,
+  read-only common action. It cannot run from this lane worktree, where
+  shared files are frozen. The owner has not yet named its venue or executor,
+  so this lane records only the authorization.
+- **Pause (point 5).** No IB-3E or other new synthetic diagnostic milestone
+  starts until the pilot reports. Pilot-boundary work is not a synthetic
+  diagnostic and is not paused.
+- **Push.** The owner authorized this round's single push.
+
+### 72.6 Next action
+
+Codex counter-reviews every Claude commit after `07ba33e` (`b758514` and this
+record commit). The next milestone is the pilot design: settle `IBPILOT-R01`
+and `IBPILOT-R02`, and define the pilot's intake, hash binding, and report,
+tested on synthetic fixtures first. Real files are read only after the owner
+supplies them. Canonical IB-2 remains incomplete, and outcomes, historical
+validation, QC parity, paper, deployment, and live capital remain separate
+future gates.
+
+No SEC, EDGAR, network, vendor, provider, credential, licensed row, real
+filing, security master, outcome, ETF holding, QuantConnect
+upload/processing/job/backtest, broker, operator database, scheduler, paper
+deployment, capital, order, live, or trading surface was accessed or changed
+by this review. Authorized outcome looks: **0**. Consumed outcome looks:
+**0**. Research looks: **0**.

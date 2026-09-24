@@ -1253,6 +1253,30 @@ def test_bridge_result_read_requires_cash_exposure_and_target_tracking_before_va
         assert receipt["project_id"] == subject._R181_A2_PROJECT_ID
 
 
+def test_r182_valid_receipt_preserves_authenticated_matched_target_path(
+    bridge_projections, tmp_path,
+):
+    value = bridge_projections["R182"]
+    plan = _bridge_plan(tmp_path, value, "R182")
+    launch = _launched(plan)
+    digest = "b" * 64
+    receipt = subject._valid_result_receipt(
+        plan, launch, {"aggregate_sha256": "a" * 64},
+        {"target_path_sha256": digest}, bridge_run=True,
+    )
+    assert receipt["target_path_sha256"] == digest
+    assert receipt["projection_sha256"] == value.projection_sha256
+    for bad in (None, "not-a-digest", True):
+        with pytest.raises(
+            subject.Cap90QcSubmissionError,
+            match="matched target-path digest is unavailable",
+        ):
+            subject._valid_result_receipt(
+                plan, launch, {"aggregate_sha256": "a" * 64},
+                {"target_path_sha256": bad}, bridge_run=True,
+            )
+
+
 @pytest.mark.parametrize("defect", (
     "negative_cash", "cash_flag", "negative_event_cash", "event_cash_flag",
     "event_cash_missing", "excess_gross", "gross_flag",

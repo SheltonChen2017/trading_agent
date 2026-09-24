@@ -1468,6 +1468,38 @@ def _attest_uploaded_source(plan: Cap90QcPlan, launch: dict, api: QuantConnectCl
             _fail("cap-90 result-time source bytes changed")
 
 
+def _valid_result_receipt(
+    plan: Cap90QcPlan, launch: dict, meta: dict, aggregate: dict,
+    *, bridge_run: bool,
+) -> dict:
+    """Preserve the R182 matched target-path digest before its one-time read ends."""
+    receipt = {
+        "candidate_id": plan.candidate_id, "run_valid": True,
+        "aggregate_sha256": meta["aggregate_sha256"],
+    }
+    if bridge_run:
+        receipt.update({
+            "attempt": plan.attempt,
+            "projection_sha256": plan.projection_sha256,
+            "profile_sha256": plan.profile_sha256,
+            "project_id": launch["project_id"],
+            "backtest_id": launch["backtest_id"],
+        })
+        if plan.candidate_id == "R182":
+            target_path_sha256 = aggregate.get("target_path_sha256")
+            if (
+                type(target_path_sha256) is not str
+                or not _HEX.fullmatch(target_path_sha256)
+            ):
+                _fail("cap-90 matched target-path digest is unavailable")
+            receipt["target_path_sha256"] = target_path_sha256
+    elif plan.attempt == 2:
+        receipt.update({
+            "attempt": 2, "projection_sha256": plan.projection_sha256,
+        })
+    return receipt
+
+
 def read_aggregates_once(plan: Cap90QcPlan, launch: dict, api: QuantConnectClient) -> dict:
     """One read after Completed.; authenticate only META/AGGREGATES."""
     bridge_run = (plan.candidate_id, plan.attempt) in {
@@ -1561,22 +1593,9 @@ def read_aggregates_once(plan: Cap90QcPlan, launch: dict, api: QuantConnectClien
     selected_aggregate = _project_aggregate(aggregate, bridge=bridge_run)
     valid = aggregate["run_valid"] is True
     if valid:
-        valid_receipt = {
-            "candidate_id": plan.candidate_id, "run_valid": True,
-            "aggregate_sha256": meta["aggregate_sha256"],
-        }
-        if bridge_run:
-            valid_receipt.update({
-                "attempt": plan.attempt,
-                "projection_sha256": plan.projection_sha256,
-                "profile_sha256": plan.profile_sha256,
-                "project_id": launch["project_id"],
-                "backtest_id": launch["backtest_id"],
-            })
-        elif plan.attempt == 2:
-            valid_receipt.update({
-                "attempt": 2, "projection_sha256": plan.projection_sha256,
-            })
+        valid_receipt = _valid_result_receipt(
+            plan, launch, meta, aggregate, bridge_run=bridge_run,
+        )
         _write_once(_control_path(plan, "result-valid"), valid_receipt)
     return {"meta": meta, "aggregates": selected_aggregate, "run_valid": valid}
 

@@ -167,6 +167,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     refusal_smoke_projection.py run_contract.py runtime_shard_projection.py
     six_universe_cap90_submission.py six_universe_coverage_submission.py
     six_universe_r181_order_diagnostic.py
+    six_universe_tilt_submission.py
     synthetic_input_transport.py
     """.split()
 )
@@ -1142,6 +1143,18 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.owner_signature_authority
         """.split()
     ),
+    "six_universe_tilt_submission.py": tuple(
+        """
+        __future__ hashlib os re stat time dataclasses pathlib
+        research.quantconnect research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets
+        research.analyst_revisions_v2_qc.six_universe_cap90_submission
+        """.split()
+    ),
     "six_universe_r181_order_diagnostic.py": tuple(
         """
         __future__ hashlib json os re stat datetime decimal pathlib zoneinfo
@@ -1369,6 +1382,7 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "import:os",
         "import:pathlib",
     ),
+    "six_universe_tilt_submission.py": ("import:os", "import:pathlib"),
 }
 
 _QC_RUNTIME_IMPORTS = {
@@ -3599,6 +3613,10 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "research.analyst_revisions_v2_qc.six_universe_coverage_submission",
             "research.quantconnect",
         ),
+        (
+            "research.analyst_revisions_v2_qc.six_universe_tilt_submission",
+            "research.quantconnect",
+        ),
     )
 )
 
@@ -4162,6 +4180,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.six_universe_cap90_submission",
         "research.analyst_revisions_v2_qc.six_universe_coverage_submission",
         "research.analyst_revisions_v2_qc.six_universe_r181_order_diagnostic",
+        "research.analyst_revisions_v2_qc.six_universe_tilt_submission",
         "research.analyst_revisions_v2_qc.synthetic_input_transport",
     )
     assert boundary_edges == _PINNED_REPOSITORY_BOUNDARY_EDGES

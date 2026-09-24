@@ -23066,6 +23066,59 @@ attempts. The result reader may retain only the two canonical custom
 statistics and bounded derived diagnostics. No QC run or result is claimed
 in this preregistration paragraph.
 
+**R-181 A3 observed after that freeze.** The existing project `36891750`
+compiled and launched exactly one A3 backtest,
+`188e14446c4c33dcb045854da64e51c7`. It reached `Completed.` and the
+one permitted canonical META/AGGREGATES read authenticated
+`run_valid=true`: 6,315 submitted and filled orders, zero invalid or
+canceled, nonnegative observed cash (minimum daily close
+`15832.95614`), maximum end-day gross exposure `0.9849784912822988`,
+mean target-weight L1 error `0.00331880430736094`, and maximum
+`0.00818125836284742`. The preliminary cumulative return was
+`0.96628735468236` (+96.63%), maximum drawdown approximately −22.03%,
+annualized volatility approximately 20.60%, and zero-rate Sharpe
+approximately 0.763. These are exploratory, single-window results, **not**
+an analyst-selection effect or formal alpha claim; they are not compared to
+R-181 A2's invalid account path. The launch spends one shared research look
+and one ARV2 development evaluation; cumulative historical look totals
+remain unreconciled as noted in section 178.4. A3 consumes R-181's final
+allowed attempt (three of three), whether or not a later interpretation
+changes. The valid A3 receipt opens only the prospective R-182 matched-role
+gate, not R-183, leverage, paper/live, deployment, or trading.
+
+### 179.2 Prospective R-184 matched-stock revision-weight tilt
+
+The separate exploratory tilt is not a substitute for an invalid R-181 or
+R-182. It may launch only after both have authenticated `run_valid=true`
+receipts, and its source is bound to R-182's *same* bridge execution policy.
+The tilt selects precisely R-182's count-matched, market-cap-chosen stock
+identities per sleeve; analyst-revision scores only redistribute stock
+weights within each sleeve by a frozen maximum 20% per-stock change. Zero
+or missing scores are neutral. The six equal sleeve budgets, 98% target,
+9.8% aggregate duplicate cap, own-ETF fallbacks, 261 decisions, 1,255
+sessions, modeled costs, and order-based QC execution remain as in the
+matched predecessor. The R-182 valid result receipt must preserve its
+authenticated `target_path_sha256`, and R-184's completed aggregate must
+report the same `matched_baseline_target_path_sha256`; a role/profile match
+alone is insufficient evidence of an identical selected-stock path.
+
+The candidate is `R-184 A1` in a new private project named
+`107 ARV2 SIX CAP90 TILT R184 2021 2025`, exact backtest name
+`ARV2 R184A1 six cap90 bridge tilt 2021 2025 8fdb1e05`, profile SHA-256
+`e0c77820c37b394a88ab7cfc95370b1ce6218c0860ee264fc52bad9b93ada9b2`,
+and sixteen-file projection SHA-256
+`8fdb1e051c1e9620c1a126dd9d2bd09c1eb298d9dd8ae1d4e7d07ada61af9afc`
+(422,728 bytes). Its separate runtime is SHA-256
+`d6cd9f963e4754e134d1a6116ee300711ad7e28bc0e4b95f15e241d7e22f1489`
+and target builder SHA-256
+`b063c5bca9e4aa13e2deff66726cc4b6c12c405845921c1ee39bbe653f266506`.
+It inherits the R-182 bridge's observed cash, gross, zero-invalid-order,
+and target-tracking gates and uses the owner's narrow exploratory signature
+waiver, one-use O_EXCL claim, exact source/project checks, and one aggregate
+result read. R-183 remains the separate signed ETF-basket candidate; its
+`106` project identity is not reused. No R-184 launch or result is claimed
+here before the predecessor gates clear.
+
 **Validation so far.** The changed/new diagnostic, launcher, projection,
 runtime, closure, lane-record, and active-document test selection produced
 277 passed in 57.10 seconds on Python 3.13.15; targeted red/green tests

@@ -541,6 +541,17 @@ def test_period_count_and_endpoints_reject_matching_constant_drift(
     ):
         replace(policy, first_period="2005Q4")
 
+    # The last endpoint needs its own pin: without it, only the literal
+    # fingerprint catches a coherent last-period drift, so the specific
+    # endpoint cross-check can be deleted without any test noticing.
+    monkeypatch.setattr(policy_module, "CANONICAL_IB2_SOURCE_FIRST_PERIOD", "2006Q1")
+    monkeypatch.setattr(policy_module, "CANONICAL_IB2_SOURCE_LAST_PERIOD", "2026Q3")
+    with pytest.raises(
+        policy_module.CanonicalIb2SourcePolicyError,
+        match="filing-quarter coverage is not exact",
+    ):
+        replace(policy, last_period="2026Q3")
+
 
 @pytest.mark.parametrize(("field_name", "constant_name"), CONSTANT_BOUND_FIELDS)
 def test_policy_refuses_matching_constant_and_field_drift(

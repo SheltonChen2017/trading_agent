@@ -1,17 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEWED THE SYNTHETIC-FIRST NONCANONICAL SEC PILOT CONTRACT
-THROUGH PUSHED COMMIT `4d0cbf3b`; CODEX COUNTER-REVIEWED IT IN SECTION 76
-AND COMMITTED THE RECORD CORRECTIONS LOCALLY. THE CONTRACT REMAINS PURE AND
-ZERO-I/O. BY THE OWNER'S LATER, EXACT ZIP-DOWNLOAD AND DIRECT-GIT TRANSFER
-REQUESTS, ALL 82 PUBLIC SEC QUARTERLY FORM 3/4/5 ZIPS FROM 2006Q1 THROUGH
-2026Q2 AND THEIR PROVENANCE MANIFEST ARE TRACKED AS ORIGINAL BYTES IN THE
-LANE'S OTHERWISE IGNORED `artifacts/` FOLDER; SECTION 77 RECORDS THEIR
-VALIDATION AND NARROW TRACKING EXCEPTION. THIS ZIP-ONLY INTAKE DOES NOT SUPPLY THE
+Status: **CLAUDE REVIEWED THE CODEX COUNTER-REVIEW `a4192546`, THE INTAKE
+RECORD `e24584a5`, AND THE 82-ZIP TRACKING COMMIT `bde56714` IN SECTION 78;
+ALL THREE ARE ACCEPTED, WITH THREE P3 RECORD-PRECISION ITEMS AND ONE
+PROJECT-LEVEL REPOSITORY-SIZE OBSERVATION DOCUMENTED AND NOT FIXED. ONE
+PRE-EXISTING LANE P2 IS OPEN FOR CODEX: IB-1A REFUSES ALL 82 REAL ARCHIVES
+BECAUSE EACH HOLDS TWO NON-TABLE MEMBERS (`IBZIP-CR04`). ALL 82
+PUBLIC SEC QUARTERLY FORM 3/4/5 ZIPS VERIFY AGAINST THEIR MANIFEST AND THEIR
+COMMITTED BLOBS, AND EVERY ZIP PASSES A CRC TEST. NO LANE CODE OR TEST
+CHANGED IN THIS ROUND. THE ZIP-ONLY INTAKE STILL DOES NOT SUPPLY THE
 MATCHING FORM 4/4-A PRIMARY XML OR ACCEPTANCE METADATA, COMPLETE THE OFFLINE
-PILOT, OR ESTABLISH CANONICAL IB-2 COMPLETENESS. NO OUTCOME, QC, PAPER, LIVE,
-DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK
-COUNTERS REMAIN ZERO.**
+PILOT, OR ESTABLISH CANONICAL IB-2 COMPLETENESS. CODEX COUNTER-REVIEW OF
+THIS ROUND IS NEXT. NO OUTCOME, QC, PAPER, LIVE, DEPLOYMENT, BROKER,
+CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK COUNTERS REMAIN
+ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -185,6 +187,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-24 | Codex counter-review + implementation | `922a35b..23c8634` reviewed; `23c8634` -> `6f1ffbc` implementation snapshot (this record commit follows) | Claude canonical-source-policy counter-review plus synthetic-first noncanonical SEC pilot contracts | Accepted `b758514`; accepted `922a35b` after the two append-only section-73 P3 corrections. Added a pure zero-I/O pilot manifest, raw accession-candidate inventory, exact verbatim artifact identities, explicitly derived flat IB-1C byte/profile identities, source-backed cross-period amendment lineage, named operational accounting, exact manifest-derived resources and stage binding, and a sealed zero-authority report. `IBPILOT-R01` and `IBPILOT-R02` close as design items without reading a real file or changing IB-1A through IB-1E. | Python 3.13.15 / pytest 9.1.1. Focused pilot contracts **115 passed**; related IB-1A-through-IB-1E set **551 passed, 7 skipped**; recurring lane gate only **2,073 passed, 8 skipped**; final targeted mutation audit **115 baseline, 0 material survivors**; compileall exit **0**; staged diff clean. No complete repository suite was run, per owner direction. No real file, network, provider, outcome, QC, broker, operator, scheduler, or trading access; authorized/consumed outcome looks and research looks all **0**. | Section 73 closes `IB2SRC-CCR01/02`. Pre-commit adversarial review found and corrected `IBPILOT-REV01` through `IBPILOT-REV15` plus `IBPILOT-R03`; section 74 retains every disposition. No open P0-P2 remains in the lane-owned diff. `IB2SRC-CR03` and out-of-lane `IBSH-CR01` remain non-blocking. | Commit this record and make the round's single push. Claude reviews every commit in `922a35b..PUSHED_HEAD`. Only after acceptance may the owner-supplied external-file pilot run; new IB-3E diagnostics remain paused. |
 | 2026-09-24 | Claude review | `390d4e88` -> this review record | Review of the canonical-source counter-review `23c86348`, the synthetic-first noncanonical SEC pilot contracts `6f1ffbc5`, and the record `390d4e88` (`922a35b2..390d4e88`); every earlier commit since `31b3fcc` already carries a Claude disposition in sections 58-72 | Verified isolation, the owner authorization in 72.5, zero I/O at the import level, and zero authority; reproduced the focused 115 and the lane gate; ran an independent identity/determinism probe and a bytecode-safe targeted mutation sweep per IB2SRC-CR03. Full detail in section 75, including the required 1-10 rating. | Focused 115 passed on the reviewed commit and 116 after the added regression; lane gate 2,074 passed, 8 skipped in 353.11s (2,073 recorded plus the one added regression); compileall exit 0; `git diff --check` clean; module restored byte-identical after every mutant; no complete repository suite run, per owner direction. No SEC/provider, credential, licensed row, real filing, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | Accepted after a test-only correction (`cb443356`); design, isolation, zero I/O, and zero authority verified; one sole guard was untested (`IBPILOT-CR01`). Findings are in section 75.7. No real file was read; real-format compatibility remains unmeasured. | Codex counter-reviews this review round. Next bounded action is the authorized offline pilot on owner-supplied files; nothing started by inference. |
 | 2026-09-24 | Codex counter-review | `390d4e88..4d0cbf3b` (two Claude commits) -> this local-only record commit | Counter-review the duplicate-field regression `cb443356` and Claude's section-75 review `4d0cbf3b`; no next implementation because the owner confirmed the required offline files do not yet exist | Accepted the test-only correction after independently making its sole guard fail in memory, and accepted Claude's review after section-76 P3 record corrections. Clarified the review's severity, final-tree validation counts, historical mutation evidence, and current handoff status. No product code or test changed in this counter-review. | Python 3.13.14 / pytest 9.1.1. Focused pilot suite **116 passed**; recurring Insider lane gate **2,074 passed, 8 skipped in 402.02s**; in-memory duplicate-guard mutant **1 failed, 115 passed** with only the added regression failing; final record/active-document checks and compileall are recorded in section 76. No complete repository suite run, per owner direction; no SEC, real filing, outcome, QC, broker, or trading access; **0 looks**. | `cb443356` accepted; `4d0cbf3b` accepted after the section-76 P3 corrections. No open lane-owned P0-P2. `IBSH-CR01` remains shared/out of lane and unfixed. | Hold the counter-review commit locally while the offline pilot lacks owner-supplied files and provenance. No pilot runner, real-file run, or push is started; when inputs arrive, complete the authorized bounded pilot and make at most one combined push. |
+| 2026-09-24 | Claude review | `bde56714` -> this review record | Review of `4d0cbf3b..bde56714`: the Codex counter-review `a4192546`, the intake record `e24584a5`, and the owner-authorized tracking of the 82 SEC quarterly ZIPs `bde56714` (three commits, zero merges) | Verified isolation and the recorded authorization; accepted all three section-76 counter-review findings; reproduced the manifest hash, all 82 ZIP sizes, SHA-256s, and committed-blob identities, the byte total, quarter contiguity, the ZIP CRC test, and the fit against IB-1A limits; confirmed both lane ZIP-URL grammars accept all 82 real URLs. Full detail in section 78, including the required 1-10 rating. | Lane gate on `bde56714` 2,074 passed, 8 skipped in 386.24s; record/active-document checks 70 passed in 6.17s; compileall exit 0; `git diff --check` clean; CRC **82 passed, 0 failed** (Python `zipfile.testzip`; recorded 82/0); no complete repository suite run, per owner direction. No SEC/EDGAR, network, provider, credential, licensed row, filing content, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | `a4192546` accepted; `e24584a5` accepted with a discipline note; `bde56714` accepted after verification, with the pre-existing P2 `IBZIP-CR04` (IB-1A refuses all 82 real archives) opened for Codex. Three P3 record items and one project-level repository-size observation documented, not fixed (78.6, 78.7); one pre-existing lane P2 (`IBZIP-CR04`) documented for Codex. No lane code or test changed. | Codex counter-reviews this review round. The offline pilot still needs its matching XML/metadata bundle; nothing started by inference. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -10106,3 +10109,166 @@ focused implementation-record and active-document checks passed **70** in
 **2.21 seconds** before this validation paragraph; the final record-only edit
 is rechecked before commit. No complete repository suite or real-file pilot
 was run.
+
+## 78. Claude review - Codex counter-review of the pilot-contract review and the owner-authorized 82-ZIP intake (2026-09-24 UTC)
+
+Reviewer: Claude, in the lane worktree
+`C:\git\customizedAgent\trading_agent_insider` on `codex/strategy-insider-buying`.
+No branch, worktree, fork, or handoff was created or switched to. The
+worktree was already at the pushed head `bde56714` and clean when this review
+began, because Codex commits in this same checkout.
+
+Range: `4d0cbf3b..bde56714`, three commits, zero merges, `4d0cbf3b` an
+ancestor of `bde56714`: `a4192546` (Codex counter-review of section 75, record
+only), `e24584a5` (intake record, record only), and `bde56714` (`.gitignore`
+comment, 82 SEC quarterly ZIPs, a nested `.gitattributes`, the provenance
+manifest, and the record).
+
+Authority: section 77 records two later, exact owner requests made to Codex:
+download all 82 public quarterly Form 3/4/5 ZIPs using the configured Git
+identity as the SEC contact, then push them through ordinary Git rather than
+Git LFS after being told this adds about 0.92 GB to repository history. This
+reviewer did not witness those requests; the owner's present instruction to
+review the pushed commits is consistent with them, and the lane's frozen
+source policy (section 70) already named these 82 quarters as the canonical
+span. This review made no SEC, EDGAR, or network request, downloaded nothing,
+and parsed no ZIP member. Every check below is structural: byte hashes,
+sizes, Git blob identity, ZIP CRC, and central-directory inventory. Per the
+owner's standing direction the lane gate is the validation standard; **no
+complete repository suite was run and none is represented**.
+
+### 78.1 Isolation and scope
+
+`a4192546` and `e24584a5` touch only this record. `bde56714` touches two
+out-of-lane locations: the shared `.gitignore` (a comment only; `artifacts/`
+stays ignored and the files are force-tracked) and the new
+`artifacts/sec_insider/raw/` tree. Both are covered by the recorded owner
+authorization and are not reverted. Their project-level consequences are
+documented in 78.7 and not fixed here. This review changes only this record.
+
+### 78.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `a4192546` | Counter-review of `cb443356`/`4d0cbf3b`; three P3 record corrections | **Accepted.** Deleted lines are the mutable top status block only. All three corrections are fair and are adopted in 78.3. |
+| `e24584a5` | Section 77 as first written: ZIPs local and untracked | **Accepted with a discipline note.** Its section 77 stated the ZIPs were not committed and would need an approved transfer path; `bde56714` rewrote those sentences in place (`IBZIP-CR02`). |
+| `bde56714` | Track the 82 ZIPs, manifest, attributes; `.gitignore` comment | **Accepted after verification. The recorded authorization is narrow and honoured, all 82 files verify byte for byte against the manifest and the committed blobs, and the project-level consequences are documented in 78.7. The intake also exposed a pre-existing lane defect: IB-1A cannot accept a single real quarter (`IBZIP-CR04`, P2, documented for Codex, not corrected here).** |
+
+### 78.3 Codex counter-review findings on section 75
+
+- `IBPILOT-CCR01` (severity of `IBPILOT-CR01`): accepted. A missing test for
+  a correct guard is weak test sensitivity, P3 under the review severity
+  guide; the finding, the regression, and its isolation stand.
+- `IBPILOT-CCR02` (stale top status): accepted. This reviewer left the status
+  block saying review was awaited after section 75 recorded completion. This
+  round updates the status block to describe the reviewed tree.
+- `IBPILOT-CCR03` (mixed counts under "on the exact commit"): accepted. The
+  exact sequence is 115 focused and 2,073 lane passes on `390d4e88`, then 116
+  and 2,074 after `cb443356`; the section-5 row carried no separate
+  record-check count. This round keeps pre- and post-change counts apart.
+
+### 78.4 Claims reproduced on the exact commit
+
+- Manifest: working bytes SHA-256 equals the recorded
+  `dc254e4e...f9f76d`; the committed blob equals the working bytes; 82 rows;
+  periods are exactly `2006Q1..2026Q2` in order; every filename is
+  `<period>_form345.zip`; every source URL is HTTPS on `sec.gov` and ends
+  with its filename; one capture commit (`a4192546`); one timestamp basis
+  (local last-write, labelled not SEC-attested); no contact address in the
+  manifest or in any record line added by the range.
+- ZIPs: for all **82 of 82**, the byte size and SHA-256 match the manifest
+  and the index blob ID equals the unfiltered working bytes (no LFS pointer,
+  no filter). Total **921,904,566 bytes (879.2 MiB)**, as recorded; largest
+  17,306,804 bytes; no file at or above GitHub's 50 MiB warning threshold;
+  84 tracked entries under `raw/` (82 ZIPs, manifest, `.gitattributes`) and
+  nothing unexpected.
+- ZIP integrity: CRC test over every member, **82 passed, 0 failed** (Python `zipfile.testzip`; recorded 82/0).
+- Member inventory (central directories only): two member-name sets of ten members each. 2006Q1-2022Q4 (68 quarters) carry the eight SEC tables plus `insider_transactions_metadata.json` and `insider_transactions_readme.htm`; 2023Q1-2026Q2 (14 quarters) carry the same eight tables plus `FORM_345_metadata.json` and `FORM_345_readme.htm`. Largest member 50,575,056 bytes (`2021Q1:FOOTNOTES.tsv`); largest per-archive expanded total 104,561,459 bytes (2021Q1); expanded grand total 5,617,066,490 bytes (5.23 GiB).
+- Fit against the lane's own IB-1A limits (512 MiB archive, 1 GiB member,
+  4 GiB total uncompressed): no per-archive cap is violated (largest archive 17.3 MB, largest member 50.6 MB, largest per-archive expanded total 104.6 MB, maximum compression ratio 24.8 against a cap of 250). The stage never reaches those caps on a real file, because its member-count and inventory rules refuse every one of the 82 archives first: see `IBZIP-CR04`, the material finding of this round.
+- URL grammar: both lane ZIP-URL patterns (`sec_bulk_snapshot` and the pilot
+  contracts) accept all 82 manifest URLs, so neither stage would refuse the
+  real filenames or either official directory.
+- Lane gate over the nineteen Insider files plus active-document,
+  module-hygiene, overlay-import, and ML-import boundaries on `bde56714`:
+  **2,074 passed, 8 skipped in 386.24s** (recorded 2,074 passed, 8 skipped). Record and active-document
+  checks: **70 passed in 6.17s**. `compileall` including `research/`: exit 0.
+  `git diff --check`: clean.
+
+### 78.5 Not verified by this review
+
+The SEC index check, the per-file source URLs, the request identity, and the
+300 ms pacing were a one-off shell operation outside repository code and
+cannot be reproduced without SEC access, which this review does not have.
+The manifest shows two source directories: 81 files under
+`/files/structureddata/data/insider-transactions-data-sets/` and 2026Q2
+under `/files/datastandardsinnovation/data/insider-transactions-data-sets/`.
+Section 77 does not mention the split; it is recorded here so a future
+re-fetch can be compared exactly (`IBZIP-CR03`). No ZIP member was parsed,
+so nothing about filing content, format, or eligibility is claimed.
+
+### 78.6 Findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBZIP-CR01 | P3 | OPEN - record precision; documented, not fixed | `e24584a5`, `bde56714` | Section 5 ledger | Neither intake commit has a section-5 row; the last row (`390d4e88..4d0cbf3b`) ends at the local-only counter-review commit, so the ledger index skips the commits that added 0.92 GB of tracked data. | `grep` of the 2026-09-24 ledger rows: four rows, none naming `e24584a5`, `bde56714`, the ZIPs, or the intake. | The ledger is the lane's per-round index; a reader following it would not learn that data was committed. | None by this review: rows record their own author's work, and this review's row names all three commits so the range is not blind. | Codex to add its own row in the counter-review. |
+| IBZIP-CR02 | P3 | OPEN - record discipline; documented, not fixed | `bde56714` | Section 77 | `e24584a5` wrote section 77 stating the ZIPs were local, untracked, and would need an approved transfer path; `bde56714` rewrote those sentences in place instead of appending the change of decision. The final text does narrate the later push request, but the earlier state survives only in Git history. | `git show bde56714 -- <record>` deletes five section-77 lines ("Neither the ZIPs nor their manifest is committed or pushed; transferring this work to another machine requires an approved artifact-transfer path, not `git pull`"). | Sections and rows are append-only so that decisions can be audited from the record alone. | None; cannot be un-rewritten without a further rewrite. Noted for future rounds. | This section. |
+| IBZIP-CR03 | P3 | OPEN - unverifiable by this review; documentation note | `bde56714` | `artifacts/sec_insider/raw/insider_quarterly_zip_manifest_2006q1_2026q2.csv`; section 77 | The SEC index check and URLs cannot be verified without SEC access. The manifest shows two source directories (81 files under `structureddata`, 2026Q2 under `datastandardsinnovation`), which section 77 does not mention, so a future re-fetch has no recorded expectation for the split. | 78.4 URL census. | A provenance record should state every distinct source location it relied on. | None to the data; the split is recorded in 78.5. | 78.5. |
+| IBZIP-CR04 | P2 | OPEN - lane-specific, pre-existing; documented for Codex implementation, not corrected in this review round | Pre-existing IB-1A (`sec_bulk_snapshot.py`), exposed by `bde56714` | `research/insider_buying/sec_bulk_snapshot.py` lines 380-383 (member count) and 396-401 (inventory) | Every one of the 82 real SEC quarterly ZIPs holds ten members: the eight allowed tables plus a metadata JSON and a readme HTM (`insider_transactions_*` through 2022Q4, `FORM_345_*` from 2023Q1). IB-1A refuses any archive with more than eight members and any member outside `ALLOWED_SEC_TABLES`, so the lane's first real-file stage would refuse all 82 quarters, and the authorized pilot, which invokes the stages unchanged, would report every quarter refused at IB-1A. Canonical IB-2 cannot start on these files as the stage stands. | Central-directory inventory of all 82 ZIPs, then the module's own inventory rule simulated on those names: 82 of 82 refused (68 with `insider_transactions_*` unexpected, 14 with `FORM_345_*` unexpected, none missing a required table). No stage was invoked and no member was parsed. Compression ratios are within the cap (maximum 24.8 against 250). | The stage's synthetic fixtures assumed an eight-table archive; the real archives never had that shape, so this is a contract error in lane code, not a data error. | None in this review: admitting the two non-table members changes the raw snapshot contract (`RAW_SNAPSHOT_CONTRACT_VERSION`), needs a decision on whether their bytes are hashed, retained, or ignored across the two naming eras, and needs real-shape fixtures and tests; that is an implementation milestone for Codex, not a review correction. Recommended: allow exactly the two documented non-table members per era, hash them into the snapshot manifest, keep the eight-table rule for tables, bump the contract version, and add real-shape fixtures. | This row; the pilot's first real run must show IB-1A accepting the archives before any IB-1B claim. |
+
+### 78.7 Project-level consequences (documented, not fixed)
+
+- About 0.92 GB of compressed public data now sits in ordinary Git history on
+  the lane branch. Every clone or fetch of this branch, and of `main` after
+  any merge, transfers it; that includes the other lanes' checkouts on the
+  Codex machine. This was the owner's explicit choice over Git LFS.
+- On this host the shared object store (`C:\git\customizedAgent\trading_agent\.git`,
+  used by six worktrees) holds the 82 blobs as **132 loose objects totalling
+  882.09 MiB** plus six leftover temporary objects (34.65 KiB). Packing them
+  would not shrink already-compressed ZIPs. Repacking or garbage collection
+  in a store shared with other active sessions is not this lane's call.
+- The frozen data-source register lists the SEC Insider Transactions Data
+  Sets as free and available but has no entry for this tracked artifact set,
+  its manifest, or its verification rule; the register is out of lane.
+- `tests/test_module_hygiene.py` still requires `artifacts` in pytest's
+  excluded directories; the tracked ZIPs do not affect collection.
+
+### 78.8 Implementation-quality rating
+
+Per the review process (mandatory 1-10 rating), the intake in `bde56714`
+rates **8 of 10** as an operational milestone. Strengths: a hash-bound
+provenance manifest whose every row reproduces byte for byte; committed blobs
+identical to the unfiltered files with a nested `.gitattributes` preventing
+platform text conversion; a narrow, commented `.gitignore` exception that
+leaves the rest of `artifacts/` ignored; no contact address stored; CRC and
+size checks recorded before commit; honest labelling of the timestamps as a
+local filesystem observation; and an explicit statement that the intake is
+ZIP-only and proves no canonical completeness, format compatibility, or
+signal. Deductions: no section-5 ledger row for the two intake commits
+(`IBZIP-CR01`), an in-place rewrite of section 77 between the two commits
+(`IBZIP-CR02`), and no mention of the two distinct source directories the
+manifest relied on (`IBZIP-CR03`). The counter-review `a4192546` is fair and
+precise. Nothing here is evidence about filing content or market edge.
+
+### 78.9 Validation
+
+- Lane gate on `bde56714` **2,074 passed, 8 skipped in 386.24s**; record and active-document checks
+  **70 passed in 6.17s**; `compileall` exit 0; `git diff --check` clean;
+  82-file hash, size, blob-identity, and CRC checks as in 78.4; no complete
+  repository suite run, per owner direction.
+
+No SEC, EDGAR, network, vendor, provider, credential, licensed row, real
+filing content, security master, outcome, ETF holding, QuantConnect, broker,
+operator-database, scheduler, deployment, capital, order, live, or trading
+surface was accessed. Authorized outcome looks **0**, consumed outcome looks
+**0**, research looks **0**.
+
+### 78.10 Next step
+
+Codex counter-reviews this review round. The authorized offline pilot still
+needs its selected matching Form 4/4-A primary XML and acceptance-metadata
+bundle with exact provenance; the tracked ZIPs do not supply it. Before that
+pilot can accept any quarter, `IBZIP-CR04` must be implemented and reviewed
+as its own bounded milestone. Nothing is
+started by inference, and the shared security-master/calendar audit still has
+no named venue or executor.

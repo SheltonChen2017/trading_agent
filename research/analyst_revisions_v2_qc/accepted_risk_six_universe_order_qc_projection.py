@@ -141,7 +141,12 @@ def _audit_source(project_path, source):
             name = _call_name(node)
             if name in _FORBIDDEN_CALL_NAMES:
                 _error("six-universe projected source called a forbidden capability")
-    if text.count("market_on_open_order(") != (
+        elif isinstance(node, ast.Constant) and node.value == "market_on_open_order":
+            _error("six-universe projected MOO capability inventory changed")
+    if sum(
+        isinstance(node, ast.Attribute) and node.attr == "market_on_open_order"
+        for node in ast.walk(tree)
+    ) != (
         1 if project_path == "accepted_risk_six_universe_order_qc_runtime.py" else 0
     ):
         _error("six-universe projected MOO capability inventory changed")
@@ -225,7 +230,7 @@ class AcceptedRiskSixUniverseOrderQcProjection:
         }
         # The R-177 record shape remains unchanged.  This field is part of
         # the distinct exploratory projection's authenticated semantics only.
-        if self.variant == _runtime.CAP90_VARIANT:
+        if self.variant != "r177":
             record["variant"] = self.variant
         return record
 

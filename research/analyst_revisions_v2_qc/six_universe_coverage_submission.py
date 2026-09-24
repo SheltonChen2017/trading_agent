@@ -23,6 +23,13 @@ from research.quantconnect import API_BASE, QuantConnectClient
 from . import accepted_risk_six_universe_coverage_qc_runtime as coverage
 from . import accepted_risk_six_universe_coverage_qc_projection as source_builder
 from .formal_qc_transport import MAX_RESPONSE_BYTES, _default_http_transport
+from .owner_signature_authority import (
+    FORMAL_EXECUTION_PURPOSE,
+    OwnerSignatureAuthority,
+    OwnerSignatureAuthorityError,
+    load_formal_execution_owner_signature,
+    require_formal_execution_owner_signature,
+)
 
 
 class CoverageQcSubmissionError(ValueError):
@@ -38,6 +45,7 @@ _DEFAULT_FILES = frozenset({"main.py", "research.ipynb"})
 _TICKERS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
 _MAX_FILE = source_builder.MAXIMUM_SOURCE_FILE_BYTES
 _MAX_TOTAL_WITH_MARGIN = source_builder.MAXIMUM_TOTAL_SOURCE_BYTES
+_LAUNCH_PERMIT_SCHEMA = "arv2-six-universe-coverage-qc-owner-launch-permit-v1"
 _R180_PRIOR_SOURCE_ATTESTATION = (
     "R180_MIA_RECONCILED_COUNTS",
     "3d91e1c9c6138a9642154bf1e96124933e5c9c934f538d31413b77a1d0e76876",
@@ -203,6 +211,98 @@ def preview_plan(plan: CoverageQcPlan, projection: object) -> dict[str, object]:
     }
 
 
+def render_owner_launch_permit(plan: CoverageQcPlan, projection: object) -> bytes:
+    """Bind one exploratory counts-only launch to its exact source and destination.
+
+    This schema is distinct from a formal QC execution receipt. The existing
+    formal execution namespace supplies only the reviewed signature verifier.
+    """
+    identity = preview_plan(plan, projection)
+    return _canonical({
+        "schema": _LAUNCH_PERMIT_SCHEMA,
+        "signature_purpose": FORMAL_EXECUTION_PURPOSE,
+        "action": "one_private_exploratory_coverage_backtest_launch",
+        "candidate_id": plan.candidate_id,
+        "attempt": plan.attempt,
+        "organization_id_sha256": hashlib.sha256(
+            plan.organization_id.encode("ascii")
+        ).hexdigest(),
+        "project_name": plan.project_name,
+        "backtest_name": plan.backtest_name,
+        "control_directory": str(plan.control_directory),
+        "projection_sha256": plan.projection_sha256,
+        "profile_id": identity["profile_id"],
+        "profile_sha256": identity["profile_sha256"],
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
+        "symbol_resolution_sha256": plan.symbol_resolution_sha256,
+        "source_files_sha256": hashlib.sha256(
+            _canonical(identity["source_files"])
+        ).hexdigest(),
+        "custom_statistic_names": identity["custom_statistic_names"],
+        "mutating_endpoint_budget": {
+            "projects/create": 1,
+            "files/delete": 1,
+            "files/create": len(identity["source_files"]),
+            "files/update": 1,
+            "compile/create": 1,
+            "backtests/create": 1,
+        },
+        "maximum_backtest_submissions": 1,
+        "result_read_authorized": False,
+        "raw_provider_rows_authorized": False,
+        "prices_returns_orders_authorized": False,
+        "paper_live_deployment_funded_trading_authorized": False,
+    })
+
+
+def load_owner_launch_permit(
+    plan: CoverageQcPlan, projection: object, *,
+    allowed_signers_path: Path, signature_path: Path,
+) -> OwnerSignatureAuthority:
+    """Verify owner-controlled files against the exact coverage launch bytes."""
+    payload = render_owner_launch_permit(plan, projection)
+    try:
+        return load_formal_execution_owner_signature(
+            authority_payload=payload,
+            allowed_signers_path=allowed_signers_path,
+            signature_path=signature_path,
+        )
+    except OwnerSignatureAuthorityError as exc:
+        raise CoverageQcSubmissionError(
+            "coverage owner launch signature is unavailable"
+        ) from exc
+
+
+def _require_owner_launch_permit(
+    plan: CoverageQcPlan, projection: object,
+    owner_signature: OwnerSignatureAuthority | None,
+) -> dict[str, str]:
+    payload = render_owner_launch_permit(plan, projection)
+    try:
+        verified = require_formal_execution_owner_signature(
+            owner_signature, authority_payload=payload,
+        )
+    except OwnerSignatureAuthorityError as exc:
+        raise CoverageQcSubmissionError(
+            "coverage owner launch signature is unavailable"
+        ) from exc
+    if (
+        verified.purpose != FORMAL_EXECUTION_PURPOSE
+        or verified.authority_payload_sha256 != hashlib.sha256(payload).hexdigest()
+        or type(verified.authority_sha256) is not str
+        or _HEX.fullmatch(verified.authority_sha256) is None
+        or type(verified.signature_sha256) is not str
+        or _HEX.fullmatch(verified.signature_sha256) is None
+    ):
+        _fail("coverage owner launch signature identity changed")
+    return {
+        "owner_signature_authority_sha256": verified.authority_sha256,
+        "owner_signature_sha256": verified.signature_sha256,
+        "owner_signed_payload_sha256": verified.authority_payload_sha256,
+    }
+
+
 def _client(api: QuantConnectClient) -> None:
     if (
         type(api) is not QuantConnectClient
@@ -287,7 +387,7 @@ def _write_once(path: Path, value: dict) -> None:
         raise CoverageQcSubmissionError("coverage one-use control was already spent") from None
 
 
-def _claim_attempt(plan: CoverageQcPlan, preview: dict) -> None:
+def _claim_attempt(plan: CoverageQcPlan, preview: dict, signature: dict[str, str]) -> None:
     for ordinal in range(1, 4):
         claim = _path(plan, "claim", ordinal)
         terminal = _path(plan, "terminal", ordinal)
@@ -300,6 +400,7 @@ def _claim_attempt(plan: CoverageQcPlan, preview: dict) -> None:
         elif claim.exists() or terminal.exists():
             _fail("coverage attempt already exists")
     _write_once(_path(plan, "claim"), {
+        **signature,
         "candidate_id": plan.candidate_id,
         "attempt": plan.attempt,
         "project_name": plan.project_name,
@@ -327,9 +428,11 @@ def _project(response: dict, plan: CoverageQcPlan) -> int:
 
 def prepare_and_launch_once(
     plan: CoverageQcPlan, projection: object, api: QuantConnectClient,
+    *, owner_signature: OwnerSignatureAuthority | None = None,
 ) -> dict[str, object]:
     """Create one fresh project, verify exact source, compile, and launch once."""
     preview = preview_plan(plan, projection)
+    signature = _require_owner_launch_permit(plan, projection, owner_signature)
     _client(api)
     if _path(plan, "claim").exists():
         _fail("coverage attempt already exists")
@@ -340,7 +443,7 @@ def prepare_and_launch_once(
         for row in inventory
     ):
         _fail("coverage project name is not fresh")
-    _claim_attempt(plan, preview)
+    _claim_attempt(plan, preview, signature)
     project_id = _project(_post(api, "projects/create", {
         "name": plan.project_name, "language": "Py",
         "organizationId": plan.organization_id,
@@ -432,6 +535,7 @@ def prepare_and_launch_once(
     ):
         _fail("coverage backtest launch identity changed")
     receipt = {
+        **signature,
         "candidate_id": plan.candidate_id, "attempt": plan.attempt,
         "project_id": project_id, "project_name": plan.project_name,
         "compile_id": compile_id, "backtest_id": backtest_id,
@@ -746,4 +850,5 @@ __all__ = (
     "CoverageQcPlan", "CoverageQcSubmissionError", "preview_plan",
     "prepare_and_launch_once", "poll_status_once", "production_client",
     "read_counts_once", "read_imported_counts_once",
+    "render_owner_launch_permit", "load_owner_launch_permit",
 )

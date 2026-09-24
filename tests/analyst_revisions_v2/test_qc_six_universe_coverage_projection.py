@@ -22,6 +22,8 @@ PACKAGE_PATH = Path(
 
 @pytest.fixture(scope="module")
 def loaded_delta():
+    if not PACKAGE_PATH.is_dir():
+        pytest.skip("local gitignored ARV2 delta package is unavailable")
     return delta.load_accepted_risk_delta_order_package(
         PACKAGE_PATH,
         expected_package_sha256=delta.EXPECTED_DELTA_PACKAGE_SHA256,

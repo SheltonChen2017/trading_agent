@@ -4,12 +4,15 @@ from __future__ import annotations
 
 import copy
 import dataclasses
+import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from research.quantconnect import QuantConnectClient, QuantConnectCredentials
+from research.analyst_revisions_v2_qc.owner_signature_authority import OwnerSignatureAuthorityError
 from research.analyst_revisions_v2_qc import (
     accepted_risk_delta_order_package as delta,
     accepted_risk_six_universe_coverage_qc_projection as projection_builder,
@@ -27,6 +30,8 @@ PACKAGE_PATH = Path(
 
 @pytest.fixture(scope="module")
 def projection():
+    if not PACKAGE_PATH.is_dir():
+        pytest.skip("local gitignored ARV2 delta package is unavailable")
     package = delta.load_accepted_risk_delta_order_package(
         PACKAGE_PATH,
         expected_package_sha256=delta.EXPECTED_DELTA_PACKAGE_SHA256,
@@ -179,6 +184,113 @@ def _client(monkeypatch, fake):
     )
 
 
+def _allow_owner_signature(monkeypatch, plan, projection):
+    """Verify the exact rendered launch bytes without using an owner private key."""
+    payload = subject.render_owner_launch_permit(plan, projection)
+    signature = object()
+    verified = SimpleNamespace(
+        purpose=subject.FORMAL_EXECUTION_PURPOSE,
+        authority_payload_sha256=hashlib.sha256(payload).hexdigest(),
+        authority_sha256="a" * 64,
+        signature_sha256="b" * 64,
+    )
+    calls = []
+
+    def require(value, *, authority_payload):
+        calls.append((value, authority_payload))
+        if value is not signature or authority_payload != payload:
+            raise OwnerSignatureAuthorityError("wrong signed coverage payload")
+        return verified
+
+    monkeypatch.setattr(subject, "require_formal_execution_owner_signature", require)
+    return signature, calls
+
+
+def test_unsigned_coverage_launch_refuses_before_any_qc_or_claim(
+    monkeypatch, tmp_path, projection,
+):
+    plan = _plan(tmp_path, projection)
+    fake = FakeQc(plan, projection)
+    api = _client(monkeypatch, fake)
+    with pytest.raises(subject.CoverageQcSubmissionError, match="owner launch signature"):
+        subject.prepare_and_launch_once(plan, projection, api)
+    assert fake.calls == []
+    assert not plan.control_directory.exists()
+
+
+def test_coverage_permit_binds_exact_attempt_source_and_single_counts_only_run(
+    tmp_path, projection,
+):
+    plan = _plan(tmp_path, projection)
+    raw = subject.render_owner_launch_permit(plan, projection)
+    permit = json.loads(raw)
+    assert subject._canonical(permit) == raw
+    assert permit["schema"] == subject._LAUNCH_PERMIT_SCHEMA
+    assert permit["signature_purpose"] == subject.FORMAL_EXECUTION_PURPOSE
+    assert permit["action"] == "one_private_exploratory_coverage_backtest_launch"
+    assert permit["candidate_id"] == plan.candidate_id
+    assert permit["attempt"] == 1
+    assert permit["projection_sha256"] == projection.projection_sha256
+    assert permit["profile_sha256"] == projection.profile_sha256
+    assert permit["symbol_resolution_sha256"] == plan.symbol_resolution_sha256
+    assert permit["maximum_backtest_submissions"] == 1
+    assert permit["mutating_endpoint_budget"]["backtests/create"] == 1
+    assert permit["result_read_authorized"] is False
+    assert permit["prices_returns_orders_authorized"] is False
+    assert permit["paper_live_deployment_funded_trading_authorized"] is False
+    for changed in (
+        dataclasses.replace(plan, attempt=2),
+        dataclasses.replace(plan, candidate_id="OTHER_DIAGNOSTIC"),
+        dataclasses.replace(plan, project_name=plan.project_name + " changed"),
+        dataclasses.replace(plan, backtest_name=plan.backtest_name + " changed"),
+        dataclasses.replace(plan, organization_id="b" * 32),
+        dataclasses.replace(plan, symbol_resolution_sha256=None),
+        dataclasses.replace(plan, control_directory=tmp_path / "another"),
+    ):
+        assert subject.render_owner_launch_permit(changed, projection) != raw
+    assert not plan.control_directory.exists()
+
+
+def test_coverage_permit_loader_uses_exact_rendered_bytes(
+    monkeypatch, tmp_path, projection,
+):
+    plan = _plan(tmp_path, projection)
+    allowed = tmp_path / "allowed-signers"
+    detached = tmp_path / "launch.sig"
+    observed = []
+    sentinel = object()
+
+    def load(**kwargs):
+        observed.append(kwargs)
+        return sentinel
+
+    monkeypatch.setattr(subject, "load_formal_execution_owner_signature", load)
+    assert subject.load_owner_launch_permit(
+        plan, projection, allowed_signers_path=allowed, signature_path=detached,
+    ) is sentinel
+    assert observed == [{
+        "authority_payload": subject.render_owner_launch_permit(plan, projection),
+        "allowed_signers_path": allowed, "signature_path": detached,
+    }]
+
+
+def test_coverage_wrong_signed_scope_refuses_before_any_qc_or_claim(
+    monkeypatch, tmp_path, projection,
+):
+    plan = _plan(tmp_path, projection)
+    fake = FakeQc(plan, projection)
+    api = _client(monkeypatch, fake)
+    signature, checks = _allow_owner_signature(monkeypatch, plan, projection)
+    changed = dataclasses.replace(plan, backtest_name=plan.backtest_name + " changed")
+    with pytest.raises(subject.CoverageQcSubmissionError, match="owner launch signature"):
+        subject.prepare_and_launch_once(
+            changed, projection, api, owner_signature=signature,
+        )
+    assert len(checks) == 1
+    assert fake.calls == []
+    assert not plan.control_directory.exists()
+
+
 def test_preview_is_local_bounded_and_omits_organization(tmp_path, projection):
     plan = _plan(tmp_path, projection)
     preview = subject.preview_plan(plan, projection)
@@ -197,13 +309,25 @@ def test_launch_and_count_read_are_one_use_and_ignore_unrelated_results(
     fake = FakeQc(plan, projection)
     api = _client(monkeypatch, fake)
     monkeypatch.setattr(subject.time, "sleep", lambda _: None)
-    launch = subject.prepare_and_launch_once(plan, projection, api)
+    signature, checks = _allow_owner_signature(monkeypatch, plan, projection)
+    launch = subject.prepare_and_launch_once(
+        plan, projection, api, owner_signature=signature,
+    )
+    assert len(checks) == 1
+    assert launch["owner_signature_sha256"] == "b" * 64
+    assert launch["owner_signed_payload_sha256"] == hashlib.sha256(
+        subject.render_owner_launch_permit(plan, projection)
+    ).hexdigest()
+    claim = subject._read_control(subject._path(plan, "claim"))
+    assert claim["owner_signature_sha256"] == "b" * 64
     assert fake.compile_reads == 2
     assert sum(path == "backtests/create" for path, _ in fake.calls) == 1
     assert len(fake.files) == 9
     prior_calls = len(fake.calls)
     with pytest.raises(subject.CoverageQcSubmissionError, match="already exists"):
-        subject.prepare_and_launch_once(plan, projection, api)
+        subject.prepare_and_launch_once(
+            plan, projection, api, owner_signature=signature,
+        )
     assert len(fake.calls) == prior_calls
     assert subject.poll_status_once(plan, launch, api) == "Completed."
     counts = subject.read_counts_once(plan, launch, api)
@@ -216,13 +340,41 @@ def test_launch_and_count_read_are_one_use_and_ignore_unrelated_results(
     assert len(fake.calls) == prior_calls
 
 
+def test_existing_unsigned_coverage_receipt_remains_readable(
+    monkeypatch, tmp_path, projection,
+):
+    """The new launch gate does not erase an already completed R180 receipt."""
+    plan = _plan(tmp_path, projection)
+    fake = FakeQc(plan, projection)
+    api = _client(monkeypatch, fake)
+    legacy_launch = {
+        "candidate_id": plan.candidate_id, "attempt": plan.attempt,
+        "project_id": 123, "project_name": plan.project_name,
+        "compile_id": "compile-1", "backtest_id": "backtest-1",
+        "backtest_name": plan.backtest_name,
+        "projection_sha256": plan.projection_sha256,
+        "profile_id": projection.profile_id,
+        "profile_sha256": projection.profile_sha256,
+    }
+    subject._write_once(subject._path(plan, "launch"), legacy_launch)
+    assert subject.poll_status_once(plan, legacy_launch, api) == "Completed."
+    result = subject.read_counts_once(plan, legacy_launch, api)
+    assert result["sleeves"]["SPY"]["totals"]["decision_count"] == 261
+    assert not any(name in legacy_launch for name in (
+        "owner_signature_sha256", "owner_signed_payload_sha256",
+    ))
+
+
 def test_source_readback_change_stops_before_compile(monkeypatch, tmp_path, projection):
     plan = _plan(tmp_path, projection)
     fake = FakeQc(plan, projection)
     fake.corrupt_readback = True
     api = _client(monkeypatch, fake)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, projection)
     with pytest.raises(subject.CoverageQcSubmissionError, match="readback bytes"):
-        subject.prepare_and_launch_once(plan, projection, api)
+        subject.prepare_and_launch_once(
+            plan, projection, api, owner_signature=signature,
+        )
     assert not any(path == "compile/create" for path, _ in fake.calls)
     assert (plan.control_directory / "COVERAGE_DIAGNOSTIC-A1-claim.json").exists()
 
@@ -338,7 +490,10 @@ def test_unknown_custom_statistic_is_refused_after_one_read(monkeypatch, tmp_pat
     fake.statistics["ARV2_SIX_COVERAGE_RAW"] = "secret"
     api = _client(monkeypatch, fake)
     monkeypatch.setattr(subject.time, "sleep", lambda _: None)
-    launch = subject.prepare_and_launch_once(plan, projection, api)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, projection)
+    launch = subject.prepare_and_launch_once(
+        plan, projection, api, owner_signature=signature,
+    )
     subject.poll_status_once(plan, launch, api)
     with pytest.raises(subject.CoverageQcSubmissionError, match="inventory"):
         subject.read_counts_once(plan, launch, api)
@@ -364,7 +519,10 @@ def test_qc_computed_resolution_digest_is_not_invented_before_run(
     api = _client(monkeypatch, fake)
     monkeypatch.setattr(subject.time, "sleep", lambda _: None)
     assert subject.preview_plan(plan, projection)["quantconnect_io_performed"] is False
-    launch = subject.prepare_and_launch_once(plan, projection, api)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, projection)
+    launch = subject.prepare_and_launch_once(
+        plan, projection, api, owner_signature=signature,
+    )
     assert subject.poll_status_once(plan, launch, api) == "Completed."
     assert subject.read_counts_once(plan, launch, api)["meta"]["symbol_resolution_sha256"] == "d" * 64
 

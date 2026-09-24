@@ -90,6 +90,8 @@ Section 178 is Claude's independent review of the forty-four-commit range
 lane-record gates that were red at the pushed head are corrected by
 test-only and record commits, and the unsigned exploratory launchers
 (`ARV2R178-001`) stay open before any R-181 A3 or comparator launch.
+Section 179 counter-reviews Claude's three commits and records the bounded
+R-181 A2 order diagnosis. It creates no valid result or later QC launch.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -551,10 +553,20 @@ record the post-R-177 diagnostic, the R-180 counts-only coverage read, the
 cap-90 R-181 family, its A1 upload refusal, and its A2 invalid execution
 (22 `Invalid` orders, `run_valid=false`). Section 178 is Claude's
 independent review of the exact pushed range `87dd82f..b2df5ea`, with the
-test-only corrections `2bd3368` and `865ae3b`. The immediate next step is
-that Codex counter-reviews section 178 and the exact pushed range, closes or
-explicitly waives `ARV2R178-001` before any R-181 A3 or comparator launch,
-and diagnoses the 22 invalid orders before spending the last R-181 attempt.
+test-only corrections `2bd3368` and `865ae3b`. Claude will review section 179
+after Codex's single final push; it records Codex's counter-review of all
+three Claude commits and bounded, redacted R-181 A2
+order diagnostics: all 22 invalid orders were buys rejected before 09:30 New
+York time for insufficient buying power. R-181 remains invalid, its A3 attempt
+is unspent, and no R-182 or tilt comparison has launched. Before A3, freeze
+and test the owner's prospective 2x buying-power admission bridge while
+preserving the 98% target and bounding observed cash, gross exposure, and
+target tracking. Detached signatures are explicitly waived only for
+exploratory R-181 A3, R-182, and the separate tilt candidate; exact one-use
+claims and source gates remain required. R-182's
+existing A2-valid predecessor pin must be prospectively changed to the actual
+authenticated A3 result if valid; an invalid A2 cannot yield a clean matched
+spread. The separately versioned tilt candidate is local and unlaunched.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. V15 and R-170 remain immutable, no R-170
 aggregate may be read, no R-169 diagnostic may be relabelled, and R-138
@@ -22906,3 +22918,162 @@ Not exercised here: no QuantConnect endpoint, result read, or launcher was
 run, so the R-180 counts and the R-181 A2 figures are taken from sections
 173.3 and 176.2 exactly as recorded, and the launchers' live behaviour
 against the private projects is attested only by their tests.
+
+## 179. Codex counter-review of section 178 and R-181 A2 redacted order diagnosis, 2026-09-24
+
+**Scope and disposition.** Counter-reviewed each incoming same-lane Claude
+commit, `2bd3368`, `865ae3b`, and `6f498cb`. `2bd3368` is accepted: its
+eight-module/196-edge closure test correctly refused the previously omitted
+modules. `865ae3b` is accepted after an additional isolating test: removing
+the final 64,000-character inventory guard was red for the runtime case, but
+a non-runtime projected file lacked its own case. The new target-builder
+growth case closes that distinct blind spot. `6f498cb` is accepted after
+the record corrections below. Claude's three P2 and five P3 findings in
+section 178 were reviewed individually; no Claude production code changed.
+
+| Finding | Priority | Counter-review result |
+|---|---|---|
+| `ARV2R178-001` | P2 | Confirmed as a control-consistency gap. Both exploratory host launchers now render and verify an exact one-use owner-signed payload before mutation; A1/A2 paths have focused rejection and binding tests. After this counter-review began, the owner explicitly chose the section-178.5 alternative of waiving detached signatures **only** for exploratory R-181 A3, R-182, and the separate tilt candidate. The named paths must bind that waiver, exact source/project identity, and one-use claim before launch; R-183 and other projects remain signed. |
+| `ARV2R178-002/-003/-004` | P2/P2/P3 | Claude's corrections accepted; section 4 now points to this counter-review. The extra non-runtime file-size test is separately green. The section-5 ledger row will be appended before this round's single push, not retroactively inserted into prior pushes. |
+| `ARV2R178-005` | P3 | Confirmed. Four module-scoped fixtures now skip explicitly only when the gitignored delta package directory is absent; malformed *present* packages still fail. This avoids fresh-clone collection errors without fabricating a source-identity test pass. |
+| `ARV2R178-006/-007` | P3/P3 | Confirmed as documented. The executor has its own tested live-mode refusal, and the historical R-177 launches cannot be retroactively made source-reproducible. |
+| `ARV2R178-008` | P3 | Confirmed; new closure record: `ARV2CR174-002` is addressed by the separately versioned cap-90 runtime/projector (`test_cap90_profiles_bind_all_three_roles_without_mutating_r177`, `test_cap90_projection_binds_new_profile_and_runtime_selection`). `ARV2CR174-003` is addressed only for *explicitly unavailable* cap-90 collections by `test_only_explicit_cap90_can_freeze_an_actual_empty_collection` and `test_cap90_explicit_unavailable_collection_preserves_own_etf_target`; the R-177 default still refuses unflagged empties. Neither old row is rewritten. |
+
+**Additional counter-review findings.** `ARV2CR179-001` (P2, corrected): the
+projector's literal text count of `market_on_open_order(` could miss an
+attribute assigned to an alias and called later. The projection now counts
+AST attribute references; the alias-injection test turns red without it.
+`ARV2CR179-004` (P3, corrected): an independent audit found that a literal
+`getattr(algorithm, "market_on_open_order")` bypassed the AST-attribute
+count. The projection now rejects the literal reflected capability name,
+with a separate focused regression; exact current-source pins already
+prevented this from changing the pending candidate.
+`ARV2CR179-002` (P2, open before any comparison): the R-182 launcher's
+predecessor check pins a *valid R-181 A2* receipt, whereas A2 is known
+invalid. A valid, prospectively corrected A3 must be bound explicitly; do
+not bypass that check or claim a clean spread from A2. The same execution
+policy and target-validity gates must hold in R-182 and any tilt successor.
+
+**Bounded diagnosis of the existing A2, not a new backtest.** The preserved
+QC identity is project `36891750`, backtest
+`a74626d4d6ce7360ae95d2e1d7930910`. Its existing aggregate reports
+6,289 submitted, 6,267 filled, 22 invalid and `run_valid=false`. A
+separately versioned one-use diagnostic read only this run's paginated order
+endpoint, discarded raw order fields in memory, and persisted count-only
+categories and receipt hashes under the private lane control directory.
+The first strict one-page probe refused an unexpected response shape; later
+one-page probes established that the QC `length` field describes the total
+6,289 orders, not the 99-item first page. The corrected V4 reader reconciled
+64 pages and all 6,289 unique order identities, counting **22 insufficient-
+buying-power invalid orders and zero other reasons**. A distinct one-use V5
+timing read independently reconciled the same count and found **22 BUY,
+zero SELL; all 22 Invalid events before 09:30 New York, zero at/after the
+open**. Each final reader used 64 endpoint calls with no transient retries;
+the earlier three one-page probes were refusals/shape checks, not outcome
+reads. No raw order, price, ticker, message, provider row, log, chart, or
+standard QC statistic was retained or printed. No `backtests/create` was
+called, so **zero additional research looks, evaluations, or result cells**.
+The A2 result remains invalid regardless of its diagnostic account path.
+
+`ARV2CR179-003` (P2, diagnosis only): the pre-open direction and status
+locate the failure at buy-admission buying power. The current planner sizes
+to 98% of prior-close gross, submits MOO sells before buys at 09:20, and its
+offline fixture credits sells synchronously. A real pending sell is not yet
+settled cash at a pre-open buy admission. This is the leading mechanism,
+**not proven causally** by the redacted order rows; it rules out an
+at-open fill-price jump as the direct timing of these Invalid events. A
+blind target haircut, silently dropping orders, or a fourth R-181 try would
+alter economics or violate the three-attempt rule. A3 remains unspent until
+one prospective execution correction and target-tracking acceptance gate
+are chosen, versioned, and tested.
+
+**Subsequent owner decisions, before A3.** The owner chose option 1 from
+Codex's execution choices: a research-only 2x buying-power *admission*
+bridge, while keeping the 98% target and rejecting a result that shows
+negative observed cash, gross exposure over 100%, or excessive target
+tracking error. This changes the cap-90 execution contract prospectively;
+it is not a retroactive repair or a claim that temporary intraday margin is
+impossible. The owner also explicitly **waived detached owner signatures**
+for the exploratory R-181 A3, R-182, and separately versioned tilt QC
+backtests only. This is the exact section-178.5 alternative to a signed
+one-use permit for those named candidates; it does not cover R-183, another
+project, a fourth R-181 attempt, a formal result, paper/live/funded orders,
+or trading. Local O_EXCL claims, source/project identity checks, three-attempt
+limits, and result-validity gates remain in force. The bridge must be used
+identically by signal and matched roles before any attribution claim.
+
+**Next family, unlaunched.** A separate local V4 candidate holds the exact
+R-182 cap-selected stock identities and the same six-sleeve, 98%-gross and
+9.8%-duplicate-cap rules, then applies a bounded analyst-revision *weight*
+tilt within each sleeve. Zero/missing scores are neutral, not a selection
+gate. Its pure target builder, role/profile-bound runtime, and separate QC
+projection have focused tests and no QC project or launch. This is a
+development candidate, not an authenticated R-182-relative result. It must
+be re-pinned to the final valid signal execution policy before a comparison.
+R-182 itself is still unlaunched, as is the ETF basket; the section-175
+predecessor-validity gate remains operative.
+
+### 179.1 Prospective final R-181 attempt: order-admission bridge
+
+Before any new QC launch or economic read, the owner selected the
+research-only 2x buying-power *admission* bridge and explicitly waived a
+detached signature for R-181 A3, R-182, and the separately versioned tilt
+candidate only. R-181 A3 must reuse private project `36891750` with no fourth
+attempt. The existing 98% long-only target, six sleeves, 90% cap-coverage
+rule, input package, 261 decisions, 1,255 sessions, 10-bps modeled-cost
+comparison, and own-ETF fallback are unchanged. The new permission is not a
+2x portfolio target: static, universe-added, and dynamically subscribed
+securities must all report effective 2x buying-power leverage before their
+orders. A valid completed run additionally needs **zero invalid or canceled
+orders, all submitted orders filled, nonnegative cash at every observed
+order-event boundary and daily close, end-day gross exposure at most 100%,
+and target-weight L1 error at most 2% mean and 5% on any one rebalance**.
+The tracking mark is the prior-close reference price, not an independently
+measured realized opening fill weight. Cash is observed at order-event
+boundaries and daily close, not continuously between callbacks; no broader
+intraday no-borrowing claim is made. A failed check or terminal `Completed.`
+without authenticated `run_valid=true` cannot support a matched spread.
+
+The exact prospective R-181 A3 source is fourteen files with bridge runtime
+SHA-256 `60b0e300393c1356e21de310fdfce1ff029632d77e6bf62efd7bb053de55b5ab`,
+signal profile SHA-256
+`9e1b93c3fc5fca0cd3154f8c8270fd10cdb2acc67742e9712aafb5682fbed031`,
+and projection SHA-256
+`f75725c37cb5e66f7db4070fcf89a05d5efe29cda60b6fc75086615d622cce0d`
+(394,268 bytes). The fixed project name is
+`104 ARV2 SIX CAP90 SIGNAL R181 2021 2025`; the exact A3 backtest name is
+`ARV2 R181A3 six cap90 bridge signal 2021 2025 f75725c3`. The matched
+R-182 A1 must use the **same admission and validity policy**, profile
+SHA-256 `b419d3f2b149a1509ef09bd0a5bf607bea8c25a3363cbc8a9dc04a40910f9c0c`,
+projection SHA-256
+`186cb2bb3dbd2a37358c9c0b2dbfa86e1e685203dba33795eb192f74faa9feeb`
+(394,269 bytes), and may launch only after an authenticated *valid A3*,
+never the invalid A2. R-182's project name is
+`105 ARV2 SIX CAP90 MATCHED R182 2021 2025` and its A1 backtest name is
+`ARV2 R182A1 six cap90 bridge matched 2021 2025 186cb2bb`.
+
+This is a prospective execution-policy version change to the exploratory
+family, not a repair of A2's already observed outcome or independent
+confirmation. The A2 count-only diagnostic establishes that all 22 invalid
+orders were pre-open buys rejected for insufficient buying power; it does not
+prove the engine's exact reservation arithmetic. The A3 launcher authenticates
+the private A2 claim, launch, terminal, result-read claim, V4/V5 diagnostic
+receipts, the unchanged 13-file cloud source, and the one-backtest project
+census before its O_EXCL one-use claim; it then changes only `main.py` and
+adds the bridge runtime, byte-checks all fourteen files, compiles, and launches
+at most one backtest. A1 and A2 already consumed two of R-181's three allowed
+attempts. The result reader may retain only the two canonical custom
+statistics and bounded derived diagnostics. No QC run or result is claimed
+in this preregistration paragraph.
+
+**Validation so far.** The changed/new diagnostic, launcher, projection,
+runtime, closure, lane-record, and active-document test selection produced
+277 passed in 57.10 seconds on Python 3.13.15; targeted red/green tests
+isolate literal and reflected order capabilities, the non-runtime file
+ceiling, signed-launch refusal, and count-only pagination.
+`compileall` and `git diff --check` are clean; the two active-record gate
+files separately pass 76/76. The complete lane and repository suites were
+not run by Codex, per the owner's rule. The final focused checks, exact
+source/record identities, per-commit range, and push ledger will be updated
+before this round's single push; this section does not assert a completed
+QC successor or an authorized trading result.

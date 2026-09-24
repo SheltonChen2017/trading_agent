@@ -118,9 +118,14 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_six_universe_gate.py
     accepted_risk_six_universe_gate_evaluator.py
     accepted_risk_six_universe_gate_qc_runtime.py
+    accepted_risk_six_universe_order_bridge_qc_projection.py
+    accepted_risk_six_universe_order_bridge_qc_runtime.py
     accepted_risk_six_universe_order_qc_projection.py
     accepted_risk_six_universe_order_qc_runtime.py
     accepted_risk_six_universe_order_targets.py
+    accepted_risk_six_universe_order_tilt_qc_projection.py
+    accepted_risk_six_universe_order_tilt_qc_runtime.py
+    accepted_risk_six_universe_order_tilt_targets.py
     accepted_risk_spy_order_level_v1_qc_runtime.py
     accepted_risk_stock_portfolio_evaluator.py
     accepted_risk_terminal_disposition.py event_study.py
@@ -161,6 +166,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     production_evidence_acquisition_io.py production_evidence_composer.py
     refusal_smoke_projection.py run_contract.py runtime_shard_projection.py
     six_universe_cap90_submission.py six_universe_coverage_submission.py
+    six_universe_r181_order_diagnostic.py
     synthetic_input_transport.py
     """.split()
 )
@@ -408,6 +414,19 @@ _ZERO_EXTERNAL_IO_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator
+        """.split()
+    ),
+    "accepted_risk_six_universe_order_tilt_targets.py": tuple(
+        """
+        dataclasses hashlib json decimal
+        accepted_risk_sequential_r055_score accepted_risk_six_universe_gate
+        accepted_risk_six_universe_gate_evaluator
+        accepted_risk_six_universe_order_targets
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_sequential_r055_score
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets
         """.split()
     ),
 }
@@ -1081,12 +1100,35 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate
         """.split()
     ),
+    "accepted_risk_six_universe_order_bridge_qc_projection.py": tuple(
+        """
+        dataclasses hashlib pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime
+        """.split()
+    ),
+    "accepted_risk_six_universe_order_tilt_qc_projection.py": tuple(
+        """
+        dataclasses hashlib pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets
+        """.split()
+    ),
     "six_universe_cap90_submission.py": tuple(
         """
         __future__ hashlib json os re stat time dataclasses decimal pathlib
         research.quantconnect research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime
+        research.analyst_revisions_v2_qc.owner_signature_authority
         research.analyst_revisions_v2_qc.six_universe_coverage_submission
         """.split()
     ),
@@ -1097,6 +1139,13 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_coverage_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_coverage_qc_projection
         research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.owner_signature_authority
+        """.split()
+    ),
+    "six_universe_r181_order_diagnostic.py": tuple(
+        """
+        __future__ hashlib json os re stat datetime decimal pathlib zoneinfo
+        research.analyst_revisions_v2_qc.six_universe_coverage_submission
         """.split()
     ),
 }
@@ -1295,6 +1344,14 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "call:read_bytes",
         "import:pathlib",
     ),
+    "accepted_risk_six_universe_order_bridge_qc_projection.py": (
+        "call:read_bytes",
+        "import:pathlib",
+    ),
+    "accepted_risk_six_universe_order_tilt_qc_projection.py": (
+        "call:read_bytes",
+        "import:pathlib",
+    ),
     "six_universe_cap90_submission.py": (
         "call:open",
         "call:read_bytes",
@@ -1304,6 +1361,11 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "six_universe_coverage_submission.py": (
         "call:open",
         "call:read_bytes",
+        "import:os",
+        "import:pathlib",
+    ),
+    "six_universe_r181_order_diagnostic.py": (
+        "call:open",
         "import:os",
         "import:pathlib",
     ),
@@ -1509,6 +1571,28 @@ _QC_RUNTIME_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets
         """.split()
     ),
+    "accepted_risk_six_universe_order_bridge_qc_runtime.py": tuple(
+        """
+        json decimal accepted_risk_six_universe_order_qc_runtime
+        accepted_risk_six_universe_order_targets
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets
+        """.split()
+    ),
+    "accepted_risk_six_universe_order_tilt_qc_runtime.py": tuple(
+        """
+        json accepted_risk_six_universe_order_qc_runtime
+        accepted_risk_six_universe_order_bridge_qc_runtime
+        accepted_risk_six_universe_order_tilt_targets
+        accepted_risk_six_universe_order_targets
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets
+        """.split()
+    ),
 }
 _QC_RUNTIME_IO_SURFACE = {
     "accepted_risk_order_level_input_runtime.py": (
@@ -1517,6 +1601,7 @@ _QC_RUNTIME_IO_SURFACE = {
     ),
     "accepted_risk_qqq_order_level_qc_runtime.py": (
         "call:history",
+        "call:market_on_open_order",
         "call:open",
         "call:set_summary_statistic",
     ),
@@ -1602,9 +1687,14 @@ _QC_RUNTIME_IO_SURFACE = {
     ),
     "accepted_risk_six_universe_order_qc_runtime.py": (
         "call:history",
+        "call:market_on_open_order",
         "call:remove_security",
         "call:set_summary_statistic",
     ),
+    "accepted_risk_six_universe_order_bridge_qc_runtime.py": (
+        "call:set_summary_statistic",
+    ),
+    "accepted_risk_six_universe_order_tilt_qc_runtime.py": (),
 }
 
 _PINNED_ZERO_IO_TO_ACTION_BEARING_EDGES = frozenset(
@@ -2569,6 +2659,7 @@ def _no_io_violations(source: str) -> tuple[str, ...]:
         "launch",
         "history",
         "add_equity",
+        "market_on_open_order",
         "remove_security",
         "set_summary_statistic",
         "submit_order",
@@ -2630,6 +2721,15 @@ def _no_io_violations(source: str) -> tuple[str, ...]:
             ):
                 violations.add(f"call:{node.func.attr}")
     return tuple(sorted(violations))
+
+
+def test_no_io_closure_catches_aliased_market_on_open_order_capability():
+    source = (
+        "def hidden(algorithm):\n"
+        "    submit = algorithm.market_on_open_order\n"
+        "    return submit('SPY', 1)\n"
+    )
+    assert _no_io_violations(source) == ("call:market_on_open_order",)
 
 
 def _local_module_path(module_name: str) -> tuple[Path, bool] | None:
@@ -2920,6 +3020,14 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "accepted_risk_six_universe_gate_evaluator",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime",
+            "accepted_risk_six_universe_order_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime",
+            "accepted_risk_six_universe_order_targets",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime",
             "accepted_risk_order_level_forced_exit",
         ),
@@ -2962,6 +3070,38 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
         (
             "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets",
             "accepted_risk_six_universe_gate_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_bridge_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_tilt_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_sequential_r055_score",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_six_universe_gate",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_six_universe_gate_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_six_universe_order_targets",
         ),
         (
             "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
@@ -3716,6 +3856,46 @@ _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
             "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets",
             "accepted_risk_six_universe_gate_evaluator",
         ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime",
+            "accepted_risk_six_universe_order_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime",
+            "accepted_risk_six_universe_order_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_bridge_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_tilt_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+            "accepted_risk_six_universe_order_targets",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_sequential_r055_score",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_six_universe_gate",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_six_universe_gate_evaluator",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+            "accepted_risk_six_universe_order_targets",
+        ),
     }
 )
 
@@ -3905,9 +4085,14 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_projection",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_projection",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
         "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
@@ -3976,6 +4161,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.runtime_shard_projection",
         "research.analyst_revisions_v2_qc.six_universe_cap90_submission",
         "research.analyst_revisions_v2_qc.six_universe_coverage_submission",
+        "research.analyst_revisions_v2_qc.six_universe_r181_order_diagnostic",
         "research.analyst_revisions_v2_qc.synthetic_input_transport",
     )
     assert boundary_edges == _PINNED_REPOSITORY_BOUNDARY_EDGES

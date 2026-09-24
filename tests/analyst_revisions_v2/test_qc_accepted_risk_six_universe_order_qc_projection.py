@@ -27,6 +27,8 @@ PACKAGE_PATH = Path(
 
 @pytest.fixture(scope="module")
 def loaded_delta():
+    if not PACKAGE_PATH.is_dir():
+        pytest.skip("local gitignored ARV2 delta package is unavailable")
     return delta.load_accepted_risk_delta_order_package(
         PACKAGE_PATH,
         expected_package_sha256=delta.EXPECTED_DELTA_PACKAGE_SHA256,
@@ -135,6 +137,32 @@ def test_projection_embeds_every_local_source_byte_for_byte(loaded_delta):
 def test_projection_capability_audit_refuses_expansion(source):
     with pytest.raises(subject.AcceptedRiskSixUniverseOrderQcProjectionError):
         subject._source_file("hostile.py", source)
+
+
+def test_projection_refuses_aliased_extra_moo_capability():
+    source = (
+        b"def hidden(algorithm):\n"
+        b"    submit = algorithm.market_on_open_order\n"
+        b"    return submit('SPY', 1)\n"
+    )
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcProjectionError,
+        match="MOO capability inventory",
+    ):
+        subject._source_file("accepted_risk_simulated_moo_executor.py", source)
+
+
+def test_projection_refuses_reflected_extra_moo_capability():
+    source = (
+        b"def hidden(algorithm):\n"
+        b"    submit = getattr(algorithm, 'market_on_open_order')\n"
+        b"    return submit('SPY', 1)\n"
+    )
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcProjectionError,
+        match="MOO capability inventory",
+    ):
+        subject._source_file("accepted_risk_simulated_moo_executor.py", source)
 
 
 def test_projection_refuses_unfrozen_role(loaded_delta):
@@ -305,6 +333,37 @@ def test_cap90_projection_refuses_any_oversized_projected_file(
         subject, "_cap90_qc_runtime_source", normalize_under_the_real_limit
     )
     monkeypatch.setattr(subject, "MAXIMUM_QC_SOURCE_CHARACTERS", 1_000)
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcProjectionError,
+        match="file limit",
+    ):
+        subject.build_accepted_risk_six_universe_order_qc_projection(
+            loaded_delta,
+            role=targets.ROLE_SIGNAL,
+            variant=runtime.CAP90_VARIANT,
+        )
+
+
+def test_cap90_projection_refuses_oversized_non_runtime_file(
+    loaded_delta, monkeypatch
+):
+    """The final inventory check also covers a target-builder file.
+
+    The runtime has a separate inner size check. Growing only this different
+    projected file makes a runtime-only inventory check an observable defect.
+    """
+
+    source_file = subject._source_file
+    limit = subject.MAXIMUM_QC_SOURCE_CHARACTERS
+
+    def oversized_target_builder(project_path, source):
+        if project_path == "accepted_risk_six_universe_order_targets.py":
+            assert len(source) < limit
+            padding = limit + 1 - len(source)
+            source += b"\n" + b" " * (padding - 1)
+        return source_file(project_path, source)
+
+    monkeypatch.setattr(subject, "_source_file", oversized_target_builder)
     with pytest.raises(
         subject.AcceptedRiskSixUniverseOrderQcProjectionError,
         match="file limit",

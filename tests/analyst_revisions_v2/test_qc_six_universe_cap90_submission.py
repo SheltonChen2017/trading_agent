@@ -4,13 +4,17 @@ import dataclasses
 import hashlib
 import json
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
 from research.analyst_revisions_v2_qc import accepted_risk_delta_order_package as delta
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_qc_projection as projector
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_qc_runtime as runtime
+from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_bridge_qc_projection as bridge_projector
+from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_bridge_qc_runtime as bridge_runtime
 from research.analyst_revisions_v2_qc import six_universe_cap90_submission as subject
+from research.analyst_revisions_v2_qc.owner_signature_authority import OwnerSignatureAuthorityError
 from research.quantconnect import QuantConnectClient, QuantConnectCredentials
 
 
@@ -62,6 +66,8 @@ AGGREGATE_DIGESTS = (
 
 @pytest.fixture(scope="module")
 def projections():
+    if not PACKAGE_PATH.is_dir():
+        pytest.skip("local gitignored ARV2 delta package is unavailable")
     package = delta.load_accepted_risk_delta_order_package(
         PACKAGE_PATH,
         expected_package_sha256=delta.EXPECTED_DELTA_PACKAGE_SHA256,
@@ -73,6 +79,42 @@ def projections():
         )
         for candidate, role in subject._ROLES.items()
     }
+
+
+@pytest.fixture(scope="module")
+def bridge_projections():
+    if not PACKAGE_PATH.is_dir():
+        pytest.skip("local gitignored ARV2 delta package is unavailable")
+    package = delta.load_accepted_risk_delta_order_package(
+        PACKAGE_PATH,
+        expected_package_sha256=delta.EXPECTED_DELTA_PACKAGE_SHA256,
+        expected_lineage_sha256=delta.EXPECTED_DELTA_LINEAGE_SHA256,
+    )
+    return {
+        candidate: bridge_projector.build_accepted_risk_six_universe_order_bridge_qc_projection(
+            package, role=subject._ROLES[candidate],
+        )
+        for candidate in ("R181", "R182")
+    }
+
+
+def _bridge_plan(tmp_path, projection, candidate="R181"):
+    attempt = 3 if candidate == "R181" else 1
+    project_name = (
+        subject._R181_A2_PROJECT_NAME if candidate == "R181"
+        else "105 ARV2 SIX CAP90 MATCHED R182 2021 2025"
+    )
+    run_prefix = (
+        "ARV2 R181A3 six cap90 bridge signal 2021 2025 "
+        if candidate == "R181" else
+        "ARV2 R182A1 six cap90 bridge matched 2021 2025 "
+    )
+    return dataclasses.replace(
+        _plan(tmp_path, projection, candidate),
+        attempt=attempt,
+        project_name=project_name,
+        backtest_name=run_prefix + projection.projection_sha256[:8],
+    )
 
 
 def _plan(tmp_path, projection, candidate="R181"):
@@ -91,6 +133,28 @@ def _plan(tmp_path, projection, candidate="R181"):
     )
 
 
+def _allow_owner_signature(monkeypatch, plan, projection):
+    """Pin the actual rendered bytes while avoiding the owner's private key."""
+    payload = subject.render_owner_launch_permit(plan, projection)
+    signature = object()
+    verified = SimpleNamespace(
+        purpose=subject.FORMAL_EXECUTION_PURPOSE,
+        authority_payload_sha256=hashlib.sha256(payload).hexdigest(),
+        authority_sha256="a" * 64,
+        signature_sha256="b" * 64,
+    )
+    calls = []
+
+    def require(value, *, authority_payload):
+        calls.append((value, authority_payload))
+        if value is not signature or authority_payload != payload:
+            raise OwnerSignatureAuthorityError("wrong signed launch payload")
+        return verified
+
+    monkeypatch.setattr(subject, "require_formal_execution_owner_signature", require)
+    return signature, calls
+
+
 @pytest.mark.parametrize("candidate", ("R181", "R182", "R183"))
 def test_preview_authenticates_exact_role_and_source(projections, tmp_path, candidate):
     value = projections[candidate]
@@ -106,6 +170,87 @@ def test_preview_authenticates_exact_role_and_source(projections, tmp_path, cand
         subject.preview(dataclasses.replace(plan, role="matched" if plan.role != "matched" else "signal"), value)
     with pytest.raises(subject.Cap90QcSubmissionError):
         subject.preview(plan, dataclasses.replace(value, projection_sha256="0" * 64))
+
+
+def test_owner_permit_binds_exact_attempt_source_project_and_one_submission(
+    projections, tmp_path,
+):
+    value = projections["R181"]
+    a1 = _plan(tmp_path, value)
+    raw = subject.render_owner_launch_permit(a1, value)
+    permit = json.loads(raw)
+    assert subject._canonical(permit) == raw
+    assert permit["schema"] == subject._LAUNCH_PERMIT_SCHEMA
+    assert permit["signature_purpose"] == subject.FORMAL_EXECUTION_PURPOSE
+    assert permit["action"] == "one_private_exploratory_order_backtest_launch"
+    assert permit["attempt"] == 1
+    assert permit["project_id"] is None
+    assert permit["projection_sha256"] == value.projection_sha256
+    assert permit["profile_sha256"] == value.profile_sha256
+    assert permit["maximum_backtest_submissions"] == 1
+    assert permit["mutating_endpoint_budget"]["backtests/create"] == 1
+    assert permit["result_read_authorized"] is False
+    assert permit["paper_live_deployment_funded_trading_authorized"] is False
+    for changed in (
+        dataclasses.replace(a1, project_name=a1.project_name + " changed"),
+        dataclasses.replace(a1, backtest_name=a1.backtest_name + " changed"),
+        dataclasses.replace(a1, control_directory=tmp_path / "other"),
+        dataclasses.replace(a1, organization_id="b" * 32),
+    ):
+        assert subject.render_owner_launch_permit(changed, value) != raw
+    a2 = _a2_plan(tmp_path, value)
+    a2_permit = json.loads(subject.render_owner_launch_permit(a2, value))
+    assert a2_permit["attempt"] == 2
+    assert a2_permit["project_id"] == subject._R181_A2_PROJECT_ID
+    assert a2_permit["mutating_endpoint_budget"] == {
+        "files/create": 1, "files/update": 2,
+        "compile/create": 1, "backtests/create": 1,
+    }
+    assert subject.render_owner_launch_permit(a2, value) != raw
+
+
+def test_load_owner_permit_passes_exact_bytes_to_reviewed_verifier(
+    monkeypatch, projections, tmp_path,
+):
+    value = projections["R181"]
+    plan = _plan(tmp_path, value)
+    allowed = tmp_path / "allowed-signers"
+    detached = tmp_path / "launch.sig"
+    observed = []
+    sentinel = object()
+
+    def load(**kwargs):
+        observed.append(kwargs)
+        return sentinel
+
+    monkeypatch.setattr(subject, "load_formal_execution_owner_signature", load)
+    assert subject.load_owner_launch_permit(
+        plan, value, allowed_signers_path=allowed, signature_path=detached,
+    ) is sentinel
+    assert observed == [{
+        "authority_payload": subject.render_owner_launch_permit(plan, value),
+        "allowed_signers_path": allowed, "signature_path": detached,
+    }]
+
+
+def test_unsigned_or_wrongly_signed_launch_refuses_before_any_qc_or_claim(
+    monkeypatch, projections, tmp_path,
+):
+    value = projections["R181"]
+    plan = _plan(tmp_path, value)
+    calls = _fake_qc(monkeypatch, plan, value)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="owner launch signature"):
+        subject.launch_a1(plan, value, object())
+    assert calls == []
+    assert not (plan.control_directory / "R181-A1-claim.json").exists()
+
+    signature, checks = _allow_owner_signature(monkeypatch, plan, value)
+    changed = dataclasses.replace(plan, backtest_name=plan.backtest_name + " changed")
+    with pytest.raises(subject.Cap90QcSubmissionError, match="owner launch signature"):
+        subject.launch_a1(changed, value, object(), owner_signature=signature)
+    assert len(checks) == 1
+    assert calls == []
+    assert not (plan.control_directory / "R181-A1-claim.json").exists()
 
 
 def _project_row(plan, project_id=987):
@@ -166,16 +311,19 @@ def test_launch_claims_before_first_mutation_uploads_exact_bytes_and_launches_on
 ):
     value = projections["R181"]
     plan = _plan(tmp_path, value)
+    signature, signature_calls = _allow_owner_signature(monkeypatch, plan, value)
     calls = _fake_qc(monkeypatch, plan, value)
-    receipt = subject.launch_a1(plan, value, object())
+    receipt = subject.launch_a1(plan, value, object(), owner_signature=signature)
     assert receipt["backtest_id"] == "run-a1"
+    assert receipt["owner_signature_sha256"] == "b" * 64
+    assert len(signature_calls) == 1
     assert subject._read_control(subject._control_path(plan, "claim"))["projection_sha256"] == value.projection_sha256
     assert [endpoint for endpoint, _ in calls].count("backtests/create") == 1
     assert [endpoint for endpoint, _ in calls].count("compile/create") == 1
     assert len([endpoint for endpoint, _ in calls if endpoint in {"files/create", "files/update"}]) == 13
     before = len(calls)
     with pytest.raises(subject.Cap90QcSubmissionError):
-        subject.launch_a1(plan, value, object())
+        subject.launch_a1(plan, value, object(), owner_signature=signature)
     assert len(calls) == before
 
 
@@ -189,6 +337,7 @@ def test_launch_refuses_nonfresh_private_or_mismatched_source_and_spends_claim(
 ):
     value = projections["R181"]
     plan = _plan(tmp_path, value)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, value)
     opts = {
         "project_exists": defect == "project_exists",
         "private": defect != "private",
@@ -197,7 +346,7 @@ def test_launch_refuses_nonfresh_private_or_mismatched_source_and_spends_claim(
     }
     calls = _fake_qc(monkeypatch, plan, value, **opts)
     with pytest.raises(subject.Cap90QcSubmissionError):
-        subject.launch_a1(plan, value, object())
+        subject.launch_a1(plan, value, object(), owner_signature=signature)
     mutations = [endpoint for endpoint, _ in calls if endpoint in {
         "projects/create", "files/create", "files/update", "compile/create", "backtests/create",
     }]
@@ -481,12 +630,15 @@ def test_result_reader_refuses_modified_cloud_source_before_outcome_read(
 
 
 def test_later_roles_require_prior_authenticated_valid_result(
-    monkeypatch, projections, tmp_path,
+    monkeypatch, bridge_projections, tmp_path,
 ):
-    plan = _plan(tmp_path, projections["R182"], "R182")
-    calls = _fake_qc(monkeypatch, plan, projections["R182"])
+    value = bridge_projections["R182"]
+    plan = _bridge_plan(tmp_path, value, "R182")
+    calls = _fake_qc(monkeypatch, plan, value)
     with pytest.raises(subject.Cap90QcSubmissionError, match="unavailable"):
-        subject.launch_a1(plan, projections["R182"], object())
+        subject.launch_a1(
+            plan, value, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+        )
     assert calls == []
 
 
@@ -612,16 +764,32 @@ def _fake_a2_qc(monkeypatch, plan, projection, uploaded, *, defect=None):
     return calls
 
 
-def test_r181_a2_resumes_same_project_and_authenticates_completed_result(
+def test_r181_a2_unsigned_refuses_before_existing_project_read_or_mutation(
     monkeypatch, projections, tmp_path,
 ):
     value = projections["R181"]
     plan = _a2_plan(tmp_path, value)
     uploaded = _a2_residue(monkeypatch, plan, value)
     calls = _fake_a2_qc(monkeypatch, plan, value, uploaded)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="owner launch signature"):
+        subject.launch_r181_a2(plan, value, object())
+    assert calls == []
+    assert not subject._control_path(plan, "claim").exists()
 
-    receipt = subject.launch_r181_a2(plan, value, object())
+
+def test_r181_a2_resumes_same_project_and_authenticates_completed_result(
+    monkeypatch, projections, tmp_path,
+):
+    value = projections["R181"]
+    plan = _a2_plan(tmp_path, value)
+    signature, signature_calls = _allow_owner_signature(monkeypatch, plan, value)
+    uploaded = _a2_residue(monkeypatch, plan, value)
+    calls = _fake_a2_qc(monkeypatch, plan, value, uploaded)
+
+    receipt = subject.launch_r181_a2(plan, value, object(), owner_signature=signature)
     assert receipt["attempt"] == 2
+    assert receipt["owner_signature_sha256"] == "b" * 64
+    assert len(signature_calls) == 1
     assert receipt["project_id"] == subject._R181_A2_PROJECT_ID
     assert [endpoint for endpoint, _ in calls].count("backtests/create") == 1
     assert [endpoint for endpoint, _ in calls].count("compile/create") == 1
@@ -638,7 +806,7 @@ def test_r181_a2_resumes_same_project_and_authenticates_completed_result(
     assert [endpoint for endpoint, _ in calls].count("backtests/read") == 1
     before = len(calls)
     with pytest.raises(subject.Cap90QcSubmissionError):
-        subject.launch_r181_a2(plan, value, object())
+        subject.launch_r181_a2(plan, value, object(), owner_signature=signature)
     with pytest.raises(subject.Cap90QcSubmissionError):
         subject.launch_a1(plan, value, object())
     with pytest.raises(subject.Cap90QcSubmissionError):
@@ -654,6 +822,7 @@ def test_r181_a2_refuses_changed_residue_or_project_before_claim_or_mutation(
 ):
     value = projections["R181"]
     plan = _a2_plan(tmp_path, value)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, value)
     uploaded = _a2_residue(monkeypatch, plan, value)
     if defect == "runtime":
         uploaded[subject._R181_RUNTIME_PATH] = "!"
@@ -665,7 +834,7 @@ def test_r181_a2_refuses_changed_residue_or_project_before_claim_or_mutation(
         uploaded["unexpected.py"] = "#"
     calls = _fake_a2_qc(monkeypatch, plan, value, uploaded, defect=defect)
     with pytest.raises(subject.Cap90QcSubmissionError):
-        subject.launch_r181_a2(plan, value, object())
+        subject.launch_r181_a2(plan, value, object(), owner_signature=signature)
     assert not subject._control_path(plan, "claim").exists()
     assert not any(endpoint in {
         "projects/create", "files/create", "files/update", "compile/create", "backtests/create",
@@ -678,10 +847,11 @@ def test_r181_a2_claim_remains_spent_after_upload_or_compile_failure(
 ):
     value = projections["R181"]
     plan = _a2_plan(tmp_path, value)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, value)
     uploaded = _a2_residue(monkeypatch, plan, value)
     calls = _fake_a2_qc(monkeypatch, plan, value, uploaded, defect=defect)
     with pytest.raises(subject.Cap90QcSubmissionError):
-        subject.launch_r181_a2(plan, value, object())
+        subject.launch_r181_a2(plan, value, object(), owner_signature=signature)
     assert subject._control_path(plan, "claim").exists()
     assert not any(endpoint == "backtests/create" for endpoint, _ in calls)
     assert not any(endpoint == "projects/create" for endpoint, _ in calls)
@@ -691,7 +861,7 @@ def test_r181_a2_claim_remains_spent_after_upload_or_compile_failure(
         assert not any(endpoint == "compile/create" for endpoint, _ in calls)
     before = len(calls)
     with pytest.raises(subject.Cap90QcSubmissionError):
-        subject.launch_r181_a2(plan, value, object())
+        subject.launch_r181_a2(plan, value, object(), owner_signature=signature)
     assert len(calls) == before
 
 
@@ -700,11 +870,12 @@ def test_r181_a2_refuses_a1_claim_mutation_before_qc_access(
 ):
     value = projections["R181"]
     plan = _a2_plan(tmp_path, value)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, value)
     uploaded = _a2_residue(monkeypatch, plan, value)
     calls = _fake_a2_qc(monkeypatch, plan, value, uploaded)
     monkeypatch.setattr(subject, "_R181_A1_CLAIM_SHA256", "0" * 64)
     with pytest.raises(subject.Cap90QcSubmissionError, match="claim bytes changed"):
-        subject.launch_r181_a2(plan, value, object())
+        subject.launch_r181_a2(plan, value, object(), owner_signature=signature)
     assert calls == []
 
 
@@ -713,6 +884,7 @@ def test_r181_a2_pins_new_runtime_bytes_not_only_claimed_projection_digest(
 ):
     value = projections["R181"]
     plan = _a2_plan(tmp_path, value)
+    signature, _ = _allow_owner_signature(monkeypatch, plan, value)
     uploaded = _a2_residue(monkeypatch, plan, value)
     calls = _fake_a2_qc(monkeypatch, plan, value, uploaded)
     items = []
@@ -728,8 +900,496 @@ def test_r181_a2_pins_new_runtime_bytes_not_only_claimed_projection_digest(
         value, source_files=tuple(items),
         total_source_byte_count=value.total_source_byte_count + 1,
     )
-    # The object still advertises the original projection digest. Only the
-    # independent A2 per-file pin catches this split-view source.
-    with pytest.raises(subject.Cap90QcSubmissionError, match="changes more"):
-        subject.launch_r181_a2(plan, altered, object())
+    # Even though the projection advertises its old digest, the signed source
+    # inventory refuses the split view before QC. A newly signed split view
+    # must still hit the independent exact A2 per-file pin.
+    with pytest.raises(subject.Cap90QcSubmissionError, match="owner launch signature"):
+        subject.launch_r181_a2(plan, altered, object(), owner_signature=signature)
     assert calls == []
+    altered_signature, _ = _allow_owner_signature(monkeypatch, plan, altered)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="changes more"):
+        subject.launch_r181_a2(plan, altered, object(), owner_signature=altered_signature)
+    assert calls == []
+
+
+def _synthetic_a2_invalid_receipts(monkeypatch, plan, old_projection):
+    """Create private, count-only spent-A2 evidence without real QC I/O."""
+    root = plan.control_directory
+    root.mkdir(mode=0o700)
+    project = subject._R181_A2_PROJECT_ID
+    backtest = subject._R181_A2_BACKTEST_ID
+    original = {
+        "claim": {
+            "candidate_id": "R181", "attempt": 2, "role": "signal",
+            "project_id": project,
+            "projection_sha256": subject._R181_A2_PROJECTION_SHA256,
+            "profile_sha256": subject._R181_A2_PROFILE_SHA256,
+            "source_files": [
+                [item.project_path, item.content_sha256, item.byte_count]
+                for item in old_projection.source_files
+            ],
+        },
+        "launch": {
+            "candidate_id": "R181", "attempt": 2,
+            "project_id": project, "backtest_id": backtest,
+            "projection_sha256": subject._R181_A2_PROJECTION_SHA256,
+            "profile_sha256": subject._R181_A2_PROFILE_SHA256,
+        },
+        "terminal": {
+            "candidate_id": "R181", "status": "Completed.",
+            "project_id": project, "backtest_id": backtest,
+        },
+        "result-read-claim": {
+            "candidate_id": "R181", "project_id": project,
+            "backtest_id": backtest,
+        },
+    }
+    digests = {}
+    for name, value in original.items():
+        subject._write_once(root / ("R181-A2-" + name + ".json"), value)
+        digests[name] = hashlib.sha256(subject._canonical(value)).hexdigest()
+    common = {
+        "aggregate_sha256": subject._R181_A2_AGGREGATE_SHA256,
+        "backtest_id": backtest, "project_id": project,
+        "profile_sha256": subject._R181_A2_PROFILE_SHA256,
+        "receipt_sha256": {
+            "R181-A2-" + key + ".json": digest for key, digest in digests.items()
+        },
+        "raw_order_values_retained": False,
+    }
+    v4_claim = {**common, "schema": "synthetic-v4-claim"}
+    v4_result = {
+        "schema": "arv2-r181-a2-redacted-order-reasons-v4",
+        "filled_order_count": 6267, "invalid_order_count": 22,
+        "reason_counts": {"INSUFFICIENT_BUYING_POWER": 22},
+    }
+    for name, value in (
+        ("invalid-order-diagnostic-v4-claim", v4_claim),
+        ("invalid-order-diagnostic-v4-result", v4_result),
+    ):
+        subject._write_once(root / ("R181-A2-" + name + ".json"), value)
+        digests[name] = hashlib.sha256(subject._canonical(value)).hexdigest()
+    v5_claim = {
+        **common, "schema": "synthetic-v5-claim",
+        "v4_claim_sha256": digests["invalid-order-diagnostic-v4-claim"],
+        "v4_result_sha256": digests["invalid-order-diagnostic-v4-result"],
+    }
+    v5_result = {
+        "schema": "arv2-r181-a2-buying-power-timing-v5",
+        "filled_order_count": 6267, "invalid_order_count": 22,
+        "direction_counts": {"BUY": 22, "SELL": 0, "UNKNOWN": 0},
+        "time_bin_counts": {
+            "PRE_OPEN": 22, "AT_OR_AFTER_OPEN": 0, "UNKNOWN": 0,
+        },
+    }
+    for name, value in (
+        ("buying-power-timing-v5-claim", v5_claim),
+        ("buying-power-timing-v5-result", v5_result),
+    ):
+        subject._write_once(root / ("R181-A2-" + name + ".json"), value)
+        digests[name] = hashlib.sha256(subject._canonical(value)).hexdigest()
+    monkeypatch.setattr(subject, "_R181_A2_CONTROL_SHA256", digests)
+    return {
+        item.project_path: item.source_bytes.decode("ascii")
+        for item in old_projection.source_files
+    }
+
+
+def _fake_a3_qc(monkeypatch, plan, uploaded, *, defect=None):
+    calls = []
+    launched = False
+    file_reads = 0
+
+    def post(_api, endpoint, payload):
+        nonlocal launched, file_reads
+        calls.append((endpoint, payload))
+        if endpoint == "authenticate":
+            return {"success": True}
+        if endpoint == "projects/read":
+            row = _project_row(plan, subject._R181_A2_PROJECT_ID)
+            if defect == "public":
+                row["collaborators"].append({"owner": False})
+            return {"success": True, "projects": [row]}
+        if endpoint == "backtests/list":
+            if launched:
+                return {"success": True, "count": 1, "backtests": [{
+                    "projectId": subject._R181_A2_PROJECT_ID,
+                    "backtestId": "run-a3", "name": plan.backtest_name,
+                    "status": "Completed.",
+                }]}
+            return {"success": True, "count": 1, "backtests": [{
+                "projectId": subject._R181_A2_PROJECT_ID,
+                "backtestId": (
+                    "unexpected" if defect == "extra_run"
+                    else subject._R181_A2_BACKTEST_ID
+                ),
+                "name": "ARV2 R181A2 six cap90 signal 2021 2025 b68661ec",
+                "status": "Completed.",
+            }]}
+        if endpoint == "files/read":
+            file_reads += 1
+            return {"success": True, "files": [{
+                "projectId": subject._R181_A2_PROJECT_ID,
+                "name": path,
+                "content": content + (
+                    "#" if defect == "bad_readback" and file_reads == 2
+                    and path == "main.py" else ""
+                ),
+            } for path, content in uploaded.items()]}
+        if endpoint in {"files/create", "files/update"}:
+            uploaded[payload["name"]] = payload["content"]
+            return {"success": True}
+        if endpoint == "compile/create":
+            return {"success": True, "compileId": "compile-a3"}
+        if endpoint == "compile/read":
+            return {"success": True, "compileId": "compile-a3", "state": (
+                "BuildError" if defect == "compile_error" else "BuildSuccess"
+            )}
+        if endpoint == "backtests/create":
+            launched = True
+            return {"success": True, "backtest": {
+                "projectId": subject._R181_A2_PROJECT_ID,
+                "backtestId": "run-a3", "name": plan.backtest_name,
+                "status": "In Queue...",
+            }}
+        raise AssertionError("unexpected endpoint " + endpoint)
+
+    monkeypatch.setattr(subject, "_client", lambda _api: None)
+    monkeypatch.setattr(subject, "_post", post)
+    return calls
+
+
+def test_r181_a3_exact_waiver_and_a2_evidence_precede_all_qc_access(
+    monkeypatch, projections, bridge_projections, tmp_path,
+):
+    value = bridge_projections["R181"]
+    plan = _bridge_plan(tmp_path, value)
+    uploaded = _synthetic_a2_invalid_receipts(monkeypatch, plan, projections["R181"])
+    calls = _fake_a3_qc(monkeypatch, plan, uploaded)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="owner launch signature"):
+        subject.launch_r181_a3(plan, value, object())
+    with pytest.raises(subject.Cap90QcSubmissionError, match="waiver"):
+        subject.launch_r181_a3(
+            plan, value, object(), owner_waiver_id="different-owner-waiver",
+        )
+    assert calls == []
+    assert not subject._control_path(plan, "claim").exists()
+
+    # Both A2's invalid diagnosis and the per-file source are predecessor
+    # authority, not a caller assertion. A modified private receipt refuses.
+    tampered = plan.control_directory / "R181-A2-buying-power-timing-v5-result.json"
+    tampered.write_bytes(tampered.read_bytes() + b" ")
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_r181_a3(
+            plan, value, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+        )
+    assert calls == []
+    assert not subject._control_path(plan, "claim").exists()
+
+
+def test_r181_a3_reuses_only_a2_project_and_launches_once(
+    monkeypatch, projections, bridge_projections, tmp_path,
+):
+    value = bridge_projections["R181"]
+    plan = _bridge_plan(tmp_path, value)
+    uploaded = _synthetic_a2_invalid_receipts(monkeypatch, plan, projections["R181"])
+    calls = _fake_a3_qc(monkeypatch, plan, uploaded)
+    receipt = subject.launch_r181_a3(
+        plan, value, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+    )
+    assert receipt["attempt"] == 3
+    assert receipt["project_id"] == subject._R181_A2_PROJECT_ID
+    assert receipt["owner_launch_waiver_id"] == subject._EXPLORATORY_WAIVER_ID
+    claim = subject._read_control(subject._control_path(plan, "claim"))
+    assert claim["owner_waived_payload_sha256"] == receipt["owner_waived_payload_sha256"]
+    assert len(claim["source_files"]) == 14
+    endpoints = [endpoint for endpoint, _ in calls]
+    assert endpoints.count("backtests/create") == 1
+    assert endpoints.count("compile/create") == 1
+    assert [endpoint for endpoint in endpoints if endpoint in {
+        "projects/create", "files/create", "files/update", "files/delete",
+    }] == ["files/update", "files/create"]
+    assert not any(endpoint == "backtests/read" for endpoint in endpoints)
+    assert subject.poll_status(plan, receipt, object()) == "Completed."
+    before = len(calls)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="already claimed"):
+        subject.launch_r181_a3(
+            plan, value, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+        )
+    assert len(calls) == before
+
+
+@pytest.mark.parametrize("defect", (
+    "source", "public", "extra_run", "bad_readback", "compile_error",
+))
+def test_r181_a3_refuses_bad_preflight_or_spends_only_final_claim(
+    monkeypatch, projections, bridge_projections, tmp_path, defect,
+):
+    value = bridge_projections["R181"]
+    plan = _bridge_plan(tmp_path, value)
+    uploaded = _synthetic_a2_invalid_receipts(monkeypatch, plan, projections["R181"])
+    if defect == "source":
+        uploaded["main.py"] += "# changed"
+    calls = _fake_a3_qc(monkeypatch, plan, uploaded, defect=defect)
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_r181_a3(
+            plan, value, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+        )
+    endpoints = [endpoint for endpoint, _ in calls]
+    assert endpoints.count("backtests/create") == 0
+    assert endpoints.count("projects/create") == 0
+    if defect in {"source", "public", "extra_run"}:
+        assert not subject._control_path(plan, "claim").exists()
+        assert not any(endpoint in {
+            "files/create", "files/update", "compile/create",
+        } for endpoint in endpoints)
+    else:
+        assert subject._control_path(plan, "claim").exists()
+
+
+def test_bridge_source_split_view_refuses_before_qc_even_with_waiver(
+    monkeypatch, projections, bridge_projections, tmp_path,
+):
+    value = bridge_projections["R181"]
+    plan = _bridge_plan(tmp_path, value)
+    uploaded = _synthetic_a2_invalid_receipts(monkeypatch, plan, projections["R181"])
+    calls = _fake_a3_qc(monkeypatch, plan, uploaded)
+    changed_files = []
+    for item in value.source_files:
+        if item.project_path == "main.py":
+            raw = item.source_bytes + b"# altered\n"
+            item = dataclasses.replace(
+                item, source_bytes=raw, byte_count=len(raw),
+                content_sha256=hashlib.sha256(raw).hexdigest(),
+            )
+        changed_files.append(item)
+    altered = dataclasses.replace(
+        value, source_files=tuple(changed_files),
+        total_source_byte_count=value.total_source_byte_count + len(b"# altered\n"),
+    )
+    with pytest.raises(subject.Cap90QcSubmissionError, match="self-authenticating"):
+        subject.launch_r181_a3(
+            plan, altered, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+        )
+    assert calls == []
+    assert not subject._control_path(plan, "claim").exists()
+
+
+def _bridge_statistics(plan, launch, *, valid=True, tracking_error=False):
+    statistics = _statistics(plan, launch, valid=valid)
+    aggregate = json.loads(statistics[runtime.AGGREGATES_STATISTIC_NAME])
+    aggregate.update({
+        "schema": bridge_runtime.BRIDGE_SUMMARY_SCHEMA,
+        "admission_leverage": "2", "target_gross_exposure": "0.98",
+        "minimum_end_day_cash": "1000",
+        "daily_cash_nonnegative": True,
+        "order_event_cash_observation_count": 10,
+        "minimum_observed_order_event_cash": "1000",
+        "order_event_cash_nonnegative": True,
+        "cash_observation_granularity": (
+            "daily_close_and_post_order_event_not_continuous_intraday"
+        ),
+        "end_day_gross_at_most_one": True,
+        "target_tracking_valid": not tracking_error,
+        "maximum_mean_target_weight_l1_error": "0.02",
+        "maximum_single_target_weight_l1_error": "0.05",
+        "run_valid": valid and not tracking_error,
+    })
+    aggregate["execution"]["mean_target_weight_l1_error"] = "0.01"
+    aggregate["execution"]["maximum_target_weight_l1_error"] = (
+        "0.10" if tracking_error else "0.03"
+    )
+    raw = subject._canonical(aggregate)
+    statistics[runtime.AGGREGATES_STATISTIC_NAME] = raw.decode("ascii")
+    meta = json.loads(statistics[runtime.META_STATISTIC_NAME])
+    meta["aggregate_schema"] = bridge_runtime.BRIDGE_SUMMARY_SCHEMA
+    meta["aggregate_sha256"] = hashlib.sha256(raw).hexdigest()
+    statistics[runtime.META_STATISTIC_NAME] = subject._canonical(meta).decode("ascii")
+    return statistics
+
+
+@pytest.mark.parametrize("valid,tracking_error", ((True, False), (False, False), (True, True)))
+def test_bridge_result_read_requires_cash_exposure_and_target_tracking_before_valid_receipt(
+    monkeypatch, projections, bridge_projections, tmp_path, valid, tracking_error,
+):
+    value = bridge_projections["R181"]
+    plan = _bridge_plan(tmp_path, value)
+    uploaded = _synthetic_a2_invalid_receipts(monkeypatch, plan, projections["R181"])
+    _fake_a3_qc(monkeypatch, plan, uploaded)
+    launch = subject.launch_r181_a3(
+        plan, value, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+    )
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    previous_post = subject._post
+    statistics = _bridge_statistics(
+        plan, launch, valid=valid, tracking_error=tracking_error,
+    )
+
+    def post(api, endpoint, payload):
+        if endpoint == "backtests/read":
+            return {"success": True, "backtest": {
+                "projectId": launch["project_id"],
+                "backtestId": launch["backtest_id"],
+                "name": plan.backtest_name, "status": "Completed.",
+                "statistics": statistics,
+                "orders": {"unread": True},
+            }}
+        return previous_post(api, endpoint, payload)
+
+    monkeypatch.setattr(subject, "_post", post)
+    result = subject.read_aggregates_once(plan, launch, object())
+    assert result["run_valid"] is (valid and not tracking_error)
+    assert result["aggregates"]["minimum_end_day_cash"] == "1000"
+    assert result["aggregates"]["maximum_target_weight_l1_error"] == (
+        "0.10" if tracking_error else "0.03"
+    )
+    valid_path = subject._control_path(plan, "result-valid")
+    assert valid_path.exists() is (valid and not tracking_error)
+    if valid and not tracking_error:
+        receipt = subject._read_control(valid_path)
+        assert receipt["attempt"] == 3
+        assert receipt["projection_sha256"] == value.projection_sha256
+        assert receipt["profile_sha256"] == value.profile_sha256
+        assert receipt["project_id"] == subject._R181_A2_PROJECT_ID
+
+
+@pytest.mark.parametrize("defect", (
+    "negative_cash", "cash_flag", "negative_event_cash", "event_cash_flag",
+    "event_cash_missing", "excess_gross", "gross_flag",
+    "tracking_flag", "tracking_error", "invalid_order", "admission_leverage",
+))
+def test_bridge_aggregate_guard_isolates_actual_cash_exposure_and_tracking(
+    bridge_projections, tmp_path, defect,
+):
+    plan = _bridge_plan(tmp_path, bridge_projections["R181"])
+    launch = _launched(plan)
+    aggregate = json.loads(
+        _bridge_statistics(plan, launch)[runtime.AGGREGATES_STATISTIC_NAME]
+    )
+    if defect == "negative_cash":
+        aggregate["minimum_end_day_cash"] = "-1"
+    elif defect == "cash_flag":
+        aggregate["daily_cash_nonnegative"] = False
+    elif defect == "negative_event_cash":
+        aggregate["minimum_observed_order_event_cash"] = "-1"
+    elif defect == "event_cash_flag":
+        aggregate["order_event_cash_nonnegative"] = False
+    elif defect == "event_cash_missing":
+        aggregate["minimum_observed_order_event_cash"] = None
+    elif defect == "excess_gross":
+        aggregate["maximum_gross_exposure"] = "1.01"
+    elif defect == "gross_flag":
+        aggregate["end_day_gross_at_most_one"] = False
+    elif defect == "tracking_flag":
+        aggregate["target_tracking_valid"] = False
+    elif defect == "tracking_error":
+        aggregate["execution"]["maximum_target_weight_l1_error"] = "0.051"
+    elif defect == "invalid_order":
+        aggregate["execution"]["invalid_order_count_sum"] = 1
+    else:
+        aggregate["admission_leverage"] = "1"
+    with pytest.raises(subject.Cap90QcSubmissionError, match="bridge cash, exposure, or target tracking"):
+        subject._project_aggregate(aggregate, bridge=True)
+
+
+def test_r182_bridge_requires_valid_a3_chain_not_invalid_a2(
+    monkeypatch, projections, bridge_projections, tmp_path,
+):
+    signal = bridge_projections["R181"]
+    matched = bridge_projections["R182"]
+    signal_plan = _bridge_plan(tmp_path, signal)
+    matched_plan = _bridge_plan(tmp_path, matched, "R182")
+    uploaded = _synthetic_a2_invalid_receipts(monkeypatch, signal_plan, projections["R181"])
+    calls = _fake_a3_qc(monkeypatch, signal_plan, uploaded)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="unavailable"):
+        subject._require_prior_valid_role(matched_plan)
+    assert calls == []
+    signal_launch = subject.launch_r181_a3(
+        signal_plan, signal, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+    )
+    assert subject.poll_status(signal_plan, signal_launch, object()) == "Completed."
+    subject._write_once(subject._control_path(signal_plan, "result-read-claim"), {
+        "candidate_id": "R181", "project_id": subject._R181_A2_PROJECT_ID,
+        "backtest_id": signal_launch["backtest_id"],
+    })
+    subject._write_once(subject._control_path(signal_plan, "result-valid"), {
+        "candidate_id": "R181", "attempt": 3, "run_valid": True,
+        "aggregate_sha256": "a" * 64,
+        "projection_sha256": signal.projection_sha256,
+        "profile_sha256": signal.profile_sha256,
+        "project_id": subject._R181_A2_PROJECT_ID,
+        "backtest_id": signal_launch["backtest_id"],
+    })
+    subject._require_prior_valid_role(matched_plan)
+    monkeypatch.setattr(subject, "_R181_A3_PROJECTION_SHA256", "0" * 64)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="preceding matched"):
+        subject._require_prior_valid_role(matched_plan)
+
+
+def test_r182_bridge_launch_is_waived_only_after_exact_valid_a3(
+    monkeypatch, bridge_projections, tmp_path,
+):
+    signal = bridge_projections["R181"]
+    matched = bridge_projections["R182"]
+    signal_plan = _bridge_plan(tmp_path, signal)
+    plan = _bridge_plan(tmp_path, matched, "R182")
+    claim = {
+        **subject.preview_bridge(signal_plan, signal),
+        "attempt": 3, "project_id": subject._R181_A2_PROJECT_ID,
+        "a2_control_sha256": dict(subject._R181_A2_CONTROL_SHA256),
+    }
+    launch = {
+        "candidate_id": "R181", "attempt": 3,
+        "project_id": subject._R181_A2_PROJECT_ID,
+        "backtest_id": "run-a3",
+        "projection_sha256": signal.projection_sha256,
+        "profile_sha256": signal.profile_sha256,
+    }
+    subject._write_once(subject._control_path(signal_plan, "claim"), claim)
+    subject._write_once(subject._control_path(signal_plan, "launch"), launch)
+    subject._write_once(subject._control_path(signal_plan, "terminal"), {
+        "candidate_id": "R181", "status": "Completed.",
+        "project_id": subject._R181_A2_PROJECT_ID,
+        "backtest_id": "run-a3",
+    })
+    subject._write_once(subject._control_path(signal_plan, "result-read-claim"), {
+        "candidate_id": "R181", "project_id": subject._R181_A2_PROJECT_ID,
+        "backtest_id": "run-a3",
+    })
+    subject._write_once(subject._control_path(signal_plan, "result-valid"), {
+        "candidate_id": "R181", "attempt": 3,
+        "run_valid": True, "aggregate_sha256": "a" * 64,
+        "projection_sha256": signal.projection_sha256,
+        "profile_sha256": signal.profile_sha256,
+        "project_id": subject._R181_A2_PROJECT_ID,
+        "backtest_id": "run-a3",
+    })
+    calls = _fake_qc(monkeypatch, plan, matched)
+    receipt = subject.launch_a1(
+        plan, matched, object(),
+        owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+    )
+    assert receipt["candidate_id"] == "R182"
+    assert receipt["owner_launch_waiver_id"] == subject._EXPLORATORY_WAIVER_ID
+    assert len(subject._read_control(subject._control_path(plan, "claim"))["source_files"]) == 14
+    endpoints = [endpoint for endpoint, _ in calls]
+    assert endpoints.count("projects/create") == 1
+    assert endpoints.count("backtests/create") == 1
+    assert endpoints.count("compile/create") == 1
+
+
+@pytest.mark.parametrize("candidate,attempt", (
+    ("R181", 1), ("R181", 2), ("R183", 1),
+))
+def test_exploratory_waiver_cannot_replace_unrelated_signed_permits(
+    projections, tmp_path, candidate, attempt,
+):
+    value = projections[candidate]
+    plan = _plan(tmp_path, value, candidate)
+    if attempt == 2:
+        plan = _a2_plan(tmp_path, value)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="waiver"):
+        subject._launch_authority(
+            plan, value, owner_signature=None,
+            owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+        )

@@ -198,6 +198,62 @@ def test_cap90_projection_binds_new_profile_and_runtime_selection(
     assert record["funded_orders"] is False
 
 
+@pytest.mark.parametrize("role", targets.ROLES)
+def test_cap90_runtime_ast_is_exact_and_every_cloud_file_fits_qc(
+    loaded_delta, role
+):
+    local_runtime = Path(runtime.__file__).read_bytes()
+    historical = subject.build_accepted_risk_six_universe_order_qc_projection(
+        loaded_delta, role=role
+    )
+    projected = subject.build_accepted_risk_six_universe_order_qc_projection(
+        loaded_delta, role=role, variant=runtime.CAP90_VARIANT
+    )
+    name = "accepted_risk_six_universe_order_qc_runtime.py"
+    historical_runtime = next(
+        item.source_bytes for item in historical.source_files
+        if item.project_path == name
+    )
+    cloud_runtime = next(
+        item.source_bytes for item in projected.source_files
+        if item.project_path == name
+    )
+    assert historical_runtime == local_runtime
+    assert cloud_runtime != local_runtime
+    assert ast.dump(ast.parse(cloud_runtime), include_attributes=False) == (
+        ast.dump(ast.parse(local_runtime), include_attributes=False)
+    )
+    assert all(
+        len(item.source_bytes.decode("ascii"))
+        <= subject.MAXIMUM_QC_SOURCE_CHARACTERS
+        for item in projected.source_files
+    )
+    assert len(projected.source_files) == len(historical.source_files) == 13
+
+
+def test_cap90_ast_normalization_refuses_semantic_rewrite(monkeypatch):
+    source = Path(runtime.__file__).read_bytes()
+    monkeypatch.setattr(subject.ast, "unparse", lambda _tree: "pass")
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcProjectionError,
+        match="AST changed",
+    ):
+        subject._cap90_qc_runtime_source(source)
+
+
+def test_cap90_ast_normalization_refuses_qc_file_limit(monkeypatch):
+    source = Path(runtime.__file__).read_bytes()
+    normalized = subject._cap90_qc_runtime_source(source)
+    monkeypatch.setattr(
+        subject, "MAXIMUM_QC_SOURCE_CHARACTERS", len(normalized) - 1
+    )
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcProjectionError,
+        match="source limit",
+    ):
+        subject._cap90_qc_runtime_source(source)
+
+
 @pytest.mark.parametrize("variant", ["", "cap95", "r177 ", None, 1])
 def test_projection_refuses_unfrozen_variant(loaded_delta, variant):
     with pytest.raises(subject.AcceptedRiskSixUniverseOrderQcProjectionError):

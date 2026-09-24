@@ -22479,3 +22479,80 @@ no later `Completed.` status is promoted to valid R-177 evidence. This does
 not substitute for R-181's fresh upload/readback and independent validity
 checks. The inventory read retained no statistics, logs, orders, charts, raw
 rows, or outcome aggregate.
+
+## 176. R-181 A1 pre-compile QC upload refusal and in-place A2 gate, 2026-09-23
+
+The owner explicitly directed launch of the frozen section-175 family. R-181
+A1 passed the local exact projection/profile preview, created private QC
+project `104 ARV2 SIX CAP90 SIGNAL R181 2021 2025` (`36891750`), removed the
+default notebook, and uploaded the first ten projected modules. The next
+`files/create`, for `accepted_risk_six_universe_order_qc_runtime.py`,
+returned failure before compile or `backtests/create`. A value-free project
+read shows its failed-upload residue as a **one-byte** runtime path, the ten
+previously uploaded modules at their expected lengths, absent
+`accepted_risk_six_universe_order_targets.py`, and the original 406-byte
+default `main.py`. No backtest exists from this attempt; no outcome statistic,
+log, chart, order, raw row, or provider value was read. The one-use A1 claim
+is spent, but **zero research looks, development evaluations, and formal
+cells** were spent because no backtest was launched.
+
+Read-only byte checks against the frozen A1 projection confirmed all ten
+completed uploads exactly; the runtime residue SHA-256 is
+`334359b90efed75da5f0ada1d5e6b256f4a6bd0aee7eb39c0f90182a021ffc8b`
+and the default `main.py` SHA-256 is
+`215476644fd846a1488ca4c45876ed21c9c736faa79b31a59fcaaa1643aac608`.
+The project's `backtests/list` with `includeStatistics=false` returned zero
+runs. These pins identify only the present A1 residue, not a backtest source.
+
+The projected runtime is **67,316 ASCII characters**. Section 66.3 already
+records QC's actual `files/create` maximum as **64,000 characters** (a failed
+mutation can still return HTTP 200). The cap-90 projector incorrectly raised
+its local per-file bound from 64 KiB to 80 KiB; both bounds exceed QC's
+64,000-character ceiling. The matching oversized file and one-byte residue
+make this the high-confidence cause; the new submission adapter deliberately
+suppressed the raw API error, so it has not independently captured the exact
+message for this attempt. This is a lane-owned **P2 pre-compile transport
+defect**, not a failed or ambiguous alpha estimate. It should have been
+caught by a source-size test before project creation.
+
+R-181 A2 may proceed only as a prospectively versioned, source-rehashed
+in-place correction in **the same project `36891750`**, with all projected
+files below the measured 64,000-character ceiling, exact residual inventory
+authentication and byte readback, a new one-use A2 claim, then at most one
+compile/backtest launch. No duplicate project is authorized. The frozen
+R-181 economic rule, package/activation, three-role comparator logic, and
+aggregate-only read scope do not change. R-182/R-183 remain unlaunched until
+R-181 produces an authenticated valid result. The three-attempt maximum is
+not enlarged; A1 is conservatively treated as the first consumed submission
+slot even though it never reached compile or backtest.
+
+### 176.1 Prospective A2 source repair and unlaunched-comparator supersession
+
+The repair changes **only host-side cap-90 QC source projection**. Python's
+`ast.unparse(ast.parse(runtime_source))` renders the 67,316-character
+reviewed runtime as 56,398 ASCII characters; reparsing yields the exact same
+attribute-free AST. Every projected file is now at most 64,000 ASCII
+characters, and the generated runtime compiles under the available Python
+3.9 as well as the local bundled interpreter. The local runtime, R-177
+default projection bytes, economic profile SHA, package/activation, decision
+rule, and result-read schema remain unchanged. The cap-90 projection schema
+is versioned to v3. This is a transport normalization, not a rule change;
+comments and formatting in the cloud runtime are not source-byte-identical to
+the local file, while executable syntax is AST-identical. Its generated
+runtime SHA-256 is
+`66cbc2966972467d3d38511e541c984d3932ad1dca2bcf05ccf69830307349b1`.
+
+| Candidate | Project and new exact backtest name | Profile SHA-256 (unchanged) | New projection SHA-256 / files / bytes |
+| --- | --- | --- | --- |
+| R-181 A2 signal | Existing `104 ARV2 SIX CAP90 SIGNAL R181 2021 2025` (`36891750`) / `ARV2 R181A2 six cap90 signal 2021 2025 b68661ec` | `d27c558b71d20694e803a244e89f3feb79ba5084971c8d6d8eefa7cf8ecf09f0` | `b68661ec2f90f98eb47e09242b8b9d4cd8ed21101667f355afba0a4a48461c29` / 13 / 375,616 |
+| R-182 A1 matched | Uncreated `105 ARV2 SIX CAP90 MATCHED R182 2021 2025` / `ARV2 R182A1 six cap90 matched 2021 2025 f72c05cc` | `ab8e53adb828c5bb8cad23150d87f1ab87964887dc45e2e783a822cd754ce57a` | `f72c05cc2168262f2c298ad934d87cc6e4005802d2ff0bdee7a472e18be7341f` / 13 / 375,617 |
+| R-183 A1 ETF basket | Uncreated `106 ARV2 SIX CAP90 ETF R183 2021 2025` / `ARV2 R183A1 six cap90 ETF basket 2021 2025 3df9bfe2` | `8d6f58c2a4ac427c7f81487d5ad00c901b4822a530bb0b6e9d729160819b4c1c` | `3df9bfe2dd05c47c34b52de0b544aeaa68a3ee7f2ffec65437ac020d07ee41d7` / 13 / 375,624 |
+
+The earlier section-175 R-182/R-183 A1 source hashes and backtest names are
+superseded **before those projects or backtests exist**. Their profiles,
+projects, comparator roles, look accounting, and economic rules are not
+changed. A2 may mutate only project `36891750` after authenticating the
+section-176 residual inventory, and then performs one exact 13-file readback,
+compile, and at most one `backtests/create`. The exact new identities above
+must be committed before that mutation. No backtest/result read has yet been
+made under these repaired identities.

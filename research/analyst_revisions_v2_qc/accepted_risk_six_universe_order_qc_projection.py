@@ -22,10 +22,14 @@ class AcceptedRiskSixUniverseOrderQcProjectionError(ValueError):
 
 
 PROJECTION_SCHEMA = "arv2-six-universe-order-qc-projection-v1"
-CAP90_PROJECTION_SCHEMA = "arv2-six-universe-order-qc-projection-cap90-v2"
+CAP90_PROJECTION_SCHEMA = "arv2-six-universe-order-qc-projection-cap90-v3"
 SOURCE_FILE_SCHEMA = "arv2-six-universe-order-qc-source-file-v1"
 MAIN_PROJECT_PATH = "main.py"
 MAXIMUM_SOURCE_FILE_BYTES = 80 * 1024
+# QC's file-management API refuses a Python source above 64,000 characters.
+# Keep this platform bound distinct from the local source-review byte bound:
+# only the new cap-90 projection is normalized; R-177 remains byte-identical.
+MAXIMUM_QC_SOURCE_CHARACTERS = 64000
 MAXIMUM_TOTAL_SOURCE_BYTES = 448 * 1024
 MINIMUM_REVIEW_MARGIN_BYTES = 32 * 1024
 ALGORITHM_START = (2020, 11, 1)
@@ -243,6 +247,35 @@ def _source_file(project_path, source):
         hashlib.sha256(source).hexdigest(),
         source,
     )
+
+
+def _cap90_qc_runtime_source(source):
+    """Render the reviewed runtime's exact AST within QC's file limit.
+
+    This transformation is exclusive to the cap-90 exploratory projection.
+    It cannot change statements, expressions, literals, or their order: both
+    parsed syntax trees must be structurally identical before upload.
+    """
+
+    if type(source) is not bytes:
+        _error("six-universe cap-90 runtime source is not bytes")
+    try:
+        original = source.decode("ascii")
+        original_tree = ast.parse(original)
+        normalized = ast.unparse(original_tree) + "\n"
+        normalized_source = normalized.encode("ascii")
+        normalized_tree = ast.parse(normalized)
+    except (SyntaxError, UnicodeError, RecursionError, ValueError) as exc:
+        raise AcceptedRiskSixUniverseOrderQcProjectionError(
+            "six-universe cap-90 runtime AST normalization failed"
+        ) from exc
+    if ast.dump(original_tree, include_attributes=False) != ast.dump(
+        normalized_tree, include_attributes=False
+    ):
+        _error("six-universe cap-90 runtime AST changed during normalization")
+    if len(normalized) > MAXIMUM_QC_SOURCE_CHARACTERS:
+        _error("six-universe cap-90 runtime exceeded QC's source limit")
+    return normalized_source
 
 
 def _main_source(*, activation, profile, variant):
@@ -464,6 +497,11 @@ def build_accepted_risk_six_universe_order_qc_projection(
             raise AcceptedRiskSixUniverseOrderQcProjectionError(
                 "six-universe projected source is unavailable"
             ) from exc
+        if (
+            variant == _runtime.CAP90_VARIANT
+            and project_path == "accepted_risk_six_universe_order_qc_runtime.py"
+        ):
+            source = _cap90_qc_runtime_source(source)
         files.append(_source_file(project_path, source))
     files.append(
         _source_file(
@@ -476,6 +514,10 @@ def build_accepted_risk_six_universe_order_qc_projection(
         )
     )
     files.sort(key=lambda item: item.project_path)
+    if variant == _runtime.CAP90_VARIANT and any(
+        item.byte_count > MAXIMUM_QC_SOURCE_CHARACTERS for item in files
+    ):
+        _error("six-universe cap-90 source exceeded QC's file limit")
     total = sum(item.byte_count for item in files)
     if total + MINIMUM_REVIEW_MARGIN_BYTES > MAXIMUM_TOTAL_SOURCE_BYTES:
         _error("six-universe projected source set exceeded its reviewed bound")
@@ -548,6 +590,7 @@ __all__ = (
     "ALGORITHM_START",
     "CAP90_PROJECTION_SCHEMA",
     "MAIN_PROJECT_PATH",
+    "MAXIMUM_QC_SOURCE_CHARACTERS",
     "MAXIMUM_SOURCE_FILE_BYTES",
     "MAXIMUM_TOTAL_SOURCE_BYTES",
     "MINIMUM_REVIEW_MARGIN_BYTES",

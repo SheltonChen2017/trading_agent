@@ -1148,6 +1148,24 @@ def test_field_source_backing_and_identity_drift_fail_closed() -> None:
         )
 
 
+def test_duplicate_projection_field_names_fail_closed() -> None:
+    # Isolating regression (Claude review 2026-09-24): the set-based
+    # missing/extras check cannot see a repeated name and flat_payload() would
+    # let the later duplicate win silently, so this guard must stand alone.
+    projection = _manifest().projections[0]
+    form_type = next(item for item in projection.fields if item.field_name == "form_type")
+    accepted = next(item for item in projection.fields if item.field_name == "accepted_at")
+    for duplicate in (
+        form_type,
+        dataclasses.replace(accepted, value="2026-01-15T15:30:00+00:00"),
+    ):
+        with pytest.raises(SecNoncanonicalPilotContractError, match="duplicate names"):
+            dataclasses.replace(projection, fields=(*projection.fields, duplicate))
+    # Case-colliding names cannot reach the projection: the field syntax is lowercase-only.
+    with pytest.raises(SecNoncanonicalPilotContractError, match="field name"):
+        dataclasses.replace(form_type, field_name="Form_type")
+
+
 def test_amendment_link_transform_self_and_form4_directions_fail_closed() -> None:
     _, amendment = _projection(
         "2026Q1",

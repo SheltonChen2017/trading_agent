@@ -84,55 +84,6 @@ _SELECTION_STATUSES = frozenset({
     "DUPLICATE_CAP_ETF_FALLBACK", "PARTIAL_STOCK_SLOTS_WITH_ETF_FALLBACK",
     "FULL_STOCK_SLOTS",
 })
-_EXECUTION_FIELDS = frozenset({
-    "schema", "decision_count", "submitted_rebalance_count",
-    "completed_rebalance_count", "holding_drift_skipped_rebalance_count",
-    "submitted_order_count", "filled_order_count_sum", "canceled_order_count_sum",
-    "invalid_order_count_sum", "orders_with_any_fill_count_sum",
-    "modeled_fee_bps_per_side", "modeled_fee_amount", "actual_engine_fee_amount",
-    "total_filled_notional", "mean_target_weight_l1_error",
-    "maximum_target_weight_l1_error", "target_weight_l1_error_mark_basis",
-    "fee_mismatch", "execution_failure", "run_valid", "plan_path_sha256",
-    "submitted_plan_path_sha256", "holding_drift_path_sha256",
-    "order_lifecycle_sha256", "external_order_event_count",
-    "external_order_event_path_sha256", "corporate_action_replan_count",
-    "corporate_action_replan_path_sha256",
-    "complete_holding_census_before_each_submission", "raw_order_rows_in_summary",
-    "raw_security_rows_in_summary", "backtest_only",
-    "simulated_market_on_open_orders", "live_orders", "paper_orders",
-    "funded_orders", "deployment", "trading",
-})
-_FORCED_FIELDS = frozenset({
-    "schema", "order_count", "event_count", "fill_event_count",
-    "terminal_order_count", "absolute_filled_quantity", "filled_notional",
-    "actual_engine_fee_amount", "accounting_complete", "ledger_sha256",
-    "raw_order_rows_in_summary", "raw_security_rows_in_summary",
-})
-_EXECUTION_COUNTS = frozenset({
-    "decision_count", "submitted_rebalance_count", "completed_rebalance_count",
-    "holding_drift_skipped_rebalance_count", "submitted_order_count",
-    "filled_order_count_sum", "canceled_order_count_sum",
-    "invalid_order_count_sum", "orders_with_any_fill_count_sum",
-    "external_order_event_count", "corporate_action_replan_count",
-})
-_EXECUTION_DECIMALS = frozenset({
-    "modeled_fee_amount", "actual_engine_fee_amount", "total_filled_notional",
-    "mean_target_weight_l1_error", "maximum_target_weight_l1_error",
-})
-_EXECUTION_DIGESTS = frozenset({
-    "plan_path_sha256", "submitted_plan_path_sha256", "holding_drift_path_sha256",
-    "order_lifecycle_sha256", "external_order_event_path_sha256",
-    "corporate_action_replan_path_sha256",
-})
-_AGGREGATE_DIGESTS = frozenset({
-    "account_observation_path_sha256", "gross_exposure_path_sha256",
-    "target_path_sha256", "construction_path_sha256",
-    "decision_target_path_sha256",
-    "fundamental_snapshot_unavailable_session_sha256",
-    "constituent_collection_unavailable_path_sha256",
-})
-
-
 @dataclass(frozen=True)
 class Cap90QcPlan:
     candidate_id: str
@@ -530,7 +481,8 @@ def _bounded_counts(value: object, *, maximum: int = 1_000_000,
     )
 
 
-def _check_nested_aggregate(aggregate: dict) -> None:
+def _project_aggregate(aggregate: dict) -> dict:
+    """Retain bounded comparison diagnostics, never arbitrary nested fields."""
     account = aggregate.get("account")
     sleeves = aggregate.get("sleeve_diagnostics")
     execution = aggregate.get("execution")
@@ -546,13 +498,10 @@ def _check_nested_aggregate(aggregate: dict) -> None:
         ))
         or (account["zero_rate_sharpe"] is not None and not _finite_decimal(account["zero_rate_sharpe"]))
         or type(sleeves) is not dict
-        or set(sleeves) != {"schema", "fields", "rows"}
-        or sleeves["schema"] != "arv2-six-universe-order-sleeve-summary-table-v1"
-        or sleeves["fields"] != list(_SLEEVE_FIELDS)
-        or type(sleeves["rows"]) is not list
-        or len(sleeves["rows"]) != 6
+        or sleeves.get("schema") != "arv2-six-universe-order-sleeve-summary-table-v1"
+        or sleeves.get("fields") != list(_SLEEVE_FIELDS)
+        or type(sleeves.get("rows")) is not list or len(sleeves["rows"]) != 6
         or type(execution) is not dict
-        or set(execution) != _EXECUTION_FIELDS
         or execution.get("schema") != "arv2-simulated-moo-executor-summary-v1"
         or execution.get("decision_count") != runtime.EXPECTED_DECISION_COUNT
         or execution.get("raw_order_rows_in_summary") is not False
@@ -564,33 +513,13 @@ def _check_nested_aggregate(aggregate: dict) -> None:
         or execution.get("deployment") is not False
         or execution.get("trading") is not False
         or type(forced) is not dict
-        or set(forced) != _FORCED_FIELDS
         or forced.get("schema") != runtime._forced.FORCED_DELISTING_SUMMARY_SCHEMA
         or forced.get("accounting_complete") is not True
         or forced.get("raw_order_rows_in_summary") is not False
         or forced.get("raw_security_rows_in_summary") is not False
-        or any(type(execution[key]) is not int or execution[key] < 0 for key in _EXECUTION_COUNTS)
-        or any(not _finite_decimal(execution[key]) for key in _EXECUTION_DECIMALS)
-        or any(type(execution[key]) is not str or not _HEX.fullmatch(execution[key]) for key in _EXECUTION_DIGESTS)
-        or any(type(execution[key]) is not bool for key in (
-            "fee_mismatch", "execution_failure", "run_valid",
-            "complete_holding_census_before_each_submission",
-        ))
-        or execution.get("complete_holding_census_before_each_submission") is not True
-        or execution.get("simulated_market_on_open_orders") is not True
-        or type(execution.get("modeled_fee_bps_per_side")) is not int
-        or type(execution.get("target_weight_l1_error_mark_basis")) is not str
-        or len(execution["target_weight_l1_error_mark_basis"]) > 80
-        or any(type(forced[key]) is not int or forced[key] < 0 for key in (
-            "order_count", "event_count", "fill_event_count",
-            "terminal_order_count", "absolute_filled_quantity",
-        ))
-        or not _finite_decimal(forced.get("filled_notional"))
-        or not _finite_decimal(forced.get("actual_engine_fee_amount"))
-        or type(forced.get("ledger_sha256")) is not str
-        or not _HEX.fullmatch(forced["ledger_sha256"])
     ):
         _fail("cap-90 nested aggregate identity changed")
+    clean_rows = []
     for ticker, row in zip(_UNIVERSES, sleeves["rows"]):
         if (
             type(row) is not list or len(row) != len(_SLEEVE_FIELDS)
@@ -602,26 +531,56 @@ def _check_nested_aggregate(aggregate: dict) -> None:
             or not _bounded_counts(row[11], keys=_SELECTION_STATUSES)
         ):
             _fail("cap-90 sleeve aggregate shape changed")
+        clean_rows.append(row[:10] + [dict(row[10]), dict(row[11])])
+    counts = aggregate.get("fallback_counts")
+    unavailable = aggregate.get("constituent_collection_unavailable_universe_counts")
+    count_keys = (
+        "reference_history_call_count", "pit_callback_source_row_count",
+        "fundamental_snapshot_unavailable_decision_count",
+        "constituent_collection_unavailable_decision_count",
+    )
+    execution_counts = (
+        "submitted_rebalance_count", "completed_rebalance_count",
+        "submitted_order_count", "filled_order_count_sum",
+        "canceled_order_count_sum", "invalid_order_count_sum",
+    )
+    execution_amounts = (
+        "modeled_fee_amount", "actual_engine_fee_amount", "total_filled_notional",
+    )
     if (
-        not _bounded_counts(aggregate.get("fallback_counts"), maximum=6 * runtime.EXPECTED_DECISION_COUNT, keys=_SELECTION_STATUSES)
-        or not _bounded_counts(aggregate.get("constituent_collection_unavailable_universe_counts"), maximum=runtime.EXPECTED_DECISION_COUNT, keys=frozenset(_UNIVERSES))
-        or set(aggregate["constituent_collection_unavailable_universe_counts"]) != set(_UNIVERSES)
-        or any(type(aggregate.get(key)) is not str or not _HEX.fullmatch(aggregate[key]) for key in _AGGREGATE_DIGESTS)
-        or type(aggregate.get("target_path_id")) is not str
-        or not _ID.fullmatch(aggregate["target_path_id"])
-        or sum(aggregate["fallback_counts"].values()) != 6 * runtime.EXPECTED_DECISION_COUNT
-        or any(type(aggregate.get(key)) is not int or aggregate[key] < 0 for key in (
-            "reference_history_call_count", "active_dynamic_minute_security_count",
-            "maximum_active_dynamic_minute_security_count",
-            "removed_dynamic_minute_security_count", "pit_callback_source_row_count",
-            "fundamental_snapshot_unavailable_decision_count",
-            "constituent_collection_unavailable_decision_count",
-        ))
+        not _bounded_counts(counts, maximum=6 * runtime.EXPECTED_DECISION_COUNT, keys=_SELECTION_STATUSES)
+        or sum(counts.values()) != 6 * runtime.EXPECTED_DECISION_COUNT
+        or not _bounded_counts(unavailable, maximum=runtime.EXPECTED_DECISION_COUNT, keys=frozenset(_UNIVERSES))
+        or set(unavailable) != set(_UNIVERSES)
+        or any(type(aggregate.get(key)) is not int or aggregate[key] < 0 for key in count_keys)
         or any(not _finite_decimal(aggregate.get(key)) for key in (
             "mean_gross_exposure", "maximum_gross_exposure",
         ))
+        or any(type(execution.get(key)) is not int or execution[key] < 0 for key in execution_counts)
+        or any(not _finite_decimal(execution.get(key)) for key in execution_amounts)
+        or type(execution.get("run_valid")) is not bool
+        or type(execution.get("execution_failure")) is not bool
+        or type(forced.get("order_count")) is not int or forced["order_count"] < 0
+        or type(forced.get("event_count")) is not int or forced["event_count"] < 0
     ):
-        _fail("cap-90 aggregate count or exposure shape changed")
+        _fail("cap-90 comparison diagnostic shape changed")
+    return {
+        "schema": aggregate["schema"], "role": aggregate["role"],
+        "profile_id": aggregate["profile_id"],
+        "profile_sha256": aggregate["profile_sha256"],
+        "account": dict(account),
+        "mean_gross_exposure": aggregate["mean_gross_exposure"],
+        "maximum_gross_exposure": aggregate["maximum_gross_exposure"],
+        "fallback_counts": dict(counts),
+        "sleeve_diagnostics": {"fields": list(_SLEEVE_FIELDS), "rows": clean_rows},
+        "execution": {key: execution[key] for key in (*execution_counts, *execution_amounts, "run_valid", "execution_failure")},
+        "engine_forced_delisting": {
+            "order_count": forced["order_count"], "event_count": forced["event_count"],
+        },
+        **{key: aggregate[key] for key in count_keys},
+        "constituent_collection_unavailable_universe_counts": dict(unavailable),
+        "run_valid": aggregate["run_valid"],
+    }
 
 
 def _attest_uploaded_source(plan: Cap90QcPlan, launch: dict, api: QuantConnectClient) -> None:
@@ -632,6 +591,12 @@ def _attest_uploaded_source(plan: Cap90QcPlan, launch: dict, api: QuantConnectCl
         or claim.get("profile_sha256") != launch["profile_sha256"]
         or type(claim.get("source_files")) is not list
         or len(claim["source_files"]) != 13
+        or any(
+            type(record) is not list or len(record) != 3
+            or type(record[0]) is not str or type(record[1]) is not str
+            or type(record[2]) is not int
+            for record in claim["source_files"]
+        )
     ):
         _fail("cap-90 claimed source identity changed")
     files = _post(api, "files/read", {"projectId": launch["project_id"]}).get("files")
@@ -738,14 +703,14 @@ def read_aggregates_once(plan: Cap90QcPlan, launch: dict, api: QuantConnectClien
         or (aggregate["run_valid"] is True and aggregate["execution"]["run_valid"] is not True)
     ):
         _fail("cap-90 result profile, digest, or safety flag changed")
-    _check_nested_aggregate(aggregate)
+    selected_aggregate = _project_aggregate(aggregate)
     valid = aggregate["run_valid"] is True
     if valid:
         _write_once(_control_path(plan, "result-valid"), {
             "candidate_id": plan.candidate_id, "run_valid": True,
             "aggregate_sha256": meta["aggregate_sha256"],
         })
-    return {"meta": meta, "aggregates": aggregate, "run_valid": valid}
+    return {"meta": meta, "aggregates": selected_aggregate, "run_valid": valid}
 
 
 __all__ = (

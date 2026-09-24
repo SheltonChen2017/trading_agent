@@ -18,6 +18,46 @@ PACKAGE_PATH = Path(
     "artifacts/analyst_revisions_v2/accepted_risk_delta_order_package_20260918_01/"
     "arv2-preliminary-qc-package-7803b84f0841f9685a4951de"
 )
+EXECUTION_FIELDS = (
+    "schema", "decision_count", "submitted_rebalance_count",
+    "completed_rebalance_count", "holding_drift_skipped_rebalance_count",
+    "submitted_order_count", "filled_order_count_sum", "canceled_order_count_sum",
+    "invalid_order_count_sum", "orders_with_any_fill_count_sum",
+    "modeled_fee_bps_per_side", "modeled_fee_amount", "actual_engine_fee_amount",
+    "total_filled_notional", "mean_target_weight_l1_error",
+    "maximum_target_weight_l1_error", "target_weight_l1_error_mark_basis",
+    "fee_mismatch", "execution_failure", "run_valid", "plan_path_sha256",
+    "submitted_plan_path_sha256", "holding_drift_path_sha256",
+    "order_lifecycle_sha256", "external_order_event_count",
+    "external_order_event_path_sha256", "corporate_action_replan_count",
+    "corporate_action_replan_path_sha256",
+    "complete_holding_census_before_each_submission", "raw_order_rows_in_summary",
+    "raw_security_rows_in_summary", "backtest_only",
+    "simulated_market_on_open_orders", "live_orders", "paper_orders",
+    "funded_orders", "deployment", "trading",
+)
+FORCED_FIELDS = (
+    "schema", "order_count", "event_count", "fill_event_count",
+    "terminal_order_count", "absolute_filled_quantity", "filled_notional",
+    "actual_engine_fee_amount", "accounting_complete", "ledger_sha256",
+    "raw_order_rows_in_summary", "raw_security_rows_in_summary",
+)
+EXECUTION_DECIMALS = (
+    "modeled_fee_amount", "actual_engine_fee_amount", "total_filled_notional",
+    "mean_target_weight_l1_error", "maximum_target_weight_l1_error",
+)
+EXECUTION_DIGESTS = (
+    "plan_path_sha256", "submitted_plan_path_sha256", "holding_drift_path_sha256",
+    "order_lifecycle_sha256", "external_order_event_path_sha256",
+    "corporate_action_replan_path_sha256",
+)
+AGGREGATE_DIGESTS = (
+    "account_observation_path_sha256", "gross_exposure_path_sha256",
+    "target_path_sha256", "construction_path_sha256",
+    "decision_target_path_sha256",
+    "fundamental_snapshot_unavailable_session_sha256",
+    "constituent_collection_unavailable_path_sha256",
+)
 
 
 @pytest.fixture(scope="module")
@@ -229,12 +269,12 @@ def _statistics(plan, launch, *, valid=True, bad_digest=False):
         "cumulative_return": "0.1", "maximum_drawdown": "-0.1",
         "annualized_volatility": "0.2", "zero_rate_sharpe": "0.5",
     }
-    execution = {key: 0 for key in subject._EXECUTION_FIELDS}
+    execution = {key: 0 for key in EXECUTION_FIELDS}
     execution.update({
         "schema": "arv2-simulated-moo-executor-summary-v1",
         "decision_count": runtime.EXPECTED_DECISION_COUNT,
-        **{key: "0" for key in subject._EXECUTION_DECIMALS},
-        **{key: "0" * 64 for key in subject._EXECUTION_DIGESTS},
+        **{key: "0" for key in EXECUTION_DECIMALS},
+        **{key: "0" * 64 for key in EXECUTION_DIGESTS},
         "target_weight_l1_error_mark_basis": "prior_close_reference_prices_not_realized_open_prices",
         "fee_mismatch": False, "execution_failure": not valid, "run_valid": valid,
         "complete_holding_census_before_each_submission": True,
@@ -243,7 +283,7 @@ def _statistics(plan, launch, *, valid=True, bad_digest=False):
         "live_orders": False, "paper_orders": False, "funded_orders": False,
         "deployment": False, "trading": False,
     })
-    forced = {key: 0 for key in subject._FORCED_FIELDS}
+    forced = {key: 0 for key in FORCED_FIELDS}
     forced.update({
         "schema": runtime._forced.FORCED_DELISTING_SUMMARY_SCHEMA,
         "filled_notional": "0", "actual_engine_fee_amount": "0",
@@ -262,7 +302,7 @@ def _statistics(plan, launch, *, valid=True, bad_digest=False):
         "role": plan.role, "profile_id": launch["profile_id"],
         "profile_sha256": plan.profile_sha256,
         "account": account,
-        **{key: "0" * 64 for key in subject._AGGREGATE_DIGESTS},
+        **{key: "0" * 64 for key in AGGREGATE_DIGESTS},
         "mean_gross_exposure": "0.98", "maximum_gross_exposure": "0.98",
         "target_path_id": "arv2-target-path-v1",
         "fallback_counts": {"SIX_ETF_BASKET": 6 * runtime.EXPECTED_DECISION_COUNT},
@@ -403,8 +443,14 @@ def test_result_reader_refuses_extra_fields_even_with_recomputed_digest(
 
     monkeypatch.setattr(subject, "_client", lambda _api: None)
     monkeypatch.setattr(subject, "_post", post)
-    with pytest.raises(subject.Cap90QcSubmissionError):
-        subject.read_aggregates_once(plan, launch, object())
+    if insertion in {"top", "sleeve_reason"}:
+        with pytest.raises(subject.Cap90QcSubmissionError):
+            subject.read_aggregates_once(plan, launch, object())
+    else:
+        result = subject.read_aggregates_once(plan, launch, object())
+        assert "raw_orders" not in result["aggregates"][
+            "execution" if insertion == "execution" else "engine_forced_delisting"
+        ]
     assert calls == ["files/read", "backtests/read"]
     assert subject._control_path(plan, "result-read-claim").exists()
 

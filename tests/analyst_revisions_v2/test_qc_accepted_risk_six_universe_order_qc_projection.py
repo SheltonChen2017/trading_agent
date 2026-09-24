@@ -280,3 +280,37 @@ def test_projection_source_is_qc_prelude_safe():
         for node in ast.walk(tree)
     )
     compile(source, subject.__file__, "exec")
+
+
+def test_cap90_projection_refuses_any_oversized_projected_file(
+    loaded_delta, monkeypatch
+):
+    """Every cap-90 file must fit QC's 64,000-character ceiling, not only the
+    AST-normalized runtime: a grown gate, executor, or target builder must
+    refuse locally instead of failing at QC's ``files/create``."""
+
+    real_limit = subject.MAXIMUM_QC_SOURCE_CHARACTERS
+    normalize = subject._cap90_qc_runtime_source
+
+    def normalize_under_the_real_limit(source):
+        # The runtime's own normalization check keeps the real ceiling so the
+        # per-file inventory check is the only guard exercised here.
+        subject.MAXIMUM_QC_SOURCE_CHARACTERS = real_limit
+        try:
+            return normalize(source)
+        finally:
+            subject.MAXIMUM_QC_SOURCE_CHARACTERS = 1_000
+
+    monkeypatch.setattr(
+        subject, "_cap90_qc_runtime_source", normalize_under_the_real_limit
+    )
+    monkeypatch.setattr(subject, "MAXIMUM_QC_SOURCE_CHARACTERS", 1_000)
+    with pytest.raises(
+        subject.AcceptedRiskSixUniverseOrderQcProjectionError,
+        match="file limit",
+    ):
+        subject.build_accepted_risk_six_universe_order_qc_projection(
+            loaded_delta,
+            role=targets.ROLE_SIGNAL,
+            variant=runtime.CAP90_VARIANT,
+        )

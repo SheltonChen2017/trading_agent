@@ -1168,7 +1168,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     ),
     "six_universe_tilt40_submission.py": tuple(
         """
-        __future__ hashlib os re stat time dataclasses pathlib
+        __future__ hashlib json os re stat time dataclasses pathlib
         research.quantconnect research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime

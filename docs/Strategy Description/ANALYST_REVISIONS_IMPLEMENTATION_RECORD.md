@@ -23703,6 +23703,15 @@ were unauthorized despite a one-time aggregate reader. The permit now
 explicitly authorizes only one aggregate read, and the read-time digest
 check binds the same permit bytes. Forty-one focused R-185, R-184-regression,
 and import-boundary checks pass; this is not a full lane suite.
+An optional R-185-only exploratory waiver branch is implemented but **not
+activated**: the existing signed route remains available, and the waiver
+route requires the exact distinct ID
+`ARV2-OWNER-2026-09-24-R185A1-TILT40-EXPLORATORY-SIGNATURE-WAIVER` plus an
+explicit owner choice. Both routes bind the same one-use source and
+aggregate-only result scope; missing, wrong, mixed, or tampered authorities
+refuse before the relevant QC read or write. After this addition, 86 focused
+tests pass across R-185, R-184 regression, import-boundary, and lane-record
+selections. No R-185 QC call has occurred.
 
 **Review and launch gates.** At this implementation start, the remote lane
 head is `c8dfd27`; Claude has not yet pushed an independent review of that

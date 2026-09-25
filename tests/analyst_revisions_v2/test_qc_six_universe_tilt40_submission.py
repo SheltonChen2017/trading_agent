@@ -332,3 +332,123 @@ def test_equal_tampered_signature_digests_refuse_before_result_network_read(
         subject.read_aggregates_once(plan, launch, object())
     assert calls[before:] == []
     assert not subject._control_path(plan, "result-read-claim").exists()
+
+
+@pytest.mark.parametrize("authority", ("missing", "wrong", "mixed"))
+def test_r185_waiver_refuses_missing_wrong_or_mixed_authority_before_network(
+    projection, tmp_path, monkeypatch, authority,
+):
+    plan = _plan(tmp_path, projection)
+    r184_tests._predecessors(monkeypatch, plan)
+    calls, _ = _fake_qc(monkeypatch, plan, projection)
+    signature = _signed(monkeypatch)
+    kwargs = {
+        "missing": {},
+        "wrong": {"owner_waiver_id": cap90._R183_BRIDGE_WAIVER_ID},
+        "mixed": {
+            "owner_waiver_id": subject._WAIVER_ID,
+            "owner_signature": signature,
+        },
+    }[authority]
+    with pytest.raises(subject.SixUniverseTilt40SubmissionError):
+        subject.launch_a1(plan, projection, object(), **kwargs)
+    assert calls == []
+    assert not subject._control_path(plan, "claim").exists()
+
+
+def test_r185_exact_waiver_binds_one_use_launch_and_aggregate_read(
+    projection, tmp_path, monkeypatch,
+):
+    plan = _plan(tmp_path, projection)
+    r184_tests._predecessors(monkeypatch, plan)
+    calls, state = _fake_qc(monkeypatch, plan, projection)
+    launch = subject.launch_a1(
+        plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
+    )
+    claim = subject._read(subject._control_path(plan, "claim"))
+    waived_payload = subject._render_waived_launch_payload(
+        plan, subject.preview(plan, projection),
+        matched_baseline_target_path_sha256="f" * 64,
+    )
+    scope = json.loads(waived_payload)
+    assert subject._canonical(scope) == waived_payload
+    assert scope["schema"] == subject._WAIVER_SCHEMA
+    assert scope["owner_launch_waiver_id"] == subject._WAIVER_ID
+    assert scope["project_name"] == plan.project_name
+    assert scope["backtest_name"] == plan.backtest_name
+    assert scope["source_files_sha256"] == subject._SOURCE_FILES_SHA256
+    assert scope["matched_baseline_target_path_sha256"] == "f" * 64
+    assert scope["aggregate_only_result_read_authorized"] is True
+    assert scope["maximum_result_reads"] == 1
+    assert scope["paper_live_deployment_funded_trading_authorized"] is False
+    permit_sha = hashlib.sha256(waived_payload).hexdigest()
+    expected = {
+        "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
+        "owner_launch_waiver_schema": subject._WAIVER_SCHEMA,
+        "owner_launch_waiver_id": subject._WAIVER_ID,
+        "owner_waived_payload_sha256": permit_sha,
+    }
+    assert {key: claim[key] for key in expected} == expected
+    assert {key: launch[key] for key in expected} == expected
+    assert not any(key.startswith("owner_signature") for key in claim)
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    state["statistics"] = _statistics(plan, launch)
+    result = subject.read_aggregates_once(plan, launch, object())
+    assert result["run_valid"] is True
+    assert calls.count("backtests/create") == 1
+    assert calls.count("backtests/read") == 1
+    with pytest.raises(subject.SixUniverseTilt40SubmissionError, match="already claimed"):
+        subject.launch_a1(
+            plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
+        )
+
+
+def test_equal_tampered_waiver_digests_refuse_before_result_network_read(
+    projection, tmp_path, monkeypatch,
+):
+    plan = _plan(tmp_path, projection)
+    r184_tests._predecessors(monkeypatch, plan)
+    calls, _ = _fake_qc(monkeypatch, plan, projection)
+    launch = subject.launch_a1(
+        plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
+    )
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    claim_path = subject._control_path(plan, "claim")
+    launch_path = subject._control_path(plan, "launch")
+    claim = subject._read(claim_path)
+    claim["owner_waived_payload_sha256"] = "0" * 64
+    claim_path.write_bytes(subject._canonical(claim))
+    launch = {**launch, "owner_waived_payload_sha256": "0" * 64}
+    launch_path.write_bytes(subject._canonical(launch))
+    before = len(calls)
+    with pytest.raises(subject.SixUniverseTilt40SubmissionError, match="waiver"):
+        subject.read_aggregates_once(plan, launch, object())
+    assert calls[before:] == []
+    assert not subject._control_path(plan, "result-read-claim").exists()
+
+
+def test_waiver_claim_rejects_equal_source_manifest_tamper_before_result_read(
+    projection, tmp_path, monkeypatch,
+):
+    plan = _plan(tmp_path, projection)
+    r184_tests._predecessors(monkeypatch, plan)
+    calls, _ = _fake_qc(monkeypatch, plan, projection)
+    launch = subject.launch_a1(
+        plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
+    )
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    claim_path = subject._control_path(plan, "claim")
+    claim = subject._read(claim_path)
+    claim["source_files"][0][1] = "0" * 64
+    claim["owner_waived_payload_sha256"] = hashlib.sha256(
+        subject._render_waived_launch_payload(
+            plan, claim, matched_baseline_target_path_sha256="f" * 64,
+        )
+    ).hexdigest()
+    claim_path.write_bytes(subject._canonical(claim))
+    launch = {**launch, "owner_waived_payload_sha256": claim["owner_waived_payload_sha256"]}
+    subject._control_path(plan, "launch").write_bytes(subject._canonical(launch))
+    before = len(calls)
+    with pytest.raises(subject.SixUniverseTilt40SubmissionError, match="source claim"):
+        subject.read_aggregates_once(plan, launch, object())
+    assert calls[before:] == []

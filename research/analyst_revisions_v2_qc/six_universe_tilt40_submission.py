@@ -8,6 +8,7 @@ I/O. A valid R181 A3 and R182 A1 receipt chain precedes its single A1 launch.
 from __future__ import annotations
 
 import hashlib
+import json
 import os
 import re
 import stat
@@ -42,11 +43,14 @@ _PROJECT_NAME = "108 ARV2 SIX CAP90 TILT40 R185 2021 2025"
 _ROLE = "matched_revision_tilt40"
 _PROJECTION_SHA256 = "2a9f9a2175e2765c1136d4aca3d86d617bbee970769eecae6dcab2e0f1127c7d"
 _PROFILE_SHA256 = "a76cead2de5fef1176803f77b2a7efd3cc11fa24734dcdcf91a047f4ae552539"
+_SOURCE_FILES_SHA256 = "898fe81760270071b47365a3b2296781effec63b99413bb220c75a7ca757f6c0"
 _BACKTEST_NAME = "ARV2 R185A1 six cap90 bridge tilt40 2021 2025 " + _PROJECTION_SHA256[:8]
 _TOTAL_SOURCE_BYTES = 422_758
 _SOURCE_COUNT = 16
 _PREDECESSOR_PROJECT_NAME = "105 ARV2 SIX CAP90 MATCHED R182 2021 2025"
 _LAUNCH_PERMIT_SCHEMA = "arv2-six-universe-tilt40-owner-launch-permit-v1"
+_WAIVER_SCHEMA = "arv2-six-universe-tilt40-exact-owner-waiver-v1"
+_WAIVER_ID = "ARV2-OWNER-2026-09-24-R185A1-TILT40-EXPLORATORY-SIGNATURE-WAIVER"
 _CUSTOM_NAMES = tuple(sorted((
     base_runtime.META_STATISTIC_NAME,
     base_runtime.AGGREGATES_STATISTIC_NAME,
@@ -207,6 +211,10 @@ def preview(plan: Tilt40QcPlan, projection: object) -> dict:
         or projection.projection_id != (
             "arv2-six-universe-order-tilt40-qc-projection-" + digest[:24]
         )
+        or hashlib.sha256(_canonical(tuple(
+            (item.project_path, item.content_sha256, item.byte_count)
+            for item in files
+        ))).hexdigest() != _SOURCE_FILES_SHA256
     ):
         _fail("tilt source manifest is not self-authenticating")
     return {
@@ -214,6 +222,8 @@ def preview(plan: Tilt40QcPlan, projection: object) -> dict:
         "projection_sha256": plan.projection_sha256,
         "profile_id": profile["profile_id"],
         "profile_sha256": plan.profile_sha256,
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
         "source_files": tuple((item.project_path, item.content_sha256, item.byte_count) for item in files),
     }
 
@@ -264,6 +274,27 @@ def _render_owner_launch_payload(
         "raw_logs_orders_charts_authorized": False,
         "paper_live_deployment_funded_trading_authorized": False,
     })
+
+
+def _render_waived_launch_payload(
+    plan: Tilt40QcPlan, identity: dict, *, matched_baseline_target_path_sha256: str,
+) -> bytes:
+    """Bind this separate owner waiver to the same exact one-use scope.
+
+    Do not reuse the signed payload hash: the waiver's own schema and ID must
+    be part of its canonical bytes, not merely adjacent receipt fields.
+    """
+    signed_scope = json.loads(_render_owner_launch_payload(
+        plan, identity,
+        matched_baseline_target_path_sha256=matched_baseline_target_path_sha256,
+    ))
+    signed_scope.pop("signature_purpose")
+    signed_scope.update({
+        "schema": _WAIVER_SCHEMA,
+        "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
+        "owner_launch_waiver_id": _WAIVER_ID,
+    })
+    return _canonical(signed_scope)
 
 
 def render_owner_launch_permit(plan: Tilt40QcPlan, projection: object) -> bytes:
@@ -324,15 +355,42 @@ def _require_owner_launch_permit(
     }
 
 
+def _launch_authority(
+    plan: Tilt40QcPlan, identity: dict, matched_path_sha: str, *,
+    owner_signature: OwnerSignatureAuthority | None,
+    owner_waiver_id: str | None,
+) -> dict:
+    """Require exactly one R185 A1 authority mode, before network or claim."""
+    if (owner_signature is None) == (owner_waiver_id is None):
+        _fail("tilt40 launch needs exactly one owner signature or exact waiver")
+    if owner_waiver_id is None:
+        return _require_owner_launch_permit(
+            plan, identity, matched_path_sha, owner_signature,
+        )
+    if type(owner_waiver_id) is not str or owner_waiver_id != _WAIVER_ID:
+        _fail("tilt40 exploratory owner signature waiver does not cover launch")
+    payload = _render_waived_launch_payload(
+        plan, identity, matched_baseline_target_path_sha256=matched_path_sha,
+    )
+    return {
+        "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
+        "owner_launch_waiver_schema": _WAIVER_SCHEMA,
+        "owner_launch_waiver_id": _WAIVER_ID,
+        "owner_waived_payload_sha256": hashlib.sha256(payload).hexdigest(),
+    }
+
+
 def launch_a1(
     plan: Tilt40QcPlan, projection: object, api: QuantConnectClient, *,
     owner_signature: OwnerSignatureAuthority | None = None,
+    owner_waiver_id: str | None = None,
 ) -> dict:
     """Use one fresh private project and one QC backtest attempt."""
     identity = preview(plan, projection)
     matched_path_sha = _require_valid_predecessors(plan)
-    authority = _require_owner_launch_permit(
-        plan, identity, matched_path_sha, owner_signature,
+    authority = _launch_authority(
+        plan, identity, matched_path_sha,
+        owner_signature=owner_signature, owner_waiver_id=owner_waiver_id,
     )
     _client(api)
     claim_path = _control_path(plan, "claim")
@@ -562,8 +620,17 @@ def read_aggregates_once(plan: Tilt40QcPlan, launch: dict,
         or claim.get("profile_sha256") != plan.profile_sha256
         or claim.get("profile_id") != launch.get("profile_id")
         or claim.get("profile_id") != tilt40_projection.require_tilt40_profile()["profile_id"]
+        or claim.get("package_sha256") != plan.package_sha256
+        or claim.get("activation_manifest_sha256") != plan.activation_manifest_sha256
         or claim.get("matched_baseline_target_path_sha256") != matched_path_sha
         or launch.get("matched_baseline_target_path_sha256") != matched_path_sha
+        or hashlib.sha256(_canonical(claim["source_files"])).hexdigest()
+        != _SOURCE_FILES_SHA256
+        or any(claim.get(key) != launch.get(key) for key in (
+            "candidate_id", "attempt", "role", "projection_sha256",
+            "profile_id", "profile_sha256", "package_sha256",
+            "activation_manifest_sha256",
+        ))
     ):
         _fail("tilt40 source claim or predecessor changed")
     signature_keys = (
@@ -574,18 +641,31 @@ def read_aggregates_once(plan: Tilt40QcPlan, launch: dict,
         "owner_launch_authority_mode", "owner_launch_waiver_schema",
         "owner_launch_waiver_id", "owner_waived_payload_sha256",
     )
-    expected_payload_sha = hashlib.sha256(_render_owner_launch_payload(
-        plan, claim, matched_baseline_target_path_sha256=matched_path_sha,
-    )).hexdigest()
-    if (
-        any(
+    if claim.get("owner_launch_authority_mode") == "exact_exploratory_signature_waiver":
+        expected_payload_sha = hashlib.sha256(_render_waived_launch_payload(
+            plan, claim, matched_baseline_target_path_sha256=matched_path_sha,
+        )).hexdigest()
+        if (
+            any(key in claim or key in launch for key in signature_keys)
+            or claim.get("owner_launch_waiver_schema") != _WAIVER_SCHEMA
+            or claim.get("owner_launch_waiver_id") != _WAIVER_ID
+            or claim.get("owner_waived_payload_sha256") != expected_payload_sha
+            or any(claim.get(key) != launch.get(key) for key in waiver_keys)
+        ):
+            _fail("tilt40 exact owner waiver receipt changed")
+    elif (
+        any(key in claim or key in launch for key in waiver_keys)
+        or any(
             type(claim.get(key)) is not str
             or not _HEX.fullmatch(claim[key])
             or claim[key] != launch.get(key)
             for key in signature_keys
         )
-        or claim["owner_signed_payload_sha256"] != expected_payload_sha
-        or any(key in claim or key in launch for key in waiver_keys)
+        or claim["owner_signed_payload_sha256"] != hashlib.sha256(
+            _render_owner_launch_payload(
+                plan, claim, matched_baseline_target_path_sha256=matched_path_sha,
+            )
+        ).hexdigest()
     ):
         _fail("tilt40 owner signature receipt changed")
     _check_uploaded_source(plan, launch["project_id"], claim, api)

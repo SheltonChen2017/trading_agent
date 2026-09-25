@@ -124,6 +124,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_six_universe_order_qc_runtime.py
     accepted_risk_six_universe_order_settlement_qc_projection.py
     accepted_risk_six_universe_order_targets.py
+    accepted_risk_six_universe_order_tilt100_floor_qc_projection.py
     accepted_risk_six_universe_order_tilt100_qc_projection.py
     accepted_risk_six_universe_order_tilt40_qc_projection.py
     accepted_risk_six_universe_order_tilt80_qc_projection.py
@@ -1163,6 +1164,13 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_settlement_qc_projection
         """.split()
     ),
+    "accepted_risk_six_universe_order_tilt100_floor_qc_projection.py": tuple(
+        """
+        dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_qc_projection
+        """.split()
+    ),
     "accepted_risk_six_universe_order_tilt_ladder_qc_projection.py": tuple(
         """
         dataclasses hashlib json types research.analyst_revisions_v2_qc
@@ -1475,6 +1483,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "call:compile",
     ),
     "accepted_risk_six_universe_order_tilt100_qc_projection.py": (
+        "call:compile",
+    ),
+    "accepted_risk_six_universe_order_tilt100_floor_qc_projection.py": (
         "call:compile",
     ),
     "six_universe_cap90_submission.py": (
@@ -4241,6 +4252,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_settlement_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_floor_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt40_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt80_qc_projection",

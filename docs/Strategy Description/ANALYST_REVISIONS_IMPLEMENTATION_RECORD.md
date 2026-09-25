@@ -622,7 +622,9 @@ authenticated cells. The owner explicitly defers Claude review of section
 185 through the bounded, separately versioned R-191 matched and R-192 80%
 settlement-policy research tests; Claude should review section 185 and the
 prior pushed sections after that single lane push. No 80% return is yet
-accepted, and the old R-186 cash/reader gates remain unchanged.
+accepted at this section's prelaunch point, and the old R-186 cash/reader
+gates remain unchanged. Sections 185.1–185.2 later authenticate R-191 and
+R-192 under the newly versioned settlement policy.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
@@ -639,6 +641,18 @@ paper/live deployment, funded-account, broker, or trading authority follows
 from R-168 through R-177. The economic figures in sections 148, 154, and 167
 came from bounded diagnostic aggregate reads and must retain that label;
 R-177 produced no economic result.
+
+Section 186 freezes R-193's 100% target rule and records its A1 runtime
+refusal. Section 187 records the owner's report of a Mia-completed ~133%
+repair, the exact cloud target-file change, and a separately pinned local
+R-194 positive-residual projection. That owner-reported return is not an
+authenticated result cell. A concurrent third run in the same QC project
+is in progress and conservatively exhausts the R-193-lineage three-attempt
+ceiling; Codex must not make a fourth launch or silently promote either
+cloud run. The current floor is 188 shared research looks, 131 ARV2
+development evaluations, 32 infrastructure looks, and 615 authenticated
+cells. Claude should review section 187 with sections 181–186 after the
+owner's deferred same-round QC work closes and Codex makes its single push.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -683,7 +697,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–185
+findings, outcomes, and per-run accounting remain in numbered sections 1–187
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -24574,3 +24588,112 @@ R-193, not a blind A2 or a stronger tilt sweep. Even if a later correction
 yields a 100% in-sample return, selecting the best of these same-window
 settings requires a separate untouched period before any live-trading
 claim. No owner-authorized paper/live/funded deployment or trading exists.
+
+## 187. Owner/Mia R-193 positive-residual repair audit, 2026-09-25
+
+The owner reports that QC Mia repaired the R-193 100% tilt and saw a
+roughly **+133%** headline return. This is an owner-reported QC display
+figure, **not yet an authenticated ARV2 result cell**. At the first
+status-only QC inventory of the same private project `36958163`, there
+were two backtests: frozen A1 `c185799f754b7b74592d98a033299480` at
+`Runtime Error`, then Mia verification
+`03339972a62ecdbffe66aaa2187653f9` at `Completed.`. The latter's
+metadata names snapshot `36959165`; the current changed source file was
+modified at 2026-09-25 19:20:53 UTC and the run was created at 19:20:55
+UTC. The timing strongly links them but a read of *current* project files
+does not cryptographically prove the historical snapshot's source.
+No result statistic, raw log/order/provider/price row, or chart was read
+in this audit.
+
+At that first source read, the QC project had all 16 R-193 Python paths,
+and 15 were byte-identical to the frozen A1 projection. Mia had changed only
+`accepted_risk_six_universe_order_tilt_targets.py`: 20,754 to 21,329
+bytes; its new SHA-256 is
+`83d8abe00794fa7211b2f6fe0124179bd526cca37d0a9f94bf283901d5d442b4`.
+The change caps a donor's remaining transfer by
+`stock_totals[donor_id] - WEIGHT_TRANSFER_QUANTUM` (`1e-30`) in addition
+to the existing rank-based capacity. Thus a market-cap-selected stock
+keeps a strictly positive aggregate target when a nominal 100% transfer
+would otherwise set it to zero. This plausibly repairs the exact-zero
+refusal demonstrated locally, but neither the A1 error text nor the Mia
+run's authenticated aggregate has been read. An extra `mia.ipynb` existed
+in QC and was not imported or read. The SHA-256 of the 16-file Python
+manifest at that first source read was
+`4376572e2572898ea4920259719ff97cf55466249a77bd138636c43e61f2dc52`.
+
+This is a **new target rule**, however small its `1e-30` floor may be:
+the frozen R-193 projection/profile/source hash and A1-only result reader
+cannot authenticate Mia's run. The 16 Python files then totaled **426,329
+bytes**, 345 over the lane's frozen 425,984-byte source-review bound; simply
+copying Mia's full file into the old projection would refuse. These are
+`ARV2CR187-001` (P2, open: changed rule/source lacks independently pinned
+result authority) and `ARV2CR187-002` (P2, the Mia cloud source exceeds
+the frozen review budget). Any local port must be separately versioned,
+behaviorally tested against the zero-weight failure and negative-weight
+direction, and kept within its own declared source budget without silently
+weakening the old A1 pins. A future matched comparison also needs an exact
+source/snapshot binding, signed aggregate validity, orders/cash/exposure/
+tracking/cost gates, and the same-window adaptive-tuning disclosure.
+
+The owner/Mia backtest is conservatively another research look, moving
+the shared floor **186 -> 187**, ARV2 development evaluations **129 -> 130**,
+with infrastructure looks **32** and authenticated cells **615** unchanged.
+It is the second launch in the R-193 lineage, not a retroactive successful
+A1; the owner's three-attempt limit is not reset by renaming a repair.
+
+### 187.1 Separate local R-194 floor source and focused proof
+
+The host-only `accepted_risk_six_universe_order_tilt100_floor_qc_projection.py`
+derives the exact frozen R-193 closure without editing its A1 bytes. It
+changes only three projected files: the target transfer, runtime profile,
+and entrypoint identity. Its compact transfer expression is algebraically
+equal to Mia's nested minimum for finite Decimals, but the distinct rule
+has its own role, schema, profile, and pins. The 16-file R-194 projection
+SHA-256 is `c10b1aa8c6d56104ec6fcdc134a4a335ae648df9be67a75894cf79090b33dd85`;
+profile SHA-256 is `1f338baac6cad9ea0e95661d8320711013435e24d20a2d7ee67496194a430053`;
+manifest SHA-256 is `2e51cd6547908ac2c3adbae5430fdb7ce4e2af8e724002281931c59d58b88d5c`.
+Its 425,919 source bytes are 65 under the frozen 425,984-byte review
+ceiling, resolving `ARV2CR187-002` **for this local prospective source**;
+the prior cloud source remains over that ceiling and unauthenticated.
+
+Focused local validation: 17 R-194 projection tests passed, including
+R-193 red/R-194 green on exact-zero donor refusal, a single-guard mutant
+that restores that refusal, six compact-versus-Mia Decimal transfer cases,
+unchanged selected IDs and six sleeve budgets, 98% gross target, aggregate
+stock cap, refusal of negative/nonfinite baseline weights, and exact
+profile/source pins. Seven frozen R-193 tests and the exhaustive host-only
+import/no-I/O closure test also passed: **25 focused tests passed** total.
+The lane-record integrity selection also passed **11/11**, for **36**
+focused and active-document checks in the final local selection. Codex
+did not run the full lane or repository suite, per the owner rule.
+No QC upload, compile, backtest, or outcome read was made for R-194 by
+Codex. This is a local corrected candidate, not evidence of a 133% return.
+
+### 187.2 Concurrent third QC run exhausts the R-193-lineage attempt ceiling
+
+While a final-attempt adapter was being designed, a later status-only
+`backtests/list` read found a third backtest already **In Queue...** in
+project `36958163`: ID `8cf40956b404bcef885f864086a9c40c`, name
+`R194 tilt100 fraction parameterization identity check`. Codex did not
+create, compile, or launch it. A1 and Mia A2 were still the other two
+entries, with the exact statuses above. A separate read-only file-digest
+check then found further current QC edits beyond the Mia A2 snapshot:
+`accepted_risk_six_universe_order_tilt_targets.py` was 22,881 bytes / SHA-256
+`2a003f7c0d51195a727ba04ad0908287830499817ab27dbb265340a283a4cf2b`,
+the tilt runtime was 8,899 bytes / SHA-256
+`35734f3ec2fc437c73d51357a2d31d662096f88d998b5f1ab3d5ebaf67f9f892`,
+and `main.py` was 6,854 bytes / SHA-256
+`49b5c2e5dccab15faebd9495b97b8a9bfb46fcb5e87cd576277e1f331f191c85`.
+No content or outcome from this newer source/run was used as strategy
+evidence. The exact launch actor and purpose are not yet established.
+
+`ARV2CR187-003` (P2, open): until the third run is classified, count it
+conservatively as the **third and final R-193-lineage launch** despite its
+R-194 label. The shared research-look floor moves **187 -> 188**, ARV2
+development evaluations **130 -> 131**, infrastructure remains **32**, and
+authenticated cells remain **615**. No Codex A3 launcher was built or
+executed; a fourth run cannot be relabelled as a new candidate to bypass
+the owner’s three-attempt limit. The queued run's terminal status and
+result validity remain unknown. No R-194 Codex launch, accepted 100%
+return, broker/paper/live/funded order, deployment, or trading follows
+from either displayed headline.

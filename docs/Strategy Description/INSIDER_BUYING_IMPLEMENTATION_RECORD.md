@@ -1,20 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEWED CODEX COMMITS `653874e..eac2fc1` (SECTION 80).
-`8a021df` AND `eac2fc1` ARE ACCEPTED; `008baa8` (IB-1A RAW CONTRACT V2) IS
-ACCEPTED AFTER TEST-ONLY P3 CORRECTION `IBZIP-CR05` IN `acc1d3d`. THE FIX IS
-VERIFIED ON THE REAL FILES: IN-MEMORY IB-1A INSPECTION ACCEPTS ALL 82
-TRACKED SEC QUARTERLY ZIPS, AND ONE QUARTER PER NAMING ERA ROUND-TRIPS
-THROUGH WRITE AND LOAD IN A SCRATCH DIRECTORY OUTSIDE THE REPOSITORY, SO
-`IBZIP-CR04` IS CLOSED. NO TSV ROW, FILING, OR XML WAS PARSED AND NO LATER
-STAGE RAN. THE COMPLETE SUITE ON `eac2fc1` IS **8,294 PASSED, 38 SKIPPED,
-0 FAILED**; 214, 355, AND 425 REPRODUCE; 17 OF 18 MUTANTS ARE CAUGHT AFTER
-THE PINS (THE SURVIVOR IS REDUNDANT). THE MATCHING FORM 4/4-A PRIMARY XML AND
-ACCEPTANCE METADATA ARE STILL ABSENT, SO THE OFFLINE PILOT BEYOND IB-1A AND
-CANONICAL IB-2 COMPLETENESS ARE NOT ESTABLISHED. CODEX COUNTER-REVIEW OF
-`acc1d3d` AND THIS RECORD IS NEXT. NO OUTCOME, QC, PAPER, LIVE, DEPLOYMENT,
-BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK COUNTERS
-REMAIN ZERO.**
+Status: **CODEX ACCEPTED BOTH CLAUDE COMMITS `acc1d3d` AND `efc2c7d` AFTER
+COUNTER-REVIEW (SECTION 81); `IBZIP-CR06` P3 IS CLOSED BY AN APPEND-ONLY
+RED-COUNT CORRECTION. THE OWNER-AUTHORIZED SYNTHETIC, ZERO-I/O 82-QUARTER
+SOURCE-MANIFEST/STREAMING CANDIDATE IS IMPLEMENTED IN `3b1e797`, PENDING
+CLAUDE'S INDEPENDENT REVIEW OF THE EXACT COMBINED PUSH. THE NEW FILE HAS
+64 PASSING SYNTHETIC TESTS; THE FOCUSED CODE/BOUNDARY/DOCUMENT SET HAS
+614 PASSED. NO REAL FILE OR EXTERNAL SOURCE WAS READ IN THIS ROUND. IB-1A'S
+EARLIER 82-ZIP ACCEPTANCE REMAINS VERIFIED, BUT THE REAL-FILE IB-1B PILOT
+NEEDS AN AUDITED SCHEMA PROFILE AND A BOUNDED RUNNER; MATCHING PRIMARY XML
+AND ACCEPTANCE METADATA ARE STILL ABSENT. CANONICAL IB-2, OUTCOMES, QC,
+PAPER/LIVE DEPLOYMENT, BROKER, CAPITAL, ORDERS, AND TRADING REMAIN GATED;
+ALL LOOK COUNTERS ARE ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -191,6 +188,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-24 | Claude review | `bde56714` -> this review record | Review of `4d0cbf3b..bde56714`: the Codex counter-review `a4192546`, the intake record `e24584a5`, and the owner-authorized tracking of the 82 SEC quarterly ZIPs `bde56714` (three commits, zero merges) | Verified isolation and the recorded authorization; accepted all three section-76 counter-review findings; reproduced the manifest hash, all 82 ZIP sizes, SHA-256s, and committed-blob identities, the byte total, quarter contiguity, the ZIP CRC test, and the fit against IB-1A limits; confirmed both lane ZIP-URL grammars accept all 82 real URLs. Full detail in section 78, including the required 1-10 rating. | Lane gate on `bde56714` 2,074 passed, 8 skipped in 386.24s; record/active-document checks 70 passed in 6.17s; compileall exit 0; `git diff --check` clean; CRC **82 passed, 0 failed** (Python `zipfile.testzip`; recorded 82/0); no complete repository suite run, per owner direction. No SEC/EDGAR, network, provider, credential, licensed row, filing content, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 research looks**. | `a4192546` accepted; `e24584a5` accepted with a discipline note; `bde56714` accepted after verification, with the pre-existing P2 `IBZIP-CR04` (IB-1A refuses all 82 real archives) opened for Codex. Three P3 record items and one project-level repository-size observation documented, not fixed (78.6, 78.7); one pre-existing lane P2 (`IBZIP-CR04`) documented for Codex. No lane code or test changed. | Codex counter-reviews this review round. The offline pilot still needs its matching XML/metadata bundle; nothing started by inference. |
 | 2026-09-25 | Codex counter-review + implementation | `bde56714..653874e` reviewed; `008baa8` raw-snapshot v2 code snapshot; this record commit follows | Claude section-78 counter-review plus bounded `IBZIP-CR04` repair | Accepted Claude's sole new record commit; this row also indexes ZIP-intake commits `e24584a5` and `bde56714`. Corrected IB-1A to admit the exact complete metadata/readme pair for each observed naming era, kept table descriptors separate from auxiliary descriptors so IB-1B continues to parse only TSVs, hash-bound every auxiliary byte into raw lineage, and advanced the raw contract to v2. Kept the existing three-required/five-optional table-only fixture path. | Python 3.12.14 / pytest 9.1.1. Eight new real-shape/guard cases failed red on the old eight-member cap; the same eight passed after correction. Final focused raw/parsed set **214 passed**; related raw/parsed, persisted multi-period, pilot contracts, module hygiene, and ML/overlay import boundaries **355 passed**; targeted `compileall` exit 0 and staged diff check clean. No complete lane or repository suite run, per owner direction; no real ZIP member parsed or SEC request; **0 looks**. | `653874e` accepted with no new finding. `IBZIP-CR04` P2 corrected in `008baa8`, pending Claude review. `IBZIP-CR01` P3 corrected by this section-5 row; `IBZIP-CR02` historical append-only lapse retained; `IBZIP-CR03` source-route note retained without unauthorised re-fetch. Project-level repository-size issue remains documented/out of lane. | Commit this lane record and make the round's one push. Claude reviews every commit in `653874e..PUSHED_HEAD`, then Codex counter-reviews every Claude commit. The selected matching Form 4/4-A XML and acceptance-metadata bundle with exact provenance is still needed before the offline pilot; no outcome/QC/trading authority follows. |
 | 2026-09-25 | Claude review | `eac2fc1` -> `acc1d3d` (test correction) -> this review record | Independent review of the section-79 counter-review and the IB-1A raw contract v2 repair of `IBZIP-CR04` (`653874e..eac2fc1`, 3 commits, 0 merges, 4 lane-owned paths) | Verified the remote tip and clean worktree, then dispositioned all three commits: `8a021df` and `eac2fc1` accepted, `008baa8` accepted after a test-only correction. Read the v2 contract against the loader and IB-1B, ran 18 faithful mutants in a read-only export with bytecode caching disabled, reproduced the red check on the pre-fix module, and verified the fix on the real files: in-memory IB-1A inspection of all 82 tracked SEC ZIPs and a write-then-load round trip for one quarter per era in a scratch directory outside the repository, deleted afterwards. No TSV row, filing, or XML parsed; no later stage run. | Complete suite on `eac2fc1` in the worktree **8,294 passed, 38 skipped, 28 warnings, 0 failed in 441.57s**. Recorded counts reproduce: **214**, **355**, **425**. Red check on `653874e`: **14 failed, 200 passed**. Real archives: **82 of 82 accepted**, 0 refused. Mutation: **10 of 15 caught** on the pushed tree, **17 of 18** after `acc1d3d`, survivor redundant. Final tree: IB-1A plus IB-1B **219 passed**; lane gate (19 Insider files plus active-document, module-hygiene, overlay-import, and ML-import boundaries) **2,101 passed, 0 skipped in 34.12s**; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IBZIP-CR04` P2 closed in `008baa8` and verified on real files. `IBZIP-CR05` P3 closed in `acc1d3d` (five unpinned v2 guards, two pre-existing). `IBZIP-CR06` P3 open, record precision (79.4 names eight red cases; the failing set is 14). `IBZIP-CR01` closed by Codex's row; `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `acc1d3d` and this record. Next real-file step under the 72.5 pilot is IB-1B on a bounded contiguous selection through the reviewed pilot runner; the matching XML and acceptance-metadata bundle is still absent. No outcome, QC, paper, or trading step is inferred. |
+| 2026-09-25 | Codex counter-review + implementation | `eac2fc1..efc2c7d` reviewed; `3b1e797` implementation snapshot; this lane-record commit follows | Claude IB-1A-v2 review counter-review plus owner-approved synthetic 82-quarter source-manifest/stream boundary | Accepted both Claude commits; closed `IBZIP-CR06` P3 with an append-only 14-red-case precision note. Added a pure candidate manifest that binds the exact 82-period policy, raw-v2 and parsed identities, complete accession JSONL including context forms, exactly paired Form 4/4-A source receipts, exact accession URL provenance, and globally unique accessions via an 82-way bounded merge. No real data, publisher, parser-cap expansion, or authority change. | Python 3.12.14 / pytest 9.1.1: new synthetic file **64 passed**; focused policy, raw/parsed, boundary, record/active-document, and import checks **614 passed** on the code-committed tree with this record edit; incoming raw/parsed counter-review set **219 passed**. Material duplicate, TOCTOU, URL, memory, and stream failures reproduced red and restored green; two read-only hash/seal reverse mutations were caught. Targeted `compileall` exited 0; `git show --check` on `3b1e797` and the staged code diff were clean. No complete lane/repository suite. No real ZIP, XML, metadata, SEC/provider, outcome, QC, broker, or trading access; **0 looks**. | Incoming `acc1d3d`/`efc2c7d` accepted. `IB2MAN-R01`–`R06` P2/P3 fixed before code commit with red/green evidence. `IBZIP-CR06` P3 closed; historical `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, and out-of-lane `IBSH-CR01` retained. No open P0-P2 in the candidate. | Commit this record, make the round's one push, and have Claude independently review every commit in `efc2c7d..PUSHED_HEAD`; Codex then counter-reviews every Claude commit. Real-file IB-1B pilot still requires an audited schema/profile and bounded runner; matching XML/acceptance metadata remains absent. No outcome/QC/paper/live/trading authority follows. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -10568,3 +10566,144 @@ scheduler, deployment, capital, order, live, or trading surface was
 accessed. Real SEC archive bytes were read only by IB-1A as described in
 80.3. Authorized outcome looks: **0**. Consumed outcome looks: **0**.
 Research looks: **0**.
+
+## 81. Codex counter-review of Claude's IB-1A v2 review and the next source-boundary milestone (2026-09-25 UTC)
+
+### 81.1 Exact incoming range and per-commit dispositions
+
+The designated worktree remained
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. The fetched local and remote tips matched
+at `efc2c7d609554c8bd1981c2d4e5f8a1d65cf30af` before this round, and the
+worktree was clean. The exact linear Claude range after the previous Codex
+head is `eac2fc1..efc2c7d`: two commits, no merge.
+
+| Claude commit | Disposition | Counter-review evidence |
+|---|---|---|
+| `acc1d3da40561bdcf2c4f3ead37f637a64f3af2b` | **Accepted; no new finding.** | The test-only diff adds four test functions with five effective cases: inspect-side auxiliary lineage binding, null table and auxiliary inventories as contract errors, an unknown `.tsv` within the caps, and ZIP-order-independent auxiliary canonicalization. Each exercises the named guard without relaxing a prior test or changing production code. The IB-1A plus IB-1B focused set passes **219** tests on the pushed tree. |
+| `efc2c7d609554c8bd1981c2d4e5f8a1d65cf30af` | **Accepted; no new finding.** | Section 80 distinguishes Claude's complete-suite run and real-file IB-1A verification from any IB-1B or later-stage claim, records all three prior Codex dispositions, closes `IBZIP-CR04` and `IBZIP-CR05` with evidence, and correctly leaves the matching XML/acceptance bundle absent. The diff changes only this lane record: one mutable top-status block, one section-5 row, and appended section 80. |
+
+Both Claude commits pass `git show --check`; the range passes `git diff
+--check`. No new P0-P3 finding arose in their changes. The previously open
+`IBZIP-CR02` (historical append-only lapse), `IBZIP-CR03` (unattested SEC
+request provenance), and `IB2SRC-CR03` (historical mutation-harness caveat)
+remain recorded without unauthorized re-fetch or retroactive rewrite.
+`IBSH-CR01` remains shared and out of this lane.
+
+### 81.2 `IBZIP-CR06` append-only red-count correction
+
+`IBZIP-CR06` (P3, record precision) is **CLOSED by this append-only note**.
+Section 79.4 accurately reports the initial targeted run of eight new
+real-shape/auxiliary cases, all red on the old eight-member cap and green
+after `008baa8`, but it does not describe the *complete* pre-fix failing
+set. Claude's broader red check applied the `008baa8` tests to the pre-fix
+`653874e` module and obtained **14 failed, 200 passed**: thirteen failing
+cases in the IB-1A test file, including the version-1 parameter, plus the
+IB-1B round-trip case. The corrected tree gave **214 passed** in that same
+pre-`acc1d3d` focused set and **219 passed** after Claude's five test pins.
+The fourteen comprise the two era parameters of
+`test_real_shape_archive_hashes_auxiliaries_without_parsing_them_as_tables`,
+the five inventory parameters of
+`test_incomplete_or_wrong_era_auxiliary_inventory_refuses`, and one each from
+`test_auxiliary_bytes_change_lineage_and_forged_descriptor_refuses`,
+`test_corrupt_auxiliary_bytes_refuse_before_publication`,
+`test_auxiliary_manifest_order_is_canonical_even_with_rehashed_commit`,
+`test_auxiliary_member_obeys_expanded_size_limit`,
+`test_more_than_ten_zip_members_refuses_before_member_content_read`, the
+`invalid_version=1` parameter of
+`test_manifest_raw_contract_version_requires_current_exact_integer`, and
+`test_parsed_snapshot_consumes_only_tables_from_auxiliary_bearing_raw_zip`.
+Thus eight was a subset, not the total; the section-79 historical wording is
+preserved, not rewritten. This closes the lane-owned documentation finding
+without changing production behavior or claiming new real-file work.
+
+### 81.3 Owner-authorized synthetic 82-quarter source-manifest candidate
+
+The owner separately authorized a **synthetic-only, zero-I/O** scalable
+82-quarter content-addressed source-manifest and streaming-validation
+boundary after Claude's review of `226c4c1..07ba33e` and Codex's
+counter-review of its commits. That condition was completed in the earlier
+rounds. Section 80.6's IB-1B step is the next *real-file pilot* step, not
+permission to process files as part of this separate boundary. This round
+adds only `sec_canonical_source_manifest.py`, its package exports, and
+synthetic tests. No real corpus manifest was instantiated or published.
+
+The pure builder requires the exact frozen source-policy type and digest and
+all **82** ordered periods, 2006Q1 through 2026Q2. For each period it binds
+an IB-1A raw-contract-v2 identity to an IB-1B parsed identity, including the
+raw manifest hash and parsed parent; rehashes the complete canonical
+`accessions.jsonl` stream, including Forms 3/5 as retained context; and
+requires exactly one caller-declared acceptance-metadata/primary-XML pair for
+each Form 4/4-A accession. An 82-way merge of one accession number per
+quarter refuses duplicate accession numbers anywhere in the corpus without
+retaining accession rows or serialized lines. Metadata/XML chunks are
+SHA-256/size checked incrementally, with 1 MiB chunk and 64 MiB per-artifact
+ceilings. Declared SEC HTTPS URLs, exact accession path segments, canonical
+UTC retrieval instants, and source-byte receipts are bound into per-quarter
+digests; the primary XML URL must use the exact SEC Archives accession path.
+The result retains 82 summaries and a self-checking content hash, not the
+source bytes. Raw/parsed identities and the policy are rechecked after all
+caller-owned streams finish to refuse mid-build mutation.
+
+This is a **candidate contract**, not canonical IB-2 completion. The tests
+construct hash-coherent in-memory identities and synthetic byte streams;
+they do not prove that a caller's identity came from an independently
+verified loader, that a URL was actually fetched from SEC, that metadata
+contains a genuine EDGAR acceptance timestamp, that an XML file is complete
+or semantically correct, or that official accession coverage and amendment
+lineage are complete. The code has no filesystem, network, cache publisher,
+real-file adapter, outcome, QC, broker, or execution operation. Existing
+IB-1B and IB-1E per-stage limits are unchanged; this boundary does not lift
+the 16-quarter/256-XML downstream cap or create an official schema profile.
+
+### 81.4 P0-P3 implementation finding ledger and red/green evidence
+
+The following lane-owned issues were found and corrected **before the code
+commit**. Each material guard was pinned by a synthetic red case or a
+read-only in-memory reverse mutation, then restored green on the final code.
+
+| ID | Priority | Status | Issue and impact | Red evidence | Correction and green evidence |
+|---|---|---|---|---|---|
+| `IB2MAN-R01` | P2 | **CLOSED before commit** | Per-quarter accession ordering did not prevent the same accession being counted in two quarters. | A coherently rehashed interior-quarter duplicate was accepted; its dedicated test failed red. | Bounded 82-way global merge refuses the duplicate. The test passes green with a duplicate-specific refusal. |
+| `IB2MAN-R02` | P2 | **CLOSED before commit** | Caller-owned generators could mutate a frozen source declaration, raw/parsed identity, policy, or queued accession between validation and serialization, producing a hash-bound but internally inconsistent candidate. | Separate source-URL/time, raw-identity/policy, and queued-accession mutation tests failed red; a read-only probe demonstrated the queued/serialized number mismatch. | Snapshot declarations and accession scalars, process each row before queuing only its number, and recheck identities/policy after all streams. The same cases pass green; no live accession row or line is held across the merge. |
+| `IB2MAN-R03` | P2 | **CLOSED before commit** | A SEC-shaped metadata/XML URL for a different accession was accepted, contrary to the no-cross-accession source rule. | Two wrong-accession URL cases failed red; an independent probe built an 82-quarter candidate with a foreign Archives accession. | Require exact accession path segments for both artifacts and the reviewed SEC Archives shape for primary XML. The cases pass green; a targeted in-memory deletion of the strict XML-path guard makes its two specific tests fail. |
+| `IB2MAN-R04` | P2 | **CLOSED before commit** | The first 82-way lookahead retained whole canonical accession lines (and live rows), allowing large per-quarter rows to accumulate across 82 cursors despite the streaming claim. | A 234,714-byte synthetic accession line remained in a cursor and the bounded-memory invariant test failed red; the theoretical retained-line ceiling was 82 times the 256 MiB per-quarter artifact cap. | Consume/hash the row and its source before queueing only its immutable number; no row or serialized line remains in a cursor. The invariant passes green. |
+| `IB2MAN-R05` | P3 | **CLOSED before commit** | Zero-length chunks could advance a stream without advancing its byte count; source URLs had no length cap; a metadata URL could include both the correct and a foreign accession-looking segment. | One empty-chunk case, one over-8-KiB URL case, and two ambiguous-metadata-segment cases failed red. | Refuse empty chunks, cap URLs at the existing 8-KiB evidence boundary, require canonical UTC seconds, and refuse any foreign accession-shaped segment. All four cases pass green. |
+| `IB2MAN-R06` | P3 | **CLOSED before commit** | Early candidate output construction did not self-check its manifest digest, and the first source-row digest sketch omitted URL/time declarations. | Read-only in-memory reverse mutations demonstrated that dropping source provenance makes two different declared URLs hash identically and disabling the manifest seal admits a forged digest. | Bind validated URL/time into each source receipt and verify the manifest hash/82-period inventory in construction. Restored behavior distinguishes the two provenance declarations and refuses the forged digest; the production module is byte-unchanged by the probes. |
+
+No new P0 or P1 finding was found. `IBZIP-CR06` is closed by 81.2;
+`IBZIP-CR02`/`CR03` and `IB2SRC-CR03` remain historical or unattested P3
+items, and shared `IBSH-CR01` remains out of lane. The synthetic candidate
+opens no P0-P2 item for handoff; it still requires independent Claude review
+before acceptance.
+
+### 81.5 Validation, exclusions, and handoff
+
+On the final synthetic code, the new manifest test file passed **64/64**.
+The focused manifest, frozen source-policy, IB-1A/IB-1B, implementation-record,
+active-document, module-hygiene, overlay-import, and ML-import set passed
+**614/614** on the bundled Python 3.12.14 / pytest 9.1.1. The incoming
+Claude tree's IB-1A plus IB-1B set independently passed **219/219** during
+counter-review. Targeted `compileall` exited **0**; the code commit passes
+`git show --check`, and its staged diff passed `git diff --cached --check`.
+Codex did **not** run a
+complete lane or repository suite; Claude owns that independent review gate.
+All fixtures are synthetic and built in memory. No actual ZIP member, TSV
+row, XML, acceptance metadata, security master, provider row, or outcome was
+read by this round. Authorized and consumed outcome looks: **0**; research
+looks: **0**.
+
+Make one combined push of this counter-review, implementation, tests, and
+record on the existing `codex/strategy-insider-buying` branch. Claude then
+reviews **every commit** after `efc2c7d`, including this candidate boundary;
+Codex counter-reviews every Claude commit before another implementation
+round. The next **real-file pilot** step is a separately reviewed offline
+IB-1B adapter/profile on a bounded contiguous selection of owner-supplied
+quarters. The exact official TSV header/source-row-key profile and matching
+Form 4/4-A primary XML plus acceptance-metadata bundle are still missing, so
+IB-1C/IB-1E pilot completion and canonical 82-quarter corpus acceptance
+cannot be claimed. The shared security-master/calendar audit still has no
+venue/executor; new synthetic diagnostics remain paused under 72.5. No SEC
+or network request, official source authentication, outcome, ETF, QC job,
+paper/live deployment, broker, capital, order, or trading authority follows
+from this round.

@@ -651,12 +651,14 @@ has reached QC `Completed.` without an authorized result read and
 conservatively exhausts the R-193-lineage three-attempt
 ceiling; neither cloud completion is an authenticated result. Section 188
 records the owner's later explicit, one-time exception for exactly one
-source-pinned fourth-lineage corrected 100% rerun. This grants no
-automatic retry or return acceptance. Before that launch, the floor is
-188 shared research looks, 131 ARV2
-development evaluations, 32 infrastructure looks, and 615 authenticated
-cells. Claude should review section 188 with sections 181–187 after the
-owner's deferred same-round QC work closes and Codex makes its single push.
+source-pinned fourth-lineage corrected 100% rerun. QC completed that run,
+but its sole bounded result read refused the matched-baseline tilt binding;
+no R-194 return or comparative cell was accepted. The one-use read and
+launch exception are spent, with no automatic retry. The floor is now
+189 shared research looks, 132 ARV2 development evaluations, 32
+infrastructure looks, and 615 authenticated cells. Claude should review
+section 188 with sections 181–187 after the owner's deferred same-round QC
+work closes and Codex makes its single push.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -24811,3 +24813,103 @@ infrastructure **32**, authenticated cells **615**. One submitted run will
 move the first two floors to **189/132** even if it fails. No raw provider,
 price, order, or log rows, charts, broker, paper/live/funded, deployment,
 or trading endpoint is authorized or required.
+
+### 188.1 Exact R-194 launch and spent look
+
+After prospective commit `537ce53`, the authenticated hardened QC client
+read a status-only inventory: old project `36958163` still had exactly
+three R-193-lineage runs (two `Completed.`, one `Runtime Error`), and the
+new R-194 private project name had zero matches. The one-use R-194 launch
+claim was then written before cloud mutation. QC created private project
+`36961621`, uploaded and byte-read back the exact 16 pinned Python files,
+compiled them, and launched one backtest
+`364671e6478228b691b86d78aba51574` named
+`ARV2 R194A1 six cap90 settlement 2021 2025 c10b1aa8`. The returned
+receipt binds the R-194 projection/profile hashes from section 188 and
+`r193_lineage_look_number=4`. No source was uploaded to, or backtest
+created in, the older owner/Mia project.
+
+This **spends the one-time exception**: shared research looks **188 -> 189**
+and ARV2 development evaluations **131 -> 132**. Infrastructure looks
+remain **32**; authenticated cells remain **615** pending one valid,
+source-bound aggregate read. No second R-194 launch or automatic retry is
+admitted by the claim, regardless of the run's terminal status.
+
+### 188.2 Terminal run and one-use result refusal
+
+The status-only poll authenticated `Completed.` for private project
+`36961621`, backtest `364671e6478228b691b86d78aba51574`, and wrote the
+exact R-194 terminal receipt. The sole permitted bounded custom-statistic
+read then rechecked the **current uploaded project files** against the
+pinned closure, authenticated exact run identity, custom-statistic
+inventory, META schema and aggregate digest, profile/package lineage,
+and safety flags, and passed preliminary signed-cash, gross-exposure,
+and tracking consistency checks. It refused at
+`_settlement_aggregate` with **`settlement tilt or matched target binding
+changed`**, before the deeper base-account projection. The read claim was
+written before the QC response, as designed; no `result-valid` receipt
+exists. The response was not retained outside that one-use Python process.
+Consequently this is a **completed QC run, not an authenticated economic
+result**: no R-194 return, drawdown, Sharpe, matched spread, or additional
+cell is accepted or inferred from a QC headline statistic.
+
+`ARV2D188-001` (**P2, open result-lineage refusal**): the failed check has
+three conjuncts. The exact projected producer emits the pinned R-191
+matched-profile SHA-256
+`f650044a704a4a0522e4c95c065a3eda3d3de22e8c5425579e04155c88f5220c`
+and literal `maximum_stock_weight_change_fraction="1.00"`; both remain
+unchanged by the R-194 floor projection. Its third field is the **dynamic**
+`path.baseline_target_path_sha256` from the matched decisions, whereas the
+reader requires the prior R-182/R-191/R-192 digest
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`.
+A changed matched path, potentially a data-vintage change, is therefore
+the leading **inference**, not an observed diagnosis: the particular
+mismatching field and its actual value were not retained. This is not
+evidence of a strategy loss or a successful 100% tilt. The gate is not
+relaxed, its read claim is not deleted, and neither a second result read
+nor a fifth R-193-lineage backtest is attempted. Further diagnosis must
+be separately authorized and prospectively bounded; a changed matched
+path would prevent a clean same-basis comparison to R-191/R-192 even if
+the engine's own return statistic were visible.
+
+The final look accounting remains **189 shared research looks, 132 ARV2
+development evaluations, 32 infrastructure looks, 615 authenticated
+cells**. This run added one look and zero accepted cells. QC access after
+launch comprised status-only polls and the single bounded custom-statistic
+read; no raw provider/price/order rows, logs, chart, or standard-statistic
+field was inspected or retained. No broker, paper/live/funded endpoint,
+deployment, or real order was read or acted on. The owner separately
+approved a bookkeeping-only
+append to the project-wide `docs/research/alpha-result.md`. Its R-194
+entry also reconciles the two earlier R-193 A2/A3 looks without rewriting
+the historical R-193 A1 entry or importing an unverified return.
+
+### 188.3 Review notes for Claude and handoff
+
+Review the exact same-lane range **`db340ac..` this round's pushed head**.
+`537ce53` is the prospective R-194 launcher/claim extension, focused
+regressions, and prelaunch record; accept only if the fourth-lineage look
+and one-use receipt semantics are sound. The successor documentation-only
+commit records the launched run, bounded refusal, updated live handoff,
+and owner-authorized shared-ledger append; it makes no strategy-source or
+verifier change. No Claude commit was counter-reviewed in this
+owner-deferred implementation round. In
+particular, check the R-194 source/waiver/manifest pins, isolation from
+old QC project `36958163`, the three-field tilt-binding test at the
+reader, the static-versus-dynamic inference in `ARV2D188-001`, and the
+absence of an accepted return. Do not mistake `Completed.` or the owner's
+earlier Mia-reported ~133% for a valid R-194 cell.
+
+Before launch, focused source, submission, host-only closure, and active
+record checks were **78 passed in 10.70 s**; changed-source compilation
+and `git diff --check` were clean. After the ledger append, focused
+record, submission, and R-194 projection checks were **77 passed in
+8.78 s**, and `git diff --check` remained clean. The complete
+lane/repository suite was not run by Codex under the owner rule; Claude
+runs it in review. No
+subsequent QC launch or result read occurred after the refusal. The next
+decision is whether the owner wants a separately bounded diagnostic of
+the matched path and data vintage or to stop this tuned 100% line. No
+automatic retry, reader relaxation, higher tilt, formal acceptance,
+leverage, broker, deployment, paper/live/funded operation, or trading
+follows from this run.

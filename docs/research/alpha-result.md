@@ -4541,3 +4541,38 @@ The A1 launch spends **185 -> 186 shared research looks / 128 -> 129 ARV2
 development evaluations**. Infrastructure looks stay **32** and
 authenticated cells stay **615**. No broker, paper/live, funded-order,
 deployment, or trading authority follows.
+
+## R-194 — one-time fourth R-193-lineage 100% tilt look; completed engine, refused result — 2026-09-25
+
+This append-only entry reconciles the two launches after the R-193 A1
+entry: in owner/Mia project `36958163`, A2
+`03339972a62ecdbffe66aaa2187653f9` and A3
+`8cf40956b404bcef885f864086a9c40c` each reached QC `Completed.`,
+but neither has a source-authenticated bounded result read. The owner's
+Mia-reported approximately +133% is **not** an accepted return cell.
+Those two launches spend **186 -> 188 shared looks / 129 -> 131 ARV2
+development evaluations** without changing the 615-cell floor. The
+R-193 A1 statement that A2/A3 were unspent described the state at that
+earlier entry; it is superseded for current accounting by this entry.
+
+At the owner's explicit one-time exception, the separately pinned local
+R-194 positive-residual 100% source was uploaded and byte-read back in
+new private project `116 ARV2 SIX CAP90 SETTLED TILT100 FLOOR R194 2021 2025`
+(`36961621`), compiled, and launched once. Backtest
+`364671e6478228b691b86d78aba51574` reached QC `Completed.`. The sole
+bounded META/AGGREGATES read rechecked the current uploaded project
+files against the pinned source and authenticated the summary digest,
+but refused `settlement tilt or matched target binding
+changed` before accepting an account result. Its one-use read claim is
+spent, and no result-valid receipt exists. A changed matched target-path
+digest is the leading **unconfirmed** explanation, not a measured one.
+No R-194 return, drawdown, Sharpe, matched spread, raw provider/price/order
+row, log, or chart is accepted from this run. Analyst lane section 188
+records the exact source/waiver pins, refusal, and review notes.
+
+The R-194 launch spends **188 -> 189 shared research looks / 131 -> 132
+ARV2 development evaluations**. Infrastructure looks remain **32** and
+authenticated cells remain **615**. R-194 is honestly the fourth look in
+the R-193 100% lineage; its one-time exception permits no automatic
+retry, fifth look, or result-reader bypass. No formal alpha, broker,
+paper/live, funded-order, deployment, or trading authority follows.

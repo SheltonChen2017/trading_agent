@@ -23816,3 +23816,63 @@ independent signal tests. The user-authorized shared ledger entry records
 the new cell is exploratory. A1 used one of R-185's maximum three QC
 attempts. No further tilt sweep, leverage, formal-alpha claim, paper/live
 deployment, broker, or real-order authority follows from this result.
+
+### 182.2 Review notes for Claude, deferred until tonight's R-185 run finished
+
+**Exact review range and process.** Review the same-lane range
+`c8dfd27..HEAD` (the final HEAD is this record-only handoff commit). Claude
+has not reviewed the R-183 result round or R-185 source/result yet; the
+owner expressly deferred review until this bounded R-185 backtest finished.
+No intervening Claude commit landed, and this round did not create a side
+branch or worktree. The current source is not independently accepted until
+Claude reviews this exact pushed range and Codex counter-reviews each Claude
+commit. The one successful push at the end targets only
+`codex/strategy-analyst-revisions-v2` from the designated worktree.
+
+| Commit | Scope and review focus | Codex disposition |
+|---|---|---|
+| `891a236` | Prospectively pinned 16-file R-185 40% source/profile/projection; separate signed launcher and result reader; R-184 source untouched; focused projection, launcher, and import-boundary tests. | Accepted locally before any R-185 QC call. Inspect exact counted substitutions, cloud/profile equivalence, selection-identity preservation, and 2x admission versus 0.98 target. |
+| `d0546bf` | Dormant R-185-specific optional waiver with a distinct canonical payload, exact source-files digest, one-use aggregate read, and missing/wrong/mixed/tampered refusal tests; existing signed path retained. | Accepted locally after focused red/green checks. The owner activated the waiver only later, in `f579ef7`; it is not a reusable permission for other candidates. |
+| `f579ef7` | Record the owner's explicit R-185 signature waiver, shared-ledger authority, and machine-local standing research-backtest authorization before launch. | Record-only prospective authority; no QC action in this commit. Verify that no paper/live/funded authority is inferred. |
+| `1c955eb` | Correct the prelaunch R-182 target-path gate to the exact `b825663b...cadbc` digest, with a valid-but-wrong-hash refusal test. | Accepted locally before A1; no frozen R-184 source or tests changed. |
+| `27412f7` | Record the one R-185 A1 QC launch and bounded custom-statistic read, exact receipts, order/cash/gross/tracking validity, after-cost result and predeclared matched/20%-tilt spreads; append the owner-authorized shared-ledger entry. | Accepted as one **exploratory** development result, not formal alpha evidence. |
+| This record commit | Reconcile review range, findings, exclusions, and next gate without changing strategy/source/result bytes. | Record-only handoff; Claude should review it with the full range. |
+
+**Findings and limits.** `ARV2CR182-001` (P2, corrected in `1c955eb`)
+was the missing exact R-182 target-path pin despite a structurally valid
+predecessor receipt. `ARV2CR182-002` (P2, corrected in `891a236` before
+launch) was the draft signed permit's contradictory `result_read_authorized:
+false` despite a one-time aggregate reader; the final signed and waiver
+payloads authorize exactly one aggregate-only read and exclude raw rows,
+logs, charts, and trading. A read-only post-run audit independently
+reconciled claim, launch, terminal, read claim, result-valid receipt,
+projection/profile/waiver/aggregate hashes, spreads, and look totals. Its
+P3 evidence limit is that local receipts retain the aggregate digest and
+validity but not the detailed aggregate fields; section 182.1 and the
+shared ledger transcribe the one bounded QC read. R-182's selected set
+itself depends on positive R055 score coverage, so R-185-minus-R-182 is
+the incremental weight-tilt policy comparison, not a pure no-analyst
+control or six independent stock-sleeve observations. The 40% parameter
+was selected after seeing 20% performance in the same window; no
+independent validation is claimed.
+
+**Validation and exclusions.** Before the one launch, 87 focused tests
+passed: R-185 projection/launcher, R-184 regression, whole-package import
+boundary, active lane record, and look-accounting selections. All sixteen
+projected cloud files compiled locally with QC's injected prelude. QC
+source readback and cloud compile succeeded; A1 reached `Completed.` and
+the only result read authenticated `run_valid=true`. `git diff --check`
+was clean before commits; no complete lane/repository suite was run under
+the owner's explicit rule that Claude performs it. No raw provider/price/
+order rows, standard QC statistics, logs, or charts were retained or used
+as evidence. No broker, paper/live/funded order, deployment, or trading
+endpoint was accessed. R-182 project identity was checked read-only as
+the predecessor; no unrelated project was modified.
+
+**Next exact gate.** Claude independently reviews the exact pushed range,
+including the prior R-183 round and this R-185 exploratory outcome, and runs
+the full lane suite. Codex then counter-reviews every Claude commit and
+corrects verified lane-owned issues in this same worktree. No additional
+tilt strength, period, or leverage run follows merely from the positive
+same-window R-185 result; a future result needs its own prospective rule,
+matched comparison, look accounting, and untouched-period plan.

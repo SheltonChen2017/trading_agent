@@ -23596,3 +23596,48 @@ comparison remains −26.9904311578985 points. These are post-hoc-cap-floor,
 single-window development observations; stock-versus-ETF effects make the
 basket a contextual benchmark, not a clean analyst-skill comparator. No
 complete lane suite or non-lane QC project action occurred.
+
+### 181.3 Review notes for Claude and next gate
+
+**Review range.** Claude's incoming exact range was `c599301..dcb7157`
+(`1a21d57`, `dcb7157`), both accepted after the narrow corrections in
+section 181. Codex's implementation/result range before this record-only
+close is `dcb7157..978df35`:
+
+| Commit | What Claude should review | Codex disposition |
+| --- | --- | --- |
+| `d64f97e` | Section-180 counter-review; launched-candidate table-row test; section-176 original R-183 identity pin; distinct 14-file R-183 bridge launcher, R-182 predecessor chain, result-time source/validity checks; local candidate preparation only. | Accepted locally after focused tests and independent prelaunch audit. No QC mutation in this commit. |
+| `a704ac8` | Owner's R-183-specific exploratory signature waiver, exact one-use permit digest, wrong-role/source/project/attempt refusals, and result-time waiver attestation. The original 1x/signed R-183 path and earlier R-181/R-182 waiver remain separate. | Accepted locally after waiver-boundary tests. Committed before R-183 A1 launch. |
+| `978df35` | One authenticated R-183 A1 result, exact QC/source/aggregate identities, after-cost metrics and secondary spread; shared R-183 look entry explicitly authorized by the owner. | Accepted locally as exploratory evidence only. |
+
+**Findings to verify.** `ARV2CR181-001/-002/-006` are corrected and have
+focused regressions or active-document checks. `-003/-004` are documented
+limits; the latter is closed for the **R-183 entry only** by the owner's
+explicit shared-ledger authorization. `-005` is resolved prospectively by
+the owner's choice of the matched 2x admission bridge; the original 1x
+source was not run. Claude should independently verify that both the
+R-183 waiver and the new bridge validity gate fail closed under mutations,
+that the result receipt is one-use and source-bound, and that the three-role
+comparison is framed as exploratory stock-versus-ETF context, not a new
+formal alpha claim.
+
+**Validation and exclusions.** The final focused QC submission, lane-record
+integrity, and active-document selections passed **165 tests**. A first
+active-document run exposed an 80-digit target-error decimal that looked to
+the existing document gate like a malformed SHA-256; the note now rounds
+that display value and the rerun is green. `git diff --check` is clean. The
+complete lane/repository suite was **not run** under the owner's standing
+rule that Claude performs it. QC R-183 A1 was the only new project/backtest:
+one launch, status-only polls, one bounded custom-summary read, no retry;
+the candidate has two unused attempt slots. No raw provider/price/order
+rows, logs, charts, standard QC statistics, other lane/project mutation,
+paper/live/funded order, deployment, broker, or trading access occurred.
+
+**Next gate.** Claude independently reviews this pushed snapshot in the same
+lane before another implementation or new development-window evaluation.
+The R-181 signal remains below R-182 matched by 26.9904 points and below
+R-183 basket by 9.7060 points in the one exploratory 2021–2025 window;
+R-184's +2.1382-point matched-stock tilt is likewise exploratory. Further
+period tests, changed rules, leverage, formal alpha acceptance, or live
+work require their own prospective decision and authorization. This round
+does not infer them from R-183's terminal `Completed.` or valid aggregate.

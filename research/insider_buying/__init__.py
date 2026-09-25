@@ -27,6 +27,9 @@ IB-3D preserves that selection and applies a separate, caller-declared buyer-
 breadth gate, atomically refusing fewer than two cluster-qualified stocks.
 The canonical IB-2 source policy freezes an owner-supplied, offline 82-quarter
 input requirement while keeping every real artifact and authority unbound.
+The synthetic-only source-manifest boundary validates caller-supplied byte
+streams and ordered 82-quarter identity claims without reading real artifacts
+or declaring canonical completeness.
 """
 
 from research.insider_buying.contracts import (
@@ -281,6 +284,19 @@ from research.insider_buying.sec_owner_supplied_source_policy import (
     CanonicalIb2SourcePolicy,
     CanonicalIb2SourcePolicyError,
 )
+from research.insider_buying.sec_canonical_source_manifest import (
+    CANONICAL_IB2_SOURCE_MANIFEST_KIND,
+    CANONICAL_IB2_SOURCE_MANIFEST_VERSION,
+    CanonicalIb2AccessionSource,
+    CanonicalIb2ArtifactReceipt,
+    CanonicalIb2ArtifactStream,
+    CanonicalIb2QuarterInput,
+    CanonicalIb2QuarterSummary,
+    CanonicalIb2SourceManifest,
+    CanonicalIb2SourceManifestError,
+    build_canonical_ib2_source_manifest,
+    verify_artifact_chunks,
+)
 from research.insider_buying.sec_noncanonical_pilot_contracts import (
     SEC_NONCANONICAL_PILOT_CONTRACT_VERSION,
     SEC_NONCANONICAL_PILOT_DERIVED_JSON_VERSION,
@@ -330,12 +346,21 @@ __all__ = [
     "ALLOWED_SEC_TABLES",
     "CANONICAL_IB2_REQUIRED_PERIODS",
     "CANONICAL_IB2_SOURCE_MODE",
+    "CANONICAL_IB2_SOURCE_MANIFEST_KIND",
+    "CANONICAL_IB2_SOURCE_MANIFEST_VERSION",
     "CANONICAL_IB2_SOURCE_POLICY",
     "CANONICAL_IB2_SOURCE_POLICY_SHA256",
     "CANONICAL_IB2_SOURCE_POLICY_VERSION",
     "CANONICAL_SPEC",
     "CanonicalIb2SourcePolicy",
     "CanonicalIb2SourcePolicyError",
+    "CanonicalIb2AccessionSource",
+    "CanonicalIb2ArtifactReceipt",
+    "CanonicalIb2ArtifactStream",
+    "CanonicalIb2QuarterInput",
+    "CanonicalIb2QuarterSummary",
+    "CanonicalIb2SourceManifest",
+    "CanonicalIb2SourceManifestError",
     "SEC_NONCANONICAL_PILOT_CONTRACT_VERSION",
     "SEC_NONCANONICAL_PILOT_DERIVED_JSON_VERSION",
     "SEC_NONCANONICAL_PILOT_DERIVED_PROFILE_VERSION",
@@ -480,6 +505,7 @@ __all__ = [
     "SuppliedForm4AmendmentLinkEvidence",
     "TransactionDiagnostic",
     "build_filing_corpus",
+    "build_canonical_ib2_source_manifest",
     "build_form4_observed_identity_inventory",
     "build_form4_pit_security_mapping",
     "build_form4_provisional_disposition_report",
@@ -498,6 +524,7 @@ __all__ = [
     "reconcile_sec_form4_amendments",
     "write_sec_bulk_snapshot",
     "write_form4_provisional_disposition_snapshot",
+    "verify_artifact_chunks",
     "FORM4_STOCK_SIGNAL_DECIMAL_PRECISION",
     "FORM4_STOCK_SIGNAL_DECIMAL_ROUNDING",
     "FORM4_STOCK_SIGNAL_DOLLAR_BREADTH_FORMULA",

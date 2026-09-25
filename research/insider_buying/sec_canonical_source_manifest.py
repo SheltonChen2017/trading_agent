@@ -21,7 +21,6 @@ from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 from typing import Any
-from urllib.parse import urlsplit
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying.sec_bulk_parsed_snapshot import (
@@ -57,7 +56,14 @@ MAX_SOURCE_URL_CHARACTERS = 8 * 1024
 _SHA256_RE = re.compile(r"[0-9a-f]{64}\Z")
 _ACCESSION_RE = re.compile(r"[0-9]{10}-[0-9]{2}-[0-9]{6}\Z")
 _COMPACT_ACCESSION_RE = re.compile(r"[0-9]{18}\Z")
-_URL_PATH_RE = re.compile(r"/[A-Za-z0-9._~!$&'()*+,;=:@/-]+\Z")
+# Exact literal scheme and host plus the bounded path charset used by the
+# earlier IB-1C boundary. The charset excludes "?", "#", "%", and whitespace,
+# so a matching URL has no query, fragment, userinfo, port, or escape and
+# needs no library parser. The lane package must not import `urllib`.
+_SOURCE_URL_RE = re.compile(
+    r"https://(?P<host>www\.sec\.gov|data\.sec\.gov)"
+    r"(?P<path>/[A-Za-z0-9._~!$&'()*+,;=:@/-]+)\Z"
+)
 _SEC_PRIMARY_URL_RE = re.compile(
     r"https://www\.sec\.gov/Archives/edgar/data/[0-9]{1,10}/"
     r"(?P<accession>[0-9]{18})/[A-Za-z0-9._-]{1,255}\Z"
@@ -315,25 +321,14 @@ def _validate_declared_provenance(
         raise CanonicalIb2SourceManifestError(
             "REFUSED: source URL is not canonical"
         )
-    try:
-        parts = urlsplit(url)
-    except ValueError as exc:
-        raise CanonicalIb2SourceManifestError(
-            "REFUSED: source URL is not canonical"
-        ) from exc
-    if (
-        parts.scheme != "https"
-        or parts.netloc not in {"www.sec.gov", "data.sec.gov"}
-        or parts.query
-        or parts.fragment
-        or _URL_PATH_RE.fullmatch(parts.path) is None
-        or any(segment in {"", ".", ".."} for segment in parts.path[1:].split("/"))
-        or parts.geturl() != url
+    match = _SOURCE_URL_RE.fullmatch(url)
+    if match is None or any(
+        segment in {"", ".", ".."} for segment in match.group("path")[1:].split("/")
     ):
         raise CanonicalIb2SourceManifestError(
             "REFUSED: source URL must be canonical HTTPS sec.gov"
         )
-    components = parts.path.split("/")[1:]
+    components = match.group("path").split("/")[1:]
     accession_digits = accession_number.replace("-", "")
     expected_segments = {accession_number, accession_digits}
     accession_segments = tuple(

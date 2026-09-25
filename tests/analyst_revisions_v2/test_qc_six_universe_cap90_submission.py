@@ -1528,7 +1528,7 @@ def test_r183_bridge_preview_pins_distinct_fourteen_file_candidate(
             subject.preview_bridge(changed, value)
 
 
-def test_r183_bridge_permit_requires_detached_signature_and_exact_source(
+def test_r183_bridge_permit_pins_exact_source_and_rejects_old_waiver(
     monkeypatch, bridge_projections, tmp_path,
 ):
     value = bridge_projections["R183"]
@@ -1556,10 +1556,72 @@ def test_r183_bridge_permit_requires_detached_signature_and_exact_source(
         )
     calls = _fake_qc(monkeypatch, plan, value)
     _r182_valid_for_r183(plan, bridge_projections["R182"])
+    with pytest.raises(subject.Cap90QcSubmissionError, match="waiver"):
+        subject.launch_a1(
+            plan, value, object(), owner_waiver_id=subject._EXPLORATORY_WAIVER_ID,
+        )
     with pytest.raises(subject.Cap90QcSubmissionError, match="owner launch signature"):
         subject.launch_a1(plan, value, object())
     assert calls == []
     assert not subject._control_path(plan, "claim").exists()
+
+
+@pytest.mark.parametrize("candidate,bridge", (
+    ("R181", False), ("R181", True), ("R182", True), ("R183", False),
+))
+def test_r183_bridge_waiver_cannot_authorize_other_candidates(
+    projections, bridge_projections, tmp_path, candidate, bridge,
+):
+    value = bridge_projections[candidate] if bridge else projections[candidate]
+    plan = (
+        _bridge_plan(tmp_path, value, candidate) if bridge
+        else _plan(tmp_path, value, candidate)
+    )
+    with pytest.raises(subject.Cap90QcSubmissionError, match="waiver"):
+        subject._launch_authority(
+            plan, value, owner_signature=None,
+            owner_waiver_id=subject._R183_BRIDGE_WAIVER_ID,
+        )
+
+
+@pytest.mark.parametrize("defect", ("source", "project", "run", "attempt"))
+def test_r183_bridge_waiver_refuses_changed_identity_before_any_qc_or_claim(
+    monkeypatch, bridge_projections, tmp_path, defect,
+):
+    value = bridge_projections["R183"]
+    plan = _bridge_plan(tmp_path, value, "R183")
+    _r182_valid_for_r183(plan, bridge_projections["R182"])
+    if defect == "source":
+        changed_files = []
+        for item in value.source_files:
+            if item.project_path == "main.py":
+                raw = item.source_bytes + b"# altered\n"
+                item = dataclasses.replace(
+                    item, source_bytes=raw, byte_count=len(raw),
+                    content_sha256=hashlib.sha256(raw).hexdigest(),
+                )
+            changed_files.append(item)
+        value = dataclasses.replace(
+            value, source_files=tuple(changed_files),
+            total_source_byte_count=value.total_source_byte_count + len(b"# altered\n"),
+        )
+    elif defect == "project":
+        plan = dataclasses.replace(plan, project_name=plan.project_name + " changed")
+    elif defect == "run":
+        plan = dataclasses.replace(plan, backtest_name=plan.backtest_name + " changed")
+    else:
+        plan = dataclasses.replace(plan, attempt=2)
+
+    def forbid_qc(*_args, **_kwargs):
+        pytest.fail("QC must not be contacted for a changed R183 waiver identity")
+
+    monkeypatch.setattr(subject, "_client", forbid_qc)
+    monkeypatch.setattr(subject, "_post", forbid_qc)
+    with pytest.raises(subject.Cap90QcSubmissionError):
+        subject.launch_a1(
+            plan, value, object(), owner_waiver_id=subject._R183_BRIDGE_WAIVER_ID,
+        )
+    assert not list(plan.control_directory.glob("R183-A*-claim.json"))
 
 
 def test_r183_bridge_requires_valid_r182_before_any_qc_mutation(
@@ -1609,18 +1671,34 @@ def test_r183_bridge_refuses_each_broken_r182_predecessor_control_before_qc(
     assert not subject._control_path(plan, "claim").exists()
 
 
+@pytest.mark.parametrize("authorization", ("signature", "waiver"))
 def test_r183_bridge_launch_and_result_read_are_one_use_and_enforce_bridge_gates(
-    monkeypatch, bridge_projections, tmp_path,
+    monkeypatch, bridge_projections, tmp_path, authorization,
 ):
     value = bridge_projections["R183"]
     plan = _bridge_plan(tmp_path, value, "R183")
     _r182_valid_for_r183(plan, bridge_projections["R182"])
-    signature, signature_checks = _allow_owner_signature(monkeypatch, plan, value)
+    if authorization == "signature":
+        signature, signature_checks = _allow_owner_signature(monkeypatch, plan, value)
+        authority_kwargs = {"owner_signature": signature}
+    else:
+        authority_kwargs = {"owner_waiver_id": subject._R183_BRIDGE_WAIVER_ID}
     calls = _fake_qc(monkeypatch, plan, value)
-    launch = subject.launch_a1(plan, value, object(), owner_signature=signature)
-    assert launch["owner_signature_sha256"] == "b" * 64
-    assert len(signature_checks) == 1
-    assert len(subject._read_control(subject._control_path(plan, "claim"))["source_files"]) == 14
+    launch = subject.launch_a1(plan, value, object(), **authority_kwargs)
+    claim = subject._read_control(subject._control_path(plan, "claim"))
+    if authorization == "signature":
+        assert launch["owner_signature_sha256"] == "b" * 64
+        assert len(signature_checks) == 1
+    else:
+        expected_payload_sha256 = hashlib.sha256(
+            subject.render_owner_launch_permit(plan, value),
+        ).hexdigest()
+        for receipt in (claim, launch):
+            assert receipt["owner_launch_authority_mode"] == "exact_exploratory_signature_waiver"
+            assert receipt["owner_launch_waiver_schema"] == subject._R183_BRIDGE_WAIVER_SCHEMA
+            assert receipt["owner_launch_waiver_id"] == subject._R183_BRIDGE_WAIVER_ID
+            assert receipt["owner_waived_payload_sha256"] == expected_payload_sha256
+    assert len(claim["source_files"]) == 14
     endpoints = [endpoint for endpoint, _ in calls]
     assert endpoints.count("backtests/create") == 1
     assert endpoints.count("compile/create") == 1
@@ -1629,7 +1707,7 @@ def test_r183_bridge_launch_and_result_read_are_one_use_and_enforce_bridge_gates
     }]) == 14
     before = len(calls)
     with pytest.raises(subject.Cap90QcSubmissionError, match="already claimed"):
-        subject.launch_a1(plan, value, object(), owner_signature=signature)
+        subject.launch_a1(plan, value, object(), **authority_kwargs)
     assert len(calls) == before
     subject._write_once(subject._control_path(plan, "terminal"), {
         "candidate_id": "R183", "status": "Completed.",
@@ -1668,6 +1746,33 @@ def test_r183_bridge_launch_and_result_read_are_one_use_and_enforce_bridge_gates
     with pytest.raises(subject.Cap90QcSubmissionError, match="already claimed"):
         subject.read_aggregates_once(plan, launch, object())
     assert read_calls == ["files/read", "backtests/read"]
+
+
+def test_r183_bridge_waiver_result_read_refuses_equal_tampered_payload_digests(
+    monkeypatch, bridge_projections, tmp_path,
+):
+    value = bridge_projections["R183"]
+    plan = _bridge_plan(tmp_path, value, "R183")
+    _r182_valid_for_r183(plan, bridge_projections["R182"])
+    calls = _fake_qc(monkeypatch, plan, value)
+    launch = subject.launch_a1(
+        plan, value, object(), owner_waiver_id=subject._R183_BRIDGE_WAIVER_ID,
+    )
+    subject._write_once(subject._control_path(plan, "terminal"), {
+        "candidate_id": "R183", "status": "Completed.",
+        "project_id": launch["project_id"], "backtest_id": launch["backtest_id"],
+    })
+    for name in ("claim", "launch"):
+        path = subject._control_path(plan, name)
+        record = subject._read_control(path)
+        record["owner_waived_payload_sha256"] = "0" * 64
+        path.write_bytes(subject._canonical(record))
+    tampered_launch = subject._read_control(subject._control_path(plan, "launch"))
+    before = len(calls)
+    with pytest.raises(subject.Cap90QcSubmissionError, match="waived payload"):
+        subject.read_aggregates_once(plan, tampered_launch, object())
+    assert len(calls) == before
+    assert not subject._control_path(plan, "result-read-claim").exists()
 
 
 @pytest.mark.parametrize("defect", (

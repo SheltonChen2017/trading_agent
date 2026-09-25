@@ -23499,8 +23499,8 @@ selection. No complete lane suite is run by Codex under the owner rule.
 
 The original section-176 R-183 A1 candidate remains a distinct, unlaunched
 13-file/1x-admission source. For an execution-policy-matched *alternative*, a
-14-file bridge source has been prepared locally, but **not activated** while
-the owner's route and signature choice is pending. Its exact private project
+14-file bridge source was prepared locally before the owner's route and
+signature choice. Its exact private project
 is `106 ARV2 SIX CAP90 ETF R183 2021 2025`; the proposed A1 backtest name is
 `ARV2 R183A1 six cap90 bridge ETF basket 2021 2025 980528e2`. The bridge
 projection SHA-256 is
@@ -23515,12 +23515,31 @@ at-most-1x end-day gross, target-tracking, and zero-invalid/canceled-order
 validity gates. It can be launched only after the authenticated R-182 A1
 predecessor chain and an R-183-specific owner signature or waiver; the
 R-181/R-182/R-184 waiver does not apply. No QC project, compile, backtest,
-economic result read, or research look is claimed for R-183 here. If the
-owner instead selects the original 1x source, its result is contextual and
-not an execution-policy-matched basket comparison.
+economic result read, or research look is claimed in this preparation
+paragraph. The original 1x source would have yielded a contextual, not an
+execution-policy-matched, basket comparison.
 
 Focused local validation after the counter-review and bridge preparation:
 the QC submission, lane-record integrity, and active-document selections
-passed **155 tests** under the configured Python 3.13 environment; no
+passed **165 tests** under the configured Python 3.13 environment; no
 complete lane suite was run. The original R-183 identity pin and four
-predecessor-receipt mismatch regressions are included before any launch.
+predecessor-receipt mismatch regressions are included before any launch;
+the final count also includes the narrow waiver and equal-tampered-receipt
+refusal tests.
+
+**Owner activation, after the local preparation.** The owner selected this
+exact 14-file 2x buying-power-admission R-183 bridge rather than the
+contextual original 1x path, waived the detached signature specifically for
+this exploratory R-183 launch, and separately authorized appending the
+resulting research-look entry to the shared alpha-result ledger. The waiver
+is exact ID
+`ARV2-OWNER-2026-09-24-R183A1-2X-ADMISSION-BRIDGE-EXPLORATORY-SIGNATURE-WAIVER`
+under schema `arv2-cap90-qc-r183-bridge-exact-owner-waiver-v1`; its one-use
+receipt binds SHA-256 of the rendered exact launch permit, including the
+candidate, attempt, private project, backtest, role, profile, projection,
+source-file manifest, and one-submission endpoint budget. The waiver
+does not change the 98% portfolio target, waive source/project/one-use or
+result-validity checks, cover any other candidate or attempt, or authorize
+paper/live/funded orders. This selection is recorded before any R-183 QC
+project or backtest is created. R-183 still has zero spent attempts at this
+activation point.

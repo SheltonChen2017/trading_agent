@@ -2,9 +2,9 @@
 
 This module never acts on import. A1 creates one private project per role;
 the narrowly pinned R181 A2 and final A3 repair that same project in place.
-The owner-waived bridge is limited to R181 A3 and R182 A1, with exact source,
-predecessor, and one-use controls. The separately pinned R183 A1 bridge
-retains its detached-signature gate; the original 1x R183 source is not edited.
+The owner-waived bridge covers exact R181 A3, R182 A1, and R183 A1 sources,
+predecessors, and one-use controls. R183 has its own waiver identity; its
+original 1x source and detached-signature path remain available.
 Only two bounded custom statistics may be retained from a completed run.
 """
 
@@ -52,6 +52,8 @@ _QC_MAXIMUM_FILE_CHARACTERS = 64_000
 _LAUNCH_PERMIT_SCHEMA = "arv2-cap90-qc-owner-launch-permit-v1"
 _EXPLORATORY_WAIVER_SCHEMA = "arv2-cap90-qc-exact-owner-waiver-v1"
 _EXPLORATORY_WAIVER_ID = "ARV2-OWNER-2026-09-24-R181A3-R182-TILT-EXPLORATORY-SIGNATURE-WAIVER"
+_R183_BRIDGE_WAIVER_SCHEMA = "arv2-cap90-qc-r183-bridge-exact-owner-waiver-v1"
+_R183_BRIDGE_WAIVER_ID = "ARV2-OWNER-2026-09-24-R183A1-2X-ADMISSION-BRIDGE-EXPLORATORY-SIGNATURE-WAIVER"
 _R181_A2_PROJECT_ID = 36_891_750
 _R181_A2_PROJECT_NAME = "104 ARV2 SIX CAP90 SIGNAL R181 2021 2025"
 _R181_A2_PROJECTION_SHA256 = "b68661ec2f90f98eb47e09242b8b9d4cd8ed21101667f355afba0a4a48461c29"
@@ -376,6 +378,38 @@ def preview_bridge(plan: Cap90QcPlan, projection: object) -> dict:
     return identity
 
 
+def _render_owner_launch_payload(
+    plan: Cap90QcPlan, identity: dict, project_id: int | None,
+    mutations: dict[str, int],
+) -> bytes:
+    """Canonical launch bytes shared by prelaunch and waived-receipt checks."""
+    return _canonical({
+        "schema": _LAUNCH_PERMIT_SCHEMA,
+        "signature_purpose": FORMAL_EXECUTION_PURPOSE,
+        "action": "one_private_exploratory_order_backtest_launch",
+        "candidate_id": plan.candidate_id,
+        "attempt": plan.attempt,
+        "role": plan.role,
+        "organization_id_sha256": hashlib.sha256(plan.organization_id.encode("ascii")).hexdigest(),
+        "project_id": project_id,
+        "project_name": plan.project_name,
+        "backtest_name": plan.backtest_name,
+        "control_directory": str(plan.control_directory),
+        "projection_sha256": plan.projection_sha256,
+        "profile_id": identity["profile_id"],
+        "profile_sha256": plan.profile_sha256,
+        "package_sha256": plan.package_sha256,
+        "activation_manifest_sha256": plan.activation_manifest_sha256,
+        "source_files_sha256": hashlib.sha256(_canonical(identity["source_files"])).hexdigest(),
+        "mutating_endpoint_budget": mutations,
+        "maximum_backtest_submissions": 1,
+        "result_read_authorized": False,
+        "raw_provider_rows_authorized": False,
+        "raw_logs_orders_charts_authorized": False,
+        "paper_live_deployment_funded_trading_authorized": False,
+    })
+
+
 def render_owner_launch_permit(plan: Cap90QcPlan, projection: object) -> bytes:
     """Render the exact exploratory launch bytes for the owner's detached signature.
 
@@ -412,31 +446,7 @@ def render_owner_launch_permit(plan: Cap90QcPlan, projection: object) -> bytes:
         }
     else:
         _fail("cap-90 signed launch attempt is unsupported")
-    return _canonical({
-        "schema": _LAUNCH_PERMIT_SCHEMA,
-        "signature_purpose": FORMAL_EXECUTION_PURPOSE,
-        "action": "one_private_exploratory_order_backtest_launch",
-        "candidate_id": plan.candidate_id,
-        "attempt": plan.attempt,
-        "role": plan.role,
-        "organization_id_sha256": hashlib.sha256(plan.organization_id.encode("ascii")).hexdigest(),
-        "project_id": project_id,
-        "project_name": plan.project_name,
-        "backtest_name": plan.backtest_name,
-        "control_directory": str(plan.control_directory),
-        "projection_sha256": plan.projection_sha256,
-        "profile_id": identity["profile_id"],
-        "profile_sha256": plan.profile_sha256,
-        "package_sha256": plan.package_sha256,
-        "activation_manifest_sha256": plan.activation_manifest_sha256,
-        "source_files_sha256": hashlib.sha256(_canonical(identity["source_files"])).hexdigest(),
-        "mutating_endpoint_budget": mutations,
-        "maximum_backtest_submissions": 1,
-        "result_read_authorized": False,
-        "raw_provider_rows_authorized": False,
-        "raw_logs_orders_charts_authorized": False,
-        "paper_live_deployment_funded_trading_authorized": False,
-    })
+    return _render_owner_launch_payload(plan, identity, project_id, mutations)
 
 
 def load_owner_launch_permit(
@@ -490,18 +500,27 @@ def _launch_authority(
     """Bind the owner's narrow exploratory waiver or require a real signature."""
     if owner_waiver_id is None:
         return _require_owner_launch_permit(plan, projection, owner_signature)
+    if owner_signature is not None or type(owner_waiver_id) is not str:
+        _fail("cap-90 owner exploratory waiver does not cover this launch")
     if (
-        owner_signature is not None
-        or type(owner_waiver_id) is not str
-        or owner_waiver_id != _EXPLORATORY_WAIVER_ID
-        or (plan.candidate_id, plan.attempt) not in {("R181", 3), ("R182", 1)}
+        owner_waiver_id == _R183_BRIDGE_WAIVER_ID
+        and (plan.candidate_id, plan.attempt) == ("R183", 1)
+        and plan.projection_sha256 == _R183_BRIDGE_PROJECTION_SHA256
     ):
+        preview_bridge(plan, projection)
+        waiver_schema = _R183_BRIDGE_WAIVER_SCHEMA
+    elif (
+        owner_waiver_id == _EXPLORATORY_WAIVER_ID
+        and (plan.candidate_id, plan.attempt) in {("R181", 3), ("R182", 1)}
+    ):
+        waiver_schema = _EXPLORATORY_WAIVER_SCHEMA
+    else:
         _fail("cap-90 owner exploratory waiver does not cover this launch")
     payload = render_owner_launch_permit(plan, projection)
     return {
         "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
-        "owner_launch_waiver_schema": _EXPLORATORY_WAIVER_SCHEMA,
-        "owner_launch_waiver_id": _EXPLORATORY_WAIVER_ID,
+        "owner_launch_waiver_schema": waiver_schema,
+        "owner_launch_waiver_id": owner_waiver_id,
         "owner_waived_payload_sha256": hashlib.sha256(payload).hexdigest(),
     }
 
@@ -1502,21 +1521,40 @@ def _attest_uploaded_source(plan: Cap90QcPlan, launch: dict, api: QuantConnectCl
             "owner_launch_authority_mode", "owner_launch_waiver_schema",
             "owner_launch_waiver_id", "owner_waived_payload_sha256",
         )
-        if any(claim.get(key) != launch.get(key) for key in authority_keys) or (
-            launch.get("owner_launch_authority_mode") == "exact_exploratory_signature_waiver"
-            and (
-                launch.get("owner_launch_waiver_schema") != _EXPLORATORY_WAIVER_SCHEMA
-                or launch.get("owner_launch_waiver_id") != _EXPLORATORY_WAIVER_ID
+        if any(claim.get(key) != launch.get(key) for key in authority_keys):
+            _fail("cap-90 bridge launch waiver identity changed")
+        signature_keys = (
+            "owner_signature_authority_sha256", "owner_signature_sha256",
+            "owner_signed_payload_sha256",
+        )
+        if launch.get("owner_launch_authority_mode") == "exact_exploratory_signature_waiver":
+            waiver_schema, waiver_id = (
+                (_R183_BRIDGE_WAIVER_SCHEMA, _R183_BRIDGE_WAIVER_ID)
+                if plan.candidate_id == "R183" else
+                (_EXPLORATORY_WAIVER_SCHEMA, _EXPLORATORY_WAIVER_ID)
+            )
+            if (
+                launch.get("owner_launch_waiver_schema") != waiver_schema
+                or launch.get("owner_launch_waiver_id") != waiver_id
                 or type(launch.get("owner_waived_payload_sha256")) is not str
                 or not _HEX.fullmatch(launch["owner_waived_payload_sha256"])
-            )
-        ):
-            _fail("cap-90 bridge launch waiver identity changed")
-        if plan.candidate_id == "R183":
-            signature_keys = (
-                "owner_signature_authority_sha256", "owner_signature_sha256",
-                "owner_signed_payload_sha256",
-            )
+            ):
+                _fail("cap-90 bridge launch waiver identity changed")
+            if plan.candidate_id == "R183":
+                if (
+                    any(key in claim or key in launch for key in signature_keys)
+                    or type(claim.get("profile_id")) is not str
+                    or claim["profile_id"] != launch.get("profile_id")
+                ):
+                    _fail("cap-90 R183 bridge waiver receipt changed")
+                payload = _render_owner_launch_payload(plan, claim, None, {
+                    "projects/create": 1, "files/delete": 1,
+                    "files/create": 14, "files/update": 1,
+                    "compile/create": 1, "backtests/create": 1,
+                })
+                if launch["owner_waived_payload_sha256"] != hashlib.sha256(payload).hexdigest():
+                    _fail("cap-90 R183 bridge waived payload changed")
+        elif plan.candidate_id == "R183":
             if any(
                 type(claim.get(key)) is not str
                 or not _HEX.fullmatch(claim[key])

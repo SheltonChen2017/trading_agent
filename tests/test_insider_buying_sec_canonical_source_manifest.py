@@ -2,11 +2,22 @@
 
 from __future__ import annotations
 
+import csv
+import io
+import zipfile
 from dataclasses import fields, replace
+from datetime import datetime, timezone
 
 import pytest
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
+from research.insider_buying import (
+    SecBulkSource,
+    build_sec_bulk_parsed_snapshot,
+    load_sec_bulk_parsed_snapshot,
+    load_sec_bulk_snapshot,
+    write_sec_bulk_snapshot,
+)
 from research.insider_buying.sec_bulk_parsed_snapshot import (
     ParsedSecBulkAccession,
     ParsedSecBulkArtifactIdentity,
@@ -908,3 +919,196 @@ def test_manifest_construction_has_no_filesystem_or_network_side_effect(monkeypa
     assert len(manifest.quarters) == 82
     assert CanonicalIb2SourcePolicy().authorized_outcome_looks == 0
     assert CanonicalIb2SourcePolicy().consumed_outcome_looks == 0
+
+
+def test_document_type_outside_the_sec_domain_refuses_before_source_pairing():
+    # The whitelist is the only guard that names the accepted forms; without
+    # it an unknown type would fall through to Form 4 source pairing and be
+    # refused, if at all, only by the artifact digest.
+    quarters = list(_quarters())
+    item = quarters[0]
+    accessions = (replace(item.accessions[0], document_type="8-K"), item.accessions[1])
+    quarters[0] = replace(item, accessions=accessions)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="unapproved document type"):
+        _build(quarters)
+
+
+def test_unordered_accessions_within_a_quarter_refuse():
+    quarters = list(_quarters())
+    item = _quarter("2006Q1", document_types=("3", "4"))
+    quarters[0] = replace(item, accessions=(item.accessions[1], item.accessions[0]))
+    with pytest.raises(CanonicalIb2SourceManifestError, match="unordered"):
+        _build(quarters)
+
+
+def test_single_chunk_above_1_mib_refuses_even_with_a_matching_receipt():
+    # The existing oversize case also breaks the declared size, so it never
+    # reaches the chunk cap that bounds how much input is held at once.
+    payload = b"x" * (1024 * 1024 + 1)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="bounded exact bytes"):
+        verify_artifact_chunks(
+            (payload,), sha256=hash_bytes(payload), size_bytes=len(payload)
+        )
+
+
+def test_stream_overflow_refuses_before_requesting_another_chunk():
+    def chunks():
+        yield b"xx"
+        raise AssertionError("a chunk was requested after the declared size was exceeded")
+
+    with pytest.raises(
+        CanonicalIb2SourceManifestError, match="exceeds its declared byte size"
+    ):
+        verify_artifact_chunks(chunks(), sha256=hash_bytes(b"x"), size_bytes=1)
+
+
+def test_metadata_url_above_8_kib_refuses_without_a_filename_cap():
+    # The primary XML filename is capped at 255 characters by its own regex;
+    # a metadata URL has only the 8 KiB cap between it and the manifest.
+    quarters = list(_quarters())
+    item = quarters[0]
+    source = item.sources[0]
+    accession = item.accessions[0].accession_number.replace("-", "")
+    long_url = (
+        "https://data.sec.gov/submissions/"
+        + "/".join(["segment"] * 1200)
+        + f"/{accession}/metadata.json"
+    )
+    assert len(long_url) > 8 * 1024
+    changed = replace(source.acceptance_metadata, source_url=long_url)
+    quarters[0] = replace(
+        item, sources=(replace(source, acceptance_metadata=changed),)
+    )
+    with pytest.raises(CanonicalIb2SourceManifestError, match="URL is not canonical"):
+        _build(quarters)
+
+
+def test_raw_lineage_hash_must_recompute_even_when_the_parent_binding_agrees():
+    # A forged raw lineage hash that the parsed parent fields also carry
+    # passes every binding check; only the recomputation from the raw
+    # payload exposes it.
+    quarters = list(_quarters())
+    item = quarters[3]
+    forged = "1" * 64
+    raw = replace(item.raw, lineage_hash=forged)
+    raw_manifest_sha256 = hash_bytes(
+        (canonical_json(raw.to_payload()) + "\n").encode("utf-8")
+    )
+    parsed = _relineage_parsed(
+        replace(
+            item.parsed,
+            raw_lineage_hash=forged,
+            raw_manifest_sha256=raw_manifest_sha256,
+        )
+    )
+    quarters[3] = replace(item, raw=raw, parsed=parsed)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="raw snapshot lineage"):
+        _build(quarters)
+
+
+def test_schema_profile_hash_must_match_the_profile_even_when_relineaged():
+    quarters = list(_quarters())
+    item = quarters[4]
+    parsed = _relineage_parsed(replace(item.parsed, schema_profile_hash="2" * 64))
+    quarters[4] = replace(item, parsed=parsed)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="schema profile hash"):
+        _build(quarters)
+
+
+def test_direct_manifest_construction_refuses_reordered_quarters():
+    manifest = _build()
+    quarters = list(manifest.quarters)
+    quarters[0], quarters[1] = quarters[1], quarters[0]
+    payload = {
+        "kind": manifest_module.CANONICAL_IB2_SOURCE_MANIFEST_KIND,
+        "version": manifest_module.CANONICAL_IB2_SOURCE_MANIFEST_VERSION,
+        "policy_sha256": manifest.policy_sha256,
+        "quarters": [quarter.to_payload() for quarter in quarters],
+    }
+    with pytest.raises(CanonicalIb2SourceManifestError, match="quarter inventory"):
+        CanonicalIb2SourceManifest(
+            policy_sha256=manifest.policy_sha256,
+            quarters=tuple(quarters),
+            manifest_sha256=hash_payload(payload),
+        )
+
+
+def test_builder_accepts_a_quarter_produced_by_the_ib1a_and_ib1b_loaders(tmp_path):
+    # Every other quarter in this file is an identity built by hand. This pins
+    # that identities and accession rows produced by the real IB-1A/IB-1B
+    # publish-and-load path satisfy the builder's recomputed lineage, parent,
+    # profile, ordering, and JSONL digest checks.
+    accession_form4 = "0000123456-06-000101"
+    accession_form3 = "0000123456-06-000102"
+
+    def tsv(headers, rows):
+        stream = io.StringIO(newline="")
+        writer = csv.writer(stream, delimiter="\t", lineterminator="\n")
+        writer.writerow(headers)
+        writer.writerows(rows)
+        return stream.getvalue().encode("utf-8")
+
+    submission, owner, transaction = _PROFILE.variants
+    tables = {
+        "SUBMISSION.tsv": tsv(
+            submission.headers,
+            (
+                (accession_form4, "2006-01-15", "2006-01-10", "4", "0000123456", "Synthetic Issuer", "SYN"),
+                (accession_form3, "2006-01-16", "2006-01-10", "3", "0000123456", "Synthetic Issuer", "SYN"),
+            ),
+        ),
+        "REPORTINGOWNER.tsv": tsv(
+            owner.headers, ((accession_form4, "0000000042"), (accession_form3, "0000000042"))
+        ),
+        "NONDERIV_TRANS.tsv": tsv(transaction.headers, ((accession_form4, "0000007"),)),
+    }
+    archive = io.BytesIO()
+    with zipfile.ZipFile(archive, "w") as zipped:
+        for name, data in tables.items():
+            info = zipfile.ZipInfo(name, date_time=(2026, 8, 20, 18, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = 0o100600 << 16
+            zipped.writestr(info, data)
+    source = SecBulkSource(
+        year=2006,
+        quarter=1,
+        source_url=(
+            "https://www.sec.gov/files/dera/data/insider-transactions-data-sets/"
+            "2006q1_form345.zip"
+        ),
+        git_commit=_CAPTURE_COMMIT,
+        retrieved_at=datetime(2026, 8, 20, 18, 0, tzinfo=timezone.utc),
+    )
+    raw = write_sec_bulk_snapshot(archive.getvalue(), source, tmp_path / "raw")
+    raw_directory = tmp_path / "raw" / raw.snapshot_id
+    parsed = build_sec_bulk_parsed_snapshot(
+        raw_directory,
+        tmp_path / "parsed",
+        schema_profile=_PROFILE,
+        parser_git_commit=_PARSER_COMMIT,
+    )
+    loaded_raw = load_sec_bulk_snapshot(raw_directory)
+    loaded_parsed = load_sec_bulk_parsed_snapshot(
+        tmp_path / "parsed" / parsed.snapshot_id,
+        raw_snapshot_directory=raw_directory,
+    )
+    assert [
+        (item.accession_number, item.document_type) for item in loaded_parsed.accessions
+    ] == [(accession_form4, "4"), (accession_form3, "3")]
+
+    quarters = list(_quarters())
+    quarters[0] = CanonicalIb2QuarterInput(
+        raw=loaded_raw.identity,
+        parsed=loaded_parsed.identity,
+        accessions=loaded_parsed.accessions,
+        sources=tuple(
+            _source(item, "2006Q1")
+            for item in loaded_parsed.accessions
+            if item.document_type in {"4", "4/A"}
+        ),
+    )
+    summary = _build(quarters).quarters[0].to_payload()
+    assert summary["raw_snapshot_id"] == raw.snapshot_id
+    assert summary["parsed_snapshot_id"] == parsed.snapshot_id
+    assert (summary["form4_accession_count"], summary["context_accession_count"]) == (1, 1)

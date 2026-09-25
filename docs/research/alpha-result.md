@@ -4353,3 +4353,86 @@ three QC attempts. A byte-identical retry of the diagnosed cash refusal
 is not planned. Subsequent 70%/60%/50% candidates, if launched, are
 separate post-result development looks and cannot be relabelled as R-186
 retries, untouched validation, or authorization for leverage or trading.
+
+## R-187 — 70% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+The owner authorized the bounded same-session 70%/60%/50% order-based
+sensitivity ladder without additional narrow approval prompts. Analyst lane
+section 184 prospectively froze R-187's separate source, profile, private
+project name, and one-use waiver before QC mutation. Project
+`110 ARV2 SIX CAP90 TILT70 R187 2021 2025` (`36935685`) read back and
+compiled the exact 16-file projection SHA-256
+`3203481571307cbad000153542ac9529cb1e4a3ac1bac030f18150b6a22dcbe0`
+and profile SHA-256
+`6189373282c0e5652bda0317d0133e1ccc52057116035ed6a51428788d8e31f2`.
+The sole A1 backtest `d733c02345bafc5d857a2710a4635bb6` launched under
+waived-payload SHA-256
+`e42bad241af84594a2cfb834b912d4378ff4621dfa4d509c1c55bb531c8f22c4`
+and terminated `Runtime Error`. A value-free status-envelope classifier
+located `_portfolio_cash` during `on_order_event`, consistent with the
+unchanged finite/nonnegative event-cash refusal; the actual cash value
+was not read. No result aggregate, return, order row, provider/price row,
+chart, or log was read or retained. This is not a successful backtest or
+evidence of alpha.
+
+One A1 launch spends **176 -> 177 shared research looks / 119 -> 120 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. A1 consumes one of R-187's maximum
+three QC attempts. A byte-identical retry of this cash refusal is not
+planned. R-188 and R-189 have different preregistered tilt fractions and
+identities; each launch is a separate same-window exploratory look.
+
+## R-188 — 60% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+Analyst lane section 184 prospectively froze R-188's distinct 16-file
+projection SHA-256
+`3eed978da51ef82b0de3f44b2f3bb30311e27a8f628ed3f9b6663d902f78fc55`
+and profile SHA-256
+`82592bb4c82078496899f2e225c31f6c47a759b93997f464fac731eff99ed875`
+before QC mutation. The private project
+`111 ARV2 SIX CAP90 TILT60 R188 2021 2025` (`36935799`) read back and
+compiled those exact files. Its one A1 backtest
+`163a61a9c9b878e566030e6573310e10` launched under distinct
+waived-payload SHA-256
+`e4ef52f5ab99eedeb935bb874cd5ccae400181736db4b5be08ef3c5a03d561f4`
+and terminated `Runtime Error`. Statistics-disabled status-envelope
+classification again located `_portfolio_cash` during `on_order_event`;
+the actual value was not read. No result aggregate, return, raw provider/
+price/order row, chart, or log was read or retained. The refusal does not
+estimate alpha or justify weakening the cash guard.
+
+R-188 A1 spends **177 -> 178 shared research looks / 120 -> 121 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. It uses one of R-188's three attempt
+slots. The preregistered R-189 50% candidate is a separate exploratory
+look, not a retry of either cash-refused predecessor.
+
+## R-189 — 50% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+Analyst lane section 184 prospectively froze R-189's separate 16-file
+projection SHA-256
+`e1f417b2a7e785e558ec0af83297083fa07c0bbc22c930447bb6e0e99a25f2d3`
+and profile SHA-256
+`5314cab14e8f50e38998c07dead583eb38b57eefcb0e2ad8768d5681adec116e`
+before QC mutation. Private project
+`112 ARV2 SIX CAP90 TILT50 R189 2021 2025` (`36935869`) read back and
+compiled the exact source. Its sole A1 backtest
+`35f0a10e81cd32980782ebe7e49b7542` launched under distinct
+waived-payload SHA-256
+`f457c276e76f36361cb51268a4ef8d9e0f8d56931b4697859d039f195e5ff8ff`
+and terminated `Runtime Error`. Value-free statistics-disabled status
+classification located `_portfolio_cash` during `on_order_event`; the
+actual cash amount was not read. No result aggregate, return, raw
+provider/price/order row, chart, or log was read or retained. This is
+neither a successful backtest nor an alpha estimate.
+
+R-189 A1 spends **178 -> 179 shared research looks / 121 -> 122 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. It uses one of R-189's maximum three
+attempt slots. The preregistered 70%/60%/50% ladder is complete, with
+all three cash-refused and no new result cell. Together with R-186 80%
+the four refusals are an execution-validity limitation under unchanged
+98%-gross/2x-admission/nonnegative-event-cash rules, not a comparative
+return curve. R-185 40% is the highest tested tilt in this family with a
+valid result; no unbounded follow-on sweep or retroactive rescue is
+authorized by these failures.

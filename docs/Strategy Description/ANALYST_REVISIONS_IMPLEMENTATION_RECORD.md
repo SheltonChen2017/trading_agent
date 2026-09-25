@@ -98,6 +98,12 @@ test-only and record commits, and the unsigned exploratory launchers
 (`ARV2R178-001`) stay open before any R-181 A3 or comparator launch.
 Section 179 counter-reviews Claude's three commits and records the bounded
 R-181 A2 order diagnosis. It creates no valid result or later QC launch.
+Sections 181–184 record the later order-based six-universe matched baseline,
+20% and 40% exploratory weight tilts, and the post-result 80%/70%/60%/50%
+ladder. All four stronger-tilt A1s refused at the post-order-event cash
+guard; none added a return cell. The active count is 179 shared research
+looks, 122 development evaluations, 32 infrastructure looks, and 613
+authenticated cells, the latest valid cell remaining exploratory.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -591,13 +597,16 @@ shared looks / 118 development evaluations / 32 infrastructure looks /
 Section 183 prospectively freezes the owner's single 80% R-186 weight-tilt
 sensitivity and its distinct private order-based source/launch identity.
 Section 183.1 records R-186 A1's authenticated cash-bound runtime refusal:
-no valid result or alpha estimate exists. Section 184 prospectively freezes
-the bounded 70% / 60% / 50% R-187–R-189 sensitivity ladder. Claude should
-review sections 181–184 after this bounded owner-authorized round; these
-same-window comparisons are not untouched validation, and their cash/order
-validity gates remain enforced.
-Claude should review section 184 after Codex's final single
-push for this owner-authorized interim backtest sequence.
+no valid result or alpha estimate exists. Section 184 prospectively froze
+the bounded 70% / 60% / 50% R-187–R-189 sensitivity ladder before the three
+QC launches; sections 184.1–184.3 record each A1's same post-order-event
+cash refusal. No 50%–80% return is known. R-185's valid 40% order run
+remains the highest tilt with a valid result in this family, not a proven
+return optimum. Claude should review section 184 after Codex's final single
+push, along with sections 181–183; these same-window looks are not untouched
+validation, and their cash/order validity gates remain enforced. The final
+ladder count is 179 shared looks / 122 development evaluations / 32
+infrastructure looks / 613 authenticated cells.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
@@ -24080,3 +24089,86 @@ attestations scope that standing authorization to each frozen research source;
 they are **not** signed artifacts, do not borrow R-186's waiver, and grant
 no paper/live/funded/broker order authority. At this prospective freeze none
 of the three has a project, compile, backtest, result read, or spent look.
+
+### 184.1 R-187 A1 70% order run: cash-bound refusal
+
+The committed `87a9e90` freeze and its focused source/predecessor/waiver
+checks preceded the first QC mutation. The fresh private project
+`110 ARV2 SIX CAP90 TILT70 R187 2021 2025` (`36935685`) read back the exact
+16-file source and compiled successfully as
+`73c75b4e77a474f402bdd3851c54eb49-e9666745aa2c9a31a7283a1c9a89be51`.
+The one A1 backtest `d733c02345bafc5d857a2710a4635bb6`, launched under
+exact waived-payload SHA-256
+`e42bad241af84594a2cfb834b912d4378ff4621dfa4d509c1c55bb531c8f22c4`,
+advanced `In Queue...` → `In Progress...` → **`Runtime Error`**. A
+statistics-disabled status-envelope classifier found `cash`,
+`on_order_event`, and `_portfolio_cash` but not `_observe_account` in the
+error/stacktrace strings. This is the same finite/nonnegative
+post-order-event cash guard as R-186. Neither the actual cash value nor
+its negative-versus-nonfinite class was read or inferred. No `backtests/read`,
+aggregate, return, drawdown, order row, provider/price row, chart, or log
+was read; **R-187 has no valid result cell or alpha estimate**. No
+byte-identical A2 is justified by the known deterministic refusal.
+
+This A1 uses one of R-187's three permitted attempt slots and spends one
+development research look: shared totals become **177 looks / 120
+development evaluations / 32 infrastructure looks / 613 authenticated
+cells**. The separately frozen R-188 60% candidate follows under its own
+source, waiver, project, and look ID; it is not a retry of R-187.
+
+### 184.2 R-188 A1 60% order run: cash-bound refusal
+
+The distinct R-188 project `111 ARV2 SIX CAP90 TILT60 R188 2021 2025`
+(`36935799`) read back its 16 pinned files and compiled as
+`97afb38cd843922c3dbdca86bdc78723-20723be2a68900c60dff446f3f9777f8`.
+Its only A1 backtest `163a61a9c9b878e566030e6573310e10` launched
+under the R-188-specific waived-payload SHA-256
+`e4ef52f5ab99eedeb935bb874cd5ccae400181736db4b5be08ef3c5a03d561f4`.
+The status moved `In Progress...` → **`Runtime Error`**. A value-free
+statistics-disabled error/stacktrace classification again identified
+`cash`, `on_order_event`, and `_portfolio_cash`, not `_observe_account`.
+The actual cash value was not read. No result read, return, order row, raw
+provider/price row, chart, or log was retained, and **R-188 has no valid
+result cell**. The unchanged finite/nonnegative event-cash guard has not
+been weakened and no byte-identical A2 is planned.
+
+R-188 A1 uses one of its three attempt slots and one separate development
+look: totals become **178 shared looks / 121 development evaluations / 32
+infrastructure looks / 613 authenticated cells**. R-189 at 50% was
+separately frozen before either lower-tilt outcome and remains next.
+
+### 184.3 R-189 A1 50% order run: cash-bound refusal and ladder stop
+
+The preregistered final project `112 ARV2 SIX CAP90 TILT50 R189 2021 2025`
+(`36935869`) read back its 16 pinned files and compiled as
+`38b407011cb6c7a770bc20c588538319-741cc87d5ca24495fc54cc902d37b4a1`.
+Its sole A1 backtest `35f0a10e81cd32980782ebe7e49b7542` launched
+under R-189-specific waived-payload SHA-256
+`f457c276e76f36361cb51268a4ef8d9e0f8d56931b4697859d039f195e5ff8ff`.
+The status moved `In Queue...` → `In Progress...` → **`Runtime Error`**.
+Statistics-disabled status-envelope classification again found `cash`,
+`on_order_event`, and `_portfolio_cash`, not `_observe_account`. The actual
+cash value was not read, and the classifier cannot distinguish negative
+from nonfinite. No `backtests/read`, aggregate, return, order row, raw
+provider/price row, chart, or log was retained. **R-189 has no valid
+result cell or alpha estimate.** A1 spends one of its maximum three
+attempts; no byte-identical A2 is planned. Totals become **179 shared
+looks / 122 development evaluations / 32 infrastructure looks / 613
+authenticated cells**.
+
+The bounded R-187–R-189 ladder is exhausted. R-186 80%, R-187 70%, R-188
+60%, and R-189 50% all compiled their distinct frozen order sources but
+refused at the same post-order-event cash check; only R-185 at 40% has a
+valid stronger-tilt result (+127.7967% cumulative after modeled 10-bps-
+per-side costs in this 2021–2025 window). This locates a tested
+*execution-validity* boundary between 40% and 50% for these exact physical
+sources, **not** a return optimum, a monotonic alpha curve, or proof that
+50%–80% cannot be made executable under a separately versioned cash/order
+policy. R-185's minimum observed event cash was only about $945 on a
+$1 million starting account, consistent with thin cash headroom, but no
+greater-tilt actual cash amount was read or inferred. The current cash
+refusal remains fail-closed. Any cash-reserve, order-sequencing, sizing, or
+admission-policy correction changes the candidate and needs prospective
+source/authority/validity pins plus a separately counted look; it cannot
+retroactively make these four refusals valid results. There is no further
+percentage sweep in this round.

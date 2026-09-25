@@ -659,6 +659,13 @@ launch exception are spent, with no automatic retry. The floor is now
 infrastructure looks, and 615 authenticated cells. Claude should review
 section 188 with sections 181–187 after the owner's deferred same-round QC
 work closes and Codex makes its single push.
+Section 189 freezes the owner's new 100% rerun, then 120% and 140%
+exploratory order-based candidates under distinct source and one-use QC
+identities. Claude will review section 189 after these three bounded runs
+and the single round-end push; the complete lane suite remains Claude's
+independent review responsibility. A QC completion
+without an authenticated valid aggregate is not a return result, and this
+same-window ladder cannot establish a prospective trading edge.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -703,7 +710,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–188
+findings, outcomes, and per-run accounting remain in numbered sections 1–189
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -24913,3 +24920,98 @@ the matched path and data vintage or to stop this tuned 100% line. No
 automatic retry, reader relaxation, higher tilt, formal acceptance,
 leverage, broker, deployment, paper/live/funded operation, or trading
 follows from this run.
+
+## 189. Prospective owner-directed 100% / 120% / 140% exploratory ladder, 2026-09-25
+
+After R-194's completed engine run and refused one-use result read, the
+owner explicitly directed: rerun 100%, then run 120%, then run 140%.
+This later instruction authorizes **one fifth R-193-lineage 100% launch**;
+it does not retroactively validate R-194, erase its spent read claim, or
+create a general unlimited-retry exception. R-195 is the new 100% anchor;
+R-196 and R-197 are distinct 120% and 140% candidates. The owner has
+not requested a formal or out-of-sample claim. These are three adaptive
+looks at the already inspected 2021–2025 window, reported as exploratory
+even if their order-based QC runs complete. Each candidate has its own
+one-use A1 project/source/waiver/result identity. Technical attempts may
+never exceed the machine-wide three-per-candidate ceiling; R-195 will
+not automatically receive another 100% lineage launch if its A1 fails.
+
+**Frozen economic interpretation to implement before outcome access.**
+The 100/120/140 labels are maximum transfers relative to each selected
+stock's *own post-cap matched weight*, not 100%/120%/140% portfolio
+allocation and not portfolio leverage. The same selected point-in-time
+stock IDs, six sleeve budgets, ETF fallback, 98% target gross, 261 weekly
+decisions, 2021-01-04 through 2025-12-31 window, next-session whole-share
+MOO execution, RAW execution prices, 10-bps-per-side modeled costs, 2x
+**order admission only**, and R-191 settlement-cash policy remain. The
+new rule retains R-194's aggregate 1e-30 donor floor **and** adds a
+1e-30 per-sleeve donor floor before every transfer. A local counterexample
+showed why the second guard matters: when one stock appears in multiple
+sleeves, R-194's aggregate-only floor can leave a positive aggregate
+weight but a zero/negative component in a donor sleeve. The 100% anchor
+must use the same corrected nonnegative rule as 120% and 140%; the QC
+headline +133.47% from R-194 is therefore context, **not** a matched
+result in this new ladder. Receiver caps and total 98% gross remain
+mandatory; a requested 120%/140% capacity can saturate at a floor or cap
+and is not a promise that every stock actually moves by that fraction.
+
+**Prospectively frozen result comparison rule.** Each of R-195/R-196/R-197
+may yield its **own** exploratory return only after a completed,
+current-source-checked, schema-valid, `run_valid=true` bounded aggregate
+clears the full existing decision, order, cash, exposure, cost, and
+tracking checks. Each valid receipt records its producer-derived
+matched-target-path SHA-256. The first valid R-195 receipt freezes its
+digest `H` automatically **regardless of the return**; there is no
+re-anchoring to a more attractive result. R-196 and R-197 may be
+**compared** with R-195 only if each independently emits exactly `H`
+under the same matched profile, package and activation lineage. If
+R-195 is invalid, the owner-requested later runs may still report their
+own valid returns, but no cross-run spread is accepted. If a later
+digest differs, its own valid return may be reported while its
+comparison is refused; the reader is not relaxed to rescue a spread.
+Even equal target-path
+digests prove target decisions, **not** identical QC price or execution
+data vintages. If `H` differs from the historical R-182/R-191/R-192
+digest, none of their returns is on a proven common target basis with
+this ladder; a new contemporaneous matched control would be needed for
+selection attribution. No best-setting choice from this same-window
+sweep can be called prospective evidence for live use.
+
+The prelaunch look floor is **189 shared research looks, 132 ARV2
+development evaluations, 32 infrastructure looks, and 615 authenticated
+cells**. Each submitted QC backtest advances the first two counts by one
+even if it fails; a cell advances only after one exact bounded result
+read passes. The R-194 one-use result read remains spent. No raw provider,
+price or order rows, logs, charts, broker, paper/live/funded account,
+deployment, real order, or trading action is part of this request. Exact
+R-195/R-196/R-197 source/profile/manifest, project and waiver hashes,
+focused tests, and per-run outcomes follow in this section **before and
+after their respective launches**; no QC mutation is justified by this
+paragraph alone.
+
+**Exact prospective A1 identities (frozen before QC mutation).** The
+host-only projection derives three independently pinned 16-file,
+425,975-byte closures from R-194; the only changed projected files are
+the tilt targets, tilt runtime, and `main.py`. The host-only launcher
+independently pins every closure, waiver, project, role, profile, and
+summary schema. The shared local one-use control directory remains
+`artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923` in this
+worktree. A status-only inventory found all three exact project names
+unused. Each row below is **one** new A1 and one maximum aggregate read,
+not a permission to retry an earlier project.
+
+| Candidate / percent | Exact private project / backtest | Projection SHA-256 | Profile SHA-256 | Source-manifest SHA-256 | Exact waiver ID / payload SHA-256 |
+|---|---|---|---|---|---|
+| R-195 / 100% | `117 ARV2 SIX CAP90 SETTLED TILT100 GUARD R195 2021 2025` / `ARV2 R195A1 six cap90 settlement 2021 2025 c20e2c13` | `c20e2c13ef477e4c1619cb93aafb4fef58c2a36c95f5a514c62d015f5722e28d` | `ecdc210a6f65ea1ee8e2163e4dc3debaf8b0c0996a457c57299dbed1c4198561` | `75a3cfd8091e6311e34c0295e787969a5ba637fc2da74f9e83c70fd7700fdef3` | `ARV2-OWNER-2026-09-25-R195A1-TILT100-GUARD-EXPLORATORY` / `5cc94a081d104c4d0a395f5cc40102a35d2e955d1087b41defa5056554f8c620` |
+| R-196 / 120% | `118 ARV2 SIX CAP90 SETTLED TILT120 GUARD R196 2021 2025` / `ARV2 R196A1 six cap90 settlement 2021 2025 f8489764` | `f8489764d1925f93ecd13092d5ef0d916f681385a12dc817f02115f66328f82e` | `cf9932e48e2f282713101d8d38dec2e702b08a7796ae8ccb503abff7f32234c1` | `1b933d0f925b3103a875e9960c24741856a33b50e0b3c5c1675bfed07d76c051` | `ARV2-OWNER-2026-09-25-R196A1-TILT120-GUARD-EXPLORATORY` / `0a234576ca0b840c9bbc9f2994b636a1a8a8beca3d1b38b3b179866df911542e` |
+| R-197 / 140% | `119 ARV2 SIX CAP90 SETTLED TILT140 GUARD R197 2021 2025` / `ARV2 R197A1 six cap90 settlement 2021 2025 c3edcd8b` | `c3edcd8bae80446fd564e4d21a1a8ff3c8a35ee68af914b13de2a344ab596576` | `83893aca4ab0dd0b0a98eb39f51b8a8c2f77ef114a1cf231acd9214437c3287f` | `2456ee4d5089a4d9cd7cdd87068f0d1f5897ce87a6ffb1b4dfd0938ec0bf6082` | `ARV2-OWNER-2026-09-25-R197A1-TILT140-GUARD-EXPLORATORY` / `3373bd526d6ba6993b1077a748a4f71d1c0353d6eeeefd942ce79472ff149182` |
+
+All three waiver payloads were calculated from the authenticated local
+package, this exact control path, and the existing private QC organization;
+that read-only calculation made no project or backtest. The R-195 waiver
+records fifth R-193-lineage look explicitly. R-196/R-197 are distinct
+candidates, not disguised retries of R-195. The prior R-182 predecessor
+receipt is still required; its historical matched-path digest is
+disclosed but not falsely substituted for a new producer-derived path.
+The older R-191 through R-194 source, waiver, and result gate semantics
+remain frozen.

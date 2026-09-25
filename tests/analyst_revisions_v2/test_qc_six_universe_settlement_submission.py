@@ -12,6 +12,7 @@ from research.analyst_revisions_v2_qc import accepted_risk_delta_order_package a
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_settlement_qc_projection as projector
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_tilt100_qc_projection as tilt100_projector
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_tilt100_floor_qc_projection as floor_projector
+from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection as ladder_projector
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_qc_runtime as runtime
 from research.analyst_revisions_v2_qc import six_universe_cap90_submission as cap90
 from research.analyst_revisions_v2_qc import six_universe_settlement_submission as subject
@@ -39,6 +40,9 @@ def projections():
         "R192": projector.build_settlement_projection(package, "R192"),
         "R193": tilt100_projector.build_tilt100_settlement_projection(package),
         "R194": floor_projector.build_tilt100_floor_projection(package),
+        "R195": ladder_projector.build_tilt_floor_projection(package, 100),
+        "R196": ladder_projector.build_tilt_floor_projection(package, 120),
+        "R197": ladder_projector.build_tilt_floor_projection(package, 140),
     }
 
 
@@ -60,7 +64,8 @@ def _fake_qc(monkeypatch, plan, projection, **kwargs):
     return r185_tests._fake_qc(monkeypatch, plan, projection, **kwargs)
 
 
-def _statistics(plan, launch, *, defect=None):
+def _statistics(plan, launch, *, defect=None,
+                target_path=subject._PREDECESSOR_TARGET_PATH_SHA256):
     values = r185_tests._statistics(plan, launch, fraction="0.40")
     aggregate = json.loads(values[runtime.AGGREGATES_STATISTIC_NAME])
     aggregate.pop("order_event_cash_nonnegative")
@@ -86,7 +91,7 @@ def _statistics(plan, launch, *, defect=None):
     else:
         aggregate.update({
             "matched_baseline_profile_sha256": subject._CANDIDATES["R191"].profile_sha256,
-            "matched_baseline_target_path_sha256": subject._PREDECESSOR_TARGET_PATH_SHA256,
+            "matched_baseline_target_path_sha256": target_path,
             "maximum_stock_weight_change_fraction": subject._TILT_FRACTIONS[plan.candidate_id],
         })
     if defect == "digest":
@@ -121,6 +126,8 @@ def _aggregate(candidate_id="R192"):
         "schema": "settlement-summary",
         "role": ("matched" if candidate_id == "R191" else
                  floor_projector.TILT_ROLE if candidate_id == "R194" else
+                 ladder_projector.TILT_ROLES[subject._LADDER_PERCENTS[candidate_id]]
+                 if candidate_id in subject._LADDER_PERCENTS else
                  f"matched_revision_tilt{80 if candidate_id == 'R192' else 100}"),
         "minimum_observed_order_event_cash": "-25",
         "transient_negative_order_event_count": 1,
@@ -153,7 +160,9 @@ def _aggregate(candidate_id="R192"):
     return aggregate, candidate
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
+@pytest.mark.parametrize("candidate_id", (
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+))
 def test_signed_temporary_cash_is_retained_without_old_nonnegative_claim(candidate_id):
     aggregate, candidate = _aggregate(candidate_id)
     selected = subject._settlement_aggregate(
@@ -262,7 +271,9 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
         )
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
+@pytest.mark.parametrize("candidate_id", (
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+))
 def test_wrong_waiver_or_source_refuses_before_qc(
     projections, tmp_path, monkeypatch, candidate_id,
 ):
@@ -292,7 +303,9 @@ def test_wrong_waiver_or_source_refuses_before_qc(
     assert not subject._control_path(plan, "claim").exists()
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
+@pytest.mark.parametrize("candidate_id", (
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+))
 def test_a1_launch_status_and_one_signed_cash_aggregate_read(
     projections, tmp_path, monkeypatch, candidate_id,
 ):
@@ -310,6 +323,12 @@ def test_a1_launch_status_and_one_signed_cash_aggregate_read(
     before = len(calls)
     result = subject.read_aggregates_once(plan, launch, object())
     assert result["run_valid"] is True
+    if candidate_id in subject._LADDER_PERCENTS:
+        assert result["comparison_valid"] is False
+        receipt = subject._read(subject._control_path(plan, "result-valid"))
+        assert receipt["matched_baseline_target_path_sha256"] == (
+            subject._PREDECESSOR_TARGET_PATH_SHA256
+        )
     assert result["aggregates"]["minimum_observed_order_event_cash"] == "-25"
     assert "order_event_cash_nonnegative" not in result["aggregates"]
     assert calls[before:] == ["files/read", "backtests/read"]
@@ -325,7 +344,9 @@ def test_a1_launch_status_and_one_signed_cash_aggregate_read(
         )
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
+@pytest.mark.parametrize("candidate_id", (
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+))
 @pytest.mark.parametrize("defect", ("digest", "unknown", "unexplained"))
 def test_one_result_read_refuses_changed_digest_or_cash_policy(
     projections, tmp_path, monkeypatch, candidate_id, defect,
@@ -360,11 +381,12 @@ def test_r193_result_refuses_r192_fraction_even_with_correct_settlement_policy()
 
 
 def test_prior_waiver_payload_digests_are_unchanged():
-    """R194's exception fields cannot alter the earlier authority payloads."""
+    """The new ladder cannot alter any earlier authority payload bytes."""
     pinned = {
         "R191": "39e86b9b9f7cea0d2b4563505deeaec95ae106ed1810c8883ac1608e645c5738",
         "R192": "6207b84a3985c1693769d8a25e36853f005e0acfe65fdb6235787263cb812dee",
         "R193": "e11e77fe3e1be42df75291d84886d74d4a8dec7e12128c0a464f5cb5c54d19af",
+        "R194": "d2e0ba03bf63ecfc409586d1314015870dacbff6bcb16fd25257abd52f1e28ad",
     }
     for candidate_id, expected in pinned.items():
         plan = subject.SettlementQcPlan(
@@ -427,3 +449,124 @@ def test_r194_profile_floor_mutation_refuses_before_qc(
         subject.launch_a1(plan, projection, object(),
                           owner_waiver_id=subject._CANDIDATES["R194"].waiver_id)
     assert not subject._control_path(plan, "claim").exists()
+
+
+@pytest.mark.parametrize("candidate_id,percent", (
+    ("R195", 100), ("R196", 120), ("R197", 140),
+))
+def test_guarded_ladder_preview_and_owner_waiver(
+    projections, tmp_path, monkeypatch, candidate_id, percent,
+):
+    projection = projections[candidate_id]
+    plan = _plan(tmp_path, projection, candidate_id)
+    identity = subject.preview(plan, projection)
+    assert identity["projection_sha256"] == (
+        ladder_projector.PINNED_PROJECTION_SHA256S[percent]
+    )
+    assert identity["profile_sha256"] == (
+        ladder_projector.PINNED_PROFILE_SHA256S[percent]
+    )
+    assert len(identity["source_files"]) == 16
+    _predecessors(monkeypatch, plan)
+    waiver = json.loads(subject.render_owner_waiver_payload(plan, projection))
+    assert waiver["matched_baseline_target_path_sha256"] is None
+    assert waiver["historical_r182_target_path_sha256"] == (
+        subject._PREDECESSOR_TARGET_PATH_SHA256
+    )
+    assert waiver["matched_target_path_policy_id"] == (
+        "producer_derived_per_candidate_v1"
+    )
+    assert waiver["comparison_requires_valid_r195_exact_path"] is True
+    assert waiver["project_name"].startswith({
+        100: "117 ", 120: "118 ", 140: "119 ",
+    }[percent])
+    assert waiver["source_files_sha256"] == (
+        ladder_projector.PINNED_SOURCE_MANIFEST_SHA256S[percent]
+    )
+    if candidate_id == "R195":
+        assert identity["r193_lineage_look_number"] == 5
+        assert waiver["r193_lineage_look_number"] == 5
+        assert waiver["r193_prior_looks_spent"] == 4
+        assert waiver["owner_explicit_additional_look"] is True
+    else:
+        assert "r193_lineage_look_number" not in waiver
+
+
+@pytest.mark.parametrize("candidate_id", ("R195", "R196", "R197"))
+@pytest.mark.parametrize("bad_path", (None, "F" * 64, "bad"))
+def test_guarded_ladder_refuses_malformed_producer_path(candidate_id, bad_path):
+    aggregate, candidate = _aggregate(candidate_id)
+    aggregate["matched_baseline_target_path_sha256"] = bad_path
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="producer-derived matched target path"):
+        subject._settlement_aggregate(
+            aggregate, candidate, matched_target_path=None,
+        )
+
+
+@pytest.mark.parametrize("candidate_id", ("R196", "R197"))
+@pytest.mark.parametrize("same_path", (True, False))
+def test_guarded_ladder_comparison_needs_valid_r195_same_path(
+    projections, tmp_path, monkeypatch, candidate_id, same_path,
+):
+    anchor_path = "d" * 64
+    r195_projection = projections["R195"]
+    r195_plan = _plan(tmp_path, r195_projection, "R195")
+    _predecessors(monkeypatch, r195_plan)
+    _, r195_qc = _fake_qc(monkeypatch, r195_plan, r195_projection)
+    r195_launch = subject.launch_a1(
+        r195_plan, r195_projection, object(),
+        owner_waiver_id=subject._CANDIDATES["R195"].waiver_id,
+    )
+    assert subject.poll_status(r195_plan, r195_launch, object()) == "Completed."
+    r195_qc["statistics"] = _statistics(
+        r195_plan, r195_launch, target_path=anchor_path,
+    )
+    r195_result = subject.read_aggregates_once(r195_plan, r195_launch, object())
+    assert r195_result["run_valid"] is True
+    assert r195_result["comparison_valid"] is False
+    r195_receipt = subject._read(subject._control_path(r195_plan, "result-valid"))
+    assert r195_receipt["matched_baseline_target_path_sha256"] == anchor_path
+
+    projection = projections[candidate_id]
+    plan = _plan(tmp_path, projection, candidate_id)
+    _, qc = _fake_qc(monkeypatch, plan, projection)
+    launch = subject.launch_a1(
+        plan, projection, object(),
+        owner_waiver_id=subject._CANDIDATES[candidate_id].waiver_id,
+    )
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    observed_path = anchor_path if same_path else "e" * 64
+    qc["statistics"] = _statistics(
+        plan, launch, target_path=observed_path,
+    )
+    result = subject.read_aggregates_once(plan, launch, object())
+    assert result["run_valid"] is True
+    assert result["comparison_valid"] is same_path
+    receipt = subject._read(subject._control_path(plan, "result-valid"))
+    assert receipt["matched_baseline_target_path_sha256"] == observed_path
+    assert receipt["comparison_valid"] is same_path
+
+
+def test_guarded_ladder_invalid_r195_receipt_cannot_enable_comparison(
+    projections, tmp_path, monkeypatch,
+):
+    anchor_plan = _plan(tmp_path, projections["R195"], "R195")
+    _predecessors(monkeypatch, anchor_plan)
+    subject._write(subject._control_path(anchor_plan, "result-valid"), {
+        "candidate_id": "R195", "run_valid": True,
+        "matched_baseline_target_path_sha256": "d" * 64,
+    })
+    projection = projections["R196"]
+    plan = _plan(tmp_path, projection, "R196")
+    _, qc = _fake_qc(monkeypatch, plan, projection)
+    launch = subject.launch_a1(
+        plan, projection, object(),
+        owner_waiver_id=subject._CANDIDATES["R196"].waiver_id,
+    )
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    qc["statistics"] = _statistics(plan, launch, target_path="d" * 64)
+    result = subject.read_aggregates_once(plan, launch, object())
+    assert result["run_valid"] is True
+    assert result["comparison_valid"] is False
+    assert subject._control_path(plan, "result-valid").exists()

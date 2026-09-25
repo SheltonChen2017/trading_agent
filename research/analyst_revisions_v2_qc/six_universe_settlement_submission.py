@@ -3,6 +3,9 @@
 R191 (matched), R192 (80% revision tilt), R193 (100% revision tilt), and the
 separately pinned R194 positive-residual correction are admitted. R194 is a
 one-time fourth look in the R193 lineage, not a reset of its attempt budget.
+R195/R196/R197 are separately pinned 100/120/140% exploratory launches.
+Each authenticates its own matched target path; only a path match to a valid
+R195 receipt permits a later candidate comparison.
 Import does no I/O. The exact source, project, owner waiver,
 predecessor, and result are authenticated independently. A completed QC
 status alone is not a result.
@@ -26,6 +29,7 @@ from . import accepted_risk_six_universe_order_qc_runtime as base_runtime
 from . import accepted_risk_six_universe_order_settlement_qc_projection as settlement_projection
 from . import accepted_risk_six_universe_order_tilt100_qc_projection as tilt100_projection
 from . import accepted_risk_six_universe_order_tilt100_floor_qc_projection as floor_projection
+from . import accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection as ladder_projection
 from . import six_universe_cap90_submission as cap90
 from . import six_universe_tilt80_submission as prior
 
@@ -104,7 +108,41 @@ _CANDIDATES = {
         floor_projection.SUMMARY_SCHEMA,
         "ARV2-OWNER-2026-09-25-R193-LINEAGE-LOOK4-R194-ONE-TIME-EXCEPTION",
     ),
+    "R195": _Candidate(
+        "R195", "117 ARV2 SIX CAP90 SETTLED TILT100 GUARD R195 2021 2025",
+        ladder_projection.TILT_ROLES[100], ladder_projection.TILT_VARIANTS[100],
+        ladder_projection.PROJECTION_SCHEMAS[100],
+        "c20e2c13ef477e4c1619cb93aafb4fef58c2a36c95f5a514c62d015f5722e28d",
+        "ecdc210a6f65ea1ee8e2163e4dc3debaf8b0c0996a457c57299dbed1c4198561",
+        "75a3cfd8091e6311e34c0295e787969a5ba637fc2da74f9e83c70fd7700fdef3",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[100],
+        "ARV2-OWNER-2026-09-25-R195A1-TILT100-GUARD-EXPLORATORY",
+    ),
+    "R196": _Candidate(
+        "R196", "118 ARV2 SIX CAP90 SETTLED TILT120 GUARD R196 2021 2025",
+        ladder_projection.TILT_ROLES[120], ladder_projection.TILT_VARIANTS[120],
+        ladder_projection.PROJECTION_SCHEMAS[120],
+        "f8489764d1925f93ecd13092d5ef0d916f681385a12dc817f02115f66328f82e",
+        "cf9932e48e2f282713101d8d38dec2e702b08a7796ae8ccb503abff7f32234c1",
+        "1b933d0f925b3103a875e9960c24741856a33b50e0b3c5c1675bfed07d76c051",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[120],
+        "ARV2-OWNER-2026-09-25-R196A1-TILT120-GUARD-EXPLORATORY",
+    ),
+    "R197": _Candidate(
+        "R197", "119 ARV2 SIX CAP90 SETTLED TILT140 GUARD R197 2021 2025",
+        ladder_projection.TILT_ROLES[140], ladder_projection.TILT_VARIANTS[140],
+        ladder_projection.PROJECTION_SCHEMAS[140],
+        "c3edcd8bae80446fd564e4d21a1a8ff3c8a35ee68af914b13de2a344ab596576",
+        "83893aca4ab0dd0b0a98eb39f51b8a8c2f77ef114a1cf231acd9214437c3287f",
+        "2456ee4d5089a4d9cd7cdd87068f0d1f5897ce87a6ffb1b4dfd0938ec0bf6082",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[140],
+        "ARV2-OWNER-2026-09-25-R197A1-TILT140-GUARD-EXPLORATORY",
+    ),
 }
+_LADDER_PERCENTS = {"R195": 100, "R196": 120, "R197": 140}
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
 _ORG = re.compile(r"[0-9a-f]{32}\Z")
 _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]*\Z")
@@ -284,7 +322,23 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
         or projection.activation_manifest_sha256 != plan.activation_manifest_sha256
     ):
         _fail("settlement projection, profile, or package changed")
-    if candidate.candidate_id == "R194":
+    if candidate.candidate_id in _LADDER_PERCENTS:
+        percent = _LADDER_PERCENTS[candidate.candidate_id]
+        try:
+            profile = ladder_projection.require_tilt_floor_profile(percent)
+        except ladder_projection.SixUniverseTiltLadderFloorQcProjectionError as exc:
+            raise SixUniverseSettlementSubmissionError(str(exc)) from None
+        projection_id_prefix = ladder_projection.PROJECTION_ID_PREFIXES[percent]
+        if (
+            profile.get("role") != candidate.role
+            or profile.get("maximum_stock_weight_change_fraction")
+            != _TILT_FRACTIONS[candidate.candidate_id]
+            or profile.get("minimum_stock_and_sleeve_residual_weight") != "1e-30"
+            or profile.get("matched_baseline_profile_sha256")
+            != _MATCHED_SETTLEMENT_PROFILE_SHA256
+        ):
+            _fail("settlement guarded tilt rule or matched profile changed")
+    elif candidate.candidate_id == "R194":
         try:
             profile = floor_projection.require_tilt100_floor_profile()
         except floor_projection.SixUniverseTilt100FloorQcProjectionError as exc:
@@ -341,6 +395,11 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
             "r193_lineage_look_number": 4,
             "owner_one_time_exception": True,
         })
+    elif candidate.candidate_id == "R195":
+        identity.update({
+            "r193_lineage_look_number": 5,
+            "owner_explicit_additional_look": True,
+        })
     return identity
 
 
@@ -354,9 +413,20 @@ def _require_valid_predecessor(plan: SettlementQcPlan) -> str:
     return target_path_sha
 
 
-def _waiver_payload(plan: SettlementQcPlan, identity: dict, target_path: str) -> bytes:
+def _launch_target_path(plan: SettlementQcPlan) -> str | None:
+    """Keep the old exact path gate; new looks bind their own runtime paths."""
+    predecessor = _require_valid_predecessor(plan)
+    return None if plan.candidate_id in _LADDER_PERCENTS else predecessor
+
+
+def _waiver_payload(plan: SettlementQcPlan, identity: dict,
+                    target_path: str | None) -> bytes:
     candidate = _candidate(plan)
-    if target_path != _PREDECESSOR_TARGET_PATH_SHA256:
+    if candidate.candidate_id in _LADDER_PERCENTS:
+        valid_path = target_path is None
+    else:
+        valid_path = target_path == _PREDECESSOR_TARGET_PATH_SHA256
+    if not valid_path:
         _fail("settlement predecessor target path changed")
     payload = {
         "schema": f"arv2-six-universe-{candidate.candidate_id.lower()}-settlement-waiver-v1",
@@ -397,12 +467,26 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict, target_path: str) ->
             "owner_one_time_exception": True,
             "maximum_additional_r193_lineage_submissions": 1,
         })
+    elif candidate.candidate_id in _LADDER_PERCENTS:
+        payload.update({
+            "historical_r182_target_path_sha256": _PREDECESSOR_TARGET_PATH_SHA256,
+            "matched_target_path_policy_id": "producer_derived_per_candidate_v1",
+            "comparison_reference_candidate_id": "R195",
+            "comparison_requires_valid_r195_exact_path": True,
+        })
+        if candidate.candidate_id == "R195":
+            payload.update({
+                "r193_lineage_look_number": 5,
+                "r193_prior_looks_spent": 4,
+                "owner_explicit_additional_look": True,
+                "maximum_additional_r193_lineage_submissions": 1,
+            })
     return _canonical(payload)
 
 
 def render_owner_waiver_payload(plan: SettlementQcPlan, projection: object) -> bytes:
     identity = preview(plan, projection)
-    return _waiver_payload(plan, identity, _require_valid_predecessor(plan))
+    return _waiver_payload(plan, identity, _launch_target_path(plan))
 
 
 def _check_uploaded_source(project_id: int, identity: dict,
@@ -439,7 +523,7 @@ def launch_a1(
     """Claim one A1, create a fresh private project, and submit exact source."""
     candidate = _candidate(plan)
     identity = preview(plan, projection)
-    target_path = _require_valid_predecessor(plan)
+    target_path = _launch_target_path(plan)
     if type(owner_waiver_id) is not str or owner_waiver_id != candidate.waiver_id:
         _fail("settlement owner waiver does not cover this candidate")
     authority = {
@@ -456,6 +540,11 @@ def launch_a1(
         authority.update({
             "r193_lineage_look_number": 4,
             "owner_one_time_exception": True,
+        })
+    elif candidate.candidate_id == "R195":
+        authority.update({
+            "r193_lineage_look_number": 5,
+            "owner_explicit_additional_look": True,
         })
     claim_path = _control_path(plan, "claim")
     if claim_path.exists():
@@ -583,7 +672,8 @@ def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
         or launch.get("projection_sha256") != candidate.projection_sha256
         or launch.get("profile_sha256") != candidate.profile_sha256
         or launch.get("matched_baseline_target_path_sha256")
-        != _PREDECESSOR_TARGET_PATH_SHA256
+        != (None if candidate.candidate_id in _LADDER_PERCENTS
+            else _PREDECESSOR_TARGET_PATH_SHA256)
         or type(launch.get("project_id")) is not int
         or launch["project_id"] <= 0
         or type(launch.get("backtest_id")) is not str
@@ -595,6 +685,11 @@ def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
         or launch.get("owner_one_time_exception") is not True
     ):
         _fail("R194 is not bound to the fourth R193-lineage look")
+    if candidate.candidate_id == "R195" and (
+        launch.get("r193_lineage_look_number") != 5
+        or launch.get("owner_explicit_additional_look") is not True
+    ):
+        _fail("R195 is not bound to the fifth R193-lineage look")
     return candidate
 
 
@@ -652,7 +747,10 @@ _TILT_FIELDS = frozenset({
     "matched_baseline_profile_sha256", "matched_baseline_target_path_sha256",
     "tilt_rank_rule_id", "maximum_stock_weight_change_fraction",
 })
-_TILT_FRACTIONS = {"R192": "0.80", "R193": "1.00", "R194": "1.00"}
+_TILT_FRACTIONS = {
+    "R192": "0.80", "R193": "1.00", "R194": "1.00",
+    "R195": "1.00", "R196": "1.20", "R197": "1.40",
+}
 
 
 def _exact_result_claim(
@@ -661,7 +759,7 @@ def _exact_result_claim(
     """Rebind source, predecessor and waiver before consuming the one read."""
     claim = _read(_control_path(plan, "claim"))
     source_files = claim.get("source_files")
-    target_path = _require_valid_predecessor(plan)
+    target_path = _launch_target_path(plan)
     if (
         claim.get("candidate_id") != candidate.candidate_id
         or claim.get("attempt") != 1
@@ -694,6 +792,13 @@ def _exact_result_claim(
         or launch.get("owner_one_time_exception") is not True
     ):
         _fail("R194 claim did not persist the one-time fourth lineage look")
+    if candidate.candidate_id == "R195" and (
+        claim.get("r193_lineage_look_number") != 5
+        or claim.get("owner_explicit_additional_look") is not True
+        or launch.get("r193_lineage_look_number") != 5
+        or launch.get("owner_explicit_additional_look") is not True
+    ):
+        _fail("R195 claim did not persist the fifth R193-lineage look")
     waiver_sha = hashlib.sha256(
         _waiver_payload(plan, claim, target_path)
     ).hexdigest()
@@ -715,7 +820,7 @@ def _exact_result_claim(
 
 
 def _settlement_aggregate(
-    aggregate: dict, candidate: _Candidate, *, matched_target_path: str,
+    aggregate: dict, candidate: _Candidate, *, matched_target_path: str | None,
 ) -> dict:
     """Retain only an exact, internally consistent new-policy aggregate."""
     tilt_fields = (_TILT_FIELDS if candidate.candidate_id in _TILT_FRACTIONS
@@ -787,11 +892,16 @@ def _settlement_aggregate(
         ))
     ):
         _fail("settlement order, exposure, or tracking validity changed")
+    if candidate.candidate_id in _LADDER_PERCENTS:
+        observed_path = aggregate.get("matched_baseline_target_path_sha256")
+        if type(observed_path) is not str or not _HEX.fullmatch(observed_path):
+            _fail("settlement producer-derived matched target path is invalid")
     if candidate.candidate_id in _TILT_FRACTIONS and (
         aggregate.get("matched_baseline_profile_sha256")
         != _MATCHED_SETTLEMENT_PROFILE_SHA256
-        or aggregate.get("matched_baseline_target_path_sha256")
-        != matched_target_path
+        or (candidate.candidate_id not in _LADDER_PERCENTS
+            and aggregate.get("matched_baseline_target_path_sha256")
+            != matched_target_path)
         or aggregate.get("maximum_stock_weight_change_fraction")
         != _TILT_FRACTIONS[candidate.candidate_id]
     ):
@@ -807,6 +917,65 @@ def _settlement_aggregate(
         "maximum_target_weight_l1_error": execution["maximum_target_weight_l1_error"],
     })
     return selected
+
+
+def _valid_r195_comparison_path(plan: SettlementQcPlan) -> str | None:
+    """Use only a complete, source-bound R195 receipt as a comparison anchor."""
+    anchor_plan = SettlementQcPlan(
+        "R195", plan.organization_id, plan.package_sha256,
+        plan.activation_manifest_sha256, plan.control_directory,
+    )
+    valid_path = _control_path(anchor_plan, "result-valid")
+    if not valid_path.exists():
+        return None
+    try:
+        launch = _read(_control_path(anchor_plan, "launch"))
+        candidate = _match_launch(anchor_plan, launch)
+        _exact_result_claim(anchor_plan, launch, candidate)
+        if _read(_control_path(anchor_plan, "terminal")) != {
+            "candidate_id": "R195", "status": "Completed.",
+            "project_id": launch["project_id"],
+            "backtest_id": launch["backtest_id"],
+        }:
+            return None
+        if _read(_control_path(anchor_plan, "result-read-claim")) != {
+            "candidate_id": "R195", "project_id": launch["project_id"],
+            "backtest_id": launch["backtest_id"],
+        }:
+            return None
+        receipt = _read(valid_path)
+    except SixUniverseSettlementSubmissionError:
+        return None
+    expected = {
+        "candidate_id", "attempt", "run_valid", "aggregate_sha256",
+        "projection_sha256", "profile_sha256", "project_id", "backtest_id",
+        "matched_baseline_target_path_sha256", "matched_baseline_profile_sha256",
+        "package_sha256", "activation_manifest_sha256", "source_files_sha256",
+        "comparison_valid",
+    }
+    if (
+        set(receipt) != expected
+        or receipt.get("candidate_id") != "R195"
+        or receipt.get("attempt") != 1
+        or receipt.get("run_valid") is not True
+        or receipt.get("projection_sha256") != candidate.projection_sha256
+        or receipt.get("profile_sha256") != candidate.profile_sha256
+        or receipt.get("project_id") != launch["project_id"]
+        or receipt.get("backtest_id") != launch["backtest_id"]
+        or receipt.get("matched_baseline_profile_sha256")
+        != _MATCHED_SETTLEMENT_PROFILE_SHA256
+        or receipt.get("package_sha256") != plan.package_sha256
+        or receipt.get("activation_manifest_sha256")
+        != plan.activation_manifest_sha256
+        or receipt.get("source_files_sha256") != candidate.source_files_sha256
+        or receipt.get("comparison_valid") is not False
+        or type(receipt.get("aggregate_sha256")) is not str
+        or not _HEX.fullmatch(receipt["aggregate_sha256"])
+        or type(receipt.get("matched_baseline_target_path_sha256")) is not str
+        or not _HEX.fullmatch(receipt["matched_baseline_target_path_sha256"])
+    ):
+        return None
+    return receipt["matched_baseline_target_path_sha256"]
 
 
 def read_aggregates_once(
@@ -898,19 +1067,46 @@ def read_aggregates_once(
         _fail("settlement result lineage, digest, or safety flag changed")
     selected = _settlement_aggregate(
         aggregate, candidate,
-        matched_target_path=_PREDECESSOR_TARGET_PATH_SHA256,
+        matched_target_path=(
+            None if candidate.candidate_id in _LADDER_PERCENTS
+            else _PREDECESSOR_TARGET_PATH_SHA256
+        ),
     )
     valid = aggregate["run_valid"] is True
+    comparison_valid = False
+    if valid and candidate.candidate_id in {"R196", "R197"}:
+        anchor = _valid_r195_comparison_path(plan)
+        comparison_valid = (
+            anchor is not None
+            and selected["matched_baseline_target_path_sha256"] == anchor
+        )
     if valid:
-        _write(_control_path(plan, "result-valid"), {
+        receipt = {
             "candidate_id": candidate.candidate_id, "attempt": 1,
             "run_valid": True, "aggregate_sha256": meta["aggregate_sha256"],
             "projection_sha256": candidate.projection_sha256,
             "profile_sha256": candidate.profile_sha256,
             "project_id": launch["project_id"],
             "backtest_id": launch["backtest_id"],
-        })
-    return {"meta": meta, "aggregates": selected, "run_valid": valid}
+        }
+        if candidate.candidate_id in _LADDER_PERCENTS:
+            receipt.update({
+                "matched_baseline_target_path_sha256": (
+                    selected["matched_baseline_target_path_sha256"]
+                ),
+                "matched_baseline_profile_sha256": (
+                    _MATCHED_SETTLEMENT_PROFILE_SHA256
+                ),
+                "package_sha256": plan.package_sha256,
+                "activation_manifest_sha256": plan.activation_manifest_sha256,
+                "source_files_sha256": candidate.source_files_sha256,
+                "comparison_valid": comparison_valid,
+            })
+        _write(_control_path(plan, "result-valid"), receipt)
+    result = {"meta": meta, "aggregates": selected, "run_valid": valid}
+    if candidate.candidate_id in _LADDER_PERCENTS:
+        result["comparison_valid"] = comparison_valid
+    return result
 
 
 __all__ = (

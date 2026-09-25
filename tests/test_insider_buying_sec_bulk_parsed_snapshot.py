@@ -155,7 +155,9 @@ def _default_tables() -> dict[str, bytes]:
     }
 
 
-def _archive(tables: dict[str, bytes]) -> bytes:
+def _archive(
+    tables: dict[str, bytes], *, auxiliary_payloads: dict[str, bytes] | None = None
+) -> bytes:
     stream = io.BytesIO()
     with zipfile.ZipFile(stream, "w") as archive:
         for table_name in ALLOWED_SEC_TABLES:
@@ -171,6 +173,12 @@ def _archive(tables: dict[str, bytes]) -> bytes:
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore", message="Duplicate name")
                 archive.writestr(info, tables[table_name])
+        for name, payload in (auxiliary_payloads or {}).items():
+            info = zipfile.ZipInfo(name, date_time=(2026, 8, 20, 18, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = 0o100600 << 16
+            archive.writestr(info, payload)
     return stream.getvalue()
 
 
@@ -359,6 +367,46 @@ def test_round_trip_preserves_exact_strings_quoted_text_and_lineage(tmp_path):
     for line in (parsed / "rows.jsonl").read_bytes().splitlines(keepends=True):
         value = json.loads(line)
         assert line == (canonical_json(value) + "\n").encode("utf-8")
+
+
+def test_parsed_snapshot_consumes_only_tables_from_auxiliary_bearing_raw_zip(
+    tmp_path,
+):
+    auxiliary_names = ("FORM_345_metadata.json", "FORM_345_readme.htm")
+    raw_root = tmp_path / "raw"
+    raw_identity = write_sec_bulk_snapshot(
+        _archive(
+            _default_tables(),
+            auxiliary_payloads={
+                auxiliary_names[0]: b"\xff\x00opaque metadata",
+                auxiliary_names[1]: b"\x00opaque readme\xfe",
+            },
+        ),
+        _source(),
+        raw_root,
+    )
+    expected_tables = (
+        "SUBMISSION.tsv",
+        "REPORTINGOWNER.tsv",
+        "NONDERIV_TRANS.tsv",
+    )
+    assert tuple(member.name for member in raw_identity.auxiliary_members) == auxiliary_names
+    assert tuple(member.name for member in raw_identity.members) == expected_tables
+    raw_directory = raw_root / raw_identity.snapshot_id
+    identity = build_sec_bulk_parsed_snapshot(
+        raw_directory,
+        tmp_path / "parsed",
+        schema_profile=_profile(),
+        parser_git_commit=PARSER_COMMIT,
+    )
+    loaded = load_sec_bulk_parsed_snapshot(
+        tmp_path / "parsed" / identity.snapshot_id,
+        raw_snapshot_directory=raw_directory,
+    )
+    assert loaded.identity == identity
+    assert identity.raw_lineage_hash == raw_identity.lineage_hash
+    assert tuple(table.table_name for table in identity.tables) == expected_tables
+    assert {row.table_name for row in loaded.rows} == set(expected_tables)
 
 
 def test_owner_rows_do_not_multiply_transaction_rows(tmp_path):

@@ -38,6 +38,14 @@ SOURCE_URL = (
     "https://www.sec.gov/files/dera/data/insider-transactions-data-sets/"
     "2026q2_form345.zip"
 )
+LEGACY_AUXILIARY_MEMBERS = (
+    "insider_transactions_metadata.json",
+    "insider_transactions_readme.htm",
+)
+CURRENT_AUXILIARY_MEMBERS = (
+    "FORM_345_metadata.json",
+    "FORM_345_readme.htm",
+)
 
 
 def _source(**overrides) -> SecBulkSource:
@@ -50,6 +58,17 @@ def _source(**overrides) -> SecBulkSource:
     }
     values.update(overrides)
     return SecBulkSource(**values)
+
+
+def _source_for_period(year: int, quarter: int) -> SecBulkSource:
+    return _source(
+        year=year,
+        quarter=quarter,
+        source_url=(
+            "https://www.sec.gov/files/dera/data/insider-transactions-data-sets/"
+            f"{year}q{quarter}_form345.zip"
+        ),
+    )
 
 
 def _table_bytes(name: str, *, suffix: bytes = b"") -> bytes:
@@ -128,10 +147,16 @@ def _set_first_member_encrypted(payload: bytes) -> bytes:
     return bytes(mutated)
 
 
-def _corrupt_first_stored_member(payload: bytes) -> bytes:
+def _corrupt_first_stored_member(
+    payload: bytes, *, member_name: str | None = None
+) -> bytes:
     mutated = bytearray(payload)
     with zipfile.ZipFile(io.BytesIO(payload), "r") as archive:
-        info = archive.infolist()[0]
+        info = (
+            archive.getinfo(member_name)
+            if member_name is not None
+            else archive.infolist()[0]
+        )
     name_length = struct.unpack_from("<H", mutated, info.header_offset + 26)[0]
     extra_length = struct.unpack_from("<H", mutated, info.header_offset + 28)[0]
     data_offset = info.header_offset + 30 + name_length + extra_length
@@ -199,6 +224,139 @@ def test_valid_archive_round_trips_exact_bytes_and_member_lineage(tmp_path):
         path.name for path in (tmp_path / written.snapshot_id).iterdir()
     } == {"archive.zip", "manifest.json", "snapshot.commit.json"}
     assert (tmp_path / f".{written.snapshot_id}.publication.lock").is_file()
+
+
+@pytest.mark.parametrize(
+    ("year", "quarter", "auxiliary_names"),
+    [
+        (2022, 4, LEGACY_AUXILIARY_MEMBERS),
+        (2023, 1, CURRENT_AUXILIARY_MEMBERS),
+    ],
+)
+def test_real_shape_archive_hashes_auxiliaries_without_parsing_them_as_tables(
+    tmp_path, year, quarter, auxiliary_names
+):
+    auxiliary_payloads = {
+        auxiliary_names[0]: b"\xff\x00opaque metadata",
+        auxiliary_names[1]: b"\x00opaque readme\xfe",
+    }
+    archive = _archive(
+        names=ALLOWED_SEC_TABLES + auxiliary_names,
+        payload_overrides=auxiliary_payloads,
+    )
+    source = _source_for_period(year, quarter)
+    identity = write_sec_bulk_snapshot(archive, source, tmp_path)
+    assert snapshot_module.RAW_SNAPSHOT_CONTRACT_VERSION == 2
+    assert tuple(member.name for member in identity.members) == ALLOWED_SEC_TABLES
+    assert tuple(member.name for member in identity.auxiliary_members) == auxiliary_names
+    with zipfile.ZipFile(io.BytesIO(archive), "r") as source_zip:
+        for member in identity.auxiliary_members:
+            info = source_zip.getinfo(member.name)
+            payload = auxiliary_payloads[member.name]
+            assert member.sha256 == hashlib.sha256(payload).hexdigest()
+            assert member.size_bytes == len(payload) == info.file_size
+            assert member.compressed_size_bytes == info.compress_size
+            assert member.crc32 == f"{zlib.crc32(payload) & 0xFFFFFFFF:08x}"
+            assert member.compression == "deflated"
+
+    manifest = json.loads(
+        (tmp_path / identity.snapshot_id / "manifest.json").read_bytes()
+    )
+    assert manifest["raw_contract_version"] == 2
+    assert tuple(row["name"] for row in manifest["auxiliary_members"]) == auxiliary_names
+    loaded = load_sec_bulk_snapshot(tmp_path / identity.snapshot_id)
+    assert loaded.identity == identity
+    assert loaded.archive_bytes == archive
+
+
+@pytest.mark.parametrize(
+    ("year", "quarter", "names"),
+    [
+        (2022, 4, ALLOWED_SEC_TABLES + LEGACY_AUXILIARY_MEMBERS[:1]),
+        (2023, 1, ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS[:1]),
+        (2022, 4, ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS),
+        (2023, 1, ALLOWED_SEC_TABLES + LEGACY_AUXILIARY_MEMBERS),
+        (
+            2023,
+            1,
+            ALLOWED_SEC_TABLES
+            + (LEGACY_AUXILIARY_MEMBERS[0], CURRENT_AUXILIARY_MEMBERS[1]),
+        ),
+    ],
+)
+def test_incomplete_or_wrong_era_auxiliary_inventory_refuses(year, quarter, names):
+    with pytest.raises(SecBulkSnapshotError, match="auxiliary inventory"):
+        inspect_sec_bulk_archive(
+            _archive(names=names), _source_for_period(year, quarter)
+        )
+
+
+def test_auxiliary_bytes_change_lineage_and_forged_descriptor_refuses(tmp_path):
+    names = ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS
+    source = _source_for_period(2023, 1)
+    first_archive = _archive(
+        names=names,
+        payload_overrides={CURRENT_AUXILIARY_MEMBERS[0]: b"first metadata"},
+    )
+    second_archive = _archive(
+        names=names,
+        payload_overrides={CURRENT_AUXILIARY_MEMBERS[0]: b"second metadata"},
+    )
+    first = write_sec_bulk_snapshot(first_archive, source, tmp_path)
+    second = inspect_sec_bulk_archive(second_archive, source)
+    assert first.auxiliary_members[0].sha256 != second.auxiliary_members[0].sha256
+    assert first.lineage_hash != second.lineage_hash
+    assert first.snapshot_id != second.snapshot_id
+
+    target = tmp_path / first.snapshot_id
+    _rewrite_manifest_and_commit(
+        target,
+        lambda manifest: manifest["auxiliary_members"][0].update(
+            sha256=second.auxiliary_members[0].sha256
+        ),
+    )
+    with pytest.raises(SecBulkSnapshotError, match="does not integrity-check"):
+        load_sec_bulk_snapshot(target)
+
+
+def test_corrupt_auxiliary_bytes_refuse_before_publication(tmp_path):
+    auxiliary_name = CURRENT_AUXILIARY_MEMBERS[0]
+    archive = _archive(
+        names=ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS,
+        compression=zipfile.ZIP_STORED,
+        payload_overrides={auxiliary_name: b"synthetic metadata"},
+    )
+    identity = inspect_sec_bulk_archive(archive, _source())
+    assert all(member.compression == "stored" for member in identity.auxiliary_members)
+    corrupt = _corrupt_first_stored_member(archive, member_name=auxiliary_name)
+    with pytest.raises(SecBulkSnapshotError, match="integrity|CRC|corrupt"):
+        write_sec_bulk_snapshot(corrupt, _source(), tmp_path)
+    assert not tmp_path.exists() or not any(tmp_path.iterdir())
+
+
+def test_auxiliary_manifest_order_is_canonical_even_with_rehashed_commit(tmp_path):
+    archive = _archive(names=ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS)
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    target = tmp_path / identity.snapshot_id
+    _rewrite_manifest_and_commit(
+        target, lambda manifest: manifest["auxiliary_members"].reverse()
+    )
+    with pytest.raises(SecBulkSnapshotError, match="auxiliary member order"):
+        load_sec_bulk_snapshot(target)
+
+
+def test_auxiliary_member_obeys_expanded_size_limit(monkeypatch):
+    auxiliary_name = CURRENT_AUXILIARY_MEMBERS[0]
+    payload = b"synthetic metadata payload"
+    archive = _archive(
+        names=ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS,
+        payload_overrides={auxiliary_name: payload},
+    )
+    monkeypatch.setattr(
+        snapshot_module, "MAX_MEMBER_UNCOMPRESSED_BYTES", len(payload) - 1
+    )
+    with pytest.raises(SecBulkSnapshotError, match="expanded-size"):
+        inspect_sec_bulk_archive(archive, _source())
 
 
 @pytest.mark.parametrize(
@@ -424,6 +582,12 @@ def test_source_contract_refuses_instants_that_overflow_during_utc_conversion(
 )
 def test_member_inventory_and_paths_fail_closed(names, match):
     with pytest.raises(SecBulkSnapshotError, match=match):
+        inspect_sec_bulk_archive(_archive(names=names), _source())
+
+
+def test_more_than_ten_zip_members_refuses_before_member_content_read():
+    names = ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS + ("surplus.bin",)
+    with pytest.raises(SecBulkSnapshotError, match="more than ten members"):
         inspect_sec_bulk_archive(_archive(names=names), _source())
 
 
@@ -700,12 +864,15 @@ def test_manifest_unknown_or_missing_fields_refuse_even_with_updated_commit(
         load_sec_bulk_snapshot(target)
 
 
-def test_manifest_raw_contract_version_requires_an_exact_integer(tmp_path):
+@pytest.mark.parametrize("invalid_version", [True, 1])
+def test_manifest_raw_contract_version_requires_current_exact_integer(
+    tmp_path, invalid_version
+):
     identity = write_sec_bulk_snapshot(_archive(), _source(), tmp_path)
     target = tmp_path / identity.snapshot_id
 
     def mutate(manifest):
-        manifest["raw_contract_version"] = True
+        manifest["raw_contract_version"] = invalid_version
 
     _rewrite_manifest_and_commit(target, mutate)
     with pytest.raises(SecBulkSnapshotError, match="contract version"):

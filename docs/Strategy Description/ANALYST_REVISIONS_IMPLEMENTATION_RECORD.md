@@ -649,10 +649,13 @@ R-194 positive-residual projection. That owner-reported return is not an
 authenticated result cell. A concurrent third run in the same QC project
 has reached QC `Completed.` without an authorized result read and
 conservatively exhausts the R-193-lineage three-attempt
-ceiling; Codex must not make a fourth launch or silently promote either
-cloud run. The current floor is 188 shared research looks, 131 ARV2
+ceiling; neither cloud completion is an authenticated result. Section 188
+records the owner's later explicit, one-time exception for exactly one
+source-pinned fourth-lineage corrected 100% rerun. This grants no
+automatic retry or return acceptance. Before that launch, the floor is
+188 shared research looks, 131 ARV2
 development evaluations, 32 infrastructure looks, and 615 authenticated
-cells. Claude should review section 187 with sections 181–186 after the
+cells. Claude should review section 188 with sections 181–187 after the
 owner's deferred same-round QC work closes and Codex makes its single push.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
@@ -698,7 +701,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–187
+findings, outcomes, and per-run accounting remain in numbered sections 1–188
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -24739,3 +24742,72 @@ is to identify who launched the third run and what source/rule it used,
 without reading an unpinned outcome or making a fourth R-193-lineage
 attempt. Only then can a separately versioned, source-bound result
 assessment decide whether any stronger tilt candidate is meaningful.
+
+## 188. Prospective one-time corrected 100% tilt rerun, 2026-09-25
+
+After section 187 recorded three QC runs in the R-193 100% lineage and
+explicitly stopped a fourth, the owner directed: “try run it again to see
+the result.” This is treated as a **one-time owner exception** for exactly
+one additional order-based research launch, honestly the **fourth R-193-
+lineage look**. It does not reset the lineage to three new attempts, permit
+an automatic retry after a compile/runtime failure, or authorize a 120%/
+140% rule, production acceptance, paper/live/funded orders, or trading.
+
+The new run will use the already pinned **local R-194 positive-residual
+100% source**, not the later mutable QC project's parameterized code and
+not a claimed byte-identical replay of Mia's historical A2 snapshot. Its
+transfer keeps a `1e-30` aggregate stock residual. The selection IDs,
+six budgets, 98% gross target, 261 decisions, 2021-01-04 through
+2025-12-31 evaluation, 10-bps-per-side modeled cost, whole-share next-
+session MOO order execution, and 2x *admission only* plus settlement-cash
+policy remain the R-191/R-192 comparability baseline. This same-window
+look is exploratory and post-result-tuned; it cannot confirm persistence.
+
+**Frozen prelaunch identity.** The 16-file R-194 projection SHA-256 is
+`c10b1aa8c6d56104ec6fcdc134a4a335ae648df9be67a75894cf79090b33dd85`;
+profile SHA-256 is `1f338baac6cad9ea0e95661d8320711013435e24d20a2d7ee67496194a430053`;
+source-manifest SHA-256 is
+`2e51cd6547908ac2c3adbae5430fdb7ce4e2af8e724002281931c59d58b88d5c`;
+the closure has 16 Python files and 425,919 bytes. The exact new private
+project name is `116 ARV2 SIX CAP90 SETTLED TILT100 FLOOR R194 2021 2025`;
+the exact one-run backtest name is
+`ARV2 R194A1 six cap90 settlement 2021 2025 c10b1aa8`. Here `A1` means
+the first and only attempt under the newly pinned source profile; the
+launch waiver/claim additionally records **R-193 lineage look 4** and
+three already spent prior looks. The one-time exploratory waiver ID is
+`ARV2-OWNER-2026-09-25-R193-LINEAGE-LOOK4-R194-ONE-TIME-EXCEPTION`,
+with canonical payload SHA-256
+`3f964bdeb3234f2869970d6939926416e3d3ef112249ca2e001054a3b6d787ac`.
+The local one-use control directory is
+`artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923` in this
+exact worktree. The private project name was absent in a status-only QC
+inventory before this freeze. Neither the existing owner/Mia project
+`36958163` nor its mutable source will be overwritten.
+
+The host-only settlement launcher now admits only this exact R-194
+projection/profile/source and reuses its existing one-use project/source
+readback, compile, terminal-status, and bounded two-statistic result gates.
+R-194-specific waiver/claim/result checks require the fourth-look owner
+exception; all three older candidates' waiver payload digests remain
+unchanged. A `Completed.` status alone will not be promoted to a result:
+the aggregate must independently prove 261/261 rebalances, zero invalid/
+canceled orders and all fills, signed-cash policy, end-day gross at most
+one, 2%/5% target-tracking limits, and exact
+META/AGGREGATES digests. A valid result may be compared with R-191 matched
++123.6191666261345% and R-192 80% +131.5199589587574% on this same
+window, with adaptive-tuning and snapshot-source limitations beside it.
+The producer includes any modeled-versus-engine fee mismatch in its
+`execution_failure` flag, which the reader requires to be false; the
+reader does not independently recompute fee equality from raw orders.
+
+Before any QC mutation, focused validation passed **78 tests** across the
+R-194 source, settlement launcher/result reader, exhaustive host-only
+import/no-I/O closure, and active lane-record integrity. The complete
+lane/repository suite was not run per
+the owner rule; Claude will run it in independent review. The first QC
+mutation must occur only after this source-and-authority freeze is committed.
+The prelaunch shared look floor remains **188**, ARV2 development **131**,
+infrastructure **32**, authenticated cells **615**. One submitted run will
+move the first two floors to **189/132** even if it fails. No raw provider,
+price, order, or log rows, charts, broker, paper/live/funded, deployment,
+or trading endpoint is authorized or required.

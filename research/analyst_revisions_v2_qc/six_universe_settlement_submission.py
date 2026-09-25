@@ -1,7 +1,9 @@
 """One-use private QC order launches for the separately versioned cash policy.
 
-Only R191 (matched), R192 (80% revision tilt), and R193 (100% revision tilt)
-are admitted. Import does no I/O. The exact source, project, owner waiver,
+R191 (matched), R192 (80% revision tilt), R193 (100% revision tilt), and the
+separately pinned R194 positive-residual correction are admitted. R194 is a
+one-time fourth look in the R193 lineage, not a reset of its attempt budget.
+Import does no I/O. The exact source, project, owner waiver,
 predecessor, and result are authenticated independently. A completed QC
 status alone is not a result.
 """
@@ -23,6 +25,7 @@ from . import accepted_risk_six_universe_order_qc_projection as base_projection
 from . import accepted_risk_six_universe_order_qc_runtime as base_runtime
 from . import accepted_risk_six_universe_order_settlement_qc_projection as settlement_projection
 from . import accepted_risk_six_universe_order_tilt100_qc_projection as tilt100_projection
+from . import accepted_risk_six_universe_order_tilt100_floor_qc_projection as floor_projection
 from . import six_universe_cap90_submission as cap90
 from . import six_universe_tilt80_submission as prior
 
@@ -89,6 +92,17 @@ _CANDIDATES = {
         16, 425_754,
         "arv2-six-universe-order-tilt100-settlement-summary-v1",
         "ARV2-OWNER-2026-09-25-R193A1-TILT100-SETTLEMENT-EXPLORATORY-SIGNATURE-WAIVER",
+    ),
+    "R194": _Candidate(
+        "R194", "116 ARV2 SIX CAP90 SETTLED TILT100 FLOOR R194 2021 2025",
+        floor_projection.TILT_ROLE, floor_projection.TILT_VARIANT,
+        floor_projection.PROJECTION_SCHEMA,
+        "c10b1aa8c6d56104ec6fcdc134a4a335ae648df9be67a75894cf79090b33dd85",
+        "1f338baac6cad9ea0e95661d8320711013435e24d20a2d7ee67496194a430053",
+        "2e51cd6547908ac2c3adbae5430fdb7ce4e2af8e724002281931c59d58b88d5c",
+        16, 425_919,
+        floor_projection.SUMMARY_SCHEMA,
+        "ARV2-OWNER-2026-09-25-R193-LINEAGE-LOOK4-R194-ONE-TIME-EXCEPTION",
     ),
 }
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
@@ -270,7 +284,19 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
         or projection.activation_manifest_sha256 != plan.activation_manifest_sha256
     ):
         _fail("settlement projection, profile, or package changed")
-    if candidate.candidate_id == "R193":
+    if candidate.candidate_id == "R194":
+        try:
+            profile = floor_projection.require_tilt100_floor_profile()
+        except floor_projection.SixUniverseTilt100FloorQcProjectionError as exc:
+            raise SixUniverseSettlementSubmissionError(str(exc)) from None
+        projection_id_prefix = floor_projection.PROJECTION_ID_PREFIX
+        if (
+            profile.get("role") != floor_projection.TILT_ROLE
+            or profile.get("maximum_stock_weight_change_fraction") != "1.00"
+            or profile.get("minimum_stock_residual_weight") != "1e-30"
+        ):
+            _fail("R194 positive-residual tilt rule changed")
+    elif candidate.candidate_id == "R193":
         try:
             profile = tilt100_projection.require_tilt100_profile()
         except tilt100_projection.SixUniverseTilt100QcProjectionError as exc:
@@ -301,7 +327,7 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
         or projection.projection_id != projection_id_prefix + digest[:24]
     ):
         _fail("settlement projection is not self-authenticating")
-    return {
+    identity = {
         "candidate_id": candidate.candidate_id, "attempt": 1,
         "role": candidate.role, "projection_sha256": candidate.projection_sha256,
         "profile_id": projection.profile_id,
@@ -310,6 +336,12 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
         "activation_manifest_sha256": plan.activation_manifest_sha256,
         "source_files": manifest,
     }
+    if candidate.candidate_id == "R194":
+        identity.update({
+            "r193_lineage_look_number": 4,
+            "owner_one_time_exception": True,
+        })
+    return identity
 
 
 def _require_valid_predecessor(plan: SettlementQcPlan) -> str:
@@ -326,7 +358,7 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict, target_path: str) ->
     candidate = _candidate(plan)
     if target_path != _PREDECESSOR_TARGET_PATH_SHA256:
         _fail("settlement predecessor target path changed")
-    return _canonical({
+    payload = {
         "schema": f"arv2-six-universe-{candidate.candidate_id.lower()}-settlement-waiver-v1",
         "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
         "owner_launch_waiver_id": candidate.waiver_id,
@@ -357,7 +389,15 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict, target_path: str) ->
         "raw_provider_rows_authorized": False,
         "raw_logs_orders_charts_authorized": False,
         "paper_live_deployment_funded_trading_authorized": False,
-    })
+    }
+    if candidate.candidate_id == "R194":
+        payload.update({
+            "r193_lineage_look_number": 4,
+            "r193_prior_looks_spent": 3,
+            "owner_one_time_exception": True,
+            "maximum_additional_r193_lineage_submissions": 1,
+        })
+    return _canonical(payload)
 
 
 def render_owner_waiver_payload(plan: SettlementQcPlan, projection: object) -> bytes:
@@ -412,6 +452,11 @@ def launch_a1(
             _waiver_payload(plan, identity, target_path)
         ).hexdigest(),
     }
+    if candidate.candidate_id == "R194":
+        authority.update({
+            "r193_lineage_look_number": 4,
+            "owner_one_time_exception": True,
+        })
     claim_path = _control_path(plan, "claim")
     if claim_path.exists():
         _fail("settlement A1 attempt was already claimed")
@@ -545,6 +590,11 @@ def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
         or not _ID.fullmatch(launch["backtest_id"])
     ):
         _fail("settlement launch receipt differs from exact plan")
+    if candidate.candidate_id == "R194" and (
+        launch.get("r193_lineage_look_number") != 4
+        or launch.get("owner_one_time_exception") is not True
+    ):
+        _fail("R194 is not bound to the fourth R193-lineage look")
     return candidate
 
 
@@ -602,7 +652,7 @@ _TILT_FIELDS = frozenset({
     "matched_baseline_profile_sha256", "matched_baseline_target_path_sha256",
     "tilt_rank_rule_id", "maximum_stock_weight_change_fraction",
 })
-_TILT_FRACTIONS = {"R192": "0.80", "R193": "1.00"}
+_TILT_FRACTIONS = {"R192": "0.80", "R193": "1.00", "R194": "1.00"}
 
 
 def _exact_result_claim(
@@ -637,6 +687,13 @@ def _exact_result_claim(
         ))
     ):
         _fail("settlement source claim or predecessor changed")
+    if candidate.candidate_id == "R194" and (
+        claim.get("r193_lineage_look_number") != 4
+        or claim.get("owner_one_time_exception") is not True
+        or launch.get("r193_lineage_look_number") != 4
+        or launch.get("owner_one_time_exception") is not True
+    ):
+        _fail("R194 claim did not persist the one-time fourth lineage look")
     waiver_sha = hashlib.sha256(
         _waiver_payload(plan, claim, target_path)
     ).hexdigest()

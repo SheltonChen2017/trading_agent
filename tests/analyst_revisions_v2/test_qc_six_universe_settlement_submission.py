@@ -11,6 +11,7 @@ import pytest
 from research.analyst_revisions_v2_qc import accepted_risk_delta_order_package as delta
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_settlement_qc_projection as projector
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_tilt100_qc_projection as tilt100_projector
+from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_tilt100_floor_qc_projection as floor_projector
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_qc_runtime as runtime
 from research.analyst_revisions_v2_qc import six_universe_cap90_submission as cap90
 from research.analyst_revisions_v2_qc import six_universe_settlement_submission as subject
@@ -37,6 +38,7 @@ def projections():
         "R191": projector.build_settlement_projection(package, "R191"),
         "R192": projector.build_settlement_projection(package, "R192"),
         "R193": tilt100_projector.build_tilt100_settlement_projection(package),
+        "R194": floor_projector.build_tilt100_floor_projection(package),
     }
 
 
@@ -118,6 +120,7 @@ def _aggregate(candidate_id="R192"):
     aggregate.update({
         "schema": "settlement-summary",
         "role": ("matched" if candidate_id == "R191" else
+                 floor_projector.TILT_ROLE if candidate_id == "R194" else
                  f"matched_revision_tilt{80 if candidate_id == 'R192' else 100}"),
         "minimum_observed_order_event_cash": "-25",
         "transient_negative_order_event_count": 1,
@@ -150,7 +153,7 @@ def _aggregate(candidate_id="R192"):
     return aggregate, candidate
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
 def test_signed_temporary_cash_is_retained_without_old_nonnegative_claim(candidate_id):
     aggregate, candidate = _aggregate(candidate_id)
     selected = subject._settlement_aggregate(
@@ -213,7 +216,7 @@ def test_new_reader_isolates_every_cash_and_order_gate(defect):
 
 
 @pytest.mark.parametrize("candidate_id,source_count", (
-    ("R191", 14), ("R192", 16), ("R193", 16),
+    ("R191", 14), ("R192", 16), ("R193", 16), ("R194", 16),
 ))
 def test_exact_preview_and_candidate_specific_owner_waiver(
     projections, tmp_path, monkeypatch, candidate_id, source_count,
@@ -222,7 +225,9 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
     plan = _plan(tmp_path, projection, candidate_id)
     identity = subject.preview(plan, projection)
     assert len(identity["source_files"]) == source_count
-    expected_sha = (tilt100_projector.PINNED_TILT100_PROJECTION_SHA256
+    expected_sha = (floor_projector.PINNED_PROJECTION_SHA256
+                    if candidate_id == "R194" else
+                    tilt100_projector.PINNED_TILT100_PROJECTION_SHA256
                     if candidate_id == "R193" else
                     projector.CANDIDATES[candidate_id]["projection_sha256"])
     assert identity["projection_sha256"] == expected_sha
@@ -234,6 +239,16 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
     assert waiver["maximum_backtest_submissions"] == 1
     assert waiver["maximum_result_reads"] == 1
     assert waiver["raw_logs_orders_charts_authorized"] is False
+    if candidate_id == "R194":
+        assert identity["r193_lineage_look_number"] == 4
+        assert identity["owner_one_time_exception"] is True
+        assert waiver["r193_lineage_look_number"] == 4
+        assert waiver["r193_prior_looks_spent"] == 3
+        assert waiver["maximum_additional_r193_lineage_submissions"] == 1
+        assert waiver["owner_one_time_exception"] is True
+    else:
+        assert "r193_lineage_look_number" not in waiver
+        assert "owner_one_time_exception" not in waiver
     if candidate_id == "R193":
         assert waiver["project_name"] == (
             "115 ARV2 SIX CAP90 SETTLED TILT100 R193 2021 2025"
@@ -247,7 +262,7 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
         )
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
 def test_wrong_waiver_or_source_refuses_before_qc(
     projections, tmp_path, monkeypatch, candidate_id,
 ):
@@ -277,7 +292,7 @@ def test_wrong_waiver_or_source_refuses_before_qc(
     assert not subject._control_path(plan, "claim").exists()
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
 def test_a1_launch_status_and_one_signed_cash_aggregate_read(
     projections, tmp_path, monkeypatch, candidate_id,
 ):
@@ -310,7 +325,7 @@ def test_a1_launch_status_and_one_signed_cash_aggregate_read(
         )
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193", "R194"))
 @pytest.mark.parametrize("defect", ("digest", "unknown", "unexplained"))
 def test_one_result_read_refuses_changed_digest_or_cash_policy(
     projections, tmp_path, monkeypatch, candidate_id, defect,
@@ -342,3 +357,73 @@ def test_r193_result_refuses_r192_fraction_even_with_correct_settlement_policy()
             aggregate, candidate,
             matched_target_path=subject._PREDECESSOR_TARGET_PATH_SHA256,
         )
+
+
+def test_prior_waiver_payload_digests_are_unchanged():
+    """R194's exception fields cannot alter the earlier authority payloads."""
+    pinned = {
+        "R191": "39e86b9b9f7cea0d2b4563505deeaec95ae106ed1810c8883ac1608e645c5738",
+        "R192": "6207b84a3985c1693769d8a25e36853f005e0acfe65fdb6235787263cb812dee",
+        "R193": "e11e77fe3e1be42df75291d84886d74d4a8dec7e12128c0a464f5cb5c54d19af",
+    }
+    for candidate_id, expected in pinned.items():
+        plan = subject.SettlementQcPlan(
+            candidate_id, "a" * 32, "b" * 64, "c" * 64,
+            Path("/tmp/arv2-settlement-waiver-pin"),
+        )
+        actual = hashlib.sha256(subject._waiver_payload(
+            plan, {"profile_id": "p"}, subject._PREDECESSOR_TARGET_PATH_SHA256,
+        )).hexdigest()
+        assert actual == expected
+
+
+def test_r194_claim_and_result_refuse_tampered_lineage(
+    projections, tmp_path, monkeypatch,
+):
+    projection = projections["R194"]
+    plan = _plan(tmp_path, projection, "R194")
+    _predecessors(monkeypatch, plan)
+    calls, state = _fake_qc(monkeypatch, plan, projection)
+    launch = subject.launch_a1(
+        plan, projection, object(),
+        owner_waiver_id=subject._CANDIDATES["R194"].waiver_id,
+    )
+    assert calls.count("backtests/create") == 1
+    assert launch["r193_lineage_look_number"] == 4
+    assert launch["owner_one_time_exception"] is True
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    state["statistics"] = _statistics(plan, launch)
+    tampered = dict(launch, r193_lineage_look_number=1)
+    before = len(calls)
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="fourth R193-lineage look"):
+        subject.read_aggregates_once(plan, tampered, object())
+    assert calls[before:] == []
+    assert not subject._control_path(plan, "result-read-claim").exists()
+    claim_path = subject._control_path(plan, "claim")
+    claim = json.loads(claim_path.read_text())
+    claim["owner_one_time_exception"] = False
+    monkeypatch.setattr(subject, "_read", lambda path: (
+        claim if path == claim_path else cap90._read_control(path)
+    ))
+    before = len(calls)
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="one-time fourth lineage look"):
+        subject.read_aggregates_once(plan, launch, object())
+    assert calls[before:] == []
+    assert not subject._control_path(plan, "result-read-claim").exists()
+
+
+def test_r194_profile_floor_mutation_refuses_before_qc(
+    projections, tmp_path, monkeypatch,
+):
+    projection = projections["R194"]
+    plan = _plan(tmp_path, projection, "R194")
+    profile = floor_projector.require_tilt100_floor_profile()
+    monkeypatch.setattr(subject.floor_projection, "require_tilt100_floor_profile",
+                        lambda: dict(profile, minimum_stock_residual_weight="0"))
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="positive-residual"):
+        subject.launch_a1(plan, projection, object(),
+                          owner_waiver_id=subject._CANDIDATES["R194"].waiver_id)
+    assert not subject._control_path(plan, "claim").exists()

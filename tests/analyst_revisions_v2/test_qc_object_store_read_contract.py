@@ -1256,6 +1256,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_settlement_qc_projection
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_floor_qc_projection
         research.analyst_revisions_v2_qc.six_universe_cap90_submission
         research.analyst_revisions_v2_qc.six_universe_tilt80_submission
         """.split()

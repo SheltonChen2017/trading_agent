@@ -647,7 +647,8 @@ refusal. Section 187 records the owner's report of a Mia-completed ~133%
 repair, the exact cloud target-file change, and a separately pinned local
 R-194 positive-residual projection. That owner-reported return is not an
 authenticated result cell. A concurrent third run in the same QC project
-is in progress and conservatively exhausts the R-193-lineage three-attempt
+has reached QC `Completed.` without an authorized result read and
+conservatively exhausts the R-193-lineage three-attempt
 ceiling; Codex must not make a fourth launch or silently promote either
 cloud run. The current floor is 188 shared research looks, 131 ARV2
 development evaluations, 32 infrastructure looks, and 615 authenticated
@@ -24676,7 +24677,10 @@ While a final-attempt adapter was being designed, a later status-only
 project `36958163`: ID `8cf40956b404bcef885f864086a9c40c`, name
 `R194 tilt100 fraction parameterization identity check`. Codex did not
 create, compile, or launch it. A1 and Mia A2 were still the other two
-entries, with the exact statuses above. A separate read-only file-digest
+entries, with the exact statuses above. One later status-only poll found
+this third run at `In Progress...`, and one final status-only poll found
+it at `Completed.`. No statistic or custom aggregate was read; engine
+completion is not an authenticated result cell. A separate read-only file-digest
 check then found further current QC edits beyond the Mia A2 snapshot:
 `accepted_risk_six_universe_order_tilt_targets.py` was 22,881 bytes / SHA-256
 `2a003f7c0d51195a727ba04ad0908287830499817ab27dbb265340a283a4cf2b`,
@@ -24693,7 +24697,45 @@ R-194 label. The shared research-look floor moves **187 -> 188**, ARV2
 development evaluations **130 -> 131**, infrastructure remains **32**, and
 authenticated cells remain **615**. No Codex A3 launcher was built or
 executed; a fourth run cannot be relabelled as a new candidate to bypass
-the owner’s three-attempt limit. The queued run's terminal status and
-result validity remain unknown. No R-194 Codex launch, accepted 100%
+the owner’s three-attempt limit. The third run's result validity remains
+unknown despite its terminal `Completed.` status. No R-194 Codex launch,
+accepted 100%
 return, broker/paper/live/funded order, deployment, or trading follows
 from either displayed headline.
+
+### 187.3 Review notes and next gate
+
+The exact review range after this round's single push is
+`84a9b4b..HEAD` on `codex/strategy-analyst-revisions-v2`, in this same
+worktree. Commit `97cc7bb` ports the separately versioned R-194 local
+positive-residual projection, its mutation-sensitive tests, exhaustive
+host-only import registry, and the first owner/Mia audit record. The
+record-only successor updates the concurrent third-run status, active
+handoff, and these notes; it makes no strategy-source change. No Claude
+review occurred during this owner-deferred same-round work, and no
+Claude commit is being counter-reviewed here. Claude should examine the
+compact-versus-Mia transfer equivalence, source-size margin, frozen R-193
+nonmutation, 1e-30 minimum, and third-run attempt accounting in particular.
+
+Findings: `ARV2CR187-001` remains P2/open because neither cloud completion
+has a source-authenticated, one-use aggregate read. `ARV2CR187-002` is
+resolved for the separately pinned local R-194 source but the Mia A2
+cloud bytes remain beyond the old review ceiling. `ARV2CR187-003`
+remains P2/open pending classification of the concurrent completed third
+run. `ARV2CR187-004` is P3/documented: the project-wide
+`docs/research/alpha-result.md` still says R-193 A2/A3 are unspent and
+stops at 186 looks. This lane-only round does not edit a shared project
+document without an explicit owner-directed coordination change; section
+187 is the current conservative lane accounting at 188 looks. No return
+or alpha claim is inferred from that stale shared row.
+
+Validation was the focused **36 passed** reported in section 187.1 and
+`git diff --check` clean. The complete lane/repository suite was not run
+per the owner rule. QC access in this round comprised status-only run
+inventory/polls and source-hash comparison; no Codex upload, compile,
+backtest launch, result statistic, raw log/order/provider/price row,
+broker, live/paper/funded action, or deployment occurred. The next gate
+is to identify who launched the third run and what source/rule it used,
+without reading an unpinned outcome or making a fourth R-193-lineage
+attempt. Only then can a separately versioned, source-bound result
+assessment decide whether any stronger tilt candidate is meaningful.

@@ -588,6 +588,11 @@ development sensitivity, not out-of-sample confirmation. R-185 used one of
 three attempts; its authorized shared-ledger entry brings totals to 175
 shared looks / 118 development evaluations / 32 infrastructure looks /
 613 authenticated cells, the last exploratory.
+Section 183 prospectively freezes the owner's single 80% R-186 weight-tilt
+sensitivity and its distinct private order-based source/launch identity.
+Claude should review section 183 with sections 181–182 after this bounded
+owner-authorized round; the same-window comparison is not untouched
+validation, and its cash/order validity gates remain enforced.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
@@ -613,6 +618,11 @@ exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
 alpha evidence merely because the QC engine completed it.
+The owner's subsequent R-186 instruction extends only that interim timing
+exception through the one prospective 80% same-window experiment in section
+183. Its exact one-use launch mode must be resolved before any QC mutation;
+neither the R-185 waiver nor general research-backtest permission silently
+waives a new detached-signature gate.
 Each distinct backtest candidate has a hard maximum of three QC attempts.
 A compile failure, runtime error, or any other unsuccessful terminal run each
 counts as one attempt. After the third failure Codex makes no further code
@@ -641,7 +651,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–182
+findings, outcomes, and per-run accounting remain in numbered sections 1–183
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -23876,3 +23886,65 @@ corrects verified lane-owned issues in this same worktree. No additional
 tilt strength, period, or leverage run follows merely from the positive
 same-window R-185 result; a future result needs its own prospective rule,
 matched comparison, look accounting, and untouched-period plan.
+
+## 183. R-186 single 80% analyst-revision weight-tilt sensitivity, 2026-09-25
+
+After observing the R-184 20% and R-185 40% exploratory results, the owner
+asked for one bolder version and authorized its implementation and private
+research backtest before the deferred Claude review. R-186 is exactly **one**
+prospectively specified 80% maximum relative change to each already-selected
+stock's own post-cap R-182 market-cap weight. It is not a 60%/70%/80% search,
+an untouched-period test, or a formal alpha cell. The latest authorization is
+scoped to this R-186 exploratory candidate and its one bounded aggregate
+read; it grants no deployment, broker, paper/live/funded order, or trading
+action. Independent review of R-183 through R-186 remains due after this
+single bounded development round.
+
+The only intended economic change from R-185 is `0.40` to `0.80` in the
+existing deterministic within-sleeve score-rank weight-transfer cap. The
+R-182 selected stock IDs and counts, score availability, market-cap baseline,
+ETF fallbacks, six equal sleeve budgets, 98% target gross, 9.8% aggregate
+duplicate-stock cap, and direct-stock cap remain unchanged. The period is
+2021-01-04 through 2025-12-31, with 261 weekly decisions, next-session
+whole-share MOO orders, RAW prices, 10-bps-per-side modeled cost, and the
+same research-only 2x **buying-power admission** bridge—not a 2x target.
+R-186 is valid only if the existing all-rebalances/all-orders-filled,
+zero-invalid/canceled, nonnegative observed daily-close and post-order-event
+cash, at-most-1x end-day gross, and 2% mean/5% maximum target-tracking gates
+pass. A runtime refusal or invalid aggregate is recorded as such rather than
+rescued by relaxing a gate. At most three QC launch attempts are allowed for
+R-186 under the standing rule; no byte-identical deterministic failure is
+repeated merely to spend the budget.
+
+The primary exploratory comparison is R-186 minus unchanged R-182; the
+secondary parameter-sensitivity comparisons are R-186 minus R-185 and
+R-186 minus R-184. Report absolute return, drawdown, volatility, Sharpe,
+fees, observed cash/gross, target tracking, order validity, stock breadth,
+and all six sleeve fallback states, including an unfavorable or invalid
+result. This third same-window tilt-strength look is explicitly post-hoc;
+even a monotonic 20%/40%/80% sequence cannot establish persistence, six
+independent universe replications, or permission to trade. A separately
+frozen, genuinely untouched period would be needed for stronger evidence.
+
+**Exact source and launch freeze before any QC mutation.** The separate
+16-file projection SHA-256 is
+`16240a1ead1dd8466961556ffcfcfc58a6c974d763e87b72c27cfdce72699604`
+(422,758 bytes); its profile SHA-256 is
+`2fe851dd13421ea0d7d750d17ba509ee6f8407e25eb6a142725cf7c17f387036`,
+and its source-file manifest SHA-256 is
+`78a650aa270e830e4f8194df5c32e32f3f9d4d0e9e6bd280d6180d4d4c37e02c`.
+The R-185 projection and profile are authenticated at their section-182 pins
+before counted substitutions; thirteen files remain byte-identical, and
+only the target builder, tilt runtime, and `main.py` change. The private A1
+project name is `109 ARV2 SIX CAP90 TILT80 R186 2021 2025`; the exact
+backtest name is
+`ARV2 R186A1 six cap90 bridge tilt80 2021 2025 16240a1e`.
+The R-186 A1 launcher admits either a detached signature over its exact
+permit or a distinct R-186-only waiver ID
+`ARV2-OWNER-2026-09-25-R186A1-TILT80-EXPLORATORY-SIGNATURE-WAIVER`;
+neither R-185 authority mode is reusable. Both route through the same exact
+R-182 predecessor target-path SHA-256
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`,
+single QC submission, and one aggregate-only result read. The exact mode
+must be chosen before launch. No R-186 project, compile, backtest,
+aggregate read, research look, or result is claimed at this prelaunch point.

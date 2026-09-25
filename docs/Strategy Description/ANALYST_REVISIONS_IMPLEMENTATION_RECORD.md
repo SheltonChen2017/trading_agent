@@ -25015,3 +25015,123 @@ receipt is still required; its historical matched-path digest is
 disclosed but not falsely substituted for a new producer-derived path.
 The older R-191 through R-194 source, waiver, and result gate semantics
 remain frozen.
+
+### 189.1 R-195 A1 failed at QC backtest creation; no return
+
+After prospective source commit `9db8d0f`, the exact 16-file R-195
+closure was uploaded to fresh private project `36963958`, read back
+byte-for-byte, and compiled. The one-use A1 claim was already persisted.
+The subsequent `backtests/create` call raised the host adapter's generic
+endpoint failure before a run ID or launch receipt was returned. Two
+separate statistics-disabled `backtests/list` reads found **zero** runs in
+that project; `projects/read` found it idle, and another bounded source
+read still matched all 16 claimed files. Thus no R-195 A1 return, order
+result, or accepted result cell exists. The failed response's specific
+reason is **unknown** because the current transport wrapper intentionally
+redacts the underlying exception; do not label this a compile failure,
+runtime error, data problem, or alpha outcome.
+
+R-195 A1 is **spent as a technical attempt**. For conservative look
+accounting, count the attempted `backtests/create` as one possible research
+look even though QC currently lists no run: shared looks **189 → 190**,
+ARV2 development evaluations **132 → 133**, infrastructure **32** and
+authenticated cells **615** unchanged. The owner still requests the
+100% rerun; any in-place A2 must be separately frozen, waive a distinct
+one-use payload, reauthenticate the same private idle project, prove
+zero backtests and exact source, and count as another attempt/look.
+It may not reuse the A1 waiver or create a disguised replacement project.
+
+### 189.2 R-196 120% A1 completed with a standalone valid result
+
+The exact pinned R-196 source was uploaded to new private project
+`36963997`, read back byte-for-byte, compiled, and launched once as
+backtest `3c293b5de792030fc8228c0002886bdf`. Status-only polling reached
+`Completed.`. The one-use result reader then reauthenticated the current
+source, exact launch/waiver/profile/package, META and aggregate SHA-256,
+261-decision and order census, signed-cash, exposure, cost, and tracking
+gates. It returned `run_valid=true` and retained one bounded exploratory
+aggregate. All **5,656/5,656** submitted orders filled. The 2021–2025
+after-modeled-cost cumulative return was **+136.1123820392753%**;
+maximum drawdown was approximately **−21.2125%**. Its producer-derived
+matched-target-path digest is
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`.
+At read time there was no valid R-195 100% anchor receipt, so
+`comparison_valid=false`: **this is a standalone result, not an accepted
+120%-minus-100% spread.** The one result read is spent; no standard QC
+statistics, chart, raw order, provider/price row, or log was retained.
+The launch moves conservative shared looks **190 → 191**, development
+evaluations **133 → 134**, authenticated cells **615 → 616**;
+infrastructure looks remain **32**.
+
+### 189.3 R-197 140% A1 launched
+
+The independently pinned R-197 16-file source was uploaded to new
+private project `36964125`, byte-read back, compiled, and launched once
+as backtest `d9916c8906d1810eaeb8c89fec56a186`. This spends its A1
+technical attempt and one conservative development look: shared looks
+**191 → 192**, development evaluations **134 → 135**, infrastructure
+**32**, authenticated cells **616** pending a valid one-use aggregate read.
+Engine completion, validity, return, and path comparison remain to be
+determined; no result is inferred from launch alone.
+
+### 189.4 R-197 140% A1 completed with a standalone valid result
+
+The R-197 status-only poll reached `Completed.`. Its single bounded
+custom-aggregate read rechecked current source, launch/waiver/profile/
+package, META/AGGREGATES digest, 261 decisions, order census, signed
+cash, exposure, costs, and target tracking, and returned `run_valid=true`.
+All **5,542/5,542** submitted orders filled. The 2021–2025
+after-modeled-cost cumulative return was **+138.28465642521377%**;
+maximum drawdown was approximately **−21.1368%**. Its producer-derived
+matched-target-path digest was
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`,
+equal to the valid R-196 digest. Nevertheless its read-time
+`comparison_valid=false` because the R-195 anchor was still absent. No
+R-197-minus-R-195 or tuned optimum is accepted at this point. The
+result read is spent and authenticated cells move **616 → 617**;
+shared looks remain **192**, development evaluations **135**, and
+infrastructure looks **32**. Any later receipt-only comparison must
+reauthenticate both complete receipt chains without rereading a QC
+result or rewriting this historical read-time flag.
+
+### 189.5 Prospective in-place R-195 A2 recovery, before QC mutation
+
+The owner requested a 100% rerun and authorizes up to three technical
+attempts per distinct backtest candidate. R-195 A1 failed at the
+`backtests/create` boundary with no QC-listed run; it nonetheless remains
+the conservatively counted **fifth** R-193-lineage possible look and
+first of R-195's three technical slots. A separately versioned R-195 A2
+may use only existing project **`36963958`**, identical R-195 100% source
+and economics, and the new backtest name
+`ARV2 R195A2 six cap90 settlement 2021 2025 c20e2c13`. It is the
+**sixth** conservatively counted lineage submission and second R-195
+technical attempt, not a relabeling of A1 or a reset of its look count.
+The distinct one-use recovery waiver ID is
+`ARV2-OWNER-2026-09-25-R195A2-TILT100-GUARD-RECOVERY-EXPLORATORY`,
+canonical payload SHA-256
+`6b7cff4e9f501cc4b60bafb0859d763a8742fd0e36db4dd7bc1041c91db2bc13`.
+The payload binds the exact A1 claim SHA-256
+`284598b4a039b23a2de80d67103d64d8e5a222b3b2f2020187fcb7e68f99bff9`,
+existing project ID/name,
+R-195 projection `c20e2c13...5722e28d`, profile
+`ecdc210a...4198561`, 16-file manifest
+`75a3cfd8...0fdef3`, same package/activation and matched source role,
+no new project or source upload, at most one `compile/create` and one
+`backtests/create`, and one later bounded aggregate read. The host A2
+launcher must authenticate spent A1/no A1 launch, private idle project,
+zero listed runs, and byte-identical source **before** writing its own
+one-use claim or making a QC mutation. A completed A2 is not a valid
+return until the separate source/result gate passes. If it fails,
+R-196/R-197 remain standalone valid cells without the frozen 100%
+anchor; their observed higher returns must not be sold as a ladder
+improvement.
+Before the A2 QC mutation, the R-195 recovery project was read-only
+checked as privately owned, idle, with **zero** listed backtests, and
+its 16 uploaded files matched the exact A1 claim. The real A1 claim hash
+and A2 canonical waiver hash recomputed to the values frozen above.
+Focused ladder projection, predecessor floor, and settlement submission
+checks were **122 passed**; `git diff --check` was clean. The complete
+lane/repository suite was not run under the owner rule. The active lane
+record's shared-look-heading test remains pending the owner's separate
+permission to append R-195 through R-197 bookkeeping to the project-wide
+ledger; this does not authorize changing that shared file by inference.

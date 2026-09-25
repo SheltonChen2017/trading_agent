@@ -570,3 +570,228 @@ def test_guarded_ladder_invalid_r195_receipt_cannot_enable_comparison(
     assert result["run_valid"] is True
     assert result["comparison_valid"] is False
     assert subject._control_path(plan, "result-valid").exists()
+
+
+def _write_r195_a1_spent_claim(plan, projection):
+    a1_plan = dataclasses.replace(plan, attempt=1)
+    identity = subject.preview(a1_plan, projection)
+    claim = {
+        **identity,
+        "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
+        "owner_launch_waiver_schema": "arv2-six-universe-r195-settlement-waiver-v1",
+        "owner_launch_waiver_id": subject._CANDIDATES["R195"].waiver_id,
+        "owner_waived_payload_sha256": hashlib.sha256(
+            subject._waiver_payload(a1_plan, identity, None)
+        ).hexdigest(),
+        "r193_lineage_look_number": 5,
+        "owner_explicit_additional_look": True,
+        "matched_baseline_target_path_sha256": None,
+    }
+    subject._write(subject._control_path(a1_plan, "claim"), claim)
+    return claim
+
+
+def _fake_r195_a2_qc(monkeypatch, plan, projection, *, source_drift=False,
+                     prior_backtest=False):
+    files = {item.project_path: item.source_bytes.decode("ascii")
+             for item in projection.source_files}
+    calls = []
+    state = {"launched": False, "statistics": None}
+
+    def post(_api, endpoint, payload):
+        calls.append(endpoint)
+        if endpoint == "authenticate":
+            return {"success": True}
+        if endpoint == "projects/read":
+            assert payload == {"projectId": subject._R195_A2_PROJECT_ID}
+            return {"success": True, "projects": [{
+                "projectId": subject._R195_A2_PROJECT_ID,
+                "name": plan.project_name,
+                "organizationId": plan.organization_id,
+                "language": "Py", "owner": True, "codeRunning": False,
+                "collaborators": [{"owner": True}],
+            }]}
+        if endpoint == "files/read":
+            observed = dict(files)
+            if source_drift:
+                observed["main.py"] += "# drift"
+            return {"success": True, "files": [{
+                "projectId": subject._R195_A2_PROJECT_ID,
+                "name": name, "content": content,
+            } for name, content in observed.items()]}
+        if endpoint == "backtests/list":
+            assert payload == {
+                "projectId": subject._R195_A2_PROJECT_ID,
+                "includeStatistics": False,
+            }
+            rows = ([{"projectId": subject._R195_A2_PROJECT_ID,
+                      "backtestId": "prior", "name": "prior",
+                      "status": "Completed."}] if prior_backtest else
+                    [{"projectId": subject._R195_A2_PROJECT_ID,
+                      "backtestId": "r195-a2", "name": plan.backtest_name,
+                      "status": "Completed."}] if state["launched"] else [])
+            return {"success": True, "count": len(rows), "backtests": rows}
+        if endpoint == "compile/create":
+            assert subject._control_path(plan, "claim").exists()
+            return {"success": True, "compileId": "r195-a2-compile"}
+        if endpoint == "compile/read":
+            return {"success": True, "compileId": "r195-a2-compile",
+                    "state": "BuildSuccess"}
+        if endpoint == "backtests/create":
+            assert subject._control_path(plan, "claim").exists()
+            state["launched"] = True
+            return {"success": True, "backtest": {
+                "projectId": subject._R195_A2_PROJECT_ID,
+                "backtestId": "r195-a2", "name": plan.backtest_name,
+                "status": "In Queue...",
+            }}
+        if endpoint == "backtests/read":
+            assert state["statistics"] is not None
+            return {"success": True, "backtest": {
+                "projectId": subject._R195_A2_PROJECT_ID,
+                "backtestId": "r195-a2", "name": plan.backtest_name,
+                "status": "Completed.", "statistics": state["statistics"],
+            }}
+        raise AssertionError(endpoint)
+
+    monkeypatch.setattr(subject, "_client", lambda _api: None)
+    monkeypatch.setattr(subject, "_post", post)
+    return calls, state
+
+
+def test_r195_a2_exact_recovery_launch_and_result(
+    projections, tmp_path, monkeypatch,
+):
+    projection = projections["R195"]
+    plan = dataclasses.replace(_plan(tmp_path, projection, "R195"), attempt=2)
+    _predecessors(monkeypatch, plan)
+    _write_r195_a1_spent_claim(plan, projection)
+    waiver = json.loads(subject.render_owner_waiver_payload(plan, projection))
+    assert waiver["attempt"] == 2
+    assert waiver["project_id"] == subject._R195_A2_PROJECT_ID
+    assert waiver["r193_lineage_look_number"] == 6
+    assert waiver["r193_prior_looks_spent"] == 5
+    assert waiver["r195_prior_attempts_spent"] == 1
+    assert waiver["mutating_endpoint_budget"] == {
+        "compile/create": 1, "backtests/create": 1,
+    }
+    assert waiver["source_upload_authorized"] is False
+    calls, qc = _fake_r195_a2_qc(monkeypatch, plan, projection)
+    launch = subject.launch_r195_a2(
+        plan, projection, object(),
+        owner_waiver_id=subject._R195_A2_WAIVER_ID,
+    )
+    assert launch["attempt"] == 2
+    assert launch["r193_lineage_look_number"] == 6
+    assert launch["r193_prior_looks_spent"] == 5
+    assert launch["r195_prior_attempts_spent"] == 1
+    assert calls == [
+        "authenticate", "projects/read", "files/read", "backtests/list",
+        "compile/create", "compile/read", "backtests/create",
+    ]
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    qc["statistics"] = _statistics(plan, launch, target_path="d" * 64)
+    result = subject.read_aggregates_once(plan, launch, object())
+    assert result["run_valid"] is True
+    receipt = subject._read(subject._control_path(plan, "result-valid"))
+    assert receipt["attempt"] == 2
+    assert receipt["r193_lineage_look_number"] == 6
+    assert receipt["r193_prior_looks_spent"] == 5
+    assert receipt["r195_prior_attempts_spent"] == 1
+    assert receipt["matched_baseline_target_path_sha256"] == "d" * 64
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="already claimed"):
+        subject.launch_r195_a2(
+            plan, projection, object(),
+            owner_waiver_id=subject._R195_A2_WAIVER_ID,
+        )
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="already claimed"):
+        subject.read_aggregates_once(plan, launch, object())
+
+
+@pytest.mark.parametrize("defect", (
+    "source_drift", "prior_backtest", "a1_claim_tamper", "wrong_waiver",
+))
+def test_r195_a2_refuses_before_any_mutation(
+    projections, tmp_path, monkeypatch, defect,
+):
+    projection = projections["R195"]
+    plan = dataclasses.replace(_plan(tmp_path, projection, "R195"), attempt=2)
+    _predecessors(monkeypatch, plan)
+    _write_r195_a1_spent_claim(plan, projection)
+    calls, _ = _fake_r195_a2_qc(
+        monkeypatch, plan, projection,
+        source_drift=defect == "source_drift",
+        prior_backtest=defect == "prior_backtest",
+    )
+    if defect == "a1_claim_tamper":
+        real_read = subject._read
+        a1_path = subject._control_path(dataclasses.replace(plan, attempt=1), "claim")
+        monkeypatch.setattr(subject, "_read", lambda path: (
+            dict(real_read(path), r193_lineage_look_number=1)
+            if path == a1_path else real_read(path)
+        ))
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError):
+        subject.launch_r195_a2(
+            plan, projection, object(),
+            owner_waiver_id=("wrong" if defect == "wrong_waiver"
+                             else subject._R195_A2_WAIVER_ID),
+        )
+    assert not any(name in calls for name in (
+        "projects/create", "files/delete", "files/create", "files/update",
+        "compile/create", "backtests/create",
+    ))
+    assert not subject._control_path(plan, "claim").exists()
+
+
+@pytest.mark.parametrize("candidate_id", ("R196", "R197"))
+@pytest.mark.parametrize("same_path", (True, False))
+def test_r195_a2_posthoc_receipt_comparison_keeps_read_time_flag(
+    projections, tmp_path, monkeypatch, candidate_id, same_path,
+):
+    projection = projections[candidate_id]
+    plan = _plan(tmp_path, projection, candidate_id)
+    _predecessors(monkeypatch, plan)
+    _, qc = _fake_qc(monkeypatch, plan, projection)
+    launch = subject.launch_a1(
+        plan, projection, object(),
+        owner_waiver_id=subject._CANDIDATES[candidate_id].waiver_id,
+    )
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    qc["statistics"] = _statistics(plan, launch, target_path="d" * 64)
+    result = subject.read_aggregates_once(plan, launch, object())
+    assert result["run_valid"] is True
+    assert result["comparison_valid"] is False
+
+    anchor_projection = projections["R195"]
+    anchor_plan = dataclasses.replace(
+        _plan(tmp_path, anchor_projection, "R195"), attempt=2,
+    )
+    _write_r195_a1_spent_claim(anchor_plan, anchor_projection)
+    _, anchor_qc = _fake_r195_a2_qc(
+        monkeypatch, anchor_plan, anchor_projection,
+    )
+    anchor_launch = subject.launch_r195_a2(
+        anchor_plan, anchor_projection, object(),
+        owner_waiver_id=subject._R195_A2_WAIVER_ID,
+    )
+    assert subject.poll_status(anchor_plan, anchor_launch, object()) == "Completed."
+    anchor_qc["statistics"] = _statistics(
+        anchor_plan, anchor_launch,
+        target_path="d" * 64 if same_path else "e" * 64,
+    )
+    assert subject.read_aggregates_once(
+        anchor_plan, anchor_launch, object(),
+    )["run_valid"] is True
+    comparison = subject.compare_valid_receipts(plan)
+    assert comparison["comparison_valid"] is same_path
+    assert comparison["r195_anchor_attempt"] == 2
+    assert comparison["matched_baseline_target_path_sha256"] == "d" * 64
+    assert comparison["r195_matched_baseline_target_path_sha256"] == (
+        "d" * 64 if same_path else "e" * 64
+    )
+    # The one-use R196/R197 result receipt remains a historical read-time fact.
+    assert subject._read(subject._control_path(plan, "result-valid"))[
+        "comparison_valid"
+    ] is False

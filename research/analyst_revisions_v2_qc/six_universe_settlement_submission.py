@@ -18,7 +18,7 @@ import os
 import re
 import stat
 import time
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from decimal import Decimal
 from pathlib import Path
 
@@ -143,6 +143,10 @@ _CANDIDATES = {
     ),
 }
 _LADDER_PERCENTS = {"R195": 100, "R196": 120, "R197": 140}
+_R195_A2_PROJECT_ID = 36963958
+_R195_A2_WAIVER_ID = (
+    "ARV2-OWNER-2026-09-25-R195A2-TILT100-GUARD-RECOVERY-EXPLORATORY"
+)
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
 _ORG = re.compile(r"[0-9a-f]{32}\Z")
 _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]*\Z")
@@ -178,7 +182,10 @@ class SettlementQcPlan:
 
     @property
     def backtest_name(self) -> str:
-        return _candidate(self).backtest_name
+        candidate = _candidate(self)
+        if self.candidate_id == "R195" and self.attempt == 2:
+            return candidate.backtest_name.replace("R195A1", "R195A2", 1)
+        return candidate.backtest_name
 
     @property
     def role(self) -> str:
@@ -206,7 +213,8 @@ def _candidate(plan: SettlementQcPlan) -> _Candidate:
         _fail("settlement plan type changed")
     candidate = _CANDIDATES.get(plan.candidate_id)
     if candidate is None or (
-        type(plan.attempt) is not int or plan.attempt != 1
+        type(plan.attempt) is not int
+        or plan.attempt not in ((1, 2) if plan.candidate_id == "R195" else (1,))
         or type(plan.organization_id) is not str
         or not _ORG.fullmatch(plan.organization_id)
         or type(plan.package_sha256) is not str
@@ -216,7 +224,7 @@ def _candidate(plan: SettlementQcPlan) -> _Candidate:
         or not isinstance(plan.control_directory, Path)
         or not plan.control_directory.is_absolute()
     ):
-        _fail("settlement plan changed from its exact A1 identity")
+        _fail("settlement plan changed from its exact attempt identity")
     return candidate
 
 
@@ -252,7 +260,7 @@ def _control_path(plan: SettlementQcPlan, name: str) -> Path:
         or (hasattr(os, "getuid") and info.st_uid != os.getuid())
     ):
         _fail("settlement control directory is not private")
-    return root / f"{candidate.candidate_id}-A1-{name}.json"
+    return root / f"{candidate.candidate_id}-A{plan.attempt}-{name}.json"
 
 
 def _read(path: Path) -> dict:
@@ -382,7 +390,7 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
     ):
         _fail("settlement projection is not self-authenticating")
     identity = {
-        "candidate_id": candidate.candidate_id, "attempt": 1,
+        "candidate_id": candidate.candidate_id, "attempt": plan.attempt,
         "role": candidate.role, "projection_sha256": candidate.projection_sha256,
         "profile_id": projection.profile_id,
         "profile_sha256": candidate.profile_sha256,
@@ -397,9 +405,15 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
         })
     elif candidate.candidate_id == "R195":
         identity.update({
-            "r193_lineage_look_number": 5,
+            "r193_lineage_look_number": 5 if plan.attempt == 1 else 6,
             "owner_explicit_additional_look": True,
         })
+        if plan.attempt == 2:
+            identity.update({
+                "r195_prior_attempts_spent": 1,
+                "r193_prior_looks_spent": 5,
+                "recovery_project_id": _R195_A2_PROJECT_ID,
+            })
     return identity
 
 
@@ -419,9 +433,64 @@ def _launch_target_path(plan: SettlementQcPlan) -> str | None:
     return None if plan.candidate_id in _LADDER_PERCENTS else predecessor
 
 
+def _require_r195_a1_recovery_claim(plan: SettlementQcPlan) -> str:
+    """Authenticate the spent A1 claim and absence of any A1 launch receipt."""
+    if plan.candidate_id != "R195" or plan.attempt != 2:
+        _fail("R195 recovery requires its exact A2 plan")
+    a1_plan = replace(plan, attempt=1)
+    _require_valid_predecessor(a1_plan)
+    claim = _read(_control_path(a1_plan, "claim"))
+    files = claim.get("source_files")
+    if (
+        set(claim) != {
+            "candidate_id", "attempt", "role", "projection_sha256", "profile_id",
+            "profile_sha256", "package_sha256", "activation_manifest_sha256",
+            "source_files", "r193_lineage_look_number",
+            "owner_explicit_additional_look", "owner_launch_authority_mode",
+            "owner_launch_waiver_schema", "owner_launch_waiver_id",
+            "owner_waived_payload_sha256", "matched_baseline_target_path_sha256",
+        }
+        or claim.get("candidate_id") != "R195"
+        or claim.get("attempt") != a1_plan.attempt
+        or claim.get("role") != _CANDIDATES["R195"].role
+        or claim.get("projection_sha256") != _CANDIDATES["R195"].projection_sha256
+        or claim.get("profile_id") != ladder_projection.PROFILE_IDS[100]
+        or claim.get("profile_sha256") != _CANDIDATES["R195"].profile_sha256
+        or claim.get("package_sha256") != plan.package_sha256
+        or claim.get("activation_manifest_sha256")
+        != plan.activation_manifest_sha256
+        or type(files) is not list or len(files) != _CANDIDATES["R195"].source_count
+        or any(type(row) is not list or len(row) != 3
+               or type(row[0]) is not str or type(row[1]) is not str
+               or type(row[2]) is not int or row[2] <= 0 for row in files)
+        or _manifest_digest(files) != _CANDIDATES["R195"].source_files_sha256
+        or claim.get("r193_lineage_look_number") != 5
+        or claim.get("owner_explicit_additional_look") is not True
+        or claim.get("matched_baseline_target_path_sha256") is not None
+        or claim.get("owner_launch_authority_mode")
+        != "exact_exploratory_signature_waiver"
+        or claim.get("owner_launch_waiver_schema")
+        != "arv2-six-universe-r195-settlement-waiver-v1"
+        or claim.get("owner_launch_waiver_id") != _CANDIDATES["R195"].waiver_id
+        or claim.get("owner_waived_payload_sha256") != hashlib.sha256(
+            _waiver_payload(a1_plan, claim, None)
+        ).hexdigest()
+        or any(_control_path(a1_plan, name).exists() for name in (
+            "launch", "terminal", "result-read-claim", "result-valid",
+        ))
+    ):
+        _fail("R195 A1 claim or no-launch recovery boundary changed")
+    return hashlib.sha256(_canonical(claim)).hexdigest()
+
+
 def _waiver_payload(plan: SettlementQcPlan, identity: dict,
-                    target_path: str | None) -> bytes:
+                    target_path: str | None, *,
+                    a1_claim_sha256: str | None = None) -> bytes:
     candidate = _candidate(plan)
+    a2 = candidate.candidate_id == "R195" and plan.attempt == 2
+    if a2 and (type(a1_claim_sha256) is not str
+               or not _HEX.fullmatch(a1_claim_sha256)):
+        _fail("R195 A2 waiver lacks the exact spent A1 claim")
     if candidate.candidate_id in _LADDER_PERCENTS:
         valid_path = target_path is None
     else:
@@ -431,15 +500,19 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict,
     payload = {
         "schema": f"arv2-six-universe-{candidate.candidate_id.lower()}-settlement-waiver-v1",
         "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
-        "owner_launch_waiver_id": candidate.waiver_id,
-        "action": "one_private_exploratory_order_backtest_launch",
-        "candidate_id": candidate.candidate_id, "attempt": 1,
+        "owner_launch_waiver_id": (
+            _R195_A2_WAIVER_ID if a2 else candidate.waiver_id
+        ),
+        "action": ("one_existing_private_project_order_backtest_launch" if a2
+                   else "one_private_exploratory_order_backtest_launch"),
+        "candidate_id": candidate.candidate_id, "attempt": plan.attempt,
         "role": candidate.role,
         "organization_id_sha256": hashlib.sha256(
             plan.organization_id.encode("ascii")
         ).hexdigest(),
-        "project_id": None, "project_name": candidate.project_name,
-        "backtest_name": candidate.backtest_name,
+        "project_id": _R195_A2_PROJECT_ID if a2 else None,
+        "project_name": candidate.project_name,
+        "backtest_name": plan.backtest_name,
         "control_directory": str(plan.control_directory),
         "projection_sha256": candidate.projection_sha256,
         "profile_id": identity["profile_id"],
@@ -448,11 +521,13 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict,
         "activation_manifest_sha256": plan.activation_manifest_sha256,
         "matched_baseline_target_path_sha256": target_path,
         "source_files_sha256": candidate.source_files_sha256,
-        "mutating_endpoint_budget": {
-            "projects/create": 1, "files/delete": 1,
-            "files/create": candidate.source_count, "files/update": 1,
-            "compile/create": 1, "backtests/create": 1,
-        },
+        "mutating_endpoint_budget": (
+            {"compile/create": 1, "backtests/create": 1} if a2 else {
+                "projects/create": 1, "files/delete": 1,
+                "files/create": candidate.source_count, "files/update": 1,
+                "compile/create": 1, "backtests/create": 1,
+            }
+        ),
         "maximum_backtest_submissions": 1,
         "aggregate_only_result_read_authorized": True,
         "maximum_result_reads": 1,
@@ -475,18 +550,34 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict,
             "comparison_requires_valid_r195_exact_path": True,
         })
         if candidate.candidate_id == "R195":
-            payload.update({
-                "r193_lineage_look_number": 5,
-                "r193_prior_looks_spent": 4,
-                "owner_explicit_additional_look": True,
-                "maximum_additional_r193_lineage_submissions": 1,
-            })
+            if a2:
+                payload.update({
+                    "r193_lineage_look_number": 6,
+                    "r193_prior_looks_spent": 5,
+                    "r195_prior_attempts_spent": 1,
+                    "a1_claim_sha256": a1_claim_sha256,
+                    "source_upload_authorized": False,
+                    "existing_project_id": _R195_A2_PROJECT_ID,
+                    "owner_explicit_additional_look": True,
+                    "maximum_additional_r193_lineage_submissions": 1,
+                })
+            else:
+                payload.update({
+                    "r193_lineage_look_number": 5,
+                    "r193_prior_looks_spent": 4,
+                    "owner_explicit_additional_look": True,
+                    "maximum_additional_r193_lineage_submissions": 1,
+                })
     return _canonical(payload)
 
 
 def render_owner_waiver_payload(plan: SettlementQcPlan, projection: object) -> bytes:
     identity = preview(plan, projection)
-    return _waiver_payload(plan, identity, _launch_target_path(plan))
+    a1_sha = (_require_r195_a1_recovery_claim(plan)
+              if plan.candidate_id == "R195" and plan.attempt == 2 else None)
+    return _waiver_payload(
+        plan, identity, _launch_target_path(plan), a1_claim_sha256=a1_sha,
+    )
 
 
 def _check_uploaded_source(project_id: int, identity: dict,
@@ -522,6 +613,8 @@ def launch_a1(
 ) -> dict:
     """Claim one A1, create a fresh private project, and submit exact source."""
     candidate = _candidate(plan)
+    if plan.attempt != 1:
+        _fail("settlement A1 launcher requires attempt one")
     identity = preview(plan, projection)
     target_path = _launch_target_path(plan)
     if type(owner_waiver_id) is not str or owner_waiver_id != candidate.waiver_id:
@@ -661,14 +754,126 @@ def launch_a1(
     return receipt
 
 
+def launch_r195_a2(
+    plan: SettlementQcPlan, projection: object, api: QuantConnectClient, *,
+    owner_waiver_id: str,
+) -> dict:
+    """Recover one R195 launch in the exact A1 project without uploading code."""
+    candidate = _candidate(plan)
+    if candidate.candidate_id != "R195" or plan.attempt != 2:
+        _fail("R195 A2 recovery requires its exact second-attempt plan")
+    identity = preview(plan, projection)
+    a1_claim_sha = _require_r195_a1_recovery_claim(plan)
+    target_path = _launch_target_path(plan)
+    if type(owner_waiver_id) is not str or owner_waiver_id != _R195_A2_WAIVER_ID:
+        _fail("R195 A2 owner waiver does not cover this recovery")
+    authority = {
+        "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
+        "owner_launch_waiver_schema": "arv2-six-universe-r195-settlement-waiver-v1",
+        "owner_launch_waiver_id": _R195_A2_WAIVER_ID,
+        "owner_waived_payload_sha256": hashlib.sha256(_waiver_payload(
+            plan, identity, target_path, a1_claim_sha256=a1_claim_sha,
+        )).hexdigest(),
+        "r193_lineage_look_number": 6,
+        "r193_prior_looks_spent": 5,
+        "r195_prior_attempts_spent": 1,
+        "owner_explicit_additional_look": True,
+        "a1_claim_sha256": a1_claim_sha,
+        "recovery_project_id": _R195_A2_PROJECT_ID,
+    }
+    claim_path = _control_path(plan, "claim")
+    if claim_path.exists():
+        _fail("R195 A2 attempt was already claimed")
+    _client(api)
+    _post(api, "authenticate", {})
+    project_id = _R195_A2_PROJECT_ID
+    projects = _post(api, "projects/read", {"projectId": project_id}).get("projects")
+    if type(projects) is not list or len(projects) != 1 or type(projects[0]) is not dict:
+        _fail("R195 A2 existing project is unavailable")
+    row = projects[0]
+    collaborators = row.get("collaborators")
+    if (
+        row.get("projectId") != project_id
+        or row.get("name") != candidate.project_name
+        or row.get("organizationId") != plan.organization_id
+        or row.get("language") != "Py"
+        or row.get("owner") is not True
+        or row.get("codeRunning") is not False
+        or type(collaborators) is not list or len(collaborators) > 1
+        or any(type(item) is not dict or item.get("owner") is not True
+               for item in collaborators)
+    ):
+        _fail("R195 A2 existing project is not exact, private, and idle")
+    _check_uploaded_source(project_id, identity, api)
+    inventory = _post(api, "backtests/list", {
+        "projectId": project_id, "includeStatistics": False,
+    })
+    if (type(inventory.get("backtests")) is not list
+            or inventory["backtests"] != [] or inventory.get("count") != 0):
+        _fail("R195 A2 existing project has a prior or ambiguous backtest")
+    _write(claim_path, {
+        **identity, **authority,
+        "matched_baseline_target_path_sha256": target_path,
+    })
+    started = _post(api, "compile/create", {"projectId": project_id})
+    compile_id = started.get("compileId")
+    if type(compile_id) is not str or not _ID.fullmatch(compile_id):
+        _fail("R195 A2 compile identity changed")
+    for poll in range(120):
+        state = _post(api, "compile/read", {
+            "projectId": project_id, "compileId": compile_id,
+        })
+        if (
+            state.get("compileId") != compile_id
+            or state.get("state") not in {
+                "InQueue", "Building", "BuildSuccess", "BuildError",
+            }
+        ):
+            _fail("R195 A2 compile state changed")
+        if state["state"] in {"BuildSuccess", "BuildError"}:
+            break
+        if poll < 119:
+            time.sleep(2)
+    else:
+        _fail("R195 A2 compile poll exhausted; attempt remains spent")
+    if state["state"] == "BuildError":
+        _write(_control_path(plan, "terminal"), {
+            "candidate_id": "R195", "attempt": 2, "status": "BuildError",
+            "project_id": project_id, "compile_id": compile_id,
+        })
+        _fail("R195 A2 compile failed; attempt was consumed")
+    launched = _post(api, "backtests/create", {
+        "projectId": project_id, "compileId": compile_id,
+        "backtestName": plan.backtest_name,
+    }).get("backtest")
+    if type(launched) is not dict or (
+        type(launched.get("backtestId")) is not str
+        or not _ID.fullmatch(launched["backtestId"])
+        or launched.get("projectId") != project_id
+        or launched.get("name") != plan.backtest_name
+        or launched.get("status") not in {"In Queue...", "In Progress..."}
+    ):
+        _fail("R195 A2 backtest launch identity changed")
+    receipt = {
+        **{key: value for key, value in identity.items() if key != "source_files"},
+        **authority,
+        "matched_baseline_target_path_sha256": target_path,
+        "project_id": project_id, "project_name": candidate.project_name,
+        "compile_id": compile_id, "backtest_id": launched["backtestId"],
+        "backtest_name": plan.backtest_name,
+    }
+    _write(_control_path(plan, "launch"), receipt)
+    return receipt
+
+
 def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
     candidate = _candidate(plan)
     if type(launch) is not dict or (
         launch.get("candidate_id") != candidate.candidate_id
-        or launch.get("attempt") != 1
+        or launch.get("attempt") != plan.attempt
         or launch.get("role") != candidate.role
         or launch.get("project_name") != candidate.project_name
-        or launch.get("backtest_name") != candidate.backtest_name
+        or launch.get("backtest_name") != plan.backtest_name
         or launch.get("projection_sha256") != candidate.projection_sha256
         or launch.get("profile_sha256") != candidate.profile_sha256
         or launch.get("matched_baseline_target_path_sha256")
@@ -685,11 +890,23 @@ def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
         or launch.get("owner_one_time_exception") is not True
     ):
         _fail("R194 is not bound to the fourth R193-lineage look")
-    if candidate.candidate_id == "R195" and (
-        launch.get("r193_lineage_look_number") != 5
-        or launch.get("owner_explicit_additional_look") is not True
-    ):
-        _fail("R195 is not bound to the fifth R193-lineage look")
+    if candidate.candidate_id == "R195":
+        if plan.attempt == 1 and (
+            launch.get("r193_lineage_look_number") != 5
+            or launch.get("owner_explicit_additional_look") is not True
+        ):
+            _fail("R195 A1 is not bound to the fifth R193-lineage look")
+        if plan.attempt == 2 and (
+            launch.get("r193_lineage_look_number") != 6
+            or launch.get("r193_prior_looks_spent") != 5
+            or launch.get("r195_prior_attempts_spent") != 1
+            or launch.get("owner_explicit_additional_look") is not True
+            or launch.get("recovery_project_id") != _R195_A2_PROJECT_ID
+            or launch.get("project_id") != _R195_A2_PROJECT_ID
+            or type(launch.get("a1_claim_sha256")) is not str
+            or not _HEX.fullmatch(launch["a1_claim_sha256"])
+        ):
+            _fail("R195 A2 recovery launch identity changed")
     return candidate
 
 
@@ -717,7 +934,7 @@ def poll_status(
     row = matched[0]
     status = row.get("status")
     if (
-        row.get("name") != candidate.backtest_name
+        row.get("name") != plan.backtest_name
         or ("projectId" in row and row["projectId"] != launch["project_id"])
         or status not in {
             "In Queue...", "In Progress...", "Completed.", "Runtime Error",
@@ -725,11 +942,14 @@ def poll_status(
     ):
         _fail("settlement backtest status identity changed")
     if status in {"Completed.", "Runtime Error"}:
-        _write(terminal_path, {
+        terminal = {
             "candidate_id": candidate.candidate_id, "status": status,
             "project_id": launch["project_id"],
             "backtest_id": launch["backtest_id"],
-        })
+        }
+        if plan.attempt == 2:
+            terminal["attempt"] = 2
+        _write(terminal_path, terminal)
     return status
 
 
@@ -762,7 +982,7 @@ def _exact_result_claim(
     target_path = _launch_target_path(plan)
     if (
         claim.get("candidate_id") != candidate.candidate_id
-        or claim.get("attempt") != 1
+        or claim.get("attempt") != plan.attempt
         or claim.get("role") != candidate.role
         or type(source_files) is not list
         or len(source_files) != candidate.source_count
@@ -792,15 +1012,33 @@ def _exact_result_claim(
         or launch.get("owner_one_time_exception") is not True
     ):
         _fail("R194 claim did not persist the one-time fourth lineage look")
-    if candidate.candidate_id == "R195" and (
+    if candidate.candidate_id == "R195" and plan.attempt == 1 and (
         claim.get("r193_lineage_look_number") != 5
         or claim.get("owner_explicit_additional_look") is not True
         or launch.get("r193_lineage_look_number") != 5
         or launch.get("owner_explicit_additional_look") is not True
     ):
         _fail("R195 claim did not persist the fifth R193-lineage look")
+    a1_claim_sha = None
+    if candidate.candidate_id == "R195" and plan.attempt == 2:
+        a1_claim_sha = _require_r195_a1_recovery_claim(plan)
+        if (
+            claim.get("r193_lineage_look_number") != 6
+            or claim.get("r193_prior_looks_spent") != 5
+            or claim.get("r195_prior_attempts_spent") != 1
+            or claim.get("owner_explicit_additional_look") is not True
+            or claim.get("recovery_project_id") != _R195_A2_PROJECT_ID
+            or claim.get("a1_claim_sha256") != a1_claim_sha
+            or any(claim.get(key) != launch.get(key) for key in (
+                "r193_lineage_look_number", "r193_prior_looks_spent",
+                "r195_prior_attempts_spent", "owner_explicit_additional_look",
+                "recovery_project_id", "a1_claim_sha256",
+            ))
+        ):
+            _fail("R195 A2 claim did not persist its exact recovery lineage")
     waiver_sha = hashlib.sha256(
-        _waiver_payload(plan, claim, target_path)
+        _waiver_payload(plan, claim, target_path,
+                        a1_claim_sha256=a1_claim_sha)
     ).hexdigest()
     if (
         claim.get("owner_launch_authority_mode")
@@ -808,7 +1046,10 @@ def _exact_result_claim(
         or claim.get("owner_launch_waiver_schema") != (
             f"arv2-six-universe-{candidate.candidate_id.lower()}-settlement-waiver-v1"
         )
-        or claim.get("owner_launch_waiver_id") != candidate.waiver_id
+        or claim.get("owner_launch_waiver_id") != (
+            _R195_A2_WAIVER_ID if candidate.candidate_id == "R195"
+            and plan.attempt == 2 else candidate.waiver_id
+        )
         or claim.get("owner_waived_payload_sha256") != waiver_sha
         or any(claim.get(key) != launch.get(key) for key in (
             "owner_launch_authority_mode", "owner_launch_waiver_schema",
@@ -919,29 +1160,34 @@ def _settlement_aggregate(
     return selected
 
 
-def _valid_r195_comparison_path(plan: SettlementQcPlan) -> str | None:
-    """Use only a complete, source-bound R195 receipt as a comparison anchor."""
-    anchor_plan = SettlementQcPlan(
-        "R195", plan.organization_id, plan.package_sha256,
-        plan.activation_manifest_sha256, plan.control_directory,
-    )
-    valid_path = _control_path(anchor_plan, "result-valid")
+def _verified_ladder_result_receipt(plan: SettlementQcPlan) -> dict | None:
+    """Authenticate one local result chain without another QC result read."""
+    candidate = _candidate(plan)
+    if candidate.candidate_id not in _LADDER_PERCENTS:
+        _fail("settlement receipt comparison requires a guarded tilt candidate")
+    valid_path = _control_path(plan, "result-valid")
     if not valid_path.exists():
         return None
     try:
-        launch = _read(_control_path(anchor_plan, "launch"))
-        candidate = _match_launch(anchor_plan, launch)
-        _exact_result_claim(anchor_plan, launch, candidate)
-        if _read(_control_path(anchor_plan, "terminal")) != {
-            "candidate_id": "R195", "status": "Completed.",
+        launch = _read(_control_path(plan, "launch"))
+        _match_launch(plan, launch)
+        _exact_result_claim(plan, launch, candidate)
+        terminal = {
+            "candidate_id": candidate.candidate_id, "status": "Completed.",
             "project_id": launch["project_id"],
             "backtest_id": launch["backtest_id"],
-        }:
-            return None
-        if _read(_control_path(anchor_plan, "result-read-claim")) != {
-            "candidate_id": "R195", "project_id": launch["project_id"],
+        }
+        read_claim = {
+            "candidate_id": candidate.candidate_id,
+            "project_id": launch["project_id"],
             "backtest_id": launch["backtest_id"],
-        }:
+        }
+        if plan.attempt == 2:
+            terminal["attempt"] = 2
+            read_claim["attempt"] = 2
+        if _read(_control_path(plan, "terminal")) != terminal:
+            return None
+        if _read(_control_path(plan, "result-read-claim")) != read_claim:
             return None
         receipt = _read(valid_path)
     except SixUniverseSettlementSubmissionError:
@@ -953,10 +1199,16 @@ def _valid_r195_comparison_path(plan: SettlementQcPlan) -> str | None:
         "package_sha256", "activation_manifest_sha256", "source_files_sha256",
         "comparison_valid",
     }
+    if candidate.candidate_id == "R195" and plan.attempt == 2:
+        expected.update({
+            "r193_lineage_look_number", "r193_prior_looks_spent",
+            "r195_prior_attempts_spent", "a1_claim_sha256",
+            "recovery_project_id",
+        })
     if (
         set(receipt) != expected
-        or receipt.get("candidate_id") != "R195"
-        or receipt.get("attempt") != 1
+        or receipt.get("candidate_id") != candidate.candidate_id
+        or receipt.get("attempt") != plan.attempt
         or receipt.get("run_valid") is not True
         or receipt.get("projection_sha256") != candidate.projection_sha256
         or receipt.get("profile_sha256") != candidate.profile_sha256
@@ -968,14 +1220,61 @@ def _valid_r195_comparison_path(plan: SettlementQcPlan) -> str | None:
         or receipt.get("activation_manifest_sha256")
         != plan.activation_manifest_sha256
         or receipt.get("source_files_sha256") != candidate.source_files_sha256
-        or receipt.get("comparison_valid") is not False
+        or type(receipt.get("comparison_valid")) is not bool
+        or (candidate.candidate_id == "R195"
+            and receipt.get("comparison_valid") is not False)
         or type(receipt.get("aggregate_sha256")) is not str
         or not _HEX.fullmatch(receipt["aggregate_sha256"])
         or type(receipt.get("matched_baseline_target_path_sha256")) is not str
         or not _HEX.fullmatch(receipt["matched_baseline_target_path_sha256"])
     ):
         return None
-    return receipt["matched_baseline_target_path_sha256"]
+    if candidate.candidate_id == "R195" and plan.attempt == 2 and (
+        receipt.get("r193_lineage_look_number") != 6
+        or receipt.get("r193_prior_looks_spent") != 5
+        or receipt.get("r195_prior_attempts_spent") != 1
+        or receipt.get("a1_claim_sha256") != launch.get("a1_claim_sha256")
+        or receipt.get("recovery_project_id") != _R195_A2_PROJECT_ID
+    ):
+        return None
+    return receipt
+
+
+def _valid_r195_comparison_anchor(plan: SettlementQcPlan) -> tuple[int, str] | None:
+    """Select exactly one valid R195 attempt as the matched-path anchor."""
+    found = []
+    for attempt in (1, 2):
+        anchor_plan = SettlementQcPlan(
+            "R195", plan.organization_id, plan.package_sha256,
+            plan.activation_manifest_sha256, plan.control_directory, attempt,
+        )
+        receipt = _verified_ladder_result_receipt(anchor_plan)
+        if receipt is not None:
+            found.append((attempt, receipt["matched_baseline_target_path_sha256"]))
+    return found[0] if len(found) == 1 else None
+
+
+def compare_valid_receipts(plan: SettlementQcPlan) -> dict:
+    """Reconcile frozen R195 and a later result without QC calls or rewrites."""
+    candidate = _candidate(plan)
+    if candidate.candidate_id not in {"R196", "R197"}:
+        _fail("settlement comparison requires an R196 or R197 A1 plan")
+    observed = _verified_ladder_result_receipt(plan)
+    anchor = _valid_r195_comparison_anchor(plan)
+    return {
+        "candidate_id": candidate.candidate_id,
+        "comparison_valid": (
+            observed is not None and anchor is not None
+            and observed["matched_baseline_target_path_sha256"] == anchor[1]
+        ),
+        "r195_anchor_attempt": None if anchor is None else anchor[0],
+        "matched_baseline_target_path_sha256": (
+            None if observed is None else observed["matched_baseline_target_path_sha256"]
+        ),
+        "r195_matched_baseline_target_path_sha256": (
+            None if anchor is None else anchor[1]
+        ),
+    }
 
 
 def read_aggregates_once(
@@ -985,11 +1284,14 @@ def read_aggregates_once(
     candidate = _match_launch(plan, launch)
     if _read(_control_path(plan, "launch")) != launch:
         _fail("settlement launch receipt changed")
-    if _read(_control_path(plan, "terminal")) != {
+    expected_terminal = {
         "candidate_id": candidate.candidate_id, "status": "Completed.",
         "project_id": launch["project_id"],
         "backtest_id": launch["backtest_id"],
-    }:
+    }
+    if plan.attempt == 2:
+        expected_terminal["attempt"] = 2
+    if _read(_control_path(plan, "terminal")) != expected_terminal:
         _fail("settlement exact run did not complete")
     read_path = _control_path(plan, "result-read-claim")
     if read_path.exists():
@@ -997,11 +1299,14 @@ def read_aggregates_once(
     claim = _exact_result_claim(plan, launch, candidate)
     _client(api)
     _check_uploaded_source(launch["project_id"], claim, api)
-    _write(read_path, {
+    read_claim = {
         "candidate_id": candidate.candidate_id,
         "project_id": launch["project_id"],
         "backtest_id": launch["backtest_id"],
-    })
+    }
+    if plan.attempt == 2:
+        read_claim["attempt"] = 2
+    _write(read_path, read_claim)
     response = _post(api, "backtests/read", {
         "projectId": launch["project_id"],
         "backtestId": launch["backtest_id"],
@@ -1010,7 +1315,7 @@ def read_aggregates_once(
     if type(backtest) is not dict or (
         backtest.get("projectId") != launch["project_id"]
         or backtest.get("backtestId") != launch["backtest_id"]
-        or backtest.get("name") != candidate.backtest_name
+        or backtest.get("name") != plan.backtest_name
         or backtest.get("status") != "Completed."
     ):
         _fail("settlement result identity changed")
@@ -1075,14 +1380,14 @@ def read_aggregates_once(
     valid = aggregate["run_valid"] is True
     comparison_valid = False
     if valid and candidate.candidate_id in {"R196", "R197"}:
-        anchor = _valid_r195_comparison_path(plan)
+        anchor = _valid_r195_comparison_anchor(plan)
         comparison_valid = (
             anchor is not None
-            and selected["matched_baseline_target_path_sha256"] == anchor
+            and selected["matched_baseline_target_path_sha256"] == anchor[1]
         )
     if valid:
         receipt = {
-            "candidate_id": candidate.candidate_id, "attempt": 1,
+            "candidate_id": candidate.candidate_id, "attempt": plan.attempt,
             "run_valid": True, "aggregate_sha256": meta["aggregate_sha256"],
             "projection_sha256": candidate.projection_sha256,
             "profile_sha256": candidate.profile_sha256,
@@ -1102,14 +1407,29 @@ def read_aggregates_once(
                 "source_files_sha256": candidate.source_files_sha256,
                 "comparison_valid": comparison_valid,
             })
+        if candidate.candidate_id == "R195" and plan.attempt == 2:
+            receipt.update({
+                "r193_lineage_look_number": 6,
+                "r193_prior_looks_spent": 5,
+                "r195_prior_attempts_spent": 1,
+                "a1_claim_sha256": launch["a1_claim_sha256"],
+                "recovery_project_id": _R195_A2_PROJECT_ID,
+            })
         _write(_control_path(plan, "result-valid"), receipt)
     result = {"meta": meta, "aggregates": selected, "run_valid": valid}
     if candidate.candidate_id in _LADDER_PERCENTS:
         result["comparison_valid"] = comparison_valid
+    if candidate.candidate_id == "R195" and plan.attempt == 2:
+        result.update({
+            "r193_lineage_look_number": 6,
+            "r193_prior_looks_spent": 5,
+            "r195_prior_attempts_spent": 1,
+        })
     return result
 
 
 __all__ = (
-    "SettlementQcPlan", "SixUniverseSettlementSubmissionError", "launch_a1",
-    "poll_status", "preview", "read_aggregates_once", "render_owner_waiver_payload",
+    "SettlementQcPlan", "SixUniverseSettlementSubmissionError",
+    "compare_valid_receipts", "launch_a1", "launch_r195_a2", "poll_status",
+    "preview", "read_aggregates_once", "render_owner_waiver_payload",
 )

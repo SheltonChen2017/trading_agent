@@ -10369,3 +10369,15 @@ IB-1A/IB-1B acceptance result is therefore not yet claimed. The scalable
 remains a separate later milestone. No outcome, ETF, QC, paper/live,
 deployment, broker, capital, order, or trading authority follows from this
 repair.
+
+### 79.6 Final committed-tree validation addendum
+
+After code commit `008baa8` and record commit `8a021df`, the exact committed
+tree passed the seven focused code/boundary files in 79.4 plus
+`test_insider_buying_implementation_record.py` and
+`test_active_document_consistency.py`: **425 passed, 0 skipped, 0 failed in
+5.44s** on Python 3.12.14 / pytest 9.1.1. Targeted `compileall` exited 0;
+both commits passed `git show --check`; the worktree diff check was clean.
+This addendum changes the lane record only and does not change the tested code
+or its authority. The record-sensitive checks are repeated after committing
+this note, before the single push.

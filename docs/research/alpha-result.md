@@ -4436,3 +4436,37 @@ the four refusals are an execution-validity limitation under unchanged
 return curve. R-185 40% is the highest tested tilt in this family with a
 valid result; no unbounded follow-on sweep or retroactive rescue is
 authorized by these failures.
+
+## R-190 — owner/Mia post-R-186 settlement-cash repair census (FOUR LOOKS; NO ACCEPTED RESULT CELL) — 2026-09-25
+
+After R-186 A1's recorded cash-bound refusal, the owner worked with QC's
+Mia in the same private project `36935164`. An authenticated
+statistics-disabled backtest list shows four additional launches: the
+one-day `ARV2 MOO probe ABBV 2023-11-28`
+(`63718874d7ded09ef0e56c3039f9ab18`, `Completed.`), settlement-cash
+repair v1 (`96e893534c6cab2da9a9c53491e3c1d1`, `Runtime Error`),
+repair v2 (`62925e83f6be1933f73e4670c53de3fb`, `Runtime Error`), and
+repair v3 (`5d22091028f19f0787120bd7b4db3f2d`, `Completed.`).
+No result statistic, aggregate, order, log, chart, provider row, or raw
+price was read for this census. The probe is conservatively counted as
+a development evaluation until its exact snapshot and observation scope
+can be authenticated; no valid return cell follows from either
+`Completed.` status.
+
+The current QC project source differs from frozen R-186 in two cash/order
+files, not in the 80% target. Mia changed buy-fill-prefix cash refusal
+to final-settled cash refusal and admitted temporary negative event cash
+while a market-on-open order remains pending. That is a new execution
+policy. The original R-186 source/profile/reader cannot authenticate the
+new v3 run; in particular, the original reader requires nonnegative event
+cash and the old A1 backtest ID. The v3 run remains a **diagnostic**, with
+no return or alpha estimate imported into this ledger. Analyst lane
+section 185 records the full code comparison and separately prospective
+R-191 matched/R-192 80% settlement-policy test plan.
+
+All four post-A1 launches are counted conservatively: **179 -> 183 shared
+research looks / 122 -> 126 ARV2 development evaluations**; infrastructure
+looks remain **32** and authenticated cells remain **613**. This count
+includes Mia's launches even though Codex did not submit them. It neither
+rewrites the previous R-186 refusal nor treats the new policy as the
+original 80% test.

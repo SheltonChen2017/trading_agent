@@ -104,6 +104,12 @@ ladder. All four stronger-tilt A1s refused at the post-order-event cash
 guard; none added a return cell. The active count is 179 shared research
 looks, 122 development evaluations, 32 infrastructure looks, and 613
 authenticated cells, the latest valid cell remaining exploratory.
+Section 185 counts four owner/Mia post-R-186 research launches. One
+settlement-cash repair backtest reached QC `Completed.`, but the changed
+execution policy has not produced an authenticated result cell; R-191/R-192
+are separate prospective matched/80% tests. The conservative census is
+183 shared looks, 126 development evaluations, 32 infrastructure looks,
+and 613 authenticated cells.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -607,6 +613,16 @@ push, along with sections 181–183; these same-window looks are not untouched
 validation, and their cash/order validity gates remain enforced. The final
 ladder count is 179 shared looks / 122 development evaluations / 32
 infrastructure looks / 613 authenticated cells.
+Section 185 records four previously uncounted owner/Mia QC launches in the
+R-186 project and the two-file settlement-cash change. Mia's latest v3
+reached QC `Completed.`, but it is a different execution policy and **not**
+an authenticated R-186 result. The conservative census becomes 183 shared
+looks / 126 development evaluations / 32 infrastructure looks / 613
+authenticated cells. The owner explicitly defers Claude review of section
+185 through the bounded, separately versioned R-191 matched and R-192 80%
+settlement-policy research tests; Claude should review section 185 and the
+prior pushed sections after that single lane push. No 80% return is yet
+accepted, and the old R-186 cash/reader gates remain unchanged.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
@@ -667,7 +683,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–184
+findings, outcomes, and per-run accounting remain in numbered sections 1–185
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -24237,3 +24253,127 @@ Codex counter-reviews every Claude commit. Only after that handoff should
 any new execution-cash diagnosis or separately versioned order-reserve
 policy be considered; no further post-hoc fraction sweep, leverage run, or
 formal-alpha claim follows from these refusals.
+
+## 185. Owner/Mia settlement-cash diagnosis and prospective matched repair, 2026-09-25
+
+After the section-184 single push, the owner reported that Mia fixed the
+80% project and explicitly directed Codex to continue without waiting for
+Claude's independent review. This is a bounded owner exception to the
+serialized review timing, not acceptance of the previous snapshot, a waiver
+of cash/lineage/result gates, or live/paper/funded trading authority. Claude
+will review the exact later pushed source and evidence; Codex will then
+counter-review every Claude commit in this same lane. The already-pushed
+R-186/R-187/R-188/R-189 sources, claims, and invalid A1 receipts remain
+immutable.
+
+**Authenticated value-free QC census.** Private project `36935164`
+(`109 ARV2 SIX CAP90 TILT80 R186 2021 2025`) has five backtests. Original
+R-186 A1 `8aeb2084d160f3d13b2849540116f422` is `Runtime Error` and
+already counted in section 183.1. Four later owner/Mia launches are:
+
+| Backtest ID | QC name / role | Terminal status | Accounted here |
+|---|---|---|---|
+| `63718874d7ded09ef0e56c3039f9ab18` | `ARV2 MOO probe ABBV 2023-11-28` / one-day mechanism probe | `Completed.` | One look, conservatively a development evaluation pending exact source/outcome-scope evidence. No strategy result read. |
+| `96e893534c6cab2da9a9c53491e3c1d1` | `tilt80 admission bridge - settlement-scoped cash audit fix` / repair v1 | `Runtime Error` | One development look; no result read. |
+| `62925e83f6be1933f73e4670c53de3fb` | `tilt80 admission bridge - settlement-scoped cash audit fix v2` / repair v2 | `Runtime Error` | One development look; no result read. |
+| `5d22091028f19f0787120bd7b4db3f2d` | `ARV2 settlement-scoped margin refusal v3` / repair v3 | `Completed.` | One development look, **zero accepted cells** pending source/run authentication and a new policy-specific bounded reader. |
+
+This append-only R-190 reconciliation advances the shared research-look
+floor **179 -> 183**, ARV2 development evaluations **122 -> 126**, leaves
+infrastructure looks at **32**, and leaves authenticated cells at **613**.
+Counting the one-day probe as development is intentionally conservative;
+its exact run snapshot and what Mia inspected are not yet authenticated.
+No `backtests/read`, standard statistic, raw provider/price/order row,
+chart, or log was used for this census. A QC `Completed.` terminal state
+does not by itself establish strategy validity or return.
+
+**Current cloud source versus pinned R-186.** An authenticated read of the
+project's current files found the original 16 projected source paths plus
+Mia's extra `mia.ipynb`. Thirteen of those 16 source files and the 80%
+target file are byte-identical to the pinned R-186 projection; exactly two
+code files differ: `accepted_risk_order_level_core.py` and
+`accepted_risk_six_universe_order_bridge_qc_runtime.py`. In the order core,
+Mia removed the immediate negative buy-fill-prefix cash refusal and added
+a negative **final settled cash** refusal after the terminal lifecycle
+check. In the bridge, Mia observes signed post-order-event cash, tracks
+submitted market-on-open IDs, and tolerates a negative event observation
+when **any** tracked MOO remains open, while retaining a nonnegative daily
+cash check. The source read is current-project state, not cryptographic
+proof of v3's exact snapshot (the v3 backtest has its own snapshot ID).
+Mia's extra notebook is not imported or projected into the strategy.
+
+This is an execution-policy change, not a cosmetic guard repair. The
+frozen R-186 profile still says `realized_borrowing_allowed: false`, its
+original result reader authenticates the old 16-file hash and A1 backtest
+ID, and its bridge reader refuses a negative event-cash minimum. Thus Mia's
+completed v3 is an **unaccepted diagnostic**, not an R-186 result and not
+automatically comparable with R-182 or R-185. No 80% return is recorded or
+inferred from QC's standard statistics. In particular, keeping the old
+profile SHA while changing the cash rule would falsely bind different
+economics to one identity. `ARV2CR185-001` (P2, confirmed and open) records
+that lineage/validity mismatch; no frozen old reader or old result is
+weakened or relabelled.
+
+**Prospective repair family, before any new QC mutation.** R-191 is the
+unchanged R-182 matched market-cap target and R-192 is the unchanged R-186
+80% analyst-revision weight-tilt target, both under one separately named
+settlement-scoped order/cash policy. They retain the same point-in-time
+selected stock IDs, six budgets and ETF fallbacks, 2021-01-04 through
+2025-12-31 window, 261 weekly decisions, next-session whole-share MOO,
+RAW execution prices, 10-bps-per-side modeled costs, 98% target gross,
+2x **order-admission** leverage only, and end-day gross at most 1x. The
+new profile and aggregate schemas must explicitly permit *temporary*
+negative cash only when a tracked **sell** MOO remains pending, report a
+finite signed event-cash minimum and explained/unexplained negative-event
+counts honestly, and require all orders terminal/filled, zero invalid or
+canceled, nonnegative final settled and daily-close cash, and the unchanged
+2% mean/5% maximum target-weight L1 tracking bounds. A pending buy alone,
+an unexplained negative event, a negative final settled balance, nonfinite
+cash, or a negative daily close must refuse. This is not a 2x portfolio
+target or authority for broker, paper/live, funded, or real orders.
+
+The two candidate profiles, full source-file hashes, exact private project
+and backtest names, one-use waivers, and aggregate-only result readers must
+be pinned and committed **before** either QC launch. Run R-191 first; a
+clean R-192-minus-R-191 comparison requires both to complete under the
+same new policy and pass independent authenticated validity gates. Each
+`backtests/create` is a separate development look and each candidate has
+at most three QC launch attempts, with no byte-identical retry of a known
+deterministic failure. These same-window repairs are exploratory, not
+untouched confirmation. The existing R-182/R-185 returns are context only
+unless execution-policy path equivalence is proved. No new QC project,
+compile, backtest, result read, or look for R-191/R-192 existed at this
+prospective decision point.
+
+**Frozen R-191/R-192 A1 identities before launch.** The host-only
+`accepted_risk_six_universe_order_settlement_qc_projection.py` derives the
+unchanged R-182 matched and R-186 tilt-80 target sources, then makes only
+the separately versioned cash/order, profile, and entrypoint changes. The
+host-only `six_universe_settlement_submission.py` independently pins the
+same projection/profile/source-manifest digests. Both use one exact
+owner-waived exploratory research launch, not a detached-signature claim
+and not trading authority.
+
+| Candidate | Exact private QC project / A1 backtest | Projection SHA-256 | Profile SHA-256 | Source-manifest SHA-256 / source closure | Exact waiver ID |
+|---|---|---|---|---|---|
+| R-191 matched | `113 ARV2 SIX CAP90 SETTLED MATCHED R191 2021 2025` / `ARV2 R191A1 six cap90 settlement 2021 2025 883fc448` | `883fc448d6b5a3f7800921988a174995ad233e0c8eab5434f6b18874b189a5bb` | `f650044a704a4a0522e4c95c065a3eda3d3de22e8c5425579e04155c88f5220c` | `5bf0cdc32148d84105256da5c818c1d023ee996b27a014302fe7c250ad1f9f73` / 14 files, 397,120 bytes | `ARV2-OWNER-2026-09-25-R191A1-MATCHED-SETTLEMENT-EXPLORATORY-SIGNATURE-WAIVER` |
+| R-192 tilt 80% | `114 ARV2 SIX CAP90 SETTLED TILT80 R192 2021 2025` / `ARV2 R192A1 six cap90 settlement 2021 2025 8f5db5bf` | `8f5db5bf895a51683d9c7c2a4848c302aeac01284317ceaab9e22d9c9b3c3b09` | `2c149ea159473f7976f10daa5ad74b0a3f8d0bf6992911e96a58b3a7a490f923` | `023707c5709525247ac88384e5ea356655ef5501fb7f07e19b158642456224ae` / 16 files, 425,742 bytes | `ARV2-OWNER-2026-09-25-R192A1-TILT80-SETTLEMENT-EXPLORATORY-SIGNATURE-WAIVER` |
+
+R-192 binds R-191's **new** profile digest, not the old R-182 profile.
+Neither source admits an 80%-of-portfolio allocation claim: 80% is the
+maximum change relative to an individual selected stock's own baseline
+weight; the names, six sleeve budgets, and total 98% target stay fixed.
+The exact new aggregate schema drops the misleading old
+`order_event_cash_nonnegative` field. Source/readback, result identity,
+signed-cash consistency, terminal order census, cost, exposure, tracking,
+and one-use result-read checks remain independent fail-closed gates.
+The exact local control directory is
+`artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923` in this
+worktree. A read-only check against the already-authorized QC organization
+and the locally authenticated package produced canonical R-191/R-192
+waiver-payload SHA-256 values
+`2539b3e7d6b47af5bd95ed13247fee6c0db93260cd2061ecea669f0a1265e0af`
+and
+`0193be500c0ad81390bfc90c214b38e56d6c3cd139bfaf30553fb99de0ff0ae5`,
+respectively. That check did not create a project, compile, launch a
+backtest, or read an outcome.

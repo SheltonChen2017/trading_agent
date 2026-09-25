@@ -191,7 +191,11 @@ def test_review_sentence_classifier_requires_agent_and_accepts_verb_forms() -> N
 
 SHARED_LOOK_LEDGER = RECORD.parents[1] / "research" / "alpha-result.md"
 _CANDIDATE_ID = re.compile(r"\bR-(\d{3})\b")
-_RECORDED_BACKTEST = re.compile(r"backtest\s+`[0-9a-f]{32}`")
+_RECORDED_BACKTEST = re.compile(
+    r"backtest\s+`[0-9a-f]{32}`"
+    r"|^\|\s*Backtest\s*\|[^\n]*`[0-9a-f]{32}`",
+    flags=re.MULTILINE,
+)
 _SECTION_HEADING = re.compile(r"(?m)^(#{2,3} .*)$")
 
 
@@ -208,9 +212,9 @@ def _launched_candidates(record: str) -> dict[str, str]:
 
 
 def test_shared_look_ledger_names_every_launched_candidate() -> None:
-    # The shared ledger is the cross-lane look census; a candidate whose
-    # record section names a launched backtest must have a ledger heading,
-    # alone or combined with others, so no launch is counted only in prose.
+    # The shared ledger is the cross-lane look census. This checks that each
+    # detected launched candidate has a heading, not that every additional
+    # launch under an already-ledgered candidate has its own run-level entry.
     record = RECORD.read_text(encoding="utf-8")
     ledger = SHARED_LOOK_LEDGER.read_text(encoding="utf-8")
     ledger_candidates = {
@@ -239,6 +243,23 @@ def test_launched_candidate_classifier_requires_a_backtest_identity() -> None:
         "### 2.1 R-902 attempt\n\nCompiled and launched backtest `" + "b" * 32 + "`.\n"
     )
     assert sorted(_launched_candidates(record)) == ["901", "902"]
+
+
+def test_launched_candidate_classifier_accepts_backtest_table_rows() -> None:
+    record = (
+        "## 1. R-900 unlaunched\n\n| Source | `" + "0" * 32 + "` |\n\n"
+        "## 2. R-901 completed\n\n| Backtest | `" + "a" * 32 + "`; run name |\n\n"
+        "### 2.1 R-902 attempt\n\n| Backtest | `run name`, id `"
+        + "b" * 32
+        + "` |\n\n"
+        "## 3. R-903 planned\n\n| Backtest | `run name only` |\n"
+    )
+    assert sorted(_launched_candidates(record)) == ["901", "902"]
+
+
+def test_launched_candidate_classifier_covers_historical_table_rows() -> None:
+    launched = _launched_candidates(RECORD.read_text(encoding="utf-8"))
+    assert {"053", "173", "174", "175", "176"} <= launched.keys()
 
 
 def test_owner_review_waiver_classifier_is_exact_and_section_shaped() -> None:

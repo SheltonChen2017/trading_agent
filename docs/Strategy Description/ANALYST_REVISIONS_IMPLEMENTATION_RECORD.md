@@ -199,7 +199,7 @@ exhaustive lifecycle-to-named-refusal builder now exists. The status envelope
 and exact result reader are implemented but have not been used. B5D and the
 section-69 candidate were accepted in section 70. The order-level lineage
 through V16 and the R-169 through R-172 execution evidence are accepted in
-section 165 with no code correction, pending Codex counter-review; section 166 adds the immutable V17 fail-closed decision-skip successor as a candidate pending Codex counter-review and records the R-173 diagnostic refusal; section 180 reconciles the shared look ledger and reviews the cap-90 bridge, matched and tilt runs as exploratory cells; section 167 adds the immutable V18 bounded-boundary successor as a candidate pending Codex counter-review and records the R-174 diagnostic outcome; no
+section 165 with no code correction, pending Codex counter-review; section 166 adds the immutable V17 fail-closed decision-skip successor as a candidate pending Codex counter-review and records the R-173 diagnostic refusal; section 167 adds the immutable V18 bounded-boundary successor as a candidate pending Codex counter-review and records the R-174 diagnostic outcome; section 180 later reconciles the shared look ledger and reviews the cap-90 bridge, matched and tilt runs as exploratory cells; no
 wording above grants physical access or makes a pristine-PIT claim.
 
 The production source, firm-ontology, security-master, classification, cost,
@@ -562,16 +562,18 @@ independent review of the exact pushed range `87dd82f..b2df5ea`, with the
 test-only corrections `2bd3368` and `865ae3b`. Section 179 records Codex's counter-review of all
 three Claude commits and bounded, redacted R-181 A2
 order diagnostics: all 22 invalid orders were buys rejected before 09:30 New
-York time for insufficient buying power. R-181 remains invalid, its A3 attempt
-is unspent, and no R-182 or tilt comparison has launched. Before A3, freeze
-and test the owner's prospective 2x buying-power admission bridge while
-preserving the 98% target and bounding observed cash, gross exposure, and
-target tracking. Detached signatures are explicitly waived only for
-exploratory R-181 A3, R-182, and the separate tilt candidate; exact one-use
-claims and source gates remain required. R-182's
-existing A2-valid predecessor pin must be prospectively changed to the actual
-authenticated A3 result if valid; an invalid A2 cannot yield a clean matched
-spread. The separately versioned tilt candidate is local and unlaunched.
+York time for insufficient buying power. At that prelaunch point A3 was
+unspent and neither comparator had launched. Section 179.1 then freezes and
+tests the owner's research-only 2x buying-power admission bridge, preserving
+the 98% target and bounding observed cash, gross exposure, and target
+tracking. Detached signatures were explicitly waived only for exploratory
+R-181 A3, R-182 A1, and R-184 A1; exact one-use claims and source gates
+remained required. R-181 A3, R-182 A1, and R-184 A1 subsequently completed
+with authenticated valid aggregates; sections 179.1, 179.3, and 179.4 record
+their exploratory returns and limitations. Section 180 counts all three as
+exploratory cells, not formal alpha evidence; R-182 also has an unrecorded
+second launch that consumes its second attempt slot. R-183 remains signed
+and unlaunched.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
@@ -590,9 +592,12 @@ R-177 produced no economic result.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
-Codex runs it only if the owner explicitly requests it. Claude will review
-section 170 and the final cumulative pushed snapshot; no intermediate
-unreviewed QC experiment becomes accepted evidence merely by completing.
+Codex runs it only if the owner explicitly requests it. Claude has reviewed
+the pushed range through section 180; Claude will review section 181
+independently after Codex's next combined push. The owner has directed Codex
+to counter-review section 180 and begin the next backtesting round before
+that review. No intermediate unreviewed QC experiment becomes accepted
+evidence merely by completing.
 Each distinct backtest candidate has a hard maximum of three QC attempts.
 A compile failure, runtime error, or any other unsuccessful terminal run each
 counts as one attempt. After the third failure Codex makes no further code
@@ -621,7 +626,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–178
+findings, outcomes, and per-run accounting remain in numbered sections 1–181
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -23274,7 +23279,7 @@ printed.
 
 **Verdict.** All twenty-eight commits are accepted; `c599301` and the
 range's record chain are accepted after the two record corrections in this
-round (`ARV2R180-001`, `ARV2R180-002`). **0 P0, 0 P1, 4 P2, 6 P3.** No
+round (`ARV2R180-001`, `ARV2R180-002`). **0 P0, 0 P1, 3 P2, 7 P3.** No
 production line changed in this round: this session adds one lane-record gate
 and the five missing shared-ledger entries, and reconciles the look totals.
 
@@ -23435,3 +23440,87 @@ No fourth R-181 attempt, R-178/R-179 launch, leverage beyond the recorded
 research-only admission bridge, six-universe expansion beyond the cap-90
 family, paper/live deployment, broker, funded-account, real-order or trading
 action is authorised. `ARV2CR28-008` remains out of lane.
+
+## 181. Codex counter-review of the section-180 ledger reconciliation and R-183 prelaunch gate, 2026-09-24
+
+**Exact scope and disposition.** The designated worktree fast-forwarded from
+`c599301` to Claude's pushed `dcb7157` with a clean tree. Both incoming
+commits were reviewed separately. `1a21d57` is accepted after the narrow
+lane-record test correction below: its five append-only shared-ledger entries
+reconcile arithmetically from 159 / 102 / 27 / 608 to **173 shared looks /
+116 ARV2 development evaluations / 32 infrastructure looks / 611
+authenticated cells**. The three `run_valid=true` outcome reads count as
+three *exploratory* authenticated cells, not formal alpha cells; counts-only
+R-180 remains infrastructure. A status-only QC inventory independently found
+five backtests in project `36854638` (R-180) and two in `36909823` (R-182),
+including the exact previously unrecorded `06bdcc2a...` and `78d6532e...`
+identities. Neither was read for outcomes or adopted as evidence. The latter
+consumes R-182's second of three launch slots. `dcb7157` is accepted after
+correcting its 3-P2/7-P3 finding arithmetic and the lane record's stale
+active-status prose. No production strategy or QC source changed in the
+incoming range or these corrections.
+
+| Finding | Priority | Counter-review disposition |
+|---|---|---|
+| `ARV2CR181-001` | P3 | Corrected. Section 180.1 said four P2/six P3, but its ten finding rows classify `-001/-002/-004` P2 and the other seven P3. The summary now says three P2/seven P3. The active status also still said R-181 A3 was unspent and R-182/tilt unlaunched; it now distinguishes the earlier A2 prelaunch point from the later valid A3/R-182/R-184 reads. |
+| `ARV2CR181-002` | P3 | Corrected in the lane-record gate. The new launched-candidate classifier recognized prose `backtest \`<32-hex>\`` but missed five earlier own-section `| Backtest | ... id \`<32-hex>\` |` rows (R-053, R-173, R-174, R-175, R-176). A table-row fixture and real-record assertion pin that additional shape. |
+| `ARV2CR181-003` | P3 | Documented limit, not a second-gate claim: a ledger *heading* check does not count additional launches of an already-ledgered candidate; Claude's R-182 rerun is the counterexample. A status-only project census and append-only run accounting remain necessary before claiming complete totals. |
+| `ARV2CR181-004` | P3 | Documented process scope. The correctly reconciled `docs/research/alpha-result.md` is shared-project state; retaining Claude's accepted append does not by itself grant future shared-file edits. The owner is being asked explicitly whether this round may append a new R-183 entry. |
+| `ARV2CR181-005` | P2 prelaunch | The frozen R-183 ETF-basket A1 source has 1x order admission, while the valid R-181 A3/R-182 A1 used the separate research-only 2x admission bridge. The shared 98% target is insufficient to call their execution policies identical. An original 1x R-183 run would be contextual only; a clean execution-policy comparison needs a prospectively versioned R-183 bridge and the same cash/gross/tracking gates. The R-183 launcher also requires an exact detached owner signature: the earlier waiver excludes it. No R-183 launch or result is claimed here; the owner has been asked to choose the route and signing mode. |
+| `ARV2CR181-006` | P2 prelaunch | Corrected during independent audit of the locally prepared successor. The retained original 13-file R-183 A1 path used generic `preview()` without pinning section 176's superseding exact source/profile/project/run identity. That original path now refuses changed identities, while the separate 14-file bridge remains opt-in by its own exact source. Focused tests isolate the original pin and R-182 predecessor-control tampering. No launch was made under the former check. |
+
+**Other section-180 findings.** `ARV2R180-001` and `-002` are independently
+confirmed and their accounting correction is accepted. `-003` is confirmed
+by the fifth R-180 status row. `-004`'s three exploratory-cell classification
+is accepted for the valid one-use economic reads. `-005/-006` are equivalent
+or redundant defenses in the safe direction; no production change is
+warranted. For `-007`, the owner's explicit direction to investigate why
+R-181's orders were rejected authorized the bounded count-only A2 diagnosis;
+raw order values were not retained. `-008` is a Windows-host class, while
+this designated POSIX worktree can run the focused selection. `-009` is
+superseded by section 180.2's second-slot census. `-010` is a provenance
+caution: later byte-identical QC re-saves do not replace the launcher's
+prelaunch source verification or independently prove historical snapshot
+bytes. No finding authorizes live/paper/funded orders or a levered portfolio
+target.
+
+**Next exact gate.** Counter-review validation and an R-183 source/policy
+choice precede any project mutation. R-183 has zero used attempts and its
+existing signed 13-file/1x candidate is not silently converted into a
+bridge run. The owner will choose either the original contextual basket or
+a versioned execution-matched bridge, and provide an exact signature or an
+R-183-specific exploratory waiver before one private order-based QC A1.
+The standing maximum is three launch attempts for R-183; an unsuccessful
+third attempt stops without disguising a fourth as a new candidate. The
+result, if any, remains exploratory and is compared without winner
+selection. No complete lane suite is run by Codex under the owner rule.
+
+### 181.1 Local preparation of an execution-matched R-183 basket
+
+The original section-176 R-183 A1 candidate remains a distinct, unlaunched
+13-file/1x-admission source. For an execution-policy-matched *alternative*, a
+14-file bridge source has been prepared locally, but **not activated** while
+the owner's route and signature choice is pending. Its exact private project
+is `106 ARV2 SIX CAP90 ETF R183 2021 2025`; the proposed A1 backtest name is
+`ARV2 R183A1 six cap90 bridge ETF basket 2021 2025 980528e2`. The bridge
+projection SHA-256 is
+`980528e2ae982c7c8e19e07b856a15b7c386b338acf66336abe2766ff512de80`
+(14 files, 394,276 bytes); its role-bound profile SHA-256 is
+`7e4a108e378f59f5927225c919b2a7e9bae4ed3de6cfd89a31a8a416e3a00349`.
+The source keeps the six equal-budget ETF basket and the frozen 2021-01-04
+through 2025-12-31 axis, but uses the same research-only 2x *buying-power
+admission* bridge as valid R-181 A3 and R-182 A1. It still targets 98% gross,
+not a levered portfolio, and remains subject to nonnegative observed cash,
+at-most-1x end-day gross, target-tracking, and zero-invalid/canceled-order
+validity gates. It can be launched only after the authenticated R-182 A1
+predecessor chain and an R-183-specific owner signature or waiver; the
+R-181/R-182/R-184 waiver does not apply. No QC project, compile, backtest,
+economic result read, or research look is claimed for R-183 here. If the
+owner instead selects the original 1x source, its result is contextual and
+not an execution-policy-matched basket comparison.
+
+Focused local validation after the counter-review and bridge preparation:
+the QC submission, lane-record integrity, and active-document selections
+passed **155 tests** under the configured Python 3.13 environment; no
+complete lane suite was run. The original R-183 identity pin and four
+predecessor-receipt mismatch regressions are included before any launch.

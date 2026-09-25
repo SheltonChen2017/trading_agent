@@ -3,7 +3,8 @@
 This module never acts on import. A1 creates one private project per role;
 the narrowly pinned R181 A2 and final A3 repair that same project in place.
 The owner-waived bridge is limited to R181 A3 and R182 A1, with exact source,
-predecessor, and one-use controls; R183 retains its detached-signature gate.
+predecessor, and one-use controls. The separately pinned R183 A1 bridge
+retains its detached-signature gate; the original 1x R183 source is not edited.
 Only two bounded custom statistics may be retained from a completed run.
 """
 
@@ -69,8 +70,13 @@ _R181_A2_CONTROL_SHA256 = {
 }
 _R181_A3_PROJECTION_SHA256 = "f75725c37cb5e66f7db4070fcf89a05d5efe29cda60b6fc75086615d622cce0d"
 _R182_BRIDGE_PROJECTION_SHA256 = "186cb2bb3dbd2a37358c9c0b2dbfa86e1e685203dba33795eb192f74faa9feeb"
+_R183_ORIGINAL_PROJECTION_SHA256 = "3df9bfe2dd05c47c34b52de0b544aeaa68a3ee7f2ffec65437ac020d07ee41d7"
+_R183_BRIDGE_PROJECTION_SHA256 = "980528e2ae982c7c8e19e07b856a15b7c386b338acf66336abe2766ff512de80"
 _R181_A3_PROFILE_SHA256 = "9e1b93c3fc5fca0cd3154f8c8270fd10cdb2acc67742e9712aafb5682fbed031"
 _R182_BRIDGE_PROFILE_SHA256 = "b419d3f2b149a1509ef09bd0a5bf607bea8c25a3363cbc8a9dc04a40910f9c0c"
+_R183_ORIGINAL_PROFILE_SHA256 = "8d6f58c2a4ac427c7f81487d5ad00c901b4822a530bb0b6e9d729160819b4c1c"
+_R183_BRIDGE_PROFILE_SHA256 = "7e4a108e378f59f5927225c919b2a7e9bae4ed3de6cfd89a31a8a416e3a00349"
+_R183_PROJECT_NAME = "106 ARV2 SIX CAP90 ETF R183 2021 2025"
 _R181_A1_PROJECTION_SHA256 = "947fd40922e2503a118e54bde8c0475cd9504fa0d2d212ccdc40e36f6fc72dc0"
 _R181_A1_CLAIM_SHA256 = "bcef1a218cd15cd22b9f470b5cdbba9e08b3bb555b74edfd09c5a961329983ff"
 _R181_A1_FAILED_RUNTIME = (1, "334359b90efed75da5f0ada1d5e6b256f4a6bd0aee7eb39c0f90182a021ffc8b")
@@ -293,8 +299,19 @@ def _preview_exact(
 
 
 def preview(plan: Cap90QcPlan, projection: object) -> dict:
-    """Validate the original A1 source without I/O."""
-    return _preview_exact(plan, projection, attempt=1)
+    """Validate the original A1 source, including R183's superseding pin."""
+    identity = _preview_exact(plan, projection, attempt=1)
+    if plan.candidate_id == "R183" and (
+        plan.projection_sha256 != _R183_ORIGINAL_PROJECTION_SHA256
+        or plan.profile_sha256 != _R183_ORIGINAL_PROFILE_SHA256
+        or plan.project_name != _R183_PROJECT_NAME
+        or plan.backtest_name != (
+            "ARV2 R183A1 six cap90 ETF basket 2021 2025 "
+            + _R183_ORIGINAL_PROJECTION_SHA256[:8]
+        )
+    ):
+        _fail("cap-90 original R183 source, project, or run is not frozen")
+    return identity
 
 
 def preview_a2(plan: Cap90QcPlan, projection: object) -> dict:
@@ -313,30 +330,39 @@ def preview_a2(plan: Cap90QcPlan, projection: object) -> dict:
     return identity
 
 
+def _is_bridge_run(plan: Cap90QcPlan) -> bool:
+    """R183's bridge is opt-in by its exact versioned projection, not its role."""
+    return (plan.candidate_id, plan.attempt) in {("R181", 3), ("R182", 1)} or (
+        plan.candidate_id == "R183"
+        and plan.attempt == 1
+        and plan.projection_sha256 == _R183_BRIDGE_PROJECTION_SHA256
+    )
+
+
 def preview_bridge(plan: Cap90QcPlan, projection: object) -> dict:
-    """Admit only the separately pinned bridge source for R181 A3 or R182 A1."""
+    """Admit only each prospectively pinned, role-bound bridge source."""
     if type(plan) is not Cap90QcPlan or (
         plan.candidate_id, plan.attempt
-    ) not in {("R181", 3), ("R182", 1)}:
-        _fail("cap-90 bridge attempt is not R181 A3 or R182 A1")
+    ) not in {("R181", 3), ("R182", 1), ("R183", 1)}:
+        _fail("cap-90 bridge attempt is not a frozen candidate")
     identity = _preview_exact(plan, projection, attempt=plan.attempt, bridge=True)
-    expected_sha = (
-        _R181_A3_PROJECTION_SHA256 if plan.candidate_id == "R181"
-        else _R182_BRIDGE_PROJECTION_SHA256
-    )
-    expected_profile_sha = (
-        _R181_A3_PROFILE_SHA256 if plan.candidate_id == "R181"
-        else _R182_BRIDGE_PROFILE_SHA256
-    )
-    expected_project_name = (
-        _R181_A2_PROJECT_NAME if plan.candidate_id == "R181"
-        else "105 ARV2 SIX CAP90 MATCHED R182 2021 2025"
-    )
-    backtest_prefix = (
-        "ARV2 R181A3 six cap90 bridge signal 2021 2025 "
-        if plan.candidate_id == "R181" else
-        "ARV2 R182A1 six cap90 bridge matched 2021 2025 "
-    )
+    expected_sha, expected_profile_sha, expected_project_name, backtest_prefix = {
+        "R181": (
+            _R181_A3_PROJECTION_SHA256, _R181_A3_PROFILE_SHA256,
+            _R181_A2_PROJECT_NAME,
+            "ARV2 R181A3 six cap90 bridge signal 2021 2025 ",
+        ),
+        "R182": (
+            _R182_BRIDGE_PROJECTION_SHA256, _R182_BRIDGE_PROFILE_SHA256,
+            "105 ARV2 SIX CAP90 MATCHED R182 2021 2025",
+            "ARV2 R182A1 six cap90 bridge matched 2021 2025 ",
+        ),
+        "R183": (
+            _R183_BRIDGE_PROJECTION_SHA256, _R183_BRIDGE_PROFILE_SHA256,
+            _R183_PROJECT_NAME,
+            "ARV2 R183A1 six cap90 bridge ETF basket 2021 2025 ",
+        ),
+    }[plan.candidate_id]
     if (
         type(expected_sha) is not str or not _HEX.fullmatch(expected_sha)
         or type(expected_profile_sha) is not str
@@ -361,7 +387,7 @@ def render_owner_launch_permit(plan: Cap90QcPlan, projection: object) -> bytes:
         _fail("cap-90 signed launch plan type changed")
     if plan.attempt == 1:
         identity = (
-            preview_bridge(plan, projection) if plan.candidate_id == "R182"
+            preview_bridge(plan, projection) if _is_bridge_run(plan)
             else preview(plan, projection)
         )
         project_id = None
@@ -590,6 +616,49 @@ def _require_prior_valid_role(plan: Cap90QcPlan) -> None:
         ))
     ):
         _fail("cap-90 preceding matched role is not authenticated valid")
+    if prior == "R182" and _is_bridge_run(plan):
+        root = plan.control_directory
+        claim = _read_control(root / "R182-A1-claim.json")
+        launch = _read_control(root / "R182-A1-launch.json")
+        terminal = _read_control(root / "R182-A1-terminal.json")
+        result_read = _read_control(root / "R182-A1-result-read-claim.json")
+        project_id = prior_result.get("project_id")
+        backtest_id = prior_result.get("backtest_id")
+        if (
+            prior_result.get("attempt") != 1
+            or type(project_id) is not int or project_id <= 0
+            or type(backtest_id) is not str or not _ID.fullmatch(backtest_id)
+            or type(prior_result.get("target_path_sha256")) is not str
+            or not _HEX.fullmatch(prior_result["target_path_sha256"])
+            or claim.get("candidate_id") != "R182"
+            or claim.get("role") != "matched"
+            or claim.get("projection_sha256") != _R182_BRIDGE_PROJECTION_SHA256
+            or claim.get("profile_sha256") != _R182_BRIDGE_PROFILE_SHA256
+            or type(claim.get("source_files")) is not list
+            or len(claim["source_files"]) != 14
+            or launch.get("candidate_id") != "R182"
+            or launch.get("role") != "matched"
+            or launch.get("project_id") != project_id
+            or launch.get("project_name") != (
+                "105 ARV2 SIX CAP90 MATCHED R182 2021 2025"
+            )
+            or launch.get("backtest_id") != backtest_id
+            or launch.get("backtest_name") != (
+                "ARV2 R182A1 six cap90 bridge matched 2021 2025 "
+                + _R182_BRIDGE_PROJECTION_SHA256[:8]
+            )
+            or launch.get("projection_sha256") != _R182_BRIDGE_PROJECTION_SHA256
+            or launch.get("profile_sha256") != _R182_BRIDGE_PROFILE_SHA256
+            or terminal != {
+                "candidate_id": "R182", "status": "Completed.",
+                "project_id": project_id, "backtest_id": backtest_id,
+            }
+            or result_read != {
+                "candidate_id": "R182", "project_id": project_id,
+                "backtest_id": backtest_id,
+            }
+        ):
+            _fail("cap-90 R182 bridge predecessor chain changed")
     if prior == "R181":
         root = plan.control_directory
         claim = _read_control(root / "R181-A3-claim.json")
@@ -1069,7 +1138,7 @@ def launch_a1(
 ) -> dict:
     """Claim before mutation; create, byte-check, compile, and launch once."""
     identity = (
-        preview_bridge(plan, projection) if plan.candidate_id == "R182"
+        preview_bridge(plan, projection) if _is_bridge_run(plan)
         else preview(plan, projection)
     )
     _require_prior_valid_role(plan)
@@ -1414,9 +1483,7 @@ def _project_aggregate(aggregate: dict, *, bridge: bool = False) -> dict:
 def _attest_uploaded_source(plan: Cap90QcPlan, launch: dict, api: QuantConnectClient) -> None:
     """Recheck current project bytes; historical run-snapshot bytes remain unproven."""
     claim = _read_control(_control_path(plan, "claim"))
-    expected_file_count = 14 if (
-        plan.candidate_id, plan.attempt
-    ) in {("R181", 3), ("R182", 1)} else 13
+    expected_file_count = 14 if _is_bridge_run(plan) else 13
     if (
         claim.get("projection_sha256") != launch["projection_sha256"]
         or claim.get("profile_sha256") != launch["profile_sha256"]
@@ -1445,6 +1512,18 @@ def _attest_uploaded_source(plan: Cap90QcPlan, launch: dict, api: QuantConnectCl
             )
         ):
             _fail("cap-90 bridge launch waiver identity changed")
+        if plan.candidate_id == "R183":
+            signature_keys = (
+                "owner_signature_authority_sha256", "owner_signature_sha256",
+                "owner_signed_payload_sha256",
+            )
+            if any(
+                type(claim.get(key)) is not str
+                or not _HEX.fullmatch(claim[key])
+                or claim[key] != launch.get(key)
+                for key in signature_keys
+            ) or any(key in claim or key in launch for key in authority_keys):
+                _fail("cap-90 R183 bridge signature receipt changed")
     files = _post(api, "files/read", {"projectId": launch["project_id"]}).get("files")
     if type(files) is not list or len(files) != expected_file_count:
         _fail("cap-90 result-time project source inventory changed")
@@ -1502,9 +1581,7 @@ def _valid_result_receipt(
 
 def read_aggregates_once(plan: Cap90QcPlan, launch: dict, api: QuantConnectClient) -> dict:
     """One read after Completed.; authenticate only META/AGGREGATES."""
-    bridge_run = (plan.candidate_id, plan.attempt) in {
-        ("R181", 3), ("R182", 1),
-    }
+    bridge_run = _is_bridge_run(plan)
     summary_schema = (
         bridge_runtime.BRIDGE_SUMMARY_SCHEMA if bridge_run
         else runtime.CAP90_SUMMARY_SCHEMA

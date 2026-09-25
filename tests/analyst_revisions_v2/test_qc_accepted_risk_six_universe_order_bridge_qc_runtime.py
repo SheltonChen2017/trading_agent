@@ -300,6 +300,28 @@ def test_bridge_observes_each_order_event_cash_and_refuses_borrowing(
     assert driver._bridge_event_cash_count == 1
 
 
+@pytest.mark.parametrize("invalid_cash", ("-1", "NaN", "Infinity", "-Infinity"))
+def test_bridge_order_event_refuses_nonfinite_or_negative_cash_before_record(
+    monkeypatch, invalid_cash
+):
+    driver = _bare_bridge()
+    driver._algorithm.portfolio = SimpleNamespace(cash=Decimal(invalid_cash))
+    calls = []
+    monkeypatch.setattr(
+        base.AcceptedRiskSixUniverseOrderQcDriver,
+        "on_order_event",
+        lambda _self, event: calls.append(event) or True,
+    )
+    with pytest.raises(
+        base.AcceptedRiskSixUniverseOrderQcRuntimeError,
+        match="six-universe portfolio cash is outside its finite bound",
+    ):
+        driver.on_order_event("filled-buy")
+    assert calls == ["filled-buy"]
+    assert driver._bridge_event_cash_count == 0
+    assert driver._bridge_event_cash_minimum is None
+
+
 @pytest.mark.parametrize(
     ("mean_error", "maximum_error", "valid"),
     (("0.019", "0.049", True), ("0.02", "0.05", True),

@@ -590,9 +590,14 @@ shared looks / 118 development evaluations / 32 infrastructure looks /
 613 authenticated cells, the last exploratory.
 Section 183 prospectively freezes the owner's single 80% R-186 weight-tilt
 sensitivity and its distinct private order-based source/launch identity.
-Claude should review section 183 with sections 181–182 after this bounded
-owner-authorized round; the same-window comparison is not untouched
-validation, and its cash/order validity gates remain enforced.
+Section 183.1 records R-186 A1's authenticated cash-bound runtime refusal:
+no valid result or alpha estimate exists. Section 184 prospectively freezes
+the bounded 70% / 60% / 50% R-187–R-189 sensitivity ladder. Claude should
+review sections 181–184 after this bounded owner-authorized round; these
+same-window comparisons are not untouched validation, and their cash/order
+validity gates remain enforced.
+Claude should review section 184 after Codex's final single
+push for this owner-authorized interim backtest sequence.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
@@ -618,9 +623,10 @@ exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
 alpha evidence merely because the QC engine completed it.
-The owner's subsequent R-186 instruction extends only that interim timing
-exception through the one prospective 80% same-window experiment in section
-183. After a direct question about R-186's detached signature, the owner
+The owner's subsequent R-186 instruction extended that interim timing
+exception through the 80% same-window experiment in section 183 and the
+explicitly requested lower-tilt ladder in section 184. After a direct
+question about R-186's detached signature, the owner
 explicitly authorized starting the backtest and extended research-backtest
 authorization for this machine/session. Section 183 records the R-186-only
 one-use waiver chosen for this launch; the R-185 waiver is not reused.
@@ -652,7 +658,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–183
+findings, outcomes, and per-run accounting remain in numbered sections 1–184
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -24005,3 +24011,72 @@ owner's subsequent request for 70%, 60%, and lower tilt strengths is a new
 bounded *parameter-sensitivity family*, not a retroactive correction or
 fourth attempt at R-186. Each successor requires its own prospective
 source/launch identity and look accounting before QC mutation.
+
+## 184. Prospective lower-tilt sensitivity ladder R-187–R-189, 2026-09-25
+
+After the invalid R-186 80% cash-bound run, the owner directed Codex to
+continue the same-session backtesting without more approval requests, naming
+70% and 60% and lower strengths. Codex fixes this *bounded* ladder now as
+**R-187 = 70%, R-188 = 60%, R-189 = 50%**, in that launch order, before
+seeing any of their outcomes. All three will be reported, including failures;
+success at 70% does not cancel 60% or 50%, and failure does not trigger a
+new unbounded sweep. This is a post-R-184/R-185/R-186 same-window
+development sensitivity, not formal confirmation or a search whose best
+return may be presented as an unbiased estimate.
+
+Each candidate retains R-182's exact selected stock identities/counts,
+point-in-time market-cap baseline, ETF fallback states, six equal sleeve
+budgets, 9.8% duplicate-stock cap, 98% target gross, the 2021-01-04 to
+2025-12-31 window, 261 weekly decisions, next-session whole-share MOO
+orders, RAW execution prices, 10-bps-per-side modeled costs, and the
+research-only 2x *buying-power admission* bridge. Only the within-selected-
+stock deterministic score-rank maximum relative weight-transfer fraction
+changes. The unchanged validity gates require all rebalances and submitted
+orders to complete, zero invalid/canceled orders, finite nonnegative
+observed cash at daily-close and post-order-event boundaries, end-day gross
+at most 1x, and target L1 tracking at most 2% mean/5% maximum. The same
+R-182 target-path digest is authenticated for every candidate. No levered
+portfolio target, safety relaxation, new stock selection, or live/paper/
+funded order authority is included.
+
+Every candidate has its own exact source/profile/project/run identity,
+one-use A1 claim, and at most three QC attempts under the standing rule.
+A deterministic cash-bound refusal is not byte-identically retried. A
+successful QC `Completed.` status still needs the candidate's one bounded
+custom META/AGGREGATES read and `run_valid=true`; no raw provider/price/
+order rows, charts, logs, or standard statistics are research evidence.
+One `backtests/create` spends one shared exploratory research look and one
+ARV2 development evaluation even if the run refuses; only a valid one-time
+aggregate read adds an exploratory authenticated cell. The primary
+comparisons are each candidate's return minus unchanged R-182, with
+R-184/R-185 and the invalid R-186 disclosed as sensitivities, not a winner
+selection. Absolute risk, fees, cash/gross/tracking and six sleeve fallback
+states are reported for every valid candidate. SPY's recorded +95.6663%
+reference is contextual only because its later data vintage is not proven
+identical to these physical runs.
+
+The exact A1 source/authority pins below are committed before any of these
+three QC mutations. Each projection has the same 16 paths and 422,758 total
+source bytes as R-185; only the projected target, runtime, and entry point
+change. The source-manifest digest is over the canonical ordered path/hash/
+byte-count tuples, not a claim that the three projected files are identical.
+
+| Candidate / rank transfer | Private QC project | Projection SHA-256 | Profile SHA-256 | Source-manifest SHA-256 |
+|---|---|---|---|---|
+| R-187 A1 / 70% | `110 ARV2 SIX CAP90 TILT70 R187 2021 2025` | `3203481571307cbad000153542ac9529cb1e4a3ac1bac030f18150b6a22dcbe0` | `6189373282c0e5652bda0317d0133e1ccc52057116035ed6a51428788d8e31f2` | `7d068209b38bfdb527e85529b991a9ff30d3638667a99b24fbb1edbaf98b4412` |
+| R-188 A1 / 60% | `111 ARV2 SIX CAP90 TILT60 R188 2021 2025` | `3eed978da51ef82b0de3f44b2f3bb30311e27a8f628ed3f9b6663d902f78fc55` | `82592bb4c82078496899f2e225c31f6c47a759b93997f464fac731eff99ed875` | `239398535d2b33f5ccf2e1b156a48a941225a60ffade2bfaca24e82e4f7c7e19` |
+| R-189 A1 / 50% | `112 ARV2 SIX CAP90 TILT50 R189 2021 2025` | `e1f417b2a7e785e558ec0af83297083fa07c0bbc22c930447bb6e0e99a25f2d3` | `5314cab14e8f50e38998c07dead583eb38b57eefcb0e2ad8768d5681adec116e` | `566ca01d30590dbd7252c3a4b9bc6301618b1bac7e1721cd827c2001ccdb29ba` |
+
+The exact proposed backtest name is `ARV2 R187A1 six cap90 bridge tilt70
+2021 2025 32034815`, and analogously `ARV2 R188A1 six cap90 bridge tilt60
+2021 2025 3eed978d` and `ARV2 R189A1 six cap90 bridge tilt50 2021 2025
+e1f417b2`. Distinct A1 owner-waiver IDs are
+`ARV2-OWNER-2026-09-25-R187A1-TILT70-EXPLORATORY-SIGNATURE-WAIVER`,
+`ARV2-OWNER-2026-09-25-R188A1-TILT60-EXPLORATORY-SIGNATURE-WAIVER`, and
+`ARV2-OWNER-2026-09-25-R189A1-TILT50-EXPLORATORY-SIGNATURE-WAIVER`.
+The owner authorized all research backtesting in this session on this machine
+and expressly declined further narrow approval prompts. These exact one-use
+attestations scope that standing authorization to each frozen research source;
+they are **not** signed artifacts, do not borrow R-186's waiver, and grant
+no paper/live/funded/broker order authority. At this prospective freeze none
+of the three has a project, compile, backtest, result read, or spent look.

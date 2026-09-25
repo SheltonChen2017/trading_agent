@@ -4470,3 +4470,54 @@ looks remain **32** and authenticated cells remain **613**. This count
 includes Mia's launches even though Codex did not submit them. It neither
 rewrites the previous R-186 refusal nor treats the new policy as the
 original 80% test.
+
+## R-191 — settlement-policy same-selected-stock market-cap weights, A1 valid exploratory result — 2026-09-25
+
+Analyst lane section 185 prospectively pinned a distinct settlement-cash
+execution policy, exact 14-file source/profile, private project, and
+owner-waived one-use research launch before QC mutation. Private project
+`113 ARV2 SIX CAP90 SETTLED MATCHED R191 2021 2025` (`36957444`)
+read back and compiled the exact projection SHA-256
+`883fc448d6b5a3f7800921988a174995ad233e0c8eab5434f6b18874b189a5bb`.
+A1 backtest `a6e22bae6ee4279dd5272500442b3f59` completed. Its one
+claimed bounded custom-aggregate read authenticated the new source/profile,
+result digest, 261/261 rebalances, 6,314/6,314 filled orders, zero invalid
+or canceled, nonnegative event/final/daily cash, sub-1x end-day gross and
+the frozen target-tracking bounds. The after-modeled-cost 2021-2025
+cumulative return was **+123.6191666261345%**, equal to the earlier R-182
+matched-return figure; this is an exploratory same-window control, not a
+new alpha claim or full-path equivalence proof. The stock-selection gate
+still depends on positive analyst-score coverage; this control removes
+the *weight tilt*, not every analyst-data influence. No raw rows, logs, orders,
+or charts were read.
+
+The A1 launch spends **183 -> 184 shared research looks / 126 -> 127 ARV2
+development evaluations**. Infrastructure looks remain **32**; the one
+valid bounded result moves **613 -> 614 authenticated cells**. R-191 used
+one of at most three QC attempts. No broker, paper/live, funded order,
+deployment, or trading authority follows.
+
+## R-192 — settlement-policy 80% analyst-revision tilt, A1 valid exploratory result — 2026-09-25
+
+After R-191's valid receipt, the separately pinned 16-file R-192 80%-tilt
+source was uploaded, byte-read back and compiled in private project
+`114 ARV2 SIX CAP90 SETTLED TILT80 R192 2021 2025` (`36957707`). One A1
+backtest `a0f8440f5b57104f2f26b992ab7badcc` completed. Its one claimed,
+source-authenticated bounded custom-aggregate read accepted `run_valid=true`
+under aggregate SHA-256
+`0a15968da37cf6660efc9ed8a8c12ea384f5d77549b562e06d781f967e9dc0be`:
+261/261 rebalances, 6,195/6,195 orders filled, zero invalid or canceled,
+one explained same-session pending-SELL negative event-cash observation,
+zero unexplained negatives, nonnegative final/daily cash, sub-1x end-day
+gross, and 2%/5% tracking bounds. After-modeled-cost cumulative return
+was **+131.5199589587574%** over 2021-2025. Against the new-policy R-191
+matched return of +123.6191666261345%, the predeclared difference is
+**+7.900792332622900 percentage points**. This same-window, adaptively
+selected 80% parameter is exploratory, not an untouched alpha estimate.
+No raw provider/price/order rows, logs or charts were read.
+
+The A1 launch spends **184 -> 185 shared research looks / 127 -> 128 ARV2
+development evaluations**. Infrastructure looks remain **32**; the valid
+bounded read moves **614 -> 615 authenticated cells**. R-192 used one of
+at most three QC attempts. No broker, paper/live, funded-order,
+deployment, or trading authority follows.

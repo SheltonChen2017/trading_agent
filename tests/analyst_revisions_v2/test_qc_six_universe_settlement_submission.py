@@ -10,6 +10,7 @@ import pytest
 
 from research.analyst_revisions_v2_qc import accepted_risk_delta_order_package as delta
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_settlement_qc_projection as projector
+from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_tilt100_qc_projection as tilt100_projector
 from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_qc_runtime as runtime
 from research.analyst_revisions_v2_qc import six_universe_cap90_submission as cap90
 from research.analyst_revisions_v2_qc import six_universe_settlement_submission as subject
@@ -32,8 +33,11 @@ def projections():
         expected_package_sha256=delta.EXPECTED_DELTA_PACKAGE_SHA256,
         expected_lineage_sha256=delta.EXPECTED_DELTA_LINEAGE_SHA256,
     )
-    return {candidate_id: projector.build_settlement_projection(package, candidate_id)
-            for candidate_id in ("R191", "R192")}
+    return {
+        "R191": projector.build_settlement_projection(package, "R191"),
+        "R192": projector.build_settlement_projection(package, "R192"),
+        "R193": tilt100_projector.build_tilt100_settlement_projection(package),
+    }
 
 
 def _plan(tmp_path, projection, candidate_id):
@@ -81,7 +85,7 @@ def _statistics(plan, launch, *, defect=None):
         aggregate.update({
             "matched_baseline_profile_sha256": subject._CANDIDATES["R191"].profile_sha256,
             "matched_baseline_target_path_sha256": subject._PREDECESSOR_TARGET_PATH_SHA256,
-            "maximum_stock_weight_change_fraction": "0.80",
+            "maximum_stock_weight_change_fraction": subject._TILT_FRACTIONS[plan.candidate_id],
         })
     if defect == "digest":
         pass
@@ -113,7 +117,8 @@ def _aggregate(candidate_id="R192"):
     aggregate.pop("order_event_cash_nonnegative")
     aggregate.update({
         "schema": "settlement-summary",
-        "role": "matched_revision_tilt80" if candidate_id == "R192" else "matched",
+        "role": ("matched" if candidate_id == "R191" else
+                 f"matched_revision_tilt{80 if candidate_id == 'R192' else 100}"),
         "minimum_observed_order_event_cash": "-25",
         "transient_negative_order_event_count": 1,
         "unexplained_negative_order_event_count": 0,
@@ -127,11 +132,11 @@ def _aggregate(candidate_id="R192"):
         "filled_order_count_sum": runtime.EXPECTED_DECISION_COUNT,
         "execution_failure": False,
     })
-    if candidate_id == "R192":
+    if candidate_id in subject._TILT_FRACTIONS:
         aggregate.update({
             "matched_baseline_profile_sha256": subject._MATCHED_SETTLEMENT_PROFILE_SHA256,
             "matched_baseline_target_path_sha256": subject._PREDECESSOR_TARGET_PATH_SHA256,
-            "maximum_stock_weight_change_fraction": "0.80",
+            "maximum_stock_weight_change_fraction": subject._TILT_FRACTIONS[candidate_id],
         })
     else:
         for key in subject._TILT_FIELDS:
@@ -139,13 +144,13 @@ def _aggregate(candidate_id="R192"):
     candidate = subject._Candidate(
         candidate_id, "private", aggregate["role"], "settlement-variant",
         "settlement-projection", "a" * 64, "a" * 64, "a" * 64,
-        16 if candidate_id == "R192" else 14, 400_000,
+        16 if candidate_id in subject._TILT_FRACTIONS else 14, 400_000,
         "settlement-summary", "owner-waiver",
     )
     return aggregate, candidate
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
 def test_signed_temporary_cash_is_retained_without_old_nonnegative_claim(candidate_id):
     aggregate, candidate = _aggregate(candidate_id)
     selected = subject._settlement_aggregate(
@@ -207,7 +212,9 @@ def test_new_reader_isolates_every_cash_and_order_gate(defect):
         )
 
 
-@pytest.mark.parametrize("candidate_id,source_count", (("R191", 14), ("R192", 16)))
+@pytest.mark.parametrize("candidate_id,source_count", (
+    ("R191", 14), ("R192", 16), ("R193", 16),
+))
 def test_exact_preview_and_candidate_specific_owner_waiver(
     projections, tmp_path, monkeypatch, candidate_id, source_count,
 ):
@@ -215,7 +222,10 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
     plan = _plan(tmp_path, projection, candidate_id)
     identity = subject.preview(plan, projection)
     assert len(identity["source_files"]) == source_count
-    assert identity["projection_sha256"] == projector.CANDIDATES[candidate_id]["projection_sha256"]
+    expected_sha = (tilt100_projector.PINNED_TILT100_PROJECTION_SHA256
+                    if candidate_id == "R193" else
+                    projector.CANDIDATES[candidate_id]["projection_sha256"])
+    assert identity["projection_sha256"] == expected_sha
     _predecessors(monkeypatch, plan)
     waiver = json.loads(subject.render_owner_waiver_payload(plan, projection))
     assert waiver["candidate_id"] == candidate_id
@@ -224,9 +234,20 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
     assert waiver["maximum_backtest_submissions"] == 1
     assert waiver["maximum_result_reads"] == 1
     assert waiver["raw_logs_orders_charts_authorized"] is False
+    if candidate_id == "R193":
+        assert waiver["project_name"] == (
+            "115 ARV2 SIX CAP90 SETTLED TILT100 R193 2021 2025"
+        )
+        assert waiver["backtest_name"] == (
+            "ARV2 R193A1 six cap90 settlement 2021 2025 473163be"
+        )
+        assert waiver["owner_launch_waiver_id"] == (
+            "ARV2-OWNER-2026-09-25-R193A1-TILT100-SETTLEMENT-"
+            "EXPLORATORY-SIGNATURE-WAIVER"
+        )
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
 def test_wrong_waiver_or_source_refuses_before_qc(
     projections, tmp_path, monkeypatch, candidate_id,
 ):
@@ -256,7 +277,7 @@ def test_wrong_waiver_or_source_refuses_before_qc(
     assert not subject._control_path(plan, "claim").exists()
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
 def test_a1_launch_status_and_one_signed_cash_aggregate_read(
     projections, tmp_path, monkeypatch, candidate_id,
 ):
@@ -289,7 +310,7 @@ def test_a1_launch_status_and_one_signed_cash_aggregate_read(
         )
 
 
-@pytest.mark.parametrize("candidate_id", ("R191", "R192"))
+@pytest.mark.parametrize("candidate_id", ("R191", "R192", "R193"))
 @pytest.mark.parametrize("defect", ("digest", "unknown", "unexplained"))
 def test_one_result_read_refuses_changed_digest_or_cash_policy(
     projections, tmp_path, monkeypatch, candidate_id, defect,
@@ -310,3 +331,14 @@ def test_one_result_read_refuses_changed_digest_or_cash_policy(
     assert calls[before:] == ["files/read", "backtests/read"]
     assert subject._control_path(plan, "result-read-claim").exists()
     assert not subject._control_path(plan, "result-valid").exists()
+
+
+def test_r193_result_refuses_r192_fraction_even_with_correct_settlement_policy():
+    aggregate, candidate = _aggregate("R193")
+    aggregate["maximum_stock_weight_change_fraction"] = "0.80"
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="tilt or matched target"):
+        subject._settlement_aggregate(
+            aggregate, candidate,
+            matched_target_path=subject._PREDECESSOR_TARGET_PATH_SHA256,
+        )

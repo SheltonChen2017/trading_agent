@@ -1,8 +1,9 @@
 """One-use private QC order launches for the separately versioned cash policy.
 
-Only R191 (matched) and R192 (80% revision tilt) are admitted. Import does no
-I/O. The exact source, project, owner waiver, predecessor, and result are
-authenticated independently. A completed QC status alone is not a result.
+Only R191 (matched), R192 (80% revision tilt), and R193 (100% revision tilt)
+are admitted. Import does no I/O. The exact source, project, owner waiver,
+predecessor, and result are authenticated independently. A completed QC
+status alone is not a result.
 """
 
 from __future__ import annotations
@@ -21,6 +22,7 @@ from research.quantconnect import QuantConnectClient
 from . import accepted_risk_six_universe_order_qc_projection as base_projection
 from . import accepted_risk_six_universe_order_qc_runtime as base_runtime
 from . import accepted_risk_six_universe_order_settlement_qc_projection as settlement_projection
+from . import accepted_risk_six_universe_order_tilt100_qc_projection as tilt100_projection
 from . import six_universe_cap90_submission as cap90
 from . import six_universe_tilt80_submission as prior
 
@@ -76,6 +78,17 @@ _CANDIDATES = {
         16, 425_742,
         "arv2-six-universe-order-tilt80-settlement-summary-v1",
         "ARV2-OWNER-2026-09-25-R192A1-TILT80-SETTLEMENT-EXPLORATORY-SIGNATURE-WAIVER",
+    ),
+    "R193": _Candidate(
+        "R193", "115 ARV2 SIX CAP90 SETTLED TILT100 R193 2021 2025",
+        "matched_revision_tilt100", "cap90_matched_revision_tilt100_settlement_v1",
+        "arv2-six-universe-order-qc-projection-tilt100-settlement-v1",
+        "473163be0d2b9281c4c18a2a1565146536d93eab8226dcf5a90556cece77bfb9",
+        "c938f20cbcfe2bc3b4d60728b9ec7c9a450a88e5ba3fd0fe43a4c90985abc243",
+        "2489eb7102ab7d6dd3f555d2aae5bc2c46df6816bd0d3ad4b78be77238d68abb",
+        16, 425_754,
+        "arv2-six-universe-order-tilt100-settlement-summary-v1",
+        "ARV2-OWNER-2026-09-25-R193A1-TILT100-SETTLEMENT-EXPLORATORY-SIGNATURE-WAIVER",
     ),
 }
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
@@ -257,10 +270,18 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
         or projection.activation_manifest_sha256 != plan.activation_manifest_sha256
     ):
         _fail("settlement projection, profile, or package changed")
-    try:
-        profile = settlement_projection.require_settlement_profile(candidate.candidate_id)
-    except settlement_projection.SixUniverseSettlementQcProjectionError as exc:
-        raise SixUniverseSettlementSubmissionError(str(exc)) from None
+    if candidate.candidate_id == "R193":
+        try:
+            profile = tilt100_projection.require_tilt100_profile()
+        except tilt100_projection.SixUniverseTilt100QcProjectionError as exc:
+            raise SixUniverseSettlementSubmissionError(str(exc)) from None
+        projection_id_prefix = tilt100_projection.PROJECTION_ID_PREFIX
+    else:
+        try:
+            profile = settlement_projection.require_settlement_profile(candidate.candidate_id)
+        except settlement_projection.SixUniverseSettlementQcProjectionError as exc:
+            raise SixUniverseSettlementSubmissionError(str(exc)) from None
+        projection_id_prefix = "arv2-six-universe-order-settlement-qc-projection-"
     if (
         profile.get("profile_id") != projection.profile_id
         or profile.get("profile_sha256") != candidate.profile_sha256
@@ -277,9 +298,7 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
     digest = hashlib.sha256(_canonical(semantic)).hexdigest()
     if (
         digest != candidate.projection_sha256
-        or projection.projection_id != (
-            "arv2-six-universe-order-settlement-qc-projection-" + digest[:24]
-        )
+        or projection.projection_id != projection_id_prefix + digest[:24]
     ):
         _fail("settlement projection is not self-authenticating")
     return {
@@ -583,6 +602,7 @@ _TILT_FIELDS = frozenset({
     "matched_baseline_profile_sha256", "matched_baseline_target_path_sha256",
     "tilt_rank_rule_id", "maximum_stock_weight_change_fraction",
 })
+_TILT_FRACTIONS = {"R192": "0.80", "R193": "1.00"}
 
 
 def _exact_result_claim(
@@ -641,7 +661,8 @@ def _settlement_aggregate(
     aggregate: dict, candidate: _Candidate, *, matched_target_path: str,
 ) -> dict:
     """Retain only an exact, internally consistent new-policy aggregate."""
-    tilt_fields = _TILT_FIELDS if candidate.candidate_id == "R192" else frozenset()
+    tilt_fields = (_TILT_FIELDS if candidate.candidate_id in _TILT_FRACTIONS
+                   else frozenset())
     if (
         type(aggregate) is not dict
         or set(aggregate) != cap90._AGGREGATE_FIELDS | _SETTLEMENT_FIELDS | tilt_fields
@@ -709,12 +730,13 @@ def _settlement_aggregate(
         ))
     ):
         _fail("settlement order, exposure, or tracking validity changed")
-    if candidate.candidate_id == "R192" and (
+    if candidate.candidate_id in _TILT_FRACTIONS and (
         aggregate.get("matched_baseline_profile_sha256")
         != _MATCHED_SETTLEMENT_PROFILE_SHA256
         or aggregate.get("matched_baseline_target_path_sha256")
         != matched_target_path
-        or aggregate.get("maximum_stock_weight_change_fraction") != "0.80"
+        or aggregate.get("maximum_stock_weight_change_fraction")
+        != _TILT_FRACTIONS[candidate.candidate_id]
     ):
         _fail("settlement tilt or matched target binding changed")
     base = {key: aggregate[key] for key in cap90._AGGREGATE_FIELDS}

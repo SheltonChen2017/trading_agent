@@ -24377,3 +24377,146 @@ and
 `0193be500c0ad81390bfc90c214b38e56d6c3cd139bfaf30553fb99de0ff0ae5`,
 respectively. That check did not create a project, compile, launch a
 backtest, or read an outcome.
+
+### 185.1 R-191 matched settlement-policy A1 completed and authenticated
+
+After prospective commit `d5766d2`, the exact 14-file R-191 source was
+uploaded to private project `36957444` (the pinned project name above),
+read back byte-for-byte, compiled, and launched once as backtest
+`a6e22bae6ee4279dd5272500442b3f59`. The launch receipt attests the
+previously pinned R-191 owner-waiver payload digest. The status-only poll
+reached `Completed.`; a separately claimed, one-time bounded custom-
+aggregate read then rechecked current project source, waiver, predecessor,
+profile, meta/aggregate digest, exact schema, signed cash and order gates.
+It accepted **one exploratory result cell** with `run_valid=true`.
+
+The 2021-01-04 through 2025-12-31 R-191 account rose from `$1,000,000`
+to `$2,236,191.666261345`, a **+123.6191666261345%** after-modeled-cost
+cumulative return. Maximum drawdown was approximately **−21.2227%**,
+annualized volatility **20.3230%**, and zero-rate Sharpe **0.8975**. All
+**6,314/6,314** submitted orders filled across **261/261** rebalances;
+invalid and canceled counts were zero; modeled and engine fees both were
+`34955.3652829`. Minimum observed daily-close and post-event cash were
+`15832.95614` and `5026.196966345001`, respectively. There were zero
+transient or unexplained negative event-cash observations, and maximum
+end-day gross was `0.9849784912822988248387557248`, under 1x. Mean/
+maximum target-weight L1 errors were
+`0.004838441032489092834466614284` /
+`0.010482085366166491044965923110474159764669114914288756532826063137437271159504026`,
+under the 2%/5% bounds. The cumulative return equals old R-182's
+`+123.6191666261345%`; this checks the matched-return baseline under the
+new policy, not every unseen path value or an untouched replication.
+
+R-191 A1 consumed **one of at most three** candidate attempts and advanced
+the shared look floor **183 -> 184**, ARV2 development evaluations
+**126 -> 127**, authenticated cells **613 -> 614**; infrastructure looks
+remain **32**. Only the permitted bounded aggregate was retained. No raw
+provider/price/order rows, logs or charts, broker, paper/live, funded,
+deployment, or trading endpoint was read or used.
+
+### 185.2 R-192 tilt-80 settlement-policy A1 completed and authenticated
+
+After the R-191 valid receipt existed, the exact 16-file R-192 source was
+uploaded to private project `36957707`, byte-read back, compiled, and
+launched once as backtest `a0f8440f5b57104f2f26b992ab7badcc` under
+the separately pinned R-192 owner-waiver digest. A status-only poll reached
+`Completed.`; the separately claimed one-time bounded custom-aggregate read
+authenticated the exact current source, predecessor, waiver, meta/aggregate
+digest, new profile/schema, signed cash, orders, exposure and tracking. Its
+aggregate SHA-256 is
+`0a15968da37cf6660efc9ed8a8c12ea384f5d77549b562e06d781f967e9dc0be`.
+The read accepted **one exploratory result cell** with `run_valid=true`.
+
+Starting/ending equity was `$1,000,000` / `$2,315,199.589587574`, a
+**+131.5199589587574%** 2021-2025 after-modeled-cost cumulative return.
+Maximum drawdown was approximately **−21.2080%**, annualized volatility
+**20.3878%**, and zero-rate Sharpe **0.9295**. All **6,195/6,195**
+submitted orders filled across **261/261** rebalances, with zero invalid
+or canceled. Modeled and engine fees both were `38010.4886799`.
+Minimum daily-close cash was `15832.95614`, and the minimum observed
+post-order-event cash was **−3455.7015444060003**: exactly one negative
+event was classified as a same-session pending-SELL overlap, with zero
+unexplained negatives. Settled and daily-close cash were nonnegative,
+maximum end-day gross was `0.9849784912822988248387557248`, and the
+mean/maximum target-weight L1 errors were
+`0.00473645035664330505499446818` /
+`0.011273035599154974559655579026472464318164465023716012101028446711590082656425528`,
+below the 2%/5% bounds.
+
+The temporary negative observation is a post-order-event snapshot, not a
+measured continuous intraday borrowing path. This exploratory result does
+not add a separate financing charge for the short-lived pending-sell
+overlap; its maximum observed deficit was about 0.35% of starting equity.
+That limitation belongs beside the return, even though final and daily
+cash were nonnegative.
+
+The prospectively matched R-192-minus-R-191 **after-cost cumulative
+return difference is +7.900792332622900 percentage points**. A secondary
+same-window sensitivity against old-policy R-185 40% is
+**+3.723259914161900 points**; because execution policies differ, it is
+not an isolated tilt-only estimate. R-192's selected stock identities,
+six budgets, fallback counts, period and 98% gross target are unchanged
+from the pinned target lineage. This outcome does not establish persistent
+alpha: both 80% and the settlement policy were chosen after earlier looks
+at this same window. No 2x portfolio target or broker/live authority is
+inferred.
+
+R-192 A1 consumed **one of at most three** candidate attempts and advanced
+the shared look floor **184 -> 185**, ARV2 development evaluations
+**127 -> 128**, authenticated cells **614 -> 615**; infrastructure looks
+remain **32**. The one bounded aggregate read was the only result access;
+no raw provider/price/order rows, logs, or charts were retained.
+
+## 186. Prospective 100% analyst-revision weight tilt R-193, 2026-09-25
+
+After the separately valid R-191 matched and R-192 80% results above, the
+owner approved one 100% boundary sensitivity under the current long-only
+weight-transfer rule. This is a same-window, look-guided exploratory test,
+not an untouched confirmation or a license to search until a peak is found.
+The owner also proposed 120%/140%; those are **not** launched under this
+profile because a donor can reach zero at 100%, and a larger fraction would
+need a new nonnegative-weight rule. Earlier 60%/70% refusals under the old
+cash policy are not silently repeated or reclassified.
+
+R-193 changes only the maximum change of an individual stock's *own*
+post-cap matched weight from `0.80` to `1.00`, plus candidate identity,
+profile, schema and target-path bindings. It does not allocate 100% of the
+portfolio to analyst revisions. The same selected stock IDs, six sleeve
+budgets, ETF fallback, 98% gross target, 2021-01-04 through 2025-12-31
+window, 261 decisions, order-based next-session whole-share MOO execution,
+RAW prices, 10-bps-per-side modeled costs, 2x order admission only, and
+R-191/R-192 settlement-cash policy remain frozen. A stock driven to exactly
+zero may cause the existing strict-positive target guard to refuse; that
+would be an invalid candidate, not permission to relax the rule after
+seeing QC output. Comparison is against R-191's matched +123.6191666261345%
+and R-192's 80% +131.5199589587574%, with same-window adaptation disclosed.
+
+**Frozen R-193 A1 identity before QC mutation.** The host-only
+`accepted_risk_six_universe_order_tilt100_qc_projection.py` derives the
+exact R-192 16-file source and changes only three projected files. All
+16 output file hashes and byte counts are pinned. The independently
+checking `six_universe_settlement_submission.py` admits only the exact
+private project `115 ARV2 SIX CAP90 SETTLED TILT100 R193 2021 2025` and
+backtest `ARV2 R193A1 six cap90 settlement 2021 2025 473163be`.
+The projection SHA-256 is
+`473163be0d2b9281c4c18a2a1565146536d93eab8226dcf5a90556cece77bfb9`,
+profile SHA-256 is
+`c938f20cbcfe2bc3b4d60728b9ec7c9a450a88e5ba3fd0fe43a4c90985abc243`,
+and 16-file manifest SHA-256 is
+`2489eb7102ab7d6dd3f555d2aae5bc2c46df6816bd0d3ad4b78be77238d68abb`;
+the closure is 425,754 bytes. The exact exploratory one-use waiver ID is
+`ARV2-OWNER-2026-09-25-R193A1-TILT100-SETTLEMENT-EXPLORATORY-SIGNATURE-WAIVER`.
+A read-only organization/package check yielded its canonical waiver-payload
+SHA-256
+`3032d52493bcf0264ab7734896d0a28f60c0e0a919ec5fb6d0d9534cfae31a27`.
+That check did not create a project, compile, submit, or read a result.
+The exact local control directory remains
+`artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923` in this
+worktree. One A1 QC launch may follow this prospective commit; at most three
+attempts total are allowed for R-193, and a deterministic economic-rule
+refusal will not be repaired adaptively. Only status and one bounded,
+source-authenticated custom aggregate may be inspected; no raw provider,
+price, or order rows, logs or charts, broker/paper/live/funded/deployment,
+or trading access is authorized. The shared look floor is still **185**,
+ARV2 development **128**, infrastructure **32**, authenticated cells **615**
+at this prelaunch point.

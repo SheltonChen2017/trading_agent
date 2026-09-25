@@ -4224,3 +4224,47 @@ Accounting: **172 -> 173 shared looks / 115 -> 116 ARV2 development
 evaluations / 32 infrastructure looks / 610 -> 611 authenticated cells**.
 No R-183 basket run, leverage, deployment, broker, paper/live,
 funded-account, real-order or trading authority follows.
+
+## R-183 — cap-90 six-ETF basket under the matched 2x buying-power admission bridge, A1 valid (EXPLORATORY; run_valid=true; ONE EXPLORATORY CELL) — 2026-09-24
+
+The owner selected the versioned 14-file bridge rather than the original
+13-file/1x-admission basket, specifically waived R-183's detached signature,
+and authorized this shared-ledger entry before launch (Analyst lane section
+181.1). The separate private project is
+`106 ARV2 SIX CAP90 ETF R183 2021 2025` (`36931797`); exact A1 backtest
+`221353a5a0fe523992de6938eb942504` is
+`ARV2 R183A1 six cap90 bridge ETF basket 2021 2025 980528e2`.
+Projection SHA-256
+`980528e2ae982c7c8e19e07b856a15b7c386b338acf66336abe2766ff512de80`
+and profile SHA-256
+`7e4a108e378f59f5927225c919b2a7e9bae4ed3de6cfd89a31a8a416e3a00349`
+bind the 98%-target order-based ETF basket to the same research-only 2x
+*buying-power admission*, observed-cash, gross, target-tracking, and order
+validity gates as R-181 A3 and R-182 A1. This is not a 2x portfolio target.
+The one-use claim and launch receipts bind the owner's exact R-183 waiver to
+the launch-permit digest
+`97d482f38ea739dd4c614a901dce9e3f7d5851632288ae83da6d3ea6ca3a96bc`.
+The first status-only poll was `In Queue...`; later status-only polls reached
+`Completed.`. The single permitted custom META/AGGREGATES read then
+authenticated `run_valid=true`, aggregate SHA-256
+`31a0a03760dbcb458d07dae78ad182d154ac67722535d314e824629f33bb88ab`,
+all 261 rebalances, all 1,523 submitted orders filled, zero invalid and
+canceled orders, nonnegative observed cash (minimum daily close
+`15832.95614`), maximum end-day gross `0.9849784912822988248387557248`,
+and target tracking within the frozen bounds. Starting equity was
+`1000000`; ending equity `2063347.73436208`; after-modeled-cost cumulative
+return **+106.334773436208%**, maximum drawdown approximately **−21.27%**,
+annualized volatility approximately **19.83%**, and zero-rate Sharpe
+approximately **0.833**. Modeled and actual engine fees both report
+`8028.44136`. All 1,566 sleeve-decisions were six-ETF-basket decisions.
+No standard QC statistic, log, chart, order row, or provider/price row was
+retained. One `backtests/create` spends **173 -> 174 shared research looks /
+116 -> 117 ARV2 development evaluations**; infrastructure looks remain 32,
+and the valid one-time result read moves **611 -> 612 authenticated cells**,
+labelled exploratory. This is R-183's first of at most three QC attempts.
+On the matched execution-policy window, R-181 signal minus this ETF basket
+is **−9.706037967972 percentage points**; R-182 matched market-cap minus
+the basket is **+17.2843931899265 percentage points**. The primary
+R-181-minus-R-182 stock-selection comparison remains −26.9904311578985
+percentage points. The basket is secondary whole-portfolio context, not a
+clean analyst-selection comparator or formal alpha confirmation.

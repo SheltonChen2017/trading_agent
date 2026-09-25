@@ -572,15 +572,21 @@ remained required. R-181 A3, R-182 A1, and R-184 A1 subsequently completed
 with authenticated valid aggregates; sections 179.1, 179.3, and 179.4 record
 their exploratory returns and limitations. Section 180 counts all three as
 exploratory cells, not formal alpha evidence; R-182 also has an unrecorded
-second launch that consumes its second attempt slot. R-183 remains signed
-and unlaunched.
+second launch that consumes its second attempt slot. At that review point
+R-183 remained signed and unlaunched; section 181 then records Codex's
+counter-review, the owner's separate exact R-183 bridge waiver and shared-
+ledger authorization, and the authenticated valid R-183 A1 ETF-basket result.
+That order-based result was +106.33% over 2021–2025 after modeled costs,
+contextual rather than a clean analyst-selection effect; R-183 has spent
+one of three allowed attempts.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
 from a QC census to 173 / 116 / 32 / 611 with the unrecorded R-182 rerun and
-fifth R-180 launch counted, and a new ledger gate; Codex must counter-review
-section 180 and its two commits and confirm or correct the exploratory-cell
-classification before any further launch. V15 and R-170 remain immutable, no R-170
+fifth R-180 launch counted, and a new ledger gate. Codex counter-reviewed
+both commits in section 181, corrected the lane-record test and stale handoff,
+and retained the exploratory-cell classification. After R-183 the totals
+are 174 / 117 / 32 / 612; the last cell is exploratory. V15 and R-170 remain immutable, no R-170
 aggregate may be read, no R-169 diagnostic may be relabelled, and R-138
 remains unlaunched/unspent.
 
@@ -23543,3 +23549,50 @@ result-validity checks, cover any other candidate or attempt, or authorize
 paper/live/funded orders. This selection is recorded before any R-183 QC
 project or backtest is created. R-183 still has zero spent attempts at this
 activation point.
+
+### 181.2 R-183 A1 private order-based launch and authenticated exploratory result
+
+After the owner choice and exact waiver implementation were committed
+locally, **165 focused tests passed** (QC submission, lane-record integrity,
+active-document consistency); `git diff --check` was clean. The bounded
+preflight authenticated R-182 A1's valid local predecessor chain and its
+private QC project, reproduced the exact fourteen-file R-183 projection and
+role profile above, confirmed the R-183 project name absent, and found no
+R-183 one-use claim. Then a single `launch_a1` under the R-183-specific
+waiver created private project `36931797`, uploaded and read back the exact
+source, compiled as
+`76d887606b278acc9d7e7391b76d5f2f-e266e5060b80b40cc46c24d5e7d1e6ef`,
+and launched backtest `221353a5a0fe523992de6938eb942504`. The claim and
+launch receipts both bind waived exact-permit SHA-256
+`97d482f38ea739dd4c614a901dce9e3f7d5851632288ae83da6d3ea6ca3a96bc`.
+The first status-only poll returned `In Queue...`, the second `In
+Progress...`, and the third exact `Completed.`. The one permitted custom
+META/AGGREGATES read reauthenticated the present 14-file QC source, the
+R-183-specific waived permit, role/profile/package, and raw-ASCII aggregate
+digest `31a0a03760dbcb458d07dae78ad182d154ac67722535d314e824629f33bb88ab`.
+It returned `run_valid=true`: 1,255 account sessions, all 261 rebalances
+completed, 1,523 of 1,523 submitted orders filled, zero invalid or canceled,
+nonnegative observed cash (minimum daily close `15832.95614`), maximum
+end-day gross `0.9849784912822988248387557248`, and target-tracking mean
+`0.00109626464489579733402503593` / maximum approximately `0.00818126`,
+within the frozen 2%/5% limits. All 1,566 sleeve-decisions report
+`SIX_ETF_BASKET`. Starting/ending equity is `1000000` / `2063347.73436208`;
+the preliminary after-modeled-cost cumulative return is
+`1.06334773436208` (+106.334773436208%), maximum drawdown approximately
+−21.27%, annualized volatility approximately 19.83%, and zero-rate Sharpe
+approximately 0.833. Actual engine and modeled fees both equal
+`8028.44136` under the same 10-bps-per-side model. No standard QC statistic,
+raw price/provider/order row, chart, or log was retained.
+
+The launch consumes **one** of R-183's maximum three attempts and one shared
+exploratory look / one ARV2 development evaluation. The owner authorized
+its appended shared-ledger entry; totals are now **174 shared looks / 117
+development evaluations / 32 infrastructure looks / 612 authenticated
+cells**, including this one exploratory R-183 cell. The execution-policy-
+matched secondary R-181-minus-ETF-basket spread is
+**−9.706037967972 percentage points**; R-182-minus-basket is
+**+17.2843931899265 points**. The primary R-181-minus-R-182 signal-selection
+comparison remains −26.9904311578985 points. These are post-hoc-cap-floor,
+single-window development observations; stock-versus-ETF effects make the
+basket a contextual benchmark, not a clean analyst-skill comparator. No
+complete lane suite or non-lane QC project action occurred.

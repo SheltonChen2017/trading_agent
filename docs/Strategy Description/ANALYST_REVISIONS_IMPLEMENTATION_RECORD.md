@@ -599,11 +599,11 @@ R-177 produced no economic result.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 180; Claude will review section 181
-independently after Codex's next combined push. The owner has directed Codex
-to counter-review section 180 and begin the next backtesting round before
-that review. No intermediate unreviewed QC experiment becomes accepted
-evidence merely by completing.
+the pushed range through section 180. Section 182 records the owner's exact
+exception: finish the bounded R-185 stronger-tilt backtest before Claude
+reviews sections 181–182 and their pushed source and results. That review is
+deferred, not canceled; no intermediate unreviewed QC experiment becomes
+accepted evidence merely by completing.
 Each distinct backtest candidate has a hard maximum of three QC attempts.
 A compile failure, runtime error, or any other unsuccessful terminal run each
 counts as one attempt. After the third failure Codex makes no further code
@@ -632,7 +632,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–181
+findings, outcomes, and per-run accounting remain in numbered sections 1–182
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -23641,3 +23641,80 @@ R-184's +2.1382-point matched-stock tilt is likewise exploratory. Further
 period tests, changed rules, leverage, formal alpha acceptance, or live
 work require their own prospective decision and authorization. This round
 does not infer them from R-183's terminal `Completed.` or valid aggregate.
+
+## 182. Prospective stronger analyst-revision weight tilt R-185, implementation only, 2026-09-24
+
+After seeing exploratory R-184's +2.13824673594447-point spread over R-182,
+the owner asked Codex to begin implementing one stronger analyst-revision
+*weight tilt*. Codex specified **40% maximum relative change per selected
+stock's own post-cap baseline weight**, twice R-184's 20% bound; the owner
+affirmed implementation. This is a **single post-result development choice**,
+not an independent discovery, adaptive search, or formal confirmation. R-184
+and its reviewed 16-file cloud source remain byte-for-byte frozen.
+
+The proposed R-185 holds R-182's exact point-in-time market-cap-selected
+stock identities, selected counts, ETF fallbacks, six equal sleeve budgets,
+98% gross target, and 9.8% aggregate duplicate-stock cap. Zero/missing
+analyst scores remain neutral; scored names retain R-184's deterministic
+within-sleeve rank and cap-aware weight-transfer rule. Only the maximum
+relative weight band changes from 20% to 40%. The same 2021-01-04 through
+2025-12-31 window, 261 weekly decisions, next-session whole-share MOO
+orders, RAW execution prices, 10-bps-per-side modeled fee check, and
+research-only 2x *buying-power admission* bridge apply. Validity still
+requires zero invalid/canceled orders, all submitted orders filled,
+nonnegative cash at the observed daily-close and post-order-event
+boundaries, at-most-1x end-day gross, and prior-close-reference target
+tracking at most 2% mean / 5% maximum. A 40% tilt cap does not authorize
+a 2x portfolio target or real orders.
+
+R-185 needs a distinct target-path schema, runtime profile/summary schema,
+source projection, exact private project and run identity, one-use launch
+claim, and result reader. Its reader must bind R-182 A1's authenticated
+baseline stock-target path SHA-256
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`.
+The primary exploratory comparison is R-185 minus unchanged R-182; the
+secondary sensitivity comparison is R-185 minus R-184. Report absolute
+return, drawdown, volatility, fees, gross/cash, order validity, stock
+breadth, and all six sleeve fallback states without selecting a winning
+tilt after the result. A positive difference would be a hypothesis for
+future untouched periods, not evidence of persistence or permission to
+trade.
+
+**Pinned R-185 candidate before any outcome look.** The new 16-file order
+projection reuses R-184's exact source closure and changes only the target
+builder, runtime, and `main.py` by counted, SHA-bound substitutions. Its
+source-manifest SHA-256 is
+`2a9f9a2175e2765c1136d4aca3d86d617bbee970769eecae6dcab2e0f1127c7d`,
+profile SHA-256 is
+`a76cead2de5fef1176803f77b2a7efd3cc11fa24734dcdcf91a047f4ae552539`,
+and total source is 422,758 bytes. The other thirteen projected files retain
+R-184's exact bytes. The separate private A1 identity is project
+`108 ARV2 SIX CAP90 TILT40 R185 2021 2025` and backtest
+`ARV2 R185A1 six cap90 bridge tilt40 2021 2025 2a9f9a21`.
+Before a QC call, the local projection builds and compiles all sixteen cloud
+files; focused projection tests pass 5/5 and verify the projected
+runtime/profile, unchanged R-184 hash pins, and the bounded 40% transfer.
+The separate one-use R-185 host launcher binds that identity to an exact
+owner permit, the authenticated R-182 target path, a private project, and a
+single aggregate-only result read; it grants no raw rows, logs, orders,
+charts, or deployment. Independent prelaunch audit caught and corrected a
+permit inconsistency before launch: the original draft said result reads
+were unauthorized despite a one-time aggregate reader. The permit now
+explicitly authorizes only one aggregate read, and the read-time digest
+check binds the same permit bytes. Forty-one focused R-185, R-184-regression,
+and import-boundary checks pass; this is not a full lane suite.
+
+**Review and launch gates.** At this implementation start, the remote lane
+head is `c8dfd27`; Claude has not yet pushed an independent review of that
+R-183 round. The owner explicitly then directed Codex to finish **tonight's
+R-185 stronger-tilt backtesting before Claude reviews**. This is a bounded
+interim review-timing exception for this named exploratory test, not a
+standing waiver of independent review or formal outcome authority. The
+prior R-181/R-182/R-184 and R-183 signature waivers do not cover R-185. A
+future launch still needs exact R-185 source/profile/run pins committed,
+focused tests and source-closure checks, and an exact detached owner
+signature or a new explicitly scoped waiver. Any resulting shared
+research-look entry also needs its own owner authorization; neither follows
+automatically from moving Claude's review later. No R-185 QC project,
+compile, backtest, result read, research look, or authenticated cell is
+claimed at this point.

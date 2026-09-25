@@ -25135,3 +25135,140 @@ lane/repository suite was not run under the owner rule. The active lane
 record's shared-look-heading test remains pending the owner's separate
 permission to append R-195 through R-197 bookkeeping to the project-wide
 ledger; this does not authorize changing that shared file by inference.
+
+### 189.6 In-place R-195 A2 launched
+
+After prospective recovery commit `bbfa4c1`, the A2 launcher rechecked
+the authentic spent A1 claim, private idle project `36963958`, exact
+16-file source, and zero-backtest status inventory before writing its
+distinct one-use A2 claim. It made **no new project or source upload**,
+compiled the same R-195 projection and submitted backtest
+`5762679ab25e1661208762ceb16fd043` named
+`ARV2 R195A2 six cap90 settlement 2021 2025 c20e2c13`.
+This is R-195's second technical attempt and the conservative sixth
+100%-lineage possible look. The submission advances shared research
+looks **192 → 193** and ARV2 development evaluations **135 → 136**;
+infrastructure looks remain **32** and authenticated cells remain
+**617** until the separate completed-run aggregate gate passes. No
+result, comparison, or selected tilt is inferred from the launch.
+
+### 189.7 R-195 A2 valid anchor and receipt-only tilt-ladder comparison
+
+Status-only polling authenticated `Completed.` for the exact in-place
+R-195 A2 backtest. Its sole bounded META/AGGREGATES read rechecked the
+current byte-identical 16-file source, spent-A1/new-A2 claim chain,
+waiver, project and run IDs, profile/package, digest, 261-decision order
+census, signed-cash, exposure, fee, and tracking gates. It accepted
+`run_valid=true`: **5,744/5,744** submitted orders filled; modeled and
+engine fees both were `$38,884.7907116`. From `$1,000,000` starting
+equity, the 2021–2025 cumulative return was **+133.4663997983659% after
+modeled costs**, with maximum drawdown approximately **−21.2207%**,
+annualized volatility **20.4158%**, and zero-rate Sharpe **0.9368**.
+The matched-target-path SHA-256 was
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`,
+exactly the valid R-196/R-197 value. This one result read is spent and
+authenticated cells move **617 → 618**. Total conservatively counted
+shared research looks are **193**, ARV2 development evaluations **136**,
+and infrastructure looks **32**.
+
+A separate **local receipt-only** check then reauthenticated the complete
+R-195 A2 and R-196/R-197 launch, claim, terminal, read-claim and
+result-valid chains. It found `comparison_valid=true` for both later
+candidates against the exact R-195 A2 anchor because all three producer-
+derived matched-target-path digests equal the value above. No QC result
+was reread, and the historical R-196/R-197 read-time
+`comparison_valid=false` flags were not rewritten. The after-cost
+same-window cumulative-return ladder is:
+
+| Nominal revision-weight transfer capacity | Candidate | Return | Maximum drawdown | Difference versus 100% |
+|---|---|---:|---:|---:|
+| 100% | R-195 A2 | +133.4664% | −21.2207% | anchor |
+| 120% | R-196 A1 | +136.1124% | −21.2125% | +2.6460 percentage points |
+| 140% | R-197 A1 | +138.2847% | −21.1368% | +4.8183 percentage points |
+
+R-197 minus R-196 is **+2.1723 percentage points**. These percentages
+are *maximum rank-scaled per-stock transfer capacities*, bounded by
+receiver caps and both donor floors, **not** portfolio leverage or 100–
+140% of account capital in analyst-revision names. Exact matched target
+decisions and source lineage permit this narrow sensitivity comparison;
+they do **not** prove identical QC price/fee tape vintages or an untouched
+out-of-sample effect. These are three adaptively chosen settings in the same
+2021–2025 window, and returns have not yet turned down within the tested
+range. Do not select 140% for production, infer monotonicity beyond 140%,
+or compare this ladder's spread with the older R-191/R-192 controls on
+an unproven common target/price basis. No raw provider/price/order rows,
+logs, charts, broker, paper/live/funded accounts, deployment, real
+orders, or trading were accessed.
+
+The one-use read retained the common **matched** target-path digest, not
+each tilted target-path digest or the QC price-series digest. Local
+fixtures prove the three source rules can create different targets, and
+the accepted aggregate order counts differ, but this round does not
+independently prove how many of the 261 real decisions changed target
+weights or that the cloud price tape was byte-identical across runs.
+The observed return ordering is therefore a narrow same-window
+sensitivity, not clean causal proof of incremental analyst tilt.
+
+### 189.8 Round-end review notes for Claude (pending shared-ledger closure)
+
+**Range and disposition.** Base `c058fd4`; `9db8d0f` freezes the three
+guarded 100/120/140 source/profile/manifest/waiver identities and
+behavioral tests **before** any of their QC mutations. `bbfa4c1`
+separately freezes the exact in-place R-195 A2 recovery and receipt-only
+comparison helper after the A1 transport failure, **before** A2 QC
+mutation. Both are Codex implementation commits, not Claude review
+commits; there is no Claude commit to counter-review in this round.
+This record's final result/ledger commit and the exact single pushed head
+must be filled at handoff. Review each commit separately, then their
+combined final tree.
+
+**Findings and corrections.** `ARV2D189-001` (P2, corrected
+prospectively): R-194's aggregate donor floor alone can leave a zero or
+negative donor component within one of six sleeves when a stock is shared.
+All three new projected rules preserve a 1e-30 floor in the donor's own
+sleeve **and** its aggregate, with a fixture and load-bearing mutant test;
+R-194's historical source/result remain unchanged. `ARV2D189-002` (P3,
+documented): R-195 A1's `backtests/create` generic failure discards the
+specific transport response, so the cause is unknown. Status-only QC
+twice listed zero runs, and A2 was separately pinned to the same idle
+source-verified project; A1 was not unspent. `ARV2D189-003` (P3,
+documented): equal matched-target-path digests do not prove equal price
+tapes or realized tilt-target paths. No pristine-PIT, formal alpha,
+leverage, or live-readiness claim is made.
+
+**Physical QC and look evidence.** R-195 A1 created/compiled its private
+source but produced no listed backtest or return; A2 in the same project
+completed valid +133.4663997983659%. R-196 A1 completed valid
++136.1123820392753%; R-197 A1 completed valid
++138.28465642521377%. All three valid reads used exact current-source,
+waiver, META/AGGREGATES, order/cash/gross/tracking checks and retained
+the same matched-path SHA-256. A receipt-only later check permits the
+predeclared same-window +2.6459822409094-point and
++4.81825662684787-point comparisons to the A2 100% anchor without
+rereading outcomes. Four conservative possible looks (including the
+failed A1 call) move 189/132/32/615 to **193 shared looks / 136
+development evaluations / 32 infrastructure looks / 618 accepted
+aggregate cells**. One-use read claims are spent for R-195 A2, R-196,
+and R-197. No further launch in these candidates is planned.
+
+**Validation and exclusions.** Before first launch the focused ladder,
+settlement, predecessor floor, and active record checks were 124 passed.
+After A2 adapter changes the focused code battery was **122 passed**;
+changed-file compilation and `git diff --check` were clean. The active
+record battery is currently **10 passed, 1 failed solely because the
+project-wide research-look ledger lacks R-195/R-196/R-197 headings**;
+Codex requested but has not yet received separate owner approval to
+append that shared file. Re-run this gate after any authorized ledger
+append and before the final push. No complete Analyst-lane or repository
+suite was run (Claude's review responsibility), and no raw provider,
+price, order, log or chart content, broker, live/paper/funded account,
+deployment, real order, or trading endpoint was accessed.
+
+**Next gate.** Complete only the authorized shared-ledger bookkeeping and
+active-document check, then make this round's one same-branch push.
+Claude reviews the exact pushed snapshot and runs the full lane suite;
+Codex counter-reviews that push before any new milestone. The tested
+window is adaptively reused, so an additional 160% or wider sweep
+would require a fresh prospective identity/look and cannot be called
+out-of-sample confirmation. No automatic launch or production use
+follows from the ascending three-point result.

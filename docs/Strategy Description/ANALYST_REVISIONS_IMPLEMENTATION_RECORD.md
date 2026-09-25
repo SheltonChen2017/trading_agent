@@ -24172,3 +24172,68 @@ admission-policy correction changes the candidate and needs prospective
 source/authority/validity pins plus a separately counted look; it cannot
 retroactively make these four refusals valid results. There is no further
 percentage sweep in this round.
+
+### 184.4 Review notes for Claude: R-186 and bounded R-187–R-189 ladder
+
+**Exact snapshot and process.** Independently review the same-lane range
+`9ece049..HEAD` after this record-only handoff commit, including all five
+named commits below and this final handoff commit. The owner explicitly
+deferred Claude review until tonight's bounded stronger-tilt order tests
+finished. No other branch or worktree was used. This round makes exactly
+one successful push after these notes; Claude then reviews the pushed
+snapshot and runs the full lane suite, and Codex counter-reviews every
+Claude commit before a new milestone.
+
+| Commit | Scope and review focus | Codex disposition before independent review |
+|---|---|---|
+| `ae3da8c` | Exact R-186 80% 16-file projection/profile and one-use private order launcher; source changes only target, runtime, and entry point from the pinned R-185 lineage. | Accepted locally before launch. Check role/schema/fraction substitutions, 2x admission versus 98% target, source identity, and fail-closed result read. |
+| `5585141` | Recorded owner's session research-backtest authority and distinct R-186-only exact waived-payload ID before QC mutation. | Accepted as scoped owner activation; no paper/live/funded/trading authority. |
+| `cfb186c` | Recorded R-186 A1 `Runtime Error` at post-order-event cash guard and one append-only shared research look. | Accepted as a refusal, **not** a return or authenticated cell. |
+| `87a9e90` | Prospectively froze separate 70%/60%/50% R-187–R-189 source/profile/project/waiver pins before their outcomes; compact shared projection/launcher, behavioral tests, exact import closure, and negative/nonfinite event-cash tests. | Accepted locally before all three QC mutations. Check that each candidate differs only in the intended fraction/identities and never weakens cash/order/gross/tracking gates. |
+| `34c746c` | Recorded all three compiled but cash-refused A1 runs, append-only R-187/R-188/R-189 shared look entries, current handoff, and the tested execution-validity boundary. | Accepted as three failed exploratory runs and zero new result cells; verify four distinct receipt chains and 175→179 look reconciliation. |
+| This handoff commit | Exact review range, findings, validation, exclusions, and next gate. | Record-only; no source, QC run, or result changes. |
+
+**Findings and limits.** `ARV2CR184-001` (P2, open execution blocker, not a
+confirmed safety-guard defect): R-186 through R-189 all reach QC runtime
+and stop at the same finite/nonnegative cash check during `on_order_event`.
+The local base guard and bridge tests prove refusal is deliberate; the
+status-only envelope does not reveal the actual cash amount, so the record
+does not assert negative rather than nonfinite cash or blame a particular
+fill/fee. R-185 at 40% completed with only about $945 minimum observed
+event cash on $1 million, leaving a plausible thin-reserve mechanism but
+not a proven root-cause decomposition. A separate prospective cash-reserve
+or order-sequencing candidate may be needed; no 50%–80% return can be
+compared until one passes its own unchanged or newly reviewed validity
+gates. `ARV2CR184-002` (P3, documented): all valid 20%/40% and failed
+50%–80% strengths use the same 2021–2025 development period, while three
+of six sleeves remain ETF fallbacks. These are not six independent tests,
+untouched validation, or evidence for live deployment. No verified P0/P1
+source defect or fail-open cash-path mutation was found in the new ladder.
+
+**Validation and accounting.** A focused integrated selection passed **76
+tests** (three pinned projections, private launch/status/read refusal cases,
+cash-event NaN/infinity/negative boundaries, active lane record, and whole-
+package no-I/O closure); `git diff --check` was clean. The 16 cloud files
+for each R-187/R-188/R-189 candidate prelude-compiled locally, read back
+byte-exactly after upload, and compiled in QC. Each private project has
+exactly one A1 backtest; authenticated statistics-disabled QC status and
+local one-use terminal receipts agree on `Runtime Error`. No aggregate or
+standard-statistic read occurred, and none has a result-read claim. One
+independent read-only audit reconciled each claim/launch/terminal and the
+append-only shared ledger: **179 shared looks / 122 development evaluations
+/ 32 infrastructure looks / 613 authenticated cells**. Each failed
+candidate used one of its three allowed slots; none received a byte-
+identical retry. Codex did **not** run the complete lane or repository
+suite under the owner's standing rule; Claude performs the full lane suite
+during this independent review.
+
+**Exclusions and next gate.** No raw provider, price, order, log, chart, or
+standard QC statistic was used as research evidence; no broker, paper/live,
+funded order, deployment, or trading endpoint was touched. The four failed
+private projects remain available for review/Mia rather than being silently
+deleted. Claude reviews the exact pushed range and the cash-boundary
+interpretation, then pushes its findings/corrections on this same lane.
+Codex counter-reviews every Claude commit. Only after that handoff should
+any new execution-cash diagnosis or separately versioned order-reserve
+policy be considered; no further post-hoc fraction sweep, leverage run, or
+formal-alpha claim follows from these refusals.

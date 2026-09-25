@@ -620,9 +620,10 @@ review is deferred, not canceled; the valid exploratory result is not formal
 alpha evidence merely because the QC engine completed it.
 The owner's subsequent R-186 instruction extends only that interim timing
 exception through the one prospective 80% same-window experiment in section
-183. Its exact one-use launch mode must be resolved before any QC mutation;
-neither the R-185 waiver nor general research-backtest permission silently
-waives a new detached-signature gate.
+183. After a direct question about R-186's detached signature, the owner
+explicitly authorized starting the backtest and extended research-backtest
+authorization for this machine/session. Section 183 records the R-186-only
+one-use waiver chosen for this launch; the R-185 waiver is not reused.
 Each distinct backtest candidate has a hard maximum of three QC attempts.
 A compile failure, runtime error, or any other unsuccessful terminal run each
 counts as one attempt. After the third failure Codex makes no further code
@@ -23948,3 +23949,19 @@ R-182 predecessor target-path SHA-256
 single QC submission, and one aggregate-only result read. The exact mode
 must be chosen before launch. No R-186 project, compile, backtest,
 aggregate read, research look, or result is claimed at this prelaunch point.
+
+**Owner activation before any R-186 QC mutation.** In response to Codex's
+specific choice between signing R-186's exact permit and waiving its detached
+signature, the owner directed Codex to start backtesting and said this
+authorization extends to all research backtesting in this session on this
+machine. For this A1, Codex selects the distinct exact R-186 waiver ID above;
+its canonical permit binds this attempt's project, source-file manifest,
+profile, predecessor, single submission, and one bounded aggregate read.
+The broader session authorization does not make that one-use ID reusable,
+change the three-attempt candidate limit, turn an invalid run valid, waive
+the untouched cash/order gates, or grant broker, paper/live/funded order,
+deployment, or trading authority. Recording this research look in the
+append-only shared `docs/research/alpha-result.md` ledger is ordinary
+accounting for the authorized launch; it is not a shared strategy-policy
+change. No R-186 QC project, compile, backtest, or result read has occurred
+at this activation point.

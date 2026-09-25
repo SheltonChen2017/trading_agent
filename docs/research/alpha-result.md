@@ -4521,3 +4521,23 @@ development evaluations**. Infrastructure looks remain **32**; the valid
 bounded read moves **614 -> 615 authenticated cells**. R-192 used one of
 at most three QC attempts. No broker, paper/live, funded-order,
 deployment, or trading authority follows.
+
+## R-193 — settlement-policy 100% analyst-revision tilt, A1 runtime error; no result — 2026-09-25
+
+Analyst lane section 186 prospectively pinned the separate 100% stock-
+weight-change candidate, exact 16-file source/profile/waiver, and one
+private order-based QC launch before any cloud mutation. Project
+`115 ARV2 SIX CAP90 SETTLED TILT100 R193 2021 2025` (`36958163`)
+read back and compiled the pinned source. A1 backtest
+`c185799f754b7b74592d98a033299480` reached **`Runtime Error`** under
+status-only polling. No aggregate, return, raw row, log, order, or chart
+was read. There is **no valid R-193 return** and no basis to say whether
+100% is better or worse than the valid 80% result. A zero-weight donor is
+a locally reproduced possible refusal, but the QC cause was not established
+from permitted evidence. A2/A3 remain unspent; no blind retry, 120%/140%
+sweep, or post-outcome rule change occurred.
+
+The A1 launch spends **185 -> 186 shared research looks / 128 -> 129 ARV2
+development evaluations**. Infrastructure looks stay **32** and
+authenticated cells stay **615**. No broker, paper/live, funded-order,
+deployment, or trading authority follows.

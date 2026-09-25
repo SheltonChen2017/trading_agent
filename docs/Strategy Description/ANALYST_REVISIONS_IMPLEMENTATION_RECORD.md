@@ -24520,3 +24520,57 @@ price, or order rows, logs or charts, broker/paper/live/funded/deployment,
 or trading access is authorized. The shared look floor is still **185**,
 ARV2 development **128**, infrastructure **32**, authenticated cells **615**
 at this prelaunch point.
+
+### 186.1 R-193 A1 compiled and launched; runtime refusal, no result
+
+After prospective commit `6a3bcda`, the exact pinned 16-file R-193 source
+was uploaded to the new private QC project above (`36958163`), read back
+byte-for-byte, and compiled as
+`9d1fa559608aa4bbccafd8c520aa7ecf-fb4c7447a3d773d0d6fd85ad5c614043`.
+One A1 backtest `c185799f754b7b74592d98a033299480` was launched under the
+previously pinned waiver-payload SHA-256. The status-only reader reached
+`Runtime Error` and wrote an exact terminal receipt. **No aggregate or
+return was read, and no valid R-193 result exists.** The test had already
+demonstrated that a 100% transfer *can* reduce a donor weight to zero and
+trigger the positive-weight refusal; this is a plausible cause, **not a
+confirmed diagnosis of this QC run**. The status-only authority excludes
+raw logs and orders, so the terminal status alone cannot distinguish that
+guard from another runtime cause. No A2/A3 retry is justified without a
+separately established cause and prospective tested correction. In
+particular, this A1 refusal does not authorize adapting the weight rule,
+running 120%/140%, or treating 80% as an observed optimum.
+
+R-193 A1 consumed **one of at most three** candidate attempts and moved
+the shared look floor **185 -> 186**, ARV2 development evaluations
+**128 -> 129**. Infrastructure looks remain **32**, and authenticated cells
+remain **615** because the run yielded no accepted outcome. Project and
+failed run remain private QC evidence; no raw provider/price/order rows,
+logs, charts, broker, paper/live, funded, deployment, or trading access
+was used.
+
+### 186.2 Codex round handoff for later independent Claude review
+
+The exact lane range for the deferred review is `5472189..HEAD`, after the
+single end-of-round push. `d5766d2` prospectively introduced the R-191
+matched and R-192 80% settlement-cash source/reader; review the changed
+cash economics and temporary pending-SELL exception. `6a3bcda` recorded
+their individually valid QC results and prospectively pinned R-193's
+source/profile/waiver before its launch; review the 80%-to-100% source
+diff, independently recomputed file hashes, and zero-weight refusal test.
+The final record-only commit will document R-193's failed A1 and exact
+research-look accounting. No earlier Claude commit was counter-reviewed
+in this owner-deferred round; no claim of independent review is made.
+
+Focused validation before R-193 launch: **116 passed** across the R-193
+projection, R-191/R-192/R-193 launcher, import/no-I/O closure, and active-
+document consistency tests. The independent local source audit found only
+three intended projected file changes and no R-191/R-192 regression.
+`git diff --check` was clean. Per the owner's rule, Codex did **not** run
+the complete analyst lane or repository suite; Claude will run the full
+lane suite at its later review. QC itself proved R-191 and R-192 A1
+Completed with authenticated valid aggregates, while R-193 A1 compiled
+but reached Runtime Error. The next gate is a cause-evidenced decision on
+R-193, not a blind A2 or a stronger tilt sweep. Even if a later correction
+yields a 100% in-sample return, selecting the best of these same-window
+settings requires a separate untouched period before any live-trading
+claim. No owner-authorized paper/live/funded deployment or trading exists.

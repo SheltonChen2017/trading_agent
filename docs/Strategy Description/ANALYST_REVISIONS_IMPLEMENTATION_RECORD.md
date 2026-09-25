@@ -23965,3 +23965,43 @@ append-only shared `docs/research/alpha-result.md` ledger is ordinary
 accounting for the authorized launch; it is not a shared strategy-policy
 change. No R-186 QC project, compile, backtest, or result read has occurred
 at this activation point.
+
+### 183.1 R-186 A1 private QC launch and cash-bound refusal
+
+The pinned source in `ae3da8c` and owner activation in `5585141` preceded
+any R-186 QC mutation. Focused prelaunch selection passed 92 tests, all
+sixteen projected cloud files compiled locally with the QC prelude,
+`git diff --check` was clean, the R-182 predecessor target path matched its
+exact pin, and a value-free project list found the proposed R-186 name free.
+Under the R-186-only waiver, one fresh private project was created:
+`109 ARV2 SIX CAP90 TILT80 R186 2021 2025` (`36935164`). Exact sixteen-file
+readback and QC compile
+`247d8bfcbf6ef2aeab65c2c03076cd09-7416915e5f1ecb7ad3e84cbc2cc9d9e1`
+succeeded. The sole A1 backtest is `8aeb2084d160f3d13b2849540116f422`;
+the claim and launch attest the waived exact-permit SHA-256
+`1c95281540a153e6256843e41a9231813d81af55ff7ddae32f0f45ff75a4e37b`.
+Status-only polling moved from `In Progress...` to **`Runtime Error`**.
+
+The owner reported the QC message `six-universe portfolio cash is outside
+its finite bound`. A value-free inspection of the same statistics-disabled
+status envelope confirmed the error/stacktrace fields were strings and
+classified only the presence of `cash`, `on_order_event`, and
+`_portfolio_cash`, not `_observe_account`; neither raw error text nor any
+order, provider, price, chart, or log row was retained. The projected base
+`_portfolio_cash` explicitly requires a finite, nonnegative Decimal, so
+this is a post-order-event cash-bound refusal, consistent with R-185's
+minimum observed event cash of about $945 on $1 million. It does **not**
+prove the actual R-186 cash value or separately distinguish a negative
+value from a nonfinite one. The unchanged fail-closed cash gate is not
+weakened. No `backtests/read`, aggregate, return, drawdown, or authenticated
+result cell exists for R-186; `Runtime Error` is not a negative alpha estimate.
+
+A1 spends **one** of R-186's maximum three attempts and one exploratory
+research look/development evaluation: shared totals move **175 -> 176
+looks / 118 -> 119 development evaluations / 32 unchanged infrastructure
+looks / 613 unchanged authenticated cells**. The remaining two slots are
+not spent on byte-identical retries of this diagnosed cash refusal. The
+owner's subsequent request for 70%, 60%, and lower tilt strengths is a new
+bounded *parameter-sensitivity family*, not a retroactive correction or
+fourth attempt at R-186. Each successor requires its own prospective
+source/launch identity and look accounting before QC mutation.

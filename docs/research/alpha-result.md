@@ -4323,3 +4323,33 @@ evaluations**, infrastructure looks remain **32**, and the valid bounded
 read moves **612 -> 613 authenticated cells**, labelled exploratory. R-185
 has used one of at most three attempts. No paper/live/funded order,
 broker, deployment, or trading authority follows.
+
+## R-186 — single 80% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+The owner authorized the exact R-186 private order-based research run and,
+after a direct question about its detached signature, authorized starting
+backtesting for this machine/session. Analyst lane section 183 records the
+distinct one-use R-186 A1 waiver and preregistered source/profile. Private
+project `109 ARV2 SIX CAP90 TILT80 R186 2021 2025` (`36935164`) read back
+and compiled the exact 16-file projection SHA-256
+`16240a1ead1dd8466961556ffcfcfc58a6c974d763e87b72c27cfdce72699604`
+and profile SHA-256
+`2fe851dd13421ea0d7d750d17ba509ee6f8407e25eb6a142725cf7c17f387036`.
+One A1 backtest `8aeb2084d160f3d13b2849540116f422` launched under
+waived permit SHA-256
+`1c95281540a153e6256843e41a9231813d81af55ff7ddae32f0f45ff75a4e37b`
+and terminated `Runtime Error`. The owner supplied the QC message
+`six-universe portfolio cash is outside its finite bound`; a value-free
+status-envelope classification located `_portfolio_cash` at
+`on_order_event`, consistent with a post-order-event finite/nonnegative
+cash refusal. The actual cash value was not read or inferred. No result
+aggregate, return, order row, provider/price row, chart, or log was read
+or retained. This is neither a successful backtest nor evidence of alpha.
+
+One A1 launch spends **175 -> 176 shared research looks / 118 -> 119 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. A1 consumes one of R-186's maximum
+three QC attempts. A byte-identical retry of the diagnosed cash refusal
+is not planned. Subsequent 70%/60%/50% candidates, if launched, are
+separate post-result development looks and cannot be relabelled as R-186
+retries, untouched validation, or authorization for leverage or trading.

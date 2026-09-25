@@ -23713,6 +23713,18 @@ refuse before the relevant QC read or write. After this addition, 86 focused
 tests pass across R-185, R-184 regression, import-boundary, and lane-record
 selections. No R-185 QC call has occurred.
 
+**Owner activation, before R-185 A1.** The owner answered **yes** to the
+R-185-only exact exploratory detached-signature waiver and to appending its
+research-look entry in the shared `docs/research/alpha-result.md` ledger.
+The owner also directed that research backtests on this machine may proceed
+under standing authorization. This records authority to launch the pinned
+private R-185 order-based backtest and read its one bounded aggregate, not
+authority to alter the frozen candidate, skip one-use/three-attempt controls,
+inspect raw provider/price/order rows or logs, or place paper/live/funded
+orders. Other code-level signature or review gates remain unless the owner
+specifically changes them. No R-185 QC attempt had been made when this
+authorization was recorded.
+
 **Review and launch gates.** At this implementation start, the remote lane
 head is `c8dfd27`; Claude has not yet pushed an independent review of that
 R-183 round. The owner explicitly then directed Codex to finish **tonight's

@@ -48,6 +48,9 @@ _BACKTEST_NAME = "ARV2 R185A1 six cap90 bridge tilt40 2021 2025 " + _PROJECTION_
 _TOTAL_SOURCE_BYTES = 422_758
 _SOURCE_COUNT = 16
 _PREDECESSOR_PROJECT_NAME = "105 ARV2 SIX CAP90 MATCHED R182 2021 2025"
+_PREDECESSOR_TARGET_PATH_SHA256 = (
+    "b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc"
+)
 _LAUNCH_PERMIT_SCHEMA = "arv2-six-universe-tilt40-owner-launch-permit-v1"
 _WAIVER_SCHEMA = "arv2-six-universe-tilt40-exact-owner-waiver-v1"
 _WAIVER_ID = "ARV2-OWNER-2026-09-24-R185A1-TILT40-EXPLORATORY-SIGNATURE-WAIVER"
@@ -231,9 +234,12 @@ def preview(plan: Tilt40QcPlan, projection: object) -> dict:
 def _require_valid_predecessors(plan: Tilt40QcPlan) -> str:
     """Authenticate R181 A3 and R182 A1 and return R182's target-path digest."""
     try:
-        return tilt20._require_valid_predecessors(plan)
+        target_path_sha256 = tilt20._require_valid_predecessors(plan)
     except tilt20.SixUniverseTiltSubmissionError as exc:
         raise SixUniverseTilt40SubmissionError(str(exc)) from None
+    if target_path_sha256 != _PREDECESSOR_TARGET_PATH_SHA256:
+        _fail("tilt40 R182 target path changed from its preregistered pin")
+    return target_path_sha256
 
 
 def _render_owner_launch_payload(

@@ -24,6 +24,9 @@ PACKAGE_PATH = Path(
     "artifacts/analyst_revisions_v2/accepted_risk_delta_order_package_20260918_01/"
     "arv2-preliminary-qc-package-7803b84f0841f9685a4951de"
 )
+TARGET_PATH_SHA256 = (
+    "b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc"
+)
 
 
 @pytest.fixture(scope="module")
@@ -46,6 +49,13 @@ def _plan(tmp_path, projection):
         package_sha256=projection.package_sha256,
         activation_manifest_sha256=projection.activation_manifest_sha256,
         control_directory=tmp_path / "control",
+    )
+
+
+def _predecessors(monkeypatch, plan, *, valid=True,
+                  target_path=TARGET_PATH_SHA256):
+    return r184_tests._predecessors(
+        monkeypatch, plan, valid=valid, target_path=target_path,
     )
 
 
@@ -137,6 +147,7 @@ def _statistics(plan, launch, *, fraction="0.40", defect=None):
     statistics = r184_tests._statistics(plan, launch)
     aggregate = json.loads(statistics[runtime.AGGREGATES_STATISTIC_NAME])
     aggregate["schema"] = projector.TILT40_SUMMARY_SCHEMA
+    aggregate["matched_baseline_target_path_sha256"] = TARGET_PATH_SHA256
     aggregate["tilt_rank_rule_id"] = projector.TILT40_RANK_RULE_ID
     aggregate["maximum_stock_weight_change_fraction"] = fraction
     if defect == "negative_cash":
@@ -166,7 +177,7 @@ def test_exact_preview_and_signed_payload_bind_r185_identity(projection, tmp_pat
     assert identity["attempt"] == 1
     assert len(identity["source_files"]) == 16
     assert projection.total_source_byte_count == 422_758
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     payload_bytes = subject.render_owner_launch_permit(plan, projection)
     payload = json.loads(payload_bytes)
     assert subject._canonical(payload) == payload_bytes
@@ -179,7 +190,7 @@ def test_exact_preview_and_signed_payload_bind_r185_identity(projection, tmp_pat
     assert payload["backtest_name"] == subject._BACKTEST_NAME
     assert payload["projection_sha256"] == subject._PROJECTION_SHA256
     assert payload["profile_sha256"] == subject._PROFILE_SHA256
-    assert payload["matched_baseline_target_path_sha256"] == "f" * 64
+    assert payload["matched_baseline_target_path_sha256"] == TARGET_PATH_SHA256
     assert payload["mutating_endpoint_budget"]["files/create"] == 16
     assert payload["maximum_backtest_submissions"] == 1
     assert payload["aggregate_only_result_read_authorized"] is True
@@ -192,7 +203,7 @@ def test_changed_plan_or_source_refuses_before_qc_or_claim(
     projection, tmp_path, monkeypatch, changed,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, _ = _fake_qc(monkeypatch, plan, projection)
     signature = _signed(monkeypatch)
     if changed == "project":
@@ -229,12 +240,27 @@ def test_predecessor_gate_refuses_before_qc(
     calls, _ = _fake_qc(monkeypatch, plan, projection)
     signature = _signed(monkeypatch)
     if predecessor != "absent":
-        r184_tests._predecessors(
+        _predecessors(
             monkeypatch, plan, valid=predecessor != "invalid",
-            target_path=None if predecessor == "missing_path" else "f" * 64,
+            target_path=None if predecessor == "missing_path" else TARGET_PATH_SHA256,
         )
     with pytest.raises(subject.SixUniverseTilt40SubmissionError):
         subject.launch_a1(plan, projection, object(), owner_signature=signature)
+    assert calls == []
+    assert not subject._control_path(plan, "claim").exists()
+
+
+def test_different_well_formed_r182_target_path_refuses_before_qc(
+    projection, tmp_path, monkeypatch,
+):
+    plan = _plan(tmp_path, projection)
+    _predecessors(monkeypatch, plan, target_path="f" * 64)
+    calls, _ = _fake_qc(monkeypatch, plan, projection)
+    with pytest.raises(subject.SixUniverseTilt40SubmissionError,
+                       match="preregistered pin"):
+        subject.launch_a1(
+            plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
+        )
     assert calls == []
     assert not subject._control_path(plan, "claim").exists()
 
@@ -243,7 +269,7 @@ def test_signed_launch_is_one_use_and_missing_signature_refuses(
     projection, tmp_path, monkeypatch,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, _ = _fake_qc(monkeypatch, plan, projection)
     signature = _signed(monkeypatch)
     with pytest.raises(subject.SixUniverseTilt40SubmissionError, match="signature"):
@@ -268,7 +294,7 @@ def test_upload_mismatch_or_compile_failure_spends_attempt_without_backtest(
     projection, tmp_path, monkeypatch, defect,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, _ = _fake_qc(
         monkeypatch, plan, projection,
         source_corrupt=defect == "source", compile_error=defect == "compile",
@@ -289,7 +315,7 @@ def test_result_read_binds_40_percent_and_bridge_validity_gates(
     projection, tmp_path, monkeypatch, fraction, defect, accepted,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, state = _fake_qc(monkeypatch, plan, projection)
     signature = _signed(monkeypatch)
     launch = subject.launch_a1(plan, projection, object(), owner_signature=signature)
@@ -315,7 +341,7 @@ def test_equal_tampered_signature_digests_refuse_before_result_network_read(
     projection, tmp_path, monkeypatch,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, _ = _fake_qc(monkeypatch, plan, projection)
     signature = _signed(monkeypatch)
     launch = subject.launch_a1(plan, projection, object(), owner_signature=signature)
@@ -339,7 +365,7 @@ def test_r185_waiver_refuses_missing_wrong_or_mixed_authority_before_network(
     projection, tmp_path, monkeypatch, authority,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, _ = _fake_qc(monkeypatch, plan, projection)
     signature = _signed(monkeypatch)
     kwargs = {
@@ -360,7 +386,7 @@ def test_r185_exact_waiver_binds_one_use_launch_and_aggregate_read(
     projection, tmp_path, monkeypatch,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, state = _fake_qc(monkeypatch, plan, projection)
     launch = subject.launch_a1(
         plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
@@ -368,7 +394,7 @@ def test_r185_exact_waiver_binds_one_use_launch_and_aggregate_read(
     claim = subject._read(subject._control_path(plan, "claim"))
     waived_payload = subject._render_waived_launch_payload(
         plan, subject.preview(plan, projection),
-        matched_baseline_target_path_sha256="f" * 64,
+        matched_baseline_target_path_sha256=TARGET_PATH_SHA256,
     )
     scope = json.loads(waived_payload)
     assert subject._canonical(scope) == waived_payload
@@ -377,7 +403,7 @@ def test_r185_exact_waiver_binds_one_use_launch_and_aggregate_read(
     assert scope["project_name"] == plan.project_name
     assert scope["backtest_name"] == plan.backtest_name
     assert scope["source_files_sha256"] == subject._SOURCE_FILES_SHA256
-    assert scope["matched_baseline_target_path_sha256"] == "f" * 64
+    assert scope["matched_baseline_target_path_sha256"] == TARGET_PATH_SHA256
     assert scope["aggregate_only_result_read_authorized"] is True
     assert scope["maximum_result_reads"] == 1
     assert scope["paper_live_deployment_funded_trading_authorized"] is False
@@ -407,7 +433,7 @@ def test_equal_tampered_waiver_digests_refuse_before_result_network_read(
     projection, tmp_path, monkeypatch,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, _ = _fake_qc(monkeypatch, plan, projection)
     launch = subject.launch_a1(
         plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
@@ -431,7 +457,7 @@ def test_waiver_claim_rejects_equal_source_manifest_tamper_before_result_read(
     projection, tmp_path, monkeypatch,
 ):
     plan = _plan(tmp_path, projection)
-    r184_tests._predecessors(monkeypatch, plan)
+    _predecessors(monkeypatch, plan)
     calls, _ = _fake_qc(monkeypatch, plan, projection)
     launch = subject.launch_a1(
         plan, projection, object(), owner_waiver_id=subject._WAIVER_ID,
@@ -442,7 +468,7 @@ def test_waiver_claim_rejects_equal_source_manifest_tamper_before_result_read(
     claim["source_files"][0][1] = "0" * 64
     claim["owner_waived_payload_sha256"] = hashlib.sha256(
         subject._render_waived_launch_payload(
-            plan, claim, matched_baseline_target_path_sha256="f" * 64,
+            plan, claim, matched_baseline_target_path_sha256=TARGET_PATH_SHA256,
         )
     ).hexdigest()
     claim_path.write_bytes(subject._canonical(claim))

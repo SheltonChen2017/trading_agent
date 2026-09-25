@@ -23725,6 +23725,16 @@ orders. Other code-level signature or review gates remain unless the owner
 specifically changes them. No R-185 QC attempt had been made when this
 authorization was recorded.
 
+The independent final prelaunch audit found `ARV2CR182-001` (P2,
+corrected before any QC call): the R-185 launcher accepted any well-formed
+target-path SHA returned by R-184's structurally authenticated R-182 receipt,
+although this candidate preregistered R-182's exact
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`.
+The launcher now pins that exact digest before network access or an attempt
+claim; an isolated test substitutes a different valid 64-hex digest and is
+red without the guard, green with it. R-184's frozen code and test fixtures
+were not changed. Focused R-185 projection/submission tests pass 31/31.
+
 **Review and launch gates.** At this implementation start, the remote lane
 head is `c8dfd27`; Claude has not yet pushed an independent review of that
 R-183 round. The owner explicitly then directed Codex to finish **tonight's

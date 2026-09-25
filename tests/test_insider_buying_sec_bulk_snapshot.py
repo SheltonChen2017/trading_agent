@@ -19,7 +19,7 @@ from types import SimpleNamespace
 
 import pytest
 
-from data.hashing import canonical_json, hash_bytes
+from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying import (
     ALLOWED_SEC_TABLES,
     REQUIRED_SEC_TABLES,
@@ -357,6 +357,73 @@ def test_auxiliary_member_obeys_expanded_size_limit(monkeypatch):
     )
     with pytest.raises(SecBulkSnapshotError, match="expanded-size"):
         inspect_sec_bulk_archive(archive, _source())
+
+
+def test_lineage_hash_binds_auxiliary_descriptors_through_the_identity_payload():
+    # The lineage hash is computed from a dict built inside
+    # inspect_sec_bulk_archive, while the manifest is written from
+    # SecBulkSnapshotIdentity.lineage_payload(). Pin that the two definitions
+    # agree and both carry the auxiliary descriptors, so neither can silently
+    # stop binding them into the lineage hash and snapshot ID.
+    archive = _archive(names=ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS)
+    identity = inspect_sec_bulk_archive(archive, _source())
+    lineage = identity.lineage_payload()
+    assert (
+        tuple(row["name"] for row in lineage["auxiliary_members"])
+        == CURRENT_AUXILIARY_MEMBERS
+    )
+    assert hash_payload(lineage) == identity.lineage_hash
+    assert identity.snapshot_id.endswith(identity.lineage_hash[:16])
+
+
+@pytest.mark.parametrize(
+    ("field", "match"),
+    [
+        ("members", "member inventory is invalid"),
+        ("auxiliary_members", "auxiliary member inventory is invalid"),
+    ],
+)
+def test_manifest_null_member_inventories_refuse_as_contract_errors(
+    tmp_path, field, match
+):
+    # A null inventory must be refused by the contract, not escape as a
+    # TypeError from iterating None.
+    archive = _archive(names=ALLOWED_SEC_TABLES + CURRENT_AUXILIARY_MEMBERS)
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    target = tmp_path / identity.snapshot_id
+    _rewrite_manifest_and_commit(
+        target, lambda manifest: manifest.update({field: None})
+    )
+    with pytest.raises(SecBulkSnapshotError, match=match):
+        load_sec_bulk_snapshot(target)
+
+
+def test_unknown_table_within_the_member_cap_refuses_instead_of_being_dropped():
+    # With seven allowed tables plus one unknown .tsv, the ten-member and
+    # eight-table caps both pass; only the unexpected-table check stands
+    # between the archive and a manifest that silently omits the unknown
+    # member while the archive hash still covers its bytes.
+    names = ALLOWED_SEC_TABLES[:7] + ("EXTRA.tsv",)
+    with pytest.raises(SecBulkSnapshotError, match=r"unexpected=\['EXTRA\.tsv'\]"):
+        inspect_sec_bulk_archive(_archive(names=names), _source())
+
+
+def test_auxiliary_order_is_canonical_regardless_of_zip_member_order(tmp_path):
+    # The real SEC archives happen to list the metadata member before the
+    # readme; the contract must not depend on that, or a differently ordered
+    # archive would publish a manifest its own loader refuses.
+    reversed_auxiliaries = tuple(reversed(CURRENT_AUXILIARY_MEMBERS))
+    archive = _archive(
+        names=tuple(reversed(ALLOWED_SEC_TABLES)) + reversed_auxiliaries
+    )
+    identity = write_sec_bulk_snapshot(archive, _source(), tmp_path)
+    assert tuple(member.name for member in identity.members) == ALLOWED_SEC_TABLES
+    assert (
+        tuple(member.name for member in identity.auxiliary_members)
+        == CURRENT_AUXILIARY_MEMBERS
+    )
+    loaded = load_sec_bulk_snapshot(tmp_path / identity.snapshot_id)
+    assert loaded.identity == identity
 
 
 @pytest.mark.parametrize(

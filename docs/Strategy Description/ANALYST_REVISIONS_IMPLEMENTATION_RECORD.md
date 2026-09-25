@@ -578,7 +578,16 @@ counter-review, the owner's separate exact R-183 bridge waiver and shared-
 ledger authorization, and the authenticated valid R-183 A1 ETF-basket result.
 That order-based result was +106.33% over 2021–2025 after modeled costs,
 contextual rather than a clean analyst-selection effect; R-183 has spent
-one of three allowed attempts.
+one of three allowed attempts. Section 182 records the owner's bounded
+review-timing exception, prospective 40% R-185 weight-tilt source freeze,
+one first-attempt private order-based QC run, and a valid aggregate-only
+result. R-185 returned +127.80% after modeled costs versus R-184's +125.76%
+at 20% tilt and R-182's +123.62% matched baseline in the same 2021–2025
+window. The incremental +2.04-point R-185-minus-R-184 spread is a post-result
+development sensitivity, not out-of-sample confirmation. R-185 used one of
+three attempts; its authorized shared-ledger entry brings totals to 175
+shared looks / 118 development evaluations / 32 infrastructure looks /
+613 authenticated cells, the last exploratory.
 Separately, R-177 remains preserved for the owner's Mia work; no Codex A4
 change or relaunch is permitted. Section 180 is Claude's independent review of
 `0132031..c599301`: every commit accepted, the shared look ledger reconciled
@@ -600,10 +609,10 @@ During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
 the pushed range through section 180. Section 182 records the owner's exact
-exception: finish the bounded R-185 stronger-tilt backtest before Claude
-reviews sections 181–182 and their pushed source and results. That review is
-deferred, not canceled; no intermediate unreviewed QC experiment becomes
-accepted evidence merely by completing.
+exception: the bounded R-185 stronger-tilt backtest was completed before
+Claude reviews sections 181–182 and their pushed source and results. That
+review is deferred, not canceled; the valid exploratory result is not formal
+alpha evidence merely because the QC engine completed it.
 Each distinct backtest candidate has a hard maximum of three QC attempts.
 A compile failure, runtime error, or any other unsuccessful terminal run each
 counts as one attempt. After the third failure Codex makes no further code
@@ -23642,7 +23651,7 @@ period tests, changed rules, leverage, formal alpha acceptance, or live
 work require their own prospective decision and authorization. This round
 does not infer them from R-183's terminal `Completed.` or valid aggregate.
 
-## 182. Prospective stronger analyst-revision weight tilt R-185, implementation only, 2026-09-24
+## 182. Stronger analyst-revision weight tilt R-185, prospective freeze and exploratory A1, 2026-09-24
 
 After seeing exploratory R-184's +2.13824673594447-point spread over R-182,
 the owner asked Codex to begin implementing one stronger analyst-revision
@@ -23703,8 +23712,9 @@ were unauthorized despite a one-time aggregate reader. The permit now
 explicitly authorizes only one aggregate read, and the read-time digest
 check binds the same permit bytes. Forty-one focused R-185, R-184-regression,
 and import-boundary checks pass; this is not a full lane suite.
-An optional R-185-only exploratory waiver branch is implemented but **not
-activated**: the existing signed route remains available, and the waiver
+An optional R-185-only exploratory waiver branch was prepared but **not
+activated at this prelaunch stage**: the existing signed route remained
+available, and the waiver
 route requires the exact distinct ID
 `ARV2-OWNER-2026-09-24-R185A1-TILT40-EXPLORATORY-SIGNATURE-WAIVER` plus an
 explicit owner choice. Both routes bind the same one-use source and
@@ -23749,3 +23759,60 @@ research-look entry also needs its own owner authorization; neither follows
 automatically from moving Claude's review later. No R-185 QC project,
 compile, backtest, result read, research look, or authenticated cell is
 claimed at this point.
+
+### 182.1 R-185 A1 private order-based QC run and authenticated exploratory read
+
+After the owner-specific waiver and exact R-182 target-path correction were
+committed locally, Codex performed one private QC launch. Project
+`108 ARV2 SIX CAP90 TILT40 R185 2021 2025` is `36933404`; exact 16-file
+source readback, compile
+`c1dc0a010333a9b1c1d27e9f3f499aeb-aed0ec1b11ec692bab3c357ce646945a`,
+and A1 backtest `273bc9592c54f158dde812b528d69e47` bind the pinned
+projection/profile above. The R-185-specific owner waiver is attested in
+the claim and launch by canonical payload SHA-256
+`00193c4e2813334ae3dd0bebd564bac01e745cfd14e08785a06fbdbc96a530cc`.
+Status-only polling went from `In Progress...` to `Completed.`. The one
+bounded custom META/AGGREGATES read reauthenticated current source and
+waiver identity and returned aggregate SHA-256
+`899aca607f8083a589185f10e3ab0c582369f9ee1707eb1f3e4d6a2062d49891`
+with `run_valid=true`; no standard statistic, raw provider/price/order row,
+chart, or log was retained. The one-use read claim and valid receipt are
+present, and no further read is authorized.
+
+The 2021-01-04 through 2025-12-31 account had 1,255 observations and 261
+completed rebalances. All 6,324 submitted orders filled, with zero invalid
+or canceled. Observed daily-close cash stayed at least `15832.95614` and
+post-order-event cash at least `945.1112891750001`; maximum end-day gross
+was `0.9849784912822988248387557248`. Mean/maximum target-weight L1
+tracking errors were `0.004849416426936300731722565747` /
+`0.010762069594720217858499386646228593179417086416781424508499515488143566639303284`,
+under the 2%/5% gates. The admission leverage value is 2 but portfolio
+target gross remains 0.98; observed cash checks are daily-close/event,
+not continuous intraday. Modeled and actual engine fees both equal
+`36376.6563843` at 10 bps per side.
+
+Starting/ending equity was `1000000` / `2277966.990445955`. Preliminary
+after-modeled-cost cumulative return was **+127.7966990445955%**;
+maximum drawdown was approximately **−21.2095%**, annualized volatility
+approximately **20.3496%**, and zero-rate Sharpe approximately **0.9149**.
+The predeclared R-185-minus-R-182 matched-stock spread is
+**+4.1775324184610 percentage points**; the secondary R-185-minus-R-184
+20%-tilt sensitivity is **+2.03928568251653 points**. Against R-184,
+R-185 paid `825.7752848` more modeled/engine fees and made eleven more
+filled orders. The selected identities, counts and six-sleeve fallbacks
+remain R-184's: SPY 249 full-stock decisions, XLV 236; QQQ/SOXX/REMX
+261 own-ETF fallbacks each; XLE 163 partial-stock and 82 positive-score-
+floor decisions plus 16 coverage fallbacks. This comparison isolates a
+stronger within-selected-stock weight tilt, not new stock selection or a
+fully analyst-independent market-cap comparator.
+
+The 40% bound was chosen after seeing the 20% tilt's positive result in
+the **same** 2021–2025 window. This is one post-hoc development parameter
+look; neither +2.04 points nor +4.18 points is untouched validation or a
+forecast. Three sleeves never contained selected stocks, so it is not six
+independent signal tests. The user-authorized shared ledger entry records
+**174 -> 175 shared looks / 117 -> 118 ARV2 development evaluations /
+32 unchanged infrastructure looks / 612 -> 613 authenticated cells**;
+the new cell is exploratory. A1 used one of R-185's maximum three QC
+attempts. No further tilt sweep, leverage, formal-alpha claim, paper/live
+deployment, broker, or real-order authority follows from this result.

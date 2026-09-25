@@ -4268,3 +4268,58 @@ the basket is **+17.2843931899265 percentage points**. The primary
 R-181-minus-R-182 stock-selection comparison remains −26.9904311578985
 percentage points. The basket is secondary whole-portfolio context, not a
 clean analyst-selection comparator or formal alpha confirmation.
+
+## R-185 — stronger 40% matched-stock analyst-revision tilt, A1 valid (EXPLORATORY; run_valid=true; ONE EXPLORATORY CELL) — 2026-09-24
+
+The owner authorized an R-185-specific exploratory detached-signature waiver
+and this shared-ledger entry before launch (Analyst lane section 182). The
+new private order-based QC project
+`108 ARV2 SIX CAP90 TILT40 R185 2021 2025` (`36933404`) compiled the exact
+16-file projection SHA-256
+`2a9f9a2175e2765c1136d4aca3d86d617bbee970769eecae6dcab2e0f1127c7d`
+and profile SHA-256
+`a76cead2de5fef1176803f77b2a7efd3cc11fa24734dcdcf91a047f4ae552539`.
+Its only backtest attempt, A1 `273bc9592c54f158dde812b528d69e47`,
+reached `Completed.`. The one permitted META/AGGREGATES read reauthenticated
+the exact present source, waiver payload SHA-256
+`00193c4e2813334ae3dd0bebd564bac01e745cfd14e08785a06fbdbc96a530cc`,
+R-182's exact target-path SHA-256
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`,
+and aggregate SHA-256
+`899aca607f8083a589185f10e3ab0c582369f9ee1707eb1f3e4d6a2062d49891`.
+It returned `run_valid=true` with 261/261 scheduled rebalances,
+6,324/6,324 submitted orders filled, and zero invalid or canceled orders.
+Observed minimum daily-close cash was `15832.95614`, minimum post-order-event
+cash `945.1112891750001`, maximum end-day gross `0.9849784912822988248387557248`,
+and mean/maximum target-tracking L1 error `0.004849416426936300731722565747`
+/ `0.010762069594720217858499386646228593179417086416781424508499515488143566639303284`,
+within the frozen 2%/5% bounds. The 2x setting is buying-power admission
+only; the target remains 98% long gross, not a 2x portfolio.
+
+Over 2021-01-04 through 2025-12-31, starting/ending equity was `1000000`
+/ `2277966.990445955`, with preliminary after-modeled-cost cumulative
+return **+127.7966990445955%** (`1.277966990445955`), maximum drawdown
+approximately **−21.2095%**, annualized volatility approximately **20.3496%**,
+and zero-rate Sharpe approximately **0.9149**. Modeled and actual engine
+fees both report `36376.6563843` under 10 bps per side. Against the frozen
+R-182 matched result (+123.6191666261345%), the R-185-minus-R-182 spread
+is **+4.1775324184610 percentage points**; against the frozen R-184 20%
+tilt (+125.75741336207897%), the added 20%-to-40% tilt is
+**+2.03928568251653 points**. R-185 uses the same selected stocks and ETF
+fallbacks as R-184: SPY and XLV supplied most full-stock sleeve decisions;
+QQQ, SOXX and REMX remained own-ETF fallbacks on all 261 decisions; XLE
+mixed partial stocks, positive-score-floor fallback, and coverage fallback.
+
+This is a parameter-strengthening choice made **after seeing R-184's
+positive result in the same window**. It is one additional development look,
+not untouched validation, six independent universe replications, formal
+alpha acceptance, or evidence that the extra 2.04 points will persist. The
+lowest observed post-order-event cash narrowed to about $945 on a $1m
+starting account; daily-close/event observations do not establish continuous
+intraday cash. No raw provider/price/order rows, standard QC statistics,
+logs, or charts were retained. Accounting: one A1 launch spends
+**174 -> 175 shared research looks / 117 -> 118 ARV2 development
+evaluations**, infrastructure looks remain **32**, and the valid bounded
+read moves **612 -> 613 authenticated cells**, labelled exploratory. R-185
+has used one of at most three attempts. No paper/live/funded order,
+broker, deployment, or trading authority follows.

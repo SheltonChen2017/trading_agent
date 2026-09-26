@@ -118,6 +118,12 @@ Section 195 completes the total AR entry/count/weight ablation: fully AR-off
 R223 versus exact R222-source AR-on 100% R224, both valid A1 order runs.
 The current reconciled floor is 222 shared looks, 163 development evaluations,
 34 infrastructure looks and 644 authenticated exploratory cells.
+Section 196 is Claude's independent review of the forty-five-commit range
+`dcb7157..08c9eab`, sections 181–195 (0 P0, 0 P1, 1 P2, 5 P3): one test-only
+correction pins the relaxed launcher's frozen-manifest hash check; the P2 is
+the two-window disagreement about the analyst-revision overlay, whose leading
+explanation is the current-vintage historical analyst archive, to be measured
+before any further capacity or period run.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -729,8 +735,12 @@ live use or formal acceptance is scheduled automatically from these results.
 Section 195 is the owner's explicit next bounded exception: implement and run
 a fully AR-off cap-ranked control R223 versus a fresh exact R222-source AR-on
 100% arm R224 on the same all-six 25% policy, input, window and execution rules.
-Claude review of section 195 and earlier deferred commits follows one final
-push; Codex counter-reviews every Claude commit. Each candidate has at most
+Section 196 is Claude's independent review of the exact pushed range
+`dcb7157..08c9eab` (forty-five commits, sections 181–195) with the test-only
+correction `22bdbce`. The immediate next step is that Codex counter-reviews
+section 196 and the exact pushed range, then measures the vendor vintage drift
+of the analyst archive (section 196.5, item 1) before any further capacity or
+period run. Each candidate has at most
 three attempts, no full-suite run by Codex and no automatic follow-on research
 or trading. Both are now valid on A1: AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
@@ -743,7 +753,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 180. Section 182 records the owner's exact
+the pushed range through section 195 (section 196). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -783,7 +793,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–195
+findings, outcomes, and per-run accounting remain in numbered sections 1–196
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -2466,6 +2476,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-26 | Codex owner-directed autopilot | `e6ef6e3` -> `8bb47ed`, `d587643`, `1d4de30`, and this final record commit | Measured coverage easing, independent XLE entry, recent 20%–200% order ladder | R209 count diagnostic completed A1; one lost host receipt read recovered under its exact separately frozen exception. Same package/window/cost/exposure, fixed pre-outcome thresholds, partial own-ETF residuals, unknown identities excluded. All ten order candidates R210–R219 valid on A1, no retries or Mia edits. Shared bookkeeping owner-authorized. | Focused coverage 18, helper 38, generated profile/transport 29, launcher 32, production freeze 11; final 72-case integration green; exact closure/smuggling green. All ten local receipt chains reauthenticated without another QC outcome read. Final document/compilation checks in 193.6. No full suite. Counts 217 shared / 158 development / 34 infrastructure / 639 cells. | `ARV2D193-001` P2 local envelope defect corrected prospectively with 128 KiB bounded artifacts; original read claim retained and extra infrastructure look explicit. No new P0/P1. REMX remains ETF-only, score-conditioned count/control and PIT/vintage/adaptivity limitations retained. | One final same-lane push. Claude reviews section 193 and earlier deferred sections 181–192, including each commit and isolated guards; Codex counter-reviews its push. No best-setting, same-universe ETF-outperformance, formal acceptance or trading claim. |
 | 2026-09-26 | Codex owner-directed comparison | `1583157` -> `4b00c2b`, `004a338`, and final record commit | Same-selection 0/100 weight ablation; separate all-six 25%/100% construction | R220/R221/R222 valid A1 order-based runs, same input/window/cost/exposure; only the pair has an identical baseline path. No retries, Mia or new provider capture. All three cached receipt chains reauthenticated locally, no second QC reads. | Focused generated boundaries, family pins, launcher and cached-arm regressions; exact closure and document gates. Final checks in 194.5; no full suite. Final 220 shared / 161 development / 34 infrastructure / 642 cells. | `ARV2D194-001` P2 cached-arm attribution gap corrected before reporting; six old-comparator mutations red. 100% overlay -0.385576 pp versus zero, all25 -1.230479 pp versus original 100%; AR entry/count and PIT/vintage/adaptivity caveats retained. | One final same-lane push. Claude reviews section 194 and all earlier deferred commits; Codex counter-reviews its exact push. No automatic new research/trading milestone. |
 | 2026-09-26 | Codex owner-directed total AR ablation | `7c1694e` -> `8cc7e7c`, `7c4351e`, and final record commit | Fully AR-off versus exact all25 AR-on100 reference | R223/R224 valid A1 order runs, same non-AR coverage/census, window/input/execution; AR entry/count/weights removed only in OFF. No retry/Mia/provider capture or extra outcome read. | Focused source/mode/cached comparison, mutation, exact closure and document gates; final checks in 195.4. No full suite. Final 222/163/34/644. | `ARV2D195-001` P2 common coverage/census comparison corrected before paired reporting; four isolating cases red then green. Net AR spread -0.114367 pp, risk slightly worse. Conditional input/identity catalog, PIT/vintage/adaptive window retained. | One final same-lane push; Claude reviews section 195 plus all deferred commits, Codex counter-reviews exact Claude push. No automatic additional research or trading. |
+| 2026-09-26 | Claude independent review of sections 181–195: tilt ladders, settlement-cash policy, recent-window family, coverage easing, and the AR ablations | `08c9eab` -> `22bdbce` -> this record commit | Section 196: forty-five commits `dcb7157..08c9eab` individually disposed (44 accepted, 1 accepted after correction, 0 rejected); zero QC calls, looks, evaluations, or cells | Pinned the relaxed launcher's frozen-manifest hash check (`22bdbce`, test-only, red with the check disabled, green restored); no production line changed | Standing lane selection in a byte-faithful export of the final code tree, focused delta files, fourteen mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 196.7 | 0 P0, 0 P1, 1 P2, 5 P3 (`ARV2R196-001` through `-006`); `-002` corrected; `-001` is the two-window disagreement about the AR overlay and the vintage hypothesis | Single push of the two Claude commits; Codex counter-reviews section 196 and measures the vendor vintage drift before any further capacity or period run |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -26840,3 +26851,286 @@ lane or repository suite. Both actual QC runs and sole reads succeeded on A1;
 no failure/retry/recovery/Mia/provider capture. Claude performs the full lane
 review. This round ends with one final same-worktree/same-branch push; no
 additional experiment or monitoring task is started automatically.
+
+## 196. Independent Claude review of sections 181–195: tilt ladders, the settlement-cash policy, the recent-window family, coverage easing, and the analyst-revision ablations, 2026-09-26
+
+**Range reviewed:** `dcb7157..08c9eab`, forty-five Codex commits, each
+disposed in 196.1, plus the two Claude lane commits of this round
+(`22bdbce`, test-only, and this record commit). Section 180 was the last
+independent review; every section from 181 to 195 was written under the
+owner's explicit same-round deferrals, so this is the first review of
+sections 181–195, the thirty-one valid order results they report, and the
+eight unsuccessful launches they record. Codex's per-section handoff notes
+(181.3, 182.2, 184.4, 186.2, 187.3, 188.3, 189.8, 190.9, 191.6, 192.9,
+193.6, 194.5, 195.4) were read and are answered below.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect endpoint was called.
+Every figure quoted is transcribed from the record or the shared ledger and
+was recomputed by script where it is an arithmetic result.
+
+**Mia provenance.** Three Mia-touched runs enter this range: the R-186
+settlement-cash repairs (section 185, not accepted as results), the R-193
+positive-residual fix (section 187, ported as a separately versioned R-194
+source), and the R-203 `contains_key` removal (section 192.4, ported only
+into the projected recent-window source and imported through a one-use
+reader that pins Mia's backtest and snapshot identities). Each was
+retrieved, byte-compared, and ported behind a red/green regression; none
+was promoted to evidence by its cloud status. The handling is adequate.
+
+**Verdict.** Forty-four commits are accepted; one (`8bb47ed`) is accepted
+after a test-only correction; none is rejected. **0 P0, 0 P1, 1 P2, 5 P3.**
+No production line changed in this round. The P2 is not a code defect: it
+is the unexplained disagreement between the two evaluation windows about
+the analyst-revision weight overlay, with the current-vintage historical
+analyst archive as the leading explanation and a direct, look-free
+measurement proposed before any further capacity or period run.
+
+### 196.1 Per-commit dispositions
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `d64f97e` | Codex counter-review of section 180; launched-candidate table-row gate; original R-183 identity pin; 14-file R-183 bridge launcher | accepted | Reviewed with section 181; the bridge keeps the 98% target and the fail-closed validity gates; the R-183-specific waiver refuses other candidates per its tests. |
+| `a704ac8` | R-183-specific exploratory signature waiver bound to the exact permit digest | accepted | One-use, candidate-bound; the R-181/R-182/R-184 waiver is not reused. |
+| `978df35` | Record: authenticated R-183 A1 result and look accounting | accepted | Record only; the −9.706 and +17.284 point spreads reproduce. |
+| `c8dfd27` | Record: R-183 round close with review notes | accepted | Record only. |
+| `891a236` | R-185 40% tilt projection and launcher; closure registration | accepted | Counted substitutions from the R-184 source; only three projected files change; pins verified by its tests. |
+| `d0546bf` | Dormant R-185-only waiver route | accepted | Distinct ID; activated only in `f579ef7`. |
+| `f579ef7` | Record: owner R-185 waiver and shared-ledger authority | accepted | Record only. |
+| `1c955eb` | Exact R-182 target-path digest pinned before R-185 launch (`ARV2CR182-001`) | accepted | Correct direction: a structurally valid but different predecessor path now refuses. |
+| `27412f7` | Record: R-185 A1 valid result | accepted | Record only; the +4.178 and +2.039 point spreads reproduce. |
+| `9ece049` | Record: R-185 handoff | accepted | Record only. |
+| `ae3da8c` | R-186 80% tilt projection and launcher | accepted | Same substitution pattern; pins verified. |
+| `5585141` | Record: R-186 one-use authority | accepted | Record only. |
+| `cfb186c` | Record: R-186 cash-bound refusal | accepted | Record only; correctly a refusal, not a result. |
+| `87a9e90` | R-187/R-188/R-189 ladder projection and launcher; cash-event boundary tests | accepted | Fraction text `0.70/0.60/0.50` substituted into the pinned R-185 source; refusals are deliberate. |
+| `34c746c` | Record: three cash-bound refusals | accepted | Record only. |
+| `5472189` | Record: ladder handoff | accepted | Record only. |
+| `d5766d2` | R-191/R-192 settlement-cash projection and launcher | accepted | Reviewed in detail in 196.3: transient negative event cash only with an open same-session SELL MOO; final settled and daily cash must be nonnegative; a pending buy alone refuses. |
+| `6a3bcda` | Record: R-191/R-192 valid results; R-193 100% freeze | accepted | Record plus pinned projection; the +7.901 point spread reproduces. |
+| `84a9b4b` | Record: R-193 runtime refusal | accepted | Record only. |
+| `97cc7bb` | R-194 positive-residual (1e-30) floor projection ported from Mia's diff | accepted | Compact expression is algebraically Mia's nested minimum; frozen R-193 bytes untouched; within the source budget. |
+| `db340ac` | Record: Mia run and concurrent third R-193-lineage run | accepted | Record only; conservative attempt accounting. |
+| `537ce53` | R-194 one-time fourth-look launcher extension | accepted | Explicitly records look 4; no attempt reset. |
+| `c058fd4` | Record: R-194 completed engine, refused read (`ARV2D188-001`) | accepted | Record only; the gate was not relaxed. |
+| `9db8d0f` | R-195–R-197 guarded ladder with the per-sleeve donor floor (`ARV2D189-001`) | accepted | Both floors present in the substitution; load-bearing mutant test named in 196.3. |
+| `bbfa4c1` | In-place R-195 A2 recovery and receipt-only comparison helper | accepted | Same project, same source, new one-use claim; A1 stays spent. |
+| `bddbef6` | Record: R-195–R-197 results | accepted | Record only; spreads reproduce. |
+| `0d20bdd` | R-198–R-200 pins; authorized R-195–R-197 shared-ledger entries | accepted | Old projected bytes and waivers unchanged per its tests. |
+| `43f74f0` | Record: section-190 plan and identities | accepted | Record only. |
+| `c872a26` | Record: R-198–R-200 results; closure inventory correction (`ARV2D190-001`) | accepted | Test-only inventory fix; the smuggling regression is red without the pin. |
+| `4808a5d` | R-201/R-202 250%/300% pins | accepted | Same projection family; 16 files / 425,975 bytes. |
+| `a80718a` | R-201/R-202 launcher identities | accepted | Candidate-bound waiver IDs. |
+| `b1d5ba7` | Record: R-201/R-202 results; offline latest-input package builder | accepted | Package builder reviewed in 196.3: fresh capture must start after the cutoff close; collisions and cross-archive daily conflicts are quarantined; predecessor rows are preserved byte-for-byte. |
+| `d5afc82` | Recent-window (2025-08-01 to 2026-09-25) projections R-203–R-208 and launcher | accepted | Period literals and the 290/289/61 geometry verified against the decision-axis rule in 196.3. |
+| `1744659` | Mia direct-read port into the corrected recent family; R-203 importer | accepted | The precheck removal is applied only to the projected source; the local runtime is unchanged; the importer pins Mia's backtest and snapshot identities. |
+| `e6ef6e3` | Record: recent-window outcomes and handoff | accepted | Record only; the +0.174 point spread and both annualizations reproduce. |
+| `8bb47ed` | R-209 counts-only coverage diagnostic and relaxed launcher | accepted after correction | Manifest bytes pinned by SHA-256 in code and counts-only with no order capability, but the hash check itself was unpinned (`ARV2R196-002`); corrected in `22bdbce`. |
+| `d587643` | 128 KiB private result envelope for the seven-statistic receipt (`ARV2D193-001`) | accepted | Individual statistic bound unchanged; one explicit recovery read. |
+| `1d4de30` | Relaxed selection source (XLE cap-ranked entry; QQQ/SOXX/REMX floors; partial-budget scaling) and ten-capacity family | accepted | Reviewed in 196.3; unknown identities cannot be selected; unresolved budget stays in the own ETF. |
+| `1583157` | Record: ten relaxed results | accepted | Record only. |
+| `4b00c2b` | Zero/100 weight ablation and all-six 25% coverage families | accepted | Zero arm reproduces the baseline exactly; 100% arm preserves R-214 bytes. |
+| `004a338` | Cached-pair comparator authenticates each arm (`ARV2D194-001`) | accepted | Six isolating regressions; a copied arm now refuses. |
+| `7c1694e` | Record: ablation and all-six 25% outcomes | accepted | Record only; the −0.386 and −1.230 point spreads reproduce. |
+| `8cc7e7c` | Fully AR-off order control R223 and exact R222-source AR-on R224; strict family mode | accepted | The AR-off gate replaces `_selected_ids` by an AST body swap to cap-ranked top-ten and nulls the score enrichment with an exact-count anchor; the frozen manifest census requires `analyst_revision_enabled` false/true; historical manifests untouched. |
+| `7c4351e` | Total-AR comparator requires common non-AR coverage and callback census (`ARV2D195-001`) | accepted | Correct direction: a vintage change that altered coverage can no longer pass as an AR effect; four isolating cases are red on the original comparator. |
+| `08c9eab` | Record: R223/R224 outcomes, in-memory behavioural audit test | accepted | Record plus a checked-in in-memory mutant test; the −0.114 point spread reproduces; the section-4 pointer and ledger row were current at the push (record gates green). |
+
+Note on `8bb47ed`: the correction is `22bdbce`; see `ARV2R196-002`.
+
+### 196.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R196-001` | P2 | record sections 189–194 (interpretation) | The two evaluation windows disagree about the analyst-revision weight overlay, and the record reports both without naming the most likely cause. In 2021–2025 the overlay's after-cost gain rises monotonically with capacity to +23.4 points at 300% (R-191 matched +123.62% versus R-202 +147.00%); in the recent window the paired ablation shows the overlay subtracting 0.39 points (R-220 zero overlay +55.27% versus R-221 100% +54.88%) with a worse drawdown and Sharpe. The lane's own disclosure says the historical analyst archive is current-vintage history in which vendor corrections overwrite records, while the recent-window scores were captured days after their events. An overlay that concentrates capital in the highest current-vintage scores would be expected to improve with concentration on the historical window and lose that edge as soon as scores are near point-in-time, which is the observed pattern. Regime difference is the alternative and cannot be excluded by these runs. | Documented; interpretation only, no code change. The 2021–2025 capacity curve must not be read as evidence for a stronger tilt, and no capacity above zero has beaten the zero-overlay control on the only window where that control exists. Plan items 1 and 2. |
+| `ARV2R196-002` | P3 | `8bb47ed` | The relaxed launcher's frozen-manifest SHA-256 check (`_manifest`) was unpinned: disabling it left `test_qc_relaxed_submission.py` and `test_qc_relaxed_family_freeze.py` green (43 passed), because the only corruption test writes `{}`, which the shape and census checks also refuse. An edited but shape-identical row is exactly the attempt-renaming escape the freeze exists to close; the one-use claims and cloud census are the remaining layers. | Corrected in `22bdbce` (test-only): `test_frozen_manifest_hash_binds_every_byte_not_only_shape` edits one row field the shape check ignores and requires refusal before any QC call; red with the hash check disabled (1 failed, 32 passed), green restored (33 passed). |
+| `ARV2R196-003` | P3 | `4808a5d`, `d5afc82`, `1744659` (shared ledger) | Four shared-ledger headings in `docs/research/alpha-result.md` still read "A1 launched" for runs whose bodies record valid completion (R-201, R-202, R-203, R-205). Headings are the ledger's status labels and the only thing the launched-candidate gate reads. | Documented only: the file is shared project state and this lane edits it only under the owner's bookkeeping permission, which Codex holds. Plan item 6. |
+| `ARV2R196-004` | P3 | pre-existing test, surfaced by `ARV2D190-002` | `test_records_are_frozen_slotted_and_copy_deepcopy_pickle_reauthenticate` expects `AttributeError` when an unknown field is set on a frozen, slotted dataclass through `object.__setattr__`. Python 3.13.15 raises `AttributeError` (verified here); Codex's bundled 3.12.14 raises `TypeError`. README names 3.12 or newer as supported, so the expectation is version-dependent. Both exceptions are refusals; the invariant holds on both versions. | Documented; not corrected here because the 3.12 behaviour cannot be reproduced on this Mac. Recommended one-line change: `pytest.raises((AttributeError, TypeError))`, verified red/green on 3.12 by Codex. |
+| `ARV2R196-005` | P3 | `d5766d2` and every later result section (interpretation) | "Modeled and engine fees equal to the cent" is reported as a validity gate in every result. The engine fee model is configured to the same 10-bps-per-side rule, so the equality verifies configuration, not cost realism; no slippage or market impact is modeled, and every MOO fills at the open print. For 5,000–6,300 orders over five years this is plausible for large caps but unmeasured. | Documented; the fee line should be labelled a configuration check in future results. Plan item 5. |
+| `ARV2R196-006` | P3 | `b1d5ba7` | The latest-input package extends every predecessor-active ETF membership from the old package's last session (2026-09-17) to 2026-09-25 by carry-forward (`_extend_memberships`), so the final decision (2026-09-21) sees memberships that may be up to six sessions stale. The rule is disclosed as "extend only predecessor-active known-FIGI memberships" and cannot admit an unknown name; the exposure is one decision in sixty-one. | Documented; not a defect. A future fresh capture should refresh memberships rather than extend them. |
+
+### 196.3 Mechanical verification
+
+All trials ran in exports under the session scratchpad (never in the
+worktree), without `-x`, with `-rf`, and with failing test names captured,
+so a red result counts only when a guard-specific test fails. Trials `M1`
+through `M9` ran against `7c1694e`; the delta trials ran against the final
+code tree `22bdbce`.
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `M1` | settlement core: final settled-cash refusal removed | red: 5 failed, 2 passed | `test_projected_core_allows_only_pending_sell_funded_prefix_and_refuses_unsettled` plus three pin-drift tests |
+| `M2` | settlement bridge: negative event cash admitted without a pending SELL | red: 5 failed, 2 passed | `test_projected_event_cash_requires_open_sell_moo_in_same_session` plus pin drift |
+| `M3` | floor ladder: per-sleeve donor floor removed from the substitution | red by anchor loss (1 failed, 6 errors) | `test_output_pin_drift_refuses`; the behavioural proof is the test's own in-memory mutant in `test_per_sleeve_guard_is_load_bearing_on_shared_worst_donor`, which could not run because its safe anchor no longer existed |
+| `M4a` | relaxed selection: XLE cap-ranked entry bypass removed | red: 6 failed, 32 passed | `test_xle_entry_uses_ten_cap_names_without_positive_analyst_signals[…]`, `test_xle_two_positive_scores_do_not_limit_stock_count_or_override_cap_order` |
+| `M4b` | relaxed selection: unresolved-coverage budget scaling removed | red: 5 failed, 33 passed | `test_relaxed_coverage_boundary_keeps_unknown_denominator_and_residual_etf[…]`, `test_low_reported_total_scales_invested_stock_budget_instead_of_normalizing_up` |
+| `M5` | latest package: cross-boundary rating collisions no longer quarantined | red: 1 failed, 25 passed | `test_fresh_reused_event_is_quarantined_without_erasing_original` |
+| `M6` | relaxed launcher: frozen-manifest hash check disabled | **green: 43 passed** → `ARV2R196-002`, pinned by `22bdbce`; afterwards red: 1 failed, 32 passed | `test_frozen_manifest_hash_binds_every_byte_not_only_shape` |
+| `M7` | recent projection: Object Store precheck restored | red: 6 failed, 21 errors | `test_public_corrected_projection_binds_retrieved_reader_only[100…200]` |
+| `M9` | settlement launcher: waiver ID no longer bound to the candidate | red: 12 failed, 162 passed | `test_wrong_waiver_or_source_refuses_before_qc[R191…R202]` |
+| `M6f` | relaxed launcher on the final tree: frozen-manifest hash check disabled | red: 1 failed, 32 passed | `test_frozen_manifest_hash_binds_every_byte_not_only_shape` (the `22bdbce` pin, re-proven on the final launcher) |
+| `MA` | AR-off targets renderer: the exact-count guard on the score-nulling anchor disabled | green: 89 passed | — (with the pinned input the anchor count is exactly one, so the guard is unreachable by construction; it defends against future source drift, not a gap) |
+| `MB` | AR-off gate renderer: the cap-ranked `_selected_ids` body swap skipped | red: 42 failed, 49 passed | `test_off_admits_top_ten_cap_names_regardless_of_ar_entry_or_count[…]` and the in-memory audit |
+| `MC` | total-AR comparator: common non-AR census requirement removed | red: 2 failed, 10 passed | `test_total_ar_comparison_requires_common_non_ar_coverage_and_census[callbacks]`, `[unavailable]` |
+| `MD` | full-AR manifest census: `analyst_revision_enabled` mode check removed | red: 3 failed, 37 passed | `test_full_ar_authenticated_manifest_requires_exact_census[off_enabled]`, `[on_disabled]`, `[mode_number]` |
+
+Static and arithmetic checks: every launcher in the range pins its
+candidates' owner-waiver IDs as code constants and refuses any other ID
+before network access (`M9`); all three JSON candidate manifests are bound
+by SHA-256 constants; the settlement projection admits a negative
+post-order-event cash observation only while a SELL market-on-open ticket
+submitted the same session is still open, and refuses at the terminal
+lifecycle check if settled cash is negative; the recent-window geometry
+(290 sessions, 289 returns, 61 decisions, first decision 2025-08-01
+executing 2025-08-04, last decision 2026-09-21) reproduces from the
+decision-axis rule (first session of each ISO week plus the cutoff); all
+ten reported return spreads and the four annualized conversions in
+sections 181–195 reproduce to the digits recorded; the shared ledger's
+final floor (222 / 163 / 34 / 644) equals the record's. The 55 new and
+modified test files of the range passed **878** tests on `7c1694e`.
+
+### 196.4 Results, read on the record's own terms
+
+Every figure below is transcribed from sections 181–194 and the shared
+ledger; no QC endpoint was called in this round. The arithmetic was
+recomputed by script: all ten reported spreads and the four annualized
+conversions reproduce to the digits recorded.
+
+**The 2021–2025 capacity sweep.** With the settlement-cash policy held
+fixed, the after-cost cumulative return rises at every step of the
+analyst-revision weight-transfer capacity: matched 0% +123.62%, 80%
++131.52%, 100% +133.47%, 120% +136.11%, 140% +138.28%, 160% +139.82%,
+180% +141.18%, 200% +142.63%, 250% +145.51%, 300% +147.00%. Drawdowns
+stay within −21.0% to −21.3% and the matched target path is identical
+across the guarded ladder. Eleven same-window development looks, each
+chosen after the previous result, produced a curve with no turning point.
+
+**The recent window, 2025-08-01 to 2026-09-25.** The same construction
+on the fresh input package gives +51.05% at 100% and +51.56% at 200%;
+after the coverage easing, +55.17% at 20%, +54.88% at 100% and +55.68% at
+200%. The paired ablation is the decisive observation: **zero weight
+overlay +55.27% against 100% overlay +54.88%** on an identical baseline
+target path, with a worse drawdown and a lower Sharpe at 100%.
+
+**Interpretation.** These two windows disagree in a way that the record
+notes but does not name. In 2021–2025 the overlay is worth 23 points of
+cumulative return at 300% capacity and is monotone; in the recent window
+it is worth nothing or slightly less than nothing. The lane's own data
+disclosure explains the most likely cause: the historical Massive/Benzinga
+analyst archive is an accepted-risk **current-vintage** history in which
+vendor corrections overwrite records, whereas the recent-window scores
+come from captures made days after the events and are far closer to
+point-in-time. A weight overlay that concentrates ever more capital in
+the names with the highest *current-vintage* scores would be expected to
+look better the harder it concentrates, and to lose that advantage the
+moment the scores are near point-in-time. That is exactly the pattern
+observed. This is a hypothesis with a testable prediction, not proof;
+the alternative explanation (regime difference between the two windows)
+cannot be excluded by these runs. Either way, the sweep's monotone
+2021–2025 gain is not evidence that a stronger tilt is better, and no
+capacity above 0% has yet beaten the zero-overlay control on the only
+window where such a control exists.
+
+**What the runs do establish.** The order-based execution path is now
+robust: 27 of the 29 order runs in the range completed with every
+submitted order filled, zero invalid or canceled orders, the 98% target
+respected, and modeled fees equal to engine fees to the cent. The
+settlement-cash policy removed the cash refusals that stopped four
+candidates under the old policy without letting any run end with negative
+settled or daily cash. The stock-selection mechanism (cap-ranked equal
+slots, five-positive-score entry outside XLE) is what carries the recent
+window's return; the analyst-revision weight overlay does not add to it
+there.
+
+**The total ablation (section 195).** With analyst revisions removed from
+entry, count, and weights, the recent-window construction returns
++53.77% (R223) against +53.65% with analyst entry, count, and a 100%
+overlay (R224), with lower drawdown and volatility when the signal is
+off. Together with the R220/R221 pair this means the signal contributes
+nothing measurable at any layer on the only window with near
+point-in-time scores. The construction's return there is the cap-ranked
+selection plus ETF exposure in a strong market, not analyst skill.
+
+### 196.5 Improvement plan
+
+1. **Measure the vintage drift directly before any further capacity work**
+   (`ARV2R196-001`). No QC look is needed. Re-capture, with the same
+   three-role Massive request, the event-date range the old archives
+   already hold for their last six weeks (2026-08-01 to 2026-09-16), and
+   diff the re-captured semantic rows against the frozen old rows by
+   rating ID: the fraction of rows whose rating, price target, or dates
+   changed within two to six weeks of age is the vendor overwrite rate
+   the lane has so far only assumed. If it is material, the 2021–2025
+   archive, which was captured in one backfill years after its events,
+   cannot support any weight overlay claim, and the historical capacity
+   curve is a vintage artifact; if it is near zero, regime difference
+   becomes the leading explanation and a paired zero-versus-100% run on
+   2021–2025 under the settlement policy (which does not yet exist: R-191
+   is the old-coverage matched control and R-195 has no zero arm) is the
+   next test. Until one of these is read, treat every 2021–2025 capacity
+   result as unexplained, not as edge.
+2. **Freeze the AR-off control and the ETF benchmark for the recent
+   window.** The zero-overlay arm still uses analyst scores for entry and
+   count. The AR-off behavioural audit Codex is preparing should run as
+   one order-based candidate on both windows, alongside a same-period
+   six-ETF basket and SPY, so the owner's question (construction or
+   analyst signal?) is answered on identical inputs, exposure, and costs.
+3. **Stop the capacity sweep.** Eleven same-window looks have been spent
+   on the 2021–2025 curve and ten on the recent window. Further
+   percentages add development evaluations without information; the
+   preregistration ledger should record the sweep as closed at 300% and
+   200% respectively, and any later formal claim must apply the declared
+   multiplicity correction to the full look count (220 shared looks, 161
+   development evaluations at the pushed head).
+4. **Hold the recent window as touched.** Both windows are now
+   development windows. A genuinely unexamined period (or prospective
+   paper observation) is the only remaining source of confirmation; no
+   result in sections 181–194 can play that role.
+5. **Label the fee equality as a configuration check** (`ARV2R196-005`)
+   and add one bounded slippage sensitivity (for example 5 bps of adverse
+   open-print impact) to the next paired run, so the ordering of arms is
+   known to survive a plausible cost.
+6. **Shared-ledger hygiene** (`ARV2R196-003`): update the four stale
+   headings under the owner's bookkeeping permission, and make the
+   launched-candidate gate read the status token so a stale heading fails
+   rather than passes.
+7. **Portability** (`ARV2R196-004`): accept either exception in the frozen
+   slotted-dataclass test after a red/green check on Python 3.12.
+8. **Memberships** (`ARV2R196-006`): refresh ETF memberships in the next
+   fresh capture instead of carrying them forward.
+
+### 196.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; plan item 1 decides it. |
+| `ARV2CR185-001` | P2 | Open as recorded: Mia's R-186 v3 completion is an unaccepted diagnostic; no 80% old-policy result exists. |
+| `ARV2CR187-001`, `-003` | P2 | Open as recorded: the two later R-193-lineage cloud runs have no source-authenticated read; the third run's actor is unestablished. |
+| `ARV2D188-001` | P2 | Open as recorded: R-194's one-use read refused on the dynamic matched-path binding; no R-194 result exists. |
+| `ARV2D189-002`, `-003` | P3 | Open as recorded: R-195 A1 transport cause unknown; equal matched paths do not prove equal price tapes. |
+| `ARV2D190-002` | P3 | Open; restated as `ARV2R196-004` with the exact test and the recommended change. |
+| `ARV2CR187-004`, `ARV2R196-003` | P3 | Shared-ledger staleness; owner-permitted bookkeeping. |
+| `ARV2R196-005`, `-006` | P3 | Documented this round. |
+| `ARV2R165-001` | P3 | Windows-host suite; unchanged. |
+
+### 196.7 Validation
+
+Run on the exact final tree of this round (`22bdbce` plus this record
+commit) with `~/.venvs/trading_agent-py313/bin/python` (3.13.15):
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, run in a byte-faithful export of the tracked tree at `22bdbce` with `artifacts/analyst_revisions_v2` copied in | **8,330 passed, 1 failed, 11 skipped, 35 warnings in 1:47:19.** The single failure is the known export artifact `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` (shells to `git check-attr`; no `.git` in an export), re-run green below. The eleven skips are the standing host-capability skips (Windows-only junctions, no mainline ref in an export, one top-five-profile-only case). |
+| Export failure re-run in the real checkout | `test_dataset_and_import_firewall.py` | 173 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` in the worktree | 80 passed |
+| Delta focused files on the final tree | the seven full-AR/relaxed/weight-ablation files, the closure test, and the record gates in a second export | 358 passed, 3 skipped (no mainline ref) |
+| Changed test file on the final tree | `test_qc_relaxed_submission.py` in the worktree | 33 passed (32 before `22bdbce`) |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this record commit | clean; two Claude commits ahead of `08c9eab`, published in this round's single push |
+
+Not exercised here: no QuantConnect endpoint, result read, provider capture,
+or launcher was run; every result figure is transcribed from sections
+181–195 and the shared ledger, and the launchers' live behaviour against
+the private projects is attested only by their tests and Codex's receipts.
+Python 3.12 behaviour (`ARV2R196-004`) was not reproduced on this Mac.

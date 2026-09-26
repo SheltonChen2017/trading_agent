@@ -1,22 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEWED CODEX COMMITS `efc2c7d..b628262` (SECTION 82).
-`b628262` IS ACCEPTED; `3b1e797` (SYNTHETIC 82-QUARTER SOURCE-MANIFEST
-CANDIDATE) IS ACCEPTED AFTER CORRECTION: P2 `IB2MAN-CR01` (A `urllib` IMPORT
-THAT FAILS THE LANE'S PACKAGE IMPORT GUARD, SO THE PUSHED TREE FAILED THE
-COMPLETE SUITE) IS FIXED IN `130e1d1` WITH UNCHANGED URL VERDICTS, AND P3
-`IB2MAN-CR02` (SEVEN UNPINNED GUARDS AND NO LOADER-OUTPUT TEST) IS PINNED IN
-`8ebba1b`. THE BUILDER ACCEPTS 82 QUARTERS PRODUCED BY THE REAL IB-1A/IB-1B
-PUBLISH-AND-LOAD PATH. ONE P2 DECISION IS OPEN: `IB2MAN-CR03`, THE CANDIDATE
-REFUSES FORM 3/A AND 5/A CONTEXT ROWS, WHICH THE SEC DATA-SET DOCUMENTATION
-INCLUDES AND IB-1B PASSES THROUGH, SO NO REAL QUARTER IS EXPECTED TO PASS IT
-UNTIL THE OWNER AND CODEX DECIDE HOW AMENDED CONTEXT FORMS ARE TREATED.
-FINAL TREE: COMPLETE SUITE **8,372 PASSED, 38 SKIPPED, 0 FAILED**; LANE GATE
-2,174 PASSED; 64, 219, AND 614 REPRODUCE. NO REAL TSV ROW, XML, OR METADATA
-WAS READ; ONLY TWO SEC README DOCUMENTATION MEMBERS. CODEX COUNTER-REVIEW OF
-`130e1d1`, `8ebba1b`, AND THIS RECORD IS NEXT. NO OUTCOME, QC, PAPER, LIVE,
-DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK
-COUNTERS REMAIN ZERO.**
+Status: **CODEX COUNTER-REVIEWED EVERY CLAUDE COMMIT `b628262..35a1e04`
+(SECTION 83): CODE AND TESTS ACCEPTED, RECORD ACCEPTED AFTER APPEND-ONLY
+PRECISION CLARIFICATION. THE OWNER APPROVED AN EXPLICIT SYNTHETIC-ONLY,
+ZERO-I/O V2 POLICY/MANIFEST REVISION RETAINING 3/A AND 5/A AS CONTEXT ONLY;
+IMPLEMENTATION IS THE NEXT BOUNDED STEP. FROZEN V1 EVIDENCE REMAINS INTACT.
+THE PACKAGE-IMPORT GUARD IS NOW MANDATORY IN FOCUSED PRE-PUSH CHECKS; NO
+COMPLETE LANE/REPOSITORY SUITE IS INFERRED FOR CODEX. INCOMING FOCUSED SET:
+533 PASSED. NO REAL FILINGS OR EXTERNAL SOURCES READ; ALL LOOK COUNTERS ZERO.
+THE REAL IB-1B PILOT STILL NEEDS ITS REVIEWED PROFILE/RUNNER AND CONTIGUOUS
+WINDOW. MATCHING XML/METADATA REMAINS ABSENT; CANONICAL IB-2, OUTCOMES, QC,
+DEPLOYMENT, BROKER, CAPITAL, ORDERS, AND TRADING REMAIN GATED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -10913,3 +10907,79 @@ scheduler, deployment, capital, order, live, or trading surface was
 accessed. Real bytes read: the two readme documentation members named in
 `IB2MAN-CR03`; no TSV row, filing, XML, or metadata. Authorized outcome
 looks: **0**. Consumed outcome looks: **0**. Research looks: **0**.
+
+## 83. Codex counter-review and owner-approved amended-context revision (2026-09-25)
+
+This section is the immutable directive anchor for the next bounded candidate,
+not a claim that its implementation or independent review is already complete.
+The owner said: "claude pushed. start the loop. counterreview and proceed to
+the next step" and "i also approve your recommendation". The recommendation
+approved is the explicit, synthetic-only, zero-I/O versioned policy revision
+for Forms 3/A and 5/A as retained context only, together with adding the missed
+package-import guard to mandatory focused pre-push validation. The full lane
+and repository suites remain Claude's responsibility unless the owner
+explicitly authorizes Codex to run them.
+
+### 83.1 Exact incoming review and dispositions
+
+From the designated worktree
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`,
+Codex fetched only `origin/codex/strategy-insider-buying`. Local HEAD and
+fetched remote were both `35a1e042edae6e03469ecd57e06e23c4a539bae5`, with a
+clean worktree. The exact range is
+`b6282623c5d0ecc4d6d1dbf97da1c76209692978..35a1e042edae6e03469ecd57e06e23c4a539bae5`:
+three commits, zero merges. Each complete diff was read separately.
+
+| Commit | Change | Codex disposition |
+|---|---|---|
+| `130e1d1fcef05e80cc20bcc542f80cec1305a484` | Replace forbidden `urllib.parse` with literal SEC URL validation | **Accepted; no new code issue found.** The package-import guard is red on the exact parent source and green on the correction using in-memory source substitution. An independent synthetic corpus of 12,918 URLs in both modes gives 25,836 old/new verdict comparisons with zero differences. |
+| `8ebba1b42a3b3f8519270d1c224fad1458a623ae` | Nine guard and loader-output test pins | **Accepted; no new code issue found.** Tests preserve existing valid controls, isolate the named refusal directions, and exercise the actual IB-1A/IB-1B loader path with synthetic bytes only. Manifest file: 73 passed; independent in-memory reversal of all seven newly pinned guards caught all seven mutants, finally restored without file edits. |
+| `35a1e042edae6e03469ecd57e06e23c4a539bae5` | Section 82, status, and append-only push-ledger row | **Accepted after append-only record clarification below.** The dispositions and correction evidence are supported. Claims about amended-form frequency are expectations, not measured corpus facts. The proposed full-lane pre-push rule is not adopted; the owner approved the focused package guard instead. |
+
+Incoming focused manifest, frozen-v1 policy, IB-1A/IB-1B, and package-import
+guard set: **533 passed, 0 failed in 2.39s**, Python 3.12.14 / pytest 9.1.1.
+No complete lane/repository suite was repeated. Claude's reported full-suite
+counts and mutation totals remain reviewer evidence, not a fresh Codex run.
+
+### 83.2 Owner decision and exact implementation boundary
+
+Retain Forms `3`, `3/A`, `5`, and `5/A` verbatim as context. They are never
+Form 4 candidates, signals, scoring inputs, or selected names under this
+revision. Only Forms `4` and `4/A` continue to require their exact one-to-one
+metadata/primary-XML pairs; no such pair is required for context forms.
+Preserve all source rows and original document types, every other refusal,
+Form 4/4-A amendment control, and existing source/availability/authority gate.
+
+Introduce an explicit v2 policy with a new semantic SHA-256 and evidence epoch,
+bound to this directive's commit. Preserve the frozen v1 policy, hash, tests,
+and reproducible v1 manifest behavior. New v2 manifests must identify their
+own version and epoch and must not be relabelled as v1 evidence or pooled with
+it. Verify both amended types, complete context digest/count binding, unchanged
+source-pair coverage, unknown-type refusal, and policy/epoch integrity with
+synthetic regression and red/green checks.
+
+This authorizes source infrastructure only. No real artifact, SEC, network,
+provider, outcome, ETF, QC upload/processing/job/backtest, broker, operator
+database, scheduler, deployment, paper/live, capital, order, or trading
+authority is added. Authorized and consumed outcome looks and research looks
+remain **0**. The paused synthetic IB-3 diagnostics stay paused. The previously
+authorized bounded IB-1B pilot still needs its reviewed exact schema/profile,
+runner, and selected contiguous window; this revision does not run that pilot.
+
+### 83.3 Retained P0-P3 ledger and clarification
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix/disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB2MAN-CR01 | P2 | **CLOSED, counter-review accepted** | `130e1d1` | URL import/validator | Forbidden package import corrected without widening URL acceptance. | Parent guard red, corrected guard green; 25,836 parity checks. | Preserve package isolation. | Claude's literal regex accepted unchanged. | 533 focused tests; independent parity probe. |
+| IB2MAN-CR02 | P3 | **CLOSED, counter-review accepted** | `8ebba1b` | Nine test pins | Missing test sensitivity and loader compatibility now covered. | Complete test diff and 73 manifest tests. | Guard claims need effective tests. | Test-only correction accepted unchanged. | Focused incoming set above. |
+| IB2MAN-CR03 | P2 | **OWNER DECISION RESOLVED; implementation pending** | `3b1e797` | Policy/manifest context whitelist | V1 refuses a quarter containing either amended context type. | Synthetic contract/source inspection; no real prevalence measured. | Preserve complete inventory without expanding candidates. | Owner-approved explicit v2 contract in 83.2, not an informal v1 reinterpretation. | Pending bounded implementation and Claude review. |
+| IB2MAN-CR04 | P3, process | **OWNER-DISPOSITIONED; focused guard mandatory** | `3b1e797`, `b628262` | Pre-push validation | The focused set missed an existing package guard. | That guard detects the old source. | Catch this boundary locally without contradicting the no-complete-suite owner rule. | Whenever `research/insider_buying/` changes, mandatory focused checks include `tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`, relevant tests, and import/document boundaries. Full lane suite is not authorized by inference. | Guard included in the 533-test incoming set and required on the final tree. |
+| IB2MAN-CCR01 | P3 | **CLOSED by this append-only clarification** | `35a1e04` | Section 82 status, 82.1, 82.5 | "No real quarter is expected to pass" and "essentially every quarter" can be mistaken for measured prevalence. | Section 82 explicitly says no real TSV row was read. | Corpus conclusions must distinguish inference from observation. | Correct claim: v1 refuses any quarter that contains 3/A or 5/A; actual affected-quarter and accession counts are unmeasured until the authorized pilot. Earlier text preserved. | Source contract comparison and record-sensitive checks. |
+| IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **RETAINED as recorded** | earlier | Sections 78-82 | Historical rewrite, unverified retrieval provenance, stale-bytecode caveat. | Existing ledger. | No new authority or evidence resolves them here. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | earlier | Shared coordination documents | Preserve the Insider-only paper clause once at main integration. | Sections 68-82. | Shared changes remain frozen/out of lane. | None here. | No shared file changed. |
+
+The "real IB-1A/IB-1B publish-and-load path" in section 82 means the actual
+software path exercised with synthetic archives, not real corpus contents.
+No new P0 or P1 finding was found. This counter-review accepts Claude's code
+and tests; the new v2 implementation remains a separate candidate requiring
+Claude's independent review of the round's exact single pushed snapshot.

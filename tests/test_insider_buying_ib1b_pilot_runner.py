@@ -4,6 +4,8 @@ import io
 import json
 import os
 from pathlib import Path
+import subprocess
+import sys
 import zipfile
 
 import pytest
@@ -16,7 +18,7 @@ from research.insider_buying.sec_ib1b_pilot_profile import (
     approved_ib1b_archive_bindings,
     approved_ib1b_schema_profile,
 )
-from scripts import insider_buying_ib1b_pilot as runner
+from research.insider_buying import ib1b_pilot_runner as runner
 
 
 PARSER_COMMIT = "b" * 40
@@ -179,7 +181,7 @@ def test_output_overlap_refused(pilot, overlap):
     source, _, bindings, profile = pilot
     destination = {
         "same": source, "descendant": source / "child", "ancestor": source.parent,
-        "repository": Path(runner.__file__).resolve().parents[1] / "blocked-ib1b-test-output",
+        "repository": Path(__file__).resolve().parents[1] / "blocked-ib1b-test-output",
     }[overlap]
     with pytest.raises(runner.Ib1bPilotError, match="overlap"):
         runner._run_ib1b_pilot(source, destination, PARSER_COMMIT, bindings=bindings, profile=profile)
@@ -190,7 +192,7 @@ def test_output_overlap_refused_through_a_case_variant_alias(pilot, overlap):
     # macOS volumes are case-insensitive by default, so a differently cased
     # spelling of an input or repository directory is the same directory.
     source, _, bindings, profile = pilot
-    repository = Path(runner.__file__).resolve().parents[1]
+    repository = Path(__file__).resolve().parents[1]
     target = source if overlap == "input_alias" else repository
     alias = target.parent / target.name.swapcase()
     if alias == target or not alias.exists() or not os.path.samefile(alias, target):
@@ -319,6 +321,44 @@ def test_cli_requires_all_explicit_inputs_and_no_synthetic_switch():
     with pytest.raises(SystemExit) as caught:
         runner.main(["--allow-synthetic"])
     assert caught.value.code == 2
+
+
+def test_runner_is_lane_owned_without_an_unclassified_script_stub():
+    repository = Path(__file__).resolve().parents[1]
+    assert Path(runner.__file__).resolve() == (
+        repository / "research" / "insider_buying" / "ib1b_pilot_runner.py"
+    )
+    assert not (repository / "scripts" / "insider_buying_ib1b_pilot.py").exists()
+
+
+def test_relocated_runner_refuses_the_actual_repository_before_publication(pilot):
+    # Derive this independently from the test, not from the moved module.
+    # Exercising only validation makes a wrong-depth reversal safe: no source
+    # read or stage publication can occur even if that reversal accepts it.
+    repository = Path(__file__).resolve().parents[1]
+    destination = repository / "blocked-ib1b-relocation-test-output"
+    with pytest.raises(runner.Ib1bPilotError, match="overlap"):
+        runner._validate_roots(pilot[0], destination)
+    assert not destination.exists()
+
+
+def test_relocated_module_cli_help_completes_without_running_the_pilot():
+    repository = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        [sys.executable, "-B", "-m", "research.insider_buying.ib1b_pilot_runner", "--help"],
+        cwd=repository,
+        capture_output=True,
+        text=True,
+        check=False,
+        timeout=30,
+    )
+    assert result.returncode == 0, result.stderr
+    assert result.stderr == ""
+    assert "--input-root" in result.stdout
+    assert "--output-root" in result.stdout
+    assert "--parser-git-commit" in result.stdout
+    assert "--reviewed-preparation" in result.stdout
+    assert "--allow-synthetic" not in result.stdout
 
 
 def _rewrite_member(raw: bytes, name: str, transform) -> bytes:

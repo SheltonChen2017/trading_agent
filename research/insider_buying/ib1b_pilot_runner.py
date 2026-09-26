@@ -1,5 +1,7 @@
 """Explicit, offline, noncanonical IB-1A/IB-1B pilot composition.
 
+CLI: python -m research.insider_buying.ib1b_pilot_runner --help
+
 Importing this module performs no I/O. Do not invoke it on real bytes until
 Claude has independently reviewed this preparation and Codex counter-reviewed
 that review. ``reviewed_preparation`` is a caller acknowledgement, not an
@@ -117,7 +119,7 @@ def _validate_roots(input_root: str | Path, output_root: str | Path) -> tuple[Pa
     destination = _require_plain_path(output_root, label="output root")
     if not source.is_dir():
         raise Ib1bPilotError("REFUSED: input root must exist")
-    repository_root = Path(__file__).resolve().parents[1]
+    repository_root = Path(__file__).resolve().parents[2]
     if _overlap(source, destination) or _overlap(repository_root, destination):
         raise Ib1bPilotError("REFUSED: output root cannot overlap inputs or the repository")
     if destination.exists() and any(destination.iterdir()):

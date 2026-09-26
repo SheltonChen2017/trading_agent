@@ -4937,6 +4937,67 @@ Matched path equals R203; cells **627 -> 628**, totals **204 / 147 / 32 / 628**.
 Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
 No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.
 
+## R-220 — same-selection zero weight-tilt control; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998687**, A1 backtest
+`9f38b5c172f30d93c222c64aeadc7b32`. One of three attempts used. Exact source,
+profile and input pins: `six_universe_weight_ablation_candidates.json`.
+Order-based 2025-08-01–2026-09-25, 61 weekly decisions, 98% gross, 10 bps/side;
+zero weight transfers but AR entry/count retained outside XLE. Completed;
+sole bounded custom read valid, aggregate SHA
+`2f4ac136b1ca6d9ca026ac4475870c55daa11638adeeb549d414aba96224cf1f`.
+Net return **+55.2672684305%**, drawdown **−10.5819836762%**, volatility
+**18.1452359393%**, zero-rate Sharpe **2.20671238239**; 2,076 orders all filled,
+engine/model fees `$14,102.845695`, zero invalid/canceled/unexplained negative
+cash; cash/gross/tracking gates pass. Matched path equals R214 and the ladder:
+`e86d0ce6aa38a35cbae8eeedb317e895a71f30fc1bd27e7fbd77b9e6d490b006`.
+Launch **217 -> 218 shared / 158 -> 159 development / 34 infrastructure /
+639 cells**; accepted preliminary read **639 -> 640**. Result is not a fully
+AR-free control or proof of skill. Current floor **218 / 159 / 34 / 640**.
+
+## R-221 — fresh matched-selection 100% weight tilt; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998780**, A1 backtest
+`c76bd1544ee04df6bd94c3c046042bd9`. One of three attempts used, no retry.
+Exact R214 100% source reproduced, pins in the separate ablation manifest.
+Same order-based input/window, 61 decisions, 98% gross and 10 bps/side as R220.
+Completed; sole bounded read valid; aggregate SHA
+`592d2436072b63d2aa91119bccebaaa31dd5150ca1e64029b48d78ea495f4dad`
+is identical to R214, not merely a rounded-return replication. Net return
+**+54.8816924105%**, drawdown **−10.8136325554%**, volatility **18.4635271944%**,
+zero-rate Sharpe **2.16004362529**; 1,914 orders all filled, engine/model fees
+`$14,577.520895`, zero invalid/canceled/unexplained negative cash; all gates pass.
+Locally reauthenticated arm claims/raw summaries match each other's complete
+baseline path and sleeve diagnostics. Weight-tilt net spread versus R220 is
+**−0.385576020000 pp**; this window offers no incremental benefit for that
+100% overlay. AR entry/count remain in both; no entire-AR verdict or ETF
+comparison follows. Data-vintage/PIT/adaptive-window caveats remain.
+Launch **218 -> 219 shared / 159 -> 160 development / 34 infrastructure /
+640 cells**, valid read **640 -> 641**; floor **219 / 160 / 34 / 641**.
+
+## R-222 — all-six 25% coverage floors with 100% tilt; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998897**, A1 backtest
+`25d4689780c4d8db9fc1b0f9989d97e4`. One of three attempts used, no retry/Mia.
+Separate `six_universe_coverage25_candidates.json` pins the changed construction.
+Same package/activation and 2025-08-01–2026-09-25 window, 61 weekly decisions,
+98% gross and 10 bps/side; five verified names/positive-score entry outside
+XLE retained, all-six identified-budget scaling and own-ETF residuals.
+Completed; sole bounded read valid, aggregate SHA
+`c592f0703e8988bfb54852d7ea9193269269a2850896ff72b83b908f74cf3db2`.
+Net return **+53.6512129385%**, drawdown **−11.0951445171%**, volatility
+**18.5155660557%**, zero-rate Sharpe **2.11688653215**; 2,050 orders all filled,
+engine/model fees `$12,689.385615`, zero invalid/canceled/unexplained negative
+cash; all cash/gross/tracking gates pass. Matched path changed to
+`6ec82176adb5e29c94b2a3b3cd114862b322e26032b904afad1c9475f96be568`.
+Stock-entry decisions: SPY 58/61 (was45), QQQ55, SOXX53, XLV58, XLE58,
+REMX0. Return is **−1.230479472000 pp** versus R221, a construction comparison,
+not AR attribution: stock admission and residual budgets changed together.
+REMX still fails five-known-name coverage on60 dates, AR entry on the other.
+No fresh same-period ETF-basket result or live/formal acceptance is claimed.
+Launch **219 -> 220 shared / 160 -> 161 development / 34 infrastructure /
+641 cells**, valid read **641 -> 642**; final floor **220 / 161 / 34 / 642**.
+
 ## R-209 — recent six-sleeve coverage counts and one transport recovery — 2026-09-26
 
 Owner-authorized count-only diagnostic, not an alpha/return evaluation.

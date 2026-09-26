@@ -25554,3 +25554,57 @@ reads plus the failed creation are accounted for; no outcome reread or
 additional launch occurred during final bookkeeping. The remote lane tip
 is checked again before the single push, and only this matching branch
 is targeted. Other shared coordination documents remain unchanged.
+
+## 191. Owner-directed 250/300% extension and August-2025 period family
+
+The owner explicitly requested 250% and 300% on the same 2021–2025 window,
+then 100/120/140/160/180/200% from August 2025 to the latest closed date.
+This is a research-only continuation without waiting for Claude, not a
+production selection or leverage authorization. All eight settings are
+declared now, before their outcomes; no automatic wider sweep follows.
+Order-based QC, 98% target gross, modeled 10 bps per side, weekly cadence,
+position caps, both positive donor floors, unchanged ETF fallback weights,
+and at most three launch attempts per candidate remain mandatory. The
+owner's standing exploratory signature waiver applies. One final lane push.
+
+### 191.1 Exact full-period identities before launch
+
+| Candidate | Private project name | Projection SHA-256 | Profile SHA-256 | Source-manifest SHA-256 |
+|---|---|---|---|---|
+| R-201 / 250% | `123 ARV2 SIX CAP90 SETTLED TILT250 GUARD R201 2021 2025` | `09af59032015e04b8e7a97a0f54f90a240cc87b38ed793700bf58bcedca98780` | `cd38f3589131bbec453aee57b726dd09ca4f7b77441db3fe2673bafa104d6ca6` | `f20e12994b333178342031700011ce0c86421db550dfeb154b5dd9a794632788` |
+| R-202 / 300% | `124 ARV2 SIX CAP90 SETTLED TILT300 GUARD R202 2021 2025` | `5eeaa095fe57f267cf8093525c01646717c3c77f235acbaf46d185224fead287` | `5c023ec203cd14753f1dcb049d1fbb85da5078f6b16b85fe03b78a22336f7714` | `46c85fbbe6fb4288e0ff73d8f48c8a52e3ef0e0328fbf3aefe725e5fad39a392` |
+
+Each closure is 16 files / 425,975 bytes. Existing 100–200% source and
+authority bytes remain unchanged. Canonical exact A1 waiver hashes are
+respectively `596beb6ec4f1b372d39ab17546b1ff8cf80be4398abe36862ab323c027eed6da`
+and `15049b8546b378a3ca82e1c1d82dc122d40bbc26f22c6053472b217481955e3a`.
+The input is the same authenticated `7803b84f...` delta package and private
+control directory as section 190; comparison requires the valid R-195 A2
+anchor, with price-vintage/tilted-path limitations retained. Focused tests:
+projection **31 passed**; submission **174 passed**, no full lane suite.
+Local source preview authenticated both exact closures before QC mutation.
+Starting look floor: **196 shared / 139 development / 32 infrastructure /
+621 authenticated cells**. No launch or result is implied by these pins.
+
+### 191.2 Fresh-input requirement for the six shorter-period tests
+
+R-203–R-208 are reserved respectively for 100/120/140/160/180/200%, with
+the common requested window **2025-08-01 through 2026-09-25** (latest closed
+NYSE session at this preparation). Geometry: 290 account observations,
+289 return intervals, 61 weekly decisions; first decision August 1 executes
+August 4, last decision September 21. This changes dates, not economics.
+The existing authenticated package ends September 17; it must not be
+relabeled as current. A new immutable Massive three-role September 17–25
+capture, recovery of September 15–16 events whose eligibility lag crossed
+the old cutoff, and separately bound package/activation/source/profile
+identities are required. Old package and historical results remain frozen.
+All six exact identities and the common matched baseline will be recorded
+before the first shorter-window outcome. Unknown mappings remain named
+refusals. These samples overlap previously examined data and are adaptive
+diagnostics, not untouched confirmation, pristine PIT or live authority.
+
+The first capture command stopped before provider access because the
+bundled interpreter lacked the already-pinned `requests==2.34.2` dependency.
+That existing dependency was installed in the local runtime; no repository
+dependency specification changed and no QC attempt or research look was
+spent by the dependency refusal.

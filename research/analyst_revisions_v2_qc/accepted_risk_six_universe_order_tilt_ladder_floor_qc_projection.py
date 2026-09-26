@@ -1,4 +1,4 @@
-"""Pinned R195-R200 per-sleeve-positive revision-tilt projections.
+"""Pinned R195-R202 per-sleeve-positive revision-tilt projections.
 
 Each candidate derives from the exact R194 16-file closure. The new donor
 transfer keeps both its own sleeve allocation and aggregate stock allocation
@@ -20,6 +20,7 @@ class SixUniverseTiltLadderFloorQcProjectionError(ValueError):
 CANDIDATE_IDS = {
     100: "R195", 120: "R196", 140: "R197",
     160: "R198", 180: "R199", 200: "R200",
+    250: "R201", 300: "R202",
 }
 MINIMUM_STOCK_AND_SLEEVE_RESIDUAL_WEIGHT = "1e-30"
 PROJECTION_SCHEMAS = {
@@ -65,6 +66,8 @@ PINNED_PROFILE_SHA256S = {
     160: "7b4dac4771d1cfaf5851cb8d4c31448d01f8408baa652857292755fe88776a87",
     180: "46d6b61812c48d2d5797ac636e5919e160a6adca6e06005f2f31c596cdc7c778",
     200: "3b6acc8e91cd674d267bde3985b8fc123a5c2fbc809c87acfb9c74b2c3ec215c",
+    250: "cd38f3589131bbec453aee57b726dd09ca4f7b77441db3fe2673bafa104d6ca6",
+    300: "5c023ec203cd14753f1dcb049d1fbb85da5078f6b16b85fe03b78a22336f7714",
 }
 PINNED_PROJECTION_SHA256S = {
     100: "c20e2c13ef477e4c1619cb93aafb4fef58c2a36c95f5a514c62d015f5722e28d",
@@ -73,6 +76,8 @@ PINNED_PROJECTION_SHA256S = {
     160: "97fdd9a4332ae2d973399535c2687153e08a81ccd2eb1e4a89daf4270c687a9f",
     180: "773787eac1cce21d27be7dd5256b917c453c3f8474a0a0d24e8b7ef9dd86d09d",
     200: "e8cc677ad751362fe702949ab52daa24ec89ade8bc6b303779a815543ef213cb",
+    250: "09af59032015e04b8e7a97a0f54f90a240cc87b38ed793700bf58bcedca98780",
+    300: "5eeaa095fe57f267cf8093525c01646717c3c77f235acbaf46d185224fead287",
 }
 PINNED_SOURCE_MANIFEST_SHA256S = {
     100: "75a3cfd8091e6311e34c0295e787969a5ba637fc2da74f9e83c70fd7700fdef3",
@@ -81,6 +86,8 @@ PINNED_SOURCE_MANIFEST_SHA256S = {
     160: "514230dd7bde96f347d2d6eae390d2c7b4fb09403c1ca7cf687f6da228eb383f",
     180: "0cc2299ac2062366046da0a027f88946fe684bcc87f27974ceab174a1da0035f",
     200: "c2bb27d8a851d365d3ab45813e9e62aa3e63fc110cd69cac05b8791585249745",
+    250: "f20e12994b333178342031700011ce0c86421db550dfeb154b5dd9a794632788",
+    300: "46c85fbbe6fb4288e0ff73d8f48c8a52e3ef0e0328fbf3aefe725e5fad39a392",
 }
 PINNED_TOTAL_SOURCE_BYTES = {
     100: 425_975,
@@ -89,6 +96,8 @@ PINNED_TOTAL_SOURCE_BYTES = {
     160: 425_975,
     180: 425_975,
     200: 425_975,
+    250: 425_975,
+    300: 425_975,
 }
 PINNED_CHANGED_FILE_SHA256S = {
     100: {
@@ -120,6 +129,16 @@ PINNED_CHANGED_FILE_SHA256S = {
         "accepted_risk_six_universe_order_tilt_targets.py": "e03faa4c3578bf14ca01dece6125a9cbcf2959f8aaba0500fd43f61224666865",
         "accepted_risk_six_universe_order_tilt_qc_runtime.py": "c85d19239949645016927ae2e3043664d511e144301d66895d787498e80a0e8e",
         "main.py": "b8fb4131a08170d804f1acec0547f0e75b085207589471676b3b40afbe7a74f9",
+    },
+    250: {
+        "accepted_risk_six_universe_order_tilt_targets.py": "56d0dbae9f52478d802f9cfcca0f06be71cae12316f9248e12ac9a97ea67e844",
+        "accepted_risk_six_universe_order_tilt_qc_runtime.py": "b2227980c3abe229f1faa02465af82cf4afd824897da2c8ce5fb562c9d8ab940",
+        "main.py": "d5fab171ee9e653d72c15e936eb7f0f7f435c80468511041bc55294331ab47ff",
+    },
+    300: {
+        "accepted_risk_six_universe_order_tilt_targets.py": "e5de407907002b081a070d5ba3610326ceaed0f3714701170392f2e220f24a5b",
+        "accepted_risk_six_universe_order_tilt_qc_runtime.py": "b3b54aa2e3c65ec5b7b32aab3bf6f0e438fce7782d397a1de13e56ddad8f88ba",
+        "main.py": "fcd319fc823836e70e4c364d36bdbf05866f1839edfce88afd0b714912ba9e31",
     },
 }
 PINNED_CHANGED_FILE_BYTE_COUNTS = {
@@ -153,6 +172,16 @@ PINNED_CHANGED_FILE_BYTE_COUNTS = {
         "accepted_risk_six_universe_order_tilt_qc_runtime.py": 7_938,
         "main.py": 6_593,
     },
+    250: {
+        "accepted_risk_six_universe_order_tilt_targets.py": 20_873,
+        "accepted_risk_six_universe_order_tilt_qc_runtime.py": 7_938,
+        "main.py": 6_593,
+    },
+    300: {
+        "accepted_risk_six_universe_order_tilt_targets.py": 20_873,
+        "accepted_risk_six_universe_order_tilt_qc_runtime.py": 7_938,
+        "main.py": 6_593,
+    },
 }
 
 
@@ -162,7 +191,7 @@ def _error(message):
 
 def _percent(percent):
     if type(percent) is not int or percent not in CANDIDATE_IDS:
-        _error("tilt floor percent is not one of 100, 120, 140, 160, 180, or 200")
+        _error("tilt floor percent is not one of 100, 120, 140, 160, 180, 200, 250, or 300")
     return percent
 
 

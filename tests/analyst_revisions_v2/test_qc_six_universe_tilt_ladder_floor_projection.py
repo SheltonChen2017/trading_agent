@@ -1,4 +1,4 @@
-"""Focused behavioral and exact-source guards for the R195-R200 tilt ladder."""
+"""Focused behavioral and exact-source guards for the R195-R202 tilt ladder."""
 
 import dataclasses
 from decimal import Decimal, localcontext
@@ -107,6 +107,7 @@ def test_exact_ladder_pins_and_frozen_r194(package, projections):
     assert subject.CANDIDATE_IDS == {
         100: "R195", 120: "R196", 140: "R197",
         160: "R198", 180: "R199", 200: "R200",
+        250: "R201", 300: "R202",
     }
     for percent, projection in projections.items():
         profile = subject.require_tilt_floor_profile(percent)
@@ -227,18 +228,21 @@ def test_ladder_rules_are_distinct_when_room_remains_and_keep_every_sleeve_posit
             results[percent] = {item.security_id: item.weight for item in tilted}
         assert any(results[100][sid] != results[120][sid] for sid in results[100])
         assert any(results[120][sid] != results[140][sid] for sid in results[100])
-        for lower, higher in ((140, 160), (160, 180), (180, 200)):
+        for lower, higher in ((140, 160), (160, 180), (180, 200), (200, 250), (250, 300)):
             assert any(results[lower][sid] != results[higher][sid]
                        for sid in results[lower])
 
 
-def test_old_100_120_140_projection_identities_remain_frozen(projections):
+def test_old_100_through_200_projection_identities_remain_frozen(projections):
     # These literal historical identities do not derive from the new pin tables.
     assert {percent: projections[percent].projection_sha256
-            for percent in (100, 120, 140)} == {
+            for percent in (100, 120, 140, 160, 180, 200)} == {
         100: "c20e2c13ef477e4c1619cb93aafb4fef58c2a36c95f5a514c62d015f5722e28d",
         120: "f8489764d1925f93ecd13092d5ef0d916f681385a12dc817f02115f66328f82e",
         140: "c3edcd8bae80446fd564e4d21a1a8ff3c8a35ee68af914b13de2a344ab596576",
+        160: "97fdd9a4332ae2d973399535c2687153e08a81ccd2eb1e4a89daf4270c687a9f",
+        180: "773787eac1cce21d27be7dd5256b917c453c3f8474a0a0d24e8b7ef9dd86d09d",
+        200: "e8cc677ad751362fe702949ab52daa24ec89ade8bc6b303779a815543ef213cb",
     }
 
 
@@ -249,7 +253,7 @@ def test_higher_capacity_may_saturate_without_forcing_a_target_change(
     construction = gate.build_six_universe_construction(
         snapshots, gate.TOP10_CAP90_EXPLORATORY_PROFILE)
     results = []
-    for percent in (160, 180, 200):
+    for percent in (160, 180, 200, 250, 300):
         source = _target_source(projections[percent])
         module = _projected_targets(source, monkeypatch, f"arv2_saturation_{percent}")
         tilted, sleeves = _tilt_and_capture_sleeves(
@@ -263,7 +267,7 @@ def test_higher_capacity_may_saturate_without_forcing_a_target_change(
                 assert min(after.values()) == module.WEIGHT_TRANSFER_QUANTUM
                 assert sum(after.values(), Decimal(0)) == sum(before.values(), Decimal(0))
         results.append(tilted)
-    assert results[0] == results[1] == results[2]
+    assert all(result == results[0] for result in results)
 
 
 def test_per_sleeve_guard_is_load_bearing_on_shared_worst_donor(
@@ -295,10 +299,10 @@ def test_per_sleeve_guard_is_load_bearing_on_shared_worst_donor(
 @pytest.mark.parametrize("percent", (True, 0, 99, 101, 220, "120", None))
 def test_only_exact_pinned_ladder_candidates_are_admitted(package, percent):
     with pytest.raises(subject.SixUniverseTiltLadderFloorQcProjectionError,
-                       match="100, 120, 140, 160, 180, or 200"):
+                       match="100, 120, 140, 160, 180, 200, 250, or 300"):
         subject.build_tilt_floor_projection(package, percent)
     with pytest.raises(subject.SixUniverseTiltLadderFloorQcProjectionError,
-                       match="100, 120, 140, 160, 180, or 200"):
+                       match="100, 120, 140, 160, 180, 200, 250, or 300"):
         subject.require_tilt_floor_profile(percent)
 
 

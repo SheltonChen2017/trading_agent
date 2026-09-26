@@ -671,6 +671,12 @@ Section 190 records the owner's explicit extension to 160%, 180%, and
 one final push. Claude will review section 190 together with section 189
 at that pushed snapshot; this owner-directed same-round extension does
 not accept a best setting for live use.
+Section 190 now records all three new QC runs completed valid on their
+first attempts: 160% +139.82%, 180% +141.18%, 200% +142.63% after modeled
+costs. Shared ledger entries R-195–R-200 are reconciled; the current floor
+is 196 shared looks / 139 development evaluations / 32 infrastructure
+looks / 621 authenticated cells. The bounded sweep is finished; Claude
+will review section 190 and the exact pushed source before further work.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -2392,6 +2398,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-24 | Claude independent review of the V14–V19/SPY order-level, six-universe order, R-180 coverage, and cap-90 R-181 range | `b2df5ea` -> `2bd3368` -> `865ae3b` -> this record commit | Section 178: forty-four commits `87dd82f..b2df5ea` individually disposed (38 accepted, 6 accepted after correction, 0 rejected); Mia provenance handling reviewed against the owner's clarification; zero QC calls | Registered eight new package modules in the whole-package closure test (`2bd3368`, test-only, 72 passed) and pinned the cap-90 per-file 64,000-character check (`865ae3b`, test-only, red with the check removed); rewrote the stale section-4 pointer and appended this row | Standing lane selection in a byte-faithful export, closure and projection files, record gates, `compileall`, `git diff --check`; results in 178.7. 0 looks, 0 evaluations, 0 cells | 0 P0, 0 P1, 3 P2, 5 P3 (`ARV2R178-001` through `-008`); `ARV2R178-002/-003/-004` corrected, `-001` open before any launch | Single push of the three Claude commits; Codex counter-reviews section 178, closes or waives `ARV2R178-001`, diagnoses the 22 invalid orders before R-181 A3 |
 | 2026-09-24 | Codex counter-review and exploratory order-based QC | `6f498cb` -> this record commit (`ef776d7`, `cf057af` precede it) | Section 179: accept Claude's three commits after lane corrections, diagnose R-181 A2, freeze and run the final A3 bridge, matched R-182 A1, and separate revision-weight tilt R-184 A1 | The A2 count-only read isolated 22 insufficient-buying-power pre-open BUY refusals. The owner chose a prospective research-only 2x order-admission bridge with the same 98% target and validity gates, and waived detached signatures for these three named exploratory runs only. R-181 A3 completed valid at +96.63%; R-182 A1 completed valid at +123.62%; R-184 A1 completed valid at +125.76%. R-181 minus matched is -26.99 pp; tilt minus matched is +2.14 pp, both exploratory in one window. Three sleeves remained ETF fallbacks. | Focused exact-tree checks, compilation, diff, QC upload/compile, status-only polls, and one bounded custom-statistic read per completed run; exact figures and caveats in 179.1-179.4. Three launches spent three shared research looks and three ARV2 development evaluations; A2 diagnostic spent none. No full lane suite by Codex under owner rule. The earlier A2 diagnostic transiently inspected paginated order rows but retained only redacted counts; no raw order/provider/price/log row was retained or printed, and no broker, live/paper/funded order, or trading access occurred. | `ARV2CR179-001/-004` corrected; `-002` closed by valid A3 predecessor binding; `-003` diagnosed and addressed prospectively, not retroactively proven causal. `ARV2D179-005` documents that the matched stock-count/fallback policy remains score-dependent, so R-184 isolates only within-stock weight tilt and is not a pure no-analyst baseline. | Push this lane once regardless of candidate success, as owner directed. Claude independently reviews the exact pushed range; no leverage, R-183, live/paper, or formal alpha claim follows by inference. |
 | 2026-09-24 | Claude independent review of `0132031..c599301` and shared look-ledger reconciliation | `c599301` -> `1a21d57` -> this record commit | Review of the twenty-eight commits pushed since `0132031` (V19, R-175, SPY V1, R-176, six-universe order family, R-177, R-180, cap-90 R-181 through R-184, section 178 and Codex's section 179), with Codex's `ef776d7`, `cf057af` and `c599301` reviewed for the first time, and a QC-census reconciliation of the look ledger (section 180) | Synced the lane clone by fast-forward from a clean tree on this Windows host. Section 178's per-commit dispositions confirmed; the admission bridge, R-182 predecessor gate, R-184 receipt chain and bounded tilt reviewed and accepted; section 179's spread arithmetic reproduced exactly. An administrative QC census (zero looks) of nine projects and thirty-one backtests found two unrecorded launches (an R-182 "rerun" and a fifth R-180 run) and that the shared look ledger ends at R-176. Appended the five missing ledger entries, reconciled the totals from 159/102/27/608 to **173/116/32/611**, and added the record gate `test_shared_look_ledger_names_every_launched_candidate` (red at `c599301`, green with the entries). No production line changed. | Real tree at `c599301`: `compileall` exit 0; `git diff --check` clean; record gates **78 passed** (76 before this round's two tests); closure pins **6 passed**; the range's collectable test files **275 passed** with ten files uncollectable through the `fcntl` chain (`ARV2R165-001`). Guarded LF scratch worktree: those ten files **45 passed, 13 failed, 119 skipped**, the thirteen failures all in the R-181 A2 order-diagnostic reader's one-use claim path, which requires POSIX `0o700`/`0o600` modes and `O_DIRECTORY`/`dir_fd` opens that this NTFS host cannot satisfy (the same class as the adapter's permission semantics in section 165). Mutation matrix on the bridge and tilt batteries **six of six non-equivalent mutations killed**, three survivors proven equivalent or redundant (`ARV2R180-005`, `-006`). QC access: administrative census and evidence-project source reads only; no launch, statistic, chart, order, log, price, provider row or return read. | 0 P0, 0 P1. `ARV2R180-001` (P2, corrected): shared ledger missing five launched candidates and unreconciled totals. `ARV2R180-002` (P2, counted): unrecorded R-182 rerun plus an owner-side Mia notebook with standard statistics. `ARV2R180-004` (P2, classified): three valid cap-90 reads counted as exploratory cells. `ARV2R180-003`/`-005`/`-006`/`-007`/`-008`/`-009`/`-010` (P3): fifth R-180 launch; bridge cash flags always true behind the nonnegative read; tilt conservation check redundant; owner authorization for the A2 order reads not quoted; host test class; stale "first of three" wording; post-launch re-saves of evidence projects. | Codex counter-reviews section 180 and its two commits and confirms or corrects the cell classification with a reason. R-181 is exhausted, R-182 has used two of three slots, R-183 stays signed and unlaunched. No fourth R-181 attempt, R-178/R-179 launch, levered target, six-universe expansion beyond cap-90, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
+| 2026-09-26 | Codex owner-directed exploratory QC | `c058fd4` -> this final record commit | Freeze and run 100/120/140, then owner-extended 160/180/200, reconcile shared ledger and push once | Same designated worktree/branch. Original three source and recovery commits, then `0d20bdd` and `43f74f0` freeze the extension before QC. Six order-based results valid; failed R-195 A1 creation remains spent/counted, A2 same project. R-198/R-199/R-200 each valid on A1, no retry. Shared R-195–R-200 bookkeeping explicitly owner-authorized. | Prelaunch 184 focused passed; corrected closure/smuggling/mutants 3 passed. Broader contract-file check 71 passed/2 failed before the closure correction; unrelated pre-existing Python 3.12 slot exception expectation retained. Final active-document/compilation/diff evidence in section 190. No full suite, raw rows/logs/orders/charts, broker or trading. Seven conservative looks and six valid cells since base: totals 196/139/32/621. | `ARV2D189-001` corrected; `ARV2D189-002`/`-003` documented. `ARV2D190-001` P2 closure inventory corrected with load-bearing regression; `ARV2D190-002` P3 pre-existing host compatibility documented. No P0/P1 identified. | One final same-lane push. Claude reviews every commit and sections 181–190 and runs the full lane suite; Codex then counter-reviews. No automatic new setting, live use or leverage. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -25367,3 +25374,183 @@ owner's explicit permission; the previous missing-heading gate is green.
 Implementation freeze: `0d20bdd`; this following record commit freezes
 the exact prospective plan and identities before any R-198–R-200 QC
 mutation. No source or record is pushed separately.
+
+### 190.2 R-198 160% A1 launched
+
+After source freeze `0d20bdd` and prospective record commit `43f74f0`,
+the exact 16-file source was uploaded, byte-read back and compiled in
+private project **`36975010`**, with the R-198 name above. A1 launched
+backtest `8886f3cccaa387bd019e8427899f4679` named
+`ARV2 R198A1 six cap90 settlement 2021 2025 97fdd9a4`.
+One of three technical attempts is spent; conservative totals move
+**193 → 194 shared looks / 136 → 137 development evaluations**.
+Infrastructure remains **32** and authenticated cells remain **618**
+pending the separate terminal/result gate. No result follows from launch.
+
+### 190.3 R-198 160% A1 completed and authenticated
+
+Status-only polling reached `Completed.`. The sole current-source-checked
+bounded custom-aggregate read accepted **`run_valid=true`** and
+**`comparison_valid=true`** against R-195 A2's identical matched path.
+Aggregate SHA-256:
+`572a0de39256cb7153fd281315cfcad027d23cd4e7f60f4684ee878c9f4edf86`.
+The 2021–2025 after-modeled-cost cumulative return is **+139.8215252042003%**,
+maximum drawdown **−21.0738847306476%**, annualized volatility
+**20.5423257243235%**, and zero-rate Sharpe **0.958551911562468**.
+All **5,436/5,436** submitted orders filled, 261/261 rebalances completed,
+zero invalid/canceled orders; modeled and engine fees both `$40,572.6008493`.
+Mean observed gross is **97.71798%**, maximum **98.49785%**; the exact-source
+cash, exposure and target-tracking gates passed. One-use read spent;
+authenticated cells **618 → 619**, conservative look totals **194 / 137 / 32**
+unchanged. This is exploratory same-window evidence, not production authority.
+
+### 190.4 R-199 180% A1 launched
+
+The exact pinned 16-file R-199 source uploaded, byte-read back and compiled
+in private project **`36975172`**. A1 launched backtest
+`6661e97812562dea4941c77e095fef4d` named
+`ARV2 R199A1 six cap90 settlement 2021 2025 773787ea`.
+One of three attempts is spent. Conservative totals move
+**194 → 195 shared looks / 137 → 138 development evaluations**;
+infrastructure **32**, cells **619** pending its separate valid read.
+
+### 190.5 Focused boundary-audit findings and corrections
+
+`ARV2D190-001` (P2, corrected): the earlier `9db8d0f` ladder projection
+addition was absent from the whole-QC package's source/import inventory;
+the enforcing test refused the tree. The exact host-only inventory, import
+edges, compilation surface and reachability pins now include that module
+and the settlement adapter's edge. No runtime or projected source changed.
+A new zero-direct-I/O source importing the host-only settlement adapter is
+still refused. Disabling just the zero-I/O exact-import pin made this
+smuggling regression red; the real guard was restored safely. The focused
+closure, smuggling and I/O-mutant selection is **3 passed, 71 deselected**.
+
+`ARV2D190-002` (P3, documented; pre-existing host compatibility): an
+additional focused Object Store contract-file run was **71 passed,
+2 failed in 32.23 seconds** before the inventory fix. Its other failure
+expects `AttributeError` for an unknown field on a frozen/slotted
+dataclass; bundled Python **3.12.14** instead raises `TypeError` from the
+generated setter. The same plain dataclass behavior reproduces independently,
+and no new attribute is created. This test and its production contract were
+unchanged from base `c058fd4` before that run. Do not call the whole file
+green or silently alter its expected exception; Claude should investigate
+the supported-host expectation during full-lane review. This does not
+change strategy economics, QC execution or result acceptance. No complete
+lane/repository suite was run.
+
+### 190.6 R-199 180% A1 completed and authenticated
+
+Status-only polling reached `Completed.`. Its sole source-authenticated
+bounded read accepted **`run_valid=true`** and **`comparison_valid=true`**.
+Aggregate SHA-256:
+`3e53697150ce57bd93030714762fc191bc41613d8edc3165b70be5baf405922c`.
+Return **+141.1760623485837% after modeled costs**, drawdown approximately
+**−21.011398%**, annualized volatility **20.560856%**, zero-rate Sharpe
+**0.963386**. All **5,367/5,367** orders filled and 261/261 rebalances
+completed, zero invalid/canceled; engine/modeled fees `$40,960.2810356`.
+Matched path equals the same R-195 A2 digest; the full cash, exposure and
+tracking gates passed. Read claim spent; cells **619 → 620**, conservative
+counts **195 / 138 / 32** unchanged. The 180%-minus-160% return difference
+is a same-window sensitivity, not a prospective trading claim.
+
+### 190.7 R-200 200% A1 launched
+
+The independently pinned 16-file R-200 source uploaded, byte-read back
+and compiled in private project **`36975331`**. A1 launched backtest
+`f976080aa39af6f8d060b562d3e7e35e` named
+`ARV2 R200A1 six cap90 settlement 2021 2025 e8cc677a`.
+One of three technical attempts spent. Conservative totals move
+**195 → 196 shared looks / 138 → 139 development evaluations**;
+infrastructure **32**, cells **620** pending its exact terminal/result gate.
+
+### 190.8 R-200 valid result and completed six-point sensitivity
+
+Status-only polling reached `Completed.`. Its sole current-source-checked
+bounded read passed **`run_valid=true`** and **`comparison_valid=true`**.
+Aggregate SHA-256:
+`2043ef35f20522c95d4d4b6928d419a426d97421717bd045d2d2275f7a17949f`.
+Return **+142.6322318004882% after modeled costs**, drawdown approximately
+**−21.027256%**, annualized volatility **20.575772%**, zero-rate Sharpe
+**0.968724**. All **5,304/5,304** orders filled, 261/261 rebalances completed,
+zero invalid/canceled; modeled/engine fees `$41,241.0606886`. Cash,
+exposure and tracking gates passed. Read claim spent; cells **620 → 621**.
+Final totals: **196 shared looks / 139 development evaluations /
+32 infrastructure looks / 621 authenticated cells**. Each new candidate
+used exactly one of three attempts; no technical recovery or Mia edit.
+
+All three new producer-derived matched-target-path digests equal the valid
+R-195 A2 anchor. The bounded same-window sensitivity, without claiming
+identical price vintages or actual tilted-target paths, is:
+
+| AR transfer capacity | Candidate | Return after modeled costs | Maximum drawdown | Increment from previous setting |
+|---|---|---:|---:|---:|
+| 100% | R-195 A2 | +133.4664% | −21.2207% | anchor |
+| 120% | R-196 A1 | +136.1124% | −21.2125% | +2.6460 pp |
+| 140% | R-197 A1 | +138.2847% | −21.1368% | +2.1723 pp |
+| 160% | R-198 A1 | +139.8215% | −21.0739% | +1.5369 pp |
+| 180% | R-199 A1 | +141.1761% | −21.0114% | +1.3545 pp |
+| 200% | R-200 A1 | +142.6322% | −21.0273% | +1.4562 pp |
+
+Returns increased throughout the tested range; **no turning point was
+observed**. Marginal gains are smaller overall than at 100–140%, but are
+not monotonically shrinking (the last increment rises slightly). Receiver
+caps and donor floors can saturate capacity; this alone does not prove
+the cause of observed returns. All six settings reuse the already observed
+2021–2025 period adaptively. Do not select 200% for production, infer
+future monotonicity, or silently widen the sweep. An untouched period and
+independent review remain necessary before stronger conclusions.
+
+### 190.9 Review handoff for Claude and one final push
+
+**Exact range:** base `c058fd4` through this final record/closure commit.
+Review every commit individually, then the combined snapshot:
+
+| Commit | Role / requested review focus |
+|---|---|
+| `9db8d0f` | Original 100/120/140 guard and behavioral tests, frozen before QC; closure registration omission corrected in this final commit. |
+| `bbfa4c1` | R-195 A2 exact existing-project recovery and spent-A1 accounting, frozen before retry. |
+| `bddbef6` | R-195–R-197 outcomes and narrow receipt-only comparison limits. |
+| `0d20bdd` | 160/180/200 independent source/waiver pins and behavioral coverage; authorized shared R-195–R-197 ledger entries. No prior projected bytes or waivers changed. |
+| `43f74f0` | Exact section-190 plan, settings, look floor and all three launch identities before QC mutations. |
+| This final commit | All three completed valid outcomes, shared ledger closure, import-inventory correction and stronger smuggling regression, remaining host compatibility finding. |
+
+These are Codex implementation/record commits pending Claude disposition;
+no new Claude commit arrived for counter-review in this owner-directed
+extension. `ARV2D189-001` remains prospectively corrected, `ARV2D189-002`
+transport-cause uncertainty and `ARV2D189-003` price/tilted-path limitations
+remain documented. Section 190.5 retains **ARV2D190-001 P2 corrected** and
+**ARV2D190-002 P3 documented** with real red/green evidence and no production
+contract change. No P0/P1 finding identified in the extension.
+
+**Review priorities:** unchanged old identities; floor/cap conservation and
+capacity saturation; new result fraction/role/digest checks; exactly one
+valid R-195 A2 comparison anchor; all failed attempts and one-use reads
+retained; new closure pins remain fail-closed against a zero-I/O module
+importing a host-only adapter. Verify the remaining Python 3.12 frozen-slot
+exception expectation on the supported reviewer host. Do not treat tests,
+engine completion, or these adaptive returns as formal alpha acceptance.
+
+**Validation/exclusions:** prelaunch combined focused battery **184 passed**;
+after the test-only inventory fix, the selected closure/smuggling/mutant
+battery **3 passed, 71 deselected**. The broader focused contract-file run
+had **71 passed, 2 failed** before that fix, with the second pre-existing
+host exception mismatch still documented, not falsely green. Changed-file
+compilation and diff checks are clean. Final active-document counts and
+status checks are appended before the push. No full lane/repository suite
+(Claude's responsibility), raw/provider/price/order rows, logs, charts,
+other lane/worktree, shared behavior, broker, paper/live/funded account,
+deployment or real trading accessed. Shared bookkeeping is owner-authorized.
+
+**Next action:** make exactly one same-branch final push; Claude reviews
+sections 181–190 at that exact snapshot and runs the full lane suite.
+Codex counter-reviews Claude's push before any further milestone. No
+automatic 220% test, new period, live use or leverage follows this handoff.
+
+Final active-document/ledger check: **11 passed in 0.34 seconds**; changed-
+file compilation and `git diff --check` clean. All R-195–R-200 shared headings
+and the one contiguous session/push ledger are present. Six valid return
+reads plus the failed creation are accounted for; no outcome reread or
+additional launch occurred during final bookkeeping. The remote lane tip
+is checked again before the single push, and only this matching branch
+is targeted. Other shared coordination documents remain unchanged.

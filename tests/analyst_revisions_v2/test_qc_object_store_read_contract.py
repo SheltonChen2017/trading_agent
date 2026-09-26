@@ -128,6 +128,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_six_universe_order_tilt100_qc_projection.py
     accepted_risk_six_universe_order_tilt40_qc_projection.py
     accepted_risk_six_universe_order_tilt80_qc_projection.py
+    accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection.py
     accepted_risk_six_universe_order_tilt_ladder_qc_projection.py
     accepted_risk_six_universe_order_tilt_qc_projection.py
     accepted_risk_six_universe_order_tilt_qc_runtime.py
@@ -1171,6 +1172,13 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_qc_projection
         """.split()
     ),
+    "accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection.py": tuple(
+        """
+        dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_floor_qc_projection
+        """.split()
+    ),
     "accepted_risk_six_universe_order_tilt_ladder_qc_projection.py": tuple(
         """
         dataclasses hashlib json types research.analyst_revisions_v2_qc
@@ -1257,6 +1265,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_settlement_qc_projection
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_qc_projection
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_floor_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection
         research.analyst_revisions_v2_qc.six_universe_cap90_submission
         research.analyst_revisions_v2_qc.six_universe_tilt80_submission
         """.split()
@@ -1487,6 +1496,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "call:compile",
     ),
     "accepted_risk_six_universe_order_tilt100_floor_qc_projection.py": (
+        "call:compile",
+    ),
+    "accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection.py": (
         "call:compile",
     ),
     "six_universe_cap90_submission.py": (
@@ -4257,6 +4269,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt40_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt80_qc_projection",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_ladder_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
@@ -4347,6 +4360,27 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         for path in sources
         if path.name in _ZERO_EXTERNAL_IO_SOURCES
     } == {name: () for name in _ZERO_EXTERNAL_IO_SOURCES}
+
+
+def test_zero_io_source_cannot_smuggle_a_host_only_adapter(monkeypatch):
+    """A no-direct-I/O source still cannot gain an unpinned host capability."""
+    target = PACKAGE / "accepted_risk_order_level_core.py"
+    original_read_text = Path.read_text
+    original_source = original_read_text(target, encoding="utf-8")
+    mutant = original_source + (
+        "\nfrom research.analyst_revisions_v2_qc import "
+        "six_universe_settlement_submission\n"
+    )
+    assert _no_io_violations(mutant) == ()
+
+    def read_mutated_source(path, *args, **kwargs):
+        if path == target:
+            return mutant
+        return original_read_text(path, *args, **kwargs)
+
+    monkeypatch.setattr(Path, "read_text", read_mutated_source)
+    with pytest.raises(AssertionError):
+        _qc_transitive_import_closure()
 
 
 def test_no_io_guard_detects_transitive_and_attribute_call_mutants():

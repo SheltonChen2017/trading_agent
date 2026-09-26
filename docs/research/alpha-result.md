@@ -4666,3 +4666,78 @@ research looks / 136 ARV2 development evaluations / 32 infrastructure
 looks / 618 authenticated aggregate cells**. All three accepted result
 reads are spent. No raw provider/price/order rows, logs, charts, broker,
 paper/live/funded account, deployment, or trading access occurred.
+
+## R-198 — guarded 160% revision tilt; A1 valid exploratory order result — 2026-09-25
+
+Owner-requested section 190 prospectively freezes the 160/180/200 ladder
+before any outcome, with unchanged six universes, selection, market-cap
+base, ETF fallback, 98% gross and 10-bps-per-side modeled costs. Source
+`97fdd9a4332ae2d973399535c2687153e08a81ccd2eb1e4a89daf4270c687a9f`
+and profile `7b4dac4771d1cfaf5851cb8d4c31448d01f8408baa652857292755fe88776a87`
+were uploaded/read back/compiled in private project
+`120 ARV2 SIX CAP90 SETTLED TILT160 GUARD R198 2021 2025` (`36975010`).
+A1 backtest `8886f3cccaa387bd019e8427899f4679` completed. Its sole
+source-authenticated bounded aggregate passes `run_valid=true` and
+`comparison_valid=true` against R-195 A2's exact matched path. Return
+**+139.8215252042003% after modeled costs**, drawdown **−21.0738847306476%**,
+volatility **20.5423257243235%**, zero-rate Sharpe **0.958551911562468**;
+5,436/5,436 orders filled and 261/261 rebalances, no invalid/canceled.
+Engine/modeled fees both `$40,572.6008493`; read claim spent.
+
+One of three technical attempts used. Look totals **193 → 194 shared /
+136 → 137 development**, infrastructure **32** unchanged; accepted cells
+**618 → 619**. Equal matched targets do not prove equal QC price vintages
+or realized tilted paths. Higher capacity is not portfolio leverage;
+donor floors/receiver caps can saturate it. This is an adaptive same-window
+sensitivity, not untouched confirmation or live-use authority. No raw rows,
+logs, orders, charts, broker, paper/live/funded account or trading accessed.
+
+## R-199 — guarded 180% revision tilt; A1 valid exploratory order result — 2026-09-25
+
+Section 190 freezes unchanged R-198 economics except capacity and candidate
+identity. Source `773787eac1cce21d27be7dd5256b917c453c3f8474a0a0d24e8b7ef9dd86d09d`,
+profile `46d6b61812c48d2d5797ac636e5919e160a6adca6e06005f2f31c596cdc7c778`.
+Private project `121 ARV2 SIX CAP90 SETTLED TILT180 GUARD R199 2021 2025`
+(`36975172`) uploaded/read back/compiled the exact source. A1 backtest
+`6661e97812562dea4941c77e095fef4d` completed; its sole bounded aggregate
+accepted `run_valid=true` and `comparison_valid=true` against the sole
+valid R-195 A2 matched-path anchor. After-modeled-cost return
+**+141.1760623485837%**, drawdown approximately **−21.011398%**, volatility
+**20.560856%**, zero-rate Sharpe **0.963386**. All **5,367/5,367** orders
+filled, 261/261 rebalances, no invalid/canceled; modeled/engine fees both
+`$40,960.2810356`. Exact source, signed cash, exposure, cost and tracking
+gates passed; one-use read spent. One of three attempts used.
+
+Totals **194 → 195 shared looks / 137 → 138 development evaluations**,
+infrastructure **32** unchanged, authenticated cells **619 → 620**.
+This remains adaptive same-window sensitivity, not out-of-sample alpha.
+Equal matched paths do not prove identical QC price or tilted-target paths;
+180% is transfer capacity, not leverage. No raw/provider/order/price rows,
+logs, charts, broker, paper/live/funded account or trading accessed.
+
+## R-200 — guarded 200% revision tilt; A1 valid exploratory order result — 2026-09-25
+
+The final owner-requested capacity uses exact source
+`e8cc677ad751362fe702949ab52daa24ec89ade8bc6b303779a815543ef213cb`,
+profile `3b6acc8e91cd674d267bde3985b8fc123a5c2fbc809c87acfb9c74b2c3ec215c`.
+Private project `122 ARV2 SIX CAP90 SETTLED TILT200 GUARD R200 2021 2025`
+(`36975331`) uploaded/read back/compiled the pinned source. A1 backtest
+`f976080aa39af6f8d060b562d3e7e35e` completed. Its sole bounded aggregate
+read accepted `run_valid=true` and `comparison_valid=true` against R-195
+A2's exact matched-path anchor. After-modeled-cost return **+142.6322318004882%**,
+drawdown approximately **−21.027256%**, volatility **20.575772%**, zero-rate
+Sharpe **0.968724**; **5,304/5,304** orders filled, 261/261 rebalances,
+zero invalid/canceled. Engine/modeled fees both `$41,241.0606886`.
+Source, digest, signed cash, exposure, cost and tracking gates passed;
+one-use result read spent. One of three attempts used; no retry.
+
+Totals **195 → 196 shared research looks / 138 → 139 development
+evaluations**, infrastructure **32** unchanged, authenticated cells
+**620 → 621**. All six 100–200% settings are adaptive same-window tests,
+not untouched validation; the common matched path is
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`,
+not a QC price-vintage or realized-tilt-path proof. Returns did not peak
+within this bounded sweep; no 220% launch or production parameter selection
+is implied. Target gross stays 98%, and 200% means bounded AR transfer
+capacity, not portfolio leverage. No raw rows/logs/orders/charts, broker,
+paper/live/funded account, deployment or real trading accessed.

@@ -84,8 +84,32 @@ def _require_plain_path(value: str | Path, *, label: str) -> Path:
     return path
 
 
+def _identity(path: Path) -> tuple[int, int] | None:
+    try:
+        status = path.lstat()
+    except FileNotFoundError:
+        return None
+    return status.st_dev, status.st_ino
+
+
+def _ancestor_or_self_identities(path: Path) -> set[tuple[int, int]]:
+    identities = {_identity(component) for component in (path, *path.parents)}
+    identities.discard(None)
+    return identities
+
+
 def _overlap(first: Path, second: Path) -> bool:
-    return first == second or first in second.parents or second in first.parents
+    # Spelling comparison alone misses aliases on a case-insensitive volume
+    # (the default on macOS): "/Repo/out" and "/repo/out" name one directory.
+    # Also compare device/inode identity against every existing ancestor.
+    if first == second or first in second.parents or second in first.parents:
+        return True
+    first_identity = _identity(first)
+    second_identity = _identity(second)
+    return (
+        (first_identity is not None and first_identity in _ancestor_or_self_identities(second))
+        or (second_identity is not None and second_identity in _ancestor_or_self_identities(first))
+    )
 
 
 def _validate_roots(input_root: str | Path, output_root: str | Path) -> tuple[Path, Path]:

@@ -185,6 +185,22 @@ def test_output_overlap_refused(pilot, overlap):
         runner._run_ib1b_pilot(source, destination, PARSER_COMMIT, bindings=bindings, profile=profile)
 
 
+@pytest.mark.parametrize("overlap", ["input_alias", "repository_alias"])
+def test_output_overlap_refused_through_a_case_variant_alias(pilot, overlap):
+    # macOS volumes are case-insensitive by default, so a differently cased
+    # spelling of an input or repository directory is the same directory.
+    source, _, bindings, profile = pilot
+    repository = Path(runner.__file__).resolve().parents[1]
+    target = source if overlap == "input_alias" else repository
+    alias = target.parent / target.name.swapcase()
+    if alias == target or not alias.exists() or not os.path.samefile(alias, target):
+        pytest.skip("filesystem is case-sensitive; no alias spelling exists")
+    destination = alias / "blocked-ib1b-test-output"
+    with pytest.raises(runner.Ib1bPilotError, match="overlap"):
+        runner._run_ib1b_pilot(source, destination, PARSER_COMMIT, bindings=bindings, profile=profile)
+    assert not destination.exists()
+
+
 def test_relative_output_refused(pilot):
     with pytest.raises(runner.Ib1bPilotError, match="absolute"):
         runner._run_ib1b_pilot(pilot[0], "relative", PARSER_COMMIT, bindings=pilot[2], profile=pilot[3])

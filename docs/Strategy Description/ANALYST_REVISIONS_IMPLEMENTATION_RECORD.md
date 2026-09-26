@@ -26224,3 +26224,46 @@ and active-document selection **80 passed in 1.03 s**. The 37 importer/direct-
 read cases were green in that combined run. Exact whole-QC closure and
 host-only smuggling checks **2 passed, 72 deselected in 3.81 s**. Changed
 modules, script and tests compile clean; `git diff --check` is clean.
+
+## 193. Owner-directed coverage easing and recent 20%–200% ladder — 2026-09-26
+
+### 193.1 Scope and prospective diagnostic
+
+Base is `e6ef6e3a95f9504f31d4b066da1d429cc1d1f912`; fetch confirmed the same
+remote head, with no new Claude review to counter-review. The owner explicitly
+authorized this round before independent review: remove XLE's AR entry gate,
+diagnose QQQ/SOXX/REMX mapping and coverage, use measured discretion to ease
+rules, run 20/40/60/80/100/120/140/160/180/200% tilt, and push once. All are
+exploratory research, not portfolio leverage or trading. Claude's deferred
+review remains due. No full suite will be run by Codex.
+
+The ten order candidates retain the exact latest input/activation in 192.1,
+2025-08-01–2026-09-25 period, 61 weekly decisions, 98% target gross exposure,
+9.8% combined direct-name cap, 10 bps per-side costs, and settlement-aware
+2× **admission** (not a 2× exposure target). The old family stays immutable.
+Current stock allocation is cap-ranked, equal baseline slots; it is not true
+cap-proportional weighting. XLE will rank verified historical-cap names
+without requiring five positive AR scores; AR still changes their weights.
+Unknown identities remain excluded, and missing exposure stays in the own ETF.
+
+R209 is a justified **non-order** diagnostic: it measures no prices, returns
+or orders, only seven bounded coverage/count statistics. It uses the same
+immutable package and period as the forthcoming order ladder. Its grid is
+mapping/cap floors 50/60/70/80/90%, reported-weight floors 25/50/75/95%,
+ceiling 105%, and at least five verified-cap members. The denominators retain
+unmapped names. Unknown catalog SIDs with positive QC cap are counted without
+joining by ticker or claiming the missing identity is resolved. Coverage
+floors will be selected from these counts **before** any new return is read;
+one fixed policy will apply to all ten tilt candidates.
+
+Prospective R209: private project `131 ARV2 SIX RECENT COVERAGE R209 202508
+202609`; nine files / 234,508 bytes; projection
+`5bd2733a5f05582845f707178992f56081e8fe78e615bb0294e9506c0e0b2690`,
+profile `854b469ad40667cc8e55a23a23da5593cfc247fca945cf6e1270d79d4096c4f9`,
+source manifest `19cdb90959a9636d4f416867a0a06615aa79adbd9acc4d07cd66d884631235da`.
+Stage-one manifest bytes SHA
+`70cd295d6883f32d387c5de1ccb2827dae8fb8f07e70d9dbd55bab34351d39c6`.
+At most three attempts per candidate, reuse its project; all unsuccessful
+launches remain spent. One bounded aggregate read per completed launch, no
+standard statistics, raw rows, logs or orders. No launch or look has been
+claimed by this prospective paragraph.

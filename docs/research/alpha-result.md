@@ -4959,6 +4959,226 @@ policy (55/58 of 61 coverage decisions); REMX 50%/50%/25% with five known names
 admits only one decision and leaves unresolved exposure in REMX. These are
 coverage, not AR-entry or return counts. Full decision/risk notes in lane 193.
 
+
+## R-210 — relaxed six-universe 20% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36982854**,
+A1 backtest `7ce855ca03066d9317ad825a9d57cff0`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`3d609445a484a25d8e48a8b88158f7a6ed844d53cd5f9b441bba8cc8e7d9a2c9`.
+Net return **+55.168949%**, drawdown
+**-10.629583%**, volatility **18.192717%**,
+zero-rate Sharpe **2.198383**; 2089 filled orders,
+fees `$14163.793475` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **207 -> 208 shared /
+148 -> 149 development / 34 infrastructure / 629 cells**;
+accepted preliminary read adds one cell, **629 -> 630**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **208 / 149 / 34 / 630**.
+
+
+## R-211 — relaxed six-universe 40% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36982955**,
+A1 backtest `29559dc652911e93a03465f84412765a`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`771cc81aae6b13840e0928308307e0e591d20a934c774340c77728264b0007b2`.
+Net return **+55.098631%**, drawdown
+**-10.683660%**, volatility **18.247446%**,
+zero-rate Sharpe **2.190163**; 2082 filled orders,
+fees `$14250.354145` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **208 -> 209 shared /
+149 -> 150 development / 34 infrastructure / 630 cells**;
+accepted preliminary read adds one cell, **630 -> 631**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **209 / 150 / 34 / 631**.
+
+
+## R-212 — relaxed six-universe 60% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983039**,
+A1 backtest `0966264e2ff7ddc042ac8e1129885196`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`df10566471fd7d12a5f1aac9179c999d8469796b407f4e29df66fa9979e81b02`.
+Net return **+54.974562%**, drawdown
+**-10.735042%**, volatility **18.314493%**,
+zero-rate Sharpe **2.178994**; 2075 filled orders,
+fees `$14356.056525` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **209 -> 210 shared /
+150 -> 151 development / 34 infrastructure / 631 cells**;
+accepted preliminary read adds one cell, **631 -> 632**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **210 / 151 / 34 / 632**.
+
+
+## R-213 — relaxed six-universe 80% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983111**,
+A1 backtest `11e54c1c7af7193fbe21f76292886636`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`5024964ab33dd19862324755bafa70c35c2e8691b03241de05cac988d8a5a417`.
+Net return **+54.950556%**, drawdown
+**-10.764413%**, volatility **18.382683%**,
+zero-rate Sharpe **2.170851**; 2049 filled orders,
+fees `$14470.287425` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **210 -> 211 shared /
+151 -> 152 development / 34 infrastructure / 632 cells**;
+accepted preliminary read adds one cell, **632 -> 633**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **211 / 152 / 34 / 633**.
+
+
+## R-214 — relaxed six-universe 100% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983178**,
+A1 backtest `4edc6954f573fd2624f7fd381a014fc3`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`592d2436072b63d2aa91119bccebaaa31dd5150ca1e64029b48d78ea495f4dad`.
+Net return **+54.881692%**, drawdown
+**-10.813633%**, volatility **18.463527%**,
+zero-rate Sharpe **2.160044**; 1914 filled orders,
+fees `$14577.520895` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **211 -> 212 shared /
+152 -> 153 development / 34 infrastructure / 633 cells**;
+accepted preliminary read adds one cell, **633 -> 634**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **212 / 153 / 34 / 634**.
+
+
+## R-215 — relaxed six-universe 120% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983239**,
+A1 backtest `78acf4051b06bb482d9cf002baf8c0b5`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`6a3b9e4f6805994a2f1e4b2cb9e25ea8ebbee2258add2d0a24ac332db414d82c`.
+Net return **+55.085975%**, drawdown
+**-10.754727%**, volatility **18.461410%**,
+zero-rate Sharpe **2.166500**; 1908 filled orders,
+fees `$14672.588135` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **212 -> 213 shared /
+153 -> 154 development / 34 infrastructure / 634 cells**;
+accepted preliminary read adds one cell, **634 -> 635**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **213 / 154 / 34 / 635**.
+
+
+## R-216 — relaxed six-universe 140% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983309**,
+A1 backtest `b9eee5b433c71b8f57faee629aaa37e3`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`c47a5356cb1b2498734f7414605e57e2ce896a5327320bb03b2535d82c928cfc`.
+Net return **+55.231199%**, drawdown
+**-10.701562%**, volatility **18.466941%**,
+zero-rate Sharpe **2.170327**; 1859 filled orders,
+fees `$14751.433495` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **213 -> 214 shared /
+154 -> 155 development / 34 infrastructure / 635 cells**;
+accepted preliminary read adds one cell, **635 -> 636**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **214 / 155 / 34 / 636**.
+
+
+## R-217 — relaxed six-universe 160% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983369**,
+A1 backtest `dff7b806e543a885e6b35a6c3487eb45`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`a62e438c6cb8c04b7ce66374e6ec1098563c8eef9ddf5db9424f2318e11dc98e`.
+Net return **+55.309408%**, drawdown
+**-10.628493%**, volatility **18.476952%**,
+zero-rate Sharpe **2.171625**; 1830 filled orders,
+fees `$14844.834645` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **214 -> 215 shared /
+155 -> 156 development / 34 infrastructure / 636 cells**;
+accepted preliminary read adds one cell, **636 -> 637**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **215 / 156 / 34 / 637**.
+
+
+## R-218 — relaxed six-universe 180% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983425**,
+A1 backtest `7aa218f6371c458ff3a250e43e0ef428`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`c0c73e617d0ca994727d00413d18ffd1d9ffe81b5e66583c78309840ac7ddfe5`.
+Net return **+55.424784%**, drawdown
+**-10.521886%**, volatility **18.481644%**,
+zero-rate Sharpe **2.174624**; 1806 filled orders,
+fees `$14924.10465` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **215 -> 216 shared /
+156 -> 157 development / 34 infrastructure / 637 cells**;
+accepted preliminary read adds one cell, **637 -> 638**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **216 / 157 / 34 / 638**.
+
+
+## R-219 — relaxed six-universe 200% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983491**,
+A1 backtest `166f906ab5144ef84eee4107c0b3f670`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`8a33713d10509a0eb50ee047858cafeff9de68e230e505443d42c7cb82062f25`.
+Net return **+55.675177%**, drawdown
+**-10.444006%**, volatility **18.489376%**,
+zero-rate Sharpe **2.181392**; 1737 filled orders,
+fees `$14999.56159` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **216 -> 217 shared /
+157 -> 158 development / 34 infrastructure / 638 cells**;
+accepted preliminary read adds one cell, **638 -> 639**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **217 / 158 / 34 / 639**.
+
 ## R-208 — corrected 200% revision tilt, recent period; A1 valid — 2026-09-26
 
 Prospective source commit `1744659`; private project **36981612**,

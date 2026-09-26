@@ -692,6 +692,11 @@ fresh ratings, then exact period/package/projection bindings. Current floor:
 198 shared looks / 141 development / 32 infrastructure / 623 cells.
 Claude will review section 191 at that exact pushed snapshot; Codex will
 counter-review every resulting Claude commit before the next reviewed round.
+Section 192 resumes the already declared recent-period family after the
+owner's latest entitlement recheck returned ratings HTTP 200. New immutable
+inputs and all six source/profile bindings must authenticate before outcomes.
+Claude will review section 192 after the six bounded tests and single final
+push; this is the owner's explicit same-round continuation, not live use.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -25776,3 +25781,108 @@ After the final record edits, the record-only check is **11 passed in
 0.31 seconds**; an intermediate table-contiguity failure was corrected by
 removing a blank separator, not by weakening the test. Both completed
 projects and backtests remain in QC; no active run remains in this round.
+
+## 192. Restored ratings access and the declared six recent-period tests
+
+The owner's latest recheck returned analyst-ratings HTTP **200**, restoring
+the external blocker in section 191. This continuation starts from pushed
+`b1d5ba7` in the same worktree/branch, with no new Claude review or extra
+authorization requirement. The previously declared settings remain exactly
+100/120/140/160/180/200% (R-203–R-208), all **2025-08-01–2026-09-25**,
+290 observations / 289 returns / 61 weekly decisions. The common 98% gross,
+10 bps per side, stock selection, six universes, ETF fallback, positive
+donor floors, caps and next-open order-based execution remain unchanged.
+This is accepted-risk, adaptive, overlapping-data research—not an untouched
+holdout, a production optimum, pristine PIT or portfolio leverage. Freeze
+all six exact source/profile/input identities before their first outcome;
+no automatic 250/300% test on this newer period. Maximum three QC attempts
+per candidate, failed-attempt accounting and same-project recovery remain.
+
+### 192.1 Fresh provider capture and offline archive
+
+The September 17–25 three-role capture completed with **3 pages / 1,398
+rows**, immutable artifact `arv2-massive-three-role-20260926T061343494005Z`,
+capture ID `arv2-capture-1ad4a5318ac93e995fdf3125`. No provider row or key
+was displayed. Its source-manifest SHA-256 is
+`e3e3fb4b9d26abf2e68bc972170d6c2d8a6c4b404278084e3e28b9d43327a8ce`.
+Physical archive `arv2-physical-accepted-risk-f87c0cb219a7e5f8d51a33b8`,
+SHA-256 `f87c0cb219a7e5f8d51a33b8b2973b11c6d795d3586d7a11fc27f96fdb409cff`,
+was constructed beneath the separate private latest-archive root.
+
+The first offline archive construction refused a combined report-leaf
+byte/hash/LF/identity check during final publication and cleaned its
+unpublished output. A repeat on the same immutable capture, with a bounded
+read-only exception observer (no guard modification), authenticated and
+published successfully. The precise transient cause is unresolved; do not
+claim a measured fix or relax that guard. Separately pinned archive reload
+precedes input composition. These provider/offline steps spend no QC attempt
+or return look. Starting floor: **198 shared / 141 development / 32
+infrastructure / 623 authenticated cells**. Exact new package and source
+identities, focused checks, launch attempts and outcomes follow below.
+
+The new collision census initially reused the legacy per-row normalizer,
+which remained CPU-active scanning the frozen parent after ten minutes.
+Reuse of the existing sealed semantic fold was then tested: the same real
+1,398-row archive in the three compatibility-probe positions produced
+identical 1,289-ID collision sets (digest
+`e0c5bd57ba4382236e8097578948a16264905d12b3be0a02f4d4bef7a59e7b89`),
+13.1935 seconds legacy versus 0.6601 seconds sealed. All roles, bytes,
+source links and terminal archive checks remain authenticated; no provider
+rows or strategy economics changed. **26 focused tests passed.** The slow
+offline composition was cancelled, not counted as a failed QC attempt, and
+the identical pinned composition restarted with this verified reader.
+
+The optimized production composition completed successfully in about twelve
+minutes. Package `arv2-preliminary-qc-package-2649577ac55ac39de37a4a70`,
+SHA-256 `2649577ac55ac39de37a4a70ab4337274f1887e1a113f0972beefab615121be1`,
+contains **3,454 history sessions / 13,015 combined contributions**,
+preserving the old stream and adding **12 recovered tail / 16 fresh**
+eligible contributions. This is an eligibility census, not the raw provider
+row count. Lineage SHA-256
+`c39b6fe27782a7776891aab67c82d816fcd2109b12928cc84643073d140b2dbb`
+is separately persisted as owner-private canonical `lineage.json` and
+externally pinned on reload. Activation key
+`arv2/preliminary-rating/01820a4b37c320d580bd1977/transport-manifest.json`,
+SHA-256 `9ee1013f429ed87e7b7a262cf352c5604cd532ce4eb3e9defffe23be31c39b35`,
+is **4,523 bytes**; the exact input inventory totals **2,771,341 bytes**.
+
+### 192.2 Exact pre-outcome six-candidate freeze
+
+All six public builders passed on the actual externally pinned package;
+all 96 QC-prelude compilation checks passed. Each closure has **16 files /
+425,165 bytes**, preserving the 32-KiB review margin and leaving 819 bytes
+inside its source budget. Main formatting is AST-equivalent, not an economic
+change. The new matched profile is
+`440c7a683efe7476d88aaab730d87955efcbeb31aac4b559b330ad32f39c4fc6`.
+The ordered six-object upload-manifest SHA-256 is
+`7d4e031e6dfdc531e9e0954a741009fa5995ec62c5297032714882fa1343e0a7`.
+Activation is uploaded last and metadata-verified; no input-upload claim or
+QC attempt has been spent at this freeze. Owner research/signature waivers
+remain scoped to this lane and exploratory backtesting, never trading.
+
+| Candidate | Capacity | Projection SHA-256 | Profile SHA-256 | Source-manifest SHA-256 | Exact owner-waiver payload SHA-256 |
+|---|---|---|---|---|---|
+| R203 | 100% | `39793ae7247bae5282f93edfbaa5f6828bd4e49332f5b7909cf07baf92557b21` | `2a14727e763e5cbcbb6c32b08b1e051cf24af210761eacabc288f8e8ae140410` | `f8f706628fc6aefb5756cdaeb382bccdf97231f816fb5367e8d74ffbe1f72911` | `5f055057620a6d74ab5180b9533e2bdad186be7eae74a2c8e379c3e3edc85529` |
+| R204 | 120% | `dd8eb43587ea2b893992f40ce3b33af4da65415cd3515fed3130e5a2e294fedb` | `9e4d7a788e594834433ec34f957db25caf4f2847598fc8b3423957170195ccb9` | `724fbcf56108f2a5d7478f3067c43f4e232ea1ea063c39678684d6a9e52ab501` | `68f232b2126f716f051f6734e8cae8e03c2f21d340552bb734f87ed52d990205` |
+| R205 | 140% | `78b52a953782257f5fbef2d5dbeaafec2533a5f853e41da1b8ce7117493a8b66` | `f8e641731f322c67420c82ccf463cbb5e513fb08961330132855e667daacf271` | `18be41789db4fbfc33daf41daf433713027bb71455774bb416a94624ce8d2b70` | `13cc6d6add4e82c2aabdd072c3ee74b3995e4428dc1b8b2adeccdb8acd212ba0` |
+| R206 | 160% | `d70d5b314f409c70fb16fbbe19171bcb29819fdff0716ca4620657b0775d7f9a` | `3ff5c516323b945eea28bd1104f3ebaa215ebfb3a70c1ab76f778ec033ada2c5` | `4cf2518306e18589a193646a320d25a80585fbb5d3a387bad735d50a9a184824` | `b73cd64ab39122dca1dbcfe64c0945fcc7b89ce0a2c778f25a1e3d97e24fec99` |
+| R207 | 180% | `7d344126844c46642f52be74daa8f5a702e65e50d8979ee7df78e25f1b3ca7b1` | `cbfc4c7ad196f50b0dfdd221572b4f26a3fddef6e3cd87781d03e192e2d7a214` | `e2a11a2c90ae496e64daa1c9d3ce5cdd6248c1110acbdadbd3c7d1886dcd1cdd` | `3607b4366a64a48f7f1c47667af7bcc49a27588b20e21d4db0bed8901d17f032` |
+| R208 | 200% | `9f4df0c75eda0e6aa27ee69351ee044263bfe0f1d79312f0b40a62034a26e85f` | `c84a1a17d23e504044baf63807a83135b4d098062b7a2b98a041336234f1809a` | `563f3de21000c4588610f7c43904091d1dafbbfff930f50d1cd193261b954b43` | `b4e689f028d9252929cbc9b3e81d5418737528dc9390c2dd9cee82f4c5327091` |
+
+Project names are `125 ARV2 SIX CAP90 SETTLED TILT100 R203 202508 NOW`
+through `130 ARV2 SIX CAP90 SETTLED TILT200 R208 202508 NOW`, with each
+intermediate number/capacity/R-number exactly as pinned in the independent
+host adapter. Common period/input/source authority is frozen before the
+first outcome. R203 is this period's 100% capacity reference, **not a new
+tilt-off account**; later exact matched paths permit capacity comparisons,
+not a clean no-analyst alpha claim or a price-vintage identity proof.
+
+Pre-launch validation: combined targeted selection **272 passed / 29.67 s**,
+then the corrected uploader's final focused file **45 passed / 10.30 s**.
+Two closure/smuggling checks passed; the 174 historical launch tests preserve
+old waiver bytes. Actual-package preflight caught an incorrect host-only
+activation accessor before I/O: generic packages expose the descriptor at
+`upload_objects[-1].content_sha256`, not an `activation_manifest_sha256`
+attribute. A real-package regression is red with the wrong accessor and
+green with the correction. No projected source/economics changed. Full lane
+and repository suites were not run; Claude owns the full lane validation.

@@ -4795,3 +4795,516 @@ Higher adaptive same-window return does not identify a production optimum.
 The six August-2025-to-September-25-2026 candidates remain unlaunched
 because fresh Analyst Ratings access returns HTTP 403; no missing-look
 entry or successful recent-period result is inferred from their reservation.
+
+## R-203 — guarded 100% revision tilt, recent period; A1 launched — 2026-09-25
+
+Ratings access restored to HTTP 200. Owner-authorized section 192 and
+prospective commit `d5afc82` freeze all six 100–200% capacities before any
+new outcome: **2025-08-01–2026-09-25**, 290 observations / 289 returns /
+61 weekly decisions, same six universes, ETF fallback, 98% gross,
+10 bps per side, positive donor floors and order-based next-open execution.
+Authenticated new input package
+`2649577ac55ac39de37a4a70ab4337274f1887e1a113f0972beefab615121be1`
+preserves history and adds 12 recovered / 16 fresh eligible contributions.
+Exact six-object upload authenticated, activation last. Source
+`39793ae7247bae5282f93edfbaa5f6828bd4e49332f5b7909cf07baf92557b21`,
+profile `2a14727e763e5cbcbb6c32b08b1e051cf24af210761eacabc288f8e8ae140410`.
+Private project `125 ARV2 SIX CAP90 SETTLED TILT100 R203 202508 NOW`
+(`36978919`) launched A1 `61b3faad153e52b02cca15349924b594` after exact
+source read-back and compile. **One of three attempts used**, no retry.
+Totals **198 → 199 shared / 141 → 142 development / 32 infrastructure /
+623 authenticated cells**, pending terminal and sole bounded result read.
+This overlapping, adaptively chosen window is not untouched validation.
+R203 is a 100% capacity reference, not a new tilt-off account. No outcome,
+leverage, optimum or trading authority follows from launch.
+
+A1 reached **Runtime Error during initialization**: first activation
+manifest unavailable to the worker's existence/type guard. No orders,
+accepted aggregate, or result-read claim; counts remain **199 shared /
+142 development / 32 infrastructure / 623 cells**. Same-org backend
+metadata and Mia's read-only project inspection find the exact 4,523-byte
+manifest present; engine-local visibility and bool type remain unresolved.
+R204–R208 were stopped before launch to avoid repeating a common failure.
+Two R203 attempts remain, restricted to the same project and frozen
+economics. No fourth attempt or successful result is inferred.
+
+The owner/Mia subsequently completed actual **R203 attempt 2** in the same
+project, backtest `10769b9d9b285c5413823cd8dda3d64c`, snapshot 36980748,
+named `R203 A1 contains-key-fix rerun`. Its A1 label does not reset the
+budget; Codex's prepared same-source A2 was never claimed/launched.
+Conservative totals **199 -> 200 shared / 142 -> 143 development /
+32 infrastructure / 623 authenticated cells**, pending one-use imported
+aggregate validation. Current source differs only by removal of the
+redundant Object Store existence precheck; direct read, exact bytes and
+SHA-256 still enforce input integrity. Fifteen other files and all economic
+profiles are unchanged. Recovery projection
+`a5fff0112a08ca453fac5b01740a89eeb67bc72a1adecbfb1b9cbe686139ab26`.
+No historical-source cryptographic proof or accepted return is inferred
+from current read-back/timestamps/Completed alone. Section 192.4 freezes
+the separately corrected R204-R208 source identities before their launches.
+
+The sole R203 owner/Mia imported read passed **run_valid=true** with
+aggregate SHA-256 `013f4d9d5d7236766ac03feb6e4a166a3a36b9d4e263e2d861856075e15324ee`:
+**+51.0522340385% after modeled costs**, drawdown **−11.2230083664100%**,
+volatility **17.5742323730253%**, zero-rate Sharpe **2.13585197884188**,
+1,072 filled orders / 61 rebalances, no invalid/canceled, engine/model
+fees `$9,058.299615`. Cash/exposure/tracking gates passed. Cells
+**623 -> 624**, look totals **200 shared / 143 development / 32 infrastructure**.
+Separate Mia provenance and no historical snapshot byte proof retained;
+no invented Codex launch or waiver. Matched path
+`7710b02b7608ec2b5128ab4435351e5501ea1569dfcb69f69ddd6d9e4e189328`.
+
+## R-204 — corrected 120% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective commit `1744659` freezes the verified input direct-read
+correction before all remaining launches; economic settings and authenticated
+inputs remain unchanged from section 192.2. Exact 16-file source readback
+and compile in private project `36981341`,
+`126 ARV2 SIX CAP90 SETTLED TILT120 R204 202508 NOW`, precede A1 backtest
+`0842cd97750e0dd6bc026f4b3ec7d8a1`. Corrected projection
+`1aad7dc4b7083dd8d062d08f2ca3d239d142e9c5dc4e93e5fc50fbd6fa5a7b32`,
+profile `9e4d7a788e594834433ec34f957db25caf4f2847598fc8b3423957170195ccb9`.
+One of three technical attempts spent; launch counts **200 -> 201 shared /
+143 -> 144 development / 32 infrastructure / 624 cells**.
+Completed; sole bounded read passed **run_valid=true / comparison_valid=true**,
+aggregate SHA-256 `dc12131b29003374697ec12ea8b456bc94a6dbbaf363dda926cd0889ed3d165b`.
+Return **+51.226273341% after modeled costs**, drawdown **−11.2200602232%**,
+volatility **17.5929305337%**, zero-rate Sharpe **2.13948115551**,
+1,057 filled orders / 61 rebalances, no invalid/canceled; engine/model
+fees `$9,120.08659`; cash/gross/tracking passed. Matched path equals R203.
+Cells **624 -> 625**; final counts **201 / 144 / 32 / 625**.
+Only SPY/XLV stock sleeves are tilted on this period; QQQ/SOXX/REMX/XLE
+retain ETF fallback. Same-window adaptivity and PIT limits remain.
+
+## R-205 — corrected 140% revision tilt, recent period; A1 launched — 2026-09-26
+
+Exact source from prospective `1744659` uploaded, read back and compiled
+in private project **36981429**,
+`127 ARV2 SIX CAP90 SETTLED TILT140 R205 202508 NOW`; A1 backtest
+`0cbf0b03ad27d0e6328c324af4d45444`. Source
+`91747ad28ccf17784a3d40f4bc374a12c74c7289da7be3659739c7fa899ff4d0`,
+profile `f8e641731f322c67420c82ccf463cbb5e513fb08961330132855e667daacf271`.
+One of three attempts spent. Counts **201 -> 202 shared / 144 -> 145
+development / 32 infrastructure / 625 authenticated cells**; pending
+separate terminal and one-use bounded result validation.
+
+R205 completion: `Completed.`; sole source-authenticated bounded read
+**run_valid=true / comparison_valid=true**, aggregate SHA-256
+`23ed3042efc6b6fc3d46dfed4f672557c1571c3f217d46470894a11feedd2895`.
+After-cost return **+51.292307799%**, drawdown **−11.1991253331%**,
+volatility **17.6097562359%**, zero-rate Sharpe **2.13976681998**;
+1,022 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,188.79201`; cash/gross/tracking passed.
+Matched path equals R203; cells **625 -> 626**, totals **202 / 145 / 32 / 626**.
+Only SPY/XLV stock sleeves carry tilt; other four sleeves remain ETF fallback.
+
+## R-206 — corrected 160% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981490**,
+`128 ARV2 SIX CAP90 SETTLED TILT160 R206 202508 NOW`, A1 backtest
+`d550721731730c4dbbcd2f503cbca7f4`. One of three attempts spent; launch
+**202 -> 203 shared / 145 -> 146 development / 32 infrastructure / 626 cells**.
+Projection `d79ca9149f963079cbca4de91fbab670454910dc92d3921b97e28f565a6859ea`,
+profile `3ff5c516323b945eea28bd1104f3ebaa215ebfb3a70c1ab76f778ec033ada2c5`,
+source manifest `69628fb750f270d4de148e153bb709fdb85ccc0e84713a21451dd9939857e613`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `e5ac0b5af2a4dfbb010eb16b9fa331e3c044f55e9b4a4b996d70ae7da589225e`.
+2025-08-01–2026-09-25 after-cost return **+51.386924546%**, drawdown
+**−11.1665198634%**, volatility **17.6421226761%**, zero-rate Sharpe **2.13925424180**.
+996 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,257.05954`; cash/gross/tracking gates passed.
+Matched path equals the authenticated R203 recent reference; cells **626 -> 627**,
+totals **203 / 146 / 32 / 627**. SPY selects stocks on 45/61 decisions,
+XLV on 58/61; QQQ/SOXX/REMX/XLE remain ETF fallback on all 61.
+No same-period ETF benchmark return was read; repeated-window adaptivity remains.
+
+## R-207 — corrected 180% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981560**,
+`129 ARV2 SIX CAP90 SETTLED TILT180 R207 202508 NOW`, A1 backtest
+`9fbe2814b500db873b984b2751618299`. One of three attempts spent; launch
+**203 -> 204 shared / 146 -> 147 development / 32 infrastructure / 627 cells**.
+Projection `89461345526643e61be70badf7a9610d664434b092ba353fc7f534f050de4882`,
+profile `cbfc4c7ad196f50b0dfdd221572b4f26a3fddef6e3cd87781d03e192e2d7a214`,
+source manifest `22974f9ffc7ec011381f6a187960ad6ad77387483d7367597d1a018cbc9e5a13`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `e2dca03cc456a9deff0258c23071e6d8745b98c9f79b1c41eb342ba18a4040ca`.
+2025-08-01–2026-09-25 after-cost return **+51.4590932735%**, drawdown
+**−11.1689544091%**, volatility **17.6822881787%**, zero-rate Sharpe **2.13714668449**.
+991 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,339.177265`; cash/gross/tracking passed.
+Matched path equals R203; cells **627 -> 628**, totals **204 / 147 / 32 / 628**.
+Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
+No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.
+
+## R-220 — same-selection zero weight-tilt control; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998687**, A1 backtest
+`9f38b5c172f30d93c222c64aeadc7b32`. One of three attempts used. Exact source,
+profile and input pins: `six_universe_weight_ablation_candidates.json`.
+Order-based 2025-08-01–2026-09-25, 61 weekly decisions, 98% gross, 10 bps/side;
+zero weight transfers but AR entry/count retained outside XLE. Completed;
+sole bounded custom read valid, aggregate SHA
+`2f4ac136b1ca6d9ca026ac4475870c55daa11638adeeb549d414aba96224cf1f`.
+Net return **+55.2672684305%**, drawdown **−10.5819836762%**, volatility
+**18.1452359393%**, zero-rate Sharpe **2.20671238239**; 2,076 orders all filled,
+engine/model fees `$14,102.845695`, zero invalid/canceled/unexplained negative
+cash; cash/gross/tracking gates pass. Matched path equals R214 and the ladder:
+`e86d0ce6aa38a35cbae8eeedb317e895a71f30fc1bd27e7fbd77b9e6d490b006`.
+Launch **217 -> 218 shared / 158 -> 159 development / 34 infrastructure /
+639 cells**; accepted preliminary read **639 -> 640**. Result is not a fully
+AR-free control or proof of skill. Current floor **218 / 159 / 34 / 640**.
+
+## R-221 — fresh matched-selection 100% weight tilt; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998780**, A1 backtest
+`c76bd1544ee04df6bd94c3c046042bd9`. One of three attempts used, no retry.
+Exact R214 100% source reproduced, pins in the separate ablation manifest.
+Same order-based input/window, 61 decisions, 98% gross and 10 bps/side as R220.
+Completed; sole bounded read valid; aggregate SHA
+`592d2436072b63d2aa91119bccebaaa31dd5150ca1e64029b48d78ea495f4dad`
+is identical to R214, not merely a rounded-return replication. Net return
+**+54.8816924105%**, drawdown **−10.8136325554%**, volatility **18.4635271944%**,
+zero-rate Sharpe **2.16004362529**; 1,914 orders all filled, engine/model fees
+`$14,577.520895`, zero invalid/canceled/unexplained negative cash; all gates pass.
+Locally reauthenticated arm claims/raw summaries match each other's complete
+baseline path and sleeve diagnostics. Weight-tilt net spread versus R220 is
+**−0.385576020000 pp**; this window offers no incremental benefit for that
+100% overlay. AR entry/count remain in both; no entire-AR verdict or ETF
+comparison follows. Data-vintage/PIT/adaptive-window caveats remain.
+Launch **218 -> 219 shared / 159 -> 160 development / 34 infrastructure /
+640 cells**, valid read **640 -> 641**; floor **219 / 160 / 34 / 641**.
+
+## R-222 — all-six 25% coverage floors with 100% tilt; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998897**, A1 backtest
+`25d4689780c4d8db9fc1b0f9989d97e4`. One of three attempts used, no retry/Mia.
+Separate `six_universe_coverage25_candidates.json` pins the changed construction.
+Same package/activation and 2025-08-01–2026-09-25 window, 61 weekly decisions,
+98% gross and 10 bps/side; five verified names/positive-score entry outside
+XLE retained, all-six identified-budget scaling and own-ETF residuals.
+Completed; sole bounded read valid, aggregate SHA
+`c592f0703e8988bfb54852d7ea9193269269a2850896ff72b83b908f74cf3db2`.
+Net return **+53.6512129385%**, drawdown **−11.0951445171%**, volatility
+**18.5155660557%**, zero-rate Sharpe **2.11688653215**; 2,050 orders all filled,
+engine/model fees `$12,689.385615`, zero invalid/canceled/unexplained negative
+cash; all cash/gross/tracking gates pass. Matched path changed to
+`6ec82176adb5e29c94b2a3b3cd114862b322e26032b904afad1c9475f96be568`.
+Stock-entry decisions: SPY 58/61 (was45), QQQ55, SOXX53, XLV58, XLE58,
+REMX0. Return is **−1.230479472000 pp** versus R221, a construction comparison,
+not AR attribution: stock admission and residual budgets changed together.
+REMX still fails five-known-name coverage on60 dates, AR entry on the other.
+No fresh same-period ETF-basket result or live/formal acceptance is claimed.
+Launch **219 -> 220 shared / 160 -> 161 development / 34 infrastructure /
+641 cells**, valid read **641 -> 642**; final floor **220 / 161 / 34 / 642**.
+
+## R-209 — recent six-sleeve coverage counts and one transport recovery — 2026-09-26
+
+Owner-authorized count-only diagnostic, not an alpha/return evaluation.
+Source frozen at `8bb47ed`; private project **36982551**, A1 backtest
+`1e2b8175fa026c00c69f601c855e64fc` reached `Completed.`. Nine files /234,508 B,
+projection `5bd2733a5f05582845f707178992f56081e8fe78e615bb0294e9506c0e0b2690`,
+profile `854b469ad40667cc8e55a23a23da5593cfc247fca945cf6e1270d79d4096c4f9`.
+The first count read's old 16 KiB receipt writer refused the 30,199-byte
+seven-string envelope before saving/parsing. New finite 128 KiB artifact
+writer and exact one-time recovery frozen at `d587643`; original spent claim
+preserved, separate recovery claim, same exact run/source, no relaunch.
+Conservatively count launch **205 -> 206 shared / 148 development / 32 -> 33
+infrastructure / 629 cells**, recovery read **206 -> 207 shared / 148 development
+/ 33 -> 34 infrastructure / 629 cells**. No alpha/development look or cell added.
+Seven custom count summaries authenticated; no returns, prices, raw identifiers,
+orders, logs or standard statistics inspected. Coverage aggregate SHA
+`384db067a3fd7d6cd8c673b7924d77fb08d17678b8984a729d14a216d9e9202b`.
+Counts justify a separately frozen QQQ/SOXX 70%-member/80%-cap-weight/95%-total
+policy (55/58 of 61 coverage decisions); REMX 50%/50%/25% with five known names
+admits only one decision and leaves unresolved exposure in REMX. These are
+coverage, not AR-entry or return counts. Full decision/risk notes in lane 193.
+
+
+## R-210 — relaxed six-universe 20% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36982854**,
+A1 backtest `7ce855ca03066d9317ad825a9d57cff0`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`3d609445a484a25d8e48a8b88158f7a6ed844d53cd5f9b441bba8cc8e7d9a2c9`.
+Net return **+55.168949%**, drawdown
+**-10.629583%**, volatility **18.192717%**,
+zero-rate Sharpe **2.198383**; 2089 filled orders,
+fees `$14163.793475` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **207 -> 208 shared /
+148 -> 149 development / 34 infrastructure / 629 cells**;
+accepted preliminary read adds one cell, **629 -> 630**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **208 / 149 / 34 / 630**.
+
+
+## R-211 — relaxed six-universe 40% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36982955**,
+A1 backtest `29559dc652911e93a03465f84412765a`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`771cc81aae6b13840e0928308307e0e591d20a934c774340c77728264b0007b2`.
+Net return **+55.098631%**, drawdown
+**-10.683660%**, volatility **18.247446%**,
+zero-rate Sharpe **2.190163**; 2082 filled orders,
+fees `$14250.354145` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **208 -> 209 shared /
+149 -> 150 development / 34 infrastructure / 630 cells**;
+accepted preliminary read adds one cell, **630 -> 631**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **209 / 150 / 34 / 631**.
+
+
+## R-212 — relaxed six-universe 60% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983039**,
+A1 backtest `0966264e2ff7ddc042ac8e1129885196`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`df10566471fd7d12a5f1aac9179c999d8469796b407f4e29df66fa9979e81b02`.
+Net return **+54.974562%**, drawdown
+**-10.735042%**, volatility **18.314493%**,
+zero-rate Sharpe **2.178994**; 2075 filled orders,
+fees `$14356.056525` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **209 -> 210 shared /
+150 -> 151 development / 34 infrastructure / 631 cells**;
+accepted preliminary read adds one cell, **631 -> 632**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **210 / 151 / 34 / 632**.
+
+
+## R-213 — relaxed six-universe 80% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983111**,
+A1 backtest `11e54c1c7af7193fbe21f76292886636`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`5024964ab33dd19862324755bafa70c35c2e8691b03241de05cac988d8a5a417`.
+Net return **+54.950556%**, drawdown
+**-10.764413%**, volatility **18.382683%**,
+zero-rate Sharpe **2.170851**; 2049 filled orders,
+fees `$14470.287425` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **210 -> 211 shared /
+151 -> 152 development / 34 infrastructure / 632 cells**;
+accepted preliminary read adds one cell, **632 -> 633**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **211 / 152 / 34 / 633**.
+
+
+## R-214 — relaxed six-universe 100% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983178**,
+A1 backtest `4edc6954f573fd2624f7fd381a014fc3`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`592d2436072b63d2aa91119bccebaaa31dd5150ca1e64029b48d78ea495f4dad`.
+Net return **+54.881692%**, drawdown
+**-10.813633%**, volatility **18.463527%**,
+zero-rate Sharpe **2.160044**; 1914 filled orders,
+fees `$14577.520895` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **211 -> 212 shared /
+152 -> 153 development / 34 infrastructure / 633 cells**;
+accepted preliminary read adds one cell, **633 -> 634**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **212 / 153 / 34 / 634**.
+
+
+## R-215 — relaxed six-universe 120% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983239**,
+A1 backtest `78acf4051b06bb482d9cf002baf8c0b5`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`6a3b9e4f6805994a2f1e4b2cb9e25ea8ebbee2258add2d0a24ac332db414d82c`.
+Net return **+55.085975%**, drawdown
+**-10.754727%**, volatility **18.461410%**,
+zero-rate Sharpe **2.166500**; 1908 filled orders,
+fees `$14672.588135` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **212 -> 213 shared /
+153 -> 154 development / 34 infrastructure / 634 cells**;
+accepted preliminary read adds one cell, **634 -> 635**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **213 / 154 / 34 / 635**.
+
+
+## R-216 — relaxed six-universe 140% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983309**,
+A1 backtest `b9eee5b433c71b8f57faee629aaa37e3`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`c47a5356cb1b2498734f7414605e57e2ce896a5327320bb03b2535d82c928cfc`.
+Net return **+55.231199%**, drawdown
+**-10.701562%**, volatility **18.466941%**,
+zero-rate Sharpe **2.170327**; 1859 filled orders,
+fees `$14751.433495` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **213 -> 214 shared /
+154 -> 155 development / 34 infrastructure / 635 cells**;
+accepted preliminary read adds one cell, **635 -> 636**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **214 / 155 / 34 / 636**.
+
+
+## R-217 — relaxed six-universe 160% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983369**,
+A1 backtest `dff7b806e543a885e6b35a6c3487eb45`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`a62e438c6cb8c04b7ce66374e6ec1098563c8eef9ddf5db9424f2318e11dc98e`.
+Net return **+55.309408%**, drawdown
+**-10.628493%**, volatility **18.476952%**,
+zero-rate Sharpe **2.171625**; 1830 filled orders,
+fees `$14844.834645` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **214 -> 215 shared /
+155 -> 156 development / 34 infrastructure / 636 cells**;
+accepted preliminary read adds one cell, **636 -> 637**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **215 / 156 / 34 / 637**.
+
+
+## R-218 — relaxed six-universe 180% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983425**,
+A1 backtest `7aa218f6371c458ff3a250e43e0ef428`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`c0c73e617d0ca994727d00413d18ffd1d9ffe81b5e66583c78309840ac7ddfe5`.
+Net return **+55.424784%**, drawdown
+**-10.521886%**, volatility **18.481644%**,
+zero-rate Sharpe **2.174624**; 1806 filled orders,
+fees `$14924.10465` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **215 -> 216 shared /
+156 -> 157 development / 34 infrastructure / 637 cells**;
+accepted preliminary read adds one cell, **637 -> 638**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **216 / 157 / 34 / 638**.
+
+
+## R-219 — relaxed six-universe 200% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983491**,
+A1 backtest `166f906ab5144ef84eee4107c0b3f670`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`8a33713d10509a0eb50ee047858cafeff9de68e230e505443d42c7cb82062f25`.
+Net return **+55.675177%**, drawdown
+**-10.444006%**, volatility **18.489376%**,
+zero-rate Sharpe **2.181392**; 1737 filled orders,
+fees `$14999.56159` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **216 -> 217 shared /
+157 -> 158 development / 34 infrastructure / 638 cells**;
+accepted preliminary read adds one cell, **638 -> 639**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **217 / 158 / 34 / 639**.
+
+## R-223 — fully AR-off all-six 25% control; A1 valid — 2026-09-26
+
+Prospective source `8cc7e7c`; private project **37001346**, backtest
+`7651b2b7e8df020d1e34aa4f432a879f`, one of three attempts used. Exact mode,
+source/profile/protocol pins are in `six_universe_full_ar_ablation_candidates.json`.
+All-six 25% coverage, same authenticated input/identity catalog and
+2025-08-01–2026-09-25 period, 61 weekly pre-open order decisions, 98% target
+gross, 9.8% direct-name cap and modeled 10 bps/side. AR entry/count/weight
+disabled; five verified-cap names, partial scaled budget and own-ETF residual
+preserved. Not an independent full-security-master or ETF comparison.
+Launch **220 -> 221 shared / 161 -> 162 development / 34 infrastructure /
+642 cells**. Completed; sole custom read **run_valid=true**, aggregate SHA
+`b150621e2bc2d6daeb6d27d09f60382c478c678de4cedc72354d90da4f3e898e`.
+Net return **+53.7655799466%**, maximum drawdown **-10.8847003960%**,
+annualized volatility **17.8552601860%**, zero-rate Sharpe **2.19210042573**.
+2,415 orders all filled, engine/model fees `$13,083.082534`, zero invalid,
+canceled or unexplained-negative-cash events; 61 completed rebalances and
+cash/settlement/gross/tracking gates green. Valid read adds one cell,
+**642 -> 643**; floor **221 / 162 / 34 / 643**. No retry/Mia edit/repeated read.
+Economic AR-off remains conditional on the same accepted-risk input catalog;
+authenticated score clock/input validation retained, AR-positive diagnostic
+zero means not-used. Stock-entry decisions SPY 58, QQQ 55, SOXX 58, XLV 58,
+REMX 1, XLE 58 of 61; same coverage refusals, not invented identities.
+Fresh AR-on result and cached authenticated comparison follow separately.
+
+## R-224 — fresh all-six 25% AR-on 100% reference; A1 valid — 2026-09-26
+
+Prospective source `8cc7e7c`; private project **37001447**, backtest
+`4a703ad303007b317fb638cc6d3f63a9`, one of three attempts used. Exact R222
+cloud source/projection/profile reproduced inside the separately pinned
+full-AR ablation family. Same period/input/coverage/order/cost/exposure as R223;
+AR entry/count outside XLE and 100% weighting remain enabled. Launch
+**221 -> 222 shared / 162 -> 163 development / 34 infrastructure / 643 cells**.
+Completed; sole bounded read **run_valid=true**, aggregate SHA
+`c592f0703e8988bfb54852d7ea9193269269a2850896ff72b83b908f74cf3db2`,
+identical to R222's entire aggregate, not merely its rounded return.
+Net return **+53.6512129385%**, drawdown **-11.0951445171%**,
+annualized volatility **18.5155660557%**, zero-rate Sharpe **2.11688653215**.
+2,050 orders all filled; engine/model fees `$12,689.385615`, zero invalid,
+canceled or unexplained-negative-cash events, 61 completed rebalances;
+cash/settlement/gross/tracking gates green. Read adds one cell,
+**643 -> 644**; final floor **222 / 163 / 34 / 644**. No retry, Mia edit or
+repeated outcome read. Locally reauthenticated pair has identical non-AR
+coverage counts/reasons and input-collection census; intentionally different
+baseline paths and AR-dependent stocks/weights. Total AR-on-minus-off net
+spread **-0.114367008100 pp**; no incremental net return in this construction
+and window, not universal AR rejection or a fresh ETF-outperformance claim.
+The selected adaptive window, input/identity catalog, missing histories,
+PIT/vintage and lack of an independent price-series digest remain limitations.
+
+## R-208 — corrected 200% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981612**,
+`130 ARV2 SIX CAP90 SETTLED TILT200 R208 202508 NOW`, A1 backtest
+`55cd303aa5010cd5ef76e76d0cac29b3`. One of three attempts spent; launch
+**204 -> 205 shared / 147 -> 148 development / 32 infrastructure / 628 cells**.
+Projection `8efe09156adddd25dab77f489220cc6a9aeb5e8481516c75fbd9f24bed6d76cc`,
+profile `c84a1a17d23e504044baf63807a83135b4d098062b7a2b98a041336234f1809a`,
+source manifest `ed0d135c1c150c489542c69eb027803b9d448d1cee14842ba27ac83aa233e875`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `4fd041c198ba5ee173acac9f8a18ff4d9cf3924148191e29d5fce4293092e38e`.
+2025-08-01–2026-09-25 after-cost return **+51.5554638035%**, drawdown
+**−11.1821102836%**, volatility **17.7121758791%**, zero-rate Sharpe **2.13697297011**.
+984 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,393.636965`; cash/gross/tracking passed.
+Matched path equals R203; cells **628 -> 629**, totals **205 / 148 / 32 / 629**.
+Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
+No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.

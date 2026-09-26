@@ -11,6 +11,7 @@ from __future__ import annotations
 import dataclasses
 import hashlib
 import json
+import os
 import tempfile
 from collections import Counter, defaultdict
 from datetime import date
@@ -38,6 +39,9 @@ FRESH_LAST_EVENT_DATE = "2026-09-25"
 DECISION_CUTOFF_SESSION = "2026-09-25"
 FINAL_EXECUTION_SESSION = "2026-09-25"
 FRESH_CUTOFF_CLOSE_AT = "2026-09-25T20:00:00.000000Z"
+_PINNED_SEMANTIC_FOLD = _archive._fold_authenticated_physical_accepted_risk_rows
+_PINNED_SEMANTIC_ROW_TYPE = _archive._AuthenticatedAcceptedRiskSemanticRow
+_PINNED_SOURCE_ROW_TYPE = _archive._PINNED_SOURCE_ROW_TYPE
 
 
 class LatestOrderInputPackageError(ValueError):
@@ -83,10 +87,102 @@ def require_latest_order_input_package(value):
             or lineage.get("final_execution_session") != value.final_execution_session
             or type(value.recovered_tail_contribution_count) is not int
             or type(value.fresh_contribution_count) is not int
+            or value.recovered_tail_contribution_count < 0
+            or value.fresh_contribution_count < 0
             or lineage.get("recovered_tail_contribution_count") != value.recovered_tail_contribution_count
             or lineage.get("fresh_contribution_count") != value.fresh_contribution_count):
         _refuse("latest input lineage or wrapper binding changed")
     return value
+
+
+def persist_latest_order_input_lineage(value, output_root: Path) -> Path:
+    """Publish canonical lineage separately from the frozen package inventory."""
+    value = require_latest_order_input_package(value)
+    root = Path(output_root)
+    root.mkdir(parents=True, exist_ok=True)
+    directory = root / ("arv2-latest-lineage-" + value.lineage_sha256)
+    try:
+        directory.mkdir(mode=0o700)
+    except FileExistsError:
+        pass
+    _path, descriptor = _compact._open_private_package_directory(directory)
+    identity = _compact._directory_identity(os.fstat(descriptor))
+    try:
+        inventory = set(os.listdir(descriptor))
+        if inventory not in (set(), {"lineage.json"}):
+            _refuse("latest input lineage sidecar inventory changed")
+        if inventory:
+            payload = _compact._read_private_package_file_at(
+                descriptor, "lineage.json", maximum_bytes=64 * 1024,
+                expected_byte_count=len(value.lineage_bytes),
+                expected_sha256=value.lineage_sha256,
+            )
+            if payload != value.lineage_bytes:
+                _refuse("latest input immutable lineage sidecar changed")
+        else:
+            # The leaf directory is held and owner-private; no caller-owned
+            # package inventory is changed, and exclusive creation preserves
+            # a previously published sidecar rather than overwriting it.
+            flags = os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW
+            file_descriptor = os.open("lineage.json", flags, 0o600, dir_fd=descriptor)
+            try:
+                with os.fdopen(file_descriptor, "wb", closefd=False) as handle:
+                    handle.write(value.lineage_bytes)
+                    handle.flush()
+                    os.fsync(handle.fileno())
+            finally:
+                os.close(file_descriptor)
+        persisted = _compact._read_private_package_file_at(
+            descriptor, "lineage.json", maximum_bytes=64 * 1024,
+            expected_byte_count=len(value.lineage_bytes),
+            expected_sha256=value.lineage_sha256,
+        )
+        if persisted != value.lineage_bytes or set(os.listdir(descriptor)) != {"lineage.json"}:
+            _refuse("latest input lineage changed during publication")
+    finally:
+        os.close(descriptor)
+    _path, reopened = _compact._open_private_package_directory(directory)
+    try:
+        if _compact._directory_identity(os.fstat(reopened)) != identity:
+            _refuse("latest input lineage directory changed during publication")
+    finally:
+        os.close(reopened)
+    return directory / "lineage.json"
+
+
+def load_latest_order_input_package(
+    package_path: Path, *, expected_package_sha256: str,
+    lineage_path: Path, expected_lineage_sha256: str,
+) -> LatestOrderInputPackage:
+    """Reload using external package and canonical-sidecar pins, no sources."""
+    expected = _compact._safe_sha(expected_lineage_sha256, "latest lineage pin")
+    lineage_path = Path(lineage_path)
+    if lineage_path.name != "lineage.json":
+        _refuse("latest input lineage sidecar name changed")
+    _path, descriptor = _compact._open_private_package_directory(lineage_path.parent)
+    try:
+        if set(os.listdir(descriptor)) != {"lineage.json"}:
+            _refuse("latest input lineage sidecar inventory changed")
+        payload = _compact._read_private_package_file_at(
+            descriptor, "lineage.json", maximum_bytes=64 * 1024,
+            expected_sha256=expected,
+        )
+    finally:
+        os.close(descriptor)
+    package = _compact.load_accepted_risk_preliminary_package(
+        package_path, expected_package_sha256=expected_package_sha256,
+    )
+    try:
+        lineage = json.loads(payload.decode("ascii"))
+        value = LatestOrderInputPackage(
+            package, payload, expected, lineage["decision_cutoff_session"],
+            lineage["final_execution_session"],
+            lineage["recovered_tail_contribution_count"],
+            lineage["fresh_contribution_count"],
+        )
+    except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError) as exc:
+        raise LatestOrderInputPackageError("latest input lineage is unreadable") from exc
+    return require_latest_order_input_package(value)
 
 
 def _refuse(message):
@@ -177,8 +273,8 @@ def _authenticate_archives(parent, delta, fresh):
     return values
 
 
-def _cross_boundary_rating_events(parent, delta, fresh):
-    """Quarantine fresh reused rating IDs without altering predecessor rows."""
+def _cross_boundary_rating_events_legacy(parent, delta, fresh):
+    """Slow compatibility oracle; production uses the sealed semantic fold."""
     fresh_ids = set()
     for row in _archive.iter_physical_accepted_risk_rows(fresh):
         if (row.locator.source_role is MassiveSourceRole.ANALYST_RATINGS
@@ -190,6 +286,40 @@ def _cross_boundary_rating_events(parent, delta, fresh):
             if (row.locator.source_role is MassiveSourceRole.ANALYST_RATINGS
                     and row.provider_event_id in fresh_ids):
                 collisions.add(_compact._PINNED_COMMON_EVENT_ID(row.provider_event_id))
+    return frozenset(collisions)
+
+
+def _cross_boundary_rating_events(parent, delta, fresh):
+    """Exhaustively authenticate IDs without legacy per-row renormalization.
+
+    The sealed archive fold already checks source linkage, canonical semantic
+    bytes, counters, terminal roots and held file identities. Its callbacks
+    have no authority until the entire fold returns successfully. Every role
+    is still authenticated; only rating IDs are retained in the small census.
+    """
+    if (_archive._fold_authenticated_physical_accepted_risk_rows is not _PINNED_SEMANTIC_FOLD
+            or _archive._AuthenticatedAcceptedRiskSemanticRow is not _PINNED_SEMANTIC_ROW_TYPE):
+        _refuse("latest input semantic fold dependency changed")
+    fresh_ids = set()
+    collisions = set()
+    def rating_row(item):
+        if (type(item) is not _PINNED_SEMANTIC_ROW_TYPE
+                or type(item.row) is not _PINNED_SOURCE_ROW_TYPE):
+            _refuse("latest input semantic fold row type changed")
+        return item.row
+    def index_fresh(item):
+        row = rating_row(item)
+        if (row.locator.source_role is MassiveSourceRole.ANALYST_RATINGS
+                and row.provider_event_id is not None):
+            fresh_ids.add(row.provider_event_id)
+    def inspect_old(item):
+        row = rating_row(item)
+        if (row.locator.source_role is MassiveSourceRole.ANALYST_RATINGS
+                and row.provider_event_id in fresh_ids):
+            collisions.add(_compact._PINNED_COMMON_EVENT_ID(row.provider_event_id))
+    _PINNED_SEMANTIC_FOLD(fresh, index_fresh)
+    _PINNED_SEMANTIC_FOLD(parent, inspect_old)
+    _PINNED_SEMANTIC_FOLD(delta, inspect_old)
     return frozenset(collisions)
 
 
@@ -357,4 +487,5 @@ __all__ = [
     "LatestOrderInputPackage", "LatestOrderInputPackageError",
     "build_latest_order_input_package", "DECISION_CUTOFF_SESSION", "FINAL_EXECUTION_SESSION",
     "require_latest_order_input_package",
+    "persist_latest_order_input_lineage", "load_latest_order_input_package",
 ]

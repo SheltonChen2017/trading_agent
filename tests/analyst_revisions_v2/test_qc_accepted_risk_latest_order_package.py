@@ -191,9 +191,46 @@ def test_cross_boundary_ids_use_rating_role_only_and_return_common_id(monkeypatc
                     source("guidance-only", MassiveSourceRole.ANALYST_RATINGS)),
     }
     monkeypatch.setattr(module._archive, "iter_physical_accepted_risk_rows", lambda value: iter(rows[id(value)]))
-    assert module._cross_boundary_rating_events(parent, delta, fresh) == frozenset({
+    expected = module._cross_boundary_rating_events_legacy(parent, delta, fresh)
+    folds = []
+    def fold(value, visitor):
+        folds.append(value)
+        for row in rows[id(value)]:
+            visitor(module._archive._AuthenticatedAcceptedRiskSemanticRow(row, b"{}\n"))
+    monkeypatch.setattr(module, "_PINNED_SOURCE_ROW_TYPE", SimpleNamespace)
+    monkeypatch.setattr(module, "_PINNED_SEMANTIC_FOLD", fold)
+    monkeypatch.setattr(module._archive, "_fold_authenticated_physical_accepted_risk_rows", fold)
+    assert module._cross_boundary_rating_events(parent, delta, fresh) == expected == frozenset({
         module._compact._PINNED_COMMON_EVENT_ID("reuse"),
     })
+    assert folds == [fresh, parent, delta]
+
+
+def test_semantic_fold_dependency_mutant_is_refused_before_census(monkeypatch):
+    monkeypatch.setattr(module._archive, "_fold_authenticated_physical_accepted_risk_rows", lambda *_args: None)
+    with pytest.raises(module.LatestOrderInputPackageError, match="semantic fold dependency"):
+        module._cross_boundary_rating_events(*_old_archives(), _fresh())
+
+
+def test_semantic_fold_wrong_wrapper_is_refused(monkeypatch):
+    def fold(_value, visitor):
+        visitor(object())
+    monkeypatch.setattr(module, "_PINNED_SEMANTIC_FOLD", fold)
+    monkeypatch.setattr(module._archive, "_fold_authenticated_physical_accepted_risk_rows", fold)
+    with pytest.raises(module.LatestOrderInputPackageError, match="semantic fold row type"):
+        module._cross_boundary_rating_events(*_old_archives(), _fresh())
+
+
+def test_semantic_terminal_mismatch_cannot_publish_partial_census(monkeypatch):
+    row = SimpleNamespace(provider_event_id="event", locator=SimpleNamespace(source_role=MassiveSourceRole.ANALYST_RATINGS))
+    def fold(_value, visitor):
+        visitor(module._archive._AuthenticatedAcceptedRiskSemanticRow(row, b"{}\n"))
+        raise ValueError("semantic terminal digest mismatch")
+    monkeypatch.setattr(module, "_PINNED_SOURCE_ROW_TYPE", SimpleNamespace)
+    monkeypatch.setattr(module, "_PINNED_SEMANTIC_FOLD", fold)
+    monkeypatch.setattr(module._archive, "_fold_authenticated_physical_accepted_risk_rows", fold)
+    with pytest.raises(ValueError, match="terminal digest mismatch"):
+        module._cross_boundary_rating_events(*_old_archives(), _fresh())
 
 
 def test_offline_build_materializes_real_canonical_package_and_activation(monkeypatch, tmp_path):
@@ -269,3 +306,75 @@ def test_offline_build_materializes_real_canonical_package_and_activation(monkey
     # Package publication is immutable/content-derived; replay returns the
     # same exact package rather than overwriting a different historical pin.
     assert result.package.package_id != module._old.EXPECTED_DELTA_PACKAGE_ID
+    lineage_path = module.persist_latest_order_input_lineage(result, tmp_path / "sidecars")
+    assert lineage_path.read_bytes() == result.lineage_bytes
+    assert lineage_path.stat().st_mode & 0o777 == 0o600
+    assert lineage_path.parent.stat().st_mode & 0o777 == 0o700
+    assert module.persist_latest_order_input_lineage(result, tmp_path / "sidecars") == lineage_path
+    recovered = module.load_latest_order_input_package(
+        result.package.package_path,
+        expected_package_sha256=result.package.package_sha256,
+        lineage_path=lineage_path, expected_lineage_sha256=result.lineage_sha256,
+    )
+    assert recovered.lineage_bytes == result.lineage_bytes
+    assert recovered.package.package_sha256 == result.package.package_sha256
+    # A corrupt published sidecar is refused, never silently overwritten.
+    lineage_path.write_bytes(result.lineage_bytes + b" ")
+    with pytest.raises(ValueError):
+        module.persist_latest_order_input_lineage(result, tmp_path / "sidecars")
+    with pytest.raises(ValueError):
+        module.load_latest_order_input_package(
+            result.package.package_path,
+            expected_package_sha256=result.package.package_sha256,
+            lineage_path=lineage_path, expected_lineage_sha256=result.lineage_sha256,
+        )
+
+
+def test_lineage_loader_rejects_noncanonical_name_before_any_package_read(tmp_path):
+    with pytest.raises(module.LatestOrderInputPackageError, match="sidecar name"):
+        module.load_latest_order_input_package(
+            tmp_path, expected_package_sha256="a" * 64,
+            lineage_path=tmp_path / "wrong.json", expected_lineage_sha256="b" * 64,
+        )
+
+
+def test_cli_metadata_is_value_free_and_exports_exact_activation():
+    from scripts import build_arv2_latest_order_input_package as script
+    value = SimpleNamespace(
+        package=SimpleNamespace(
+            package_id="package", package_sha256="a" * 64, package_path="private/package",
+            upload_objects=(SimpleNamespace(object_store_key="arv2/input/transport-manifest.json",
+                                            content_sha256="b" * 64, byte_count=500),),
+            contribution_census=(("combined_contribution_count", 123),),
+            total_upload_byte_count=1000,
+        ),
+        lineage_sha256="c" * 64, lineage={"session_count": 3454},
+        decision_cutoff_session="2026-09-25", final_execution_session="2026-09-25",
+        recovered_tail_contribution_count=2, fresh_contribution_count=3,
+    )
+    metadata = script.metadata(value, "private/lineage.json")
+    assert metadata["activation_sha256"] == "b" * 64
+    assert metadata["combined_contribution_count"] == 123
+    assert metadata["orders"] is False and metadata["trading"] is False
+    assert not {"api_key", "provider_rows", "prices", "returns"} & metadata.keys()
+
+
+def test_cli_normalizes_relative_fresh_paths_without_resolving_links(monkeypatch):
+    from pathlib import Path
+    from scripts import build_arv2_latest_order_input_package as script
+    seen = []
+    def load(**kwargs):
+        seen.append(kwargs)
+        if len(seen) == 3:
+            raise RuntimeError("stop after fresh preflight")
+        return SimpleNamespace()
+    monkeypatch.setattr(script._predecessor, "load_physical_accepted_risk_archive", load)
+    with pytest.raises(RuntimeError, match="stop after fresh preflight"):
+        script.build(
+            fresh_archive_path=Path("artifacts/fresh/archive"),
+            fresh_source_path=Path("artifacts/fresh/source"),
+            expected_fresh_archive_sha256="a" * 64,
+            expected_fresh_source_manifest_sha256="b" * 64,
+        )
+    assert seen[-1]["archive_path"] == Path("artifacts/fresh/archive").absolute()
+    assert seen[-1]["source_artifact_path"] == Path("artifacts/fresh/source").absolute()

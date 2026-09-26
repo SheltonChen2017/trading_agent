@@ -55,8 +55,9 @@ class _Candidate:
 
     @property
     def backtest_name(self) -> str:
+        window = "202508 NOW" if self.candidate_id in _RECENT_PERCENTS else "2021 2025"
         return (
-            f"ARV2 {self.candidate_id}A1 six cap90 settlement 2021 2025 "
+            f"ARV2 {self.candidate_id}A1 six cap90 settlement {window} "
             f"{self.projection_sha256[:8]}"
         )
 
@@ -203,6 +204,12 @@ _LADDER_PERCENTS = {
     "R201": 250, "R202": 300,
 }
 _LATER_LADDER_CANDIDATES = frozenset(_LADDER_PERCENTS) - {"R195"}
+_RECENT_PERCENTS = {
+    "R203": 100, "R204": 120, "R205": 140,
+    "R206": 160, "R207": 180, "R208": 200,
+}
+_ALL_GUARDED_IDS = frozenset(_LADDER_PERCENTS) | frozenset(_RECENT_PERCENTS)
+_RECENT_GEOMETRY = ("2025-08-01", "2026-09-25", 290, 61)
 _R195_A2_PROJECT_ID = 36963958
 _R195_A2_WAIVER_ID = (
     "ARV2-OWNER-2026-09-25-R195A2-TILT100-GUARD-RECOVERY-EXPLORATORY"
@@ -243,8 +250,9 @@ class SettlementQcPlan:
     @property
     def backtest_name(self) -> str:
         candidate = _candidate(self)
-        if self.candidate_id == "R195" and self.attempt == 2:
-            return candidate.backtest_name.replace("R195A1", "R195A2", 1)
+        if self.candidate_id in {"R195", "R203"} and self.attempt == 2:
+            return candidate.backtest_name.replace(
+                self.candidate_id + "A1", self.candidate_id + "A2", 1)
         return candidate.backtest_name
 
     @property
@@ -272,9 +280,13 @@ def _candidate(plan: SettlementQcPlan) -> _Candidate:
     if type(plan) is not SettlementQcPlan or type(plan.candidate_id) is not str:
         _fail("settlement plan type changed")
     candidate = _CANDIDATES.get(plan.candidate_id)
+    if plan.candidate_id in _RECENT_PERCENTS:
+        recent = _recent_adapter()
+        recent.require_package_binding(plan)
+        candidate = recent.TRUSTED_CANDIDATES.get(plan.candidate_id)
     if candidate is None or (
         type(plan.attempt) is not int
-        or plan.attempt not in ((1, 2) if plan.candidate_id == "R195" else (1,))
+        or plan.attempt not in ((1, 2) if plan.candidate_id in {"R195", "R203"} else (1,))
         or type(plan.organization_id) is not str
         or not _ORG.fullmatch(plan.organization_id)
         or type(plan.package_sha256) is not str
@@ -286,6 +298,19 @@ def _candidate(plan: SettlementQcPlan) -> _Candidate:
     ):
         _fail("settlement plan changed from its exact attempt identity")
     return candidate
+
+
+def _recent_adapter():
+    # The new adapter owns independent literal pins; loading it never changes
+    # the historical registry or substitutes a short window into old globals.
+    from . import six_universe_recent_settlement_submission
+    return six_universe_recent_settlement_submission
+
+
+def _matched_profile_sha256(candidate: _Candidate) -> str:
+    if candidate.candidate_id in _RECENT_PERCENTS:
+        return _recent_adapter().MATCHED_BASELINE_PROFILE_SHA256
+    return _MATCHED_SETTLEMENT_PROFILE_SHA256
 
 
 def _post(api: QuantConnectClient, endpoint: str, payload: dict) -> dict:
@@ -304,7 +329,10 @@ def _client(api: QuantConnectClient) -> None:
 
 def _control_path(plan: SettlementQcPlan, name: str) -> Path:
     candidate = _candidate(plan)
-    if name not in {"claim", "launch", "terminal", "result-read-claim", "result-valid"}:
+    if name not in {"claim", "launch", "terminal", "result-read-claim", "result-valid"} and not (
+        candidate.candidate_id == "R203"
+        and name in {"inputs-upload-claim", "inputs-upload-valid", "visibility-evidence"}
+    ):
         _fail("settlement control name is not allowlisted")
     root = plan.control_directory
     try:
@@ -390,7 +418,25 @@ def preview(plan: SettlementQcPlan, projection: object) -> dict:
         or projection.activation_manifest_sha256 != plan.activation_manifest_sha256
     ):
         _fail("settlement projection, profile, or package changed")
-    if candidate.candidate_id in _LADDER_PERCENTS:
+    if candidate.candidate_id in _RECENT_PERCENTS:
+        percent = _RECENT_PERCENTS[candidate.candidate_id]
+        recent = _recent_adapter()
+        profile = recent.require_profile(percent)
+        projection_id_prefix = recent.PROJECTION_ID_PREFIXES[percent]
+        if (
+            profile.get("role") != candidate.role
+            or profile.get("maximum_stock_weight_change_fraction")
+            != _TILT_FRACTIONS[candidate.candidate_id]
+            or profile.get("minimum_stock_and_sleeve_residual_weight") != "1e-30"
+            or profile.get("matched_baseline_profile_sha256")
+            != _matched_profile_sha256(candidate)
+            or profile.get("evaluation_start_session") != _RECENT_GEOMETRY[0]
+            or profile.get("evaluation_end_session") != _RECENT_GEOMETRY[1]
+            or profile.get("evaluation_session_count") != _RECENT_GEOMETRY[2]
+            or profile.get("decision_count") != _RECENT_GEOMETRY[3]
+        ):
+            _fail("settlement recent-window rule, geometry, or matched profile changed")
+    elif candidate.candidate_id in _LADDER_PERCENTS:
         percent = _LADDER_PERCENTS[candidate.candidate_id]
         try:
             profile = ladder_projection.require_tilt_floor_profile(percent)
@@ -490,7 +536,7 @@ def _require_valid_predecessor(plan: SettlementQcPlan) -> str:
 def _launch_target_path(plan: SettlementQcPlan) -> str | None:
     """Keep the old exact path gate; new looks bind their own runtime paths."""
     predecessor = _require_valid_predecessor(plan)
-    return None if plan.candidate_id in _LADDER_PERCENTS else predecessor
+    return None if plan.candidate_id in _ALL_GUARDED_IDS else predecessor
 
 
 def _require_r195_a1_recovery_claim(plan: SettlementQcPlan) -> str:
@@ -547,11 +593,13 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict,
                     target_path: str | None, *,
                     a1_claim_sha256: str | None = None) -> bytes:
     candidate = _candidate(plan)
+    if candidate.candidate_id == "R203" and plan.attempt == 2:
+        return _recent_adapter()._a2_waiver_payload(plan, identity, target_path)
     a2 = candidate.candidate_id == "R195" and plan.attempt == 2
     if a2 and (type(a1_claim_sha256) is not str
                or not _HEX.fullmatch(a1_claim_sha256)):
         _fail("R195 A2 waiver lacks the exact spent A1 claim")
-    if candidate.candidate_id in _LADDER_PERCENTS:
+    if candidate.candidate_id in _ALL_GUARDED_IDS:
         valid_path = target_path is None
     else:
         valid_path = target_path == _PREDECESSOR_TARGET_PATH_SHA256
@@ -601,6 +649,20 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict,
             "r193_prior_looks_spent": 3,
             "owner_one_time_exception": True,
             "maximum_additional_r193_lineage_submissions": 1,
+        })
+    elif candidate.candidate_id in _RECENT_PERCENTS:
+        payload.update({
+            "historical_r182_target_path_sha256": _PREDECESSOR_TARGET_PATH_SHA256,
+            "matched_target_path_policy_id": "producer_derived_per_candidate_v1",
+            "comparison_reference_candidate_id": "R203",
+            "comparison_requires_valid_r203_exact_path": True,
+            "matched_baseline_profile_sha256": _matched_profile_sha256(candidate),
+            "evaluation_start_session": _RECENT_GEOMETRY[0],
+            "evaluation_end_session": _RECENT_GEOMETRY[1],
+            "evaluation_session_count": _RECENT_GEOMETRY[2],
+            "decision_count": _RECENT_GEOMETRY[3],
+            "input_upload_manifest_sha256": _recent_adapter().UPLOAD_MANIFEST_SHA256,
+            "input_lineage_sha256": _recent_adapter().PINNED_LINEAGE_SHA256,
         })
     elif candidate.candidate_id in _LADDER_PERCENTS:
         payload.update({
@@ -677,6 +739,8 @@ def launch_a1(
         _fail("settlement A1 launcher requires attempt one")
     identity = preview(plan, projection)
     target_path = _launch_target_path(plan)
+    if candidate.candidate_id in _RECENT_PERCENTS:
+        _recent_adapter().require_uploaded_inputs(plan)
     if type(owner_waiver_id) is not str or owner_waiver_id != candidate.waiver_id:
         _fail("settlement owner waiver does not cover this candidate")
     authority = {
@@ -937,7 +1001,7 @@ def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
         or launch.get("projection_sha256") != candidate.projection_sha256
         or launch.get("profile_sha256") != candidate.profile_sha256
         or launch.get("matched_baseline_target_path_sha256")
-        != (None if candidate.candidate_id in _LADDER_PERCENTS
+        != (None if candidate.candidate_id in _ALL_GUARDED_IDS
             else _PREDECESSOR_TARGET_PATH_SHA256)
         or type(launch.get("project_id")) is not int
         or launch["project_id"] <= 0
@@ -967,6 +1031,8 @@ def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
             or not _HEX.fullmatch(launch["a1_claim_sha256"])
         ):
             _fail("R195 A2 recovery launch identity changed")
+    if candidate.candidate_id == "R203" and plan.attempt == 2:
+        _recent_adapter()._require_a2_launch(plan, launch)
     return candidate
 
 
@@ -1032,6 +1098,8 @@ _TILT_FRACTIONS = {
     "R195": "1.00", "R196": "1.20", "R197": "1.40",
     "R198": "1.60", "R199": "1.80", "R200": "2.00",
     "R201": "2.50", "R202": "3.00",
+    "R203": "1.00", "R204": "1.20", "R205": "1.40",
+    "R206": "1.60", "R207": "1.80", "R208": "2.00",
 }
 
 
@@ -1110,7 +1178,9 @@ def _exact_result_claim(
         )
         or claim.get("owner_launch_waiver_id") != (
             _R195_A2_WAIVER_ID if candidate.candidate_id == "R195"
-            and plan.attempt == 2 else candidate.waiver_id
+            and plan.attempt == 2 else _recent_adapter()._A2_WAIVER_ID
+            if candidate.candidate_id == "R203" and plan.attempt == 2
+            else candidate.waiver_id
         )
         or claim.get("owner_waived_payload_sha256") != waiver_sha
         or any(claim.get(key) != launch.get(key) for key in (
@@ -1185,8 +1255,14 @@ def _settlement_aggregate(
             or event_count == 0
             or aggregate["end_day_gross_at_most_one"] is not True
             or aggregate["target_tracking_valid"] is not True
-            or execution.get("submitted_rebalance_count") != base_runtime.EXPECTED_DECISION_COUNT
-            or execution.get("completed_rebalance_count") != base_runtime.EXPECTED_DECISION_COUNT
+            or execution.get("submitted_rebalance_count") != (
+                _RECENT_GEOMETRY[3] if candidate.candidate_id in _RECENT_PERCENTS
+                else base_runtime.EXPECTED_DECISION_COUNT
+            )
+            or execution.get("completed_rebalance_count") != (
+                _RECENT_GEOMETRY[3] if candidate.candidate_id in _RECENT_PERCENTS
+                else base_runtime.EXPECTED_DECISION_COUNT
+            )
             or execution.get("submitted_order_count")
             != execution.get("filled_order_count_sum")
             or execution.get("invalid_order_count_sum") != 0
@@ -1195,14 +1271,14 @@ def _settlement_aggregate(
         ))
     ):
         _fail("settlement order, exposure, or tracking validity changed")
-    if candidate.candidate_id in _LADDER_PERCENTS:
+    if candidate.candidate_id in _ALL_GUARDED_IDS:
         observed_path = aggregate.get("matched_baseline_target_path_sha256")
         if type(observed_path) is not str or not _HEX.fullmatch(observed_path):
             _fail("settlement producer-derived matched target path is invalid")
     if candidate.candidate_id in _TILT_FRACTIONS and (
         aggregate.get("matched_baseline_profile_sha256")
-        != _MATCHED_SETTLEMENT_PROFILE_SHA256
-        or (candidate.candidate_id not in _LADDER_PERCENTS
+        != _matched_profile_sha256(candidate)
+        or (candidate.candidate_id not in _ALL_GUARDED_IDS
             and aggregate.get("matched_baseline_target_path_sha256")
             != matched_target_path)
         or aggregate.get("maximum_stock_weight_change_fraction")
@@ -1211,7 +1287,11 @@ def _settlement_aggregate(
         _fail("settlement tilt or matched target binding changed")
     base = {key: aggregate[key] for key in cap90._AGGREGATE_FIELDS}
     try:
-        selected = cap90._project_aggregate(base, bridge=False)
+        selected = cap90._project_aggregate(
+            base, bridge=False,
+            expected_geometry=(_RECENT_GEOMETRY
+                               if candidate.candidate_id in _RECENT_PERCENTS else None),
+        )
     except cap90.Cap90QcSubmissionError as exc:
         raise SixUniverseSettlementSubmissionError(str(exc)) from None
     selected.update({key: aggregate[key] for key in _SETTLEMENT_FIELDS | tilt_fields})
@@ -1225,7 +1305,7 @@ def _settlement_aggregate(
 def _verified_ladder_result_receipt(plan: SettlementQcPlan) -> dict | None:
     """Authenticate one local result chain without another QC result read."""
     candidate = _candidate(plan)
-    if candidate.candidate_id not in _LADDER_PERCENTS:
+    if candidate.candidate_id not in _ALL_GUARDED_IDS:
         _fail("settlement receipt comparison requires a guarded tilt candidate")
     valid_path = _control_path(plan, "result-valid")
     if not valid_path.exists():
@@ -1277,13 +1357,13 @@ def _verified_ladder_result_receipt(plan: SettlementQcPlan) -> dict | None:
         or receipt.get("project_id") != launch["project_id"]
         or receipt.get("backtest_id") != launch["backtest_id"]
         or receipt.get("matched_baseline_profile_sha256")
-        != _MATCHED_SETTLEMENT_PROFILE_SHA256
+        != _matched_profile_sha256(candidate)
         or receipt.get("package_sha256") != plan.package_sha256
         or receipt.get("activation_manifest_sha256")
         != plan.activation_manifest_sha256
         or receipt.get("source_files_sha256") != candidate.source_files_sha256
         or type(receipt.get("comparison_valid")) is not bool
-        or (candidate.candidate_id == "R195"
+        or (candidate.candidate_id in {"R195", "R203"}
             and receipt.get("comparison_valid") is not False)
         or type(receipt.get("aggregate_sha256")) is not str
         or not _HEX.fullmatch(receipt["aggregate_sha256"])
@@ -1319,6 +1399,25 @@ def _valid_r195_comparison_anchor(plan: SettlementQcPlan) -> tuple[int, str] | N
 def compare_valid_receipts(plan: SettlementQcPlan) -> dict:
     """Reconcile frozen R195 and a later result without QC calls or rewrites."""
     candidate = _candidate(plan)
+    if candidate.candidate_id in _RECENT_PERCENTS:
+        if candidate.candidate_id == "R203":
+            _fail("recent comparison requires a later recent-window A1 plan")
+        observed = _verified_ladder_result_receipt(plan)
+        anchor = _recent_adapter()._valid_comparison_anchor(plan)
+        return {
+            "candidate_id": candidate.candidate_id,
+            "comparison_valid": (
+                observed is not None and anchor is not None
+                and observed["matched_baseline_target_path_sha256"] == anchor[1]
+            ),
+            "r203_anchor_attempt": None if anchor is None else anchor[0],
+            "matched_baseline_target_path_sha256": (
+                None if observed is None else observed["matched_baseline_target_path_sha256"]
+            ),
+            "r203_matched_baseline_target_path_sha256": (
+                None if anchor is None else anchor[1]
+            ),
+        }
     if candidate.candidate_id not in _LATER_LADDER_CANDIDATES:
         _fail("settlement comparison requires a later guarded ladder A1 plan")
     observed = _verified_ladder_result_receipt(plan)
@@ -1435,7 +1534,7 @@ def read_aggregates_once(
     selected = _settlement_aggregate(
         aggregate, candidate,
         matched_target_path=(
-            None if candidate.candidate_id in _LADDER_PERCENTS
+            None if candidate.candidate_id in _ALL_GUARDED_IDS
             else _PREDECESSOR_TARGET_PATH_SHA256
         ),
     )
@@ -1447,6 +1546,13 @@ def read_aggregates_once(
             anchor is not None
             and selected["matched_baseline_target_path_sha256"] == anchor[1]
         )
+    elif valid and candidate.candidate_id in _RECENT_PERCENTS and candidate.candidate_id != "R203":
+        anchor = _recent_adapter()._valid_comparison_anchor(plan)
+        comparison_valid = (
+            anchor is not None
+            and selected["matched_baseline_target_path_sha256"]
+            == anchor[1]
+        )
     if valid:
         receipt = {
             "candidate_id": candidate.candidate_id, "attempt": plan.attempt,
@@ -1456,13 +1562,13 @@ def read_aggregates_once(
             "project_id": launch["project_id"],
             "backtest_id": launch["backtest_id"],
         }
-        if candidate.candidate_id in _LADDER_PERCENTS:
+        if candidate.candidate_id in _ALL_GUARDED_IDS:
             receipt.update({
                 "matched_baseline_target_path_sha256": (
                     selected["matched_baseline_target_path_sha256"]
                 ),
                 "matched_baseline_profile_sha256": (
-                    _MATCHED_SETTLEMENT_PROFILE_SHA256
+                    _matched_profile_sha256(candidate)
                 ),
                 "package_sha256": plan.package_sha256,
                 "activation_manifest_sha256": plan.activation_manifest_sha256,
@@ -1479,7 +1585,7 @@ def read_aggregates_once(
             })
         _write(_control_path(plan, "result-valid"), receipt)
     result = {"meta": meta, "aggregates": selected, "run_valid": valid}
-    if candidate.candidate_id in _LADDER_PERCENTS:
+    if candidate.candidate_id in _ALL_GUARDED_IDS:
         result["comparison_valid"] = comparison_valid
     if candidate.candidate_id == "R195" and plan.attempt == 2:
         result.update({

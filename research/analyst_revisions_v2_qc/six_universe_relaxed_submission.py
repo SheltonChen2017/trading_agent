@@ -25,6 +25,8 @@ FROZEN_ABLATION_MANIFEST_SHA256 = "aa0781076073a466c904881399c5d1f34e915ff0fc88c
 ABLATION_MANIFEST_PATH = Path(__file__).with_name("six_universe_weight_ablation_candidates.json")
 FROZEN_COVERAGE25_MANIFEST_SHA256 = "2f8ba60e2357ac886d84105145e8dfd719e101f3f5d35effde114931da01fa62"
 COVERAGE25_MANIFEST_PATH = Path(__file__).with_name("six_universe_coverage25_candidates.json")
+FROZEN_FULL_AR_ABLATION_MANIFEST_SHA256 = "a2e7181b4181394f3a39093445f3aa784896e5db9ac22b51645758349ce0c7ef"
+FULL_AR_ABLATION_MANIFEST_PATH = Path(__file__).with_name("six_universe_full_ar_ablation_candidates.json")
 _TERMINAL = {"Completed.", "Runtime Error", "BuildError"}
 _GEOMETRY = ("2025-08-01", "2026-09-25", 290, 61)
 _TICKERS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
@@ -90,6 +92,24 @@ def _coverage25_manifest():
     return value
 
 
+def _full_ar_ablation_manifest():
+    raw = FULL_AR_ABLATION_MANIFEST_PATH.read_bytes()
+    if (type(FROZEN_FULL_AR_ABLATION_MANIFEST_SHA256) is not str
+            or hashlib.sha256(raw).hexdigest() != FROZEN_FULL_AR_ABLATION_MANIFEST_SHA256):
+        _fail("full AR ablation family is not the frozen manifest")
+    value = json.loads(raw)
+    rows = value.get("candidates") if type(value) is dict else None
+    if (type(rows) is not list or len(rows) != 2
+            or any(type(row) is not dict for row in rows)
+            or [row.get("candidate_id") for row in rows] != ["R223", "R224"]
+            or [row.get("tilt_fraction") for row in rows] != ["0.00", "1.00"]
+            or any(row.get("kind") != "order" for row in rows)
+            or rows[0].get("analyst_revision_enabled") is not False
+            or rows[1].get("analyst_revision_enabled") is not True):
+        _fail("full AR ablation family candidate census changed")
+    return value
+
+
 def _plan_manifest(plan):
     # Legacy parser fixtures deliberately use a non-plan sentinel; real public
     # operations validate the exact plan in _candidate before any I/O.
@@ -99,6 +119,8 @@ def _plan_manifest(plan):
         return _ablation_manifest()
     if type(plan.family) is str and plan.family == "coverage25":
         return _coverage25_manifest()
+    if type(plan.family) is str and plan.family == "full_ar_ablation":
+        return _full_ar_ablation_manifest()
     _fail("relaxed plan family changed")
 
 
@@ -107,6 +129,8 @@ def _plan_manifest_sha256(plan):
         return FROZEN_ABLATION_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "coverage25":
         return FROZEN_COVERAGE25_MANIFEST_SHA256
+    if type(plan) is RelaxedQcPlan and plan.family == "full_ar_ablation":
+        return FROZEN_FULL_AR_ABLATION_MANIFEST_SHA256
     return FROZEN_MANIFEST_SHA256
 
 
@@ -127,7 +151,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]

@@ -28,6 +28,8 @@ SUMMARY_SCHEMAS = {percent: f"arv2-six-universe-order-tilt{percent}-recent-summa
 META_SCHEMA = "arv2-six-universe-order-runtime-meta-v1-relaxed-v1"
 ALL25_SUMMARY_SCHEMA = "arv2-six-universe-order-tilt100-recent-summary-v1-all25-v1"
 ALL25_META_SCHEMA = "arv2-six-universe-order-runtime-meta-v1-all25-v1"
+FULL_AR_OFF_SUMMARY_SCHEMA = "arv2-six-universe-order-tilt0-recent-summary-v1-aroff-v1"
+FULL_AR_OFF_META_SCHEMA = "arv2-six-universe-order-runtime-meta-v1-aroff-v1"
 _GATE_PATH = "accepted_risk_six_universe_gate.py"
 _TARGET_PATH = "accepted_risk_six_universe_order_targets.py"
 _TILT_TARGET_PATH = "accepted_risk_six_universe_order_tilt_targets.py"
@@ -46,19 +48,46 @@ def _replace(source, old, new, count=1):
     return source.replace(old, new, count)
 
 
-def _render_source(path, source, percent, policy, *, all25=False):
+def _render_source(path, source, percent, policy, *, all25=False, ar_off=False):
     if path == _GATE_PATH:
-        source = (_selection.render_all25_gate_source(source, policy) if all25
+        source = (_selection.render_full_ar_off_gate_source(source) if ar_off
+                  else _selection.render_all25_gate_source(source, policy) if all25
                   else _selection.render_gate_source(source, policy))
     elif path == _TARGET_PATH:
-        source = (_selection.render_all25_targets_source(source) if all25
+        source = (_selection.render_full_ar_off_targets_source(source) if ar_off
+                  else _selection.render_all25_targets_source(source) if all25
                   else _selection.render_targets_source(source))
     fraction = f"{percent // 100}.{percent % 100:02d}"
     if path in (_TILT_TARGET_PATH, _TILT_RUNTIME_PATH):
         source = _replace(source, '"1.00"', repr(fraction), 2)
+    if ar_off and path == _TILT_TARGET_PATH:
+        tree = ast.parse(source)
+        function = next(node for node in tree.body if isinstance(node, ast.FunctionDef)
+                        and node.name == "tilt_matched_weights")
+        # Keep construction/snapshot authentication and baseline cap checks,
+        # then return exactly the cap-only weights without traversing scores.
+        index = next(index for index, node in enumerate(function.body)
+                     if isinstance(node, ast.With))
+        function.body = function.body[:index] + [
+            ast.Return(ast.Attribute(ast.Name("construction", ast.Load()),
+                                     "matched_weights", ast.Load()))]
+        function.body[0] = ast.Expr(ast.Constant(
+            "Return authenticated cap-only weights; AR entry, count and transfers are disabled."))
+        count = 0
+        for node in ast.walk(tree):
+            if isinstance(node, ast.keyword) and node.arg == "firm_specific_score":
+                node.value = ast.Constant(None)
+                count += 1
+            if isinstance(node, ast.Assign) and any(isinstance(target, ast.Name)
+                    and target.id == "TILT_RANK_RULE_ID" for target in node.targets):
+                node.value = ast.Constant("disabled_full_AR_off_v1")
+        if count != 1:
+            raise RelaxedOrderProjectionError("full AR-off tilt enrichment exact anchor changed")
+        ast.fix_missing_locations(tree)
+        source = ast.unparse(tree) + "\n"
     if path not in _VERSIONED_PATHS:
         return source
-    successor = "all25" if all25 else "relaxed"
+    successor = "aroff" if ar_off else "all25" if all25 else "relaxed"
     replacements = {
         "matched_revision_tilt100_recent": f"matched_revision_tilt{percent}_{successor}_recent",
         "cap90_matched_revision_tilt100_recent_v1": f"cap90_matched_revision_tilt{percent}_{successor}_recent_v1",
@@ -75,6 +104,7 @@ def _render_source(path, source, percent, policy, *, all25=False):
                 elif value.startswith("arv2-six-universe-"):
                     if ("relaxed-selection" not in value and "order-relaxed-sleeve" not in value
                             and "all25-selection" not in value and "order-all25-sleeve" not in value
+                            and "full-ar-off-selection" not in value and "order-full-ar-off-sleeve" not in value
                             and value != "arv2-six-universe-order-sleeve-summary-table-v1"):
                         value = value.replace("tilt100", f"tilt{percent}")
                         node.value = (value + successor + "-") if value.endswith("-") else value + f"-{successor}-v1"
@@ -82,7 +112,7 @@ def _render_source(path, source, percent, policy, *, all25=False):
 
         def visit_ClassDef(self, node):
             if path == "main.py" and node.name == "ARV2SixUniverseOrderTilt100RecentAlgorithm":
-                title = "All25" if all25 else "Relaxed"
+                title = "FullArOff" if ar_off else "All25" if all25 else "Relaxed"
                 node.name = f"ARV2SixUniverseOrderTilt{percent}{title}RecentAlgorithm"
             return self.generic_visit(node)
 
@@ -174,12 +204,29 @@ def build_all25_order_projection(prior_package, latest_package, percent=100):
                              _selection.ALL25_COVERAGE_POLICY, all25=True)
 
 
-def _build_projection(prior_package, latest_package, percent, policy, *, all25=False):
+def build_full_ar_ablation_projection(prior_package, latest_package, ar_enabled):
+    """Exact R222 AR-on reference versus a prospectively versioned AR-off arm.
+
+    OFF retains the identical input bundles, all-six25 coverage, verified cap
+    floor, market-cap ordering, scaled sleeve budgets and execution economics;
+    no score can control entry, stock count or weights. Existing authenticated
+    input/scorer clock plumbing remains, and is disclosed in the profile.
+    """
+    if type(ar_enabled) is not bool:
+        raise RelaxedOrderProjectionError("full AR ablation requires an exact boolean mode")
+    if ar_enabled:
+        return build_all25_order_projection(prior_package, latest_package, 100)
+    return _build_projection(prior_package, latest_package, 0,
+                             _selection.ALL25_COVERAGE_POLICY, all25=True, ar_off=True)
+
+
+def _build_projection(prior_package, latest_package, percent, policy, *, all25=False, ar_off=False):
     if not all25:
         policy = _selection._policy(policy)
     predecessor = _recent.build_corrected_short_window_tilt_projection(prior_package, latest_package, 100)
     sources = {item.project_path: _render_source(item.project_path,
-        item.source_bytes.decode("ascii"), percent, policy, all25=all25) for item in predecessor.source_files}
+        item.source_bytes.decode("ascii"), percent, policy, all25=all25,
+        ar_off=ar_off) for item in predecessor.source_files}
     # The bridge hash includes the changed gate and evaluator. Rebind it before
     # loading the tilt runtime, which verifies that literal at profile reads.
     with _cloud_loader(sources) as (load, _modules):
@@ -190,9 +237,9 @@ def _build_projection(prior_package, latest_package, percent, policy, *, all25=F
         runtime = load(_TILT_RUNTIME_PATH[:-3])
         profile = runtime.require_tilt_profile()
         runtime.expected_tilt_custom_statistic_names()
-        summary_schema = (ALL25_SUMMARY_SCHEMA if all25
+        summary_schema = (FULL_AR_OFF_SUMMARY_SCHEMA if ar_off else ALL25_SUMMARY_SCHEMA if all25
                           else f"arv2-six-universe-order-tilt{percent}-recent-summary-v1-relaxed-v1")
-        meta_schema = ALL25_META_SCHEMA if all25 else META_SCHEMA
+        meta_schema = FULL_AR_OFF_META_SCHEMA if ar_off else ALL25_META_SCHEMA if all25 else META_SCHEMA
         if runtime.TILT_SUMMARY_SCHEMA != summary_schema or runtime.TILT_META_SCHEMA != meta_schema:
             raise RelaxedOrderProjectionError("relaxed result schema binding changed")
     files = tuple(sorted((_base._source_file(path, source.encode("ascii"))
@@ -204,7 +251,7 @@ def _build_projection(prior_package, latest_package, percent, policy, *, all25=F
         raise RelaxedOrderProjectionError("relaxed source closure exceeded unchanged QC budgets")
     for item in files:
         compile("from AlgorithmImports import *\n" + item.source_bytes.decode("ascii"), item.project_path, "exec")
-    successor = "all25" if all25 else "relaxed"
+    successor = "aroff" if ar_off else "all25" if all25 else "relaxed"
     value = dataclasses.replace(predecessor,
         schema=f"arv2-six-universe-{successor}-tilt{percent}-qc-projection-v1",
         role=profile["role"], variant=f"cap90_matched_revision_tilt{percent}_{successor}_recent_v1",

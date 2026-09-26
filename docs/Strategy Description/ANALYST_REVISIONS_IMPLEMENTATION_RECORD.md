@@ -724,6 +724,14 @@ push, including the R209 recovery and new cached-arm integrity correction;
 Codex counter-reviews every Claude commit. No further tilt setting, universe,
 live use or formal acceptance is scheduled automatically from these results.
 
+Section 195 is the owner's explicit next bounded exception: implement and run
+a fully AR-off cap-ranked control R223 versus a fresh exact R222-source AR-on
+100% arm R224 on the same all-six 25% policy, input, window and execution rules.
+Claude review of section 195 and earlier deferred commits follows one final
+push; Codex counter-reviews every Claude commit. Each candidate has at most
+three attempts, no full-suite run by Codex and no automatic follow-on research
+or trading. Outcomes remain unobserved at this prospective freeze.
+
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
@@ -767,7 +775,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–194
+findings, outcomes, and per-run accounting remain in numbered sections 1–195
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -26671,3 +26679,46 @@ result reads passed on A1; three launch looks, three exploratory cells, zero
 retries/additional reads/infrastructure looks. Final fetch still equals base
 `1583157`: no new Claude push to counter-review in this round. One final
 same-worktree, same-branch push follows the final record commit.
+
+## 195. Owner-directed total analyst-revision ablation — 2026-09-26
+
+### 195.1 Prospective scope and frozen pair
+
+Base `7c1694e3e9b7719f423a3271a6c9eb44fc5b9846`. After the owner asked whether
+the small weight-overlay spread meant AR had little effect, Codex distinguished
+that from the still-active entry/count rules and proposed a fully AR-off control.
+The owner instructed implementation and one final push. Standing exploratory
+research authority, detached-signature waiver and shared look bookkeeping apply.
+Intermediate Claude review is deferred for this bounded pair, not canceled.
+Fetch equals this base; no intervening Claude commits to counter-review.
+
+R223 removes AR from stock entry, stock count and weights. Each coverage-valid
+sleeve selects up to ten verified names by prior-time market cap descending,
+security-ID tie-break, equal scaled slots; missing slots stay in its own ETF.
+No AR-positive floor or AR weight transfer. Its positive-score diagnostic is
+explicitly zero/not-used. Authenticated score/input/clock plumbing remains for
+the immutable common input bundle, but finite, missing, zero, negative or
+permuted score values cannot change its construction or weights.
+
+R224 is a fresh exact-source R222 replication: all-six 25% coverage with AR
+entry/count outside XLE and 100% weight overlay. Both retain identical verified
+identity/known-five floors, effective mapping/cap/reported-total coverage,
+prior-time/staleness constraints, input package/activation, six universes,
+2025-08-01–2026-09-25 window (290 observations, 61 decisions), weekly pre-open
+orders, 98% target gross, 9.8% combined direct-name cap and modeled 10 bps/side.
+2x buying-power admission is not levered target exposure. This tests AR's total
+contribution to this construction, not an ETF benchmark or formal-alpha claim.
+Different stock targets/fallback diagnostics/baseline paths are allowed: unlike
+the earlier weight-only pair, entry/count removal intentionally changes them.
+
+Separate `six_universe_full_ar_ablation_candidates.json`, byte SHA
+`a2e7181b4181394f3a39093445f3aa784896e5db9ac22b51645758349ce0c7ef`, pins R223/R224,
+their exact modes, 16-file sources/profile/schemas and common protocol. Projects
+are `145 ARV2 SIX FULL AR OFF R223 202508 NOW` and
+`146 ARV2 SIX FULL AR ON100 R224 202508 NOW`. Historical manifests and cloud
+modules remain unchanged. At most three attempts each, same-project retries,
+one bounded aggregate read per launch. The existing authenticated cached-arm
+reader is shared with the old comparison without weakening its identity checks.
+No outcome observed at this freeze; pre-launch floor remains 220 shared /
+161 development / 34 infrastructure / 642 authenticated exploratory cells.
+Results, validation and exact review handoff follow after the runs.

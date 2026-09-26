@@ -61,39 +61,40 @@ def freeze(*, all25=False):
         predecessor_manifest_sha256=adapter.FROZEN_MANIFEST_SHA256)
 
 
+def authenticated_cached_result(candidate, control, family):
+    """Reparse the sole retained custom read; never fetch another QC outcome."""
+    for attempt in range(3, 0, -1):
+        path = control / f"{candidate}-A{attempt}-result.json"
+        if path.is_file():
+            plan = adapter.build_plan(candidate, "a" * 32, control, attempt, family=family)
+            launch = common._read(adapter._path(plan, "launch"))
+            identity = adapter._receipt(plan, launch)
+            expected = {"candidate_id": candidate, "attempt": attempt,
+                "project_id": launch["project_id"], "backtest_id": launch["backtest_id"],
+                "status": "Completed."}
+            if (common._read(adapter._path(plan, "terminal")) != expected
+                    or common._read(adapter._path(plan, "read-claim")) != expected):
+                raise ValueError("comparison cached terminal or result-read claim changed")
+            raw = adapter._read_artifact(adapter._path(plan, "raw-custom"))
+            row = adapter._candidate(plan)
+            if (set(raw) != set(expected) | {"statistics"}
+                    or any(raw.get(key) != value for key, value in expected.items())
+                    or type(raw.get("statistics")) is not dict
+                    or set(raw["statistics"]) != set(row["statistic_names"])):
+                raise ValueError("comparison cached raw-statistic identity changed")
+            parsed = adapter._parse_order(plan, raw["statistics"])
+            result = adapter._read_artifact(path)
+            if result != {**expected, **parsed,
+                    "manifest_sha256": identity["manifest_sha256"],
+                    "projection_sha256": row["projection_sha256"]}:
+                raise ValueError("comparison cached arm differs from authenticated statistics")
+            return result
+    raise ValueError("comparison lacks a completed result")
+
+
 def compare_cached():
-    results = {}
-    for candidate in PAIR:
-        for attempt in range(3, 0, -1):
-            path = CONTROL / f"{candidate}-A{attempt}-result.json"
-            if path.is_file():
-                plan = adapter.build_plan(candidate, "a" * 32, CONTROL, attempt,
-                    family="weight_ablation")
-                launch = common._read(adapter._path(plan, "launch"))
-                identity = adapter._receipt(plan, launch)
-                expected = {"candidate_id": candidate, "attempt": attempt,
-                    "project_id": launch["project_id"], "backtest_id": launch["backtest_id"],
-                    "status": "Completed."}
-                if (common._read(adapter._path(plan, "terminal")) != expected
-                        or common._read(adapter._path(plan, "read-claim")) != expected):
-                    raise ValueError("comparison cached terminal or result-read claim changed")
-                raw = adapter._read_artifact(adapter._path(plan, "raw-custom"))
-                row = adapter._candidate(plan)
-                if (set(raw) != set(expected) | {"statistics"}
-                        or any(raw.get(key) != value for key, value in expected.items())
-                        or type(raw.get("statistics")) is not dict
-                        or set(raw["statistics"]) != set(row["statistic_names"])):
-                    raise ValueError("comparison cached raw-statistic identity changed")
-                parsed = adapter._parse_order(plan, raw["statistics"])
-                result = adapter._read_artifact(path)
-                if result != {**expected, **parsed,
-                        "manifest_sha256": identity["manifest_sha256"],
-                        "projection_sha256": row["projection_sha256"]}:
-                    raise ValueError("comparison cached arm differs from authenticated statistics")
-                results[candidate] = result
-                break
-        else:
-            raise ValueError("comparison lacks a completed result")
+    results = {candidate: authenticated_cached_result(candidate, CONTROL, "weight_ablation")
+               for candidate in PAIR}
     off, on = (results[candidate] for candidate in PAIR)
     for result in results.values():
         if result.get("run_valid") is not True:

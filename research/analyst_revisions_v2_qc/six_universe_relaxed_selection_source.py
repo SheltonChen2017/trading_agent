@@ -135,6 +135,86 @@ def render_all25_gate_source(original_ascii, policy=ALL25_COVERAGE_POLICY):
     return _render_gate_source(original_ascii, policy, all25=True)
 
 
+def render_full_ar_off_gate_source(original_ascii):
+    """All25 coverage with cap-ranked stock entry/count independent of AR.
+
+    Existing score input validation is retained, but the count diagnostic is
+    explicitly zero/not-used and no score enters selection or construction.
+    Five verified cap names, finite coverage, budget scaling and caps remain.
+    """
+    source = render_all25_gate_source(original_ascii)
+    source = _replace(source, "arv2-six-universe-gate-all25-selection-profile-v1",
+                      "arv2-six-universe-gate-full-ar-off-selection-profile-v1")
+    source = _replace(source, "arv2-six-universe-gate-all25-selection-construction-v1",
+                      "arv2-six-universe-gate-full-ar-off-selection-construction-v1")
+    tree = ast.parse(source)
+    selected = next(node for node in tree.body
+                    if isinstance(node, ast.FunctionDef) and node.name == "_selected_ids")
+    selected.body = ast.parse('''
+if not coverage.valid:
+    return (), (), 0
+cap_ranked = sorted((row for row in rows if row.security_id is not None
+                    and row.security_name is not None and row.pit_market_cap is not None),
+                    key=lambda row: (-row.pit_market_cap, row.security_id))
+selected_ids = tuple(row.security_id for row in cap_ranked[:slot_count])
+return selected_ids, selected_ids, 0
+''').body
+    # Profile semantics must describe the actual absence of score authority,
+    # rather than retaining a positive-score entry rule in a new schema.
+    class OffProfile(ast.NodeTransformer):
+        def visit_Dict(self, node):
+            self.generic_visit(node)
+            replacements = {
+                "minimum_positive_score_count": ast.Constant(0),
+                "signal_rank_rule": ast.Constant("point_in_time_market_cap_desc_then_security_id_top10_independent_of_AR"),
+                "matched_rank_rule": ast.Constant("point_in_time_market_cap_desc_then_security_id_top10_independent_of_AR"),
+                "underfill_rule": ast.Constant("verified_cap_names_fill_up_to_ten_slots_unfilled_scaled_budget_stays_in_own_ETF"),
+            }
+            for index, key in enumerate(node.keys):
+                if isinstance(key, ast.Constant) and key.value in replacements:
+                    node.values[index] = replacements[key.value]
+            if any(isinstance(key, ast.Constant) and key.value == "minimum_positive_score_count"
+                   for key in node.keys):
+                node.keys.append(ast.Constant("analyst_revision_usage"))
+                node.values.append(ast.Constant("disabled_for_stock_entry_stock_count_and_weights_authenticated_score_clock_retained"))
+                node.keys.append(ast.Constant("positive_score_count_diagnostic"))
+                node.values.append(ast.Constant("zero_not_used_no_positive_entry_floor"))
+            return node
+    tree = OffProfile().visit(tree)
+    ast.fix_missing_locations(tree)
+    return _normalize(ast.unparse(tree) + "\n")
+
+
+def render_full_ar_off_targets_source(original_ascii):
+    """AR-off diagnostics and enrichment: scores cannot enter gate inputs."""
+    source = render_all25_targets_source(original_ascii)
+    source = _replace(source, "arv2-six-universe-order-all25-sleeve-diagnostic-v1",
+                      "arv2-six-universe-order-full-ar-off-sleeve-diagnostic-v1")
+    tree = ast.parse(source)
+    count = 0
+    for node in ast.walk(tree):
+        if isinstance(node, ast.keyword) and node.arg == "firm_specific_score":
+            node.value = ast.Constant(None)
+            count += 1
+    if count != 1:
+        raise RelaxedSelectionSourceError("full AR-off score enrichment exact anchor changed")
+    class RemovePositiveFallback(ast.NodeTransformer):
+        count = 0
+
+        def visit_If(self, node):
+            self.generic_visit(node)
+            if ast.unparse(node.test) == "sleeve.positive_score_count < _gate.MINIMUM_POSITIVE_SCORE_COUNT and sleeve.universe_id != 'XLE'":
+                self.count += 1
+                return node.orelse
+            return node
+    remover = RemovePositiveFallback()
+    tree = remover.visit(tree)
+    if remover.count != 1:
+        raise RelaxedSelectionSourceError("full AR-off positive fallback exact anchor changed")
+    ast.fix_missing_locations(tree)
+    return _normalize(ast.unparse(tree) + "\n")
+
+
 def _render_gate_source(original_ascii, policy, *, all25):
     if type(original_ascii) is not str or not original_ascii.isascii():
         raise RelaxedSelectionSourceError("relaxed source is not exact ASCII text")

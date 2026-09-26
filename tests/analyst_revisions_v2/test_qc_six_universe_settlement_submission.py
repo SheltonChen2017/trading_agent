@@ -43,6 +43,9 @@ def projections():
         "R195": ladder_projector.build_tilt_floor_projection(package, 100),
         "R196": ladder_projector.build_tilt_floor_projection(package, 120),
         "R197": ladder_projector.build_tilt_floor_projection(package, 140),
+        "R198": ladder_projector.build_tilt_floor_projection(package, 160),
+        "R199": ladder_projector.build_tilt_floor_projection(package, 180),
+        "R200": ladder_projector.build_tilt_floor_projection(package, 200),
     }
 
 
@@ -161,7 +164,7 @@ def _aggregate(candidate_id="R192"):
 
 
 @pytest.mark.parametrize("candidate_id", (
-    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
 ))
 def test_signed_temporary_cash_is_retained_without_old_nonnegative_claim(candidate_id):
     aggregate, candidate = _aggregate(candidate_id)
@@ -272,7 +275,7 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
 
 
 @pytest.mark.parametrize("candidate_id", (
-    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
 ))
 def test_wrong_waiver_or_source_refuses_before_qc(
     projections, tmp_path, monkeypatch, candidate_id,
@@ -304,7 +307,7 @@ def test_wrong_waiver_or_source_refuses_before_qc(
 
 
 @pytest.mark.parametrize("candidate_id", (
-    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
 ))
 def test_a1_launch_status_and_one_signed_cash_aggregate_read(
     projections, tmp_path, monkeypatch, candidate_id,
@@ -345,7 +348,7 @@ def test_a1_launch_status_and_one_signed_cash_aggregate_read(
 
 
 @pytest.mark.parametrize("candidate_id", (
-    "R191", "R192", "R193", "R194", "R195", "R196", "R197",
+    "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
 ))
 @pytest.mark.parametrize("defect", ("digest", "unknown", "unexplained"))
 def test_one_result_read_refuses_changed_digest_or_cash_policy(
@@ -387,6 +390,9 @@ def test_prior_waiver_payload_digests_are_unchanged():
         "R192": "6207b84a3985c1693769d8a25e36853f005e0acfe65fdb6235787263cb812dee",
         "R193": "e11e77fe3e1be42df75291d84886d74d4a8dec7e12128c0a464f5cb5c54d19af",
         "R194": "d2e0ba03bf63ecfc409586d1314015870dacbff6bcb16fd25257abd52f1e28ad",
+        "R195": "c3897251d66f14f5a0c0d46ef783b34f3d12413aff9c1b34fa0cc256dfe2cb86",
+        "R196": "8d20fa19c5e0204815d3886f4834ecd4ab01c47f24c078b64417dc3f004da19f",
+        "R197": "8110689f1ba355ef86b7dac73254ce3d489513c943dd9e3fcbf76914c79a4805",
     }
     for candidate_id, expected in pinned.items():
         plan = subject.SettlementQcPlan(
@@ -394,7 +400,9 @@ def test_prior_waiver_payload_digests_are_unchanged():
             Path("/tmp/arv2-settlement-waiver-pin"),
         )
         actual = hashlib.sha256(subject._waiver_payload(
-            plan, {"profile_id": "p"}, subject._PREDECESSOR_TARGET_PATH_SHA256,
+            plan, {"profile_id": "p"},
+            None if candidate_id in subject._LADDER_PERCENTS
+            else subject._PREDECESSOR_TARGET_PATH_SHA256,
         )).hexdigest()
         assert actual == expected
 
@@ -453,6 +461,7 @@ def test_r194_profile_floor_mutation_refuses_before_qc(
 
 @pytest.mark.parametrize("candidate_id,percent", (
     ("R195", 100), ("R196", 120), ("R197", 140),
+    ("R198", 160), ("R199", 180), ("R200", 200),
 ))
 def test_guarded_ladder_preview_and_owner_waiver(
     projections, tmp_path, monkeypatch, candidate_id, percent,
@@ -479,6 +488,7 @@ def test_guarded_ladder_preview_and_owner_waiver(
     assert waiver["comparison_requires_valid_r195_exact_path"] is True
     assert waiver["project_name"].startswith({
         100: "117 ", 120: "118 ", 140: "119 ",
+        160: "120 ", 180: "121 ", 200: "122 ",
     }[percent])
     assert waiver["source_files_sha256"] == (
         ladder_projector.PINNED_SOURCE_MANIFEST_SHA256S[percent]
@@ -492,7 +502,9 @@ def test_guarded_ladder_preview_and_owner_waiver(
         assert "r193_lineage_look_number" not in waiver
 
 
-@pytest.mark.parametrize("candidate_id", ("R195", "R196", "R197"))
+@pytest.mark.parametrize("candidate_id", (
+    "R195", "R196", "R197", "R198", "R199", "R200",
+))
 @pytest.mark.parametrize("bad_path", (None, "F" * 64, "bad"))
 def test_guarded_ladder_refuses_malformed_producer_path(candidate_id, bad_path):
     aggregate, candidate = _aggregate(candidate_id)
@@ -504,7 +516,24 @@ def test_guarded_ladder_refuses_malformed_producer_path(candidate_id, bad_path):
         )
 
 
-@pytest.mark.parametrize("candidate_id", ("R196", "R197"))
+@pytest.mark.parametrize("candidate_id,wrong_fraction", (
+    ("R198", "1.40"), ("R199", "1.60"), ("R200", "1.80"),
+))
+def test_extended_ladder_result_refuses_neighboring_candidate_fraction(
+    candidate_id, wrong_fraction,
+):
+    aggregate, candidate = _aggregate(candidate_id)
+    aggregate["maximum_stock_weight_change_fraction"] = wrong_fraction
+    with pytest.raises(subject.SixUniverseSettlementSubmissionError,
+                       match="tilt or matched target"):
+        subject._settlement_aggregate(
+            aggregate, candidate, matched_target_path=None,
+        )
+
+
+@pytest.mark.parametrize("candidate_id", (
+    "R196", "R197", "R198", "R199", "R200",
+))
 @pytest.mark.parametrize("same_path", (True, False))
 def test_guarded_ladder_comparison_needs_valid_r195_same_path(
     projections, tmp_path, monkeypatch, candidate_id, same_path,
@@ -548,8 +577,11 @@ def test_guarded_ladder_comparison_needs_valid_r195_same_path(
     assert receipt["comparison_valid"] is same_path
 
 
+@pytest.mark.parametrize("candidate_id", (
+    "R196", "R197", "R198", "R199", "R200",
+))
 def test_guarded_ladder_invalid_r195_receipt_cannot_enable_comparison(
-    projections, tmp_path, monkeypatch,
+    projections, tmp_path, monkeypatch, candidate_id,
 ):
     anchor_plan = _plan(tmp_path, projections["R195"], "R195")
     _predecessors(monkeypatch, anchor_plan)
@@ -557,12 +589,12 @@ def test_guarded_ladder_invalid_r195_receipt_cannot_enable_comparison(
         "candidate_id": "R195", "run_valid": True,
         "matched_baseline_target_path_sha256": "d" * 64,
     })
-    projection = projections["R196"]
-    plan = _plan(tmp_path, projection, "R196")
+    projection = projections[candidate_id]
+    plan = _plan(tmp_path, projection, candidate_id)
     _, qc = _fake_qc(monkeypatch, plan, projection)
     launch = subject.launch_a1(
         plan, projection, object(),
-        owner_waiver_id=subject._CANDIDATES["R196"].waiver_id,
+        owner_waiver_id=subject._CANDIDATES[candidate_id].waiver_id,
     )
     assert subject.poll_status(plan, launch, object()) == "Completed."
     qc["statistics"] = _statistics(plan, launch, target_path="d" * 64)
@@ -745,7 +777,9 @@ def test_r195_a2_refuses_before_any_mutation(
     assert not subject._control_path(plan, "claim").exists()
 
 
-@pytest.mark.parametrize("candidate_id", ("R196", "R197"))
+@pytest.mark.parametrize("candidate_id", (
+    "R196", "R197", "R198", "R199", "R200",
+))
 @pytest.mark.parametrize("same_path", (True, False))
 def test_r195_a2_posthoc_receipt_comparison_keeps_read_time_flag(
     projections, tmp_path, monkeypatch, candidate_id, same_path,
@@ -791,7 +825,7 @@ def test_r195_a2_posthoc_receipt_comparison_keeps_read_time_flag(
     assert comparison["r195_matched_baseline_target_path_sha256"] == (
         "d" * 64 if same_path else "e" * 64
     )
-    # The one-use R196/R197 result receipt remains a historical read-time fact.
+    # The later candidate's one-use receipt remains a historical read-time fact.
     assert subject._read(subject._control_path(plan, "result-valid"))[
         "comparison_valid"
     ] is False

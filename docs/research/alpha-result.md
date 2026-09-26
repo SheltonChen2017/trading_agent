@@ -4576,3 +4576,93 @@ authenticated cells remain **615**. R-194 is honestly the fourth look in
 the R-193 100% lineage; its one-time exception permits no automatic
 retry, fifth look, or result-reader bypass. No formal alpha, broker,
 paper/live, funded-order, deployment, or trading authority follows.
+
+## R-195 — guarded 100% revision tilt; A1 creation failure, A2 valid exploratory aggregate — 2026-09-25
+
+At the owner's prospective instruction, lane section 189 froze the new
+per-sleeve **and** aggregate 1e-30 donor floors, exact 16-file source
+SHA-256 `c20e2c13ef477e4c1619cb93aafb4fef58c2a36c95f5a514c62d015f5722e28d`,
+profile `ecdc210a6f65ea1ee8e2163e4dc3debaf8b0c0996a457c57299dbed1c4198561`,
+and private project `117 ARV2 SIX CAP90 SETTLED TILT100 GUARD R195 2021 2025`
+(`36963958`). The order-based 2021-01-04 through 2025-12-31 construction
+keeps 98% target gross, weekly next-open whole-share MOO execution,
+10-bps-per-side modeled costs, and 2x **order admission only**. The nominal
+100% label is a rank-scaled transfer capacity relative to each stock's
+matched weight, not account allocation or leverage.
+
+A1 uploaded/read back/compiled the exact source, but `backtests/create`
+failed before returning a run ID or launch receipt. Two statistics-disabled
+inventories listed zero runs; the project was idle with unchanged source.
+The specific transport cause remains unknown. A1 is spent and conservatively
+counts as a possible research look: **189 -> 190 shared looks / 132 -> 133
+ARV2 development evaluations**; 32 infrastructure looks and 615 cells
+unchanged. After a separately frozen one-use recovery, A2 reused that same
+private project and source, with no new project or upload, and launched
+backtest `5762679ab25e1661208762ceb16fd043`. It is the second of R-195's
+maximum three technical attempts and the conservative sixth 100%-lineage
+possible look; the failed A1 is not erased.
+
+A2 completed and its sole current-source-authenticated bounded aggregate
+read accepted `run_valid=true`: **+133.4663997983659% after modeled costs**,
+maximum drawdown approximately **-21.2207%**, annualized volatility
+**20.4158%**, zero-rate Sharpe **0.9368**, and **5,744/5,744** submitted
+orders filled. Modeled/engine fees both were `$38,884.7907116`. After the
+intervening R-196/R-197 launches, A2 spends **192 -> 193 shared looks /
+135 -> 136 development evaluations** and its accepted read moves
+**617 -> 618 authenticated aggregate cells**; infrastructure remains 32.
+This is an adaptive same-window exploratory result with independent review
+pending, not formal alpha, production selection, or validation of R-194's
+refused result. No raw rows, logs, orders, or charts were read.
+
+## R-196 — guarded 120% revision tilt; A1 valid exploratory aggregate — 2026-09-25
+
+Lane section 189 prospectively froze the distinct 120% candidate, projection
+SHA-256 `f8489764d1925f93ecd13092d5ef0d916f681385a12dc817f02115f66328f82e`
+and profile `cf9932e48e2f282713101d8d38dec2e702b08a7796ae8ccb503abff7f32234c1`.
+Private project `118 ARV2 SIX CAP90 SETTLED TILT120 GUARD R196 2021 2025`
+(`36963997`) read back/compiled the exact source and launched A1
+`3c293b5de792030fc8228c0002886bdf`. The completed run's sole authenticated
+bounded aggregate accepted `run_valid=true`: **+136.1123820392753% after
+modeled costs**, maximum drawdown approximately **-21.2125%**, and
+**5,656/5,656** orders filled, on the same window/economic constraints as
+R-195. It spends **190 -> 191 shared looks / 133 -> 134 development
+evaluations**, moving **615 -> 616 cells**; infrastructure remains 32.
+One of three technical attempts was used.
+
+Its historical read-time `comparison_valid=false` records the then-absent
+R-195 anchor. After R-195 A2 passed, a local receipt-only reauthentication
+accepted the predeclared comparison: **+2.6459822409094 percentage points**
+versus R-195 A2. No QC result was reread and no historical flag rewritten.
+The common matched-target-path SHA-256 is
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`.
+It proves matched decisions/lineage, not identical cloud price vintages or
+realized tilted target paths. This adaptive sensitivity has review pending;
+no pristine out-of-sample, formal alpha, leverage, or trading claim follows.
+
+## R-197 — guarded 140% revision tilt; A1 valid exploratory aggregate — 2026-09-25
+
+The separately frozen projection is
+`c3edcd8bae80446fd564e4d21a1a8ff3c8a35ee68af914b13de2a344ab596576`,
+profile `83893aca4ab0dd0b0a98eb39f51b8a8c2f77ef114a1cf231acd9214437c3287f`.
+Private project `119 ARV2 SIX CAP90 SETTLED TILT140 GUARD R197 2021 2025`
+(`36964125`) read back/compiled the exact source and launched A1
+`d9916c8906d1810eaeb8c89fec56a186`. Its completed, sole authenticated
+bounded aggregate accepted `run_valid=true`: **+138.28465642521377% after
+modeled costs**, maximum drawdown approximately **-21.1368%**, and
+**5,542/5,542** orders filled, under the R-195 window/economic constraints.
+It spends **191 -> 192 shared looks / 134 -> 135 development evaluations**,
+moving **616 -> 617 cells**; infrastructure remains 32. One of three
+technical attempts was used.
+
+The read-time `comparison_valid=false` remains historical. The later local
+receipt-only check accepted comparison to R-195 A2 using the same matched
+path digest as R-196: **+4.81825662684787 percentage points** versus 100%,
+and **+2.17227438593847 points** versus 120%. Receiver caps and positive
+donor floors can saturate these nominal transfer capacities; they are not
+portfolio leverage. The three same-window results are adaptive exploratory
+sensitivities, with no untouched confirmation or monotonicity guarantee.
+Across R-195 A1/A2 and R-196/R-197 A1, the cumulative floor is **193 shared
+research looks / 136 ARV2 development evaluations / 32 infrastructure
+looks / 618 authenticated aggregate cells**. All three accepted result
+reads are spent. No raw provider/price/order rows, logs, charts, broker,
+paper/live/funded account, deployment, or trading access occurred.

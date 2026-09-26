@@ -3,7 +3,7 @@
 R191 (matched), R192 (80% revision tilt), R193 (100% revision tilt), and the
 separately pinned R194 positive-residual correction are admitted. R194 is a
 one-time fourth look in the R193 lineage, not a reset of its attempt budget.
-R195/R196/R197 are separately pinned 100/120/140% exploratory launches.
+R195-R200 are separately pinned 100/120/140/160/180/200% exploratory launches.
 Each authenticates its own matched target path; only a path match to a valid
 R195 receipt permits a later candidate comparison.
 Import does no I/O. The exact source, project, owner waiver,
@@ -141,8 +141,45 @@ _CANDIDATES = {
         ladder_projection.SUMMARY_SCHEMAS[140],
         "ARV2-OWNER-2026-09-25-R197A1-TILT140-GUARD-EXPLORATORY",
     ),
+    "R198": _Candidate(
+        "R198", "120 ARV2 SIX CAP90 SETTLED TILT160 GUARD R198 2021 2025",
+        ladder_projection.TILT_ROLES[160], ladder_projection.TILT_VARIANTS[160],
+        ladder_projection.PROJECTION_SCHEMAS[160],
+        "97fdd9a4332ae2d973399535c2687153e08a81ccd2eb1e4a89daf4270c687a9f",
+        "7b4dac4771d1cfaf5851cb8d4c31448d01f8408baa652857292755fe88776a87",
+        "514230dd7bde96f347d2d6eae390d2c7b4fb09403c1ca7cf687f6da228eb383f",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[160],
+        "ARV2-OWNER-2026-09-25-R198A1-TILT160-GUARD-EXPLORATORY",
+    ),
+    "R199": _Candidate(
+        "R199", "121 ARV2 SIX CAP90 SETTLED TILT180 GUARD R199 2021 2025",
+        ladder_projection.TILT_ROLES[180], ladder_projection.TILT_VARIANTS[180],
+        ladder_projection.PROJECTION_SCHEMAS[180],
+        "773787eac1cce21d27be7dd5256b917c453c3f8474a0a0d24e8b7ef9dd86d09d",
+        "46d6b61812c48d2d5797ac636e5919e160a6adca6e06005f2f31c596cdc7c778",
+        "0cc2299ac2062366046da0a027f88946fe684bcc87f27974ceab174a1da0035f",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[180],
+        "ARV2-OWNER-2026-09-25-R199A1-TILT180-GUARD-EXPLORATORY",
+    ),
+    "R200": _Candidate(
+        "R200", "122 ARV2 SIX CAP90 SETTLED TILT200 GUARD R200 2021 2025",
+        ladder_projection.TILT_ROLES[200], ladder_projection.TILT_VARIANTS[200],
+        ladder_projection.PROJECTION_SCHEMAS[200],
+        "e8cc677ad751362fe702949ab52daa24ec89ade8bc6b303779a815543ef213cb",
+        "3b6acc8e91cd674d267bde3985b8fc123a5c2fbc809c87acfb9c74b2c3ec215c",
+        "c2bb27d8a851d365d3ab45813e9e62aa3e63fc110cd69cac05b8791585249745",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[200],
+        "ARV2-OWNER-2026-09-25-R200A1-TILT200-GUARD-EXPLORATORY",
+    ),
 }
-_LADDER_PERCENTS = {"R195": 100, "R196": 120, "R197": 140}
+_LADDER_PERCENTS = {
+    "R195": 100, "R196": 120, "R197": 140,
+    "R198": 160, "R199": 180, "R200": 200,
+}
+_LATER_LADDER_CANDIDATES = frozenset(_LADDER_PERCENTS) - {"R195"}
 _R195_A2_PROJECT_ID = 36963958
 _R195_A2_WAIVER_ID = (
     "ARV2-OWNER-2026-09-25-R195A2-TILT100-GUARD-RECOVERY-EXPLORATORY"
@@ -970,6 +1007,7 @@ _TILT_FIELDS = frozenset({
 _TILT_FRACTIONS = {
     "R192": "0.80", "R193": "1.00", "R194": "1.00",
     "R195": "1.00", "R196": "1.20", "R197": "1.40",
+    "R198": "1.60", "R199": "1.80", "R200": "2.00",
 }
 
 
@@ -1257,8 +1295,8 @@ def _valid_r195_comparison_anchor(plan: SettlementQcPlan) -> tuple[int, str] | N
 def compare_valid_receipts(plan: SettlementQcPlan) -> dict:
     """Reconcile frozen R195 and a later result without QC calls or rewrites."""
     candidate = _candidate(plan)
-    if candidate.candidate_id not in {"R196", "R197"}:
-        _fail("settlement comparison requires an R196 or R197 A1 plan")
+    if candidate.candidate_id not in _LATER_LADDER_CANDIDATES:
+        _fail("settlement comparison requires a later guarded ladder A1 plan")
     observed = _verified_ladder_result_receipt(plan)
     anchor = _valid_r195_comparison_anchor(plan)
     return {
@@ -1379,7 +1417,7 @@ def read_aggregates_once(
     )
     valid = aggregate["run_valid"] is True
     comparison_valid = False
-    if valid and candidate.candidate_id in {"R196", "R197"}:
+    if valid and candidate.candidate_id in _LATER_LADDER_CANDIDATES:
         anchor = _valid_r195_comparison_anchor(plan)
         comparison_valid = (
             anchor is not None

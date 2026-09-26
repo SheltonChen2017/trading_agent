@@ -1384,3 +1384,57 @@ def test_builder_accepts_a_quarter_produced_by_the_ib1a_and_ib1b_loaders(
     assert summary["raw_snapshot_id"] == raw.snapshot_id
     assert summary["parsed_snapshot_id"] == parsed.snapshot_id
     assert (summary["form4_accession_count"], summary["context_accession_count"]) == (1, 1)
+
+
+def test_direct_manifest_construction_refuses_a_foreign_policy_hash():
+    # The builder checks the policy itself, so only direct construction can
+    # present a policy hash that is neither pinned literal. The version
+    # resolver must refuse it rather than default to a version.
+    manifest = _build()
+    foreign = "0" * 64
+    payload = {
+        "kind": manifest_module.CANONICAL_IB2_SOURCE_MANIFEST_KIND,
+        "version": manifest_module.CANONICAL_IB2_SOURCE_MANIFEST_VERSION,
+        "policy_sha256": foreign,
+        "quarters": [quarter.to_payload() for quarter in manifest.quarters],
+    }
+    with pytest.raises(
+        CanonicalIb2SourceManifestError, match="policy or quarter inventory"
+    ):
+        CanonicalIb2SourceManifest(
+            policy_sha256=foreign,
+            quarters=manifest.quarters,
+            manifest_sha256=hash_payload(payload),
+        )
+
+
+def test_policy_class_swapped_mid_stream_is_refused():
+    # A hostile caller-held generator can rebind __class__ on a frozen
+    # instance to a same-layout subclass. The payload and digest do not
+    # change, so only the final exact-type recheck can see it.
+    class SwappedPolicy(CanonicalIb2SourcePolicyV2):
+        pass
+
+    policy = CanonicalIb2SourcePolicyV2()
+    quarters = list(_quarters())
+    item = quarters[-1]
+    source = item.sources[0]
+    payload = tuple(source.acceptance_metadata.chunks)
+
+    def chunks():
+        object.__setattr__(policy, "__class__", SwappedPolicy)
+        yield from payload
+
+    quarters[-1] = replace(
+        item,
+        sources=(
+            replace(
+                source,
+                acceptance_metadata=replace(source.acceptance_metadata, chunks=chunks()),
+            ),
+        ),
+    )
+    with pytest.raises(CanonicalIb2SourceManifestError, match="changed while streaming"):
+        _build(quarters, policy=policy)
+    assert type(policy) is SwappedPolicy
+    assert policy.semantic_sha256 == CANONICAL_IB2_SOURCE_POLICY_V2_SHA256

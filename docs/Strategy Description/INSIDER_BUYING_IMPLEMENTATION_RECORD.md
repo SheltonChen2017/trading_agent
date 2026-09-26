@@ -11280,3 +11280,70 @@ filing, security master, outcome, ETF holding, QuantConnect, broker,
 operator database, scheduler, deployment, capital, order, live, or trading
 surface was accessed. Authorized outcome looks: **0**. Consumed outcome
 looks: **0**. Research looks: **0**.
+
+## 86. Codex counter-review and owner-selected IB-1B preparation window (2026-09-26 UTC)
+
+### 86.1 Exact incoming commits and dispositions
+
+Incoming local and fetched remote tip:
+`a507c4c697ec95a662bc1b21db075de5da4cdb39`, clean, in the designated
+`trading_agent__insider_buying` worktree on `codex/strategy-insider-buying`.
+The counter-review range is **`f040c6c..a507c4c`**, with both commits read
+individually:
+
+| Commit | Disposition | Evidence |
+|---|---|---|
+| `2e2999327b63787dd3523d946fdb743c1fdcaad3` | **Accepted; no new issue found.** Two test-only dispatch pins; production modules unchanged. | Manifest suite reproduces 109 passed. Independent in-memory reversals of the unknown-hash resolver and final exact-class recheck each make its new test fail with `DID NOT RAISE`; patches restored before green verification. |
+| `a507c4c697ec95a662bc1b21db075de5da4cdb39` | **Accepted; no new issue found.** Section 85, status, and one ledger row distinguish reviewer results from authorization. | Compared each disposition, count reconciliation, mutation caveat, retained finding, and next-step gate with incoming changes. No new authority inferred from review. |
+
+Focused incoming validation on Python 3.12.14 / pytest 9.1.1: **746 passed,
+0 failed, 0 skipped, 0 warnings** (v1/v2 source policies, source manifest,
+lane record, active-document checks, and exact package-import guard).
+Targeted compilation exits 0; worktree and both commit whitespace checks
+are clean. No complete lane/repository suite was run by Codex.
+
+`IB2CTX-CR01` P3 remains closed by the accepted test pins. `IB2CTX-CR02`
+P3 remains an open, nonblocking observation: the existing record-prose test
+is a valid owner-decision anchor, but this pattern will not be extended.
+No valid test is weakened for cosmetic cleanup. `IB2MAN-CR03` is closed for
+the candidate; amended-context prevalence remains unmeasured. Retain
+`IBZIP-CR02`, `IBZIP-CR03`, `IB2SRC-CR03`, and shared/out-of-lane
+`IBSH-CR01` unchanged. No P0, P1, or open P2 is introduced.
+
+### 86.2 Owner decision and next bounded implementation
+
+Codex asked the owner to approve **2022Q4 through 2023Q1** for bounded,
+noncanonical offline IB-1B pilot preparation: exact schema/profile and
+runner, independently reviewed before processing, with no additional
+network, outcome, QC, broker, or trading authority. The owner replied
+**"yes approved for now"**. This selects exactly two contiguous quarters;
+it is not approval of another window, the full corpus, canonical evidence,
+or any later milestone.
+
+The implementation freezes nine schema variants: seven identical table
+headers spanning these two quarters and one SUBMISSION variant per quarter
+(`AFF10B5ONE` is appended in 2023Q1). Only transaction tables assert
+accession-relative keys, `NONDERIV_TRANS_SK` and `DERIV_TRANS_SK`.
+Other tables retain ordinal duplicates without an unmeasured uniqueness
+claim. Header-only reconnaissance inspected ZIP directory metadata and the
+first physical line of each selected TSV, not filing rows, auxiliary
+contents, or XML. Header compatibility is observed; row validity, key
+uniqueness, and form prevalence are not yet measured.
+
+The bounded script composes existing IB-1A and IB-1B publishers and replay
+loaders, using only selected archive identities, unchanged resource caps,
+and scalar operational reports. Synthetic tests exercise the pipeline;
+the real runner will not be invoked in this round. Claude must review the
+pushed preparation before real row processing. Any legacy raw-source
+timestamp representation must accompany the original seven-digit intake
+timestamp and explicit label **unverified local filesystem last-write
+observation**; neither its field name nor normalization authenticates
+retrieval. This retains `IBZIP-CR03`, not cures it.
+
+Matching Form 4/4-A XML and acceptance metadata still blocks the canonical
+source manifest and real stages beyond IB-1B. New IB-3 diagnostics remain
+paused. Shared security-master/calendar audit has no venue/executor.
+Shared documents and `SESSION_HANDOFF.md` remain frozen; no monitor is
+rearmed. Outcome authority, consumed outcome looks, and research looks
+remain **0**. No provider/network, QC-job, broker, deployment, capital,
+order, or trading authority is added.

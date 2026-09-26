@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from fractions import Fraction
 from functools import lru_cache
 from hashlib import sha256
@@ -51,6 +51,8 @@ from research.short_interest_etf.stock_score_order import (
 )
 from tests.test_short_interest_stock_normalization import (
     _fresh_non_affine_scores,
+    _scores,
+    _single_sector_specs,
     _single_sector_scores,
 )
 from tests.test_short_interest_stock_score_order import (
@@ -562,6 +564,70 @@ def test_every_exact_tie_group_is_indivisible_without_quota_fill():
         assert len({item.role_percentile for item in group}) == 1
         assert len({item.candidate_state for item in group}) == 1
         assert len({item.threshold_candidate for item in group}) == 1
+
+
+@pytest.mark.parametrize("top_tie_size", (4, 5))
+def test_authenticated_public_boundary_ties_include_whole_groups_and_allow_empty_pressure(
+    top_tie_size,
+):
+    # Alter authentic source facts, then traverse the complete normalization,
+    # covering, order and percentile chain; no projected row is fabricated.
+    specs = tuple(
+        replace(spec, current_shares=50, prior_shares=200)
+        if spec.index < 4
+        else replace(spec, current_shares=200, prior_shares=100)
+        if spec.index >= 20 - top_tie_size
+        else spec
+        for spec in _single_sector_specs(20)
+    )
+    projection = build_stock_percentile_projection(
+        build_stock_score_order_inventory(
+            build_pit_stock_covering_scores(_scores(specs))
+        )
+    )
+    payload = projection.to_payload()
+    pressure = [
+        row for row in payload["dispositions"]
+        if row["role"] == StockScoreOrderRole.PRESSURE.value
+        and row["role_percentile"] is not None
+    ]
+    covering = [
+        row for row in payload["dispositions"]
+        if row["role"] == StockScoreOrderRole.COVERING.value
+        and row["role_percentile"] is not None
+    ]
+    assert len(pressure) == len(covering) == 20
+    assert {row["scoreable_count"] for row in (*pressure, *covering)} == {20}
+    bottom_ids = {f"sec-si3c-{index:03d}" for index in range(4)}
+    top_ids = {
+        f"sec-si3c-{index:03d}" for index in range(20 - top_tie_size, 20)
+    }
+    pressure_top = [row for row in pressure if row["security_id"] in top_ids]
+    covering_bottom = [row for row in covering if row["security_id"] in bottom_ids]
+    expected_top = Fraction(9, 10) if top_tie_size == 4 else Fraction(7, 8)
+    for row in pressure_top:
+        assert row["equal_count"] == top_tie_size
+        assert Fraction(**row["role_percentile"]) == expected_top
+        assert row["threshold_candidate"] is (top_tie_size == 4)
+    assert len({row["source_equivalence_group_sha256"] for row in pressure_top}) == 1
+    for row in covering_bottom:
+        assert row["equal_count"] == 4
+        assert Fraction(**row["role_percentile"]) == Fraction(9, 10)
+        assert Fraction(**row["pressure_percentile"]) == Fraction(1, 10)
+        assert row["threshold_candidate"] is True
+    assert len({row["source_equivalence_group_sha256"] for row in covering_bottom}) == 1
+    pressure_candidate_ids = {
+        row["security_id"] for row in pressure if row["threshold_candidate"]
+    }
+    covering_candidate_ids = {
+        row["security_id"] for row in covering if row["threshold_candidate"]
+    }
+    assert pressure_candidate_ids == (top_ids if top_tie_size == 4 else set())
+    assert covering_candidate_ids == bottom_ids
+    assert Fraction(len(covering_candidate_ids), len(covering)) == Fraction(1, 5)
+    assert Fraction(len(pressure_candidate_ids), len(pressure)) == (
+        Fraction(1, 5) if top_tie_size == 4 else 0
+    )
 
 
 def test_terminal_rows_are_retained_without_percentile_or_classification():

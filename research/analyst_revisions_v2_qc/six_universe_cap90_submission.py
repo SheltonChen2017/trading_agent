@@ -1337,17 +1337,35 @@ def _bounded_counts(value: object, *, maximum: int = 1_000_000,
     )
 
 
-def _project_aggregate(aggregate: dict, *, bridge: bool = False) -> dict:
+def _project_aggregate(
+    aggregate: dict, *, bridge: bool = False,
+    expected_geometry: tuple[str, str, int, int] | None = None,
+) -> dict:
     """Retain bounded comparison diagnostics, never arbitrary nested fields."""
+    if expected_geometry is None:
+        start, end = runtime.EVALUATION_START_SESSION, runtime.EVALUATION_END_SESSION
+        observations, decisions = runtime.EXPECTED_SESSION_COUNT, runtime.EXPECTED_DECISION_COUNT
+    else:
+        # The recent-window successor is a separate, literal census. A caller
+        # cannot invent a smaller census to make an underfilled result valid.
+        if (
+            type(expected_geometry) is not tuple
+            or len(expected_geometry) != 4
+            or any(type(value) is not str for value in expected_geometry[:2])
+            or any(type(value) is not int for value in expected_geometry[2:])
+            or expected_geometry != ("2025-08-01", "2026-09-25", 290, 61)
+        ):
+            _fail("cap-90 aggregate expected geometry is not an authorized literal window")
+        start, end, observations, decisions = expected_geometry
     account = aggregate.get("account")
     sleeves = aggregate.get("sleeve_diagnostics")
     execution = aggregate.get("execution")
     forced = aggregate.get("engine_forced_delisting")
     if (
         type(account) is not dict or set(account) != _ACCOUNT_FIELDS
-        or account["observation_count"] != runtime.EXPECTED_SESSION_COUNT
-        or account["first_observation_session"] != runtime.EVALUATION_START_SESSION
-        or account["last_observation_session"] != runtime.EVALUATION_END_SESSION
+        or account["observation_count"] != observations
+        or account["first_observation_session"] != start
+        or account["last_observation_session"] != end
         or any(not _finite_decimal(account[key]) for key in (
             "starting_equity", "ending_equity", "cumulative_return",
             "maximum_drawdown", "annualized_volatility",
@@ -1359,7 +1377,7 @@ def _project_aggregate(aggregate: dict, *, bridge: bool = False) -> dict:
         or type(sleeves.get("rows")) is not list or len(sleeves["rows"]) != 6
         or type(execution) is not dict
         or execution.get("schema") != "arv2-simulated-moo-executor-summary-v1"
-        or execution.get("decision_count") != runtime.EXPECTED_DECISION_COUNT
+        or execution.get("decision_count") != decisions
         or execution.get("raw_order_rows_in_summary") is not False
         or execution.get("raw_security_rows_in_summary") is not False
         or execution.get("backtest_only") is not True
@@ -1380,7 +1398,7 @@ def _project_aggregate(aggregate: dict, *, bridge: bool = False) -> dict:
         if (
             type(row) is not list or len(row) != len(_SLEEVE_FIELDS)
             or row[0] != ticker or row[1] != ticker
-            or row[2] != runtime.EXPECTED_DECISION_COUNT
+            or row[2] != decisions
             or any(type(row[index]) is not int or row[index] < 0 for index in range(2, 8))
             or not _finite_decimal(row[8]) or not _finite_decimal(row[9])
             or not _bounded_counts(row[10], keys=_COVERAGE_REASONS)
@@ -1404,9 +1422,9 @@ def _project_aggregate(aggregate: dict, *, bridge: bool = False) -> dict:
         "modeled_fee_amount", "actual_engine_fee_amount", "total_filled_notional",
     )
     if (
-        not _bounded_counts(counts, maximum=6 * runtime.EXPECTED_DECISION_COUNT, keys=_SELECTION_STATUSES)
-        or sum(counts.values()) != 6 * runtime.EXPECTED_DECISION_COUNT
-        or not _bounded_counts(unavailable, maximum=runtime.EXPECTED_DECISION_COUNT, keys=frozenset(_UNIVERSES))
+        not _bounded_counts(counts, maximum=6 * decisions, keys=_SELECTION_STATUSES)
+        or sum(counts.values()) != 6 * decisions
+        or not _bounded_counts(unavailable, maximum=decisions, keys=frozenset(_UNIVERSES))
         or set(unavailable) != set(_UNIVERSES)
         or any(type(aggregate.get(key)) is not int or aggregate[key] < 0 for key in count_keys)
         or any(not _finite_decimal(aggregate.get(key)) for key in (

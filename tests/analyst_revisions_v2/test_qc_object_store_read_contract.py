@@ -79,6 +79,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     __init__.py accepted_risk_delta_order_package.py
     accepted_risk_etf_baseline_evaluator.py
     accepted_risk_etf_baseline_qc_runtime.py
+    accepted_risk_latest_order_package.py
     accepted_risk_market_cap_stock_portfolio_evaluator.py
     accepted_risk_market_cap_stock_portfolio_qc_runtime.py
     accepted_risk_market_cap_stock_portfolio_tilt.py
@@ -448,6 +449,20 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "accepted_risk_latest_order_package.py": tuple(
+        """
+        __future__ dataclasses hashlib json tempfile collections datetime pathlib
+        data.exchange_calendar research.analyst_revisions_v2.accepted_risk_input_pair
+        research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2.global_benchmark_contract
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_rating_evaluator
+        research.analyst_revisions_v2_qc.physical_accepted_risk_archive
+        research.analyst_revisions_v2_qc.production_evidence_composer
+        """.split()
+    ),
     "accepted_risk_delta_order_package.py": tuple(
         """
         __future__ dataclasses hashlib json shutil tempfile datetime pathlib
@@ -1279,6 +1294,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "accepted_risk_latest_order_package.py": ("import:pathlib",),
     "accepted_risk_delta_order_package.py": ("import:pathlib",),
     "accepted_risk_massive_delta.py": ("import:os",),
     "accepted_risk_order_level_qc_projection.py": (
@@ -2954,6 +2970,18 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "accepted_risk_preliminary_qc_runtime",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_latest_order_package",
+            "research.analyst_revisions_v2.accepted_risk_input_pair",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_latest_order_package",
+            "research.analyst_revisions_v2.canonical",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_latest_order_package",
+            "research.analyst_revisions_v2.global_benchmark_contract",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_evaluator",
             "accepted_risk_market_cap_stock_portfolio_tilt",
         ),
@@ -4218,6 +4246,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_delta_order_package",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_latest_order_package",
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt",

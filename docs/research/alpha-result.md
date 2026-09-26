@@ -4741,3 +4741,57 @@ within this bounded sweep; no 220% launch or production parameter selection
 is implied. Target gross stays 98%, and 200% means bounded AR transfer
 capacity, not portfolio leverage. No raw rows/logs/orders/charts, broker,
 paper/live/funded account, deployment or real trading accessed.
+
+## R-201 — guarded 250% revision tilt; A1 launched — 2026-09-25
+
+Owner-authorized section 191 prospectively extends the adaptive 2021–2025
+capacity sweep to 250/300%, preserving order-based execution, six universes,
+98% gross, 10-bps-per-side modeled costs, caps and both positive donor
+floors. Source `09af59032015e04b8e7a97a0f54f90a240cc87b38ed793700bf58bcedca98780`,
+profile `cd38f3589131bbec453aee57b726dd09ca4f7b77441db3fe2673bafa104d6ca6`,
+were frozen in `4808a5d` / `a80718a` before upload/read-back/compile in
+private project `123 ARV2 SIX CAP90 SETTLED TILT250 GUARD R201 2021 2025`
+(`36976935`). A1 `fa9d363b1f3348500d19f1e06a8c4b03` is launched; no
+outcome is inferred. One of three technical attempts spent. Counts
+**196 → 197 shared / 139 → 140 development / 32 infrastructure / 621
+authenticated cells** pending terminal and sole bounded aggregate read.
+This is capacity, not leverage; no live/trading authority follows.
+
+R-201 A1 subsequently completed. Its sole authenticated bounded read
+accepted **run_valid=true / comparison_valid=true**, aggregate SHA-256
+`14cd97ea712b1004fd8249e43c6221f055d491c6125cabec953e4228c7dbb613`.
+Return **+145.5074024902979% after modeled costs**, drawdown
+**−21.05455364129342%**, volatility **20.62827276454471%**, zero-rate
+Sharpe **0.978278005694657**; all 5,168 orders filled, all 261 rebalances,
+no invalid/canceled, engine/modeled fees `$41,781.3400106`. Matched path
+equals the valid R-195 A2 anchor; price-vintage limitations remain. Read
+spent, cells **621 → 622**; look counts stay **197 / 140 / 32**.
+
+## R-202 — guarded 300% revision tilt; A1 launched — 2026-09-25
+
+Section 191 and commits `4808a5d` / `a80718a` prospectively freeze 300%
+with all R-201 period/economics unchanged. Source
+`5eeaa095fe57f267cf8093525c01646717c3c77f235acbaf46d185224fead287`,
+profile `5c023ec203cd14753f1dcb049d1fbb85da5078f6b16b85fe03b78a22336f7714`.
+Private project `124 ARV2 SIX CAP90 SETTLED TILT300 GUARD R202 2021 2025`
+(`36977057`) uploaded/read back/compiled exact source and launched A1
+`314605525ec8f12185f79006a4a7b8b3`. One of three attempts spent.
+Totals **197 → 198 shared / 140 → 141 development / 32 infrastructure /
+622 authenticated cells** pending its terminal/sole aggregate-read gate.
+No outcome or production setting follows from launch; this is adaptive
+same-window research with unchanged 98% target gross, not 3× leverage.
+
+R-202 A1 subsequently completed; its sole source-authenticated bounded read
+passed **run_valid=true / comparison_valid=true**, aggregate SHA-256
+`24a12697c303dccf95f35fbba0c537428e20045b8f12c6ff0222f10bb7e43be5`.
+Return **+146.9997049244877% after modeled costs**, drawdown
+**−21.25079923748689%**, volatility **20.66859855462075%**, zero-rate
+Sharpe **0.982680581947944**. All 5,000 orders filled, 261 rebalances,
+no invalid/canceled; engine/modeled fees `$41,986.5684216`. Cash, gross
+and tracking gates passed; same R-195 A2 matched path, one-use read spent.
+Cells **622 → 623**; final counts **198 shared / 141 development /
+32 infrastructure / 623 cells**. Both new capacities succeeded on A1.
+Higher adaptive same-window return does not identify a production optimum.
+The six August-2025-to-September-25-2026 candidates remain unlaunched
+because fresh Analyst Ratings access returns HTTP 403; no missing-look
+entry or successful recent-period result is inferred from their reservation.

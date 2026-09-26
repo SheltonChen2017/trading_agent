@@ -125,6 +125,9 @@ the two-window disagreement about the analyst-revision overlay. Section 197
 counter-reviews both Claude commits, qualifies its unmatched historical-control
 and near-PIT recent-window claims, fixes ledger/test hygiene, and measures
 between-capture vendor drift before any further capacity or period run.
+Section 198 implements the owner's subsequent matched historical comparison:
+fully AR-off, AR-on100%, and six actual ETFs, each under fixed 0/5-bps
+slippage. Six prospective sources are frozen; none has launched in QC.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -740,12 +743,14 @@ Section 196 is Claude's independent review of the exact pushed range
 `dcb7157..08c9eab` (forty-five commits, sections 181–195) with the test-only
 correction `22bdbce`. Section 197 counter-reviews exact pushed Claude range
 `08c9eab..8570bbb`, accepts the test correction and qualifies the interpretation.
-Current bounded work is provider-only between-capture drift measurement; no
-QC period/capacity run is launched in this round. This cannot diagnose the
-cause of historical performance by itself. Each candidate has at most
-three attempts, no full-suite run by Codex and no automatic follow-on research
-or trading. Claude reviews section 197 after its one final push; Codex then
-counter-reviews that exact review before the next bounded research milestone.
+The provider-only drift measurement is complete. After that counter-review,
+the owner directed implementation of the matched historical study in section
+198: six frozen order-based sources, not a new capacity sweep. No QC run has
+launched. Each candidate has at most three attempts; Codex uses focused checks,
+not a full suite. Claude reviews section 198 alongside section 197 and every new commit after
+the one combined push; Codex then counter-reviews that exact review before
+executing the frozen research candidates. Standing research authorization
+remains; no new broker/live/paper or trading authority is inferred.
 Both are now valid on A1: AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
 match, while stock counts/weights intentionally differ. Current floor is
@@ -797,7 +802,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–197
+findings, outcomes, and per-run accounting remain in numbered sections 1–198
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -2482,6 +2487,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-26 | Codex owner-directed total AR ablation | `7c1694e` -> `8cc7e7c`, `7c4351e`, and final record commit | Fully AR-off versus exact all25 AR-on100 reference | R223/R224 valid A1 order runs, same non-AR coverage/census, window/input/execution; AR entry/count/weights removed only in OFF. No retry/Mia/provider capture or extra outcome read. | Focused source/mode/cached comparison, mutation, exact closure and document gates; final checks in 195.4. No full suite. Final 222/163/34/644. | `ARV2D195-001` P2 common coverage/census comparison corrected before paired reporting; four isolating cases red then green. Net AR spread -0.114367 pp, risk slightly worse. Conditional input/identity catalog, PIT/vintage/adaptive window retained. | One final same-lane push; Claude reviews section 195 plus all deferred commits, Codex counter-reviews exact Claude push. No automatic additional research or trading. |
 | 2026-09-26 | Claude independent review of sections 181–195: tilt ladders, settlement-cash policy, recent-window family, coverage easing, and the AR ablations | `08c9eab` -> `22bdbce` -> this record commit | Section 196: forty-five commits `dcb7157..08c9eab` individually disposed (44 accepted, 1 accepted after correction, 0 rejected); zero QC calls, looks, evaluations, or cells | Pinned the relaxed launcher's frozen-manifest hash check (`22bdbce`, test-only, red with the check disabled, green restored); no production line changed | Standing lane selection in a byte-faithful export of the final code tree, focused delta files, fourteen mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 196.7 | 0 P0, 0 P1, 1 P2, 5 P3 (`ARV2R196-001` through `-006`); `-002` corrected; `-001` is the two-window disagreement about the AR overlay and the vintage hypothesis | Single push of the two Claude commits; Codex counter-reviews section 196 and measures the vendor vintage drift before any further capacity or period run |
 | 2026-09-26 | Codex counter-review and provider-only drift checkpoint | `8570bbb` -> `0b93fda` and final record commit | Counter-review both Claude commits; test/ledger hygiene; exact snapshot comparison | Qualified historical unmatched-control, near-PIT and causal overstatements without rewriting Claude's historical review. One fresh three-role capture; 9,105 common ratings, 3,446 earnings and 1,758 guidance unchanged, five added rating IDs. No input replacement or QC operation. | 164 focused passed; 1 portability target passed; final document checks below. No full suite; count report and both captures authenticated. Floor unchanged 222/163/34/644. | Interpretive qualifications corrected; causal AR/PIT question remains open. Real slippage, membership refresh and older unaccepted-result debt retained. No new P0/P1. | One same-lane push; Claude reviews section 197 and both commits, Codex counter-reviews before any next bounded research run. |
+| 2026-09-26 | Codex matched historical study implementation | `b352807` -> this commit | Owner-requested AR-off/on100/six-ETF comparison under two fixed cost conditions | Reuse historical input/order engine; independently frozen R225–R230, all-six 25% coverage, annual metrics and construction-only universe diagnostics, linked third bounded statistic. No QC launch or outcome read. | Focused projection/diagnostics/host/legacy checks and final document checks in section 198; no full suite. Counters unchanged 222/163/34/644. | In-round count/wrapper/finite-comparison gaps corrected before any network action; old sources and results immutable. Historical PIT/causal and full-price-tape limitations remain. | Make the same round's one combined push. Claude reviews sections 197–198 and all commits since `8570bbb`; Codex counter-reviews before frozen QC execution. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -27282,3 +27288,131 @@ counter-review, then a separately frozen same-rule AR-on/off historical pair
 and relevant ETF benchmark may test the unexplained benefit. They are not
 launched here; no new capacity search, formal acceptance, broker/live/paper,
 funded account, deployment or trading follows from this measurement.
+
+## 198. Matched historical AR-off / AR-on100 / six-ETF implementation — 2026-09-26
+
+After section 197's counter-review and vendor measurement, the owner asked
+for the recommended comparison to be implemented in the same lane. This is
+the next bounded implementation milestone, not a new tilt search or a claim
+that historical data are now pristine. Source construction, offline preview,
+focused behavioral validation and a single combined push are in scope;
+**no R225–R230 QC launch, attempt or result read has occurred**.
+
+### 198.1 Prospective comparison and interpretation
+
+| Research candidate | Economic construction | Adverse slippage per side |
+|---|---|---|
+| R225 | Fully AR-off cap-ranked stocks plus own-sleeve ETF residuals | 0 bps |
+| R226 | Same construction family with AR entry/count and 100% weight transfers | 0 bps |
+| R227 | Actual six-ETF basket; no direct stocks | 0 bps |
+| R228 | Fully AR-off | 5 bps |
+| R229 | AR-on100% | 5 bps |
+| R230 | Actual six-ETF basket | 5 bps |
+
+Every arm uses **2021-01-04 through 2025-12-31**, **1,255 account observations /
+1,254 daily returns**, **261 weekly decisions**, the same historical immutable
+input, **98% gross target**, whole-share next-open MOO execution, settlement
+cash rules and **10 bps modeled fees per side**. Two-times buying power is
+admission plumbing, not a doubled exposure target. The 5-bps model is a fixed
+adverse fill-price sensitivity, not a calibrated spread/impact estimate. The
+constant percentage API and MOO slippage behavior were checked against
+[QC's supported slippage models](https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/slippage/supported-models)
+and [MOO fill documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/trade-fills/supported-models/latest-price-model).
+
+The current **all-six 25% verified-subset policy** applies equally to the two
+stock arms; unknown identities still cannot be selected, five known cap names
+remain required, and unresolved budget stays in the respective ETF. Stock
+selection is cap-ranked top-ten **equal slots**, not all-universe cap-weighting.
+AR-off removes score entry/count and all weight transfers. AR-on retains the
+existing XLE no-AR-entry exception. The basket holds SPY/QQQ/SOXX/XLV/REMX/XLE
+using the same six sleeve budgets, equal apart from the existing exact rounding
+residual. It uses real simulated ETF orders, not an analytical price curve.
+
+This is a **total AR ablation**, not a weight-only tilt comparison. Coverage
+also differs from older historical capacity runs; it is not an attempt to
+reproduce R195's headline. Read on-minus-off as the combined entry/count/weight
+effect under this prospectively fixed construction, and compare both stock
+arms with the same-period ETF account at each cost condition. Do not choose
+the best arm/cost setting after seeing results. These are touched development
+windows, not independent confirmation or formal alpha.
+
+### 198.2 Source, transport and bounded diagnostics
+
+New projection reuses the guarded historical closure and current verified
+selection renderers; old modules, old projection pins and earlier cloud
+results are unchanged. Seventeen rendered files per arm remain below QC's
+64,000-character file bound and existing total-source/review-margin budgets.
+The frozen family is
+`research/analyst_revisions_v2_qc/six_universe_matched_study_candidates.json`,
+SHA-256 **`8c7e79faf1b25603a110744ad4464cd22a439dfc65fa1fe312cbaddd6938e0e5`**.
+Its six rows independently pin source/profile/file-manifest identities; it
+contains no absolute machine path. Package SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`
+and activation SHA-256
+`69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41`
+are the reviewed historical inputs, not replacements from the drift capture.
+
+The existing atomic same-project three-attempt/one-read adapter is reused.
+The separate `ARV2_SIX_GATE_ORDER_DIAGNOSTICS` statistic stays within **8,192
+ASCII bytes**, inclusive, and META binds its **raw-text SHA-256**. No double
+JSON encoding, truncated exact decimals/digests, or larger legacy bound is
+introduced. The reader validates the mode, cost, 261/1,255/7,530 census,
+annual compounding and aggregate-account return equality before comparison.
+
+Diagnostics provide five calendar-year net account return/risk rows, with the
+previous year-end equity as the next year's opening anchor; thirty year-universe
+rows describe coverage, name counts and ETF fallback target exposure. They
+**do not invent realized sleeve P&L** for an overlapping, deduplicated account.
+The source digest includes original raw constituent SIDs (including unknown
+ones), weights, prior fundamentals/caps and resolved snapshots, independent
+of analyst scores. One terminal history call digests a fixed six-ETF RAW daily
+panel: **1,255 sessions × 6 ETFs = 7,530 observations**. No extra per-decision
+price requests or execution subscriptions are installed. All six results must
+agree on this source/panel provenance and non-AR source census; target paths
+may intentionally differ. This **does not prove equality of every stock or
+minute fill-price tape**, nor original event-time vendor history.
+
+### 198.3 Validation and handoff
+
+Projection behavioral tests prove economic AR-off score-perturbation invariance
+through the actual projected builder, active AR-on transfers, ETF-only targets
+and true basket diagnostics. The six cost factories, source closure, prelude
+compilation and all exact offline previews are checked. Diagnostics prove
+year-boundary compounding, unknown-SID distinction, missing/duplicate history
+refusal, and 8,192 accepted / 8,193 refused transport. The fake completed QC
+pipeline invokes the real result parser and one-use controls for every arm;
+it is **not a claim that LEAN has executed these new sources**.
+
+In-round preflights exposed a wrapper-versus-package property access, a
+1,254-return versus 1,255-observation diagnostic count, and an initially
+unguarded non-finite value in the comparison helper. All were corrected and
+behaviorally pinned before any cloud action. The existing outcome parser
+already refused non-finite account values; the helper correction prevents
+standalone misuse, not a demonstrated QC fail-open. Independent finally-
+restored in-memory mutations caught basket-to-stock substitution, omission
+of the year-end anchor, diagnostic digest bypass and decision-census bypass.
+
+Python **3.12.14**: **174 focused software cases passed** (20 projection,
+22 diagnostics, 59 host/real-freeze/fake-cloud, 73 legacy adapter/family).
+The combined software/document selection was **254 passed, 2 failed in
+39.26 s**: both failures named a missing contiguous active section-198 review
+reference, corrected in the live handoff; final record/active-document checks
+are **82 passed in 0.77 s**. Exact inventory/I/O registration for all three
+new modules is pinned with no broad exceptions: closure and attribute-call
+mutation **2 passed in 2.27 s**, transitive host-smuggling mutation **1 passed
+in 1.35 s**. Source compilation, all six exact offline previews, manifest
+reproduction and `git diff --check` are clean. No full lane/repository suite
+by Codex. Zero additional provider captures, credentials,
+QC calls, orders, return reads, research looks, attempts or cells in this
+implementation stage; floor remains **222 / 163 / 34 / 644**. Broker, paper/live,
+funded trading, deployment and real orders remain out of scope.
+
+Claude reviews **every commit after `8570bbb`**, including `0b93fda` and
+`b352807` from the completed counter-review/drift stage and this implementation.
+Focus on total-versus-weight-only scope, actual ETF order routing, unchanged
+cash/fee rules, five-bps factory/profile agreement, linked transport and year
+anchor behavior. Existing causal/PIT, membership-refresh and price-tape debt
+remains open. After review and counter-review, the next operation is execution
+of the frozen research family, with at most three unsuccessful attempts per
+candidate and Mia/owner recovery thereafter. No further capacity sweep is
+scheduled. One same-lane combined push ends this implementation round.

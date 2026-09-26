@@ -27,6 +27,8 @@ FROZEN_COVERAGE25_MANIFEST_SHA256 = "2f8ba60e2357ac886d84105145e8dfd719e101f3f5d
 COVERAGE25_MANIFEST_PATH = Path(__file__).with_name("six_universe_coverage25_candidates.json")
 FROZEN_FULL_AR_ABLATION_MANIFEST_SHA256 = "a2e7181b4181394f3a39093445f3aa784896e5db9ac22b51645758349ce0c7ef"
 FULL_AR_ABLATION_MANIFEST_PATH = Path(__file__).with_name("six_universe_full_ar_ablation_candidates.json")
+FROZEN_MATCHED_STUDY_MANIFEST_SHA256 = "8c7e79faf1b25603a110744ad4464cd22a439dfc65fa1fe312cbaddd6938e0e5"
+MATCHED_STUDY_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_candidates.json")
 _TERMINAL = {"Completed.", "Runtime Error", "BuildError"}
 _GEOMETRY = ("2025-08-01", "2026-09-25", 290, 61)
 _TICKERS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
@@ -110,6 +112,14 @@ def _full_ar_ablation_manifest():
     return value
 
 
+def _matched_study_manifest():
+    raw = MATCHED_STUDY_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != FROZEN_MATCHED_STUDY_MANIFEST_SHA256:
+        _fail("matched study is not the frozen manifest")
+    from . import six_universe_matched_study as study
+    return study.validate_manifest(json.loads(raw))
+
+
 def _plan_manifest(plan):
     # Legacy parser fixtures deliberately use a non-plan sentinel; real public
     # operations validate the exact plan in _candidate before any I/O.
@@ -121,10 +131,14 @@ def _plan_manifest(plan):
         return _coverage25_manifest()
     if type(plan.family) is str and plan.family == "full_ar_ablation":
         return _full_ar_ablation_manifest()
+    if type(plan.family) is str and plan.family == "matched_study":
+        return _matched_study_manifest()
     _fail("relaxed plan family changed")
 
 
 def _plan_manifest_sha256(plan):
+    if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
+        return FROZEN_MATCHED_STUDY_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "weight_ablation":
         return FROZEN_ABLATION_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "coverage25":
@@ -151,7 +165,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]
@@ -270,6 +284,15 @@ def preview(plan, projection):
 
 def _require_inputs(plan):
     family = _plan_manifest(plan)
+    if plan.family == "matched_study":
+        # Historical production inputs remain the exact reviewed package and
+        # activation; this family must never use the recent R203 upload permit.
+        from . import accepted_risk_delta_order_package as delta
+        from . import six_universe_matched_study as study
+        if (family["package_sha256"] != delta.EXPECTED_DELTA_PACKAGE_SHA256
+                or family["activation_manifest_sha256"] != study.HISTORICAL_ACTIVATION_SHA256):
+            _fail("matched study historical input binding changed")
+        return
     control = Path(family["input_control_directory"])
     prior_plan = recent.build_plan("R203", plan.organization_id, control)
     if (prior_plan.package_sha256 != family["package_sha256"]
@@ -495,11 +518,21 @@ def _statistic(value):
 
 
 def _parse_order(plan, statistics):
+    if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
+        from . import six_universe_matched_study as study
+        return study.parse_order(plan, statistics)
+    return _parse_order_common(plan, statistics)
+
+
+def _parse_order_common(plan, statistics, *, expected_geometry=_GEOMETRY,
+                        decision_count=61, extra_meta_fields=frozenset(),
+                        extra_aggregate_fields=frozenset(),
+                        result_transport="two_bounded_custom_summary_statistics"):
     row, family = _candidate(plan), _plan_manifest(plan)
     meta_name = next(name for name in row["statistic_names"] if name.endswith("META"))
     agg_name = next(name for name in row["statistic_names"] if name.endswith("AGGREGATES"))
     meta, aggregate = _statistic(statistics[meta_name]), _statistic(statistics[agg_name])
-    if (set(meta) != cap._META_FIELDS or meta.get("schema") != row["meta_schema"]
+    if (set(meta) != cap._META_FIELDS | extra_meta_fields or meta.get("schema") != row["meta_schema"]
             or meta.get("role") != row["role"]
             or meta.get("profile_id") != row["profile_id"]
             or meta.get("profile_sha256") != row["profile_sha256"]
@@ -507,11 +540,11 @@ def _parse_order(plan, statistics):
             or meta.get("activation_manifest_sha256") != family["activation_manifest_sha256"]
             or meta.get("aggregate_schema") != row["summary_schema"]
             or meta.get("aggregate_sha256") != hashlib.sha256(statistics[agg_name].encode("ascii")).hexdigest()
-            or meta.get("result_transport") != "two_bounded_custom_summary_statistics"
+            or meta.get("result_transport") != result_transport
             or any(meta.get(key) is not False for key in ("raw_provider_rows", "raw_price_rows", "raw_order_rows", "formal", "trading"))
             or meta.get("preliminary") is not True or meta.get("backtest_only") is not True):
         _fail("relaxed outcome metadata or raw-text digest changed")
-    fields = cap._AGGREGATE_FIELDS | common._SETTLEMENT_FIELDS | common._TILT_FIELDS
+    fields = cap._AGGREGATE_FIELDS | common._SETTLEMENT_FIELDS | common._TILT_FIELDS | extra_aggregate_fields
     if (set(aggregate) != fields or aggregate.get("schema") != row["summary_schema"]
             or aggregate.get("role") != row["role"]
             or aggregate.get("profile_id") != row["profile_id"]
@@ -528,7 +561,7 @@ def _parse_order(plan, statistics):
             or type(aggregate.get("unexplained_negative_order_event_count")) is not int
             or aggregate["unexplained_negative_order_event_count"] != 0):
         _fail("relaxed aggregate identity or cash policy changed")
-    selected = _bounded_order_base(aggregate)
+    selected = _bounded_order_base(aggregate, expected_geometry=expected_geometry)
     execution = aggregate["execution"]
     numeric = [aggregate["minimum_end_day_cash"], aggregate["maximum_gross_exposure"],
         execution.get("mean_target_weight_l1_error"), execution.get("maximum_target_weight_l1_error")]
@@ -555,18 +588,18 @@ def _parse_order(plan, statistics):
         _fail("relaxed signed-event cash or matched path changed")
     if aggregate["run_valid"] and (execution.get("run_valid") is not True
             or execution.get("execution_failure") is not False
-            or execution.get("submitted_rebalance_count") != 61
-            or execution.get("completed_rebalance_count") != 61
+            or execution.get("submitted_rebalance_count") != decision_count
+            or execution.get("completed_rebalance_count") != decision_count
             or execution.get("submitted_order_count") != execution.get("filled_order_count_sum")
             or execution.get("invalid_order_count_sum") != 0 or execution.get("canceled_order_count_sum") != 0
             or aggregate["end_day_gross_at_most_one"] is not True
             or aggregate["target_tracking_valid"] is not True or event_count == 0):
         _fail("relaxed valid flag disagrees with order evidence")
-    selected.update({key: aggregate[key] for key in common._SETTLEMENT_FIELDS | common._TILT_FIELDS})
+    selected.update({key: aggregate[key] for key in common._SETTLEMENT_FIELDS | common._TILT_FIELDS | extra_aggregate_fields})
     return {"meta": meta, "aggregates": selected, "run_valid": aggregate["run_valid"]}
 
 
-def _bounded_order_base(aggregate):
+def _bounded_order_base(aggregate, *, expected_geometry=_GEOMETRY):
     """Reuse legacy shape checks without rewriting frozen status inventories.
 
     Validate the two new named states explicitly, map only a private temporary
@@ -596,7 +629,7 @@ def _bounded_order_base(aggregate):
                             cap._COVERAGE_REASONS)
         row[11] = translate(row[11], "PARTIAL_STOCK_SLOTS_WITH_ETF_FALLBACK", new_status,
                             cap._SELECTION_STATUSES)
-    selected = cap._project_aggregate(temporary, expected_geometry=_GEOMETRY)
+    selected = cap._project_aggregate(temporary, expected_geometry=expected_geometry)
     selected["fallback_counts"] = dict(base["fallback_counts"])
     for selected_row, original in zip(selected["sleeve_diagnostics"]["rows"], base["sleeve_diagnostics"]["rows"]):
         selected_row[10], selected_row[11] = dict(original[10]), dict(original[11])

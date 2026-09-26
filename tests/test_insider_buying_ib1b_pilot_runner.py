@@ -319,3 +319,110 @@ def test_cli_requires_all_explicit_inputs_and_no_synthetic_switch():
     with pytest.raises(SystemExit) as caught:
         runner.main(["--allow-synthetic"])
     assert caught.value.code == 2
+
+
+def _rewrite_member(raw: bytes, name: str, transform) -> bytes:
+    stream = io.BytesIO()
+    with zipfile.ZipFile(io.BytesIO(raw)) as source, zipfile.ZipFile(
+        stream, "w", compression=zipfile.ZIP_DEFLATED
+    ) as target:
+        for info in source.infolist():
+            content = source.read(info)
+            target.writestr(info.filename, transform(content) if info.filename == name else content)
+    return stream.getvalue()
+
+
+def test_physical_header_drift_refuses_in_preflight_before_any_output(pilot):
+    # The receipt still matches the approved profile; only the ZIP's physical
+    # header line differs (two same-length columns swapped). Preflight must
+    # refuse before IB-1A publishes anything, not leave it to IB-1B later.
+    source, destination, bindings, profile = pilot
+    binding = bindings[0]
+    path = source / binding.filename
+
+    def swap_first_two_columns(content: bytes) -> bytes:
+        header, rest = content.split(b"\n", 1)
+        columns = header.split(b"\t")
+        columns[1], columns[2] = columns[2], columns[1]
+        return b"\t".join(columns) + b"\n" + rest
+
+    raw = _rewrite_member(path.read_bytes(), "SUBMISSION.tsv", swap_first_two_columns)
+    path.write_bytes(raw)
+    altered = replace(binding, archive_sha256=hash_bytes(raw), archive_size_bytes=len(raw))
+    with pytest.raises(runner.Ib1bPilotError, match="physical header"):
+        runner._run_ib1b_pilot(
+            source, destination, PARSER_COMMIT, bindings=(altered, bindings[1]), profile=profile,
+        )
+    assert not destination.exists()
+
+
+def test_expanded_size_budget_refuses_in_preflight_before_any_output(monkeypatch, pilot):
+    source, destination, bindings, profile = pilot
+    declared = sum(item.expanded_size_bytes for item in bindings[0].header_receipts)
+    # Only the runner's preflight constant is lowered; IB-1B's own cap is
+    # untouched, so without the preflight the pipeline would succeed.
+    monkeypatch.setattr(runner, "MAX_TOTAL_PARSED_INPUT_BYTES", declared - 1)
+    with pytest.raises(runner.Ib1bPilotError, match="exceeds the unchanged IB-1B limit"):
+        _run(pilot)
+    assert not destination.exists()
+
+
+def test_output_appearing_during_preflight_refuses_without_adopting_it(monkeypatch, pilot):
+    source, destination, bindings, profile = pilot
+    original_read = runner._read_bound_archive
+    foreign = destination / "foreign.txt"
+
+    def read_and_intrude(*args, **kwargs):
+        if not destination.exists():
+            destination.mkdir()
+            foreign.write_bytes(b"not this run's output")
+        return original_read(*args, **kwargs)
+
+    monkeypatch.setattr(runner, "_read_bound_archive", read_and_intrude)
+    with pytest.raises(runner.Ib1bPilotError, match="fresh or empty"):
+        _run(pilot)
+    assert foreign.read_bytes() == b"not this run's output"
+    assert sorted(item.name for item in destination.iterdir()) == ["foreign.txt"]
+
+
+def test_source_receipt_mutated_during_processing_refuses_without_report(monkeypatch, pilot):
+    source, destination, bindings, profile = pilot
+    original_write = runner.write_sec_bulk_snapshot
+    calls = []
+
+    def write_then_mutate(*args, **kwargs):
+        result = original_write(*args, **kwargs)
+        if not calls:
+            object.__setattr__(bindings[1], "local_last_write_utc", "2026-09-24T22:53:38.0000000Z")
+        calls.append(1)
+        return result
+
+    monkeypatch.setattr(runner, "write_sec_bulk_snapshot", write_then_mutate)
+    with pytest.raises(runner.Ib1bPilotError, match="source receipts changed"):
+        _run(pilot)
+    assert not list(destination.glob("ib1b-pilot-report-*.json"))
+
+
+def test_report_above_its_byte_cap_refuses_without_publication(monkeypatch, pilot):
+    monkeypatch.setattr(runner, "MAX_REPORT_BYTES", 1024)
+    with pytest.raises(runner.Ib1bPilotError, match="byte-size cap"):
+        _run(pilot)
+    assert not list(pilot[1].glob("ib1b-pilot-report-*.json"))
+    assert not list(pilot[1].glob(".ib1b-pilot-report-*.tmp"))
+
+
+def test_publication_refuses_a_target_that_is_not_its_complete_temporary(monkeypatch, tmp_path):
+    destination = tmp_path.resolve() / "destination"
+    destination.mkdir()
+    original_link = os.link
+
+    def substitute(src, dst, *, src_dir_fd=None, dst_dir_fd=None, follow_symlinks=True):
+        descriptor = os.open(dst, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600, dir_fd=dst_dir_fd)
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(b"substituted")
+
+    monkeypatch.setattr(os, "link", substitute)
+    monkeypatch.setattr(os, "supports_dir_fd", {*os.supports_dir_fd, substitute})
+    with pytest.raises(runner.Ib1bPilotError, match="differs from its complete temporary"):
+        runner._publish_report(destination, {"synthetic": True})
+    assert original_link is not substitute

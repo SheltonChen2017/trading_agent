@@ -46,6 +46,8 @@ def projections():
         "R198": ladder_projector.build_tilt_floor_projection(package, 160),
         "R199": ladder_projector.build_tilt_floor_projection(package, 180),
         "R200": ladder_projector.build_tilt_floor_projection(package, 200),
+        "R201": ladder_projector.build_tilt_floor_projection(package, 250),
+        "R202": ladder_projector.build_tilt_floor_projection(package, 300),
     }
 
 
@@ -165,6 +167,7 @@ def _aggregate(candidate_id="R192"):
 
 @pytest.mark.parametrize("candidate_id", (
     "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 def test_signed_temporary_cash_is_retained_without_old_nonnegative_claim(candidate_id):
     aggregate, candidate = _aggregate(candidate_id)
@@ -276,6 +279,7 @@ def test_exact_preview_and_candidate_specific_owner_waiver(
 
 @pytest.mark.parametrize("candidate_id", (
     "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 def test_wrong_waiver_or_source_refuses_before_qc(
     projections, tmp_path, monkeypatch, candidate_id,
@@ -308,6 +312,7 @@ def test_wrong_waiver_or_source_refuses_before_qc(
 
 @pytest.mark.parametrize("candidate_id", (
     "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 def test_a1_launch_status_and_one_signed_cash_aggregate_read(
     projections, tmp_path, monkeypatch, candidate_id,
@@ -349,6 +354,7 @@ def test_a1_launch_status_and_one_signed_cash_aggregate_read(
 
 @pytest.mark.parametrize("candidate_id", (
     "R191", "R192", "R193", "R194", "R195", "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 @pytest.mark.parametrize("defect", ("digest", "unknown", "unexplained"))
 def test_one_result_read_refuses_changed_digest_or_cash_policy(
@@ -462,6 +468,7 @@ def test_r194_profile_floor_mutation_refuses_before_qc(
 @pytest.mark.parametrize("candidate_id,percent", (
     ("R195", 100), ("R196", 120), ("R197", 140),
     ("R198", 160), ("R199", 180), ("R200", 200),
+    ("R201", 250), ("R202", 300),
 ))
 def test_guarded_ladder_preview_and_owner_waiver(
     projections, tmp_path, monkeypatch, candidate_id, percent,
@@ -489,6 +496,7 @@ def test_guarded_ladder_preview_and_owner_waiver(
     assert waiver["project_name"].startswith({
         100: "117 ", 120: "118 ", 140: "119 ",
         160: "120 ", 180: "121 ", 200: "122 ",
+        250: "123 ", 300: "124 ",
     }[percent])
     assert waiver["source_files_sha256"] == (
         ladder_projector.PINNED_SOURCE_MANIFEST_SHA256S[percent]
@@ -504,6 +512,7 @@ def test_guarded_ladder_preview_and_owner_waiver(
 
 @pytest.mark.parametrize("candidate_id", (
     "R195", "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 @pytest.mark.parametrize("bad_path", (None, "F" * 64, "bad"))
 def test_guarded_ladder_refuses_malformed_producer_path(candidate_id, bad_path):
@@ -518,6 +527,7 @@ def test_guarded_ladder_refuses_malformed_producer_path(candidate_id, bad_path):
 
 @pytest.mark.parametrize("candidate_id,wrong_fraction", (
     ("R198", "1.40"), ("R199", "1.60"), ("R200", "1.80"),
+    ("R201", "2.00"), ("R202", "2.50"),
 ))
 def test_extended_ladder_result_refuses_neighboring_candidate_fraction(
     candidate_id, wrong_fraction,
@@ -533,6 +543,7 @@ def test_extended_ladder_result_refuses_neighboring_candidate_fraction(
 
 @pytest.mark.parametrize("candidate_id", (
     "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 @pytest.mark.parametrize("same_path", (True, False))
 def test_guarded_ladder_comparison_needs_valid_r195_same_path(
@@ -579,6 +590,7 @@ def test_guarded_ladder_comparison_needs_valid_r195_same_path(
 
 @pytest.mark.parametrize("candidate_id", (
     "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 def test_guarded_ladder_invalid_r195_receipt_cannot_enable_comparison(
     projections, tmp_path, monkeypatch, candidate_id,
@@ -779,6 +791,7 @@ def test_r195_a2_refuses_before_any_mutation(
 
 @pytest.mark.parametrize("candidate_id", (
     "R196", "R197", "R198", "R199", "R200",
+    "R201", "R202",
 ))
 @pytest.mark.parametrize("same_path", (True, False))
 def test_r195_a2_posthoc_receipt_comparison_keeps_read_time_flag(

@@ -3,7 +3,7 @@
 R191 (matched), R192 (80% revision tilt), R193 (100% revision tilt), and the
 separately pinned R194 positive-residual correction are admitted. R194 is a
 one-time fourth look in the R193 lineage, not a reset of its attempt budget.
-R195-R200 are separately pinned 100/120/140/160/180/200% exploratory launches.
+R195-R202 are separately pinned 100/120/140/160/180/200/250/300% exploratory launches.
 Each authenticates its own matched target path; only a path match to a valid
 R195 receipt permits a later candidate comparison.
 Import does no I/O. The exact source, project, owner waiver,
@@ -174,10 +174,33 @@ _CANDIDATES = {
         ladder_projection.SUMMARY_SCHEMAS[200],
         "ARV2-OWNER-2026-09-25-R200A1-TILT200-GUARD-EXPLORATORY",
     ),
+    "R201": _Candidate(
+        "R201", "123 ARV2 SIX CAP90 SETTLED TILT250 GUARD R201 2021 2025",
+        ladder_projection.TILT_ROLES[250], ladder_projection.TILT_VARIANTS[250],
+        ladder_projection.PROJECTION_SCHEMAS[250],
+        "09af59032015e04b8e7a97a0f54f90a240cc87b38ed793700bf58bcedca98780",
+        "cd38f3589131bbec453aee57b726dd09ca4f7b77441db3fe2673bafa104d6ca6",
+        "f20e12994b333178342031700011ce0c86421db550dfeb154b5dd9a794632788",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[250],
+        "ARV2-OWNER-2026-09-25-R201A1-TILT250-GUARD-EXPLORATORY",
+    ),
+    "R202": _Candidate(
+        "R202", "124 ARV2 SIX CAP90 SETTLED TILT300 GUARD R202 2021 2025",
+        ladder_projection.TILT_ROLES[300], ladder_projection.TILT_VARIANTS[300],
+        ladder_projection.PROJECTION_SCHEMAS[300],
+        "5eeaa095fe57f267cf8093525c01646717c3c77f235acbaf46d185224fead287",
+        "5c023ec203cd14753f1dcb049d1fbb85da5078f6b16b85fe03b78a22336f7714",
+        "46c85fbbe6fb4288e0ff73d8f48c8a52e3ef0e0328fbf3aefe725e5fad39a392",
+        16, 425_975,
+        ladder_projection.SUMMARY_SCHEMAS[300],
+        "ARV2-OWNER-2026-09-25-R202A1-TILT300-GUARD-EXPLORATORY",
+    ),
 }
 _LADDER_PERCENTS = {
     "R195": 100, "R196": 120, "R197": 140,
     "R198": 160, "R199": 180, "R200": 200,
+    "R201": 250, "R202": 300,
 }
 _LATER_LADDER_CANDIDATES = frozenset(_LADDER_PERCENTS) - {"R195"}
 _R195_A2_PROJECT_ID = 36963958
@@ -1008,6 +1031,7 @@ _TILT_FRACTIONS = {
     "R192": "0.80", "R193": "1.00", "R194": "1.00",
     "R195": "1.00", "R196": "1.20", "R197": "1.40",
     "R198": "1.60", "R199": "1.80", "R200": "2.00",
+    "R201": "2.50", "R202": "3.00",
 }
 
 

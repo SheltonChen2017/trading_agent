@@ -1,22 +1,21 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE COMMITS `c9d6923` AND `ba64d61`
-COMMIT BY COMMIT (SECTION 47) AND IMPLEMENTED THE OWNER-FROZEN SI-3E-P1A
-EXACT STRUCTURAL STOCK-PERCENTILE PROJECTION AT `0f8600d` (SECTION 48).
-SI-3E-P1A USES EXACT `p=(2L+E)/(2N)`, INDIVISIBLE TIES, INCLUSIVE 90TH/10TH
-BOUNDARIES, PERCENTILES FOR `N>=1`, AND THRESHOLD CLASSIFICATION ONLY FOR
-`N>=10`. PAIRED PRESSURE-ROLE AND COVERING-ROLE `role_percentile` VALUES ARE
-MECHANICAL COMPLEMENTS; BOTH ROWS CARRY THE SAME PRESSURE-ORIENTED
-`pressure_percentile`. FUTURE OUTCOMES MUST BE EVALUATED INDEPENDENTLY.
-INVESTABILITY REMAINS FALSE,
-EVERY CANDIDATE IS STRUCTURAL ONLY, AND SEED-SELECTION AUTHORITY REMAINS
-FALSE. SI-3E-P1A IS PENDING THIS LANE-RECORD COMMIT, THE ROUND'S SINGLE
-COMBINED PUSH, AND THEN CLAUDE'S INDEPENDENT REVIEW. THE SHARED P2
-`SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN FOR THE OWNER. NO PERMANENT CELL OR
-OUTCOME LOOK HAS BEEN ALLOCATED; AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN
-ZERO. ALL PROVIDER, LICENSED-DATA, OUTCOME, HOLDOUT, SEEDING, INVESTABILITY,
-ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
-PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
+Status: **CLAUDE HAS REVIEWED THE THREE-COMMIT RANGE `ba64d61..7844c81`
+COMMIT BY COMMIT (SECTION 49): COUNTER-REVIEW RECORD `67cd803` ACCEPTED;
+SI-3E-P1A `0f8600d` **CONDITIONALLY ACCEPTED** AFTER A TEST-ONLY CORRECTION;
+RECORD COMMIT `7844c81` ACCEPTED AFTER QUALIFICATION. THE IMPLEMENTATION IS
+TECHNICALLY CORRECT AND WAS INDEPENDENTLY RE-DERIVED, BUT ACCEPTANCE OF THE
+PERCENTILE POLICY'S **OWNER AUTHORITY** IS WITHHELD: `SI-CR8-001` (P2, OPEN,
+OWNER ACTION) RECORDS THAT THE CLAIMED 2026-09-14 FREEZE CARRIES ONLY A
+SELF-MINTED DIRECTIVE ID AND DATE STRING, WITH NO DURABLE PATH OR COMMIT AND
+NOTHING A TEST CAN VERIFY, UNLIKE THE SI-0M STANDARD. NINE FAIL-OPEN GUARDS
+ARE NOW PINNED (`SI-CR8-002`). THE EXACT ELEVEN-FILE SHORT INTEREST LANE IS
+619 PASSED. THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN.
+CODEX COUNTER-REVIEW OF THE CLAUDE COMMITS IS NEXT. NO PERMANENT CELL OR LOOK
+HAS BEEN ALLOCATED; AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL
+PROVIDER, LICENSED-DATA, OUTCOME, HOLDOUT, SEED-SELECTION, INVESTABILITY, ETF,
+QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT, PAPER/LIVE,
+ORDER, AND TRADING GATES REMAIN CLOSED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -167,6 +166,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-09 | Codex implementation | `9047375` -> `dc2055c` (counter-review record `22a889d`, code/test snapshot `dc2055c`; this lane-record commit follows) | SI-3E-P0 exact stock score-order/tie inventory and Claude review handoff | Added a parameter-free, content-addressed exact sufficient statistic over authenticated SI-3D: release-local lower/equal/higher/scoreable counts for pressure and covering roles, terminal-row retention, exact tie-equivalence witnesses, complete embedded lineage verification, detached callback-free capture, coherent-forgery refusal and fail-before-every-yield sabotage detection. It deliberately emits no percentile, rank, seed, investability, ETF, outcome or operational decision. | Exact ten-file Short Interest lane: **570 passed in 1,534.57s (25m34s)**. Final focused hardening selectors and red/green evidence are in section 45; active-document, lane compilation, diff and status checks are recorded there. Two independent exact-byte audits accepted after correction with no open in-lane P0-P3. Synthetic/offline only; **0 authorized looks, 0 consumed looks**. No complete-repository suite was run. | `SI3EP0-REV-001..010` are closed in section 45. The O(N²) iterator scan is retained as a bounded non-defect tradeoff under the current fail-before-every-yield contract. Shared `SI-CR5-005` / `SI-CCR16-007` remains open and out of lane. | Commit this record, verify exact root/branch/remote, then make exactly one push to `origin/codex/strategy-short-interest`. Claude reviews every commit in `9047375..pushed HEAD` independently. No later strategy, data, outcome, ETF, QC or operational milestone is authorized by inference. |
 | 2026-09-11 | Claude review | `9047375` -> `e1f7e48` reviewed; test-only correction at `c9d6923` (this record commit follows) | Independent review of the SI-3D counter-review record and the SI-3E-P0 exact score-order inventory | Reviewed the three pushed commits individually on the macOS lane worktree; local `HEAD` already equalled the fetched remote. Confirmed all four `SI-CCR18` corrections against the prior Claude record. Re-derived every exact `lower/equal/higher/scoreable` count with an independent naive O(N^2) oracle over single-release, four-release and tie-heavy fixtures (36 tie groups), and independently recomputed the equivalence-group, row and batch identities. Verified the pressure/covering mirror identity, terminal-row exclusion from denominators, the one-argument signature, the unexported package root, and the absence of any network, file, environment or subprocess surface. Removed 17 candidate guards together, then attributed each one individually to isolate three survivors, of which two fail open and are now pinned. | Ten-file lane **572 passed in 1,515.52s**; focused SI-3E-P0 file **45 passed in 368.33s**; active-document **69 passed**; compileall **exit 0**; `git diff --check` clean. Seventeen-guard removal **7 failed, 36 passed in 423.64s**, confirming the recorded 43 collected tests. No complete-repository suite, per the dedicated-lane direction. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0/P1/P2 in lane. `SI-CR7-001` (P3, closed, test-only), `SI-CR7-002` (P3, advisory, layered guard not pinned), `SI-CR7-003` (P3, process, self-reported), `SI-CR7-004` (P3, this ledger's own column count, self-reported). Shared `SI-CR5-005` stays open. | Codex counter-reviews `c9d6923` and this record commit before any next milestone; the percentile/tie policy, seed selection, investability universe and every provider, outcome, ETF, QC and trading gate remain closed. |
 | 2026-09-14 | Codex counter-review + implementation | `ba64d61` -> `0f8600d` (counter-review record `67cd803`, code/test snapshot `0f8600d`; this lane-record commit follows) | Counter-review of Claude's SI-3E-P0 correction + owner-approved SI-3E-P1A exact structural stock percentiles | Accepted `c9d6923`; accepted `ba64d61` after four record-only P3 corrections. Implemented a frozen, content-addressed exact percentile projection over the authenticated SI-3E-P0 inventory using `p=(2L+E)/(2N)`, indivisible ties, inclusive 90th/10th boundaries, percentile calculation for `N>=1`, and classification only for `N>=10`. Paired pressure-role and covering-role role percentiles are mechanical complements; both rows carry the same pressure-oriented percentile, while future outcomes must be evaluated independently. Output is structural threshold-candidate evidence only; investability and seed-selection authority remain false. | Exact eleven-file Short Interest lane: **615 passed in 6,115.14s (1h41m55s)**. Final focused SI-3E-P1A file: **43 passed in 635.08s (10m35s)**; exact-policy/boundary selection **18 passed**; final adversarial selection **6 passed**; active-document **69 passed** before and after the record update, including post-update runs in **46.74s** and **2.35s**; compileall exit 0; six dangerous-direction mutations turned their intended guards red and every file was restored byte-exact; final `git diff --check` clean. No complete-repository suite was run. Synthetic/offline only; **0 authorized looks, 0 consumed looks**. | `SI-CCR19-001..004` are closed in section 47. `SI3EP1A-REV-001..005` are closed; `REV-006` is an open nonblocking P3 advisory; `REV-007` is closed as a false-alarm/out-of-threat-model non-defect; `REV-008` is closed as a non-defect observation. Shared `SI-CR5-005` / `SI-CCR16-007` remains open and out of lane. | Commit this record, verify the remote remains `ba64d61`, and make the round's single push. Claude reviews every commit in `ba64d61..pushed HEAD`. Any investability/seed conversion, licensed/provider or outcome work, SI-4 ETF work, QuantConnect job, or operational action requires the applicable owner choice or authorization listed in section 48.8. |
+| 2026-09-26 | Claude review | `ba64d61` -> `7844c81` reviewed; test-only correction at `2bf764a` (this record commit follows) | Independent review of the SI-3E-P0 counter-review record and the SI-3E-P1A exact structural stock percentiles | Reviewed the three pushed commits individually; the lane was already synced to the remote with a clean tree. Confirmed all four `SI-CCR19` corrections. Re-derived every `role_percentile` from an independent `Fraction` oracle over single-release and four-release fixtures, proved the pressure/covering complement sums to exactly one, proved tie indivisibility, and confirmed the blueprint 5.2 thresholds. Probed the kernel directly: classification begins at exactly `N=10`, exactly `9/10` is admitted inclusively, and covering admits at pressure percentile exactly `1/10`. Verified both file hashes, the policy digest, the one-argument signature and the unexported package root. Removed 26 candidate guards together, attributed each individually, then probed all 16 survivors: nine fail open and are now pinned, six are layered, one leaks a raw `ValueError`. Characterized the frozen convention's realized candidate fraction across `N`. | Eleven-file lane **619 passed in 1,645.17s (27m25s)**, reconciling exactly to section 48.5's 615 plus the four tests added here; focused percentile file **47 passed in 127.84s** (the pushed 43 plus the four added here); active-document **69 passed**; compileall **exit 0**; `git diff --check` clean. Combined 26-guard removal **18 failed, 25 passed**, confirming the recorded 43 collected tests. No complete-repository suite, per the dedicated-lane direction. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | **`SI-CR8-001` (P2, OPEN, owner action): the percentile policy's owner authority is not durably cited.** `SI-CR8-002` (P3, closed, test-only, nine fail-open guards). `SI-CR8-003` (P3, advisory, convention selects 0 to 20 percent depending on tie structure). `SI-CR8-004` (P3, advisory, leaked `ValueError`). `SI-CR8-005` (P3, record, lane-runtime figure unreconciled). Shared `SI-CR5-005` stays open. | Owner supplies a durable citation for the 2026-09-14 percentile freeze before SI-3E-P1A is treated as authorized. Codex counter-reviews `2bf764a` and this record commit. Seed selection, investability, `S2`-`S4`, ETF work, outcomes and every QuantConnect or operational gate remain closed. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -6861,3 +6861,187 @@ investability/seed tranche or another explicitly sequenced Short Interest
 tranche. It is not authorized merely because SI-3E-P1A is complete. The
 immediate next action after the single push is Claude's independent review of
 this exact snapshot.
+
+## 49. Claude independent review - 2026-09-26 (SI-3E-P0 counter-review and SI-3E-P1A exact structural stock percentiles)
+
+Reviewer: Claude, in the lane worktree `trading_agent__short_interest` on
+`codex/strategy-short-interest`, macOS, CPython 3.13.15 / pytest 9.1.1 in the
+persistent `~/.venvs/trading_agent-py313` environment built from the pinned
+`requirements.txt`. `git worktree list` reported the long-lived lane worktrees
+and nothing else; no branch, detached, temporary or forked worktree was
+created. Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, the parallel-workflow
+contract, the four-family direction record and the owner blueprint.
+
+**Disposition: conditionally accepted.** The implementation is technically
+correct and every mathematical claim was independently re-derived. One
+test-sensitivity defect was corrected in the lane test file only; no production
+code changed. **Acceptance of the percentile policy's owner authority is
+withheld** under `SI-CR8-001`: the record asserts an owner freeze that this
+lane cannot verify, and section 47.4 had declared exactly those choices
+blocked. Technical acceptance of the code is not acceptance of the authority to
+have frozen the policy, and nothing here establishes market evidence, selects a
+seed, or lifts a gate.
+
+### 49.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review head | `ba64d611f890dc2d7f303f5eae88134f3e4b781f` |
+| Reviewed remote head | `7844c81145acf5d2bfc8ea9bb8d7bcabca6674f2` |
+| Ordered reviewed range | `ba64d61..7844c81` (3 commits, no merge commit) |
+| Ancestry | `ba64d61` is an ancestor; after `git fetch` the local branch already equalled the remote with a clean tree |
+| Claude correction commit | `2bf764a41bd8c2a207db8ebeae744769221fa2ab` (changes only `tests/test_short_interest_stock_percentile.py`) |
+| Production file SHA-256 verified | `stock_percentile.py` `5688c6099ec057a853c66e29adb39fefdbf0dd7306ab1aacb2e4af5efb357a0e`, matching section 48.1 |
+| Test file SHA-256 verified | `d43c880ae44bfe209c07b2026d3f68fc80dd8f016dcc0ffd71080ad76b4f0438` as pushed, matching section 48.1 |
+| Percentile policy SHA-256 verified | `08899fe5a586fe9472da859cfa9d89934b7771d47d8c3f552031ad1012c4f9d7`, recomputed from the live policy payload |
+
+### 49.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `67cd803` | Record SI-3E-P0 Claude counter-review | **accepted** |
+| 2 | `0f8600d` | Implement SI-3E-P1A exact stock percentiles | **conditionally accepted** (test-only `SI-CR8-002`; authority withheld under `SI-CR8-001`) |
+| 3 | `7844c81` | Record SI-3E-P1A implementation and handoff | **accepted after qualification** (`SI-CR8-001`, `SI-CR8-005`) |
+
+### 49.3 Counter-review findings against my prior commits are accepted
+
+All four `SI-CCR19` items are confirmed and accepted:
+
+1. `SI-CCR19-001`: my section 46 omitted the mandatory 1-10 implementation
+   quality rating. It is supplied in 49.8 of this section.
+2. `SI-CCR19-002`: `SI-CR7-002` should have been closed as a non-defect
+   observation rather than left `Open`, since the same row requested no change
+   and proved another layer refuses the attack. Accepted.
+3. `SI-CCR19-003`: my "no cutoff value" phrasing was overbroad;
+   `revision_selection_state` legitimately carries release-cutoff states. The
+   intended claim was no percentile or ranking-threshold cutoff value.
+4. `SI-CCR19-004`: a combined mutant leaving tests green does not prove each of
+   those tests independently detects every removed guard, because guard
+   interactions can mask behavior. **I applied this correction directly in this
+   round**: after the combined 26-guard run I attributed every guard
+   individually, and then probed all 16 survivors one at a time with a direct
+   attack rather than inferring from the combined result. That is what
+   separated nine fail-open guards from six layered ones.
+
+### 49.4 Claims executed rather than read
+
+- **Every percentile re-derived independently.** An oracle recomputed
+  `role_percentile` as `Fraction(L) + Fraction(E, 2)` over `Fraction(N)`,
+  unlike the module's `(2L+E)/(2N)` integer form, over a single-release and a
+  four-release fixture. All values matched exactly and all were stored reduced.
+- **The complement identity is exact.** For every paired projection the
+  pressure and covering `role_percentile` sum to exactly `1`, both rows carry
+  the same `pressure_percentile`, and the pressure row's `pressure_percentile`
+  equals its own `role_percentile`. This is an arithmetic consequence of
+  `C = -B` that the module does not enforce directly.
+- **Blueprint 5.2 conformance.** Covering candidacy holds exactly when the
+  pressure percentile is at most `1/10`, and pressure candidacy exactly when
+  the pressure percentile is at least `9/10`, matching the blueprint's `I-` and
+  `I+` seed definitions. The 90th/10th thresholds are blueprint-derived, not
+  invented by this tranche.
+- **Boundaries probed directly at the kernel.** Classification is withheld for
+  every `N` from 1 to 9 and begins at exactly `N=10`. A row at exactly `9/10`
+  is admitted, confirming the inclusive boundary. A covering row at pressure
+  percentile exactly `1/10` is admitted while its pressure counterpart is not.
+  Count-identity violations, `equal=0`, negative counts and `N=0` are refused.
+- **Ties are indivisible in practice.** Across the fixtures every member of an
+  exact equivalence group shares one percentile and one candidate state; no
+  group is split.
+- **Identity and scope verified.** Both recorded file hashes and the policy
+  digest reproduce; the builder signature is exactly
+  `(score_order_batch: StockScoreOrderBatch)`; none of the six public names is
+  in the package root's `__all__` or reachable as an attribute.
+- **Twenty-six guard removals, then individual attribution.** The combined
+  mutant left **18 failed, 25 passed**, which confirms the recorded 43
+  collected tests. Individual attribution isolated 16 survivors; a direct
+  per-guard attack probe then classified them. Every mutation was restored
+  byte-exact to SHA-256 `5688c6099ec0...`, verified 16 of 16 times.
+
+### 49.5 P0-P3 issue ledger
+
+There is no P0 or P1. One in-lane P2 is open and requires owner action.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR8-001 | **P2** | **Open; owner action required** | `0f8600d`, `7844c81` | `stock_percentile.py` `_OWNER_DIRECTIVE_ID` / `_OWNER_DIRECTIVE_DATE`; section 48 opening paragraph | Section 47.4 recorded that the percentile tranche could not begin because five financial-policy choices were unfrozen, and cited the README rule that ambiguity is a stop condition. Section 48 resolves all five and supersedes that block solely on an asserted "owner's exact policy freeze on 2026-09-14". That authority is encoded only as the self-minted string `si3ep1a-owner-freeze-2026-09-14` and the date `2026-09-14`. There is no document path, no commit, and therefore nothing any test can check. The lane's own established standard for binding an owner decision, SI-0M, carries a directive id, a tracked path, the exact commit that introduced the owner language, and a typed effective date, and its test asserts the owner's exact phrases appear in the cited file. A preregistered policy whose only provenance is an agent-authored label in the same commit that implements it gives no independent check that the convention frozen is the convention the owner chose. | `grep` of the new module shows exactly two owner-authority fields against SI-0M's four plus asserted document text. Section 47.4 lists the five unfrozen items; section 48.2 answers all five. | `CLAUDE.md` section 6 requires frozen specifications and preserved lineage, and section 2 makes ambiguity a stop condition. This is the same class as the open shared P2 `SI-CCR16-007`, which this lane raised against shared changes, applied here to research policy, which is more consequential. It proves a missing durable citation, **not** that no owner decision occurred. | **Not fixed, and not fixable from this lane.** A reviewer cannot manufacture owner authority; the shared documents where such directives live are frozen on lanes; and adding path/commit fields would change the policy digest and encode a citation I cannot verify. A sufficient remedy, modelled on SI-0M, is a tracked document carrying the owner's exact freeze language, the commit that introduced it bound into the policy, and a test asserting those phrases. | Open. Technical acceptance of `0f8600d` is recorded separately and does not depend on this item. |
+| SI-CR8-002 | P3 | Closed | `0f8600d` | `stock_percentile.py` row and batch `_validate_structure` | Nine fail-closed guards had no test that would notice their removal, and each is the sole defence for its attack: the row-level percentile-policy binding, SI-0M gate binding and `production_authoritative` flag; the batch-level percentile-policy binding, SI-0M gate binding and structural authority; the row slot and record identities; and the refusal that stops a terminal row from acquiring a percentile. The row `production_authoritative` gap is the most safety-relevant, because the batch equivalent **is** covered while the row equivalent is not, so a single row could serialize claiming production authority. | Combined 26-guard removal: **18 failed, 25 passed**. Individual attribution: **18 passed, 25 deselected** for each of these nine, i.e. no detector test notices. A direct probe refuses all nine on the pristine tree with each guard's own message, and reports ACCEPTED for each when only that guard is removed. | `CLAUDE.md` section 9 requires the dangerous direction of a guard to be asserted, and section 1 makes the research/production boundary a safety property. All nine are reachable through the public serialization surface with no other defence. | Added four regression tests covering all nine guards. No production code changed. | Pristine: **4 passed, 43 deselected in 24.38s**. Under each of the nine individual removals the covering test fails. Complete focused file on the final tree: **47 passed in 127.84s** (the pushed 43 plus the four added here). |
+| SI-CR8-003 | P3 | Open (advisory, characterization only) | `0f8600d` | frozen convention, `_PRESSURE_CANDIDATE_MINIMUM` with indivisible ties | The realized candidate fraction under the frozen convention is not 10 percent in general, and at a boundary tie it is discontinuous. With no ties the fraction is exactly `1/10` only when `N` is a multiple of 10, and ranges from `1/14` to `2/15` across `N=10..60`. At `N=20` a top tie of 4 selects all 4 rows, which is 20 percent, while a top tie of 5 selects **zero** rows, because the shared mid-rank falls to `7/8`. A release can therefore produce an empty candidate set. | Kernel characterization across `N=10..60` and top ties of 1 to 6 at `N=20`. | No change requested. This is the correct and documented consequence of indivisible ties plus an inclusive threshold, and the record already states that no 10 percent quota is force-filled. It is recorded because short-interest ratios tie frequently in small and illiquid names, so a downstream seed stage must treat an empty candidate set as a valid fail-closed outcome rather than an error, and the owner should confirm the zero-selection case matches intent before any seed policy is frozen. | None. | Characterization figures above. |
+| SI-CR8-004 | P3 | Open (advisory, no change) | `0f8600d` | batch `_validate_structure`, `disposition_count != len(source_rows)` | Removing this guard does not admit the attack but raises a raw `ValueError: zip() argument 2 is shorter than argument 1` instead of the typed public refusal. Its value is converting an internal crash into a domain error. | Probe under removal produced the `ValueError`; the attack still failed closed. | No change requested; the same class Codex recorded for the SI-3E-P0 projection-count guard in section 44.3. Recorded so the surviving mutation is not mistaken for a coverage hole. | None. | Probe output. |
+| SI-CR8-005 | P3 | Open (record accuracy) | `7844c81` | section 48.5 lane runtime | The recorded eleven-file lane figure of **6,115.14s** does not reconcile with the lane's own history: the ten-file lane was recorded at **1,178.80s** in section 44.4 and the new focused file at **635.08s** in section 48.5, which predicts roughly 1,814s. The recorded value is about 3.4 times that. Host speed and contention plausibly explain it, but the record states no host for this run, so a reader cannot reconcile it. | Section 44.4, section 48.5, and this section's figures on one stated host, where the relationship is additive: my prior ten-file lane was **1,515.52s** (section 46.6) and the new focused file measures **127.84s** here, predicting about 1,643s against a measured **1,645.17s**. The recorded 6,115.14s therefore cannot share a host with the recorded 1,178.80s, and section 48.1 names no host for this run. | Validation figures must be reconcilable or carry the context that explains them. Not a code defect and it does not affect any pass count. | No record rewrite; this section records an independent figure and names its host and environment. | **619 passed in 1,645.17s (27m25s)**, reconciling exactly to section 48.5's 615 plus the four tests added here in 49.6. |
+| SI-CR7-002 | P3 | Closed as a non-defect observation | `ac1789d` | section 46.5 | Superseded per `SI-CCR19-002`; no change, another layer refuses the attack. | Section 46 probe. | Accepted from the counter-review. | None. | Closed. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | shared integration history | Unchanged: the durable owner sentence covering the 2026-09-05 follow-up fix and the `13079d5` alignment is still absent from lane-visible shared history. | Sections 41.5, 43.5, 44.2, 46.5 and 47.2. | Owner decision. | None on this lane. | Open. |
+
+No new out-of-lane finding. No complete-repository suite was run, so this
+review makes no claim about tests outside the Short Interest lane.
+
+### 49.6 Validation
+
+- On the exact pushed tree `7844c81`, clean, before any edit: compileall
+  including `research` **exit 0**; active-document consistency **69 passed**.
+  A lane run started on that tree was deliberately discarded, not reported,
+  because it overlapped the mutation window; see 49.7.
+- Final tree at the correction commit `2bf764a`, clean: exact
+  complete eleven-file Short Interest lane **619 passed in 1,645.17s (27m25s)**, reconciling exactly to section 48.5's 615 plus the four tests added here; focused percentile file
+  **47 passed in 127.84s** (the pushed 43 plus the four added here); active-document consistency **69 passed**; compileall including
+  `research` **exit 0**; `git diff --check` **clean**.
+- Mutations, each restored byte-exact to SHA-256 `5688c6099ec0...`: combined
+  26-guard removal **18 failed, 25 passed in 127.03s**; 26 individual
+  attributions at roughly 42s each; 16 survivor probes; 9 red-proof runs for
+  the new tests.
+- Validation host and environment: macOS, CPython 3.13.15 / pytest 9.1.1.
+- Per the owner's dedicated-lane direction recorded in sections 42, 44, 45 and
+  47, **no complete-repository suite was run or claimed**.
+
+All inputs were tracked documents and synthetic/offline fixtures. No
+credential, provider, programmatic FINRA request, licensed row, price, market
+outcome, holdout, ETF data, QuantConnect artifact/upload/compile/job, broker,
+operator database, scheduler, deployment, paper/live, order or trading surface
+was accessed. **Authorized outcome looks: 0. Consumed outcome looks: 0.**
+
+### 49.7 Method note on the discarded baseline
+
+A baseline lane run was launched on the pushed tree before section 47 and 48
+had been read, and it would have overlapped the mutation of a file the lane
+covers. That is the defect I self-reported last round as `SI-CR7-003`. On
+recognising the overlap I stopped that run and discarded it without reporting
+any figure from it, and this section reports only the clean final-tree lane
+run. The compileall and active-document results in 49.6 completed before the
+first mutation and are reported as pushed-tree baseline.
+
+### 49.8 Quality rating and limits
+
+**SI-3E-P1A implementation quality: 8/10.** The arithmetic is exact and
+correct, the convention makes the pressure/covering symmetry exact with no
+float, the blueprint thresholds are honoured inclusively, ties are genuinely
+indivisible, terminal rows are retained without invented values, and the
+lineage, detachment and fail-closed structure follow the lane's established
+pattern. Two points are withheld: nine reachable sole-defence guards had no
+regression, including the row-level production-authority flag; and the policy's
+owner authority is not durably cited, which is the one thing a preregistered
+policy most needs.
+
+**Codex's SI-3E-P0 counter-review quality: 9/10.** Its four findings against my
+record are all correct, and `SI-CCR19-004` improved this round's method.
+
+Limits of this review: everything is software behaviour on synthetic fixtures
+and says nothing about whether short pressure or covering predicts returns. I
+did not re-derive the upstream SI-3C, SI-3D or SI-3E-P0 arithmetic beyond the
+lineage bindings this tranche re-authenticates. I cannot verify whether the
+owner froze the percentile policy; `SI-CR8-001` records the missing citation,
+not an absence of owner intent.
+
+### 49.9 Remaining gates and next authorized step
+
+1. **The owner supplies a durable citation for the 2026-09-14 percentile
+   freeze**, modelled on SI-0M, before SI-3E-P1A is treated as authorized.
+   Until then its technical acceptance stands and its policy authority does
+   not.
+2. Codex counter-reviews the test-only correction commit `2bf764a`
+   and this record commit, and makes the round's single push.
+3. `SI-CR5-005` / `SI-CCR16-007` remains an owner question.
+4. Seed selection, the investability universe and its lookbacks, licensed
+   SI-1/full SI-2, `S2`-`S4`, DTC delta/window `K`, SI-4 ETF work, every
+   outcome join, portfolio stages and every QuantConnect artifact/upload/
+   compile/job remain gated. No milestone is started here.

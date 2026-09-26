@@ -121,9 +121,10 @@ The current reconciled floor is 222 shared looks, 163 development evaluations,
 Section 196 is Claude's independent review of the forty-five-commit range
 `dcb7157..08c9eab`, sections 181–195 (0 P0, 0 P1, 1 P2, 5 P3): one test-only
 correction pins the relaxed launcher's frozen-manifest hash check; the P2 is
-the two-window disagreement about the analyst-revision overlay, whose leading
-explanation is the current-vintage historical analyst archive, to be measured
-before any further capacity or period run.
+the two-window disagreement about the analyst-revision overlay. Section 197
+counter-reviews both Claude commits, qualifies its unmatched historical-control
+and near-PIT recent-window claims, fixes ledger/test hygiene, and measures
+between-capture vendor drift before any further capacity or period run.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -737,12 +738,15 @@ a fully AR-off cap-ranked control R223 versus a fresh exact R222-source AR-on
 100% arm R224 on the same all-six 25% policy, input, window and execution rules.
 Section 196 is Claude's independent review of the exact pushed range
 `dcb7157..08c9eab` (forty-five commits, sections 181–195) with the test-only
-correction `22bdbce`. The immediate next step is that Codex counter-reviews
-section 196 and the exact pushed range, then measures the vendor vintage drift
-of the analyst archive (section 196.5, item 1) before any further capacity or
-period run. Each candidate has at most
+correction `22bdbce`. Section 197 counter-reviews exact pushed Claude range
+`08c9eab..8570bbb`, accepts the test correction and qualifies the interpretation.
+Current bounded work is provider-only between-capture drift measurement; no
+QC period/capacity run is launched in this round. This cannot diagnose the
+cause of historical performance by itself. Each candidate has at most
 three attempts, no full-suite run by Codex and no automatic follow-on research
-or trading. Both are now valid on A1: AR-off +53.76558%, AR-on +53.65121%,
+or trading. Claude reviews section 197 after its one final push; Codex then
+counter-reviews that exact review before the next bounded research milestone.
+Both are now valid on A1: AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
 match, while stock counts/weights intentionally differ. Current floor is
 222/163/34/644. This window does not demonstrate incremental net AR return;
@@ -793,7 +797,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–196
+findings, outcomes, and per-run accounting remain in numbered sections 1–197
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -2477,6 +2481,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-26 | Codex owner-directed comparison | `1583157` -> `4b00c2b`, `004a338`, and final record commit | Same-selection 0/100 weight ablation; separate all-six 25%/100% construction | R220/R221/R222 valid A1 order-based runs, same input/window/cost/exposure; only the pair has an identical baseline path. No retries, Mia or new provider capture. All three cached receipt chains reauthenticated locally, no second QC reads. | Focused generated boundaries, family pins, launcher and cached-arm regressions; exact closure and document gates. Final checks in 194.5; no full suite. Final 220 shared / 161 development / 34 infrastructure / 642 cells. | `ARV2D194-001` P2 cached-arm attribution gap corrected before reporting; six old-comparator mutations red. 100% overlay -0.385576 pp versus zero, all25 -1.230479 pp versus original 100%; AR entry/count and PIT/vintage/adaptivity caveats retained. | One final same-lane push. Claude reviews section 194 and all earlier deferred commits; Codex counter-reviews its exact push. No automatic new research/trading milestone. |
 | 2026-09-26 | Codex owner-directed total AR ablation | `7c1694e` -> `8cc7e7c`, `7c4351e`, and final record commit | Fully AR-off versus exact all25 AR-on100 reference | R223/R224 valid A1 order runs, same non-AR coverage/census, window/input/execution; AR entry/count/weights removed only in OFF. No retry/Mia/provider capture or extra outcome read. | Focused source/mode/cached comparison, mutation, exact closure and document gates; final checks in 195.4. No full suite. Final 222/163/34/644. | `ARV2D195-001` P2 common coverage/census comparison corrected before paired reporting; four isolating cases red then green. Net AR spread -0.114367 pp, risk slightly worse. Conditional input/identity catalog, PIT/vintage/adaptive window retained. | One final same-lane push; Claude reviews section 195 plus all deferred commits, Codex counter-reviews exact Claude push. No automatic additional research or trading. |
 | 2026-09-26 | Claude independent review of sections 181–195: tilt ladders, settlement-cash policy, recent-window family, coverage easing, and the AR ablations | `08c9eab` -> `22bdbce` -> this record commit | Section 196: forty-five commits `dcb7157..08c9eab` individually disposed (44 accepted, 1 accepted after correction, 0 rejected); zero QC calls, looks, evaluations, or cells | Pinned the relaxed launcher's frozen-manifest hash check (`22bdbce`, test-only, red with the check disabled, green restored); no production line changed | Standing lane selection in a byte-faithful export of the final code tree, focused delta files, fourteen mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 196.7 | 0 P0, 0 P1, 1 P2, 5 P3 (`ARV2R196-001` through `-006`); `-002` corrected; `-001` is the two-window disagreement about the AR overlay and the vintage hypothesis | Single push of the two Claude commits; Codex counter-reviews section 196 and measures the vendor vintage drift before any further capacity or period run |
+| 2026-09-26 | Codex counter-review and provider-only drift checkpoint | `8570bbb` -> `0b93fda` and final record commit | Counter-review both Claude commits; test/ledger hygiene; exact snapshot comparison | Qualified historical unmatched-control, near-PIT and causal overstatements without rewriting Claude's historical review. One fresh three-role capture; 9,105 common ratings, 3,446 earnings and 1,758 guidance unchanged, five added rating IDs. No input replacement or QC operation. | 164 focused passed; 1 portability target passed; final document checks below. No full suite; count report and both captures authenticated. Floor unchanged 222/163/34/644. | Interpretive qualifications corrected; causal AR/PIT question remains open. Real slippage, membership refresh and older unaccepted-result debt retained. No new P0/P1. | One same-lane push; Claude reviews section 197 and both commits, Codex counter-reviews before any next bounded research run. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -27134,3 +27139,146 @@ or launcher was run; every result figure is transcribed from sections
 181–195 and the shared ledger, and the launchers' live behaviour against
 the private projects is attested only by their tests and Codex's receipts.
 Python 3.12 behaviour (`ARV2R196-004`) was not reproduced on this Mac.
+
+## 197. Codex counter-review of section 196 and bounded vendor-drift measurement — 2026-09-26
+
+Exact fetched review range **`08c9eab..8570bbb6825c7aa47a83b211181f64ab983b2854`**,
+same designated worktree/branch, clean and equal to origin at start. No other
+lane, root Action Plan/Session Handoff, broker or trading state is in scope.
+The next bounded milestone is section 196.5 item 1: a provider-only comparison
+of two snapshots, not another capacity/period/QC run. Existing owner provider
+and shared-bookkeeping authority applies; this consumes no return look.
+
+### 197.1 Per-commit dispositions and retained findings
+
+| Claude commit | Disposition | Evidence |
+| --- | --- | --- |
+| `22bdbce` | accepted | Test-only manifest byte pin isolated: 44 focused cases green; disabling only the SHA guard in memory leaves 43 green and the new case red; restored case green. No production line changes. |
+| `8570bbb` | accepted after correction | Code/test dispositions accepted; interpretation and next-step causal claims require the qualifications below. Its full-suite count is Claude's report, not re-run by Codex. The export failure's `git check-attr` dependency is verified in source. |
+
+Scoped software/proof assessment: **8/10, accepted after correction**.
+The isolated manifest regression is sound; the corrected evidence narrative
+does not manufacture an explanation for the unresolved trading signal.
+
+| Finding | P | Counter-review disposition and evidence |
+| --- | --- | --- |
+| `ARV2R196-001` | P2 | **Partially correct; unexplained AR benefit remains open.** Recent paired 100% weight effect -0.385576 pp and total effect -0.114367 pp reproduce. Historical 100–300% sensitivities increase, but R191's matched path `b825663b…` differs from guarded R195–R202 `cfa8d5c8…`; section 189.7 explicitly forbids the claimed +23.38 pp as a clean paired overlay gain. Both windows are current-vintage/non-pristine-PIT. A short drift measurement does not decide causal attribution. |
+| `ARV2R196-002` | P3 | **Confirmed/corrected by Claude.** Root/advisory focused mutation reproduces guard isolation. This proves the manifest pin, not a demonstrated fourth-attempt exploit. |
+| `ARV2R196-003` | P3 | **Confirmed/corrected.** Four authorized shared headings now match retained valid bodies; R203 preserves failed A1 versus valid Mia A2. New status/census regression detects old headings and false A1 attribution. No historical body, value or count rewritten. |
+| `ARV2R196-004` | P3 | **Confirmed/corrected.** Bundled Python 3.12.14 raises TypeError at the unknown-field assignment. Accept either refusal exception and prove no unknown field installed; exact FrozenInstanceError and reconstruction checks remain. |
+| `ARV2R196-005` | P3 | **Confirmed, documented.** Equal modeled/engine fees verify accounting/configuration, not realistic fills. Existing projections use NullSlippageModel and no market impact. No retroactive costs/economics changed; a prospective cost sensitivity remains future work. |
+| `ARV2R196-006` | P3 | **Mechanism confirmed; wording qualified.** Predecessor-active membership intervals extend over six tail sessions. September 21 is the sole affected decision, two trading sessions after the September 17 boundary; actual underlying snapshot age is not established by that interval. Refresh, do not silently extend, in the next new input epoch. |
+| `ARV2CR197-001` | P2 | **Confirmed/corrected interpretation overreach in 8570bbb.** The blanket near-PIT recent-window claim is unsupported: January–September 2026 delta was backfilled on September 17; latest package preserves old history and adds only 12 tail/16 fresh contributions of 13,015. Look-ahead contamination is a hypothesis, not an identified leading cause. Regime, selection/coverage, baseline/price-vintage differences and adaptive research remain confounded. Total ablation identifies the combined effect, not each layer separately or statistical equivalence. |
+| `ARV2CR197-002` | P3 | **Confirmed/corrected blanket capacity statement.** Recorded R219 200% +55.675177% exceeds zero-overlay R220 +55.2672684305% by about +0.407909 pp. This is not a fresh dedicated 200/0 comparison and does not select a winner, but disproves “no capacity above zero” arithmetically. The authenticated 100/0 comparison remains negative. |
+
+These qualifications supersede conflicting interpretation in section 196,
+retaining that review as history. No past source, receipt, result or research
+look is changed. Historical/archive age alone does not specify the direction
+of any bias. Both windows remain touched exploratory research, and the
+capacity sweeps remain closed rather than searching for another winning tilt.
+
+### 197.2 Prospective provider-only measurement
+
+Compare event dates **2026-08-01 through 2026-09-16** in the September 17
+capture `arv2-massive-three-role-20260917T051836493365Z`, externally pinned
+manifest `3384e9745c3093eb203997d4a98057ae2d066180add5e0367c4c3687a50d83ea`,
+against one fresh immutable three-role capture using the existing reviewed
+ratings/earnings/guidance endpoints, same date sort and no last_updated filter.
+The old broader January–September query is filtered offline to this exact
+47-day range. IDs/values remain private; output is counts, field names,
+capture times and digests only. Do not replace a backtest input or recalculate
+returns. New script reuses the authenticated page visitor, external manifest
+pins, strict canonical JSON and private exclusive artifact writer.
+
+Count shared single-variant IDs, unchanged records, substantive field changes,
+last_updated-only re-stamps, rating/target/clock/identity changes, added and
+absent IDs separately. Reused ambiguous IDs are excluded from the comparable
+denominator and counted; identical duplicate rows are disclosed. Missing keys
+and null differ. Endpoint/query/range, chronological captures, IDs/dates and
+manifest/page authenticity must pass before any report is published.
+
+This measures changes **between capture dates** (about nine days), not the
+original event-time state or a “two-to-six-week overwrite probability.” Date
+changes outside the queried window can appear absent; absent/new IDs do not
+prove tombstones/backfills without vendor evidence. Even material drift cannot
+show which corrections caused returns; zero short-interval drift cannot bound
+years of earlier overwrites or make regime dependence the diagnosed cause.
+No materiality threshold is tuned to this measurement; `ARV2R196-001` remains
+open under either result. Source preflight and focused tests precede reporting.
+
+### 197.3 Physical capture and measured drift
+
+One fresh capture completed: **3 pages / 14,314 rows**, artifact
+`arv2-massive-three-role-20260926T211839751388Z`, capture
+`arv2-capture-1300846918a5689151d91c99`, manifest SHA-256
+`653a6ffbf6a53e3498ef30d67f685507d3d6eedccffedc16734674ee4a7ccecf`.
+Both complete captures and external manifest pins authenticate through the
+existing page visitor. Old capture completed September 17 05:18:48.773522 UTC;
+new began September 26 21:18:39.751388 UTC: **9 days, 15:59:50.977866** apart.
+
+| Source role | Old IDs | New IDs | Comparable common IDs | Changed payloads | Timestamp-only changes | Old-only / new-only IDs |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Analyst ratings | 9105 | 9110 | 9105 | 0 | 0 | 0 / 5 |
+| Earnings | 3446 | 3446 | 3446 | 0 | 0 | 0 / 0 |
+| Corporate guidance | 1758 | 1758 | 1758 | 0 | 0 | 0 / 0 |
+
+No ambiguous or repeated IDs in this measured window. Every shared record is
+unchanged under the exact typed-field comparison, including rating/target,
+clock/identity and last_updated. The five new rating IDs are **additions to
+the observed query result**, not diagnosed backfills or corrections.
+Private immutable count report SHA-256
+`a86f3607e8be28ff433d242f6d842f195207dbf0bfb296cb5328d6cdeb946f4d`,
+under `artifacts/analyst_revisions_v2/vendor_vintage_drift_20260926/`.
+Raw rows/IDs/credential values were neither printed nor committed.
+
+**Interpretation:** no edits observed between these snapshots, so this
+measurement supplies no positive evidence that recent vendor overwrites
+explain the return disagreement. It does not measure corrections before
+September 17, reconstruct event-time history, bound multi-year drift, or
+diagnose regime dependence. The causal/evidence question `ARV2R196-001`
+remains open; the +23.38 pp historical attribution remains unproved. Inputs,
+QC source, costs, receipts and previous outcomes are unchanged. Zero new QC
+calls, return reads, launches, attempts or result cells; floor stays
+**222 shared / 163 development / 34 infrastructure / 644 cells**.
+
+### 197.4 Validation and review handoff
+
+Python **3.12.14**: final focused drift/relaxed submission/family/document
+selection **164 passed in 19.71 s**; unknown-field portability case **1 passed,
+73 deselected in 4.47 s**. Advisory portability target plus adjacent checks
+**3 passed in 6.42 s** after a true **1 failed in 1.62 s** on the old assertion.
+Manifest guard isolation **1 failed / 43 passed in 14.26 s**, restored new case
+green; four-heading status mutation red, restored green. Drift helper has
+**38 offline cases**, including actual authenticated page reload, raw/row
+tampering, Decimal and type preservation, ambiguous IDs, missing/null, date
+shifts, capture chronology, external pins, private publication/overwrite
+refusal and descriptor cleanup. Three complementary in-memory mutations were
+caught and finally restored. No full lane/repository suite run by Codex.
+
+Two initial old-source preflights refused local JSON text/Decimal API mismatch,
+before any provider request; corrected using the existing strict decoder and
+provider Decimal serializer. Publisher validation was moved ahead of opening
+its descriptor. An intermediate document gate refused the missing explicit
+section-197 review link; corrected, all final cases green. None consumed a QC
+attempt/look or changed financial rules. Changed-file compilation and
+`git diff --check` clean. Actual new capture and authenticated count-only
+comparison succeeded; no input replacement, QC or outcome operation performed.
+
+Claude reviews every commit after **`8570bbb6825c7aa47a83b211181f64ab983b2854`**
+through this round's final record commit: **`0b93fda`** (200-line diagnostic,
+38 offline cases, portability/status tests and authorized shared bookkeeping),
+then the counter-review/result/handoff record. Final document checks:
+**82 passed in 1.13 s** after the measured results were added. Attention:
+preserve exact field representation
+and ambiguous-ID exclusions, do not interpret missing IDs as deletion, and
+do not mistake zero nine-day drift for pristine multi-year data. Shared
+heading fixes are bookkeeping only; unknown-field exceptions still refuse.
+Root Action Plan/Session Handoff and other lanes frozen. No P0/P1 identified;
+the confirmed interpretive errors are qualified, while causal/PIT/vintage,
+membership refresh, real slippage and older unaccepted-result debt remain.
+
+One final same-lane push ends this round. Next: independent review and Codex
+counter-review, then a separately frozen same-rule AR-on/off historical pair
+and relevant ETF benchmark may test the unexplained benefit. They are not
+launched here; no new capacity search, formal acceptance, broker/live/paper,
+funded account, deployment or trading follows from this measurement.

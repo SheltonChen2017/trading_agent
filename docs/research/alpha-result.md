@@ -4742,7 +4742,7 @@ is implied. Target gross stays 98%, and 200% means bounded AR transfer
 capacity, not portfolio leverage. No raw rows/logs/orders/charts, broker,
 paper/live/funded account, deployment or real trading accessed.
 
-## R-201 — guarded 250% revision tilt; A1 launched — 2026-09-25
+## R-201 — guarded 250% revision tilt; A1 valid — 2026-09-25
 
 Owner-authorized section 191 prospectively extends the adaptive 2021–2025
 capacity sweep to 250/300%, preserving order-based execution, six universes,
@@ -4767,7 +4767,7 @@ no invalid/canceled, engine/modeled fees `$41,781.3400106`. Matched path
 equals the valid R-195 A2 anchor; price-vintage limitations remain. Read
 spent, cells **621 → 622**; look counts stay **197 / 140 / 32**.
 
-## R-202 — guarded 300% revision tilt; A1 launched — 2026-09-25
+## R-202 — guarded 300% revision tilt; A1 valid — 2026-09-25
 
 Section 191 and commits `4808a5d` / `a80718a` prospectively freeze 300%
 with all R-201 period/economics unchanged. Source
@@ -4796,7 +4796,7 @@ The six August-2025-to-September-25-2026 candidates remain unlaunched
 because fresh Analyst Ratings access returns HTTP 403; no missing-look
 entry or successful recent-period result is inferred from their reservation.
 
-## R-203 — guarded 100% revision tilt, recent period; A1 launched — 2026-09-25
+## R-203 — guarded 100% revision tilt, recent period; A1 failed; Mia A2 valid — 2026-09-25
 
 Ratings access restored to HTTP 200. Owner-authorized section 192 and
 prospective commit `d5afc82` freeze all six 100–200% capacities before any
@@ -4876,7 +4876,7 @@ Cells **624 -> 625**; final counts **201 / 144 / 32 / 625**.
 Only SPY/XLV stock sleeves are tilted on this period; QQQ/SOXX/REMX/XLE
 retain ETF fallback. Same-window adaptivity and PIT limits remain.
 
-## R-205 — corrected 140% revision tilt, recent period; A1 launched — 2026-09-26
+## R-205 — corrected 140% revision tilt, recent period; A1 valid — 2026-09-26
 
 Exact source from prospective `1744659` uploaded, read back and compiled
 in private project **36981429**,
@@ -5308,3 +5308,19 @@ engine/model fees `$9,393.636965`; cash/gross/tracking passed.
 Matched path equals R203; cells **628 -> 629**, totals **205 / 148 / 32 / 629**.
 Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
 No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.
+
+## Provider-only vintage-drift checkpoint — 2026-09-26 (no new research look)
+
+Lane section 197 counter-reviews Claude section 196 and compares authenticated
+September 17 versus September 26 Massive snapshots over event dates
+2026-08-01–2026-09-16. Fresh capture `arv2-capture-1300846918a5689151d91c99`,
+manifest `653a6ffbf6a53e3498ef30d67f685507d3d6eedccffedc16734674ee4a7ccecf`,
+3 pages / 14,314 rows. **9,105 common ratings unchanged; five additional
+rating IDs; all 3,446 common earnings and 1,758 common guidance unchanged.**
+Zero disappeared or ambiguous IDs; no payload or last_updated-only changes.
+Count-only report `a86f3607e8be28ff433d242f6d842f195207dbf0bfb296cb5328d6cdeb946f4d`.
+This measures about nine days between captures, not original event-time truth
+or years of overwrite risk. Historical AR return attribution remains unproved;
+no QC launch/read, backtest input replacement or return calculation. Floor
+unchanged: **222 / 163 / 34 / 644**. Four corrected completion headings preserve
+their historical bodies and R203's failed-A1/valid-Mia-A2 distinction.

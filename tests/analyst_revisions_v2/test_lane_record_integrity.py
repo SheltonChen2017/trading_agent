@@ -279,3 +279,43 @@ def test_owner_review_waiver_classifier_is_exact_and_section_shaped() -> None:
     assert not any(
         _names_explicit_owner_review_waiver(value) for value in rejected
     )
+
+
+def _stale_completed_shared_ledger_headings(ledger: str) -> dict[str, str]:
+    """Headline status must reflect the retained completed-run body census."""
+
+    parts = re.split(r"(?m)^(## R-(\d{3})[^\n]*)\n", ledger)
+    sections = {parts[index + 1]: (parts[index], parts[index + 2])
+                for index in range(1, len(parts), 3)}
+    expected = {"201": ("A1 valid", 261), "202": ("A1 valid", 261),
+                "203": ("A1 failed; Mia A2 valid", 61), "205": ("A1 valid", 61)}
+    stale = {}
+    for candidate, (status, rebalance_count) in expected.items():
+        assert candidate in sections, f"shared ledger is missing R-{candidate}"
+        heading, body = sections[candidate]
+        plain = body.replace("**", "")
+        assert "run_valid=true" in plain, f"R-{candidate} lacks an authenticated valid body"
+        assert re.search(rf"\b{rebalance_count}\s+(?:completed\s+)?rebalances\b", plain)
+        cell_step = re.search(r"\bcells\s+(\d+)\s*(?:→|->)\s*(\d+)", plain, re.IGNORECASE)
+        assert cell_step and int(cell_step[2]) == int(cell_step[1]) + 1
+        if candidate == "203":
+            assert "A1 reached Runtime Error during initialization" in plain
+            assert "R203 attempt 2" in plain and "owner/Mia imported read passed" in plain
+        if f"; {status} — " not in heading:
+            stale[candidate] = heading
+    return stale
+
+
+def test_completed_shared_ledger_headlines_match_authenticated_body_census() -> None:
+    ledger = SHARED_LOOK_LEDGER.read_text(encoding="utf-8")
+    assert not _stale_completed_shared_ledger_headings(ledger)
+
+
+def test_completed_heading_classifier_refuses_old_launch_and_mislabeled_mia() -> None:
+    ledger = SHARED_LOOK_LEDGER.read_text(encoding="utf-8")
+    mutated = ledger.replace("A1 valid — 2026-09-25", "A1 launched — 2026-09-25")
+    mutated = mutated.replace("A1 valid — 2026-09-26", "A1 launched — 2026-09-26")
+    mutated = mutated.replace("A1 failed; Mia A2 valid", "A1 launched")
+    assert set(_stale_completed_shared_ledger_headings(mutated)) == {"201", "202", "203", "205"}
+    mislabeled = ledger.replace("A1 failed; Mia A2 valid", "A1 valid")
+    assert set(_stale_completed_shared_ledger_headings(mislabeled)) == {"203"}

@@ -2741,8 +2741,11 @@ def test_records_are_frozen_slotted_and_copy_deepcopy_pickle_reauthenticate():
         assert not hasattr(value, "__dict__")
         with pytest.raises(dataclasses.FrozenInstanceError):
             value.real_qc_object_store_access_performed = True
-        with pytest.raises(AttributeError):
+        # Frozen slotted dataclasses may raise TypeError for unknown fields on
+        # Python 3.12; the invariant is refusal without installing the field.
+        with pytest.raises((AttributeError, TypeError)):
             value.unreviewed_field = True
+        assert not hasattr(value, "unreviewed_field")
         for reconstructed in (
             copy.copy(value),
             copy.deepcopy(value),

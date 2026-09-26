@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from fractions import Fraction
 from datetime import date
 from functools import lru_cache
 from pathlib import Path
@@ -19,6 +20,7 @@ from research.short_interest_etf.pit_eligibility import (
     build_stock_data_readiness,
     load_synthetic_pit_reference,
 )
+import research.short_interest_etf.stock_investability as investability_module
 from research.short_interest_etf.stock_investability import (
     DailyLiquidityObservation,
     MarketCapObservation,
@@ -521,3 +523,35 @@ def test_unknown_nested_value_is_refused_before_metaclass_introspection():
     with pytest.raises(StockInvestabilityError):
         build_stock_investability(source, references, history)
     assert calls == []
+
+
+def test_every_candidate_lookback_is_even_so_the_median_stays_exact():
+    """The median helper always averages the two middle values.
+
+    `(ordered[mid - 1] + ordered[mid]) / 2` with `mid = lookback // 2` is the
+    exact median only for an even window. For an odd window it averages the two
+    values straddling the true middle and silently returns a wrong number: for
+    five sorted values 1..5 it yields 5/2 instead of 3. Nothing in the evidence
+    builder refuses an odd candidate window, and the policy advertises
+    `exact_middle_or_mean_of_two_middle_values`, so an odd lookback added to the
+    approved grid would change eligibility without any other test noticing.
+    This pins the precondition the arithmetic depends on.
+    """
+    policy = investability_module._policy()
+    lookbacks = policy["candidate_lookbacks"]
+    assert tuple(lookbacks) == LOOKBACKS
+    odd = [value for value in lookbacks if value % 2]
+    assert not odd, (
+        f"odd candidate lookbacks {odd} need an exact odd-window median before "
+        "they can be admitted"
+    )
+    for lookback in lookbacks:
+        values = [Fraction(index + 1) for index in range(lookback)]
+        middle = lookback // 2
+        as_implemented = (values[middle - 1] + values[middle]) / 2
+        true_median = (
+            values[lookback // 2]
+            if lookback % 2
+            else (values[lookback // 2 - 1] + values[lookback // 2]) / 2
+        )
+        assert as_implemented == true_median

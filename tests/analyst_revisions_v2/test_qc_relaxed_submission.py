@@ -425,3 +425,17 @@ def test_retry_census_refuses_untracked_manual_or_mia_run(frozen):
     with pytest.raises(sut.RelaxedQcSubmissionError, match="untracked"):
         sut.launch(dataclasses.replace(plan, attempt=2), projection, fake)
     assert not sut._path(dataclasses.replace(plan, attempt=2), "claim").exists()
+
+
+def test_frozen_manifest_hash_binds_every_byte_not_only_shape(frozen):
+    """A shape-identical manifest whose bytes differ from the frozen digest
+    must refuse before any QC call. The census check alone would admit an
+    edited row, which is the attempt-renaming escape the freeze closes."""
+
+    plan, projection, fake, row = frozen
+    value = json.loads(sut.MANIFEST_PATH.read_bytes())
+    value["candidates"][0]["project_name"] = row["project_name"] + " EDITED"
+    sut.MANIFEST_PATH.write_bytes(canonical(value))
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="frozen manifest"):
+        sut.launch(plan, projection, fake)
+    assert fake.calls == []

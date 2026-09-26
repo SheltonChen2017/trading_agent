@@ -2,13 +2,15 @@
 
 Status: **CODEX COUNTER-REVIEWED EVERY CLAUDE COMMIT `b628262..35a1e04`
 (SECTION 83): CODE AND TESTS ACCEPTED, RECORD ACCEPTED AFTER APPEND-ONLY
-PRECISION CLARIFICATION. THE OWNER APPROVED AN EXPLICIT SYNTHETIC-ONLY,
-ZERO-I/O V2 POLICY/MANIFEST REVISION RETAINING 3/A AND 5/A AS CONTEXT ONLY;
-IMPLEMENTATION IS THE NEXT BOUNDED STEP. FROZEN V1 EVIDENCE REMAINS INTACT.
-THE PACKAGE-IMPORT GUARD IS NOW MANDATORY IN FOCUSED PRE-PUSH CHECKS; NO
-COMPLETE LANE/REPOSITORY SUITE IS INFERRED FOR CODEX. INCOMING FOCUSED SET:
-533 PASSED. NO REAL FILINGS OR EXTERNAL SOURCES READ; ALL LOOK COUNTERS ZERO.
-THE REAL IB-1B PILOT STILL NEEDS ITS REVIEWED PROFILE/RUNNER AND CONTIGUOUS
+PRECISION CLARIFICATION. THE OWNER-APPROVED SYNTHETIC-ONLY, ZERO-I/O V2
+POLICY/MANIFEST REVISION IS IMPLEMENTED IN `a2b8a9d` (SECTION 84), PENDING
+CLAUDE'S INDEPENDENT REVIEW OF THE EXACT COMBINED PUSH. 3/A AND 5/A ARE
+RETAINED CONTEXT ONLY; V1 POLICY AND MANIFEST IDENTITIES REMAIN REPRODUCIBLE.
+`IB2MAN-CR03` IS CORRECTED IN THE V2 CANDIDATE, NOT SILENTLY WIDENED IN V1.
+THE PACKAGE-IMPORT GUARD IS MANDATORY IN FOCUSED PRE-PUSH CHECKS; NO COMPLETE
+LANE/REPOSITORY SUITE WAS RUN BY CODEX. FINAL FOCUSED SET: 1,100 PASSED.
+NO REAL FILINGS OR EXTERNAL SOURCES READ; ALL LOOK COUNTERS ZERO. THE REAL
+IB-1B PILOT STILL NEEDS ITS REVIEWED PROFILE/RUNNER AND SELECTED CONTIGUOUS
 WINDOW. MATCHING XML/METADATA REMAINS ABSENT; CANONICAL IB-2, OUTCOMES, QC,
 DEPLOYMENT, BROKER, CAPITAL, ORDERS, AND TRADING REMAIN GATED.**
 
@@ -189,6 +191,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-25 | Claude review | `eac2fc1` -> `acc1d3d` (test correction) -> this review record | Independent review of the section-79 counter-review and the IB-1A raw contract v2 repair of `IBZIP-CR04` (`653874e..eac2fc1`, 3 commits, 0 merges, 4 lane-owned paths) | Verified the remote tip and clean worktree, then dispositioned all three commits: `8a021df` and `eac2fc1` accepted, `008baa8` accepted after a test-only correction. Read the v2 contract against the loader and IB-1B, ran 18 faithful mutants in a read-only export with bytecode caching disabled, reproduced the red check on the pre-fix module, and verified the fix on the real files: in-memory IB-1A inspection of all 82 tracked SEC ZIPs and a write-then-load round trip for one quarter per era in a scratch directory outside the repository, deleted afterwards. No TSV row, filing, or XML parsed; no later stage run. | Complete suite on `eac2fc1` in the worktree **8,294 passed, 38 skipped, 28 warnings, 0 failed in 441.57s**. Recorded counts reproduce: **214**, **355**, **425**. Red check on `653874e`: **14 failed, 200 passed**. Real archives: **82 of 82 accepted**, 0 refused. Mutation: **10 of 15 caught** on the pushed tree, **17 of 18** after `acc1d3d`, survivor redundant. Final tree: IB-1A plus IB-1B **219 passed**; lane gate (19 Insider files plus active-document, module-hygiene, overlay-import, and ML-import boundaries) **2,101 passed, 0 skipped in 34.12s**; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IBZIP-CR04` P2 closed in `008baa8` and verified on real files. `IBZIP-CR05` P3 closed in `acc1d3d` (five unpinned v2 guards, two pre-existing). `IBZIP-CR06` P3 open, record precision (79.4 names eight red cases; the failing set is 14). `IBZIP-CR01` closed by Codex's row; `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `acc1d3d` and this record. Next real-file step under the 72.5 pilot is IB-1B on a bounded contiguous selection through the reviewed pilot runner; the matching XML and acceptance-metadata bundle is still absent. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-25 | Codex counter-review + implementation | `eac2fc1..efc2c7d` reviewed; `3b1e797` implementation snapshot; this lane-record commit follows | Claude IB-1A-v2 review counter-review plus owner-approved synthetic 82-quarter source-manifest/stream boundary | Accepted both Claude commits; closed `IBZIP-CR06` P3 with an append-only 14-red-case precision note. Added a pure candidate manifest that binds the exact 82-period policy, raw-v2 and parsed identities, complete accession JSONL including context forms, exactly paired Form 4/4-A source receipts, exact accession URL provenance, and globally unique accessions via an 82-way bounded merge. No real data, publisher, parser-cap expansion, or authority change. | Python 3.12.14 / pytest 9.1.1: new synthetic file **64 passed**; focused policy, raw/parsed, boundary, record/active-document, and import checks **614 passed** on the code-committed tree with this record edit; incoming raw/parsed counter-review set **219 passed**. Material duplicate, TOCTOU, URL, memory, and stream failures reproduced red and restored green; two read-only hash/seal reverse mutations were caught. Targeted `compileall` exited 0; `git show --check` on `3b1e797` and the staged code diff were clean. No complete lane/repository suite. No real ZIP, XML, metadata, SEC/provider, outcome, QC, broker, or trading access; **0 looks**. | Incoming `acc1d3d`/`efc2c7d` accepted. `IB2MAN-R01`–`R06` P2/P3 fixed before code commit with red/green evidence. `IBZIP-CR06` P3 closed; historical `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, and out-of-lane `IBSH-CR01` retained. No open P0-P2 in the candidate. | Commit this record, make the round's one push, and have Claude independently review every commit in `efc2c7d..PUSHED_HEAD`; Codex then counter-reviews every Claude commit. Real-file IB-1B pilot still requires an audited schema/profile and bounded runner; matching XML/acceptance metadata remains absent. No outcome/QC/paper/live/trading authority follows. |
 | 2026-09-25 | Claude review | `b628262` -> `130e1d1` (code correction) -> `8ebba1b` (test pins) -> this review record | Independent review of the section-81 counter-review and the synthetic 82-quarter source-manifest candidate (`efc2c7d..b628262`, 2 commits, 0 merges, 4 lane-owned paths) | Verified the remote tip and clean worktree, dispositioned both commits, read the candidate against IB-1A, IB-1B, and the frozen policy, ran 28 direct and 4 combined mutants in a read-only export with bytecode caching disabled, and fed 82 quarters produced by the real IB-1A/IB-1B publish-and-load path into the builder in a scratch directory (accepted; deleted afterward). Found that the module's `urllib` import fails the lane's package import guard and replaced it with a literal regex whose verdicts match over 66 adversarial checks; pinned seven unpinned guards, one untested direction, and the loader path. Raised the deferred Form 3/A and 5/A question as an open P2 decision after reading only the two SEC readme documentation members. | Pushed tree `b628262`: complete suite **1 failed, 8,362 passed, 38 skipped** (the import guard); recorded **64**, **219**, **614** reproduce; mutation **15 of 28 caught**. Final tree `8ebba1b`: complete suite **8,372 passed, 38 skipped, 28 warnings, 0 failed in 443.68s**; lane gate **2,174 passed, 0 skipped in 35.71s**; manifest file **73 passed**; mutation **22 of 28 caught**, six survivors redundant or without effect (combined mutants C01-C04 caught); compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; no TSV row, XML, or metadata read; **0 looks**. | `IB2MAN-CR01` P2 closed in `130e1d1` (forbidden `urllib` import). `IB2MAN-CR02` P3 closed in `8ebba1b` (nine pins). `IB2MAN-CR03` P2 open, decision (Form 3/A and 5/A refused by the candidate; frozen policy names only 3 and 5). `IB2MAN-CR04` P3 open, process (lane gate not run before push). `IBZIP-CR06` closed by Codex; `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `130e1d1`, `8ebba1b`, and this record, and decides `IB2MAN-CR03` with the owner before the candidate meets any real quarter. Next real-file step remains IB-1B through the reviewed pilot runner on a bounded contiguous selection; the matching XML and acceptance-metadata bundle is still absent. No outcome, QC, paper, or trading step is inferred. |
+| 2026-09-25 | Codex counter-review + implementation | `b628262..35a1e04` reviewed; `7e61d18` owner directive/counter-review; `a2b8a9d` v2 candidate; this record commit follows | Section-82 counter-review and owner-approved retained amended-context revision | Accepted every Claude code/test commit and accepted its record after append-only unmeasured-prevalence clarification. Preserved frozen v1 and introduced an independently fingerprinted v2 policy and manifest evidence epoch that retains 3/A and 5/A verbatim as context, never candidates or signals, without requiring context source pairs. Form 4/4-A coverage and all other gates remain unchanged. Added the missed package-import guard to mandatory focused pre-push validation. | Incoming focused set **533 passed**; final focused policy v1/v2, manifest, raw/parsed, pilot contracts, record/active-document, hygiene, package guard, overlay and ML import boundaries **1,100 passed**, zero failures/skips/warnings. Both amended-form success cases failed red against v1; corrected v2 green. Eight root in-memory reversals caught, finally restored; all seven Claude guard pins independently detected their reversals. Targeted compilation and diff checks clean. No complete lane/repository suite; no real artifacts or external/operational access; **0 looks**. | `IB2MAN-CR01`/`CR02` closure accepted; `IB2MAN-CR03` corrected in the v2 candidate pending Claude review; `IB2MAN-CR04` closed by owner-approved focused guard disposition; `IB2MAN-CCR01` P3 closed append-only; draft-only `IB2CTX-R01` P2 fixed with static exact types and paired-rebinding pins. Historical P3 and out-of-lane `IBSH-CR01` retained. | Make the round's one same-lane push. Claude reviews every commit after `35a1e04` through the exact pushed head; Codex counter-reviews every Claude commit. Next source step remains the reviewed, bounded IB-1B profile/runner and explicit contiguous pilot selection. No real canonical manifest, outcome, QC, paper/live, broker, or trading authority follows. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -10983,3 +10986,133 @@ software path exercised with synthetic archives, not real corpus contents.
 No new P0 or P1 finding was found. This counter-review accepts Claude's code
 and tests; the new v2 implementation remains a separate candidate requiring
 Claude's independent review of the round's exact single pushed snapshot.
+
+## 84. Explicit retained-context v2 policy and manifest candidate (2026-09-25)
+
+Implementation: `a2b8a9dd8381677b6def10c2133ef235dc51f17e`.
+Owner-directive anchor and Codex counter-review:
+`7e61d186b39520f87318e0608463bf1a0b35cea4`, section 83. The incoming pushed
+Claude head is `35a1e042edae6e03469ecd57e06e23c4a539bae5`. Work is confined
+to the existing designated lane worktree and `codex/strategy-insider-buying`;
+no side branch or worktree was created. This is a bounded infrastructure
+candidate, not canonical IB-2 completion or research evidence of market edge.
+
+### 84.1 Implemented behavior and compatibility
+
+`sec_owner_supplied_source_policy_v2.py` adds the exact
+`CanonicalIb2SourcePolicyV2` dataclass and explicit v2 singleton, hash, version,
+and epoch exports. It inherits the 99-field frozen v1 schema, changes only six
+approved fields (version, schema, directive ID/commit/date, and context tuple),
+and adds two fields: predecessor policy SHA-256 and evidence epoch ID. All 93
+unchanged fields are checked through the exact v1 constructor and its literal
+semantic fingerprint after normalizing only those six approved differences.
+Static exact-type checks and an independent literal v2 fingerprint reject
+both ordinary drift and coherent module-constant/field rebinding.
+
+The v2 context tuple is exact `("3", "3/A", "5", "5/A")`. Original document
+types remain verbatim in the complete digest-bound accession inventory.
+Context rows never consume source pairs or enter Form 4 counts; only `4` and
+`4/A` continue to require exact one-to-one acceptance-metadata/primary-XML
+streams. Unknown and noncanonical type spellings still refuse. The existing
+digest/size/count checks, globally unique accession merge, per-quarter order,
+source provenance rules, identity rechecks, resource caps, and every candidate,
+amendment, availability, authentication, and execution gate remain intact.
+
+The manifest builder dispatches only on the exact v1 or v2 class with its own
+independently pinned expected policy hash. The final post-stream policy check
+must match that same class and hash. V1 callers keep the exact v1 policy,
+three-argument manifest constructor, payload shape, hash, and amended-context
+refusals. V2 callers get a version-2 manifest whose self-checked lineage includes
+the epoch and predecessor policy hash. Neither version can reuse the other's
+manifest hash. There is no implicit migration, relabelling, evidence pooling,
+new publisher/loader, or real canonical singleton.
+
+Identities:
+
+- frozen v1 policy:
+  `eec42a1e34b6200e0e195a6702307a5c716c10c40dbfd8e9e8095846c79e7dbe`;
+- v2 policy:
+  `556dd4f74e4fadadba69fa917758868ad955af4cbc4e8b988a98d454e599c580`;
+- v2 evidence epoch:
+  `insider-buying-ib2-source-v2-context-amendments-2026-09-25`;
+- unchanged synthetic v1 manifest fixture:
+  `b2d9c77ca2f89d286093bcd29d84af6a131db6868c8c85d308354d8c5dfb4aea`.
+
+Five explicit policy symbols and one v2 manifest-version symbol are added to
+the package facade. The original v1 module is byte-unchanged. Context admission
+does not assert authenticated provenance, XML semantics, official schema
+verification, corpus completeness, point-in-time eligibility, or an investable
+signal. Actual amended-form and affected-quarter counts remain unmeasured.
+
+### 84.2 Verification and retained P0-P3 findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix/disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB2MAN-CR03 | P2 | **CORRECTED in `a2b8a9d`; pending Claude independent review** | `3b1e797` | V1 context whitelist / v2 source boundary | Quarters containing 3/A or 5/A cannot be represented by v1. | Both synthetic amended-form success cases fail red with the exact unapproved-document-type refusal under the old v1 contract. | Owner approved retaining source context without expanding candidates. | Separate version/hash/epoch; v1 deliberately preserved. | Both amended forms green under v2; v1 still refuses them. Six-form 82-quarter inventory, context counts/digests, source pairs, and synthetic publish/load paths pinned. |
+| IB2CTX-R01 | P2 | **CLOSED before `a2b8a9d`** | draft of `a2b8a9d` | V2 constructor exact types | The first draft derived expected runtime type from a rebindable constant. A coherent same-value subclass plus constant could construct without changing canonical bytes/hash. | Restoring that assignment in memory makes the paired-subclass regression fail with `DID NOT RAISE`; this is a draft defect, not a defect in Claude's code or in the pushed candidate. | Exact typed policy contracts cannot be weakened by equal-valued subclass constants. | Use static `str`, `date`, and `tuple` expected types, plus exact tuple elements. | Eight paired-rebinding pins; 101-field changed-value/type/hash-binding matrices; corrected v2 suite green. |
+| IB2MAN-CR04 | P3, process | **CLOSED by owner-approved disposition and final guard run** | `3b1e797`, `b628262` | Focused pre-push boundary | Missed import guard previously let a package-boundary defect reach review. | Counter-review reproduced red/green. | The owner approved the focused package guard, not a complete lane-suite exception. | Section 83.3 makes the exact package guard mandatory; a lane-local record test pins the decision. Shared workflow files remain frozen. | Exact guard included in final 1,100-test set. |
+| IB2MAN-CR01, IB2MAN-CR02, IB2MAN-CCR01 | P2/P3 | **CLOSED, retained** | Claude round / `7e61d18` | Section 83 | Import correction, seven newly pinned guards, and unmeasured-prevalence clarification. | Per-commit counter-review evidence in 83.1. | Preserve supported closures and precise corpus claims. | Claude code/tests unchanged; historical record preserved append-only. | Incoming 533 tests; independent parity and all seven guard reversals. |
+| IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **RETAINED as recorded** | earlier | Earlier sections | Historical append-only lapse, unverified retrieval provenance, and stale-bytecode caveat. | Existing evidence. | No new data/provenance authority or evidence here. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | earlier | Shared coordination | Preserve Insider-only paper clause once at main integration. | Earlier record. | Out of lane; shared documents frozen. | None here. | No shared changes. |
+
+On Python 3.12.14 / pytest 9.1.1, the final focused set has **1,100 passed,
+0 failed, 0 skipped, 0 warnings**. It comprises the v1/v2 policies, source
+manifest, raw/parsed snapshots, noncanonical pilot contracts, lane record,
+active-document consistency, module hygiene, exact package-import guard,
+overlay import boundary, and ML import boundary. The final tree is rerun after
+the handoff commit; no complete lane or repository suite was run by Codex.
+
+Red/green evidence includes both amended-context successes refusing under v1,
+then succeeding under v2; the draft paired-type issue above; and eight root
+read-only reversal probes: remove v2 amendment admission (two cases), widen v1
+admission (two), mislabel v2 as v1, remove epoch metadata, bypass the independent
+v2 fingerprint under coherent epoch rebinding, and restore the draft dynamic-
+type assignment. Every expected regression was caught and patches were restored
+in `finally`-safe contexts. An initial root mutation harness used copied globals,
+so its paired-constant probe did not represent the intended mutant; that result
+was discarded and all eight probes were rerun with live module globals and
+asserted failure kinds. Independent read-only audits found no remaining new
+P0-P3 defect. These audits are not Claude's independent disposition.
+
+Targeted compilation of the lane package and changed tests exits 0. Worktree,
+staged, and per-commit whitespace checks, fixed-root/branch checks, exact
+remote-head stability, and final clean status accompany the one push.
+
+### 84.3 Review notes for Claude and next bounded step
+
+Review every commit in **`35a1e04..PUSHED_HEAD`**, not just the combined diff:
+
+1. `7e61d186b39520f87318e0608463bf1a0b35cea4`: counter-review dispositions,
+   append-only corpus precision, exact owner approval, and focused guard rule;
+2. `a2b8a9dd8381677b6def10c2133ef235dc51f17e`: v2 policy, explicit manifest
+   dispatch/epoch sealing, package exports, and regression pins;
+3. this record commit: current status, one append-only section-5 push row,
+   retained findings, verification, exclusions, and next-step gates.
+
+Claude should independently verify both policy fingerprints, v1 byte/hash
+compatibility, exact-class/hash dispatch, all inherited authority directions,
+verbatim amended context with no source pair or Form 4 count, unchanged
+Form 4/4-A coverage, refusal and TOCTOU directions, synthetic loader output,
+and mutation sensitivity. Claude performs the complete lane/repository suite
+under the standing reviewer workflow and gives each commit a disposition.
+After Claude's single same-lane push, Codex counter-reviews every Claude commit.
+
+The next source step remains the bounded noncanonical IB-1B pilot preparation:
+review/freeze its exact per-table schema and transaction keys, implement its
+bounded offline runner, and obtain explicit selection of the contiguous pilot
+window. The previously recommended `2022Q4..2023Q1` window is not silently
+approved by this context-policy decision. No real pilot or full 82-quarter
+manifest ran here. Missing matching Form 4/4-A XML and acceptance metadata
+still blocks the real canonical source manifest and later evidence stages;
+that bundle is not required merely to begin IB-1B. The shared security-master/
+calendar audit still has no authorized venue/executor, and new synthetic
+IB-3 diagnostics stay paused under section 72.5.
+
+No real artifact, TSV row, XML, metadata, SEC/EDGAR/network/provider source,
+credential, licensed row, outcome, ETF holding, QC job/upload/processing,
+broker, operator database, scheduler, paper/live deployment, capital, order,
+or trading surface was accessed. The implementation itself remains zero-I/O;
+tests use synthetic fixtures and isolated scratch artifacts only. Authorized
+and consumed outcome looks and research looks remain **0**. Shared/project-wide
+documents, `SESSION_HANDOFF.md`, and sibling lanes were not changed. No monitor
+was armed; the owner's earlier release remains in effect.

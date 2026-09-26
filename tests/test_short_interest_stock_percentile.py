@@ -1083,3 +1083,59 @@ def test_row_and_batch_payloads_reject_direct_authority_sabotage():
     forged_batch = _clone_batch(projection, production_authoritative=True)
     with pytest.raises(StockPercentileError, match="non-production"):
         forged_batch.to_payload()
+
+
+def test_percentile_row_binds_its_policy_gate_and_production_flag():
+    """Each row must name the frozen percentile policy, the SI-0M gate and stay non-production."""
+    scored = next(
+        item for item in _projection_rows() if item.role_percentile is not None
+    )
+    cases = (
+        ({"percentile_policy_sha256": "0" * 64}, "another percentile policy"),
+        ({"research_gate_sha256": "0" * 64}, "not bound to the SI-0M gate"),
+        ({"production_authoritative": True}, "must remain non-production"),
+    )
+    for changes, message in cases:
+        with pytest.raises(StockPercentileError, match=message):
+            _clone_disposition(scored, **changes).to_payload()
+
+
+def test_percentile_batch_binds_its_policy_gate_and_structural_authority():
+    """The batch must name the frozen policy, the SI-0M gate and the structural authority."""
+    projection = _projection()
+    cases = (
+        ({"percentile_policy_sha256": "0" * 64}, "another percentile policy"),
+        ({"research_gate_sha256": "0" * 64}, "not bound to the SI-0M gate"),
+        (
+            {"authority": "production_stock_percentile_batch"},
+            "wrong structural authority",
+        ),
+    )
+    for changes, message in cases:
+        with pytest.raises(StockPercentileError, match=message):
+            _clone_batch(projection, **changes).to_payload()
+
+
+def test_percentile_row_identities_are_content_bound():
+    """Slot and record identities must be recomputed, not trusted from the row."""
+    scored = next(
+        item for item in _projection_rows() if item.role_percentile is not None
+    )
+    with pytest.raises(StockPercentileError, match="wrong slot identity"):
+        _clone_disposition(scored, percentile_slot_id="0" * 64).to_payload()
+    with pytest.raises(StockPercentileError, match="wrong record identity"):
+        _clone_disposition(scored, percentile_record_id="0" * 64).to_payload()
+
+
+def test_terminal_percentile_row_cannot_be_given_a_percentile():
+    """A terminal source row must never acquire an invented percentile."""
+    rows = _projection_rows()
+    terminal = next(item for item in rows if item.role_percentile is None)
+    scored = next(item for item in rows if item.role_percentile is not None)
+    forged = _clone_disposition(
+        terminal,
+        role_percentile=scored.role_percentile,
+        pressure_percentile=scored.pressure_percentile,
+    )
+    with pytest.raises(StockPercentileError, match="cannot carry a percentile"):
+        forged.to_payload()

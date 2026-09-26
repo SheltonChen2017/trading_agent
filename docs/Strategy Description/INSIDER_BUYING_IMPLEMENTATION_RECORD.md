@@ -1,18 +1,21 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX ACCEPTED BOTH CLAUDE COMMITS `f040c6c..a507c4c` (SECTION 86).
-THE OWNER SELECTED EXACTLY 2022Q4 THROUGH 2023Q1 FOR BOUNDED NONCANONICAL
-IB-1B PREPARATION. SECTION 87 RECORDS THE PINNED NINE-VARIANT OBSERVED-HEADER
-PROFILE AND OFFLINE IB-1A/IB-1B RUNNER CANDIDATE, PENDING CLAUDE REVIEW.
-NO REAL FILING ROW WAS PROCESSED THIS ROUND; ONLY SELECTED TSV HEADER LINES,
-ZIP DIRECTORY METADATA, AND TWO EXISTING INTAKE RECEIPTS WERE INSPECTED.
-REAL ROW VALIDITY, KEY UNIQUENESS, AND AMENDED-FORM PREVALENCE ARE UNMEASURED.
-TIMESTAMPS REMAIN UNVERIFIED FILESYSTEM OBSERVATIONS, NOT RETRIEVAL EVIDENCE.
-CLAUDE REVIEWS THE EXACT PUSHED PREPARATION NEXT; CODEX COUNTER-REVIEWS EACH
-CLAUDE COMMIT BEFORE REAL PILOT PROCESSING. XML AND ACCEPTANCE METADATA STILL
-BLOCK REAL STAGES BEYOND IB-1B. IB-3 DIAGNOSTICS STAY PAUSED. NO NETWORK,
-PROVIDER, OUTCOME, QC, BROKER, DEPLOYMENT, CAPITAL, OR TRADING AUTHORITY
-IS ADDED; ALL LOOK COUNTERS REMAIN ZERO.**
+Status: **CLAUDE REVIEWED CODEX COMMITS `a507c4c..5f61b45` (SECTION 88).
+`267463c` AND `5f61b45` ARE ACCEPTED; `84017e1` (TWO-QUARTER IB-1B PILOT
+PROFILE AND RUNNER) IS ACCEPTED AFTER CORRECTION, WITH ONE P2 OPEN. THE
+PROFILE MATCHES ALL SIXTEEN REAL HEADER LINES AND BOTH ARCHIVE RECEIPTS
+EXACTLY (READ: ZIP DIRECTORIES AND FIRST LINES ONLY). P2 `IB1BP-CR01`, AN
+OUTPUT-CONTAINMENT BYPASS THROUGH A CASE-VARIANT PATH ON THIS MAC, IS FIXED
+IN `be83183`; P3 `IB1BP-CR03`, SIX UNPINNED RUNNER GUARDS, IS PINNED IN
+`c298a95`. OPEN P2 `IB1BP-CR02`: THE NEW SCRIPT IS NOT REGISTERED IN THE
+SHARED `architecture/entry_points.json`, SO THE COMPLETE SUITE FAILS TWO
+TESTS ON BOTH THE PUSHED AND THE FINAL TREE (FINAL: 2 FAILED, 8,877 PASSED,
+38 SKIPPED); THE OWNER MUST CHOOSE BETWEEN A SHARED-MANIFEST ENTRY AND
+MOVING THE RUNNER INTO THE LANE PACKAGE. LANE GATE 2,681 PASSED. THE REAL
+PILOT WAS NOT RUN AND SHOULD WAIT FOR A GREEN COMPLETE SUITE. CODEX
+COUNTER-REVIEW OF `be83183`, `c298a95`, AND THIS RECORD IS NEXT. NO OUTCOME,
+QC, PAPER, LIVE, DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS
+OPENED; ALL LOOK COUNTERS REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -194,6 +197,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-25 | Codex counter-review + implementation | `b628262..35a1e04` reviewed; `7e61d18` owner directive/counter-review; `a2b8a9d` v2 candidate; this record commit follows | Section-82 counter-review and owner-approved retained amended-context revision | Accepted every Claude code/test commit and accepted its record after append-only unmeasured-prevalence clarification. Preserved frozen v1 and introduced an independently fingerprinted v2 policy and manifest evidence epoch that retains 3/A and 5/A verbatim as context, never candidates or signals, without requiring context source pairs. Form 4/4-A coverage and all other gates remain unchanged. Added the missed package-import guard to mandatory focused pre-push validation. | Incoming focused set **533 passed**; final focused policy v1/v2, manifest, raw/parsed, pilot contracts, record/active-document, hygiene, package guard, overlay and ML import boundaries **1,100 passed**, zero failures/skips/warnings. Both amended-form success cases failed red against v1; corrected v2 green. Eight root in-memory reversals caught, finally restored; all seven Claude guard pins independently detected their reversals. Targeted compilation and diff checks clean. No complete lane/repository suite; no real artifacts or external/operational access; **0 looks**. | `IB2MAN-CR01`/`CR02` closure accepted; `IB2MAN-CR03` corrected in the v2 candidate pending Claude review; `IB2MAN-CR04` closed by owner-approved focused guard disposition; `IB2MAN-CCR01` P3 closed append-only; draft-only `IB2CTX-R01` P2 fixed with static exact types and paired-rebinding pins. Historical P3 and out-of-lane `IBSH-CR01` retained. | Make the round's one same-lane push. Claude reviews every commit after `35a1e04` through the exact pushed head; Codex counter-reviews every Claude commit. Next source step remains the reviewed, bounded IB-1B profile/runner and explicit contiguous pilot selection. No real canonical manifest, outcome, QC, paper/live, broker, or trading authority follows. |
 | 2026-09-26 | Claude review | `f040c6c` -> `2e29993` (test pins) -> this review record | Independent review of the section-83 counter-review and the owner-approved v2 retained-context policy and manifest epoch (`35a1e04..f040c6c`, 3 commits, 0 merges, 7 lane-owned paths) | Verified the remote tip and clean worktree, dispositioned all three commits, read the v2 constructor and the manifest dispatch against v1, confirmed the v1 module is byte-unchanged and its manifest fixture hash stable, recomputed the v2 hash independently, checked that no consumer uses isinstance on either policy class, and ran 18 direct and 2 combined mutants in a read-only export with bytecode caching disabled. Pinned the version resolver's foreign-hash refusal and the final exact-type recheck. Accepted `IB2MAN-CCR01` against this reviewer. No real byte read. | Pushed tree `f040c6c`: complete suite **8,732 passed, 38 skipped, 28 warnings, 0 failed in 474.08s**; recorded **1,100** reproduces, **325** and **107** per new file, 533 on the incoming tree is 567 on the final tree; mutation **14 of 18 caught**. Final tree `2e29993`: lane gate **2,536 passed, 0 skipped in 42.03s**; manifest file **109 passed**; mutation **16 of 18 caught**, both survivors redundant (C1, C2 caught); compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB2MAN-CR03` P2 closed in `a2b8a9d` for the candidate. `IB2CTX-CR01` P3 closed in `2e29993` (two unpinned dispatch guards). `IB2CTX-CR02` P3 open, observation (a test pins record prose). `IB2MAN-CCR01` accepted against this reviewer; `IB2MAN-CR04` closed by owner disposition; `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `2e29993` and this record. Next source step: bounded IB-1B pilot preparation (reviewed schema profile and keys, bounded runner, owner-selected contiguous window). Matching XML and acceptance-metadata bundle still absent. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-26 | Codex counter-review + implementation | `f040c6c..a507c4c` reviewed; `267463c` owner decision; `84017e1` preparation; this record commit follows | Owner-selected 2022Q4–2023Q1 noncanonical IB-1B preparation | Accepted both Claude commits. Pinned nine observed-header variants and two ZIP/header receipt inventories. Added explicit bounded offline IB-1A/IB-1B script composition, sequential replay, scalar zero-authority operational report, and synthetic integration/refusal tests. No real row processing; original filesystem timestamps remain unverified. | Incoming 746 passed; final focused 999 passed, 0 failed/skipped/warnings; new profile 105 and runner 32 passed. Five profile reversals and three publication/cleanup reversals caught; root independently repeated both fingerprint reversals. Compileall 0, CLI help 0, diff checks clean. No complete lane/repository suite; header-only reconnaissance plus synthetic tests; 0 looks. | Draft-only IB1BP-R01 P2 corrected before `84017e1`; IB1BP-R02 P3 optional incomplete reader removed before commit. IB2CTX-CR01 closed and accepted; IB2CTX-CR02 observation open; historical P3 and shared IBSH-CR01 retained. No open P0–P2. | One same-lane push; Claude reviews every commit in `a507c4c..PUSHED_HEAD`, then Codex counter-reviews every Claude commit before real IB-1B processing. Matching XML/acceptance metadata still blocks later real stages; no outcome/QC/paper/live/trading step inferred. |
+| 2026-09-26 | Claude review | `5f61b45` -> `be83183` (code correction) -> `c298a95` (test pins) -> this review record | Independent review of the section-86 counter-review and the owner-selected two-quarter IB-1B pilot preparation (`a507c4c..5f61b45`, 3 commits, 0 merges, 5 lane-owned paths) | Verified the remote tip and clean worktree, dispositioned all three commits, checked the profile's sixteen header receipts and two archive bindings against the real ZIPs (directories and first lines only, plus whole-archive SHA-256), read the runner's order of operations, and ran 38 mutants in read-only exports with bytecode caching disabled. Found and fixed a case-variant path alias that bypassed output containment on this Mac (demonstrated: the unfixed runner published a full synthetic pilot inside the repository), pinned six untested runner guards, and found that the unregistered script fails the project's script-classification tests. Did not run the real pilot. | Pushed tree `5f61b45`: complete suite **2 failed, 8,869 passed, 38 skipped in 595.84s** (script classification; reproduced in a clean export, green on `a507c4c`); recorded **105**, **32**, **746**, **999** reproduce (export: 743 and 996 plus 3 git-dependent skips); fingerprints recompute; real headers **16 of 16** and archives **2 of 2** match; mutation profile **9 of 9**, runner **15 of 29**. Final tree `c298a95`: complete suite **2 failed (same), 8,877 passed, 38 skipped in 503.27s**; lane gate **2,681 passed, 0 skipped in 40.13s**; runner mutation **21 of 29**, eight survivors classified; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; no filing row read; **0 looks**. | `IB1BP-CR01` P2 closed in `be83183` (case-variant containment bypass). `IB1BP-CR02` P2 open, owner decision (unregistered script; complete suite red). `IB1BP-CR03` P3 closed in `c298a95` (six pins). `IB2CTX-CR02`, `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `be83183`, `c298a95`, and this record; confirms `fromisoformat` truncation of the seven-digit stamp on Python 3.12.14; resolves `IB1BP-CR02` once the owner chooses a shared-manifest entry or relocation. The real IB-1B pilot on 2022Q4..2023Q1 waits for a green complete suite. No outcome, QC, paper, or trading step is inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -11492,3 +11496,191 @@ reconnaissance is described in 86.2; all implementation tests use synthetic
 bytes and isolated scratch paths. Authorized and consumed outcome looks and
 research looks remain **0**. No shared/project-wide document or sibling lane
 was changed; no monitor was armed.
+
+## 88. Claude review - the two-quarter IB-1B pilot preparation and the section-86 counter-review (2026-09-26 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying` (owner's Mac, Python 3.13.15, pytest 9.1.1).
+No branch, worktree, fork, or handoff was created or switched to. After
+`git fetch`, the local branch and the remote tip were both exactly
+`5f61b459bfe788548776261acc3aefbc754cdbc2` and the worktree was clean.
+
+Range: `a507c4c..5f61b45`, three commits, zero merges, five lane-owned
+paths: `267463c` (section 86), `84017e1` (new
+`research/insider_buying/sec_ib1b_pilot_profile.py`, new
+`scripts/insider_buying_ib1b_pilot.py`, and their two test modules), and
+`5f61b45` (section 87, status, ledger row). Mutation runs used read-only
+`git archive` exports without `artifacts/`, with `python -B`,
+`PYTHONDONTWRITEBYTECODE=1`, and a cache purge before every mutant.
+
+Authority: section 86.2 quotes the owner approving "2022Q4 through 2023Q1"
+for bounded, noncanonical IB-1B preparation ("yes approved for now"). This
+reviewer did not witness it; it is the window decision this reviewer said in
+section 85.5 the owner still had to make, and the owner's instruction to
+review this push is consistent with it. The pilot runner was **not** invoked
+on real data by this review. Real bytes read by this review: the ZIP
+directories and the first line of each of the sixteen TSV members in the two
+selected archives, plus the two whole archives for SHA-256 recomputation,
+to check Codex's header and archive receipts against the files. No filing
+row, auxiliary member, XML, or metadata was read.
+
+### 88.1 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `267463c` | Section 86: counter-review of `2e29993` and `a507c4c`; owner-selected window | **Accepted.** Both dispositions are fair; `IB2CTX-CR02` is retained as this reviewer recorded it. The window is recorded narrowly as preparation for exactly two quarters, not the corpus or a later milestone. |
+| `84017e1` | Observed-header profile, fixed archive receipts, offline runner, synthetic tests | **Accepted after correction and with one open P2.** The profile is exact against the real files (88.3). The runner's output-containment check could be bypassed through a case-variant alias on this Mac (`IB1BP-CR01`, fixed in `be83183`); six runner guards had no test sensitivity (`IB1BP-CR03`, pinned in `c298a95`); and the new script is not registered in the project's script-ownership manifest, so the pushed tree fails the complete suite (`IB1BP-CR02`, open, needs an owner decision because the fix touches a shared registry or moves the script). |
+| `5f61b45` | Section 87, status, ledger row | **Accepted.** 105, 32, 746, and 999 reproduce; both fingerprints recompute. It honestly records the limits: header-only reconnaissance, unmeasured row validity and key uniqueness, non-transactional whole-pilot publication, no RSS guarantee, Windows unvalidated, and unverified timestamps. It did not run the complete suite, which is how `IB1BP-CR02` reached review. |
+
+Implementation quality of `84017e1`: **7 of 10**. Strengths: the profile
+matches all sixteen real header lines byte for byte and both archive
+receipts match the recomputed files and the intake manifest; exact types and
+two independent literal fingerprints; only the two transaction tables claim
+keys; forms are counted verbatim with an OTHER bucket; both archives are
+preflighted before any output is created and reread for execution; stage
+outputs are replayed through the existing IB-1A and IB-1B loaders; the
+report is descriptor-anchored, exclusive, and content-addressed; the zero-
+authority payload is reused; and every limitation above is stated rather
+than hidden. Deductions: the pushed tree fails the complete suite for the
+second consecutive round, the stated "outside the repository" rule failed
+open on the platform the pilot will run on, and the runner's own tests
+caught 15 of 29 guard mutants.
+
+### 88.2 Code review
+
+- The profile module is pure: nine `SecTsvSchemaVariant`s (one SUBMISSION
+  per quarter, `AFF10B5ONE` appended in 2023Q1; seven shared tables), the
+  verbatim SEC spelling `EXCERCISE_DATE` in DERIV_TRANS, keys only on
+  `NONDERIV_TRANS_SK` and `DERIV_TRANS_SK`, validity exactly 2022Q4 to
+  2023Q1. Receipts rebuild each header line as tab-joined ASCII plus LF and
+  check its size and hash; bindings pin URL, commit, the verbatim
+  seven-digit stamp, `source_provenance_verified is False`, and eight
+  receipts.
+- The runner's public entry takes no source, profile, or synthetic
+  override; it requires the review acknowledgement flag, recomputes and
+  verifies the literal bindings, and calls the private core with
+  `_approved=True`. The private core is reachable only by import, as the
+  record says.
+- Order of operations: parser commit, profile fingerprint, window, platform
+  capability, root validation, preflight of both archives (hash, size,
+  eight receipts, ZIP directory sizes, receipt headers against the profile,
+  physical header lines), root re-validation, output creation, an exclusive
+  marker, then per quarter: reread and recheck, IB-1A publish, IB-1A replay,
+  IB-1B parse, IB-1B replay and completeness, scalar report; finally profile
+  and binding rechecks and the report publication.
+- `SecBulkSource.retrieved_at` receives `datetime.fromisoformat` of the
+  seven-digit stamp. On Python 3.13.15 this truncates to six digits
+  (`...37.384448`), which matches the snapshot IDs this reviewer derived in
+  section 80.3. Codex runs 3.12.14; this reviewer could not check that
+  interpreter here. If it rounded instead, IB-1A snapshot IDs would differ
+  by host. Codex should confirm in its counter-review.
+- The runner imports the private `_read_regular_bytes` from
+  `sec_bulk_snapshot`. It reuses a reviewed hardened reader rather than
+  duplicating it, so this is a note, not a finding.
+
+### 88.3 Real-file verification of the receipts
+
+For both selected archives this review recomputed the whole-archive SHA-256
+and size, compared URL, capture commit, and stamp with the intake manifest,
+and for each of the eight TSV members read the ZIP directory entry and at
+most the first 4 KiB, taking only the first physical line:
+
+- 2022Q4 and 2023Q1: archive hash and size **match** the bindings and the
+  manifest; URL, commit, and stamp **match**.
+- All sixteen header lines: tab-split columns **equal** the profile variant
+  and the receipt; line hash and size **match**; every line is LF-terminated
+  with no CR and no BOM; every directory `file_size` **equals** the
+  receipt's expanded size. Expanded totals 51,839,037 and 90,806,476 bytes,
+  as recorded.
+
+This proves the preparation matches the real headers. It says nothing about
+whether the rows parse, fit the row, field, and artifact caps, or have
+unique transaction keys; that is what the pilot will measure.
+
+### 88.4 Claims reproduced and validation
+
+- Recorded counts on the pushed tree: profile **105**, runner **32**; the
+  746 and 999 sets reproduce as 743 and 996 passed plus 3 skipped in a
+  `.git`-less export, the 3 being git-dependent active-document checks.
+  Both fingerprints recompute with plain standard-library JSON and SHA-256.
+- Complete repository suite on `5f61b45` in the worktree: **2 failed, 8,869
+  passed, 38 skipped, 28 warnings in 595.84s**. Both failures are in
+  `tests/test_project_separation_entrypoints.py`
+  (`test_every_script_is_classified_exactly_once` and
+  `test_sep2_definition_of_done_is_reconstructed_not_self_asserted`), fail
+  identically in a clean export of `5f61b45`, and pass on the parent
+  `a507c4c` (26 passed): `IB1BP-CR02`. This reviewer edited two files in
+  the worktree while that run was in progress; the collected code was the
+  pushed code, and the export reproduction confirms the two failures do not
+  depend on the edit.
+- Mutation, 38 faithful mutants: 29 on the runner, 9 on the profile.
+  Profile: **9 of 9 caught**. Runner on the pushed tree: **15 of 29
+  caught**. After `c298a95`: **21 of 29 caught**; the eight survivors are
+  classified below.
+
+| Mutant | Guard neutralised | Pushed tree | After `c298a95` |
+|---|---|---|---|
+| R01-R04 | review flag, parser commit, window, archive hash/size | caught | caught |
+| R05 | receipt canonical order | survived | survived: redundant with the literal binding fingerprint on the public path |
+| R06 | expanded-size budget in preflight | **survived** | caught |
+| R07 | receipt headers against the profile | survived | survived: redundant with the physical header check, which compares the file with the profile |
+| R08 | ZIP directory size against the receipt | caught | caught |
+| R09 | physical header line in preflight | **survived** | caught |
+| R10, R11 | IB-1A replay identity; IB-1B replay and completeness | survived | survived: no observable effect with honest stages; the loaders rebuild the identities they are compared with |
+| R12 | absent-tables refusal alone | survived | survived: redundant with the preflight's eight-table requirement |
+| R13 | post-run binding digest recheck | **survived** | caught |
+| R14 | final approved-binding verification | survived | survived: reachable only with the real archives; redundant with R13 |
+| R15-R20 | public binding check, no-overwrite, overlap, identity overlap (`be83183`), redirect, capability | caught | caught |
+| R21 | root identity before link | survived | survived: redundant with the post-link check R22 |
+| R22 | root identity after link | caught | caught |
+| R23 | temporary identity before link | survived | survived: concurrency guard, not pinned |
+| R24 | published file identity | **survived** | caught |
+| R25 | foreign marker preserved | caught | caught |
+| R26 | report byte cap | **survived** | caught |
+| R27 | OTHER form bucket | caught | caught |
+| R28 | root re-validation after preflight | **survived** | caught |
+| R29 | exclusive marker claim | survived | survived: concurrency guard, not pinned; R28 covers the non-racing case |
+| F01-F09 | profile and binding fingerprints, receipt line, unverified provenance, nested exact types, stamp shape, eight receipts, size order, recheck | caught | caught |
+
+- Final code tree `c298a95`: profile and runner **145 passed** (105 plus
+  32 plus 8); lane gate (19 Insider files plus active-document, module-hygiene,
+  overlay-import, and ML-import boundaries) **2,681 passed, 0 skipped in
+  40.13s**; complete repository suite **2 failed, 8,877 passed, 38 skipped,
+  28 warnings in 503.27s**, the same two `IB1BP-CR02` failures and
+  otherwise 8,869 plus the 8 new tests; `compileall` exit 0; `git diff
+  --check` clean; `git show --check` clean for all three reviewed commits.
+
+### 88.5 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1BP-CR01 | P2 | **CLOSED in `be83183`** | `84017e1` | `scripts/insider_buying_ib1b_pilot.py`, `_overlap` | The rule that the output root may not overlap the inputs or the repository compared path spellings only. macOS volumes are case-insensitive by default, so `/.../TRADING_AGENT__INSIDER_BUYING/out` names a directory inside this worktree but passed the check. The unfixed runner then ran the complete synthetic pilot and published its IB-1A and IB-1B snapshots and report inside the repository. On the real pilot that would put hundreds of megabytes of parsed filing rows into the worktree. | `_validate_roots` accepted the case-variant repository path on this Mac; in an export, the new test's red run left `ib1a/`, `ib1b/`, and a report under the aliased repository root. | The same containment property Codex closed for symlink redirects in `IB1BP-R01`, on the platform the pilot is meant to run on. | Keep the spelling comparison and also compare device and inode of each root against every existing ancestor-or-self of the other. Error message unchanged. | New test, parametrised over an input alias and a repository alias, fails on `5f61b45` and passes on `be83183`; it skips on a case-sensitive filesystem. Runner and profile files 139 passed at that commit; mutant R18 (the new check removed) is caught. |
+| IB1BP-CR02 | P2 | **OPEN; needs an owner decision; not fixed** | `84017e1` | `scripts/insider_buying_ib1b_pilot.py`; `architecture/entry_points.json`; `tests/test_project_separation_entrypoints.py` | The project requires every file under `scripts/` to be classified exactly once in `architecture/entry_points.json` (trading assistant, strategy research, or cross-product composition). The new runner is not classified, so the pushed tree fails the complete suite with two failures. The Insider lane gate does not include this test, and Codex ran only focused sets, so this is the second consecutive round in which the pushed tree failed the complete suite (`IB2MAN-CR01` was the first). | 88.4: red on `5f61b45` in the worktree and in a clean export; green on `a507c4c`. | A red complete suite hides any later regression and blocks integration. | Not corrected: `architecture/entry_points.json` is a project-wide registry, and the parallel-lane workflow requires the owner to coordinate any shared-file change. Two ways out, both small: (a) the owner authorizes adding `scripts/insider_buying_ib1b_pilot.py` to `strategy_research` in that manifest on this lane; or (b) Codex moves the runner into the lane package (for example `research/insider_buying/`) with its CLI, which needs no shared edit but must then pass that package's import guard. | Red until one is chosen. |
+| IB1BP-CR03 | P3 | **CLOSED in `c298a95`** (test only) | `84017e1` | `tests/test_insider_buying_ib1b_pilot_runner.py` | Six runner guards had no test sensitivity: the physical-header and expanded-size preflight refusals (without them IB-1B refuses later, after IB-1A output already exists, or succeeds past the runner's own budget), root re-validation after preflight (a foreign file appearing during preflight was adopted), the post-run binding digest recheck, the report byte cap, and the published-file identity check. | Mutants R06, R09, R13, R24, R26, R28 survived on the pushed tree. | These are the guards that make "refuse before output" and "publish only the complete report" true. The module is correct on all six. | Six tests: swapped header columns with a profile-consistent receipt refuse before any output exists; a lowered runner budget refuses before any output; a foreign file written during preflight is refused and preserved; a binding mutated after the first quarter refuses without a report; a 1 KiB report cap refuses without a report or temporary; a substituted link target refuses. No module change. | All six mutants now caught; 21 of 29 runner mutants overall, eight survivors classified in 88.4. |
+| IB2CTX-CR02 | P3 | **OPEN, non-blocking, retained** | `a507c4c` | Record-prose test | As recorded in 85.4 and 86.1. | Sections 85-87. | Unchanged. | None. | None new. |
+| IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **Retained as recorded** | earlier | earlier | Historical rewrite; unverified retrieval route (the pilot reports keep the stamps labelled unverified); bounded stale-bytecode caveat. | Sections 78-87. | Unchanged. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. | Sections 68-72. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no P0 or P1 finding. One P2 is closed in code and one P2 is open
+pending the owner's choice.
+
+### 88.6 Next action
+
+Codex counter-reviews every Claude commit after `5f61b45` (`be83183`,
+`c298a95`, and this record commit), confirms on Python 3.12.14 how
+`fromisoformat` treats the seven-digit stamp, and resolves `IB1BP-CR02`
+once the owner chooses (a) or (b). The first real IB-1B pilot run on
+2022Q4..2023Q1 should wait until the complete suite is green again, so the
+preparation it runs on is the reviewed one. That run will give the first
+measured row counts, key-uniqueness refusals, resource use, and amended-form
+counts. The matching Form 4/4-A XML and acceptance metadata are still
+absent, so nothing past IB-1B can run on real data. The shared
+security-master and calendar audit still has no venue or executor; IB-3
+diagnostics stay paused. No outcome, ETF, QC, paper, live, deployment,
+broker, capital, order, or trading authority follows from this section.
+
+No SEC, EDGAR, network, vendor, provider, credential, licensed row,
+security master, outcome, ETF holding, QuantConnect, broker, operator
+database, scheduler, deployment, capital, order, live, or trading surface
+was accessed. Real bytes read are listed in the preamble. Authorized
+outcome looks: **0**. Consumed outcome looks: **0**. Research looks: **0**.

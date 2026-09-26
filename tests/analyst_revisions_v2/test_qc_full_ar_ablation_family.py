@@ -85,3 +85,19 @@ def test_total_ar_comparison_refuses_changed_prospective_protocol(comparison, mo
         "cost_bps_per_side": "0"}})
     with pytest.raises(ValueError, match="protocol"):
         script.compare_cached()
+
+
+@pytest.mark.parametrize("difference", ("coverage", "refusals", "callbacks", "unavailable"))
+def test_total_ar_comparison_requires_common_non_ar_coverage_and_census(comparison, difference):
+    arms, _ = comparison
+    aggregate = arms["R224"]["aggregates"]
+    if difference == "coverage":
+        aggregate["sleeve_diagnostics"]["rows"][0][3] -= 1
+    elif difference == "refusals":
+        aggregate["sleeve_diagnostics"]["rows"][0][10] = {"MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM": 1}
+    elif difference == "callbacks":
+        aggregate["pit_callback_source_row_count"] += 1
+    else:
+        aggregate["constituent_collection_unavailable_universe_counts"]["QQQ"] += 1
+    with pytest.raises(ValueError, match="coverage|census"):
+        script.compare_cached()

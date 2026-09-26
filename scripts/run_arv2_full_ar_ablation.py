@@ -88,6 +88,15 @@ def compare_cached():
     for key in ("observation_count", "first_observation_session", "last_observation_session", "starting_equity"):
         if off["aggregates"]["account"][key] != on["aggregates"]["account"][key]:
             raise ValueError("full AR comparison account observations differ")
+    common_census = ("pit_callback_source_row_count", "reference_history_call_count",
+        "fundamental_snapshot_unavailable_decision_count", "constituent_collection_unavailable_decision_count",
+        "constituent_collection_unavailable_universe_counts")
+    if any(off["aggregates"][key] != on["aggregates"][key] for key in common_census):
+        raise ValueError("full AR comparison non-AR source census differs")
+    off_rows = off["aggregates"]["sleeve_diagnostics"]["rows"]
+    on_rows = on["aggregates"]["sleeve_diagnostics"]["rows"]
+    if any(left[:5] != right[:5] or left[10] != right[10] for left, right in zip(off_rows, on_rows)):
+        raise ValueError("full AR comparison non-AR coverage differs")
     # Entry/count removal intentionally changes stock targets, fallback counts,
     # baseline profiles and paths. Equality there is not required for ablation.
     with localcontext() as context:

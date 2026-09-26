@@ -26722,3 +26722,20 @@ reader is shared with the old comparison without weakening its identity checks.
 No outcome observed at this freeze; pre-launch floor remains 220 shared /
 161 development / 34 infrastructure / 642 authenticated exploratory cells.
 Results, validation and exact review handoff follow after the runs.
+
+### 195.2 Comparison qualification corrected before paired reporting
+
+`ARV2D195-001` **P2, confirmed and corrected**: at prospective `8cc7e7c`,
+the full-AR comparator authenticated both exact cached arms and common account
+geometry but did not require common non-AR coverage/callback census. A QC
+data-vintage change could therefore pass a total-AR comparison despite changed
+coverage, even though the modes should differ only in AR economics. Four
+isolated altered coverage/refusal/callback/unavailable-universe cases all
+fail red on the original comparator (did not raise); the correction requires
+matching coverage counts/reasons and non-AR input-collection counts, while
+allowing intentionally different positive-score diagnostics, stock counts,
+fallback weights and target paths. No cloud source, profile, strategy or run
+is changed, no result read repeated and no new research look incurred.
+Corrected before reading/reporting the paired R224 outcome. Common census
+does not establish a price-series digest or remove accepted-risk PIT/vintage
+limitations; these remain explicitly open.

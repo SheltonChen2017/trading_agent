@@ -382,7 +382,12 @@ def leverage_plan_qqq(monkeypatch, tmp_path):
     )
 
 
-@pytest.fixture(params=six_universe_evaluator.PROFILE_IDS)
+@pytest.fixture(
+    params=(
+        six_universe_evaluator.TOP10_PRIMARY_PROFILE.profile_id,
+        six_universe_evaluator.TOP5_SENSITIVITY_PROFILE.profile_id,
+    )
+)
 def six_universe_plan(request, monkeypatch, tmp_path):
     return _build_plan(monkeypatch, tmp_path, request.param)
 
@@ -3910,6 +3915,42 @@ def test_six_universe_projection_is_exact_and_qc_prelude_safe(six_universe_plan)
     assert "AcceptedRiskSixUniverseGateQcDriver" in main
     assert "('SPY', 'QQQ', 'SOXX', 'XLV', 'REMX', 'XLE')" in main
     assert "profile_id=" + repr(projection.evaluation_profile_id) in main
+
+
+def test_exploratory_six_universe_profile_preserves_legacy_submission_specs():
+    assert six_universe_evaluator.PROFILE_IDS == (
+        six_universe_evaluator.TOP10_PRIMARY_PROFILE.profile_id,
+        six_universe_evaluator.TOP5_SENSITIVITY_PROFILE.profile_id,
+        six_universe_evaluator.TOP10_CAP95_EXPLORATORY_PROFILE.profile_id,
+        six_universe_evaluator.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id,
+    )
+    assert adapter._six_universe_contract_bindings_are_current()
+    assert (
+        adapter._run_spec(
+            six_universe_evaluator.TOP10_PRIMARY_PROFILE.profile_id
+        ).ledger_entry_id
+        == "R-121"
+    )
+    assert (
+        adapter._run_spec(
+            six_universe_evaluator.TOP5_SENSITIVITY_PROFILE.profile_id
+        ).ledger_entry_id
+        == "R-122"
+    )
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="not allowlisted",
+    ):
+        adapter._run_spec(
+            six_universe_evaluator.TOP10_CAP95_EXPLORATORY_PROFILE.profile_id
+        )
+    with pytest.raises(
+        adapter.AcceptedRiskPreliminarySubmissionError,
+        match="not allowlisted",
+    ):
+        adapter._run_spec(
+            six_universe_evaluator.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id
+        )
 
 
 def test_six_universe_profiles_have_exact_run_specs_and_result_inventory(

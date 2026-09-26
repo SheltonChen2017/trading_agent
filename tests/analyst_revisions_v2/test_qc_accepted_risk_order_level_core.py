@@ -831,3 +831,22 @@ def test_nonterminal_order_refuses_closed_lifecycle_summary():
         plan, (partial,), require_all_terminal=False
     )
     assert open_summary.fill_event_count == 1
+
+
+def test_weekly_decision_axis_requires_the_execution_session_to_be_the_next_session():
+    """ARV2R150: the execution session must be exactly the session after the cutoff."""
+
+    axis = ("2026-01-02", "2026-01-05", "2026-01-06", "2026-01-07", "2026-01-08")
+
+    decisions, start, cutoff, final = core.weekly_decision_axis(
+        axis, "2026-01-02", "2026-01-06", "2026-01-07", core.OrderLevelBacktestError
+    )
+    assert decisions == ("2026-01-02", "2026-01-05", "2026-01-06")
+    assert (start, cutoff, final) == (0, 2, 3)
+
+    with pytest.raises(
+        core.OrderLevelBacktestError, match="exact next execution session"
+    ):
+        core.weekly_decision_axis(
+            axis, "2026-01-02", "2026-01-06", "2026-01-08", core.OrderLevelBacktestError
+        )

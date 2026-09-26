@@ -268,7 +268,18 @@ def _build_profile(gate_profile):
 
 TOP10_PRIMARY_PROFILE = _build_profile(_gate.TOP10_PRIMARY_PROFILE)
 TOP5_SENSITIVITY_PROFILE = _build_profile(_gate.TOP5_SENSITIVITY_PROFILE)
-PROFILES = (TOP10_PRIMARY_PROFILE, TOP5_SENSITIVITY_PROFILE)
+TOP10_CAP95_EXPLORATORY_PROFILE = _build_profile(
+    _gate.TOP10_CAP95_EXPLORATORY_PROFILE
+)
+TOP10_CAP90_EXPLORATORY_PROFILE = _build_profile(
+    _gate.TOP10_CAP90_EXPLORATORY_PROFILE
+)
+PROFILES = (
+    TOP10_PRIMARY_PROFILE,
+    TOP5_SENSITIVITY_PROFILE,
+    TOP10_CAP95_EXPLORATORY_PROFILE,
+    TOP10_CAP90_EXPLORATORY_PROFILE,
+)
 PROFILE_IDS = tuple(item.profile_id for item in PROFILES)
 
 
@@ -1196,6 +1207,8 @@ __all__ = (
     "SixUniverseGateEvaluationError",
     "SixUniverseGateEvaluationRuntime",
     "TOP10_PRIMARY_PROFILE",
+    "TOP10_CAP95_EXPLORATORY_PROFILE",
+    "TOP10_CAP90_EXPLORATORY_PROFILE",
     "TOP5_SENSITIVITY_PROFILE",
     "decision_sessions_for_input",
     "expected_custom_summary_statistic_names",

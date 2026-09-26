@@ -1,4 +1,4 @@
-"""Exact, backtest-only QC source projection for QQQ order-level runs.
+"""Exact, backtest-only QC source projection for ETF order-level runs.
 
 The projected runtime may submit simulated ``MarketOnOpenOrder`` requests
 inside a QuantConnect backtest.  The source firewall rejects every other
@@ -25,6 +25,13 @@ from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_qqq_order_level_qc_runtime as runtime_builder
 from . import accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime_builder
 from . import accepted_risk_qqq_order_level_v13_qc_runtime as v13_runtime_builder
+from . import accepted_risk_qqq_order_level_v14_qc_runtime as v14_runtime_builder
+from . import accepted_risk_qqq_order_level_v15_qc_runtime as v15_runtime_builder
+from . import accepted_risk_qqq_order_level_v16_qc_runtime as v16_runtime_builder
+from . import accepted_risk_qqq_order_level_v17_qc_runtime as v17_runtime_builder
+from . import accepted_risk_qqq_order_level_v18_qc_runtime as v18_runtime_builder
+from . import accepted_risk_qqq_order_level_v19_qc_runtime as v19_runtime_builder
+from . import accepted_risk_spy_order_level_v1_qc_runtime as spy_runtime_builder
 
 
 class AcceptedRiskOrderLevelQcProjectionError(ValueError):
@@ -37,6 +44,16 @@ MAIN_PROJECT_PATH = "main.py"
 RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_qc_runtime.py"
 V12_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v12_qc_runtime.py"
 V13_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v13_qc_runtime.py"
+V14_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v14_qc_runtime.py"
+V15_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v15_qc_runtime.py"
+V16_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v16_qc_runtime.py"
+V17_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v17_qc_runtime.py"
+V18_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v18_qc_runtime.py"
+V19_RUNTIME_PROJECT_PATH = "accepted_risk_qqq_order_level_v19_qc_runtime.py"
+UNIVERSE_BENCHMARK_PROJECT_PATH = (
+    "accepted_risk_order_level_universe_benchmark.py"
+)
+SPY_RUNTIME_PROJECT_PATH = "accepted_risk_spy_order_level_v1_qc_runtime.py"
 FORCED_EXIT_PROJECT_PATH = "accepted_risk_order_level_forced_exit.py"
 MAX_SOURCE_FILE_BYTES = 64_000
 # The fixed ten-file closure includes the ETF-residual accounting and
@@ -55,10 +72,47 @@ MAX_FORCED_EXIT_TOTAL_SOURCE_BYTES = 325_000
 # 335,000 is the smallest 5,000-byte round ceiling retaining the prospective
 # 2,048-byte margin.  V12 and legacy profiles keep their narrower ceilings.
 MAX_ROLLOVER_TOTAL_SOURCE_BYTES = 335_000
+# V14 adds one prospective diagnostic wrapper to the exact V13 closure.  Its
+# measured production closure is 344,215 bytes; 350,000 is the smallest
+# 5,000-byte round ceiling retaining the prospective 2,048-byte margin.  The
+# ceiling is profile-bound so older profiles retain narrower inventories.
+MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES = 350_000
+# V15 adds one account-reconciliation wrapper to the exact V14 closure.  Its
+# exact production size is pinned by the focused projection test; 365,000 is
+# the smallest 5,000-byte round ceiling preserving the review margin.
+MAX_ACCOUNT_TOTAL_SOURCE_BYTES = 365_000
+# V16 adds one exact mean-exposure-complement wrapper to the immutable V15
+# closure.  Its exact production size is pinned by focused projection tests;
+# 375,000 is the smallest 5,000-byte round ceiling retaining the margin.
+MAX_EXPOSURE_TOTAL_SOURCE_BYTES = 375_000
+# V17 adds one fail-closed decision-skip wrapper to the immutable V16
+# closure.  Its exact production size is pinned by focused projection tests;
+# 400,000 is the smallest 5,000-byte round ceiling retaining the margin.
+MAX_SKIP_TOTAL_SOURCE_BYTES = 400_000
+# V18 adds one bounded terminal-composition wrapper to the immutable V17
+# closure.  Its exact production size is pinned by focused projection tests;
+# 410,000 is the smallest 5,000-byte round ceiling retaining the margin.
+MAX_BOUNDARY_TOTAL_SOURCE_BYTES = 410_000
+# V19 adds one prospective evidence-correction wrapper to the immutable V18
+# closure.  Its exact production size is pinned by focused projection tests;
+# 430,000 is the smallest 5,000-byte ceiling retaining the review margin.
+MAX_SUCCESSOR_TOTAL_SOURCE_BYTES = 430_000
+# SPY V1 adds only a ticker-bound benchmark helper and semantic adapter to the
+# exact V19 engine closure.  The focused projection test pins the production
+# size and proves this profile-specific ceiling retains the review margin;
+# every QQQ profile keeps its narrower predecessor ceiling.
+MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES = 475_000
 MIN_REVIEW_MARGIN_BYTES = 2_048
 _ENGINE_ORDER_PROFILE_IDS = (
     v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
     + v13_runtime_builder.ROLLOVER_PROFILE_IDS
+    + v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS
+    + v15_runtime_builder.ACCOUNT_PROFILE_IDS
+    + v16_runtime_builder.EXPOSURE_PROFILE_IDS
+    + v17_runtime_builder.SKIP_PROFILE_IDS
+    + v18_runtime_builder.BOUNDARY_PROFILE_IDS
+    + v19_runtime_builder.SUCCESSOR_PROFILE_IDS
+    + spy_runtime_builder.SUCCESSOR_PROFILE_IDS
 )
 
 PROJECT_SOURCE_PATHS = (
@@ -75,6 +129,77 @@ PROJECT_SOURCE_PATHS = (
 
 
 def _project_source_paths(profile_id: str) -> tuple[str, ...]:
+    if profile_id in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+            V16_RUNTIME_PROJECT_PATH,
+            V17_RUNTIME_PROJECT_PATH,
+            V18_RUNTIME_PROJECT_PATH,
+            V19_RUNTIME_PROJECT_PATH,
+            UNIVERSE_BENCHMARK_PROJECT_PATH,
+            SPY_RUNTIME_PROJECT_PATH,
+        )
+    if profile_id in v19_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+            V16_RUNTIME_PROJECT_PATH,
+            V17_RUNTIME_PROJECT_PATH,
+            V18_RUNTIME_PROJECT_PATH,
+            V19_RUNTIME_PROJECT_PATH,
+        )
+    if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+            V16_RUNTIME_PROJECT_PATH,
+            V17_RUNTIME_PROJECT_PATH,
+            V18_RUNTIME_PROJECT_PATH,
+        )
+    if profile_id in v17_runtime_builder.SKIP_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+            V16_RUNTIME_PROJECT_PATH,
+            V17_RUNTIME_PROJECT_PATH,
+        )
+    if profile_id in v16_runtime_builder.EXPOSURE_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+            V16_RUNTIME_PROJECT_PATH,
+        )
+    if profile_id in v15_runtime_builder.ACCOUNT_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+            V15_RUNTIME_PROJECT_PATH,
+        )
+    if profile_id in v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS:
+        return PROJECT_SOURCE_PATHS + (
+            FORCED_EXIT_PROJECT_PATH,
+            V12_RUNTIME_PROJECT_PATH,
+            V13_RUNTIME_PROJECT_PATH,
+            V14_RUNTIME_PROJECT_PATH,
+        )
     if profile_id in v13_runtime_builder.ROLLOVER_PROFILE_IDS:
         return PROJECT_SOURCE_PATHS + (
             FORCED_EXIT_PROJECT_PATH,
@@ -89,6 +214,20 @@ def _project_source_paths(profile_id: str) -> tuple[str, ...]:
 
 
 def _maximum_total_source_bytes(profile_id: str) -> int:
+    if profile_id in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
+    if profile_id in v19_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return MAX_SUCCESSOR_TOTAL_SOURCE_BYTES
+    if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
+        return MAX_BOUNDARY_TOTAL_SOURCE_BYTES
+    if profile_id in v17_runtime_builder.SKIP_PROFILE_IDS:
+        return MAX_SKIP_TOTAL_SOURCE_BYTES
+    if profile_id in v16_runtime_builder.EXPOSURE_PROFILE_IDS:
+        return MAX_EXPOSURE_TOTAL_SOURCE_BYTES
+    if profile_id in v15_runtime_builder.ACCOUNT_PROFILE_IDS:
+        return MAX_ACCOUNT_TOTAL_SOURCE_BYTES
+    if profile_id in v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS:
+        return MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES
     if profile_id in v13_runtime_builder.ROLLOVER_PROFILE_IDS:
         return MAX_ROLLOVER_TOTAL_SOURCE_BYTES
     return (
@@ -99,6 +238,20 @@ def _maximum_total_source_bytes(profile_id: str) -> int:
 
 
 def _require_profile(profile_id: str) -> dict[str, object]:
+    if profile_id in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return spy_runtime_builder.require_spy_order_level_profile(profile_id)
+    if profile_id in v19_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return v19_runtime_builder.require_qqq_order_level_profile(profile_id)
+    if profile_id in v18_runtime_builder.BOUNDARY_PROFILE_IDS:
+        return v18_runtime_builder.require_qqq_order_level_profile(profile_id)
+    if profile_id in v17_runtime_builder.SKIP_PROFILE_IDS:
+        return v17_runtime_builder.require_qqq_order_level_profile(profile_id)
+    if profile_id in v16_runtime_builder.EXPOSURE_PROFILE_IDS:
+        return v16_runtime_builder.require_qqq_order_level_profile(profile_id)
+    if profile_id in v15_runtime_builder.ACCOUNT_PROFILE_IDS:
+        return v15_runtime_builder.require_qqq_order_level_profile(profile_id)
+    if profile_id in v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS:
+        return v14_runtime_builder.require_qqq_order_level_profile(profile_id)
     if profile_id in v13_runtime_builder.ROLLOVER_PROFILE_IDS:
         return v13_runtime_builder.require_qqq_order_level_profile(profile_id)
     if profile_id in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS:
@@ -111,6 +264,13 @@ def _all_profile_ids() -> tuple[str, ...]:
         runtime_builder.PROFILE_IDS
         + v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
         + v13_runtime_builder.ROLLOVER_PROFILE_IDS
+        + v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS
+        + v15_runtime_builder.ACCOUNT_PROFILE_IDS
+        + v16_runtime_builder.EXPOSURE_PROFILE_IDS
+        + v17_runtime_builder.SKIP_PROFILE_IDS
+        + v18_runtime_builder.BOUNDARY_PROFILE_IDS
+        + v19_runtime_builder.SUCCESSOR_PROFILE_IDS
+        + spy_runtime_builder.SUCCESSOR_PROFILE_IDS
     )
 
 _FUTURE = re.compile(rb"(?m)^\s*from\s+__future__\s+import\s+")
@@ -119,6 +279,7 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_order_level_core",
     "accepted_risk_order_level_forced_exit",
     "accepted_risk_order_level_benchmark",
+    "accepted_risk_order_level_universe_benchmark",
     "accepted_risk_market_cap_stock_portfolio_tilt",
     "accepted_risk_order_level_input_runtime",
     "accepted_risk_preliminary_qc_figi",
@@ -127,6 +288,13 @@ _ALLOWED_IMPORT_MODULES = {
     "accepted_risk_qqq_order_level_qc_runtime",
     "accepted_risk_qqq_order_level_v12_qc_runtime",
     "accepted_risk_qqq_order_level_v13_qc_runtime",
+    "accepted_risk_qqq_order_level_v14_qc_runtime",
+    "accepted_risk_qqq_order_level_v15_qc_runtime",
+    "accepted_risk_qqq_order_level_v16_qc_runtime",
+    "accepted_risk_qqq_order_level_v17_qc_runtime",
+    "accepted_risk_qqq_order_level_v18_qc_runtime",
+    "accepted_risk_qqq_order_level_v19_qc_runtime",
+    "accepted_risk_spy_order_level_v1_qc_runtime",
     "accepted_risk_sequential_r055_score",
     "collections",
     "collections.abc",
@@ -330,7 +498,7 @@ def _approved_forced_exit_order_lookup(
 
 
 def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
-    """Bind the lookup exception to an exact V12-or-V13 generated main."""
+    """Bind the lookup exception to an exact versioned generated main."""
 
     if project_path != MAIN_PROJECT_PATH:
         return False
@@ -342,6 +510,34 @@ def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
         "accepted_risk_qqq_order_level_v13_qc_runtime": (
             "AcceptedRiskQqqOrderLevelV13QcRuntime",
             v13_runtime_builder.ROLLOVER_PROFILE_IDS,
+        ),
+        "accepted_risk_qqq_order_level_v14_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV14QcRuntime",
+            v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS,
+        ),
+        "accepted_risk_qqq_order_level_v15_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV15QcRuntime",
+            v15_runtime_builder.ACCOUNT_PROFILE_IDS,
+        ),
+        "accepted_risk_qqq_order_level_v16_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV16QcRuntime",
+            v16_runtime_builder.EXPOSURE_PROFILE_IDS,
+        ),
+        "accepted_risk_qqq_order_level_v17_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV17QcRuntime",
+            v17_runtime_builder.SKIP_PROFILE_IDS,
+        ),
+        "accepted_risk_qqq_order_level_v18_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV18QcRuntime",
+            v18_runtime_builder.BOUNDARY_PROFILE_IDS,
+        ),
+        "accepted_risk_qqq_order_level_v19_qc_runtime": (
+            "AcceptedRiskQqqOrderLevelV19QcRuntime",
+            v19_runtime_builder.SUCCESSOR_PROFILE_IDS,
+        ),
+        "accepted_risk_spy_order_level_v1_qc_runtime": (
+            "AcceptedRiskSpyOrderLevelV1QcRuntime",
+            spy_runtime_builder.SUCCESSOR_PROFILE_IDS,
         ),
     }
     imports = tuple(
@@ -356,8 +552,13 @@ def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
         return False
     imported_module, imported_names = imports[0]
     runtime_name, profile_ids = allowed_imports[imported_module]
+    runtime_binding = (
+        "AcceptedRiskSpyOrderLevelQcRuntime"
+        if imported_module == "accepted_risk_spy_order_level_v1_qc_runtime"
+        else "AcceptedRiskQqqOrderLevelQcRuntime"
+    )
     expected_names = (
-        (runtime_name, "AcceptedRiskQqqOrderLevelQcRuntime"),
+        (runtime_name, runtime_binding),
         ("STARTING_CASH", None),
     )
     driver_initializers = []
@@ -373,7 +574,7 @@ def _is_exact_forced_exit_main(tree: ast.Module, project_path: str) -> bool:
             and target.value.id == "self"
             and isinstance(call, ast.Call)
             and isinstance(call.func, ast.Name)
-            and call.func.id == "AcceptedRiskQqqOrderLevelQcRuntime"
+            and call.func.id == runtime_binding
         ):
             continue
         profile_keywords = tuple(
@@ -691,6 +892,203 @@ def _require_delta_package(value):
     return value, package
 
 
+def _spy_main_source(
+    *,
+    activation_manifest_key: str,
+    activation_manifest_sha256: str,
+    activation_manifest_byte_count: int,
+    profile: dict[str, object],
+) -> bytes:
+    """Render the dedicated SPY entry without a second SPY subscription."""
+
+    try:
+        start = tuple(
+            int(part) for part in profile["evaluation_start_session"].split("-")
+        )
+    except (AttributeError, KeyError, TypeError, ValueError) as exc:
+        raise AcceptedRiskOrderLevelQcProjectionError(
+            "SPY order-level profile start session changed"
+        ) from exc
+    if (
+        len(start) != 3
+        or profile.get("profile_id")
+        not in spy_runtime_builder.SUCCESSOR_PROFILE_IDS
+        or profile.get("universe_proxy_ticker") != "SPY"
+        or profile.get("decision_cutoff_session")
+        != delta_package_builder.DELTA_DECISION_END_SESSION
+        or profile.get("final_execution_session")
+        != delta_package_builder.FINAL_EXECUTION_SESSION
+        or profile.get("backtest_only") is not True
+        or profile.get("simulated_order_submission") is not True
+        or any(
+            profile.get(field) is not False
+            for field in (
+                "live_orders",
+                "paper_orders",
+                "funded_orders",
+                "deployment",
+                "broker_credentials",
+                "trading",
+            )
+        )
+    ):
+        raise AcceptedRiskOrderLevelQcProjectionError(
+            "SPY order-level profile capability, universe, or date binding changed"
+        )
+    end = tuple(
+        int(part)
+        for part in delta_package_builder.FINAL_EXECUTION_SESSION.split("-")
+    )
+    preopen_schedule_source = (
+        "\n        self.schedule.on(\n"
+        "            self.date_rules.every_day(spy_benchmark),\n"
+        "            self.time_rules.before_market_open(spy_benchmark, 10),\n"
+        "            self._arv2_driver.on_before_open,\n"
+        "        )"
+        if profile.get("execution_submission_timing")
+        == "NEXT_AUTHENTICATED_SESSION_PREOPEN_10_MINUTES"
+        else ""
+    )
+    reflected_status_source = '''from System import Convert as _Arv2DotNetConvert, Enum as _Arv2DotNetEnum
+
+
+def _arv2_reflected_order_status(enum_type):
+    refusal = "QC OrderStatus reflected map changed"
+    try:
+        names = tuple(_Arv2DotNetEnum.GetNames(enum_type))
+        values = tuple(_Arv2DotNetEnum.GetValues(enum_type))
+        numbers = tuple(_Arv2DotNetConvert.ToInt32(value) for value in values)
+        reflected_type = values[0].GetType()
+        same_type = all(value.GetType() == reflected_type for value in values)
+    except Exception as exc:
+        raise RuntimeError(refusal) from exc
+    expected = (
+        ("New", 0), ("Submitted", 1), ("PartiallyFilled", 2),
+        ("Filled", 3), ("Canceled", 5), ("None", 6), ("Invalid", 7),
+        ("CancelPending", 8), ("UpdateSubmitted", 9),
+    )
+    if (
+        len(names) != len(expected)
+        or len(values) != len(expected)
+        or any(type(name) is not str for name in names)
+        or any(type(number) is not int for number in numbers)
+        or tuple(zip(names, numbers)) != expected
+        or not same_type
+        or any(type(value) is not type(values[0]) for value in values)
+        or any(
+            value == prior
+            for index, value in enumerate(values)
+            for prior in values[:index]
+        )
+    ):
+        raise RuntimeError(refusal)
+
+    class ReflectedOrderStatus:
+        NEW, SUBMITTED, PARTIALLY_FILLED, FILLED, CANCELED, NONE, INVALID, CANCEL_PENDING, UPDATE_SUBMITTED = values
+
+    return ReflectedOrderStatus
+
+
+'''
+    source = f'''from AlgorithmImports import *
+from decimal import Decimal
+{reflected_status_source}# Bind the dedicated SPY profile's declared statistic transport.
+import accepted_risk_qqq_order_level_qc_runtime as _arv2_runtime_module
+
+_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 16384
+from accepted_risk_spy_order_level_v1_qc_runtime import (
+    AcceptedRiskSpyOrderLevelV1QcRuntime as AcceptedRiskSpyOrderLevelQcRuntime,
+    STARTING_CASH,
+)
+from accepted_risk_order_level_core import MODELED_FEE_RATE_PER_SIDE
+
+
+class Arv2TenBpsFeeModel(FeeModel):
+    def get_order_fee(self, parameters):
+        price = Decimal(str(parameters.security.open))
+        quantity = abs(Decimal(str(parameters.order.absolute_quantity)))
+        if not price.is_finite() or price <= 0 or not quantity.is_finite():
+            raise RuntimeError("ARV2 fee input is invalid")
+        return OrderFee(CashAmount(
+            price * quantity * MODELED_FEE_RATE_PER_SIDE,
+            "USD",
+        ))
+
+
+class ARV2SpyOrderLevelAlgorithm(QCAlgorithm):
+    def initialize(self):
+        self.set_time_zone("America/New_York")
+        self.settings.daily_precise_end_time = True
+        self.set_start_date({start[0]}, {start[1]}, {start[2]})
+        self.set_end_date({end[0]}, {end[1]}, {end[2]})
+        self.set_cash(STARTING_CASH)
+        self.universe_settings.asynchronous = False
+        self.universe_settings.resolution = Resolution.MINUTE
+        self.universe_settings.data_normalization_mode = DataNormalizationMode.RAW
+        spy_benchmark = self.add_equity(
+            "SPY",
+            Resolution.MINUTE,
+            fill_forward=False,
+            leverage=1,
+            extended_market_hours=True,
+            data_normalization_mode=DataNormalizationMode.RAW,
+        ).symbol
+        self.set_benchmark(spy_benchmark)
+        spy_constituent_universe = self.add_universe(
+            self.universe.etf(
+                spy_benchmark,
+                self.universe_settings,
+                self._arv2_accept_spy_constituents,
+            )
+        )
+        self._arv2_driver = AcceptedRiskSpyOrderLevelQcRuntime(
+            self,
+            activation_manifest_key={activation_manifest_key!r},
+            activation_manifest_sha256={activation_manifest_sha256!r},
+            activation_manifest_byte_count={activation_manifest_byte_count},
+            profile_id={profile['profile_id']!r},
+            authority_benchmark_symbol=spy_benchmark,
+            spy_benchmark_symbol=spy_benchmark,
+            spy_constituent_universe=spy_constituent_universe,
+            minute_resolution=Resolution.MINUTE,
+            raw_normalization=DataNormalizationMode.RAW,
+            trade_bar_type=TradeBar,
+            daily_resolution=Resolution.DAILY,
+            total_return_normalization=DataNormalizationMode.TOTAL_RETURN,
+            fee_model_factory=lambda: Arv2TenBpsFeeModel(),
+            slippage_model_factory=lambda: NullSlippageModel(),
+            order_status_enum=_arv2_reflected_order_status(OrderStatus),
+        )
+        self._arv2_driver.initialize()
+        self.schedule.on(
+            self.date_rules.every_day(spy_benchmark),
+            self.time_rules.after_market_close(spy_benchmark, 0),
+            self._arv2_driver.on_after_close,
+        ){preopen_schedule_source}
+
+    def _arv2_accept_spy_constituents(self, constituents):
+        if not hasattr(self, "_arv2_driver"):
+            return []
+        return self._arv2_driver.accept_spy_constituents(constituents)
+
+    def on_data(self, data):
+        self._arv2_driver.on_data(data)
+
+    def on_securities_changed(self, changes):
+        self._arv2_driver.on_securities_changed(changes)
+
+    def on_order_event(self, event):
+        engine_order = self.transactions.get_order_by_id(event.order_id)
+        self._arv2_driver.on_order_event(
+            event, engine_order=engine_order,
+        )
+
+    def on_end_of_algorithm(self):
+        self._arv2_driver.on_end_of_algorithm()
+'''
+    return source.encode("ascii")
+
+
 def _main_source(
     *,
     activation_manifest_key: str,
@@ -699,6 +1097,14 @@ def _main_source(
     profile: dict[str, object],
 ) -> bytes:
     """Render the thin QC entry after the runtime interface is authenticated."""
+
+    if profile.get("profile_id") in spy_runtime_builder.SUCCESSOR_PROFILE_IDS:
+        return _spy_main_source(
+            activation_manifest_key=activation_manifest_key,
+            activation_manifest_sha256=activation_manifest_sha256,
+            activation_manifest_byte_count=activation_manifest_byte_count,
+            profile=profile,
+        )
 
     engine_order_profile = profile.get("profile_id") in _ENGINE_ORDER_PROFILE_IDS
     try:
@@ -809,6 +1215,12 @@ def _arv2_reflected_order_status(enum_type):
     # Raise only this profile's generated-main guard; do not modify the
     # shared runtime file, quantize decimals, truncate digests, or rekey JSON.
     statistic_transport_source = (
+        "# V19: bind the declared prospective statistic transport.\n"
+        "import accepted_risk_qqq_order_level_qc_runtime as _arv2_runtime_module\n"
+        "\n"
+        "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 16384\n"
+        if profile["profile_id"] in v19_runtime_builder.SUCCESSOR_PROFILE_IDS
+        else
         "# V10: 4764 exact aggregate bytes exceed the local 4096-byte guard.\n"
         "import accepted_risk_qqq_order_level_qc_runtime as _arv2_runtime_module\n"
         "\n"
@@ -829,14 +1241,48 @@ def _arv2_reflected_order_status(enum_type):
         else "        self._arv2_driver.on_order_event(event)"
     )
     runtime_import_module = (
-        "accepted_risk_qqq_order_level_v13_qc_runtime"
+        "accepted_risk_qqq_order_level_v19_qc_runtime"
+        if profile["profile_id"] in v19_runtime_builder.SUCCESSOR_PROFILE_IDS
+        else
+        "accepted_risk_qqq_order_level_v18_qc_runtime"
+        if profile["profile_id"] in v18_runtime_builder.BOUNDARY_PROFILE_IDS
+        else
+        "accepted_risk_qqq_order_level_v17_qc_runtime"
+        if profile["profile_id"] in v17_runtime_builder.SKIP_PROFILE_IDS
+        else
+        "accepted_risk_qqq_order_level_v16_qc_runtime"
+        if profile["profile_id"] in v16_runtime_builder.EXPOSURE_PROFILE_IDS
+        else
+        "accepted_risk_qqq_order_level_v15_qc_runtime"
+        if profile["profile_id"] in v15_runtime_builder.ACCOUNT_PROFILE_IDS
+        else
+        "accepted_risk_qqq_order_level_v14_qc_runtime"
+        if profile["profile_id"] in v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS
+        else "accepted_risk_qqq_order_level_v13_qc_runtime"
         if profile["profile_id"] in v13_runtime_builder.ROLLOVER_PROFILE_IDS
         else "accepted_risk_qqq_order_level_v12_qc_runtime"
         if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS
         else "accepted_risk_qqq_order_level_qc_runtime"
     )
     runtime_import_binding = (
-        "AcceptedRiskQqqOrderLevelV13QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        "AcceptedRiskQqqOrderLevelV19QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v19_runtime_builder.SUCCESSOR_PROFILE_IDS
+        else
+        "AcceptedRiskQqqOrderLevelV18QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v18_runtime_builder.BOUNDARY_PROFILE_IDS
+        else
+        "AcceptedRiskQqqOrderLevelV17QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v17_runtime_builder.SKIP_PROFILE_IDS
+        else
+        "AcceptedRiskQqqOrderLevelV16QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v16_runtime_builder.EXPOSURE_PROFILE_IDS
+        else
+        "AcceptedRiskQqqOrderLevelV15QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v15_runtime_builder.ACCOUNT_PROFILE_IDS
+        else
+        "AcceptedRiskQqqOrderLevelV14QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
+        if profile["profile_id"] in v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS
+        else "AcceptedRiskQqqOrderLevelV13QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
         if profile["profile_id"] in v13_runtime_builder.ROLLOVER_PROFILE_IDS
         else "AcceptedRiskQqqOrderLevelV12QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime"
         if profile["profile_id"] in v12_runtime_builder.FORCED_EXIT_PROFILE_IDS

@@ -36,6 +36,9 @@ from . import accepted_risk_preliminary_package as package_builder
 from . import accepted_risk_qqq_order_level_qc_runtime as runtime_builder
 from . import accepted_risk_qqq_order_level_v12_qc_runtime as v12_runtime_builder
 from . import accepted_risk_qqq_order_level_v13_qc_runtime as v13_runtime_builder
+from . import accepted_risk_qqq_order_level_v14_qc_runtime as v14_runtime_builder
+from . import accepted_risk_qqq_order_level_v15_qc_runtime as v15_runtime_builder
+from . import accepted_risk_qqq_order_level_v16_qc_runtime as v16_runtime_builder
 from . import formal_submission_adapter as formal
 from .formal_qc_transport import FormalQcTransport
 from .owner_signature_authority import (
@@ -107,11 +110,24 @@ PROFILE_IDS = (
     "arv2-qqq-order-level-tilt-2026-cutoff-v12",
     "arv2-qqq-order-level-tilt-2025-cutoff-v13",
     "arv2-qqq-order-level-tilt-2026-cutoff-v13",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v14",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v14",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v15",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v15",
+    "arv2-qqq-order-level-tilt-2025-cutoff-v16",
+    "arv2-qqq-order-level-tilt-2026-cutoff-v16",
 )
 PROXY_PROFILE_IDS = PROFILE_IDS[2:]
 ROLLOVER_PROFILE_IDS = tuple(v13_runtime_builder.ROLLOVER_PROFILE_IDS)
+DIAGNOSTIC_PROFILE_IDS = tuple(v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS)
+ACCOUNT_PROFILE_IDS = tuple(v15_runtime_builder.ACCOUNT_PROFILE_IDS)
+EXPOSURE_PROFILE_IDS = tuple(v16_runtime_builder.EXPOSURE_PROFILE_IDS)
 FORCED_EXIT_PROFILE_IDS = (
-    tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS) + ROLLOVER_PROFILE_IDS
+    tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS)
+    + ROLLOVER_PROFILE_IDS
+    + DIAGNOSTIC_PROFILE_IDS
+    + ACCOUNT_PROFILE_IDS
+    + EXPOSURE_PROFILE_IDS
 )
 _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[0], "2025-01-03", 91, 428, 427),
@@ -134,6 +150,12 @@ _PINNED_PROFILE_CENSUS = (
     (PROFILE_IDS[17], "2026-01-05", 39, 178, 177),
     (PROFILE_IDS[18], "2025-01-03", 91, 428, 427),
     (PROFILE_IDS[19], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[20], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[21], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[22], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[23], "2026-01-05", 39, 178, 177),
+    (PROFILE_IDS[24], "2025-01-03", 91, 428, 427),
+    (PROFILE_IDS[25], "2026-01-05", 39, 178, 177),
 )
 MAX_PROJECT_NAME_BYTES = 100
 MAX_BACKTEST_NAME_BYTES = 200
@@ -209,6 +231,9 @@ _PINNED_REQUIRE_PROJECTION = (
 _PINNED_REQUIRE_LEGACY_PROFILE = runtime_builder.require_qqq_order_level_profile
 _PINNED_REQUIRE_V12_PROFILE = v12_runtime_builder.require_qqq_order_level_profile
 _PINNED_REQUIRE_V13_PROFILE = v13_runtime_builder.require_qqq_order_level_profile
+_PINNED_REQUIRE_V14_PROFILE = v14_runtime_builder.require_qqq_order_level_profile
+_PINNED_REQUIRE_V15_PROFILE = v15_runtime_builder.require_qqq_order_level_profile
+_PINNED_REQUIRE_V16_PROFILE = v16_runtime_builder.require_qqq_order_level_profile
 _PINNED_EXPECTED_LEGACY_NAMES = (
     runtime_builder.expected_custom_summary_statistic_names
 )
@@ -218,18 +243,59 @@ _PINNED_EXPECTED_V12_NAMES = (
 _PINNED_EXPECTED_V13_NAMES = (
     v13_runtime_builder.expected_custom_summary_statistic_names
 )
+_PINNED_EXPECTED_V14_NAMES = (
+    v14_runtime_builder.expected_custom_summary_statistic_names
+)
+_PINNED_EXPECTED_V15_NAMES = (
+    v15_runtime_builder.expected_custom_summary_statistic_names
+)
+_PINNED_EXPECTED_V16_NAMES = (
+    v16_runtime_builder.expected_custom_summary_statistic_names
+)
 _PINNED_RUNTIME_PROFILE_IDS = (
     tuple(runtime_builder.PROFILE_IDS)
     + tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS)
     + tuple(v13_runtime_builder.ROLLOVER_PROFILE_IDS)
+    + tuple(v14_runtime_builder.DIAGNOSTIC_PROFILE_IDS)
+    + tuple(v15_runtime_builder.ACCOUNT_PROFILE_IDS)
+    + tuple(v16_runtime_builder.EXPOSURE_PROFILE_IDS)
 )
 _PINNED_META_STATISTIC_NAME = runtime_builder.META_STATISTIC_NAME
 _PINNED_AGGREGATES_STATISTIC_NAME = runtime_builder.AGGREGATES_STATISTIC_NAME
 _PINNED_LEGACY_META_SCHEMA = "arv2-qqq-order-level-tilt-runtime-meta-v1"
 _PINNED_FORCED_EXIT_META_SCHEMA = "arv2-qqq-order-level-tilt-runtime-meta-v2"
+_PINNED_DIAGNOSTIC_META_SCHEMA = "arv2-qqq-order-level-tilt-runtime-meta-v3"
 _PINNED_RUNTIME_SUMMARY_SCHEMA = runtime_builder.SUMMARY_SCHEMA
 _PINNED_PROXY_SUMMARY_SCHEMA = runtime_builder.PROXY_SUMMARY_SCHEMA
 _PINNED_FORCED_EXIT_SUMMARY_SCHEMA = v12_runtime_builder.FORCED_EXIT_SUMMARY_SCHEMA
+_PINNED_DIAGNOSTIC_SUMMARY_SCHEMA = v14_runtime_builder.DIAGNOSTIC_SUMMARY_SCHEMA
+_PINNED_ACCOUNT_SUMMARY_SCHEMA = v15_runtime_builder.ACCOUNT_SUMMARY_SCHEMA
+_PINNED_EXPOSURE_SUMMARY_SCHEMA = v16_runtime_builder.EXPOSURE_SUMMARY_SCHEMA
+_PINNED_RETIRED_TARGET_PATH_SCHEMA = (
+    v15_runtime_builder.RETIRED_TARGET_PATH_SCHEMA
+)
+_PINNED_EXACT_COMPLEMENT_POLICY = v14_runtime_builder.EXACT_COMPLEMENT_POLICY
+_PINNED_EXACT_COMPLEMENT_DECIMAL_PRECISION = (
+    v14_runtime_builder.EXACT_COMPLEMENT_DECIMAL_PRECISION
+)
+_PINNED_SKIPPED_UNPRICED_EVIDENCE_POLICY = (
+    v14_runtime_builder.SKIPPED_UNPRICED_EVIDENCE_POLICY
+)
+_PINNED_SKIPPED_UNPRICED_EVIDENCE_SCHEMA = (
+    v14_runtime_builder.SKIPPED_UNPRICED_EVIDENCE_SCHEMA
+)
+_PINNED_SKIPPED_UNPRICED_PATH_SCHEMA = (
+    v14_runtime_builder.SKIPPED_UNPRICED_PATH_SCHEMA
+)
+_PINNED_MISSING_SECURITY_PATH_SCHEMA = (
+    v14_runtime_builder.MISSING_SECURITY_PATH_SCHEMA
+)
+_PINNED_MAXIMUM_RETAINED_SKIPPED_DECISIONS = (
+    v14_runtime_builder.MAXIMUM_RETAINED_SKIPPED_DECISIONS
+)
+_PINNED_MAXIMUM_RETAINED_MISSING_SECURITY_HASHES = (
+    v14_runtime_builder.MAXIMUM_RETAINED_MISSING_SECURITY_HASHES
+)
 _PINNED_FORCED_DELISTING_SUMMARY_SCHEMA = (
     forced_exit_builder.FORCED_DELISTING_SUMMARY_SCHEMA
 )
@@ -239,14 +305,26 @@ _PINNED_TRANSPORT_CALL = formal._transport_call
 
 def _pinned_require_profile(
     profile_id,
+    _v16_ids=EXPOSURE_PROFILE_IDS,
+    _v15_ids=ACCOUNT_PROFILE_IDS,
+    _v14_ids=DIAGNOSTIC_PROFILE_IDS,
     _v13_ids=ROLLOVER_PROFILE_IDS,
     _v12_ids=tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS),
+    _v16_requirer=_PINNED_REQUIRE_V16_PROFILE,
+    _v15_requirer=_PINNED_REQUIRE_V15_PROFILE,
+    _v14_requirer=_PINNED_REQUIRE_V14_PROFILE,
     _v13_requirer=_PINNED_REQUIRE_V13_PROFILE,
     _v12_requirer=_PINNED_REQUIRE_V12_PROFILE,
     _legacy_requirer=_PINNED_REQUIRE_LEGACY_PROFILE,
 ):
     return (
-        _v13_requirer(profile_id)
+        _v16_requirer(profile_id)
+        if profile_id in _v16_ids
+        else _v15_requirer(profile_id)
+        if profile_id in _v15_ids
+        else _v14_requirer(profile_id)
+        if profile_id in _v14_ids
+        else _v13_requirer(profile_id)
         if profile_id in _v13_ids
         else _v12_requirer(profile_id)
         if profile_id in _v12_ids
@@ -256,14 +334,26 @@ def _pinned_require_profile(
 
 def _pinned_expected_names(
     profile_id,
+    _v16_ids=EXPOSURE_PROFILE_IDS,
+    _v15_ids=ACCOUNT_PROFILE_IDS,
+    _v14_ids=DIAGNOSTIC_PROFILE_IDS,
     _v13_ids=ROLLOVER_PROFILE_IDS,
     _v12_ids=tuple(v12_runtime_builder.FORCED_EXIT_PROFILE_IDS),
+    _v16_names=_PINNED_EXPECTED_V16_NAMES,
+    _v15_names=_PINNED_EXPECTED_V15_NAMES,
+    _v14_names=_PINNED_EXPECTED_V14_NAMES,
     _v13_names=_PINNED_EXPECTED_V13_NAMES,
     _v12_names=_PINNED_EXPECTED_V12_NAMES,
     _legacy_names=_PINNED_EXPECTED_LEGACY_NAMES,
 ):
     return (
-        _v13_names(profile_id)
+        _v16_names(profile_id)
+        if profile_id in _v16_ids
+        else _v15_names(profile_id)
+        if profile_id in _v15_ids
+        else _v14_names(profile_id)
+        if profile_id in _v14_ids
+        else _v13_names(profile_id)
         if profile_id in _v13_ids
         else _v12_names(profile_id)
         if profile_id in _v12_ids
@@ -455,11 +545,34 @@ _FORCED_EXIT_AGGREGATE_FIELDS = _PROXY_AGGREGATE_FIELDS | frozenset({
     "engine_forced_delisting",
     "forced_exit_invalidated_pending_rebalance_count",
 })
+_DIAGNOSTIC_AGGREGATE_FIELDS = _FORCED_EXIT_AGGREGATE_FIELDS | frozenset({
+    "qqq_proxy_complement_policy",
+    "skipped_unpriced_decision_evidence_policy",
+    "skipped_unpriced_decision_evidence",
+})
+_ACCOUNT_AGGREGATE_FIELDS = _DIAGNOSTIC_AGGREGATE_FIELDS | frozenset({
+    "delisted_zero_holding_target_retirement_count",
+    "delisted_zero_holding_target_retirement_decision_count",
+    "delisted_zero_holding_target_retired_weight_total",
+    "delisted_zero_holding_target_path_sha256",
+    "terminal_account_observation_adjustment",
+    "terminal_account_observation_prior_equity",
+    "terminal_account_observation_equity",
+})
 _FORCED_DELISTING_FIELDS = frozenset({
     "schema", "order_count", "event_count", "fill_event_count",
     "terminal_order_count", "absolute_filled_quantity", "filled_notional",
     "actual_engine_fee_amount", "accounting_complete", "ledger_sha256",
     "raw_order_rows_in_summary", "raw_security_rows_in_summary",
+})
+_SKIPPED_UNPRICED_EVIDENCE_FIELDS = frozenset({
+    "schema", "skipped_decision_count", "retained_decision_count",
+    "omitted_decision_count", "records", "path_sha256",
+})
+_SKIPPED_UNPRICED_RECORD_FIELDS = frozenset({
+    "decision_session", "missing_security_count",
+    "retained_missing_security_sha256s",
+    "omitted_missing_security_count", "missing_security_path_sha256",
 })
 
 
@@ -699,6 +812,20 @@ def _utc(value: object, name: str) -> str:
         ) from exc
     if parsed.tzinfo != timezone.utc or parsed.isoformat().replace("+00:00", "Z") != value:
         _error(f"{name} is not an exact UTC instant")
+    return value
+
+
+def _result_session(value: object, name: str) -> str:
+    if type(value) is not str or len(value) != 10:
+        _error(f"{name} is not an exact session date")
+    try:
+        parsed = datetime.fromisoformat(value)
+    except ValueError as exc:
+        raise AcceptedRiskOrderLevelSubmissionError(
+            f"{name} is not an exact session date"
+        ) from exc
+    if parsed.date().isoformat() != value or parsed.time().isoformat() != "00:00:00":
+        _error(f"{name} is not an exact session date")
     return value
 
 
@@ -2655,6 +2782,10 @@ def _make_result_read_authority_operations(
     forced_exit_aggregate_fields = tuple(
         sorted(_FORCED_EXIT_AGGREGATE_FIELDS)
     )
+    diagnostic_aggregate_fields = tuple(
+        sorted(_DIAGNOSTIC_AGGREGATE_FIELDS)
+    )
+    account_aggregate_fields = tuple(sorted(_ACCOUNT_AGGREGATE_FIELDS))
     statistic_limit = _maximum_statistic_bytes
 
     def candidate(
@@ -2679,7 +2810,13 @@ def _make_result_read_authority_operations(
         ):
             raise error_type("order-level result authority context changed")
         aggregate_fields = (
-            forced_exit_aggregate_fields
+            account_aggregate_fields
+            if plan.profile_id in (
+                ACCOUNT_PROFILE_IDS + EXPOSURE_PROFILE_IDS
+            )
+            else diagnostic_aggregate_fields
+            if plan.profile_id in DIAGNOSTIC_PROFILE_IDS
+            else forced_exit_aggregate_fields
             if plan.profile_id in FORCED_EXIT_PROFILE_IDS
             else proxy_aggregate_fields
             if plan.profile_id in PROXY_PROFILE_IDS
@@ -3018,6 +3155,13 @@ def _parse_result(response, plan, launch):
     meta = parsed[_PINNED_META_STATISTIC_NAME]
     aggregates = parsed[_PINNED_AGGREGATES_STATISTIC_NAME]
     proxy_mode = plan.profile_id in PROXY_PROFILE_IDS
+    exposure_mode = plan.profile_id in EXPOSURE_PROFILE_IDS
+    account_mode = (
+        plan.profile_id in ACCOUNT_PROFILE_IDS or exposure_mode
+    )
+    diagnostic_mode = (
+        plan.profile_id in DIAGNOSTIC_PROFILE_IDS or account_mode
+    )
     forced_exit_mode = (
         plan.profile_id in FORCED_EXIT_PROFILE_IDS
     )
@@ -3029,7 +3173,11 @@ def _parse_result(response, plan, launch):
     if set(meta) != _META_FIELDS:
         _error("order-level aggregate META field inventory changed")
     expected_aggregate_fields = (
-        _FORCED_EXIT_AGGREGATE_FIELDS
+        _ACCOUNT_AGGREGATE_FIELDS
+        if account_mode
+        else _DIAGNOSTIC_AGGREGATE_FIELDS
+        if diagnostic_mode
+        else _FORCED_EXIT_AGGREGATE_FIELDS
         if forced_exit_mode
         else _PROXY_AGGREGATE_FIELDS
         if proxy_mode
@@ -3039,7 +3187,9 @@ def _parse_result(response, plan, launch):
         _error("order-level aggregate field inventory changed")
     if (
         meta.get("schema") != (
-            _PINNED_FORCED_EXIT_META_SCHEMA
+            _PINNED_DIAGNOSTIC_META_SCHEMA
+            if diagnostic_mode
+            else _PINNED_FORCED_EXIT_META_SCHEMA
             if forced_exit_mode else _PINNED_LEGACY_META_SCHEMA
         )
         or meta.get("profile_id") != plan.profile_id
@@ -3091,10 +3241,19 @@ def _parse_result(response, plan, launch):
     ) + (
         ("forced_exit_invalidated_pending_rebalance_count",)
         if forced_exit_mode else ()
+    ) + (
+        (
+            "delisted_zero_holding_target_retirement_count",
+            "delisted_zero_holding_target_retirement_decision_count",
+        )
+        if account_mode else ()
     )
     if (
         aggregates.get("schema") != (
-            _PINNED_FORCED_EXIT_SUMMARY_SCHEMA if forced_exit_mode
+            _PINNED_EXPOSURE_SUMMARY_SCHEMA if exposure_mode
+            else _PINNED_ACCOUNT_SUMMARY_SCHEMA if account_mode
+            else _PINNED_DIAGNOSTIC_SUMMARY_SCHEMA if diagnostic_mode
+            else _PINNED_FORCED_EXIT_SUMMARY_SCHEMA if forced_exit_mode
             else _PINNED_PROXY_SUMMARY_SCHEMA if proxy_mode
             else _PINNED_RUNTIME_SUMMARY_SCHEMA
         )
@@ -3188,6 +3347,151 @@ def _parse_result(response, plan, launch):
             > forced_delisting["order_count"]
         ):
             _error("order-level forced delisting accounting changed")
+    if diagnostic_mode:
+        evidence = aggregates.get("skipped_unpriced_decision_evidence")
+        if (
+            aggregates.get("qqq_proxy_complement_policy")
+            != _PINNED_EXACT_COMPLEMENT_POLICY
+            or aggregates.get("skipped_unpriced_decision_evidence_policy")
+            != _PINNED_SKIPPED_UNPRICED_EVIDENCE_POLICY
+            or type(evidence) is not dict
+            or set(evidence) != _SKIPPED_UNPRICED_EVIDENCE_FIELDS
+            or evidence.get("schema")
+            != _PINNED_SKIPPED_UNPRICED_EVIDENCE_SCHEMA
+            or any(
+                type(evidence.get(name)) is not int or evidence[name] < 0
+                for name in (
+                    "skipped_decision_count", "retained_decision_count",
+                    "omitted_decision_count",
+                )
+            )
+            or type(evidence.get("records")) is not list
+            or evidence.get("skipped_decision_count")
+            != aggregates["skipped_unpriced_decision_count"]
+            or evidence.get("retained_decision_count")
+            != len(evidence.get("records", ()))
+            or evidence.get("retained_decision_count")
+            != min(
+                evidence.get("skipped_decision_count", 0),
+                _PINNED_MAXIMUM_RETAINED_SKIPPED_DECISIONS,
+            )
+            or evidence.get("omitted_decision_count")
+            != evidence.get("skipped_decision_count", 0)
+            - evidence.get("retained_decision_count", 0)
+        ):
+            _error("order-level skipped-unpriced evidence changed")
+        _sha(
+            evidence.get("path_sha256"),
+            "order-level skipped-unpriced evidence path digest",
+        )
+        prior_session = None
+        complete_records = []
+        for record in evidence["records"]:
+            if (
+                type(record) is not dict
+                or set(record) != _SKIPPED_UNPRICED_RECORD_FIELDS
+                or type(record.get("missing_security_count")) is not int
+                or record.get("missing_security_count", 0) <= 0
+                or type(record.get("retained_missing_security_sha256s"))
+                is not list
+                or not record.get("retained_missing_security_sha256s")
+                or len(record["retained_missing_security_sha256s"])
+                != min(
+                    record["missing_security_count"],
+                    _PINNED_MAXIMUM_RETAINED_MISSING_SECURITY_HASHES,
+                )
+                or type(record.get("omitted_missing_security_count")) is not int
+                or record.get("omitted_missing_security_count", -1)
+                != record["missing_security_count"]
+                - len(record["retained_missing_security_sha256s"])
+            ):
+                _error("order-level skipped-unpriced evidence changed")
+            session = _result_session(
+                record.get("decision_session"),
+                "order-level skipped-unpriced decision session",
+            )
+            hashes = tuple(record["retained_missing_security_sha256s"])
+            for digest in hashes:
+                _sha(
+                    digest,
+                    "order-level skipped-unpriced security digest",
+                )
+            if (
+                prior_session is not None and session <= prior_session
+            ) or hashes != tuple(sorted(set(hashes))):
+                _error("order-level skipped-unpriced evidence changed")
+            prior_session = session
+            missing_path_sha256 = _sha(
+                record.get("missing_security_path_sha256"),
+                "order-level skipped-unpriced security path digest",
+            )
+            if record["omitted_missing_security_count"] == 0:
+                if missing_path_sha256 != hashlib.sha256(_canonical({
+                    "schema": _PINNED_MISSING_SECURITY_PATH_SCHEMA,
+                    "security_sha256s": list(hashes),
+                })).hexdigest():
+                    _error("order-level skipped-unpriced evidence changed")
+                complete_records.append({
+                    "decision_session": session,
+                    "missing_security_sha256s": list(hashes),
+                })
+        if (
+            evidence["omitted_decision_count"] == 0
+            and len(complete_records) == len(evidence["records"])
+            and evidence["path_sha256"]
+            != hashlib.sha256(_canonical({
+                "schema": _PINNED_SKIPPED_UNPRICED_PATH_SCHEMA,
+                "records": complete_records,
+            })).hexdigest()
+        ):
+            _error("order-level skipped-unpriced evidence changed")
+    if account_mode:
+        retirement_count = aggregates[
+            "delisted_zero_holding_target_retirement_count"
+        ]
+        retirement_decision_count = aggregates[
+            "delisted_zero_holding_target_retirement_decision_count"
+        ]
+        retired_weight_total = _result_decimal(
+            aggregates["delisted_zero_holding_target_retired_weight_total"],
+            "order-level aggregate retired delisted target weight total",
+        )
+        retirement_path_sha256 = _sha(
+            aggregates["delisted_zero_holding_target_path_sha256"],
+            "order-level aggregate retired delisted target path digest",
+        )
+        if (
+            retirement_decision_count > retirement_count
+            or retirement_decision_count > aggregates["decision_count"]
+            or retirement_count > (
+                forced_delisting["order_count"]
+                * aggregates["decision_count"]
+            )
+            or retired_weight_total < 0
+            or retired_weight_total > (
+                Decimal("0.98") * Decimal(retirement_decision_count)
+            )
+            or (
+                retirement_count == 0
+                and (
+                    retirement_decision_count != 0
+                    or retired_weight_total != 0
+                    or retirement_path_sha256
+                    != hashlib.sha256(_canonical({
+                        "schema": _PINNED_RETIRED_TARGET_PATH_SCHEMA,
+                        "records": [],
+                    })).hexdigest()
+                )
+            )
+            or (
+                retirement_count > 0
+                and (
+                    retirement_decision_count == 0
+                    or retired_weight_total <= 0
+                )
+            )
+        ):
+            _error("order-level retired delisted target accounting changed")
     for name in (
         "mean_tilted_name_count", "mean_one_way_active_share",
         "modeled_fee_amount", "total_filled_notional", "starting_equity",
@@ -3329,7 +3633,10 @@ def _parse_result(response, plan, launch):
         # This precision exceeds even V10's 8,192-byte transport cap, keeping
         # decimal complements exact rather than default-context rounded.
         with localcontext() as ratio_context:
-            ratio_context.prec = MAX_STATISTIC_BYTES * 4
+            ratio_context.prec = (
+                _PINNED_EXACT_COMPLEMENT_DECIMAL_PRECISION
+                if diagnostic_mode else MAX_STATISTIC_BYTES * 4
+            )
             ratios_conserve = (
                 proxy_mean + mean_resolved == Decimal(1)
                 and proxy_maximum + minimum_resolved == Decimal(1)
@@ -3358,6 +3665,27 @@ def _parse_result(response, plan, launch):
         aggregates["strategy_total_return"],
         "order-level aggregate strategy total return",
     )
+    if account_mode:
+        terminal_prior_equity = _result_decimal(
+            aggregates["terminal_account_observation_prior_equity"],
+            "order-level aggregate terminal prior equity",
+        )
+        terminal_observation_equity = _result_decimal(
+            aggregates["terminal_account_observation_equity"],
+            "order-level aggregate terminal observation equity",
+        )
+        terminal_adjustment = _result_decimal(
+            aggregates["terminal_account_observation_adjustment"],
+            "order-level aggregate terminal observation adjustment",
+        )
+        terminal_reconciliation_is_exact = (
+            terminal_prior_equity > 0
+            and terminal_observation_equity == ending_equity
+            and terminal_adjustment
+            == terminal_observation_equity - terminal_prior_equity
+        )
+    else:
+        terminal_reconciliation_is_exact = True
     qqq_total_return = _result_decimal(
         aggregates["QQQ_total_return"],
         "order-level aggregate QQQ total return",
@@ -3492,6 +3820,7 @@ def _parse_result(response, plan, launch):
         or benchmark_target_gross != Decimal("0.98")
         or starting_equity != Decimal("1000000")
         or ending_equity <= 0
+        or not terminal_reconciliation_is_exact
         or not strategy_return_is_exact
         or strategy_total_return <= Decimal(-1)
         or qqq_total_return <= Decimal(-1)

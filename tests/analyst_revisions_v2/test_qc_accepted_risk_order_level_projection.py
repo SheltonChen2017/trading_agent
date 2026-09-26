@@ -32,6 +32,27 @@ from research.analyst_revisions_v2_qc import (
 from research.analyst_revisions_v2_qc import (
     accepted_risk_qqq_order_level_v13_qc_runtime as v13_runtime,
 )
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v14_qc_runtime as v14_runtime,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v15_qc_runtime as v15_runtime,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v16_qc_runtime as v16_runtime,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v17_qc_runtime as v17_runtime,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v18_qc_runtime as v18_runtime,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_qqq_order_level_v19_qc_runtime as v19_runtime,
+)
+from research.analyst_revisions_v2_qc import (
+    accepted_risk_spy_order_level_v1_qc_runtime as spy_runtime,
+)
 
 
 def _exact(message: str) -> str:
@@ -85,6 +106,13 @@ def delta_package(monkeypatch):
         runtime.PROFILE_IDS
         + v12_runtime.FORCED_EXIT_PROFILE_IDS
         + v13_runtime.ROLLOVER_PROFILE_IDS
+        + v14_runtime.DIAGNOSTIC_PROFILE_IDS
+        + v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
+        + v17_runtime.SKIP_PROFILE_IDS
+        + v18_runtime.BOUNDARY_PROFILE_IDS
+        + v19_runtime.SUCCESSOR_PROFILE_IDS
+        + spy_runtime.SUCCESSOR_PROFILE_IDS
     ),
 )
 def test_projection_is_exact_profile_bound_and_backtest_only(
@@ -125,15 +153,29 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     assert f"set_start_date({start[0]}, {start[1]}, {start[2]})" in main
     assert "set_end_date(2026, 9, 17)" in main
     assert "market_on_open_order" not in main
-    transport_override = (
+    legacy_transport_override = (
         "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 8192"
     )
-    assert (transport_override in main) is (
+    successor_transport_override = (
+        "_arv2_runtime_module.MAXIMUM_STATISTIC_BYTES = 16384"
+    )
+    assert (successor_transport_override in main) is (
+        profile_id in (
+            v19_runtime.SUCCESSOR_PROFILE_IDS
+            + spy_runtime.SUCCESSOR_PROFILE_IDS
+        )
+    )
+    assert (legacy_transport_override in main) is (
         profile_id in (
             runtime.TICKET_PROFILE_IDS
             + runtime.REFLECTED_TICKET_PROFILE_IDS
             + v12_runtime.FORCED_EXIT_PROFILE_IDS
             + v13_runtime.ROLLOVER_PROFILE_IDS
+            + v14_runtime.DIAGNOSTIC_PROFILE_IDS
+            + v15_runtime.ACCOUNT_PROFILE_IDS
+            + v16_runtime.EXPOSURE_PROFILE_IDS
+            + v17_runtime.SKIP_PROFILE_IDS
+            + v18_runtime.BOUNDARY_PROFILE_IDS
         )
     )
     assert "self.schedule.on(" in main
@@ -142,8 +184,22 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
         runtime.PREOPEN_PROXY_PROFILE_IDS
         + v12_runtime.FORCED_EXIT_PROFILE_IDS
         + v13_runtime.ROLLOVER_PROFILE_IDS
+        + v14_runtime.DIAGNOSTIC_PROFILE_IDS
+        + v15_runtime.ACCOUNT_PROFILE_IDS
+        + v16_runtime.EXPOSURE_PROFILE_IDS
+        + v17_runtime.SKIP_PROFILE_IDS
+        + v18_runtime.BOUNDARY_PROFILE_IDS
+        + v19_runtime.SUCCESSOR_PROFILE_IDS
+        + spy_runtime.SUCCESSOR_PROFILE_IDS
     ):
-        assert "self.time_rules.before_market_open(qqq_benchmark, 10)" in main
+        benchmark_name = (
+            "spy_benchmark"
+            if profile_id in spy_runtime.SUCCESSOR_PROFILE_IDS
+            else "qqq_benchmark"
+        )
+        assert (
+            f"self.time_rules.before_market_open({benchmark_name}, 10)" in main
+        )
         assert "self._arv2_driver.on_before_open" in main
         assert main.count("extended_market_hours=True") == 1
     else:
@@ -157,7 +213,12 @@ def test_projection_is_exact_profile_bound_and_backtest_only(
     assert "self.set_cash(STARTING_CASH)" in main
     assert "AddUniverse" not in main
     assert "fundamental_universe" not in main
-    assert "qqq_constituent_universe=qqq_constituent_universe" in main
+    if profile_id in spy_runtime.SUCCESSOR_PROFILE_IDS:
+        assert "spy_constituent_universe=spy_constituent_universe" in main
+        assert "authority_benchmark_symbol=spy_benchmark" in main
+        assert "spy_benchmark_symbol=spy_benchmark" in main
+    else:
+        assert "qqq_constituent_universe=qqq_constituent_universe" in main
     assert "trade_bar_type=TradeBar" in main
     assert "daily_resolution=Resolution.DAILY" in main
     assert (
@@ -692,6 +753,702 @@ def test_v13_total_cap_is_profile_specific_and_load_bearing(
     assert projection.require_accepted_risk_order_level_qc_projection(v12) is v12
 
 
+def test_v14_adds_only_diagnostic_runtime_to_exact_v13_closure(delta_package):
+    v14 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
+    )
+    v13 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v13_runtime.ROLLOVER_PROFILE_2026_ID,
+    )
+    v14_by_path = {item.project_path: item for item in v14.source_files}
+    v13_by_path = {item.project_path: item for item in v13.source_files}
+
+    assert set(v14_by_path) == set(v13_by_path) | {
+        projection.V14_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v13_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v14_by_path[path] == v13_by_path[path]
+    main = v14_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v14_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV14QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert b"engine_order = self.transactions.get_order_by_id(event.order_id)" in main
+    assert b"event, engine_order=engine_order" in main
+    assert (
+        v14.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES
+    )
+    assert projection.MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES == 350_000
+    assert v14.total_source_byte_count == 344_185
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v14.total_source_byte_count + (72 - fixture_key_length)
+    assert production_total == 344_215
+    assert (
+        projection.MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES - production_total
+    ) == 5_785
+
+
+def test_v14_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v13 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v13_runtime.ROLLOVER_PROFILE_2026_ID,
+    )
+    v14 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
+    )
+    assert (
+        projection._maximum_total_source_bytes(v13.profile_id)
+        == projection.MAX_ROLLOVER_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        projection._maximum_total_source_bytes(v14.profile_id)
+        == projection.MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES",
+        v14.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v14)
+    assert projection.require_accepted_risk_order_level_qc_projection(v13) is v13
+
+
+def test_v15_adds_only_account_runtime_to_exact_v14_closure(delta_package):
+    v15 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v15_runtime.ACCOUNT_PROFILE_2026_ID,
+    )
+    v14 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
+    )
+    v15_by_path = {item.project_path: item for item in v15.source_files}
+    v14_by_path = {item.project_path: item for item in v14.source_files}
+
+    assert set(v15_by_path) == set(v14_by_path) | {
+        projection.V15_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v14_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v15_by_path[path] == v14_by_path[path]
+    main = v15_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v15_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV15QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert b"engine_order = self.transactions.get_order_by_id(event.order_id)" in main
+    assert b"event, engine_order=engine_order" in main
+    assert (
+        v15.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_ACCOUNT_TOTAL_SOURCE_BYTES
+    )
+    assert projection.MAX_ACCOUNT_TOTAL_SOURCE_BYTES == 365_000
+    assert v15.total_source_byte_count == 362_458
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v15.total_source_byte_count + (72 - fixture_key_length)
+    assert production_total == 362_488
+    assert projection.MAX_ACCOUNT_TOTAL_SOURCE_BYTES - production_total == 2_512
+    assert v15.projection_sha256 == (
+        "7c7b6ded4c2a1d1e1269e8fa47093a5742bb5a991beea7c9d2935a04d077aea6"
+    )
+
+
+def test_v15_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v14 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v14_runtime.DIAGNOSTIC_PROFILE_2026_ID,
+    )
+    v15 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v15_runtime.ACCOUNT_PROFILE_2026_ID,
+    )
+    assert (
+        projection._maximum_total_source_bytes(v14.profile_id)
+        == projection.MAX_DIAGNOSTIC_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        projection._maximum_total_source_bytes(v15.profile_id)
+        == projection.MAX_ACCOUNT_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_ACCOUNT_TOTAL_SOURCE_BYTES",
+        v15.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v15_runtime.ACCOUNT_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v15)
+    assert projection.require_accepted_risk_order_level_qc_projection(v14) is v14
+
+
+def test_v16_adds_only_exposure_runtime_to_exact_v15_closure(delta_package):
+    v16 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v16_runtime.EXPOSURE_PROFILE_2026_ID,
+    )
+    v15 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v15_runtime.ACCOUNT_PROFILE_2026_ID,
+    )
+    v16_by_path = {item.project_path: item for item in v16.source_files}
+    v15_by_path = {item.project_path: item for item in v15.source_files}
+
+    assert set(v16_by_path) == set(v15_by_path) | {
+        projection.V16_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v15_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v16_by_path[path] == v15_by_path[path]
+    main = v16_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v16_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV16QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert (
+        v16.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES
+    )
+    assert projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES == 375_000
+    assert v16.total_source_byte_count == 370_889
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v16.total_source_byte_count + (72 - fixture_key_length)
+    assert production_total == 370_919
+    assert projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES - production_total == 4_081
+    assert v16.projection_sha256 == (
+        "70979684bcabac182f0486be5214a293d203907b90d99e471856338e11bdb314"
+    )
+
+
+def test_v16_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v15 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v15_runtime.ACCOUNT_PROFILE_2026_ID,
+    )
+    v16 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v16_runtime.EXPOSURE_PROFILE_2026_ID,
+    )
+    assert (
+        projection._maximum_total_source_bytes(v15.profile_id)
+        == projection.MAX_ACCOUNT_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        projection._maximum_total_source_bytes(v16.profile_id)
+        == projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_EXPOSURE_TOTAL_SOURCE_BYTES",
+        v16.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v16_runtime.EXPOSURE_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v16)
+    assert projection.require_accepted_risk_order_level_qc_projection(v15) is v15
+
+
+def test_v17_adds_only_skip_runtime_to_exact_v16_closure(delta_package):
+    v17 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v17_runtime.SKIP_PROFILE_2025_ID,
+    )
+    v16 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v16_runtime.EXPOSURE_PROFILE_2025_ID,
+    )
+    v17_by_path = {item.project_path: item for item in v17.source_files}
+    v16_by_path = {item.project_path: item for item in v16.source_files}
+
+    assert set(v17_by_path) == set(v16_by_path) | {
+        projection.V17_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v16_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v17_by_path[path] == v16_by_path[path]
+    main = v17_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v17_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV17QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert b"profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v17'" in main
+    assert b"set_start_date(2025, 1, 2)" in main
+    # The generated main differs from V16's only in the version token, so the
+    # V17 closure grows by exactly the V17 source file.
+    v16_main = v16_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert len(main) == len(v16_main)
+    v17_source = v17_by_path[projection.V17_RUNTIME_PROJECT_PATH]
+    assert (
+        v17.total_source_byte_count
+        == v16.total_source_byte_count + v17_source.byte_count
+    )
+    assert v17_source.byte_count <= projection.MAX_SOURCE_FILE_BYTES
+    assert (
+        v17.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_SKIP_TOTAL_SOURCE_BYTES
+    )
+    assert projection.MAX_SKIP_TOTAL_SOURCE_BYTES == 400_000
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v17.total_source_byte_count + (72 - fixture_key_length)
+    assert production_total == 370_919 + v17_source.byte_count
+    assert (
+        projection.MAX_SKIP_TOTAL_SOURCE_BYTES - production_total
+        >= projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert (
+        projection.MAX_SKIP_TOTAL_SOURCE_BYTES - 5_000 - production_total
+        < projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert v17.profile_sha256 == projection._require_profile(
+        v17_runtime.SKIP_PROFILE_2025_ID
+    )["profile_sha256"]
+
+
+def test_v17_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v16 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v16_runtime.EXPOSURE_PROFILE_2026_ID,
+    )
+    v17 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v17_runtime.SKIP_PROFILE_2026_ID,
+    )
+    assert (
+        projection._maximum_total_source_bytes(v16.profile_id)
+        == projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        projection._maximum_total_source_bytes(v17.profile_id)
+        == projection.MAX_SKIP_TOTAL_SOURCE_BYTES
+    )
+    # The V16 ceiling would refuse the larger V17 closure on its own.
+    assert (
+        v17.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        > projection.MAX_EXPOSURE_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_SKIP_TOTAL_SOURCE_BYTES",
+        v17.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v17_runtime.SKIP_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v17)
+    assert projection.require_accepted_risk_order_level_qc_projection(v16) is v16
+
+
+def test_firewall_allows_only_exact_v17_read_only_engine_order_lookup():
+    accepted = (
+        "from accepted_risk_qqq_order_level_v17_qc_runtime import (\n"
+        "    AcceptedRiskQqqOrderLevelV17QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime,\n"
+        "    STARTING_CASH,\n"
+        ")\n"
+        "class Algorithm:\n"
+        "    def initialize(self):\n"
+        "        self._arv2_driver = AcceptedRiskQqqOrderLevelQcRuntime(\n"
+        "            self, profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v17',\n"
+        "        )\n"
+        "    def on_order_event(self, event):\n"
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._driver.on_order_event(event, engine_order=engine_order)\n"
+    )
+    projection._audit_cloud_capabilities(accepted, projection.MAIN_PROJECT_PATH)
+    for refused in (
+        accepted.replace("cutoff-v17", "cutoff-v16"),
+        accepted.replace("V17QcRuntime", "V16QcRuntime"),
+        accepted.replace("cutoff-v17", "cutoff-v20"),
+        accepted.replace(
+            "accepted_risk_qqq_order_level_v17_qc_runtime",
+            "accepted_risk_qqq_order_level_v20_qc_runtime",
+        ).replace("V17QcRuntime", "V20QcRuntime"),
+    ):
+        with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+            projection._audit_cloud_capabilities(
+                refused, projection.MAIN_PROJECT_PATH,
+            )
+
+
+def test_v18_adds_only_boundary_runtime_to_exact_v17_closure(delta_package):
+    v18 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v18_runtime.BOUNDARY_PROFILE_2025_ID,
+    )
+    v17 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v17_runtime.SKIP_PROFILE_2025_ID,
+    )
+    v18_by_path = {item.project_path: item for item in v18.source_files}
+    v17_by_path = {item.project_path: item for item in v17.source_files}
+
+    assert set(v18_by_path) == set(v17_by_path) | {
+        projection.V18_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v17_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v18_by_path[path] == v17_by_path[path]
+    main = v18_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v18_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV18QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert b"profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v18'" in main
+    assert len(main) == len(v17_by_path[projection.MAIN_PROJECT_PATH].source_bytes)
+    v18_source = v18_by_path[projection.V18_RUNTIME_PROJECT_PATH]
+    assert (
+        v18.total_source_byte_count
+        == v17.total_source_byte_count + v18_source.byte_count
+    )
+    assert v18_source.byte_count <= projection.MAX_SOURCE_FILE_BYTES
+    assert projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES == 410_000
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v18.total_source_byte_count + (72 - fixture_key_length)
+    assert (
+        projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES - production_total
+        >= projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert (
+        projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES - 5_000 - production_total
+        < projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert v18.profile_sha256 == projection._require_profile(
+        v18_runtime.BOUNDARY_PROFILE_2025_ID
+    )["profile_sha256"]
+
+
+def test_v18_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v17 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v17_runtime.SKIP_PROFILE_2026_ID,
+    )
+    v18 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v18_runtime.BOUNDARY_PROFILE_2026_ID,
+    )
+    assert (
+        projection._maximum_total_source_bytes(v17.profile_id)
+        == projection.MAX_SKIP_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        projection._maximum_total_source_bytes(v18.profile_id)
+        == projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        v18.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        > projection.MAX_SKIP_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_BOUNDARY_TOTAL_SOURCE_BYTES",
+        v18.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v18_runtime.BOUNDARY_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v18)
+    assert projection.require_accepted_risk_order_level_qc_projection(v17) is v17
+
+
+def test_v19_adds_only_successor_runtime_to_exact_v18_closure(delta_package):
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    v18 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v18_runtime.BOUNDARY_PROFILE_2025_ID,
+    )
+    v19_by_path = {item.project_path: item for item in v19.source_files}
+    v18_by_path = {item.project_path: item for item in v18.source_files}
+
+    assert set(v19_by_path) == set(v18_by_path) | {
+        projection.V19_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v18_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert v19_by_path[path] == v18_by_path[path]
+    main = v19_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    assert (
+        b"from accepted_risk_qqq_order_level_v19_qc_runtime import (" in main
+    )
+    assert (
+        b"AcceptedRiskQqqOrderLevelV19QcRuntime as "
+        b"AcceptedRiskQqqOrderLevelQcRuntime" in main
+    )
+    assert b"MAXIMUM_STATISTIC_BYTES = 16384" in main
+    assert b"profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v19'" in main
+    v19_source = v19_by_path[projection.V19_RUNTIME_PROJECT_PATH]
+    main_delta = len(main) - len(
+        v18_by_path[projection.MAIN_PROJECT_PATH].source_bytes
+    )
+    assert (
+        v19.total_source_byte_count
+        == v18.total_source_byte_count + v19_source.byte_count + main_delta
+    )
+    assert v19_source.byte_count <= projection.MAX_SOURCE_FILE_BYTES
+    assert projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES == 430_000
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = v19.total_source_byte_count + (72 - fixture_key_length)
+    assert (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES - production_total
+        >= projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES - 5_000 - production_total
+        < projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert v19.profile_sha256 == projection._require_profile(
+        v19_runtime.SUCCESSOR_PROFILE_2025_ID
+    )["profile_sha256"]
+
+
+def test_v19_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v18 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v18_runtime.BOUNDARY_PROFILE_2026_ID,
+    )
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2026_ID,
+    )
+    assert projection._maximum_total_source_bytes(v18.profile_id) == (
+        projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES
+    )
+    assert projection._maximum_total_source_bytes(v19.profile_id) == (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        v19.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        > projection.MAX_BOUNDARY_TOTAL_SOURCE_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_SUCCESSOR_TOTAL_SOURCE_BYTES",
+        v19.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(v19)
+    assert projection.require_accepted_risk_order_level_qc_projection(v18) is v18
+
+
+def test_spy_v1_adds_only_ticker_bound_adapter_to_exact_v19_closure(
+    delta_package,
+):
+    spy = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    spy_by_path = {item.project_path: item for item in spy.source_files}
+    v19_by_path = {item.project_path: item for item in v19.source_files}
+
+    assert set(spy_by_path) == set(v19_by_path) | {
+        projection.UNIVERSE_BENCHMARK_PROJECT_PATH,
+        projection.SPY_RUNTIME_PROJECT_PATH,
+    }
+    for path in set(v19_by_path) - {projection.MAIN_PROJECT_PATH}:
+        assert spy_by_path[path] == v19_by_path[path]
+    assert spy.profile_sha256 == projection._require_profile(
+        spy_runtime.SUCCESSOR_PROFILE_2025_ID
+    )["profile_sha256"]
+    assert projection.require_accepted_risk_order_level_qc_projection(spy) is spy
+
+
+def test_spy_v1_generated_main_has_one_raw_spy_and_no_qqq_equity(
+    delta_package,
+):
+    value = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2025_ID,
+    )
+    main = next(
+        item.source_bytes.decode("ascii")
+        for item in value.source_files
+        if item.project_path == projection.MAIN_PROJECT_PATH
+    )
+
+    assert main.count("self.add_equity(") == 1
+    assert main.count('"SPY"') == 1
+    assert '"QQQ"' not in main
+    assert "Resolution.MINUTE" in main
+    assert "data_normalization_mode=DataNormalizationMode.RAW" in main
+    assert "spy_benchmark = self.add_equity(" in main
+    assert "authority_benchmark_symbol=spy_benchmark" in main
+    assert "spy_benchmark_symbol=spy_benchmark" in main
+    assert "self.set_benchmark(spy_benchmark)" in main
+    assert "self.universe.etf(\n                spy_benchmark," in main
+    assert "self.date_rules.every_day(spy_benchmark)" in main
+    assert "self.time_rules.after_market_close(spy_benchmark, 0)" in main
+    assert "self.time_rules.before_market_open(spy_benchmark, 10)" in main
+    assert "self._arv2_accept_spy_constituents" in main
+    assert "accept_spy_constituents(constituents)" in main
+    assert "AcceptedRiskSpyOrderLevelQcRuntime(" in main
+    assert "qqq_benchmark = self.add_equity(" not in main
+    assert "qqq_constituent_universe=" not in main
+
+
+def test_spy_v1_total_cap_is_profile_specific_and_load_bearing(
+    delta_package, monkeypatch,
+):
+    v19 = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=v19_runtime.SUCCESSOR_PROFILE_2026_ID,
+    )
+    spy = projection.build_accepted_risk_order_level_qc_projection(
+        delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2026_ID,
+    )
+    assert projection._maximum_total_source_bytes(v19.profile_id) == (
+        projection.MAX_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    assert projection._maximum_total_source_bytes(spy.profile_id) == (
+        projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    assert (
+        spy.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES
+        <= projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
+    )
+    fixture_key_length = len("arv2/order-fixture/transport-manifest.json")
+    production_total = spy.total_source_byte_count + (72 - fixture_key_length)
+    assert (
+        projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES - production_total
+        >= projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    assert (
+        projection.MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES
+        - 5_000
+        - production_total
+        < projection.MIN_REVIEW_MARGIN_BYTES
+    )
+    monkeypatch.setattr(
+        projection,
+        "MAX_SPY_SUCCESSOR_TOTAL_SOURCE_BYTES",
+        spy.total_source_byte_count + projection.MIN_REVIEW_MARGIN_BYTES - 1,
+    )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="source set exceeds reviewed total size",
+    ):
+        projection.build_accepted_risk_order_level_qc_projection(
+            delta_package, profile_id=spy_runtime.SUCCESSOR_PROFILE_2026_ID,
+        )
+    with pytest.raises(
+        projection.AcceptedRiskOrderLevelQcProjectionError,
+        match="projection disclosure or inventory changed",
+    ):
+        projection.require_accepted_risk_order_level_qc_projection(spy)
+    assert projection.require_accepted_risk_order_level_qc_projection(v19) is v19
+
+
+def test_firewall_allows_only_exact_v18_read_only_engine_order_lookup():
+    accepted = (
+        "from accepted_risk_qqq_order_level_v18_qc_runtime import (\n"
+        "    AcceptedRiskQqqOrderLevelV18QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime,\n"
+        "    STARTING_CASH,\n"
+        ")\n"
+        "class Algorithm:\n"
+        "    def initialize(self):\n"
+        "        self._arv2_driver = AcceptedRiskQqqOrderLevelQcRuntime(\n"
+        "            self, profile_id='arv2-qqq-order-level-tilt-2025-cutoff-v18',\n"
+        "        )\n"
+        "    def on_order_event(self, event):\n"
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._driver.on_order_event(event, engine_order=engine_order)\n"
+    )
+    projection._audit_cloud_capabilities(accepted, projection.MAIN_PROJECT_PATH)
+    for refused in (
+        accepted.replace("cutoff-v18", "cutoff-v17"),
+        accepted.replace("V18QcRuntime", "V17QcRuntime"),
+        accepted + "    def on_end_of_algorithm(self):\n"
+        "        self.object_store.save('arv2/diag/composition.txt', 'x')\n",
+        accepted + "    def on_end_of_algorithm(self):\n"
+        "        self.debug('x')\n",
+    ):
+        with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+            projection._audit_cloud_capabilities(
+                refused, projection.MAIN_PROJECT_PATH,
+            )
+    v18_source = (
+        Path(projection.__file__).resolve().parent
+        / projection.V18_RUNTIME_PROJECT_PATH
+    ).read_bytes()
+    projection._validate_source(projection.V18_RUNTIME_PROJECT_PATH, v18_source)
+
+
+def test_firewall_refuses_algorithm_log_calls_in_versioned_runtime_sources():
+    """A cloud runtime that logs is refused; the lane never ships log calls."""
+
+    source = (
+        "class Runtime:\n"
+        "    def _pit_benchmark_measures(self, session):\n"
+        "        self._algorithm.log('PIT FALLBACK ' + session)\n"
+        "        return {}\n"
+    )
+    with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+        projection._audit_cloud_capabilities(
+            source, projection.V17_RUNTIME_PROJECT_PATH,
+        )
+    v17_source = (
+        Path(projection.__file__).resolve().parent
+        / projection.V17_RUNTIME_PROJECT_PATH
+    ).read_bytes()
+    projection._validate_source(projection.V17_RUNTIME_PROJECT_PATH, v17_source)
+
+
 @pytest.mark.parametrize(
     "enum_type",
     (
@@ -980,6 +1737,96 @@ def test_firewall_allows_only_exact_v13_read_only_engine_order_lookup():
             )
 
 
+def test_firewall_allows_only_exact_v14_read_only_engine_order_lookup():
+    accepted = (
+        "from accepted_risk_qqq_order_level_v14_qc_runtime import (\n"
+        "    AcceptedRiskQqqOrderLevelV14QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime,\n"
+        "    STARTING_CASH,\n"
+        ")\n"
+        "class Algorithm:\n"
+        "    def initialize(self):\n"
+        "        self._arv2_driver = AcceptedRiskQqqOrderLevelQcRuntime(\n"
+        "            self, profile_id='arv2-qqq-order-level-tilt-2026-cutoff-v14',\n"
+        "        )\n"
+        "    def on_order_event(self, event):\n"
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._driver.on_order_event(event, engine_order=engine_order)\n"
+    )
+    projection._audit_cloud_capabilities(accepted, projection.MAIN_PROJECT_PATH)
+    for refused in (
+        accepted.replace("cutoff-v14", "cutoff-v13"),
+        accepted.replace("V14QcRuntime", "V13QcRuntime"),
+        accepted.replace(
+            "accepted_risk_qqq_order_level_v14_qc_runtime",
+            "accepted_risk_qqq_order_level_v13_qc_runtime",
+        ),
+    ):
+        with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+            projection._audit_cloud_capabilities(
+                refused, projection.MAIN_PROJECT_PATH,
+            )
+
+
+def test_firewall_allows_only_exact_v15_read_only_engine_order_lookup():
+    accepted = (
+        "from accepted_risk_qqq_order_level_v15_qc_runtime import (\n"
+        "    AcceptedRiskQqqOrderLevelV15QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime,\n"
+        "    STARTING_CASH,\n"
+        ")\n"
+        "class Algorithm:\n"
+        "    def initialize(self):\n"
+        "        self._arv2_driver = AcceptedRiskQqqOrderLevelQcRuntime(\n"
+        "            self, profile_id='arv2-qqq-order-level-tilt-2026-cutoff-v15',\n"
+        "        )\n"
+        "    def on_order_event(self, event):\n"
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._driver.on_order_event(event, engine_order=engine_order)\n"
+    )
+    projection._audit_cloud_capabilities(accepted, projection.MAIN_PROJECT_PATH)
+    for refused in (
+        accepted.replace("cutoff-v15", "cutoff-v14"),
+        accepted.replace("V15QcRuntime", "V14QcRuntime"),
+        accepted.replace(
+            "accepted_risk_qqq_order_level_v15_qc_runtime",
+            "accepted_risk_qqq_order_level_v14_qc_runtime",
+        ),
+    ):
+        with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+            projection._audit_cloud_capabilities(
+                refused, projection.MAIN_PROJECT_PATH,
+            )
+
+
+def test_firewall_allows_only_exact_v16_read_only_engine_order_lookup():
+    accepted = (
+        "from accepted_risk_qqq_order_level_v16_qc_runtime import (\n"
+        "    AcceptedRiskQqqOrderLevelV16QcRuntime as AcceptedRiskQqqOrderLevelQcRuntime,\n"
+        "    STARTING_CASH,\n"
+        ")\n"
+        "class Algorithm:\n"
+        "    def initialize(self):\n"
+        "        self._arv2_driver = AcceptedRiskQqqOrderLevelQcRuntime(\n"
+        "            self, profile_id='arv2-qqq-order-level-tilt-2026-cutoff-v16',\n"
+        "        )\n"
+        "    def on_order_event(self, event):\n"
+        "        engine_order = self.transactions.get_order_by_id(event.order_id)\n"
+        "        self._driver.on_order_event(event, engine_order=engine_order)\n"
+    )
+    projection._audit_cloud_capabilities(accepted, projection.MAIN_PROJECT_PATH)
+    for refused in (
+        accepted.replace("cutoff-v16", "cutoff-v15"),
+        accepted.replace("V16QcRuntime", "V15QcRuntime"),
+        accepted.replace(
+            "accepted_risk_qqq_order_level_v16_qc_runtime",
+            "accepted_risk_qqq_order_level_v15_qc_runtime",
+        ),
+    ):
+        with pytest.raises(projection.AcceptedRiskOrderLevelQcProjectionError):
+            projection._audit_cloud_capabilities(
+                refused, projection.MAIN_PROJECT_PATH,
+            )
+
+
 def test_firewall_rejects_live_write_and_paper_broker_deploy_references():
     cases = (
         "def f(self):\n    self._algorithm.live_mode = False\n",
@@ -1072,6 +1919,13 @@ def test_qc_prelude_compilation_and_future_import_regression():
         (runtime.REFLECTED_TICKET_PROFILE_2026_ID, 8192),
         (v12_runtime.FORCED_EXIT_PROFILE_2026_ID, 8192),
         (v13_runtime.ROLLOVER_PROFILE_2026_ID, 8192),
+        (v14_runtime.DIAGNOSTIC_PROFILE_2026_ID, 8192),
+        (v15_runtime.ACCOUNT_PROFILE_2026_ID, 8192),
+        (v16_runtime.EXPOSURE_PROFILE_2026_ID, 8192),
+        (v17_runtime.SKIP_PROFILE_2026_ID, 8192),
+        (v18_runtime.BOUNDARY_PROFILE_2026_ID, 8192),
+        (v19_runtime.SUCCESSOR_PROFILE_2026_ID, 16384),
+        (spy_runtime.SUCCESSOR_PROFILE_2026_ID, 16384),
     ),
 )
 def test_generated_main_imports_from_exact_flat_qc_projection(
@@ -1100,8 +1954,12 @@ def test_generated_main_imports_from_exact_flat_qc_projection(
                 "import sys;"
                 f"sys.path.insert(0, {str(tmp_path)!r});"
                 "import main;"
-                "assert main.ARV2QqqOrderLevelAlgorithm;"
-                "import accepted_risk_qqq_order_level_qc_runtime as runtime;"
+                + (
+                    "assert main.ARV2SpyOrderLevelAlgorithm;"
+                    if profile_id in spy_runtime.SUCCESSOR_PROFILE_IDS
+                    else "assert main.ARV2QqqOrderLevelAlgorithm;"
+                )
+                + "import accepted_risk_qqq_order_level_qc_runtime as runtime;"
                 f"assert runtime.MAXIMUM_STATISTIC_BYTES == {statistic_limit}"
             ),
         ],

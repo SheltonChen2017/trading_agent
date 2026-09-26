@@ -31,14 +31,26 @@ MINIMUM_TOTAL_REPORTED_WEIGHT = Decimal("0.95")
 MAXIMUM_TOTAL_REPORTED_WEIGHT = Decimal("1.05")
 MINIMUM_SID_NAME_MAPPING_RATIO = Decimal("0.90")
 MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO = Decimal("0.99")
+CAP95_MARKET_CAP_WEIGHT_COVERAGE_RATIO = Decimal("0.95")
+CAP90_MARKET_CAP_WEIGHT_COVERAGE_RATIO = Decimal("0.90")
 SOURCE_VIEW_ID = "conservative_censored_current_vintage_non_pristine_pit"
 SCORE_ARM_ID = "firm_specific"
 PROFILE_SCHEMA = "arv2-six-universe-gate-profile-v1"
 CONSTRUCTION_SCHEMA = "arv2-six-universe-gate-construction-v1"
+UNAVAILABLE_COLLECTION_REASON = "CONSTITUENT_COLLECTION_UNAVAILABLE"
 DECIMAL_RESIDUAL_RULE = (
     "floor_each_nominal_equal_sleeve_to_1e-24_and_assign_the_residual_"
     "to_the_final_frozen_sleeve"
 )
+# Coverage ratios are deliberately evaluated under a 96-digit Decimal
+# context below.  Their canonical recorder must accept that same finite
+# domain: ordinary member-count ratios such as 30/31 use all 96 digits and
+# an exponent of -96.  The former 64-digit / -48 floor contradicted the
+# arithmetic contract and made a normal point-in-time snapshot impossible
+# to record after it had already passed the economic gates.
+DECIMAL_MAXIMUM_DIGITS = 96
+DECIMAL_MINIMUM_EXPONENT = -96
+DECIMAL_MAXIMUM_EXPONENT = 96
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -92,7 +104,12 @@ def _require_decimal(
     if type(value) is not Decimal or not value.is_finite():
         raise SixUniverseGateError(f"{name} must be an exact finite Decimal")
     decimal_tuple = value.as_tuple()
-    if len(decimal_tuple.digits) > 64 or not -48 <= decimal_tuple.exponent <= 48:
+    if (
+        len(decimal_tuple.digits) > DECIMAL_MAXIMUM_DIGITS
+        or not DECIMAL_MINIMUM_EXPONENT
+        <= decimal_tuple.exponent
+        <= DECIMAL_MAXIMUM_EXPONENT
+    ):
         raise SixUniverseGateError(f"{name} escaped the canonical Decimal bound")
     if positive and value <= 0:
         raise SixUniverseGateError(f"{name} must be strictly positive")
@@ -144,7 +161,11 @@ def _sleeve_budgets() -> tuple[Decimal, ...]:
 SLEEVE_BUDGETS = _sleeve_budgets()
 
 
-def _profile_semantic(label: str, slot_count: int) -> dict[str, object]:
+def _profile_semantic(
+    label: str,
+    slot_count: int,
+    minimum_market_cap_weight_coverage_ratio: Decimal,
+) -> dict[str, object]:
     return {
         "schema": PROFILE_SCHEMA,
         "label": label,
@@ -175,7 +196,7 @@ def _profile_semantic(label: str, slot_count: int) -> dict[str, object]:
             MINIMUM_SID_NAME_MAPPING_RATIO
         ),
         "minimum_market_cap_weight_coverage_ratio": _decimal_text(
-            MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO
+            minimum_market_cap_weight_coverage_ratio
         ),
         "signal_rank_rule": "strictly_positive_score_desc_then_security_id",
         "matched_rank_rule": (
@@ -201,9 +222,14 @@ class GateProfile:
     profile_sha256: str
     label: str
     slot_count: int
+    minimum_market_cap_weight_coverage_ratio: Decimal
 
     def to_record(self) -> dict[str, object]:
-        semantic = _profile_semantic(self.label, self.slot_count)
+        semantic = _profile_semantic(
+            self.label,
+            self.slot_count,
+            self.minimum_market_cap_weight_coverage_ratio,
+        )
         if _sha256(semantic) != self.profile_sha256:
             raise SixUniverseGateError("six-universe profile authority changed")
         return {
@@ -213,20 +239,54 @@ class GateProfile:
         }
 
 
-def _build_profile(label: str, slot_count: int) -> GateProfile:
-    semantic = _profile_semantic(label, slot_count)
+def _build_profile(
+    label: str,
+    slot_count: int,
+    *,
+    minimum_market_cap_weight_coverage_ratio: Decimal = (
+        MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO
+    ),
+) -> GateProfile:
+    semantic = _profile_semantic(
+        label,
+        slot_count,
+        minimum_market_cap_weight_coverage_ratio,
+    )
     digest = _sha256(semantic)
     return GateProfile(
         profile_id=f"arv2-six-universe-gate-{label}-{digest[:24]}",
         profile_sha256=digest,
         label=label,
         slot_count=slot_count,
+        minimum_market_cap_weight_coverage_ratio=(
+            minimum_market_cap_weight_coverage_ratio
+        ),
     )
 
 
 TOP10_PRIMARY_PROFILE = _build_profile("top10-primary-v1", 10)
 TOP5_SENSITIVITY_PROFILE = _build_profile("top5-sensitivity-v1", 5)
-PROFILES = (TOP10_PRIMARY_PROFILE, TOP5_SENSITIVITY_PROFILE)
+# Offline exploratory constructor only; the QC order path still pins primary.
+TOP10_CAP95_EXPLORATORY_PROFILE = _build_profile(
+    "top10-cap95-exploratory-v1",
+    10,
+    minimum_market_cap_weight_coverage_ratio=(
+        CAP95_MARKET_CAP_WEIGHT_COVERAGE_RATIO
+    ),
+)
+TOP10_CAP90_EXPLORATORY_PROFILE = _build_profile(
+    "top10-cap90-exploratory-v1",
+    10,
+    minimum_market_cap_weight_coverage_ratio=(
+        CAP90_MARKET_CAP_WEIGHT_COVERAGE_RATIO
+    ),
+)
+PROFILES = (
+    TOP10_PRIMARY_PROFILE,
+    TOP5_SENSITIVITY_PROFILE,
+    TOP10_CAP95_EXPLORATORY_PROFILE,
+    TOP10_CAP90_EXPLORATORY_PROFILE,
+)
 
 
 @dataclasses.dataclass(frozen=True, slots=True)
@@ -374,8 +434,12 @@ def _validate_profile(value: object) -> GateProfile:
 
 def _validated_constituents(
     snapshot: UniverseSnapshot,
+    *,
+    allow_empty: bool = False,
 ) -> tuple[UniverseConstituent, ...]:
-    if type(snapshot.constituents) is not tuple or not snapshot.constituents:
+    if type(snapshot.constituents) is not tuple or (
+        not snapshot.constituents and not allow_empty
+    ):
         raise SixUniverseGateError("universe constituents must be a nonempty tuple")
     seen: set[str] = set()
     result = []
@@ -405,7 +469,10 @@ def _validated_constituents(
     return tuple(result)
 
 
-def _coverage(rows: tuple[UniverseConstituent, ...]) -> CoverageAssessment:
+def _coverage(
+    rows: tuple[UniverseConstituent, ...],
+    profile: GateProfile,
+) -> CoverageAssessment:
     total_weight = _sum(row.reported_weight for row in rows)
     mapped = tuple(
         row
@@ -430,7 +497,7 @@ def _coverage(rows: tuple[UniverseConstituent, ...]) -> CoverageAssessment:
         reasons.append("TOTAL_REPORTED_WEIGHT_OUT_OF_RANGE")
     if mapping_ratio < MINIMUM_SID_NAME_MAPPING_RATIO:
         reasons.append("SID_NAME_MAPPING_BELOW_MINIMUM")
-    if cap_ratio < MINIMUM_MARKET_CAP_WEIGHT_COVERAGE_RATIO:
+    if cap_ratio < profile.minimum_market_cap_weight_coverage_ratio:
         reasons.append("MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM")
     return CoverageAssessment(
         member_count=len(rows),
@@ -493,6 +560,8 @@ def _raw_sleeve(
     snapshot: UniverseSnapshot,
     budget: Decimal,
     profile: GateProfile,
+    *,
+    unavailable: bool = False,
 ) -> tuple[
     CoverageAssessment,
     int,
@@ -503,8 +572,26 @@ def _raw_sleeve(
     Decimal,
     Decimal,
 ]:
-    rows = _validated_constituents(snapshot)
-    coverage = _coverage(rows)
+    rows = _validated_constituents(snapshot, allow_empty=unavailable)
+    if unavailable:
+        if rows:
+            raise SixUniverseGateError(
+                "unavailable universe flagged with nonempty constituents"
+            )
+        # A known unavailable collection is an invalid sleeve, not a zero-
+        # weight synthetic constituent or a replay of an earlier snapshot.
+        coverage = CoverageAssessment(
+            member_count=0,
+            mapped_member_count=0,
+            total_reported_weight=Decimal(0),
+            cap_covered_reported_weight=Decimal(0),
+            mapping_ratio=Decimal(0),
+            cap_weight_coverage_ratio=Decimal(0),
+            valid=False,
+            refusal_reasons=(UNAVAILABLE_COLLECTION_REASON,),
+        )
+    else:
+        coverage = _coverage(rows, profile)
     signal_ids, matched_ids, positive_count = _selected_ids(
         rows,
         coverage,
@@ -589,10 +676,34 @@ def _apply_duplicate_cap(
 def build_six_universe_construction(
     snapshots: tuple[UniverseSnapshot, ...],
     profile: GateProfile,
+    *,
+    unavailable_universe_ids: tuple[str, ...] = (),
 ) -> SixUniverseConstruction:
-    """Build the frozen score-gated, size-matched, and ETF-basket targets."""
+    """Build targets; opt-in cap-90 absence spends only the affected ETF sleeve.
+
+    An unavailable collection must be explicitly named and represented by
+    an actual empty tuple.  The default/old profile still refuses emptiness.
+    """
 
     profile = _validate_profile(profile)
+    if (
+        type(unavailable_universe_ids) is not tuple
+        or any(
+            type(item) is not str or item not in UNIVERSE_IDS
+            for item in unavailable_universe_ids
+        )
+        or unavailable_universe_ids
+        != tuple(
+            item for item in UNIVERSE_IDS if item in unavailable_universe_ids
+        )
+        or (
+            unavailable_universe_ids
+            and profile is not TOP10_CAP90_EXPLORATORY_PROFILE
+        )
+    ):
+        raise SixUniverseGateError(
+            "unavailable universe IDs require exact cap-90 canonical tuple"
+        )
     if type(snapshots) is not tuple or len(snapshots) != len(UNIVERSE_SPECS):
         raise SixUniverseGateError("exactly six universe snapshots are required")
     by_id = {}
@@ -618,7 +729,12 @@ def build_six_universe_construction(
         snapshot = by_id[spec.universe_id]
         if snapshot.etf_ticker != spec.etf_ticker:
             raise SixUniverseGateError("universe ETF ticker changed")
-        rows = _validated_constituents(snapshot)
+        unavailable = spec.universe_id in unavailable_universe_ids
+        rows = _validated_constituents(snapshot, allow_empty=unavailable)
+        if unavailable and rows:
+            raise SixUniverseGateError(
+                "unavailable universe flagged with nonempty constituents"
+            )
         member_security_ids.update(
             row.security_id for row in rows if row.security_id is not None
         )
@@ -629,7 +745,12 @@ def build_six_universe_construction(
     raw_sleeves = tuple(
         (
             snapshot,
-            _raw_sleeve(snapshot, SLEEVE_BUDGETS[index], profile),
+            _raw_sleeve(
+                snapshot,
+                SLEEVE_BUDGETS[index],
+                profile,
+                unavailable=snapshot.universe_id in unavailable_universe_ids,
+            ),
         )
         for index, snapshot in enumerate(ordered)
     )
@@ -674,6 +795,8 @@ def build_six_universe_construction(
 
 
 __all__ = (
+    "CAP90_MARKET_CAP_WEIGHT_COVERAGE_RATIO",
+    "CAP95_MARKET_CAP_WEIGHT_COVERAGE_RATIO",
     "CONSTRUCTION_SCHEMA",
     "DIRECT_STOCK_WEIGHT_CAP",
     "GateProfile",
@@ -692,6 +815,9 @@ __all__ = (
     "SleeveConstruction",
     "TARGET_GROSS_EXPOSURE",
     "TOP10_PRIMARY_PROFILE",
+    "TOP10_CAP95_EXPLORATORY_PROFILE",
+    "TOP10_CAP90_EXPLORATORY_PROFILE",
+    "UNAVAILABLE_COLLECTION_REASON",
     "TOP5_SENSITIVITY_PROFILE",
     "UNIVERSE_IDS",
     "UNIVERSE_SPECS",

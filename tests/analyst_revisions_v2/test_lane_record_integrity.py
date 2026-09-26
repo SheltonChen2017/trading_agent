@@ -76,6 +76,19 @@ def test_session_push_ledger_is_one_contiguous_gfm_table() -> None:
     )
 
 
+def test_live_banner_retains_the_no_accepted_signal_assertion() -> None:
+    """Historical quotations must not satisfy the live safety banner gate."""
+
+    text = RECORD.read_text(encoding="utf-8")
+    banner = text.split("\nBranch: `codex/strategy-analyst-revisions-v2`", 1)[0]
+    normalized = " ".join(banner.split())
+
+    assert (
+        "NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR PRODUCTION-EXECUTABLE."
+        in normalized
+    )
+
+
 def test_exact_next_step_references_the_latest_numbered_section() -> None:
     """A new review section must not leave the live handoff one round behind."""
 
@@ -174,6 +187,79 @@ def test_review_sentence_classifier_requires_agent_and_accepts_verb_forms() -> N
 
     assert all(_names_review_by_agent(sentence) for sentence in accepted)
     assert not any(_names_review_by_agent(sentence) for sentence in rejected)
+
+
+SHARED_LOOK_LEDGER = RECORD.parents[1] / "research" / "alpha-result.md"
+_CANDIDATE_ID = re.compile(r"\bR-(\d{3})\b")
+_RECORDED_BACKTEST = re.compile(
+    r"backtest\s+`[0-9a-f]{32}`"
+    r"|^\|\s*Backtest\s*\|[^\n]*`[0-9a-f]{32}`",
+    flags=re.MULTILINE,
+)
+_SECTION_HEADING = re.compile(r"(?m)^(#{2,3} .*)$")
+
+
+def _launched_candidates(record: str) -> dict[str, str]:
+    """Candidates whose own record section names a QC backtest identity."""
+
+    parts = _SECTION_HEADING.split(record)
+    launched: dict[str, str] = {}
+    for heading, body in zip(parts[1::2], parts[2::2]):
+        if _RECORDED_BACKTEST.search(body):
+            for candidate in _CANDIDATE_ID.findall(heading):
+                launched.setdefault(candidate, heading.strip())
+    return launched
+
+
+def test_shared_look_ledger_names_every_launched_candidate() -> None:
+    # The shared ledger is the cross-lane look census. This checks that each
+    # detected launched candidate has a heading, not that every additional
+    # launch under an already-ledgered candidate has its own run-level entry.
+    record = RECORD.read_text(encoding="utf-8")
+    ledger = SHARED_LOOK_LEDGER.read_text(encoding="utf-8")
+    ledger_candidates = {
+        candidate
+        for line in ledger.splitlines()
+        if line.startswith("## ")
+        for candidate in _CANDIDATE_ID.findall(line)
+    }
+    launched = _launched_candidates(record)
+    assert launched, "no launched candidate found in the record"
+    missing = {
+        candidate: heading
+        for candidate, heading in launched.items()
+        if candidate not in ledger_candidates
+    }
+    assert not missing, (
+        "launched candidates without a shared look-ledger heading: "
+        f"{sorted(missing)!r} (first named in {sorted(missing.values())[:3]!r})"
+    )
+
+
+def test_launched_candidate_classifier_requires_a_backtest_identity() -> None:
+    record = (
+        "## 1. R-900 preregistration\n\nNo launch yet.\n\n"
+        "## 2. R-901 completed run\n\nbacktest `" + "a" * 32 + "` reached Completed.\n\n"
+        "### 2.1 R-902 attempt\n\nCompiled and launched backtest `" + "b" * 32 + "`.\n"
+    )
+    assert sorted(_launched_candidates(record)) == ["901", "902"]
+
+
+def test_launched_candidate_classifier_accepts_backtest_table_rows() -> None:
+    record = (
+        "## 1. R-900 unlaunched\n\n| Source | `" + "0" * 32 + "` |\n\n"
+        "## 2. R-901 completed\n\n| Backtest | `" + "a" * 32 + "`; run name |\n\n"
+        "### 2.1 R-902 attempt\n\n| Backtest | `run name`, id `"
+        + "b" * 32
+        + "` |\n\n"
+        "## 3. R-903 planned\n\n| Backtest | `run name only` |\n"
+    )
+    assert sorted(_launched_candidates(record)) == ["901", "902"]
+
+
+def test_launched_candidate_classifier_covers_historical_table_rows() -> None:
+    launched = _launched_candidates(RECORD.read_text(encoding="utf-8"))
+    assert {"053", "173", "174", "175", "176"} <= launched.keys()
 
 
 def test_owner_review_waiver_classifier_is_exact_and_section_shaped() -> None:

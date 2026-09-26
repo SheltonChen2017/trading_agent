@@ -83,6 +83,71 @@ def _gross(weights):
     return sum((item.weight for item in weights), Decimal(0))
 
 
+def test_cap90_explicit_empty_collection_is_only_own_etf_fallback():
+    snapshots = _replace_snapshot(_snapshots(), "REMX", ())
+    result = subject.build_six_universe_construction(
+        snapshots,
+        subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+        unavailable_universe_ids=("REMX",),
+    )
+    remx = result.sleeves[4]
+    assert remx.coverage.to_record() == {
+        "member_count": 0,
+        "mapped_member_count": 0,
+        "total_reported_weight": "0",
+        "cap_covered_reported_weight": "0",
+        "mapping_ratio": "0",
+        "cap_weight_coverage_ratio": "0",
+        "valid": False,
+        "refusal_reasons": ["CONSTITUENT_COLLECTION_UNAVAILABLE"],
+    }
+    assert remx.positive_score_count == 0
+    assert remx.signal_security_ids == remx.matched_security_ids == ()
+    assert remx.signal_stock_weights == remx.matched_stock_weights == ()
+    assert remx.signal_etf_fallback_weight == remx.matched_etf_fallback_weight == (
+        subject.SLEEVE_BUDGETS[4]
+    )
+    assert _gross(result.signal_weights) == Decimal("0.98")
+    assert _gross(result.matched_weights) == Decimal("0.98")
+    assert _gross(result.etf_basket_weights) == Decimal("0.98")
+    assert any(item.asset_kind == "stock" for item in result.signal_weights)
+    assert result.to_record()["construction_sha256"]
+
+
+@pytest.mark.parametrize(
+    "unavailable_universe_ids",
+    (None, ["REMX"], ("OTHER",), ("REMX", "REMX"), ("XLE", "REMX"), (1,)),
+)
+def test_cap90_unavailable_flags_require_exact_canonical_tuple(unavailable_universe_ids):
+    snapshots = _replace_snapshot(_snapshots(), "REMX", ())
+    with pytest.raises(subject.SixUniverseGateError, match="unavailable universe"):
+        subject.build_six_universe_construction(
+            snapshots,
+            subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+            unavailable_universe_ids=unavailable_universe_ids,
+        )
+
+
+def test_unavailable_flag_never_licenses_nonempty_or_legacy_empty_collection():
+    snapshots = _snapshots()
+    with pytest.raises(subject.SixUniverseGateError, match="flagged.*nonempty"):
+        subject.build_six_universe_construction(
+            snapshots,
+            subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+            unavailable_universe_ids=("REMX",),
+        )
+    empty = _replace_snapshot(snapshots, "REMX", ())
+    for profile, flags in (
+        (subject.TOP10_CAP90_EXPLORATORY_PROFILE, ()),
+        (subject.TOP10_PRIMARY_PROFILE, ()),
+        (subject.TOP10_PRIMARY_PROFILE, ("REMX",)),
+    ):
+        with pytest.raises(subject.SixUniverseGateError):
+            subject.build_six_universe_construction(
+                empty, profile, unavailable_universe_ids=flags
+            )
+
+
 def test_profiles_freeze_source_view_universes_and_distinct_top_counts():
     assert subject.UNIVERSE_IDS == (
         "SPY",
@@ -113,6 +178,30 @@ def test_profiles_freeze_source_view_universes_and_distinct_top_counts():
         == "16dbb321cf013cfdbf9ea2ec6af7888db080b293b72d58d027228377b68b8124"
     )
     assert subject.TOP10_PRIMARY_PROFILE != subject.TOP5_SENSITIVITY_PROFILE
+    assert (
+        subject.TOP10_CAP95_EXPLORATORY_PROFILE
+        .minimum_market_cap_weight_coverage_ratio
+        == Decimal("0.95")
+    )
+    assert subject.TOP10_CAP95_EXPLORATORY_PROFILE.profile_sha256 == (
+        "e68c13ef1682028709404d03493addf65d35bc23bbca0600f10ce54d1bfb2b84"
+    )
+    assert subject.TOP10_CAP95_EXPLORATORY_PROFILE.profile_sha256 not in {
+        subject.TOP10_PRIMARY_PROFILE.profile_sha256,
+        subject.TOP5_SENSITIVITY_PROFILE.profile_sha256,
+    }
+    assert subject.TOP10_CAP90_EXPLORATORY_PROFILE.profile_id == (
+        "arv2-six-universe-gate-top10-cap90-exploratory-v1-278d334f9e6364bf4e3c181d"
+    )
+    assert subject.TOP10_CAP90_EXPLORATORY_PROFILE.profile_sha256 == (
+        "278d334f9e6364bf4e3c181d35b1b5fb9b48fc37db9ab66e97f841221cdc62b6"
+    )
+    assert subject.PROFILES == (
+        subject.TOP10_PRIMARY_PROFILE,
+        subject.TOP5_SENSITIVITY_PROFILE,
+        subject.TOP10_CAP95_EXPLORATORY_PROFILE,
+        subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+    )
     assert sum(subject.SLEEVE_BUDGETS, Decimal(0)) == Decimal("0.98")
     assert len(set(subject.SLEEVE_BUDGETS[:-1])) == 1
     assert subject.SLEEVE_BUDGETS[-1] - subject.SLEEVE_BUDGETS[0] == Decimal(
@@ -305,6 +394,178 @@ def test_coverage_exact_boundaries_are_inclusive():
     )
     assert upper.sleeves[0].coverage.total_reported_weight == Decimal("1.05")
     assert upper.sleeves[0].coverage.valid is True
+
+
+def test_cap95_variation_changes_only_the_cap_coverage_boundary():
+    snapshots = _snapshots(missing_caps=frozenset({19}))
+    primary = subject.build_six_universe_construction(
+        snapshots, subject.TOP10_PRIMARY_PROFILE
+    )
+    relaxed = subject.build_six_universe_construction(
+        snapshots, subject.TOP10_CAP95_EXPLORATORY_PROFILE
+    )
+    assert primary.sleeves[0].coverage.cap_weight_coverage_ratio == Decimal("0.95")
+    assert primary.sleeves[0].coverage.valid is False
+    assert primary.sleeves[0].signal_security_ids == ()
+    assert relaxed.sleeves[0].coverage.valid is True
+    assert len(relaxed.sleeves[0].signal_security_ids) == 10
+    assert len(relaxed.sleeves[0].matched_security_ids) == 10
+    assert sum(item.weight for item in relaxed.signal_weights) == Decimal("0.98")
+    assert (
+        relaxed.profile.to_record()["minimum_market_cap_weight_coverage_ratio"]
+        == "0.95"
+    )
+    assert (
+        primary.profile.to_record()["minimum_market_cap_weight_coverage_ratio"]
+        == "0.99"
+    )
+
+
+def test_cap95_variation_still_refuses_below_boundary_and_other_gates():
+    snapshots = _snapshots()
+    cap_rows = list(_rows("SPY", missing_caps=frozenset({19})))
+    cap_rows[19] = dataclasses.replace(
+        cap_rows[19], reported_weight=Decimal("0.051")
+    )
+    cap_rows[18] = dataclasses.replace(
+        cap_rows[18], reported_weight=Decimal("0.049")
+    )
+    cases = (
+        (tuple(cap_rows), "MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM"),
+        (
+            _rows("SPY", missing_names=frozenset({0, 1, 2})),
+            "SID_NAME_MAPPING_BELOW_MINIMUM",
+        ),
+        (
+            _rows("SPY", reported_weight=Decimal("0.047")),
+            "TOTAL_REPORTED_WEIGHT_OUT_OF_RANGE",
+        ),
+    )
+    for rows, reason in cases:
+        result = subject.build_six_universe_construction(
+            _replace_snapshot(snapshots, "SPY", rows),
+            subject.TOP10_CAP95_EXPLORATORY_PROFILE,
+        )
+        assert reason in result.sleeves[0].coverage.refusal_reasons
+        assert result.sleeves[0].signal_security_ids == ()
+        assert result.sleeves[0].matched_security_ids == ()
+        assert result.sleeves[0].signal_etf_fallback_weight == result.sleeves[0].budget
+        assert result.sleeves[1].coverage.valid is True
+
+    score_floor = subject.build_six_universe_construction(
+        _snapshots(positive_count=4),
+        subject.TOP10_CAP95_EXPLORATORY_PROFILE,
+    )
+    assert all(sleeve.coverage.valid for sleeve in score_floor.sleeves)
+    assert all(sleeve.signal_security_ids == () for sleeve in score_floor.sleeves)
+
+
+def test_cap90_exploration_admits_exact_boundary_for_both_stock_roles():
+    baseline_record = subject.TOP10_PRIMARY_PROFILE.to_record()
+    exploratory_record = subject.TOP10_CAP90_EXPLORATORY_PROFILE.to_record()
+    changed = {
+        key
+        for key in baseline_record
+        if baseline_record[key] != exploratory_record[key]
+    }
+    assert changed == {
+        "label",
+        "minimum_market_cap_weight_coverage_ratio",
+        "profile_id",
+        "profile_sha256",
+    }
+    assert exploratory_record["minimum_sid_name_mapping_ratio"] == "0.9"
+    assert exploratory_record["minimum_total_reported_weight"] == "0.95"
+    assert exploratory_record["maximum_total_reported_weight"] == "1.05"
+    snapshots = _replace_snapshot(
+        _snapshots(),
+        "SPY",
+        _rows("SPY", missing_caps=frozenset({18, 19})),
+    )
+    primary = subject.build_six_universe_construction(
+        snapshots, subject.TOP10_PRIMARY_PROFILE
+    )
+    cap95 = subject.build_six_universe_construction(
+        snapshots, subject.TOP10_CAP95_EXPLORATORY_PROFILE
+    )
+    cap90 = subject.build_six_universe_construction(
+        snapshots, subject.TOP10_CAP90_EXPLORATORY_PROFILE
+    )
+    for earlier in (primary, cap95):
+        assert earlier.sleeves[0].coverage.cap_weight_coverage_ratio == Decimal("0.9")
+        assert earlier.sleeves[0].coverage.valid is False
+        assert earlier.sleeves[0].signal_security_ids == ()
+        assert earlier.sleeves[0].matched_security_ids == ()
+    spy = cap90.sleeves[0]
+    assert spy.coverage.mapping_ratio == Decimal("1")
+    assert spy.coverage.cap_weight_coverage_ratio == Decimal("0.9")
+    assert spy.coverage.valid is True
+    assert len(spy.signal_security_ids) == len(spy.matched_security_ids) == 10
+    assert spy.signal_etf_fallback_weight == spy.matched_etf_fallback_weight == 0
+    assert _gross(cap90.signal_weights) == Decimal("0.98")
+    assert _gross(cap90.matched_weights) == Decimal("0.98")
+    assert cap90.profile.to_record()["minimum_market_cap_weight_coverage_ratio"] == "0.9"
+    assert primary.profile.profile_sha256 == (
+        "600ba939174f67b47345117279ab88818b479a0ba543d6ac4487f0dad99338f1"
+    )
+    assert cap95.profile.profile_sha256 == (
+        "e68c13ef1682028709404d03493addf65d35bc23bbca0600f10ce54d1bfb2b84"
+    )
+
+
+def test_cap90_exploration_still_refuses_below_boundary_and_independent_gates():
+    snapshots = _snapshots()
+    cap_rows = list(_rows("SPY", missing_caps=frozenset({18, 19})))
+    cap_rows[19] = dataclasses.replace(
+        cap_rows[19], reported_weight=Decimal("0.051")
+    )
+    cap_rows[17] = dataclasses.replace(
+        cap_rows[17], reported_weight=Decimal("0.049")
+    )
+    below = subject.build_six_universe_construction(
+        _replace_snapshot(snapshots, "SPY", tuple(cap_rows)),
+        subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+    ).sleeves[0].coverage
+    assert below.cap_weight_coverage_ratio == Decimal("0.899")
+    cases = (
+        (tuple(cap_rows), "MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM"),
+        (
+            _rows("SPY", missing_names=frozenset({0, 1, 2})),
+            "SID_NAME_MAPPING_BELOW_MINIMUM",
+        ),
+        (
+            _rows("SPY", reported_weight=Decimal("0.047")),
+            "TOTAL_REPORTED_WEIGHT_OUT_OF_RANGE",
+        ),
+    )
+    for rows, reason in cases:
+        result = subject.build_six_universe_construction(
+            _replace_snapshot(snapshots, "SPY", rows),
+            subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+        )
+        assert reason in result.sleeves[0].coverage.refusal_reasons
+        assert result.sleeves[0].signal_security_ids == ()
+        assert result.sleeves[0].matched_security_ids == ()
+        assert result.sleeves[0].signal_etf_fallback_weight == result.sleeves[0].budget
+        assert result.sleeves[0].matched_etf_fallback_weight == result.sleeves[0].budget
+
+    score_floor = subject.build_six_universe_construction(
+        _snapshots(positive_count=4),
+        subject.TOP10_CAP90_EXPLORATORY_PROFILE,
+    )
+    assert all(sleeve.coverage.valid for sleeve in score_floor.sleeves)
+    assert all(sleeve.signal_security_ids == () for sleeve in score_floor.sleeves)
+    assert all(sleeve.matched_security_ids == () for sleeve in score_floor.sleeves)
+
+
+def test_repeating_coverage_ratio_uses_the_frozen_96_digit_recording_domain():
+    ratio = subject._ratio(Decimal(30), Decimal(31))
+    assert len(ratio.as_tuple().digits) == subject.DECIMAL_MAXIMUM_DIGITS
+    assert ratio.as_tuple().exponent == subject.DECIMAL_MINIMUM_EXPONENT
+    assert subject._decimal_text(ratio) == format(ratio, "f")
+
+    with pytest.raises(subject.SixUniverseGateError, match="canonical Decimal"):
+        subject._require_decimal(Decimal("1e-97"), "too-small ratio")
 
 
 def test_cap_weight_coverage_counts_only_mapped_usable_constituents():

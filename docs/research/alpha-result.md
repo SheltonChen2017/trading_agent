@@ -4842,3 +4842,116 @@ profiles are unchanged. Recovery projection
 No historical-source cryptographic proof or accepted return is inferred
 from current read-back/timestamps/Completed alone. Section 192.4 freezes
 the separately corrected R204-R208 source identities before their launches.
+
+The sole R203 owner/Mia imported read passed **run_valid=true** with
+aggregate SHA-256 `013f4d9d5d7236766ac03feb6e4a166a3a36b9d4e263e2d861856075e15324ee`:
+**+51.0522340385% after modeled costs**, drawdown **−11.2230083664100%**,
+volatility **17.5742323730253%**, zero-rate Sharpe **2.13585197884188**,
+1,072 filled orders / 61 rebalances, no invalid/canceled, engine/model
+fees `$9,058.299615`. Cash/exposure/tracking gates passed. Cells
+**623 -> 624**, look totals **200 shared / 143 development / 32 infrastructure**.
+Separate Mia provenance and no historical snapshot byte proof retained;
+no invented Codex launch or waiver. Matched path
+`7710b02b7608ec2b5128ab4435351e5501ea1569dfcb69f69ddd6d9e4e189328`.
+
+## R-204 — corrected 120% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective commit `1744659` freezes the verified input direct-read
+correction before all remaining launches; economic settings and authenticated
+inputs remain unchanged from section 192.2. Exact 16-file source readback
+and compile in private project `36981341`,
+`126 ARV2 SIX CAP90 SETTLED TILT120 R204 202508 NOW`, precede A1 backtest
+`0842cd97750e0dd6bc026f4b3ec7d8a1`. Corrected projection
+`1aad7dc4b7083dd8d062d08f2ca3d239d142e9c5dc4e93e5fc50fbd6fa5a7b32`,
+profile `9e4d7a788e594834433ec34f957db25caf4f2847598fc8b3423957170195ccb9`.
+One of three technical attempts spent; launch counts **200 -> 201 shared /
+143 -> 144 development / 32 infrastructure / 624 cells**.
+Completed; sole bounded read passed **run_valid=true / comparison_valid=true**,
+aggregate SHA-256 `dc12131b29003374697ec12ea8b456bc94a6dbbaf363dda926cd0889ed3d165b`.
+Return **+51.226273341% after modeled costs**, drawdown **−11.2200602232%**,
+volatility **17.5929305337%**, zero-rate Sharpe **2.13948115551**,
+1,057 filled orders / 61 rebalances, no invalid/canceled; engine/model
+fees `$9,120.08659`; cash/gross/tracking passed. Matched path equals R203.
+Cells **624 -> 625**; final counts **201 / 144 / 32 / 625**.
+Only SPY/XLV stock sleeves are tilted on this period; QQQ/SOXX/REMX/XLE
+retain ETF fallback. Same-window adaptivity and PIT limits remain.
+
+## R-205 — corrected 140% revision tilt, recent period; A1 launched — 2026-09-26
+
+Exact source from prospective `1744659` uploaded, read back and compiled
+in private project **36981429**,
+`127 ARV2 SIX CAP90 SETTLED TILT140 R205 202508 NOW`; A1 backtest
+`0cbf0b03ad27d0e6328c324af4d45444`. Source
+`91747ad28ccf17784a3d40f4bc374a12c74c7289da7be3659739c7fa899ff4d0`,
+profile `f8e641731f322c67420c82ccf463cbb5e513fb08961330132855e667daacf271`.
+One of three attempts spent. Counts **201 -> 202 shared / 144 -> 145
+development / 32 infrastructure / 625 authenticated cells**; pending
+separate terminal and one-use bounded result validation.
+
+R205 completion: `Completed.`; sole source-authenticated bounded read
+**run_valid=true / comparison_valid=true**, aggregate SHA-256
+`23ed3042efc6b6fc3d46dfed4f672557c1571c3f217d46470894a11feedd2895`.
+After-cost return **+51.292307799%**, drawdown **−11.1991253331%**,
+volatility **17.6097562359%**, zero-rate Sharpe **2.13976681998**;
+1,022 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,188.79201`; cash/gross/tracking passed.
+Matched path equals R203; cells **625 -> 626**, totals **202 / 145 / 32 / 626**.
+Only SPY/XLV stock sleeves carry tilt; other four sleeves remain ETF fallback.
+
+## R-206 — corrected 160% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981490**,
+`128 ARV2 SIX CAP90 SETTLED TILT160 R206 202508 NOW`, A1 backtest
+`d550721731730c4dbbcd2f503cbca7f4`. One of three attempts spent; launch
+**202 -> 203 shared / 145 -> 146 development / 32 infrastructure / 626 cells**.
+Projection `d79ca9149f963079cbca4de91fbab670454910dc92d3921b97e28f565a6859ea`,
+profile `3ff5c516323b945eea28bd1104f3ebaa215ebfb3a70c1ab76f778ec033ada2c5`,
+source manifest `69628fb750f270d4de148e153bb709fdb85ccc0e84713a21451dd9939857e613`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `e5ac0b5af2a4dfbb010eb16b9fa331e3c044f55e9b4a4b996d70ae7da589225e`.
+2025-08-01–2026-09-25 after-cost return **+51.386924546%**, drawdown
+**−11.1665198634%**, volatility **17.6421226761%**, zero-rate Sharpe **2.13925424180**.
+996 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,257.05954`; cash/gross/tracking gates passed.
+Matched path equals the authenticated R203 recent reference; cells **626 -> 627**,
+totals **203 / 146 / 32 / 627**. SPY selects stocks on 45/61 decisions,
+XLV on 58/61; QQQ/SOXX/REMX/XLE remain ETF fallback on all 61.
+No same-period ETF benchmark return was read; repeated-window adaptivity remains.
+
+## R-207 — corrected 180% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981560**,
+`129 ARV2 SIX CAP90 SETTLED TILT180 R207 202508 NOW`, A1 backtest
+`9fbe2814b500db873b984b2751618299`. One of three attempts spent; launch
+**203 -> 204 shared / 146 -> 147 development / 32 infrastructure / 627 cells**.
+Projection `89461345526643e61be70badf7a9610d664434b092ba353fc7f534f050de4882`,
+profile `cbfc4c7ad196f50b0dfdd221572b4f26a3fddef6e3cd87781d03e192e2d7a214`,
+source manifest `22974f9ffc7ec011381f6a187960ad6ad77387483d7367597d1a018cbc9e5a13`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `e2dca03cc456a9deff0258c23071e6d8745b98c9f79b1c41eb342ba18a4040ca`.
+2025-08-01–2026-09-25 after-cost return **+51.4590932735%**, drawdown
+**−11.1689544091%**, volatility **17.6822881787%**, zero-rate Sharpe **2.13714668449**.
+991 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,339.177265`; cash/gross/tracking passed.
+Matched path equals R203; cells **627 -> 628**, totals **204 / 147 / 32 / 628**.
+Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
+No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.
+
+## R-208 — corrected 200% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981612**,
+`130 ARV2 SIX CAP90 SETTLED TILT200 R208 202508 NOW`, A1 backtest
+`55cd303aa5010cd5ef76e76d0cac29b3`. One of three attempts spent; launch
+**204 -> 205 shared / 147 -> 148 development / 32 infrastructure / 628 cells**.
+Projection `8efe09156adddd25dab77f489220cc6a9aeb5e8481516c75fbd9f24bed6d76cc`,
+profile `c84a1a17d23e504044baf63807a83135b4d098062b7a2b98a041336234f1809a`,
+source manifest `ed0d135c1c150c489542c69eb027803b9d448d1cee14842ba27ac83aa233e875`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `4fd041c198ba5ee173acac9f8a18ff4d9cf3924148191e29d5fce4293092e38e`.
+2025-08-01–2026-09-25 after-cost return **+51.5554638035%**, drawdown
+**−11.1821102836%**, volatility **17.7121758791%**, zero-rate Sharpe **2.13697297011**.
+984 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,393.636965`; cash/gross/tracking passed.
+Matched path equals R203; cells **628 -> 629**, totals **205 / 148 / 32 / 629**.
+Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
+No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.

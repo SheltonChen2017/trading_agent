@@ -666,6 +666,11 @@ and the single round-end push; the complete lane suite remains Claude's
 independent review responsibility. A QC completion
 without an authenticated valid aggregate is not a return result, and this
 same-window ladder cannot establish a prospective trading edge.
+Section 190 records the owner's explicit extension to 160%, 180%, and
+200%, plus shared-ledger bookkeeping for all six ladder candidates and
+one final push. Claude will review section 190 together with section 189
+at that pushed snapshot; this owner-directed same-round extension does
+not accept a best setting for live use.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -25272,3 +25277,93 @@ window is adaptively reused, so an additional 160% or wider sweep
 would require a fresh prospective identity/look and cannot be called
 out-of-sample confirmation. No automatic launch or production use
 follows from the ascending three-point result.
+
+## 190. Prospective owner-directed 160% / 180% / 200% extension, 2026-09-25
+
+The owner explicitly requested three more exploratory order-based tests,
+shared research-ledger bookkeeping, and exactly one final push. This
+supersedes section 189's pending bookkeeping permission and its stop before
+additional settings, not its historical look/result accounting. R-198,
+R-199, and R-200 separately freeze 160%, 180%, and 200% maximum rank-scaled
+weight-transfer capacity. The label is relative to each stock's own matched
+weight, **not** invested capital or leverage. Receiver caps and positive
+aggregate/per-sleeve donor floors may bind before the nominal capacity.
+
+Only that capacity and each candidate's source/profile/result identity
+change. Preserve the six universes, selected stocks, market-cap base,
+ETF fallback, 98% gross target, weekly next-session whole-share MOO orders,
+RAW execution prices, 10-bps-per-side modeled costs, R-191 settlement-cash
+policy and 2x **admission only**. Period: 2021-01-04 through 2025-12-31,
+261 decisions. Each candidate permits at most three technical attempts;
+a compile, launch or runtime failure consumes a slot. No blind retry,
+new-project attempt reset, result-reader weakening, or Mia edit accepted
+without source comparison is permitted. Initial launch authority is one
+separately claimed A1 per candidate; any justified recovery must be frozen
+prospectively in the same project before mutation.
+
+Freeze all three settings before their results. A completed run must clear
+the existing exact-source, META/AGGREGATES digest, order census, signed-cash,
+exposure, fee and tracking gates before reporting its own return. Compare
+against the sole valid R-195 A2 100% anchor only on an identical producer-
+derived matched-target-path digest, same package/activation and matched
+profile. Do not change the anchor in response to returns. Equal matched
+targets do not prove equal QC price vintages or realized tilted targets.
+These additional settings are adaptive same-window development looks,
+not untouched confirmation; report every valid, invalid and failed attempt,
+not only a winning parameter. No formal alpha or live-use claim follows.
+
+Prelaunch floor: **193 shared research looks / 136 ARV2 development
+evaluations / 32 infrastructure looks / 618 authenticated cells**. The
+owner now explicitly permits appending only bookkeeping to shared
+`docs/research/alpha-result.md`, including the previously completed
+R-195–R-197 tests and failed R-195 A1. All other shared documents and
+behavior remain untouched. No raw provider/price/order rows, logs, charts,
+broker, paper/live/funded account, deployment or real trading is in scope.
+
+Exact source/profile/manifest and waiver identities, focused validation,
+prospective freeze commit, physical QC attempts and outcomes are recorded
+below. The complete lane/repository suite is not run by Codex; Claude owns
+that independent review. No QC launch is inferred from this plan alone.
+
+### 190.1 Exact A1 identities, frozen before QC mutation
+
+All three projections contain 16 ASCII files totaling **425,975 bytes**,
+within the existing source/review margin; the prior 100/120/140 projected
+bytes and waivers remain unchanged. The new independent identities are:
+
+| Candidate / capacity | Private project name | Projection SHA-256 | Profile SHA-256 | Source-manifest SHA-256 |
+|---|---|---|---|---|
+| R-198 / 160% | `120 ARV2 SIX CAP90 SETTLED TILT160 GUARD R198 2021 2025` | `97fdd9a4332ae2d973399535c2687153e08a81ccd2eb1e4a89daf4270c687a9f` | `7b4dac4771d1cfaf5851cb8d4c31448d01f8408baa652857292755fe88776a87` | `514230dd7bde96f347d2d6eae390d2c7b4fb09403c1ca7cf687f6da228eb383f` |
+| R-199 / 180% | `121 ARV2 SIX CAP90 SETTLED TILT180 GUARD R199 2021 2025` | `773787eac1cce21d27be7dd5256b917c453c3f8474a0a0d24e8b7ef9dd86d09d` | `46d6b61812c48d2d5797ac636e5919e160a6adca6e06005f2f31c596cdc7c778` | `0cc2299ac2062366046da0a027f88946fe684bcc87f27974ceab174a1da0035f` |
+| R-200 / 200% | `122 ARV2 SIX CAP90 SETTLED TILT200 GUARD R200 2021 2025` | `e8cc677ad751362fe702949ab52daa24ec89ade8bc6b303779a815543ef213cb` | `3b6acc8e91cd674d267bde3985b8fc123a5c2fbc809c87acfb9c74b2c3ec215c` | `c2bb27d8a851d365d3ab45813e9e62aa3e63fc110cd69cac05b8791585249745` |
+
+Each exact owner research waiver has ID
+`ARV2-OWNER-2026-09-25-R{198/199/200}A1-TILT{160/180/200}-GUARD-EXPLORATORY`
+(the corresponding pair, not a wildcard), one private-project/source/compile/
+backtest budget, one bounded aggregate read, and no raw or trading access.
+Canonical waiver SHA-256s respectively:
+`98fb857f0bc988d20a0bda5c496252473852b0296cf587de8fdee05d92b8e1bb`,
+`dfc9a388589e290fe5d31bb5f7a6f9aaaf28e25be8a733fafe3db8bd5d8f24de`,
+`73d1cfb4d1ec38c8250b903ea2b0742687a8764251acbaf6892d7efe72638f4a`.
+The shared private control directory remains
+`artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923`.
+Value-free administrative reads found these three project names unused;
+local preview checked each exact closure and the valid R-195 A2 anchor
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`.
+No new QC mutation, claim or result exists at this preregistration point.
+
+Focused submission tests: **139 passed**. Projected targets retain both
+donor floors, per-stock caps, unchanged ETF weights and exact 98% gross;
+fixtures explicitly permit saturation rather than promising that increasing
+capacity always changes weights or returns. Final projection validation and
+the exact prelaunch commit follow before the first QC action.
+
+The final prelaunch combined projection, frozen R-194 predecessor,
+submission and active-record check is **184 passed in 24.11 seconds**;
+changed-file compilation and `git diff --check` are clean. Existing
+waiver-byte pins remain green. These fixtures prove local behavior, not
+market edge. Shared R-195–R-197 bookkeeping is now appended under the
+owner's explicit permission; the previous missing-heading gate is green.
+Implementation freeze: `0d20bdd`; this following record commit freezes
+the exact prospective plan and identities before any R-198–R-200 QC
+mutation. No source or record is pushed separately.

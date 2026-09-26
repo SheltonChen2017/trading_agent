@@ -30,6 +30,8 @@ input requirement while keeping every real artifact and authority unbound.
 The synthetic-only source-manifest boundary validates caller-supplied byte
 streams and ordered 82-quarter identity claims without reading real artifacts
 or declaring canonical completeness.
+The explicit v2 source-policy/manifest epoch retains 3/A and 5/A as context
+only while preserving the frozen v1 policy and its reproducible manifest.
 """
 
 from research.insider_buying.contracts import (
@@ -284,9 +286,17 @@ from research.insider_buying.sec_owner_supplied_source_policy import (
     CanonicalIb2SourcePolicy,
     CanonicalIb2SourcePolicyError,
 )
+from research.insider_buying.sec_owner_supplied_source_policy_v2 import (
+    CANONICAL_IB2_SOURCE_POLICY_V2,
+    CANONICAL_IB2_SOURCE_POLICY_V2_SHA256,
+    CANONICAL_IB2_SOURCE_POLICY_V2_VERSION,
+    CANONICAL_IB2_SOURCE_V2_EVIDENCE_EPOCH,
+    CanonicalIb2SourcePolicyV2,
+)
 from research.insider_buying.sec_canonical_source_manifest import (
     CANONICAL_IB2_SOURCE_MANIFEST_KIND,
     CANONICAL_IB2_SOURCE_MANIFEST_VERSION,
+    CANONICAL_IB2_SOURCE_MANIFEST_V2_VERSION,
     CanonicalIb2AccessionSource,
     CanonicalIb2ArtifactReceipt,
     CanonicalIb2ArtifactStream,
@@ -348,11 +358,17 @@ __all__ = [
     "CANONICAL_IB2_SOURCE_MODE",
     "CANONICAL_IB2_SOURCE_MANIFEST_KIND",
     "CANONICAL_IB2_SOURCE_MANIFEST_VERSION",
+    "CANONICAL_IB2_SOURCE_MANIFEST_V2_VERSION",
     "CANONICAL_IB2_SOURCE_POLICY",
     "CANONICAL_IB2_SOURCE_POLICY_SHA256",
     "CANONICAL_IB2_SOURCE_POLICY_VERSION",
+    "CANONICAL_IB2_SOURCE_POLICY_V2",
+    "CANONICAL_IB2_SOURCE_POLICY_V2_SHA256",
+    "CANONICAL_IB2_SOURCE_POLICY_V2_VERSION",
+    "CANONICAL_IB2_SOURCE_V2_EVIDENCE_EPOCH",
     "CANONICAL_SPEC",
     "CanonicalIb2SourcePolicy",
+    "CanonicalIb2SourcePolicyV2",
     "CanonicalIb2SourcePolicyError",
     "CanonicalIb2AccessionSource",
     "CanonicalIb2ArtifactReceipt",

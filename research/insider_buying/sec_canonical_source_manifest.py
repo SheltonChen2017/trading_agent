@@ -41,14 +41,24 @@ from research.insider_buying.sec_bulk_snapshot import (
 from research.insider_buying.sec_owner_supplied_source_policy import (
     CanonicalIb2SourcePolicy,
 )
+from research.insider_buying.sec_owner_supplied_source_policy_v2 import (
+    CanonicalIb2SourcePolicyV2,
+)
 
 
 CANONICAL_IB2_SOURCE_MANIFEST_KIND = "insider-buying-ib2-source-manifest-candidate"
 CANONICAL_IB2_SOURCE_MANIFEST_VERSION = 1
+CANONICAL_IB2_SOURCE_MANIFEST_V2_VERSION = 2
 # Independent literal from the reviewed policy freeze, not a mutable alias to
 # the policy module's computed public constant.
 _FROZEN_POLICY_SHA256 = (
     "eec42a1e34b6200e0e195a6702307a5c716c10c40dbfd8e9e8095846c79e7dbe"
+)
+_FROZEN_POLICY_V2_SHA256 = (
+    "556dd4f74e4fadadba69fa917758868ad955af4cbc4e8b988a98d454e599c580"
+)
+_V2_EVIDENCE_EPOCH = (
+    "insider-buying-ib2-source-v2-context-amendments-2026-09-25"
 )
 MAX_ARTIFACT_CHUNK_BYTES = 1024 * 1024
 MAX_SOURCE_ARTIFACT_BYTES = 64 * 1024 * 1024
@@ -76,6 +86,7 @@ _EXPECTED_PERIODS = tuple(
 )
 _REQUIRED_FORMS = frozenset(("4", "4/A"))
 _CONTEXT_FORMS = frozenset(("3", "5"))
+_CONTEXT_FORMS_V2 = frozenset(("3", "3/A", "5", "5/A"))
 _SENTINEL = object()
 
 
@@ -206,9 +217,9 @@ class CanonicalIb2SourceManifest:
     manifest_sha256: str
 
     def __post_init__(self) -> None:
+        _manifest_policy_version(self.policy_sha256)
         if (
-            self.policy_sha256 != _FROZEN_POLICY_SHA256
-            or type(self.quarters) is not tuple
+            type(self.quarters) is not tuple
             or len(self.quarters) != len(_EXPECTED_PERIODS)
             or any(
                 type(item) is not CanonicalIb2QuarterSummary
@@ -231,15 +242,41 @@ class CanonicalIb2SourceManifest:
             )
 
     def lineage_payload(self) -> dict[str, object]:
-        return {
-            "kind": CANONICAL_IB2_SOURCE_MANIFEST_KIND,
-            "version": CANONICAL_IB2_SOURCE_MANIFEST_VERSION,
-            "policy_sha256": self.policy_sha256,
-            "quarters": [quarter.to_payload() for quarter in self.quarters],
-        }
+        return _manifest_lineage(self.policy_sha256, self.quarters)
 
     def to_payload(self) -> dict[str, object]:
         return {**self.lineage_payload(), "manifest_sha256": self.manifest_sha256}
+
+
+def _manifest_policy_version(policy_sha256: str) -> int:
+    """Resolve only independently pinned policy identities, never caller versions."""
+
+    if type(policy_sha256) is str:
+        if policy_sha256 == _FROZEN_POLICY_SHA256:
+            return 1
+        if policy_sha256 == _FROZEN_POLICY_V2_SHA256:
+            return 2
+    raise CanonicalIb2SourceManifestError(
+        "REFUSED: source manifest policy or quarter inventory is invalid"
+    )
+
+
+def _manifest_lineage(
+    policy_sha256: str, quarters: tuple[CanonicalIb2QuarterSummary, ...]
+) -> dict[str, object]:
+    version = _manifest_policy_version(policy_sha256)
+    payload = {
+        "kind": CANONICAL_IB2_SOURCE_MANIFEST_KIND,
+        "version": version,
+        "policy_sha256": policy_sha256,
+        "quarters": [quarter.to_payload() for quarter in quarters],
+    }
+    if version == 2:
+        payload["revision"] = {
+            "evidence_epoch_id": _V2_EVIDENCE_EPOCH,
+            "supersedes_policy_sha256": _FROZEN_POLICY_SHA256,
+        }
+    return payload
 
 
 def _require_sha256(value: object, *, label: str) -> str:
@@ -581,6 +618,7 @@ class _QuarterCursor:
     snapshot: _QuarterIdentitySnapshot
     accessions_iter: Iterator[ParsedSecBulkAccession]
     sources_iter: Iterator[CanonicalIb2AccessionSource]
+    context_forms: frozenset[str] = _CONTEXT_FORMS
     accessions_digest: Any = field(default_factory=hashlib.sha256)
     source_digest: Any = field(default_factory=hashlib.sha256)
     accessions_size: int = 0
@@ -591,7 +629,10 @@ class _QuarterCursor:
 
 
 def _quarter_cursor(
-    quarter: CanonicalIb2QuarterInput, *, expected_period: str
+    quarter: CanonicalIb2QuarterInput,
+    *,
+    expected_period: str,
+    context_forms: frozenset[str] = _CONTEXT_FORMS,
 ) -> _QuarterCursor:
     if type(quarter) is not CanonicalIb2QuarterInput:
         raise CanonicalIb2SourceManifestError(
@@ -635,6 +676,7 @@ def _quarter_cursor(
         snapshot=snapshot,
         accessions_iter=accessions_iter,
         sources_iter=sources_iter,
+        context_forms=context_forms,
     )
 
 
@@ -659,7 +701,7 @@ def _advance_cursor(cursor: _QuarterCursor) -> str | None:
         )
     document_type = accession.document_type
     if type(document_type) is not str or document_type not in (
-        _REQUIRED_FORMS | _CONTEXT_FORMS
+        _REQUIRED_FORMS | cursor.context_forms
     ):
         raise CanonicalIb2SourceManifestError(
             "REFUSED: parsed accession has an unapproved document type"
@@ -678,7 +720,7 @@ def _advance_cursor(cursor: _QuarterCursor) -> str | None:
         raise CanonicalIb2SourceManifestError(
             "REFUSED: parsed accession stream exceeds its declared artifact"
         )
-    if document_type in _CONTEXT_FORMS:
+    if document_type in cursor.context_forms:
         cursor.context_count += 1
         cursor.previous_accession = number
         return number
@@ -823,7 +865,7 @@ def _require_identity_unchanged(cursor: _QuarterCursor) -> None:
 def build_canonical_ib2_source_manifest(
     quarters: Iterable[CanonicalIb2QuarterInput],
     *,
-    policy: CanonicalIb2SourcePolicy,
+    policy: CanonicalIb2SourcePolicy | CanonicalIb2SourcePolicyV2,
 ) -> CanonicalIb2SourceManifest:
     """Consume exactly the frozen 82 quarters and return a pure candidate.
 
@@ -831,9 +873,18 @@ def build_canonical_ib2_source_manifest(
     in different quarters cannot hide behind bounded-memory validation. The
     result holds summaries only and makes no claim of SEC authentication,
     semantic XML completeness, canonical filtering, or outcome authority.
+    Exact v1 policies retain v1 behavior and hashes. Exact v2 policies retain
+    amended context forms and produce separately versioned/epoch-bound evidence.
     """
 
-    if type(policy) is not CanonicalIb2SourcePolicy:
+    policy_type = type(policy)
+    if policy_type is CanonicalIb2SourcePolicy:
+        expected_policy_sha256 = _FROZEN_POLICY_SHA256
+        context_forms = _CONTEXT_FORMS
+    elif policy_type is CanonicalIb2SourcePolicyV2:
+        expected_policy_sha256 = _FROZEN_POLICY_V2_SHA256
+        context_forms = _CONTEXT_FORMS_V2
+    else:
         raise CanonicalIb2SourceManifestError(
             "REFUSED: canonical IB-2 owner source policy is not the frozen version"
         )
@@ -843,7 +894,7 @@ def build_canonical_ib2_source_manifest(
         raise CanonicalIb2SourceManifestError(
             "REFUSED: canonical IB-2 owner source policy is malformed"
         ) from exc
-    if policy_sha256 != _FROZEN_POLICY_SHA256:
+    if policy_sha256 != expected_policy_sha256:
         raise CanonicalIb2SourceManifestError(
             "REFUSED: canonical IB-2 owner source policy is not the frozen version"
         )
@@ -861,7 +912,9 @@ def build_canonical_ib2_source_manifest(
                 "REFUSED: canonical source inventory is missing a required quarter"
             )
         cursors.append(
-            _quarter_cursor(quarter, expected_period=expected_period)
+            _quarter_cursor(
+                quarter, expected_period=expected_period, context_forms=context_forms
+            )
         )
     if next(quarter_iter, _SENTINEL) is not _SENTINEL:
         raise CanonicalIb2SourceManifestError(
@@ -897,18 +950,16 @@ def build_canonical_ib2_source_manifest(
         raise CanonicalIb2SourceManifestError(
             "REFUSED: canonical IB-2 owner source policy changed while streaming"
         ) from exc
-    if final_policy_sha256 != _FROZEN_POLICY_SHA256:
+    if (
+        type(policy) is not policy_type
+        or final_policy_sha256 != expected_policy_sha256
+    ):
         raise CanonicalIb2SourceManifestError(
             "REFUSED: canonical IB-2 owner source policy changed while streaming"
         )
-    lineage_payload = {
-        "kind": CANONICAL_IB2_SOURCE_MANIFEST_KIND,
-        "version": CANONICAL_IB2_SOURCE_MANIFEST_VERSION,
-        "policy_sha256": _FROZEN_POLICY_SHA256,
-        "quarters": [quarter.to_payload() for quarter in summary_tuple],
-    }
+    lineage_payload = _manifest_lineage(policy_sha256, summary_tuple)
     return CanonicalIb2SourceManifest(
-        policy_sha256=_FROZEN_POLICY_SHA256,
+        policy_sha256=policy_sha256,
         quarters=summary_tuple,
         manifest_sha256=hash_payload(lineage_payload),
     )
@@ -917,6 +968,7 @@ def build_canonical_ib2_source_manifest(
 __all__ = [
     "CANONICAL_IB2_SOURCE_MANIFEST_KIND",
     "CANONICAL_IB2_SOURCE_MANIFEST_VERSION",
+    "CANONICAL_IB2_SOURCE_MANIFEST_V2_VERSION",
     "MAX_ARTIFACT_CHUNK_BYTES",
     "MAX_SOURCE_ARTIFACT_BYTES",
     "MAX_SOURCE_URL_CHARACTERS",

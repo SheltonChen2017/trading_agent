@@ -40,6 +40,11 @@ from research.insider_buying.sec_owner_supplied_source_policy import (
     CANONICAL_IB2_REQUIRED_PERIODS,
     CanonicalIb2SourcePolicy,
 )
+from research.insider_buying.sec_owner_supplied_source_policy_v2 import (
+    CANONICAL_IB2_SOURCE_POLICY_V2_SHA256,
+    CANONICAL_IB2_SOURCE_V2_EVIDENCE_EPOCH,
+    CanonicalIb2SourcePolicyV2,
+)
 
 
 _CAPTURE_COMMIT = "a" * 40
@@ -247,6 +252,266 @@ def _build(quarters=None, *, policy=None):
         _quarters() if quarters is None else quarters,
         policy=CanonicalIb2SourcePolicy() if policy is None else policy,
     )
+
+
+def _build_v2(quarters=None):
+    return _build(quarters, policy=CanonicalIb2SourcePolicyV2())
+
+
+@pytest.mark.parametrize("amended_form", ["3/A", "5/A"])
+def test_v2_amended_context_is_retained_without_source_pairs(amended_form):
+    quarters = list(_quarters())
+    item = _quarter("2006Q1", document_types=("4", amended_form))
+    assert len(item.sources) == 1
+    quarters[0] = item
+    summary = _build_v2(quarters).quarters[0]
+    assert summary.form4_accession_count == 1
+    assert summary.context_accession_count == 1
+    assert summary.accessions_record_count == 2
+    assert item.accessions[1].document_type == amended_form
+    assert summary.accessions_artifact_sha256 == item.parsed.artifacts[1].sha256
+
+
+def test_v1_manifest_identity_is_preserved_and_v2_is_a_distinct_epoch():
+    legacy = _build()
+    assert legacy.to_payload()["version"] == 1
+    assert manifest_module.CANONICAL_IB2_SOURCE_MANIFEST_VERSION == 1
+    assert manifest_module.CANONICAL_IB2_SOURCE_MANIFEST_V2_VERSION == 2
+    assert legacy.manifest_sha256 == (
+        "b2d9c77ca2f89d286093bcd29d84af6a131db6868c8c85d308354d8c5dfb4aea"
+    )
+    revised = _build_v2()
+    payload = revised.to_payload()
+    assert payload["version"] == 2
+    assert payload["policy_sha256"] == CANONICAL_IB2_SOURCE_POLICY_V2_SHA256
+    assert payload["revision"] == {
+        "evidence_epoch_id": CANONICAL_IB2_SOURCE_V2_EVIDENCE_EPOCH,
+        "supersedes_policy_sha256": legacy.policy_sha256,
+    }
+    assert legacy.quarters == revised.quarters
+    assert legacy.manifest_sha256 != revised.manifest_sha256
+    assert _build_v2().to_payload() == payload
+    assert hash_payload(revised.lineage_payload()) == revised.manifest_sha256
+    # A v2 hash cannot be reused under the old policy, nor vice versa.
+    with pytest.raises(CanonicalIb2SourceManifestError, match="content hash"):
+        replace(revised, policy_sha256=legacy.policy_sha256)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="content hash"):
+        replace(legacy, policy_sha256=revised.policy_sha256)
+
+
+@pytest.mark.parametrize("amended_form", ["3/A", "5/A"])
+def test_v1_still_refuses_amended_context(amended_form):
+    quarters = list(_quarters())
+    quarters[0] = _quarter("2006Q1", document_types=("4", amended_form))
+    with pytest.raises(CanonicalIb2SourceManifestError, match="unapproved document type"):
+        _build(quarters)
+
+
+def test_v2_all_six_types_across_82_quarters_keep_exact_form4_coverage():
+    forms = ("3", "3/A", "4", "4/A", "5", "5/A")
+    quarters = tuple(
+        _quarter(period, document_types=forms)
+        for period in CANONICAL_IB2_REQUIRED_PERIODS
+    )
+    manifest = _build_v2(_OneShot(quarters))
+    assert len(manifest.quarters) == 82
+    for item, summary in zip(quarters, manifest.quarters):
+        assert tuple(row.document_type for row in item.accessions) == forms
+        assert (
+            summary.accessions_record_count,
+            summary.form4_accession_count,
+            summary.context_accession_count,
+        ) == (6, 2, 4)
+        assert len(item.sources) == 2
+        assert summary.accessions_artifact_sha256 == item.parsed.artifacts[1].sha256
+
+
+@pytest.mark.parametrize("form", ["8-K", "3/a", "5/a", "5/A ", "", "4/A/A"])
+def test_v2_unknown_or_noncanonical_type_still_refuses(form):
+    quarters = list(_quarters())
+    quarters[0] = _quarter("2006Q1", document_types=("4", form))
+    with pytest.raises(CanonicalIb2SourceManifestError, match="unapproved document type"):
+        _build_v2(quarters)
+
+
+@pytest.mark.parametrize("form", ["3", "3/A", "5", "5/A"])
+def test_v2_context_only_quarter_needs_no_sources_and_refuses_extra_pair(form):
+    quarters = list(_quarters())
+    item = _quarter("2006Q1", document_types=(form,))
+    assert item.sources == ()
+    quarters[0] = item
+    assert _build_v2(quarters).quarters[0].form4_accession_count == 0
+    quarters[0] = replace(item, sources=(_source(item.accessions[0], "2006Q1"),))
+    with pytest.raises(CanonicalIb2SourceManifestError, match="extra source"):
+        _build_v2(quarters)
+
+
+@pytest.mark.parametrize("mutation", ["changed", "missing", "extra"])
+def test_v2_complete_amended_context_inventory_remains_digest_bound(mutation):
+    quarters = list(_quarters())
+    item = _quarter("2006Q1", document_types=("4", "3/A", "5/A"))
+    if mutation == "changed":
+        rows = (
+            item.accessions[0],
+            replace(item.accessions[1], document_type="3"),
+            item.accessions[2],
+        )
+    elif mutation == "missing":
+        rows = item.accessions[:2]
+    else:
+        rows = (*item.accessions, _accession("2006Q1", 4, "5/A"))
+    quarters[0] = replace(item, accessions=rows)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="artifact"):
+        _build_v2(quarters)
+
+
+@pytest.mark.parametrize("mutation", ["missing", "wrong_accession", "extra"])
+def test_v2_form4_amendments_keep_one_to_one_sources(mutation):
+    quarters = list(_quarters())
+    item = _quarter("2006Q1", document_types=("3/A", "4", "4/A", "5/A"))
+    if mutation == "missing":
+        sources = item.sources[:1]
+    elif mutation == "wrong_accession":
+        sources = (item.sources[1], item.sources[0])
+    else:
+        sources = (*item.sources, item.sources[1])
+    quarters[0] = replace(item, sources=sources)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="metadata/XML"):
+        _build_v2(quarters)
+
+
+def test_v2_cross_quarter_duplicate_amended_context_is_refused():
+    quarters = list(_quarters())
+    first = _quarter("2006Q1", document_types=("3/A",))
+    second = _quarter("2006Q2", document_types=("5/A",))
+    repeated = replace(
+        second.accessions[0],
+        accession_number=first.accessions[0].accession_number,
+    )
+    data = (canonical_json(repeated.to_payload()) + "\n").encode("utf-8")
+    artifacts = tuple(
+        _artifact("accessions.jsonl", data, 1) if a.name == "accessions.jsonl" else a
+        for a in second.parsed.artifacts
+    )
+    quarters[0] = first
+    quarters[1] = replace(
+        second,
+        accessions=(repeated,),
+        parsed=_relineage_parsed(replace(second.parsed, artifacts=artifacts)),
+    )
+    with pytest.raises(CanonicalIb2SourceManifestError, match="duplicate accession"):
+        _build_v2(quarters)
+
+
+def test_v2_relabeling_an_amendment_changes_content_identity_not_form4_count():
+    amended = list(_quarters())
+    original = list(_quarters())
+    amended[0] = _quarter("2006Q1", document_types=("4", "3/A", "5/A"))
+    original[0] = _quarter("2006Q1", document_types=("4", "3", "5"))
+    left, right = _build_v2(amended), _build_v2(original)
+    assert left.manifest_sha256 != right.manifest_sha256
+    assert (
+        left.quarters[0].accession_sources_sha256
+        == right.quarters[0].accession_sources_sha256
+    )
+    assert (
+        left.quarters[0].form4_accession_count
+        == right.quarters[0].form4_accession_count == 1
+    )
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    [
+        ("context_document_types", ("3", "5")),
+        ("evidence_epoch_id", "forged-epoch"),
+        ("supersedes_policy_sha256", "0" * 64),
+        ("canonical_scoring_authorized", True),
+    ],
+)
+def test_v2_hostile_policy_mutation_before_or_during_streaming_refuses(field, value):
+    policy = CanonicalIb2SourcePolicyV2()
+    object.__setattr__(policy, field, value)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="frozen version"):
+        _build(policy=policy)
+    policy = CanonicalIb2SourcePolicyV2()
+    quarters = list(_quarters())
+    item = quarters[-1]
+    source = item.sources[0]
+    payload = tuple(source.acceptance_metadata.chunks)
+
+    def chunks():
+        object.__setattr__(policy, field, value)
+        yield from payload
+
+    quarters[-1] = replace(
+        item,
+        sources=(
+            replace(
+                source,
+                acceptance_metadata=replace(source.acceptance_metadata, chunks=chunks()),
+            ),
+        ),
+    )
+    with pytest.raises(CanonicalIb2SourceManifestError, match="changed while streaming"):
+        _build(quarters, policy=policy)
+
+
+def test_v2_policy_subclass_is_not_a_frozen_policy():
+    class ForgedPolicy(CanonicalIb2SourcePolicyV2):
+        pass
+
+    # The v2 constructor also refuses subclasses. Bypass it to prove that the
+    # consumer independently checks exact type, rather than relying on it.
+    forged = object.__new__(ForgedPolicy)
+    valid = CanonicalIb2SourcePolicyV2()
+    for item in fields(valid):
+        object.__setattr__(forged, item.name, getattr(valid, item.name))
+    with pytest.raises(CanonicalIb2SourceManifestError, match="frozen version"):
+        _build(policy=forged)
+
+
+def test_v2_coherent_public_digest_rebinding_does_not_widen_the_consumer(monkeypatch):
+    from research.insider_buying import sec_owner_supplied_source_policy_v2 as v2
+
+    policy = CanonicalIb2SourcePolicyV2()
+    object.__setattr__(policy, "context_document_types", ("3", "5", "8-K"))
+    monkeypatch.setattr(v2, "CANONICAL_IB2_SOURCE_POLICY_V2_SHA256", policy.semantic_sha256)
+    with pytest.raises(CanonicalIb2SourceManifestError, match="frozen version"):
+        _build(policy=policy)
+
+
+def test_v2_policy_and_manifest_package_exports_are_explicit():
+    import research.insider_buying as package
+    from research.insider_buying import sec_owner_supplied_source_policy_v2 as v2
+
+    for name in v2.__all__:
+        assert name in package.__all__
+        assert getattr(package, name) is getattr(v2, name)
+    name = "CANONICAL_IB2_SOURCE_MANIFEST_V2_VERSION"
+    assert name in package.__all__
+    assert getattr(package, name) == 2
+
+
+def test_v2_builder_with_amended_context_has_no_io(monkeypatch):
+    import builtins
+    import socket
+    from pathlib import Path
+
+    quarters = list(_quarters())
+    quarters[0] = _quarter("2006Q1", document_types=("4", "3/A", "5/A"))
+    policy = CanonicalIb2SourcePolicyV2()
+
+    def forbidden(*args, **kwargs):
+        raise AssertionError("unexpected I/O")
+
+    with monkeypatch.context() as patch:
+        patch.setattr(builtins, "open", forbidden)
+        patch.setattr(Path, "open", forbidden)
+        patch.setattr(socket, "socket", forbidden)
+        manifest = _build(quarters, policy=policy)
+    assert manifest.quarters[0].context_accession_count == 2
+    assert policy.authorized_outcome_looks == policy.consumed_outcome_looks == 0
 
 
 def test_valid_82_quarter_manifest_is_deterministic_and_retains_context():
@@ -1033,7 +1298,14 @@ def test_direct_manifest_construction_refuses_reordered_quarters():
         )
 
 
-def test_builder_accepts_a_quarter_produced_by_the_ib1a_and_ib1b_loaders(tmp_path):
+@pytest.mark.parametrize(
+    "context_form,policy_factory",
+    [("3", CanonicalIb2SourcePolicy), ("3/A", CanonicalIb2SourcePolicyV2),
+     ("5/A", CanonicalIb2SourcePolicyV2)],
+)
+def test_builder_accepts_a_quarter_produced_by_the_ib1a_and_ib1b_loaders(
+    tmp_path, context_form, policy_factory
+):
     # Every other quarter in this file is an identity built by hand. This pins
     # that identities and accession rows produced by the real IB-1A/IB-1B
     # publish-and-load path satisfy the builder's recomputed lineage, parent,
@@ -1054,7 +1326,7 @@ def test_builder_accepts_a_quarter_produced_by_the_ib1a_and_ib1b_loaders(tmp_pat
             submission.headers,
             (
                 (accession_form4, "2006-01-15", "2006-01-10", "4", "0000123456", "Synthetic Issuer", "SYN"),
-                (accession_form3, "2006-01-16", "2006-01-10", "3", "0000123456", "Synthetic Issuer", "SYN"),
+                (accession_form3, "2006-01-16", "2006-01-10", context_form, "0000123456", "Synthetic Issuer", "SYN"),
             ),
         ),
         "REPORTINGOWNER.tsv": tsv(
@@ -1095,7 +1367,7 @@ def test_builder_accepts_a_quarter_produced_by_the_ib1a_and_ib1b_loaders(tmp_pat
     )
     assert [
         (item.accession_number, item.document_type) for item in loaded_parsed.accessions
-    ] == [(accession_form4, "4"), (accession_form3, "3")]
+    ] == [(accession_form4, "4"), (accession_form3, context_form)]
 
     quarters = list(_quarters())
     quarters[0] = CanonicalIb2QuarterInput(
@@ -1108,7 +1380,7 @@ def test_builder_accepts_a_quarter_produced_by_the_ib1a_and_ib1b_loaders(tmp_pat
             if item.document_type in {"4", "4/A"}
         ),
     )
-    summary = _build(quarters).quarters[0].to_payload()
+    summary = _build(quarters, policy=policy_factory()).quarters[0].to_payload()
     assert summary["raw_snapshot_id"] == raw.snapshot_id
     assert summary["parsed_snapshot_id"] == parsed.snapshot_id
     assert (summary["form4_accession_count"], summary["context_accession_count"]) == (1, 1)

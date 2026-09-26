@@ -35,7 +35,7 @@ from ml.immutable_io import (
 
 
 SNAPSHOT_KIND = "sec-insider-bulk-quarter"
-RAW_SNAPSHOT_CONTRACT_VERSION = 1
+RAW_SNAPSHOT_CONTRACT_VERSION = 2
 ALLOWED_SEC_TABLES = (
     "SUBMISSION.tsv",
     "REPORTINGOWNER.tsv",
@@ -50,6 +50,14 @@ REQUIRED_SEC_TABLES = (
     "SUBMISSION.tsv",
     "REPORTINGOWNER.tsv",
     "NONDERIV_TRANS.tsv",
+)
+_LEGACY_AUXILIARY_MEMBERS = (
+    "insider_transactions_metadata.json",
+    "insider_transactions_readme.htm",
+)
+_CURRENT_AUXILIARY_MEMBERS = (
+    "FORM_345_metadata.json",
+    "FORM_345_readme.htm",
 )
 MAX_ARCHIVE_BYTES = 512 * 1024 * 1024
 MAX_MEMBER_UNCOMPRESSED_BYTES = 1024 * 1024 * 1024
@@ -83,6 +91,7 @@ _MANIFEST_KEYS = {
     "archive_sha256",
     "archive_size_bytes",
     "members",
+    "auxiliary_members",
     "lineage_hash",
     "snapshot_id",
 }
@@ -208,7 +217,9 @@ class SecBulkMember:
         }
 
     @classmethod
-    def from_payload(cls, payload: object) -> "SecBulkMember":
+    def from_payload(
+        cls, payload: object, *, allowed_names: tuple[str, ...] = ALLOWED_SEC_TABLES
+    ) -> "SecBulkMember":
         if not isinstance(payload, dict) or set(payload) != _MEMBER_KEYS:
             raise SecBulkSnapshotError("REFUSED: member manifest is malformed")
         name = payload.get("name")
@@ -217,8 +228,8 @@ class SecBulkMember:
         compressed_size_bytes = payload.get("compressed_size_bytes")
         crc32 = payload.get("crc32")
         compression = payload.get("compression")
-        if name not in ALLOWED_SEC_TABLES:
-            raise SecBulkSnapshotError("REFUSED: member manifest has an unknown table")
+        if name not in allowed_names:
+            raise SecBulkSnapshotError("REFUSED: member manifest has an unknown name")
         if not isinstance(sha256, str) or not _SHA256_RE.fullmatch(sha256):
             raise SecBulkSnapshotError("REFUSED: member manifest has an invalid hash")
         if (
@@ -254,6 +265,7 @@ class SecBulkSnapshotIdentity:
     archive_sha256: str
     archive_size_bytes: int
     members: tuple[SecBulkMember, ...]
+    auxiliary_members: tuple[SecBulkMember, ...]
     lineage_hash: str
     snapshot_id: str
 
@@ -269,6 +281,9 @@ class SecBulkSnapshotIdentity:
             "archive_sha256": self.archive_sha256,
             "archive_size_bytes": self.archive_size_bytes,
             "members": [member.to_payload() for member in self.members],
+            "auxiliary_members": [
+                member.to_payload() for member in self.auxiliary_members
+            ],
         }
 
     def to_payload(self) -> dict[str, object]:
@@ -291,6 +306,12 @@ def _compression_name(value: int) -> str:
     if value == zipfile.ZIP_DEFLATED:
         return "deflated"
     raise SecBulkSnapshotError("REFUSED: ZIP member uses unsupported compression")
+
+
+def _allowed_auxiliary_members(source: SecBulkSource) -> tuple[str, str]:
+    if source.year <= 2022:
+        return _LEGACY_AUXILIARY_MEMBERS
+    return _CURRENT_AUXILIARY_MEMBERS
 
 
 def _validate_member_name(info: zipfile.ZipInfo) -> None:
@@ -319,11 +340,18 @@ def _validate_member_name(info: zipfile.ZipInfo) -> None:
         raise SecBulkSnapshotError("REFUSED: encrypted ZIP members are prohibited")
 
 
-def _hash_text_member(
-    archive: zipfile.ZipFile, info: zipfile.ZipInfo
+def _hash_member(
+    archive: zipfile.ZipFile,
+    info: zipfile.ZipInfo,
+    *,
+    require_utf8_text: bool,
 ) -> tuple[str, int, int]:
     digest = hashlib.sha256()
-    decoder = codecs.getincrementaldecoder("utf-8-sig")("strict")
+    decoder = (
+        codecs.getincrementaldecoder("utf-8-sig")("strict")
+        if require_utf8_text
+        else None
+    )
     size_bytes = 0
     crc32 = 0
     try:
@@ -332,11 +360,12 @@ def _hash_text_member(
                 chunk = member.read(1024 * 1024)
                 if not chunk:
                     break
-                if b"\x00" in chunk:
-                    raise SecBulkSnapshotError(
-                        "REFUSED: ZIP table is not UTF-8 text"
-                    )
-                decoder.decode(chunk, final=False)
+                if decoder is not None:
+                    if b"\x00" in chunk:
+                        raise SecBulkSnapshotError(
+                            "REFUSED: ZIP table is not UTF-8 text"
+                        )
+                    decoder.decode(chunk, final=False)
                 digest.update(chunk)
                 crc32 = zlib.crc32(chunk, crc32)
                 size_bytes += len(chunk)
@@ -347,7 +376,8 @@ def _hash_text_member(
                     raise SecBulkSnapshotError(
                         "REFUSED: ZIP member expanded beyond its declared limit"
                     )
-        decoder.decode(b"", final=True)
+        if decoder is not None:
+            decoder.decode(b"", final=True)
     except SecBulkSnapshotError:
         raise
     except UnicodeDecodeError as exc:
@@ -361,12 +391,20 @@ def _hash_text_member(
         zlib.error,
     ) as exc:
         raise SecBulkSnapshotError(
-            "REFUSED: ZIP table member failed integrity validation"
+            "REFUSED: ZIP member failed integrity validation"
         ) from exc
     return digest.hexdigest(), size_bytes, crc32 & 0xFFFFFFFF
 
 
-def _read_archive_members(zip_bytes: bytes) -> tuple[SecBulkMember, ...]:
+def _hash_text_member(
+    archive: zipfile.ZipFile, info: zipfile.ZipInfo
+) -> tuple[str, int, int]:
+    return _hash_member(archive, info, require_utf8_text=True)
+
+
+def _read_archive_members(
+    zip_bytes: bytes, source: SecBulkSource
+) -> tuple[tuple[SecBulkMember, ...], tuple[SecBulkMember, ...]]:
     if type(zip_bytes) is not bytes or not zip_bytes:
         raise SecBulkSnapshotError("REFUSED: SEC archive must be non-empty bytes")
     if len(zip_bytes) > MAX_ARCHIVE_BYTES:
@@ -377,9 +415,9 @@ def _read_archive_members(zip_bytes: bytes) -> tuple[SecBulkMember, ...]:
     try:
         with zipfile.ZipFile(stream, "r") as archive:
             infos = archive.infolist()
-            if len(infos) > len(ALLOWED_SEC_TABLES):
+            if len(infos) > len(ALLOWED_SEC_TABLES) + 2:
                 raise SecBulkSnapshotError(
-                    "REFUSED: SEC archive contains more than eight tables"
+                    "REFUSED: SEC archive contains more than ten members"
                 )
             for info in infos:
                 _validate_member_name(info)
@@ -392,12 +430,23 @@ def _read_archive_members(zip_bytes: bytes) -> tuple[SecBulkMember, ...]:
                 raise SecBulkSnapshotError(
                     "REFUSED: ZIP archive contains case-colliding member names"
                 )
+            table_names = {name for name in names if name.endswith(".tsv")}
+            if len(table_names) > len(ALLOWED_SEC_TABLES):
+                raise SecBulkSnapshotError(
+                    "REFUSED: SEC archive contains more than eight tables"
+                )
             missing = sorted(set(REQUIRED_SEC_TABLES) - set(names))
-            unexpected = sorted(set(names) - set(ALLOWED_SEC_TABLES))
+            unexpected = sorted(table_names - set(ALLOWED_SEC_TABLES))
             if missing or unexpected:
                 raise SecBulkSnapshotError(
                     "REFUSED: ZIP table inventory mismatch; "
                     f"missing={missing}, unexpected={unexpected}"
+                )
+            allowed_auxiliary = _allowed_auxiliary_members(source)
+            auxiliary_names = set(names) - table_names
+            if auxiliary_names and auxiliary_names != set(allowed_auxiliary):
+                raise SecBulkSnapshotError(
+                    "REFUSED: ZIP auxiliary inventory does not match the source era"
                 )
 
             total_uncompressed = 0
@@ -422,14 +471,19 @@ def _read_archive_members(zip_bytes: bytes) -> tuple[SecBulkMember, ...]:
 
             by_name: dict[str, SecBulkMember] = {}
             for info in infos:
-                member_hash, size_bytes, crc32 = _hash_text_member(archive, info)
+                if info.filename in table_names:
+                    member_hash, size_bytes, crc32 = _hash_text_member(archive, info)
+                else:
+                    member_hash, size_bytes, crc32 = _hash_member(
+                        archive, info, require_utf8_text=False
+                    )
                 if size_bytes != info.file_size:
                     raise SecBulkSnapshotError(
-                        "REFUSED: ZIP table member size disagrees with metadata"
+                        "REFUSED: ZIP member size disagrees with metadata"
                     )
                 if crc32 != info.CRC:
                     raise SecBulkSnapshotError(
-                        "REFUSED: ZIP table member failed CRC validation"
+                        "REFUSED: ZIP member failed CRC validation"
                     )
                 by_name[info.filename] = SecBulkMember(
                     name=info.filename,
@@ -444,7 +498,10 @@ def _read_archive_members(zip_bytes: bytes) -> tuple[SecBulkMember, ...]:
             "REFUSED: malformed or corrupt SEC ZIP archive"
         ) from exc
 
-    return tuple(by_name[name] for name in ALLOWED_SEC_TABLES if name in by_name)
+    return (
+        tuple(by_name[name] for name in ALLOWED_SEC_TABLES if name in by_name),
+        tuple(by_name[name] for name in allowed_auxiliary if name in by_name),
+    )
 
 
 def inspect_sec_bulk_archive(
@@ -454,7 +511,7 @@ def inspect_sec_bulk_archive(
 
     if type(source) is not SecBulkSource:
         raise SecBulkSnapshotError("REFUSED: source metadata contract is required")
-    members = _read_archive_members(zip_bytes)
+    members, auxiliary_members = _read_archive_members(zip_bytes, source)
     lineage = {
         "kind": SNAPSHOT_KIND,
         "raw_contract_version": RAW_SNAPSHOT_CONTRACT_VERSION,
@@ -466,6 +523,9 @@ def inspect_sec_bulk_archive(
         "archive_sha256": hash_bytes(zip_bytes),
         "archive_size_bytes": len(zip_bytes),
         "members": [member.to_payload() for member in members],
+        "auxiliary_members": [
+            member.to_payload() for member in auxiliary_members
+        ],
     }
     lineage_hash = hash_payload(lineage)
     return SecBulkSnapshotIdentity(
@@ -477,6 +537,7 @@ def inspect_sec_bulk_archive(
         archive_sha256=lineage["archive_sha256"],
         archive_size_bytes=len(zip_bytes),
         members=members,
+        auxiliary_members=auxiliary_members,
         lineage_hash=lineage_hash,
         snapshot_id=(
             f"sec-insider-bulk-{source.year:04d}q{source.quarter}-"
@@ -528,11 +589,19 @@ def _same_file_version(first: os.stat_result, second: os.stat_result) -> bool:
 
 
 def _read_regular_bytes(
-    path: Path, *, label: str, max_bytes: int | None = None
+    path: Path,
+    *,
+    label: str,
+    max_bytes: int | None = None,
+    require_single_link: bool = False,
 ) -> bytes:
     try:
         before = path.lstat()
-        if _status_is_redirect(before) or not stat.S_ISREG(before.st_mode):
+        if (
+            _status_is_redirect(before)
+            or not stat.S_ISREG(before.st_mode)
+            or (require_single_link and before.st_nlink != 1)
+        ):
             raise SecBulkSnapshotError(
                 f"REFUSED: {label} must be a regular immutable file"
             )
@@ -542,6 +611,7 @@ def _read_regular_bytes(
                 _status_is_redirect(opened)
                 or not stat.S_ISREG(opened.st_mode)
                 or not _same_file_identity(before, opened)
+                or (require_single_link and opened.st_nlink != 1)
             ):
                 raise SecBulkSnapshotError(
                     f"REFUSED: {label} changed while it was opened"
@@ -553,8 +623,13 @@ def _read_regular_bytes(
             raw = handle.read() if max_bytes is None else handle.read(max_bytes + 1)
             after_read = os.fstat(handle.fileno())
         after_path = path.lstat()
-        if not _same_file_version(opened, after_read) or not _same_file_version(
-            after_read, after_path
+        if (
+            not _same_file_version(opened, after_read)
+            or not _same_file_version(after_read, after_path)
+            or (
+                require_single_link
+                and (after_read.st_nlink != 1 or after_path.st_nlink != 1)
+            )
         ):
             raise SecBulkSnapshotError(
                 f"REFUSED: {label} changed while it was read"
@@ -588,9 +663,18 @@ def _parse_canonical_object(raw: bytes, *, label: str) -> dict[str, object]:
 
 
 def _read_canonical_object(
-    path: Path, *, label: str, max_bytes: int
+    path: Path,
+    *,
+    label: str,
+    max_bytes: int,
+    require_single_link: bool = False,
 ) -> dict[str, object]:
-    raw = _read_regular_bytes(path, label=label, max_bytes=max_bytes)
+    raw = _read_regular_bytes(
+        path,
+        label=label,
+        max_bytes=max_bytes,
+        require_single_link=require_single_link,
+    )
     return _parse_canonical_object(raw, label=label)
 
 
@@ -962,6 +1046,7 @@ def load_sec_bulk_snapshot(snapshot_directory: str | Path) -> LoadedSecBulkSnaps
         directory / _COMMIT_NAME,
         label="commit marker",
         max_bytes=MAX_COMMIT_BYTES,
+        require_single_link=True,
     )
     if set(commit) != {"kind", "snapshot_id", "members"}:
         raise SecBulkSnapshotError("REFUSED: commit marker fields are not exact")
@@ -977,11 +1062,13 @@ def load_sec_bulk_snapshot(snapshot_directory: str | Path) -> LoadedSecBulkSnaps
         directory / _ARCHIVE_NAME,
         label="committed archive",
         max_bytes=MAX_ARCHIVE_BYTES,
+        require_single_link=True,
     )
     manifest_bytes = _read_regular_bytes(
         directory / _MANIFEST_NAME,
         label="committed manifest",
         max_bytes=MAX_MANIFEST_BYTES,
+        require_single_link=True,
     )
     actual_commit_members = {
         _ARCHIVE_NAME: hash_bytes(archive_bytes),
@@ -1015,6 +1102,21 @@ def load_sec_bulk_snapshot(snapshot_directory: str | Path) -> LoadedSecBulkSnaps
         or not set(REQUIRED_SEC_TABLES) <= set(recorded_names)
     ):
         raise SecBulkSnapshotError("REFUSED: snapshot member order is not canonical")
+    auxiliary_payload = manifest.get("auxiliary_members")
+    if not isinstance(auxiliary_payload, list):
+        raise SecBulkSnapshotError(
+            "REFUSED: snapshot auxiliary member inventory is invalid"
+        )
+    allowed_auxiliary = _allowed_auxiliary_members(source)
+    recorded_auxiliary = tuple(
+        SecBulkMember.from_payload(payload, allowed_names=allowed_auxiliary)
+        for payload in auxiliary_payload
+    )
+    auxiliary_names = tuple(member.name for member in recorded_auxiliary)
+    if auxiliary_names not in ((), allowed_auxiliary):
+        raise SecBulkSnapshotError(
+            "REFUSED: snapshot auxiliary member order is not canonical"
+        )
     if (
         not isinstance(manifest.get("archive_sha256"), str)
         or not _SHA256_RE.fullmatch(manifest["archive_sha256"])

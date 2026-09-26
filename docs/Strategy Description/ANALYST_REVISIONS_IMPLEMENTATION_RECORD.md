@@ -26549,3 +26549,22 @@ entry, and separate profile identities. All-six 25% checks independently
 exercise threshold dimensions, known-name floor, unknown exclusion, own-ETF
 residuals and the unchanged order/profile chain. Legacy family and source
 pins are revalidated. Final checks, outcomes and review handoff follow below.
+
+### 194.2 Advisory finding and cached-pair correction
+
+`ARV2D194-001` **P2, confirmed and corrected**: the first cached comparison
+checked common baseline paths/diagnostics but did not authenticate each named
+arm's candidate, source/profile/fraction and launch/read lineage. A canonical
+private artifact copied into both arm paths could be mislabeled as a valid
+0/100 comparison. This is a material report-attribution defect, not a QC order
+or strategy defect. No pair result was issued through that weak comparator.
+
+The correction locally reauthenticates each exact family/attempt claim and
+launch, terminal and sole-read claim, preserved raw-custom identity and
+inventory; it reparses the original bounded statistics against the frozen arm
+and requires the saved result to equal that authenticated record. No QC read
+is repeated and no source, economics or launch is changed. Six isolating
+cases cover wrong candidate/fraction, copied arm, projection, read claim and
+launch claim: **14 focused cases pass**, restoring the former comparator in
+memory makes all six new cases fail; the corrected function is restored.
+This is an in-progress advisory audit, not independent Claude acceptance.

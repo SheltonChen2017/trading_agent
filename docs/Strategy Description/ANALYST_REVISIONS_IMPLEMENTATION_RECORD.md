@@ -715,6 +715,13 @@ deferred commits after this round's single push, including the R209 transport
 recovery; Codex then counter-reviews every Claude commit. No live/trading or
 formal alpha acceptance is implied.
 
+Section 194 is the owner's subsequent same-round research instruction: isolate
+100% weight tilt with an identical-selection zero-tilt control, then separately
+try all-six 25% coverage floors with 100% tilt. Claude will review section 194
+and all earlier deferred commits after one final push. No new outcome is
+claimed by the prospective source freeze; execution and result receipts below
+will distinguish weighting attribution from changed-selection performance.
+
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
@@ -26485,3 +26492,60 @@ pointer (9 passed / 2 failed); corrected the pointer, not the tests, before
 the final 80-case green document run. Final fetch still equals base `e6ef6e3`:
 no intervening Claude/owner push. Only the lane record and explicitly
 authorized shared look ledger are changed in this final record commit.
+
+## 194. Owner-directed 100% weight ablation and all-six 25% coverage — 2026-09-26
+
+### 194.1 Prospective scope and exact freezes
+
+Base is `1583157`. The owner requested the 100% comparison after questioning
+whether AR or cap-ranked stock construction causes the return, then added a
+subsequent 100%-tilt run with each universe's percentage floors reduced to
+25%. Standing exploratory research authority and signature waiver apply;
+intermediate Claude review remains deferred, not canceled. No broker,
+paper/live/funded trading, deployment, full-suite run or new provider capture.
+
+R220 is zero **weight transfer**, R221 is a fresh exact-R214-source 100%
+replication. Both retain the identical AR-dependent stock-entry/count rules
+outside XLE, known-cap-ranked equal baseline slots, six universes, input
+package/activation, 2025-08-01–2026-09-25 window, 61 decisions, 98% gross,
+9.8% direct-name cap, weekly pre-open orders and 10 bps/side. A zero-tilt arm
+is NOT entirely AR-off. Same matched baseline profile/path and complete
+sleeve diagnostics are required before a return spread is attributed to the
+weight overlay. Fresh paired runs reduce but do not prove absence of QC
+data-vintage differences; no independent price-series digest is added.
+
+R222 is separately versioned **changed selection**, not the clean ablation:
+member identity, known-cap reported-weight coverage, and delivered-positive-
+holdings total floors are 25% for SPY/QQQ/SOXX/XLV/REMX/XLE. Five verified-cap
+names, five positive AR scores outside XLE, strictly prior/staleness rules,
+105% reported-total ceiling and all exposure/order/cash gates remain. XLE
+still enters independently of AR. Each sleeve's verified-stock budget scales
+by `min(1, cap_coverage_ratio * delivered_total)` and unfilled slots stay in
+its own ETF. Unknown identities never become selected by lowering a floor.
+Inherited global default floor metadata is superseded for every named sleeve
+by the explicit six-tuple effective policy in the hashed profile.
+
+Both manifests are separate from the untouched historical R209–R219 manifest:
+
+| Candidate | Tilt | Private project name | Prospective manifest |
+| --- | --- | --- | --- |
+| R220 | 0% weight overlay | 142 ARV2 SIX WEIGHT ABLATION TILT0 R220 202508 NOW | `six_universe_weight_ablation_candidates.json` |
+| R221 | 100% weight overlay | 143 ARV2 SIX WEIGHT ABLATION TILT100 R221 202508 NOW | same two-arm manifest |
+| R222 | 100%, all-six 25% coverage | 144 ARV2 SIX COVERAGE25 TILT100 R222 202508 NOW | `six_universe_coverage25_candidates.json` |
+
+Manifest byte SHAs respectively
+`aa0781076073a466c904881399c5d1f34e915ff0fc88c17ba24bb124ab9c4562`
+and `2f8ba60e2357ac886d84105145e8dfd719e101f3f5d35effde114931da01fa62`.
+Each contains exact projection/profile/source pins, same package/activation,
+and exclusive candidate census. Each launch has at most three attempts in one
+project and one bounded aggregate read. No outcomes are claimed at this freeze.
+Shared look bookkeeping is authorized by the owner's standing instruction;
+the current pre-launch floor remains 217/158/34/639.
+
+The scoped zero/100 projection API does not extend the historical ladder's
+permitted strengths. Behavioral checks prove exact baseline equality at zero,
+real weight movement at 100%, same construction/ETF residuals, retained AR
+entry, and separate profile identities. All-six 25% checks independently
+exercise threshold dimensions, known-name floor, unknown exclusion, own-ETF
+residuals and the unchanged order/profile chain. Legacy family and source
+pins are revalidated. Final checks, outcomes and review handoff follow below.

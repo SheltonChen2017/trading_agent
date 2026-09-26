@@ -21,6 +21,10 @@ from . import six_universe_settlement_submission as common
 FROZEN_MANIFEST_SHA256 = "b8f7482c780bf48e83fa0ae6acd50a3b68e46ce5ebdfb215d356cf12a3697442"
 PREDECESSOR_MANIFEST_SHA256 = "70cd295d6883f32d387c5de1ccb2827dae8fb8f07e70d9dbd55bab34351d39c6"
 MANIFEST_PATH = Path(__file__).with_name("six_universe_relaxed_candidates.json")
+FROZEN_ABLATION_MANIFEST_SHA256 = "aa0781076073a466c904881399c5d1f34e915ff0fc88c17ba24bb124ab9c4562"
+ABLATION_MANIFEST_PATH = Path(__file__).with_name("six_universe_weight_ablation_candidates.json")
+FROZEN_COVERAGE25_MANIFEST_SHA256 = "2f8ba60e2357ac886d84105145e8dfd719e101f3f5d35effde114931da01fa62"
+COVERAGE25_MANIFEST_PATH = Path(__file__).with_name("six_universe_coverage25_candidates.json")
 _TERMINAL = {"Completed.", "Runtime Error", "BuildError"}
 _GEOMETRY = ("2025-08-01", "2026-09-25", 290, 61)
 _TICKERS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
@@ -55,12 +59,64 @@ def _manifest():
     return value
 
 
+def _ablation_manifest():
+    raw = ABLATION_MANIFEST_PATH.read_bytes()
+    if (type(FROZEN_ABLATION_MANIFEST_SHA256) is not str
+            or hashlib.sha256(raw).hexdigest() != FROZEN_ABLATION_MANIFEST_SHA256):
+        _fail("weight ablation family is not the frozen manifest")
+    value = json.loads(raw)
+    rows = value.get("candidates") if type(value) is dict else None
+    if (type(rows) is not list or len(rows) != 2
+            or any(type(row) is not dict for row in rows)
+            or [row.get("candidate_id") for row in rows] != ["R220", "R221"]
+            or [row.get("tilt_fraction") for row in rows] != ["0.00", "1.00"]
+            or any(row.get("kind") != "order" for row in rows)):
+        _fail("weight ablation family candidate census changed")
+    return value
+
+
+def _coverage25_manifest():
+    raw = COVERAGE25_MANIFEST_PATH.read_bytes()
+    if (type(FROZEN_COVERAGE25_MANIFEST_SHA256) is not str
+            or hashlib.sha256(raw).hexdigest() != FROZEN_COVERAGE25_MANIFEST_SHA256):
+        _fail("coverage25 family is not the frozen manifest")
+    value = json.loads(raw)
+    rows = value.get("candidates") if type(value) is dict else None
+    if (type(rows) is not list or len(rows) != 1 or type(rows[0]) is not dict
+            or rows[0].get("candidate_id") != "R222"
+            or rows[0].get("tilt_fraction") != "1.00"
+            or rows[0].get("kind") != "order"):
+        _fail("coverage25 family candidate census changed")
+    return value
+
+
+def _plan_manifest(plan):
+    # Legacy parser fixtures deliberately use a non-plan sentinel; real public
+    # operations validate the exact plan in _candidate before any I/O.
+    if type(plan) is not RelaxedQcPlan or plan.family == "relaxed":
+        return _manifest()
+    if type(plan.family) is str and plan.family == "weight_ablation":
+        return _ablation_manifest()
+    if type(plan.family) is str and plan.family == "coverage25":
+        return _coverage25_manifest()
+    _fail("relaxed plan family changed")
+
+
+def _plan_manifest_sha256(plan):
+    if type(plan) is RelaxedQcPlan and plan.family == "weight_ablation":
+        return FROZEN_ABLATION_MANIFEST_SHA256
+    if type(plan) is RelaxedQcPlan and plan.family == "coverage25":
+        return FROZEN_COVERAGE25_MANIFEST_SHA256
+    return FROZEN_MANIFEST_SHA256
+
+
 @dataclasses.dataclass(frozen=True)
 class RelaxedQcPlan:
     candidate_id: str
     organization_id: str = dataclasses.field(repr=False)
     control_directory: Path
     attempt: int = 1
+    family: str = "relaxed"
 
 
 def _candidate(plan):
@@ -69,17 +125,19 @@ def _candidate(plan):
             or type(plan.organization_id) is not str
             or not cap._ORG.fullmatch(plan.organization_id)
             or not isinstance(plan.control_directory, Path)
-            or not plan.control_directory.is_absolute()):
+            or not plan.control_directory.is_absolute()
+            or type(plan.family) is not str
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25"}):
         _fail("relaxed plan or three-attempt bound changed")
-    rows = [row for row in _manifest()["candidates"]
+    rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]
     if len(rows) != 1:
         _fail("relaxed candidate is not frozen")
     return rows[0]
 
 
-def build_plan(candidate_id, organization_id, control_directory, attempt=1):
-    plan = RelaxedQcPlan(candidate_id, organization_id, Path(control_directory), attempt)
+def build_plan(candidate_id, organization_id, control_directory, attempt=1, *, family="relaxed"):
+    plan = RelaxedQcPlan(candidate_id, organization_id, Path(control_directory), attempt, family)
     _candidate(plan)
     return plan
 
@@ -138,7 +196,7 @@ def _read_artifact(path):
 
 
 def preview(plan, projection):
-    row, family = _candidate(plan), _manifest()
+    row, family = _candidate(plan), _plan_manifest(plan)
     for key in ("projection_sha256", "profile_id", "profile_sha256"):
         if getattr(projection, key, None) != row[key]:
             _fail("relaxed projection or profile changed")
@@ -178,7 +236,7 @@ def preview(plan, projection):
             or total + 32_768 > (448 * 1024 if row["kind"] == "order" else 320 * 1024)):
         _fail("relaxed source closure or size changed")
     return {"candidate_id": plan.candidate_id, "attempt": plan.attempt,
-            "manifest_sha256": FROZEN_MANIFEST_SHA256, "candidate_sha256": _sha(row),
+            "manifest_sha256": _plan_manifest_sha256(plan), "candidate_sha256": _sha(row),
             "projection_sha256": row["projection_sha256"],
             "profile_id": row["profile_id"], "profile_sha256": row["profile_sha256"],
             "package_sha256": family["package_sha256"],
@@ -187,7 +245,7 @@ def preview(plan, projection):
 
 
 def _require_inputs(plan):
-    family = _manifest()
+    family = _plan_manifest(plan)
     control = Path(family["input_control_directory"])
     prior_plan = recent.build_plan("R203", plan.organization_id, control)
     if (prior_plan.package_sha256 != family["package_sha256"]
@@ -235,9 +293,10 @@ def _files(plan, api, project_id, identity):
 def _receipt(plan, launch):
     row = _candidate(plan)
     identity = common._read(_path(plan, "claim"))
-    family = _manifest()
-    accepted_manifests = {FROZEN_MANIFEST_SHA256}
-    if plan.candidate_id == "R209" and type(PREDECESSOR_MANIFEST_SHA256) is str:
+    family = _plan_manifest(plan)
+    accepted_manifests = {_plan_manifest_sha256(plan)}
+    if (plan.family == "relaxed" and plan.candidate_id == "R209"
+            and type(PREDECESSOR_MANIFEST_SHA256) is str):
         accepted_manifests.add(PREDECESSOR_MANIFEST_SHA256)
     if (identity.get("manifest_sha256") not in accepted_manifests
             or identity.get("candidate_sha256") != _sha(row)
@@ -412,7 +471,7 @@ def _statistic(value):
 
 
 def _parse_order(plan, statistics):
-    row, family = _candidate(plan), _manifest()
+    row, family = _candidate(plan), _plan_manifest(plan)
     meta_name = next(name for name in row["statistic_names"] if name.endswith("META"))
     agg_name = next(name for name in row["statistic_names"] if name.endswith("AGGREGATES"))
     meta, aggregate = _statistic(statistics[meta_name]), _statistic(statistics[agg_name])
@@ -521,7 +580,7 @@ def _bounded_order_base(aggregate):
 
 
 def _parse_coverage(plan, statistics):
-    row, family = _candidate(plan), _manifest()
+    row, family = _candidate(plan), _plan_manifest(plan)
     parsed = {name: _statistic(statistics[name]) for name in row["statistic_names"]}
     meta = parsed["ARV2_SIX_COVERAGE_META"]
     if (meta.get("schema") != row["meta_schema"] or meta.get("profile_id") != row["profile_id"]
@@ -559,7 +618,7 @@ def read_result_once(plan, launch_receipt, api, *, recover_r209_transport=False)
     _project(plan, api, launch_receipt["project_id"])
     _files(plan, api, launch_receipt["project_id"], identity)
     if recover_r209_transport:
-        if (plan.candidate_id != "R209" or plan.attempt != 1
+        if (plan.family != "relaxed" or plan.candidate_id != "R209" or plan.attempt != 1
                 or (launch_receipt["project_id"], launch_receipt["backtest_id"]) != _R209_RECOVERY_IDENTITY
                 or common._read(_path(plan, "read-claim")) != expected
                 or _path(plan, "raw-custom").exists() or _path(plan, "result").exists()):

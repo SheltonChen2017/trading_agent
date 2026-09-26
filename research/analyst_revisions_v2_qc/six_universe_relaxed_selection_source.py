@@ -10,6 +10,9 @@ class RelaxedSelectionSourceError(ValueError):
 
 
 RELAXED_UNIVERSES = ("QQQ", "SOXX", "REMX")
+ALL25_UNIVERSES = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
+ALL25_COVERAGE_POLICY = tuple((name, "0.25", "0.25", "0.25", 5)
+                              for name in ALL25_UNIVERSES)
 
 
 def _replace(source, old, new):
@@ -113,6 +116,26 @@ def render_gate_source(original_ascii, per_universe_policy_tuple):
     members remain coverage denominators and cannot become selected names.
     """
     policy = _policy(per_universe_policy_tuple)
+    return _render_gate_source(original_ascii, policy, all25=False)
+
+
+def render_all25_gate_source(original_ascii, policy=ALL25_COVERAGE_POLICY):
+    """Strict separate successor: all six numeric coverage floors are 25%.
+
+    Five verified names, prior-time inputs, positive-score entry outside XLE,
+    and the original finite upper bounds remain unchanged. Unresolved budget
+    stays in each sleeve's own ETF rather than guessed security identities.
+    """
+    if (type(policy) is not tuple or len(policy) != 6
+            or any(type(item) is not tuple or len(item) != 5
+                   or any(type(value) is not str for value in item[:4])
+                   or type(item[4]) is not int for item in policy)
+            or policy != ALL25_COVERAGE_POLICY):
+        raise RelaxedSelectionSourceError("all25 policy requires exact six-universe 25-percent floors")
+    return _render_gate_source(original_ascii, policy, all25=True)
+
+
+def _render_gate_source(original_ascii, policy, *, all25):
     if type(original_ascii) is not str or not original_ascii.isascii():
         raise RelaxedSelectionSourceError("relaxed source is not exact ASCII text")
     source = _replace(original_ascii,
@@ -138,11 +161,28 @@ def render_gate_source(original_ascii, per_universe_policy_tuple):
         '        coverage = _coverage(rows, profile, snapshot.universe_id)')
     source = _replace(source, _SELECTION_ANCHOR, _SELECTION_REPLACEMENT)
     source = _replace(source, 'def _raw_sleeve(\n', _SLOT_HELPER + 'def _raw_sleeve(\n')
+    if all25:
+        source = _replace(source, "arv2-six-universe-gate-relaxed-selection-profile-v1",
+                          "arv2-six-universe-gate-all25-selection-profile-v1")
+        source = _replace(source, "arv2-six-universe-gate-relaxed-selection-construction-v1",
+                          "arv2-six-universe-gate-all25-selection-construction-v1")
+        source = _replace(source,
+            "QQQ_SOXX_REMX_budget_times_min_1_cap_coverage_times_reported_total_unresolved_slots_floor_to_1e-24_residual_own_ETF",
+            "ALL_SIX_budget_times_min_1_cap_coverage_times_reported_total_unresolved_slots_floor_to_1e-24_residual_own_ETF")
     return _normalize(source)
 
 
 def render_targets_source(original_ascii):
     """Render honest unresolved-budget diagnostics using the gate's same rule."""
+    return _render_targets_source(original_ascii, all25=False)
+
+
+def render_all25_targets_source(original_ascii):
+    """New-schema diagnostics using all six sleeves' shared partial-budget rule."""
+    return _render_targets_source(original_ascii, all25=True)
+
+
+def _render_targets_source(original_ascii, *, all25):
     if type(original_ascii) is not str or not original_ascii.isascii():
         raise RelaxedSelectionSourceError("relaxed source is not exact ASCII text")
     source = _replace(original_ascii,
@@ -159,4 +199,7 @@ def render_targets_source(original_ascii):
         '''    elif slot_weight * Decimal(gate_profile.slot_count) < sleeve.budget:
         status = "PARTIAL_STOCK_EXPOSURE_WITH_ETF_FALLBACK"
     elif len(selected_ids) < gate_profile.slot_count:''')
+    if all25:
+        source = _replace(source, "arv2-six-universe-order-relaxed-sleeve-diagnostic-v1",
+                          "arv2-six-universe-order-all25-sleeve-diagnostic-v1")
     return _normalize(source)

@@ -1,0 +1,77 @@
+{
+  "activation_manifest_sha256": "9ee1013f429ed87e7b7a262cf352c5604cd532ce4eb3e9defffe23be31c39b35",
+  "candidates": [
+    {
+      "backtest_name": "ARV2 R220 weight ablation tilt0 recent",
+      "candidate_id": "R220",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt0-recent-v1-relaxed-v1",
+      "profile_sha256": "a452b273bc07e84713e2e47ff06f6072f1ef9ac7d2d595bf88569dfe57ec384a",
+      "project_name": "142 ARV2 SIX WEIGHT ABLATION TILT0 R220 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt0-qc-projection-v1",
+      "projection_sha256": "bc9e5fd2dc1d72586e785e7f4d83b2b88c97f11413358222b2073c90cb077182",
+      "role": "matched_revision_tilt0_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "75cfe455e35f710478cc234051be8100756c419bd7e8e42adb832845f471535c",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt0-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "0.00",
+      "total_source_bytes": 403638
+    },
+    {
+      "backtest_name": "ARV2 R221 weight ablation tilt100 recent",
+      "candidate_id": "R221",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt100-recent-v1-relaxed-v1",
+      "profile_sha256": "6aa3b0f87bff974c4ea9ca2fde223786299519821072324c96125214d1702536",
+      "project_name": "143 ARV2 SIX WEIGHT ABLATION TILT100 R221 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt100-qc-projection-v1",
+      "projection_sha256": "ff17894b0d869baef73b497b7221ba6e1c2f7046ce2940dc8a74b41e55b94771",
+      "role": "matched_revision_tilt100_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "ebfb242367e962c36956f00677147552c987b317b78df61c927f02b908ce1612",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt100-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "1.00",
+      "total_source_bytes": 403660
+    }
+  ],
+  "comparison": "same_selection_weight_tilt_only_AR_entry_and_count_retained",
+  "coverage_policy": [
+    [
+      "QQQ",
+      "0.70",
+      "0.80",
+      "0.95",
+      5
+    ],
+    [
+      "SOXX",
+      "0.70",
+      "0.80",
+      "0.95",
+      5
+    ],
+    [
+      "REMX",
+      "0.50",
+      "0.50",
+      "0.25",
+      5
+    ]
+  ],
+  "input_control_directory": "/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923",
+  "package_sha256": "2649577ac55ac39de37a4a70ab4337274f1887e1a113f0972beefab615121be1",
+  "predecessor_manifest_sha256": "b8f7482c780bf48e83fa0ae6acd50a3b68e46ce5ebdfb215d356cf12a3697442",
+  "schema": "arv2-six-weight-ablation-family-v1"
+}

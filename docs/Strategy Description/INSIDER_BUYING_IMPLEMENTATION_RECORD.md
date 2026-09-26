@@ -1,21 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEWED CODEX COMMITS `a507c4c..5f61b45` (SECTION 88).
-`267463c` AND `5f61b45` ARE ACCEPTED; `84017e1` (TWO-QUARTER IB-1B PILOT
-PROFILE AND RUNNER) IS ACCEPTED AFTER CORRECTION, WITH ONE P2 OPEN. THE
-PROFILE MATCHES ALL SIXTEEN REAL HEADER LINES AND BOTH ARCHIVE RECEIPTS
-EXACTLY (READ: ZIP DIRECTORIES AND FIRST LINES ONLY). P2 `IB1BP-CR01`, AN
-OUTPUT-CONTAINMENT BYPASS THROUGH A CASE-VARIANT PATH ON THIS MAC, IS FIXED
-IN `be83183`; P3 `IB1BP-CR03`, SIX UNPINNED RUNNER GUARDS, IS PINNED IN
-`c298a95`. OPEN P2 `IB1BP-CR02`: THE NEW SCRIPT IS NOT REGISTERED IN THE
-SHARED `architecture/entry_points.json`, SO THE COMPLETE SUITE FAILS TWO
-TESTS ON BOTH THE PUSHED AND THE FINAL TREE (FINAL: 2 FAILED, 8,877 PASSED,
-38 SKIPPED); THE OWNER MUST CHOOSE BETWEEN A SHARED-MANIFEST ENTRY AND
-MOVING THE RUNNER INTO THE LANE PACKAGE. LANE GATE 2,681 PASSED. THE REAL
-PILOT WAS NOT RUN AND SHOULD WAIT FOR A GREEN COMPLETE SUITE. CODEX
-COUNTER-REVIEW OF `be83183`, `c298a95`, AND THIS RECORD IS NEXT. NO OUTCOME,
-QC, PAPER, LIVE, DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS
-OPENED; ALL LOOK COUNTERS REMAIN ZERO.**
+Status: **CODEX COUNTER-REVIEWED ALL THREE CLAUDE COMMITS
+`5f61b45..392eed2` (SECTION 89). `be83183` AND `c298a95` ARE ACCEPTED;
+`392eed2` IS ACCEPTED AFTER APPEND-ONLY RECORD PRECISION CORRECTION.
+INCOMING FOCUSED CHECKS: 1,007 PASSED; THE ENTRY-POINT FILE REPRODUCES
+2 FAILED / 24 PASSED. OPEN P2 `IB1BP-CR02` STILL REQUIRES THE OWNER'S
+EXPLICIT CHOICE. CODEX RECOMMENDS LANE-ONLY RELOCATION INTO
+`research/insider_buying/`, WITH NO SHARED-MANIFEST EDIT. NO RELOCATION,
+NEXT MILESTONE, OR PUSH OCCURS WHILE THAT CHOICE IS PENDING. THE REAL PILOT
+ALSO WAITS FOR CLAUDE'S GREEN COMPLETE-SUITE REVIEW. PYTHON 3.12.14 CONFIRMS
+THE SAME TIMESTAMP TRUNCATION AS CLAUDE'S 3.13.15. NO REAL SOURCE BYTES OR
+FILING ROWS WERE READ BY THIS COUNTER-REVIEW; ALL LOOKS REMAIN ZERO.
+NO PROVIDER, OUTCOME, QC, BROKER, DEPLOYMENT, OR TRADING AUTHORITY IS ADDED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -11684,3 +11680,102 @@ security master, outcome, ETF holding, QuantConnect, broker, operator
 database, scheduler, deployment, capital, order, live, or trading surface
 was accessed. Real bytes read are listed in the preamble. Authorized
 outcome looks: **0**. Consumed outcome looks: **0**. Research looks: **0**.
+
+## 89. Codex counter-review - Claude IB-1B preparation review and owner-choice gate (2026-09-26 UTC)
+
+### 89.1 Exact snapshot and per-commit dispositions
+
+Designated worktree remains
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`,
+branch `codex/strategy-insider-buying`. Fetched remote and incoming local
+HEAD both equal **`392eed2266b0b2789cb95c8b2b02cd37485b37fa`**, clean.
+The pasted pre-push notes say "NOT pushed yet"; the fetched remote proves
+all three commits have since been pushed. Counter-review uses that exact
+remote snapshot, not the stale pre-push availability statement.
+
+| Commit | Disposition | Evidence |
+|---|---|---|
+| `be83183770c5e7db8c4858da3c7c7f00f01334cc` | **Accepted; no new issue found.** Case-variant output containment fix and regression test. | The 40-test runner suite is green. Independent spelling-only reversal makes `_validate_roots` accept both input and repository aliases; actual code refuses both. No pipeline or repository write was needed for that reversal. Disjoint missing outputs still pass, with no common-ancestor false positive. |
+| `c298a95d9f08cf3a76544984a1638057208a2f6d` | **Accepted; no new issue found.** Six test-only guard pins. | Independently reversed all six guarded conditions in memory. Physical-header deletion reaches the later parser refusal rather than the required preflight refusal; the other five yield `DID NOT RAISE`. Restored each original function in finally-safe contexts and verified green on fresh synthetic fixtures. |
+| `392eed2266b0b2789cb95c8b2b02cd37485b37fa` | **Accepted after append-only precision correction `IB1BP-CCR01` below.** | Full diff and dispositions read. Counts reconcile (145 = 105 + 32 + 8; 8,877 = 8,869 + 8). Owner preparation scope, timestamp limitations, partial-publication caveats, and the unresolved architecture gate are consistent. Historical suite-red events were not consecutive rounds. |
+
+### 89.2 Verification and append-only precision
+
+Python **3.12.14** / pytest **9.1.1**, exact incoming tree:
+
+- Focused profile/runner, raw/parsed, pilot contracts, source manifest/v2
+  policy, record/active-document, hygiene, package guard, overlay and ML
+  boundaries: **1,007 passed, 0 failed, 0 skipped, 0 warnings**.
+- `tests/test_project_separation_entrypoints.py`: **2 failed, 24 passed,
+  0 skipped, 0 warnings**. Both failures are exactly `IB1BP-CR02`, the
+  unclassified lane script; this is a focused reproduction, not a complete
+  suite run.
+- Supplemental runner check: **40 passed**, no skips/warnings. Both alias
+  directions and six Claude guard reversals were caught and restored green.
+- Targeted lane/script/test compilation exits 0. Worktree and all three
+  incoming commit whitespace checks are clean.
+
+Both approved original timestamps were converted without source artifact
+I/O. On 3.12.14, `2026-09-24T22:53:37.3844487Z` becomes
+`2026-09-24T22:53:37.384448+00:00` (microsecond 384448); the second becomes
+`2026-09-24T22:53:38.464651+00:00` (464651). This **truncates, not rounds**,
+matching Claude's 3.13.15 observation. It does not authenticate retrieval
+or remove the original seven-digit timestamp/provenance caveats.
+
+Append-only correction to section 88's rating paragraph and `IB1BP-CR02`
+ledger: the earlier `b628262` package-import failure and current `5f61b45`
+classification failure are **two separate occurrences, not consecutive
+rounds**. The intervening v2 round is explicitly green in section 85:
+`f040c6c`, 8,732 passed / 38 skipped / zero failures. This narrows only
+the chronology claim; both underlying defects and the present gate remain
+valid. No prior paragraph or ledger row is rewritten.
+
+### 89.3 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix/disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1BP-CR02 | P2 | **OPEN, owner choice pending** | `84017e1` | Lane runner / shared entry-point inventory | New script is unclassified; two architecture guards fail. | Focused incoming reproduction: 2 failed / 24 passed. | Cannot infer a shared-registry amendment or the requested relocation choice. | Recommended lane-only option (b), not implemented until selected. | Remains red. |
+| IB1BP-CCR01 | P3 | **CLOSED by this append-only correction** | `392eed2` | Section 88 chronology | "Second consecutive round" contradicts the intervening green v2 review. | Section 85 records 8,732 passed / zero failed on `f040c6c`. | Keep the process criticism factual without weakening either genuine defect. | Clarify separate occurrences in 89.2; preserve historical text. | Cross-checked exact recorded snapshots and counts. |
+| IB1BP-CR01 | P2 | **CLOSED in `be83183`, accepted** | `84017e1` | Case-variant containment | Spelling-only overlap admitted APFS aliases. | Independent alias red/green above. | Enforce existing lane output containment. | Claude device/inode ancestor check unchanged. | 40 runner tests; both alias directions pinned. |
+| IB1BP-CR03 | P3 | **CLOSED in `c298a95`, accepted** | `84017e1` | Six guard pins | Correct guards lacked sensitivity. | Six independent reversals caught. | Preserve preflight/final-publication refusals. | Claude tests unchanged. | Fresh-fixture green restoration. |
+| IB2CTX-CR02 | P3 | **OPEN, nonblocking observation, retained** | earlier | Record-prose test | Existing brittle decision anchor. | Earlier sections. | Do not weaken a valid test or extend the pattern. | None. | No new prose-pinning tests. |
+| IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **RETAINED as recorded** | earlier | Historical record/provenance/bytecode | Existing limitations unchanged. | Earlier evidence. | No new authority. | None. | No retrieval-authentication claim. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, nonblocking, retained** | earlier | Shared coordination | Insider-only paper clause at main integration. | Earlier evidence. | Shared documents remain frozen. | None here. | No shared edits. |
+
+### 89.4 Owner decision, durable handoff, and next action
+
+The owner requested counter-review, the next milestone, and then a push.
+Counter-review is complete, but section 88's explicit owner-choice gate
+remains unresolved. Codex asked whether to select **(b) move the runner
+into the Insider Buying research package** (recommended), or expressly
+authorize **(a) adding it to the shared entry-point manifest**. No selection
+has been inferred from the generic instruction to proceed.
+
+Option (b) needs only the lane runner, its sole active test caller, and this
+record: move the entire script into `research/insider_buying/`, remove the
+old script without a compatibility stub, adjust repository-root derivation
+for the deeper path, and document the new module CLI. Preserve historical
+paths and do not re-export the I/O runner through the package facade.
+Every existing runner import satisfies the exact package guard. Add
+focused entry-point classification and CLI/root regression checks, leaving
+all shared registries and execution behavior unchanged.
+
+This counter-review record is **local-only pending the owner choice**;
+no push has been attempted. No push-ledger row is appended until an actual
+authorized combined push is prepared. The serialized workflow stops before
+the next milestone and push while the owner-choice gate is open. After a
+choice, implement and verify its bounded correction and make one combined
+same-lane push containing this record, the correction, and final Claude
+notes. Claude reviews every commit and verifies the complete suite; Codex
+counter-reviews every Claude commit before the first real IB-1B pilot.
+Codex has not run or inferred permission to run a complete lane/repository
+suite here.
+
+No real archive, TSV header/data row, auxiliary member, XML, new metadata,
+provider/SEC/network source, credential, outcome, ETF holding, QC job,
+broker, operator database, deployment, capital, order, or trading surface
+was accessed. Tests use only synthetic scratch artifacts. Source window
+remains exactly 2022Q4..2023Q1; XML and acceptance metadata still blocks
+later real stages, shared audit has no venue/executor, and IB-3 diagnostics
+remain paused. All outcome/research look counters remain **0**. No monitor
+was armed and no shared/project-wide document or sibling lane was changed.

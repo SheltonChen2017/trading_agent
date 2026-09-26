@@ -1,17 +1,17 @@
 # Insider Buying ETF Strategy — implementation and session record
 
 Status: **CODEX COUNTER-REVIEWED ALL THREE CLAUDE COMMITS
-`5f61b45..392eed2` (SECTION 89). `be83183` AND `c298a95` ARE ACCEPTED;
-`392eed2` IS ACCEPTED AFTER APPEND-ONLY RECORD PRECISION CORRECTION.
-INCOMING FOCUSED CHECKS: 1,007 PASSED; THE ENTRY-POINT FILE REPRODUCES
-2 FAILED / 24 PASSED. OPEN P2 `IB1BP-CR02` STILL REQUIRES THE OWNER'S
-EXPLICIT CHOICE. CODEX RECOMMENDS LANE-ONLY RELOCATION INTO
-`research/insider_buying/`, WITH NO SHARED-MANIFEST EDIT. NO RELOCATION,
-NEXT MILESTONE, OR PUSH OCCURS WHILE THAT CHOICE IS PENDING. THE REAL PILOT
-ALSO WAITS FOR CLAUDE'S GREEN COMPLETE-SUITE REVIEW. PYTHON 3.12.14 CONFIRMS
-THE SAME TIMESTAMP TRUNCATION AS CLAUDE'S 3.13.15. NO REAL SOURCE BYTES OR
-FILING ROWS WERE READ BY THIS COUNTER-REVIEW; ALL LOOKS REMAIN ZERO.
-NO PROVIDER, OUTCOME, QC, BROKER, DEPLOYMENT, OR TRADING AUTHORITY IS ADDED.**
+`5f61b45..392eed2` (SECTION 89). THE OWNER APPROVED LANE-ONLY RELOCATION
+TO `research/insider_buying/ib1b_pilot_runner.py` (SECTION 90).
+`IB1BP-CR02` IS CORRECTED IN CANDIDATE `e75f263`: THE OLD SCRIPT IS REMOVED,
+NO SHARED REGISTRY OR FACADE CHANGED, AND ALL 26 ENTRY-POINT CHECKS PASS.
+FINAL FOCUSED VALIDATION: 1,036 PASSED. CLAUDE REVIEWS THIS COMBINED PUSH
+AND VERIFIES THE COMPLETE SUITE NEXT; CODEX COUNTER-REVIEWS EVERY CLAUDE
+COMMIT BEFORE REAL PILOT PROCESSING. THE SOURCE WINDOW REMAINS EXACTLY
+2022Q4..2023Q1. NO REAL SOURCE BYTES OR FILING ROWS WERE READ THIS ROUND;
+XML/ACCEPTANCE METADATA STILL BLOCKS LATER REAL STAGES, IB-3 DIAGNOSTICS
+REMAIN PAUSED, AND ALL LOOKS REMAIN ZERO. NO PROVIDER, OUTCOME, QC, BROKER,
+DEPLOYMENT, OR TRADING AUTHORITY IS ADDED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -194,6 +194,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-26 | Claude review | `f040c6c` -> `2e29993` (test pins) -> this review record | Independent review of the section-83 counter-review and the owner-approved v2 retained-context policy and manifest epoch (`35a1e04..f040c6c`, 3 commits, 0 merges, 7 lane-owned paths) | Verified the remote tip and clean worktree, dispositioned all three commits, read the v2 constructor and the manifest dispatch against v1, confirmed the v1 module is byte-unchanged and its manifest fixture hash stable, recomputed the v2 hash independently, checked that no consumer uses isinstance on either policy class, and ran 18 direct and 2 combined mutants in a read-only export with bytecode caching disabled. Pinned the version resolver's foreign-hash refusal and the final exact-type recheck. Accepted `IB2MAN-CCR01` against this reviewer. No real byte read. | Pushed tree `f040c6c`: complete suite **8,732 passed, 38 skipped, 28 warnings, 0 failed in 474.08s**; recorded **1,100** reproduces, **325** and **107** per new file, 533 on the incoming tree is 567 on the final tree; mutation **14 of 18 caught**. Final tree `2e29993`: lane gate **2,536 passed, 0 skipped in 42.03s**; manifest file **109 passed**; mutation **16 of 18 caught**, both survivors redundant (C1, C2 caught); compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB2MAN-CR03` P2 closed in `a2b8a9d` for the candidate. `IB2CTX-CR01` P3 closed in `2e29993` (two unpinned dispatch guards). `IB2CTX-CR02` P3 open, observation (a test pins record prose). `IB2MAN-CCR01` accepted against this reviewer; `IB2MAN-CR04` closed by owner disposition; `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `2e29993` and this record. Next source step: bounded IB-1B pilot preparation (reviewed schema profile and keys, bounded runner, owner-selected contiguous window). Matching XML and acceptance-metadata bundle still absent. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-26 | Codex counter-review + implementation | `f040c6c..a507c4c` reviewed; `267463c` owner decision; `84017e1` preparation; this record commit follows | Owner-selected 2022Q4–2023Q1 noncanonical IB-1B preparation | Accepted both Claude commits. Pinned nine observed-header variants and two ZIP/header receipt inventories. Added explicit bounded offline IB-1A/IB-1B script composition, sequential replay, scalar zero-authority operational report, and synthetic integration/refusal tests. No real row processing; original filesystem timestamps remain unverified. | Incoming 746 passed; final focused 999 passed, 0 failed/skipped/warnings; new profile 105 and runner 32 passed. Five profile reversals and three publication/cleanup reversals caught; root independently repeated both fingerprint reversals. Compileall 0, CLI help 0, diff checks clean. No complete lane/repository suite; header-only reconnaissance plus synthetic tests; 0 looks. | Draft-only IB1BP-R01 P2 corrected before `84017e1`; IB1BP-R02 P3 optional incomplete reader removed before commit. IB2CTX-CR01 closed and accepted; IB2CTX-CR02 observation open; historical P3 and shared IBSH-CR01 retained. No open P0–P2. | One same-lane push; Claude reviews every commit in `a507c4c..PUSHED_HEAD`, then Codex counter-reviews every Claude commit before real IB-1B processing. Matching XML/acceptance metadata still blocks later real stages; no outcome/QC/paper/live/trading step inferred. |
 | 2026-09-26 | Claude review | `5f61b45` -> `be83183` (code correction) -> `c298a95` (test pins) -> this review record | Independent review of the section-86 counter-review and the owner-selected two-quarter IB-1B pilot preparation (`a507c4c..5f61b45`, 3 commits, 0 merges, 5 lane-owned paths) | Verified the remote tip and clean worktree, dispositioned all three commits, checked the profile's sixteen header receipts and two archive bindings against the real ZIPs (directories and first lines only, plus whole-archive SHA-256), read the runner's order of operations, and ran 38 mutants in read-only exports with bytecode caching disabled. Found and fixed a case-variant path alias that bypassed output containment on this Mac (demonstrated: the unfixed runner published a full synthetic pilot inside the repository), pinned six untested runner guards, and found that the unregistered script fails the project's script-classification tests. Did not run the real pilot. | Pushed tree `5f61b45`: complete suite **2 failed, 8,869 passed, 38 skipped in 595.84s** (script classification; reproduced in a clean export, green on `a507c4c`); recorded **105**, **32**, **746**, **999** reproduce (export: 743 and 996 plus 3 git-dependent skips); fingerprints recompute; real headers **16 of 16** and archives **2 of 2** match; mutation profile **9 of 9**, runner **15 of 29**. Final tree `c298a95`: complete suite **2 failed (same), 8,877 passed, 38 skipped in 503.27s**; lane gate **2,681 passed, 0 skipped in 40.13s**; runner mutation **21 of 29**, eight survivors classified; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; no filing row read; **0 looks**. | `IB1BP-CR01` P2 closed in `be83183` (case-variant containment bypass). `IB1BP-CR02` P2 open, owner decision (unregistered script; complete suite red). `IB1BP-CR03` P3 closed in `c298a95` (six pins). `IB2CTX-CR02`, `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `be83183`, `c298a95`, and this record; confirms `fromisoformat` truncation of the seven-digit stamp on Python 3.12.14; resolves `IB1BP-CR02` once the owner chooses a shared-manifest entry or relocation. The real IB-1B pilot on 2022Q4..2023Q1 waits for a green complete suite. No outcome, QC, paper, or trading step is inferred. |
+| 2026-09-26 | Codex counter-review + lane-only correction | `5f61b45..392eed2` reviewed; `6dc0dd2` counter-review; `e75f263` relocation; this record commit follows | Owner-approved resolution of IB1BP-CR02 without a shared edit | Accepted every Claude code/test commit; accepted its record after append-only chronology clarification. Owner explicitly approved moving the runner within the same lane. Relocated it to the Insider Buying package with unchanged signatures, CLI arguments, source receipts, and authority; adjusted repository-root depth and sole active caller; removed old script without a compatibility stub. | Incoming focused 1,007 passed; architecture red 2 failed / 24 passed. Candidate final focused 1,036 passed, 0 failed/skipped/warnings, including all 26 entry-point checks and mandatory package guard. Old-depth mutation caught by a direct validation-only regression; restored green without repository publication. CLI help, compilation, and diff checks clean. No complete lane/repository suite or real processing; 0 looks. | IB1BP-CR02 corrected in `e75f263`, pending Claude independent review/full-suite gate. IB1BP-CR01/CR03 closures accepted; IB1BP-CCR01 P3 closed append-only in `6dc0dd2`; all historical P3 and shared IBSH-CR01 retained. | One same-lane push of `392eed2..PUSHED_HEAD`. Claude dispositions every commit and verifies a green complete suite; Codex counter-reviews every Claude commit before real IB-1B processing on exactly the selected window. Shared files frozen; no outcome/QC/paper/live/trading authority. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -11779,3 +11780,114 @@ remains exactly 2022Q4..2023Q1; XML and acceptance metadata still blocks
 later real stages, shared audit has no venue/executor, and IB-3 diagnostics
 remain paused. All outcome/research look counters remain **0**. No monitor
 was armed and no shared/project-wide document or sibling lane was changed.
+
+## 90. Codex candidate - owner-approved lane-only runner relocation (2026-09-26 UTC)
+
+### 90.1 Owner decision and exact scope
+
+Following section 89, the owner approved the recommended lane-only option:
+**"yes, approved. as long as the file move stays within the same lane."**
+This selects option (b), not a shared-registry amendment. The move and every
+command remain in the designated `trading_agent__insider_buying` worktree
+on `codex/strategy-insider-buying`. The fetched remote remains
+`392eed2266b0b2789cb95c8b2b02cd37485b37fa`; the earlier local-only
+counter-review `6dc0dd2392647e39c4e4cecf31c78629d65e7c5a` now joins this
+round's one combined push. The pending-choice and local-only statements in
+section 89 are historical and superseded by this decision and handoff.
+
+Code/test candidate:
+**`e75f2638fc03a854573b68f4d0d4dc7d4513fb28`**. It moves the entire
+`scripts/insider_buying_ib1b_pilot.py` into
+`research/insider_buying/ib1b_pilot_runner.py`. No old script stub, shared
+entry-point registry edit, shared architecture change, package-facade
+re-export, or sibling-lane edit is made. Historical record paths remain
+unchanged. The sole active caller now imports the new lane module.
+
+New CLI: `python -m research.insider_buying.ib1b_pilot_runner --help`.
+Actual processing retains exactly the existing explicit `--input-root`,
+`--output-root`, `--parser-git-commit`, and `--reviewed-preparation`
+arguments. The old script/import path is deliberately removed; no backwards-
+compatibility wrapper is supplied because that would still leave an
+unclassified script. The function signatures and their contracts are
+otherwise unchanged.
+
+The only runtime source change is repository-root derivation from
+`Path(__file__).resolve().parents[1]` to `.parents[2]` for the deeper module
+location. New tests derive the actual repository root independently from
+the test file, so production and test code cannot share the same incorrect
+depth. The existing APFS alias guards and all six Claude guard pins remain
+intact. Header/profile/source receipts, both literal fingerprints, resource
+caps, timestamp caveats, report payloads, and zero authority are unchanged.
+
+### 90.2 Verification and retained P0-P3 findings
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix/disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1BP-CR02 | P2 | **CORRECTED in candidate `e75f263`; pending Claude review** | `84017e1` | Unclassified lane script | Extra script made two project-ownership guards fail. | Section 89 focused red: 2 failed / 24 passed. | Preserve exhaustive classification without an unauthorized shared edit. | Owner-approved lane-only relocation, no old script stub, correct deeper-path root, new module CLI and caller tests. | All 26 entry-point tests green; exact package guard green; final focused 1,036 passed. Complete-suite gate remains Claude's. |
+| IB1BP-CCR01 | P3 | **CLOSED in `6dc0dd2`, retained** | `392eed2` | Section 88 chronology | Two failures were separate occurrences, not consecutive rounds. | Intervening green v2 suite in section 85. | Accurate process evidence. | Append-only correction in 89.2. | Historical text preserved. |
+| IB1BP-CR01, IB1BP-CR03 | P2/P3 | **CLOSED and accepted, retained** | `be83183`, `c298a95` | Alias and six guard pins | Corrected containment and test sensitivity. | Section 89 independent red/green. | Preserve every accepted correction during relocation. | No change to guards or refusal behavior. | Runner regressions remain green. |
+| IB2CTX-CR02 | P3 | **OPEN, nonblocking observation, retained** | earlier | Record-prose test | Existing brittle decision anchor. | Earlier evidence. | Do not weaken or extend it. | None. | No prose-pinning test added. |
+| IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **RETAINED as recorded** | earlier | Record/provenance/bytecode | Unchanged historical limitations. | Earlier sections. | No new provenance authority. | None. | No verified-retrieval claim. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, nonblocking, retained** | earlier | Shared coordination | Insider-only paper clause at main integration. | Earlier evidence. | Shared files remain frozen. | None. | No shared edits. |
+
+Python **3.12.14** / pytest **9.1.1**: final focused set **1,036 passed,
+0 failed, 0 skipped, 0 warnings**. It includes the previous 1,007-test set,
+three new relocation tests, and all 26 project entry-point checks. The new
+runner file has 43 tests; all profile and upstream raw/parsed/source/pilot
+contracts, record/active-document checks, module hygiene, mandatory package
+guard, overlay and ML import boundaries remain included. This is **not** a
+complete lane or repository suite. Final-tree repetition follows this
+record commit before push.
+
+Material red/green evidence: both classification tests failed before the
+move and pass afterwards. Independently restore the old production path
+depth in memory: the new direct `_validate_roots` regression fails with
+`DID NOT RAISE`; restore the actual function in a finally-safe context and
+it passes. That probe performs no source read or repository publication.
+The child-process module-help test exits 0 with no stderr and exercises no
+pilot. The lane-owned module/no-old-stub test pins the intended location.
+No valid existing test is removed, skipped, or weakened.
+
+Supplemental read-only audit confirms the production file equals the
+incoming source plus only the CLI documentation line and path-depth change;
+all AST function signatures match, both literal fingerprints recompute
+unchanged, shared architecture manifests and the package facade are
+unchanged, and no active old-path caller remains. Its five focused CLI,
+root, package, and architecture checks pass. These are Codex supplemental
+checks, not Claude's independent disposition. Targeted compilation and
+worktree/staged/per-commit whitespace checks are clean.
+
+### 90.3 Review notes for Claude and next gate
+
+Review every commit in **`392eed2..PUSHED_HEAD`**:
+
+1. `6dc0dd2392647e39c4e4cecf31c78629d65e7c5a`: section 89, exact
+   per-commit counter-review, chronology clarification, and the then-pending
+   owner choice; that historical pause was respected, with no push then;
+2. `e75f2638fc03a854573b68f4d0d4dc7d4513fb28`: approved lane-only move,
+   adjusted repository-root depth, sole caller update, and three new tests;
+3. this record commit: owner quote, current status, one append-only ledger
+   row, findings, verification, exclusions, and next-action gates.
+
+Independently check the rename-only production delta, actual root and APFS
+alias containment, no compatibility stub/unclassified script, module CLI,
+unchanged function signatures, package imports, source fingerprints, all
+accepted Claude guard pins, and frozen shared files. Run the complete
+lane/repository suite and give every commit a disposition. Green focused
+entry-point checks do not assert the complete suite is green.
+
+After Claude's one same-lane push, Codex counter-reviews every Claude
+commit. **The first real IB-1B pilot still waits for accepted preparation
+and Claude's green complete-suite result**. No real runner invocation is
+made now. The source window remains exactly 2022Q4..2023Q1 under section
+72.5; matching Form 4/4-A XML and acceptance metadata still blocks later
+real stages and the canonical source manifest. Shared audit still has no
+venue/executor; IB-3 diagnostics remain paused.
+
+No real artifact bytes, TSV rows, auxiliary contents, XML, new retrieval,
+SEC/provider/network source, outcome, ETF holdings, QC upload/processing/
+job, broker, operator database, scheduler, paper/live deployment, capital,
+order, or trading surface was accessed. Synthetic tests and CLI help only.
+All look counters remain **0**. Shared/project-wide documents and
+`SESSION_HANDOFF.md` remain frozen; no monitor is armed. This is the
+round's one combined same-lane push, not a new authority grant.

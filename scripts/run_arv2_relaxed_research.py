@@ -44,9 +44,10 @@ def projection(candidate):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=("diagnostic-manifest", "preview", "launch", "status", "read"))
+    parser.add_argument("operation", choices=("diagnostic-manifest", "order-manifest", "preview", "launch", "status", "read", "recover-counts"))
     parser.add_argument("candidate", nargs="?", default="R209")
     parser.add_argument("--attempt", type=int, default=1)
+    parser.add_argument("--policy", help="Prospective canonical three-universe policy JSON")
     args = parser.parse_args()
     if Path.cwd().resolve() != ROOT or ROOT.name != "trading_agent__analyst_revisions_v2":
         raise ValueError("operation requires the designated lane worktree")
@@ -66,6 +67,30 @@ def main():
             input_control_directory=str(ROOT / "artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923"),
             candidates=[row]), sort_keys=True, indent=2))
         return
+    if args.operation == "order-manifest":
+        from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_relaxed_qc_projection as relaxed
+        policy = tuple(tuple(item) for item in json.loads(args.policy))
+        family = adapter._manifest()
+        if len(family["candidates"]) != 1:
+            raise ValueError("order freeze requires the exact diagnostic-only predecessor")
+        prior, current = packages()
+        rows = list(family["candidates"])
+        for offset, percent in enumerate(relaxed.TILT_PERCENTS, 210):
+            value, profile = relaxed.build_relaxed_order_projection(prior, current, percent, policy)
+            files = [[item.project_path, item.content_sha256, item.byte_count] for item in value.source_files]
+            rows.append(dict(candidate_id=f"R{offset}", project_name=f"{offset - 78} ARV2 SIX RELAXED TILT{percent} R{offset} 202508 NOW",
+                backtest_name=f"ARV2 R{offset} relaxed tilt{percent} recent", kind="order", role=value.role,
+                projection_schema=value.schema, projection_sha256=value.projection_sha256,
+                profile_id=value.profile_id, profile_sha256=value.profile_sha256,
+                source_files_sha256=hashlib.sha256(common._canonical(files)).hexdigest(),
+                source_file_count=len(files), total_source_bytes=value.total_source_byte_count,
+                statistic_names=["ARV2_SIX_GATE_ORDER_META", "ARV2_SIX_GATE_ORDER_AGGREGATES"],
+                meta_schema=relaxed.META_SCHEMA, summary_schema=relaxed.SUMMARY_SCHEMAS[percent],
+                tilt_fraction=profile["maximum_stock_weight_change_fraction"],
+                matched_baseline_profile_sha256=profile["matched_baseline_profile_sha256"]))
+        print(json.dumps({**family, "coverage_policy": [list(item) for item in policy],
+            "candidates": rows}, sort_keys=True, indent=2))
+        return
     api = coverage.production_client()
     organization = common._post(api, "projects/read", {"projectId": 36978919})["projects"][0]["organizationId"]
     plan = adapter.build_plan(args.candidate, organization, CONTROL, args.attempt)
@@ -80,8 +105,16 @@ def main():
         if args.operation == "status":
             print(adapter.poll_status(plan, receipt, api))
         else:
-            result = adapter.read_result_once(plan, receipt, api)
-            print(json.dumps(result, sort_keys=True))
+            result = adapter.read_result_once(plan, receipt, api,
+                recover_r209_transport=args.operation == "recover-counts")
+            if args.candidate == "R209":
+                report = {"run_valid": result["run_valid"],
+                    "resolver_counts": result["meta"]["resolver_counts"],
+                    "resolver_refusal_reasons": result["meta"]["resolver_refusal_reasons"],
+                    "sleeves": {ticker: value["totals"] for ticker, value in result["sleeves"].items()}}
+            else:
+                report = result
+            print(json.dumps(report, sort_keys=True))
 
 
 if __name__ == "__main__":

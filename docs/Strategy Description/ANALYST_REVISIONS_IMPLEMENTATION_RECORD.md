@@ -26267,3 +26267,28 @@ At most three attempts per candidate, reuse its project; all unsuccessful
 launches remain spent. One bounded aggregate read per completed launch, no
 standard statistics, raw rows, logs or orders. No launch or look has been
 claimed by this prospective paragraph.
+
+### 193.2 R209 execution and count-read transport recovery
+
+R209 A1 used source frozen at `8bb47ed`, project **36982551**, backtest
+`1e2b8175fa026c00c69f601c855e64fc`. It compiled and reached `Completed.`;
+one of three launch attempts is spent. The first custom-statistic read spent
+its atomic claim, but saving the seven individually bounded strings through
+the older cap-90 small-control-record writer refused the combined envelope
+as oversized before saving or parsing it. No result/cell was fabricated.
+`ARV2D193-001` **P2**: new diagnostic adapter incorrectly reused a small claim
+writer for a seven-statistic result artifact. This is a local transport defect,
+not a QC runtime or economic change; the run itself completed.
+
+Before any further read, the successor will use a separate finite 128 KiB,
+private, exclusive-create artifact writer for bounded raw-custom/result
+receipts; individual statistic bounds stay 8,192 bytes and control claims
+retain the old bound. A worst-case seven-statistic regression must pass.
+Standing owner research authority permits **one explicitly recorded recovery
+read of R209 A1 only**, after exact project/source/run reauthentication,
+with the original read claim preserved and a separate atomic recovery claim.
+It is counted conservatively as another infrastructure look, not disguised
+as the original sole read or a new launch. No additional read exception is
+granted to another candidate. Planned reconciliation if recovery succeeds:
+205/148/32/629 -> **207 shared / 148 development / 34 infrastructure / 629
+cells** (one diagnostic launch plus one recovery read). No return was read.

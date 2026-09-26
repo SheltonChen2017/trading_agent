@@ -24,6 +24,8 @@ MANIFEST_PATH = Path(__file__).with_name("six_universe_relaxed_candidates.json")
 _TERMINAL = {"Completed.", "Runtime Error", "BuildError"}
 _GEOMETRY = ("2025-08-01", "2026-09-25", 290, 61)
 _TICKERS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
+MAXIMUM_ARTIFACT_BYTES = 128 * 1024
+_R209_RECOVERY_IDENTITY = (36982551, "1e2b8175fa026c00c69f601c855e64fc")
 
 
 class RelaxedQcSubmissionError(ValueError):
@@ -84,7 +86,7 @@ def build_plan(candidate_id, organization_id, control_directory, attempt=1):
 
 def _path(plan, suffix, *, attempt=None):
     _candidate(plan)
-    if suffix not in {"claim", "project", "launch", "terminal", "read-claim", "raw-custom", "result"}:
+    if suffix not in {"claim", "project", "launch", "terminal", "read-claim", "recovery-read-claim", "raw-custom", "result"}:
         _fail("relaxed control suffix changed")
     root = plan.control_directory
     root.mkdir(mode=0o700, parents=False, exist_ok=True)
@@ -95,6 +97,44 @@ def _path(plan, suffix, *, attempt=None):
     slot = plan.attempt if attempt is None else attempt
     stem = plan.candidate_id if suffix == "project" else f"{plan.candidate_id}-A{slot}"
     return root / f"{stem}-{suffix}.json"
+
+
+def _write_artifact(path, value):
+    """Separate bounded aggregate envelope; do not enlarge legacy control files."""
+    raw = common._canonical(value)
+    if type(value) is not dict or not 0 < len(raw) <= MAXIMUM_ARTIFACT_BYTES:
+        _fail("relaxed aggregate artifact is oversized")
+    try:
+        descriptor = os.open(path, os.O_WRONLY | os.O_CREAT | os.O_EXCL
+            | getattr(os, "O_NOFOLLOW", 0), 0o600)
+        try:
+            with os.fdopen(descriptor, "wb", closefd=False) as stream:
+                stream.write(raw)
+                stream.flush()
+                os.fsync(stream.fileno())
+        finally:
+            os.close(descriptor)
+    except OSError:
+        _fail("relaxed aggregate artifact was already spent or is unavailable")
+
+
+def _read_artifact(path):
+    try:
+        descriptor = os.open(path, os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0))
+        try:
+            info = os.fstat(descriptor)
+            with os.fdopen(descriptor, "rb", closefd=False) as stream:
+                raw = stream.read(MAXIMUM_ARTIFACT_BYTES + 1)
+        finally:
+            os.close(descriptor)
+        value = json.loads(raw.decode("ascii"))
+    except (OSError, ValueError, UnicodeError):
+        _fail("relaxed aggregate artifact is unavailable")
+    if (not stat.S_ISREG(info.st_mode) or stat.S_IMODE(info.st_mode) != 0o600
+            or info.st_uid != os.getuid() or not 0 < len(raw) <= MAXIMUM_ARTIFACT_BYTES
+            or type(value) is not dict or common._canonical(value) != raw):
+        _fail("relaxed aggregate artifact changed")
+    return value
 
 
 def preview(plan, projection):
@@ -231,7 +271,7 @@ def launch(plan, projection, api):
         terminal = common._read(_path(plan, "terminal", attempt=slot))
         if (terminal.get("status") not in _TERMINAL
                 or terminal.get("status") == "Completed."
-                and common._read(_path(plan, "result", attempt=slot)).get("run_valid") is not False):
+                and _read_artifact(_path(plan, "result", attempt=slot)).get("run_valid") is not False):
             _fail("relaxed retry predecessor is not an unsuccessful terminal run")
     common._post(api, "authenticate", {})
     project_path = _path(plan, "project")
@@ -246,6 +286,7 @@ def launch(plan, projection, api):
         if receipt.get("candidate_id") != plan.candidate_id:
             _fail("relaxed retry project receipt changed")
         _project(plan, api, project_id)
+        _require_retry_inventory(plan, api, project_id)
     common._write(_path(plan, "claim"), identity)  # Atomic O_EXCL before mutation.
     if plan.attempt == 1:
         rows = common._post(api, "projects/create", {"name": row["project_name"],
@@ -301,6 +342,36 @@ def launch(plan, projection, api):
         "compile_id": compile_id, "backtest_id": value["backtestId"], "backtest_name": name}
     common._write(_path(plan, "launch"), receipt)
     return receipt
+
+
+def _require_retry_inventory(plan, api, project_id):
+    """Count remote runs, including untracked manual/Mia attempts, without outcomes."""
+    expected = {}
+    for slot in range(1, plan.attempt):
+        prior_plan = dataclasses.replace(plan, attempt=slot)
+        terminal = common._read(_path(prior_plan, "terminal"))
+        launch_path = _path(prior_plan, "launch")
+        if not launch_path.exists():
+            if terminal.get("status") != "BuildError" or terminal.get("project_id") != project_id:
+                _fail("relaxed retry has an ambiguous earlier launch")
+            continue
+        prior = common._read(launch_path)
+        _receipt(prior_plan, prior)
+        if prior["project_id"] != project_id or terminal.get("backtest_id") != prior["backtest_id"]:
+            _fail("relaxed retry prior project or run changed")
+        expected[prior["backtest_id"]] = (prior["backtest_name"], terminal["status"])
+    listing = common._post(api, "backtests/list", {"projectId": project_id, "includeStatistics": False})
+    rows = listing.get("backtests")
+    if type(rows) is not list or listing.get("count", len(rows)) != len(rows) or len(rows) != len(expected):
+        _fail("relaxed retry remote run census has an untracked attempt")
+    observed = {}
+    for row in rows:
+        if (type(row) is not dict or row.get("backtestId") in observed
+                or row.get("projectId", project_id) != project_id):
+            _fail("relaxed retry remote run identity changed")
+        observed[row.get("backtestId")] = (row.get("name"), row.get("status"))
+    if observed != expected:
+        _fail("relaxed retry remote terminal identities changed")
 
 
 def poll_status(plan, launch_receipt, api):
@@ -388,6 +459,17 @@ def _parse_order(plan, statistics):
             or aggregate.get("target_tracking_valid") is not (mean <= Decimal("0.02") and maximum <= Decimal("0.05"))
             or type(aggregate.get("run_valid")) is not bool):
         _fail("relaxed exposure or tracking flag is inconsistent")
+    event_count = aggregate.get("order_event_cash_observation_count")
+    transient = aggregate.get("transient_negative_order_event_count")
+    minimum = aggregate.get("minimum_observed_order_event_cash")
+    if (type(event_count) is not int or event_count < 0
+            or type(transient) is not int or not 0 <= transient <= event_count
+            or event_count == 0 and minimum is not None
+            or event_count > 0 and (not cap._finite_decimal(minimum)
+                or (transient > 0) is not (Decimal(minimum) < 0))
+            or type(aggregate.get("matched_baseline_target_path_sha256")) is not str
+            or not cap._HEX.fullmatch(aggregate["matched_baseline_target_path_sha256"])):
+        _fail("relaxed signed-event cash or matched path changed")
     if aggregate["run_valid"] and (execution.get("run_valid") is not True
             or execution.get("execution_failure") is not False
             or execution.get("submitted_rebalance_count") != 61
@@ -395,7 +477,7 @@ def _parse_order(plan, statistics):
             or execution.get("submitted_order_count") != execution.get("filled_order_count_sum")
             or execution.get("invalid_order_count_sum") != 0 or execution.get("canceled_order_count_sum") != 0
             or aggregate["end_day_gross_at_most_one"] is not True
-            or aggregate["target_tracking_valid"] is not True):
+            or aggregate["target_tracking_valid"] is not True or event_count == 0):
         _fail("relaxed valid flag disagrees with order evidence")
     selected.update({key: aggregate[key] for key in common._SETTLEMENT_FIELDS | common._TILT_FIELDS})
     return {"meta": meta, "aggregates": selected, "run_valid": aggregate["run_valid"]}
@@ -465,7 +547,7 @@ def _parse_coverage(plan, statistics):
     return {"meta": meta, "sleeves": dict(zip(_TICKERS, sleeves)), "run_valid": True}
 
 
-def read_result_once(plan, launch_receipt, api):
+def read_result_once(plan, launch_receipt, api, *, recover_r209_transport=False):
     """One bounded custom-statistic read, never logs, prices or order rows."""
     identity, row = _receipt(plan, launch_receipt), _candidate(plan)
     terminal = common._read(_path(plan, "terminal"))
@@ -476,7 +558,16 @@ def read_result_once(plan, launch_receipt, api):
         _fail("relaxed exact run has not completed")
     _project(plan, api, launch_receipt["project_id"])
     _files(plan, api, launch_receipt["project_id"], identity)
-    common._write(_path(plan, "read-claim"), expected)
+    if recover_r209_transport:
+        if (plan.candidate_id != "R209" or plan.attempt != 1
+                or (launch_receipt["project_id"], launch_receipt["backtest_id"]) != _R209_RECOVERY_IDENTITY
+                or common._read(_path(plan, "read-claim")) != expected
+                or _path(plan, "raw-custom").exists() or _path(plan, "result").exists()):
+            _fail("relaxed R209 one-time transport recovery is not exact")
+        common._write(_path(plan, "recovery-read-claim"), {**expected,
+            "reason": "original_16KiB_control_writer_refused_seven_bounded_custom_statistics"})
+    else:
+        common._write(_path(plan, "read-claim"), expected)
     response = common._post(api, "backtests/read", {"projectId": launch_receipt["project_id"],
         "backtestId": launch_receipt["backtest_id"]}).get("backtest")
     if (type(response) is not dict or response.get("projectId") != launch_receipt["project_id"]
@@ -494,8 +585,8 @@ def read_result_once(plan, launch_receipt, api):
     # A future parser correction can recover locally, never consume a second read.
     for value in retained.values():
         _statistic(value)
-    common._write(_path(plan, "raw-custom"), {**expected, "statistics": retained})
+    _write_artifact(_path(plan, "raw-custom"), {**expected, "statistics": retained})
     result = (_parse_coverage if row["kind"] == "coverage" else _parse_order)(plan, retained)
-    common._write(_path(plan, "result"), {**expected, **result,
-        "manifest_sha256": FROZEN_MANIFEST_SHA256, "projection_sha256": row["projection_sha256"]})
+    _write_artifact(_path(plan, "result"), {**expected, **result,
+        "manifest_sha256": identity["manifest_sha256"], "projection_sha256": row["projection_sha256"]})
     return result

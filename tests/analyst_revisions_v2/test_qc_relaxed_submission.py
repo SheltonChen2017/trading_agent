@@ -49,6 +49,7 @@ class Fake:
         self.compile_state, self.status = "BuildSuccess", "In Progress..."
         self.collaborators = [{"owner": True}]
         self.statistics = {}
+        self.runs = []
 
     def post(self, api, endpoint, body):
         self.calls.append((endpoint, body))
@@ -79,12 +80,13 @@ class Fake:
             return {"compileId": "compile-1", "state": self.compile_state}
         if endpoint == "backtests/create":
             self.backtest_name = body["backtestName"]
+            self.runs.append({"projectId": 123, "backtestId": "run-1",
+                "name": self.backtest_name, "status": self.status})
             return {"backtest": {"projectId": 123, "backtestId": "run-1",
                 "name": self.backtest_name, "status": self.status}}
         if endpoint == "backtests/list":
             assert body["includeStatistics"] is False
-            return {"count": 1, "backtests": [{"projectId": 123,
-                "backtestId": "run-1", "name": self.backtest_name, "status": self.status}]}
+            return {"count": len(self.runs), "backtests": [{**row, "status": self.status} for row in self.runs]}
         if endpoint == "backtests/read":
             return {"backtest": {"projectId": 123, "backtestId": "run-1",
                 "name": self.backtest_name, "status": self.status,
@@ -250,9 +252,176 @@ def test_bad_digest_still_consumes_one_read(frozen):
     with pytest.raises(sut.RelaxedQcSubmissionError, match="digest"):
         sut.read_result_once(plan, launch, fake)
     assert sut._path(plan, "read-claim").exists()
+    assert sut._path(plan, "raw-custom").exists()
 
 
 @pytest.mark.parametrize("value", ["{} ", "[]", "{\"x\":NaN}", "é", " " * 8193])
 def test_noncanonical_or_oversized_statistic_refused(value):
     with pytest.raises((sut.RelaxedQcSubmissionError, ValueError)):
         sut._statistic(value)
+
+
+def test_new_named_diagnostics_bound_without_legacy_global_mutation(monkeypatch):
+    new_status = "PARTIAL_STOCK_EXPOSURE_WITH_ETF_FALLBACK"
+    new_reason = "KNOWN_MARKET_CAP_NAME_COUNT_BELOW_MINIMUM"
+    aggregate = {key: None for key in sut.cap._AGGREGATE_FIELDS}
+    aggregate["fallback_counts"] = {new_status: 366}
+    aggregate["sleeve_diagnostics"] = {"rows": [
+        [ticker, ticker, 61, 1, 60, 0, 1, 1, "0.1", "0", {new_reason: 60}, {new_status: 61}]
+        for ticker in sut._TICKERS]}
+    original_statuses, original_reasons = sut.cap._SELECTION_STATUSES, sut.cap._COVERAGE_REASONS
+    def validator(base, *, expected_geometry):
+        assert new_status not in base["fallback_counts"]
+        assert base["fallback_counts"]["PARTIAL_STOCK_SLOTS_WITH_ETF_FALLBACK"] == 366
+        for row in base["sleeve_diagnostics"]["rows"]:
+            assert row[10] == {"MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM": 60}
+            assert row[11] == {"PARTIAL_STOCK_SLOTS_WITH_ETF_FALLBACK": 61}
+        return base
+    monkeypatch.setattr(sut.cap, "_project_aggregate", validator)
+    retained = sut._bounded_order_base(aggregate)
+    assert retained["fallback_counts"] == {new_status: 366}
+    assert retained["sleeve_diagnostics"]["rows"][0][10] == {new_reason: 60}
+    assert sut.cap._SELECTION_STATUSES is original_statuses
+    assert sut.cap._COVERAGE_REASONS is original_reasons
+    assert aggregate["fallback_counts"] == {new_status: 366}
+    aggregate["fallback_counts"] = {"UNKNOWN_ARBITRARY_STATUS": 366}
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="named state"):
+        sut._bounded_order_base(aggregate)
+
+
+def test_stage_two_preserves_exact_stage_one_candidate_claim(frozen, monkeypatch):
+    plan, projection, fake, row = frozen
+    launch = sut.launch(plan, projection, fake)
+    old_pin = sut.FROZEN_MANIFEST_SHA256
+    family = json.loads(sut.MANIFEST_PATH.read_bytes())
+    family["candidates"].extend([{**row, "candidate_id": "R" + str(number)} for number in range(210, 220)])
+    sut.MANIFEST_PATH.write_bytes(canonical(family))
+    monkeypatch.setattr(sut, "PREDECESSOR_MANIFEST_SHA256", old_pin)
+    monkeypatch.setattr(sut, "FROZEN_MANIFEST_SHA256", hashlib.sha256(sut.MANIFEST_PATH.read_bytes()).hexdigest())
+    assert sut._receipt(plan, launch)["manifest_sha256"] == old_pin
+    family["candidates"][0]["profile_sha256"] = "f" * 64
+    sut.MANIFEST_PATH.write_bytes(canonical(family))
+    monkeypatch.setattr(sut, "FROZEN_MANIFEST_SHA256", hashlib.sha256(sut.MANIFEST_PATH.read_bytes()).hexdigest())
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="claim"):
+        sut._receipt(plan, launch)
+
+
+def order_fixture():
+    from tests.analyst_revisions_v2 import test_qc_six_universe_settlement_submission as legacy
+    aggregate, _ = legacy._aggregate("R195")
+    aggregate.update(schema="relaxed-summary", role="matched_revision_tilt20_relaxed_recent",
+        profile_id="relaxed-profile", profile_sha256="a" * 64,
+        maximum_stock_weight_change_fraction="0.20", matched_baseline_profile_sha256="b" * 64)
+    aggregate["account"].update(first_observation_session=sut._GEOMETRY[0],
+        last_observation_session=sut._GEOMETRY[1], observation_count=290)
+    aggregate["execution"].update(decision_count=61, submitted_rebalance_count=61,
+        completed_rebalance_count=61, submitted_order_count=61, filled_order_count_sum=61)
+    aggregate["fallback_counts"] = {"PARTIAL_STOCK_EXPOSURE_WITH_ETF_FALLBACK": 366}
+    for row in aggregate["sleeve_diagnostics"]["rows"]:
+        row[2] = 61
+        row[10] = {"KNOWN_MARKET_CAP_NAME_COUNT_BELOW_MINIMUM": 61}
+        row[11] = {"PARTIAL_STOCK_EXPOSURE_WITH_ETF_FALLBACK": 61}
+    candidate = {"role": aggregate["role"], "summary_schema": aggregate["schema"],
+        "profile_id": aggregate["profile_id"], "profile_sha256": aggregate["profile_sha256"],
+        "tilt_fraction": "0.20", "matched_baseline_profile_sha256": "b" * 64,
+        "statistic_names": ["ARV2_SIX_GATE_ORDER_META", "ARV2_SIX_GATE_ORDER_AGGREGATES"],
+        "meta_schema": "test-order-meta"}
+    meta = {key: None for key in sut.cap._META_FIELDS}
+    meta.update(schema=candidate["meta_schema"], role=candidate["role"],
+        profile_id=candidate["profile_id"], profile_sha256=candidate["profile_sha256"],
+        package_sha256="c" * 64, activation_manifest_sha256="d" * 64,
+        aggregate_schema=candidate["summary_schema"],
+        result_transport="two_bounded_custom_summary_statistics",
+        raw_provider_rows=False, raw_price_rows=False, raw_order_rows=False,
+        formal=False, trading=False, preliminary=True, backtest_only=True)
+    return aggregate, candidate, meta
+
+
+@pytest.mark.parametrize("defect", [None, "invalid_order", "tracking", "negative_cash",
+    "event_count", "event_minimum", "missing_fill", "wrong_tilt", "wrong_hash"])
+def test_real_order_parser_isolates_new_generation_cash_execution_and_digest(monkeypatch, defect):
+    aggregate, row, meta = order_fixture()
+    if defect == "invalid_order":
+        aggregate["execution"]["invalid_order_count_sum"] = 1
+    elif defect == "tracking":
+        aggregate["execution"]["mean_target_weight_l1_error"] = "0.03"
+    elif defect == "negative_cash":
+        aggregate["minimum_end_day_cash"] = "-1"
+    elif defect == "event_count":
+        aggregate["order_event_cash_observation_count"] = True
+    elif defect == "event_minimum":
+        aggregate["minimum_observed_order_event_cash"] = "25"
+    elif defect == "missing_fill":
+        aggregate["execution"]["filled_order_count_sum"] = 60
+    elif defect == "wrong_tilt":
+        aggregate["maximum_stock_weight_change_fraction"] = "0.40"
+    raw = canonical(aggregate).decode("ascii")
+    meta["aggregate_sha256"] = "0" * 64 if defect == "wrong_hash" else hashlib.sha256(raw.encode("ascii")).hexdigest()
+    stats = {"ARV2_SIX_GATE_ORDER_META": canonical(meta).decode("ascii"),
+             "ARV2_SIX_GATE_ORDER_AGGREGATES": raw}
+    monkeypatch.setattr(sut, "_candidate", lambda plan: row)
+    monkeypatch.setattr(sut, "_manifest", lambda: {"package_sha256": "c" * 64, "activation_manifest_sha256": "d" * 64})
+    if defect:
+        with pytest.raises((sut.RelaxedQcSubmissionError, sut.cap.Cap90QcSubmissionError)):
+            sut._parse_order(object(), stats)
+    else:
+        result = sut._parse_order(object(), stats)
+        assert result["run_valid"] is True
+        assert result["aggregates"]["fallback_counts"] == aggregate["fallback_counts"]
+
+
+def test_seven_maximum_custom_strings_fit_private_artifact(tmp_path):
+    raw = canonical({"p": "\\" * 4092}).decode("ascii")
+    assert len(raw) == 8192
+    value = {"statistics": {str(index): raw for index in range(7)}}
+    assert len(canonical(value)) > 16 * 1024
+    path = tmp_path / "custom.json"
+    sut._write_artifact(path, value)
+    assert sut._read_artifact(path) == value
+    assert path.stat().st_mode & 0o777 == 0o600
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="spent"):
+        sut._write_artifact(path, value)
+
+
+def test_private_artifact_inclusive_boundary_and_symlink_refusal(tmp_path):
+    exact = {"p": "x" * (sut.MAXIMUM_ARTIFACT_BYTES - len(canonical({"p": ""})))}
+    path = tmp_path / "exact.json"
+    sut._write_artifact(path, exact)
+    assert len(path.read_bytes()) == sut.MAXIMUM_ARTIFACT_BYTES
+    assert sut._read_artifact(path) == exact
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="oversized"):
+        sut._write_artifact(tmp_path / "too-big.json", {"p": exact["p"] + "x"})
+    link = tmp_path / "link.json"
+    link.symlink_to(path)
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="unavailable"):
+        sut._read_artifact(link)
+
+
+def test_r209_transport_recovery_is_exact_one_time_without_relaunch(frozen, monkeypatch):
+    plan, projection, fake, row = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    sut.poll_status(plan, launch, fake)
+    expected = sut.common._read(sut._path(plan, "terminal"))
+    sut.common._write(sut._path(plan, "read-claim"), expected)
+    fake.statistics = coverage_stats(row)
+    monkeypatch.setattr(sut, "_R209_RECOVERY_IDENTITY", (123, "run-1"))
+    result = sut.read_result_once(plan, launch, fake, recover_r209_transport=True)
+    assert result["run_valid"] is True
+    assert sut.common._read(sut._path(plan, "read-claim")) == expected
+    assert sut._path(plan, "recovery-read-claim").exists()
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="recovery"):
+        sut.read_result_once(plan, launch, fake, recover_r209_transport=True)
+    assert sum(endpoint == "backtests/read" for endpoint, _ in fake.calls) == 1
+    assert sum(endpoint == "backtests/create" for endpoint, _ in fake.calls) == 1
+
+
+def test_retry_census_refuses_untracked_manual_or_mia_run(frozen):
+    plan, projection, fake, _ = frozen
+    fake.compile_state = "BuildError"
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="compile failed"):
+        sut.launch(plan, projection, fake)
+    fake.runs.append({"projectId": 123, "backtestId": "owner-manual-run", "name": "owner run", "status": "Completed."})
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="untracked"):
+        sut.launch(dataclasses.replace(plan, attempt=2), projection, fake)
+    assert not sut._path(dataclasses.replace(plan, attempt=2), "claim").exists()

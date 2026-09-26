@@ -4937,6 +4937,28 @@ Matched path equals R203; cells **627 -> 628**, totals **204 / 147 / 32 / 628**.
 Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
 No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.
 
+## R-209 — recent six-sleeve coverage counts and one transport recovery — 2026-09-26
+
+Owner-authorized count-only diagnostic, not an alpha/return evaluation.
+Source frozen at `8bb47ed`; private project **36982551**, A1 backtest
+`1e2b8175fa026c00c69f601c855e64fc` reached `Completed.`. Nine files /234,508 B,
+projection `5bd2733a5f05582845f707178992f56081e8fe78e615bb0294e9506c0e0b2690`,
+profile `854b469ad40667cc8e55a23a23da5593cfc247fca945cf6e1270d79d4096c4f9`.
+The first count read's old 16 KiB receipt writer refused the 30,199-byte
+seven-string envelope before saving/parsing. New finite 128 KiB artifact
+writer and exact one-time recovery frozen at `d587643`; original spent claim
+preserved, separate recovery claim, same exact run/source, no relaunch.
+Conservatively count launch **205 -> 206 shared / 148 development / 32 -> 33
+infrastructure / 629 cells**, recovery read **206 -> 207 shared / 148 development
+/ 33 -> 34 infrastructure / 629 cells**. No alpha/development look or cell added.
+Seven custom count summaries authenticated; no returns, prices, raw identifiers,
+orders, logs or standard statistics inspected. Coverage aggregate SHA
+`384db067a3fd7d6cd8c673b7924d77fb08d17678b8984a729d14a216d9e9202b`.
+Counts justify a separately frozen QQQ/SOXX 70%-member/80%-cap-weight/95%-total
+policy (55/58 of 61 coverage decisions); REMX 50%/50%/25% with five known names
+admits only one decision and leaves unresolved exposure in REMX. These are
+coverage, not AR-entry or return counts. Full decision/risk notes in lane 193.
+
 ## R-208 — corrected 200% revision tilt, recent period; A1 valid — 2026-09-26
 
 Prospective source commit `1744659`; private project **36981612**,

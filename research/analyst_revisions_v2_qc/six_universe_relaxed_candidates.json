@@ -15,10 +15,261 @@
       "sleeve_schema": "arv2-six-universe-recent-coverage-sleeve-v2",
       "source_file_count": 9,
       "source_files_sha256": "19cdb90959a9636d4f416867a0a06615aa79adbd9acc4d07cd66d884631235da",
-      "statistic_names": ["ARV2_SIX_COVERAGE_META", "ARV2_SIX_COVERAGE_QQQ", "ARV2_SIX_COVERAGE_REMX", "ARV2_SIX_COVERAGE_SOXX", "ARV2_SIX_COVERAGE_SPY", "ARV2_SIX_COVERAGE_XLE", "ARV2_SIX_COVERAGE_XLV"],
+      "statistic_names": [
+        "ARV2_SIX_COVERAGE_META",
+        "ARV2_SIX_COVERAGE_QQQ",
+        "ARV2_SIX_COVERAGE_REMX",
+        "ARV2_SIX_COVERAGE_SOXX",
+        "ARV2_SIX_COVERAGE_SPY",
+        "ARV2_SIX_COVERAGE_XLE",
+        "ARV2_SIX_COVERAGE_XLV"
+      ],
       "summary_schema": "arv2-six-universe-recent-coverage-sleeve-v2",
       "total_source_bytes": 234508
+    },
+    {
+      "backtest_name": "ARV2 R210 relaxed tilt20 recent",
+      "candidate_id": "R210",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt20-recent-v1-relaxed-v1",
+      "profile_sha256": "ecaf5227f7792cadbae5f38b818b80ed333d5e8ec36bd0df3499f152a1972a8c",
+      "project_name": "132 ARV2 SIX RELAXED TILT20 R210 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt20-qc-projection-v1",
+      "projection_sha256": "2e7175a09575a6906066474638c5e9adbe5a12be55568675c2ae4bc7d72f0226",
+      "role": "matched_revision_tilt20_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "ed1df753a8c282e1e04b3136a56d1dca20f8426d95e0cf0feaf65bbc8e164ce8",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt20-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "0.20",
+      "total_source_bytes": 403649
+    },
+    {
+      "backtest_name": "ARV2 R211 relaxed tilt40 recent",
+      "candidate_id": "R211",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt40-recent-v1-relaxed-v1",
+      "profile_sha256": "378ba7ec7195c113090aa43a1c5e1e6bc3985f3e3e4639b49096e926a1026413",
+      "project_name": "133 ARV2 SIX RELAXED TILT40 R211 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt40-qc-projection-v1",
+      "projection_sha256": "c8639d3571c75d8b915cd099ffef94dcd20f0ce8d1cf0b496c6ab92384bfee68",
+      "role": "matched_revision_tilt40_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "7bfbf038624f7ee3608e671517903a11bd4f362cef95c40d54c94dd2548f6ce6",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt40-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "0.40",
+      "total_source_bytes": 403649
+    },
+    {
+      "backtest_name": "ARV2 R212 relaxed tilt60 recent",
+      "candidate_id": "R212",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt60-recent-v1-relaxed-v1",
+      "profile_sha256": "d6c9bec3397f30acb19ef1d73d4ec9e157fec08616b80830138177a7cac4faa6",
+      "project_name": "134 ARV2 SIX RELAXED TILT60 R212 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt60-qc-projection-v1",
+      "projection_sha256": "13abdfbecd7487ccba78ec85bb1f87230b25f9a43481d4f7e1a3e1aee1b6b014",
+      "role": "matched_revision_tilt60_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "d89d64629f2d6daa0886b40fcc74ed1176678ca821fa0a9c9a650dccc35e916b",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt60-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "0.60",
+      "total_source_bytes": 403649
+    },
+    {
+      "backtest_name": "ARV2 R213 relaxed tilt80 recent",
+      "candidate_id": "R213",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt80-recent-v1-relaxed-v1",
+      "profile_sha256": "992acdd06719898c4b20db477ca66a39ebab47d144d33a238fda064696486020",
+      "project_name": "135 ARV2 SIX RELAXED TILT80 R213 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt80-qc-projection-v1",
+      "projection_sha256": "6f5997ba0f34c2205d07b53d079575cd42cfd5bd8ffa64b43420356e22cf696b",
+      "role": "matched_revision_tilt80_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "89b81c4aaf703ef0d1d856f93a2c1651855ff65cb1293a8444a4fe224355ee56",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt80-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "0.80",
+      "total_source_bytes": 403649
+    },
+    {
+      "backtest_name": "ARV2 R214 relaxed tilt100 recent",
+      "candidate_id": "R214",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt100-recent-v1-relaxed-v1",
+      "profile_sha256": "6aa3b0f87bff974c4ea9ca2fde223786299519821072324c96125214d1702536",
+      "project_name": "136 ARV2 SIX RELAXED TILT100 R214 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt100-qc-projection-v1",
+      "projection_sha256": "ff17894b0d869baef73b497b7221ba6e1c2f7046ce2940dc8a74b41e55b94771",
+      "role": "matched_revision_tilt100_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "ebfb242367e962c36956f00677147552c987b317b78df61c927f02b908ce1612",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt100-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "1.00",
+      "total_source_bytes": 403660
+    },
+    {
+      "backtest_name": "ARV2 R215 relaxed tilt120 recent",
+      "candidate_id": "R215",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt120-recent-v1-relaxed-v1",
+      "profile_sha256": "e82ec10ffe3c3c07ef56229b7f41ef7b1ed2158728f2b5295041f58e2898d86e",
+      "project_name": "137 ARV2 SIX RELAXED TILT120 R215 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt120-qc-projection-v1",
+      "projection_sha256": "3036d0708e3a0ff4261a80ec11b497a9acf31364a7974313258e9ed2d80389d1",
+      "role": "matched_revision_tilt120_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "a2f2680312e611fca0eb30bb70bf0d72edbaf173310732748b8593e191f5e795",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt120-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "1.20",
+      "total_source_bytes": 403660
+    },
+    {
+      "backtest_name": "ARV2 R216 relaxed tilt140 recent",
+      "candidate_id": "R216",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt140-recent-v1-relaxed-v1",
+      "profile_sha256": "9867d5d65f64bd7229b6af28c9cf736b0b6c2f0cff1bf88860af21acb9c4ddb8",
+      "project_name": "138 ARV2 SIX RELAXED TILT140 R216 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt140-qc-projection-v1",
+      "projection_sha256": "ad9abba46087ac02439a29f6435880dea89ca070ef48914971cee169a4076184",
+      "role": "matched_revision_tilt140_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "39e1ac144aa5640b09be699a6b8e19517a7a703d06546bbd7edec28a51daed27",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt140-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "1.40",
+      "total_source_bytes": 403660
+    },
+    {
+      "backtest_name": "ARV2 R217 relaxed tilt160 recent",
+      "candidate_id": "R217",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt160-recent-v1-relaxed-v1",
+      "profile_sha256": "2452f1dcc42628f9bb725f7ab2ee40d099731e915023f9110a4d201f303c7b97",
+      "project_name": "139 ARV2 SIX RELAXED TILT160 R217 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt160-qc-projection-v1",
+      "projection_sha256": "93520ee269aa74adf4ecfe3390795e31c261f4579533a4befe0a7d94d01998a2",
+      "role": "matched_revision_tilt160_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "6a0e7f53b7a1d077ff9eedac82af61033ecc8a63f62a342bf3ccf8677504053e",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt160-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "1.60",
+      "total_source_bytes": 403660
+    },
+    {
+      "backtest_name": "ARV2 R218 relaxed tilt180 recent",
+      "candidate_id": "R218",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt180-recent-v1-relaxed-v1",
+      "profile_sha256": "cfc2319b091aea298a31cd839d4a802c1041b24935c39bb13f9ad16a837c8601",
+      "project_name": "140 ARV2 SIX RELAXED TILT180 R218 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt180-qc-projection-v1",
+      "projection_sha256": "395d2c82314e89cfaa1e22e800bbf8526f43ebb3805bc0962064a514f45be42b",
+      "role": "matched_revision_tilt180_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "c59531bc6d35a5e0996703c9889fa0050260606e357986c67de1bba90eef0c82",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt180-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "1.80",
+      "total_source_bytes": 403660
+    },
+    {
+      "backtest_name": "ARV2 R219 relaxed tilt200 recent",
+      "candidate_id": "R219",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "dc80e4c755f040c0ddac697b8346b88ee0df1f8dbccc6c2c2fdfbedd8bebb7c3",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-relaxed-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt200-recent-v1-relaxed-v1",
+      "profile_sha256": "0cd78f4588d22670bd6daa7a8cb9f63f54afe94586e4a911a07323c7b4f13b63",
+      "project_name": "141 ARV2 SIX RELAXED TILT200 R219 202508 NOW",
+      "projection_schema": "arv2-six-universe-relaxed-tilt200-qc-projection-v1",
+      "projection_sha256": "27eb5ca7216ee731b85cad8d660d80d542b2e9e4785bead58cdd6b578c973559",
+      "role": "matched_revision_tilt200_relaxed_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "35b4c9e295e69facf6f25281e1a81d4edbda1e8391a4921b40a22894f890ac0d",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt200-recent-summary-v1-relaxed-v1",
+      "tilt_fraction": "2.00",
+      "total_source_bytes": 403660
     }
+  ],
+  "coverage_policy": [
+    [
+      "QQQ",
+      "0.70",
+      "0.80",
+      "0.95",
+      5
+    ],
+    [
+      "SOXX",
+      "0.70",
+      "0.80",
+      "0.95",
+      5
+    ],
+    [
+      "REMX",
+      "0.50",
+      "0.50",
+      "0.25",
+      5
+    ]
   ],
   "input_control_directory": "/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923",
   "package_sha256": "2649577ac55ac39de37a4a70ab4337274f1887e1a113f0972beefab615121be1",

@@ -26292,3 +26292,86 @@ as the original sole read or a new launch. No additional read exception is
 granted to another candidate. Planned reconciliation if recovery succeeds:
 205/148/32/629 -> **207 shared / 148 development / 34 infrastructure / 629
 cells** (one diagnostic launch plus one recovery read). No return was read.
+
+### 193.3 Measured policy decision before any new economic outcome
+
+The exact recovery succeeded: seven custom statistics authenticated, no
+return/order/price access. Counts resolve 5,116 of 6,151 input bindings; 1,035
+have named QC composite-FIGI resolution refusals. Unknown catalog SIDs with
+positive QC cap occur in QQQ (760 member-observations), SOXX (120), REMX (153).
+These are counts across decisions, not unique-name counts; neither absent
+catalog rows nor resolver refusals prove those identities can safely be joined.
+
+Fixed policy for every R210–R219, in order **mapping member-count / known-cap
+reported-weight coverage / delivered positive-weight total floor / known-cap
+name minimum**:
+
+| Sleeve | Frozen floors | Count-only jointly admitted decisions |
+| --- | --- | --- |
+| QQQ | 70% / 80% / 95% / 5 | 55 of 61 |
+| SOXX | 70% / 80% / 95% / 5 | 58 of 61 |
+| REMX | 50% / 50% / 25% / 5 | 1 of 61 |
+
+All retain the 105% delivered-total ceiling, strictly prior histories, identity
+exclusion and no missing-cap substitution. QQQ's measured name mapping spans
+79.6117%–83%; SOXX spans 73.3333%–76.6667%, while both usually cover over 80%
+of reported constituent weight. The old 90%-member floor explains their
+wholesale fallback. The selected grid point recovers 55/58 coverage decisions
+without going below 80% weighted cap coverage. QQQ's two stale constituent
+snapshots, three stale fundamental decisions and one tiny delivered-weight
+collection remain refused where applicable; overlapping counts are not summed.
+
+REMX delivered totals span only 27.53%–38.65% and mapping 37.5%–62.5%; only
+one decision has five verified-cap members. The 25% total floor admits only
+that demonstrably usable subset, never pretends the delivered collection is
+the whole fund. Its baseline stock budget is multiplied by
+`min(1, cap_coverage_ratio * total_reported_weight)`; unresolved exposure stays
+in REMX. No lower five-name floor or invented identity is justified. QQQ and
+SOXX use the same budget scaling. Their five-positive-AR stock-entry rule
+remains, so coverage admission counts do not predict stock-selection counts.
+XLE instead admits the largest verified-cap names independently of AR on its
+58 coverage-valid decisions. SPY/XLV coverage and entry rules are unchanged.
+
+This is diagnostic-driven easing, not return-driven threshold optimization.
+All ten capacities share this policy and data/window/cost/exposure. The ten
+points are an adaptive exploratory sensitivity sweep; none is a held-out
+winner, validated live strategy, or guarantee of persistent return. The new
+matched target path must be identical across the ladder; it is still subject
+to score-dependent counts outside XLE and is not a clean AR-off control.
+
+### 193.4 Prospective order-family source freeze
+
+The authoritative compact manifest is
+`research/analyst_revisions_v2_qc/six_universe_relaxed_candidates.json`, bytes
+SHA `b8f7482c780bf48e83fa0ae6acd50a3b68e46ce5ebdfb215d356cf12a3697442`.
+It preserves R209's exact row and appends the ten order candidates R210–R219,
+respectively 20%–200%. Each has a separate projection/profile/source-manifest
+pin and exact private project name; none is an attempt-renaming escape.
+Sixteen files each, 403,649–403,660 bytes, within the unchanged per-file
+64,000-byte and 448 KiB total minus 32 KiB review-margin budgets. Exact
+gate → evaluator → base → bridge → tilt identities are recomputed from the
+new cloud-only closure; the matched baseline literal is rebound before tilt
+profile authentication. AST normalization preserves executable trees while
+making room; old frozen files are not rewritten. Unchanged nested sleeve
+transport retains its old schema, while new profiles/results/target paths
+are separately versioned. New diagnostic states are validated independently
+without changing legacy parser globals.
+
+Validation before launch: coverage 18 cases, selection helper 38 cases, full
+generated projection 24 cases, launcher 32 cases, production freeze 11 cases;
+whole-QC exact closure and host-smuggling checks green. Isolating in-memory
+mutations remove XLE's bypass, uncovered-budget scaling, five-known-name grid
+admission and unmapped-cap census: distinctive tests turn red. A prelude test
+was corrected to authenticate its mutated source before reaching compilation;
+the first fixture had refused earlier for changed identity. A projection test
+initially referenced an obsolete profile key; corrected to the real settlement
+cash/gross policy, not a fabricated field. No full suite was run.
+
+R209's recovery receipt is 28,193 bytes, retained seven-string envelope
+30,199 bytes; the old 16,384-byte writer demonstrably could not hold it.
+Coverage aggregate SHA
+`384db067a3fd7d6cd8c673b7924d77fb08d17678b8984a729d14a216d9e9202b`,
+coverage-path SHA
+`249871d9b95c1252156b31806c55a121d22fb5dd9567b91fdb0ed54eda7d9601`.
+`ARV2D193-001` is corrected prospectively at `d587643`, with first spent claim
+and separate recovery claim intact; no automatic second-read authority exists.

@@ -18,8 +18,8 @@ from . import six_universe_recent_settlement_submission as recent
 from . import six_universe_settlement_submission as common
 
 
-FROZEN_MANIFEST_SHA256 = "70cd295d6883f32d387c5de1ccb2827dae8fb8f07e70d9dbd55bab34351d39c6"
-PREDECESSOR_MANIFEST_SHA256 = None  # Stage-one R209 manifest, retained unchanged.
+FROZEN_MANIFEST_SHA256 = "b8f7482c780bf48e83fa0ae6acd50a3b68e46ce5ebdfb215d356cf12a3697442"
+PREDECESSOR_MANIFEST_SHA256 = "70cd295d6883f32d387c5de1ccb2827dae8fb8f07e70d9dbd55bab34351d39c6"
 MANIFEST_PATH = Path(__file__).with_name("six_universe_relaxed_candidates.json")
 _TERMINAL = {"Completed.", "Runtime Error", "BuildError"}
 _GEOMETRY = ("2025-08-01", "2026-09-25", 290, 61)

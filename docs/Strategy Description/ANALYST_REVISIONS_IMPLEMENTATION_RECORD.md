@@ -25886,3 +25886,146 @@ activation accessor before I/O: generic packages expose the descriptor at
 attribute. A real-package regression is red with the wrong accessor and
 green with the correction. No projected source/economics changed. Full lane
 and repository suites were not run; Claude owns the full lane validation.
+
+### 192.3 Input upload and launch accounting
+
+Prospective commit **`d5afc82`** freezes all six candidates before any
+upload, launch or outcome. The exact six input objects were uploaded and
+their size/MD5 metadata verified, activation last; the durable input claim
+and valid receipt authenticate the common inventory. This spends no return
+look. QC credentials and the owned private organization were verified with
+administrative reads only.
+
+R-203 A1 uploaded/read back/compiled the frozen 100% source in private
+project **36978919**, name
+`125 ARV2 SIX CAP90 SETTLED TILT100 R203 202508 NOW`, and launched
+**`61b3faad153e52b02cca15349924b594`**. One of three technical attempts
+spent; no outcome inferred from its queued status. Totals become **199
+shared / 142 development / 32 infrastructure / 623 cells**, pending its
+terminal and sole authenticated aggregate read.
+
+A1 terminated **Runtime Error during initialization**, before any order or
+accepted return result: the first manifest's Object Store existence guard
+refused at input-runtime line 156 / loader line 303. No outcome-read claim
+was spent; the floor remains 199 / 142 / 32 / 623. The sequence stopped
+immediately, leaving R204–R208 unlaunched and R203 two attempts remaining.
+Administrative checks established the same private organization, exact
+cloud main key, and backend manifest size/MD5; Mia's read-only project
+inspection also found the manifest readable (4,523 bytes), without edits,
+compilation or another backtest. The guard conflates a false existence
+answer with a non-native Python bool. Engine-local visibility/return type
+has not yet been measured, so neither cache staleness nor a bool-binding
+defect is a confirmed root cause. No schema, integrity guard or economics
+has been relaxed. Administrative source/metadata inspection is not an
+additional outcome look; any subsequent research computation or launch
+will be recorded before use.
+
+Prospective A2 recovery: one **same-source / same-project** repeat in
+36978919 tests unresolved transient worker visibility, not a claimed
+technical fix. The input loader is byte-identical to successful R201/R202;
+main, bridge and tilt initialization ASTs are unchanged, and the base
+initialization changes only its last-decision literal after package load.
+Mia inspected only activation/evaluator control manifests, not provider
+rows or outcomes; no research computation or source edit was made.
+Canonical private visibility-evidence SHA-256
+`4ac128a97db369de7d7289e0501e8f2301ad090e96a07e802063113542d1d3b5`
+records measured backend presence and the unmeasured engine return type.
+The narrow recovery adapter must authenticate A1's spent claim and failed
+terminal, this evidence, input-upload receipts and all 16 exact cloud files
+before one compile/backtest; it cannot create a project, upload new source,
+substitute a previous-period result or reset attempt accounting. A2 spends
+another development look if launched. A repeated refusal is not evidence
+that the cache hypothesis was correct. Maximum three candidate attempts
+and Mia recovery after exhaustion remain binding.
+
+A2's actual rendered owner-waiver payload SHA-256 is
+`14bf21ae9183520e9b4b82a700638015b1a6ae6d8e9939a80cb026bc255ae4ec`.
+Final focused recovery/historical selection: **226 passed / 23.61 s**
+(52 recent, 174 historical). Seven new behavioral cases cover one same-source
+launch/sole read, duplicate refusal, and evidence/terminal/prior-valid/
+source/cloud-inventory/waiver refusals before any attempt claim. An
+independent read-only audit found no confirmed defect in this narrow helper;
+source and old waiver bytes are unchanged. It also refuses any extra or
+active cloud run before A2, so an externally launched attempt cannot be
+hidden. The evidence's initialization flag refers to the unchanged pre-input
+initialization and main loader call, not the post-load period literal.
+Mia's temporary editor presence is being released before the owned/private/
+idle preflight; no idle or collaborator check is bypassed to launch.
+
+### 192.4 Owner/Mia recovery and prospective direct-read correction
+
+The owner subsequently took over debugging and reported success. Codex left
+the project untouched during that work. Administrative inventory confirms
+exactly two R203 backtests: failed A1 above and Mia's actual **attempt 2**,
+`10769b9d9b285c5413823cd8dda3d64c`, named `R203 A1 contains-key-fix rerun`,
+created `2026-09-26 08:02:36`, snapshot **36980748**, terminal `Completed.`.
+The displayed A1 label does not reset accounting. The proposed same-source
+Codex A2 was never claimed or launched and is superseded, not spent.
+Conservative totals advance **199 -> 200 shared / 142 -> 143 development /
+32 infrastructure / 623 authenticated cells**, pending bounded validation.
+
+All sixteen current project sources were retrieved and compared with the
+original freeze. Fifteen are byte-identical. The only change is
+`accepted_risk_order_level_input_runtime.py`, SHA-256
+`66e441f73d624e63464561ba725d30e751d575785abd2aef9b126ad16364aa12`,
+24,307 bytes: remove the redundant `contains_key`/native-bool precheck and
+read the object directly; unreadable data still refuses, and exact byte
+length and SHA-256 still authenticate every object before parsing. The
+precheck caused the practical refusal; its precise false/stale/binding
+mechanism remains unmeasured. Do not call this a missing subscription,
+missing uploaded file, or measured cache bug. All file modification times
+are `08:02:34`, preceding the run by two seconds. Current byte read-back
+and these timestamps are attestation, not access to historical snapshot
+bytes. No source, membership, score, price, selection or risk rule changed.
+
+The owner directed retrieval, porting and R204-R208 launches. The verified
+reader is applied only to a separately pinned recent-window source v2;
+the old public builder and historical closures remain intact. All six
+corrected closures are 16 files / **424,835 bytes**, 330 bytes smaller.
+The economic profile/input/activation pins in 192.2 are unchanged. R203's
+old A1 authority remains intact; Mia's successful result uses a dedicated
+one-use import, never a fabricated Codex launch/signature receipt. The
+remaining unlaunched candidates keep their R-numbers and three-attempt
+budgets. A Completed status alone does not yield an accepted result.
+
+| Candidate | Corrected projection SHA-256 | Corrected source-manifest SHA-256 | Rendered owner-waiver SHA-256 |
+|---|---|---|---|
+| R204 | `1aad7dc4b7083dd8d062d08f2ca3d239d142e9c5dc4e93e5fc50fbd6fa5a7b32` | `ad7ae57beeb9ed140cd0441228d5ed274639e9cb45db19e8d662a1e41e240e7e` | `1155d9aabdcd5f94f66f8979890ea1145a032100ab13babe9b87e49adc380147` |
+| R205 | `91747ad28ccf17784a3d40f4bc374a12c74c7289da7be3659739c7fa899ff4d0` | `f787e29374076bb36a2cde5499aa8dabf48bc7fdf126a72112364e3f34e22603` | `30d0e09a2c82e48aad780b10f25edf1aef6b5826fd03833ad0c6067472ef08a9` |
+| R206 | `d79ca9149f963079cbca4de91fbab670454910dc92d3921b97e28f565a6859ea` | `69628fb750f270d4de148e153bb709fdb85ccc0e84713a21451dd9939857e613` | `f16404e8ec8acd1231ac6ee54cd607e5825f2a4964f7508941589e5f9485cfca` |
+| R207 | `89461345526643e61be70badf7a9610d664434b092ba353fc7f534f050de4882` | `22974f9ffc7ec011381f6a187960ad6ad77387483d7367597d1a018cbc9e5a13` | `a29cc30a5118c22a46baa230c4f0c80b021922bd29b1593e06fdf8d5ce27e02f` |
+| R208 | `8efe09156adddd25dab77f489220cc6a9aeb5e8481516c75fbd9f24bed6d76cc` | `ed0d135c1c150c489542c69eb027803b9d448d1cee14842ba27ac83aa233e875` | `1fd77f869705b2217534dcd8ee8f8c5a8571b9aa4028983181459b4d24ed2837` |
+
+Mia recovery source identity for R203 is
+`a5fff0112a08ca453fac5b01740a89eeb67bc72a1adecbfb1b9cbe686139ab26`,
+source manifest `977023de3f2ad18445d1d5e992417c9ff06e93954085c22f323f4b59f10cea68`.
+The five corrected launch identities above were rendered on the real
+authenticated package before any new launch/outcome. Detached signatures
+remain waived under the owner's standing exploratory authority, not for
+trading. Temporary Mia collaboration on R203 is not removed or bypassed
+to mutate that project: the importer is read-only, and the five remaining
+fresh projects retain their normal private/source/idle checks.
+
+`ARV2D192-001` (P2, corrected for this source generation): redundant
+existence/type precheck could refuse readable authenticated inputs. The
+direct-read regression is red with the old reader restored in memory and
+green with the retrieved correction. **27 focused tests / 20.71 s** include
+all six real corrected public builders and package load, missing/read-error/
+size/hash refusals, and unchanged historical bytes. Existing recent and
+historical launcher selection: **226 passed / 18.84 s**; record/import
+closure/smuggling selection: **13 passed, 72 deselected / 4.78 s**.
+The dedicated Mia-import selection is **10 passed / 10.97 s** before the
+final anchor integration check. One interim test run during the exact Mia
+collaborator-pin addition had ten failures caused by the old test fixture;
+the fixture was corrected to the actual identity, not the production guard
+weakened. No QC attempt/result read was spent by these offline checks.
+The importer binds the exact two-run inventory, snapshot, current source and
+pre-run timestamps, then the same canonical aggregate lineage, digest,
+290-observation/61-decision, order, cash, exposure and tracking gates. It
+retains an explicit owner/Mia provenance and separate one-use read claim.
+No historical snapshot byte proof or fabricated Codex permit is claimed.
+No full lane/repository suite was run.
+
+Final recent-launcher/importer anchor integration selection: **62 passed /
+19.75 s**. Correction-only source identities and all five actual rendered
+waivers are frozen above before the first corrected launch.

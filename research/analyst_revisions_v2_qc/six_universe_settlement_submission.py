@@ -250,8 +250,9 @@ class SettlementQcPlan:
     @property
     def backtest_name(self) -> str:
         candidate = _candidate(self)
-        if self.candidate_id == "R195" and self.attempt == 2:
-            return candidate.backtest_name.replace("R195A1", "R195A2", 1)
+        if self.candidate_id in {"R195", "R203"} and self.attempt == 2:
+            return candidate.backtest_name.replace(
+                self.candidate_id + "A1", self.candidate_id + "A2", 1)
         return candidate.backtest_name
 
     @property
@@ -285,7 +286,7 @@ def _candidate(plan: SettlementQcPlan) -> _Candidate:
         candidate = recent.TRUSTED_CANDIDATES.get(plan.candidate_id)
     if candidate is None or (
         type(plan.attempt) is not int
-        or plan.attempt not in ((1, 2) if plan.candidate_id == "R195" else (1,))
+        or plan.attempt not in ((1, 2) if plan.candidate_id in {"R195", "R203"} else (1,))
         or type(plan.organization_id) is not str
         or not _ORG.fullmatch(plan.organization_id)
         or type(plan.package_sha256) is not str
@@ -330,7 +331,7 @@ def _control_path(plan: SettlementQcPlan, name: str) -> Path:
     candidate = _candidate(plan)
     if name not in {"claim", "launch", "terminal", "result-read-claim", "result-valid"} and not (
         candidate.candidate_id == "R203"
-        and name in {"inputs-upload-claim", "inputs-upload-valid"}
+        and name in {"inputs-upload-claim", "inputs-upload-valid", "visibility-evidence"}
     ):
         _fail("settlement control name is not allowlisted")
     root = plan.control_directory
@@ -592,6 +593,8 @@ def _waiver_payload(plan: SettlementQcPlan, identity: dict,
                     target_path: str | None, *,
                     a1_claim_sha256: str | None = None) -> bytes:
     candidate = _candidate(plan)
+    if candidate.candidate_id == "R203" and plan.attempt == 2:
+        return _recent_adapter()._a2_waiver_payload(plan, identity, target_path)
     a2 = candidate.candidate_id == "R195" and plan.attempt == 2
     if a2 and (type(a1_claim_sha256) is not str
                or not _HEX.fullmatch(a1_claim_sha256)):
@@ -1028,6 +1031,8 @@ def _match_launch(plan: SettlementQcPlan, launch: dict) -> _Candidate:
             or not _HEX.fullmatch(launch["a1_claim_sha256"])
         ):
             _fail("R195 A2 recovery launch identity changed")
+    if candidate.candidate_id == "R203" and plan.attempt == 2:
+        _recent_adapter()._require_a2_launch(plan, launch)
     return candidate
 
 
@@ -1173,7 +1178,9 @@ def _exact_result_claim(
         )
         or claim.get("owner_launch_waiver_id") != (
             _R195_A2_WAIVER_ID if candidate.candidate_id == "R195"
-            and plan.attempt == 2 else candidate.waiver_id
+            and plan.attempt == 2 else _recent_adapter()._A2_WAIVER_ID
+            if candidate.candidate_id == "R203" and plan.attempt == 2
+            else candidate.waiver_id
         )
         or claim.get("owner_waived_payload_sha256") != waiver_sha
         or any(claim.get(key) != launch.get(key) for key in (
@@ -1396,21 +1403,19 @@ def compare_valid_receipts(plan: SettlementQcPlan) -> dict:
         if candidate.candidate_id == "R203":
             _fail("recent comparison requires a later recent-window A1 plan")
         observed = _verified_ladder_result_receipt(plan)
-        anchor_plan = replace(plan, candidate_id="R203", attempt=1)
-        anchor = _verified_ladder_result_receipt(anchor_plan)
+        anchor = _recent_adapter()._valid_comparison_anchor(plan)
         return {
             "candidate_id": candidate.candidate_id,
             "comparison_valid": (
                 observed is not None and anchor is not None
-                and observed["matched_baseline_target_path_sha256"]
-                == anchor["matched_baseline_target_path_sha256"]
+                and observed["matched_baseline_target_path_sha256"] == anchor[1]
             ),
-            "r203_anchor_attempt": None if anchor is None else 1,
+            "r203_anchor_attempt": None if anchor is None else anchor[0],
             "matched_baseline_target_path_sha256": (
                 None if observed is None else observed["matched_baseline_target_path_sha256"]
             ),
             "r203_matched_baseline_target_path_sha256": (
-                None if anchor is None else anchor["matched_baseline_target_path_sha256"]
+                None if anchor is None else anchor[1]
             ),
         }
     if candidate.candidate_id not in _LATER_LADDER_CANDIDATES:
@@ -1542,11 +1547,11 @@ def read_aggregates_once(
             and selected["matched_baseline_target_path_sha256"] == anchor[1]
         )
     elif valid and candidate.candidate_id in _RECENT_PERCENTS and candidate.candidate_id != "R203":
-        anchor = _verified_ladder_result_receipt(replace(plan, candidate_id="R203", attempt=1))
+        anchor = _recent_adapter()._valid_comparison_anchor(plan)
         comparison_valid = (
             anchor is not None
             and selected["matched_baseline_target_path_sha256"]
-            == anchor["matched_baseline_target_path_sha256"]
+            == anchor[1]
         )
     if valid:
         receipt = {

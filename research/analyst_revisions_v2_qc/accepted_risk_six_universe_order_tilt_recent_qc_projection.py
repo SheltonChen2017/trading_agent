@@ -362,3 +362,74 @@ def build_short_window_tilt_projection(prior_delta_package, latest_package, perc
             or {path: item.byte_count for path, item in files.items()} != PINNED_FILE_BYTE_COUNTS.get(percent)):
         _error("recent projected profile, source, or manifest changed from exact pin")
     return value
+
+
+CORRECTED_INPUT_SHA256 = "66e441f73d624e63464561ba725d30e751d575785abd2aef9b126ad16364aa12"
+CORRECTED_INPUT_BYTE_COUNT = 24307
+CORRECTED_PROJECTION_SHA256S = {
+    100: "a5fff0112a08ca453fac5b01740a89eeb67bc72a1adecbfb1b9cbe686139ab26",
+    120: "1aad7dc4b7083dd8d062d08f2ca3d239d142e9c5dc4e93e5fc50fbd6fa5a7b32",
+    140: "91747ad28ccf17784a3d40f4bc374a12c74c7289da7be3659739c7fa899ff4d0",
+    160: "d79ca9149f963079cbca4de91fbab670454910dc92d3921b97e28f565a6859ea",
+    180: "89461345526643e61be70badf7a9610d664434b092ba353fc7f534f050de4882",
+    200: "8efe09156adddd25dab77f489220cc6a9aeb5e8481516c75fbd9f24bed6d76cc",
+}
+CORRECTED_SOURCE_MANIFEST_SHA256S = {
+    100: "977023de3f2ad18445d1d5e992417c9ff06e93954085c22f323f4b59f10cea68",
+    120: "ad7ae57beeb9ed140cd0441228d5ed274639e9cb45db19e8d662a1e41e240e7e",
+    140: "f787e29374076bb36a2cde5499aa8dabf48bc7fdf126a72112364e3f34e22603",
+    160: "69628fb750f270d4de148e153bb709fdb85ccc0e84713a21451dd9939857e613",
+    180: "22974f9ffc7ec011381f6a187960ad6ad77387483d7367597d1a018cbc9e5a13",
+    200: "ed0d135c1c150c489542c69eb027803b9d448d1cee14842ba27ac83aa233e875",
+}
+
+
+def _correct_input_reader(source):
+    """Port only Mia's measured direct-read correction, retaining byte authority."""
+    original = _prior._r194.PINNED_FILE_SHA256S["accepted_risk_order_level_input_runtime.py"]
+    if type(source) is not str or hashlib.sha256(source.encode("ascii")).hexdigest() != original:
+        _error("recent direct-read predecessor input source changed")
+    old = '''    try:
+        contains = store.contains_key(key)
+    except Exception as exc:
+        raise AcceptedRiskOrderLevelInputRuntimeError(
+            "preliminary Object Store existence check failed"
+        ) from exc
+    if type(contains) is not bool or not contains:
+        _error("preliminary Object Store object is unavailable")
+'''
+    corrected = _replace(source, old, "")
+    corrected = _replace(corrected, '"preliminary Object Store object read failed"',
+                         '"preliminary Object Store object is unavailable"')
+    payload = corrected.encode("ascii")
+    if len(payload) != CORRECTED_INPUT_BYTE_COUNT or hashlib.sha256(payload).hexdigest() != CORRECTED_INPUT_SHA256:
+        _error("recent direct-read correction differs from retrieved Mia source")
+    return corrected
+
+
+def _build_corrected_unpinned(prior_delta_package, latest_package, percent):
+    original = build_short_window_tilt_projection(prior_delta_package, latest_package, percent)
+    files = tuple(_base._source_file(item.project_path,
+        _correct_input_reader(item.source_bytes.decode("ascii")).encode("ascii"))
+        if item.project_path == "accepted_risk_order_level_input_runtime.py" else item
+        for item in original.source_files)
+    value = dataclasses.replace(original,
+        schema=f"arv2-six-universe-order-qc-projection-tilt{percent}-recent-direct-read-v2",
+        source_files=files, total_source_byte_count=sum(item.byte_count for item in files))
+    semantic = {key: item for key, item in value.to_record().items()
+                if key not in ("projection_id", "projection_sha256")}
+    digest = hashlib.sha256(_base._canonical(semantic)).hexdigest()
+    return dataclasses.replace(value, projection_sha256=digest,
+        projection_id=f"arv2-six-universe-order-tilt{percent}-recent-direct-read-qc-projection-" + digest[:24])
+
+
+def build_corrected_short_window_tilt_projection(prior_delta_package, latest_package, percent):
+    """A separately pinned transport correction; all economic profiles unchanged."""
+    value = _build_corrected_unpinned(prior_delta_package, latest_package, percent)
+    manifest = hashlib.sha256(_base._canonical(tuple((item.project_path,
+        item.content_sha256, item.byte_count) for item in value.source_files))).hexdigest()
+    if (value.projection_sha256 != CORRECTED_PROJECTION_SHA256S.get(percent)
+            or manifest != CORRECTED_SOURCE_MANIFEST_SHA256S.get(percent)
+            or value.profile_sha256 != PINNED_PROFILE_SHA256S.get(percent)):
+        _error("recent corrected projection differs from independent source pins")
+    return value

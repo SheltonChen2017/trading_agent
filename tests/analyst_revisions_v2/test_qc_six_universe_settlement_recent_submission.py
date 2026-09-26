@@ -489,3 +489,116 @@ def test_recent_changed_launch_binding_refuses_before_any_qc_or_attempt_claim(
         subject.launch_a1(plan, projection, object(), owner_waiver_id=waiver)
     assert calls == []
     assert not claim_path.exists()
+
+
+def _failed_a1(monkeypatch, tmp_path, projections):
+    _install_offline_candidates(monkeypatch, projections)
+    monkeypatch.setattr(subject, "_A2_PROJECT_ID", 111)
+    monkeypatch.setattr(subject, "_A1_BACKTEST_ID", "tilt40-a1")
+    projection = projections["R203"]
+    plan = _prepared(monkeypatch, tmp_path, projection)
+    calls, state = legacy._fake_qc(monkeypatch, plan, projection)
+    original = common._post
+    active = {"a2": False}
+
+    def post(api, endpoint, payload):
+        result = original(api, endpoint, payload)
+        if endpoint == "backtests/create" and payload["backtestName"] != plan.backtest_name:
+            active["a2"] = True
+        if endpoint in {"backtests/create", "backtests/read"} and active["a2"]:
+            result["backtest"].update({"backtestId": "visibility-a2",
+                                      "name": plan.backtest_name.replace("R203A1", "R203A2")})
+        if endpoint == "backtests/list":
+            result["backtests"][0]["status"] = "Completed." if active["a2"] else "Runtime Error"
+            if active["a2"]:
+                result["backtests"][0].update({"backtestId": "visibility-a2",
+                    "name": plan.backtest_name.replace("R203A1", "R203A2")})
+        return result
+
+    monkeypatch.setattr(common, "_post", post)
+    launch = subject.launch_a1(plan, projection, object(),
+                             owner_waiver_id=common._candidate(plan).waiver_id)
+    assert subject.poll_status(plan, launch, object()) == "Runtime Error"
+    evidence = {
+        "schema": "arv2-r203-worker-visibility-retry-evidence-v1",
+        "candidate_id": "R203", "failed_attempt": 1, "project_id": 111,
+        "backtest_id": "tilt40-a1",
+        "organization_id_sha256": hashlib.sha256(plan.organization_id.encode("ascii")).hexdigest(),
+        "package_sha256": subject.PINNED_PACKAGE_SHA256,
+        "activation_manifest_sha256": subject.PINNED_ACTIVATION_MANIFEST_SHA256,
+        "source_files_sha256": common._candidate(plan).source_files_sha256,
+        "api_same_org_exact_manifest_metadata_verified": True,
+        "project_context_manifest_byte_count": 4523,
+        "project_context_evaluator_manifest_readable": True,
+        "input_loader_matches_successful_prior_sources": True,
+        "initialization_ast_unchanged": True,
+        "engine_contains_key_return_unmeasured": True,
+        "root_cause_known": False, "source_or_economics_changed": False,
+        "retry_hypothesis": "unresolved_transient_worker_visibility",
+    }
+    common._write(common._control_path(plan, "visibility-evidence"), evidence)
+    digest = hashlib.sha256(common._canonical(evidence)).hexdigest()
+    return dataclasses.replace(plan, attempt=2), projection, digest, calls, state
+
+
+def test_visibility_hypothesis_a2_reuses_exact_source_project_and_has_one_read(
+    offline_recent_projections, monkeypatch, tmp_path,
+):
+    plan, projection, digest, calls, state = _failed_a1(monkeypatch, tmp_path, offline_recent_projections)
+    waiver = json.loads(subject.render_visibility_a2_waiver(
+        plan, projection, visibility_evidence_sha256=digest))
+    assert waiver["project_id"] == 111 and waiver["attempt"] == 2
+    assert waiver["root_cause_known"] is False
+    assert waiver["source_or_economics_changed"] is False
+    assert waiver["mutating_endpoint_budget"] == {"compile/create": 1, "backtests/create": 1}
+    before = len(calls)
+    launch = subject.launch_visibility_a2(plan, projection, object(),
+        owner_waiver_id=subject._A2_WAIVER_ID, visibility_evidence_sha256=digest)
+    subsequent = calls[before:]
+    assert subsequent.count("compile/create") == subsequent.count("backtests/create") == 1
+    assert not set(subsequent) & {"projects/create", "files/create", "files/update", "files/delete"}
+    assert subject.poll_status(plan, launch, object()) == "Completed."
+    state["statistics"] = _recent_statistics(plan, launch)
+    assert subject.read_aggregates_once(plan, launch, object())["run_valid"] is True
+    assert subject._valid_comparison_anchor(plan) == (2, "d" * 64)
+    with pytest.raises(common.SixUniverseSettlementSubmissionError, match="already claimed"):
+        subject.launch_visibility_a2(plan, projection, object(),
+            owner_waiver_id=subject._A2_WAIVER_ID, visibility_evidence_sha256=digest)
+    with pytest.raises(common.SixUniverseSettlementSubmissionError):
+        subject.preview(dataclasses.replace(plan, attempt=3), projection)
+
+
+@pytest.mark.parametrize("defect", ("evidence", "terminal", "prior_valid", "source", "inventory", "waiver"))
+def test_a2_refuses_changed_evidence_predecessor_or_source_without_spending_attempt(
+    offline_recent_projections, monkeypatch, tmp_path, defect,
+):
+    plan, projection, digest, calls, state = _failed_a1(monkeypatch, tmp_path, offline_recent_projections)
+    waiver = subject._A2_WAIVER_ID
+    a1 = dataclasses.replace(plan, attempt=1)
+    if defect == "evidence":
+        digest = "0" * 64
+    elif defect == "terminal":
+        monkeypatch.setattr(common, "_read", lambda _path: {})
+    elif defect == "prior_valid":
+        common._write(common._control_path(a1, "result-valid"), {"run_valid": True})
+    elif defect in {"source", "inventory"}:
+        original = common._post
+
+        def post(api, endpoint, payload):
+            result = original(api, endpoint, payload)
+            if endpoint == "files/read" and defect == "source":
+                result["files"][0]["content"] += "# edited"
+            if endpoint == "backtests/list" and defect == "inventory":
+                result["backtests"].append(dict(result["backtests"][0], backtestId="unexpected"))
+                result["count"] = 2
+            return result
+
+        monkeypatch.setattr(common, "_post", post)
+    else:
+        waiver = "wrong"
+    before = len(calls)
+    with pytest.raises(common.SixUniverseSettlementSubmissionError):
+        subject.launch_visibility_a2(plan, projection, object(),
+            owner_waiver_id=waiver, visibility_evidence_sha256=digest)
+    assert not set(calls[before:]) & {"compile/create", "backtests/create", "files/update"}
+    assert not common._control_path(plan, "claim").exists()

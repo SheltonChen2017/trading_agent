@@ -4795,3 +4795,50 @@ Higher adaptive same-window return does not identify a production optimum.
 The six August-2025-to-September-25-2026 candidates remain unlaunched
 because fresh Analyst Ratings access returns HTTP 403; no missing-look
 entry or successful recent-period result is inferred from their reservation.
+
+## R-203 — guarded 100% revision tilt, recent period; A1 launched — 2026-09-25
+
+Ratings access restored to HTTP 200. Owner-authorized section 192 and
+prospective commit `d5afc82` freeze all six 100–200% capacities before any
+new outcome: **2025-08-01–2026-09-25**, 290 observations / 289 returns /
+61 weekly decisions, same six universes, ETF fallback, 98% gross,
+10 bps per side, positive donor floors and order-based next-open execution.
+Authenticated new input package
+`2649577ac55ac39de37a4a70ab4337274f1887e1a113f0972beefab615121be1`
+preserves history and adds 12 recovered / 16 fresh eligible contributions.
+Exact six-object upload authenticated, activation last. Source
+`39793ae7247bae5282f93edfbaa5f6828bd4e49332f5b7909cf07baf92557b21`,
+profile `2a14727e763e5cbcbb6c32b08b1e051cf24af210761eacabc288f8e8ae140410`.
+Private project `125 ARV2 SIX CAP90 SETTLED TILT100 R203 202508 NOW`
+(`36978919`) launched A1 `61b3faad153e52b02cca15349924b594` after exact
+source read-back and compile. **One of three attempts used**, no retry.
+Totals **198 → 199 shared / 141 → 142 development / 32 infrastructure /
+623 authenticated cells**, pending terminal and sole bounded result read.
+This overlapping, adaptively chosen window is not untouched validation.
+R203 is a 100% capacity reference, not a new tilt-off account. No outcome,
+leverage, optimum or trading authority follows from launch.
+
+A1 reached **Runtime Error during initialization**: first activation
+manifest unavailable to the worker's existence/type guard. No orders,
+accepted aggregate, or result-read claim; counts remain **199 shared /
+142 development / 32 infrastructure / 623 cells**. Same-org backend
+metadata and Mia's read-only project inspection find the exact 4,523-byte
+manifest present; engine-local visibility and bool type remain unresolved.
+R204–R208 were stopped before launch to avoid repeating a common failure.
+Two R203 attempts remain, restricted to the same project and frozen
+economics. No fourth attempt or successful result is inferred.
+
+The owner/Mia subsequently completed actual **R203 attempt 2** in the same
+project, backtest `10769b9d9b285c5413823cd8dda3d64c`, snapshot 36980748,
+named `R203 A1 contains-key-fix rerun`. Its A1 label does not reset the
+budget; Codex's prepared same-source A2 was never claimed/launched.
+Conservative totals **199 -> 200 shared / 142 -> 143 development /
+32 infrastructure / 623 authenticated cells**, pending one-use imported
+aggregate validation. Current source differs only by removal of the
+redundant Object Store existence precheck; direct read, exact bytes and
+SHA-256 still enforce input integrity. Fifteen other files and all economic
+profiles are unchanged. Recovery projection
+`a5fff0112a08ca453fac5b01740a89eeb67bc72a1adecbfb1b9cbe686139ab26`.
+No historical-source cryptographic proof or accepted return is inferred
+from current read-back/timestamps/Completed alone. Section 192.4 freezes
+the separately corrected R204-R208 source identities before their launches.

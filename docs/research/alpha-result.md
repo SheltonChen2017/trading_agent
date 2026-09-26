@@ -5240,6 +5240,56 @@ QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
 combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
 Total after this read: **217 / 158 / 34 / 639**.
 
+## R-223 — fully AR-off all-six 25% control; A1 valid — 2026-09-26
+
+Prospective source `8cc7e7c`; private project **37001346**, backtest
+`7651b2b7e8df020d1e34aa4f432a879f`, one of three attempts used. Exact mode,
+source/profile/protocol pins are in `six_universe_full_ar_ablation_candidates.json`.
+All-six 25% coverage, same authenticated input/identity catalog and
+2025-08-01–2026-09-25 period, 61 weekly pre-open order decisions, 98% target
+gross, 9.8% direct-name cap and modeled 10 bps/side. AR entry/count/weight
+disabled; five verified-cap names, partial scaled budget and own-ETF residual
+preserved. Not an independent full-security-master or ETF comparison.
+Launch **220 -> 221 shared / 161 -> 162 development / 34 infrastructure /
+642 cells**. Completed; sole custom read **run_valid=true**, aggregate SHA
+`b150621e2bc2d6daeb6d27d09f60382c478c678de4cedc72354d90da4f3e898e`.
+Net return **+53.7655799466%**, maximum drawdown **-10.8847003960%**,
+annualized volatility **17.8552601860%**, zero-rate Sharpe **2.19210042573**.
+2,415 orders all filled, engine/model fees `$13,083.082534`, zero invalid,
+canceled or unexplained-negative-cash events; 61 completed rebalances and
+cash/settlement/gross/tracking gates green. Valid read adds one cell,
+**642 -> 643**; floor **221 / 162 / 34 / 643**. No retry/Mia edit/repeated read.
+Economic AR-off remains conditional on the same accepted-risk input catalog;
+authenticated score clock/input validation retained, AR-positive diagnostic
+zero means not-used. Stock-entry decisions SPY 58, QQQ 55, SOXX 58, XLV 58,
+REMX 1, XLE 58 of 61; same coverage refusals, not invented identities.
+Fresh AR-on result and cached authenticated comparison follow separately.
+
+## R-224 — fresh all-six 25% AR-on 100% reference; A1 valid — 2026-09-26
+
+Prospective source `8cc7e7c`; private project **37001447**, backtest
+`4a703ad303007b317fb638cc6d3f63a9`, one of three attempts used. Exact R222
+cloud source/projection/profile reproduced inside the separately pinned
+full-AR ablation family. Same period/input/coverage/order/cost/exposure as R223;
+AR entry/count outside XLE and 100% weighting remain enabled. Launch
+**221 -> 222 shared / 162 -> 163 development / 34 infrastructure / 643 cells**.
+Completed; sole bounded read **run_valid=true**, aggregate SHA
+`c592f0703e8988bfb54852d7ea9193269269a2850896ff72b83b908f74cf3db2`,
+identical to R222's entire aggregate, not merely its rounded return.
+Net return **+53.6512129385%**, drawdown **-11.0951445171%**,
+annualized volatility **18.5155660557%**, zero-rate Sharpe **2.11688653215**.
+2,050 orders all filled; engine/model fees `$12,689.385615`, zero invalid,
+canceled or unexplained-negative-cash events, 61 completed rebalances;
+cash/settlement/gross/tracking gates green. Read adds one cell,
+**643 -> 644**; final floor **222 / 163 / 34 / 644**. No retry, Mia edit or
+repeated outcome read. Locally reauthenticated pair has identical non-AR
+coverage counts/reasons and input-collection census; intentionally different
+baseline paths and AR-dependent stocks/weights. Total AR-on-minus-off net
+spread **-0.114367008100 pp**; no incremental net return in this construction
+and window, not universal AR rejection or a fresh ETF-outperformance claim.
+The selected adaptive window, input/identity catalog, missing histories,
+PIT/vintage and lack of an independent price-series digest remain limitations.
+
 ## R-208 — corrected 200% revision tilt, recent period; A1 valid — 2026-09-26
 
 Prospective source commit `1744659`; private project **36981612**,

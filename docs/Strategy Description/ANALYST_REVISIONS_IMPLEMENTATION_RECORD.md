@@ -114,8 +114,10 @@ R203–R208, ending at 205/148/32/629. Section 193 completes the measured
 coverage/XLE successor and all ten 20%–200% order-based runs on A1.
 Section 194 completes the fresh same-selection 0/100 weight-tilt comparison
 and separate all-six 25%-coverage/100%-tilt construction test, all on A1.
-The current reconciled floor is 220 shared looks, 161 development evaluations,
-34 infrastructure looks and 642 authenticated exploratory cells.
+Section 195 completes the total AR entry/count/weight ablation: fully AR-off
+R223 versus exact R222-source AR-on 100% R224, both valid A1 order runs.
+The current reconciled floor is 222 shared looks, 163 development evaluations,
+34 infrastructure looks and 644 authenticated exploratory cells.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -718,7 +720,7 @@ Section 194 is the owner's subsequent same-round research instruction: isolate
 try all-six 25% coverage floors with 100% tilt. All three completed on A1.
 The 100% weight overlay underperformed its identical-selection zero control
 by 0.385576 pp; all-six 25% construction underperformed the original 100% by
-1.230479 pp, not an AR attribution. Current floor is 220/161/34/642. Claude
+1.230479 pp, not an AR attribution. That round ended at 220/161/34/642. Claude
 will review section 194 and all earlier deferred commits after one final
 push, including the R209 recovery and new cached-arm integrity correction;
 Codex counter-reviews every Claude commit. No further tilt setting, universe,
@@ -730,7 +732,13 @@ a fully AR-off cap-ranked control R223 versus a fresh exact R222-source AR-on
 Claude review of section 195 and earlier deferred commits follows one final
 push; Codex counter-reviews every Claude commit. Each candidate has at most
 three attempts, no full-suite run by Codex and no automatic follow-on research
-or trading. Outcomes remain unobserved at this prospective freeze.
+or trading. Both are now valid on A1: AR-off +53.76558%, AR-on +53.65121%,
+net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
+match, while stock counts/weights intentionally differ. Current floor is
+222/163/34/644. This window does not demonstrate incremental net AR return;
+no fully independent security-master, new ETF benchmark, formal alpha or
+production claim follows. Review focuses on source-mode separation, preserved
+execution, corrected coverage comparison and the retained input/clock plumbing.
 
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
@@ -2457,6 +2465,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-26 | Codex owner-directed recent-period completion | `b1d5ba7` -> `d5afc82`, `1744659`, and this final record commit | Restore fresh input capture, import Mia's corrected R203, and complete R204–R208 | Retrieved all 16 current QC files; only the redundant Object Store existence precheck changed. Exact read-byte count and SHA remain enforced. Economic profiles unchanged; five corrected sources frozen before launch. R203 Mia A2 valid; R204–R208 valid on A1. All six local receipt chains and matching target paths reauthenticated without outcome rereads. Shared bookkeeping explicitly owner-authorized. | Focused direct-read 27 passed, recent/historical launcher 226 passed, imported result 10 passed, final receipt integration 62 passed; final document/closure checks in 192.9. Real QC completion and bounded aggregate reads verified. No full suite. Seven conservative looks and six cells: 205 shared / 148 development / 32 infrastructure / 629 cells. | `ARV2D192-001` P2 corrected prospectively; precise precheck-return cause remains unmeasured. Existing host/PIT/vintage/adaptivity debt retained. No new P0/P1 identified. Prepared Codex A2 never launched; no invented launch or historical source proof. | One same-lane push. Claude reviews section 192 and every earlier deferred commit in sections 181–191, then Codex counter-reviews. No new setting, selection rule, leverage or live/trading action by inference. |
 | 2026-09-26 | Codex owner-directed autopilot | `e6ef6e3` -> `8bb47ed`, `d587643`, `1d4de30`, and this final record commit | Measured coverage easing, independent XLE entry, recent 20%–200% order ladder | R209 count diagnostic completed A1; one lost host receipt read recovered under its exact separately frozen exception. Same package/window/cost/exposure, fixed pre-outcome thresholds, partial own-ETF residuals, unknown identities excluded. All ten order candidates R210–R219 valid on A1, no retries or Mia edits. Shared bookkeeping owner-authorized. | Focused coverage 18, helper 38, generated profile/transport 29, launcher 32, production freeze 11; final 72-case integration green; exact closure/smuggling green. All ten local receipt chains reauthenticated without another QC outcome read. Final document/compilation checks in 193.6. No full suite. Counts 217 shared / 158 development / 34 infrastructure / 639 cells. | `ARV2D193-001` P2 local envelope defect corrected prospectively with 128 KiB bounded artifacts; original read claim retained and extra infrastructure look explicit. No new P0/P1. REMX remains ETF-only, score-conditioned count/control and PIT/vintage/adaptivity limitations retained. | One final same-lane push. Claude reviews section 193 and earlier deferred sections 181–192, including each commit and isolated guards; Codex counter-reviews its push. No best-setting, same-universe ETF-outperformance, formal acceptance or trading claim. |
 | 2026-09-26 | Codex owner-directed comparison | `1583157` -> `4b00c2b`, `004a338`, and final record commit | Same-selection 0/100 weight ablation; separate all-six 25%/100% construction | R220/R221/R222 valid A1 order-based runs, same input/window/cost/exposure; only the pair has an identical baseline path. No retries, Mia or new provider capture. All three cached receipt chains reauthenticated locally, no second QC reads. | Focused generated boundaries, family pins, launcher and cached-arm regressions; exact closure and document gates. Final checks in 194.5; no full suite. Final 220 shared / 161 development / 34 infrastructure / 642 cells. | `ARV2D194-001` P2 cached-arm attribution gap corrected before reporting; six old-comparator mutations red. 100% overlay -0.385576 pp versus zero, all25 -1.230479 pp versus original 100%; AR entry/count and PIT/vintage/adaptivity caveats retained. | One final same-lane push. Claude reviews section 194 and all earlier deferred commits; Codex counter-reviews its exact push. No automatic new research/trading milestone. |
+| 2026-09-26 | Codex owner-directed total AR ablation | `7c1694e` -> `8cc7e7c`, `7c4351e`, and final record commit | Fully AR-off versus exact all25 AR-on100 reference | R223/R224 valid A1 order runs, same non-AR coverage/census, window/input/execution; AR entry/count/weights removed only in OFF. No retry/Mia/provider capture or extra outcome read. | Focused source/mode/cached comparison, mutation, exact closure and document gates; final checks in 195.4. No full suite. Final 222/163/34/644. | `ARV2D195-001` P2 common coverage/census comparison corrected before paired reporting; four isolating cases red then green. Net AR spread -0.114367 pp, risk slightly worse. Conditional input/identity catalog, PIT/vintage/adaptive window retained. | One final same-lane push; Claude reviews section 195 plus all deferred commits, Codex counter-reviews exact Claude push. No automatic additional research or trading. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -26739,3 +26748,95 @@ is changed, no result read repeated and no new research look incurred.
 Corrected before reading/reporting the paired R224 outcome. Common census
 does not establish a price-series digest or remove accepted-risk PIT/vintage
 limitations; these remain explicitly open.
+
+### 195.3 Two valid order runs and total AR comparison
+
+Both immutable-source A1s from `8cc7e7c` compiled and reached `Completed.`;
+each sole bounded custom read authenticated `run_valid=true`. No unsuccessful
+attempt, retry, Mia/cloud edit, or repeated outcome read. R223 project
+**37001346**, backtest `7651b2b7e8df020d1e34aa4f432a879f`; R224 project
+**37001447**, backtest `4a703ad303007b317fb638cc6d3f63a9`. Exact aggregate
+digests and launch/read accounting are in shared R223/R224 entries. R224's
+entire aggregate SHA is identical to R222's historical accepted read.
+
+| Arm | Net cumulative return | Maximum drawdown | Zero-rate Sharpe | Volatility | Filled orders | Fees ($) |
+| --- | --- | --- | --- | --- | --- | --- |
+| R223, fully AR-off economics | +53.7655799466% | -10.8847003960% | 2.19210042573 | 17.8552601860% | 2415 | 13083.082534 |
+| R224, AR entry/count + 100% tilt | +53.6512129385% | -11.0951445171% | 2.11688653215 | 18.5155660557% | 2050 | 12689.385615 |
+
+Net AR-on minus AR-off **-0.114367008100 pp**. All orders filled, zero
+invalid/canceled/unexplained negative cash; 61 completed rebalances, 290
+observations, unchanged modeled costs and cash/settlement/gross/tracking
+gates pass. The stronger cached reader authenticates both modes and finds
+identical non-AR coverage/count reasons and callback/input-collection census.
+No extra QC outcome read or look for the local comparison. Baseline paths,
+stock counts and ETF residuals intentionally differ and are not forced equal.
+
+SPY/QQQ/XLV/XLE stock-slot counts are unchanged. SOXX increases from 345 to
+580 slots and 53 to 58 stock-entry decisions with AR off; REMX increases from
+zero to 5 slots on its only coverage-valid decision. Thus nearly equal total
+return does not mean identical holdings or inactive AR rules. The construction
+can derive returns from its cap-ranked names/ETF exposure; its large absolute
+return cannot be attributed to AR edge from these results. This observed pair
+demonstrates no incremental net AR return and
+slightly worse risk with AR enabled. It does not establish a universal AR
+verdict or benchmark-relative skill. Both arms remain conditional on the
+same accepted-risk input/identity catalog and authenticated score clock,
+not a new independent security master or data pipeline. The adaptive recent
+window, vendor-history/PIT/vintage debt and missing price-series digest remain.
+
+Two launch looks/two valid reads move the conservative floor from
+220/161/34/642 to **222 shared / 163 development / 34 infrastructure /
+644 authenticated exploratory cells**. No fresh ETF basket, formal alpha,
+holdout/winner selection, broker/live/paper/funded account, deployment or trading.
+
+### 195.4 Review handoff and final checks
+
+Claude reviews **`7c1694e3e9b7719f423a3271a6c9eb44fc5b9846` through this
+round's final record commit**, plus all deferred sections 181–194. Commit scopes:
+
+- `8cc7e7c`: frozen full-AR off/on source family, exact R222 ON replication,
+  strict mode and old-family/source preservation, reused authenticated cache
+  reader, operational script, focused behavior/transport tests and prospective
+  section 195. No result claim in the freeze.
+- `7c4351e`: verified P2 non-AR coverage/census comparison correction, four
+  red/green regression cases and retained finding. QC bytes/profile/economics
+  unchanged; correction committed before paired R224 read/report.
+- Final record commit: complementary in-memory behavior mutations, two physical
+  outcomes, interpretation, shared bookkeeping, live pointer/push ledger and
+  final validation. No new QC action or strategy change.
+
+Attention: this is total AR entry/count/weight economics, unlike R220's
+weight-only zero. OFF diagnostic positive count is zero/not-used, not evidence
+that no analyst event exists. Same verified identities/five-name/25% coverage
+and partial budgets/order execution remain; historical cloud files/manifests
+untouched. Match non-AR coverage/census but do not require identical baseline
+paths or score-dependent counts. No secretly strengthened tilt or leverage.
+Advisory agent audits are not independent Claude acceptance. `ARV2D195-001`
+P2 corrected; no new P0/P1 identified. Existing host-compatibility and
+PIT/vintage/adaptivity debt remains open. Latest fetched remote still equals
+base `7c1694e`, so there were no new Claude commits to counter-review.
+Root Action Plan/Session Handoff and other lanes remain frozen; only the
+explicitly authorized shared research look ledger changes outside lane files.
+
+Final Python **3.12.14** validation: **174 passed in 40.51 s** across the
+seven directly relevant full-AR/old-weight/all25/projection/transport/comparison/
+mutation files. Four isolated coverage/census regressions failed on the original
+comparison (4 failed, 8 deselected in 2.36 s), then the corrected two-family
+comparison selection passed **26 in 19.32 s**. Projection integration also
+passed **156 in 20.35 s** including historical selection behavior; four-family
+adapter integration passed **92 in 2.69 s**. Three isolated entry/count/
+conserving-weight mutations and three strict-mode manifest mutations were
+caught; restored in memory. Complementary checked-in mutations prove zero
+weight tilt alone still traverses AR and original positive entry empties
+otherwise covered baskets. One intermediate test used a nonexistent profile
+key, corrected to the actual fee field and separately checked gate cap; no
+production defect or QC retry resulted.
+
+Whole-QC exact transitive closure and host-only smuggling checks **2 passed,
+72 deselected in 3.82 s**; document/live-record gates **80 passed in 0.76 s**.
+Changed source/scripts/tests compile clean, `git diff --check` clean. No full
+lane or repository suite. Both actual QC runs and sole reads succeeded on A1;
+no failure/retry/recovery/Mia/provider capture. Claude performs the full lane
+review. This round ends with one final same-worktree/same-branch push; no
+additional experiment or monitoring task is started automatically.

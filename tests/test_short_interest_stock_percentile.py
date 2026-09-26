@@ -5,7 +5,10 @@ from copy import deepcopy
 from dataclasses import FrozenInstanceError
 from fractions import Fraction
 from functools import lru_cache
+from hashlib import sha256
 import inspect
+from pathlib import Path
+import subprocess
 
 import pytest
 
@@ -144,8 +147,11 @@ def test_percentile_policy_is_exact_content_addressed_owner_freeze():
         "minimum_threshold_classification_population",
         "normalization_policy_sha256",
         "outcome_access_authorized",
+        "owner_directive_commit",
         "owner_directive_date",
         "owner_directive_id",
+        "owner_directive_path",
+        "owner_directive_sha256",
         "percentile_formula",
         "policy_id",
         "population_scope",
@@ -164,13 +170,16 @@ def test_percentile_policy_is_exact_content_addressed_owner_freeze():
     assert STOCK_PERCENTILE_POLICY.sha256 == hash_payload(payload)
     assert STOCK_PERCENTILE_POLICY.sha256 == STOCK_PERCENTILE_POLICY_SHA256
     assert STOCK_PERCENTILE_POLICY_SHA256 == (
-        "08899fe5a586fe9472da859cfa9d89934b7771d47d8c3f552031ad1012c4f9d7"
+        "0e521b8275c5f813c11b578e1b9a6aefa3c8ba13ae57a53ad32393682efcd180"
     )
     assert require_stock_percentile_policy(STOCK_PERCENTILE_POLICY) == (
         STOCK_PERCENTILE_POLICY_SHA256
     )
     assert payload["policy_id"] == STOCK_PERCENTILE_POLICY_ID
-    assert payload["owner_directive_id"] == "si3ep1a-owner-freeze-2026-09-14"
+    assert payload["owner_directive_id"] == (
+        "si3ep1a-owner-approval-recorded-2026-09-26"
+    )
+    assert payload["owner_directive_date"] == "2026-09-26"
     assert payload["blueprint_path"] == SHORT_INTEREST_BLUEPRINT_PATH
     assert payload["blueprint_sha256"] == SHORT_INTEREST_BLUEPRINT_SHA256
     assert payload["preregistration_sha256"] == PREREGISTRATION.sha256
@@ -212,6 +221,59 @@ def test_percentile_policy_is_exact_content_addressed_owner_freeze():
     assert payload["seed_selection_authorized"] is False
     assert payload["outcome_access_authorized"] is False
     assert payload["production_authoritative"] is False
+
+
+def test_percentile_policy_binds_committed_verbatim_owner_approval():
+    payload = STOCK_PERCENTILE_POLICY.to_payload()
+    directive_path = (
+        "docs/Strategy Description/SHORT_INTEREST_OWNER_DECISIONS_2026-09-26.md"
+    )
+    directive_commit = "c329d6f9aa616ea48776d6fbe75c36413b81d19b"
+    assert payload["owner_directive_path"] == directive_path
+    assert payload["owner_directive_commit"] == directive_commit
+    assert payload["owner_directive_sha256"] == (
+        "0172439871e3ace82cd0fe5fcd3526c7b20989185b10e334d169e16c50427bc3"
+    )
+    repository_root = Path(__file__).resolve().parents[1]
+    committed_bytes = subprocess.run(
+        ["git", "show", f"{directive_commit}:{directive_path}"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert sha256(committed_bytes).hexdigest() == payload["owner_directive_sha256"]
+    assert (repository_root / directive_path).read_bytes() == committed_bytes
+    directive = committed_bytes.decode("utf-8")
+    assert (
+        "> yes this works. Approved. Freeze the proposed defaults and implement "
+        "SI-2B offline, then complete the round with one push to the Short Interest "
+        "lane only. With one change, tho. candidate lookbacks first"
+    ) in directive
+    assert "**20, 60, 120, and 252 trading sessions**" in directive
+    assert "There is no selected lookback winner at this stage." in directive
+    assert "equivalently `(2*L+E)/(2*N)`." in directive
+    assert "Inclusive pressure `p >= 0.90` and covering `p <= 0.10`" in directive
+    assert "Keep whole tie groups; never split or force exactly 10%" in directive
+    assert "Fewer than 10 eligible stocks produces no seeds" in directive
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    (
+        ("owner_directive_path", "docs/another-owner-record.md"),
+        ("owner_directive_commit", "0" * 40),
+        ("owner_directive_sha256", "0" * 64),
+    ),
+)
+def test_percentile_policy_refuses_rebound_owner_provenance(field, value):
+    forged = object.__new__(StockPercentilePolicy)
+    for name in StockPercentilePolicy.__dataclass_fields__:
+        object.__setattr__(forged, name, getattr(STOCK_PERCENTILE_POLICY, name))
+    object.__setattr__(forged, field, value)
+    with pytest.raises(StockPercentileError, match="wrong owner directive"):
+        require_stock_percentile_policy(forged)
+    with pytest.raises(StockPercentileError, match="wrong owner directive"):
+        forged.to_payload()
 
 
 @pytest.mark.parametrize(

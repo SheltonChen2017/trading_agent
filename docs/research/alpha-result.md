@@ -5409,3 +5409,49 @@ and drawdown **−21.289982830798%** are retained as invalid-run context only,
 not an accepted cell or matched spread. No second external result read.
 Prospective fee-basis diagnosis/correction is required before A2. Current
 floor **227 / 168 / 34 / 645**; no additional valid cell.
+
+## R-225 A3 — final same-project corrected-source attempt failed — 2026-09-26
+
+Prospective source **`e006757`**, closing-minute/fee manifest
+`be23fba84bf233d3e667a649bf8f288d45c277cba4c9ebc6cfcbcda1d7759fe5`,
+same private project **37017548**, backtest `5e2255a7bb0e28f8cb404907551393a2`.
+Third of three slots consumed; no fourth Codex attempt or candidate alias.
+Only strictly fresh same-session RAW minute references may repair missing
+daily History; profile and v2 count/path-hash disclosure version that change.
+Signed installed-slippage MOO fee basis is also pinned (zero-slip unchanged).
+AR-off, dates/input/coverage/exposure/order rules and ten-bps fee rate remain.
+Launch **227 -> 228 shared / 168 -> 169 development / 34 infrastructure /
+645 cells**. Terminal `Runtime Error` at **2021-01-05 11:20:00**:
+`Arv2TenBpsFeeModel.get_order_fee() takes 2 positional arguments but 3 were given`.
+This new cloud callback failure prevents reaching the prior QCOM date; local
+tests did not reproduce QC's overload behavior. No outcome read or cell.
+R225's three Codex slots are exhausted. Mia recovery is being checked;
+remaining candidates are held rather than knowingly repeating this failure.
+
+## R-225 independent Mia recovery — verified callback source, launched — 2026-09-26
+
+After all three Codex attempts failed, Mia independently launched one
+recovery in the same private project **37017548**, backtest
+`b3d9e0b65d6c5c3b34ef306b10255416`, snapshot **37019605**, created
+2026-09-27 03:40:28 UTC. Not an A4, renamed candidate or rewritten A3.
+Only `main.py` changed: SHA-256
+`5b009507cc68a0689c47f22b58b01679579037a7f45beed631c98cd9d79f0a49`,
+8,127 bytes; other sixteen files equal the original A3 closure. The fix
+supports LEAN's synthetic MARKET fee valuation with the prior RAW-open
+ten-bps estimate; signed-slippage MOO execution fees/rules remain unchanged.
+Source attested before launch; eight actual-cloud class cases passed.
+Same historical period/input/coverage/98%-gross total-AR-off study arm.
+Conservatively count another development look: **228 -> 229 shared /
+169 -> 170 development / 34 infrastructure / 645 cells**. Only terminal
+status/error inspected so far; no outcome read or accepted cell. Mia
+recovery provenance and its one-time bounded read are separate from the
+three immutable failed Codex receipts. Completion alone will not accept it.
+
+Terminal update: `Runtime Error` at **2022-10-03 16:00**, past the fee
+callback failure. The same missing active held+target QCOM has no exact
+same-session closing-minute cache replacement; 46 prices required, 45
+received. No custom-statistic read or valid cell. The native QC panel
+inadvertently displayed partial engine performance while reporting failure;
+invalid partial outcomes are excluded and not represented as an accepted
+result. Floor remains **229 / 170 / 34 / 645**. Mia is diagnosing only;
+there is no fourth Codex attempt or further automatic Mia launch.

@@ -27565,3 +27565,104 @@ Final combined prelaunch focused selection: **276 passed in 35.37 s**,
 including exact production-package freeze/all-six previews, v2 transport
 and candidate binding, distinct three-generation routing, legacy attempt
 guards and the lane-record gate. Targeted compilation and diff checks clean.
+
+### 199.5 Final R225 Codex slot failed; Mia recovery initiated
+
+Corrected-source commit **`e006757`** uploaded/read back/compiled for R225
+A3 in existing project **37017548**, backtest
+`5e2255a7bb0e28f8cb404907551393a2`. Terminal `Runtime Error` at
+**2021-01-05 11:20:00**: `Arv2TenBpsFeeModel.get_order_fee() takes 2 positional
+arguments but 3 were given`. This new QC/CLR callback failure precedes the
+QCOM reference date; A3 does not validate actual closing-minute availability.
+Local projected-fee tests prove arithmetic and refusal behavior, not actual
+Python.NET method dispatch. **ARV2D199-001 P2, open:** prospectively corrected
+slippage arithmetic exposed an untested native callback interaction. No
+outcome read or result cell; total floor **228 / 169 / 34 / 645**.
+
+R225's three Codex attempts are exhausted; no A4 or alias is permitted.
+Authenticated Safari/QC project UI exposes Mia, and Codex sent a bounded
+research-only diagnosis request there. Mia must first report the real cause
+and minimal diff; no additional backtest was requested yet. Preserve the
+MOO/10-bps/signed-slippage/cash/price/AR rules and all result checks, forbid
+stale marks, dropped holdings, raw provider/order inspection and trading.
+Remaining candidates are held to avoid repeating this known callback defect.
+Any Mia recovery is separately evidenced/accounted, not silently counted as
+a valid A3 or accepted merely because QC reports `Completed.`.
+
+### 199.6 Confirmed fee callback cause, minimal Mia port and independent recovery
+
+The failure is not a missing Python overload. LEAN legitimately constructs
+synthetic MARKET orders for `SecurityHolding.TotalCloseProfit` via
+`Extensions.GetMarketOrderFees`. The new MOO-only fee guard raised on that
+valuation callback. `FeeModelPythonWrapper` catches any Python exception,
+permanently switches to its legacy two-argument callback and masks the
+original refusal with the observed positional-argument TypeError. Primary
+sources: LEAN `Common/Securities/SecurityHolding.cs`, `Common/Extensions.cs`
+and `Common/Python/FeeModelPythonWrapper.cs`. The prior `not_moo` test encoded
+the wrong contract. Callback acceptance is not order-submission authority.
+
+Mia initially proposed a zero-fee MARKET estimate; that was rejected as an
+unnecessary valuation change. The verified correction preserves the prior
+finite-positive RAW-open × absolute quantity × ten-bps estimate for synthetic
+MARKET valuation, without consulting slippage or signed quantity. MOO fees
+retain signed installed slippage; the executor remains MOO-only and all
+lifecycle, cash, missing-price, selection and result guards remain. Only
+cloud `main.py` changed: SHA-256
+**`5b009507cc68a0689c47f22b58b01679579037a7f45beed631c98cd9d79f0a49`**,
+8,127 ASCII bytes. The other sixteen files equal the A3 closure exactly.
+Prelaunch source attestation **2026-09-27T03:39:09.443573 UTC**, retained
+privately with exact source and modification times. Eight tests of the actual
+retrieved cloud fee class passed; prospective renderer tests **103 passed in
+20.41 s**. Removing only MARKET support in memory reproduces the masked
+TypeError through the wrapper model; restored green. This proves the
+callback correction, not completion or usable outcome evidence.
+
+Prospective fee-callback manifest
+`six_universe_matched_study_fee_callback_candidates.json`, SHA-256
+**`ed48433443670d5e04ce53188d2bfb5b3a67b78946a7e9ef642bb38dff55b35b`**, preserves every arm's economic/profile/input pins
+from the closing-minute generation. Exact dispatch keeps spent R225 A3 on
+its old pin; no failed receipt is rewritten. The new source is for remaining
+allowed attempts only, not an R225 A4. Comparison now validates the strictly
+versioned v2 repair report alongside the unchanged valid R227 v1 control.
+
+Mia independently launched one recovery in project **37017548**: backtest
+**`b3d9e0b65d6c5c3b34ef306b10255416`**, snapshot **37019605**, name
+`ARV2 R225 Mia recovery fee callback 2021 2025`, created
+**2026-09-27 03:40:28 UTC**. This is separately attributed Mia recovery after
+three exhausted Codex slots, not a fourth Codex launch or accepted A3.
+Conservative look floor **229 / 170 / 34 / 645**; no outcome read yet.
+Only terminal status/error is inspected while it runs. A sole bounded custom
+read requires exact attested source, current-source timing, ownership and
+terminal identity. QC's current-source API does not certify historical
+snapshot byte contents. No further automatic Mia retry is requested.
+
+Interpretation retained after the owner's correction: the historical tilt
+sweep rose roughly two return points per twenty tilt points, but not at an
+exact universal rate; the August-2025–latest paired controls did not repeat
+that benefit. The divergence, rather than the historical maximum, motivates
+this matched study. Regime effects and overwritten historical-vintage data
+remain alternatives; unchanged IDs over the nine-day drift check do not
+establish original point-in-time history or reliable live edge.
+
+The independent Mia recovery terminated `Runtime Error` at **2022-10-03
+16:00**, past the former fee-callback failure: the same QCOM daily reference
+is absent, and the cached bar fails `not_exact_same_session_closing_minute`
+with zero acceptable fresh replacements. The strict guard remains effective;
+the proposed cache fallback is not an operational repair. **ARV2D199-001 P2
+corrected** for the fee callback; the missing-reference cause remains open.
+No bounded custom outcome read or valid cell. QC's native backtest panel
+automatically exposed partial engine performance for this failed run during
+terminal inspection; that inadvertent exposure is recorded, invalid and
+excluded from strategy comparison. Do not describe this as wholly outcome-
+unseen. No extra look is charged beyond its already-recorded launch.
+
+Mia is asked for source-level diagnosis only, no further run/code edit yet.
+All three Codex R225 slots remain exhausted. Stock arms are held to avoid
+knowingly repeating the unresolved reference failure; the corrected ETF
+five-bps control may use its own remaining allowed slot. Independent recovery
+reader has no launch endpoint or A4 capability and uses separate provenance
+and sole-read artifacts; **40 focused cases passed**, but it has not read
+this failed run. Combined submission/routing/diagnostic/recovery selection
+**220 passed in 21.24 s**; an initial twelve old third-generation expectations
+failed and were updated for the new exact fourth-generation dispatch before
+launch. Full lane/repository suites were not run.

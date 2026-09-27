@@ -476,7 +476,7 @@ def _projected_fee_model(projection):
     fee_class = next(node for node in tree.body if isinstance(node, ast.ClassDef)
                      and node.name == "Arv2TenBpsFeeModel")
     scope = {"FeeModel": object, "Decimal": Decimal, "MODELED_FEE_RATE_PER_SIDE": Decimal("0.001"),
-             "OrderType": SimpleNamespace(MARKET_ON_OPEN="moo"),
+             "OrderType": SimpleNamespace(MARKET_ON_OPEN="moo", MARKET="market"),
              "OrderFee": lambda value: SimpleNamespace(value=value),
              "CashAmount": lambda amount, currency: SimpleNamespace(amount=amount, currency=currency)}
     exec(compile(ast.fix_missing_locations(ast.Module(body=[fee_class], type_ignores=[])),
@@ -516,7 +516,7 @@ def test_projected_fee_matches_full_moo_fill_with_installed_slippage(family, arm
 
 @pytest.mark.parametrize("mutation", ("zero_open", "negative_open", "nan_open", "infinite_open",
     "negative_slippage", "nan_slippage", "infinite_slippage", "nonpositive_sell_price",
-    "nan_quantity", "zero_quantity", "wrong_absolute_quantity", "not_moo", "unreadable_model"))
+    "nan_quantity", "zero_quantity", "wrong_absolute_quantity", "unsupported_order_type", "unreadable_model"))
 def test_projected_fee_refuses_invalid_model_or_fill_price_basis(family, mutation):
     model = _projected_fee_model(family["six_etf_basket", 5][0])
     parameters, calls = _fee_parameters(Decimal(-7), Decimal("0.05"))
@@ -534,14 +534,64 @@ def test_projected_fee_refuses_invalid_model_or_fill_price_basis(family, mutatio
         parameters.order.quantity = parameters.order.absolute_quantity = Decimal(0)
     elif mutation == "wrong_absolute_quantity":
         parameters.order.absolute_quantity = Decimal(8)
-    elif mutation == "not_moo":
-        parameters.order.type = "market"
+    elif mutation == "unsupported_order_type":
+        parameters.order.type = "limit"
     elif mutation == "unreadable_model":
         def unreadable(asset, order):
             raise RuntimeError("synthetic unreadable slippage model")
         parameters.security.slippage_model.get_slippage_approximation = unreadable
     with pytest.raises(RuntimeError):
         model.get_order_fee(parameters)
+
+
+@pytest.mark.parametrize("arm,slip,quantity", tuple((arm, slip, quantity)
+    for arm in subject.ARMS for slip in subject.SLIPPAGE_BPS for quantity in (Decimal(7), Decimal(-7))))
+def test_projected_fee_accepts_market_valuation_without_slippage_or_legacy_dispatch(family, arm, slip, quantity):
+    model = _projected_fee_model(family[arm, slip][0])
+    parameters, calls = _fee_parameters(quantity, Decimal("0.07123"))
+    parameters.order.type = "market"
+    # LEAN's valuation order only needs absolute quantity. The fee callback
+    # must not read signed quantity or consult the execution slippage model.
+    del parameters.order.quantity
+    def unexpected_slippage(asset, order):
+        pytest.fail("synthetic MARKET valuation must preserve the original RAW-open estimate")
+    parameters.security.slippage_model.get_slippage_approximation = unexpected_slippage
+
+    class _FeeModelPythonWrapper:
+        """Reproduce the callback fallback that masked the original refusal."""
+        extended_version = True
+        legacy_calls = 0
+
+        def get_order_fee(self, current):
+            if self.extended_version:
+                try:
+                    return model.get_order_fee(current)
+                except Exception:
+                    self.extended_version = False
+            self.legacy_calls += 1
+            return model.get_order_fee(current.security, current.order)
+
+    wrapper = _FeeModelPythonWrapper()
+    for _ in range(2):
+        fee = wrapper.get_order_fee(parameters)
+        assert type(fee.value.amount) is Decimal
+        assert fee.value.currency == "USD"
+        assert fee.value.amount == parameters.security.open * abs(quantity) * Decimal("0.001")
+    assert wrapper.extended_version and wrapper.legacy_calls == 0
+    assert calls == []
+
+
+@pytest.mark.parametrize("field,value", tuple((field, Decimal(value))
+    for field in ("open", "absolute_quantity") for value in ("0", "NaN", "Infinity"))
+    + (("open", Decimal(-1)),))
+def test_projected_fee_refuses_invalid_market_valuation_inputs_before_slippage(family, field, value):
+    model = _projected_fee_model(family["ar_off", 5][0])
+    parameters, calls = _fee_parameters(Decimal(7), Decimal("0.05"))
+    parameters.order.type = "market"
+    setattr(parameters.security if field == "open" else parameters.order, field, value)
+    with pytest.raises(RuntimeError, match="ARV2 fee input is invalid"):
+        model.get_order_fee(parameters)
+    assert calls == []
 
 
 @pytest.mark.parametrize("quantity", (Decimal(7), Decimal(-7)))

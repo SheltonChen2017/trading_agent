@@ -134,18 +134,23 @@ def test_protocol_has_exact_three_arms_and_two_prospective_cost_conditions():
 def test_real_source_freeze_reproduces_committed_manifest_and_all_previews(exact_delta_package, tmp_path, monkeypatch):
     from scripts import run_arv2_matched_study as script
     monkeypatch.setattr(script, "package", lambda: exact_delta_package)
-    frozen = adapter._matched_study_closing_minute_manifest()
+    frozen = adapter._matched_study_fee_callback_manifest()
     assert script.freeze() == frozen
     assert "input_control_directory" not in frozen
     for candidate in study.CANDIDATES:
+        if candidate == "R225":
+            # No fourth Codex slot: its successor source is for Mia evidence,
+            # not a launchable attempt. Check its freeze, never build A4.
+            continue
         attempt = next(slot for slot in range(1, 4) if (candidate, slot) not in
-            adapter._MATCHED_STUDY_ORIGINAL_ATTEMPTS | adapter._MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS)
+            adapter._MATCHED_STUDY_ORIGINAL_ATTEMPTS | adapter._MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS
+            | adapter._MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
         plan = adapter.build_plan(candidate, ORG, tmp_path / "control", attempt, family="matched_study")
         projected, _ = script.projected(candidate)
         preview = adapter.preview(plan, projected)
         assert preview["candidate_id"] == candidate
         assert preview["projection_sha256"] == projected.projection_sha256
-        assert preview["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256
+        assert preview["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_FEE_CALLBACK_MANIFEST_SHA256
 
 
 @pytest.mark.parametrize("defect", ["missing", "duplicate", "reordered", "wrong_arm",
@@ -198,6 +203,8 @@ def frozen(tmp_path, monkeypatch):
     # Generic fake-cloud tests retain their v1 report fixtures; the real
     # closing-minute source/manifest and v2 parser are tested separately.
     monkeypatch.setattr(adapter, "_matched_study_closing_minute_manifest",
+        lambda: adapter._matched_study_diagnostic_manifest())
+    monkeypatch.setattr(adapter, "_matched_study_fee_callback_manifest",
         lambda: adapter._matched_study_diagnostic_manifest())
     monkeypatch.setattr(adapter, "_require_inputs", lambda plan: None)
     monkeypatch.setattr(adapter.common, "_client", lambda api: None)
@@ -285,27 +292,33 @@ def test_only_exact_spent_attempts_use_original_manifest(frozen, monkeypatch, ca
         adapter.FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if original
         else adapter.FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256
         if (candidate, attempt) in adapter._MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS
-        else adapter.FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256)
+        else adapter.FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256
+        if (candidate, attempt) in adapter._MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS
+        else adapter.FROZEN_MATCHED_STUDY_FEE_CALLBACK_MANIFEST_SHA256)
 
 
 @pytest.mark.parametrize("candidate", list(study.CANDIDATES))
 @pytest.mark.parametrize("attempt", [1, 2, 3])
-def test_three_generations_dispatch_distinct_source_and_pin(frozen, monkeypatch, candidate, attempt):
+def test_four_generations_dispatch_distinct_source_and_pin(frozen, monkeypatch, candidate, attempt):
     plan = dataclasses.replace(frozen[0], candidate_id=candidate, attempt=attempt)
-    old, diagnostic, current = object(), object(), object()
+    old, diagnostic, closing, current = object(), object(), object(), object()
     monkeypatch.setattr(adapter, "_matched_study_manifest", lambda: old)
     monkeypatch.setattr(adapter, "_matched_study_diagnostic_manifest", lambda: diagnostic)
-    monkeypatch.setattr(adapter, "_matched_study_closing_minute_manifest", lambda: current)
+    monkeypatch.setattr(adapter, "_matched_study_closing_minute_manifest", lambda: closing)
+    monkeypatch.setattr(adapter, "_matched_study_fee_callback_manifest", lambda: current)
     monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_MANIFEST_SHA256", "a" * 64)
     monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256", "b" * 64)
     monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256", "c" * 64)
+    monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_FEE_CALLBACK_MANIFEST_SHA256", "d" * 64)
     key = (candidate, attempt)
     if key in {("R225", 1), ("R226", 1), ("R227", 1)}:
         expected, pin = old, "a" * 64
     elif key in {("R225", 2), ("R230", 1)}:
         expected, pin = diagnostic, "b" * 64
+    elif key == ("R225", 3):
+        expected, pin = closing, "c" * 64
     else:
-        expected, pin = current, "c" * 64
+        expected, pin = current, "d" * 64
     assert adapter._plan_manifest(plan) is expected
     assert adapter._plan_manifest_sha256(plan) == pin
 
@@ -538,6 +551,17 @@ def test_comparison_accepts_deliberately_different_target_paths_and_computes_spr
     assert Decimal(answer["comparisons"][0]["AR_on_minus_fully_off_percentage_points"]) == Decimal(5)
     assert Decimal(answer["comparisons"][1]["AR_on_minus_fully_off_percentage_points"]) == Decimal(4)
     assert "not_full_stock_minute_fill_tape" in answer["reference_data_scope"]
+
+
+def test_comparison_accepts_versioned_repair_reports_beside_unchanged_etf_control():
+    results = results_fixture()
+    for candidate, result in results.items():
+        if candidate != "R227":
+            result["diagnostics"].update(schema=diagnostics.REFERENCE_REPAIR_SCHEMA,
+                closing_minute_reference_repair_count=0,
+                closing_minute_reference_repair_session_count=0,
+                closing_minute_reference_repair_path_sha256=adapter._sha([]))
+    assert study.compare_results(results)["comparison_valid"] is True
 
 
 @pytest.mark.parametrize("defect", ["missing_arm", "invalid", "boolean_valid", "observations",

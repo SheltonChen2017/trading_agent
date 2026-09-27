@@ -142,7 +142,7 @@ def _render_identity(path, source, arm, slippage_bps):
 
 
 def _render_fee_basis(path, source):
-    """Charge ten bps on the same price used by the default full MOO fill."""
+    """Preserve valuation estimates and match actual default full MOO fees."""
     if path != "main.py":
         return source
     tree = ast.parse(source)
@@ -158,7 +158,20 @@ return OrderFee(CashAmount(price * quantity * MODELED_FEE_RATE_PER_SIDE, "USD"))
             or [ast.dump(node, include_attributes=False) for node in method.body]
             != [ast.dump(node, include_attributes=False) for node in original]):
         _error("matched historical fee-basis exact anchor changed")
-    method.body = ast.parse("""
+    method.body = ast.parse('''
+"""MARKET callbacks are LEAN valuation estimates, not order authority.
+
+The executor remains MOO-only. Preserve the original RAW-open estimate
+without querying slippage for synthetic MARKET calls; actual MOO fees use
+the signed installed slippage below.
+"""
+if parameters.order.type == OrderType.MARKET:
+    estimate_price = Decimal(str(parameters.security.open))
+    estimate_quantity = abs(Decimal(str(parameters.order.absolute_quantity)))
+    if (not estimate_price.is_finite() or estimate_price <= 0
+            or not estimate_quantity.is_finite() or estimate_quantity <= 0):
+        raise RuntimeError("ARV2 fee input is invalid")
+    return OrderFee(CashAmount(estimate_price * estimate_quantity * MODELED_FEE_RATE_PER_SIDE, "USD"))
 price = Decimal(str(parameters.security.open))
 quantity = abs(Decimal(str(parameters.order.absolute_quantity)))
 signed_quantity = Decimal(str(parameters.order.quantity))
@@ -178,7 +191,7 @@ price += slippage if signed_quantity > 0 else -slippage
 if not price.is_finite() or price <= 0:
     raise RuntimeError("ARV2 fee fill-price basis is invalid")
 return OrderFee(CashAmount(price * quantity * MODELED_FEE_RATE_PER_SIDE, "USD"))
-""").body
+''').body
     ast.fix_missing_locations(tree)
     return ast.unparse(tree) + "\n"
 

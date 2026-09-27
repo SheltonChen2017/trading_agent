@@ -34,6 +34,9 @@ FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 = "2718100d6c3863ebd7959142afaca
 MATCHED_STUDY_DIAGNOSTIC_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_diagnostic_candidates.json")
 FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256 = "be23fba84bf233d3e667a649bf8f288d45c277cba4c9ebc6cfcbcda1d7759fe5"
 MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_closing_minute_candidates.json")
+FROZEN_MATCHED_STUDY_FEE_CALLBACK_MANIFEST_SHA256 = "ed48433443670d5e04ce53188d2bfb5b3a67b78946a7e9ef642bb38dff55b35b"
+MATCHED_STUDY_FEE_CALLBACK_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_fee_callback_candidates.json")
+_MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
 # closures remain immutable when a corrected attempt uses the successor source.
@@ -158,6 +161,22 @@ def _matched_study_diagnostic_attempt(plan):
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS)
 
 
+def _matched_study_fee_callback_manifest():
+    raw = MATCHED_STUDY_FEE_CALLBACK_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != FROZEN_MATCHED_STUDY_FEE_CALLBACK_MANIFEST_SHA256:
+        _fail("matched study fee-callback source is not the frozen manifest")
+    from . import six_universe_matched_study as study
+    value = study.validate_manifest(json.loads(raw))
+    if any(row.get("reference_repair_enabled") is not True for row in value["candidates"]):
+        _fail("matched study fee-callback profile disclosure changed")
+    return value
+
+
+def _matched_study_closing_minute_attempt(plan):
+    return (type(plan.candidate_id) is str
+            and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
+
+
 def _plan_manifest(plan):
     # Legacy parser fixtures deliberately use a non-plan sentinel; real public
     # operations validate the exact plan in _candidate before any I/O.
@@ -172,7 +191,8 @@ def _plan_manifest(plan):
     if type(plan.family) is str and plan.family == "matched_study":
         return (_matched_study_manifest() if _matched_study_original_attempt(plan)
                 else _matched_study_diagnostic_manifest() if _matched_study_diagnostic_attempt(plan)
-                else _matched_study_closing_minute_manifest())
+                else _matched_study_closing_minute_manifest() if _matched_study_closing_minute_attempt(plan)
+                else _matched_study_fee_callback_manifest())
     _fail("relaxed plan family changed")
 
 
@@ -180,7 +200,8 @@ def _plan_manifest_sha256(plan):
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
                 else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 if _matched_study_diagnostic_attempt(plan)
-                else FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256)
+                else FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256 if _matched_study_closing_minute_attempt(plan)
+                else FROZEN_MATCHED_STUDY_FEE_CALLBACK_MANIFEST_SHA256)
     if type(plan) is RelaxedQcPlan and plan.family == "weight_ablation":
         return FROZEN_ABLATION_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "coverage25":

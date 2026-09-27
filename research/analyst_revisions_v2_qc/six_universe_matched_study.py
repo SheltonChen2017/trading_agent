@@ -88,7 +88,9 @@ AR-on/off target paths deliberately differ: equality there is not a gate.
             raise ValueError("matched study requires six valid order results")
         aggregate = result["aggregates"]
         account = aggregate["account"]
-        diagnostics.validate_report(result["diagnostics"], *CANDIDATES[candidate])
+        diagnostics.validate_report(result["diagnostics"], *CANDIDATES[candidate],
+            reference_repair_enabled=(result["diagnostics"].get("schema")
+                == diagnostics.REFERENCE_REPAIR_SCHEMA))
         if (not adapter.cap._finite_decimal(account.get("cumulative_return"))
                 or not adapter.cap._finite_decimal(account.get("starting_equity"))
                 or Decimal(account["starting_equity"]) <= 0

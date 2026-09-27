@@ -67,6 +67,7 @@ def compare_cached():
     adapter._matched_study_manifest()
     adapter._matched_study_diagnostic_manifest()
     adapter._matched_study_closing_minute_manifest()
+    adapter._matched_study_fee_callback_manifest()
     results = {candidate: authenticated_cached_result(candidate, CONTROL, "matched_study")
                for candidate in study.CANDIDATES}
     return study.compare_results(results)

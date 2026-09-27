@@ -5455,3 +5455,28 @@ inadvertently displayed partial engine performance while reporting failure;
 invalid partial outcomes are excluded and not represented as an accepted
 result. Floor remains **229 / 170 / 34 / 645**. Mia is diagnosing only;
 there is no fourth Codex attempt or further automatic Mia launch.
+
+## R-230 A2 — corrected fee-callback ETF cost control launched — 2026-09-26
+
+Source **`f9ee4e1`**, prospective manifest
+`ed48433443670d5e04ce53188d2bfb5b3a67b78946a7e9ef642bb38dff55b35b`,
+same private project **37018137**, backtest `83aa1868a48cdbbe43cee6ef2bc0d7c4`.
+Two of this candidate's three slots consumed; A1 stays invalid/immutable.
+Same 2021-01-04–2025-12-31 actual six-ETF basket, 98% gross, ten-bps fees
+plus five-bps slippage per side. Fee model now supports legitimate synthetic
+MARKET valuation; actual MOO fees use signed installed slippage. No selection
+or invariant relaxation. Upload/readback/compile passed. Conservatively
+**229 -> 230 shared / 170 -> 171 development / 34 infrastructure / 645 cells**.
+No result read yet. This ETF-only control does not depend on the unresolved
+QCOM stock-reference failure; stock arms are held, not blindly retried.
+
+Terminal update: `Completed.`; sole bounded custom read **run_valid=true**,
+**+105.758712420075%** net, **−21.289990498226%** maximum drawdown,
+annualized volatility **19.828188193774%**, zero-rate Sharpe
+**0.830511667729**. 261 rebalances and **1,516 / 1,516** filled orders;
+zero invalid/canceled. Engine/model fees match exactly at **`$8,012.73234237`**.
+Membership/cap and six-ETF RAW-panel digests equal valid R227; zero stock
+reference repairs. Compared with R227, five-bps slippage costs **0.576061016133
+percentage points** net; this is ETF cost sensitivity, not AR attribution.
+One accepted cell **645 -> 646**, floor **230 / 171 / 34 / 646**. A1 stays
+invalid and is not retrospectively repaired or re-read.

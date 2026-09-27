@@ -27666,3 +27666,104 @@ this failed run. Combined submission/routing/diagnostic/recovery selection
 **220 passed in 21.24 s**; an initial twelve old third-generation expectations
 failed and were updated for the new exact fourth-generation dispatch before
 launch. Full lane/repository suites were not run.
+
+### 199.7 Corrected ETF cost control launched in its existing project
+
+R230 A2, source **`f9ee4e1`**, fee-callback manifest
+`ed48433443670d5e04ce53188d2bfb5b3a67b78946a7e9ef642bb38dff55b35b`,
+launched in existing project **37018137**, backtest
+**`83aa1868a48cdbbe43cee6ef2bc0d7c4`**. Two of its own three slots spent.
+This actual six-ETF five-bps control does not hold the stock responsible for
+the unresolved QCOM reference failure. Exact source readback and compile
+passed; corrected MOO fees remain ten bps of signed-slippage filled notional.
+Same historical dates, fixed ETF basket, 98% gross target and one result read.
+Launch floor **230 / 171 / 34 / 645**; no result read yet. Stock arms remain
+held pending measured price-source diagnosis, not silently launched against
+a known failing path.
+
+R230 A2 completed and its sole bounded read is **run_valid=true**:
+**+105.758712420075%** net, **−21.289990498226%** maximum drawdown,
+**19.828188193774%** annualized volatility, zero-rate Sharpe
+**0.830511667729**. All **1,516 / 1,516** orders filled; 261 / 261 rebalances,
+zero invalid/canceled. Actual/model fees both **`$8,012.73234237`**;
+starting `$1,000,000`, ending `$2,057,587.12420075`. Zero stock-reference
+repairs. Its membership/cap digest
+`b3233cf7b2a0a85cee81c2cefd891c8a4f6a57491ec9ce0bc33e50d1968c2063`
+and six-ETF RAW-panel digest
+`89d9c6387c0cf47fa70a8a0c9c3108cae263436e0b8e503fc127ecbe9deeff66`
+equal valid R227 exactly. Five-bps slippage reduces the ETF basket's net
+return by **0.576061016133 percentage points** on this window. That is a
+matched ETF cost sensitivity, not AR contribution or full-stock-price proof.
+One valid cell added; floor **230 / 171 / 34 / 646**. The invalid A1 return
+remains invalid and is not substituted for this corrected result.
+
+### 199.8 Round handoff and review notes for Claude
+
+Exact implementation range **`575b611..f9ee4e1`**; the final record-only
+handoff commit follows it. Per-commit dispositions for independent review:
+
+- **`f8b2830`**: bounded missing-reference diagnostics, immutable original
+  receipts and actual R227 evidence. Diagnostic R225 A2 confirms an absent
+  QCOM reference, not its provider cause or a valid stock result.
+- **`e006757`**: prospective exact-closing-minute fallback, v2 repair
+  evidence and signed-slippage MOO fee arithmetic. Arithmetic is correct,
+  but its MOO-only callback guard failed in QC (corrected by the successor);
+  the fallback itself remains operationally unproven and failed in Mia.
+  Do not accept local green tests as proof of either cloud property.
+- **`f9ee4e1`**: verified Mia MARKET-valuation fee port, exact fourth-source
+  routing without rewriting R225 A3, version-aware comparison and separate
+  read-only Mia provenance/one-read machinery. Actual valid R230 A2 now
+  proves the fee invariant with slippage; the Mia reader remains unused
+  because its one recovery failed. No launch endpoint/A4 was added.
+
+**Findings:** `ARV2D199-001` P2 corrected (valid valuation callback contract,
+isolated wrapper regression and actual QC completion). `ARV2D199-002` P2
+open: stock RAW reference incompleteness remains. A present same-SID,
+non-fill-forward cached TradeBar fails one of four timestamp comparisons;
+actual Time/EndTime/Period has not been measured. Daily-cache overwrite,
+clock/type mismatch and delivery order are hypotheses, not measured causes.
+Current LEAN updates security caches before current-time scheduled events;
+the statement “events precede OnData” alone does not prove stale cache.
+Do not loosen freshness, use `security.price`, omit held stocks, widen
+fee tolerance or claim matched stock results. `ARV2D199-003` P3 documented:
+QC's native error panel inadvertently exposed invalid partial performance;
+exclude it and prefer bounded API status/error inspection.
+
+**Actual QC outcome/attempt census:** R225 three failed Codex slots exhausted
+plus one independently attributed failed Mia recovery; R226 one failed slot,
+two available but held; R227 A1 valid and not rerun; R228/R229 unlaunched,
+three slots each; R230 A1 invalid, A2 valid, one unused slot (no reason to
+rerun a valid control). Only two valid ETF controls, no complete six-arm
+comparison or stock/AR spread. Floor **230 shared looks / 171 development /
+34 infrastructure / 646 cells**. R225/R230 spent receipts and sole reads
+remain unchanged, and no failed run is relabeled valid.
+
+**Validation:** 103 prospective projection cases, 220 focused
+submission/routing/diagnostic/recovery cases, 13 lane-record cases; eight
+actual retrieved-cloud fee-class cases; targeted compilation and diff checks.
+Removing only the MARKET branch in memory reproduces the observed sticky
+wrapper fallback error. The initial twelve legacy source-pin expectations
+were red, corrected for the fourth generation and rerun green. No full lane
+or repository suite by Codex, per the owner's latest rule. These checks do
+not compensate for the failed stock QC run; Claude performs the full lane
+selection at review.
+
+**Next action/blocker:** authenticated native Safari became inaccessible
+because the Mac locked. No unlock/authentication bypass is attempted; the
+owner must unlock it to resume Mia. Mia was investigating source only, with
+no further code edit/run requested; final API inventory shows no extra job,
+all R225 jobs terminal and the attested seventeen-file source unchanged.
+The other stock arms are held against a known failing reference path. After
+unlock, obtain measured, value-free bar/clock/current-slice metadata through
+Mia's recovery process before any prospective stock correction. If current
+slice contains the exact RAW closing minute, it may satisfy unchanged strict
+guards; otherwise a narrowly bounded fresh-minute-history policy would need
+its own prospective source/profile/call-accounting change. Neither is
+implemented or authorized as a disguised fourth Codex R225 attempt.
+
+No fresh vendor archive substituted for the frozen study input, no raw
+provider/order inspection, other worktree/branch, root Action Plan/Handoff,
+broker, paper/live deployment or real trading. Shared `alpha-result.md`
+changes are limited to owner-authorized bookkeeping. One final successful
+lane push hands off this honest partial round; unlock and reference-source
+evidence, not another permission waiver, are the continuation requirements.

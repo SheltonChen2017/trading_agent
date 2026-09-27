@@ -5480,3 +5480,69 @@ reference repairs. Compared with R227, five-bps slippage costs **0.576061016133
 percentage points** net; this is ETF cost sensitivity, not AR attribution.
 One accepted cell **645 -> 646**, floor **230 / 171 / 34 / 646**. A1 stays
 invalid and is not retrospectively repaired or re-read.
+
+## R-225 independent Mia metadata diagnostic 2 — launched — 2026-09-27
+
+Owner requested continuation ("try again?"). R225's three failed Codex
+attempts remain exhausted; this is one separately attributed Mia diagnostic,
+not A4 or a new candidate. Existing private project **37017548**, backtest
+**`21158b807cfa8f45ef50a0e14b90ffbc`**, snapshot **37046054**, created
+2026-09-27 17:41:46 UTC. Same 2021-01-04–2025-12-31 AR-off economic path;
+expected original QCOM missing-price refusal, no automatic retry.
+Only `main.py` adds bounded simulated-clock/cache/current-slice metadata:
+SHA **`c523a4629c994935a8db7e00819a4c3f3bd866a1d34da92f369d559bebe0180f`**,
+19,816 bytes; other sixteen files unchanged. Exact source was attested
+before launch and reverified after it. No extra History request, replacement
+price, selection/exposure/order/fee change or result-statistic call. Focused
+actual-source checks and independent audit passed; original exception stays.
+Period metadata rounds seconds, observer capture lacks a separate SID filter,
+and the output cap is appended-only; none weakens the authoritative guard.
+Inspect terminal/error and metadata only; no performance/order/log read.
+Conservatively another development look: **230 -> 231 shared / 171 -> 172
+development / 34 infrastructure / 646 cells**. No valid cell or stock spread.
+
+Terminal: `Runtime Error` at **2022-10-03 16:00**, preserving the original
+refusal. Bounded metadata confirms the cached same-SID, non-fill-forward
+TradeBar is **2022-09-30 15:59–16:00**, not Monday's closing minute;
+algorithm and current-slice clocks both equal Monday 16:00. No timezone
+equality problem or daily-period cache overwrite is established. A diagnostic
+`AttributeError` occurs before subscription/slice details complete; source
+uses `config.fill_forward`, while LEAN exposes `FillDataForward`. That is a
+diagnostic-reader defect, not permission to accept the stale reference.
+API retained only terminal/error and parsed metadata, discarding other
+response fields. The native automatic error/result view subsequently exposed
+invalid partial performance and terminal log text during Mia navigation;
+both are excluded and no custom result read or valid cell is claimed. This
+run is not represented as wholly outcome-unseen. Floor **231 / 172 / 34 / 646**.
+
+## R-225 independent Mia metadata diagnostic 3 — launched — 2026-09-27
+
+Same exhausted R225 candidate, private project **37017548**; not a fourth
+Codex attempt. Mia independently launched one run
+**`9a695522aa929d3fcc104e32f14b2dac`**, snapshot **37046837**, created
+**2026-09-27 18:01:35 UTC**, named
+`ARV2 R225 Mia metadata diagnostic3 2021 2025`.
+`main.py` SHA **`ba9a221b2babc77b64df54e7930503aee5b78a9a4eceba6a1ec7733641892f70`**,
+21,647 ASCII bytes; other sixteen files unchanged. Fixes only metadata-reader
+CLR property names, collector isolation and exact period comparison; adds
+a post-refusal one-minute RAW/non-fill-forward History probe, at most two
+missing securities, timestamp/count/identity output only. Probe prices never
+enter valuation or orders. Original refusal and economic path remain intact.
+No performance/order/log inspection or automatic retry requested. Prelaunch
+source attested; focused actual-source checks and independent audit passed.
+Conservative development look: **231 -> 232 shared / 172 -> 173 development /
+34 infrastructure / 646 cells**. Expected refusal is diagnostic evidence,
+not a valid stock result or matched spread; zero new accepted cells.
+
+Terminal: expected original `Runtime Error` at 2022-10-03 16:00. All
+diagnostic collectors complete: same-SID cached bar is still Sep30;
+Oct3 current slice and 15:59 observer contain no QCOM TradeBar. Both
+TradeBar/QuoteBar subscriptions are RAW minute, regular hours, fill-forward
+off. The one exact 15:59–16:00 RAW minute History probe returns zero bars
+without exception. The 16:00 `OnData` observer has not run at the scheduled
+refusal. This establishes absence in the requested paths, not dataset-wide
+absence or a safe stale-price substitute. Source inventory/timestamps match
+the prelaunch pin. Bounded terminal/error metadata retained privately;
+performance/custom-statistic/order/log response fields discarded. No native
+result view revisited. No accepted cell, altered study economics or stock
+spread; floor **232 / 173 / 34 / 646**. Stock arms remain held.

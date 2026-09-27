@@ -752,9 +752,19 @@ at most three attempts; Codex uses focused checks, not a full suite. Claude
 reviews section 199 and the preceding implementation after the one combined
 push; Codex then counter-reviews that exact review. Standing research authorization
 remains; no new broker/live/paper or trading authority is inferred.
-Both are now valid on A1: AR-off +53.76558%, AR-on +53.65121%,
+Continuation in 199.9–199.10 re-accessed Mia and measured the stock blocker:
+QCOM's Oct3,2022 reference is absent in the requested exact RAW closing-minute
+paths, with a stale Sep30 cache correctly refused. No valid stock arm exists;
+R227/R230 ETF controls remain valid. Current look floor **232 / 173 / 34 / 646**.
+Claude's test-only closure correction `c0f3e87` is accepted in focused
+counter-review, but its full review/push is not yet confirmed. Preserve that
+concurrent review work and defer the final push; next investigate bounded
+same-SID session availability/mapping, not an identical performance retry.
+
+Earlier recent-window R223/R224 were both valid on A1:
+AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
-match, while stock counts/weights intentionally differ. Current floor is
+match, while stock counts/weights intentionally differ. Their closing floor was
 222/163/34/644. This window does not demonstrate incremental net AR return;
 no fully independent security-master, new ETF benchmark, formal alpha or
 production claim follows. Review focuses on source-mode separation, preserved
@@ -27767,3 +27777,228 @@ broker, paper/live deployment or real trading. Shared `alpha-result.md`
 changes are limited to owner-authorized bookkeeping. One final successful
 lane push hands off this honest partial round; unlock and reference-source
 evidence, not another permission waiver, are the continuation requirements.
+
+### 199.9 Owner-requested Mia continuation — 2026-09-27
+
+Owner: **"try again?"** Native authenticated Safari is accessible again.
+The designated lane was fetched; `HEAD` and remote both remain `0eedef3`,
+so no new Claude commit is available for counter-review. R225's three
+Codex attempts remain exhausted. Mia is preparing an independently attributed
+metadata-only diagnostic in existing project **37017548**; Codex has not
+called a launch endpoint, reset a slot or created a candidate alias.
+
+The first retrieved Mia draft adds observation/refusal metadata in `main.py`
+only; the other sixteen source contents equal the attested first recovery.
+It has **not been launched or accepted**. Review requested removal of its
+minute-History probe, use of simulated local/UTC clocks instead of machine
+wall time, each original timestamp predicate separately, current-slice time,
+at most two missing entries/eight subscription configurations, a 6,000-byte
+diagnostic bound and fixed error labels rather than exception `repr` values.
+The original missing-price refusal, actual simulated orders and all strategy
+economics must remain unchanged. Compilation does not establish runtime
+diagnostic correctness. Source retrieval and behavioral checks precede any
+request for Mia to run this diagnostic.
+
+Primary-source correction: `SecurityCache` uses the **OR** condition
+`_lastQuoteBarUpdate != data.EndTime || _lastOHLCUpdate != data.EndTime`.
+A last-OHLC timestamp tie alone does not suppress updates when there is no
+same-time quote. Therefore the proposed dual-subscription/cache-overwrite
+mechanism is not established. Ordinary `AlgorithmManager` processing assigns
+`CurrentSlice`, updates caches and then calls `realtime.SetTime`, before
+`OnData`; catch-up `ScanPastEvents` runs before those assignments. Metadata
+must compare the current slice's clock explicitly and label an `OnData`
+observer's clock independently. With `daily_precise_end_time=true`, daily
+bars normally use exchange open/close timestamps, not necessarily the legacy
+midnight-to-midnight convention. These engine facts are not a measurement
+of QCOM's actual cached bar.
+
+Sources inspected: official LEAN
+[SecurityCache](https://github.com/QuantConnect/Lean/blob/master/Common/Securities/SecurityCache.cs),
+[AlgorithmManager](https://github.com/QuantConnect/Lean/blob/master/Engine/AlgorithmManager.cs),
+[BacktestingRealTimeHandler](https://github.com/QuantConnect/Lean/blob/master/Engine/RealTime/BacktestingRealTimeHandler.cs),
+[AlgorithmSettings](https://github.com/QuantConnect/Lean/blob/master/Common/AlgorithmSettings.cs)
+and [LeanData](https://github.com/QuantConnect/Lean/blob/master/Common/Util/LeanData.cs).
+The failure's
+cause remains unmeasured; no fresh price is authorized merely by labeling
+it a daily bar or a prior callback. Valid R227/R230 controls are unchanged.
+
+Retrieved final diagnostic `main.py`:
+**`c523a4629c994935a8db7e00819a4c3f3bd866a1d34da92f369d559bebe0180f`**,
+**19,816 ASCII bytes**; all other sixteen files equal the first recovery.
+Exact private source and seventeen-file prelaunch attestation are retained as
+`R225-MIA-diagnostic2-source-main.py` and
+`R225-MIA-diagnostic2-prelaunch-source.json` in the existing control directory.
+Nine actual-retrieved-source behavioral/static cases passed; independent
+read-only audit passed seven additional cases. The same exception object is
+re-raised, unrelated exceptions are untouched, and no History, order,
+price-replacement or result/statistic call was added. Existing Mia recovery
+reader selection: **40 passed**, not a full lane suite.
+
+Diagnostic limitations explicitly retained, not acceptance-rule changes:
+the metadata period comparison rounds total seconds (60.5 can report 60),
+while the real price guard still compares exact timedeltas; `OnData` capture
+has no separate configured-SID/count filter; the 5,900-byte reduction applies
+to the appended JSON, not the combined original refusal. The known single
+missing-QCOM diagnostic is approved narrowly; do not call those generic
+strict guarantees or use its rounded flag to admit a mark. Oversized metadata
+reduces to value-free counts instead of dropping the original refusal.
+
+Mia was asked to independently launch **exactly one** run named
+`ARV2 R225 Mia metadata diagnostic2 2021 2025`, in the same project, with
+no further source edits, automatic retry or performance/order/log inspection.
+Its expected original refusal is a metadata measurement, not a successful
+stock result. Launch must be confirmed by read-only inventory before adding
+the shared look entry; R225 A1/A2/A3 and recovery-one artifacts stay immutable.
+
+Launch confirmed: backtest **`21158b807cfa8f45ef50a0e14b90ffbc`**, snapshot
+**37046054**, created **2026-09-27 17:41:46 UTC**, initially `In Progress...`.
+Exact source reverified after creation; modification times precede creation.
+Private `R225-MIA-diagnostic2-evidence.json` binds the independent origin,
+seventeen-file inventory and no performance-read permission. Conservatively
+one development look recorded in the owner-authorized shared ledger:
+**231 shared / 172 development / 34 infrastructure / 646 cells**.
+Three Codex slots remain spent, zero new accepted cells; terminal/error-only
+inspection follows. The diagnostic is not a QCOM price-source correction.
+
+Terminal/error-only read confirms expected `Runtime Error` at Monday
+**2022-10-03 16:00**. The cached QCOM TradeBar is Friday **2022-09-30
+15:59–16:00**, 60 seconds, same SID, non-fill-forward. Algorithm local
+clock/current slice both equal Monday 16:00, UTC 20:00. Thus the exact guard
+correctly refuses a prior-session mark: date, EndTime and start-minute
+comparisons are false. This is not a measured daily-bar period overwrite or
+clock equality failure. No claim that QC has no Monday QCOM data is yet
+established. Private terminal/error and parsed metadata alone are retained
+from the API; its response's performance/statistic/order/log fields were
+discarded. On returning to Mia, QC's native automatically opened error view
+again exposed invalid partial performance and terminal log text. These are
+excluded; do not describe this run as wholly outcome-unseen or use the
+partial performance for selection. `ARV2D199-003` therefore recurred.
+
+Mia's diagnostic hits `AttributeError` before subscription/observer/current-
+slice bar details are emitted. Its subscription reader uses
+`config.fill_forward`; official LEAN
+[SubscriptionDataConfig](https://github.com/QuantConnect/Lean/blob/master/Common/Data/SubscriptionDataConfig.cs)
+defines `FillDataForward` (snake-case `fill_data_forward`), not that alias.
+The error type alone does not identify the exact access, but the retrieved
+reader contains this verified defect. Any subsequent diagnostic must use
+the real property and isolate each metadata collector so one failure cannot
+hide the other collectors. R225 remains exhausted for Codex; the result is
+partial diagnostic evidence, not a valid study arm. No accepted cell added;
+floor remains **231 / 172 / 34 / 646**.
+
+Diagnostic3 prepared and compile-checked by Mia, then retrieved and reviewed:
+`main.py` SHA **`ba9a221b2babc77b64df54e7930503aee5b78a9a4eceba6a1ec7733641892f70`**,
+**21,647 ASCII bytes**; other sixteen source files unchanged. The real CLR
+subscription properties are used, each collector is independently isolated,
+current-slice bars are collected before subscription metadata, and the
+minute-period metadata now compares exact timedeltas. A post-refusal typed
+RAW `History[TradeBar]` probe requests only the immediately preceding minute,
+without fill-forward or extended hours. It reports count/timestamp/identity
+metadata, never prices, and does not supply valuation or order inputs. At
+most two missing securities mean at most two extra one-minute History calls;
+the known failing context has one. The original refusal remains raised.
+
+Seven actual-source focused checks and six independent fake-interface cases
+passed, including CLR-only properties, 60.5-second rejection, exact History
+arguments, collector isolation and original-exception preservation. These
+are interface checks, not proof of actual cloud minute availability. Private
+source and seventeen-file prelaunch attestation are retained under
+`R225-MIA-diagnostic3-*`. Appended-only output cap and unfiltered `OnData`
+observer limitations remain explicitly unchanged.
+
+Mia requested to launch **one** independently attributed diagnostic3 in
+the same R225 project with the attested source, no further edits, retries,
+performance/order/log inspection or stale-price admission. Launch inventory
+confirmation is required before recording a new look; no fourth Codex slot,
+accepted cell or production correction is inferred from this request.
+
+Launch confirmed: **`9a695522aa929d3fcc104e32f14b2dac`**, snapshot
+**37046837**, created **2026-09-27 18:01:35 UTC**. Exact seventeen-file
+inventory equals its prelaunch attestation; every source modification
+precedes creation (parsed datetime comparisons). Private evidence binds
+the independent Mia origin and maximum two extra one-minute probes.
+Shared bookkeeping conservatively adds one development look:
+**232 shared / 173 development / 34 infrastructure / 646 cells**.
+
+Terminal/error-only inspection: original `Runtime Error` at **2022-10-03
+16:00**. Diagnostic3 successfully reports every collector. QCOM remains
+cached at Friday 2022-09-30 15:59–16:00; Monday's current slice has no
+same-SID TradeBar. The Monday 15:59 observer also records no QCOM bar;
+the 16:00 `OnData` observer has not yet run, so that absence is not a
+claim about its eventual callback. Two live subscription configurations
+are `MINUTE`, `RAW`, non-fill-forward, regular hours: TradeBar and QuoteBar.
+The exact typed RAW **15:59–16:00** History request returns **zero bars**,
+with no probe exception. Eight metadata assertions passed. No raw prices,
+orders, logs, custom summary or performance result was inspected through
+the API; all response fields outside bounded terminal/error metadata were
+discarded. No native results view was revisited after this run.
+
+**Interpretation:** this proves missing data in the requested daily/cached/
+current-slice/exact-minute paths, not the absence of QCOM data across the
+whole QC dataset or every possible timestamp/mapping request. It refutes
+the proposed simple cache timestamp-overwrite fix in this measured context.
+Correctly configured subscriptions alone do not make a fresh reference
+available. The exact-minute fallback cannot solve this session either.
+No stale-price, dropped-holding or altered-selection workaround is ported.
+The outstanding issue remains `ARV2D199-002` P2, open; the diagnostic-reader
+property/collector defects are corrected in private Mia evidence only,
+not a production strategy fix or new accepted stock cell.
+
+**Next step:** obtain a QC data/mapping correction or independently verified
+fresh same-session RAW source before resuming the stock arms. A broader
+valuation/missing-price policy would change the study and needs prospective
+versioning and comparability disclosure; no such policy is silently adopted.
+R225's three Codex attempts remain exhausted. R226 has two slots left;
+R228/R229 are unlaunched, held against the known failing reference path.
+R227/R230 are valid controls and must not be rerun merely to conceal this
+blocker. No claim of stock/AR attribution is possible from the ETF controls.
+
+### 199.10 Focused counter-review and continuation handoff
+
+Concurrent local Claude commit **`c0f3e87c36de2dc45690eb350add847ab9c372c0`**
+appeared atop **`0eedef314c35493d55e76ba5d7e91bc862c66605`** before Codex
+staging. The expected-HEAD check stopped the commit without staging anything.
+Remote remained `0eedef3`; do not infer that Claude's complete review has
+finished or publish its unpushed review work. Review range for this correction:
+**`0eedef3..c0f3e87`**, one commit, **accepted**. It adds the missing
+`matched_mia_recovery.py` inventory/import/direct-surface/reached entries
+to the whole-package closure test; other boundary and zero-I/O pins are
+unchanged. Whitespace wrapping is semantically inert. Host-only classification
+is correct: delegated QC/filesystem I/O is not zero-I/O authority merely
+because the direct scanner surface is empty. Independent semantic audit agrees.
+
+Finding **ARV2CR199-001**, P3, corrected by `c0f3e87`: the previous focused
+selection missed a stale whole-package registry. The reader was already
+host-only in production, but its registration test did not pass. Acceptance
+of this correction does not mean acceptance of an unfinished full review.
+Validation now: complete affected closure **file**, **74 passed in 48.50 s**;
+independent exact closure case **1 passed in 3.18 s**; lane-record integrity
+**13 passed in 0.67 s**. Earlier continuation checks: Mia recovery reader
+**40 passed**, diagnostic2 nine root/seven independent cases, diagnostic3
+seven root/six independent cases. These are focused selections, not a full
+lane/repository suite. Final document checks are required after this note.
+
+**Review focus:** verify the two independent Mia launch identities and
+seventeen-file prelaunch pins, immutable exhausted Codex receipts, timestamp
+comparisons, bounded error-only reads, extra-minute-call census, and shared
+look floor **232 / 173 / 34 / 646**. Check the limited missing-data inference,
+diagnostic2 native partial-performance exposure exclusion, and that neither
+diagnostic admits stale prices or counts as a successful stock arm. All new
+tracked changes in this continuation are lane notes and authorized shared
+bookkeeping; private retrieved source/evidence remain ignored. No production
+code, frozen study profile/input, outcome validator or economic rule changed.
+
+**Remaining blocker/next action:** stock study still lacks an admissible
+QCOM closing reference on Oct3,2022. Bounded same-SID whole-session and
+neighbor-session availability metadata, or a QC data-ticket draft, would
+help distinguish a mapping issue from a data gap; dataset-wide absence is
+not established here. Do not repeat the identical performance run or treat
+ETF controls as a stock/AR verdict. Preserve Claude's in-progress local work;
+one final lane push remains deferred until its review push/state is resolved.
+No live/paper/broker access, real orders, new permissions, other lane/worktree,
+shared behavior or root Action Plan/Handoff changes.
+
+Final continuation document validation: record integrity **13 passed in
+0.62 s**, `git diff --check` clean. Source correction `c0f3e87` remains
+local-only at this check; remote is still `0eedef3`. Commit only Codex-owned
+documentation/bookkeeping now, without pushing Claude's unfinished series.

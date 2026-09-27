@@ -1,0 +1,592 @@
+"""Synthetic-only refusal and crash-boundary tests for the fixed SEC pilot.
+
+Every network response and prior-source candidate in this file is invented.
+No test reads the approved external ZIPs or connects to SEC.
+"""
+from __future__ import annotations
+
+import json
+import os
+from pathlib import Path
+
+import pytest
+
+from data.hashing import hash_bytes, hash_payload
+from research import insider_buying_sec_acquisition as pilot
+
+
+CONTACT = "synthetic-contact@example.invalid"
+COMMIT = "c" * 40
+ZIP_HASH = "a" * 64
+ROW_HASH = "b" * 64
+ISSUER_CIK = "0000123456"
+INDEX = b'{"directory":{"item":[{"name":"ownership.xml"}]}}'
+
+
+def _candidates() -> tuple[pilot.SecPilotCandidate, ...]:
+    items = []
+    for year, quarter, filing_date in (
+        (2022, 4, "2022-11-07"), (2023, 1, "2023-03-13"),
+    ):
+        for ordinal in range(1, 9):
+            accession = f"0000999999-{year % 100:02d}-{ordinal:06d}"
+            items.append(pilot.SecPilotCandidate(
+                period=f"{year}Q{quarter}", accession_number=accession,
+                form_type="4" if ordinal <= 6 else "4/A",
+                filing_date_raw="07-NOV-2022" if year == 2022 else "13-MAR-2023",
+                filing_date=filing_date, issuer_cik=ISSUER_CIK,
+                quarterly_zip_sha256=ZIP_HASH, submission_row_id=ROW_HASH,
+                raw_snapshot_id="synthetic-only", raw_lineage_sha256="d" * 64,
+            ))
+    return tuple(items)
+
+
+def _header(candidate: pilot.SecPilotCandidate, *, wrong_accession: bool = False) -> bytes:
+    accession = "0000999999-22-999999" if wrong_accession else candidate.accession_number
+    accepted = "20221107101112" if candidate.period == "2022Q4" else "20230313101112"
+    return (
+        "<SEC-HEADER>\n"
+        f"ACCESSION NUMBER: {accession}\n"
+        f"CONFORMED SUBMISSION TYPE: {candidate.form_type}\n"
+        f"FILED AS OF DATE: {candidate.filing_date.replace('-', '')}\n"
+        f"<ACCEPTANCE-DATETIME>{accepted}\n"
+        "ISSUER:\n COMPANY DATA:\n  CENTRAL INDEX KEY: 123456\n"
+        "REPORTING-OWNER:\n COMPANY DATA:\n  CENTRAL INDEX KEY: 999999\n"
+        "</SEC-HEADER>\n"
+    ).encode("ascii")
+
+
+def _xml(candidate: pilot.SecPilotCandidate) -> bytes:
+    return (
+        "<ownershipDocument>"
+        f"<documentType>{candidate.form_type}</documentType>"
+        "<issuer><issuerCik>0000123456</issuerCik></issuer>"
+        "</ownershipDocument>"
+    ).encode("ascii")
+
+
+@pytest.fixture
+def synthetic_run(monkeypatch, tmp_path):
+    root = tmp_path.resolve()
+    source = root / "source"
+    prior = root / "prior"
+    output = root / "output"
+    source.mkdir()
+    prior.mkdir()
+    candidates = _candidates()
+    monkeypatch.setattr(pilot, "select_fixed_pilot", lambda *args: candidates)
+    monkeypatch.setattr(pilot, "MIN_REQUEST_INTERVAL_SECONDS", 0)
+    return source, prior, output, candidates
+
+
+def _fake_fetch(candidates, *, wrong_header_for=None):
+    called = []
+
+    def fetch(path, user_agent):
+        assert path.startswith("/Archives/edgar/data/123456/")
+        assert user_agent == f"InsiderBuyingResearch/0.1 ({CONTACT})"
+        called.append(path)
+        candidate = next(item for item in candidates if path.startswith(item.archive_path))
+        if path == candidate.archive_path + "index.json":
+            return 200, INDEX
+        if path == candidate.archive_path + candidate.accession_number + ".hdr.sgml":
+            return 200, _header(candidate, wrong_accession=candidate.accession_number == wrong_header_for)
+        if path == candidate.archive_path + "ownership.xml":
+            return 200, _xml(candidate)
+        pytest.fail(f"unapproved path: {path}")
+
+    return fetch, called
+
+
+def _run(inputs):
+    source, prior, output, _ = inputs
+    return pilot.run_fixed_sec_pilot(
+        source, prior, output, contact_email=CONTACT, capture_git_commit=COMMIT,
+    )
+
+
+def test_synthetic_success_uses_exact_three_routes_per_frozen_candidate_and_zero_authority(
+    monkeypatch, synthetic_run,
+):
+    source, prior, output, candidates = synthetic_run
+    fetch, called = _fake_fetch(candidates)
+    monkeypatch.setattr(pilot, "_fetch_sec", fetch)
+    report = _run(synthetic_run)
+    payload = json.loads(report.read_bytes())
+    assert payload["kind"] == pilot.PILOT_VERSION
+    assert payload["inventory_sha256"] == hash_payload([item.to_payload() for item in candidates])
+    assert payload["attempt_count"] == payload["distinct_artifact_count"] == 48
+    assert len(called) == 48 == len(set(called))
+    assert len(payload["rows"]) == 16
+    assert all(row["status"] == "acquired_noncanonical" for row in payload["rows"])
+    assert payload["acquisition_available"] is True
+    assert all(row["primary_xml_filename"] == "ownership.xml" for row in payload["rows"])
+    assert all(row["header_projection"]["authority"]["direct_ib1c_ingest_authorized"] is False
+               for row in payload["rows"])
+    assert payload["canonical"] is False
+    assert payload["point_in_time_data"] is False
+    assert payload["direct_ib1c_ingest_authorized"] is False
+    assert payload["index_route_version"] == pilot.INDEX_ROUTE_VERSION
+    assert payload["research_looks"] == payload["authorized_outcome_looks"] == payload["consumed_outcome_looks"] == 0
+    for candidate in candidates:
+        assert candidate.archive_path + "index.json" in called
+        assert candidate.archive_path + candidate.accession_number + ".hdr.sgml" in called
+        assert candidate.archive_path + "ownership.xml" in called
+    assert (output / "commit.json").is_file()
+    assert CONTACT.encode() not in b"".join(path.read_bytes() for path in output.rglob("*") if path.is_file())
+    journal = [json.loads(line) for line in (output / "attempts.jsonl").read_text().splitlines()]
+    assert [event["ordinal"] for event in journal if event["kind"] == "attempt-reserved"] == list(range(1, 49))
+    assert journal[-1] == {
+        "kind": "pilot-finished", "attempts": 48, "distinct_artifacts": 48,
+        "inventory_sha256": payload["inventory_sha256"],
+    }
+
+
+def test_inventory_is_persisted_and_hash_bound_before_first_request(monkeypatch, synthetic_run):
+    source, prior, output, candidates = synthetic_run
+
+    def interrupt_at_first_request(path, user_agent):
+        # This interruption simulates a process death after its first durable
+        # attempt reservation. The frozen source inventory must already exist.
+        raise KeyboardInterrupt("synthetic crash before network")
+
+    monkeypatch.setattr(pilot, "_fetch_sec", interrupt_at_first_request)
+    with pytest.raises(KeyboardInterrupt):
+        _run(synthetic_run)
+    inventory_path = output / "inventory.json"
+    assert inventory_path.is_file()
+    inventory = json.loads(inventory_path.read_bytes())
+    assert inventory["inventory_sha256"] == hash_payload([item.to_payload() for item in candidates])
+    assert inventory["candidates"] == [item.to_payload() for item in candidates]
+    assert inventory["index_route_version"] == pilot.INDEX_ROUTE_VERSION
+    assert not (output / "commit.json").exists()
+    journal = [json.loads(line) for line in (output / "attempts.jsonl").read_text().splitlines()]
+    assert journal[0]["kind"] == "attempt-reserved"
+    assert journal[0]["ordinal"] == 1
+
+
+def test_header_identity_refusal_quarantines_only_that_accession(monkeypatch, synthetic_run):
+    _, _, output, candidates = synthetic_run
+    bad = candidates[0].accession_number
+    fetch, called = _fake_fetch(candidates, wrong_header_for=bad)
+    monkeypatch.setattr(pilot, "_fetch_sec", fetch)
+    report = _run(synthetic_run)
+    payload = json.loads(report.read_bytes())
+    assert len(payload["rows"]) == 16
+    assert payload["rows"][0]["status"] == "quarantined"
+    assert payload["rows"][0]["reason"].startswith("REFUSED:")
+    assert payload["rows"][0]["artifacts"]["header"]["sha256"] == hash_bytes(
+        _header(candidates[0], wrong_accession=True)
+    )
+    assert "xml" not in payload["rows"][0]["artifacts"]
+    assert "header_projection" not in payload["rows"][0]
+    assert all(row["status"] == "acquired_noncanonical" for row in payload["rows"][1:])
+    assert payload["acquisition_available"] is False
+    assert candidates[0].archive_path + "ownership.xml" not in called
+    assert len(called) == 47
+    assert (output / "commit.json").is_file()
+
+
+def test_sec_403_stops_all_further_requests_and_retains_unattempted_rows(monkeypatch, synthetic_run):
+    _, _, output, candidates = synthetic_run
+    called = []
+
+    def denied(path, user_agent):
+        called.append(path)
+        return 403, b"denied"
+
+    monkeypatch.setattr(pilot, "_fetch_sec", denied)
+    report = _run(synthetic_run)
+    payload = json.loads(report.read_bytes())
+    assert called == [candidates[0].archive_path + "index.json"]
+    assert payload["halted_on_sec_access"] is True
+    assert payload["attempt_count"] == payload["distinct_artifact_count"] == 1
+    assert len(payload["rows"]) == 16
+    assert all(row["status"] == "quarantined" for row in payload["rows"])
+    assert payload["acquisition_available"] is False
+    assert all(row["reason"] == "not attempted after SEC access stop" for row in payload["rows"][1:])
+    assert (output / "commit.json").is_file()
+
+
+def test_exhausted_sec_503_stops_entire_pilot_after_three_attempts(monkeypatch, synthetic_run):
+    _, _, _, candidates = synthetic_run
+    called = []
+    monkeypatch.setattr(pilot, '_fetch_sec', lambda path, agent: (called.append(path) or (503, b'')))
+    monkeypatch.setattr(pilot.time, 'sleep', lambda _: None)
+    report = _run(synthetic_run)
+    payload = json.loads(report.read_bytes())
+    assert called == [candidates[0].archive_path + 'index.json'] * 3
+    assert payload['halted_on_sec_access'] is True
+    assert payload['attempt_count'] == 3
+    assert payload['rows'][0]['status'] == 'quarantined'
+    assert '503' in payload['rows'][0]['reason']
+    assert all(row['reason'] == 'not attempted after SEC access stop' for row in payload['rows'][1:])
+
+
+def test_first_response_framing_refusal_stops_entire_pilot(monkeypatch, synthetic_run):
+    called = []
+
+    class Response:
+        status = 200
+
+        def getheaders(self):
+            return [('Transfer-Encoding', 'chunked')]
+
+    class Connection:
+        def __init__(self, host, timeout):
+            assert host == 'www.sec.gov'
+
+        def request(self, method, path, headers):
+            called.append(path)
+
+        def getresponse(self):
+            return Response()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(pilot.http.client, 'HTTPSConnection', Connection)
+    report = _run(synthetic_run)
+    payload = json.loads(report.read_bytes())
+    assert called == [synthetic_run[3][0].archive_path + 'index.json']
+    assert payload['halted_on_sec_access'] is True
+    assert payload['attempt_count'] == 1
+    assert 'Content-Length' in payload['rows'][0]['reason']
+    assert all(row['reason'] == 'not attempted after SEC access stop' for row in payload['rows'][1:])
+
+
+def test_redirect_has_no_fallback_or_xml_fetch(monkeypatch, synthetic_run):
+    _, _, _, candidates = synthetic_run
+    called = []
+
+    def redirect(path, user_agent):
+        called.append(path)
+        return 302, b"redirect"
+
+    monkeypatch.setattr(pilot, "_fetch_sec", redirect)
+    report = _run(synthetic_run)
+    payload = json.loads(report.read_bytes())
+    assert len(called) == 16
+    assert set(called) == {item.archive_path + "index.json" for item in candidates}
+    assert all(row["status"] == "quarantined" for row in payload["rows"])
+
+
+def test_attempt_is_fsynced_before_transport_and_network_errors_never_reset_budget(monkeypatch, tmp_path):
+    output = tmp_path.resolve()
+    journal = pilot._Journal(output)
+    monkeypatch.setattr(pilot, "MIN_REQUEST_INTERVAL_SECONDS", 0)
+    calls = []
+    fsync_calls = []
+    real_fsync = os.fsync
+
+    def fsync(fd):
+        fsync_calls.append(fd)
+        return real_fsync(fd)
+
+    def failing_fetch(path, user_agent):
+        calls.append(path)
+        rows = [json.loads(line) for line in (output / "attempts.jsonl").read_text().splitlines()]
+        assert rows[-1]["kind"] == "attempt-reserved"
+        assert rows[-1]["ordinal"] == len(calls)
+        assert len(fsync_calls) >= len(calls)
+        raise OSError("synthetic transport failure")
+
+    monkeypatch.setattr(pilot.os, "fsync", fsync)
+    monkeypatch.setattr(pilot, "_fetch_sec", failing_fetch)
+    monkeypatch.setattr(pilot.time, "sleep", lambda _: None)
+    try:
+        with pytest.raises(pilot.SecPilotError, match="exhausted bounded transport retries"):
+            journal.fetch("/Archives/edgar/data/123456/000099999922000001/index.json", "synthetic")
+    finally:
+        journal.close()
+    assert len(calls) == journal.count == 3
+    assert len(journal.distinct) == 1
+    with pytest.raises(FileExistsError):
+        pilot._Journal(output)
+
+
+def test_attempt_and_distinct_ceiling_refuse_before_transport(monkeypatch, tmp_path):
+    journal = pilot._Journal(tmp_path.resolve())
+    monkeypatch.setattr(pilot, "_fetch_sec", lambda *args: pytest.fail("transport reached"))
+    try:
+        journal.count = 144
+        with pytest.raises(pilot.SecPilotError, match="144-attempt ceiling"):
+            journal.fetch("/Archives/edgar/data/123456/000099999922000001/index.json", "synthetic")
+        assert journal.count == 144
+        journal.count = 0
+        journal.distinct.clear()
+        journal.distinct.update(f"synthetic-{index}" for index in range(48))
+        with pytest.raises(pilot.SecPilotError, match="48-distinct-artifact ceiling"):
+            journal.fetch("/Archives/edgar/data/123456/000099999922000001/index.json", "synthetic")
+        assert len(journal.distinct) == 48
+    finally:
+        journal.close()
+
+
+def test_same_path_retry_budget_cannot_reset_between_fetch_calls(monkeypatch, tmp_path):
+    journal = pilot._Journal(tmp_path.resolve())
+    monkeypatch.setattr(pilot, 'MIN_REQUEST_INTERVAL_SECONDS', 0)
+    monkeypatch.setattr(pilot.time, 'sleep', lambda _: None)
+    called = []
+
+    def unavailable(path, user_agent):
+        called.append(path)
+        raise OSError('synthetic persistent failure')
+
+    monkeypatch.setattr(pilot, '_fetch_sec', unavailable)
+    path = '/Archives/edgar/data/123456/000099999922000001/index.json'
+    try:
+        with pytest.raises(pilot.SecPilotError):
+            journal.fetch(path, 'synthetic')
+        with pytest.raises(pilot.SecPilotError):
+            journal.fetch(path, 'synthetic')
+        assert len(called) == journal.count == 3
+        assert journal.distinct == {path}
+    finally:
+        journal.close()
+
+
+def test_attempt_journal_creation_fsyncs_directory_before_request(monkeypatch, tmp_path):
+    synced_modes = []
+    original = os.fsync
+
+    def fsync(fd):
+        synced_modes.append(os.fstat(fd).st_mode)
+        return original(fd)
+
+    monkeypatch.setattr(pilot.os, 'fsync', fsync)
+    journal = pilot._Journal(tmp_path.resolve())
+    try:
+        assert any(__import__('stat').S_ISDIR(mode) for mode in synced_modes)
+    finally:
+        journal.close()
+
+
+def test_replaced_output_root_prevents_next_network_attempt(monkeypatch, tmp_path):
+    output = tmp_path / 'output'
+    output.mkdir()
+    journal = pilot._Journal(output)
+    moved = tmp_path / 'moved'
+    output.rename(moved)
+    output.mkdir()
+    monkeypatch.setattr(pilot, '_fetch_sec', lambda *args: pytest.fail('network reached after root replacement'))
+    try:
+        with pytest.raises((pilot.SecPilotError, OSError), match='root|directory|changed'):
+            journal.fetch('/Archives/edgar/data/123456/000099999922000001/index.json', 'synthetic')
+    finally:
+        journal.close()
+
+
+def test_report_and_commit_final_names_not_visible_before_fsync(monkeypatch, tmp_path):
+    output = tmp_path.resolve()
+    monkeypatch.setattr(pilot.os, 'fsync', lambda fd: (_ for _ in ()).throw(OSError('synthetic fsync failure')))
+    with pytest.raises(OSError, match='synthetic fsync failure'):
+        pilot._write_commit_last(output, {'kind': 'synthetic-only'})
+    assert not list(output.glob('sec-pilot-report-*.json'))
+    assert not (output / 'commit.json').exists()
+
+
+def test_immutable_object_name_is_not_published_before_successful_fsync(monkeypatch, tmp_path):
+    output = tmp_path.resolve()
+    (output / "objects").mkdir()
+    raw = b"synthetic raw object"
+    name = output / "objects" / f"{hash_bytes(raw)}.bin"
+
+    def failed_fsync(fd):
+        raise OSError("synthetic fsync failure")
+
+    monkeypatch.setattr(pilot.os, "fsync", failed_fsync)
+    with pytest.raises(OSError, match="synthetic fsync failure"):
+        pilot._store_object(output, raw)
+    assert not name.exists()
+
+
+def test_output_overlap_refuses_case_variant_alias_on_default_mac_volume(tmp_path):
+    root = tmp_path.resolve()
+    source = root / 'SyntheticSource'
+    prior = root / 'SyntheticPrior'
+    source.mkdir()
+    prior.mkdir()
+    alias = root / 'syntheticsource'
+    if not alias.exists() or not os.path.samefile(source, alias):
+        pytest.skip('test volume is case-sensitive; no case-variant alias exists')
+    output = alias / 'new-output'
+    with pytest.raises(pilot.SecPilotError, match='overlap'):
+        pilot._safe_roots(source, prior, output)
+    assert not output.exists()
+
+
+@pytest.mark.parametrize("raw, expected", [
+    ("07-NOV-2022", "2022-11-07"),
+    ("13-MAR-2023", "2023-03-13"),
+])
+def test_source_date_dialect_is_explicit(raw, expected):
+    assert pilot._filing_date(raw) == expected
+
+
+@pytest.mark.parametrize("raw", [
+    "2022-11-07", "7-NOV-2022", "07-Nov-2022", "31-FEB-2023",
+    "07-XYZ-2022", "07-NOV-2022\n", True,
+])
+def test_unapproved_source_date_refused(raw):
+    with pytest.raises(pilot.SecPilotError):
+        pilot._filing_date(raw)
+
+
+@pytest.mark.parametrize("index", [
+    b'{"directory":{"item":[{"name":"a.xml"},{"name":"b.xml"}]}}',
+    b'{"directory":{"item":[{"name":"xslF345X05.xml"}]}}',
+    b'{"directory":{"item":[{"name":"../ownership.xml"}]}}',
+    b'{"directory":{"item":[{"name":"https://evil.invalid/o.xml"}]}}',
+    b'{"directory":{"item":[{"name":"ownership.XML"}]}}',
+    b'{"directory":{"item":[{"name":"ownership.xml"}]},"directory":{}}',
+    b'{"directory":{"item":[{"name":"ownership.xml"},{"name":"ownership.xml"}]}}',
+    b'not json',
+])
+def test_index_refuses_ambiguous_or_unsafe_primary_xml(index):
+    with pytest.raises(pilot.SecPilotError):
+        pilot._primary_filename(index)
+
+
+def test_index_accepts_only_one_root_xml_item():
+    assert pilot._primary_filename(INDEX) == "ownership.xml"
+
+
+@pytest.mark.parametrize("raw", [
+    b'<ownershipDocument><documentType>4</documentType><documentType>4/A</documentType><issuer><issuerCik>123456</issuerCik></issuer></ownershipDocument>',
+    b'<ownershipDocument><documentType>4</documentType><issuer><issuerCik>123456</issuerCik><issuerCik>999999</issuerCik></issuer></ownershipDocument>',
+    b'<ownershipDocument><documentType>4</documentType><issuer><issuerCik>1234567890123456789012345678901234567890</issuerCik></issuer></ownershipDocument>',
+    b'<!DOCTYPE ownershipDocument [<!ENTITY x "4">]><ownershipDocument><documentType>&x;</documentType></ownershipDocument>',
+])
+def test_xml_refuses_conflicting_or_unbounded_identity(raw):
+    with pytest.raises(pilot.SecPilotError):
+        pilot._validate_xml(raw, _candidates()[0])
+
+
+def test_xml_refuses_utf16_entity_expansion_hidden_from_ascii_scan():
+    hostile = (
+        '<?xml version="1.0" encoding="utf-16"?>'
+        '<!DOCTYPE ownershipDocument [<!ENTITY injected "4">]>'
+        '<ownershipDocument><documentType>&injected;</documentType>'
+        '<issuer><issuerCik>123456</issuerCik></issuer></ownershipDocument>'
+    ).encode('utf-16')
+    with pytest.raises(pilot.SecPilotError, match='UTF-8|DTD|encoding'):
+        pilot._validate_xml(hostile, _candidates()[0])
+
+
+@pytest.mark.parametrize("headers, body", [
+    ([('Content-Length', str(2 * 1024 * 1024 + 1))], b''),
+    ([('Content-Length', '3'), ('content-length', '3')], b'abc'),
+    ([('Content-Length', '5')], b'abc'),
+    ([('Content-Encoding', 'gzip')], b'abc'),
+    ([('Transfer-Encoding', 'chunked')], b'abc'),
+    ([], b'abc'),
+])
+def test_transport_refuses_oversize_duplicate_truncated_or_compressed_body(monkeypatch, headers, body):
+    calls = []
+
+    class Response:
+        status = 200
+
+        def getheaders(self):
+            return headers
+
+        def read(self, limit):
+            calls.append(('read', limit))
+            return body[:limit]
+
+    class Connection:
+        def __init__(self, host, timeout):
+            assert host == 'www.sec.gov'
+            assert timeout <= 15
+            calls.append(('connect', host))
+
+        def request(self, method, path, headers):
+            assert method == 'GET'
+            assert headers['User-Agent'] == 'synthetic-agent'
+            assert headers['Accept-Encoding'] == 'identity'
+            calls.append(('request', path))
+
+        def getresponse(self):
+            return Response()
+
+        def close(self):
+            calls.append(('close',))
+
+    monkeypatch.setattr(pilot.http.client, 'HTTPSConnection', Connection)
+    with pytest.raises(pilot.SecPilotError):
+        pilot._fetch_sec('/Archives/edgar/data/123456/000099999922000001/index.json', 'synthetic-agent')
+    assert [call for call in calls if call[0] == 'request'] == [
+        ('request', '/Archives/edgar/data/123456/000099999922000001/index.json')
+    ]
+    assert all(call[1] <= pilot.MAX_BODY_BYTES for call in calls if call[0] == 'read')
+    assert calls[-1] == ('close',)
+
+
+def test_transport_reads_exact_declared_body_size_not_cap_plus_one(monkeypatch):
+    reads = []
+
+    class Response:
+        status = 200
+
+        def getheaders(self):
+            return [('Content-Length', '3')]
+
+        def read(self, limit):
+            reads.append(limit)
+            return b'abc'
+
+    class Connection:
+        def __init__(self, host, timeout):
+            assert host == 'www.sec.gov'
+
+        def request(self, method, path, headers):
+            assert method == 'GET'
+            assert headers['User-Agent'] == 'synthetic-agent'
+
+        def getresponse(self):
+            return Response()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(pilot.http.client, 'HTTPSConnection', Connection)
+    status, body = pilot._fetch_sec(
+        '/Archives/edgar/data/123456/000099999922000001/index.json',
+        'synthetic-agent',
+    )
+    assert (status, body) == (200, b'abc')
+    assert reads == [3]
+
+
+@pytest.mark.parametrize("path", [
+    'https://evil.invalid/Archives/edgar/data/123456/000099999922000001/index.json',
+    '/Archives/edgar/data/123456/000099999922000001/../other',
+    '/Archives/edgar/data/123456/000099999922000001/ownership.xml?x=1',
+    '/Archives/edgar/data/123456/000099999922000001/%2e%2e.xml',
+    '/Archives/edgar/data/123456/000099999922000001/xsl/owner.xml',
+])
+def test_transport_path_cannot_escape_exact_sec_host_or_accession_directory(monkeypatch, path):
+    monkeypatch.setattr(pilot.http.client, 'HTTPSConnection', lambda *args, **kwargs: pytest.fail('network object reached'))
+    with pytest.raises(pilot.SecPilotError):
+        pilot._fetch_sec(path, 'synthetic-agent')
+
+
+def test_contact_and_capture_validation_precede_any_source_io(monkeypatch, synthetic_run):
+    monkeypatch.setattr(pilot, 'select_fixed_pilot', lambda *args: pytest.fail('source I/O reached'))
+    source, prior, output, _ = synthetic_run
+    with pytest.raises(pilot.SecPilotError, match='identifying contact'):
+        pilot.run_fixed_sec_pilot(source, prior, output, contact_email='bad\nHeader: injected', capture_git_commit=COMMIT)
+    with pytest.raises(pilot.SecPilotError, match='capture commit'):
+        pilot.run_fixed_sec_pilot(source, prior, output, contact_email=CONTACT, capture_git_commit='C' * 40)
+    assert not output.exists()
+
+
+def test_runner_is_outside_provider_free_core_and_has_no_ib1c_promotion_import():
+    path = Path(pilot.__file__).resolve()
+    assert path.name == 'insider_buying_sec_acquisition.py'
+    assert path.parent.name == 'research'
+    source = path.read_text()
+    assert 'write_sec_edgar_acceptance_snapshot' not in source
+    assert 'write_sec_noncanonical_pilot' not in source
+    assert 'run_ib1c' not in source

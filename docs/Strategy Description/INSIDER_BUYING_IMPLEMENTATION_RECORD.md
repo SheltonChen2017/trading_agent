@@ -1,19 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE'S SOLE PUSHED COMMIT `bebc235`
-(SECTION 95), ACCEPTED AFTER APPEND-ONLY DOCUMENTATION CORRECTION.
-THE REAL NONCANONICAL 2022Q4..2023Q1 IB-1B PILOT REMAINS ACCEPTED.
-REPORT AND STAGE-RECEIPT HASHES AND THE INDEPENDENT SOURCE COUNTS VERIFY.
-`IB1BP-CR04` REMAINS OPEN: FOUR DIRECTORY TIMESTAMPS CHANGED AFTER THE
-REPORT; THE RECOVERED COMMAND LOGS DO NOT ESTABLISH THE ACTOR OR ACTION.
-`IB1BP-CR05` REMAINS A VERIFIED, NON-BLOCKING SOURCE-CONTRACT OBSERVATION;
-THE FROZEN PROFILE AND EVERY ROW ARE UNCHANGED. THE NEXT MILESTONE AND
-THIS ROUND'S PUSH ARE BLOCKED PENDING THE OWNER-SUPPLIED MATCHING FORM
-4/4-A XML AND ACCESSION-SPECIFIC ACCEPTANCE METADATA FOR 99,394 FILINGS
-IN THIS WINDOW, OR A SEPARATE BOUNDED SOURCE DIRECTION. COUNTER-REVIEW
-NOTES ARE LOCAL-ONLY; THE ONE-ROUND MONITOR IS PAUSED. NO NEW MILESTONE,
-RETRIEVAL, OUTCOME, QC, DEPLOYMENT, BROKER, OR TRADING AUTHORITY IS
-INFERRED; ALL LOOK COUNTERS REMAIN ZERO.**
+Status: **OWNER-AUTHORIZED SEC ACQUISITION PREPARATION CANDIDATE IMPLEMENTED
+IN `d9f023f`; CLAUDE REVIEW PENDING (SECTIONS 96-97). THIS IS A ZERO-I/O
+REQUEST RECIPE AND RAW-HEADER DERIVED-METADATA BOUNDARY, NOT A DOWNLOADER
+OR REAL INGESTION. CLAUDE'S `bebc235` REMAINS ACCEPTED AFTER SECTION-95
+APPEND-ONLY DOCUMENTATION CORRECTION. THE OWNER'S NEW BOUNDED SOURCE
+DIRECTION LIFTS THE PREPARATION/PUSH GATE, NOT THE REAL RETRIEVAL GATE.
+THE ACCEPTED 2022Q4..2023Q1 IB-1B PILOT AND ALL FROZEN SOURCE CONTRACTS
+ARE UNCHANGED; MATCHING XML/ACCEPTANCE ARTIFACTS REMAIN ABSENT.
+THE 16-FILING PILOT IS ONLY A PROPOSAL, NOT SELECTED OR APPROVED.
+`IB1BP-CR04` AND `IB1BP-CR05` REMAIN OPEN AS QUALIFIED IN SECTION 95.
+NO OUTCOME, QC, DEPLOYMENT, BROKER, OR TRADING AUTHORITY; ALL LOOKS ZERO.
+THE ONE-ROUND MONITOR REMAINS PAUSED. ONE COMBINED SAME-LANE PUSH WILL
+HAND OFF THE PRIOR COUNTER-REVIEW AND THIS PREPARATION CANDIDATE.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -201,6 +200,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Codex counter-review + operational pilot | `151fa8e..bd2c65c` reviewed; pilot executed on clean `bd2c65c`; this record commit follows | First real noncanonical IB-1B pilot, exactly 2022Q4..2023Q1 | Accepted Claude's sole record commit without correction. After the reviewed-preparation and green-complete-suite gates, invoked the unchanged reviewed runner once on the two pinned local ZIPs with external output. Both raw and parsed quarters replayed; all eight tables retained; report declares zero authority and no canonical/PIT claim. No production/test/shared file changed. | Incoming focused 1,275 passed plus exact package guard 1 passed, zero failures/skips/warnings; supplemental record/active-doc 71 passed. Pilot exit 0 in 119.06s, maximum RSS 2,991,423,488 bytes; 901,682 rows / 107,764 accessions; 2 accepted / 0 refused / 0 quarantined. Report payload SHA-256 c4d1211c49b306f17446cd62aa9784ae8451f617661f67a654fcdefbddad04bb; canonical/file hash and scalar receipts independently verified. Final relevant checks repeat before push; no complete suite by Codex; 0 looks. | No new verified P0-P3 finding. IB1BP-CR02 closure accepted; all earlier closed/open P3 and shared IBSH-CR01 retained. Successful keyed-table parsing/replay is enforcement evidence, not a new standalone uniqueness statistic or canonical identity claim. | One same-lane push; Claude reviews every commit in bd2c65c..PUSHED_HEAD and the operational evidence. XML/acceptance artifacts remain absent, so no real stage past IB-1B starts; shared audit needs venue/executor. No further synthetic diagnostic, outcome, ETF, QC, deployment, or trading step inferred. |
 | 2026-09-27 | Claude review | `d3c10a4` -> this review record | Independent review of the section-92 counter-review and the first real noncanonical IB-1B pilot on 2022Q4..2023Q1 (`bd2c65c..d3c10a4`, 1 record-only commit, 0 merges) | Verified the remote tip and clean worktree and accepted the commit. Verified the Mac-local report bytes and digests, replayed both quarters through the existing IB-1A/IB-1B loaders without writing, and ran an independent standard-library parse of both source ZIPs for table counts, forms, duplicates, orphans, transaction keys, SEC-declared keys, and quoting; read the SEC metadata and readme members as documentation. Aggregate counts only; no row content printed or persisted; pilot not rerun. | Report 32,494 bytes, SHA-256 and payload digest verify; replay **2 of 2 quarters equal the report** (98.5 s, 2.25 GB peak); oracle **16 of 16 table counts**, all form counts, 0 duplicate filings, 0 orphans, 0 blank or duplicate transaction keys; quoting is genuine CSV (13,962 and 24,196 quoted fields). Complete suite on `d3c10a4` **8,882 passed, 38 skipped, 28 warnings, 0 failed in 774.22s**; recorded **1,276** reproduces; lane gate **2,684 passed, 0 skipped in 52.36s**; compileall exit **0**. Python 3.13.15, pytest 9.1.1. No XML, acceptance metadata, SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB1BP-CR04` P3 open (post-run directory entry changes, artifacts intact). `IB1BP-CR05` P3 open (SEC declares keys for all eight tables; seven hold, OWNER_SIGNATURE has 191 and 111 duplicates). Earlier items retained. No P0-P2. | Codex counter-reviews this record and answers `IB1BP-CR04`. Next source gate: owner-supplied matching Form 4/4-A XML and acceptance metadata for 2022Q4..2023Q1, with reviewed IB-1C to IB-1E preparation before processing. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-27 | Codex counter-review; input-gated, local only | `d3c10a4..bebc235` reviewed; this local record commit follows | Section-94 counter-review, provenance qualification, and next-source boundary | Accepted the sole Claude record commit after append-only documentation correction of filesystem inference. Independently matched both approved ZIP inventories, SEC-declared keys and quoting, canonical report/digests, and ten stage receipt member hashes. Recovered this task's exact prior command logs but could not attribute the directory timestamp changes. No code, profile, tests, shared files, real stage, or output artifact changed. | Incoming focused source/preparation, active-document and import-boundary checks including the exact Insider package guard: 1,276 passed in 22.06s; final record checks in 95.4. Independent source oracle: all 16 table counts and forms match, seven declared keys unique, OWNER_SIGNATURE duplicate rows 191/111, no blank keys, width errors or orphans. All 26 output-entry inode/size/mtime/ctime observations unchanged during this audit. No full lane/repository suite by Codex; 0 looks. | IB1BP-CR04 P3 OPEN, actor/action unestablished; IB1BP-CR05 P3 OPEN verified source-contract input, not a current defect. All earlier resolved and open findings retained in 95.3. No P0-P2 or new production defect. | No push while this owner-input gate blocks the next milestone. Supply exact matching XML/acceptance bundle for 99,394 Form 4/4-A accessions, then freeze/review bounded IB-1C-E preparation before processing; no retrieval authority inferred. Monitor PAUSED, not rearmed. |
+| 2026-09-27 | Codex counter-review + authorized preparation | `bebc235..e0f884f` counter-review; `d9f023f` preparation; this record commit follows | SEC-only acquisition preparation, synthetic and zero-I/O | Owner approved preparation after source guidance. Added exact-tuple, hash-bound request recipes and strict raw-header derived projections; retained raw bytes/hash and unverified lineage, no downloader or direct IB-1C integration. Prior counter-review accepted after append-only clarification; no shared file changed. | Focused 1,129 passed in 12.55s; new file 148 passed in 0.66s; eight in-memory mutants killed; independent 15 adversarial refusals plus valid control; targeted compilation and diff clean. Final record checks in 97.4; no full suite by Codex; 0 looks. | IBSEC-R01/R02 P2 draft provenance defects fixed red/green; IBSEC-R03 P3 ledger shape corrected append-only. Prior open and resolved ledger retained. No remaining verified P0-P2. | One combined push, then Claude reviews every commit after bebc235. Only after review/counter-review may separately authorized downloader/profile integration and an exact owner-approved fixed pilot proceed. No downloads, new quarter, XML processing, outcome, QC, deployment, or trading inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -12542,3 +12542,292 @@ counts/keys/quoting, filesystem-evidence limitation, retained findings,
 focused validation, zero looks, and blocked-next-step status. Do not
 overwrite or rerun the pilot output to explain historical timestamps; a
 new experiment needs its own bounded authorization and fresh root.
+
+## 96. Owner-authorized SEC-only acquisition preparation (2026-09-27 UTC)
+
+### 96.1 Directive, bounded interpretation, and sequencing
+
+After asking where the missing information could be obtained, the owner
+approved the recommendation to prepare an SEC-only acquisition boundary and
+provenance-preserving metadata adapter, obtain Claude review, and then seek
+approval for a small fixed pilot before expanding coverage. The owner reply
+was **"authorized. please proceed"**. This session implements the first,
+**synthetic-only, zero-I/O preparation candidate**. The preceding commentary
+explicitly retained the real-download gate. The directive is a new bounded
+source direction under 95.5; it authorizes publishing this preparation with
+the local counter-review, not retrieving SEC filings or executing IB-1C-E.
+The historical section-95 stop/no-push entry remains accurate at that time.
+
+There is no executable downloader in this candidate. The pure request recipe
+defines proposed paths, identities, and transport requirements without an
+HTTP client, credentials, filesystem, clock, scheduler, or publishing API.
+An operational downloader, verified source dialect/profile, and integration
+must themselves be implemented and independently reviewed before a real
+pilot is run. Future transport placement must preserve the exact Insider
+package import guard and frozen shared entry-point registry; no shared-file
+exception or network module inside this package is inferred.
+
+The **99,394** Form 4/4-A accessions in 95.5 describe eventual full-window
+coverage, not a minimum file count needed to design this preparation. A
+separately approved small pilot can test source compatibility before full
+coverage. No real inventory was generated, no filename discovered, and no
+existing two-quarter ZIP or external pilot artifact was read in this
+preparation session. Section 95 retains its earlier authorized read scope.
+
+### 96.2 Request-recipe contract
+
+`research/insider_buying/sec_acquisition_preparation.py` supplies
+`SecAcquisitionTarget`, `SecAcquisitionPlan`, and
+`build_sec_acquisition_plan`. Exact targets bind the period, accession,
+Form 4 or 4/A, filing date, nonzero padded issuer CIK, quarterly ZIP SHA-256,
+submission-row identity, and caller-declared raw root XML filename. Existing
+candidate identity checks enforce the quarter/date/accession-year relation.
+Only 2022Q4 and 2023Q1 are allowed. Unsafe filenames, XSL-rendered paths,
+non-exact scalar types, duplicate accessions, and foreign scope are refused.
+
+The plan requires an **exact tuple of 1..64 targets**, snapshots each target,
+and sorts by period/accession. Caller generators, arbitrary iterables, and
+tuple subclasses are refused before their iterator callbacks run. It
+proposes exact HTTPS `www.sec.gov/Archives/edgar/data/` header, index, and raw
+XML URLs, using the declared issuer rather than substituting the accession
+prefix. That directory choice and filename are **not resolver-verified**.
+Canonical payload hashing binds the recipe, not SEC authenticity or a
+completed retrieval. Payload mutation does not mutate the retained recipe.
+
+Transport fields are planning requirements only: **current external request
+budget 0**, prospective 2 requests/second, at most 3 attempts per artifact,
+no redirects, identifying contact, backoff/checkpoints, immutable accession
+cache, and **executable transport supplied false**. No limiter, retry loop,
+cache, request counter, or transfer-budget enforcement is implemented.
+The generic 64-target recipe capacity is not approval to collect 64 filings
+and is distinct from the proposed 16-filing pilot below. Existing v1/v2
+source policies and their zero network budgets are byte-unchanged.
+
+### 96.3 Derived header projection; no direct ingestion
+
+`SecHeaderMetadataProjection` and `derive_sec_header_projection` accept only
+a caller-supplied exact header byte image of at most **2 MiB**, matching
+the target's exact proposed `.hdr.sgml` URL, a full lowercase capture Git
+SHA, and exact second-precision `datetime` with native fixed-offset
+`datetime.timezone`. Retrieval time is detached to UTC; custom timezone
+callbacks and host ZoneInfo providers are refused before invocation.
+
+The provisional dialect requires one complete ASCII SEC-HEADER block with
+no extraneous body, top-level column-zero filing fields in its preamble,
+one fourteen-digit acceptance tag, and one column-zero ISSUER role whose
+first subsection is unique COMPANY DATA. Issuer CIK comes from that company
+subsection, never reporting-owner/address/former-company text. Missing,
+duplicate, mismatched, nested, ambiguous, or invalid fields fail closed.
+Raw unpadded issuer CIK is retained while comparison uses padded target CIK.
+Raw CRLF bytes are preserved rather than silently normalized.
+
+The **caller-declared, unverified** timezone policy interprets the raw
+acceptance string as Eastern for this exact two-quarter window with fixed
+2022-11-06 / 2023-03-12 transitions. The repeated fall hour and nonexistent
+spring hour are refused. The general
+[NIST DST rule](https://www.nist.gov/pml/time-and-frequency-division/popular-links/daylight-saving-time-dst)
+supports those transition dates; it does **not** establish SEC's source
+timezone convention. No host timezone database is read. The unchanged
+IB-1C availability-record validator additionally enforces the conservative
+filing-day envelope and retrieval cannot precede acceptance. The temporary
+record is used only for validation, not persisted or promoted as a snapshot.
+
+Output retains raw header bytes as base64, their SHA/size, source URL,
+UTC capture time/commit, and each raw source field. Separately hashed
+canonical JSON-plus-LF contains the five proposed IB-1C-shaped fields.
+The explicit transform/profile hash, raw acceptance string, timezone
+policy, and caller filename remain visible. **Verbatim SEC JSON, official
+profile verification, primary URL verification, direct IB-1C ingestion,
+source authentication, canonical/PIT evidence, completeness, approved
+sample, and execution authority are all false; all three look counters
+are zero.** No amendment-to-original accession is inferred.
+
+This new derived recipe is **not** a `SecEdgarMetadataSource` and is not an
+existing `PilotDerivedFlatIb1cProjectionIdentity`. The latter's frozen
+locators describe a different input dialect. Existing IB-1C accepts profiled
+flat JSON, not raw SGML; the frozen pilot contract permits one verbatim
+metadata parent per accession. Separate header and index parents cannot be
+silently collapsed, labelled verbatim JSON, or directly ingested. A reviewed
+versioned raw-parent/projection integration must precede real IB-1C-E work.
+
+### 96.4 Proposed fixed pilot, not authority or implemented selection
+
+Recommendation for a later owner decision: **16 accessions**, exactly
+**6 original Form 4 plus 2 Form 4/A in each quarter**, using deterministic
+lexical accession selection from the already approved quarter window.
+This is a compatibility sample, not representative investment evidence.
+Before retrieval, provide an exact hash-bound accession/issuer/filename
+inventory, verified primary-file/index/header paths, source profile and
+timezone interpretation, fresh output root, identifying contact, and a
+reviewed executor with fail-closed response/publication handling. The
+selection is **not coded, performed, or owner-approved** by this round.
+
+Proposed operational ceilings: three artifacts per accession (index,
+header, XML), **48 distinct artifact requests**, **144 total attempts** at
+three attempts each, no redirects, at most 2 requests/second, and at most
+2 MiB per response/artifact. Accepted raw storage would be at most 32 MiB
+per category, 64 MiB for header+index, and 32 MiB for XML; maximum response
+bytes across 144 attempts would be 288 MiB. These are proposed caps for the
+future executor, **not enforced by this zero-I/O module**. Unresolved 4/A
+original linkage stays quarantined; no extra original, quarter, or fallback
+provider request follows from including an amendment in the sample.
+
+General source guidance remains the official
+[SEC access documentation](https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data)
+and [quarterly insider dataset page](https://www.sec.gov/data-research/sec-markets-data/insider-transactions-data-sets).
+The flattened quarterly extract is not the complete filing. Consulting
+general documentation is not permission to retrieve an accession artifact.
+No new request allowance is introduced by citing SEC's public fair-access
+ceiling or by the recipe's more conservative proposed 2 requests/second.
+
+## 97. Candidate verification and durable Claude handoff (2026-09-27 UTC)
+
+### 97.1 Exact commits and review scope
+
+Every repository command/edit/test/commit uses the designated existing Mac
+worktree and `codex/strategy-insider-buying`, with no side branch or checkout.
+Matching-branch-only fetch reconfirmed origin
+`bebc235013dc553caf06997b7e5e40ec19248f28`; unexpected dirty/concurrent work
+was absent. The owner-directed bounded preparation follows acceptance of
+the sole Claude commit, not a new independent review by Codex's helpers.
+
+| Commit | Scope | Disposition / handoff |
+|---|---|---|
+| `bebc235013dc553caf06997b7e5e40ec19248f28` | Sole incoming Claude review of `d3c10a4` | **Accepted after append-only documentation correction**, 95.1-95.2; independent counts/receipts verified and provenance limitation retained. |
+| `e0f884fcfa8e7d10d1e17a7d8a3a5426031ab058` | Previously local-only section-95 counter-review | Codex-authored, **pending Claude review**, included in the one combined push. Historical input-gated stop remains preserved. |
+| `d9f023ff13a6afacd667c67446b89fa321508d20` | New preparation module and 148 synthetic test cases | Codex-authored, **pending Claude review**; only these two new lane files change production/tests. Sections 96 and 97 define its deliberately incomplete acquisition scope. |
+| This lane-record commit | Current status, one session row, sections 96-97 | Codex-authored, **pending Claude review**; no shared document or SESSION_HANDOFF update. Exact final hash is obtained from pushed Git history. |
+
+Claude must review **every commit in `bebc235..PUSHED_HEAD`**, including the
+prior counter-review and this record, on this same branch. Codex then
+counter-reviews every Claude commit before subsequent implementation.
+
+### 97.2 Candidate behavior in technical and plain language
+
+The candidate adds a pure, deterministic request-recipe boundary and a
+bounded raw-header projection receipt with replayed source/target identity,
+raw-byte lineage, canonical hashes, strict section-scoped fields, pinned
+provisional DST handling, detached UTC capture metadata, and explicit
+non-verbatim/zero-authority output. It changes neither existing loaders nor
+their source profiles, imports/exports, stage manifests, or operational pilot.
+Focused verification and adversarial tests pass; independent Claude review
+is pending, so this is not a completed operational acquisition milestone.
+
+In ordinary terms, this prepares a list of proposed filing URLs and checks
+invented filing headers without downloading anything. It keeps the original
+header separate from the JSON it creates so nobody can mistake generated
+metadata for the SEC's original document. It does not know whether the
+proposed real filenames, header format, or timezone are correct yet. Those
+need a reviewed downloader and a separately approved small sample before
+real filings can move toward backtesting.
+
+### 97.3 P0-P3 ledger; draft red/green and retained findings
+
+Append-only ledger-shape clarification: section 95.3's six-column summary
+does not alone meet the binding ten-column minimum. This table supplements
+it with every required field without erasing earlier findings or history.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSEC-R01 | P2 | **CLOSED, candidate** | Pre-commit draft -> d9f023f | Header projection retrieval timestamp | Retained custom tzinfo changed capture time/hash; a callback could mutate source URL after its guard and serialize unbound provenance. | Synthetic mutable offset/hash drift and evil URL callback reproduced; no I/O performed. | Source lineage and zero-I/O validation cannot depend on caller callbacks. | Require exact native fixed timezone before callbacks; detach UTC and replay validation. | Initial mutable/reentrant regressions red; final custom timezone refusal pins zero callbacks and native-offset UTC parity green; M01 killed. |
+| IBSEC-R02 | P2 | **CLOSED, candidate** | Pre-commit draft -> d9f023f | Header preamble and issuer/company role parser | Nested owner fields, fake indented ISSUER, or company data under address/former sections could masquerade as filing/issuer provenance. | Initial moved core fields red; later seven role/indentation cases red, 141 others green. | Must bind fields to their declared source roles, not merely unique labels anywhere. | Column-zero preamble/root roles, global duplicate refusal, first issuer COMPANY DATA and CIK sub-scope. | Final 148 green; independent 15 adversarial refusals plus valid control; M05 killed. |
+| IBSEC-R03 | P3 | **CLOSED, documentation** | e0f884f -> this record | Section 95.3 ledger summary | Six columns omitted the binding minimum's commit, impact, reason, and correction detail fields. | Direct comparison to GENERAL_CODE_REVIEW_INSTRUCTIONS section 2. | Durable dispositions require all ten fields, including retained issues. | This append-only ten-column superseding ledger adds missing detail; earlier history preserved. | Column shape checked; record/active-document regression checks green. |
+| IB1BP-CR04 | P3 | **OPEN, non-blocking observation** | bebc235 / e0f884f | External directory timestamps, 95.2 | Post-run changes do not establish actor/action or forensic impossibility of replacement. | Four directory times; exact prior logs; current hashes intact. | Cannot close by inference; no lane behavior defect established. | Append-only evidence qualification retained; no external artifact touched. | Section-95 receipts/source verification retained; not historical-cause resolution. |
+| IB1BP-CR05 | P3 | **OPEN, source-contract input** | bebc235 / e0f884f | Two-quarter declared keys | OWNER_SIGNATURE duplicates 191/111 after first occurrence; seven other keys unique. | Approved-window oracle in 95.2. | Retain rows and frozen profile; no new measured quarter authorized. | No row dropped or source contract amended. | Existing focused source-policy/pilot contracts green. |
+| IB2CTX-CR02 | P3 | **OPEN, non-blocking** | Prior sections 85-95 | Record-prose test | Brittle owner-decision anchor, not a pattern to extend. | Existing literal prose assertions. | No requested behavior correction; preserve historical authorization anchor. | Not extended in new tests. | Existing record test green. |
+| IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **Retained as recorded** | Prior sections 78-95 | Historical source/review limitations | Rewrite history, retrieval-route proof and stale-bytecode caveats remain scoped. | Earlier complete entries retained. | No additional authority or erased evidence. | No historical rewrite, retrieval or frozen-policy change. | Policies byte-unchanged; mutations in fresh -B subprocesses only. |
+| IBSH-CR01 | P3, shared | **OPEN, out of lane** | Prior sections 68-95 | Common coordination | Shared reconciliation needs main-line venue/executor. | Earlier shared finding and missing audit venue. | Out-of-lane changes remain prohibited. | Documented only; no shared file touched. | Exact changed-path inventory stays lane-owned. |
+| IB1BP-CR01/02/03/CCR01 and earlier resolved findings | P2/P3 | **CLOSED, retained** | Prior sections 88-95 and complete historical ledger | Prior pilot/profile/runner fixes | Prior resolutions are not reopened or erased by preparation. | Full prior entries remain in this file. | Preserve accepted fixes and provenance. | Existing corrected behavior unchanged. | Relevant focused regressions green; no new runner execution. |
+
+The red evidence above concerns **uncommitted draft states**, not a red test
+reproducible from pushed historical commits. Final committed regression
+tests and faithful in-memory reversals are the durable verification. API
+assumptions permitting caller iterables/custom zones were narrowed as part
+of this new draft contract, not weakened to accept dangerous behavior. The
+exact tuple guard is mutation-pinned; no released API was changed. No
+remaining verified P0, P1, or P2 exists in this candidate.
+
+### 97.4 Exact validation and independent probes
+
+Python **3.12.14**, pytest **9.1.1**. Root new-file run: **148 passed**,
+zero failures/skips/warnings, **0.66s**. Independent security helper:
+**148 passed in 0.59s**, 15 dangerous-direction refusals and a valid control;
+custom timezone and iterable callback counts zero. Helpers worked serially
+on implementation/test files and do not replace independent Claude review.
+
+Existing acceptance snapshot, pilot contracts, v1 policy and v2 policy:
+**879 passed in 3.24s**. Record, active-document, module-hygiene,
+overlay/ML/project-separation boundaries and the exact Insider package
+guard: **102 passed in 8.89s**. Combined affected selection before the
+record update: **1,129 passed in 12.55s**, zero failures/skips/warnings.
+Exact command selection:
+
+```text
+tests/test_insider_buying_sec_acquisition_preparation.py
+tests/test_insider_buying_sec_edgar_acceptance_snapshot.py
+tests/test_insider_buying_sec_noncanonical_pilot_contracts.py
+tests/test_insider_buying_sec_owner_supplied_source_policy.py
+tests/test_insider_buying_sec_owner_supplied_source_policy_v2.py
+tests/test_insider_buying_implementation_record.py
+tests/test_active_document_consistency.py
+tests/test_module_hygiene.py
+tests/test_overlay_import_boundary.py
+tests/test_ml_import_boundary.py
+tests/test_project_separation_boundary.py
+tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports
+```
+
+Eight faithful in-memory mutants were each killed in fresh Python `-B`
+subprocesses: fixed timezone guard, exact header URL match, fall fold,
+spring gap, company subsection position, 64-target cap, network-authority
+false literal, and exact tuple guard. No production file was edited for
+mutation. Independent standard-library JSON/SHA replay of the invented
+default test fixture matches these illustrative hashes (not real data):
+
+| Synthetic payload | SHA-256 |
+|---|---|
+| One-target request recipe | `7b792e062c16c0749c3953cfe8d58225933a202cf7dfc4025457e785875a8069` |
+| Header projection receipt | `ffc6d30f7967ed6c08870324f285a8f42dd0018bc487ab507cb39de7f3db1581` |
+| Raw synthetic header bytes | `0a7a35d8ada48c9e30ef1079a81bfd25b0b4824b0f57ef70cc8b9c3aeb7fd3a4` |
+| Derived JSON-plus-LF | `c00a5e53438ada1ef4272e72f9690d3c1d349f144b9697a87766559e26c87d2c` |
+
+Targeted compileall for `research/insider_buying` and the new test exits
+**0**; staged whitespace checks and `git show --check` pass. Final
+combined affected selection after the record update repeats **1,129 passed
+in 11.37s**, zero failures/skips/warnings; the new ledger has all ten required
+columns. Before push the final committed record/package boundaries will be
+rechecked, and remote availability will be verified and reported in the task
+handoff. **No complete lane/repository suite by Codex.** Claude's
+prior 8,882-pass suite is earlier reviewer evidence, not this candidate's
+full-suite result. Full lane suite is not authorized by inference.
+
+### 97.5 Exclusions, blockers, and next action for Claude
+
+Review the entire exact three-commit Codex range after `bebc235`, including
+section 95 and both new files. Verify all per-commit dispositions, retained
+ledger, draft red/green limits, pure dependency/import boundary, raw versus
+derived hashes, timezone/role checks, and false-authority/zero-look output.
+Run the independent complete lane suite under the standing reviewer role;
+do not retrieve SEC artifacts or rerun the external pilot as a review step.
+
+No real SEC artifact, new source byte, quarter table, XML, acceptance bundle,
+outcome, security master/calendar, price, corporate action, ETF data,
+credential/provider/license, QC processing/upload/job/backtest, broker,
+operator database, scheduler, deployment, capital, order, or trading access
+occurred in this preparation session. Network scope was matching-lane Git
+sync and general documentation only. Authorized outcome looks **0**,
+consumed outcome looks **0**, research looks **0**. Existing external pilot
+artifacts, frozen loaders/policies/contracts and all shared/project-wide
+documents including SESSION_HANDOFF remain unchanged.
+
+Next: Claude reviews this pushed preparation; Codex counter-reviews every
+Claude commit. Then the owner must approve the exact real pilot inventory,
+retrieval/processing limits, verified profile, output root and reviewed
+executor before any acquisition/ingestion runs. The proposed 16-file policy
+alone is not that approval. Until these gates are satisfied, no XML
+retrieval, real IB-1C-E execution, expansion, canonical scoring, replacement
+diagnostic, outcome/QC/backtest, or paper/live step is authorized. The shared
+security-master/calendar audit still lacks its main-line venue and executor;
+IB-3 diagnostics stay paused. The task monitor remains **PAUSED**, not
+rearmed or extended into another round. The authorized preparation is ready
+for one combined push; the later real-execution gate is deliberately intact.

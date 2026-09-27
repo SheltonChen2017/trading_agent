@@ -127,7 +127,8 @@ and near-PIT recent-window claims, fixes ledger/test hygiene, and measures
 between-capture vendor drift before any further capacity or period run.
 Section 198 implements the owner's subsequent matched historical comparison:
 fully AR-off, AR-on100%, and six actual ETFs, each under fixed 0/5-bps
-slippage. Six prospective sources are frozen; none has launched in QC.
+slippage. Section 199 executes those frozen sources on the owner's subsequent
+"begin testing now" direction before another review; R225 A1 has launched.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -745,11 +746,11 @@ correction `22bdbce`. Section 197 counter-reviews exact pushed Claude range
 `08c9eab..8570bbb`, accepts the test correction and qualifies the interpretation.
 The provider-only drift measurement is complete. After that counter-review,
 the owner directed implementation of the matched historical study in section
-198: six frozen order-based sources, not a new capacity sweep. No QC run has
-launched. Each candidate has at most three attempts; Codex uses focused checks,
-not a full suite. Claude reviews section 198 alongside section 197 and every new commit after
-the one combined push; Codex then counter-reviews that exact review before
-executing the frozen research candidates. Standing research authorization
+198: six frozen order-based sources, not a new capacity sweep. The owner then
+directed execution in section 199 before another review. Each candidate has
+at most three attempts; Codex uses focused checks, not a full suite. Claude
+reviews section 199 and the preceding implementation after the one combined
+push; Codex then counter-reviews that exact review. Standing research authorization
 remains; no new broker/live/paper or trading authority is inferred.
 Both are now valid on A1: AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
@@ -802,7 +803,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–198
+findings, outcomes, and per-run accounting remain in numbered sections 1–199
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -27416,3 +27417,76 @@ remains open. After review and counter-review, the next operation is execution
 of the frozen research family, with at most three unsuccessful attempts per
 candidate and Mia/owner recovery thereafter. No further capacity sweep is
 scheduled. One same-lane combined push ends this implementation round.
+
+## 199. Owner-directed matched historical execution — 2026-09-26
+
+After section 198 was pushed at `575b611`, the owner directed **"begin
+testing now"**. This explicitly advances execution before another Claude
+review; it does not waive result validation, the same-project three-attempt
+limit, accepted-risk historical disclosures, or broker/live exclusions.
+The frozen R225–R230 family, package, source and cost settings in section 198
+remain unchanged. No further tilt/capacity search is added. Fetch at the
+start of this round found the remote at the same committed head.
+
+Run the three zero-slippage arms first, then their five-bps sensitivities,
+using available owned QC capacity. Count every launched attempt, including
+invalid runs, as one shared/development look; add a result cell only after
+the bounded reader accepts `run_valid=true`. Starting floor is
+**222 / 163 / 34 / 644**. Record terminal identities and outcomes below;
+do not call a partial family a valid matched comparison. Focused validation
+only; no full lane/repository suite by Codex. One final same-lane push is
+due after this execution round, including any failed attempts.
+
+### 199.1 First three attempts and prospective diagnostic-only source
+
+One available B2-8 node was verified via QC's documented
+`projects/nodes/read` endpoint (read-only; the economic submission transport
+allowlist remains unchanged). R225 A1 project **37017548** / backtest
+`2eac544a09443faa044a14b30cf57524` and R226 A1 project **37017666** / backtest
+`1ff10eae2ac4a03d202c0cc291dd784e` both refused at **2022-10-03 16:00**:
+incomplete RAW reference prices, stale-price fallback prohibited. The requested
+census is precisely target IDs plus nonzero holdings, not the full identity
+catalog. The original error identifies neither the missing ID nor its role;
+no missing-price correction or partial-period outcome is inferred.
+
+R227 A1 project **37017790** / backtest `b9b45f646a567b5f688031e38cc5018e`
+completed and its sole bounded reader accepted **run_valid=true**: net
+**+106.334773436208%**, drawdown **−21.273414804413%**, volatility
+**19.828479860206%**, zero-rate Sharpe **0.833337465284**, 1,523 orders all
+filled, 261 completed rebalances, engine/model fees `$8,028.44136`. The
+diagnostic is 4,818 bytes. Floor after these launches/read is
+**225 / 166 / 34 / 645**; no AR spread exists yet.
+
+Before any R225 A2, the projected reference-price refusal gains bounded
+context only: session, requested/received counts, hashed missing identities,
+target/held roles, whole holding quantities and exact/unknown delisted flags.
+No price, provider row, extra history request, stale replacement, selection
+change or new order rule is introduced. Every complete-reference successful
+path is unchanged. Successor manifest
+`six_universe_matched_study_diagnostic_candidates.json`, SHA-256
+**`2718100d6c3863ebd7959142afaca58323360372d03a346961d04657102de4b3`**,
+changes only each arm's projection SHA, source-file-manifest SHA and total
+source bytes; all profile, package and economic pins equal the original.
+Original R225/R226/R227 A1 manifest/claims/receipts remain immutable. Exact
+candidate/attempt dispatch reauthenticates those three against the original
+pin; other attempts use the new pin. Same-project and remote-attempt census
+checks remain intact, with no fourth attempt or new candidate disguised as retry.
+The next R225 A2 is a prospective diagnostic of the refusal, not a blind
+unchanged-source rerun and not an expectation of usable return evidence.
+
+The first local successor reproduction check failed: all six generated
+closures were four bytes smaller than the initial, still-unspent freeze.
+An independent production-package reproduction confirmed this was not a
+synthetic fixture discrepancy. The unspent manifest was regenerated from
+the final renderer and revalidated before any successor claim or QC action;
+original cloud source and receipts were not modified. No economic/profile
+field differed.
+
+Focused pre-A2 validation: projected-source behavior **30 passed in 16.47 s**,
+attempt routing plus legacy adapter **119 passed, 1 intentionally deselected
+in 3.16 s**, then the exact production freeze/all-six-preview case **1 passed
+in 19.64 s**. Record gate **13 passed in 0.36 s**. Mislabeling missing-ID roles
+was red in all six cases; disabling original-attempt routing was red in all
+three receipt cases. Mutations restored; compilation/diff checks clean. No
+full lane/repository suite. These prove diagnostics and receipt isolation,
+not a repair of the still-unknown missing-price cause.

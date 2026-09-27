@@ -20,8 +20,8 @@ from tests.analyst_revisions_v2.test_qc_six_universe_tilt_ladder_floor_projectio
 )
 
 
-def manifest_fixture():
-    projection = Projection()
+def manifest_fixture(raw=b"x = 1\n"):
+    projection = Projection(raw)
     projection.package_sha256 = study.delta.EXPECTED_DELTA_PACKAGE_SHA256
     projection.activation_manifest_sha256 = study.HISTORICAL_ACTIVATION_SHA256
     projection.role = "matched-test-role"
@@ -129,16 +129,17 @@ def test_protocol_has_exact_three_arms_and_two_prospective_cost_conditions():
 def test_real_source_freeze_reproduces_committed_manifest_and_all_previews(exact_delta_package, tmp_path, monkeypatch):
     from scripts import run_arv2_matched_study as script
     monkeypatch.setattr(script, "package", lambda: exact_delta_package)
-    frozen = adapter._matched_study_manifest()
+    frozen = adapter._matched_study_diagnostic_manifest()
     assert script.freeze() == frozen
     assert "input_control_directory" not in frozen
     for candidate in study.CANDIDATES:
-        plan = adapter.build_plan(candidate, ORG, tmp_path / "control", family="matched_study")
+        attempt = 2 if (candidate, 1) in adapter._MATCHED_STUDY_ORIGINAL_ATTEMPTS else 1
+        plan = adapter.build_plan(candidate, ORG, tmp_path / "control", attempt, family="matched_study")
         projected, _ = script.projected(candidate)
         preview = adapter.preview(plan, projected)
         assert preview["candidate_id"] == candidate
         assert preview["projection_sha256"] == projected.projection_sha256
-        assert preview["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_MANIFEST_SHA256
+        assert preview["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256
 
 
 @pytest.mark.parametrize("defect", ["missing", "duplicate", "reordered", "wrong_arm",
@@ -182,14 +183,164 @@ def frozen(tmp_path, monkeypatch):
     manifest, projection = manifest_fixture()
     path = tmp_path / "matched.json"
     path.write_bytes(canonical(manifest))
+    current_path = tmp_path / "matched-diagnostic.json"
+    current_path.write_bytes(canonical(manifest))
     monkeypatch.setattr(adapter, "MATCHED_STUDY_MANIFEST_PATH", path)
     monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_MANIFEST_SHA256", hashlib.sha256(path.read_bytes()).hexdigest())
+    monkeypatch.setattr(adapter, "MATCHED_STUDY_DIAGNOSTIC_MANIFEST_PATH", current_path)
+    monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256", hashlib.sha256(current_path.read_bytes()).hexdigest())
     monkeypatch.setattr(adapter, "_require_inputs", lambda plan: None)
     monkeypatch.setattr(adapter.common, "_client", lambda api: None)
     fake = Fake()
     monkeypatch.setattr(adapter.common, "_post", fake.post)
     plan = adapter.build_plan("R225", ORG, tmp_path / "control", family="matched_study")
     return plan, projection, fake, manifest
+
+
+def diagnostic_revision(monkeypatch):
+    """Install a different pinned source closure without changing economics."""
+    manifest, projection = manifest_fixture(b"x = 2\n")
+    raw = canonical(manifest)
+    adapter.MATCHED_STUDY_DIAGNOSTIC_MANIFEST_PATH.write_bytes(raw)
+    monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256",
+        hashlib.sha256(raw).hexdigest())
+    return manifest, projection
+
+
+@pytest.mark.parametrize("candidate", ["R225", "R226", "R227"])
+def test_original_attempt_receipt_remains_bound_to_original_source_after_revision(frozen, monkeypatch, candidate):
+    plan, projection, fake, original_manifest = frozen
+    plan = dataclasses.replace(plan, candidate_id=candidate)
+    receipt = adapter.launch(plan, projection, fake)
+    original_identity = adapter._receipt(plan, receipt)
+    original_manifest_bytes = adapter.MATCHED_STUDY_MANIFEST_PATH.read_bytes()
+    claim_bytes = adapter._path(plan, "claim").read_bytes()
+    launch_bytes = adapter._path(plan, "launch").read_bytes()
+    current_manifest, current_projection = diagnostic_revision(monkeypatch)
+    assert current_projection.projection_sha256 != projection.projection_sha256
+    assert adapter._receipt(plan, receipt) == original_identity
+    assert adapter._plan_manifest(plan) == original_manifest
+    assert adapter.MATCHED_STUDY_MANIFEST_PATH.read_bytes() == original_manifest_bytes
+    assert adapter._path(plan, "claim").read_bytes() == claim_bytes
+    assert adapter._path(plan, "launch").read_bytes() == launch_bytes
+    second = dataclasses.replace(plan, attempt=2)
+    assert adapter._plan_manifest(second) == current_manifest
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="projection"):
+        adapter.preview(plan, current_projection)
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="projection"):
+        adapter.preview(second, projection)
+
+
+def test_corrected_source_retry_keeps_original_receipts_and_reuses_project(frozen, monkeypatch):
+    plan, projection, fake, _ = frozen
+    first = adapter.launch(plan, projection, fake)
+    fake.status = "Runtime Error"
+    assert adapter.poll_status(plan, first, fake) == "Runtime Error"
+    original_bytes = {suffix: adapter._path(plan, suffix).read_bytes()
+        for suffix in ("claim", "launch", "terminal")}
+    _, current_projection = diagnostic_revision(monkeypatch)
+    fake.status = "In Progress..."
+    # Model the remote inventory's immutable terminal A1 status separately from
+    # the queued A2 state; the inherited fake otherwise rewrites all run states.
+    original_post = fake.post
+    def post(api, endpoint, body):
+        response = original_post(api, endpoint, body)
+        if endpoint == "backtests/list":
+            response["backtests"][0]["status"] = "Runtime Error"
+        return response
+    monkeypatch.setattr(adapter.common, "_post", post)
+    second = dataclasses.replace(plan, attempt=2)
+    receipt = adapter.launch(second, current_projection, fake)
+    assert receipt["project_id"] == first["project_id"] == 123
+    assert receipt["attempt"] == 2
+    assert receipt["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256
+    assert receipt["projection_sha256"] == current_projection.projection_sha256
+    assert fake.files["main.py"] == "x = 2\n"
+    assert sum(endpoint == "projects/create" for endpoint, _ in fake.calls) == 1
+    assert sum(endpoint == "backtests/create" for endpoint, _ in fake.calls) == 2
+    for suffix, raw in original_bytes.items():
+        assert adapter._path(plan, suffix).read_bytes() == raw
+    assert adapter._receipt(plan, first)["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_MANIFEST_SHA256
+
+
+@pytest.mark.parametrize("candidate", list(study.CANDIDATES))
+@pytest.mark.parametrize("attempt", [1, 2, 3])
+def test_only_exact_spent_attempts_use_original_manifest(frozen, monkeypatch, candidate, attempt):
+    plan, _, _, original_manifest = frozen
+    current_manifest, _ = diagnostic_revision(monkeypatch)
+    plan = dataclasses.replace(plan, candidate_id=candidate, attempt=attempt)
+    original = (candidate, attempt) in {("R225", 1), ("R226", 1), ("R227", 1)}
+    assert adapter._plan_manifest(plan) == (original_manifest if original else current_manifest)
+    assert adapter._plan_manifest_sha256(plan) == (
+        adapter.FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if original
+        else adapter.FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256)
+
+
+@pytest.mark.parametrize("original", [True, False])
+def test_original_and_current_manifest_bytes_are_pinned_before_cloud_mutation(frozen, monkeypatch, original):
+    plan, old_projection, fake, _ = frozen
+    current_manifest, current_projection = diagnostic_revision(monkeypatch)
+    if original:
+        path, projection = adapter.MATCHED_STUDY_MANIFEST_PATH, old_projection
+        manifest = copy.deepcopy(adapter._matched_study_manifest())
+    else:
+        plan = dataclasses.replace(plan, candidate_id="R228")
+        path, projection, manifest = adapter.MATCHED_STUDY_DIAGNOSTIC_MANIFEST_PATH, current_projection, current_manifest
+    manifest["candidates"][0]["project_name"] += " TAMPERED"
+    path.write_bytes(canonical(manifest))
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="frozen manifest"):
+        adapter.launch(plan, projection, fake)
+    assert fake.calls == []
+
+
+@pytest.mark.parametrize("original", [True, False])
+def test_both_manifest_generations_validate_census_after_exact_hash_check(frozen, monkeypatch, original):
+    plan, projection, fake, manifest = frozen
+    if original:
+        path, pin = adapter.MATCHED_STUDY_MANIFEST_PATH, "FROZEN_MATCHED_STUDY_MANIFEST_SHA256"
+    else:
+        manifest, projection = diagnostic_revision(monkeypatch)
+        plan = dataclasses.replace(plan, candidate_id="R228")
+        path, pin = adapter.MATCHED_STUDY_DIAGNOSTIC_MANIFEST_PATH, "FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256"
+    manifest["candidates"].pop()
+    raw = canonical(manifest)
+    path.write_bytes(raw)
+    monkeypatch.setattr(adapter, pin, hashlib.sha256(raw).hexdigest())
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="census"):
+        adapter.launch(plan, projection, fake)
+    assert fake.calls == []
+
+
+def test_corrected_source_retry_refuses_untracked_remote_attempt_before_claim(frozen, monkeypatch):
+    plan, projection, fake, _ = frozen
+    first = adapter.launch(plan, projection, fake)
+    fake.status = "Runtime Error"
+    adapter.poll_status(plan, first, fake)
+    fake.runs.append({"projectId": 123, "backtestId": "untracked-run",
+        "name": "manual or Mia run", "status": "Runtime Error"})
+    _, current_projection = diagnostic_revision(monkeypatch)
+    second = dataclasses.replace(plan, attempt=2)
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="untracked attempt"):
+        adapter.launch(second, current_projection, fake)
+    assert not adapter._path(second, "claim").exists()
+    assert sum(endpoint == "backtests/create" for endpoint, _ in fake.calls) == 1
+    assert fake.files["main.py"] == "x = 1\n"
+
+
+def test_corrected_source_does_not_permit_retry_of_valid_completed_original(frozen, monkeypatch):
+    plan, projection, fake, manifest = frozen
+    first = adapter.launch(plan, projection, fake)
+    fake.status = "Completed."
+    adapter.poll_status(plan, first, fake)
+    fake.statistics = order_statistics(manifest["candidates"][0])
+    assert adapter.read_result_once(plan, first, fake)["run_valid"] is True
+    _, current_projection = diagnostic_revision(monkeypatch)
+    second = dataclasses.replace(plan, attempt=2)
+    calls_before = len(fake.calls)
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="unsuccessful terminal"):
+        adapter.launch(second, current_projection, fake)
+    assert len(fake.calls) == calls_before
+    assert not adapter._path(second, "claim").exists()
 
 
 def test_new_family_dispatch_keeps_claim_one_use_and_owner_research_waiver(frozen):

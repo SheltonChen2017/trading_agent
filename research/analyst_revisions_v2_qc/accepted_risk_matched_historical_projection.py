@@ -180,6 +180,77 @@ def _render_diagnostics(path, source, arm, slippage_bps):
     return ast.unparse(tree) + "\n"
 
 
+def _render_reference_refusal(path, source):
+    """Describe missing planning marks without changing or replacing them."""
+    if path != "accepted_risk_six_universe_order_qc_runtime.py":
+        return source
+    tree = ast.parse(source)
+    reference = _named_function(tree, "_reference_prices")
+    close = _named_function(tree, "on_after_close")
+    refusal = "six-universe RAW reference price census is incomplete; no stale-price fallback is permitted"
+    branches = [node for node in reference.body if isinstance(node, ast.If)
+                and ast.unparse(node.test) == "set(result) != set(security_ids)"]
+    assignments = [node for node in reference.body if isinstance(node, ast.Assign)
+                   and ast.unparse(node) == "sid_to_security = {}"]
+    symbols = [node for node in ast.walk(reference) if isinstance(node, ast.Assign)
+               and ast.unparse(node) == "sid_to_security[sid] = security_id"]
+    loops = [node for node in reference.body if isinstance(node, ast.For)
+             and any(item in symbols for item in node.body)]
+    calls = [node for node in ast.walk(close) if isinstance(node, ast.Call)
+             and ast.unparse(node) == "self._reference_prices(session, reference_ids)"]
+    if (len(branches) != 1 or len(assignments) != 1 or len(symbols) != 1 or len(loops) != 1
+            or len(calls) != 1 or [item.arg for item in reference.args.args]
+            != ["self", "session", "security_ids"] or reference.args.kwonlyargs
+            or len(branches[0].body) != 1
+            or ast.unparse(branches[0].body[0]) != f"_error({refusal!r})"):
+        _error("matched historical reference-refusal exact anchor changed")
+    reference.args.kwonlyargs.extend((ast.arg("target_security_ids"), ast.arg("holding_quantities")))
+    reference.args.kw_defaults.extend((None, None))
+    calls[0].keywords.extend(ast.parse(
+        "f(target_security_ids=tuple(sorted(target_weights)), holding_quantities=holdings)"
+    ).body[0].value.keywords)
+    reference.body.insert(reference.body.index(assignments[0]) + 1,
+                          ast.parse("reference_securities = {}").body[0])
+    # Reuse securities already resolved for the existing history request.
+    loops[0].body.insert(loops[0].body.index(symbols[0]) + 1,
+                        ast.parse("reference_securities[security_id] = _security").body[0])
+    branches[0].body = ast.parse("""
+if (type(target_security_ids) is not tuple
+        or tuple(sorted(set(target_security_ids))) != target_security_ids
+        or type(holding_quantities) is not dict
+        or any(type(quantity) is not int or quantity <= 0 for quantity in holding_quantities.values())
+        or set(target_security_ids) | set(holding_quantities) != set(security_ids)):
+    _error("six-universe missing-reference diagnostic context changed")
+missing = tuple(sorted(set(security_ids) - set(result)))
+missing_hashes = [hashlib.sha256(item.encode("utf-8")).hexdigest() for item in missing]
+entries = []
+for security_id, security_hash in zip(missing[:32], missing_hashes[:32]):
+    delisted = getattr(reference_securities[security_id], "is_delisted", None)
+    entries.append({
+        "security_id_sha256": security_hash,
+        "role": ("target_and_held" if security_id in target_security_ids and security_id in holding_quantities
+                 else "target_only" if security_id in target_security_ids else "held_only"),
+        "holding_quantity": holding_quantities.get(security_id, 0),
+        "is_delisted": delisted if type(delisted) is bool else None,
+    })
+context = _canonical({
+    "session": session,
+    "requested_count": len(security_ids),
+    "received_count": len(result),
+    "missing_count": len(missing),
+    "missing": entries,
+    "omitted_missing_count": max(0, len(missing) - 32),
+    "missing_security_id_path_sha256": _sha(missing_hashes),
+})
+if len(context) > 8192:
+    _error("six-universe missing-reference diagnostic exceeded bounded context")
+_error("six-universe RAW reference price census is incomplete; no stale-price fallback is permitted; context="
+       + context.decode("ascii"))
+""").body
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree) + "\n"
+
+
 def build_matched_historical_projection(package, arm, slippage_bps=0):
     """Return a launch-ready projection/profile, never launch or inspect returns.
 
@@ -201,7 +272,8 @@ def build_matched_historical_projection(package, arm, slippage_bps=0):
             source = _render_basket(path, source)
         if path == "accepted_risk_order_level_input_runtime.py":
             source = _recent._correct_input_reader(original)
-        sources[path] = _render_diagnostics(path, _render_identity(path, source, arm, slippage_bps), arm, slippage_bps)
+        sources[path] = _render_reference_refusal(path,
+            _render_diagnostics(path, _render_identity(path, source, arm, slippage_bps), arm, slippage_bps))
     sources[DIAGNOSTICS_PATH] = Path(__file__).with_name(DIAGNOSTICS_PATH).read_text(encoding="ascii")
     # Recompute every descendant authority from prospective source, never reuse
     # an old matched profile as the denominator of a changed construction.

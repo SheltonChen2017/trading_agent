@@ -5324,3 +5324,52 @@ or years of overwrite risk. Historical AR return attribution remains unproved;
 no QC launch/read, backtest input replacement or return calculation. Floor
 unchanged: **222 / 163 / 34 / 644**. Four corrected completion headings preserve
 their historical bodies and R203's failed-A1/valid-Mia-A2 distinction.
+
+## R-225 — matched historical AR-off, zero slippage; A1 runtime refusal — 2026-09-26
+
+Owner directed execution before another review of source `575b611`; lane
+section 198 prospectively freezes all six R225–R230 arms, unchanged manifest
+`8c7e79faf1b25603a110744ad4464cd22a439dfc65fa1fe312cbaddd6938e0e5`.
+Private project **37017548**, `147 ARV2 SIX MATCHED AR_OFF S0 R225 2021 2025`,
+A1 backtest `2eac544a09443faa044a14b30cf57524`. One of three attempts spent.
+2021-01-04–2025-12-31, fully AR-off cap-ranked top-ten equal slots plus
+own-ETF residuals, all-six 25% known-subset coverage, 98% gross target,
+10-bps fees / zero slippage per side, next-open MOO actual simulated orders.
+Launch **222 -> 223 shared / 163 -> 164 development / 34 infrastructure /
+644 cells**. A1 stopped at simulated **2022-10-03 16:00** because the RAW
+reference-price census for targets/current holdings was incomplete. The
+guard refused stale-price fallback. Exact terminal inventory/error inspected;
+no return/statistic read, no valid cell. Cause within the census is still
+under investigation; no blind unchanged-source retry. Current-vintage accepted-risk
+history; total AR ablation, not an independent confirmation or capacity winner.
+
+## R-226 — matched historical AR-on100, zero slippage; A1 runtime refusal — 2026-09-26
+
+Same prospective section-198 family/source `575b611`; private project
+**37017666**, `148 ARV2 SIX MATCHED AR_ON100 S0 R226 2021 2025`, A1 backtest
+`1ff10eae2ac4a03d202c0cc291dd784e`. One of three attempts spent. Same dates,
+input, coverage/exposure/order rules and 10-bps fees / zero slippage; AR entry,
+count and bounded 100% weight transfers active, XLE entry exception retained.
+Launch **223 -> 224 shared / 164 -> 165 development / 34 infrastructure /
+644 cells**. A1 stopped at simulated **2022-10-03 16:00**, with the same
+incomplete RAW reference-price census refusal as R225. Exact terminal/error
+inspected; no returns/statistics read, no cell. A valid individual arm would
+not clear the failed control or complete the six-arm matched comparison.
+
+## R-227 — matched historical actual six-ETF basket, zero slippage; A1 valid — 2026-09-26
+
+Original frozen source `575b611`, private project **37017790**,
+`149 ARV2 SIX MATCHED SIX_ETF_BASKET S0 R227 2021 2025`, A1 backtest
+`b9b45f646a567b5f688031e38cc5018e`. Same period, input and execution plumbing;
+equal six sleeve budgets apart from exact rounding residual, actual ETF
+orders only, 98% gross / 10-bps fees / zero slippage. One of three attempts
+spent. Launch **224 -> 225 shared / 165 -> 166 development / 34 infrastructure /
+644 cells**. Completed; sole bounded read **run_valid=true**, 1,255 observations,
+261 completed rebalances, **1,523 orders all filled**, zero invalid/canceled.
+Net account return **+106.334773436208%**, maximum drawdown **−21.273414804413%**,
+annualized volatility **19.828479860206%**, zero-rate Sharpe **0.833337465284**.
+Engine/model fees `$8,028.44136`, starting equity `$1,000,000`; no leverage
+exposure claim. Linked diagnostic is 4,818 bytes; source/panel/annual censuses
+accepted. Read adds one cell, **644 -> 645**, floor **225 / 166 / 34 / 645**.
+The stock controls remain invalid; no matched AR spread is claimed from this
+partial family. This ETF account is a simulated construction, not live returns.

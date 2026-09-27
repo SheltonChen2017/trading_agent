@@ -7,6 +7,7 @@ from decimal import Decimal, localcontext
 import hashlib
 import json
 from types import SimpleNamespace
+from pathlib import Path
 
 import pytest
 
@@ -192,3 +193,141 @@ def test_third_statistic_bytes_are_authenticated_by_emitted_meta(family):
         assert meta["matched_diagnostics_sha256"] == hashlib.sha256(diagnostic_text.encode("ascii")).hexdigest()
         assert meta["result_transport"] == "three_bounded_custom_summary_statistics"
         assert driver._completed and driver._emitted
+
+
+def _reference_driver(base, available, missing_count=3):
+    requested = tuple("security-" + str(index).zfill(3) for index in range(missing_count))
+    symbols = {security_id: SimpleNamespace(id="SID-" + security_id) for security_id in requested}
+    calls = []
+
+    class _Security:
+        def __init__(self, delisted):
+            self.is_delisted = delisted
+
+        @property
+        def price(self):
+            pytest.fail("missing history must never read a stale security price")
+
+    securities = {security_id: _Security(index == 0) for index, security_id in enumerate(requested)}
+
+    class _Batch:
+        time = datetime(2022, 10, 3, 16)
+
+        def items(self):
+            return tuple((symbols[security_id], SimpleNamespace(
+                symbol=symbols[security_id], time=self.time, close=Decimal("123.45")))
+                for security_id in available)
+
+    class _History:
+        def __getitem__(self, _trade_bar_type):
+            def read(*args, **kwargs):
+                calls.append((args, kwargs))
+                return (_Batch(),) if available else ()
+            return read
+
+    driver = object.__new__(base.AcceptedRiskSixUniverseOrderQcDriver)
+    driver._algorithm = SimpleNamespace(history=_History())
+    driver._trade_bar_type = object()
+    driver._daily_resolution = object()
+    driver._raw_normalization = object()
+    driver._reference_history_call_count = 0
+    driver._ensure_security = lambda security_id: (symbols[security_id], securities[security_id])
+    return driver, requested, calls
+
+
+@pytest.mark.parametrize("arm,slip", tuple((arm, slip) for arm in subject.ARMS for slip in subject.SLIPPAGE_BPS))
+def test_projected_missing_reference_refuses_with_truthful_bounded_context(family, arm, slip):
+    with subject._relaxed._cloud_loader(_sources(family[arm, slip][0])) as (load, _):
+        base = load("accepted_risk_six_universe_order_qc_runtime")
+        driver, ids, calls = _reference_driver(base, ())
+        with pytest.raises(base.AcceptedRiskSixUniverseOrderQcRuntimeError,
+                           match="no stale-price fallback is permitted; context=") as caught:
+            driver._reference_prices("2022-10-03", ids,
+                target_security_ids=(ids[0], ids[2]), holding_quantities={ids[1]: 7, ids[2]: 9})
+        text = str(caught.value).split("; context=", 1)[1]
+        value = json.loads(text)
+        assert len(text.encode("ascii")) <= 8192
+        assert text == base._canonical(value).decode("ascii")
+        assert value["session"] == "2022-10-03"
+        assert (value["requested_count"], value["received_count"], value["missing_count"]) == (3, 0, 3)
+        assert value["omitted_missing_count"] == 0
+        hashes = [hashlib.sha256(security_id.encode("utf-8")).hexdigest() for security_id in ids]
+        assert value["missing_security_id_path_sha256"] == base._sha(hashes)
+        assert value["missing"] == [
+            {"security_id_sha256": hashes[0], "role": "target_only", "holding_quantity": 0, "is_delisted": True},
+            {"security_id_sha256": hashes[1], "role": "held_only", "holding_quantity": 7, "is_delisted": False},
+            {"security_id_sha256": hashes[2], "role": "target_and_held", "holding_quantity": 9, "is_delisted": False},
+        ]
+        assert all(security_id not in text for security_id in ids)
+        assert "123.45" not in text
+        assert len(calls) == driver._reference_history_call_count == 1
+        assert calls[0][1]["fill_forward"] is False
+        assert calls[0][1]["data_normalization_mode"] is driver._raw_normalization
+
+
+def test_projected_reference_complete_and_partial_paths_keep_exact_history_marks(family):
+    with subject._relaxed._cloud_loader(_sources(family["ar_off", 0][0])) as (load, _):
+        base = load("accepted_risk_six_universe_order_qc_runtime")
+        ids = tuple("security-" + str(index).zfill(3) for index in range(3))
+        driver, requested, calls = _reference_driver(base, ids)
+        assert driver._reference_prices("2022-10-03", requested,
+            target_security_ids=ids, holding_quantities={}) == {security_id: Decimal("123.45") for security_id in ids}
+        assert len(calls) == driver._reference_history_call_count == 1
+        driver, requested, calls = _reference_driver(base, ids[:2])
+        with pytest.raises(base.AcceptedRiskSixUniverseOrderQcRuntimeError) as caught:
+            driver._reference_prices("2022-10-03", requested, target_security_ids=ids, holding_quantities={})
+        value = json.loads(str(caught.value).split("; context=", 1)[1])
+        assert (value["requested_count"], value["received_count"], value["missing_count"]) == (3, 2, 1)
+        assert value["missing"][0]["security_id_sha256"] == hashlib.sha256(ids[2].encode()).hexdigest()
+        assert len(calls) == driver._reference_history_call_count == 1
+
+
+def test_projected_reference_refusal_bounds_large_missing_census(family):
+    with subject._relaxed._cloud_loader(_sources(family["ar_off", 0][0])) as (load, _):
+        base = load("accepted_risk_six_universe_order_qc_runtime")
+        driver, requested, calls = _reference_driver(base, (), missing_count=base.MAXIMUM_REFERENCE_SECURITIES)
+        with pytest.raises(base.AcceptedRiskSixUniverseOrderQcRuntimeError) as caught:
+            driver._reference_prices("2022-10-03", requested, target_security_ids=requested, holding_quantities={})
+        text = str(caught.value).split("; context=", 1)[1]
+        value = json.loads(text)
+        assert len(text.encode("ascii")) <= 8192
+        assert len(value["missing"]) == 32
+        assert value["missing_count"] == base.MAXIMUM_REFERENCE_SECURITIES
+        assert value["omitted_missing_count"] == base.MAXIMUM_REFERENCE_SECURITIES - 32
+        assert len(calls) == 1
+
+
+def test_projected_after_close_supplies_exact_target_and_nonzero_holding_context(family):
+    with subject._relaxed._cloud_loader(_sources(family["ar_off", 0][0])) as (load, _):
+        base = load("accepted_risk_six_universe_order_qc_runtime")
+        driver = object.__new__(base.AcceptedRiskSixUniverseOrderQcDriver)
+        driver._algorithm = SimpleNamespace(time=datetime(2022, 10, 3, 16))
+        driver._require_initialized = lambda: None
+        driver._observe_account = lambda session: None
+        driver._decision_set = {"2022-10-03"}
+        driver._variant = "r177"
+        driver._snapshot = lambda session: object()
+        driver._target_builder = SimpleNamespace(next_required_session="2022-10-03", build=lambda *args: SimpleNamespace(
+            target_weights=(SimpleNamespace(security_id="target", weight=Decimal("0.98")),),
+            target_sha256="a" * 64, sleeves=()))
+        driver._current_holding_census = lambda: {"held": 7}
+        driver._executor = SimpleNamespace(close_open_rebalance=lambda: None, prepare_rebalance=lambda **kwargs: None)
+        driver._prune_execution_subscriptions = lambda ids: None
+        observed = []
+        driver._reference_prices = lambda *args, **kwargs: observed.append((args, kwargs)) or {}
+        driver._session_positions = {"2022-10-03": 0}
+        driver._session_axis = ("2022-10-03", "2022-10-04")
+        driver._decision_target_sha256s = []
+        driver._record_sleeve_diagnostics = lambda sleeves: None
+        driver._fallback_counts = {}
+        assert driver.on_after_close() is True
+        assert observed == [(("2022-10-03", ("held", "target")),
+                             {"target_security_ids": ("target",), "holding_quantities": {"held": 7}})]
+
+
+def test_reference_diagnostic_renderer_requires_exact_original_refusal_anchor():
+    path = "accepted_risk_six_universe_order_qc_runtime.py"
+    original = Path(subject.__file__).with_name(path).read_text(encoding="ascii")
+    changed = original.replace("no stale-price fallback is permitted", "changed refusal", 1)
+    with pytest.raises(subject.MatchedHistoricalProjectionError, match="reference-refusal exact anchor"):
+        subject._render_reference_refusal(path, changed)

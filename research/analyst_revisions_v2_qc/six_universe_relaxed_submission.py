@@ -36,6 +36,10 @@ FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256 = "be23fba84bf233d3e667a649b
 MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_closing_minute_candidates.json")
 FROZEN_MATCHED_STUDY_FEE_CALLBACK_MANIFEST_SHA256 = "ed48433443670d5e04ce53188d2bfb5b3a67b78946a7e9ef642bb38dff55b35b"
 MATCHED_STUDY_FEE_CALLBACK_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_fee_callback_candidates.json")
+# Prospectively separate QCOM-excluded sensitivity: never dispatch an R225
+# retry or repin any of the four historical matched-study source generations.
+FROZEN_QCOM_EXCLUSION_MANIFEST_SHA256 = "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0"
+QCOM_EXCLUSION_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_exclusion_candidates.json")
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -172,6 +176,16 @@ def _matched_study_fee_callback_manifest():
     return value
 
 
+def _qcom_exclusion_manifest():
+    if type(FROZEN_QCOM_EXCLUSION_MANIFEST_SHA256) is not str:
+        _fail("QCOM-excluded study has no frozen manifest pin")
+    raw = QCOM_EXCLUSION_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != FROZEN_QCOM_EXCLUSION_MANIFEST_SHA256:
+        _fail("QCOM-excluded study is not the frozen manifest")
+    from . import six_universe_qcom_exclusion_study as study
+    return study.validate_manifest(json.loads(raw))
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -193,10 +207,14 @@ def _plan_manifest(plan):
                 else _matched_study_diagnostic_manifest() if _matched_study_diagnostic_attempt(plan)
                 else _matched_study_closing_minute_manifest() if _matched_study_closing_minute_attempt(plan)
                 else _matched_study_fee_callback_manifest())
+    if type(plan.family) is str and plan.family == "qcom_exclusion":
+        return _qcom_exclusion_manifest()
     _fail("relaxed plan family changed")
 
 
 def _plan_manifest_sha256(plan):
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion":
+        return FROZEN_QCOM_EXCLUSION_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
                 else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 if _matched_study_diagnostic_attempt(plan)
@@ -228,7 +246,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]
@@ -347,13 +365,13 @@ def preview(plan, projection):
 
 def _require_inputs(plan):
     family = _plan_manifest(plan)
-    if plan.family == "matched_study":
+    if plan.family in {"matched_study", "qcom_exclusion"}:
         # Historical production inputs remain the exact reviewed package and
         # activation; this family must never use the recent R203 upload permit.
         from . import accepted_risk_delta_order_package as delta
-        from . import six_universe_matched_study as study
+        from . import six_universe_matched_study as historical
         if (family["package_sha256"] != delta.EXPECTED_DELTA_PACKAGE_SHA256
-                or family["activation_manifest_sha256"] != study.HISTORICAL_ACTIVATION_SHA256):
+                or family["activation_manifest_sha256"] != historical.HISTORICAL_ACTIVATION_SHA256):
             _fail("matched study historical input binding changed")
         return
     control = Path(family["input_control_directory"])
@@ -583,6 +601,9 @@ def _statistic(value):
 def _parse_order(plan, statistics):
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         from . import six_universe_matched_study as study
+        return study.parse_order(plan, statistics)
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion":
+        from . import six_universe_qcom_exclusion_study as study
         return study.parse_order(plan, statistics)
     return _parse_order_common(plan, statistics)
 

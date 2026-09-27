@@ -15,6 +15,7 @@ from . import accepted_risk_six_universe_order_relaxed_qc_projection as _relaxed
 from . import accepted_risk_six_universe_order_settlement_qc_projection as _settlement
 from . import accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection as _historical
 from . import accepted_risk_six_universe_order_tilt_recent_qc_projection as _recent
+from . import accepted_risk_delta_order_package as _delta
 from . import six_universe_relaxed_selection_source as _selection
 
 
@@ -29,6 +30,10 @@ META_SCHEMA = "arv2-six-matched-historical-meta-v1"
 SUMMARY_SCHEMA = "arv2-six-matched-historical-summary-v1"
 REFERENCE_PRICE_RULE = "raw_daily_history_or_exact_same_session_closing_minute_tradebar_v1"
 ENGINE_FEE_BASIS = "raw_moo_open_plus_signed_installed_slippage_v1"
+QCOM_EXCLUSION_POLICY_ID = "qcom_stock_eligibility_after_coverage_v1"
+QCOM_EXCLUSION_SECURITY_ID_SHA256 = "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f"
+QCOM_EXCLUSION_META_SCHEMA = "arv2-six-matched-qcom-excluded-meta-v1"
+QCOM_EXCLUSION_SUMMARY_SCHEMA = "arv2-six-matched-qcom-excluded-summary-v1"
 
 
 def _error(message):
@@ -423,3 +428,240 @@ def build_matched_historical_projection(package, arm, slippage_bps=0):
     digest = hashlib.sha256(_base._canonical(semantic)).hexdigest()
     return dataclasses.replace(value, projection_sha256=digest,
         projection_id="arv2-six-matched-historical-projection-" + digest[:24]), json.loads(_base._canonical(profile))
+
+
+def _authenticated_qcom_security_id(package):
+    """Bind the exclusion to the reviewed logical ID, never a current ticker."""
+    if (type(package) is not _delta.AcceptedRiskDeltaOrderPackage
+            or package.package.package_sha256 != _delta.EXPECTED_DELTA_PACKAGE_SHA256):
+        _error("QCOM exclusion requires the exact historical package")
+    _manifest, roles = _delta._load_prior_roles(package.package)
+    bindings = roles["runtime_symbol_bindings"]
+    matches = [row for row in bindings
+               if type(row) is dict and row.get("diagnostic_current_ticker") == "QCOM"]
+    if len(matches) != 1 or type(matches[0].get("security_id")) is not str:
+        _error("QCOM exclusion historical identity is missing or ambiguous")
+    security_id = matches[0]["security_id"]
+    if (not security_id or hashlib.sha256(security_id.encode("utf-8")).hexdigest()
+            != QCOM_EXCLUSION_SECURITY_ID_SHA256):
+        _error("QCOM exclusion historical identity differs from R225 diagnostic")
+    return security_id
+
+
+def _render_qcom_exclusion(path, source, security_id, arm, slippage_bps):
+    """Change only eligibility/guards and variant schemas in a rendered arm."""
+    old_role = f"matched_historical_{arm}_s{slippage_bps}"
+    new_role = f"matched_qcom_excluded_{arm}_s{slippage_bps}"
+    old_variant = f"cap90_matched_historical_{arm}_s{slippage_bps}_v1"
+    new_variant = f"cap90_matched_qcom_excluded_{arm}_s{slippage_bps}_v1"
+    changed_paths = (_relaxed._GATE_PATH, "accepted_risk_six_universe_order_qc_runtime.py",
+                     _relaxed._TILT_RUNTIME_PATH, "main.py")
+    if path not in changed_paths and old_role not in source and old_variant not in source:
+        return source
+    tree = ast.parse(source)
+
+    class ExactRuntimeIdentity(ast.NodeTransformer):
+        count = 0
+
+        def visit_Constant(self, node):
+            replacement = {old_role: new_role, old_variant: new_variant}.get(node.value) if type(node.value) is str else None
+            if replacement is not None:
+                self.count += 1
+                node.value = replacement
+            return node
+
+    identity = ExactRuntimeIdentity()
+    tree = identity.visit(tree)
+    if path not in changed_paths and identity.count == 0:
+        _error("QCOM exclusion role/variant identity anchor changed")
+    if path == _relaxed._GATE_PATH:
+        constants = {
+            "EXCLUDED_QCOM_SECURITY_ID": security_id,
+            "EXCLUDED_QCOM_SECURITY_ID_SHA256": QCOM_EXCLUSION_SECURITY_ID_SHA256,
+        }
+        insertion = next((index for index, node in enumerate(tree.body)
+                          if isinstance(node, (ast.Assign, ast.AnnAssign, ast.ClassDef, ast.FunctionDef))), None)
+        if insertion is None:
+            _error("QCOM exclusion gate insertion anchor changed")
+        tree.body[insertion:insertion] = [ast.Assign([ast.Name(name, ast.Store())], ast.Constant(value))
+                                          for name, value in constants.items()]
+        schema_count = 0
+        for node in tree.body:
+            if (isinstance(node, ast.Assign) and len(node.targets) == 1
+                    and isinstance(node.targets[0], ast.Name)
+                    and node.targets[0].id in ("PROFILE_SCHEMA", "CONSTRUCTION_SCHEMA")
+                    and isinstance(node.value, ast.Constant) and type(node.value.value) is str):
+                node.value.value += "-qcom-excluded-v1"
+                schema_count += 1
+        semantic = _named_function(tree, "_profile_semantic")
+        semantic_returns = [node for node in semantic.body
+                            if isinstance(node, ast.Return) and isinstance(node.value, ast.Dict)]
+        if len(semantic_returns) != 1:
+            _error("QCOM exclusion profile disclosure anchor changed")
+        profile_dict = semantic_returns[0].value
+        keys = [key.value if isinstance(key, ast.Constant) else None for key in profile_dict.keys]
+        if (schema_count != 2 or keys.count("minimum_positive_score_count") != 1
+                or "excluded_logical_security_sha256" in keys):
+            _error("QCOM exclusion gate schema or profile anchor changed")
+        profile_dict.keys.extend((ast.Constant("stock_exclusion_policy_id"),
+                                  ast.Constant("excluded_logical_security_sha256"),
+                                  ast.Constant("stock_exclusion_scope")))
+        profile_dict.values.extend((ast.Constant(QCOM_EXCLUSION_POLICY_ID),
+                                    ast.Name("EXCLUDED_QCOM_SECURITY_ID_SHA256", ast.Load()),
+                                    ast.Constant("all_six_stock_sleeves_all_decisions_2021_2025_coverage_denominators_unchanged")))
+        sleeve = _named_function(tree, "_raw_sleeve")
+        coverage = [node for node in ast.walk(sleeve) if isinstance(node, ast.Assign)
+                    and ast.unparse(node) == "coverage = _coverage(rows, profile, snapshot.universe_id)"]
+        selected = [node for node in sleeve.body if isinstance(node, ast.Assign)
+                    and isinstance(node.value, ast.Call)
+                    and ast.unparse(node.value.func) == "_selected_ids"]
+        xle = [node for node in ast.walk(sleeve) if isinstance(node, ast.Assign)
+               and any(isinstance(target, ast.Name) and target.id == "eligible"
+                       for target in node.targets)]
+        if (len(coverage) != 1 or len(selected) != 1 or len(xle) != 1
+                or len(selected[0].value.args) != 3
+                or ast.unparse(selected[0].value.args[0]) != "rows"
+                or not isinstance(xle[0].value, ast.Call)
+                or len(xle[0].value.args) != 1
+                or not isinstance(xle[0].value.args[0], ast.GeneratorExp)
+                or len(xle[0].value.args[0].generators) != 1
+                or ast.unparse(xle[0].value.args[0].generators[0].iter) != "rows"):
+            _error("QCOM exclusion eligibility anchor changed")
+        # The original rows still determine source validity and coverage.
+        # Only stock rank/entry candidates are filtered; unfilled capital
+        # follows the unchanged own-sleeve ETF rule.
+        sleeve.body.insert(sleeve.body.index(selected[0]), ast.parse(
+            "eligible_rows = tuple(row for row in rows if row.security_id != EXCLUDED_QCOM_SECURITY_ID)"
+        ).body[0])
+        selected[0].value.args[0] = ast.Name("eligible_rows", ast.Load())
+        xle[0].value.args[0].generators[0].iter = ast.Name("eligible_rows", ast.Load())
+    elif path == "accepted_risk_six_universe_order_qc_runtime.py":
+        schema = [node for node in tree.body if isinstance(node, ast.Assign)
+                  and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+                  and node.targets[0].id == "META_SCHEMA"]
+        reference = _named_function(tree, "_reference_prices")
+        closing = _named_function(tree, "on_after_close")
+        holdings = [node for node in closing.body if isinstance(node, ast.Assign)
+                    and ast.unparse(node) == "holdings = self._current_holding_census()"]
+        if (len(schema) != 1 or len(holdings) != 1
+                or not isinstance(schema[0].value, ast.Constant)
+                or type(schema[0].value.value) is not str):
+            _error("QCOM exclusion runtime guard anchor changed")
+        schema[0].value = ast.Constant(QCOM_EXCLUSION_META_SCHEMA)
+        closing.body.insert(closing.body.index(holdings[0]) + 1, ast.parse('''
+if (_gate.EXCLUDED_QCOM_SECURITY_ID in target_weights
+        or _gate.EXCLUDED_QCOM_SECURITY_ID in holdings):
+    _error("QCOM-excluded sensitivity contains an excluded target or holding")
+''').body[0])
+        reference.body.insert(0, ast.parse('''
+if _gate.EXCLUDED_QCOM_SECURITY_ID in security_ids:
+    _error("QCOM-excluded sensitivity requested an excluded reference")
+''').body[0])
+    elif path == _relaxed._TILT_RUNTIME_PATH:
+        summaries = [node for node in tree.body if isinstance(node, ast.Assign)
+                  and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+                  and node.targets[0].id == "TILT_SUMMARY_SCHEMA"]
+        metas = [node for node in tree.body if isinstance(node, ast.Assign)
+                 and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+                 and node.targets[0].id == "TILT_META_SCHEMA"]
+        profile_schemas = [node for node in tree.body if isinstance(node, ast.Assign)
+                           and len(node.targets) == 1 and isinstance(node.targets[0], ast.Name)
+                           and node.targets[0].id == "TILT_PROFILE_SCHEMA"]
+        updates = [node.args[0] for node in ast.walk(_named_function(tree, "require_tilt_profile"))
+                   if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                       and isinstance(node.func.value, ast.Name) and node.func.value.id == "seed"
+                       and node.func.attr == "update" and len(node.args) == 1
+                       and isinstance(node.args[0], ast.Dict))]
+        aggregate_updates = [node.args[0] for node in ast.walk(_named_function(tree, "_aggregate"))
+                             if (isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute)
+                                 and isinstance(node.func.value, ast.Name) and node.func.value.id == "aggregate"
+                                 and node.func.attr == "update" and len(node.args) == 1
+                                 and isinstance(node.args[0], ast.Dict))]
+        if (len(summaries) != 1 or not isinstance(summaries[0].value, ast.Constant)
+                or len(metas) != 1 or len(profile_schemas) != 1
+                or not isinstance(profile_schemas[0].value, ast.Constant)
+                or len(aggregate_updates) != 1
+                or len(updates) != 1):
+            _error("QCOM exclusion summary schema anchor changed")
+        summaries[0].value = ast.Constant(QCOM_EXCLUSION_SUMMARY_SCHEMA)
+        metas[0].value = ast.Constant(QCOM_EXCLUSION_META_SCHEMA)
+        profile_schemas[0].value = ast.Constant("arv2-six-matched-qcom-excluded-profile-v1")
+        keys = [key.value if isinstance(key, ast.Constant) else None for key in updates[0].keys]
+        aggregate_keys = [key.value if isinstance(key, ast.Constant) else None
+                          for key in aggregate_updates[0].keys]
+        if (keys.count("maximum_stock_weight_change_fraction") != 1
+                or aggregate_keys.count("maximum_stock_weight_change_fraction") != 1
+                or "stock_exclusion_policy_id" in keys
+                or "stock_exclusion_policy_id" in aggregate_keys):
+            _error("QCOM exclusion tilt profile disclosure anchor changed")
+        profile_ids = [index for index, key in enumerate(keys) if key == "profile_id"]
+        if len(profile_ids) != 1:
+            _error("QCOM exclusion tilt profile ID anchor changed")
+        updates[0].values[profile_ids[0]] = ast.Constant(
+            f"arv2-six-matched-qcom-excluded-{arm}-s{slippage_bps}-profile-v1")
+        updates[0].keys.extend((ast.Constant("stock_exclusion_policy_id"),
+                                ast.Constant("excluded_logical_security_sha256")))
+        updates[0].values.extend((ast.Constant(QCOM_EXCLUSION_POLICY_ID),
+                                  ast.Constant(QCOM_EXCLUSION_SECURITY_ID_SHA256)))
+        aggregate_updates[0].keys.extend((ast.Constant("stock_exclusion_policy_id"),
+                                          ast.Constant("excluded_logical_security_sha256")))
+        aggregate_updates[0].values.extend((ast.Constant(QCOM_EXCLUSION_POLICY_ID),
+                                            ast.Constant(QCOM_EXCLUSION_SECURITY_ID_SHA256)))
+    elif path == "main.py":
+        classes = [node for node in tree.body if isinstance(node, ast.ClassDef)
+                   and node.name == f"ARV2MatchedHistorical{arm.title().replace('_', '')}S{slippage_bps}Algorithm"]
+        if len(classes) != 1:
+            _error("QCOM exclusion main algorithm anchor changed")
+        classes[0].name = classes[0].name.replace("Algorithm", "QcomExcludedAlgorithm")
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree) + "\n"
+
+
+def build_qcom_exclusion_projection(package, arm, slippage_bps=0):
+    """Prospective QCOM-excluded stock sensitivity; not a rerun of R225.
+
+    This preserves every original constituent/coverage denominator and all
+    historical input bytes. It excludes one authenticated logical security
+    from stock eligibility from the first decision in both stock arms.
+    """
+    if type(arm) is not str or arm not in ("ar_off", "ar_on100"):
+        _error("QCOM exclusion needs the exact two stock arms")
+    if type(slippage_bps) is not int or slippage_bps not in SLIPPAGE_BPS:
+        _error("QCOM exclusion needs zero or five bps slippage")
+    security_id = _authenticated_qcom_security_id(package)
+    predecessor, old_profile = build_matched_historical_projection(package, arm, slippage_bps)
+    sources = {item.project_path: _render_qcom_exclusion(item.project_path,
+        item.source_bytes.decode("ascii"), security_id, arm, slippage_bps)
+        for item in predecessor.source_files}
+    with _relaxed._cloud_loader(sources) as (load, _):
+        baseline = load(_relaxed._BRIDGE_NAME).require_bridge_profile("matched")
+        sources[_relaxed._TILT_RUNTIME_PATH] = _relaxed._replace(
+            sources[_relaxed._TILT_RUNTIME_PATH],
+            old_profile["matched_baseline_profile_sha256"], baseline["profile_sha256"])
+        runtime = load(_relaxed._TILT_RUNTIME_PATH[:-3])
+        profile = runtime.require_tilt_profile()
+        runtime.expected_tilt_custom_statistic_names()
+        if (profile.get("stock_exclusion_policy_id") != QCOM_EXCLUSION_POLICY_ID
+                or profile.get("excluded_logical_security_sha256") != QCOM_EXCLUSION_SECURITY_ID_SHA256
+                or runtime.TILT_META_SCHEMA != QCOM_EXCLUSION_META_SCHEMA
+                or runtime.TILT_SUMMARY_SCHEMA != QCOM_EXCLUSION_SUMMARY_SCHEMA):
+            _error("QCOM exclusion profile or transport schema changed")
+    files = tuple(sorted((_base._source_file(path, source.encode("ascii"))
+                          for path, source in sources.items()), key=lambda item: item.project_path))
+    total = sum(item.byte_count for item in files)
+    if (len(files) != 17 or len({item.project_path for item in files}) != 17
+            or any(item.byte_count > _base.MAXIMUM_QC_SOURCE_CHARACTERS for item in files)
+            or total + _base.MINIMUM_REVIEW_MARGIN_BYTES > _base.MAXIMUM_TOTAL_SOURCE_BYTES):
+        _error("QCOM-excluded source closure exceeded unchanged QC budgets")
+    for item in files:
+        _base._audit_source(item.project_path, item.source_bytes)
+    value = dataclasses.replace(predecessor,
+        schema="arv2-six-matched-qcom-excluded-projection-v1",
+        variant=f"cap90_matched_qcom_excluded_{arm}_s{slippage_bps}_v1", role=profile["role"],
+        profile_id=profile["profile_id"], profile_sha256=profile["profile_sha256"],
+        source_files=files, total_source_byte_count=total)
+    semantic = {key: item for key, item in value.to_record().items()
+                if key not in ("projection_id", "projection_sha256")}
+    digest = hashlib.sha256(_base._canonical(semantic)).hexdigest()
+    return dataclasses.replace(value, projection_sha256=digest,
+        projection_id="arv2-six-matched-qcom-excluded-projection-" + digest[:24]), json.loads(_base._canonical(profile))

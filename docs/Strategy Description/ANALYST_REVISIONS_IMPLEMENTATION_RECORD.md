@@ -140,8 +140,11 @@ QuantConnect's daily, cached, current-slice, and exact-minute paths on
 2022-10-03; the analyst-revision question on 2021–2025 stays open.
 Section 201 counter-reviews both pushed Claude commits, accepts the closure
 correction, and qualifies the record's accounting, drift and inference claims.
-The owner is debugging QC with Mia; Codex performs no cloud mutation or launch
-in this counter-review. The look floor remains **232 / 173 / 34 / 646**.
+The owner is debugging QC with Mia; Codex performed no cloud mutation or launch
+in that counter-review. Section 202 prospectively freezes a separate
+QCOM-direct-stock-excluded 2021–2025 sensitivity, leaving R225 and Mia's QC
+project untouched. Its QC execution and outcome status are recorded below.
+Before any new launch its look floor is **232 / 173 / 34 / 646**.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -781,6 +784,14 @@ counter-review, and section 200 completes that review; the round's single
 push carries `c0f3e87`, `7ec16ba`, and the section-200 record commit. Next,
 investigate bounded same-SID session availability/mapping, not an identical
 performance retry.
+
+The owner subsequently authorized the separate QCOM-excluded sensitivity in
+section 202. Execute only its exact new four-arm, order-based source and
+three-attempt bounds, record every actual QC launch and bounded result, then
+make one lane push. Claude reviews section 202 at that pushed snapshot;
+Codex counter-reviews Claude's eventual changes before another milestone.
+This is an owner-directed review-timing exception for the same round, not
+permission to run a fourth R225 attempt or infer formal alpha.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -28279,3 +28290,70 @@ Added that direction without weakening the gate; rerun **120 passed in
 closure file, **194 unique focused cases passed**. Targeted `py_compile`
 and `git diff --check` clean; final record-only checks rerun before commit.
 No failed QC attempt or canceled/full suite is hidden in these counts.
+
+## 202. Prospective QCOM-excluded historical sensitivity, 2026-09-27
+
+### 202.1 Frozen question and source before any launch
+
+The owner asked for a way to proceed while QuantConnect/Mia investigates the
+missing same-session QCOM reference on 2022-10-03. This is a **new exploratory
+sensitivity**, not R225 A4, a repair or completion of R225–R230, or evidence
+that QCOM's historical returns can be safely omitted. Those six frozen
+manifests, their attempts, the 2021–2025 input package, the 261-decision axis,
+the valid R227/R230 ETF results and the exhausted R225 budget are unchanged.
+QCOM can remain present indirectly inside an ETF; only direct-stock eligibility
+is excluded. No stale bar, synthetic QCOM price, skipped session, changed
+period, or additional missing-name exclusion is admitted.
+
+The authenticated historical package has exactly one current-ticker QCOM
+binding. Its *logical* security ID hashes to
+`12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f`,
+the ID observed in R225's missing-reference diagnostic. The new rendered
+gate retains every original universe constituent in membership and coverage
+denominators, then excludes that exact ID from stock-eligible ranks in all
+six sleeves, including XLE. The next eligible stock fills a slot when one
+exists; any unfilled stock budget stays in its own sleeve ETF. Both AR-off
+and AR-on use the identical exclusion. The runtime refuses an excluded direct
+target, holding, or reference request; it never accepts a prior close in
+place of a current-session price.
+
+The separately frozen four-arm manifest is
+`research/analyst_revisions_v2_qc/six_universe_qcom_exclusion_candidates.json`,
+SHA-256 `53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0`.
+It binds the unchanged historical package
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`
+and activation
+`69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41`,
+the new exclusion policy `qcom_stock_eligibility_after_coverage_v1`, exact
+source-file/projection/profile hashes, three-statistic result transport, and
+distinct private QC projects. It fixes 2021-01-04 through 2025-12-31, 1,255
+daily account observations, 261 weekly prior-session decisions with next-open
+physical MOO orders, 98% target gross, two-times *buying-power admission*
+(not two-times target exposure), 10 bps modeled fees per side, and either
+zero or five bps modeled adverse slippage. It is not a capacity search or a
+formal/confirmatory alpha test.
+
+| New candidate | AR economics | Slippage | Frozen projection SHA-256 |
+|---|---|---:|---|
+| R231 | Fully AR-off cap-ranked stock selection | 0 bps | `0c6a4c5a7cd3bffacb9d4148b5167fe0d1b38b8617b3c01fd974f2639a76704b` |
+| R232 | AR entry/count plus 100% stock-weight tilt | 0 bps | `87c3ecd2a36522f101086afeaf0bf19758757267f59035db2fb169e23bd3e803` |
+| R233 | Fully AR-off cap-ranked stock selection | 5 bps | `f1a6fb92823dea0c15a70ebef9b5dddebdfb9f5ba58be3e617815659832b02e5` |
+| R234 | AR entry/count plus 100% stock-weight tilt | 5 bps | `6637b2fa86e25135446d90af59af44ced2f9cde03d0f4dfa1d2c185d6aade1f9` |
+
+The preregistered primary comparison is R232 minus R231 after modeled costs;
+R234 minus R233 is the cost sensitivity. A valid paired comparison requires
+all four authenticated order results, common membership/cap and ETF RAW-panel
+digests, exact source-row and unavailable-collection censuses, account window
+and starting capital. The old R227/R230 ETF results are contextual only, not
+members of this exact four-stock-arm matched comparison. Source/panel digest
+equality still does not prove equality of every minute stock fill. The
+current-vintage Benzinga overwrite and PIT-causality caveat in
+`ARV2R196-001` remains open regardless of any new return.
+
+Each new candidate has at most three QC launch attempts in its own new
+project, with every attempted launch counted conservatively. An invalid
+candidate is not renamed to disguise a fourth attempt; after three failures,
+the owner/Mia recovery rule applies. A terminal `Completed.` is not a valid
+result until its one-use bounded custom-statistic reader accepts it. No
+provider rows, raw order rows, logs, broker, live/paper/funded orders,
+deployment, or trading are within this research sensitivity.

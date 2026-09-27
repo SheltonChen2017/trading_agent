@@ -30,6 +30,131 @@ def _sources(projection):
     return {item.project_path: item.source_bytes.decode("ascii") for item in projection.source_files}
 
 
+@pytest.fixture(scope="module")
+def qcom_excluded_family(package):
+    return {(arm, slip): subject.build_qcom_exclusion_projection(package, arm, slip)
+            for arm in ("ar_off", "ar_on100") for slip in (0, 5)}
+
+
+def test_qcom_exclusion_binds_one_authenticated_logical_security(package, monkeypatch):
+    security_id = subject._authenticated_qcom_security_id(package)
+    assert hashlib.sha256(security_id.encode("utf-8")).hexdigest() == subject.QCOM_EXCLUSION_SECURITY_ID_SHA256
+    for bindings in ((), ({"diagnostic_current_ticker": "QCOM", "security_id": security_id},) * 2,
+                     ({"diagnostic_current_ticker": "QCOM", "security_id": "other"},)):
+        monkeypatch.setattr(subject._delta, "_load_prior_roles",
+            lambda _package, rows=bindings: ({}, {"runtime_symbol_bindings": rows}))
+        with pytest.raises(subject.MatchedHistoricalProjectionError, match="QCOM exclusion historical identity"):
+            subject._authenticated_qcom_security_id(package)
+
+
+def test_qcom_exclusion_variants_preserve_input_and_audited_closure(qcom_excluded_family, family):
+    for (arm, slip), (value, profile) in qcom_excluded_family.items():
+        original, _original_profile = family[arm, slip]
+        assert (value.package_sha256, value.activation_manifest_sha256) == (
+            original.package_sha256, original.activation_manifest_sha256)
+        assert value.schema == "arv2-six-matched-qcom-excluded-projection-v1"
+        assert value.role == profile["role"] == f"matched_qcom_excluded_{arm}_s{slip}"
+        assert value.variant == f"cap90_matched_qcom_excluded_{arm}_s{slip}_v1"
+        assert profile["stock_exclusion_policy_id"] == subject.QCOM_EXCLUSION_POLICY_ID
+        assert profile["excluded_logical_security_sha256"] == subject.QCOM_EXCLUSION_SECURITY_ID_SHA256
+        sources = _sources(value)
+        predecessor = _sources(original)
+        assert len(sources) == len(predecessor) == 17
+        for path in sources:
+            if sources[path] == predecessor[path]:
+                continue
+            assert path in {"accepted_risk_six_universe_gate.py", "accepted_risk_six_universe_order_qc_runtime.py",
+                "accepted_risk_six_universe_order_tilt_qc_runtime.py", "accepted_risk_six_universe_order_tilt_targets.py",
+                "accepted_risk_six_universe_order_bridge_qc_runtime.py", "main.py"}
+        assert sources["accepted_risk_order_level_input_runtime.py"] == predecessor["accepted_risk_order_level_input_runtime.py"]
+        assert sources["accepted_risk_matched_diagnostics.py"] == predecessor["accepted_risk_matched_diagnostics.py"]
+        for item in value.source_files:
+            subject._base._audit_source(item.project_path, item.source_bytes)
+        with subject._relaxed._cloud_loader(sources) as (load, _):
+            runtime = load(subject._relaxed._TILT_RUNTIME_PATH[:-3])
+            assert runtime.require_tilt_profile() == profile
+            assert runtime.TILT_META_SCHEMA == subject.QCOM_EXCLUSION_META_SCHEMA
+            assert runtime.TILT_SUMMARY_SCHEMA == subject.QCOM_EXCLUSION_SUMMARY_SCHEMA
+
+
+@pytest.mark.parametrize("arm", ("ar_off", "ar_on100"))
+@pytest.mark.parametrize("slippage_bps", (0, 5))
+@pytest.mark.parametrize("universe", ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE"))
+def test_qcom_exclusion_after_coverage_preserves_denominators_and_stock_slots(
+        qcom_excluded_family, family, package, arm, slippage_bps, universe):
+    security_id = subject._authenticated_qcom_security_id(package)
+    value, _ = qcom_excluded_family[arm, slippage_bps]
+    with subject._relaxed._cloud_loader(_sources(value)) as (load, _):
+        gate = load(subject._relaxed._GATE_PATH[:-3])
+        rows = list(fixtures._rows(gate, universe))
+        rows[0] = dataclasses.replace(rows[0], security_id=security_id,
+            security_name="QCOM", pit_market_cap=Decimal("1000000"),
+            firm_specific_score=Decimal("1000000"))
+        for index in (-1, -2):
+            rows[index] = dataclasses.replace(rows[index], security_id=None,
+                security_name=None, pit_market_cap=None)
+        for index in (-3, -4):
+            rows[index] = dataclasses.replace(rows[index], pit_market_cap=None)
+        snapshots = fixtures._snapshots(gate, {universe: tuple(rows)})
+        construction = gate.build_six_universe_construction(
+            snapshots, gate.TOP10_CAP90_EXPLORATORY_PROFILE)
+        sleeve = next(item for item in construction.sleeves if item.universe_id == universe)
+        assert sleeve.coverage.valid
+        assert sleeve.coverage.member_count == 20
+        assert sleeve.coverage.mapped_member_count == 18
+        assert sleeve.coverage.mapping_ratio == Decimal("0.9")
+        assert sleeve.coverage.cap_weight_coverage_ratio == Decimal("0.8")
+        assert security_id not in sleeve.signal_security_ids
+        assert security_id not in sleeve.matched_security_ids
+        assert len(sleeve.matched_security_ids) == 10
+        assert sleeve.matched_security_ids == tuple(row.security_id for row in rows[1:11])
+        original, _ = family[arm, slippage_bps]
+        with subject._relaxed._cloud_loader(_sources(original)) as (old_load, _):
+            old_gate = old_load(subject._relaxed._GATE_PATH[:-3])
+            old_rows = tuple(old_gate.UniverseConstituent(**dataclasses.asdict(row)) for row in rows)
+            original_coverage = old_gate._coverage(
+                old_rows, old_gate.TOP10_CAP90_EXPLORATORY_PROFILE, universe)
+            assert sleeve.coverage.to_record() == original_coverage.to_record()
+
+
+@pytest.mark.parametrize("arm", ("ar_off", "ar_on100"))
+@pytest.mark.parametrize("slippage_bps", (0, 5))
+@pytest.mark.parametrize("kind", ("target", "holding", "reference"))
+def test_qcom_exclusion_runtime_refuses_any_target_holding_or_reference(
+        qcom_excluded_family, package, kind, arm, slippage_bps):
+    security_id = subject._authenticated_qcom_security_id(package)
+    value, _ = qcom_excluded_family[arm, slippage_bps]
+    with subject._relaxed._cloud_loader(_sources(value)) as (load, _):
+        runtime = load("accepted_risk_six_universe_order_qc_runtime")
+        if kind == "reference":
+            with pytest.raises(runtime.AcceptedRiskSixUniverseOrderQcRuntimeError,
+                               match="excluded reference"):
+                runtime.AcceptedRiskSixUniverseOrderQcDriver._reference_prices(
+                    SimpleNamespace(), "2021-01-04", (security_id,),
+                    target_security_ids=(security_id,), holding_quantities={})
+            return
+        session = "2021-01-04"
+        target = SimpleNamespace(target_weights=(SimpleNamespace(
+            security_id=security_id if kind == "target" else "other",
+            weight=Decimal("0.1")),))
+        driver = SimpleNamespace(
+            _require_initialized=lambda: None,
+            _algorithm=SimpleNamespace(time=datetime(2021, 1, 4, 16, 0)),
+            _observe_account=lambda _session: None,
+            _decision_set={session},
+            _target_builder=SimpleNamespace(next_required_session=session,
+                build=lambda _session, _snapshot, *, unavailable_universe_ids: target
+                if unavailable_universe_ids == () else (_ for _ in ()).throw(AssertionError("unexpected unavailable sleeve"))),
+            _snapshot=lambda _session: object(),
+            _variant=runtime.CAP90_VARIANT,
+            _pending_unavailable_universe_ids=(),
+            _current_holding_census=lambda: {security_id: 1} if kind == "holding" else {},
+        )
+        with pytest.raises(runtime.AcceptedRiskSixUniverseOrderQcRuntimeError,
+                           match="excluded target or holding"):
+            runtime.AcceptedRiskSixUniverseOrderQcDriver.on_after_close(driver)
+
+
 @pytest.mark.parametrize("arm,slip", ((True, 0), ("unknown", 0), ("ar_off", True),
                                      ("ar_off", Decimal(5)), ("ar_off", -5), ("ar_off", 10)))
 def test_invalid_mode_refused_before_input_access(arm, slip):

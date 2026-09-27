@@ -546,8 +546,8 @@ def test_every_candidate_lookback_is_even_so_the_median_stays_exact():
     assert tuple(lookbacks) == LOOKBACKS
     odd = [value for value in lookbacks if value % 2]
     assert not odd, (
-        f"odd candidate lookbacks {odd} need an exact odd-window median before "
-        "they can be admitted"
+        f"odd candidate lookbacks {odd} require a separately approved candidate-grid "
+        "decision; exact helper support does not authorize their admission"
     )
     for lookback in lookbacks:
         values = [Fraction(index + 1) for index in range(lookback)]

@@ -221,6 +221,19 @@ def _policy() -> dict[str, Any]:
     }
 
 
+def _exact_liquidity_median(values: tuple[Fraction, ...]) -> Fraction:
+    """Exact nonnegative median; odd support does not approve new lookbacks."""
+    if type(values) is not tuple or not values or any(
+        type(value) is not Fraction or value < 0 for value in values
+    ):
+        raise _refuse("median requires a nonempty tuple of exact nonnegative rationals")
+    ordered = sorted(values)
+    middle = len(ordered) // 2
+    if len(ordered) % 2:
+        return ordered[middle]
+    return (ordered[middle - 1] + ordered[middle]) / 2
+
+
 def _selection(rows: tuple, cutoff, identity: str):
     visible = [
         row for row in rows
@@ -396,9 +409,7 @@ class StockInvestabilityEvidence:
                         dollar_volumes.append(Fraction(row.close_usd) * row.volume_shares)
                 median = None
                 if len(dollar_volumes) == lookback:
-                    ordered = sorted(dollar_volumes)
-                    mid = lookback // 2
-                    median = (ordered[mid - 1] + ordered[mid]) / 2
+                    median = _exact_liquidity_median(tuple(dollar_volumes))
                     if median < Fraction(policy["minimum_median_dollar_volume_usd"]):
                         reasons.append("below_median_dollar_volume_floor")
                 if cap_error is not None:

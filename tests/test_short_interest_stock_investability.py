@@ -1,6 +1,7 @@
 """Offline SI-2B candidate-window eligibility, never market evidence."""
 from __future__ import annotations
 
+import json
 from dataclasses import replace
 from fractions import Fraction
 from datetime import date
@@ -11,14 +12,22 @@ import pytest
 
 from data.exchange_calendar import trading_sessions
 from data.hashing import hash_payload
+from research.short_interest_etf.contracts import (
+    ReleaseCalendarEntry,
+    ShortInterestSnapshot,
+)
 from research.short_interest_etf.dataset import (
     build_identity,
     build_vintage,
     load_synthetic_fixture,
 )
 from research.short_interest_etf.pit_eligibility import (
+    PitReferenceBundle,
+    SectorClassificationObservation,
+    SecurityLifecycleObservation,
     build_stock_data_readiness,
     load_synthetic_pit_reference,
+    reference_fixture_body_sha256,
 )
 import research.short_interest_etf.stock_investability as investability_module
 from research.short_interest_etf.stock_investability import (
@@ -526,16 +535,11 @@ def test_unknown_nested_value_is_refused_before_metaclass_introspection():
 
 
 def test_every_candidate_lookback_is_even_so_the_median_stays_exact():
-    """The median helper always averages the two middle values.
+    """Retain Claude's frozen-grid detector and exercise production arithmetic.
 
-    `(ordered[mid - 1] + ordered[mid]) / 2` with `mid = lookback // 2` is the
-    exact median only for an even window. For an odd window it averages the two
-    values straddling the true middle and silently returns a wrong number: for
-    five sorted values 1..5 it yields 5/2 instead of 3. Nothing in the evidence
-    builder refuses an odd candidate window, and the policy advertises
-    `exact_middle_or_mean_of_two_middle_values`, so an odd lookback added to the
-    approved grid would change eligibility without any other test noticing.
-    This pins the precondition the arithmetic depends on.
+    Odd support in the private arithmetic helper is not approval to add an odd
+    candidate. The four approved windows stay unchanged and even. Unlike the
+    former copied formula, the arithmetic assertion now calls production.
     """
     policy = investability_module._policy()
     lookbacks = policy["candidate_lookbacks"]
@@ -547,11 +551,140 @@ def test_every_candidate_lookback_is_even_so_the_median_stays_exact():
     )
     for lookback in lookbacks:
         values = [Fraction(index + 1) for index in range(lookback)]
-        middle = lookback // 2
-        as_implemented = (values[middle - 1] + values[middle]) / 2
+        as_implemented = investability_module._exact_liquidity_median(tuple(values))
         true_median = (
             values[lookback // 2]
             if lookback % 2
             else (values[lookback // 2 - 1] + values[lookback // 2]) / 2
         )
         assert as_implemented == true_median
+
+
+def _supported_calendar_boundary_inputs():
+    """Rebuild authentic synthetic contracts at the supported 1990 boundary."""
+    vintage, references, _ = _inputs()
+
+    def shifted_payload(payload):
+        # The first prior cycle and ADV window precede the calendar boundary;
+        # the contract retains those source dates without fabricating sessions.
+        text = json.dumps(payload)
+        return json.loads(
+            text.replace("2024", "1990")
+            .replace("2023", "1989")
+            .replace("2020", "1980")
+        )
+
+    calendar = tuple(
+        ReleaseCalendarEntry.from_payload(shifted_payload(row.to_payload()))
+        for row in vintage.release_calendar
+    )
+    snapshots = tuple(
+        ShortInterestSnapshot.from_payload(shifted_payload(row.to_payload()))
+        for row in vintage.snapshots
+    )
+    manifest = replace(
+        vintage.manifest,
+        retrieved_at="1990-02-14T22:00:00Z",
+        settlement_start="1990-01-12",
+        settlement_end="1990-01-31",
+    )
+    vintage = build_vintage(manifest, calendar, snapshots, vintage.refusals)
+    lifecycles = tuple(
+        SecurityLifecycleObservation.from_payload(
+            shifted_payload(row.to_payload())
+        )
+        for row in references.lifecycles
+    )
+    classifications = tuple(
+        SectorClassificationObservation.from_payload(
+            shifted_payload(row.to_payload())
+        )
+        for row in references.classifications
+    )
+    reference_manifest = replace(
+        references.manifest,
+        retrieved_at="1990-03-02T22:00:00Z",
+        source_body_sha256=reference_fixture_body_sha256(
+            [row.to_payload() for row in lifecycles],
+            [row.to_payload() for row in classifications],
+        ),
+    )
+    references = PitReferenceBundle(
+        reference_manifest, lifecycles, classifications
+    )
+    security = snapshots[-1].security
+    identity = hash_payload(security.to_payload())
+    sessions = trading_sessions(date(1990, 1, 1), date(1990, 2, 12))
+    daily = tuple(
+        DailyLiquidityObservation(
+            security_id=security.security_id,
+            security_identity_sha256=identity,
+            session=session.isoformat(),
+            close_usd="100",
+            volume_shares=100000,
+            available_at=f"{session.isoformat()}T23:00:00Z",
+            observed_at=f"{session.isoformat()}T23:00:00Z",
+            raw_record_sha256=hash_payload(
+                {"synthetic_calendar_boundary_daily": session.isoformat()}
+            ),
+        )
+        for session in sessions
+    )
+    capitalizations = tuple(
+        MarketCapObservation(
+            security_id=security.security_id,
+            security_identity_sha256=identity,
+            session=session,
+            market_cap_usd="300000000",
+            available_at=f"{session}T23:00:00Z",
+            observed_at=f"{session}T23:00:00Z",
+            raw_record_sha256=hash_payload(
+                {"synthetic_calendar_boundary_cap": session}
+            ),
+        )
+        for session in ("1990-01-25", "1990-02-12")
+    )
+    return vintage, references, SyntheticMarketHistory(daily, capitalizations)
+
+
+def test_short_authentic_calendar_refuses_every_underfilled_lookback():
+    vintage, references, history = _supported_calendar_boundary_inputs()
+    assert len(history.daily) == 30
+    assert history.daily[0].session == "1990-01-02"
+    assert history.daily[-1].session == "1990-02-12"
+    evidence = build_stock_investability(vintage, references, history)
+    rows = _rows(evidence, vintage.snapshots[-1].event_id)
+    assert rows[20]["eligible"] is True
+    assert rows[20]["complete_session_count"] == 20
+    assert rows[20]["median_dollar_volume"] == {
+        "numerator": 10000000, "denominator": 1
+    }
+    for lookback in (60, 120, 252):
+        row = rows[lookback]
+        assert row["evidence_cutoff_at"] == "1990-02-13T14:30:00Z"
+        assert row["complete_session_count"] == 30
+        assert row["median_dollar_volume"] is None
+        assert row["eligible"] is False
+        assert row["refusal_reasons"] == ["insufficient_calendar_history"]
+
+
+@pytest.mark.parametrize(
+    "values,expected",
+    [
+        ((1,), Fraction(1)),
+        ((5, 1, 4, 2, 3), Fraction(3)),
+        ((4, 1, 3, 2), Fraction(5, 2)),
+        ((0, 0, 0), Fraction(0)),
+        ((Fraction(1, 3), Fraction(2, 3)), Fraction(1, 2)),
+    ],
+)
+def test_exact_liquidity_median_calls_production_for_odd_and_even_windows(values, expected):
+    assert investability_module._exact_liquidity_median(
+        tuple(Fraction(value) for value in values)
+    ) == expected
+
+
+@pytest.mark.parametrize("values", [(), [Fraction(1)], (1,), (True,), (1.0,), (Fraction(-1),)])
+def test_exact_liquidity_median_refuses_empty_or_noncanonical_values(values):
+    with pytest.raises(StockInvestabilityError):
+        investability_module._exact_liquidity_median(values)

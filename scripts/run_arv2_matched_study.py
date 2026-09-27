@@ -55,6 +55,7 @@ def freeze():
             meta_schema=projection.META_SCHEMA, summary_schema=projection.SUMMARY_SCHEMA,
             tilt_fraction=profile["maximum_stock_weight_change_fraction"],
             matched_baseline_profile_sha256=profile["matched_baseline_profile_sha256"]))
+        rows[-1]["reference_repair_enabled"] = True
     value = dict(schema="arv2-six-matched-historical-study-v1", protocol=study.PROTOCOL,
         package_sha256=value.package_sha256,
         activation_manifest_sha256=study.HISTORICAL_ACTIVATION_SHA256,
@@ -65,6 +66,7 @@ def freeze():
 def compare_cached():
     adapter._matched_study_manifest()
     adapter._matched_study_diagnostic_manifest()
+    adapter._matched_study_closing_minute_manifest()
     results = {candidate: authenticated_cached_result(candidate, CONTROL, "matched_study")
                for candidate in study.CANDIDATES}
     return study.compare_results(results)

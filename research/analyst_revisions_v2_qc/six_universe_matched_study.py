@@ -67,7 +67,8 @@ def parse_order(plan, statistics):
     if parsed["meta"].get("matched_diagnostics_sha256") != adapter._sha(diagnostic):
         adapter._fail("matched study diagnostic digest changed")
     from . import accepted_risk_matched_diagnostics as diagnostics
-    diagnostics.validate_report(diagnostic, row["arm"], row["slippage_bps"])
+    diagnostics.validate_report(diagnostic, row["arm"], row["slippage_bps"],
+        reference_repair_enabled=row.get("reference_repair_enabled", False))
     if diagnostic["overall_cumulative_return"] != parsed["aggregates"]["account"]["cumulative_return"]:
         adapter._fail("matched study diagnostic/account return differs")
     return {**parsed, "diagnostics": diagnostic}

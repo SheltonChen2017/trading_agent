@@ -105,6 +105,11 @@ def order_statistics(row):
         sleeve[10] = {"KNOWN_MARKET_CAP_NAME_COUNT_BELOW_MINIMUM": 261}
         sleeve[11] = {"PARTIAL_STOCK_EXPOSURE_WITH_ETF_FALLBACK": 261}
     report = diagnostic_fixture(row["arm"], row["slippage_bps"], aggregate["account"]["cumulative_return"])
+    if row.get("reference_repair_enabled") is True:
+        report.update(schema=diagnostics.REFERENCE_REPAIR_SCHEMA,
+            closing_minute_reference_repair_count=0,
+            closing_minute_reference_repair_session_count=0,
+            closing_minute_reference_repair_path_sha256=adapter._sha([]))
     raw = canonical(aggregate).decode("ascii")
     meta.update(schema=row["meta_schema"], role=row["role"], profile_id=row["profile_id"],
         profile_sha256=row["profile_sha256"], package_sha256=study.delta.EXPECTED_DELTA_PACKAGE_SHA256,
@@ -129,17 +134,18 @@ def test_protocol_has_exact_three_arms_and_two_prospective_cost_conditions():
 def test_real_source_freeze_reproduces_committed_manifest_and_all_previews(exact_delta_package, tmp_path, monkeypatch):
     from scripts import run_arv2_matched_study as script
     monkeypatch.setattr(script, "package", lambda: exact_delta_package)
-    frozen = adapter._matched_study_diagnostic_manifest()
+    frozen = adapter._matched_study_closing_minute_manifest()
     assert script.freeze() == frozen
     assert "input_control_directory" not in frozen
     for candidate in study.CANDIDATES:
-        attempt = 2 if (candidate, 1) in adapter._MATCHED_STUDY_ORIGINAL_ATTEMPTS else 1
+        attempt = next(slot for slot in range(1, 4) if (candidate, slot) not in
+            adapter._MATCHED_STUDY_ORIGINAL_ATTEMPTS | adapter._MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS)
         plan = adapter.build_plan(candidate, ORG, tmp_path / "control", attempt, family="matched_study")
         projected, _ = script.projected(candidate)
         preview = adapter.preview(plan, projected)
         assert preview["candidate_id"] == candidate
         assert preview["projection_sha256"] == projected.projection_sha256
-        assert preview["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256
+        assert preview["manifest_sha256"] == adapter.FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256
 
 
 @pytest.mark.parametrize("defect", ["missing", "duplicate", "reordered", "wrong_arm",
@@ -189,6 +195,10 @@ def frozen(tmp_path, monkeypatch):
     monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_MANIFEST_SHA256", hashlib.sha256(path.read_bytes()).hexdigest())
     monkeypatch.setattr(adapter, "MATCHED_STUDY_DIAGNOSTIC_MANIFEST_PATH", current_path)
     monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256", hashlib.sha256(current_path.read_bytes()).hexdigest())
+    # Generic fake-cloud tests retain their v1 report fixtures; the real
+    # closing-minute source/manifest and v2 parser are tested separately.
+    monkeypatch.setattr(adapter, "_matched_study_closing_minute_manifest",
+        lambda: adapter._matched_study_diagnostic_manifest())
     monkeypatch.setattr(adapter, "_require_inputs", lambda plan: None)
     monkeypatch.setattr(adapter.common, "_client", lambda api: None)
     fake = Fake()
@@ -273,7 +283,69 @@ def test_only_exact_spent_attempts_use_original_manifest(frozen, monkeypatch, ca
     assert adapter._plan_manifest(plan) == (original_manifest if original else current_manifest)
     assert adapter._plan_manifest_sha256(plan) == (
         adapter.FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if original
-        else adapter.FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256)
+        else adapter.FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256
+        if (candidate, attempt) in adapter._MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS
+        else adapter.FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256)
+
+
+@pytest.mark.parametrize("candidate", list(study.CANDIDATES))
+@pytest.mark.parametrize("attempt", [1, 2, 3])
+def test_three_generations_dispatch_distinct_source_and_pin(frozen, monkeypatch, candidate, attempt):
+    plan = dataclasses.replace(frozen[0], candidate_id=candidate, attempt=attempt)
+    old, diagnostic, current = object(), object(), object()
+    monkeypatch.setattr(adapter, "_matched_study_manifest", lambda: old)
+    monkeypatch.setattr(adapter, "_matched_study_diagnostic_manifest", lambda: diagnostic)
+    monkeypatch.setattr(adapter, "_matched_study_closing_minute_manifest", lambda: current)
+    monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_MANIFEST_SHA256", "a" * 64)
+    monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256", "b" * 64)
+    monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256", "c" * 64)
+    key = (candidate, attempt)
+    if key in {("R225", 1), ("R226", 1), ("R227", 1)}:
+        expected, pin = old, "a" * 64
+    elif key in {("R225", 2), ("R230", 1)}:
+        expected, pin = diagnostic, "b" * 64
+    else:
+        expected, pin = current, "c" * 64
+    assert adapter._plan_manifest(plan) is expected
+    assert adapter._plan_manifest_sha256(plan) == pin
+
+
+def test_closing_minute_manifest_requires_pin_census_and_explicit_rule_disclosure(tmp_path, monkeypatch):
+    value, _ = manifest_fixture()
+    for row in value["candidates"]:
+        row["reference_repair_enabled"] = True
+    path = tmp_path / "closing-minute.json"
+    monkeypatch.setattr(adapter, "MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_PATH", path)
+    def write_and_pin():
+        raw = canonical(value)
+        path.write_bytes(raw)
+        monkeypatch.setattr(adapter, "FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256", hashlib.sha256(raw).hexdigest())
+    write_and_pin()
+    assert adapter._matched_study_closing_minute_manifest() == value
+    path.write_bytes(canonical({**value, "schema": "tampered"}))
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="frozen manifest"):
+        adapter._matched_study_closing_minute_manifest()
+    value["candidates"][0]["reference_repair_enabled"] = False
+    write_and_pin()
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="disclosure"):
+        adapter._matched_study_closing_minute_manifest()
+    value["candidates"].pop()
+    write_and_pin()
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="census"):
+        adapter._matched_study_closing_minute_manifest()
+
+
+def test_v2_report_is_bound_to_candidate_mode_not_silently_accepted(monkeypatch):
+    manifest, _ = manifest_fixture()
+    row = copy.deepcopy(manifest["candidates"][0])
+    row["reference_repair_enabled"] = True
+    plan = adapter.RelaxedQcPlan("R225", ORG, Path("/unused"), family="matched_study")
+    monkeypatch.setattr(adapter, "_candidate", lambda value: row)
+    stats = order_statistics(row)
+    assert study.parse_order(plan, stats)["run_valid"] is True
+    row["reference_repair_enabled"] = False
+    with pytest.raises(diagnostics._base.AcceptedRiskSixUniverseOrderQcRuntimeError, match="schema"):
+        study.parse_order(plan, stats)
 
 
 @pytest.mark.parametrize("original", [True, False])

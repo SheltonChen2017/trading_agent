@@ -2,7 +2,7 @@
 
 import ast
 import dataclasses
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal, localcontext
 import hashlib
 import json
@@ -55,6 +55,8 @@ def test_family_has_identical_exact_historical_inputs_and_distinct_sources(famil
         assert profile["evaluation_session_count"] == 1255
         assert profile["target_gross_exposure"] == "0.98"
         assert profile["modeled_fee_bps_per_side"] == "10"
+        assert profile["reference_price_rule"] == subject.REFERENCE_PRICE_RULE
+        assert profile["engine_fee_basis"] == subject.ENGINE_FEE_BASIS
         assert profile["admission_leverage"] == "2"
         assert profile["maximum_stock_weight_change_fraction"] == ("1.00" if arm == "ar_on100" else "0.00")
         assert len(value.source_files) == 17
@@ -201,14 +203,25 @@ def _reference_driver(base, available, missing_count=3):
     calls = []
 
     class _Security:
-        def __init__(self, delisted):
+        def __init__(self, symbol, delisted):
+            self.symbol = symbol
             self.is_delisted = delisted
+            self.last_data = None
+            self.last_data_calls = 0
+
+        def get_last_data(self):
+            self.last_data_calls += 1
+            return self.last_data
 
         @property
         def price(self):
             pytest.fail("missing history must never read a stale security price")
 
-    securities = {security_id: _Security(index == 0) for index, security_id in enumerate(requested)}
+    securities = {security_id: _Security(symbols[security_id], index == 0)
+                  for index, security_id in enumerate(requested)}
+
+    class _TradeBar(SimpleNamespace):
+        pass
 
     class _Batch:
         time = datetime(2022, 10, 3, 16)
@@ -226,11 +239,15 @@ def _reference_driver(base, available, missing_count=3):
             return read
 
     driver = object.__new__(base.AcceptedRiskSixUniverseOrderQcDriver)
-    driver._algorithm = SimpleNamespace(history=_History())
-    driver._trade_bar_type = object()
+    driver._algorithm = SimpleNamespace(history=_History(), time=datetime(2022, 10, 3, 16))
+    driver._trade_bar_type = _TradeBar
     driver._daily_resolution = object()
     driver._raw_normalization = object()
     driver._reference_history_call_count = 0
+    driver._configured_sids = {symbol.id for symbol in symbols.values()}
+    driver._reference_closing_minute_repair_count = 0
+    driver._reference_closing_minute_repair_sessions = set()
+    driver._reference_closing_minute_repair_path = []
     driver._ensure_security = lambda security_id: (symbols[security_id], securities[security_id])
     return driver, requested, calls
 
@@ -254,9 +271,12 @@ def test_projected_missing_reference_refuses_with_truthful_bounded_context(famil
         hashes = [hashlib.sha256(security_id.encode("utf-8")).hexdigest() for security_id in ids]
         assert value["missing_security_id_path_sha256"] == base._sha(hashes)
         assert value["missing"] == [
-            {"security_id_sha256": hashes[0], "role": "target_only", "holding_quantity": 0, "is_delisted": True},
-            {"security_id_sha256": hashes[1], "role": "held_only", "holding_quantity": 7, "is_delisted": False},
-            {"security_id_sha256": hashes[2], "role": "target_and_held", "holding_quantity": 9, "is_delisted": False},
+            {"security_id_sha256": hashes[0], "role": "target_only", "holding_quantity": 0, "is_delisted": True,
+             "closing_minute_refusal_reason": "not_trade_bar"},
+            {"security_id_sha256": hashes[1], "role": "held_only", "holding_quantity": 7, "is_delisted": False,
+             "closing_minute_refusal_reason": "not_trade_bar"},
+            {"security_id_sha256": hashes[2], "role": "target_and_held", "holding_quantity": 9, "is_delisted": False,
+             "closing_minute_refusal_reason": "not_trade_bar"},
         ]
         assert all(security_id not in text for security_id in ids)
         assert "123.45" not in text
@@ -273,6 +293,9 @@ def test_projected_reference_complete_and_partial_paths_keep_exact_history_marks
         assert driver._reference_prices("2022-10-03", requested,
             target_security_ids=ids, holding_quantities={}) == {security_id: Decimal("123.45") for security_id in ids}
         assert len(calls) == driver._reference_history_call_count == 1
+        assert all(driver._ensure_security(security_id)[1].last_data_calls == 0 for security_id in ids)
+        assert driver._reference_closing_minute_repair_count == 0
+        assert driver._reference_closing_minute_repair_path == []
         driver, requested, calls = _reference_driver(base, ids[:2])
         with pytest.raises(base.AcceptedRiskSixUniverseOrderQcRuntimeError) as caught:
             driver._reference_prices("2022-10-03", requested, target_security_ids=ids, holding_quantities={})
@@ -331,3 +354,254 @@ def test_reference_diagnostic_renderer_requires_exact_original_refusal_anchor():
     changed = original.replace("no stale-price fallback is permitted", "changed refusal", 1)
     with pytest.raises(subject.MatchedHistoricalProjectionError, match="reference-refusal exact anchor"):
         subject._render_reference_refusal(path, changed)
+
+
+def _fresh_closing_bar(driver, security_id):
+    symbol, security = driver._ensure_security(security_id)
+    security.last_data = driver._trade_bar_type(symbol=symbol,
+        time=driver._algorithm.time - timedelta(minutes=1), end_time=driver._algorithm.time,
+        period=timedelta(minutes=1), is_fill_forward=False, close=Decimal("234.56"))
+    return security
+
+
+@pytest.mark.parametrize("arm,slip", tuple((arm, slip) for arm in subject.ARMS for slip in subject.SLIPPAGE_BPS))
+def test_missing_daily_reference_accepts_only_exact_fresh_closing_minute(family, arm, slip):
+    with subject._relaxed._cloud_loader(_sources(family[arm, slip][0])) as (load, _):
+        base = load("accepted_risk_six_universe_order_qc_runtime")
+        ids = tuple("security-" + str(index).zfill(3) for index in range(3))
+        driver, requested, calls = _reference_driver(base, ids[:2])
+        security = _fresh_closing_bar(driver, ids[2])
+        assert driver._reference_prices("2022-10-03", requested,
+            target_security_ids=ids, holding_quantities={ids[2]: 136}) == {
+                ids[0]: Decimal("123.45"), ids[1]: Decimal("123.45"), ids[2]: Decimal("234.56")}
+        assert len(calls) == driver._reference_history_call_count == security.last_data_calls == 1
+        assert driver._reference_closing_minute_repair_count == 1
+        assert driver._reference_closing_minute_repair_sessions == {"2022-10-03"}
+        assert driver._reference_closing_minute_repair_path == [
+            ["2022-10-03", hashlib.sha256(ids[2].encode("utf-8")).hexdigest()]]
+
+
+@pytest.mark.parametrize("mutation,reason", (
+    ("stale", "not_exact_same_session_closing_minute"),
+    ("wrong_start", "not_exact_same_session_closing_minute"),
+    ("wrong_end", "not_exact_same_session_closing_minute"),
+    ("next_day", "not_exact_same_session_closing_minute"),
+    ("wrong_session", "not_exact_same_session_closing_minute"),
+    ("wrong_sid", "bar_sid_mismatch"),
+    ("wrong_security_sid", "security_sid_mismatch"),
+    ("fill_forward", "fill_forward_or_unknown"),
+    ("unknown_fill_forward", "fill_forward_or_unknown"),
+    ("zero", "closing_minute_unavailable_or_invalid"),
+    ("negative", "closing_minute_unavailable_or_invalid"),
+    ("nan", "closing_minute_unavailable_or_invalid"),
+    ("infinity", "closing_minute_unavailable_or_invalid"),
+    ("quote", "not_trade_bar"),
+    ("unreadable_cache", "closing_minute_unavailable_or_invalid"),
+    ("unreadable_close", "closing_minute_unavailable_or_invalid"),
+    ("not_raw", "not_raw_configured"),
+    ("wrong_period", "not_one_minute_period"),
+))
+def test_closing_minute_repair_refuses_every_stale_or_invalid_direction(family, mutation, reason):
+    with subject._relaxed._cloud_loader(_sources(family["ar_off", 0][0])) as (load, _):
+        base = load("accepted_risk_six_universe_order_qc_runtime")
+        driver, ids, calls = _reference_driver(base, (), missing_count=1)
+        security = _fresh_closing_bar(driver, ids[0])
+        bar = security.last_data
+        if mutation == "stale":
+            bar.time -= timedelta(minutes=1)
+            bar.end_time -= timedelta(minutes=1)
+        elif mutation == "wrong_start":
+            bar.time -= timedelta(seconds=1)
+        elif mutation == "wrong_end":
+            bar.end_time -= timedelta(seconds=1)
+        elif mutation == "next_day":
+            bar.time += timedelta(days=1)
+            bar.end_time += timedelta(days=1)
+        elif mutation == "wrong_session":
+            driver._algorithm.time += timedelta(days=1)
+            bar.time += timedelta(days=1)
+            bar.end_time += timedelta(days=1)
+        elif mutation == "wrong_sid":
+            bar.symbol = SimpleNamespace(id="OTHER-SID")
+        elif mutation == "wrong_security_sid":
+            security.symbol = SimpleNamespace(id="OTHER-SID")
+        elif mutation in ("fill_forward", "unknown_fill_forward"):
+            bar.is_fill_forward = True if mutation == "fill_forward" else None
+        elif mutation in ("zero", "negative", "nan", "infinity"):
+            bar.close = Decimal({"zero": "0", "negative": "-1", "nan": "NaN", "infinity": "Infinity"}[mutation])
+        elif mutation == "quote":
+            security.last_data = SimpleNamespace(**vars(bar))
+        elif mutation == "unreadable_cache":
+            def unreadable():
+                raise Exception("synthetic unreadable CLR cache")
+            security.get_last_data = unreadable
+        elif mutation == "unreadable_close":
+            del bar.close
+        elif mutation == "not_raw":
+            driver._configured_sids.clear()
+        elif mutation == "wrong_period":
+            bar.period = timedelta(minutes=2)
+        with pytest.raises(base.AcceptedRiskSixUniverseOrderQcRuntimeError,
+                           match="no stale-price fallback is permitted; context=") as caught:
+            driver._reference_prices("2022-10-03", ids, target_security_ids=ids, holding_quantities={ids[0]: 136})
+        context = json.loads(str(caught.value).split("; context=", 1)[1])
+        assert context["missing"][0]["closing_minute_refusal_reason"] == reason
+        assert context["missing"][0]["role"] == "target_and_held"
+        assert context["missing"][0]["holding_quantity"] == 136
+        assert context["fresh_closing_minute_available_count"] == 0
+        assert len(calls) == driver._reference_history_call_count == 1
+        assert driver._reference_closing_minute_repair_count == 0
+        assert driver._reference_closing_minute_repair_path == []
+
+
+def test_partial_fresh_closing_census_is_not_committed_or_counted(family):
+    with subject._relaxed._cloud_loader(_sources(family["ar_off", 0][0])) as (load, _):
+        base = load("accepted_risk_six_universe_order_qc_runtime")
+        driver, ids, calls = _reference_driver(base, ())
+        _fresh_closing_bar(driver, ids[0])
+        with pytest.raises(base.AcceptedRiskSixUniverseOrderQcRuntimeError) as caught:
+            driver._reference_prices("2022-10-03", ids, target_security_ids=ids, holding_quantities={})
+        context = json.loads(str(caught.value).split("; context=", 1)[1])
+        assert context["fresh_closing_minute_available_count"] == 1
+        assert context["missing_count"] == 3 and context["received_count"] == 0
+        assert context["missing"][0]["closing_minute_refusal_reason"] == "fresh_closing_minute_available_census_incomplete"
+        assert driver._reference_closing_minute_repair_count == 0
+        assert driver._reference_closing_minute_repair_sessions == set()
+        assert driver._reference_closing_minute_repair_path == []
+        assert len(calls) == 1
+
+
+def _projected_fee_model(projection):
+    tree = ast.parse(_sources(projection)["main.py"])
+    fee_class = next(node for node in tree.body if isinstance(node, ast.ClassDef)
+                     and node.name == "Arv2TenBpsFeeModel")
+    scope = {"FeeModel": object, "Decimal": Decimal, "MODELED_FEE_RATE_PER_SIDE": Decimal("0.001"),
+             "OrderType": SimpleNamespace(MARKET_ON_OPEN="moo"),
+             "OrderFee": lambda value: SimpleNamespace(value=value),
+             "CashAmount": lambda amount, currency: SimpleNamespace(amount=amount, currency=currency)}
+    exec(compile(ast.fix_missing_locations(ast.Module(body=[fee_class], type_ignores=[])),
+                 "projected-fee-model", "exec"), scope)
+    return scope["Arv2TenBpsFeeModel"]()
+
+
+def _fee_parameters(quantity, slippage, open_price=Decimal("100")):
+    calls = []
+    order = SimpleNamespace(quantity=quantity, absolute_quantity=abs(quantity), type="moo")
+    security = SimpleNamespace(open=open_price)
+    def installed_model(asset, current_order):
+        assert asset is security and current_order is order
+        calls.append(current_order)
+        return slippage
+    security.slippage_model = SimpleNamespace(get_slippage_approximation=installed_model)
+    return SimpleNamespace(security=security, order=order), calls
+
+
+@pytest.mark.parametrize("arm,slip,quantity", tuple((arm, slip, quantity)
+    for arm in subject.ARMS for slip in subject.SLIPPAGE_BPS for quantity in (Decimal(7), Decimal(-7))))
+def test_projected_fee_matches_full_moo_fill_with_installed_slippage(family, arm, slip, quantity):
+    model = _projected_fee_model(family[arm, slip][0])
+    # This installed slippage deliberately differs from open * .0005, as an
+    # older LEAN ConstantSlippageModel can reference the last bar's close.
+    installed_slippage = Decimal(0) if slip == 0 else Decimal("0.07123")
+    parameters, calls = _fee_parameters(quantity, installed_slippage)
+    fee = model.get_order_fee(parameters)
+    fill_price = parameters.security.open + (installed_slippage if quantity > 0 else -installed_slippage)
+    assert type(fee.value.amount) is Decimal
+    assert fee.value.currency == "USD"
+    assert fee.value.amount == fill_price * abs(quantity) * Decimal("0.001")
+    assert len(calls) == 1
+    if slip == 0:
+        assert fee.value.amount == parameters.security.open * abs(quantity) * Decimal("0.001")
+
+
+@pytest.mark.parametrize("mutation", ("zero_open", "negative_open", "nan_open", "infinite_open",
+    "negative_slippage", "nan_slippage", "infinite_slippage", "nonpositive_sell_price",
+    "nan_quantity", "zero_quantity", "wrong_absolute_quantity", "not_moo", "unreadable_model"))
+def test_projected_fee_refuses_invalid_model_or_fill_price_basis(family, mutation):
+    model = _projected_fee_model(family["six_etf_basket", 5][0])
+    parameters, calls = _fee_parameters(Decimal(-7), Decimal("0.05"))
+    if mutation.endswith("_open"):
+        parameters.security.open = Decimal({"zero_open": "0", "negative_open": "-1",
+            "nan_open": "NaN", "infinite_open": "Infinity"}[mutation])
+    elif mutation.endswith("_slippage"):
+        parameters, calls = _fee_parameters(Decimal(-7), Decimal({"negative_slippage": "-1",
+            "nan_slippage": "NaN", "infinite_slippage": "Infinity"}[mutation]))
+    elif mutation == "nonpositive_sell_price":
+        parameters, calls = _fee_parameters(Decimal(-7), Decimal("100"))
+    elif mutation == "nan_quantity":
+        parameters.order.quantity = Decimal("NaN")
+    elif mutation == "zero_quantity":
+        parameters.order.quantity = parameters.order.absolute_quantity = Decimal(0)
+    elif mutation == "wrong_absolute_quantity":
+        parameters.order.absolute_quantity = Decimal(8)
+    elif mutation == "not_moo":
+        parameters.order.type = "market"
+    elif mutation == "unreadable_model":
+        def unreadable(asset, order):
+            raise RuntimeError("synthetic unreadable slippage model")
+        parameters.security.slippage_model.get_slippage_approximation = unreadable
+    with pytest.raises(RuntimeError):
+        model.get_order_fee(parameters)
+
+
+@pytest.mark.parametrize("quantity", (Decimal(7), Decimal(-7)))
+def test_fee_correction_preserves_load_bearing_lifecycle_mismatch_detection(family, quantity):
+    with subject._relaxed._cloud_loader(_sources(family["six_etf_basket", 5][0])) as (load, _):
+        core = load("accepted_risk_order_level_core")
+        starting = {} if quantity > 0 else {"stock": 20}
+        target = {"stock": Decimal("0.98")} if quantity > 0 else {"proxy": Decimal("0.98")}
+        plan = core.plan_rebalance(rebalance_id="fee-basis-regression",
+            starting_cash=Decimal("1000000"), current_quantities=starting, target_weights=target,
+            reference_prices={security_id: Decimal(100) for security_id in set(starting) | set(target)})
+        # Complete every actual intent using the default full-MOO fill shape.
+        model = _projected_fee_model(family["six_etf_basket", 5][0])
+        events = []
+        wrong = []
+        for index, intent in enumerate(plan.intents):
+            signed = Decimal(intent.quantity) * (Decimal(1) if intent.side == core.BUY else Decimal(-1))
+            parameters, calls = _fee_parameters(signed, Decimal("0.05"))
+            fill_price = Decimal(100) + (Decimal("0.05") if signed > 0 else Decimal("-0.05"))
+            fee = model.get_order_fee(parameters).value.amount
+            event = core.FillEvent(event_id="event-" + str(index), rebalance_id=plan.rebalance_id,
+                client_order_id=intent.client_order_id, status=core.FILLED, fill_quantity=intent.quantity,
+                fill_price=fill_price, engine_fee_amount=fee, engine_fee_currency="USD")
+            events.append(event)
+            wrong.append(dataclasses.replace(event,
+                engine_fee_amount=Decimal(100) * Decimal(intent.quantity) * Decimal("0.001")))
+        corrected = core.summarize_order_lifecycle(plan, tuple(events))
+        assert corrected.fee_mismatch is False
+        assert corrected.modeled_fee_amount == corrected.actual_engine_fee_amount
+        assert core.summarize_order_lifecycle(plan, tuple(wrong)).fee_mismatch is True
+
+
+def test_fee_basis_renderer_refuses_changed_original_fee_anchor():
+    original = """class Arv2TenBpsFeeModel(FeeModel):
+    def get_order_fee(self, parameters):
+        return None
+"""
+    with pytest.raises(subject.MatchedHistoricalProjectionError, match="fee-basis exact anchor"):
+        subject._render_fee_basis("main.py", original)
+
+
+def test_fee_basis_keeps_decimal_string_conversion_and_exact_cash_amount(family):
+    model = _projected_fee_model(family["six_etf_basket", 5][0])
+    class _ClrDecimalLike:
+        def __init__(self, text):
+            self.text = text
+
+        def __str__(self):
+            return self.text
+
+        def __float__(self):
+            pytest.fail("authoritative fee values must not convert through binary float")
+
+    order = SimpleNamespace(quantity=_ClrDecimalLike("-777"),
+        absolute_quantity=_ClrDecimalLike("777"), type="moo")
+    security = SimpleNamespace(open=_ClrDecimalLike("100.12345678"),
+        slippage_model=SimpleNamespace(get_slippage_approximation=lambda asset, current:
+            _ClrDecimalLike("0.05006172839")))
+    fee = model.get_order_fee(SimpleNamespace(security=security, order=order))
+    assert type(fee.value.amount) is Decimal
+    assert fee.value.amount == (Decimal("100.12345678") - Decimal("0.05006172839")) * Decimal(777) * Decimal("0.001")
+    assert fee.value.currency == "USD"
+    assert fee.value.amount.as_tuple().exponent >= -28

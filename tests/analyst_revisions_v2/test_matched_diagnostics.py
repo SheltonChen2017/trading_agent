@@ -209,3 +209,64 @@ def test_load_bearing_report_guards_refuse(mutation):
     mutation(report)
     with pytest.raises(diag._base.AcceptedRiskSixUniverseOrderQcRuntimeError):
         diag.validate_report(report, "ar_off", 0)
+
+
+def reference_repair_report(count=1, sessions=1):
+    report = valid_report()
+    report.update(schema=diag.REFERENCE_REPAIR_SCHEMA,
+        closing_minute_reference_repair_count=count,
+        closing_minute_reference_repair_session_count=sessions,
+        closing_minute_reference_repair_path_sha256=("c" * 64 if count else diag._base._sha([])))
+    return report
+
+
+@pytest.mark.parametrize("count,sessions", ((0, 0), (1, 1), (256, 1), (261 * 256, 261)))
+def test_reference_repair_schema_census_and_explicit_candidate_binding(count, sessions):
+    report = reference_repair_report(count, sessions)
+    assert diag.validate_report(report, "ar_off", 0, reference_repair_enabled=True)
+    with pytest.raises(diag._base.AcceptedRiskSixUniverseOrderQcRuntimeError, match="schema"):
+        diag.validate_report(report, "ar_off", 0, reference_repair_enabled=False)
+    with pytest.raises(diag._base.AcceptedRiskSixUniverseOrderQcRuntimeError, match="schema"):
+        diag.validate_report(valid_report(), "ar_off", 0, reference_repair_enabled=True)
+
+
+@pytest.mark.parametrize("changes", (
+    {"closing_minute_reference_repair_count": True},
+    {"closing_minute_reference_repair_count": -1},
+    {"closing_minute_reference_repair_count": 261 * 256 + 1},
+    {"closing_minute_reference_repair_session_count": True},
+    {"closing_minute_reference_repair_session_count": 0},
+    {"closing_minute_reference_repair_session_count": 2},
+    {"closing_minute_reference_repair_count": 257},
+    {"closing_minute_reference_repair_count": 0},
+    {"closing_minute_reference_repair_path_sha256": "C" * 64},
+    {"closing_minute_reference_repair_path_sha256": "c" * 63},
+    {"closing_minute_reference_repair_path_sha256": diag._base._sha([])},
+))
+def test_reference_repair_invalid_census_isolated_refusals(changes):
+    report = reference_repair_report()
+    report.update(changes)
+    with pytest.raises(diag._base.AcceptedRiskSixUniverseOrderQcRuntimeError, match="reference-repair census"):
+        diag.validate_report(report, "ar_off", 0, reference_repair_enabled=True)
+
+
+def test_zero_reference_repairs_require_exact_empty_path_digest():
+    report = reference_repair_report(0, 0)
+    report["closing_minute_reference_repair_path_sha256"] = "c" * 64
+    with pytest.raises(diag._base.AcceptedRiskSixUniverseOrderQcRuntimeError, match="reference-repair census"):
+        diag.validate_report(report, "ar_off", 0, reference_repair_enabled=True)
+
+
+def test_runtime_emits_and_hash_links_reference_repair_counts_without_prices():
+    driver, sleeves, _ = driver_fixture()
+    driver._reference_closing_minute_repair_count = 2
+    driver._reference_closing_minute_repair_sessions = {"2021-01-04"}
+    driver._reference_closing_minute_repair_path = [["2021-01-04", "a" * 64], ["2021-01-04", "b" * 64]]
+    diag.install_matched_diagnostics(driver, "ar_off", 0)
+    _, report = populate(driver, sleeves)
+    assert report["schema"] == diag.REFERENCE_REPAIR_SCHEMA
+    assert report["closing_minute_reference_repair_count"] == 2
+    assert report["closing_minute_reference_repair_session_count"] == 1
+    assert report["closing_minute_reference_repair_path_sha256"] == diag._base._sha(driver._reference_closing_minute_repair_path)
+    assert not any("reference_price" in key for key in report)
+    assert diag.diagnostic_digest(driver) == hashlib.sha256(diag.diagnostic_text(driver).encode("ascii")).hexdigest()

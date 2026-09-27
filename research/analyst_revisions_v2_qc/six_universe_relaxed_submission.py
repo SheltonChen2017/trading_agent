@@ -29,9 +29,12 @@ FROZEN_FULL_AR_ABLATION_MANIFEST_SHA256 = "a2e7181b4181394f3a39093445f3aa784896e
 FULL_AR_ABLATION_MANIFEST_PATH = Path(__file__).with_name("six_universe_full_ar_ablation_candidates.json")
 FROZEN_MATCHED_STUDY_MANIFEST_SHA256 = "8c7e79faf1b25603a110744ad4464cd22a439dfc65fa1fe312cbaddd6938e0e5"
 MATCHED_STUDY_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_candidates.json")
-# TEMP: replaced by the exact committed diagnostic-source manifest before launch.
+# Exact spent diagnostic source; never repin historical claims to a successor.
 FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 = "2718100d6c3863ebd7959142afaca58323360372d03a346961d04657102de4b3"
 MATCHED_STUDY_DIAGNOSTIC_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_diagnostic_candidates.json")
+FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256 = "be23fba84bf233d3e667a649bf8f288d45c277cba4c9ebc6cfcbcda1d7759fe5"
+MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_PATH = Path(__file__).with_name("six_universe_matched_study_closing_minute_candidates.json")
+_MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
 # closures remain immutable when a corrected attempt uses the successor source.
 _MATCHED_STUDY_ORIGINAL_ATTEMPTS = frozenset({("R225", 1), ("R226", 1), ("R227", 1)})
@@ -139,6 +142,22 @@ def _matched_study_original_attempt(plan):
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_ORIGINAL_ATTEMPTS)
 
 
+def _matched_study_closing_minute_manifest():
+    raw = MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256:
+        _fail("matched study closing-minute source is not the frozen manifest")
+    from . import six_universe_matched_study as study
+    value = study.validate_manifest(json.loads(raw))
+    if any(row.get("reference_repair_enabled") is not True for row in value["candidates"]):
+        _fail("matched study closing-minute profile disclosure changed")
+    return value
+
+
+def _matched_study_diagnostic_attempt(plan):
+    return (type(plan.candidate_id) is str
+            and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS)
+
+
 def _plan_manifest(plan):
     # Legacy parser fixtures deliberately use a non-plan sentinel; real public
     # operations validate the exact plan in _candidate before any I/O.
@@ -152,14 +171,16 @@ def _plan_manifest(plan):
         return _full_ar_ablation_manifest()
     if type(plan.family) is str and plan.family == "matched_study":
         return (_matched_study_manifest() if _matched_study_original_attempt(plan)
-                else _matched_study_diagnostic_manifest())
+                else _matched_study_diagnostic_manifest() if _matched_study_diagnostic_attempt(plan)
+                else _matched_study_closing_minute_manifest())
     _fail("relaxed plan family changed")
 
 
 def _plan_manifest_sha256(plan):
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
-                else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256)
+                else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 if _matched_study_diagnostic_attempt(plan)
+                else FROZEN_MATCHED_STUDY_CLOSING_MINUTE_MANIFEST_SHA256)
     if type(plan) is RelaxedQcPlan and plan.family == "weight_ablation":
         return FROZEN_ABLATION_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "coverage25":

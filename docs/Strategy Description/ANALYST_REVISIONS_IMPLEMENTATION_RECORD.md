@@ -27424,8 +27424,9 @@ After section 198 was pushed at `575b611`, the owner directed **"begin
 testing now"**. This explicitly advances execution before another Claude
 review; it does not waive result validation, the same-project three-attempt
 limit, accepted-risk historical disclosures, or broker/live exclusions.
-The frozen R225–R230 family, package, source and cost settings in section 198
-remain unchanged. No further tilt/capacity search is added. Fetch at the
+The original frozen R225–R230 family, package and spent source in section 198
+remain immutable; prospective repairs are separately pinned below. No further
+tilt/capacity search is added. Fetch at the
 start of this round found the remote at the same committed head.
 
 Run the three zero-slippage arms first, then their five-bps sensitivities,
@@ -27490,3 +27491,77 @@ was red in all six cases; disabling original-attempt routing was red in all
 three receipt cases. Mutations restored; compilation/diff checks clean. No
 full lane/repository suite. These prove diagnostics and receipt isolation,
 not a repair of the still-unknown missing-price cause.
+
+### 199.2 Missing-price diagnostic and prospective bounded repair
+
+R225 A2 used the same project **37017548**, backtest
+`80babe5d0bde49438921b19e5445d706`. It again refused on **2022-10-03 16:00**:
+46 target/current-held prices required, 45 received. The missing identity
+hash `12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f`
+was both target and a 136-share holding, with `is_delisted=false`. Exact local
+package binding resolves it to QCOM. The observed defect is a missing daily
+History reference for an active held stock; a delisting or vendor data cause
+has not been established. No returns read; R225 has spent two of three slots.
+
+The prospective correction accepts only an actual already-subscribed RAW
+TradeBar with matching SID, positive finite close, explicit non-fill-forward
+flag, same session, exact end time equal to the algorithm clock, and exact
+one-minute period/start. There is no `security.price`, prior quote, extra
+History request, dropping of held names, selection change or extra order.
+Every missing reference must pass or the original bounded refusal remains.
+This explicitly changes the reference-price source rule and profile pin;
+it is not a diagnostic-only change or a retrospective edit to spent runs.
+Count/session/path-hash repair evidence is linked through a versioned v2
+diagnostic, with no exported quote. Only prospective attempts use this source;
+original A1 and diagnostic R225 A2 / R230 A1 manifests remain immutable.
+R225 A3 is the final allowed attempt; if it fails, no further Codex retry,
+renaming or fourth candidate is permitted. Mia/owner recovery follows.
+
+### 199.3 Five-bps ETF control completed but invalid
+
+R230 A1 project **37018137**, backtest `400c867869102efc76af5193db539117`,
+used the diagnostic-only source `f8b2830`. All 1,516 orders filled and
+261 rebalances completed. The sole bounded result read nevertheless reports
+**run_valid=false / execution_failure=true**: modeled fee `$8,012.82988829`
+versus actual engine fee `$8,012.29576`, difference `$0.53412829`. Its retained
+**+105.757567201312%** return is invalid diagnostic context, not an accepted
+result or evidence that five-bps costs beat any stock arm. No new cell.
+The confirmed fee defect is specific to the price basis: default MOO fills
+use the RAW opening price plus/minus the installed slippage approximation,
+but the original fee model charges ten bps on the unadjusted open. Lifecycle
+reconciliation correctly refuses the difference from ten bps of filled
+notional. The prospective fee model now uses the same signed installed
+deterministic slippage model for fully filled MOO orders and discloses
+`engine_fee_basis=raw_moo_open_plus_signed_installed_slippage_v1` in the
+profile. Zero-slippage fees are unchanged. Core/executor fee-mismatch checks,
+partial-fill validity, forced-delisting treatment and the ten-bps rate remain
+unchanged; no tolerance expansion or suppression is accepted as a fix.
+True floor after five launches and one valid cell is **227 / 168 / 34 / 645**.
+
+### 199.4 Corrected-source preregistration before remaining attempts
+
+Prospective manifest `six_universe_matched_study_closing_minute_candidates.json`
+SHA-256 **`be23fba84bf233d3e667a649bf8f288d45c277cba4c9ebc6cfcbcda1d7759fe5`**
+freezes both bounded reference repair and signed-slippage fee basis for all
+six arms. Exact dispatch preserves original R225/R226/R227 A1 and diagnostic
+R225 A2 / R230 A1 pins; subsequent attempts use this new source. Old claims,
+launches, terminal records and sole reads remain unchanged. Valid R227 is
+not rerun; its ETF prices require no stock repair and zero-slippage fee
+economics are unchanged. Digests must still match before any paired claim.
+
+Prelaunch projection behavior: **84 passed in 17.47 s**, including all-six
+fresh-minute acceptance, 18 stale/invalid directions, partial-census atomicity,
+both MOO fee directions, exact zero-slip preservation and invalid inputs.
+Deleting the minute-period guard was red; disabling signed fee adjustment
+was red in both core-lifecycle regressions. Independent repair audit passed
+11 additional assertions; receipt/routing audit **42 passed**, identifying
+one count/hash inconsistency in the new sidecar (positive repair count with
+empty-path hash), corrected before freeze with an isolated regression.
+The sidecar now requires empty hash iff zero repairs. These are software
+proofs, not evidence of actual QC cache availability or successful A3.
+No full lane/repository suite by Codex.
+
+Final combined prelaunch focused selection: **276 passed in 35.37 s**,
+including exact production-package freeze/all-six previews, v2 transport
+and candidate binding, distinct three-generation routing, legacy attempt
+guards and the lane-record gate. Targeted compilation and diff checks clean.

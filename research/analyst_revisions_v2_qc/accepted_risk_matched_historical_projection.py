@@ -27,6 +27,8 @@ SLIPPAGE_BPS = (0, 5)
 DIAGNOSTICS_PATH = "accepted_risk_matched_diagnostics.py"
 META_SCHEMA = "arv2-six-matched-historical-meta-v1"
 SUMMARY_SCHEMA = "arv2-six-matched-historical-summary-v1"
+REFERENCE_PRICE_RULE = "raw_daily_history_or_exact_same_session_closing_minute_tradebar_v1"
+ENGINE_FEE_BASIS = "raw_moo_open_plus_signed_installed_slippage_v1"
 
 
 def _error(message):
@@ -102,6 +104,10 @@ def _render_identity(path, source, arm, slippage_bps):
             keys = [key.value if isinstance(key, ast.Constant) else None for key in node.keys]
             if path == "accepted_risk_six_universe_order_qc_runtime.py" and "slippage_bps" in keys:
                 node.values[keys.index("slippage_bps")] = ast.Constant(str(slippage_bps))
+                node.keys.append(ast.Constant("reference_price_rule"))
+                node.values.append(ast.Constant(REFERENCE_PRICE_RULE))
+                node.keys.append(ast.Constant("engine_fee_basis"))
+                node.values.append(ast.Constant(ENGINE_FEE_BASIS))
                 counters["profile_slippage"] += 1
             if path == _relaxed._TILT_RUNTIME_PATH and "maximum_stock_weight_change_fraction" in keys:
                 node.keys += [ast.Constant("comparison_arm"), ast.Constant("analyst_revision_economic_usage")]
@@ -131,6 +137,48 @@ def _render_identity(path, source, arm, slippage_bps):
     # One dict specifies the profile and one emits the same fields in aggregates.
     if counters != expected:
         _error("matched historical profile or execution anchor changed")
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree) + "\n"
+
+
+def _render_fee_basis(path, source):
+    """Charge ten bps on the same price used by the default full MOO fill."""
+    if path != "main.py":
+        return source
+    tree = ast.parse(source)
+    method = _named_function(tree, "get_order_fee")
+    original = ast.parse("""
+price = Decimal(str(parameters.security.open))
+quantity = abs(Decimal(str(parameters.order.absolute_quantity)))
+if not price.is_finite() or price <= 0 or not quantity.is_finite():
+    raise RuntimeError("ARV2 fee input is invalid")
+return OrderFee(CashAmount(price * quantity * MODELED_FEE_RATE_PER_SIDE, "USD"))
+""").body
+    if ([item.arg for item in method.args.args] != ["self", "parameters"]
+            or [ast.dump(node, include_attributes=False) for node in method.body]
+            != [ast.dump(node, include_attributes=False) for node in original]):
+        _error("matched historical fee-basis exact anchor changed")
+    method.body = ast.parse("""
+price = Decimal(str(parameters.security.open))
+quantity = abs(Decimal(str(parameters.order.absolute_quantity)))
+signed_quantity = Decimal(str(parameters.order.quantity))
+if (parameters.order.type != OrderType.MARKET_ON_OPEN
+        or not price.is_finite() or price <= 0
+        or not quantity.is_finite() or quantity <= 0
+        or not signed_quantity.is_finite() or signed_quantity == 0
+        or abs(signed_quantity) != quantity):
+    raise RuntimeError("ARV2 fee input is invalid")
+# Reuse the installed deterministic model: its MOO reference can differ
+# across LEAN versions, so hardcoding open times five bps is not equivalent.
+slippage = Decimal(str(parameters.security.slippage_model.get_slippage_approximation(
+    parameters.security, parameters.order)))
+if not slippage.is_finite() or slippage < 0:
+    raise RuntimeError("ARV2 fee slippage input is invalid")
+price += slippage if signed_quantity > 0 else -slippage
+if not price.is_finite() or price <= 0:
+    raise RuntimeError("ARV2 fee fill-price basis is invalid")
+return OrderFee(CashAmount(price * quantity * MODELED_FEE_RATE_PER_SIDE, "USD"))
+""").body
     ast.fix_missing_locations(tree)
     return ast.unparse(tree) + "\n"
 
@@ -181,12 +229,16 @@ def _render_diagnostics(path, source, arm, slippage_bps):
 
 
 def _render_reference_refusal(path, source):
-    """Describe missing planning marks without changing or replacing them."""
+    """Admit only the exact RAW closing minute when daily history is absent."""
     if path != "accepted_risk_six_universe_order_qc_runtime.py":
         return source
     tree = ast.parse(source)
     reference = _named_function(tree, "_reference_prices")
     close = _named_function(tree, "on_after_close")
+    initialize = _named_function(tree, "__init__")
+    initializations = [node for node in initialize.body if isinstance(node, ast.Assign)
+                       and ast.unparse(node) == "self._reference_history_call_count = 0"]
+    classes = [node for node in tree.body if isinstance(node, ast.ClassDef) and reference in node.body]
     refusal = "six-universe RAW reference price census is incomplete; no stale-price fallback is permitted"
     branches = [node for node in reference.body if isinstance(node, ast.If)
                 and ast.unparse(node.test) == "set(result) != set(security_ids)"]
@@ -199,11 +251,46 @@ def _render_reference_refusal(path, source):
     calls = [node for node in ast.walk(close) if isinstance(node, ast.Call)
              and ast.unparse(node) == "self._reference_prices(session, reference_ids)"]
     if (len(branches) != 1 or len(assignments) != 1 or len(symbols) != 1 or len(loops) != 1
+            or len(initializations) != 1 or len(classes) != 1
             or len(calls) != 1 or [item.arg for item in reference.args.args]
             != ["self", "session", "security_ids"] or reference.args.kwonlyargs
             or len(branches[0].body) != 1
             or ast.unparse(branches[0].body[0]) != f"_error({refusal!r})"):
         _error("matched historical reference-refusal exact anchor changed")
+    index = initialize.body.index(initializations[0]) + 1
+    initialize.body[index:index] = ast.parse("""
+self._reference_closing_minute_repair_count = 0
+self._reference_closing_minute_repair_sessions = set()
+self._reference_closing_minute_repair_path = []
+""").body
+    classes[0].body.append(ast.parse("""
+def _same_session_closing_minute_price(self, session, security, requested_sid):
+    try:
+        if requested_sid not in self._configured_sids:
+            return None, "not_raw_configured"
+        if _symbol_sid(security.symbol, "closing-minute reference security") != requested_sid:
+            return None, "security_sid_mismatch"
+        bar = security.get_last_data()
+        if not isinstance(bar, self._trade_bar_type):
+            return None, "not_trade_bar"
+        if _symbol_sid(bar.symbol, "closing-minute reference bar") != requested_sid:
+            return None, "bar_sid_mismatch"
+        if bar.is_fill_forward is not False:
+            return None, "fill_forward_or_unknown"
+        actual_time = self._algorithm.time
+        if (actual_time.date().isoformat() != session
+                or bar.time.date().isoformat() != session
+                or bar.end_time != actual_time
+                or bar.time != actual_time - timedelta(minutes=1)):
+            return None, "not_exact_same_session_closing_minute"
+        if bar.period != timedelta(minutes=1):
+            return None, "not_one_minute_period"
+        return _decimal(bar.close, "same-session RAW closing-minute close", positive=True), None
+    except Exception:
+        # Unreadable Python/CLR cache data produces a reason and the existing
+        # complete-census refusal; it never produces an authoritative mark.
+        return None, "closing_minute_unavailable_or_invalid"
+""").body[0])
     reference.args.kwonlyargs.extend((ast.arg("target_security_ids"), ast.arg("holding_quantities")))
     reference.args.kw_defaults.extend((None, None))
     calls[0].keywords.extend(ast.parse(
@@ -223,6 +310,22 @@ if (type(target_security_ids) is not tuple
     _error("six-universe missing-reference diagnostic context changed")
 missing = tuple(sorted(set(security_ids) - set(result)))
 missing_hashes = [hashlib.sha256(item.encode("utf-8")).hexdigest() for item in missing]
+security_sids = {security_id: sid for sid, security_id in sid_to_security.items()}
+repair_prices = {}
+repair_reasons = {}
+for security_id in missing:
+    price, reason = self._same_session_closing_minute_price(
+        session, reference_securities[security_id], security_sids[security_id])
+    repair_reasons[security_id] = reason
+    if price is not None:
+        repair_prices[security_id] = price
+if len(repair_prices) == len(missing):
+    result.update(repair_prices)
+    self._reference_closing_minute_repair_count += len(missing)
+    self._reference_closing_minute_repair_sessions.add(session)
+    self._reference_closing_minute_repair_path.extend(
+        [[session, security_hash] for security_hash in missing_hashes])
+    return result
 entries = []
 for security_id, security_hash in zip(missing[:32], missing_hashes[:32]):
     delisted = getattr(reference_securities[security_id], "is_delisted", None)
@@ -232,12 +335,15 @@ for security_id, security_hash in zip(missing[:32], missing_hashes[:32]):
                  else "target_only" if security_id in target_security_ids else "held_only"),
         "holding_quantity": holding_quantities.get(security_id, 0),
         "is_delisted": delisted if type(delisted) is bool else None,
+        "closing_minute_refusal_reason": (repair_reasons[security_id]
+            or "fresh_closing_minute_available_census_incomplete"),
     })
 context = _canonical({
     "session": session,
     "requested_count": len(security_ids),
     "received_count": len(result),
     "missing_count": len(missing),
+    "fresh_closing_minute_available_count": len(repair_prices),
     "missing": entries,
     "omitted_missing_count": max(0, len(missing) - 32),
     "missing_security_id_path_sha256": _sha(missing_hashes),
@@ -272,8 +378,8 @@ def build_matched_historical_projection(package, arm, slippage_bps=0):
             source = _render_basket(path, source)
         if path == "accepted_risk_order_level_input_runtime.py":
             source = _recent._correct_input_reader(original)
-        sources[path] = _render_reference_refusal(path,
-            _render_diagnostics(path, _render_identity(path, source, arm, slippage_bps), arm, slippage_bps))
+        sources[path] = _render_fee_basis(path, _render_reference_refusal(path,
+            _render_diagnostics(path, _render_identity(path, source, arm, slippage_bps), arm, slippage_bps)))
     sources[DIAGNOSTICS_PATH] = Path(__file__).with_name(DIAGNOSTICS_PATH).read_text(encoding="ascii")
     # Recompute every descendant authority from prospective source, never reuse
     # an old matched profile as the denominator of a changed construction.

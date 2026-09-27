@@ -16,6 +16,9 @@ except ImportError:
     from research.analyst_revisions_v2_qc import accepted_risk_six_universe_order_qc_runtime as _base
 
 SCHEMA = "arv2-matched-historical-diagnostics-v1"
+REFERENCE_REPAIR_SCHEMA = "arv2-matched-historical-diagnostics-v2-closing-minute"
+REFERENCE_REPAIR_FIELDS = frozenset({"closing_minute_reference_repair_count",
+    "closing_minute_reference_repair_session_count", "closing_minute_reference_repair_path_sha256"})
 STATISTIC_NAME = "ARV2_SIX_GATE_ORDER_DIAGNOSTICS"
 MAXIMUM_STATISTIC_BYTES = 8192
 MAXIMUM_PANEL_SYMBOLS = 2048
@@ -173,6 +176,13 @@ def install_matched_diagnostics(driver, arm, slippage_bps):
                 "minute_execution_price_equality_proved": False,
                 "daily_price_normalization": "RAW", "fill_forward": False,
             }
+            if hasattr(driver, "_reference_closing_minute_repair_count"):
+                state["cached"].update({
+                    "schema": REFERENCE_REPAIR_SCHEMA,
+                    "closing_minute_reference_repair_count": driver._reference_closing_minute_repair_count,
+                    "closing_minute_reference_repair_session_count": len(driver._reference_closing_minute_repair_sessions),
+                    "closing_minute_reference_repair_path_sha256": _base._sha(driver._reference_closing_minute_repair_path),
+                })
         text = _base._canonical(state["cached"]).decode("ascii")
         if len(text.encode("ascii")) > MAXIMUM_STATISTIC_BYTES:
             _fail("matched diagnostics exceeded its transport bound")
@@ -195,7 +205,7 @@ def diagnostic_text(driver):
     return text
 
 
-def validate_report(report, arm, slippage_bps):
+def validate_report(report, arm, slippage_bps, *, reference_repair_enabled=None):
     """Authenticate transport and fixed historical aggregate geometry."""
     if (type(arm) is not str or arm not in ("ar_off", "ar_on100", "six_etf_basket")
             or type(slippage_bps) is not int or slippage_bps not in (0, 5)):
@@ -206,11 +216,30 @@ def validate_report(report, arm, slippage_bps):
         "six_etf_panel_row_count", "year_universe_fields", "year_universe_rows",
         "universe_realized_profit_attributed", "all_stock_price_equality_proved",
         "minute_execution_price_equality_proved", "daily_price_normalization", "fill_forward"}
-    if (type(report) is not dict or set(report) != keys or report["schema"] != SCHEMA
+    if reference_repair_enabled is None:
+        reference_repair_enabled = type(report) is dict and report.get("schema") == REFERENCE_REPAIR_SCHEMA
+    if type(reference_repair_enabled) is not bool:
+        _fail("matched diagnostics reference-repair mode changed")
+    expected_schema = REFERENCE_REPAIR_SCHEMA if reference_repair_enabled else SCHEMA
+    if reference_repair_enabled:
+        keys |= REFERENCE_REPAIR_FIELDS
+    if (type(report) is not dict or set(report) != keys or report["schema"] != expected_schema
             or report["arm"] != arm or type(report["slippage_bps_per_side"]) is not int
             or report["slippage_bps_per_side"] != slippage_bps
             or len(_base._canonical(report)) > MAXIMUM_STATISTIC_BYTES):
         _fail("matched diagnostics schema, arm or transport changed")
+    if reference_repair_enabled:
+        count = report["closing_minute_reference_repair_count"]
+        sessions = report["closing_minute_reference_repair_session_count"]
+        digest = report["closing_minute_reference_repair_path_sha256"]
+        if (type(count) is not int or not 0 <= count <= 261 * _base.MAXIMUM_REFERENCE_SECURITIES
+                or type(sessions) is not int or not 0 <= sessions <= min(count, 261)
+                or count > sessions * _base.MAXIMUM_REFERENCE_SECURITIES
+                or (count == 0) != (sessions == 0)
+                or type(digest) is not str or len(digest) != 64
+                or any(character not in "0123456789abcdef" for character in digest)
+                or (count == 0) != (digest == _base._sha([]))):
+            _fail("matched diagnostics reference-repair census changed")
     for key in ("membership_cap_path_sha256", "etf_daily_panel_sha256"):
         digest = report[key]
         if type(digest) is not str or len(digest) != 64 or any(c not in "0123456789abcdef" for c in digest):

@@ -5373,3 +5373,39 @@ exposure claim. Linked diagnostic is 4,818 bytes; source/panel/annual censuses
 accepted. Read adds one cell, **644 -> 645**, floor **225 / 166 / 34 / 645**.
 The stock controls remain invalid; no matched AR spread is claimed from this
 partial family. This ETF account is a simulated construction, not live returns.
+
+## R-225 A2 — same-project missing-reference diagnostic refused — 2026-09-26
+
+Prospective diagnostic source `f8b2830`, successor manifest
+`2718100d6c3863ebd7959142afaca58323360372d03a346961d04657102de4b3`;
+economic/profile/package pins unchanged. Same private project **37017548**,
+A2 backtest `80babe5d0bde49438921b19e5445d706`. Two of three attempts spent;
+A1 remains immutable. Adds only bounded missing-ID hashes/roles/counts to
+the strict refusal, no replacement quote or economics. Conservatively count
+this unchanged-economic run as development: **225 -> 226 shared /
+166 -> 167 development / 34 infrastructure / 645 cells**. No result read.
+Terminal `Runtime Error` at **2022-10-03 16:00**: 46 required prices,
+45 received; one missing target-and-held identity, quantity 136, delisted
+false. Hashed identity `12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f`
+resolves within the authenticated local package to QCOM. No quote or
+partial-period return exported. One final allowed R225 slot remains;
+it requires a prospective tested price-source correction, not a stale mark.
+
+## R-230 — matched historical actual six-ETF basket, five-bps slippage; A1 invalid — 2026-09-26
+
+Diagnostic-only prospective source `f8b2830`, manifest
+`2718100d6c3863ebd7959142afaca58323360372d03a346961d04657102de4b3`,
+private project **37018137**, `152 ARV2 SIX MATCHED SIX_ETF_BASKET S5 R230 2021 2025`,
+A1 backtest `400c867869102efc76af5193db539117`. Same 2021-01-04–2025-12-31
+period, actual ETF orders, 98% gross, ten-bps fees plus five-bps adverse
+slippage per side. One of three attempts spent. Launch **226 -> 227 shared /
+167 -> 168 development / 34 infrastructure / 645 cells**.
+Terminal `Completed.` is **not acceptance**: sole bounded read reports
+**run_valid=false / execution_failure=true**. All 1,516 orders filled and
+261 rebalances completed, but modeled fees `$8,012.82988829` differ from
+engine fees `$8,012.29576`. The difference is `$0.53412829`; do not round it
+away or disable the fee invariant. Diagnostic net return **+105.757567201312%**
+and drawdown **−21.289982830798%** are retained as invalid-run context only,
+not an accepted cell or matched spread. No second external result read.
+Prospective fee-basis diagnosis/correction is required before A2. Current
+floor **227 / 168 / 34 / 645**; no additional valid cell.

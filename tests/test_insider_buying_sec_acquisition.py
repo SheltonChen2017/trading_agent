@@ -65,6 +65,57 @@ def _xml(candidate: pilot.SecPilotCandidate) -> bytes:
     ).encode("ascii")
 
 
+def _tag_header(candidate: pilot.SecPilotCandidate) -> bytes:
+    return (
+        f'<SEC-HEADER>{candidate.accession_number}.hdr.sgml : '
+        f'{candidate.filing_date.replace("-", "")}\n'
+        '<ACCEPTANCE-DATETIME>' + ('20221107101112' if candidate.period == '2022Q4' else '20230313101112') + '\n'
+        f'<ACCESSION-NUMBER>{candidate.accession_number}\n'
+        f'<TYPE>{candidate.form_type}\n'
+        f'<FILING-DATE>{candidate.filing_date.replace("-", "")}\n'
+        '<REPORTING-OWNER>\n<OWNER-DATA>\n<CIK>0000999999\n</OWNER-DATA>\n</REPORTING-OWNER>\n'
+        '<ISSUER>\n<COMPANY-DATA>\n<CIK>0000123456\n</COMPANY-DATA>\n</ISSUER>\n'
+        '</SEC-HEADER>\n'
+    ).encode('ascii')
+
+
+def test_tag_header_compatibility_parses_scoped_identity_without_verifying_timezone():
+    candidate = _candidates()[0]
+    target = pilot.SecAcquisitionTarget(
+        period=candidate.period, accession_number=candidate.accession_number,
+        form_type=candidate.form_type, filing_date=candidate.filing_date,
+        issuer_cik=candidate.issuer_cik, quarterly_zip_sha256=candidate.quarterly_zip_sha256,
+        submission_row_id=candidate.submission_row_id, primary_xml_filename='ownership.xml',
+    )
+    receipt = pilot._validate_tag_header(_tag_header(candidate), target)
+    assert receipt['raw_header_sha256'] == hash_bytes(_tag_header(candidate))
+    assert receipt['source_fields']['issuer_cik_raw'] == '0000123456'
+    assert receipt['accepted_at_interpretation'].startswith('2022-11-07T10:11:12-05:00')
+    assert receipt['timezone_interpretation_verified'] is False
+    assert receipt['retrieval_timestamp_unavailable'] is True
+    assert receipt['direct_ib1c_ingest_authorized'] is False
+
+
+@pytest.mark.parametrize('mutator', [
+    lambda b: b.replace(b'<ACCESSION-NUMBER>', b'<OWNER-DATA>\n<ACCESSION-NUMBER>', 1),
+    lambda b: b.replace(b'<TYPE>4\n', b'<TYPE>4\n<TYPE>4/A\n', 1),
+    lambda b: b.replace(b'<COMPANY-DATA>\n<CIK>0000123456', b'<COMPANY-DATA>\n<CIK>0000999999', 1),
+    lambda b: b.replace(b'<COMPANY-DATA>\n<CIK>0000123456', b'<COMPANY-DATA>\n<CIK>0000123456\n<CIK>0000123456', 1),
+    lambda b: b.replace(b'<ACCEPTANCE-DATETIME>20221107101112', b'<ACCEPTANCE-DATETIME>20221106013000', 1),
+    lambda b: b.replace(b'</REPORTING-OWNER>\n', b'', 1),
+])
+def test_tag_header_refuses_nested_duplicate_wrong_issuer_or_ambiguous_time(mutator):
+    candidate = _candidates()[0]
+    target = pilot.SecAcquisitionTarget(
+        period=candidate.period, accession_number=candidate.accession_number,
+        form_type=candidate.form_type, filing_date=candidate.filing_date,
+        issuer_cik=candidate.issuer_cik, quarterly_zip_sha256=candidate.quarterly_zip_sha256,
+        submission_row_id=candidate.submission_row_id, primary_xml_filename='ownership.xml',
+    )
+    with pytest.raises(pilot.SecPilotError):
+        pilot._validate_tag_header(mutator(_tag_header(candidate)), target)
+
+
 @pytest.fixture
 def synthetic_run(monkeypatch, tmp_path):
     root = tmp_path.resolve()
@@ -103,6 +154,147 @@ def _run(inputs):
     return pilot.run_fixed_sec_pilot(
         source, prior, output, contact_email=CONTACT, capture_git_commit=COMMIT,
     )
+
+
+@pytest.fixture
+def synthetic_first_pass(monkeypatch, synthetic_run):
+    candidates = synthetic_run[3]
+
+    def fetch(path, user_agent):
+        candidate = next(item for item in candidates if path.startswith(item.archive_path))
+        if path == candidate.archive_path + 'index.json':
+            return 200, INDEX
+        if path == candidate.archive_path + candidate.accession_number + '.hdr.sgml':
+            return 200, _tag_header(candidate)
+        pytest.fail('first pass must not fetch XML with incompatible v1 header')
+
+    monkeypatch.setattr(pilot, '_fetch_sec', fetch)
+    report = _run(synthetic_run)
+    assert json.loads(report.read_bytes())['attempt_count'] == 32
+    monkeypatch.setattr(pilot, 'FIRST_PASS_REPORT_SHA256', hash_bytes(report.read_bytes()))
+    return synthetic_run, report
+
+
+def test_offline_first_pass_replay_checks_all_32_receipts_and_tag_headers(synthetic_first_pass):
+    inputs, report = synthetic_first_pass
+    replay = pilot.replay_first_sec_pass(
+        inputs[2], inputs[3], prior_code_commit=pilot.FIRST_PASS_CODE_COMMIT,
+    )
+    assert replay.report_sha256 == hash_bytes(report.read_bytes())
+    assert len(replay.sources) == 16
+    assert len(replay.prior_paths) == 32
+    assert all(source.tag_receipt['timezone_interpretation_verified'] is False
+               for source in replay.sources)
+    assert all(source.first_pass_reason.startswith('REFUSED:') for source in replay.sources)
+
+
+def test_first_pass_replay_refuses_corrupt_object_before_continuation(synthetic_first_pass):
+    inputs, report = synthetic_first_pass
+    descriptor = json.loads(report.read_bytes())['rows'][0]['artifacts']['header']
+    (inputs[2] / descriptor['relative_path']).write_bytes(b'changed synthetic header')
+    with pytest.raises(pilot.SecPilotError):
+        pilot.replay_first_sec_pass(inputs[2], inputs[3], prior_code_commit=pilot.FIRST_PASS_CODE_COMMIT)
+
+
+def test_first_pass_replay_refuses_journal_path_drift(synthetic_first_pass):
+    inputs, _ = synthetic_first_pass
+    journal = inputs[2] / 'attempts.jsonl'
+    journal.write_text(journal.read_text().replace('/index.json', '/not-index.json', 1))
+    with pytest.raises(pilot.SecPilotError, match='journal'):
+        pilot.replay_first_sec_pass(inputs[2], inputs[3], prior_code_commit=pilot.FIRST_PASS_CODE_COMMIT)
+
+
+def test_xml_continuation_uses_only_sixteen_replayed_index_named_paths(monkeypatch, synthetic_first_pass):
+    inputs, first_report = synthetic_first_pass
+    source, prior, first, candidates = inputs
+    output = first.parent / 'xml-continuation'
+    first_report_sha = hash_bytes(first_report.read_bytes())
+    first_journal_sha = hash_bytes((first / 'attempts.jsonl').read_bytes())
+    calls = []
+
+    def xml_only(path, user_agent):
+        assert path.endswith('/ownership.xml')
+        assert user_agent == f'InsiderBuyingResearch/0.1 ({CONTACT})'
+        calls.append(path)
+        candidate = next(item for item in candidates if path.startswith(item.archive_path))
+        return 200, _xml(candidate)
+
+    monkeypatch.setattr(pilot, '_fetch_sec', xml_only)
+    monkeypatch.setattr(pilot, '_verify_continuation_code_commit', lambda _: None)
+    result = pilot.run_fixed_sec_xml_continuation(
+        source, prior, first, output, contact_email=CONTACT,
+        prior_code_commit=pilot.FIRST_PASS_CODE_COMMIT, continuation_code_commit=COMMIT,
+    )
+    payload = json.loads(result.read_bytes())
+    assert len(calls) == len(set(calls)) == 16
+    assert calls == [candidate.archive_path + 'ownership.xml' for candidate in candidates]
+    assert payload['new_attempt_count'] == 16
+    assert payload['cumulative_attempt_count'] == payload['cumulative_distinct_artifact_count'] == 48
+    assert payload['first_pass_report_sha256'] == first_report_sha
+    assert payload['first_pass_journal_sha256'] == first_journal_sha
+    assert payload['first_pass_code_commit_operator_attested'] == pilot.FIRST_PASS_CODE_COMMIT
+    assert payload['prior_code_sha_artifact_verified'] is False
+    assert payload['continuation_code_commit_verified'] == COMMIT
+    assert payload['acquisition_available'] is True
+    assert all(row['status'] == 'acquired_noncanonical' for row in payload['rows'])
+    assert all(set(row['artifacts']) == {'index', 'header', 'xml'} for row in payload['rows'])
+    assert all(row['tag_header_validation']['direct_ib1c_ingest_authorized'] is False for row in payload['rows'])
+    events = [json.loads(line) for line in (output / 'attempts.jsonl').read_text().splitlines()]
+    assert events[0]['kind'] == 'verified-first-pass-replayed'
+    assert [event['ordinal'] for event in events if event['kind'] == 'attempt-reserved'] == list(range(33, 49))
+    assert CONTACT.encode() not in b''.join(path.read_bytes() for path in output.rglob('*') if path.is_file())
+    assert hash_bytes(first_report.read_bytes()) == first_report_sha
+    assert hash_bytes((first / 'attempts.jsonl').read_bytes()) == first_journal_sha
+
+
+def test_continuation_refuses_corrupt_prior_object_without_output_or_request(monkeypatch, synthetic_first_pass):
+    inputs, first_report = synthetic_first_pass
+    source, prior, first, _ = inputs
+    object_ref = json.loads(first_report.read_bytes())['rows'][0]['artifacts']['index']['relative_path']
+    (first / object_ref).write_bytes(b'corrupt')
+    monkeypatch.setattr(pilot, '_verify_continuation_code_commit', lambda _: None)
+    monkeypatch.setattr(pilot, '_fetch_sec', lambda *args: pytest.fail('network before replay'))
+    output = first.parent / 'must-not-exist'
+    with pytest.raises(pilot.SecPilotError):
+        pilot.run_fixed_sec_xml_continuation(source, prior, first, output,
+            contact_email=CONTACT, prior_code_commit=pilot.FIRST_PASS_CODE_COMMIT,
+            continuation_code_commit=COMMIT)
+    assert not output.exists()
+
+
+def test_continuation_output_cannot_overlap_first_root(monkeypatch, synthetic_first_pass):
+    inputs, _ = synthetic_first_pass
+    source, prior, first, _ = inputs
+    monkeypatch.setattr(pilot, '_verify_continuation_code_commit', lambda _: None)
+    monkeypatch.setattr(pilot, '_fetch_sec', lambda *args: pytest.fail('network before root guard'))
+    with pytest.raises(pilot.SecPilotError, match='overlaps'):
+        pilot.run_fixed_sec_xml_continuation(source, prior, first, first / 'nested',
+            contact_email=CONTACT, prior_code_commit=pilot.FIRST_PASS_CODE_COMMIT,
+            continuation_code_commit=COMMIT)
+
+
+@pytest.mark.parametrize('dirty', [b' M research/local.py\n', b'?? untracked.local\n'])
+def test_continuation_git_binding_refuses_dirty_or_untracked_lane(monkeypatch, dirty):
+    root = Path(pilot.__file__).resolve().parents[1]
+    source = Path(pilot.__file__).read_bytes()
+
+    def git_output(command, **kwargs):
+        assert kwargs['cwd'] == root
+        if command == ('git', 'rev-parse', '--show-toplevel'):
+            return (str(root) + '\n').encode()
+        if command == ('git', 'branch', '--show-current'):
+            return b'codex/strategy-insider-buying\n'
+        if command == ('git', 'rev-parse', 'HEAD'):
+            return (COMMIT + '\n').encode()
+        if command == ('git', 'status', '--porcelain=v1', '--untracked-files=all'):
+            return dirty
+        if command == ('git', 'show', f'{COMMIT}:research/insider_buying_sec_acquisition.py'):
+            return source
+        pytest.fail(f'unexpected git command {command}')
+
+    monkeypatch.setattr(pilot.subprocess, 'check_output', git_output)
+    with pytest.raises(pilot.SecPilotError, match='clean committed lane source'):
+        pilot._verify_continuation_code_commit(COMMIT)
 
 
 def test_synthetic_success_uses_exact_three_routes_per_frozen_candidate_and_zero_authority(
@@ -342,6 +534,34 @@ def test_same_path_retry_budget_cannot_reset_between_fetch_calls(monkeypatch, tm
             journal.fetch(path, 'synthetic')
         assert len(called) == journal.count == 3
         assert journal.distinct == {path}
+    finally:
+        journal.close()
+
+
+def test_limiter_spaces_request_starts_including_retry_and_seeded_continuation(monkeypatch, tmp_path):
+    journal = pilot._Journal(tmp_path.resolve())
+    replay = pilot._FirstPassReplay((), 'a' * 64, 'b' * 64, 'c' * 64,
+                                    frozenset(f'prior-{n}' for n in range(32)))
+    journal.seed_verified_first_pass(replay)
+    clock = [100.0]
+    starts = []
+    monkeypatch.setattr(pilot.time, 'monotonic', lambda: clock[0])
+    monkeypatch.setattr(pilot.time, 'sleep', lambda seconds: clock.__setitem__(0, clock[0] + seconds))
+    paths = [f'/Archives/edgar/data/123456/000099999922000001/file{n}.xml' for n in range(2)]
+
+    def fetch(path, user_agent):
+        starts.append(clock[0])
+        return (503, b'') if len(starts) == 1 else (200, b'abc')
+
+    monkeypatch.setattr(pilot, '_fetch_sec', fetch)
+    try:
+        assert journal.fetch(paths[0], 'synthetic') == (200, b'abc')
+        assert journal.fetch(paths[1], 'synthetic') == (200, b'abc')
+        assert journal.count == 35
+        with pytest.raises(pilot.SecPilotError, match='rerequest'):
+            journal.fetch('prior-0', 'synthetic')
+        assert len(starts) == 3
+        assert all(later - earlier >= 0.5 for earlier, later in zip(starts, starts[1:]))
     finally:
         journal.close()
 

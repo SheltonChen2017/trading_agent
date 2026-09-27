@@ -12831,3 +12831,69 @@ security-master/calendar audit still lacks its main-line venue and executor;
 IB-3 diagnostics stay paused. The task monitor remains **PAUSED**, not
 rearmed or extended into another round. The authorized preparation is ready
 for one combined push; the later real-execution gate is deliberately intact.
+
+## 98. Owner-authorized fixed SEC acquisition: first run and source-dialect correction (2026-09-27 UTC)
+
+### 98.1 Authority, review state, and fixed inventory
+
+After section 97, the owner authorized the proposed **SEC-only 16-filing
+compatibility pilot** and supplied the identifying SEC contact out of band.
+The sample is exactly six lexical-first original Form 4 and two lexical-first
+Form 4/A accessions from each of the already approved 2022Q4 and 2023Q1
+SUBMISSION tables. The contact is runtime-only; it is not written to Git,
+the pilot inventory, journal, raw objects, or report. The owner allowed this
+bounded implementation to proceed without a *prerequisite* Claude review;
+independent Claude review of the eventual single pushed snapshot is expected
+after this round. No Claude commit arrived after `36a2edb` before this work,
+so there is no incoming commit to counter-review or disposition here.
+
+The verified exact-16 inventory hash is
+`4b8a4c3a233855ea2aa6cde0b2739a83aca478180ac881e1cf011943753d78db`.
+The versioned pilot uses the documented SEC accession-directory `index.json`
+route, not section 96's provisional `{accession}-index.htm` recipe; it does
+not claim to replay that zero-I/O plan. The path stays inside the same exact
+SEC host and accession directory. The first code snapshot is
+`f5430fff9b09a963b5cb0307c9e87b28a69c4767`; it adds a standalone
+network runner outside the provider-free Insider package and synthetic-only
+tests. The owner-approved **whole-pilot** ceiling is 48 distinct artifacts,
+144 attempts, three per artifact, two requests/second, and 2 MiB per response,
+with no redirects/fallback host or source expansion. The first runner enforces
+its own run's ceilings; a continuation must replay its journal and enforce
+the cumulative ceiling before any further request.
+
+### 98.2 First real bounded attempt, retained but unavailable
+
+The first run's external root is
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider_buying_sec_pilot_2022q4_2023q1_f5430ff`.
+Its commit marker binds report SHA-256
+`410bbb079f9cec25733e798d3aceaea179c0d47d657743d199a041922d81f642`.
+Read-only independent replay verified the marker/report, exact inventory,
+16 rows, journal ordinals 1..32, **32 distinct HTTP 200 responses** (one
+`index.json` and one accession `.hdr.sgml` per selected filing), 32 matching
+regular content-addressed objects totaling **28,001 raw bytes**, and zero
+XML requests. All 16 rows are retained as quarantined; the report correctly
+says `acquisition_available=false`, `halted_on_sec_access=false`, and all
+three look counters zero. No source byte from this run is committed to Git.
+
+The first run could not apply the provisional section-96 derived-header
+projection: real SEC headers use tag lines such as `<ACCESSION-NUMBER>`,
+`<TYPE>`, `<FILING-DATE>`, and issuer `<COMPANY-DATA><CIK>`, whereas its
+frozen v1 projection expects colon-labelled fields. All 16 refusals are
+`REFUSED: missing or ambiguous ACCESSION NUMBER`. The raw index/header
+objects were retained before that refusal, and no XML request followed an
+unverified header. Offline, all 16 retained headers match their pinned
+accession, form, filing date, issuer CIK and fourteen-digit acceptance value
+under the observed tag-line dialect; this is a source-shape observation, not
+SEC timezone verification, source authentication, canonical evidence, or
+IB-1C authority. The first report does **not** cryptographically bind the
+executing Git SHA because every v1 projection refused before serializing its
+capture field. `f5430ff` is an operator-attested execution link only; later
+receipts must keep `prior_code_sha_artifact_verified=false`.
+
+The same owner-approved request budget has 16 XML artifact slots remaining.
+Any continuation must replay the immutable first receipt and all 32 source
+objects offline, use an explicit new tagged-header profile, request **only**
+those 16 XML filenames into a fresh external root, and account for attempts
+cumulatively. A full rerun would rerequest the first 32 artifacts and is not
+the authorized continuation. No additional SEC request has been made while
+this correction is developed and verified.

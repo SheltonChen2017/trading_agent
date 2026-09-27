@@ -18,6 +18,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import subprocess
 import time
 import uuid
 import xml.etree.ElementTree as ET
@@ -25,9 +26,17 @@ import zipfile
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying.sec_acquisition_preparation import (
+    MAX_SEC_HEADER_BYTES,
     SecAcquisitionPreparationError,
     SecAcquisitionTarget,
+    _eastern_timestamp,
     derive_sec_header_projection,
+)
+from research.insider_buying.sec_edgar_acceptance_snapshot import (
+    SecEdgarAcceptanceSnapshotError,
+    SecEdgarAvailabilityRecord,
+    SecEdgarAvailabilityRule,
+    SecEdgarAvailabilityTier,
 )
 from research.insider_buying.sec_bulk_parsed_snapshot import _parse_table
 from research.insider_buying.sec_bulk_snapshot import (
@@ -47,6 +56,10 @@ from research.insider_buying.sec_noncanonical_pilot_contracts import (
 
 PILOT_VERSION = "INSETF-SEC-SIXTEEN-ACQUISITION-v1"
 INDEX_ROUTE_VERSION = "sec-accession-directory-index-json-v1"
+CONTINUATION_VERSION = "INSETF-SEC-SIXTEEN-XML-CONTINUATION-v1"
+FIRST_PASS_REPORT_SHA256 = "410bbb079f9cec25733e798d3aceaea179c0d47d657743d199a041922d81f642"
+FIRST_PASS_CODE_COMMIT = "f5430fff9b09a963b5cb0307c9e87b28a69c4767"
+FIRST_PASS_ATTEMPTS = 32
 MAX_BODY_BYTES = 2 * 1024 * 1024
 MAX_ATTEMPTS = 3
 MAX_DISTINCT_REQUESTS = 48
@@ -177,6 +190,33 @@ def _safe_roots(input_root: str | Path, prior_root: str | Path, output_root: str
     return source, prior, output
 
 
+def _refuse_output_overlap(output: Path, protected: Path) -> None:
+    if (os.path.commonpath((str(output), str(protected))) in (str(output), str(protected))
+            or any(ancestor.exists() and os.path.samefile(ancestor, protected)
+                   for ancestor in output.parents)):
+        raise SecPilotError("REFUSED: continuation output overlaps the first SEC pass")
+
+
+def _verify_continuation_code_commit(commit: str) -> None:
+    """Bind the current runner file to exact local HEAD; no network or write."""
+    if type(commit) is not str or re.fullmatch(r"[0-9a-f]{40}", commit) is None:
+        raise SecPilotError("REFUSED: continuation code SHA must be a full lowercase Git commit")
+    root = Path(__file__).resolve().parents[1]
+    try:
+        top = subprocess.check_output(("git", "rev-parse", "--show-toplevel"), cwd=root, stderr=subprocess.DEVNULL).decode().strip()
+        branch = subprocess.check_output(("git", "branch", "--show-current"), cwd=root, stderr=subprocess.DEVNULL).decode().strip()
+        actual = subprocess.check_output(("git", "rev-parse", "HEAD"), cwd=root, stderr=subprocess.DEVNULL).decode().strip()
+        dirty = subprocess.check_output(("git", "status", "--porcelain=v1", "--untracked-files=all"),
+                                        cwd=root, stderr=subprocess.DEVNULL)
+        committed = subprocess.check_output(("git", "show", f"{commit}:research/insider_buying_sec_acquisition.py"),
+                                            cwd=root, stderr=subprocess.DEVNULL)
+    except (OSError, subprocess.CalledProcessError, UnicodeDecodeError) as exc:
+        raise SecPilotError("REFUSED: continuation Git source could not be verified") from exc
+    if (top != str(root) or branch != "codex/strategy-insider-buying" or dirty
+            or actual != commit or hash_bytes(committed) != hash_bytes(Path(__file__).read_bytes())):
+        raise SecPilotError("REFUSED: continuation code SHA requires this exact clean committed lane source")
+
+
 def select_fixed_pilot(input_root: str | Path, prior_pilot_root: str | Path) -> tuple[SecPilotCandidate, ...]:
     """Replay only pinned raw ZIPs and SUBMISSION tables; never reread all 901k rows."""
     source = _plain_path(input_root, must_exist=True)
@@ -282,6 +322,269 @@ def _primary_filename(index_bytes: bytes) -> str:
     return names[0]
 
 
+def _validate_tag_header(raw: bytes, target: SecAcquisitionTarget) -> dict[str, object]:
+    """Validate the observed tag-line dialect, without changing frozen v1.
+
+    Its acceptance timezone interpretation remains caller-declared and
+    unverified. A valid receipt is only noncanonical compatibility evidence.
+    """
+    target.to_payload()
+    if type(raw) is not bytes or not raw or len(raw) > MAX_SEC_HEADER_BYTES:
+        raise SecPilotError("REFUSED: tag header is not an exact bounded byte image")
+    if any(byte < 32 and byte not in (9, 10, 13) for byte in raw) or b"\x00" in raw:
+        raise SecPilotError("REFUSED: tag header contains unsupported control bytes")
+    try:
+        text = raw.decode("ascii", errors="strict").replace("\r\n", "\n")
+    except UnicodeDecodeError as exc:
+        raise SecPilotError("REFUSED: tag header is not ASCII") from exc
+    if "\r" in text:
+        raise SecPilotError("REFUSED: tag header has unsupported line endings")
+    lines = text.split("\n")
+    if lines[-1] == "":
+        lines.pop()
+    expected_open = (f"<SEC-HEADER>{target.accession_number}.hdr.sgml : "
+                     f"{target.filing_date.replace('-', '')}")
+    if (len(lines) < 8 or lines[0] != expected_open or lines[-1] != "</SEC-HEADER>"
+            or sum(line.startswith("<SEC-HEADER>") for line in lines) != 1
+            or lines.count("</SEC-HEADER>") != 1):
+        raise SecPilotError("REFUSED: tag header envelope disagrees with target")
+    body = lines[1:-1]
+    roles = [index for index, line in enumerate(body) if line in ("<REPORTING-OWNER>", "<ISSUER>")]
+    if not roles:
+        raise SecPilotError("REFUSED: tag header has no role sections")
+    if any(body.count(marker) != 1 for marker in (
+        "<REPORTING-OWNER>", "</REPORTING-OWNER>", "<ISSUER>", "</ISSUER>",
+    )):
+        raise SecPilotError("REFUSED: tag header has missing or repeated root roles")
+    owner_open = body.index("<REPORTING-OWNER>")
+    owner_close = body.index("</REPORTING-OWNER>")
+    issuer_open = body.index("<ISSUER>")
+    issuer_close = body.index("</ISSUER>")
+    if (owner_open != roles[0] or not owner_open < owner_close
+            or issuer_open != owner_close + 1 or issuer_close != len(body) - 1
+            or issuer_open >= issuer_close):
+        raise SecPilotError("REFUSED: tag header role topology is invalid")
+    preamble = body[:roles[0]]
+    allowed_preamble = {
+        "ACCEPTANCE-DATETIME", "ACCESSION-NUMBER", "TYPE",
+        "PUBLIC-DOCUMENT-COUNT", "PERIOD", "FILING-DATE",
+        "DATE-OF-FILING-DATE-CHANGE",
+    }
+    for line in preamble:
+        match = re.fullmatch(r"<([A-Z][A-Z0-9-]*)>([^<>]+)", line)
+        if match is None or match.group(1) not in allowed_preamble:
+            raise SecPilotError("REFUSED: tag header preamble has nested or foreign fields")
+
+    def field(scope: list[str], tag: str, *, global_unique: bool = False) -> str:
+        prefix = f"<{tag}>"
+        matching = [line[len(prefix):] for line in scope if line.startswith(prefix)]
+        if len(matching) != 1 or not matching[0] or matching[0] != matching[0].strip():
+            raise SecPilotError(f"REFUSED: missing or ambiguous tag header {tag}")
+        if global_unique and sum(line.startswith(prefix) for line in body) != 1:
+            raise SecPilotError(f"REFUSED: duplicate tag header {tag} outside preamble")
+        return matching[0]
+
+    accession = field(preamble, "ACCESSION-NUMBER", global_unique=True)
+    form = field(preamble, "TYPE", global_unique=True)
+    filing_raw = field(preamble, "FILING-DATE", global_unique=True)
+    accepted_raw = field(preamble, "ACCEPTANCE-DATETIME", global_unique=True)
+    issuer = body[issuer_open + 1:issuer_close]
+    if (not issuer or issuer[0] != "<COMPANY-DATA>"
+            or issuer.count("<COMPANY-DATA>") != 1
+            or issuer.count("</COMPANY-DATA>") != 1):
+        raise SecPilotError("REFUSED: issuer COMPANY-DATA is missing or not first")
+    company_end = issuer.index("</COMPANY-DATA>")
+    company = issuer[1:company_end]
+    if any(re.fullmatch(r"<[A-Z][A-Z0-9-]*>[^<>]+", line) is None for line in company):
+        raise SecPilotError("REFUSED: issuer COMPANY-DATA contains a nested or empty field")
+    issuer_cik = field(company, "CIK")
+    if sum(line.startswith("<CIK>") for line in issuer) != 1:
+        raise SecPilotError("REFUSED: issuer CIK is ambiguous outside COMPANY-DATA")
+    if (accession != target.accession_number or form != target.form_type
+            or filing_raw != target.filing_date.replace("-", "")
+            or re.fullmatch(r"[0-9]{1,10}", issuer_cik) is None
+            or int(issuer_cik) == 0 or issuer_cik.zfill(10) != target.issuer_cik
+            or re.fullmatch(r"[0-9]{14}", accepted_raw) is None):
+        raise SecPilotError("REFUSED: tag header identity disagrees with frozen source")
+    try:
+        accepted = _eastern_timestamp(accepted_raw)
+        SecEdgarAvailabilityRecord(
+            accession_number=target.accession_number, document_type=target.form_type,
+            submission_row_id=target.submission_row_id,
+            filing_date=date.fromisoformat(target.filing_date),
+            availability_tier=SecEdgarAvailabilityTier.EXACT_ACCEPTANCE_TIMESTAMP,
+            next_open_rule=SecEdgarAvailabilityRule.NEXT_OPEN_AFTER_ACCEPTANCE,
+            accepted_at=accepted, primary_document_url=target.primary_xml_url,
+            metadata_source_sha256=hash_bytes(raw),
+        )
+    except (SecAcquisitionPreparationError, SecEdgarAcceptanceSnapshotError) as exc:
+        raise SecPilotError(str(exc)) from exc
+    return {
+        "version": "sec-header-tag-line-compat-v1",
+        "raw_header_sha256": hash_bytes(raw), "raw_header_size_bytes": len(raw),
+        "source_url": target.header_url,
+        "source_fields": {
+            "accession_number": accession, "form_type": form,
+            "filing_date_raw": filing_raw, "accepted_at_raw": accepted_raw,
+            "issuer_cik_raw": issuer_cik,
+        },
+        "accepted_at_interpretation": accepted.isoformat(timespec="seconds"),
+        "timezone_interpretation_verified": False,
+        "retrieval_timestamp_unavailable": True,
+        "official_sec_profile_verified": False,
+        "direct_ib1c_ingest_authorized": False,
+        "canonical": False,
+    }
+
+
+@dataclass(frozen=True)
+class _ReplayedSource:
+    candidate: SecPilotCandidate
+    target: SecAcquisitionTarget
+    index_bytes: bytes
+    header_bytes: bytes
+    tag_receipt: dict[str, object]
+    first_pass_reason: str
+
+
+@dataclass(frozen=True)
+class _FirstPassReplay:
+    sources: tuple[_ReplayedSource, ...]
+    report_sha256: str
+    inventory_sha256: str
+    journal_sha256: str
+    prior_paths: frozenset[str]
+
+
+def _canonical_object(raw: bytes, *, label: str) -> dict[str, object]:
+    try:
+        value = json.loads(raw, object_pairs_hook=_json_no_duplicate_keys)
+    except (UnicodeError, json.JSONDecodeError) as exc:
+        raise SecPilotError(f"REFUSED: {label} is not strict JSON") from exc
+    if type(value) is not dict or (canonical_json(value) + "\n").encode("utf-8") != raw:
+        raise SecPilotError(f"REFUSED: {label} is not canonical JSON plus one LF")
+    return value
+
+
+def _read_first_object(root: Path, descriptor: object) -> bytes:
+    if (type(descriptor) is not dict or set(descriptor) != {"relative_path", "sha256", "size_bytes"}
+            or type(descriptor["sha256"]) is not str
+            or re.fullmatch(r"[0-9a-f]{64}", descriptor["sha256"]) is None
+            or type(descriptor["size_bytes"]) is not int
+            or not 0 < descriptor["size_bytes"] <= MAX_BODY_BYTES
+            or descriptor["relative_path"] != f'objects/{descriptor["sha256"]}.bin'):
+        raise SecPilotError("REFUSED: first-pass object descriptor is malformed")
+    raw = _read_regular_bytes(root / descriptor["relative_path"],
+                              label="first-pass SEC object", max_bytes=MAX_BODY_BYTES,
+                              require_single_link=True)
+    if len(raw) != descriptor["size_bytes"] or hash_bytes(raw) != descriptor["sha256"]:
+        raise SecPilotError("REFUSED: first-pass object hash or size disagrees")
+    return raw
+
+
+def replay_first_sec_pass(first_root: str | Path, candidates: tuple[SecPilotCandidate, ...],
+                          *, prior_code_commit: str) -> _FirstPassReplay:
+    """Fully replay the exact committed 32-object pass, without source writes."""
+    if type(prior_code_commit) is not str or prior_code_commit != FIRST_PASS_CODE_COMMIT:
+        raise SecPilotError("REFUSED: first-pass code SHA attestation is not the exact operator value")
+    root = _plain_path(first_root, must_exist=True)
+    report_name = f"sec-pilot-report-{FIRST_PASS_REPORT_SHA256}.json"
+    required = {"attempts.jsonl", "inventory.json", "commit.json", "objects", report_name}
+    if {child.name for child in root.iterdir()} != required:
+        raise SecPilotError("REFUSED: first-pass publication inventory is not exact")
+    objects_root = _plain_path(root / "objects", must_exist=True)
+    commit = _canonical_object(_read_regular_bytes(root / "commit.json", label="first-pass commit",
+                                                  max_bytes=4096, require_single_link=True), label="first-pass commit")
+    if commit != {"kind": "sec-pilot-commit", "report": report_name,
+                  "report_sha256": FIRST_PASS_REPORT_SHA256}:
+        raise SecPilotError("REFUSED: first-pass commit marker disagrees")
+    report_bytes = _read_regular_bytes(root / report_name, label="first-pass report",
+                                       max_bytes=MAX_BODY_BYTES, require_single_link=True)
+    if hash_bytes(report_bytes) != FIRST_PASS_REPORT_SHA256:
+        raise SecPilotError("REFUSED: first-pass report digest is not the pinned exact pass")
+    report = _canonical_object(report_bytes, label="first-pass report")
+    inventory_bytes = _read_regular_bytes(root / "inventory.json", label="first-pass inventory",
+                                          max_bytes=128 * 1024, require_single_link=True)
+    inventory = _canonical_object(inventory_bytes, label="first-pass inventory")
+    candidate_payloads = [candidate.to_payload() for candidate in candidates]
+    inventory_hash = hash_payload(candidate_payloads)
+    if (inventory != {"kind": "sec-pilot-frozen-inventory", "version": PILOT_VERSION,
+                      "index_route_version": INDEX_ROUTE_VERSION,
+                      "inventory_sha256": inventory_hash, "candidates": candidate_payloads}
+            or report.get("kind") != PILOT_VERSION
+            or report.get("inventory_sha256") != inventory_hash
+            or report.get("index_route_version") != INDEX_ROUTE_VERSION
+            or report.get("source_zip_bindings_sha256") != hash_payload([
+                item.to_payload() for item in approved_ib1b_archive_bindings()])
+            or report.get("attempt_count") != FIRST_PASS_ATTEMPTS
+            or report.get("distinct_artifact_count") != FIRST_PASS_ATTEMPTS
+            or report.get("halted_on_sec_access") is not False
+            or report.get("acquisition_available") is not False
+            or any(report.get(flag) is not False for flag in (
+                "canonical", "point_in_time_data", "direct_ib1c_ingest_authorized",
+                "source_authenticity_verified", "official_sec_profile_verified"))
+            or any(report.get(look) != 0 for look in (
+                "research_looks", "authorized_outcome_looks", "consumed_outcome_looks"))):
+        raise SecPilotError("REFUSED: first-pass inventory, scope, or authority disagrees")
+    rows = report.get("rows")
+    if type(rows) is not list or len(rows) != 16 or len(candidates) != 16:
+        raise SecPilotError("REFUSED: first-pass row count is not 16")
+    journal_bytes = _read_regular_bytes(root / "attempts.jsonl", label="first-pass journal",
+                                        max_bytes=128 * 1024, require_single_link=True)
+    if not journal_bytes.endswith(b"\n"):
+        raise SecPilotError("REFUSED: first-pass journal is not complete JSONL")
+    events = [_canonical_object(line + b"\n", label="first-pass journal event")
+              for line in journal_bytes.splitlines()]
+    if len(events) != FIRST_PASS_ATTEMPTS * 2 + 1 or events[-1] != {
+        "kind": "pilot-finished", "attempts": FIRST_PASS_ATTEMPTS,
+        "distinct_artifacts": FIRST_PASS_ATTEMPTS, "inventory_sha256": inventory_hash,
+    }:
+        raise SecPilotError("REFUSED: first-pass journal count or terminal event disagrees")
+    sources: list[_ReplayedSource] = []
+    paths: list[str] = []
+    object_names: set[str] = set()
+    for index, (candidate, row) in enumerate(zip(candidates, rows, strict=True)):
+        if (type(row) is not dict or row.get("candidate") != candidate.to_payload()
+                or row.get("status") != "quarantined"
+                or type(row.get("reason")) is not str
+                or "header_projection" in row or type(row.get("artifacts")) is not dict
+                or set(row["artifacts"]) != {"index", "header"}):
+            raise SecPilotError("REFUSED: first-pass row is not the exact quarantined pair")
+        raw_index = _read_first_object(objects_root.parent, row["artifacts"]["index"])
+        raw_header = _read_first_object(objects_root.parent, row["artifacts"]["header"])
+        for role in ("index", "header"):
+            object_names.add(row["artifacts"][role]["sha256"] + ".bin")
+        filename = _primary_filename(raw_index)
+        if filename != row.get("primary_xml_filename"):
+            raise SecPilotError("REFUSED: first-pass index filename replay drifted")
+        target = SecAcquisitionTarget(
+            period=candidate.period, accession_number=candidate.accession_number,
+            form_type=candidate.form_type, filing_date=candidate.filing_date,
+            issuer_cik=candidate.issuer_cik, quarterly_zip_sha256=candidate.quarterly_zip_sha256,
+            submission_row_id=candidate.submission_row_id, primary_xml_filename=filename,
+        )
+        tag_receipt = _validate_tag_header(raw_header, target)
+        sources.append(_ReplayedSource(candidate, target, raw_index, raw_header,
+                                       tag_receipt, row["reason"]))
+        for role, suffix in (("index", "index.json"),
+                             ("header", candidate.accession_number + ".hdr.sgml")):
+            path = candidate.archive_path + suffix
+            ordinal = index * 2 + (1 if role == "index" else 2)
+            descriptor = row["artifacts"][role]
+            expected_reservation = {"kind": "attempt-reserved", "ordinal": ordinal,
+                                    "path": path, "attempt": 1}
+            expected_response = {"kind": "attempt-response", "ordinal": ordinal,
+                                 "status": 200, "size_bytes": descriptor["size_bytes"],
+                                 "sha256": descriptor["sha256"]}
+            if events[2 * (ordinal - 1):2 * ordinal] != [expected_reservation, expected_response]:
+                raise SecPilotError("REFUSED: first-pass journal path or response replay drifted")
+            paths.append(path)
+    if len(set(paths)) != FIRST_PASS_ATTEMPTS or {child.name for child in objects_root.iterdir()} != object_names:
+        raise SecPilotError("REFUSED: first-pass path or object inventory is not exact")
+    return _FirstPassReplay(tuple(sources), FIRST_PASS_REPORT_SHA256, inventory_hash,
+                            hash_bytes(journal_bytes), frozenset(paths))
+
+
 def _validate_xml(raw: bytes, candidate: SecPilotCandidate) -> None:
     try:
         text = raw.decode("utf-8", errors="strict")
@@ -372,7 +675,22 @@ class _Journal:
         self.count = 0
         self.distinct: set[str] = set()
         self.attempts_by_path: dict[str, int] = {}
+        self.prior_paths: frozenset[str] = frozenset()
         self.last_request_at = 0.0
+
+    def seed_verified_first_pass(self, replay: _FirstPassReplay) -> None:
+        if (self.count != 0 or self.distinct or self.attempts_by_path
+                or len(replay.prior_paths) != FIRST_PASS_ATTEMPTS):
+            raise SecPilotError("REFUSED: first-pass counters cannot be seeded twice")
+        self.prior_paths = replay.prior_paths
+        self.distinct = set(replay.prior_paths)
+        self.attempts_by_path = {path: 1 for path in replay.prior_paths}
+        self.count = FIRST_PASS_ATTEMPTS
+        self.event({"kind": "verified-first-pass-replayed",
+                    "prior_attempts": FIRST_PASS_ATTEMPTS,
+                    "prior_distinct_artifacts": FIRST_PASS_ATTEMPTS,
+                    "prior_report_sha256": replay.report_sha256,
+                    "prior_journal_sha256": replay.journal_sha256})
 
     def event(self, payload: dict[str, object]) -> None:
         _check_output_directory(self.output, self.directory_fd, self.root_identity)
@@ -382,6 +700,8 @@ class _Journal:
         _check_output_directory(self.output, self.directory_fd, self.root_identity)
 
     def fetch(self, path: str, user_agent: str) -> tuple[int, bytes]:
+        if path in self.prior_paths:
+            raise SecPilotError("REFUSED: continuation may not rerequest a first-pass artifact")
         if self.count >= MAX_TOTAL_ATTEMPTS:
             raise SecPilotError("REFUSED: 144-attempt ceiling reached")
         if path not in self.distinct and len(self.distinct) >= MAX_DISTINCT_REQUESTS:
@@ -499,10 +819,13 @@ def _store_object(output: Path, raw: bytes,
 
 
 def _write_inventory_before_request(output: Path, candidates: list[dict[str, str]],
-                                    digest: str, expected_identity: tuple[int, int] | None = None) -> None:
+                                    digest: str, expected_identity: tuple[int, int] | None = None,
+                                    continuation: dict[str, object] | None = None) -> None:
     payload = {"kind": "sec-pilot-frozen-inventory", "version": PILOT_VERSION,
                "index_route_version": INDEX_ROUTE_VERSION,
                "inventory_sha256": digest, "candidates": candidates}
+    if continuation is not None:
+        payload["continuation"] = continuation
     directory_fd = _open_output_directory(output, expected_identity)
     try:
         with (output / "inventory.json").open("xb") as handle:
@@ -649,18 +972,142 @@ def run_fixed_sec_pilot(
     return _write_commit_last(output, payload, output_identity)
 
 
+def run_fixed_sec_xml_continuation(
+    input_root: str | Path, prior_pilot_root: str | Path,
+    first_sec_root: str | Path, output_root: str | Path, *,
+    contact_email: str, prior_code_commit: str, continuation_code_commit: str,
+) -> Path:
+    """Replay the exact first pass, then request only its 16 index-named XMLs.
+
+    The earlier code SHA is explicitly operator-attested, not artifact-proven.
+    The current SHA is checked against local HEAD/source. Neither pass is an
+    IB-1C input, authenticated SEC source, canonical result or research look.
+    """
+    if (type(contact_email) is not str or len(contact_email) > 254
+            or _CONTACT_RE.fullmatch(contact_email) is None):
+        raise SecPilotError("REFUSED: an identifying contact email is required")
+    if type(prior_code_commit) is not str or prior_code_commit != FIRST_PASS_CODE_COMMIT:
+        raise SecPilotError("REFUSED: first-pass code SHA attestation is not exact")
+    _verify_continuation_code_commit(continuation_code_commit)
+    source, prior, output = _safe_roots(input_root, prior_pilot_root, output_root)
+    first = _plain_path(first_sec_root, must_exist=True)
+    _refuse_output_overlap(output, first)
+    selected = select_fixed_pilot(source, prior)
+    replay = replay_first_sec_pass(first, selected, prior_code_commit=prior_code_commit)
+    # All 16 index/header objects, journal paths and tag identities have been
+    # revalidated before creating the new root or issuing any request.
+    _safe_roots(source, prior, output)
+    _refuse_output_overlap(output, first)
+    output.mkdir(mode=0o700)
+    created = output.lstat()
+    output_identity = (created.st_dev, created.st_ino)
+    (output / "objects").mkdir(mode=0o700)
+    inventory = [candidate.to_payload() for candidate in selected]
+    continuation = {
+        "version": CONTINUATION_VERSION,
+        "first_pass_report_sha256": replay.report_sha256,
+        "first_pass_journal_sha256": replay.journal_sha256,
+        "first_pass_attempts": FIRST_PASS_ATTEMPTS,
+        "first_pass_code_commit_operator_attested": prior_code_commit,
+        "prior_code_sha_artifact_verified": False,
+        "continuation_code_commit_verified": continuation_code_commit,
+        "requests": [source_item.target.primary_xml_url for source_item in replay.sources],
+    }
+    _write_inventory_before_request(output, inventory, replay.inventory_sha256,
+                                    output_identity, continuation=continuation)
+    # Retain a standalone immutable copy of all 32 prior raw byte images.
+    # The first root is only read, never updated or relinked.
+    prior_objects = []
+    for source_item in replay.sources:
+        prior_objects.append({
+            "index": _store_object(output, source_item.index_bytes, output_identity),
+            "header": _store_object(output, source_item.header_bytes, output_identity),
+        })
+    journal = _Journal(output, output_identity)
+    journal.seed_verified_first_pass(replay)
+    user_agent = f"InsiderBuyingResearch/0.1 ({contact_email})"
+    rows: list[dict[str, object]] = []
+    halt = False
+    try:
+        for source_item, objects in zip(replay.sources, prior_objects, strict=True):
+            row: dict[str, object] = {
+                "candidate": source_item.candidate.to_payload(),
+                "primary_xml_filename": source_item.target.primary_xml_filename,
+                "status": "quarantined", "reason": None,
+                "first_pass_reason": source_item.first_pass_reason,
+                "artifacts": dict(objects),
+                "tag_header_validation": source_item.tag_receipt,
+            }
+            rows.append(row)
+            if halt:
+                row["reason"] = "not attempted after SEC access stop"
+                continue
+            path = source_item.candidate.archive_path + source_item.target.primary_xml_filename
+            if "https://www.sec.gov" + path != source_item.target.primary_xml_url:
+                raise SecPilotError("REFUSED: continuation XML path drifted from frozen index")
+            try:
+                _, xml = journal.fetch(path, user_agent)
+                row["artifacts"]["xml"] = _store_object(output, xml, output_identity)
+                _validate_xml(xml, source_item.candidate)
+                row["status"] = "acquired_noncanonical"
+            except SecPilotGlobalStop as exc:
+                row["reason"] = str(exc)
+                halt = True
+            except SecPilotError as exc:
+                row["reason"] = str(exc)
+        journal.event({"kind": "continuation-finished", "cumulative_attempts": journal.count,
+                       "cumulative_distinct_artifacts": len(journal.distinct),
+                       "new_attempts": journal.count - FIRST_PASS_ATTEMPTS,
+                       "first_pass_report_sha256": replay.report_sha256})
+    finally:
+        journal.close()
+    payload = {
+        "kind": CONTINUATION_VERSION, "canonical": False,
+        "point_in_time_data": False, "direct_ib1c_ingest_authorized": False,
+        "source_authenticity_verified": False, "official_sec_profile_verified": False,
+        "timezone_interpretation_verified": False,
+        "research_looks": 0, "authorized_outcome_looks": 0, "consumed_outcome_looks": 0,
+        "inventory_sha256": replay.inventory_sha256,
+        "index_route_version": INDEX_ROUTE_VERSION,
+        "first_pass_report_sha256": replay.report_sha256,
+        "first_pass_journal_sha256": replay.journal_sha256,
+        "first_pass_code_commit_operator_attested": prior_code_commit,
+        "prior_code_sha_artifact_verified": False,
+        "continuation_code_commit_verified": continuation_code_commit,
+        "cumulative_attempt_count": journal.count,
+        "cumulative_distinct_artifact_count": len(journal.distinct),
+        "new_attempt_count": journal.count - FIRST_PASS_ATTEMPTS,
+        "halted_on_sec_access": halt, "rows": rows,
+        "acquisition_available": len(rows) == 16 and all(
+            row["status"] == "acquired_noncanonical" for row in rows),
+    }
+    return _write_commit_last(output, payload, output_identity)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-root", required=True)
     parser.add_argument("--prior-pilot-root", required=True)
     parser.add_argument("--output-root", required=True)
     parser.add_argument("--capture-git-commit", required=True)
+    parser.add_argument("--continue-from", help="Exact committed first SEC pass; XML-only mode")
+    parser.add_argument("--prior-code-commit", help="Explicit operator attestation of first-pass code")
     arguments = parser.parse_args(argv)
     contact = getpass.getpass("SEC identifying contact email (not persisted): ")
-    print(run_fixed_sec_pilot(
-        arguments.input_root, arguments.prior_pilot_root, arguments.output_root,
-        contact_email=contact, capture_git_commit=arguments.capture_git_commit,
-    ))
+    if arguments.continue_from:
+        print(run_fixed_sec_xml_continuation(
+            arguments.input_root, arguments.prior_pilot_root, arguments.continue_from,
+            arguments.output_root, contact_email=contact,
+            prior_code_commit=arguments.prior_code_commit,
+            continuation_code_commit=arguments.capture_git_commit,
+        ))
+    else:
+        if arguments.prior_code_commit is not None:
+            parser.error("--prior-code-commit requires --continue-from")
+        print(run_fixed_sec_pilot(
+            arguments.input_root, arguments.prior_pilot_root, arguments.output_root,
+            contact_email=contact, capture_git_commit=arguments.capture_git_commit,
+        ))
     return 0
 
 

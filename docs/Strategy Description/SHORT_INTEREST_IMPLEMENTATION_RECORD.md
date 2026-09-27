@@ -1,23 +1,18 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED THE FIVE-COMMIT RANGE `f72f83c..86f56fd` COMMIT
-BY COMMIT (SECTION 52). ALL FIVE ARE ACCEPTED; SI-2B-P0 `e567bfb` IS ACCEPTED
-AFTER A TEST-ONLY CORRECTION. **`SI-CR8-001` IS CLOSED BY CORRECTION**: the
-lane-owned owner-decision record `c329d6f` and the policy binding `3ebddf2`
-supply a durable path, introducing commit and document SHA-256, and a test
-retrieves the committed bytes, rehashes them and asserts the verbatim approval,
-which exceeds the SI-0M standard. ALL FIVE `SI-CCR20` CORRECTIONS AGAINST THE
-PRIOR CLAUDE RECORD ARE ACCEPTED, INCLUDING TWO REPEAT LAPSES THAT ARE MINE.
-THE FOUR CANDIDATE WINDOWS, BOTH INCLUSIVE FLOORS, THE EXACT EVEN-WINDOW
-MEDIAN AND THE ABSENCE OF ANY SELECTED LOOKBACK WERE INDEPENDENTLY VERIFIED.
-ONE LATENT P3 IS PINNED: THE MEDIAN IS EXACT ONLY FOR EVEN WINDOWS
-(`SI-CR9-001`). THE EXACT TWELVE-FILE SHORT INTEREST LANE IS 678 PASSED.
-THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN. CODEX COUNTER-REVIEW
-OF THE CLAUDE COMMITS IS NEXT. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED;
-AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER, LICENSED-DATA,
-ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION, SEED, ETF, QUANTCONNECT,
-BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT, PAPER/LIVE, ORDER, AND
-TRADING GATES REMAIN CLOSED.**
+Status: **CODEX HAS COUNTER-REVIEWED BOTH CLAUDE COMMITS IN
+`86f56fd..50636ad`, EACH ACCEPTED AFTER CORRECTION (SECTION 53).
+SI-2B NOW USES PRODUCTION ODD/EVEN EXACT MEDIAN ARITHMETIC WITHOUT CHANGING
+THE APPROVED 20/60/120/252 GRID. THE AUTHENTIC SUPPORTED-CALENDAR UNDERFILL
+GUARD IS PINNED; CLAUDE'S PRIOR NON-DEFECT CLASSIFICATION IS SUPERSEDED.
+SI-2B-P1A CANDIDATE-SPECIFIC ELIGIBLE-POPULATION MEMBERSHIP IS IMPLEMENTED
+FOR INDEPENDENT REVIEW (SECTION 54), NOT RERANKING OR SEED SELECTION.
+THE OWNER CITATION REMAINS ACCEPTED AND UNCHANGED. CODEX FOCUSED CHECKS PASS;
+CLAUDE OWNS FULL LANE VALIDATION. SHARED P2 `SI-CR5-005` / `SI-CCR16-007`
+REMAINS OPEN AND UNFIXED. NO SELECTED LOOKBACK, PERMANENT CELL, EMPIRICAL
+LOOK, LICENSED/ACTUAL DATA ACCESS, OUTCOME ACCESS, HOLDOUT ACCESS, QC JOB,
+BROKER, SCHEDULER, PAPER/LIVE, CAPITAL, ORDER OR TRADING AUTHORITY IS ADDED.
+AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -170,6 +165,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-14 | Codex counter-review + implementation | `ba64d61` -> `0f8600d` (counter-review record `67cd803`, code/test snapshot `0f8600d`; this lane-record commit follows) | Counter-review of Claude's SI-3E-P0 correction + owner-approved SI-3E-P1A exact structural stock percentiles | Accepted `c9d6923`; accepted `ba64d61` after four record-only P3 corrections. Implemented a frozen, content-addressed exact percentile projection over the authenticated SI-3E-P0 inventory using `p=(2L+E)/(2N)`, indivisible ties, inclusive 90th/10th boundaries, percentile calculation for `N>=1`, and classification only for `N>=10`. Paired pressure-role and covering-role role percentiles are mechanical complements; both rows carry the same pressure-oriented percentile, while future outcomes must be evaluated independently. Output is structural threshold-candidate evidence only; investability and seed-selection authority remain false. | Exact eleven-file Short Interest lane: **615 passed in 6,115.14s (1h41m55s)**. Final focused SI-3E-P1A file: **43 passed in 635.08s (10m35s)**; exact-policy/boundary selection **18 passed**; final adversarial selection **6 passed**; active-document **69 passed** before and after the record update, including post-update runs in **46.74s** and **2.35s**; compileall exit 0; six dangerous-direction mutations turned their intended guards red and every file was restored byte-exact; final `git diff --check` clean. No complete-repository suite was run. Synthetic/offline only; **0 authorized looks, 0 consumed looks**. | `SI-CCR19-001..004` are closed in section 47. `SI3EP1A-REV-001..005` are closed; `REV-006` is an open nonblocking P3 advisory; `REV-007` is closed as a false-alarm/out-of-threat-model non-defect; `REV-008` is closed as a non-defect observation. Shared `SI-CR5-005` / `SI-CCR16-007` remains open and out of lane. | Commit this record, verify the remote remains `ba64d61`, and make the round's single push. Claude reviews every commit in `ba64d61..pushed HEAD`. Any investability/seed conversion, licensed/provider or outcome work, SI-4 ETF work, QuantConnect job, or operational action requires the applicable owner choice or authorization listed in section 48.8. |
 | 2026-09-26 | Claude review | `ba64d61` -> `7844c81` reviewed; test-only correction at `2bf764a` (this record commit follows) | Independent review of the SI-3E-P0 counter-review record and the SI-3E-P1A exact structural stock percentiles | Reviewed the three pushed commits individually; the lane was already synced to the remote with a clean tree. Confirmed all four `SI-CCR19` corrections. Re-derived every `role_percentile` from an independent `Fraction` oracle over single-release and four-release fixtures, proved the pressure/covering complement sums to exactly one, proved tie indivisibility, and confirmed the blueprint 5.2 thresholds. Probed the kernel directly: classification begins at exactly `N=10`, exactly `9/10` is admitted inclusively, and covering admits at pressure percentile exactly `1/10`. Verified both file hashes, the policy digest, the one-argument signature and the unexported package root. Removed 26 candidate guards together, attributed each individually, then probed all 16 survivors: nine fail open and are now pinned, six are layered, one leaks a raw `ValueError`. Characterized the frozen convention's realized candidate fraction across `N`. | Eleven-file lane **619 passed in 1,645.17s (27m25s)**, reconciling exactly to section 48.5's 615 plus the four tests added here; focused percentile file **47 passed in 127.84s** (the pushed 43 plus the four added here); active-document **69 passed**; compileall **exit 0**; `git diff --check` clean. Combined 26-guard removal **18 failed, 25 passed**, confirming the recorded 43 collected tests. No complete-repository suite, per the dedicated-lane direction. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | **`SI-CR8-001` (P2, OPEN, owner action): the percentile policy's owner authority is not durably cited.** `SI-CR8-002` (P3, closed, test-only, nine fail-open guards). `SI-CR8-003` (P3, advisory, convention selects 0 to 20 percent depending on tie structure). `SI-CR8-004` (P3, advisory, leaked `ValueError`). `SI-CR8-005` (P3, record, lane-runtime figure unreconciled). Shared `SI-CR5-005` stays open. | Owner supplies a durable citation for the 2026-09-14 percentile freeze before SI-3E-P1A is treated as authorized. Codex counter-reviews `2bf764a` and this record commit. Seed selection, investability, `S2`-`S4`, ETF work, outcomes and every QuantConnect or operational gate remain closed. |
 | 2026-09-27 | Claude review | `f72f83c` -> `86f56fd` reviewed; test-only correction at `4729219` (this record commit follows) | Independent review of the owner-decision citation, the percentile provenance binding, SI-2B-P0 offline candidate-window evidence and the boundary-tie hardening | Reviewed all five pushed commits individually; the lane was already synced with a clean tree. Verified the `SI-CR8-001` remedy end to end: the policy binds path, introducing commit and document SHA-256, and the test rehashes the committed git object and asserts the verbatim owner approval plus six policy phrases, with forged path/commit/hash refused. Confirmed all four recorded file hashes, the new policy digest, removal of the superseded digest, and monotonic heading order 1-51. Independently checked the four candidate windows, both inclusive floors, exact even-window medians, no selected lookback, and that the module has no network, file, environment or subprocess surface. Removed 11 candidate guards together, then attributed each individually; two survivors were probed and neither is a demonstrated fail-open. Accepted all five `SI-CCR20` corrections. | Baseline on the pushed tree: twelve-file lane **677 passed in 1,760.45s**, reconciling exactly to 619 - 47 + 53 + 52; compileall **exit 0**; active-document **69 passed**. Final tree: lane **678 passed in 1,672.37s (27m52s)**, reconciling exactly to the 677-pass baseline plus the one test added here; SI-2B focused file **53 passed in 8.01s** (the pushed 52 plus the one added here); import boundary **9 passed**; active-document **69 passed**; compileall **exit 0**; `git diff --check` clean. Combined 11-guard removal **18 failed, 34 passed**, confirming the recorded 52 tests. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR8-001` **closed by correction**. `SI-CR9-001` (P3, closed, test-only): the median is exact only for even windows and nothing refuses an odd lookback. `SI-CR9-002` and `SI-CR9-003` (P3, advisories, unreachable defence in depth). `SI-CR9-004` (P3, self-reported: two repeat ledger/status lapses of mine). Shared `SI-CR5-005` stays open. | Codex counter-reviews `4729219` and this record commit. The production fix for the odd-window median, the eligible-population adapter, any lookback selection with a frozen metric, and every provider, outcome, ETF, QuantConnect and trading gate remain open or closed as recorded. |
+| 2026-09-27 | Codex counter-review + implementation | `50636ad` -> `6418236` (correction `722a8a0`; this final record commit follows) | Claude SI-2B-P0 counter-review + SI-2B-P1A authenticated candidate membership | Accepted both Claude commits after verified corrections; exact odd/even production median without changing approved grid; true supported-calendar guard path pinned; new membership-only inventories retain complete eligible/refused partitions per settlement, execution open and lookback. | Focused correction 65 passed; population 27 passed; combined final focused files 92 passed in 19.60s; boundary/active-doc 78 passed; compile and diff clean; isolated mutations red/green. No full lane/repository suite by Codex; authorized/consumed looks 0/0. | SI-CCR21-001..006 and SI2BP1A-REV-001 closed; prior calendar survivor classification superseded; shared P2 remains open and unfixed. | Claude reviews every commit after `50636ad` through this record's pushed remote head on the same lane/worktree; one push only. Ranking, winner selection, real data/outcomes, QC and all operational gates remain separate. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -7516,3 +7512,205 @@ faithfulness of the transcribed owner approval; 52.3 records that limit.
    next destination and requires its own source-rights, coverage,
    cost-specification, outcome-look accounting and QC authorizations. The
    shared final holdout remains sealed. No milestone is started here.
+
+## 53. Codex counter-review of Claude SI-2B-P0 review — 2026-09-27 UTC
+
+### 53.1 Exact scope and per-commit dispositions
+
+Fetched only `origin/codex/strategy-short-interest`; the clean local head
+already equalled exact reviewed remote
+`50636ad7d46262274d90f169fac34982b48b469d`. Ordered review range:
+`86f56fd4a522900205abbf5e05e8afd057ab375f..50636ad7d46262274d90f169fac34982b48b469d`.
+Both complete diffs, section 52, owner decisions and the existing source/tests
+were inspected. Every command, test and commit is in the designated worktree
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+on `codex/strategy-short-interest`; no other checkout or branch is used.
+
+| Commit | Scope | Disposition | Findings |
+|---|---|---|---|
+| `472921930588f29028cae5463cb88223e03c3456` | Test-only approved-grid/parity assertion and copied median arithmetic | **Accepted after correction** | Grid assertion retained; arithmetic now calls production, with odd/even behavioral detectors. Its original scope was weaker than claimed. |
+| `50636ad7d46262274d90f169fac34982b48b469d` | Claude acceptance, evidence, ledger, status and next step | **Accepted after correction** | Calendar-guard attribution, cap-guard reachability, date, final test hash and offline-next-step qualification below. |
+
+Claude's accepted software review of the prior five Codex commits stands.
+The provenance correction is accepted; its inherent transcription limit
+remains documented and is not a new owner blocker. The current correction
+and new milestone remain candidates pending Claude's independent review.
+
+### 53.2 P0–P3 ledger: verified corrections and retained observations
+
+No P0 or P1; no current in-lane P2 production defect was found. Findings below
+are P3 test sensitivity or record accuracy. Historical section 52 remains
+unchanged; these are explicit superseding dispositions.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CCR21-001 / SI-CR9-001 | P3 | Closed by correction | `4729219`, `50636ad` | Median test and claims | The original test checks grid/parity then repeats the formula; it does not execute production median arithmetic. Adding an odd window was already detected by the existing four-candidate test. The latent odd arithmetic concern is nevertheless real. | Old hypothetical five-window public output returns 5/2 instead of 3. Breaking production even arithmetic leaves Claude's new test green but the existing public test red; a failure sentinel in the production path is never invoked by the original new test. | Claimed arithmetic sensitivity must be real, and generic exact-median semantics should match the implementation. | `722a8a0` adds `_exact_liquidity_median` with exact odd/even branches, uses it in the actual builder and retains the approved-grid assertions while calling production. No new candidate window is approved. | Focused pristine three-test selection: 3 passed / 50 deselected in 5.63s. Eleven new helper tests first red for missing helper, then median/grid selection 13 passed / 51 deselected in 3.36s. Isolated odd-branch and lower-middle mutations turn intended behavioral tests red, restored green in 3.46s total. |
+| SI-CCR21-002 / SI-CR9-002 | P3 | Closed by regression; non-defect attribution superseded | `50636ad` | Complete calendar-history guard | Truncating market rows to 200 tests missing data, not a short calendar. At the authentic supported 1990 boundary the length guard is the sole refusal for underfilled calendar windows; its removal admits incomplete history with no median. The live guard is correct. | Thirty real XNYS sessions from 1990-01-02 through 1990-02-12: pristine 20 eligible; 60/120/252 refused only for insufficient_calendar_history. Removing only the length guard makes those windows eligible with count 30 and median None. | Pin the dangerous direction through a reachable canonical fixture rather than call the survivor unreachable or layered. | Authentic source/reference contracts are rebuilt near the existing calendar boundary; add public regression, without fabricating calendar sessions or modifying the calendar. | 1 passed / 64 deselected in 3.43s; isolated AST removal red, restored green in 3.14s total; final focused file green. |
+| SI-CCR21-003 / SI-CR9-003 | P3 | Closed as qualified layered observation | `50636ad` | Cap lifetime attribution | Moving cap to the wrong session proves missing-key refusal, not this guard. The guard is reachable without a ticker-chain adapter; its removal still refuses through real daily/identity checks. | Authentic identity valid_to 2024-02-09, cap remains at 2024-02-12, all identity hashes coherently rebound: pristine cap, daily and execution-validity reasons; remove only cap guard and daily/execution reasons remain. | Retain the correct non-defect closure but correct the unsupported unreachable/out-of-scope reasoning. | This bounded direct probe replaces the old attribution; no production change is needed. | Pristine and isolated mutant both refuse, with actual reached guard-specific reasons. |
+| SI-CCR21-004 | P3 | Closed by record qualification | `50636ad` | Section 52 date and UTC push ledger | The historical review/push row says 2026-09-27, but the record commit and matching remote update are September 26 UTC. | Author/committer 2026-09-26T11:07:53-07:00 = 18:07:53Z; remote update-by-push reflog 11:07:56-07:00 = 18:07:56Z. | An auditable UTC ledger must reflect its published snapshot evidence. | Preserve the historical row; correct its publication date here to 2026-09-26 UTC. This current counter-review is recorded on 2026-09-27 UTC. | Git object metadata and matching reflog independently checked. |
+| SI-CCR21-005 | P3 | Closed by this record | `50636ad` | Section 52.1/52.4 snapshot hash claim | “Every final hash” is overbroad: the SI-2B test hash listed is the original pushed 52-case file, not the corrected 53-case file at 4729219. | Final committed test bytes hash to 31a43af343cc5f40a25c44efac7e3ad35ccf368814011a6fc3377c7e37ba1dd3. | Baseline and corrected snapshots must be distinguishable. | Record that exact corrected Claude hash here; original 136b4cfe... remains a valid baseline hash. | `git show 50636ad:tests/test_short_interest_stock_investability.py` rehashed. |
+| SI-CCR21-006 | P3 | Closed by sequencing qualification | `50636ad` | Section 52.9 offline adapter gate | A blanket new gate on the eligible-population adapter conflicts with section 51.5 and the already-approved offline SI-2B next step, now explicitly requested again by the owner. | Existing owner approval and section 51.5 schedule the candidate-specific offline adapter after accepted counter-review. | Review acceptance must not manufacture a new owner decision for an already authorized bounded offline slice. | Implement only membership inventory in section 54; normalized reranking and all empirical/operational gates remain separate. | Scope checked against owner citation and exact current user request. |
+| SI-CR9-004 | P3 | Closed, retained | `50636ad` | Prior ledger/status lapses | Claude's self-reported repeat lapses remain acknowledged. | Section 52.4 and 52.6. | Its corrected closure/column count is valid. | No additional code correction. | New ledger column shapes checked before commit. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open; shared and out of lane | N/A (pre-existing) | shared integration history | Missing durable shared owner sentence for the 2026-09-05 follow-up and 13079d5 alignment. | Prior sections 41–52. | This round does not authorize shared edits. | Documented, not fixed. | Shared/project-wide files remain untouched. |
+
+### 53.3 Correction evidence, lineage and quality
+
+Correction commit `722a8a01b2539ffeae9c4098d3a53a46d5d4e8f7` changes only
+the lane's SI-2B source and focused tests. All four approved even-window
+results and the policy payload remain unchanged; odd helper support is a
+private mathematical correction, not admission of additional lookbacks.
+The approved grid is still 20/60/120/252, with no selected winner.
+
+The supported-boundary regression uses genuine calendar authority and
+synthetic facts only. Exact fixture hashes: vintage
+`1c00d95b791b98b0d908932b8dd08a7fa6f0cfd0c5f42bc22e4c6d8b0384d545`,
+reference `9596b58be678aa2ccff051c99734c041b792b25338c671f6666b7472ee97d6e6`,
+history `92dc62138125d9869f5be2a1e291830ca5b803adac5be05a57da0b45594f9cea`.
+The cutoff is 1990-02-13T14:30:00Z and no unsupported calendar is invented.
+
+**Claude test-correction quality: 7/10; Claude record quality: 8/10.**
+The even-grid observation and source-provenance acceptance are sound, but
+arithmetic assertions copied production and the survivor probes did not
+exercise the claimed calendar/cap guard paths. These are now corrected with
+behavioral evidence. Mutations were isolated in memory and restored in finally;
+no source file or checkout was temporarily rewritten.
+
+## 54. SI-2B-P1A candidate eligible-population inventory — 2026-09-27 UTC
+
+### 54.1 Exact implemented scope, pending independent review
+
+Implementation commit `64182365cb0f03332b773221a5eabadd457fe668` adds
+`stock_eligible_population.py` and its focused tests. It also corrects the
+approved-grid test diagnostic: odd helper support does not grant permission
+to change the grid. This is one bounded **membership-only** part of the
+offline adapter scheduled in section 51.5. It is not the full adapter/reranking
+milestone, full licensed SI-2, stock backtesting, or a completed reviewed feature.
+
+Technical: the one-argument builder accepts only exact canonical
+`StockInvestabilityEvidence`. It reauthenticates that evidence before capture,
+detaches its source contracts, compares captured and original payloads, pins
+the evidence digest, and repeats direct class-method authentication at public
+serialization. It rebuilds readiness from the same captured vintage and
+references, verifies exactly one source event/window slot, and joins each
+eligibility disposition by event, stable identity and authenticated cutoff.
+Cohorts are keyed by settlement date, execution open and candidate window;
+each retains every supplied authenticated snapshot member, eligibility-row
+hash, classification lineage and refusal reason. Eligible/refused counts and
+event-ID partitions are derived, deterministic and complete. Multiple eligible
+events for one security in a cohort refuse rather than being deduplicated.
+Cohorts, policy and inventory have exact content hashes; changed captured
+sources or rebound hashes fail closed. No package-root export or external
+access surface is added.
+
+Plain language: the new prototype makes four separate lists showing which
+synthetic stocks pass each history-length check and which do not. It keeps
+the reasons for rejection and proves the lists came from the same checked
+inputs. It cannot mix a different date or execution time into a list. These
+are membership lists only: they neither rank stocks nor decide what to buy,
+choose the best lookback, read real market results or start a backtest.
+
+### 54.2 Scope limits and implementation findings
+
+No new P0–P2 implementation finding. Independent advisory probes found no
+production defect in this new inventory. The small diagnostic correction is
+retained below, rather than silently dropped from the ledger.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI2BP1A-REV-001 | P3 | Closed | `722a8a0`; corrected by `6418236` | Approved-grid test failure diagnostic | The diagnostic still requested an exact odd median even after the helper supplied one. | Independent final source/test audit. | Distinguish mathematical support from candidate admission authority. | Require a separate owner-approved grid decision instead; retain all grid/parity assertions. | Final combined focused files pass. |
+
+- This is a partition of **supplied authenticated snapshot dispositions**,
+  not proof of licensed/provider universe coverage. Parser refusals without
+  an identity/cutoff remain bound in the vintage/evidence hash; no stock rows
+  are fabricated for them.
+- Cohorts at different settlements, execution opens or lookbacks never pool.
+  The inventory does not resolve delayed-release/common-cutoff population
+  synchronization for a later canonical ranking adapter.
+- `no_eligible_members` means an empty membership inventory only. Nonempty
+  lists are not qualified seeds: the owner's N<10 seed restriction remains
+  for the future seed/classification stage.
+- No structural normalization is relabelled an eligible-universe score. Sector
+  peer selection, winsorization/MAD, score ordering and percentiles are not
+  recomputed here. A later adapter must authenticate their population/cutoff
+  relationship explicitly before eligible-population reranking.
+- `ranking_authorized`, `seed_authorized`, `outcome_authorized` and
+  `production_authoritative` remain false, and `selected_lookback` remains None.
+
+### 54.3 Focused validation and exact final bytes
+
+- Final focused correction file: **65 passed in 8.91s**.
+- Final new population-inventory file: **27 passed in 14.28s**.
+- Root combined rerun of these two focused files on the final code tree:
+  **92 passed in 19.60s**. No test is skipped or reported as a full lane run.
+- Independent inventory probes: **3.99s**, verifying eight authentic cohort
+  partitions, missing/duplicate slots, cutoff/identity mismatches, inconsistent
+  eligibility states, source drift, caller detachment and all zero-authority
+  flags. No production issue found.
+- Isolated removal of the inventory source-binding guard turns its forged-hash
+  regression red (`DID NOT RAISE`); restored method and regression green.
+- Import-boundary plus active-document checks before this record update:
+  **78 passed in 0.78s** (9 boundary, 69 active-document).
+- Compilation of the lane package and changed test files: **exit 0**;
+  `git diff --check`: **clean**. Final record checks are repeated before commit.
+- Environment: macOS / CPython 3.13.15 / pytest 9.1.1 at
+  `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`.
+  A test-agent initial system-python check found no pytest and ran no tests;
+  this is not a claimed missing-module regression or a QC attempt.
+- **Codex ran no complete lane or repository suite.** Claude owns full lane
+  validation during independent review. No QC run was attempted.
+
+| Final file | SHA-256 |
+|---|---|
+| `research/short_interest_etf/stock_investability.py` | `f004f152d1c42b0c28f067517b8a81aa8f107b613aa7611153def748c2c96e77` |
+| `tests/test_short_interest_stock_investability.py` | `34955c49ddf5b5df2f33f66c2f01260a66c6d2335ee57a4e7d6f83208754026e` |
+| `research/short_interest_etf/stock_eligible_population.py` | `8cc87f0b23b21801fc6a9a2db7d9a96334c58a1862ee5e4dfb28d8cc606d5a60` |
+| `tests/test_short_interest_stock_eligible_population.py` | `c981706e85fecf61e2c86615616420803c36ee1c56727578d47e04e02c051227` |
+
+**Implementation self-assessment: 8/10, pending independent review.** The
+membership/lineage boundary is tested and deterministic; licensed coverage,
+population-normalization semantics, ranking and empirical evaluation are not
+solved or claimed by this slice. No completed milestone is added to a frozen
+shared feature record.
+
+### 54.4 Single-push manifest and Claude's next action
+
+Ordered new range after reviewed head `50636ad7d46262274d90f169fac34982b48b469d`:
+
+1. `722a8a01b2539ffeae9c4098d3a53a46d5d4e8f7` — median correction,
+   behavioral arithmetic tests and authentic supported-calendar refusal.
+2. `64182365cb0f03332b773221a5eabadd457fe668` — authenticated candidate
+   membership inventory, 27-case focused file and corrected grid diagnostic.
+3. This final record commit — per-commit counter-review, retained findings,
+   bounded milestone, exact checks, exclusions and next step.
+
+These commits are local at record preparation. All are published together by
+one successful push from this exact worktree to
+`HEAD:refs/heads/codex/strategy-short-interest`, after root/branch/clean-status
+and unchanged-remote checks. Verify local and remote full heads after push;
+no other worktree, branch, PR or force-push is part of this round.
+
+Claude next reviews **every commit in `50636ad..origin/codex/strategy-short-interest`**
+on this same exact branch/worktree. Reproduce material findings red/green,
+keep P0–P3 dispositions, verify median behavior and authentic calendar guard
+attribution, check all candidate memberships/partitions and source hashes,
+and run the full lane suite including the new population file. Apply only
+verified lane corrections, update only this record, commit and push once.
+
+After that review and Codex counter-review, the next offline part is the
+explicit population/cutoff binding for normalization and eligible-population
+reranking. Do not filter structural percentile rows and call them reranked.
+Freeze any unresolved financial population choice before implementing it;
+no winner or outcomes may be used to make that choice.
+
+Historical development **stock backtesting** remains the next empirical
+destination before ETF/forward-looking work. It still requires authorized
+historical source rights/PIT coverage, dates/universe, frozen evaluation and
+portfolio/cost specifications, look accounting and scoped QC processing/launch
+permission. The shared final holdout stays sealed. Future evaluations default
+to order-based backtests, with at most three unsuccessful launches per distinct
+QC candidate before stopping for Mia/source-diff recovery; this is not launch
+authority. No provider, FINRA, credential, licensed/actual price, outcome,
+holdout, ETF, QC upload/compile/job/backtest, broker, operator database,
+scheduler, deployment, paper/live, capital, order or trading surface accessed.
+**Authorized looks: 0. Consumed looks: 0.** Shared documents and the root
+Session Handoff remain frozen. Only this lane record replaces the handoff.

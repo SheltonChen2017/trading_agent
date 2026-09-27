@@ -1,18 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEWED CODEX COMMITS `392eed2..151fa8e` (SECTION 91)
-AND ACCEPTED ALL THREE WITH NO CORRECTION. THE OWNER-APPROVED LANE-ONLY MOVE
-OF THE IB-1B PILOT RUNNER TO `research/insider_buying/ib1b_pilot_runner.py`
-CLOSES P2 `IB1BP-CR02`: THE COMPLETE SUITE IS GREEN AGAIN, **8,882 PASSED,
-38 SKIPPED, 0 FAILED**, AND 1,036 REPRODUCES. `IB1BP-CCR01` IS ACCEPTED
-AGAINST THIS REVIEWER. PYTHON 3.12.14 AND 3.13.15 BOTH TRUNCATE THE
-SEVEN-DIGIT STAMP, SO SNAPSHOT IDS DO NOT DEPEND ON THE INTERPRETER. THE
-PREPARATION IS REVIEWED AND THE SUITE IS GREEN, SO THE NEXT STEP IS THE
-FIRST REAL NONCANONICAL IB-1B PILOT ON EXACTLY 2022Q4..2023Q1, AFTER CODEX
-COUNTER-REVIEWS THIS RECORD. NO REAL BYTE WAS READ AND THE PILOT WAS NOT RUN
-THIS ROUND. MATCHING XML AND METADATA REMAIN ABSENT. NO OUTCOME, QC, PAPER,
-LIVE, DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED;
-ALL LOOK COUNTERS REMAIN ZERO.**
+Status: **CODEX ACCEPTED CLAUDE'S EXACT PUSHED `bd2c65c` (SECTION 92)
+AND RAN THE FIRST REAL NONCANONICAL IB-1B PILOT ON EXACTLY 2022Q4..2023Q1
+(SECTION 93). BOTH QUARTERS ACCEPTED AND REPLAY-VERIFIED: 901,682 TABLE
+ROWS, 107,764 ACCESSIONS, ZERO REFUSALS OR QUARANTINES. EXIT 0; 119.06
+SECONDS; MAXIMUM RESIDENT SET SIZE 2,991,423,488 BYTES. THE IMMUTABLE
+REPORT AND RAW/PARSED SNAPSHOTS REMAIN OUTSIDE THE REPOSITORY ON THIS MAC;
+THIS RECORD IS THE PORTABLE HASH/COUNT HANDOFF, NOT THE ARTIFACTS.
+CLAUDE REVIEWS THE COUNTER-REVIEW AND OPERATIONAL EVIDENCE NEXT.
+FOCUSED CHECKS: 1,275 PASSED PLUS THE EXACT PACKAGE GUARD, 1 PASSED.
+CLAUDE'S PRIOR COMPLETE-SUITE RESULT REMAINS 8,882 PASSED / 38 SKIPPED;
+CODEX DID NOT RERUN A COMPLETE SUITE. MATCHING XML/ACCEPTANCE METADATA AND
+THE UNASSIGNED SHARED IDENTITY/CALENDAR AUDIT STILL BLOCK LATER REAL WORK.
+NO CANONICAL SIGNAL, OUTCOME, ETF, QC, PAPER, LIVE, DEPLOYMENT, BROKER,
+CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOKS REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -197,6 +198,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-26 | Claude review | `5f61b45` -> `be83183` (code correction) -> `c298a95` (test pins) -> this review record | Independent review of the section-86 counter-review and the owner-selected two-quarter IB-1B pilot preparation (`a507c4c..5f61b45`, 3 commits, 0 merges, 5 lane-owned paths) | Verified the remote tip and clean worktree, dispositioned all three commits, checked the profile's sixteen header receipts and two archive bindings against the real ZIPs (directories and first lines only, plus whole-archive SHA-256), read the runner's order of operations, and ran 38 mutants in read-only exports with bytecode caching disabled. Found and fixed a case-variant path alias that bypassed output containment on this Mac (demonstrated: the unfixed runner published a full synthetic pilot inside the repository), pinned six untested runner guards, and found that the unregistered script fails the project's script-classification tests. Did not run the real pilot. | Pushed tree `5f61b45`: complete suite **2 failed, 8,869 passed, 38 skipped in 595.84s** (script classification; reproduced in a clean export, green on `a507c4c`); recorded **105**, **32**, **746**, **999** reproduce (export: 743 and 996 plus 3 git-dependent skips); fingerprints recompute; real headers **16 of 16** and archives **2 of 2** match; mutation profile **9 of 9**, runner **15 of 29**. Final tree `c298a95`: complete suite **2 failed (same), 8,877 passed, 38 skipped in 503.27s**; lane gate **2,681 passed, 0 skipped in 40.13s**; runner mutation **21 of 29**, eight survivors classified; compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; no filing row read; **0 looks**. | `IB1BP-CR01` P2 closed in `be83183` (case-variant containment bypass). `IB1BP-CR02` P2 open, owner decision (unregistered script; complete suite red). `IB1BP-CR03` P3 closed in `c298a95` (six pins). `IB2CTX-CR02`, `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. | Codex counter-reviews `be83183`, `c298a95`, and this record; confirms `fromisoformat` truncation of the seven-digit stamp on Python 3.12.14; resolves `IB1BP-CR02` once the owner chooses a shared-manifest entry or relocation. The real IB-1B pilot on 2022Q4..2023Q1 waits for a green complete suite. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-26 | Codex counter-review + lane-only correction | `5f61b45..392eed2` reviewed; `6dc0dd2` counter-review; `e75f263` relocation; this record commit follows | Owner-approved resolution of IB1BP-CR02 without a shared edit | Accepted every Claude code/test commit; accepted its record after append-only chronology clarification. Owner explicitly approved moving the runner within the same lane. Relocated it to the Insider Buying package with unchanged signatures, CLI arguments, source receipts, and authority; adjusted repository-root depth and sole active caller; removed old script without a compatibility stub. | Incoming focused 1,007 passed; architecture red 2 failed / 24 passed. Candidate final focused 1,036 passed, 0 failed/skipped/warnings, including all 26 entry-point checks and mandatory package guard. Old-depth mutation caught by a direct validation-only regression; restored green without repository publication. CLI help, compilation, and diff checks clean. No complete lane/repository suite or real processing; 0 looks. | IB1BP-CR02 corrected in `e75f263`, pending Claude independent review/full-suite gate. IB1BP-CR01/CR03 closures accepted; IB1BP-CCR01 P3 closed append-only in `6dc0dd2`; all historical P3 and shared IBSH-CR01 retained. | One same-lane push of `392eed2..PUSHED_HEAD`. Claude dispositions every commit and verifies a green complete suite; Codex counter-reviews every Claude commit before real IB-1B processing on exactly the selected window. Shared files frozen; no outcome/QC/paper/live/trading authority. |
 | 2026-09-26 | Claude review | `151fa8e` -> this review record | Independent review of the section-89 counter-review and the owner-approved lane-only relocation of the IB-1B pilot runner (`392eed2..151fa8e`, 3 commits, 0 merges, 3 lane-owned paths) | Verified the remote tip and clean worktree, dispositioned all three commits with no correction, confirmed the production delta is only the CLI docstring and the repository-root depth, that no stub, shared-registry edit, facade export, or old-path caller remains, and that the module CLI works; reran all runner and profile mutants against the relocated module plus a wrong-depth mutant. Accepted `IB1BP-CCR01` against this reviewer. No real byte read; pilot not run. | Complete suite on `151fa8e` **8,882 passed, 38 skipped, 28 warnings, 0 failed in 498.65s**; recorded **1,036** reproduces; lane gate **2,684 passed, 0 skipped in 41.82s**; mutation profile **9 of 9**, runner **22 of 30** (same eight classified survivors, wrong-depth mutant caught); compileall exit **0**; `git diff --check` clean. Python 3.13.15, pytest 9.1.1. No SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB1BP-CR02` P2 closed in `e75f263`. `IB1BP-CCR01` accepted against this reviewer. `IB1BP-CR01`/`CR03`, `IB2CTX-CR02`, `IBZIP-CR02`/`CR03`, `IB2SRC-CR03`, `IBSH-CR01` retained. No open P0-P2. | Codex counter-reviews this record. Next: the first real noncanonical IB-1B pilot on exactly 2022Q4..2023Q1 with output outside the repository, recording counts, refusals, key uniqueness, amended forms, and resources. XML and acceptance metadata still absent. No outcome, QC, paper, or trading step is inferred. |
+| 2026-09-27 | Codex counter-review + operational pilot | `151fa8e..bd2c65c` reviewed; pilot executed on clean `bd2c65c`; this record commit follows | First real noncanonical IB-1B pilot, exactly 2022Q4..2023Q1 | Accepted Claude's sole record commit without correction. After the reviewed-preparation and green-complete-suite gates, invoked the unchanged reviewed runner once on the two pinned local ZIPs with external output. Both raw and parsed quarters replayed; all eight tables retained; report declares zero authority and no canonical/PIT claim. No production/test/shared file changed. | Incoming focused 1,275 passed plus exact package guard 1 passed, zero failures/skips/warnings; supplemental record/active-doc 71 passed. Pilot exit 0 in 119.06s, maximum RSS 2,991,423,488 bytes; 901,682 rows / 107,764 accessions; 2 accepted / 0 refused / 0 quarantined. Report payload SHA-256 c4d1211c49b306f17446cd62aa9784ae8451f617661f67a654fcdefbddad04bb; canonical/file hash and scalar receipts independently verified. Final relevant checks repeat before push; no complete suite by Codex; 0 looks. | No new verified P0-P3 finding. IB1BP-CR02 closure accepted; all earlier closed/open P3 and shared IBSH-CR01 retained. Successful keyed-table parsing/replay is enforcement evidence, not a new standalone uniqueness statistic or canonical identity claim. | One same-lane push; Claude reviews every commit in bd2c65c..PUSHED_HEAD and the operational evidence. XML/acceptance artifacts remain absent, so no real stage past IB-1B starts; shared audit needs venue/executor. No further synthetic diagnostic, outcome, ETF, QC, deployment, or trading step inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -11988,3 +11990,252 @@ filing, security master, outcome, ETF holding, QuantConnect, broker,
 operator database, scheduler, deployment, capital, order, live, or trading
 surface was accessed. Authorized outcome looks: **0**. Consumed outcome
 looks: **0**. Research looks: **0**.
+
+## 92. Codex counter-review - Claude's runner-relocation review (2026-09-27 UTC)
+
+### 92.1 Exact snapshot and sole commit disposition
+
+The designated worktree remains
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. The clean local branch already contained
+Claude's commit; a lane-only fetch verified the exact remote object
+**`bd2c65c34ee5c4c5e00bfa31ed5a43008ca4f58f`**. The complete incoming
+range is **`151fa8e..bd2c65c`**, one commit and no merges. No fast-forward,
+branch switch, second worktree, or shared-file change was needed.
+
+| Commit | Disposition | Independent counter-review evidence |
+|---|---|---|
+| `bd2c65c34ee5c4c5e00bfa31ed5a43008ca4f58f` | **Accepted; no new issue found.** | Read its complete diff: only the lane status, one append-only ledger row, and section 91 change. All three Codex dispositions, owner-approved relocation, chronology correction, retained findings, and bounded next-action authority agree with sections 88-90. Counts reconcile: 8,877 + 2 recovered architecture checks + 3 new tests = 8,882; 2,681 + 3 = 2,684. Production, tests, scripts, and shared architecture are byte-unchanged. |
+
+The complete-suite evidence is **Claude's** section-91 result on `151fa8e`:
+8,882 passed, 38 skipped, 28 warnings, zero failed in 498.65s. Codex did
+not independently rerun a complete lane/repository suite, infer authority
+to do so, or relabel that result as its own. The incoming code tree is
+unchanged by `bd2c65c`. The eight classified runner mutation survivors
+remain exactly the recorded inherited observations, not newly verified
+defects. No valid test was removed, skipped, or weakened.
+
+Python 3.12.14 / pytest 9.1.1: the focused preparation/source/document/
+architecture set below passed **1,275**, zero failures/skips/warnings,
+in 14.29s; the exact package guard separately passed **1**. This is a
+different, explicitly listed selection from the prior 1,036 set, not a
+claim to have reproduced that selection's count. A supplemental read-only
+record audit independently passed the record and active-document checks,
+**71**, and accepted this commit. Incoming commit/worktree whitespace
+checks and targeted compilation are clean.
+
+### 92.2 Retained P0-P3 ledger and gate disposition
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1BP-CR02 | P2 | **CLOSED in `e75f263`; accepted** | `84017e1` | Runner classification | Old script placement failed two project checks. | Sections 89-91. | Reviewed lane-only move and green complete suite satisfy the gate. | None needed in this round. | Focused entry-point checks green; Claude's 8,882-pass result. |
+| IB1BP-CR01, IB1BP-CR03, IB1BP-CCR01 | P2/P3 | **CLOSED and accepted, retained** | `be83183`, `c298a95`, `6dc0dd2` | Alias, test pins, chronology | Earlier verified corrections. | Sections 89-91. | Preserve every accepted correction and append-only history. | None. | Runner tests remain green; chronology reconciles. |
+| IB2CTX-CR02 | P3 | **OPEN, nonblocking observation, retained** | `a507c4c` | Existing prose test | Brittle owner-decision anchor. | Earlier sections. | No new prose-pinning pattern or cosmetic weakening. | None. | Existing test remains green. |
+| IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **RETAINED as recorded** | earlier | History/provenance/bytecode | Earlier limitations remain. | Earlier sections. | A successful local parse does not verify the retrieval route or public availability. | None. | Report keeps original timestamps and explicit false provenance flags. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, nonblocking, retained** | earlier | Shared coordination | Insider-only paper clause reconciles at main integration. | Earlier sections. | Shared documents remain frozen. | None here. | This round changes only the lane record. |
+
+No new verified defect or open P0-P2 is introduced. The independent review
+and counter-review conditions are satisfied before the real invocation in
+section 93. Section 72.5 and the exact owner-selected window in 86.2 permit
+that noncanonical, offline IB-1A/IB-1B operation; they do not permit any
+adjacent source, signal, outcome, or operational surface.
+
+## 93. First real noncanonical two-quarter IB-1B pilot (2026-09-27 UTC)
+
+### 93.1 Exact execution and artifact locality
+
+Executed once, after the counter-review above, on the clean unchanged
+**`bd2c65c34ee5c4c5e00bfa31ed5a43008ca4f58f`** tree:
+
+```text
+/usr/bin/time -l /Users/sheltonchen/.cache/codex-runtimes/codex-primary-runtime/dependencies/python/bin/python3 -m research.insider_buying.ib1b_pilot_runner --input-root /Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying/artifacts/sec_insider/raw --output-root /Users/sheltonchen/Documents/Codex/2026-09-03/f/insider_buying_ib1b_pilot_2022q4_2023q1_bd2c65c --parser-git-commit bd2c65c34ee5c4c5e00bfa31ed5a43008ca4f58f --reviewed-preparation
+```
+
+The output was a fresh, caller-controlled, absolute directory outside the
+worktree and input root, with no redirects or case-alias overlap. Only the
+two exact reviewed archive bindings were read. Both raw snapshots and both
+parsed snapshots were published and replay-verified sequentially. The
+runner returned **exit 0**, not merely artifact existence. No retry or
+additional quarter was processed; no cap, profile, key, parser behavior,
+or production/test file was changed.
+
+Local report:
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider_buying_ib1b_pilot_2022q4_2023q1_bd2c65c/ib1b-pilot-report-c4d1211c49b306f17446cd62aa9784ae8451f617661f67a654fcdefbddad04bb.json`.
+Exact size **32,494 bytes**; whole-file SHA-256
+**`d16689465924f3224c5444b7efde922ba1f6e09fa1765d4467fdf72781161e79`**;
+payload SHA-256 and filename binding
+**`c4d1211c49b306f17446cd62aa9784ae8451f617661f67a654fcdefbddad04bb`**.
+Canonical JSON plus one LF recomputes to the exact file hash. A supplemental
+read-only audit independently verified the scalar report, literal source
+and profile receipts, counts, and zero-authority payload. This is not a
+new standalone report-acceptance API or Claude's independent disposition.
+
+The report and row-bearing snapshots are **Mac-local and not committed**.
+This record transfers hashes, sizes, counts, and reasons through Git, not
+the artifacts themselves. A different machine cannot obtain those derived
+files merely by fetching this push. No runner `.running` marker or report
+temporary remains; the four inherited persistent stage `.publication.lock`
+files are intentional and remain untouched. No material output was deleted.
+
+### 93.2 Measured operational results
+
+Both quarters are **ACCEPTED**. Whole-pilot archive counts: **2 accepted,
+0 refused, 0 quarantined**. These are parser/source outcomes, not investment
+eligibility decisions. Table totals are **901,682 rows** and **107,764
+SUBMISSION accessions**; they are not independent research observations.
+
+| Table | 2022Q4 rows | 2023Q1 rows |
+|---|---:|---:|
+| SUBMISSION.tsv | 38,307 | 69,457 |
+| REPORTINGOWNER.tsv | 42,965 | 73,681 |
+| NONDERIV_TRANS.tsv | 58,429 | 106,093 |
+| NONDERIV_HOLDING.tsv | 18,390 | 32,256 |
+| DERIV_TRANS.tsv | 21,056 | 42,592 |
+| DERIV_HOLDING.tsv | 9,337 | 17,092 |
+| FOOTNOTES.tsv | 89,627 | 166,835 |
+| OWNER_SIGNATURE.tsv | 42,325 | 73,240 |
+| **Total** | **320,436** | **581,246** |
+
+| SUBMISSION document form | 2022Q4 accessions | 2023Q1 accessions |
+|---|---:|---:|
+| 3 | 2,530 | 3,526 |
+| 3/A | 114 | 154 |
+| 4 | 34,958 | 62,557 |
+| 4/A | 592 | 1,287 |
+| 5 | 109 | 1,901 |
+| 5/A | 4 | 32 |
+| OTHER | 0 | 0 |
+| **Total** | **38,307** | **69,457** |
+
+Amended context is now **measured for these two quarters only**: 268 Form
+3/A and 36 Form 5/A accessions. Earlier statements that prevalence was
+unmeasured remain historically true; this does not measure the full
+82-quarter corpus or authenticate amendment linkage/completeness. Form 4/A
+count is 1,879; no amended filing becomes a signal or supersession rule.
+
+Successful parsing and raw-bound replay enforce nonblank, accession-relative
+`NONDERIV_TRANS_SK` and `DERIV_TRANS_SK` uniqueness in these supplied tables,
+plus duplicate-SUBMISSION and orphan-child refusal. No duplicate keyed row
+or orphan was accepted, and no row was deliberately dropped. The report
+does **not** contain a separate key-uniqueness metric; success under those
+guards is the evidence. Other tables deliberately retain ordinal duplicates.
+No claim of globally unique securities, economic transactions, deduplicated
+buyers, canonical share classes, or point-in-time availability follows.
+
+### 93.3 Exact stage and resource identities
+
+| Receipt | 2022Q4 | 2023Q1 |
+|---|---|---|
+| Raw snapshot ID | `sec-insider-bulk-2022q4-e34b743e2bee3381` | `sec-insider-bulk-2023q1-c8c35e859ab09342` |
+| Raw lineage SHA-256 | `e34b743e2bee3381ea9395ddf64b850b409d4e635979f02f71f15734bb79a36c` | `c8c35e859ab093425078491008428677e1e78b01843ebbf5b849357d9c6a0658` |
+| Parsed snapshot ID | `sec-insider-parsed-2022q4-277084d85445a25d` | `sec-insider-parsed-2023q1-5afb03260f879c6d` |
+| Parsed lineage SHA-256 | `277084d85445a25d8a4ae44c78904442cf56f8b4ab38fe8f4a2a328d52f30b11` | `5afb03260f879c6da5654a2ddfe0428f7fdb48e01f00da77f4fa58963c89f21b` |
+| rows.jsonl SHA-256 | `6a84e98cfdc068cedde6077f689383d6dee4b6a7b60e3f9231eb2ca93902916d` | `ffc62c8424117a9018d265daea27c2500da1856c815c0eb025f7f7863ba54d41` |
+| rows.jsonl bytes | 147,350,683 | 264,550,489 |
+| accessions.jsonl SHA-256 | `b5b381f19a661c0dc0c722e97d45b2ed4696645042c7e804c6c333fa4a43fd62` | `d36211b894aa905de1c9a0b5251cbbae8ec2529b3db8f49ca0d169f4bcaad6eb` |
+| accessions.jsonl bytes | 42,260,131 | 76,636,294 |
+| Archive bytes | 8,400,983 | 13,882,049 |
+| Expanded table bytes | 51,839,037 | 90,806,476 |
+| Parsed artifact bytes | 189,610,814 | 341,186,783 |
+| Quarter elapsed nanoseconds | 40,174,883,167 | 78,486,558,500 |
+
+The profile remains exactly
+`54abe3073a83b4da9231aaa62b58b50907af2a6815f721890312b0f6c8a41f2e`;
+source-binding inventory remains exactly
+`3ac52c110a641acf3c9420c2e32877d4a624cec73fcf041b5ba2a90047ad8f6f`.
+Original archive hashes and seven-digit filesystem observations remain the
+section-87 receipts. Their microsecond-normalized legacy IB-1A field is
+still explicitly **unverified**, not an authenticated retrieval timestamp.
+Successful replay does not authenticate public EDGAR acceptance times.
+
+Total source ZIP bytes: **22,283,032**; expanded table bytes:
+**142,645,513**; parsed row/accession artifact bytes: **530,797,597**.
+The latter excludes raw snapshot copies, manifests, commit receipts, lock
+files, and report. `/usr/bin/time -l` independently measured **119.06s real,
+114.45s user, 2.87s system**, maximum resident set size **2,991,423,488
+bytes** (about 2.8 GiB), and peak memory footprint **3,565,407,520 bytes**.
+Quarter timings are monotonic-clock observations; whole-process resource
+numbers are external measurements, not fields invented in the report.
+These two quarters fitting input/artifact caps is not an RSS bound or an
+82-quarter scalability guarantee. The parser still materializes each
+bounded quarter and its replay; no streaming parser was introduced.
+
+### 93.4 Validation, scope, and next Claude review
+
+Focused files, run before the pilot and repeated on the final record tree:
+
+```text
+tests/test_insider_buying_ib1b_pilot_runner.py
+tests/test_insider_buying_ib1b_pilot_profile.py
+tests/test_insider_buying_sec_bulk_snapshot.py
+tests/test_insider_buying_sec_bulk_parsed_snapshot.py
+tests/test_insider_buying_sec_noncanonical_pilot_contracts.py
+tests/test_insider_buying_sec_owner_supplied_source_policy.py
+tests/test_insider_buying_sec_owner_supplied_source_policy_v2.py
+tests/test_insider_buying_sec_canonical_source_manifest.py
+tests/test_insider_buying_implementation_record.py
+tests/test_active_document_consistency.py
+tests/test_module_hygiene.py
+tests/test_overlay_import_boundary.py
+tests/test_ml_import_boundary.py
+tests/test_project_separation_entrypoints.py
+```
+
+**1,275 passed**, zero failures/skips/warnings; separately,
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`
+**1 passed**. Final combined repetition: **1,276 passed**, zero failures,
+skips, or warnings, in **14.09s**. Targeted compilation and incoming/final
+diff checks are clean.
+No complete lane/repository suite was run by Codex. No production behavior,
+import, schema, CLI, resource cap, or active assistant behavior changed.
+No new defect required a fix or a red/green correction this round.
+
+Claude reviews **every commit in `bd2c65c..PUSHED_HEAD`** (this combined
+record commit) and gives a disposition. Verify the sole incoming Claude
+disposition, count reconciliation, original source/profile/parser bindings,
+report canonical bytes and digest, stage identities and replay evidence,
+all eight table counts and form totals, the external resource measurements,
+artifact locality, and the retained P0-P3 ledger. Report hashing is not a
+substitute for stage replay; the actual successful invocation used the
+reviewed public raw/parsed loaders. Any authorized independent repeat needs
+a new fresh external output root; the existing outputs must not be
+overwritten. Timings/report hashes may vary on repeat; identical code,
+profile, source, and parser-commit bindings govern deterministic stage IDs.
+
+**Next source gate after Claude review and Codex counter-review:** the owner
+supplies the matching complete Form 4/4-A XML and accession-specific
+acceptance-metadata bundle for this selected window, with provenance and
+exact inventory; freeze and independently review any necessary IB-1C-E
+preparation before processing it. Nothing past real IB-1B ran here. The
+shared read-only identity/calendar audit remains separately approved but
+needs its main-line venue and executor; this lane cannot perform it by
+editing frozen shared files. No IB-3 diagnostic milestone was resumed and
+no additional quarter/canonical corpus was processed. This operational
+report does not automatically schedule IB-3E or open canonical scoring.
+
+Real source scope was only the two pinned local ZIPs and their raw/parsed
+operational outputs. No new retrieval, network, SEC/provider endpoint,
+credential, licensed row, XML/acceptance artifact, security-master row,
+price, corporate-action/outcome, ETF holding, QC upload/processing/job,
+broker, operator database, scheduler, paper/live deployment, capital,
+order, or trading surface was accessed. Authorized outcome looks **0**,
+consumed outcome looks **0**, research looks **0**; every report authority
+boolean remains false. Shared/project-wide documents and
+`SESSION_HANDOFF.md` stay frozen. No monitor was armed. Only this lane
+record enters the round's one combined same-lane push.
+
+### 93.5 Technical and plain-language checkpoint summary
+
+The reviewed fixed-window runner accepted and replay-verified both exact
+source archives under the existing nine-variant profile, retained all eight
+table inventories and accession-relative transaction-key guards, and
+published a canonical hash-bound, zero-authority operational report outside
+Git. This establishes real-format IB-1A/IB-1B compatibility for this window
+only. Claude's independent review of this new operational evidence remains
+next; canonical IB-1/IB-2 completeness and IB-3 scoring are not achieved.
+
+We have now actually read the two approved quarterly files, not just tested
+made-up examples. Both worked: about 902,000 table rows from about 108,000
+filings were retained and checked. This does not show that insider buying
+makes money. We still need the matching original filings and public filing
+times, then verified stock identities and later permission to test returns.

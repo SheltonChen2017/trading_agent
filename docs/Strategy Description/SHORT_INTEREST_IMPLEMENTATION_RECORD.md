@@ -1,23 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED THE TWO-COMMIT RANGE `ceef4bf..91243e3` COMMIT BY
-COMMIT (SECTION 58). BOTH ARE ACCEPTED WITH **NO CODE OR TEST CORRECTION
-REQUIRED**, THE SECOND SUCH ROUND. THE CRITICAL SCOPE BOUNDARY HOLDS: SI-2B-P1B
-REBUILDS THE **UNCHANGED** CANONICAL SI-3C NORMALIZATION FROM THE FULL CAPTURED
-VINTAGE, NOT OVER ELIGIBLE-ONLY PEERS, AND ITS REPORTED COHORT DIGESTS WERE
-INDEPENDENTLY PROVEN EQUAL TO CANONICAL SI-3C ON A 20-SECURITY FIXTURE WITH 20
-STRUCTURAL PEERS. NO SCORE VALUE, PERCENTILE, RANK OR SEED IS EMITTED; MEMBER
-FIELDS ARE MEMBERSHIP BOOLEANS AND LISTS ONLY. THE DELAYED-REVISION BINDING
-CORRECTLY KEEPS ITS OWN LATER CUTOFF AND POINTS AT THE ORIGINAL SELECTED EVENT.
-SEVEN INTERNAL-INVARIANT GUARDS SURVIVE REMOVAL AND ARE RECORDED AS
-CURRENT-API NON-DEFECTS ON THE SAME BASIS SECTION 56 ACCEPTED FOR SI-CR10-001
-(`SI-CR11-001`). THE EXACT FOURTEEN-FILE SHORT INTEREST LANE IS 746 PASSED.
-THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN. CODEX COUNTER-REVIEW
-OF THIS RECORD COMMIT IS NEXT. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED;
-AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER,
-LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, RANKING, LOOKBACK-SELECTION,
-SEED, ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
-PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
+Status: **CODEX ACCEPTED CLAUDE'S `1b8ad3b` REVIEW-RECORD COMMIT WITHOUT
+CORRECTION, THEN IMPLEMENTED THE OWNER-FROZEN SI-2B-P1C OFFLINE ELIGIBLE-STOCK
+RERANKING AT `c9ce1aa`. THE STRUCTURAL SI-3C NORMALIZATION REMAINS UNCHANGED;
+ONLY ELIGIBLE, REVISION-SELECTED, S1-SCOREABLE STOCKS AT THE RELEASE'S NEXT
+OPEN ENTER THE NEW RANKING DENOMINATOR, AND LATER-ARRIVING EVIDENCE IS
+EXCLUDED FROM THAT COHORT. THIS
+ROUND AWAITS CLAUDE'S INDEPENDENT REVIEW AFTER ONE FINAL MATCHING-LANE PUSH.
+CODEX'S NEW TEN-CASE FOCUS IS GREEN; CLAUDE'S PRIOR FOURTEEN-FILE LANE WAS
+746 PASSED AND WAS NOT RERUN BY CODEX. SHARED P2 `SI-CR5-005` /
+`SI-CCR16-007` REMAINS OPEN AND OUT OF LANE. CANDIDATE LOOKBACKS REMAIN
+20/60/120/252 WITH NO SELECTED WINNER; NO PERMANENT CELL IS ALLOCATED,
+AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO, AND ALL PROVIDER,
+LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, SEED, PRODUCTION-RANKING, ETF,
+QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT, PAPER/LIVE,
+ORDER AND TRADING GATES REMAIN CLOSED.** Details and limitations: section 59.
 
 Branch: `codex/strategy-short-interest`
 
@@ -174,6 +171,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Claude review | `50636ad` -> `5216228` reviewed; no code or test correction required (this record commit is the only Claude commit) | Independent review of the SI-2B median correction, the authentic calendar-boundary refusal and the SI-2B-P1A candidate eligible-population inventory | Reviewed all three pushed commits individually; the lane was already synced with a clean tree. Verified `_exact_liquidity_median` against an independent oracle over roughly 1,300 random populations spanning n=1..39 plus 60, 120, 251, 252 and 253, all matching, with empty, list, negative and float inputs refused. Reproduced the 1990 calendar-boundary regression red and green, which confirms my prior `SI-CR9-002` disposition was wrong and the guard is a genuine fail-open. Confirmed all four recorded final file hashes. Confirmed SI-2B-P1A computes no percentile, rank, score or seed, imports no network, filesystem or subprocess surface, keeps every authority flag false and `selected_lookback` None. Removed 11 inventory guards individually: two are detected and nine survive; three attempted attacks on the survivors were all blocked upstream by the self-validating serializer and the capture-and-rebuild, so they are recorded as unreachable rather than as gaps. Accepted all six `SI-CCR21` corrections. | Baseline on the pushed tree: compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**; thirteen-file lane **717 passed in 2,342.27s (39m02s)**, reconciling exactly to the prior 678 minus the old 53-case investability file plus its new 65 cases plus the 27 new eligible-population cases. Focused files independently rerun: investability **65 passed in 12.22s**, eligible population **27 passed in 18.68s**. Combined guard removal broke collection and was replaced by individual attribution. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. `SI-CR10-001` (P3, advisory: nine unreachable internal-invariant guards, mechanism named). `SI-CR10-002` (P3, self-reported: my review-method failures across three rounds and the change applied here). `SI-CR9-001` closed by `722a8a0`; `SI-CR9-002` reclassified as a real fail-open and closed by regression; `SI-CR9-003` closed with corrected reasoning. Shared `SI-CR5-005` stays open. | Codex counter-reviews this record commit. Next offline part is the explicit population/cutoff binding for normalization before any eligible-population reranking; no lookback winner without a frozen metric. Every provider, licensed-data, outcome, ETF, QuantConnect and trading gate remains closed. |
 | 2026-09-27 | Codex counter-review + implementation | `ceef4bf` -> `e2f0a80` (this final record commit follows) | Claude SI-2B-P1A counter-review and SI-2B-P1B population/cutoff relationships | Accepted Claude's sole record commit without correction; closed nine-guard advisory as a non-defect under the current capture/rebuild API; implemented authenticated relations between each candidate eligibility cohort and existing canonical normalization, retaining delayed revisions and distinct populations without choosing a ranking universe. | Counter-review focus 170 passed in 25.06s; final new binding file 29 passed in 93.38s; boundary/active-doc 78 passed in 0.93s before record; final record checks below; compile/diff clean; isolated binding-guard red/green 9.53s. No complete lane/repository suite by Codex; looks 0/0. | No new actionable counter-review issue; SI-CR10-001 closed as non-defect; SI2BP1B-REV-001 draft fixture errors corrected and verified. Shared P2 remains open and unfixed. | One combined matching-lane push, then Claude reviews every commit after `ceef4bf` through the pushed head. Owner must freeze financial population/cutoff choices before reranking. The one-cycle owner-requested Codex heartbeat stops after verified publication. |
 | 2026-09-27 | Claude review | `ceef4bf` -> `91243e3` reviewed; no code or test correction required (this record commit is the only Claude commit) | Independent review of the SI-2B-P1A counter-review and the SI-2B-P1B authenticated population/cutoff binding | Reviewed both pushed commits individually; the lane was already synced with a clean tree. Verified the central scope claim by execution: the adapter rebuilds normalization from the full captured vintage and references with no eligibility filter, and its reported cohort digests equal canonical SI-3C independently recomputed, on the default fixture and on a 20-security fixture with 20 structural peers. Confirmed no score value, percentile, rank or seed field in the payload, that member fields are membership booleans and lists only, that the self-referential inventory digest covers the complete payload, one binding per settlement/open/lookback, and the documented three cutoff relations. Confirmed the delayed-revision case keeps its own later cutoff, reports `NOT_VISIBLE`, and points at the original selected event rather than itself. Both recorded file hashes reproduce. Attributed nine binding guards individually: two detected, seven surviving; three coverage probes including a refused-member fixture show the eligibility and normalization derivations always coincide because both read one captured source. | Baseline on the pushed tree: compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. An earlier lane run was discarded because it overlapped the mutation window; the reported lane is a clean rerun: fourteen-file lane **746 passed in 1,815.55s (30m15s)**, reconciling exactly to the prior 717 plus the 29 new binding cases. Focused binding file **29 passed in 84.47s**, matching section 57.3. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. `SI-CR11-001` (P3, current-API non-defect: seven internal-invariant guards, mechanism named, with Codex's section 56 qualification accepted that a finite attack set is supporting evidence rather than a theorem). `SI-CR10-001` and `SI-CR10-002` closures accepted. Shared `SI-CR5-005` stays open. | Codex counter-reviews this record commit. Next steps remain owner decisions: the financial population policy that `financial_population_policy_required` flags, any eligible-population reranking, and any lookback selection with a frozen metric. Every provider, licensed-data, outcome, ETF, QuantConnect and trading gate remains closed. |
+
+| 2026-09-27 | Codex counter-review + implementation | `91243e3` -> `1b8ad3b` counter-reviewed; `c9ce1aa` code/test snapshot; this lane-record commit follows | Owner-frozen SI-2B-P1C offline eligible-stock reranking | Accepted Claude's only new record commit without correction. Rebuilt unchanged structural SI-3C normalization and reranked only authenticated, S1-scoreable stocks eligible at each release's next open for all four candidate lookbacks; later evidence is excluded without retroactive membership. An initially failing later-only cohort case was corrected before handoff. No lookback winner, seed, production or empirical authority. | New focused file **10 passed in 673.92s**; later-only regression **1 failed** before correction, **1 passed** after; active-document/import boundary **78 passed in 0.81s** before this record; final record checks below. Claude-reported prior lane **746 passed** was not rerun by Codex. Synthetic/offline only; looks **0/0**. | In-lane P2 and P3 draft findings corrected; one overlap suspicion closed as a false alarm. Shared P2 remains open and unfixed. | Commit this lane record, reverify exact lane/remote, and make exactly one push only to `origin/codex/strategy-short-interest`. Claude independently reviews every commit after `1b8ad3b` through pushed HEAD and runs the full lane suite. All empirical, source-rights, QC and operational gates remain separate. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -8282,3 +8281,145 @@ faithfulness of the transcribed owner approval; section 52.3 records that limit.
    its own source-rights, coverage, cost-specification, outcome-look accounting
    and QuantConnect authorizations. The shared final holdout remains sealed.
    No milestone is started here.
+
+## 59. Codex counter-review and SI-2B-P1C owner-frozen offline eligible-stock reranking — 2026-09-27
+
+### 59.1 Exact review range, dispositions, and owner decision
+
+The starting pushed Codex snapshot was `91243e374bdba6655e882efcdec2ebe25ba36fb3`.
+Fetching only `refs/heads/codex/strategy-short-interest` found exactly one new
+Claude commit, `1b8ad3b16cb233fcf8812b803c785b0570e827e8`, which changed
+this lane record only. Codex fast-forwarded the designated existing worktree
+and counter-reviewed that commit individually against its diff, section 58 and
+the separately supplied independent review notes. **Disposition: accepted,
+no correction.** The record accurately reported Claude's review of each
+prior Codex commit and the remaining gate. Codex reproduced active-document
+and import-boundary checks (**78 passed in 1.05s**) and three focused
+population-binding cases (**3 passed in 57.75s**) without a full lane run.
+
+The owner then explicitly froze the unresolved financial choice for this
+bounded offline step in this chat:
+
+> keep the existing structural normalization, rank only stocks eligible at the
+> release’s next open, and exclude later-arriving evidence from that cohort.
+>
+> proceed
+
+This authorizes **offline SI-2B-P1C cohort/reranking calculation only**.
+The prior candidate grid `20/60/120/252` and structural normalization policy,
+including the 20-sector-peer floor, remain unchanged. It does not select a
+winning lookback, authorize a production rank or seed, join outcomes, grant
+historical source rights, or permit a QuantConnect job. A current release/open
+never admits evidence with a later eligibility cutoff. Filtering existing
+structural percentile rows and calling the result a rerank would not satisfy
+this decision; new eligible denominators must be computed from unchanged
+canonical scores.
+
+### 59.2 Bounded implementation and exact behavior
+
+Code/test snapshot `c9ce1aa8c196ded518d81568a0fee6aefab70dac` adds
+`research/short_interest_etf/stock_eligible_ranking.py` and
+`tests/test_short_interest_stock_eligible_ranking.py`. The one-argument
+`build_stock_eligible_ranking_inventory(StockPopulationBindingInventory)`
+captures and validates the authenticated SI-2B-P1B inventory, then rebuilds
+canonical SI-3C S1 normalization from its **full structural captured vintage
+and references**. Eligibility never filters winsorization, sector-peer/MAD
+normalization or the 20-peer floor; an ineligible stock may therefore still
+influence a structural score. This preserves the owner-frozen estimand, not
+an eligible-only normalization.
+
+For each settlement and candidate lookback, the new ranking cohort is the
+authenticated `same_open` binding at the release's `decision_at`, intersected
+with eligible, revision-selected and canonical S1-scoreable event IDs. Pressure
+uses the unchanged S1 value; covering uses its exact negative under frozen
+blueprint equation 4.20. Each role independently recomputes `L`, `E`, `H`,
+`N` and exact `(2*L+E)/(2*N)` **within that eligible selected scoreable
+cohort**, without reusing structural percentile counts. Ties remain
+indivisible. With `N>=10`, inclusive upper-tail `>=9/10` gives a reported
+offline `threshold_candidate` for each role (covering's upper tail is the
+lower tail of the original S1 score). With `N<10`, percentile rows still
+exist when `N>0`, but classification is `None` with explicit role underfill.
+These are candidate diagnostics, not seeds or authorized production ranks.
+
+Off-open bindings, including later-arriving eligible revisions, are listed
+under `excluded_off_open_bindings` and `excluded_later_event_ids` and never
+retime or retroactively enlarge the release-next-open cohort. When a release
+has only later eligibility evidence, all four release-open ranking cohorts
+are present as empty rows with `no_release_open_eligibility_cohort` and both
+role-underfill reasons. An entirely absent authenticated release/lookback
+evidence slot still refuses. A derived projection-row hash is explicitly
+`derived_s1_covering_row_sha256`, distinct from canonical source lineage
+`source_s1_covering_rows_sha256`. Rows, ranking groups, policy and inventory
+are content-addressed; payloads are detached. `selected_lookback` remains
+`None`, and seed, outcome, production-authoritative and production-ranking
+flags remain false.
+
+This is offline synthetic computation. Rebuilding the full structural batch
+and exact pairwise counts are bounded fixture behaviors, not a provider-scale
+runtime or predictive-value claim. Section 58's “no score or rank emitted”
+described **P1B before this new P1C commit**, not this new diagnostic output.
+
+### 59.3 Persistent P0-P3 ledger and verification disposition
+
+No P0 or P1 was found. Confirmed current-lane issues found during this
+implementation were fixed before handoff. Earlier entries and their
+historical evidence remain in sections 56-58.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|---|
+| SI2BP1C-REV-001 | P2 | Closed, corrected in lane | `c9ce1aa` development | `stock_eligible_ranking.py` all-later release | The first implementation refused the entire inventory when all a release's eligibility bindings arrived after next open, discarding valid earlier-release results rather than representing an empty next-open cohort. | Dedicated later-only regression **1 failed in 10.07s** before correction. | The owner excludes late evidence; an explicit empty earlier cohort is faithful, while fully missing authenticated evidence remains invalid. | Preserve four empty release/open rows; report late IDs and `no_release_open_eligibility_cohort` plus role underfill. | Same regression **1 passed in 11.55s** after correction; final ten-case focus green. |
+| SI2BP1C-REV-002 | P3 | Closed, corrected in lane | `c9ce1aa` development | derived covering row lineage label | Initial projection-row digest name could be misread as the canonical SI-3D source-row digest. | Independent code audit compared derived target with canonical source lineage. | Trace labels must not imply stronger source identity. | Renamed `derived_s1_covering_row_sha256`; top-level source remains `source_s1_covering_rows_sha256`. | Final focused payload/hash checks and source inspection. |
+| SI2BP1C-REV-003 | P3 | Closed, false alarm | `c9ce1aa` development | ranked versus later-event ID reporting | Preliminary audit suspected an event ID could be both ranked and listed as later for the same release/lookback. | SI-2B-P1A admits one authenticated event/lookback eligibility slot with one cutoff; same-open and later slots cannot coexist for that ID through this public API. | No reachable violation under the current source contract; reassess if slot cardinality changes. | None; no impossible fixture added. | Public source-slot invariant and binding/ranking cases inspected. |
+| SI-CR11-001 | P3 | Closed, current-API non-defect, retained | `1b8ad3b` | seven P1B internal guards | Claude's seven surviving guard removals remain documented with section 58's evidence limits. | Section 58.5 and Codex counter-review. | One captured validated source supplies both binding and normalization; no demonstrated reachable fail-open. | None. | Section 59.1 focus and unchanged section 58 evidence. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared/out of lane | pre-existing | shared owner-direction history | Durable shared citation for earlier common-remediation decision remains absent. | Sections 41, 43-58. | Owner/shared coordination scope; this lane cannot silently edit shared history. | None on this lane. | Open for owner disposition. |
+
+### 59.4 Focused validation and exact artifacts
+
+- Final `tests/test_short_interest_stock_eligible_ranking.py`:
+  **10 passed, 0 failed, 0 skipped in 673.92s (11m13s)**. An independent
+  `Fraction` oracle recomputes eligible denominators across four windows;
+  cases cover 20 structural peers but 19 eligible scores, 20-versus-19
+  missing-history split, `N=9` underfill, delayed revision exclusion,
+  later-only empty release/open, exact ties, forged binding refusal, and
+  detached zero-authority payloads. Initial missing-API red and the all-later
+  P2 red/green are development evidence, not failures on the committed tree.
+- Before this record edit, active-document consistency plus Short Interest
+  import boundary: **78 passed in 0.81s** (69 + 9). After the record update,
+  the same selection was **78 passed**. Targeted compilation
+  **exit 0** and `git diff --check` clean. Earlier focused attempts were
+  intentionally **cancelled** while code changed; their partial passes are
+  not final-tree validation claims.
+- Committed code SHA-256:
+  `c3e6bd8f3d0a6b222f8726c3416dca7846f8bcae5025d3c9e84f1770d690ead8`.
+  Committed test SHA-256:
+  `cc2de1293d67e371d954f52c5a3b52f8dea9cffd675bbab70a0d6ac403ab60d6`.
+  Claude-reported prior fourteen-file lane **746 passed** was not rerun by
+  Codex on this new tree.
+- No complete Short Interest lane or repository suite was run by Codex. No
+  provider/FINRA/SEC, credential, licensed or actual price, market outcome,
+  sealed holdout, QC artifact/upload/compile/job/backtest, broker, operator
+  database, deployment, paper/live, capital, order or trading surface was
+  accessed. **Authorized outcome looks: 0; consumed outcome looks: 0.**
+
+### 59.5 Claude handoff and remaining owner gates
+
+The new Codex range for independent review is
+`1b8ad3b16cb233fcf8812b803c785b0570e827e8..pushed HEAD`, comprising
+`c9ce1aa8c196ded518d81568a0fee6aefab70dac` and this lane-record
+commit. Claude should disposition both individually on **this same lane
+branch**, run the full Short Interest lane suite, recompute the source/test
+hashes and policy/content digests, independently check eligible `L/E/H/N`,
+later-only empty release, delayed-revision exclusion, ties, underfill and
+authority flags, and record any P0-P3 findings. Codex will counter-review
+every Claude commit in the next serialized round. No shared/project-wide
+document or `docs/SESSION_HANDOFF.md` is to change on this lane.
+
+Historical **stock backtesting before forward-looking work** remains the
+empirical destination, not permission granted here. Actual source rights and
+PIT price/volume coverage (including 60 complete valid trading sessions),
+evaluation dates/universe, the metric for lookback selection, portfolio/cost
+specification, permanent research-look allocation and QuantConnect access
+retain separate owner gates. No lookback winner, production-ranking/seed
+authority, actual outcome join, sealed-holdout access, QC operation or
+execution has been authorized or attempted. If choices remain unfrozen, the
+next step is an owner decision, not an inferred later milestone.

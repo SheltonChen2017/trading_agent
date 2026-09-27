@@ -1,24 +1,19 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED THE THREE-COMMIT RANGE `50636ad..5216228` COMMIT
-BY COMMIT (SECTION 55). ALL THREE ARE ACCEPTED WITH **NO CODE OR TEST
-CORRECTION REQUIRED**; THIS IS THE FIRST ROUND IN WHICH INDEPENDENT REVIEW
-FOUND NOTHING TO FIX. THE `SI-CR9-001` MEDIAN FIX IS VERIFIED EXACT OVER
-ROUGHLY 1,300 RANDOM ODD AND EVEN POPULATIONS, AND THE AUTHENTIC 1990
-CALENDAR-BOUNDARY REGRESSION WAS REPRODUCED RED AND GREEN, CONFIRMING THAT MY
-PRIOR `SI-CR9-002` "UNREACHABLE" DISPOSITION WAS WRONG AND THAT THE GUARD IS A
-REAL FAIL-OPEN NOW PINNED. ALL SIX `SI-CCR21` CORRECTIONS AGAINST MY RECORD
-ARE ACCEPTED, FOUR OF THEM SUBSTANTIVE; `SI-CR10-002` RECORDS THE METHOD
-CHANGE. SI-2B-P1A IS MEMBERSHIP-ONLY: NO PERCENTILE, RANK, SCORE OR SEED IS
-COMPUTED OR RELABELLED. NINE INTERNAL-INVARIANT GUARDS SURVIVE REMOVAL AND ARE
-RECORDED AS UNREACHABLE BEHIND THE CAPTURE-AND-REBUILD DESIGN AFTER THREE
-ATTEMPTED ATTACKS (`SI-CR10-001`). THE EXACT THIRTEEN-FILE SHORT INTEREST LANE
-IS 717 PASSED. THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN.
-CODEX COUNTER-REVIEW OF THIS RECORD COMMIT IS NEXT. NO PERMANENT CELL OR LOOK
-HAS BEEN ALLOCATED; AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL
-PROVIDER, LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, RANKING,
-LOOKBACK-SELECTION, SEED, ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE,
-SCHEDULER, DEPLOYMENT, PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
+Status: **CODEX HAS COUNTER-REVIEWED CLAUDE'S SOLE RECORD COMMIT `ceef4bf`,
+ACCEPTED WITH NO CORRECTION REQUIRED (SECTION 56). SI-2B-P1A AND THE PRIOR
+MEDIAN/CALENDAR CORRECTIONS REMAIN ACCEPTED. SI-2B-P1B POPULATION/CUTOFF
+BINDING IS IMPLEMENTED AT `e2f0a80` FOR CLAUDE REVIEW (SECTION 57).
+IT AUTHENTICATES EXISTING STRUCTURAL NORMALIZATION RELATIONSHIPS ONLY:
+NO ELIGIBLE-UNIVERSE RESCORING, RERANKING, PERCENTILE OR SEED IS EMITTED.
+THE FOUR LOOKBACKS REMAIN 20/60/120/252 WITH NO WINNER. THE NORMALIZATION
+POPULATION AND RANKING-CUTOFF CHOICES STILL REQUIRE OWNER FREEZE BEFORE
+RERANKING. ALL CURRENT IN-LANE FINDINGS ARE CLOSED; SHARED P2
+`SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN AND UNFIXED. CODEX FOCUSED
+CHECKS PASS; CLAUDE OWNS FULL LANE VALIDATION. NO PROVIDER, LICENSED/ACTUAL
+DATA, OUTCOME, HOLDOUT, ETF, QC, BROKER, APPLICATION SCHEDULER, PAPER/LIVE,
+CAPITAL, ORDER OR TRADING AUTHORITY IS ADDED. AUTHORIZED AND CONSUMED
+OUTCOME LOOKS REMAIN ZERO.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -173,6 +168,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Claude review | `f72f83c` -> `86f56fd` reviewed; test-only correction at `4729219` (this record commit follows) | Independent review of the owner-decision citation, the percentile provenance binding, SI-2B-P0 offline candidate-window evidence and the boundary-tie hardening | Reviewed all five pushed commits individually; the lane was already synced with a clean tree. Verified the `SI-CR8-001` remedy end to end: the policy binds path, introducing commit and document SHA-256, and the test rehashes the committed git object and asserts the verbatim owner approval plus six policy phrases, with forged path/commit/hash refused. Confirmed all four recorded file hashes, the new policy digest, removal of the superseded digest, and monotonic heading order 1-51. Independently checked the four candidate windows, both inclusive floors, exact even-window medians, no selected lookback, and that the module has no network, file, environment or subprocess surface. Removed 11 candidate guards together, then attributed each individually; two survivors were probed and neither is a demonstrated fail-open. Accepted all five `SI-CCR20` corrections. | Baseline on the pushed tree: twelve-file lane **677 passed in 1,760.45s**, reconciling exactly to 619 - 47 + 53 + 52; compileall **exit 0**; active-document **69 passed**. Final tree: lane **678 passed in 1,672.37s (27m52s)**, reconciling exactly to the 677-pass baseline plus the one test added here; SI-2B focused file **53 passed in 8.01s** (the pushed 52 plus the one added here); import boundary **9 passed**; active-document **69 passed**; compileall **exit 0**; `git diff --check` clean. Combined 11-guard removal **18 failed, 34 passed**, confirming the recorded 52 tests. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR8-001` **closed by correction**. `SI-CR9-001` (P3, closed, test-only): the median is exact only for even windows and nothing refuses an odd lookback. `SI-CR9-002` and `SI-CR9-003` (P3, advisories, unreachable defence in depth). `SI-CR9-004` (P3, self-reported: two repeat ledger/status lapses of mine). Shared `SI-CR5-005` stays open. | Codex counter-reviews `4729219` and this record commit. The production fix for the odd-window median, the eligible-population adapter, any lookback selection with a frozen metric, and every provider, outcome, ETF, QuantConnect and trading gate remain open or closed as recorded. |
 | 2026-09-27 | Codex counter-review + implementation | `50636ad` -> `6418236` (correction `722a8a0`; this final record commit follows) | Claude SI-2B-P0 counter-review + SI-2B-P1A authenticated candidate membership | Accepted both Claude commits after verified corrections; exact odd/even production median without changing approved grid; true supported-calendar guard path pinned; new membership-only inventories retain complete eligible/refused partitions per settlement, execution open and lookback. | Focused correction 65 passed; population 27 passed; combined final focused files 92 passed in 19.60s; boundary/active-doc 78 passed; compile and diff clean; isolated mutations red/green. No full lane/repository suite by Codex; authorized/consumed looks 0/0. | SI-CCR21-001..006 and SI2BP1A-REV-001 closed; prior calendar survivor classification superseded; shared P2 remains open and unfixed. | Claude reviews every commit after `50636ad` through this record's pushed remote head on the same lane/worktree; one push only. Ranking, winner selection, real data/outcomes, QC and all operational gates remain separate. |
 | 2026-09-27 | Claude review | `50636ad` -> `5216228` reviewed; no code or test correction required (this record commit is the only Claude commit) | Independent review of the SI-2B median correction, the authentic calendar-boundary refusal and the SI-2B-P1A candidate eligible-population inventory | Reviewed all three pushed commits individually; the lane was already synced with a clean tree. Verified `_exact_liquidity_median` against an independent oracle over roughly 1,300 random populations spanning n=1..39 plus 60, 120, 251, 252 and 253, all matching, with empty, list, negative and float inputs refused. Reproduced the 1990 calendar-boundary regression red and green, which confirms my prior `SI-CR9-002` disposition was wrong and the guard is a genuine fail-open. Confirmed all four recorded final file hashes. Confirmed SI-2B-P1A computes no percentile, rank, score or seed, imports no network, filesystem or subprocess surface, keeps every authority flag false and `selected_lookback` None. Removed 11 inventory guards individually: two are detected and nine survive; three attempted attacks on the survivors were all blocked upstream by the self-validating serializer and the capture-and-rebuild, so they are recorded as unreachable rather than as gaps. Accepted all six `SI-CCR21` corrections. | Baseline on the pushed tree: compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**; thirteen-file lane **717 passed in 2,342.27s (39m02s)**, reconciling exactly to the prior 678 minus the old 53-case investability file plus its new 65 cases plus the 27 new eligible-population cases. Focused files independently rerun: investability **65 passed in 12.22s**, eligible population **27 passed in 18.68s**. Combined guard removal broke collection and was replaced by individual attribution. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. `SI-CR10-001` (P3, advisory: nine unreachable internal-invariant guards, mechanism named). `SI-CR10-002` (P3, self-reported: my review-method failures across three rounds and the change applied here). `SI-CR9-001` closed by `722a8a0`; `SI-CR9-002` reclassified as a real fail-open and closed by regression; `SI-CR9-003` closed with corrected reasoning. Shared `SI-CR5-005` stays open. | Codex counter-reviews this record commit. Next offline part is the explicit population/cutoff binding for normalization before any eligible-population reranking; no lookback winner without a frozen metric. Every provider, licensed-data, outcome, ETF, QuantConnect and trading gate remains closed. |
+| 2026-09-27 | Codex counter-review + implementation | `ceef4bf` -> `e2f0a80` (this final record commit follows) | Claude SI-2B-P1A counter-review and SI-2B-P1B population/cutoff relationships | Accepted Claude's sole record commit without correction; closed nine-guard advisory as a non-defect under the current capture/rebuild API; implemented authenticated relations between each candidate eligibility cohort and existing canonical normalization, retaining delayed revisions and distinct populations without choosing a ranking universe. | Counter-review focus 170 passed in 25.06s; final new binding file 29 passed in 93.38s; boundary/active-doc 78 passed in 0.93s before record; final record checks below; compile/diff clean; isolated binding-guard red/green 9.53s. No complete lane/repository suite by Codex; looks 0/0. | No new actionable counter-review issue; SI-CR10-001 closed as non-defect; SI2BP1B-REV-001 draft fixture errors corrected and verified. Shared P2 remains open and unfixed. | One combined matching-lane push, then Claude reviews every commit after `ceef4bf` through the pushed head. Owner must freeze financial population/cutoff choices before reranking. The one-cycle owner-requested Codex heartbeat stops after verified publication. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -7891,3 +7887,213 @@ section 52.3 records that limit.
    its own source-rights, coverage, cost-specification, outcome-look accounting
    and QuantConnect authorizations. The shared final holdout remains sealed.
    No milestone is started here.
+
+## 56. Codex counter-review of Claude SI-2B-P1A review — 2026-09-27 UTC
+
+The owner-requested Git heartbeat detected the completed Claude push on
+2026-09-27 at 18:10 UTC. Local `HEAD` already equalled the fetched remote,
+`ceef4bf306069068f01f3734166c86f700e59e31`, with a clean tree. No merge,
+switch, secondary checkout or fast-forward was needed. Every repository
+command, probe, test and commit uses the existing absolute worktree
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+on `codex/strategy-short-interest`. The baseline was
+`52162283dea32567041be25b8b1b6ceb952f2016`.
+
+### 56.1 Exact commit disposition
+
+| Commit | Scope | Disposition | Evidence |
+|---|---|---|---|
+| `ceef4bf306069068f01f3734166c86f700e59e31` | Record-only Claude review of the three prior Codex commits; no production or test correction | **Accepted; no actionable issue found** | Complete individual diff, section 55, unchanged production/tests and four byte hashes inspected; three prior dispositions retained; thirteen-file inventory and `678 - 53 + 65 + 27 = 717` reconcile. |
+
+The review correctly accepts all six prior `SI-CCR21` corrections. Independent
+advisory probing through the production median matched **1,320** exact-rational
+random populations for lengths 1–39, 60, 120, 251, 252 and 253; empty, list,
+negative and float inputs refused. Root reran the two relevant SI-2B files,
+import boundary and active-document checks: **170 passed in 25.06s**
+(65 investability, 27 population, 9 boundary, 69 active-document).
+
+The source serializer, canonical rebuild and snapshot identity/selection
+invariants support the nine internal-guard survivor classifications. Their
+public API does not accept caller-supplied derived rows. The three historical
+attack families are supporting examples, not an exhaustive theorem about
+all possible internal or concurrent mutation. Historical lane timings,
+mutation failure counts and byte restores remain explicitly Claude-reported
+observations; Codex did not rerun or claim the complete 717-test lane.
+
+### 56.2 Retained P0–P3 ledger and quality
+
+No new actionable counter-review finding, P0, P1 or in-lane P2 was confirmed.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for closure or fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR10-001 | P3 | Closed as a current-API non-defect observation | `ceef4bf`, referencing `6418236` | Section 55.5; SI-2B-P1A internal assertions | Nine internal guards survive removal, but the public source is canonicalized before those invariants are consumed. | Source serializer/rebuild and complete authenticated source inventory; section 55's named upstream blocking mechanisms. | No demonstrated fail-open or contract breach; adding fabricated public states would misrepresent the current API. Preserve the guard tests and reassess if the capture/rebuild changes. | No production/test change. | Root relevant focus 170 passed; independent source/type/identity review. |
+| SI-CR10-002 | P3 | Closed; prior method correction retained | `ceef4bf` | Section 55.5 | Claude acknowledges prior incorrect survivor reasoning, tautological arithmetic and record/gate claims. | Prior SI-CCR19–21 records and current explicit corrections. | Current review evidence and limits support the closure; no new defect is inferred from prior failures. | None outstanding. | Full record diff checked; hashes and count reconciliation independently verified. |
+| SI-CR9-001 / SI-CR9-002 / SI-CR9-003 | P3 | Closed; corrected dispositions retained | Prior rounds | Median/calendar/cap evidence | Exact median fix, authentic calendar underfill regression and corrected cap-guard reasoning remain accepted. | Sections 53–55. | The earlier mistakes were corrected without changing the approved candidate grid. | No new change. | 65 investability tests pass in the root 170-case focus. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open; shared, out of lane | Pre-existing shared history | Shared integration authority | Unchanged missing durable owner sentence for the follow-up shared fix/alignment. | Sections 41, 43–55. | Owner routing remains required; lane ownership does not authorize a shared fix. | Documented, deliberately unfixed. | No shared file changed. |
+
+Counter-review quality assessment: **9/10**. The record accurately separates
+software behavior, review acceptance and operational authority. Prior runtime
+and mutation observations are not independently reconstructible from a
+documentary commit; that evidence limitation is preserved, not converted
+into an invented finding. No review correction was necessary.
+
+## 57. SI-2B-P1B authenticated population/cutoff binding — 2026-09-27 UTC
+
+Implementation snapshot: `e2f0a80f21b1c825f804a616acad7784f6e30ea2`.
+This completes one bounded **binding-only** tranche, pending Claude's review.
+It does not complete full SI-2B, eligible-population reranking or backtesting.
+Authority is the owner's serialized next-step instruction and sections
+51.5, 54.4 and 55.8: bind population and cutoff before any later reranking.
+
+Technical: `stock_population_binding.py` adds the one-argument
+`build_stock_population_binding_inventory`, exact frozen
+`StockPopulationBindingInventory` and typed `StockPopulationBindingError`.
+The source must be an exact authenticated SI-2B-P1A inventory; it is detached,
+content-pinned and reauthenticated on every serialization. From that same
+captured vintage/reference bundle the adapter rebuilds the **unchanged**
+complete SI-3A and canonical SI-3C structural normalization. It binds each
+candidate eligibility cohort to the official release, canonical decision
+cutoff, event-and-stable-identity revision selection and distinct structural
+candidate, peer-floor-qualified and model-scoreable populations. It reports
+exact intersections/differences and cutoff observations, with content hashes,
+retained eligible/refused members and no package-root export. It emits no
+score values, ranks, percentiles or seed qualifications and chooses no
+normalization or ranking universe. Every authority flag remains false.
+
+Plain language: this offline report checks whether the stocks passing a
+history-length candidate were evaluated at the same time, and from the same
+revisions, as the existing structural scoring process. It keeps rejected
+stocks and later corrections visible instead of silently treating them as
+the earlier selected data. A stock can pass the size/liquidity checks while
+its sector has too few peers for a score. The report exposes those differences;
+it does not choose stocks, show investment performance or start a backtest.
+
+### 57.1 Binding contract and deliberate exclusions
+
+- Payload schema `1.0`, binding ID
+  `si2b-offline-population-normalization-binding-v1`. Policy, each relationship
+  and the complete inventory use canonical SHA-256 content identity. Source
+  population/evidence/vintage/reference/history and normalization-policy
+  identities are retained. The full original source remains captured, not a
+  caller-supplied list of eligible IDs or normalized rows.
+- One canonical normalization summary per settlement; one relationship per
+  original `(settlement, execution open, candidate lookback)` cohort. The
+  complete event partitions, source row hashes, identities, taxonomy and
+  refusal reasons remain visible. No delayed cohort is pooled or retimed.
+- A later eligible correction of the same security does **not** match the
+  older canonical selected event. Matching is by event and authenticated
+  stable identity, never ticker or security ID alone.
+- The existing structural policy v1 and its 20-sector-peer rule stay frozen.
+  Rebuilding that canonical calculation internally is not recomputation of
+  normalization over eligible-only peers. The output exports membership,
+  not its arithmetic or financial values.
+- The grid is still 20/60/120/252. `selected_lookback` is `None`;
+  `financial_population_policy_required` is `True`. Production, ranking,
+  seed and outcome authority are false even when cutoffs and memberships
+  coincide. No chosen ranking population or automatic seed classification
+  is inferred from an empty observation list.
+- Underfilled-sector, empty eligibility, zero-MAD/model-scoreability and
+  the owner's fewer-than-10 seed restriction remain separate concepts.
+  No model, peer floor, percentile convention, threshold, tie rule, financial
+  population, common cutoff, winner or outcome policy is changed.
+
+### 57.2 Implementation P0–P3 ledger
+
+No production P0–P3 defect was confirmed by the independent read-only audit
+and root review.
+The real draft-test errors are retained below rather than reported as
+production defects or hidden behind the final green count.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI2BP1B-REV-001 | P3 | Closed before commit | `e2f0a80` | New focused synthetic fixtures/assertions | The delayed cohort lacked a cap observation at its later cutoff; the missing-session assertion used a nonexistent refusal literal. The draft tests could not prove their claimed paths. | Initial expanded run: 2 failed, 27 passed in 93.59s; production correctly refused stale cap evidence and emitted `daily_history_missing`. | Authentic fixtures must reach the intended path without weakening production contracts. | Extend synthetic daily/cap evidence through the later close, use the actual refusal contract, and safely handle optional helper refusal identity. No production rule changed. | Corrected cases: 2 passed / 27 deselected in 11.24s; root final 29 passed in 93.38s. |
+
+### 57.3 Exact focused verification and hashes
+
+- Missing-public-API red: **1 failed in 0.34s** before the new module existed.
+  The final new focused file is **29 passed, 0 failed, 0 skipped in 93.38s**,
+  independently run by root on the final committed code/test bytes.
+- Coverage includes authentic 20 structural peers with only 19 eligible
+  stocks, all four candidates, complete refused partitions, canonical hashes,
+  missing history, pre-open supersession, delayed execution/old revision
+  mismatch, caller detachment, captured-source/hash drift, exact types,
+  subclasses/callbacks, zero authority and no financial-output fields.
+- Independent static/source and authentic relationship probes passed in
+  **13.47s** (base, source/type/identity/cutoff paths 7.03s; a separate authentic
+  delayed-revision probe 6.44s). These are advisory checks, not independent
+  acceptance of Codex's own implementation.
+- Root isolated in-memory AST mutation removes only the new source-binding
+  guard: forged captured-population digest then succeeds (red); unchanged
+  production refuses it, and authentic binding succeeds (green). **9.53s**.
+  No tracked file was mutated; production bytes were verified unchanged.
+- New-module import-boundary plus active-document checks:
+  **78 passed in 0.93s** (9 boundary, 69 active-document), before this record.
+  Post-record checks: **78 passed in 0.94s**, compilation exit 0 and clean
+  diff. Metadata-only verification updates are checked again before commit.
+- Lane and changed-test compilation **exit 0**; `git diff --check` clean.
+  macOS / CPython 3.13.15 / pytest 9.1.1, runtime
+  `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`.
+- **No complete lane or repository suite was run by Codex.** Claude owns the
+  full lane check including the new fourteenth test file. The earlier
+  717-pass result is Claude's prior review, not a new Codex claim.
+
+| Final artifact | Exact byte SHA-256 |
+|---|---|
+| `research/short_interest_etf/stock_population_binding.py` | `4994ed6368cf526b0114683eb69af5f550d7755eb9e2000653b19ff5becb8992` |
+| `tests/test_short_interest_stock_population_binding.py` | `0e040915d55026509e17f32c60cfd600ef85ecc18f5b4d74ab52c932b9f69bf1` |
+
+Implementation self-assessment: **8/10**, pending exact-snapshot Claude review.
+The relational scope is complete, but rebuilding the rich structural batch on
+every payload is intentionally a bounded synthetic implementation, not a
+provider-scale performance claim. No production-execution, broker, risk,
+capital, database or application-scheduler behavior changes.
+
+### 57.4 One-push manifest, Claude scope and next owner decisions
+
+| Ordered local commit | Scope | Status at record preparation |
+|---|---|---|
+| `e2f0a80f21b1c825f804a616acad7784f6e30ea2` | SI-2B-P1B binding-only source and 29-case focused test file | Local; ready for independent review |
+| This final lane-record commit | Counter-review section 56; implementation/handoff section 57; current status and push row | Committed last before the single push |
+
+Verify exact worktree/branch/clean status and remote still
+`ceef4bf306069068f01f3734166c86f700e59e31`, then make exactly one successful
+`git push origin HEAD:refs/heads/codex/strategy-short-interest` from this same
+worktree. No other branch or checkout is a publish target. Verify the final
+local/tracking/actual remote object names agree afterward. Stop the explicitly
+owner-requested one-cycle Codex Git heartbeat after that verification; this
+does not touch an application/trading scheduler or authorize another round.
+
+Copyable Claude scope: “Fetch only the matching Short Interest branch and
+review every commit in `ceef4bf..origin/codex/strategy-short-interest` from
+the designated existing `trading_agent__short_interest` worktree. Verify the
+single-commit counter-review and independently examine the new population/
+cutoff bindings. Distinguish internally rebuilt **unchanged structural**
+normalization from any unimplemented eligible-universe rescoring/reranking.
+Check event/identity revision selection, delayed cutoffs, distinct candidate/
+peer/scoreable sets, full eligible/refused partitions, hash/detachment guards
+and zero authority. Give every commit a disposition, retain the P0–P3 ledger,
+run the full lane suite including the new binding file, reproduce material
+in-lane findings red/green, fix only lane-owned issues, update only this record,
+and commit/push once on this same branch. No provider, outcome, QC or trading
+access.”
+
+After Claude's review and Codex counter-review, **before any reranking**, the
+owner must freeze whether eligibility changes the normalization peer/winsor/
+MAD population or only the subsequent ranking population, and whether ranking
+uses the existing once-per-release canonical open or a separately specified
+later execution cohort. Preserve the already-frozen sector floor of 20 and
+seed floor of 10 explicitly when choosing that policy. This binding inventory
+does not decide those economics or lift the next gate by inference.
+
+Historical **stock backtesting before forward-looking work** remains the next
+empirical destination. Source rights/PIT coverage, historical dates/universe,
+frozen evaluation and portfolio/cost specifications, research-look accounting
+and scoped QC processing/launch permission remain separate prerequisites.
+Order-based evaluations remain the default; max three unsuccessful QC launches
+per distinct candidate then Mia/source-diff recovery. No QC attempt occurred.
+The shared final holdout stays sealed. No provider, FINRA/SEC, credentials,
+licensed/actual price or outcome, ETF, QC, broker, operator database,
+application scheduler, deployment, paper/live, capital, order or trading
+surface was accessed. Only the owner's Codex Git follow-up was used.
+**Authorized looks: 0. Consumed looks: 0.** Shared/project-wide documents and
+`SESSION_HANDOFF.md` stay frozen; this lane record is the sole branch handoff.

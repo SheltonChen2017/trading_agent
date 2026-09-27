@@ -128,7 +128,16 @@ between-capture vendor drift before any further capacity or period run.
 Section 198 implements the owner's subsequent matched historical comparison:
 fully AR-off, AR-on100%, and six actual ETFs, each under fixed 0/5-bps
 slippage. Section 199 executes those frozen sources on the owner's subsequent
-"begin testing now" direction before another review; R225 A1 has launched.
+"begin testing now" direction before another review: R227 and R230 A2 are
+valid ETF cost controls, while R225 exhausted its three attempts and three
+Mia diagnostics on a missing QCOM daily reference and the stock arms are held.
+Section 200 is Claude's independent review of `8570bbb..0eedef3` and Codex's
+local continuation `7ec16ba` (0 P0, 0 P1, 1 P2, 3 P3): the whole-package
+closure pin was red at the pushed head and is corrected by the test-only
+`c0f3e87`; the two ETF cost controls are valid; the stock arms remain blocked
+by the QCOM reference gap, which Codex's diagnostic 3 measured as absent in
+QuantConnect's daily, cached, current-slice, and exact-minute paths on
+2022-10-03; the analyst-revision question on 2021–2025 stays open.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -748,18 +757,22 @@ The provider-only drift measurement is complete. After that counter-review,
 the owner directed implementation of the matched historical study in section
 198: six frozen order-based sources, not a new capacity sweep. The owner then
 directed execution in section 199 before another review. Each candidate has
-at most three attempts; Codex uses focused checks, not a full suite. Claude
-reviews section 199 and the preceding implementation after the one combined
-push; Codex then counter-reviews that exact review. Standing research authorization
+at most three attempts; Codex uses focused checks, not a full suite. Section
+200 is Claude's independent review of the exact pushed range
+`8570bbb..0eedef3` with the test-only correction `c0f3e87`. The immediate
+next step is that Codex counter-reviews section 200 and the exact pushed
+range, then resolves the QCOM daily-reference gap on the QuantConnect side
+before any further stock-arm attempt. Standing research authorization
 remains; no new broker/live/paper or trading authority is inferred.
 Continuation in 199.9–199.10 re-accessed Mia and measured the stock blocker:
 QCOM's Oct3,2022 reference is absent in the requested exact RAW closing-minute
 paths, with a stale Sep30 cache correctly refused. No valid stock arm exists;
 R227/R230 ETF controls remain valid. Current look floor **232 / 173 / 34 / 646**.
 Claude's test-only closure correction `c0f3e87` is accepted in focused
-counter-review, but its full review/push is not yet confirmed. Preserve that
-concurrent review work and defer the final push; next investigate bounded
-same-SID session availability/mapping, not an identical performance retry.
+counter-review, and section 200 completes that review; the round's single
+push carries `c0f3e87`, `7ec16ba`, and the section-200 record commit. Next,
+investigate bounded same-SID session availability/mapping, not an identical
+performance retry.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -773,7 +786,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 195 (section 196). Section 182 records the owner's exact
+the pushed range through section 199 (section 200). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -813,7 +826,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–199
+findings, outcomes, and per-run accounting remain in numbered sections 1–200
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -2499,6 +2512,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-26 | Claude independent review of sections 181–195: tilt ladders, settlement-cash policy, recent-window family, coverage easing, and the AR ablations | `08c9eab` -> `22bdbce` -> this record commit | Section 196: forty-five commits `dcb7157..08c9eab` individually disposed (44 accepted, 1 accepted after correction, 0 rejected); zero QC calls, looks, evaluations, or cells | Pinned the relaxed launcher's frozen-manifest hash check (`22bdbce`, test-only, red with the check disabled, green restored); no production line changed | Standing lane selection in a byte-faithful export of the final code tree, focused delta files, fourteen mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 196.7 | 0 P0, 0 P1, 1 P2, 5 P3 (`ARV2R196-001` through `-006`); `-002` corrected; `-001` is the two-window disagreement about the AR overlay and the vintage hypothesis | Single push of the two Claude commits; Codex counter-reviews section 196 and measures the vendor vintage drift before any further capacity or period run |
 | 2026-09-26 | Codex counter-review and provider-only drift checkpoint | `8570bbb` -> `0b93fda` and final record commit | Counter-review both Claude commits; test/ledger hygiene; exact snapshot comparison | Qualified historical unmatched-control, near-PIT and causal overstatements without rewriting Claude's historical review. One fresh three-role capture; 9,105 common ratings, 3,446 earnings and 1,758 guidance unchanged, five added rating IDs. No input replacement or QC operation. | 164 focused passed; 1 portability target passed; final document checks below. No full suite; count report and both captures authenticated. Floor unchanged 222/163/34/644. | Interpretive qualifications corrected; causal AR/PIT question remains open. Real slippage, membership refresh and older unaccepted-result debt retained. No new P0/P1. | One same-lane push; Claude reviews section 197 and both commits, Codex counter-reviews before any next bounded research run. |
 | 2026-09-26 | Codex matched historical study implementation | `b352807` -> this commit | Owner-requested AR-off/on100/six-ETF comparison under two fixed cost conditions | Reuse historical input/order engine; independently frozen R225–R230, all-six 25% coverage, annual metrics and construction-only universe diagnostics, linked third bounded statistic. No QC launch or outcome read. | Focused projection/diagnostics/host/legacy checks and final document checks in section 198; no full suite. Counters unchanged 222/163/34/644. | In-round count/wrapper/finite-comparison gaps corrected before any network action; old sources and results immutable. Historical PIT/causal and full-price-tape limitations remain. | Make the same round's one combined push. Claude reviews sections 197–198 and all commits since `8570bbb`; Codex counter-reviews before frozen QC execution. |
+| 2026-09-27 | Claude independent review of sections 197–199 (including the 199.9–199.10 continuation): vendor-drift measurement, matched historical study, and its blocked execution | `0eedef3` -> `c0f3e87` -> `7ec16ba` (Codex, local) -> this record commit | Section 200: seven pushed commits `8570bbb..0eedef3` plus Codex's local `7ec16ba` individually disposed (7 accepted, 1 accepted after correction, 0 rejected); Codex's qualifications of section 196 accepted; zero QC or provider calls, looks, evaluations, or cells | Registered the unregistered Mia recovery reader in the whole-package closure pin (`c0f3e87`, test-only; 1 failed at the pushed head, 74 passed after); corrected the stale banner sentence; no production line changed | Standing lane selection in a byte-faithful export of the pushed head plus the closure file on the final tree, nine mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 200.7 | 0 P0, 0 P1, 1 P2, 3 P3 (`ARV2R200-001` through `-004`); `-001` corrected; `-003` names why the QCOM reference gap appears only now and records Codex's diagnostic-3 measurement | Single push of `c0f3e87`, `7ec16ba`, and this commit; Codex counter-reviews section 200, runs the whole closure file before every push, and resolves the QCOM data or mapping gap on the QC side before another stock attempt |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -28002,3 +28016,180 @@ Final continuation document validation: record integrity **13 passed in
 0.62 s**, `git diff --check` clean. Source correction `c0f3e87` remains
 local-only at this check; remote is still `0eedef3`. Commit only Codex-owned
 documentation/bookkeeping now, without pushing Claude's unfinished series.
+
+## 200. Independent Claude review of sections 197–199: the vendor-drift measurement, the matched historical study, and its blocked execution, 2026-09-27
+
+**Range reviewed:** `8570bbb..0eedef3`, seven pushed Codex commits, plus
+Codex's local continuation commit `7ec16ba` (sections 199.9–199.10, written
+while this review ran and deliberately left unpushed for the round's single
+push), each disposed in 200.1, plus the two Claude lane commits of this round
+(`c0f3e87`, test-only, and this record commit). The range holds Codex's counter-review
+of section 196, the provider-only vendor-drift measurement, the frozen
+six-arm matched historical study (R225–R230), and its owner-directed
+execution, which ended with two valid ETF cost controls and both stock arms
+blocked by a missing daily reference price.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint
+was called; every figure below is transcribed from sections 197–199 and the
+shared ledger.
+
+**Counter-review of section 196 accepted.** Codex's qualifications
+`ARV2CR197-001` and `-002` are correct: the recent window's inputs were
+also backfilled (on 2026-09-17, one to seven weeks after their events), so
+"near point-in-time" overstated the contrast with the multi-year backfill,
+and the sentence "no capacity above zero has beaten the zero-overlay
+control" was arithmetically wrong (R219 at 200% exceeds R220 by
++0.408 points). The substantive disagreement between the two windows and
+the open causal question stand; see 200.4.
+
+**Verdict.** Seven commits are accepted; one (`f9ee4e1`) is accepted after a
+test-only correction; none is rejected. **0 P0, 0 P1, 1 P2, 3 P3.** No
+production line changed in this round. The P2 is a red gate at the pushed
+head: the whole-package closure pin failed because the Mia recovery reader
+was never registered, the second recurrence of `ARV2R178-002`.
+
+### 200.1 Per-commit dispositions
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `0b93fda` | Vendor-drift measurement script and 38 offline cases; shared-ledger heading gate (`ARV2R196-003`); either-exception portability fix (`ARV2R196-004`); closure inventory | accepted | The script compares only single-variant common IDs by exact typed bytes, discloses ambiguous and repeated IDs, filters the date window offline, requires chronological non-overlapping captures, and publishes counts only. Trials `T3`/`T4` are red on its own tests. The portability change still requires refusal and proves no field was installed. |
+| `b352807` | Record: counter-review of section 196 and the measured drift | accepted | Record only; the qualifications are accepted above. |
+| `575b611` | Matched historical projection (three arms × two costs), diagnostics, study manifest, launcher dispatch, script, tests | accepted | AR-off/AR-on/ETF arms are rendered from the verified selection renderers; the 5-bps arm installs a constant slippage model by AST substitution; the diagnostics statistic is bounded at 8,192 bytes (`T8` red); the study comparison refuses differing vintage digests (`T6` red); the attempt bound stays at three (`T5` red). |
+| `f8b2830` | Bounded missing-reference diagnostics; original A1 receipts immutable; R227 valid | accepted | The diagnostic context hashes identities and carries no price; the original three A1 claims stay on the original manifest by exact dispatch. |
+| `e006757` | Exact same-session closing-minute reference fallback; signed-slippage MOO fee basis | accepted | The fallback admits only an already-subscribed RAW one-minute TradeBar with matching SID, non-fill-forward, same session, end time equal to the clock, and positive finite close, and requires every missing name to be repaired or refuses (`T1`, `T9` red); the fee basis applies the installed slippage with the order's sign (`T2` red). Its MOO-only fee guard failed in QC on LEAN's valuation callback, corrected in the successor. |
+| `f9ee4e1` | MARKET-valuation fee callback port from Mia; fourth-generation dispatch; read-only Mia recovery reader | accepted after correction | The valuation branch is pinned (`T7` red) and the reader has only `files/read`, `backtests/list`, and `backtests/read`. The new module `matched_mia_recovery.py` was not registered in the whole-package closure pin (`ARV2R200-001`), corrected in `c0f3e87`. |
+| `0eedef3` | Record: R230 A2 valid, R225 exhausted, Mia recovery failed, handoff | accepted | Record only; its round was pushed without a section-5 ledger row and with a stale banner sentence (`ARV2R200-002`, corrected here). |
+| `7ec16ba` | Record: owner-requested Mia continuation (two independently attributed metadata diagnostics), focused counter-review of `c0f3e87` (`ARV2CR199-001`), shared-ledger bookkeeping | accepted | Record and bookkeeping only; the two Mia launches are counted as development looks (230 → 232 shared, 171 → 173 development, 646 cells unchanged); diagnostic 3 measured the QCOM gap without admitting a stale mark; the push was correctly deferred to this round's single push. |
+
+### 200.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R200-001` | P2 | `f9ee4e1` | The whole-package closure pin `test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned` was red at the pushed head: `matched_mia_recovery.py` was absent from `_PINNED_QC_PACKAGE_SOURCES`, the host-only import surface, the I/O surface, and the reached tuple (1 failed, 73 passed in an export of `0eedef3`). Section 198.3's registration statement covered the three modules of `575b611`; the fourth module arrived two commits later, and every validation after it ran the closure file with `-k`, which deselects this test (`2 passed, 72 deselected`). This is the second recurrence of `ARV2R178-002`. | Corrected in `c0f3e87` (test-only): registered as a host-only adapter with its exact imports and no direct I/O; the boundary-edge and zero-I/O pins were already exact; 74 passed. Plan item 1. |
+| `ARV2R200-002` | P3 | `0eedef3` | The push that carried `f8b2830..0eedef3` has no section-5 ledger row (the last row ends at the `575b611` push), against the ledger's own rule, and the live banner still said "R225 A1 has launched" although the section records three failed attempts, a failed Mia recovery, and two valid ETF controls. The record gates do not check either. | Corrected here for the banner's live sentence and by this round's row; Codex may append its catch-up row. Plan item 3. |
+| `ARV2R200-003` | P3 | `575b611` (data path, documented) | The QCOM daily reference is missing on 2022-10-03 in every stock-arm attempt. QQQ and SOXX names enter the 2021–2025 census for the first time in this study: every earlier historical order run kept both sleeves in full own-ETF fallback (section 182.1), so no QQQ/SOXX constituent was ever held or priced on that window before. QCOM traded on 2022-10-03, so the absence is a property of QuantConnect's data delivery for that symbol and session, not of the market; the same hole was unreachable before the all-six 25% policy. Codex's continuation diagnostic 3 (199.9) then measured it directly: the cached QCOM bar is Friday 2022-09-30 15:59–16:00, Monday's current slice holds no same-SID TradeBar, and an exact one-minute RAW history request for 15:59–16:00 returns zero bars, which refutes the cache-overwrite hypothesis and confirms the gap in every requested path. | Documented; not a defect in the range. Plan item 2: a QC-side data or mapping check for that symbol and session before any further runtime rule. |
+| `ARV2R200-004` | P3 | `b352807` (interpretation, documented) | The drift measurement shows zero field edits across 9,105 shared rating IDs over nine days, which lowers the prior for short-horizon corrections but tests only one vintage channel. Retroactive coverage additions, deletions, and identity remaps, the channels that would bias a multi-year backfill, are untested because the comparison is restricted to IDs present in both captures. | Documented; `ARV2R196-001` stays open under this result, as section 197.3 already says. Plan item 4 names a direct test of the coverage channel. |
+
+### 200.3 Mechanical verification
+
+All trials ran in exports under the session scratchpad, never in the
+worktree, without `-x`, with `-rf`, and with failing test names captured.
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| Closure at pushed head | none (export of `0eedef3`) | **red**: 1 failed, 73 passed | `test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned` (`matched_mia_recovery.py` unregistered) |
+| Closure after `c0f3e87` | none (worktree) | green: 74 passed | — |
+| Closure pin at the final head `7ec16ba` | none (worktree; docs-only commit) | green: 1 passed | — |
+| `T1` | closing-minute repair: fill-forward refusal removed | red: 2 failed, 101 passed | `test_closing_minute_repair_refuses_every_stale_or_invalid_direction[fill_forward…]`, `[unknown…]` |
+| `T2` | fee basis: signed slippage no longer applied to the MOO fee price | red: 11 failed, 200 passed | `test_projected_fee_matches_full_moo_fill_with_installed_slippage[…]` |
+| `T3` | drift: ambiguous IDs admitted into the comparable set | red: 2 failed, 36 passed | `test_ambiguous_ids_repeats_and_typed_id_additions_are_disclosed_not_selected`, `test_empty_or_only_ambiguous_comparison_has_no_invented_percentage` |
+| `T4` | drift: last_updated-only changes counted as semantic | red: 1 failed, 37 passed | `test_ambiguous_ids_repeats_and_typed_id_additions_are_disclosed_not_selected` |
+| `T5` | launcher: attempt bound widened to four | red: 2 failed, 139 passed | `test_attempt_bound[4]`, `test_matched_family_cannot_change_three_attempt_bound[4]` |
+| `T6` | study comparison: reference-data vintage check removed | red: 2 failed, 106 passed | `test_comparison_refuses_nonmatched_or_invalid_evidence[membership_digest]`, `[etf_digest]` |
+| `T7` | fee basis: MARKET valuation branch removed | red: 12 failed, 91 passed | `test_projected_fee_accepts_market_valuation_without_slippage_or_legacy_dispatch[…]` |
+| `T8` | diagnostics: statistic byte bound raised to 8,193 | red: 1 failed, 38 passed | `test_transport_bound_inclusive_without_altering_canonical_content` |
+| `T9` | closing-minute repair: partial repair accepted | red: 27 failed, 76 passed | `test_projected_missing_reference_refuses_with_truthful_bounded_context[…]` |
+
+Static checks: the four study manifests are bound by SHA-256 constants and
+exact per-attempt dispatch keeps the spent R225 A1/A2/A3 and R230 A1 on
+their historical manifests; the matched-study family refuses any package
+or activation other than the reviewed historical inputs; the Mia recovery
+reader has no create, upload, compile, or launch endpoint; the fee model's
+MARKET branch is reachable only through LEAN's valuation callback and the
+executor remains MOO-only. The nine new, modified, and adjacent test files of the range
+passed **513** tests in an export of `0eedef3` with the closure pin as the
+only failure.
+
+### 200.4 Results, read on the record's own terms
+
+- **Reproducibility.** R227, the zero-slippage six-ETF basket under the
+  current construction, returned exactly R-183's +106.334773436208% on the
+  same window with the same costs. Two independent source generations
+  reproduced the same account path to the last digit; this is the
+  strongest execution-path check the lane has produced.
+- **Cost sensitivity.** R230 A2 shows five basis points of adverse open
+  fill costing the ETF basket 0.576 points of cumulative return. The stock
+  arms turn over four to five times as much notional (their modeled fees
+  run $35,000–42,000 against $8,000 for the basket), so the same slippage
+  would cost them roughly two to three points. That leaves the historical
+  stock-construction edge over the basket (about 17 points for R-182)
+  intact, but it is the same order as the one-to-three-point steps of the
+  capacity ladder, which are therefore not distinguishable from cost noise
+  at plausible slippage.
+- **The stock arms are blocked, so the question the study was built to
+  answer is still open.** R225 spent three attempts and one Mia recovery
+  on the same missing QCOM daily reference; R226 has two slots, R228 and
+  R229 three each. No AR-on-minus-off spread exists on 2021–2025 under the
+  current construction, and nothing in this round changes the recent-window
+  result (the signal contributes nothing at any layer there).
+- **Drift.** Zero field edits over nine days across 9,105 rating IDs, 3,446
+  earnings IDs, and 1,758 guidance IDs. The measurement is sound for what
+  it measures; it does not reach the coverage and identity channels.
+- **Accounting.** 230 shared looks, 171 development evaluations, 34
+  infrastructure looks, 646 authenticated cells; the shared ledger's
+  entries and transitions reconcile with sections 197–199.
+
+### 200.5 Improvement plan
+
+1. **Run the whole closure file before every push** (`ARV2R200-001`).
+   The `-k` subsets that select the smuggling and attribute-call cases
+   deselect the whole-package pin; that pin has now caught two unregistered
+   modules only in Claude review. Add it to the focused selection whenever
+   `research/analyst_revisions_v2_qc/` gains a file.
+2. **Resolve the QCOM reference on the QC side before another stock
+   attempt** (`ARV2R200-003`, `ARV2D199-002`). Two value-free checks: (a)
+   whether QuantConnect's daily RAW data for QCOM has a bar for
+   2022-10-03 at all (data explorer or a one-symbol history probe outside
+   the study's call census); (b) the four timestamps of the cached
+   one-minute bar at the 16:00 event, which Codex already plans. If (a) is
+   a genuine data hole, the clean prospective policy is one bounded
+   one-minute History request for the exact 16:00 bar of each missing
+   name, counted in the call census, rather than a cache read whose timing
+   is LEAN-version dependent. Do not loosen the freshness rule.
+3. **Ledger row and banner on every push** (`ARV2R200-002`).
+4. **Test the coverage channel of the vintage question** (`ARV2R200-004`).
+   Re-capture one older window that the 2026-09-17 archive already holds
+   (for example 2024-01-01 to 2024-03-31) and compare the per-ticker sets
+   of rating IDs, not only shared IDs: added or absent IDs at a two-year
+   horizon are the retroactive-coverage signal that a nine-day shared-ID
+   comparison cannot see. Provider-only, zero looks.
+5. **Report cost-adjusted spreads.** When R228/R229 run, state the
+   AR-on-minus-off spread at both cost levels beside the estimate in 200.4
+   so the reader sees whether the effect survives plausible slippage.
+
+### 200.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the nine-day drift result does not close it; plan item 4. |
+| `ARV2D199-002` | P2 | Open; stock RAW reference incompleteness; plan item 2. |
+| `ARV2CR187-001`, `-003` | P2 | Open as recorded. |
+| `ARV2D188-001`, `ARV2CR185-001` | P2 | Open as recorded. |
+| `ARV2D199-003` | P3 | Documented by Codex (inadvertent panel exposure). |
+| `ARV2R196-005`, `-006` | P3 | Documented; slippage sensitivity now exists for the ETF arm only. |
+| `ARV2R196-003`, `-004`, `ARV2D190-002` | P3 | Closed by `0b93fda`. |
+| `ARV2CR199-001` | P3 | Codex's counter-review record of the same closure omission; closed by `c0f3e87`. |
+| `ARV2R200-003`, `-004` | P3 | Documented this round. |
+
+### 200.7 Validation
+
+Run on the exact final tree of this round (`c0f3e87`, `7ec16ba`, and this
+record commit) with `~/.venvs/trading_agent-py313/bin/python` (3.13.15):
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, run in a byte-faithful export of the pushed head `0eedef3` with `artifacts/analyst_revisions_v2` copied in (the final code tree differs from it only by the closure test file of `c0f3e87`; `7ec16ba` and this commit are record-only) | **2 failed, 8659 passed, 11 skipped, 35 warnings in 7318.84s (2:01:58).** Exactly two failures: the known export artifact `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` (shells to `git check-attr`; no `.git` in an export), re-run green below, and the closure pin `test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned`, which is `ARV2R200-001` and is green on the final tree below. The skips are the standing host-capability skips. |
+| Export failure re-run in the real checkout | `test_dataset_and_import_firewall.py` | 173 passed |
+| Closure file on the final tree | `test_qc_object_store_read_contract.py` in the worktree after `c0f3e87` | 74 passed (1 failed, 73 passed at `0eedef3`) |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` in the worktree | 82 passed |
+| New, modified, and adjacent test files of the range | nine files in the export of `0eedef3` | 513 passed, 1 failed (the closure pin above), 3 skipped (no mainline ref) |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this record commit | clean; three commits ahead of `0eedef3` (`c0f3e87`, `7ec16ba`, this commit), published in this round's single push |
+
+Not exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run; every figure is transcribed from sections 197–199 and the
+shared ledger; the closing-minute fallback and the fee callback are attested
+in the cloud only by Codex's receipts and Mia's diagnostics, not by any run
+of this round.

@@ -28739,3 +28739,50 @@ The 17-file source closure and distinct role/profile/schema/policy identities
 are pinned for each arm. Prelaunch look floor **244 shared / 185 development /
 34 infrastructure / 657 accepted exploratory cells**. No new QC launch or
 outcome read had occurred when this prelaunch record was written.
+
+R242 A1 AR-off uploaded and read back the exact source, compiled, and created
+private project **37065880**, backtest
+`c331f640f1a14299af58f0f06a8aecd3`. R243 A1 AR-on80 likewise created
+private project **37065881**, backtest
+`db969eb51df7b67c4869f57d84f77868`. Both were `In Progress...` at the
+latest status-only check; no outcome read had occurred. R244 A1 AR-on120
+created private project **37065932** and R245 A1 AR-on200 created private
+project **37065931**. Both uploaded/read back exact 17-file source and
+compiled, but `backtests/create` refused before returning a launch receipt.
+Their first QC attempt slots are **spent**, regardless of whether the likely
+cause was account capacity; that cause is unconfirmed. A fresh
+statistics-free `backtests/list` count was zero for each exact project, so
+there was no known remote run at that check. Neither R244 nor R245 has a
+result cell. All four attempts count conservatively: floor **248 shared /
+189 development / 34 infrastructure / 657 cells**. Do not create a new
+candidate to disguise these attempts or infer a return from QC compile.
+
+R242/R243 reached `Completed.` and their respective sole receipt-bound
+custom-statistic reads passed `run_valid=true`, 261 submitted and 261
+completed weekly rebalances, and zero invalid/canceled orders. R242 AR-off
+returned **+142.98445011517648%** after modeled ten-bps/side fees, with
+**−21.766037476727435%** maximum drawdown and 11,223 filled orders. R243
+AR-on80 returned **+155.5564211621942%**, **−21.79467853235618%** maximum
+drawdown and 10,255 filled orders. The new AR-off arm admitted REMX on **125
+of 261** decisions (375 selected-name slots); its 10%-floor/five-name
+counterpart R238 admitted it on none. The AR-on80 arm had the same 125 valid
+REMX coverage decisions but **zero REMX stock selections**, all 125 falling
+back under the three-positive-score entry rule. SOXX's AR-on selected-name
+slot sum rose from R239's 1,947 to R243's 2,020. Thus the construction
+changed, but these early outcomes do not show an analyst-based REMX entry.
+The exact four-arm comparison remains pending R244/R245. Two authenticated
+exploratory cells raise the floor to **248 shared / 189 development / 34
+infrastructure / 659 cells**; no additional launch/look was spent by the
+R242/R243 reads.
+
+Before any R244/R245 retry, an exact A2-only, same-project pre-create
+recovery has been implemented and tested. It is allowlisted solely for
+R244/project **37065932** and R245/project **37065931**, with each frozen
+manifest and projection digest. It requires the original A1 claim and
+project receipt, no A1 launch/terminal/result receipt, exact private idle
+cloud source, and two fresh statistics-free zero-run inventories (one before
+claiming A2 and one immediately before create). It never reuploads source or
+creates a replacement project; an unexpected late A1 run refuses A2. The
+existing R237 exception remains independently covered. Focused retry tests:
+**23 passed**. This preparation itself spends no research look and asserts
+no A2 outcome.

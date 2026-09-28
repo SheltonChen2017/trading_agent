@@ -61,6 +61,23 @@ _GEOMETRY = ("2025-08-01", "2026-09-25", 290, 61)
 _TICKERS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
 MAXIMUM_ARTIFACT_BYTES = 128 * 1024
 _R209_RECOVERY_IDENTITY = (36982551, "1e2b8175fa026c00c69f601c855e64fc")
+# Only these spent A1 claims may recover after upload/compile but before a
+# backtest receipt. A2 reuses the exact project and source; this is not a
+# general retry of an ambiguous create response.
+_PRECREATE_A2_RECOVERY = {
+    ("qcom_exclusion_tilt", "R237"): (
+        "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4",
+        "44b7e0dfcd31ecb1698e0b46196ebe4de80ca036d9273516b05f35dd65241f25",
+        37060477),
+    ("qcom_exclusion_three_name", "R244"): (
+        "6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef",
+        "f72bc3f00065d259af10480ce7c2a99f55826da8ab419b50aab6529c7194b10c",
+        37065932),
+    ("qcom_exclusion_three_name", "R245"): (
+        "6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef",
+        "954aeea6c375659d7dfd6d8357cde1a70623287f4cdc7581f4e3a4070a650e35",
+        37065931),
+}
 
 
 class RelaxedQcSubmissionError(ValueError):
@@ -510,28 +527,32 @@ def launch(plan, projection, api):
     common._client(api)
     if _path(plan, "claim").exists():
         _fail("relaxed attempt is already consumed")
-    # R237 A1 reached backtests/create after a successful upload/compile, but
-    # transport failed before a launch receipt. Its exact project had no remote
-    # backtests. Permit only A2 in that same project, after two fresh empty
-    # remote inventories; never turn this into a generic receipt-less retry.
+    # Only the exact spent pre-create A1 claims below can be recovered. An
+    # empty remote inventory must be observed both before claiming A2 and
+    # immediately before create; any delayed A1 run makes A2 refuse.
     precreate_recovery = False
+    precreate_project_id = None
     for slot in range(1, plan.attempt):
         terminal_path = _path(plan, "terminal", attempt=slot)
-        if (not terminal_path.exists() and plan.family == "qcom_exclusion_tilt"
-                and plan.candidate_id == "R237" and plan.attempt == 2
-                and slot == 1 and row["projection_sha256"] ==
-                "44b7e0dfcd31ecb1698e0b46196ebe4de80ca036d9273516b05f35dd65241f25"
-                and FROZEN_QCOM_EXCLUSION_TILT_MANIFEST_SHA256 ==
-                "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4"):
+        recovery = _PRECREATE_A2_RECOVERY.get((plan.family, plan.candidate_id))
+        if (not terminal_path.exists() and plan.attempt == 2 and slot == 1
+                and recovery is not None):
+            manifest_sha256, projection_sha256, project_id = recovery
+            if (identity["manifest_sha256"] != manifest_sha256
+                    or _plan_manifest_sha256(plan) != manifest_sha256
+                    or identity["projection_sha256"] != projection_sha256
+                    or row["projection_sha256"] != projection_sha256):
+                _fail("pre-create frozen manifest or projection changed")
             prior_plan = dataclasses.replace(plan, attempt=1)
             if (common._read(_path(prior_plan, "claim")) != preview(prior_plan, projection)
                     or any(_path(prior_plan, name).exists() for name in
                         ("launch", "terminal", "read-claim", "raw-custom", "result"))
                     or common._read(_path(prior_plan, "project")) != {
-                        "candidate_id": "R237", "project_id": 37060477,
+                        "candidate_id": plan.candidate_id, "project_id": project_id,
                         "project_name": row["project_name"]}):
-                _fail("R237 pre-create predecessor identity changed")
+                _fail("pre-create predecessor identity changed")
             precreate_recovery = True
+            precreate_project_id = project_id
             continue
         terminal = common._read(terminal_path)
         if (terminal.get("status") not in _TERMINAL
@@ -552,10 +573,10 @@ def launch(plan, projection, api):
             _fail("relaxed retry project receipt changed")
         _project(plan, api, project_id)
         if precreate_recovery:
-            if project_id != 37060477:
-                _fail("R237 pre-create project changed")
+            if type(project_id) is not int or project_id != precreate_project_id:
+                _fail("pre-create project changed")
             _files(plan, api, project_id, identity)
-            _require_empty_r237_precreate_inventory(api, project_id)
+            _require_empty_precreate_inventory(api, project_id, precreate_project_id)
         else:
             _require_retry_inventory(plan, api, project_id)
     common._write(_path(plan, "claim"), identity)  # Atomic O_EXCL before mutation.
@@ -604,7 +625,7 @@ def launch(plan, projection, api):
         _fail("relaxed compile failed; attempt consumed")
     name = f'{row["backtest_name"]} A{plan.attempt}'
     if precreate_recovery:
-        _require_empty_r237_precreate_inventory(api, project_id)
+        _require_empty_precreate_inventory(api, project_id, precreate_project_id)
     value = common._post(api, "backtests/create", {"projectId": project_id,
         "compileId": compile_id, "backtestName": name}).get("backtest")
     if (type(value) is not dict or value.get("projectId") != project_id
@@ -618,16 +639,17 @@ def launch(plan, projection, api):
     return receipt
 
 
-def _require_empty_r237_precreate_inventory(api, project_id):
-    """Refuse a delayed or hidden A1 run before R237's one-off A2 recovery."""
-    if type(project_id) is not int or project_id != 37060477:
-        _fail("R237 pre-create project identity changed")
+def _require_empty_precreate_inventory(api, project_id, expected_project_id):
+    """Refuse any delayed or hidden A1 run in an exact A2 recovery project."""
+    if (type(project_id) is not int or type(expected_project_id) is not int
+            or project_id != expected_project_id):
+        _fail("pre-create project identity changed")
     listing = common._post(api, "backtests/list", {"projectId": project_id,
         "includeStatistics": False})
     if (type(listing.get("count")) is not int or listing["count"] != 0
             or type(listing.get("backtests")) is not list
             or listing["backtests"] != []):
-        _fail("R237 pre-create retry has an ambiguous remote run")
+        _fail("pre-create retry has an ambiguous remote run")
 
 
 def _require_retry_inventory(plan, api, project_id):

@@ -5807,3 +5807,40 @@ research, not confirmation or trading authority. Prelaunch floor remains
 **244 shared research looks / 185 ARV2 development evaluations / 34
 infrastructure looks / 657 accepted exploratory cells**; this entry itself
 spends **zero** looks and records no result.
+
+R-242 A1 AR-off exact 17-file source readback/compile succeeded; private QC
+project **37065880**, backtest `c331f640f1a14299af58f0f06a8aecd3`.
+R-243 A1 AR-on80 likewise launched in private project **37065881**,
+backtest `db969eb51df7b67c4869f57d84f77868`. Both reached `In Progress...`
+at a status-only check; no result read yet. R-244 A1 AR-on120 exact source
+uploaded/compiled in project **37065932**, and R-245 A1 AR-on200 in project
+**37065931**, but each `backtests/create` call failed before a launch receipt.
+A fresh statistics-free remote inventory counted **zero** runs in each of
+these two projects at that check. These failures consumed A1; the cause is
+not established and no outcome or cell exists for them. Four conservative
+attempt looks raise the floor to **248 shared / 189 ARV2 development / 34
+infrastructure / 657 accepted cells**. No A2 is claimed or attempted by
+this entry.
+
+R-242/R-243 terminal `Completed.` and each sole receipt-bound aggregate read
+passed `run_valid=true`, with 261 submitted/completed weekly rebalances and
+zero invalid/canceled orders. R-242 AR-off: **+142.98445011517648%**
+cumulative return after modeled fees, **−21.766037476727435%** maximum
+drawdown, 11,223 filled orders. R-243 AR-on80: **+155.5564211621942%**,
+**−21.79467853235618%**, 10,255 filled orders. Three-name admission gave
+R-242 REMX valid coverage on **125/261** decisions and 375 selected-name
+slots, versus zero valid REMX decisions in R-238. R-243 had those same 125
+coverage-valid REMX decisions but **zero direct REMX stocks**: all 125 failed
+the active three-positive-score entry floor. SOXX selected-name slots rose
+from R-239's 1,947 to R-243's 2,020. These are two valid exploratory cells,
+not a four-arm comparison or a REMX analyst-signal result. No new launch/look
+from the reads; floor **248 / 189 / 34 / 659**.
+
+Before any R-244/R-245 A2 launch, Codex froze an exact, same-project
+pre-create recovery: only projects **37065932** and **37065931**, respectively,
+with pinned source identities, unchanged private/idle project and cloud files,
+no local A1 launch/terminal/result, and two fresh statistics-free remote
+inventories showing zero runs. A late A1 run refuses A2. It does not create a
+new project or reupload source. The R-237 exception remains separately
+tested; focused recovery tests **23 passed**. This code preparation spends
+**zero** looks and produces no result. Floor remains **248 / 189 / 34 / 659**.

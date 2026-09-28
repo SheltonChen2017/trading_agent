@@ -5,7 +5,10 @@ THE SECTION-64 CODEX RECORD QUALIFICATIONS FOR ITS SOLE FOLLOW-ON COMMIT
 `985743e`. THE OWNER'S NARROW SECTION-65 DECISION NOW RESOLVES THE HORIZON
 SEMANTICS: NEXT-RELEASE HOLDING FOR EVENTUAL ORDER-BASED P&L AND A DISTINCT
 FIXED 20-SESSION STOCK-EVALUATION DIAGNOSTIC. IT DOES NOT APPROVE SECTION
-62'S PROPOSED SELECTION STATISTIC OR THE SI-5 PROTOCOL. THE POWER/LOOK AND
+62'S PROPOSED SELECTION STATISTIC OR THE SI-5 PROTOCOL. SECTION 66 RECORDS
+THE OWNER'S LATER INSTRUCTION TO BUILD THROUGH MULTIPLE BOUNDED LANE STEPS
+BEFORE CLAUDE'S WHOLE-LANE REVIEW, WITH INTERNAL OWNER DECISIONS DELEGATED
+TO CODEX AND LOGGED; EXTERNAL ENTITLEMENT/COVERAGE REMAINS UNPROVEN. THE POWER/LOOK AND
 ROLE-DEPENDENCE ADVISORIES `SI-CR13-002`/`003` REMAIN OPEN; THE SHARED,
 OUT-OF-LANE P2 `SI-CR5-005`/`SI-CCR16-007` REMAINS OPEN. CLAUDE REPORTED
 759 PASSED FOR THE FIFTEEN-FILE SHORT INTEREST LANE; CODEX DID NOT RERUN
@@ -19,8 +22,9 @@ Local-only Codex counter-review of Claude's sole follow-on commit
 `985743e77212c0313121f1ae1754e03dd452c374` is in section 64. It does
 not freeze the SI-5 protocol, authorize a data/outcome/QC step, or constitute
 the lane's next combined push. Section 65 records the subsequent narrow owner
-decision; both updates remain local-only pending the next authorized combined
-round.
+decision. Section 66 supersedes the earlier review cadence for the current
+owner-directed build; all updates remain local-only pending one complete,
+reviewable lane push.
 
 Branch: `codex/strategy-short-interest`
 
@@ -9173,3 +9177,71 @@ made while the next milestone remains owner-gated. The one-shot Claude-push
 monitor stays paused. The next action is to obtain an owner-frozen SI-5
 specification and the independent data/look/QC permissions, not to substitute
 an empirical or forward-looking milestone.
+
+## 66. Owner-directed accelerated lane build and delegated SI-5 design — 2026-09-28
+
+### 66.1 Workflow authorization and its boundary
+
+The owner now directs Codex to build toward Short Interest lane completion
+before Claude's **whole-lane** independent review, preauthorizes steps that
+call for owner approval, and asks Codex to exercise best judgment for owner
+decisions, with a complete authorization/decision list at project completion.
+This is a later explicit exception to the usual one-milestone/Claude-review
+cadence for this lane. It does **not** change the single existing physical
+worktree or `codex/strategy-short-interest` branch, the one-final-push rule,
+commit-by-commit disposition of prior Claude commits, P0–P3 ledger, material
+red/green proof, or the freeze on shared/project-wide documents. Codex may
+make multiple bounded **lane-owned** offline implementation commits, then
+offer one exact pushed snapshot for Claude's independent whole-lane review.
+
+The blanket delegation is authorization to choose and implement internal
+research/software terms, **not evidence** that a historical SI feed exists,
+that its vendor permits retention or QC processing, that PIT prices and
+delisted names cover the target dates, or that a Short Interest QC project
+and datasets are available. Under `CLAUDE.md` and the shared workflow, an
+external action still needs an exact source/account/project, representation,
+mode and scope; funded broker, paper/live, deployment, capital, order and
+trading actions are not part of this lane build. No credential, provider,
+FINRA/SEC, licensed row, actual price, outcome, sealed holdout, QC upload,
+processing, compile, job or backtest is accessed by this instruction alone.
+No synthetic fixture is market evidence. **Authorized and consumed real
+outcome looks remain 0/0.**
+
+This section begins the running list the owner requested. A final consolidated
+authorization and decision inventory must be produced when the project is
+actually complete; recording it here does not claim completion.
+
+| ID | Type | Decision or authorization recorded now | Limit / verification status |
+|---|---|---|---|
+| `SI-AUTH-20260928-01` | Owner authorization | Continue through multiple bounded Short Interest lane-owned steps before Claude reviews the whole pushed lane snapshot; retain one final push from this worktree. | No shared-file or side-branch change. No partial push while the lane build is blocked. |
+| `SI-AUTH-20260928-02` | Owner delegation | Codex may decide internal SI-5 research-design and offline implementation choices on the owner's behalf, recording each choice. | Does not supply vendor rights, actual PIT coverage, a QC project, a research outcome look or any trading authority. |
+| `SI-DEC-20260928-01` | Codex delegated choice | Treat the governing PDF's stock-first 20-session high-versus-low pressure hypothesis as **one** prospective confirmatory stock contrast, not two independent pressure and covering confirmations. The covering tail is the lower-pressure tail of the same S1 ranking. | This avoids double-counting mathematical complements. No alpha is yet permanently allocated or outcome read. |
+| `SI-DEC-20260928-02` | Codex delegated choice | Use the blueprint's stock `R(20)` open-to-open high-versus-low comparison as the prospective primary statistic; report PIT sector-relative results as a separately labelled diagnostic, not as a second primary test. | This supersedes Codex's earlier suggested sector-relative primary default after re-reading blueprint physical pages 8, 25–28. Exact corporate-action/terminal-value and release-aggregation rules must be made executable before outcomes. |
+| `SI-DEC-20260928-03` | Codex delegated choice | Retain all four 20/60/120/252 **eligibility** candidates and predeclare comparison on the common release/security intersection, with each authentic full cohort reported separately. No replenishment, missing-window substitution, or post-result relaxation. | An empty/underfilled common intersection means no lookback winner, not permission to choose a convenient subset. The actual coverage and statistical power remain unknown. |
+| `SI-DEC-20260928-04` | Codex delegated choice | Do not spend or allocate the permanent `1/80` lane alpha before a prospective power/minimum-detectable-effect assessment and exact development/validation dates are fixed from rights-cleared metadata without looking at outcomes. | A single prospective cell is a design intention, not a registered permanent look; current SI-0M zero-authority gate remains unchanged. |
+| `SI-DEC-20260928-05` | Codex delegated choice | Keep eventual unlevered long/avoidance stock-order P&L, rebalanced after each public release at the next permitted open and held to the next release, distinct from the 20-session stock diagnostic. Retain frozen 10 bps per side primary cost and 0/5/20 bps sensitivities. | No short sale, leverage, inverse product, seed conversion, production rank or execution authority. Exact fill, dividend, split, suspension and delisting behavior remains to be specified and tested offline. |
+
+### 66.2 Bounded build order and non-substitutable evidence gate
+
+Codex first builds a content-addressed, synthetic-only SI-5 design/validation
+boundary and dangerous-direction tests. It then builds only the offline
+components whose behavior can be verified without actual market rows. The
+next **factual** gate is to name and verify the historical SI and PIT market
+sources, rights (including any QC representation), publication/revision and
+identifier histories, actual 20/60/120/252 coverage and delisted/terminal
+semantics. These facts cannot be chosen by judgment. Exact dates, power and
+permanent looks are frozen only after rights-cleared metadata and before
+any outcome access. A genuine stock result then controls whether SI-4 ETF
+work can proceed: a valid null closes the canonical family; neither ETF nor
+QC work may rescue it. SI-6/7/8 and any operational promotion remain later
+conditional steps, not entitlements from this accelerated instruction.
+
+At this section's start, local `HEAD` is
+`0216bc3e474e41128b21672c46397dc4cbe4e6ac`, clean and two commits ahead
+of the unchanged lane remote
+`985743e77212c0313121f1ae1754e03dd452c374`. Those two earlier commits
+remain local-only. Codex has requested the owner's factual source/product
+names and license scope without requesting credentials; no response or source
+access is presumed. On the decision-only text, active-document plus Short
+Interest import-boundary checks were **78 passed in 1.30s**; no full lane or
+repository suite was run. No push is made by this decision record alone.

@@ -16,6 +16,7 @@ import os
 from pathlib import Path
 import re
 import stat
+import zlib
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying.sec_bulk_snapshot import (
@@ -293,7 +294,9 @@ def _master_plain(raw: bytes) -> bytes:
             plain = reader.read(MAX_MASTER_INDEX_BYTES + 1)
             if len(plain) > MAX_MASTER_INDEX_BYTES or reader.read(1):
                 _refuse("master.gz exceeds its decoded budget")
-    except (OSError, EOFError, ValueError) as exc:
+    # zlib.error (a corrupt deflate stream) is not an OSError; without it a
+    # malformed master escaped as an untyped crash with no refusal record.
+    except (OSError, EOFError, ValueError, zlib.error) as exc:
         if isinstance(exc, SecCompletePilotAdapterError):
             raise
         raise SecCompletePilotAdapterError("REFUSED: master.gz is malformed") from exc

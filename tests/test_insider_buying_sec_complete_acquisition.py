@@ -482,3 +482,36 @@ def test_fresh_runner_import_does_not_invoke_sec_transport():
                             cwd=Path(__file__).resolve().parents[1],
                             capture_output=True, text=True, check=True, timeout=60)
     assert result.stdout.strip() == runner.COMPLETE_ACQUISITION_VERSION
+
+
+# Section 107 (Claude review): regressions for IBSECCOM-CR02 and
+# IBSECCOM-CR01 at the runner boundary. A malformed source must end in a
+# written report with a recorded refusal, never an untyped crash that leaves
+# the root without one.
+def test_corrupt_master_deflate_stream_is_a_recorded_refusal(monkeypatch, tmp_path):
+    images = _images()
+    first = runner._MASTER_URLS["2022Q4"]
+    # 0xFF opens the deflate stream with the reserved block type 3, which
+    # zlib rejects with zlib.error rather than an OSError.
+    images[first] = images[first][:10] + b"\xff" + images[first][11:]
+    calls = []
+    _, payload = _run(monkeypatch, tmp_path, _transport(images, calls))
+    assert calls == [first]
+    assert payload["master_indexes"][0]["status"] == "refused"
+    assert "master.gz is malformed" in payload["halted_reason"]
+    assert payload["complete_sample_acquired"] is False
+    assert all(row["status"] == "not_attempted" for row in payload["filings"])
+
+
+def test_document_header_without_sequence_is_a_recorded_refusal(monkeypatch, tmp_path):
+    images = _images()
+    first_txt = runner._HOST_PREFIX + (
+        f"edgar/data/123456/{_candidates()[0].accession_number}.txt"
+    )
+    images[first_txt] = images[first_txt].replace(b"<SEQUENCE>1\n", b"")
+    calls = []
+    _, payload = _run(monkeypatch, tmp_path, _transport(images, calls))
+    assert calls == [*runner._MASTER_URLS.values(), first_txt]
+    assert payload["filings"][0]["status"] == "refused"
+    assert "lacks type, sequence, or filename" in payload["halted_reason"]
+    assert all(row["status"] == "not_attempted" for row in payload["filings"][1:])

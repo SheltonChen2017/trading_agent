@@ -343,3 +343,22 @@ def test_document_cap_refuses_extra_non_xml_attachment(monkeypatch):
     monkeypatch.setattr(module, "MAX_COMPLETE_DOCUMENTS", 1)
     with pytest.raises(SecCompleteSubmissionError, match="too many documents"):
         _project(_complete(document=_document(_xml()) + extra))
+
+
+# Section 107 (Claude review): regression for IBSECCOM-CR01. A document
+# header that carries DESCRIPTION but lacks a required field must be a typed
+# refusal, not a KeyError.
+@pytest.mark.parametrize("missing", ["TYPE", "SEQUENCE", "FILENAME"])
+def test_document_header_missing_required_field_is_a_typed_refusal(missing):
+    fields = {
+        "TYPE": b"<TYPE>4\n",
+        "SEQUENCE": b"<SEQUENCE>1\n",
+        "FILENAME": b"<FILENAME>ownership.xml\n",
+    }
+    document = (b"<DOCUMENT>\n"
+                + b"".join(line for name, line in fields.items() if name != missing)
+                + b"<DESCRIPTION>Invented ownership document\n<TEXT>\n"
+                + _xml() + b"</TEXT>\n</DOCUMENT>\n")
+    with pytest.raises(SecCompleteSubmissionError,
+                       match="lacks type, sequence, or filename"):
+        _project(_complete(document=document))

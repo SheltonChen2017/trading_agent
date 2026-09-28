@@ -278,3 +278,10 @@ def test_receipt_rechecks_caller_mutation(monkeypatch, tmp_path):
     object.__setattr__(receipt, "projections", receipt.projections[:-1])
     with pytest.raises(adapter.SecCompletePilotAdapterError, match="partial|binding"):
         receipt.to_payload()
+
+
+# Section 107 (Claude review): replay-side regression for IBSECCOM-CR02.
+def test_corrupt_master_deflate_stream_is_a_typed_refusal():
+    good = gzip.compress(_index(_candidates(), "2022Q4"), mtime=0)
+    with pytest.raises(adapter.SecCompletePilotAdapterError, match="master.gz is malformed"):
+        adapter._master_plain(good[:10] + b"\xff" + good[11:])

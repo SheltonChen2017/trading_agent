@@ -20,6 +20,7 @@ import stat
 import subprocess
 import time
 from typing import Callable
+import zlib
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying.sec_bulk_snapshot import _read_regular_bytes
@@ -189,7 +190,9 @@ def _decompress_master(raw: bytes) -> bytes:
             body = reader.read(MAX_MASTER_INDEX_BYTES + 1)
             if len(body) > MAX_MASTER_INDEX_BYTES or reader.read(1):
                 raise SecCompleteAcquisitionError("REFUSED: master.gz expands beyond 64 MiB")
-    except (OSError, EOFError, ValueError) as exc:
+    # zlib.error (a corrupt deflate stream) is not an OSError; without it a
+    # malformed master escaped as an untyped crash with no refusal record.
+    except (OSError, EOFError, ValueError, zlib.error) as exc:
         if isinstance(exc, SecCompleteAcquisitionError):
             raise
         raise SecCompleteAcquisitionError("REFUSED: master.gz is malformed or truncated") from exc

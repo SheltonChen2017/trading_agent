@@ -431,7 +431,9 @@ def _document(raw_lines: list[bytes], pieces: list[bytes],
                 or match.group(1) in metadata):
             _refuse("document header is malformed or ambiguous")
         metadata[match.group(1)] = match.group(2)
-    if set(metadata) < {"TYPE", "SEQUENCE", "FILENAME"}:
+    # Superset test: a proper-subset comparison let a header carrying
+    # DESCRIPTION but lacking a required field escape as KeyError.
+    if not {"TYPE", "SEQUENCE", "FILENAME"} <= set(metadata):
         _refuse("document header lacks type, sequence, or filename")
     if re.fullmatch(r"[1-9][0-9]{0,5}", metadata["SEQUENCE"]) is None:
         _refuse("document sequence is invalid")

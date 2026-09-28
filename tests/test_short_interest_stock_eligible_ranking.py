@@ -4,6 +4,9 @@ from __future__ import annotations
 from dataclasses import replace
 from fractions import Fraction
 from functools import lru_cache
+from hashlib import sha256
+from pathlib import Path
+import subprocess
 
 import pytest
 
@@ -394,6 +397,15 @@ def test_invalid_or_forged_binding_refuses_before_ranking():
         build_stock_eligible_ranking_inventory(forged)
 
 
+def test_postconstruction_ranking_source_hash_tampering_refuses():
+    inventory = StockEligibleRankingInventory(
+        build_stock_population_binding_inventory(_multi_security_population(1))
+    )
+    object.__setattr__(inventory, "_source_binding_sha256", "00" * 32)
+    with pytest.raises(StockEligibleRankingError, match="ranking source differs"):
+        inventory.to_payload()
+
+
 def test_returned_ranking_payload_is_detached_and_all_authorities_remain_false():
     inventory = _small_ranking()
     before = inventory.to_payload()
@@ -421,9 +433,8 @@ def test_returned_ranking_payload_is_detached_and_all_authorities_remain_false()
 def test_inclusive_upper_tail_admits_an_exact_nine_tenths_tie_group():
     """The owner froze an inclusive `p >= 0.90`; pin that boundary exactly.
 
-    No existing fixture produces an S1 tie, so every eligible cohort has
-    `equal_count == 1` and no percentile can land on exactly `9/10`. A strict
-    `>` would therefore pass the whole focused file while silently excluding a
+    Existing fixtures include S1 ties, but none at exactly `9/10`. A strict
+    `>` therefore passed the earlier focused file while silently excluding a
     boundary group. Four securities are given identical authentic share deltas
     so they share one exact S1 value at the top of a 20-eligible cohort:
     `L=16`, `E=4`, `N=20` gives `(2*16+4)/(2*20) = 9/10` exactly, and the
@@ -463,3 +474,41 @@ def test_inclusive_upper_tail_admits_an_exact_nine_tenths_tie_group():
         mirror = covering[row["event_id"]]
         assert _rational(mirror["role_percentile"]) == Fraction(1, 10)
         assert mirror["threshold_candidate"] is False
+
+
+def test_ranking_policy_binds_committed_verbatim_owner_freeze():
+    policy = _small_ranking().to_payload()["policy"]
+    directive_path = (
+        "docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md"
+    )
+    directive_commit = "252ece89bdc687e993f7424ec04a8c54592d92a1"
+    directive_sha256 = (
+        "e5b068024bb65e4b1398116255fc6f81bf74c57993f9d2668ffbacc42d2bc90a"
+    )
+    assert policy["owner_directive_path"] == directive_path
+    assert policy["owner_directive_commit"] == directive_commit
+    assert policy["owner_directive_sha256"] == directive_sha256
+    assert policy["owner_decision_record"] == f"{directive_path}#59"
+    assert policy["owner_freeze"] == (
+        "keep the existing structural normalization, rank only stocks eligible "
+        "at the release’s next open, and exclude later-arriving evidence from "
+        "that cohort."
+    )
+    repository_root = Path(__file__).resolve().parents[1]
+    committed_bytes = subprocess.run(
+        ["git", "show", f"{directive_commit}:{directive_path}"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert sha256(committed_bytes).hexdigest() == directive_sha256
+    section = committed_bytes.decode("utf-8").split("### 59.1", 1)[1].split(
+        "### 59.2", 1
+    )[0]
+    assert (
+        "> keep the existing structural normalization, rank only stocks eligible at the\n"
+        "> release’s next open, and exclude later-arriving evidence from that cohort."
+    ) in section
+    assert "> proceed" in section
+    assert "offline SI-2B-P1C cohort/reranking calculation only" in section
+    assert "does not select a\nwinning lookback" in section

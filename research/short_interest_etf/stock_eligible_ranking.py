@@ -35,6 +35,13 @@ _OWNER_FREEZE = (
     "at the release’s next open, and exclude later-arriving evidence from "
     "that cohort."
 )
+_OWNER_DIRECTIVE_PATH = (
+    "docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md"
+)
+_OWNER_DIRECTIVE_COMMIT = "252ece89bdc687e993f7424ec04a8c54592d92a1"
+_OWNER_DIRECTIVE_SHA256 = (
+    "e5b068024bb65e4b1398116255fc6f81bf74c57993f9d2668ffbacc42d2bc90a"
+)
 
 
 class StockEligibleRankingError(ValueError):
@@ -73,9 +80,10 @@ def _policy(source: dict[str, Any]) -> dict[str, Any]:
         raise _refuse("source binding selected a lookback")
     return {
         "owner_freeze": _OWNER_FREEZE,
-        "owner_decision_record": (
-            "docs/Strategy Description/SHORT_INTEREST_IMPLEMENTATION_RECORD.md#59"
-        ),
+        "owner_decision_record": f"{_OWNER_DIRECTIVE_PATH}#59",
+        "owner_directive_path": _OWNER_DIRECTIVE_PATH,
+        "owner_directive_commit": _OWNER_DIRECTIVE_COMMIT,
+        "owner_directive_sha256": _OWNER_DIRECTIVE_SHA256,
         "normalization_population": "unchanged_full_structural_SI3C",
         "ranking_population": "eligible_selected_S1_scoreable_at_release_next_open",
         "later_evidence": "exclude_and_report_never_retime_or_backdate",

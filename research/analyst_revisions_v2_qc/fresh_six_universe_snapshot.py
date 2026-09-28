@@ -73,7 +73,9 @@ def _display_ticker(row):
 
 def _callback_time(algorithm):
     value = algorithm.time
-    if type(value) is not datetime:
+    # QC's Python bridge may supply a datetime subtype. Other completed lane
+    # runtimes accept that shape; exact-type equality rejected it at initialize.
+    if not isinstance(value, datetime):
         _refuse("QC callback clock is unavailable")
     # LEAN algorithm.time is normally naive in the algorithm time zone.
     local = value.replace(tzinfo=NEW_YORK) if value.tzinfo is None else value.astimezone(NEW_YORK)
@@ -94,7 +96,7 @@ def _source_end_time(rows, name):
             value = row.end_time
         except AttributeError as exc:
             raise FreshSixUniverseSnapshotError(name + " source end time is absent") from exc
-        if type(value) is not datetime:
+        if not isinstance(value, datetime):
             _refuse(name + " source end time is not a datetime")
         local = value.replace(tzinfo=NEW_YORK) if value.tzinfo is None else value.astimezone(NEW_YORK)
         observed.add(local.isoformat(timespec="seconds"))

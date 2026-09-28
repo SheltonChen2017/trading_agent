@@ -29823,3 +29823,68 @@ prospective correction; a fresh project is not a permitted retry. Focused
 offline tests include executable early/decision end-hook behavior,
 predecessor/source/waiver/claim refusals, one launch and one bounded metadata
 read. No QC A2 action or result is implied by this source freeze.
+
+### 212.4 R247-A2 terminal disposition and A3 cause hypothesis
+
+After the A2 correction was frozen locally at `f6aac9c`, the same private QC
+project **37097547** read back A1's exact two files, updated only `main.py`,
+read back A2's exact two files, compiled, and launched backtest
+`eb7a099fe67e00812e7b07924c37d924`. Its source-manifest SHA-256 was
+`123c17148c6850cf432dbf64534de7c3f040324b80639ada369567867b0c7f9d`.
+A2 also ended `Runtime Error` at the 2026-09-11 start clock, but unmasked the
+initiating `QC callback clock is unavailable` exception in the Fundamental
+universe callback. There were zero authenticated input metadata results,
+orders, returns, or result cells. A2 is the **second spent attempt**, not a
+successful six-universe capture. One infrastructure look moves the floor to
+**253 shared / 192 development / 36 infrastructure / 662 cells**; its
+matching owner-authorized shared-ledger entry is R-247 A2.
+
+The exception is raised by the runtime's exact `type(value) is datetime`
+guard before traversing any rows. It establishes only that QC's callback
+clock did not pass that exact Python type comparison, **not** its actual
+runtime type. The row `end_time` guard uses the same exact comparison and is
+a prospective next-failure risk, not an A2-observed error. A completed prior
+lane runtime used `isinstance(observed, datetime)` for its QC callback clock.
+An in-memory red/green trial against the committed A2 runtime and a
+`datetime` subtype isolated both guards: each old exact-type check refused;
+the proposed `isinstance` checks accepted while unrelated non-datetime
+values still refused. The cutoff, mixed/future source-EndTime, timezone,
+identity, positivity, Object Store, and decision-unready gates are unchanged.
+This is a tested **hypothesis** for a final A3 in the same project, not proof
+that QC will complete it. A3 must be separately pinned before launch and
+cannot be retried a fourth time if it fails.
+
+### 212.5 Prospective R247-A3 source and final-attempt gate
+
+A3 applies only the two `datetime`-subtype acceptance corrections in
+`fresh_six_universe_snapshot.py`; generated `main.py` remains byte-identical
+to A2. This is still the same **input-only** diagnostic, closed decision
+session, private project, source set, time cutoff, no-price/no-order behavior,
+Object Store content-addressing, and decision-unready receipt. It is not a
+change to analyst score, market-cap ranking, portfolio weights, or any
+outcome-bearing 100%/200% arm. The corrected runtime SHA differs from A2
+solely by the two tested type guards and explanatory comment.
+
+| Frozen R247-A3 identity | Value |
+|---|---|
+| Existing private QC project | `ARV2 R247 FRESH SIX INPUT 20260925`, ID **37097547** |
+| Backtest name | `ARV2 R247A3 fresh six input runtime correction 20260925` |
+| Corrected runtime SHA-256 | `39b519dccde32aa2a86499873015adcd0a377b8ca0c69905f9609e6411a2f0c9` |
+| Generated `main.py` SHA-256, unchanged from A2 | `9227144284e54ba3894ee86a7fea3e3d1f06a8892d5a7eebf3068b5eac123830` |
+| Sorted two-file manifest SHA-256 | `104a7afb8298a52537ef42a3c29eb2d86f8565807a5e6affde73816450877cce` |
+| Exact A3 waiver | `ARV2-OWNER-STANDING-EXPLORATORY-R247A3-INPUT-ONLY-SIGNATURE-WAIVER` |
+
+Before A3 mutates QC, its launcher authenticates both local predecessor
+launch/terminal receipts, requires both to be invalid `Runtime Error` runs
+in the same pinned project, checks that project's private idle status and
+byte-identical A2 two-file source, and checks the remote inventory contains
+**exactly** those two failed runs. A3's exclusive claim precedes a one-file
+runtime update. It then reads back both exact A3 files, compiles, and
+launches at most once. A read-only preflight confirmed the two-run inventory
+shape and identities without requesting statistics. The only permissible
+result read remains a single bounded, authenticated
+`ARV2_FRESH_SIX_INPUT_META` after terminal `Completed.`; absent metadata or
+any terminal error means no valid input result. A3 is the owner's **third and
+last** R247 attempt. No A4 launcher or new-project retry exists. If it
+fails, stop this candidate and use the owner/Mia recovery rule. No QC A3
+action or result is implied by this prospective source freeze.

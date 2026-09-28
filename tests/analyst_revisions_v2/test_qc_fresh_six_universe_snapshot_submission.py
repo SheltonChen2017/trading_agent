@@ -34,16 +34,20 @@ def _canonical(value: object) -> str:
 class FakeQc:
     """A deliberately small QC boundary fake; never opens a connection."""
 
-    def __init__(self, plan):
+    def __init__(self, plan, *, project_id=247):
         self.plan = plan
+        self.project_id = project_id
         self.calls: list[tuple[str, dict]] = []
         self.files = {"main.py": "# QC default\n", "research.ipynb": "{}"}
         self.project = None
         self.corrupt_readback = False
         self.corrupt_after_a2_update = False
+        self.corrupt_after_a3_update = False
         self.a2_main_updated = False
+        self.a3_runtime_updated = False
         self.status = "Completed."
         self.a2_status = "Completed."
+        self.a3_status = "Completed."
         self.backtests: list[dict] = []
         self.compile_reads = 0
         self.compile_creates = 0
@@ -65,7 +69,7 @@ class FakeQc:
             result["projects"] = [] if self.project is None else [self.project]
         elif endpoint == "projects/create":
             self.project = {
-                "projectId": 247, "name": payload["name"],
+                "projectId": self.project_id, "name": payload["name"],
                 "organizationId": payload["organizationId"],
                 "language": "Py", "owner": True, "codeRunning": False,
                 "collaborators": [{"owner": True}],
@@ -74,12 +78,17 @@ class FakeQc:
         elif endpoint == "files/read":
             result["files"] = [
                 {
-                    "projectId": 247, "name": name,
+                    "projectId": self.project_id, "name": name,
                     "content": content + (
-                        "# mutated\n" if name == "main.py" and (
-                            self.corrupt_readback or (
-                                self.corrupt_after_a2_update and self.a2_main_updated
+                        "# mutated\n" if (
+                            name == "main.py" and (
+                                self.corrupt_readback or (
+                                    self.corrupt_after_a2_update and self.a2_main_updated
+                                )
                             )
+                        ) or (
+                            name == "fresh_six_universe_snapshot.py"
+                            and self.corrupt_after_a3_update and self.a3_runtime_updated
                         ) else ""
                     ),
                 }
@@ -88,26 +97,31 @@ class FakeQc:
         elif endpoint == "files/delete":
             del self.files[payload["name"]]
         elif endpoint in {"files/create", "files/update"}:
-            if endpoint == "files/update" and self.backtests:
+            if endpoint == "files/update" and payload["name"] == "main.py" and self.backtests:
                 self.a2_main_updated = True
+            if (
+                endpoint == "files/update"
+                and payload["name"] == "fresh_six_universe_snapshot.py"
+                and len(self.backtests) == 2
+            ):
+                self.a3_runtime_updated = True
             self.files[payload["name"]] = payload["content"]
         elif endpoint == "compile/create":
             self.compile_creates += 1
-            compile_id = (
-                "compile-r247" if self.compile_creates == 1 else "compile-r247-a2"
-            )
-            result.update(projectId=247, compileId=compile_id, state="InQueue")
+            compile_id = "compile-r247-a" + str(self.compile_creates)
+            result.update(projectId=self.project_id, compileId=compile_id, state="InQueue")
         elif endpoint == "compile/read":
             self.compile_reads += 1
             result.update(
-                projectId=247, compileId=payload["compileId"], state="BuildSuccess",
+                projectId=self.project_id, compileId=payload["compileId"], state="BuildSuccess",
             )
         elif endpoint == "backtests/create":
             backtest_id = (
-                "backtest-r247" if not self.backtests else "backtest-r247-a2"
+                "backtest-r247" if not self.backtests
+                else "backtest-r247-a" + str(len(self.backtests) + 1)
             )
             launched = {
-                "projectId": 247, "backtestId": backtest_id,
+                "projectId": self.project_id, "backtestId": backtest_id,
                 "name": payload["backtestName"], "status": "In Queue...",
             }
             self.backtests.append(launched)
@@ -119,7 +133,8 @@ class FakeQc:
                     **launched,
                     "status": (
                         self.status if launched["backtestId"] == "backtest-r247"
-                        else self.a2_status
+                        else self.a2_status if launched["backtestId"] == "backtest-r247-a2"
+                        else self.a3_status
                     ),
                     "created": "2026-09-28 12:00:00",
                     "sharpeRatio": "NEVER RETAIN THIS",
@@ -133,11 +148,12 @@ class FakeQc:
                 if row["backtestId"] == payload["backtestId"]
             )
             result["backtest"] = {
-                "projectId": 247, "backtestId": launched["backtestId"],
+                "projectId": self.project_id, "backtestId": launched["backtestId"],
                 "name": launched["name"],
                 "status": (
                     self.status if launched["backtestId"] == "backtest-r247"
-                    else self.a2_status
+                    else self.a2_status if launched["backtestId"] == "backtest-r247-a2"
+                    else self.a3_status
                 ),
                 "statistics": {
                     "ARV2_FRESH_SIX_INPUT_META": (
@@ -171,6 +187,24 @@ def _failed_a1(monkeypatch, tmp_path):
     )
     assert subject.poll_status_once(a1, launch, api) == "Runtime Error"
     return _plan(tmp_path, 2), fake, api, launch
+
+
+def _failed_a2(monkeypatch, tmp_path):
+    a1 = _plan(tmp_path)
+    fake = FakeQc(a1, project_id=subject.PROJECT_ID_A3)
+    fake.status = "Runtime Error"
+    fake.a2_status = "Runtime Error"
+    api = _offline_api(monkeypatch, fake)
+    first = subject.prepare_and_launch_once(
+        a1, api, owner_waiver_id=subject.WAIVER_ID,
+    )
+    assert subject.poll_status_once(a1, first, api) == "Runtime Error"
+    a2 = _plan(tmp_path, 2)
+    second = subject.prepare_and_launch_once(
+        a2, api, owner_waiver_id=subject.WAIVER_ID_A2,
+    )
+    assert subject.poll_status_once(a2, second, api) == "Runtime Error"
+    return _plan(tmp_path, 3), fake, api, first, second
 
 
 def test_preview_and_waiver_are_offline_and_bind_two_exact_sources(tmp_path):
@@ -224,16 +258,15 @@ def test_exact_waiver_binds_one_input_only_launch(monkeypatch, tmp_path):
     assert b"2026-09-25" in subject.render_owner_waiver_payload(plan)
 
 
-def test_unimplemented_third_and_fourth_attempts_require_a_versioned_correction_before_qc(
+def test_fourth_attempt_refuses_before_qc(
     monkeypatch, tmp_path,
 ):
-    for attempt in (3, 4):
-        plan = _plan(tmp_path, attempt)
-        fake = FakeQc(plan)
-        api = _offline_api(monkeypatch, fake)
-        with pytest.raises(subject.FreshSnapshotSubmissionError, match="attempt|A1|version"):
-            subject.prepare_and_launch_once(plan, api)
-        assert fake.calls == []
+    plan = _plan(tmp_path, 4)
+    fake = FakeQc(plan)
+    api = _offline_api(monkeypatch, fake)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="attempt|A1|version"):
+        subject.prepare_and_launch_once(plan, api)
+    assert fake.calls == []
 
 
 def test_launch_creates_one_private_project_exact_two_files_and_one_backtest(
@@ -567,3 +600,205 @@ def test_a2_completed_without_snapshot_meta_is_not_accepted(monkeypatch, tmp_pat
     assert [endpoint for endpoint, _ in fake.calls].count("backtests/read") == 1
     with pytest.raises(subject.FreshSnapshotSubmissionError, match="spent|already"):
         subject.read_meta_once(a2, launch, api)
+
+
+def test_a3_source_and_waiver_bind_runtime_only_in_fixed_project(monkeypatch, tmp_path):
+    first_files = dict(subject._files(1))
+    second_files = dict(subject._files(2))
+    third_files = dict(subject._files(3))
+    assert first_files["fresh_six_universe_snapshot.py"] == second_files[
+        "fresh_six_universe_snapshot.py"
+    ]
+    assert third_files["fresh_six_universe_snapshot.py"] != second_files[
+        "fresh_six_universe_snapshot.py"
+    ]
+    assert third_files["main.py"] == second_files["main.py"]
+    assert subject._digest(third_files["fresh_six_universe_snapshot.py"]) == (
+        subject.RUNTIME_SHA256_A3
+    )
+    preview = subject.preview_plan(_plan(tmp_path, 3))
+    assert preview["source_manifest_sha256"] == subject.SOURCE_MANIFEST_SHA256_A3
+    assert preview["backtest_name"] == subject.BACKTEST_NAME_A3
+    assert preview["implemented_attempts"] == [1, 2, 3]
+
+    a3, fake, _, first, second = _failed_a2(monkeypatch, tmp_path)
+    before = len(fake.calls)
+    waiver = json.loads(subject.render_owner_waiver_payload(a3))
+    assert len(fake.calls) == before
+    assert waiver["schema"] == subject.WAIVER_SCHEMA_A3
+    assert waiver["owner_launch_waiver_id"] == subject.WAIVER_ID_A3
+    assert waiver["predecessor_project_id"] == subject.PROJECT_ID_A3
+    assert waiver["predecessor_backtest_id"] == second["backtest_id"]
+    assert waiver["predecessor_source_manifest_sha256"] == (
+        subject.SOURCE_MANIFEST_SHA256_A2
+    )
+    assert waiver["first_backtest_id"] == first["backtest_id"]
+    assert waiver["first_source_manifest_sha256"] == subject.SOURCE_MANIFEST_SHA256
+    assert waiver["source_manifest_sha256"] == subject.SOURCE_MANIFEST_SHA256_A3
+    assert waiver["mutating_endpoint_budget"] == {
+        "projects/create": 0, "files/delete": 0, "files/update": 1,
+        "files/create": 0, "compile/create": 1, "backtests/create": 1,
+    }
+    assert waiver["maximum_backtest_submissions_this_waiver"] == 1
+
+
+def test_a3_reuses_exact_a2_project_updates_only_runtime_and_launches_once(
+    monkeypatch, tmp_path,
+):
+    a3, fake, api, first, second = _failed_a2(monkeypatch, tmp_path)
+    before = len(fake.calls)
+    launch = subject.prepare_and_launch_once(
+        a3, api, owner_waiver_id=subject.WAIVER_ID_A3,
+    )
+    new_calls = fake.calls[before:]
+    endpoints = [endpoint for endpoint, _ in new_calls]
+    assert launch["attempt"] == 3
+    assert launch["project_id"] == first["project_id"] == second["project_id"] == (
+        subject.PROJECT_ID_A3
+    )
+    assert launch["backtest_name"] == subject.BACKTEST_NAME_A3
+    assert launch["backtest_id"] not in {first["backtest_id"], second["backtest_id"]}
+    assert launch["source_manifest_sha256"] == subject.SOURCE_MANIFEST_SHA256_A3
+    assert launch["predecessor_backtest_id"] == second["backtest_id"]
+    assert launch["first_backtest_id"] == first["backtest_id"]
+    assert launch["owner_launch_waiver_id"] == subject.WAIVER_ID_A3
+    assert endpoints.count("files/update") == 1
+    assert [payload["name"] for endpoint, payload in new_calls
+            if endpoint == "files/update"] == ["fresh_six_universe_snapshot.py"]
+    assert endpoints.count("compile/create") == 1
+    assert endpoints.count("backtests/create") == 1
+    assert not set(endpoints) & {"projects/create", "files/create", "files/delete"}
+    assert endpoints.count("files/read") == 2
+    assert fake.files["main.py"].encode("ascii") == dict(subject._files(2))["main.py"]
+    assert fake.files["fresh_six_universe_snapshot.py"].encode("ascii") == (
+        dict(subject._files(3))["fresh_six_universe_snapshot.py"]
+    )
+
+    assert subject.poll_status_once(a3, launch, api) == "Completed."
+    assert [endpoint for endpoint, _ in fake.calls].count("backtests/read") == 0
+    observed = subject.read_meta_once(a3, launch, api)
+    assert observed["canonical_sha256"] == "b" * 64
+    assert "NEVER RETAIN THIS" not in repr(observed)
+    assert [endpoint for endpoint, _ in fake.calls].count("backtests/read") == 1
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="spent|already"):
+        subject.read_meta_once(a3, launch, api)
+    after = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="already|spent"):
+        subject.prepare_and_launch_once(
+            a3, api, owner_waiver_id=subject.WAIVER_ID_A3,
+        )
+    assert len(fake.calls) == after
+
+
+def test_a3_wrong_waiver_refuses_before_qc_or_claim(monkeypatch, tmp_path):
+    a3, fake, api, _, _ = _failed_a2(monkeypatch, tmp_path)
+    before = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="waiver"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A2)
+    assert len(fake.calls) == before
+    assert not subject._path(a3, "claim").exists()
+
+
+def test_a3_requires_authenticated_a2_runtime_error_before_qc(monkeypatch, tmp_path):
+    a3 = _plan(tmp_path, 3)
+    fake = FakeQc(a3, project_id=subject.PROJECT_ID_A3)
+    api = _offline_api(monkeypatch, fake)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="A2|control"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    assert fake.calls == []
+    assert not subject._path(a3, "claim").exists()
+
+    a1 = _plan(tmp_path)
+    fake.status = "Runtime Error"
+    fake.a2_status = "Completed."
+    first = subject.prepare_and_launch_once(a1, api, owner_waiver_id=subject.WAIVER_ID)
+    assert subject.poll_status_once(a1, first, api) == "Runtime Error"
+    a2 = _plan(tmp_path, 2)
+    second = subject.prepare_and_launch_once(a2, api, owner_waiver_id=subject.WAIVER_ID_A2)
+    assert subject.poll_status_once(a2, second, api) == "Completed."
+    before = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="A2|Runtime Error"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    assert len(fake.calls) == before
+    assert not subject._path(a3, "claim").exists()
+
+
+def test_a3_refuses_nonfixed_local_project_before_qc(monkeypatch, tmp_path):
+    a2, fake, api, _ = _failed_a1(monkeypatch, tmp_path)
+    fake.a2_status = "Runtime Error"
+    second = subject.prepare_and_launch_once(
+        a2, api, owner_waiver_id=subject.WAIVER_ID_A2,
+    )
+    assert subject.poll_status_once(a2, second, api) == "Runtime Error"
+    a3 = _plan(tmp_path, 3)
+    before = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="A2|fixed project"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    assert len(fake.calls) == before
+    assert not subject._path(a3, "claim").exists()
+
+
+@pytest.mark.parametrize("change", ["extra", "a1_status", "a2_status", "a2_name"])
+def test_a3_refuses_changed_remote_predecessor_inventory_before_claim(
+    monkeypatch, tmp_path, change,
+):
+    a3, fake, api, _, _ = _failed_a2(monkeypatch, tmp_path)
+    if change == "extra":
+        fake.backtests.append({
+            "projectId": subject.PROJECT_ID_A3, "backtestId": "unexpected-cloud-run",
+            "name": "unrelated run", "status": "In Queue...",
+        })
+    elif change == "a1_status":
+        fake.status = "Completed."
+    elif change == "a2_status":
+        fake.a2_status = "Completed."
+    else:
+        fake.backtests[1]["name"] = "renamed cloud run"
+    before = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="inventory|identity|status"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    assert not {endpoint for endpoint, _ in fake.calls[before:]} & {
+        "files/update", "compile/create", "backtests/create",
+    }
+    assert not subject._path(a3, "claim").exists()
+
+
+def test_a3_requires_exact_a2_source_and_private_idle_project_before_claim(
+    monkeypatch, tmp_path,
+):
+    a3, fake, api, _, _ = _failed_a2(monkeypatch, tmp_path)
+    fake.files["main.py"] += "# changed after A2\n"
+    before = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="readback|source"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    assert not {endpoint for endpoint, _ in fake.calls[before:]} & {
+        "files/update", "compile/create", "backtests/create",
+    }
+    assert not subject._path(a3, "claim").exists()
+
+    fake.files["main.py"] = dict(subject._files(2))["main.py"].decode("ascii")
+    fake.project["codeRunning"] = True
+    before = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="private and idle"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    assert not {endpoint for endpoint, _ in fake.calls[before:]} & {
+        "files/update", "compile/create", "backtests/create",
+    }
+    assert not subject._path(a3, "claim").exists()
+
+
+def test_a3_corrupt_upload_readback_spends_claim_without_compile(monkeypatch, tmp_path):
+    a3, fake, api, _, _ = _failed_a2(monkeypatch, tmp_path)
+    fake.corrupt_after_a3_update = True
+    before = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="readback|source"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    endpoints = [endpoint for endpoint, _ in fake.calls[before:]]
+    assert endpoints.count("files/update") == 1
+    assert "compile/create" not in endpoints
+    assert "backtests/create" not in endpoints
+    assert subject._path(a3, "claim").exists()
+    after = len(fake.calls)
+    with pytest.raises(subject.FreshSnapshotSubmissionError, match="already|spent"):
+        subject.prepare_and_launch_once(a3, api, owner_waiver_id=subject.WAIVER_ID_A3)
+    assert len(fake.calls) == after

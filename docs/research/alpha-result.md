@@ -5936,3 +5936,22 @@ A1 as valid. One infrastructure look moves the conservative floor from
 **251/192/34/662** to **252 shared research looks / 192 development
 evaluations / 35 infrastructure looks / 662 authenticated exploratory
 cells**. There is no forward-performance or formal-paper inference.
+
+## R-247 A2 — same-project initialization-error diagnostic — 2026-09-28
+
+The second and separately pinned R247 input-only launch reused private QC
+project **37097547**. It changed only generated `main.py` to avoid masking
+pre-target initialization failures in the end hook. The two-file source
+manifest SHA-256 was
+`123c17148c6850cf432dbf64534de7c3f040324b80639ada369567867b0c7f9d`;
+backtest `eb7a099fe67e00812e7b07924c37d924` reached `Runtime Error` at
+the 2026-09-11 start clock. The newly exposed first failure was `QC callback
+clock is unavailable` in the Fundamental universe callback, before any
+snapshot or decision-session result. A2 establishes that this clock object
+failed the source's exact `datetime` type comparison; it does not reveal its
+concrete runtime type. No raw universe rows, prices, returns, orders, or Object
+Store contents were inspected. A2 is spent and invalid, not an alpha result.
+It adds one infrastructure look and zero development evaluations or cells:
+**253 shared research looks / 192 development evaluations / 36 infrastructure
+looks / 662 authenticated exploratory cells**. Only one R247 attempt remains
+under the owner's three-attempt rule, in this same project.

@@ -46,6 +46,39 @@ class _Algorithm:
         self.statistics[key] = value
 
 
+class _QcDatetime(datetime):
+    """A Python-bridge-compatible datetime subtype, not an exact datetime."""
+
+
+def test_qc_datetime_subtypes_are_accepted_at_both_clock_boundaries():
+    algo = _Algorithm()
+    algo.time = _QcDatetime(2026, 9, 25, 8, 0)
+    capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")
+    capture.accept("FUNDAMENTALS", [_row(
+        "A-SID", "A", cap=100,
+        end_time=_QcDatetime(2026, 9, 25, 7, 0),
+    )])
+    assert capture._collections["FUNDAMENTALS"]["qc_callback_time_ny"].startswith(
+        "2026-09-25T08:00:00"
+    )
+    assert capture._collections["FUNDAMENTALS"]["qc_source_end_time_ny"].startswith(
+        "2026-09-25T07:00:00"
+    )
+
+
+def test_non_datetime_qc_clock_and_end_time_still_refuse():
+    algo = _Algorithm()
+    capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")
+    algo.time = "2026-09-25T08:00:00"
+    with pytest.raises(snapshot.FreshSixUniverseSnapshotError, match="callback clock is unavailable"):
+        capture.accept("FUNDAMENTALS", [_row("A-SID", "A", cap=100)])
+    algo.time = datetime(2026, 9, 25, 8, 0)
+    with pytest.raises(snapshot.FreshSixUniverseSnapshotError, match="source end time is not a datetime"):
+        capture.accept("FUNDAMENTALS", [_row(
+            "A-SID", "A", cap=100, end_time="2026-09-25T07:00:00",
+        )])
+
+
 def _populated(*, qcom_cap=True, qcom_sid="QCOM-SID"):
     algo = _Algorithm()
     capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")

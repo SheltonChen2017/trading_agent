@@ -5733,3 +5733,51 @@ all profiles/source digests and the actual emitted META schemas frozen before
 any 10%-floor outcome. This is exploratory, adaptive and not a formal
 confirmation; 25%-floor arms are contextual rather than assumed identical.
 No launch, attempt or look charged in this prelaunch entry.
+
+R-238 A1 AR-off 10%-floor control: private project **37061484**, backtest
+`389af03172e979375612269ff1c526bd`. R-239 A1 AR-on80: private project
+**37061511**, backtest `d65472592672f7e8f6dee8bc9989463d`.
+Both passed exact 17-file source readback and QC compile, and were running
+without an outcome read at this entry. One of three attempts spent on each;
+two exploratory development looks, **240 -> 242 shared / 181 -> 183
+development / 34 infrastructure / 653 cells**. R-240/R-241 were held until
+a node frees; no speculative result is claimed from a launch receipt.
+
+R-238/R-239 terminal `Completed.` and sole receipt-bound custom reads
+passed `run_valid=true`: AR-off R-238 **+143.74911021917653%** cumulative
+return, **−21.757819663952834%** drawdown, 261 rebalances and 10,812 filled
+orders; AR-on80 R-239 **+155.0715704271942%**, **−21.79467853235618%**
+drawdown, 261 rebalances and 10,222 filled orders. Both account results,
+orders-filled counts and source-panel digests equal their respective
+25%-floor R-231/R-235 counterparts exactly. The looser floor removes many
+REMX numeric-coverage refusal reasons, but **258/261** REMX decisions still
+lack five verified market-cap names, so its valid-admission count remains
+zero; other universes' selection counts remain unchanged. These two cells
+do not demonstrate added stock exposure from the 10% change. Cell floor
+**653 -> 655**; research floor **242 / 183 / 34 / 655**.
+
+R-240 A1 AR-on120: private project **37061716**, backtest
+`13db599e6e55c03cf5484f818d9404be`. R-241 A1 AR-on200: private project
+**37061748**, backtest `311e32bae8ef605f83512306e2ba963c`.
+Both passed exact 17-file upload/readback and QC compilation and were
+running at this entry, with no outcome read. One attempt and conservative
+development look each; floor **244 shared / 185 development / 34
+infrastructure / 655 cells**. No additional threshold tweak is inferred.
+
+R-240/R-241 terminal `Completed.` and sole bounded reads passed
+`run_valid=true`: R-240 AR-on120 **+164.1642341075784%** cumulative,
+**−22.01194134932266%** drawdown, 261 rebalances and 9,316 filled orders;
+R-241 AR-on200 **+166.8224071798157%**, **−22.08205274435079%** drawdown,
+261 rebalances and 8,607 filled orders. Each aggregate account metric,
+selected-count vector, fallback-count vector, filled-order count and
+membership-cap digest equals its 25%-floor R-236/R-237 counterpart.
+The authenticated within-10% AR-on80/120/200-minus-R-238 AR-off spreads
+are **+11.32246020801767 / +20.41512388840187 /
++23.07329696063917 pp**. Each 10%-minus-25% counterpart difference is
+**zero** at recorded precision. Lowering the numeric floors alone did not
+change this period's admitted stock selections or returns; REMX remains
+ETF-only because it still fails the five-verified-name requirement on
+258/261 decisions. Two accepted exploratory cells; closing floor
+**244 shared / 185 development / 34 infrastructure / 657 cells**.
+These are adaptive, QCOM-excluded current-vintage sensitivities, not an
+unbiased alpha estimate or live-trading gate.

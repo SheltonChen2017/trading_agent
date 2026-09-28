@@ -144,7 +144,10 @@ The owner is debugging QC with Mia; Codex performed no cloud mutation or launch
 in that counter-review. Section 202 prospectively freezes a separate
 QCOM-direct-stock-excluded 2021–2025 sensitivity, leaving R225 and Mia's QC
 project untouched. Its QC execution and outcome status are recorded below.
-Before any new launch its look floor is **232 / 173 / 34 / 646**.
+Section 203 hands off eleven valid, explicitly exploratory QCOM-excluded
+order cells and the 10%-floor null sensitivity for Claude review. The
+current look floor is **244 / 185 / 34 / 657**. The original R225 stock
+arm and its QCOM reference-price gap remain unresolved.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -786,12 +789,14 @@ investigate bounded same-SID session availability/mapping, not an identical
 performance retry.
 
 The owner subsequently authorized the separate QCOM-excluded sensitivity in
-section 202. Execute only its exact new four-arm, order-based source and
-three-attempt bounds, record every actual QC launch and bounded result, then
-make one lane push. Claude reviews section 202 at that pushed snapshot;
-Codex counter-reviews Claude's eventual changes before another milestone.
-This is an owner-directed review-timing exception for the same round, not
-permission to run a fourth R225 attempt or infer formal alpha.
+section 202 and added the 80/120/200 AR-on ladder and a lower 10% minimum
+data-coverage study. All eleven new order results completed and authenticated;
+R237 required A2 after a spent pre-create A1, while every other candidate
+completed on A1. The 10% change did not alter selected counts, fallback
+counts, return, or drawdown against the matching 25% arms. After the one
+final same-lane push, Claude reviews section 203 and the exact pushed range;
+Codex then counter-reviews Claude's push. No fourth R225 attempt,
+formal alpha, live/paper order, or automatic further threshold search follows.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -2534,6 +2539,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Claude independent review of sections 197–199 (including the 199.9–199.10 continuation): vendor-drift measurement, matched historical study, and its blocked execution | `0eedef3` -> `c0f3e87` -> `7ec16ba` (Codex, local) -> this record commit | Section 200: seven pushed commits `8570bbb..0eedef3` plus Codex's local `7ec16ba` individually disposed (7 accepted, 1 accepted after correction, 0 rejected); Codex's qualifications of section 196 accepted; zero QC or provider calls, looks, evaluations, or cells | Registered the unregistered Mia recovery reader in the whole-package closure pin (`c0f3e87`, test-only; 1 failed at the pushed head, 74 passed after); corrected the stale banner sentence; no production line changed | Standing lane selection in a byte-faithful export of the pushed head plus the closure file on the final tree, nine mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 200.7 | 0 P0, 0 P1, 1 P2, 3 P3 (`ARV2R200-001` through `-004`); `-001` corrected; `-003` names why the QCOM reference gap appears only now and records Codex's diagnostic-3 measurement | Single push of `c0f3e87`, `7ec16ba`, and this commit; Codex counter-reviews section 200, runs the whole closure file before every push, and resolves the QCOM data or mapping gap on the QC side before another stock attempt |
 | 2026-09-27 | Catch-up entry for the 2026-09-26 Codex execution push (`ARV2R200-002`); append only | `575b611..0eedef3`: `f8b2830`, `e006757`, `f9ee4e1`, `0eedef3` | Section 199: immutable attempt dispatch, bounded reference diagnostics, exact-minute repair and fee callback; R227/R230 valid ETF controls; stock arms blocked | No stale-price admission; R225 exhausted three Codex slots; first independent Mia recovery failed. Subsequent diagnostics belong to `7ec16ba`, not this push. | Focused validation and cloud evidence recorded in 199.1–199.8; no full Codex suite. Historical floor ended 230/171/34/646. | Missing execution-push row now closed; no historical row rewritten. QCOM and causal-vintage gates stay open. | Historical bookkeeping only; not a new push/look/result. |
 | 2026-09-27 | Codex counter-review of section 200; owner retains Mia debugging | `f612899` -> this record commit | Both Claude commits dispositioned; no new milestone or cloud operation | Accept closure correction; qualify accounting, drift, QCOM chronology, fee-callback and cost/result inferences; catch up omitted execution row | Full affected closure file, focused drift/record checks, in-memory red/green registration proof, compilation/diff checks; exact counts in 201.3. No complete suite. | Five P3 record qualifications resolved; no new P0/P1/P2. Existing reference/vintage P2s open. | One final same-lane push; wait for owner's Mia findings before any cloud-source retrieval/port or next launch. |
+| 2026-09-27 | Codex owner-directed exploratory order-based QC | `e1678f1` -> `51194b4`, `6541c5d`, and this final record commit | QCOM-excluded 2021–2025 cost, tilt and 10%-minimum-coverage sensitivities R231–R241 | Eleven valid exploratory cells across 12 QC launch attempts; R237 A1 failed before creation and A2 completed in the same project. The 10%-floor arms exactly matched corresponding 25%-floor selections and results because the REMX five-verified-name floor still bound. One-use receipt chains, corrections and caveats are detailed in sections 202–203. | Affected focused battery 232 passed; lane-record gate 13 passed; exact source readback and compile for each QC project; one bounded result read per valid run. No complete lane suite. Closing floor 244 shared / 185 development / 34 infrastructure / 657 cells. | Local comparator count, META-parser and pre-create retry defects corrected with isolating tests. Current-vintage Benzinga PIT, original QCOM reference hole, adaptive setting search and zero-slippage limits remain; no formal alpha or trading claim. | One final same-lane push; Claude independently reviews every commit, runs the full lane suite, and pushes once; Codex then counter-reviews. No automatic further capacity search. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -28544,9 +28550,143 @@ and fewer than five verified names still refuse; original source hashes
 remain unchanged. Each new candidate gets its own three-attempt cap and one
 bounded result read; no 10% QC run had launched at this record update.
 
-After this ladder, the owner clarified that the next four-arm study should
-make direct-stock **admission** easier by lowering all six numeric minimum
-mapping, market-cap-weight-coverage, and reported-total floors from **25% to
-10%**, not raising them to 50%. The five verified-name floor and all economic
-constraints remain unchanged. That study will have separate identities and
-an AR-off control plus AR-on80/120/200; it is not a rerun of these 25% arms.
+After frozen source commit `6541c5d`, the 10%-floor manifest was regenerated
+byte-for-byte and all four actual projections previewed against their pins.
+Focused tests across the affected order, parser, retry and closure files
+passed **232/232**, with lane-record integrity **13/13**; this is deliberately
+not the owner's full lane suite. **R238 A1** uploaded/read back and compiled
+17 pinned files to new private project **37061484**, launching backtest
+`389af03172e979375612269ff1c526bd`. **R239 A1** likewise used new
+private project **37061511** and launched backtest
+`d65472592672f7e8f6dee8bc9989463d`. Both were running when this note
+was written; no 10% outcome has yet been read. One of three attempts each,
+two new exploratory development looks: floor **242 shared / 183 development /
+34 infrastructure / 653 cells**. R240/R241 launches are held until a QC
+node is available, after the earlier two-concurrent-run pre-create refusal.
+
+R238 and R239 both reached `Completed.`; their single bounded reads each
+passed `run_valid=true`, all 261 weekly rebalances and respectively 10,812
+and 10,222 filled orders. R238 AR-off returned **+143.74911021917653%**
+with **−21.757819663952834%** maximum drawdown; R239 AR-on80 returned
+**+155.0715704271942%** with **−21.79467853235618%** maximum drawdown.
+Both aggregate account metrics and fill-count summaries are **exactly equal** to their
+25%-floor counterparts R231 and R235, despite distinct source/profile
+hashes. The REMX coverage-refusal census changed (cap-coverage failures
+20→9, total-reported-weight failures 140→2), but its five-known-cap-name
+refusal remains at **258 of 261** decisions and the sleeve still has **zero
+valid admission decisions**. All other sleeves' validity/selection counts
+were unchanged. Thus these two cells show no realized economic effect from
+lowering the numeric floor; they do not prove an admission benefit. Cell
+floor **655**.
+
+After the two QC nodes became free, R240 A1 AR-on120 uploaded/read back,
+compiled and launched private project **37061716**, backtest
+`13db599e6e55c03cf5484f818d9404be`; R241 A1 AR-on200 likewise launched
+private project **37061748**, backtest
+`311e32bae8ef605f83512306e2ba963c`. Each uses the original frozen
+10%-floor manifest and counts one of three allowed attempts; both were
+running at this update with no outcome read. Research floor **244 shared /
+185 development / 34 infrastructure / 655 cells**.
+
+R240/R241 reached `Completed.`; each sole bounded read passed `run_valid=true`.
+R240 AR-on120 returned **+164.1642341075784%** cumulative with
+**−22.01194134932266%** maximum drawdown, 21.11998007970799% annualized
+volatility, 1.03009296929968 zero-rate Sharpe, 261 rebalances and 9,316
+filled orders. R241 AR-on200 returned **+166.8224071798157%** with
+**−22.08205274435079%** drawdown, 21.31573162540370% annualized
+volatility, 1.03204173624957 zero-rate Sharpe, 261 rebalances and 8,607
+filled orders. Both have aggregate account metrics, selected-stock counts,
+fallback counts, membership-cap digest and filled-order counts **exactly
+equal** to their R236/R237 25%-floor counterparts. The fully authenticated
+four-arm 10% comparison passes, with AR-on80/120/200 minus R238 AR-off at
+**+11.32246020801767 / +20.41512388840187 / +23.07329696063917 pp**.
+Each 10%-minus-25% counterpart cumulative difference is exactly zero in
+the recorded precision. No direct-stock admission or return improved from
+this numeric-floor change on the frozen period. Total research floor
+**244 shared / 185 development / 34 infrastructure / 657 cells**; four
+of four 10% cells accepted on A1. The QCOM data gap and current-vintage
+Benzinga point-in-time caveat remain; no selected tilt level is promoted
+to a trading rule.
+
+## 203. Claude review notes — QCOM-excluded sensitivities, 2026-09-27
+
+**Exact range to review:** the one-push round begins at remote predecessor
+`e1678f1` and contains `51194b4` (freeze original QCOM-excluded four-arm
+source), `6541c5d` (validate R231–R237 and freeze R238–R241), and the final
+record/results commit following this section. No other worktree or branch
+is in scope. `51194b4` preceded the R231–R234 launches; `6541c5d` followed
+the R235–R237 launches but preceded R238–R241. The R235–R237 manifest and
+all three local previews were frozen before those results, and each QC
+upload/readback pinned its exact source files. Claude should disposition each
+commit and counter-check
+the local result parser against the retained custom-statistic envelopes.
+
+**What changed and what to focus on.** R231–R234 form a prospective but
+post-hoc QCOM-direct-stock-excluded 0/5-bps-slippage, AR-off/on100 four-arm
+study. R235–R237 form a separate 80/120/200 AR-on *weight transfer* ladder
+on that same 25%-minimum coverage, and R238–R241 a third four-arm study
+lowering only the six numeric minimum data-coverage floors to 10%, with
+an AR-off control. These are physical MOO order backtests, not a synthetic
+return splice or 2x leveraged positions. R231–R241 are **11 new valid
+exploratory cells**; R237 spent two of three attempts because A1 failed at
+`backtests/create` without a remote run. All other candidates completed on
+A1. There is one original R225 missing-QCOM blocker; none of these is R225 A4.
+The source/manifest/claim/terminal/custom result chain, exact role/profile,
+same-source census, and zero-run A2 recovery should be reviewed especially.
+
+**Verified lane-specific corrections.** The original R231–R234 local
+comparator and the new R235–R237 comparator had used a synthetic test fixture's
+nonexistent `execution.decision_count`. This was a **P2 local interpretation
+defect, corrected** to require both emitted `submitted_rebalance_count` and
+`completed_rebalance_count` equal 261; the fixture now omits the invented
+field and count mutation is red. It did not change QC source or spend a new
+look. R235's first QC result read encountered a second **P2 local transport
+parser defect, corrected**: the pinned plain order runtime emits a shared
+META schema while the new manifest recorded a tilt-specific intended schema.
+The one-use read retained only three bounded custom statistics; an exact
+R235–R237 source-census/projection/family accommodation reparsed the retained
+R235 evidence locally, without another QC read. R236/R237 parsed normally
+after correction. Focus tests refuse unrelated schema, role, hash or source.
+R237 A1 then revealed a **P2 early-create retry-path gap, corrected**: the
+generic retry gate required a terminal receipt when `backtests/create` failed
+before any receipt could exist. The exceptional A2 path is literal to R237,
+same project/source, exact A1 claim, and two fresh statistics-free zero-run
+inventories; any remote orphan refuses. The first attempted A2 command was
+local-only refusal, not a QC attempt/look. The subsequent A2 backtest
+completed and its single result read validated. No generalized fail-open
+retry path or source/economic accommodation was introduced.
+
+**Results and exclusions.** R231/232: +143.7491%/+159.9507% at zero
+slippage (+16.2016 pp paired); R233/234: +139.3310%/+154.8208% with five
+bps per side (+15.4899 pp). R235/236/237: +155.0716%/+164.1642%/+166.8224%
+at 80/120/200 vs R231 +143.7491%. The 10% admission-floor counterparts
+R238–R241 match the corresponding 25% arms' aggregate account metrics,
+selected counts, fallback counts, filled-order counts and common panel
+digests exactly. REMX's five-verified-name requirement still prevents
+admission on 258 of 261 decisions. Do **not** infer additional exposure
+or return from the 10% floor; do not choose 200% by this in-sample ladder.
+R227/R230 ETF controls are context, not matched stock construction. The
+current-vintage analyst archive's overwrite/PIT issue (`ARV2R196-001`),
+original QCOM same-session reference hole and absence of modeled slippage
+in the zero-bps ladder all remain disclosed. No raw provider rows/orders,
+broker, paper/live/funded trading, deployment, or formal alpha was accessed.
+
+**Validation.** The affected focused order/adapter/projection/closure battery
+passed **232 tests**, the lane-record gate **13 tests**, exact R238–R241
+manifest regeneration and four local previews matched frozen SHAs, all QC
+uploads read back exact 17-file source and compiled, and all 11 new bounded
+result reads authenticated. The R237 A2 recovery has seven focused fake-cloud
+tests, including early/late orphan refusals. `py_compile` and `git diff
+--check` passed. No complete lane or repository suite was run, per owner
+direction; Claude owns the full lane suite. The only unsuccessful cloud
+launch was R237 A1 and it is counted. The shared research ledger accounts
+for every attempted new launch and one accepted cell per valid result;
+closing floor **244 / 185 / 34 / 657**.
+
+**Next authorized action.** Claude independently reviews this exact pushed
+snapshot, runs the full lane suite if appropriate, corrects only verified
+lane-specific issues, and pushes once on this same branch; Codex then
+counter-reviews. Further easing of the five-known-name floor or another
+historical tilt search is **not** scheduled by this result. QuantConnect/Mia
+may investigate QCOM's original historical price gap separately; no attempt
+budget is reset by these sensitivities.

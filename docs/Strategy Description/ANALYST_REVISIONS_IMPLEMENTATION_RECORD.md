@@ -169,6 +169,12 @@ Section 209 records the owner's subsequent choice of **both 100% and 200%**
 as named forward-development candidates against one AR-off control. It does
 not select a historical winner, add a research look, or grant a two-arm formal
 paper test. The one-look, 1/80 Analyst allocation and all paper gates remain.
+Section 210 is the owner's bounded pre-review continuation: it corrects the
+forward-quality import-firewall regression reported against section 209,
+records one private same-day vendor capture, and prepares an offline-tested,
+input-only QC six-universe snapshot diagnostic. The QC diagnostic has not
+been uploaded, compiled, or run; it yields no performance or point-in-time
+claim. The floor remains **251 / 192 / 34 / 662**.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -839,6 +845,18 @@ ARV2-4 through ARV2-8 gates, and distinct paper authority remain necessary.
 The historical QCOM-exclusion repair is provenance, not an automatic forward
 universe rule. No new QC run, result read, forward-return cell, or paper
 deployment occurs in section 209.
+
+Claude will review section 210 after the owner's later "continue" instruction
+added this bounded pre-review continuation. Its required import-firewall
+regression is fixed without an allowlist exception. A 2026-09-28 08:43 PDT
+provider capture is partial-day
+data, not a decision-ready or historical point-in-time archive. The new QC
+source is an input-only, non-order diagnostic candidate, not an evaluated
+strategy or a ready-to-trade forward package. It still needs a separate
+private QC compile/run and verification of real callback and Object Store
+behavior. Section 209's two forward AR percentages and the one-look/1/80
+paper gate are unchanged. Claude reviews sections 209–210 and every commit in
+their combined exact pushed range; Codex then counter-reviews Claude's push.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -2586,6 +2604,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Catch-up entry for the 2026-09-27 Codex execution push (`ARV2R206-001`); append only | `89bdb29..1b1da0e`: `bcf6356`, `ef352c1`, `1b1da0e` | Sections 204–205 three-name sensitivity, R242–R245, same-project A2 recovery and receipt-bound comparison | Four valid exploratory cells, two spent pre-create A1 slots; no result or code is changed by this catch-up row. | Exact prior validation and QC receipts are in sections 204–205; Claude's independent checks are in section 206. The prior floor was 250/191/34/661. | Missing push-ledger row corrected without rewriting historical evidence or excusing the two then-red record gates. | Historical bookkeeping only; no additional QC look, code change or independent review bypass. |
 | 2026-09-28 | Codex counter-review and owner-directed AR mechanism/forward-data round | `1cb3705` -> `47e892b`, `23f511c`, and this final record commit | Section 207 counter-reviews both Claude commits; section 208 freezes the 60–200 discrete AR range, implements R246 entry/count-only 0%-transfer order diagnostic, and starts development-only forward capture receipts | R246 A1 valid in project 37072332: +136.87% net, −21.75% drawdown; matched cached decomposition is −6.88 pp entry/count/fallback and +23.08 pp weight transfer, combined +16.20 pp. Same-window Massive recaptures show 1,398 same-ID/same-version records and zero observed changes over this short interval; new weekend capture has zero events. No paper/forward-return test. | Focused source/projection/predecessor, import-closure and forward receipt tests; exact QC source readback/compile, completed 261/261 order schedule, single bounded read, local comparison, final active-document gates. No complete lane suite. Closing floor 251/192/34/662. | Six section-207 qualifications corrected or documented; `ARV2R196-001` vintage/regime/construction issue and the R225 QCOM price gap remain open. Eight-point range is fixed, but the primary future percentage is owner-pending and four points are unrun. | One combined same-lane push; Claude independently reviews section 208 and exact commits, including the R246 writer-schema pin, decomposition guard and forward-receipt boundary. Codex then counter-reviews before another efficacy step; no automatic ARV2-9 paper authority. |
 | 2026-09-28 | Codex owner-directed dual forward-rule freeze | `7aefeb1` -> `e5c13ac` and this final record commit | Section 209 additive 100%/200% forward-development choice | Bind two named arms to R232 and R237 historical construction identities and one AR-off control, while leaving future universe, exclusion, epoch and execution identities unset. No historical winner or formal two-arm result is selected. | Focused dual-policy and transitive no-I/O closure tests, final record/active-document gates, compilation and diff checks recorded in 209. No full lane suite or QC/provider access; floor unchanged 251/192/34/662. | One prospective Analyst look and total two-sided 1/80 alpha remain; no per-arm alpha or paper/deployment authority. QCOM historical repair and archive-vintage concerns remain open. | One same-lane push; Claude reviews section 209 and exact commits, then Codex counter-reviews. A reviewed common-epoch two-arm protocol and all ARV2-9 prerequisites are required before formal paper confirmation. |
+| 2026-09-28 | Codex owner-directed bounded forward continuation | `ccc522f` -> `f9fa648`, `d6c855d`, and this final record commit | Section 210 firewall correction, private same-day vendor receipt, and input-only QC snapshot candidate | Move authentication to the host CLI while keeping the forward core import-pure; collect 141 ratings, 16 earnings and 10 guidance rows in ignored private artifacts; prepare seven-source exact-SID/cap/weight diagnostic with no prices, orders or outcomes. The QC source has not been compiled or run in Cloud. | Required import-firewall regression and affected forward/QC closure battery 285 passed; final record/active-document, compilation and diff checks in section 210. No complete suite. No new QC research look or result cell; floor 251/192/34/662. | Required import-firewall gate corrected; no-price and pre-cutoff timing findings corrected before cloud use. QC callback/EndTime and Object Store behavior remain unverified; the partial-day capture cannot prove PIT availability. | One same-lane push. Claude reviews both sections 209–210 and each commit; Codex counter-reviews before a later bounded QC diagnostic or efficacy step. Formal paper, broker and trading gates remain closed. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -29356,7 +29375,7 @@ deployment or research look occurred in this section. The floor remains
 
 ### 209.1 Review notes for Claude
 
-**Exact range:** `7aefeb1..HEAD` on the same designated Analyst lane. The
+**Exact range at that push:** `7aefeb1..ccc522f` on the same designated Analyst lane. The
 round contains `e5c13ac` (bounded dual-policy implementation) and this final
 record commit; review each commit separately. The implementation adds only
 the new policy JSON/loader and its isolating tests, plus the exact package
@@ -29377,3 +29396,96 @@ passed **82 tests**, after an in-round blank ledger separator was caught and
 removed. Targeted compilation and `git diff --check` were clean. Codex did
 not run the complete lane suite; Claude owns that review check. No other lane
 or shared file was changed.
+
+## 210. Forward input-quality firewall repair and input-only QC candidate, 2026-09-28
+
+The owner directed a bounded continuation before Claude's section-209 review
+landed, then supplied an early, reproducible finding: the required
+`test_current_v2_package_transitive_import_closure_is_outcome_free` failed at
+`ccc522f` because `forward_data_quality.py` imported `os` and the host-only
+`scripts.capture_arv2_massive`. This was a required gate, not an optional
+style check. `f9fa648` moves the authenticated provider and private filesystem
+bridge to `scripts/run_arv2_forward_data_quality.py`; the V2 core accepts a
+page visitor and performs only deterministic receipt validation/comparison.
+The exact firewall test was red on the old tree and is green after the change.
+The firewall's forbidden-import rule was not relaxed. This is a lane-specific
+P2 correction, `ARV2D210-001`, closed before push.
+
+One private, ignored three-role Massive/Benzinga capture requested the exact
+event-date window 2026-09-28 through 2026-09-28. At 08:43 PDT
+(15:43:48 UTC), it produced 3 pages / 167 rows: 141 analyst ratings,
+16 earnings, and 10 corporate guidance. Its manifest SHA-256 is
+`386e2c3d4c0038997dda0e142978f3f630370eee04d840eb7baa2ca6dcef6b6d`;
+the private quality receipt SHA-256 is
+`b29a06778c8af7befd2539072ac9e0a2d375a9176d0027f62c45768875e57d49`.
+The receipt explicitly says `point_in_time_proven=false`,
+`paper_look_committed=false`, zero QC calls, and zero outcome reads. Because
+this was an in-progress event day, it is a version/coverage observation, not
+the final 2026-09-28 daily input and not proof that the archived historical
+rows were available on their event dates. The private rows are not tracked;
+no shared research-look ledger entry is added for this provider-only capture.
+
+`d6c855d` prepares `fresh_six_universe_snapshot.py`, a separately versioned,
+**development-only input diagnostic**. Its generated QC entry registers one
+Fundamental universe and six constituent universes (SPY, QQQ, SOXX, XLV,
+REMX, XLE), then attempts a single 09:20 New York snapshot of exact QC SIDs,
+positive market caps, and positive constituent weights. It preserves the
+separate QC source EndTime, callback clock, capture clock and decision clock;
+reports QCOM exact-SID join status without guessing a ticker mapping; bounds
+and content-addresses a compressed private Object Store artifact; and checks
+exact read-back before publishing bounded metadata. It hard-codes
+`decision_ready=false`, `point_in_time_vendor_availability_proven=false`, and
+`order_and_outcome_access=false`. This is a documented exception to the
+order-based evaluation default: it collects *inputs only* and evaluates no
+returns or fills, so an order path would be inappropriate. No new QC project,
+cloud upload, compile, launch, receipt read, or research look occurred in this
+section. The source is **not** evidence that all seven real QC callbacks will
+arrive or expose homogeneous EndTime values; a refusal on either is an
+invalid diagnostic, not a valid input. Its raw EndTime calendar lag is labeled
+diagnostic, not an exchange-session age or vendor availability guarantee.
+
+Independent pre-launch inspection found two further P2 candidate defects,
+both corrected before the commit: `ARV2D210-002` removed an unnecessary
+`add_equity` price subscription in favor of QC `Symbol.create`, and
+`ARV2D210-003` permits a prior-session collection delivered *before* the
+09:20 decision on that same morning instead of discarding it by callback
+date. Isolating tests cover no price/order APIs, the pre-cutoff supersession,
+exact cutoff, source-clock regression, same-EndTime content conflict, DST
+instant ordering, missing sources, invalid identities/numbers, artifact
+bounds and read-back refusal. The known P3 operational uncertainty is real
+QC callback/EndTime/Object Store behavior; it is not silently upgraded by
+offline tests. The 100% and 200% AR arms still have no common forward universe,
+formal two-arm multiplicity protocol, paper authorization, or forward return.
+The 2021–2025 current-vintage results and open `ARV2R196-001`/QCOM caveats
+remain unchanged. The conservative look floor remains **251 shared / 192
+development / 34 infrastructure / 662 authenticated exploratory cells**.
+
+### 210.1 Review notes for Claude
+
+**Exact combined range:** `7aefeb1..HEAD` at this round's one final push.
+Review the section-209 commits `e5c13ac` (100%/200% dual policy) and
+`ccc522f` (record), then `f9fa648` (import-firewall repair), `d6c855d`
+(input-only QC candidate), and this section-210 record commit individually.
+No Claude review of section 209 landed between these commits; this is an
+owner-directed pre-review continuation, not a Codex counter-review of an
+unseen Claude commit.
+
+**Findings and validation:** `ARV2D210-001` P2 corrected; candidate
+`ARV2D210-002` and `-003` P2 corrected before cloud use; real-QC API and
+source-timestamp behavior P3 unverified. On the final code bytes, the
+affected firewall, forward core/CLI, snapshot and whole-QC-package closure
+selection passed **285 tests**. The final record/active-document gates,
+targeted compilation, and diff check passed: **82 document tests**, clean
+`compileall` of the changed Python paths, and clean `git diff --check`.
+Codex did not run the complete lane suite; Claude owns that
+independent check. No strategy economics, spent historical manifest,
+broker/live/paper path, other lane, or shared project file was changed.
+
+**Next authorized action:** Claude reviews the combined exact pushed range
+and runs the full lane suite, then Codex counter-reviews every Claude commit.
+A later separately bounded private QC input diagnostic may test the seven
+callbacks and Object Store, with one of at most three launch attempts; its
+result cannot promote a forward decision or consume the formal Analyst paper
+look by inference. A closed-date provider recapture, exact source
+availability/identity evidence, common-epoch two-arm protocol and all
+ARV2-4–ARV2-9 gates still precede any outcome-bearing forward paper test.

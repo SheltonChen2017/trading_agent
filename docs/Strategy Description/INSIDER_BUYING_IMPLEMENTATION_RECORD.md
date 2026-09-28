@@ -1,18 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **OWNER-AUTHORIZED SEC ACQUISITION PREPARATION CANDIDATE IMPLEMENTED
-IN `d9f023f`; CLAUDE REVIEW PENDING (SECTIONS 96-97). THIS IS A ZERO-I/O
-REQUEST RECIPE AND RAW-HEADER DERIVED-METADATA BOUNDARY, NOT A DOWNLOADER
-OR REAL INGESTION. CLAUDE'S `bebc235` REMAINS ACCEPTED AFTER SECTION-95
-APPEND-ONLY DOCUMENTATION CORRECTION. THE OWNER'S NEW BOUNDED SOURCE
-DIRECTION LIFTS THE PREPARATION/PUSH GATE, NOT THE REAL RETRIEVAL GATE.
-THE ACCEPTED 2022Q4..2023Q1 IB-1B PILOT AND ALL FROZEN SOURCE CONTRACTS
-ARE UNCHANGED; MATCHING XML/ACCEPTANCE ARTIFACTS REMAIN ABSENT.
-THE 16-FILING PILOT IS ONLY A PROPOSAL, NOT SELECTED OR APPROVED.
-`IB1BP-CR04` AND `IB1BP-CR05` REMAIN OPEN AS QUALIFIED IN SECTION 95.
-NO OUTCOME, QC, DEPLOYMENT, BROKER, OR TRADING AUTHORITY; ALL LOOKS ZERO.
-THE ONE-ROUND MONITOR REMAINS PAUSED. ONE COMBINED SAME-LANE PUSH WILL
-HAND OFF THE PRIOR COUNTER-REVIEW AND THIS PREPARATION CANDIDATE.**
+Status: **OWNER-AUTHORIZED FIXED 16-FILING SEC-ONLY COMPATIBILITY PILOT
+ACQUIRED, NONCANONICAL AND ZERO-LOOK (SECTION 98). THE FIRST 32 INDEX/HEADER
+REQUESTS AND XML-ONLY CONTINUATION'S 16 REQUESTS TOTAL 48 DISTINCT HTTP 200
+ARTIFACTS; ALL 16 ROWS ARE RETAINED AND STRUCTURALLY VALIDATED. RAW OBJECTS
+AND REPORTS STAY OUTSIDE GIT. THE ORIGINAL 2022Q4..2023Q1 IB-1B PILOT,
+FROZEN V1 HEADER RECIPE, AND ALL OTHER SOURCE CONTRACTS ARE UNCHANGED.
+FIRST-PASS CODE SHA IS OPERATOR-ATTESTED, NOT ARTIFACT-PROVEN; SEC TIMEZONE,
+OFFICIAL PROFILE, SOURCE AUTHENTICITY, CANONICAL/PIT STATUS, AND DIRECT
+IB-1C INGESTION REMAIN FALSE OR UNVERIFIED. NO OUTCOME, ETF, QC, BROKER,
+DEPLOYMENT, OR TRADING AUTHORITY; ALL LOOKS ZERO. CLAUDE INDEPENDENT REVIEW
+OF THE EXACT ONE-PUSH SNAPSHOT IS NEXT; CODEX COUNTER-REVIEWS EVERY CLAUDE
+COMMIT THEREAFTER. THE ONE-ROUND PUSH MONITOR WILL BE REARMED ONLY AFTER
+THE PUSH.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -201,6 +201,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Claude review | `d3c10a4` -> this review record | Independent review of the section-92 counter-review and the first real noncanonical IB-1B pilot on 2022Q4..2023Q1 (`bd2c65c..d3c10a4`, 1 record-only commit, 0 merges) | Verified the remote tip and clean worktree and accepted the commit. Verified the Mac-local report bytes and digests, replayed both quarters through the existing IB-1A/IB-1B loaders without writing, and ran an independent standard-library parse of both source ZIPs for table counts, forms, duplicates, orphans, transaction keys, SEC-declared keys, and quoting; read the SEC metadata and readme members as documentation. Aggregate counts only; no row content printed or persisted; pilot not rerun. | Report 32,494 bytes, SHA-256 and payload digest verify; replay **2 of 2 quarters equal the report** (98.5 s, 2.25 GB peak); oracle **16 of 16 table counts**, all form counts, 0 duplicate filings, 0 orphans, 0 blank or duplicate transaction keys; quoting is genuine CSV (13,962 and 24,196 quoted fields). Complete suite on `d3c10a4` **8,882 passed, 38 skipped, 28 warnings, 0 failed in 774.22s**; recorded **1,276** reproduces; lane gate **2,684 passed, 0 skipped in 52.36s**; compileall exit **0**. Python 3.13.15, pytest 9.1.1. No XML, acceptance metadata, SEC, network, provider, credential, licensed row, outcome, QuantConnect, broker, operator-database, scheduler, deployment, capital, or trading access; **0 looks**. | `IB1BP-CR04` P3 open (post-run directory entry changes, artifacts intact). `IB1BP-CR05` P3 open (SEC declares keys for all eight tables; seven hold, OWNER_SIGNATURE has 191 and 111 duplicates). Earlier items retained. No P0-P2. | Codex counter-reviews this record and answers `IB1BP-CR04`. Next source gate: owner-supplied matching Form 4/4-A XML and acceptance metadata for 2022Q4..2023Q1, with reviewed IB-1C to IB-1E preparation before processing. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-27 | Codex counter-review; input-gated, local only | `d3c10a4..bebc235` reviewed; this local record commit follows | Section-94 counter-review, provenance qualification, and next-source boundary | Accepted the sole Claude record commit after append-only documentation correction of filesystem inference. Independently matched both approved ZIP inventories, SEC-declared keys and quoting, canonical report/digests, and ten stage receipt member hashes. Recovered this task's exact prior command logs but could not attribute the directory timestamp changes. No code, profile, tests, shared files, real stage, or output artifact changed. | Incoming focused source/preparation, active-document and import-boundary checks including the exact Insider package guard: 1,276 passed in 22.06s; final record checks in 95.4. Independent source oracle: all 16 table counts and forms match, seven declared keys unique, OWNER_SIGNATURE duplicate rows 191/111, no blank keys, width errors or orphans. All 26 output-entry inode/size/mtime/ctime observations unchanged during this audit. No full lane/repository suite by Codex; 0 looks. | IB1BP-CR04 P3 OPEN, actor/action unestablished; IB1BP-CR05 P3 OPEN verified source-contract input, not a current defect. All earlier resolved and open findings retained in 95.3. No P0-P2 or new production defect. | No push while this owner-input gate blocks the next milestone. Supply exact matching XML/acceptance bundle for 99,394 Form 4/4-A accessions, then freeze/review bounded IB-1C-E preparation before processing; no retrieval authority inferred. Monitor PAUSED, not rearmed. |
 | 2026-09-27 | Codex counter-review + authorized preparation | `bebc235..e0f884f` counter-review; `d9f023f` preparation; this record commit follows | SEC-only acquisition preparation, synthetic and zero-I/O | Owner approved preparation after source guidance. Added exact-tuple, hash-bound request recipes and strict raw-header derived projections; retained raw bytes/hash and unverified lineage, no downloader or direct IB-1C integration. Prior counter-review accepted after append-only clarification; no shared file changed. | Focused 1,129 passed in 12.55s; new file 148 passed in 0.66s; eight in-memory mutants killed; independent 15 adversarial refusals plus valid control; targeted compilation and diff clean. Final record checks in 97.4; no full suite by Codex; 0 looks. | IBSEC-R01/R02 P2 draft provenance defects fixed red/green; IBSEC-R03 P3 ledger shape corrected append-only. Prior open and resolved ledger retained. No remaining verified P0-P2. | One combined push, then Claude reviews every commit after bebc235. Only after review/counter-review may separately authorized downloader/profile integration and an exact owner-approved fixed pilot proceed. No downloads, new quarter, XML processing, outcome, QC, deployment, or trading inferred. |
+| 2026-09-27 | Codex implementation + bounded SEC acquisition | `36a2edb..f5430ff..5cc897d`; this final record commit follows | Owner-approved fixed 16-filing SEC-only compatibility pilot | Built a standalone exact-inventory runner, then corrected the observed tag-header dialect with a versioned parser and hash-verified XML-only continuation. First pass acquired 16 indexes and 16 headers; continuation replayed those exact objects without refetch and acquired 16 XMLs. Final external report `722ab1b03c93d1d6aa61f798b2cb6a391a934ee8a334034eff2b5102cea40ec5` binds 48 distinct HTTP 200 artifacts / 48 attempts and all 16 retained acquired rows; raw artifacts remain outside Git. First-pass code SHA is operator-attested only, timezone and source authenticity unverified, no direct IB-1C or canonical/PIT claim. | First candidate 52 synthetic passed, affected selection 1,181 passed. Continuation 68 synthetic passed, affected selection 1,197 passed; compilation/import/active-document/package guard/diff green. Independent first/second report, journal, object, route and authority replay verified 48 regular single-link objects (113,902 bytes) and 0 / 0 / 0 looks. No complete suite by Codex. | IBSECACQ-R01..R07 P2 draft/real-dialect issues closed with red/green or exact replay; R08/R09 P3 provenance/pacing-observability limits remain open; R10 P3 route drift documented. Earlier ledger retained, no open new P0-P2. | Make one same-lane push, then arm the existing one-round Claude-push monitor against exact HEAD. Claude independently reviews every commit since `bebc235`; Codex counter-reviews every Claude commit. No further SEC acquisition, canonical IB-1C, outcome/ETF/QC/backtest, paper/live or trading step inferred. |
+
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -12897,3 +12899,130 @@ those 16 XML filenames into a fresh external root, and account for attempts
 cumulatively. A full rerun would rerequest the first 32 artifacts and is not
 the authorized continuation. No additional SEC request has been made while
 this correction is developed and verified.
+
+### 98.3 XML-only continuation and exact external receipt
+
+`5cc897dbf9b7e9216370b2157ef79c9c9b2a0508` adds an **explicitly
+versioned** tag-line compatibility validator and a separate continuation
+mode. It leaves the section-96 v1 colon-labelled projection byte-unchanged.
+Before creating output or issuing a request, the continuation replays the
+same two source ZIP bindings and exact 16 candidates, the first-pass commit
+marker/report/inventory, every ordinal/path/status/size/hash in its 32-attempt
+journal, every regular single-link index/header object, the index-selected
+filename, and the newly scoped header identity and raw acceptance. The
+first-pass root remains immutable. The new root copies those 32 verified raw
+objects, seeds its durable journal at ordinal 32, refuses rerequests of any
+first-pass path, and requests only the 16 exact index-named primary XMLs.
+The new runner also refuses an uncommitted/dirty lane worktree or a runner
+file different from its exact supplied `HEAD` SHA before source or network
+work. Synthetic dangerous-direction checks pin root-role nesting, direct
+issuer-company CIK, corrupt prior objects, journal path drift, output
+overlap, clean-tree provenance, and pacing across retries.
+
+The committed-tree continuation ran once from a clean `5cc897d` checkout.
+Its external root is
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider_buying_sec_xml_continue_2022q4_2023q1_5cc897d`.
+Its commit marker binds report SHA-256
+`722ab1b03c93d1d6aa61f798b2cb6a391a934ee8a334034eff2b5102cea40ec5`.
+The report binds first journal SHA-256
+`e56ec3fb369a11598bb2ac30cf5fd1f1e299c52fae1a6ee410c6816c4d2586db`,
+the first report hash, original inventory hash, operator-attested first code
+SHA with `prior_code_sha_artifact_verified=false`, and clean-committed
+continuation code SHA. The second journal has one verified-replay event,
+ordinals **33..48** reserved and answered HTTP 200, and one terminal event.
+The combined pilot used **48 distinct artifacts / 48 attempts**, exactly
+one each per approved index, header, and XML route; zero retries, redirects,
+access denials, extra filings, or fallback providers. Independent read-only
+replay verified all 16 rows acquired, 48 regular single-link objects with
+matching SHA/size/path (113,902 total raw bytes), the XML response hashes,
+both journal hashes, both commit/report bindings, exact inventory, and all
+hard-false authority fields. `acquisition_available=true` means this exact
+16-artifact-set compatibility acquisition is complete, **not** that the
+sources are canonical, PIT-ready, complete for history, or authorized for
+IB-1C. The XML check is structural only: strict UTF-8, no DTD/entity,
+`ownershipDocument` root, unique exact document type and issuer CIK.
+Amendment-to-original identity remains unresolved. The tagged acceptance
+interpretation retains an explicit unverified Eastern-time convention.
+
+### 98.4 Commit dispositions and P0-P3 ledger
+
+No incoming Claude commit follows `36a2edb` in this round. The owner waived
+Claude review as a prerequisite to this authorized acquisition, then
+explicitly directed one push and monitoring for Claude's independent review
+of the resulting snapshot. This is **not** a claim that Claude has accepted
+`e0f884f`, `d9f023f`, `36a2edb`, or either new code commit. Dispositions for
+the round's own commits are:
+
+| Commit | Scope | Current disposition |
+|---|---|---|
+| `f5430fff9b09a963b5cb0307c9e87b28a69c4767` | Fixed first-run runner and 52 synthetic cases | Codex implementation candidate; real tagged-header mismatch found in its first live run, corrected by `5cc897d`; independent Claude review pending. |
+| `5cc897dbf9b7e9216370b2157ef79c9c9b2a0508` | Versioned tag-header validator, exact receipt replay, XML-only continuation, 68-case synthetic file, and first-run record | Codex candidate accepted by focused/security review and one exact bounded run; independent Claude review pending. |
+| This final record commit | Current status, section 98, and one session-ledger row | Documentation handoff; independent Claude review pending; exact hash is obtained from pushed history. |
+
+The following ten-column ledger supplements, without erasing, all prior
+open/closed entries. Draft red states were **uncommitted** and cannot be
+reproduced as separate pushed commits; the committed regressions, source
+replay, and exact live refusal/continuation are the durable evidence.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSECACQ-R01 | P2 | CLOSED | Pre-`f5430ff` draft -> `f5430ff` | SEC transport and retry budget | Missing/duplicate/oversized declared lengths, unsupported compression/framing, and per-path retry reset could admit unbounded or excess transfers. | Initial synthetic runner: 35 passed, 10 failed across material directions. | The owner capped every response and artifact, not merely the full run. | Exact one Content-Length <=2 MiB; no compression/chunked; body-size parity; status-before-body on denial; per-path three-attempt and global ceilings. | 52 first-run tests green; 68 after continuation; global-stop and retry/pacing regressions included. |
+| IBSECACQ-R02 | P2 | CLOSED | Pre-`f5430ff` draft -> `f5430ff` | Publication and root identity | A final hash/commit name could become visible before fsync; case-alias or root replacement could redirect writes. | Draft crash/alias tests red; first version stored final object before fsync. | Incomplete raw evidence must never look committed or overwrite protected roots. | Fsynced temporary plus exclusive-link publication, journal-directory fsync, root inode checks, case-alias refusal. | Synthetic fsync-failure, alias, and replaced-root tests green; final roots mode 0700 and object hashes independently replayed. |
+| IBSECACQ-R03 | P2 | CLOSED | Pre-`f5430ff` draft -> `f5430ff` | XML DTD/entity validation | UTF-16 internal DTD/entity evaded raw ASCII scan and ElementTree expanded it. | In-memory 406-byte malicious XML accepted before strict decode; red regression. | No XML entity expansion may enter even noncanonical compatibility evidence. | Strict UTF-8/no BOM/foreign declaration and decoded-text DTD/entity refusal before parsing. | Same hostile fixture refused; 52 and later 68 synthetic cases green. |
+| IBSECACQ-R04 | P2 | CLOSED | Pre-`f5430ff` draft -> `f5430ff` | `acquisition_available` | A partial sample was marked available when any one row passed. | New mixed-row assertion: 51 passed, 1 failed. | The approved sample is all 16; partial evidence must stay unavailable. | Require exactly 16 acquired rows; retain all refused/partial rows. | 52 passed after one-line correction; first run false, complete continuation true. |
+| IBSECACQ-R05 | P2 | CLOSED for this sample | First real run -> `5cc897d` | SEC header dialect | Provisional colon-labelled projection rejected every real tag-line header, blocking XML despite 32 successful index/header responses. | Exact first report: 16 identical `missing or ambiguous ACCESSION NUMBER` refusals and zero XML requests. | Current-lane source compatibility requires explicit observed-shape handling without weakening v1. | New `sec-header-tag-line-compat-v1` parser and receipt; frozen v1 parser unchanged. | All 16 hash-pinned real headers replayed offline, 68 synthetic cases green; XML-only continuation acquired all16. |
+| IBSECACQ-R06 | P2 | CLOSED | Pre-`5cc897d` draft -> `5cc897d` | Tagged issuer role parser | An `ISSUER` nested inside an unclosed reporting owner or nested CIK inside company data could spoof issuer identity. | Independent in-memory hostile repro accepted by draft, then red tests. | Issuer CIK must be scoped to a genuine root issuer's first company subsection. | Exact one-owner/one-issuer topology, balanced order, direct leaf fields, unique issuer CIK. | Nested/unclosed/indirect CIK cases refused; 16 real headers still replay; 68 synthetic cases green. |
+| IBSECACQ-R07 | P2 | CLOSED | First run -> `5cc897d` | Cumulative acquisition budget | A full rerun would rerequest 32 completed artifacts and lose durable cross-run accounting. | First run's 32 HTTP 200 journal responses and retained objects. | Continue the exact same approved sample without untracked retries or source expansion. | Replay prior receipt before network; seed 32 paths/attempts; prohibit old paths; request only 16 XML. | Corrupt-object/path-drift/no-refetch tests green; final ordinals 33..48 and 48 total distinct/attempts verified. |
+| IBSECACQ-R08 | P3 | OPEN, provenance limit | `f5430ff` first run | First-pass executable SHA | First report did not artifact-bind the code commit because no v1 header projection serialized. | Report/commit/journal lack a code-SHA field; local run used clean `f5430ff` but that link is outside the artifact. | Never upgrade operator knowledge to cryptographic evidence. | Continuation records exact first SHA as operator-attested with `prior_code_sha_artifact_verified=false`; no rewrite of first root. | Both immutable reports replayed; final false flag verified. Future canonical ingest must settle executable provenance separately. |
+| IBSECACQ-R09 | P3 | OPEN, observability | `f5430ff` first run | Request pacing evidence | First journal has ordinal/attempt but no wall or monotonic timestamps, so 2 rps cannot be independently timed from that artifact. | Exact first journal schema, 32 reservations/responses. | Code enforcement is not a measured external pacing trace. | Keep limitation explicit; continuation adds synthetic monotonic/sleep regression, not a retroactive timestamp claim. | Algorithm's >=0.5-second start spacing pinned across retry and seeded continuation; no historical timing inference. |
+| IBSECACQ-R10 | P3 | CLOSED, documented | `f5430ff`/`5cc897d` | Index route provenance | Executable pilot uses directory `index.json`, while section 96's non-executable recipe named `{accession}-index.htm`. | Exact first journal paths and official SEC accession-directory route. | Different source bytes cannot be called a replay of the provisional recipe. | Pin `sec-accession-directory-index-json-v1` in both inventories/reports and this record. | All 16 first index requests HTTP 200; index filename replay is mandatory before XML. |
+
+Earlier P3 findings `IB1BP-CR04/CR05`, `IB2CTX-CR02`, `IBZIP-CR02/CR03`,
+`IB2SRC-CR03`, and shared `IBSH-CR01` retain their prior dispositions;
+out-of-lane shared behavior was not changed. No verified P0/P1 or remaining
+open P2 exists in this bounded candidate.
+
+### 98.5 Validation, exclusions, and Claude handoff
+
+Codex used Python 3.12.14 with `-B`/`PYTHONDONTWRITEBYTECODE=1`.
+First-run runner: **52 synthetic tests passed** after its red/green fixes;
+independent affected selection **1,181 passed** in 11.02s. Before the
+continuation live run: new-file **68 passed**; affected active-document,
+source-contract, import-boundary and exact Insider package-guard selection
+**1,197 passed in 12.02s**, zero failures; targeted compileall exit 0 and
+`git diff --check` clean. Independent offline replay of the retained first
+report returned exactly 16 tag-validated sources and 32 prior paths, with
+the pinned report/inventory/journal hashes. A read-only security audit found
+no remaining verified P0-P2 before the second live request. No complete lane
+or repository suite was run by Codex; Claude's independent review should
+perform the full lane suite under the standing workflow.
+
+The continuation was launched only after `5cc897d` and its clean-tree/code
+SHA guard passed; it finished with the exact result in 98.3. Follow-up
+record-sensitive, compilation, diff, import and status checks on this final
+documentation tree are green: the same affected selection repeated **1,197
+passed in 11.65s**, targeted compileall exit 0, `git diff --check` clean,
+and the only post-run changed path is this lane record. No raw SEC accession
+index, header, XML, personal contact, or derived external report is in Git.
+The first report's source-authenticity and code-SHA caveat remains open;
+acceptance-time timezone semantics, full filing completeness, amendment
+lineage, security-master/calendar identity, canonical IB-1C parent/projection
+integration, and any outcome/ETF/QC/backtest/paper/live gate remain unproved
+or separately authorized. No additional quarter, SEC/provider source,
+credential, licensed row, outcome look, ETF data, QC processing/upload/job,
+broker/operator database, scheduler, deployment, capital, order or trading
+operation occurred. Research, authorized-outcome and consumed-outcome looks
+remain **0 / 0 / 0**.
+
+Claude next reviews **every commit in `bebc235..PUSHED_HEAD`** on this same
+lane branch, including the previously unreviewed counter-review/preparation
+commits, both acquisition commits and this record, without rerunning live
+SEC collection as part of review. Codex then counter-reviews every Claude
+commit. The next real IB-1C-E integration is **not authorized by this pilot**:
+it needs an independently reviewed versioned raw-index/header/XML parent
+contract, the first-pass provenance caveat disposition, and separate owner
+direction before any canonical or outcome-facing processing. The shared
+security-master/calendar audit still lacks its main-line venue/executor;
+IB-3 diagnostics remain paused. The owner requested a single combined push
+and a monitor for Claude's next pushed review; rearm that monitor only after
+the push, with the exact pushed HEAD as baseline.

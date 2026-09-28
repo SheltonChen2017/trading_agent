@@ -134,7 +134,7 @@ def _company_cik(lines: list[str], *, outer: str) -> str:
         raise SecRawParentProjectionError(f"REFUSED: {outer} data scope is incomplete")
     data_end = lines.index(end)
     contents = lines[1:data_end]
-    forbidden = _PREAMBLE_TAGS | {
+    forbidden = _PREAMBLE_TAGS | _OWNER_SUBSECTIONS | _ISSUER_SUBSECTIONS | {
         "OWNER-DATA", "COMPANY-DATA", "REPORTING-OWNER", "ISSUER", "SEC-HEADER",
     }
     if not contents or any((match := _TAG_FIELD.fullmatch(line)) is None

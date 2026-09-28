@@ -218,6 +218,21 @@ def test_trailing_subsections_admit_only_known_flat_identity_free_blocks(old, ne
         _derive(owners=("0000999999", "0000888888"), header=header.replace(old, new, 1))
 
 
+@pytest.mark.parametrize(("old", "new", "match"), [
+    (b"<CONFORMED-NAME>Invented Owner", b"<MAIL-ADDRESS>shadow",
+     "data has nested or malformed fields"),
+    (b"<FORM-TYPE>4", b"<MAIL-ADDRESS>shadow",
+     "subsection has nested, malformed, or identity fields"),
+    (b"<STREET1>2 Invented Way", b"<FORMER-COMPANY>shadow",
+     "subsection has nested, malformed, or identity fields"),
+])
+def test_valued_subsection_names_cannot_masquerade_as_flat_fields(old, new, match):
+    header = _real_shape_header()
+    assert old in header
+    with pytest.raises(SecRawParentProjectionError, match=match):
+        _derive(owners=("0000999999", "0000888888"), header=header.replace(old, new, 1))
+
+
 def test_xml_owner_set_mismatch_or_duplicate_refused_without_attribution():
     for xml in (_xml(("0000888888",)), _xml(("0000999999", "0000999999")),
                 _xml(())):

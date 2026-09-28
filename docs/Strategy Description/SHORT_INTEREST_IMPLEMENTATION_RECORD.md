@@ -9245,3 +9245,32 @@ names and license scope without requesting credentials; no response or source
 access is presumed. On the decision-only text, active-document plus Short
 Interest import-boundary checks were **78 passed in 1.30s**; no full lane or
 repository suite was run. No push is made by this decision record alone.
+
+## 67. SI-5 offline design precision and independent P3 audit — 2026-09-28
+
+The read-only independent audit of the pending SI-5 offline protocol found no
+P0–P2 authority escape, but found two P3 precision gaps. The following
+delegated choices extend section 66 before any outcome access; they are
+**prospective offline design terms**, not a data-right, look, QC or trading
+authorization. This section is part of the owner's requested running
+authorization/decision inventory.
+
+| ID | Type | Exact delegated choice | Boundary |
+|---|---|---|---|
+| `SI-DEC-20260928-06` | Return-basis choice | The gross stock diagnostic `R(20)` compares the release's next permitted XNYS open to the **20th later XNYS session open**. Use split-adjusted open prices and exclude cash dividends from this *price-return diagnostic*; report its basis explicitly. Do not equate it to dividend-inclusive investable total return. | Missing opens, suspensions, delistings, terminal proceeds and corporate-action quality are **unresolved fail-closed admission conditions** before any real outcome is joined. This choice does not silently drop such names. |
+| `SI-DEC-20260928-07` | Aggregation choice | Within each release, equally weight eligible stocks in the high- and low-pressure tails and form **low minus high** for that release. Equally weight release-level contrasts for the development statistic, so ticker rows are not independent confirmatory observations. | Tail construction must use the authenticated next-open eligible population; no post-release evidence or replenishment. Inference and effective sample size remain to be validated prospectively. |
+| `SI-DEC-20260928-08` | Candidate-selection choice | On the predeclared common release/security intersection, a *development-only* candidate would maximize the mean release-level low-minus-high `R(20)` contrast across 20/60/120/252. An exact tie, empty cohort, or unmet power/coverage gate yields **no winner**. | No candidate is selected now; validation outcomes cannot choose or revise a candidate. No fallback to individually convenient candidate cohorts. |
+| `SI-DEC-20260928-09` | Cost-role choice | `R(20)` is a **gross diagnostic**, with no 10 bps or sensitivity subtraction. The existing 10 bps per side primary and 0/5/20 bps per side sensitivities apply only to a separately specified eventual next-release **order-based P&L**. Sector-relative stock returns remain descriptive, not another confirmatory cell. | Exact order fills, split/dividend/terminal cashflows and cost application need a later executable offline contract before empirical P&L or QC action. |
+
+The audit ledger keeps both findings rather than discarding them:
+
+| Finding | Priority | Status at this record snapshot | Evidence and required correction |
+|---|---|---|---|
+| `SI-CCR24-001` | P3 | Confirmed; correction pending | The pending protocol test verified only decision IDs in the pinned section-66 record, while the implementation contained substantive 20th-open, weighting and selection choices not written there. Pin this complete section-67 decision text to an immutable commit and assert the substantive clauses in focused tests. |
+| `SI-CCR24-002` | P3 | Confirmed; correction pending | The pending protocol used ambiguous “corporate-action-adjusted” for `R(20)`, conflating price return with possible dividend-inclusive total return. Specify split-adjusted, dividend-excluded gross stock diagnostic separately from costed, dividend-inclusive eventual order P&L, and fail closed on unresolved terminal semantics. |
+
+This decision record uses the governing blueprint's distinct fixed-20-session
+stock diagnostic and natural next-release order holding. It does not change
+the frozen SI-0M zero-look gate, choose dates/look IDs or claim market-data
+coverage. The planned code correction and focused red/green verification are
+recorded in the next section after they actually occur.

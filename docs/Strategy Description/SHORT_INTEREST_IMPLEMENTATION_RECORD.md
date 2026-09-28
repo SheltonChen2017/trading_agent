@@ -1,23 +1,16 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED THE TWO-COMMIT RANGE `7156565..d25e5d2` COMMIT BY
-COMMIT (SECTION 63). BOTH ARE ACCEPTED WITH NO CODE OR TEST CORRECTION.
-`SI-CR12-002` IS **CLOSED BY CORRECTION**: the ranking policy now binds an
-immutable owner citation, verified as the record blob at `252ece8` with
-SHA-256 `e5b06802...`, and a test rehashes that committed git object and
-asserts the verbatim freeze. ALL FOUR `SI-CCR22` CORRECTIONS AGAINST MY
-RECORD ARE CONFIRMED AND ACCEPTED, INCLUDING A MATERIALLY MISLEADING LEDGER
-ROW OF MINE THAT SAID NO TEST CORRECTION WAS REQUIRED WHILE `7bad2a9`
-EXISTED; `SI-CR13-004` RECORDS THE MECHANICAL GUARD NOW ADDED. SECTION 62 IS
-ACCEPTED AS A BOUNDED NO-OUTCOME DRAFT THAT FREEZES NOTHING AND CONSUMES NO
-LOOK. THREE PRE-APPROVAL RESEARCH-DESIGN ADVISORIES ARE RAISED FOR THE OWNER
-BEFORE ANY METRIC IS FROZEN: A BLUEPRINT-VERSUS-PREREGISTRATION HOLDING-HORIZON
-CONFLICT (`SI-CR13-001`), THE PERMANENT ALPHA BUDGET VERSUS ACHIEVABLE POWER
-(`SI-CR13-002`), AND THE COMPLEMENT DEPENDENCE OF THE TWO ROLE CELLS PLUS
-SECTOR-NEUTRAL TRANSFERABILITY (`SI-CR13-003`). THE EXACT FIFTEEN-FILE SHORT
-INTEREST LANE IS 759 PASSED. THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007`
-REMAINS OPEN. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED; AUTHORIZED AND
-CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER, LICENSED-DATA,
+Status: **CLAUDE'S SECTION-63 REVIEW OF `7156565..d25e5d2` IS ACCEPTED AFTER
+THE SECTION-64 CODEX RECORD QUALIFICATIONS FOR ITS SOLE FOLLOW-ON COMMIT
+`985743e`. THE OWNER'S NARROW SECTION-65 DECISION NOW RESOLVES THE HORIZON
+SEMANTICS: NEXT-RELEASE HOLDING FOR EVENTUAL ORDER-BASED P&L AND A DISTINCT
+FIXED 20-SESSION STOCK-EVALUATION DIAGNOSTIC. IT DOES NOT APPROVE SECTION
+62'S PROPOSED SELECTION STATISTIC OR THE SI-5 PROTOCOL. THE POWER/LOOK AND
+ROLE-DEPENDENCE ADVISORIES `SI-CR13-002`/`003` REMAIN OPEN; THE SHARED,
+OUT-OF-LANE P2 `SI-CR5-005`/`SI-CCR16-007` REMAINS OPEN. CLAUDE REPORTED
+759 PASSED FOR THE FIFTEEN-FILE SHORT INTEREST LANE; CODEX DID NOT RERUN
+THE COMPLETE LANE. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED; AUTHORIZED
+AND CONSUMED OUTCOME LOOKS ARE ZERO. ALL PROVIDER, LICENSED-DATA,
 ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION, PRODUCTION-RANKING, SEED,
 ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
 PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
@@ -25,7 +18,9 @@ PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
 Local-only Codex counter-review of Claude's sole follow-on commit
 `985743e77212c0313121f1ae1754e03dd452c374` is in section 64. It does
 not freeze the SI-5 protocol, authorize a data/outcome/QC step, or constitute
-the lane's next combined push.
+the lane's next combined push. Section 65 records the subsequent narrow owner
+decision; both updates remain local-only pending the next authorized combined
+round.
 
 Branch: `codex/strategy-short-interest`
 
@@ -9107,3 +9102,74 @@ milestone. This counter-review makes no next-milestone implementation or
 push; its record correction remains **local-only** pending an owner decision
 and the later single combined lane push. The one-shot Claude-push monitor
 remains paused.
+
+## 65. Owner horizon interpretation for the gated SI-5 draft — 2026-09-28 UTC
+
+### 65.1 Exact decision and bounded effect
+
+After the section-64 counter-review, Codex recommended **holding until the
+next public short-interest release for eventual order-based strategy P&L** and
+using **20 completed trading sessions for the distinct stock-evaluation
+diagnostic**. Codex asked the owner whether that interpretation was approved,
+while explicitly stating that power/look allocation and role dependence still
+needed settlement before a metric could be frozen. The owner's reply was:
+
+> yes approved
+
+This approves that **horizon interpretation only**. The eventual order-based
+stock simulation exits or rebalances under the next-release rule, with its
+precise fill/execution treatment still to be specified. The fixed 20-session
+stock outcome is a separate evaluation horizon, not that variable-length
+order holding period or an approved return/selection formula.
+`PREREGISTRATION.primary_horizon_sessions = 20` denotes the fixed stock
+evaluation horizon; it does **not** prescribe an order exit after 20 sessions.
+This interpretation is consistent with the governing blueprint's next-release
+primary holding rule (physical page 8, section 1.3), its simultaneous
+20-session fixed primary horizon/natural next-release holding distinction
+(physical page 26, section 8.4), and its stock-first `R(20)` hypothesis
+(physical page 28, section 9.2). No blueprint amendment, preregistration
+field/digest change or code change follows from this semantic decision.
+
+### 65.2 Persistent finding dispositions and remaining gates
+
+| Finding | Priority | Status after owner decision | Scope of closure or remaining action |
+|---|---|---|---|
+| `SI-CR13-001` / `SI-CCR23-001` | P3 | **Horizon ambiguity closed by owner decision**; Claude's claimed necessary PDF/preregistration conflict remains unsupported for the reasons in section 64.2. | Next-release order holding and fixed 20-session stock evaluation coexist. The exact statistic, comparator, hypothesis and selection rule remain **unapproved**, so this is not a metric freeze. |
+| `SI-CR13-002` | P3 | **Open.** | Require a prospective power/minimum-detectable-effect assessment using approved assumptions before permanent alpha allocation; no cell ID or look is allocated here. |
+| `SI-CR13-003` | P3 | **Open.** | Freeze the dependence/multiplicity treatment of complementary pressure and covering cells and the interpretation/possible diagnostic of sector-neutral stock evidence versus later ETF transfer before outcomes. |
+| `SI-CCR23-002` / `SI-CCR23-003` | P3 | Historical section-64 qualifications retained. | The review's I/O and file-change claims are scope-qualified, and its claimed private ledger guard remains self-reported/unverified; no unrelated tooling change is inferred. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | **Open, shared/out of lane.** | Document only on this lane; no shared-file correction is authorized. |
+
+Section 62 remains a **draft, not preregistered or approved**. Its proposed
+20-session **sector-relative** statistic is not approved by this horizon
+decision. The owner still needs to freeze the exact metric and sector
+comparator, candidate-cohort comparison, role hypotheses/null/selection/tie
+rule, development/validation dates and folds, release clustering and
+purge/embargo, stock-order construction and costs, missing/delist treatment,
+prospective power assumptions and permanent look IDs/alpha allocation.
+Historical SI and PIT price/volume source rights, actual 20/60/120/252
+coverage, any row-level audit or outcome join, and each QuantConnect action
+retain **separate authorization gates**. The 20/60/120/252 numbers remain
+candidate **eligibility lookbacks**, not a winning lookback or holding rule.
+No provider, licensed/actual price or volume, market outcome, sealed holdout,
+QC, broker, order or trading access was used or granted. **Authorized outcome
+looks: 0; consumed outcome looks: 0.**
+
+### 65.3 Focused validation and handoff
+
+On this decision-only record edit, active-document consistency plus Short
+Interest import boundary: **78 passed in 1.07s** and **78 passed in 0.90s**
+after the decision wording. `git diff --check` is
+**clean**. No production code, test, frozen preregistration, shared/project
+document or `SESSION_HANDOFF.md` changed. Codex did not run the complete
+lane/repository suite or execute a historical backtest; Claude's previously
+reported 759-pass lane result is not a validation claim on this local update.
+
+This is a decision-only, lane-record update after local counter-review commit
+`cabfc6c3da243358af8c89ad2e1e86956dcf511e`; it does not implement a
+new milestone. The designated branch is ahead of the unchanged lane remote
+`985743e77212c0313121f1ae1754e03dd452c374` locally, and **no push** is
+made while the next milestone remains owner-gated. The one-shot Claude-push
+monitor stays paused. The next action is to obtain an owner-frozen SI-5
+specification and the independent data/look/QC permissions, not to substitute
+an empirical or forward-looking milestone.

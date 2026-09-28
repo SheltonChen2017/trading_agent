@@ -57,6 +57,9 @@ def result_fixture():
                 else "none_authenticated_score_clock_only"),
             stock_exclusion_policy_id=study.EXCLUSION_RULE,
             excluded_logical_security_sha256=study.EXCLUDED_STOCK_SECURITY_ID_SHA256)
+        # The physical order runtime emits submitted/completed rebalance counts,
+        # not the synthetic decision_count supplied by the older test fixture.
+        result["aggregates"]["execution"].pop("decision_count", None)
         report = result["diagnostics"]
         report.update(schema=study.diagnostics.REFERENCE_REPAIR_SCHEMA,
             closing_minute_reference_repair_count=0,
@@ -261,7 +264,7 @@ def test_four_stock_arm_comparison_refuses_unmatched_or_invalid_evidence(defect)
     elif defect == "changed_exclusion":
         item["aggregates"]["excluded_logical_security_sha256"] = "f" * 64
     elif defect == "changed_decisions":
-        item["aggregates"]["execution"]["decision_count"] = 260
+        item["aggregates"]["execution"]["completed_rebalance_count"] = 260
     elif defect == "nonfinite_return":
         item["aggregates"]["account"]["cumulative_return"] = "NaN"
     with pytest.raises((ValueError, study.diagnostics._base.AcceptedRiskSixUniverseOrderQcRuntimeError)):

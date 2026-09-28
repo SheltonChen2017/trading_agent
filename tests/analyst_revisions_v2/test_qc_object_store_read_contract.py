@@ -176,7 +176,11 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     production_evidence_acquisition_io.py production_evidence_composer.py
     refusal_smoke_projection.py run_contract.py runtime_shard_projection.py
     six_universe_cap90_submission.py six_universe_coverage_submission.py
-    six_universe_matched_study.py six_universe_qcom_exclusion_study.py
+    six_universe_matched_study.py
+    six_universe_qcom_exclusion_coverage10_projection.py
+    six_universe_qcom_exclusion_coverage10_study.py
+    six_universe_qcom_exclusion_study.py
+    six_universe_qcom_exclusion_tilt_study.py
     six_universe_r181_order_diagnostic.py
     six_universe_recent_settlement_submission.py
     six_universe_relaxed_selection_source.py six_universe_relaxed_submission.py
@@ -451,6 +455,25 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "six_universe_qcom_exclusion_coverage10_projection.py": tuple(
+        """
+        ast dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.six_universe_relaxed_selection_source
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_coverage10_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_tilt_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
     "accepted_risk_matched_historical_projection.py": tuple(
         """
         ast dataclasses hashlib json pathlib research.analyst_revisions_v2_qc
@@ -486,6 +509,15 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
         research.analyst_revisions_v2_qc.six_universe_matched_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_tilt_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
         research.analyst_revisions_v2_qc.six_universe_relaxed_submission
         """.split()
     ),
@@ -1375,6 +1407,8 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.six_universe_settlement_submission
         research.analyst_revisions_v2_qc.six_universe_matched_study
         research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_tilt_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_study
         decimal research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         """.split()
     ),
@@ -1387,9 +1421,12 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "six_universe_qcom_exclusion_coverage10_projection.py": (),
+    "six_universe_qcom_exclusion_coverage10_study.py": (),
     "accepted_risk_matched_historical_projection.py": ("call:read_text", "import:pathlib"),
     "six_universe_matched_study.py": (),
     "six_universe_qcom_exclusion_study.py": (),
+    "six_universe_qcom_exclusion_tilt_study.py": (),
     "matched_mia_recovery.py": (),
     "accepted_risk_latest_order_package.py": ("call:open", "import:os", "import:pathlib"),
     "accepted_risk_delta_order_package.py": ("import:pathlib",),
@@ -4510,7 +4547,10 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.six_universe_cap90_submission",
         "research.analyst_revisions_v2_qc.six_universe_coverage_submission",
         "research.analyst_revisions_v2_qc.six_universe_matched_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_projection",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_study",
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_tilt_study",
         "research.analyst_revisions_v2_qc.six_universe_r181_order_diagnostic",
         "research.analyst_revisions_v2_qc.six_universe_recent_settlement_submission",
         "research.analyst_revisions_v2_qc.six_universe_relaxed_selection_source",

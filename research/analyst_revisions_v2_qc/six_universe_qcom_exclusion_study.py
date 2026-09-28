@@ -150,8 +150,10 @@ def compare_results(results):
                 or aggregate.get("target_gross_exposure") != PROTOCOL["target_gross_exposure"]
                 or aggregate.get("admission_leverage") != PROTOCOL["admission_leverage"]
                 or type(aggregate.get("execution")) is not dict
-                or type(aggregate["execution"].get("decision_count")) is not int
-                or aggregate["execution"]["decision_count"] != PROTOCOL["decision_count"]
+                or type(aggregate["execution"].get("submitted_rebalance_count")) is not int
+                or aggregate["execution"]["submitted_rebalance_count"] != PROTOCOL["decision_count"]
+                or type(aggregate["execution"].get("completed_rebalance_count")) is not int
+                or aggregate["execution"]["completed_rebalance_count"] != PROTOCOL["decision_count"]
                 or type(account) is not dict
                 or type(account.get("observation_count")) is not int
                 or account["observation_count"] != PROTOCOL["observation_count"]

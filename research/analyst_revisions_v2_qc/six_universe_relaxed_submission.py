@@ -40,6 +40,14 @@ MATCHED_STUDY_FEE_CALLBACK_MANIFEST_PATH = Path(__file__).with_name("six_univers
 # retry or repin any of the four historical matched-study source generations.
 FROZEN_QCOM_EXCLUSION_MANIFEST_SHA256 = "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0"
 QCOM_EXCLUSION_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_exclusion_candidates.json")
+# Separate source/protocol freeze for R235--R237; the R231--R234 pin above
+# remains immutable and is only used as a contextual control.
+FROZEN_QCOM_EXCLUSION_TILT_MANIFEST_SHA256 = "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4"
+QCOM_EXCLUSION_TILT_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_exclusion_tilt_candidates.json")
+# Independently pinned 10% minimum-coverage sources; the R231--R237 bytes
+# above remain their own 25% historical experiments.
+FROZEN_QCOM_EXCLUSION_COVERAGE10_MANIFEST_SHA256 = "cd078ea5c0ce1d5a706ab82cb76139f29a04e8a98477d18a7f9cce0aed8a7c2b"
+QCOM_EXCLUSION_COVERAGE10_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_exclusion_coverage10_candidates.json")
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -186,6 +194,28 @@ def _qcom_exclusion_manifest():
     return study.validate_manifest(json.loads(raw))
 
 
+def _qcom_exclusion_tilt_manifest():
+    pin = FROZEN_QCOM_EXCLUSION_TILT_MANIFEST_SHA256
+    if type(pin) is not str or not cap._HEX.fullmatch(pin):
+        _fail("QCOM-excluded tilt study has no frozen manifest pin")
+    raw = QCOM_EXCLUSION_TILT_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != pin:
+        _fail("QCOM-excluded tilt study is not the frozen manifest")
+    from . import six_universe_qcom_exclusion_tilt_study as study
+    return study.validate_manifest(json.loads(raw))
+
+
+def _qcom_exclusion_coverage10_manifest():
+    pin = FROZEN_QCOM_EXCLUSION_COVERAGE10_MANIFEST_SHA256
+    if type(pin) is not str or not cap._HEX.fullmatch(pin):
+        _fail("QCOM-excluded coverage10 study has no frozen manifest pin")
+    raw = QCOM_EXCLUSION_COVERAGE10_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != pin:
+        _fail("QCOM-excluded coverage10 study is not the frozen manifest")
+    from . import six_universe_qcom_exclusion_coverage10_study as study
+    return study.validate_manifest(json.loads(raw))
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -209,12 +239,20 @@ def _plan_manifest(plan):
                 else _matched_study_fee_callback_manifest())
     if type(plan.family) is str and plan.family == "qcom_exclusion":
         return _qcom_exclusion_manifest()
+    if type(plan.family) is str and plan.family == "qcom_exclusion_tilt":
+        return _qcom_exclusion_tilt_manifest()
+    if type(plan.family) is str and plan.family == "qcom_exclusion_coverage10":
+        return _qcom_exclusion_coverage10_manifest()
     _fail("relaxed plan family changed")
 
 
 def _plan_manifest_sha256(plan):
     if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion":
         return FROZEN_QCOM_EXCLUSION_MANIFEST_SHA256
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion_tilt":
+        return FROZEN_QCOM_EXCLUSION_TILT_MANIFEST_SHA256
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion_coverage10":
+        return FROZEN_QCOM_EXCLUSION_COVERAGE10_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
                 else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 if _matched_study_diagnostic_attempt(plan)
@@ -246,7 +284,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]
@@ -365,7 +403,7 @@ def preview(plan, projection):
 
 def _require_inputs(plan):
     family = _plan_manifest(plan)
-    if plan.family in {"matched_study", "qcom_exclusion"}:
+    if plan.family in {"matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10"}:
         # Historical production inputs remain the exact reviewed package and
         # activation; this family must never use the recent R203 upload permit.
         from . import accepted_risk_delta_order_package as delta
@@ -454,8 +492,30 @@ def launch(plan, projection, api):
     common._client(api)
     if _path(plan, "claim").exists():
         _fail("relaxed attempt is already consumed")
+    # R237 A1 reached backtests/create after a successful upload/compile, but
+    # transport failed before a launch receipt. Its exact project had no remote
+    # backtests. Permit only A2 in that same project, after two fresh empty
+    # remote inventories; never turn this into a generic receipt-less retry.
+    precreate_recovery = False
     for slot in range(1, plan.attempt):
-        terminal = common._read(_path(plan, "terminal", attempt=slot))
+        terminal_path = _path(plan, "terminal", attempt=slot)
+        if (not terminal_path.exists() and plan.family == "qcom_exclusion_tilt"
+                and plan.candidate_id == "R237" and plan.attempt == 2
+                and slot == 1 and row["projection_sha256"] ==
+                "44b7e0dfcd31ecb1698e0b46196ebe4de80ca036d9273516b05f35dd65241f25"
+                and FROZEN_QCOM_EXCLUSION_TILT_MANIFEST_SHA256 ==
+                "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4"):
+            prior_plan = dataclasses.replace(plan, attempt=1)
+            if (common._read(_path(prior_plan, "claim")) != preview(prior_plan, projection)
+                    or any(_path(prior_plan, name).exists() for name in
+                        ("launch", "terminal", "read-claim", "raw-custom", "result"))
+                    or common._read(_path(prior_plan, "project")) != {
+                        "candidate_id": "R237", "project_id": 37060477,
+                        "project_name": row["project_name"]}):
+                _fail("R237 pre-create predecessor identity changed")
+            precreate_recovery = True
+            continue
+        terminal = common._read(terminal_path)
         if (terminal.get("status") not in _TERMINAL
                 or terminal.get("status") == "Completed."
                 and _read_artifact(_path(plan, "result", attempt=slot)).get("run_valid") is not False):
@@ -473,7 +533,13 @@ def launch(plan, projection, api):
         if receipt.get("candidate_id") != plan.candidate_id:
             _fail("relaxed retry project receipt changed")
         _project(plan, api, project_id)
-        _require_retry_inventory(plan, api, project_id)
+        if precreate_recovery:
+            if project_id != 37060477:
+                _fail("R237 pre-create project changed")
+            _files(plan, api, project_id, identity)
+            _require_empty_r237_precreate_inventory(api, project_id)
+        else:
+            _require_retry_inventory(plan, api, project_id)
     common._write(_path(plan, "claim"), identity)  # Atomic O_EXCL before mutation.
     if plan.attempt == 1:
         rows = common._post(api, "projects/create", {"name": row["project_name"],
@@ -485,21 +551,22 @@ def launch(plan, projection, api):
         common._write(project_path, {"candidate_id": plan.candidate_id,
             "project_id": project_id, "project_name": row["project_name"]})
         _project(plan, api, project_id)
-    initial = common._post(api, "files/read", {"projectId": project_id}).get("files")
-    if type(initial) is not list or any(type(item) is not dict for item in initial):
-        _fail("relaxed initial source unavailable")
-    names = [item.get("name") for item in initial]
-    expected = {item.project_path for item in projection.source_files}
-    if (len(names) != len(set(names)) or any(name not in expected | {"research.ipynb"}
-            for name in names)):
-        _fail("relaxed initial source has unrelated files")
-    if "research.ipynb" in names:
-        common._post(api, "files/delete", {"projectId": project_id, "name": "research.ipynb"})
-    for item in projection.source_files:
-        common._post(api, "files/update" if item.project_path in names else "files/create",
-            {"projectId": project_id, "name": item.project_path,
-             "content": item.source_bytes.decode("ascii")})
-    _files(plan, api, project_id, identity)
+    if not precreate_recovery:
+        initial = common._post(api, "files/read", {"projectId": project_id}).get("files")
+        if type(initial) is not list or any(type(item) is not dict for item in initial):
+            _fail("relaxed initial source unavailable")
+        names = [item.get("name") for item in initial]
+        expected = {item.project_path for item in projection.source_files}
+        if (len(names) != len(set(names)) or any(name not in expected | {"research.ipynb"}
+                for name in names)):
+            _fail("relaxed initial source has unrelated files")
+        if "research.ipynb" in names:
+            common._post(api, "files/delete", {"projectId": project_id, "name": "research.ipynb"})
+        for item in projection.source_files:
+            common._post(api, "files/update" if item.project_path in names else "files/create",
+                {"projectId": project_id, "name": item.project_path,
+                 "content": item.source_bytes.decode("ascii")})
+        _files(plan, api, project_id, identity)
     compile_id = common._post(api, "compile/create", {"projectId": project_id}).get("compileId")
     if type(compile_id) is not str or not cap._ID.fullmatch(compile_id):
         _fail("relaxed compile identity changed; attempt remains spent")
@@ -518,6 +585,8 @@ def launch(plan, projection, api):
             "compile_id": compile_id, "status": "BuildError"})
         _fail("relaxed compile failed; attempt consumed")
     name = f'{row["backtest_name"]} A{plan.attempt}'
+    if precreate_recovery:
+        _require_empty_r237_precreate_inventory(api, project_id)
     value = common._post(api, "backtests/create", {"projectId": project_id,
         "compileId": compile_id, "backtestName": name}).get("backtest")
     if (type(value) is not dict or value.get("projectId") != project_id
@@ -529,6 +598,18 @@ def launch(plan, projection, api):
         "compile_id": compile_id, "backtest_id": value["backtestId"], "backtest_name": name}
     common._write(_path(plan, "launch"), receipt)
     return receipt
+
+
+def _require_empty_r237_precreate_inventory(api, project_id):
+    """Refuse a delayed or hidden A1 run before R237's one-off A2 recovery."""
+    if type(project_id) is not int or project_id != 37060477:
+        _fail("R237 pre-create project identity changed")
+    listing = common._post(api, "backtests/list", {"projectId": project_id,
+        "includeStatistics": False})
+    if (type(listing.get("count")) is not int or listing["count"] != 0
+            or type(listing.get("backtests")) is not list
+            or listing["backtests"] != []):
+        _fail("R237 pre-create retry has an ambiguous remote run")
 
 
 def _require_retry_inventory(plan, api, project_id):
@@ -605,18 +686,27 @@ def _parse_order(plan, statistics):
     if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion":
         from . import six_universe_qcom_exclusion_study as study
         return study.parse_order(plan, statistics)
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion_tilt":
+        from . import six_universe_qcom_exclusion_tilt_study as study
+        return study.parse_order(plan, statistics)
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion_coverage10":
+        from . import six_universe_qcom_exclusion_coverage10_study as study
+        return study.parse_order(plan, statistics)
     return _parse_order_common(plan, statistics)
 
 
 def _parse_order_common(plan, statistics, *, expected_geometry=_GEOMETRY,
                         decision_count=61, extra_meta_fields=frozenset(),
                         extra_aggregate_fields=frozenset(),
-                        result_transport="two_bounded_custom_summary_statistics"):
+                        result_transport="two_bounded_custom_summary_statistics",
+                        expected_meta_schema=None):
     row, family = _candidate(plan), _plan_manifest(plan)
     meta_name = next(name for name in row["statistic_names"] if name.endswith("META"))
     agg_name = next(name for name in row["statistic_names"] if name.endswith("AGGREGATES"))
     meta, aggregate = _statistic(statistics[meta_name]), _statistic(statistics[agg_name])
-    if (set(meta) != cap._META_FIELDS | extra_meta_fields or meta.get("schema") != row["meta_schema"]
+    if (set(meta) != cap._META_FIELDS | extra_meta_fields
+            or meta.get("schema") != (row["meta_schema"] if expected_meta_schema is None
+                                      else expected_meta_schema)
             or meta.get("role") != row["role"]
             or meta.get("profile_id") != row["profile_id"]
             or meta.get("profile_sha256") != row["profile_sha256"]

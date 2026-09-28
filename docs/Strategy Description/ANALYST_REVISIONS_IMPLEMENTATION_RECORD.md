@@ -28357,3 +28357,196 @@ the owner/Mia recovery rule applies. A terminal `Completed.` is not a valid
 result until its one-use bounded custom-statistic reader accepts it. No
 provider rows, raw order rows, logs, broker, live/paper/funded orders,
 deployment, or trading are within this research sensitivity.
+
+### 202.2 First exact cloud attempt
+
+After prospective source commit `51194b4` and the focused source, adapter,
+closure, and document checks, **R231 A1** uploaded all 17 pinned files to
+new private project **37059318**, `153 ARV2 SIX QCOM EXCLUSION AR_OFF S0 R231
+2021 2025`. Exact source readback and QC compile succeeded; backtest
+`c8583a3fdbb78a99684668b230440e8e` launched. The status-only reader first
+reported `In Queue...`, then `In Progress...`. No custom statistic or outcome
+has yet been read, and a running/`Completed.` engine status alone is not a
+valid result. This consumes R231 attempt **one of three** and one exploratory
+development look: **232 -> 233 shared / 173 -> 174 development / 34
+infrastructure / 646 cells**. R225/Mia's existing project was not edited.
+
+R231 then reached `Completed.` and its single receipt-bound read passed
+`run_valid=true`: **+143.74911021917653%** cumulative net return,
+**−21.757819663952834%** maximum drawdown, 20.51364896743773% annualized
+volatility and 0.97555463376627 zero-rate Sharpe. All 261 rebalances and
+10,812 / 10,812 orders completed, zero invalid/canceled, with exact equality
+between modeled and engine fees of $64,498.1188949 and zero closing-minute
+repairs. This is only the fully AR-off stock sensitivity; its acceptance adds
+one exploratory cell (**647**), not an AR spread or an original R225 result.
+
+**R232 A1** uploaded its distinct 17-file AR-on100/zero-slippage projection
+to new private project **37059623**, `154 ARV2 SIX QCOM EXCLUSION AR_ON100
+S0 R232 2021 2025`, then compiled and launched backtest
+`78fd77c07f46512eb413aa1a0cf2d652`. Its result has not yet been read.
+R232 consumes one of three attempts and one look, bringing the provisional
+floor to **234 shared / 175 development / 34 infrastructure / 647 cells**.
+
+R232 reached `Completed.`; its sole bounded result read authenticated
+`run_valid=true`: **+159.9507341441203%** cumulative return, **−21.784261140342733%**
+maximum drawdown, 20.99727709431368% annualized volatility, 1.0194809691779258
+zero-rate Sharpe, all 261 rebalances and 9,432 / 9,432 orders filled.
+This makes the zero-slippage paired AR-on minus AR-off spread **+16.20162392494377
+percentage points**. One exploratory cell accepted; floor **234 / 175 / 34 /
+648**. No second result read.
+
+R233 A1 used new private project **37059950**, backtest
+`d45faa459397596ef80c31f4e018e828`, with the same AR-off QCOM exclusion
+but five-bps modeled slippage per side. Exact 17-file upload/readback and QC
+compile passed. Its sole result read authenticated `run_valid=true`:
+**+139.330970595487%** cumulative return, **−21.80578426418867%** maximum
+drawdown, 20.51589391932637% annualized volatility, 0.95754150327163
+zero-rate Sharpe, all 261 rebalances and 10,852 / 10,852 orders filled.
+One attempt and one accepted exploratory cell; floor **235 shared / 176
+development / 34 infrastructure / 649 cells**.
+
+R234 A1 used new private project **37060007**, backtest
+`694dca3d158e1fdc69fe28527c631035`, with AR entry/count, 100% tilt,
+and five-bps modeled slippage. Exact 17-file upload/readback and QC compile
+passed. Its sole result read authenticated `run_valid=true`:
+**+154.82082529635523%** cumulative return, **−21.85688490340542%**
+maximum drawdown, 21.00331554608409% annualized volatility, 1.00016494680033
+zero-rate Sharpe, all 261 rebalances and 9,434 / 9,434 orders filled.
+R234 minus R233 is **+15.48985470086823 percentage points**. One attempt and
+one accepted exploratory cell; floor **236 shared / 177 development / 34
+infrastructure / 650 cells**. All four result paths bind the same membership,
+cap and six-ETF panel digests, starting equity and source census; the matched
+comparison explicitly does not prove identical minute stock-fill data.
+
+The first local four-arm comparison attempt refused despite four valid QC
+runs: its test fixture invented `execution.decision_count`, a field the actual
+order aggregates do not emit. The consumer now checks both real
+`submitted_rebalance_count` and `completed_rebalance_count` against 261;
+the synthetic fixture omits the nonexistent field and a mutated count is red.
+Focused comparison tests pass; the authenticated cached four-arm comparison
+now passes. This was a local interpretation/test-isolation defect, **not** a
+failed QC attempt, new research look, or altered source/economics. No original
+R225 result or formal edge is claimed.
+
+### 202.3 Separate AR-on weight-tilt ladder and a cloud admission refusal
+
+At the owner's additional request, R235/R236/R237 prospectively freeze AR-on
+stock-weight transfer caps of **80%/120%/200%** against the same QCOM-excluded
+25%-minimum-coverage 2021–2025 package. The separate manifest
+`six_universe_qcom_exclusion_tilt_candidates.json` hashes to
+`3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4`.
+Each arm retains AR entry/count, QCOM direct-stock exclusion, MOO execution,
+98% gross, two-times buying-power *admission*, ten-bps/side fees and zero
+modeled slippage; the percentage scales stock-weight transfers, **not leverage**.
+The existing valid R231 AR-off result is the authenticated contextual control.
+All three settings were frozen and previewed before any R235–R237 result read.
+These were chosen after observing R231–R234 and are exploratory, not an
+out-of-sample optimization or a claim that a higher percentage is best.
+
+The new family's local comparison initially inherited the old study fixture's
+invented `execution.decision_count` field. Before these results were read,
+both comparators were corrected to validate the real order aggregate's
+`submitted_rebalance_count` and `completed_rebalance_count` instead; the
+synthetic fixtures now omit the nonexistent field and mutation tests pin the
+real counts. The cached R231–R234 comparison and focused tests are green.
+This changes only the local result consumer, not any uploaded algorithm.
+
+**R235 A1**, AR-on80, uploaded/read back and compiled its pinned 17 files,
+then launched private project **37060424**, backtest
+`584c34d7a20510b0cecbc9110da3c352`. **R236 A1**, AR-on120, likewise
+launched private project **37060449**, backtest
+`10058e4a01806844ace709c773f220fe`. Both were in progress at this
+record update; no outcomes read yet. **R237 A1**, AR-on200, created private
+project **37060477** and got through source upload and compile, but QC's
+`backtests/create` request failed through the bounded adapter before a
+backtest receipt existed. It is a spent first attempt, not a result or a
+valid cell. A retry is withheld pending terminal status/capacity checks of
+R235/R236; exact remote error cause is not established from this sanitized
+exception. All three launches are conservatively charged development looks:
+floor **239 shared / 180 development / 34 infrastructure / 650 cells**.
+
+R235's engine reached `Completed.`, but its one-use reader initially refused:
+the pinned plain order runtime emitted the shared transport META schema
+`arv2-six-matched-qcom-excluded-meta-v1`, while the new manifest described
+a percent-specific META schema from the tilt module. The aggregate was
+retained before parsing. An exact-source/family-scoped parser correction and
+local-only O_EXCL recovery authenticated that retained result without a
+second QC result read, source edit or extra look. **R235 is valid**:
+**+155.0715704271942%** cumulative return, **−21.79467853235618%**
+maximum drawdown, 20.88135086396085% annualized volatility, 1.005732416052
+zero-rate Sharpe; 261 rebalances and 10,222 filled orders. R235 − R231 is
+**+11.32246020801767 percentage points**, exploratory. Accepted cell floor
+**651**.
+
+R236 reached `Completed.` and its sole QC result read passed after that
+local parser correction. **R236 is valid**: **+164.1642341075784%**
+cumulative return, **−22.01194134932266%** maximum drawdown,
+21.11998007970799% annualized volatility, 1.03009296929968 zero-rate
+Sharpe; 261 rebalances and 9,316 filled orders. R236 − R231 is
+**+20.41512388840187 percentage points**, exploratory. Accepted cell floor
+**652**.
+
+An attempted R237 A2 CLI call first refused **locally before any QC mutation**
+because the generic retry guard required a predecessor terminal receipt,
+which an A1 `backtests/create` transport failure could not produce. That
+local admission refusal is not an additional QC attempt or research look.
+A focused, literal **R237 A2-only** recovery checks the exact A1 claim,
+project **37060477**, uploaded 17-file source, and zero remote backtests
+before its O_EXCL A2 claim and again immediately before creation; it does
+not create another project or reupload source. The remote project census
+was empty before retry; fake-cloud tests include an early and a late orphan
+run refusal. A2 then launched backtest
+`a7cbe7e3fea4ba46f02865539141be99` in the **same** project, consuming
+R237 attempt two of three and another conservative development look. It was
+in progress at this update. Research floor **240 shared / 181 development /
+34 infrastructure / 652 cells** pending its result. The server's original
+sanitized create failure remains unattributed; concurrent node use is a
+possibility, not an established cause.
+
+R237 A2 reached `Completed.` and its sole bounded result read passed
+`run_valid=true`: **+166.8224071798157%** cumulative return,
+**−22.08205274435079%** maximum drawdown, 21.31573162540370% annualized
+volatility, 1.03204173624957 zero-rate Sharpe, all 261 rebalances and
+8,607 filled orders. Versus R231 AR-off, +23.07329696063917 percentage
+points. The authenticated cached R231/R235/R236/R237 comparison passed:
+80%/120%/200% AR-on minus AR-off were **+11.32246020801767 /
++20.41512388840187 / +23.07329696063917 pp**. The next tilt increment
+has a smaller incremental gain, but these observed settings are not an
+unbiased search for an optimum. Cell floor **653**; research floor
+**240 / 181 / 34 / 653**. No QC result was read twice.
+
+### 202.4 Prospective all-six 10% data-coverage floor, before launch
+
+The owner explicitly clarified that the next batch should **make stock
+admission easier**, and chose lowering the numeric minimum mapping,
+market-cap-weight coverage and total-reported-weight floors from 25% to
+**10% in all six universes**. Raising a minimum floor to 50% would instead
+reject more collections; no 50% gate is being represented as an easing.
+This new R238–R241 family retains the five verified-name minimum, QCOM
+direct-stock exclusion, unresolved-budget own-ETF fallback, unchanged
+partial-budget scaling, the same historical package/period/physical MOO
+orders, 98% gross, two-times buying-power admission, ten-bps fees and zero
+modeled slippage. Only the three numeric admission floors change; unknown
+identities are not manufactured. R238 is AR-off; R239/R240/R241 are AR-on
+80%/120%/200%, respectively. The percent still scales stock-weight transfers
+and is not leverage. The within-10% four-arm comparison is primary; the 25%
+arms are contextual and can have different membership paths.
+
+All four projections and their manifest were frozen prospectively before
+any 10%-floor outcome access, under SHA-256
+`cd078ea5c0ce1d5a706ab82cb76139f29a04e8a98477d18a7f9cce0aed8a7c2b`.
+The standalone builder derives from exact R231/R235–R237 predecessor hashes,
+versions the profile/aggregate `coverage_policy_id`, and pins the *emitted*
+plain order META schema (a correction learned from R235) rather than assuming
+the tilt module's constant controls transport. Focused test fixtures prove
+12% and exact 10% can admit five known names where 25% refused, while 9%
+and fewer than five verified names still refuse; original source hashes
+remain unchanged. Each new candidate gets its own three-attempt cap and one
+bounded result read; no 10% QC run had launched at this record update.
+
+After this ladder, the owner clarified that the next four-arm study should
+make direct-stock **admission** easier by lowering all six numeric minimum
+mapping, market-cap-weight-coverage, and reported-total floors from **25% to
+10%**, not raising them to 50%. The five verified-name floor and all economic
+constraints remain unchanged. That study will have separate identities and
+an AR-off control plus AR-on80/120/200; it is not a rerun of these 25% arms.

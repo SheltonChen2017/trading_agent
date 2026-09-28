@@ -665,3 +665,132 @@ def build_qcom_exclusion_projection(package, arm, slippage_bps=0):
     digest = hashlib.sha256(_base._canonical(semantic)).hexdigest()
     return dataclasses.replace(value, projection_sha256=digest,
         projection_id="arv2-six-matched-qcom-excluded-projection-" + digest[:24]), json.loads(_base._canonical(profile))
+
+
+# These are new prospective arms. The R231--R234 renderer above and its source
+# closure remain frozen, including the R232 100% reference used below.
+QCOM_EXCLUSION_TILT_PERCENTS = (80, 120, 200)
+
+
+def _render_qcom_exclusion_tilt(path, source, percent):
+    """Change only the 100% arm's transfer strength and tilt identities."""
+    target_path = _relaxed._TILT_TARGET_PATH
+    runtime_path = _relaxed._TILT_RUNTIME_PATH
+    if path not in (target_path, runtime_path, "main.py"):
+        return source
+    arm = f"ar_on{percent}"
+    fraction = f"{percent // 100}.{percent % 100:02d}"
+    role = f"matched_qcom_excluded_{arm}_s0"
+    variant = f"cap90_matched_qcom_excluded_{arm}_s0_v1"
+    old_role = "matched_qcom_excluded_ar_on100_s0"
+    old_variant = "cap90_matched_qcom_excluded_ar_on100_s0_v1"
+    replacements = {
+        target_path: {
+            old_role: (role, 1),
+            "arv2-six-universe-order-tilt100-guard-decision-target-v1-all25-v1-matched-ar_on100-s0-v1":
+                (f"arv2-six-universe-order-tilt{percent}-guard-decision-target-v1-all25-v1-matched-{arm}-s0-v1", 1),
+            "arv2-six-universe-order-tilt100-guard-target-path-v1-all25-v1-matched-ar_on100-s0-v1":
+                (f"arv2-six-universe-order-tilt{percent}-guard-target-path-v1-all25-v1-matched-{arm}-s0-v1", 1),
+            "arv2-six-universe-order-tilt100-guard-target-path-all25--matched-ar_on100-s0-v1":
+                (f"arv2-six-universe-order-tilt{percent}-guard-target-path-all25--matched-{arm}-s0-v1", 1),
+            "1.00": (fraction, 2),
+        },
+        runtime_path: {
+            old_variant: (variant, 1),
+            "arv2-six-matched-qcom-excluded-profile-v1":
+                (f"arv2-six-matched-qcom-excluded-tilt{percent}-profile-v1", 1),
+            QCOM_EXCLUSION_META_SCHEMA:
+                (f"arv2-six-matched-qcom-excluded-tilt{percent}-meta-v1", 1),
+            QCOM_EXCLUSION_SUMMARY_SCHEMA:
+                (f"arv2-six-matched-qcom-excluded-tilt{percent}-summary-v1", 1),
+            "arv2-six-matched-qcom-excluded-ar_on100-s0-profile-v1":
+                (f"arv2-six-matched-qcom-excluded-{arm}-s0-profile-v1", 1),
+            "ar_on100": (arm, 2),
+            "1.00": (fraction, 2),
+        },
+        "main.py": {old_role: (role, 1), old_variant: (variant, 1)},
+    }
+    expected = replacements[path]
+    counts = {value: 0 for value in expected}
+
+    class TiltIdentity(ast.NodeTransformer):
+        class_count = 0
+        description_count = 0
+
+        def visit_Constant(self, node):
+            if type(node.value) is str:
+                if node.value in expected:
+                    counts[node.value] += 1
+                    node.value = expected[node.value][0]
+                elif path == target_path and "bounded by 100% of its own post-cap" in node.value:
+                    self.description_count += 1
+                    node.value = node.value.replace("bounded by 100% of its own post-cap",
+                                                    f"bounded by {percent}% of its own post-cap")
+            return node
+
+        def visit_ClassDef(self, node):
+            if path == "main.py" and node.name == "ARV2MatchedHistoricalArOn100S0QcomExcludedAlgorithm":
+                self.class_count += 1
+                node.name = f"ARV2MatchedHistoricalArOn{percent}S0QcomExcludedAlgorithm"
+            return self.generic_visit(node)
+
+    transform = TiltIdentity()
+    tree = transform.visit(ast.parse(source))
+    if (any(counts[value] != expected[value][1] for value in expected)
+            or transform.class_count != int(path == "main.py")
+            or transform.description_count != int(path == target_path)):
+        _error("QCOM-excluded tilt exact source anchor changed")
+    ast.fix_missing_locations(tree)
+    return ast.unparse(tree) + "\n"
+
+
+def build_qcom_exclusion_tilt_projection(package, percent, slippage_bps=0):
+    """Prospective 80/120/200% QCOM-excluded AR-on physical-order sources.
+
+    The percentage scales each stock's own post-cap weight transfer capacity;
+    it does not scale the 98% portfolio target or the admission leverage.
+    The matched gate, bridge, historical package and R232 baseline are common.
+    """
+    if type(percent) is not int or percent not in QCOM_EXCLUSION_TILT_PERCENTS:
+        _error("QCOM-excluded tilt percent must be exactly 80, 120 or 200")
+    if type(slippage_bps) is not int or slippage_bps != 0:
+        _error("QCOM-excluded tilt study requires zero modeled slippage")
+    predecessor, original_profile = build_qcom_exclusion_projection(package, "ar_on100", 0)
+    sources = {item.project_path: _render_qcom_exclusion_tilt(
+        item.project_path, item.source_bytes.decode("ascii"), percent)
+        for item in predecessor.source_files}
+    with _relaxed._cloud_loader(sources) as (load, _):
+        runtime = load(_relaxed._TILT_RUNTIME_PATH[:-3])
+        profile = runtime.require_tilt_profile()
+        runtime.expected_tilt_custom_statistic_names()
+        if (profile.get("maximum_stock_weight_change_fraction")
+                != f"{percent // 100}.{percent % 100:02d}"
+                or profile.get("comparison_arm") != f"ar_on{percent}"
+                or profile.get("matched_baseline_profile_sha256")
+                != original_profile["matched_baseline_profile_sha256"]
+                or profile.get("stock_exclusion_policy_id") != QCOM_EXCLUSION_POLICY_ID
+                or profile.get("excluded_logical_security_sha256")
+                != QCOM_EXCLUSION_SECURITY_ID_SHA256
+                or profile.get("modeled_fee_bps_per_side") != "10"
+                or profile.get("slippage_bps") != "0"):
+            _error("QCOM-excluded tilt profile or order economics changed")
+    files = tuple(sorted((_base._source_file(path, source.encode("ascii"))
+                          for path, source in sources.items()), key=lambda item: item.project_path))
+    total = sum(item.byte_count for item in files)
+    if (len(files) != 17 or len({item.project_path for item in files}) != 17
+            or any(item.byte_count > _base.MAXIMUM_QC_SOURCE_CHARACTERS for item in files)
+            or total + _base.MINIMUM_REVIEW_MARGIN_BYTES > _base.MAXIMUM_TOTAL_SOURCE_BYTES):
+        _error("QCOM-excluded tilt source closure exceeded unchanged QC budgets")
+    for item in files:
+        _base._audit_source(item.project_path, item.source_bytes)
+    arm = f"ar_on{percent}"
+    value = dataclasses.replace(predecessor,
+        schema=f"arv2-six-matched-qcom-excluded-tilt{percent}-projection-v1",
+        variant=f"cap90_matched_qcom_excluded_{arm}_s0_v1", role=profile["role"],
+        profile_id=profile["profile_id"], profile_sha256=profile["profile_sha256"],
+        source_files=files, total_source_byte_count=total)
+    semantic = {key: item for key, item in value.to_record().items()
+                if key not in ("projection_id", "projection_sha256")}
+    digest = hashlib.sha256(_base._canonical(semantic)).hexdigest()
+    return dataclasses.replace(value, projection_sha256=digest,
+        projection_id=f"arv2-six-matched-qcom-excluded-tilt{percent}-projection-" + digest[:24]), json.loads(_base._canonical(profile))

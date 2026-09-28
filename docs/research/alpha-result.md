@@ -5546,3 +5546,190 @@ the prelaunch pin. Bounded terminal/error metadata retained privately;
 performance/custom-statistic/order/log response fields discarded. No native
 result view revisited. No accepted cell, altered study economics or stock
 spread; floor **232 / 173 / 34 / 646**. Stock arms remain held.
+
+## R-231 A1 — QCOM-excluded AR-off stock sensitivity launched — 2026-09-27
+
+This is a new **post-hoc exploratory sensitivity**, not an R-225 retry or a
+repair of its missing QCOM reference. Exact committed prospective source
+`51194b4`, four-arm manifest SHA-256
+`53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0`;
+2021-01-04–2025-12-31, all-six 25% coverage, QCOM excluded only from
+direct-stock eligibility in every sleeve from the first decision, with raw
+membership/coverage retained. R-231 is fully AR-off, 98% gross, two-times
+buying-power admission, ten-bps modeled fees per side, zero modeled slippage,
+weekly prior-session decisions and next-open MOO orders. The original R-225
+three-attempt failure and R-227/R-230 ETF controls are unchanged.
+
+New private project **37059318**, `153 ARV2 SIX QCOM EXCLUSION AR_OFF S0 R231
+2021 2025`; exact 17-file readback and QC compile passed. Backtest
+`c8583a3fdbb78a99684668b230440e8e` is launched, with only queue/progress
+status inspected so far. No result is accepted or read yet. One of three
+R-231 attempts spent: **232 -> 233 shared research looks / 173 -> 174 ARV2
+development evaluations / 34 infrastructure looks / 646 cells**. A later
+terminal or bounded-read update must not reinterpret mere `Completed.` as
+run-valid.
+
+R-231 terminal update: `Completed.` and the sole receipt-bound custom-statistic
+read passed `run_valid=true`. Cumulative return **+143.74911021917653%** after
+modeled fees, maximum drawdown **−21.757819663952834%**, annualized
+volatility **20.51364896743773%**, zero-rate Sharpe **0.97555463376627**.
+All **261** weekly rebalances executed; **10,812 / 10,812** submitted orders
+filled, zero invalid/canceled. Modeled and actual engine fee fields match at
+**$64,498.1188949**. No closing-minute reference repair was used. This is
+one exploratory AR-off stock cell, not a paired AR effect or validation of
+R-225's original universe. Authenticated cell floor **646 -> 647**; totals
+**233 / 174 / 34 / 647**. No second outcome read is authorized or needed.
+
+## R-232 A1 — QCOM-excluded AR-on stock sensitivity launched — 2026-09-27
+
+Same prospective R-231–R-234 manifest, 2021–2025 package, exclusion ID,
+membership/coverage, order timing, 98% gross, ten-bps fees and zero modeled
+slippage as R-231. R-232 alone enables the analyst-revision entry/count
+logic and 100% stock-weight overlay, with its own frozen profile/source.
+New private project **37059623**, `154 ARV2 SIX QCOM EXCLUSION AR_ON100 S0
+R232 2021 2025`; exact 17-file readback and QC compile passed. Backtest
+`78fd77c07f46512eb413aa1a0cf2d652` launched; no outcome or custom
+statistic read yet. R-232 attempt **one of three** spends another exploratory
+development look: **233 -> 234 shared / 174 -> 175 development / 34
+infrastructure / 647 cells**. A `Completed.` terminal alone will not be
+counted as a valid AR comparison.
+
+R-232 terminal update: `Completed.` and its sole receipt-bound custom-statistic
+read passed `run_valid=true`. Cumulative return **+159.9507341441203%**
+after modeled fees, maximum drawdown **−21.784261140342733%**,
+annualized volatility **20.99727709431368%**, zero-rate Sharpe
+**1.0194809691779258**. All **261** weekly rebalances executed; **9,432 /
+9,432** submitted orders filled. The paired zero-slippage AR-on minus AR-off
+cumulative-return difference is **+16.20162392494377 percentage points**
+on this QCOM-excluded, current-vintage historical package. It is exploratory,
+post-hoc, and not a causal or out-of-sample alpha estimate. Authenticated
+cell floor **647 -> 648**; totals **234 / 175 / 34 / 648**. No second
+outcome read is authorized or needed.
+
+## R-233 A1 — QCOM-excluded AR-off 5-bps-slippage sensitivity launched — 2026-09-27
+
+Same frozen four-arm manifest, historical package, QCOM-direct-stock
+exclusion, AR-off rule, order cadence, 98% gross, two-times buying-power
+admission, and ten-bps modeled fees per side as R-231; R-233 changes only
+the prospective modeled slippage to five bps per side. New private project
+**37059950**, `155 ARV2 SIX QCOM EXCLUSION AR_OFF S5 R233 2021 2025`;
+backtest **`d45faa459397596ef80c31f4e018e828`** launched after exact
+17-file readback and QC compile. No outcome read yet. One of three attempts
+spent; research floor **235 shared / 176 development / 34 infrastructure /
+648 cells**. A terminal completion is not by itself a valid result.
+
+R-233 terminal update: `Completed.` and sole authenticated bounded read
+passed `run_valid=true`: **+139.330970595487%** cumulative return after
+fees/slippage, **−21.80578426418867%** maximum drawdown, 20.51589391932637%
+annualized volatility, 0.95754150327163 zero-rate Sharpe; 261 completed
+rebalances and 10,852 / 10,852 filled orders. One exploratory cell accepted;
+totals **235 / 176 / 34 / 649**. No second result read.
+
+## R-234 A1 — QCOM-excluded AR-on100 5-bps-slippage sensitivity — 2026-09-27
+
+Same prospective four-arm manifest and shared order inputs as R-233, with
+AR entry/count and 100% stock-weight overlay enabled. New private project
+**37060007**, `156 ARV2 SIX QCOM EXCLUSION AR_ON100 S5 R234 2021 2025`,
+backtest **`694dca3d158e1fdc69fe28527c631035`**. Exact 17-file readback
+and QC compile passed. One of three attempts spent, one development look:
+floor **236 / 177 / 34 / 649** before result validation.
+
+R-234 terminal update: `Completed.` and sole authenticated bounded read
+passed `run_valid=true`: **+154.82082529635523%** cumulative return,
+**−21.85688490340542%** maximum drawdown, 21.00331554608409% annualized
+volatility, 1.00016494680033 zero-rate Sharpe; 261 completed rebalances,
+9,434 / 9,434 filled orders. One exploratory cell accepted; floor
+**236 / 177 / 34 / 650**. The cached, fully authenticated four-arm comparison
+now passes: R-232 − R-231 is **+16.20162392494377 pp** at zero modeled
+slippage; R-234 − R-233 is **+15.48985470086823 pp** with five bps per side.
+This is a post-hoc QCOM-excluded sensitivity on current-vintage analyst data,
+not a repaired R-225, out-of-sample edge, or deployment evidence. The first
+local comparator call failed because its fixture invented a nonexistent
+`execution.decision_count`; local code/test corrected it to the two actual
+submitted/completed rebalance counts, without a new QC attempt or look.
+
+## R-235–R-237 A1 — QCOM-excluded 25%-coverage AR-on weight ladder — 2026-09-27
+
+Three settings **80%/120%/200%** were frozen together before outcome access
+in separate manifest SHA-256
+`3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4`.
+The percentage scales transfers from matched stock weights; it is **not**
+gross leverage. All retain the exact R231–R234 historical package, 25%
+minimum coverage, QCOM direct-stock exclusion, AR entry/count, 98% gross,
+ten-bps/side fees, zero modeled slippage, next-open physical MOO orders and
+one-use result transport. Valid R-231 AR-off is the contextual matched
+control. These settings followed prior result observation, so this is an
+adaptive exploratory sensitivity, not a confirmatory capacity search.
+
+R-235 AR-on80 private project **37060424**, backtest
+`584c34d7a20510b0cecbc9110da3c352`, and R-236 AR-on120 private project
+**37060449**, backtest `10058e4a01806844ace709c773f220fe`, passed exact
+17-file source readback and QC compilation on A1. Both were `In Progress...`
+at this entry; no result read. R-237 AR-on200 A1 created private project
+**37060477**, with upload/readback and compile complete, but the bounded
+`backtests/create` request failed before a receipt. The adapter exposes no
+underlying error detail, so its cause is not asserted. This counts as **one
+of three** allowed R-237 attempts and no valid result. Wait for other node
+work before a prospectively justified A2; do not disguise a fourth launch.
+Three conservative development looks: floor **236 -> 239 shared / 177 ->
+180 development / 34 infrastructure / 650 cells**. No raw orders, provider
+rows or result logs inspected.
+
+R-235's only QC outcome read initially failed local parsing because the
+frozen plain order runtime emitted the shared META transport schema, whereas
+the new manifest expected a tilt-specific META schema. The bounded custom
+statistics had already been retained by the one-use reader. An exact-source
+and family-scoped parser correction authenticated those retained strings
+**locally, without a second QC result read or new look**. R-235 A1 is valid:
+**+155.0715704271942%** cumulative return, **−21.79467853235618%**
+maximum drawdown, 20.88135086396085% annualized volatility, 1.005732416052
+zero-rate Sharpe, 261 rebalances, 10,222 filled orders. Versus the same
+QCOM-excluded 25%-floor AR-off R-231, +11.32246020801767 pp. One
+exploratory cell; floor **239 / 180 / 34 / 651**.
+
+R-236 A1 `Completed.` and its sole bounded read passed the corrected parser:
+**+164.1642341075784%** cumulative return, **−22.01194134932266%**
+maximum drawdown, 21.11998007970799% annualized volatility, 1.03009296929968
+zero-rate Sharpe, 261 rebalances, 9,316 filled orders. Versus R-231,
++20.41512388840187 pp. One exploratory cell; floor **239 / 180 / 34 /
+652**. This remains a post-hoc settings ladder on current-vintage analyst
+history, not evidence of a tuned optimum or live readiness.
+
+R-237 A2's initial **local** CLI call was refused before QC mutation because
+the generic retry guard required an A1 terminal receipt, which a pre-create
+failure did not have. That call was not another QC attempt/look. An exact
+R-237/A2-only retry path now verifies its A1 claim, project **37060477**,
+17 pinned source files, and two explicit empty statistics-free remote
+backtest inventories; any early or delayed orphan stops the retry. A2 then
+launched backtest **`a7cbe7e3fea4ba46f02865539141be99`** in the original
+project without reupload, spending its second of three QC attempts and one
+additional development look. It was still running at this update; no R-237
+cell yet. Floor **240 / 181 / 34 / 652**.
+
+R-237 A2 terminal `Completed.`; sole bounded custom-statistic read passed
+`run_valid=true`: **+166.8224071798157%** cumulative return,
+**−22.08205274435079%** maximum drawdown, 21.31573162540370% annualized
+volatility, 1.03204173624957 zero-rate Sharpe, 261 rebalances and 8,607
+filled orders. One exploratory cell; floor **240 / 181 / 34 / 653**.
+Authenticated cached R-231/R-235/R-236/R-237 comparison passes: AR-on
+80%/120%/200% minus R-231 AR-off = **+11.32246020801767 /
++20.41512388840187 / +23.07329696063917 percentage points**, respectively.
+This is a current-vintage, QCOM-excluded 2021–2025 adaptive sensitivity,
+not a reliable optimized setting, original R-225 repair, or formal alpha.
+
+## R-238–R-241 — prospective QCOM-excluded 10%-minimum-coverage study — frozen before launch
+
+Owner clarification: make direct-stock admission easier by lowering each
+of the six universes' **minimum** mapping, market-cap-weight coverage and
+reported-total-weight floors from 25% to 10%; do **not** raise a minimum to
+50%, which would tighten the gate. Five verified names remain mandatory;
+unknown names are not guessed, and missing stock budget remains in each
+sleeve's own ETF. R-238 AR-off and R-239/R-240/R-241 AR-on80/120/200 use the
+same QCOM-excluded 2021–2025 order inputs, 98% gross, two-times buying-power
+admission, ten-bps/side fees, zero slippage and next-open MOO execution.
+Separate four-arm source manifest SHA-256
+`cd078ea5c0ce1d5a706ab82cb76139f29a04e8a98477d18a7f9cce0aed8a7c2b`;
+all profiles/source digests and the actual emitted META schemas frozen before
+any 10%-floor outcome. This is exploratory, adaptive and not a formal
+confirmation; 25%-floor arms are contextual rather than assumed identical.
+No launch, attempt or look charged in this prelaunch entry.

@@ -77,6 +77,7 @@ EXPECTED_ARV2_IMPORT_CLOSURE = (
     "research.analyst_revisions_v2.firm_ontology",
     "research.analyst_revisions_v2.fold_manifest",
     "research.analyst_revisions_v2.formulas",
+    "research.analyst_revisions_v2.forward_data_quality",
     "research.analyst_revisions_v2.four_family_multiplicity",
     "research.analyst_revisions_v2.global_benchmark_contract",
     "research.analyst_revisions_v2.holdings",

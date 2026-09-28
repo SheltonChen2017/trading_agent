@@ -1,7 +1,7 @@
 """Offline, value-free forward vendor-vintage receipts for development only.
 
-The existing Massive adapter owns provider I/O and immutable raw captures.
-This module reads *already captured*, externally SHA-pinned pages. It records
+The host-only Massive adapter owns provider I/O and immutable raw captures.
+This module derives receipts from pages authenticated by that adapter. It records
 when our machine received each version of a Benzinga ID; it cannot establish
 when the vendor first published that version, reconstruct overwritten history,
 or create the separately gated ARV2-9 prospective paper look.
@@ -9,10 +9,9 @@ or create the separately gated ARV2-9 prospective paper look.
 from __future__ import annotations
 
 from datetime import timedelta
-import os
-from pathlib import Path
-from typing import Any
+from typing import Any, Callable
 
+from research.analyst_revisions_v2.accepted_risk_input_pair import MassiveSourceRole
 from research.analyst_revisions_v2.canonical import (
     canonical_json_bytes,
     parse_date,
@@ -24,7 +23,6 @@ from research.analyst_revisions_v2.canonical import (
     sha256_bytes,
     strict_json_loads,
 )
-from scripts import capture_arv2_massive as capture
 
 
 SCHEMA = "arv2-forward-vendor-quality-receipt-v1"
@@ -32,34 +30,47 @@ PURPOSE = "development_data_quality_only_not_arv2_9_confirmation"
 MAX_WINDOW_DAYS = 32
 MAX_OBSERVATIONS = 100_000
 MAX_RECEIPT_BYTES = 64 * 1024 * 1024
+ROLE_ORDER = (
+    MassiveSourceRole.ANALYST_RATINGS,
+    MassiveSourceRole.EARNINGS,
+    MassiveSourceRole.CORPORATE_GUIDANCE,
+)
+PRODUCTION_TRANSPORT = "massive_https_bearer_default_session"
+TEST_TRANSPORT = "offline_test_double"
 
 
 class ForwardDataQualityError(ValueError):
     """The development-only forward observation cannot be authenticated."""
 
 
-def build_receipt(
-    artifact_path: Path,
+def build_receipt_from_authenticated_pages(
+    visit_authenticated_pages: Callable[[Callable[[Any], None]], Any],
     expected_manifest_sha256: str,
     *,
     first_event_date: str,
     last_event_date: str,
-    expected_transport: str = capture.PRODUCTION_TRANSPORT,
+    expected_transport: str = PRODUCTION_TRANSPORT,
 ) -> tuple[bytes, str]:
-    """Derive canonical receipt bytes from one authenticated private capture.
+    """Derive canonical receipt bytes from a host-authenticated private capture.
 
     A short, exact event-date query makes later same-ID recaptures comparable;
     there is no lookback fill or inference from a vendor ``last_updated`` field.
     IDs are represented only by role-scoped SHA-256 digests in the receipt.
+    The host-only caller must supply the verified capture-page traversal.
     """
     require_sha256(expected_manifest_sha256, "external capture manifest pin")
+    if type(expected_transport) is not str or expected_transport not in (
+        PRODUCTION_TRANSPORT,
+        TEST_TRANSPORT,
+    ):
+        raise ForwardDataQualityError("capture transport is not reviewed")
     first = parse_date(first_event_date, "first event date")
     last = parse_date(last_event_date, "last event date")
     if last < first or last - first >= timedelta(days=MAX_WINDOW_DAYS):
         raise ForwardDataQualityError("forward event-date window is invalid or too broad")
 
     observed: dict[str, dict[str, dict[str, Any]]] = {
-        role.value: {} for role in capture.ROLE_ORDER
+        role.value: {} for role in ROLE_ORDER
     }
     row_count = 0
 
@@ -89,13 +100,13 @@ def build_receipt(
             times = versions.setdefault(version_hash, [])
             times.append(page.response_received_at)
 
-    source = capture._visit_authenticated_massive_capture_pages_for_bridge(
-        Path(artifact_path), expected_transport=expected_transport, visit_page=visit
-    )
+    source = visit_authenticated_pages(visit)
     if source.manifest_sha256 != expected_manifest_sha256:
         raise ForwardDataQualityError("capture manifest does not match external pin")
+    if source.capture_transport != expected_transport:
+        raise ForwardDataQualityError("capture transport does not match expectation")
     roles = []
-    for role in capture.ROLE_ORDER:
+    for role in ROLE_ORDER:
         events = []
         for event_hash, versions in sorted(observed[role.value].items()):
             events.append(
@@ -163,15 +174,15 @@ def _require_receipt(payload: bytes, expected_sha256: str) -> dict[str, Any]:
         or type(value["source_row_count"]) is not int
         or value["source_row_count"] < 0
         or type(value["roles"]) is not list
-        or len(value["roles"]) != len(capture.ROLE_ORDER)
+        or len(value["roles"]) != len(ROLE_ORDER)
     ):
         raise ForwardDataQualityError("forward receipt authority or role census changed")
     for key in ("capture_sha256", "capture_manifest_sha256"):
         require_sha256(value[key], key)
     require_identifier(value["capture_id"], "capture ID")
     if value["capture_transport"] not in (
-        capture.PRODUCTION_TRANSPORT,
-        capture.TEST_TRANSPORT,
+        PRODUCTION_TRANSPORT,
+        TEST_TRANSPORT,
     ):
         raise ForwardDataQualityError("capture transport is not reviewed")
     started = parse_utc_timestamp(value["capture_started_at"], "capture start")
@@ -183,7 +194,7 @@ def _require_receipt(payload: bytes, expected_sha256: str) -> dict[str, Any]:
     if last < first or last - first >= timedelta(days=MAX_WINDOW_DAYS):
         raise ForwardDataQualityError("receipt event window is invalid")
     total_rows = 0
-    for actual, expected in zip(value["roles"], capture.ROLE_ORDER, strict=True):
+    for actual, expected in zip(value["roles"], ROLE_ORDER, strict=True):
         require_exact_keys(actual, {"role", "events"}, "forward role")
         if actual["role"] != expected.value or type(actual["events"]) is not list:
             raise ForwardDataQualityError("forward role order or shape changed")
@@ -215,27 +226,6 @@ def _require_receipt(payload: bytes, expected_sha256: str) -> dict[str, Any]:
     if total_rows != value["source_row_count"] or total_rows > MAX_OBSERVATIONS:
         raise ForwardDataQualityError("forward receipt row census changed")
     return value
-
-
-def publish_receipt(
-    payload: bytes, expected_sha256: str, output_root: Path
-) -> Path:
-    """Write once inside the private artifact tree; never replace old bytes."""
-    _require_receipt(payload, expected_sha256)
-    root = Path(output_root).absolute()
-    capture._require_operational_artifact_scope(root)
-    _, descriptor = capture._open_directory_path(
-        root, create=True, name="forward quality receipt root"
-    )
-    try:
-        name = f"forward-quality-{expected_sha256}.json"
-        capture._exclusive_private_write_at(
-            descriptor, name, payload, "forward quality receipt"
-        )
-        os.fsync(descriptor)
-    finally:
-        os.close(descriptor)
-    return root / name
 
 
 def compare_receipts(

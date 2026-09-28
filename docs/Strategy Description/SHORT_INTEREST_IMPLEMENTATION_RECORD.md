@@ -4,12 +4,13 @@ Status: **CLAUDE'S SECTION-63 REVIEW OF `7156565..d25e5d2` IS ACCEPTED AFTER
 THE SECTION-64 CODEX RECORD QUALIFICATIONS FOR ITS SOLE FOLLOW-ON COMMIT
 `985743e`. THE OWNER'S NARROW SECTION-65 DECISION NOW RESOLVES THE HORIZON
 SEMANTICS: NEXT-RELEASE HOLDING FOR EVENTUAL ORDER-BASED P&L AND A DISTINCT
-FIXED 20-SESSION STOCK-EVALUATION DIAGNOSTIC. IT DOES NOT APPROVE SECTION
-62'S PROPOSED SELECTION STATISTIC OR THE SI-5 PROTOCOL. SECTION 66 RECORDS
-THE OWNER'S LATER INSTRUCTION TO BUILD THROUGH MULTIPLE BOUNDED LANE STEPS
-BEFORE CLAUDE'S WHOLE-LANE REVIEW, WITH INTERNAL OWNER DECISIONS DELEGATED
-TO CODEX AND LOGGED; EXTERNAL ENTITLEMENT/COVERAGE REMAINS UNPROVEN. THE POWER/LOOK AND
-ROLE-DEPENDENCE ADVISORIES `SI-CR13-002`/`003` REMAIN OPEN; THE SHARED,
+FIXED 20-SESSION STOCK-EVALUATION DIAGNOSTIC. SECTIONS 66–68 RECORD THE
+OWNER'S LATER ACCELERATED-BUILD DELEGATION AND TWO CONTENT-ADDRESSED,
+SYNTHETIC-ONLY SI-5 DESIGN/COHORT STEPS. THE SECTION-62 DRAFT IS NOT AN
+EMPIRICAL PREREGISTRATION; NO LOOKBACK WINNER, DATE, POWER RESULT OR REAL
+OUTCOME LOOK IS FROZEN. EXTERNAL ENTITLEMENT/COVERAGE REMAINS UNPROVEN.
+THE POWER/LOOK ADVISORY `SI-CR13-002` REMAINS OPEN; THE ROLE-DEPENDENCE
+DESIGN CHOICE IN `SI-CR13-003` IS SETTLED OFFLINE, NOT EMPIRICALLY TESTED. THE SHARED,
 OUT-OF-LANE P2 `SI-CR5-005`/`SI-CCR16-007` REMAINS OPEN. CLAUDE REPORTED
 759 PASSED FOR THE FIFTEEN-FILE SHORT INTEREST LANE; CODEX DID NOT RERUN
 THE COMPLETE LANE. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED; AUTHORIZED
@@ -23,8 +24,10 @@ Local-only Codex counter-review of Claude's sole follow-on commit
 not freeze the SI-5 protocol, authorize a data/outcome/QC step, or constitute
 the lane's next combined push. Section 65 records the subsequent narrow owner
 decision. Section 66 supersedes the earlier review cadence for the current
-owner-directed build; all updates remain local-only pending one complete,
-reviewable lane push.
+owner-directed build. Sections 67–68 log the additional delegated design,
+two bounded offline steps and counter-review ledger. All updates remain
+local-only pending the owner-supplied factual source/rights/coverage inputs
+and one final, reviewable lane push.
 
 Branch: `codex/strategy-short-interest`
 
@@ -9274,3 +9277,92 @@ stock diagnostic and natural next-release order holding. It does not change
 the frozen SI-0M zero-look gate, choose dates/look IDs or claim market-data
 coverage. The planned code correction and focused red/green verification are
 recorded in the next section after they actually occur.
+
+## 68. Codex accelerated offline SI-5 round; factual admission gate — 2026-09-28
+
+### 68.1 Exact local commit range and dispositions
+
+The sole Claude commit after the last pushed Codex snapshot is
+`985743e77212c0313121f1ae1754e03dd452c374`; section 64 counter-reviewed
+and **accepted it after three record qualifications**. The following ordered
+Codex range is local-only on the designated worktree and branch, after that
+remote head. Each commit has an explicit disposition; none is represented as
+independently reviewed by Claude yet.
+
+| Local commit | Disposition and bounded effect |
+|---|---|
+| `cabfc6c3da243358af8c89ad2e1e86956dcf511e` | Counter-review record qualification of Claude's sole commit; **accepted after qualification**. No production code change. |
+| `0216bc3e474e41128b21672c46397dc4cbe4e6ac` | **Accepted decision record** of the owner's narrow next-release-holding versus 20-session-diagnostic approval; no metric, data or outcome authority. |
+| `38dc01c8b7dd54a3233716c598d9f301a70e3efb` | **Accepted delegated offline plan** in section 66; opens an accelerated lane-owned build, not external entitlement. |
+| `b13e9be1c30d22397b5822a8b2273523dcc40297` | **Accepted precision correction** in section 67; pins gross diagnostic, original-tail and cost-role choices; records two P3 audit findings. |
+| `552a2044f1f0164514986ce960bfaeb55bf89c74` | **Implemented; pending Claude whole-lane review.** Content-addressed SI-5 offline protocol, immutable owner-record blob binding, four unselected lookbacks, one complementary-tail stock contrast, zero allocated looks and zero outcome/QC/production/trading authority. |
+| `293919bb21c25cb58882fa299a6f5596b2f2d1d5` | **Implemented after correction; pending Claude whole-lane review.** Synthetic-only, source-hash-bound release/cohort projection retaining each authentic full candidate ranking and a separate stable-identity/event common comparison view without reranking or outcome access. |
+
+### 68.2 Persistent findings and material corrections
+
+| Finding | Priority | Current disposition | Evidence / correction |
+|---|---|---|---|
+| `SI-CCR24-001` | P3 | **Closed for offline protocol** | Section 67 is pinned to committed blob SHA-256 `4852b2734f0cba69fc4db55e3ca321ba70f845779456113336bc0f029bc9a320`; focused tests verify substantive decision clauses, not only IDs. An independent read-only re-audit confirmed the binding. |
+| `SI-CCR24-002` | P3 | **Closed for offline diagnostic; empirical cashflows gated** | `R(20)` is explicitly gross, split-adjusted, dividend-excluded next-open to 20th-later-XNYS-open price return; diagnostic cost is zero. The 10 bps primary and 0/5/20 sensitivities belong only to eventual order P&L. Terminal values and order cashflows remain `None` and cannot be assumed before data admission. The revised focused protocol tests went green after a 5-failure/18-pass red run on the missing precision. |
+| `SI-CCR24-003` | P2 | **Closed by material red/green** | A valid in-range release-calendar entry with zero accepted snapshots was absent from upstream normalization summaries and would silently disappear from the SI-5 projection. The public-path synthetic zero-snapshot fixture **failed** without the calendar guard (`1 failed in 12.24s`) and **passed** with the guard restored; the guard refuses a missing or duplicate in-range cohort. No fabricated empty return is substituted. |
+| `SI-CCR24-004` | P3 | **Closed in synthetic projection test** | Four individually ten-name full cohorts can have a nine-name common intersection and lose the original high or low tail. A pure projection regression asserts exact no-comparison reasons and original source percentiles/flags; the common subset is never reranked or replenished. |
+| `SI-CCR24-005` | P3 | **Redundant work corrected; historical scaling unverified** | Construction originally serialized/rebuilt the complete upstream ranking three times. It now defensively copies then authenticates that captured ranking once and freezes the projection; each later public read still reauthenticates the nested source. Historical-scale profiling remains a future admission concern, not permission to bypass verification. |
+| `SI-CR13-002` | P3 | **Open** | Prospective power/MDE, exact dates, effective release count and any permanent alpha/look allocation require rights-cleared metadata. The single planned stock contrast does not spend the 1/80 ceiling. |
+| `SI-CR13-003` | P3 | **Offline design choice settled; empirical transfer open** | Pressure and covering are complementary tails of one S1 rank, not independent confirmations. Raw stock `R(20)` is primary; sector-relative is descriptive. Any ETF transfer still requires a valid stock result and separate gate. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | **Open, shared/out of lane** | Preserve the historical shared citation concern; this lane does not modify shared/project-wide files. |
+
+### 68.3 Focused verification, exclusions and Claude review notes
+
+Protocol test first had a missing-module collection error (expected red);
+after the P3 precision tests were added, it showed **5 failed, 18 passed in
+0.45s** before the semantic/source correction. The focused protocol,
+Short Interest import-boundary and active-document run finished **102 passed
+in 0.71s**; targeted compilation completed without diagnostics.
+
+The new cohort test first had a missing-module collection error (expected
+red). Its authentic 19-name and partial-history positive cases each passed
+before a broader cohort-file run was **interrupted for runtime** after **2
+passed in 385.44s**; that interruption is **cancelled, not a test failure**.
+The zero-snapshot P2 case was separately red/green as above; with the guard,
+the zero-snapshot plus nine-name-common-tail regressions were **2 passed in
+12.33s**. After narrowing redundant large fixtures, the selected calendar,
+tail, tamper and no-winner cases were **4 passed in 27.06s**; underfill plus
+detached-payload cases were **2 passed in 31.21s**. An earlier detached-payload
+test failed because it cleared an already-empty list; the assertion was
+corrected to mutate a populated field and separately **passed in 17.64s**.
+The source/protocol re-audits reported no remaining P0–P2 finding. Codex did
+not run the full Short Interest lane or repository suite; Claude owns that
+whole-lane validation after the eventual exact push. The target files compiled,
+and staged/working diffs receive whitespace and status checks before any
+commit/push. These tests use synthetic fixtures only; no price or outcome row
+is evidence of strategy performance.
+
+Nothing here uses a provider, FINRA/SEC, credentials, actual/licensed SI or
+PIT price/volume, outcomes, sealed holdout, QC project/upload/compile/job,
+broker, operator database, deployment, paper/live, capital, orders or trading.
+No candidate wins; authorized and consumed real outcome looks remain **0/0**.
+This is **not** lane completion or backtesting readiness.
+
+### 68.4 Non-substitutable next factual gate
+
+The owner-delegated authorization and decision inventory to date is exactly
+`SI-AUTH-20260928-01` through `-02` and `SI-DEC-20260928-01` through `-09`
+in sections 66–67. It must be consolidated at actual project completion.
+Judgment cannot supply these still-missing facts: the named historical
+official-style SI source/product and its retention/QC-processing license;
+the named PIT price/volume, adjustment, identifier and delisting/terminal
+source with 20/60/120/252-session coverage; authentic publication/revision
+metadata, exact dates and prospective release-level power/MDE; and an exact
+Short Interest QC project/account/dataset route before any QC action. The
+owner has been asked for source/product names and license scope without
+credentials; no response has been assumed. If those facts do not exist, stop
+at this gate rather than replacing the stock-first test with ETF work or
+claiming a backtest. Once evidence is supplied, freeze an executable
+rights/coverage receipt and permanent look specification **before** any
+outcome join. A valid null stock result closes the canonical family.
+
+Claude's eventual independent review should inspect **every commit** in the
+exact local range above after the one final lane push, recheck this persistent
+ledger and the counter-review qualifications, run the complete lane suite,
+and examine the synthetic-only versus empirical authority boundary. No push
+is made by this record edit while the factual source gate remains unresolved.

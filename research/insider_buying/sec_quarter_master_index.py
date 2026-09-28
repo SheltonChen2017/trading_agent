@@ -357,6 +357,8 @@ def select_sec_master_index_subset(
 
     Unrequested Form 4/4-A rows in the index are allowed, so this is suitable
     for a fixed small compatibility sample but *not* an exact corpus audit.
+    A sole as-indexed path is retained even when its archive CIK differs from
+    the declared issuer; the issuer CIK only disambiguates multiple aliases.
     """
     expected = _expected_map(receipt, expected_rows)
     found: dict[str, list[SecMasterIndexRow]] = {}
@@ -371,11 +373,11 @@ def select_sec_master_index_subset(
         if any(row.form_type != check.form_type or row.filing_date != check.filing_date
                for row in aliases):
             raise SecQuarterMasterIndexError("REFUSED: master index contradicts requested form or date")
-        if check.issuer_cik is None:
-            if len(aliases) != 1:
-                raise SecQuarterMasterIndexError("REFUSED: duplicate archive aliases need an issuer CIK")
+        if len(aliases) == 1:
             selected.append(aliases[0])
             continue
+        if check.issuer_cik is None:
+            raise SecQuarterMasterIndexError("REFUSED: duplicate archive aliases need an issuer CIK")
         issuer = int(check.issuer_cik)
         matching = [row for row in aliases
                     if int(_PATH_RE.fullmatch(row.archive_path).group("archive_cik")) == issuer]

@@ -49,6 +49,21 @@ _HEADER_PREAMBLE = frozenset({
     "PUBLIC-DOCUMENT-COUNT", "PERIOD", "FILING-DATE",
     "DATE-OF-FILING-DATE-CHANGE",
 })
+_LEGACY_PREAMBLE = (
+    "ACCESSION NUMBER", "CONFORMED SUBMISSION TYPE", "PUBLIC DOCUMENT COUNT",
+    "CONFORMED PERIOD OF REPORT", "FILED AS OF DATE", "DATE AS OF CHANGE",
+)
+_LEGACY_ROLE = frozenset({"REPORTING-OWNER:", "ISSUER:"})
+_LEGACY_OWNER_SCOPES = (
+    "OWNER DATA", "FILING VALUES", "BUSINESS ADDRESS", "MAIL ADDRESS",
+)
+_LEGACY_ISSUER_SCOPES = (
+    "COMPANY DATA", "BUSINESS ADDRESS", "MAIL ADDRESS", "FORMER COMPANY",
+)
+_LEGACY_FIELD = re.compile(r"([A-Z][A-Z0-9 -]*):[ \t]+([^\r\n]+)\Z")
+_LEGACY_ROLE_LINE = re.compile(r"(REPORTING-OWNER:|ISSUER:)\t{0,4}\Z")
+_LEGACY_SCOPE = re.compile(r"\t([A-Z][A-Z0-9 -]*):\t{0,4}\Z")
+_LEGACY_LEAF = re.compile(r"\t\t([A-Z][A-Z0-9 -]*):[ \t]*([ -~]*)\Z")
 _ROOT_MARKERS = frozenset({
     "<REPORTING-OWNER>", "</REPORTING-OWNER>", "<ISSUER>", "</ISSUER>",
 })
@@ -154,6 +169,153 @@ def _unique_tag(lines: list[str], name: str, *, label: str) -> str:
     return values[0]
 
 
+def _legacy_role_cik(
+    lines: list[str], *, owner: bool, target: SecCompleteSubmissionTarget,
+) -> str:
+    """Accept only the observed flat, tab-indented legacy SGML role shape."""
+    allowed = _LEGACY_OWNER_SCOPES if owner else _LEGACY_ISSUER_SCOPES
+    first = "OWNER DATA" if owner else "COMPANY DATA"
+    scopes: list[str] = []
+    fields: dict[str, dict[str, str]] = {}
+    current: str | None = None
+    seen_keys: set[str] = set()
+    for line in lines:
+        scope = _LEGACY_SCOPE.fullmatch(line)
+        if scope is not None:
+            name = scope.group(1)
+            if name not in allowed or (scopes and not seen_keys):
+                _refuse("legacy header has an empty or foreign role subsection")
+            if not scopes and name != first:
+                _refuse("legacy header data subsection is not first")
+            if scopes and (allowed.index(name) < allowed.index(scopes[-1])
+                           or (name == scopes[-1] and name != "FORMER COMPANY")):
+                _refuse("legacy header role subsections are repeated or out of order")
+            scopes.append(name)
+            current = name
+            seen_keys = set()
+            if name != "FORMER COMPANY":
+                fields[name] = {}
+            continue
+        leaf = _LEGACY_LEAF.fullmatch(line)
+        if leaf is None or current is None:
+            _refuse("legacy header role indentation or leaf is malformed")
+        key, value = leaf.groups()
+        if key in seen_keys:
+            _refuse("legacy header role repeats a leaf")
+        seen_keys.add(key)
+        if (key in _LEGACY_PREAMBLE or key == "ACCEPTANCE-DATETIME"
+                or key + ":" in _LEGACY_ROLE
+                or key in _LEGACY_OWNER_SCOPES or key in _LEGACY_ISSUER_SCOPES):
+            _refuse("legacy header repeats a preamble identity inside a role")
+        if key == "CENTRAL INDEX KEY" and current != first:
+            _refuse("legacy header CIK occurs outside the data subsection")
+        if key == "FORM TYPE" and (not owner or current != "FILING VALUES"):
+            _refuse("legacy header form type occurs outside owner filing values")
+        if current != "FORMER COMPANY":
+            fields[current][key] = value
+    if not scopes or not seen_keys or first not in fields:
+        _refuse("legacy header role is empty or lacks its data subsection")
+    if owner and ("FILING VALUES" not in fields
+                  or fields["FILING VALUES"].get("FORM TYPE") != target.form_type):
+        _refuse("legacy header owner filing values disagree with target")
+    cik_raw = fields[first].get("CENTRAL INDEX KEY")
+    try:
+        return _cik(cik_raw, label="legacy owner CIK" if owner else "legacy issuer CIK")
+    except SecRawParentProjectionError as exc:
+        raise SecCompleteSubmissionError(str(exc)) from exc
+
+
+def _legacy_boundary_lines(lines: list[str], *, preceding: str) -> list[str]:
+    """Discard only short SGML separator runs at explicit section boundaries."""
+    result: list[str] = []
+    index = 0
+    while index < len(lines):
+        if lines[index] != "":
+            result.append(lines[index])
+            index += 1
+            continue
+        end = index
+        while end < len(lines) and lines[end] == "":
+            end += 1
+        if end - index > 2:
+            _refuse("legacy header has too many blank separator lines")
+        previous = result[-1] if result else preceding
+        following = lines[end] if end < len(lines) else None
+        following_role = _LEGACY_ROLE_LINE.fullmatch(following) if following is not None else None
+        after_preamble = (previous.startswith("DATE AS OF CHANGE:")
+                          and following_role is not None
+                          and following_role.group(1) == "REPORTING-OWNER:")
+        after_role = (
+            _LEGACY_ROLE_LINE.fullmatch(previous) is not None and following is not None
+            and _LEGACY_SCOPE.fullmatch(following) is not None
+        )
+        after_leaf = (
+            _LEGACY_LEAF.fullmatch(previous) is not None
+            and (following is None or following_role is not None
+                 or _LEGACY_SCOPE.fullmatch(following) is not None)
+        )
+        if not (after_preamble or after_role or after_leaf):
+            _refuse("legacy header blank line is not a section separator")
+        index = end
+    return result
+
+
+def _legacy_header_identity(
+    body: list[str], target: SecCompleteSubmissionTarget,
+) -> dict[str, object]:
+    if len(body) < len(_LEGACY_PREAMBLE) + 4:
+        _refuse("legacy header is incomplete")
+    accepted_line = body[0]
+    prefix = "<ACCEPTANCE-DATETIME>"
+    if not accepted_line.startswith(prefix):
+        _refuse("legacy header has no leading acceptance tag")
+    accepted = accepted_line[len(prefix):]
+    if re.fullmatch(r"[0-9]{14}", accepted) is None:
+        _refuse("legacy acceptance timestamp is not fourteen digits")
+    try:
+        datetime.strptime(accepted, "%Y%m%d%H%M%S")
+    except ValueError as exc:
+        raise SecCompleteSubmissionError("REFUSED: legacy acceptance time is invalid") from exc
+    preamble: dict[str, str] = {}
+    for expected, line in zip(_LEGACY_PREAMBLE, body[1:1 + len(_LEGACY_PREAMBLE)], strict=True):
+        match = _LEGACY_FIELD.fullmatch(line)
+        if match is None or match.group(1) != expected or match.group(2) != match.group(2).strip():
+            _refuse("legacy header preamble is malformed or out of order")
+        preamble[expected] = match.group(2)
+    if (preamble["ACCESSION NUMBER"] != target.accession_number
+            or preamble["CONFORMED SUBMISSION TYPE"] != target.form_type
+            or preamble["FILED AS OF DATE"] != target.filing_date.replace("-", "")):
+        _refuse("legacy header accession, form, or filing date disagrees with target")
+    if (re.fullmatch(r"[1-9][0-9]*", preamble["PUBLIC DOCUMENT COUNT"]) is None
+            or int(preamble["PUBLIC DOCUMENT COUNT"]) > MAX_COMPLETE_DOCUMENTS):
+        _refuse("legacy header public document count is invalid")
+    for name in ("CONFORMED PERIOD OF REPORT", "DATE AS OF CHANGE"):
+        _date_digits(preamble[name].encode("ascii"), label=f"legacy {name}")
+    roles = _legacy_boundary_lines(
+        body[1 + len(_LEGACY_PREAMBLE):], preceding=body[len(_LEGACY_PREAMBLE)],
+    )
+    markers = [
+        (index, match.group(1)) for index, line in enumerate(roles)
+        if (match := _LEGACY_ROLE_LINE.fullmatch(line)) is not None
+    ]
+    if (len(markers) < 2 or markers[0] != (0, "REPORTING-OWNER:")
+            or markers[-1][1] != "ISSUER:" or any(
+                line != "REPORTING-OWNER:" for _, line in markers[:-1]
+            ) or len(markers) - 1 > MAX_COMPLETE_OWNERS):
+        _refuse("legacy header owner and issuer topology is ambiguous")
+    owners = [
+        _legacy_role_cik(roles[start + 1:markers[index + 1][0]], owner=True, target=target)
+        for index, (start, _) in enumerate(markers[:-1])
+    ]
+    issuer = _legacy_role_cik(roles[markers[-1][0] + 1:], owner=False, target=target)
+    if issuer != target.issuer_cik or len(set(owners)) != len(owners):
+        _refuse("legacy header issuer or owner identity disagrees with target")
+    return {
+        "accepted_at_raw": accepted, "owner_ciks": owners,
+        "public_document_count": int(preamble["PUBLIC DOCUMENT COUNT"]),
+    }
+
+
 def _header_identity(raw: bytes, target: SecCompleteSubmissionTarget) -> dict[str, object]:
     if not 0 < len(raw) <= MAX_COMPLETE_HEADER_BYTES:
         _refuse("header exceeds its exact byte cap")
@@ -176,6 +338,8 @@ def _header_identity(raw: bytes, target: SecCompleteSubmissionTarget) -> dict[st
         _refuse("header opener disagrees with accession")
     _date_digits(opener.group(2).encode("ascii"), label="header opener date")
     body = lines[1:-1]
+    if len(body) > 1 and body[1].startswith("ACCESSION NUMBER:"):
+        return _legacy_header_identity(body, target)
     markers = [(index, line) for index, line in enumerate(body) if line in _ROOT_MARKERS]
     if (not markers or sum(line.count(marker) for line in body for marker in _ROOT_MARKERS)
             != len(markers)):
@@ -334,6 +498,9 @@ def _extract(target: SecCompleteSubmissionTarget, raw: bytes) -> tuple[bytes, by
                 _refuse("ownership XML filename is unsafe")
             xml_docs.append((form, filename, body))
         position = next_position
+    if ("public_document_count" in header_fields
+            and header_fields["public_document_count"] != documents):
+        _refuse("legacy header document count disagrees with complete submission")
     if documents == 0 or len(xml_docs) != 1:
         _refuse("exactly one ownership XML document is required")
     form, filename, xml = xml_docs[0]

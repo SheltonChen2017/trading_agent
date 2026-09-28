@@ -49,6 +49,46 @@ def _header(owners: tuple[str, ...] = ("0000999999",)) -> bytes:
     )
 
 
+def _legacy_owner(cik: str) -> bytes:
+    return (
+        "REPORTING-OWNER:\n\n"
+        "\tOWNER DATA:\n"
+        "\t\tCOMPANY CONFORMED NAME:\tInvented Owner\n"
+        f"\t\tCENTRAL INDEX KEY:\t{cik}\n"
+        "\n\tFILING VALUES:\n"
+        "\t\tFORM TYPE:\t4\n"
+        "\n\tMAIL ADDRESS:\n"
+        "\t\tSTREET 1:\tInvented Street\n"
+    ).encode("ascii")
+
+
+def _legacy_header(owners: tuple[str, ...] = ("0000999999",)) -> bytes:
+    return (
+        b"<SEC-HEADER>0000999999-22-000001.hdr.sgml : 20221107\n"
+        b"<ACCEPTANCE-DATETIME>20221107101112\n"
+        b"ACCESSION NUMBER:\t0000999999-22-000001\n"
+        b"CONFORMED SUBMISSION TYPE:\t4\n"
+        b"PUBLIC DOCUMENT COUNT:\t1\n"
+        b"CONFORMED PERIOD OF REPORT:\t20221107\n"
+        b"FILED AS OF DATE:\t20221107\n"
+        b"DATE AS OF CHANGE:\t20221107\n\n"
+        + b"".join(_legacy_owner(owner) for owner in owners)
+        + b"\nISSUER:\n\n"
+          b"\tCOMPANY DATA:\n"
+          b"\t\tCOMPANY CONFORMED NAME:\tInvented Issuer\n"
+          b"\t\tCENTRAL INDEX KEY:\t0000123456\n"
+          b"\n\tBUSINESS ADDRESS:\n"
+          b"\t\tSTREET 1:\tInvented Road\n"
+          b"\n\tMAIL ADDRESS:\n"
+          b"\t\tSTREET 1:\tInvented Road\n"
+          b"\n\tFORMER COMPANY:\n"
+          b"\t\tFORMER CONFORMED NAME:\tInvented Previous\n"
+          b"\n\tFORMER COMPANY:\n"
+          b"\t\tFORMER CONFORMED NAME:\tInvented Earlier\n"
+          b"</SEC-HEADER>\n"
+    )
+
+
 def _xml(owners: tuple[str, ...] = ("0000999999",)) -> bytes:
     return (
         b"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -111,6 +151,89 @@ def test_exact_raw_and_derived_children_are_hash_bound_without_authority():
     assert payload["authority"]["direct_ib1c_ingest_authorized"] is False
     assert payload["authority"]["research_looks"] == 0
     assert projection.sha256 == _project(raw).sha256
+
+
+def test_legacy_column_header_retains_exact_bytes_and_identity_without_promotion():
+    header = _legacy_header(("0000999999", "0000888888"))
+    raw = _complete(header=header, owners=("0000999999", "0000888888"))
+    projection = _project(raw)
+    payload = projection.to_payload()
+    assert projection.header_bytes == header
+    assert projection.xml_bytes == _xml(("0000999999", "0000888888"))
+    assert projection.accepted_at_raw == "20221107101112"
+    assert projection.header_owner_ciks == ("0000999999", "0000888888")
+    assert payload["children"]["header"]["sha256"] == hash_bytes(header)
+    assert payload["authority"]["canonical_evidence"] is False
+    assert payload["authority"]["real_shape_verified"] is False
+
+
+def test_legacy_structural_labels_allow_only_bounded_trailing_tabs():
+    header = (_legacy_header()
+              .replace(b"REPORTING-OWNER:\n", b"REPORTING-OWNER:\t\n")
+              .replace(b"\tOWNER DATA:\n", b"\tOWNER DATA:\t\n")
+              .replace(b"ISSUER:\n", b"ISSUER:\t\t\n")
+              .replace(b"\tCOMPANY DATA:\n", b"\tCOMPANY DATA:\t\n"))
+    assert _project(_complete(header=header)).header_bytes == header
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header.replace(
+            b"REPORTING-OWNER:\t\n", b"REPORTING-OWNER:\t\t\t\t\t\n"
+        )))
+
+
+@pytest.mark.parametrize("old,new", [
+    (b"ACCESSION NUMBER:\t0000999999-22-000001", b"ACCESSION NUMBER:\t0000999999-22-000002"),
+    (b"CONFORMED SUBMISSION TYPE:\t4", b"CONFORMED SUBMISSION TYPE:\t4/A"),
+    (b"FILED AS OF DATE:\t20221107", b"FILED AS OF DATE:\t20221108"),
+    (b"<ACCEPTANCE-DATETIME>20221107101112", b"<ACCEPTANCE-DATETIME>20221107101199"),
+    (b"CENTRAL INDEX KEY:\t0000123456", b"CENTRAL INDEX KEY:\t0000777777"),
+    (b"\t\tFORM TYPE:\t4", b"\t\tFORM TYPE:\t4/A"),
+    (b"PUBLIC DOCUMENT COUNT:\t1", b"PUBLIC DOCUMENT COUNT:\t0"),
+    (b"CONFORMED PERIOD OF REPORT:\t20221107", b"CONFORMED PERIOD OF REPORT:\tbad"),
+])
+def test_legacy_column_header_refuses_wrong_identity(old, new):
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=_legacy_header().replace(old, new)))
+
+
+def test_legacy_declared_document_count_must_match_envelope():
+    header = _legacy_header().replace(
+        b"PUBLIC DOCUMENT COUNT:\t1", b"PUBLIC DOCUMENT COUNT:\t2"
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
+
+
+@pytest.mark.parametrize("old,new", [
+    (b"ACCESSION NUMBER:\t0000999999-22-000001\n", b"ACCESSION NUMBER:\t0000999999-22-000001\nACCESSION NUMBER:\t0000999999-22-000001\n"),
+    (b"PUBLIC DOCUMENT COUNT:\t1\n", b"UNKNOWN FIELD:\t1\n"),
+    (b"REPORTING-OWNER:\n", b"\tREPORTING-OWNER:\n"),
+    (b"\tOWNER DATA:\n", b"\tFOREIGN DATA:\n"),
+    (b"\t\tCENTRAL INDEX KEY:\t0000999999", b"\tCENTRAL INDEX KEY:\t0000999999"),
+    (b"\t\tCENTRAL INDEX KEY:\t0000999999\n", b"\t\tCENTRAL INDEX KEY:\t0000999999\n\t\tCENTRAL INDEX KEY:\t0000999999\n"),
+    (b"\tMAIL ADDRESS:\n", b"\tOWNER DATA:\n"),
+    (b"\t\tSTREET 1:\tInvented Street", b"\t\tCENTRAL INDEX KEY:\t0000999999"),
+    (b"\t\tSTREET 1:\tInvented Street", b"\t\tISSUER:\tInvented Street"),
+    (b"ISSUER:\n", b"REPORTING-OWNER:\n"),
+    (b"\tFORMER COMPANY:\n", b"\tFILING VALUES:\n"),
+])
+def test_legacy_column_header_refuses_ambiguous_or_foreign_scope(old, new):
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=_legacy_header().replace(old, new)))
+
+
+def test_legacy_blank_line_is_not_allowed_inside_a_leaf_block():
+    header = _legacy_header().replace(
+        b"\t\tCOMPANY CONFORMED NAME:\tInvented Owner\n",
+        b"\t\tCOMPANY CONFORMED NAME:\tInvented Owner\n\n",
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
+
+
+def test_legacy_blank_line_run_is_bounded():
+    header = _legacy_header().replace(b"REPORTING-OWNER:\n\n", b"REPORTING-OWNER:\n\n\n\n")
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
 
 
 def test_line_endings_remain_verbatim_in_each_child():

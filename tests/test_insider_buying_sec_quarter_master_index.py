@@ -179,6 +179,15 @@ def test_duplicate_form4_aliases_preserve_both_paths_and_select_exact_issuer_pat
         )
 
 
+def test_unique_reporter_archive_path_does_not_have_to_equal_declared_issuer():
+    receipt = _parse(_FOUR)
+    expected = SecMasterIndexExpectedRow(
+        _EXPECTED[0].accession_number, "4", "2023-02-10", "0000123456"
+    )
+    assert select_sec_master_index_subset(receipt, (expected,)) == receipt.rows
+    assert join_exact_sec_master_inventory(receipt, (expected,)) == receipt.rows
+
+
 def test_multiple_archive_paths_with_same_numeric_issuer_refuse():
     same_issuer_alias = (
         b"2000|Invented Alias|4|2023-02-10|"

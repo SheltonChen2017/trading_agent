@@ -182,6 +182,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     six_universe_qcom_exclusion_ar_range_policy.py
     six_universe_qcom_exclusion_coverage10_projection.py
     six_universe_qcom_exclusion_coverage10_study.py
+    six_universe_qcom_exclusion_dual_forward_policy.py
     six_universe_qcom_exclusion_study.py
     six_universe_qcom_exclusion_three_name_projection.py
     six_universe_qcom_exclusion_three_name_study.py
@@ -480,6 +481,12 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     ),
     "six_universe_qcom_exclusion_ar_range_policy.py": tuple(
         "hashlib json pathlib types".split()
+    ),
+    "six_universe_qcom_exclusion_dual_forward_policy.py": tuple(
+        """
+        hashlib json pathlib types research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_ar_range_policy
+        """.split()
     ),
     "six_universe_qcom_exclusion_three_name_projection.py": tuple(
         """
@@ -1470,6 +1477,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "six_universe_qcom_entry_only_projection.py": (),
     "six_universe_qcom_entry_only_study.py": (),
     "six_universe_qcom_exclusion_ar_range_policy.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
+    "six_universe_qcom_exclusion_dual_forward_policy.py": (
         "call:read_bytes", "import:pathlib",
     ),
     "six_universe_qcom_exclusion_three_name_projection.py": (),
@@ -4605,6 +4615,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_ar_range_policy",
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_projection",
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_dual_forward_policy",
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study",
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_projection",
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_study",

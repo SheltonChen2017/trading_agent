@@ -1060,16 +1060,35 @@ def test_lane_package_stays_network_free_through_indirect_imports():
     import sys
 
     repository = Path(__file__).resolve().parents[1]
-    code = (
+    imports = (
         "import importlib, pkgutil, sys\n"
         "import research.insider_buying as p\n"
         "for m in pkgutil.iter_modules(p.__path__):\n"
         "    importlib.import_module('research.insider_buying.' + m.name)\n"
-        "bad = sorted(n for n in sys.modules if n.split('.')[0] in "
-        "{'http', 'socket', 'ssl', 'urllib', 'requests', 'httpx', 'ftplib', 'smtplib', 'subprocess'}"
-        " or n == 'research.insider_buying_sec_acquisition')\n"
+    )
+    scan = (
+        "blocked = ('http.client', 'http.server', 'socket', 'socketserver', 'ssl', "
+        "'urllib.request', 'urllib3', 'requests', 'httpx', 'aiohttp', 'ftplib', "
+        "'smtplib', 'subprocess', 'research.insider_buying_sec_acquisition')\n"
+        "bad = sorted(n for n in sys.modules if any("
+        "n == root or n.startswith(root + '.') for root in blocked))\n"
         "print(','.join(bad))\n"
     )
-    result = subprocess.run([sys.executable, "-B", "-c", code], cwd=repository,
-                            capture_output=True, text=True, check=True, timeout=60)
+    result = subprocess.run(
+        [sys.executable, "-B", "-c", imports + "import urllib.parse\n" + scan],
+        cwd=repository, capture_output=True, text=True, check=True, timeout=60,
+    )
     assert result.stdout.strip() == ""
+    # The harmless parser is allowed, while actual network-capable imports
+    # remain visible to this scan on every supported Python version.
+    result = subprocess.run(
+        [sys.executable, "-B", "-c", imports + "import urllib.request\n" + scan],
+        cwd=repository, capture_output=True, text=True, check=True, timeout=60,
+    )
+    assert "urllib.request" in result.stdout.strip().split(",")
+    result = subprocess.run(
+        [sys.executable, "-B", "-c", imports + "import research.insider_buying_sec_acquisition\n" + scan],
+        cwd=repository, capture_output=True, text=True, check=True, timeout=60,
+    )
+    assert "research.insider_buying_sec_acquisition" in result.stdout.strip().split(",")
+    assert "http.client" in result.stdout.strip().split(",")

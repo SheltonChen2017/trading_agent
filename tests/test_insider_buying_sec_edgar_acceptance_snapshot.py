@@ -116,6 +116,12 @@ FILING_DATES = {
     ACCESSION_C: "2026-05-03",
     ACCESSION_D: "2026-05-04",
 }
+LEGACY_FILING_DATES = {
+    ACCESSION_A: "01-MAY-2026",
+    ACCESSION_B: "02-MAY-2026",
+    ACCESSION_C: "03-MAY-2026",
+    ACCESSION_D: "04-MAY-2026",
+}
 FORM_TYPES = {
     ACCESSION_A: "4",
     ACCESSION_B: "4/A",
@@ -534,6 +540,88 @@ def test_all_accessions_conservatively_fall_back_when_no_metadata_is_supplied(tm
         FILING_DATES[ACCESSION_C],
         FILING_DATES[ACCESSION_D],
     )
+
+
+def test_existing_iso_upstream_fixture_keeps_exact_bundle_hash(tmp_path):
+    raw_path, parsed_path, bundle_path, identity = _build(tmp_path)
+    loaded = _load(bundle_path, parsed_path, raw_path)
+    assert loaded.identity == identity
+    assert identity.lineage_hash == (
+        "8a21c9a1c52f540467bf7d6f76f7b3d6e00b2917bf42153d541b6aefbfb8ea9d"
+    )
+    assert hash_bytes(bundle_path.read_bytes()) == (
+        "d95946af162283fdb7ff0cdcf316ae1816882eb2b0cf795d99a63ae0bb830245"
+    )
+
+
+def test_legacy_upstream_dates_preserve_raw_rows_and_fallback_authority(tmp_path):
+    raw_path, parsed_path = _upstream(
+        tmp_path, tables=_tables(filing_dates=LEGACY_FILING_DATES)
+    )
+    _, _, bundle_path, identity = _build(
+        tmp_path, raw_path=raw_path, parsed_path=parsed_path, sources=()
+    )
+    loaded = _load(bundle_path, parsed_path, raw_path)
+    upstream = load_sec_bulk_parsed_snapshot(
+        parsed_path, raw_snapshot_directory=raw_path
+    )
+    upstream_by_row = {row.row_id: row for row in upstream.rows}
+    for record in loaded.records:
+        row = upstream_by_row[record.submission_row_id]
+        assert row.values[SUBMISSION_HEADERS.index("FILING_DATE")] == (
+            LEGACY_FILING_DATES[record.accession_number]
+        )
+        assert record.filing_date.isoformat() == FILING_DATES[record.accession_number]
+        assert record.availability_tier is SecEdgarAvailabilityTier.FILING_DATE_FALLBACK
+        assert record.next_open_rule is SecEdgarAvailabilityRule.NEXT_OPEN_AFTER_FILING_DATE
+        assert record.accepted_at is None
+        assert record.primary_document_url is None
+        assert record.metadata_source_sha256 is None
+    assert identity.exact_acceptance_count == 0
+    assert identity.filing_date_fallback_count == len(ACCESSIONS)
+
+
+def test_legacy_upstream_dates_match_iso_only_metadata_without_rewriting_it(tmp_path):
+    raw_path, parsed_path = _upstream(
+        tmp_path, tables=_tables(filing_dates=LEGACY_FILING_DATES)
+    )
+    _, _, bundle_path, _ = _build(tmp_path, raw_path=raw_path, parsed_path=parsed_path)
+    loaded = _load(bundle_path, parsed_path, raw_path)
+    assert loaded.identity.exact_acceptance_count == 2
+    assert tuple(record.filing_date.isoformat() for record in loaded.records) == tuple(
+        FILING_DATES[accession] for accession in ACCESSIONS
+    )
+    assert tuple(source.metadata_bytes for source in loaded.sources) == tuple(
+        source.metadata_bytes for source in _sources()
+    )
+
+
+def test_legacy_metadata_date_remains_refused_even_with_legacy_upstream(tmp_path):
+    raw_path, parsed_path = _upstream(
+        tmp_path, tables=_tables(filing_dates=LEGACY_FILING_DATES)
+    )
+    with pytest.raises(SecEdgarAcceptanceSnapshotError, match="metadata filing date"):
+        _build(
+            tmp_path,
+            raw_path=raw_path,
+            parsed_path=parsed_path,
+            sources=(_metadata_source(ACCESSION_A, filed="01-MAY-2026"),),
+        )
+    assert not tuple((tmp_path / "acceptance").glob("sec-edgar-acceptance-*.json"))
+
+
+def test_legacy_upstream_date_still_cross_checks_iso_metadata_date(tmp_path):
+    raw_path, parsed_path = _upstream(
+        tmp_path, tables=_tables(filing_dates=LEGACY_FILING_DATES)
+    )
+    with pytest.raises(SecEdgarAcceptanceSnapshotError, match="filing date|filed"):
+        _build(
+            tmp_path,
+            raw_path=raw_path,
+            parsed_path=parsed_path,
+            sources=(_metadata_source(ACCESSION_A, filed="2026-05-02"),),
+        )
+    assert not tuple((tmp_path / "acceptance").glob("sec-edgar-acceptance-*.json"))
 
 
 def test_forms_3_4a_and_5_are_retained_without_amendment_or_xml_inference(tmp_path):
@@ -1220,7 +1308,13 @@ def test_exact_acceptance_cannot_extend_beyond_filing_day_window(
         assert loaded.records[0].accepted_at == datetime.fromisoformat(accepted)
 
 
-@pytest.mark.parametrize("filing_date", ["", "2026-02-30", "05/01/2026"])
+@pytest.mark.parametrize(
+    "filing_date",
+    [
+        "", "2026-02-30", "05/01/2026", "1-MAY-2026", "01-may-2026",
+        "01-FOO-2026", "31-FEB-2026", " 01-MAY-2026", "01-MAY-2026 ",
+    ],
+)
 def test_missing_or_malformed_upstream_filing_date_refuses_whole_build(
     tmp_path, filing_date
 ):
@@ -1236,6 +1330,25 @@ def test_missing_or_malformed_upstream_filing_date_refuses_whole_build(
             raw_path,
             output_root,
             sources=_sources(),
+            metadata_profile=_metadata_profile(),
+            parser_git_commit=ACCEPTANCE_COMMIT,
+        )
+    assert not tuple(output_root.glob("sec-edgar-acceptance-*.json"))
+
+
+def test_mixed_upstream_filing_date_dialects_refuse_whole_snapshot(tmp_path):
+    filing_dates = dict(FILING_DATES)
+    filing_dates[ACCESSION_B] = LEGACY_FILING_DATES[ACCESSION_B]
+    raw_path, parsed_path = _upstream(
+        tmp_path, tables=_tables(filing_dates=filing_dates)
+    )
+    output_root = tmp_path / "acceptance"
+    with pytest.raises(SecEdgarAcceptanceSnapshotError, match="dialect|filing date"):
+        build_sec_edgar_acceptance_snapshot(
+            parsed_path,
+            raw_path,
+            output_root,
+            sources=(),
             metadata_profile=_metadata_profile(),
             parser_git_commit=ACCEPTANCE_COMMIT,
         )

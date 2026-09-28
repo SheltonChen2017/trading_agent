@@ -148,6 +148,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     formal_runtime_projection.py formal_streaming_bridge.py
     formal_streaming_input.py formal_submission_adapter.py
     formal_terminal_disposition_builder.py fresh_six_universe_snapshot.py
+    fresh_six_universe_snapshot_submission.py
     fundamental_universe_discovery.py
     fundamental_universe_discovery_runtime.py
     fundamental_universe_discovery_submission_adapter.py
@@ -462,6 +463,14 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "fresh_six_universe_snapshot_submission.py": tuple(
+        """
+        __future__ argparse hashlib json re time dataclasses pathlib
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.fresh_six_universe_snapshot
+        research.analyst_revisions_v2_qc.six_universe_coverage_submission
+        """.split()
+    ),
     "six_universe_qcom_entry_only_projection.py": tuple(
         """
         dataclasses hashlib json research.analyst_revisions_v2_qc
@@ -1475,6 +1484,9 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "fresh_six_universe_snapshot_submission.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
     "six_universe_qcom_entry_only_projection.py": (),
     "six_universe_qcom_entry_only_study.py": (),
     "six_universe_qcom_exclusion_ar_range_policy.py": (
@@ -4572,6 +4584,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.formal_submission_adapter",
         "research.analyst_revisions_v2_qc.formal_terminal_disposition_builder",
         "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot",
+        "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot_submission",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery_submission_adapter",

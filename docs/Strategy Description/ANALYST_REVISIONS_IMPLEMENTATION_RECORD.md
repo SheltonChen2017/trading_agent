@@ -182,6 +182,9 @@ by the test-only `8c06df6`. Paired by calendar year,
 the historical AR effect averages +1.6 points per year (t ≈ 0.6 over five
 years); the weight overlay's gain comes from 2021 and 2024 and the
 entry/count drag from 2025.
+Section 212 counter-reviews every Claude commit, corrects three P3 record
+details and the snapshot warm-up refusal, and freezes R247-A1 as a private,
+input-only QC probe. No forward performance or paper result is inferred.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -864,10 +867,12 @@ private QC compile/run and verification of real callback and Object Store
 behavior. Section 209's two forward AR percentages and the one-look/1/80
 paper gate are unchanged. Section 211 is Claude's independent review of the
 exact pushed range `1cb3705..d75c114` (sections 207–210), with the test-only
-correction `8c06df6`. The
-immediate next step is that Codex counter-reviews section 211 and the exact
-pushed range, and settles the snapshot warm-up refusal (`ARV2R211-002`)
-before that diagnostic's first QC launch.
+correction `8c06df6`. Section 212 completes Codex's counter-review and
+prospectively freezes R247-A1 after correcting the snapshot warm-up refusal.
+The immediate next step under section 212 is to attempt that one input-only
+QC diagnostic, then record its exact terminal disposition and the remaining
+forward-input gates. Claude should review section 212 after Codex's one
+final lane push.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -921,7 +926,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–211
+findings, outcomes, and per-run accounting remain in numbered sections 1–212
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -29605,7 +29610,7 @@ lane has produced, and the per-year view sharpens it:
 | 2022 | −13.70% | −13.70% | −13.47% | +0.01 | +0.22 | +0.23 |
 | 2023 | +27.83% | +27.58% | +24.53% | −0.25 | −3.05 | −3.30 |
 | 2024 | +12.13% | +11.55% | +20.60% | −0.57 | +9.05 | +8.47 |
-| 2025 | +35.64% | +32.62% | +31.76% | −3.03 | −0.85 | −3.88 |
+| 2025 | +35.64% | +32.61% | +31.76% | −3.03 | −0.85 | −3.88 |
 
 Effects are in-year percentage points, each year anchored on the previous
 year-end equity.
@@ -29613,8 +29618,10 @@ year-end equity.
 - **The five-year "benefit" is two good years.** The weight overlay helped in
   2021 and 2024, roughly matched in 2022, and lost in 2023 and 2025. Paired
   by year, no component is distinguishable from zero (t between −1.3 and
-  +1.0 over five observations). The cumulative +16.20 points is what those
-  five in-year spreads compound to; it is not a stable annual edge.
+  +1.0 over five observations). The cumulative +16.20-point difference is
+  obtained by compounding each account's annual returns separately and then
+  subtracting their cumulative returns, not by compounding the five annual
+  percentage-point spreads; it is not a stable annual edge.
 - **2025 is the weak year for both components**, and the recent window
   (August 2025 onward) was flat to negative for AR. That is consistent with a
   regime change and with a vintage effect that fades for the most recent
@@ -29641,7 +29648,9 @@ year-end equity.
 1. **State uncertainty with every historical spread** (`ARV2R211-003`).
    Retain monthly paired account returns (sixty values fit easily inside the
    8,192-byte statistic) in any future order run, and report the per-year
-   table and a paired test beside every cumulative spread.
+   table and a dependence-aware paired analysis beside every cumulative
+   spread. Sixty months are not automatically sixty independent observations,
+   and adaptive look multiplicity still applies.
 2. **Freeze the forward protocol with the decomposition in view.** Decide
    before the protocol is frozen whether the forward arms keep AR
    entry/count, and whether an AR-off-admission, AR-weight arm is added
@@ -29692,3 +29701,59 @@ and this record commit; no production file changed) with `~/.venvs/trading_agent
 Not exercised here: no QuantConnect or provider endpoint, result read, or
 launcher was run; the input-only snapshot diagnostic's real callback, EndTime,
 and Object Store behavior remain untested, as section 210 states.
+
+## 212. Codex counter-review of section 211 and prospective R247 input-only probe
+
+**Same lane and exact review range:** `d75c114..aef4855`. Codex reviewed
+each of Claude's three commits. `8c06df6` is accepted: its test-only pins
+refuse excess forward-receipt authority, a relabeled transport, and each
+R246 non-AR census mismatch. Six in-memory guard removals were red against
+the new tests. `7ec9f6c` is accepted after two P3 record corrections below;
+`aef4855` is accepted as an accurately qualified, record-only suite report.
+Claude's export-only failures are not described as real-checkout defects.
+
+| Counter-review finding | Severity and disposition |
+|---|---|
+| `ARV2CR212-001` | P3, corrected in section 211.4: R246's 2025 return of 32.614874% rounds to **32.61%**, not 32.62%. The retained receipt and its cumulative return are unchanged. |
+| `ARV2CR212-002` | P3, corrected in section 211.4: the cumulative +16.20-point R232-minus-R231 spread is obtained by separately compounding each account, then subtracting; compounding annual spreads directly does not produce it. |
+| `ARV2CR212-003` | P3, clarified in section 211.5: monthly paired observations are dependent and the adaptive research history still requires multiplicity treatment; sixty months are not sixty independent confirmations. |
+| `ARV2R211-002` | P3, corrected prospectively by `3d4fbc5`: pre-cutoff empty/nonpositive callbacks become counted degenerate sentinels; a later valid collection may supersede one, while a latest degenerate collection refuses persistence. Changed valid collections at the same source EndTime or callback second still refuse. The receipt remains decision-unready. |
+| Historical non-AR census isolation | P3 test debt corrected without changing production: each field of five within-family/cross-family QCOM comparison checks now has an isolating case. Removal of any one of the five checks made its four cases red. |
+
+### 212.1 Frozen R247-A1 research plan, before any cloud mutation
+
+R247 is a **development-only input diagnostic**, not a stock/equity performance
+evaluation, strategy order test, formal paper look, or AR 100%/200% comparison.
+The owner-selected 100% and 200% policy of section 209 is unchanged. The
+single closed QC decision session is **2026-09-25 at 09:20 New York time**;
+the generated source starts fourteen calendar days earlier. It gathers seven
+fresh QC universe callbacks, never reuses the September-25 historical
+accepted-risk package, and neither reads a price/return nor places an order.
+That input-only nature is the documented exception to the order-based
+performance-evaluation default. The September-28 08:43 PDT Massive capture
+is partial-day and is not a source for this probe.
+
+| Frozen R247-A1 identity | Value |
+|---|---|
+| Private QC project | `ARV2 R247 FRESH SIX INPUT 20260925` |
+| Backtest name | `ARV2 R247A1 fresh six input 20260925` |
+| Runtime file SHA-256 | `6c386957b25b83d6a5f6333cfa699ae07e0808b965a5a9184059becd992e529f` |
+| Generated `main.py` SHA-256 | `6138e86c6589e88f26f1cfddb646d46d692d8e412fe6b26ef09b2df4fa1f955e` |
+| Sorted two-file manifest SHA-256 | `3954de79a3398e900a78e6c2f0330ff9cdda370ade3570e41dbe50380684b381` |
+| One-use A1 waiver | `ARV2-OWNER-STANDING-EXPLORATORY-R247A1-INPUT-ONLY-SIGNATURE-WAIVER` |
+| Result read | One bounded `ARV2_FRESH_SIX_INPUT_META` custom statistic after exact `Completed.` status; no Object Store download, raw SID/cap/weight, outcome, order, or log inspection |
+
+The waiver is a candidate-specific binding of the owner's standing
+exploratory research/signature waiver (sections 191, 192 and 195), not a new
+paper or trading authorization. An exclusive private claim precedes any QC
+mutation; exact readback of the two uploaded source files precedes compile;
+the module implements only A1. Any unsuccessful compile or run consumes A1.
+A2/A3 would require a prospective tested correction **in the same QC
+project**, and the owner's maximum of three attempts cannot be circumvented
+with another project. A terminal `Completed.` without the one-use, schema-
+and digest-bound metadata is not a valid input result. Even a valid input
+probe cannot prove vendor publication-time availability or make the
+100%/200% pair decision-ready. Count an actual launch conservatively as one
+infrastructure research look, zero development/economic result cells;
+until launch, the floor remains **251 shared / 192 development / 34
+infrastructure / 662 authenticated cells**.

@@ -1,15 +1,15 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CLAUDE'S THREE-COMMIT SECTION-102 REVIEW WAS COUNTER-REVIEWED IN
-SECTION 103. AFTER THE OWNER APPROVED ONLY THE EXACT-16 READ-ONLY,
-NONCANONICAL OFFLINE ADAPTER, CODEX IMPLEMENTED `49851e5` AND RECORDED THE
-COMBINED HANDOFF IN SECTION 104. THE PINNED REPORT, INVENTORY, 48 RAW OBJECTS
-AND DERIVED PROJECTIONS REPLAY FOR ALL 16 RETAINED PILOT ACCESSIONS, WITH NO
-NEW SEC REQUEST, FILE WRITE, OR RESEARCH LOOK. THIS IS COMPATIBILITY ONLY:
-THE JOURNAL IS NOT REPLAYED, FIRST-PASS PROVENANCE IS NOT REPAIRED, AND NO
-IB-1C, CANONICAL, PIT, OUTCOME, QC, BACKTEST, PAPER, LIVE, BROKER, CAPITAL,
-ORDER OR TRADING AUTHORITY IS OPEN. CODEX'S FOCUSED CHECKS PASS; CLAUDE'S
-INDEPENDENT REVIEW OF THE EXACT COMBINED PUSH REMAINS NEXT. THE ONE-ROUND
+Status: **THE SECTION-103 COUNTER-REVIEW AND OWNER-APPROVED EXACT-16 OFFLINE
+ADAPTER WERE PUSHED AT `40e9b20`. BEFORE CLAUDE REVIEWED THAT SNAPSHOT, THE
+OWNER DIRECTED CODEX TO BUILD AHEAD; SECTION 105 RECORDS THE EXPLICIT TIMING
+EXCEPTION AND `7222d95`, AN IN-MEMORY IB-1C BLOCKER INVENTORY FOR THE SAME
+NONCANONICAL 16. IT DOES NOT RUN IB-1C OR COMPLETE IB-1. THE OWNER'S
+BACKTEST-GATE PREAUTHORIZATION IS IN PRINCIPLE, PENDING EXACT DATA, LOOK AND
+ALLOCATION TERMS; NO OUTCOME READ OR QUANTCONNECT JOB IS ENABLED. CLAUDE'S
+INDEPENDENT REVIEW OF BOTH PUSHED CODEX SLICES AND CODEX'S COUNTER-REVIEW
+REMAIN REQUIRED. CANONICAL, PIT, OUTCOME, QC, PAPER, LIVE, BROKER, CAPITAL,
+ORDER AND TRADING AUTHORITY REMAIN CLOSED. LOOKS 0/0/0. THE ONE-ROUND
 MONITOR REMAINS PAUSED.**
 
 Branch: `codex/strategy-insider-buying`
@@ -206,6 +206,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Claude review | `333398e` -> `644f46e` (code correction) -> `cfb316d` (test pins) -> this review record | Independent review of the Python-3.12 test correction, the section-100 counter-review, and the owner-approved synthetic raw-parent projection contract (`9fb6273..333398e`, 4 commits, 0 merges) | Verified the remote tip and clean worktree and dispositioned all four commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Ran the new contract in memory over the 16 already-acquired real index/header/XML triples (read-only, aggregates only): 0 of 16 accepted as pushed; fixed the contract to admit the real flat role subsections, after which 16 of 16 are accepted. Ran 36 direct and 2 combined mutants in the worktree and pinned the untested guards. Accepted `IBSECACQ-CCR01`, `CCR02`, and `CCR04`; recorded a position on the export part of `CCR03`. | Pushed `333398e`: complete suite **9,167 passed, 38 skipped, 0 failed in 524.98s**; recorded 35 and 357 reproduce; contract mutation **8 of 32** Codex guards caught. Final `cfb316d`: complete suite **9,194 passed, 38 skipped, 28 warnings, 0 failed in 520.28s**; lane gate **2,996 passed** on Python 3.13 and on 3.12; contract file 62 passed on both; mutation **26 of 32** plus 4 of 4 new-code guards, survivors classified; real triples **16 of 16** accepted; compileall exit **0**. **0 looks**. | `IBSECRP-CR01` P2 closed in `644f46e` (real headers refused). `IBSECRP-CR02` P3 closed in `cfb316d` (24 of 32 guard mutants survived; the commit message's 17 is wrong). `IBSECACQ-CCR01` P2 closed by `9e41ae3`, accepted against this reviewer; `CCR02`, `CCR04` accepted; `CCR03` open with position. `IBSECACQ-CR03` open for real multi-owner headers; earlier P3 items retained. No open P0-P2. | Codex counter-reviews `644f46e`, `cfb316d`, and this record. Any wiring of the contract, further acquisition, IB-1C processing, or canonical promotion needs its own owner decision. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-28 | Codex counter-review; owner-decision gate, local only | `333398e..f8877fe` reviewed; `a89a324` scope correction; this record commit follows | Counter-review Claude's section-102 three-commit review without a new source milestone | Accepted `644f46e` after one verified P3 scope-name correction, accepted test-only `cfb316d`, and accepted `f8877fe` with an append-only qualification of the earlier export-validation dispute. Independently replayed all 16 exact approved pilot triples from hash-checked single-link objects after the correction: 12 Form 4, 4 Form 4/A, one owner each; no data persisted or new SEC request. | New synthetic subsection-marker cases red 3/3 before the fix and green 3/3 after. Final focused contract/preparation/runner/record/active-document/import-boundary selection 387 passed in 1.97s on Python 3.12.14; two modified Python files compiled in memory; no complete suite by Codex. Looks 0/0/0. | `IBSECRP-CCR01` P3 closed in `a89a324`; Claude's `CR01` P2 and `CR02` P3 corrections accepted, earlier open and closed P0-P3 retained; no open current P0-P2. | Stop before any next milestone or push. Owner must expressly choose bounded wiring, acquisition or other source scope; existing evidence does not imply IB-1C, outcomes, QC or trading authority. Monitor remains paused. |
 | 2026-09-28 | Codex counter-review plus owner-approved implementation | `f8877fe..49851e5` (section-104 record follows) | Exact-16 retained SEC offline projection adapter | Carried forward all three section-103 Claude dispositions and P3 correction, then added a pinned read-only loader for the 16 retained continuation triples. It checks the committed report and inventory, exact accession and form inventory, all 48 content-addressed raw parents, and the separate derived projection receipts in memory. It does not import the SEC runner or use IB-1C. | New synthetic adapter file 33 passed; focused adapter, raw-parent, preparation, runner, active-document, record and import-boundary selection 431 passed in 6.64s on Python 3.12.14; two files compiled in memory; read-only pinned-root smoke 16 of 16, 12 Form 4 and 4 Form 4/A; three in-memory guard mutants produced expected red, restored final checks green. No complete suite by Codex; looks 0/0/0. | Precommit P3 receipt-fabrication and journal-shape findings closed in `49851e5` with red/green tests; earlier open and resolved ledger retained. No open current-lane P0-P2. | Make one combined lane push including `a89a324`, `43a48fd`, `49851e5` and this record. Claude independently reviews every pushed commit; no new data, IB-1C, outcome, QC or trading step follows by inference. |
+| 2026-09-28 | Codex owner-directed build-ahead | `40e9b20..7222d95` (section-105 record follows) | Exact-16 IB-1C blocker inventory, not direct IB-1C | Before Claude reviewed `40e9b20`, the owner directed build-ahead and preauthorized the future backtest gate in principle. Added a pure in-memory, hash-bound, 16-row report of missing metadata/provenance/amendment evidence without constructing an IB-1C source or advancing authority. No shared file changed. | Final focused adapter/source/record/active-document/import-boundary and project-separation selection 479 passed on Python 3.12.14; two in-memory deletion probes red then green; exact retained-root read-only smoke 16/16, 12 Form 4, 4 Form 4/A, one owner each, four amendment-link blockers; no complete suite by Codex and looks 0/0/0. | No confirmed new P0-P3 production finding; a self-referential blocker test oracle was tightened precommit and mutation-pinned. All earlier open and closed findings retained. | One same-lane push after section 105 and final checks. Claude reviews every Codex commit after `f8877fe`, including the previously pushed `40e9b20` slice and this build-ahead; Codex counter-reviews every Claude commit. Full-source and exact outcome gates remain separate. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -13802,3 +13803,114 @@ deployment, broker/operator database/scheduler, capital, orders and trading
 remain separate owner decisions. The one-round Claude-push monitor remains
 paused; no automated continuation is inferred. Research looks **0**,
 authorized outcome looks **0**, consumed outcome looks **0**.
+
+## 105. Owner-directed pre-review build-ahead: exact-16 IB-1C blocker inventory (2026-09-28 UTC)
+
+### 105.1 Directive, exact tree, and review status
+
+After the single push at `40e9b20e5be07d4ba8ce0680ff5eff3f072b7fe7`,
+and before Claude independently reviewed it, the owner directed Codex to
+**build toward backtest readiness before Claude reviews** and gave advance
+approval for the future authorization gate. This is an explicit timing
+exception to waiting for the section-104 review; it is not acceptance of that
+unreviewed code or a waiver of later independent review and counter-review.
+The only new code commit is
+`7222d95d91825802891f0e1566bd0f5b2596fa25` on the existing
+`codex/strategy-insider-buying` branch in the designated worktree. This
+record commit follows it. No side branch or worktree was created. A
+matching-lane-only fetch showed the remote still at `40e9b20` before the
+code commit; no concurrent branch movement or unrelated dirty work was seen.
+
+The owner's advance approval is recorded as intent to proceed to a future
+IB-5 stock-level historical study **after its executable terms and inputs
+are frozen**. It does not identify a particular outcome dataset/vintage,
+cutoff, primary cell and horizon, permanent look ID, within-lane alpha
+allocation (whose total ceiling is `1/80`), data rights, QC job or artifact.
+Consequently no outcome read, research look, upload or backtest is executable
+from this instruction alone. The existing IB-0/IB-1I zero-look contract is
+unchanged. Fresh SEC acquisition, real IB-1C to IB-1E processing,
+security-master/calendar access, ETF/provider data, QC processing, paper/live
+deployment and trading also remain separately scoped decisions.
+
+### 105.2 Bounded code and observed compatibility
+
+`research/insider_buying/sec_pilot_ib1c_readiness.py` adds the pure
+`assess_sec_pilot_ib1c_readiness(receipt)` entry point. It accepts only an
+exact `SecOfflinePilotProjectionReceipt`, replays its own serialization and
+each of its 16 raw-parent projections, refuses any changed row identity,
+parent digest, partial population or positive authority claim, and returns
+an immutable, hashable blocker report. The report retains every accession,
+period, form, projection and index/header/XML hash, derived-projection hash,
+and observed reporting-owner count in fixed order. It names unavailable
+verbatim IB-1C metadata, retrieval timestamp, official profile, verified
+timezone/source authenticity and direct IB-1C authority for every row; each
+Form 4/A additionally lacks an authenticated original-accession link. At
+the corpus level it records the unreplayed continuation journal, unverified
+first-pass code-SHA artifact and pacing trace, and incomplete **canonical
+82-quarter XML/metadata** corpus. That last item is a full-history canonical
+gate, not a claim that a separately authorized bounded diagnostic pilot
+must first acquire all 82 quarters.
+
+The report always states `ib1c_ready=false`, canonical/PIT/outcome authority
+false and all look counts zero. It constructs no `SecEdgarMetadataSource` or
+`SecForm4XmlSource`, does not invoke an IB-1C loader, and neither reads a path
+nor opens transport. This is a machine-checkable blocker inventory, **not
+direct IB-1C integration or completion of an IB-1 milestone**. It cannot
+repair the original first-pass provenance by relabeling existing bytes.
+
+The already owner-approved retained-root smoke was read-only and printed
+aggregates only: **16 of 16** exact receipt rows replayed, **12 Form 4 / 4
+Form 4/A**, **one observed owner per row**, and **four amendment-link
+blockers**. `ib1c_ready` remained false and research looks remained zero.
+No source byte, CIK, XML or real-data derived report was placed in Git or
+printed.
+
+### 105.3 P0-P3 ledger and test sensitivity
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSECIR-R01 | P3 | **CLOSED before `7222d95`** | precommit draft | `tests/test_insider_buying_sec_pilot_projection_adapter.py`, readiness blocker assertion | The test compared blocker output to the module's own blocker constant. Deleting a blocker from that constant could therefore leave the test green and overstate the completeness of the known-gap inventory. | Independent implementation self-check identified the shared oracle. | The blocker names are the artifact's purpose; their absence must be detected independently. | Assert independent literal row and corpus blocker lists, including the Form 4/A-only link. | In-memory deletion of the first row blocker: **1 failed** at the literal assertion; fresh-process restored code: **1 passed**. |
+| IBSECAD-R01/R02, IBSECRP-CCR01/CR01/CR02 | P2/P3 | **CLOSED, retained** | earlier | Sections 102-104 | Receipt binding, journal shape and parent-scope corrections remain in force. | Existing tests plus the focused selection below. | This report must not bypass the parent evidence. | No reversal or weakening. | Exact parent and adapter tests pass. |
+| IBSECACQ-CCR03, IBSECACQ-CR03/CR04, IBSECACQ-R08/R09, IB1BP-CR04/CR05, IB2CTX-CR02, IBZIP-CR02/CR03, IB2SRC-CR03, IBSH-CR01 | P3 or shared/out of lane | **OPEN, retained** | earlier | Sections 68-104 | Historical process, real multi-owner, first-pass provenance/pacing and older observations remain. | Earlier full ledger rows. | The blocker inventory resolves none of them. | None. | No new authority. |
+
+No confirmed new production-code P0-P3 finding was found in a separate
+Codex-side read-only audit; Claude's formal independent review is pending.
+An in-memory deletion of the positive-authority refusal
+made its named synthetic test fail **1 failed** (`DID NOT RAISE`), and the
+restored code passed **1 passed**. The existing module and test files were
+not mutated on disk for either probe. No open current-lane P0-P2 is claimed
+closed by this build-ahead.
+
+### 105.4 Validation, exclusions, and exact next action
+
+Codex used bundled Python **3.12.14**, disabled bytecode/pytest caches, and
+ran only focused validation in the designated worktree. The exact final
+source/test selection (adapter, raw parent, acquisition preparation and
+runner, lane record, active documents, module hygiene, ML import boundary,
+project-separation checks and the exact Insider package guard) passed
+**479/479 in 14.66 seconds**, zero skipped or failed. The narrower
+pre-record selection passed 444/444. Both touched Python files compiled in
+memory. The two named mutation directions were red then green; the Git diff
+whitespace check was clean. Record-sensitive checks rerun after this document
+commit. Codex did not run a complete lane or repository suite; Claude's earlier 9,194-pass
+complete run applies to its older tree, not this one.
+
+The work excludes a new SEC request, a new accession or quarter, real
+IB-1C..IB-1E execution, source authentication, calendar/security mapping,
+canonical stock signal, outcome join, ETF holdings, QC upload/job/backtest,
+operator database, broker, scheduler, paper/live deployment, capital,
+orders and trading. Research looks **0**, authorized outcome looks **0**,
+consumed outcome looks **0**. The one-round monitor remains paused.
+
+Make one normal same-lane push after this record and final integrity checks.
+Claude then independently reviews **every** Codex commit in the exact remote
+range `f8877fee51669cb4ab754ef0bfca873a05a8d6ac..PUSHED_HEAD`, including
+the four-commit section-104 push, this code commit and this record commit;
+Codex counter-reviews every later Claude commit. The critical-path owner
+input is provenance-complete, accession-matched Form 4/4-A XML plus
+acceptance metadata for a frozen historical scope, with separately scoped
+SEC acquisition if it is to be fetched rather than supplied. The full
+canonical study additionally needs authenticated amendment linkage and
+completeness, an authoritative PIT security master/calendar, and the exact
+outcome-registration terms named above. No IB-1, IB-2, IB-3 or IB-5 gate is
+marked complete by this blocker report.

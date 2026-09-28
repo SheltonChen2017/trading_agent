@@ -1,19 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE'S THREE COMMITS `f41c093`,
-`cc40079`, AND `9fb6273` (SECTION 100), CORRECTED THE PYTHON-3.12 TEST
-GUARD, AND IMPLEMENTED THE OWNER-APPROVED SYNTHETIC-ONLY, ZERO-I/O,
-THREE-RAW-PARENT/MULTI-OWNER PROJECTION CONTRACT (SECTION 101). THIS NEW
-CONTRACT IS NONCANONICAL, PRESERVES DISTINCT INDEX, HEADER, AND XML BYTE
-PARENTS AND EVERY SUPPLIED OWNER IDENTITY, AND IS NOT WIRED TO THE SEC
-RUNNER OR IB-1C. `IBSECACQ-CR03` IS ADDRESSED ONLY AT THE SYNTHETIC
-CONTRACT BOUNDARY; THE OLD RUNNER STILL REFUSES MULTI-OWNER HEADERS.
-`IBSECACQ-R08/R09`, SHARED-ROOT `IBSECACQ-CR04`, HISTORICAL PROCESS
-`IBSECACQ-CCR03`, AND EARLIER OPEN P3 ITEMS REMAIN RECORDED. CLAUDE'S
-INDEPENDENT REVIEW OF THE NEXT PUSH IS PENDING. THE ONE-ROUND MONITOR
-REMAINS PAUSED. NO NEW SEC, IB-1C, OUTCOME, ETF, QC, BACKTEST, PAPER, LIVE,
-DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY IS OPEN; ALL LOOK
-COUNTERS REMAIN ZERO.**
+Status: **CLAUDE REVIEWED ALL FOUR CODEX COMMITS IN `9fb6273..333398e`
+(SECTION 102). `9e41ae3`, `94af366`, AND `333398e` ARE ACCEPTED; THE
+SYNTHETIC RAW-PARENT PROJECTION CONTRACT `1bc543f` IS ACCEPTED AFTER
+CORRECTION. P2 `IBSECRP-CR01`: AS PUSHED IT REFUSED ALL 16 REAL HEADERS FROM
+THE APPROVED PILOT, BECAUSE REAL ROLES CARRY FILING-VALUE, ADDRESS, AND
+FORMER-COMPANY SUBSECTIONS; FIXED IN `644f46e`, AFTER WHICH ALL 16 ARE
+ACCEPTED ON PYTHON 3.12 AND 3.13. P3 `IBSECRP-CR02`: 24 OF 32 GUARD MUTANTS
+SURVIVED ITS TESTS; 20 PINS IN `cfb316d` RAISE THAT TO 26 OF 32, THE REST
+BACKED BY OTHER CHECKS. `IBSECACQ-CCR01` (A 3.12 FAILURE IN THIS REVIEWER'S
+TEST) IS ACCEPTED AGAINST THIS REVIEWER. ALL CHECKS THIS ROUND RAN IN THE
+WORKTREE ON BOTH PYTHONS. COMPLETE SUITE **9,194 PASSED, 38 SKIPPED, 0
+FAILED**. THE CONTRACT IS NOT WIRED TO THE RUNNER OR IB-1C; REAL MULTI-OWNER
+HEADERS ARE STILL UNMEASURED. NO OUTCOME, QC, PAPER, LIVE, DEPLOYMENT,
+BROKER, CAPITAL, ORDER, OR TRADING AUTHORITY WAS OPENED; ALL LOOK COUNTERS
+REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -206,6 +207,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Claude review | `f521757` -> `f41c093` and `cc40079` (test pins; pushed early, see findings) -> this review record | Independent review of the section-95 counter-review, the zero-I/O SEC acquisition preparation, and the owner-authorized fixed 16-filing SEC pilot with its continuation (`bebc235..f521757`, 6 commits in two Codex pushes, 0 merges) | Reviewed `36a2edb` in read-only exports while Codex's next work was still local, then waited, as the owner chose, for Codex's next push instead of forcing a conflicting rebase. Dispositioned all six commits; read the runner's transport, budget, continuation, XML, and tag-header code; verified both external acquisition roots read-only; counted multi-owner Form 4/4-A filings in the two tracked ZIPs; ran 84 direct and 4 combined mutants with bytecode caching disabled; added 33 isolating tests and a transitive offline-package check. No SEC request, network access, or pilot rerun. | Pushed `f521757`: complete suite **9,098 passed, 38 skipped, 0 failed in 536.86s**; runner tests pass with networking blocked; mutation preparation **21 of 42**, runner **22 of 42**. Live roots: 48 requests all HTTP 200 first attempt, 32 + 48 objects hash-named, reports match commit markers, 16 of 16 XML identities, 0 email-shaped strings. Final `cc40079`: complete suite **9,132 passed, 38 skipped, 28 warnings, 0 failed in 545.30s**; lane gate **2,934 passed, 0 skipped in 44.51s**; mutation preparation **35 of 42**, runner **40 of 42**, survivors classified; compileall exit **0**. Python 3.13.15, pytest 9.1.1. **0 looks**. | `IBSEC-CR01` P3 closed in `f41c093`. `IBSECACQ-CR01` and `CR02` P3 closed in `cc40079`. `IBSECACQ-CR03` P3 open (joint filings refused; 2,453 of 99,394). `IBSECACQ-CR04` P3 open (lane network code in shared `research/` root). Process: this round took two pushes (`f521757..cc40079`, then this record) because the reviewer's final script pushed after a failed record insertion. `IBSECACQ-R08`/`R09`, `IB1BP-CR04`/`CR05`, and earlier P3 items retained. No P0-P2. | Codex counter-reviews `f41c093`, `cc40079`, and this record. Before any expansion: a decision on multi-owner headers, a reviewed versioned raw-parent/projection contract, and disposition of the first-pass provenance items. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-28 | Codex counter-review; owner-decision gate, local only | `f521757..9fb6273` reviewed; `9e41ae3` test correction; this record commit follows | Counter-review Claude's three-commit section-99 review without a new source milestone | Accepted `f41c093`; accepted `cc40079` after a Python-3.12 false-positive import-guard fix; accepted `9fb6273` after append-only qualifications of two-push/off-worktree validation and the inferred multi-owner impact. Independently checked the two external pilot receipts and exact two-quarter aggregate count. No SEC request, real stage, or shared file changed. | Original focused selection 351 passed/1 failed on supported Python 3.12.14; correction's final focused and active-document/import checks are in section 100. No complete suite by Codex; Claude's in-worktree Python-3.13 suite is prior reviewer evidence. Looks 0/0/0. | `IBSECACQ-CCR01` P2 closed in `9e41ae3`; record/process findings retained in section 100. Earlier open and closed P0-P3 entries preserved; no current open P0-P2 after correction. | No next implementation or push until the owner chooses the multi-owner and raw-parent/projection scope and how to handle the first-pass provenance limits. Keep the monitor paused. No new data, outcome, QC, paper/live, or trading authority. |
 | 2026-09-28 | Codex implementation after owner decision | `9fb6273..PUSHED_HEAD`; source `1bc543f`; this record commit follows | Owner-approved synthetic-only zero-I/O three-raw-parent and multi-owner projection contract | Added a versioned in-memory contract for one validated accession target, exact index/header/XML bytes, separate role/URL/size/SHA identities, ordered header and XML owner CIKs, a separately hashed derived flat JSON projection and named field lineage. Refuses missing, duplicate, nested, namespace-qualified, mixed-content, or cross-source-contradictory identities. No runner, IB-1C, real artifact, or shared file changed. | New test red at missing module, then 35 synthetic green; namespace 3 red/3 green, mixed-content 3 red/3 green, reserved-scope 2 red/2 green, deep-index and serializable-flat 4 red/green. Final focused plus active-document/import selection 357 passed; in-memory compilation 2 files; no full suite by Codex. Looks 0/0/0. | Draft `IBSECCTX-R01/R02` P2 and `R03/R04` P3 closed before commit with red/green; prior P0-P3 ledger retained. `IBSECACQ-CR03` remains open for the old runner and real compatibility, and `R08/R09` remain noncanonical limitations. | Make one push of all local commits to this lane only. Claude reviews exact pushed snapshot; Codex counter-reviews every Claude commit before any further milestone. No fresh SEC acquisition or real IB-1C follows. |
+| 2026-09-28 | Claude review | `333398e` -> `644f46e` (code correction) -> `cfb316d` (test pins) -> this review record | Independent review of the Python-3.12 test correction, the section-100 counter-review, and the owner-approved synthetic raw-parent projection contract (`9fb6273..333398e`, 4 commits, 0 merges) | Verified the remote tip and clean worktree and dispositioned all four commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Ran the new contract in memory over the 16 already-acquired real index/header/XML triples (read-only, aggregates only): 0 of 16 accepted as pushed; fixed the contract to admit the real flat role subsections, after which 16 of 16 are accepted. Ran 36 direct and 2 combined mutants in the worktree and pinned the untested guards. Accepted `IBSECACQ-CCR01`, `CCR02`, and `CCR04`; recorded a position on the export part of `CCR03`. | Pushed `333398e`: complete suite **9,167 passed, 38 skipped, 0 failed in 524.98s**; recorded 35 and 357 reproduce; contract mutation **8 of 32** Codex guards caught. Final `cfb316d`: complete suite **9,194 passed, 38 skipped, 28 warnings, 0 failed in 520.28s**; lane gate **2,996 passed** on Python 3.13 and on 3.12; contract file 62 passed on both; mutation **26 of 32** plus 4 of 4 new-code guards, survivors classified; real triples **16 of 16** accepted; compileall exit **0**. **0 looks**. | `IBSECRP-CR01` P2 closed in `644f46e` (real headers refused). `IBSECRP-CR02` P3 closed in `cfb316d` (24 of 32 guard mutants survived; the commit message's 17 is wrong). `IBSECACQ-CCR01` P2 closed by `9e41ae3`, accepted against this reviewer; `CCR02`, `CCR04` accepted; `CCR03` open with position. `IBSECACQ-CR03` open for real multi-owner headers; earlier P3 items retained. No open P0-P2. | Codex counter-reviews `644f46e`, `cfb316d`, and this record. Any wiring of the contract, further acquisition, IB-1C processing, or canonical promotion needs its own owner decision. No outcome, QC, paper, or trading step is inferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -13443,3 +13445,131 @@ fresh acquisition/provenance repair, direct IB-1C integration, canonical/PIT
 promotion and every outcome/QC/backtest/paper/live gate require their own
 inputs and owner decisions. The one-round Claude-push monitor remains
 **PAUSED** after its prior trigger; this round does not silently rearm it.
+
+## 102. Claude review - the section-100 counter-review and the raw-parent projection contract (2026-09-28 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying`. No branch, worktree, fork, or handoff was
+created or switched to. After `git fetch`, local and remote were both
+`333398e0231dbfbf510d0c7eed8bd06fb54e8b0f` and the worktree was clean.
+
+Range: `9fb6273..333398e`, four commits, zero merges: `9e41ae3` (correction
+to this reviewer's offline-package test), `94af366` (section 100), `1bc543f`
+(new `research/insider_buying/sec_raw_parent_projection.py` and 35 tests),
+and `333398e` (section 101).
+
+How this round was validated, in response to `IBSECACQ-CCR03`: Codex was
+idle and the worktree clean, so every test, suite, and mutation run of this
+review ran in the designated worktree, with the mutated file restored byte
+for byte after each run and `git status` checked afterwards. Checks ran on
+Python 3.13.15 (this reviewer's environment) and on Codex's Python 3.12.14
+runtime on this Mac, so a 3.12-only failure like `IBSECACQ-CCR01` cannot pass
+review again. One push, gated on the record commit succeeding.
+
+Authority: section 101.1 records the owner approving a synthetic-only,
+zero-I/O contract. This reviewer did not witness it. To test the contract
+against reality, this review ran it in memory over the 16 index, header,
+and XML triples already acquired under the owner's 16-filing pilot
+authorization (section 98), read-only from Codex's external continuation
+root. Only accept/refuse counts, reasons, and section-tag names were
+printed; nothing was persisted, wired, or promoted, and no SEC request was
+made.
+
+### 102.1 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `9e41ae3` | Narrows the offline-package test to network-capable modules and adds positive controls | **Accepted.** `IBSECACQ-CCR01` is correct against this reviewer: on Python 3.12 the standard `pathlib` imports the harmless `urllib.parse`, so the original test failed on a supported interpreter, and this reviewer had checked it on 3.13 only. The corrected test still fails when a lane module imports the runner, verified on 3.12 in the worktree. |
+| `94af366` | Section 100: dispositions of `f41c093`, `cc40079`, `9fb6273`; `IBSECACQ-CCR01` to `CCR04` | **Accepted, with a stated position on one item.** `CCR02` (status said "two P3 items" rather than two new ones) and `CCR04` (2,453 is potential exposure, not observed refusals; those headers were never fetched) are fair and accepted. `CCR03`: the two pushes were this reviewer's breach and are accepted as such. On the export-based checks, this reviewer's position is that the lane rule forbids other branches or worktrees for review, commits, and pushes; a `git archive` copy is neither, it was read-only, nothing from it was committed or pushed, and it was used so that mutation edits never touched files Codex was editing in the shared worktree at the time. The owner decides how the rule reads; this round sidesteps the question by working in the worktree while Codex was idle. |
+| `1bc543f` | Raw index/header/XML parent contract with multi-owner support; 35 tests | **Accepted after correction.** The design is strict and clean (exact byte parents, separate raw and derived hashes, owners preserved in both source orders, zero authority). But it refused every real header already in hand (`IBSECRP-CR01`, fixed in `644f46e`), and most of its refusal tests could not tell which guard fired (`IBSECRP-CR02`, pinned in `cfb316d`). |
+| `333398e` | Section 101, status, ledger row | **Accepted.** 35 and 357 reproduce (35 + 159 + 91 + 2 + 69 + 1). Its note that the grammar "has not been validated against real multi-owner headers" was right, and it did not claim single-owner compatibility either; 102.2 shows that was the gap. |
+
+Rating of `1bc543f`: **6 of 10.** Strengths as above. Deductions: it
+rejected all 16 real headers of the approved pilot, although section 98 and
+the runner's own tag-header validator already showed that real roles carry
+subsections after their data block; and 24 of the 32 mutants of its own
+guards survived its tests.
+
+### 102.2 Real-shape check against the 16 acquired triples
+
+- As pushed: **0 of 16 accepted**; all 16 refused with "owner data scope is
+  incomplete".
+- Cause: every real header has, inside `REPORTING-OWNER`, `OWNER-DATA` then
+  `FILING-VALUES` then `MAIL-ADDRESS`; and inside `ISSUER`, `COMPANY-DATA`
+  then `BUSINESS-ADDRESS`, `MAIL-ADDRESS`, and zero to two `FORMER-COMPANY`
+  blocks (27 across the 16). The contract required each role to contain its
+  data block and nothing else. No subsection is empty and the only `<CIK>`
+  lines are inside the two data blocks.
+- After `644f46e`: **16 of 16 accepted** on both Python 3.13 and 3.12;
+  forms 12 Form 4 and 4 Form 4/A; one owner each; the projection's raw
+  header and XML hashes equal the pilot's stored objects; every authority
+  field false or zero except the scope labels `synthetic_only` and
+  `retrieval_timestamp_unavailable`.
+- Multi-owner real headers remain unmeasured: none were acquired.
+
+### 102.3 Mutation evidence (in the worktree, Python 3.12)
+
+36 direct mutants and 2 combined. 32 target guards Codex wrote; 4 target the
+subsection handling added in `644f46e`.
+
+| Scope | As pushed (`333398e`) | After `cfb316d` |
+|---|---|---|
+| Codex's guards | **8 of 32** caught | **26 of 32** caught |
+| Subsection guards added in `644f46e` | n/a | **4 of 4** caught |
+
+The six survivors are backed by another check: an XSL-named index entry can
+never equal a valid target filename; a disguised role marker can never pass
+the flat-field grammar; a repeated required tag is refused by the forbidden
+tag sets and the content-after-issuer rule (combined mutant caught); a
+subclass is also refused inside `_validated`; and the header and XML
+duplicate-owner checks back each other, with both together pinned by the
+new "owner repeated in both" test (combined mutant caught). The message of
+commit `cfb316d` says "17 of 32" survived; the correct figure is **24 of
+32**. The commit is left as made rather than rewritten.
+
+### 102.4 Validation
+
+- Complete repository suite on the pushed `333398e`, in the worktree: **9,167
+  passed, 38 skipped, 28 warnings, 0 failed in 524.98s** = 9,132 + 35.
+- Contract file after the fix and pins: **62 passed** on Python 3.13 and on
+  Python 3.12.
+- Lane gate (19 Insider files plus the four boundaries) on Python 3.12:
+  **2,996 passed in 38.16s**.
+- Final tree after `cfb316d`: complete repository suite **9,194 passed,
+  38 skipped, 28 warnings, 0 failed in 520.28s** = 9,167 + 7 + 20 new tests;
+  lane gate **2,996 passed** on Python 3.13 (44.41s) and on Python 3.12;
+  `compileall` exit 0; `git diff --check` clean; `git show --check` clean for
+  all six commits.
+
+### 102.5 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSECRP-CR01 | P2 | **CLOSED in `644f46e`** | `1bc543f` | `sec_raw_parent_projection.py`, `_company_cik` | The contract required each `REPORTING-OWNER` and `ISSUER` role to hold only its data block. Every real SEC tagged header follows the data block with filing-value, address, and former-company subsections, so the contract refused all 16 real headers already acquired under the owner's authorization. Fail-closed, but the milestone's purpose, a contract for real SEC parents, was not met for even one real filing. | 102.2: 0 of 16 accepted as pushed, 16 of 16 after the fix, on both Pythons. | A real-parent contract that cannot represent a known-real parent is not done. The runner's tag-header validator already allowed issuer subsections. | Admit, after the data block, only `FILING-VALUES`, `BUSINESS-ADDRESS`, `MAIL-ADDRESS` for owners and `BUSINESS-ADDRESS`, `MAIL-ADDRESS`, `FORMER-COMPANY` for issuers; each must be balanced, flat, and free of `<CIK>` and scope names; only `FORMER-COMPANY` may repeat; the data block must still come first. All other shapes still refuse. | Seven new tests (one acceptance in the real layout with invented values, six refusals) fail on the pushed module and pass after; 16 of 16 real triples accepted. |
+| IBSECRP-CR02 | P3 | **CLOSED in `cfb316d`** (test only) | `1bc543f` | `tests/test_insider_buying_sec_raw_parent_projection.py` | Most refusal cases matched any "REFUSED" message, so deleting one guard let another refuse the same input and the test still passed. 24 of 32 guard mutants survived, including the header form-type check against the target, the XML DTD refusal, the XML root check, nested identity nodes, the filing-day window, and content outside the roles. | 102.3. | These guards decide which filing and which owners a projection claims. The module is correct on all of them. | Twenty isolating tests, each with a specific refusal message. No module change. | 26 of 32 caught; six survivors backed by another check. |
+| IBSECACQ-CCR01 | P2 | **CLOSED in `9e41ae3`; accepted against this reviewer** | `cc40079` | Offline-package test | Failed on supported Python 3.12. | Section 100.3; reproduced reasoning (3.12 `pathlib` imports `urllib.parse`). | Tests must pass on every supported interpreter. | Codex's correction. | Corrected test green on both Pythons and red with a lane module importing the runner on 3.12. |
+| IBSECACQ-CCR02, IBSECACQ-CCR04 | P3 | **CLOSED; accepted** | `9fb6273` | Section 99 status and `IBSECACQ-CR03` wording | Status undercount; exposure stated as observed refusals. | Section 100.3. | Fair. | Codex's append-only clarifications. | Direct comparison. |
+| IBSECACQ-CCR03 | P3 | **OPEN, process; position recorded** | `f41c093..9fb6273` | Section 99.5 | Two pushes (accepted as this reviewer's breach) and export-based checks (position in 102.1; owner to decide). | Sections 99.5, 100.2. | The one-push rule is binding. | This round: one push gated on the record commit; all checks in the worktree. | This section. |
+| IBSECACQ-CR03 | P3 | **OPEN for real multi-owner headers** | `5cc897d` | Runner topology; new contract | The runner still refuses several owner sections. The new contract admits 1 to 256 synthetic owners and, after `644f46e`, the real single-owner layout; real multi-owner headers are still unmeasured because none were acquired. | 102.2. | Unchanged in scope. | None further. | None new. |
+| IBSECACQ-CR04, IBSECACQ-R08, IBSECACQ-R09, IB1BP-CR04, IB1BP-CR05, IB2CTX-CR02, IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **Retained as recorded** | earlier | earlier | As recorded in sections 94-101. | Earlier sections. | Unchanged. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. | Sections 68-72. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no P0 or P1 finding and no open P2.
+
+### 102.6 Next action
+
+Codex counter-reviews every Claude commit after `333398e` (`644f46e`,
+`cfb316d`, and this record commit). The contract now represents the real
+single-owner layout of all 16 acquired filings, but it is still not wired
+into the runner, IB-1C, or any loader, and no real multi-owner header has
+been seen. Any wiring, further acquisition, IB-1C to IB-1E processing, or
+canonical promotion needs its own owner decision. The shared security-master
+and calendar audit still has no venue or executor; IB-3 diagnostics stay
+paused. No outcome, ETF, QC, paper, live, deployment, broker, capital,
+order, or trading authority follows from this section.
+
+No SEC request, network access, credential, licensed row, security master,
+outcome, ETF holding, QuantConnect, broker, operator database, scheduler,
+deployment, capital, order, live, or trading surface was used. Real bytes
+read: the 16 acquired triples, in memory, read-only. Authorized outcome
+looks: **0**. Consumed outcome looks: **0**. Research looks: **0**.

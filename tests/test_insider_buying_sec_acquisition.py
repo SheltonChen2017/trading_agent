@@ -810,3 +810,266 @@ def test_runner_is_outside_provider_free_core_and_has_no_ib1c_promotion_import()
     assert 'write_sec_edgar_acceptance_snapshot' not in source
     assert 'write_sec_noncanonical_pilot' not in source
     assert 'run_ib1c' not in source
+
+
+# Isolating pins: each input is otherwise valid, so only the named guard can
+# refuse it. Several earlier cases were refused first by a different check.
+
+
+def _valid_xml(candidate, *, root="ownershipDocument", form=None, issuer="0000123456", prefix=""):
+    return (
+        prefix + f"<{root}>"
+        f"<documentType>{form or candidate.form_type}</documentType>"
+        f"<issuer><issuerCik>{issuer}</issuerCik></issuer>"
+        f"</{root}>"
+    ).encode("utf-8")
+
+
+def test_xml_utf8_internal_entity_with_complete_identity_is_refused_as_dtd():
+    candidate = _candidates()[0]
+    hostile = (
+        '<!DOCTYPE ownershipDocument [<!ENTITY f "4">]>'
+        "<ownershipDocument><documentType>&f;</documentType>"
+        "<issuer><issuerCik>0000123456</issuerCik></issuer></ownershipDocument>"
+    ).encode("utf-8")
+    with pytest.raises(pilot.SecPilotError, match="DTD or entity"):
+        pilot._validate_xml(hostile, candidate)
+
+
+def test_xml_with_utf8_bom_is_refused():
+    candidate = _candidates()[0]
+    with pytest.raises(pilot.SecPilotError, match="without BOM"):
+        pilot._validate_xml(b"\xef\xbb\xbf" + _valid_xml(candidate), candidate)
+
+
+def test_xml_declaring_a_foreign_encoding_is_a_named_refusal():
+    candidate = _candidates()[0]
+    raw = _valid_xml(candidate, prefix='<?xml version="1.0" encoding="UTF-16"?>')
+    with pytest.raises(pilot.SecPilotError, match="foreign declaration"):
+        pilot._validate_xml(raw, candidate)
+
+
+def test_xml_with_another_root_element_is_refused():
+    candidate = _candidates()[0]
+    with pytest.raises(pilot.SecPilotError, match="not a Form 4 ownership document"):
+        pilot._validate_xml(_valid_xml(candidate, root="otherDocument"), candidate)
+
+
+@pytest.mark.parametrize("change", ["form", "issuer"])
+def test_xml_for_another_form_or_issuer_is_refused(change):
+    candidate = _candidates()[0]
+    raw = (_valid_xml(candidate, form="4/A") if change == "form"
+           else _valid_xml(candidate, issuer="0000777777"))
+    with pytest.raises(pilot.SecPilotError, match="disagrees with approved source"):
+        pilot._validate_xml(raw, candidate)
+
+
+def _transport_refusal(monkeypatch, headers, body):
+    class Response:
+        status = 200
+
+        def getheaders(self):
+            return headers
+
+        def read(self, limit):
+            return body[:limit]
+
+    class Connection:
+        def __init__(self, host, timeout):
+            pass
+
+        def request(self, method, path, headers):
+            pass
+
+        def getresponse(self):
+            return Response()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(pilot.http.client, "HTTPSConnection", Connection)
+    return lambda: pilot._fetch_sec("/Archives/edgar/data/123456/000099999922000001/index.json", "agent")
+
+
+def test_transport_refuses_compression_even_with_one_bounded_length(monkeypatch):
+    fetch = _transport_refusal(monkeypatch, [("Content-Length", "3"), ("Content-Encoding", "gzip")], b"abc")
+    with pytest.raises(pilot.SecPilotGlobalStop, match="unsupported compression"):
+        fetch()
+
+
+def test_transport_refuses_chunking_even_with_one_bounded_length(monkeypatch):
+    fetch = _transport_refusal(monkeypatch, [("Content-Length", "3"), ("Transfer-Encoding", "chunked")], b"abc")
+    with pytest.raises(pilot.SecPilotGlobalStop, match="unbounded transfer encoding"):
+        fetch()
+
+
+def test_index_item_repeating_a_key_is_refused_not_resolved_last_wins():
+    index = b'{"directory":{"item":[{"name":"ownership.xml","name":"other.xml"}]}}'
+    with pytest.raises(pilot.SecPilotError, match="repeats a JSON key"):
+        pilot._primary_filename(index)
+
+
+def test_index_item_list_above_512_entries_is_refused():
+    items = [{"name": "ownership.xml"}] + [{"name": f"f{i}.txt"} for i in range(512)]
+    with pytest.raises(pilot.SecPilotError, match="bounded item list"):
+        pilot._primary_filename(json.dumps({"directory": {"item": items}}).encode())
+
+
+def _tag_target(candidate):
+    return pilot.SecAcquisitionTarget(
+        period=candidate.period, accession_number=candidate.accession_number,
+        form_type=candidate.form_type, filing_date=candidate.filing_date,
+        issuer_cik=candidate.issuer_cik, quarterly_zip_sha256=candidate.quarterly_zip_sha256,
+        submission_row_id=candidate.submission_row_id, primary_xml_filename="ownership.xml",
+    )
+
+
+@pytest.mark.parametrize(("old", "new", "match"), [
+    # Envelope names another accession; the ACCESSION-NUMBER field is right.
+    (b".hdr.sgml : ", b"X.hdr.sgml : ", "envelope disagrees"),
+    # ACCESSION-NUMBER field names another accession; the envelope is right.
+    (b"<ACCESSION-NUMBER>0000999999-22-000001", b"<ACCESSION-NUMBER>0000999999-22-000009", "identity disagrees"),
+    # A foreign preamble field.
+    (b"<TYPE>", b"<FOREIGN-FIELD>x\n<TYPE>", "nested or foreign fields"),
+    # ISSUER placed before REPORTING-OWNER; each role still appears once.
+    (b"<REPORTING-OWNER>\n<OWNER-DATA>\n<CIK>0000999999\n</OWNER-DATA>\n</REPORTING-OWNER>\n<ISSUER>\n<COMPANY-DATA>\n<CIK>0000123456\n</COMPANY-DATA>\n</ISSUER>\n",
+     b"<ISSUER>\n<COMPANY-DATA>\n<CIK>0000123456\n</COMPANY-DATA>\n</ISSUER>\n<REPORTING-OWNER>\n<OWNER-DATA>\n<CIK>0000999999\n</OWNER-DATA>\n</REPORTING-OWNER>\n",
+     "role topology"),
+    # A subsection before COMPANY-DATA inside ISSUER.
+    (b"<ISSUER>\n<COMPANY-DATA>", b"<ISSUER>\n<BUSINESS-ADDRESS>\n<CITY>X\n</BUSINESS-ADDRESS>\n<COMPANY-DATA>", "missing or not first"),
+    # A second CIK inside ISSUER but outside COMPANY-DATA.
+    (b"</COMPANY-DATA>\n</ISSUER>", b"</COMPANY-DATA>\n<FORMER-COMPANY>\n<CIK>0000123456\n</FORMER-COMPANY>\n</ISSUER>", "ambiguous outside COMPANY-DATA"),
+])
+def test_tag_header_isolated_refusals(old, new, match):
+    candidate = _candidates()[0]
+    raw = _tag_header(candidate)
+    assert old in raw
+    with pytest.raises(pilot.SecPilotError, match=match):
+        pilot._validate_tag_header(raw.replace(old, new, 1), _tag_target(candidate))
+
+
+def _continue(inputs, output, **overrides):
+    source, prior, first, _ = inputs
+    values = dict(contact_email=CONTACT, prior_code_commit=pilot.FIRST_PASS_CODE_COMMIT,
+                  continuation_code_commit=COMMIT)
+    values.update(overrides)
+    return pilot.run_fixed_sec_xml_continuation(source, prior, first, output, **values)
+
+
+def test_continuation_is_not_available_when_any_xml_is_refused(monkeypatch, synthetic_first_pass):
+    inputs, _ = synthetic_first_pass
+    candidates = inputs[3]
+
+    def one_bad(path, user_agent):
+        candidate = next(item for item in candidates if path.startswith(item.archive_path))
+        if candidate is candidates[5]:
+            return 200, _valid_xml(candidate, issuer="0000777777")
+        return 200, _xml(candidate)
+
+    monkeypatch.setattr(pilot, "_fetch_sec", one_bad)
+    monkeypatch.setattr(pilot, "_verify_continuation_code_commit", lambda _: None)
+    payload = json.loads(_continue(inputs, inputs[2].parent / "one-bad").read_bytes())
+    assert sum(row["status"] == "acquired_noncanonical" for row in payload["rows"]) == 15
+    assert payload["acquisition_available"] is False
+
+
+def test_continuation_stops_all_requests_after_a_global_stop(monkeypatch, synthetic_first_pass):
+    inputs, _ = synthetic_first_pass
+    calls = []
+
+    def denied(path, user_agent):
+        calls.append(path)
+        return 403, b""
+
+    monkeypatch.setattr(pilot, "_fetch_sec", denied)
+    monkeypatch.setattr(pilot, "_verify_continuation_code_commit", lambda _: None)
+    payload = json.loads(_continue(inputs, inputs[2].parent / "denied").read_bytes())
+    assert len(calls) == 1
+    assert payload["halted_on_sec_access"] is True
+    assert sum(row["reason"] == "not attempted after SEC access stop" for row in payload["rows"]) == 15
+
+
+def test_continuation_refuses_an_xml_path_that_drifts_from_the_frozen_index(monkeypatch, synthetic_first_pass):
+    # Drift is injected after a clean replay: the target's XML URL no longer
+    # matches the candidate's archive directory plus the index-named file.
+    import dataclasses
+    from types import SimpleNamespace
+
+    inputs, _ = synthetic_first_pass
+    monkeypatch.setattr(pilot, "_verify_continuation_code_commit", lambda _: None)
+    monkeypatch.setattr(pilot, "_fetch_sec", lambda *args: pytest.fail("network after path drift"))
+    original_replay = pilot.replay_first_sec_pass
+
+    def drifted_replay(*args, **kwargs):
+        replay = original_replay(*args, **kwargs)
+        sources = tuple(
+            dataclasses.replace(item, target=SimpleNamespace(
+                primary_xml_filename=item.target.primary_xml_filename,
+                primary_xml_url=item.target.primary_xml_url.replace("/123456/", "/999999/"),
+            ))
+            for item in replay.sources
+        )
+        return dataclasses.replace(replay, sources=sources)
+
+    monkeypatch.setattr(pilot, "replay_first_sec_pass", drifted_replay)
+    with pytest.raises(pilot.SecPilotError, match="drifted from frozen index"):
+        _continue(inputs, inputs[2].parent / "drift")
+
+
+@pytest.mark.parametrize("site", ["continuation", "replay"])
+def test_first_pass_code_attestation_must_be_the_exact_operator_value(monkeypatch, synthetic_first_pass, site):
+    inputs, _ = synthetic_first_pass
+    monkeypatch.setattr(pilot, "_fetch_sec", lambda *args: pytest.fail("network before attestation"))
+    monkeypatch.setattr(pilot, "_verify_continuation_code_commit", lambda _: None)
+    wrong = "e" * 40
+    with pytest.raises(pilot.SecPilotError, match="attestation"):
+        if site == "continuation":
+            _continue(inputs, inputs[2].parent / "wrong-attestation", prior_code_commit=wrong)
+        else:
+            pilot.replay_first_sec_pass(inputs[2], inputs[3], prior_code_commit=wrong)
+
+
+def test_continuation_git_binding_refuses_head_other_than_the_declared_commit(monkeypatch):
+    root = Path(pilot.__file__).resolve().parents[1]
+    source = Path(pilot.__file__).read_bytes()
+
+    def git_output(command, **kwargs):
+        if command == ("git", "rev-parse", "--show-toplevel"):
+            return (str(root) + "\n").encode()
+        if command == ("git", "branch", "--show-current"):
+            return b"codex/strategy-insider-buying\n"
+        if command == ("git", "rev-parse", "HEAD"):
+            return ("f" * 40 + "\n").encode()
+        if command == ("git", "status", "--porcelain=v1", "--untracked-files=all"):
+            return b""
+        if command == ("git", "show", f"{COMMIT}:research/insider_buying_sec_acquisition.py"):
+            return source
+        pytest.fail(f"unexpected git command {command}")
+
+    monkeypatch.setattr(pilot.subprocess, "check_output", git_output)
+    with pytest.raises(pilot.SecPilotError, match="clean committed lane source"):
+        pilot._verify_continuation_code_commit(COMMIT)
+
+
+def test_lane_package_stays_network_free_through_indirect_imports():
+    # The package guard checks direct imports only. This runner lives outside
+    # the package and imports http.client, so a lane module importing it would
+    # pull networking in without tripping that guard. Import every lane module
+    # in a fresh interpreter and require that no networking module loads.
+    import subprocess
+    import sys
+
+    repository = Path(__file__).resolve().parents[1]
+    code = (
+        "import importlib, pkgutil, sys\n"
+        "import research.insider_buying as p\n"
+        "for m in pkgutil.iter_modules(p.__path__):\n"
+        "    importlib.import_module('research.insider_buying.' + m.name)\n"
+        "bad = sorted(n for n in sys.modules if n.split('.')[0] in "
+        "{'http', 'socket', 'ssl', 'urllib', 'requests', 'httpx', 'ftplib', 'smtplib', 'subprocess'}"
+        " or n == 'research.insider_buying_sec_acquisition')\n"
+        "print(','.join(bad))\n"
+    )
+    result = subprocess.run([sys.executable, "-B", "-c", code], cwd=repository,
+                            capture_output=True, text=True, check=True, timeout=60)
+    assert result.stdout.strip() == ""

@@ -165,6 +165,10 @@ the historical net AR spread to **−6.88 points** from entry/count/fallback and
 **+23.08 points** from weight transfer conditional on the same AR-on baseline;
 it is not a prospective efficacy result. The current look floor is
 **251 / 192 / 34 / 662**. Formal paper confirmation remains gated.
+Section 209 records the owner's subsequent choice of **both 100% and 200%**
+as named forward-development candidates against one AR-off control. It does
+not select a historical winner, add a research look, or grant a two-arm formal
+paper test. The one-look, 1/80 Analyst allocation and all paper gates remain.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -823,6 +827,18 @@ the authenticated R246 result. Claude will review section 208 independently
 and the exact next pushed implementation before any formal efficacy or paper
 authority is inferred. No fourth R225 attempt, formal alpha, live/paper
 order, or automatic threshold search follows.
+
+The owner subsequently selected **both 100% and 200%** for forward
+development. Section 209 records that additive rule choice, without editing
+the section-208 immutable eight-point ancestor or retroactively choosing a
+historical winner. Claude will review section 209 and the exact next pushed
+implementation. A single formal look with total Analyst alpha at most 1/80
+cannot be treated as two independent full-budget looks: a separately reviewed
+two-arm multiplicity, power, common-epoch and execution protocol, upstream
+ARV2-4 through ARV2-8 gates, and distinct paper authority remain necessary.
+The historical QCOM-exclusion repair is provenance, not an automatic forward
+universe rule. No new QC run, result read, forward-return cell, or paper
+deployment occurs in section 209.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -2569,6 +2585,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Claude independent review of sections 201–205: Codex's counter-review of section 200, the QCOM-excluded historical sensitivities, the 10% and three-name admission studies | `1b1da0e` -> this record commit | Section 206: seven commits `f612899..1b1da0e` individually disposed (6 accepted, 1 accepted after a record correction, 0 rejected); Codex's five qualifications of section 200 accepted; zero QC or provider calls, looks, evaluations, or cells | Record-only: section 4 now names section 206, the banner's live sentences are current, this row appended; no code or test changed | Standing lane selection in a byte-faithful export of the pushed head, focused new files, eight mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 206.7 | 0 P0, 0 P1, 1 P2, 2 P3 (`ARV2R206-001` through `-003`); `-001` corrected (record gates red at the pushed head, third recurrence) | Single push of this commit; Codex counter-reviews section 206, runs the record gates on the final bytes before every push, and decomposes the 2021–2025 effect with one AR-entry, zero-tilt arm before any further admission or capacity change |
 | 2026-09-28 | Catch-up entry for the 2026-09-27 Codex execution push (`ARV2R206-001`); append only | `89bdb29..1b1da0e`: `bcf6356`, `ef352c1`, `1b1da0e` | Sections 204–205 three-name sensitivity, R242–R245, same-project A2 recovery and receipt-bound comparison | Four valid exploratory cells, two spent pre-create A1 slots; no result or code is changed by this catch-up row. | Exact prior validation and QC receipts are in sections 204–205; Claude's independent checks are in section 206. The prior floor was 250/191/34/661. | Missing push-ledger row corrected without rewriting historical evidence or excusing the two then-red record gates. | Historical bookkeeping only; no additional QC look, code change or independent review bypass. |
 | 2026-09-28 | Codex counter-review and owner-directed AR mechanism/forward-data round | `1cb3705` -> `47e892b`, `23f511c`, and this final record commit | Section 207 counter-reviews both Claude commits; section 208 freezes the 60–200 discrete AR range, implements R246 entry/count-only 0%-transfer order diagnostic, and starts development-only forward capture receipts | R246 A1 valid in project 37072332: +136.87% net, −21.75% drawdown; matched cached decomposition is −6.88 pp entry/count/fallback and +23.08 pp weight transfer, combined +16.20 pp. Same-window Massive recaptures show 1,398 same-ID/same-version records and zero observed changes over this short interval; new weekend capture has zero events. No paper/forward-return test. | Focused source/projection/predecessor, import-closure and forward receipt tests; exact QC source readback/compile, completed 261/261 order schedule, single bounded read, local comparison, final active-document gates. No complete lane suite. Closing floor 251/192/34/662. | Six section-207 qualifications corrected or documented; `ARV2R196-001` vintage/regime/construction issue and the R225 QCOM price gap remain open. Eight-point range is fixed, but the primary future percentage is owner-pending and four points are unrun. | One combined same-lane push; Claude independently reviews section 208 and exact commits, including the R246 writer-schema pin, decomposition guard and forward-receipt boundary. Codex then counter-reviews before another efficacy step; no automatic ARV2-9 paper authority. |
+| 2026-09-28 | Codex owner-directed dual forward-rule freeze | `7aefeb1` -> `e5c13ac` and this final record commit | Section 209 additive 100%/200% forward-development choice | Bind two named arms to R232 and R237 historical construction identities and one AR-off control, while leaving future universe, exclusion, epoch and execution identities unset. No historical winner or formal two-arm result is selected. | Focused dual-policy and transitive no-I/O closure tests, final record/active-document gates, compilation and diff checks recorded in 209. No full lane suite or QC/provider access; floor unchanged 251/192/34/662. | One prospective Analyst look and total two-sided 1/80 alpha remain; no per-arm alpha or paper/deployment authority. QCOM historical repair and archive-vintage concerns remain open. | One same-lane push; Claude reviews section 209 and exact commits, then Codex counter-reviews. A reviewed common-epoch two-arm protocol and all ARV2-9 prerequisites are required before formal paper confirmation. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -29294,3 +29311,69 @@ windows to measure same-ID changes, and resolve ARV2-4 through ARV2-8 gates
 before requesting separate ARV2-9 paper deployment. Do not promote this
 development-only capture into a confirmatory look or select the historical
 best percentage as if it were held out.
+
+## 209. Owner choice of two forward AR transfer rules, 2026-09-28
+
+After section 208's range freeze and R246 exploratory mechanism split, the
+owner chose **both 100% and 200%** for the forward-looking comparison. This
+choice was made with their 2021–2025 exploratory results already known, so it
+does not turn those years into a holdout or select a single historical winner.
+The new additive `six_universe_qcom_exclusion_dual_forward_policy.json`
+(SHA-256 `668a52c2dfb541e4be92675d354a3c405f4b5689519dcd923a3e7c633675d59d`)
+and strict loader bind two named *development* candidates:
+
+| Forward rule | Frozen transfer capacity | Historical construction reference | Role |
+|---|---:|---|---|
+| `ARV2_FORWARD_AR_100` | 100% | R232; base manifest SHA-256 `53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0` | Owner-selected candidate, not selected winner |
+| `ARV2_FORWARD_AR_200` | 200% | R237; tilt manifest SHA-256 `3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4` | Owner-selected candidate, not selected winner |
+| `ARV2_FORWARD_AR_OFF` | 0% | R231; base manifest SHA-256 above | Shared no-AR control for both contrasts |
+
+The immutable section-208 range artifact still says its primary is pending;
+it describes the state *before* this owner choice and is not rewritten. The
+successor authenticates that parent and the exact three historical bindings.
+Those references fix what “100%” and “200%” meant in the prior experiment;
+they do not silently copy its historical QCOM direct-stock exclusion into a
+future universe. The forward universe/exclusion policy, common execution
+contract, start/end sessions and evidence epoch remain null. Both arms need
+the same future cohort, decision clock, data snapshot, admission, order/fill
+and cost policy, and blinded epoch. Their results must be reported separately;
+there is no authorized post-hoc winner pick.
+
+This is **not yet a formal two-arm paper protocol**. The later reviewed
+four-family overlay, not the older superseded `1/60` QC-first text, reserves
+one Analyst prospective paper look with total two-sided family alpha at most
+`1/80`. The successor grants neither a second look nor `1/80` per arm:
+confirmatory per-arm alpha and a two-arm multiplicity protocol remain null.
+A separately reviewed protocol must specify allocation, power, missing-data
+and stop rules, common epoch, exact estimands and execution, and external
+look authority without recycling a development period as untouched evidence.
+ARV2-4 through ARV2-8 and separate paper-deployment authorization still
+precede ARV2-9. All new policy capabilities for QC, outcome, paper, funded
+and order actions are literal false. No historical rerun, provider capture,
+QC project/compile/launch, performance read, forward-return cell, paper
+deployment or research look occurred in this section. The floor remains
+**251 shared / 192 development / 34 infrastructure / 662 authenticated cells**.
+
+### 209.1 Review notes for Claude
+
+**Exact range:** `7aefeb1..HEAD` on the same designated Analyst lane. The
+round contains `e5c13ac` (bounded dual-policy implementation) and this final
+record commit; review each commit separately. The implementation adds only
+the new policy JSON/loader and its isolating tests, plus the exact package
+import/IO-closure registration. The record commit updates the live banner,
+section 4, contiguous section-5 push ledger and this section; it does not
+change a strategy rule or any spent manifest.
+
+**Review focus:** verify the 100/200/control references against the frozen
+parent, reject future-QCOM inheritance, confirm the one-look/`1/80` budget
+and false capabilities, and check that no result-based winner selection or
+second formal look is implied. The prior historical/current-vintage caveat
+`ARV2R196-001`, the original R225 QCOM price gap, and the unresolved future
+universe/epoch protocol remain open. No new P0–P3 defect was found in the
+new policy by Codex's read-only audit; Claude's independent review is still
+required. The dual-policy, frozen-parent and whole-QC-package closure files
+passed **119 focused tests**; final lane-record and active-document gates
+passed **82 tests**, after an in-round blank ledger separator was caught and
+removed. Targeted compilation and `git diff --check` were clean. Codex did
+not run the complete lane suite; Claude owns that review check. No other lane
+or shared file was changed.

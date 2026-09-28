@@ -285,3 +285,107 @@ def test_corrupt_master_deflate_stream_is_a_typed_refusal():
     good = gzip.compress(_index(_candidates(), "2022Q4"), mtime=0)
     with pytest.raises(adapter.SecCompletePilotAdapterError, match="master.gz is malformed"):
         adapter._master_plain(good[:10] + b"\xff" + good[11:])
+
+
+# Section 107 (Claude review): isolate guards whose deletion no earlier test
+# detected. Each names its exact refusal, so another guard refusing the same
+# input can no longer hide a deleted check.
+def _report_of(root: Path, report_sha: str) -> dict[str, object]:
+    return json.loads((root / f"sec-complete-report-{report_sha}.json").read_text(encoding="utf-8"))
+
+
+def test_commit_marker_must_bind_the_committed_journal(monkeypatch, tmp_path):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    (root / "commit.json").write_bytes(_canonical({
+        "kind": "sec-complete-commit",
+        "report_name": f"sec-complete-report-{report_sha}.json",
+        "report_sha256": report_sha, "attempt_journal_sha256": "0" * 64,
+    }))
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="commit does not bind report and journal"):
+        _load(root, report_sha, inventory_sha)
+
+
+def test_inventory_file_kind_is_checked_although_not_report_hashed(monkeypatch, tmp_path):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    inventory = json.loads((root / "inventory.json").read_text(encoding="utf-8"))
+    inventory["kind"] = "invented-inventory-kind"
+    (root / "inventory.json").write_bytes(_canonical(inventory))
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="frozen inventory identity or authority drifted"):
+        _load(root, report_sha, inventory_sha)
+
+
+@pytest.mark.parametrize("flag", (
+    "source_authenticated", "canonical_evidence", "point_in_time_data",
+    "direct_ib1c_ingest_authorized", "official_sec_profile_verified",
+    "outcome_access_authorized", "qc_job_authorized", "broker_or_trading_authorized",
+))
+def test_coherently_rebound_report_cannot_raise_an_authority_flag(monkeypatch, tmp_path, flag):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    report = _report_of(root, report_sha)
+    report[flag] = True
+    new_sha = _rebind_report(root, report_sha, report)
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="complete report identity, counts, or authority drifted"):
+        _load(root, new_sha, inventory_sha)
+
+
+def test_coherently_rebound_master_receipt_is_replayed(monkeypatch, tmp_path):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    report = _report_of(root, report_sha)
+    report["master_indexes"][0]["receipt"]["form4_or_4a_row_count"] += 1
+    new_sha = _rebind_report(root, report_sha, report)
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="receipt or fixed subset differs from replay"):
+        _load(root, new_sha, inventory_sha)
+
+
+def test_coherently_rebound_filing_source_url_must_equal_index_join(monkeypatch, tmp_path):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    report = _report_of(root, report_sha)
+    accession = report["filings"][0]["candidate"]["accession_number"]
+    report["filings"][0]["source_url"] = (
+        f"https://www.sec.gov/Archives/edgar/data/777777/{accession}.txt"
+    )
+    new_sha = _rebind_report(root, report_sha, report)
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="filing row differs from fixed index join"):
+        _load(root, new_sha, inventory_sha)
+
+
+def test_coherently_rebound_journal_body_hash_must_match_object(monkeypatch, tmp_path):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    events = [json.loads(line) for line in (root / "attempts.jsonl").read_text().splitlines()]
+    events[5]["body_sha256"] = "0" * 64
+    new_sha = _rebind_journal(root, report_sha, events)
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="differs from replayed objects"):
+        _load(root, new_sha, inventory_sha)
+
+
+def test_coherently_rebound_journal_gap_below_half_second_refuses(monkeypatch, tmp_path):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    events = [json.loads(line) for line in (root / "attempts.jsonl").read_text().splitlines()]
+    previous_end = events[1]["request_end_monotonic_ns"]
+    start, finish = events[2], events[3]
+    # Keep every clock ordered so only the 500 ms spacing rule can refuse.
+    for name in ("pacing_start_monotonic_ns", "pacing_end_monotonic_ns",
+                 "reservation_start_monotonic_ns"):
+        start[name] = previous_end + 1
+    finish["request_start_monotonic_ns"] = previous_end + 400_000_000
+    assert finish["request_end_monotonic_ns"] > finish["request_start_monotonic_ns"]
+    new_sha = _rebind_journal(root, report_sha, events)
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="recorded pacing or clock order is invalid"):
+        _load(root, new_sha, inventory_sha)
+
+
+def test_rebound_projection_row_is_refused_at_load_not_only_by_receipt(monkeypatch, tmp_path):
+    root, report_sha, inventory_sha = _publication(monkeypatch, tmp_path)
+    report = _report_of(root, report_sha)
+    report["filings"][0]["projection"]["children"]["primary_xml"]["sha256"] = "0" * 64
+    new_sha = _rebind_report(root, report_sha, report)
+    with pytest.raises(adapter.SecCompletePilotAdapterError,
+                       match="projection differs from replayed raw bytes"):
+        _load(root, new_sha, inventory_sha)

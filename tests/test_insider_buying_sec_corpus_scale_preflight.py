@@ -135,3 +135,16 @@ def test_reject_non_exact_descriptor_and_non_iterable() -> None:
         build_sec_corpus_scale_preflight(0)
     with pytest.raises(SecCorpusScalePreflightError, match="REFUSED"):
         build_sec_corpus_scale_preflight((object(),) + rows[1:])
+
+
+# Section 107 (Claude review): the builder always computes consistent
+# arithmetic, so only a directly constructed result exercises this recheck.
+@pytest.mark.parametrize("field,delta", [
+    ("ideal_minimum_dispatch_span_ms", -1),
+    ("planned_distinct_artifacts_without_cache", -1),
+    ("successful_raw_parent_cap_bytes", -1),
+])
+def test_directly_constructed_result_with_wrong_arithmetic_refuses(field, delta) -> None:
+    result = build_sec_corpus_scale_preflight(_descriptors())
+    with pytest.raises(SecCorpusScalePreflightError, match="arithmetic is inconsistent"):
+        replace(result, **{field: getattr(result, field) + delta})

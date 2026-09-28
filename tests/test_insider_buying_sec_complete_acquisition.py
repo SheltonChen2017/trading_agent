@@ -515,3 +515,123 @@ def test_document_header_without_sequence_is_a_recorded_refusal(monkeypatch, tmp
     assert payload["filings"][0]["status"] == "refused"
     assert "lacks type, sequence, or filename" in payload["halted_reason"]
     assert all(row["status"] == "not_attempted" for row in payload["filings"][1:])
+
+
+# Section 107 (Claude review): isolate guards whose deletion no earlier test
+# detected. Each names its exact refusal, so another guard refusing the same
+# input can no longer hide a deleted check.
+def test_refused_complete_submission_stops_every_later_request(monkeypatch, tmp_path):
+    images = _images()
+    items = _candidates()
+    urls = [runner._HOST_PREFIX + f"edgar/data/123456/{item.accession_number}.txt"
+            for item in items]
+    images[urls[1]] = images[urls[1]].replace(
+        f"<SEC-DOCUMENT>{items[1].accession_number}".encode("ascii"),
+        f"<SEC-DOCUMENT>{items[2].accession_number}".encode("ascii"),
+    )
+    calls = []
+    _, payload = _run(monkeypatch, tmp_path, _transport(images, calls))
+    assert calls == [*runner._MASTER_URLS.values(), urls[0], urls[1]]
+    assert [row["status"] for row in payload["filings"][:2]] == ["acquired_noncanonical", "refused"]
+    assert all(row["status"] == "not_attempted" for row in payload["filings"][2:])
+    assert payload["attempt_count"] == 4
+
+
+@pytest.mark.parametrize("headers", [
+    lambda size: (("Content-Length", str(size + 1)),),
+    lambda size: (("Content-Length", str(size)), ("Content-Length", str(size))),
+    lambda size: (("Content-Length", str(size)), ("Content-Encoding", "gzip")),
+    lambda size: (("Content-Length", str(size)), ("Transfer-Encoding", "chunked")),
+])
+def test_unsafe_response_framing_stops_all_requests(monkeypatch, tmp_path, headers):
+    images = _images()
+    first = runner._MASTER_URLS["2022Q4"]
+    calls = []
+
+    def fetch(url, request_headers, max_bytes):
+        calls.append(url)
+        body = images[url]
+        return runner.SecHttpResult(200, headers(len(body)), body)
+
+    _, payload = _run(monkeypatch, tmp_path, fetch)
+    assert calls == [first]
+    assert "framing" in payload["halted_reason"]
+
+
+def test_malformed_contact_refuses_before_output_or_request(monkeypatch, tmp_path):
+    source, prior, output = _setup(monkeypatch, tmp_path)
+    calls = []
+    with pytest.raises(runner.SecCompleteAcquisitionError,
+                       match="identifying SEC contact is required"):
+        runner.run_fixed_complete_submissions(
+            source, prior, output, contact_email="not-an-address",
+            capture_git_commit=COMMIT, transport=_transport(_images(), calls),
+        )
+    assert calls == []
+    assert not output.exists()
+
+
+def _journal(tmp_path):
+    output = tmp_path / "journal-root"
+    output.mkdir(mode=0o700)
+    details = output.lstat()
+    return runner._Journal(output, (details.st_dev, details.st_ino))
+
+
+def test_journal_refuses_a_second_request_for_a_consumed_artifact(monkeypatch, tmp_path):
+    monkeypatch.setattr(runner, "MIN_REQUEST_INTERVAL_NS", 0)
+    first = runner._MASTER_URLS["2022Q4"]
+    calls = []
+    journal = _journal(tmp_path)
+    try:
+        journal.request(first, max_bytes=runner.MAX_MASTER_GZIP_BYTES,
+                        contact_email="pilot@example.org",
+                        transport=_transport(_images(), calls))
+        with pytest.raises(runner.SecCompleteAcquisitionError, match="duplicate artifact request"):
+            journal.request(first, max_bytes=runner.MAX_MASTER_GZIP_BYTES,
+                            contact_email="pilot@example.org",
+                            transport=_transport(_images(), calls))
+    finally:
+        journal.close()
+    assert calls == [first]
+
+
+def test_journal_refuses_a_url_outside_the_fixed_surfaces(monkeypatch, tmp_path):
+    calls = []
+    journal = _journal(tmp_path)
+    try:
+        with pytest.raises(runner.SecCompleteAcquisitionError,
+                           match="outside the fixed SEC surfaces"):
+            journal.request(
+                "https://www.sec.gov/Archives/edgar/data/123456/0000999999-22-000001-index.htm",
+                max_bytes=1024, contact_email="pilot@example.org",
+                transport=_transport(_images(), calls),
+            )
+    finally:
+        journal.close()
+    assert calls == []
+
+
+@pytest.mark.parametrize("url", [
+    "https://evil.example/Archives/edgar/data/1/0000999999-22-000001.txt",
+    "https://www.sec.gov/Archives/edgar/data/1/0000999999-22-000001.txt?x=1",
+    "https://www.sec.gov/Archives/edgar/data/1/0000999999-22-000001.txt#x",
+    "https://www.sec.gov/Archives/edgar/data/1/%2e%2e/0000999999-22-000001.txt",
+])
+def test_real_transport_refuses_foreign_url_before_any_connection(monkeypatch, url):
+    def forbidden(*args, **kwargs):
+        raise AssertionError("a connection was attempted")
+
+    monkeypatch.setattr(runner.http.client, "HTTPSConnection", forbidden)
+    with pytest.raises(runner.SecCompleteAcquisitionError,
+                       match="escaped the exact SEC Archives host"):
+        runner._sec_transport(url, {}, 1024)
+
+
+def test_owner_scoped_pacing_and_request_budget_constants():
+    # Behavioural pacing tests read these symbols, so a loosened value
+    # would pass them; the owner-scoped D3 bounds are pinned literally.
+    assert runner.MIN_REQUEST_INTERVAL_NS == 500_000_000
+    assert runner.MAX_ATTEMPTS_PER_ARTIFACT == 3
+    assert runner.MAX_DISTINCT_ARTIFACTS == 18
+    assert runner.MAX_TOTAL_ATTEMPTS == 54

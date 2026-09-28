@@ -362,3 +362,98 @@ def test_document_header_missing_required_field_is_a_typed_refusal(missing):
     with pytest.raises(SecCompleteSubmissionError,
                        match="lacks type, sequence, or filename"):
         _project(_complete(document=document))
+
+
+# Section 107 (Claude review): isolate guards whose deletion no earlier test
+# detected. Each names its exact refusal, so another guard refusing the same
+# input can no longer hide a deleted check.
+def test_legacy_repeated_data_subsection_cannot_replace_the_first_owner():
+    owner = (b"REPORTING-OWNER:\n\n"
+             b"\tOWNER DATA:\n\t\tCENTRAL INDEX KEY:\t0000777777\n"
+             b"\n\tFILING VALUES:\n\t\tFORM TYPE:\t4\n"
+             b"\n\tOWNER DATA:\n\t\tCENTRAL INDEX KEY:\t0000999999\n")
+    header = _legacy_header().replace(_legacy_owner("0000999999"), owner)
+    with pytest.raises(SecCompleteSubmissionError, match="repeated or out of order"):
+        _project(_complete(header=header))
+
+
+def test_legacy_empty_issuer_subsection_refuses():
+    header = _legacy_header().replace(
+        b"\tBUSINESS ADDRESS:\n\t\tSTREET 1:\tInvented Road\n\n\tMAIL ADDRESS:",
+        b"\tBUSINESS ADDRESS:\n\tMAIL ADDRESS:",
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="empty or foreign role subsection"):
+        _project(_complete(header=header))
+
+
+def test_legacy_form_type_outside_owner_filing_values_refuses():
+    header = _legacy_header().replace(
+        b"\t\tCENTRAL INDEX KEY:\t0000123456\n",
+        b"\t\tCENTRAL INDEX KEY:\t0000123456\n\t\tFORM TYPE:\t4\n",
+    )
+    with pytest.raises(SecCompleteSubmissionError,
+                       match="form type occurs outside owner filing values"):
+        _project(_complete(header=header))
+
+
+def test_legacy_material_before_the_first_role_refuses():
+    header = _legacy_header().replace(
+        b"DATE AS OF CHANGE:\t20221107\n\n",
+        b"DATE AS OF CHANGE:\t20221107\n\t\tCENTRAL INDEX KEY:\t0000777777\n\n",
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="owner and issuer topology is ambiguous"):
+        _project(_complete(header=header))
+
+
+def test_legacy_acceptance_clock_must_have_fourteen_digits():
+    header = _legacy_header().replace(
+        b"<ACCEPTANCE-DATETIME>20221107101112", b"<ACCEPTANCE-DATETIME>2022110710111"
+    )
+    with pytest.raises(SecCompleteSubmissionError,
+                       match="legacy acceptance timestamp is not fourteen digits"):
+        _project(_complete(header=header))
+
+
+def test_second_ownership_xml_with_distinct_sequence_refuses():
+    second = _document(_xml(), filename=b"other.xml").replace(b"<SEQUENCE>1", b"<SEQUENCE>2")
+    with pytest.raises(SecCompleteSubmissionError, match="exactly one ownership XML document"):
+        _project(_complete(document=_document(_xml()) + second))
+
+
+def test_duplicate_document_sequence_refuses_without_a_second_xml():
+    attachment = (b"<DOCUMENT>\n<TYPE>EX-99\n<SEQUENCE>1\n"
+                  b"<FILENAME>attachment.txt\n<TEXT>\nInvented attachment\n"
+                  b"</TEXT>\n</DOCUMENT>\n")
+    with pytest.raises(SecCompleteSubmissionError, match="sequence is duplicated"):
+        _project(_complete(document=_document(_xml()) + attachment))
+
+
+def test_document_sgml_type_must_equal_target_form():
+    with pytest.raises(SecCompleteSubmissionError, match="primary XML type"):
+        _project(_complete(document=_document(_xml(), form=b"4/A")))
+
+
+def test_sec_document_opener_accession_must_equal_target():
+    raw = _complete().replace(b"<SEC-DOCUMENT>0000999999-22-000001.txt",
+                              b"<SEC-DOCUMENT>0000999999-22-000002.txt")
+    with pytest.raises(SecCompleteSubmissionError, match="SEC-DOCUMENT envelope disagrees"):
+        _project(raw)
+
+
+def test_xsl_rendered_xml_name_is_not_a_primary_document():
+    with pytest.raises(SecCompleteSubmissionError, match="ownership XML filename is unsafe"):
+        _project(_complete(document=_document(_xml(), filename=b"xslF345X03.xml")))
+
+
+def test_material_between_text_and_document_close_refuses():
+    document = _document(_xml()).replace(
+        b"</TEXT>\n</DOCUMENT>\n", b"</TEXT>\nInvented trailer\n</DOCUMENT>\n"
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="TEXT scope is ambiguous"):
+        _project(_complete(document=document))
+
+
+@pytest.mark.parametrize("filing_date,period", [("2005-12-30", "2005Q4"), ("2026-07-01", "2026Q3")])
+def test_target_filing_date_outside_frozen_window_refuses(filing_date, period):
+    with pytest.raises(SecCompleteSubmissionError, match="outside the frozen source window"):
+        replace(_target(), filing_date=filing_date, period=period)

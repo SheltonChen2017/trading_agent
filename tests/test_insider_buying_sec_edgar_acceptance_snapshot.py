@@ -3720,3 +3720,47 @@ def test_reconciliation_module_has_no_network_outcome_execution_or_ui_imports():
         "yfinance",
     }
     assert imported.isdisjoint(forbidden), imported & forbidden
+
+
+# Section 107 (Claude review). The existing malformed-date cases change one
+# accession only, so a loosened legacy pattern was still refused as a mixed
+# dialect. These cases keep the whole snapshot in one spelling, and pin the
+# month table, which no fixture outside May exercised.
+@pytest.mark.parametrize("spelling", ["{day}-MAY-2026", "{day:02d}-may-2026", "{day:02d}-May-2026"])
+def test_uniform_nonstrict_legacy_spelling_refuses_whole_build(tmp_path, spelling):
+    filing_dates = {
+        accession: spelling.format(day=day)
+        for day, accession in enumerate(ACCESSIONS, start=1)
+    }
+    raw_path, parsed_path = _upstream(tmp_path, tables=_tables(filing_dates=filing_dates))
+    output_root = tmp_path / "acceptance"
+    with pytest.raises(SecEdgarAcceptanceSnapshotError, match="unsupported spelling"):
+        build_sec_edgar_acceptance_snapshot(
+            parsed_path, raw_path, output_root, sources=(),
+            metadata_profile=_metadata_profile(), parser_git_commit=ACCEPTANCE_COMMIT,
+        )
+    assert not tuple(output_root.glob("sec-edgar-acceptance-*.json"))
+
+
+def test_legacy_upstream_april_dates_keep_their_calendar_month(tmp_path):
+    april = {
+        accession: f"{day:02d}-APR-2026" for day, accession in enumerate(ACCESSIONS, start=1)
+    }
+    raw_path, parsed_path = _upstream(tmp_path, tables=_tables(filing_dates=april))
+    _, _, bundle_path, _ = _build(
+        tmp_path, raw_path=raw_path, parsed_path=parsed_path, sources=()
+    )
+    loaded = _load(bundle_path, parsed_path, raw_path)
+    assert tuple(record.filing_date for record in loaded.records) == tuple(
+        date(2026, 4, day) for day in range(1, len(ACCESSIONS) + 1)
+    )
+
+
+@pytest.mark.parametrize("month,number", [
+    ("JAN", 1), ("FEB", 2), ("MAR", 3), ("APR", 4), ("MAY", 5), ("JUN", 6),
+    ("JUL", 7), ("AUG", 8), ("SEP", 9), ("OCT", 10), ("NOV", 11), ("DEC", 12),
+])
+def test_every_legacy_month_name_parses_to_its_own_month(month, number):
+    assert acceptance_module._upstream_submission_filing_date(f"15-{month}-2022") == (
+        date(2022, number, 15), "legacy"
+    )

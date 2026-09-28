@@ -392,3 +392,35 @@ def test_period_order_and_partial_snapshot_refuse():
     with pytest.raises(pilot.SecCompleteIb1cPilotAvailabilityError,
                        match="exactly two ordered"):
         pilot.assess_complete_pilot_ib1c_availability(receipt, snapshots[:1])
+
+
+# Section 107 (Claude review): isolate two guards whose deletion no earlier
+# test detected. Each forges one in-memory IB-1B object the raw-bound loader
+# would never return, so only the named recheck can refuse it.
+def test_selected_row_values_must_reproduce_its_lineage_row_id():
+    receipt, snapshots = _fixture()
+    index = next(i for i, row in enumerate(snapshots[0].rows)
+                 if row.table_name == "SUBMISSION.tsv"
+                 and row.accession_number == adapter.FIXED_ACCESSIONS[0])
+    row = snapshots[0].rows[index]
+    name_at = _SUBMISSION_HEADERS.index("ISSUERNAME")
+    values = row.values[:name_at] + ("Invented Other Name",) + row.values[name_at + 1:]
+    object.__setattr__(row, "values", values)
+    with pytest.raises(pilot.SecCompleteIb1cPilotAvailabilityError,
+                       match="selected SUBMISSION row lineage is inconsistent"):
+        pilot.assess_complete_pilot_ib1c_availability(receipt, snapshots)
+
+
+@pytest.mark.parametrize("field", ["schema_profile_hash", "lineage_hash"])
+def test_snapshot_identity_must_be_internally_consistent(field):
+    receipt, snapshots = _fixture()
+    identity = snapshots[0].identity
+    object.__setattr__(identity, field, "0" * 64)
+    if field == "schema_profile_hash":
+        # Re-derive the lineage and ID so only the profile-hash recheck differs.
+        lineage = hash_payload(identity.lineage_payload())
+        object.__setattr__(identity, "lineage_hash", lineage)
+        object.__setattr__(identity, "snapshot_id", f"sec-insider-parsed-2022q4-{lineage[:16]}")
+    with pytest.raises(pilot.SecCompleteIb1cPilotAvailabilityError,
+                       match="identity is internally inconsistent"):
+        pilot.assess_complete_pilot_ib1c_availability(receipt, snapshots)

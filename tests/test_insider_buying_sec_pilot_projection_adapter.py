@@ -650,3 +650,119 @@ def test_ib1c_readiness_module_has_no_io_transport_or_downstream_imports() -> No
     )
     assert all(name != prefix and not name.startswith(prefix + ".")
                for name in imported for prefix in forbidden)
+
+
+# Section 107 (Claude review): isolate adapter guards whose deletion no
+# earlier test detected. Each case names its exact refusal, so a second
+# guard refusing the same input can no longer hide a deleted check.
+def test_commit_marker_must_name_the_pinned_report(synthetic_pilot: _SyntheticPilot) -> None:
+    (synthetic_pilot.root / "commit.json").write_bytes(_canonical_bytes({
+        "kind": "sec-pilot-commit",
+        "report": synthetic_pilot.report_path.name,
+        "report_sha256": "0" * 64,
+    }))
+    with pytest.raises(adapter.SecOfflinePilotAdapterError,
+                       match="commit does not name the pinned report"):
+        synthetic_pilot.load()
+
+
+def test_canonical_report_rewrite_under_original_pins_refuses(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    synthetic_pilot.report["rows"][0]["first_pass_reason"] = "REFUSED: invented other reason"
+    synthetic_pilot.report_path.write_bytes(_canonical_bytes(synthetic_pilot.report))
+    with pytest.raises(adapter.SecOfflinePilotAdapterError,
+                       match="report SHA-256 differs from the pinned receipt"):
+        synthetic_pilot.load()
+
+
+def test_receipt_refuses_substituted_report_bytes_with_the_same_rows(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    receipt = synthetic_pilot.load()
+    synthetic_pilot.report["rows"][0]["first_pass_reason"] = "REFUSED: invented other reason"
+    object.__setattr__(receipt, "_report_bytes", _canonical_bytes(synthetic_pilot.report))
+    with pytest.raises(adapter.SecOfflinePilotAdapterError, match="lost its report byte binding"):
+        receipt.to_payload()
+
+
+def test_receipt_refuses_a_partial_projection_set(synthetic_pilot: _SyntheticPilot) -> None:
+    receipt = synthetic_pilot.load()
+    with pytest.raises(adapter.SecOfflinePilotAdapterError, match="partial or altered projection set"):
+        replace(receipt, projections=receipt.projections[:-1],
+                _projection_sha256s=receipt._projection_sha256s[:-1])
+
+
+def test_receipt_refuses_a_substituted_projection_hash_list(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    receipt = synthetic_pilot.load()
+    with pytest.raises(adapter.SecOfflinePilotAdapterError, match="partial or altered projection set"):
+        replace(receipt, _projection_sha256s=("0" * 64, *receipt._projection_sha256s[1:]))
+
+
+def test_receipt_refuses_a_projection_for_a_different_target_with_same_parents(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    receipt = synthetic_pilot.load()
+    first = receipt.projections[0]
+    changed = derive_sec_raw_parent_projection(
+        replace(first.target, submission_row_id="d" * 64),
+        first.index_bytes, first.header_bytes, first.xml_bytes,
+    )
+    with pytest.raises(adapter.SecOfflinePilotAdapterError,
+                       match="projection target differs from report"):
+        replace(receipt, projections=(changed, *receipt.projections[1:]),
+                _projection_sha256s=(changed.sha256, *receipt._projection_sha256s[1:]))
+
+
+def test_expected_accessions_out_of_order_refuse_at_the_inventory(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    with pytest.raises(adapter.SecOfflinePilotAdapterError,
+                       match="accessions differ from the approved 16 in order"):
+        adapter._load_pilot_projections(
+            synthetic_pilot.root, report_sha256=synthetic_pilot.report_sha256,
+            inventory_sha256=synthetic_pilot.inventory_sha256,
+            expected_accessions=synthetic_pilot.accessions[::-1],
+        )
+
+
+def test_relative_root_refuses_even_without_traversal(
+    synthetic_pilot: _SyntheticPilot, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.chdir(synthetic_pilot.root.parent)
+    with pytest.raises(adapter.SecOfflinePilotAdapterError, match="root must be absolute"):
+        adapter._load_pilot_projections(
+            synthetic_pilot.root.name, report_sha256=synthetic_pilot.report_sha256,
+            inventory_sha256=synthetic_pilot.inventory_sha256,
+            expected_accessions=synthetic_pilot.accessions,
+        )
+
+
+@pytest.mark.parametrize(("change", "message"), [
+    ("extra_key", "report schema drifted"),
+    ("identity", "report identity drifted"),
+    ("unavailable", "not an available 16-row pilot"),
+    ("row_status", "not an exact acquired triple"),
+    ("tag_header", "tagged-header receipt differs from its raw parent"),
+])
+def test_rehashed_report_drift_refuses_with_its_named_reason(
+    synthetic_pilot: _SyntheticPilot, change: str, message: str,
+) -> None:
+    report = synthetic_pilot.report
+    rows = report["rows"]
+    assert type(rows) is list
+    if change == "extra_key":
+        report["invented_extra"] = False
+    elif change == "identity":
+        report["index_route_version"] = "invented-route-v2"
+    elif change == "unavailable":
+        report["acquisition_available"] = False
+    elif change == "row_status":
+        rows[0]["status"] = "refused"
+    else:
+        rows[0]["tag_header_validation"]["raw_header_sha256"] = "0" * 64
+    synthetic_pilot.republish_report()
+    with pytest.raises(adapter.SecOfflinePilotAdapterError, match=message):
+        synthetic_pilot.load()

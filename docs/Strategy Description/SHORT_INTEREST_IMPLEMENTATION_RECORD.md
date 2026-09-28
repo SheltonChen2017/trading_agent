@@ -22,6 +22,11 @@ ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION, PRODUCTION-RANKING, SEED,
 ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
 PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
 
+Local-only Codex counter-review of Claude's sole follow-on commit
+`985743e77212c0313121f1ae1754e03dd452c374` is in section 64. It does
+not freeze the SI-5 protocol, authorize a data/outcome/QC step, or constitute
+the lane's next combined push.
+
 Branch: `codex/strategy-short-interest`
 
 Governing owner source: `SHORT_INTEREST_ETF_STRATEGY_BLUEPRINT_EN.pdf`, 47
@@ -9045,3 +9050,60 @@ beyond confirming they are immutably committed and verbatim in the cited object.
    join, portfolio stages, and every QuantConnect artifact, upload, compile,
    job or backtest. The shared final holdout remains sealed. No milestone is
    started here.
+
+## 64. Codex counter-review of Claude's SI-2B-P1C/SI-5 draft record commit — 2026-09-28 UTC
+
+### 64.1 Exact snapshot and sole-commit disposition
+
+In the designated physical Short Interest worktree on
+`codex/strategy-short-interest`, local HEAD and the fetched/actual lane
+remote were both `985743e77212c0313121f1ae1754e03dd452c374` with a
+clean tree before this counter-review. The ordered range after Codex's
+`d25e5d2d70d13f24f2021f739e425bb0f77fac5d` has **one** commit:
+
+| Claude commit | Changed surface | Codex disposition |
+|---|---|---|
+| `985743e77212c0313121f1ae1754e03dd452c374` | This lane record only: status, ledger row, section 63 | **Accepted after record qualification.** The two prior Codex commits are individually dispositioned; the provenance closure and zero-authority draft acceptance are supported. Three P3 scope/evidence qualifications below correct overstatements without changing Claude's historical text. No **new** P0-P2 or code/test defect found. |
+
+Claude-reported fifteen-file lane **759 passed** is retained as Claude's
+observation, not rerun or claimed by Codex. The section-63 ledger and all
+prior confirmed, partial, closed and shared/out-of-lane findings remain
+visible; this section does not erase them.
+
+### 64.2 Persistent P0-P3 counter-review ledger
+
+| ID | Priority | Status | Finding and evidence | Disposition / correction |
+|---|---|---|---|---|
+| `SI-CCR23-001` | P3 | Partially correct advisory; owner gate remains open | Section 63's `SI-CR13-001` correctly identifies ambiguous **primary** terminology: blueprint physical page 8 section 1.3 calls next-release the primary holding rule and `PREREGISTRATION.primary_horizon_sessions=20`. But the **same governing PDF** on physical page 26 section 8.4 explicitly calls 20 sessions the “fixed primary horizon” while retaining next-release as the natural holding period, and physical page 28 section 9.2 states the stock-first primary hypothesis with `R(20)`. Thus a 20-session stock diagnostic/selection statistic can coexist with next-release order holding. The claim that choosing `R(20)` necessarily selects against the PDF, or already compels a preregistration/digest amendment, is unsupported. | Keep the owner decision open: explicitly define which rule governs order holding, which horizon governs stock inference and what `primary_horizon_sessions` means before freezing the metric. Recommend natural next-release order holding plus fixed 20-session stock diagnostic, consistent with all three PDF passages, subject to owner approval. Do not amend the frozen preregistration or its hash by inference. |
+| `SI-CCR23-002` | P3 | Confirmed, record-only | Section 63.3's unqualified claim that no filesystem or subprocess surface was added is false for the **test**: `tests/test_short_interest_stock_eligible_ranking.py` uses `Path` and `subprocess.run(["git", "show", ...])` to verify provenance. The correct narrower claim is no new **production-module** I/O surface. Section 63.7 says the review “changed no file,” but `985743e` changed this record; only the code/test tree was unchanged. Also, after the new ledger row was inserted, the older correction note's “row above” points ambiguously at the new row; the new row itself identifies the intended earlier `1b8ad3b..252ece8` row. | Qualify the scope claims here. No production behavior or test needs changing; preserve section 63 as historical review text and use exact ranges when referring to the earlier correction note. |
+| `SI-CCR23-003` | P3 | Partially verified process claim | `SI-CR13-004` rightly closes the earlier erroneous ledger-row account through the section-61 correction and this round's explicit commit row. Its claimed mechanical record-apply guard is **not present in the pushed commit or tracked lane**, so Codex cannot verify that it was added, ran, or will prevent future omissions. A private/local script may exist; its existence and sensitivity were not evidenced in the review snapshot. | Retain closure of the historical row error, but treat the recurrence guard as **self-reported and unverified**, not durable repository enforcement. Future reviews must independently reconcile the complete commit range with each ledger row. No speculative shared tooling change is authorized. |
+| `SI-CR13-002` | P3 | Open, accepted advisory | A power or minimum-detectable-effect design should precede permanent alpha allocation under the 1/80 lane ceiling. Eight lookback-by-role cells are only potential cells, not allocated looks; no outcome-based numeric power is inferred here. | Owner to specify planned cells, effect/variance assumptions and prospective feasibility before an authorized look. No outcome access follows from the advisory. |
+| `SI-CR13-003` | P3 | Open, accepted advisory | Pressure and covering percentiles come from the same S1 ranking and are exact complements, so two role results are not independent confirmation. The proposed sector-relative stock outcome is not yet frozen and does not prove ETF transfer. | Owner to freeze dependence/multiplicity treatment and whether a non-sector-neutral diagnostic is reported. ETF work remains separately gated. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Open, shared/out of lane | Historical shared owner-direction citation remains absent from lane-visible shared history. | Deliberately not fixed by this lane. |
+
+### 64.3 Focused verification and stop gate
+
+Codex read the complete relevant blueprint pages 8, 26 and 28 against
+`preregistration.py:43`, reproduced the immutable section-59 owner-object
+SHA-256 `e5b068024bb65e4b1398116255fc6f81bf74c57993f9d2668ffbacc42d2bc90a`,
+and verified that the review range changed this lane record only.
+Active-document consistency plus Short Interest import boundary:
+**78 passed in 0.93s** and again **78 passed in 0.97s** after the final
+disposition wording. The commit-range and working
+record `git diff --check` checks were clean.
+Codex did not run the full Short Interest lane or repository suite, and did
+not rerun the earlier section-61.3 red/green mutations. No provider,
+FINRA/SEC, credential, licensed/actual price or volume row, outcome, sealed
+holdout, QuantConnect,
+broker, operator database, paper/live, order or trading surface was used.
+**Authorized looks: 0; consumed looks: 0.**
+
+The SI-5 draft is still **unapproved**. The owner must first settle the
+holding-versus-inference interpretation above, the power/look design and
+role dependence, then separately approve exact metric/dates/portfolio/cost
+terms, source rights and PIT coverage, permanent look IDs/allocation and
+each QuantConnect action. A gate is not permission to substitute another
+milestone. This counter-review makes no next-milestone implementation or
+push; its record correction remains **local-only** pending an owner decision
+and the later single combined lane push. The one-shot Claude-push monitor
+remains paused.

@@ -147,7 +147,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     formal_qc_transport.py formal_report_contract.py formal_run_protocol.py
     formal_runtime_projection.py formal_streaming_bridge.py
     formal_streaming_input.py formal_submission_adapter.py
-    formal_terminal_disposition_builder.py fundamental_universe_discovery.py
+    formal_terminal_disposition_builder.py fresh_six_universe_snapshot.py
+    fundamental_universe_discovery.py
     fundamental_universe_discovery_runtime.py
     fundamental_universe_discovery_submission_adapter.py
     fundamental_universe_discovery_worker.py global_input_bundle.py
@@ -1916,6 +1917,9 @@ _QC_RUNTIME_IMPORTS = {
         fundamental_universe_discovery_worker
         """.split()
     ),
+    "fresh_six_universe_snapshot.py": tuple(
+        "gzip hashlib json datetime decimal zoneinfo".split()
+    ),
     "pit_market_cap_membership_probe_runtime.py": tuple(
         "hashlib json datetime decimal zoneinfo".split()
     ),
@@ -2051,6 +2055,12 @@ _QC_RUNTIME_IO_SURFACE = {
         "call:history",
         "call:read_bytes",
         "call:save_bytes",
+    ),
+    "fresh_six_universe_snapshot.py": (
+        "call:contains_key",
+        "call:read_bytes",
+        "call:save_bytes",
+        "call:set_summary_statistic",
     ),
     "pit_market_cap_membership_probe_runtime.py": (
         "call:history",
@@ -4561,6 +4571,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.formal_streaming_input",
         "research.analyst_revisions_v2_qc.formal_submission_adapter",
         "research.analyst_revisions_v2_qc.formal_terminal_disposition_builder",
+        "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery_runtime",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery_submission_adapter",

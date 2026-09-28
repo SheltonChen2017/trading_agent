@@ -184,9 +184,11 @@ years); the weight overlay's gain comes from 2021 and 2024 and the
 entry/count drag from 2025.
 Section 212 counter-reviews every Claude commit, corrects three P3 record
 details and the snapshot warm-up refusal, and freezes R247 as a private,
-input-only QC probe. A1 failed at initialization; A2 prospectively changes
-only the end-hook masking and reuses that project. No forward performance or
-paper result is inferred. The floor after A1 is **252 / 192 / 35 / 662**.
+input-only QC probe. A1 and A2 failed at initialization; A3 passed that
+failure but refused a 10:00 QC callback against the frozen 09:20 cutoff.
+All three R247 attempts are spent, with no valid input result or forward
+performance. `ARV2D212-001` is P2 open; Mia could not be opened because QC
+had no free coding session. The floor is **254 / 192 / 37 / 662**.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -871,10 +873,14 @@ paper gate are unchanged. Section 211 is Claude's independent review of the
 exact pushed range `1cb3705..d75c114` (sections 207–210), with the test-only
 correction `8c06df6`. Section 212 completes Codex's counter-review and
 prospectively freezes R247-A1 after correcting the snapshot warm-up refusal.
-The immediate next step under section 212 is to try the prospectively pinned
-R247-A2 error-disclosure correction in the same private QC project, then
-record its exact terminal disposition and the remaining forward-input gates.
-Claude should review section 212 after Codex's one final lane push.
+The R247 input-only candidate is exhausted after exactly three attempts in
+one private QC project. Its 09:20 decision-clock mismatch and absent input
+metadata block fresh six-universe readiness. Do not launch a fourth attempt
+or forward 100%/200% outcome evaluation. When a coding session is available,
+the owner may use Mia for recovery; any cloud correction must be retrieved,
+compared and independently reviewed before a new research candidate. Claude
+should review section 212 and this disposition after Codex's one final lane
+push.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -29888,3 +29894,81 @@ any terminal error means no valid input result. A3 is the owner's **third and
 last** R247 attempt. No A4 launcher or new-project retry exists. If it
 fails, stop this candidate and use the owner/Mia recovery rule. No QC A3
 action or result is implied by this prospective source freeze.
+
+### 212.6 R247-A3 terminal result, exhaustion, and forward gate
+
+With section 212.5 committed locally at `3bce691`, the launcher verified the
+private idle project, both exact failed predecessor IDs and source bytes,
+then updated **only** `fresh_six_universe_snapshot.py` in project 37097547.
+The A3 two-file readback, compile, and single launch succeeded. Backtest
+`17652d09f5aae60c5a1aee47b705b96a` ended `Runtime Error` at
+**2026-09-25 10:00:00** with `snapshot decision cutoff changed` in
+`persist_at_decision`. The same source expected the **09:20** New York
+decision clock. A3 advanced past A2's 2026-09-11 callback-type failure and
+reached the target session, but the QC scheduled callback arrived at 10:00
+under this daily-resolution setup. The exact decision-clock gate correctly
+refused rather than accepting a later collection. There is no authenticated
+`ARV2_FRESH_SIX_INPUT_META`, private snapshot result, order, return, or
+forward 100%/200% comparison. No later time is silently substituted for the
+frozen decision. This is an **invalid input diagnostic**, not an analyst
+result.
+
+`ARV2D212-001` is a lane-specific **P2 open** QC scheduling mismatch. The
+prospective recovery must establish an actual 09:20 callback with an
+appropriate QC clock/subscription or a newly reviewed, explicitly different
+decision protocol; do not relax the exact-time check or treat a 10:00 callback
+as 09:20. The R247 candidate has spent **three of three** permitted Codex
+launches (A1, A2, A3); no A4 and no relabeled-project retry is authorized.
+The owner-directed Mia recovery path was checked through the authenticated
+QC UI. Opening this exact project showed **No Coding Session Available**,
+with two other active coding sessions; stopping either could disturb other
+work and was not done. Mia was therefore not controllable for this project
+from Codex in this round. The owner may use Mia when a QC coding session is
+available and send back its diagnosis/source; Codex must then retrieve,
+compare, and accept only verified lane-specific corrections before another
+separately authorized/reviewed candidate is considered. A3 adds one
+infrastructure look, zero development evaluations and zero cells; the shared
+ledger now records the floor **254 / 192 / 37 / 662**.
+
+The owner-selected 100% and 200% forward-development arms remain unrun.
+Fresh six-universe input readiness is not demonstrated; the September-28
+08:43 PDT Massive capture remains partial-day, and its separate after-close
+comparison is not a decision-ready signal. The common-epoch/two-arm
+outcome-bearing paper protocol, distinct paper authority, one remaining
+formal Analyst look, and total two-sided alpha <=1/80 remain unchanged.
+
+### 212.7 Claude review notes for this Codex round
+
+Review the exact post-Claude range from `aef4855` through this round's final
+record commit, not the mutable QC project as a substitute for committed
+source. Per-commit roles: `3d4fbc5` corrects the warm-up degenerate-callback
+refusal; `90ca9a5` counter-reviews all section-211 commits and freezes R247
+A1; `f6aac9c` records A1 and prospectively freezes the A2 error-disclosure
+source; `3bce691` records A2, the final prospective A3 type correction and
+its one-use same-project launcher. The final record commit documents A3's
+actual terminal result, shared-look accounting and next gate. All new code
+is lane-specific; the owner-authorized shared-ledger edits only count the
+three infrastructure looks.
+
+Review focus: the warm-up valid/degenerate same-clock ordering; preservation
+of `datetime` subtype acceptance without weakening cutoff or source-EndTime
+refusals; reconstructed A1/A2 runtime bytes in the A3 launcher; exact
+predecessor/project/source/waiver binding; no fourth-launch path; and the
+09:20-versus-10:00 QC scheduling discrepancy. A1, A2 and A3 did **not**
+produce a valid input artifact. No successful-result metadata read, Object
+Store download, provider row, return, price, order, forward arm or paper
+event was accessed. The cloud actions were the one private project creation,
+exact source uploads/readbacks, compiles and three input-only backtest
+attempts in project 37097547, plus bounded terminal/error reads (including
+one A1 failure-only read); the A3 coding session needed for
+Mia was unavailable. A3's result is not converted into a different decision
+time or a fourth attempt. `ARV2D212-001` remains P2 open; the other
+counter-review findings in section 212 are corrected/documented as stated.
+
+Focused validation on the A3 source and the updated record: 60 snapshot and
+launcher tests, 82 lane-record/active-document tests, and the exact V2
+transitive import-closure regression passed; targeted Python compilation and
+`git diff --check` were clean. The subtype test was red against committed A2
+source and green against A3; non-datetime refusal remained green. The
+complete lane/repository suite was **not run**, per owner instruction; Claude
+owns that validation. No evidence supports a new alpha or trading claim.

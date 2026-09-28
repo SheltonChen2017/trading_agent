@@ -5955,3 +5955,24 @@ It adds one infrastructure look and zero development evaluations or cells:
 **253 shared research looks / 192 development evaluations / 36 infrastructure
 looks / 662 authenticated exploratory cells**. Only one R247 attempt remains
 under the owner's three-attempt rule, in this same project.
+
+## R-247 A3 — final same-project input diagnostic — 2026-09-28
+
+The third and last R247 launch reused private project **37097547** and
+changed only the QC snapshot runtime's two `datetime` subtype guards.
+Generated `main.py` remained A2-identical. The uploaded two-file manifest
+SHA-256 was
+`104a7afb8298a52537ef42a3c29eb2d86f8565807a5e6affde73816450877cce`;
+backtest `17652d09f5aae60c5a1aee47b705b96a` compiled and launched once.
+It reached the target session, then ended `Runtime Error` at **2026-09-25
+10:00:00**: `snapshot decision cutoff changed`. The scheduled 09:20 check
+was invoked at 10:00 in this daily-resolution setup. This means the subtype
+change passed the A2 start-time failure, but the exact 09:20 snapshot was
+never authenticated. No `ARV2_FRESH_SIX_INPUT_META` exists and there is no
+valid input result, let alone an alpha or paper result. Only the exact
+terminal status and bounded error text were inspected; no raw input, prices,
+returns, orders, or Object Store contents were read. A3 adds one
+infrastructure look and zero development evaluations or cells. The floor is
+**254 shared research looks / 192 development evaluations / 37 infrastructure
+looks / 662 authenticated exploratory cells**. R247 has exhausted its three
+attempt slots; a fourth Codex launch or relabeled candidate is prohibited.

@@ -70,9 +70,14 @@ def _current_bindings(inventory, *, cutoff="2024-02-13T14:30:00Z"):
 
 
 @lru_cache(maxsize=4)
-def _multi_security_population(count, correction=None, refused_index=None):
-    """Build canonical SI-3C fixtures with real SI-2B price/identity lineage."""
-    raw = _raw_batch(_single_sector_specs(count), correction)
+def _multi_security_population(count, correction=None, refused_index=None, specs=None):
+    """Build canonical SI-3C fixtures with real SI-2B price/identity lineage.
+
+    ``specs`` overrides the default single-sector specs so a caller can shape
+    authentic share deltas, for example to create an exact S1 tie group. The
+    default stays ``_single_sector_specs(count)``.
+    """
+    raw = _raw_batch(_single_sector_specs(count) if specs is None else specs, correction)
     context = raw[0].source_context
     vintage = context.source_vintage
     references = context.reference_bundle

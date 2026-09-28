@@ -416,3 +416,50 @@ def test_returned_ranking_payload_is_detached_and_all_authorities_remain_false()
                 assert_no_authority(nested)
 
     assert_no_authority(before)
+
+
+def test_inclusive_upper_tail_admits_an_exact_nine_tenths_tie_group():
+    """The owner froze an inclusive `p >= 0.90`; pin that boundary exactly.
+
+    No existing fixture produces an S1 tie, so every eligible cohort has
+    `equal_count == 1` and no percentile can land on exactly `9/10`. A strict
+    `>` would therefore pass the whole focused file while silently excluding a
+    boundary group. Four securities are given identical authentic share deltas
+    so they share one exact S1 value at the top of a 20-eligible cohort:
+    `L=16`, `E=4`, `N=20` gives `(2*16+4)/(2*20) = 9/10` exactly, and the
+    inclusive rule must admit all four.
+    """
+    specs = tuple(
+        replace(spec, current_shares=116, prior_shares=114)
+        if spec.index >= 16
+        else spec
+        for spec in _single_sector_specs(20)
+    )
+    population = _multi_security_population(20, specs=specs)
+    payload = build_stock_eligible_ranking_inventory(
+        build_stock_population_binding_inventory(population)
+    ).to_payload()
+    rows = [
+        row
+        for row in _current_rankings(payload)[20]["rows"]
+        if row["role"] == "pressure"
+    ]
+    assert len(rows) == 20
+    tie = [row for row in rows if row["equal_count"] == 4]
+    assert len(tie) == 4
+    for row in tie:
+        assert row["strictly_lower_count"] == 16
+        assert row["strictly_higher_count"] == 0
+        assert row["scoreable_count"] == 20
+        assert _rational(row["role_percentile"]) == Fraction(9, 10)
+        assert row["threshold_candidate"] is True
+    assert len({row["score"]["numerator"] for row in tie}) == 1
+    covering = {
+        row["event_id"]: row
+        for row in _current_rankings(payload)[20]["rows"]
+        if row["role"] == "covering"
+    }
+    for row in tie:
+        mirror = covering[row["event_id"]]
+        assert _rational(mirror["role_percentile"]) == Fraction(1, 10)
+        assert mirror["threshold_candidate"] is False

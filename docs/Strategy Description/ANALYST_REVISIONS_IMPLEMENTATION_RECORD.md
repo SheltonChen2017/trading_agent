@@ -151,12 +151,13 @@ exploratory cells. The current look floor is **250 / 191 / 34 / 661**. The
 original R225 stock arm and its QCOM reference-price gap remain unresolved.
 Section 206 is Claude's independent review of the seven-commit range
 `f612899..1b1da0e` (0 P0, 0 P1, 1 P2, 2 P3, record-only correction):
-two lane-record gates were red at the pushed head and are corrected here; on
-the matched QCOM-excluded construction the analyst-revision entry, count, and
-weight overlay adds +16 to +24 points on 2021–2025 while adding nothing on the
-recent window, so the window-or-vintage question `ARV2R196-001` stays open;
-the 10% floors are a measured null and the three-name floors a sub-point
-effect.
+two lane-record gates were red at the pushed head and are corrected there.
+Section 207 counter-reviews both Claude commits. The historical QCOM-excluded
+AR-on/off pair adds +16.20 points, while the separate recent pair loses
+0.11 points; section 207 shows that the constructions are not matched across
+periods, so the divergence cannot yet be assigned to regime or data vintage
+alone. The 10% floors are a measured null and the three-name floors a
+sub-point effect. `ARV2R196-001` remains open.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -807,12 +808,13 @@ final same-lane push, Claude reviews section 203 and the exact pushed range;
 Codex then counter-reviews Claude's push. The owner's subsequent request
 now schedules the bounded R242–R245 three-name sensitivity in section 204
 before that next review. Section 206 is Claude's independent review of the
-exact pushed range `f612899..1b1da0e` (sections 201–205, record-only
-correction). The immediate next step is that Codex counter-reviews section
-206 and the exact pushed range, then runs one AR-entry, zero-weight-tilt arm
-on the QCOM-excluded 2021–2025 construction before any further admission or
-capacity change. No fourth R225 attempt, formal alpha, live/paper order, or
-automatic further threshold search follows.
+exact pushed range `f612899..1b1da0e`; Codex counter-reviews both Claude
+commits and corrects its attribution in section 207. The owner then directs
+a bounded AR 60%–200% rule freeze, a matched historical decomposition, and
+forward-looking preparation. Claude will independently review section 207
+and the exact next pushed implementation before any formal efficacy or paper
+authority is inferred. No fourth R225 attempt, formal alpha, live/paper
+order, or automatic threshold search follows.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -29084,3 +29086,41 @@ commit; no code or test file changed) with
 Not exercised here: no QuantConnect or provider endpoint, result read, or
 launcher was run; every figure is transcribed from sections 201–205 and the
 shared ledger; the fifteen cloud runs are attested only by Codex's receipts.
+
+## 207. Codex counter-review of Claude section 206, 2026-09-28
+
+**Exact reviewed range:** `1b1da0e..1cb3705` on this lane's pushed remote
+branch, fetched and resolved to full head
+`1cb37050002121aaa9d91c512073f5d8059c3eef`. Both commits are record-only;
+no production/test source or QC state changed. `dc0fd5d` (section 206
+review and record-gate repair) is **accepted after the interpretation and
+bookkeeping corrections below**: its finding that two exact-next-step gates
+were red at the prior pushed head is confirmed, and current final record
+bytes pass both. `1cb3705` (final suite-count follow-up) is **accepted after
+the two-commit wording correction below**: it records the four export-only
+failures, their real-checkout/record-gate reruns, and the 8,943 pass count
+without claiming a fully green export. No Claude finding is silently
+rejected. The frozen R235–R237 intended-versus-transported META-schema
+observation `ARV2R206-003` is confirmed; no spent manifest is rewritten.
+
+| ID | Priority/status | Evidence, disposition and correction |
+|---|---|---|
+| `ARV2CR207-001` | P2, confirmed; record corrected here | Section 206.2 subtracts R223 AR-off from R220 AR-on/zero-overlay and calls the resulting +1.50 points an AR-entry effect. R220/R221 retain inherited QQQ/SOXX 70/80/95 and REMX 50/50/25 coverage floors; R223/R224 use all-six 25% coverage with scaled verified-stock budgets. They are different constructions, so that subtraction cannot identify entry. Only R220-versus-R221 (weight transfer −0.385576 pp) and R223-versus-R224 (total AR −0.114367 pp) are matched recent pairs. The planned historical AR-on/zero-transfer arm must be matched to its own AR-off and AR-on arms; no new QC result is implied. |
+| `ARV2CR207-002` | P2, confirmed; record corrected here | Section 206.4 calls the historical and recent total-ablation constructions matched and says construction no longer explains their divergence, leaving only regime or data vintage. Historical R231/R232 exclude QCOM from direct stocks; recent R223/R224 do not. The historical and recent pairs also differ in observation window and data vintage. The historical +16.20 pp and recent −0.11 pp are valid *within their own pairs* but cannot by themselves isolate regime or vintage across pairs. `ARV2R196-001` remains open with construction among the possible explanations. |
+| `ARV2CR207-003` | P3, confirmed; record corrected here | Section 206's opening says two spent pre-create attempts; R237 A1, R244 A1 and R245 A1 make **three**. The same section's 18 launch attempts and 15 valid cells already reconcile the count. No look floor changes. |
+| `ARV2CR207-004` | P3, confirmed; qualified here | Section 206.2 infers fewer *held stocks* from fewer filled orders. Those are transaction counts, not a holdings census. The historical receipt does show fewer selected-name slots (R231 AR-off 12,570 versus R232 AR-on100 11,997 across sleeves and decisions); describe that measurement rather than inferring daily unique holdings from order count. |
+| `ARV2CR207-005` | P3, confirmed; record corrected here | Section 206's opening describes one Claude record commit, but the final pushed review has `dc0fd5d` and `1cb3705` in one push. Both are dispositioned above. |
+| `ARV2CR207-006` | P3, confirmed; qualified here | The 31 positive-score observations over 125 REMX coverage-valid decisions show that the **positive-score entry floor** failed. They do not distinguish missing analyst events from zero/negative scores and do not establish an archive-wide coverage rate. The own-ETF fallback conclusion remains valid. |
+
+**Verification and scope.** The complete two-commit diff and section 206 were
+read in this designated worktree; frozen manifest policy and cached aggregate
+fields were checked without a new outcome read. Current record/active-document
+gates passed **82 tests**, and the independent focused strategy audit passed
+**298 tests**. No complete lane suite was run by Codex; Claude's section
+206.7 records its export run and reruns. `git diff --check` is clean before
+the new implementation below. This counter-review spends **zero** research
+looks, evaluations, infrastructure looks, or cells; floor remains
+**250/191/34/661**. No provider, QC, broker, paper/live or order endpoint was
+used. The owner's next request authorizes a bounded AR 60–200 rule freeze,
+mechanism decomposition, and prospective preparation, but not a claim that
+ARV2-9's paper-deployment gates are already satisfied.

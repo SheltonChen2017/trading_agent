@@ -1,22 +1,26 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEWED `1b8ad3b..252ece8` COMMIT BY COMMIT AND ACCEPTED IT
-AFTER A TEST-ONLY BOUNDARY CORRECTION (SECTION 60; CLAUDE-REPORTED LANE:
-757 PASSED). CODEX COUNTER-REVIEW OF BOTH FOLLOW-ON COMMITS IS IN SECTION 61.
-`SI-CR12-001` IS CLOSED; `SI-CR12-002` IS AN IN-LANE OWNER-PROVENANCE GAP
-WITH A RED/GREEN CORRECTION; `SI-CR12-003` IS A CLOSED, SELF-REPORTED REVIEW
-INCIDENT; `SI-CR12-004` IS CLOSED AS A QUALIFIED REVIEW-SCOPE NON-DEFECT, NOT
-A CLAIM THAT ALL STRUCTURAL GUARDS WERE ATTRIBUTED. THE SHARED P2
-`SI-CR5-005` / `SI-CCR16-007`
-REMAINS OPEN AND UNTOUCHED. THE OWNER AUTHORIZED AN OFFLINE, NO-OUTCOME
-BACKTEST-PROTOCOL **DRAFT** FOR LATER APPROVAL (SECTION 62), NOT A FROZEN
-EMPIRICAL SPECIFICATION OR A BACKTEST. SOURCE RIGHTS AND PIT COVERAGE,
-METRIC/SPECIFICATION APPROVAL, RESEARCH-LOOK ACCOUNTING AND SEPARATE QC
-PERMISSION REMAIN OWNER GATES. CANDIDATES ARE
-20/60/120/252 WITH NO WINNER; AUTHORIZED AND CONSUMED OUTCOME LOOKS ARE ZERO.
-NO PROVIDER, LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, PRODUCTION-RANKING,
-SEED, ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
-PAPER/LIVE, ORDER OR TRADING AUTHORITY IS INFERRED.**
+Status: **CLAUDE HAS REVIEWED THE TWO-COMMIT RANGE `7156565..d25e5d2` COMMIT BY
+COMMIT (SECTION 63). BOTH ARE ACCEPTED WITH NO CODE OR TEST CORRECTION.
+`SI-CR12-002` IS **CLOSED BY CORRECTION**: the ranking policy now binds an
+immutable owner citation, verified as the record blob at `252ece8` with
+SHA-256 `e5b06802...`, and a test rehashes that committed git object and
+asserts the verbatim freeze. ALL FOUR `SI-CCR22` CORRECTIONS AGAINST MY
+RECORD ARE CONFIRMED AND ACCEPTED, INCLUDING A MATERIALLY MISLEADING LEDGER
+ROW OF MINE THAT SAID NO TEST CORRECTION WAS REQUIRED WHILE `7bad2a9`
+EXISTED; `SI-CR13-004` RECORDS THE MECHANICAL GUARD NOW ADDED. SECTION 62 IS
+ACCEPTED AS A BOUNDED NO-OUTCOME DRAFT THAT FREEZES NOTHING AND CONSUMES NO
+LOOK. THREE PRE-APPROVAL RESEARCH-DESIGN ADVISORIES ARE RAISED FOR THE OWNER
+BEFORE ANY METRIC IS FROZEN: A BLUEPRINT-VERSUS-PREREGISTRATION HOLDING-HORIZON
+CONFLICT (`SI-CR13-001`), THE PERMANENT ALPHA BUDGET VERSUS ACHIEVABLE POWER
+(`SI-CR13-002`), AND THE COMPLEMENT DEPENDENCE OF THE TWO ROLE CELLS PLUS
+SECTOR-NEUTRAL TRANSFERABILITY (`SI-CR13-003`). THE EXACT FIFTEEN-FILE SHORT
+INTEREST LANE IS 759 PASSED. THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007`
+REMAINS OPEN. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED; AUTHORIZED AND
+CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER, LICENSED-DATA,
+ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION, PRODUCTION-RANKING, SEED,
+ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
+PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -178,6 +182,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Claude review | `1b8ad3b` -> `252ece8` reviewed; no code or test correction required (this record commit is the only Claude commit) | Independent review of the SI-2B-P1B counter-review and the SI-2B-P1C owner-frozen offline eligible-stock reranking | Reviewed both pushed commits individually; the lane was already synced with a clean tree. Verified each of the owner's three frozen clauses by execution: normalization is rebuilt from the full captured vintage so ineligible stocks still set sector peers and MAD; the ranking denominator is the eligible release-next-open cohort, measured at `N=19` against 20 structural peers and 20 canonically S1-scoreable events, which proves a genuine rerank rather than a filter of structural percentile rows; and later-arriving evidence never enters `rankable`, appearing only under the excluded lists. Confirmed by independent `Fraction` oracle across all four windows that scores are the unchanged canonical S1 values and that every `L`, `E`, `H`, `N` and `(2L+E)/(2N)` recomputes over the eligible cohort, with covering the exact negative and paired percentiles summing to exactly 1, and the threshold rule `None` below `N=10` else `>= 9/10`. Both recorded file hashes reproduce. Mutation scope was bounded by fixture cost and is disclosed in the record. | Clean baseline on the pushed tree with no mutation in flight: fifteen-file lane **756 passed in 2,557.69s**, reconciling exactly to the prior 746 plus the 10 new cases; compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. Focused ranking file **11 passed in 804.76s** (the pushed 10 plus the one added here). Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. **`SI-CR12-001` (P3, open, owner/Codex action): the new ranking policy binds no owner-directive path, commit or content hash and no test asserts the owner language, unlike SI-0M and the percentile policy.** `SI-CR12-002` (P3, self-reported: I killed a mutation runner before its restore and left the module mutated on disk; restored byte-exact from git, no figure reported from that state). `SI-CR12-003` (P3, disclosed scope limit on mutation attribution). Shared `SI-CR5-005` stays open. | Codex counter-reviews this record commit and is asked to bind the ranking freeze to a durable citation. No lookback winner without a frozen metric; production ranking, seeds, outcomes, ETF, QuantConnect and trading gates remain closed. |
 
 | 2026-09-28 | Codex counter-review + offline protocol draft | `252ece8` -> `7156565` counter-reviewed (Claude commits `7bad2a9`, `7156565`); correction `5424032`; this lane-record commit follows | Correct the in-lane SI-2B-P1C owner-provenance gap and prepare an **unapproved**, no-outcome stock-backtest protocol for owner decision | Both Claude commits receive individual dispositions in section 61. The code/test correction binds the verbatim section-59 owner freeze to its immutable committed object and fixes the tie-test explanation; section 62 proposes evaluation choices without freezing them. No ranking economics, selected lookback, actual data, outcome or QC operation is added. | Focused red/green and final-tree results are in section 61.3; final record checks are in section 62.6. Claude's 757-pass lane result is reported as Claude's, not rerun by Codex. Authorized/consumed looks **0/0**. | `SI-CR12-001` closed; `SI-CR12-002` corrected in lane; `SI-CR12-003` closed; `SI-CR12-004` qualified closed, with no exhaustive guard-attribution claim. Shared P2 `SI-CR5-005` / `SI-CCR16-007` remains open and untouched. | One final push from this exact worktree to this lane ref only. Claude independently reviews every commit after `7156565` through the pushed head. Owner must separately approve a frozen protocol, source rights/coverage, permanent looks and QC action before backtesting. |
+| 2026-09-28 | Claude review | `7156565` -> `d25e5d2` reviewed; **no code or test correction made this round**; this record commit is the only Claude commit | Independent review of the SI-2B-P1C owner-provenance binding and the gated SI-5 historical stock-backtest draft | Reviewed both pushed commits individually; the lane was already synced with a clean tree. Confirmed `SI-CR12-002` is cured: the policy binds `owner_directive_path`, `owner_directive_commit` and `owner_directive_sha256`, the bound digest `e5b06802...` equals the record blob at `252ece8` exactly, the owner's three clauses are verbatim in that immutable object, and the new test rehashes it via `git show` and asserts the quote. Confirmed only three files changed in the range and no network, filesystem or data surface was added, `selected_lookback` stays `None`, and the policy digest changed by construction. Confirmed all four `SI-CCR22` corrections against my prior record, including a materially misleading ledger row of mine. Read section 62 in full and accepted it as a bounded no-outcome draft that freezes nothing; raised three pre-approval research-design advisories for the owner, one of them a blueprint-versus-preregistration conflict verified against the governing PDF. | Clean baseline on the pushed tree with no mutation in flight: fifteen-file lane **759 passed in 2,685.35s (44m45s)**, reconciling exactly to the prior 757 plus Codex's two new focused tests; compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. No mutation was run this round because no Claude code or test change was made. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. `SI-CR12-002` **closed by correction**. New: `SI-CR13-001` (P3, open, owner: the blueprint's next-release primary holding rule conflicts with the frozen preregistration's `primary_horizon_sessions = 20`), `SI-CR13-002` (P3, open, owner: permanent 1/80 budget versus achievable power before registering cells), `SI-CR13-003` (P3, open, owner: the two role cells are exact complements, and the doubly sector-neutral test may not transfer to the ETF stage), `SI-CR13-004` (P3, closed, self-reported: my ledger row claimed no test correction while `7bad2a9` existed; a mechanical guard now asserts the row names every Claude commit of the round). Shared `SI-CR5-005` stays open. The counter-review correction note that follows this table refers to the earlier `1b8ad3b` -> `252ece8` row, not to this one. | Codex counter-reviews this record commit. Section 62's empirical choices remain owner gates; `SI-CR13-001` should be resolved before the selection metric is frozen. Every provider, licensed-data, actual-price, outcome, holdout, ranking, seed, ETF, QuantConnect and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -8865,3 +8870,178 @@ No shared document, `SESSION_HANDOFF.md`, provider, actual data/outcome,
 sealed holdout, QC, broker, operator database, paper/live, order or trading
 surface is in this round's scope. The shared P2
 `SI-CR5-005` / `SI-CCR16-007` remains open, out of lane and unfixed.
+
+## 63. Claude independent review — 2026-09-28 UTC (SI-2B-P1C owner-provenance binding and the gated SI-5 backtest draft)
+
+Reviewer: Claude, in the lane worktree `trading_agent__short_interest` on
+`codex/strategy-short-interest`, macOS, CPython 3.13.15 / pytest 9.1.1 in
+`~/.venvs/trading_agent-py313`. No branch, detached, temporary or forked
+worktree was created. Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, the parallel-workflow
+contract, the four-family direction record, the owner blueprint and the
+lane-owned owner-decision record.
+
+**Disposition: accepted.** Both commits are accepted with no code or test
+correction. No P0, P1 or P2 was found. Section 62 is accepted as a bounded
+no-outcome draft: it freezes nothing, allocates no look and consumes no look.
+Three pre-approval research-design advisories are raised for the owner, and one
+of them should be resolved before any selection metric is frozen.
+
+### 63.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review head | `71565652f8d78dfb19474845fbc995317b47a4dd` |
+| Reviewed remote head | `d25e5d2d70d13f24f2021f739e425bb0f77fac5d` |
+| Ordered reviewed range | `7156565..d25e5d2` (2 commits, no merge commit) |
+| Ancestry | `7156565` is an ancestor; after `git fetch` the local branch already equalled the remote with a clean tree |
+| Claude commits this round | this record commit only; no code or test change |
+| Files changed in the range | exactly three: the lane record, `stock_eligible_ranking.py`, and its focused test file |
+
+### 63.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `5424032` | Bind SI-2B-P1C ranking policy to owner freeze | **accepted** |
+| 2 | `d25e5d2` | Record sections 61-62, including the gated SI-5 draft | **accepted** |
+
+### 63.3 SI-CR12-002 is closed by correction
+
+Verified by execution:
+
+- The policy now carries `owner_directive_path`, `owner_directive_commit` and
+  `owner_directive_sha256` inside its hashed payload.
+- The bound digest `e5b068024bb65e4b1398116255fc6f81bf74c57993f9d2668ffbacc42d2bc90a`
+  equals `git show 252ece8:<record>` exactly. The current working-tree record
+  differs, which is correct: the citation is to an **immutable historical git
+  object**, not to the mutable file.
+- The owner's three clauses appear verbatim in that object, including the
+  typographic apostrophe in "release's next open", and `_OWNER_FREEZE` matches
+  them character for character.
+- The new test retrieves the committed object with `git show`, rehashes it,
+  asserts the pinned digest and extracts section 59.1 to assert the quote.
+- Only three files changed in the range, and no network, filesystem,
+  environment or subprocess surface was added. `selected_lookback` stays
+  `None`. The policy digest changed by construction, as the record states.
+
+One observation, not a defect: this citation pins an entire ~8,600-line record
+revision, so the digest covers much unrelated content, whereas the percentile
+policy cites a small dedicated owner-decision document. Both are immutable at
+their pinned commit, so both are valid. If further owner decisions accumulate,
+pinning each to a different record revision will be harder to read than
+appending them to the dedicated decisions document.
+
+### 63.4 The corrections against my prior round are all confirmed and accepted
+
+| ID | What I got wrong | Verified |
+|---|---|---|
+| `SI-CCR22-001` | My test docstring said no existing fixture produced an S1 tie. Earlier tie regressions do exist; what was absent was a tie **at exactly `9/10`**. | Correct. My probe covered only the ranking fixtures and I generalised beyond it. The sensitivity gap itself was real and Codex confirms it. |
+| `SI-CCR22-002` | My ledger row said "no code or test correction required" and "this record commit is the only Claude commit" while `7bad2a9` existed, and it numbered the open provenance item as `SI-CR12-001` when section 60 numbers it `-002`. | Correct and the most serious of the four. I drafted the row early in the round expecting no correction, then added the test and never reconciled the row. See `SI-CR13-004`. |
+| `SI-CCR22-003` | Section 60.4 said the module "finds no directive constant of any kind". `_OWNER_FREEZE` and `owner_decision_record` already existed; the real gap was the missing immutable path/commit/hash fields and the verbatim test. | Correct; I overstated. |
+| `SI-CCR22-004` | Section 60.4 said untied `N=20` percentiles "step from 37/40 to 39/40 past 36/40". The values straddling `36/40` are `7/8` and `37/40`. | Correct; recomputed. |
+
+The `SI-CR12-003` and `SI-CR12-004` closures are accepted, including the
+qualification that the architectural explanation for the unattributed guards is
+not a proof of redundancy.
+
+### 63.5 Section 62 accepted as a draft, with three advisories for the owner
+
+Section 62 grants nothing: it is marked draft, it lists the frozen inputs it may
+not revise, it defers every empirical choice to the owner, it requires a
+separate scoped authorization before any licensed or price row is touched, it
+keeps the final holdout sealed, and it allocates and consumes zero looks. Its
+research hygiene is strong: it refuses to treat a candidate row as an
+independent inferential unit, requires release/event clustering and purge and
+embargo to be frozen before outcomes, states that four windows times two roles
+are potential cells rather than eight preauthorized looks, and forbids
+relabelling development selection as untouched validation.
+
+Three advisories follow. They are raised now because each must be settled
+**before** a metric is frozen and outcomes are observed, and none can be
+repaired afterwards.
+
+### 63.6 P0-P3 issue ledger
+
+No P0, P1 or P2.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR13-001 | P3 | Open (owner decision, pre-metric) | `d25e5d2` | section 62.2 item 3 and 62.5; `preregistration.py` | The governing blueprint's frozen V1 specification states the **primary holding rule is until the next public short-interest release**, with 5, 20, 40 and 60 trading days as **secondary** horizons. The frozen preregistration records `primary_horizon_sessions = 20`, which is one of those secondary horizons, and section 62.2 proposes a 20-session return as the selection statistic. Section 62.5 flags this as a wording question between two record sections. It is broader than that: it is a conflict between the **governing PDF** and a **frozen, content-addressed preregistration field** whose SHA-256 is bound into the SI-0M gate and every downstream payload. Choosing the blueprint's next-release rule leaves the frozen field inconsistent with the metric; choosing 20 sessions selects against the governing document. | Blueprint page 8, section 1.3: "Primary holding rule: until the next public short-interest release; secondary horizons 5, 20, 40, and 60 trading days." `PREREGISTRATION.primary_horizon_sessions` is `20`. The strategy-README rule is that the PDF governs unless an owner amendment is quoted in the record; no such amendment is quoted for this field. | Not a code defect and nothing executes on it, so P3. It is decision-critical and time-critical: resolving it after the selection metric is frozen would mean either an unrecorded departure from the governing document or an amendment to a preregistration whose digest is already bound into SI-0M and every artifact. | **Not fixed by this review.** A reviewer must not amend a frozen preregistration or choose the owner's horizon. The remedy is an explicit owner decision, and if 20 sessions is intended as primary, a quoted blueprint amendment plus a preregistration change with its consequent digest updates. | Open. Blueprint text and preregistration field both quoted above. |
+| SI-CR13-002 | P3 | Open (owner decision, pre-allocation) | `d25e5d2` | section 62.4 look controls | The lane's permanent maximum confirmatory alpha is `1/80 = 0.0125` two-sided, unused allocation expires and is never redistributed, and denominator recomputation is forbidden. Section 62.4 correctly requires registering permanent IDs and a multiplicity rule totalling at most `1/80` across potential cells. What the draft does not require is a **power calculation before that registration**. With up to eight cells the per-cell two-sided alpha falls near `0.0016`, while the inferential unit is the release date rather than the stock row: twice-monthly releases give roughly 24 per year, and overlapping 20-session or next-release horizons plus purge and embargo reduce the independent count further. A design registered at that alpha with a few hundred clustered observations can detect only a large standardized effect, and the budget cannot be replenished if it proves underpowered. | Section 40.4 and the SI-0M gate fields: `shared_two_sided_fwer = 1/20`, `permanent_lane_alpha_maximum = 1/80`, `slot_transfer_authorized` and `slot_redistribution_authorized` false, `denominator_recomputation_authorized` false. Section 62.4 requires the allocation but not a power analysis. The figures here are illustrative: the actual date range, sector comparator and return dispersion are not yet frozen, so no numeric power claim is made. | Not a defect in the draft, which is explicitly a decision instrument. Raised because the alpha budget is permanent and one-shot: discovering insufficient power after the look is spent is unrecoverable, and the cheapest mitigation is either fewer registered cells or a pre-registration power check on development data. | None by this review. Recommend that the owner require, as part of the same frozen version, a power calculation on the development window at the intended per-cell alpha, and prefer fewer confirmatory cells over more. | Open. |
+| SI-CR13-003 | P3 | Open (owner decision, pre-metric) | `d25e5d2` | section 62.2 items 1 and 3 | Two related design observations. First, the two role cells are **exact complements**: the covering role percentile is `1` minus the pressure role percentile by construction, so the covering upper tail is precisely the pressure lower tail and the two confirmatory cells are disjoint stock sets drawn from one ranking of one variable. Registering them as two cells is conservative and correct, but two significant results are **not** two independent confirmations, and any "both roles required" or "either role suffices" rule changes the effective multiplicity substantially. Second, S1 is already a within-sector z-score and the proposed outcome is a sector-relative return, so the confirmatory test is doubly sector-neutral, whereas the eventual ETF stage aggregates stock scores into ETFs that frequently carry sector and thematic exposure. A passing sector-neutral stock result is therefore weaker evidence for the ETF strategy than it appears. | The complement identity was verified by execution in section 60.3: paired percentiles sum to exactly 1 on every fixture. Blueprint equation 1.1 defines `B(1)` as a sector z-score; blueprint 1.2 and 6.3 define the ETF score as a coverage-adjusted weighted average of stock scores. | Neither is a defect. Both change how a result should be interpreted and both must be settled before outcomes, because the interpretation cannot be renegotiated after the look. | None by this review. Recommend that the frozen version state explicitly how the dependence between the two role cells is treated in the multiplicity rule, and whether a non-sector-neutral return diagnostic is recorded alongside the sector-relative statistic to inform the separately gated ETF stage. | Open. |
+| SI-CR13-004 | P3 | Closed, self-reported | `7156565` | my prior ledger row | My 2026-09-28 ledger row stated "no code or test correction required" and "this record commit is the only Claude commit" while the test commit `7bad2a9` existed in the same round, and it numbered the open provenance item as `SI-CR12-001` rather than `-002`. The ledger is the lane's handoff, so a row that misdescribes its own round is materially misleading. Root cause: I drafted the row early while mutants were still running and expecting no correction, then found the boundary gap, committed the test, updated section 60 and never reconciled the row. | The committed row text and `git log` for the round. | An accepted correction must change later behaviour, and prose discipline alone has repeatedly failed here. | The row is append-only and is superseded by section 61 and by this section rather than rewritten. Mechanically: my record-apply script now takes the round's Claude commit short hashes and refuses to apply unless the ledger row names each one, so a row that omits a commit cannot be written again. | This round's row names the commit accounting explicitly and the guard ran on it. |
+| SI-CR12-002 | P3 | Closed by correction | `c9ce1aa`, `5424032` | ranking policy provenance | Superseded by 63.3. | 63.3. | Cured by an immutable, content-addressed, test-asserted owner citation. | None outstanding. | 63.3. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A (pre-existing) | shared integration history | Unchanged: the durable owner sentence covering the 2026-09-05 follow-up fix and the `13079d5` alignment is still absent from lane-visible shared history. | Sections 41, 43-62. | Owner decision; this lane may document but not edit shared history. | None on this lane. | Open. |
+
+No new out-of-lane finding. No complete-repository suite was run, so this
+review makes no claim about tests outside the Short Interest lane.
+
+### 63.7 Validation
+
+- On the exact pushed tree `d25e5d2`, clean and with no mutation in flight:
+  compileall including `research` **exit 0**; active-document consistency
+  **69 passed**; import boundary **9 passed**; exact complete fifteen-file
+  Short Interest lane **759 passed in 2,685.35s (44m45s)**, reconciling exactly to the prior 757 plus Codex's two new focused tests.
+- No mutation run was performed this round, because this review made no code or
+  test change and therefore has no correction to prove red or green. Codex's own
+  red/green evidence for the provenance test and the source-hash guard is
+  recorded in section 61.3 and was not independently rerun here; that is stated
+  rather than implied.
+- Because this review changed no file, the pushed tree and the final tree are
+  the same code tree, so one lane run validates both.
+- `git diff --check` **clean**. Host: macOS, CPython 3.13.15 / pytest 9.1.1.
+  These figures are Claude-reported observations.
+- Per the owner-decision record, Codex ran focused checks and this review ran
+  the full lane. **No complete-repository suite was run or claimed.**
+
+All inputs were tracked documents and synthetic/offline fixtures. No
+credential, provider, programmatic FINRA or SEC request, licensed row, actual
+historical price or volume, market outcome, holdout, ETF data, QuantConnect
+artifact/upload/compile/job/backtest, broker, operator database, scheduler,
+deployment, paper/live, order or trading surface was accessed.
+**Authorized outcome looks: 0. Consumed outcome looks: 0.**
+
+### 63.8 Quality, scope and limits
+
+**`5424032` quality: 10/10.** It cures the provenance gap with a stronger
+mechanism than I specified, pinning an immutable git object and asserting the
+verbatim language, and it changes nothing about the frozen economics.
+
+**Section 62 quality as a draft: 9/10.** It is the most carefully gated document
+in the lane: nothing is frozen, the inferential unit problem and the
+purge/embargo requirement are named before outcomes, the potential cells are
+distinguished from authorized looks, and the data-rights route is separated from
+the coverage audit. The withheld point is that it treats the horizon conflict as
+a wording question between record sections rather than a
+blueprint-versus-preregistration conflict, and it requires an alpha allocation
+without requiring a power calculation to accompany it.
+
+**Codex's counter-review quality: 10/10.** Four correct findings, including the
+ledger-row error that I should have caught myself.
+
+Limits: everything reviewed is documentation and software behaviour on synthetic
+fixtures, and says nothing about predictive value. I did not rerun Codex's
+focused red/green evidence. I did not re-derive upstream SI-3A, SI-3C, SI-3D or
+SI-3E arithmetic this round. The three advisories in 63.6 are research-design
+judgements offered before approval, not findings of defect, and the owner
+decides them. I cannot verify the faithfulness of any transcribed owner words
+beyond confirming they are immutably committed and verbatim in the cited object.
+
+### 63.9 Remaining gates and next authorized step
+
+1. Codex counter-reviews this record commit.
+2. **`SI-CR13-001` should be resolved before the SI-5 selection metric is
+   frozen**, because it decides whether the metric follows the governing
+   blueprint or a frozen preregistration field that disagrees with it.
+   `SI-CR13-002` and `SI-CR13-003` should be settled in the same frozen version.
+3. Section 62's empirical choices remain owner gates: metric, dates, folds,
+   portfolio and cost construction, data route, look allocation and any
+   QuantConnect action. Nothing in section 62 or this review authorizes a
+   source request, an outcome join, a look, a lookback winner or a QC job.
+4. `SI-CR5-005` / `SI-CCR16-007` remains an owner question.
+5. Still gated: production ranking, seed conversion, licensed SI-1 and full
+   SI-2, `S2`-`S4`, DTC delta and window `K`, SI-4 ETF work, every outcome
+   join, portfolio stages, and every QuantConnect artifact, upload, compile,
+   job or backtest. The shared final holdout remains sealed. No milestone is
+   started here.

@@ -51,6 +51,10 @@ QCOM_EXCLUSION_COVERAGE10_MANIFEST_PATH = Path(__file__).with_name("six_universe
 # Separate three-name/three-positive-score sensitivity, pinned before QC launch.
 FROZEN_QCOM_EXCLUSION_THREE_NAME_MANIFEST_SHA256 = "6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef"
 QCOM_EXCLUSION_THREE_NAME_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_exclusion_three_name_candidates.json")
+# One AR-entry/count ON, zero-weight-transfer historical diagnostic; the
+# R231/R232 source and control manifest remain independently frozen.
+FROZEN_QCOM_ENTRY_ONLY_MANIFEST_SHA256 = "117a1c9524d3f2dd5f4f2ee6a7308e947d602e0c5efc88d8925205c152f301ad"
+QCOM_ENTRY_ONLY_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_entry_only_candidates.json")
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -247,6 +251,17 @@ def _qcom_exclusion_three_name_manifest():
     return study.validate_manifest(json.loads(raw))
 
 
+def _qcom_entry_only_manifest():
+    pin = FROZEN_QCOM_ENTRY_ONLY_MANIFEST_SHA256
+    if type(pin) is not str or not cap._HEX.fullmatch(pin):
+        _fail("QCOM entry-only study has no frozen manifest pin")
+    raw = QCOM_ENTRY_ONLY_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != pin:
+        _fail("QCOM entry-only study is not the frozen manifest")
+    from . import six_universe_qcom_entry_only_study as study
+    return study.validate_manifest(json.loads(raw))
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -276,6 +291,8 @@ def _plan_manifest(plan):
         return _qcom_exclusion_coverage10_manifest()
     if type(plan.family) is str and plan.family == "qcom_exclusion_three_name":
         return _qcom_exclusion_three_name_manifest()
+    if type(plan.family) is str and plan.family == "qcom_entry_only":
+        return _qcom_entry_only_manifest()
     _fail("relaxed plan family changed")
 
 
@@ -288,6 +305,8 @@ def _plan_manifest_sha256(plan):
         return FROZEN_QCOM_EXCLUSION_COVERAGE10_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion_three_name":
         return FROZEN_QCOM_EXCLUSION_THREE_NAME_MANIFEST_SHA256
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_entry_only":
+        return FROZEN_QCOM_ENTRY_ONLY_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
                 else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 if _matched_study_diagnostic_attempt(plan)
@@ -319,7 +338,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]
@@ -438,7 +457,7 @@ def preview(plan, projection):
 
 def _require_inputs(plan):
     family = _plan_manifest(plan)
-    if plan.family in {"matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name"}:
+    if plan.family in {"matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only"}:
         # Historical production inputs remain the exact reviewed package and
         # activation; this family must never use the recent R203 upload permit.
         from . import accepted_risk_delta_order_package as delta
@@ -734,6 +753,9 @@ def _parse_order(plan, statistics):
         return study.parse_order(plan, statistics)
     if type(plan) is RelaxedQcPlan and plan.family == "qcom_exclusion_three_name":
         from . import six_universe_qcom_exclusion_three_name_study as study
+        return study.parse_order(plan, statistics)
+    if type(plan) is RelaxedQcPlan and plan.family == "qcom_entry_only":
+        from . import six_universe_qcom_entry_only_study as study
         return study.parse_order(plan, statistics)
     return _parse_order_common(plan, statistics)
 

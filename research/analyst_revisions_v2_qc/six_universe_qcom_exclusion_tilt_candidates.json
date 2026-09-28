@@ -1,0 +1,113 @@
+{
+  "activation_manifest_sha256": "69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41",
+  "candidates": [
+    {
+      "arm": "ar_on80",
+      "backtest_name": "ARV2 R235 QCOM exclusion ar_on80 slippage0 2021 2025",
+      "candidate_id": "R235",
+      "excluded_stock_security_id_sha256": "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "f03e7f0f9669e3d5168511a9c05cf5e0b9c2c88801fc87433d990537c333615d",
+      "meta_schema": "arv2-six-matched-qcom-excluded-tilt80-meta-v1",
+      "profile_id": "arv2-six-matched-qcom-excluded-ar_on80-s0-profile-v1",
+      "profile_sha256": "7db16708228b5864b17d5d7aa2c132478085bc56b6a711a1cf3b50f90a52c7b9",
+      "project_name": "157 ARV2 SIX QCOM EXCLUSION AR_ON80 S0 R235 2021 2025",
+      "projection_schema": "arv2-six-matched-qcom-excluded-tilt80-projection-v1",
+      "projection_sha256": "06842824c2fee60f447c4e920ee23634917958f94fa2332a9f21ea24eeed0aa1",
+      "reference_repair_enabled": true,
+      "role": "matched_qcom_excluded_ar_on80_s0",
+      "slippage_bps": 0,
+      "source_file_count": 17,
+      "source_files_sha256": "8e21a83db1a1ec62f3a57bc69b64626e9c72101a7437fc834d8a4ca8ea7c1a82",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES",
+        "ARV2_SIX_GATE_ORDER_DIAGNOSTICS"
+      ],
+      "summary_schema": "arv2-six-matched-qcom-excluded-tilt80-summary-v1",
+      "tilt_fraction": "0.80",
+      "tilt_percent": 80,
+      "total_source_bytes": 405706
+    },
+    {
+      "arm": "ar_on120",
+      "backtest_name": "ARV2 R236 QCOM exclusion ar_on120 slippage0 2021 2025",
+      "candidate_id": "R236",
+      "excluded_stock_security_id_sha256": "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "f03e7f0f9669e3d5168511a9c05cf5e0b9c2c88801fc87433d990537c333615d",
+      "meta_schema": "arv2-six-matched-qcom-excluded-tilt120-meta-v1",
+      "profile_id": "arv2-six-matched-qcom-excluded-ar_on120-s0-profile-v1",
+      "profile_sha256": "578404e182995779dff97fda0f9030879f4702cbfba141024feb521217ba9805",
+      "project_name": "158 ARV2 SIX QCOM EXCLUSION AR_ON120 S0 R236 2021 2025",
+      "projection_schema": "arv2-six-matched-qcom-excluded-tilt120-projection-v1",
+      "projection_sha256": "cc18bcdda7dc17750c186a403c8ec74568c4a7f71c528bdd4b714c00ef63c17b",
+      "reference_repair_enabled": true,
+      "role": "matched_qcom_excluded_ar_on120_s0",
+      "slippage_bps": 0,
+      "source_file_count": 17,
+      "source_files_sha256": "6b4ab1c8109ef3deadf09c220ba9179c8156288cdae094807dc67051cac34812",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES",
+        "ARV2_SIX_GATE_ORDER_DIAGNOSTICS"
+      ],
+      "summary_schema": "arv2-six-matched-qcom-excluded-tilt120-summary-v1",
+      "tilt_fraction": "1.20",
+      "tilt_percent": 120,
+      "total_source_bytes": 405724
+    },
+    {
+      "arm": "ar_on200",
+      "backtest_name": "ARV2 R237 QCOM exclusion ar_on200 slippage0 2021 2025",
+      "candidate_id": "R237",
+      "excluded_stock_security_id_sha256": "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "f03e7f0f9669e3d5168511a9c05cf5e0b9c2c88801fc87433d990537c333615d",
+      "meta_schema": "arv2-six-matched-qcom-excluded-tilt200-meta-v1",
+      "profile_id": "arv2-six-matched-qcom-excluded-ar_on200-s0-profile-v1",
+      "profile_sha256": "a22141b0022f5032911d19dc3a837eac291c632263cc013e2a4843afd84cb22d",
+      "project_name": "159 ARV2 SIX QCOM EXCLUSION AR_ON200 S0 R237 2021 2025",
+      "projection_schema": "arv2-six-matched-qcom-excluded-tilt200-projection-v1",
+      "projection_sha256": "44b7e0dfcd31ecb1698e0b46196ebe4de80ca036d9273516b05f35dd65241f25",
+      "reference_repair_enabled": true,
+      "role": "matched_qcom_excluded_ar_on200_s0",
+      "slippage_bps": 0,
+      "source_file_count": 17,
+      "source_files_sha256": "c35d5a907d470f53425f25112956a70bc38b8e1d465cfaa1a6bedb36d979c675",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES",
+        "ARV2_SIX_GATE_ORDER_DIAGNOSTICS"
+      ],
+      "summary_schema": "arv2-six-matched-qcom-excluded-tilt200-summary-v1",
+      "tilt_fraction": "2.00",
+      "tilt_percent": 200,
+      "total_source_bytes": 405724
+    }
+  ],
+  "package_sha256": "7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f",
+  "protocol": {
+    "admission_leverage": "2",
+    "cadence": "weekly_prior_session_decision_next_open_MOO",
+    "capacity_search": false,
+    "comparison": "QCOM_excluded_AR_on_weight_tilt_80_120_200_vs_R231_AR_off_context",
+    "confirmation": false,
+    "control_candidate_id": "R231",
+    "control_manifest_sha256": "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0",
+    "cost_bps_per_side": "10",
+    "decision_count": 261,
+    "excluded_stock_security_id_sha256": "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f",
+    "exclusion_rule": "qcom_stock_eligibility_after_coverage_v1",
+    "first_session": "2021-01-04",
+    "last_session": "2025-12-31",
+    "observation_count": 1255,
+    "selection_policy": "all_six_25pct_verified_subset_top10_equal_slots_residual_own_ETF",
+    "sensitivity_only": true,
+    "slippage_bps": [
+      0
+    ],
+    "target_gross_exposure": "0.98"
+  },
+  "schema": "arv2-six-qcom-excluded-ar-on-tilt-ladder-v1"
+}

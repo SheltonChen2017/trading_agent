@@ -83,7 +83,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_market_cap_stock_portfolio_evaluator.py
     accepted_risk_market_cap_stock_portfolio_qc_runtime.py
     accepted_risk_market_cap_stock_portfolio_tilt.py
-    accepted_risk_massive_delta.py
+    accepted_risk_massive_delta.py accepted_risk_matched_diagnostics.py
+    accepted_risk_matched_historical_projection.py
     accepted_risk_objective_synthetic_leverage_evaluator.py
     accepted_risk_objective_synthetic_leverage_qc_runtime.py
     accepted_risk_order_level_benchmark.py accepted_risk_order_level_core.py
@@ -91,9 +92,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_order_level_input_runtime.py
     accepted_risk_order_level_qc_projection.py
     accepted_risk_order_level_submission_adapter.py
-    accepted_risk_order_level_universe_benchmark.py
-    accepted_risk_pair_bridge.py accepted_risk_preliminary_package.py
-    accepted_risk_preliminary_qc_figi.py
+    accepted_risk_order_level_universe_benchmark.py accepted_risk_pair_bridge.py
+    accepted_risk_preliminary_package.py accepted_risk_preliminary_qc_figi.py
     accepted_risk_preliminary_qc_projection.py
     accepted_risk_preliminary_qc_runtime.py
     accepted_risk_preliminary_rating_evaluator.py
@@ -123,6 +123,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_six_universe_order_bridge_qc_runtime.py
     accepted_risk_six_universe_order_qc_projection.py
     accepted_risk_six_universe_order_qc_runtime.py
+    accepted_risk_six_universe_order_relaxed_qc_projection.py
     accepted_risk_six_universe_order_settlement_qc_projection.py
     accepted_risk_six_universe_order_targets.py
     accepted_risk_six_universe_order_tilt100_floor_qc_projection.py
@@ -133,34 +134,35 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_six_universe_order_tilt_ladder_qc_projection.py
     accepted_risk_six_universe_order_tilt_qc_projection.py
     accepted_risk_six_universe_order_tilt_qc_runtime.py
+    accepted_risk_six_universe_order_tilt_recent_qc_projection.py
     accepted_risk_six_universe_order_tilt_targets.py
+    accepted_risk_six_universe_recent_coverage_projection.py
     accepted_risk_spy_order_level_v1_qc_runtime.py
     accepted_risk_stock_portfolio_evaluator.py
     accepted_risk_terminal_disposition.py event_study.py
     firm_ontology_candidate_builder.py firm_ontology_owner_decision.py
     firm_ontology_proposal_generator.py formal_cloud_evaluator.py
     formal_economic_execution_definition.py formal_evaluation.py
-    formal_evaluation_bridge.py formal_input_bundle.py
-    formal_input_composer.py formal_qc_transport.py formal_report_contract.py
-    formal_run_protocol.py formal_runtime_projection.py
-    formal_streaming_bridge.py formal_streaming_input.py
-    formal_submission_adapter.py formal_terminal_disposition_builder.py
-    fundamental_universe_discovery.py
+    formal_evaluation_bridge.py formal_input_bundle.py formal_input_composer.py
+    formal_qc_transport.py formal_report_contract.py formal_run_protocol.py
+    formal_runtime_projection.py formal_streaming_bridge.py
+    formal_streaming_input.py formal_submission_adapter.py
+    formal_terminal_disposition_builder.py fundamental_universe_discovery.py
     fundamental_universe_discovery_runtime.py
     fundamental_universe_discovery_submission_adapter.py
     fundamental_universe_discovery_worker.py global_input_bundle.py
     global_input_schema.py historical_preopen_input_adapter.py
     in_qc_preopen_terminal_stream.py lean_source_assembly.py
-    object_store_read_contract.py owner_signature_authority.py
-    physical_accepted_risk_archive.py
+    matched_mia_recovery.py object_store_read_contract.py
+    owner_signature_authority.py physical_accepted_risk_archive.py
     physical_firm_ontology_candidate_archive.py
     physical_firm_ontology_review_packet.py
     physical_historical_preopen_bridge.py physical_preopen_seed_archive.py
     physical_preopen_submission_adapter.py
     physical_production_evidence_acquisition.py
-    physical_production_evidence_bridge.py
-    physical_production_input_archive.py physical_production_session_index.py
-    physical_streaming_scoring.py pit_market_cap_membership_probe.py
+    physical_production_evidence_bridge.py physical_production_input_archive.py
+    physical_production_session_index.py physical_streaming_scoring.py
+    pit_market_cap_membership_probe.py
     pit_market_cap_membership_probe_runtime.py
     pit_market_cap_membership_probe_runtime_v3.py
     pit_market_cap_membership_probe_submission_adapter.py
@@ -174,13 +176,23 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     production_evidence_acquisition_io.py production_evidence_composer.py
     refusal_smoke_projection.py run_contract.py runtime_shard_projection.py
     six_universe_cap90_submission.py six_universe_coverage_submission.py
+    six_universe_matched_study.py
+    six_universe_qcom_entry_only_projection.py
+    six_universe_qcom_entry_only_study.py
+    six_universe_qcom_exclusion_ar_range_policy.py
+    six_universe_qcom_exclusion_coverage10_projection.py
+    six_universe_qcom_exclusion_coverage10_study.py
+    six_universe_qcom_exclusion_dual_forward_policy.py
+    six_universe_qcom_exclusion_study.py
+    six_universe_qcom_exclusion_three_name_projection.py
+    six_universe_qcom_exclusion_three_name_study.py
+    six_universe_qcom_exclusion_tilt_study.py
     six_universe_r181_order_diagnostic.py
-    six_universe_settlement_submission.py
-    six_universe_tilt40_submission.py
-    six_universe_tilt80_submission.py
-    six_universe_tilt_ladder_submission.py
-    six_universe_tilt_submission.py
-    synthetic_input_transport.py
+    six_universe_recent_settlement_submission.py
+    six_universe_relaxed_selection_source.py six_universe_relaxed_submission.py
+    six_universe_settlement_submission.py six_universe_tilt40_submission.py
+    six_universe_tilt80_submission.py six_universe_tilt_ladder_submission.py
+    six_universe_tilt_submission.py synthetic_input_transport.py
     """.split()
 )
 
@@ -449,9 +461,120 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "six_universe_qcom_entry_only_projection.py": tuple(
+        """
+        dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        """.split()
+    ),
+    "six_universe_qcom_entry_only_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_projection
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_ar_range_policy.py": tuple(
+        "hashlib json pathlib types".split()
+    ),
+    "six_universe_qcom_exclusion_dual_forward_policy.py": tuple(
+        """
+        hashlib json pathlib types research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_ar_range_policy
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_three_name_projection.py": tuple(
+        """
+        ast dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_projection
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_three_name_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_coverage10_projection.py": tuple(
+        """
+        ast dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.six_universe_relaxed_selection_source
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_coverage10_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_tilt_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
+    "accepted_risk_matched_historical_projection.py": tuple(
+        """
+        ast dataclasses hashlib json pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_settlement_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_recent_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.six_universe_relaxed_selection_source
+        """.split()
+    ),
+    "matched_mia_recovery.py": tuple(
+        """
+        dataclasses hashlib datetime research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.six_universe_matched_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        """.split()
+    ),
+    "six_universe_matched_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_matched_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
+    "six_universe_qcom_exclusion_tilt_study.py": tuple(
+        """
+        decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
     "accepted_risk_latest_order_package.py": tuple(
         """
-        __future__ dataclasses hashlib json tempfile collections datetime pathlib
+        __future__ dataclasses hashlib json os tempfile collections datetime pathlib
         data.exchange_calendar research.analyst_revisions_v2.accepted_risk_input_pair
         research.analyst_revisions_v2.canonical
         research.analyst_revisions_v2.global_benchmark_contract
@@ -1283,6 +1406,63 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection
         research.analyst_revisions_v2_qc.six_universe_cap90_submission
         research.analyst_revisions_v2_qc.six_universe_tilt80_submission
+        research.analyst_revisions_v2_qc.six_universe_recent_settlement_submission
+        """.split()
+    ),
+    "six_universe_recent_settlement_submission.py": tuple(
+        """
+        dataclasses hashlib json pathlib research.quantconnect
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_latest_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.formal_qc_transport
+        research.analyst_revisions_v2_qc.formal_submission_adapter
+        research.analyst_revisions_v2_qc.six_universe_coverage_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_recent_qc_projection
+        """.split()
+    ),
+    "accepted_risk_six_universe_order_tilt_recent_qc_projection.py": tuple(
+        """
+        ast dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_package
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_settlement_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_ladder_floor_qc_projection
+        """.split()
+    ),
+    "accepted_risk_six_universe_order_relaxed_qc_projection.py": tuple(
+        """
+        ast builtins contextlib dataclasses hashlib json sys types research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_recent_qc_projection
+        research.analyst_revisions_v2_qc.six_universe_relaxed_selection_source
+        """.split()
+    ),
+    "accepted_risk_six_universe_recent_coverage_projection.py": tuple(
+        """
+        dataclasses hashlib pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_coverage_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_coverage_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_recent_qc_projection
+        """.split()
+    ),
+    "six_universe_relaxed_selection_source.py": tuple("ast decimal re".split()),
+    "six_universe_relaxed_submission.py": tuple(
+        """
+        dataclasses hashlib json os pathlib stat time research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.six_universe_cap90_submission
+        research.analyst_revisions_v2_qc.six_universe_recent_settlement_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        research.analyst_revisions_v2_qc.six_universe_matched_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_tilt_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_study
+        decimal research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         """.split()
     ),
     "six_universe_r181_order_diagnostic.py": tuple(
@@ -1294,7 +1474,24 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
-    "accepted_risk_latest_order_package.py": ("import:pathlib",),
+    "six_universe_qcom_entry_only_projection.py": (),
+    "six_universe_qcom_entry_only_study.py": (),
+    "six_universe_qcom_exclusion_ar_range_policy.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
+    "six_universe_qcom_exclusion_dual_forward_policy.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
+    "six_universe_qcom_exclusion_three_name_projection.py": (),
+    "six_universe_qcom_exclusion_three_name_study.py": (),
+    "six_universe_qcom_exclusion_coverage10_projection.py": (),
+    "six_universe_qcom_exclusion_coverage10_study.py": (),
+    "accepted_risk_matched_historical_projection.py": ("call:read_text", "import:pathlib"),
+    "six_universe_matched_study.py": (),
+    "six_universe_qcom_exclusion_study.py": (),
+    "six_universe_qcom_exclusion_tilt_study.py": (),
+    "matched_mia_recovery.py": (),
+    "accepted_risk_latest_order_package.py": ("call:open", "import:os", "import:pathlib"),
     "accepted_risk_delta_order_package.py": ("import:pathlib",),
     "accepted_risk_massive_delta.py": ("import:os",),
     "accepted_risk_order_level_qc_projection.py": (
@@ -1539,9 +1736,28 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "six_universe_tilt80_submission.py": ("import:os", "import:pathlib"),
     "six_universe_tilt_ladder_submission.py": ("import:os", "import:pathlib"),
     "six_universe_settlement_submission.py": ("import:os", "import:pathlib"),
+    "six_universe_recent_settlement_submission.py": ("import:pathlib",),
+    "accepted_risk_six_universe_order_tilt_recent_qc_projection.py": (),
+    "accepted_risk_six_universe_order_relaxed_qc_projection.py": (
+        "call:__import__", "call:compile", "call:exec", "import:builtins",
+    ),
+    "accepted_risk_six_universe_recent_coverage_projection.py": (
+        "call:read_text", "import:pathlib",
+    ),
+    "six_universe_relaxed_selection_source.py": (),
+    "six_universe_relaxed_submission.py": (
+        "call:compile", "call:open", "call:read_bytes", "import:os", "import:pathlib",
+    ),
 }
 
 _QC_RUNTIME_IMPORTS = {
+    "accepted_risk_matched_diagnostics.py": tuple(
+        """
+        datetime decimal hashlib accepted_risk_six_universe_order_qc_runtime
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime
+        """.split()
+    ),
     "accepted_risk_order_level_input_runtime.py": tuple(
         """
         dataclasses gzip hashlib io itertools json re datetime decimal zoneinfo
@@ -1765,6 +1981,7 @@ _QC_RUNTIME_IMPORTS = {
     ),
 }
 _QC_RUNTIME_IO_SURFACE = {
+    "accepted_risk_matched_diagnostics.py": ("call:history",),
     "accepted_risk_order_level_input_runtime.py": (
         "call:contains_key",
         "call:read_bytes",
@@ -2673,8 +2890,11 @@ def test_records_are_frozen_slotted_and_copy_deepcopy_pickle_reauthenticate():
         assert not hasattr(value, "__dict__")
         with pytest.raises(dataclasses.FrozenInstanceError):
             value.real_qc_object_store_access_performed = True
-        with pytest.raises(AttributeError):
+        # Frozen slotted dataclasses may raise TypeError for unknown fields on
+        # Python 3.12; the invariant is refusal without installing the field.
+        with pytest.raises((AttributeError, TypeError)):
             value.unreviewed_field = True
+        assert not hasattr(value, "unreviewed_field")
         for reconstructed in (
             copy.copy(value),
             copy.deepcopy(value),
@@ -3016,6 +3236,10 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
         (
             "research.analyst_revisions_v2_qc.accepted_risk_massive_delta",
             "research.analyst_revisions_v2.canonical",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics",
+            "accepted_risk_six_universe_order_qc_runtime",
         ),
         (
             "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator",
@@ -3782,6 +4006,10 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "research.quantconnect",
         ),
         (
+            "research.analyst_revisions_v2_qc.six_universe_recent_settlement_submission",
+            "research.quantconnect",
+        ),
+        (
             "research.analyst_revisions_v2_qc.six_universe_settlement_submission",
             "research.quantconnect",
         ),
@@ -3806,6 +4034,10 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
 
 _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
     {
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics",
+            "accepted_risk_six_universe_order_qc_runtime",
+        ),
         (
             "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
             "accepted_risk_preliminary_rating_evaluator",
@@ -4251,6 +4483,8 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_market_cap_stock_portfolio_tilt",
         "research.analyst_revisions_v2_qc.accepted_risk_massive_delta",
+        "research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics",
+        "research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_objective_synthetic_leverage_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_order_level_benchmark",
@@ -4292,6 +4526,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_bridge_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_settlement_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_targets",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt100_floor_qc_projection",
@@ -4302,7 +4537,9 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_ladder_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_qc_runtime",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_recent_qc_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_tilt_targets",
+        "research.analyst_revisions_v2_qc.accepted_risk_six_universe_recent_coverage_projection",
         "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
@@ -4333,6 +4570,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.historical_preopen_input_adapter",
         "research.analyst_revisions_v2_qc.in_qc_preopen_terminal_stream",
         "research.analyst_revisions_v2_qc.lean_source_assembly",
+        "research.analyst_revisions_v2_qc.matched_mia_recovery",
         "research.analyst_revisions_v2_qc.object_store_read_contract",
         "research.analyst_revisions_v2_qc.owner_signature_authority",
         "research.analyst_revisions_v2_qc.physical_accepted_risk_archive",
@@ -4371,7 +4609,21 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.runtime_shard_projection",
         "research.analyst_revisions_v2_qc.six_universe_cap90_submission",
         "research.analyst_revisions_v2_qc.six_universe_coverage_submission",
+        "research.analyst_revisions_v2_qc.six_universe_matched_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_projection",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_ar_range_policy",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_projection",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_coverage10_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_dual_forward_policy",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_projection",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_tilt_study",
         "research.analyst_revisions_v2_qc.six_universe_r181_order_diagnostic",
+        "research.analyst_revisions_v2_qc.six_universe_recent_settlement_submission",
+        "research.analyst_revisions_v2_qc.six_universe_relaxed_selection_source",
+        "research.analyst_revisions_v2_qc.six_universe_relaxed_submission",
         "research.analyst_revisions_v2_qc.six_universe_settlement_submission",
         "research.analyst_revisions_v2_qc.six_universe_tilt40_submission",
         "research.analyst_revisions_v2_qc.six_universe_tilt80_submission",

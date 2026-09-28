@@ -1,0 +1,76 @@
+{
+  "activation_manifest_sha256": "9ee1013f429ed87e7b7a262cf352c5604cd532ce4eb3e9defffe23be31c39b35",
+  "candidates": [
+    {
+      "backtest_name": "ARV2 R222 all-six coverage25 tilt100 recent",
+      "candidate_id": "R222",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "17272fb5057ef927b5ec1105ed0560b6e2049401a981e82cc72d7840377b7366",
+      "meta_schema": "arv2-six-universe-order-runtime-meta-v1-all25-v1",
+      "profile_id": "arv2-six-universe-order-matched-revision-tilt100-recent-v1-all25-v1",
+      "profile_sha256": "5d428721d10ad8cb3b466c1bcc300325450f1b1a33d5c6cfb39888999201fabc",
+      "project_name": "144 ARV2 SIX COVERAGE25 TILT100 R222 202508 NOW",
+      "projection_schema": "arv2-six-universe-all25-tilt100-qc-projection-v1",
+      "projection_sha256": "52601ed2dfd282115b03b2403a8821b8cb180e30d7beb1749579b8b3ea32a754",
+      "role": "matched_revision_tilt100_all25_recent",
+      "source_file_count": 16,
+      "source_files_sha256": "09f189e7fa7244218ac874afe5519fcc149b578beed9d538cc9973f479f8f8b0",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES"
+      ],
+      "summary_schema": "arv2-six-universe-order-tilt100-recent-summary-v1-all25-v1",
+      "tilt_fraction": "1.00",
+      "total_source_bytes": 403664
+    }
+  ],
+  "comparison": "all_six_25pct_coverage_100pct_tilt_selection_change_not_AR_ablation",
+  "coverage_policy": [
+    [
+      "SPY",
+      "0.25",
+      "0.25",
+      "0.25",
+      5
+    ],
+    [
+      "QQQ",
+      "0.25",
+      "0.25",
+      "0.25",
+      5
+    ],
+    [
+      "SOXX",
+      "0.25",
+      "0.25",
+      "0.25",
+      5
+    ],
+    [
+      "XLV",
+      "0.25",
+      "0.25",
+      "0.25",
+      5
+    ],
+    [
+      "REMX",
+      "0.25",
+      "0.25",
+      "0.25",
+      5
+    ],
+    [
+      "XLE",
+      "0.25",
+      "0.25",
+      "0.25",
+      5
+    ]
+  ],
+  "input_control_directory": "/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/six_cap90_qc_control_20260923",
+  "package_sha256": "2649577ac55ac39de37a4a70ab4337274f1887e1a113f0972beefab615121be1",
+  "predecessor_manifest_sha256": "b8f7482c780bf48e83fa0ae6acd50a3b68e46ce5ebdfb215d356cf12a3697442",
+  "schema": "arv2-six-coverage25-family-v1"
+}

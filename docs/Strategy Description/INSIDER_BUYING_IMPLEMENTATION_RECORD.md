@@ -1,18 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **OWNER-AUTHORIZED FIXED 16-FILING SEC-ONLY COMPATIBILITY PILOT
-ACQUIRED, NONCANONICAL AND ZERO-LOOK (SECTION 98). THE FIRST 32 INDEX/HEADER
-REQUESTS AND XML-ONLY CONTINUATION'S 16 REQUESTS TOTAL 48 DISTINCT HTTP 200
-ARTIFACTS; ALL 16 ROWS ARE RETAINED AND STRUCTURALLY VALIDATED. RAW OBJECTS
-AND REPORTS STAY OUTSIDE GIT. THE ORIGINAL 2022Q4..2023Q1 IB-1B PILOT,
-FROZEN V1 HEADER RECIPE, AND ALL OTHER SOURCE CONTRACTS ARE UNCHANGED.
-FIRST-PASS CODE SHA IS OPERATOR-ATTESTED, NOT ARTIFACT-PROVEN; SEC TIMEZONE,
-OFFICIAL PROFILE, SOURCE AUTHENTICITY, CANONICAL/PIT STATUS, AND DIRECT
-IB-1C INGESTION REMAIN FALSE OR UNVERIFIED. NO OUTCOME, ETF, QC, BROKER,
-DEPLOYMENT, OR TRADING AUTHORITY; ALL LOOKS ZERO. CLAUDE INDEPENDENT REVIEW
-OF THE EXACT ONE-PUSH SNAPSHOT IS NEXT; CODEX COUNTER-REVIEWS EVERY CLAUDE
-COMMIT THEREAFTER. THE ONE-ROUND PUSH MONITOR WILL BE REARMED ONLY AFTER
-THE PUSH.**
+Status: **CLAUDE REVIEWED ALL SIX CODEX COMMITS IN `bebc235..f521757`
+(SECTION 99). `e0f884f`, `36a2edb`, AND `f521757` ARE ACCEPTED; THE ZERO-I/O
+PREPARATION `d9f023f` AND THE SEC RUNNER `f5430ff`/`5cc897d` ARE ACCEPTED
+AFTER TEST-ONLY CORRECTIONS IN `f41c093` (11 PINS) AND `cc40079` (22 PINS
+PLUS A TRANSITIVE CHECK THAT THE LANE PACKAGE LOADS NO NETWORKING MODULE).
+THE FIXED 16-FILING SEC PILOT VERIFIES INDEPENDENTLY: 48 REQUESTS, ALL HTTP
+200 ON THE FIRST ATTEMPT, 48 HASH-NAMED OBJECTS, 16 OF 16 XML IDENTITIES
+MATCH, THE CONTACT NOWHERE PERSISTED, ALL AUTHORITY FALSE. TWO P3 ITEMS OPEN:
+`IBSECACQ-CR03`, THE HEADER VALIDATOR REFUSES JOINT FILINGS (2,453 OF 99,394
+FORM 4/4-A, 2.5%); `IBSECACQ-CR04`, LANE NETWORK CODE IN THE SHARED
+`research/` ROOT. COMPLETE SUITE **9,132 PASSED, 38 SKIPPED, 0 FAILED**. THIS
+ROUND TOOK TWO PUSHES BECAUSE OF A REVIEWER SCRIPTING ERROR (SECTION 99.5).
+THE PILOT IS NONCANONICAL AND AUTHORIZES NO EXPANSION OR IB-1C PROCESSING. NO
+OUTCOME, QC, PAPER, LIVE, DEPLOYMENT, BROKER, CAPITAL, ORDER, OR TRADING
+AUTHORITY WAS OPENED; ALL LOOK COUNTERS REMAIN ZERO.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -202,6 +204,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Codex counter-review; input-gated, local only | `d3c10a4..bebc235` reviewed; this local record commit follows | Section-94 counter-review, provenance qualification, and next-source boundary | Accepted the sole Claude record commit after append-only documentation correction of filesystem inference. Independently matched both approved ZIP inventories, SEC-declared keys and quoting, canonical report/digests, and ten stage receipt member hashes. Recovered this task's exact prior command logs but could not attribute the directory timestamp changes. No code, profile, tests, shared files, real stage, or output artifact changed. | Incoming focused source/preparation, active-document and import-boundary checks including the exact Insider package guard: 1,276 passed in 22.06s; final record checks in 95.4. Independent source oracle: all 16 table counts and forms match, seven declared keys unique, OWNER_SIGNATURE duplicate rows 191/111, no blank keys, width errors or orphans. All 26 output-entry inode/size/mtime/ctime observations unchanged during this audit. No full lane/repository suite by Codex; 0 looks. | IB1BP-CR04 P3 OPEN, actor/action unestablished; IB1BP-CR05 P3 OPEN verified source-contract input, not a current defect. All earlier resolved and open findings retained in 95.3. No P0-P2 or new production defect. | No push while this owner-input gate blocks the next milestone. Supply exact matching XML/acceptance bundle for 99,394 Form 4/4-A accessions, then freeze/review bounded IB-1C-E preparation before processing; no retrieval authority inferred. Monitor PAUSED, not rearmed. |
 | 2026-09-27 | Codex counter-review + authorized preparation | `bebc235..e0f884f` counter-review; `d9f023f` preparation; this record commit follows | SEC-only acquisition preparation, synthetic and zero-I/O | Owner approved preparation after source guidance. Added exact-tuple, hash-bound request recipes and strict raw-header derived projections; retained raw bytes/hash and unverified lineage, no downloader or direct IB-1C integration. Prior counter-review accepted after append-only clarification; no shared file changed. | Focused 1,129 passed in 12.55s; new file 148 passed in 0.66s; eight in-memory mutants killed; independent 15 adversarial refusals plus valid control; targeted compilation and diff clean. Final record checks in 97.4; no full suite by Codex; 0 looks. | IBSEC-R01/R02 P2 draft provenance defects fixed red/green; IBSEC-R03 P3 ledger shape corrected append-only. Prior open and resolved ledger retained. No remaining verified P0-P2. | One combined push, then Claude reviews every commit after bebc235. Only after review/counter-review may separately authorized downloader/profile integration and an exact owner-approved fixed pilot proceed. No downloads, new quarter, XML processing, outcome, QC, deployment, or trading inferred. |
 | 2026-09-27 | Codex implementation + bounded SEC acquisition | `36a2edb..f5430ff..5cc897d`; this final record commit follows | Owner-approved fixed 16-filing SEC-only compatibility pilot | Built a standalone exact-inventory runner, then corrected the observed tag-header dialect with a versioned parser and hash-verified XML-only continuation. First pass acquired 16 indexes and 16 headers; continuation replayed those exact objects without refetch and acquired 16 XMLs. Final external report `722ab1b03c93d1d6aa61f798b2cb6a391a934ee8a334034eff2b5102cea40ec5` binds 48 distinct HTTP 200 artifacts / 48 attempts and all 16 retained acquired rows; raw artifacts remain outside Git. First-pass code SHA is operator-attested only, timezone and source authenticity unverified, no direct IB-1C or canonical/PIT claim. | First candidate 52 synthetic passed, affected selection 1,181 passed. Continuation 68 synthetic passed, affected selection 1,197 passed; compilation/import/active-document/package guard/diff green. Independent first/second report, journal, object, route and authority replay verified 48 regular single-link objects (113,902 bytes) and 0 / 0 / 0 looks. No complete suite by Codex. | IBSECACQ-R01..R07 P2 draft/real-dialect issues closed with red/green or exact replay; R08/R09 P3 provenance/pacing-observability limits remain open; R10 P3 route drift documented. Earlier ledger retained, no open new P0-P2. | Make one same-lane push, then arm the existing one-round Claude-push monitor against exact HEAD. Claude independently reviews every commit since `bebc235`; Codex counter-reviews every Claude commit. No further SEC acquisition, canonical IB-1C, outcome/ETF/QC/backtest, paper/live or trading step inferred. |
+| 2026-09-28 | Claude review | `f521757` -> `f41c093` and `cc40079` (test pins; pushed early, see findings) -> this review record | Independent review of the section-95 counter-review, the zero-I/O SEC acquisition preparation, and the owner-authorized fixed 16-filing SEC pilot with its continuation (`bebc235..f521757`, 6 commits in two Codex pushes, 0 merges) | Reviewed `36a2edb` in read-only exports while Codex's next work was still local, then waited, as the owner chose, for Codex's next push instead of forcing a conflicting rebase. Dispositioned all six commits; read the runner's transport, budget, continuation, XML, and tag-header code; verified both external acquisition roots read-only; counted multi-owner Form 4/4-A filings in the two tracked ZIPs; ran 84 direct and 4 combined mutants with bytecode caching disabled; added 33 isolating tests and a transitive offline-package check. No SEC request, network access, or pilot rerun. | Pushed `f521757`: complete suite **9,098 passed, 38 skipped, 0 failed in 536.86s**; runner tests pass with networking blocked; mutation preparation **21 of 42**, runner **22 of 42**. Live roots: 48 requests all HTTP 200 first attempt, 32 + 48 objects hash-named, reports match commit markers, 16 of 16 XML identities, 0 email-shaped strings. Final `cc40079`: complete suite **9,132 passed, 38 skipped, 28 warnings, 0 failed in 545.30s**; lane gate **2,934 passed, 0 skipped in 44.51s**; mutation preparation **35 of 42**, runner **40 of 42**, survivors classified; compileall exit **0**. Python 3.13.15, pytest 9.1.1. **0 looks**. | `IBSEC-CR01` P3 closed in `f41c093`. `IBSECACQ-CR01` and `CR02` P3 closed in `cc40079`. `IBSECACQ-CR03` P3 open (joint filings refused; 2,453 of 99,394). `IBSECACQ-CR04` P3 open (lane network code in shared `research/` root). Process: this round took two pushes (`f521757..cc40079`, then this record) because the reviewer's final script pushed after a failed record insertion. `IBSECACQ-R08`/`R09`, `IB1BP-CR04`/`CR05`, and earlier P3 items retained. No P0-P2. | Codex counter-reviews `f41c093`, `cc40079`, and this record. Before any expansion: a decision on multi-owner headers, a reviewed versioned raw-parent/projection contract, and disposition of the first-pass provenance items. No outcome, QC, paper, or trading step is inferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -13026,3 +13029,170 @@ security-master/calendar audit still lacks its main-line venue/executor;
 IB-3 diagnostics remain paused. The owner requested a single combined push
 and a monitor for Claude's next pushed review; rearm that monitor only after
 the push, with the exact pushed HEAD as baseline.
+
+## 99. Claude review - SEC acquisition preparation and the fixed 16-filing SEC pilot (2026-09-28 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying` (owner's Mac, Python 3.13.15, pytest 9.1.1).
+No branch, worktree, fork, or handoff was created or switched to.
+
+Range: `bebc235..f521757`, six commits, zero merges, in two pushes by Codex.
+The first push ended at `36a2edb` (sections 95-97 and the zero-I/O
+preparation module) while Codex's next commit and edits stayed local in the
+shared worktree. This reviewer reviewed exactly `36a2edb` in read-only
+exports and did not read, run, or disturb that local work. Pushing a review
+record then would have forced Codex into a conflicting rebase of the same
+record file it was editing, so the owner chose that this review wait and
+land after Codex's next push. That push ended at `f521757` (the SEC runner,
+its continuation, and section 98); the worktree was then clean and equal to
+the remote. Mutation runs used read-only exports with `python -B`,
+`PYTHONDONTWRITEBYTECODE=1`, and a cache purge before every mutant.
+
+Authority. Section 96.1 quotes the owner authorizing the zero-I/O
+preparation; section 98.1 records the owner authorizing the fixed 16-filing
+SEC-only pilot, supplying the contact out of band, and waiving this review
+as a prerequisite. This reviewer did not witness either statement; both are
+recorded plainly and the pilot stayed inside its stated ceilings (99.4). No
+SEC request, network access, or pilot rerun was made by this review. Real
+bytes read: the two Codex acquisition roots outside the repository (commit
+markers, reports, journals, inventories, and the 48 stored objects), read
+only, and the two tracked quarterly ZIPs for an aggregate owner count.
+
+### 99.1 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `e0f884f` | Section 95: counter-review of `bebc235`; `IB1BP-CR04` qualification; 99,394-accession input gate | **Accepted.** The qualification is fair: a directory modification time shows that an entry was added, removed, or renamed, not specifically created and removed, and the recovered logs do not identify the actor. `IB1BP-CR04` stays open and non-blocking. Its independent counts reproduce this reviewer's 94.3 oracle exactly. |
+| `d9f023f` | `sec_acquisition_preparation.py` (request recipe and colon-labelled header projection), 148 tests | **Accepted after test-only correction (`f41c093`).** Pure (standard library and lane modules; passes the package guard); strict, role-scoped parsing; exact native-offset capture time; explicit Eastern policy that refuses both 2022-11-06 and 2023-03-12 transition hours; raw header kept beside a separately hashed derived JSON; every authority false. Eleven guards had no effective test (`IBSEC-CR01`). Its header dialect is the colon-labelled `<SEC-HEADER>` found inside the complete submission text file; the `.hdr.sgml` files the pilot fetched use tag lines instead, which is why section 98's first live run refused all 16 before any XML request (`IBSECACQ-R05`). That was the fail-closed outcome the design intended. |
+| `36a2edb` | Sections 96-97, status, ledger row | **Accepted.** 148 and the 1,129 selection reproduce; `IBSEC-R03`'s ten-column supplement is correct. |
+| `f5430ff` | `research/insider_buying_sec_acquisition.py`, first-pass runner and 52 tests | **Accepted after test-only correction (`cc40079`).** See 99.2. |
+| `5cc897d` | Tag-line header validator, receipt replay, XML-only continuation, 68 tests | **Accepted after test-only correction (`cc40079`), with two open P3 items** (`IBSECACQ-CR03`, `CR04`). |
+| `f521757` | Section 98, status, two ledger rows | **Accepted.** Every figure checked against the external roots reproduces (99.4); `IBSECACQ-R08` and `R09` are correctly left open. |
+
+Ratings: `d9f023f` **7 of 10** (careful and fail-closed; 21 of 42 guard
+mutants caught as pushed, and several existing tests that seem to cover a
+direction are refused earlier by a different check). The runner
+(`f5430ff` with `5cc897d`) **7 of 10** as code: transport, journal, and
+publication discipline are strong and the live operation was clean, but 22
+of 42 guard mutants were caught as pushed, including the XML DTD refusal,
+wrong-form or wrong-issuer XML, and the continuation's stop after an SEC
+denial.
+
+### 99.2 Code review of the SEC runner
+
+- Transport: one HTTPS connection to the literal host `www.sec.gov` with
+  Python's default certificate verification; the path must match one
+  accession directory; any non-200 status is returned without following a
+  redirect; a 200 needs exactly one `Content-Length` of at most 2 MiB, no
+  compression, no chunking, and an exact-length body. HTTP 403 or 429 stops
+  the whole run; 5xx is retried within three attempts per artifact.
+- Budget: 144 attempts, 48 distinct artifacts, three attempts per artifact,
+  and a 0.5-second minimum between request starts, all enforced before each
+  request; every attempt is journalled and fsynced before the request.
+- Continuation: before creating output or requesting anything, it replays
+  the first pass's report, inventory, journal, and all 32 objects, re-derives
+  each index-named filename and tag-header identity, seeds the journal at 32
+  with those paths forbidden, and then requests only the 16 XML files.
+- Contact: taken with `getpass`, used only in the `User-Agent` header, and
+  never written. None of the journals, commit markers, inventories, or
+  reports in either root contains an email-shaped string (99.4).
+- XML check: strict UTF-8, no BOM, no foreign declaration, no DTD or entity,
+  root `ownershipDocument`, a unique document type and issuer CIK equal to
+  the approved row. Structural only, as section 98 says.
+- Placement: the runner is lane code at the root of the shared `research/`
+  package, deliberately outside `research/insider_buying/` so that package
+  stays network-free. That package guard only checks direct imports; see
+  `IBSECACQ-CR02`.
+
+### 99.3 Mutation evidence and tests added
+
+Preparation module, 42 direct and 4 combined mutants: **21 of 42** on
+`36a2edb`, **35 of 42** after `f41c093`. The seven survivors: moving the EDT
+end boundary by one hour has no effect because that hour is already refused;
+the rest are backed by a sibling check (combined mutants caught) or by the
+target's own nonzero-CIK and row-hash checks.
+
+Runner, 42 direct mutants: **22 of 42** on `f521757`, **40 of 42** after
+`cc40079`. The two survivors: the entry-time 144-attempt check is backed by
+the same check inside the retry loop; the fixed-inventory drift check sits
+in `select_fixed_pilot`, which every test replaces and only the live run
+exercised (and it passed there).
+
+`cc40079` also adds the transitive boundary test. With a lane module
+edited to import the runner, the existing direct-import package guard still
+passes and the new test fails; restored, it passes.
+
+### 99.4 Live-artifact verification (read-only)
+
+| Check | First pass `.../insider_buying_sec_pilot_2022q4_2023q1_f5430ff` | Continuation `.../insider_buying_sec_xml_continue_2022q4_2023q1_5cc897d` |
+|---|---|---|
+| Report file SHA-256 equals commit marker and filename | `410bbb07...81f642`, yes | `722ab1b0...40ec5`, yes |
+| Stored objects: count, total bytes, name equals content hash, single link | 32, 28,001, all | 48, 113,902, all |
+| Journal: reserved/response events, statuses, ordinals, attempt numbers | 32/32, all 200, 1..32, all first attempts | 16/16 plus one replay event, all 200, 33..48, all first attempts |
+| Request kinds | 16 `index.json`, 16 `.hdr.sgml`, 0 XML | 16 XML only |
+| Row status; `acquisition_available` | 16 quarantined; false | 16 `acquired_noncanonical`; true |
+| Canonical, PIT, IB-1C, authenticity, official-profile flags; look counters | all false; 0/0/0 | all false; 0/0/0 |
+| Email-shaped strings in journal, commit, inventory, report | 0 | 0 |
+
+An independent parse of the 16 stored XML objects confirms root
+`ownershipDocument`, no DTD or entity, and document type and issuer CIK
+equal to each approved row: **16 of 16**. Total requests 48, attempts 48,
+inside the owner's 48-artifact, 144-attempt ceiling.
+
+### 99.5 Validation
+
+- Complete repository suite on `f521757` in the clean worktree: **9,098
+  passed, 38 skipped, 28 warnings, 0 failed in 536.86s** = 8,882 + 148 + 68.
+- Complete suite on the pushed `36a2edb` in a read-only export: 39 failed,
+  8,987 passed, 42 skipped; all 39 are the git-dependent tests that fail
+  identically in an export of `bebc235`, whose worktree suite was green.
+- The runner's 68 tests pass with outbound connections blocked in the
+  interpreter.
+- Final tree after `cc40079`: preparation file **159 passed**; runner file
+  **91 passed**; complete repository suite **9,132 passed,
+  38 skipped, 28 warnings, 0 failed in 545.30s** = 9,098 + 11 + 23 new tests;
+  lane gate (19 Insider files plus the four boundaries, now including both
+  SEC test files) **2,934 passed, 0 skipped in 44.51s**; `compileall` exit 0;
+  `git diff --check` clean; `git show --check` clean for all six reviewed
+  commits.
+- Push accounting, stated plainly: a scripting error in this reviewer's
+  final step stopped the record insertion but still ran the push, so
+  `f41c093` and `cc40079` reached the remote in one push without this record,
+  and this record commit follows in a second push. The owner's rule is one
+  push per round; this round has two. No history was rewritten to hide it.
+
+### 99.6 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSEC-CR01 | P3 | **CLOSED in `f41c093`** (test only) | `d9f023f` | `tests/test_insider_buying_sec_acquisition_preparation.py` | Eleven guards could be deleted without a test failing: owner-window period scope for a coherent 2023Q2 target; the Eastern-policy window for an acceptance inside the filing-day envelope; a second `<SEC-HEADER>` tag mid-line; an indented root role; a second `ISSUER` section (the first was silently used); control bytes; non-ASCII bytes; the 2 MiB cap on a structurally valid header; the 255-character cap on a well-formed filename; a forged plan target order; a plan subclass. | Mutants A15, A16, A18, A23, A28, A29, A30, A35, A36, A39, A42 survived on `36a2edb`. | The period guard is the only check that keeps a target inside the owner-approved window; the others decide what header bytes are accepted. The module is correct on all eleven. | Eleven tests, each with an otherwise-valid input. No module change. | 159 passed; all eleven mutants caught. |
+| IBSECACQ-CR01 | P3 | **CLOSED in `cc40079`** (test only) | `f5430ff`, `5cc897d` | `tests/test_insider_buying_sec_acquisition.py` | Twenty runner guards had no effective test: compression and chunking with a valid length (the existing cases lacked a length, so the length check refused first); XML DTD/entity in UTF-8 with a complete identity (the UTF-16 case is refused by the decode, the UTF-8 case lacked an issuer), BOM, foreign encoding declaration, wrong root, wrong form or issuer; duplicate keys inside an index item and the 512-item cap; tag-header envelope, accession field, foreign preamble field, role order, `COMPANY-DATA` first, and CIK outside `COMPANY-DATA`; continuation availability with one refused XML; continuation stop after an SEC denial; XML path drift; the first-pass code attestation at both sites; and `HEAD` equal to the declared commit. | Mutants S06, S07, S15-S18, S20-S22, S25, S27-S31, S33, S37, S39, S40, S42 survived on `f521757`. | These include the checks that keep entity expansion, a wrong filing, and requests after an SEC access denial out of the next use of the runner. The code is correct on all of them. | Twenty-two tests, each isolating one guard. No module change. | 91 passed with networking blocked; 40 of 42 mutants caught. |
+| IBSECACQ-CR02 | P3 | **CLOSED in `cc40079`** (test only) | `f5430ff` | Lane package boundary | The package guard checks only direct imports. The runner imports `http.client`, `ssl`, `socket`, and `subprocess` and sits one import away, so a lane module importing it would bring networking into `research.insider_buying` without any test failing. The project rules ask for a transitive check whenever such a path appears. | Importing every lane module loads none of those modules today; importing the runner loads all four. | Keep the lane package offline in fact, not only by direct-import spelling. | A test imports every `research.insider_buying` module in a fresh interpreter and fails if any networking module, or the runner itself, is loaded. | Red with a lane module edited to import the runner (direct guard still green); green restored. |
+| IBSECACQ-CR03 | P3 | **OPEN; scaling input, needs a decision before any expansion** | `5cc897d` | `_validate_tag_header` role topology | The tag-header validator requires exactly one `REPORTING-OWNER`. Joint filings list several. In the two approved quarters, **2,453 of 99,394** Form 4/4-A accessions (2.5%) have 2 to 10 reporting owners (2022Q4: 1,302 Form 4 and 27 Form 4/A; 2023Q1: 1,095 and 29), and every one would be refused. | Aggregate count from `REPORTINGOWNER.tsv` joined to `SUBMISSION.tsv` in the tracked ZIPs. The 16-filing sample had none. | Fail-closed, so nothing wrong is accepted, but a real strategy cannot silently lose joint filings, which matter when buyers are counted. | None now. A later reviewed validator version should accept one or more owner sections in a fixed order and keep each owner's identity. | Measured for these two quarters only. |
+| IBSECACQ-CR04 | P3 | **OPEN; placement, settle at integration** | `f5430ff` | `research/insider_buying_sec_acquisition.py` | Lane-specific network code lives in the root of the shared `research/` package. It keeps the lane package offline (now pinned by `IBSECACQ-CR02`), but it is a lane module in a shared namespace with no registry entry. | File location; section 96.1. | Like `IBSH-CR01`, a one-time integration decision rather than a lane fix. | None. | This row. |
+| IBSECACQ-R08, IBSECACQ-R09 | P3 | **OPEN, retained as Codex recorded** | `f5430ff` | First-pass code SHA; first-pass pacing timestamps | As section 98.4 states. | Section 98.4; the first report and journal carry neither field. | Unchanged. | None. | Verified absent in the first root. |
+| IB1BP-CR04, IB1BP-CR05, IB2CTX-CR02, IBZIP-CR02, IBZIP-CR03, IB2SRC-CR03 | P3 | **Retained as recorded** | earlier | earlier | As recorded in sections 94-98. | Earlier sections. | Unchanged. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. | Sections 68-72. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no P0, P1, or P2 finding.
+
+### 99.7 Next action
+
+Codex counter-reviews every Claude commit after `f521757` (`f41c093`,
+`cc40079`, and this record commit), across both of this round's pushes. The 16-filing compatibility pilot is
+complete and verified; it is not canonical evidence and does not authorize
+IB-1C to IB-1E processing, more filings, or another quarter. Before any
+expansion, the owner and Codex need: a decision on multi-owner headers
+(`IBSECACQ-CR03`); a reviewed, versioned contract for the raw index, header,
+and XML parents and their derived projection (section 98.5); and the
+first-pass provenance items (`IBSECACQ-R08`, `R09`) either accepted or
+superseded by a fresh, fully bound run. The shared security-master and
+calendar audit still has no venue or executor; IB-3 diagnostics stay
+paused. No outcome, ETF, QC, paper, live, deployment, broker, capital,
+order, or trading authority follows from this section.
+
+No SEC request, network access, credential, licensed row, security master,
+outcome, ETF holding, QuantConnect, broker, operator database, scheduler,
+deployment, capital, order, live, or trading surface was used by this
+review. Authorized outcome looks: **0**. Consumed outcome looks: **0**.
+Research looks: **0**.

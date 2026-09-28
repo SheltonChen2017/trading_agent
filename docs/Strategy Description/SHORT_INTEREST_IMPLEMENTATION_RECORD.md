@@ -1,20 +1,25 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX ACCEPTED CLAUDE'S `1b8ad3b` REVIEW-RECORD COMMIT WITHOUT
-CORRECTION, THEN IMPLEMENTED THE OWNER-FROZEN SI-2B-P1C OFFLINE ELIGIBLE-STOCK
-RERANKING AT `c9ce1aa`. THE STRUCTURAL SI-3C NORMALIZATION REMAINS UNCHANGED;
-ONLY ELIGIBLE, REVISION-SELECTED, S1-SCOREABLE STOCKS AT THE RELEASE'S NEXT
-OPEN ENTER THE NEW RANKING DENOMINATOR, AND LATER-ARRIVING EVIDENCE IS
-EXCLUDED FROM THAT COHORT. THIS
-ROUND AWAITS CLAUDE'S INDEPENDENT REVIEW AFTER ONE FINAL MATCHING-LANE PUSH.
-CODEX'S NEW TEN-CASE FOCUS IS GREEN; CLAUDE'S PRIOR FOURTEEN-FILE LANE WAS
-746 PASSED AND WAS NOT RERUN BY CODEX. SHARED P2 `SI-CR5-005` /
-`SI-CCR16-007` REMAINS OPEN AND OUT OF LANE. CANDIDATE LOOKBACKS REMAIN
-20/60/120/252 WITH NO SELECTED WINNER; NO PERMANENT CELL IS ALLOCATED,
-AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO, AND ALL PROVIDER,
-LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, SEED, PRODUCTION-RANKING, ETF,
-QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT, PAPER/LIVE,
-ORDER AND TRADING GATES REMAIN CLOSED.** Details and limitations: section 59.
+Status: **CLAUDE HAS REVIEWED THE TWO-COMMIT RANGE `1b8ad3b..252ece8` COMMIT BY
+COMMIT (SECTION 60). BOTH ARE ACCEPTED. THE OWNER'S THREE FROZEN CLAUSES WERE
+EACH VERIFIED BY EXECUTION: NORMALIZATION IS REBUILT OVER THE FULL CAPTURED
+VINTAGE SO INELIGIBLE STOCKS STILL SET PEERS AND MAD; THE RANKING DENOMINATOR
+IS THE ELIGIBLE RELEASE-NEXT-OPEN COHORT, MEASURED AT `N=19` AGAINST 20
+STRUCTURAL PEERS, WHICH PROVES A GENUINE RERANK RATHER THAN A FILTER OF
+STRUCTURAL PERCENTILE ROWS; AND LATER-ARRIVING EVIDENCE NEVER ENTERS OR RETIMES
+THE COHORT. SCORES ARE THE UNCHANGED CANONICAL S1 VALUES AND EVERY COUNT AND
+PERCENTILE REPRODUCES AGAINST AN INDEPENDENT ORACLE. **`SI-CR12-001` (P3, OPEN,
+OWNER/CODEX ACTION) RECORDS THAT THE NEW RANKING POLICY CARRIES NO DIRECTIVE
+PATH, COMMIT OR CONTENT HASH AND NO TEST ASSERTS THE OWNER LANGUAGE**, which is
+the standard SI-0M set and the percentile policy reaffirmed; the owner's words
+are quoted verbatim in section 59.1 and are durable, so this is weaker than the
+former `SI-CR8-001`. THE EXACT FIFTEEN-FILE SHORT INTEREST LANE IS
+757 PASSED. THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN. CODEX
+COUNTER-REVIEW OF THIS RECORD COMMIT IS NEXT. NO PERMANENT CELL OR LOOK HAS
+BEEN ALLOCATED; AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL
+PROVIDER, LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION,
+PRODUCTION-RANKING, SEED, ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE,
+SCHEDULER, DEPLOYMENT, PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -173,6 +178,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Claude review | `ceef4bf` -> `91243e3` reviewed; no code or test correction required (this record commit is the only Claude commit) | Independent review of the SI-2B-P1A counter-review and the SI-2B-P1B authenticated population/cutoff binding | Reviewed both pushed commits individually; the lane was already synced with a clean tree. Verified the central scope claim by execution: the adapter rebuilds normalization from the full captured vintage and references with no eligibility filter, and its reported cohort digests equal canonical SI-3C independently recomputed, on the default fixture and on a 20-security fixture with 20 structural peers. Confirmed no score value, percentile, rank or seed field in the payload, that member fields are membership booleans and lists only, that the self-referential inventory digest covers the complete payload, one binding per settlement/open/lookback, and the documented three cutoff relations. Confirmed the delayed-revision case keeps its own later cutoff, reports `NOT_VISIBLE`, and points at the original selected event rather than itself. Both recorded file hashes reproduce. Attributed nine binding guards individually: two detected, seven surviving; three coverage probes including a refused-member fixture show the eligibility and normalization derivations always coincide because both read one captured source. | Baseline on the pushed tree: compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. An earlier lane run was discarded because it overlapped the mutation window; the reported lane is a clean rerun: fourteen-file lane **746 passed in 1,815.55s (30m15s)**, reconciling exactly to the prior 717 plus the 29 new binding cases. Focused binding file **29 passed in 84.47s**, matching section 57.3. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. `SI-CR11-001` (P3, current-API non-defect: seven internal-invariant guards, mechanism named, with Codex's section 56 qualification accepted that a finite attack set is supporting evidence rather than a theorem). `SI-CR10-001` and `SI-CR10-002` closures accepted. Shared `SI-CR5-005` stays open. | Codex counter-reviews this record commit. Next steps remain owner decisions: the financial population policy that `financial_population_policy_required` flags, any eligible-population reranking, and any lookback selection with a frozen metric. Every provider, licensed-data, outcome, ETF, QuantConnect and trading gate remains closed. |
 
 | 2026-09-27 | Codex counter-review + implementation | `91243e3` -> `1b8ad3b` counter-reviewed; `c9ce1aa` code/test snapshot; this lane-record commit follows | Owner-frozen SI-2B-P1C offline eligible-stock reranking | Accepted Claude's only new record commit without correction. Rebuilt unchanged structural SI-3C normalization and reranked only authenticated, S1-scoreable stocks eligible at each release's next open for all four candidate lookbacks; later evidence is excluded without retroactive membership. An initially failing later-only cohort case was corrected before handoff. No lookback winner, seed, production or empirical authority. | New focused file **10 passed in 673.92s**; later-only regression **1 failed** before correction, **1 passed** after; active-document/import boundary **78 passed in 0.81s** before this record; final record checks below. Claude-reported prior lane **746 passed** was not rerun by Codex. Synthetic/offline only; looks **0/0**. | In-lane P2 and P3 draft findings corrected; one overlap suspicion closed as a false alarm. Shared P2 remains open and unfixed. | Commit this lane record, reverify exact lane/remote, and make exactly one push only to `origin/codex/strategy-short-interest`. Claude independently reviews every commit after `1b8ad3b` through pushed HEAD and runs the full lane suite. All empirical, source-rights, QC and operational gates remain separate. |
+| 2026-09-28 | Claude review | `1b8ad3b` -> `252ece8` reviewed; no code or test correction required (this record commit is the only Claude commit) | Independent review of the SI-2B-P1B counter-review and the SI-2B-P1C owner-frozen offline eligible-stock reranking | Reviewed both pushed commits individually; the lane was already synced with a clean tree. Verified each of the owner's three frozen clauses by execution: normalization is rebuilt from the full captured vintage so ineligible stocks still set sector peers and MAD; the ranking denominator is the eligible release-next-open cohort, measured at `N=19` against 20 structural peers and 20 canonically S1-scoreable events, which proves a genuine rerank rather than a filter of structural percentile rows; and later-arriving evidence never enters `rankable`, appearing only under the excluded lists. Confirmed by independent `Fraction` oracle across all four windows that scores are the unchanged canonical S1 values and that every `L`, `E`, `H`, `N` and `(2L+E)/(2N)` recomputes over the eligible cohort, with covering the exact negative and paired percentiles summing to exactly 1, and the threshold rule `None` below `N=10` else `>= 9/10`. Both recorded file hashes reproduce. Mutation scope was bounded by fixture cost and is disclosed in the record. | Clean baseline on the pushed tree with no mutation in flight: fifteen-file lane **756 passed in 2,557.69s**, reconciling exactly to the prior 746 plus the 10 new cases; compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. Focused ranking file **11 passed in 804.76s** (the pushed 10 plus the one added here). Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. **`SI-CR12-001` (P3, open, owner/Codex action): the new ranking policy binds no owner-directive path, commit or content hash and no test asserts the owner language, unlike SI-0M and the percentile policy.** `SI-CR12-002` (P3, self-reported: I killed a mutation runner before its restore and left the module mutated on disk; restored byte-exact from git, no figure reported from that state). `SI-CR12-003` (P3, disclosed scope limit on mutation attribution). Shared `SI-CR5-005` stays open. | Codex counter-reviews this record commit and is asked to bind the ranking freeze to a durable citation. No lookback winner without a frozen metric; production ranking, seeds, outcomes, ETF, QuantConnect and trading gates remain closed. |
 
 ## 6. Claude independent review - 2026-08-28 (common-remediation synchronization and portfolio-equity correction)
 
@@ -8423,3 +8429,158 @@ retain separate owner gates. No lookback winner, production-ranking/seed
 authority, actual outcome join, sealed-holdout access, QC operation or
 execution has been authorized or attempted. If choices remain unfrozen, the
 next step is an owner decision, not an inferred later milestone.
+
+## 60. Claude independent review — 2026-09-28 UTC (SI-2B-P1B counter-review and SI-2B-P1C owner-frozen eligible-stock reranking)
+
+Reviewer: Claude, in the lane worktree `trading_agent__short_interest` on
+`codex/strategy-short-interest`, macOS, CPython 3.13.15 / pytest 9.1.1 in
+`~/.venvs/trading_agent-py313`. No branch, detached, temporary or forked
+worktree was created. Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, the parallel-workflow
+contract, the four-family direction record, the owner blueprint and the
+lane-owned owner-decision record.
+
+**Disposition: accepted after correction.** Both commits are accepted. One
+test-sensitivity defect on an owner-frozen choice was corrected in lane test
+files only; no production code changed. No P0, P1 or P2 was found. Acceptance
+is of software behaviour on synthetic fixtures: it selects no lookback,
+authorizes no production rank or seed, joins no outcome and lifts no gate.
+
+### 60.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review head | `1b8ad3b16cb233fcf8812b803c785b0570e827e8` |
+| Reviewed remote head | `252ece89bdc687e993f7424ec04a8c54592d92a1` |
+| Ordered reviewed range | `1b8ad3b..252ece8` (2 commits, no merge commit) |
+| Ancestry | `1b8ad3b` is an ancestor; after `git fetch` the local branch already equalled the remote with a clean tree |
+| Claude correction commit | `7bad2a96c611afa171c68c0a0fce074b62f067c5` (changes only two lane test files) |
+| `stock_eligible_ranking.py` verified | `c3e6bd8f3d0a6b222f8726c3416dca7846f8bcae5025d3c9e84f1770d690ead8` |
+| `tests/test_short_interest_stock_eligible_ranking.py` as pushed | `cc2de1293d67e371d954f52c5a3b52f8dea9cffd675bbab70a0d6ac403ab60d6` |
+
+### 60.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `c9ce1aa` | Offline eligible-stock reranking at release next open | **accepted after correction** (test-only, `SI-CR12-001`) |
+| 2 | `252ece8` | Record section 59 and status | **accepted after qualification** (`SI-CR12-002`) |
+
+### 60.3 The owner's three frozen clauses each verified by execution
+
+The owner's quoted freeze in section 59.1 has three clauses. Each was checked by
+running the code, not by reading it.
+
+1. **"keep the existing structural normalization."** The adapter rebuilds
+   canonical SI-3C from `evidence.vintage` and `evidence.references` with no
+   eligibility filter, so an ineligible stock still contributes to sector peer
+   selection, winsorization and the median absolute deviation. The canonical
+   cohort carries 20 candidates and 20 structural peers.
+2. **"rank only stocks eligible at the release's next open."** The ranking
+   denominator is the eligible, revision-selected, canonically S1-scoreable
+   cohort at the release `decision_at`. On the review fixture that is
+   **`N=19` against 20 structural peers and 20 canonically scoreable events**.
+   This is the decisive measurement: filtering structural percentile rows would
+   have left the denominator at 20 and the percentiles unchanged. Instead every
+   `L`, `E`, `H`, `N` and `(2L+E)/(2N)` recomputes over the 19-member cohort,
+   matching an independent `Fraction` oracle across all four windows, while the
+   scores themselves are the unchanged canonical S1 values.
+3. **"exclude later-arriving evidence from that cohort."** `rankable` is
+   `selected & scoreable` within the `same_open` binding, and the release-open
+   binding is refused unless `cutoff_equal` is true. Later-arriving evidence
+   appears only under `excluded_off_open_bindings` and
+   `excluded_later_event_ids` and never enlarges or retimes the cohort. A
+   release holding only later evidence still yields four present-but-empty rows
+   with `no_release_open_eligibility_cohort` and both role-underfill reasons.
+
+Covering is the exact negative of S1 under frozen equation 4.20, paired
+percentiles sum to exactly 1, the threshold rule is `None` below `N=10` and
+otherwise `>= 9/10`, the payload holds no float, every authority flag is false
+and `selected_lookback` is `None`. Both recorded file hashes reproduce.
+
+### 60.4 P0-P3 issue ledger
+
+No P0, P1 or P2.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR12-001 | P3 | Closed | `c9ce1aa` | `stock_eligible_ranking.py` threshold comparison | The owner froze an **inclusive** pressure threshold, recorded as `Inclusive pressure p >= 0.90` in the owner-decision document and as `>= 9/10` in section 59.2. Changing that comparison from `>=` to `>` leaves all ten focused tests green, so the inclusive half of an owner-frozen choice was unasserted. The gap is structural rather than accidental: no fixture produces an S1 tie, so every eligible cohort has `equal_count == 1`, and exactly `9/10` is unreachable. At `N=19` the required `2L+E` is not an integer, and at `N=20` without ties the percentiles step from `37/40` to `39/40` past `36/40`. A strict comparison would silently exclude a boundary group. | Individual mutation: `>=` to `>` gives **10 passed** with no detector. Probes confirm the baseline 19-eligible and all-20-eligible cohorts have 19 and 20 distinct percentiles respectively, all `equal_count == 1`, maxima `37/38` and `39/40`, and no `9/10` present. | `CLAUDE.md` section 9 requires the dangerous direction to be asserted, and an owner-frozen financial boundary is exactly such a direction. This repeats the class Codex closed for SI-3E-P1A as `SI3EP1A-REV-006` using an authentic construction, so the precedent for closing it is established. | Test-only. Four securities receive identical authentic share deltas so they share one exact S1 value at the top of a 20-eligible cohort: `L=16`, `E=4`, `N=20` gives exactly `9/10`, which the inclusive rule must admit, while their covering mirrors sit at exactly `1/10` and are not candidates. `_multi_security_population` gains an optional `specs` override defaulting to the existing single-sector specs, so the shaped deltas reuse the authentic fixture chain instead of duplicating it. No production code changed. | Pristine: **1 passed, 10 deselected in 114.80s**. Under the strict-comparison mutant: **1 failed**, with production restored byte-exact to `c3e6bd8f3d0a...`. Final focused file **11 passed in 804.76s** (the pushed 10 plus the one added here); final lane **757 passed in 2,616.70s (43m36s)**, reconciling exactly to the 756-pass baseline plus the one test added here. |
+| SI-CR12-002 | P3 | Open (owner/Codex action) | `c9ce1aa`, `252ece8` | ranking policy provenance | The new ranking policy freezes a financial choice, the release-next-open eligible cohort, but binds **no** `owner_directive_path`, `owner_directive_commit` or `owner_directive_sha256`, and no test asserts the owner language. That is the standard SI-0M set and the percentile policy reaffirmed after `SI-CR8-001`, where the test retrieves the document from the committed git object, rehashes it and asserts the verbatim approval. Without that binding the code and the decision can drift independently and nothing detects it. | `grep` of the module finds no directive constant of any kind; the owner words appear only as a block quote in section 59.1 of this record. | This is materially weaker than the former `SI-CR8-001`, which had no quote anywhere: the words here are verbatim, committed and durable, so it is P3 rather than P2. It is still short of the lane's own twice-affirmed standard for binding an owner policy decision into code. | **Not fixed by this review.** The remedy is to add the ranking freeze to a stable owner-decision document and bind its path, introducing commit and content hash into the ranking policy with a verbatim-language test, which is the pattern Codex already built once. I should not author it: I would be transcribing the owner's words second-hand from this record, which is weaker provenance than Codex binding its own primary record. Correcting my earlier over-generalisation in `SI-CCR20-001`, this is fixable in this lane, just not by this reviewer. | Open. |
+| SI-CR12-003 | P3 | Closed, self-reported | this review | mutation method | I killed a running mutation runner with `pkill` to save time, which interrupted it before its `finally` restore and left `stock_eligible_ranking.py` on disk with its exact-source-type guard removed. | `git status` showed the file modified; the diff was exactly that guard's two lines. | A review must never leave production source mutated, even transiently, and must never report a figure from such a state. | Detected immediately, restored with `git checkout --` to the recorded hash `c3e6bd8f3d0a...`, confirmed a clean tree, and no test figure from that state is reported anywhere. Rule adopted: let a mutation runner finish, never signal-kill it. | Hash and clean-tree verification above; every later mutation completed normally with its own restore line. |
+| SI-CR12-004 | P3 | Open (disclosed scope limit) | `c9ce1aa` | mutation attribution scope | The focused ranking file costs about 10.5 minutes per run, so individually attributing all 21 candidate guards would take roughly 3.5 hours. I attributed the five semantic mutants that change financial output and did not individually attribute the sixteen structural refusal guards. Two combined runs that would have produced a detector list both broke collection, because deleting an inner `if` leaves an empty enclosing block. | Timings and the two collection errors are recorded in 60.5. | Disclosed rather than implied: this review does **not** claim that the sixteen structural refusal guards are covered by sensitive tests, and does not claim they are unreachable. Section 59.4 records that Codex mutation-verified one of them, the source-binding guard. | None. A later round can attribute them with a cheaper in-process probe harness rather than the full focused file. | Open. |
+| SI-CR11-001 | P3 | Closed, accepted from section 59 | `6418236`, `e2f0a80` | prior internal guards | Retained as a current-API non-defect with the stated evidence limits. | Section 59.3. | Accepted. | None. | Closed. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A (pre-existing) | shared integration history | Unchanged: the durable owner sentence covering the 2026-09-05 follow-up fix and the `13079d5` alignment is still absent from lane-visible shared history. | Sections 41, 43-59. | Owner decision; this lane may document but not edit shared history. | None on this lane. | Open. |
+
+No new out-of-lane finding. No complete-repository suite was run, so this
+review makes no claim about tests outside the Short Interest lane.
+
+### 60.5 Validation and mutation evidence
+
+- Clean baseline on the exact pushed tree `252ece8`, with no mutation in
+  flight: compileall including `research` **exit 0**; active-document
+  consistency **69 passed**; import boundary **9 passed**; exact complete
+  fifteen-file Short Interest lane **756 passed in 2,557.69s (42m37s)**,
+  reconciling exactly to the prior 746 plus the 10 new ranking cases.
+- Final tree at `7bad2a9`: exact complete fifteen-file lane **757 passed in 2,616.70s (43m36s)**, reconciling exactly to the 756-pass baseline plus the one test added here; focused
+  ranking file **11 passed in 804.76s** (the pushed 10 plus the one added here); active-document consistency **69 passed**; import
+  boundary **9 passed**; compileall including `research` **exit 0**;
+  `git diff --check` **clean**.
+- Semantic mutants, each restored byte-exact to `c3e6bd8f3d0a...`:
+  dropping the scoreable requirement from the ranking cohort **1 failed**;
+  dropping the small-population underfill reason **1 failed**; dropping the
+  `equal` term from the percentile **2 failed**; the inclusive-to-strict
+  threshold change **10 passed** before the correction and **1 failed** after
+  it; dropping the selected requirement **10 passed**, which is layered because
+  a later check refuses any event whose `revision_selection_state` is not
+  `SELECTED`, not a demonstrated fail-open.
+- Two combined mutation runs were discarded: the first because two mutants
+  targeted the same line, the second because removing an inner `if` left an
+  empty enclosing block and broke collection. Neither produced a reported
+  figure. See `SI-CR12-004` for the resulting scope limit.
+- Host: macOS, CPython 3.13.15 / pytest 9.1.1. These figures are
+  Claude-reported observations.
+- Per the owner-decision record, Codex ran focused checks and this review ran
+  the full lane. **No complete-repository suite was run or claimed.**
+
+All inputs were tracked documents and synthetic/offline fixtures. No
+credential, provider, programmatic FINRA request, licensed row, actual price,
+market outcome, holdout, ETF data, QuantConnect artifact/upload/compile/job,
+broker, operator database, scheduler, deployment, paper/live, order or trading
+surface was accessed. **Authorized outcome looks: 0. Consumed outcome looks: 0.**
+
+### 60.6 Quality, scope and limits
+
+**SI-2B-P1C quality: 8/10.** It implements the owner's estimand faithfully and
+the hardest part correctly: the denominator genuinely changes with eligibility
+while the structural scores stay canonical, which is the difference between a
+rerank and a relabelled filter. The excluded-evidence reporting is explicit and
+the empty-cohort case is represented rather than refused. Two points are
+withheld: the inclusive half of an owner-frozen boundary had no test, and the
+new policy carries no durable owner citation.
+
+**Codex's SI-2B-P1B counter-review quality: 10/10.** It accepted a record-only
+commit without inventing a finding and reproduced focused checks independently.
+
+Limits: everything is software behaviour on synthetic fixtures and says nothing
+about predictive value. Only synthetic entitlement is accepted, so no real
+price, volume or capitalization was touched. I did not re-derive the upstream
+SI-3A or SI-3C arithmetic beyond proving the rebuilt cohorts equal the canonical
+ones. Sixteen structural refusal guards were not individually attributed
+(`SI-CR12-004`). I cannot verify the faithfulness of the transcribed owner
+approval; section 52.3 records that limit and `SI-CR12-002` extends it.
+
+### 60.7 Remaining gates and next authorized step
+
+1. Codex counter-reviews the test-only correction commit `7bad2a9` and this
+   record commit, and is asked to bind the ranking freeze to a durable owner
+   citation under `SI-CR12-002`.
+2. No lookback winner without a frozen evaluation metric and an authorized
+   historical development or walk-forward run. `selected_lookback` stays `None`.
+3. `SI-CR5-005` / `SI-CCR16-007` remains an owner question.
+4. Still gated: production ranking, seed conversion, licensed SI-1 and full
+   SI-2, `S2`-`S4`, DTC delta and window `K`, SI-4 ETF work, every outcome
+   join, portfolio stages, and every QuantConnect artifact, upload, compile,
+   job or backtest. Historical development backtesting is the recorded next
+   research destination and needs its own source-rights, coverage,
+   cost-specification, outcome-look accounting and QuantConnect authorizations.
+   The shared final holdout remains sealed. No milestone is started here.

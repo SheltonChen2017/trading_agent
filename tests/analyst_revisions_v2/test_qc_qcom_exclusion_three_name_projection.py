@@ -170,6 +170,31 @@ def test_unknown_and_qcom_ids_remain_outside_stock_selection(family, package):
         assert sleeve.matched_etf_fallback_weight > 0
 
 
+@pytest.mark.parametrize("arm", ("ar_off", "ar_on80"))
+def test_exact_three_verified_names_including_qcom_keep_coverage_but_exclude_stock(
+        family, package, arm):
+    _old, new = family
+    projection, _profile = new[arm]
+    qcom_id = prior._matched._authenticated_qcom_security_id(package)
+    with relaxed._cloud_loader(_sources(projection)) as (load, _):
+        gate = load(relaxed._GATE_PATH[:-3])
+        rows = list(_rows(gate, "SOXX", count=20, positives=3, weight="0.05", known=3))
+        rows[0] = dataclasses.replace(rows[0], security_id=qcom_id, security_name="QCOM")
+        construction = gate.build_six_universe_construction(
+            _snapshots(gate, {"SOXX": tuple(rows)}), gate.TOP10_CAP90_EXPLORATORY_PROFILE)
+        sleeve = next(item for item in construction.sleeves if item.universe_id == "SOXX")
+        assert sleeve.coverage.valid
+        assert sleeve.coverage.mapped_member_count == 3
+        assert qcom_id not in sleeve.matched_security_ids
+        if arm == "ar_off":
+            assert sleeve.matched_security_ids == tuple(row.security_id for row in rows[1:3])
+            assert sleeve.matched_etf_fallback_weight < sleeve.budget
+        else:
+            assert sleeve.positive_score_count == 2
+            assert sleeve.signal_security_ids == sleeve.matched_security_ids == ()
+            assert sleeve.matched_etf_fallback_weight == sleeve.budget
+
+
 def test_mutated_policy_score_or_main_identity_refuses_exact_render_anchor(family):
     old, _new = family
     predecessor, _profile = old["ar_on80"]

@@ -186,11 +186,14 @@ def test_comparison_authenticates_four_arms_and_separate_10pct_context():
     output = study.compare_results(results)
     assert output["comparisons"][0]["AR_on_minus_three_name_AR_off_percentage_points"] == "4.00"
     context = coverage10_results()
-    for result in context.values():
-        result["diagnostics"]["membership_cap_path_sha256"] = "f" * 64
     output = study.compare_results(results, context)
     assert output["context_10pct"]["compatible"] is True
-    assert output["context_10pct"]["membership_digest_equality_required"] is False
+    changed_context = copy.deepcopy(context)
+    for result in changed_context.values():
+        result["diagnostics"]["membership_cap_path_sha256"] = "f" * 64
+    with pytest.raises(ValueError, match="membership|source"):
+        study.compare_results(results, changed_context)
+    assert output["context_10pct"]["membership_digest_equality_required"] is True
     context["R240"]["aggregates"]["pit_callback_source_row_count"] += 1
     with pytest.raises(ValueError, match="source panel|source census"):
         study.compare_results(results, context)

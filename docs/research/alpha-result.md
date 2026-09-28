@@ -5812,11 +5812,14 @@ R-242 A1 AR-off exact 17-file source readback/compile succeeded; private QC
 project **37065880**, backtest `c331f640f1a14299af58f0f06a8aecd3`.
 R-243 A1 AR-on80 likewise launched in private project **37065881**,
 backtest `db969eb51df7b67c4869f57d84f77868`. Both reached `In Progress...`
-at a status-only check; no result read yet. R-244 A1 AR-on120 exact source
+at an earlier status-only check; no result had yet been read. The
+contemporaneous operator observation was R-244 A1 AR-on120 exact source
 uploaded/compiled in project **37065932**, and R-245 A1 AR-on200 in project
 **37065931**, but each `backtests/create` call failed before a launch receipt.
-A fresh statistics-free remote inventory counted **zero** runs in each of
-these two projects at that check. These failures consumed A1; the cause is
+The local artifact chain retains A1 claims and project receipts, not compile
+or create responses. A contemporaneous statistics-free remote inventory
+counted **zero** runs in each project, but that response was not separately
+retained. These failures consumed A1; the cause is
 not established and no outcome or cell exists for them. Four conservative
 attempt looks raise the floor to **248 shared / 189 ARV2 development / 34
 infrastructure / 657 accepted cells**. No A2 is claimed or attempted by
@@ -5844,3 +5847,34 @@ inventories showing zero runs. A late A1 run refuses A2. It does not create a
 new project or reupload source. The R-237 exception remains separately
 tested; focused recovery tests **23 passed**. This code preparation spends
 **zero** looks and produces no result. Floor remains **248 / 189 / 34 / 659**.
+
+R-244 A2 launched after both exact zero-run censuses in existing private
+project **37065932**, backtest `87ebfe187639b46890f77db16f23b188`.
+R-245 A2 similarly launched in project **37065931**, backtest
+`2d16f40c686b0f700615133dc2d25c67`. Each was `In Progress...` at an
+initial status-only check. Two more development looks raise the conservative
+floor to **250 / 191 / 34 / 659**. No result cell was read at this point.
+
+R-244/R-245 then reached `Completed.`. Their sole authenticated reads passed
+`run_valid=true`, 261 submitted/completed rebalances and zero invalid or
+canceled orders. R-244 AR-on120: **+164.5224424555784%** cumulative return
+after modeled fees, **−22.01194134932266%** maximum drawdown, 9,333 filled
+orders. R-245 AR-on200: **+167.1580814588157%**, **−22.08205274435079%**
+drawdown, 8,633 filled orders. The four new arms and four R-238–R-241
+same-arm context receipts share raw membership/cap SHA-256
+`b3233cf7b2a0a85cee81c2cefd891c8a4f6a57491ec9ce0bc33e50d1968c2063`;
+the four new arms share the six-ETF panel digest
+`89d9c6387c0cf47fa70a8a0c9c3108cae263436e0b8e503fc127ecbe9deeff66`.
+The local comparison now refuses a cross-family digest mismatch. R-243/244/245
+minus R-242 AR-off differences are **+12.57197104701772 / +21.53799234040192 /
++24.17363134363922 percentage points**, combining score admission and
+weighting, not isolating tilt. Three-name minus five-name same-arm differences
+are **−0.76466010400005 / +0.484850735 / +0.358208348 / +0.335674279
+points** in AR-off/80/120/200 order. REMX passed raw coverage on 125
+decisions in all new arms but admitted no direct REMX stock in any AR-on arm:
+only 31 positive-score observations across those 125 decisions, insufficient
+for the three-score entry rule. Four accepted exploratory cells total bring
+the floor to **250 shared / 191 development / 34 infrastructure / 661 cells**.
+No additional look was spent by the result reads. This is adaptive,
+current-vintage, zero-modeled-slippage sensitivity, not formal alpha evidence
+or a live-trading rule.

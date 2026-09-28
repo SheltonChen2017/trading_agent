@@ -28745,14 +28745,16 @@ private project **37065880**, backtest
 `c331f640f1a14299af58f0f06a8aecd3`. R243 A1 AR-on80 likewise created
 private project **37065881**, backtest
 `db969eb51df7b67c4869f57d84f77868`. Both were `In Progress...` at the
-latest status-only check; no outcome read had occurred. R244 A1 AR-on120
+earlier status-only check; no outcome read had yet occurred. R244 A1 AR-on120
 created private project **37065932** and R245 A1 AR-on200 created private
-project **37065931**. Both uploaded/read back exact 17-file source and
-compiled, but `backtests/create` refused before returning a launch receipt.
+project **37065931**. The contemporaneous operator observation was that both
+uploaded/read back exact 17-file source and compiled, but `backtests/create`
+refused before returning a launch receipt; the local artifact chain retains
+the claims and project receipts, not compile/create responses.
 Their first QC attempt slots are **spent**, regardless of whether the likely
-cause was account capacity; that cause is unconfirmed. A fresh
-statistics-free `backtests/list` count was zero for each exact project, so
-there was no known remote run at that check. Neither R244 nor R245 has a
+cause was account capacity; that cause is unconfirmed. A contemporaneous
+statistics-free `backtests/list` observation counted zero for each exact
+project; that response was not separately retained. Neither R244 nor R245 has a
 result cell. All four attempts count conservatively: floor **248 shared /
 189 development / 34 infrastructure / 657 cells**. Do not create a new
 candidate to disguise these attempts or infer a return from QC compile.
@@ -28786,3 +28788,117 @@ creates a replacement project; an unexpected late A1 run refuses A2. The
 existing R237 exception remains independently covered. Focused retry tests:
 **23 passed**. This preparation itself spends no research look and asserts
 no A2 outcome.
+
+R244 A2 passed both exact zero-run censuses and launched in its existing
+project **37065932**, backtest `87ebfe187639b46890f77db16f23b188`.
+R245 A2 did the same in its existing project **37065931**, backtest
+`2d16f40c686b0f700615133dc2d25c67`. Both were `In Progress...` at an
+initial status-only check. These two launches consume two more development
+looks: floor **250 shared / 191 development / 34 infrastructure / 659 cells**.
+No outcome read had occurred at this point.
+
+R244/R245 subsequently reached `Completed.`. Each sole receipt-bound
+aggregate read passed `run_valid=true`, 261 submitted/completed weekly
+rebalances and zero invalid/canceled orders. R244 AR-on120 returned
+**+164.5224424555784%** after modeled fees, with **−22.01194134932266%**
+maximum drawdown and 9,333 filled orders. R245 AR-on200 returned
+**+167.1580814588157%**, with **−22.08205274435079%** maximum drawdown and
+8,633 filled orders. All four arm results use the same raw membership/cap
+digest `b3233cf7b2a0a85cee81c2cefd891c8a4f6a57491ec9ce0bc33e50d1968c2063`
+and six-ETF daily-panel digest
+`89d9c6387c0cf47fa70a8a0c9c3108cae263436e0b8e503fc127ecbe9deeff66`.
+Two accepted exploratory cells bring the conservative floor to **250 shared /
+191 development / 34 infrastructure / 661 cells**. Neither result read is
+a further launch/look.
+
+The authenticated four-arm comparison now reports AR-on minus the three-name
+AR-off cumulative-return differences of **+12.57197104701772**, **+21.53799234040192**
+and **+24.17363134363922 percentage points** for 80%, 120% and 200%,
+respectively. These are not isolated *weight-tilt* effects: AR-off cap-ranks
+without scores, whereas AR-on changes score-based admission as well as
+weights. The separately authenticated same-arm three-name minus five-name
+context is **−0.76466010400005**, **+0.484850735**, **+0.358208348** and
+**+0.335674279 percentage points** in arm order. Easing the count gate has
+therefore made little difference to total return in the AR-on arms. REMX
+coverage passed on 125 decisions in every new arm; AR-off selected three
+REMX names on each, whereas all AR-on arms selected **zero** REMX stocks.
+Across those 125 AR-on REMX decisions there were only 31 positive-score
+observations in total, so the active three-score entry floor still forced
+the own-ETF fallback every time. The monotonic 80→120→200 returns are
+adaptive in-sample sensitivity, not evidence of persistent live alpha;
+current-vintage analyst history, QCOM exclusion and zero modeled slippage
+remain material limitations.
+
+Counter-audit found a P2 local comparison-authentication gap: the study
+previously accepted a new-versus-five-name context as `compatible` when
+membership/cap digests differed. Since the digest is taken before the
+selection gate, a 5→3 threshold cannot justify different raw input paths.
+The comparison now requires digest equality for each arm pair, with a
+red-before/green-after mismatch test. The actual four new and four old
+receipts match the digest above. A P3 interpretation boundary also has a
+new regression test: excluded QCOM counts toward raw coverage, but cannot be
+selected; three verified names including QCOM can leave only two eligible
+AR-off stocks, or leave AR-on below its positive-score entry floor. This is
+the frozen policy, not a new change to cloud source. The local comparison
+guard and tests do not alter the 17-file QC source or any run result.
+
+## 205. Codex-to-Claude review notes for the three-name round, 2026-09-27
+
+**Exact review range and commit dispositions.** Review `89bdb29..HEAD` on
+`codex/strategy-analyst-revisions-v2` in this same worktree; `HEAD` is the
+record-and-result commit containing this section. `bcf6356` is the bounded
+prelaunch R242–R245 source/manifest/study/test implementation: review its
+five-to-three verified-name and non-XLE AR-on positive-score changes, frozen
+17-file source identities, and unchanged order economics. `ef352c1` is the
+exact R244/R245 A2-only same-project recovery after their spent pre-create
+A1 attempts: review the two zero-run inventories, source/claim/project pins,
+and no reupload/new-project behavior. The final record-and-result commit
+adds receipt-backed QC results, a corrected local comparison guard and its
+tests, and this handoff. No Claude commit landed or was counter-reviewed in
+this owner-directed round; independent review is still pending. No other
+lane/branch or shared behavior was changed. The only shared file touched is
+the owner-authorized look ledger `docs/research/alpha-result.md`.
+
+**Findings and corrections.** ARV2CR205-001 P2, corrected: cross-family
+`compatible` once accepted differing raw membership/cap digests. Require
+each new/old arm pair to match that pre-selection digest; a mismatch is red
+in the focused test and the eight actual receipts match. ARV2CR205-002 P3,
+documented and test-pinned: excluded QCOM remains in coverage counts before
+stock exclusion, so exactly three verified names can leave two eligible
+names; if QCOM held one of three positive scores, AR-on falls back to its
+ETF. Do not describe the three-name gate as a guarantee of three tradable
+names. ARV2CR205-003 P3, documented: A1 `backtests/create` failures on R244
+and R245 have no retained remote error body, so their cause is unknown; both
+attempt slots remain spent and A2 did not create replacement projects.
+ARV2CR205-004 P3, interpretation only: AR-on minus AR-off combines
+score-based admission/ranking and weight changes, not a pure tilt ablation.
+The cross-family membership/cap and six-ETF panels are authenticated, but
+the protocol does not prove an identical full stock minute-fill tape across
+separate QC jobs. Current-vintage analyst history, QCOM price exclusion,
+zero modeled slippage, and repeated in-sample parameter search remain
+explicit limitations. No issue authorizes a post-hoc replacement run.
+
+**Validation and outcome.** Exact source readback/compile and four
+receipt-bound order-based results: R242 A1 and R243 A1 valid; R244/R245 A1
+spent before launch, their allowlisted A2 runs valid in the same respective
+projects. Each accepted run completed all 261 weekly rebalances with zero
+invalid/canceled orders. After modeled fees the arm returns are +142.98%,
++155.56%, +164.52% and +167.16%, but easing from five to three names adds
+only −0.76 / +0.48 / +0.36 / +0.34 percentage points by same arm; all AR-on
+REMX direct-stock selections remain zero. The authenticated comparison is
+`comparison_valid=true`, `formal_alpha=false`, `confirmation=false`,
+`membership_digest_equality_required=true`. Focused active-document,
+projection, study, retry and submission validation: **188 passed**; prior
+prelaunch projection/study/context validation: **87 passed**; no complete
+lane or repository suite was run, per the owner's rule. Targeted `compileall`,
+`git diff --check` and active-document checks were clean; manifest file
+SHA-256 remained the pinned `6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef`.
+Look floor: **250 shared / 191 development / 34 infrastructure / 661
+accepted exploratory cells**. No raw rows/logs/orders, broker, paper/live,
+funded-account or deployment access occurred.
+
+**Next authorized action.** Claude independently reviews the exact pushed
+snapshot, including both local comparison corrections and the QC results,
+and runs the full lane suite. Codex then counter-reviews every Claude commit.
+Do not infer live-trading readiness, run another adaptive threshold sweep,
+or treat monotonic five-year returns as confirmation from this study alone.

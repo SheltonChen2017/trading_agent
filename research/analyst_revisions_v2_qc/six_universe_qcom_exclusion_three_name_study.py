@@ -240,17 +240,19 @@ def compare_results(results, context_10pct=None):
     coverage10.compare_results(context_10pct)
     for new_id, old_id in CONTEXT_10PCT.items():
         new, old = results[new_id], context_10pct[old_id]
-        if (new["diagnostics"]["etf_daily_panel_sha256"]
+        if (new["diagnostics"]["membership_cap_path_sha256"]
+                != old["diagnostics"]["membership_cap_path_sha256"]
+                or new["diagnostics"]["etf_daily_panel_sha256"]
                 != old["diagnostics"]["etf_daily_panel_sha256"]
                 or new["aggregates"]["account"]["starting_equity"]
                     != old["aggregates"]["account"]["starting_equity"]
                 or any(new["aggregates"].get(key) != old["aggregates"].get(key)
                        for key in _COMMON_SOURCE_CENSUS)):
-            raise ValueError("three-name and five-name context lack a matched source panel or census")
+            raise ValueError("three-name and five-name context lack a matched membership/cap path, source panel, or census")
     with localcontext() as context:
         context.prec = 96
         output["context_10pct"] = {"compatible": True,
-            "membership_digest_equality_required": False,
+            "membership_digest_equality_required": True,
             "construction_difference": "verified-name floor five to three; non-XLE positive-score floor five to three",
             "comparisons": [{"three_name_candidate_id": new_id,
                 "five_name_candidate_id": old_id, "arm": CANDIDATES[new_id],

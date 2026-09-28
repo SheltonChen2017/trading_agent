@@ -1,18 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE'S THREE COMMITS `644f46e`,
-`cfb316d`, AND `f8877fe` (SECTION 103). THE REAL-HEADER SUBSECTION FIX IS
-ACCEPTED AFTER THE LANE-OWNED P3 SCOPE-NAME CORRECTION `a89a324`; THE
-TEST-ONLY PINS ARE ACCEPTED; THE REVIEW RECORD IS ACCEPTED WITH AN APPEND-ONLY
-PROCESS QUALIFICATION. THE HASH-VERIFIED 16 APPROVED PILOT TRIPLES ALL PASS
-THE CORRECTED CONTRACT, BUT ALL ARE SINGLE-OWNER, NONCANONICAL AND ZERO-LOOK.
-THE OLD RUNNER STILL REFUSES MULTI-OWNER HEADERS; THE CONTRACT IS NOT WIRED
-TO IB-1C OR A REAL LOADER. CLAUDE'S COMPLETE SUITE WAS 9,194 PASSED, 38
-SKIPPED; CODEX RAN ONLY FOCUSED CHECKS. NO NEXT SOURCE MILESTONE OR PUSH IS
-AUTHORIZED UNTIL THE OWNER CHOOSES A BOUNDED NEXT STEP. THE COUNTER-REVIEW
-CORRECTION AND THIS RECORD ARE LOCAL-ONLY; THE ONE-ROUND MONITOR REMAINS
-PAUSED. NO NEW SEC, OUTCOME, QC, BACKTEST, PAPER, LIVE, BROKER, CAPITAL,
-ORDER, OR TRADING AUTHORITY IS OPEN; ALL LOOK COUNTERS REMAIN ZERO.**
+Status: **CLAUDE'S THREE-COMMIT SECTION-102 REVIEW WAS COUNTER-REVIEWED IN
+SECTION 103. AFTER THE OWNER APPROVED ONLY THE EXACT-16 READ-ONLY,
+NONCANONICAL OFFLINE ADAPTER, CODEX IMPLEMENTED `49851e5` AND RECORDED THE
+COMBINED HANDOFF IN SECTION 104. THE PINNED REPORT, INVENTORY, 48 RAW OBJECTS
+AND DERIVED PROJECTIONS REPLAY FOR ALL 16 RETAINED PILOT ACCESSIONS, WITH NO
+NEW SEC REQUEST, FILE WRITE, OR RESEARCH LOOK. THIS IS COMPATIBILITY ONLY:
+THE JOURNAL IS NOT REPLAYED, FIRST-PASS PROVENANCE IS NOT REPAIRED, AND NO
+IB-1C, CANONICAL, PIT, OUTCOME, QC, BACKTEST, PAPER, LIVE, BROKER, CAPITAL,
+ORDER OR TRADING AUTHORITY IS OPEN. CODEX'S FOCUSED CHECKS PASS; CLAUDE'S
+INDEPENDENT REVIEW OF THE EXACT COMBINED PUSH REMAINS NEXT. THE ONE-ROUND
+MONITOR REMAINS PAUSED.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -207,6 +205,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Codex implementation after owner decision | `9fb6273..PUSHED_HEAD`; source `1bc543f`; this record commit follows | Owner-approved synthetic-only zero-I/O three-raw-parent and multi-owner projection contract | Added a versioned in-memory contract for one validated accession target, exact index/header/XML bytes, separate role/URL/size/SHA identities, ordered header and XML owner CIKs, a separately hashed derived flat JSON projection and named field lineage. Refuses missing, duplicate, nested, namespace-qualified, mixed-content, or cross-source-contradictory identities. No runner, IB-1C, real artifact, or shared file changed. | New test red at missing module, then 35 synthetic green; namespace 3 red/3 green, mixed-content 3 red/3 green, reserved-scope 2 red/2 green, deep-index and serializable-flat 4 red/green. Final focused plus active-document/import selection 357 passed; in-memory compilation 2 files; no full suite by Codex. Looks 0/0/0. | Draft `IBSECCTX-R01/R02` P2 and `R03/R04` P3 closed before commit with red/green; prior P0-P3 ledger retained. `IBSECACQ-CR03` remains open for the old runner and real compatibility, and `R08/R09` remain noncanonical limitations. | Make one push of all local commits to this lane only. Claude reviews exact pushed snapshot; Codex counter-reviews every Claude commit before any further milestone. No fresh SEC acquisition or real IB-1C follows. |
 | 2026-09-28 | Claude review | `333398e` -> `644f46e` (code correction) -> `cfb316d` (test pins) -> this review record | Independent review of the Python-3.12 test correction, the section-100 counter-review, and the owner-approved synthetic raw-parent projection contract (`9fb6273..333398e`, 4 commits, 0 merges) | Verified the remote tip and clean worktree and dispositioned all four commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Ran the new contract in memory over the 16 already-acquired real index/header/XML triples (read-only, aggregates only): 0 of 16 accepted as pushed; fixed the contract to admit the real flat role subsections, after which 16 of 16 are accepted. Ran 36 direct and 2 combined mutants in the worktree and pinned the untested guards. Accepted `IBSECACQ-CCR01`, `CCR02`, and `CCR04`; recorded a position on the export part of `CCR03`. | Pushed `333398e`: complete suite **9,167 passed, 38 skipped, 0 failed in 524.98s**; recorded 35 and 357 reproduce; contract mutation **8 of 32** Codex guards caught. Final `cfb316d`: complete suite **9,194 passed, 38 skipped, 28 warnings, 0 failed in 520.28s**; lane gate **2,996 passed** on Python 3.13 and on 3.12; contract file 62 passed on both; mutation **26 of 32** plus 4 of 4 new-code guards, survivors classified; real triples **16 of 16** accepted; compileall exit **0**. **0 looks**. | `IBSECRP-CR01` P2 closed in `644f46e` (real headers refused). `IBSECRP-CR02` P3 closed in `cfb316d` (24 of 32 guard mutants survived; the commit message's 17 is wrong). `IBSECACQ-CCR01` P2 closed by `9e41ae3`, accepted against this reviewer; `CCR02`, `CCR04` accepted; `CCR03` open with position. `IBSECACQ-CR03` open for real multi-owner headers; earlier P3 items retained. No open P0-P2. | Codex counter-reviews `644f46e`, `cfb316d`, and this record. Any wiring of the contract, further acquisition, IB-1C processing, or canonical promotion needs its own owner decision. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-28 | Codex counter-review; owner-decision gate, local only | `333398e..f8877fe` reviewed; `a89a324` scope correction; this record commit follows | Counter-review Claude's section-102 three-commit review without a new source milestone | Accepted `644f46e` after one verified P3 scope-name correction, accepted test-only `cfb316d`, and accepted `f8877fe` with an append-only qualification of the earlier export-validation dispute. Independently replayed all 16 exact approved pilot triples from hash-checked single-link objects after the correction: 12 Form 4, 4 Form 4/A, one owner each; no data persisted or new SEC request. | New synthetic subsection-marker cases red 3/3 before the fix and green 3/3 after. Final focused contract/preparation/runner/record/active-document/import-boundary selection 387 passed in 1.97s on Python 3.12.14; two modified Python files compiled in memory; no complete suite by Codex. Looks 0/0/0. | `IBSECRP-CCR01` P3 closed in `a89a324`; Claude's `CR01` P2 and `CR02` P3 corrections accepted, earlier open and closed P0-P3 retained; no open current P0-P2. | Stop before any next milestone or push. Owner must expressly choose bounded wiring, acquisition or other source scope; existing evidence does not imply IB-1C, outcomes, QC or trading authority. Monitor remains paused. |
+| 2026-09-28 | Codex counter-review plus owner-approved implementation | `f8877fe..49851e5` (section-104 record follows) | Exact-16 retained SEC offline projection adapter | Carried forward all three section-103 Claude dispositions and P3 correction, then added a pinned read-only loader for the 16 retained continuation triples. It checks the committed report and inventory, exact accession and form inventory, all 48 content-addressed raw parents, and the separate derived projection receipts in memory. It does not import the SEC runner or use IB-1C. | New synthetic adapter file 33 passed; focused adapter, raw-parent, preparation, runner, active-document, record and import-boundary selection 431 passed in 6.64s on Python 3.12.14; two files compiled in memory; read-only pinned-root smoke 16 of 16, 12 Form 4 and 4 Form 4/A; three in-memory guard mutants produced expected red, restored final checks green. No complete suite by Codex; looks 0/0/0. | Precommit P3 receipt-fabrication and journal-shape findings closed in `49851e5` with red/green tests; earlier open and resolved ledger retained. No open current-lane P0-P2. | Make one combined lane push including `a89a324`, `43a48fd`, `49851e5` and this record. Claude independently reviews every pushed commit; no new data, IB-1C, outcome, QC or trading step follows by inference. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -13677,3 +13676,129 @@ deployment, capital, order, live or trading surface was used. Only the
 exact previously approved 16 pilot triples were read, in memory,
 read-only; no new SEC/EDGAR/provider request was made. Research looks
 **0**, authorized outcome looks **0**, consumed outcome looks **0**.
+
+## 104. Codex exact-16 read-only offline adapter after owner decision (2026-09-28 UTC)
+
+### 104.1 Authority, ordered commits, and scope
+
+The owner answered "yes, authorized" to the section-103 recommendation of
+**only** a read-only, noncanonical offline adapter for the exact 16
+already-acquired triples. This does not authorize a new SEC request, another
+accession or quarter, transport-runner wiring, real IB-1C..IB-1E processing,
+canonical/PIT promotion, outcomes, QC, broker, deployment or trading.
+
+The designated worktree is
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+on `codex/strategy-insider-buying`. Before the implementation commit, the
+lane-only fetched remote remained
+`f8877fee51669cb4ab754ef0bfca873a05a8d6ac` and the local tree contained
+only the clean, previously documented section-103 commits. The ordered
+Codex range prepared for one combined push is:
+
+| Commit | Scope | Status and next reviewer |
+|---|---|---|
+| `a89a3244541026ef861fcf51a1901573bd309ac3` | P3 parser correction and three synthetic tests from section 103 | Codex correction of Claude's `644f46e`; Claude to review. |
+| `43a48fdbb9e7b25f685da4f94684c8327a5e5003` | Section-103 per-commit counter-review, ledger and owner-decision gate | Codex record; Claude to review. |
+| `49851e597336b96e54808d030bf04b8636fe83d5` | Offline adapter and synthetic tests | Owner-approved bounded implementation; Claude to review. |
+| This section-104 record commit | Status, contiguous ledger row, findings and review notes | Codex handoff; Claude to review. |
+
+Section 103 gives separate accepted-after-correction, accepted, and
+accepted-with-qualification dispositions for all three incoming Claude
+commits `644f46e`, `cfb316d`, and `f8877fe`. This implementation does not
+erase or revise those dispositions. It is **not independently accepted**
+until Claude reviews the exact pushed Codex range and Codex counter-reviews
+Claude's later commits.
+
+### 104.2 Bounded behavior and source evidence
+
+`research/insider_buying_sec_pilot_projection_adapter.py` supplies the one
+public `load_fixed_pilot_projections(root)` entry point. It fixes the
+continuation report SHA-256 to
+`722ab1b03c93d1d6aa61f798b2cb6a391a934ee8a334034eff2b5102cea40ec5`,
+the inventory identity to
+`4b8a4c3a233855ea2aa6cde0b2739a83aca478180ac881e1cf011943753d78db`,
+and the previously approved 16 accession numbers in order. The root may be
+an absolute nonredirected local copy with those exact bytes; it is not a
+source-discovery parameter. The loader requires the exact five-entry
+publication layout, canonical commit/report/inventory objects, report and
+inventory hashes and identities, 16 `acquired_noncanonical` rows, the
+6-original/2-amended distribution in each of 2022Q4 and 2023Q1, false
+authority flags, zero looks, and the original first-pass code-SHA caveat.
+Each index/header/XML descriptor must name a distinct hash-addressed,
+regular, single-link object with matching size and SHA-256. The object
+directory must hold exactly those 48 names. The already-reviewed pure
+raw-parent contract then revalidates every triple and produces distinct
+parent and derived-projection hashes. Any refusal aborts the entire in-memory
+batch; no partial receipt is returned. The returned frozen receipt binds
+each projection and its raw-parent digests back to the pinned report rows
+before serialization. Its output carries `input_scope=retained_noncanonical_pilot`
+only for the public fixed pins and keeps all promotion and look authority
+false or zero. The private synthetic test seam labels its output
+`synthetic_test_receipt` instead.
+
+The adapter imports no SEC transport runner, opens no network connection,
+does not reread the quarterly ZIPs, writes no file, and invokes neither an
+IB-1C loader nor a trading surface. It checks that `attempts.jsonl` is a
+bounded regular single-link file in the publication layout but **does not
+replay or authenticate journal events**; the receipt explicitly says
+`continuation_journal_replayed=false`. The existing source reader, like its
+underlying SEC bulk snapshot boundary, assumes an owner-controlled immutable
+directory rather than an adversarial actor concurrently swapping path
+components. Hash matches prove byte identity, not official SEC origin or
+transport compliance. The first-pass code SHA remains operator-attested,
+not artifact-proven; first-pass pacing remains unverified. The timezone
+interpretation, official profile, canonical/PIT status, completion, direct
+IB-1C compatibility and real multi-owner behavior are not promoted.
+
+For the exact retained root
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider_buying_sec_xml_continue_2022q4_2023q1_5cc897d`,
+the final code replayed **16/16** hash-verified triples read-only, with **12
+Form 4 and 4 Form 4/A**, one observed owner in each, and
+`input_scope=retained_noncanonical_pilot`.
+All look counters stayed **0/0/0**; the journal replay flag was false. No
+raw source bytes, real XML, real CIK table, or derived real-data receipt was
+added to Git or printed in test output.
+
+### 104.3 P0-P3 ledger and red/green
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSECAD-R01 | P3 | **CLOSED before `49851e5`** | precommit draft | `SecOfflinePilotProjectionReceipt` | A caller could construct or alter a receipt with unrelated projections and still obtain a retained-pilot-looking label, despite the strict loader. | Independent draft audit; synthetic forged-parent test with disabled receipt validation failed as expected. | The adapter must not let its own serialization imply that a different parent was part of the pinned report. | Keep loader-only construction and revalidate the report byte hash, exact row targets, projection hashes and every parent digest at receipt construction and serialization; synthetic pins receive a different scope label. | In-memory disabled-validation mutant: **1 failed**; restored focused adapter file **33 passed**. |
+| IBSECAD-R02 | P3 | **CLOSED before `49851e5`** | precommit draft | Publication journal shape | A symlink or directory named `attempts.jsonl` could satisfy a name-only root check. | Independent draft audit; synthetic journal-symlink case with the regular-file read disabled failed as expected. | Even without replaying events, a named publication component must not redirect outside the retained root. | Require a bounded regular single-link journal file using the existing no-redirect reader; continue to label journal events unreplayed. | In-memory bypass mutant: **1 failed**; restored adapter file **33 passed**. |
+| IBSECRP-CCR01, IBSECRP-CR01/CR02 | P2/P3 | **CLOSED, retained** | `a89a324`, `644f46e`, `cfb316d` | Section 103 | Previous role-scope and test-sensitivity findings remain corrected. | Sections 102-103. | An adapter cannot silently weaken its parent contract. | No reversal. | Focused parent and adapter tests below. |
+| IBSECACQ-CCR03, IBSECACQ-CR03/CR04, IBSECACQ-R08/R09, IB1BP-CR04/CR05, IB2CTX-CR02, IBZIP-CR02/CR03, IB2SRC-CR03, IBSH-CR01 | P3 or shared/out of lane | **OPEN, retained** | earlier | Sections 68-103 | Historical process, real multi-owner, first-pass provenance/pacing, shared-placement and older observations remain. | Earlier complete rows. | This adapter does not fix them or open the gates they protect. | None. | No new authority. |
+
+No open current-lane P0, P1 or P2 was found in this bounded snapshot. The
+report-authority guard also had an in-memory mutant that suppressed only the
+`canonical=true` refusal: the exact authority test went **red 1 failed/9
+passed**; restored final focused checks were green. All three mutants were
+process-local monkeypatches, with no on-disk source mutation.
+
+### 104.4 Validation, exclusions, and next review
+
+Codex used Python **3.12.14** in the designated worktree, with bytecode and
+pytest caches disabled. The new synthetic adapter file passed **33/33**.
+The final focused adapter, raw-parent, SEC preparation, SEC acquisition,
+lane-record, active-document, exact Insider package-guard, and ML
+import-boundary selection passed **431/431 in 6.64s**, zero skipped or
+failed. Both new Python files parsed/compiled in memory; staged diff and
+status checks were clean before the implementation commit. Codex did **not**
+run a complete lane or repository suite; Claude's prior complete-suite
+**9,194 passed, 38 skipped** is evidence for its earlier tree only, not
+for this new adapter. The old runner, shared security-master/calendar audit,
+IB-3 diagnostics, and every outcome/QC/broker/deployment checklist item
+were outside this milestone.
+
+After this record commit, make **exactly one** normal push from this same
+worktree to `origin/codex/strategy-insider-buying`, after rechecking root,
+branch, local and remote heads and the clean tree. Claude next independently
+reviews **every** commit in the exact remote range beginning at `f8877fe`,
+including the earlier counter-review correction and this record. No further
+source milestone is authorized by this adapter. Fresh SEC acquisition,
+additional/real multi-owner sampling, transport-runner integration,
+IB-1C..IB-1E processing, source authenticity or PIT promotion, other
+quarters, research outcomes, ETF data, QC uploads/jobs/backtests, paper/live
+deployment, broker/operator database/scheduler, capital, orders and trading
+remain separate owner decisions. The one-round Claude-push monitor remains
+paused; no automated continuation is inferred. Research looks **0**,
+authorized outcome looks **0**, consumed outcome looks **0**.

@@ -157,6 +157,67 @@ def test_malformed_or_ambiguous_owner_or_role_is_refused(header):
         _derive(header=header)
 
 
+def _real_shape_header(owners: tuple[str, ...] = ("0000999999", "0000888888")) -> bytes:
+    # Invented values in the section layout every acquired pilot header uses:
+    # owner data, filing values, mail address; issuer data, business and mail
+    # addresses, and repeated former-company blocks.
+    owner_blocks = "".join(
+        "<REPORTING-OWNER>\n<OWNER-DATA>\n<CONFORMED-NAME>Invented Owner\n"
+        f"<CIK>{owner}\n</OWNER-DATA>\n<FILING-VALUES>\n<FORM-TYPE>4\n<ACT>34\n"
+        "<FILE-NUMBER>000-00000\n<FILM-NUMBER>00000000\n</FILING-VALUES>\n"
+        "<MAIL-ADDRESS>\n<STREET1>1 Invented Way\n<CITY>Nowhere\n<STATE>XX\n"
+        "<ZIP>00000\n</MAIL-ADDRESS>\n</REPORTING-OWNER>\n"
+        for owner in owners
+    )
+    return (
+        "<SEC-HEADER>0000999999-22-000001.hdr.sgml : 20221107\n"
+        "<ACCEPTANCE-DATETIME>20221107101112\n"
+        "<ACCESSION-NUMBER>0000999999-22-000001\n"
+        "<TYPE>4\n<PUBLIC-DOCUMENT-COUNT>1\n<PERIOD>20221103\n"
+        "<FILING-DATE>20221107\n<DATE-OF-FILING-DATE-CHANGE>20221107\n"
+        + owner_blocks
+        + "<ISSUER>\n<COMPANY-DATA>\n<CONFORMED-NAME>Invented Issuer\n<CIK>0000123456\n"
+          "<ASSIGNED-SIC>0000\n<IRS-NUMBER>000000000\n<STATE-OF-INCORPORATION>XX\n"
+          "<FISCAL-YEAR-END>1231\n</COMPANY-DATA>\n"
+          "<BUSINESS-ADDRESS>\n<STREET1>2 Invented Way\n<CITY>Nowhere\n<STATE>XX\n"
+          "<ZIP>00000\n<PHONE>0000000000\n</BUSINESS-ADDRESS>\n"
+          "<MAIL-ADDRESS>\n<STREET1>2 Invented Way\n<CITY>Nowhere\n<STATE>XX\n"
+          "<ZIP>00000\n</MAIL-ADDRESS>\n"
+          "<FORMER-COMPANY>\n<FORMER-CONFORMED-NAME>Older Invented Name\n"
+          "<DATE-CHANGED>20200101\n</FORMER-COMPANY>\n"
+          "<FORMER-COMPANY>\n<FORMER-CONFORMED-NAME>Oldest Invented Name\n"
+          "<DATE-CHANGED>20100101\n</FORMER-COMPANY>\n</ISSUER>\n</SEC-HEADER>\n"
+    ).encode("ascii")
+
+
+def test_real_section_layout_with_trailing_subsections_is_accepted():
+    owners = ("0000999999", "0000888888")
+    payload = _derive(owners=owners, header=_real_shape_header(owners)).to_payload()
+    assert payload["source_fields"]["header_owner_ciks_raw"] == list(owners)
+    assert payload["source_fields"]["issuer_cik_raw"] == "0000123456"
+    assert payload["derived_projection"]["reporting_owner_count"] == 2
+
+
+@pytest.mark.parametrize(("old", "new", "match"), [
+    (b"<MAIL-ADDRESS>\n<STREET1>1 Invented Way", b"<UNKNOWN-SECTION>\n<STREET1>1 Invented Way",
+     "unsupported or repeated subsection"),
+    (b"</MAIL-ADDRESS>\n</REPORTING-OWNER>", b"</MAIL-ADDRESS>\n<MAIL-ADDRESS>\n<CITY>Again\n</MAIL-ADDRESS>\n</REPORTING-OWNER>",
+     "unsupported or repeated subsection"),
+    (b"<ZIP>00000\n</MAIL-ADDRESS>\n</REPORTING-OWNER>", b"<ZIP>00000\n<CIK>0000777777\n</MAIL-ADDRESS>\n</REPORTING-OWNER>",
+     "nested, malformed, or identity fields"),
+    (b"<PHONE>0000000000\n</BUSINESS-ADDRESS>", b"<PHONE>0000000000\n<MAIL-ADDRESS>\n</BUSINESS-ADDRESS>",
+     "nested, malformed, or identity fields"),
+    (b"</FILING-VALUES>\n", b"", "unbalanced"),
+    (b"<FORMER-COMPANY>\n<FORMER-CONFORMED-NAME>Older", b"<FILING-VALUES>\n<FORMER-CONFORMED-NAME>Older",
+     "unsupported or repeated subsection"),
+])
+def test_trailing_subsections_admit_only_known_flat_identity_free_blocks(old, new, match):
+    header = _real_shape_header()
+    assert old in header
+    with pytest.raises(SecRawParentProjectionError, match=match):
+        _derive(owners=("0000999999", "0000888888"), header=header.replace(old, new, 1))
+
+
 def test_xml_owner_set_mismatch_or_duplicate_refused_without_attribution():
     for xml in (_xml(("0000888888",)), _xml(("0000999999", "0000999999")),
                 _xml(())):

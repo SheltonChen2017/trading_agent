@@ -50,6 +50,14 @@ _PREAMBLE_TAGS = frozenset({
     "PUBLIC-DOCUMENT-COUNT", "PERIOD", "FILING-DATE",
     "DATE-OF-FILING-DATE-CHANGE",
 })
+# Real SEC tagged headers follow each role's data block with flat subsections
+# (every one of the 16 acquired pilot headers does). Only these names are
+# admitted, they may carry no CIK or nested scope, and only former-company
+# blocks may repeat; anything else still refuses.
+_OWNER_SUBSECTIONS = frozenset({"FILING-VALUES", "BUSINESS-ADDRESS", "MAIL-ADDRESS"})
+_ISSUER_SUBSECTIONS = frozenset({"BUSINESS-ADDRESS", "MAIL-ADDRESS", "FORMER-COMPANY"})
+_REPEATABLE_SUBSECTIONS = frozenset({"FORMER-COMPANY"})
+_SCOPE_LINE = re.compile(r"<([A-Z][A-Z0-9-]*)>\Z")
 
 
 class SecRawParentProjectionError(ValueError):
@@ -122,15 +130,39 @@ def _tag_value(lines: list[str], tag: str, *, label: str) -> str:
 def _company_cik(lines: list[str], *, outer: str) -> str:
     data = "<OWNER-DATA>" if outer == "owner" else "<COMPANY-DATA>"
     end = "</OWNER-DATA>" if outer == "owner" else "</COMPANY-DATA>"
-    if len(lines) < 3 or lines[0] != data or lines[-1] != end:
+    if len(lines) < 3 or lines[0] != data or lines.count(end) != 1:
         raise SecRawParentProjectionError(f"REFUSED: {outer} data scope is incomplete")
-    contents = lines[1:-1]
+    data_end = lines.index(end)
+    contents = lines[1:data_end]
     forbidden = _PREAMBLE_TAGS | {
         "OWNER-DATA", "COMPANY-DATA", "REPORTING-OWNER", "ISSUER", "SEC-HEADER",
     }
-    if any((match := _TAG_FIELD.fullmatch(line)) is None
-           or match.group(1) in forbidden for line in contents):
+    if not contents or any((match := _TAG_FIELD.fullmatch(line)) is None
+                           or match.group(1) in forbidden for line in contents):
         raise SecRawParentProjectionError(f"REFUSED: {outer} data has nested or malformed fields")
+    allowed = _OWNER_SUBSECTIONS if outer == "owner" else _ISSUER_SUBSECTIONS
+    seen: set[str] = set()
+    position = data_end + 1
+    while position < len(lines):
+        opening = _SCOPE_LINE.fullmatch(lines[position])
+        name = opening.group(1) if opening else None
+        if (name not in allowed
+                or (name in seen and name not in _REPEATABLE_SUBSECTIONS)):
+            raise SecRawParentProjectionError(
+                f"REFUSED: {outer} has an unsupported or repeated subsection"
+            )
+        seen.add(name)
+        closing = f"</{name}>"
+        if closing not in lines[position + 1:]:
+            raise SecRawParentProjectionError(f"REFUSED: {outer} subsection is unbalanced")
+        close = lines.index(closing, position + 1)
+        if any((match := _TAG_FIELD.fullmatch(line)) is None
+               or match.group(1) in forbidden or match.group(1) == "CIK"
+               for line in lines[position + 1:close]):
+            raise SecRawParentProjectionError(
+                f"REFUSED: {outer} subsection has nested, malformed, or identity fields"
+            )
+        position = close + 1
     raw = _tag_value(contents, "CIK", label=outer)
     if sum(line.startswith("<CIK>") for line in lines) != 1:
         raise SecRawParentProjectionError(f"REFUSED: {outer} CIK is ambiguous")

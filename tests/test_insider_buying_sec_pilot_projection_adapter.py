@@ -12,6 +12,7 @@ import pytest
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying.sec_acquisition_preparation import SecAcquisitionTarget
+from research.insider_buying import sec_pilot_ib1c_readiness as readiness
 from research.insider_buying.sec_raw_parent_projection import derive_sec_raw_parent_projection
 from research import insider_buying_sec_pilot_projection_adapter as adapter
 
@@ -523,3 +524,129 @@ def test_canonical_rewritten_inventory_request_drift_refuses(
     )
     with pytest.raises(ValueError, match="REFUSED"):
         synthetic_pilot.load()
+
+
+def test_ib1c_readiness_is_an_exact_sixteen_row_blocker_inventory_only(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    receipt = synthetic_pilot.load()
+    before = _tree_state(synthetic_pilot.root)
+    report = readiness.assess_sec_pilot_ib1c_readiness(receipt)
+    payload = report.to_payload()
+    assert _tree_state(synthetic_pilot.root) == before
+    assert payload["version"] == readiness.SEC_PILOT_IB1C_READINESS_VERSION
+    assert payload["input_scope"] == "synthetic_test_receipt"
+    assert payload["source_report_sha256"] == receipt.report_sha256
+    assert payload["source_inventory_sha256"] == receipt.inventory_sha256
+    assert len(payload["rows"]) == 16
+    assert [row["accession_number"] for row in payload["rows"]] == list(
+        synthetic_pilot.accessions
+    )
+    assert [row["projection_sha256"] for row in payload["rows"]] == [
+        row["projection_sha256"] for row in synthetic_pilot.expected_rows
+    ]
+    assert [row["raw_parent_sha256s"] for row in payload["rows"]] == [
+        row["raw_parent_hashes"] for row in synthetic_pilot.expected_rows
+    ]
+    assert all(row["reporting_owner_count"] == 1 for row in payload["rows"])
+    row_blockers = [
+        "VERBATIM_IB1C_METADATA_SOURCE_UNAVAILABLE",
+        "RETRIEVAL_TIMESTAMP_UNAVAILABLE",
+        "OFFICIAL_SEC_METADATA_PROFILE_UNVERIFIED",
+        "TIMEZONE_INTERPRETATION_UNVERIFIED",
+        "SOURCE_AUTHENTICITY_UNVERIFIED",
+        "DIRECT_IB1C_INGEST_NOT_AUTHORIZED",
+    ]
+    assert all(row["blockers"][:6] == row_blockers for row in payload["rows"])
+    assert sum("AMENDMENT_ORIGINAL_ACCESSION_LINK_UNAVAILABLE" in row["blockers"]
+               for row in payload["rows"]) == 4
+    assert payload["corpus_blockers"] == [
+        "CONTINUATION_JOURNAL_NOT_REPLAYED",
+        "FIRST_PASS_CODE_SHA_ARTIFACT_UNVERIFIED",
+        "FIRST_PASS_PACING_TRACE_UNVERIFIED",
+        "CANONICAL_82_QUARTER_CORPUS_INCOMPLETE",
+    ]
+    assert payload["authority"] == {
+        "ib1c_ready": False,
+        "canonical_evidence": False,
+        "point_in_time_data": False,
+        "outcome_access_authorized": False,
+        "research_looks": 0,
+        "authorized_outcome_looks": 0,
+        "consumed_outcome_looks": 0,
+    }
+    assert report.sha256 == hash_payload(payload)
+    assert report.sha256 == readiness.assess_sec_pilot_ib1c_readiness(receipt).sha256
+    payload["rows"][0]["blockers"].clear()
+    payload["authority"]["canonical_evidence"] = True
+    assert report.to_payload()["rows"][0]["blockers"]
+    assert report.to_payload()["authority"]["canonical_evidence"] is False
+
+
+def test_ib1c_readiness_refuses_foreign_partial_and_mutated_receipts(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    receipt = synthetic_pilot.load()
+    with pytest.raises(readiness.SecPilotIb1cReadinessError, match="exact fixed-pilot"):
+        readiness.assess_sec_pilot_ib1c_readiness(object())
+    object.__setattr__(receipt, "projections", receipt.projections[:-1])
+    with pytest.raises(readiness.SecPilotIb1cReadinessError, match="no longer validates"):
+        readiness.assess_sec_pilot_ib1c_readiness(receipt)
+
+
+def test_ib1c_readiness_refuses_authority_promotion_and_scope_spoof(
+    synthetic_pilot: _SyntheticPilot, monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    receipt = synthetic_pilot.load()
+    original = adapter.SecOfflinePilotProjectionReceipt.to_payload
+
+    def promoted(self):
+        payload = original(self)
+        payload["authority"]["direct_ib1c_ingest_authorized"] = True
+        return payload
+
+    monkeypatch.setattr(adapter.SecOfflinePilotProjectionReceipt, "to_payload", promoted)
+    with pytest.raises(readiness.SecPilotIb1cReadinessError, match="positive or unknown"):
+        readiness.assess_sec_pilot_ib1c_readiness(receipt)
+
+    def spoofed(self):
+        payload = original(self)
+        payload["authority"]["input_scope"] = "retained_noncanonical_pilot"
+        return payload
+
+    monkeypatch.setattr(adapter.SecOfflinePilotProjectionReceipt, "to_payload", spoofed)
+    with pytest.raises(readiness.SecPilotIb1cReadinessError, match="positive or unknown"):
+        readiness.assess_sec_pilot_ib1c_readiness(receipt)
+
+
+def test_ib1c_readiness_report_rechecks_source_and_cannot_be_relabelled(
+    synthetic_pilot: _SyntheticPilot,
+) -> None:
+    receipt = synthetic_pilot.load()
+    report = readiness.assess_sec_pilot_ib1c_readiness(receipt)
+    with pytest.raises(readiness.SecPilotIb1cReadinessError, match="not built"):
+        replace(report, _token=object())
+    with pytest.raises(readiness.SecPilotIb1cReadinessError, match="not built"):
+        replace(report, input_scope="retained_noncanonical_pilot")
+    object.__setattr__(receipt, "_public_pilot", True)
+    with pytest.raises(readiness.SecPilotIb1cReadinessError, match="no longer validates"):
+        report.to_payload()
+
+
+def test_ib1c_readiness_module_has_no_io_transport_or_downstream_imports() -> None:
+    tree = ast.parse(inspect.getsource(readiness))
+    imported = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module is not None:
+            imported.add(node.module)
+    forbidden = (
+        "pathlib", "os", "http", "urllib", "requests", "socket", "subprocess",
+        "research.insider_buying.sec_edgar_acceptance_snapshot",
+        "research.insider_buying.form4_amendment_reconciliation",
+        "research.insider_buying.form4_multi_period_amendment_evidence",
+        "backtest", "qc", "quantconnect", "execution", "broker",
+    )
+    assert all(name != prefix and not name.startswith(prefix + ".")
+               for name in imported for prefix in forbidden)

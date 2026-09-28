@@ -393,8 +393,10 @@ def test_prior_link_validation_builds_one_index_without_settlement_scans(
     assert sum(item.attribute_reads for item in indexed_snapshot_proxies) <= (
         6 * len(vintage.snapshots)
     )
-    assert snapshot_rows.passes == 2
-    assert snapshot_rows.item_reads == 2 * len(snapshot_rows)
+    # One-pass materialization and the current two-pass traversal are both
+    # linear; pin the complexity ceiling without freezing implementation shape.
+    assert 0 < snapshot_rows.passes <= 2
+    assert snapshot_rows.item_reads <= 2 * len(snapshot_rows)
     assert settlements.passes == 1
     assert settlements.iterated_items == len(settlements)
     assert settlements.indexed_reads <= len(vintage.snapshots)

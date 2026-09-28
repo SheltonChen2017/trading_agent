@@ -1,7 +1,8 @@
 """Offline-first, input-only R247 QC submission; no action occurs on import.
 
-Only A1 is implemented. A failed A1 consumes its claim; A2/A3 require a
-prospective source/permit change in this same project, never a fresh project.
+Only A1 and its one-line A2 initialization-error disclosure are implemented.
+A failed attempt consumes its claim; A3 requires a prospective correction in
+this same project, never a fresh project.
 The sole result read retains one bounded metadata statistic, not QC data.
 """
 
@@ -17,6 +18,8 @@ from pathlib import Path
 
 from . import fresh_six_universe_snapshot as snapshot
 from . import six_universe_coverage_submission as boundary
+
+
 class FreshSnapshotSubmissionError(ValueError):
     """A frozen identity, local control, or bounded QC response was refused."""
 
@@ -25,14 +28,19 @@ CANDIDATE_ID = "R247"
 DECISION_SESSION = "2026-09-25"
 PROJECT_NAME = "ARV2 R247 FRESH SIX INPUT 20260925"
 BACKTEST_NAME = "ARV2 R247A1 fresh six input 20260925"
+BACKTEST_NAME_A2 = "ARV2 R247A2 fresh six input init error disclosure 20260925"
 META_NAME = "ARV2_FRESH_SIX_INPUT_META"
 WAIVER_SCHEMA = "arv2-r247-fresh-six-input-exact-owner-waiver-v1"
+WAIVER_SCHEMA_A2 = "arv2-r247a2-fresh-six-input-exact-owner-waiver-v1"
 # Derived candidate binding under the owner's standing exploratory waiver
 # recorded in lane sections 191/192/195; not a new owner statement.
 WAIVER_ID = "ARV2-OWNER-STANDING-EXPLORATORY-R247A1-INPUT-ONLY-SIGNATURE-WAIVER"
+WAIVER_ID_A2 = "ARV2-OWNER-STANDING-EXPLORATORY-R247A2-INPUT-ONLY-SIGNATURE-WAIVER"
 RUNTIME_SHA256 = "6c386957b25b83d6a5f6333cfa699ae07e0808b965a5a9184059becd992e529f"
 MAIN_SHA256 = "6138e86c6589e88f26f1cfddb646d46d692d8e412fe6b26ef09b2df4fa1f955e"
+MAIN_SHA256_A2 = "9227144284e54ba3894ee86a7fea3e3d1f06a8892d5a7eebf3068b5eac123830"
 SOURCE_MANIFEST_SHA256 = "3954de79a3398e900a78e6c2f0330ff9cdda370ade3570e41dbe50380684b381"
+SOURCE_MANIFEST_SHA256_A2 = "123c17148c6850cf432dbf64534de7c3f040324b80639ada369567867b0c7f9d"
 MAX_SOURCE_FILE_BYTES = 64_000
 MAX_META_BYTES = 2_048
 _HEX = re.compile(r"[0-9a-f]{64}\Z")
@@ -68,19 +76,35 @@ def _digest(raw: bytes) -> str:
     return hashlib.sha256(raw).hexdigest()
 
 
-def _files() -> tuple[tuple[str, bytes], ...]:
+def _main_for_attempt(attempt: int) -> bytes:
+    main = snapshot.main_source(DECISION_SESSION)
+    if attempt == 2:
+        old = "    def on_end_of_algorithm(self):\n        self._snapshot.require_persisted()\n"
+        new = (
+            "    def on_end_of_algorithm(self):\n"
+            "        if self.time.date().isoformat() >= '2026-09-25':\n"
+            "            self._snapshot.require_persisted()\n"
+        )
+        if main.count(old) != 1:
+            _fail("R247 A2 one-line on_end source anchor changed")
+        main = main.replace(old, new)
+    return main.encode("ascii")
+
+
+def _files(attempt: int = 1) -> tuple[tuple[str, bytes], ...]:
     """Read the exact committed runtime, then authenticate generated main."""
     runtime = Path(snapshot.__file__)
     try:
         source = runtime.read_bytes()
-        main = snapshot.main_source(DECISION_SESSION).encode("ascii")
+        main = _main_for_attempt(attempt)
     except (OSError, UnicodeError, ValueError) as exc:
         raise FreshSnapshotSubmissionError("R247 source is unavailable") from exc
     files = tuple(sorted((
         ("fresh_six_universe_snapshot.py", source), ("main.py", main),
     )))
     if (
-        _digest(source) != RUNTIME_SHA256 or _digest(main) != MAIN_SHA256
+        _digest(source) != RUNTIME_SHA256
+        or _digest(main) != (MAIN_SHA256 if attempt == 1 else MAIN_SHA256_A2)
         or any(not 0 < len(raw) <= MAX_SOURCE_FILE_BYTES or not raw.isascii()
                for _, raw in files)
     ):
@@ -97,25 +121,28 @@ def preview_plan(plan: SnapshotQcPlan) -> dict[str, object]:
         or type(plan.control_directory) is not type(Path())
         or not plan.control_directory.is_absolute()
         or ".." in plan.control_directory.parts
-        or type(plan.attempt) is not int or plan.attempt != 1
+        or type(plan.attempt) is not int or plan.attempt not in {1, 2}
     ):
-        _fail("R247 permits only frozen A1 in an absolute control directory")
-    files = _files()
+        _fail("R247 permits only frozen A1/A2 in an absolute control directory")
+    files = _files(plan.attempt)
     inventory = [
         {"path": path, "sha256": _digest(raw), "bytes": len(raw)}
         for path, raw in files
     ]
     manifest_sha = _digest(_canonical(inventory))
-    if manifest_sha != SOURCE_MANIFEST_SHA256:
+    if manifest_sha != (
+        SOURCE_MANIFEST_SHA256 if plan.attempt == 1 else SOURCE_MANIFEST_SHA256_A2
+    ):
         _fail("R247 two-file source manifest changed")
     return {
-        "candidate_id": CANDIDATE_ID, "attempt": 1,
+        "candidate_id": CANDIDATE_ID, "attempt": plan.attempt,
         "decision_session": DECISION_SESSION,
-        "project_name": PROJECT_NAME, "backtest_name": BACKTEST_NAME,
+        "project_name": PROJECT_NAME,
+        "backtest_name": BACKTEST_NAME if plan.attempt == 1 else BACKTEST_NAME_A2,
         "source_manifest_sha256": manifest_sha, "source_files": inventory,
         "custom_statistic_name": META_NAME,
         "maximum_attempts_same_project": 3,
-        "implemented_attempts": [1],
+        "implemented_attempts": [1] if plan.attempt == 1 else [1, 2],
         "quantconnect_io_performed": False,
     }
 
@@ -123,22 +150,24 @@ def preview_plan(plan: SnapshotQcPlan) -> dict[str, object]:
 def render_owner_waiver_payload(plan: SnapshotQcPlan) -> bytes:
     """Bind the standing exploratory waiver to only this exact input probe."""
     preview = preview_plan(plan)
-    return _canonical({
-        "schema": WAIVER_SCHEMA,
+    is_a1 = plan.attempt == 1
+    body = {
+        "schema": WAIVER_SCHEMA if is_a1 else WAIVER_SCHEMA_A2,
         "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
-        "owner_launch_waiver_id": WAIVER_ID,
+        "owner_launch_waiver_id": WAIVER_ID if is_a1 else WAIVER_ID_A2,
         "action": "one_private_input_only_snapshot_backtest_launch",
-        "candidate_id": CANDIDATE_ID, "attempt": 1,
+        "candidate_id": CANDIDATE_ID, "attempt": plan.attempt,
         "organization_id_sha256": _digest(plan.organization_id.encode("ascii")),
         "control_directory": str(plan.control_directory),
         "decision_session": DECISION_SESSION,
-        "project_name": PROJECT_NAME, "backtest_name": BACKTEST_NAME,
+        "project_name": PROJECT_NAME, "backtest_name": preview["backtest_name"],
         "source_manifest_sha256": preview["source_manifest_sha256"],
         "source_files": preview["source_files"],
         "custom_statistic_name": META_NAME,
         "mutating_endpoint_budget": {
-            "projects/create": 1, "files/delete": 1,
-            "files/update": 1, "files/create": 1,
+            "projects/create": 1 if is_a1 else 0,
+            "files/delete": 1 if is_a1 else 0,
+            "files/update": 1, "files/create": 1 if is_a1 else 0,
             "compile/create": 1, "backtests/create": 1,
         },
         "maximum_attempts_same_project": 3,
@@ -147,18 +176,27 @@ def render_owner_waiver_payload(plan: SnapshotQcPlan) -> bytes:
         "object_store_download_authorized": False,
         "prices_returns_orders_authorized": False,
         "paper_live_broker_trading_authorized": False,
-    })
+    }
+    if not is_a1:
+        predecessor, _ = _require_failed_a1(plan)
+        body.update({
+            "predecessor_project_id": predecessor["project_id"],
+            "predecessor_backtest_id": predecessor["backtest_id"],
+            "predecessor_source_manifest_sha256": SOURCE_MANIFEST_SHA256,
+        })
+    return _canonical(body)
 
 
 def _launch_authority(
     plan: SnapshotQcPlan, *, owner_waiver_id: str | None,
 ) -> dict[str, str]:
-    if type(owner_waiver_id) is not str or owner_waiver_id != WAIVER_ID:
+    expected_id = WAIVER_ID if plan.attempt == 1 else WAIVER_ID_A2
+    if type(owner_waiver_id) is not str or owner_waiver_id != expected_id:
         _fail("R247 standing owner waiver does not cover this candidate")
     return {
         "owner_launch_authority_mode": "exact_exploratory_signature_waiver",
-        "owner_launch_waiver_schema": WAIVER_SCHEMA,
-        "owner_launch_waiver_id": WAIVER_ID,
+        "owner_launch_waiver_schema": WAIVER_SCHEMA if plan.attempt == 1 else WAIVER_SCHEMA_A2,
+        "owner_launch_waiver_id": expected_id,
         "owner_waived_payload_sha256": _digest(render_owner_waiver_payload(plan)),
     }
 
@@ -183,7 +221,7 @@ def _post(api, endpoint: str, payload: dict) -> dict:
 
 def _path(plan: SnapshotQcPlan, suffix: str) -> Path:
     try:
-        return _CONTROL_DIRECTORY(plan) / f"{CANDIDATE_ID}-A1-{suffix}.json"
+        return _CONTROL_DIRECTORY(plan) / f"{CANDIDATE_ID}-A{plan.attempt}-{suffix}.json"
     except boundary.CoverageQcSubmissionError:
         raise FreshSnapshotSubmissionError("R247 private control directory is unavailable") from None
 
@@ -218,12 +256,83 @@ def _project(response: dict, plan: SnapshotQcPlan) -> int:
     return project_id
 
 
+def _require_source_readback(api, project_id: int, files: tuple[tuple[str, bytes], ...]) -> None:
+    readback = _post(api, "files/read", {"projectId": project_id}).get("files")
+    if type(readback) is not list or len(readback) != len(files):
+        _fail("R247 two-file readback inventory changed")
+    observed = {}
+    for item in readback:
+        if (
+            type(item) is not dict or type(item.get("name")) is not str
+            or type(item.get("content")) is not str
+            or item.get("projectId") != project_id
+            or item["name"] in observed
+        ):
+            _fail("R247 source readback identity changed")
+        observed[item["name"]] = item["content"]
+    if set(observed) != {path for path, _ in files}:
+        _fail("R247 source readback paths changed")
+    for path, raw in files:
+        try:
+            rendered = observed[path].encode("ascii")
+        except UnicodeError:
+            _fail("R247 source readback is not ASCII")
+        if rendered != raw or _digest(rendered) != _digest(raw):
+            _fail("R247 source readback bytes changed")
+
+
+def _compile_and_launch(plan: SnapshotQcPlan, api, project_id: int) -> tuple[str, str]:
+    name = BACKTEST_NAME if plan.attempt == 1 else BACKTEST_NAME_A2
+    started = _post(api, "compile/create", {"projectId": project_id})
+    compile_id = started.get("compileId")
+    if type(compile_id) is not str or _ID.fullmatch(compile_id) is None:
+        _fail("R247 compile identity changed")
+    for poll in range(120):
+        state = _post(api, "compile/read", {
+            "projectId": project_id, "compileId": compile_id,
+        })
+        if state.get("compileId") != compile_id or state.get("state") not in {
+            "InQueue", "Building", "BuildSuccess", "BuildError",
+        }:
+            _fail("R247 compile state changed")
+        if state["state"] in {"BuildSuccess", "BuildError"}:
+            break
+        if poll < 119:
+            time.sleep(2)
+    else:
+        _fail("R247 compile poll budget exhausted; attempt is consumed")
+    if state["state"] == "BuildError":
+        _write(_path(plan, "terminal"), {
+            "candidate_id": CANDIDATE_ID, "attempt": plan.attempt,
+            "status": "BuildError", "project_id": project_id,
+            "compile_id": compile_id,
+        })
+        _fail("R247 compile failed; attempt is consumed")
+    launched = _post(api, "backtests/create", {
+        "projectId": project_id, "compileId": compile_id,
+        "backtestName": name,
+    }).get("backtest")
+    if type(launched) is not dict:
+        _fail("R247 launch response changed")
+    backtest_id = launched.get("backtestId")
+    if (
+        type(backtest_id) is not str or _ID.fullmatch(backtest_id) is None
+        or launched.get("projectId") != project_id
+        or launched.get("name") != name
+        or launched.get("status") not in {"In Queue...", "In Progress..."}
+    ):
+        _fail("R247 backtest launch identity changed")
+    return compile_id, backtest_id
+
+
 def prepare_and_launch_once(
     plan: SnapshotQcPlan, api, *, owner_waiver_id: str | None = None,
 ) -> dict[str, object]:
     """One exact-waived A1, one fresh private project, exact source, one launch."""
     preview = preview_plan(plan)
     permit = _launch_authority(plan, owner_waiver_id=owner_waiver_id)
+    if plan.attempt == 2:
+        return _prepare_and_launch_a2_once(plan, api, preview, permit)
     files = _files()  # Immutable bytes carried through upload/readback.
     _client(api)
     if _path(plan, "claim").exists():
@@ -275,69 +384,8 @@ def prepare_and_launch_once(
             "projectId": project_id, "name": path,
             "content": raw.decode("ascii"),
         })
-    readback = _post(api, "files/read", {"projectId": project_id}).get("files")
-    if type(readback) is not list or len(readback) != 2:
-        _fail("R247 two-file readback inventory changed")
-    observed = {}
-    for item in readback:
-        if (
-            type(item) is not dict or type(item.get("name")) is not str
-            or type(item.get("content")) is not str
-            or item.get("projectId") != project_id
-            or item["name"] in observed
-        ):
-            _fail("R247 source readback identity changed")
-        observed[item["name"]] = item["content"]
-    if set(observed) != {path for path, _ in files}:
-        _fail("R247 source readback paths changed")
-    for path, raw in files:
-        try:
-            rendered = observed[path].encode("ascii")
-        except UnicodeError:
-            _fail("R247 source readback is not ASCII")
-        if rendered != raw or _digest(rendered) != next(
-            item["sha256"] for item in preview["source_files"] if item["path"] == path
-        ):
-            _fail("R247 source readback bytes changed")
-    started = _post(api, "compile/create", {"projectId": project_id})
-    compile_id = started.get("compileId")
-    if type(compile_id) is not str or _ID.fullmatch(compile_id) is None:
-        _fail("R247 compile identity changed")
-    for poll in range(120):
-        state = _post(api, "compile/read", {
-            "projectId": project_id, "compileId": compile_id,
-        })
-        if state.get("compileId") != compile_id or state.get("state") not in {
-            "InQueue", "Building", "BuildSuccess", "BuildError",
-        }:
-            _fail("R247 compile state changed")
-        if state["state"] in {"BuildSuccess", "BuildError"}:
-            break
-        if poll < 119:
-            time.sleep(2)
-    else:
-        _fail("R247 compile poll budget exhausted; A1 is consumed")
-    if state["state"] == "BuildError":
-        _write(_path(plan, "terminal"), {
-            "candidate_id": CANDIDATE_ID, "attempt": 1,
-            "status": "BuildError", "project_id": project_id,
-            "compile_id": compile_id,
-        })
-        _fail("R247 compile failed; A1 is consumed")
-    launched = _post(api, "backtests/create", {
-        "projectId": project_id, "compileId": compile_id,
-        "backtestName": BACKTEST_NAME,
-    }).get("backtest")
-    if type(launched) is not dict:
-        _fail("R247 launch response changed")
-    backtest_id = launched.get("backtestId")
-    if (
-        type(backtest_id) is not str or _ID.fullmatch(backtest_id) is None
-        or launched.get("projectId") != project_id
-        or launched.get("name") != BACKTEST_NAME
-        or launched.get("status") not in {"In Queue...", "In Progress..."}
-    ):
-        _fail("R247 backtest launch identity changed")
+    _require_source_readback(api, project_id, files)
+    compile_id, backtest_id = _compile_and_launch(plan, api, project_id)
     receipt = {
         **permit, "candidate_id": CANDIDATE_ID, "attempt": 1,
         "decision_session": DECISION_SESSION,
@@ -350,33 +398,135 @@ def prepare_and_launch_once(
     return receipt
 
 
+def _prepare_and_launch_a2_once(
+    plan: SnapshotQcPlan, api, preview: dict, permit: dict[str, str],
+) -> dict[str, object]:
+    """Reuse A1's exact private project; change only generated main.py."""
+    predecessor, _ = _require_failed_a1(plan)
+    project_id = predecessor["project_id"]
+    a1_files = _files(1)
+    a2_files = _files(2)
+    _client(api)
+    if _path(plan, "claim").exists() or _path(plan, "launch").exists():
+        _fail("R247 A2 was already claimed")
+    _post(api, "authenticate", {})
+    verified = _post(api, "projects/read", {"projectId": project_id})
+    if _project(verified, plan) != project_id:
+        _fail("R247 A2 predecessor project changed")
+    row = verified["projects"][0]
+    collaborators = row.get("collaborators")
+    if (
+        row.get("owner") is not True or row.get("codeRunning") is not False
+        or type(collaborators) is not list or len(collaborators) > 1
+        or any(type(item) is not dict or item.get("owner") is not True
+               for item in collaborators)
+    ):
+        _fail("R247 A2 predecessor project is not private and idle")
+    _require_source_readback(api, project_id, a1_files)
+    status = _post(api, "backtests/list", {
+        "projectId": project_id, "includeStatistics": False,
+    })
+    rows = status.get("backtests")
+    if type(rows) is not list or len(rows) != 1 or status.get("count", len(rows)) != len(rows):
+        _fail("R247 A1 status inventory changed")
+    matches = [item for item in rows if type(item) is dict
+               and item.get("backtestId") == predecessor["backtest_id"]]
+    if len(matches) != 1 or (
+        matches[0].get("projectId", project_id) != project_id
+        or matches[0].get("name") != BACKTEST_NAME
+        or matches[0].get("status") != "Runtime Error"
+    ):
+        _fail("R247 A1 terminal status changed")
+    _write(_path(plan, "claim"), {
+        **permit, "candidate_id": CANDIDATE_ID, "attempt": 2,
+        "decision_session": DECISION_SESSION, "project_name": PROJECT_NAME,
+        "project_id": project_id,
+        "source_manifest_sha256": preview["source_manifest_sha256"],
+        "predecessor_backtest_id": predecessor["backtest_id"],
+        "predecessor_source_manifest_sha256": SOURCE_MANIFEST_SHA256,
+    })
+    a2_main = next(raw for path, raw in a2_files if path == "main.py")
+    _post(api, "files/update", {
+        "projectId": project_id, "name": "main.py",
+        "content": a2_main.decode("ascii"),
+    })
+    _require_source_readback(api, project_id, a2_files)
+    compile_id, backtest_id = _compile_and_launch(plan, api, project_id)
+    receipt = {
+        **permit, "candidate_id": CANDIDATE_ID, "attempt": 2,
+        "decision_session": DECISION_SESSION,
+        "project_id": project_id, "project_name": PROJECT_NAME,
+        "compile_id": compile_id, "backtest_id": backtest_id,
+        "backtest_name": BACKTEST_NAME_A2,
+        "source_manifest_sha256": preview["source_manifest_sha256"],
+        "predecessor_backtest_id": predecessor["backtest_id"],
+        "predecessor_source_manifest_sha256": SOURCE_MANIFEST_SHA256,
+    }
+    _write(_path(plan, "launch"), receipt)
+    return receipt
+
+
 def _launch(plan: SnapshotQcPlan, launch: dict) -> None:
     preview = preview_plan(plan)
     claim = _read(_path(plan, "claim"))
     if _read(_path(plan, "launch")) != launch or (
         launch.get("candidate_id") != CANDIDATE_ID
-        or launch.get("attempt") != 1
+        or launch.get("attempt") != plan.attempt
         or launch.get("decision_session") != DECISION_SESSION
         or launch.get("project_name") != PROJECT_NAME
-        or launch.get("backtest_name") != BACKTEST_NAME
+        or launch.get("backtest_name") != preview["backtest_name"]
         or launch.get("source_manifest_sha256") != preview["source_manifest_sha256"]
         or type(launch.get("project_id")) is not int
         or type(launch.get("backtest_id")) is not str
         or _ID.fullmatch(launch["backtest_id"]) is None
     ):
         _fail("R247 launch receipt changed")
-    expected = _launch_authority(plan, owner_waiver_id=WAIVER_ID)
+    expected = _launch_authority(
+        plan, owner_waiver_id=WAIVER_ID if plan.attempt == 1 else WAIVER_ID_A2,
+    )
     if any(launch.get(key) != value for key, value in expected.items()):
         _fail("R247 launch waiver receipt changed")
     if (
         claim.get("candidate_id") != CANDIDATE_ID
-        or claim.get("attempt") != 1
+        or claim.get("attempt") != plan.attempt
         or claim.get("decision_session") != DECISION_SESSION
         or claim.get("project_name") != PROJECT_NAME
         or claim.get("source_manifest_sha256") != preview["source_manifest_sha256"]
         or any(claim.get(key) != value for key, value in expected.items())
     ):
         _fail("R247 launch and claim authority differ")
+    if plan.attempt == 2:
+        predecessor, _ = _require_failed_a1(plan)
+        if any(
+            record.get(key) != value
+            for record in (claim, launch)
+            for key, value in {
+                "project_id": predecessor["project_id"],
+                "predecessor_backtest_id": predecessor["backtest_id"],
+                "predecessor_source_manifest_sha256": SOURCE_MANIFEST_SHA256,
+            }.items()
+        ):
+            _fail("R247 A2 predecessor binding changed")
+
+
+def _require_failed_a1(plan: SnapshotQcPlan) -> tuple[dict, dict]:
+    prior_plan = SnapshotQcPlan(plan.organization_id, plan.control_directory, 1)
+    predecessor = _read(_path(prior_plan, "launch"))
+    _launch(prior_plan, predecessor)
+    terminal = _read(_path(prior_plan, "terminal"))
+    if (
+        set(terminal) != {
+            "candidate_id", "attempt", "status", "project_id", "backtest_id",
+        }
+        or terminal.get("candidate_id") != CANDIDATE_ID
+        or terminal.get("attempt") != 1
+        or terminal.get("status") != "Runtime Error"
+        or terminal.get("project_id") != predecessor["project_id"]
+        or terminal.get("backtest_id") != predecessor["backtest_id"]
+        or _path(prior_plan, "result-valid").exists()
+    ):
+        _fail("R247 A1 is not an authenticated invalid predecessor")
+    return predecessor, terminal
 
 
 def poll_status_once(plan: SnapshotQcPlan, launch: dict, api) -> str:
@@ -399,27 +549,27 @@ def poll_status_once(plan: SnapshotQcPlan, launch: dict, api) -> str:
     row = matches[0]
     status = row.get("status")
     if (
-        row.get("name") != BACKTEST_NAME
+        row.get("name") != launch["backtest_name"]
         or ("projectId" in row and row["projectId"] != launch["project_id"])
         or status not in {"In Queue...", "In Progress...", "Completed.", "Runtime Error"}
     ):
         _fail("R247 backtest status identity changed")
     if status in {"Completed.", "Runtime Error"}:
         _write(terminal, {
-            "candidate_id": CANDIDATE_ID, "attempt": 1,
+            "candidate_id": CANDIDATE_ID, "attempt": plan.attempt,
             "status": status, "project_id": launch["project_id"],
             "backtest_id": launch["backtest_id"],
         })
     return status
 
 
-def _parse_meta_response(response: dict, launch: dict) -> dict:
+def _parse_meta_response(response: dict, plan: SnapshotQcPlan, launch: dict) -> dict:
     """Ignore standard QC statistics and retain only bounded input metadata."""
     backtest = response.get("backtest")
     if type(backtest) is not dict or (
         backtest.get("projectId") != launch["project_id"]
         or backtest.get("backtestId") != launch["backtest_id"]
-        or backtest.get("name") != BACKTEST_NAME
+        or backtest.get("name") != launch["backtest_name"]
         or backtest.get("status") != "Completed."
     ):
         _fail("R247 result identity changed")
@@ -471,7 +621,7 @@ def read_meta_once(plan: SnapshotQcPlan, launch: dict, api) -> dict:
         _fail("R247 run did not complete exactly")
     _client(api)
     _write(_path(plan, "result-read-claim"), {
-        "candidate_id": CANDIDATE_ID, "attempt": 1,
+        "candidate_id": CANDIDATE_ID, "attempt": plan.attempt,
         "project_id": launch["project_id"],
         "backtest_id": launch["backtest_id"],
         "custom_statistic_name": META_NAME,
@@ -479,9 +629,9 @@ def read_meta_once(plan: SnapshotQcPlan, launch: dict, api) -> dict:
     response = _post(api, "backtests/read", {
         "projectId": launch["project_id"], "backtestId": launch["backtest_id"],
     })
-    meta = _parse_meta_response(response, launch)
+    meta = _parse_meta_response(response, plan, launch)
     _write(_path(plan, "result-valid"), {
-        "candidate_id": CANDIDATE_ID, "attempt": 1,
+        "candidate_id": CANDIDATE_ID, "attempt": plan.attempt,
         "project_id": launch["project_id"],
         "backtest_id": launch["backtest_id"],
         "source_manifest_sha256": launch["source_manifest_sha256"],
@@ -497,9 +647,10 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("action", choices=("plan", "launch", "status", "read-meta"))
     parser.add_argument("--organization-id", required=True)
     parser.add_argument("--control-directory", type=Path, required=True)
+    parser.add_argument("--attempt", type=int, default=1, choices=(1, 2))
     parser.add_argument("--owner-waiver-id")
     args = parser.parse_args(argv)
-    plan = SnapshotQcPlan(args.organization_id, args.control_directory)
+    plan = SnapshotQcPlan(args.organization_id, args.control_directory, args.attempt)
     if args.action == "plan":
         print(json.dumps(preview_plan(plan), sort_keys=True))
     elif args.action == "launch":

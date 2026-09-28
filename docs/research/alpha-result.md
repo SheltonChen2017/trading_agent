@@ -5915,3 +5915,24 @@ point-in-time analyst revisions nor selects a 60%–200% rule, proves future
 alpha, or authorizes paper/live/funded orders. The private raw/result receipts
 remain in the ignored lane artifact tree; the shared ledger holds no provider,
 stock-price, or order rows.
+
+## R-247 A1 — fresh six-universe input-only QC diagnostic — 2026-09-28
+
+Under the owner's standing exploratory research and shared-look bookkeeping
+authority, one private **infrastructure** run was launched for the closed
+2026-09-25 decision session. Project **37097547**, backtest
+`917aa1b03250fa811f55914e3998d056`, exact two-file source-manifest SHA-256
+`3954de79a3398e900a78e6c2f0330ff9cdda370ade3570e41dbe50380684b381`.
+The source read back byte-identically and compiled before launch. A1 ended
+`Runtime Error` at its 2026-09-11 start clock, before the intended 09:20
+September-25 snapshot; the end hook reported that no snapshot persisted.
+The status listing exposed the end-hook error. A bounded, redacted
+failure-only read found `hasInitializeError=true` and no log entries, so the
+visible end-hook refusal may mask the initiating error. No prices, returns,
+orders, raw universe rows, or Object Store contents were inspected or
+retained. A1 is spent and has **no valid input result**. A prospective A2
+may only correct the error masking and reuse this project; it cannot re-label
+A1 as valid. One infrastructure look moves the conservative floor from
+**251/192/34/662** to **252 shared research looks / 192 development
+evaluations / 35 infrastructure looks / 662 authenticated exploratory
+cells**. There is no forward-performance or formal-paper inference.

@@ -183,8 +183,10 @@ the historical AR effect averages +1.6 points per year (t ≈ 0.6 over five
 years); the weight overlay's gain comes from 2021 and 2024 and the
 entry/count drag from 2025.
 Section 212 counter-reviews every Claude commit, corrects three P3 record
-details and the snapshot warm-up refusal, and freezes R247-A1 as a private,
-input-only QC probe. No forward performance or paper result is inferred.
+details and the snapshot warm-up refusal, and freezes R247 as a private,
+input-only QC probe. A1 failed at initialization; A2 prospectively changes
+only the end-hook masking and reuses that project. No forward performance or
+paper result is inferred. The floor after A1 is **252 / 192 / 35 / 662**.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -869,10 +871,10 @@ paper gate are unchanged. Section 211 is Claude's independent review of the
 exact pushed range `1cb3705..d75c114` (sections 207–210), with the test-only
 correction `8c06df6`. Section 212 completes Codex's counter-review and
 prospectively freezes R247-A1 after correcting the snapshot warm-up refusal.
-The immediate next step under section 212 is to attempt that one input-only
-QC diagnostic, then record its exact terminal disposition and the remaining
-forward-input gates. Claude should review section 212 after Codex's one
-final lane push.
+The immediate next step under section 212 is to try the prospectively pinned
+R247-A2 error-disclosure correction in the same private QC project, then
+record its exact terminal disposition and the remaining forward-input gates.
+Claude should review section 212 after Codex's one final lane push.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -29757,3 +29759,67 @@ probe cannot prove vendor publication-time availability or make the
 infrastructure research look, zero development/economic result cells;
 until launch, the floor remains **251 shared / 192 development / 34
 infrastructure / 662 authenticated cells**.
+
+### 212.2 R247-A1 terminal disposition and failure-only diagnosis
+
+After the prospective source and authority were committed locally at
+`90ca9a5`, the bounded launcher authenticated the existing QC organization,
+created private project **37097547**, read back exactly its two source files,
+compiled, and launched one backtest `917aa1b03250fa811f55914e3998d056`.
+The physical source-manifest SHA-256 was the frozen
+`3954de79a3398e900a78e6c2f0330ff9cdda370ade3570e41dbe50380684b381`.
+A1 reached `Runtime Error`; the status field located the error at
+**2026-09-11 00:00**, the algorithm's start, fourteen days before the target
+decision. The end hook said `fresh six-universe snapshot never persisted`.
+A single bounded, redacted diagnostic read of this failed input-only run
+reported `hasInitializeError=true` and zero log entries. That read retained
+no standard statistics, price, return, order, raw input, or Object Store
+payload. The end-hook exception is therefore secondary: it does not prove
+which operation caused initialization to fail. A1 is consumed, and no custom
+input metadata exists. This outcome is an **invalid diagnostic**, not a
+negative analyst result, and does not test the 100%/200% forward pair.
+
+The next attempt must be a prospective, tested **A2 in this same project**.
+Its first correction should remove only the pre-target end-hook masking so
+QC can expose the initiating failure; it must preserve the missing-snapshot
+refusal on and after the decision session and preserve the exact metadata
+result gate. A2 may still fail and counts toward the three-attempt maximum.
+There is no evidence yet to change universe membership, source EndTime,
+positivity, Object Store, analyst-score, or price/outcome policy. A1 adds
+**one infrastructure look, zero development evaluations and zero cells**;
+the floor is now **252 shared / 192 development / 35 infrastructure / 662
+authenticated exploratory cells**. The matching owner-authorized entry is
+in `docs/research/alpha-result.md`.
+
+### 212.3 Prospective R247-A2 source and one-use correction
+
+After A1's start-time initialization error, A2 changes **only generated
+`main.py`**: `on_end_of_algorithm` does not raise the missing-snapshot
+exception if execution ended before 2026-09-25. On or after that date it
+still requires persistence. The runtime file, seven source callbacks, 09:20
+decision, all source/identity/positivity/age checks, Object Store protocol,
+and decision-unready metadata are byte-identical to A1. This change exposes
+the initiating error rather than presuming it fixes it. A hypothetical
+`Completed.` with no metadata still fails the one-use result reader. No
+clock-anchor or price subscription is introduced: the missing-subscription
+hypothesis is not yet established.
+
+| Frozen R247-A2 identity | Value |
+|---|---|
+| Existing private project | `ARV2 R247 FRESH SIX INPUT 20260925`, ID **37097547** |
+| Backtest name | `ARV2 R247A2 fresh six input init error disclosure 20260925` |
+| Runtime file SHA-256, unchanged | `6c386957b25b83d6a5f6333cfa699ae07e0808b965a5a9184059becd992e529f` |
+| Generated A2 `main.py` SHA-256 | `9227144284e54ba3894ee86a7fea3e3d1f06a8892d5a7eebf3068b5eac123830` |
+| Sorted two-file A2 manifest SHA-256 | `123c17148c6850cf432dbf64534de7c3f040324b80639ada369567867b0c7f9d` |
+| Exact A2 waiver | `ARV2-OWNER-STANDING-EXPLORATORY-R247A2-INPUT-ONLY-SIGNATURE-WAIVER` |
+
+Before A2 changes anything in QC, the launcher requires the locally
+authenticated A1 `Runtime Error`, exactly one remote A1 run, a private idle
+project, and byte-identical A1 two-file source. It creates an exclusive A2
+claim, updates only `main.py`, reads back the exact A2 two-file source, then
+compiles and launches at most once. An A2 failure consumes the second of the
+owner's three slots. A3 is unimplemented and needs its own evidenced,
+prospective correction; a fresh project is not a permitted retry. Focused
+offline tests include executable early/decision end-hook behavior,
+predecessor/source/waiver/claim refusals, one launch and one bounded metadata
+read. No QC A2 action or result is implied by this source freeze.

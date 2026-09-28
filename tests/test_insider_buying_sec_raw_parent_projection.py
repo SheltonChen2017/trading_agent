@@ -320,3 +320,103 @@ def test_derivation_and_serialization_perform_no_file_io(monkeypatch):
     projection = _derive(owners=("0000999999", "0000888888"))
     assert projection.to_payload()["derived_projection"]["reporting_owner_count"] == 2
     assert projection.sha256
+
+
+# Isolating pins: each input is otherwise valid, so only the named guard can
+# refuse it. The broad cases above match any "REFUSED" message, which lets a
+# second guard mask the deletion of the first.
+
+
+def _index_with(items: list[dict[str, object]]) -> bytes:
+    return json.dumps({"directory": {"item": items}}, separators=(",", ":")).encode("ascii")
+
+
+def test_index_item_repeating_a_key_is_refused_even_when_the_last_value_is_right():
+    index = b'{"directory":{"item":[{"name":"other.xml","name":"ownership.xml"}]}}'
+    with pytest.raises(SecRawParentProjectionError, match="repeats a JSON key"):
+        _derive(index=index)
+
+
+def test_index_non_json_constant_is_refused():
+    index = b'{"directory":{"item":[{"name":"ownership.xml","size":NaN}]}}'
+    with pytest.raises(SecRawParentProjectionError, match="non-JSON constant"):
+        _derive(index=index)
+
+
+def test_index_above_512_items_is_refused_with_one_valid_xml():
+    items = [{"name": "ownership.xml"}] + [{"name": f"f{i}.txt"} for i in range(512)]
+    with pytest.raises(SecRawParentProjectionError, match="bounded item list"):
+        _derive(index=_index_with(items))
+
+
+@pytest.mark.parametrize(("old", "new", "match"), [
+    (b"Invented Owner", b"Invented\x01Owner", "unsupported bytes"),
+    (b".hdr.sgml : ", b"X.hdr.sgml : ", "envelope disagrees"),
+    (b"</ISSUER>\n", b"</ISSUER>\n<EXTRA-FIELD>x\n", "content after issuer"),
+    (b"<TYPE>4\n", b"<TYPE>4\n<FOREIGN-FIELD>x\n", "foreign field"),
+    (b"<TYPE>4\n", b"<TYPE>4/A\n", "identity disagrees"),
+    (b"</REPORTING-OWNER>\n<ISSUER>", b"</REPORTING-OWNER>\n<EXTRA-FIELD>x\n<ISSUER>", "between owner and issuer"),
+    (b"<ACCEPTANCE-DATETIME>20221107101112", b"<ACCEPTANCE-DATETIME>20221108101112", "internally inconsistent"),
+])
+def test_header_isolated_refusals(old, new, match):
+    header = _header()
+    assert old in header
+    with pytest.raises(SecRawParentProjectionError, match=match):
+        _derive(header=header.replace(old, new, 1))
+
+
+def test_content_between_two_owner_sections_is_refused():
+    owners = ("0000999999", "0000888888")
+    header = _header(owners).replace(
+        b"</REPORTING-OWNER>\n<REPORTING-OWNER>",
+        b"</REPORTING-OWNER>\n<EXTRA-FIELD>x\n<REPORTING-OWNER>", 1,
+    )
+    with pytest.raises(SecRawParentProjectionError, match="between owners"):
+        _derive(owners=owners, header=header)
+
+
+def test_owner_subsection_before_the_owner_data_block_is_refused():
+    header = _real_shape_header(("0000999999",))
+    moved = header.replace(
+        b"<REPORTING-OWNER>\n<OWNER-DATA>",
+        b"<REPORTING-OWNER>\n<MAIL-ADDRESS>\n<CITY>Early\n</MAIL-ADDRESS>\n<OWNER-DATA>", 1,
+    )
+    with pytest.raises(SecRawParentProjectionError, match="data scope is incomplete"):
+        _derive(owners=("0000999999",), header=moved)
+
+
+@pytest.mark.parametrize(("xml", "match"), [
+    (b'<!DOCTYPE ownershipDocument [<!ENTITY f "4">]><ownershipDocument><documentType>&f;</documentType>'
+     b"<issuer><issuerCik>0000123456</issuerCik></issuer><reportingOwner><reportingOwnerId>"
+     b"<rptOwnerCik>0000999999</rptOwnerCik></reportingOwnerId></reportingOwner></ownershipDocument>",
+     "DTD or entity"),
+    (b"\xef\xbb\xbf" + _xml(), "BOM"),
+    (_xml().replace(b"ownershipDocument>", b"otherDocument>"), "root is not ownershipDocument"),
+    (_xml().replace(b"</ownershipDocument>", b"<footnotes><documentType>4/A</documentType></footnotes></ownershipDocument>"),
+     "form or issuer is ambiguous"),
+    (_xml().replace(b"</ownershipDocument>", b"<footnotes><reportingOwner/></footnotes></ownershipDocument>"),
+     "owner topology is ambiguous"),
+    (_xml().replace(b"</reportingOwnerId>", b"</reportingOwnerId><reportingOwnerAddress><rptOwnerCik>0000777777</rptOwnerCik></reportingOwnerAddress>"),
+     "owner identity is ambiguous"),
+])
+def test_xml_isolated_refusals(xml, match):
+    with pytest.raises(SecRawParentProjectionError, match=match):
+        _derive(xml=xml)
+
+
+def test_projection_subclass_is_refused():
+    from research.insider_buying import sec_raw_parent_projection as module
+
+    class Derived(module.SecRawParentProjection):
+        pass
+
+    with pytest.raises(SecRawParentProjectionError, match="exact projection type"):
+        Derived(_target(), _index(), _header(), _xml())
+
+
+def test_owner_repeated_in_both_header_and_xml_is_refused():
+    # Each source's own duplicate check is backed by the other only when the
+    # two disagree; repeating the owner in both must still refuse.
+    owners = ("0000999999", "0000999999")
+    with pytest.raises(SecRawParentProjectionError, match="repeats a reporting-owner CIK"):
+        _derive(owners=owners)

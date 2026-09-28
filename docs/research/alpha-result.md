@@ -5878,3 +5878,40 @@ the floor to **250 shared / 191 development / 34 infrastructure / 661 cells**.
 No additional look was spent by the result reads. This is adaptive,
 current-vintage, zero-modeled-slippage sensitivity, not formal alpha evidence
 or a live-trading rule.
+
+## R-246 A1 — QCOM-excluded AR admission/count with zero weight transfer — 2026-09-28
+
+Owner-directed, separately versioned **exploratory development evaluation**
+after Claude section 206 and Codex counter-review 207. This is an order-based
+2021-01-04–2025-12-31 arm on the frozen R231/R232 all-six 25%/five-name,
+QCOM-direct-stock-excluded construction. It preserves R232's AR-positive-score
+admission/count and market-cap-selected stock identities but sets within-stock
+AR weight transfer to exactly zero. It is not an AR-off arm, a new paper
+epoch, or a confirmatory test. Private QC project **37072332**, backtest
+`01f626d4143a123ec61ec7224d4d7f2b`; manifest SHA-256
+`117a1c9524d3f2dd5f4f2ee6a7308e947d602e0c5efc88d8925205c152f301ad`,
+projection SHA-256 `711bf00ec5dbefd45fda2e07c603800ec98e134d9e392582547f6f9186c43eff`.
+Exact 17-file source was read back and compiled before A1 launch. A1 reached
+`Completed.` and the one receipt-bound custom-statistic read authenticated
+`run_valid=true`, 261 completed/261 submitted weekly rebalances, 10,325
+filled/10,325 submitted orders, and zero invalid/canceled orders. The account
+returned **+136.8727949437265%** cumulative after modeled 10-bps-per-side
+fees, with **−21.7534105323991%** maximum drawdown and 0.94686 zero-rate
+Sharpe. One launch/look and one valid exploratory cell move the conservative
+floor from **250/191/34/661** to **251 shared research looks / 192 ARV2
+development evaluations / 34 infrastructure looks / 662 accepted cells**.
+
+The cached receipt-bound three-arm comparison passed its source, result and
+same-AR-on-baseline-path checks: R231 AR-off +143.74911021917653%, R246
+AR-entry/count-only +136.8727949437265%, R232 full AR-on100
++159.9507341441203%. AR entry/count/fallback versus fully off is
+**−6.87631527545003 percentage points**; AR weight transfer on the same
+entry/count baseline is **+23.0779392003938 points**; total full AR versus
+off is **+16.20162392494377 points**. All are net policy differences with
+modeled fees; no identical full stock minute-fill tape is proven across jobs.
+The weight overlay was not positive in every annual slice. This historical
+current-vintage, QCOM-excluded, zero-slippage decomposition neither verifies
+point-in-time analyst revisions nor selects a 60%–200% rule, proves future
+alpha, or authorizes paper/live/funded orders. The private raw/result receipts
+remain in the ignored lane artifact tree; the shared ledger holds no provider,
+stock-price, or order rows.

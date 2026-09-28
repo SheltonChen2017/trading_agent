@@ -147,7 +147,7 @@ project untouched. Its QC execution and outcome status are recorded below.
 Section 203 hands off eleven valid, explicitly exploratory QCOM-excluded
 order cells and the 10%-floor null sensitivity for Claude review; sections
 204–205 add the three-name admission sensitivity R242–R245, four more valid
-exploratory cells. The current look floor is **250 / 191 / 34 / 661**. The
+exploratory cells. Their closing look floor was **250 / 191 / 34 / 661**. The
 original R225 stock arm and its QCOM reference-price gap remain unresolved.
 Section 206 is Claude's independent review of the seven-commit range
 `f612899..1b1da0e` (0 P0, 0 P1, 1 P2, 2 P3, record-only correction):
@@ -158,6 +158,13 @@ AR-on/off pair adds +16.20 points, while the separate recent pair loses
 periods, so the divergence cannot yet be assigned to regime or data vintage
 alone. The 10% floors are a measured null and the three-name floors a
 sub-point effect. `ARV2R196-001` remains open.
+Section 208 freezes the eight-point AR transfer range without selecting a
+primary rule, completes one matched historical zero-transfer order diagnostic,
+and starts development-only forward vendor-version receipts. R246 attributes
+the historical net AR spread to **−6.88 points** from entry/count/fallback and
+**+23.08 points** from weight transfer conditional on the same AR-on baseline;
+it is not a prospective efficacy result. The current look floor is
+**251 / 192 / 34 / 662**. Formal paper confirmation remains gated.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -811,7 +818,8 @@ before that next review. Section 206 is Claude's independent review of the
 exact pushed range `f612899..1b1da0e`; Codex counter-reviews both Claude
 commits and corrects its attribution in section 207. The owner then directs
 a bounded AR 60%–200% rule freeze, a matched historical decomposition, and
-forward-looking preparation. Claude will independently review section 207
+forward-looking preparation. Section 208 records their implementation and
+the authenticated R246 result. Claude will review section 208 independently
 and the exact next pushed implementation before any formal efficacy or paper
 authority is inferred. No fourth R225 attempt, formal alpha, live/paper
 order, or automatic threshold search follows.
@@ -2559,6 +2567,8 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-27 | Codex counter-review of section 200; owner retains Mia debugging | `f612899` -> this record commit | Both Claude commits dispositioned; no new milestone or cloud operation | Accept closure correction; qualify accounting, drift, QCOM chronology, fee-callback and cost/result inferences; catch up omitted execution row | Full affected closure file, focused drift/record checks, in-memory red/green registration proof, compilation/diff checks; exact counts in 201.3. No complete suite. | Five P3 record qualifications resolved; no new P0/P1/P2. Existing reference/vintage P2s open. | One final same-lane push; wait for owner's Mia findings before any cloud-source retrieval/port or next launch. |
 | 2026-09-27 | Codex owner-directed exploratory order-based QC | `e1678f1` -> `51194b4`, `6541c5d`, and this final record commit | QCOM-excluded 2021–2025 cost, tilt and 10%-minimum-coverage sensitivities R231–R241 | Eleven valid exploratory cells across 12 QC launch attempts; R237 A1 failed before creation and A2 completed in the same project. The 10%-floor arms exactly matched corresponding 25%-floor selections and results because the REMX five-verified-name floor still bound. One-use receipt chains, corrections and caveats are detailed in sections 202–203. | Affected focused battery 232 passed; lane-record gate 13 passed; exact source readback and compile for each QC project; one bounded result read per valid run. No complete lane suite. Closing floor 244 shared / 185 development / 34 infrastructure / 657 cells. | Local comparator count, META-parser and pre-create retry defects corrected with isolating tests. Current-vintage Benzinga PIT, original QCOM reference hole, adaptive setting search and zero-slippage limits remain; no formal alpha or trading claim. | One final same-lane push; Claude independently reviews every commit, runs the full lane suite, and pushes once; Codex then counter-reviews. No automatic further capacity search. |
 | 2026-09-28 | Claude independent review of sections 201–205: Codex's counter-review of section 200, the QCOM-excluded historical sensitivities, the 10% and three-name admission studies | `1b1da0e` -> this record commit | Section 206: seven commits `f612899..1b1da0e` individually disposed (6 accepted, 1 accepted after a record correction, 0 rejected); Codex's five qualifications of section 200 accepted; zero QC or provider calls, looks, evaluations, or cells | Record-only: section 4 now names section 206, the banner's live sentences are current, this row appended; no code or test changed | Standing lane selection in a byte-faithful export of the pushed head, focused new files, eight mutation trials, record gates, `compileall`, `git diff --check`; exact counts in 206.7 | 0 P0, 0 P1, 1 P2, 2 P3 (`ARV2R206-001` through `-003`); `-001` corrected (record gates red at the pushed head, third recurrence) | Single push of this commit; Codex counter-reviews section 206, runs the record gates on the final bytes before every push, and decomposes the 2021–2025 effect with one AR-entry, zero-tilt arm before any further admission or capacity change |
+| 2026-09-28 | Catch-up entry for the 2026-09-27 Codex execution push (`ARV2R206-001`); append only | `89bdb29..1b1da0e`: `bcf6356`, `ef352c1`, `1b1da0e` | Sections 204–205 three-name sensitivity, R242–R245, same-project A2 recovery and receipt-bound comparison | Four valid exploratory cells, two spent pre-create A1 slots; no result or code is changed by this catch-up row. | Exact prior validation and QC receipts are in sections 204–205; Claude's independent checks are in section 206. The prior floor was 250/191/34/661. | Missing push-ledger row corrected without rewriting historical evidence or excusing the two then-red record gates. | Historical bookkeeping only; no additional QC look, code change or independent review bypass. |
+| 2026-09-28 | Codex counter-review and owner-directed AR mechanism/forward-data round | `1cb3705` -> `47e892b`, `23f511c`, and this final record commit | Section 207 counter-reviews both Claude commits; section 208 freezes the 60–200 discrete AR range, implements R246 entry/count-only 0%-transfer order diagnostic, and starts development-only forward capture receipts | R246 A1 valid in project 37072332: +136.87% net, −21.75% drawdown; matched cached decomposition is −6.88 pp entry/count/fallback and +23.08 pp weight transfer, combined +16.20 pp. Same-window Massive recaptures show 1,398 same-ID/same-version records and zero observed changes over this short interval; new weekend capture has zero events. No paper/forward-return test. | Focused source/projection/predecessor, import-closure and forward receipt tests; exact QC source readback/compile, completed 261/261 order schedule, single bounded read, local comparison, final active-document gates. No complete lane suite. Closing floor 251/192/34/662. | Six section-207 qualifications corrected or documented; `ARV2R196-001` vintage/regime/construction issue and the R225 QCOM price gap remain open. Eight-point range is fixed, but the primary future percentage is owner-pending and four points are unrun. | One combined same-lane push; Claude independently reviews section 208 and exact commits, including the R246 writer-schema pin, decomposition guard and forward-receipt boundary. Codex then counter-reviews before another efficacy step; no automatic ARV2-9 paper authority. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -29124,3 +29134,163 @@ looks, evaluations, infrastructure looks, or cells; floor remains
 used. The owner's next request authorizes a bounded AR 60–200 rule freeze,
 mechanism decomposition, and prospective preparation, but not a claim that
 ARV2-9's paper-deployment gates are already satisfied.
+
+## 208. Owner-directed AR range freeze, mechanism isolation, and forward data-quality start, 2026-09-28
+
+The owner requested an AR weight-transfer rule freeze from 60% through 200%,
+an explanation of what AR actually changes, and a start on forward-looking
+evidence. The eight **discrete** settings are now 60, 80, 100, 120, 140, 160,
+180 and 200 percent of each selected stock's post-cap baseline weight as a
+*transfer-capacity parameter*. They do not multiply gross exposure, borrowing,
+or the 2x order-admission buying-power setting. The immutable, hash-pinned
+`six_universe_qcom_exclusion_ar_range_policy.json` records R231 as the AR-off
+control and binds the already observed R235/80, R232/100, R236/120 and R237/200
+arms to their existing manifest hashes. The 60/140/160/180 arms remain
+**unrun**; no result is interpolated. The policy explicitly withholds QC,
+outcome, paper and trading authority, labels the five-year ladder adaptive
+and exploratory, and leaves a single primary prospective percentage
+**undecided pending owner choice**. No best-setting selection is inferred
+from the observed rising returns. The policy and strict read-only loader were
+checked by 19 focused tests.
+
+**Mechanism to be isolated.** In the current matched cap-ranked construction,
+AR-positive scores can change the minimum-count admission decision and thus
+whether a sleeve uses selected stocks or its own ETF fallback. Once a sleeve
+admits stocks, identities are selected by the frozen point-in-time market-cap
+rule, not ranked directly by AR score. The AR *weight overlay* then transfers
+weight within that already selected stock set from lower-ranked scored names
+to higher-ranked scored names, subject to the stock cap and unchanged sleeve
+and 98% portfolio budgets. Prior R231 AR-off versus R232 AR-on100 combined
+these effects. New R246 copies R232's QCOM exclusion, coverage, five-name
+and five-positive-score admission/count policy, source package, and order
+economics, while changing only the within-stock transfer fraction from 1.00
+to 0.00 and giving the arm new source/profile/result identities. R231 versus
+R246 tests entry/count/fallback *as a combined component*; R246 versus R232
+tests the weight overlay conditional on the same AR-on baseline path. The
+comparison requires equal raw membership/cap and six-ETF-panel digests, the
+same AR-on baseline target path and sleeve diagnostics, and valid completed
+order receipts. It cannot prove identical entire stock minute-fill tapes
+between separate cloud jobs. This is an exploratory decomposition of the
+2021–2025 current-vintage archive, not held-out causal or formal alpha proof.
+R246's one-candidate order source is 17 files / 405,712 bytes; frozen
+projection SHA-256 `711bf00ec5dbefd45fda2e07c603800ec98e134d9e392582547f6f9186c43eff`,
+profile SHA-256 `86cde0605e404f0d0249ab8530921b6cff02aba55e2918aa7f01126000ac96ca`,
+and manifest SHA-256 `117a1c9524d3f2dd5f4f2ee6a7308e947d602e0c5efc88d8925205c152f301ad`.
+Its actual producer's custom META uses the shared QCOM-exclusion schema, not
+the tilt runtime's internal `TILT_META_SCHEMA`; a focused test pins that
+specific writer to prevent repeating `ARV2R206-003` on the new manifest.
+Offline preview, 17 new tests, 103 predecessor tests, the whole-package
+closure check, and a combined 129-test focused selection passed before QC.
+
+**Cloud attempt/accounting and authenticated decomposition.** R246 A1
+uploaded/read back exact pinned source, compiled and launched in private QC
+project **37072332**, backtest `01f626d4143a123ec61ec7224d4d7f2b`.
+The terminal status was `Completed.` and its sole bounded custom-statistic
+read passed `run_valid=true`: 261 submitted/completed weekly rebalances,
+10,325 submitted/filled orders, zero invalid or canceled orders, and matched
+modeled/engine fees of $61,573.601963. The AR-entry/count-only, zero-transfer
+arm returned **+136.8727949437265%** cumulative after modeled 10-bps/side
+fees, maximum drawdown **−21.7534105323991%**, zero-rate Sharpe **0.94686**
+and annualized volatility **20.5312%**. The receipt-bound local three-arm
+comparison passed `comparison_valid=true`, `formal_alpha=false`, and
+`confirmation=false` with the same AR-on baseline-target path SHA-256
+`d9affa29b14ce4cbd5e97eb54ddd189c6af0e7d0bec5d1cb9cd84837fe759f01`.
+Against R231 AR-off **+143.74911021917653%**, admission/count/fallback
+alone is **−6.87631527545003 percentage points**. R232 full AR-on100 is
+**+159.9507341441203%**, so the within-stock AR weight transfer is
+**+23.0779392003938 points** conditional on that same AR-on baseline;
+their combined AR-on-minus-off difference is **+16.20162392494377 points**.
+This is a *net* weight-policy comparison including differing transaction
+costs, not an isolated raw-score forecast. The overlay was not uniformly
+better by year: R232 versus R246 was positive in 2021 and 2024, slightly
+positive in 2022, but negative in 2023 and 2025. Together with the recent
+window's negative AR effect, that warns against treating the five-year
+spread as stable prospective edge. One A1 launch and one valid cell raise
+the floor to **251 shared / 192 development / 34 infrastructure / 662 cells**.
+No retry or further outcome read was used.
+
+**Forward-looking boundary and first captures.** A new offline,
+development-only receipt builder and CLI authenticate existing private Massive
+three-role captures against a caller-supplied manifest SHA-256, hash Benzinga IDs
+and row versions, record actual local receipt times, and compare two captures
+of the *same exact event-date window*. They do not use `last_updated` as an
+availability clock, reconstruct overwritten vendor history, fetch provider
+data themselves, read returns, or initiate ARV2-9 paper confirmation. The
+2026-09-26 compatible capture of event dates **2026-09-17..25** and a fresh
+2026-09-28 recapture of that same window each held **1,398 rows**: 1,289
+analyst ratings, 63 earnings and 46 guidance. For this first local comparison,
+the supplied pins came from each capture's own private `manifest.sha256` file,
+not an independent timestamping or notarization service. The manifest
+SHA-256s are respectively
+`e3e3fb4b9d26abf2e68bc972170d6c2d8a6c4b404278084e3e28b9d43327a8ce`
+and `ab7b9c92c20d42db8d2209051171f41d2e939139b35615763e8c1b73b5744151`;
+published private receipt SHA-256s are
+`bdfbc11d91d310e0d86b8d1af6abc31fac8c71bc23dfa70e1ec1fb480523c6db`
+and `14d7c8f9b76bca0917d4de5d3ab62264da539f2c46a7466291f2687d412f256b`.
+The authenticated comparison found the same version for all 1,398 IDs and
+zero different-version, old-only, new-only, or ambiguous IDs *between these
+two capture times*. It proves neither historical point-in-time completeness
+nor absence of older-window backfill. A separate first capture of
+**2026-09-26..27** contained zero rows (a weekend), retained under manifest
+SHA-256 `c801a6ac1b7eb9ff7ee5cdeba6dc8963dcdc0d69f0859b03a79c037fbb9ea4d7`
+and private receipt SHA-256
+`894642a0372be64dca0701cbaca186c39ada099824059afa2d441b8cf557860b`.
+All three private capture/receipt artifacts remain under the ignored lane
+artifact tree; no raw IDs, rows, or vendor values enter git. These provider
+captures spend **zero** QC or alpha looks. Forward receipt/CLI focused tests:
+19 passed. No scheduling, formal look, broker account, paper/funded order, or
+deployment was created.
+
+**Gate to actual prospective confirmation.** ARV2-9 still needs the
+upstream stock/ETF/pass-through gates, independently reviewed paper
+algorithm and epoch/dossier, a fixed single primary AR setting, and separate
+owner paper-deployment authority. Its single 1/80 confirmatory look cannot
+be retroactively manufactured from these development captures. No paper
+trading or forward-return observation is claimed in this section.
+
+### 208.1 Codex-to-Claude review notes and next gate
+
+**Exact review range:** `1cb3705..HEAD` on
+`codex/strategy-analyst-revisions-v2`, entirely in the designated worktree.
+Disposition every commit, including the final self-recording commit:
+
+| Commit | Scope and review focus |
+|---|---|
+| `47e892b` | Counter-review both Claude commits `dc0fd5d` and `1cb3705`, accept the corrected record gates and suite-count accounting, and correct the two unsupported cross-arm attributions plus four bookkeeping/interpretation qualifications in section 207. Confirm no Claude source/test/QC mutation. |
+| `23f511c` | New hash-pinned eight-point **non-executable range policy**, R246 physical-order source and one-candidate result gate, exact QC import-closure inventory, and development-only Massive forward-version receipt/CLI with focused tests. Check the R232-to-R246 economic diff, shared custom-META writer pin, no new provider/QC capability in the policy, and private receipt/no-paper boundary. |
+| Final record/ledger commit (`HEAD`) | Record the single R246 A1 source/terminal/result chain and the matched three-arm decomposition, two same-window Massive receipt comparison plus a zero-row weekend baseline, owner-authorized shared look bookkeeping, this review handoff, and the live banner/section-4/section-5 updates. No changed backtest economics after launch. |
+
+**Findings/status.** `ARV2CR207-001` and `-002` are P2 record-attribution
+corrections, not historical result rewrites; `-003` through `-006` are P3
+count/wording qualifiers, as listed in section 207. No new P0/P1/P2 source
+defect is known in this implementation. The final-record exact-next-step
+test caught wording that placed “independently” between “will” and “review”;
+the handoff sentence was corrected before push and the gate rerun on final
+bytes. Existing `ARV2R196-001` (recent versus historical AR divergence and
+vendor-vintage concern), `ARV2D199-002` (original R225 QCOM reference), and
+`ARV2R206-003` (old spent tilt manifests' intended-vs-emitted META label)
+remain open/documented; none is silently repaired by R246. The new 2021–2025
+split is adaptive in-sample evidence and does not cure those limitations.
+
+**Validation/exclusions.** Before launch: frozen offline preview and 129
+focused new/adjacent/closure tests passed; forward module/CLI and range policy
+had 19 focused tests each, and R246's new/predecessor tests passed 17/103.
+The production client read back exact source, compiled, and completed the
+order run; the only result read authenticated the bounded custom statistics.
+The local comparison reauthenticated the cached predecessor/result receipts,
+with no second QC outcome read. Final record/active-document gates passed
+**82 tests** on the final record bytes; targeted `compileall` and
+`git diff --check` were clean. Codex does **not** run the complete lane/repository suite;
+Claude owns it under the machine instruction. No raw provider/price/order
+rows or logs, unreviewed project cleanup, new branch/worktree, funded/broker
+account, paper/live order, deployment, or formal efficacy look is in scope.
+
+**Next authorized action.** Claude independently reviews this exact pushed
+snapshot and runs the complete lane suite. Codex then counter-reviews Claude's
+one push. A primary forward AR percentage still needs an owner choice or a
+separately frozen deterministic mapping; 60/140/160/180 are recorded as
+unrun, not inferred. Continue prospective vendor captures in exact bounded
+windows to measure same-ID changes, and resolve ARV2-4 through ARV2-8 gates
+before requesting separate ARV2-9 paper deployment. Do not promote this
+development-only capture into a confirmatory look or select the historical
+best percentage as if it were held out.

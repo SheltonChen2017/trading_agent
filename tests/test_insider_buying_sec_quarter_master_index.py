@@ -94,7 +94,8 @@ def test_exact_join_refuses_missing_extra_duplicate_form_and_date(expected, mess
         (_HEADER.replace(b"Description: Master Index", b"Description: Daily Index"), "description is not master"),
         (_HEADER.replace(b"Comments: webmaster@sec.gov\n", b"Comments: webmaster@sec.gov\nComments: duplicate\n"), "preamble keys"),
         (_HEADER.replace(b"--------------------------------------------------------------------------------", b"========"), "divider"),
-        (_HEADER.replace(b"\n\nCIK", b"\n\n\nCIK"), "preamble"),
+        (_HEADER.replace(b"\n\nCIK", b"\n" * 6 + b"CIK"), "preamble"),
+        (_HEADER.replace(b"Last Data Received:", b"\nLast Data Received:"), "preamble"),
         (b"\xef\xbb\xbf" + _HEADER, "envelope"),
         (_HEADER.replace(b"\n", b"\r\n", 1), "mixes newline"),
     ),
@@ -110,7 +111,7 @@ def test_header_and_envelope_refusals(raw, message):
         (b"1001|Example|4|2023-02-10|edgar/data/1001/0000001001-23-000003.txt|tail\n", "field count"),
         (b"1001|Example|4|2023-02-30|edgar/data/1001/0000001001-23-000003.txt\n", "filing date is invalid"),
         (b"1001|Example|4|2023-04-01|edgar/data/1001/0000001001-23-000003.txt\n", "outside quarter"),
-        (b"1001|Example|4|2023-02-10|edgar/data/1001/0000001001-23-000003.txt\n", "repeats an accession"),
+        (b"1001|Example|4|2023-02-10|edgar/data/987654/0000001001-23-000003.txt\n", "repeats.*path"),
         (b"1001|Example|4|2023-02-10|edgar/data/../0000001001-23-000003.txt\n", "archive path is malformed"),
         (b"1001|Example|4|2023-02-10|https://www.sec.gov/Archives/edgar/data/1001/0000001001-23-000003.txt\n", "archive path is malformed"),
         (b"1001|Example|4|2023-02-10|edgar/data/1001/0000001001-23-000003.xml\n", "archive path is malformed"),
@@ -125,10 +126,91 @@ def test_malformed_body_refuses_entire_quarter(bad_row, message):
 
 def test_duplicate_accession_across_forms_refuses_before_filtering():
     other_form_same_accession = (
-        b"1001|Example|8-K|2023-02-10|edgar/data/1001/0000001001-23-000003.txt\n"
+        b"1001|Example|8-K|2023-02-10|edgar/data/987654/0000001001-23-000003.txt\n"
     )
-    with pytest.raises(SecQuarterMasterIndexError, match="repeats an accession or path"):
+    with pytest.raises(SecQuarterMasterIndexError, match="repeats.*path"):
         _parse(_FOUR, other_form_same_accession)
+
+
+def test_duplicate_non_target_locator_does_not_hide_form4_inventory():
+    first = (
+        b"2000|Example Agent|8-K|2023-02-10|"
+        b"edgar/data/2000/0000002000-23-000001.txt\n"
+    )
+    second = (
+        b"2001|Example Registrant|SC 13G|2023-02-10|"
+        b"edgar/data/2000/0000002000-23-000001.txt\n"
+    )
+    receipt = _parse(first, second, _FOUR)
+    assert receipt.all_filing_row_count == 3
+    assert receipt.rows == select_sec_master_index_subset(receipt, (_EXPECTED[0],))
+
+
+def test_form4_after_different_path_non_target_alias_is_retained():
+    other = (
+        b"2000|Example Agent|8-K|2023-02-10|"
+        b"edgar/data/2000/0000001001-23-000003.txt\n"
+    )
+    receipt = _parse(other, _FOUR)
+    assert select_sec_master_index_subset(receipt, (_EXPECTED[0],)) == receipt.rows
+
+
+def test_duplicate_form4_aliases_preserve_both_paths_and_select_exact_issuer_path():
+    owner_alias = (
+        b"2000|Invented Owner|4|2023-02-10|"
+        b"edgar/data/2000/0000001001-23-000003.txt\n"
+    )
+    receipt = _parse(owner_alias, _FOUR, _AMENDMENT)
+    assert len(receipt.rows) == 3
+    assert tuple(row.archive_path for row in receipt.rows[:2]) == (
+        "edgar/data/2000/0000001001-23-000003.txt",
+        "edgar/data/987654/0000001001-23-000003.txt",
+    )
+    exact = SecMasterIndexExpectedRow(_EXPECTED[0].accession_number, "4", "2023-02-10", "0000987654")
+    selected = select_sec_master_index_subset(receipt, (exact,))
+    assert selected[0].archive_path == _FOUR.decode("ascii").split("|")[-1].strip()
+    assert join_exact_sec_master_inventory(receipt, (exact, _EXPECTED[1])) == (selected[0], receipt.rows[2])
+    with pytest.raises(SecQuarterMasterIndexError, match="ambiguous|issuer"):
+        select_sec_master_index_subset(receipt, (_EXPECTED[0],))
+    with pytest.raises(SecQuarterMasterIndexError, match="issuer"):
+        select_sec_master_index_subset(
+            receipt,
+            (SecMasterIndexExpectedRow(_EXPECTED[0].accession_number, "4", "2023-02-10", "555555"),),
+        )
+
+
+def test_multiple_archive_paths_with_same_numeric_issuer_refuse():
+    same_issuer_alias = (
+        b"2000|Invented Alias|4|2023-02-10|"
+        b"edgar/data/0987654/0000001001-23-000003.txt\n"
+    )
+    receipt = _parse(_FOUR, same_issuer_alias)
+    expected = SecMasterIndexExpectedRow(_EXPECTED[0].accession_number, "4", "2023-02-10", "987654")
+    with pytest.raises(SecQuarterMasterIndexError, match="multiple|ambiguous"):
+        select_sec_master_index_subset(receipt, (expected,))
+
+
+def test_duplicate_form4_alias_with_changed_form_or_date_refuses_selected_identity():
+    wrong_date = (
+        b"2000|Invented Alias|4|2023-02-11|"
+        b"edgar/data/2000/0000001001-23-000003.txt\n"
+    )
+    receipt = _parse(_FOUR, wrong_date)
+    expected = SecMasterIndexExpectedRow(_EXPECTED[0].accession_number, "4", "2023-02-10", "987654")
+    with pytest.raises(SecQuarterMasterIndexError, match="contradicts requested"):
+        select_sec_master_index_subset(receipt, (expected,))
+
+
+def test_duplicate_identical_form4_archive_path_refuses_even_under_other_filer():
+    repeated = _FOUR.replace(b"1001|", b"2000|", 1)
+    with pytest.raises(SecQuarterMasterIndexError, match="repeats.*path"):
+        _parse(_FOUR, repeated)
+
+
+def test_expected_issuer_cik_must_be_nonzero_canonical_numeric():
+    for value in ("0", "0000", "abc", "12345678901", " 987654"):
+        with pytest.raises(SecQuarterMasterIndexError, match="issuer CIK"):
+            SecMasterIndexExpectedRow(_EXPECTED[0].accession_number, "4", "2023-02-10", value)
 
 
 @pytest.mark.parametrize("near_form", (b"4 ", b"4/A ", b"4 /A", b"4  / A"))
@@ -155,6 +237,47 @@ def test_crlf_and_nonascii_company_are_accepted_but_raw_bytes_stay_distinct():
     receipt = parse_sec_quarter_master_index(crlf, year=2023, quarter=1)
     assert receipt.rows[0].archive_path == "edgar/data/987654/0000001001-23-000003.txt"
     assert receipt.source_sha256 != hash_bytes(lf)
+
+
+def test_bounded_official_four_blank_line_separator_is_accepted():
+    header = (
+        b"Description:           Master Index of EDGAR Dissemination Feed\n"
+        b"Last Data Received:    December 31, 2022\n"
+        b"Comments:              webmaster@sec.gov\n"
+        b"Anonymous FTP:         ftp://ftp.sec.gov/edgar/\n"
+        b"Cloud HTTP:            https://www.sec.gov/Archives/\n"
+        b"\n\n\n\n"
+        b"CIK|Company Name|Form Type|Date Filed|Filename\n"
+        b"--------------------------------------------------------------------------------\n"
+    )
+    raw = header + _FOUR[:-1]
+    receipt = parse_sec_quarter_master_index(raw, year=2023, quarter=1)
+    assert receipt.all_filing_row_count == 1
+    assert receipt.rows[0].accession_number == _EXPECTED[0].accession_number
+
+
+def test_complete_final_filing_row_without_trailing_lf_is_retained():
+    raw = _HEADER + _FOUR[:-1]
+    receipt = parse_sec_quarter_master_index(raw, year=2023, quarter=1)
+    assert receipt.source_sha256 == hash_bytes(raw)
+    assert receipt.source_size_bytes == len(raw)
+    assert receipt.all_filing_row_count == 1
+    assert receipt.rows[0].accession_number == _EXPECTED[0].accession_number
+    assert join_exact_sec_master_inventory(receipt, (_EXPECTED[0],)) == receipt.rows
+    assert receipt.source_sha256 != hash_bytes(_HEADER + _FOUR)
+
+
+def test_unterminated_final_row_still_requires_exact_archive_path():
+    raw = _HEADER + _FOUR[:-5]
+    with pytest.raises(SecQuarterMasterIndexError, match="archive path is malformed"):
+        parse_sec_quarter_master_index(raw, year=2023, quarter=1)
+
+
+def test_unterminated_final_row_counts_toward_presplit_line_cap(monkeypatch):
+    monkeypatch.setattr(module, "MAX_MASTER_INDEX_ROWS", 1)
+    raw = _HEADER + b"\n" * 20 + _FOUR[:-1]
+    with pytest.raises(SecQuarterMasterIndexError, match="pre-split line count"):
+        parse_sec_quarter_master_index(raw, year=2023, quarter=1)
 
 
 def test_input_byte_and_row_caps_refuse_before_population(monkeypatch):

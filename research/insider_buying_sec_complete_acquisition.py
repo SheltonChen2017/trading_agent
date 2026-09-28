@@ -411,7 +411,7 @@ def run_fixed_complete_submissions(
                 receipt = parse_sec_quarter_master_index(plain, year=year, quarter=quarter)
                 expected = tuple(SecMasterIndexExpectedRow(
                     accession_number=item.accession_number, form_type=item.form_type,
-                    filing_date=item.filing_date,
+                    filing_date=item.filing_date, issuer_cik=item.issuer_cik,
                 ) for item in selected if item.period == period)
                 subset = select_sec_master_index_subset(receipt, expected)
                 if len(subset) != len(expected):

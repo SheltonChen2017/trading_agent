@@ -72,6 +72,7 @@ class SecMasterIndexExpectedRow:
     accession_number: str
     form_type: str
     filing_date: str
+    issuer_cik: str | None = None
 
     def __post_init__(self) -> None:
         if (
@@ -83,6 +84,12 @@ class SecMasterIndexExpectedRow:
             or _DATE_RE.fullmatch(self.filing_date) is None
         ):
             raise SecQuarterMasterIndexError("REFUSED: expected accession tuple is invalid")
+        if self.issuer_cik is not None and (
+            type(self.issuer_cik) is not str
+            or _CIK_RE.fullmatch(self.issuer_cik) is None
+            or int(self.issuer_cik) == 0
+        ):
+            raise SecQuarterMasterIndexError("REFUSED: expected issuer CIK is invalid")
         try:
             date.fromisoformat(self.filing_date)
         except ValueError as exc:
@@ -153,19 +160,19 @@ class SecQuarterMasterIndexReceipt:
             or len(self.rows) > self.all_filing_row_count
         ):
             raise SecQuarterMasterIndexError("REFUSED: master index receipt scalars are invalid")
-        accessions: list[str] = []
+        row_keys: list[tuple[str, str]] = []
         paths: set[str] = set()
         for row in self.rows:
             if type(row) is not SecMasterIndexRow:
                 raise SecQuarterMasterIndexError("REFUSED: master index row type is invalid")
             row.__post_init__()
             _filing_date(row.filing_date, start, end)
-            accessions.append(row.accession_number)
+            row_keys.append((row.accession_number, row.archive_path))
             if row.archive_path in paths:
                 raise SecQuarterMasterIndexError("REFUSED: duplicate Form 4 archive path")
             paths.add(row.archive_path)
-        if accessions != sorted(set(accessions)):
-            raise SecQuarterMasterIndexError("REFUSED: Form 4 accessions are duplicate or unordered")
+        if row_keys != sorted(row_keys):
+            raise SecQuarterMasterIndexError("REFUSED: Form 4 archive aliases are unordered")
         if hash_payload(self._identity_payload()) != self.receipt_sha256:
             raise SecQuarterMasterIndexError("REFUSED: master index receipt fingerprint mismatch")
 
@@ -187,21 +194,28 @@ class SecQuarterMasterIndexReceipt:
 def _line_vector(raw_bytes: bytes) -> list[bytes]:
     if type(raw_bytes) is not bytes or not 0 < len(raw_bytes) <= MAX_MASTER_INDEX_BYTES:
         raise SecQuarterMasterIndexError("REFUSED: master index byte budget or type is invalid")
-    if not raw_bytes.endswith(b"\n") or raw_bytes.startswith((b"\xef\xbb\xbf", b"\xff\xfe")):
+    if raw_bytes.startswith((b"\xef\xbb\xbf", b"\xff\xfe")):
         raise SecQuarterMasterIndexError("REFUSED: master index envelope is invalid")
+    final_lf = raw_bytes.endswith(b"\n")
     # Count in the raw byte buffer before split() allocates one object per
     # line. A 64 MiB stream of newlines would otherwise create millions of
-    # Python objects despite the later body-row budget.
-    if raw_bytes.count(b"\n") > MAX_MASTER_INDEX_HEADER_LINES + 2 + MAX_MASTER_INDEX_ROWS:
+    # Python objects despite the later body-row budget. An unterminated final
+    # filing row is one additional logical line, not permission to exceed it.
+    line_count = raw_bytes.count(b"\n") + (0 if final_lf else 1)
+    if line_count > MAX_MASTER_INDEX_HEADER_LINES + 2 + MAX_MASTER_INDEX_ROWS:
         raise SecQuarterMasterIndexError("REFUSED: master index pre-split line count exceeds budget")
-    lines = raw_bytes.split(b"\n")[:-1]
+    lines = raw_bytes.split(b"\n")
+    if final_lf:
+        lines.pop()
     if any(len(line) > MAX_MASTER_INDEX_LINE_BYTES for line in lines):
         raise SecQuarterMasterIndexError("REFUSED: master index line exceeds byte budget")
-    endings = {line.endswith(b"\r") for line in lines}
+    terminated_count = len(lines) if final_lf else len(lines) - 1
+    endings = {line.endswith(b"\r") for line in lines[:terminated_count]}
     if len(endings) != 1:
         raise SecQuarterMasterIndexError("REFUSED: master index mixes newline conventions")
     if endings == {True}:
-        lines = [line[:-1] for line in lines]
+        lines = [line[:-1] if index < terminated_count else line
+                 for index, line in enumerate(lines)]
     if any(b"\r" in line or b"\x00" in line for line in lines):
         raise SecQuarterMasterIndexError("REFUSED: master index contains control bytes")
     return lines
@@ -215,8 +229,12 @@ def _body_start(lines: list[bytes]) -> int:
     if not 1 <= column_index <= MAX_MASTER_INDEX_HEADER_LINES or column_index + 1 >= len(lines):
         raise SecQuarterMasterIndexError("REFUSED: master index header is unbounded or incomplete")
     preamble = lines[:column_index]
-    if preamble[-1] == b"":
-        preamble = preamble[:-1]
+    separator_start = len(preamble)
+    while separator_start and preamble[separator_start - 1] == b"":
+        separator_start -= 1
+    if not 1 <= len(preamble) - separator_start <= 4:
+        raise SecQuarterMasterIndexError("REFUSED: master index preamble separator is malformed")
+    preamble = preamble[:separator_start]
     if not preamble or any(not _HEADER_FIELD_RE.fullmatch(line) for line in preamble):
         raise SecQuarterMasterIndexError("REFUSED: master index preamble is malformed")
     keys = [line.split(b": ", 1)[0] for line in preamble]
@@ -246,8 +264,7 @@ def parse_sec_quarter_master_index(
     if len(lines) - body_start > MAX_MASTER_INDEX_ROWS:
         raise SecQuarterMasterIndexError("REFUSED: master index row count exceeds budget")
     rows: list[SecMasterIndexRow] = []
-    seen_accessions: set[str] = set()
-    seen_paths: set[str] = set()
+    seen_paths: dict[str, bool] = {}
     for line in lines[body_start:]:
         try:
             fields = line.decode("latin-1").split("|")
@@ -269,15 +286,20 @@ def parse_sec_quarter_master_index(
         if path_match is None or int(path_match.group("archive_cik")) == 0:
             raise SecQuarterMasterIndexError("REFUSED: master index archive path is malformed")
         accession = path_match.group("accession")
-        if accession in seen_accessions or path in seen_paths:
-            raise SecQuarterMasterIndexError("REFUSED: master index repeats an accession or path")
-        seen_accessions.add(accession)
-        seen_paths.add(path)
-        if form in _TARGET_FORMS:
-            rows.append(SecMasterIndexRow(accession, form, filed, path))
-        elif form.replace(" ", "").casefold() in {"4", "4/a"}:
+        if form not in _TARGET_FORMS and form.replace(" ", "").casefold() in {"4", "4/a"}:
             raise SecQuarterMasterIndexError("REFUSED: Form 4 spelling is not canonical")
-    ordered_rows = tuple(sorted(rows, key=lambda row: row.accession_number))
+        is_target = form in _TARGET_FORMS
+        prior_target = seen_paths.get(path)
+        if prior_target is not None:
+            # Non-target index aliases may repeat. A duplicated *path* that
+            # involves Form 4 would make one locator's provenance ambiguous.
+            if is_target or prior_target:
+                raise SecQuarterMasterIndexError("REFUSED: master index repeats a Form 4 archive path")
+            continue
+        seen_paths[path] = is_target
+        if is_target:
+            rows.append(SecMasterIndexRow(accession, form, filed, path))
+    ordered_rows = tuple(sorted(rows, key=lambda row: (row.accession_number, row.archive_path)))
     source_sha256 = hash_bytes(raw_bytes)
     payload = {
         "parser_version": MASTER_INDEX_PARSER_VERSION,
@@ -337,26 +359,48 @@ def select_sec_master_index_subset(
     for a fixed small compatibility sample but *not* an exact corpus audit.
     """
     expected = _expected_map(receipt, expected_rows)
-    found = {row.accession_number: row for row in receipt.rows if row.accession_number in expected}
+    found: dict[str, list[SecMasterIndexRow]] = {}
+    for row in receipt.rows:
+        if row.accession_number in expected:
+            found.setdefault(row.accession_number, []).append(row)
     if set(found) != set(expected):
         raise SecQuarterMasterIndexError("REFUSED: master index is missing requested accessions")
-    for accession, row in found.items():
-        check = expected[accession]
-        if row.form_type != check.form_type or row.filing_date != check.filing_date:
+    selected: list[SecMasterIndexRow] = []
+    for check in expected_rows:
+        aliases = found[check.accession_number]
+        if any(row.form_type != check.form_type or row.filing_date != check.filing_date
+               for row in aliases):
             raise SecQuarterMasterIndexError("REFUSED: master index contradicts requested form or date")
-    return tuple(found[expected.accession_number] for expected in expected_rows)
+        if check.issuer_cik is None:
+            if len(aliases) != 1:
+                raise SecQuarterMasterIndexError("REFUSED: duplicate archive aliases need an issuer CIK")
+            selected.append(aliases[0])
+            continue
+        issuer = int(check.issuer_cik)
+        matching = [row for row in aliases
+                    if int(_PATH_RE.fullmatch(row.archive_path).group("archive_cik")) == issuer]
+        if not matching:
+            raise SecQuarterMasterIndexError("REFUSED: no index archive path matches issuer CIK")
+        if len(matching) != 1:
+            raise SecQuarterMasterIndexError("REFUSED: multiple index archive paths match issuer CIK")
+        selected.append(matching[0])
+    return tuple(selected)
 
 
 def join_exact_sec_master_inventory(
     receipt: SecQuarterMasterIndexReceipt,
     expected_rows: tuple[SecMasterIndexExpectedRow, ...],
 ) -> tuple[SecMasterIndexRow, ...]:
-    """Match exactly all Form 4/4-A rows in this supplied quarter index.
+    """Match the distinct Form 4/4-A accession inventory in this index.
 
-    This checks inventory equality relative to *these bytes* only.  It does
-    not prove the index itself complete, authentic, or point-in-time.
+    Archive aliases for one accession remain in the receipt; each must agree
+    on form and date, and one unique issuer path is selected. This checks
+    accession equality relative to *these bytes* only. It does not prove the
+    index itself complete, authentic, or point-in-time.
     """
     selected = select_sec_master_index_subset(receipt, expected_rows)
-    if len(selected) != len(receipt.rows):
+    if {row.accession_number for row in receipt.rows} != {
+        expected.accession_number for expected in expected_rows
+    }:
         raise SecQuarterMasterIndexError("REFUSED: master index has extra Form 4 accessions")
     return selected

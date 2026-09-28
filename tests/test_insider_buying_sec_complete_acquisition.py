@@ -48,7 +48,8 @@ def _candidates() -> tuple[SecPilotCandidate, ...]:
 
 def _index(candidates: tuple[SecPilotCandidate, ...], period: str) -> bytes:
     return _INDEX_HEADER + b"".join(
-        (f"888888|Invented Corp|{item.form_type}|{item.filing_date}|edgar/data/888888/"
+        (f"888888|Invented Corp|{item.form_type}|{item.filing_date}|"
+         f"edgar/data/{int(item.issuer_cik)}/"
          f"{item.accession_number}.txt\n").encode("ascii")
         for item in candidates if item.period == period
     )
@@ -85,7 +86,9 @@ def _images() -> dict[str, bytes]:
         for period in ("2022Q4", "2023Q1")
     }
     for item in candidates:
-        url = runner._HOST_PREFIX + f"edgar/data/888888/{item.accession_number}.txt"
+        url = runner._HOST_PREFIX + (
+            f"edgar/data/{int(item.issuer_cik)}/{item.accession_number}.txt"
+        )
         result[url] = _complete(item)
     assert len(result) == 18
     return result
@@ -136,7 +139,7 @@ def test_exact_synthetic_sixteen_follows_only_master_paths_and_retains_raw(monke
     report, payload = _run(monkeypatch, tmp_path, _transport(images, calls))
     assert len(calls) == 18
     assert calls[:2] == [runner._MASTER_URLS["2022Q4"], runner._MASTER_URLS["2023Q1"]]
-    assert all("/888888/" in url for url in calls[2:])
+    assert all("/123456/" in url for url in calls[2:])
     assert payload["complete_sample_acquired"] is True
     assert payload["attempt_count"] == 18
     assert len(payload["filings"]) == 16
@@ -153,6 +156,27 @@ def test_exact_synthetic_sixteen_follows_only_master_paths_and_retains_raw(monke
     assert len(payload["master_indexes"][0]["subset"]) == 8
     assert len(payload["master_indexes"][1]["subset"]) == 8
     assert len(payload["master_indexes"][0]["receipt"].get("rows", [])) == 0
+
+
+def test_alias_paths_keep_issuer_path_selection_from_exact_index(monkeypatch, tmp_path):
+    images = _images()
+    first = runner._MASTER_URLS["2022Q4"]
+    candidate = _candidates()[0]
+    alias = (
+        f"2178|Invented Owner|{candidate.form_type}|{candidate.filing_date}|"
+        f"edgar/data/2178/{candidate.accession_number}.txt\n"
+    ).encode("ascii")
+    images[first] = gzip.compress(_index(_candidates(), "2022Q4") + alias, mtime=0)
+    calls = []
+    _, payload = _run(monkeypatch, tmp_path, _transport(images, calls))
+    assert payload["complete_sample_acquired"] is True
+    assert len(calls) == 18
+    assert len(payload["master_indexes"][0]["subset"]) == 8
+    assert payload["master_indexes"][0]["receipt"]["form4_or_4a_row_count"] == 9
+    assert calls[2] == (
+        runner._HOST_PREFIX + f"edgar/data/123456/{candidate.accession_number}.txt"
+    )
+    assert all("/2178/" not in url for url in calls[2:])
 
 
 @pytest.mark.parametrize("status", (403, 429, 302, 404))

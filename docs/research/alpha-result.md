@@ -5781,3 +5781,29 @@ ETF-only because it still fails the five-verified-name requirement on
 **244 shared / 185 development / 34 infrastructure / 657 cells**.
 These are adaptive, QCOM-excluded current-vintage sensitivities, not an
 unbiased alpha estimate or live-trading gate.
+
+## R-242–R-245 — prospective QCOM-excluded three-name/three-positive-score sensitivity — frozen before launch
+
+The owner requested further easing after R-238–R-241's 10% numeric floors
+changed no selected stocks. R-242 AR-off and R-243/R-244/R-245 AR-on
+80%/120%/200% retain the identical 2021–2025 historical package, 10%
+mapping/cap/total coverage floors, 98% gross target, 2x buying-power
+admission, ten-bps/side modeled fees, zero modeled slippage and next-open
+physical MOO execution. A separately versioned rule reduces the six sleeves'
+verified-ID/name/PIT-cap count from five to three and, only for non-XLE AR-on
+entry, the minimum positive analyst-score count from five to three. AR-off
+remains score-independent. Missing identities/caps cannot be selected, QCOM
+remains excluded from direct stock eligibility, and unallocated stock budget
+stays in each sleeve's ETF. Existing aggregates cannot determine how many
+three-name decisions will qualify; no post-result threshold is preselected.
+
+Frozen four-arm manifest SHA-256
+`6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef`;
+distinct projection/profile/source identities and result schemas are pinned
+there. R-238–R-241 are authenticated same-window context, not an assumed
+unchanged-stock comparator. At most three QC launches per new candidate;
+every attempted launch counts conservatively. This is adaptive exploratory
+research, not confirmation or trading authority. Prelaunch floor remains
+**244 shared research looks / 185 ARV2 development evaluations / 34
+infrastructure looks / 657 accepted exploratory cells**; this entry itself
+spends **zero** looks and records no result.

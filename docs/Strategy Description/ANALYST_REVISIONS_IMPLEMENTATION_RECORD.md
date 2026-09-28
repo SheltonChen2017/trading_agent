@@ -795,8 +795,12 @@ R237 required A2 after a spent pre-create A1, while every other candidate
 completed on A1. The 10% change did not alter selected counts, fallback
 counts, return, or drawdown against the matching 25% arms. After the one
 final same-lane push, Claude reviews section 203 and the exact pushed range;
-Codex then counter-reviews Claude's push. No fourth R225 attempt,
-formal alpha, live/paper order, or automatic further threshold search follows.
+Codex then counter-reviews Claude's push. The owner's subsequent request
+now schedules the bounded R242–R245 three-name sensitivity in section 204
+before that next review; after the final same-lane push, Claude reviews
+section 204 and the exact cumulative range, then Codex counter-reviews.
+No fourth R225 attempt, formal alpha, live/paper order, or automatic
+further threshold search follows.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -28690,3 +28694,48 @@ counter-reviews. Further easing of the five-known-name floor or another
 historical tilt search is **not** scheduled by this result. QuantConnect/Mia
 may investigate QCOM's original historical price gap separately; no attempt
 budget is reset by these sensitivities.
+
+## 204. Owner-directed three-name stock-admission sensitivity, 2026-09-27
+
+The owner subsequently requested a further easing and another backtest after
+the 10% numeric-coverage study did not change selections or returns. This
+explicit later instruction schedules **only** R242–R245 before the next Claude
+review; it supersedes section 203's then-current stop, not its historical
+findings. The six numeric data-coverage floors remain 10%. The six sleeves'
+minimum count of members with verified security ID, name and point-in-time
+market cap changes **five to three**. For AR-on non-XLE sleeves, the positive
+analyst-score entry count changes **five to three** as well; the AR-off arm
+still uses no score for admission or weighting, and XLE remains cap-ranked.
+Unknown identities, missing cap values, QCOM direct-stock exclusion, source
+clock, size caps and each sleeve's own-ETF residual remain unchanged. This
+change may or may not admit REMX: existing aggregates reveal 258/261
+five-name refusals but not the per-decision three-name/three-positive-score
+joint distribution, because PIT cap and constituent collections arrive from
+QC callbacks rather than the local package. There is no invented count or
+claim of a likely return improvement.
+
+R242 AR-off, R243 AR-on80, R244 AR-on120 and R245 AR-on200 retain the exact
+2021-01-04–2025-12-31 frozen historical package, 261 weekly decisions,
+next-open physical MOO orders, 98% gross target, 2x buying-power **admission**
+(not 2x positions), ten basis points of modeled fees per side and zero modeled
+slippage. The four previously authenticated 10%-floor/five-name results
+R238–R241 are construction context; each new arm is compared with its matching
+old arm and R242 is the new AR-off within-family control. This is another
+adaptive exploratory sensitivity, not a confirmatory test or live rule.
+Each distinct candidate has at most three QC launch attempts; unsuccessful
+compile/runtime/terminal attempts count. A same-session missing stock price
+must still refuse rather than use a stale mark. No raw provider, price,
+order, broker, deployment, paper/live or funded operation is authorized.
+
+The separately frozen four-arm manifest is
+`six_universe_qcom_exclusion_three_name_candidates.json`, SHA-256
+`6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef`.
+Its exact projection SHA-256s in arm order are
+`829c370e58ebd1d398cc62a0acd5aca29885487f0353a5ff0ab7157afeb58ced`,
+`ca4546db5e649d55da0fa266a8876760d487e7984559fc512d9c64bb0e42277d`,
+`f72bc3f00065d259af10480ce7c2a99f55826da8ab419b50aab6529c7194b10c`,
+and `954aeea6c375659d7dfd6d8357cde1a70623287f4cdc7581f4e3a4070a650e35`.
+The 17-file source closure and distinct role/profile/schema/policy identities
+are pinned for each arm. Prelaunch look floor **244 shared / 185 development /
+34 infrastructure / 657 accepted exploratory cells**. No new QC launch or
+outcome read had occurred when this prelaunch record was written.

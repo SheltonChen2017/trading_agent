@@ -245,3 +245,44 @@ def test_three_way_comparison_requires_identical_ar_on_baseline_path():
     wrong["R246"]["aggregates"]["matched_baseline_target_path_sha256"] = "f" * 64
     with pytest.raises(ValueError, match="baseline holdings differ"):
         study.compare_results(wrong)
+
+
+def _three_arm_results():
+    old_results = result_fixture()
+    results = {}
+    rows = {row["candidate_id"]: row for row in adapter._qcom_exclusion_manifest()["candidates"]}
+    rows["R246"] = adapter._qcom_entry_only_manifest()["candidates"][0]
+    for candidate, original in (("R231", old_results["R231"]),
+                                ("R246", old_results["R232"]),
+                                ("R232", old_results["R232"])):
+        result = copy.deepcopy(original)
+        result.update(candidate_id=candidate, attempt=1, status="Completed.",
+            run_valid=True,
+            manifest_sha256=(adapter.FROZEN_QCOM_ENTRY_ONLY_MANIFEST_SHA256
+                if candidate == "R246" else adapter.FROZEN_QCOM_EXCLUSION_MANIFEST_SHA256),
+            projection_sha256=rows[candidate]["projection_sha256"])
+        result["aggregates"].update(
+            matched_baseline_profile_sha256=rows[candidate]["matched_baseline_profile_sha256"],
+            maximum_stock_weight_change_fraction=rows[candidate]["tilt_fraction"])
+        if candidate == "R246":
+            result["aggregates"].update(comparison_arm="ar_on0",
+                maximum_stock_weight_change_fraction="0.00",
+                analyst_revision_economic_usage=subject.ECONOMIC_USAGE)
+        results[candidate] = result
+    return results
+
+
+@pytest.mark.parametrize("key", study._SOURCE_CENSUS)
+def test_three_way_comparison_refuses_a_different_non_ar_source_census(key):
+    """R246 and R232 must share R231's non-AR callback and unavailability
+    census; a changed count cannot pass as an AR entry or weight effect."""
+
+    results = _three_arm_results()
+    assert study.compare_results(copy.deepcopy(results))["comparison_valid"] is True
+    value = results["R246"]["aggregates"][key]
+    if type(value) is dict:
+        value[sorted(value)[0]] += 1
+    else:
+        results["R246"]["aggregates"][key] = value + 1
+    with pytest.raises(ValueError, match="source or capital"):
+        study.compare_results(results)

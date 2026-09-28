@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import ast
+import dataclasses
 from datetime import datetime, timedelta, timezone
 import json
 from pathlib import Path
@@ -162,3 +163,46 @@ def test_pure_receipt_contract_matches_host_capture_role_and_transport_pins():
     assert subject.ROLE_ORDER == capture.ROLE_ORDER
     assert subject.PRODUCTION_TRANSPORT == capture.PRODUCTION_TRANSPORT
     assert subject.TEST_TRANSPORT == capture.TEST_TRANSPORT
+
+
+@pytest.mark.parametrize("field, claim", (
+    ("point_in_time_proven", True),
+    ("paper_look_committed", True),
+    ("outcome_reads", 1),
+    ("qc_calls", 1),
+))
+def test_receipt_cannot_claim_more_than_development_authority(tmp_path, field, claim):
+    """A correctly pinned receipt that claims point-in-time proof, a paper
+    look, an outcome read, or a QC call is refused before any comparison."""
+
+    before = _receipt(_capture(tmp_path))
+    after = _receipt(_capture(tmp_path, newer=True))
+    changed = json.loads(after[0])
+    changed[field] = claim
+    payload = canonical_json_bytes(changed)
+    with pytest.raises(subject.ForwardDataQualityError, match="authority"):
+        subject.compare_receipts(*before, payload, sha256_bytes(payload))
+
+
+def test_core_refuses_a_host_traversal_that_reports_another_transport(tmp_path):
+    """The pure core rechecks the transport that the host traversal reports;
+    a test-transport capture relabelled as production yields no receipt."""
+
+    source = _capture(tmp_path)
+
+    def relabelled(visit_page):
+        summary = capture._visit_authenticated_massive_capture_pages_for_bridge(
+            source.artifact_path,
+            expected_transport=capture.TEST_TRANSPORT,
+            visit_page=visit_page,
+        )
+        return dataclasses.replace(summary, capture_transport=capture.PRODUCTION_TRANSPORT)
+
+    with pytest.raises(subject.ForwardDataQualityError, match="transport"):
+        subject.build_receipt_from_authenticated_pages(
+            relabelled,
+            source.manifest_sha256,
+            first_event_date=FIRST,
+            last_event_date=LAST,
+            expected_transport=capture.TEST_TRANSPORT,
+        )

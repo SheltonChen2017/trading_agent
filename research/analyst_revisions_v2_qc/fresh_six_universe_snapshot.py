@@ -115,8 +115,6 @@ def _rows(values, name):
         raise
     except Exception as exc:
         raise FreshSixUniverseSnapshotError(name + " is unreadable") from exc
-    if not result:
-        _refuse(name + " collection is empty")
     return result
 
 
@@ -139,16 +137,16 @@ def _fundamentals(values):
             null_count += 1
             continue
         try:
-            cap = Decimal(_decimal_text(raw, "fundamental market cap"))
-        except FreshSixUniverseSnapshotError:
+            cap = Decimal(str(raw))
+        except (InvalidOperation, TypeError, ValueError):
             invalid_count += 1
             continue
+        if not cap.is_finite():
+            _refuse("fundamental market cap is not finite")
         if cap <= 0:
             nonpositive_count += 1
             continue
         positive[sid] = format(cap, "f")
-    if not positive:
-        _refuse("no positive fundamental market caps")
     return {
         "source_row_count": len(seen),
         "null_market_cap_count": null_count,
@@ -178,8 +176,6 @@ def _constituents(values, ticker):
         weight = Decimal(_decimal_text(raw, ticker + " constituent weight"))
         if weight > 0:
             positive[sid] = format(weight, "f")
-    if not positive:
-        _refuse(ticker + " has no positive constituent weights")
     return {
         "source_row_count": len(observed),
         "positive_constituents": [[sid, positive[sid]] for sid in sorted(positive)],
@@ -204,6 +200,9 @@ class FreshSixUniverseSnapshot:
         self.decision_session = decision_session
         self._decision_date = parsed
         self._collections = {}
+        self._last_valid = {}
+        self._latest_source_end_time = {}
+        self._superseded_degenerate = {source: 0 for source in SOURCES}
         self._written = False
 
     def accept(self, source, rows):
@@ -219,34 +218,60 @@ class FreshSixUniverseSnapshot:
             # session's collection; one at/after the cutoff may not.
             return []
         members = _rows(rows, source)
-        source_end_time = _source_end_time(members, source)
-        if _instant(source_end_time) > _instant(observed):
-            _refuse(source + " source end time follows QC callback")
-        if _instant(source_end_time) >= decision_cutoff:
-            # These are pre-cutoff QC inputs, not an assertion that their
-            # underlying vendor values were available in a prior session.
-            return []
-        if source == "FUNDAMENTALS":
-            body, _ = _fundamentals(members)
+        source_end_time = _source_end_time(members, source) if members else None
+        if source_end_time is not None:
+            if _instant(source_end_time) > _instant(observed):
+                _refuse(source + " source end time follows QC callback")
+            if _instant(source_end_time) >= decision_cutoff:
+                _refuse(source + " source EndTime reaches decision cutoff")
+        if not members:
+            body = {"source_row_count": 0}
+            degenerate_reason = "empty_collection"
+        elif source == "FUNDAMENTALS":
+            body, positive = _fundamentals(members)
+            degenerate_reason = None if positive else "no_positive_market_caps"
         else:
             body = _constituents(members, source)
+            degenerate_reason = (
+                None if body["positive_constituents"] else
+                "no_positive_constituent_weights"
+            )
         candidate = {
             "qc_source_end_time_ny": source_end_time,
             "qc_callback_time_ny": observed,
+            "collection_status": "degenerate" if degenerate_reason else "valid",
+            "degenerate_reason": degenerate_reason,
             **body,
         }
         prior = self._collections.get(source)
-        if prior is not None and _instant(source_end_time) < _instant(prior["qc_source_end_time_ny"]):
+        prior_end = self._latest_source_end_time.get(source)
+        if (source_end_time is not None and prior_end is not None
+                and _instant(source_end_time) < _instant(prior_end)):
             _refuse(source + " source EndTime regressed")
-        if (prior is not None
-                and _instant(source_end_time) == _instant(prior["qc_source_end_time_ny"])
+        last_valid = self._last_valid.get(source)
+        if (degenerate_reason is None and last_valid is not None
+                and _instant(source_end_time) == _instant(last_valid["qc_source_end_time_ny"])
                 and {key: value for key, value in candidate.items() if key != "qc_callback_time_ny"}
-                != {key: value for key, value in prior.items() if key != "qc_callback_time_ny"}):
-            _refuse(source + " same-EndTime collection changed")
-        if prior is None or _instant(observed) > _instant(prior["qc_callback_time_ny"]):
-            self._collections[source] = candidate
-        elif _instant(observed) == _instant(prior["qc_callback_time_ny"]) and candidate != prior:
-            _refuse(source + " repeated callback conflicts")
+                != {key: value for key, value in last_valid.items() if key != "qc_callback_time_ny"}):
+            _refuse(source + " same-EndTime valid collection changed")
+        if prior is not None:
+            if _instant(observed) < _instant(prior["qc_callback_time_ny"]):
+                _refuse(source + " QC callback time regressed")
+            if _instant(observed) == _instant(prior["qc_callback_time_ny"]) and candidate == prior:
+                return []
+            if (_instant(observed) == _instant(prior["qc_callback_time_ny"])
+                    and prior["collection_status"] == "valid"
+                    and degenerate_reason is None):
+                _refuse(source + " same-clock valid collection changed")
+            # At the same QC clock tick, call order breaks a degenerate/valid
+            # tie; two changed valid bodies are refused above.
+            if prior["collection_status"] == "degenerate":
+                self._superseded_degenerate[source] += 1
+        self._collections[source] = candidate
+        if source_end_time is not None:
+            self._latest_source_end_time[source] = source_end_time
+        if degenerate_reason is None:
+            self._last_valid[source] = candidate
         return []
 
     def persist_at_decision(self):
@@ -263,6 +288,9 @@ class FreshSixUniverseSnapshot:
         sources = {}
         for source in SOURCES:
             collection = dict(self._collections[source])
+            if collection["collection_status"] != "valid":
+                _refuse(source + " latest pre-cutoff collection is degenerate: "
+                        + collection["degenerate_reason"])
             observed = date.fromisoformat(collection["qc_source_end_time_ny"][:10])
             lag = (self._decision_date - observed).days
             # Raw QC EndTime may be next-midnight for the prior session.
@@ -295,6 +323,12 @@ class FreshSixUniverseSnapshot:
             "decision_ready": False,
             "order_and_outcome_access": False,
             "qcom_exact_sid_status": qcom_status,
+            "superseded_degenerate_callback_count_by_source": dict(
+                self._superseded_degenerate
+            ),
+            "superseded_degenerate_callback_count": sum(
+                self._superseded_degenerate.values()
+            ),
             "sources": sources,
         }
         payload = _canonical(body)

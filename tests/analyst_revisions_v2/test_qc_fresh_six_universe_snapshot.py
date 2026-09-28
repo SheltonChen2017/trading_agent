@@ -62,6 +62,17 @@ def _populated(*, qcom_cap=True, qcom_sid="QCOM-SID"):
     return algo, capture
 
 
+def _capture_with_six_other_sources(omitted):
+    algo = _Algorithm()
+    capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")
+    if omitted != "FUNDAMENTALS":
+        capture.accept("FUNDAMENTALS", [_row("A-SID", "A", cap="100")])
+    for ticker in snapshot.ETFS:
+        if ticker != omitted:
+            capture.accept(ticker, [_row("A-SID", "A", weight="1")])
+    return algo, capture
+
+
 def test_seven_exact_prior_sources_persist_one_hash_verified_private_artifact():
     algo, capture = _populated()
     receipt = capture.persist_at_decision()
@@ -127,6 +138,86 @@ def test_same_day_pre_cutoff_callback_can_supersede_older_delivery():
     assert capture._collections["FUNDAMENTALS"]["qc_callback_time_ny"].startswith("2026-09-28")
 
 
+def test_empty_warmup_then_valid_same_clock_is_a_counted_recovery():
+    algo, capture = _capture_with_six_other_sources("QQQ")
+    capture.accept("QQQ", [])
+    assert capture._collections["QQQ"]["degenerate_reason"] == "empty_collection"
+    capture.accept("QQQ", [_row("A-SID", "A", weight="1")])
+    algo.time = datetime(2026, 9, 28, 9, 20)
+    receipt = capture.persist_at_decision()
+    body = json.loads(gzip.decompress(algo.object_store.values[receipt["object_store_key"]]))
+    assert body["sources"]["QQQ"]["collection_status"] == "valid"
+    assert body["superseded_degenerate_callback_count_by_source"]["QQQ"] == 1
+    assert body["superseded_degenerate_callback_count"] == 1
+    assert body["decision_ready"] is False
+
+
+def test_all_nonpositive_warmup_then_valid_same_end_time_is_a_counted_recovery():
+    algo, capture = _capture_with_six_other_sources("FUNDAMENTALS")
+    capture.accept("FUNDAMENTALS", [_row("A-SID", "A", cap=0)])
+    assert capture._collections["FUNDAMENTALS"]["degenerate_reason"] == "no_positive_market_caps"
+    algo.time = datetime(2026, 9, 28, 8)
+    capture.accept("FUNDAMENTALS", [_row("A-SID", "A", cap=100)])
+    algo.time = datetime(2026, 9, 28, 9, 20)
+    receipt = capture.persist_at_decision()
+    body = json.loads(gzip.decompress(algo.object_store.values[receipt["object_store_key"]]))
+    assert body["sources"]["FUNDAMENTALS"]["positive_market_caps"] == [["A-SID", "100"]]
+    assert body["superseded_degenerate_callback_count_by_source"]["FUNDAMENTALS"] == 1
+
+
+@pytest.mark.parametrize(
+    "late_rows,reason",
+    [([], "empty_collection"), ([_row("A-SID", "A", weight=0)], "no_positive_constituent_weights")],
+)
+def test_later_degenerate_callback_invalidates_earlier_valid_before_any_write(late_rows, reason):
+    algo, capture = _populated()
+    algo.time = datetime(2026, 9, 28, 8)
+    capture.accept("QQQ", late_rows)
+    assert capture._collections["QQQ"]["degenerate_reason"] == reason
+    algo.time = datetime(2026, 9, 28, 9, 20)
+    with pytest.raises(snapshot.FreshSixUniverseSnapshotError, match="latest pre-cutoff collection is degenerate"):
+        capture.persist_at_decision()
+    assert not algo.object_store.values
+    assert not algo.statistics
+
+
+def test_valid_change_cannot_launder_through_an_empty_callback_at_same_end_time():
+    algo = _Algorithm()
+    capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")
+    capture.accept("FUNDAMENTALS", [_row("A", "A", cap=10)])
+    capture.accept("FUNDAMENTALS", [])
+    algo.time = datetime(2026, 9, 28, 8)
+    with pytest.raises(snapshot.FreshSixUniverseSnapshotError, match="same-EndTime valid collection changed"):
+        capture.accept("FUNDAMENTALS", [_row("A", "A", cap=20)])
+
+
+def test_two_changed_valid_collections_at_one_callback_second_refuse():
+    algo = _Algorithm()
+    capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")
+    capture.accept("QQQ", [_row(
+        "A", "A", weight=1, end_time=datetime(2026, 9, 24, 7),
+    )])
+    with pytest.raises(snapshot.FreshSixUniverseSnapshotError, match="same-clock valid collection changed"):
+        capture.accept("QQQ", [_row(
+            "A", "A", weight=1, end_time=datetime(2026, 9, 25, 7),
+        )])
+
+
+def test_mixed_or_future_source_end_time_refuses_immediately():
+    algo = _Algorithm()
+    capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")
+    with pytest.raises(snapshot.FreshSixUniverseSnapshotError, match="mixes source end times"):
+        capture.accept("QQQ", [
+            _row("A", "A", weight=1, end_time=datetime(2026, 9, 25, 7)),
+            _row("B", "B", weight=1, end_time=datetime(2026, 9, 24, 7)),
+        ])
+    algo.time = datetime(2026, 9, 28, 8)
+    with pytest.raises(snapshot.FreshSixUniverseSnapshotError, match="source end time follows QC callback"):
+        capture.accept("QQQ", [_row(
+            "A", "A", weight=1, end_time=datetime(2026, 9, 28, 8, 1),
+        )])
+
+
 def test_source_end_time_regression_or_same_version_edit_refuses():
     algo = _Algorithm()
     capture = snapshot.FreshSixUniverseSnapshot(algo, "2026-09-28")
@@ -157,10 +248,9 @@ def test_next_midnight_qc_end_time_is_a_diagnostic_not_a_prior_session_claim():
 @pytest.mark.parametrize(
     "source,rows,reason",
     [
-        ("FUNDAMENTALS", [_row("A", "A", cap="NaN")], "no positive"),
+        ("FUNDAMENTALS", [_row("A", "A", cap="NaN")], "not finite"),
         ("FUNDAMENTALS", [_row("A", "A", cap=1), _row("A", "A", cap=2)], "duplicated"),
         ("SPY", [_row("A", "A", weight="Infinity")], "not finite"),
-        ("SPY", [_row("A", "A", weight=0)], "no positive"),
         ("QQQ", [_row(None, "A", weight=1)], "no QC SID"),
     ],
 )
@@ -189,7 +279,7 @@ def test_invalid_fundamental_cap_is_counted_but_not_invented_as_zero():
     capture.accept("FUNDAMENTALS", [
         _row("A-SID", "A", cap="100.50"),
         _row("QCOM-SID", "QCOM", cap="200"),
-        _row("BROKEN-SID", "BROKEN", cap="NaN"),
+        _row("BROKEN-SID", "BROKEN", cap="not-a-number"),
     ])
     for ticker in snapshot.ETFS:
         capture.accept(ticker, [_row("A-SID", "A", weight="1")])

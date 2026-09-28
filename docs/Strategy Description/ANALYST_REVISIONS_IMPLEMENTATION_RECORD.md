@@ -175,6 +175,13 @@ records one private same-day vendor capture, and prepares an offline-tested,
 input-only QC six-universe snapshot diagnostic. The QC diagnostic has not
 been uploaded, compiled, or run; it yields no performance or point-in-time
 claim. The floor remains **251 / 192 / 34 / 662**.
+Section 211 is Claude's independent review of `1cb3705..d75c114` (sections
+207–210; 0 P0, 0 P1, 0 P2, 4 P3): the required gates pass at the pushed head
+after Codex's in-range firewall repair, and three unpinned guards are pinned
+by the test-only `8c06df6`. Paired by calendar year,
+the historical AR effect averages +1.6 points per year (t ≈ 0.6 over five
+years); the weight overlay's gain comes from 2021 and 2024 and the
+entry/count drag from 2025.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -855,8 +862,12 @@ source is an input-only, non-order diagnostic candidate, not an evaluated
 strategy or a ready-to-trade forward package. It still needs a separate
 private QC compile/run and verification of real callback and Object Store
 behavior. Section 209's two forward AR percentages and the one-look/1/80
-paper gate are unchanged. Claude reviews sections 209–210 and every commit in
-their combined exact pushed range; Codex then counter-reviews Claude's push.
+paper gate are unchanged. Section 211 is Claude's independent review of the
+exact pushed range `1cb3705..d75c114` (sections 207–210), with the test-only
+correction `8c06df6`. The
+immediate next step is that Codex counter-reviews section 211 and the exact
+pushed range, and settles the snapshot warm-up refusal (`ARV2R211-002`)
+before that diagnostic's first QC launch.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -870,7 +881,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 205 (section 206). Section 182 records the owner's exact
+the pushed range through section 210 (section 211). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -910,7 +921,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–206
+findings, outcomes, and per-run accounting remain in numbered sections 1–211
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -2605,6 +2616,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Codex counter-review and owner-directed AR mechanism/forward-data round | `1cb3705` -> `47e892b`, `23f511c`, and this final record commit | Section 207 counter-reviews both Claude commits; section 208 freezes the 60–200 discrete AR range, implements R246 entry/count-only 0%-transfer order diagnostic, and starts development-only forward capture receipts | R246 A1 valid in project 37072332: +136.87% net, −21.75% drawdown; matched cached decomposition is −6.88 pp entry/count/fallback and +23.08 pp weight transfer, combined +16.20 pp. Same-window Massive recaptures show 1,398 same-ID/same-version records and zero observed changes over this short interval; new weekend capture has zero events. No paper/forward-return test. | Focused source/projection/predecessor, import-closure and forward receipt tests; exact QC source readback/compile, completed 261/261 order schedule, single bounded read, local comparison, final active-document gates. No complete lane suite. Closing floor 251/192/34/662. | Six section-207 qualifications corrected or documented; `ARV2R196-001` vintage/regime/construction issue and the R225 QCOM price gap remain open. Eight-point range is fixed, but the primary future percentage is owner-pending and four points are unrun. | One combined same-lane push; Claude independently reviews section 208 and exact commits, including the R246 writer-schema pin, decomposition guard and forward-receipt boundary. Codex then counter-reviews before another efficacy step; no automatic ARV2-9 paper authority. |
 | 2026-09-28 | Codex owner-directed dual forward-rule freeze | `7aefeb1` -> `e5c13ac` and this final record commit | Section 209 additive 100%/200% forward-development choice | Bind two named arms to R232 and R237 historical construction identities and one AR-off control, while leaving future universe, exclusion, epoch and execution identities unset. No historical winner or formal two-arm result is selected. | Focused dual-policy and transitive no-I/O closure tests, final record/active-document gates, compilation and diff checks recorded in 209. No full lane suite or QC/provider access; floor unchanged 251/192/34/662. | One prospective Analyst look and total two-sided 1/80 alpha remain; no per-arm alpha or paper/deployment authority. QCOM historical repair and archive-vintage concerns remain open. | One same-lane push; Claude reviews section 209 and exact commits, then Codex counter-reviews. A reviewed common-epoch two-arm protocol and all ARV2-9 prerequisites are required before formal paper confirmation. |
 | 2026-09-28 | Codex owner-directed bounded forward continuation | `ccc522f` -> `f9fa648`, `d6c855d`, and this final record commit | Section 210 firewall correction, private same-day vendor receipt, and input-only QC snapshot candidate | Move authentication to the host CLI while keeping the forward core import-pure; collect 141 ratings, 16 earnings and 10 guidance rows in ignored private artifacts; prepare seven-source exact-SID/cap/weight diagnostic with no prices, orders or outcomes. The QC source has not been compiled or run in Cloud. | Required import-firewall regression and affected forward/QC closure battery 285 passed; final record/active-document, compilation and diff checks in section 210. No complete suite. No new QC research look or result cell; floor 251/192/34/662. | Required import-firewall gate corrected; no-price and pre-cutoff timing findings corrected before cloud use. QC callback/EndTime and Object Store behavior remain unverified; the partial-day capture cannot prove PIT availability. | One same-lane push. Claude reviews both sections 209–210 and each commit; Codex counter-reviews before a later bounded QC diagnostic or efficacy step. Formal paper, broker and trading gates remain closed. |
+| 2026-09-28 | Claude independent review of sections 207–210: the R246 mechanism split, the dual forward rule, forward-quality receipts, and the input-only QC snapshot | `d75c114` -> `8c06df6` -> this record commit | Section 211: eight commits `1cb3705..d75c114` individually disposed (6 accepted, 2 accepted after correction, 0 rejected); Codex's six qualifications of section 206 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned three unpinned guards (`8c06df6`, test-only, each red with its guard removed); section 4 names section 211, banner sentence added, this row appended; no production line changed | Required gates at the pushed head, standing lane selection in a byte-faithful export, focused new files, seventeen mutation trials, R232-versus-R246 source diff, per-year check from retained receipts, `compileall`, `git diff --check`; exact counts in 211.7 | 0 P0, 0 P1, 0 P2, 4 P3 (`ARV2R211-001` through `-004`): inherited `ar_on100` diagnostics label on four derived arms, snapshot warm-up refusal, per-year uncertainty of the historical AR effect (t ≈ 0.6), and three unpinned guards (corrected) | Single push of the Claude commits of this round; Codex counter-reviews section 211 and settles the snapshot warm-up refusal before its first QC launch |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -29489,3 +29501,194 @@ result cannot promote a forward decision or consume the formal Analyst paper
 look by inference. A closed-date provider recapture, exact source
 availability/identity evidence, common-epoch two-arm protocol and all
 ARV2-4–ARV2-9 gates still precede any outcome-bearing forward paper test.
+
+## 211. Independent Claude review of sections 207–210: the R246 mechanism split, the dual forward rule, the forward-quality receipts, and the input-only QC snapshot, 2026-09-28
+
+**Range reviewed:** `1cb3705..d75c114`, eight Codex commits across three
+pushes (`7aefeb1`, `ccc522f`, `d75c114`), each disposed in 211.1, plus the two
+Claude lane commits of this round (`8c06df6`, test-only, and this record commit).
+The review began only after the owner's instructed wait for Codex's next push
+(`d75c114`); an early read-only check at `ccc522f`, relayed by the owner,
+reported the import-firewall failure that section 210 then corrected.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called. Every result figure is transcribed from sections 207–210 or re-read
+from the locally retained, already-authenticated R231, R232 and R235–R237,
+R246 receipts; no QC result was read again.
+
+**Codex's counter-review of section 206 (section 207) is accepted.** All six
+qualifications are correct. `ARV2CR207-001` and `-002` in particular are
+right: R220/R221 used the section-193 coverage floors while R223/R224 used
+all-six 25%, so subtracting across those pairs cannot identify an entry
+effect, and the historical pair excludes QCOM while the recent pair does not,
+so the two windows' totals are not a matched cross-window comparison.
+
+**Verdict.** Six commits are accepted; two are accepted after correction:
+`23f511c` (its firewall violation corrected by Codex in-range at `f9fa648`,
+and two of its guards pinned by `8c06df6`) and `f9fa648` (its new transport
+recheck pinned by `8c06df6`); none is rejected. **0 P0, 0 P1, 0 P2, 4 P3.**
+No production line changed in this round. The required gates that failed at
+`ccc522f` pass at the pushed head.
+
+### 211.1 Per-commit dispositions
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `47e892b` | Codex counter-review of section 206 (`ARV2CR207-001` … `-006`) | accepted | All six qualifications verified against the cited runs; the two P2 attribution corrections are accepted above. |
+| `23f511c` | Eight-point range policy, R246 entry-only projection and study, forward vendor-quality receipts and CLI, closure registration | accepted after correction | R246's cloud source differs from R232 only in the transfer fraction (`1.00` → `0.00`) and identity strings, in the tilt targets, tilt runtime, and `main.py` (diffed line by line in 211.3). The range policy loader requires exact types and authenticates both ancestor manifests. The forward module imported `os` and `scripts.capture_arv2_massive` inside the outcome-free v2 package, failing `test_current_v2_package_transitive_import_closure_is_outcome_free`; corrected in-range by `f9fa648` (`ARV2D210-001`). The receipt's authority-field refusals and R246's source-census check were unpinned (`ARV2R211-004`, pinned in `8c06df6`). R246 inherits a mislabeled diagnostics arm (`ARV2R211-001`). |
+| `7aefeb1` | Record: R246 A1 valid result, three-arm decomposition, forward vendor-quality baseline (section 208) | accepted | The −6.87631527545003 / +23.0779392003938 / +16.20162392494377 point spreads reproduce; the per-year sign claim reproduces from the retained receipts (211.4); the 250/191/34/661 → 251/192/34/662 transition is one launch and one cell. |
+| `e5c13ac` | Owner-selected dual forward policy (100% and 200% against one AR-off control) | accepted | Exact-type loader, duplicate-key and non-finite refusal, canonical-byte check, and parent authentication (`P1`–`P3` in 211.3). All capabilities are literal `false`; the QCOM exclusion is explicitly not inherited as a future universe rule. Its pinned overlay hash `2e9f390e…` equals the SHA-256 of `arv2_four_family_multiplicity.structural.json`, which `preregistration.py`, `four_family_multiplicity.py`, and `run_contract.py` authenticate. |
+| `ccc522f` | Record: section 209 and handoff | accepted | Record only; banner, section 4, and ledger row were current at that push. |
+| `f9fa648` | Forward-quality core moved inside the import firewall | accepted after correction | The v2 core now imports only `__future__`, `datetime`, `typing`, `accepted_risk_input_pair`, and `canonical`, and accepts a host-supplied page visitor; the provider bridge and the private write moved to `scripts/run_arv2_forward_data_quality.py`. The firewall was not relaxed; its expected closure gains the one import-clean module. The receipt schema is unchanged, so the receipts published before the move still authenticate. Its new recheck of the traversal's transport was unpinned (`ARV2R211-004`, pinned in `8c06df6`). |
+| `d6c855d` | Input-only QC six-universe snapshot diagnostic | accepted | No order, price-subscription, or outcome call; the seven universe callbacks select nothing; the Object Store key is content-addressed under its own `arv2/fresh-six-universe-input-v1/` prefix and a different existing value refuses. Warm-up robustness is `ARV2R211-002`. |
+| `d75c114` | Record: section 210, banner, section 4, ledger row | accepted | Record only; the floor stays 251/192/34/662 and the provider capture adds no look. |
+
+### 211.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R211-001` | P3 | `6541c5d`, `23f511c` (documented) | Every tilt-derived arm retains a diagnostics statistic that labels itself `ar_on100`: R235, R236, R237, and R246 all carry `diagnostics.arm = 'ar_on100'` while their aggregates correctly say `ar_on80`, `ar_on120`, `ar_on200`, and `ar_on0`. The tilt renderer rewrites the role, variant, and fraction but not the `install_matched_diagnostics(…, 'ar_on100', 0)` literal inherited from R232's `main.py`, and the result parsers validate that inherited label deliberately. The aggregate, not the diagnostics label, identifies the arm. This generalizes `ARV2R206-003`. | Documented; spent receipts are not rewritten. Future derived projections should render the diagnostics arm from the arm identity. Plan item 4. |
+| `ARV2R211-002` | P3 | `d6c855d` (robustness, documented) | The snapshot's `accept` refuses an empty or all-nonpositive collection on every callback, including warm-up callbacks that a later pre-cutoff delivery would supersede. In QuantConnect an exception inside a universe callback ends the run, so one degenerate REMX collection during the fourteen-day warm-up would spend a launch attempt even though the collection persisted at 09:20 would have been valid. An offline probe with the test file's own fakes confirms the refusal happens at the warm-up callback. This is the data condition that ended R-177 A3 and that R-180 counted twice for REMX. | Documented; the fail-closed direction is kept. Recommendation before the first launch: record superseded degenerate collections as counts and apply the positivity refusal to the collection being persisted. Plan item 3. |
+| `ARV2R211-003` | P3 | `7aefeb1`, sections 202–208 (interpretation, documented) | The historical spreads are reported without an uncertainty statement. The only per-period breakdown retained is annual; paired by calendar year, the total AR effect (R232 − R231) is +6.54, +0.23, −3.30, +8.47, −3.88 points for 2021–2025 (mean +1.61 per year, t = 0.64, three of five positive). The weight overlay (R232 − R246) is +6.40, +0.22, −3.05, +9.05, −0.85 (mean +2.35, t = 1.03), so its cumulative +23.08 points comes from 2021 and 2024. The entry/count effect (R246 − R231) is +0.14, +0.01, −0.25, −0.57, −3.03 (mean −0.74, t = −1.27), so its cumulative −6.88 points comes almost entirely from 2025. | Documented. With five annual observations none of the three components is distinguishable from zero. Plan item 1 asks future runs to retain monthly paired returns. |
+| `ARV2R211-004` | P3 | `23f511c`, `f9fa648` | Three guards had no test: removing the forward receipt's refusal of `point_in_time_proven`, `outcome_reads`, or `qc_calls` claims, the core's recheck of the transport that the host traversal reports, or the R246 three-arm comparison's non-AR source-census check left every test green (`F2`, `F4`, `E2` in 211.3). Codex's tests pinned `paper_look_committed` only. | Corrected in `8c06df6` (test-only): a correctly pinned receipt claiming more than development authority, a test-transport capture relabelled as production, and an R246 aggregate with each census field changed are each refused; every case is red with its guard removed and green restored. |
+
+### 211.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Required gates at the pushed head: `test_dataset_and_import_firewall.py`, `test_ml_import_boundary.py`, `test_qc_object_store_read_contract.py`, `test_lane_record_integrity.py`, `test_active_document_consistency.py` (worktree) | 340 passed |
+| The same firewall test at `ccc522f` | red: `test_current_v2_package_transitive_import_closure_is_outcome_free` refused `os` in `forward_data_quality` |
+| R232 versus R246 projected cloud source, built from the pinned package and diffed line by line | only `accepted_risk_six_universe_order_tilt_targets.py` (fraction `1.00` → `0.00`, role and schema identities), `accepted_risk_six_universe_order_tilt_qc_runtime.py` (variant, profile, summary, and META identities), and `main.py` (class name and variant) differ |
+| New and adjacent test files of the range (eight files, export of `d75c114`) | 173 passed |
+| The two files carrying the new pins, on the final tree (worktree) | 40 passed |
+| Per-year claim of section 208 from the retained R231/R232/R246 receipts | reproduces (211.2 and 211.4) |
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `F1` | forward core: capture-manifest pin check removed | red: 2 failed, 18 passed | `test_capture_is_authenticated_and_exact_window_is_required[manifest_pin]`, `test_build_refuses_wrong_manifest_pin_and_never_publishes` |
+| `F2` | forward core: transport recheck removed | **green: 20 passed** → pinned by `8c06df6`; afterwards red: 1 failed | `test_core_refuses_a_host_traversal_that_reports_another_transport` |
+| `F3` | forward comparison: multi-version IDs no longer ambiguous | red: 1 failed, 19 passed | `test_multiple_versions_of_one_id_in_a_capture_remain_ambiguous` |
+| `F4` | forward receipt: `point_in_time_proven` refusal removed (also `outcome_reads`, `qc_calls`) | **green: 20 passed** → pinned by `8c06df6`; afterwards red: 1 failed each | `test_receipt_cannot_claim_more_than_development_authority[…]` |
+| `F5` | forward build: rows outside the exact window admitted | red: 1 failed, 19 passed | `test_capture_is_authenticated_and_exact_window_is_required[outside_row]` |
+| `S1` | snapshot: source EndTime after the callback admitted | red: 1 failed, 17 passed | `test_source_and_callback_order_uses_utc_instants_across_dst_fold` |
+| `S2` | snapshot: callbacks at or after 09:20 admitted | red: 1 failed, 17 passed | `test_at_or_after_cutoff_callback_is_not_accepted` |
+| `S3` | snapshot: same-EndTime content change admitted | red: 1 failed, 17 passed | `test_source_end_time_regression_or_same_version_edit_refuses` |
+| `S4` | snapshot: Object Store key conflict admitted | red: 1 failed, 17 passed | `test_existing_content_addressed_key_cannot_hide_different_bytes` |
+| `S5` | snapshot: EndTime lag bound widened to 100 days | red: 1 failed, 17 passed | `test_absent_or_stale_source_is_refused` |
+| `S6` | snapshot: missing-source refusal removed | red: 1 failed, 17 passed | `test_absent_or_stale_source_is_refused` |
+| `P1` | dual policy: parent authentication skipped | red: 1 failed, 44 passed | `test_loader_refuses_changed_bytes_and_parent_identity` |
+| `P2` | dual policy: canonical-byte check removed | green: 45 passed | — (redundant by construction: the file-hash pin already fixes every byte) |
+| `P3` | range policy: ancestor candidate-economics check removed | green: 45 passed | — (redundant by construction: both ancestor manifests are hash-pinned and the references are fixed by the exact policy) |
+| `E1` | R246 comparison: same AR-on baseline path no longer required | red: 1 failed, 16 passed | `test_three_way_comparison_requires_identical_ar_on_baseline_path` |
+| `E2` | R246 comparison: non-AR source-census check removed | **green: 17 passed** → pinned by `8c06df6`; afterwards red: 4 failed | `test_three_way_comparison_refuses_a_different_non_ar_source_census[…]` (all four fields) |
+| `E3` | R246 projection: transfer fraction rendered at 50% | red: 9 errors | the builder's own fraction and profile checks refuse before any test body runs |
+
+All trials ran in a separate export of `d75c114` under the session
+scratchpad, never in the worktree, without `-x`, with `-rf`, and with failing
+test names captured; every mutated file was restored byte-identical.
+
+Static and arithmetic checks: the three decomposition spreads and the
+look-floor transition reproduce by script; the dual policy's overlay pin
+matches an authenticated file; the snapshot's generated QC entry has no order,
+price-subscription, or history call; the forward CLI prints counts and
+digests only.
+
+### 211.4 Results, read on the record's own terms
+
+The decomposition in section 208 is the most useful historical result the
+lane has produced, and the per-year view sharpens it:
+
+| Year | AR-off R231 | Entry/count only R246 | Full AR-on100 R232 | Entry/count effect | Weight effect | Total AR effect |
+|---|---:|---:|---:|---:|---:|---:|
+| 2021 | +45.28% | +45.42% | +51.82% | +0.14 | +6.40 | +6.54 |
+| 2022 | −13.70% | −13.70% | −13.47% | +0.01 | +0.22 | +0.23 |
+| 2023 | +27.83% | +27.58% | +24.53% | −0.25 | −3.05 | −3.30 |
+| 2024 | +12.13% | +11.55% | +20.60% | −0.57 | +9.05 | +8.47 |
+| 2025 | +35.64% | +32.62% | +31.76% | −3.03 | −0.85 | −3.88 |
+
+Effects are in-year percentage points, each year anchored on the previous
+year-end equity.
+
+- **The five-year "benefit" is two good years.** The weight overlay helped in
+  2021 and 2024, roughly matched in 2022, and lost in 2023 and 2025. Paired
+  by year, no component is distinguishable from zero (t between −1.3 and
+  +1.0 over five observations). The cumulative +16.20 points is what those
+  five in-year spreads compound to; it is not a stable annual edge.
+- **2025 is the weak year for both components**, and the recent window
+  (August 2025 onward) was flat to negative for AR. That is consistent with a
+  regime change and with a vintage effect that fades for the most recent
+  data; the per-year pattern is not monotone in data age (2023 was also
+  negative), so it does not separate the two. `ARV2R196-001` stays open.
+- **The forward rules include the component that hurt.** Both owner-selected
+  forward arms (100% and 200%) carry AR entry/count, which cost 3.03 points in
+  2025 and is the only component with a consistently non-positive sign after
+  2022. The untested cell of the two-by-two design is AR-off admission with
+  the AR weight overlay. Whether to include it is the owner's decision; it is
+  recorded here so the forward protocol is frozen with the decomposition in
+  view.
+- **Forward receipts.** The two same-window captures agree on all 1,398 IDs,
+  and the weekend capture is empty, as expected. The receipt treats any byte
+  change in a row as a new version, so a vendor re-stamp of `last_updated`
+  would count as a change; section 197's field-level classifier is the tool
+  for interpreting any future non-zero count.
+- **Accounting.** 251 shared looks, 191 → 192 development evaluations with
+  R246, 34 infrastructure looks, 662 authenticated exploratory cells;
+  reconciled.
+
+### 211.5 Improvement plan
+
+1. **State uncertainty with every historical spread** (`ARV2R211-003`).
+   Retain monthly paired account returns (sixty values fit easily inside the
+   8,192-byte statistic) in any future order run, and report the per-year
+   table and a paired test beside every cumulative spread.
+2. **Freeze the forward protocol with the decomposition in view.** Decide
+   before the protocol is frozen whether the forward arms keep AR
+   entry/count, and whether an AR-off-admission, AR-weight arm is added
+   (as one more historical look, or as a forward arm).
+3. **Snapshot warm-up** (`ARV2R211-002`): before the first QC launch, count
+   superseded degenerate collections and refuse only if the collection
+   persisted at 09:20 is degenerate.
+4. **Diagnostics label** (`ARV2R211-001`): render the diagnostics arm from
+   the arm identity in any future derived projection.
+5. **Forward receipts**: push each receipt digest on the day of capture (the
+   remote push time is the only third-party time bound these receipts have),
+   and classify any future version change field by field before interpreting
+   it.
+6. **Run the firewall and closure files before every push.** The v2 import
+   firewall was the fourth required gate to fail at a pushed head in this
+   lane; each was caught only by a whole-file run.
+
+### 211.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the per-year view is consistent with both regime and vintage. |
+| `ARV2D199-002` | P2 | Open; the original R225 QCOM reference gap. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2D210-001` | P2 | Closed by `f9fa648`; the firewall is green at the pushed head. |
+| `ARV2D210-002`, `-003` | P2 | Closed before any launch. |
+| `ARV2R206-003` | P3 | Generalized by `ARV2R211-001`. |
+| `ARV2R211-001`, `-002`, `-003` | P3 | Documented this round. |
+| `ARV2R211-004` | P3 | Corrected in `8c06df6`. |
+
+### 211.7 Validation
+
+Run on the exact final tree of this round (`d75c114`, the test-only `8c06df6`,
+and this record commit; no production file changed) with `~/.venvs/trading_agent-py313/bin/python`
+(3.13.15):
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, run in a byte-faithful export of the pushed head `d75c114` with `artifacts/analyst_revisions_v2` copied in (the final tree differs from it only by the two test files of `8c06df6` and this record) | **Standing lane selection in progress at this commit**; its exact counts are recorded by this round's follow-up commit before the single push, so this section could be committed without leaving edits uncommitted in the shared worktree. |
+| Required gates at the pushed head | firewall, ML boundary, whole-package closure, lane-record integrity, active-document consistency (worktree) | 340 passed |
+| New and adjacent test files of the range | eight files in the export of `d75c114` | 173 passed |
+| The two files carrying the new pins, on the final tree | `test_forward_data_quality.py`, `test_qc_qcom_entry_only.py` (worktree) | 40 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` in the worktree | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+Not exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run; the input-only snapshot diagnostic's real callback, EndTime,
+and Object Store behavior remain untested, as section 210 states.

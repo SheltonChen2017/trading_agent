@@ -720,3 +720,121 @@ def test_preparation_module_has_zero_io_and_no_host_timezone_database_dependency
     assert "SecEdgarMetadataSource" not in {
         node.id for node in ast.walk(tree) if isinstance(node, ast.Name)
     }
+
+
+# Each case below is otherwise valid, so only the named guard can refuse it.
+
+
+def test_coherent_target_outside_the_approved_window_is_refused_by_scope():
+    with pytest.raises(SecAcquisitionPreparationError, match=r"outside 2022Q4\.\.2023Q1"):
+        _target(
+            period="2023Q2",
+            accession_number="0000999999-23-000001",
+            filing_date="2023-04-10",
+        )
+
+
+def test_acceptance_outside_the_policy_window_but_inside_the_filing_day_is_refused():
+    # 00:30 EDT on 2023-04-01 is 04:30Z, inside the conservative filing-day
+    # envelope for a 2023-03-31 filing, so only the timezone-policy window
+    # refuses it.
+    target = _target(
+        period="2023Q1",
+        accession_number="0000999999-23-000001",
+        filing_date="2023-03-31",
+    )
+    with pytest.raises(SecAcquisitionPreparationError, match="outside the frozen Eastern policy"):
+        _projection(target, _header(target, acceptance="20230401003000"))
+
+
+def _header_with(target, old: str, new: str) -> bytes:
+    text = _header(target).decode("ascii")
+    assert old in text
+    return text.replace(old, new, 1).encode("latin-1")
+
+
+def test_embedded_second_sec_header_tag_is_refused():
+    target = _target()
+    header = _header_with(
+        target, "  CENTRAL INDEX KEY: 0000999999\n",
+        "  CENTRAL INDEX KEY: 0000999999\n  COMPANY CONFORMED NAME: X <SEC-HEADER> Y\n",
+    )
+    with pytest.raises(SecAcquisitionPreparationError, match="exactly one complete SEC-HEADER"):
+        _projection(target, header)
+
+
+def test_indented_root_role_name_is_refused():
+    target = _target()
+    header = _header_with(
+        target, "  CENTRAL INDEX KEY: 0000999999\n",
+        "  CENTRAL INDEX KEY: 0000999999\n FILED BY:\n",
+    )
+    with pytest.raises(SecAcquisitionPreparationError, match="root roles must begin at column zero"):
+        _projection(target, header)
+
+
+def test_second_issuer_section_is_refused_not_ignored():
+    target = _target()
+    header = _header_with(
+        target, "</SEC-HEADER>\n",
+        "ISSUER:\n COMPANY DATA:\n  CENTRAL INDEX KEY: 0000777777\n</SEC-HEADER>\n",
+    )
+    with pytest.raises(SecAcquisitionPreparationError, match="exactly one ISSUER section"):
+        _projection(target, header)
+
+
+def test_control_byte_inside_the_header_is_refused():
+    target = _target()
+    header = _header_with(
+        target, "  CENTRAL INDEX KEY: 0000999999\n",
+        "  CENTRAL INDEX KEY: 0000999999\n  COMPANY CONFORMED NAME: X\x01Y\n",
+    )
+    with pytest.raises(SecAcquisitionPreparationError, match="unsupported control bytes"):
+        _projection(target, header)
+
+
+def test_non_ascii_byte_inside_the_header_is_refused():
+    target = _target()
+    header = _header_with(
+        target, "  CENTRAL INDEX KEY: 0000999999\n",
+        "  CENTRAL INDEX KEY: 0000999999\n  COMPANY CONFORMED NAME: CAFÉ\n",
+    )
+    with pytest.raises(SecAcquisitionPreparationError, match="strict ASCII"):
+        _projection(target, header)
+
+
+def test_structurally_valid_header_above_two_mib_is_refused_by_the_size_cap():
+    target = _target()
+    long_name = "X" * (2 * 1024 * 1024)
+    header = _header_with(
+        target, "  CENTRAL INDEX KEY: 0000999999\n",
+        f"  CENTRAL INDEX KEY: 0000999999\n  COMPANY CONFORMED NAME: {long_name}\n",
+    )
+    assert len(header) > preparation.MAX_SEC_HEADER_BYTES
+    with pytest.raises(SecAcquisitionPreparationError, match="nonempty bounded exact byte image"):
+        _projection(target, header)
+
+
+def test_well_formed_primary_filename_longer_than_255_characters_is_refused():
+    filename = "a" * 252 + ".xml"
+    assert len(filename) == 256
+    with pytest.raises(SecAcquisitionPreparationError, match="raw root XML filename"):
+        _target(primary_xml_filename=filename)
+
+
+def test_forged_plan_target_order_is_refused_at_serialization():
+    plan = build_sec_acquisition_plan((
+        _target(),
+        _target(accession_number="0000999999-22-000002"),
+    ))
+    object.__setattr__(plan, "targets", tuple(reversed(plan.targets)))
+    with pytest.raises(SecAcquisitionPreparationError, match="order was altered"):
+        plan.to_payload()
+
+
+def test_plan_subclass_is_refused_at_construction():
+    class DerivedPlan(preparation.SecAcquisitionPlan):
+        pass
+
+    with pytest.raises(SecAcquisitionPreparationError, match="exact acquisition plan"):
+        DerivedPlan((_target(),))

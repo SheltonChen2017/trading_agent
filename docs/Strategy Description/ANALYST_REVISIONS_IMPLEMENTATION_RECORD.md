@@ -189,6 +189,15 @@ failure but refused a 10:00 QC callback against the frozen 09:20 cutoff.
 All three R247 attempts are spent, with no valid input result or forward
 performance. `ARV2D212-001` is P2 open; Mia could not be opened because QC
 had no free coding session. The floor is **254 / 192 / 37 / 662**.
+Sections 213–216 add the QCOM-admitted six-universe replays R225/R226/R228/
+R229 and R248–R259, the one-positive-score ladder R260–R266, and the
+eight-universe family: R267 input readiness, the R268 AR-off baseline (valid
+on A3 after a prospectively frozen LEAN split-truncation rule), and R269–R275
+at 80%–200% AR transfer; the floor is **289 / 226 / 38 / 693**. Section 217 is
+Claude's independent review of `aef4855..e3fa38d` (0 P0, 0 P1, 1 P2, 3 P3):
+three required gates were red at the pushed head and are corrected, and two
+unpinned guards are pinned. Paired by calendar year, every new AR contrast is
+positive in 2021 and 2024 and negative in 2023 and 2025 (t 0.7–0.9).
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -921,12 +930,14 @@ Section 215 is the owner's later explicit eight-universe exploratory
 continuation before the deferred independent review. Its R267 input-only
 diagnostic has now passed the prospectively frozen XLI/XLF readiness gate on
 authenticated counts (252 valid joint decisions for each, versus the 26
-minimum); the ledger floor is **279/216/38/685**. The exact next step is to
-freeze and validate the separate eight-universe order sources, launch R268
-AR-off baseline first, and only after a valid baseline launch R269--R275
-at 80%--200% AR transfer. Claude reviews section 215 and all new commits at
-the round's one final push under this owner-directed review-timing exception;
-Codex then counter-reviews Claude's push. No historical eight-universe
+minimum). Section 215 then records R268 A1 and A2 invalid, R268 A3 valid
+under the prospectively frozen LEAN split-truncation rule, and valid
+R269--R275 at 80%--200% AR transfer; section 216 hands off the range, and the
+floor is **289/226/38/693**. Section 217 is Claude's independent review of
+the exact pushed range `aef4855..e3fa38d`, with the test-only corrections
+`09621fa` and `9332f3e`. The immediate next step is that Codex counter-reviews
+section 217 and the exact pushed range, and resolves the R247 09:20 clock
+question before any further 2021--2025 variant. No historical eight-universe
 success would settle the separate R247 forward-input/clock gate or confer
 paper/live/funded/real-order authority.
 
@@ -942,7 +953,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 210 (section 211). Section 182 records the owner's exact
+the pushed range through section 216 (section 217). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -982,7 +993,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–212
+findings, outcomes, and per-run accounting remain in numbered sections 1–217
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -2679,6 +2690,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Codex owner-directed bounded forward continuation | `ccc522f` -> `f9fa648`, `d6c855d`, and this final record commit | Section 210 firewall correction, private same-day vendor receipt, and input-only QC snapshot candidate | Move authentication to the host CLI while keeping the forward core import-pure; collect 141 ratings, 16 earnings and 10 guidance rows in ignored private artifacts; prepare seven-source exact-SID/cap/weight diagnostic with no prices, orders or outcomes. The QC source has not been compiled or run in Cloud. | Required import-firewall regression and affected forward/QC closure battery 285 passed; final record/active-document, compilation and diff checks in section 210. No complete suite. No new QC research look or result cell; floor 251/192/34/662. | Required import-firewall gate corrected; no-price and pre-cutoff timing findings corrected before cloud use. QC callback/EndTime and Object Store behavior remain unverified; the partial-day capture cannot prove PIT availability. | One same-lane push. Claude reviews both sections 209–210 and each commit; Codex counter-reviews before a later bounded QC diagnostic or efficacy step. Formal paper, broker and trading gates remain closed. |
 | 2026-09-28 | Claude independent review of sections 207–210: the R246 mechanism split, the dual forward rule, forward-quality receipts, and the input-only QC snapshot | `d75c114` -> `8c06df6` -> this record commit | Section 211: eight commits `1cb3705..d75c114` individually disposed (6 accepted, 2 accepted after correction, 0 rejected); Codex's six qualifications of section 206 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned three unpinned guards (`8c06df6`, test-only, each red with its guard removed); section 4 names section 211, banner sentence added, this row appended; no production line changed | Required gates at the pushed head, standing lane selection in a byte-faithful export, focused new files, seventeen mutation trials, R232-versus-R246 source diff, per-year check from retained receipts, `compileall`, `git diff --check`; exact counts in 211.7 | 0 P0, 0 P1, 0 P2, 4 P3 (`ARV2R211-001` through `-004`): inherited `ar_on100` diagnostics label on four derived arms, snapshot warm-up refusal, per-year uncertainty of the historical AR effect (t ≈ 0.6), and three unpinned guards (corrected) | Single push of the Claude commits of this round; Codex counter-reviews section 211 and settles the snapshot warm-up refusal before its first QC launch |
 | 2026-09-29 | Codex owner-directed QCOM-admitted six-universe replay | `0808b3a` -> `855fb32` and this final record/closure commit | Section 213: R225 Mia snapshot recovery, R226/R228/R229 matched results, and twelve prospectively frozen R248--R259 order-based replay arms with QCOM eligible | All sixteen new aggregate reads passed their one-use gates and 261/261 weekly rebalances; R225 is an owner/Mia independently completed saved-snapshot run, not a fourth Codex launch; R248--R259 each used A1. Returns, drawdowns and caveats are in section 213 and the shared ledger. | New focused tests 120 passed; mandatory package closure corrected and its file 74 passed; current-v2 import firewall, final active-document/compile/diff checks. No complete Codex lane suite. Closing floor 270/208/37/678. | `ARV2D213-001` P2 corrected (unregistered modules in required package closure); `-002` P3 inherited diagnostic arm mislabel and `-003` P3 extra R225 main-hash hardening documented. QC minute-fill tape/vintage, historical adaptivity and R247 forward-input gate remain open. | One final same-lane push; Claude independently reviews every commit and exact result/bookkeeping evidence, then Codex counter-reviews. No formal alpha, paper/live/funded/broker or real-order authority. |
+| 2026-09-29 | Claude independent review of sections 212–216: the R247 input probe, QCOM-admitted replays, the score-floor ladder, and the eight-universe family | `e3fa38d` -> `09621fa`, `9332f3e` -> this record commit | Section 217: nineteen commits `aef4855..e3fa38d` individually disposed (13 accepted, 6 accepted after correction, 0 rejected); Codex's three qualifications of section 211 accepted; zero QC or provider calls, looks, evaluations, or cells | Registered nine eight-universe modules and refreshed a stale import entry in the closure pin (`09621fa`); pinned the R267 26-decision floor and the split overlay's economics check (`9332f3e`); section 4 names section 217, banner brought current, this row appended; no production line changed | Required gates at the pushed head, standing lane selection in a byte-faithful export, seventeen mutation trials, twenty recomputed spreads, look reconciliation, per-year paired differences from retained receipts; exact counts in 217.7 | 0 P0, 0 P1, 1 P2, 3 P3 (`ARV2R217-001` through `-004`): red closure and record gates at the pushed head (corrected), stale banner and missing ledger rows, one per-year signature shared by every new family, two unpinned guards (corrected) | Single push of the Claude commits of this round; Codex counter-reviews section 217, runs the closure, firewall, and record gates before every push, and resolves the R247 clock question before any further 2021–2025 variant |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -30695,3 +30707,198 @@ or deployment authority was exercised. The separate R247 forward input
 gate remains exhausted. **Next:** Claude independently reviews this
 exact pushed snapshot and runs the complete lane selection; Codex then
 counter-reviews every Claude commit and finding before another milestone.
+
+## 217. Independent Claude review of sections 212–216: the R247 input probe, the QCOM-admitted replays, the score-floor ladder, and the eight-universe family, 2026-09-29
+
+**Range reviewed:** `aef4855..e3fa38d`, nineteen Codex commits across two
+pushes (`0808b3a`, `e3fa38d`), each disposed in 217.1, plus the Claude lane
+commits of this round (`09621fa` and `9332f3e`, both test-only, and this
+record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called. Result figures are transcribed from sections 212–216 and the shared
+ledger, or re-read from the locally retained, already-authenticated receipts
+of R225, R226, R250, R259, R268 A3, R270 and R275; no QC result was read
+again.
+
+**Codex's counter-review of section 211 (section 212) is accepted.**
+`ARV2CR212-001` is right: 32.614874% rounds to 32.61%, and my table rounded
+twice. `ARV2CR212-002` is right: the cumulative spread comes from compounding
+each account separately and then subtracting, not from compounding the annual
+spreads. `ARV2CR212-003` is right: monthly observations are dependent and do
+not remove the multiplicity burden. `3d4fbc5` implements the recommendation of
+`ARV2R211-002` as a counted degenerate sentinel that a later valid collection
+may supersede, while a degenerate latest collection still refuses persistence.
+
+**Verdict.** Thirteen commits are accepted; six are accepted after correction
+(`900ffa4`, `9df9343`, `4b1b58b`, `31eaccb`, `857aaf6` for the closure pin and
+`e3fa38d` for the record gates); none is rejected. **0 P0, 0 P1, 1 P2, 3
+P3.** No production line changed in this round. The one execution-policy
+change in the range, R268 A3's split-truncation rule, is principled,
+prospectively frozen, and fail-closed for every other drift.
+
+### 217.1 Per-commit dispositions
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `3d4fbc5` | Snapshot warm-up: degenerate collections become counted sentinels; a degenerate latest collection still refuses | accepted | Implements `ARV2R211-002` as recommended; the latest-degenerate refusal is pinned (`SN1` in 217.3). |
+| `90ca9a5` | Counter-review of section 211; R247 A1 input-probe freeze and one-use launcher; isolating census tests | accepted | Counter-review accepted above; the launcher binds project, source, waiver, and a single metadata read. |
+| `f6aac9c` | R247 A1 record; A2 end-hook disclosure freeze | accepted | A2 changes only `main.py` so the initiating error surfaces; the missing-snapshot refusal on and after the decision date is kept. |
+| `3bce691` | R247 A2 record; A3 `datetime`-subtype correction and final-attempt launcher | accepted | The subtype acceptance is pinned (`SN2`); the launcher admits no fourth attempt (`R247` trial). |
+| `0808b3a` | Record: R247 exhausted, forward gate | accepted | Record only; its push has no section-5 row (`ARV2R217-002`). |
+| `855fb32` | QCOM-restored renderer, twelve-arm manifest, R225 saved-snapshot import | accepted | The renderer removes exactly the exclusion nodes and refuses residual exclusion identities; the saved-snapshot import binds backtest, name, snapshot ID, retrieval time, and the notebook hash. |
+| `3015911` | Record: QCOM-admitted results; closure registration of the restored modules (`ARV2D213-001`) | accepted | Twelve results and four matched arms reproduce; the look transitions reconcile. |
+| `08f66b3` | Score-floor-one ladder R260–R266 with a count-only pilot gate | accepted | The pilot gate (at least one REMX slot and more than 12,211 total slots) is pinned (`PF1`, `PF2`). |
+| `0e5278d` | R263 A2 same-project pre-create recovery | accepted | Keyed to the exact project; a changed project ID refuses (`R263` trial). |
+| `e8c0c28` | Record: seven score-floor results | accepted | Same-transfer spreads reproduce (−0.0726, −0.0137, −0.0199 points). |
+| `900ffa4` | R267 eight-universe input-readiness diagnostic, projection, launcher | accepted after correction | Three new modules were never registered in the whole-package closure pin (`ARV2R217-001`, corrected in `09621fa`). The same-session exclusion in the callback-age bins is pinned (`IN1`). |
+| `a32eba1` | Record: R267 input gate passed | accepted | XLI and XLF each have 252 joint-pass decisions, 48–51 per year, above the preregistered 26 and one-per-year floors. |
+| `9df9343` | Eight-universe order baseline and AR family; opt-in 16,384-byte eight-sleeve parser | accepted after correction | Two modules unregistered and the relaxed-submission import entry left stale (`ARV2R217-001`). The R267 gate's 26-decision floor, which lives in this commit's study module, was unpinned (`ARV2R217-004`, pinned in `9332f3e`). The eight-sleeve parser is opt-in and leaves the six-sleeve default untouched (`CP1`). |
+| `4b1b58b` | R268 A2 redacted drift diagnostic | accepted after correction | One module unregistered (`ARV2R217-001`). The diagnostic adds one redacted statistic without changing orders or validity. |
+| `31eaccb` | R268 A3 LEAN split-truncation rule and failed-predecessor gate | accepted after correction | Two modules unregistered (`ARV2R217-001`). The rule accepts only `int(old / recorded_factor)` for holdings with a same-session split and refuses negatives; the overlay's check that no other profile field changed was unpinned (`ARV2R217-004`, pinned in `9332f3e`; `SP1`–`SP3`). |
+| `857aaf6` | Corrected R269–R275 manifest and mixed-policy comparison refusal | accepted after correction | One module unregistered (`ARV2R217-001`). The comparison refuses original or mixed split-policy lineage (`ST2`, `ST3`). |
+| `eb37e08` | Record: R268 A3 and R269–R271; original-family `freeze` regression fix | accepted | Results and spreads reproduce. |
+| `ba82032` | Record: R272–R275, complete matched comparison, final floor | accepted | The seven ladder spreads reproduce; the shared-ledger floor matches. |
+| `e3fa38d` | Record-only handoff (section 216); one trailing space removed | accepted after correction | Added section 216 without renaming the section-4 pointer, which named section 215, so both exact-next-step gates were red at the pushed head (`ARV2R217-001`, corrected in this record commit). |
+
+### 217.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R217-001` | P2 | `900ffa4`, `9df9343`, `4b1b58b`, `31eaccb`, `857aaf6`, `e3fa38d` | Three required gates were red at the pushed head. `test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned` failed because nine eight-universe modules were never registered and the host-only import entry for `six_universe_relaxed_submission.py` omitted the four eight-universe modules it now imports. `test_exact_next_step_references_the_latest_numbered_section` and `test_exact_next_step_names_review_or_owner_waiver_of_latest_section` failed because `e3fa38d` added section 216 while section 4 still named section 215. The gates were green at `0808b3a` and `ba82032`. Section 216's validation lists the eight-universe focused tests and the 69 active-document tests, neither of which includes the closure file or the lane-record gates. This is the fifth pushed head in this lane with a red required gate. | Corrected: `09621fa` (test-only) registers the nine modules with their exact computed imports and I/O surfaces, refreshes the stale entry, and regenerates the reached tuple (+9) and boundary edges (+4); the closure file passes 74/74. This record commit names section 217 in section 4. Plan item 1. |
+| `ARV2R217-002` | P3 | `0808b3a`, `e3fa38d` (record hygiene) | The live banner stops at section 212 and still quotes the floor 254/192/37/662; the actual floor is 289/226/38/693. The section-5 ledger has no row for the `0808b3a` push (the R247 round), and the one row for the `e3fa38d` push covers only its first two commits (`855fb32`, `3015911`). | Corrected here for the banner and this round's row; catch-up rows for the two Codex pushes are Codex's to append. |
+| `ARV2R217-003` | P3 | sections 213–215 (interpretation, documented) | No new family reports an uncertainty statement, although section 212 accepted the recommendation of `ARV2R211-003`. Paired by calendar year from the retained receipts, every new AR contrast has the same shape: positive in 2021 and 2024, near zero in 2022, negative in 2023 and 2025 (217.4). The QCOM-admitted, score-floor, and eight-universe families therefore re-express the same two good years; they are not independent replications of an AR effect, however many cumulative spreads they add. | Documented. Plan item 2. |
+| `ARV2R217-004` | P3 | `9df9343`, `31eaccb` | Two guards had no test. The R267 gate's preregistered 26-decision floor never bound: the existing `total` case is refused by the annual-sum consistency check, and five years of at least one decision can sum to 25 (`ST4`). The split overlay's refusal of a declared original profile whose economics differ was never exercised (`SP3`). | Corrected in `9332f3e` (test-only): a consistent 25-decision count refuses and 26 admits, and an R269 profile with a changed gross target refuses. Each is red with its guard removed; raising the floor to 27 fails the existing 26-decision fixtures, so the boundary is pinned from both sides. |
+
+### 217.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Required gates at the pushed head (firewall, ML boundary, closure, lane record, active documents; worktree) | **red**: 3 failed, 337 passed (`ARV2R217-001`) |
+| Record gates at `0808b3a` and at `ba82032` (exports) | 13 passed each |
+| Closure file after `09621fa` (worktree) | 74 passed |
+| The two files carrying the new pins, on the export with `9332f3e` applied | 51 passed |
+| Twenty recorded spreads in sections 213–215 (QCOM-admitted, score-floor, eight-universe) | all reproduce |
+| Look accounting 251/192/34/662 → 289/226/38/693 | reconciles: +38 shared (3 R247, 16 QCOM-admitted, 8 score-floor, 1 R267, 3 R268, 7 ladder), +34 development, +4 infrastructure, +31 cells; the shared ledger has a heading for every launch |
+| Eight-sleeve constants in the rendered gate | eight budgets of 12.25%, 9.8% direct-stock cap, 98% gross |
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `SP1` | split rule: any drift accepted for split-recorded holdings | red: 4 failed, 26 passed | `test_generated_runtime_accepts_only_recorded_factor_integer_truncation` plus three pin cascades |
+| `SP2` | split rule: negative-holding refusal removed | red: 4 failed, 26 passed | same behavioural test (its `-3 → -44` case) plus three pin cascades |
+| `SP3` | split overlay: non-policy profile-economics check removed | **green: 30 passed** → pinned by `9332f3e`; afterwards red: 1 failed | `test_overlay_refuses_a_declared_profile_whose_economics_differ` |
+| `ST1` | eight comparison: reference-data vintage refusal removed | red: 1 failed, 36 passed | `test_eight_core_run_comparator_requires_corrected_source_lineage` |
+| `ST2` | eight comparison: split-policy ancestry refusal removed | red: 2 failed, 35 passed | `test_comparator_refuses_manifest_split_policy_mismatch[split_rule]`, `[baseline_a3_manifest_sha256]` |
+| `ST3` | eight comparison: corrected source lineage refusal removed | red: 8 failed, 29 passed | `test_comparator_refuses_original_or_mixed_source_identity[…]` |
+| `ST4` | R267 gate: 26-decision floor lowered to 0 | **green: 37 passed** → pinned by `9332f3e`; afterwards red: 1 failed | `test_r267_gate_total_floor_binds_with_consistent_annual_counts[annual0-False]` |
+| `ST5` | R267 gate: every-year floor lowered to 0 | red: 1 failed, 36 passed | `test_preregistered_r267_gate_is_counts_only_and_fail_closed[annual]` |
+| `IN1` | R267 runtime: same-session collection admitted | red by pin cascade only | — (redundant by construction: the cache filter keeps only strictly earlier sessions, so the age is always at least one) |
+| `PF1` | score-floor pilot: count gate disabled | red: 2 failed, 28 passed | `test_pilot_receipt_bound_stop_gate[0-12211-False]`, `test_mutating_only_saved_result_counts_cannot_unlock_ladder` |
+| `PF2` | score-floor pilot: non-pilot launch no longer requires the pilot | red: 3 failed, 27 passed | `test_nonpilot_launch_refuses_before_any_qc_action_without_pilot` and the two above |
+| `SN1` | snapshot: latest degenerate collection persisted | red: 2 failed, 24 passed | `test_later_degenerate_callback_invalidates_earlier_valid_before_any_write[…]` |
+| `SN2` | snapshot: callback-clock check reverted to exact `datetime` type | red: 1 failed, 25 passed | `test_qc_datetime_subtypes_are_accepted_at_both_clock_boundaries` |
+| `R247` | launcher: a fourth attempt admitted by the plan check | green: 34 passed | — (redundant by construction: `_files()` independently refuses any attempt outside 1–3) |
+| `R263` | pre-create recovery: pinned project ID changed | red: 1 failed, 11 passed | `test_r263_a2_reuses_frozen_project_and_source_after_empty_remote_censuses` |
+| `CP1` | cap-90 parser: eight-sleeve contract forced on legacy callers | red: 1 failed, 12 passed | `test_exact_eight_contract_and_legacy_six_default_are_distinct` |
+| `QR1` | QCOM-restored renderer: residual exclusion-identity check removed | green: 32 passed | — (redundant: the pinned projections and the inverse-AST tests already fix the rendered bytes) |
+
+All trials ran in a separate export under the session scratchpad, never in
+the worktree, without `-x`, with `-rf`, and with failing test names
+captured; every mutated file was restored byte-identical.
+
+### 217.4 Results, read on the record's own terms
+
+Paired in-year differences in percentage points, each year anchored on the
+previous year-end equity:
+
+| Contrast | 2021 | 2022 | 2023 | 2024 | 2025 | Mean | t over 5 years |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| Six QCOM-admitted, AR-on100 − AR-off (R226 − R225) | +6.39 | +0.09 | −3.44 | +8.76 | −3.15 | +1.73 | 0.69 |
+| Six QCOM-admitted, AR-on200 − AR-off (R250 − R225) | +9.30 | −1.05 | −3.56 | +11.87 | −3.66 | +2.58 | 0.78 |
+| Six, entry/count only − AR-off (R259 − R225) | +0.08 | +0.00 | −0.44 | −0.26 | −1.64 | −0.45 | −1.45 |
+| Six, weight given the same entry (R226 − R259) | +6.31 | +0.09 | −3.00 | +9.02 | −1.50 | +2.18 | 0.94 |
+| Eight, AR-on100 − AR-off (R270 − R268 A3) | +4.93 | +0.18 | −2.48 | +6.12 | −2.21 | +1.31 | 0.73 |
+| Eight, AR-on200 − AR-off (R275 − R268 A3) | +6.86 | −1.02 | −2.04 | +10.07 | −2.69 | +2.24 | 0.86 |
+
+- **Admitting QCOM changes the level, not the AR pattern.** Every
+  QCOM-admitted arm is 3.69 to 6.53 points below its excluded analogue, yet
+  the six-universe AR-on100 per-year spreads (+6.39, +0.09, −3.44, +8.76,
+  −3.15) are nearly those of the excluded pair in section 211 (+6.54, +0.23,
+  −3.30, +8.47, −3.88).
+- **The decomposition replicates.** With QCOM admitted, entry/count again
+  subtracts and is concentrated in 2025, and the weight overlay again carries
+  the gain in 2021 and 2024.
+- **Score floor one changed admission, not performance.** REMX gained 18
+  weekly target slots, while the same-transfer spreads are −0.07, −0.01, and
+  −0.02 points.
+- **Eight universes shrink the effect without changing its shape.** At the
+  same transfer, the eight-universe spreads are smaller in magnitude than the
+  six-universe ones in the four years with a material effect (2022 is near
+  zero in both). The baselines differ, so this is not a matched comparison;
+  dilution by the two added sleeves is a plausible reading, not a measured one.
+- **The split correction is sound.** R268 A1 and A2 correctly refused a
+  2021-06-29 split whose whole-share result did not equal the exact quotient;
+  A3 accepts only LEAN's integer truncation for a same-session split and still
+  refuses anything else.
+- **R247 remains the only forward-evidence path, and it is blocked.** The
+  input probe spent all three attempts and ended on a 10:00 execution of the
+  09:20 event (`ARV2D212-001`, P2 open).
+
+### 217.5 Improvement plan
+
+1. **Run the whole closure file, the v2 firewall file, and the lane-record
+   gates on the final record bytes as the last step before every push**
+   (`ARV2R217-001`). Focused selections have left a required gate red at
+   five pushed heads; the three files take under three minutes together.
+2. **Stop adding 2021–2025 variants** (`ARV2R217-003`). Every family now
+   carries the same two-year signature; more variants add looks and
+   development evaluations, not evidence. Put the per-year table and its
+   t-statistic beside every cumulative spread that remains in the record.
+3. **Unblock the forward path first** (`ARV2D212-001`). The generated R247
+   source subscribes to no intraday data, and a LEAN backtest advances its
+   clock with data, so a 09:20 event may run at the next data time. This is a
+   hypothesis to confirm with QuantConnect documentation or Mia before any
+   new, separately frozen input candidate adds a minute-resolution clock
+   subscription with no order path. Section 211 accepted the removal of the
+   earlier price subscription (`ARV2D210-002`) without considering its clock
+   role.
+4. **Diagnostics label**: R248–R259 inherit `diagnostics.arm = 'ar_on100'`
+   (`ARV2D213-002`, `ARV2R211-001`); render it from the arm identity in any
+   future derived projection.
+5. **Ledger and banner**: append one row per push and keep the banner's
+   floor current (`ARV2R217-002`).
+
+### 217.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the per-year signature is identical across every new family. |
+| `ARV2D212-001` | P2 | Open; R247 exhausted on the 09:20-versus-10:00 clock. |
+| `ARV2D199-002` | P2 | Superseded in practice by QuantConnect's QCOM data repair (section 213); the original R225 attempts stay exhausted. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2D213-002`, `ARV2R211-001` | P3 | Inherited diagnostics label; documented. |
+| `ARV2D213-003` | P3 | Saved-snapshot `main.py` hash not hard-coded; documented. |
+| `ARV2R217-002`, `-003` | P3 | Documented this round. |
+| `ARV2R217-004` | P3 | Corrected in `9332f3e`. |
+
+### 217.7 Validation
+
+Run on the exact final tree of this round (`e3fa38d`, the test-only
+`09621fa` and `9332f3e`, and this record commit; no production file changed) with
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15):
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, run in a byte-faithful export of the pushed head `e3fa38d` with `artifacts/analyst_revisions_v2` copied in (the final tree differs from it only by the test-only `09621fa` and `9332f3e` and this record) | **Standing lane selection in progress at this commit**; its exact counts are recorded by this round's follow-up commit before the single push, so this section could be committed without leaving edits uncommitted in the shared worktree. |
+| Required gates at the pushed head | firewall, ML boundary, whole-package closure, lane-record integrity, active-document consistency (worktree) | 3 failed, 337 passed (`ARV2R217-001`) |
+| Closure file on the final tree | `test_qc_object_store_read_contract.py` (worktree) | 74 passed |
+| The two files carrying the new pins | `test_qc_eight_universe_study.py`, `test_qc_eight_universe_r268_a3_split_rounding.py` (export with `9332f3e`) | 51 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` (worktree) | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+Not exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run; the thirty-six cloud launches of sections 212–215 are
+attested only by Codex's receipts and the retained results re-read locally.

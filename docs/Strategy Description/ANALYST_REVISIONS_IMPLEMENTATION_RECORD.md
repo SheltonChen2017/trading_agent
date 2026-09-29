@@ -894,13 +894,28 @@ claim follows. R247 remains exhausted and its 09:20 input/clock gate remains
 open. Claude reviews section 213 and the exact final pushed range before a
 new forward diagnostic or prospective efficacy action.
 
-The owner's later same-round testing direction authorizes the bounded
+The owner's later same-round testing direction authorized the bounded
 historical floor-one sensitivity in section 214 before another independent
-review. R261/on100 is the first QC admission pilot; the six other frozen arms
-remain gated on its authenticated direct-stock count, not its return. After
-the authorized tests and one final lane push, Claude reviews section 214,
-its exact source freeze, every spent look, and the gate disposition. No
-historical result removes the separate R247 forward-input/clock gate.
+review. R261/on100 passed its preregistered direct-stock admission gate on
+authenticated counts, not on return. All seven frozen R260--R266 arms have
+now completed with valid, order-based 2021--2025 results. They each admitted
+18 REMX post-cap stock target slots out of 12,229 across six sleeves, versus
+zero REMX and 12,211 total under the prior three-positive-score rule. R263 A1
+failed before a launch receipt and spent a look; its same-project A2 completed.
+Eight attempts add eight development looks and seven exploratory cells, making
+the floor **278 shared looks / 216 development evaluations / 37 infrastructure
+looks / 685 cells**. The matched on80/on120/on200 floor-one returns are lower
+than the corresponding old-floor arms by 0.0726/0.0137/0.0199 percentage
+points; the new arms without exact same-tilt old-floor controls cannot be
+used for that comparison. After the one final lane push, Claude reviews
+section 214, its exact source freeze, validity gates, attempt accounting and
+result interpretation. The owner also requests an eight-universe successor:
+industrial XLI and financial XLF are prospective additions to the existing
+six; insurance KIE remains a separately named candidate, not a silent ninth
+universe. This is only a proposal until its input/identity/overlap contract is
+frozen and reviewed; no eight-universe performance run exists. No historical
+result removes the separate R247 forward-input/clock gate or grants paper,
+live, funded-account or real-order authority.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -30237,3 +30252,81 @@ development looks and three valid exploratory cells: floor **274 shared /
 212 development / 37 infrastructure looks / 681 cells**. The remaining
 arms and R263 A2 have no result yet; additional uses will be counted after
 their exact terminal disposition.
+
+### 214.1 Completed seven-arm order results and attempt accounting
+
+After the count-only R261 gate was authenticated, the other six frozen arms
+were launched under their own exact manifests. R263's separately frozen
+same-project A2 pre-create recovery first proved the A1 project had no remote
+backtest, then reused project **37122864** without inventing a fourth attempt
+or changing source economics. A2 reached `Completed.`; R264--R266 each
+completed on A1. All seven one-use bounded result reads authenticated
+`run_valid=true`, 261 completed of 261 submitted weekly rebalances and zero
+invalid/canceled orders. Every arm uses 10-bps-per-side modeled fees and
+**zero modeled slippage**. Cumulative return and maximum drawdown cover
+2021-01-04--2025-12-31 and are shown as percentages of the account, not as
+annualized returns.
+
+| Frozen arm | Project / backtest ID | Valid attempt | Cumulative return after modeled fees | Maximum drawdown | REMX / all-six post-cap stock target slots |
+| --- | --- | --- | ---: | ---: | ---: |
+| R260, AR 80% | `37122794` / `abee984782e0f4fc95419ffe79c94bc2` | A1 | +150.3410% | -21.8059% | 18 / 12,229 |
+| R261, AR 100% pilot | `37122534` / `7704d8a6fdb02499a2101db7f66cf0e8` | A1 | +154.5588% | -21.8275% | 18 / 12,229 |
+| R262, AR 120% | `37122826` / `5c76cdd4c4a2629fa75d00446e4661dc` | A1 | +158.5991% | -22.0978% | 18 / 12,229 |
+| R263, AR 140% | `37122864` / `93d005f720603c449b029ce85080feed` | A2; A1 invalid before create | +161.8199% | -22.1608% | 18 / 12,229 |
+| R264, AR 160% | `37123150` / `bb180b15ff3161a3a65994c8284796f4` | A1 | +162.6454% | -22.1471% | 18 / 12,229 |
+| R265, AR 180% | `37123299` / `ed86b47792b75ce6b1f8d8714ef713a6` | A1 | +161.6986% | -22.1459% | 18 / 12,229 |
+| R266, AR 200% | `37123366` / `47319712527c8b115a712a181eb92d7e` | A1 | +161.3582% | -22.0921% | 18 / 12,229 |
+
+The 18 REMX slots are repeated weekly *targets*, not 18 distinct companies or
+18 extra positions on every date. Relative to the separately frozen
+three-positive-score arms with the **same AR transfer**, R260 minus R256 at
+80%, R262 minus R257 at 120%, and R266 minus R258 at 200% are respectively
+**-0.0726, -0.0137 and -0.0199 percentage points** in cumulative return.
+Their old-floor count baseline was zero REMX and 12,211 all-six slots. The
+count gain therefore demonstrates a real admission change, but these tiny
+negative same-transfer spreads do not demonstrate improved performance. R261,
+R263, R264 and R265 have no exact same-transfer old-floor run; comparing them
+to a different transfer percentage would not isolate the rule. The observed
+seven-arm return peaks at R264/160% and then falls, but this adaptive
+same-window ladder does **not** select 160% for trading or establish a
+forecastable optimum.
+
+The three earlier valid arms plus R263 A2 and R264--R266 add **four** further
+development looks and **four** further valid exploratory cells to the
+checkpoint in section 214: **278 shared research looks / 216 development
+evaluations / 37 infrastructure looks / 685 authenticated exploratory
+cells**. The eight looks in this family are seven successful attempts plus
+the separately spent, resultless R263 A1. The owner-authorized shared ledger
+records all eight attempt uses and each result identity. No result read spends
+a second look. None of the old QCOM-excluded arms, QC terminal `Completed.`
+alone, or historical-current-vintage analyst records become independent
+confirmation evidence. The Massive archive's overwrites and the unproven
+cross-job minute-fill-tape equality remain material limitations.
+
+### 214.2 Review handoff and next bounded design
+
+Commit `08f66b3` froze the seven source projections, manifest, pilot gate and
+result parser before QC evaluation. Commit `0e5278d` pinned the exact R263
+A2 pre-create recovery after A1's resultless failure; it did not change the
+17-file cloud source or the seven prospectively frozen profiles. Claude
+should inspect both commits and the final record/ledger commit, especially
+the one-use result lineage, R263 A1/A2 attempt separation, the pilot's
+count-only gate, the corrected diagnostic arm names, and whether the matched
+comparisons above use the same transfer percentage. Focused source,
+projection, package-closure, record and ledger gates are the Codex validation
+scope; Claude owns the complete lane suite. No new safety, paper, broker,
+funded-account or live-trading authority was exercised here.
+
+The owner's next research idea is **eight** total ETF sleeves. The current
+six are SPY, QQQ, SOXX, XLV, REMX and XLE; industrial XLI and financial XLF
+would add two. Insurance KIE is a separately requested ninth candidate and
+is deferred from the eight-sleeve contract pending a measured data/mapping
+and overlap review. The six-universe engine already allocates a shared
+capital budget across overlapping stock identities; the successor must pin
+one security ID once across sleeves and disclose how its target weights are
+combined rather than double-counting a QQQ/SPY/SOXX overlap. First freeze
+an input-only identity/coverage diagnostic and matched AR-off baseline;
+only then could a separately versioned order-based AR 80%--200% ladder be
+launched and compared. No eight-universe QC project, result cell or return
+is claimed by this section. R247's failed forward-input/09:20-clock gate
+still independently blocks prospective 100%/200% paper evaluation.

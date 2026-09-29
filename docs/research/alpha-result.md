@@ -6043,3 +6043,110 @@ or vendor vintage, so that difference cannot be attributed solely to QCOM.
 These retrospectively adjusted 2021--2025 settings cannot select a live AR
 percentage or satisfy the formal prospective efficacy gate. No paper/live,
 funded, broker or real-order authority follows.
+
+## R-261 A1 — QCOM-admitted one-positive-score pilot, AR-on100 — 2026-09-29
+
+Owner-authorized, prospectively frozen **exploratory development** look.
+Seven-candidate source manifest SHA-256
+`3fde7673114794db256336c7c738c185859dd46e3d9af0765aa1cd7d008e5b86`
+and source-freeze commit `08f66b3` precede this first QC launch. The sole
+selection-rule change from the old three-positive-score family is a
+non-XLE positive-AR-name floor of **one**; 10% identity/cap coverage,
+three verified names, top-ten cap, 98% target gross, 2x buying-power
+admission, QCOM eligibility, weekly decisions and the historical input
+package remain pinned. It is order-based with 10-bps-per-side modeled fees
+and zero modeled slippage. Private project **37122534**, backtest
+`7704d8a6fdb02499a2101db7f66cf0e8`, A1 `Completed.`; the one-use
+aggregate read authenticated `run_valid=true`, 261/261 rebalances and zero
+invalid/canceled orders. The preregistered **count-only** pilot gate passed:
+18 REMX post-cap direct-stock target slots and 12,229 across six sleeves,
+versus zero and 12,211 under the old floor. These are repeated decision
+slots, not distinct stocks. Net cumulative return was **+154.5588%** and
+maximum drawdown **-21.8275%** over 2021-01-04--2025-12-31. Its return was
+not used to decide whether the six other arms could launch. One look and
+one exploratory cell move the floor from **270/208/37/678** to
+**271 shared / 209 development / 37 infrastructure looks / 679 cells**.
+
+## R-260 A1 — QCOM-admitted one-positive-score AR-on80 — 2026-09-29
+
+The pilot's authenticated admission gate permitted this previously frozen
+80% arm. Private project **37122794**, backtest
+`abee984782e0f4fc95419ffe79c94bc2`, A1 `Completed.` and one-use
+`run_valid=true`; 261/261 rebalances, zero invalid/canceled orders, 18
+REMX/12,229 all-six post-cap stock target slots. Cumulative return after
+modeled 10-bps-per-side fees was **+150.3410%**; maximum drawdown was
+**-21.8059%**. This is **-0.0726 percentage points** against R256's exact
+80% old-floor arm, not a positive floor-effect estimate. One development
+look and cell move the floor to **272/210/37/680**.
+
+## R-262 A1 — QCOM-admitted one-positive-score AR-on120 — 2026-09-29
+
+Private project **37122826**, backtest
+`5c76cdd4c4a2629fa75d00446e4661dc`, A1 `Completed.` and one-use
+`run_valid=true`; 261/261 rebalances, zero invalid/canceled orders, 18
+REMX/12,229 all-six post-cap stock target slots. Cumulative return after
+modeled fees was **+158.5991%** and maximum drawdown **-22.0978%**. This is
+**-0.0137 percentage points** against R257's exact 120% old-floor arm.
+One development look and cell move the floor to **273/211/37/681**.
+
+## R-263 A1 invalid, A2 valid — QCOM-admitted one-positive-score AR-on140 — 2026-09-29
+
+A1 created private project **37122864**, uploaded and compiled the frozen
+source, but its `backtests/create` request failed **before a launch receipt**.
+A statistics-free inventory found zero remote backtests; no A1 result or
+cell exists. The precise transport cause is not established. A1 still
+consumes one of this candidate's three allowed attempts and one conservative
+development look. The source-identical, same-project A2 pre-create recovery
+was frozen in commit `0e5278d` and required two more empty remote
+inventories before launch. A2 backtest
+`93d005f720603c449b029ce85080feed` reached `Completed.`; its sole
+bounded result read authenticated `run_valid=true`, 261/261 rebalances,
+zero invalid/canceled orders and 18 REMX/12,229 total post-cap stock
+target slots. Net cumulative return was **+161.8199%** and maximum
+drawdown **-22.1608%**. There is no exact old-floor 140% control, so this
+return cannot isolate the score-floor change. The two attempts spend two
+development looks, with only one valid exploratory cell, moving the floor
+from **273/211/37/681** to **275 shared / 213 development / 37
+infrastructure looks / 682 cells**. No A3 was used.
+
+## R-264 A1 — QCOM-admitted one-positive-score AR-on160 — 2026-09-29
+
+Private project **37123150**, backtest
+`bb180b15ff3161a3a65994c8284796f4`, A1 `Completed.` and one-use
+`run_valid=true`; 261/261 rebalances, zero invalid/canceled orders, 18
+REMX/12,229 all-six post-cap stock target slots. Cumulative return after
+modeled fees was **+162.6454%** and maximum drawdown **-22.1471%**. This
+is the largest *observed* return of the adaptive seven-arm sweep, not a
+selected live rule or a confirmation result. One look and one cell move
+the floor to **276/214/37/683**.
+
+## R-265 A1 — QCOM-admitted one-positive-score AR-on180 — 2026-09-29
+
+Private project **37123299**, backtest
+`ed86b47792b75ce6b1f8d8714ef713a6`, A1 `Completed.` and one-use
+`run_valid=true`; 261/261 rebalances, zero invalid/canceled orders, 18
+REMX/12,229 all-six post-cap stock target slots. Cumulative return after
+modeled fees was **+161.6986%** and maximum drawdown **-22.1459%**. One
+look and one cell move the floor to **277/215/37/684**.
+
+## R-266 A1 — QCOM-admitted one-positive-score AR-on200 — 2026-09-29
+
+Private project **37123366**, backtest
+`47319712527c8b115a712a181eb92d7e`, A1 `Completed.` and one-use
+`run_valid=true`; 261/261 rebalances, zero invalid/canceled orders, 18
+REMX/12,229 all-six post-cap stock target slots. Cumulative return after
+modeled fees was **+161.3582%** and maximum drawdown **-22.0921%**. This
+is **-0.0199 percentage points** against R258's exact 200% old-floor arm.
+One look and one cell move the final conservative floor to **278 shared
+research looks / 216 ARV2 development evaluations / 37 infrastructure
+looks / 685 authenticated exploratory cells**.
+
+All seven net return cells above reuse one 2021--2025 current-vintage
+Massive/Benzinga archive and a common six-universe construction. Vendor
+overwrites, prior adaptive rule changes, zero modeled slippage and the lack
+of an attested identical full stock minute-fill tape across separate QC jobs
+limit attribution. The new one-positive-score floor admitted only 18 extra
+REMX target slots and did not improve any of the three exact-transfer
+old-floor contrasts. No formal alpha, forward efficacy, paper/live/funded
+account action or real-order authority follows from these looks. The
+separately exhausted R247 input/clock gate remains open.

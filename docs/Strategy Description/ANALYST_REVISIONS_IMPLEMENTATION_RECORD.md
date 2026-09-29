@@ -917,6 +917,19 @@ frozen and reviewed; no eight-universe performance run exists. No historical
 result removes the separate R247 forward-input/clock gate or grants paper,
 live, funded-account or real-order authority.
 
+Section 215 is the owner's later explicit eight-universe exploratory
+continuation before the deferred independent review. Its R267 input-only
+diagnostic has now passed the prospectively frozen XLI/XLF readiness gate on
+authenticated counts (252 valid joint decisions for each, versus the 26
+minimum); the ledger floor is **279/216/38/685**. The exact next step is to
+freeze and validate the separate eight-universe order sources, launch R268
+AR-off baseline first, and only after a valid baseline launch R269--R275
+at 80%--200% AR transfer. Claude reviews section 215 and all new commits at
+the round's one final push under this owner-directed review-timing exception;
+Codex then counter-reviews Claude's push. No historical eight-universe
+success would settle the separate R247 forward-input/clock gate or confer
+paper/live/funded/real-order authority.
+
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
@@ -30401,3 +30414,27 @@ This section is a prospective protocol, not a claim that R267 or any
 eight-universe order backtest has run. Exact source and manifest hashes,
 validation, attempt receipts, results, review findings and final push range
 must be appended below after their respective events.
+
+### 215.1 R267 count-only QC result
+
+Commit `900ffa4` froze the exact R267 source and readiness thresholds before
+any cloud launch. Focused input/adapter tests passed **13/13**; local preview
+reproduced the pinned 10-file projection. R267 A1 created private project
+**37124263**, exact backtest `066c2f4e2e79eb2d15120596dc2b5523` and
+reached `Completed.`. The one-use bounded result reader authenticated all
+ten custom statistics, the profile/package/digest chain and 261 decisions
+for each of eight sleeves. No price or return field was read as evidence.
+XLI and XLF each had **252** preregistered 10%-policy/three-verified-name
+joint-pass decisions, with **51, 51, 51, 51, 48** by calendar year 2021--2025.
+Thus the R267 input gate passes; it says that XLI/XLF inputs exist at the
+required minimum, not that either adds independent stocks or return. The
+overlap census saw **195,947 cap-eligible input memberships** across eight
+sleeves over all 261 decisions, of which **76,128** were repeat memberships
+of the same security identity within a decision. This is repeated
+*constituent input*, not the portfolio's realized overlap or 76,128 unique
+duplicates. R267 is the non-order, input-only exception documented in the
+prospective protocol. The shared ledger records exactly one infrastructure
+look, moving the floor to **279 shared / 216 development / 38 infrastructure
+looks / 685 authenticated exploratory cells**. No outcome candidate has
+launched at this checkpoint; R268 AR-off is next only after its own source,
+manifest and parser freeze.

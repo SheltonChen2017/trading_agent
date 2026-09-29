@@ -6150,3 +6150,23 @@ REMX target slots and did not improve any of the three exact-transfer
 old-floor contrasts. No formal alpha, forward efficacy, paper/live/funded
 account action or real-order authority follows from these looks. The
 separately exhausted R247 input/clock gate remains open.
+
+## R-267 A1 — eight-universe input readiness only — 2026-09-29
+
+One owner-authorized **infrastructure** research look, with **zero** alpha or
+development outcome looks and **zero** exploratory result cells. R267's
+ten-file, input-only source and the prospective XLI/XLF readiness thresholds
+were frozen in commit `900ffa4` before this QC launch. Private project
+**37124263**, backtest `066c2f4e2e79eb2d15120596dc2b5523`, A1 reached
+`Completed.`. Its one-use read authenticated ten bounded, hash-linked
+count statistics and the exact 261-decision census. XLI and XLF each passed
+the predeclared 10%-policy/three-verified-name joint input count on **252 of
+261** decisions, including 51/51/51/51/48 decisions in 2021--2025. Both
+therefore exceed the predeclared total floor of 26 and one-per-year floors.
+This is constituent/identifier availability, **not** a stock-selection or
+performance finding. The cross-sleeve duplicate counts refer to input
+memberships, not actual holdings. The run subscribed ETF symbols to receive
+QC callbacks but did not consume prices/returns or submit orders; no
+outcome-bearing statistic was selected. The conservative floor moves from
+**278 shared / 216 development / 37 infrastructure looks / 685 cells** to
+**279 shared / 216 development / 38 infrastructure looks / 685 cells**.

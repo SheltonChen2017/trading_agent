@@ -1,33 +1,28 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE'S SECTION-63 REVIEW OF `7156565..d25e5d2` IS ACCEPTED AFTER
-THE SECTION-64 CODEX RECORD QUALIFICATIONS FOR ITS SOLE FOLLOW-ON COMMIT
-`985743e`. THE OWNER'S NARROW SECTION-65 DECISION NOW RESOLVES THE HORIZON
-SEMANTICS: NEXT-RELEASE HOLDING FOR EVENTUAL ORDER-BASED P&L AND A DISTINCT
-FIXED 20-SESSION STOCK-EVALUATION DIAGNOSTIC. SECTIONS 66–68 RECORD THE
-OWNER'S LATER ACCELERATED-BUILD DELEGATION AND TWO CONTENT-ADDRESSED,
-SYNTHETIC-ONLY SI-5 DESIGN/COHORT STEPS. THE SECTION-62 DRAFT IS NOT AN
-EMPIRICAL PREREGISTRATION; NO LOOKBACK WINNER, DATE, POWER RESULT OR REAL
-OUTCOME LOOK IS FROZEN. EXTERNAL ENTITLEMENT/COVERAGE REMAINS UNPROVEN.
-THE POWER/LOOK ADVISORY `SI-CR13-002` REMAINS OPEN; THE ROLE-DEPENDENCE
-DESIGN CHOICE IN `SI-CR13-003` IS SETTLED OFFLINE, NOT EMPIRICALLY TESTED. THE SHARED,
-OUT-OF-LANE P2 `SI-CR5-005`/`SI-CCR16-007` REMAINS OPEN. CLAUDE REPORTED
-759 PASSED FOR THE FIFTEEN-FILE SHORT INTEREST LANE; CODEX DID NOT RERUN
-THE COMPLETE LANE. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED; AUTHORIZED
-AND CONSUMED OUTCOME LOOKS ARE ZERO. ALL PROVIDER, LICENSED-DATA,
-ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION, PRODUCTION-RANKING, SEED,
-ETF, QUANTCONNECT, BROKER, OPERATOR-DATABASE, SCHEDULER, DEPLOYMENT,
-PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
+Status: **THE OWNER DIRECTED ONE MATCHING-LANE PUSH OF THE CURRENT LOCAL,
+SYNTHETIC/OFFLINE SI-5 SERIES FOR CLAUDE'S INDEPENDENT REVIEW DESPITE THE
+STILL-OPEN SOURCE GATE (SECTION 74). THE NEXT CODEX ROUND MUST WAIT FOR BOTH
+CLAUDE'S COMPLETED REVIEW PUSH OF THAT SNAPSHOT AND A SUBSTANTIVE, VERIFIABLE
+RESPONSE TO QC TICKET #979ad273f6. THE 20/60/120/252 WINDOWS REMAIN
+CANDIDATES WITH NO WINNER. NO HISTORICAL STOCK RESULT, SOURCE ADMISSION,
+EMPIRICAL PREREGISTRATION, PERMANENT RESEARCH CELL OR REAL OUTCOME LOOK
+EXISTS; AUTHORIZED/CONSUMED LOOKS ARE 0/0. THE THREE SECTION-69 P2 FACTUAL
+SOURCE GATES AND SHARED OUT-OF-LANE P2 `SI-CR5-005`/`SI-CCR16-007` REMAIN
+OPEN. QC ACCOUNT AUTHENTICATION AND A SUPPORT TICKET DO NOT AUTHORIZE DATA
+HISTORY, PROJECT PROCESSING, COMPILE, JOB, BACKTEST, PRODUCTION, BROKER,
+PAPER/LIVE, ORDER OR TRADING USE.**
 
 Local-only Codex counter-review of Claude's sole follow-on commit
 `985743e77212c0313121f1ae1754e03dd452c374` is in section 64. It does
 not freeze the SI-5 protocol, authorize a data/outcome/QC step, or constitute
 the lane's next combined push. Section 65 records the subsequent narrow owner
-decision. Section 66 supersedes the earlier review cadence for the current
-owner-directed build. Sections 67–68 log the additional delegated design,
-two bounded offline steps and counter-review ledger. All updates remain
-local-only pending the owner-supplied factual source/rights/coverage inputs
-and one final, reviewable lane push.
+decision. Section 66 supersedes the earlier review cadence for the
+owner-directed offline build. Sections 67–73 log the delegated design,
+bounded offline steps, source checks and still-open factual gates. Section
+74 records the owner's later one-time push instruction and two-condition
+next-round gate; it supersedes older no-push checkpoint text only for this
+exact review handoff, not for source admission or an empirical QC run.
 
 Branch: `codex/strategy-short-interest`
 
@@ -190,6 +185,8 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-09-28 | Codex counter-review + offline protocol draft | `252ece8` -> `7156565` counter-reviewed (Claude commits `7bad2a9`, `7156565`); correction `5424032`; this lane-record commit follows | Correct the in-lane SI-2B-P1C owner-provenance gap and prepare an **unapproved**, no-outcome stock-backtest protocol for owner decision | Both Claude commits receive individual dispositions in section 61. The code/test correction binds the verbatim section-59 owner freeze to its immutable committed object and fixes the tie-test explanation; section 62 proposes evaluation choices without freezing them. No ranking economics, selected lookback, actual data, outcome or QC operation is added. | Focused red/green and final-tree results are in section 61.3; final record checks are in section 62.6. Claude's 757-pass lane result is reported as Claude's, not rerun by Codex. Authorized/consumed looks **0/0**. | `SI-CR12-001` closed; `SI-CR12-002` corrected in lane; `SI-CR12-003` closed; `SI-CR12-004` qualified closed, with no exhaustive guard-attribution claim. Shared P2 `SI-CR5-005` / `SI-CCR16-007` remains open and untouched. | One final push from this exact worktree to this lane ref only. Claude independently reviews every commit after `7156565` through the pushed head. Owner must separately approve a frozen protocol, source rights/coverage, permanent looks and QC action before backtesting. |
 | 2026-09-28 | Claude review | `7156565` -> `d25e5d2` reviewed; **no code or test correction made this round**; this record commit is the only Claude commit | Independent review of the SI-2B-P1C owner-provenance binding and the gated SI-5 historical stock-backtest draft | Reviewed both pushed commits individually; the lane was already synced with a clean tree. Confirmed `SI-CR12-002` is cured: the policy binds `owner_directive_path`, `owner_directive_commit` and `owner_directive_sha256`, the bound digest `e5b06802...` equals the record blob at `252ece8` exactly, the owner's three clauses are verbatim in that immutable object, and the new test rehashes it via `git show` and asserts the quote. Confirmed only three files changed in the range and no network, filesystem or data surface was added, `selected_lookback` stays `None`, and the policy digest changed by construction. Confirmed all four `SI-CCR22` corrections against my prior record, including a materially misleading ledger row of mine. Read section 62 in full and accepted it as a bounded no-outcome draft that freezes nothing; raised three pre-approval research-design advisories for the owner, one of them a blueprint-versus-preregistration conflict verified against the governing PDF. | Clean baseline on the pushed tree with no mutation in flight: fifteen-file lane **759 passed in 2,685.35s (44m45s)**, reconciling exactly to the prior 757 plus Codex's two new focused tests; compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. No mutation was run this round because no Claude code or test change was made. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0, P1 or P2. `SI-CR12-002` **closed by correction**. New: `SI-CR13-001` (P3, open, owner: the blueprint's next-release primary holding rule conflicts with the frozen preregistration's `primary_horizon_sessions = 20`), `SI-CR13-002` (P3, open, owner: permanent 1/80 budget versus achievable power before registering cells), `SI-CR13-003` (P3, open, owner: the two role cells are exact complements, and the doubly sector-neutral test may not transfer to the ETF stage), `SI-CR13-004` (P3, closed, self-reported: my ledger row claimed no test correction while `7bad2a9` existed; a mechanical guard now asserts the row names every Claude commit of the round). Shared `SI-CR5-005` stays open. The counter-review correction note that follows this table refers to the earlier `1b8ad3b` -> `252ece8` row, not to this one. | Codex counter-reviews this record commit. Section 62's empirical choices remain owner gates; `SI-CR13-001` should be resolved before the selection metric is frozen. Every provider, licensed-data, actual-price, outcome, holdout, ranking, seed, ETF, QuantConnect and trading gate remains closed. |
+
+| 2026-09-29 | Codex owner-directed review handoff | `985743e` -> `8c75e8e` (14 local commits; this final record commit follows) | Offline SI-5 protocol/cohort/preflight and blocked QC source qualification | Owner explicitly requested one push of the current local snapshot so Claude can review it now. The pending QC reply does not become source admission; section 74 freezes the two-condition gate for the next Codex round. | Final focused checks in section 74; no full lane/repository suite by Codex. No QC job, historical outcome or backtest; authorized/consumed looks **0/0**. | Section 69's three P2 factual gates remain open; shared out-of-lane P2 remains untouched. All 14 pre-record commits have dispositions by section 74. | Push once to only `origin/codex/strategy-short-interest`, verify remote equality, then Claude independently reviews every commit after `985743e`. Codex waits until both that completed review push and a substantive verifiable response to QC ticket #979ad273f6 before a next round. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -9682,3 +9679,70 @@ Only this lane record changed in this follow-up; shared documents and
 was run. Claude will run that suite in later independent review. The owner's
 one-final-push rule still prohibits a partial push while this factual gate is
 open.
+
+## 74. Owner-directed single review push and two-condition next-round gate — 2026-09-29
+
+After section 73, the owner explicitly said **push**, then clarified that
+Claude will review these commits and Codex should start the next round only
+after **both** Claude's review **and** the QC response. This is direct,
+one-time `SI-AUTH-20260929-09` for a single push from this designated
+worktree to `refs/heads/codex/strategy-short-interest`, not a delegated or
+general waiver. It supersedes sections 69–73's historical no-partial-push
+checkpoint statements for this review handoff only. The push does not
+declare SI-5 complete, admit FINRA history, select a lookback, register a
+research look or authorize QC processing, history, compile, job or backtest.
+The owner-directed two-condition gate is `SI-OWNER-20260929-01`:
+
+1. Claude must independently review the exact pushed Codex snapshot,
+   disposition every commit after
+   `985743e77212c0313121f1ae1754e03dd452c374`, perform the full lane
+   suite, update this lane record and push its review commit(s) on this same
+   branch.
+2. QC ticket **#979ad273f6** must receive a substantive response, and its
+   entitlement, first-published/revision-vintage, listed-stock coverage and
+   release-calendar claims must be independently checked. A generic reply
+   that leaves the P2 facts unresolved does not satisfy this trigger.
+
+Codex shall not counter-review Claude or implement a next milestone until
+**both** conditions are met. `SI-DEC-20260929-14`, exercised under the
+standing section-72 delegation, is to reuse the existing QC-response
+heartbeat as a quiet **two-condition** monitor after the verified push, while
+the stale Claude-only heartbeat stays paused. The QC monitor was paused
+during push preparation to prevent an early trigger; after the push its
+prompt must bind the exact pushed hash and require both conditions before
+any next Codex round. This monitoring choice is retained for the owner's
+final delegated-decision inventory.
+
+The local pre-handoff range is the 14 ordered Codex commits
+`985743e77212c0313121f1ae1754e03dd452c374..8c75e8eef6e760a7225449b0f7ad7e72e9f32cc9`.
+Sections 68.1, 70, 71 and 73 give explicit individual dispositions for its
+first 13 commits. The sole additional disposition is:
+
+| Commit | Codex disposition |
+|---|---|
+| `8c75e8eef6e760a7225449b0f7ad7e72e9f32cc9` | Accepted record-only QC response-monitor and official-calendar limit; it does not admit a source or consume a look. |
+
+This section's own final lane-record commit is documentation-only and remains
+**pending Claude's independent review**; its exact hash is the one pushed
+HEAD to be verified and reported with the review note. The entire pushed
+range is within this record, `research/short_interest_etf/si5_*` and three
+focused `tests/test_short_interest_si5_*` files. No shared/project-wide file
+or `SESSION_HANDOFF.md` changed. The persistent P0–P3 ledger remains as in
+section 73: `SI-SRC-20260928-001`, `-002` and `-003` are open P2 factual
+gates, and shared `SI-CR5-005`/`SI-CCR16-007` is open and out of lane.
+Closed findings and false alarms in sections 68–70 remain retained; no new
+code finding arose from this record-only handoff. Authorized/consumed real
+outcome looks remain **0/0**, and there is no empirical stock result.
+
+Focused code-path validation under Python 3.13.15: availability, SI-5 offline
+protocol, source preflight, import boundary and active-document selection
+finished **129 passed in 1.73s**; two SI-5 cohort refusal/authority tests
+finished **2 passed, 6 deselected in 19.30s**. Narrow SI-5 source/test
+`compileall` exited 0. The active-document check on this record update
+finished **69 passed**, and `git diff --check` was clean. Codex will not run
+the complete lane or repository suite; Claude does that during independent
+review. Before the single push,
+verify physical root, branch, clean status, exact HEAD, remote ancestry and
+unchanged matching remote ref. Afterward verify local, tracking and actual
+remote heads match. If the remote advances or the worktree changes, stop
+instead of racing the other agent.

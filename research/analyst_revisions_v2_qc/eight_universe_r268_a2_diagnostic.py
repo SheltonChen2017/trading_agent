@@ -145,7 +145,7 @@ def _r268_a2_diagnostic_payload(driver, aggregate):
                    for item in rejections)
             or len({item["execution_session"] for item in rejections}) != skipped
             or rejections != sorted(rejections,
-                                    key=lambda item: item["execution_session"]) 
+                                    key=lambda item: item["execution_session"])
             or skipped and aggregate.get("run_valid") is not False):
         _error("R268 A2 drift rejection accounting changed")
     rows = []

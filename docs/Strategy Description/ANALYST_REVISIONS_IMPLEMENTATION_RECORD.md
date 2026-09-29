@@ -30625,3 +30625,73 @@ than 180%. The tested eight are SPY, QQQ, SOXX, XLV, REMX, XLE, XLI,
 and XLF; insurance has **not** been added as a distinct ninth sleeve.
 This adaptive, one-window, current-vintage sensitivity cannot set a
 live-trading parameter or establish forward efficacy.
+
+## 216. Codex-to-Claude review notes: QCOM restoration through the eight-universe order ladder, 2026-09-29
+
+**Exact substantive range for independent review:** `0808b3a..ba82032`
+on `codex/strategy-analyst-revisions-v2`, in the designated long-lived
+worktree. This record-only handoff follows that range; no Codex commit in
+it has yet received Claude's independent disposition. Please review the
+final pushed head, not any concurrent uncommitted checkout state.
+This handoff commit also removes one trailing space in the A2 local
+diagnostic module, found by a whole-range `git diff --check`; it changes
+no generated QC source or behavior.
+
+| Commit | Pending review focus |
+| --- | --- |
+| `855fb32` | R255--R259 QCOM-restored six-universe candidate/source freeze. |
+| `3015911` | Exact restored-run outcomes, ledger, and import inventory closure. |
+| `08f66b3` | R260--R266 one-positive-score, 80--200% prospective ladder. |
+| `0e5278d` | R263 A2 same-project precreate recovery pin; no fourth attempt. |
+| `e8c0c28` | Seven valid score-floor results, look counts, caveats. |
+| `900ffa4` | R267 XLI/XLF input-only readiness, no return or order statistic. |
+| `a32eba1` | R267 authenticated count read and infrastructure look. |
+| `9df9343` | R268--R276 original eight-sleeve order source/economics freeze. |
+| `4b1b58b` | R268 A2 diagnostic-only source and same-economics refusal. |
+| `31eaccb` | R268 A3 exact LEAN split truncation, failed-predecessor gate, original downstream-source launch block. |
+| `857aaf6` | Separate corrected R269--R275 source manifest, exact routing and mixed-policy comparison refusal. |
+| `eb37e08` | Valid R268 A3 and R269--R271 results; P3 original-family `freeze` CLI regression fix. |
+| `ba82032` | R272--R275 results, complete matched-source comparison, final ledger floor. |
+
+**Findings to scrutinize.** R268 A1 and A2 both finished QC but were
+invalid (260/261 rebalances). A2 isolated one 2021-06-29 same-session
+split quantity mismatch. The prospectively frozen A3 accepts only the
+observed nonnegative whole-share quantity equal to
+`int(old_quantity / recorded_split_factor)` when *each* changed holding
+has a same-session split; all other drift still refuses. A3 then passed
+261/261. [QC's corporate-action documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/corporate-actions)
+and [LEAN `ApplySplit`](https://github.com/QuantConnect/Lean/blob/master/Common/Securities/SecurityPortfolioManager.cs#L3538-L3605)
+describe the whole-share/cash-in-lieu behavior. The old R269--R276 source
+cannot launch against A3, and the final comparison requires exact A3 plus
+corrected seven-arm manifest, projection, profile, package, activation,
+and common split-policy identities. The optional R276 original basket is
+still blocked. A read-only audit found no material economic/routing issue
+but caught one P3 local `freeze()` path mixing corrected and original
+rows; `eb37e08` restores original-family freeze and its isolating test.
+
+**Validation and result boundary.** Focused final eight-universe parser,
+study, A3, and corrected-family tests: **80 passed**; compilation and
+`git diff --check` clean. The active-document gate passed **69/69**.
+The original-family `freeze` and corrected
+seven-row `freeze` reproduce their respective pins, and an actual
+source-bound `compare_results` over eight retained, one-use QC artifacts
+returned `comparison_valid=true`. All eight candidate runs have valid
+261/261 order censuses and actual/modelled fees equal. R268 used A1,
+A2, A3 (three of three); each R269--R275 used only A1. No candidate
+exceeded its three-attempt budget. Shared ledger floor is **289 research
+looks / 226 development / 38 infrastructure / 693 valid exploratory
+cells**. Codex deliberately did **not** run the full lane/repository
+suite; Claude owns the complete lane selection under the owner rule.
+
+**Interpretation and exclusions.** The eight sleeves are SPY, QQQ,
+SOXX, XLV, REMX, XLE, XLI, XLF. Insurance is not a distinct ninth
+sleeve. AR-on versus AR-off changes positive-score entry and ranking as
+well as weight transfer; its cumulative spreads are not isolated tilt
+effects. Current-vintage Benzinga revisions, adaptive multi-parameter
+search, zero modeled slippage, a single 2021--2025 window, and lack of an
+identical full stock-minute execution tape prevent a point-in-time or
+live-edge claim. No formal alpha, forward paper, broker/live/funded order,
+or deployment authority was exercised. The separate R247 forward input
+gate remains exhausted. **Next:** Claude independently reviews this
+exact pushed snapshot and runs the complete lane selection; Codex then
+counter-reviews every Claude commit and finding before another milestone.

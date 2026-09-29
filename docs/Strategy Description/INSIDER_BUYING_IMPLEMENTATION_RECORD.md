@@ -1,15 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 107 RECORDS CLAUDE'S REVIEW OF ALL 14 CODEX COMMITS IN
-`f8877fe..fdb32db` (SECTIONS 103-106): ALL ACCEPTED, TWO AFTER TWO P3
-TYPED-REFUSAL FIXES (`52bcef1`) AND SEVEN WITH TEST-ONLY ISOLATING PINS
-(`fb2df3b`). EVERY CHECKED REAL-DATA FIGURE REPRODUCES: COMPLETE-TEXT
-REPLAY 16/16, XML 16/16, MASTER-INDEX VS IB-1B 0 MISSING/EXTRA, IB-1C
-BRIDGE 16/16 WITH 4 AMENDMENTS QUARANTINED. THESE REMAIN NONCANONICAL,
-NOT 82-QUARTER COMPLETENESS, PIT PROMOTION, AN OUTCOME LOOK OR BACKTEST
-READINESS. CODEX COUNTER-REVIEW OF THE THREE CLAUDE COMMITS IS REQUIRED. NO
-OUTCOME/QC JOB, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING
-ACTIVITY OCCURRED. LOOKS 0/0/0. THE ONE-ROUND MONITOR REMAINS PAUSED.**
+Status: **SECTION 108 COUNTER-REVIEWS AND ACCEPTS ALL THREE CLAUDE COMMITS
+`fdb32db..5d73e11`, CLOSES THE CURRENT-LANE STALE-DOCSTRING P3, AND
+RECORDS THE OWNER-PREAUTHORIZED OFFLINE CENSUS OF ALL 82 RETAINED SEC ZIPS.
+THE SOURCE-BOUND NONCANONICAL RECEIPT IS `2c93041a...6bd83c33`: 4,034,227
+PER-QUARTER FORM 4/4-A TARGET ENTRIES. A BLIND NO-CACHE COMPLETE-PARENT
+ROUTE WOULD PLAN 4,034,309 REQUESTS AND AT LEAST 23 DAYS 8 HOURS OF IDEAL
+TWO-PER-SECOND DISPATCH SPACING; NO CRAWL WAS STARTED. THIS IS NOT A
+COMPLETE-TEXT/METADATA SOURCE MANIFEST, CANONICAL/PIT EVIDENCE, AN OUTCOME
+LOOK, OR BACKTEST READINESS. CLAUDE MUST REVIEW THE NEW CODE AND RECORD
+AFTER ONE SAME-LANE PUSH. LOOKS 0/0/0; NO SEC REQUEST, OUTCOME, QC JOB,
+BROKER, PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTIVITY THIS ROUND.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -208,6 +209,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Codex owner-directed build-ahead | `40e9b20..7222d95` (section-105 record follows) | Exact-16 IB-1C blocker inventory, not direct IB-1C | Before Claude reviewed `40e9b20`, the owner directed build-ahead and preauthorized the future backtest gate in principle. Added a pure in-memory, hash-bound, 16-row report of missing metadata/provenance/amendment evidence without constructing an IB-1C source or advancing authority. No shared file changed. | Final focused adapter/source/record/active-document/import-boundary and project-separation selection 479 passed on Python 3.12.14; two in-memory deletion probes red then green; exact retained-root read-only smoke 16/16, 12 Form 4, 4 Form 4/A, one owner each, four amendment-link blockers; no complete suite by Codex and looks 0/0/0. | No confirmed new P0-P3 production finding; a self-referential blocker test oracle was tightened precommit and mutation-pinned. All earlier open and closed findings retained. | One same-lane push after section 105 and final checks. Claude reviews every Codex commit after `f8877fe`, including the previously pushed `40e9b20` slice and this build-ahead; Codex counter-reviews every Claude commit. Full-source and exact outcome gates remain separate. |
 | 2026-09-28 | Codex owner-directed build-ahead | `a6b7595..c34555a` (section-106 record follows) | Exact-16 complete-text source and offline IB-1C compatibility; pure 82-quarter resource preflight | With the owner's standing scoped preauthorization, fetched only two SEC quarterly master indexes and their exact 16 selected complete `.txt` submissions into a new immutable outside-Git root after two fail-closed compatibility attempts. Added pinned journal/object/index/submission replay, a non-executable date-only 16-row IB-1C diagnostic, strict real `DD-MON-YYYY` upstream compatibility in v1, and caller-declared 82-quarter request/byte arithmetic. No shared file changed. | Final successful root: 18/18 HTTP 200 first attempts, 16/16 projections, report SHA `e3f22668...429421`; prior XML byte match 16/16; IB-1B versus master-index accession/form sets 35,550 and 63,844 with zero differences; real offline bridge 16/16, four amendments quarantined, 0 executable rules. Focused 14-file selection 714 passed; full suite not run by Codex. Looks 0/0/0. | Four P2s corrected red/green before new bridge/adapter commits; one existing real-date IB-1C P2 corrected in `c34555a`; initial master/index/SGML compatibility refusals corrected with red/green. Historical open P3s retained; no current open P0-P2 claimed. | One same-lane push after this record and final checks; Claude independently reviews every exact Codex commit since `40e9b20` and Codex counter-reviews every resulting Claude commit. Next: source-bound 82-quarter accession census/capacity plan and a reviewed complete-text source policy; no inference of canonical/PIT, outcomes, QC backtest or trading. |
 | 2026-09-28 | Claude review | `fdb32db` -> `52bcef1` (code correction) -> `fb2df3b` (test pins) -> this review record | Independent review of the section-103 counter-review, the exact-16 XML adapter, the IB-1C readiness report, and the section-106 complete-text source build-ahead (`f8877fe..fdb32db`, 14 commits, 0 merges) | Armed a watcher on `a6b7595` and started only after Codex pushed `fdb32db`. Dispositioned all 14 commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Replayed the three retained real roots read-only with aggregates only, and verified from the journals that the 22 new SEC requests stayed inside the recorded scope with no contact address in any Codex-written file. Probed malformed inputs in memory, ran 145 direct and 8 combined mutants, fixed two untyped failure paths, and pinned the untested guards. | Pushed `fdb32db`: complete suite **9,433 passed, 38 skipped, 0 failed in 479.61s**. Real roots: complete-text replay **16 of 16**, embedded XML equal **16 of 16**, master indexes vs IB-1B **0 missing, 0 extra, 0 form disagreements**, IB-1C bridge **16 of 16** with 4 quarantined. Red/green **4 failed then 4 passed** and **2 failed then 2 passed**. Mutation **54 to 86 of 98** (section 106) and **21 to 33 of 46** (sections 104-105), survivors classified. Lane gate **3,317 passed** on both Pythons. Final tree: complete suite **9,515 passed, 38 skipped, 0 failed in 442.78s**; compileall exit **0**. **0 looks**. | `IBSECCOM-CR01` P3 closed in `52bcef1` (missing document field raised KeyError). `IBSECCOM-CR02` P3 closed in `52bcef1` (corrupt master.gz raised zlib.error). `IBSECCOM-CR03` P3 closed in `fb2df3b` (broad refusal matches hid deleted guards). `IBSECCOM-OBS01` open (stale docstring; tagged-header branch synthetic-only for complete text). `IBSECACQ-CR03` open for real multi-owner headers; `IBSECACQ-CCR03` open, process. No open P0-P2. | Codex counter-reviews `52bcef1`, `fb2df3b`, and this record. The owner may wish to confirm that the section-106 preauthorization covers the 22 SEC requests, and should confirm the 82-quarter census explicitly before any crawl. No outcome, QC, paper, or trading step is inferred. |
+| 2026-09-29 | Codex counter-review and bounded implementation | `5d73e11..PUSHED_HEAD`; `e85cc24` census code and this section-108 record | Accept Claude's three-commit section-107 review and perform a source-bound, read-only 82-quarter retained-ZIP census | Accepted `52bcef1`, test-only `fb2df3b`, and record `5d73e11` separately. Added a versioned zero-I/O receipt that binds the exact retained CSV and 82 hash-checked ZIPs, validates one ZIP at a time and streams SUBMISSION records to count six forms and 4/4-A targets. Closed the stale complete-submission docstring. No high-volume crawl or real IB-1C advancement. | Claude's prior full-suite result is reviewer evidence only. Codex focused final selection **609 passed** on Python 3.12.14; new/preflight/import selection **43 passed**, record/active-document/import selection **144 passed**; three touched Python files compiled in memory; census run twice with identical hash `2c93041a...6bd83c33`; diff/show checks clean. No complete suite by Codex. Looks 0/0/0. | Incoming `IBSECCOM-CR01`/`CR02`/`CR03` closures accepted. Precommit `IBZIPC-R01`/`R02`/`R03` P2 fixed with red/green; typed-refusal P3 edge fixed; `IBSECCOM-OBS01` P3 closed. Historical open P3 and shared `IBSH-CR01` retained. No open current-lane P0-P2. | Make one same-lane push; Claude reviews every Codex commit in `5d73e11..PUSHED_HEAD` and Codex later counter-reviews every Claude commit. Before any broad crawl, review an accession-specific complete-text/acceptance-metadata manifest and a viable capacity/target policy. No canonical/PIT, outcome, QC, paper/live or trading authority follows. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -14287,3 +14289,153 @@ deployment, capital, order, live, or trading surface was used. Real bytes
 read, in memory and read-only, were the three retained roots named in 107.2.
 Authorized outcome looks: **0**. Consumed outcome looks: **0**. Research
 looks: **0**.
+
+## 108. Codex counter-review and source-bound 82-quarter ZIP census (2026-09-29 UTC)
+
+This is one serialized Codex round on the existing
+`codex/strategy-insider-buying` branch and designated Insider worktree. Its
+incoming independent Claude review is exactly `fdb32db..5d73e11` (three
+ordered commits). Its Codex code commit is `e85cc244cdccbeaa07ee9d4442ee0644e309e455`;
+this record commit follows. The owner asked Codex to counter-review and build
+toward backtest readiness in one round and one push, with scoped owner choices
+preauthorized and documented. The work below is a source census, **not** the
+82-quarter complete-text/acceptance-metadata source manifest, a canonical
+source, an outcome look, or a backtest. No side branch or alternate checkout
+was used; shared/project-wide documents and `SESSION_HANDOFF.md` are frozen.
+
+### 108.1 Per-commit Codex counter-review dispositions
+
+| Incoming Claude commit | Disposition and independent check |
+|---|---|
+| `52bcef16ec168bef03b2e66b0057e53135b671ec` | **Accepted.** The required SGML document fields now use a true superset check, so a header with `DESCRIPTION` but without `SEQUENCE` refuses instead of raising `KeyError`; corrupt deflate is caught as a typed refusal in both the live runner and offline replayer. Codex reproduced the former behavior in memory against `fdb32db` (`KeyError('SEQUENCE')`) and the typed refusal against the reviewed tree. The two earlier P3 fixes `IBSECCOM-CR01/CR02` remain closed. |
+| `fb2df3bbf4be0a86a0aa88ca8007188eb7560817` | **Accepted.** This is test-only: 76 isolating refusal cases across seven files with no production change. Codex read their assertions and ran the relevant focused tests; they pass. Claude's mutation counts in 107.3 are reviewer evidence, not a mutation matrix rerun by Codex. `IBSECCOM-CR03` remains closed. |
+| `5d73e116cc2001c32302f25d2ecd762e8bf5fc0f` | **Accepted.** Section 107 records the exact reviewed Codex range, corrections, real-root replay, test evidence, ledger, and remaining limits. The stale parser docstring observation was accurate at this commit; `e85cc24` closes it without changing parser behavior. `real_shape_verified` remains false and tagged-header complete-text coverage remains synthetic only. |
+
+All three incoming commits pass `git show --check`. The exact supported
+Python 3.12.14 focused counter-review selection passed **464 tests** (238
+SEC-boundary tests plus 226 acceptance tests). No current-lane P0/P1 or
+open P2 emerged from this review; all prior resolved findings remain in the
+ledger rather than being erased.
+
+### 108.2 Authorizations and owner decisions exercised in this round
+
+The owner's current instruction preauthorizes reasonable *choices needed to
+build toward completion* and requires Codex to list them. This is a scoped
+sequencing and decision delegation, not a representation that missing bytes,
+data rights, external service entitlements, independent review, or live-trading
+approvals exist. The earlier choices D1-D10 in 106.2 are retained; the
+following are every new choice exercised here:
+
+| ID | Decision made under the owner's preauthorization | Reason and retained limit |
+|---|---|---|
+| D11 | Counter-review all three Claude commits first, then implement one bounded source milestone before one push. | Preserves independent review and per-commit disposition while honoring the owner's build-ahead timeline. Claude still reviews this exact pushed snapshot, followed by Codex counter-review. |
+| D12 | Read only the 82 already-retained quarterly Insider ZIPs, `2006Q1..2026Q2`, and their exact committed intake CSV from the designated worktree. | Section 106 D9 scheduled a measured source-bound census. No SEC request, new provider/credential, outside-root acquisition, or different quarter was made. The CSV's local last-write stamps are not SEC publication or acceptance times. |
+| D13 | Require the literal 34,381-byte intake CSV fingerprint `dc254e4e023bf9990028e085450fc4a5c1c2ae22e1d562f2efc4ada532f9f76d`, literal 82-period order, each ZIP size/hash, the existing IB-1A member-integrity inspection, pinned descriptor-relative directory reads, and exact typed refusals. | A narrow reproducible measurement is preferable to silently treating arbitrary ZIPs or a swapped directory as SEC-authenticated. ZIP/CSV agreement proves only retained-byte consistency, not SEC origin or completeness. |
+| D14 | Count all six dataset forms (`3`, `3/A`, `4`, `4/A`, `5`, `5/A`) from streamed `SUBMISSION.tsv` logical records, designate only `4` and `4/A` as capacity targets, and leave multi-owner counts unknown. | Context forms remain context; counting them does not make them trading candidates. Per-quarter distinct accession counts are not a measured cross-quarter global deduplication. |
+| D15 | Use the existing hypothetical no-cache 82-master-plus-one-parent-per-target preflight at two requests per second, maximum three attempts per artifact, 8-MiB successful-parent cap, and one accession-specific acceptance-metadata record per target. | These are explicit arithmetic assumptions, not a crawler, rate-limit permission, elapsed-time forecast, verified metadata coverage, or storage allocation. |
+| D16 | **Do not initiate a blind full-parent crawl in this round.** | The measured target count implies 4,034,309 request occurrences and at least 23 days 8 hours of ideal dispatch spacing before work/backoff. A reviewed accession-specific complete-text/metadata source manifest, defensible capacity/target policy, observed rights/pacing and provenance are absent. Broad preauthorization cannot manufacture those inputs; no hidden reduction/filter policy is invented. |
+| D17 | Close `IBSECCOM-OBS01` by correcting its stale module docstring, without promoting `real_shape_verified` or expanding parser acceptance. | Documentation now distinguishes the 16 real legacy-header replays from synthetic-only tagged-header complete-text coverage. No source or strategy economics change. |
+| D18 | Leave canonical/PIT, research outcomes and look registration, ETF data, QC processing/upload/job/backtest, paper/live deployment, broker/operator database, scheduler, capital, orders and trading untouched. | The owner wants backtest readiness, but exact source vintages, outcome rights, primary cell/horizon and permanent look terms, QC entitlement, and shared PIT security-master/calendar evidence are still missing. Earlier 22 SEC requests are recorded in 106-107, not retroactively proven by this round's preauthorization. Looks remain 0/0/0. |
+
+### 108.3 New code, real read-only measurement, and capacity result
+
+`research/insider_buying/sec_zip_corpus_census.py` exposes
+`census_retained_sec_zip_corpus(root)` and a version-1, noncanonical aggregate
+receipt. The loader handles one bounded archive at a time, streams only
+`SUBMISSION.tsv` logical rows, refuses malformed headers, duplicate filing
+keys or forms, unsafe paths and changed directory identities, and recomputes
+its sealed quarter payload and planning arithmetic before serialization.
+`tests/test_insider_buying_sec_zip_corpus_census.py` exercises synthetic
+success, integrity, grammar, scope, tampering and filesystem boundaries.
+No filing row, CIK, XML or acceptance metadata record is returned or
+persisted by the census; it retains only the source URL already declared in
+the pinned intake CSV. The new code does not import or call the network
+runner, an outcome loader, QuantConnect, or trading services.
+
+Codex ran the public loader twice against the exact retained root. Both
+read-only runs produced the same receipt SHA-256:
+`2c93041a1dd2641d80722bd90630c37e939fb10b65837659bb1893168bd83c33`.
+It matched 82 ZIPs and the pinned CSV, totaling **921,904,566 compressed ZIP
+bytes**. Two SUBMISSION header variants were observed. The following are sums
+of *within-quarter* distinct accessions; cross-quarter deduplication was not
+measured:
+
+| Declared dataset form | Per-quarter distinct sum |
+|---|---:|
+| Form 3 | 331,258 |
+| Form 3/A | 15,819 |
+| Form 4 | 3,934,823 |
+| Form 4/A | 99,404 |
+| Form 5 | 74,654 |
+| Form 5/A | 2,451 |
+| All six | **4,458,409** |
+| Form 4 plus Form 4/A capacity targets | **4,034,227** |
+
+The two previously audited IB-1B pilot quarters remain aligned: **35,550**
+targets in `2022Q4` and **63,844** in `2023Q1`. The counted target population
+is not an eligibility screen, de-duplicated issuer set, owner count, or
+backtest universe. Every quarter's multi-owner target count remains unknown.
+No SEC authenticity, complete-text availability, accession-specific acceptance
+clock, amendment linkage, PIT security identity, market calendar, canonical
+signal, outcome, QC, paper or trading flag is promoted by this receipt.
+
+The explicitly hypothetical no-cache planning model yields **4,034,309**
+request occurrences (82 quarterly masters plus 4,034,227 targets), with a
+three-attempt ceiling of **12,102,927**. At 500 ms minimum spacing between
+dispatch starts, the mathematical floor is **2,017,154,000 ms**, or **23 days
+8 hours 19 minutes 14 seconds**, excluding transfer, backoff, parsing and
+failures. Its worst-case successful raw-parent byte cap is
+**33,842,236,751,872 bytes**; this is a cap under the 8-MiB assumption,
+not a measured storage forecast. The same number of target-specific acceptance
+metadata records would be required; extraction from complete parents would
+not necessarily be a separate request. The 82-ZIP census alone cannot say
+which targets have usable parents or whether a lower-volume strategy-preserving
+source route exists. Accordingly no crawl started.
+
+### 108.4 P0-P3 finding ledger and red/green evidence
+
+| ID | Priority/status | Location and impact | Red/green correction or disposition |
+|---|---|---|---|
+| `IBZIPC-R01` | P2, **CLOSED before `e85cc24`** | An initial root/ancestor symlink swap could redirect an approved census read outside its directory. | Deterministic synthetic swap test was red (`DID NOT RAISE`); component-wise pinned directory descriptors with `O_DIRECTORY`/`O_NOFOLLOW`, FD-relative leaf opens and root identity rechecks made it green. No outside data was read during the real census. |
+| `IBZIPC-R02` | P2, **CLOSED before `e85cc24`** | Direct construction could rebind a synthetic receipt to the retained scope and falsely label it verified. | Rebinding test red (`DID NOT RAISE`), then green with loader-only retained/synthetic construction tokens. |
+| `IBZIPC-R03` | P2, **CLOSED before `e85cc24`** | `dataclasses.replace` could alter a quarter ZIP digest after validation while retaining a verified receipt claim. | Tampering test red (`DID NOT RAISE`), then green with a sealed quarter-payload hash rechecked during construction and serialization. |
+| `IBZIPC-R04` | P3, **CLOSED before `e85cc24`** | Invalid local-time spelling and oversized integer CSV size could escape as untyped exceptions; malformed scope could cause an unhashable error. | Focused refusal cases corrected to typed `SecZipCorpusCensusError` and green. |
+| `IBSECCOM-OBS01` | P3, **CLOSED in `e85cc24`**, documentation only | Parser docstring falsely said no real complete-submission bytes were checked. | Text now records 16 legacy-header real replays and synthetic-only tagged-header complete-text coverage. No flag or parser behavior changed. |
+| `IBSECCOM-CR01/CR02/CR03` | P3, **CLOSED, accepted** | Claude's required-field, deflate and isolating-test corrections in `52bcef1`/`fb2df3b`. | Independent typed-refusal probe and focused suite above; Claude's original red/green and mutation counts remain in 107.3-107.5. |
+| `IBSECACQ-CR03`, `IBSECACQ-CCR03`, `IBSECACQ-CR04`, `IBSECACQ-R08/R09`, `IBSECREPLAY-OBS01`, `IB1BP-CR04/CR05`, `IB2CTX-CR02`, `IBZIP-CR02/CR03`, `IB2SRC-CR03` | P3, **retained as previously recorded** | Real multi-owner shape, historical process/provenance, and prior observations. | No finding is silently dropped or used to promote source authority. Shared/out-of-lane `IBSH-CR01` remains open without a lane change. |
+
+There is no open P0/P1 or verified open current-lane P2. Previously closed
+P2/P3 entries from sections 6-107 remain closed on their recorded evidence.
+The shared security-master/calendar audit still lacks a main-line venue and
+executor; this lane neither changes shared behavior nor claims its result.
+
+### 108.5 Validation, exclusions, and exact next action for Claude
+
+- Incoming counter-review: 464 focused tests passed on Python 3.12.14;
+  `git show --check` clean for all three Claude commits.
+- New census/preflight/exact Insider package guard: 43 passed. Record,
+  active-document and import checks: 144 passed. Final focused selection
+  across 15 related files plus the exact package guard: **609 passed, zero
+  failed/skipped, in 17.95 seconds** on Python 3.12.14. Three touched Python
+  files compiled in memory; code/staged diff and `git show --check` clean.
+  Codex did **not** run a complete lane or repository suite; Claude's section
+  107 full-suite pass is prior independent-review evidence, not a new result.
+- Real activity this round was two identical read-only passes over the 82
+  pre-existing ZIPs and exact manifest. No raw row content was printed or
+  persisted; no new SEC request, provider, credential, licensed row, outcome,
+  research look, ETF holding, QC, broker, operator database, scheduler,
+  deployment, paper/live, capital, order or trading surface was used.
+  Authorized/consumed/research looks are **0/0/0**.
+
+After this record is committed, make **one** push of `5d73e11..PUSHED_HEAD`
+to this existing lane branch. Claude independently reviews both Codex commits
+(the code/test/docstring commit and this record) and verifies the exact pushed
+snapshot, including the retained-root census and a full suite under its role;
+Codex then counter-reviews every Claude commit. The next source milestone,
+under the owner's scoped preauthorization but conditional on the necessary
+inputs, is a reviewed versioned accession-specific complete-text and
+acceptance-metadata source manifest with a feasible capacity/target policy.
+Neither this census nor the owner's general preauthorization substitutes for
+the missing source bytes, timing provenance, rights, amendment linkage, PIT
+security-master/calendar, frozen outcomes/look terms or QC execution gate.
+Backtest readiness and lane completion are **not yet achieved**.

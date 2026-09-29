@@ -14668,3 +14668,81 @@ no QuantConnect upload, processing job or backtest was launched: **0/0/0**.
 The locator campaign, streaming IB-1C..IB-1E successors, official acceptance
 and amendment/PIT mapping, outcome rights/vintage, frozen look and order-based
 QC gate remain incomplete. The full corpus is not yet ready for backtesting.
+
+## 111. Full-parent campaign preparation (2026-09-29 UTC; pre-launch)
+
+This extends the in-progress section 110. There is still no first historical
+Insider backtest or independent Claude review. The selected-parent root remains
+outside Git and is not the full filing population. The exact two-quarter
+all-Form-4/4-A locator manifest remains the campaign denominator.
+
+### 111.1 Further delegated owner decisions
+
+| ID | Decision | Reason and limit |
+|---|---|---|
+| D36 | Add a zero-I/O, in-memory, streaming projection-accounting receipt for the exact 99,394-locator order. | It accounts for every present or missing parent with bounded refusal examples, but retains neither acceptance strings nor ordered owner identities. It is not an IB-1C economic row, canonical signal, or PIT evidence; later stages must replay raw bytes. |
+| D37 | After a clean committed snapshot, run the 13-shard two-quarter raw-parent campaign: reuse 9,337 source-bound selected objects and request only the other 90,057 SEC archive parents. | The existing one-root limits cannot represent the denominator. The separate runner enforces at most 8,192 rows per shard, immutable objects/journals/reports, 48-GiB campaign object cap, 8-GiB free-space reserve, at most three attempts per parent and at least 500 ms after transport completion before the next request. A refusal or missing byte blocks a full-set claim. Outputs remain outside Git. |
+| D38 | Require independent read-only replay of every shard object, journal, source plan and final union before accepting campaign completion. | A terminal process status or self-asserted complete flag alone is insufficient. This is source custody, not SEC authenticity, official publication time, PIT mapping, source rights, or strategy performance. |
+
+### 111.2 Implementation and preflight evidence
+
+`ib1c_all_parent_projection_stream.py` is the separate synthetic-tested
+streaming accounting boundary. `IB1CSTR-R01` (P3) was closed by red/green
+tests: post-construction unhashable row identity fields now receive typed
+refusal rather than a Python `TypeError`. This receipt is deliberately not
+wired to IB-1C, IB-1D, IB-1E, a loader, or QC.
+
+`insider_buying_sec_all_form4_parent_campaign.py` is a standalone,
+source-bound, resumable acquisition runner. Importing the Insider package does
+not dispatch transport. Its completed-root loader is read-only and refuses
+incomplete, extra, reordered, mutated, or non-single-link members. A bounded
+request-to-SEC-header identity check precedes acquired and reused completion
+and is repeated during journal replay; it compares accession, form, filing
+date, and issuer CIK without claiming official publication time or XML
+semantics. Both initially found P2 paths were closed with red/green tests:
+`IB1BCAMP-R01` had accepted an arbitrary HTTP-200 body bearing only the
+SEC-DOCUMENT prefix for any requested filing, and `IB1BCAMP-R02` allowed
+hash-correct synthetic reused bytes to commit despite a later verifier
+refusal. The reviewer found no further confirmed P1/P2 in this new boundary.
+A separate read-only replay checked the new header validator against all
+**9,337/9,337** retained selected parent bytes, verifying their pinned report,
+request/row identities, hashes and sizes with zero structural refusals and
+zero SEC requests. This compatibility check does not establish how unseen
+historical parents are shaped. Independent
+read-only preflight of the retained exact source inputs yielded **99,394**
+requests, **9,337** pinned reuse objects, **90,057** new requests and **13**
+shards, every serialized inventory below 8 MiB. The request-inventory
+SHA-256 is
+`20479412fa9d9e931768180eacad84748ef707cc6d9c13323b1eef91120b5fba`;
+the manifest SHA-256 remains
+`3e9a0f3d1e7abe6865a70228e05b58300093211c712e980d5f146a8e3cc3d355`.
+Preflight made no SEC request, published no root and consumed no look. The
+campaign was **not launched** when this pre-launch entry was written.
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| `IB1BCAMP-R01` | P2, **CLOSED in `0dadf3f` before launch** | A 200 body with only the expected outer prefix could complete the wrong request. Synthetic wrong accession, issuer, form, or filing date cases were red; exact bounded header identity is now required before recording a valid response and again in replay. |
+| `IB1BCAMP-R02` | P2, **CLOSED in `0dadf3f` before launch** | Hash-correct but structurally wrong synthetic reused bytes could make the runner commit a root the read-only verifier refused. The same request-bound header guard now precedes reused completion and independent replay. |
+| `IB1CSTR-R01` | P3, **CLOSED in `d07b68a`** | Post-construction unhashable streaming row identity fields previously raised a raw `TypeError`; isolated red/green tests require typed refusal. |
+| Prior section-110 and earlier open P3 observations | P3, **retained** | No shared/out-of-lane behavior, provenance or economic attribution is silently changed. |
+
+On Python 3.12, the final campaign focused file and three exact Insider
+import-boundary guards passed **36**; implementation-record and active-document
+checks passed **71**; touched implementation/test files compiled; and
+`git diff --check` was clean. The streaming accounting focused set passed
+**124** after the red/green correction. Codex did not run the full lane or
+repository suite. No outcome read, QC upload/job/backtest, paper/live
+deployment, broker action, order, or trade occurred: **0/0/0**.
+
+The historical order-based study remains downstream of a verified complete
+raw campaign, source-bound IB-1C..IB-1E processing, point-in-time identity
+and calendar mapping, data-rights/vintage evidence, a frozen research look,
+and an independently verified QC execution gate. The separately approved
+shared security-master/calendar audit still has no main-line venue/executor;
+this lane does not change shared behavior by inference.
+
+The local unpushed continuation now includes `d07b68a` (streaming accounting)
+and `0dadf3f` (campaign runner and synthetic tests) after the section-110
+commits. Each awaits the owner's deferred independent Claude review after the
+first honest historical backtest. The matching remote remains `d478cfd`;
+there has been no push for this continuation.

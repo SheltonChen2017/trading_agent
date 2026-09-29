@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from research.analyst_revisions_v2_qc import eight_universe_qcom_admitted_projection as renderer
+from research.analyst_revisions_v2_qc import eight_universe_ar_on_split_rounding as ar_on_split
 from research.analyst_revisions_v2_qc import eight_universe_r268_a2_diagnostic as drift_a2
 from research.analyst_revisions_v2_qc import eight_universe_r268_a3_split_rounding as split_a3
 from research.analyst_revisions_v2_qc import eight_universe_study as study
@@ -37,6 +38,9 @@ def projected(candidate, inputs=None, *, attempt=1):
         return split_a3.build_projection(package() if inputs is None else inputs)
     if candidate == study.BASELINE and attempt != 1:
         raise ValueError("R268 attempt is outside its frozen source sequence")
+    if candidate in ar_on_split.CANDIDATES:
+        return ar_on_split.build_projection(
+            package() if inputs is None else inputs, candidate)
     return renderer.build_eight_universe_projection(
         package() if inputs is None else inputs,
         study.CANDIDATE_ARMS[candidate], candidate,
@@ -114,6 +118,8 @@ def main():
                   if args.candidate == study.BASELINE and args.attempt == 3
                   else drift_a2.freeze_manifest(package())
                   if args.candidate == study.BASELINE and args.attempt == 2
+                  else ar_on_split.freeze_manifest(package())
+                  if args.candidate in ar_on_split.CANDIDATES
                   else freeze())
     else:
         plan = adapter.build_plan(

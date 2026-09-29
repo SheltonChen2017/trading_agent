@@ -77,6 +77,7 @@ EIGHT_R268_A2_MANIFEST_PATH = Path(__file__).with_name("eight_universe_r268_a2_d
 # Neither spent predecessor pin may be changed by this prospective overlay.
 FROZEN_EIGHT_R268_A3_MANIFEST_SHA256 = "b85bd831e5dc79bed4ad8a839265043018c66b1967b807fe34bf936327e66eb2"
 EIGHT_R268_A3_MANIFEST_PATH = Path(__file__).with_name("eight_universe_r268_a3_split_rounding.json")
+FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256 = "abdc0f4bb48b7f463d696c4cc46af9655f63be60677683478b0d4b2880e4abe0"
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -346,6 +347,13 @@ def _eight_r268_a3_manifest():
     return correction.validate_manifest(json.loads(raw))
 
 
+def _eight_ar_on_split_manifest():
+    from . import eight_universe_ar_on_split_rounding as correction
+    if correction.FROZEN_MANIFEST_SHA256 != FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256:
+        _fail("eight-universe AR-on split manifest pin changed")
+    return correction.frozen_manifest()
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -386,6 +394,8 @@ def _plan_manifest(plan):
             return _eight_r268_a2_manifest()
         if plan.candidate_id == "R268" and plan.attempt == 3:
             return _eight_r268_a3_manifest()
+        if plan.candidate_id in {f"R{number}" for number in range(269, 276)}:
+            return _eight_ar_on_split_manifest()
         return _eight_universe_manifest()
     _fail("relaxed plan family changed")
 
@@ -410,6 +420,8 @@ def _plan_manifest_sha256(plan):
             return FROZEN_EIGHT_R268_A2_MANIFEST_SHA256
         if plan.candidate_id == "R268" and plan.attempt == 3:
             return FROZEN_EIGHT_R268_A3_MANIFEST_SHA256
+        if plan.candidate_id in {f"R{number}" for number in range(269, 276)}:
+            return FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256
         return FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)

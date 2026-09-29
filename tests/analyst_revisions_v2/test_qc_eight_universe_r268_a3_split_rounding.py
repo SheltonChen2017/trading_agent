@@ -114,7 +114,8 @@ def test_generated_runtime_accepts_only_recorded_factor_integer_truncation(proje
 
 
 def test_generic_overlay_accepts_an_unlaunched_ar_on_projection():
-    original, profile = script.projected("R269")
+    original, profile = a3.renderer.build_eight_universe_projection(
+        script.package(), study.CANDIDATE_ARMS["R269"], "R269")
     corrected, successor = split.correct_projection(
         original, profile,
         schema="arv2-eight-r269-split-truncation-projection-v1",
@@ -131,7 +132,7 @@ def test_generic_overlay_accepts_an_unlaunched_ar_on_projection():
         original.projection_sha256)
 
 
-@pytest.mark.parametrize("candidate", ["R269", "R275", "R276"])
+@pytest.mark.parametrize("candidate", ["R276"])
 def test_valid_a3_cannot_unlock_original_nonbaseline_source(
         candidate, tmp_path, monkeypatch):
     plan = adapter.build_plan(candidate, ORG, tmp_path / "control",
@@ -152,6 +153,19 @@ def test_valid_a3_cannot_unlock_original_nonbaseline_source(
         adapter.launch(plan, object(), NoCloud())
     assert calls == []
     assert not adapter._path(plan, "claim").exists()
+
+
+@pytest.mark.parametrize("candidate", ["R269", "R275"])
+def test_original_ar_on_source_cannot_preview_as_corrected(candidate, tmp_path):
+    plan = adapter.build_plan(candidate, ORG, tmp_path / "control",
+                              family=study.FAMILY)
+    assert adapter._plan_manifest_sha256(plan) == (
+        adapter.FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256)
+    original, _ = a3.renderer.build_eight_universe_projection(
+        script.package(), study.CANDIDATE_ARMS[candidate], candidate)
+    with pytest.raises(adapter.RelaxedQcSubmissionError,
+                       match="projection or profile changed"):
+        adapter.preview(plan, original)
 
 
 @pytest.mark.parametrize("defect", ["diagnosis", "saved", "read_claim", "project"])

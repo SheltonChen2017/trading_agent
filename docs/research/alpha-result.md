@@ -6216,3 +6216,26 @@ nor proves rounding was the entire cause. Conservative floor: **281
 shared / 218 development / 38 infrastructure looks / 685 valid
 exploratory cells**. A third attempt requires a prospectively tested,
 engine-consistent split correction; R269--R276 remain gated.
+
+## R-268 A3 — final split-consistent eight-universe AR-off baseline — 2026-09-29
+
+One exploratory **development** look was spent in existing private project
+**37125044**, backtest `be3c34bc868822aafcc85987e7b1ca3b`, after the
+prospective A3 source freeze at commit `31eaccb`. This was R268's third
+and final allowed attempt. The manifest SHA-256 is
+`b85bd831e5dc79bed4ad8a839265043018c66b1967b807fe34bf936327e66eb2`;
+the source changed only same-session split holding verification to match
+LEAN's whole-share truncation, with all other drift still refused. QC
+reached `Completed.` and the one-use authenticated result is **run-valid**:
+261/261 scheduled rebalances submitted and completed, 15,180 orders filled,
+zero invalid/canceled orders or execution failures, and actual engine fees
+exactly equal to modeled fees ($62,904.0126394 on $62,904,012.6394 filled
+notional). Net cumulative return was **+124.263646%** over 2021-01-04
+through 2025-12-31, maximum drawdown **21.103442%**, annualized volatility
+18.890072%, and zero-rate Sharpe 0.953815. This is an AR-independent,
+top-ten-cap, eight-sleeve baseline, not an AR effect. Zero slippage was
+modeled; the historical Benzinga archive is current-vintage and cannot
+establish point-in-time analyst signal efficacy. One valid exploratory cell
+raises the conservative floor to **282 shared / 219 development / 38
+infrastructure looks / 686 valid cells**. The seven separately frozen
+R269--R275 corrected AR-on arms may now enter their own launch gates.

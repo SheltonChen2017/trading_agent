@@ -30550,3 +30550,34 @@ project and third, final attempt slot. The original R269--R276 source is
 blocked even if A3 later validates; each later arm requires a separately
 frozen matching split policy. This is a prospective correction, **not**
 evidence that the 2021-06-29 mismatch has been cured or that R268 is valid.
+
+R268 A3 subsequently used that exact source in the same private QC project
+**37125044**, backtest `be3c34bc868822aafcc85987e7b1ca3b`. QC reached
+`Completed.` and the one-use result authenticated **run-valid=true**:
+261/261 rebalances, 15,180 filled orders, zero canceled or invalid orders,
+zero execution failure, and actual engine fees equal to modeled fees.
+The AR-independent baseline's 2021--2025 net cumulative return was
+**+124.263646%** after 10-bps-per-side modeled fees, maximum drawdown
+**21.103442%**, annualized volatility 18.890072%, and zero-rate Sharpe
+0.953815. The A2 diagnosis and A3 success are consistent with the recorded
+split-factor whole-share explanation, but the A3 aggregate does not expose
+the individual holding, so no stronger causal claim is made. This is one
+valid exploratory cell, not confirmation: floor **282/219/38/686**.
+
+### R269--R275 corrected-source ladder (unrun at freeze)
+
+The seven AR-on arms (80%, 100%, 120%, 140%, 160%, 180%, 200%) now have
+a separate prospective split-consistent manifest, SHA-256
+`abdc0f4bb48b7f463d696c4cc46af9655f63be60677683478b0d4b2880e4abe0`.
+Each 17-file source is derived from its own immutable, unlaunched original
+projection and changes only the runtime, bridge, and tilt source files
+needed to apply R268 A3's exact same-session split/whole-share policy and
+rebind its profile hashes. Candidate-specific admission, AR percentage,
+input lineage, fee, gross exposure, and order economics are preserved.
+The corrected manifest binds each original row, the A3 manifest, and the
+common split rule. The AR-independent baseline is **not count-matched**:
+it cap-ranks up to ten coverage-valid stocks, whereas AR-on requires at
+least one positive score. Differences are exploratory strategy contrasts,
+not a pure causal estimate of analyst-score weight. These seven sources
+remain gated on a valid, authenticated R268 result; R276's old basket source
+remains blocked pending a separate correction.

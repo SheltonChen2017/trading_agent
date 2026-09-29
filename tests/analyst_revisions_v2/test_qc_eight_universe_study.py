@@ -174,12 +174,33 @@ def test_eight_order_parser_binds_diagnostic_digest_and_policy(monkeypatch):
         study.parse_order(plan, stats)
 
 
-def test_eight_core_run_comparator_accepts_optional_basket_only_when_valid():
+def _comparison_results():
+    baseline = adapter._eight_r268_a3_manifest()
+    corrected = adapter._eight_ar_on_split_manifest()
+    source_rows = {
+        "R268": (adapter.FROZEN_EIGHT_R268_A3_MANIFEST_SHA256,
+                 baseline["candidates"][0], baseline),
+        **{row["candidate_id"]: (adapter.FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256,
+                                  row, corrected)
+           for row in corrected["candidates"]},
+    }
     results = {}
-    for index, (candidate, arm) in enumerate(study.CANDIDATE_ARMS.items()):
-        value = "0.10" if candidate == "R276" else "0.20" if candidate == "R268" else f"0.{24 + index}"
-        results[candidate] = {"run_valid": True, "diagnostics": _eight_report(arm, value),
+    for index, (candidate, arm) in enumerate(study.CORE_CANDIDATES.items()):
+        value = "0.20" if candidate == "R268" else f"0.{24 + index}"
+        manifest_sha, row, manifest = source_rows[candidate]
+        results[candidate] = {"candidate_id": candidate,
+            "attempt": 3 if candidate == "R268" else 1,
+            "manifest_sha256": manifest_sha,
+            "projection_sha256": row["projection_sha256"],
+            "meta": {"profile_id": row["profile_id"],
+                "profile_sha256": row["profile_sha256"],
+                "package_sha256": manifest["package_sha256"],
+                "activation_manifest_sha256": manifest["activation_manifest_sha256"]},
+            "run_valid": True, "diagnostics": _eight_report(arm, value),
             "aggregates": {"comparison_arm": arm,
+                "profile_id": row["profile_id"],
+                "profile_sha256": row["profile_sha256"],
+                "matched_baseline_profile_sha256": row["matched_baseline_profile_sha256"],
                 "analyst_revision_economic_usage": study._usage(arm),
                 "coverage_policy_id": study._coverage_policy(arm),
                 "target_gross_exposure": "0.98", "admission_leverage": "2",
@@ -188,28 +209,72 @@ def test_eight_core_run_comparator_accepts_optional_basket_only_when_valid():
                     "last_observation_session": "2025-12-31", "observation_count": 1255},
                 "execution": {"submitted_rebalance_count": 261,
                     "completed_rebalance_count": 261}}}
+    return results
+
+
+def test_eight_core_run_comparator_requires_corrected_source_lineage():
+    results = _comparison_results()
     comparison = study.compare_results(results)
     assert comparison["comparison_valid"] is True
     assert comparison["baseline_candidate_id"] == "R268"
-    assert comparison["basket_control_present"] is True
-    assert comparison["basket_candidate_id"] == "R276"
+    assert comparison["basket_control_present"] is False
     assert [item["tilt_percent"] for item in comparison["ladder"]] == [80, 100, 120, 140, 160, 180, 200]
-    assert comparison["R268_AR_off_minus_R276_eight_ETF_percentage_points"] == "10.00"
     assert comparison["confirmation"] is False
-    core = {candidate: result for candidate, result in results.items() if candidate != "R276"}
-    core_comparison = study.compare_results(core)
-    assert core_comparison["comparison_valid"] is True
-    assert core_comparison["basket_control_present"] is False
-    assert "basket_candidate_id" not in core_comparison
-    assert "R268_AR_off_minus_R276_eight_ETF_percentage_points" not in core_comparison
-    assert all("AR_on_minus_R276_eight_ETF_percentage_points" not in row
-               for row in core_comparison["ladder"])
-    results["R276"]["run_valid"] = False
+    results["R276"] = {"run_valid": True}
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="R276 is not corrected"):
+        study.compare_results(results)
+    del results["R276"]
+    results["R270"]["run_valid"] = False
     with pytest.raises(adapter.RelaxedQcSubmissionError, match="valid"):
         study.compare_results(results)
-    results["R276"]["run_valid"] = True
+    results["R270"]["run_valid"] = True
     results["R270"]["diagnostics"]["etf_daily_panel_sha256"] = "c" * 64
     with pytest.raises(adapter.RelaxedQcSubmissionError, match="vintage"):
+        study.compare_results(results)
+
+
+@pytest.mark.parametrize("candidate,field", [
+    ("R268", "attempt"),
+    ("R268", "manifest_sha256"),
+    ("R270", "manifest_sha256"),
+    ("R270", "projection_sha256"),
+    ("R270", "meta_profile_sha256"),
+    ("R270", "aggregate_profile_sha256"),
+    ("R270", "matched_baseline_profile_sha256"),
+    ("R270", "meta_package_sha256"),
+])
+def test_comparator_refuses_original_or_mixed_source_identity(candidate, field):
+    results = _comparison_results()
+    target = results[candidate]
+    old_rows = {row["candidate_id"]: row
+                for row in adapter._eight_universe_manifest()["candidates"]}
+    if field == "attempt":
+        target[field] = 1
+    elif field == "meta_profile_sha256":
+        target["meta"]["profile_sha256"] = old_rows[candidate]["profile_sha256"]
+    elif field == "aggregate_profile_sha256":
+        target["aggregates"]["profile_sha256"] = old_rows[candidate]["profile_sha256"]
+    elif field == "matched_baseline_profile_sha256":
+        target["aggregates"][field] = old_rows[candidate][field]
+    elif field == "meta_package_sha256":
+        target["meta"]["package_sha256"] = "a" * 64
+    elif field == "manifest_sha256":
+        target[field] = adapter.FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
+    elif field == "projection_sha256":
+        target[field] = old_rows[candidate]["projection_sha256"]
+    else:
+        target[field] = "a" * 64
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="corrected source lineage"):
+        study.compare_results(results)
+
+
+@pytest.mark.parametrize("field", ["split_rule", "baseline_a3_manifest_sha256"])
+def test_comparator_refuses_manifest_split_policy_mismatch(monkeypatch, field):
+    results = _comparison_results()
+    corrected = copy.deepcopy(adapter._eight_ar_on_split_manifest())
+    corrected[field] = "a" * 64
+    monkeypatch.setattr(adapter, "_eight_ar_on_split_manifest", lambda: corrected)
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="split-policy ancestry"):
         study.compare_results(results)
 
 
@@ -219,7 +284,10 @@ def test_rebuilt_exact_seventeen_file_source_previews_offline(candidate, tmp_pat
     projected, profile = script.projected(candidate)
     plan = adapter.build_plan(candidate, ORG, tmp_path / "control", family=study.FAMILY)
     identity = adapter.preview(plan, projected)
-    assert identity["manifest_sha256"] == adapter.FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
+    expected_manifest = (adapter.FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256
+                         if candidate == "R270" else
+                         adapter.FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256)
+    assert identity["manifest_sha256"] == expected_manifest
     assert identity["profile_sha256"] == profile["profile_sha256"]
     assert len(identity["source_files"]) == 17
     assert projected.total_source_byte_count + 32_768 <= 448 * 1024

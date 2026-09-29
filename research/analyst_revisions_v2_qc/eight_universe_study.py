@@ -276,28 +276,80 @@ def parse_order(plan, statistics):
     return {**parsed, "diagnostics": report}
 
 
-def compare_results(results):
-    """Compare eight core order arms, plus R276 only when separately present.
+def _comparison_source_rows():
+    """Pin a comparison to the common, corrected split-handling policy.
 
-    The eight-ETF basket is a separate reference, never a substituted
-    AR-off stock baseline. Matching source digests do not prove stock-minute
-    execution-price equality or create an independent confirmation sample.
+    ``read_result_once`` persists the manifest and projection identities beside
+    the parsed result.  The parsed meta/aggregate carry the profile identity.
+    None of those fields can be inferred from the candidate name alone.
+    """
+    from . import eight_universe_split_truncation_projection as split
+
+    baseline = adapter._eight_r268_a3_manifest()
+    corrected = adapter._eight_ar_on_split_manifest()
+    baseline_row = baseline["candidates"][0]
+    if (baseline_row["candidate_id"] != BASELINE
+            or not baseline_row["profile_id"].endswith(split._SUFFIX)
+            or corrected["baseline_a3_manifest_sha256"] !=
+               adapter.FROZEN_EIGHT_R268_A3_MANIFEST_SHA256
+            or corrected["split_rule"] != split._RULE
+            or corrected["package_sha256"] != baseline["package_sha256"]
+            or corrected["activation_manifest_sha256"] !=
+               baseline["activation_manifest_sha256"]):
+        _fail("eight-universe comparison split-policy ancestry changed")
+    rows = {BASELINE: (adapter.FROZEN_EIGHT_R268_A3_MANIFEST_SHA256,
+                       baseline_row, baseline)}
+    for row in corrected["candidates"]:
+        candidate = row["candidate_id"]
+        if (candidate not in CORE_CANDIDATES or candidate == BASELINE
+                or candidate in rows
+                or not row["profile_id"].endswith(split._SUFFIX)):
+            _fail("eight-universe comparison corrected source census changed")
+        rows[candidate] = (adapter.FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256,
+                           row, corrected)
+    if set(rows) != set(CORE_CANDIDATES):
+        _fail("eight-universe comparison corrected source census changed")
+    return rows
+
+
+def compare_results(results):
+    """Compare eight corrected order arms from their saved result artifacts.
+
+    R276's original source has not received the corrected split policy, so it
+    cannot enter this comparison yet. Matching source digests do not prove
+    stock-minute execution-price equality or create confirmation evidence.
     """
     core = list(CORE_CANDIDATES)
-    if type(results) is not dict or list(results) not in (core, core + [ETF_BASKET]):
-        _fail("eight-universe comparison needs the eight ordered core arms and optional R276")
-    basket_present = ETF_BASKET in results
+    if type(results) is not dict or list(results) != core:
+        _fail("eight-universe comparison needs the eight corrected ordered core arms; R276 is not corrected")
+    source_rows = _comparison_source_rows()
     reference = results[BASELINE]
     for candidate in results:
         arm = CANDIDATE_ARMS[candidate]
         result = results[candidate]
         if type(result) is not dict or result.get("run_valid") is not True:
             _fail("eight-universe comparison requires every supplied order run to be valid")
+        manifest_sha256, row, manifest = source_rows[candidate]
+        meta = result.get("meta")
+        aggregate = result.get("aggregates")
+        if (type(meta) is not dict or type(aggregate) is not dict
+                or result.get("candidate_id") != candidate
+                or type(result.get("attempt")) is not int
+                or result["attempt"] not in ((3,) if candidate == BASELINE else (1, 2, 3))
+                or result.get("manifest_sha256") != manifest_sha256
+                or result.get("projection_sha256") != row["projection_sha256"]
+                or meta.get("profile_id") != row["profile_id"]
+                or meta.get("profile_sha256") != row["profile_sha256"]
+                or meta.get("package_sha256") != manifest["package_sha256"]
+                or meta.get("activation_manifest_sha256") !=
+                   manifest["activation_manifest_sha256"]
+                or aggregate.get("profile_id") != row["profile_id"]
+                or aggregate.get("profile_sha256") != row["profile_sha256"]
+                or aggregate.get("matched_baseline_profile_sha256") !=
+                   row["matched_baseline_profile_sha256"]):
+            _fail("eight-universe comparison corrected source lineage changed")
         report = result.get("diagnostics")
         _validate_eight_diagnostics(report, arm)
-        aggregate = result.get("aggregates")
-        if type(aggregate) is not dict:
-            _fail("eight-universe comparison aggregate is absent")
         account = aggregate.get("account")
         execution = aggregate.get("execution")
         if (type(account) is not dict or type(execution) is not dict
@@ -336,8 +388,6 @@ def compare_results(results):
     with localcontext() as context:
         context.prec = 96
         off = Decimal(reference["aggregates"]["account"]["cumulative_return"])
-        basket = (Decimal(results[ETF_BASKET]["aggregates"]["account"]["cumulative_return"])
-                  if basket_present else None)
         ladder = []
         for candidate, arm in CORE_CANDIDATES.items():
             if not arm.startswith("ar_on"):
@@ -345,18 +395,12 @@ def compare_results(results):
             current = Decimal(results[candidate]["aggregates"]["account"]["cumulative_return"])
             row = {"candidate_id": candidate, "tilt_percent": int(arm[5:]),
                    "AR_on_minus_R268_AR_off_percentage_points": str((current - off) * 100)}
-            if basket_present:
-                row["AR_on_minus_R276_eight_ETF_percentage_points"] = str((current - basket) * 100)
             ladder.append(row)
-        off_vs_basket = str((off - basket) * 100) if basket_present else None
     comparison = {"comparison_valid": True, "sensitivity_only": True,
             "confirmation": False, "formal_alpha": False,
-            "baseline_candidate_id": BASELINE, "basket_control_present": basket_present,
+            "baseline_candidate_id": BASELINE, "basket_control_present": False,
             "ladder": ladder,
             "reference_data_scope": "common_membership_caps_and_eight_ETF_RAW_daily_panel_not_full_stock_minute_fill_tape"}
-    if basket_present:
-        comparison["basket_candidate_id"] = ETF_BASKET
-        comparison["R268_AR_off_minus_R276_eight_ETF_percentage_points"] = off_vs_basket
     return comparison
 
 

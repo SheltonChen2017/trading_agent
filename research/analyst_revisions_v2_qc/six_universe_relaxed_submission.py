@@ -64,6 +64,11 @@ QCOM_RESTORED_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_restor
 # counts before any other arm can launch; no spent source is repinned here.
 FROZEN_QCOM_SCORE_FLOOR1_MANIFEST_SHA256 = "3fde7673114794db256336c7c738c185859dd46e3d9af0765aa1cd7d008e5b86"
 QCOM_SCORE_FLOOR1_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_score_floor1_candidates.json")
+# R268--R276 are a separate eight-sleeve, QCOM-admitted order family.  The
+# frozen pin is filled only after every source/profile has been projected and
+# the R267 count-only input gate has been preregistered.
+FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256 = "b6802d0d7cffdc459db5e73de7ccd1e237ea0eaa412c4c44d182f759677e7b51"
+EIGHT_UNIVERSE_MANIFEST_PATH = Path(__file__).with_name("eight_universe_candidates.json")
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -300,6 +305,17 @@ def _qcom_score_floor1_manifest():
     return study.validate_manifest(json.loads(raw))
 
 
+def _eight_universe_manifest():
+    pin = FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
+    if type(pin) is not str or not cap._HEX.fullmatch(pin):
+        _fail("eight-universe study has no frozen manifest pin")
+    raw = EIGHT_UNIVERSE_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != pin:
+        _fail("eight-universe study is not the frozen manifest")
+    from . import eight_universe_study as study
+    return study.validate_manifest(json.loads(raw))
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -335,6 +351,8 @@ def _plan_manifest(plan):
         return _qcom_restored_manifest()
     if type(plan.family) is str and plan.family == "qcom_score_floor1":
         return _qcom_score_floor1_manifest()
+    if type(plan.family) is str and plan.family == "eight_universe":
+        return _eight_universe_manifest()
     _fail("relaxed plan family changed")
 
 
@@ -353,6 +371,8 @@ def _plan_manifest_sha256(plan):
         return FROZEN_QCOM_RESTORED_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "qcom_score_floor1":
         return FROZEN_QCOM_SCORE_FLOOR1_MANIFEST_SHA256
+    if type(plan) is RelaxedQcPlan and plan.family == "eight_universe":
+        return FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
                 else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 if _matched_study_diagnostic_attempt(plan)
@@ -384,7 +404,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only", "qcom_restored", "qcom_score_floor1"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]
@@ -503,7 +523,7 @@ def preview(plan, projection):
 
 def _require_inputs(plan):
     family = _plan_manifest(plan)
-    if plan.family in {"matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only", "qcom_restored", "qcom_score_floor1"}:
+    if plan.family in {"matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe"}:
         # Historical production inputs remain the exact reviewed package and
         # activation; this family must never use the recent R203 upload permit.
         from . import accepted_risk_delta_order_package as delta
@@ -591,6 +611,10 @@ def launch(plan, projection, api):
     if plan.family == "qcom_score_floor1":
         from . import six_universe_qcom_score_floor1_study as study
         study.require_successful_pilot(plan)
+    if plan.family == "eight_universe":
+        from . import eight_universe_study as study
+        study.require_input_readiness(plan)
+        study.require_completed_baseline(plan)
     _require_inputs(plan)
     common._client(api)
     if _path(plan, "claim").exists():
@@ -774,7 +798,9 @@ def poll_status(plan, launch_receipt, api):
     return status
 
 
-def _statistic(value):
+def _statistic(value, *, eight_aggregate=False):
+    if type(eight_aggregate) is not bool:
+        _fail("relaxed statistic universe contract is not authorized")
     if type(value) is not str:
         _fail("relaxed custom statistic is not text")
     try:
@@ -782,7 +808,8 @@ def _statistic(value):
         parsed = json.loads(raw)
     except (UnicodeError, ValueError):
         _fail("relaxed statistic is not ASCII JSON")
-    if not 0 < len(raw) <= 8192 or type(parsed) is not dict or common._canonical(parsed) != raw:
+    maximum = 16_384 if eight_aggregate else 8192
+    if not 0 < len(raw) <= maximum or type(parsed) is not dict or common._canonical(parsed) != raw:
         _fail("relaxed custom statistic is not bounded canonical JSON")
     return parsed
 
@@ -812,6 +839,9 @@ def _parse_order(plan, statistics):
     if type(plan) is RelaxedQcPlan and plan.family == "qcom_score_floor1":
         from . import six_universe_qcom_score_floor1_study as study
         return study.parse_order(plan, statistics)
+    if type(plan) is RelaxedQcPlan and plan.family == "eight_universe":
+        from . import eight_universe_study as study
+        return study.parse_order(plan, statistics)
     return _parse_order_common(plan, statistics)
 
 
@@ -819,11 +849,15 @@ def _parse_order_common(plan, statistics, *, expected_geometry=_GEOMETRY,
                         decision_count=61, extra_meta_fields=frozenset(),
                         extra_aggregate_fields=frozenset(),
                         result_transport="two_bounded_custom_summary_statistics",
-                        expected_meta_schema=None):
+                        expected_meta_schema=None, eight_universe=False):
+    if type(eight_universe) is not bool or (eight_universe and (
+            type(plan) is not RelaxedQcPlan or plan.family != "eight_universe")):
+        _fail("relaxed eight-universe parser is not authorized for this family")
     row, family = _candidate(plan), _plan_manifest(plan)
     meta_name = next(name for name in row["statistic_names"] if name.endswith("META"))
     agg_name = next(name for name in row["statistic_names"] if name.endswith("AGGREGATES"))
-    meta, aggregate = _statistic(statistics[meta_name]), _statistic(statistics[agg_name])
+    meta = _statistic(statistics[meta_name])
+    aggregate = _statistic(statistics[agg_name], eight_aggregate=True) if eight_universe else _statistic(statistics[agg_name])
     if (set(meta) != cap._META_FIELDS | extra_meta_fields
             or meta.get("schema") != (row["meta_schema"] if expected_meta_schema is None
                                       else expected_meta_schema)
@@ -855,7 +889,9 @@ def _parse_order_common(plan, statistics, *, expected_geometry=_GEOMETRY,
             or type(aggregate.get("unexplained_negative_order_event_count")) is not int
             or aggregate["unexplained_negative_order_event_count"] != 0):
         _fail("relaxed aggregate identity or cash policy changed")
-    selected = _bounded_order_base(aggregate, expected_geometry=expected_geometry)
+    selected = (_bounded_order_base(aggregate, expected_geometry=expected_geometry,
+                                    eight_universe=True)
+                if eight_universe else _bounded_order_base(aggregate, expected_geometry=expected_geometry))
     execution = aggregate["execution"]
     numeric = [aggregate["minimum_end_day_cash"], aggregate["maximum_gross_exposure"],
         execution.get("mean_target_weight_l1_error"), execution.get("maximum_target_weight_l1_error")]
@@ -893,13 +929,16 @@ def _parse_order_common(plan, statistics, *, expected_geometry=_GEOMETRY,
     return {"meta": meta, "aggregates": selected, "run_valid": aggregate["run_valid"]}
 
 
-def _bounded_order_base(aggregate, *, expected_geometry=_GEOMETRY):
+def _bounded_order_base(aggregate, *, expected_geometry=_GEOMETRY,
+                        eight_universe=False):
     """Reuse legacy shape checks without rewriting frozen status inventories.
 
     Validate the two new named states explicitly, map only a private temporary
     copy into legacy parser categories, then restore the original diagnostics.
     This is transport validation, not a change to producer selection semantics.
     """
+    if type(eight_universe) is not bool:
+        _fail("relaxed aggregate universe contract is not authorized")
     base = {key: aggregate[key] for key in cap._AGGREGATE_FIELDS}
     temporary = json.loads(common._canonical(base))
     new_status = "PARTIAL_STOCK_EXPOSURE_WITH_ETF_FALLBACK"
@@ -914,7 +953,7 @@ def _bounded_order_base(aggregate, *, expected_geometry=_GEOMETRY):
     temporary["fallback_counts"] = translate(temporary.get("fallback_counts"),
         "PARTIAL_STOCK_SLOTS_WITH_ETF_FALLBACK", new_status, cap._SELECTION_STATUSES)
     rows = temporary.get("sleeve_diagnostics", {}).get("rows")
-    if type(rows) is not list or len(rows) != 6:
+    if type(rows) is not list or len(rows) != (8 if eight_universe else 6):
         _fail("relaxed sleeve diagnostic rows changed")
     for row in rows:
         if type(row) is not list or len(row) != 12:
@@ -923,7 +962,10 @@ def _bounded_order_base(aggregate, *, expected_geometry=_GEOMETRY):
                             cap._COVERAGE_REASONS)
         row[11] = translate(row[11], "PARTIAL_STOCK_SLOTS_WITH_ETF_FALLBACK", new_status,
                             cap._SELECTION_STATUSES)
-    selected = cap._project_aggregate(temporary, expected_geometry=expected_geometry)
+    selected = (cap._project_aggregate(temporary, expected_geometry=expected_geometry,
+                                      eight_universe=True)
+                if eight_universe else cap._project_aggregate(temporary,
+                                                              expected_geometry=expected_geometry))
     selected["fallback_counts"] = dict(base["fallback_counts"])
     for selected_row, original in zip(selected["sleeve_diagnostics"]["rows"], base["sleeve_diagnostics"]["rows"]):
         selected_row[10], selected_row[11] = dict(original[10]), dict(original[11])
@@ -986,15 +1028,18 @@ def read_result_once(plan, launch_receipt, api, *, recover_r209_transport=False)
             or response.get("status") != "Completed."):
         _fail("relaxed result identity changed")
     statistics = response.get("statistics")
-    prefix = "ARV2_SIX_COVERAGE_" if row["kind"] == "coverage" else "ARV2_SIX_GATE_ORDER_"
+    prefix = ("ARV2_SIX_COVERAGE_" if row["kind"] == "coverage" else
+              "ARV2_EIGHT_GATE_ORDER_" if plan.family == "eight_universe" else
+              "ARV2_SIX_GATE_ORDER_")
     if (type(statistics) is not dict or sorted(key for key in statistics
             if type(key) is str and key.startswith(prefix)) != sorted(row["statistic_names"])):
         _fail("relaxed custom statistic inventory changed")
     retained = {name: statistics[name] for name in row["statistic_names"]}
     # Preserve only allowlisted bounded canonical strings before lineage parse.
     # A future parser correction can recover locally, never consume a second read.
-    for value in retained.values():
-        _statistic(value)
+    for name, value in retained.items():
+        _statistic(value, eight_aggregate=(
+            plan.family == "eight_universe" and name == "ARV2_EIGHT_GATE_ORDER_AGGREGATES"))
     _write_artifact(_path(plan, "raw-custom"), {**expected, "statistics": retained})
     result = (_parse_coverage if row["kind"] == "coverage" else _parse_order)(plan, retained)
     _write_artifact(_path(plan, "result"), {**expected, **result,

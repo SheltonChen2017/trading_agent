@@ -30351,8 +30351,9 @@ six-universe score-floor-one runs. The eight are **SPY, QQQ, SOXX, XLV, REMX,
 XLE, XLI, XLF**, in that order. XLI supplies an industrial sleeve and XLF a
 financial sleeve; XLF may hold insurers but does **not** stand in for a
 separate pure-insurance ETF. KIE would be a ninth sleeve and is not in this
-family. The first six retain their QCOM-admitted, 10%-coverage,
-three-verified-name and one-positive-analyst-score policies. Each sleeve's
+family. The first six retain their QCOM-admitted, 10%-coverage and
+three-verified-name policies. The AR-on arms retain the one-positive-score
+entry floor; the AR-off control ignores analyst scores entirely. Each sleeve's
 target budget becomes 12.25% of account equity, totaling the same 98% target
 gross exposure. Exact security IDs are aggregated across sleeves before the
 9.8% direct-stock cap, with excess returned to the contributing ETF sleeve;
@@ -30386,8 +30387,10 @@ eight-ETF budget basket, to be run as a separate reference only if its
 source/result contract validates. Each candidate uses the same frozen
 historical package and window, 261 decisions, 98% target gross exposure,
 2x buying-power admission, 10-bps-per-side modeled fees, and zero modeled
-slippage. The AR-off arm removes analyst revisions from entry and weights;
-same-universe AR-on minus AR-off is the matched comparison. Every arm has a
+slippage. The AR-off arm removes analyst revisions from entry and weights,
+selecting top-ten eligible names by point-in-time market capitalization;
+same-universe AR-on minus AR-off measures the **combined** entry/ranking and
+weight-transfer effect, not the isolated transfer effect. Every arm has a
 distinct source/profile/result identity, no more than three QC attempts, a
 private project and at most one bounded result read per successful launch.
 An outcome-bearing launch is a development research look and must be added
@@ -30438,3 +30441,31 @@ look, moving the floor to **279 shared / 216 development / 38 infrastructure
 looks / 685 authenticated exploratory cells**. No outcome candidate has
 launched at this checkpoint; R268 AR-off is next only after its own source,
 manifest and parser freeze.
+
+### 215.2 Prospective R268--R276 order-source freeze
+
+The eight-universe outcome manifest is
+`research/analyst_revisions_v2_qc/eight_universe_candidates.json`, raw SHA-256
+`b6802d0d7cffdc459db5e73de7ccd1e237ea0eaa412c4c44d182f759677e7b51`.
+It pins nine distinct 17-file source projections: R268 fully AR-off;
+R269--R275 AR-on at 80/100/120/140/160/180/200%; and R276 an optional
+eight-ETF basket. The R268 generated source was inspected and tested with
+**zero** analyst scores: every coverage-valid sleeve selected its ten
+point-in-time cap-ranked names with no AR entry gate. Its effective profile
+score floor is zero; the AR-on sources use a floor of one. The AR-off arm is
+therefore an actual no-AR total-effect control, but it is **not** daily
+count-matched to AR-on; any on-minus-off difference combines entry, ranking
+and weight-transfer changes. R276 is not required to interpret the eight
+core R268--R275 arms and must consume its own look if later launched.
+
+The new source adds XLI/XLF to the two subscription/callback loops and the
+frozen universe-policy table; all eight sleeve budgets are exactly 12.25%,
+and the direct-stock cap remains 9.8% after exact security-ID aggregation.
+The order aggregate's 16,384-byte producer/host bound is versioned for this
+eight-sleeve family; diagnostics remain separately bounded at 8,192 bytes,
+with 10,040 ETF-panel rows and 40 year-universe rows. This does not change
+the already-spent six-universe source or results. Focused local projection,
+parser and study batteries pass; the source is **unrun** in QC at this
+checkpoint. R268 A1 may launch only from the committed prospective freeze
+and the authenticated R267 input gate; any later correction uses one of at
+most three attempts and is logged explicitly.

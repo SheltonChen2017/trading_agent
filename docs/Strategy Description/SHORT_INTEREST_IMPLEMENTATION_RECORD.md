@@ -9593,20 +9593,26 @@ coverage before/after June 2021; and actual public release instant versus
 derived `EndTime`. This is a request for evidence, not source admission or a
 research look. These are the owner approvals/decisions exercised in this
 section; subsequent delegated choices must be itemized at the point of use.
+At lane completion, consolidate those exercised approval and decision IDs into
+the owner-requested final list; the delegation itself is not evidence that an
+unexercised approval or choice occurred.
 
 The signed-in support form showed a Bronze seat and four available tickets.
-The subject and questions were entered and verified in the form, but **no
-ticket has been submitted or confirmed**: macOS locked before the submission
-control could be activated, and the computer-use tool could not unlock it.
-The owner has been asked to unlock the Mac. Do not represent the draft as an
-open support request or invent a ticket number. Upon unlock, submit the
-already-drafted general inquiry once, verify the resulting ticket in QC, and
-record its durable link/ID without account secrets. The standing delegation
-does not make a factual provider claim true, waive an actual license or PIT
-vintage requirement, or override separate platform confirmation and safety
-requirements. No QC data/history request, project, compile, job or backtest
-was made; authorized/consumed real outcome looks remain **0/0**. The Short
-Interest lane still awaits a rights-cleared as-published source and the other
-section 71 P2 resolutions before source admission. No partial push occurs at
-this gate. The focused active-document test finished **69 passed in 0.83s**
-and `git diff --check` was clean; no full lane or repository suite was run.
+After macOS was unlocked, the inquiry was submitted **once**. QC displayed
+"Your ticket has been submitted," then the support history showed open
+ticket **#979ad273f6**, subject "FINRAShortInterest entitlement, original
+vintages, and release timing," dated September 29, 2026 (the site's displayed
+date), one open ticket, and three of four tickets remaining. The history
+reproduced the four questions and said no project was attached. The ticket ID,
+not its organization-bearing URL, is recorded here. The next action is to
+read QC's response and independently verify any claimed entitlement, vintage,
+listed-stock coverage, and release-time contract before reconsidering source
+admission. The standing delegation does not make a factual provider claim
+true, waive an actual license or PIT vintage requirement, or override separate
+platform confirmation and safety requirements. No QC data/history request,
+project, compile, job or backtest was made; authorized/consumed real outcome
+looks remain **0/0**. The Short Interest lane still awaits a rights-cleared
+as-published source and the other section 71 P2 resolutions before source
+admission. No partial push occurs at this gate. The focused active-document
+test finished **69 passed** on the ticket-verification tree and
+`git diff --check` was clean. No full lane or repository suite was run.

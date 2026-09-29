@@ -18,6 +18,7 @@ sys.path.insert(0, str(ROOT))
 
 from research.analyst_revisions_v2_qc import eight_universe_qcom_admitted_projection as renderer
 from research.analyst_revisions_v2_qc import eight_universe_r268_a2_diagnostic as drift_a2
+from research.analyst_revisions_v2_qc import eight_universe_r268_a3_split_rounding as split_a3
 from research.analyst_revisions_v2_qc import eight_universe_study as study
 from research.analyst_revisions_v2_qc import six_universe_relaxed_submission as adapter
 from research.analyst_revisions_v2_qc import six_universe_coverage_submission as credentials
@@ -32,8 +33,10 @@ def projected(candidate, inputs=None, *, attempt=1):
     """Build one exact new 17-file order source without cloud or outcome I/O."""
     if candidate == study.BASELINE and attempt == 2:
         return drift_a2.build_projection(package() if inputs is None else inputs)
+    if candidate == study.BASELINE and attempt == 3:
+        return split_a3.build_projection(package() if inputs is None else inputs)
     if candidate == study.BASELINE and attempt != 1:
-        raise ValueError("R268 A3 requires its own prospective source freeze")
+        raise ValueError("R268 attempt is outside its frozen source sequence")
     return renderer.build_eight_universe_projection(
         package() if inputs is None else inputs,
         study.CANDIDATE_ARMS[candidate], candidate,
@@ -107,9 +110,9 @@ def main():
     if Path.cwd().resolve() != ROOT or ROOT.name != "trading_agent__analyst_revisions_v2":
         raise ValueError("operation requires the designated lane worktree")
     if args.operation == "freeze":
-        if args.candidate == study.BASELINE and args.attempt == 3:
-            raise ValueError("R268 A3 requires its own prospective source freeze")
-        result = (drift_a2.freeze_manifest(package())
+        result = (split_a3.freeze_manifest(package())
+                  if args.candidate == study.BASELINE and args.attempt == 3
+                  else drift_a2.freeze_manifest(package())
                   if args.candidate == study.BASELINE and args.attempt == 2
                   else freeze())
     else:

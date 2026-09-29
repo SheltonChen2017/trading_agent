@@ -73,6 +73,10 @@ EIGHT_UNIVERSE_MANIFEST_PATH = Path(__file__).with_name("eight_universe_candidat
 # this diagnostic source; A3 needs a separately frozen successor.
 FROZEN_EIGHT_R268_A2_MANIFEST_SHA256 = "231db0de573ebeeaf5d4ca5caac1aa15627245a0741bfe19a5c1b2504606eb1f"
 EIGHT_R268_A2_MANIFEST_PATH = Path(__file__).with_name("eight_universe_r268_a2_diagnostic.json")
+# The third and final R268 attempt has its own corrected split-policy profile.
+# Neither spent predecessor pin may be changed by this prospective overlay.
+FROZEN_EIGHT_R268_A3_MANIFEST_SHA256 = "b85bd831e5dc79bed4ad8a839265043018c66b1967b807fe34bf936327e66eb2"
+EIGHT_R268_A3_MANIFEST_PATH = Path(__file__).with_name("eight_universe_r268_a3_split_rounding.json")
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -331,6 +335,17 @@ def _eight_r268_a2_manifest():
     return diagnostic.validate_manifest(json.loads(raw))
 
 
+def _eight_r268_a3_manifest():
+    pin = FROZEN_EIGHT_R268_A3_MANIFEST_SHA256
+    if type(pin) is not str or not cap._HEX.fullmatch(pin):
+        _fail("R268 A3 has no frozen split-correction manifest pin")
+    raw = EIGHT_R268_A3_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != pin:
+        _fail("R268 A3 split-correction manifest changed")
+    from . import eight_universe_r268_a3_split_rounding as correction
+    return correction.validate_manifest(json.loads(raw))
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -370,7 +385,7 @@ def _plan_manifest(plan):
         if plan.candidate_id == "R268" and plan.attempt == 2:
             return _eight_r268_a2_manifest()
         if plan.candidate_id == "R268" and plan.attempt == 3:
-            _fail("R268 A3 requires its own prospective source freeze")
+            return _eight_r268_a3_manifest()
         return _eight_universe_manifest()
     _fail("relaxed plan family changed")
 
@@ -394,7 +409,7 @@ def _plan_manifest_sha256(plan):
         if plan.candidate_id == "R268" and plan.attempt == 2:
             return FROZEN_EIGHT_R268_A2_MANIFEST_SHA256
         if plan.candidate_id == "R268" and plan.attempt == 3:
-            _fail("R268 A3 requires its own prospective source freeze")
+            return FROZEN_EIGHT_R268_A3_MANIFEST_SHA256
         return FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
@@ -638,8 +653,13 @@ def launch(plan, projection, api):
         from . import eight_universe_study as study
         study.require_input_readiness(plan)
         study.require_completed_baseline(plan)
+        if (plan.candidate_id != "R268"
+                and _plan_manifest_sha256(plan) == FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256):
+            _fail("original eight-universe nonbaseline split policy requires a prospective corrected source freeze")
         if plan.candidate_id == "R268" and plan.attempt == 2:
             study.require_invalid_baseline_a1(plan)
+        if plan.candidate_id == "R268" and plan.attempt == 3:
+            study.require_invalid_baseline_a2(plan)
     _require_inputs(plan)
     common._client(api)
     if _path(plan, "claim").exists():

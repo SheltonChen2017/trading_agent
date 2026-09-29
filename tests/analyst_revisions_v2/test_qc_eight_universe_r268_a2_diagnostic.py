@@ -87,9 +87,12 @@ def test_a1_pin_and_attempt_specific_a2_source_are_separate(projections, tmp_pat
     assert raw == common._canonical(a2.freeze_manifest(script.package())) + b"\n"
     assert adapter._eight_r268_a2_manifest()["candidates"][0]["project_name"] == (
         adapter._eight_universe_manifest()["candidates"][0]["project_name"])
-    with pytest.raises(adapter.RelaxedQcSubmissionError, match="A3"):
-        adapter.build_plan("R268", ORG, tmp_path / "control", 3,
-                           family=study.FAMILY)
+    a3_plan = adapter.build_plan("R268", ORG, tmp_path / "control", 3,
+                                 family=study.FAMILY)
+    assert adapter._plan_manifest_sha256(a3_plan) == (
+        adapter.FROZEN_EIGHT_R268_A3_MANIFEST_SHA256)
+    assert adapter._plan_manifest_sha256(a2_plan) == (
+        adapter.FROZEN_EIGHT_R268_A2_MANIFEST_SHA256)
 
 
 def test_a2_manifest_refuses_strategy_economics_or_a1_lineage_change():

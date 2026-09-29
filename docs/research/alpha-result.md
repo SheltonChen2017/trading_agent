@@ -6193,3 +6193,26 @@ authenticated R268 result is valid. This launch moves the conservative
 floor to **280 shared / 217 development / 38 infrastructure looks / 685
 cells**. A2, if used, must preserve this A1 record and first classify the
 drift without relaxing the outcome gate.
+
+## R-268 A2 — same-economics drift diagnosis — 2026-09-29
+
+One further exploratory **development** look was spent on R268 A2 in the
+same private project **37125044**, backtest
+`6ac80a734740d5f013755e5f19beab56`. The prospective A2 source was
+committed at `4b1b58b` before launch: diagnostic manifest SHA-256
+`231db0de573ebeeaf5d4ca5caac1aa15627245a0741bfe19a5c1b2504606eb1f`,
+projection SHA-256
+`fd8087dc0b8bdb577541017ee1fc91c804632972c6f206c81f6c84295b6ffc0a`,
+unchanged A1 strategy profile. Only a fourth redacted drift-rejection
+statistic was added; order economics and validity gates remain A1's. The
+retry authenticated A1's exact failed result and remote run inventory
+before launch. QC `Completed.` and the one-use read returned
+**run-valid=false**, 260/261 submitted and completed rebalances, and one
+redacted `split_adjusted_quantity_mismatch` on 2021-06-29 (one changed
+holding, no late split callback). Zero invalid/canceled orders or
+execution failures occurred; engine and modeled fees agreed. This is a
+diagnosis, not a baseline result cell. It neither identifies the holding
+nor proves rounding was the entire cause. Conservative floor: **281
+shared / 218 development / 38 infrastructure looks / 685 valid
+exploratory cells**. A third attempt requires a prospectively tested,
+engine-consistent split correction; R269--R276 remain gated.

@@ -30513,4 +30513,40 @@ receipt before any cloud mutation. A1 keeps its original manifest pin, and
 A3 is refused pending its own prospective source freeze. Independent AST
 comparison found no non-diagnostic source change. The five relevant focused
 test files passed **104/104**; `preview R268 --attempt 2` reproduced the
-pins above. This source is **unrun** at the freeze checkpoint, not a result.
+pins above. Source-freeze commit `4b1b58b` preceded QC launch. A2 reused
+private project **37125044** and created backtest
+`6ac80a734740d5f013755e5f19beab56`. QC reported `Completed.`; the
+one-use four-statistic read authenticated the profile and returned
+`run_valid=false`, again with 260 of 261 rebalances. The additional
+statistic isolated one changed/rejected holding on **2021-06-29**:
+`split_adjusted_quantity_mismatch`, with zero late split callbacks. A
+same-session split record existed, but the frozen exact-integer quotient
+test did not match the observed whole-share holding. It did not expose a
+raw security identity or quantify the discrepancy, so the precise
+rounding explanation remains a hypothesis. There were zero canceled or
+invalid orders, no execution failure, and modeled/engine fees agreed.
+QuantConnect's documented split handling credits non-whole-share value
+to cash, and LEAN's `SecurityPortfolioManager.ApplySplit` sets holdings to
+`(int)(old quantity / split factor)`; a separately frozen A3 may test only
+that exact engine-consistent case while retaining fail-closed behavior for
+all other drifts. A byte-identical retry or an unconditional skip waiver
+is not supported. This is R268's second consumed attempt and the lane's
+218th development look, with no valid result cell: floor
+**281/218/38/685**. R269--R276 remain blocked on a valid baseline.
+
+### R268 A3 prospective split correction (unrun at freeze)
+
+The final permitted R268 attempt is frozen separately from A1 and A2:
+manifest SHA-256 `b85bd831e5dc79bed4ad8a839265043018c66b1967b807fe34bf936327e66eb2`,
+17-file projection SHA-256 `9bf45940b9215cdbfe17e868cb56f13ba65f382e9743d271fc768dcc442d6f76`,
+and profile SHA-256 `222928e688aa56018dc5dfd4968a505a63eb8bef4207b38aaf6c37c74841b01d`.
+The only execution-policy change accepts an observed whole-share holding
+equal to `int(old_quantity / recorded_split_factor)` when each changed
+holding has its own same-session split record. Adjacent quantities, missing
+split records, negative holdings, and unrelated drift still refuse; cash
+remains bound to the existing receipt. The A3 launcher authenticates the
+exact A2 failure before any cloud mutation and uses R268's existing private
+project and third, final attempt slot. The original R269--R276 source is
+blocked even if A3 later validates; each later arm requires a separately
+frozen matching split policy. This is a prospective correction, **not**
+evidence that the 2021-06-29 mismatch has been cured or that R268 is valid.

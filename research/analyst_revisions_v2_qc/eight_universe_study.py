@@ -518,14 +518,69 @@ def require_invalid_baseline_a1(plan):
     return True
 
 
+def require_invalid_baseline_a2(plan):
+    """Reparse the spent A2 diagnosis before A3 can touch the same project."""
+    if (type(plan) is not adapter.RelaxedQcPlan or plan.family != FAMILY
+            or plan.candidate_id != BASELINE or plan.attempt != 3):
+        _fail("R268 A3 invalid predecessor plan changed")
+    a2 = dataclasses.replace(plan, attempt=2)
+    require_invalid_baseline_a1(a2)
+    from . import eight_universe_r268_a2_diagnostic as diagnostic
+    row = adapter._candidate(a2)
+    launch = adapter.common._read(adapter._path(a2, "launch"))
+    adapter._receipt(a2, launch)
+    project = adapter.common._read(adapter._path(a2, "project"))
+    expected = {
+        "candidate_id": BASELINE, "attempt": 2,
+        "project_id": launch["project_id"],
+        "backtest_id": launch["backtest_id"], "status": "Completed.",
+    }
+    if (project != {"candidate_id": BASELINE, "project_id": launch["project_id"],
+                    "project_name": row["project_name"]}
+            or adapter.common._read(adapter._path(a2, "terminal")) != expected
+            or adapter.common._read(adapter._path(a2, "read-claim")) != expected):
+        _fail("R268 A2 project, terminal, or one-use read lineage changed")
+    retained = adapter._read_artifact(adapter._path(a2, "raw-custom"))
+    if (type(retained) is not dict or set(retained) != set(expected) | {"statistics"}
+            or any(retained.get(key) != value for key, value in expected.items())
+            or type(retained["statistics"]) is not dict
+            or set(retained["statistics"]) != set(row["statistic_names"])):
+        _fail("R268 A2 retained custom-statistic lineage changed")
+    parsed = diagnostic.parse_result(a2, retained["statistics"])
+    saved = adapter._read_artifact(adapter._path(a2, "result"))
+    if saved != {**expected, **parsed,
+                  "manifest_sha256": adapter.FROZEN_EIGHT_R268_A2_MANIFEST_SHA256,
+                  "projection_sha256": row["projection_sha256"]}:
+        _fail("R268 A2 saved result differs from exact retained statistics")
+    raw_aggregate = adapter._statistic(
+        retained["statistics"][STATISTIC_NAMES[1]], eight_aggregate=True)
+    execution = raw_aggregate.get("execution")
+    diagnosis = parsed["drift_diagnostic"]
+    if (parsed["run_valid"] is not False
+            or type(execution) is not dict
+            or execution.get("decision_count") != PROTOCOL["decision_count"]
+            or execution.get("holding_drift_skipped_rebalance_count") != 1
+            or execution.get("submitted_rebalance_count") != 260
+            or execution.get("completed_rebalance_count") != 260
+            or diagnosis["holding_drift_skip_count"] != 1
+            or diagnosis["rejections"] != [{
+                "execution_session": "2021-06-29",
+                "classification": "split_adjusted_quantity_mismatch",
+                "changed_holding_count": 1,
+                "rejected_holding_count": 1,
+                "late_split_record_count": 0,
+            }]):
+        _fail("R268 A2 is not the authenticated one-split-mismatch diagnosis")
+    return True
+
+
 def require_completed_baseline(plan):
     """Permit nonbaseline launches only after an authenticated valid R268 run."""
     if type(plan) is not adapter.RelaxedQcPlan or plan.family != FAMILY:
         _fail("eight-universe baseline prerequisite plan changed")
     if plan.candidate_id == BASELINE:
         return True
-    # A3 has no source freeze yet and cannot authenticate as a baseline.
-    for attempt in (1, 2):
+    for attempt in (1, 2, 3):
         baseline = dataclasses.replace(plan, candidate_id=BASELINE, attempt=attempt)
         result_path = adapter._path(baseline, "result")
         if not result_path.exists():

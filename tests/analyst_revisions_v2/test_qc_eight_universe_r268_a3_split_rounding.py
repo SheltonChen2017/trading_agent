@@ -256,3 +256,18 @@ def test_a3_manifest_refuses_old_strategy_or_profile_identity():
         changed["candidates"][0][key] = replacement
         with pytest.raises(adapter.RelaxedQcSubmissionError):
             a3.validate_manifest(changed)
+
+
+def test_overlay_refuses_a_declared_profile_whose_economics_differ():
+    """The split overlay may change only split-policy and identity fields; a
+    declared original profile that differs in an economic field refuses."""
+
+    original, profile = a3.renderer.build_eight_universe_projection(
+        script.package(), study.CANDIDATE_ARMS["R269"], "R269")
+    tampered = dict(profile)
+    tampered["target_gross_exposure"] = "0.97"
+    with pytest.raises(split.EightUniverseSplitTruncationError, match="strategy economics"):
+        split.correct_projection(
+            original, tampered,
+            schema="arv2-eight-r269-split-truncation-projection-v1",
+            projection_id_prefix="arv2-eight-r269-split-truncation-projection-")

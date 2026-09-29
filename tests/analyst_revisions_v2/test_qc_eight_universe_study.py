@@ -301,3 +301,24 @@ def test_original_family_freeze_does_not_pull_corrected_candidate_sources(monkey
 
     monkeypatch.setattr(script, "projected", corrected_source_is_not_the_original_inventory)
     assert script.freeze() == adapter._eight_universe_manifest()
+
+
+@pytest.mark.parametrize("annual, admitted", [
+    ((5, 5, 5, 5, 5), False),
+    ((6, 5, 5, 5, 5), True),
+])
+def test_r267_gate_total_floor_binds_with_consistent_annual_counts(annual, admitted):
+    """Five years of at least one decision each can sum to 25, which must
+    refuse on the preregistered 26-decision floor alone; 26 admits."""
+
+    values = _counts()
+    for ticker in ("XLI", "XLF"):
+        sleeve = values["sleeves"][ticker]
+        for item, count in zip(sleeve["years"], annual, strict=True):
+            item["relaxed_joint_pass_10_verified3_count"] = count
+        sleeve["totals"]["relaxed_joint_pass_10_verified3_count"] = sum(annual)
+    if admitted:
+        assert study._r267_admits(values) is True
+    else:
+        with pytest.raises(adapter.RelaxedQcSubmissionError, match="count gate"):
+            study._r267_admits(values)

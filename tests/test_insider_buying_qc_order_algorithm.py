@@ -15,8 +15,7 @@ import pytest
 SOURCE = (
     Path(__file__).resolve().parents[1]
     / "research"
-    / "insider_buying"
-    / "qc_order_algorithm.py"
+    / "insider_buying_qc_order_algorithm.py"
 )
 
 

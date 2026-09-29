@@ -2,7 +2,7 @@
 
 The package's imported public exports deliberately have no network collection,
 outcome, portfolio, broker, or scheduler surface. A separate, inert-by-default
-QC order-algorithm entry point lives in this lane package but is never imported
+QC order-algorithm entry point lives outside this offline package and is never imported
 by these offline exports; it grants no source, outcome, QC-job, or trading
 authority. The offline package contains immutable in-memory Form 4
 structure, a fixture parser, and a caller-supplied SEC quarterly ZIP integrity

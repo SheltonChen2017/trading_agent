@@ -248,6 +248,33 @@ def test_crlf_and_nonascii_company_are_accepted_but_raw_bytes_stay_distinct():
     assert receipt.source_sha256 != hash_bytes(lf)
 
 
+@pytest.mark.parametrize("form", (b"8-K", b"4"))
+def test_legacy_cp1252_company_byte_does_not_drop_a_whole_quarter(form):
+    row = (
+        b"1001|Legacy \x83 Holdings|" + form + b"|2023-02-10|"
+        b"edgar/data/987654/0000001001-23-000003.txt\n"
+    )
+    raw = _HEADER + row
+    receipt = parse_sec_quarter_master_index(raw, year=2023, quarter=1)
+    assert receipt.source_sha256 == hash_bytes(raw)
+    assert receipt.all_filing_row_count == 1
+    assert tuple(item.form_type for item in receipt.rows) == (("4",) if form == b"4" else ())
+
+
+@pytest.mark.parametrize(
+    "row",
+    (
+        b"1001|Legacy \x81 Holdings|4|2023-02-10|edgar/data/987654/0000001001-23-000003.txt\n",
+        b"1001|Legacy \x7f Holdings|4|2023-02-10|edgar/data/987654/0000001001-23-000003.txt\n",
+        b"1001|Legacy Holdings|\x83|2023-02-10|edgar/data/987654/0000001001-23-000003.txt\n",
+        b"1001|Legacy Holdings|4|2023-02-10|edgar/data/987654/0000001001-23-000003.tx\x83\n",
+    ),
+)
+def test_legacy_company_compatibility_still_refuses_undefined_or_structural_bytes(row):
+    with pytest.raises(SecQuarterMasterIndexError, match="REFUSED"):
+        _parse(row)
+
+
 def test_bounded_official_four_blank_line_separator_is_accepted():
     header = (
         b"Description:           Master Index of EDGAR Dissemination Feed\n"

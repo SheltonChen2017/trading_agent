@@ -1,6 +1,7 @@
 """Research-only Insider order skeleton; every QC run is a counted research look.
 
-This single-file LEAN entry point is deliberately unbound. A later reviewed
+This standalone LEAN entry point stays outside the offline Insider package
+and is deliberately unbound. A later reviewed
 run must pin an immutable precomputed signal Object Store key, its exact raw
 SHA-256, and a research order policy in the uploaded source. Hashes here
 check byte identity, not SEC provenance, data rights, PIT correctness, or

@@ -266,13 +266,21 @@ def parse_sec_quarter_master_index(
     rows: list[SecMasterIndexRow] = []
     seen_paths: dict[str, bool] = {}
     for line in lines[body_start:]:
-        try:
-            fields = line.decode("latin-1").split("|")
-        except UnicodeDecodeError as exc:  # latin-1 is total; retained as a defensive boundary
-            raise SecQuarterMasterIndexError("REFUSED: master index row decoding failed") from exc
-        if len(fields) != 5:
+        raw_fields = line.split(b"|")
+        if len(raw_fields) != 5:
             raise SecQuarterMasterIndexError("REFUSED: master index row field count is invalid")
-        cik, company, form, filed, path = fields
+        try:
+            # The structural columns are ASCII. Historical EDGAR company
+            # names can contain printable Windows-1252 bytes (for example
+            # 0x83), which Latin-1 misclassifies as C1 controls. Keep the
+            # exact source bytes hashed and refuse undefined code-page bytes.
+            cik = raw_fields[0].decode("ascii")
+            company = raw_fields[1].decode("cp1252")
+            form = raw_fields[2].decode("ascii")
+            filed = raw_fields[3].decode("ascii")
+            path = raw_fields[4].decode("ascii")
+        except UnicodeDecodeError as exc:
+            raise SecQuarterMasterIndexError("REFUSED: master index row decoding failed") from exc
         if _CIK_RE.fullmatch(cik) is None or int(cik) == 0:
             raise SecQuarterMasterIndexError("REFUSED: master index CIK is invalid")
         if (

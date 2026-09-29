@@ -14,7 +14,7 @@ from pathlib import Path
 import pytest
 
 from data.hashing import canonical_json, hash_payload
-from research.insider_buying import ib1b_82q_snapshot_runner as runner
+from research import insider_buying_ib1b_82q_snapshot_runner as runner
 from research.insider_buying.sec_bulk_snapshot import ALLOWED_SEC_TABLES
 from research.insider_buying.sec_ib1b_82q_schema_profile import (
     build_retained_82q_schema_profile_candidate,

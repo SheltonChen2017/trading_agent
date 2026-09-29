@@ -86,7 +86,7 @@ def _validate_roots(input_root: str | Path, output_root: str | Path) -> tuple[Pa
     try:
         source = _require_plain_path(input_root, label="IB-1B input root")
         destination = _require_plain_path(output_root, label="IB-1B output root")
-        repository = Path(__file__).resolve().parents[2]
+        repository = Path(__file__).resolve().parents[1]
         if not source.is_dir() or _overlap(source, destination) or _overlap(repository, destination):
             _refuse("output must be outside both the retained source and repository")
         return _plain_root(source), destination
@@ -111,7 +111,7 @@ def _check_directory_anchor(directory: Path, descriptor: int) -> None:
 
 def _verify_retained_parser_commit(commit: str) -> None:
     """A retained receipt cannot be stamped with a caller-invented commit."""
-    repository = Path(__file__).resolve().parents[2]
+    repository = Path(__file__).resolve().parents[1]
     try:
         root = subprocess.check_output(
             ["git", "rev-parse", "--show-toplevel"], cwd=repository,

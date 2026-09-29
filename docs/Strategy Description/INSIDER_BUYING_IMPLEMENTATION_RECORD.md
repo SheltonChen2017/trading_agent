@@ -14746,3 +14746,62 @@ and `0dadf3f` (campaign runner and synthetic tests) after the section-110
 commits. Each awaits the owner's deferred independent Claude review after the
 first honest historical backtest. The matching remote remains `d478cfd`;
 there has been no push for this continuation.
+
+## 112. Full-parent campaign stopped on a source-envelope refusal (2026-09-29 UTC; blocked)
+
+The campaign launched from exact clean `b64acd1eb3c9de82d8e4f769e9f38bf7f79cb883`
+on `codex/strategy-insider-buying` into the outside-Git root
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider-source-allparents-20260929.3Nut2i/all-form4-parents`.
+The immutable plan still names 99,394 Form 4/4-A parents, of which 9,337 were
+planned reuses and 90,057 planned new requests. No campaign-level terminal
+report or completed-root receipt exists. The process exited with
+`REFUSED: shard ended incomplete; campaign cannot advance`.
+
+Read-only inspection of the committed shard metadata found shard-0000 complete
+at 8,192/8,192 (972 reused, 7,220 acquired), report SHA-256
+`a5ac1bd8d4782ac9dfbcdbfb7a5b9fd7dfdb17ad0ec1b9d4b9184d13c4cded65`.
+Shard-0001 committed an **incomplete** report SHA-256
+`99d30899a53b64ea509d96d771d59444c5e24798e3df7d95ccb03c57582e11a3`:
+1,347/8,192 complete (226 reused, 1,121 acquired), then one HTTP-200
+`source_envelope_refusal`. Across both shards, only **9,539/99,394** unique
+parents completed (1,198 reused, 8,341 newly acquired); 8,342 SEC attempts
+occurred. The shard report, journal and inventory hashes match their commit
+markers, and object-file counts match completed counts. This metadata check
+is **not** full completed-root replay, source authentication, or acceptance of
+the missing 89,855 parents. The refused 200 body has no retained hash, size or
+raw object in this no-cache campaign: validation stopped before publication.
+Its exact mismatch cannot be diagnosed from the journal alone. No accession,
+filing content or SEC contact is recorded here.
+
+The reviewed runner's `resume=True` path verifies a committed shard but
+explicitly refuses a terminal incomplete shard before transport. It cannot
+advance this root and does not silently retry. A fresh real campaign through
+the current API can reuse only the 9,337 pinned selected-root objects, not
+these shards' 8,341 new objects; it would duplicate requests. The remaining
+raw bytes cannot be inferred from the index or the selected-only root. The
+monitor was paused before any recovery work; the immutable roots remain
+untouched.
+
+### 112.1 Delegated decision, finding status, and next gate
+
+| ID | Decision | Reason and limit |
+|---|---|---|
+| D39 | Stop this campaign and preserve its incomplete shard and every prior outside-Git artifact; do not re-request the refused parent, launch another capture, narrow the 99,394 denominator, or advance to QC/backtesting under this heartbeat. | The terminal 200 response was rejected before its body was retained, so neither its cause nor the missing parent can be authenticated offline. The current resume path is intentionally fail-closed. A partial corpus cannot support the frozen full-population study. |
+
+No new P0-P3 code defect is established by this observation: refusal of an
+unverified source envelope is the intended safety direction. The open item is
+a **source-coverage and recovery gate**, not a completed campaign. A new
+source-bound, versioned recovery design would need to reuse the 9,539 pinned
+completed objects without re-requesting them and obtain diagnostic bytes for
+the one refused parent under explicit new direction, preserving all prior
+attempts and immutable evidence. If that parent is truly unavailable, any
+exclusion or changed study population needs a fresh, explicit preregistration;
+it cannot be inferred from a successful HTTP status. No new SEC, provider,
+licensed-row, outcome or QC access is authorized by this failure record.
+
+The first historical Insider order-based backtest remains **not run and not
+ready**. Official publication/PIT identity, source authenticity, complete
+parent coverage, rights/vintage, frozen look and QC processing remain open.
+Research looks, QC jobs and backtests remain **0/0/0** in this continuation.
+No commit was pushed; the local branch remains ahead of `d478cfd` and requires
+an eventual single authorized same-lane push only after a completed round.

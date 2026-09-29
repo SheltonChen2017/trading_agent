@@ -9427,3 +9427,87 @@ authority exists. This audit changed the lane record only, not code or shared
 documents. `git diff --check` passed. The focused active-document test could
 not start: `python` is absent and system `python3` has no `pytest`; zero test
 cases ran. No QC job was run and no push is made at this gate.
+
+## 70. SI-5 metadata-only source preflight implementation — 2026-09-29
+
+The owner's “yes, start implementing” after the recommendation in section 69
+is recorded as `SI-AUTH-20260929-04`: proceed with the **offline source-admission
+preflight** in this Short Interest worktree, not with historical row access or
+a QuantConnect launch. The delegated implementation choice
+`SI-DEC-20260929-11` is to cross-check separately supplied release-schedule
+date/digest claims against canonical `ReleaseCalendarEntry` values, then use
+the existing XNYS calendar with **date-only** precision. A schedule date by
+itself cannot establish a pre-open exact release instant. The preflight
+therefore defers even a claimed pre-open release to the first subsequent
+regular-session open. This is conservative mechanics, not authenticated
+FINRA provenance or a change to the frozen 20/60/120/252 candidate policy.
+
+Commit `db30866def295041531c1046cc3675121b76272d` adds
+`research/short_interest_etf/si5_source_preflight.py` and focused synthetic
+tests. It is **implemented locally, pending Claude's whole-lane independent
+review**. Its content-addressed receipt identifies only candidate routes:
+QuantConnect `FINRAShortInterest`, QuantConnect US equities for price/volume,
+and Sharadar SEP as a possible cross-check. It keeps a separate 60-session
+coverage-audit target without imposing 60 sessions on the existing 20-session
+eligibility candidate. Each receipt is permanently `source_admitted=false`,
+`point_in_time_data_verified=false`, outcome/QC/production/trading authority
+false, and authorized/consumed real outcome looks **0/0**. Matching
+caller-provided hashes is explicitly a **structural match**, not proof that
+FINRA served the claimed bytes or that original historical revisions exist.
+Missing, duplicate, extra, contradictory or malformed schedule claims refuse;
+the receipt copies caller-owned contracts and revalidates them on public read.
+No actual FINRA schedule extract, SI row, price bar, outcome or provider artifact
+was used as test input or admitted by this commit.
+
+The exact local-only range after remote head
+`985743e77212c0313121f1ae1754e03dd452c374` is
+`cabfc6c3da243358af8c89ad2e1e86956dcf511e` through
+`db30866def295041531c1046cc3675121b76272d`. Section 68.1 gives the
+per-commit dispositions for its first six commits. The remaining commits
+have these dispositions (all still await Claude's independent review):
+
+| Commit | Codex disposition |
+|---|---|
+| `7d2eeb5244fc194cccdff804713805aac570345b` | Accepted local lane record of the offline SI-5 validation and unchanged factual stop gate. |
+| `8d94cdef45df222d60306b06d62e94e3810bcb97` | Accepted read-only QC/Sharadar source-route audit in section 69; three P2 factual gates remain open. |
+| `db30866def295041531c1046cc3675121b76272d` | Implemented synthetic-only source preflight and dangerous-direction regressions; pending whole-lane Claude review. |
+
+The persistent P0–P3 ledger retains `SI-SRC-20260928-001` (authentic release
+clock), `-002` (original/revision vintages) and `-003` (rights, actual PIT
+coverage, identity/terminal and QC route) as **open P2 factual gates**. The
+shared/out-of-lane `SI-CR5-005` / `SI-CCR16-007` remains open and untouched.
+In this new code's local self-review, three lane-owned P3 defects were
+corrected rather than discarded:
+
+| Finding | Status, reason and verification |
+|---|---|
+| `SI-SRC-20260929-004` P3 | **Closed.** Direct receipt construction initially could claim a schedule match without retaining matching schedule claims. A focused regression was red (`1 failed, 9 deselected`) before the receipt retained and rechecked those claims; green afterward. The matching claims still confer no external authenticity. |
+| `SI-SRC-20260929-005` P3 | **Closed.** Direct receipt construction initially aliased caller-owned release/claim objects, allowing later mutation of its nominally frozen evidence. The regression was red (`1 failed, 10 deselected`) before defensive reconstruction; green afterward. |
+| `SI-SRC-20260929-006` P3 | **Closed.** A deleted field on a post-construction source object raised an unclassified `AttributeError` rather than the named source-preflight refusal. Both release and schedule-claim variants were red (`2 failed, 12 deselected`), then green after narrow error wrapping. |
+
+The first new-file test run correctly stopped at collection with
+`ModuleNotFoundError` before the implementation existed (zero cases executed).
+After the corrections, the preflight file finished **14 passed in 0.36s**.
+The final focused availability, SI-5 offline protocol, preflight,
+Short Interest import-boundary and active-document selection finished
+**129 passed in 1.46s** on the code commit's final tree and **129 passed in
+1.44s** after this record update using Python 3.12.14; targeted source/test
+`compileall`, working and staged `git diff --check` completed without
+diagnostics.
+These are focused software checks, not the full lane/repository suite or
+market evidence. Claude performs the whole-lane suite after the single final
+push. No shared/project-wide document or `SESSION_HANDOFF.md` changed.
+
+This is **not source admission, lane completion or backtesting readiness**.
+The preflight cannot resolve section 69's P2 facts by self-assertion. The next
+step remains an independently verifiable, rights-cleared as-published SI
+archive or documented complete affected-release exclusion; an authenticated
+publication schedule; named PIT price/volume, identifier and terminal-value
+rights and actual 20/60/120/252 coverage; and then a prospective power/date/
+permanent-look freeze before any outcome join. There was no provider/FINRA/SEC
+row request, credential, actual historical price, outcome, sealed-holdout,
+QC project/upload/processing/compile/job/backtest, broker, paper/live,
+capital, order or trading action in this round. In line with the owner's
+one-final-push instruction and section 66.1, **no partial push occurs at this
+factual gate**; this commit range is local-only and unavailable to Claude on
+another computer until a later authorized final lane push.

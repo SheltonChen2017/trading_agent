@@ -5976,3 +5976,70 @@ infrastructure look and zero development evaluations or cells. The floor is
 **254 shared research looks / 192 development evaluations / 37 infrastructure
 looks / 662 authenticated exploratory cells**. R247 has exhausted its three
 attempt slots; a fourth Codex launch or relabeled candidate is prohibited.
+
+## R-225 Mia, R-226 A2, R-228 A1, R-229 A1 — QCOM-admitted matched arms — 2026-09-29
+
+Four distinct QCOM-admitted, order-based 2021-01-04--2025-12-31 exploratory
+launches reached `Completed.` and each one-use bounded aggregate passed
+`run_valid=true`, 261/261 weekly rebalances and zero invalid/canceled orders.
+R225 is the owner's independent Mia recovery in existing project 37017548:
+its completed run was authenticated against exact saved QC source snapshot
+37101502, not relabeled as a fourth Codex attempt. Its earlier A1--A3
+failures remain invalid and separately counted. The original R225 A3 terminal
+receipt does not describe the completed Mia run. All returns below are
+cumulative after modeled 10-bps-per-side fees.
+
+| Run | Private project / backtest ID | AR arm / extra modeled slippage | Net return | Max drawdown |
+| --- | --- | --- | ---: | ---: |
+| R225 Mia | `37017548` / `c09f064ad40702f6e984939e5b96ff08` | off / 0 bps | +137.3057% | -21.7620% |
+| R226 A2 | `37017666` / `ad91a590d773db05dd893b21d3c2ad44` | on100 / 0 bps | +154.1483% | -21.8269% |
+| R228 A1 | `37118896` / `e943be0d7950ff45a7a76439bd086262` | off / 5 bps per side | +132.8056% | -21.8131% |
+| R229 A1 | `37119070` / `96ff92ed72f36bf190fd2b10dea47967` | on100 / 5 bps per side | +149.1104% | -21.8974% |
+
+Four new development looks and four accepted exploratory cells move the
+prior floor **254/192/37/662** to **258 shared looks / 196 development
+evaluations / 37 infrastructure looks / 666 cells**. The on100-minus-off
+spread is +16.8425 percentage points with zero added modeled slippage and
++16.3048 points at 5 bps per side. This is an adaptive, current-vintage
+historical sensitivity, not formal or prospective alpha. No raw provider,
+stock-price or order rows are entered in this shared ledger.
+
+## R-248--R-259 A1 — QCOM-admitted twelve-arm replay — 2026-09-29
+
+The twelve distinct exploratory sources were prospectively frozen in lane
+commit `855fb32`, manifest SHA-256
+`032d513c197507146c793bced6cfb5085347727c8558fc96bb91aeaa06473e62`,
+before their first launches. All were order-based, exact-source uploaded and
+read back, compiled, and completed on A1 in private QC projects. Their
+one-use result readers each authenticated `run_valid=true`, 261/261 weekly
+rebalances and zero invalid/canceled orders. Each used the same historical
+period, 98% target gross, 2x buying-power admission, 10-bps-per-side modeled
+fee, and zero added modeled slippage; coverage/name floors and AR arms are
+separately identified below. QCOM is eligible, not forced into a holding.
+
+| Run (QCOM-excluded analogue) | Project / backtest ID | Coverage / min names / AR transfer | Net return | Max drawdown |
+| --- | --- | --- | ---: | ---: |
+| R248 (R235) | `37119719` / `e7df7f2324cd626d98c67897f8da3ad4` | 25% / 5 / 80% | +149.9302% | -21.8104% |
+| R249 (R236) | `37119718` / `9d9a6342179d66764194ddfbb3a0b4fb` | 25% / 5 / 120% | +158.1413% | -22.1032% |
+| R250 (R237) | `37119882` / `ed2a74b2f9b2a43bec56a80b8a80973d` | 25% / 5 / 200% | +160.9307% | -22.1047% |
+| R251 (R238) | `37119956` / `5ac37e9e3c7425ea22bff7bc4a5bef3c` | 10% / 5 / off | +137.3057% | -21.7620% |
+| R252 (R239) | `37120097` / `3f49777b06d85da9416ebfbbc18e68dd` | 10% / 5 / 80% | +149.9302% | -21.8104% |
+| R253 (R240) | `37120173` / `18787f57a4d73f0ba5866cf45a1ff2b0` | 10% / 5 / 120% | +158.1413% | -22.1032% |
+| R254 (R241) | `37120290` / `d0843468a1a64ca4967fd75a41500232` | 10% / 5 / 200% | +160.9307% | -22.1047% |
+| R255 (R242) | `37120336` / `1fc5b09f74af1a02f846b90f3823ae29` | 10% / 3 / off | +136.4598% | -21.7615% |
+| R256 (R243) | `37120473` / `a133193f95e87ea8574cd13920eff426` | 10% / 3 / 80% | +150.4135% | -21.8104% |
+| R257 (R244) | `37120537` / `113a88fee502ddd3a48f1fc8283176df` | 10% / 3 / 120% | +158.6129% | -22.1032% |
+| R258 (R245) | `37120674` / `12d5b41137c5d8d3f72eab67f47fc572` | 10% / 3 / 200% | +161.3780% | -22.1047% |
+| R259 (R246) | `37120729` / `964f66d850fa021a8d9af95b446de831` | 25% / 5 / AR entry only, 0% transfer | +133.1794% | -21.7619% |
+
+Twelve launches add twelve development looks and twelve valid exploratory
+cells. The new conservative floor is **270 shared research looks / 208
+development evaluations / 37 infrastructure looks / 678 accepted cells**.
+Equal 25%- and 10%-floor five-name results in these arms are an observed
+same-window invariance, not independent confirmations. Each QCOM-admitted
+arm returned 3.69--6.53 percentage points less than its excluded analogue,
+but separate QC jobs do not attest an identical full stock minute-fill tape
+or vendor vintage, so that difference cannot be attributed solely to QCOM.
+These retrospectively adjusted 2021--2025 settings cannot select a live AR
+percentage or satisfy the formal prospective efficacy gate. No paper/live,
+funded, broker or real-order authority follows.

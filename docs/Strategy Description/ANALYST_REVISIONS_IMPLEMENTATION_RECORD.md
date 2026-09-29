@@ -882,6 +882,18 @@ compared and independently reviewed before a new research candidate. Claude
 should review section 212 and this disposition after Codex's one final lane
 push.
 
+The owner's later QCOM-restoration direction supersedes the historical
+comparison timing in that last sentence. Section 213 records sixteen
+completed, authenticated QCOM-admitted 2021--2025 order-based sensitivity
+cells: R225/R226/R228/R229 and the prospectively frozen R248--R259. The
+closing floor is **270 shared looks / 208 development evaluations / 37
+infrastructure looks / 678 exploratory cells**. All new direct-stock arms
+remain adaptive, current-vintage historical research; no QCOM-only causal
+effect, formal alpha, future AR-percentage selection or forward-readiness
+claim follows. R247 remains exhausted and its 09:20 input/clock gate remains
+open. Claude reviews section 213 and the exact final pushed range before a
+new forward diagnostic or prospective efficacy action.
+
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
@@ -2630,6 +2642,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Codex owner-directed dual forward-rule freeze | `7aefeb1` -> `e5c13ac` and this final record commit | Section 209 additive 100%/200% forward-development choice | Bind two named arms to R232 and R237 historical construction identities and one AR-off control, while leaving future universe, exclusion, epoch and execution identities unset. No historical winner or formal two-arm result is selected. | Focused dual-policy and transitive no-I/O closure tests, final record/active-document gates, compilation and diff checks recorded in 209. No full lane suite or QC/provider access; floor unchanged 251/192/34/662. | One prospective Analyst look and total two-sided 1/80 alpha remain; no per-arm alpha or paper/deployment authority. QCOM historical repair and archive-vintage concerns remain open. | One same-lane push; Claude reviews section 209 and exact commits, then Codex counter-reviews. A reviewed common-epoch two-arm protocol and all ARV2-9 prerequisites are required before formal paper confirmation. |
 | 2026-09-28 | Codex owner-directed bounded forward continuation | `ccc522f` -> `f9fa648`, `d6c855d`, and this final record commit | Section 210 firewall correction, private same-day vendor receipt, and input-only QC snapshot candidate | Move authentication to the host CLI while keeping the forward core import-pure; collect 141 ratings, 16 earnings and 10 guidance rows in ignored private artifacts; prepare seven-source exact-SID/cap/weight diagnostic with no prices, orders or outcomes. The QC source has not been compiled or run in Cloud. | Required import-firewall regression and affected forward/QC closure battery 285 passed; final record/active-document, compilation and diff checks in section 210. No complete suite. No new QC research look or result cell; floor 251/192/34/662. | Required import-firewall gate corrected; no-price and pre-cutoff timing findings corrected before cloud use. QC callback/EndTime and Object Store behavior remain unverified; the partial-day capture cannot prove PIT availability. | One same-lane push. Claude reviews both sections 209–210 and each commit; Codex counter-reviews before a later bounded QC diagnostic or efficacy step. Formal paper, broker and trading gates remain closed. |
 | 2026-09-28 | Claude independent review of sections 207–210: the R246 mechanism split, the dual forward rule, forward-quality receipts, and the input-only QC snapshot | `d75c114` -> `8c06df6` -> this record commit | Section 211: eight commits `1cb3705..d75c114` individually disposed (6 accepted, 2 accepted after correction, 0 rejected); Codex's six qualifications of section 206 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned three unpinned guards (`8c06df6`, test-only, each red with its guard removed); section 4 names section 211, banner sentence added, this row appended; no production line changed | Required gates at the pushed head, standing lane selection in a byte-faithful export, focused new files, seventeen mutation trials, R232-versus-R246 source diff, per-year check from retained receipts, `compileall`, `git diff --check`; exact counts in 211.7 | 0 P0, 0 P1, 0 P2, 4 P3 (`ARV2R211-001` through `-004`): inherited `ar_on100` diagnostics label on four derived arms, snapshot warm-up refusal, per-year uncertainty of the historical AR effect (t ≈ 0.6), and three unpinned guards (corrected) | Single push of the Claude commits of this round; Codex counter-reviews section 211 and settles the snapshot warm-up refusal before its first QC launch |
+| 2026-09-29 | Codex owner-directed QCOM-admitted six-universe replay | `0808b3a` -> `855fb32` and this final record/closure commit | Section 213: R225 Mia snapshot recovery, R226/R228/R229 matched results, and twelve prospectively frozen R248--R259 order-based replay arms with QCOM eligible | All sixteen new aggregate reads passed their one-use gates and 261/261 weekly rebalances; R225 is an owner/Mia independently completed saved-snapshot run, not a fourth Codex launch; R248--R259 each used A1. Returns, drawdowns and caveats are in section 213 and the shared ledger. | New focused tests 120 passed; mandatory package closure corrected and its file 74 passed; current-v2 import firewall, final active-document/compile/diff checks. No complete Codex lane suite. Closing floor 270/208/37/678. | `ARV2D213-001` P2 corrected (unregistered modules in required package closure); `-002` P3 inherited diagnostic arm mislabel and `-003` P3 extra R225 main-hash hardening documented. QC minute-fill tape/vintage, historical adaptivity and R247 forward-input gate remain open. | One final same-lane push; Claude independently reviews every commit and exact result/bookkeeping evidence, then Codex counter-reviews. No formal alpha, paper/live/funded/broker or real-order authority. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -29972,3 +29985,148 @@ transitive import-closure regression passed; targeted Python compilation and
 source and green against A3; non-datetime refusal remained green. The
 complete lane/repository suite was **not run**, per owner instruction; Claude
 owns that validation. No evidence supports a new alpha or trading claim.
+
+## 213. QCOM-admitted historical replay, 2026-09-28/29
+
+The owner clarified that the requested replay means **adding QCOM back as an
+eligible direct stock**, not repeating the QCOM-excluded sensitivities. The
+previous R231--R246 runs remain immutable. This is an exploratory,
+order-based, 2021-01-04--2025-12-31 replay using the same reviewed historical
+input package, weekly decision axis, 98% target gross exposure, 2x buying-
+power admission, 10-bps-per-side modeled fee, and each predecessor's own
+coverage, minimum-name, analyst-revision and slippage rules. QCOM is eligible,
+not forced into any holding. These replays do not constitute an independent
+confirmation sample: QuantConnect repaired the previously missing QCOM price,
+and the full stock minute-price/fill tape is not digest-attested across the old
+and new runs. A difference from R231--R246 cannot be assigned solely to QCOM.
+
+### 213.1 Existing QCOM-included counterparts and completed results
+
+R225, R226, R228 and R229 were already separately frozen as QCOM-included
+counterparts of R231--R234. No fourth attempt was made for exhausted R225.
+After the owner/Mia-launched R225 rerun completed, its exact QC saved snapshot
+`37101502` (18 files, including the notebook) was authenticated before its
+one-use aggregate read. Unlike mutable project files, that snapshot preserves
+the run source after the project was renamed. Only `main.py` differs from the
+Codex A3 runtime closure; its additional callback diagnostics do not alter
+weights, fees or submitted orders. R226 used its second and last-used slot;
+R228 and R229 used A1. Their one-use custom-statistic readers accepted
+`run_valid=true`, all 261 weekly rebalances, and zero invalid/canceled orders.
+
+| QCOM-included run | Old excluded analogue | AR arm / slippage | Cumulative return after modeled fees | Maximum drawdown |
+| --- | --- | --- | ---: | ---: |
+| R225 Mia completed, `c09f064ad40702f6e984939e5b96ff08` | R231 | off / 0 bps | +137.3057% | -21.7620% |
+| R226 A2, `ad91a590d773db05dd893b21d3c2ad44` | R232 | on100 / 0 bps | +154.1483% | -21.8269% |
+| R228 A1, `e943be0d7950ff45a7a76439bd086262` | R233 | off / 5 bps | +132.8056% | -21.8131% |
+| R229 A1, `96ff92ed72f36bf190fd2b10dea47967` | R234 | on100 / 5 bps | +149.1104% | -21.8974% |
+
+Within these new runs, on100 minus off is +16.8425 percentage points at zero
+modeled slippage and +16.3048 points at 5-bps modeled slippage. The arms
+share the frozen input package and construction, but the evaluator does not
+prove identical full stock minute-fill paths across jobs. These spreads are
+research sensitivities, not formal alpha or live-trading evidence. The four
+new completed launches add four conservative development looks and four
+authenticated exploratory cells: the section-212 floor of 254/192/37/662
+becomes **258 shared looks / 196 development evaluations / 37 infrastructure
+looks / 666 cells** before the separately frozen R248--R259 launches.
+
+### 213.2 Prospective twelve-variant source freeze
+
+Commit `855fb32` prospectively freezes a new QCOM-admitted source family,
+R248--R259, mapping one-for-one to R235--R246. Manifest SHA-256 is
+`032d513c197507146c793bced6cfb5085347727c8558fc96bb91aeaa06473e62`.
+The renderer verifies each predecessor projection SHA, removes only the exact
+QCOM-exclusion nodes, versions all identities, recomputes baseline/profile and
+projection hashes, and audits each 17-file closure. Four inverse-AST checks
+against the original QCOM-included baseline and all twelve later-arm builds
+passed. The submission/parser binds exact source/profile/writer schemas,
+preserves per-candidate three-attempt budgets and one bounded result read,
+and refuses residual exclusion fields. None of these IDs re-labels an old
+run. Source and manifests were committed before the first new QC launch.
+
+### 213.3 R248--R259 first-attempt execution and bounded results
+
+All twelve candidates uploaded and read back their exact 17-file projections,
+compiled, and launched once in their separately pinned private QC projects.
+Each reached `Completed.`; its sole receipt-bound aggregate read authenticated
+`run_valid=true`, 261/261 weekly rebalances, submitted orders equal filled
+orders, zero invalid/canceled orders, and zero closing-minute reference
+repairs. Each used A1 of its own three-attempt allowance; no A2 or A3 was
+launched. Values are cumulative 2021-01-04--2025-12-31 after modeled
+10-bps-per-side fees and zero modeled slippage. The profile and projection
+identities in each result match the prospectively committed manifest.
+
+| QCOM-admitted run (excluded analogue) | Project / backtest ID | Coverage / minimum names / AR transfer | Net return | Maximum drawdown |
+| --- | --- | --- | ---: | ---: |
+| R248 (R235) | `37119719` / `e7df7f2324cd626d98c67897f8da3ad4` | 25% / 5 / 80% | +149.9302% | -21.8104% |
+| R249 (R236) | `37119718` / `9d9a6342179d66764194ddfbb3a0b4fb` | 25% / 5 / 120% | +158.1413% | -22.1032% |
+| R250 (R237) | `37119882` / `ed2a74b2f9b2a43bec56a80b8a80973d` | 25% / 5 / 200% | +160.9307% | -22.1047% |
+| R251 (R238) | `37119956` / `5ac37e9e3c7425ea22bff7bc4a5bef3c` | 10% / 5 / off | +137.3057% | -21.7620% |
+| R252 (R239) | `37120097` / `3f49777b06d85da9416ebfbbc18e68dd` | 10% / 5 / 80% | +149.9302% | -21.8104% |
+| R253 (R240) | `37120173` / `18787f57a4d73f0ba5866cf45a1ff2b0` | 10% / 5 / 120% | +158.1413% | -22.1032% |
+| R254 (R241) | `37120290` / `d0843468a1a64ca4967fd75a41500232` | 10% / 5 / 200% | +160.9307% | -22.1047% |
+| R255 (R242) | `37120336` / `1fc5b09f74af1a02f846b90f3823ae29` | 10% / 3 / off | +136.4598% | -21.7615% |
+| R256 (R243) | `37120473` / `a133193f95e87ea8574cd13920eff426` | 10% / 3 / 80% | +150.4135% | -21.8104% |
+| R257 (R244) | `37120537` / `113a88fee502ddd3a48f1fc8283176df` | 10% / 3 / 120% | +158.6129% | -22.1032% |
+| R258 (R245) | `37120674` / `12d5b41137c5d8d3f72eab67f47fc572` | 10% / 3 / 200% | +161.3780% | -22.1047% |
+| R259 (R246) | `37120729` / `964f66d850fa021a8d9af95b446de831` | 25% / 5 / AR entry/count only, 0% transfer | +133.1794% | -21.7619% |
+
+Twelve new development launches and twelve accepted exploratory cells move
+section 213.1's interim floor **258/196/37/666** to **270 shared looks / 208
+development evaluations / 37 infrastructure looks / 678 cells**. The
+owner-authorized shared ledger has one separately identified entry for each
+look; result reads do not add looks. The common membership/cap digest is
+`b3233cf7b2a0a85cee81c2cefd891c8a4f6a57491ec9ce0bc33e50d1968c2063`
+and ETF-panel digest is
+`89d9c6387c0cf47fa70a8a0c9c3108cae263436e0b8e503fc127ecbe9deeff66`.
+These attest common input geometry, not identical complete stock-minute fill
+tapes across cloud jobs. The 25%- and 10%-floor five-name arm pairs had equal
+returns, drawdowns, filled-order and selection aggregates; this is observed
+invariance here, not a general claim that coverage floors do not matter.
+
+Within the QCOM-admitted cohort, AR-on80/on120/on200 minus the 25%-five-name
+AR-off arm R225 is +12.6244/+20.8356/+23.6249 percentage points. The
+10%-three-name contrasts against R255 are +13.9537/+22.1530/+24.9182
+points. R259's AR entry/count/fallback without weight transfer is -4.1264
+points against fully AR-off R225; full AR-on100 R226 is +20.9689 points above
+R259's same-entry baseline. These are net, adaptive, historical-current-
+vintage sensitivities, not formal or prospective alpha. Every QCOM-admitted
+return is 3.69--6.53 points below its QCOM-excluded analogue, but the jobs do
+not attest identical complete minute-fill tapes or vendor vintages, so the
+difference is not a causal QCOM estimate. No paper/live/funded/real-order authority
+is inferred.
+
+### 213.4 Round review notes for Claude
+
+Commit `855fb32` freezes the QCOM-restored inverse-AST renderer, twelve-arm
+manifest, one-use study/parser and launcher, the exact saved-snapshot R225 Mia
+recovery, and focused tests. Its source/prospective pins are accepted after
+local audit. `ARV2D213-001` (P2, corrected in this round): the commit omitted
+both new modules from the mandatory whole-QC-package import/no-I/O closure
+registry. That exact test was red and is now green after registration of the
+new sources, import edges and empty external-I/O surfaces. `ARV2D213-002`
+(P3, documented): the inherited derived-arm `diagnostics.arm` label remains
+`ar_on100` for R248--R250, R252--R254, R256--R258 and R259, whereas the
+profile-bound aggregate correctly identifies on80/on120/on200/on0. This
+mislabel also exists in the old excluded predecessors (`ARV2R211-001`); it
+does not authenticate the arm or alter weights/returns, but future projection
+work should correct it prospectively. `ARV2D213-003` (P3, documented): the
+snapshot recovery verifies the full 18-file saved inventory and exact
+baseline equality for all runtime files except `main.py`, whose changed hash
+is not separately hard-coded in the reader. The saved snapshot is bound to
+the one-use evidence digest and matches the earlier independently reviewed
+Mia diagnostic `main.py`; a literal hash pin would be further defense.
+
+Focused validation: the new source/projection/study/recovery tests passed
+120/120 before the closure correction; the corrected whole-QC-package test
+file passed 74/74; the current-v2 outcome-free import firewall passed.
+Every cloud source passed exact upload/readback and compile, and each valid
+run passed its one-use result gate. No complete lane suite was run by Codex,
+per the owner rule. Before push, rerun active-document gates, compile and
+`git diff --check` on the final tree. Claude should review the exact commit
+range from `0808b3a` through the final record commit, the corrected closure
+pin, every QCOM-restored candidate/result identity and look-bookkeeping row,
+the R225 saved-snapshot nuance, and the vintage/tape and inherited-label
+qualifications. The next bounded step is an independently reviewed forward
+input/clock correction to exhausted R247, not a fourth R247 attempt or a
+historical AR-capacity winner selection.

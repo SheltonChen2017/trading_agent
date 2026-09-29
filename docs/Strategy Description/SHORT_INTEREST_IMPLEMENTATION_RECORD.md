@@ -9511,3 +9511,69 @@ capital, order or trading action in this round. In line with the owner's
 one-final-push instruction and section 66.1, **no partial push occurs at this
 factual gate**; this commit range is local-only and unavailable to Claude on
 another computer until a later authorized final lane push.
+
+## 71. Authenticated QC source check; FINRA admission still denied — 2026-09-29
+
+The owner clarified that this account's QuantConnect credentials and
+subscriptions are already used by other strategy lanes and directed Codex to
+start. This is recorded as `SI-AUTH-20260929-05` for a bounded Short Interest
+**source-qualification check** using the existing account. It does not itself
+establish this dataset's entitlement or point-in-time integrity, nor does it
+authorize an outcome look, QC project, upload, compile, research/history job,
+backtest, broker, paper/live action, order or trading action. The existing
+credential transport's `is_configured()` returned true and its allowlisted
+`QuantConnectClient.authenticate()` returned `success=true` on 2026-09-29;
+only those booleans were printed. No credential, account ID, billing detail,
+market row or outcome was logged or retained. No Short Interest QC job or
+historical-data request was made.
+
+The signed-in [OTC Transparency dataset listing](https://www.quantconnect.com/datasets/finra-otc-transparency)
+shows **Cloud Usage: subscription required**, while its Pricing tab offers
+**zero licensing options**. This is stronger evidence of a FINRA-specific
+access question than the mere existence of a Researcher seat, but it is not
+proof of either usable or unusable `FINRAShortInterest` history. QC's
+[dataset documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/financial-industry-regulatory-authority/otc-transparency)
+describes a history route and aggregate coverage beginning in January 2017;
+it does not certify accessible coverage for this organization or immutable
+first-published records. [FINRA says](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+that corrected short-interest items are flagged but **only the most recent
+data is made available**. Its published revision flag is not an original-value
+or correction-time archive. The [historical-files page](https://www.finra.org/finra-data/browse-catalog/equity-short-interest/files)
+also distinguishes OTC-only coverage before June 2021; the QC dataset's
+aggregate start date cannot establish listed-stock coverage then. FINRA's
+[developer documentation](https://developer.finra.org/docs) states that
+consolidated short interest is available by 4:40 p.m. ET on its publication
+date, but that does not authenticate each historical record's release instant.
+The already-chosen release-next-regular-open treatment stays conservative.
+
+The persistent P0–P3 ledger is unchanged in priority: `SI-SRC-20260928-001`
+P2 remains **open** pending an authenticated release-date binding;
+`SI-SRC-20260928-002` P2 remains **open** pending first-published vintages or
+a complete, testable exclusion of every affected release; and
+`SI-SRC-20260928-003` P2 remains **open** because QC authentication is not
+FINRA entitlement, actual PIT 20/60/120/252 price/volume coverage, stable
+identity, terminal-value or cloud-route proof. The earlier source-preflight
+P3 closures remain closed and the out-of-lane `SI-CR5-005` /
+`SI-CCR16-007` remains open, documented and untouched. Commit
+`924d161442a2c64d06fa0cfee137426a849e2d0e` is accepted as the
+record-only disposition of the earlier synthetic preflight; it made no source
+admission claim. All local commits after remote head
+`985743e77212c0313121f1ae1754e03dd452c374` still await Claude's
+whole-lane independent review.
+
+The next factual action is a non-secret, independently verifiable QC/provider
+answer to two questions: whether this organization may access
+`FINRAShortInterest` in cloud research/backtests despite the listing's
+subscription-required/zero-option state, and whether historical files retain
+first-published values plus revision-effective times or are overwritten. If
+the latter cannot be proved, affected releases must be excluded with a
+testable completeness rule or the SI feed is rejected; do not replace it with
+daily short-sale volume. Separately establish listed-stock date coverage,
+release calendar, and PIT price/volume/identity/terminal rights before the
+prospective power/date/look freeze and any outcome join. Authorized and
+consumed real outcome looks remain **0/0**. No lookback winner or stock result
+exists. No code or shared document changed in this check; focused
+`tests/test_active_document_consistency.py` finished **69 passed in 0.96s**
+under the lane's Python 3.13 environment, and `git diff --check` was clean.
+The full lane/repository suite was not run. The owner's single-final-push
+rule still applies: **no partial push** at this factual gate.

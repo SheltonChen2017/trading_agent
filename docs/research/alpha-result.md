@@ -6170,3 +6170,26 @@ QC callbacks but did not consume prices/returns or submit orders; no
 outcome-bearing statistic was selected. The conservative floor moves from
 **278 shared / 216 development / 37 infrastructure looks / 685 cells** to
 **279 shared / 216 development / 38 infrastructure looks / 685 cells**.
+
+## R-268 A1 — eight-universe fully AR-off baseline — 2026-09-29
+
+One owner-authorized exploratory **development** look was spent by launching
+the prospectively frozen order-based R268 baseline. Source-family manifest
+SHA-256 `b6802d0d7cffdc459db5e73de7ccd1e237ea0eaa412c4c44d182f759677e7b51`
+and source-freeze commit `9df9343` precede the launch. Private project
+**37125044**, backtest `9bd7d333cfe1156cf3b83e55faf28cb5`, A1 reached
+QC `Completed.` but the one-use aggregate read is **run-valid=false**; no
+result cell is claimed. The generated
+source selects top-ten cap-ranked eligible names without any analyst score,
+under 98% gross exposure, eight equal 12.25% sleeve budgets, combined
+9.8% direct-stock ID cap, 10-bps-per-side modeled fees, zero modeled
+slippage, and 2x buying-power admission. The input-only R267 gate passed
+before launch. The invalidity is one overnight holding-drift skip: 261
+decisions, 260 submitted and completed rebalances, zero invalid/canceled
+orders, zero execution failure, and matching modeled/engine fees. The
+aggregate gives a drift-path digest, not the skipped session or cause; no
+return is interpreted as evidence. No AR-on arm may launch until an
+authenticated R268 result is valid. This launch moves the conservative
+floor to **280 shared / 217 development / 38 infrastructure looks / 685
+cells**. A2, if used, must preserve this A1 record and first classify the
+drift without relaxing the outcome gate.

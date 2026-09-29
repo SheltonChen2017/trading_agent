@@ -69,6 +69,10 @@ QCOM_SCORE_FLOOR1_MANIFEST_PATH = Path(__file__).with_name("six_universe_qcom_sc
 # the R267 count-only input gate has been preregistered.
 FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256 = "b6802d0d7cffdc459db5e73de7ccd1e237ea0eaa412c4c44d182f759677e7b51"
 EIGHT_UNIVERSE_MANIFEST_PATH = Path(__file__).with_name("eight_universe_candidates.json")
+# R268 A1 remains on the nine-arm freeze above. Only its spent A2 retry uses
+# this diagnostic source; A3 needs a separately frozen successor.
+FROZEN_EIGHT_R268_A2_MANIFEST_SHA256 = "231db0de573ebeeaf5d4ca5caac1aa15627245a0741bfe19a5c1b2504606eb1f"
+EIGHT_R268_A2_MANIFEST_PATH = Path(__file__).with_name("eight_universe_r268_a2_diagnostic.json")
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -316,6 +320,17 @@ def _eight_universe_manifest():
     return study.validate_manifest(json.loads(raw))
 
 
+def _eight_r268_a2_manifest():
+    pin = FROZEN_EIGHT_R268_A2_MANIFEST_SHA256
+    if type(pin) is not str or not cap._HEX.fullmatch(pin):
+        _fail("R268 A2 has no frozen diagnostic manifest pin")
+    raw = EIGHT_R268_A2_MANIFEST_PATH.read_bytes()
+    if hashlib.sha256(raw).hexdigest() != pin:
+        _fail("R268 A2 diagnostic manifest changed")
+    from . import eight_universe_r268_a2_diagnostic as diagnostic
+    return diagnostic.validate_manifest(json.loads(raw))
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -352,6 +367,10 @@ def _plan_manifest(plan):
     if type(plan.family) is str and plan.family == "qcom_score_floor1":
         return _qcom_score_floor1_manifest()
     if type(plan.family) is str and plan.family == "eight_universe":
+        if plan.candidate_id == "R268" and plan.attempt == 2:
+            return _eight_r268_a2_manifest()
+        if plan.candidate_id == "R268" and plan.attempt == 3:
+            _fail("R268 A3 requires its own prospective source freeze")
         return _eight_universe_manifest()
     _fail("relaxed plan family changed")
 
@@ -372,6 +391,10 @@ def _plan_manifest_sha256(plan):
     if type(plan) is RelaxedQcPlan and plan.family == "qcom_score_floor1":
         return FROZEN_QCOM_SCORE_FLOOR1_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "eight_universe":
+        if plan.candidate_id == "R268" and plan.attempt == 2:
+            return FROZEN_EIGHT_R268_A2_MANIFEST_SHA256
+        if plan.candidate_id == "R268" and plan.attempt == 3:
+            _fail("R268 A3 requires its own prospective source freeze")
         return FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
@@ -615,6 +638,8 @@ def launch(plan, projection, api):
         from . import eight_universe_study as study
         study.require_input_readiness(plan)
         study.require_completed_baseline(plan)
+        if plan.candidate_id == "R268" and plan.attempt == 2:
+            study.require_invalid_baseline_a1(plan)
     _require_inputs(plan)
     common._client(api)
     if _path(plan, "claim").exists():
@@ -840,6 +865,9 @@ def _parse_order(plan, statistics):
         from . import six_universe_qcom_score_floor1_study as study
         return study.parse_order(plan, statistics)
     if type(plan) is RelaxedQcPlan and plan.family == "eight_universe":
+        if plan.candidate_id == "R268" and plan.attempt == 2:
+            from . import eight_universe_r268_a2_diagnostic as diagnostic
+            return diagnostic.parse_result(plan, statistics)
         from . import eight_universe_study as study
         return study.parse_order(plan, statistics)
     return _parse_order_common(plan, statistics)

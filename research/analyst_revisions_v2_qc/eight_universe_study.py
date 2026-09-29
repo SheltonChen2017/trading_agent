@@ -474,13 +474,58 @@ def require_input_readiness(plan):
     return True
 
 
+def require_invalid_baseline_a1(plan):
+    """Authenticate the spent, one-skip A1 before A2 may touch its project."""
+    if (type(plan) is not adapter.RelaxedQcPlan or plan.family != FAMILY
+            or plan.candidate_id != BASELINE or plan.attempt != 2):
+        _fail("R268 A2 invalid predecessor plan changed")
+    a1 = dataclasses.replace(plan, attempt=1)
+    row = adapter._candidate(a1)
+    launch = adapter.common._read(adapter._path(a1, "launch"))
+    adapter._receipt(a1, launch)
+    expected = {
+        "candidate_id": BASELINE, "attempt": 1,
+        "project_id": launch["project_id"],
+        "backtest_id": launch["backtest_id"], "status": "Completed.",
+    }
+    if (adapter.common._read(adapter._path(a1, "project")) != {
+            "candidate_id": BASELINE, "project_id": launch["project_id"],
+            "project_name": row["project_name"]}
+            or adapter.common._read(adapter._path(a1, "terminal")) != expected
+            or adapter.common._read(adapter._path(a1, "read-claim")) != expected):
+        _fail("R268 A1 project, terminal, or one-use read lineage changed")
+    retained = adapter._read_artifact(adapter._path(a1, "raw-custom"))
+    if (type(retained) is not dict or set(retained) != set(expected) | {"statistics"}
+            or any(retained.get(key) != value for key, value in expected.items())
+            or type(retained["statistics"]) is not dict
+            or set(retained["statistics"]) != set(STATISTIC_NAMES)):
+        _fail("R268 A1 retained custom-statistic lineage changed")
+    parsed = parse_order(a1, retained["statistics"])
+    saved = adapter._read_artifact(adapter._path(a1, "result"))
+    if saved != {**expected, **parsed,
+                  "manifest_sha256": adapter.FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256,
+                  "projection_sha256": row["projection_sha256"]}:
+        _fail("R268 A1 saved result differs from its exact retained statistics")
+    aggregate = adapter._statistic(
+        retained["statistics"][STATISTIC_NAMES[1]], eight_aggregate=True)
+    execution = aggregate.get("execution")
+    if (parsed["run_valid"] is not False or type(execution) is not dict
+            or execution.get("decision_count") != PROTOCOL["decision_count"]
+            or execution.get("holding_drift_skipped_rebalance_count") != 1
+            or execution.get("submitted_rebalance_count") != 260
+            or execution.get("completed_rebalance_count") != 260):
+        _fail("R268 A1 is not the authenticated one-drift-skip predecessor")
+    return True
+
+
 def require_completed_baseline(plan):
     """Permit nonbaseline launches only after an authenticated valid R268 run."""
     if type(plan) is not adapter.RelaxedQcPlan or plan.family != FAMILY:
         _fail("eight-universe baseline prerequisite plan changed")
     if plan.candidate_id == BASELINE:
         return True
-    for attempt in (1, 2, 3):
+    # A3 has no source freeze yet and cannot authenticate as a baseline.
+    for attempt in (1, 2):
         baseline = dataclasses.replace(plan, candidate_id=BASELINE, attempt=attempt)
         result_path = adapter._path(baseline, "result")
         if not result_path.exists():
@@ -496,16 +541,17 @@ def require_completed_baseline(plan):
                 or adapter.common._read(adapter._path(baseline, "read-claim")) != expected):
             _fail("eight-universe baseline completion lineage changed")
         retained = adapter._read_artifact(adapter._path(baseline, "raw-custom"))
+        statistic_names = set(adapter._candidate(baseline)["statistic_names"])
         if (type(retained) is not dict or set(retained) != set(expected) | {"statistics"}
                 or any(retained.get(key) != value for key, value in expected.items())
                 or type(retained["statistics"]) is not dict
-                or set(retained["statistics"]) != set(STATISTIC_NAMES)):
+                or set(retained["statistics"]) != statistic_names):
             _fail("eight-universe baseline custom-statistic lineage changed")
-        parsed = parse_order(baseline, retained["statistics"])
+        parsed = adapter._parse_order(baseline, retained["statistics"])
         saved = adapter._read_artifact(result_path)
         if saved != {
             **expected, **parsed,
-            "manifest_sha256": adapter.FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256,
+            "manifest_sha256": adapter._plan_manifest_sha256(baseline),
             "projection_sha256": adapter._candidate(baseline)["projection_sha256"],
         }:
             _fail("eight-universe saved baseline differs from retained statistics")

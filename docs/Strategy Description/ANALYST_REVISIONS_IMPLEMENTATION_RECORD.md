@@ -30469,3 +30469,48 @@ parser and study batteries pass; the source is **unrun** in QC at this
 checkpoint. R268 A1 may launch only from the committed prospective freeze
 and the authenticated R267 input gate; any later correction uses one of at
 most three attempts and is logged explicitly.
+
+Source-freeze commit `9df9343` preceded the first outcome launch. R268 A1
+uploaded and compiled the exact 17-file baseline in private project
+**37125044** and launched backtest
+`9bd7d333cfe1156cf3b83e55faf28cb5`. QC reported `Completed.`, and the
+one-use custom-statistic read authenticated the profile and returned a
+**run-valid=false** aggregate. The executor counted 261 decisions but only
+260 submitted and completed rebalances: one overnight holding-drift skip.
+There were zero invalid or canceled orders, execution failures, forced
+delistings, and fee mismatches; the cash, exposure, and target-tracking
+checks passed. Completion therefore does **not** license an R268 return or
+any baseline-versus-tilt comparison. The saved aggregate discloses a drift
+path digest but not the skipped session or failed replan predicate. The
+runtime permits an overnight drift replan only for a same-session split
+record and an exactly matching adjusted quantity; which predicate failed
+is not yet proven. A byte-identical rerun would not address the evidence.
+This spends one of R268's three attempts and one development look, with no
+valid result cell: floor **280/217/38/685**. R269--R276 remain blocked until
+an authenticated valid R268 baseline. An attempt-specific redacted
+diagnostic, if frozen prospectively, may use A2 to classify the skip without
+silently relaxing the validity rule or changing the historical A1 source.
+
+### 215.3 Prospective R268 A2 drift diagnostic freeze
+
+R268 A2 reuses A1's private QC project and is explicitly the second of
+R268's maximum three attempts. Its separately pinned manifest is
+`231db0de573ebeeaf5d4ca5caac1aa15627245a0741bfe19a5c1b2504606eb1f`,
+and its 17-file projection is
+`fd8087dc0b8bdb577541017ee1fc91c804632972c6f206c81f6c84295b6ffc0a`
+(403,454 bytes). The strategy profile remains A1's
+`db5706906681542dfb084f21ed4b20311d71f076777b08070d7ec4b493dbea42`.
+Exactly two source files differ from A1: a subclass override calls the
+original split replan before recording a refused-drift reason, and the
+existing summary writer emits one additional bounded statistic. Orders,
+targets, fees, exposure, and the zero-skips validity rule are unchanged.
+The new value reports only the execution date, changed/rejected holding
+counts, missing-split versus split-quantity-mismatch classification, and
+whether a missing same-session split callback arrived later; no security
+identifier, raw row, or return is printed by the diagnostic CLI. A2's
+launch authenticates A1's retained statistics, failed result, and one-use
+receipt before any cloud mutation. A1 keeps its original manifest pin, and
+A3 is refused pending its own prospective source freeze. Independent AST
+comparison found no non-diagnostic source change. The five relevant focused
+test files passed **104/104**; `preview R268 --attempt 2` reproduced the
+pins above. This source is **unrun** at the freeze checkpoint, not a result.

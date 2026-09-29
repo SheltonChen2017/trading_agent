@@ -17,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from research.analyst_revisions_v2_qc import eight_universe_qcom_admitted_projection as renderer
+from research.analyst_revisions_v2_qc import eight_universe_r268_a2_diagnostic as drift_a2
 from research.analyst_revisions_v2_qc import eight_universe_study as study
 from research.analyst_revisions_v2_qc import six_universe_relaxed_submission as adapter
 from research.analyst_revisions_v2_qc import six_universe_coverage_submission as credentials
@@ -27,8 +28,12 @@ from scripts.run_arv2_qcom_restored import _literal, package
 CONTROL = ROOT / "artifacts/analyst_revisions_v2/eight_universe_qc_control_20260929"
 
 
-def projected(candidate, inputs=None):
+def projected(candidate, inputs=None, *, attempt=1):
     """Build one exact new 17-file order source without cloud or outcome I/O."""
+    if candidate == study.BASELINE and attempt == 2:
+        return drift_a2.build_projection(package() if inputs is None else inputs)
+    if candidate == study.BASELINE and attempt != 1:
+        raise ValueError("R268 A3 requires its own prospective source freeze")
     return renderer.build_eight_universe_projection(
         package() if inputs is None else inputs,
         study.CANDIDATE_ARMS[candidate], candidate,
@@ -102,7 +107,11 @@ def main():
     if Path.cwd().resolve() != ROOT or ROOT.name != "trading_agent__analyst_revisions_v2":
         raise ValueError("operation requires the designated lane worktree")
     if args.operation == "freeze":
-        result = freeze()
+        if args.candidate == study.BASELINE and args.attempt == 3:
+            raise ValueError("R268 A3 requires its own prospective source freeze")
+        result = (drift_a2.freeze_manifest(package())
+                  if args.candidate == study.BASELINE and args.attempt == 2
+                  else freeze())
     else:
         plan = adapter.build_plan(
             args.candidate,
@@ -110,7 +119,7 @@ def main():
             CONTROL, args.attempt, family=study.FAMILY,
         )
         if args.operation == "preview":
-            identity = adapter.preview(plan, projected(args.candidate)[0])
+            identity = adapter.preview(plan, projected(args.candidate, attempt=args.attempt)[0])
             result = {key: identity[key] for key in (
                 "candidate_id", "attempt", "manifest_sha256",
                 "projection_sha256", "profile_sha256",
@@ -118,7 +127,7 @@ def main():
         else:
             api = credentials.production_client()
             if args.operation == "launch":
-                receipt = adapter.launch(plan, projected(args.candidate)[0], api)
+                receipt = adapter.launch(plan, projected(args.candidate, attempt=args.attempt)[0], api)
                 result = {key: receipt[key] for key in (
                     "candidate_id", "attempt", "project_id", "backtest_id",
                 )}
@@ -127,6 +136,11 @@ def main():
                 result = (adapter.poll_status(plan, receipt, api)
                           if args.operation == "status"
                           else adapter.read_result_once(plan, receipt, api))
+                if (args.operation == "read" and args.candidate == study.BASELINE
+                        and args.attempt == 2):
+                    diagnostic = result["drift_diagnostic"]
+                    result = {key: diagnostic[key] for key in (
+                        "holding_drift_skip_count", "rejections")}
     print(json.dumps(result, sort_keys=True, indent=2))
 
 

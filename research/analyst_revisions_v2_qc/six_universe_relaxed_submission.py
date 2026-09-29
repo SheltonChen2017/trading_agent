@@ -90,6 +90,13 @@ _PRECREATE_A2_RECOVERY = {
         "6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef",
         "954aeea6c375659d7dfd6d8357cde1a70623287f4cdc7581f4e3a4070a650e35",
         37065931),
+    # R263 A1 spent its claim and uploaded the frozen source, but its
+    # backtests/create request failed before a launch receipt. The observed
+    # empty remote inventory does not establish a cause for that failure.
+    ("qcom_score_floor1", "R263"): (
+        "3fde7673114794db256336c7c738c185859dd46e3d9af0765aa1cd7d008e5b86",
+        "a2e05e106752d6f429795010ad6635b25969756f03e9433303a801ef7b59b990",
+        37122864),
 }
 
 

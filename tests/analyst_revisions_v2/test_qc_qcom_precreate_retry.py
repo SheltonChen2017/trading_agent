@@ -5,7 +5,9 @@ import dataclasses
 import pytest
 
 from research.analyst_revisions_v2_qc import six_universe_relaxed_submission as adapter
+from research.analyst_revisions_v2_qc import six_universe_qcom_score_floor1_study as floor1_study
 from scripts import run_arv2_qcom_exclusion_tilt as script
+from scripts import run_arv2_qcom_score_floor1 as floor1_script
 from tests.analyst_revisions_v2.test_qc_relaxed_submission import ORG
 
 
@@ -86,6 +88,99 @@ def test_r237_a2_precreate_recovery_refuses_ambiguous_predecessor(recovery, defe
     elif defect == "wrong_project":
         adapter._path(plan, "project").unlink()
     elif defect == "prior_launch":
+        adapter.common._write(adapter._path(prior, "launch"), {"unexpected": True})
+    elif defect == "wrong_source":
+        files[0]["content"] += "# changed\n"
+    elif defect == "remote_orphan":
+        inventory[0] = [{"backtestId": "orphan"}]
+    elif defect == "late_orphan":
+        inventory[1] = [{"backtestId": "orphan"}]
+    with pytest.raises((adapter.RelaxedQcSubmissionError,
+                        adapter.common.SixUniverseSettlementSubmissionError)):
+        adapter.launch(plan, projection, object())
+    assert not any(endpoint == "backtests/create" for endpoint, _body in calls)
+
+
+@pytest.fixture(scope="module")
+def r263_projection():
+    return floor1_script.projected("R263")[0]
+
+
+@pytest.fixture
+def r263_recovery(tmp_path, monkeypatch, r263_projection):
+    plan = adapter.build_plan("R263", ORG, tmp_path / "controls", 2,
+                              family="qcom_score_floor1")
+    prior = dataclasses.replace(plan, attempt=1)
+    adapter.common._write(adapter._path(prior, "claim"),
+                          adapter.preview(prior, r263_projection))
+    row = adapter._candidate(plan)
+    adapter.common._write(adapter._path(plan, "project"), {
+        "candidate_id": "R263", "project_id": 37122864,
+        "project_name": row["project_name"]})
+    monkeypatch.setattr(adapter, "_require_inputs", lambda _plan: None)
+    monkeypatch.setattr(adapter.common, "_client", lambda _api: None)
+    # The pilot's authenticated-result gate has separate tests; this fixture
+    # isolates only the spent-A1, pre-create recovery path.
+    monkeypatch.setattr(floor1_study, "require_successful_pilot", lambda _plan: None)
+    calls = []
+    inventory = [[], []]
+    files = [{"projectId": 37122864, "name": item.project_path,
+              "content": item.source_bytes.decode("ascii")}
+             for item in r263_projection.source_files]
+
+    def post(_api, endpoint, body):
+        calls.append((endpoint, body))
+        if endpoint == "authenticate":
+            return {}
+        if endpoint == "projects/read":
+            return {"projects": [{"projectId": 37122864,
+                "name": row["project_name"], "organizationId": ORG,
+                "language": "Py", "owner": True, "codeRunning": False,
+                "public": False, "collaborators": [{"owner": True}]}]}
+        if endpoint == "files/read":
+            return {"files": files}
+        if endpoint == "backtests/list":
+            rows = inventory.pop(0)
+            return {"count": len(rows), "backtests": rows}
+        if endpoint == "compile/create":
+            return {"compileId": "compile-r263-a2"}
+        if endpoint == "compile/read":
+            return {"compileId": "compile-r263-a2", "state": "BuildSuccess"}
+        if endpoint == "backtests/create":
+            return {"backtest": {"projectId": 37122864,
+                "name": body["backtestName"], "backtestId": "r263-recovered-a2",
+                "status": "In Queue..."}}
+        raise AssertionError(f"unexpected remote endpoint {endpoint}")
+
+    monkeypatch.setattr(adapter.common, "_post", post)
+    return plan, prior, r263_projection, calls, inventory, files
+
+
+def test_r263_a2_reuses_frozen_project_and_source_after_empty_remote_censuses(
+    r263_recovery,
+):
+    plan, prior, projection, calls, _inventory, _files = r263_recovery
+    receipt = adapter.launch(plan, projection, object())
+    endpoints = [endpoint for endpoint, _body in calls]
+    assert receipt["project_id"] == 37122864
+    assert receipt["backtest_id"] == "r263-recovered-a2"
+    assert receipt["projection_sha256"] == (
+        "a2e05e106752d6f429795010ad6635b25969756f03e9433303a801ef7b59b990")
+    assert endpoints.count("backtests/list") == 2
+    assert endpoints.index("backtests/list") < endpoints.index("compile/create")
+    assert endpoints[-2:] == ["backtests/list", "backtests/create"]
+    assert not any(endpoint in {"projects/create", "files/create", "files/update",
+                                "files/delete"} for endpoint in endpoints)
+    assert adapter._path(prior, "claim").exists()
+    assert adapter._path(plan, "claim").exists()
+
+
+@pytest.mark.parametrize("defect", (
+    "prior_launch", "wrong_source", "remote_orphan", "late_orphan",
+))
+def test_r263_a2_refuses_ambiguous_precreate_state(r263_recovery, defect):
+    plan, prior, projection, calls, inventory, files = r263_recovery
+    if defect == "prior_launch":
         adapter.common._write(adapter._path(prior, "launch"), {"unexpected": True})
     elif defect == "wrong_source":
         files[0]["content"] += "# changed\n"

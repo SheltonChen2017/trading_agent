@@ -30202,3 +30202,38 @@ sensitivity. It confers no formal-alpha, paper, live, funded-account or
 real-order authority. The owner's later request for these exploratory tests
 supersedes section 213.4's earlier sequencing suggestion for the next step;
 it does not reopen exhausted R247 or its forward-evidence gate.
+
+The seven-source freeze was committed at `08f66b3` before any cloud launch.
+Focused projection, study, and package-closure checks passed **118/118**;
+lane-record and active-document checks passed **82/82** after updating the
+live handoff. No complete lane suite was run, per the owner's standing rule.
+R261 A1, the pilot, completed in private project **37122534** with backtest
+`7704d8a6fdb02499a2101db7f66cf0e8`. Its one-use bounded result passed
+`run_valid=true`, 261/261 weekly rebalances and zero invalid/canceled orders:
+**+154.5588%** cumulative return after modeled fees and **-21.8275%** maximum
+drawdown. REMX had **18 post-cap direct-stock target slots**, not 18 unique
+companies, across 261 decisions; the all-sleeve total was **12,229** versus
+the pinned old-rule **12,211**. Thus the prospective *admission-count* gate
+passed, but neither a causal floor effect on return nor independent alpha is
+inferred. R260/on80 A1 (project **37122794**, backtest
+`abee984782e0f4fc95419ffe79c94bc2`) and R262/on120 A1 (project
+**37122826**, backtest `5c76cdd4c4a2629fa75d00446e4661dc`) also completed,
+passed the same order-validity checks, and yielded **+150.3410% / -21.8059%**
+and **+158.5991% / -22.0978%** return/drawdown, respectively. Each likewise
+had 18 REMX and 12,229 total post-cap stock target slots.
+
+R263/on140 A1 created private project **37122864**, uploaded and compiled
+the exact frozen source, but the `backtests/create` request failed before a
+launch receipt. It spent **one of three** R263 attempts and one research look,
+with no valid result; the bounded transport masks the underlying exception,
+so a concurrent-node-limit cause is plausible but **unproven**. A read-only
+statistics-free `backtests/list` returned count zero. The adapter's narrowly
+pinned A2 pre-create recovery now requires the exact A1 claim, same project
+and source, plus two empty remote inventories around compilation before it
+can create one A2 backtest; an orphan or mismatch refuses. This correction
+does not change any of the seventeen cloud source files, seven profile pins,
+or the frozen manifest. At this checkpoint, four launches add four
+development looks and three valid exploratory cells: floor **274 shared /
+212 development / 37 infrastructure looks / 681 cells**. The remaining
+arms and R263 A2 have no result yet; additional uses will be counted after
+their exact terminal disposition.

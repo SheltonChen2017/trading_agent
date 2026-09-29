@@ -6289,3 +6289,70 @@ return over 2021--2025 was **+138.396639%**, maximum drawdown
 zero-slippage, combined AR entry/rank/weight exploratory contrast, not a
 prospective efficacy claim. One valid cell raises the floor to **285
 shared / 222 development / 38 infrastructure looks / 689 valid cells**.
+
+## R-272 A1 — eight-universe AR-on 140% — 2026-09-29
+
+One exploratory **development** look in private project **37127855**,
+backtest `f9e64dd23c0b881f3b318ab0bd87f1d5`, used the same frozen,
+split-consistent order source family. QC `Completed.` and the one-use
+result is **run-valid**: 261/261 rebalances, zero invalid/canceled
+orders, and actual/modeled fees equal ($72,540.578895). Net cumulative
+return over 2021--2025 was **+140.792496%**, maximum drawdown
+**21.352739%**, annualized volatility 19.282308%, and zero-rate Sharpe
+1.012458. It is **+16.528850 percentage points** versus the AR-off
+R268 A3 baseline and +2.395858 points versus R271's 120% arm. This
+remains a combined entry/rank/weight historical contrast with
+current-vintage analyst records and zero modeled slippage. One valid cell
+raises the floor to **286 shared / 223 development / 38 infrastructure
+looks / 690 valid cells**.
+
+## R-273 A1 — eight-universe AR-on 160% — 2026-09-29
+
+One exploratory **development** look in private project **37128103**,
+backtest `43e55397cc6a8ade6f020cd2327407a0`, used the frozen
+split-consistent order source. QC `Completed.` and the authenticated
+one-use result is **run-valid**: 261/261 rebalances, zero invalid/canceled
+orders, and actual/modeled fees equal ($73,482.6283749). Net cumulative
+return over 2021--2025 was **+142.453543%**, maximum drawdown
+**21.439210%**, annualized volatility 19.343027%, and zero-rate Sharpe
+1.017036. It is **+18.189897 percentage points** versus the R268 A3
+AR-off baseline and +1.661047 points versus R272's 140% arm. This is
+still a current-vintage, zero-slippage, combined entry/rank/weight
+historical contrast, not live efficacy evidence. One valid cell raises
+the floor to **287 shared / 224 development / 38 infrastructure looks /
+691 valid cells**.
+
+## R-274 A1 — eight-universe AR-on 180% — 2026-09-29
+
+One exploratory **development** look in private project **37128365**,
+backtest `d98703547fa2884fd91f1c4779958a22`, used the frozen
+split-consistent order source. QC `Completed.` and the authenticated
+one-use result is **run-valid**: 261/261 rebalances, zero invalid/canceled
+orders, and actual/modeled fees equal ($74,208.0533897). Net cumulative
+return over 2021--2025 was **+143.410322%**, maximum drawdown
+**21.552800%**, annualized volatility 19.389645%, and zero-rate Sharpe
+1.019144. It is **+19.146676 percentage points** versus R268 A3 and
++0.956779 points versus R273's 160% arm. The incremental historical
+gain has narrowed, while drawdown and volatility rose. This remains a
+current-vintage, zero-slippage, combined entry/rank/weight sensitivity,
+not a forward result. One valid cell raises the floor to **288 shared /
+225 development / 38 infrastructure looks / 692 valid cells**.
+
+## R-275 A1 — eight-universe AR-on 200% — 2026-09-29
+
+The final owner-requested eight-universe ladder arm spent one exploratory
+**development** look in private project **37128702**, backtest
+`3caf6e31253a17e363e9df6cafa45ae6`. Its prospectively frozen,
+split-consistent order source reached QC `Completed.` and the one-use
+result is **run-valid**: 261/261 rebalances, zero invalid/canceled orders,
+and actual/modeled fees equal ($74,639.3015049). Net cumulative return
+over 2021--2025 was **+143.639960%**, maximum drawdown **21.693886%**,
+annualized volatility 19.432925%, and zero-rate Sharpe 1.018287. It is
+**+19.376314 percentage points** versus R268 A3 and just +0.229638
+points versus R274's 180% arm. Sharpe fell slightly from 180% while
+drawdown and volatility increased. This historical plateau is not an
+optimized setting or live edge: the analyst archive is current-vintage,
+the AR-on/off contrast changes entry/rank as well as weight, slippage is
+unmodeled, and the ladder was explored adaptively. One valid cell raises
+the conservative floor to **289 shared / 226 development / 38
+infrastructure looks / 693 valid cells**.

@@ -30579,10 +30579,10 @@ common split rule. The AR-independent baseline is **not count-matched**:
 it cap-ranks up to ten coverage-valid stocks, whereas AR-on requires at
 least one positive score. Differences are exploratory strategy contrasts,
 not a pure causal estimate of analyst-score weight. These seven sources
-remain gated on a valid, authenticated R268 result; R276's old basket source
+were gated on a valid, authenticated R268 result; R276's old basket source
 remains blocked pending a separate correction.
 
-The first three arms have since reached valid order-based QC results. All
+All eight arms have since reached valid order-based QC results. All
 use 2021-01-04--2025-12-31, 261/261 completed rebalances, 10 bps per side,
 and zero modeled slippage:
 
@@ -30592,6 +30592,10 @@ and zero modeled slippage:
 | R269 A1 | 80% | +133.381510% | 21.023522% | 19.045422% | 0.989658 |
 | R270 A1 | 100% | +136.059782% | 21.014460% | 19.107861% | 0.999055 |
 | R271 A1 | 120% | +138.396639% | 21.216897% | 19.204557% | 1.005306 |
+| R272 A1 | 140% | +140.792496% | 21.352739% | 19.282308% | 1.012458 |
+| R273 A1 | 160% | +142.453543% | 21.439210% | 19.343027% | 1.017036 |
+| R274 A1 | 180% | +143.410322% | 21.552800% | 19.389645% | 1.019144 |
+| R275 A1 | 200% | +143.639960% | 21.693886% | 19.432925% | 1.018287 |
 
 R269, R270, and R271 private projects/backtests are respectively
 **37127174**/`ca1b8d8a48b12d02f4d7c2835e735574`,
@@ -30602,5 +30606,22 @@ invalid/canceled orders. The combined AR-on minus AR-off cumulative
 differences are +9.117864, +11.796136, and +14.132992 percentage points.
 Those are not pure weight-transfer estimates because the AR-on entry/rank
 gate differs from the cap-ranked AR-off baseline. See shared research
-ledger R-268 A3 and R-269--R-271 for each look and limitation. Current
-conservative floor: **285/222/38/689**.
+ledger R-268 A3 and R-269--R-275 for each look and limitation. Current
+conservative floor: **289/226/38/693**. The R272--R275 private
+projects/backtests are respectively **37127855**/`f9e64dd23c0b881f3b318ab0bd87f1d5`,
+**37128103**/`43e55397cc6a8ade6f020cd2327407a0`,
+**37128365**/`d98703547fa2884fd91f1c4779958a22`, and
+**37128702**/`3caf6e31253a17e363e9df6cafa45ae6`. Each A1 was
+valid with 261/261 rebalances, zero invalid/canceled orders, and
+actual/modeled fees equal. The source-bound `compare_results` gate
+accepted the exact R268 A3 and seven corrected AR-on artifacts, with
+common membership-cap and eight-ETF RAW daily-panel digests; it does
+**not** prove an identical full stock-minute fill tape. The seven
+cumulative AR-on minus AR-off spreads, in ascending tilt order, are
+**+9.117864, +11.796136, +14.132992, +16.528850, +18.189897,
++19.146676, +19.376314 percentage points**. The last incremental step
+is only +0.229638 points, with higher drawdown and slightly lower Sharpe
+than 180%. The tested eight are SPY, QQQ, SOXX, XLV, REMX, XLE, XLI,
+and XLF; insurance has **not** been added as a distinct ninth sleeve.
+This adaptive, one-window, current-vintage sensitivity cannot set a
+live-trading parameter or establish forward efficacy.

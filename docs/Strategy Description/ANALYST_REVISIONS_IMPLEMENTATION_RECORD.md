@@ -30330,3 +30330,74 @@ only then could a separately versioned order-based AR 80%--200% ladder be
 launched and compared. No eight-universe QC project, result cell or return
 is claimed by this section. R247's failed forward-input/09:20-clock gate
 still independently blocks prospective 100%/200% paper evaluation.
+
+## 215. Prospective eight-universe exploratory sequence, 2026-09-29
+
+The owner directed an eight-total-universe extension after the seven completed
+six-universe score-floor-one runs. The eight are **SPY, QQQ, SOXX, XLV, REMX,
+XLE, XLI, XLF**, in that order. XLI supplies an industrial sleeve and XLF a
+financial sleeve; XLF may hold insurers but does **not** stand in for a
+separate pure-insurance ETF. KIE would be a ninth sleeve and is not in this
+family. The first six retain their QCOM-admitted, 10%-coverage,
+three-verified-name and one-positive-analyst-score policies. Each sleeve's
+target budget becomes 12.25% of account equity, totaling the same 98% target
+gross exposure. Exact security IDs are aggregated across sleeves before the
+9.8% direct-stock cap, with excess returned to the contributing ETF sleeve;
+ETF fallbacks are not subject to look-through security capping. Thus adding
+two sleeves changes budget and overlap economics; eight-versus-six returns
+cannot isolate the effect of the analyst-revision score.
+
+**Input gate, frozen before any R267 result.** R267 is an input-only private QC
+diagnostic over the same 261 weekly decisions in 2021-01-04--2025-12-31. It
+reads strictly prior ETF-constituent/fundamental callback collections and
+authenticated identifier bindings. It emits only bounded counts, ages,
+overlap totals and hashes: no prices, returns, positions, targets, orders or
+performance. It is the documented exception to the owner's order-based
+evaluation default because it evaluates input availability rather than a
+trading rule. XLI and XLF must each have at least **26 of 261** decisions on
+which the 10%-minimum mapping, capitalization coverage and reported-weight
+requirements hold with at least **three verified names**, and at least one
+such decision in **each** of 2021, 2022, 2023, 2024 and 2025. All eight
+sleeves must have the exact 261-decision census and the meta, sleeve and
+overlap hashes must authenticate. Failure refuses the eight-universe outcome
+family; these thresholds may not be selected or relaxed after seeing returns.
+They certify minimum input utility, **not** stable point-in-time completeness
+or alpha. R267 is one infrastructure research look per launch attempt, at
+most three; an unsuccessful third attempt goes to the owner/Mia recovery
+rule, not a fourth relabeled diagnostic.
+
+Only if that gate passes, launch **R268 AR-off baseline first**, then the
+separately versioned order-based R269--R275 arms at 80%, 100%, 120%, 140%,
+160%, 180% and 200% analyst-revision transfer. R276 is a proposed equal
+eight-ETF budget basket, to be run as a separate reference only if its
+source/result contract validates. Each candidate uses the same frozen
+historical package and window, 261 decisions, 98% target gross exposure,
+2x buying-power admission, 10-bps-per-side modeled fees, and zero modeled
+slippage. The AR-off arm removes analyst revisions from entry and weights;
+same-universe AR-on minus AR-off is the matched comparison. Every arm has a
+distinct source/profile/result identity, no more than three QC attempts, a
+private project and at most one bounded result read per successful launch.
+An outcome-bearing launch is a development research look and must be added
+to the shared ledger, including failed attempts. These are adaptive
+exploratory historical runs on a current-vintage, potentially overwritten
+analyst archive, **not** a confirmation sample, formal-alpha result,
+forward paper decision or authority for real trading. A missing or invalid
+baseline forbids interpreting an AR-on spread even if an AR-on run completes.
+
+R267's pre-launch source is ten files / 250,114 bytes, projection SHA-256
+`98778da49268ef91799a087dc08615c09f45cbc2620227434eb6a14e36057855`,
+profile SHA-256
+`b9856e8a7b0a7a7408fbbef7224dfbc3e1734491e6c5973ea64f4204724e98d5`,
+and raw candidate-manifest SHA-256
+`2951a4bc31288a6f214364cd0e4126b95a020e0efa2099335089001c9bc5b8cb`.
+The overlap census is about strictly prior positive-weight ETF memberships
+and resolved/capitalization-eligible identifiers **before** the AR entry,
+ranking, stock-cap and ETF-fallback rules. It is not realized holding overlap
+or a portfolio-diversification measure. The prospective readiness threshold
+above is also pinned in the R267 candidate manifest; it is not an ex-post
+choice from QC's output.
+
+This section is a prospective protocol, not a claim that R267 or any
+eight-universe order backtest has run. Exact source and manifest hashes,
+validation, attempt receipts, results, review findings and final push range
+must be appended below after their respective events.

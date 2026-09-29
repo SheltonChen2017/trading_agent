@@ -9577,3 +9577,36 @@ exists. No code or shared document changed in this check; focused
 under the lane's Python 3.13 environment, and `git diff --check` was clean.
 The full lane/repository suite was not run. The owner's single-final-push
 rule still applies: **no partial push** at this factual gate.
+
+## 72. Standing owner delegation and QC support inquiry — 2026-09-29
+
+The owner explicitly approved a QuantConnect support inquiry and directed that,
+until further notice, lane-specific owner approvals be treated as preauthorized
+and lane-specific owner decisions be made by Codex's best judgment. This is
+`SI-AUTH-20260929-06` (standing in-lane approval delegation) and
+`SI-AUTH-20260929-07` (the QC inquiry). `SI-DEC-20260929-12` is to use QC's
+**General Issue (No project required)** support category, attach no project,
+code, backtest or licensed data, and ask four non-proprietary questions:
+exact `FINRAShortInterest` cloud entitlement and activation; first-published
+versus revised historical vintages and effective timestamps; listed-stock
+coverage before/after June 2021; and actual public release instant versus
+derived `EndTime`. This is a request for evidence, not source admission or a
+research look. These are the owner approvals/decisions exercised in this
+section; subsequent delegated choices must be itemized at the point of use.
+
+The signed-in support form showed a Bronze seat and four available tickets.
+The subject and questions were entered and verified in the form, but **no
+ticket has been submitted or confirmed**: macOS locked before the submission
+control could be activated, and the computer-use tool could not unlock it.
+The owner has been asked to unlock the Mac. Do not represent the draft as an
+open support request or invent a ticket number. Upon unlock, submit the
+already-drafted general inquiry once, verify the resulting ticket in QC, and
+record its durable link/ID without account secrets. The standing delegation
+does not make a factual provider claim true, waive an actual license or PIT
+vintage requirement, or override separate platform confirmation and safety
+requirements. No QC data/history request, project, compile, job or backtest
+was made; authorized/consumed real outcome looks remain **0/0**. The Short
+Interest lane still awaits a rights-cleared as-published source and the other
+section 71 P2 resolutions before source admission. No partial push occurs at
+this gate. The focused active-document test finished **69 passed in 0.83s**
+and `git diff --check` was clean; no full lane or repository suite was run.

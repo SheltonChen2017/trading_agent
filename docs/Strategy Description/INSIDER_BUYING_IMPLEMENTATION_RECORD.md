@@ -14580,3 +14580,91 @@ register the one permanent look under the shared family, and separately
 authorize QC input processing and an order-based backtest under the
 three-attempt rule. None of those unperformed steps is represented as
 approved data, an outcome look, a QC job or backtest readiness by this round.
+
+## 110. Owner-delegated two-quarter source continuation before the first backtest (2026-09-29 UTC; in progress)
+
+The owner superseded section 109's immediate Claude-review timing: Codex is to
+build toward the first actual Insider historical order-based backtest, make
+the needed owner choices with a complete decision log, and invite Claude only
+after that backtest. Independent review has **not** occurred for the local
+implementation commits below. There is no new incoming Claude commit after
+the section-108 counter-review to disposition. This timing change does not
+make missing source bytes, data rights, point-in-time evidence, a registered
+research look, QuantConnect entitlement, or a completed backtest true. The
+designated worktree and branch remain the only place of work; the shared
+documents and `SESSION_HANDOFF.md` remain frozen. One eventual push, not a
+push for each local commit, remains the handoff rule.
+
+### 110.1 Owner decisions exercised so far
+
+These extend D1-D28 and are the decisions made on the owner's behalf in this
+continuation. They do not authorize a different branch, a claim of source
+authenticity, a research look, or trading.
+
+| ID | Decision | Reason and limit |
+|---|---|---|
+| D29 | Use the owner's later first-backtest-before-Claude sequence while retaining all local commits unpushed until a genuinely completed round. | This is an explicit timing override only; every local commit will still need Claude's independent review and a subsequent Codex counter-review. |
+| D30 | Acquire the 82 quarterly `master.gz` indexes and the two-quarter selected raw-parent priority set with immutable outside-Git journals, a private SEC contact, three attempts per artifact, and at least 500 ms between completed transport and the next dispatch. | This establishes bounded source evidence, not official provenance or a complete historical parent corpus. The observed selected priority is 9,337 filings, not the 99,394 two-quarter Form 4/4-A denominator. The source jobs made no outcome or QC request. |
+| D31 | Admit the observed legacy reporting-owner `FORMER NAME` header subsection without a `MAIL ADDRESS` only when a preceding `FILING VALUES` subsection is present. | The prior parser correctly refused an unmeasured layout but excluded one of the first 1,493 raw selected parents. The amended scope preserves balanced, flat, bounded header structure; synthetic red/green and full selected-root offline replay check it. No economic owner attribution is inferred. |
+| D32 | Build a separate exact two-quarter **all-Form-4/4-A locator** manifest, retaining nonpriority filings, and require an exact whole-master join. | Replaying the two retained parsed snapshots and both hash-verified master receipts yields 99,394 unique locators. This proves agreement only relative to supplied bytes; it does not mean 99,394 raw parents were fetched or parsed. |
+| D33 | Keep selected-parent structural projection and the all-filing locator receipt noncanonical, source-unattested, non-PIT, and at zero looks and zero QC jobs. | Header/XML byte hashes and a filing acceptance string are not official publication-time or PIT-security evidence. The 9,337 selected filings cannot be substituted for the missing 90,057 parents in a full-population strategy test. |
+| D34 | Prepare a separate 13-shard, at-most-8,192-locators-per-shard acquisition campaign for the remaining 90,057 only if exact source binding, selected-root reuse, campaign-wide pacing/capacity/attempt limits, immutable replay, and fail-closed union validation are implemented and verified first. | The existing runner's single-root 8-MiB inventory, 32-MiB report and event limits cannot safely represent 99,394. At 2 requests/s the remaining dispatches alone take at least about 12.5 hours. This is a bounded implementation decision, not a claim that the campaign has run. |
+| D35 | Do not count a wholly synthetic QC smoke as the owner's requested first historical Insider backtest. | A real order-based pilot needs source-bound filing signals, a PIT identity/calendar/outcome bridge, rights and a frozen look, plus a verified QC execution gate. A selected-only mechanics diagnostic would be labeled exploratory and could not establish canonical IB-5 performance. |
+
+### 110.2 Local commit and source evidence to date
+
+The matching remote lane tip remains `d478cfd3159b13a141f3cf2058b956526e4354b3`.
+Local unpushed implementation commits in order are `af8ef7b`, `7a5d6bb`,
+`4505d05`, `93696cf`, `979a5c5`, and `cb79218`. They cover the 82-master and
+selected-parent runners, offline selected-parent replay, bounded HTTP/header
+compatibility, the observed header-layout correction, and the exact two-quarter
+all-filing locator manifest. No commit in this range is represented as
+independently reviewed. A final exact push range and per-commit Claude handoff
+notes will be recorded when the round is ready to push.
+
+The selected-v2 outside-Git root is
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider-source-20260929.hP4utF/selected-parents-v2`.
+The terminal report SHA-256 is
+`97300d31e1bdf7fd4c44ae04bf6f94415dd7599ef5048c84b011697bdcf58f0a`;
+the journal SHA-256 is
+`4dfb94bf5ff5e0a31b0931148b615ad66b4265d736e30591fbae79ee8ed988b6`.
+An independent offline audit verified all 9,337 report rows and raw-object
+hashes/sizes, 9,328 first-attempt HTTP-200 acquisitions and nine exact reuses,
+27,993 events, 107,087,697 raw bytes, no refusal and no halted reason. The
+selected source is 4,613 targets in 2022Q4 and 4,724 in 2023Q1. After the
+bounded header fix, `load_observed_selected_parent_root` accepted 9,337/9,337
+with zero structural refusals, including 1,879 amendments and 962 multi-owner
+headers; the receipt lineage SHA-256 is
+`959208ebce46e0a5583d151b9bd233e17bacbe5403a22b1b4e53d716a7cefd1c`.
+This is a replayed *selected* source receipt, not an all-filing signal.
+
+`ib1b_all_form4_parent_locators.py` performs no I/O and rebuilds the
+candidate inventory from both loaded IB-1B parsed snapshots before joining
+every 4/4-A accession to the matching master path. An independent read-only
+real-source replay produced **99,394** locators: 97,515 Form 4 and 1,879
+Form 4/A; 35,550 in 2022Q4 and 63,844 in 2023Q1. The exact two-quarter
+manifest SHA-256 is
+`3e9a0f3d1e7abe6865a70228e05b58300093211c712e980d5f146a8e3cc3d355`.
+The quarter digests are `7d8cdb61e48e92d6a4b9aa6dead7e7f3b352d992b30b5d657abddd492f49b173`
+and `dabe171f7f3f20c08e122f6b364b159383e9a3eb2bf3a92f5f9a085592c5e45b`.
+The master receipts retain 75,296 and 131,421 archive-path rows respectively;
+aliases are not additional Form 4 filings. The master path CIK is a locator,
+not proof of issuer identity. No accession, filing content or identifying
+SEC contact was printed or placed in Git.
+
+### 110.3 Findings, validation, and remaining gate
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| `IBSECRP-R03` | P2, **CLOSED in `979a5c5`** | A real selected parent used a legacy owner `FORMER NAME` subsection after `FILING VALUES` without `MAIL ADDRESS` and the parser refused it. Synthetic acceptance/refusal tests were red on the old code; after the narrow change, 92 complete-submission tests passed and the exact selected root replay accepted 9,337/9,337. Missing `FILING VALUES` remains refused. |
+| `IB1BALL-R01` | P3, **CLOSED in `cb79218`** | Mutating a frozen locator's accession or submission-row ID to an unhashable object raised a raw `TypeError` before typed field validation. Both isolated tests were red before validation was moved ahead of set operations; the focused locator file and exact package guard then passed 12 tests. The boundary already failed closed; this makes refusal consistent. |
+| `IBSECACQ-CR03`, `IBSECACQ-CCR03`, `IBSECACQ-CR04`, `IBSECACQ-R08/R09`, `IBSECREPLAY-OBS01`, `IB1BP-CR04/CR05`, `IB2CTX-CR02`, `IBZIP-CR02/CR03`, `IB2SRC-CR03`, `IBSH-CR01` | P3, **retained at prior status** | Structural multi-owner compatibility is measured for this selected cohort only; economic attribution, provenance, older lane/shared observations, and out-of-lane placement are not cured by this replay. No shared code was changed. |
+
+On Python 3.12.14, focused all-locator/master tests and both exact Insider
+offline-import guards passed **88**, with no failures or skips. The earlier
+post-parser focused set passed **204**. Codex ran no complete lane or repository
+suite. No research outcome was accessed, no registered look was consumed, and
+no QuantConnect upload, processing job or backtest was launched: **0/0/0**.
+The locator campaign, streaming IB-1C..IB-1E successors, official acceptance
+and amendment/PIT mapping, outcome rights/vintage, frozen look and order-based
+QC gate remain incomplete. The full corpus is not yet ready for backtesting.

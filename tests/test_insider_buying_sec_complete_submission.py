@@ -240,12 +240,31 @@ def test_legacy_owner_former_name_refuses_incomplete_or_identity_bearing_block(b
         _project(_complete(header=header))
 
 
-def test_legacy_owner_former_name_requires_prior_mail_address():
+@pytest.mark.parametrize("business_address", (False, True))
+def test_legacy_owner_former_name_after_filing_values_needs_no_mail_address(
+    business_address: bool,
+):
+    preceding = (b"\n\tBUSINESS ADDRESS:\n\t\tSTREET 1:\tInvented Road\n"
+                 if business_address else b"")
     header = _legacy_header().replace(
+        b"\n\tMAIL ADDRESS:\n\t\tSTREET 1:\tInvented Street\n",
+        preceding + _former_owner_name(), 1,
+    )
+    projection = _project(_complete(header=header))
+    assert projection.header_bytes == header
+    assert projection.header_owner_ciks == ("0000999999",)
+    assert projection.to_payload()["authority"]["canonical_evidence"] is False
+
+
+def test_legacy_owner_former_name_without_filing_values_refuses_at_scope():
+    header = _legacy_header().replace(
+        b"\n\tFILING VALUES:\n\t\tFORM TYPE:\t4\n", b"", 1,
+    ).replace(
         b"\n\tMAIL ADDRESS:\n\t\tSTREET 1:\tInvented Street\n",
         _former_owner_name(), 1,
     )
-    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+    with pytest.raises(SecCompleteSubmissionError,
+                       match="former name must follow filing values"):
         _project(_complete(header=header))
 
 

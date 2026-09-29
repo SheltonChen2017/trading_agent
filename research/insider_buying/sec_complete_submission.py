@@ -205,8 +205,8 @@ def _legacy_role_cik(
                 _refuse("legacy header has an empty or foreign role subsection")
             if not scopes and name != first:
                 _refuse("legacy header data subsection is not first")
-            if name == "FORMER NAME" and (not owner or "MAIL ADDRESS" not in scopes):
-                _refuse("legacy owner former name must follow a mail address")
+            if name == "FORMER NAME" and (not owner or "FILING VALUES" not in scopes):
+                _refuse("legacy owner former name must follow filing values")
             repeatable = (owner and name == "FORMER NAME") or (
                 not owner and name == "FORMER COMPANY"
             )

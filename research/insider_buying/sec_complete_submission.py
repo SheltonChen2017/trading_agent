@@ -2,10 +2,11 @@
 
 The complete `.txt` image is the only raw parent. Header and ownership XML
 bytes are verbatim slices of that image, not independently fetched SEC files.
-The URL and index hash are caller declarations: this synthetic-shape candidate
-performs no I/O, has not been checked against real complete-submission bytes,
-does not verify index membership or SEC authenticity, and grants no PIT,
-canonical-source, IB-1C, outcome, or trading authority.
+The URL and index hash are caller declarations. The legacy-header path has
+been replayed against 16 pinned pilot complete-submission byte images, while
+the tagged-header path has synthetic coverage only. This pure projection does
+no I/O, does not verify index membership or SEC authenticity, and grants no
+PIT, canonical-source, IB-1C, outcome, or trading authority.
 """
 from __future__ import annotations
 

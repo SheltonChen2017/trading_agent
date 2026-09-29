@@ -9616,3 +9616,69 @@ as-published source and the other section 71 P2 resolutions before source
 admission. No partial push occurs at this gate. The focused active-document
 test finished **69 passed** on the ticket-verification tree and
 `git diff --check` was clean. No full lane or repository suite was run.
+
+## 73. Pending QC reply and authenticated-calendar limit — 2026-09-29
+
+The owner directed Codex to proceed under the standing in-lane delegation of
+section 72. `SI-AUTH-20260929-08` records the exercised approval for a
+read-only QC ticket follow-up; `SI-DEC-20260929-13` is to monitor the existing
+ticket, keep the source gate closed, and seek an actual as-published archive
+rather than treating a latest-only value or a schedule rule as point-in-time
+evidence. The in-thread `short-interest-qc-source-response` heartbeat was
+created and verified **ACTIVE**, checking at 30-minute intervals and staying
+quiet on unchanged state. It may inspect ticket **#979ad273f6** but grants no
+QC history request, project, compile, job, backtest, outcome look, or push.
+The existing Claude-push heartbeat remains **PAUSED**. These are the only new
+owner-delegated approval and decision exercised in this section; retain them
+for the final authorization/decision inventory.
+
+After a page refresh, QC support history still showed ticket #979ad273f6
+open with its original four questions and **no reply**. The official
+[FINRA short-interest description](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+still says corrected items expose only the most recent data. Its
+[historical-files page](https://www.finra.org/finra-data/browse-catalog/equity-short-interest/files)
+states that pre-June-2021 files are OTC-only, not exchange-listed. The live
+[FINRA publication calendar](https://www.finra.org/filing-reporting/regulatory-filing-systems/short-interest)
+provides 2025–26 settlement/publication pairs; a bounded official-source
+search did not locate retained 2021–24 year-specific tables. FINRA's
+[developer guidance](https://developer.finra.org/docs) states that
+consolidated short interest is available by 4:40 p.m. Eastern on a scheduled
+publication date. For an independently authenticated date and intact original
+vintage, the following regular open is a conservative scheduled-release
+cutoff; that rule alone does **not** establish an exceptional delay, a QC
+ingestion instant, the historic date pair, or when a later correction became
+available. It cannot repair latest-only historical rows.
+
+The section 69/71 P2 ledger therefore remains open without a priority or
+status change: `SI-SRC-20260928-001` needs authenticated date binding,
+`-002` needs original/correction vintages or complete affected-release
+exclusion, and `-003` needs exact dataset rights plus actual listed-stock,
+PIT price/volume, identity, terminal/delisting and QC-route coverage. No
+source is admitted, no historical stock outcome is joined, no lookback winner
+is selected, and authorized/consumed real outcome looks remain **0/0**.
+The next actionable trigger is a substantive QC reply with verifiable contract
+evidence; if the vintage or rights answer fails, reject this route and
+qualify an alternative rather than backtesting latest-only values.
+
+The designated worktree and branch were clean at local
+`01f91ac622366d948c3a2452b23d44859fc3f1b6` before this record-only
+update; the matching remote lane ref remained
+`985743e77212c0313121f1ae1754e03dd452c374`. The exact local-only
+range since that remote head begins at
+`cabfc6c3da243358af8c89ad2e1e86956dcf511e`; sections 68.1 and 70
+already dispose its first nine commits, and section 71 disposes
+`924d161442a2c64d06fa0cfee137426a849e2d0e`. The remaining earlier
+record-only commits are locally accepted, with independent review still due:
+
+| Commit | Local disposition |
+|---|---|
+| `84bc28863176aaa66be3d084cfb233ef7a633688` | Accepted authenticated QC access check as a blocked source qualification, not FINRA entitlement or PIT admission. |
+| `dea9f3d796e21c9330762c049b3b3e98fd555290` | Accepted standing delegation and drafted inquiry record; its submission-pending state was explicitly superseded by the next commit. |
+| `01f91ac622366d948c3a2452b23d44859fc3f1b6` | Accepted verified once-only ticket submission and no-project evidence. |
+
+Only this lane record changed in this follow-up; shared documents and
+`SESSION_HANDOFF.md` remain frozen. The focused active-document check finished
+**69 passed** and `git diff --check` was clean; no full lane/repository suite
+was run. Claude will run that suite in later independent review. The owner's
+one-final-push rule still prohibits a partial push while this factual gate is
+open.

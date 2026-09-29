@@ -1,16 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 108 COUNTER-REVIEWS AND ACCEPTS ALL THREE CLAUDE COMMITS
-`fdb32db..5d73e11`, CLOSES THE CURRENT-LANE STALE-DOCSTRING P3, AND
-RECORDS THE OWNER-PREAUTHORIZED OFFLINE CENSUS OF ALL 82 RETAINED SEC ZIPS.
-THE SOURCE-BOUND NONCANONICAL RECEIPT IS `2c93041a...6bd83c33`: 4,034,227
-PER-QUARTER FORM 4/4-A TARGET ENTRIES. A BLIND NO-CACHE COMPLETE-PARENT
-ROUTE WOULD PLAN 4,034,309 REQUESTS AND AT LEAST 23 DAYS 8 HOURS OF IDEAL
-TWO-PER-SECOND DISPATCH SPACING; NO CRAWL WAS STARTED. THIS IS NOT A
-COMPLETE-TEXT/METADATA SOURCE MANIFEST, CANONICAL/PIT EVIDENCE, AN OUTCOME
-LOOK, OR BACKTEST READINESS. CLAUDE MUST REVIEW THE NEW CODE AND RECORD
-AFTER ONE SAME-LANE PUSH. LOOKS 0/0/0; NO SEC REQUEST, OUTCOME, QC JOB,
-BROKER, PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTIVITY THIS ROUND.**
+Status: **SECTION 109 BUILDS THE OWNER-DELEGATED OFFLINE PREPARATION FOR
+BACKTEST GATES 1-5 IN ONE PRE-CLAUDE-REVIEW ROUND. CODE COMMIT `f47e031`
+PINS A HEADER-ONLY 82-QUARTER IB-1B PROFILE AND READ-ONLY PREFLIGHT,
+AN 82-MASTER REQUEST PLAN AND PURE WHOLE-INVENTORY RECONCILIATION,
+AN AS-FILED IB-1C..IB-1E DECLARATION CHECKPOINT, AND AN UNREGISTERED IB-5
+STUDY-INPUT CANDIDATE. THE RETAINED-ZIP PREFLIGHT READ 82 ZIPs AND MATCHED
+656/656 PHYSICAL HEADERS; IT DID NOT RUN IB-1B OR WRITE SNAPSHOTS.
+THE OTHER 80 MASTER INDEXES AND ~4 MILLION COMPLETE-PARENT/METADATA TARGETS
+HAVE NOT BEEN ACQUIRED. CANONICAL/PIT, OUTCOME RIGHTS/LOOK REGISTRATION,
+AND QC EXECUTION REMAIN BLOCKED: THIS LANE IS NOT BACKTEST-READY.
+CLAUDE REVIEWS THE EXACT ONE-PUSH SNAPSHOT NEXT, PER THE OWNER'S TIMING
+CHANGE. LOOKS 0/0/0; NO NEW SEC REQUEST, OUTCOME, QC JOB, BROKER,
+PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTIVITY THIS ROUND.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -14439,3 +14441,142 @@ Neither this census nor the owner's general preauthorization substitutes for
 the missing source bytes, timing provenance, rights, amendment linkage, PIT
 security-master/calendar, frozen outcomes/look terms or QC execution gate.
 Backtest readiness and lane completion are **not yet achieved**.
+
+## 109. Owner-delegated gates 1-5 build-ahead for Claude's next review (2026-09-29 UTC)
+
+The owner asked Codex to build gates 1-5 toward backtest readiness in one
+round, then clarified that **Claude will review after this implementation**.
+Accordingly there is no new incoming Claude commit to counter-review in this
+round: section 108 already dispositioned every commit of the last Claude
+review. Before editing, `HEAD` and the matching remote lane tip were both
+`17d5382cc521ac5349f1b4fcc2e716ce1d2db4e9`; the worktree was clean.
+All work, tests, one code commit `f47e03125f6ae6ce78831e72f01be2d47a88a207`,
+and this record use the designated existing Insider worktree and branch.
+There is no side branch or other checkout. The code commit is **pending**
+independent Claude review, not self-accepted. This record commit will be
+reviewed separately. Shared/project-wide documents and `SESSION_HANDOFF.md`
+are unchanged.
+
+### 109.1 All decisions exercised under the owner's preauthorization
+
+The owner delegated choices needed to build toward lane completion. That
+delegation does not invent missing bytes, source authenticity, data rights,
+historical publication, research-look registration, QC entitlement, or
+independent review. D1-D18 in earlier sections remain in force. These are
+**all new decisions made on the owner's behalf in this round**:
+
+| ID | Decision | Reason and limit |
+|---|---|---|
+| D19 | Build the five preparation boundaries before Claude reviews, in one code commit and one later record commit followed by one push. | This follows the owner's latest timing direction; the serialized independent review and later Codex counter-review remain mandatory. No review is fabricated for `f47e031`. |
+| D20 | Promote the observed **header spellings only** into a separate 82-quarter IB-1B schema-profile *candidate*. | All 656 physical TSV headers in the 82 retained ZIPs match nine ranges: two `SUBMISSION.tsv` ranges split after 2022Q4 and one range for each other table. The pilot row-key policy is inherited but has not been measured over all historical rows; the candidate is not an approved full parser profile or SEC-origin attestation. |
+| D21 | Run one read-only, source-bound 82-quarter ZIP/header/resource preflight, not an 82-quarter IB-1B publication. | Rehashing one ZIP at a time and checking the unchanged 256-MiB per-quarter expanded-input cap tests a feasible boundary without creating partial durable snapshots. It does not establish row-key uniqueness, all parsed receipts, complete parents, or acceptance metadata. |
+| D22 | Treat 82 quarterly `master.gz` indexes as the first narrower acquisition inventory, with 82 distinct requests, at most three attempts each, 500-ms completion-to-next-dispatch spacing, 8-MiB compressed and 64-MiB expanded caps, and a stop on 403/429. | This is a **zero-I/O plan**, not a live runner or SEC access. Its 40.5-second ideal first-to-last-dispatch floor excludes transfer and backoff. The existing two pilot masters do not establish the remaining 80 quarters. No blind 4,034,227-parent crawl was started. |
+| D23 | Require whole-quarter Form 4/4-A accession, form and filing-date reconciliation between source-bound parsed ZIPs and caller-parsed master indexes; withhold the entire locator digest on any missing, extra, conflicting, or ambiguous quarter. | Partial locators must not masquerade as a complete source manifest. A sole archive-path CIK may be a filing agent, so it is not issuer confirmation; issuer CIK is only an alias disambiguator under the existing reviewed join. The new pure reconciler has synthetic evidence only because 82 parsed ZIP receipts and 82 master receipts do not yet exist. |
+| D24 | Retain as-filed accessions, ordered reporting-owner identities, original/amendment claims, exact declared acceptance, parent/XML/metadata hashes, and quarter lineage in a bounded 82-quarter IB-1C..IB-1E planning checkpoint. | A maximum 500,000 filings per quarter, 5,000,000 total and 256 declared owners per filing prevents unbounded declarations. These are caller declarations, not an efficient four-million-filing processor or official amendment/PIT evidence. The existing IB-1E 16-period/256-XML caps remain blockers to real scale. |
+| D25 | Choose a **candidate**, not a registered look: stock-level 20-session primary horizon, 5/60-session descriptive views, stock alpha `1/160` and unused ETF reserve `1/160` inside the permanent `1/80` lane ceiling, with a valid stock null closing the family and no ETF/QC rescue. | The 20-session choice matches the frozen signal half-life. The identifier `IB5-STOCK-PRIMARY-20S-V1` is explicitly unregistered; alpha spent and authorized/consumed looks stay zero. The primary statistic, expected sign, split, inference/multiplicity procedure, controls and error accounting remain to be preregistered before outcomes. |
+| D26 | Inventory exact caller-declared outcome vintage/rights, PIT security master and calendar, delisting/adjustment semantics, immutable signal manifest and QC-processing entitlement, but allow only `caller_declarations_complete` to become true. | Even structurally complete synthetic declarations cannot attest data rights or create real-study, QC-processing, QC-job or parity authority. The sealed IB-1I v2 gate remains byte-unchanged and false. Future QC research should be order-based under the machine-wide default, with at most three launch attempts per candidate, only after a separate valid gate. |
+| D27 | Keep an identifying SEC contact as a private validated in-memory input, omit its value from plan payloads and object representations, and make no SEC request this round. | Prevents a later serialized plan or log from leaking the owner's contact. The real-root plan probe used only a synthetic dry-run address and printed aggregate values. A crash-safe, immutable operational runner and its independent review are still absent. |
+| D28 | Leave all canonical/PIT, outcome, research-look, ETF, QC upload/processing/job/backtest, paper/live deployment, broker/operator-database/scheduler, capital, order and trading flags false. | Neither broad preauthorization nor a source-bound ZIP hash is the missing artifact, entitlement, QC execution result or independent review. No research look was used: **0/0/0**. |
+
+### 109.2 New behavior and bounded real read-only checks
+
+`research/insider_buying/sec_ib1b_82q_schema_profile.py` pins profile SHA-256
+`ee2f201362d4002a70819e4d7123eea300aafddb8820c6a0ab9761b0ed8cdd41`.
+`research/insider_buying/ib1b_82q_offline_runner.py` revalidates the exact
+retained census `2c93041a...6bd83c33`, reads one ZIP at a time through its
+no-follow pinned-directory boundary, and returns an in-memory, zero-authority
+header receipt. The actual read-only run accepted **82 ZIPs, 656/656 physical
+headers, 921,904,566 compressed bytes and 5,557,773,850 expanded table
+bytes**. Its receipt SHA-256 was
+`3736b0327a20040d46ff5a26fd18b4154eebb18cbf4be56706cfe232e9f889c0`.
+The independent read-only audit separately recomputed all 656 first-line
+hashes with zero mismatches. The preflight did **not** parse IB-1B rows,
+publish snapshots, inspect complete Form 4 text, or access the network.
+
+`research/insider_buying_sec_master82_acquisition.py` binds one literal
+`master.gz` URL to each of those quarters; the URL inventory SHA-256 is
+`57d28aa3e7f1ca94204eaea84682947780221e72e8f8f40d3a23bbde96f801a4`.
+It has **no transport, output publication or launch function**. A separate
+in-memory probe against the real retained census, with a synthetic dry-run
+contact, produced 82 planned requests covering 4,034,227 capacity targets,
+zero implemented transport and zero looks. It made no request and retained
+no contact or request payload in Git.
+`research/insider_buying/sec_master_locator_reconciliation.py` is a pure
+future join of 82 caller-loaded
+parsed IB-1B snapshots to 82 caller-parsed master receipts; its tests cover
+missing, extra, mismatched and alias cases. No real 82-master/82-parsed join
+was run or claimed.
+
+`research/insider_buying/sec_ib1c_e_scale_readiness.py` composes bounded,
+as-filed quarter declarations and refuses reordered/missing quarters,
+cross-quarter accession duplicates, inconsistent original/amendment links,
+mutated checkpoint rows and cap breaches. Its reports enumerate absent
+acceptance, complete-parent, XML, metadata, owner, amendment, PIT-master,
+calendar and streaming-successor evidence; canonical, PIT, signal and
+backtest flags are always false.
+`research/insider_buying/ib5_candidate_readiness.py` adds the candidate horizon/alpha/null choice and
+19 individually named input declarations. Even a synthetically complete
+inventory leaves real-study, QC, registered-look and parity flags false.
+
+This is implementation **toward**, not completion of, gates 1-5. The 16
+previously acquired complete parents and two master indexes are still the
+only approved pilot artifacts; the other historical quarters have no
+complete-text/acceptance-metadata inventory. The approximately four million
+remaining target entries are capacity counts, not verified unique cross-
+quarter filings or a licensed, PIT, tradable study population. The shared
+security-master/calendar audit still lacks its main-line venue and executor;
+this lane makes no shared-code or shared-document change.
+
+### 109.3 P0-P3 ledger, red/green, and retained findings
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| `IB1B82-R01` | P2, **CLOSED in `f47e031`** | In the precommit preflight draft, a synthetic receipt could be rebound to a retained label with a forged known census SHA. An isolating test failed (`DID NOT RAISE`); distinct retained/synthetic construction tokens made it green. No snapshot was published. |
+| `IB1CE-R01` | P2, **CLOSED in `f47e031`** | A frozen quarter declaration could be mutated with `object.__setattr__` after checkpoint construction; a later append trusted its stale quarter hash and accepted changed rows. Targeted test failed (`DID NOT RAISE`), then passed after rechecking every quarter's exact payload hash during checkpoint validation and the incoming quarter on append. |
+| `IBMASTER82-R01` | P2, **CLOSED in `f47e031`** | A directly constructed plan could claim retained scope with the public census SHA and invented per-quarter ZIP hashes/counts summing to 4,034,227. Targeted forgery test failed (`DID NOT RAISE`), then passed when retained construction carried the validated census object and rechecked every period/hash/count at serialization. |
+| `IBMASTER82-R02` | P3, **CLOSED in `f47e031`** | Read-only independent audit observed that `to_payload()` serialized the SEC identifying contact. A test proved the address was present (red); the final payload contains only `identifying_contact_provided=True`, object repr omits the address, and the same test is green. Do not log the raw in-memory object in future operations. |
+| `IBSECACQ-CR03`, `IBSECACQ-CCR03`, `IBSECACQ-CR04`, `IBSECACQ-R08/R09`, `IBSECREPLAY-OBS01`, `IB1BP-CR04/CR05`, `IB2CTX-CR02`, `IBZIP-CR02/CR03`, `IB2SRC-CR03` | P3, **OPEN/retained as previously recorded** | Real multi-owner raw-header compatibility, historical process/provenance, shared placement and older observations are not resolved by synthetic declarations or a master request plan. The separate shared/out-of-lane `IBSH-CR01` remains open without a change here. |
+| Earlier closed entries, including `IBZIPC-R01..R04`, `IBSECCOM-CR01..CR03`, and earlier IB-0..IB-3 corrections | P2/P3, **CLOSED, retained** | No resolved finding is erased or silently reopened. Section 108 and prior sections retain their evidence. |
+
+No current-lane P0/P1 or open P2 is known after these corrections. The
+read-only independent audit found no additional confirmed P0-P2 defect in
+the new boundaries. It did not substitute for Claude's upcoming review.
+
+### 109.4 Validation, exclusions, and precise next step
+
+On the final code tree, a focused 11-target selection covering all six new
+test modules, existing census/master-index/preregistration tests, and both
+exact Insider offline-import checks passed **392 tests, zero failures or
+skips, in 2.13 seconds** on Python 3.12.14. Twelve new Python files compiled
+in memory. The Insider record and active-document checks passed **71**.
+`git diff --cached --check` and `git show --check` on `f47e031` were clean.
+Codex did **not** run a complete lane or repository suite;
+Claude will run the full lane suite during its independent review. The
+separate independent source/profile audit passed 79 focused tests and the
+two newer preparation modules passed 21, with overlapping guard coverage;
+these counts are not added to 392. The actual retained-root preflight and
+real-census master-plan probe were read-only. No real filing row, XML or
+contact value was printed in these probes.
+
+After this record commit, push **once** from this worktree to only
+`origin/codex/strategy-insider-buying`, exact range `17d5382..PUSHED_HEAD`.
+Claude next independently reviews **both** `f47e031` and this record commit,
+including the four closed findings, the 656-header real read-only check,
+all authority-negative tests and a full lane suite. Codex then counter-
+reviews every Claude commit before any further milestone.
+
+The next real-data route, **only after that review**, is a separately
+reviewed crash-safe 82-master-index-only runner and immutable outside-Git
+journal/report; it must obtain or revalidate the missing 80 quarters without
+assuming the two pilot masters prove them. Then build and validate all 82
+IB-1B parsed quarter receipts and run whole-inventory reconciliation.
+Before a canonical event or backtest can exist, a feasible complete-parent
+and accession-specific acceptance-metadata source policy must cover the
+required Form 4/4-A and amendment population; the streaming IB-1C..IB-1E
+successor, real multi-owner shape, official amendment linkage and PIT
+security-master/calendar must be independently reviewed. Finally freeze the
+IB-5 primary statistic/test/split, verify outcome vintage and rights,
+register the one permanent look under the shared family, and separately
+authorize QC input processing and an order-based backtest under the
+three-attempt rule. None of those unperformed steps is represented as
+approved data, an outcome look, a QC job or backtest readiness by this round.

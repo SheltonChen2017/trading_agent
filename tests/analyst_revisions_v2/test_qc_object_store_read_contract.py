@@ -77,6 +77,8 @@ B3_MODULE = PACKAGE / "synthetic_input_transport.py"
 _PINNED_QC_PACKAGE_SOURCES = tuple(
     """
     __init__.py accepted_risk_delta_order_package.py
+    accepted_risk_eight_universe_input_qc_projection.py
+    accepted_risk_eight_universe_input_qc_runtime.py
     accepted_risk_etf_baseline_evaluator.py
     accepted_risk_etf_baseline_qc_runtime.py
     accepted_risk_latest_order_package.py
@@ -139,18 +141,22 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_six_universe_recent_coverage_projection.py
     accepted_risk_spy_order_level_v1_qc_runtime.py
     accepted_risk_stock_portfolio_evaluator.py
-    accepted_risk_terminal_disposition.py event_study.py
-    firm_ontology_candidate_builder.py firm_ontology_owner_decision.py
-    firm_ontology_proposal_generator.py formal_cloud_evaluator.py
-    formal_economic_execution_definition.py formal_evaluation.py
-    formal_evaluation_bridge.py formal_input_bundle.py formal_input_composer.py
-    formal_qc_transport.py formal_report_contract.py formal_run_protocol.py
-    formal_runtime_projection.py formal_streaming_bridge.py
-    formal_streaming_input.py formal_submission_adapter.py
-    formal_terminal_disposition_builder.py fresh_six_universe_snapshot.py
-    fresh_six_universe_snapshot_submission.py
-    fundamental_universe_discovery.py
-    fundamental_universe_discovery_runtime.py
+    accepted_risk_terminal_disposition.py eight_universe_ar_on_split_rounding.py
+    eight_universe_input_submission.py
+    eight_universe_qcom_admitted_projection.py
+    eight_universe_r268_a2_diagnostic.py
+    eight_universe_r268_a3_split_rounding.py
+    eight_universe_split_truncation_projection.py eight_universe_study.py
+    event_study.py firm_ontology_candidate_builder.py
+    firm_ontology_owner_decision.py firm_ontology_proposal_generator.py
+    formal_cloud_evaluator.py formal_economic_execution_definition.py
+    formal_evaluation.py formal_evaluation_bridge.py formal_input_bundle.py
+    formal_input_composer.py formal_qc_transport.py formal_report_contract.py
+    formal_run_protocol.py formal_runtime_projection.py
+    formal_streaming_bridge.py formal_streaming_input.py
+    formal_submission_adapter.py formal_terminal_disposition_builder.py
+    fresh_six_universe_snapshot.py fresh_six_universe_snapshot_submission.py
+    fundamental_universe_discovery.py fundamental_universe_discovery_runtime.py
     fundamental_universe_discovery_submission_adapter.py
     fundamental_universe_discovery_worker.py global_input_bundle.py
     global_input_schema.py historical_preopen_input_adapter.py
@@ -178,8 +184,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     production_evidence_acquisition_io.py production_evidence_composer.py
     refusal_smoke_projection.py run_contract.py runtime_shard_projection.py
     six_universe_cap90_submission.py six_universe_coverage_submission.py
-    six_universe_matched_study.py
-    six_universe_qcom_entry_only_projection.py
+    six_universe_matched_study.py six_universe_qcom_entry_only_projection.py
     six_universe_qcom_entry_only_study.py
     six_universe_qcom_exclusion_ar_range_policy.py
     six_universe_qcom_exclusion_coverage10_projection.py
@@ -191,8 +196,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     six_universe_qcom_exclusion_tilt_study.py
     six_universe_qcom_restored_projection.py
     six_universe_qcom_restored_score_floor1_projection.py
-    six_universe_qcom_restored_study.py
-    six_universe_qcom_score_floor1_study.py
+    six_universe_qcom_restored_study.py six_universe_qcom_score_floor1_study.py
     six_universe_r181_order_diagnostic.py
     six_universe_recent_settlement_submission.py
     six_universe_relaxed_selection_source.py six_universe_relaxed_submission.py
@@ -467,6 +471,84 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "accepted_risk_eight_universe_input_qc_projection.py": tuple(
+        """
+        dataclasses hashlib pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_coverage_qc_projection
+        """.split()
+    ),
+    "eight_universe_ar_on_split_rounding.py": tuple(
+        """
+        hashlib json pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection
+        research.analyst_revisions_v2_qc.eight_universe_split_truncation_projection
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        """.split()
+    ),
+    "eight_universe_input_submission.py": tuple(
+        """
+        hashlib json re time dataclasses pathlib
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime
+        research.analyst_revisions_v2_qc.six_universe_coverage_submission
+        """.split()
+    ),
+    "eight_universe_qcom_admitted_projection.py": tuple(
+        """
+        ast dataclasses hashlib json decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_matched_historical_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_projection
+        research.analyst_revisions_v2_qc.six_universe_qcom_restored_projection
+        research.analyst_revisions_v2_qc.six_universe_qcom_restored_score_floor1_projection
+        """.split()
+    ),
+    "eight_universe_r268_a2_diagnostic.py": tuple(
+        """
+        ast dataclasses hashlib json datetime research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection
+        research.analyst_revisions_v2_qc.eight_universe_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        """.split()
+    ),
+    "eight_universe_r268_a3_split_rounding.py": tuple(
+        """
+        hashlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection
+        research.analyst_revisions_v2_qc.eight_universe_split_truncation_projection
+        research.analyst_revisions_v2_qc.eight_universe_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        """.split()
+    ),
+    "eight_universe_split_truncation_projection.py": tuple(
+        """
+        ast dataclasses hashlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        """.split()
+    ),
+    "eight_universe_study.py": tuple(
+        """
+        dataclasses decimal os pathlib stat research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.eight_universe_input_submission
+        research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.six_universe_matched_study
+        research.analyst_revisions_v2_qc.eight_universe_split_truncation_projection
+        research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime
+        research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic
+        """.split()
+    ),
     "fresh_six_universe_snapshot_submission.py": tuple(
         """
         __future__ argparse hashlib json re time dataclasses pathlib
@@ -1506,7 +1588,8 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     "six_universe_relaxed_selection_source.py": tuple("ast decimal re".split()),
     "six_universe_relaxed_submission.py": tuple(
         """
-        dataclasses hashlib json os pathlib stat time research.analyst_revisions_v2_qc
+        dataclasses hashlib json os pathlib stat time
+        research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.six_universe_cap90_submission
         research.analyst_revisions_v2_qc.six_universe_recent_settlement_submission
         research.analyst_revisions_v2_qc.six_universe_settlement_submission
@@ -1518,7 +1601,12 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_study
         research.analyst_revisions_v2_qc.six_universe_qcom_restored_study
         research.analyst_revisions_v2_qc.six_universe_qcom_score_floor1_study
-        decimal research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.eight_universe_study
+        research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic
+        research.analyst_revisions_v2_qc.eight_universe_r268_a3_split_rounding
+        research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding
+        decimal
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         """.split()
     ),
     "six_universe_r181_order_diagnostic.py": tuple(
@@ -1530,6 +1618,26 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
 }
 
 _HOST_ONLY_ADAPTER_IO_SURFACE = {
+    "accepted_risk_eight_universe_input_qc_projection.py": (
+        "call:read_bytes",
+        "import:pathlib",
+    ),
+    "eight_universe_ar_on_split_rounding.py": (
+        "call:read_bytes",
+        "import:pathlib",
+    ),
+    "eight_universe_input_submission.py": (
+        "call:read_bytes",
+        "import:pathlib",
+    ),
+    "eight_universe_qcom_admitted_projection.py": (),
+    "eight_universe_r268_a2_diagnostic.py": (),
+    "eight_universe_r268_a3_split_rounding.py": (),
+    "eight_universe_split_truncation_projection.py": (),
+    "eight_universe_study.py": (
+        "import:os",
+        "import:pathlib",
+    ),
     "fresh_six_universe_snapshot_submission.py": (
         "call:read_bytes", "import:pathlib",
     ),
@@ -1814,6 +1922,19 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
 }
 
 _QC_RUNTIME_IMPORTS = {
+    "accepted_risk_eight_universe_input_qc_runtime.py": tuple(
+        """
+        hashlib json decimal accepted_risk_six_universe_coverage_qc_runtime
+        accepted_risk_order_level_input_runtime
+        accepted_risk_preliminary_qc_figi
+        accepted_risk_six_universe_gate_evaluator
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_coverage_qc_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_order_level_input_runtime
+        research.analyst_revisions_v2_qc.accepted_risk_preliminary_qc_figi
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_gate_evaluator
+        """.split()
+    ),
     "accepted_risk_matched_diagnostics.py": tuple(
         """
         datetime decimal hashlib accepted_risk_six_universe_order_qc_runtime
@@ -2047,6 +2168,9 @@ _QC_RUNTIME_IMPORTS = {
     ),
 }
 _QC_RUNTIME_IO_SURFACE = {
+    "accepted_risk_eight_universe_input_qc_runtime.py": (
+        "call:set_summary_statistic",
+    ),
     "accepted_risk_matched_diagnostics.py": ("call:history",),
     "accepted_risk_order_level_input_runtime.py": (
         "call:contains_key",
@@ -3246,6 +3370,22 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "research.analyst_revisions_v2.global_benchmark_contract",
         ),
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_order_level_input_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_six_universe_coverage_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_six_universe_gate_evaluator",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
             "accepted_risk_preliminary_rating_evaluator",
         ),
@@ -4107,6 +4247,22 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
 _PINNED_PROJECTED_SIBLING_IMPORTS = frozenset(
     {
         (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_six_universe_coverage_qc_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_order_level_input_runtime",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_preliminary_qc_figi",
+        ),
+        (
+            "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
+            "accepted_risk_six_universe_gate_evaluator",
+        ),
+        (
             "research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics",
             "accepted_risk_six_universe_order_qc_runtime",
         ),
@@ -4548,6 +4704,8 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "data.exchange_calendar",
         "research.analyst_revisions_v2_qc",
         "research.analyst_revisions_v2_qc.accepted_risk_delta_order_package",
+        "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_projection",
+        "research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_etf_baseline_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_latest_order_package",
@@ -4615,6 +4773,13 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
+        "research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding",
+        "research.analyst_revisions_v2_qc.eight_universe_input_submission",
+        "research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection",
+        "research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic",
+        "research.analyst_revisions_v2_qc.eight_universe_r268_a3_split_rounding",
+        "research.analyst_revisions_v2_qc.eight_universe_split_truncation_projection",
+        "research.analyst_revisions_v2_qc.eight_universe_study",
         "research.analyst_revisions_v2_qc.event_study",
         "research.analyst_revisions_v2_qc.firm_ontology_candidate_builder",
         "research.analyst_revisions_v2_qc.firm_ontology_owner_decision",

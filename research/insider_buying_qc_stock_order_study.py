@@ -549,6 +549,16 @@ class InsiderBuyingStockOrderStudy(QCAlgorithm):  # type: ignore[name-defined]
                 order.symbol == symbol for order in self._pending.values()
             ):
                 raise StockStudyRefusal("REFUSED: held or pending security delisted")
+        if not hasattr(slice, "splits") or not hasattr(slice.splits, "items"):
+            raise StockStudyRefusal("REFUSED: split notifications unavailable")
+        for symbol, _split in slice.splits.items():
+            if str(symbol.id) in self._active or any(
+                order.symbol == symbol for order in self._pending.values()
+            ):
+                # LEAN adjusts RAW holdings and open-order quantities for splits.
+                # Refuse even a warning: this study has no preregistered
+                # split-adjustment path for an in-horizon 20-session exit.
+                raise StockStudyRefusal("REFUSED: split affects held or pending security")
 
     def on_order_event(self, order_event) -> None:
         if not hasattr(self, "_pending"):

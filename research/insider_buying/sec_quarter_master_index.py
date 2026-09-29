@@ -284,7 +284,11 @@ def parse_sec_quarter_master_index(
         if _CIK_RE.fullmatch(cik) is None or int(cik) == 0:
             raise SecQuarterMasterIndexError("REFUSED: master index CIK is invalid")
         if (
-            not 0 < len(company) <= 1024
+            len(company) > 1024
+            # Historical non-Form-4 index rows can have an empty company
+            # name. Preserve their row count while keeping target locators
+            # strict: they are the only rows retained for downstream use.
+            or (not company and form in _TARGET_FORMS)
             or any(ord(char) < 32 or 127 <= ord(char) <= 159 for char in company)
             or _FORM_RE.fullmatch(form) is None
         ):

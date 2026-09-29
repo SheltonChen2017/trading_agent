@@ -240,6 +240,37 @@ def test_other_form_with_legitimate_embedded_space_is_not_near_form4():
     assert _parse(_FOUR, row).rows[0].accession_number == _EXPECTED[0].accession_number
 
 
+def test_blank_company_on_non_target_form_keeps_quarter_inventory():
+    blank_other = (
+        b"1002||8-K|2023-02-10|"
+        b"edgar/data/1002/0000001002-23-000004.txt\n"
+    )
+    raw = _HEADER + blank_other + _FOUR
+    receipt = parse_sec_quarter_master_index(raw, year=2023, quarter=1)
+    assert receipt.source_sha256 == hash_bytes(raw)
+    assert receipt.all_filing_row_count == 2
+    assert receipt.rows == select_sec_master_index_subset(receipt, (_EXPECTED[0],))
+
+
+@pytest.mark.parametrize("form", (b"4", b"4/A"))
+def test_blank_company_on_form4_still_refuses_entire_quarter(form):
+    blank_target = (
+        b"1002||" + form + b"|2023-02-10|"
+        b"edgar/data/1002/0000001002-23-000004.txt\n"
+    )
+    with pytest.raises(SecQuarterMasterIndexError, match="row fields are malformed"):
+        _parse(_FOUR, blank_target)
+
+
+def test_blank_non_target_company_does_not_relax_structural_fields():
+    blank_other_bad_path = (
+        b"1002||8-K|2023-02-10|"
+        b"edgar/data/../0000001002-23-000004.txt\n"
+    )
+    with pytest.raises(SecQuarterMasterIndexError, match="archive path is malformed"):
+        _parse(_FOUR, blank_other_bad_path)
+
+
 def test_crlf_and_nonascii_company_are_accepted_but_raw_bytes_stay_distinct():
     lf = _HEADER + _FOUR
     crlf = lf.replace(b"Example One Inc", b"Caf\xe9 Inc").replace(b"\n", b"\r\n")

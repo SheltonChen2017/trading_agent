@@ -437,6 +437,40 @@ def test_missing_bar_partial_fill_delisting_and_no_fabricated_completion(
         incomplete.on_end_of_algorithm()
 
 
+@pytest.mark.parametrize("position_state", ["pending-entry", "held", "pending-exit"])
+@pytest.mark.parametrize("split_type", ["warning", "split_occurred"])
+def test_split_notification_refuses_affected_order_or_position_before_exit_quantity_drifts(
+    study: types.ModuleType, position_state: str, split_type: str,
+) -> None:
+    algorithm = _configured(study)
+    algorithm._after_market_close()
+    symbol = algorithm.orders[0][0]
+    if position_state != "pending-entry":
+        _fill(study, algorithm, algorithm.orders[0])
+        if position_state == "pending-exit":
+            row = algorithm._manifest.signals[0]
+            algorithm._submit(row, symbol, "EXIT", -42, row.exit_session)
+    before_orders = list(algorithm.orders)
+    with pytest.raises(study.StockStudyRefusal, match="split"):
+        algorithm.on_data(types.SimpleNamespace(
+            delistings={}, splits={symbol: types.SimpleNamespace(type=split_type)},
+        ))
+    assert algorithm.orders == before_orders
+
+
+def test_unrelated_clock_split_does_not_discard_held_security(
+    study: types.ModuleType,
+) -> None:
+    algorithm = _configured(study)
+    algorithm._after_market_close()
+    _fill(study, algorithm, algorithm.orders[0])
+    clock = algorithm._clock_symbol
+    algorithm.on_data(types.SimpleNamespace(
+        delistings={}, splits={clock: types.SimpleNamespace(type="split_occurred")},
+    ))
+    assert len(algorithm._active) == 1
+
+
 def test_missing_intermediate_holding_bar_refuses_entire_study(
     study: types.ModuleType,
 ) -> None:

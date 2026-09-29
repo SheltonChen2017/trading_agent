@@ -30581,3 +30581,26 @@ least one positive score. Differences are exploratory strategy contrasts,
 not a pure causal estimate of analyst-score weight. These seven sources
 remain gated on a valid, authenticated R268 result; R276's old basket source
 remains blocked pending a separate correction.
+
+The first three arms have since reached valid order-based QC results. All
+use 2021-01-04--2025-12-31, 261/261 completed rebalances, 10 bps per side,
+and zero modeled slippage:
+
+| Candidate | AR transfer | Net cumulative | Maximum drawdown | Annualized volatility | Zero-rate Sharpe |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| R268 A3 | Off, cap-ranked | +124.263646% | 21.103442% | 18.890072% | 0.953815 |
+| R269 A1 | 80% | +133.381510% | 21.023522% | 19.045422% | 0.989658 |
+| R270 A1 | 100% | +136.059782% | 21.014460% | 19.107861% | 0.999055 |
+| R271 A1 | 120% | +138.396639% | 21.216897% | 19.204557% | 1.005306 |
+
+R269, R270, and R271 private projects/backtests are respectively
+**37127174**/`ca1b8d8a48b12d02f4d7c2835e735574`,
+**37127416**/`9a202c9e829175b3f4a92e74611c1a7f`, and
+**37127611**/`d43eb5c9c4270f456ffece82a0601def`. Each one-use read
+authenticated its source and actual-versus-modeled fees, with zero
+invalid/canceled orders. The combined AR-on minus AR-off cumulative
+differences are +9.117864, +11.796136, and +14.132992 percentage points.
+Those are not pure weight-transfer estimates because the AR-on entry/rank
+gate differs from the cap-ranked AR-off baseline. See shared research
+ledger R-268 A3 and R-269--R-271 for each look and limitation. Current
+conservative floor: **285/222/38/689**.

@@ -6239,3 +6239,53 @@ establish point-in-time analyst signal efficacy. One valid exploratory cell
 raises the conservative floor to **282 shared / 219 development / 38
 infrastructure looks / 686 valid cells**. The seven separately frozen
 R269--R275 corrected AR-on arms may now enter their own launch gates.
+
+## R-269 A1 — eight-universe AR-on 80% — 2026-09-29
+
+One exploratory **development** look used prospectively frozen corrected
+manifest SHA-256
+`abdc0f4bb48b7f463d696c4cc46af9655f63be60677683478b0d4b2880e4abe0`
+and source-freeze commit `857aaf6`. Private project **37127174**,
+backtest `ca1b8d8a48b12d02f4d7c2835e735574`, A1 reached `Completed.`.
+Its one-use authenticated result is **run-valid**: all 261 rebalances
+submitted and completed, no invalid/canceled orders, and actual engine
+fees equal modeled fees ($68,059.6507905). For 2021-01-04 through
+2025-12-31, net cumulative return was **+133.381510%**, maximum drawdown
+**21.023522%**, annualized volatility 19.045422%, and zero-rate Sharpe
+0.989658. The AR-independent R268 A3 baseline returned +124.263646%,
+so the exploratory cumulative difference is **+9.117864 percentage
+points**. This is a combined AR entry/rank/weight contrast, not a pure
+tilt coefficient or causal effect; the archive is current-vintage and
+slippage is zero. One valid cell moves the floor to **283 shared / 220
+development / 38 infrastructure looks / 687 valid cells**.
+
+## R-270 A1 — eight-universe AR-on 100% — 2026-09-29
+
+One more exploratory **development** look used the same prospectively
+frozen corrected AR-on manifest and order-based protocol. Private project
+**37127416**, backtest `9a202c9e829175b3f4a92e74611c1a7f`, A1
+reached `Completed.` and its one-use result is **run-valid**: 261/261
+rebalances, zero invalid/canceled orders, and actual engine fees matching
+modeled fees ($69,947.1224612). Over 2021--2025, net cumulative return
+was **+136.059782%**, maximum drawdown **21.014460%**, annualized
+volatility 19.107861%, and zero-rate Sharpe 0.999055. This is
+**+11.796136 percentage points** versus R268 A3's +124.263646% AR-off
+baseline, and +2.678272 points versus R269's 80% arm. The difference
+still combines AR entry/rank/weight effects, in a current-vintage archive
+with zero modeled slippage. One valid cell moves the floor to **284 shared
+/ 221 development / 38 infrastructure looks / 688 valid cells**.
+
+## R-271 A1 — eight-universe AR-on 120% — 2026-09-29
+
+One exploratory **development** look in private project **37127611**,
+backtest `d43eb5c9c4270f456ffece82a0601def`, used the same prospectively
+frozen corrected seven-arm source. QC `Completed.` and the one-use result
+is **run-valid**: 261/261 completed rebalances, zero invalid/canceled
+orders, and actual/modeled fees equal ($71,212.5382188). Net cumulative
+return over 2021--2025 was **+138.396639%**, maximum drawdown
+**21.216897%**, annualized volatility 19.204557%, and zero-rate Sharpe
+1.005306. This is **+14.132992 percentage points** versus R268 A3 and
++2.336856 points versus R270's 100% arm. It remains a current-vintage,
+zero-slippage, combined AR entry/rank/weight exploratory contrast, not a
+prospective efficacy claim. One valid cell raises the floor to **285
+shared / 222 development / 38 infrastructure looks / 689 valid cells**.

@@ -291,3 +291,13 @@ def test_rebuilt_exact_seventeen_file_source_previews_offline(candidate, tmp_pat
     assert identity["profile_sha256"] == profile["profile_sha256"]
     assert len(identity["source_files"]) == 17
     assert projected.total_source_byte_count + 32_768 <= 448 * 1024
+
+
+def test_original_family_freeze_does_not_pull_corrected_candidate_sources(monkeypatch):
+    from scripts import run_arv2_eight_universe as script
+
+    def corrected_source_is_not_the_original_inventory(*_args, **_kwargs):
+        raise AssertionError("original family freeze traversed corrected routing")
+
+    monkeypatch.setattr(script, "projected", corrected_source_is_not_the_original_inventory)
+    assert script.freeze() == adapter._eight_universe_manifest()

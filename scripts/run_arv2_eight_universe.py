@@ -56,7 +56,10 @@ def freeze():
         _, parent_id, parent_projection = renderer.PARENT_IDS[arm]
         on = arm.startswith("ar_on")
         parent = (floor if on else restored)[parent_id]
-        value, profile = projected(candidate, inputs)
+        # Rebuild the immutable original nine-row inventory. Corrected A3
+        # and AR-on manifests have separate per-candidate freeze paths.
+        value, profile = renderer.build_eight_universe_projection(
+            inputs, arm, candidate)
         files = [[item.project_path, item.content_sha256, item.byte_count]
                  for item in value.source_files]
         rows.append({

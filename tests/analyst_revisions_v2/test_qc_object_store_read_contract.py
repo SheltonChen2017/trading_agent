@@ -141,7 +141,11 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     accepted_risk_six_universe_recent_coverage_projection.py
     accepted_risk_spy_order_level_v1_qc_runtime.py
     accepted_risk_stock_portfolio_evaluator.py
-    accepted_risk_terminal_disposition.py eight_universe_ar_on_split_rounding.py
+    accepted_risk_terminal_disposition.py
+    eight_universe_ar_entry_only_projection.py
+    eight_universe_ar_on_split_rounding.py
+    eight_universe_attribution_study.py
+    eight_universe_cap_holdings_weight_only_projection.py
     eight_universe_input_submission.py
     eight_universe_qcom_admitted_projection.py
     eight_universe_r268_a2_diagnostic.py
@@ -471,6 +475,35 @@ _ZERO_EXTERNAL_IO_SOURCES = frozenset(_ZERO_EXTERNAL_IO_IMPORTS)
 # package exemption.  This both documents why the file is outside the pure
 # class and makes any new dependency a review event.
 _HOST_ONLY_ADAPTER_IMPORTS = {
+    "eight_universe_ar_entry_only_projection.py": tuple(
+        """
+        ast dataclasses hashlib json decimal research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding
+        research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection
+        """.split()
+    ),
+    "eight_universe_attribution_study.py": tuple(
+        """
+        ast decimal hashlib json pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.eight_universe_ar_entry_only_projection
+        research.analyst_revisions_v2_qc.eight_universe_cap_holdings_weight_only_projection
+        research.analyst_revisions_v2_qc.eight_universe_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        research.analyst_revisions_v2_qc.six_universe_settlement_submission
+        """.split()
+    ),
+    "eight_universe_cap_holdings_weight_only_projection.py": tuple(
+        """
+        ast copy dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding
+        research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection
+        research.analyst_revisions_v2_qc.eight_universe_r268_a3_split_rounding
+        """.split()
+    ),
     "accepted_risk_eight_universe_input_qc_projection.py": tuple(
         """
         dataclasses hashlib pathlib research.analyst_revisions_v2_qc
@@ -1605,6 +1638,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic
         research.analyst_revisions_v2_qc.eight_universe_r268_a3_split_rounding
         research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding
+        research.analyst_revisions_v2_qc.eight_universe_attribution_study
         decimal
         research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         """.split()
@@ -1626,6 +1660,11 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "call:read_bytes",
         "import:pathlib",
     ),
+    "eight_universe_ar_entry_only_projection.py": (),
+    "eight_universe_attribution_study.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
+    "eight_universe_cap_holdings_weight_only_projection.py": (),
     "eight_universe_input_submission.py": (
         "call:read_bytes",
         "import:pathlib",
@@ -4773,7 +4812,10 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.accepted_risk_spy_order_level_v1_qc_runtime",
         "research.analyst_revisions_v2_qc.accepted_risk_stock_portfolio_evaluator",
         "research.analyst_revisions_v2_qc.accepted_risk_terminal_disposition",
+        "research.analyst_revisions_v2_qc.eight_universe_ar_entry_only_projection",
         "research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding",
+        "research.analyst_revisions_v2_qc.eight_universe_attribution_study",
+        "research.analyst_revisions_v2_qc.eight_universe_cap_holdings_weight_only_projection",
         "research.analyst_revisions_v2_qc.eight_universe_input_submission",
         "research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection",
         "research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic",

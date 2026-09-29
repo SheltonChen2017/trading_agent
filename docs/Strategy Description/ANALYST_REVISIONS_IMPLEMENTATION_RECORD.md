@@ -935,11 +935,13 @@ under the prospectively frozen LEAN split-truncation rule, and valid
 R269--R275 at 80%--200% AR transfer; section 216 hands off the range, and the
 floor is **289/226/38/693**. Section 217 is Claude's independent review of
 the exact pushed range `aef4855..e3fa38d`, with the test-only corrections
-`09621fa` and `9332f3e`. The immediate next step is that Codex counter-reviews
-section 217 and the exact pushed range, and resolves the R247 09:20 clock
-question before any further 2021--2025 variant. No historical eight-universe
-success would settle the separate R247 forward-input/clock gate or confer
-paper/live/funded/real-order authority.
+`09621fa` and `9332f3e`. Section 218 counter-reviews all four Claude commits
+and preregisters the owner's later, narrowly scoped fixed-100% historical
+attribution diagnostic. It is not a further percentage or universe sweep and
+cannot override the R247 09:20 forward-input/clock blocker. No historical
+eight-universe success confers paper/live/funded/real-order authority.
+Claude will review section 218 and its exact pushed source and results
+independently after Codex's single round-end push.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -30902,3 +30904,74 @@ Run on the exact final tree of this round (`e3fa38d`, the test-only
 Not exercised here: no QuantConnect or provider endpoint, result read, or
 launcher was run; the thirty-six cloud launches of sections 212–215 are
 attested only by Codex's receipts and the retained results re-read locally.
+
+## 218. Codex counter-review of section 217 and prospective fixed-100% eight-sleeve factorial diagnostic, 2026-09-29
+
+**Counter-review range:** `e3fa38d..e9e2d7d`, four Claude commits on the
+designated lane branch and worktree. `09621fa` (whole-package closure pin),
+`9332f3e` (R267 count and split-overlay guard tests), `54dde8e` (section-217
+record), and `e9e2d7d` (final validation record) are each **accepted**. The
+closure registration, test mutations, finding dispositions and commit claims
+were independently checked; a focused final-tree selection passed 207 tests.
+No verified lane-owned production defect was introduced by these commits.
+Section 217.7's introductory phrase "exact final tree" is narrower than it
+sounds: the two-hour complete lane selection ran in an export of the
+pre-correction pushed head, while focused gates were green on the final
+Claude tree. This is a P3 record-precision qualification, not a claim that
+the corrected tests failed. Codex did not repeat the complete lane suite.
+
+The owner's later explicit direction authorizes **only the missing two
+fixed-100% arms** of the already described eight-universe 2021–2025 2×2
+diagnostic, notwithstanding section 217.5's general recommendation to stop
+historical sweeps. This is a descriptive decomposition, not independent
+confirmation, an AR-percentage search, a formal alpha look, or a forward
+evaluation. R247's exhausted input/09:20 clock gate remains unchanged.
+
+### 218.1 Frozen prospective comparison, before any new QC attempt
+
+The four order-based cells are A=R268 A3 (cap-selected, base weights),
+B=R277 (the **same cap-selected holdings**, 100% AR weight transfer),
+C=R278 (R270's **same AR entry/count holdings**, zero AR weight transfer),
+and D=R270 A1 (AR entry/count plus 100% AR weight transfer). The gate uses
+the complete baseline target-path SHA-256 for each fixed-holdings pair, not
+merely a matched name count. R277's generated runtime independently refuses
+a baseline path other than authenticated R268 A3; the result comparison also
+binds R277 to R268 and R278 to R270. "AR entry/count" is precise: selected
+names within the admitted count remain cap-ranked, not score-ranked.
+
+The new two-row manifest is
+`eight_universe_attribution_candidates.json`, SHA-256
+`98e2279189c09d517441741840a173239ab2e105259d024efb17b2ba48929b60`.
+Its distinct, 17-file order sources are R277 projection
+`03833fe2e7990706ef5ac4d44120d7e9704ee94141fcd1a53d006fbd2059943e`
+and profile `6956d3dcafacc48c9aa1c47cc5c7c183318b45d340a36d3855b12ba2fb7e8aa2`,
+and R278 projection
+`a9d3c606ade43291277e6ef3bcf9faaf4778bbea6fa1f70c1bc13abf6396a32f`
+and profile `27c45839301fe8084a2428c0989d0aa30659dd7b896c13e56d05d94092b935e8`.
+The control results are pinned to the retained R268 A3 and R270 A1 result
+bytes (`45171f67…5c1ac`, `afa7b3a6…5d1a6c`) and their complete baseline
+target paths (`e2a4ea68…ba46`, `a0b8cfce…d8ea`). The same historical
+package, activation, eight universes, 261 weekly decisions, 1,255 daily
+observations, 98% target gross, 2× admission buying power, 10 bps-per-side
+modeled fee, zero modeled slippage and split-truncation rule are retained.
+Each new candidate has at most three QC attempts in one private project.
+
+The preregistered read admits only the three bounded `ARV2_EIGHT_GATE_ORDER_*`
+custom statistics, exact source/profile/input lineage, a valid 261/261
+physical-order census, zero invalid/canceled orders, actual=modelled fees
+equal, common ETF/membership digests, and fixed-holdings path equality. It
+reports B−A, C−A, D−C, their interaction and D−A as *descriptive cumulative
+percentage-point contrasts*. It does not assert a common full stock-minute
+fill tape. In-year returns and uncertainty must accompany any interpretation;
+the current-vintage Benzinga archive and adaptive look history remain open.
+
+**Prelaunch state:** no R277/R278 QC project, launch, result read, or new
+research look has occurred at this preregistration. Offline `freeze` and both
+`preview`s reproduce the manifest/projection/profile pins; the retained
+R268/R270 results reauthenticate as valid without a second QC read. The
+whole-package closure file passed 74/74 and the new integration tests 6/6.
+The new source-specific tests passed 5/5 for R278 and 6/6 for R277.
+Next: commit this frozen source and protocol, then launch at most one A1 per
+candidate, with any correction as a separately accounted attempt in the
+same project. Only if both valid may a separate adverse-slippage/liquidity
+sensitivity be preregistered; no live, paper, broker or funded order follows.

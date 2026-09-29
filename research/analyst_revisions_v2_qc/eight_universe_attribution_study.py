@@ -268,7 +268,11 @@ def require_parents(plan):
         old = adapter.build_plan(candidate, plan.organization_id, PARENT_CONTROL,
             _PARENT_ATTEMPTS[candidate], family=eight.FAMILY)
         result_path = adapter._path(old, "result")
-        if hashlib.sha256(result_path.read_bytes()).hexdigest() != PARENT_RESULT_SHA256[candidate]:
+        try:
+            result_bytes = result_path.read_bytes()
+        except OSError:
+            _fail("fixed-100 attribution predecessor result is unavailable")
+        if hashlib.sha256(result_bytes).hexdigest() != PARENT_RESULT_SHA256[candidate]:
             _fail("fixed-100 attribution predecessor result bytes changed")
         result = _authenticated_result(old)
         if (result["run_valid"] is not True
@@ -293,6 +297,45 @@ def _require_fixed_holdings_paths(parents, new):
                PARENT_BASELINE_PATH_SHA256["R270"]):
         _fail("fixed-100 attribution did not hold selected-holdings paths fixed")
     return True
+
+
+def _annual_contrasts(arms):
+    names = ("cap_base", "cap_AR_weight", "AR_entry_base_weight",
+             "AR_entry_AR_weight")
+    if type(arms) is not dict or set(arms) != set(names):
+        _fail("fixed-100 attribution annual arm census changed")
+    rows = {name: arms[name]["diagnostics"]["annual_account_rows"] for name in names}
+    dates = [[row[index] for index in (0, 1, 2, 3, 4)] for row in rows[names[0]]]
+    if (len(dates) != 5 or [row[0] for row in dates] != [str(year) for year in range(2021, 2026)]
+            or any([[row[index] for index in (0, 1, 2, 3, 4)] for row in rows[name]] != dates
+                   for name in names[1:])):
+        _fail("fixed-100 attribution annual axes differ")
+    with localcontext() as context:
+        context.prec = 96
+        annual = []
+        series = {key: [] for key in (
+            "AR_weight_on_cap_holdings_pp", "AR_entry_count_at_base_weights_pp",
+            "AR_weight_on_AR_entry_holdings_pp", "entry_weight_interaction_pp",
+            "full_minus_cap_base_pp")}
+        for index, date in enumerate(dates):
+            a, b, c, d = (Decimal(rows[name][index][5]) for name in names)
+            values = ((b - a) * 100, (c - a) * 100, (d - c) * 100,
+                      ((d - c) - (b - a)) * 100, (d - a) * 100)
+            annual.append({"year": date[0], **{
+                key: str(value) for key, value in zip(series, values)}})
+            for key, value in zip(series, values):
+                series[key].append(value)
+        uncertainty = {}
+        for key, values in series.items():
+            mean = sum(values) / Decimal(5)
+            sample_variance = sum((value - mean) ** 2 for value in values) / Decimal(4)
+            standard_error = (sample_variance / Decimal(5)).sqrt()
+            uncertainty[key] = {
+                "mean_annual_pp": str(mean),
+                "t_over_five_years": (None if standard_error == 0
+                                      else str(mean / standard_error)),
+            }
+    return annual, uncertainty
 
 
 def compare_from_saved(organization_id):
@@ -340,7 +383,9 @@ def compare_from_saved(organization_id):
         context.prec = 96
         returns = {name: Decimal(result["aggregates"]["account"]["cumulative_return"])
                    for name, result in arms.items()}
-        a, b, c, d = (returns[key] for key in arms)
+        a, b, c, d = (returns[key] for key in (
+            "cap_base", "cap_AR_weight", "AR_entry_base_weight",
+            "AR_entry_AR_weight"))
         contrasts = {
             "AR_weight_on_cap_holdings_pp": str((b - a) * 100),
             "AR_entry_count_at_base_weights_pp": str((c - a) * 100),
@@ -348,7 +393,10 @@ def compare_from_saved(organization_id):
             "entry_weight_interaction_pp": str(((d - c) - (b - a)) * 100),
             "full_minus_cap_base_pp": str((d - a) * 100),
         }
+    annual, uncertainty = _annual_contrasts(arms)
     return {"valid": True, "historical_diagnostic_only": True,
             "common_input_not_full_stock_minute_fill_tape": True,
             "returns": {name: str(value) for name, value in returns.items()},
-            "contrasts": contrasts}
+            "contrasts": contrasts,
+            "annual_contrasts": annual,
+            "five_year_descriptive_uncertainty": uncertainty}

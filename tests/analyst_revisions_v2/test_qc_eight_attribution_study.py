@@ -1,6 +1,7 @@
 """Guard-specific checks for the fixed-100% eight-sleeve factorial family."""
 
 import hashlib
+from decimal import Decimal
 
 import pytest
 
@@ -77,3 +78,41 @@ def test_parser_refuses_diagnostic_digest_mismatch(monkeypatch):
         "arm": row["arm"], "overall_cumulative_return": "0.1"})
     with pytest.raises(adapter.RelaxedQcSubmissionError, match="diagnostic digest"):
         study.parse_order(plan, {key: "{}" for key in study.STATISTIC_NAMES})
+
+
+def test_annual_factorial_contrasts_pin_the_common_calendar_axis():
+    def arm(value):
+        return {"diagnostics": {"annual_account_rows": [
+            [str(year), 250 + (year == 2021), year != 2021,
+             f"{year}-01-04", f"{year}-12-31", value, "-0.1", "0.2", "0.5"]
+            for year in range(2021, 2026)]}}
+    arms = {"cap_base": arm("0"), "cap_AR_weight": arm("0.1"),
+            "AR_entry_base_weight": arm("0.2"), "AR_entry_AR_weight": arm("0.4")}
+    annual, uncertainty = study._annual_contrasts(arms)
+    assert len(annual) == 5
+    assert Decimal(annual[0]["AR_weight_on_cap_holdings_pp"]) == 10
+    assert Decimal(annual[0]["AR_entry_count_at_base_weights_pp"]) == 20
+    assert Decimal(annual[0]["AR_weight_on_AR_entry_holdings_pp"]) == 20
+    assert Decimal(annual[0]["entry_weight_interaction_pp"]) == 10
+    assert Decimal(annual[0]["full_minus_cap_base_pp"]) == 40
+    assert uncertainty["full_minus_cap_base_pp"]["t_over_five_years"] is None
+    arms["AR_entry_AR_weight"]["diagnostics"]["annual_account_rows"][2][4] = "2023-12-28"
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="annual axes differ"):
+        study._annual_contrasts(arms)
+
+
+@pytest.mark.parametrize("unavailable", [True, False])
+def test_predecessor_result_bytes_must_be_available_and_exact(monkeypatch, unavailable):
+    class ResultPath:
+        def read_bytes(self):
+            if unavailable:
+                raise OSError("not available")
+            return b"changed predecessor result"
+
+    old_path = adapter._path
+    monkeypatch.setattr(adapter, "_path", lambda plan, kind: (
+        ResultPath() if kind == "result" else old_path(plan, kind)))
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match=(
+            "predecessor result is unavailable" if unavailable else
+            "predecessor result bytes changed")):
+        study.require_parents(_plan())

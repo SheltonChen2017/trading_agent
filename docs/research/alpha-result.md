@@ -6356,3 +6356,64 @@ the AR-on/off contrast changes entry/rank as well as weight, slippage is
 unmodeled, and the ladder was explored adaptively. One valid cell raises
 the conservative floor to **289 shared / 226 development / 38
 infrastructure looks / 693 valid cells**.
+
+## R-277 A1 — fixed-100% eight-universe AR weights on cap-selected holdings — 2026-09-29
+
+One exploratory **development** look was spent in private QC project
+**37145397**, backtest `2284ba041e2a8853e449d0aebe74d663`. The source
+was prospectively committed at `908c9b0`, under frozen attribution manifest
+SHA-256 `98e2279189c09d517441741840a173239ab2e105259d024efb17b2ba48929b60`.
+This is the fixed-holdings R277 arm derived from R268 A3; it does not
+authorize a tilt or universe sweep. Terminal and result validity are
+**pending**. One launch raises the conservative floor to **290 shared /
+227 development / 38 infrastructure looks / 693 valid cells**.
+
+## R-278 A1 — fixed-100% eight-universe AR entry/count with base weights — 2026-09-29
+
+One exploratory **development** look was spent in private QC project
+**37145472**, backtest `3b93053259c4dd64d5127c689a588f34`. The source
+was prospectively committed at `908c9b0` under the same frozen attribution
+manifest. This is R270's AR entry/count with zero AR weight transfer, not
+another percentage or universe sweep. Terminal and result validity are
+**pending**. One launch raises the conservative floor to **291 shared /
+228 development / 38 infrastructure looks / 693 valid cells**.
+
+### R-277 and R-278 A1 completion disposition — 2026-09-29
+
+The two preceding launch entries were written while terminal/result validity
+was pending. Each A1 subsequently reached QC `Completed.` and passed its
+single bounded three-statistic result read and the frozen source/input,
+physical-order and predecessor gates. R-277 (project **37145397**, backtest
+`2284ba041e2a8853e449d0aebe74d663`) returned **+137.063657%** cumulative
+after modeled 10-bps-per-side fees, with **21.001641%** maximum drawdown,
+**1.0031** zero-rate Sharpe, 261/261 completed rebalances, 13,810 filled
+orders, zero invalid/canceled orders, and actual = modeled fees of
+**$71,695.36**. Its complete pre-overlay target path equals R-268 A3.
+R-278 (project **37145472**, backtest
+`3b93053259c4dd64d5127c689a588f34`) returned **+122.396227%** with
+**21.108807%** maximum drawdown, **0.9452** zero-rate Sharpe, 261/261
+rebalances, 14,488 filled orders, zero invalid/canceled orders, and actual
+= modeled fees of **$61,183.93**. Its complete selected-holdings target
+path equals R-270 A1. Both used the historical 2021-01-04–2025-12-31
+eight-universe package, 98% target gross exposure, 2× admission buying
+power, and **zero modeled slippage**; these were simulated, not funded,
+paper or live orders.
+
+Against the already authenticated controls, the four-cell cumulative
+returns are A=cap entry/base weights **+124.263646%** (R-268 A3),
+B=cap entry/AR weights **+137.063657%** (R-277 A1), C=AR entry/base
+weights **+122.396227%** (R-278 A1), and D=AR entry/AR weights
+**+136.059782%** (R-270 A1). B−A is **+12.8000 percentage points**,
+C−A **−1.8674 points**, D−C **+13.6636 points**, interaction **+0.8635
+points**, and D−A **+11.7961 points**. The B−A annual contrasts are
++4.72, +0.20, −2.22, +6.17 and −1.84 points for 2021–2025 respectively;
+their descriptive five-year t statistic is **0.82**. This is a historical
+decomposition: weighting, not the AR entry/count rule, accounts for the
+positive cumulative contrast in these arms. It is **not** independent
+forward evidence or a formal alpha estimate. Current-vintage Benzinga
+overwrites, adaptive prior looks, zero slippage, and the absence of a
+common full stock-minute fill tape prevent an efficacy or live-use claim.
+Two launched development looks produced **two valid cells**; the closing
+conservative floor is **291 shared / 228 development / 38 infrastructure
+looks / 695 valid cells**. No additional QC read or retry was made for this
+completion disposition.

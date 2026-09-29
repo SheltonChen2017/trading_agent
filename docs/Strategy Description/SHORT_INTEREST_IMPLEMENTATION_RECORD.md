@@ -9345,7 +9345,8 @@ This is **not** lane completion or backtesting readiness.
 
 ### 68.4 Non-substitutable next factual gate
 
-The owner-delegated authorization and decision inventory to date is exactly
+At this section's implementation snapshot, the owner-delegated authorization
+and decision inventory was exactly
 `SI-AUTH-20260928-01` through `-02` and `SI-DEC-20260928-01` through `-09`
 in sections 66–67. It must be consolidated at actual project completion.
 Judgment cannot supply these still-missing facts: the named historical
@@ -9366,3 +9367,63 @@ exact local range above after the one final lane push, recheck this persistent
 ledger and the counter-review qualifications, run the complete lane suite,
 and examine the synthetic-only versus empirical authority boundary. No push
 is made by this record edit while the factual source gate remains unresolved.
+
+## 69. Read-only QC/Sharadar source-route audit; empirical gate remains closed — 2026-09-28
+
+The owner named Massive-Benzinga Analyst Ratings, Earnings and Corporate
+Guidance, a QuantConnect Research subscription, and a Sharadar subscription
+and bundle, then approved verification of the proposed QuantConnect-native
+Short Interest route. This is `SI-AUTH-20260928-03`: a bounded, read-only
+catalog/entitlement and public-source-semantics check. It is **not** approval
+to query historical market rows, create a Short Interest QC project, process
+or upload data, compile, launch a job or backtest, or consume an outcome look.
+The Massive-Benzinga products do not substitute for historical short-interest
+positions. No secret, account identifier, billing detail or licensed row is
+retained here.
+
+The signed-in QuantConnect organization's plan identified the Researcher tier
+and showed **zero paid dataset subscriptions**. The FINRA OTC Transparency
+catalog page offered **zero licensing options** and documented cloud delivery;
+neither observation proves that `FINRAShortInterest` is usable in this account,
+nor does absence of a paid add-on prove that a free dataset is unavailable.
+No dataset/history request was made. QuantConnect [documents the actual
+`FINRAShortInterest` object and historical route](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/financial-industry-regulatory-authority/otc-transparency),
+but its [LEAN class reference](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/DataSource/FINRAShortInterest/)
+says the source endpoint lacks a publication-date field and the processor
+derives `EndTime` from settlement plus a fixed offset. `EndTime` therefore
+cannot, on its own, authenticate the actual release instant required for the
+release-next-open cohort. [FINRA states](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+that amendments are marked with a revision flag but **only the most recent
+data is made available**. Neither the QC documentation nor this account check
+establishes a preserved original-versus-revised historical vintage archive.
+
+The [Sharadar bundle catalog](https://sharadar.com/bundle) includes historical
+stock prices/volume, corporate actions, security metadata and delisted
+securities, but does not advertise a short-interest table. Sharadar SEP is a
+possible price/volume corroboration source, not an SI source or automatic QC
+cloud-processing right. QuantConnect's
+[AlgoSeek US Equities](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/algoseek/us-equities)
+and security master remain candidate listed-stock price, volume, mapping and
+corporate-action inputs, subject to actual coverage, point-in-time adjustment
+and terminal/delisting verification. The prospective QC cohort must intersect
+listed securities; OTC-only SI rows cannot silently enter it.
+
+| Finding | Priority | Status / evidence | Required resolution before admission |
+|---|---|---|---|
+| `SI-SRC-20260928-001` | P2 | **Open factual gate.** QC's SI `EndTime` is derived rather than an authenticated per-report release instant; blindly using it can admit a security before public information existed. | Independently bind each settlement to an authentic FINRA/publication calendar and an exact decision cutoff, conservatively deferring uncertain release clocks; test the fail-closed path. |
+| `SI-SRC-20260928-002` | P2 | **Open factual gate.** FINRA's currently available corrected history does not prove original historical vintages; a later revision can contaminate a prior decision. | Obtain a rights-cleared vintage-preserving archive or a documented, testable exclusion of every affected release; do not call latest-only rows PIT. |
+| `SI-SRC-20260928-003` | P2 | **Open factual gate.** A Researcher seat, a catalog entry and a Sharadar bundle name do not prove QC dataset access, Sharadar-to-QC processing rights, 60 valid prior PIT price/volume sessions per admitted release, stable identifiers or terminal values. | Verify exact products, permissions, historical coverage and the exact Short Interest QC project/data route before any QC processing or outcome access. |
+
+`SI-DEC-20260928-10` is to treat QC-native FINRA short interest plus QC US
+equity bars as a **candidate route only**, with Sharadar as a possible
+price/volume cross-check, not to bind any source as canonical. The next
+authorized action remains a metadata-only, rights-cleared source and vintage
+receipt, followed by a prospective power/date/look freeze if it passes. If
+authentic vintage and release evidence cannot be obtained, stop rather than
+substitute short-sale volume, borrow availability, structural rows or a
+latest-only backtest. Authorized/consumed real outcome looks remain **0/0**;
+no lookback winner, stock result, ETF transfer, production rank or execution
+authority exists. This audit changed the lane record only, not code or shared
+documents. `git diff --check` passed. The focused active-document test could
+not start: `python` is absent and system `python3` has no `pytest`; zero test
+cases ran. No QC job was run and no push is made at this gate.

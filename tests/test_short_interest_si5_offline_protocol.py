@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import replace
+from fractions import Fraction
 from hashlib import sha256
 from pathlib import Path
 import subprocess
@@ -121,6 +122,20 @@ def test_protocol_decisions_cite_an_immutable_committed_owner_delegation():
         ("qc_backtest_authorized", True),
         ("production_authoritative", True),
         ("trading_authority", True),
+        # The ten cases below pin fields whose construction guard was
+        # previously unasserted: removing any one of those guards let
+        # ``to_payload()`` serialize the altered design with no refusal,
+        # leaving only the whole-payload digest in ``require_si5_offline_protocol``.
+        ("release_aggregation", "value_weight_releases"),
+        ("candidate_selection_rule", "pick_best_validation_window"),
+        ("sector_relative_role", "second_primary_test"),
+        ("primary_cost_bps_per_side", 0),
+        ("alpha_ceiling", Fraction(1, 20)),
+        ("prospective_power_verified", True),
+        ("validation_dates", ("2026-01-01", "2026-12-31")),
+        ("cost_sensitivities_bps_per_side", (0,)),
+        ("version", "si5-stock-test-offline-design-v2"),
+        ("owner_decision_sha256", "0" * 64),
     ],
 )
 def test_unapproved_choice_or_authority_cannot_be_constructed(field, value):

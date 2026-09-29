@@ -57,6 +57,7 @@ _LEGACY_PREAMBLE = (
 _LEGACY_ROLE = frozenset({"REPORTING-OWNER:", "ISSUER:"})
 _LEGACY_OWNER_SCOPES = (
     "OWNER DATA", "FILING VALUES", "BUSINESS ADDRESS", "MAIL ADDRESS",
+    "FORMER NAME",
 )
 _LEGACY_ISSUER_SCOPES = (
     "COMPANY DATA", "BUSINESS ADDRESS", "MAIL ADDRESS", "FORMER COMPANY",
@@ -180,21 +181,43 @@ def _legacy_role_cik(
     fields: dict[str, dict[str, str]] = {}
     current: str | None = None
     seen_keys: set[str] = set()
+    former_name_fields: list[tuple[str, str]] = []
+
+    def finish_former_name() -> None:
+        if current != "FORMER NAME":
+            return
+        if tuple(key for key, _ in former_name_fields) != (
+            "FORMER CONFORMED NAME", "DATE OF NAME CHANGE",
+        ):
+            _refuse("legacy owner former name has missing or foreign fields")
+        name = former_name_fields[0][1]
+        if not name or name != name.strip():
+            _refuse("legacy owner former name is empty or padded")
+        _date_digits(former_name_fields[1][1].encode("ascii"),
+                     label="legacy owner former-name change date")
+
     for line in lines:
         scope = _LEGACY_SCOPE.fullmatch(line)
         if scope is not None:
+            finish_former_name()
             name = scope.group(1)
             if name not in allowed or (scopes and not seen_keys):
                 _refuse("legacy header has an empty or foreign role subsection")
             if not scopes and name != first:
                 _refuse("legacy header data subsection is not first")
+            if name == "FORMER NAME" and (not owner or "MAIL ADDRESS" not in scopes):
+                _refuse("legacy owner former name must follow a mail address")
+            repeatable = (owner and name == "FORMER NAME") or (
+                not owner and name == "FORMER COMPANY"
+            )
             if scopes and (allowed.index(name) < allowed.index(scopes[-1])
-                           or (name == scopes[-1] and name != "FORMER COMPANY")):
+                           or (name == scopes[-1] and not repeatable)):
                 _refuse("legacy header role subsections are repeated or out of order")
             scopes.append(name)
             current = name
             seen_keys = set()
-            if name != "FORMER COMPANY":
+            former_name_fields = []
+            if name not in {"FORMER COMPANY", "FORMER NAME"}:
                 fields[name] = {}
             continue
         leaf = _LEGACY_LEAF.fullmatch(line)
@@ -212,8 +235,11 @@ def _legacy_role_cik(
             _refuse("legacy header CIK occurs outside the data subsection")
         if key == "FORM TYPE" and (not owner or current != "FILING VALUES"):
             _refuse("legacy header form type occurs outside owner filing values")
-        if current != "FORMER COMPANY":
+        if current == "FORMER NAME":
+            former_name_fields.append((key, value))
+        elif current != "FORMER COMPANY":
             fields[current][key] = value
+    finish_former_name()
     if not scopes or not seen_keys or first not in fields:
         _refuse("legacy header role is empty or lacks its data subsection")
     if owner and ("FILING VALUES" not in fields

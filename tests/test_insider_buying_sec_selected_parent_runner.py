@@ -1,6 +1,8 @@
 """Invented parent bytes and injected transport only; no SEC request."""
 from __future__ import annotations
 
+import http.client
+import io
 import json
 from dataclasses import replace
 
@@ -49,6 +51,53 @@ def _run(plan, output, transport, *, resume=False, reuse=None):
     return runner._run_selected(plan, output, contact_email=CONTACT,
                                 capture_git_commit=COMMIT, transport=transport,
                                 reused_bytes=reuse, resume=resume)
+
+
+def _fake_https_wire(monkeypatch, wire: bytes):
+    """Exercise the standard library's real HTTP chunk decoder with no socket."""
+    state = {"requests": [], "reads": [], "closed": 0}
+
+    class Socket:
+        def makefile(self, mode):
+            assert mode == "rb"
+            return io.BytesIO(wire)
+
+    class Response(http.client.HTTPResponse):
+        def read(self, size=None):
+            state["reads"].append(size)
+            return super().read(size)
+
+    class Connection:
+        def __init__(self, host, timeout):
+            assert (host, timeout) == ("www.sec.gov", 15)
+            self.response = None
+
+        def request(self, method, path, headers):
+            state["requests"].append((method, path, headers))
+
+        def getresponse(self):
+            self.response = Response(Socket())
+            self.response.begin()
+            return self.response
+
+        def close(self):
+            state["closed"] += 1
+            if self.response is not None:
+                self.response.close()
+
+    monkeypatch.setattr(runner.http.client, "HTTPSConnection", Connection)
+    return state
+
+
+def _http_wire(status: int, headers: tuple[tuple[str, str], ...], body: bytes) -> bytes:
+    reason = "OK" if status == 200 else "Other"
+    lines = [f"HTTP/1.1 {status} {reason}\r\n".encode()]
+    lines.extend(f"{name}: {value}\r\n".encode() for name, value in headers)
+    return b"".join(lines) + b"\r\n" + body
+
+
+def _chunked(body: bytes) -> bytes:
+    return f"{len(body):x}\r\n".encode() + body + b"\r\n0\r\n\r\n"
 
 
 @pytest.fixture(autouse=True)
@@ -218,6 +267,8 @@ def test_capacity_pause_occurs_before_request_and_is_resumable(monkeypatch, tmp_
 def test_synthetic_plan_cannot_use_real_transport_and_real_scope_cannot_be_forged(tmp_path):
     with pytest.raises(runner.SecSelectedParentRunnerError, match="real SEC transport"):
         _run(_plan(1), tmp_path / "never", runner._sec_transport)
+    with pytest.raises(runner.SecSelectedParentRunnerError, match="real SEC transport"):
+        _run(_plan(1), tmp_path / "never-selected", runner._selected_sec_transport)
     forged = runner.SelectedParentPlan(
         scope="ib1b_observed_noncanonical", locator_manifest_sha256="c" * 64,
         requests=(_request(1),),
@@ -310,6 +361,137 @@ def test_http_200_html_challenge_refuses_before_parent_object_publication(tmp_pa
     assert "envelope" in report["halted_reason"]
     assert report["rows"][0]["status"] == "refused"
     assert list((output / "objects").iterdir()) == []
+
+
+def test_selected_transport_accepts_bounded_chunked_and_preserves_header_provenance(monkeypatch):
+    body = b"<SEC-DOCUMENT>invented parent"
+    state = _fake_https_wire(monkeypatch, _http_wire(
+        200, (("Transfer-Encoding", "chunked"), ("Content-Type", "text/plain")),
+        _chunked(body)))
+    result = runner._selected_sec_transport(_request(1).url, {}, len(body))
+    assert runner._strict_selected_response(result, max_bytes=len(body)) == body
+    assert ("Transfer-Encoding", "chunked") in result.headers
+    assert not any(name.lower() == "content-length" for name, _ in result.headers)
+    assert state["requests"] == [("GET", "/Archives/edgar/data/1/0000000001-23-000001.txt", {})]
+    assert state["reads"] == [len(body) + 1, 1]
+    assert state["closed"] == 1
+
+
+def test_selected_transport_keeps_strict_content_length_route(monkeypatch):
+    body = b"<SEC-DOCUMENT>invented parent"
+    state = _fake_https_wire(monkeypatch, _http_wire(
+        200, (("Content-Length", str(len(body))),), body))
+    result = runner._selected_sec_transport(_request(1).url, {}, len(body))
+    assert runner._strict_selected_response(result, max_bytes=len(body)) == body
+    assert state["reads"] == [len(body)]
+    assert state["closed"] == 1
+
+
+@pytest.mark.parametrize("headers", [
+    (("Transfer-Encoding", "chunked"), ("Transfer-Encoding", "chunked")),
+    (("Transfer-Encoding", "gzip"),),
+    (("Transfer-Encoding", "chunked, gzip"),),
+    (("Transfer-Encoding", "chunked "),),
+    (("Content-Length", "20"), ("Transfer-Encoding", "chunked")),
+    (("Transfer-Encoding", "chunked"), ("Content-Encoding", "gzip")),
+    (("Transfer-Encoding", "chunked"), ("Content-Encoding", "identity"),
+     ("Content-Encoding", "identity")),
+    (),
+])
+def test_selected_transport_refuses_ambiguous_or_compressed_framing(monkeypatch, headers):
+    body = b"<SEC-DOCUMENT>invented parent"
+    wire = _http_wire(200, headers, _chunked(body))
+    state = _fake_https_wire(monkeypatch, wire)
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="framing"):
+        runner._selected_sec_transport(_request(1).url, {}, 100)
+    assert state["closed"] == 1
+
+
+def test_selected_transport_refuses_decoded_chunked_body_over_cap(monkeypatch):
+    body = b"<SEC-DOCUMENT>" + b"x" * 40
+    state = _fake_https_wire(monkeypatch, _http_wire(
+        200, (("Transfer-Encoding", "chunked"),), _chunked(body)))
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="bound|oversized"):
+        runner._selected_sec_transport(_request(1).url, {}, 16)
+    assert state["closed"] == 1
+
+
+def test_selected_transport_refuses_truncated_chunked_body(monkeypatch):
+    state = _fake_https_wire(monkeypatch, _http_wire(
+        200, (("Transfer-Encoding", "chunked"),),
+        b"20\r\n<SEC-DOCUMENT>short"))
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="truncated|malformed"):
+        runner._selected_sec_transport(_request(1).url, {}, 100)
+    assert state["closed"] == 1
+
+
+def test_selected_transport_refuses_truncated_content_length_body(monkeypatch):
+    state = _fake_https_wire(monkeypatch, _http_wire(
+        200, (("Content-Length", "100"),), b"<SEC-DOCUMENT>short"))
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="truncated"):
+        runner._selected_sec_transport(_request(1).url, {}, 100)
+    assert state["closed"] == 1
+
+
+def test_selected_transport_refuses_malformed_http_status_line(monkeypatch):
+    state = {"closed": 0}
+
+    class BrokenConnection:
+        def __init__(self, host, timeout):
+            assert (host, timeout) == ("www.sec.gov", 15)
+
+        def request(self, method, path, headers):
+            pass
+
+        def getresponse(self):
+            raise http.client.BadStatusLine("malformed")
+
+        def close(self):
+            state["closed"] += 1
+
+    monkeypatch.setattr(runner.http.client, "HTTPSConnection", BrokenConnection)
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="malformed"):
+        runner._selected_sec_transport(_request(1).url, {}, 100)
+    assert state["closed"] == 1
+
+
+def test_selected_runner_uses_chunked_strict_validator_before_publication(tmp_path):
+    body = b"<SEC-DOCUMENT>invented parent"
+    result = runner.SecHttpResult(200, (("Transfer-Encoding", "chunked"),), body)
+    plan = _plan(1)
+    report = _report(_run(plan, tmp_path / "chunked", lambda *_: result))
+    assert report["complete_selected_raw_set_acquired"] is True
+    object_row = report["rows"][0]["raw_object"]
+    assert object_row["sha256"] == hash_bytes(body)
+
+    ambiguous = runner.SecHttpResult(
+        200, (("Transfer-Encoding", "chunked"), ("Content-Length", str(len(body)))), body)
+    refused = _report(_run(plan, tmp_path / "ambiguous", lambda *_: ambiguous))
+    assert refused["complete_selected_raw_set_acquired"] is False
+    assert "framing" in refused["halted_reason"]
+    assert list((tmp_path / "ambiguous" / "objects").iterdir()) == []
+
+
+@pytest.mark.parametrize("status", [302, 403, 429, 503])
+def test_selected_transport_never_follows_or_reads_non_200(monkeypatch, status):
+    state = _fake_https_wire(monkeypatch, _http_wire(
+        status, (("Location", "https://example.invalid/redirect"),), b"do not read"))
+    result = runner._selected_sec_transport(_request(1).url, {}, 100)
+    assert result.status == status and result.body == b""
+    assert state["reads"] == []
+    assert len(state["requests"]) == 1 and state["closed"] == 1
+
+
+@pytest.mark.parametrize("url", [
+    "https://example.invalid/Archives/edgar/data/1/f.txt",
+    "https://www.sec.gov/Archives/edgar/data/1/f.txt?redirect=1",
+    "https://www.sec.gov/Archives/edgar/data/1/%2e%2e/f.txt",
+])
+def test_selected_transport_refuses_escaped_url_before_connection(monkeypatch, url):
+    state = _fake_https_wire(monkeypatch, b"")
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="host"):
+        runner._selected_sec_transport(url, {}, 100)
+    assert state["requests"] == [] and state["closed"] == 0
 
 
 def test_retry_ceiling_and_completion_to_dispatch_spacing(tmp_path, _quick_capacity):

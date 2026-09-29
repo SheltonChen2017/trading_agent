@@ -74,6 +74,7 @@ _CONTACT = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}\Z")
 _ACCESSION = re.compile(r"[0-9]{10}-[0-9]{2}-[0-9]{6}\Z")
 _RETRY_STATUSES = frozenset({500, 502, 503, 504})
 _ENVELOPE_REFUSAL = "REFUSED: SEC HTTP 200 body lacks complete-text envelope"
+_SEC_ARCHIVE_PREFIX = "https://www.sec.gov/Archives/"
 
 
 class SecSelectedParentRunnerError(ValueError):
@@ -109,6 +110,96 @@ def _strict_json(raw: bytes, *, label: str) -> dict[str, object]:
     if type(value) is not dict or _bytes(value) != raw:
         _refuse(f"{label} is not canonical JSON plus LF")
     return value
+
+
+def _selected_framing(headers: tuple[tuple[str, str], ...],
+                      max_bytes: int) -> tuple[str, int | None]:
+    """Accept one bounded length or one identity-encoded chunked framing."""
+    if (type(max_bytes) is not int or not 0 < max_bytes <= MAX_COMPLETE_TXT_BYTES
+            or type(headers) is not tuple
+            or any(type(pair) is not tuple or len(pair) != 2
+                   or type(pair[0]) is not str or type(pair[1]) is not str
+                   for pair in headers)):
+        raise SecCompleteAcquisitionError("REFUSED: selected SEC response framing is malformed")
+    lengths = [value for name, value in headers if name.lower() == "content-length"]
+    transfers = [value for name, value in headers if name.lower() == "transfer-encoding"]
+    encodings = [value for name, value in headers if name.lower() == "content-encoding"]
+    if len(encodings) > 1 or (encodings and encodings[0].strip().lower() != "identity"):
+        raise SecCompleteAcquisitionError("REFUSED: selected SEC response framing is compressed")
+    if len(lengths) == 1 and not transfers and lengths[0].isdigit():
+        size = int(lengths[0])
+        if 0 < size <= max_bytes:
+            return "length", size
+    # Match http.client.HTTPResponse's decoder condition exactly. It does not
+    # de-chunk a value such as "chunked "; accepting that spelling here would
+    # mistake raw chunk framing for decoded complete-submission bytes.
+    if not lengths and len(transfers) == 1 and transfers[0].lower() == "chunked":
+        return "chunked", None
+    raise SecCompleteAcquisitionError("REFUSED: selected SEC response framing is ambiguous or oversized")
+
+
+def _strict_selected_response(result: SecHttpResult, *, max_bytes: int) -> bytes:
+    """Keep the observed wire framing; do not invent Content-Length."""
+    if type(result) is not SecHttpResult or type(result.status) is not int or result.status != 200:
+        raise SecCompleteAcquisitionError("REFUSED: selected SEC response is not HTTP 200")
+    mode, _ = _selected_framing(result.headers, max_bytes)
+    if mode == "length":
+        return _strict_response(result, max_bytes=max_bytes)
+    if type(result.body) is not bytes or not 0 < len(result.body) <= max_bytes:
+        raise SecCompleteAcquisitionError("REFUSED: selected SEC chunked body exceeds its bound")
+    return result.body
+
+
+def _selected_sec_transport(url: str, headers: dict[str, str], max_bytes: int) -> SecHttpResult:
+    """Selected-parent-only SEC transport; http.client de-chunks at a hard cap."""
+    if (type(url) is not str or not url.startswith(_SEC_ARCHIVE_PREFIX)
+            or "?" in url or "#" in url or "%" in url):
+        raise SecCompleteAcquisitionError("REFUSED: request escaped the exact SEC Archives host")
+    if type(max_bytes) is not int or not 0 < max_bytes <= MAX_COMPLETE_TXT_BYTES:
+        raise SecCompleteAcquisitionError("REFUSED: selected SEC response bound is invalid")
+    connection = http.client.HTTPSConnection("www.sec.gov", timeout=15)
+    try:
+        connection.request("GET", url.removeprefix("https://www.sec.gov"), headers=headers)
+        response = connection.getresponse()
+        if type(response.status) is not int:
+            raise SecCompleteAcquisitionError("REFUSED: selected SEC HTTP status is malformed")
+        if response.status != 200:
+            # No redirect follow and no non-200 body read, including 403/429.
+            return SecHttpResult(response.status, tuple(response.getheaders()), b"")
+        response_headers = tuple(response.getheaders())
+        mode, size = _selected_framing(response_headers, max_bytes)
+        if mode == "chunked" and response.chunked is not True:
+            raise SecCompleteAcquisitionError(
+                "REFUSED: selected SEC response framing decoder disagrees"
+            )
+        try:
+            if mode == "length":
+                if size is None:
+                    raise SecCompleteAcquisitionError(
+                        "REFUSED: selected SEC length framing has no size"
+                    )
+                body = response.read(size)
+                if len(body) != size:
+                    raise SecCompleteAcquisitionError("REFUSED: selected SEC response was truncated")
+            else:
+                # HTTPResponse validates the chunk syntax and returns decoded
+                # bytes. Read one over the cap and demand the terminal chunk.
+                body = response.read(max_bytes + 1)
+                if len(body) > max_bytes:
+                    raise SecCompleteAcquisitionError("REFUSED: selected SEC chunked body exceeds its bound")
+                if response.read(1) != b"" or not response.isclosed():
+                    raise SecCompleteAcquisitionError("REFUSED: selected SEC chunked body is malformed")
+        except http.client.HTTPException as exc:
+            raise SecCompleteAcquisitionError("REFUSED: selected SEC response was truncated or malformed") from exc
+        result = SecHttpResult(200, response_headers, body)
+        _strict_selected_response(result, max_bytes=max_bytes)
+        return result
+    except http.client.HTTPException as exc:
+        raise SecCompleteAcquisitionError(
+            "REFUSED: selected SEC response was truncated or malformed"
+        ) from exc
+    finally:
+        connection.close()
 
 
 def _recover(path: Path, *, label: str, max_bytes: int,
@@ -549,7 +640,7 @@ def _run_selected(plan: SelectedParentPlan, output_root: str | Path, *,
     frozen_plan = plan.to_payload()
     if plan.scope == "ib1b_observed_noncanonical":
         _verify_exact_committed_code(capture_git_commit)
-    elif transport is _sec_transport:
+    elif transport in {_sec_transport, _selected_sec_transport}:
         _refuse("synthetic plan cannot reach the real SEC transport")
     if type(capture_git_commit) is not str or _COMMIT.fullmatch(capture_git_commit) is None:
         _refuse("capture commit is invalid")
@@ -705,7 +796,7 @@ def _run_selected(plan: SelectedParentPlan, output_root: str | Path, *,
                     reason = f"REFUSED: SEC returned HTTP {result.status}"
                 continue
             try:
-                raw = _strict_response(result, max_bytes=MAX_COMPLETE_TXT_BYTES)
+                raw = _strict_selected_response(result, max_bytes=MAX_COMPLETE_TXT_BYTES)
             except SecCompleteAcquisitionError:
                 events.append({"kind": "attempt-finish", "accession_number": accession,
                                "ordinal": ordinal, "outcome": "transport_refusal", "status": None,
@@ -837,7 +928,7 @@ def run_observed_selected_parent_acquisition(
     plan.to_payload()
     return _run_selected(plan, output_root, contact_email=contact_email,
                          capture_git_commit=capture_git_commit,
-                         transport=_sec_transport, reused_bytes=reuse_bytes,
+                         transport=_selected_sec_transport, reused_bytes=reuse_bytes,
                          resume=resume)
 
 

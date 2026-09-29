@@ -89,6 +89,25 @@ def _legacy_header(owners: tuple[str, ...] = ("0000999999",)) -> bytes:
     )
 
 
+def _former_owner_name(*, name: str = "Invented Earlier Owner",
+                       changed: str = "20200102") -> bytes:
+    return (
+        "\n\tFORMER NAME:\n"
+        f"\t\tFORMER CONFORMED NAME:\t{name}\n"
+        f"\t\tDATE OF NAME CHANGE:\t{changed}\n"
+    ).encode("ascii")
+
+
+def _legacy_header_with_former_owner_names(
+    blocks: tuple[bytes, ...], *, owners: tuple[str, ...] = ("0000999999",),
+    owner_position: int = 0,
+) -> bytes:
+    header = _legacy_header(owners)
+    owner = _legacy_owner(owners[owner_position])
+    assert header.count(owner) == 1
+    return header.replace(owner, owner + b"".join(blocks), 1)
+
+
 def _xml(owners: tuple[str, ...] = ("0000999999",)) -> bytes:
     return (
         b"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
@@ -165,6 +184,97 @@ def test_legacy_column_header_retains_exact_bytes_and_identity_without_promotion
     assert payload["children"]["header"]["sha256"] == hash_bytes(header)
     assert payload["authority"]["canonical_evidence"] is False
     assert payload["authority"]["real_shape_verified"] is False
+
+
+@pytest.mark.parametrize("owners,owner_position,block_count", [
+    (("0000999999",), 0, 1),
+    (("0000999999",), 0, 2),
+    (("0000999999", "0000888888"), 1, 2),
+])
+def test_legacy_owner_former_name_blocks_preserve_identity_without_promotion(
+    owners, owner_position, block_count,
+):
+    blocks = tuple(_former_owner_name(changed=f"2020010{index + 1}")
+                   for index in range(block_count))
+    header = _legacy_header_with_former_owner_names(
+        blocks, owners=owners, owner_position=owner_position,
+    )
+    projection = _project(_complete(header=header, owners=owners))
+    assert projection.header_bytes == header
+    assert projection.header_owner_ciks == owners
+    assert projection.to_payload()["authority"]["canonical_evidence"] is False
+
+
+@pytest.mark.parametrize("block", [
+    b"\n\tFORMER NAME:\n",
+    b"\n\tFORMER NAME:\n\t\tFORMER CONFORMED NAME:\tInvented Earlier Owner\n",
+    _former_owner_name().replace(b"FORMER CONFORMED NAME", b"FOREIGN FIELD"),
+    _former_owner_name().replace(b"DATE OF NAME CHANGE", b"FOREIGN FIELD"),
+    _former_owner_name().replace(b"20200102", b"20200230"),
+    _former_owner_name().replace(b"20200102", b"not-a-date"),
+    _former_owner_name(name=" "),
+    _former_owner_name().replace(
+        b"DATE OF NAME CHANGE:\t20200102\n",
+        b"DATE OF NAME CHANGE:\t20200102\n"
+        b"\t\tFOREIGN FIELD:\tInvented\n",
+    ),
+    _former_owner_name().replace(
+        b"DATE OF NAME CHANGE:\t20200102\n",
+        b"DATE OF NAME CHANGE:\t20200102\n"
+        b"\t\tCENTRAL INDEX KEY:\t0000777777\n",
+    ),
+    _former_owner_name().replace(
+        b"DATE OF NAME CHANGE:\t20200102\n",
+        b"DATE OF NAME CHANGE:\t20200102\n"
+        b"\t\tFORM TYPE:\t4\n",
+    ),
+    _former_owner_name().replace(
+        b"DATE OF NAME CHANGE:\t20200102\n",
+        b"FORMER CONFORMED NAME:\tInvented Earlier Owner\n"
+        b"\t\tDATE OF NAME CHANGE:\t20200102\n",
+    ),
+])
+def test_legacy_owner_former_name_refuses_incomplete_or_identity_bearing_block(block):
+    header = _legacy_header_with_former_owner_names((block,))
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
+
+
+def test_legacy_owner_former_name_requires_prior_mail_address():
+    header = _legacy_header().replace(
+        b"\n\tMAIL ADDRESS:\n\t\tSTREET 1:\tInvented Street\n",
+        _former_owner_name(), 1,
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
+
+
+def test_legacy_owner_former_name_refuses_before_data_block():
+    header = _legacy_header().replace(
+        b"REPORTING-OWNER:\n\n\tOWNER DATA:\n",
+        b"REPORTING-OWNER:\n\tFORMER NAME:\n"
+        b"\t\tFORMER CONFORMED NAME:\tInvented Earlier Owner\n"
+        b"\t\tDATE OF NAME CHANGE:\t20200102\n\tOWNER DATA:\n", 1,
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
+
+
+def test_legacy_owner_former_name_refuses_out_of_order_before_mail_address():
+    header = _legacy_header().replace(
+        b"\n\tMAIL ADDRESS:\n",
+        _former_owner_name() + b"\n\tMAIL ADDRESS:\n", 1,
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
+
+
+def test_legacy_owner_former_name_refuses_arbitrary_following_scope():
+    header = _legacy_header_with_former_owner_names((
+        _former_owner_name() + b"\n\tUNRECOGNIZED SCOPE:\n\t\tLEAF:\tInvented\n",
+    ))
+    with pytest.raises(SecCompleteSubmissionError, match="REFUSED"):
+        _project(_complete(header=header))
 
 
 def test_legacy_structural_labels_allow_only_bounded_trailing_tabs():

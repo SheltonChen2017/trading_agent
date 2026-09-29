@@ -894,6 +894,14 @@ claim follows. R247 remains exhausted and its 09:20 input/clock gate remains
 open. Claude reviews section 213 and the exact final pushed range before a
 new forward diagnostic or prospective efficacy action.
 
+The owner's later same-round testing direction authorizes the bounded
+historical floor-one sensitivity in section 214 before another independent
+review. R261/on100 is the first QC admission pilot; the six other frozen arms
+remain gated on its authenticated direct-stock count, not its return. After
+the authorized tests and one final lane push, Claude reviews section 214,
+its exact source freeze, every spent look, and the gate disposition. No
+historical result removes the separate R247 forward-input/clock gate.
+
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
 net AR spread -0.114367 pp with slightly worse risk. Common coverage/census
@@ -30130,3 +30138,67 @@ the R225 saved-snapshot nuance, and the vintage/tape and inherited-label
 qualifications. The next bounded step is an independently reviewed forward
 input/clock correction to exhausted R247, not a fourth R247 attempt or a
 historical AR-capacity winner selection.
+
+## 214. Prospective QCOM-admitted positive-score-floor sensitivity, 2026-09-29
+
+The owner asked whether easing stock admission further would select more
+direct stocks, while retaining the 80%--200% analyst-revision transfer
+ladder. This is a new **exploratory historical sensitivity**, not a continuation
+of R248--R259 under their old identities or a confirmation test. The
+candidate manifest is
+`research/analyst_revisions_v2_qc/six_universe_qcom_score_floor1_candidates.json`,
+SHA-256 `3fde7673114794db256336c7c738c185859dd46e3d9af0765aa1cd7d008e5b86`.
+Its seven fresh order-based, 2021-01-04--2025-12-31 candidates are frozen as:
+
+| Candidate | Analyst-revision transfer | Exact QCOM-admitted source |
+| --- | ---: | --- |
+| R260 | 80% | R256 |
+| R261, admission pilot | 100% | R256 |
+| R262 | 120% | R257 |
+| R263 | 140% | R256 |
+| R264 | 160% | R256 |
+| R265 | 180% | R256 |
+| R266 | 200% | R258 |
+
+The single intended admission change is the **non-XLE minimum count of stocks
+with a positive analyst-revision score, from three to one**, before that
+sleeve may hold direct stocks instead of its ETF fallback. The all-six-universe
+10% minimum mapping/capitalization coverage floors, minimum of three verified
+names, XLE's cap-ranked rule, point-in-time constituent and identity checks,
+top-ten holding cap, and QCOM eligibility remain. Thus "three names" is an
+eligibility minimum, **not** a three-stock holding target; a one-positive-score
+floor does not waive the independent three-verified-name or coverage gates.
+The historical input package, 261 weekly decisions, 98% target gross exposure,
+2x buying-power admission, and modeled 10-bps-per-side fees with zero modeled
+slippage are held fixed. Candidate, profile, coverage-policy, metadata,
+summary, projection and source identities are separately versioned. These
+conditions describe the frozen software plan, not an observed QC result.
+
+R261/on100 is the **first and only initial launch**. Before any of the other
+six candidates may launch, its retained, authenticated completed result must
+show at least one post-cap REMX direct-stock target and **more than 12,211**
+post-cap direct-stock target slots across all six sleeves. R256/on80,
+R257/on120 and R258/on200 each had 12,211 slots and zero REMX slots under the
+three-positive-score rule, so the pilot asks whether the relaxed rule actually
+changes stock admission, not whether its return looks attractive. These old
+arms agree on that count, but none is an exact same-transfer 100% return
+control. The aggregate positive-score count of 31 previously reported for
+REMX spans all 261 decisions; it does **not** establish that any positive
+score occurred on a coverage-valid REMX decision. If R261 fails the count
+gate, the other six must not launch. A positive gate would permit a bounded
+ladder, not prove the score floor improved returns or the analyst signal.
+
+Each candidate has at most three QC launch attempts. A compile failure,
+runtime error, or otherwise unsuccessful terminal run consumes one; after
+three failures the owner/Mia recovery rule applies rather than a fourth
+Codex attempt or a relabeled candidate. Each launched exploratory candidate
+is a separate development look and requires its own shared-ledger row. Result
+reads must be bounded, one-use and lineage-checked; no return, drawdown,
+order count or positive selection effect is asserted before those reads.
+The vendor's historical analyst archive is current-vintage, can overwrite
+earlier records, and is not an independent point-in-time confirmation sample.
+Changing the floor after seeing R248--R259 also makes this an adaptive
+sensitivity. It confers no formal-alpha, paper, live, funded-account or
+real-order authority. The owner's later request for these exploratory tests
+supersedes section 213.4's earlier sequencing suggestion for the next step;
+it does not reopen exhausted R247 or its forward-evidence gate.

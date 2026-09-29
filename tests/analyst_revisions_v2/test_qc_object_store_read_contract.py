@@ -190,7 +190,9 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     six_universe_qcom_exclusion_three_name_study.py
     six_universe_qcom_exclusion_tilt_study.py
     six_universe_qcom_restored_projection.py
+    six_universe_qcom_restored_score_floor1_projection.py
     six_universe_qcom_restored_study.py
+    six_universe_qcom_score_floor1_study.py
     six_universe_r181_order_diagnostic.py
     six_universe_recent_settlement_submission.py
     six_universe_relaxed_selection_source.py six_universe_relaxed_submission.py
@@ -510,6 +512,24 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_projection
         research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
         research.analyst_revisions_v2_qc.six_universe_qcom_restored_projection
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
+    "six_universe_qcom_restored_score_floor1_projection.py": tuple(
+        """
+        ast dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_projection
+        research.analyst_revisions_v2_qc.six_universe_qcom_restored_projection
+        """.split()
+    ),
+    "six_universe_qcom_score_floor1_study.py": tuple(
+        """
+        dataclasses research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
+        research.analyst_revisions_v2_qc.accepted_risk_matched_diagnostics
+        research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_study
         research.analyst_revisions_v2_qc.six_universe_relaxed_submission
         """.split()
     ),
@@ -1497,6 +1517,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_study
         research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_study
         research.analyst_revisions_v2_qc.six_universe_qcom_restored_study
+        research.analyst_revisions_v2_qc.six_universe_qcom_score_floor1_study
         decimal research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         """.split()
     ),
@@ -1515,7 +1536,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "six_universe_qcom_entry_only_projection.py": (),
     "six_universe_qcom_entry_only_study.py": (),
     "six_universe_qcom_restored_projection.py": (),
+    "six_universe_qcom_restored_score_floor1_projection.py": (),
     "six_universe_qcom_restored_study.py": (),
+    "six_universe_qcom_score_floor1_study.py": (),
     "six_universe_qcom_exclusion_ar_range_policy.py": (
         "call:read_bytes", "import:pathlib",
     ),
@@ -4672,7 +4695,9 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_three_name_study",
         "research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_tilt_study",
         "research.analyst_revisions_v2_qc.six_universe_qcom_restored_projection",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_restored_score_floor1_projection",
         "research.analyst_revisions_v2_qc.six_universe_qcom_restored_study",
+        "research.analyst_revisions_v2_qc.six_universe_qcom_score_floor1_study",
         "research.analyst_revisions_v2_qc.six_universe_r181_order_diagnostic",
         "research.analyst_revisions_v2_qc.six_universe_recent_settlement_submission",
         "research.analyst_revisions_v2_qc.six_universe_relaxed_selection_source",

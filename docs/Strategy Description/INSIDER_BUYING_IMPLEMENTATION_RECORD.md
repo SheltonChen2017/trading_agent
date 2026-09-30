@@ -15144,3 +15144,75 @@ completed corpus. Publication/PIT identity, canonical IB-1C..IB-1E signals,
 validity-dated CIK-to-QC mapping, data-processing rights, frozen look,
 historical order-based backtest, and Claude review remain **not done**. There
 is still **no push** merely for enabling or launching capture.
+
+## 117. Observed v3 transport stop with unresolved start (2026-09-30 UTC; no completed campaign)
+
+The one source-only observed v3 continuation launched from exact clean local
+commit `aa0d635d00b64825bf8003289e0a60279bd52e73` on
+`codex/strategy-insider-buying` in the designated Insider worktree. Its
+private outside-Git root is
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/insider-source-allparents-20260929.3Nut2i/all-form4-parents-recovery-v3`.
+The launch retained the frozen **99,394** ordered Form 4/4-A population,
+source-assignment SHA-256
+`9c497cabeff43a40f01b8da916264cc140088a356dc18233c660e91d7a6552d2`,
+and later-dispatch inventory SHA-256
+`2318bafbe7eec167b545b747ce5a7923fcb5dbef34bd38aca27c95bd3d7f52b8`.
+No wider quarter, filing class, or source was added.
+
+At approximately 2026-09-30 08:20 UTC, the SEC connection reset during the
+TLS handshake. The runner exited with `ConnectionResetError: [Errno 54]
+Connection reset by peer` wrapped as `REFUSED: v3 transport result is
+ambiguous; start remains unresolved`. This is a transport failure, **not** a
+completed HTTP response or an established code defect. The traceback suggests
+the failure preceded HTTP application-data exchange, but neither that stack
+nor the immutable journal proves the server did not receive the request.
+Consequently the durable start cannot be treated as safe to repeat.
+
+Read-only aggregate inspection of the private root found **1,847** durable
+`attempt-start` events, **1,846** `attempt-finish` events (all recorded as
+`valid_response`), **1,846** `item-complete` events, and **1,846** body objects.
+The final event is the unmatched start. The 5,539 event-file byte sequence,
+ordered by journal filename for this observation, has SHA-256
+`3decc20fec36eb7bcebdf57893cc1194e0df5414f1a3143f4d0de18a5ffda6ae`.
+No shard/campaign terminal report or completed-root verification exists.
+The preceding 9,539 prior completed parents, one offline-corrected diagnostic,
+and 8,139 selected reuses are not made canonical by this partial progress;
+the arithmetic 19,525 source-bound rows including the 1,846 new bodies is
+**not** an independently replayed 99,394-row union.
+
+### 117.1 Delegated decisions, finding disposition, and handoff
+
+| ID | Decision made for the owner | Reason and limit |
+|---|---|---|
+| D51 | Stop the observed v3 campaign, preserve its immutable private root and all prior roots, and pause the source-completion heartbeat. Do not relaunch this root, retry the ambiguous parent, skip it, or silently narrow the frozen denominator. | The reviewed resume path refuses a pending durable `attempt-start`; the failure has no durable response or absence proof. The source-completion monitor is paused, so it cannot retrigger another run. |
+| D52 | Keep the branch local and unpushed while this source-coverage gate is unresolved; do not launch QC, upload data, inspect outcomes, or describe the first Insider historical backtest as run or ready. | A partial raw archive does not establish SEC authenticity, official acceptance/publication/PIT identity, data-processing rights, validity-dated CIK-to-QC mapping, a frozen look, or QC entitlement. The owner's delegated choices do not supply those missing facts. |
+
+There is **no new confirmed P0–P3 code finding** from this stop: the
+fsynced-start refusal is the intended fail-closed behavior. The open issue is
+an ambiguous source request and incomplete full-population custody. The
+observed executor's `resume=True` path itself refuses this root before
+redispatch; the handshake traceback is not a substitute for a durable
+non-dispatch receipt. Any future recovery must be separately versioned,
+preserve and independently replay the existing attempts, and resolve the one
+ambiguous parent without duplicate-request or invented-completion claims.
+Whether to pursue a bounded diagnostic, obtain independent server-side
+non-dispatch evidence, or explicitly re-preregister a changed population is
+the next owner direction; none is executed here. Earlier P3 and out-of-lane
+findings retain their prior dispositions. No shared or project-wide document
+was changed.
+
+The exact local code/record range since remote `d478cfd` remains unpushed;
+this section records a failed source job, **not** a completed milestone or a
+Claude-reviewed snapshot. The designated worktree was clean at the capture
+commit when the process failed. Research looks, QC jobs, and backtests remain
+**0/0/0** for this continuation. There was no broker, deployment, capital,
+order, or trading action. The first honest order-based historical Insider
+backtest remains **not run and not ready**; a single future lane push remains
+deferred until a genuinely completed authorized round.
+
+Focused Python 3.12.14 active-document, lane-record and exact Insider
+package/import-boundary validation passed **73/73**. The observed executor
+and verifier compiled, and `git diff --check` was clean. An independent
+read-only countercheck confirmed the unmatched start and the reviewed
+`resume=True` refusal. No complete lane/repository suite, SEC retry,
+completed-root replay, QC attempt, or outcome check was run after the stop.

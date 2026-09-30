@@ -146,6 +146,8 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     eight_universe_ar_on_split_rounding.py
     eight_universe_attribution_study.py
     eight_universe_cap_holdings_weight_only_projection.py
+    eight_universe_execution_stress_projection.py
+    eight_universe_execution_stress_study.py
     eight_universe_input_submission.py
     eight_universe_qcom_admitted_projection.py
     eight_universe_r268_a2_diagnostic.py
@@ -159,6 +161,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     formal_run_protocol.py formal_runtime_projection.py
     formal_streaming_bridge.py formal_streaming_input.py
     formal_submission_adapter.py formal_terminal_disposition_builder.py
+    fresh_six_universe_clock_successor.py
     fresh_six_universe_snapshot.py fresh_six_universe_snapshot_submission.py
     fundamental_universe_discovery.py fundamental_universe_discovery_runtime.py
     fundamental_universe_discovery_submission_adapter.py
@@ -504,6 +507,26 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.eight_universe_r268_a3_split_rounding
         """.split()
     ),
+    "eight_universe_execution_stress_projection.py": tuple(
+        """
+        ast dataclasses hashlib json research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_relaxed_qc_projection
+        research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding
+        research.analyst_revisions_v2_qc.eight_universe_attribution_study
+        research.analyst_revisions_v2_qc.eight_universe_r268_a3_split_rounding
+        """.split()
+    ),
+    "eight_universe_execution_stress_study.py": tuple(
+        """
+        hashlib json pathlib research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
+        research.analyst_revisions_v2_qc.eight_universe_attribution_study
+        research.analyst_revisions_v2_qc.eight_universe_execution_stress_projection
+        research.analyst_revisions_v2_qc.eight_universe_study
+        research.analyst_revisions_v2_qc.six_universe_relaxed_submission
+        """.split()
+    ),
     "accepted_risk_eight_universe_input_qc_projection.py": tuple(
         """
         dataclasses hashlib pathlib research.analyst_revisions_v2_qc
@@ -580,6 +603,15 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.eight_universe_split_truncation_projection
         research.analyst_revisions_v2_qc.accepted_risk_eight_universe_input_qc_runtime
         research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic
+        """.split()
+    ),
+    "fresh_six_universe_clock_successor.py": tuple(
+        """
+        __future__ argparse hashlib json re time dataclasses pathlib
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.fresh_six_universe_snapshot
+        research.analyst_revisions_v2_qc.fresh_six_universe_snapshot_submission
+        research.analyst_revisions_v2_qc.six_universe_coverage_submission
         """.split()
     ),
     "fresh_six_universe_snapshot_submission.py": tuple(
@@ -1639,6 +1671,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc.eight_universe_r268_a3_split_rounding
         research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding
         research.analyst_revisions_v2_qc.eight_universe_attribution_study
+        research.analyst_revisions_v2_qc.eight_universe_execution_stress_study
         decimal
         research.analyst_revisions_v2_qc.accepted_risk_delta_order_package
         """.split()
@@ -1665,6 +1698,10 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "call:read_bytes", "import:pathlib",
     ),
     "eight_universe_cap_holdings_weight_only_projection.py": (),
+    "eight_universe_execution_stress_projection.py": (),
+    "eight_universe_execution_stress_study.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
     "eight_universe_input_submission.py": (
         "call:read_bytes",
         "import:pathlib",
@@ -1676,6 +1713,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
     "eight_universe_study.py": (
         "import:os",
         "import:pathlib",
+    ),
+    "fresh_six_universe_clock_successor.py": (
+        "call:compile", "import:pathlib",
     ),
     "fresh_six_universe_snapshot_submission.py": (
         "call:read_bytes", "import:pathlib",
@@ -4816,6 +4856,8 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.eight_universe_ar_on_split_rounding",
         "research.analyst_revisions_v2_qc.eight_universe_attribution_study",
         "research.analyst_revisions_v2_qc.eight_universe_cap_holdings_weight_only_projection",
+        "research.analyst_revisions_v2_qc.eight_universe_execution_stress_projection",
+        "research.analyst_revisions_v2_qc.eight_universe_execution_stress_study",
         "research.analyst_revisions_v2_qc.eight_universe_input_submission",
         "research.analyst_revisions_v2_qc.eight_universe_qcom_admitted_projection",
         "research.analyst_revisions_v2_qc.eight_universe_r268_a2_diagnostic",
@@ -4840,6 +4882,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.formal_streaming_input",
         "research.analyst_revisions_v2_qc.formal_submission_adapter",
         "research.analyst_revisions_v2_qc.formal_terminal_disposition_builder",
+        "research.analyst_revisions_v2_qc.fresh_six_universe_clock_successor",
         "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot",
         "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot_submission",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery",

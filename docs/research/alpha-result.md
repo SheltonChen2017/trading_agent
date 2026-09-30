@@ -6417,3 +6417,17 @@ Two launched development looks produced **two valid cells**; the closing
 conservative floor is **291 shared / 228 development / 38 infrastructure
 looks / 695 valid cells**. No additional QC read or retry was made for this
 completion disposition.
+
+### R-279 A1 input-clock infrastructure look — 2026-09-29
+
+The separately pinned, input-only R-279 source (manifest SHA-256
+`927bfeca30d72d319a74960533466421f0e16b9145b4bae3d6ae3a13b253986c`)
+compiled and launched once in private QC project **37163330**, backtest
+`941242b2425d5857bbdc57c5468ccaf9`. Its terminal status was
+**Runtime Error**. No result, metadata, provider row, price, order or log
+was read, so neither the 09:20 callback nor Object Store persistence is
+confirmed. A1 is consumed; no blind A2/A3 relaunch or R-247 fourth attempt
+follows. This is **one infrastructure research look, zero alpha/development
+looks, zero valid cells**. The conservative floor becomes **292 shared /
+228 development / 39 infrastructure looks / 695 valid cells**. The
+forward-input gate remains open.

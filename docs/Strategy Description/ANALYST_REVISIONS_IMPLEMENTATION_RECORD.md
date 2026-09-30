@@ -940,11 +940,14 @@ and preregisters the owner's later, narrowly scoped fixed-100% historical
 attribution diagnostic. R277/R278 then each completed validly on A1; the
 four-arm decomposition and bounded, unlaunched adverse-execution successor
 protocol are in sections 218.2–218.3. The current conservative floor is
-**291/228/38/695**. It is not a further percentage or universe sweep and
+**292/228/39/695** after the R279 A1 input-clock failure and its one
+infrastructure look. It is not a further percentage or universe sweep and
 cannot override the R247 09:20 forward-input/clock blocker. No historical
 eight-universe success confers paper/live/funded/real-order authority.
-Claude will review section 218 and its exact pushed source and results
-independently after Codex's single round-end push.
+The owner expressly waived waiting for Claude's review before section 219's
+separate R279 clock probe and fixed-100 execution-stress development; Claude
+will review section 219 independently, including its exact pushed source, QC
+dispositions and result claims after Codex's single round-end push.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -998,7 +1001,7 @@ blocked by the project-running flag and the current fresh-project contract.
 That narrow interim waiver does not cancel Claude's
 independent review after the final single push. Earlier milestone decisions,
 authorities, provider limitations, profile hashes, physical run identities,
-findings, outcomes, and per-run accounting remain in numbered sections 1–217
+findings, outcomes, and per-run accounting remain in numbered sections 1–219
 and `docs/research/alpha-result.md`; this section is only the current
 navigation and handoff state.
 
@@ -31124,3 +31127,94 @@ do not promote the historically positive weight-transfer contrast into a
 point-in-time or forward efficacy claim. The next serialized action is
 Claude's independent review of this exact pushed snapshot, followed by
 Codex counter-review; the stress source is not yet frozen or run.
+
+## 219. Owner-directed pre-review forward-clock and adverse-execution development, 2026-09-29
+
+The owner explicitly directed Codex to proceed with the next bounded work
+**without waiting for Claude's review of section 218**; Claude will review
+this round's pushed snapshot afterward. This is a one-round sequencing
+exception, not a relaxation of research-look, QC-attempt, paper-order,
+funded-order, live-order, provider, or financial-result gates. The section-218
+zero-slippage four-arm source and results remain immutable controls.
+
+### 219.1 Prospectively frozen source and scope before any new QC launch
+
+**Forward clock, R279 A1.** R247 consumed all three permitted attempts and
+remains exhausted. R279 is a separate input-only candidate and private QC
+project, `ARV2 R279 FRESH SIX CLOCK 20260928`. It derives the exact R247 A3
+seven-source runtime (SHA-256
+`39b519dccde32aa2a86499873015adcd0a377b8ca0c69905f9609e6411a2f0c9`)
+with a new `main.py` (SHA-256
+`39d319efdcf29c766ef091ba647d576b6c6bc1d4fc4e78629b768a72cbc47232`);
+the sorted two-file source manifest is
+`927bfeca30d72d319a74960533466421f0e16b9145b4bae3d6ae3a13b253986c`.
+For the already closed 2026-09-28 decision date, one extended-hours minute
+SPY subscription serves only as a backtest clock feed. No price, return,
+order, or outcome value is read from it. The existing exact 09:20 New York
+cutoff, seven callback-source checks, Object Store write and bounded
+`ARV2_FRESH_SIX_INPUT_META` digest receipt remain load-bearing. If QC does
+not deliver a bar at the exact cutoff, R279 refuses; `Completed.` alone is
+insufficient. A1 is the only implemented attempt. Any A2/A3 correction
+requires a separately prospective, tested source in this same project;
+there is no R247 A4. R279 can prove only QC callback/clock/Object Store
+mechanics, not vendor point-in-time completeness or a forward signal.
+
+**Execution stress, R280–R283.** One 2021-01-04–2025-12-31 order-based
+condition adds 5 bps constant adverse slippage per side to the already
+modeled 10-bps-per-side fee. The four candidates map respectively to the
+fixed-100 factorial A/B/C/D arms R268 A3, R277 A1, R278 A1, and R270 A1;
+all selection, target-weight, historical input, 261 weekly decisions,
+98% target gross, and 2× admission buying power rules are retained.
+The frozen stress manifest SHA-256 is
+`1e1754c6bf46aceeb03aadb80647c11524094063c0fe0d59ae5121a2a5d7f5fa`.
+Its R280/R281/R282/R283 projection SHA-256s are, in that order,
+`4cc0a420bc4c0ed48c65aef1d27be49b840913f0045beed23f92ec28a3f3ffdd`,
+`7a725fe4dc8d913cf56916b1f3d87409e6019a0cb01c7f1c73231e679fdddc2d`,
+`ce56c5860e2c76af685f02da53fcc18d5c93e5caa208e09b37ef8749ada1b5fe`,
+and `bf5a8a130efe4a89d57ee06c62333bccd59c0d0ad72fbae0b6fbee4687ff12b1`.
+Only three projected source files per arm change: `main.py` installs
+`ConstantSlippageModel(0.0005)` and a bounded in-aggregate, same-session
+TradeBar-open audit of adverse buy/sell MOO fills, while runtime/target
+identities disclose the new `s5` profile. That audit must count both sides,
+reject missing/unverifiable or non-adverse fills, and reconcile with the
+executor's filled-order count. It is digested into the existing META-bound
+aggregate; no order rows or IDs are exported. The already corrected signed
+installed-slippage MOO fee callback is preserved rather than applied twice.
+The four economic arm labels remain the producer's original labels. Each new candidate has at most
+three attempts in its own private project and one bounded result read.
+
+The section-218.3 1%-of-20-fully-prior-session-volume capacity warning is
+**unavailable**, not zero or passed: the current source has no authenticated
+raw-share daily-volume feed. This run may assess 5-bps fill-price sensitivity
+but cannot assess participation or opening-auction capacity. No volume,
+outcome, or order datum is fabricated to fill that gap. Historical results
+remain current-vintage, adaptive development diagnostics, not independent
+confirmation or forward efficacy.
+
+**Forward paper boundary.** The owner-selected 100% and 200% AR rules and
+AR-off control remain in the development-only dual-forward policy. Its common
+epoch, future universe/exclusion and execution contracts, algorithm,
+multiplicity allocation, and paper authority are still null. The 2026-09-28
+after-close Massive recapture is distinct from the morning partial-day
+capture and does not establish point-in-time vendor availability. Neither
+R279 nor the historical stress may create a paper order or consume the one
+formal Analyst look. The next development step after an exact successful
+input receipt is to prepare a common predecision snapshot and two-arm
+protocol; actual paper deployment still requires separate authority.
+
+**Accounting and validation to date.** R279 A1 compiled and launched in the
+exact private QC project (project 37163330, backtest
+`941242b2425d5857bbdc57c5468ccaf9`), but reached `Runtime Error`; no
+metadata, outcome, order or log result was read. A1 is consumed, no automatic
+A2 retry is authorized by this failure, and the R247/R279 forward clock gate
+remains open. R280–R283 have not yet launched. The shared prelaunch look
+floor was 291 total / 228 development / 38 infrastructure / 695 valid cells;
+R279 A1 adds one infrastructure look and zero cells, pending append-only
+shared-ledger reconciliation. Focused
+R279 tests passed 11/11, stress source tests 38/38, and the exact whole-QC
+package import/I-O closure passed after registering the new host-only modules.
+The stress manifest reproduced all four rendered projections offline;
+adapter previews for all four candidates matched its exact SHA and profiles.
+Codex will commit the source, tests, adapter and this prospective record
+before any QC launch, then add terminal dispositions and Claude review notes.
+No complete lane suite is run by Codex under the owner rule.

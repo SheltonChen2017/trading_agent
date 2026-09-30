@@ -192,9 +192,11 @@ def validate_manifest(value):
     return value
 
 
-def _validate_eight_diagnostics(report, arm):
+def _validate_eight_diagnostics(report, arm, *, expected_slippage_bps=0):
     """Authenticate eight-sleeve geometry using the frozen six-sleeve validator."""
-    if type(report) is not dict:
+    if (type(expected_slippage_bps) is not int
+            or expected_slippage_bps not in (0, 5)
+            or type(report) is not dict):
         _fail("eight-universe diagnostic is not a record")
     six_key = "six_etf_panel_row_count"
     eight_key = "eight_etf_panel_row_count"
@@ -207,7 +209,10 @@ def _validate_eight_diagnostics(report, arm):
                 | diagnostics.REFERENCE_REPAIR_FIELDS)
     if (set(report) != expected
             or report["schema"] != "arv2-eight-matched-historical-diagnostics-v2-closing-minute"
-            or report["arm"] != arm or report[eight_key] != 10040
+            or report["arm"] != arm
+            or type(report["slippage_bps_per_side"]) is not int
+            or report["slippage_bps_per_side"] != expected_slippage_bps
+            or report[eight_key] != 10040
             or type(report["year_universe_rows"]) is not list
             or len(report["year_universe_rows"]) != 40):
         _fail("eight-universe diagnostic schema or panel census changed")
@@ -238,7 +243,7 @@ def _validate_eight_diagnostics(report, arm):
                   six_key: 7530,
                   "year_universe_rows": [item for item in rows if item[1] in renderer.UNIVERSES[:6]]}
     del six_report[eight_key]
-    diagnostics.validate_report(six_report, old_arm, 0,
+    diagnostics.validate_report(six_report, old_arm, expected_slippage_bps,
                                 reference_repair_enabled=True)
     return True
 

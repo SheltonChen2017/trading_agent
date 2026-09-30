@@ -81,6 +81,8 @@ FROZEN_EIGHT_AR_ON_SPLIT_MANIFEST_SHA256 = "abdc0f4bb48b7f463d696c4cc46af9655f63
 # The two fixed-100% factorial arms are separate from the spent eight-sleeve
 # ladder. Their manifest is pinned prospectively before either cloud launch.
 FROZEN_EIGHT_ATTRIBUTION_MANIFEST_SHA256 = "98e2279189c09d517441741840a173239ab2e105259d024efb17b2ba48929b60"
+# One separately frozen 5-bps physical-order replay of the fixed-100 four arms.
+FROZEN_EIGHT_EXECUTION_STRESS_MANIFEST_SHA256 = "1e1754c6bf46aceeb03aadb80647c11524094063c0fe0d59ae5121a2a5d7f5fa"
 _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS = frozenset({("R225", 3)})
 _MATCHED_STUDY_DIAGNOSTIC_ATTEMPTS = frozenset({("R225", 2), ("R230", 1)})
 # These launches spent A1 against the original source. Their claims and source
@@ -364,6 +366,13 @@ def _eight_attribution_manifest():
     return study.frozen_manifest()
 
 
+def _eight_execution_stress_manifest():
+    from . import eight_universe_execution_stress_study as study
+    if study.FROZEN_MANIFEST_SHA256 != FROZEN_EIGHT_EXECUTION_STRESS_MANIFEST_SHA256:
+        _fail("eight-universe execution-stress manifest pin changed")
+    return study.frozen_manifest()
+
+
 def _matched_study_closing_minute_attempt(plan):
     return (type(plan.candidate_id) is str
             and (plan.candidate_id, plan.attempt) in _MATCHED_STUDY_CLOSING_MINUTE_ATTEMPTS)
@@ -409,6 +418,8 @@ def _plan_manifest(plan):
         return _eight_universe_manifest()
     if type(plan.family) is str and plan.family == "eight_attribution":
         return _eight_attribution_manifest()
+    if type(plan.family) is str and plan.family == "eight_execution_stress":
+        return _eight_execution_stress_manifest()
     _fail("relaxed plan family changed")
 
 
@@ -437,6 +448,8 @@ def _plan_manifest_sha256(plan):
         return FROZEN_EIGHT_UNIVERSE_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "eight_attribution":
         return FROZEN_EIGHT_ATTRIBUTION_MANIFEST_SHA256
+    if type(plan) is RelaxedQcPlan and plan.family == "eight_execution_stress":
+        return FROZEN_EIGHT_EXECUTION_STRESS_MANIFEST_SHA256
     if type(plan) is RelaxedQcPlan and plan.family == "matched_study":
         return (FROZEN_MATCHED_STUDY_MANIFEST_SHA256 if _matched_study_original_attempt(plan)
                 else FROZEN_MATCHED_STUDY_DIAGNOSTIC_MANIFEST_SHA256 if _matched_study_diagnostic_attempt(plan)
@@ -468,7 +481,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe", "eight_attribution"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe", "eight_attribution", "eight_execution_stress"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]
@@ -587,7 +600,7 @@ def preview(plan, projection):
 
 def _require_inputs(plan):
     family = _plan_manifest(plan)
-    if plan.family in {"matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe", "eight_attribution"}:
+    if plan.family in {"matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe", "eight_attribution", "eight_execution_stress"}:
         # Historical production inputs remain the exact reviewed package and
         # activation; this family must never use the recent R203 upload permit.
         from . import accepted_risk_delta_order_package as delta
@@ -688,6 +701,9 @@ def launch(plan, projection, api):
             study.require_invalid_baseline_a2(plan)
     if plan.family == "eight_attribution":
         from . import eight_universe_attribution_study as study
+        study.require_parents(plan)
+    if plan.family == "eight_execution_stress":
+        from . import eight_universe_execution_stress_study as study
         study.require_parents(plan)
     _require_inputs(plan)
     common._client(api)
@@ -922,6 +938,9 @@ def _parse_order(plan, statistics):
     if type(plan) is RelaxedQcPlan and plan.family == "eight_attribution":
         from . import eight_universe_attribution_study as study
         return study.parse_order(plan, statistics)
+    if type(plan) is RelaxedQcPlan and plan.family == "eight_execution_stress":
+        from . import eight_universe_execution_stress_study as study
+        return study.parse_order(plan, statistics)
     return _parse_order_common(plan, statistics)
 
 
@@ -932,7 +951,7 @@ def _parse_order_common(plan, statistics, *, expected_geometry=_GEOMETRY,
                         expected_meta_schema=None, eight_universe=False):
     if type(eight_universe) is not bool or (eight_universe and (
             type(plan) is not RelaxedQcPlan or plan.family not in {
-                "eight_universe", "eight_attribution"})):
+                "eight_universe", "eight_attribution", "eight_execution_stress"})):
         _fail("relaxed eight-universe parser is not authorized for this family")
     row, family = _candidate(plan), _plan_manifest(plan)
     meta_name = next(name for name in row["statistic_names"] if name.endswith("META"))
@@ -1110,7 +1129,7 @@ def read_result_once(plan, launch_receipt, api, *, recover_r209_transport=False)
         _fail("relaxed result identity changed")
     statistics = response.get("statistics")
     prefix = ("ARV2_SIX_COVERAGE_" if row["kind"] == "coverage" else
-              "ARV2_EIGHT_GATE_ORDER_" if plan.family in {"eight_universe", "eight_attribution"} else
+              "ARV2_EIGHT_GATE_ORDER_" if plan.family in {"eight_universe", "eight_attribution", "eight_execution_stress"} else
               "ARV2_SIX_GATE_ORDER_")
     if (type(statistics) is not dict or sorted(key for key in statistics
             if type(key) is str and key.startswith(prefix)) != sorted(row["statistic_names"])):
@@ -1120,7 +1139,7 @@ def read_result_once(plan, launch_receipt, api, *, recover_r209_transport=False)
     # A future parser correction can recover locally, never consume a second read.
     for name, value in retained.items():
         _statistic(value, eight_aggregate=(
-            plan.family in {"eight_universe", "eight_attribution"}
+            plan.family in {"eight_universe", "eight_attribution", "eight_execution_stress"}
             and name == "ARV2_EIGHT_GATE_ORDER_AGGREGATES"))
     _write_artifact(_path(plan, "raw-custom"), {**expected, "statistics": retained})
     result = (_parse_coverage if row["kind"] == "coverage" else _parse_order)(plan, retained)

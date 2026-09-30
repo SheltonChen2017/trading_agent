@@ -9926,3 +9926,129 @@ owner words.
    or backtest; every outcome join and look; lookback selection; production
    ranking; seeds; SI-4 ETF work; portfolio stages; broker, deployment,
    paper/live and trading actions. The shared final holdout remains sealed.
+
+## 76. Codex counter-review, QC reply, and exchange-archive qualification — 2026-09-30 UTC
+
+### 76.1 Exact Claude range and counter-review disposition
+
+The designated worktree was clean on `codex/strategy-short-interest` at
+`614214aa6650d98818564b6f72a327bf5d0f05ce`; local, tracking and actual
+remote heads matched. The exact ordered Claude range after the Codex handoff
+`0f501db7eb1184f01299f28c4dd53a6b5109fbed` consists of **two** commits:
+
+| Commit | Codex disposition and independently checked boundary |
+|---|---|
+| `eb2f3ea39c917b609ca9b2c14b1ad7e8ccf98eb3` | **Accepted.** It adds ten refusal cases for already-frozen SI-5 fields without changing production code. The focused protocol file was independently green: **34 passed in 0.78s**. Claude's per-guard mutation counts remain Claude-reported, not independently rerun by Codex. |
+| `614214aa6650d98818564b6f72a327bf5d0f05ce` | **Accepted after qualification.** Section 75 correctly retains all fifteen prior dispositions, source gates and test-only correction. `SI-CR14-001` correctly identifies a missing *durable verbatim citation*, not proof of unauthorized action. The owner words below exist in the primary conversation; the frozen SI-0M object is a research-software admission gate, not a retrospective ledger of separately authorized agent-side catalog browsing or support correspondence. No SI-0M flag is flipped. `SI-CR14-003` is a verified layered-guard non-defect, `SI-CR14-005` a self-reported reviewer probe error, and `SI-CR14-006` remains an open governance advisory rather than a code defect. |
+
+No new P0/P1 or shared-file correction arose. The out-of-lane P2
+`SI-CR5-005` / `SI-CCR16-007` remains open and untouched. The complete lane
+suite's **815 passed** and mutations in section 75 are Claude's observations;
+Codex did not rerun the full lane or repository suite.
+
+### 76.2 Verbatim owner provenance and exact scope
+
+These are the owner's own words in the Short Interest conversation, preserving
+their spelling. They support the previously recorded `SI-AUTH-20260928-01`/`-02`
+and `SI-AUTH-20260929-05`/`-06` scope; the citation gap in `SI-CR14-001` was
+real. The inquiry-specific later one-word approval is not treated as
+stand-alone evidence without its preceding proposal.
+
+> for any steps involving owner approvals, consider i pre authorize you to proceed.
+
+> for any step involving owner decisions, please use your own best judgment and make decisions on my behalf.
+
+> other lanes have been using qc credentails and subscrioptions for a while. so start
+
+> from now on, in this lane, anything you need my approval, consider i preauthorize it.
+
+> anything you need owner decision, consider i trust your best judgment.
+
+> this applies to this lane moving forward, until further notice.
+
+The owner's latest **“yes, proceed”** followed Codex's explicit recommendation
+to qualify an as-published, vintage-preserving listed-stock short-interest
+archive. `SI-AUTH-20260930-01` records that direct, bounded approval for
+public-document review and non-secret, pre-purchase product/license inquiries.
+`SI-DEC-20260930-01` is the delegated choice to ask **both** NYSE and Nasdaq,
+because neither exchange's documented product alone establishes full US-listed
+coverage. This is not a decision to narrow the stock population, purchase a
+feed, accept vendor terms, request market rows, or process licensed data.
+
+The SI-0M `ShortInterestResearchGate` flags for network, credential, provider,
+source-row and QC access remain **false** as executable empirical/software
+authority. They do not purport to chronicle separately owner-authorized
+agent-side administrative checks and correspondence. A signed-in catalog
+check or a metadata-only support question does not make a research-data request
+or QC backtest valid. The standing delegation still cannot establish provider
+facts, a license, actual PIT history or platform processing rights. The P3
+`SI-CR14-006` scope/expiry advisory remains open; no expiry is invented.
+
+### 76.3 Substantive QC response and independent official-source checks
+
+QC engineer Alex's response to ticket `#979ad273f6` satisfies the *timing*
+condition in section 74, alongside Claude's completed review, but not source
+admission. QC states that this organization can use `FINRAShortInterest` in
+Cloud without a purchase; History exposes one stored value per settlement
+date, and QC cannot identify a prior-correction vintage, revision-effective
+timestamp, separately captured public-release timestamp, or listed-versus-OTC
+historical split. The [QC dataset documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/financial-industry-regulatory-authority/otc-transparency)
+documents the object and History route but not those missing guarantees.
+[FINRA's own description](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+says only the latest corrected value is available. The [FINRA reporting
+schedule](https://www.finra.org/filing-reporting/regulatory-filing-systems/short-interest)
+can supply scheduled publication dates, but cannot recover original values or
+authenticate each actual release and correction time. FINRA's [2021 notice](https://www.finra.org/rules-guidance/notices/21-19)
+described then-public FINRA short-interest dissemination as OTC-only while
+listing exchanges published listed-stock interest. Therefore QC's aggregate
+January-2017 start and approximately 59,712-equity count do not prove the
+required listed-stock historical population. QC cloud entitlement is now
+provider-asserted; PIT source admission is **denied pending evidence**.
+
+Official public documents identify the [NYSE Group Short Interest historical
+product](https://www.nyse.com/data-products/catalog/nyse-group-short-interest)
+and its [client specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf)
+as a semi-monthly exchange-listed lead with a scheduled release time and a
+revision indicator. [Nasdaq's Short Interest Report](https://www.nasdaqtrader.com/trader.aspx?id=ShortInterest)
+is another exchange-specific lead. Neither public contract proves that a
+historical purchase retains **each original first-disseminated file and every
+correction vintage with actual timestamps**, or licenses local retention and
+third-party QuantConnect Cloud processing. A revision flag or scheduled date
+alone is insufficient. Neither route is admitted, and the current eligible
+population is not narrowed by convenience.
+
+Under `SI-AUTH-20260930-01`, Codex sent **one** non-secret, pre-purchase email
+each to NYSE Data Sales (`datasales@nyse.com`) and Nasdaq Global Data Sales
+(`datasales@nasdaq.com`); Gmail returned `SENT` for both. The respective
+subjects were “Pre-purchase qualification: NYSE Group Short Interest historical
+vintages and license” and “Pre-purchase qualification: Nasdaq Short Interest
+Report historical vintages and license”. Each asks for original and corrected
+release files and actual timestamps, historical calendar/exception and listed
+coverage, as-of identifiers and delisted names, local-research and QC-cloud
+processing rights, and metadata-only schema/manifest and pricing. Both
+explicitly prohibit initiating a purchase/subscription or sending market
+rows. No account identifier, credential, private market row, code or project
+artifact was sent. This is an inquiry, not vendor confirmation.
+
+### 76.4 Persistent P0–P3 ledger and stop gate
+
+| Finding | Priority | Current disposition |
+|---|---|---|
+| `SI-CR14-001` | P2 | **Partially corrected, open until immutable protocol binding is updated.** The verbatim owner statements and separate SI-0M software-versus-agent scope are now durable above. The protocol still binds the earlier section-67 record revision, so a focused content-addressed regression and rebind remain required before closure. No QC data authority is inferred. |
+| `SI-CR14-006` | P3 | **Open advisory.** Do not invent a shorter expiry or claim that the standing delegation establishes external facts. Independent review remains required. |
+| `SI-SRC-20260928-001` | P2 | **Open.** Require authenticated historical release-date/actual-cutoff binding, not settlement time or a generic offset. |
+| `SI-SRC-20260928-002` | P2 | **Open.** Require rights-cleared original as-published and correction vintages, or a complete testable affected-release exclusion; FINRA/QC latest-only data is not sufficient. |
+| `SI-SRC-20260928-003` | P2 | **Open.** Require exact exchange scope, license and QC representation, PIT 20/60/120/252 price/volume, identity, delisting and terminal-value coverage. QC's cloud-entitlement answer resolves only one component. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | **Open, shared/out of lane.** No shared behavior or document changed here. |
+
+The next factual step is to evaluate the two written vendor replies and any
+applicable executed license and metadata-only manifest. Until one route meets
+all P2 requirements, there is no empirical SI-5 milestone, no candidate
+winner, and no permanent research look or actual outcome join. Authorized and
+consumed real outcome looks remain **0/0**. No FINRA/SEC/provider market-row
+request, licensed input, actual stock price, sealed holdout, QC history,
+project, upload, processing, compile, job or backtest, broker, operator
+database, deployment, paper/live, capital, order or trading action occurred
+in this qualification. This record-only correction is local; no partial push
+is authorized at the factual gate. The one-time push in section 74 was for the
+previous review handoff and is not generalized.

@@ -10034,7 +10034,7 @@ artifact was sent. This is an inquiry, not vendor confirmation.
 
 | Finding | Priority | Current disposition |
 |---|---|---|
-| `SI-CR14-001` | P2 | **Partially corrected, open until immutable protocol binding is updated.** The verbatim owner statements and separate SI-0M software-versus-agent scope are now durable above. The protocol still binds the earlier section-67 record revision, so a focused content-addressed regression and rebind remain required before closure. No QC data authority is inferred. |
+| `SI-CR14-001` | P2 | **Partially corrected; exact inquiry-specific antecedent remains unverified.** The verbatim owner statements and separate SI-0M software-versus-agent scope are durable above. The offline protocol now binds their immutable committed record while retaining the original section-66/67 design clauses in that same blob. The separate owner-decision document was not substituted because it does not contain those design clauses. This does not turn a broad delegation into vendor rights or QC data authority. The inquiry-specific one-word assent is not called stand-alone proof without its original proposal. |
 | `SI-CR14-006` | P3 | **Open advisory.** Do not invent a shorter expiry or claim that the standing delegation establishes external facts. Independent review remains required. |
 | `SI-SRC-20260928-001` | P2 | **Open.** Require authenticated historical release-date/actual-cutoff binding, not settlement time or a generic offset. |
 | `SI-SRC-20260928-002` | P2 | **Open.** Require rights-cleared original as-published and correction vintages, or a complete testable affected-release exclusion; FINRA/QC latest-only data is not sufficient. |
@@ -10049,6 +10049,45 @@ consumed real outcome looks remain **0/0**. No FINRA/SEC/provider market-row
 request, licensed input, actual stock price, sealed holdout, QC history,
 project, upload, processing, compile, job or backtest, broker, operator
 database, deployment, paper/live, capital, order or trading action occurred
-in this qualification. This record-only correction is local; no partial push
-is authorized at the factual gate. The one-time push in section 74 was for the
-previous review handoff and is not generalized.
+in this qualification. This source-qualification and provenance-correction
+work remains local; no partial push is authorized at the factual gate. The
+one-time push in section 74 was for the previous review handoff and is not
+generalized.
+
+### 76.5 Lane-owned provenance correction and focused verification
+
+The record above was committed locally as
+`0e3150507bfa1b396e798fd23ad6fa4a7558a326` after rechecking the physical
+root, lane branch, staged-only record change, local head and unchanged matching
+remote. Its committed file SHA-256 is
+`3f7a31a7b3955b31bc6f29d312e1c74f4a923302b70121aa5e91a45d5fddf9d6`.
+The SI-5 offline protocol's content-addressed owner source now points to that
+immutable record revision, which contains both the original delegated design
+terms in sections 66–67 and the verbatim owner authority in section 76. The
+protocol semantic identity therefore changes by construction from
+`50b34faa016f52cee72b06ef23cd7fb3bd2652d97a60dd62acae22c457029e3f`
+to `bfa06b282132a0b5ceef4e9e4e3900f0dea6ffaadad8e00e22f5c8f837022972`.
+This creates a new **synthetic provenance epoch** for SI-5 cohort manifests and
+source-preflight receipts; it is not a new hypothesis, market-data admission,
+permanent research cell or outcome look. The SI-0M frozen gate and all
+economic/eligibility choices are unchanged.
+
+A new focused regression required the exact owner quotations in the bound
+committed blob. Against the old binding it was materially **red: 1 failed,
+33 deselected** because the old `b13e9be` record lacked the first quoted
+approval sentence. After rebinding the owner commit/digest, the initial broader
+focus exposed the deliberately stale protocol semantic digest (**7 failed,
+119 passed**); it was recalculated from the exact new payload and corrected.
+The protocol, source-preflight, Short Interest import-boundary and
+active-document selection then finished **126 passed in 1.13s**. Two focused
+cohort manifest/protocol refusal cases finished **2 passed, 6 deselected in
+181.84s**. These are synthetic software checks only; Claude remains the owner
+of the complete lane suite at a future pushed snapshot. No complete lane or
+repository suite was run by Codex.
+
+The next permissible empirical step is still blocked on written vendor
+vintage, release, coverage and license answers, plus separate PIT price/volume,
+identity and terminal evidence. No partial push is made while this factual
+gate is open; the local provenance correction and source inquiry record are
+preserved in this designated worktree for the next authorized completed
+round or an explicit owner-directed checkpoint handoff.

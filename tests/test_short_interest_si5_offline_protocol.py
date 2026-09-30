@@ -96,6 +96,17 @@ def test_protocol_decisions_cite_an_immutable_committed_owner_delegation():
         "apply only to a separately specified eventual next-release",
     ):
         assert exact_clause in section
+    # The same immutable design source must include the owner's actual words
+    # for the separately exercised administrative/source-qualification scope.
+    for exact_owner_quote in (
+        "for any steps involving owner approvals, consider i pre authorize you to proceed.",
+        "for any step involving owner decisions, please use your own best judgment and make decisions on my behalf.",
+        "other lanes have been using qc credentails and subscrioptions for a while. so start",
+        "from now on, in this lane, anything you need my approval, consider i preauthorize it.",
+        "anything you need owner decision, consider i trust your best judgment.",
+        "this applies to this lane moving forward, until further notice.",
+    ):
+        assert exact_owner_quote in text
 
 
 @pytest.mark.parametrize(

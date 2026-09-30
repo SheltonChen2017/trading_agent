@@ -14918,3 +14918,87 @@ added. The real diagnostic and v2 plan
 cannot be replayed against real source yet because no diagnostic request has
 been sent. Neither an accepted source body nor complete corpus, PIT, rights,
 frozen research look, QC job or backtest has been established.
+
+## 114. One-shot refused-parent retry and offline short-CIK correction (2026-09-30 UTC; continuation not launched)
+
+The owner supplied an identifying SEC contact for the previously authorized
+single diagnostic retry. It was entered through a no-echo terminal prompt,
+used only in that one request's User-Agent, and was not printed or added to
+Git. The private diagnostic response metadata may retain server-supplied
+headers, so the mode-0700 root and mode-0600 files remain outside Git. The
+exact old campaign, selected, pilot and quarter roots were replayed before
+dispatch. The one-shot sibling root did not exist beforehand; its durable
+attempt-start marker consumed the authorization. **Exactly one** diagnostic
+SEC request was made, and no second retry or broad continuation was made.
+
+The response was HTTP **200**, bounded at **4,060** bytes, with body SHA-256
+`bfb6889e4eeebd0278c33cbcf5cbe48f944c2bfef888c26953e5154b93f88c05`.
+The immutable report SHA-256 is
+`7cf590125633f0e4a087e50494ba85a6d9b92c05d0cc151ca2fc6c2c7287fbb7`
+under diagnostic capture commit
+`629bdf736697d410ff2fa2af241ea92502a2ba4f`. Its **original** envelope
+outcome remains `refused`, reason `REFUSED: issuer CIK is not ten padded
+nonzero digits`; neither the report nor body was rewritten. The report,
+response, object and one-shot commit are hash-consistent and private. The
+stopped v1 campaign still has no campaign-level completed report.
+
+### 114.1 Exact range, delegated decisions and dispositions
+
+There are **no incoming Claude review commits** in this local continuation.
+The exact local code range is `629bdf736697d410ff2fa2af241ea92502a2ba4f..20555de0d641975b40b09d4b4d04863c519d97e2`;
+neither commit has been pushed. Review of the preparation snapshot
+`629bdf7` found the source-CIK representation mismatch when the one-shot
+body was captured; its immutable one-shot and source replay behavior is
+otherwise retained. Commit `20555de` is accepted after the focused red/green
+corrections below and independent read-only review, which found no P0-P2
+issue and one P3 receipt-lineage issue corrected before that commit. Claude
+has not reviewed `20555de`.
+
+| ID | Delegated decision and boundary |
+|---|---|
+| D42 | Use the owner-supplied contact for exactly one source-bound diagnostic retry; keep the value out of terminal output and Git. Do not relaunch after a consumed attempt marker, including an ambiguous stop. |
+| D43 | Treat the 1-10 digit nonzero CIK in the frozen quarter-index locator as a raw source representation; pad it only when constructing the strict 10-digit complete-submission header target. Do not change request, locator, manifest or source-lineage hashes. |
+| D44 | Permit the **same** captured body to pass a separate, versioned offline correction only after replay of the exact original refused report, private response framing and bytes, short-CIK refusal reason, request identity, corrected header validator, and validator source-code digest. Record it as `offline_corrected_diagnostic`, never as an originally accepted response or a second SEC acquisition. |
+| D45 | Keep the full-corpus continuation **inert**. A successful offline source partition is not completed raw acquisition, source authenticity, publication/PIT evidence, data rights, a research look, QC entitlement, or backtest readiness. Implement a source-bound executable journal and completed-root verifier before any further acquisition launch. |
+
+### 114.2 Findings, proof and real-source partition
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| `IB1BCAMP-R07` | P2, **CLOSED in `20555de`** | The pinned refused request has a valid nonzero six-digit index CIK, but the campaign passed it unpadded to a target requiring exactly ten digits, refusing before response parsing. The exact stored body passed the existing request-bound header validator in memory when only that target representation was zero-padded; the source request hash stayed unchanged. A synthetic short-CIK test was red (one failure) before the boundary fix and green afterward, with wrong numeric issuer and malformed source CIK refusals retained. |
+| `IB1BCAMP-R08` | P2, **CLOSED in `20555de`** | The original diagnostic report durably said `refused`; the accepted-diagnostic verifier correctly rejected it even after the header code fix. A new offline-correction verifier requires that exact original outcome and reason, private immutable custody, the same body and request, and successful corrected validation; the union labels it separately. Tests were red before the verifier/union/inert-plan changes and green afterward. A wrong header, different original reason, or padded-source attempt cannot be laundered through this route. |
+| `IB1BCAMP-R09` | P3, **CLOSED in `20555de`** | Independent review found that the correction receipt initially bound the old capture commit but not the code performing revalidation. An added regression was red before the receipt exposed validator identity; the receipt now hashes the exact union, campaign, complete-submission and raw-parent source bytes and refuses if those files change during replay. |
+| `IB1BCAMP-OBS01` and earlier P3 ledger | P3, **OPEN/retained** | Prior concurrent-writer, provenance, multi-owner, PIT, economics and shared/out-of-lane observations are not cured by a one-parent offline header correction. No shared behavior or project-wide document was changed. |
+
+On committed `20555de` code, the exact observed read-only v3 preflight
+verified **99,394** ordered Form 4/4-A locators in **13** shards:
+**9,539 prior completed** (1,198 selected reuse, 8,341 newly acquired)
++ **1 offline-corrected diagnostic** + **8,139 remaining selected reuse**
++ **81,715 later unattempted**. It independently replayed the old partial
+campaign and diagnostic, validated remaining selected objects, and made
+**zero** SEC requests. Source-assignment SHA-256:
+`9c497cabeff43a40f01b8da916264cc140088a356dc18233c660e91d7a6552d2`;
+later-dispatch inventory SHA-256:
+`2318bafbe7eec167b545b747ce5a7923fcb5dbef34bd38aca27c95bd3d7f52b8`.
+The deterministic offline-correction receipt SHA-256 is
+`615bc9c08fd0414969177940d66667d0892ffd1418ce58cddc7ba7b02309cc13`,
+validator-source SHA-256
+`e47d595ee62fe30c1b9823d9db4d2219160af5e182aa16d8a9ed4b658eb7f0ee`,
+and inert v3 plan SHA-256
+`b6bc1fe9a106324a135e4c03a4e53bddd5fe3a1ebf48b28bc4f3538b601eb08a`.
+These hashes are custody/plan identities, not SEC authenticity or canonical
+signal claims. The v3 plan writes no output and has no transport or
+completed-root verifier.
+
+Focused Python 3.12.14 source, diagnostic, union, continuation-plan and
+exact Insider package-guard checks passed **93/93**; active-document,
+implementation-record, module-hygiene, overlay/ML/project-separation and
+exact package-guard checks passed **102/102**. Touched files compiled and
+`git diff --check` was clean. This was **not** a complete lane or repository
+suite. No outcome/research look, QC upload/job, historical backtest, broker
+action, paper/live deployment, capital or order occurred (**0/0/0** looks,
+QC jobs, backtests). The next bounded implementation action is an executable
+v3 continuation with durable no-duplicate request state and an independent
+99,394-row completed-root verifier; any launch still needs its source,
+rights and publication/PIT gates established rather than inferred from this
+header-only diagnostic.

@@ -31205,9 +31205,15 @@ protocol; actual paper deployment still requires separate authority.
 **Accounting and validation to date.** R279 A1 compiled and launched in the
 exact private QC project (project 37163330, backtest
 `941242b2425d5857bbdc57c5468ccaf9`), but reached `Runtime Error`; no
-metadata, outcome, order or log result was read. A1 is consumed, no automatic
-A2 retry is authorized by this failure, and the R247/R279 forward clock gate
-remains open. R280–R283 have not yet launched. The shared prelaunch look
+outcome, order, custom statistic or raw log result was read. A status-only
+QC listing did expose the redacted error stack: the callback fired at the
+exact **09:20 New York** decision time, seven-source checks reached
+`persist_at_decision`, and `LocalObjectStore` refused its two-extension
+`.json.gz` key as an unsupported path. The write/receipt did not complete.
+A1 is consumed; only a prospectively frozen, tested, same-project A2
+correction may launch, never R247 A4. The forward input-readiness gate
+remains open. R280 A1 has since launched and is awaiting a terminal result;
+R281–R283 have not launched. The shared prelaunch look
 floor was 291 total / 228 development / 38 infrastructure / 695 valid cells;
 R279 A1 adds one infrastructure look and zero cells, pending append-only
 shared-ledger reconciliation. Focused
@@ -31215,6 +31221,29 @@ R279 tests passed 11/11, stress source tests 38/38, and the exact whole-QC
 package import/I-O closure passed after registering the new host-only modules.
 The stress manifest reproduced all four rendered projections offline;
 adapter previews for all four candidates matched its exact SHA and profiles.
-Codex will commit the source, tests, adapter and this prospective record
-before any QC launch, then add terminal dispositions and Claude review notes.
-No complete lane suite is run by Codex under the owner rule.
+The source, tests, adapter and prospective record were committed before
+the R280 QC launch; terminal dispositions follow below. No complete lane
+suite is run by Codex under the owner rule.
+
+### 219.2 R279 A2 prospective Object Store key correction
+
+The redacted A1 status-only error pointed to the exact unsupported key
+at the Object Store write, not to the QC callback. The
+[Lean `LocalObjectStore.SaveBytes` key grammar](https://github.com/QuantConnect/Lean/blob/master/Engine/Storage/LocalObjectStore.cs)
+permits only one optional dot;
+the A1 content-addressed suffix `.json.gz` contains two. The separately
+pinned A2 source changes **only** the runtime key suffix to `.gz`, leaving
+the content digest, decision date, compressed payload, private write and
+read-back checks, seven-source capture, 09:20 decision time, and unchanged
+`main.py` intact. A2's runtime SHA-256 is
+`6b2d2f4d03d2b7e749c112f053f45685a21b4f9f69359130ac64551b1792047a`;
+its sorted two-file source manifest SHA-256 is
+`440b6e7ccfa561668e2ce40a8e737d4ab2c1529e40cd149f1439b382004755f6`.
+The same private QC project **37163330** and failed A1 identity are
+required before its one-use update/compile/backtest; no new project or
+R247 fourth attempt is permitted. A1+A2 focused tests passed **20/20**,
+including a red/green key-grammar simulation, source-delta pin, failed-A1
+and private-project guards, duplicate-launch refusal, and one-use
+metadata-only read. This is prospective work, not a claim that A2 has
+completed or that vendor availability was proven. Its eventual terminal
+status and accounting must be appended separately.

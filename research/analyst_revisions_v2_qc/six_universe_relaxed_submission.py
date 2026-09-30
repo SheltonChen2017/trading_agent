@@ -488,7 +488,7 @@ def _candidate(plan):
             or not isinstance(plan.control_directory, Path)
             or not plan.control_directory.is_absolute()
             or type(plan.family) is not str
-            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe", "eight_attribution", "eight_execution_stress"}):
+            or plan.family not in {"relaxed", "weight_ablation", "coverage25", "full_ar_ablation", "matched_study", "qcom_exclusion", "qcom_exclusion_tilt", "qcom_exclusion_coverage10", "qcom_exclusion_three_name", "qcom_entry_only", "qcom_restored", "qcom_score_floor1", "eight_universe", "eight_attribution", "eight_execution_stress"}):
         _fail("relaxed plan or three-attempt bound changed")
     rows = [row for row in _plan_manifest(plan)["candidates"]
             if row["candidate_id"] == plan.candidate_id]

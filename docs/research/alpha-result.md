@@ -6500,8 +6500,9 @@ zero-slippage R-278 parent returned **4.1320 percentage points more**.
 R-283 returned **+131.3431%** with **-21.0701%** maximum drawdown and
 **13,225** filled orders; its exact zero-slippage R-270 parent returned
 **4.7167 points more**. Each arm's membership/cap and ETF-panel digests
-match its own parent, so those paired gaps are not attributable to a
-changed input vintage. R-281 (cap entry, AR weight) made a first attempt
+match its own parent; a full stock-minute fill-tape digest is unavailable,
+so all possible data-vintage effects are not ruled out. R-281 (cap entry,
+AR weight) made a first attempt
 in private
 project **37165262**, uploaded the exact **17/17** frozen source files,
 but stopped before a launch receipt. A statistics-free QC inventory found
@@ -6513,3 +6514,49 @@ floor to **297 shared / 232 development / 40 infrastructure looks /
 698 valid cells**. No four-arm stress contrast exists until R-281
 validates. All three runs remain historical development diagnostics with
 current-vintage input and no authenticated ADV-capacity check.
+
+### R-281 A2 exact pre-create recovery launch — 2026-09-30
+
+The `54e1fd4` prospective recovery pin was committed before launch.
+R-281 A2 reauthenticated its exact spent A1 claim, private project
+**37165262**, all 17 frozen source files, and zero remote runs both before
+and immediately before `backtests/create`; it created no new project or
+rewrote source files. Backtest `2007f9f73fcbfa7fb5ba95abdb094831`
+launched from that project, reached **Completed.**, and passed its one
+bounded custom-statistic read with `run_valid=true`. All **261/261**
+rebalances executed; **13,829** MOO orders filled, zero invalid/canceled
+orders, and the digest-bound same-session fill audit had zero
+unverifiable/non-adverse fills and a **5.0000-bps** minimum signed
+adverse difference. After modeled fees the cumulative return is
+**+132.2347%**, maximum drawdown **-21.0669%**, and actual engine and
+modeled fees both **$70,921.07**. The exact zero-slippage R-277 parent
+returned **4.8289 percentage points more**; membership/cap and ETF-panel
+digests, account geometry and starting equity match. A2 is the valid
+second attempt; no A3 is needed. One further development look and valid
+cell move the floor to **298 shared / 233 development / 40
+infrastructure looks / 699 valid cells**.
+
+The four-way, fixed-100% 5-bps stress comparison now passes its local
+parent-lineage, same-input, account-geometry, order, fee and fill-audit
+gates. At 5 bps, the four arms return **+120.0625%** (cap entry/base
+weight), **+132.2347%** (cap entry/AR weight), **+118.2642%** (AR
+entry/base weight), and **+131.3431%** (AR entry/AR weight). AR weight
+adds **+12.1723 percentage points** on cap-selected holdings and
+**+13.0789 points** on AR-entry holdings; AR entry at base weights
+contributes **-1.7982 points** versus cap entry, with a **+0.9066-point**
+interaction. The full rule exceeds cap/base by **+11.2806 points**.
+Each arm loses **4.1320–4.8289 points** versus its own authenticated
+zero-slippage result. Thus a simple 5-bps adverse-price model does not
+erase the historical weighting contrast. However the annual AR-weight
+contrast on cap-selected holdings is **+4.64, +0.14, -2.28, +6.15,
+and -1.84 points** for 2021–2025, with a merely descriptive five-year
+`t≈0.80`; it is not a stable annually positive effect. The input remains
+current-vintage, the window is adaptively explored, the fill audit is
+directional, and no authenticated prior-20-session raw-volume feed
+supports the intended 1%-ADV participation check. The matched digests
+do not authenticate every underlying stock-minute fill datum. This is
+descriptive
+development evidence, not independent alpha, forward efficacy, capacity,
+or a live-trading claim; the comparison consumes **no additional QC
+look** beyond the five stress attempts already counted (R280 A1,
+R281 A1/A2, R282 A1 and R283 A1).

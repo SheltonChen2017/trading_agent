@@ -162,6 +162,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     formal_streaming_bridge.py formal_streaming_input.py
     formal_submission_adapter.py formal_terminal_disposition_builder.py
     fresh_six_universe_clock_successor.py
+    fresh_six_universe_clock_successor_a2.py
     fresh_six_universe_snapshot.py fresh_six_universe_snapshot_submission.py
     fundamental_universe_discovery.py fundamental_universe_discovery_runtime.py
     fundamental_universe_discovery_submission_adapter.py
@@ -519,7 +520,7 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
     ),
     "eight_universe_execution_stress_study.py": tuple(
         """
-        hashlib json pathlib research.analyst_revisions_v2_qc
+        hashlib json decimal pathlib research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.accepted_risk_six_universe_order_qc_projection
         research.analyst_revisions_v2_qc.eight_universe_attribution_study
         research.analyst_revisions_v2_qc.eight_universe_execution_stress_projection
@@ -611,6 +612,15 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.fresh_six_universe_snapshot
         research.analyst_revisions_v2_qc.fresh_six_universe_snapshot_submission
+        research.analyst_revisions_v2_qc.six_universe_coverage_submission
+        """.split()
+    ),
+    "fresh_six_universe_clock_successor_a2.py": tuple(
+        """
+        __future__ argparse json re time pathlib
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.fresh_six_universe_clock_successor
+        research.analyst_revisions_v2_qc.fresh_six_universe_snapshot
         research.analyst_revisions_v2_qc.six_universe_coverage_submission
         """.split()
     ),
@@ -1715,6 +1725,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "import:pathlib",
     ),
     "fresh_six_universe_clock_successor.py": (
+        "call:compile", "import:pathlib",
+    ),
+    "fresh_six_universe_clock_successor_a2.py": (
         "call:compile", "import:pathlib",
     ),
     "fresh_six_universe_snapshot_submission.py": (
@@ -4883,6 +4896,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.formal_submission_adapter",
         "research.analyst_revisions_v2_qc.formal_terminal_disposition_builder",
         "research.analyst_revisions_v2_qc.fresh_six_universe_clock_successor",
+        "research.analyst_revisions_v2_qc.fresh_six_universe_clock_successor_a2",
         "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot",
         "research.analyst_revisions_v2_qc.fresh_six_universe_snapshot_submission",
         "research.analyst_revisions_v2_qc.fundamental_universe_discovery",

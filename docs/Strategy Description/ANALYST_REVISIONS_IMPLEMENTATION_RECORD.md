@@ -198,6 +198,12 @@ Claude's independent review of `aef4855..e3fa38d` (0 P0, 0 P1, 1 P2, 3 P3):
 three required gates were red at the pushed head and are corrected, and two
 unpinned guards are pinned. Paired by calendar year, every new AR contrast is
 positive in 2021 and 2024 and negative in 2023 and 2025 (t 0.7–0.9).
+Section 218's fixed-100% four-arm order diagnostic and section 219's
+5-bps adverse-execution successor are exploratory: the latter completed
+four valid arms and an input-only QC clock/persistence probe, with a closing
+floor of **298 / 233 / 40 / 699**. The historical AR weighting contrast
+survives that simple slippage model but changes sign across years; vendor
+vintage, volume capacity and forward input readiness remain unresolved.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -940,9 +946,9 @@ and preregisters the owner's later, narrowly scoped fixed-100% historical
 attribution diagnostic. R277/R278 then each completed validly on A1; the
 four-arm decomposition and bounded, unlaunched adverse-execution successor
 protocol are in sections 218.2–218.3. The current conservative floor is
-**297/232/40/698** after R279 A1's input-clock failure, R279 A2's
+**298/233/40/699** after R279 A1's input-clock failure, R279 A2's
 successful mechanical persistence receipt, R280 A1's valid stress control,
-and R281–R283 A1 attempts (R281 pre-create, R282/R283 valid). This is
+R281 A1's pre-create stop and valid A2, and valid R282/R283 A1. This is
 not a further percentage or universe sweep; the exact
 09:20 QC callback is now proven, but vendor availability and a
 decision-ready forward input are not. No historical
@@ -2705,6 +2711,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-29 | Codex retrospective push-ledger catch-up (no new push or look) | `aef4855` -> `0808b3a` | Section 212/R247 input-only QC probe, previously omitted from section 5 | R247 A1, A2 and A3 consumed exactly three attempts; the 09:20 versus 10:00 callback clock prevented input readiness. The candidate is exhausted; no fourth attempt or outcome evaluation is inferred. This row records the already-pushed range only. | Section 212's focused tests and three QC terminal receipts; historical floor after the three infrastructure looks 254/192/37/662. No validation or provider action is newly claimed by this catch-up. | `ARV2R217-002` P3 record omission corrected by appended row; `ARV2D212-001` P2 forward gate remains open. | The later `0808b3a..e3fa38d` range was separately pushed and reviewed in section 217. |
 | 2026-09-29 | Codex retrospective push-ledger catch-up (no new push or look) | `0808b3a` -> `e3fa38d` | Sections 213–216, the complete second Codex push reviewed in section 217 | This supplementary row resolves the partial earlier section-213 row without rewriting it: QCOM-admitted replay, score-floor sensitivity, R267 input gate, R268 split-truncation A3, and R269–R275 eight-universe order results were all in this one pushed range. | Exact run/results accounting and focused validations remain in sections 213–216; closing floor 289/226/38/693. No QC action or new look is caused by this catch-up. | `ARV2R217-002` P3 record omission corrected by appended row; section 217's P2 closure/record-gate corrections remain attributable to Claude. | Section 218 counter-reviews Claude and freezes the owner's narrow fixed-100% factorial diagnostic. |
 | 2026-09-29 | Codex section-217 counter-review and fixed-100 eight-universe attribution diagnostic | `e9e2d7d` -> `908c9b0` and this completion commit | Section 218: accept and qualify the four Claude commits; freeze the R277/R278 order sources before launch; run the two missing arms; compare all four with exact retained controls; preregister one bounded adverse-execution successor | R277 and R278 both completed validly on A1 in private QC; B−A +12.8000 pp, C−A −1.8674 pp, D−C +13.6636 pp, D−A +11.7961 pp, with annual signature and current-vintage/zero-slippage cautions. Two development looks and two cells; floor 291/228/38/695. | Exact source/manifest and one bounded read per new run, retained-result reauthentication, focused closure/firewall/record/attribution tests, compilation and diff; final results in 218.4. No complete lane suite by Codex. | No new P0/P1/P2 defect; `ARV2CR218-001` P3 qualifies Claude's final-tree suite wording; `ARV2R217-002` ledger omission closed by two append-only catch-up rows. R247 forward clock and archive-vintage evidence gates remain open. | One final same-lane push. Claude reviews section 218 and the exact pushed commits; no stress QC launch, formal alpha, paper/live/funded/broker order or forward-efficacy claim is inferred. |
+| 2026-09-30 | Codex owner-directed section-219 pre-review forward-clock and fixed-100 execution stress | `b212048` -> this final lane correction/record commit | R279 input-only callback/Object Store mechanics; four 5-bps adverse-slippage order arms R280–R283 on exact fixed-100% 2021–2025 inputs | R279 A1 failed on QC one-dot key grammar; A2 completed in the same project with a bounded input-only metadata read. R280 A1, R281 A2, R282 A1 and R283 A1 completed validly; R281 A1 stopped before backtest creation and was spent. Four-arm return/parent comparisons and annual instability are in 219.3–219.5. The historical QCOM three-name recovery family omission and new-module closure pin were corrected locally, without a QC launch. | Exact one-use terminal/statistic reads and digest-bound parent comparison; R279 battery 20 passed, stress/recovery/import boundary 50 passed, historical recovery red/green 21 passed then 1 error -> 37 passed; final affected selection 251 passed, closure file 74 passed, compilation and diff clean. No complete Codex lane suite. Floor 298/233/40/699. | `ARV2D219-001` P2 parent-vintage interpretation gap, `ARV2D219-002` P2 legacy QCOM recovery admission gap and `ARV2D219-003` P2 required closure-pin gap corrected; R281 A1 transport cause unresolved. Current-vintage archive, annual sign changes, no raw-volume/1%-ADV capacity check, incomplete fill-tape identity and forward-vendor readiness remain disclosed. | One same-lane push; Claude independently reviews the exact section-219 range. No formal alpha, paper/live/funded/broker order or forward-efficacy authority follows. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -31261,7 +31268,7 @@ orders, or outcomes were read. Thus QC's exact callback and persistence
 mechanics are proven, while vendor historical availability, full
 point-in-time completeness, and a decision-ready forward input remain
 unproven. This is one infrastructure look, taking the shared floor
-to 294 total / 229 development / 40 infrastructure / 695 valid cells.
+to 294 total / 229 development / 40 infrastructure / 696 valid cells.
 No A3 is needed for this mechanical gate.
 
 ### 219.3 Fixed-100 execution-stress control and retrospective validity correction
@@ -31282,7 +31289,7 @@ modeled costs, cumulative return was **+120.0625%** and maximum drawdown
 4.2012 percentage points more. The membership/cap and ETF panel digests,
 starting equity, and selected-holdings baseline path match that parent.
 
-The postlaunch independent static audit found a real P2 interpretation
+The postlaunch independent static audit found `ARV2D219-001`, a P2 interpretation
 gap: the four stress arms were compared with each other but not with each
 exact zero-slippage parent's input digests. A changed QC data vintage could
 masquerade as slippage. The retrospective validator now refuses any
@@ -31306,7 +31313,8 @@ audits. After modeled costs, R282 returned **+118.2642%** with
 **-21.1471%** maximum drawdown and R283 returned **+131.3431%** with
 **-21.0701%** drawdown. Their exact zero-slippage-parent return gaps are
 **-4.1320** and **-4.7167** percentage points, respectively; each
-parent's input-panel digests match. R281 A1 created private
+parent's membership/cap and ETF-panel digests match; a complete
+stock-minute fill-tape digest is unavailable. R281 A1 created private
 project **37165262** and uploaded the exact 17-file source but stopped
 before a backtest was created. A statistics-free inventory confirms zero
 remote runs; its precise transport cause is unproven, but A1 is consumed.
@@ -31334,3 +31342,122 @@ success/refusal battery passed **9/9**, including changed claim/source,
 missing or wrong pin, and early/late orphan-run cases. The A2 source is
 otherwise identical to A1 and has not yet launched at this point; a fresh
 remote zero-run census and committed recovery pin precede any launch.
+
+After commit `54e1fd4`, A2 reauthenticated that exact source and both
+empty inventories, then launched backtest
+`2007f9f73fcbfa7fb5ba95abdb094831` in the same private project.
+Terminal status and one-use result validity are pending. This second
+development look brings the conservative floor to 298 shared /
+233 development / 40 infrastructure / 698 valid cells; no A3 or four-arm
+interpretation was warranted while A2 was unresolved.
+
+R281 A2 then reached **Completed.** and its sole bounded result read
+authenticated `run_valid=true`: 261/261 rebalances, **13,829** filled MOO
+orders, zero invalid/canceled orders, zero unverifiable/non-adverse fills,
+and a 5.0000-bps minimum signed adverse fill difference. Net cumulative
+return was **+132.2347%** with **-21.0669%** maximum drawdown and
+**$70,921.07** actual/modeled fees. Its zero-slippage R277 parent returned
+**4.8289 percentage points more** on matching authenticated inputs and
+account geometry. A2 adds one valid cell but no new look beyond its
+already recorded launch. The closing conservative floor is **298 shared /
+233 development / 40 infrastructure looks / 699 valid cells**; no A3
+is needed.
+
+### 219.5 Completed historical stress comparison and review handoff
+
+The host-only four-arm comparison reauthenticated all four private project
+receipts, one-use custom-statistic reads, zero-slippage parent artifacts,
+same membership/cap and ETF-panel digests, account dates/start equity,
+98% gross target, 2× admission buying power, 261 completed rebalances,
+fees and fill audits. It returned `valid=true`; no further QC result read
+was made for this comparison. The A/B/C/D 5-bps net cumulative returns
+were **+120.0625%, +132.2347%, +118.2642%, +131.3431%**. AR weight
+adds **+12.1723 pp** on cap-entry names and **+13.0789 pp** on AR-entry
+names; AR entry at base weights contributes **-1.7982 pp** and the
+entry/weight interaction is **+0.9066 pp**. Full versus cap/base is
+**+11.2806 pp**. Each matched 5-bps arm trails its own zero-slippage
+parent by **4.1320–4.8289 pp**. The annual cap-name AR-weight contrasts
+for 2021–2025 are **+4.64, +0.14, -2.28, +6.15, -1.84 pp**; the
+descriptive five-year t is only **0.80**. Slippage does not erase the
+historical cumulative weighting contrast, but the sign-changing years,
+adaptive research looks, current-vintage Benzinga archive, and unavailable
+prior-20-session raw-volume/1%-ADV capacity check and lack of a complete
+stock-minute fill-tape digest prevent a reliable-edge,
+forward-efficacy, liquidity-capacity or live-use conclusion.
+
+The final focused historical-recovery regression found `ARV2D219-002`,
+a P2 lane-owned reachability defect predating this round: the R244/R245
+QCOM-excluded three-name family is supported by the frozen manifest,
+projection, source dispatch, A2 recovery pin and tests, but absent from
+`six_universe_relaxed_submission._candidate`'s exact family allowlist.
+Before correction, the selected battery passed 21 tests and then refused
+the first R244 setup with `relaxed plan or three-attempt bound changed`;
+the earlier unbounded selection had 14 such setup errors and two dependent
+failures. Adding only that missing family identifier made the whole
+37-test selection pass. No historical QC candidate was relaunched, no
+economics changed, and this does not retroactively validate an old result.
+
+The mandatory whole-QC-package closure check exposed `ARV2D219-003`, a P2
+test-inventory gap at the pre-push tree: its source inventory omitted the
+R279 A2 successor, and its host-adapter import pin omitted the stress
+study's existing `decimal` import. The first focused check failed at the
+inventory comparison (80 preceding tests passed); after registering the
+exact A2 imports, I/O surface and reached module and the `decimal` edge,
+the closure test passed and its whole file passed **74/74**. This is a
+test-only correction; no provider or QC run changed.
+
+**Review notes for Claude (owner-directed review after this round).**
+Review the exact pushed lane range beginning at `b212048` and ending at
+this round's pushed HEAD, in one worktree/branch. The first four
+implementation commits are `cdbdeb5` (R279 input-only clock source),
+`057fae6` (frozen four-arm 5-bps order stress), `54cc232` (R279 A2 exact
+Object Store key correction), and `54e1fd4` (stress-parent validity gates
+and R281 same-project A2 recovery). The final correction/record commit
+closes `ARV2D219-002`, QC dispositions and the shared-ledger rows. No Claude commit was
+counter-reviewed in this special owner-directed pre-review round; section
+218 remains the accepted predecessor. Particular review targets:
+
+- Verify the R279 A1 redacted 09:20 error diagnosis, the Lean one-dot
+  Object Store key grammar, A2 source delta and same-project one-use
+  input metadata receipt. Neither run proved vendor PIT availability.
+- Reproduce the four stress source SHA/profile pins, role-independent
+  source delta, MOO fee/slippage behavior, and filled buy/sell audit.
+  The observed minimum was 5.0000 bps in each run; the audit guard itself
+  requires only a positive signed adverse difference.
+- Recheck all four exact zero-slippage parent result hashes, project
+  receipts, input-panel and baseline paths, 261-decision/account geometry,
+  costs and the five-year annual contrasts. Specifically mutate a
+  parent-only input digest; the comparison must refuse.
+- Review R281 A1's unresolved pre-create transport cause and the exact
+  A2 whitelist. A1 consumed an attempt/look despite zero remote runs;
+  A2 reused that project and completed. No fourth try or other project was
+  created.
+- Recheck the one-token QCOM three-name family-admission correction and
+  the red/green historical A2 recovery battery. It changes only local
+  recovery reachability, not a frozen strategy or QC result.
+- Verify the A2 module's source, import, I/O and reached-graph closure
+  pins, plus the stress study's `decimal` import. The required closure
+  check was red before this final test-only correction and is green now.
+- Keep the historical current-vintage/selection/multiple-look caveat,
+  missing raw-volume capacity leg, forward input-readiness gate and
+  paper/live/broker/funded-order prohibition explicit. Do not turn these
+  exploratory returns into a formal alpha or deployment claim.
+
+Codex validation for this round: R279 A1/A2 focused tests **20 passed**;
+execution/recovery/import-boundary focused selection **50 passed**;
+affected non-closure selection (including active-document and lane-record
+gates) **251 passed**; required closure file **74 passed**; Python
+compilation and `git diff --check` clean. The broader historical recovery selection was
+red at the prior head (21 passed then the R244 admission setup error,
+with 14 setup errors and two dependent failures in the unbounded run),
+and **37 passed** after the one-token correction; the new R281 recovery's
+own **9 tests pass**. The complete lane
+suite was **not** run under the owner's explicit Claude-only full-suite
+rule. No raw provider records, QC logs, order rows, Object Store payloads,
+paper/live orders, or funded/broker actions were read or performed.
+
+**Next authorized step after Claude's review:** counter-review every
+Claude commit/finding on this same lane. Then decide whether to build an
+authenticated prior-20-session volume/participation diagnostic and a
+separately reviewed common-epoch forward input protocol. R279 proves QC
+mechanics only; no outcome-bearing forward paper run is authorized by it.

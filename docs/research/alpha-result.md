@@ -6424,10 +6424,92 @@ The separately pinned, input-only R-279 source (manifest SHA-256
 `927bfeca30d72d319a74960533466421f0e16b9145b4bae3d6ae3a13b253986c`)
 compiled and launched once in private QC project **37163330**, backtest
 `941242b2425d5857bbdc57c5468ccaf9`. Its terminal status was
-**Runtime Error**. No result, metadata, provider row, price, order or log
-was read, so neither the 09:20 callback nor Object Store persistence is
-confirmed. A1 is consumed; no blind A2/A3 relaunch or R-247 fourth attempt
-follows. This is **one infrastructure research look, zero alpha/development
+**Runtime Error**. A subsequent status-only QC listing exposed the redacted
+error stack: the runtime entered `persist_at_decision` at **09:20 New York**,
+then `LocalObjectStore` refused the two-extension `.json.gz` key as an
+unsupported path. Thus the exact callback fired and seven-source checks
+reached persistence; an Object Store write, receipt, or decision-ready input
+was **not** confirmed. No result/custom statistic, provider row, price,
+order, or raw log was read. A1 is consumed; only a prospectively tested
+same-project A2/A3 correction, not a blind retry or R-247 fourth attempt,
+can follow. This is **one infrastructure research look, zero alpha/development
 looks, zero valid cells**. The conservative floor becomes **292 shared /
 228 development / 39 infrastructure looks / 695 valid cells**. The
 forward-input gate remains open.
+
+### R-280 A1 five-bps execution-stress launch — 2026-09-29
+
+The prospectively frozen four-arm, fixed-100% eight-universe stress manifest
+(SHA-256 `1e1754c6bf46aceeb03aadb80647c11524094063c0fe0d59ae5121a2a5d7f5fa`)
+was committed before the first launch. R-280 is the cap-entry/base-weight
+control with a 5-bps constant slippage model, 10-bps-per-side modeled fee,
+98% target gross, 2× admission buying power, and a bounded in-aggregate
+buy/sell MOO-fill audit. QC project **37163942**, backtest
+`f507db76969da35be849b71599077ba5` is A1; terminal/result validity
+is **Completed.** and `run_valid=true` on its one bounded result read.
+Its 261/261 rebalances had **15,178 filled MOO orders**, zero invalid or
+canceled orders, and a digest-bound audit of **7,938 buys / 7,240 sells**
+with zero unverifiable or non-adverse fills; minimum signed adverse fill
+was **5.0000 bps** against the same-session TradeBar open. After modeled
+fees, cumulative return was **+120.0625%** with maximum drawdown
+**-21.1476%**; actual engine and modeled fees both equal **$62,306.88**.
+Against authenticated zero-slippage R-268 A3, its return is **-4.2012
+percentage points**. Both input-panel digests and starting equity match
+that parent; the four-arm sensitivity remains incomplete until R281–R283
+validate. The 1%-of-prior-20-session-ADV diagnostic is unavailable
+for lack of an authenticated raw-volume source, not a passing zero. One
+launched development look and one valid cell raise the conservative floor
+to **293 shared / 229 development / 39 infrastructure looks / 696 valid
+cells**. No alpha,
+paper/live, broker or funded-order claim follows from its launch.
+
+### R-279 A2 supported-key input-clock launch — 2026-09-29
+
+The prospective, same-project A2 source was committed at `54cc232` before
+launch. Its sorted two-file source manifest SHA-256 is
+`440b6e7ccfa561668e2ce40a8e737d4ab2c1529e40cd149f1439b382004755f6`;
+only the unsupported `.json.gz` Object Store key suffix changes to `.gz`.
+The exact failed A1 and private project **37163330** were authenticated
+before one `files/update`, compile and launch. A2 backtest
+`4a2840c75c70831c98787043dccc844b` reached **Completed.** One
+bounded input-only statistic read authenticated the content-addressed
+private Object Store key and canonical/compressed SHA-256s with byte counts
+**190,633 / 83,011**. Its persisted local receipt remains private; no
+Object Store download or provider row was read. The QC clock and
+write/read-back path are now proven, but vendor historical availability,
+point-in-time completeness, and decision-readiness remain **unproven**.
+One further infrastructure look raises the conservative floor to
+**294 shared / 229 development / 40 infrastructure looks / 696 valid
+cells**. There is no outcome, order, price, paper or live authority in this
+input-clock diagnostic, and A3 remains the last possible attempt only if a
+separately evidenced prospective correction is needed.
+
+### R-281 A1 / R-282 A1 / R-283 A1 execution-stress attempts — 2026-09-30
+
+The three remaining source projections were frozen with R-280 before any
+QC launch. R-282 (AR entry, base weight) launched in private project
+**37165259**, backtest `fb7f5fa2f4df8d3674e77451718d9b0e`;
+R-283 (AR entry, AR weight) launched in private project **37165258**,
+backtest `a38a4f0ab4f8be298fdc2dc6dcaa7b8a`. Both reached
+**Completed.** and passed their one bounded result read with
+`run_valid=true`, 261/261 completed rebalances, zero invalid/canceled
+orders, and same-session adverse-fill audits with no unverifiable or
+non-adverse fills. R-282 returned **+118.2642%** after modeled fees with
+**-21.1471%** maximum drawdown and **14,508** filled orders; its exact
+zero-slippage R-278 parent returned **4.1320 percentage points more**.
+R-283 returned **+131.3431%** with **-21.0701%** maximum drawdown and
+**13,225** filled orders; its exact zero-slippage R-270 parent returned
+**4.7167 points more**. Each arm's membership/cap and ETF-panel digests
+match its own parent, so those paired gaps are not attributable to a
+changed input vintage. R-281 (cap entry, AR weight) made a first attempt
+in private
+project **37165262**, uploaded the exact **17/17** frozen source files,
+but stopped before a launch receipt. A statistics-free QC inventory found
+**zero** remote backtests. Its cause is not established; A1 is consumed
+and requires separately checked same-project A2 pre-create recovery, not
+an unaccounted retry. Conservatively all three attempts count as
+development looks, despite zero R-281 result. Two valid cells bring the
+floor to **297 shared / 232 development / 40 infrastructure looks /
+698 valid cells**. No four-arm stress contrast exists until R-281
+validates. All three runs remain historical development diagnostics with
+current-vintage input and no authenticated ADV-capacity check.

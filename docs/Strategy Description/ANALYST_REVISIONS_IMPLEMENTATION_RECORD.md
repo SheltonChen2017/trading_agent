@@ -940,9 +940,12 @@ and preregisters the owner's later, narrowly scoped fixed-100% historical
 attribution diagnostic. R277/R278 then each completed validly on A1; the
 four-arm decomposition and bounded, unlaunched adverse-execution successor
 protocol are in sections 218.2–218.3. The current conservative floor is
-**292/228/39/695** after the R279 A1 input-clock failure and its one
-infrastructure look. It is not a further percentage or universe sweep and
-cannot override the R247 09:20 forward-input/clock blocker. No historical
+**297/232/40/698** after R279 A1's input-clock failure, R279 A2's
+successful mechanical persistence receipt, R280 A1's valid stress control,
+and R281–R283 A1 attempts (R281 pre-create, R282/R283 valid). This is
+not a further percentage or universe sweep; the exact
+09:20 QC callback is now proven, but vendor availability and a
+decision-ready forward input are not. No historical
 eight-universe success confers paper/live/funded/real-order authority.
 The owner expressly waived waiting for Claude's review before section 219's
 separate R279 clock probe and fixed-100 execution-stress development; Claude
@@ -31247,3 +31250,87 @@ and private-project guards, duplicate-launch refusal, and one-use
 metadata-only read. This is prospective work, not a claim that A2 has
 completed or that vendor availability was proven. Its eventual terminal
 status and accounting must be appended separately.
+
+After that prospective commit, A2 compiled in the same private QC project
+and launched exactly once as backtest
+`4a2840c75c70831c98787043dccc844b`. It reached **Completed.**, and
+its one bounded metadata read authenticated the private content-addressed
+Object Store key, canonical/compressed SHA-256s and byte counts
+**190,633 / 83,011**. No raw Object Store payload, vendor rows, prices,
+orders, or outcomes were read. Thus QC's exact callback and persistence
+mechanics are proven, while vendor historical availability, full
+point-in-time completeness, and a decision-ready forward input remain
+unproven. This is one infrastructure look, taking the shared floor
+to 294 total / 229 development / 40 infrastructure / 695 valid cells.
+No A3 is needed for this mechanical gate.
+
+### 219.3 Fixed-100 execution-stress control and retrospective validity correction
+
+R280 A1 in project **37163942**, backtest
+`f507db76969da35be849b71599077ba5`, reached **Completed.** and its
+single bounded custom-statistic read authenticated `run_valid=true`.
+All **261/261** rebalances executed, **15,178** MOO orders filled,
+zero orders were invalid or canceled, and actual engine and modeled fees
+both equal **$62,306.88**. Its digest-bound fill audit counted 7,938 buys
+and 7,240 sells with zero unverifiable or non-adverse fills; the minimum
+signed adverse price difference from the same-session TradeBar open was
+**5.0000 bps**. That observed minimum corroborates the installed 5-bps
+model for this run; the audit's general validity rule is directional
+(`>0`), not an independent exact-5-bps assertion for every fill. After
+modeled costs, cumulative return was **+120.0625%** and maximum drawdown
+**-21.1476%**. Its authenticated zero-slippage R268 A3 parent returned
+4.2012 percentage points more. The membership/cap and ETF panel digests,
+starting equity, and selected-holdings baseline path match that parent.
+
+The postlaunch independent static audit found a real P2 interpretation
+gap: the four stress arms were compared with each other but not with each
+exact zero-slippage parent's input digests. A changed QC data vintage could
+masquerade as slippage. The retrospective validator now refuses any
+stress-parent membership/cap or ETF-panel mismatch and unequal starting
+equity or observation geometry, authenticates each private project receipt,
+and reports per-arm stress-minus-parent net-return, fee, and drawdown
+deltas. A red/green local regression makes a parent-only vintage mismatch
+refuse. These are host-side analysis corrections; they change **no**
+already-launched QC source or result bytes. The raw target-path digest
+includes the `s0` versus `s5` role, so it is not directly equal across
+models; the frozen AST source delta is limited to the slippage/diagnostic
+and audit installation, while the role-independent matched baseline path
+and exact parent inputs are checked. Neither this run nor these checks
+establish a 1%-ADV liquidity capacity result: no authenticated prior-20-
+session raw-volume input exists in the frozen source.
+
+R282 A1 and R283 A1 launched in private projects **37165259** and
+**37165258**, respectively, and both completed validly with 261/261
+rebalances, zero invalid/canceled orders, and digest-bound adverse-fill
+audits. After modeled costs, R282 returned **+118.2642%** with
+**-21.1471%** maximum drawdown and R283 returned **+131.3431%** with
+**-21.0701%** drawdown. Their exact zero-slippage-parent return gaps are
+**-4.1320** and **-4.7167** percentage points, respectively; each
+parent's input-panel digests match. R281 A1 created private
+project **37165262** and uploaded the exact 17-file source but stopped
+before a backtest was created. A statistics-free inventory confirms zero
+remote runs; its precise transport cause is unproven, but A1 is consumed.
+Only a prospectively pinned, same-project A2 pre-create recovery with two
+empty-run checks may proceed. The conservative floor is 297 shared /
+232 development / 40 infrastructure looks / 698 valid cells at this
+point. No four-arm or forward-efficacy inference is available yet.
+
+### 219.4 R281 same-project pre-create recovery, prospectively pinned
+
+The R281 A1 private project **37165262** contains the exact 17-file
+frozen source and has zero QC backtests. Its local A1 claim and project
+receipt exist; no launch or terminal receipt exists. A1 is conservatively
+spent even though no performance result was produced. The existing
+pre-create recovery mechanism now admits only this exact `(family,
+candidate)`, stress manifest SHA-256
+`1e1754c6bf46aceeb03aadb80647c11524094063c0fe0d59ae5121a2a5d7f5fa`,
+R281 projection SHA-256
+`7a725fe4dc8d913cf56916b1f3d87409e6019a0cb01c7f1c73231e679fdddc2d`,
+and project **37165262** for A2. It reauthenticates the A1 claim,
+private idle project, all 17 cloud source bytes, and an empty backtest
+inventory both before and immediately before `backtests/create`. It
+creates no new project and does not rewrite files. The prospective
+success/refusal battery passed **9/9**, including changed claim/source,
+missing or wrong pin, and early/late orphan-run cases. The A2 source is
+otherwise identical to A1 and has not yet launched at this point; a fresh
+remote zero-run census and committed recovery pin precede any launch.

@@ -311,6 +311,11 @@ def test_stress_parser_accepts_only_digest_bound_five_bps_report(monkeypatch, tm
     with pytest.raises(study.EightUniverseExecutionStressStudyError,
                        match="diagnostic identity"):
         adapter._parse_order(plan, stats)
+    parsed["meta"]["matched_diagnostics_sha256"] = adapter._sha(report)
+    parsed["aggregates"]["matched_baseline_target_path_sha256"] = "0" * 64
+    with pytest.raises(study.EightUniverseExecutionStressStudyError,
+                       match="matched selected-name/weight baseline path"):
+        adapter._parse_order(plan, stats)
 
 
 def test_stress_parser_refuses_unverified_or_zero_adversity(monkeypatch, tmp_path):
@@ -341,3 +346,94 @@ def test_stress_parser_refuses_unverified_or_zero_adversity(monkeypatch, tmp_pat
     with pytest.raises(study.EightUniverseExecutionStressStudyError,
                        match="fill audit"):
         adapter._parse_order(plan, stats)
+
+
+def test_saved_four_arm_stress_requires_common_input_and_valid_fills(monkeypatch, tmp_path):
+    """The comparison refuses a tampered arm, not merely a completed QC job."""
+    originals = {candidate: {
+        "run_valid": True,
+        "aggregates": {
+            "account": {
+                "cumulative_return": str(Decimal(index) / Decimal(10)),
+                "maximum_drawdown": "0.1", "starting_equity": "1000000",
+                "first_observation_session": "2021-01-04",
+                "last_observation_session": "2025-12-31",
+                "observation_count": 1255,
+            },
+            "execution": {
+                "submitted_rebalance_count": 261,
+                "completed_rebalance_count": 261,
+                "invalid_order_count_sum": 0,
+                "canceled_order_count_sum": 0,
+                "submitted_order_count": 2,
+                "filled_order_count_sum": 2,
+                "actual_engine_fee_amount": "10",
+                "modeled_fee_amount": "10",
+            },
+            "execution_stress_fill_audit": {"valid": True},
+            "matched_baseline_target_path_sha256":
+                study.attribution.PARENT_BASELINE_PATH_SHA256[
+                    "R268" if candidate in ("R280", "R281") else "R270"],
+            "target_gross_exposure": "0.98", "admission_leverage": "2",
+        },
+        "diagnostics": {
+            "membership_cap_path_sha256": "member-pin",
+            "etf_daily_panel_sha256": "etf-pin",
+            "slippage_bps_per_side": 5,
+        },
+    } for index, candidate in enumerate(study.PARENT_BY_CANDIDATE)}
+    parents = {study.PARENT_BY_CANDIDATE[candidate]: {
+        "aggregates": {
+            "account": {"starting_equity": "1000000", "cumulative_return": "0",
+                        "maximum_drawdown": "0.1"},
+            "execution": {"modeled_fee_amount": "8"},
+        },
+        "diagnostics": {
+            "membership_cap_path_sha256": "member-pin",
+            "etf_daily_panel_sha256": "etf-pin",
+        },
+    } for candidate in originals}
+    monkeypatch.setattr(study, "require_parents", lambda plan: {"results": parents})
+    monkeypatch.setattr(study.attribution, "_annual_contrasts", lambda arms: ([], {}))
+    monkeypatch.setattr(adapter, "_path", lambda plan, kind: tmp_path / (
+        plan.candidate_id + "-" + str(plan.attempt) + "-" + kind))
+    for candidate in originals:
+        (tmp_path / (candidate + "-1-result")).touch()
+    monkeypatch.setattr(study, "_authenticated_result", lambda plan:
+                        originals[plan.candidate_id])
+    common = study.compare_from_saved("a" * 32)
+    assert common["valid"] is True
+    assert common["all_moo_fill_audits_valid"] is True
+    assert common["contrasts"]["full_minus_cap_base_pp"] == "30.0"
+    assert common["paired_five_bps_minus_zero_bps"]["R281"]["net_return_change_pp"] == "10.0"
+
+    originals["R281"]["aggregates"]["execution_stress_fill_audit"]["valid"] = False
+    with pytest.raises(study.EightUniverseExecutionStressStudyError,
+                       match="fill, fee or order gate"):
+        study.compare_from_saved("a" * 32)
+    originals["R281"]["aggregates"]["execution_stress_fill_audit"]["valid"] = True
+    originals["R282"]["diagnostics"]["etf_daily_panel_sha256"] = "changed"
+    with pytest.raises(study.EightUniverseExecutionStressStudyError,
+                       match="common input"):
+        study.compare_from_saved("a" * 32)
+    originals["R282"]["diagnostics"]["etf_daily_panel_sha256"] = "etf-pin"
+    parents["R278"]["diagnostics"]["etf_daily_panel_sha256"] = "old-vintage"
+    with pytest.raises(study.EightUniverseExecutionStressStudyError,
+                       match="common input"):
+        study.compare_from_saved("a" * 32)
+
+
+def test_retrospective_stress_result_refuses_changed_private_project_receipt(
+        monkeypatch, tmp_path):
+    plan = adapter.build_plan("R280", "a" * 32, tmp_path / "control",
+                              family=study.FAMILY)
+    launch = {"project_id": 123, "backtest_id": "exact-run"}
+    monkeypatch.setattr(adapter, "_receipt", lambda *args: None)
+    monkeypatch.setattr(adapter, "_path", lambda _plan, kind: tmp_path / kind)
+    monkeypatch.setattr(adapter.common, "_read", lambda path:
+                        launch if path.name == "launch" else {
+                            "candidate_id": "R280", "project_id": 123,
+                            "project_name": "wrong-project"})
+    with pytest.raises(study.EightUniverseExecutionStressStudyError,
+                       match="retained terminal or read claim"):
+        study._authenticated_result(plan)

@@ -116,6 +116,13 @@ _PRECREATE_A2_RECOVERY = {
         "3fde7673114794db256336c7c738c185859dd46e3d9af0765aa1cd7d008e5b86",
         "a2e05e106752d6f429795010ad6635b25969756f03e9433303a801ef7b59b990",
         37122864),
+    # R281 A1 consumed its claim and uploaded the exact 17-file stress source,
+    # but stopped before a backtest receipt. A2 may use only that same private
+    # project and source after two empty remote backtest inventories.
+    ("eight_execution_stress", "R281"): (
+        "1e1754c6bf46aceeb03aadb80647c11524094063c0fe0d59ae5121a2a5d7f5fa",
+        "7a725fe4dc8d913cf56916b1f3d87409e6019a0cb01c7f1c73231e679fdddc2d",
+        37165262),
 }
 
 

@@ -7,7 +7,7 @@ the 1%-of-20-prior-session-ADV leg is unavailable, not a passing zero.
 
 import hashlib
 import json
-from decimal import Decimal
+from decimal import Decimal, localcontext
 from pathlib import Path
 
 from . import accepted_risk_six_universe_order_qc_projection as source_contract
@@ -177,9 +177,11 @@ def require_parents(plan):
     """Reauthenticate the completed four-arm zero-slippage comparison locally."""
     if plan.family != FAMILY or plan.candidate_id not in PARENT_BY_CANDIDATE:
         _fail("five-bps stress parent plan changed")
-    result = attribution.compare_from_saved(plan.organization_id)
-    if result.get("valid") is not True or result.get("common_input_not_full_stock_minute_fill_tape") is not True:
+    summary = attribution.compare_from_saved(plan.organization_id)
+    if (summary.get("valid") is not True
+            or summary.get("common_input_not_full_stock_minute_fill_tape") is not True):
         _fail("five-bps stress parent result is not valid")
+    results = {}
     for parent, digest in PARENT_RESULT_SHA256.items():
         control = (attribution.CONTROL if parent in {"R277", "R278"}
                    else attribution.PARENT_CONTROL)
@@ -194,7 +196,11 @@ def require_parents(plan):
             _fail("five-bps stress parent result is unavailable")
         if hashlib.sha256(raw).hexdigest() != digest:
             _fail("five-bps stress parent result bytes changed")
-    return result
+        result = attribution._authenticated_result(prior)
+        if result["run_valid"] is not True:
+            _fail("five-bps stress predecessor is not valid")
+        results[parent] = result
+    return {"summary": summary, "results": results}
 
 
 def parse_order(plan, statistics):
@@ -256,7 +262,127 @@ def parse_order(plan, statistics):
     return {**parsed, "diagnostics": report}
 
 
+def _authenticated_result(plan):
+    row = adapter._candidate(plan)
+    launch = adapter.common._read(adapter._path(plan, "launch"))
+    adapter._receipt(plan, launch)
+    expected = {"candidate_id": plan.candidate_id, "attempt": plan.attempt,
+                "project_id": launch["project_id"],
+                "backtest_id": launch["backtest_id"], "status": "Completed."}
+    if (adapter.common._read(adapter._path(plan, "project")) != {
+            "candidate_id": plan.candidate_id, "project_id": launch["project_id"],
+            "project_name": row["project_name"]}
+            or adapter.common._read(adapter._path(plan, "terminal")) != expected
+            or adapter.common._read(adapter._path(plan, "read-claim")) != expected):
+        _fail("five-bps stress retained terminal or read claim changed")
+    raw = adapter._read_artifact(adapter._path(plan, "raw-custom"))
+    if (type(raw) is not dict or set(raw) != set(expected) | {"statistics"}
+            or any(raw.get(key) != value for key, value in expected.items())
+            or type(raw["statistics"]) is not dict
+            or set(raw["statistics"]) != set(row["statistic_names"])):
+        _fail("five-bps stress retained statistic inventory changed")
+    parsed = parse_order(plan, raw["statistics"])
+    saved = adapter._read_artifact(adapter._path(plan, "result"))
+    if saved != {**expected, **parsed,
+                 "manifest_sha256": adapter._plan_manifest_sha256(plan),
+                 "projection_sha256": row["projection_sha256"]}:
+        _fail("five-bps stress saved result differs from exact statistics")
+    return saved
+
+
+def compare_from_saved(organization_id):
+    """Value-free QC access: compare only four one-use local result artifacts."""
+    anchor = adapter.build_plan("R280", organization_id, CONTROL, 1, family=FAMILY)
+    parents = require_parents(anchor)["results"]
+    arms = {}
+    names = {"R280": "cap_base", "R281": "cap_AR_weight",
+             "R282": "AR_entry_base_weight", "R283": "AR_entry_AR_weight"}
+    for candidate, name in names.items():
+        found = []
+        for attempt in (1, 2, 3):
+            plan = adapter.build_plan(candidate, organization_id, CONTROL,
+                                      attempt, family=FAMILY)
+            if adapter._path(plan, "result").exists():
+                found.append(_authenticated_result(plan))
+        valid = [item for item in found if item["run_valid"] is True]
+        if len(valid) != 1:
+            _fail("five-bps stress requires exactly one valid " + candidate + " result")
+        arms[name] = valid[0]
+    reference = arms["cap_base"]["diagnostics"]
+    reference_account = parents["R268"]["aggregates"]["account"]
+    for candidate, name in names.items():
+        result = arms[name]
+        aggregate, report = result["aggregates"], result["diagnostics"]
+        execution = aggregate["execution"]
+        account = aggregate["account"]
+        parent = parents[PARENT_BY_CANDIDATE[candidate]]
+        parent_report = parent["diagnostics"]
+        if (account["starting_equity"] != reference_account["starting_equity"]
+                or account["first_observation_session"] != "2021-01-04"
+                or account["last_observation_session"] != "2025-12-31"
+                or account["observation_count"] != 1255
+                or aggregate["target_gross_exposure"] != "0.98"
+                or aggregate["admission_leverage"] != "2"
+                or report["membership_cap_path_sha256"] != reference["membership_cap_path_sha256"]
+                or report["etf_daily_panel_sha256"] != reference["etf_daily_panel_sha256"]
+                or report["membership_cap_path_sha256"] !=
+                   parent_report["membership_cap_path_sha256"]
+                or report["etf_daily_panel_sha256"] !=
+                   parent_report["etf_daily_panel_sha256"]
+                or report["slippage_bps_per_side"] != 5
+                or aggregate["execution_stress_fill_audit"]["valid"] is not True
+                or execution["submitted_rebalance_count"] != 261
+                or execution["completed_rebalance_count"] != 261
+                or execution["invalid_order_count_sum"] != 0
+                or execution["canceled_order_count_sum"] != 0
+                or execution["submitted_order_count"] != execution["filled_order_count_sum"]
+                or execution["actual_engine_fee_amount"] != execution["modeled_fee_amount"]):
+            _fail("five-bps stress common input, fill, fee or order gate changed: " + name)
+    if (arms["cap_base"]["aggregates"]["matched_baseline_target_path_sha256"] !=
+            arms["cap_AR_weight"]["aggregates"]["matched_baseline_target_path_sha256"]
+            or arms["AR_entry_base_weight"]["aggregates"]["matched_baseline_target_path_sha256"] !=
+               arms["AR_entry_AR_weight"]["aggregates"]["matched_baseline_target_path_sha256"]):
+        _fail("five-bps stress fixed-pair matched selection path changed")
+    with localcontext() as context:
+        context.prec = 96
+        returns = {name: Decimal(item["aggregates"]["account"]["cumulative_return"])
+                   for name, item in arms.items()}
+        a, b, c, d = (returns[name] for name in (
+            "cap_base", "cap_AR_weight", "AR_entry_base_weight", "AR_entry_AR_weight"))
+        contrasts = {
+            "AR_weight_on_cap_holdings_pp": str((b - a) * 100),
+            "AR_entry_count_at_base_weights_pp": str((c - a) * 100),
+            "AR_weight_on_AR_entry_holdings_pp": str((d - c) * 100),
+            "entry_weight_interaction_pp": str(((d - c) - (b - a)) * 100),
+            "full_minus_cap_base_pp": str((d - a) * 100),
+        }
+        paired = {}
+        for candidate, parent in PARENT_BY_CANDIDATE.items():
+            stressed = arms[names[candidate]]["aggregates"]
+            unstressed = parents[parent]["aggregates"]
+            paired[candidate] = {
+                "parent": parent,
+                "net_return_change_pp": str((
+                    Decimal(stressed["account"]["cumulative_return"])
+                    - Decimal(unstressed["account"]["cumulative_return"])) * 100),
+                "modeled_fee_change": str(
+                    Decimal(stressed["execution"]["modeled_fee_amount"])
+                    - Decimal(unstressed["execution"]["modeled_fee_amount"])),
+                "maximum_drawdown_change_pp": str((
+                    Decimal(stressed["account"]["maximum_drawdown"])
+                    - Decimal(unstressed["account"]["maximum_drawdown"])) * 100),
+            }
+    annual, uncertainty = attribution._annual_contrasts(arms)
+    return {"valid": True, "historical_diagnostic_only": True,
+            "all_moo_fill_audits_valid": True,
+            "liquidity_capacity_diagnostic": ADV_UNAVAILABLE,
+            "returns": {name: str(value) for name, value in returns.items()},
+            "paired_five_bps_minus_zero_bps": paired,
+            "contrasts": contrasts, "annual_contrasts": annual,
+            "five_year_descriptive_uncertainty": uncertainty}
+
+
 __all__ = ("ADV_UNAVAILABLE", "ARMS", "CONTROL", "FAMILY", "FROZEN_MANIFEST_SHA256",
            "MANIFEST_PATH", "PARENT_BY_CANDIDATE", "PARENT_RESULT_SHA256", "PINS", "PROTOCOL",
-           "build_projection", "freeze_manifest", "frozen_manifest",
-           "parse_order", "require_parents")
+           "build_projection", "compare_from_saved", "freeze_manifest",
+           "frozen_manifest", "parse_order", "require_parents")

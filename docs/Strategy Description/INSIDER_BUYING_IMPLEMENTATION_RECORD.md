@@ -14805,3 +14805,116 @@ parent coverage, rights/vintage, frozen look and QC processing remain open.
 Research looks, QC jobs and backtests remain **0/0/0** in this continuation.
 No commit was pushed; the local branch remains ahead of `d478cfd` and requires
 an eventual single authorized same-lane push only after a completed round.
+
+## 113. Source-bound refusal recovery preflight (2026-09-30 UTC; diagnostic pending)
+
+The owner replied **“retry”** after the section-112 failure report and the
+proposed one-target diagnostic/recovery path. This supersedes D39 only for one
+bounded diagnostic SEC re-fetch of the refused parent and a separately
+versioned continuation that does not re-request any completed parent. It does
+not authorize skipping an unverified filing, relaxing identity checks,
+copying the incomplete root into a false completed root, widening the source
+window, consuming a research look, or launching QC/backtesting. The original
+campaign root and its terminal refusal remain immutable and authoritative
+history. The identifying SEC contact must be supplied at launch, kept out of
+Git and public reports; it has not yet been supplied for this retry.
+
+### 113.1 Delegated owner decisions and exact offline evidence
+
+| ID | Decision | Reason and limit |
+|---|---|---|
+| D40 | Independently replay the exact halted root and bind a one-shot private diagnostic capture to its one refused request. | A changed, copied, or malformed old root must not authorize another request. A durable start marker consumes the one retry even if the process stops ambiguously. A bounded HTTP-200 body is stored before envelope validation; a validator refusal remains a refusal, not an exclusion. |
+| D41 | Prepare a new, source-bound continuation path only if the diagnostic body independently passes request-bound validation. | The continuation must reverify old and diagnostic roots, reuse every prior completed object and the remaining selected objects, and dispatch only previously unattempted parents. Its exact denominator remains 99,394, not the 9,337 selected cohort. A partial or merely HTTP-successful result is not backtest-ready. |
+
+`insider_buying_sec_all_form4_parent_recovery_preflight.py` replays both
+committed v1 shards read-only against the exact `b64acd1` capture code and
+source plan. It checks the complete event chains, journals, reports, commits,
+object bytes, unique object descriptors, directory members, the one terminal
+refusal, and the manifest/request inventory. Its real-source replay returned
+the previously anchored report SHA-256 pair
+`a5ac1bd8d4782ac9dfbcdbfb7a5b9fd7dfdb17ad0ec1b9d4b9184d13c4cded65`
+and `99d30899a53b64ea509d96d771d59444c5e24798e3df7d95ccb03c57582e11a3`.
+The journal SHA-256 pair is
+`fca2d22859893d70f89b10a31acdfb81eebe272bba327cf0bc779819fa6630c8`
+and `a0c409e1011652682a58d9b5bb18fc174fea775fb1e9983675d1ed287ebcb3d8`.
+The original plan SHA-256 is
+`0d6a85d2edb2e9d41cce6092297930d9f9d16fdfdb7d49669af01e0214aac17b`.
+The replay confirmed **9,539** completed parents (1,198 selected reuse and
+8,341 new), **8,342** prior attempts including exactly one refused attempt,
+**8,139** later selected reuses, and **81,716** as-yet-uncompleted new
+requests including the refused parent. The latter inventory SHA-256 is
+`37cfa21a210a68d2b3da9f3a903552a5af23352b2dad317546309f356d84c931`.
+If the single diagnostic succeeds, only **81,715** later parent URLs remain
+eligible for first dispatch. This is a fully replayed *partial* root, not a
+campaign completion or source-authenticity claim.
+
+`insider_buying_sec_parent_refusal_diagnostic.py` is a separate one-shot
+capture boundary. The real entry pins the exact old root and requires an
+exact clean committed lane snapshot; importing or preflighting it has no
+network effect. Its private sibling output root is fixed, new, and
+non-resumable. The output-directory entry, manifest, and attempt-start marker
+are fsynced before the single SEC transport call. Any bounded, framed 200
+body is published before the request-bound header check. Its resulting
+`accepted` label means only that bounded header identity passed; it neither
+advances the v1 campaign nor establishes a complete document, SEC source
+authenticity, official publication time, PIT, canonical signals or data
+rights. No actual diagnostic dispatch has occurred in this entry.
+
+### 113.2 Findings, validation, and remaining gate
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| `IB1BCAMP-R03` | P1, **CLOSED locally before diagnostic** | The new one-shot root initially fsynced child files but not the parent directory entry. A power loss could erase the only consumed-authorization marker after a request. An instrumented test failed before parent-directory fsync and passed after it was required before transport. |
+| `IB1BCAMP-R04` | P2, **CLOSED locally before diagnostic** | The real diagnostic initially accepted a caller-chosen copied old root, producing a different sibling output and permitting a second dispatch. An isolated test showed the copied root reached replay before the fix; the real entry now pins the exact old absolute root and refuses the copy before replay/transport. |
+| `IB1BCAMP-OBS01` | P3, **OPEN limitation** | The old-root replay releases read locks before the diagnostic request. A concurrent external writer could stale the receipt; this workflow forbids changes to the old root, and any later continuation must replay it again before dispatch or completion. The private diagnostic response metadata may retain server headers, including cookies or an echoed contact; its root is mode 0700 and files are mode 0600, and no header or contact is printed or committed. |
+| Earlier open P3 ledger entries | P3, **retained** | No source recovery or partial-root replay cures the prior provenance, multi-owner, PIT, economics or shared/out-of-lane observations. |
+
+On Python 3.12.14, the focused v1 campaign, recovery-preflight and
+diagnostic tests passed **49/49** after the two red/green fixes. This was not
+a complete lane or repository suite. The real offline partial-root replay
+completed with the exact 99,394-row arithmetic above and no SEC request.
+Exact-clean-code gating prevents a real diagnostic call until the
+implementation is committed and the contact input is available. No response
+has yet been retried, no campaign
+recovery has been launched, no QC job/backtest/look has occurred, and nothing
+has been pushed. The first historical order-based Insider backtest remains
+blocked on accepted source bytes, complete independently replayed coverage,
+source/rights and official acceptance/PIT evidence, a frozen look, and an
+honest QC execution gate.
+
+### 113.3 Offline diagnostic union and inert v2 plan
+
+`insider_buying_sec_all_form4_parent_recovery_union.py` independently replays
+the private diagnostic manifest, durable attempt marker, response framing,
+raw body, exact request-bound header, report, commit, member set and private
+file modes. It requires an independently supplied report SHA-256 and the
+diagnostic capture commit; those anchors must be recorded after an actual
+one-shot capture, not copied from an arbitrary self-consistent directory.
+The observed entry fixes the old and diagnostic root paths. Only an accepted
+diagnostic body can fill the refused index. The source-union preflight then
+rechecks the original partial root and remaining selected objects and
+accounts for **9,539 prior + 1 diagnostic + 8,139 selected + 81,715 later
+unattempted = 99,394** in the original order. It returns only aggregate
+counts and source-class/request-inventory digests; it publishes no root and
+performs no transport.
+
+`insider_buying_sec_all_form4_parent_recovery_campaign.py` prepares an
+**inert** 13-shard v2 plan from that verified union. It rejects overlapping
+output paths and exposes the exact later-dispatch inventory while explicitly
+marking transport, durable attempt journaling, and completed-root verification
+**unimplemented**. It cannot launch the remaining requests, and its plan is
+not source completion. A versioned executor must still be implemented and
+reviewed before any broad continuation.
+
+| ID | Priority/status | Evidence and correction |
+|---|---|---|
+| `IB1BCAMP-R05` | P3, **CLOSED locally** | Independent review found that a canonical JSON float equal to the integer body length could pass the diagnostic report's size comparison. A rehashed-report regression was red before an exact-int check and green afterward. |
+| `IB1BCAMP-R06` | P3, **CLOSED locally** | The independent replay initially accepted a chmod-broadened diagnostic root despite possibly sensitive private headers. A mode-change regression was red; replay now requires owner-only mode for the pinned root, objects directory, every metadata file, and body object. |
+
+The focused v1 campaign plus four new recovery test files passed **82/82** on
+Python 3.12.14 after the above red/green fixes. Active-document and exact
+Insider package-import checks passed **72/72** after this subsection was
+added. The real diagnostic and v2 plan
+cannot be replayed against real source yet because no diagnostic request has
+been sent. Neither an accepted source body nor complete corpus, PIT, rights,
+frozen research look, QC job or backtest has been established.

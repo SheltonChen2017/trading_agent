@@ -15217,7 +15217,7 @@ read-only countercheck confirmed the unmatched start and the reviewed
 `resume=True` refusal. No complete lane/repository suite, SEC retry,
 completed-root replay, QC attempt, or outcome check was run after the stop.
 
-## 118. Owner-authorized v3 ambiguous-parent diagnostic gate (2026-09-30 UTC; pre-dispatch)
+## 118. Owner-authorized v3 ambiguous-parent diagnostic gate (2026-09-30 UTC; accepted body, incomplete campaign)
 
 The owner explicitly authorized **one** narrowly scoped diagnostic request for
 the single parent whose original v3 `attempt-start` has no durable finish,
@@ -15274,3 +15274,55 @@ request, report, QC job, outcome look, or backtest had occurred yet.** The
 capture result and its external hash, any refusal, final validation and
 exact push range must be recorded after the one-shot attempt; this section
 does not predeclare success or source completion.
+
+### 118.1 One-shot result, independent acceptance, and exact handoff
+
+From clean committed capture snapshot
+`b5a140816eeaa05c6178fa544d00fa7028e4a9d9`, the fixed private sibling
+root was absent. The one-shot entry freshly replayed the observed stopped v3
+root, wrote its own fsynced manifest and start, then made **one** additional
+SEC archive request for the single unresolved parent. Its terminal report
+records `returned`, HTTP `200`, and request-bound parent-envelope `accepted`.
+The externally recorded diagnostic report SHA-256 is
+`206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`;
+the retained raw body is **7,373 bytes**, SHA-256
+`61c9b1bee6d9b365cb7f5363b30969382def65f5e652f2f63722348db465ce1c`.
+The contact, request identity, and body are not in Git or this handoff.
+
+The separate observed acceptance wrapper, given the report hash and capture
+commit from this record rather than deriving them from the diagnostic root,
+passed its read-only check. It verified private members and modes, the one
+durable start/response/report/commit, response framing, stored body hash,
+request-bound parent identity, false authority flags, exact capture-module
+blob, and a fresh full partial-v3 replay both before and after the diagnostic
+check. It reproduced the same original root-plan, active-journal and
+pending-start hashes listed above. **The old v3 start remains unresolved in
+its preserved root**; the new body is a separately accepted diagnostic input
+for a future versioned union, not a repaired v3 campaign. The source-bound
+arithmetic is now 19,526 rows including the one new diagnostic body, leaving
+79,868 originally unattempted parents. No complete 99,394-row union or
+completed-root report has been produced.
+
+This round has **no incoming Claude commits to dispose**: the outstanding
+remote baseline remains `d478cfd3159b13a141f3cf2058b956526e4354b3`.
+Claude's next review should inspect the accumulated Codex-only range
+`d478cfd3159b13a141f3cf2058b956526e4354b3..HEAD` at this lane's one
+push, with earlier implementation/failure decisions in sections 110–117 and
+this diagnostic's code in `b5a1408` plus this record commit. The P2 findings
+`IB1BCAMP-V3AMB01` through `03` and P3 `04` are closed with the stated
+red/green proof; earlier open P3 and shared/out-of-lane findings retain their
+prior status. No shared/project-wide file or `SESSION_HANDOFF.md` changed.
+
+The completed scope is only **the one-shot ambiguous-parent diagnostic and
+its independent offline custody check**. Source authenticity, official
+acceptance/publication/PIT identity, canonical IB-1C..IB-1E signals,
+validity-dated CIK-to-QC mapping, data-processing rights, a frozen research
+look, QC job entitlement, and an honest historical order-based backtest are
+still false or unverified. QC jobs, research looks, and backtests remain
+**0/0/0** for this continuation; no broker, deployment, capital, order, or
+trading action occurred. Under D55, the next action is one lane push and a
+quiet Claude-push monitor. Only after Claude independently reviews this exact
+snapshot and Codex counter-reviews every incoming commit may a separately
+versioned v4 union/continuation be considered for the remaining 79,868;
+diagnostic acceptance alone does not authorize skipping them or launching
+the backtest.

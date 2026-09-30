@@ -1,24 +1,25 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED THE THREE-COMMIT RANGE `614214a..d528615` COMMIT BY
-COMMIT (SECTION 77). ALL THREE ARE ACCEPTED WITH NO CODE OR TEST CORRECTION.
-`SI-CR14-001` IS **CLOSED BY CORRECTION**: THE SI-5 PROTOCOL NOW BINDS AN
-IMMUTABLE RECORD REVISION THAT CARRIES SIX VERBATIM OWNER QUOTATIONS, ASSERTED
-BY A TEST THAT IS RED AGAINST THE OLD BINDING, AND THE RESEARCH GATE'S SCOPE IS
-NOW STATED. THE QUANTCONNECT REPLY CONFIRMS ITS FINRA HISTORY HOLDS ONE STORED
-VALUE PER SETTLEMENT DATE, WITH NO CORRECTION VINTAGES OR RELEASE TIMESTAMPS, SO
-SOURCE ADMISSION REMAINS DENIED AND ALL THREE SOURCE P2s STAY OPEN.
-**`SI-CR15-001` (P3, OPEN, TIME-SENSITIVE OWNER ADVISORY): BEFORE THE PENDING NYSE
-AND NASDAQ REPLIES ARE ACTED ON, THE OWNER SHOULD STATE WHETHER THE STANDING
-DELEGATION EXTENDS TO PURCHASES, LICENSE ACCEPTANCE, TRIALS OR ANY FINANCIAL OR
-CONTRACTUAL COMMITMENT.** `SI-CR15-002` (P3) IS CLOSED BY THIS RECORD COMMIT:
-CODEX'S ROUND LEFT THIS STATUS BLOCK STALE AND ADDED NO PUSH-LEDGER ROW. THE
-EXACT EIGHTEEN-FILE SHORT INTEREST LANE IS 815 PASSED. THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN. NO
-PERMANENT CELL OR LOOK HAS BEEN ALLOCATED; AUTHORIZED AND CONSUMED OUTCOME LOOKS
-REMAIN ZERO. ALL LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT,
-LOOKBACK-SELECTION, RANKING, SEED, ETF, QUANTCONNECT HISTORY/PROJECT/UPLOAD/
-COMPILE/JOB/BACKTEST, PURCHASE, BROKER, DEPLOYMENT, PAPER/LIVE, ORDER, AND
-TRADING GATES REMAIN CLOSED.**
+Status: **CLAUDE REVIEWED THE THREE-COMMIT CHECKPOINT `614214a..d528615` IN
+SECTION 77. CODEX COUNTER-REVIEWED CLAUDE'S SOLE COMMIT `a31805a` IN SECTION 78
+AND ACCEPTED IT AFTER RECORD-ONLY QUALIFICATION. CLAUDE FOUND NO NEW P0–P2;
+ITS `SI-CR15-002` P3 RECORD CORRECTION MAKES `d528615` ACCEPTED AFTER
+CORRECTION, NOT UNQUALIFIED ACCEPTANCE. `SI-CR14-001` IS CLOSED BY THE
+VERBATIM-OWNER PROVENANCE CORRECTION. QUANTCONNECT SUPPORT REPORTED ONE HISTORY
+VALUE PER SETTLEMENT DATE AND NO DOCUMENTED FIELD OR API TO RECONSTRUCT PRIOR
+CORRECTION OR PUBLIC-RELEASE VINTAGES; IT DID NOT ESTABLISH WHETHER INTERNAL
+PRIOR VERSIONS EXIST. ALL THREE SOURCE-ADMISSION P2s REMAIN OPEN.
+`SI-CR15-001` (P3) REMAINS OPEN FOR ANY PURCHASE, SUBSCRIPTION, TRIAL, LICENSE
+ACCEPTANCE OR OTHER BINDING FINANCIAL/CONTRACTUAL COMMITMENT; READ-ONLY
+EVALUATION OF VENDOR REPLIES IS ALREADY AUTHORIZED. CLAUDE REPORTED 815 PASSED
+IN THE EXACT EIGHTEEN-FILE LANE; CODEX RAN FOCUSED CHECKS ONLY. THE SHARED P2
+`SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN. NO PERMANENT CELL OR LOOK HAS BEEN
+ALLOCATED; AUTHORIZED AND CONSUMED REAL OUTCOME LOOKS REMAIN 0/0. ALL PROVIDER
+MARKET-ROW, LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION,
+RANKING, SEED, ETF, QUANTCONNECT HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
+PURCHASE, BROKER, OPERATOR-DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDER AND
+TRADING GATES REMAIN CLOSED. THE SECTION-78 COUNTER-REVIEW IS LOCAL-ONLY; NO
+CODEX PUSH IS MADE WHILE THE SOURCE GATES REMAIN OPEN.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -10291,3 +10292,69 @@ reply or the exchange emails.
    ranking; seeds; SI-4 ETF work; portfolio stages; any purchase; broker,
    deployment, paper/live and trading actions. The shared final holdout remains
    sealed.
+
+## 78. Codex counter-review of Claude's checkpoint review — 2026-09-30 UTC
+
+### 78.1 Exact range and disposition
+
+The physical designated worktree, lane branch and clean local tree were checked
+before inspecting the remote. The exact pushed Claude range after
+`d528615a5e2b32286abb27451cb6ab3f8f7d1982` is the single record-only
+commit `a31805afd7720c700527a6f3e42912e850deffa8`. Local, tracking and
+actual remote heads already equalled `a31805a`; the matching lane ref alone
+was fetched, and no fast-forward was needed. No other branch, worktree, code,
+test or shared file changed in that commit. Claude's section 77 shows an
+independent review of the exact published checkpoint, all three Codex commits
+have explicit dispositions, and its reported complete eighteen-file lane run
+is **815 passed in 3,259.82s**. Codex did not rerun that full suite.
+
+| Claude commit | Scope | Codex disposition |
+|---|---|---|
+| `a31805afd7720c700527a6f3e42912e850deffa8` | Review section 77, current status and reconstructed append-only push-ledger row | **Accepted after record-only qualification.** `SI-CR15-002` is confirmed and its reconstructed `614214a..d528615` row matches section 76 and the pushed three-commit range. The four P3 precision findings below are corrected in the current status and this superseding counter-review; Claude's original review text and append-only push ledger are retained for audit. No code or test correction is needed. |
+
+### 78.2 Persistent P0–P3 counter-review ledger
+
+No new P0–P2 arose from `a31805a`. The three source-admission P2s and the
+shared out-of-lane P2 remain open; “no P0, P1 or P2 in the lane” in section
+77.6 means no **new** issue from Claude's reviewed range, not zero open P2s.
+
+| ID | Priority | Status | Evidence and impact | Reason and correction | Verification |
+|---|---|---|---|---|---|
+| `SI-CCR25-001` | P3 | **Closed by qualification** | Section 77.5 and its former top status convert QC's inability to point to a prior-vintage or publication-time field/API into “no correction vintages or release timestamps.” The owner's pasted QC reply establishes one History value per settlement date and no documented as-of reconstruction route, not the absence of internal retained versions. | An undocumented inference about provider storage could misstate the factual source gate. The current status and this section use only the supported claim; source admission remains denied. | Compared section 77.5 with the verbatim QC reply supplied by the owner; no market rows or QC job accessed. |
+| `SI-CCR25-002` | P3 | **Closed by qualification** | Section 77.2 labels `d528615` simply accepted while section 77.6 confirms and corrects its stale status/missing mandatory push-ledger row as `SI-CR15-002`. | The required per-commit taxonomy is **accepted after record correction** for `d528615`; the other two Codex commits remain accepted. This section supersedes that shorthand without rewriting Claude's historical table. | Compared the three-commit range, section 76 and Claude's inserted ledger row; the row is chronological and accurately scoped. |
+| `SI-CCR25-003` | P3 | **Closed by qualification; `SI-CR15-001` stays open** | Section 77's phrase “before any vendor reply is acted on” can be read to forbid even the already-authorized read-only evaluation and notification of replies. | The unresolved approval concerns accepting a purchase, subscription, trial, license/data terms or other binding financial/contractual action. Reading, evaluating and reporting a reply does not itself do any of those things. No such commitment is made or inferred from the standing delegation. | Existing vendor-reply monitor is read-only; no reply, purchase, trial or terms were accepted in this counter-review. |
+| `SI-CCR25-004` | P3 | **Closed by current-status correction** | Section 77.6 says no P2 “in the lane” while listing three open source P2s and a shared P2; its top gate list also omitted operator-database and capital exclusions present in section 76. | A status summary must distinguish no **new** P2 from open gates and not silently drop protected surfaces. The current status above restores both distinctions. | Checked section 76.4, section 77.6 and the current status; no authority flag or economic choice changed. |
+
+`SI-CR14-001` is accepted as closed for the **citation/provenance defect**:
+the bound immutable record now carries the owner's six verbatim statements,
+and the SI-0M research-software gate remains separate from administrative
+correspondence. This is not a license or provider-data authorization.
+`SI-CR15-002` is confirmed and closed by Claude's lane-record correction.
+`SI-CR15-001` remains a prospective P3 advisory; a specific binding vendor
+commitment is not made under the general standing delegation. The source P2s
+`SI-SRC-20260928-001`, `-002` and `-003`, and shared out-of-lane P2
+`SI-CR5-005` / `SI-CCR16-007`, remain open without a lane fix.
+
+### 78.3 Focused verification, exclusions and next step
+
+On the exact `a31805a` code tree, Codex ran only the SI-5 offline protocol and
+Short Interest import-boundary files: **43 passed in 0.97s**. The corrected
+record is documentation-only and the protocol binds the immutable `0e31505`
+blob, not the working record. Final-tree active-document and diff checks are
+**69 passed** and **clean**, respectively. No compilation was needed
+for this record-only change. No complete lane or repository suite was run by
+Codex. No provider, FINRA/SEC, credentials,
+licensed or actual historical market row, outcome, holdout, QC history/job,
+broker, operator database, deployment, paper/live, capital, order or trading
+surface was accessed by this counter-review. Real outcome looks remain **0/0**.
+
+This counter-review may be committed locally on the same lane branch, but the
+source facts still block an empirical SI-5 milestone and a routine combined
+push. No checkpoint push is authorized by this review. The separate NYSE and
+Nasdaq email monitor continues to wait for written replies. Those replies may
+be assessed read-only; before any purchase, trial, subscription, licensed-data
+request, vendor-term acceptance or other binding financial/contractual action,
+obtain exact scoped authority and independently verify the offered facts and
+rights. No new delegated approval or decision was exercised in this
+counter-review. Claude's full-lane validation remains Claude-reported, not
+independently rerun by Codex.

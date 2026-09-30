@@ -48,8 +48,9 @@ def _body(request: campaign.CampaignRequest, *, wrong: bool = False) -> bytes:
     ).encode("ascii")
 
 
-def _stopped_source(tmp_path, monkeypatch, *, short_source_cik=False):
-    requests = tuple(_request(index) for index in range(1, 8))
+def _stopped_source(tmp_path, monkeypatch, *, short_source_cik=False,
+                    request_count=7):
+    requests = tuple(_request(index) for index in range(1, request_count + 1))
     if short_source_cik:
         requests = (*requests[:4], replace(requests[4], issuer_cik="1"),
                     *requests[5:])

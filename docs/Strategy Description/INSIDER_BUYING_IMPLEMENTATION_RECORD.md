@@ -15002,3 +15002,80 @@ v3 continuation with durable no-duplicate request state and an independent
 99,394-row completed-root verifier; any launch still needs its source,
 rights and publication/PIT gates established rather than inferred from this
 header-only diagnostic.
+
+## 115. Fail-closed v3 continuation and independent verifier, synthetic-only (2026-09-30 UTC; observed launch blocked)
+
+The owner directed Codex to proceed under the previously delegated build-ahead
+authority. This section covers the exact local code range
+`c339ef6f62dcfbd0e1974a9976bd4a221fd0488b..10f49165c01a46f87ac0d2b57813acd8e074e5f0`;
+there are **no incoming Claude commits** to counter-review in this range.
+`10f4916` is accepted as a bounded **synthetic-only** implementation and test
+snapshot, not as an observed acquisition, source-authenticity result, or
+backtest-ready corpus. This record is the branch-local handoff; shared plans,
+project-wide documents, and `docs/SESSION_HANDOFF.md` remain unchanged.
+Neither this code snapshot nor this handoff has been pushed.
+
+### 115.1 Delegated owner decisions and exact scope
+
+| ID | Decision made for the owner | Boundary and reason |
+|---|---|---|
+| D46 | Implement the versioned v3 continuation journal now with an injected synthetic transport, preserving the 99,394-row source partition and dispatching only the `later_unattempted` class. | The prior 9,539 completed, one offline-corrected diagnostic, and 8,139 remaining selected objects stay external and immutable. A test callback is not inherently network-free, but all tests used invented offline callbacks; no observed SEC entry can dispatch. |
+| D47 | Add an independent, read-only completed-root verifier, including an observed-source loader that requires externally pinned report and committed executor-code hashes. | A self-consistent root is not sufficient: the verifier separately replays old, diagnostic, selected, and v3 bytes and refuses missing/extra members, broken journal or custody, source drift, or a changed 99,394-row union. Its observed entry is unexercised because no v3 observed root exists. |
+| D48 | Keep the observed SEC executor hard-disabled and defer QC upload/job, outcome look, and the historical order-based backtest. Do not substitute a synthetic QC smoke for the owner's requested historical study. | Broad preauthorization permits owner choices but cannot supply missing factual source rights, official acceptance/publication/PIT mapping, QC processing entitlement, or a frozen-look record. The existing stopped source campaign is not complete merely because its diagnostic body was corrected offline. |
+
+The executable synthetic path reserves mode-0700 roots and shard/object
+directories, publishes mode-0600 immutable files, fsyncs a request-start
+event before each injected callback, and maintains a hash-chained event
+journal. A durable valid HTTP-200 finish and body can complete offline after
+an interruption; an unresolved start, missing body, ambiguous transport
+exception, invalid 200, or terminal response cannot authorize redispatch.
+Only explicit, durable empty-body 500/502/503/504 outcomes may retry, at
+most three attempts for that parent. Pacing and resume delay remain bounded
+across shards. The final report requires a second source-union replay and
+exact source-bound plus newly acquired denominator accounting. All authority
+flags remain false and looks/jobs remain zero. The verifier uses its own
+replay logic and read-only cooperative locks; it does not promote a synthetic
+root into an observed SEC corpus.
+
+### 115.2 Findings, independent checks, and retained limitations
+
+| ID | Priority/status | Evidence and disposition |
+|---|---|---|
+| `IB1BCAMP-R10` | P3, **CLOSED in `10f4916`** | A rehashed event with a floating-point `global_index` could alias an integer if replay relied on equality alone. Removing the exact-type guard made the targeted mutation test red; the exact-int guard and focused test are green. Ordinal and attempt counters are exact integers too. |
+| `IB1BCAMP-R11` | P3, **CLOSED in `10f4916`** | A rehashed attempt-finish timestamp preceding its durable start could otherwise survive syntax validation. Disabling the chronological comparison made the targeted test red; replay now requires canonical UTC and finish at or after start, and the test is green. |
+| `IB1BCAMP-R12` | P3, **CLOSED in `10f4916`** | Independent verifier replay initially tolerated a chmod-broadened v3 directory. The private-mode mutation test was red before the verifier guard and green afterward; metadata, object, and directory modes and member sets are checked. |
+| `IB1BCAMP-OBS01` and earlier P3 ledger | P3, **OPEN/retained** | Read-only cooperative locks do not establish protection against a same-user writer that ignores advisory locks. Existing provenance, multi-owner, PIT, economics, and shared/out-of-lane observations remain open or previously resolved exactly as recorded. No new P0-P2 finding was established in this round. |
+
+On designated-lane Python 3.12.14, the five prior focused source/recovery
+test files plus the new executor and verifier files passed **118/118** after
+adding a two-shard, four-new-parent ordering test. Active-document,
+implementation-record, module-hygiene, shared-package, overlay/ML import,
+and project-separation checks passed **104/104**; the two exact Insider
+package/import guards passed **2/2**. The five touched Python files compiled,
+and staged `git diff --check` was clean. These are focused checks, **not** a
+complete lane or repository suite. No real v3 output root was created, no
+additional SEC request or provider access occurred, and no outcome look,
+QC upload/job, historical backtest, broker action, paper/live deployment,
+capital, or order occurred (**0/0/0** looks, QC jobs, backtests).
+
+### 115.3 Exact blocker and next authorized action
+
+The first honest Insider historical order-based backtest is **not run and not
+ready**. The observed executor remains hard-disabled, the original full-parent
+campaign remains stopped and incomplete, and the exact 99,394-row observed
+v3 union has no completed root or independent completed-root replay. The
+9,337 selected cohort must not be relabeled as the full denominator. Required
+external evidence still includes source-use/derived-data rights and complete
+submission provenance, official acceptance/publication/PIT identity,
+validity-dated CIK-to-QC security-master/calendar mapping including delisted
+and share-class treatment, QC organization/data/processing/Object Store
+entitlement, and a frozen candidate/look registration before outcomes. The
+shared security-master/calendar audit still needs its **main-line** venue and
+executor, not an edit on this lane. Once those facts are evidenced, the next
+bounded action is to review and explicitly gate the observed transport,
+complete only the 81,715 never-attempted parents under the frozen plan,
+independently replay every shard and the 99,394-row union, then proceed to
+one registered order-based historical candidate with at most three QC
+launches. Claude reviews only after that first actual backtest, per the
+owner's current direction. Until the factual gates are satisfied, keep this
+branch local and unpushed; do not manufacture a completion or spend a look.

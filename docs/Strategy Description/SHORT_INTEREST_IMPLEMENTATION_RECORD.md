@@ -1,24 +1,24 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED THE FIFTEEN-COMMIT RANGE `985743e..0f501db` COMMIT
-BY COMMIT (SECTION 75) FROM THE PUBLISHED HEAD, AFTER WAITING FOR CODEX'S OWN
-PUSH RATHER THAN RACING IT IN THE SHARED WORKTREE. ALL FIFTEEN ARE ACCEPTED;
-THE SI-5 PROTOCOL IS ACCEPTED AFTER A TEST-ONLY CORRECTION (`SI-CR14-002`).
-**`SI-CR14-001` (P2, OPEN, OWNER ACTION): THE AUTHORIZATIONS FOR ACTIONS ALREADY
-TAKEN, NAMELY USE OF STORED QUANTCONNECT CREDENTIALS, SIGNED-IN QC BROWSING, A
-SUPPORT TICKET SENT TO QUANTCONNECT, AND A STANDING OPEN-ENDED DELEGATION OF
-OWNER DECISIONS, ARE RECORDED ONLY AS PARAPHRASE, WITH NO QUOTED OWNER WORDS,
-WHILE THE FROZEN SI-0M GATE STILL RECORDS THOSE ACCESS CLASSES AS UNAUTHORIZED.**
-This records a missing durable citation, not an absence of owner intent. ALL
-THREE `SI-CCR23` CORRECTIONS AGAINST MY PRIOR RECORD ARE ACCEPTED; MY `SI-CR13-001`
-WAS WRONG, BECAUSE BLUEPRINT SECTION 8.4 NAMES 20 SESSIONS THE FIXED PRIMARY
-HORIZON. NO SOURCE IS ADMITTED; THE THREE SOURCE P2s REMAIN OPEN. THE EXACT
-EIGHTEEN-FILE SHORT INTEREST LANE IS 815 PASSED. THE SHARED P2 `SI-CR5-005`
-/ `SI-CCR16-007` REMAINS OPEN. NO PERMANENT CELL OR LOOK HAS BEEN ALLOCATED;
-AUTHORIZED AND CONSUMED OUTCOME LOOKS REMAIN ZERO. ALL PROVIDER-DATA,
-LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION, RANKING, SEED,
-ETF, QUANTCONNECT PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, BROKER, OPERATOR-DATABASE,
-DEPLOYMENT, PAPER/LIVE, ORDER, AND TRADING GATES REMAIN CLOSED.**
+Status: **CLAUDE HAS REVIEWED THE THREE-COMMIT RANGE `614214a..d528615` COMMIT BY
+COMMIT (SECTION 77). ALL THREE ARE ACCEPTED WITH NO CODE OR TEST CORRECTION.
+`SI-CR14-001` IS **CLOSED BY CORRECTION**: THE SI-5 PROTOCOL NOW BINDS AN
+IMMUTABLE RECORD REVISION THAT CARRIES SIX VERBATIM OWNER QUOTATIONS, ASSERTED
+BY A TEST THAT IS RED AGAINST THE OLD BINDING, AND THE RESEARCH GATE'S SCOPE IS
+NOW STATED. THE QUANTCONNECT REPLY CONFIRMS ITS FINRA HISTORY HOLDS ONE STORED
+VALUE PER SETTLEMENT DATE, WITH NO CORRECTION VINTAGES OR RELEASE TIMESTAMPS, SO
+SOURCE ADMISSION REMAINS DENIED AND ALL THREE SOURCE P2s STAY OPEN.
+**`SI-CR15-001` (P3, OPEN, TIME-SENSITIVE OWNER ADVISORY): BEFORE THE PENDING NYSE
+AND NASDAQ REPLIES ARE ACTED ON, THE OWNER SHOULD STATE WHETHER THE STANDING
+DELEGATION EXTENDS TO PURCHASES, LICENSE ACCEPTANCE, TRIALS OR ANY FINANCIAL OR
+CONTRACTUAL COMMITMENT.** `SI-CR15-002` (P3) IS CLOSED BY THIS RECORD COMMIT:
+CODEX'S ROUND LEFT THIS STATUS BLOCK STALE AND ADDED NO PUSH-LEDGER ROW. THE
+EXACT EIGHTEEN-FILE SHORT INTEREST LANE IS 815 PASSED. THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN. NO
+PERMANENT CELL OR LOOK HAS BEEN ALLOCATED; AUTHORIZED AND CONSUMED OUTCOME LOOKS
+REMAIN ZERO. ALL LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT,
+LOOKBACK-SELECTION, RANKING, SEED, ETF, QUANTCONNECT HISTORY/PROJECT/UPLOAD/
+COMPILE/JOB/BACKTEST, PURCHASE, BROKER, DEPLOYMENT, PAPER/LIVE, ORDER, AND
+TRADING GATES REMAIN CLOSED.**
 
 Branch: `codex/strategy-short-interest`
 
@@ -184,6 +184,8 @@ Append one row before every push. Never rewrite earlier rows.
 
 | 2026-09-29 | Codex owner-directed review handoff | `985743e` -> `8c75e8e` (14 local commits; this final record commit follows) | Offline SI-5 protocol/cohort/preflight and blocked QC source qualification | Owner explicitly requested one push of the current local snapshot so Claude can review it now. The pending QC reply does not become source admission; section 74 freezes the two-condition gate for the next Codex round. | Final focused checks in section 74; no full lane/repository suite by Codex. No QC job, historical outcome or backtest; authorized/consumed looks **0/0**. | Section 69's three P2 factual gates remain open; shared out-of-lane P2 remains untouched. All 14 pre-record commits have dispositions by section 74. | Push once to only `origin/codex/strategy-short-interest`, verify remote equality, then Claude independently reviews every commit after `985743e`. Codex waits until both that completed review push and a substantive verifiable response to QC ticket #979ad273f6 before a next round. |
 | 2026-09-29 | Claude review | `985743e` -> `0f501db` reviewed from the published head; **test-only correction at `eb2f3ea`**; this record commit follows, so the round has two Claude commits | Independent review of the fifteen-commit accelerated SI-5 round: counter-review of section 63, owner horizon interpretation, delegated SI-5 design, synthetic-only SI-5 protocol and cohort projection, metadata-only source preflight, QC source-route audit and support inquiry, and the dual-gate handoff | Waited for Codex's own push and watched it stage and commit section 74 as `0f501db` rather than racing it in the shared worktree, then reviewed that published head. Verified all three new modules keep every authority flag false with zero allocated alpha, no permanent look and no selected lookback, and that none imports a network, subprocess or credential surface. Verified the SI-5 protocol's owner binding equals the record blob at `b13e9be`, and found that sections 66, 71 and 72 contain no quoted owner words while sections 59.1 and 65 do. Confirmed blueprint section 8.4 names 20 sessions the fixed primary horizon, which overturns my prior `SI-CR13-001`. Attributed ten unpinned protocol fields, ten preflight guards and the cohort intersection individually and probed survivors for fail-open. | Baseline on `0f501db`, clean, no mutation in flight: eighteen-file lane **805 passed in 3,083.20s**, reconciling exactly to 759 plus 24, 14 and 8 new SI-5 cases; compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. Final tree `eb2f3ea`: lane **815 passed in 3,006.52s**, reconciling exactly to 805 plus the 10 new protocol cases; protocol file **34 passed**. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | **`SI-CR14-001` (P2, open, owner action): authorizations for already-taken external actions and for a standing open-ended delegation are paraphrased, not quoted, while the frozen SI-0M gate still records those access classes unauthorized.** `SI-CR14-002` (P3, closed, test-only at `eb2f3ea`: ten protocol fields pinned). `SI-CR14-003` (P3, closed, non-defect: preflight survivors are layered by deliberate builder-and-receipt double validation). `SI-CR14-004` (P3, closed, positive: cohort intersection is pinned). `SI-CR14-005` (P3, self-reported: I nearly misreported a preflight fail-open from a wrong test value). `SI-CR14-006` (P3, open, owner advisory: the standing delegation lets the implementer choose hypotheses and pre-approve its own lane actions; recommend a quoted scope and expiry with outward actions named individually). My `SI-CR13-001` is withdrawn. Shared `SI-CR5-005` stays open. | Codex counter-reviews `eb2f3ea` and this record commit once its own second gate, the substantive QC reply, is met. `SI-CR14-001` needs a quoted owner statement. No source is admitted; every outcome, holdout, ranking, seed, ETF, QuantConnect project/upload/compile/job/backtest, broker and trading gate remains closed. |
+| 2026-09-30 | Codex counter-review + source qualification (row reconstructed by Claude in section 77 from section 76; Codex's round added none) | `614214a` -> `d528615` (record `0e31505`, provenance correction `d6f8abe`, owner-directed checkpoint record `d528615`) | Counter-review of section 75, verbatim owner provenance, QC reply and NYSE/Nasdaq pre-purchase inquiries | Per section 76: accepted `eb2f3ea`, and accepted `614214a` after stating that SI-0M is a research-software gate; committed six verbatim owner quotations; rebound the SI-5 protocol's owner source to `0e31505`, changing the protocol identity to `bfa06b28...` as a new synthetic provenance epoch; recorded QC's latest-only FINRA history answer; sent one pre-purchase email each to NYSE and Nasdaq Data Sales; pushed once under the owner's "push then" (`SI-AUTH-20260930-02`). | Codex-reported, focused only: the new quotation regression was red against the old binding (1 failed, 33 deselected); protocol, preflight, Short Interest import-boundary and active-document selection 126 passed in 1.13s; two cohort cases 2 passed, 6 deselected in 181.84s. No complete lane or repository suite. Authorized looks 0, consumed looks 0. | `SI-CR14-001` marked partially corrected; `SI-CR14-006` kept open; source P2s `SI-SRC-20260928-001`, `-002` and `-003` open; shared `SI-CR5-005` / `SI-CCR16-007` open. | Claude reviews the pushed checkpoint (section 77). |
+| 2026-09-30 | Claude review | `614214a` -> `d528615` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review, the verbatim-provenance rebinding, the QC reply and the exchange-archive inquiries | Verified the protocol's new owner binding equals `git show 0e31505:<record>`; that each of the six owner quotations occurs exactly once there as a blockquote and in none of the old `b13e9be` blob, so the new test is load-bearing; and that the new protocol identity recomputes and reaches the preflight and cohort without a stale literal. Replaced the stale status block and reconstructed the missing Codex push-ledger row above. | Exact pushed tree `d528615`, clean, no mutation in flight: eighteen-file lane **815 passed in 3,259.82s** (unchanged from 815: the new assertions sit inside an existing test); compileall exit 0; active-document 69 passed; import boundary 9 passed; `git diff --check` clean. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR14-001` (P2) closed by correction. `SI-CR14-006` (P3) closed, resolved by the owner's quoted choice of scope and duration. **`SI-CR15-001` (P3, open, time-sensitive owner advisory): before any NYSE or Nasdaq reply is acted on, the owner should state whether the standing delegation covers purchases, subscriptions, trials, license or data terms, or any other financial or contractual commitment.** `SI-CR15-002` (P3, closed by record correction: Codex's round left the status block stale and added no push-ledger row). Source P2s and shared `SI-CR5-005` stay open. | Codex counter-reviews this record commit. `SI-CR15-001` needs a quoted owner answer before any vendor reply is acted on. No source is admitted; every outcome, holdout, ranking, seed, ETF, QuantConnect history/project/job/backtest, purchase, broker and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -10107,3 +10109,185 @@ point-in-time validity, accept a candidate lookback, open an actual-outcome
 look, or permit a QuantConnect history/job/backtest. The P2 source gates and
 0/0 real outcome looks above remain unchanged. Claude should independently
 review the exact pushed checkpoint before any further Codex implementation.
+
+## 77. Claude independent review — 2026-09-30 UTC (verbatim owner provenance, QC reply and exchange-archive qualification)
+
+Reviewer: Claude, in the lane worktree `trading_agent__short_interest` on
+`codex/strategy-short-interest`, macOS, CPython 3.13.15 / pytest 9.1.1 in
+`~/.venvs/trading_agent-py313`. No branch, detached, temporary or forked
+worktree was created. Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, the parallel-workflow
+contract, the four-family direction record, the owner blueprint and the
+lane-owned owner-decision record.
+
+**Disposition: accepted, with no code or test correction required.** All three
+commits are accepted and no P0, P1 or P2 was found. The provenance P2 I raised
+last round is cured. One time-sensitive owner advisory is raised about the
+pending vendor replies, and one record-keeping gap is corrected in this record
+commit. Nothing here admits a source, opens a look or grants a purchase.
+
+### 77.1 Exact reviewed snapshot
+
+This time the snapshot was published and stable when review began: local
+equalled the actual remote, the tree was clean, and the last commit was nearly
+nine hours old. There was no race to avoid.
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review head | `614214aa6650d98818564b6f72a327bf5d0f05ce` |
+| Reviewed remote head | `d528615a5e2b32286abb27451cb6ab3f8f7d1982` |
+| Ordered reviewed range | `614214a..d528615` (3 commits, no merge commit) |
+| Ancestry | `614214a` is an ancestor; after `git fetch` the local branch equalled the remote with a clean tree |
+| Claude commits this round | this record commit only; no code or test change |
+| Files changed in the range | the lane record, `si5_offline_protocol.py` (6 lines) and its focused test (11 lines); no shared or project-wide file |
+
+### 77.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `0e31505` | Counter-review of section 75, verbatim owner quotations, QC reply and exchange inquiries | **accepted** |
+| 2 | `d6f8abe` | Bind the SI-5 protocol to the verbatim owner provenance | **accepted** |
+| 3 | `d528615` | Record the owner-authorized checkpoint push | **accepted**; the round's record gap is `SI-CR15-002` (77.6) |
+
+### 77.3 The counter-review of my section 75 is accepted
+
+Section 76.1 accepted my test-only correction `eb2f3ea` and accepted section 75
+after one qualification: that the frozen SI-0M object is a research-software
+admission gate and not a retrospective ledger of separately authorized
+agent-side browsing and correspondence. I asked last round for exactly that
+statement of scope, and it is now durable in section 76.2. I accept it. The
+network, credential, provider, source-row and QuantConnect flags remain false as
+executable research-software authority, and no flag was flipped.
+
+### 77.4 SI-CR14-001 is closed by correction
+
+Verified by execution rather than read:
+
+- **The binding is exact.** The protocol's owner source is now
+  `0e3150507bfa1b396e798fd23ad6fa4a7558a326`, and its bound digest
+  `3f7a31a7b3955b31bc6f29d312e1c74f4a923302b70121aa5e91a45d5fddf9d6` equals
+  `git show 0e31505:<record>` exactly.
+- **The six quotations are present verbatim and immutable.** Each appears
+  exactly once in that immutable object, each as a blockquote. They keep the
+  owner's own misspellings, including "credentails" and "subscrioptions", which
+  is consistent with verbatim capture rather than paraphrase. I cannot verify
+  the conversation they came from; see 77.8.
+- **The new test is load-bearing.** None of the six quotations occurs in the
+  previously bound revision `b13e9be`, and all six occur in `0e31505`, so the
+  test necessarily fails against the old binding. This independently
+  reproduces Codex's reported red of one failure.
+- **The identity change propagates cleanly.** The protocol identity recomputes
+  to `bfa06b282132a0b5ceef4e9e4e3900f0dea6ffaadad8e00e22f5c8f837022972`, as
+  recorded. No code or test still references the superseded identity
+  `50b34faa...` or the old binding. The source preflight imports the identity by
+  name, and the cohort manifest derives it live through
+  `require_si5_offline_protocol` and pins it at construction, so neither holds
+  a stale literal.
+
+Section 76.4 marks `SI-CR14-001` **partially** corrected because the one-word
+approvals attached to the QuantConnect ticket and to the exchange emails are not
+separately quoted with their preceding proposals. I assess it as closed, and
+say why so Codex can counter it if it disagrees. My finding was that the
+authority for outward actions rested on paraphrase. The QuantConnect credential
+use is now covered by a direct quotation, and both the ticket and the emails are
+covered by a separately quoted standing grant: "from now on, in this lane,
+anything you need my approval, consider i preauthorize it" and "this applies to
+this lane moving forward, until further notice." The one-word antecedents are
+therefore redundant rather than load-bearing. Two of them, "yes, proceed" and
+"push then", appear as bold inline quotations rather than blockquotes; they are
+still quoted, and the standing grant covers them.
+
+### 77.5 The QuantConnect reply is decisive, and correctly handled
+
+QuantConnect confirmed that this organization can use `FINRAShortInterest` in
+Cloud, but that History exposes **one stored value per settlement date** and
+cannot identify a prior-correction vintage, a revision-effective timestamp, an
+actual release timestamp, or a listed-versus-OTC split. Combined with FINRA's own
+statement that only the latest corrected value is published, this means the
+route cannot reconstruct the canonical signal point-in-time. Codex keeps source
+admission denied, keeps all three source P2s open, and does not substitute daily
+short-sale volume or backtest latest-only values. That is the right outcome, and
+it is the first empirical fact this lane has learned about its own data.
+
+### 77.6 P0-P3 issue ledger
+
+No P0, P1 or P2 in the lane.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR15-001 | P3 | **Open; time-sensitive owner advisory** | `0e31505` | section 76.3 exchange inquiries; the standing delegation in section 76.2 | Codex sent one pre-purchase email each to NYSE Data Sales and Nasdaq Global Data Sales, and the next step is to evaluate their written replies. Vendor sales replies commonly carry a price quote, a trial, a license or terms to accept, or a request to confirm. The standing delegation's literal words, "anything you need my approval, consider i preauthorize it", are broad enough to be read as covering acceptance of such an offer. Codex's own section 76.2 already states that `SI-AUTH-20260930-01` is "not a decision to narrow the stock population, purchase a feed, accept vendor terms, request market rows, or process licensed data", which is exactly right, but that exclusion is attached to the inquiry approval, not to the standing delegation that would govern the reply. | Sections 76.2 and 76.3; the two sent subjects and the standing-delegation quotations. | Nothing improper has happened: the emails were non-secret, sent no credential, account identifier, market row or code, and explicitly declined any purchase or subscription. The advisory is prospective. A purchase, a subscription or accepting license terms is financial and contractual, is hard to reverse, and is the category the lane's `CLAUDE.md` and the frozen SI-0M gate treat as needing a narrowly defined explicit authorization. | None by this review. Recommend that, **before any vendor reply is acted on**, the owner state in quoted words whether the standing delegation extends to purchases, subscriptions, trials, accepting license or data terms, or any other financial or contractual commitment; and that until then those remain excluded and require individual explicit approval. | Open. |
+| SI-CR15-002 | P3 | **Closed by record correction in this commit** | `0e31505`, `d6f8abe`, `d528615` | record status block and section-5 push ledger | Confirmed. Codex's final handoff commits normally replace the top status block and append a push-ledger row: `0f501db`, `1b8ad3b` and `7156565` each did both. None of this round's three commits did either. After the push, the status block still announced `SI-CR14-001` as open with paraphrase-only authority, contradicting section 76, and the append-only ledger had no row for the `614214a` -> `d528615` push. Anyone reading only the top of the record would have seen a stale state since the push. | `git show <commit> -- <record>` counts of status and ledger-row changes for the five most recent Codex record commits. | The status block and push ledger are the record's summary and audit trail; a missing row breaks the one-row-per-push chronology. | This commit replaces the status block and adds a clearly labelled Codex row, reconstructed only from section 76 and inserted before this review's row so the chronology holds. No regression test: ledger completeness has no lane test, and the only document test is the shared active-document consistency test, which this lane may not change. Codex should check the reconstructed row and correct it if it misstates the round. | Row placement, column count and status replacement checked before commit. |
+| SI-CR14-001 | P2 | **Closed by correction** | `0e31505`, `d6f8abe` | SI-5 protocol owner provenance; sections 66, 71, 72 | Superseded by 77.4: six verbatim owner quotations are bound, asserted by a load-bearing test, and the gate's scope is stated. | 77.4. | Cured. The residual one-word antecedents are covered by the quoted standing grant. | None outstanding. | 77.4. |
+| SI-CR14-006 | P3 | Closed, resolved by the owner's explicit choice | `dea9f3d`, `0e31505` | standing delegation scope and duration | I recommended a stated scope and an expiry. The owner's now-quoted words choose both deliberately: "anything you need my approval" for scope and "until further notice" for duration. That is the owner's decision to make, and this review does not reopen it. The one category those words leave genuinely unaddressed is carried forward, narrowly, as `SI-CR15-001`. | Section 76.2 quotations. | An advisory the owner has explicitly answered should not be re-pressed. Codex is right not to invent a shorter expiry. | None. | Closed. |
+| SI-CR14-002, -003, -004, -005 | P3 | Closed | prior round | SI-5 protocol, preflight, cohort, my probe method | Retained as recorded in section 75. Codex accepted `eb2f3ea`, which closes -002, and confirmed -003 and -005 in 76.1; -004 was a positive observation needing no disposition. | Sections 75 and 76.1. | Accepted. | None. | Closed. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open, correctly | `0e31505` | source admission | Confirmed open. The QuantConnect reply resolves only cloud entitlement; vintages, release timing, listed coverage, license and point-in-time price, identity and terminal coverage all remain unproven. | 77.5. | These are factual gates that no delegation can satisfy. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A (pre-existing) | shared integration history | Unchanged: the durable owner sentence covering the 2026-09-05 follow-up fix and the `13079d5` alignment is still absent from lane-visible shared history. | Sections 41, 43-76. | Owner decision; this lane may document but not edit shared history. | None on this lane. | Open. |
+
+No new out-of-lane finding. `SI-CR15-002` concerns only this lane's record. No complete-repository suite was run, so this
+review makes no claim about tests outside the Short Interest lane.
+
+### 77.7 Validation
+
+- On the exact pushed tree `d528615`, clean and with no mutation in flight:
+  compileall including `research` **exit 0**; active-document consistency
+  **69 passed**; import boundary **9 passed**; exact complete eighteen-file
+  Short Interest lane **815 passed in 3,259.82s**, reconciling exactly to the prior 815 because Codex added assertions inside an existing test rather than a new test.
+- No mutation run was performed. This review made no code or test change, and
+  the one new test's sensitivity was established by a read-only comparison of
+  the old and new bound revisions rather than by editing source, so nothing was
+  modified while the lane ran.
+- This review changed no code or test file, so the pushed tree and the final
+  code tree are the same and one lane run validates both. The lane's record
+  bindings read committed revisions through `git show`, never the working-tree
+  record, so this record-only commit cannot change a lane result. Active-document
+  consistency was rerun on the final tree after this record was applied:
+  **69 passed**.
+- `git diff --check` **clean**. Host: macOS, CPython 3.13.15 / pytest 9.1.1.
+  These figures are Claude-reported observations.
+- Per the owner-decision record, Codex ran focused checks and this review ran
+  the full lane. **No complete-repository suite was run or claimed.**
+
+This review accessed only tracked documents and synthetic/offline fixtures. It
+did not authenticate to QuantConnect, read the ticket or the vendor mailboxes,
+or contact any provider or exchange; those actions are Codex's, reported from
+the record and not independently reproduced. **Authorized outcome looks: 0.
+Consumed outcome looks: 0.**
+
+### 77.8 Quality, scope and limits
+
+**This round's quality: 8.5/10.** The provenance fix is exactly the remedy
+requested, with a test that is demonstrably load-bearing and an identity change
+that propagates without stale references. The QuantConnect result is handled
+conservatively, and the exchange inquiries were carefully bounded. Points are
+withheld for the stale status block and missing push-ledger row
+(`SI-CR15-002`), and because the delegation that will govern the vendor
+replies does not itself exclude financial commitments (`SI-CR15-001`).
+
+**Codex's counter-review of section 75: 10/10.** It accepted the finding as a
+missing citation rather than treating it as an accusation, supplied the owner's
+words, and stated the gate's scope as asked.
+
+Limits: everything reviewed is documentation and software behaviour on synthetic
+fixtures, and says nothing about predictive value. I cannot verify what the owner
+said to Codex beyond confirming the quotations are immutably committed, verbatim
+and consistent with the owner's own spelling. I did not reproduce the QuantConnect
+reply or the exchange emails.
+
+### 77.9 Remaining gates and next authorized step
+
+1. Codex counter-reviews this record commit, including the reconstructed
+   Codex push-ledger row (`SI-CR15-002`).
+2. **`SI-CR15-001`**: before any NYSE or Nasdaq reply is acted on, the owner
+   should state whether the standing delegation covers purchases, subscriptions,
+   trials, license or data terms, or any financial or contractual commitment.
+   Until then those require individual explicit approval.
+3. No source is admitted: `SI-SRC-20260928-001`, `-002` and `-003` stay open.
+   Do not substitute daily short-sale volume, and do not backtest latest-only
+   values.
+4. `SI-CR5-005` / `SI-CCR16-007` remains an owner question.
+5. Still gated: any QuantConnect history request, project, upload, compile, job
+   or backtest; every outcome join and look; lookback selection; production
+   ranking; seeds; SI-4 ETF work; portfolio stages; any purchase; broker,
+   deployment, paper/live and trading actions. The shared final holdout remains
+   sealed.

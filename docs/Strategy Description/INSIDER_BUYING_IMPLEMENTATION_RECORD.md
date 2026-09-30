@@ -15216,3 +15216,61 @@ and verifier compiled, and `git diff --check` was clean. An independent
 read-only countercheck confirmed the unmatched start and the reviewed
 `resume=True` refusal. No complete lane/repository suite, SEC retry,
 completed-root replay, QC attempt, or outcome check was run after the stop.
+
+## 118. Owner-authorized v3 ambiguous-parent diagnostic gate (2026-09-30 UTC; pre-dispatch)
+
+The owner explicitly authorized **one** narrowly scoped diagnostic request for
+the single parent whose original v3 `attempt-start` has no durable finish,
+with the understood risk that the SEC may already have received that request.
+This changes neither the frozen 99,394 Form 4/4-A denominator nor the
+stopped root. The original `resume=True` path still refuses the unresolved
+start; it is not used. The diagnostic is a separately versioned, private
+outside-Git sibling root, not a resumed campaign or a second source window.
+The owner subsequently directed **one push after this bounded round**, then a
+quiet monitor for Claude's independent push; Codex must counter-review that
+review before any next acquisition milestone or backtest.
+
+| ID | Decision made for the owner | Reason and limit |
+|---|---|---|
+| D53 | Accept the potential duplicate of exactly the one v3 ambiguous SEC request and reserve one new diagnostic root. | The owner expressly approved this risk after the TLS reset; no other v3 request is authorized for duplicate dispatch. A durable new manifest and start consume the one-shot allowance even if the new transport fails. |
+| D54 | Require independent partial-v3 replay and an external report digest before treating a successful diagnostic as one source-bound body. | A valid HTTP response cannot erase the original ambiguous start or prove SEC authenticity, publication/PIT timing, canonical signal, or data-processing rights. No accepted diagnostic alone completes the 99,394-row corpus. |
+| D55 | Stop this implementation round for Claude after the diagnostic outcome is recorded and one successful lane push, if the bounded round completes; counter-review Claude before further milestone or backtest work. | This follows the owner's latest serialized-review instruction. No QC job, outcome look, or historical backtest is launched in this round. |
+
+An independent, read-only replay of the stopped observed v3 root verified
+**1,846** immutable completed bodies, **1,847** attempts and exactly one
+trailing unmatched start. It reproduced root-plan SHA-256
+`f8f1d26f93f9f7e5a5fa90c0867231519b0c6c791cdc0cdc50cc165072889f41`,
+active-journal SHA-256
+`3decc20fec36eb7bcebdf57893cc1194e0df5414f1a3143f4d0de18a5ffda6ae`,
+and pending-start SHA-256
+`789f9595c35cf44a5974bbf62a20011480f6cb50387fa7dc142316a9a95ebb4b`.
+The new observed loader pins those independently recorded hashes, the old
+committed executor bytes, exact roots, source assignment, request inventory,
+and counts. It does no network access. The one-shot capture requires a clean
+committed lane both before reservation and immediately before dispatch,
+fsyncs its own new root, manifest, and start before at most one request,
+bounds and retains a response privately, and publishes a terminal report or
+leaves a consumed unresolved start. It never changes the v3 root. A separate
+read-only observed acceptance wrapper requires the fixed sibling path,
+externally supplied report SHA and capture commit, matching committed code
+bytes, request-bound parent identity and framing, false authority flags, and
+fresh partial-v3 replay before and after. Its generic synthetic seam is not
+itself an observed-custody authorization.
+
+| Finding | Priority/status | Independent proof and correction |
+|---|---|---|
+| `IB1BCAMP-V3AMB01` | P2, **CLOSED in this gate** | A count/shape-valid, rehashed active journal could have produced a different observed pending-start receipt. Pin the root-plan, journal and start hashes above. A timestamp/chain rehash still passed generic replay but failed the observed-anchor test; disabling the journal/start comparisons made that test red, restoring them green. |
+| `IB1BCAMP-V3AMB02` | P2, **CLOSED in this gate** | The private synthetic seam initially admitted the production SEC transport. A focused guard test was red before the synthetic seam rejected that direct transport and green afterward. Observed mode additionally requires the exact production transport and fixed paths. |
+| `IB1BCAMP-V3AMB03` | P2, **CLOSED in this gate** | An observed lane could change after its durable start but before network dispatch. A focused test was red before the immediate pre-dispatch clean-commit check and green afterward; drift consumes the one-shot root without sending the request. |
+| `IB1BCAMP-V3AMB04` | P3, **CLOSED in this gate** | The module introduction overstated that the injected synthetic callback was network-free. The docstring now explicitly distinguishes the observed production entry from the synthetic seam. |
+
+Before the real request, the six new module/test files passed **89/89** focused
+partial-replay, capture, diagnostic-verifier, and existing recovery checks on
+Python 3.12.14. Active-document, lane-record, module-hygiene, overlay/ML
+import-boundary, project-separation, and exact Insider package-guard checks
+passed **119/119**. No complete lane or repository suite was run by Codex.
+The diagnostic root was absent at this pre-dispatch check. **No new SEC
+request, report, QC job, outcome look, or backtest had occurred yet.** The
+capture result and its external hash, any refusal, final validation and
+exact push range must be recorded after the one-shot attempt; this section
+does not predeclare success or source completion.

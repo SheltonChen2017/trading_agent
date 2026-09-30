@@ -1,11 +1,10 @@
 """Fail-closed v3 continuation executor for a source-bound parent campaign.
 
-The public executable path is synthetic and receives an injected transport.
-Callers of that test seam must supply an offline fake; an arbitrary callback
-cannot be proven network-free merely by checking its function identity.
-The observed SEC entry is deliberately disabled until source rights and
-publication/PIT gates are evidenced.  An interrupted request-start is never
-interpreted as permission to send its URL again.
+The synthetic path receives an injected transport; callers of that test seam
+must supply an offline fake. The separately pinned observed entry archives
+only public SEC source bytes, never grants publication/PIT or QC authority,
+and requires the exact clean committed lane before any request. An interrupted
+request-start is never interpreted as permission to send its URL again.
 """
 from __future__ import annotations
 
@@ -16,6 +15,7 @@ import http.client
 import os
 import re
 import stat
+import subprocess
 import time
 
 from data.hashing import hash_bytes, hash_payload
@@ -42,6 +42,52 @@ _COMMIT = re.compile(r"[0-9a-f]{40}\Z")
 _CONTACT = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}\Z")
 _RETRY = frozenset({500, 502, 503, 504})
 _PLAN_MAX = 256 * 1024
+_OBSERVED_LANE_ROOT = Path(
+    "/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying"
+)
+_OBSERVED_PRIOR_ROOT = Path(
+    "/Users/sheltonchen/Documents/Codex/2026-09-03/f/"
+    "insider-source-allparents-20260929.3Nut2i/all-form4-parents"
+)
+_OBSERVED_DIAGNOSTIC_ROOT = _OBSERVED_PRIOR_ROOT.parent / "refused-parent-diagnostic-v1"
+_OBSERVED_SELECTED_ROOT = Path(
+    "/Users/sheltonchen/Documents/Codex/2026-09-03/f/"
+    "insider-source-20260929.hP4utF/selected-parents-v2"
+)
+_OBSERVED_OUTPUT_ROOT = _OBSERVED_PRIOR_ROOT.parent / "all-form4-parents-recovery-v3"
+_OBSERVED_ASSIGNMENT_SHA256 = "9c497cabeff43a40f01b8da916264cc140088a356dc18233c660e91d7a6552d2"
+_OBSERVED_LATER_INVENTORY_SHA256 = "2318bafbe7eec167b545b747ce5a7923fcb5dbef34bd38aca27c95bd3d7f52b8"
+_COMMITTED_DEPENDENCIES = (
+    "research/insider_buying_sec_all_form4_parent_recovery_executor.py",
+    "research/insider_buying_sec_all_form4_parent_recovery_verifier.py",
+    "research/insider_buying_sec_all_form4_parent_recovery_campaign.py",
+    "research/insider_buying_sec_all_form4_parent_recovery_union.py",
+    "research/insider_buying_sec_all_form4_parent_recovery_preflight.py",
+    "research/insider_buying_sec_parent_refusal_diagnostic.py",
+    "research/insider_buying_sec_all_form4_parent_campaign.py",
+    "research/insider_buying_sec_selected_parent_runner.py",
+    "research/insider_buying_sec_selected_parent_projection_adapter.py",
+    "research/insider_buying_sec_complete_acquisition.py",
+    "research/insider_buying_sec_complete_projection_adapter.py",
+    "research/insider_buying_sec_master82_runner.py",
+    "research/insider_buying_sec_master82_acquisition.py",
+    "research/insider_buying_sec_acquisition.py",
+    "research/insider_buying/ib1b_all_form4_parent_locators.py",
+    "research/insider_buying/ib1b_observed_candidate_inventory.py",
+    "research/insider_buying/ib1b_observed_master_locators.py",
+    "research/insider_buying/sec_bulk_parsed_snapshot.py",
+    "research/insider_buying/sec_bulk_snapshot.py",
+    "research/insider_buying/sec_acquisition_preparation.py",
+    "research/insider_buying/sec_edgar_acceptance_snapshot.py",
+    "research/insider_buying/sec_ib1b_pilot_profile.py",
+    "research/insider_buying/sec_noncanonical_pilot_contracts.py",
+    "research/insider_buying/sec_master_locator_reconciliation.py",
+    "research/insider_buying/sec_zip_corpus_census.py",
+    "research/insider_buying/sec_quarter_master_index.py",
+    "research/insider_buying/sec_complete_submission.py",
+    "research/insider_buying/sec_raw_parent_projection.py",
+    "data/hashing.py",
+)
 
 
 class RecoveryExecutorError(ValueError):
@@ -54,6 +100,47 @@ def _refuse(reason: str) -> None:
 
 def _bytes(value: object) -> bytes:
     return campaign._bytes(value)
+
+
+def _git_output(*args: str) -> bytes:
+    return subprocess.check_output(
+        ("git", *args), cwd=_OBSERVED_LANE_ROOT, stderr=subprocess.DEVNULL,
+    )
+
+
+def _verify_lane_state(commit: str) -> None:
+    """Cheap per-request guard; never consume an attempt after lane drift."""
+    if type(commit) is not str or _COMMIT.fullmatch(commit) is None:
+        _refuse("observed capture commit is malformed")
+    root = Path(__file__).resolve().parents[1]
+    try:
+        if (root != _OBSERVED_LANE_ROOT
+                or _git_output("rev-parse", "--show-toplevel").decode().strip()
+                != str(root)
+                or _git_output("branch", "--show-current").decode().strip()
+                != "codex/strategy-insider-buying"
+                or _git_output("rev-parse", "HEAD").decode().strip() != commit
+                or _git_output("status", "--porcelain=v1", "--untracked-files=all")):
+            _refuse("exact clean committed Insider lane is required")
+    except (OSError, UnicodeError, subprocess.CalledProcessError) as exc:
+        raise RecoveryExecutorError(
+            "REFUSED: exact clean committed v3 lane state could not be verified"
+        ) from exc
+
+
+def _verify_exact_committed_code(commit: str) -> None:
+    """Bind the observed SEC path to one clean, committed lane dependency set."""
+    _verify_lane_state(commit)
+    root = Path(__file__).resolve().parents[1]
+    try:
+        for relative in _COMMITTED_DEPENDENCIES:
+            committed = _git_output("show", f"{commit}:{relative}")
+            if hash_bytes(committed) != hash_bytes((root / relative).read_bytes()):
+                _refuse("committed v3 dependency differs on disk")
+    except (OSError, UnicodeError, subprocess.CalledProcessError) as exc:
+        raise RecoveryExecutorError(
+            "REFUSED: exact clean committed v3 code could not be verified"
+        ) from exc
 
 
 def _recover(path: Path, *, cap: int, label: str, expected: bytes | None = None) -> bytes:
@@ -76,6 +163,7 @@ def _source_and_plan(
     *, prior_expectation: partial.PartialCampaignExpectation,
     diagnostic_capture_git_commit: str, expected_diagnostic_report_sha256: str,
     diagnostic_mode: str, capture_git_commit: str, resume: bool,
+    observed: bool,
 ) -> tuple[Path, dict[str, object], bytes, tuple[tuple[dict[str, object], bytes], ...]]:
     """Revalidate all external sources and construct exact immutable inventories."""
     if (type(plan) is not campaign.CampaignPlan or type(resume) is not bool
@@ -99,9 +187,10 @@ def _source_and_plan(
         _refuse_output_overlap(output, protected)
     if not resume and (output.exists() or output.is_symlink()):
         _refuse("new v3 output root already exists")
-    if plan.scope == "ib1b_observed_full_form4_noncanonical":
-        _refuse("observed SEC continuation is gated off pending rights and PIT evidence")
-    if plan.scope != "synthetic_test_manifest":
+    if observed:
+        if plan.scope != "ib1b_observed_full_form4_noncanonical":
+            _refuse("v3 observed executor requires the pinned real-source plan")
+    elif plan.scope != "synthetic_test_manifest":
         _refuse("v3 synthetic executor requires a synthetic-only source plan")
     if (receipt["total_parents"] != len(plan.requests)
             or receipt["later_unattempted_request_count"] != len(dispatch)):
@@ -403,6 +492,7 @@ def _run_shard(root: Path, root_identity: tuple[int, int],
                transport: Callable[[str, dict[str, str], int], SecHttpResult],
                *, contact_email: str, resume: bool, used_bytes: int,
                last_completion_ns: int | None,
+               before_attempt: Callable[[], None] | None = None,
                ) -> tuple[dict[str, object], str, int, int | None]:
     shard = root / inventory["name"]
     exists = shard.exists() or shard.is_symlink()
@@ -516,6 +606,8 @@ def _run_shard(root: Path, root_identity: tuple[int, int],
             remaining = earliest - time.monotonic_ns()
             if remaining > 0:
                 time.sleep(remaining / 1_000_000_000)
+            if before_attempt is not None:
+                before_attempt()
             ordinal = sum(attempts.values()) + 1
             events.append({"kind": "attempt-start", "global_index": index,
                            "accession_number": request["accession_number"],
@@ -627,19 +719,25 @@ def _run(
     diagnostic_capture_git_commit: str, expected_diagnostic_report_sha256: str,
     diagnostic_mode: str, capture_git_commit: str,
     transport: Callable[[str, dict[str, str], int], SecHttpResult],
-    contact_email: str, resume: bool,
+    contact_email: str, resume: bool, observed: bool,
 ) -> Path:
     if (type(contact_email) is not str or _CONTACT.fullmatch(contact_email) is None
             or not contact_email.isascii() or len(contact_email) > 254
-            or not callable(transport) or transport is campaign._selected_sec_transport):
-        _refuse("synthetic contact or injected transport is invalid")
+            or not callable(transport) or type(observed) is not bool):
+        _refuse("v3 contact or transport interface is invalid")
+    if observed:
+        if transport is not campaign._selected_sec_transport:
+            _refuse("observed v3 transport differs from the reviewed SEC client")
+        _verify_exact_committed_code(capture_git_commit)
+    elif transport is campaign._selected_sec_transport:
+        _refuse("synthetic v3 transport cannot use the SEC client")
     output, plan_body, plan_raw, inventories = _source_and_plan(
         plan, prior_campaign_root, diagnostic_root, selected_root, output_root,
         prior_expectation=prior_expectation,
         diagnostic_capture_git_commit=diagnostic_capture_git_commit,
         expected_diagnostic_report_sha256=expected_diagnostic_report_sha256,
         diagnostic_mode=diagnostic_mode, capture_git_commit=capture_git_commit,
-        resume=resume,
+        resume=resume, observed=observed,
     )
     if resume:
         info = output.lstat()
@@ -682,10 +780,14 @@ def _run(
         last_completion_ns: int | None = None
         shard_summaries: list[dict[str, object]] = []
         for inventory, raw in inventories:
+            if observed:
+                _verify_exact_committed_code(capture_git_commit)
             report, digest, used_bytes, last_completion_ns = _run_shard(
                 output, identity, inventory, raw, transport,
                 contact_email=contact_email, resume=resume,
                 used_bytes=used_bytes, last_completion_ns=last_completion_ns,
+                before_attempt=(lambda: _verify_lane_state(capture_git_commit))
+                if observed else None,
             )
             shard_summaries.append({
                 "name": inventory["name"], "start": inventory["start"],
@@ -701,6 +803,8 @@ def _run(
         # for the entire multi-hour campaign. Replaying their exact bytes at
         # the final publication point prevents a mid-run source edit from
         # producing a seemingly complete v3 root.
+        if observed:
+            _verify_exact_committed_code(capture_git_commit)
         _, _, final_plan_raw, final_inventories = _source_and_plan(
             plan, prior_campaign_root, diagnostic_root, selected_root, output,
             prior_expectation=prior_expectation,
@@ -708,11 +812,14 @@ def _run(
             expected_diagnostic_report_sha256=expected_diagnostic_report_sha256,
             diagnostic_mode=diagnostic_mode,
             capture_git_commit=capture_git_commit, resume=True,
+            observed=observed,
         )
         if (final_plan_raw != plan_raw
                 or [raw for _, raw in final_inventories]
                 != [raw for _, raw in inventories]):
             _refuse("v3 source union changed before final report")
+        if observed:
+            _verify_exact_committed_code(capture_git_commit)
         report = {
             "kind": EXECUTOR_VERSION + "/campaign-report",
             "plan_sha256": hash_bytes(plan_raw),
@@ -775,6 +882,7 @@ def run_synthetic_recovery_continuation(
             expected_diagnostic_report_sha256=expected_diagnostic_report_sha256,
             diagnostic_mode=diagnostic_mode, capture_git_commit=capture_git_commit,
             transport=transport, contact_email=contact_email, resume=resume,
+            observed=False,
         )
     except RecoveryExecutorError:
         raise
@@ -785,9 +893,103 @@ def run_synthetic_recovery_continuation(
         raise RecoveryExecutorError("REFUSED: v3 source or journal verification failed") from exc
 
 
-def run_observed_recovery_continuation(*_args: object, **_kwargs: object) -> None:
-    """Real SEC continuation remains closed; no caller can turn on transport."""
-    _refuse("observed SEC continuation is gated off pending rights and PIT evidence")
+def _pinned_observed_path(value: str | Path, expected: Path, *, must_exist: bool) -> Path:
+    if not (type(value) is str or isinstance(value, Path)) or Path(value) != expected:
+        _refuse("observed v3 root differs from its pinned absolute path")
+    candidate = _plain_path(value, must_exist=must_exist)
+    if candidate != expected:
+        _refuse("observed v3 root resolves away from its pinned path")
+    return candidate
+
+
+def run_observed_recovery_continuation(
+    raw_q4_directory: str | Path, parsed_q4_directory: str | Path,
+    raw_q1_directory: str | Path, parsed_q1_directory: str | Path,
+    exact16_pilot_root: str | Path, selected_root: str | Path,
+    prior_campaign_root: str | Path, diagnostic_root: str | Path,
+    output_root: str | Path, *, contact_email: str,
+    capture_git_commit: str, resume: bool = False,
+) -> Path:
+    """Archive only the frozen never-attempted SEC parents; never run QC.
+
+    Source custody does not establish SEC authenticity, publication/PIT
+    identity, a canonical signal, research-look authority, or QC processing
+    rights. The prior, diagnostic, selected, and output roots are path-pinned;
+    IB-1B and pilot inputs are content-pinned. Transport is not injectable.
+    """
+    try:
+        _verify_exact_committed_code(capture_git_commit)
+        if type(resume) is not bool:
+            _refuse("observed v3 resume flag is malformed")
+        prior = _pinned_observed_path(prior_campaign_root, _OBSERVED_PRIOR_ROOT,
+                                      must_exist=True)
+        diagnostic = _pinned_observed_path(
+            diagnostic_root, _OBSERVED_DIAGNOSTIC_ROOT, must_exist=True,
+        )
+        selected = _pinned_observed_path(
+            selected_root, _OBSERVED_SELECTED_ROOT, must_exist=True,
+        )
+        output = _pinned_observed_path(
+            output_root, _OBSERVED_OUTPUT_ROOT, must_exist=resume,
+        )
+        if (not resume and (output.exists() or output.is_symlink())):
+            _refuse("new observed v3 root already exists")
+        if (prior != union.diagnostic._PRIOR_CAMPAIGN_ROOT
+                or diagnostic != prior.parent / union._DIAGNOSTIC_NAME
+                or output != prior.parent / recovery._OUTPUT_NAME):
+            _refuse("observed v3 source or destination differs from pinned lineage")
+        receipt = union.preflight_observed_all_form4_parent_recovery_union(
+            raw_q4_directory, parsed_q4_directory, raw_q1_directory,
+            parsed_q1_directory, exact16_pilot_root, selected,
+            prior, diagnostic,
+            diagnostic_capture_git_commit=union.OBSERVED_DIAGNOSTIC_CAPTURE_COMMIT,
+            expected_diagnostic_report_sha256=union.OBSERVED_DIAGNOSTIC_REPORT_SHA256,
+        )
+        plan = campaign._build_real_plan(
+            raw_q4_directory, parsed_q4_directory, raw_q1_directory,
+            parsed_q1_directory, exact16_pilot_root, selected,
+        )
+        classes, dispatch = recovery._source_layout(plan, receipt)
+        if (plan.scope != "ib1b_observed_full_form4_noncanonical"
+                or plan.manifest_sha256 != campaign.REAL_MANIFEST_SHA256
+                or plan.shard_size != campaign.SHARD_SIZE
+                or plan.to_payload()["request_inventory_sha256"]
+                != partial.PRIOR_REQUEST_INVENTORY_SHA256
+                or len(plan.requests) != 99_394 or len(classes) != 99_394
+                or receipt["prior_completed_count"] != 9_539
+                or receipt["offline_corrected_diagnostic_count"] != 1
+                or receipt["accepted_diagnostic_count"] != 0
+                or receipt["remaining_selected_reuse_count"] != 8_139
+                or len(dispatch) != 81_715
+                or receipt["source_assignment_sha256"]
+                != _OBSERVED_ASSIGNMENT_SHA256
+                or receipt["later_unattempted_request_inventory_sha256"]
+                != _OBSERVED_LATER_INVENTORY_SHA256):
+            _refuse("observed v3 source population differs from frozen partition")
+        expectation = partial.PartialCampaignExpectation(
+            capture_git_commit=partial.PRIOR_CAPTURE_GIT_COMMIT,
+            shard_report_sha256s=partial.PRIOR_SHARD_REPORT_SHA256S,
+            completed_counts=(8_192, 1_347), reused_counts=(972, 226),
+            total_attempt_count=8_342,
+        )
+        return _run(
+            plan, prior, diagnostic, selected, output,
+            prior_expectation=expectation,
+            diagnostic_capture_git_commit=union.OBSERVED_DIAGNOSTIC_CAPTURE_COMMIT,
+            expected_diagnostic_report_sha256=union.OBSERVED_DIAGNOSTIC_REPORT_SHA256,
+            diagnostic_mode="offline_corrected",
+            capture_git_commit=capture_git_commit,
+            transport=campaign._selected_sec_transport,
+            contact_email=contact_email, resume=resume, observed=True,
+        )
+    except RecoveryExecutorError:
+        raise
+    except (campaign.CampaignError, union.RecoveryUnionError,
+            recovery.RecoveryCampaignPlanError, SecPilotError, OSError,
+            KeyError, TypeError, ValueError, RecursionError) as exc:
+        raise RecoveryExecutorError(
+            "REFUSED: observed v3 source or committed code verification failed"
+        ) from exc
 
 
 __all__ = ["RecoveryExecutorError", "run_synthetic_recovery_continuation",

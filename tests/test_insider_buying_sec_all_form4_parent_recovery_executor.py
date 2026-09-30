@@ -3,6 +3,8 @@ from __future__ import annotations
 
 import json
 import stat
+from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -337,7 +339,206 @@ def test_terminal_finish_without_report_is_finalized_offline_without_retry(
     assert seen == [request.url]
 
 
-def test_observed_entry_is_hard_disabled_without_creating_output(tmp_path):
-    with pytest.raises(executor.RecoveryExecutorError, match="gated off"):
-        executor.run_observed_recovery_continuation(output_root=tmp_path / "real")
-    assert not (tmp_path / "real").exists()
+def _observed_args(*, selected=None, prior=None, diagnostic=None, output=None):
+    return dict(
+        raw_q4_directory="/invented/raw-q4", parsed_q4_directory="/invented/parsed-q4",
+        raw_q1_directory="/invented/raw-q1", parsed_q1_directory="/invented/parsed-q1",
+        exact16_pilot_root="/invented/pilot",
+        selected_root=selected or executor._OBSERVED_SELECTED_ROOT,
+        prior_campaign_root=prior or executor._OBSERVED_PRIOR_ROOT,
+        diagnostic_root=diagnostic or executor._OBSERVED_DIAGNOSTIC_ROOT,
+        output_root=output or executor._OBSERVED_OUTPUT_ROOT,
+        contact_email="invented@example.test", capture_git_commit="f" * 40,
+    )
+
+
+def test_observed_entry_refuses_copied_roots_and_destination_before_any_source_replay(
+    tmp_path, monkeypatch,
+):
+    monkeypatch.setattr(executor, "_verify_exact_committed_code", lambda _: None)
+    monkeypatch.setattr(executor.union, "preflight_observed_all_form4_parent_recovery_union",
+                        lambda *_, **__: pytest.fail("source replay reached"))
+    cases = (
+        {"selected": tmp_path / "selected-copy"},
+        {"prior": tmp_path / "prior-copy"},
+        {"diagnostic": tmp_path / "diagnostic-copy"},
+        {"output": tmp_path / "different-output"},
+    )
+    for overrides in cases:
+        with pytest.raises(executor.RecoveryExecutorError, match="pinned|root"):
+            executor.run_observed_recovery_continuation(**_observed_args(**overrides))
+    assert not (tmp_path / "different-output").exists()
+
+
+def test_observed_entry_refuses_dirty_or_changed_head_before_transport(monkeypatch):
+    real_root = Path(executor.__file__).resolve().parents[1]
+    commit = "f" * 40
+
+    def git_dirty(*args):
+        if args == ("rev-parse", "--show-toplevel"):
+            return (str(real_root) + "\n").encode()
+        if args == ("branch", "--show-current"):
+            return b"codex/strategy-insider-buying\n"
+        if args == ("rev-parse", "HEAD"):
+            return (commit + "\n").encode()
+        if args == ("status", "--porcelain=v1", "--untracked-files=all"):
+            return b" M research/insider_buying_sec_all_form4_parent_recovery_executor.py\n"
+        pytest.fail(f"unexpected Git command: {args}")
+
+    monkeypatch.setattr(executor, "_git_output", git_dirty)
+    with pytest.raises(executor.RecoveryExecutorError, match="clean committed"):
+        executor._verify_exact_committed_code(commit)
+
+    def git_wrong_head(*args):
+        if args == ("rev-parse", "HEAD"):
+            return ("e" * 40 + "\n").encode()
+        return git_dirty(*args)
+
+    monkeypatch.setattr(executor, "_git_output", git_wrong_head)
+    with pytest.raises(executor.RecoveryExecutorError, match="clean committed"):
+        executor._verify_exact_committed_code(commit)
+
+
+def test_observed_entry_refuses_changed_committed_dependency(monkeypatch):
+    root = Path(executor.__file__).resolve().parents[1]
+    commit = "f" * 40
+    def git_output(*args):
+        if args == ("rev-parse", "--show-toplevel"):
+            return (str(root) + "\n").encode()
+        if args == ("branch", "--show-current"):
+            return b"codex/strategy-insider-buying\n"
+        if args == ("rev-parse", "HEAD"):
+            return (commit + "\n").encode()
+        if args == ("status", "--porcelain=v1", "--untracked-files=all"):
+            return b""
+        if args == ("show", f"{commit}:{executor._COMMITTED_DEPENDENCIES[0]}"):
+            return b"changed executor dependency"
+        pytest.fail(f"unexpected Git command: {args}")
+    monkeypatch.setattr(executor, "_git_output", git_output)
+    with pytest.raises(executor.RecoveryExecutorError, match="dependency differs"):
+        executor._verify_exact_committed_code(commit)
+
+
+def test_observed_runner_refuses_any_injected_nonreviewed_transport_before_output(
+    source, tmp_path, monkeypatch,
+):
+    plan, prior, diagnostic, selected, expectation, report_sha, _ = source
+    monkeypatch.setattr(executor, "_verify_exact_committed_code", lambda _: None)
+    output = tmp_path / "wrong-transport"
+    with pytest.raises(executor.RecoveryExecutorError, match="transport differs"):
+        executor._run(
+            plan, prior, diagnostic, selected, output,
+            prior_expectation=expectation,
+            diagnostic_capture_git_commit="e" * 40,
+            expected_diagnostic_report_sha256=report_sha,
+            diagnostic_mode="originally_accepted", capture_git_commit="f" * 40,
+            transport=lambda *_: pytest.fail("transport dispatched"),
+            contact_email="invented@example.test", resume=False, observed=True,
+        )
+    assert not output.exists()
+
+
+def test_observed_entry_passes_only_frozen_source_partition_to_reviewed_transport(
+    source, tmp_path, monkeypatch,
+):
+    _, prior, diagnostic, selected, _, _, _ = source
+    output = tmp_path / "all-form4-parents-recovery-v3"
+    monkeypatch.setattr(executor, "_OBSERVED_PRIOR_ROOT", prior)
+    monkeypatch.setattr(executor, "_OBSERVED_DIAGNOSTIC_ROOT", diagnostic)
+    monkeypatch.setattr(executor, "_OBSERVED_SELECTED_ROOT", selected)
+    monkeypatch.setattr(executor, "_OBSERVED_OUTPUT_ROOT", output)
+    monkeypatch.setattr(executor.union.diagnostic, "_PRIOR_CAMPAIGN_ROOT", prior)
+    monkeypatch.setattr(executor.union, "_DIAGNOSTIC_NAME", diagnostic.name)
+    monkeypatch.setattr(executor.recovery, "_OUTPUT_NAME", output.name)
+    monkeypatch.setattr(executor, "_verify_exact_committed_code", lambda _: None)
+    def forbidden_transport(*_args):
+        pytest.fail("observed SEC transport was dispatched")
+    monkeypatch.setattr(executor.campaign, "_selected_sec_transport", forbidden_transport)
+    receipt = {
+        "prior_completed_count": 9_539,
+        "offline_corrected_diagnostic_count": 1,
+        "accepted_diagnostic_count": 0,
+        "remaining_selected_reuse_count": 8_139,
+        "source_assignment_sha256": executor._OBSERVED_ASSIGNMENT_SHA256,
+        "later_unattempted_request_inventory_sha256":
+            executor._OBSERVED_LATER_INVENTORY_SHA256,
+    }
+    monkeypatch.setattr(
+        executor.union, "preflight_observed_all_form4_parent_recovery_union",
+        lambda *_, **__: receipt,
+    )
+    plan = SimpleNamespace(
+        scope="ib1b_observed_full_form4_noncanonical",
+        manifest_sha256=executor.campaign.REAL_MANIFEST_SHA256,
+        shard_size=executor.campaign.SHARD_SIZE,
+        requests=range(99_394),
+        to_payload=lambda: {
+            "request_inventory_sha256": executor.partial.PRIOR_REQUEST_INVENTORY_SHA256,
+        },
+    )
+    monkeypatch.setattr(executor.campaign, "_build_real_plan", lambda *args: plan)
+    monkeypatch.setattr(executor.recovery, "_source_layout", lambda *_: (
+        ["prior_completed"] * 99_394, range(81_715),
+    ))
+    seen = []
+    def inert_run(*args, **kwargs):
+        seen.append((args, kwargs))
+        assert args[:5] == (plan, prior, diagnostic, selected, output)
+        assert kwargs["transport"] is forbidden_transport
+        assert kwargs["observed"] is True
+        assert kwargs["diagnostic_mode"] == "offline_corrected"
+        assert kwargs["prior_expectation"].total_attempt_count == 8_342
+        return output / "inert-report"
+    monkeypatch.setattr(executor, "_run", inert_run)
+    result = executor.run_observed_recovery_continuation(**_observed_args(
+        selected=selected, prior=prior, diagnostic=diagnostic, output=output,
+    ))
+    assert result == output / "inert-report"
+    assert len(seen) == 1
+    assert not output.exists()
+
+
+def test_mid_shard_lane_drift_refuses_before_next_observed_attempt(
+    tmp_path, monkeypatch,
+):
+    source = _stopped_source(tmp_path, monkeypatch, request_count=10)
+    plan, prior, diagnostic, selected, expectation, report_sha, _ = source
+    original_source_and_plan = executor._source_and_plan
+    monkeypatch.setattr(
+        executor, "_source_and_plan",
+        lambda *args, **kwargs: original_source_and_plan(
+            *args, **{**kwargs, "observed": False},
+        ),
+    )
+    monkeypatch.setattr(executor, "_verify_exact_committed_code", lambda _: None)
+    seen = []
+    def offline_transport(url, _headers, _cap):
+        seen.append(url)
+        request = next(request for request in plan.requests if request.url == url)
+        raw = _body(request)
+        return SecHttpResult(200, (("Content-Length", str(len(raw))),), raw)
+    monkeypatch.setattr(executor.campaign, "_selected_sec_transport", offline_transport)
+    checks = []
+    def lane_state(_commit):
+        checks.append(True)
+        if len(checks) > 1:
+            raise executor.RecoveryExecutorError(
+                "REFUSED: exact clean committed Insider lane is required"
+            )
+    monkeypatch.setattr(executor, "_verify_lane_state", lane_state)
+    output = tmp_path / "mid-shard"
+    with pytest.raises(executor.RecoveryExecutorError, match="clean committed"):
+        executor._run(
+            plan, prior, diagnostic, selected, output,
+            prior_expectation=expectation,
+            diagnostic_capture_git_commit="e" * 40,
+            expected_diagnostic_report_sha256=report_sha,
+            diagnostic_mode="originally_accepted", capture_git_commit="f" * 40,
+            transport=offline_transport, contact_email="invented@example.test",
+            resume=False, observed=True,
+        )
+    assert len(checks) == 2
+    assert seen == [plan.requests[6].url]
+    events = [json.loads(path.read_text()) for path in (
+        output / "shard-0002").glob("event-*.json")]
+    assert sum(event["kind"] == "attempt-start" for event in events) == 1

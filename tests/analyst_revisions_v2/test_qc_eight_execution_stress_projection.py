@@ -3,6 +3,7 @@
 import ast
 from datetime import datetime
 from decimal import Decimal
+import hashlib
 from types import SimpleNamespace
 
 import pytest
@@ -437,3 +438,62 @@ def test_retrospective_stress_result_refuses_changed_private_project_receipt(
     with pytest.raises(study.EightUniverseExecutionStressStudyError,
                        match="retained terminal or read claim"):
         study._authenticated_result(plan)
+
+
+def test_stress_parser_refuses_a_valid_run_whose_consistent_audit_is_invalid(
+        monkeypatch, tmp_path):
+    """run_valid=True must carry a valid fill audit even when the audit's own
+    valid flag agrees with its counts; an invalid run may still be parsed."""
+    plan = adapter.build_plan("R280", "a" * 32, tmp_path / "control",
+                              family=study.FAMILY)
+    row = adapter._candidate(plan)
+    report = _eight_report(row["arm"])
+    report["slippage_bps_per_side"] = 5
+    audit = {"schema": "arv2-eight-five-bps-moo-fill-audit-v1",
+             "filled_moo_count": 2, "buy_fill_count": 1, "sell_fill_count": 1,
+             "unverifiable_fill_count": 0, "non_adverse_fill_count": 1,
+             "minimum_signed_adverse_bps": "0",
+             "reference": "same-session-TradeBar-open", "valid": False}
+    parsed = {"meta": {"matched_diagnostics_sha256": adapter._sha(report)},
+              "aggregates": {
+                  "comparison_arm": row["arm"],
+                  "analyst_revision_economic_usage": row["analyst_revision_economic_usage"],
+                  "coverage_policy_id": row["coverage_policy_id"],
+                  "matched_baseline_target_path_sha256":
+                      study.attribution.PARENT_BASELINE_PATH_SHA256["R268"],
+                  "execution": {"filled_order_count_sum": 2},
+                  "execution_stress_fill_audit": audit,
+                  "account": {"cumulative_return": report["overall_cumulative_return"]}},
+              "run_valid": False}
+    monkeypatch.setattr(adapter, "_parse_order_common", lambda *a, **kw: parsed)
+    monkeypatch.setattr(adapter, "_statistic", lambda *a, **kw: report)
+    stats = {key: "{}" for key in row["statistic_names"]}
+    assert adapter._parse_order(plan, stats)["run_valid"] is False
+    parsed["run_valid"] = True
+    with pytest.raises(study.EightUniverseExecutionStressStudyError,
+                       match="fill audit is inconsistent"):
+        adapter._parse_order(plan, stats)
+
+
+@pytest.mark.parametrize("tampered", ("R268", "R277", "R278", "R270"))
+def test_stress_parent_result_bytes_are_pinned_for_every_parent(
+        monkeypatch, tmp_path, tampered):
+    """R277/R278 result bytes are pinned only here; the attribution family pins
+    R268 and R270 alone. Equal JSON with different bytes must still refuse."""
+    plan = adapter.build_plan("R280", "a" * 32, tmp_path / "control",
+                              family=study.FAMILY)
+    served = {parent: ('{"parent": "' + parent + '"}').encode()
+              for parent in study.PARENT_RESULT_SHA256}
+    monkeypatch.setattr(study, "PARENT_RESULT_SHA256", {
+        parent: hashlib.sha256(raw).hexdigest() for parent, raw in served.items()})
+    monkeypatch.setattr(study.attribution, "compare_from_saved", lambda organization_id: {
+        "valid": True, "common_input_not_full_stock_minute_fill_tape": True})
+    monkeypatch.setattr(study.attribution, "_authenticated_result",
+                        lambda prior: {"run_valid": True})
+    monkeypatch.setattr(adapter, "_path", lambda prior, kind: SimpleNamespace(
+        read_bytes=lambda: served[prior.candidate_id]))
+    assert set(study.require_parents(plan)["results"]) == set(served)
+    served[tampered] = served[tampered].replace(b": ", b":")
+    with pytest.raises(study.EightUniverseExecutionStressStudyError,
+                       match="parent result bytes changed"):
+        study.require_parents(plan)

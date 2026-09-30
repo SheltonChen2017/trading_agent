@@ -116,3 +116,59 @@ def test_predecessor_result_bytes_must_be_available_and_exact(monkeypatch, unava
             "predecessor result is unavailable" if unavailable else
             "predecessor result bytes changed")):
         study.require_parents(_plan())
+
+
+def _factorial_arm(cumulative_return, baseline_path):
+    return {
+        "run_valid": True,
+        "aggregates": {
+            "account": {"cumulative_return": cumulative_return,
+                        "starting_equity": "1000000",
+                        "first_observation_session": "2021-01-04",
+                        "last_observation_session": "2025-12-31",
+                        "observation_count": 1255},
+            "execution": {"submitted_rebalance_count": 261,
+                          "completed_rebalance_count": 261,
+                          "invalid_order_count_sum": 0, "canceled_order_count_sum": 0,
+                          "submitted_order_count": 2, "filled_order_count_sum": 2,
+                          "actual_engine_fee_amount": "10", "modeled_fee_amount": "10"},
+            "matched_baseline_target_path_sha256": baseline_path,
+            "target_gross_exposure": "0.98", "admission_leverage": "2"},
+        "diagnostics": {"membership_cap_path_sha256": "member-pin",
+                        "etf_daily_panel_sha256": "etf-pin"},
+    }
+
+
+@pytest.mark.parametrize("arm, part, key", (
+    ("R277", "diagnostics", "etf_daily_panel_sha256"),
+    ("R278", "diagnostics", "membership_cap_path_sha256"),
+    ("R270", "diagnostics", "etf_daily_panel_sha256"),
+    ("R277", "account", "starting_equity"),
+))
+def test_factorial_comparison_refuses_a_changed_input_vintage_or_account(
+        monkeypatch, tmp_path, arm, part, key):
+    """The attribution analogue of ARV2D219-001: a QC data-vintage change in any
+    one arm must refuse rather than masquerade as an AR contrast."""
+    paths = study.PARENT_BASELINE_PATH_SHA256
+    results = {"R268": _factorial_arm("0.1", paths["R268"]),
+               "R277": _factorial_arm("0.2", paths["R268"]),
+               "R278": _factorial_arm("0.3", paths["R270"]),
+               "R270": _factorial_arm("0.4", paths["R270"])}
+    monkeypatch.setattr(study, "require_parents", lambda plan: {
+        "R268": results["R268"], "R270": results["R270"]})
+    monkeypatch.setattr(study, "_annual_contrasts", lambda arms: ([], {}))
+    monkeypatch.setattr(adapter, "_path", lambda plan, kind: tmp_path / (
+        f"{plan.candidate_id}-{plan.attempt}-{kind}"))
+    for candidate in study.CANDIDATE_ARMS:
+        (tmp_path / f"{candidate}-1-result").touch()
+    monkeypatch.setattr(study, "_authenticated_result",
+                        lambda plan: results[plan.candidate_id])
+    summary = study.compare_from_saved("a" * 32)
+    assert summary["valid"] is True
+    assert summary["contrasts"]["full_minus_cap_base_pp"] == "30.0"
+    target = (results[arm]["diagnostics"] if part == "diagnostics"
+              else results[arm]["aggregates"]["account"])
+    target[key] = "changed"
+    with pytest.raises(adapter.RelaxedQcSubmissionError,
+                       match="account, orders, fee or input changed"):
+        study.compare_from_saved("a" * 32)

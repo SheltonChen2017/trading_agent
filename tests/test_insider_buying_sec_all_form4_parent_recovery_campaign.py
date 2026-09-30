@@ -35,9 +35,13 @@ def _plan(*, total: int = 7, shard_size: int = 3) -> campaign.CampaignPlan:
     )
 
 
-def _union_receipt(plan: campaign.CampaignPlan) -> dict[str, object]:
+def _union_receipt(
+    plan: campaign.CampaignPlan, *, offline_corrected: bool = False,
+) -> dict[str, object]:
     selected = {item.accession_number for item in plan.reuses}
-    classes = ["prior_completed"] * 4 + ["accepted_diagnostic"]
+    diagnostic_class = ("offline_corrected_diagnostic"
+                        if offline_corrected else "accepted_diagnostic")
+    classes = ["prior_completed"] * 4 + [diagnostic_class]
     later = []
     for request in plan.requests[5:]:
         if request.accession_number in selected:
@@ -55,6 +59,12 @@ def _union_receipt(plan: campaign.CampaignPlan) -> dict[str, object]:
         "prior_shard_journal_sha256s": ("4" * 64, "5" * 64),
         "diagnostic_capture_git_commit": "f" * 40,
         "diagnostic_report_sha256": "6" * 64,
+        "original_diagnostic_envelope_outcome": (
+            "refused" if offline_corrected else "accepted"
+        ),
+        "offline_correction_receipt_sha256": (
+            "7" * 64 if offline_corrected else None
+        ),
         "source_assignment_sha256": hash_payload(classes),
         "later_unattempted_request_inventory_sha256": hash_payload(later),
         "total_parents": len(plan.requests),
@@ -62,7 +72,8 @@ def _union_receipt(plan: campaign.CampaignPlan) -> dict[str, object]:
         "prior_selected_reused_count": 2,
         "prior_newly_acquired_count": 2,
         "prior_attempt_count": 3,
-        "accepted_diagnostic_count": 1,
+        "accepted_diagnostic_count": 0 if offline_corrected else 1,
+        "offline_corrected_diagnostic_count": 1 if offline_corrected else 0,
         "refused_parent_total_attempt_count": 2,
         "remaining_selected_reuse_count": 1,
         "later_unattempted_request_count": len(later),
@@ -124,6 +135,23 @@ def test_inert_v2_plan_pins_complete_order_and_only_new_dispatches(
         "halt_without_redispatch"
     )
     assert not output.exists()
+
+
+def test_inert_plan_preserves_originally_refused_offline_correction(
+    monkeypatch, tmp_path, source_paths,
+):
+    plan = _plan()
+    result = _preflight(
+        monkeypatch, plan, source_paths, tmp_path / "corrected-root",
+        _union_receipt(plan, offline_corrected=True),
+    )
+    assert result["accepted_diagnostic_count"] == 0
+    assert result["offline_corrected_diagnostic_count"] == 1
+    assert result["original_diagnostic_envelope_outcome"] == "refused"
+    assert result["offline_correction_receipt_sha256"] == "7" * 64
+    assert [shard["offline_corrected_diagnostic_count"]
+            for shard in result["shards"]] == [0, 1, 0]
+    assert result["transport_implemented"] is False
 
 
 def test_thirteen_shard_boundary_preserves_all_dispatchable_rows(

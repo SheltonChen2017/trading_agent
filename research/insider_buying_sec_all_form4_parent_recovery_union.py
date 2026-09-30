@@ -4,6 +4,8 @@ This module never dispatches a request or writes a recovery root.  It replays
 the immutable v1 prefix, independently checks the one-shot diagnostic, and
 accounts for the exact source of each still-needed parent.  Its receipt is an
 acquisition plan, not complete, canonical, PIT, or authenticated evidence.
+An originally refused diagnostic may pass a separately versioned, zero-request
+offline correction; its original report is never rewritten as accepted.
 """
 from __future__ import annotations
 
@@ -13,6 +15,7 @@ from pathlib import Path
 import os
 import re
 import stat
+import sys
 
 from data.hashing import hash_bytes, hash_payload
 from research.insider_buying_sec_acquisition import SecPilotError, _plain_path
@@ -26,9 +29,15 @@ from research.insider_buying_sec_selected_parent_runner import _strict_selected_
 import research.insider_buying_sec_all_form4_parent_campaign as campaign
 import research.insider_buying_sec_all_form4_parent_recovery_preflight as partial
 import research.insider_buying_sec_parent_refusal_diagnostic as diagnostic
+import research.insider_buying.sec_complete_submission as complete_submission
+import research.insider_buying.sec_raw_parent_projection as raw_projection
 
 
-UNION_VERSION = "INSETF-SEC-ALL-FORM4-PARENTS-RECOVERY-UNION-v1"
+UNION_VERSION = "INSETF-SEC-ALL-FORM4-PARENTS-RECOVERY-UNION-v2"
+OFFLINE_CORRECTION_VERSION = "INSETF-SEC-PARENT-DIAGNOSTIC-OFFLINE-CORRECTION-v1"
+ORIGINAL_SHORT_CIK_REASON = "REFUSED: issuer CIK is not ten padded nonzero digits"
+OBSERVED_DIAGNOSTIC_CAPTURE_COMMIT = "629bdf736697d410ff2fa2af241ea92502a2ba4f"
+OBSERVED_DIAGNOSTIC_REPORT_SHA256 = "7cf590125633f0e4a087e50494ba85a6d9b92c05d0cc151ca2fc6c2c7287fbb7"
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
 _COMMIT = re.compile(r"[0-9a-f]{40}\Z")
 _DIAGNOSTIC_NAME = "refused-parent-diagnostic-v1"
@@ -58,6 +67,24 @@ def _require_private_diagnostic_mode(
         _refuse("diagnostic custody mode is not owner-only")
 
 
+def _validator_source_sha256() -> str:
+    """Bind the exact source bytes that implement offline header validation."""
+    sources = (
+        (sys.modules[__name__],
+         "research/insider_buying_sec_all_form4_parent_recovery_union.py"),
+        (campaign, "research/insider_buying_sec_all_form4_parent_campaign.py"),
+        (complete_submission, "research/insider_buying/sec_complete_submission.py"),
+        (raw_projection, "research/insider_buying/sec_raw_parent_projection.py"),
+    )
+    rows: list[dict[str, str]] = []
+    for module, relative in sources:
+        path = (diagnostic._LANE_ROOT / relative).resolve()
+        if Path(module.__file__).resolve() != path:
+            _refuse("offline validator module is not from the designated lane")
+        rows.append({"path": relative, "sha256": hash_bytes(path.read_bytes())})
+    return hash_payload(rows)
+
+
 @dataclass(frozen=True, slots=True)
 class VerifiedAcceptedDiagnostic:
     report_sha256: str
@@ -65,12 +92,17 @@ class VerifiedAcceptedDiagnostic:
     body_sha256: str
     body_size_bytes: int
     refused_request_sha256: str
+    original_envelope_outcome: str
+    source_class: str
+    offline_correction_receipt_sha256: str | None
+    validator_source_sha256: str | None
 
 
-def verify_accepted_diagnostic(
+def _verify_diagnostic(
     diagnostic_root: str | Path,
     binding: diagnostic.RefusedParentBinding,
     *, capture_git_commit: str, expected_report_sha256: str,
+    offline_correction: bool,
 ) -> VerifiedAcceptedDiagnostic:
     """Read every committed diagnostic member and recheck its raw 200 body.
 
@@ -81,10 +113,14 @@ def verify_accepted_diagnostic(
             or type(capture_git_commit) is not str
             or _COMMIT.fullmatch(capture_git_commit) is None
             or type(expected_report_sha256) is not str
-            or _SHA.fullmatch(expected_report_sha256) is None):
+            or _SHA.fullmatch(expected_report_sha256) is None
+            or type(offline_correction) is not bool):
         _refuse("diagnostic replay binding is malformed")
     try:
         manifest = binding.to_manifest(capture_git_commit=capture_git_commit)
+        if offline_correction and len(binding.request.issuer_cik) == 10:
+            _refuse("offline correction requires an originally short source CIK")
+        validator_sha = _validator_source_sha256() if offline_correction else None
         manifest_raw = diagnostic._bytes(manifest)
         manifest_sha = hash_bytes(manifest_raw)
         root = _plain_path(diagnostic_root, must_exist=True)
@@ -162,8 +198,12 @@ def verify_accepted_diagnostic(
                         or report["body_sha256"] != body_sha
                         or type(report["body_size_bytes"]) is not int
                         or report["body_size_bytes"] != len(body)
-                        or report["envelope_outcome"] != "accepted"
-                        or report["envelope_reason"] is not None
+                        or report["envelope_outcome"] != (
+                            "refused" if offline_correction else "accepted"
+                        )
+                        or report["envelope_reason"] != (
+                            ORIGINAL_SHORT_CIK_REASON if offline_correction else None
+                        )
                         or any(report[name] is not False for name in (
                             "campaign_advanced", "source_authenticated", "canonical_evidence",
                             "point_in_time_data",
@@ -171,7 +211,7 @@ def verify_accepted_diagnostic(
                         or type(report["outcome_looks"]) is not int
                         or report["outcome_looks"] != 0
                         or type(report["qc_jobs"]) is not int or report["qc_jobs"] != 0):
-                    _refuse("diagnostic report does not prove accepted raw custody")
+                    _refuse("diagnostic report does not prove its original outcome")
                 campaign._check_utc(report["finished_utc"])
                 if datetime.fromisoformat(report["finished_utc"]) < datetime.fromisoformat(
                     start["started_utc"]
@@ -201,12 +241,37 @@ def verify_accepted_diagnostic(
                 _require_private_diagnostic_mode(
                     pinned, f"{body_sha}.bin", object_file=True,
                 )
+        if offline_correction and _validator_source_sha256() != validator_sha:
+            _refuse("offline validator changed during diagnostic replay")
+        correction_receipt_sha256 = None
+        if offline_correction:
+            correction_receipt_sha256 = hash_payload({
+                "kind": OFFLINE_CORRECTION_VERSION,
+                "original_diagnostic_report_sha256": expected_report_sha256,
+                "original_diagnostic_capture_git_commit": capture_git_commit,
+                "refused_request_sha256": manifest["refused_request_sha256"],
+                "body_sha256": body_sha,
+                "body_size_bytes": len(body),
+                "original_envelope_outcome": "refused",
+                "original_envelope_reason": ORIGINAL_SHORT_CIK_REASON,
+                "offline_header_validated": True,
+                "validator_source_sha256": validator_sha,
+                "sec_dispatches": 0,
+                "source_authenticated": False,
+                "canonical_evidence": False,
+                "point_in_time_data": False,
+            })
         return VerifiedAcceptedDiagnostic(
             report_sha256=expected_report_sha256,
             capture_git_commit=capture_git_commit,
             body_sha256=body_sha,
             body_size_bytes=len(body),
             refused_request_sha256=manifest["refused_request_sha256"],
+            original_envelope_outcome="refused" if offline_correction else "accepted",
+            source_class=("offline_corrected_diagnostic" if offline_correction
+                          else "accepted_diagnostic"),
+            offline_correction_receipt_sha256=correction_receipt_sha256,
+            validator_source_sha256=validator_sha,
         )
     except RecoveryUnionError:
         raise
@@ -214,6 +279,32 @@ def verify_accepted_diagnostic(
             SecPilotError, SecCompletePilotAdapterError, SecCompleteAcquisitionError,
             OSError, KeyError, TypeError, ValueError, RecursionError) as exc:
         raise RecoveryUnionError("REFUSED: accepted diagnostic replay failed") from exc
+
+
+def verify_accepted_diagnostic(
+    diagnostic_root: str | Path,
+    binding: diagnostic.RefusedParentBinding,
+    *, capture_git_commit: str, expected_report_sha256: str,
+) -> VerifiedAcceptedDiagnostic:
+    """Require that the immutable original diagnostic already said accepted."""
+    return _verify_diagnostic(
+        diagnostic_root, binding, capture_git_commit=capture_git_commit,
+        expected_report_sha256=expected_report_sha256,
+        offline_correction=False,
+    )
+
+
+def verify_offline_corrected_diagnostic(
+    diagnostic_root: str | Path,
+    binding: diagnostic.RefusedParentBinding,
+    *, capture_git_commit: str, expected_report_sha256: str,
+) -> VerifiedAcceptedDiagnostic:
+    """Preserve an original short-CIK refusal, then validate its same bytes offline."""
+    return _verify_diagnostic(
+        diagnostic_root, binding, capture_git_commit=capture_git_commit,
+        expected_report_sha256=expected_report_sha256,
+        offline_correction=True,
+    )
 
 
 def preflight_source_union(
@@ -224,9 +315,12 @@ def preflight_source_union(
     *, prior_expectation: partial.PartialCampaignExpectation,
     diagnostic_capture_git_commit: str,
     expected_diagnostic_report_sha256: str,
+    diagnostic_mode: str = "originally_accepted",
 ) -> dict[str, object]:
     """Return aggregate-only source assignment after three offline replays."""
-    if type(plan) is not campaign.CampaignPlan:
+    if (type(plan) is not campaign.CampaignPlan
+            or type(diagnostic_mode) is not str
+            or diagnostic_mode not in {"originally_accepted", "offline_corrected"}):
         _refuse("recovery plan is malformed")
     try:
         receipt = partial.verify_partial_campaign(
@@ -238,7 +332,10 @@ def preflight_source_union(
             prior_shard_report_sha256s=receipt.prior_shard_report_sha256s,
             prior_shard_journal_sha256s=receipt.prior_shard_journal_sha256s,
         )
-        accepted = verify_accepted_diagnostic(
+        verifier = (verify_offline_corrected_diagnostic
+                    if diagnostic_mode == "offline_corrected"
+                    else verify_accepted_diagnostic)
+        accepted = verifier(
             diagnostic_root, binding,
             capture_git_commit=diagnostic_capture_git_commit,
             expected_report_sha256=expected_diagnostic_report_sha256,
@@ -252,7 +349,7 @@ def preflight_source_union(
             _refuse("diagnostic does not fill the exact refused request")
         later_selected = 0
         later_dispatch: list[dict[str, str]] = []
-        classes = ["prior_completed"] * old_count + ["accepted_diagnostic"]
+        classes = ["prior_completed"] * old_count + [accepted.source_class]
         selected_path = _plain_path(selected_root, must_exist=True)
         with _PinnedRoot(selected_path) as pinned:
             for request in plan.requests[old_count + 1:]:
@@ -289,6 +386,10 @@ def preflight_source_union(
             "prior_shard_journal_sha256s": receipt.prior_shard_journal_sha256s,
             "diagnostic_capture_git_commit": accepted.capture_git_commit,
             "diagnostic_report_sha256": accepted.report_sha256,
+            "original_diagnostic_envelope_outcome": accepted.original_envelope_outcome,
+            "offline_correction_receipt_sha256": (
+                accepted.offline_correction_receipt_sha256
+            ),
             "source_assignment_sha256": hash_payload(classes),
             "later_unattempted_request_inventory_sha256": hash_payload(later_dispatch),
             "total_parents": len(plan.requests),
@@ -296,7 +397,12 @@ def preflight_source_union(
             "prior_selected_reused_count": receipt.prior_selected_reused_count,
             "prior_newly_acquired_count": receipt.prior_newly_acquired_count,
             "prior_attempt_count": receipt.prior_attempt_count,
-            "accepted_diagnostic_count": 1,
+            "accepted_diagnostic_count": int(
+                accepted.source_class == "accepted_diagnostic"
+            ),
+            "offline_corrected_diagnostic_count": int(
+                accepted.source_class == "offline_corrected_diagnostic"
+            ),
             "diagnostic_attempt_count": 1,
             "known_attempt_count": receipt.prior_attempt_count + 1,
             "refused_parent_total_attempt_count": receipt.refused_prior_attempt_count + 1,
@@ -327,6 +433,10 @@ def preflight_observed_all_form4_parent_recovery_union(
 ) -> dict[str, object]:
     """Exact real-source, read-only gate; no arbitrary copied recovery roots."""
     try:
+        if (diagnostic_capture_git_commit != OBSERVED_DIAGNOSTIC_CAPTURE_COMMIT
+                or expected_diagnostic_report_sha256
+                != OBSERVED_DIAGNOSTIC_REPORT_SHA256):
+            _refuse("real diagnostic differs from the one independently captured")
         prior = _plain_path(prior_campaign_root, must_exist=True)
         candidate = _plain_path(diagnostic_root, must_exist=True)
         if (prior != diagnostic._PRIOR_CAMPAIGN_ROOT
@@ -348,6 +458,7 @@ def preflight_observed_all_form4_parent_recovery_union(
             ),
             diagnostic_capture_git_commit=diagnostic_capture_git_commit,
             expected_diagnostic_report_sha256=expected_diagnostic_report_sha256,
+            diagnostic_mode="offline_corrected",
         )
         if (result["total_parents"] != 99_394
                 or result["prior_completed_count"] != 9_539
@@ -355,6 +466,10 @@ def preflight_observed_all_form4_parent_recovery_union(
                 or result["prior_newly_acquired_count"] != 8_341
                 or result["prior_attempt_count"] != 8_342
                 or result["refused_parent_total_attempt_count"] != 2
+                or result["original_diagnostic_envelope_outcome"] != "refused"
+                or result["accepted_diagnostic_count"] != 0
+                or result["offline_corrected_diagnostic_count"] != 1
+                or result["offline_correction_receipt_sha256"] is None
                 or result["remaining_selected_reuse_count"] != 8_139
                 or result["later_unattempted_request_count"] != 81_715):
             _refuse("real recovery union differs from the frozen 99,394-source partition")
@@ -368,6 +483,7 @@ def preflight_observed_all_form4_parent_recovery_union(
 
 __all__ = [
     "RecoveryUnionError", "VerifiedAcceptedDiagnostic",
-    "verify_accepted_diagnostic", "preflight_source_union",
+    "verify_accepted_diagnostic", "verify_offline_corrected_diagnostic",
+    "preflight_source_union",
     "preflight_observed_all_form4_parent_recovery_union",
 ]

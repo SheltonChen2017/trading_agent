@@ -6,7 +6,7 @@ from dataclasses import replace
 
 import pytest
 
-from data.hashing import hash_bytes
+from data.hashing import hash_bytes, hash_payload
 import research.insider_buying_sec_all_form4_parent_campaign as campaign
 from research.insider_buying_sec_selected_parent_runner import SecHttpResult
 
@@ -76,6 +76,29 @@ def _response(url: str | None = None, *, body: bytes | None = None,
 
 def _json(path):
     return json.loads(path.read_bytes())
+
+
+def test_short_source_issuer_cik_normalizes_only_at_header_target():
+    request = replace(_request(1), issuer_cik="123456")
+    source_payload = request.to_payload()
+    source_hash = hash_payload(source_payload)
+    campaign._validate_parent_header(
+        _parent(request, issuer_cik="0000123456"), source_payload,
+    )
+    assert request.to_payload() == source_payload
+    assert hash_payload(request.to_payload()) == source_hash
+    assert source_payload["issuer_cik"] == "123456"
+    with pytest.raises(campaign.CampaignError, match="header issuer CIK disagrees"):
+        campaign._validate_parent_header(
+            _parent(request, issuer_cik="0000654321"), source_payload,
+        )
+
+
+@pytest.mark.parametrize("issuer_cik", ["0", "12345678901", "12A456"])
+def test_invalid_source_issuer_cik_refuses_before_header(issuer_cik):
+    request = replace(_request(1), issuer_cik=issuer_cik)
+    with pytest.raises(campaign.CampaignError, match="REFUSED"):
+        request.to_payload()
 
 
 def _run(plan, output, transport, *, resume=False, reused_bytes=None):

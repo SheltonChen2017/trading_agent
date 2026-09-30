@@ -1,4 +1,4 @@
-"""Inert v2 continuation plan for the halted two-quarter SEC parent campaign.
+"""Inert v3 continuation plan for the halted two-quarter SEC parent campaign.
 
 This module performs no transport and creates no output root.  It consumes the
 independent, read-only source-union replay and pins the ordered source classes
@@ -21,14 +21,14 @@ import research.insider_buying_sec_all_form4_parent_recovery_union as union
 import research.insider_buying_sec_parent_refusal_diagnostic as diagnostic
 
 
-RECOVERY_CAMPAIGN_VERSION = "INSETF-SEC-ALL-FORM4-PARENTS-RECOVERY-CAMPAIGN-v2"
+RECOVERY_CAMPAIGN_VERSION = "INSETF-SEC-ALL-FORM4-PARENTS-RECOVERY-CAMPAIGN-v3"
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
 _COMMIT = re.compile(r"[0-9a-f]{40}\Z")
 _SOURCE_CLASSES = (
     "prior_completed", "accepted_diagnostic", "remaining_selected_reuse",
-    "later_unattempted",
+    "offline_corrected_diagnostic", "later_unattempted",
 )
-_OUTPUT_NAME = "all-form4-parents-recovery-v2"
+_OUTPUT_NAME = "all-form4-parents-recovery-v3"
 
 
 class RecoveryCampaignPlanError(ValueError):
@@ -69,12 +69,24 @@ def _source_layout(
     payload = plan.to_payload()
     total = len(plan.requests)
     old_count = receipt.get("prior_completed_count")
+    accepted_count = receipt.get("accepted_diagnostic_count")
+    corrected_count = receipt.get("offline_corrected_diagnostic_count")
+    original_outcome = receipt.get("original_diagnostic_envelope_outcome")
+    correction_sha = receipt.get("offline_correction_receipt_sha256")
     if (type(old_count) is not int or not 0 <= old_count < total
             or receipt.get("total_parents") != total
             or receipt.get("manifest_sha256") != plan.manifest_sha256
             or receipt.get("request_inventory_sha256")
             != payload["request_inventory_sha256"]
-            or receipt.get("accepted_diagnostic_count") != 1
+            or type(accepted_count) is not int
+            or type(corrected_count) is not int
+            or accepted_count not in (0, 1)
+            or corrected_count not in (0, 1)
+            or accepted_count + corrected_count != 1
+            or (accepted_count == 1
+                and (original_outcome != "accepted" or correction_sha is not None))
+            or (corrected_count == 1
+                and (original_outcome != "refused" or not _sha(correction_sha)))
             or receipt.get("refused_parent_total_attempt_count") != 2
             or receipt.get("sec_dispatches") != 0
             or any(receipt.get(name) is not False for name in (
@@ -103,7 +115,9 @@ def _source_layout(
     selected = {item.accession_number for item in plan.reuses}
     if plan.requests[old_count].accession_number in selected:
         _refuse("accepted diagnostic overlaps a selected reuse")
-    classes = ["prior_completed"] * old_count + ["accepted_diagnostic"]
+    diagnostic_class = ("offline_corrected_diagnostic" if corrected_count
+                        else "accepted_diagnostic")
+    classes = ["prior_completed"] * old_count + [diagnostic_class]
     dispatch: list[dict[str, str]] = []
     for request in plan.requests[old_count + 1:]:
         if request.accession_number in selected:
@@ -161,6 +175,9 @@ def _inert_plan(
             "later_unattempted_request_inventory_sha256": hash_payload(later),
             "prior_completed_count": source_classes.count("prior_completed"),
             "accepted_diagnostic_count": source_classes.count("accepted_diagnostic"),
+            "offline_corrected_diagnostic_count": source_classes.count(
+                "offline_corrected_diagnostic"
+            ),
             "remaining_selected_reuse_count": source_classes.count(
                 "remaining_selected_reuse"
             ),
@@ -186,10 +203,19 @@ def _inert_plan(
         "prior_shard_journal_sha256s": list(receipt["prior_shard_journal_sha256s"]),
         "diagnostic_capture_git_commit": receipt["diagnostic_capture_git_commit"],
         "diagnostic_report_sha256": receipt["diagnostic_report_sha256"],
+        "original_diagnostic_envelope_outcome": receipt[
+            "original_diagnostic_envelope_outcome"
+        ],
+        "offline_correction_receipt_sha256": receipt[
+            "offline_correction_receipt_sha256"
+        ],
         "proposed_output_root": str(output),
         "total_parents": len(plan.requests),
         "prior_completed_count": receipt["prior_completed_count"],
-        "accepted_diagnostic_count": 1,
+        "accepted_diagnostic_count": receipt["accepted_diagnostic_count"],
+        "offline_corrected_diagnostic_count": receipt[
+            "offline_corrected_diagnostic_count"
+        ],
         "remaining_selected_reuse_count": receipt["remaining_selected_reuse_count"],
         "later_unattempted_request_count": len(dispatch),
         "shard_size": plan.shard_size,
@@ -225,6 +251,7 @@ def preflight_synthetic_recovery_continuation(
     *, prior_expectation: partial.PartialCampaignExpectation,
     diagnostic_capture_git_commit: str,
     expected_diagnostic_report_sha256: str,
+    diagnostic_mode: str = "originally_accepted",
 ) -> dict[str, object]:
     """Offline, injected-fixture preflight; it cannot issue an SEC request."""
     if type(plan) is not campaign.CampaignPlan or plan.scope != "synthetic_test_manifest":
@@ -234,6 +261,7 @@ def preflight_synthetic_recovery_continuation(
         prior_expectation=prior_expectation,
         diagnostic_capture_git_commit=diagnostic_capture_git_commit,
         expected_diagnostic_report_sha256=expected_diagnostic_report_sha256,
+        diagnostic_mode=diagnostic_mode,
     )
     return _inert_plan(
         plan, receipt, output_root,
@@ -272,7 +300,9 @@ def preflight_observed_recovery_continuation(
     )
     if (result["total_parents"] != 99_394
             or result["prior_completed_count"] != 9_539
-            or result["accepted_diagnostic_count"] != 1
+            or result["accepted_diagnostic_count"] != 0
+            or result["offline_corrected_diagnostic_count"] != 1
+            or result["original_diagnostic_envelope_outcome"] != "refused"
             or result["remaining_selected_reuse_count"] != 8_139
             or result["later_unattempted_request_count"] != 81_715
             or len(result["shards"]) != 13):

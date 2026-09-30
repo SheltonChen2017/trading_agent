@@ -48,9 +48,11 @@ def _body(request: campaign.CampaignRequest, *, wrong: bool = False) -> bytes:
     ).encode("ascii")
 
 
-@pytest.fixture
-def stopped_source(tmp_path, monkeypatch):
+def _stopped_source(tmp_path, monkeypatch, *, short_source_cik=False):
     requests = tuple(_request(index) for index in range(1, 8))
+    if short_source_cik:
+        requests = (*requests[:4], replace(requests[4], issuer_cik="1"),
+                    *requests[5:])
     reused = {requests[index].accession_number: _body(requests[index])
               for index in (0, 3, 5)}
     descriptors = tuple(campaign.CampaignReuse(
@@ -111,15 +113,40 @@ def stopped_source(tmp_path, monkeypatch):
     )
     body = _body(receipt.refused_request)
     diag = tmp_path / "one-shot-diagnostic"
-    report = diagnostic._capture_one(
-        binding, diag,
-        transport=lambda *_: SecHttpResult(
-            200, (("Content-Length", str(len(body))),), body,
-        ),
-        contact_email=_CONTACT, capture_git_commit=_DIAGNOSTIC_COMMIT,
-        protected_roots=(prior, selected),
-    )
+    def capture():
+        return diagnostic._capture_one(
+            binding, diag,
+            transport=lambda *_: SecHttpResult(
+                200, (("Content-Length", str(len(body))),), body,
+            ),
+            contact_email=_CONTACT, capture_git_commit=_DIAGNOSTIC_COMMIT,
+            protected_roots=(prior, selected),
+        )
+
+    if short_source_cik:
+        with monkeypatch.context() as patch:
+            def original_validator(raw, request):
+                if len(request["issuer_cik"]) != 10:
+                    raise campaign.CampaignError(
+                        "REFUSED: issuer CIK is not ten padded nonzero digits"
+                    )
+                campaign._validate_parent_header(raw, request)
+
+            patch.setattr(diagnostic, "_validate_parent_header", original_validator)
+            report = capture()
+    else:
+        report = capture()
     return plan, prior, diag, selected, expected, report.name[18:-5], binding
+
+
+@pytest.fixture
+def stopped_source(tmp_path, monkeypatch):
+    return _stopped_source(tmp_path, monkeypatch)
+
+
+@pytest.fixture
+def stopped_short_source(tmp_path, monkeypatch):
+    return _stopped_source(tmp_path, monkeypatch, short_source_cik=True)
 
 
 def _union(stopped_source):
@@ -170,6 +197,126 @@ def test_accepted_diagnostic_and_disjoint_source_union_are_read_only(stopped_sou
     assert receipt["source_authenticated"] is False
     assert receipt["canonical_evidence"] is False
     assert receipt["point_in_time_data"] is False
+
+
+def test_originally_refused_short_cik_diagnostic_needs_offline_correction(
+    tmp_path, stopped_source, monkeypatch,
+):
+    _plan, prior, _diag, selected, _expected, _sha, binding = stopped_source
+    short_binding = replace(
+        binding, request=replace(binding.request, issuer_cik="1"),
+    )
+    body = _body(short_binding.request)
+    corrected_root = tmp_path / "originally-refused-short-cik"
+    current_validator = campaign._validate_parent_header
+
+    def old_validator(raw, request):
+        if len(request["issuer_cik"]) != 10:
+            raise campaign.CampaignError(
+                "REFUSED: issuer CIK is not ten padded nonzero digits"
+            )
+        return current_validator(raw, request)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(diagnostic, "_validate_parent_header", old_validator)
+        report_path = diagnostic._capture_one(
+            short_binding, corrected_root,
+            transport=lambda *_: SecHttpResult(
+                200, (("Content-Length", str(len(body))),), body,
+            ),
+            contact_email=_CONTACT, capture_git_commit=_DIAGNOSTIC_COMMIT,
+            protected_roots=(prior, selected),
+        )
+    report_sha = report_path.name[18:-5]
+    assert json.loads(report_path.read_bytes())["envelope_outcome"] == "refused"
+    with pytest.raises(union.RecoveryUnionError, match="REFUSED"):
+        union.verify_accepted_diagnostic(
+            corrected_root, short_binding,
+            capture_git_commit=_DIAGNOSTIC_COMMIT,
+            expected_report_sha256=report_sha,
+        )
+    verified = union.verify_offline_corrected_diagnostic(
+        corrected_root, short_binding,
+        capture_git_commit=_DIAGNOSTIC_COMMIT,
+        expected_report_sha256=report_sha,
+    )
+    assert verified.body_sha256 == hash_bytes(body)
+    assert verified.original_envelope_outcome == "refused"
+    assert verified.source_class == "offline_corrected_diagnostic"
+    assert verified.validator_source_sha256 is not None
+    assert verified.offline_correction_receipt_sha256 == hash_payload({
+        "kind": union.OFFLINE_CORRECTION_VERSION,
+        "original_diagnostic_report_sha256": report_sha,
+        "original_diagnostic_capture_git_commit": _DIAGNOSTIC_COMMIT,
+        "refused_request_sha256": hash_payload(short_binding.request.to_payload()),
+        "body_sha256": hash_bytes(body),
+        "body_size_bytes": len(body),
+        "original_envelope_outcome": "refused",
+        "original_envelope_reason": "REFUSED: issuer CIK is not ten padded nonzero digits",
+        "offline_header_validated": True,
+        "validator_source_sha256": verified.validator_source_sha256,
+        "sec_dispatches": 0,
+        "source_authenticated": False,
+        "canonical_evidence": False,
+        "point_in_time_data": False,
+    })
+
+
+def test_corrected_diagnostic_fills_exact_refused_source_without_rewriting_history(
+    stopped_short_source,
+):
+    plan, prior, diag, selected, expected, report_sha, _binding = stopped_short_source
+    receipt = union.preflight_source_union(
+        plan, prior, diag, selected,
+        prior_expectation=expected,
+        diagnostic_capture_git_commit=_DIAGNOSTIC_COMMIT,
+        expected_diagnostic_report_sha256=report_sha,
+        diagnostic_mode="offline_corrected",
+    )
+    assert receipt["original_diagnostic_envelope_outcome"] == "refused"
+    assert receipt["accepted_diagnostic_count"] == 0
+    assert receipt["offline_corrected_diagnostic_count"] == 1
+    assert receipt["diagnostic_attempt_count"] == 1
+    assert receipt["refused_parent_total_attempt_count"] == 2
+    assert receipt["source_assignment_sha256"] == hash_payload(
+        ["prior_completed"] * 4 + ["offline_corrected_diagnostic",
+                                  "remaining_selected_reuse", "later_unattempted"]
+    )
+    assert json.loads((diag / f"diagnostic-report-{report_sha}.json").read_bytes())[
+        "envelope_outcome"
+    ] == "refused"
+
+
+@pytest.mark.parametrize("failure", ["wrong_header", "other_reason", "padded_source"])
+def test_offline_correction_does_not_launder_other_refusals(
+    tmp_path, stopped_short_source, monkeypatch, failure,
+):
+    _plan, prior, _diag, selected, _expected, _sha, binding = stopped_short_source
+    if failure == "padded_source":
+        binding = replace(binding, request=replace(binding.request, issuer_cik="0000000001"))
+    body = _body(binding.request, wrong=failure == "wrong_header")
+    reason = ("REFUSED: different original reason" if failure == "other_reason"
+              else union.ORIGINAL_SHORT_CIK_REASON)
+
+    def original_validator(_raw, _request):
+        raise campaign.CampaignError(reason)
+
+    with monkeypatch.context() as patch:
+        patch.setattr(diagnostic, "_validate_parent_header", original_validator)
+        report_path = diagnostic._capture_one(
+            binding, tmp_path / failure,
+            transport=lambda *_: SecHttpResult(
+                200, (("Content-Length", str(len(body))),), body,
+            ),
+            contact_email=_CONTACT, capture_git_commit=_DIAGNOSTIC_COMMIT,
+            protected_roots=(prior, selected),
+        )
+    with pytest.raises(union.RecoveryUnionError, match="REFUSED"):
+        union.verify_offline_corrected_diagnostic(
+            report_path.parent, binding,
+            capture_git_commit=_DIAGNOSTIC_COMMIT,
+            expected_report_sha256=report_path.name[18:-5],
+        )
 
 
 @pytest.mark.parametrize("member", [

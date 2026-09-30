@@ -604,7 +604,10 @@ def _validate_parent_header(raw: bytes, request: dict[str, object]) -> None:
         target = SecCompleteSubmissionTarget(
             period=request["period"], accession_number=request["accession_number"],
             form_type=request["form_type"], filing_date=request["filing_date"],
-            issuer_cik=request["issuer_cik"],
+            # The quarter-index locator permits 1–10 digits; the complete-
+            # submission target compares the ten-digit header representation.
+            # Preserve the raw locator in its request and lineage hashes.
+            issuer_cik=request["issuer_cik"].zfill(10),
             quarterly_index_sha256=request["master_source_sha256"],
             complete_submission_url=request["url"],
         )

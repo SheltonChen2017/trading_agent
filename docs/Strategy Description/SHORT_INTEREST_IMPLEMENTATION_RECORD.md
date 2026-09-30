@@ -10091,3 +10091,19 @@ identity and terminal evidence. No partial push is made while this factual
 gate is open; the local provenance correction and source inquiry record are
 preserved in this designated worktree for the next authorized completed
 round or an explicit owner-directed checkpoint handoff.
+
+### 76.6 Explicit owner-directed checkpoint handoff (2026-09-30)
+
+After being told that the vendor replies had not arrived, the factual gates
+remained open, and the two local commits had not been pushed, the owner said
+**“push then”**. `SI-AUTH-20260930-02` records this explicit exception to the
+no-partial-push default for this checkpoint only. The authorized handoff
+comprises the counter-review/source-inquiry record commit
+`0e3150507bfa1b396e798fd23ad6fa4a7558a326`, the provenance-correction
+commit `d6f8abe9015a080e8e520a8e8977f337a9524ac5`, and this record-only
+checkpoint addendum, on `codex/strategy-short-interest` from the designated
+worktree. It does not authorize a second push, infer vendor rights or historical
+point-in-time validity, accept a candidate lookback, open an actual-outcome
+look, or permit a QuantConnect history/job/backtest. The P2 source gates and
+0/0 real outcome looks above remain unchanged. Claude should independently
+review the exact pushed checkpoint before any further Codex implementation.

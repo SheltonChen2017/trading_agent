@@ -15079,3 +15079,68 @@ one registered order-based historical candidate with at most three QC
 launches. Claude reviews only after that first actual backtest, per the
 owner's current direction. Until the factual gates are satisfied, keep this
 branch local and unpushed; do not manufacture a completion or spend a look.
+
+## 116. Exact observed v3 SEC continuation gate (2026-09-30 UTC; pre-launch)
+
+The owner's later direction to proceed, together with the previously delegated
+source-capture choices D37 and D41, supersedes D48 **only for public SEC raw
+source acquisition**. The code correction is local commit `eee1bc8` on
+`codex/strategy-insider-buying`; no incoming Claude commit is present in this
+range and no independent Claude review is claimed. This lane record remains
+the branch-local handoff; the Action Plan, shared source register, project-wide
+workflow, and `docs/SESSION_HANDOFF.md` are unchanged. No commit in this local
+continuation has yet been pushed.
+
+### 116.1 Delegated owner decisions and limits
+
+| ID | Decision made for the owner | Scope and evidence |
+|---|---|---|
+| D49 | Permit the versioned v3 executor to archive only the frozen **81,715 never-attempted** public SEC complete-submission parents from the exact 2022Q4–2023Q1 Form 4/4-A population. | The source register identifies SEC full filings as free and requires fair-access pacing; the runner uses a descriptive contact-bearing User-Agent and at least 500 ms between completed requests, below the SEC 10/s ceiling. The 9,539 prior completed objects, one offline-corrected diagnostic body, and 8,139 later selected reuses are replayed, never re-requested. This decision does not authorize a wider source window or turn raw custody into authenticated/PIT/canonical evidence. |
+| D50 | Keep QC, outcomes, and trading separate from this source-only continuation; use the other lane's QC work as technical precedent only. | Analyst Revisions has demonstrated QC Cloud order-based execution and digest-verified Object Store read-back on this account, but its current-vintage Sharadar mapping is not a PIT SEC CIK-to-QC security-master bridge. Short Interest's dataset-specific Cloud entitlement does not establish Insider's US Equities/Security Master coverage or permission to process SEC-derived files. No QC upload/job, research look, backtest, broker/operator-database action, paper/live deployment, capital, or order is granted here. |
+
+The observed entry pins the old campaign, one-shot diagnostic, selected source,
+and deterministic sibling v3 output paths; rebuilds the exact original
+IB-1B/pilot source bytes; requires the 99,394-row manifest and ordered request
+inventory and the independently measured assignment hashes; and dispatches
+only through the reviewed SEC client. It requires the exact clean committed
+lane code at entry, every shard, and final publication, with a lightweight
+root/branch/HEAD/status check immediately before **each** durable request
+start. The fsynced event journal still refuses redispatch after an ambiguous
+start; only explicit durable empty-body 500/502/503/504 responses may retry,
+at most three attempts per parent. The private immutable outside-Git roots
+and independent completed-root verifier remain mandatory. No observed v3
+output or request had been made when this entry was committed.
+
+### 116.2 Countercheck, validation, and honest next action
+
+| ID | Priority/status | Evidence and disposition |
+|---|---|---|
+| `IB1BCAMP-OBS02` | P3, **CLOSED in `eee1bc8`** | Independent advisory audit found the observed entry docstring overstated that all source roots were path-pinned. Prior/diagnostic/selected/output are path-pinned, while IB-1B and pilot inputs are content-pinned by the rebuilt manifest, report and request inventory. The wording was corrected; no alternate population was admitted. |
+| Earlier `IB1BCAMP-OBS01` and P3 ledger | P3, **retained** | Advisory locks cannot exclude an uncooperative same-user writer. Earlier provenance, multi-owner, PIT, economics, and shared/out-of-lane observations retain their recorded status. No new confirmed P0–P2 finding was found in the observed-entry audit. |
+
+Independent read-only replay of the actual retained source roots, with **zero
+SEC requests**, reproduced the exact partition
+`99,394 = 9,539 + 1 + 8,139 + 81,715`, source-assignment SHA-256
+`9c497cabeff43a40f01b8da916264cc140088a356dc18233c660e91d7a6552d2`,
+and never-attempted inventory SHA-256
+`2318bafbe7eec167b545b747ce5a7923fcb5dbef34bd38aca27c95bd3d7f52b8`.
+On Python 3.12.14, six focused campaign/recovery files passed **115/115**;
+the exact two Insider package/import guards plus active-document, lane-record,
+module-hygiene, overlay/ML import, and project-separation checks passed
+**129/129**. Touched Python files compiled and `git diff --check` passed. The
+two load-bearing guards were mutation-proven red/green: disabling the
+per-attempt clean-lane check or the pinned-root check failed its respective
+focused test, then both passed restored. The observed wiring success test
+uses invented offline/mocked collaborators; it is **not** a real SEC campaign
+or completed-root proof. Codex did not run a complete lane/repository suite.
+
+Next: commit this record, verify the exact clean lane and matching remote,
+then launch **one** source-only v3 continuation from that committed snapshot
+with the owner-supplied contact passed without echo or Git persistence. While
+its immutable events grow, keep the code tree unchanged and monitor quietly.
+At a terminal report, independently replay every shard and the full union
+before claiming source custody. A stopped or refused campaign is not a
+completed corpus. Publication/PIT identity, canonical IB-1C..IB-1E signals,
+validity-dated CIK-to-QC mapping, data-processing rights, frozen look,
+historical order-based backtest, and Claude review remain **not done**. There
+is still **no push** merely for enabling or launching capture.

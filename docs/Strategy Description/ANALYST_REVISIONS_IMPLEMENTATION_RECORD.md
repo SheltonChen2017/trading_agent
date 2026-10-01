@@ -204,6 +204,12 @@ four valid arms and an input-only QC clock/persistence probe, with a closing
 floor of **298 / 233 / 40 / 699**. The historical AR weighting contrast
 survives that simple slippage model but changes sign across years; vendor
 vintage, volume capacity and forward input readiness remain unresolved.
+Section 220 is Claude's independent review of `e9e2d7d..1bff115` (0 P0,
+0 P1, 0 P2, 2 P3): the required gates pass at both pushed heads, every
+recorded figure reproduces from the retained results, and three unpinned
+guards are pinned by the test-only `1cff51c`. The first push `b212048`
+carried 22 red three-name lane tests from `908c9b0`'s dropped family token,
+which Codex's `1bff115` corrected.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -954,9 +960,13 @@ not a further percentage or universe sweep; the exact
 decision-ready forward input are not. No historical
 eight-universe success confers paper/live/funded/real-order authority.
 The owner expressly waived waiting for Claude's review before section 219's
-separate R279 clock probe and fixed-100 execution-stress development; Claude
-will review section 219 independently, including its exact pushed source, QC
-dispositions and result claims after Codex's single round-end push.
+separate R279 clock probe and fixed-100 execution-stress development. Section
+220 is Claude's independent review of the exact pushed range
+`e9e2d7d..1bff115` (sections 218–219), with the test-only correction `1cff51c`.
+The immediate next step is that Codex counter-reviews section 220 and every
+Claude commit of this round; the owner then decides whether to build the
+authenticated prior-20-session volume diagnostic and the common-epoch forward
+input protocol.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -970,7 +980,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 216 (section 217). Section 182 records the owner's exact
+the pushed range through section 219 (section 220). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -2712,6 +2722,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-29 | Codex retrospective push-ledger catch-up (no new push or look) | `0808b3a` -> `e3fa38d` | Sections 213–216, the complete second Codex push reviewed in section 217 | This supplementary row resolves the partial earlier section-213 row without rewriting it: QCOM-admitted replay, score-floor sensitivity, R267 input gate, R268 split-truncation A3, and R269–R275 eight-universe order results were all in this one pushed range. | Exact run/results accounting and focused validations remain in sections 213–216; closing floor 289/226/38/693. No QC action or new look is caused by this catch-up. | `ARV2R217-002` P3 record omission corrected by appended row; section 217's P2 closure/record-gate corrections remain attributable to Claude. | Section 218 counter-reviews Claude and freezes the owner's narrow fixed-100% factorial diagnostic. |
 | 2026-09-29 | Codex section-217 counter-review and fixed-100 eight-universe attribution diagnostic | `e9e2d7d` -> `908c9b0` and this completion commit | Section 218: accept and qualify the four Claude commits; freeze the R277/R278 order sources before launch; run the two missing arms; compare all four with exact retained controls; preregister one bounded adverse-execution successor | R277 and R278 both completed validly on A1 in private QC; B−A +12.8000 pp, C−A −1.8674 pp, D−C +13.6636 pp, D−A +11.7961 pp, with annual signature and current-vintage/zero-slippage cautions. Two development looks and two cells; floor 291/228/38/695. | Exact source/manifest and one bounded read per new run, retained-result reauthentication, focused closure/firewall/record/attribution tests, compilation and diff; final results in 218.4. No complete lane suite by Codex. | No new P0/P1/P2 defect; `ARV2CR218-001` P3 qualifies Claude's final-tree suite wording; `ARV2R217-002` ledger omission closed by two append-only catch-up rows. R247 forward clock and archive-vintage evidence gates remain open. | One final same-lane push. Claude reviews section 218 and the exact pushed commits; no stress QC launch, formal alpha, paper/live/funded/broker order or forward-efficacy claim is inferred. |
 | 2026-09-30 | Codex owner-directed section-219 pre-review forward-clock and fixed-100 execution stress | `b212048` -> this final lane correction/record commit | R279 input-only callback/Object Store mechanics; four 5-bps adverse-slippage order arms R280–R283 on exact fixed-100% 2021–2025 inputs | R279 A1 failed on QC one-dot key grammar; A2 completed in the same project with a bounded input-only metadata read. R280 A1, R281 A2, R282 A1 and R283 A1 completed validly; R281 A1 stopped before backtest creation and was spent. Four-arm return/parent comparisons and annual instability are in 219.3–219.5. The historical QCOM three-name recovery family omission and new-module closure pin were corrected locally, without a QC launch. | Exact one-use terminal/statistic reads and digest-bound parent comparison; R279 battery 20 passed, stress/recovery/import boundary 50 passed, historical recovery red/green 21 passed then 1 error -> 37 passed; final affected selection 251 passed, closure file 74 passed, compilation and diff clean. No complete Codex lane suite. Floor 298/233/40/699. | `ARV2D219-001` P2 parent-vintage interpretation gap, `ARV2D219-002` P2 legacy QCOM recovery admission gap and `ARV2D219-003` P2 required closure-pin gap corrected; R281 A1 transport cause unresolved. Current-vintage archive, annual sign changes, no raw-volume/1%-ADV capacity check, incomplete fill-tape identity and forward-vendor readiness remain disclosed. | One same-lane push; Claude independently reviews the exact section-219 range. No formal alpha, paper/live/funded/broker order or forward-efficacy authority follows. |
+| 2026-10-01 | Claude independent review of sections 218–219: the fixed-100 factorial, the R279 clock probe, and the 5-bps execution stress | `1bff115` -> `1cff51c` -> this record commit | Section 220: seven commits `e9e2d7d..1bff115` individually disposed (5 accepted, 2 accepted after correction, 0 rejected); Codex's counter-review of section 217 accepted, including `ARV2CR218-001`; zero QC or provider calls, looks, evaluations, or cells | Pinned three unpinned guards (`1cff51c`, test-only, each red with its guard removed); corrected the recorded origin and scope of `ARV2D219-002`; section 4 names section 220, banner sentence added, this row appended; no production line changed | Required gates at both pushed heads, standing lane selection in a byte-faithful export of `1bff115`, the three-name files at `b212048` and `54e1fd4`, seventeen mutation trials, every recorded figure recomputed from the retained results, `compileall`, `git diff --check`; exact counts in 220.7 | 0 P0, 0 P1, 0 P2, 2 P3 (`ARV2R220-001`, `-002`): the misattributed three-name defect, whose first push carried 22 red lane tests, and three unpinned guards (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 220 |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -31461,3 +31472,175 @@ Claude commit/finding on this same lane. Then decide whether to build an
 authenticated prior-20-session volume/participation diagnostic and a
 separately reviewed common-epoch forward input protocol. R279 proves QC
 mechanics only; no outcome-bearing forward paper run is authorized by it.
+
+## 220. Independent Claude review of sections 218–219: the fixed-100% factorial, the R279 clock probe, and the 5-bps execution stress, 2026-09-30
+
+**Range reviewed:** `e9e2d7d..1bff115`, seven Codex commits across two
+pushes (`b212048`, `1bff115`), each disposed in 220.1, plus this round's
+Claude lane commits (the test-only `1cff51c` and this record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called. Every result figure below was re-read from the locally retained,
+already-authenticated result files of R268 A3, R270 A1, R277 A1, R278 A1,
+R280 A1, R281 A2, R282 A1 and R283 A1; no QC result was read again.
+
+**Codex's counter-review of section 217 (section 218) is accepted.**
+`ARV2CR218-001` is right: section 217.7 called its scope the "exact final
+tree", but its complete lane selection ran in an export of the pushed head
+`e3fa38d`, and only the focused gates ran on the final tree. Section 220.7
+states each scope separately. The two catch-up ledger rows close
+`ARV2R217-002`.
+
+**Verdict.** Five commits are accepted and two are accepted after
+correction: `908c9b0`, whose dropped family token Codex restored in
+`1bff115`, and `057fae6`; none is rejected. **0 P0, 0 P1, 0 P2, 2 P3.**
+No production line changed in this round; the test-only `1cff51c` pins
+three guards. The required gates (firewall, ML boundary, whole-package
+closure, lane record, active documents) pass at both pushed heads. Every
+recorded return, contrast, annual row, fee, fill count, audit count and
+look transition reproduces.
+
+### 220.1 Per-commit dispositions
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `908c9b0` | R277/R278 fixed-100 attribution arms, two-row manifest, adapter routing, closure registration | accepted after correction | While adding `eight_attribution`, the commit dropped `qcom_exclusion_three_name` from `_candidate`'s family allowlist, so every R242–R245 plan refused (`ARV2D219-002`; restored in-range by `1bff115`; red without it, `A1` in 220.3). R277 changes exactly five of the seventeen R268 A3 files, keeps the AR-off coverage policy, and its generated runtime refuses a baseline path other than R268 A3's (`P1`). R278 changes four R270 files; its one economic change is the zero transfer fraction. The attribution comparison's cross-arm input and account check had no test (`ARV2R220-002`, pinned in `1cff51c`). |
+| `b212048` | Record: R277/R278 results; annual contrasts and predecessor guards | accepted | The four returns, five contrasts, annual rows and t = 0.82 reproduce from the retained results; both parent result hashes match their pins. |
+| `cdbdeb5` | R279 A1 input-only clock successor | accepted | Derived from the authenticated R247 A3 source by exact anchors: three session literals, the start and end dates, and one extended-hours SPY minute subscription used only as a clock feed. The 09:20 rule is unchanged and the source is pinned by SHA-256. |
+| `057fae6` | 5-bps stress manifest, projection, study and launcher; R279 A1 record | accepted after correction | Three files change per arm, each rendering refused unless the edit census is exact. The installed model changes from `NullSlippageModel` to `ConstantSlippageModel(0.0005)` once; the fee callback is untouched. The fill audit is fail-closed; its zero-slip and stale-bar refusals are behaviourally tested (`F1`, `F3`). The parser's refusal of a valid run with an invalid audit and the byte pins on the four parents had no test (`ARV2R220-002`, pinned in `1cff51c`). |
+| `54cc232` | R279 A2 Object Store key correction | accepted | A single-anchor change from `.json.gz` to `.gz`; `main.py` is byte-identical to A1. Lean's `LocalObjectStore` key pattern, read at its source, admits one optional extension dot, so the diagnosis holds. Its local failed-A1 refusal has no isolating test, but the remote run census independently requires the exact failed A1 before any upload (`C1`). |
+| `54e1fd4` | Stress parent authentication (`ARV2D219-001`) and R281 A2 same-project recovery | accepted | A parent-only input-digest mismatch now refuses (`S1`); the R281 recovery entry binds manifest, projection and project `37165262` (`R1`). |
+| `1bff115` | Section 219 record, the one-token family fix, closure registration of the A2 module | accepted | The fix is correct and the pushed head is green. Its record misattributes the defect to an earlier round and understates its scope (`ARV2R220-001`). |
+
+### 220.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R220-001` | P3 | `1bff115` (record text) | Section 219.5 calls `ARV2D219-002` a defect "predating this round" and the ledger row calls it a "legacy" gap. `git show 908c9b0` shows the opposite: that commit replaced `"qcom_exclusion_three_name"` with `"eight_attribution"` in `_candidate`'s allowlist, while `_require_inputs` kept the token. The count of the token in the adapter falls from 12 at `e3fa38d` to 11 at `908c9b0` and returns to 12 at `1bff115`. The first pushed head `b212048` therefore carried 22 red lane tests, 8 failures and 14 errors across `test_qc_qcom_exclusion_three_name_study.py` and `test_qc_qcom_three_name_precreate_retry.py`; the same 22 are red at `54e1fd4`. Section 219 counts only the recovery file's 14 errors and 2 failures. The six study-file failures were outside Codex's focused selection. | Documented; the correction itself is Codex's and right. Plan item 1. |
+| `ARV2R220-002` | P3 | `908c9b0`, `057fae6` | Three guards had no test. The attribution comparison's cross-arm account and input check (`AT2`) never ran with a changed digest or starting equity, although it is the attribution analogue of the stress-family gap `ARV2D219-001`. The stress parser's refusal of a valid run carrying a self-consistent invalid fill audit (`S3`) was never exercised; Codex's test tampers the audit flag against its own counts, which a different clause refuses. The stress family's byte pins on its four parents (`S4`) had no test, and for R277 and R278 they are the only byte pins, because the attribution family pins R268 and R270 alone. | Corrected in `1cff51c` (test-only): each new test is red with its guard removed (220.3), and equal JSON with different bytes still refuses. |
+
+### 220.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Required gates at the pushed head `1bff115` (worktree) | 340 passed |
+| Required gates at the first pushed head `b212048` (export) | 336 passed, 3 skipped, 1 failed: only the `git check-attr` export artifact |
+| The two three-name test files at `b212048` and at `54e1fd4` (exports) | 8 failed, 27 passed, 14 errors at each |
+| Parent result bytes R268 A3 and R270 A1 | match `PARENT_RESULT_SHA256` |
+| Zero-slippage contrasts B−A, C−A, D−C, interaction, D−A | +12.8000, −1.8674, +13.6636, +0.8635, +11.7961 pp: reproduce |
+| 5-bps contrasts | +12.1723, −1.7982, +13.0789, +0.9066, +11.2806 pp: reproduce |
+| Stress-minus-parent return gaps R280, R281, R282, R283 | −4.2012, −4.8289, −4.1320, −4.7167 pp: reproduce |
+| Annual B−A rows and t, zero-slippage and 5-bps | +4.72, +0.20, −2.22, +6.17, −1.84 (t 0.82); +4.64, +0.14, −2.28, +6.15, −1.84 (t 0.80): reproduce |
+| Fill audits R280–R283 | buys + sells equal filled orders in each arm; zero non-adverse and zero unverifiable fills; minimum 5.0000 bps in each |
+| Baseline target paths | R277, R280 and R281 equal R268 A3's `e2a4ea68…`; R278, R282 and R283 equal R270 A1's `a0b8cfce…` |
+| Input digests | one membership/cap digest and one ETF-panel digest across all eight arms |
+| Look accounting 289/226/38/693 → 298/233/40/699 | reconciles: +9 shared (R277, R278, R279 A1, R280, R279 A2, R281 A1, R282, R283, R281 A2), +7 development, +2 infrastructure, +6 cells; the shared ledger has a heading for every launch |
+| Lean key grammar | `LocalObjectStore` pattern `^\.?[a-zA-Z0-9\\/_#\-\$= ]+\.?[a-zA-Z0-9]*$`, read at the Lean source: `.json.gz` fails, `.gz` passes |
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `A1` | adapter: `qcom_exclusion_three_name` dropped from `_candidate`, the `908c9b0` state | red: 8 failed, 27 passed, 14 errors | `test_exact_projection_and_offline_preview`, `test_fake_cloud_launch_and_one_bounded_read[R242]` through `[R245]`, and 14 recovery-file setup errors |
+| `S1` | stress comparison: parent-only input-digest refusal removed (`ARV2D219-001`) | red: 1 failed, 39 passed | `test_saved_four_arm_stress_requires_common_input_and_valid_fills` |
+| `S2` | stress parser: parent baseline-path refusal removed | red: 1 failed, 39 passed | `test_stress_parser_accepts_only_digest_bound_five_bps_report` |
+| `S3` | stress parser: a valid run with an invalid audit admitted | **green: 40 passed** → pinned by `1cff51c`; afterwards red: 1 failed, 44 passed | `test_stress_parser_refuses_a_valid_run_whose_consistent_audit_is_invalid` |
+| `S4` | stress parents: result-byte check removed | **green: 49 passed** → pinned by `1cff51c`; afterwards red: 4 failed, 50 passed | `test_stress_parent_result_bytes_are_pinned_for_every_parent[R268]`, `[R277]`, `[R278]`, `[R270]` |
+| `S5` | stress comparison: whole common input, fill, fee and order gate disabled | red: 1 failed, 39 passed | `test_saved_four_arm_stress_requires_common_input_and_valid_fills` |
+| `S6` | stress comparison: fixed-pair selection-path refusal removed | green: 40 passed | none; redundant by construction: the parser already binds each arm's baseline path to its pinned parent path, so each pair is equal |
+| `F1` | fill audit: a zero-slippage fill counted as adverse | red: 10 failed, 30 passed | `test_projected_fill_audit_refuses_zero_slip_or_stale_bar[100-2021-01-05-non_adverse_fill_count]` plus nine pin cascades |
+| `F2` | fill audit: the sell side no longer required | red by pin cascade only: 9 failed | none behavioural; the rendered audit is frozen by the projection hashes and all four runs are complete |
+| `F3` | fill audit: stale-bar refusal removed | red: 10 failed, 30 passed | `test_projected_fill_audit_refuses_zero_slip_or_stale_bar[100.05-2021-01-04-unverifiable_fill_count]` plus nine pin cascades |
+| `AT1` | attribution: fixed-holdings path refusal removed | red: 1 failed, 8 passed | `test_both_factorial_holdings_paths_are_load_bearing` |
+| `AT2` | attribution comparison: account, order, fee and input gate disabled | **green: 49 passed** → pinned by `1cff51c`; afterwards red: 4 failed, 54 passed | `test_factorial_comparison_refuses_a_changed_input_vintage_or_account[…]`, all four cases |
+| `AT3` | attribution parents: validity and holdings-path refusal removed | green: 9 passed | none; redundant by construction: the parent result bytes are hash-pinned first, which fixes both fields |
+| `AT4` | attribution comparison: two valid results admitted | green: 9 passed | none; unreachable by construction: the launcher refuses a retry unless every earlier attempt ended with `run_valid` false |
+| `P1` | R277 runtime: reference baseline-path refusal disabled | red: 2 failed, 4 passed | `test_r277_authenticates_profile_and_refuses_changed_baseline_path`, `test_r277_aggregate_actually_refuses_a_valid_but_wrong_baseline_path` |
+| `C1` | R279 A2: local failed-A1 predecessor refusal removed | green: 9 passed | none; redundant: the remote run census independently requires the exact A1 backtest in `Runtime Error`, and A2 is spent |
+| `R1` | R281 recovery: pinned project ID changed | red: 1 failed, 8 passed | `test_r281_a2_reuses_exact_project_source_and_two_empty_run_censuses` |
+
+All trials ran in a separate export of `1bff115` under the session
+scratchpad, never in the worktree, without `-x`, with `-rfE`, and with
+failing test names captured; every mutated file was restored byte-identical
+after each trial. The unmutated baseline of the seven files was green
+(122 passed).
+
+### 220.4 Results, read on the record's own terms
+
+- **The factorial decomposes the same two-year signature.** AR weighting on
+  the cap-selected names (B−A) is +4.72, +0.20, −2.22, +6.17 and −1.84
+  points by year, t = 0.82 over five years. The AR entry/count rule at base
+  weights (C−A) is +0.20, −0.01, −0.29, −0.25 and −0.66 points, t = −1.40.
+  So the weight overlay carries 2021 and 2024 and gives back 2023 and 2025,
+  and the entry rule is small and mostly negative. This refines section
+  217's `ARV2R217-003`; it does not add an independent replication.
+- **The contrast survives 5 bps, and the gaps fit 5 bps applied once.** Each
+  stressed arm trails its parent by 4.13–4.83 points. Dividing each parent
+  gap in ending equity by 5 bps of the stressed arm's filled notional gives
+  a mean compounding factor of 1.35–1.36 in all four arms; smooth growth at
+  the observed 2.2–2.4× would give about 1.46–1.49. A systematic 10-bps
+  charge on one side would imply about 0.90, implausible for costs spread
+  across a growing account. The audit itself bounds slippage only from
+  below, as section 219.3 says.
+- **The capacity leg is correctly unavailable, and its meaning depends on
+  account size.** Every arm starts at $1,000,000 and ends near $2.2–2.4
+  million. At that size, 1% of 20-session volume is unlikely to bind for the
+  ETFs and large-cap stocks and could bind only for the smallest
+  constituents; at institutional size the leg becomes decisive. Any future
+  capacity statement must name the account size it assumes.
+- **R279 settles the clock mechanism, not forward readiness.** A1's callback
+  fired at 09:20 once an extended-hours minute feed drove the clock, which
+  confirms the section 217 hypothesis. A2 then persisted and read back the
+  input. Both ran as backtests over already-published data, so vendor
+  point-in-time availability remains unproven.
+
+### 220.5 Improvement plan
+
+1. **When a shared adapter allowlist changes, run every test file that builds
+   a plan through that adapter before pushing** (`ARV2R220-001`). The
+   three-name files are the files that went red; `grep -l "build_plan("` over
+   `tests/analyst_revisions_v2` lists the set.
+2. **Record a defect's origin from `git log -S` or `git show`, and its scope
+   from the complete failing set**, not from the first focused selection
+   that exposed it.
+3. **Report the maximum and each side's minimum adverse difference** in any
+   future stress audit, so the audit bounds slippage from both sides, and
+   test a one-sided fill set behaviourally (`F2` is caught only by hashes).
+4. **Name the account size** beside any capacity or participation result.
+5. **Forward path.** Build the common predecision snapshot and two-arm
+   protocol on R279's mechanics, with vendor availability captured live
+   before 09:20 rather than inferred from a later backtest.
+
+### 220.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the factorial shows the same two-year signature. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279 A1 and A2; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2D219-001`, `-002`, `-003` | P2 | Corrected by Codex in-range; `-002`'s origin and scope are corrected in `ARV2R220-001`. |
+| R281 A1 transport cause | n/a | Unresolved; A1 was spent conservatively and A2 completed in the same project. |
+| `ARV2D213-002`, `ARV2R211-001`, `ARV2D213-003` | P3 | Documented. |
+| `ARV2R220-001` | P3 | Documented this round. |
+| `ARV2R220-002` | P3 | Corrected in `1cff51c`. |
+
+### 220.7 Validation
+
+Each scope is stated separately, following `ARV2CR218-001`. Runs used
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15).
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, in a byte-faithful export of the pushed head `1bff115` with `artifacts/analyst_revisions_v2` copied in | **3 failed, 9461 passed, 11 skipped, 35 warnings in 7958.81s (2:12:38).** Exactly three failures, all export artifacts, each re-run green in the real checkout: `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` shells to `git check-attr`, and an export has no `.git` (the firewall file passes 173 there); `test_recover_cli_uses_only_retained_local_artifacts` and `test_a2_cli_read_prints_only_rejection_census` call scripts whose designated-worktree guard refuses any other directory (2 passed there). The eleven skips are the standing ones: seven Windows-only directory-junction tests, three document checks that need a mainline Git ref an export lacks, and one top-five-only profile case. The export predates the pins of `1cff51c`; their two files are validated on the final tree below. |
+| Required gates at the pushed head | firewall, ML boundary, whole-package closure, lane-record integrity, active-document consistency (worktree at `1bff115`) | 340 passed |
+| The two files carrying the new pins | `test_qc_eight_attribution_study.py`, `test_qc_eight_execution_stress_projection.py` (worktree, final tree) | 58 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` (worktree, final tree) | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` (final tree) | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+The final tree differs from the pushed head `1bff115` only by this round's
+Claude commits, the test-only `1cff51c` and this record commit. Not
+exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run; the nine cloud attempts of sections 218–219 (eight
+backtests and R281 A1's pre-create stop) are attested only by Codex's
+receipts and the retained results re-read locally.

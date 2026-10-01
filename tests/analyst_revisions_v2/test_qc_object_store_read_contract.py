@@ -194,6 +194,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     six_universe_cap90_submission.py six_universe_coverage_submission.py
     six_universe_forward_construction_policy.py
     six_universe_forward_predecision.py
+    six_universe_forward_stock_selection_policy.py
     six_universe_matched_study.py six_universe_qcom_entry_only_projection.py
     six_universe_qcom_entry_only_study.py
     six_universe_qcom_exclusion_ar_range_policy.py
@@ -713,6 +714,12 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         research.analyst_revisions_v2 research.analyst_revisions_v2.forward_data_quality
         research.analyst_revisions_v2.canonical
         research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.six_universe_forward_construction_policy
+        """.split()
+    ),
+    "six_universe_forward_stock_selection_policy.py": tuple(
+        """
+        hashlib json pathlib types research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.six_universe_forward_construction_policy
         """.split()
     ),
@@ -1766,6 +1773,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "call:read_bytes", "import:pathlib",
     ),
     "six_universe_forward_predecision.py": (),
+    "six_universe_forward_stock_selection_policy.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
     "six_universe_qcom_exclusion_three_name_projection.py": (),
     "six_universe_qcom_exclusion_three_name_study.py": (),
     "six_universe_qcom_exclusion_coverage10_projection.py": (),
@@ -4982,6 +4992,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.six_universe_coverage_submission",
         "research.analyst_revisions_v2_qc.six_universe_forward_construction_policy",
         "research.analyst_revisions_v2_qc.six_universe_forward_predecision",
+        "research.analyst_revisions_v2_qc.six_universe_forward_stock_selection_policy",
         "research.analyst_revisions_v2_qc.six_universe_matched_study",
         "research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_projection",
         "research.analyst_revisions_v2_qc.six_universe_qcom_entry_only_study",

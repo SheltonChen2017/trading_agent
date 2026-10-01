@@ -239,6 +239,10 @@ Section 226 is Claude's independent review of `2f5cc92..b753476` (0 P0,
 0 P1, 0 P2, 1 P3): Codex's correction of the 99% holdings-identity floor
 (`ARV2CR225-001`, a miss in section 224) is accepted, the October 1 capture
 is verified by hash, and the test-only `8096a51` pins one identity guard.
+Section 227 counter-reviews both section-226 Claude commits and freezes a
+distinct, development-only forward stock-selection/fallback policy. Its
+historically informed choice is adaptive; input provenance, executable
+weights, execution, confirmatory evidence and paper authority remain open.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1014,9 +1018,10 @@ and price evidence, stock-selection/fallback and execution freezes, the
 formal protocol, and a separately permitted QC Paper epoch remain open.
 Section 226 is Claude's independent review of the exact pushed range
 `2f5cc92..b753476` (section 225), with the test-only correction `8096a51`.
-The immediate next step is that Codex counter-reviews section 226 and both
-Claude commits of this round, then advances one bounded input/clock or
-stock-selection/fallback milestone.
+Section 227 counter-reviews both section-226 Claude commits and freezes only
+the outcome-free selection/fallback rule; it does not prove inputs or make a
+forward decision. Claude will review section 227 and its exact pushed
+source/test/record range before Codex advances another bounded milestone.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -2779,6 +2784,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-01 | Claude independent review of section 223: the counter-review of section 222 and the common-predecision diagnostic | `fc94f8c` -> `53cf4ae` -> this record commit | Section 224: one commit `65a150c..fc94f8c` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 222 accepted; zero QC or provider calls, looks, evaluations, or cells | Bound the validator to the producer's real bytes and pinned six boundaries (`53cf4ae`, test-only, each red with its guard moved); section 4 names section 224, banner sentence added, this row appended; no production line changed | Required gates and new tests at the pushed head, standing lane selection in a byte-faithful export of `fc94f8c`, twenty mutation trials, `compileall`, `git diff --check`; exact counts in 224.7 | 0 P0, 0 P1, 0 P2, 2 P3 (`ARV2R224-001`, `-002`): validator never run on producer bytes, and six untested boundaries (both corrected) | Single push of this round's Claude commits; Codex counter-reviews section 224 |
 | 2026-10-01 | Codex section-224 counter-review, separate claimed holdings-security mapping and one pre-cutoff development capture | `2f5cc92` -> this round's final commit | Section 225 accepts both Claude commits and closes `ARV2R224-001/-002`; prospectively corrects `ARV2CR225-001` P2 without rewriting the six-universe construction policy or spent artifacts. One read-only provider capture and quality receipt, zero QC calls, outcomes, orders, paper looks, research evaluations or cells; floor remains 298/233/40/699. | A canonical, hash-pinned, as-of claimed security-identity input now supplies the exact 99% ETF holdings weight check; vendor analyst mapping stays separate. Private October 1 capture/receipt hashes and redacted timestamps/counts are in 225.3. The diagnostic remains refusal-only and non-decision-ready. | Focused tests, import/record gates, compilation, diff and status in 225.4; no complete Codex lane suite. | `ARV2CR225-001` P2: prior code conflated holdings identity with analyst-vendor coverage, corrected here. Independent identity provenance, first-publication availability, execution, stock-selection/fallback, protocol, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 225 and its source/test/record range before the next bounded Codex round. No paper/live/funded/broker/real-order authority. |
 | 2026-10-01 | Claude independent review of section 225: the counter-review of section 224, the holdings-identity input, and the October 1 capture | `b753476` -> `8096a51` -> this record commit | Section 226: one commit `2f5cc92..b753476` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 224 accepted, including `ARV2CR225-001`, a miss in section 224; zero QC or provider calls, looks, evaluations, or cells in this review | Pinned the padded-QC-SID refusal (`8096a51`, test-only, red with the check removed); verified the October 1 capture by hash and validated receipt; section 4 names section 226, banner sentence added, this row appended; no production line changed | Required gates and affected tests at the pushed head, standing lane selection in a byte-faithful export of `b753476`, fourteen mutation trials, blueprint 17.2 and 18.1 read, `compileall`, `git diff --check`; exact counts in 226.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R226-001`): one untested identity guard (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 226 |
+| 2026-10-01 | Codex section-226 counter-review and declarative future selection/fallback freeze | `377741c` -> this round's final record commit | Section 227 accepts both Claude commits, including the `ARV2R226-001` test correction, and freezes one adaptive, outcome-free forward rule child; zero QC/provider calls, outcomes, looks, evaluations, cells or orders; floor 298/233/40/699. | Distinct future hybrid: 25% name-count/cap-covered floors and five-name admission with a stricter 95–105% complete-book interval, cap-ranked/count-matched AR-on holdings, AR-off cap-only control, XLE cap-only entry, conditional exact-SID QCOM, own-ETF fallback and explicit false action authority. It is not an exact R232/R237 replay or an executable selector. | Focused policy/closure 114 passed; affected policy, input, snapshot, closure, dataset/ML import and record selection 526 passed; compilation and diff clean. No complete Codex lane suite. | No new defect in the two Claude commits. `ARV2D227-001` P3 initial QC-SID tie-break corrected to mapped security ID before push. Independent security names, own-ETF identity, vendor first-publication/crosswalk, scored input, execution, formal protocol, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 227 and the exact child/source/test/record snapshot before another Codex milestone. No paper/live/funded/broker/real-order authority. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -32386,3 +32392,106 @@ exercised here: no QuantConnect or provider endpoint, result read, or
 launcher was run in this review; the October 1 capture was verified only by
 local hashes, its validated receipt's clocks and counts, and its recorded
 authority.
+
+## 227. Codex counter-review of section 226 and declarative forward stock-selection/fallback freeze, 2026-10-01
+
+**Exact Claude range:** `b753476b0b6e98e56f854d764ff4b42cd3e05f7a..377741c4684a0c0895b452732b33076d5ecb0ad4`, two commits in one completed independent-review push. Codex verified the designated worktree root, lane branch and clean status; fetched only `codex/strategy-analyst-revisions-v2`. The shared lane checkout had already reached that remote head, so the ancestor-checked `--ff-only` merge was a no-op, not a branch switch. No earlier Claude range is being reprocessed.
+
+### 227.1 Per-commit counter-review
+
+| Claude commit | Disposition | Evidence and finding status |
+|---|---|---|
+| `8096a51` | accepted | Test-only padded-QC-SID case isolates the holdings-identity whitespace refusal. It goes red if that guard is removed; no production source or authority changed. `ARV2R226-001` is corrected. |
+| `377741c` | accepted | Record-only section 226 correctly disposes section 225, acknowledges Claude's missed `ARV2CR225-001`, separates the October 1 machine receipt from vendor publication/PIT proof, and states final-tree gates separately from the byte-faithful export's three known path/Git artifacts. Its banner, section-4 pointer and section-5 row are present. |
+
+Codex found no new P0–P3 defect in either Claude commit. The independent
+read-only counter-audit also accepted both; Codex's focused predecision and
+record selection passed **144/144** before this successor. No QC/provider
+call, result read, order or research look was made in the counter-review.
+
+### 227.2 Adaptive forward choice, not a replay or executable portfolio
+
+The owner-selected six-ETF/QCOM and AR-off/100%/200% construction parent
+remains frozen. This round makes an additive, hash-pinned **declarative**
+stock-selection/fallback child. It chooses the historically studied 25%
+SID-plus-name member-count floor, 25% cap-covered reported-weight floor,
+five verified-cap/name admission floor and top-ten cap ranking as design
+inputs. It deliberately **tightens** the historical 25% total-reported-
+weight lower bound to the existing predecision diagnostic's 95% complete-
+book bound (upper bound 105%). This is a distinct future hybrid selected
+after observing both 25% and 10% historical families. No 2021–2025 return
+or October 1 partial-day vendor row was used as a fresh threshold test; none
+of those outcomes is an untouched holdout or proof of forward efficacy.
+
+The initial child draft said to break market-cap ties by QC SID. An
+independent in-round audit checked the R232/R237 producer and found it uses
+the mapped security ID; `ARV2D227-001` (P3) was corrected in the child and
+its focused test **before** this one push. No selector or order had used the
+draft. This keeps the deterministic cap-descending, exact mapped-security-ID
+tie-break, while the independent mapping source remains unproven.
+
+The 99%-by-weight claimed valid-security mapping gate is separate from the
+25% name-count and cap-weight measures; analyst-vendor coverage is a fourth,
+separate input. For SPY, QQQ, SOXX, XLV and REMX, each AR-on arm requires
+at least five eligible positive-score names; that positive-score count sets
+the number (up to ten) of **market-cap-ranked** holdings. AR score ranking
+does not choose those identities. The AR-off control cap-ranks up to ten
+verified names without using AR for entry, count or weight. XLE cap-ranks
+up to ten in all arms without an AR-positive entry floor; that exception
+does not disable an otherwise authorized AR weight transfer on its selected
+names. The 100% and 200% transfer fractions remain those of the frozen
+parent, not leverage multipliers. Historical QCOM exclusion is **not**
+inherited: QCOM requires exact QC-SID cap, ETF weight and reference price
+and the separate forward crosswalk gate; a display ticker cannot repair it.
+
+Invalid identity/coverage or an under-five admission routes a sleeve's
+budget to its own ETF; unfilled top-ten slots, unresolved cap-covered budget
+and aggregate direct-stock-cap excess return to the contributing sleeve's
+ETF, never another sleeve. The rule states six-sleeve order, 98% gross,
+9.8% direct-stock aggregate cap and deterministic residual handling.
+There is **no selector or target producer in this round**. Current
+predecision inputs do not supply independently proven as-of security names,
+the exact own-ETF security identities or authenticated stock scores; source
+first-publication, crosswalk, prices, weight-transfer implementation,
+execution/fills, dates and forward epoch remain unbound. A frozen policy
+text cannot substitute for any of those and grants no QC, outcome, paper,
+order, funded or broker authority.
+
+### 227.3 Validation, exclusions and next gate
+
+The canonical child policy SHA-256 is
+`b691699baf506f8d7ef142439094527a936c73b37d3a2d39ed075315888bfcd0`.
+Its loader authenticates exact JSON types, keys, canonical bytes, the frozen
+parent cohort/QCOM/three-arm modes and all-false authority, then returns an
+immutable view. The new source/JSON/test files and the four whole-package
+closure registrations are the only code/test scope; the policy test mutates
+floors, count/selected pool, mapped-security-ID tie-break, XLE, QCOM,
+fallback, null bindings and action flags. The first in-round draft's QC-SID
+tie-break was corrected before final validation or any commit.
+
+| Focused check | Result |
+|---|---|
+| New policy and whole-package Object Store read-contract tests | **114 passed** after the tie-break correction |
+| Affected policy, predecision, real-byte snapshot, closure, dataset/ML import boundaries, lane-record and active-document selection | **526 passed** on the final source/test tree |
+| Lane-record integrity and active-document gates after the final record edit | **82 passed** |
+| Changed Python compilation and `git diff --check` | clean |
+
+Codex did not run the complete lane suite; Claude owns it. The
+shared floor remains **298 research looks / 233 development evaluations /
+40 infrastructure looks / 699 authenticated cells**; this round adds zero.
+The October 1 receipt still proves only this machine's pre-09:20 receipt,
+not first publication, immutable PIT or a complete session. R247's separate
+forward-input QC candidate remains attempt-exhausted.
+
+**Next serialized gate:** Claude independently reviews section 227 and the
+exact pushed child/source/test/record snapshot. Only after Codex
+counter-reviews a new complete Claude push may the lane bind genuine
+security-master/name, own-ETF, vendor/crosswalk, score and price provenance
+to a common predecision input and implement a refusal-tested no-order
+selector, including refusal if an ETF security identity collides with a
+direct-stock identity. Shared execution, preregistered two-arm estimands/power/missing
+data/stops/multiplicity within one formal Analyst look and total two-sided
+alpha <=1/80, formal ARV2-4 through ARV2-8 evidence, capacity, parity,
+paper algorithm and independent dossier remain open. Exact QC Paper
+project/mode/epoch permission is separately required before deployment.
+No funded/broker/real orders or live-efficacy claim are authorized.

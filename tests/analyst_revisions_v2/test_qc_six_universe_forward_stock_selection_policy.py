@@ -244,3 +244,27 @@ def test_parent_loader_failure_refuses(monkeypatch):
     monkeypatch.setattr(parent, "load_policy", unavailable)
     with pytest.raises(subject.ForwardStockSelectionPolicyError, match="failed authentication"):
         subject.load_policy()
+
+
+@pytest.mark.parametrize("mutate, reason", (
+    (lambda item: item.update(independent_confirmation_authorized=True), "authority or cohort"),
+    (lambda item: item["qcom_stock_admission"].update(display_ticker_is_identity=True), "QCOM rule"),
+    (lambda item: item["qcom_stock_admission"].update(ticker_alias_repair=True), "QCOM rule"),
+    (lambda item: item["qcom_stock_admission"]["all_required"].pop(), "QCOM rule"),
+    (lambda item: item["signal_semantics"]["control"].update(
+        forward_candidate_id="ARV2_FORWARD_AR_OFF_RENAMED"), "signal modes"),
+    (lambda item: item["signal_semantics"]["control"].update(
+        ar_weight_transfer_fraction="0.10"), "signal modes"),
+    (lambda item: item["signal_semantics"]["arms"][0].update(
+        forward_candidate_id="ARV2_FORWARD_AR_100_RENAMED"), "signal modes"),
+    (lambda item: item["signal_semantics"]["arms"][1].update(
+        ar_entry_count_enabled=False), "signal modes"),
+))
+def test_each_remaining_parent_condition_refuses_alone(monkeypatch, mutate, reason):
+    """Each case changes one parent field that the combined guard test leaves
+    untouched, so every condition of the parent check refuses on its own."""
+    changed = json.loads(parent.POLICY_PATH.read_bytes())
+    mutate(changed)
+    monkeypatch.setattr(parent, "load_policy", lambda: changed)
+    with pytest.raises(subject.ForwardStockSelectionPolicyError, match=reason):
+        subject.load_policy()

@@ -586,3 +586,15 @@ def test_material_between_text_and_document_close_refuses():
 def test_target_filing_date_outside_frozen_window_refuses(filing_date, period):
     with pytest.raises(SecCompleteSubmissionError, match="outside the frozen source window"):
         replace(_target(), filing_date=filing_date, period=period)
+
+
+# Section 119 (Claude review): the former-name change made one owner subsection
+# repeatable; a consecutively repeated non-repeatable one must still refuse.
+def test_legacy_consecutive_duplicate_filing_values_refuses():
+    header = _legacy_header().replace(
+        b"\n\tFILING VALUES:\n\t\tFORM TYPE:\t4\n",
+        b"\n\tFILING VALUES:\n\t\tFORM TYPE:\t4\n"
+        b"\n\tFILING VALUES:\n\t\tFILM NUMBER:\tInvented\n", 1,
+    )
+    with pytest.raises(SecCompleteSubmissionError, match="repeated or out of order"):
+        _project(_complete(header=header))

@@ -661,3 +661,28 @@ def test_crash_after_404_response_resumes_as_not_found_without_retry(monkeypatch
 def test_non_ascii_content_length_is_a_typed_selected_framing_refusal(declared):
     with pytest.raises(runner.SecCompleteAcquisitionError, match="ambiguous or oversized"):
         runner._selected_framing((("Content-Length", declared),), 100)
+
+
+# Section 119 (Claude review): isolate two selected-runner guards.
+def test_selected_dispatch_refuses_when_the_pacing_sleep_returns_early(
+    monkeypatch, tmp_path, _quick_capacity,
+):
+    monkeypatch.setattr(runner.time, "sleep", lambda _seconds: None)
+    plan = _plan(1, 2)
+    calls = []
+
+    def transport(url, _headers, _cap):
+        calls.append(url)
+        return _result(b"<SEC-DOCUMENT>invented parent")
+
+    with pytest.raises(runner.SecSelectedParentRunnerError, match="dispatch pacing was too early"):
+        _run(plan, tmp_path / "early", transport)
+    assert calls == [plan.requests[0].url]
+
+
+def test_committed_selected_root_cannot_be_resumed(tmp_path, _quick_capacity):
+    plan = _plan(1)
+    output = tmp_path / "committed"
+    _run(plan, output, lambda *_: _result(b"<SEC-DOCUMENT>invented parent"))
+    with pytest.raises(runner.SecSelectedParentRunnerError, match="committed selected-parent root cannot be resumed"):
+        _run(plan, output, lambda *_: pytest.fail("network was called"), resume=True)

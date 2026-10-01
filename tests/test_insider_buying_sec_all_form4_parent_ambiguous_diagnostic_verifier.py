@@ -342,3 +342,50 @@ def test_observed_capture_blob_must_match_exact_committed_file(monkeypatch):
     monkeypatch.setattr(verify.subprocess, "check_output", wrong_blob)
     with pytest.raises(verify.AmbiguousDiagnosticVerificationError, match="REFUSED"):
         verify._verify_observed_capture_blob(_COMMIT)
+
+
+# Section 119 (Claude review): the external report digest is the verifier's
+# trust anchor. A canonical, shape-valid report stored under the anchored
+# file name must refuse on the digest itself; earlier cases added an unknown
+# key, which the key-set check refused first. The read-only directory wrapper
+# replaces the specific reason with a generic one, so the reason is asserted
+# on the exception chain.
+def _refusal_chain(error: BaseException) -> list[str]:
+    reasons = []
+    current: BaseException | None = error
+    while current is not None:
+        reasons.append(str(current))
+        current = current.__cause__
+    return reasons
+
+
+def test_shape_valid_report_under_the_anchored_name_fails_the_external_digest(tmp_path):
+    receipt, report_path = _accepted(tmp_path)
+    anchor = hash_bytes(report_path.read_bytes())
+    report = json.loads(report_path.read_bytes())
+    assert report["finished_utc"].endswith("+00:00")
+    report["finished_utc"] = "2031-01-01T00:00:00.000000+00:00"
+    assert _write_json(report_path, report) != anchor
+    with pytest.raises(verify.AmbiguousDiagnosticVerificationError) as refused:
+        verify.verify_accepted_ambiguity_diagnostic(
+            receipt, report_path.parent, capture_git_commit=_COMMIT,
+            expected_report_sha256=anchor,
+        )
+    assert any("differs from its separate trusted digest" in reason
+               for reason in _refusal_chain(refused.value))
+
+
+@pytest.mark.parametrize("field,value", [
+    ("canonical_evidence", True),
+    ("envelope_reason", "REFUSED: invented reason"),
+])
+def test_reanchored_report_cannot_claim_canonical_evidence_or_a_refusal_reason(
+    tmp_path, field, value,
+):
+    receipt, report_path = _accepted(tmp_path)
+    report = json.loads(report_path.read_bytes())
+    report[field] = value
+    # The report is re-anchored and self-consistent, so only the report's own
+    # status and authority rule can refuse it.
+    with pytest.raises(verify.AmbiguousDiagnosticVerificationError, match="REFUSED"):
+        _verify(receipt, _repin_report(report_path, report))

@@ -544,3 +544,53 @@ def test_opening_gap_or_cash_reserve_breach_cannot_complete(
             status="filled", order_id=order_id, symbol=symbol,
             fill_quantity=quantity, fill_price=100,
         ))
+
+
+# Section 119 (Claude review): isolate the study's per-session and per-order
+# research-only gates, which no earlier test reached after initialization.
+@pytest.mark.parametrize("state", ["live", "disabled"])
+def test_session_handler_rechecks_live_mode_and_the_research_gate(
+    study: types.ModuleType, state: str,
+) -> None:
+    algorithm = _configured(study)
+    if state == "live":
+        algorithm.live_mode = True
+    else:
+        study.RESEARCH_BACKTEST_ENABLED = False
+    with pytest.raises(study.StockStudyRefusal, match="live or unapproved order path"):
+        algorithm._after_market_close()
+    assert algorithm.orders == []
+
+
+@pytest.mark.parametrize("state", ["live", "disabled"])
+def test_order_submission_rechecks_live_mode_and_the_research_gate(
+    study: types.ModuleType, state: str,
+) -> None:
+    algorithm = _configured(study)
+    row = algorithm._manifest.signals[0]
+    symbol = next(iter(algorithm.securities))
+    if state == "live":
+        algorithm.live_mode = True
+    else:
+        study.RESEARCH_BACKTEST_ENABLED = False
+    with pytest.raises(study.StockStudyRefusal, match="research-only order gate disabled"):
+        algorithm._submit(row, symbol, "ENTRY", 1, row.decision_session)
+    assert algorithm.orders == []
+
+
+@pytest.mark.parametrize("side,quantity,reason", [
+    ("ENTRY", 0, "zero or malformed order quantity"),
+    ("ENTRY", 1.0, "zero or malformed order quantity"),
+    ("ENTRY", True, "zero or malformed order quantity"),
+    ("ENTRY", -1, "order direction drifted"),
+    ("EXIT", 1, "order direction drifted"),
+])
+def test_order_submission_refuses_malformed_quantity_or_direction(
+    study: types.ModuleType, side: str, quantity: object, reason: str,
+) -> None:
+    algorithm = _configured(study)
+    row = algorithm._manifest.signals[0]
+    symbol = next(iter(algorithm.securities))
+    with pytest.raises(study.StockStudyRefusal, match=reason):
+        algorithm._submit(row, symbol, side, quantity, row.decision_session)
+    assert algorithm.orders == []

@@ -270,3 +270,57 @@ def test_live_mode_refuses_before_loading_data(qc_module: types.ModuleType) -> N
     algorithm.live_mode = True
     with pytest.raises(qc_module.SignalManifestError, match="live"):
         algorithm.initialize()
+
+
+# Section 119 (Claude review): isolate skeleton guards no earlier test reached.
+# Each names its exact refusal, so a sibling guard cannot hide a deleted check.
+@pytest.mark.parametrize("shares", [2, 1000, -1, True, 1.0, "1"])
+def test_research_entry_shares_must_be_exactly_zero_or_one(
+    qc_module: types.ModuleType, shares: object,
+) -> None:
+    raw = _manifest()
+    qc_module.SIGNAL_OBJECT_STORE_KEY = "insider-buying/synthetic-test/manifest.json"
+    qc_module.APPROVED_SIGNAL_MANIFEST_SHA256 = hashlib.sha256(raw).hexdigest()
+    qc_module.RESEARCH_ENTRY_SHARES = shares
+    algorithm = qc_module.InsiderBuyingOrderSkeleton()
+    algorithm.object_store.content[qc_module.SIGNAL_OBJECT_STORE_KEY] = raw
+    with pytest.raises(qc_module.SignalManifestError, match="must be 0 or 1"):
+        algorithm.initialize()
+    assert algorithm.securities == {} and algorithm.orders == []
+
+
+def test_live_mode_is_rechecked_before_every_order(qc_module: types.ModuleType) -> None:
+    algorithm = _configured(qc_module)
+    algorithm.live_mode = True
+    with pytest.raises(qc_module.SignalManifestError, match="live mode is prohibited"):
+        algorithm._after_market_close()
+    assert algorithm.orders == []
+
+
+def test_window_past_the_shared_research_cutoff_refuses(qc_module: types.ModuleType) -> None:
+    from datetime import timedelta
+
+    payload = json.loads(_manifest())
+    payload["window_end"] = (qc_module.SHARED_RESEARCH_CUTOFF + timedelta(days=1)).isoformat()
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    with pytest.raises(qc_module.SignalManifestError, match="crosses holdout"):
+        qc_module.parse_signal_manifest(raw, hashlib.sha256(raw).hexdigest())
+    payload["window_end"] = qc_module.SHARED_RESEARCH_CUTOFF.isoformat()
+    payload["window_start"] = payload["window_end"]
+    raw = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    # The cutoff day itself is inside the window; refusal then comes from the
+    # row no longer fitting, not from the holdout rule.
+    with pytest.raises(qc_module.SignalManifestError) as refused:
+        qc_module.parse_signal_manifest(raw, hashlib.sha256(raw).hexdigest())
+    assert "crosses holdout" not in str(refused.value)
+
+
+def test_already_invested_security_cannot_receive_a_second_order(
+    qc_module: types.ModuleType,
+) -> None:
+    algorithm = _configured(qc_module)
+    symbol = algorithm._symbols["ACME"]
+    algorithm.portfolio[symbol] = types.SimpleNamespace(invested=True)
+    with pytest.raises(qc_module.SignalManifestError, match="repeated or already invested"):
+        algorithm._after_market_close()
+    assert algorithm.orders == []

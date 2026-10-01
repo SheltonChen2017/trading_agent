@@ -268,3 +268,28 @@ def test_observed_mode_rechecks_clean_commit_after_durable_start_before_dispatch
     assert checks == [1, 1]
     assert (output / "attempt-start.json").is_file()
     assert not (output / "commit.json").exists()
+
+
+# Section 119 (Claude review): every test in this file replaces the clean-lane
+# check, so its own dirty-tree clause had no test.
+def test_dirty_lane_is_not_an_exact_committed_diagnostic_state(monkeypatch):
+    import research.insider_buying_sec_all_form4_parent_ambiguous_diagnostic as module
+
+    commit = "c" * 40
+    root = str(module._LANE_ROOT)
+
+    def git_output(command, **_kwargs):
+        if command == ("git", "rev-parse", "--show-toplevel"):
+            return (root + "\n").encode()
+        if command == ("git", "branch", "--show-current"):
+            return b"codex/strategy-insider-buying\n"
+        if command == ("git", "rev-parse", "HEAD"):
+            return (commit + "\n").encode()
+        if command == ("git", "status", "--porcelain=v1", "--untracked-files=all"):
+            return b"?? invented-untracked-file\n"
+        pytest.fail(f"dependency blobs were read on a dirty lane: {command!r}")
+
+    monkeypatch.setattr(module.subprocess, "check_output", git_output)
+    with pytest.raises(module.AmbiguousParentDiagnosticError,
+                       match="exact clean committed Insider lane is required"):
+        module._verify_exact_committed_code(commit)

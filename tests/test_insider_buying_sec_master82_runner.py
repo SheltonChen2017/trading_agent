@@ -368,3 +368,50 @@ def test_public_entry_requires_a_committed_clean_lane_before_source_or_network(m
             capture_git_commit="short", transport=lambda *_: calls.append("network"),
         )
     assert calls == []
+
+
+# Section 119 (Claude review): the 500 ms completion-to-dispatch rule and its
+# dispatch-time recheck had no test in this runner.
+def test_master_requests_keep_completion_to_dispatch_spacing(monkeypatch, tmp_path) -> None:
+    clock = _clock(monkeypatch)
+    plan = _plan()
+    inner = _transport(_images(plan), [])
+    stamps = []
+
+    def fetch(url, headers, max_bytes):
+        stamps.append(clock.now)
+        return inner(url, headers, max_bytes)
+
+    _run(plan, tmp_path / "paced", fetch)
+    assert len(stamps) == 82
+    assert all(later - prior >= runner.MIN_REQUEST_INTERVAL_NS
+               for prior, later in zip(stamps, stamps[1:]))
+
+
+def test_master_dispatch_refuses_when_the_pacing_sleep_returns_early(monkeypatch, tmp_path) -> None:
+    _clock(monkeypatch)
+    monkeypatch.setattr(runner.time, "sleep", lambda _seconds: None)
+    plan = _plan()
+    calls = []
+    with pytest.raises(runner.SecMaster82RunnerError, match="dispatch pacing was too early"):
+        _run(plan, tmp_path / "early", _transport(_images(plan), calls))
+    assert calls == [plan.requests[0].url]
+
+
+def test_dirty_lane_is_not_an_exact_committed_code_state(monkeypatch) -> None:
+    root = str(Path(runner.__file__).resolve().parents[1])
+
+    def git_output(command, **_kwargs):
+        if command == ("git", "rev-parse", "--show-toplevel"):
+            return (root + "\n").encode()
+        if command == ("git", "branch", "--show-current"):
+            return b"codex/strategy-insider-buying\n"
+        if command == ("git", "rev-parse", "HEAD"):
+            return (COMMIT + "\n").encode()
+        if command == ("git", "status", "--porcelain=v1", "--untracked-files=all"):
+            return b"?? invented-untracked-file\n"
+        pytest.fail(f"dependency blobs were read on a dirty lane: {command!r}")
+
+    monkeypatch.setattr(runner.subprocess, "check_output", git_output)
+    with pytest.raises(runner.SecMaster82RunnerError, match="exact clean committed Insider lane"):
+        runner._verify_exact_committed_code(COMMIT)

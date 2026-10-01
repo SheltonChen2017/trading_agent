@@ -542,3 +542,52 @@ def test_mid_shard_lane_drift_refuses_before_next_observed_attempt(
     events = [json.loads(path.read_text()) for path in (
         output / "shard-0002").glob("event-*.json")]
     assert sum(event["kind"] == "attempt-start" for event in events) == 1
+
+
+# Section 119 (Claude review): the v3 executor made 1,847 real requests, yet no
+# test asserted its 500 ms completion-to-dispatch rule, the dispatch-time
+# recheck, or that the synthetic entry cannot reach the SEC client.
+def _multi_parent_transport(source, stamps):
+    expected = source[0].requests[6:]
+
+    def transport(url, _headers, _cap):
+        stamps.append(executor.campaign.time.monotonic_ns())
+        request = next(request for request in expected if request.url == url)
+        raw = _body(request)
+        return SecHttpResult(200, (("Content-Length", str(len(raw))),), raw)
+
+    return transport
+
+
+def test_v3_requests_keep_completion_to_dispatch_spacing(tmp_path, monkeypatch):
+    source = _stopped_source(tmp_path, monkeypatch, request_count=10)
+    stamps = []
+    _run(source, tmp_path / "paced", _multi_parent_transport(source, stamps))
+    assert len(stamps) == 4
+    assert all(later - prior >= executor.campaign.MIN_REQUEST_INTERVAL_NS
+               for prior, later in zip(stamps, stamps[1:]))
+
+
+def test_v3_dispatch_refuses_when_the_pacing_sleep_returns_early(tmp_path, monkeypatch):
+    source = _stopped_source(tmp_path, monkeypatch, request_count=10)
+    monkeypatch.setattr(executor.campaign.time, "sleep", lambda _seconds: None)
+    stamps = []
+    with pytest.raises(executor.RecoveryExecutorError) as refused:
+        _run(source, tmp_path / "early", _multi_parent_transport(source, stamps))
+    reasons = []
+    current: BaseException | None = refused.value
+    while current is not None:
+        reasons.append(str(current))
+        current = current.__cause__
+    assert any("dispatch pacing was too early" in reason for reason in reasons)
+    assert len(stamps) == 1
+
+
+def test_synthetic_v3_entry_cannot_use_the_reviewed_sec_client(source, tmp_path, monkeypatch):
+    def forbidden(*_args, **_kwargs):
+        raise AssertionError("a connection was attempted")
+
+    monkeypatch.setattr("http.client.HTTPSConnection", forbidden)
+    with pytest.raises(executor.RecoveryExecutorError,
+                       match="synthetic v3 transport cannot use the SEC client"):
+        _run(source, tmp_path / "real-client", executor.campaign._selected_sec_transport)

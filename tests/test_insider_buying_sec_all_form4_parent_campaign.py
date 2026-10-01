@@ -536,3 +536,103 @@ def test_resume_recovers_lock_and_empty_objects_shard_before_request(tmp_path):
                   resume=True)
     assert result.is_file()
     assert calls == [plan.requests[0].url]
+
+
+# Section 119 (Claude review): isolate campaign guards no earlier test reached.
+def test_resume_after_a_journaled_denial_never_redispatches(monkeypatch, tmp_path):
+    # A crash between the journaled 403 and the shard commit must not let a
+    # resume send the denied request again: the terminal is re-derived from
+    # the journal alone.
+    plan = _plan(1, 2, shard_size=2)
+    output = tmp_path / "denied-then-crashed"
+    calls = []
+    real_finalize = campaign._finalize_shard
+
+    def crash(*_args, **_kwargs):
+        raise KeyboardInterrupt
+
+    def denied(url, _headers, _cap):
+        calls.append(url)
+        return _response(status=403)
+
+    monkeypatch.setattr(campaign, "_finalize_shard", crash)
+    with pytest.raises(KeyboardInterrupt):
+        _run(plan, output, denied)
+    assert not (output / "shard-0000" / "commit.json").exists()
+    monkeypatch.setattr(campaign, "_finalize_shard", real_finalize)
+    with pytest.raises(campaign.CampaignError, match="shard ended incomplete"):
+        _run(plan, output,
+             lambda *_: pytest.fail("network was called after a journaled denial"),
+             resume=True)
+    assert calls == [plan.requests[0].url]
+    report = _json(next((output / "shard-0000").glob("shard-report-*.json")))
+    assert report["halted_reason"] == "REFUSED: SEC returned a terminal HTTP status"
+
+
+def test_dispatch_refuses_when_the_pacing_sleep_returns_early(monkeypatch, tmp_path):
+    monkeypatch.setattr(campaign.time, "sleep", lambda _seconds: None)
+    plan = _plan(1, 2, shard_size=2)
+    calls = []
+
+    def transport(url, _headers, _cap):
+        calls.append(url)
+        return _response(url)
+
+    with pytest.raises(campaign.CampaignError, match="dispatch pacing was too early"):
+        _run(plan, tmp_path / "early", transport)
+    assert calls == [plan.requests[0].url]
+
+
+def test_reused_bytes_with_a_valid_header_but_wrong_hash_refuse(tmp_path):
+    first = _request(1)
+    raw = _parent(first)
+    reuse = campaign.CampaignReuse(
+        accession_number=first.accession_number, object_sha256=hash_bytes(raw),
+        object_size_bytes=len(raw), prior_report_sha256="e" * 64,
+    )
+    plan = _plan(1, 2, reuses=(reuse,))
+    changed = raw.replace(b"\ninvented\n", b"\ninventEd\n")
+    assert changed != raw and len(changed) == len(raw)
+    campaign._validate_parent_header(changed, first.to_payload())
+    with pytest.raises(campaign.CampaignError, match="prior selected object changed before reuse"):
+        _run(plan, tmp_path / "substituted",
+             lambda *_: pytest.fail("network was called"),
+             reused_bytes={first.accession_number: changed})
+
+
+def test_resume_refuses_a_tampered_completed_object_before_network(tmp_path):
+    plan = _plan(1, 2, shard_size=2)
+    output = tmp_path / "tampered"
+
+    def interrupt_second(url, _headers, _cap):
+        if url == plan.requests[1].url:
+            raise KeyboardInterrupt
+        return _response(url)
+
+    with pytest.raises(KeyboardInterrupt):
+        _run(plan, output, interrupt_second)
+    (stored,) = (output / "shard-0000" / "objects").iterdir()
+    raw = stored.read_bytes()
+    changed = raw.replace(b"\ninvented\n", b"\ninventEd\n")
+    assert changed != raw and len(changed) == len(raw)
+    stored.write_bytes(changed)
+    with pytest.raises(campaign.CampaignError, match="object hash or size changed"):
+        _run(plan, output, lambda *_: pytest.fail("network was called"), resume=True)
+
+
+def test_completed_campaign_cannot_be_relaunched(tmp_path):
+    plan = _plan(1, 2, shard_size=2)
+    output = tmp_path / "complete"
+    _run(plan, output, lambda url, _headers, _cap: _response(url))
+    with pytest.raises(campaign.CampaignError, match="completed campaign cannot be relaunched"):
+        _run(plan, output, lambda *_: pytest.fail("network was called"), resume=True)
+
+
+def test_synthetic_campaign_cannot_use_the_reviewed_sec_transport(tmp_path):
+    output = tmp_path / "synthetic-real-transport"
+    with pytest.raises(campaign.CampaignError, match="synthetic campaign cannot use the SEC transport"):
+        campaign.run_synthetic_campaign(
+            _plan(1), output, transport=campaign._selected_sec_transport,
+            contact_email=CONTACT, capture_git_commit=COMMIT,
+        )
+    assert not output.exists()

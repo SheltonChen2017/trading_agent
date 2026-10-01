@@ -233,3 +233,34 @@ def test_parent_cannot_claim_future_authority_by_mocked_loader(monkeypatch):
     monkeypatch.setattr(parent, "load_policy", lambda: ancestor)
     with pytest.raises(subject.ForwardConstructionPolicyError, match="parent authority changed"):
         subject.load_policy()
+
+
+@pytest.mark.parametrize("path, alias", (
+    (("capabilities", "orders"), 0),
+    (("capabilities", "qc_launch"), 0),
+    (("common_eligible_cohort_required",), 1),
+    (("analyst_event_identity", "ticker_only_join_authorized"), 0),
+))
+def test_numeric_aliases_of_booleans_are_refused(path, alias):
+    """0 == False and 1 == True in Python; only the exact-type check refuses them."""
+    value = _raw_policy()
+    target = value
+    for key in path[:-1]:
+        target = target[key]
+    assert target[path[-1]] == alias
+    target[path[-1]] = alias
+    with pytest.raises(subject.ForwardConstructionPolicyError, match="policy changed"):
+        subject.validate_policy(value)
+
+
+@pytest.mark.parametrize("field, changed", (
+    ("forward_candidate_id", "ARV2_FORWARD_AR_OFF_RENAMED"),
+    ("tilt_fraction", "0.10"),
+))
+def test_parent_control_mismatch_refuses(monkeypatch, field, changed):
+    ancestor = json.loads(parent.POLICY_PATH.read_bytes())
+    assert ancestor["control"][field] != changed
+    ancestor["control"][field] = changed
+    monkeypatch.setattr(parent, "load_policy", lambda: ancestor)
+    with pytest.raises(subject.ForwardConstructionPolicyError, match="control changed"):
+        subject.load_policy()

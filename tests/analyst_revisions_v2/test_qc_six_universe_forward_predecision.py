@@ -1,6 +1,8 @@
 """Fixture-only predecision refusal checks; no QC, provider, outcome or order I/O."""
 
 import copy
+from datetime import datetime
+import gzip
 import hashlib
 import json
 from dataclasses import FrozenInstanceError
@@ -8,7 +10,9 @@ from dataclasses import FrozenInstanceError
 import pytest
 
 from research.analyst_revisions_v2.canonical import canonical_json_bytes
+from research.analyst_revisions_v2_qc import fresh_six_universe_snapshot as producer
 from research.analyst_revisions_v2_qc import six_universe_forward_predecision as subject
+from tests.analyst_revisions_v2 import test_qc_fresh_six_universe_snapshot as producer_tests
 
 
 SESSION = "2026-09-28"
@@ -240,3 +244,83 @@ def test_changed_or_noncanonical_bytes_cannot_be_relabelled_by_a_pin():
             crosswalk_bytes=b"", crosswalk_sha256="0" * 64,
             reference_price_bytes=b"", reference_price_sha256="0" * 64,
         )
+
+
+def test_actual_producer_snapshot_bytes_pass_the_predecision_validator():
+    """Both suites use hand-written snapshots; this binds the producer's real bytes.
+
+    A renamed field or changed canonical form in the producer would otherwise
+    leave both suites green while every real snapshot was refused.
+    """
+    algo = producer_tests._Algorithm()
+    algo.time = datetime(2026, 9, 28, 9, 0)
+    capture = producer.FreshSixUniverseSnapshot(algo, SESSION)
+    end = datetime(2026, 9, 25, 17, 0)
+    capture.accept("FUNDAMENTALS", [
+        producer_tests._row("A-SID", "A", cap="100", end_time=end),
+        producer_tests._row("QCOM-SID", "QCOM", cap="200", end_time=end),
+    ])
+    for etf in subject.ETFS:
+        capture.accept(etf, [
+            producer_tests._row("A-SID", "A", weight="0.50", end_time=end),
+            producer_tests._row("QCOM-SID", "QCOM", weight="0.50", end_time=end),
+        ])
+    algo.time = datetime(2026, 9, 28, 9, 20)
+    receipt = capture.persist_at_decision()
+    qc_bytes = gzip.decompress(algo.object_store.values[receipt["object_store_key"]])
+    qc_sha = hashlib.sha256(qc_bytes).hexdigest()
+    assert qc_sha == receipt["canonical_sha256"]
+    _, vendor, mapping, prices = _documents()
+    vendor_bytes = canonical_json_bytes(vendor)
+    vendor_sha = hashlib.sha256(vendor_bytes).hexdigest()
+    mapping["qc_snapshot_sha256"] = qc_sha
+    mapping["vendor_receipt_sha256"] = vendor_sha
+    prices["qc_snapshot_sha256"] = qc_sha
+    mapping_bytes = _ascii_bytes(mapping)
+    price_bytes = _ascii_bytes(prices)
+    report = subject.build_predecision_diagnostic(
+        decision_session=SESSION,
+        qc_snapshot_bytes=qc_bytes,
+        qc_snapshot_sha256=qc_sha,
+        vendor_receipt_bytes=vendor_bytes,
+        vendor_receipt_sha256=vendor_sha,
+        crosswalk_bytes=mapping_bytes,
+        crosswalk_sha256=hashlib.sha256(mapping_bytes).hexdigest(),
+        reference_price_bytes=price_bytes,
+        reference_price_sha256=hashlib.sha256(price_bytes).hexdigest(),
+    )
+    assert report.decision_ready is False
+    assert report.order_or_outcome_access is False
+    assert {arm.common_input_sha256 for arm in report.arms} == {report.common_input_sha256}
+
+
+@pytest.mark.parametrize(("part", "change", "reason"), [
+    ("qc", lambda d: d["sources"]["QQQ"].update(qc_callback_time_ny="2026-09-28T09:20:00-04:00"), "QC_SOURCE_NOT_PREDECISION"),
+    ("vendor", lambda d: d.update(capture_completed_at="2026-09-28T13:20:00.000000Z"), "VENDOR_CAPTURE_NOT_PREDECISION"),
+    ("mapping", lambda d: d["rows"][1].update(available_at_utc="2026-09-28T13:20:00Z"), "CROSSWALK_NOT_AVAILABLE_BY_DECISION"),
+    ("mapping", lambda d: d["rows"].append({**d["rows"][0], "qc_sid": "OTHER-SID"}), "CROSSWALK_AMBIGUOUS_EXACT_IDENTITY"),
+    ("qc", lambda d: d["sources"]["QQQ"].update(positive_constituents=[["A-SID", "0.5" + "0" * 126], ["QCOM-SID", "0.50"]]), "QC_MEMBER_ROWS_INVALID"),
+    ("qc", lambda d: d["sources"]["FUNDAMENTALS"].update(qc_source_end_time_ny="2026-09-23T17:00:00-04:00", diagnostic_raw_end_time_calendar_lag_days=5), "QC_DIAGNOSTIC_SOURCE_AGE_CHANGED"),
+])
+def test_exact_cutoff_identity_length_and_age_boundaries_refuse(part, change, reason):
+    """Each case sits exactly on a boundary that the one-minute-late cases miss:
+    a callback, vendor capture or crosswalk row at exactly 09:20, one vendor ID
+    mapped to two QC SIDs, a 129-character weight, and five-day fundamentals."""
+    documents = dict(zip(("qc", "vendor", "mapping", "prices"), _documents(), strict=True))
+    change(documents[part])
+    with pytest.raises(subject.ForwardPredecisionError, match=reason):
+        _run(**documents)
+
+
+def test_values_one_step_inside_each_boundary_are_accepted():
+    qc, vendor, mapping, prices = _documents()
+    qc["sources"]["QQQ"]["qc_callback_time_ny"] = "2026-09-28T09:19:59-04:00"
+    qc["sources"]["QQQ"]["positive_constituents"] = [["A-SID", "0.5" + "0" * 125], ["QCOM-SID", "0.50"]]
+    qc["sources"]["FUNDAMENTALS"].update(
+        qc_source_end_time_ny="2026-09-24T17:00:00-04:00",
+        diagnostic_raw_end_time_calendar_lag_days=4,
+    )
+    vendor["capture_completed_at"] = "2026-09-28T13:19:59.999999Z"
+    mapping["rows"][1]["available_at_utc"] = "2026-09-28T13:19:59Z"
+    report = _run(qc, vendor, mapping, prices)
+    assert report.decision_ready is False

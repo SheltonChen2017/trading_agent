@@ -226,6 +226,10 @@ positive caps, late clocks and unproven vendor/price provenance. It is
 never decision-ready; the complete stock-selection/fallback rule, genuine
 pre-cutoff vendor availability, independent crosswalk, execution, protocol
 and paper authority remain open.
+Section 224 is Claude's independent review of `65a150c..fc94f8c` (0 P0,
+0 P1, 0 P2, 2 P3): the input-only predecision diagnostic is accepted, and
+the test-only `53cf4ae` binds it to the snapshot producer's real bytes and
+pins six exact boundaries.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -988,10 +992,14 @@ and common-epoch predecision input protocol remain separate open gates.
 Section 222 is Claude's independent review of the exact pushed range
 `5a0ac38..7d078b9` (section 221), with the test-only correction `bc1150a`.
 Section 223 counter-reviews both Claude commits and implements only an
-outcome-free common-input diagnostic; Claude will review section 223 next.
-It does not freeze the still-open
+outcome-free common-input diagnostic. It does not freeze the still-open
 stock-selection/fallback or execution rules, establish real pre-cutoff
-vendor availability, or authorize a QC paper run.
+vendor availability, or authorize a QC paper run. Section 224 is Claude's
+independent review of the exact pushed range `65a150c..fc94f8c` (section
+223), with the test-only correction `53cf4ae`. The immediate next step is
+that Codex counter-reviews section 224 and both Claude commits of this round,
+then takes up independent pre-09:20 vendor, crosswalk and price evidence and
+the stock-selection, fallback and execution freeze.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -1005,8 +1013,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 221 (section 222); section 223 awaits
-independent review. Section 182 records the owner's exact
+the pushed range through section 223 (section 224). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -2752,6 +2759,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-01 | Codex section-220 counter-review and bounded future construction choice | `5a0ac38` -> this round's final record commit | Section 221: accept both Claude commits; freeze only the future six-ETF names, QCOM exact-SID/no-ticker treatment, and full AR entry/count plus owner-selected 100%/200% transfer against one AR-off control | New canonical, hash-pinned successor policy and refusal tests; the historical parent is authenticated, every action capability remains false, and future input/execution/epoch/dates/multiplicity/paper pins remain null. No QC/provider call, outcome read, paper look, result cell or shared-ledger change; floor remains 298/233/40/699. | Focused policy, package-closure, firewall, record/active-document, compile and diff gates reported in section 221; no Codex complete lane suite | No new P0–P3 finding in Claude's two commits; `ARV2R220-001` documented, `-002` corrected by Claude. Adaptive construction and incomplete stock-selection/input/execution gates remain explicit. | One final same-lane push; Claude independently reviews this bounded policy/record range before the next common predecision input milestone. No paper/live/funded/broker order authority follows. |
 | 2026-10-01 | Claude independent review of section 221: the counter-review of section 220 and the forward construction policy | `7d078b9` -> `bc1150a` -> this record commit | Section 222: one commit `5a0ac38..7d078b9` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 220 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned two unpinned loader guards (`bc1150a`, test-only, each red with its guard removed); section 4 names section 222, banner sentence added, this row appended; no production line changed | Required gates and policy tests at the pushed head, standing lane selection in a byte-faithful export of `7d078b9`, eleven mutation trials, `compileall`, `git diff --check`; exact counts in 222.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R222-001`): two loader guards without tests (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 222 |
 | 2026-10-01 | Codex section-222 counter-review and common-predecision diagnostic | `7d078b9` -> `65a150c` -> this round's final commit | Section 223 accepts both Claude commits, registers one input-only host-side diagnostic and its refusal tests, and binds AR-off/100%/200% candidate names to identical supplied canonical bytes; zero QC/provider calls, outcomes, looks, evaluations, cells or orders; floor 298/233/40/699 | The diagnostic checks seven-source QC census, pre-09:20 clocks, exact-SID ETF weight mapping, QCOM cap/member/price and claimed crosswalk/price receipts; it never marks decision-ready. Private September 28 capture receipts were reauthenticated read-only, and both are after the same-day decision cutoff. | Focused diagnostic/policy/snapshot tests 118 passed; exact whole-package closure, final-tree affected selection, compilation, diff and record gates reported in 223.3. No complete Codex lane suite. | Claude's `ARV2R222-001` correction accepted. In-round `ARV2D223-001` P2 exact-fraction threshold, `ARV2D223-002` P2 impossible fundamentals/QCOM status, and `ARV2D223-003` P2 unweighted ETF row refusals corrected before push. Actual vendor publication, independent crosswalk, price provenance, stock-selection/fallback, execution/protocol and paper permit remain open. | One final same-lane push; Claude reviews section 223 and the exact source/test/record range before another bounded step. No paper/live/funded/broker/real-order authority. |
+| 2026-10-01 | Claude independent review of section 223: the counter-review of section 222 and the common-predecision diagnostic | `fc94f8c` -> `53cf4ae` -> this record commit | Section 224: one commit `65a150c..fc94f8c` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 222 accepted; zero QC or provider calls, looks, evaluations, or cells | Bound the validator to the producer's real bytes and pinned six boundaries (`53cf4ae`, test-only, each red with its guard moved); section 4 names section 224, banner sentence added, this row appended; no production line changed | Required gates and new tests at the pushed head, standing lane selection in a byte-faithful export of `fc94f8c`, twenty mutation trials, `compileall`, `git diff --check`; exact counts in 224.7 | 0 P0, 0 P1, 0 P2, 2 P3 (`ARV2R224-001`, `-002`): validator never run on producer bytes, and six untested boundaries (both corrected) | Single push of this round's Claude commits; Codex counter-reviews section 224 |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -31984,3 +31992,129 @@ QC diagnostic. A QC Paper project/mode/epoch permit, independently reviewed
 ARV2-4 through ARV2-8 dossier and the separate ARV2-9 paper authority are
 still absent. No paper/live/funded/broker/real order or forward-efficacy
 claim follows from section 223.
+
+## 224. Independent Claude review of section 223: the counter-review of section 222 and the common-predecision diagnostic, 2026-10-01
+
+**Range reviewed:** `65a150c..fc94f8c`, one Codex commit in one push,
+disposed in 224.1, plus this round's Claude lane commits (the test-only
+`53cf4ae` and this record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called, and section 223 records none; the floor stays **298 / 233 / 40 /
+699**.
+
+**Codex's counter-review of section 222 (section 223) is accepted.** It
+accepts both Claude commits and keeps `ARV2R222-001` attributed to Claude's
+correction `bc1150a`.
+
+**Verdict.** The one commit is accepted after correction; none is rejected.
+**0 P0, 0 P1, 0 P2, 2 P3.** No production line changed in this round; the
+test-only `53cf4ae` binds the validator to the producer's real bytes and
+pins six boundaries. The required gates and the new tests pass at the pushed
+head, and section 223's banner sentence, ledger row and section-4 pointer are
+present.
+
+### 224.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `fc94f8c` | Section 223 counter-review; the input-only common-predecision diagnostic, its tests and closure registration | accepted after correction | The diagnostic is host-only and always returns `decision_ready=False` with `order_or_outcome_access=False` and four explicit refusal codes. It checks byte pins, canonical JSON, the 09:20 cutoff, a seven-source census, source chronology and age, fixed-point positive numbers, one-to-one as-of crosswalk rows, a 99% exact-identity weight floor by exact fractions, unweighted rows, and QCOM evidence. Codex's three in-round corrections (`ARV2D223-001` to `-003`) are each caught by a named test. The validator was never run on the producer's real bytes (`ARV2R224-001`), and six boundaries had no test (`ARV2R224-002`); both pinned in `53cf4ae`. |
+
+### 224.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R224-001` | P3 | `fc94f8c` | The validator's tests build the QC snapshot by hand, and the producer's tests check the producer only against itself. Nothing fed the producer's persisted bytes to the validator, so a drift between them would leave both suites green while every real snapshot was refused. Changing the producer's canonical JSON separators did exactly that: all 60 existing tests in the two files still passed. The two sides agree today on keys, canonical form, offset-aware New York times and fixed-point numbers. | Corrected in `53cf4ae` (test-only): the producer's real persisted bytes now pass through the full diagnostic; under the separator drift it is the only failing test. |
+| `ARV2R224-002` | P3 | `fc94f8c` | Six guards had no boundary test. The cutoff fixtures sit one minute late, so a callback, a vendor capture or a crosswalk row at exactly 09:20 was never refused by a test (`PD15`, `PD8`, `PD7`). One vendor ID mapped to two QC SIDs was untested; only the duplicate-SID half of the one-to-one rule was (`PD14`). The 128-character numeric bound had no test, although section 223 calls its refusal pinned; only the exponent case was (`PD12`). The four-day fundamentals age bound had no test (`PD16`). | Corrected in `53cf4ae` (test-only): six exact-boundary refusals and one test that places every value one step inside its boundary and must pass. Each refusal is red with its guard moved. |
+
+### 224.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Required gates, the new diagnostic tests and the construction-policy tests at the pushed head `fc94f8c` (worktree) | 432 passed |
+| Producer and validator agreement | same canonical JSON form, keys, offset-aware New York times, and fixed-point numbers; the producer initializes all seven superseded-callback counts and its fundamentals counts sum to `source_row_count` |
+| Look floor | unchanged at 298/233/40/699; no QC or provider action in section 223 |
+| Record hygiene | banner sentence, ledger row and section-4 pointer present for section 223 |
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `PD1` | unweighted constituent rows admitted (`ARV2D223-003`) | red: 1 failed | `test_unsafe_claims_refuse[…ETF_UNWEIGHTED_CONSTITUENT_ROWS_UNRESOLVED]` |
+| `PD2` | 99% exact-identity floor lowered to 98% | red: 2 failed | `test_unsafe_claims_refuse[…BELOW_99_PERCENT]`, `test_exact_fraction_rejects_sub_99_percent_coverage_hidden_by_decimal_rounding` |
+| `PD3` | 95% total-weight floor lowered to 94% | red: 1 failed | `test_exact_fraction_rejects_sub_95_percent_total_hidden_by_decimal_rounding` |
+| `PD4` | valid fundamentals with no positive cap admitted (`ARV2D223-002`) | red: 1 failed | `test_unsafe_claims_refuse[…QC_VALID_FUNDAMENTALS_HAVE_NO_POSITIVE_CAP]` |
+| `PD5` | QCOM status re-derivation removed | red: 1 failed | `test_unsafe_claims_refuse[…QC_QCOM_STATUS_CHANGED]` |
+| `PD6` | crosswalk end date made inclusive | red: 1 failed | `test_unsafe_claims_refuse[…CROSSWALK_NOT_VALID_AS_OF_DECISION]` |
+| `PD7` | crosswalk row available exactly at 09:20 admitted | **green** → pinned by `53cf4ae`; afterwards red: 1 failed | `test_exact_cutoff_identity_length_and_age_boundaries_refuse[mapping…NOT_AVAILABLE…]` |
+| `PD8` | vendor capture completed exactly at 09:20 admitted | **green** → pinned; afterwards red: 1 failed | `test_exact_cutoff_identity_length_and_age_boundaries_refuse[vendor…]` |
+| `PD9` | vendor capture started before the session admitted | red: 1 failed | `test_unsafe_claims_refuse[…VENDOR_CAPTURE_NOT_PREDECISION1]` |
+| `PD10` | reference price at or after the cutoff admitted | red: 1 failed | `test_unsafe_claims_refuse[…PRICE_NOT_PREDECISION]` |
+| `PD11` | QCOM cap, weight and price requirement removed | red: 2 failed | `test_unsafe_claims_refuse[…QCOM_CAP_WEIGHT_OR_REFERENCE_PRICE_UNAVAILABLE]`, both cases |
+| `PD12` | 128-character numeric bound removed | **green** → pinned; afterwards red: 1 failed | `test_exact_cutoff_identity_length_and_age_boundaries_refuse[qc…QC_MEMBER_ROWS_INVALID]` |
+| `PD13` | source end after callback admitted | red: 1 failed | `test_unsafe_claims_refuse[…QC_SOURCE_END_FOLLOWS_CALLBACK]` |
+| `PD14` | one vendor ID mapped to two QC SIDs admitted | **green** → pinned; afterwards red: 1 failed | `test_exact_cutoff_identity_length_and_age_boundaries_refuse[mapping…AMBIGUOUS…]` |
+| `PD15` | QC callback exactly at 09:20 admitted | **green** → pinned; afterwards red: 1 failed | `test_exact_cutoff_identity_length_and_age_boundaries_refuse[qc…QC_SOURCE_NOT_PREDECISION]` |
+| `PD16` | fundamentals age bound widened from 4 to 5 days | **green** → pinned; afterwards red: 1 failed | `test_exact_cutoff_identity_length_and_age_boundaries_refuse[qc…QC_DIAGNOSTIC_SOURCE_AGE_CHANGED]` |
+| `PD17` | QCOM exact identity resolution removed | red: 1 failed | `test_unsafe_claims_refuse[…QCOM_EXACT_IDENTITY_UNRESOLVED]` |
+| `PD18` | vendor receipt session or transport check removed | red: 1 failed | `test_unsafe_claims_refuse[…VENDOR_RECEIPT_SESSION_OR_TRANSPORT_CHANGED]` |
+| `DR1` | producer canonical separators changed | red only on the new compatibility test: 1 failed, 60 passed across both files | `test_actual_producer_snapshot_bytes_pass_the_predecision_validator` |
+| `DR2` | producer lag field renamed | red: 2 failed, 59 passed | the new compatibility test and the producer's `test_next_midnight_qc_end_time_is_a_diagnostic_not_a_prior_session_claim` |
+
+All trials ran in a separate export of `fc94f8c` under the session
+scratchpad, never in the worktree, with failing test names captured; each
+mutated module was restored byte-identical to `fc94f8c`. The unmutated
+baseline of the validator file was green (35 passed with the
+compatibility pin, 42 with all pins).
+
+### 224.4 Reading the diagnostic on the record's own terms
+
+- **It says what it cannot prove.** Hash pins are caller-supplied, so the
+  diagnostic checks internal consistency, not origin. Its four refusal codes
+  keep vendor publication time, crosswalk review, price provenance and price
+  freshness explicitly unproven, and it never becomes decision-ready.
+- **Codex correctly kept the September 28 captures out.** Both private
+  receipts were captured after that day's 09:20 cutoff, so neither is a
+  predecision input.
+- **The real-bytes gap mattered most.** R279 A2's actual snapshot sits in
+  QuantConnect's Object Store and was never read back locally, so until
+  `53cf4ae` the validator had never seen anything the producer emits.
+
+### 224.5 Improvement plan
+
+1. **Bind every validator to its producer's real output** in a test, not
+   only to a hand-written fixture.
+2. **Test each time cutoff exactly at the boundary instant** as well as
+   outside it, and each one-to-one rule from both sides.
+3. **When a record says a refusal is pinned, name the test**, so a
+   neighbouring case cannot stand in for it.
+
+### 224.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2D223-001`, `-002`, `-003` | P2 | Corrected by Codex in-range; each caught by a named test. |
+| `ARV2D213-002`, `ARV2R211-001`, `ARV2D213-003`, `ARV2R220-001` | P3 | Documented. |
+| `ARV2R224-001`, `-002` | P3 | Corrected in `53cf4ae`. |
+
+### 224.7 Validation
+
+Each scope is stated separately. Runs used
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15).
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, in a byte-faithful export of the pushed head `fc94f8c` with `artifacts/analyst_revisions_v2` copied in | **3 failed, 9562 passed, 11 skipped, 35 warnings in 7387.54s (2:03:07).** Exactly three failures, all export artifacts, each re-run green in the real checkout: `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` shells to `git check-attr`, and an export has no `.git` (the firewall file passes 173 there); `test_recover_cli_uses_only_retained_local_artifacts` and `test_a2_cli_read_prints_only_rejection_census` call scripts whose designated-worktree guard refuses any other directory (2 passed there). The eleven skips are the standing ones: seven Windows-only directory-junction tests, three document checks that need a mainline Git ref an export lacks, and one top-five-only profile case. The export predates the pins of `53cf4ae`; their files are validated on the final tree below. |
+| Required gates and the new tests at the pushed head | firewall, ML boundary, whole-package closure, lane-record integrity, active-document consistency, the predecision and construction-policy test files (worktree at `fc94f8c`) | 432 passed |
+| The two files touched by the pins | `test_qc_six_universe_forward_predecision.py`, `test_qc_fresh_six_universe_snapshot.py` (worktree, final tree) | 68 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` (worktree, final tree) | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` (final tree) | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+The final tree differs from the pushed head `fc94f8c` only by this round's
+Claude commits, the test-only `53cf4ae` and this record commit. Not
+exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run, and section 223 records none.

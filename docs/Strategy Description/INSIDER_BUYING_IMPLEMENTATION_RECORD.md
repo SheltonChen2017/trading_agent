@@ -1,18 +1,20 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 119 RECORDS CLAUDE'S REVIEW OF ALL 25 CODEX COMMITS IN
-`5d73e11..5a87bcf` (SECTIONS 108-118): ALL ACCEPTED, WITH TYPED-REFUSAL
-FIXES IN `5db165f` AND TEST-ONLY PINS IN `01a6b7e`. EVERY REAL-DATA FIGURE
-CODEX RECORDED REPRODUCES, INCLUDING THE 99,394 PARTITION AND THE STOPPED V3
-ROOT (1,846 OF 1,847). THREE P2 FINDINGS ARE OPEN AND FAIL CLOSED: IB-1C V1
-REFUSES 19 OF THE 82 REAL QUARTERS; RETAINED V3 CUSTODY IS BOUND TO THE
-CURRENT BYTES OF FOUR SOURCE FILES; THE EXACT MASTER RECONCILIATION RULE
-FAILS ON SIX REAL QUARTERS. THE JOURNALS SHOW 19,973 SEC REQUESTS, 372 OF
-THEM IN THREE STOPPED RUNS THE RECORD DOES NOT MENTION. ONLY 19,526 OF THE
-99,394 TWO-QUARTER PARENTS ARE HELD; THE LANE IS NOT BACKTEST-READY. CODEX
-COUNTER-REVIEW OF THE THREE CLAUDE COMMITS IS REQUIRED. NO OUTCOME/QC JOB,
-BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING ACTIVITY OCCURRED.
-LOOKS 0/0/0.**
+Status: **SECTION 120 COUNTER-REVIEWS CLAUDE'S EXACT THREE-COMMIT RANGE
+`5a87bcf..d6242f9`. THE REVIEWED IMPLEMENTATION IS CONDITIONALLY ACCEPTED
+WITH THREE OPEN FAIL-CLOSED P2 GATES; IT IS NOT AN ACCEPTED 82-QUARTER
+CORPUS OR BACKTEST CANDIDATE. THE 82-QUARTER EXACT MASTER GATE HAS
+SEVEN NONEXACT QUARTERS, INCLUDING A FILING-DATE CONFLICT CLAUDE DID NOT
+COUNT IN ITS SIX MISSING-ACCESSION QUARTERS. TEST-ONLY CORRECTIONS ARE LOCAL
+AND UNPUSHED. THE STOPPED V3 ROOT IS PRESERVED WITH 1,846 COMPLETED OF
+1,847 STARTS, AND ONLY 19,526 OF THE FROZEN 99,394 TWO-QUARTER PARENTS
+ARE SOURCE-BOUND; 79,868 WERE ORIGINALLY UNATTEMPTED. CLAUDE RECONCILED
+19,973 JOURNALED SEC REQUESTS, INCLUDING 372 IN THREE EARLIER STOPPED
+RUNS NOT PREVIOUSLY RECORDED. OWNER POLICY AND SOURCE/RIGHTS/PIT/MAPPING/
+LOOK/QC GATES BLOCK THE NEXT MILESTONE AND ANY PUSH. THE ONE-SHOT CLAUDE
+MONITOR IS PAUSED. NO NEW SEC OR PROVIDER REQUEST, LICENSED ROW, OUTCOME
+LOOK, QC JOB, BACKTEST, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR
+TRADING ACTION OCCURRED IN THIS COUNTER-REVIEW. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -213,7 +215,16 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Claude review | `fdb32db` -> `52bcef1` (code correction) -> `fb2df3b` (test pins) -> this review record | Independent review of the section-103 counter-review, the exact-16 XML adapter, the IB-1C readiness report, and the section-106 complete-text source build-ahead (`f8877fe..fdb32db`, 14 commits, 0 merges) | Armed a watcher on `a6b7595` and started only after Codex pushed `fdb32db`. Dispositioned all 14 commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Replayed the three retained real roots read-only with aggregates only, and verified from the journals that the 22 new SEC requests stayed inside the recorded scope with no contact address in any Codex-written file. Probed malformed inputs in memory, ran 145 direct and 8 combined mutants, fixed two untyped failure paths, and pinned the untested guards. | Pushed `fdb32db`: complete suite **9,433 passed, 38 skipped, 0 failed in 479.61s**. Real roots: complete-text replay **16 of 16**, embedded XML equal **16 of 16**, master indexes vs IB-1B **0 missing, 0 extra, 0 form disagreements**, IB-1C bridge **16 of 16** with 4 quarantined. Red/green **4 failed then 4 passed** and **2 failed then 2 passed**. Mutation **54 to 86 of 98** (section 106) and **21 to 33 of 46** (sections 104-105), survivors classified. Lane gate **3,317 passed** on both Pythons. Final tree: complete suite **9,515 passed, 38 skipped, 0 failed in 442.78s**; compileall exit **0**. **0 looks**. | `IBSECCOM-CR01` P3 closed in `52bcef1` (missing document field raised KeyError). `IBSECCOM-CR02` P3 closed in `52bcef1` (corrupt master.gz raised zlib.error). `IBSECCOM-CR03` P3 closed in `fb2df3b` (broad refusal matches hid deleted guards). `IBSECCOM-OBS01` open (stale docstring; tagged-header branch synthetic-only for complete text). `IBSECACQ-CR03` open for real multi-owner headers; `IBSECACQ-CCR03` open, process. No open P0-P2. | Codex counter-reviews `52bcef1`, `fb2df3b`, and this record. The owner may wish to confirm that the section-106 preauthorization covers the 22 SEC requests, and should confirm the 82-quarter census explicitly before any crawl. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-29 | Codex counter-review and bounded implementation | `5d73e11..PUSHED_HEAD`; `e85cc24` census code and this section-108 record | Accept Claude's three-commit section-107 review and perform a source-bound, read-only 82-quarter retained-ZIP census | Accepted `52bcef1`, test-only `fb2df3b`, and record `5d73e11` separately. Added a versioned zero-I/O receipt that binds the exact retained CSV and 82 hash-checked ZIPs, validates one ZIP at a time and streams SUBMISSION records to count six forms and 4/4-A targets. Closed the stale complete-submission docstring. No high-volume crawl or real IB-1C advancement. | Claude's prior full-suite result is reviewer evidence only. Codex focused final selection **609 passed** on Python 3.12.14; new/preflight/import selection **43 passed**, record/active-document/import selection **144 passed**; three touched Python files compiled in memory; census run twice with identical hash `2c93041a...6bd83c33`; diff/show checks clean. No complete suite by Codex. Looks 0/0/0. | Incoming `IBSECCOM-CR01`/`CR02`/`CR03` closures accepted. Precommit `IBZIPC-R01`/`R02`/`R03` P2 fixed with red/green; typed-refusal P3 edge fixed; `IBSECCOM-OBS01` P3 closed. Historical open P3 and shared `IBSH-CR01` retained. No open current-lane P0-P2. | Make one same-lane push; Claude reviews every Codex commit in `5d73e11..PUSHED_HEAD` and Codex later counter-reviews every Claude commit. Before any broad crawl, review an accession-specific complete-text/acceptance-metadata manifest and a viable capacity/target policy. No canonical/PIT, outcome, QC, paper/live or trading authority follows. |
 | 2026-10-01 | Claude review | `5a87bcf` -> `5db165f` (code correction) -> `01a6b7e` (test pins) -> this review record | Independent review of the section-108 counter-review, the 82-quarter census, the gates 1-5 preparation, the SEC source runners and campaigns, the recovery and diagnostic modules, and the two QC entry files (`5d73e11..5a87bcf`, 25 commits, 0 merges) | Armed a watcher on `d478cfd` and started only after Codex pushed `5a87bcf`. Dispositioned all 25 commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Audited every new module line by line and verified each reported defect before acting. Replayed the retained roots read-only with aggregates only, reconciled 19,973 SEC requests from the journals, and ran three new real-data checks: 82 masters against the census, the IB-1C row rules against all 4,458,409 SUBMISSION rows, and the custody freeze. Fixed five untyped failure paths and pinned untested guards. | Pushed `5a87bcf`: complete suite **10,017 passed, 38 skipped, 0 failed in 611.34s**; every recorded hash and the 99,394 partition reproduce. Red/green **15 failed then 15 passed**. Mutation **66 to 94 of 139**. Lane gate **3,874 passed** on both Pythons. Retained roots replay identically after the fix commit. Final tree: complete suite **10,072 passed, 38 skipped, 0 failed in 611.80s**; compileall exit **0**. **0 looks**. | `IB1C-REAL-CR01` P2 open (IB-1C v1 refuses 19 of 82 real quarters). `IB1BCAMP-CR01` P2 open (v3 custody bound to current source bytes). `IBSRC-CR01` P2 open (exact master reconciliation fails on six quarters). `IBSECACQ-CR06`, `IBOFF-CR01`, `IBOFF-CR02` P3 closed in `5db165f`. `IBTEST-CR01`, `IBQC-CR01` P3 closed in `01a6b7e`. `IBREC-CR01..CR03`, `IB1BCAMP-CR02/CR03`, `IBSECACQ-CR05` and four observations open. No P0 or P1. | Codex counter-reviews `5db165f`, `01a6b7e`, and this record, adds its own ledger rows for sections 109-118 and a QC entry, and needs a decision on each open P2 before further acquisition. The owner may wish to confirm that the recorded directions covered all 19,973 requests. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
-
+| 2026-10-01 | Codex retrospective ledger index for section 109 | `f47e031..d478cfd` | Gates 1-5 preparation, not completion | D19-D28: 82-quarter header/resource preflight, zero-I/O master plan, pure reconciler, bounded IB-1C..E declarations and an unregistered IB-5 candidate. This row was added after Claude's section-119 review, not before the earlier push. | Section 109: 656/656 headers and focused 392; no SEC request or look in this slice. | `IB1B82-R01`, `IB1CE-R01`, `IBMASTER82-R01/R02` closed locally; `IB1C-REAL-CR01`, `IBSRC-CR01` and section-120 `IBSRC-CCR01` qualify the real-data gates. | Section 120 blocks promotion and next acquisition pending decisions. |
+| 2026-10-01 | Codex retrospective ledger index for section 110 | `af8ef7b..8759444` | Bounded SEC source and inert QC entries | D29-D35: 82-master and 9,337-selected-parent runners/replay, legacy header correction, exact 99,394 two-quarter locator; `insider_buying_qc_order_algorithm.py` and `insider_buying_qc_stock_order_study.py` are default-off, separate LEAN-only order entry files, not an authorized job or result. Their first skeleton location inside the offline package was corrected before this review; the source tests and move are in `af8ef7b`, `7a5d6bb`, and `4505d05`. | Section 110: 9,337 selected replay; focused 88 and parser 204; QC jobs/looks/backtests 0/0/0. | `IBSECRP-R03` and `IB1BALL-R01` closed; selected-only coverage remains noncanonical. `IBREC-CR03` is addressed by this entry and section 120. | No source-completion or QC authority inferred. |
+| 2026-10-01 | Codex retrospective ledger index for section 111 | `d07b68a..b64acd1` | Full-parent campaign preparation | D36-D38: zero-I/O projection accounting and 13-shard campaign for 90,057 not in the selected set; immutable replay required before completion. | Section 111: real-source preflight only, focused 36 and 124; no campaign dispatch at that entry. | `IB1BCAMP-R01/R02` P2 and `IB1CSTR-R01` P3 closed red/green. | Later stopped-run history and section 120 supersede the prelaunch next step. |
+| 2026-10-01 | Codex retrospective ledger index for section 112 | `bc974f5` | First full-parent campaign stopped | From exact `b64acd1`, 8,342 requests yielded 9,539 completed parents and one HTTP-200 envelope refusal; 99,394 completion was not claimed, the refused body was not retained, and the root was preserved. | Section 112: two shard metadata/journal reports checked, not completed-root replay; no look/QC/backtest. | D39 stopped the root; no code defect was inferred from the fail-closed refusal. | No resume or duplicate request. |
+| 2026-10-01 | Codex retrospective ledger index for section 113 | `629bdf7` | Refusal recovery preflight | D40-D41: read-only partial-root replay, one-shot diagnostic boundary, source union, and inert continuation plan; 9,539 prior + one pending diagnostic + 8,139 selected + 81,715 later was conditional, not source completion. | Section 113: focused 49 then 82, exact old-root replay; no request at this preflight. | `IB1BCAMP-R03/R04` and `R05/R06` closed; `OBS01` retained. | One separately authorized diagnostic only; no inferred continuation. |
+| 2026-10-01 | Codex retrospective ledger index for section 114 | `20555de..c339ef6` | One-shot refused-parent result and offline correction | Owner-authorized one request returned 4,060 bytes but original diagnostic stayed `refused`; D43-D45 pad short source CIK only at the header target and replay the same immutable body as `offline_corrected_diagnostic`. | Section 114: read-only 99,394 partition preflight; focused 93 and boundary 102; no complete corpus/look/QC/backtest. | `IB1BCAMP-R07/R08` P2 and `R09` P3 closed; `IB1BCAMP-CR01` now identifies fragility in the current-byte receipt. | No rewrite or re-request of the refused parent. |
+| 2026-10-01 | Codex retrospective ledger index for section 115 | `10f4916..7dd4e50` | Synthetic-only v3 executor and verifier | D46-D48: fsynced no-duplicate continuation and independent completed-root verifier, with observed transport still disabled. | Section 115: focused 118 and active/boundary 104; zero observed v3 output or new request at that entry. | `IB1BCAMP-R10..R12` P3 closed; advisory-lock observation retained. | Observed launch required a separate exact gate. |
+| 2026-10-01 | Codex retrospective ledger index for section 116 | `eee1bc8..aa0d635` | Exact observed v3 source gate | D49-D50: pinned 99,394 partition, 81,715 never-attempted inventory, clean-lane checks before dispatch, SEC-only scope; no QC or outcome authority. | Section 116: read-only partition replay; focused 115 and boundary 129; no request at prelaunch entry. | `IB1BCAMP-OBS02` wording corrected; older findings retained. | Section 117 records the observed stop. |
+| 2026-10-01 | Codex retrospective ledger index for section 117 | `e6a0d02` | Observed v3 transport stopped | At exact `aa0d635` capture, TLS reset left 1,847 starts, 1,846 valid finishes/bodies and one unmatched start; no terminal campaign report. Original root remains immutable. | Section 117: read-only journal aggregates and focused 73; no retry, QC job, outcome or look. | D51-D52 stop/refrain; no confirmed code defect or completed corpus. | Any later diagnostic required distinct owner authority. |
+| 2026-10-01 | Codex retrospective ledger index for section 118 | `b5a1408..5a87bcf` | One authorized ambiguous-parent diagnostic and Claude handoff | D53-D55: separately journaled one-shot HTTP 200, accepted request-bound 7,373-byte body, external report SHA-256 `206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`; old v3 start remains unresolved. Source-bound arithmetic is 19,526/99,394 with 79,868 originally unattempted. | Section 118: focused 89 and boundary 119 pre-dispatch, independent acceptance replay post-request; no QC/outcome/backtest. | `IB1BCAMP-V3AMB01..04` closed red/green; Claude review and this counter-review are sections 119-120. | Stop before v4/acquisition/backtest until review and factual gates. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -15585,3 +15596,126 @@ deployment, capital, order, live, or trading surface was used. Real bytes
 read, in memory and read-only, were the 82 retained ZIPs and the retained
 roots named in 119.3 and section 107.2. Authorized outcome looks: **0**.
 Consumed outcome looks: **0**. Research looks: **0**.
+
+## 120. Codex counter-review of Claude's three commits; owner-decision stop (2026-10-01 UTC; local only)
+
+The only incoming range after Codex's pushed `5a87bcf3e0d0d7fbffc7b6735f66e9589a3b0ad7`
+is `5a87bcf..d6242f9dc291804493aefbd8c573d04f94cf1704`, in order:
+`5db165fc30a80ebd36ea50f60cc4e38bdb781a5b`,
+`01a6b7edfef067a33867749fa43bdb0d20cf31bf`, and
+`d6242f9dc291804493aefbd8c573d04f94cf1704` (zero merges). The exact
+designated worktree root and branch were verified, local `HEAD` and the
+matching fetched remote were both clean at `d6242f9`, and `5a87bcf` was a
+strict ancestor. Section 119 and the three commit contents identify Claude's
+independent review of that exact Codex push; shared Git authorship alone was
+not taken as proof. No fast-forward was necessary. The one-shot
+`insider-buying-claude-push` heartbeat was paused **before** this
+counter-review and must remain paused. This review touched only Insider lane
+tests and this lane record; no shared/project-wide document or
+`docs/SESSION_HANDOFF.md` changed.
+
+### 120.1 Per-commit dispositions
+
+| Incoming commit | Codex disposition | Independent countercheck and qualification |
+|---|---|---|
+| `5db165f` (production corrections and 15 regression cases) | **Accepted.** | Inspected each changed path, including all four Content-Length call sites and the forged-input refusal order. ASCII-only decimal checking precedes `int()` and typed refusals cover the three forged shapes and recursive receipt. None of the four v3 validator-source files changed. A new fake-HTTPSConnection test now directly pins the standalone `_sec_transport` branch; its `isdigit()` regression made 3 cases red and restoration made 3 green. No new production defect was confirmed. |
+| `01a6b7e` (test-only pins and import boundary) | **Accepted after lane-owned test correction in this local counter-review.** | The QC, resume, custody and framing pins inspect the intended guards; current production pacing uses response-completion timestamps and a pre-dispatch recheck. Three synthetic-real-transport guard tests lacked a network tripwire, two normal-spacing tests measured entry-to-entry rather than completion-to-entry, and the package-import check observed loaded modules only after import. Corrections below make those checks safe and precise without changing production economics or source custody. |
+| `d6242f9` (section 119 and status) | **Accepted with append-only factual correction and qualification in this section and retrospective section-5 rows.** | The 25-commit reviewed range, zero merges, 60 changed files, and 19,973-request arithmetic are consistent. The three topical P2 gates are credible and fail closed, but section 119's six-quarter statement counts missing-accession quarters only: the exact rule also refuses 2026Q2 for a filing-date conflict, making at least seven nonexact quarters (`IBSRC-CCR01`). “All accepted” in the former status header was too broad for a promoted corpus while P2s remain open; the current header states conditional implementation acceptance. Section 119's suggested literal-only custody receipt is not a sufficient fix by itself: historical replay must still bind the exact validator code that produced its decision. Its replay outcomes beyond the independent aggregate checks below remain Claude's evidence, not a new Codex complete-root certification. |
+
+The retrospective section-5 rows for sections 109-118 were added **after**
+Claude identified the missing ledger entries, without claiming they were
+present before `5a87bcf`. They also identify both default-off QC entry files
+and their earlier move out of the offline package. They do not relabel a
+synthetic order skeleton or QC study as an authorized run.
+
+### 120.2 Counter-review P0-P3 ledger and material checks
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `IBTEST-CCR01` | P1 | **CLOSED locally** | `01a6b7e` and generalized older guard tests | Campaign, master82 and selected-parent synthetic-real-transport tests | If a tested identity guard regressed, the test could call the real SEC transport on an invented SEC URL. This is a test-safety hazard, not evidence a request occurred. The v3 analogue already had a tripwire. | Direct source trace from those three tests to `http.client.HTTPSConnection`. | A red/green safety test must not itself dispatch to an external service when the guard is broken. | Mock the HTTPS constructor to fail before connection in all three tests. | All four guard tests green. Three separate in-memory alias-drift probes reached only the mocked network tripwire; no connection was made. |
+| `IBTEST-CCR02` | P2 | **CLOSED locally** | `01a6b7e` | Master82 and v3 normal-spacing tests | Their prior entry-to-entry stamps could pass a start-to-start-only pacer after a slow response, despite claiming completion-to-dispatch coverage. Production pacing was already completion-based. | Test and implementation inspection. | The claimed 500-ms safety interval must be measured from a completed transport. | Simulate a 750-ms response and compare its completion stamp to the next transport entry. | Both exact tests failed under temporary start-timestamp mutants (2 red), which were restored; both passed on the final code (2 green). |
+| `IBTEST-CCR03` | P3 | **CLOSED locally, bounded check** | `01a6b7e` | Lane import-boundary test | A post-import `sys.modules` scan alone could miss import-time network or process I/O. Static roots also do not cover every possible dynamic client. No current side effect was observed. | Review of the subprocess test body. | Keep this test from causing external I/O if a package import regresses. | Install a child-process audit hook before importing the package; block socket connection/name resolution and child process/shell events, with a synthetic audit-event positive control. | All three import-boundary tests pass. This is a bounded runtime guard, not a proof against every external channel. |
+| `IBTEST-CCR04` | P3 | **CLOSED locally** | `5db165f` | Standalone complete-acquisition SEC transport test | The `_sec_transport` non-ASCII Content-Length branch had no direct fake-connection test, despite the production correction being valid. | Direct call-site and test inspection. | Pin refusal before any body read, without an SEC request. | Three invented-header fake-connection cases. | `isdigit()` mutant: 3 red; restored production: 3 green. |
+| `IBREC-CCR01` | P3 | **CLOSED locally** | `d6242f9` | Current status and section 119.7 | Unqualified “all accepted” could be read as corpus/backtest acceptance; comparing only a stored receipt literal would sever the executing validator from historical custody. | Section 119 versus the three open P2s; source-hash/replay path. | Keep implementation review distinct from data and research authorization. | Current status, this per-commit disposition, and the exact-code-binding qualification above. | Active-document/record checks below. |
+| `IB1C-REAL-CR01` | P2 | **OPEN, accepted finding** | `d6242f9` | IB-1C and 82-quarter readiness contracts | Short source CIK and accession/filing-year mismatch fail closed; IB-1C cannot construct all affected quarters, including 2022Q4, under v1. | The row validators require ten digits and matching years. Independent read-only aggregate streaming of the 82 retained ZIPs reproduced 4,458,409 SUBMISSION rows, 146 short-CIK rows across nine quarters (132 Form 4/4-A), and 15 year-mismatch rows across ten disjoint quarters: 19 quarters total. No row identity or content was printed. | Padding only for comparison while preserving raw lineage is plausible, but treatment of the 15 mismatches and one consistent preregistered policy need an owner decision. This is not in the source-only campaign call path. | None to production. | Static validators and independent aggregate counts; no IB-1C promotion. |
+| `IB1BCAMP-CR01` | P2 | **OPEN, accepted finding** | `d6242f9` | V3 union, plan and partial verifier | The stopped v3 replay hashes current bytes of four validator files; a later edit can make the preserved root unreplayable. | Inspected `_validator_source_sha256`, plan receipt binding and byte-exact partial replay. | A literal-only receipt comparison is insufficient; use an immutable versioned historical validator or equivalent exact committed-code binding when designing v4, with no rewrite of the stopped root. | None to bound source files. | Static code path confirmed; no v4 or completed-root claim. |
+| `IBSRC-CR01` | P2 | **OPEN, accepted for missing accessions; quarter conclusion qualified** | `d6242f9` | 82-quarter master reconciliation | Six reported quarters have Form 4 rows not matched in their own master. The six-quarter list is not exhaustive for the exact rule, because date conflicts count too. These six exclude the frozen 2022Q4/2023Q1 source window. | Section 119.2's read-only aggregate report; code returns `exact=False`/no digest on mismatch rather than throwing. | Any changed 82-quarter reconciliation rule needs preregistration; the separate exact two-quarter campaign is not mechanically blocked by this rule. | None. | Static refusal/digest path and independent aggregate checks below. |
+| `IBSRC-CCR01` | P2 | **OPEN, new counter-review finding** | `d6242f9` | Exact master reconciliation, 2026Q2 and 2025Q3 | A Form 4/4-A target and a same-accession, same-form master row have different filing dates in each of these quarters. 2025Q3 is already in Claude's six missing-accession quarters; 2026Q2 has zero missing accessions and is an additional nonexact quarter under D23. Thus seven quarters fail the exact rule, not six. No accession, row or raw content is disclosed here. | Read-only, hash-checked retained ZIP/master comparison using the reconciler's own date normalization and parsed master receipts; `_compare_quarter` increments `conflict_count` for a same-accession date disagreement and requires zero conflicts for `.exact`. | The original six-quarter conclusion understated the promotion gate. A changed date policy or exception requires a separately preregistered owner decision; no silent tolerance or source rewrite. | None to production or retained sources; append-only correction to current status and section 120. | The all-82 code-equivalent aggregate below confirms two date conflicts and seven nonexact quarters. |
+| `IBREC-CR01` | P3 | **OPEN; owner confirmation needed** | `d6242f9` | Source request ledger | Three stopped roots add 24 + 41 + 307 = 372 requests absent from earlier sections; 19,973 total minus 374 repeats = 19,599 distinct artifacts. | Section 119.3 and internal arithmetic. | Historical request scope cannot be approved by implication. | Claude recorded the counts; Codex added retrospective section-5 entries without claiming prior disclosure. | Owner to confirm whether the recorded directions covered all 19,973 requests. |
+| `IBREC-CR02`, `IBREC-CR03` | P3 | **CLOSED locally** | `d6242f9` | Status, section-5 ledger, QC entries | Sections 109-118 had no own ledger row; the two QC entry files were omitted from the handoff. | Direct record/code inspection. | An order-capable algorithm and incomplete source campaign need discoverable status. | Ten explicitly retrospective ledger rows, QC entry description and current status. | Record/active-document checks below. |
+| Other open and resolved findings from 119.6 | P3 and earlier P0-P3 | **RETAINED at recorded status** | earlier and `d6242f9` | Lane and shared/out-of-lane | `IB1BCAMP-CR02/CR03`, `IBSECACQ-CR05`, `IBDIAG-OBS01`, `IBSEL-OBS01`, `IBQC-OBS01`, `IBSH-CR01`, the 45 unclassified surviving mutants, and earlier findings are not silently closed. | Section 119.4/119.6 and earlier sections. | The four v3-bound source files and shared behavior are not changed by a test-only counter-review. | None. | No current production change, full suite, QC run or source continuation. |
+
+The independent, read-only, all-82 comparison hash-verified the retained ZIP
+manifest, 82 ZIPs, master report and 82 raw master objects. It parsed masters
+with the lane parser, normalized ZIP dates with the reconciler's own
+`_filing_date`, then applied `_compare_quarter`'s accession, alias, form and
+date rules. The **4,034,227** ZIP targets and **4,034,218** distinct master
+accessions yield **12 missing, 3 extra and 2 filing-date conflicts** (no
+form or alias conflicts). Nine missing accessions appear nowhere in the
+retained masters and three appear in earlier quarters. No filing identity or
+row contents were printed. The seven nonexact quarters are:
+
+| Quarter | Missing | Extra | Conflict |
+|---|---:|---:|---:|
+| 2015Q4 | 1 | 0 | 0 |
+| 2022Q2 | 2 | 0 | 0 |
+| 2025Q1 | 3 | 2 | 0 |
+| 2025Q2 | 2 | 1 | 0 |
+| 2025Q3 | 3 | 0 | 1 |
+| 2026Q1 | 1 | 0 | 0 |
+| 2026Q2 | 0 | 0 | 1 |
+
+### 120.3 Validation, exclusions and exact owner action
+
+Focused synthetic SEC runner, v3, test-boundary and direct framing selection:
+**191 passed** on bundled Python/pytest; the two exact Insider package guards
+and module-hygiene, overlay/ML import, and project-separation selection:
+**58 passed**. The three direct framing mutants failed before restoration;
+the two start-timestamp pacing mutants failed before restoration; the three
+in-memory transport-alias probes reached only the mocked network tripwire.
+The six touched test files compiled. Final active-document, implementation-
+record, diff and status checks are recorded in the following local
+validation checkpoint; Codex did **not** run a complete lane or repository
+suite. Claude's full-suite numbers in 119.5 remain reviewer evidence on its
+tree, not Codex's validation of this local correction. No SEC request,
+provider/credential/licensed-row access, outcome look, QC upload/job,
+historical backtest, broker/operator-database/scheduler, deployment,
+capital, order, paper/live or trading action occurred in this counter-review.
+The public retained ZIP check above was read-only and aggregate-only.
+
+**Stop before the next acquisition milestone and before any push.** The
+review is dispositioned but three topical gates and four P2 findings remain
+open. The owner must confirm
+whether the previously recorded directions covered all **19,973** SEC
+requests, including the **372** omitted stopped-run requests; choose one
+preregistered short-CIK and accession-year policy for IB-1C and the scale
+checkpoint; decide the treatment of the six missing-accession quarters and
+the additional 2026Q2 filing-date-only conflict (seven nonexact quarters)
+for 82-quarter promotion; and explicitly decide whether a separately versioned
+v4 should even be pursued for the **79,868** originally unattempted parents.
+The v4 custody design must preserve/replay the exact stopped v3 validator
+without rewriting or redispatching its ambiguous start. Any new SEC
+dispatch needs its own scope/contact/factual gate; this paused monitor
+provides none. A complete union, official acceptance/publication/PIT
+identity, amendment linkage, rights, validity-dated CIK-to-QC mapping,
+frozen look, QC processing entitlement and an authorized order-based
+historical backtest remain absent. No code or test result promotes the
+19,526 source-bound rows to a complete corpus. This local counter-review
+commit and its record are **not pushed** while owner decisions remain open;
+the heartbeat stays paused and cannot retrigger on a later Codex push.
+
+### 120.4 Local validation checkpoint before the owner-decision stop
+
+The six touched test files passed **191/191** focused tests after the final
+test edits. The two exact Insider package guards plus module-hygiene,
+overlay/ML import and project-separation checks passed **58/58**. The
+active-document and implementation-record checks passed **71/71** after the
+seven-quarter correction; they are rerun once more after this checkpoint
+entry. All six touched test files passed `compileall -q`, and `git diff
+--check` reported no whitespace errors. The precommit diff/status contained
+only this lane record and six Insider test files; no production or shared
+file was edited. Temporary pacing/framing source mutants were restored and
+the production files have no diff. The stopped v3 root, original two-quarter
+denominator and 79,868 unattempted inventory were not modified. This is a
+local committed handoff only if the final precommit root/branch/HEAD/status
+checks succeed; it is not a remote push or authorization to continue.

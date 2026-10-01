@@ -264,7 +264,13 @@ def test_capacity_pause_occurs_before_request_and_is_resumable(monkeypatch, tmp_
     assert result["complete_selected_raw_set_acquired"] is True
 
 
-def test_synthetic_plan_cannot_use_real_transport_and_real_scope_cannot_be_forged(tmp_path):
+def test_synthetic_plan_cannot_use_real_transport_and_real_scope_cannot_be_forged(
+    tmp_path, monkeypatch,
+):
+    monkeypatch.setattr(
+        "http.client.HTTPSConnection",
+        lambda *_args, **_kwargs: pytest.fail("synthetic selected plan attempted a real SEC connection"),
+    )
     with pytest.raises(runner.SecSelectedParentRunnerError, match="real SEC transport"):
         _run(_plan(1), tmp_path / "never", runner._sec_transport)
     with pytest.raises(runner.SecSelectedParentRunnerError, match="real SEC transport"):

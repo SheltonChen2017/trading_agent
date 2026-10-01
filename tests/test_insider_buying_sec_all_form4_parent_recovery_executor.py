@@ -547,13 +547,16 @@ def test_mid_shard_lane_drift_refuses_before_next_observed_attempt(
 # Section 119 (Claude review): the v3 executor made 1,847 real requests, yet no
 # test asserted its 500 ms completion-to-dispatch rule, the dispatch-time
 # recheck, or that the synthetic entry cannot reach the SEC client.
-def _multi_parent_transport(source, stamps):
+def _multi_parent_transport(source, stamps, completions=None):
     expected = source[0].requests[6:]
 
     def transport(url, _headers, _cap):
         stamps.append(executor.campaign.time.monotonic_ns())
         request = next(request for request in expected if request.url == url)
         raw = _body(request)
+        if completions is not None:
+            executor.campaign.time.sleep(0.75)
+            completions.append(executor.campaign.time.monotonic_ns())
         return SecHttpResult(200, (("Content-Length", str(len(raw))),), raw)
 
     return transport
@@ -562,10 +565,11 @@ def _multi_parent_transport(source, stamps):
 def test_v3_requests_keep_completion_to_dispatch_spacing(tmp_path, monkeypatch):
     source = _stopped_source(tmp_path, monkeypatch, request_count=10)
     stamps = []
-    _run(source, tmp_path / "paced", _multi_parent_transport(source, stamps))
-    assert len(stamps) == 4
-    assert all(later - prior >= executor.campaign.MIN_REQUEST_INTERVAL_NS
-               for prior, later in zip(stamps, stamps[1:]))
+    completions = []
+    _run(source, tmp_path / "paced", _multi_parent_transport(source, stamps, completions))
+    assert len(stamps) == len(completions) == 4
+    assert all(later_entry - prior_completion >= executor.campaign.MIN_REQUEST_INTERVAL_NS
+               for prior_completion, later_entry in zip(completions, stamps[1:]))
 
 
 def test_v3_dispatch_refuses_when_the_pacing_sleep_returns_early(tmp_path, monkeypatch):

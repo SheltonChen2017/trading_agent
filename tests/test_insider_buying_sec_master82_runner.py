@@ -351,7 +351,11 @@ def test_unsupported_host_refuses_before_root_or_transport(monkeypatch, tmp_path
     assert not (tmp_path / "unused").exists()
 
 
-def test_synthetic_plan_cannot_reach_real_transport(tmp_path) -> None:
+def test_synthetic_plan_cannot_reach_real_transport(tmp_path, monkeypatch) -> None:
+    monkeypatch.setattr(
+        "http.client.HTTPSConnection",
+        lambda *_args, **_kwargs: pytest.fail("synthetic master plan attempted a real SEC connection"),
+    )
     output = tmp_path / "unused"
     with pytest.raises(runner.SecMaster82RunnerError, match="synthetic plan"):
         runner._run_master82(_plan(), output, capture_git_commit=COMMIT,
@@ -376,16 +380,20 @@ def test_master_requests_keep_completion_to_dispatch_spacing(monkeypatch, tmp_pa
     clock = _clock(monkeypatch)
     plan = _plan()
     inner = _transport(_images(plan), [])
-    stamps = []
+    entries = []
+    completions = []
 
     def fetch(url, headers, max_bytes):
-        stamps.append(clock.now)
-        return inner(url, headers, max_bytes)
+        entries.append(clock.now)
+        result = inner(url, headers, max_bytes)
+        clock.sleep(0.75)
+        completions.append(clock.now)
+        return result
 
     _run(plan, tmp_path / "paced", fetch)
-    assert len(stamps) == 82
-    assert all(later - prior >= runner.MIN_REQUEST_INTERVAL_NS
-               for prior, later in zip(stamps, stamps[1:]))
+    assert len(entries) == len(completions) == 82
+    assert all(later_entry - prior_completion >= runner.MIN_REQUEST_INTERVAL_NS
+               for prior_completion, later_entry in zip(completions, entries[1:]))
 
 
 def test_master_dispatch_refuses_when_the_pacing_sleep_returns_early(monkeypatch, tmp_path) -> None:

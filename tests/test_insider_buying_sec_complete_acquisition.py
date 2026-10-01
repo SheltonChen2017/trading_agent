@@ -652,6 +652,37 @@ def test_non_ascii_content_length_is_a_typed_framing_refusal(declared, body):
         )
 
 
+@pytest.mark.parametrize("declared", ["²", "٣", "１"])
+def test_sec_transport_refuses_non_ascii_length_before_body_read(monkeypatch, declared):
+    class Response:
+        status = 200
+
+        def getheaders(self):
+            return [("Content-Length", declared)]
+
+        def read(self, _size):
+            pytest.fail("unsafe Content-Length reached body read")
+
+    class Connection:
+        def __init__(self, host, timeout):
+            assert host == "www.sec.gov" and timeout == 15
+
+        def request(self, method, path, headers):
+            assert method == "GET" and path.startswith("/Archives/")
+
+        def getresponse(self):
+            return Response()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(runner.http.client, "HTTPSConnection", Connection)
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="framing"):
+        runner._sec_transport(
+            "https://www.sec.gov/Archives/edgar/data/1/invented.txt", {}, 100,
+        )
+
+
 def test_non_ascii_content_length_is_a_recorded_refusal(monkeypatch, tmp_path):
     images = _images()
     first = runner._MASTER_URLS["2022Q4"]

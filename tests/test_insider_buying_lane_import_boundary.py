@@ -81,6 +81,16 @@ def test_importing_the_whole_package_loads_no_network_capable_lane_module() -> N
                "AlgorithmImports", "http.client", "socket", "ssl", "subprocess")
     load_package = (
         "import importlib, pkgutil, sys\n"
+        "def deny_external(event, _args):\n"
+        "    if event in {'socket.connect', 'socket.getaddrinfo', 'subprocess.Popen', 'os.system'}:\n"
+        "        raise AssertionError('offline package import attempted external I/O: ' + event)\n"
+        "sys.addaudithook(deny_external)\n"
+        "try:\n"
+        "    sys.audit('socket.connect', None, None)\n"
+        "except AssertionError as exc:\n"
+        "    assert 'offline package import attempted external I/O' in str(exc)\n"
+        "else:\n"
+        "    raise AssertionError('external-I/O audit hook did not fire')\n"
         "import research.insider_buying as p\n"
         "for m in pkgutil.iter_modules(p.__path__):\n"
         "    importlib.import_module('research.insider_buying.' + m.name)\n"

@@ -628,7 +628,13 @@ def test_completed_campaign_cannot_be_relaunched(tmp_path):
         _run(plan, output, lambda *_: pytest.fail("network was called"), resume=True)
 
 
-def test_synthetic_campaign_cannot_use_the_reviewed_sec_transport(tmp_path):
+def test_synthetic_campaign_cannot_use_the_reviewed_sec_transport(tmp_path, monkeypatch):
+    # The guard is the subject of this test. If it regresses, refuse before
+    # the real transport can open a connection to the SEC.
+    def forbidden_connection(*_args, **_kwargs):
+        pytest.fail("synthetic campaign attempted a real SEC connection")
+
+    monkeypatch.setattr("http.client.HTTPSConnection", forbidden_connection)
     output = tmp_path / "synthetic-real-transport"
     with pytest.raises(campaign.CampaignError, match="synthetic campaign cannot use the SEC transport"):
         campaign.run_synthetic_campaign(

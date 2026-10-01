@@ -16,7 +16,8 @@ from zoneinfo import ZoneInfo
 
 from research.analyst_revisions_v2 import forward_data_quality as vendor_quality
 from research.analyst_revisions_v2.canonical import (
-    CanonicalEvidenceError, parse_date, require_sha256, strict_json_loads,
+    CanonicalEvidenceError, parse_date, require_identifier, require_sha256,
+    strict_json_loads,
 )
 
 from . import six_universe_forward_construction_policy as construction_policy
@@ -26,8 +27,9 @@ class ForwardPredecisionError(ValueError):
     """A supplied byte pin, clock, exact identity or safety gate refused."""
 
 
-SCHEMA = "arv2-six-forward-predecision-diagnostic-v1"
+SCHEMA = "arv2-six-forward-predecision-diagnostic-v2"
 MAPPING_SCHEMA = "arv2-six-forward-claimed-crosswalk-v1"
+HOLDINGS_IDENTITY_SCHEMA = "arv2-six-forward-claimed-holdings-security-identity-v1"
 PRICE_SCHEMA = "arv2-six-forward-reference-price-diagnostic-v1"
 MAX_INPUT_BYTES = 8_000_000
 ETFS = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
@@ -35,6 +37,7 @@ SOURCES = ("FUNDAMENTALS",) + ETFS
 NEW_YORK = ZoneInfo("America/New_York")
 _REFUSALS = (
     "VENDOR_PUBLICATION_AVAILABILITY_UNPROVEN",
+    "HOLDINGS_SECURITY_IDENTITY_PROVENANCE_UNPROVEN",
     "CROSSWALK_INDEPENDENT_REVIEW_UNPROVEN",
     "REFERENCE_PRICE_PROVENANCE_UNPROVEN",
     "PRICE_FRESHNESS_UNPROVEN",
@@ -278,6 +281,53 @@ def _crosswalk(value, session, cutoff, qc_sha256, vendor_sha256):
     return by_sid, qcom
 
 
+def _holdings_identity(value, session, cutoff, qc_sha256):
+    """Validate a claimed security-master join, not analyst-vendor coverage."""
+    _keys(value, {
+        "schema", "decision_session", "qc_snapshot_sha256", "acquired_at_utc", "rows",
+    }, "HOLDINGS_IDENTITY_SHAPE_CHANGED")
+    if (value["schema"] != HOLDINGS_IDENTITY_SCHEMA
+            or value["decision_session"] != session
+            or value["qc_snapshot_sha256"] != qc_sha256):
+        _refuse("HOLDINGS_IDENTITY_INPUT_BINDING_CHANGED")
+    acquired = _instant(value["acquired_at_utc"], "HOLDINGS_IDENTITY_CLOCK_INVALID")
+    session_date = _session_date(session, "DECISION_SESSION_INVALID")
+    session_start = datetime.combine(session_date, time(0, 0), NEW_YORK).astimezone(timezone.utc)
+    if not session_start <= acquired < cutoff:
+        _refuse("HOLDINGS_IDENTITY_ACQUISITION_NOT_PREDECISION")
+    rows = value["rows"]
+    if type(rows) is not list or len(rows) > 150_000:
+        _refuse("HOLDINGS_IDENTITY_ROWS_INVALID")
+    by_qc_sid = {}
+    security_ids = set()
+    for row in rows:
+        _keys(row, {
+            "qc_sid", "security_id", "valid_from_session", "valid_to_session",
+            "available_at_utc",
+        }, "HOLDINGS_IDENTITY_ROW_SHAPE_CHANGED")
+        qc_sid = row["qc_sid"]
+        security_id = row["security_id"]
+        if (type(qc_sid) is not str or not qc_sid or qc_sid != qc_sid.strip()
+                or type(security_id) is not str or not security_id
+                or security_id != security_id.strip()
+                or qc_sid in by_qc_sid or security_id in security_ids):
+            _refuse("HOLDINGS_IDENTITY_AMBIGUOUS_EXACT_SECURITY")
+        try:
+            require_identifier(security_id, "claimed security ID")
+        except CanonicalEvidenceError as exc:
+            raise ForwardPredecisionError("HOLDINGS_IDENTITY_SECURITY_ID_INVALID") from exc
+        start = _session_date(row["valid_from_session"], "HOLDINGS_IDENTITY_DATE_INVALID")
+        end = None if row["valid_to_session"] is None else _session_date(
+            row["valid_to_session"], "HOLDINGS_IDENTITY_DATE_INVALID")
+        if start > session_date or (end is not None and end <= session_date):
+            _refuse("HOLDINGS_IDENTITY_NOT_VALID_AS_OF_DECISION")
+        if _instant(row["available_at_utc"], "HOLDINGS_IDENTITY_CLOCK_INVALID") > acquired:
+            _refuse("HOLDINGS_IDENTITY_NOT_AVAILABLE_BY_ACQUISITION")
+        by_qc_sid[qc_sid] = security_id
+        security_ids.add(security_id)
+    return by_qc_sid
+
+
 def _prices(value, session, cutoff, qc_sha256):
     _keys(value, {"schema", "decision_session", "qc_snapshot_sha256",
                   "source_time_utc", "positive_reference_prices"}, "PRICE_SHAPE_CHANGED")
@@ -292,7 +342,8 @@ def _prices(value, session, cutoff, qc_sha256):
 def build_predecision_diagnostic(
     *, decision_session, qc_snapshot_bytes, qc_snapshot_sha256,
     vendor_receipt_bytes, vendor_receipt_sha256, crosswalk_bytes,
-    crosswalk_sha256, reference_price_bytes, reference_price_sha256,
+    crosswalk_sha256, holdings_identity_bytes, holdings_identity_sha256,
+    reference_price_bytes, reference_price_sha256,
 ):
     """Validate supplied private-input claims; never promote them to an order.
 
@@ -324,6 +375,10 @@ def build_predecision_diagnostic(
     by_sid, qcom = _crosswalk(
         crosswalk, decision_session, cutoff, qc_snapshot_sha256, vendor_receipt_sha256,
     )
+    holdings_identity = _holdings_identity(
+        _pinned_json(holdings_identity_bytes, holdings_identity_sha256, "HOLDINGS_IDENTITY"),
+        decision_session, cutoff, qc_snapshot_sha256,
+    )
     prices = _prices(
         _pinned_json(reference_price_bytes, reference_price_sha256, "PRICE"),
         decision_session, cutoff, qc_snapshot_sha256,
@@ -331,11 +386,12 @@ def build_predecision_diagnostic(
     for etf in ETFS:
         weights = members[etf]
         total = sum((Fraction(weight) for weight in weights.values()), Fraction(0))
-        mapped = sum((Fraction(weight) for sid, weight in weights.items() if sid in by_sid), Fraction(0))
+        mapped = sum((Fraction(weight) for sid, weight in weights.items() if sid in holdings_identity), Fraction(0))
         if mapped * 100 < total * 99:
             _refuse("ETF_EXACT_IDENTITY_WEIGHT_BELOW_99_PERCENT")
     if displayed_qcom or qcom is not None:
-        if qcom is None or displayed_qcom != {qcom} or qcom not in by_sid:
+        if (qcom is None or displayed_qcom != {qcom}
+                or qcom not in by_sid or qcom not in holdings_identity):
             _refuse("QCOM_EXACT_IDENTITY_UNRESOLVED")
         if qcom not in caps or qcom not in prices or not any(qcom in members[etf] for etf in ETFS):
             _refuse("QCOM_CAP_WEIGHT_OR_REFERENCE_PRICE_UNAVAILABLE")
@@ -346,6 +402,7 @@ def build_predecision_diagnostic(
         "qc_snapshot_sha256": qc_snapshot_sha256,
         "vendor_receipt_sha256": vendor_receipt_sha256,
         "crosswalk_sha256": crosswalk_sha256,
+        "holdings_identity_sha256": holdings_identity_sha256,
         "reference_price_sha256": reference_price_sha256,
     }
     common = hashlib.sha256(json.dumps(body, sort_keys=True, separators=(",", ":")).encode("ascii")).hexdigest()

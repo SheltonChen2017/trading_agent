@@ -430,3 +430,15 @@ def test_values_one_step_inside_each_boundary_are_accepted():
     holdings_identity["rows"][1]["available_at_utc"] = "2026-09-28T13:19:59Z"
     report = _run(qc, vendor, mapping, holdings_identity, prices)
     assert report.decision_ready is False
+
+
+def test_padded_qc_sid_cannot_pose_as_a_distinct_holdings_identity():
+    """QC SIDs have no identifier-grammar check, so only the whitespace refusal
+    stops "A-SID " from sitting beside "A-SID" as a second, distinct claim."""
+    documents = dict(zip(
+        ("qc", "vendor", "mapping", "holdings_identity", "prices"), _documents(), strict=True))
+    rows = documents["holdings_identity"]["rows"]
+    rows.append({**rows[0], "qc_sid": rows[0]["qc_sid"] + " ", "security_id": "PADDED-SECURITY"})
+    with pytest.raises(subject.ForwardPredecisionError,
+                       match="HOLDINGS_IDENTITY_AMBIGUOUS_EXACT_SECURITY"):
+        _run(**documents)

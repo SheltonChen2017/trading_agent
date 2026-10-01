@@ -1,0 +1,68 @@
+{
+  "adaptive_selection_disclosure": "chosen_after_adaptive_historical_exploration_not_a_holdout_or_forward_efficacy_result",
+  "analyst_event_identity": {
+    "ar_contribution_requires": "reviewed_vendor_security_to_exact_qc_sid_mapping_as_of_decision",
+    "ticker_only_join_authorized": false,
+    "unmapped_event_is_zero_signal": false,
+    "unmapped_or_ambiguous_event": "named_refusal_no_ar_contribution"
+  },
+  "capabilities": {
+    "confirmatory_look_commitment": false,
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false
+  },
+  "common_eligible_cohort_required": true,
+  "forward_end_session": null,
+  "forward_evidence_epoch_sha256": null,
+  "forward_start_session": null,
+  "future_common_predecision_input_contract_sha256": null,
+  "future_shared_execution_contract_sha256": null,
+  "future_universe": [
+    "SPY",
+    "QQQ",
+    "SOXX",
+    "XLV",
+    "REMX",
+    "XLE"
+  ],
+  "independent_confirmation_authorized": false,
+  "paper_algorithm_sha256": null,
+  "paper_deployment_authority_sha256": null,
+  "parent_dual_forward_policy_sha256": "668a52c2dfb541e4be92675d354a3c405f4b5689519dcd923a3e7c633675d59d",
+  "qcom_stock_admission": {
+    "all_required": [
+      "finite_positive_market_cap_for_exact_qc_sid",
+      "finite_positive_etf_member_weight_for_exact_qc_sid",
+      "finite_positive_tradable_reference_price_for_exact_qc_sid"
+    ],
+    "display_ticker_is_identity": false,
+    "special_exclusion": false,
+    "ticker_alias_repair": false
+  },
+  "schema": "arv2-six-universe-forward-construction-policy-v1",
+  "signal_semantics": {
+    "arms": [
+      {
+        "ar_entry_count_enabled": true,
+        "ar_weight_transfer_fraction": "1.00",
+        "forward_candidate_id": "ARV2_FORWARD_AR_100"
+      },
+      {
+        "ar_entry_count_enabled": true,
+        "ar_weight_transfer_fraction": "2.00",
+        "forward_candidate_id": "ARV2_FORWARD_AR_200"
+      }
+    ],
+    "control": {
+      "ar_entry_count_enabled": false,
+      "ar_weight_transfer_fraction": "0.00",
+      "forward_candidate_id": "ARV2_FORWARD_AR_OFF"
+    }
+  },
+  "two_arm_confirmatory_multiplicity_protocol_sha256": null
+}

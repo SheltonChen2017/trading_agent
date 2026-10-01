@@ -210,6 +210,11 @@ recorded figure reproduces from the retained results, and three unpinned
 guards are pinned by the test-only `1cff51c`. The first push `b212048`
 carried 22 red three-name lane tests from `908c9b0`'s dropped family token,
 which Codex's `1bff115` corrected.
+Section 221 counter-reviews both section-220 Claude commits and records one
+outcome-free future construction choice: the six-ETF cohort, exact-security-ID
+QCOM treatment, and full AR entry/count plus 100%/200% weight transfer versus
+one AR-off control. Stock-selection thresholds, common predecision inputs,
+execution, dates, epoch, multiplicity and paper authority remain unbound.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -963,10 +968,12 @@ The owner expressly waived waiting for Claude's review before section 219's
 separate R279 clock probe and fixed-100 execution-stress development. Section
 220 is Claude's independent review of the exact pushed range
 `e9e2d7d..1bff115` (sections 218–219), with the test-only correction `1cff51c`.
-The immediate next step is that Codex counter-reviews section 220 and every
-Claude commit of this round; the owner then decides whether to build the
-authenticated prior-20-session volume diagnostic and the common-epoch forward
-input protocol.
+Codex counter-reviews section 220 and both Claude commits in section 221.
+The owner has since directed continued bounded work toward forward/paper
+readiness. Section 221 records the narrow
+six-universe/QCOM/AR-semantics construction choice; the authenticated
+prior-20-session volume diagnostic, exact stock-selection and execution rules,
+and common-epoch predecision input protocol remain separate open gates.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -2723,6 +2730,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-29 | Codex section-217 counter-review and fixed-100 eight-universe attribution diagnostic | `e9e2d7d` -> `908c9b0` and this completion commit | Section 218: accept and qualify the four Claude commits; freeze the R277/R278 order sources before launch; run the two missing arms; compare all four with exact retained controls; preregister one bounded adverse-execution successor | R277 and R278 both completed validly on A1 in private QC; B−A +12.8000 pp, C−A −1.8674 pp, D−C +13.6636 pp, D−A +11.7961 pp, with annual signature and current-vintage/zero-slippage cautions. Two development looks and two cells; floor 291/228/38/695. | Exact source/manifest and one bounded read per new run, retained-result reauthentication, focused closure/firewall/record/attribution tests, compilation and diff; final results in 218.4. No complete lane suite by Codex. | No new P0/P1/P2 defect; `ARV2CR218-001` P3 qualifies Claude's final-tree suite wording; `ARV2R217-002` ledger omission closed by two append-only catch-up rows. R247 forward clock and archive-vintage evidence gates remain open. | One final same-lane push. Claude reviews section 218 and the exact pushed commits; no stress QC launch, formal alpha, paper/live/funded/broker order or forward-efficacy claim is inferred. |
 | 2026-09-30 | Codex owner-directed section-219 pre-review forward-clock and fixed-100 execution stress | `b212048` -> this final lane correction/record commit | R279 input-only callback/Object Store mechanics; four 5-bps adverse-slippage order arms R280–R283 on exact fixed-100% 2021–2025 inputs | R279 A1 failed on QC one-dot key grammar; A2 completed in the same project with a bounded input-only metadata read. R280 A1, R281 A2, R282 A1 and R283 A1 completed validly; R281 A1 stopped before backtest creation and was spent. Four-arm return/parent comparisons and annual instability are in 219.3–219.5. The historical QCOM three-name recovery family omission and new-module closure pin were corrected locally, without a QC launch. | Exact one-use terminal/statistic reads and digest-bound parent comparison; R279 battery 20 passed, stress/recovery/import boundary 50 passed, historical recovery red/green 21 passed then 1 error -> 37 passed; final affected selection 251 passed, closure file 74 passed, compilation and diff clean. No complete Codex lane suite. Floor 298/233/40/699. | `ARV2D219-001` P2 parent-vintage interpretation gap, `ARV2D219-002` P2 legacy QCOM recovery admission gap and `ARV2D219-003` P2 required closure-pin gap corrected; R281 A1 transport cause unresolved. Current-vintage archive, annual sign changes, no raw-volume/1%-ADV capacity check, incomplete fill-tape identity and forward-vendor readiness remain disclosed. | One same-lane push; Claude independently reviews the exact section-219 range. No formal alpha, paper/live/funded/broker order or forward-efficacy authority follows. |
 | 2026-10-01 | Claude independent review of sections 218–219: the fixed-100 factorial, the R279 clock probe, and the 5-bps execution stress | `1bff115` -> `1cff51c` -> this record commit | Section 220: seven commits `e9e2d7d..1bff115` individually disposed (5 accepted, 2 accepted after correction, 0 rejected); Codex's counter-review of section 217 accepted, including `ARV2CR218-001`; zero QC or provider calls, looks, evaluations, or cells | Pinned three unpinned guards (`1cff51c`, test-only, each red with its guard removed); corrected the recorded origin and scope of `ARV2D219-002`; section 4 names section 220, banner sentence added, this row appended; no production line changed | Required gates at both pushed heads, standing lane selection in a byte-faithful export of `1bff115`, the three-name files at `b212048` and `54e1fd4`, seventeen mutation trials, every recorded figure recomputed from the retained results, `compileall`, `git diff --check`; exact counts in 220.7 | 0 P0, 0 P1, 0 P2, 2 P3 (`ARV2R220-001`, `-002`): the misattributed three-name defect, whose first push carried 22 red lane tests, and three unpinned guards (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 220 |
+| 2026-10-01 | Codex section-220 counter-review and bounded future construction choice | `5a0ac38` -> this round's final record commit | Section 221: accept both Claude commits; freeze only the future six-ETF names, QCOM exact-SID/no-ticker treatment, and full AR entry/count plus owner-selected 100%/200% transfer against one AR-off control | New canonical, hash-pinned successor policy and refusal tests; the historical parent is authenticated, every action capability remains false, and future input/execution/epoch/dates/multiplicity/paper pins remain null. No QC/provider call, outcome read, paper look, result cell or shared-ledger change; floor remains 298/233/40/699. | Focused policy, package-closure, firewall, record/active-document, compile and diff gates reported in section 221; no Codex complete lane suite | No new P0–P3 finding in Claude's two commits; `ARV2R220-001` documented, `-002` corrected by Claude. Adaptive construction and incomplete stock-selection/input/execution gates remain explicit. | One final same-lane push; Claude independently reviews this bounded policy/record range before the next common predecision input milestone. No paper/live/funded/broker order authority follows. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -31644,3 +31652,92 @@ exercised here: no QuantConnect or provider endpoint, result read, or
 launcher was run; the nine cloud attempts of sections 218–219 (eight
 backtests and R281 A1's pre-create stop) are attested only by Codex's
 receipts and the retained results re-read locally.
+
+## 221. Codex counter-review of section 220 and bounded future construction choice, 2026-10-01
+
+**Exact Claude range:** `1bff115..5a0ac38`, two commits on the designated
+`codex/strategy-analyst-revisions-v2` branch in its existing worktree.
+The remote and local branch were already at the same clean `5a0ac38` head
+when the review push was detected; no merge, side branch, cherry-pick or
+other checkout was used. This is a new, outcome-free policy successor, not
+a QuantConnect evaluation, a forward paper observation, or a completed
+paper algorithm. The shared look floor is unchanged at **298 shared / 233
+development / 40 infrastructure / 699 authenticated cells**.
+
+### 221.1 Per-commit counter-review and findings
+
+| Claude commit | Disposition | Counter-review evidence |
+|---|---|---|
+| `1cff51c` | accepted | Two test files only. The attribution cases change a single arm's input digest or starting equity, the stress parser case makes a valid run carry a self-consistent invalid fill audit, and the four byte-pin cases alter equal-JSON parent bytes. Each assertion reaches its named production guard; the two files pass **58 tests** on the reviewed tree. No production code or economic rule changed. |
+| `5a0ac38` | accepted | Record only. It disposes each of seven earlier Codex commits, correctly locates the dropped three-name family token in `908c9b0` rather than an older round, and separately states the export-only failures and final-tree gates. Its historical figures remain descriptive and expressly do not establish forward efficacy. No new production or QC action is claimed. |
+
+No new P0–P3 defect was confirmed in these two commits. `ARV2R220-001` is
+confirmed as a P3 record-origin/scope error and remains documented; the
+source correction had already landed at `1bff115`. `ARV2R220-002` is a P3
+test-isolation gap corrected by Claude's `1cff51c`, not by this Codex round.
+The missing general stock-selection and executable input rules below are
+open milestone gates, not defects falsely attributed to Claude's test-only
+and record-only commits.
+
+### 221.2 Outcome-free future construction successor
+
+The new canonical
+`six_universe_forward_construction_policy.json` is an additive child of the
+hash-authenticated owner-selected dual forward policy; neither historical
+parent nor spent QC source is rewritten. It fixes the *future cohort names*
+to SPY, QQQ, SOXX, XLV, REMX and XLE. The historical QCOM direct-stock
+exclusion is not inherited: QCOM is eligible only when its exact QC SID has
+finite positive market cap, ETF membership weight and tradable reference
+price. A display ticker or guessed alias is never an identity join. An AR
+event contributes only after a reviewed vendor-security-to-exact-QC-SID
+mapping as of the decision; unresolved or ambiguous events have a named
+no-contribution refusal, not a fabricated zero score.
+
+For both owner-selected 100% and 200% arms, AR retains **entry/count and
+weight-transfer** semantics. The shared AR-off control has neither. This
+preserves the meaning of the owner's selected R232/R237 development rules;
+it does **not** silently substitute the historically favorable weight-only
+ablation. Choosing these six ETFs and rules after many observed historical
+results is adaptive, and none of those returns becomes a holdout. The
+policy requires a common eligible cohort across arms but does not yet define
+the complete stock-selection coverage floor, minimum-name rule, cap ranking,
+overlap treatment or ETF fallback. Those and the shared execution/fee/fill
+contract are explicitly open; the policy is **not an executable forward
+strategy**.
+
+The successor keeps the common predecision input contract, start/end dates,
+evidence epoch, shared execution contract, multiplicity protocol, paper
+algorithm and deployment authority null. All QC, outcome, paper, order and
+funded capabilities are literal false. It neither authenticates a fresh
+Massive event at the 09:20 New York decision clock nor upgrades R279's
+historical callback/Object Store readback into point-in-time vendor evidence.
+The V2 blueprint's two-clock/PIT security-ID and stock-first/ETF promotion
+gates remain binding. ARV2-4 through ARV2-8, the one formal Analyst look
+and total two-sided `1/80` allocation, and separately authorized ARV2-9
+paper deployment remain unresolved.
+
+### 221.3 Validation, exclusions and next gate
+
+The new loader enforces exact JSON types, keys, canonical bytes and SHA-256,
+authenticates the dual-policy parent, returns frozen nested values and
+refuses changed identities, AR modes, cohort, QCOM rules or claimed action
+authority. Isolating tests mutate each of those boundaries. The whole-QC
+package closure inventory registers its exact imports and `read_bytes`
+surface; this is a host-side policy reader, not a QC runtime or network
+adapter. The canonical policy SHA-256 is
+`7f1dbfe54f8179add6db9b15abdf343e55253ba50541175a5764e4c15dc644d4`.
+The final-tree focused policy/parent, whole-QC closure, package and ML
+firewall, lane-record and active-document selection passed **418/418**.
+The reviewed Claude guard files passed **58/58** separately. Compilation,
+diff and exact Git status were checked before the single commit/push;
+Codex did not run the complete lane suite under the owner's Claude-only
+full-suite rule. No QC/provider launch, outcome read or paper order occurred.
+
+**Next bounded milestone after independent review:** define and test the
+remaining stock-selection/fallback and common predecision input protocol,
+including exact as-of security mapping and separately evidenced vendor
+receipt before each 09:20 cutoff; refuse stale, partial-day and unbound
+vintages. Only then consider an input-only QC diagnostic under an exact
+gate. Raw prior-20-session volume/1%-ADV capacity at the named $1 million
+starting account, outcome-bearing forward comparison, paper deployment,
+broker/funded activity and real orders remain outside this round.

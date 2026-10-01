@@ -215,6 +215,10 @@ outcome-free future construction choice: the six-ETF cohort, exact-security-ID
 QCOM treatment, and full AR entry/count plus 100%/200% weight transfer versus
 one AR-off control. Stock-selection thresholds, common predecision inputs,
 execution, dates, epoch, multiplicity and paper authority remain unbound.
+Section 222 is Claude's independent review of `5a0ac38..7d078b9` (0 P0,
+0 P1, 0 P2, 1 P3): Codex's counter-review is accepted, the forward
+construction policy is accepted as outcome-free and non-executable, and
+two unpinned loader guards are pinned by the test-only `bc1150a`.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -974,6 +978,11 @@ readiness. Section 221 records the narrow
 six-universe/QCOM/AR-semantics construction choice; the authenticated
 prior-20-session volume diagnostic, exact stock-selection and execution rules,
 and common-epoch predecision input protocol remain separate open gates.
+Section 222 is Claude's independent review of the exact pushed range
+`5a0ac38..7d078b9` (section 221), with the test-only correction `bc1150a`.
+The immediate next step is that Codex counter-reviews section 222 and both
+Claude commits of this round, then takes up the stock-selection, fallback
+and common predecision input milestone.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -987,7 +996,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 219 (section 220). Section 182 records the owner's exact
+the pushed range through section 221 (section 222). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -2731,6 +2740,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-30 | Codex owner-directed section-219 pre-review forward-clock and fixed-100 execution stress | `b212048` -> this final lane correction/record commit | R279 input-only callback/Object Store mechanics; four 5-bps adverse-slippage order arms R280–R283 on exact fixed-100% 2021–2025 inputs | R279 A1 failed on QC one-dot key grammar; A2 completed in the same project with a bounded input-only metadata read. R280 A1, R281 A2, R282 A1 and R283 A1 completed validly; R281 A1 stopped before backtest creation and was spent. Four-arm return/parent comparisons and annual instability are in 219.3–219.5. The historical QCOM three-name recovery family omission and new-module closure pin were corrected locally, without a QC launch. | Exact one-use terminal/statistic reads and digest-bound parent comparison; R279 battery 20 passed, stress/recovery/import boundary 50 passed, historical recovery red/green 21 passed then 1 error -> 37 passed; final affected selection 251 passed, closure file 74 passed, compilation and diff clean. No complete Codex lane suite. Floor 298/233/40/699. | `ARV2D219-001` P2 parent-vintage interpretation gap, `ARV2D219-002` P2 legacy QCOM recovery admission gap and `ARV2D219-003` P2 required closure-pin gap corrected; R281 A1 transport cause unresolved. Current-vintage archive, annual sign changes, no raw-volume/1%-ADV capacity check, incomplete fill-tape identity and forward-vendor readiness remain disclosed. | One same-lane push; Claude independently reviews the exact section-219 range. No formal alpha, paper/live/funded/broker order or forward-efficacy authority follows. |
 | 2026-10-01 | Claude independent review of sections 218–219: the fixed-100 factorial, the R279 clock probe, and the 5-bps execution stress | `1bff115` -> `1cff51c` -> this record commit | Section 220: seven commits `e9e2d7d..1bff115` individually disposed (5 accepted, 2 accepted after correction, 0 rejected); Codex's counter-review of section 217 accepted, including `ARV2CR218-001`; zero QC or provider calls, looks, evaluations, or cells | Pinned three unpinned guards (`1cff51c`, test-only, each red with its guard removed); corrected the recorded origin and scope of `ARV2D219-002`; section 4 names section 220, banner sentence added, this row appended; no production line changed | Required gates at both pushed heads, standing lane selection in a byte-faithful export of `1bff115`, the three-name files at `b212048` and `54e1fd4`, seventeen mutation trials, every recorded figure recomputed from the retained results, `compileall`, `git diff --check`; exact counts in 220.7 | 0 P0, 0 P1, 0 P2, 2 P3 (`ARV2R220-001`, `-002`): the misattributed three-name defect, whose first push carried 22 red lane tests, and three unpinned guards (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 220 |
 | 2026-10-01 | Codex section-220 counter-review and bounded future construction choice | `5a0ac38` -> this round's final record commit | Section 221: accept both Claude commits; freeze only the future six-ETF names, QCOM exact-SID/no-ticker treatment, and full AR entry/count plus owner-selected 100%/200% transfer against one AR-off control | New canonical, hash-pinned successor policy and refusal tests; the historical parent is authenticated, every action capability remains false, and future input/execution/epoch/dates/multiplicity/paper pins remain null. No QC/provider call, outcome read, paper look, result cell or shared-ledger change; floor remains 298/233/40/699. | Focused policy, package-closure, firewall, record/active-document, compile and diff gates reported in section 221; no Codex complete lane suite | No new P0–P3 finding in Claude's two commits; `ARV2R220-001` documented, `-002` corrected by Claude. Adaptive construction and incomplete stock-selection/input/execution gates remain explicit. | One final same-lane push; Claude independently reviews this bounded policy/record range before the next common predecision input milestone. No paper/live/funded/broker order authority follows. |
+| 2026-10-01 | Claude independent review of section 221: the counter-review of section 220 and the forward construction policy | `7d078b9` -> `bc1150a` -> this record commit | Section 222: one commit `5a0ac38..7d078b9` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 220 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned two unpinned loader guards (`bc1150a`, test-only, each red with its guard removed); section 4 names section 222, banner sentence added, this row appended; no production line changed | Required gates and policy tests at the pushed head, standing lane selection in a byte-faithful export of `7d078b9`, eleven mutation trials, `compileall`, `git diff --check`; exact counts in 222.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R222-001`): two loader guards without tests (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 222 |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -31741,3 +31751,120 @@ vintages. Only then consider an input-only QC diagnostic under an exact
 gate. Raw prior-20-session volume/1%-ADV capacity at the named $1 million
 starting account, outcome-bearing forward comparison, paper deployment,
 broker/funded activity and real orders remain outside this round.
+
+## 222. Independent Claude review of section 221: the counter-review of section 220 and the forward construction policy, 2026-10-01
+
+**Range reviewed:** `5a0ac38..7d078b9`, one Codex commit in one push,
+disposed in 222.1, plus this round's Claude lane commits (the test-only
+`bc1150a` and this record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called, and section 221 records none; the floor stays **298 / 233 / 40 /
+699**.
+
+**Codex's counter-review of section 220 (section 221) is accepted.** It
+accepts both Claude commits, confirms `ARV2R220-001` as a P3 origin and scope
+error whose source correction had already landed in `1bff115`, and confirms
+`ARV2R220-002` as corrected by `1cff51c`.
+
+**Verdict.** The one commit is accepted after correction; none is rejected.
+**0 P0, 0 P1, 0 P2, 1 P3.** No production line changed in this round; the
+test-only `bc1150a` pins two loader guards. The required gates and the new
+policy tests pass at the pushed head, and section 221's banner sentence,
+ledger row and section-4 pointer are all present.
+
+### 222.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `7d078b9` | Section 221 counter-review; the outcome-free six-universe forward construction policy, its canonical JSON, loader, tests and closure registration | accepted after correction | The policy is an additive child of the hash-authenticated dual forward parent and rewrites neither the parent nor any spent source. The loader compares the parsed JSON with a frozen expected structure by exact type, refuses duplicate keys, non-finite values and non-canonical bytes, re-authenticates the parent's identity, capabilities, null authorities, control and arms, and returns frozen nested values. All eight action capabilities are literal false. Two loader guards had no isolating test (`ARV2R222-001`, pinned in `bc1150a`). |
+
+### 222.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R222-001` | P3 | `7d078b9` | Two loader guards had no test. `validate_policy` promises to refuse type aliases, but no test fed `0` or `1` where a boolean is expected, and Python treats `0 == False`; only the exact-type check refuses `capabilities.orders = 0` (`FC4`). The parent control check had no test, unlike the parent arms check (`FC7`). Through `load_policy` both sit behind hash pins, but `validate_policy` is public, and the control check is the only defence against a changed parent loader. | Corrected in `bc1150a` (test-only): four alias cases and two control cases, each red with its guard removed. |
+
+### 222.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Required gates and the new policy tests at the pushed head `7d078b9` (worktree) | 392 passed |
+| Policy identity | the loader reproduces canonical SHA-256 `7f1dbfe5…` and re-authenticates the parent pin `668a52c2…` |
+| Look floor | unchanged at 298/233/40/699; no QC or provider action in section 221 |
+| Record hygiene | banner sentence, ledger row and section-4 pointer present for section 221 |
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `FC1` | canonical-bytes refusal removed | red: 1 failed, 51 passed | `test_loader_refuses_changed_bytes_even_when_rehashed` |
+| `FC2` | duplicate-key refusal removed | red: 1 failed, 51 passed | `test_rehashed_duplicate_or_nonfinite_json_is_refused[…duplicate…]` |
+| `FC3` | non-finite refusal removed | red: 1 failed, 51 passed | `test_rehashed_duplicate_or_nonfinite_json_is_refused[…NaN…]` |
+| `FC4` | exact-type comparison weakened to containers only | **green: 52 passed** → pinned by `bc1150a`; afterwards red: 4 failed, 54 passed | `test_numeric_aliases_of_booleans_are_refused[…]`, all four cases |
+| `FC5` | parent identity pin check removed | red: 1 failed, 51 passed | `test_parent_identity_and_rule_mismatch_refuse` |
+| `FC6` | parent authority check removed | red: 1 failed, 51 passed | `test_parent_cannot_claim_future_authority_by_mocked_loader` |
+| `FC7` | parent control check removed | **green: 52 passed** → pinned by `bc1150a`; afterwards red: 2 failed, 56 passed | `test_parent_control_mismatch_refuses[…]`, both cases |
+| `FC8` | parent arms check removed | red: 1 failed, 51 passed | `test_parent_identity_and_rule_mismatch_refuse` |
+| `FC9` | nested freezing removed | red: 1 failed, 51 passed | `test_exact_parent_cohort_qcom_and_three_signal_rules_have_no_action_authority` |
+| `FC10` | 8,192-byte bound removed | green: 52 passed | none; redundant: any file must match the frozen hash, and the bytes are read in full before the bound is checked |
+| `FC11` | parent verification skipped entirely | red: 2 failed, 50 passed | `test_parent_identity_and_rule_mismatch_refuse`, `test_parent_cannot_claim_future_authority_by_mocked_loader` |
+
+All trials ran in a separate export of `7d078b9` under the session
+scratchpad, never in the worktree, with failing test names captured; the
+module was restored byte-identical to `7d078b9` after every trial. The
+unmutated baseline was green (52 passed).
+
+### 222.4 Reading the policy on the record's own terms
+
+- **Keeping full AR entry/count with the weight transfer is the right
+  discipline.** Section 220 found the historical entry rule slightly negative
+  (t = −1.40) and the weight overlay carrying 2021 and 2024. Switching the
+  forward arms to weight-only now would choose a rule after seeing its
+  history; retaining the owner's pre-chosen R232/R237 semantics avoids that,
+  and section 221 says so explicitly.
+- **The policy is declarative, not executable.** Its QCOM admission and
+  analyst-event mapping rules are strings that nothing yet enforces. The next
+  milestone must turn each into a tested refusal: no exact-SID mapping, no AR
+  contribution; no finite positive cap, member weight and price, no QCOM
+  admission.
+- **The cohort choice is itself adaptive**, as section 221 discloses. No
+  historical return becomes a holdout for these arms.
+
+### 222.5 Improvement plan
+
+1. **Make every policy string a tested refusal** in the stock-selection,
+   fallback and predecision-input milestone.
+2. **Test numeric aliases of booleans** whenever a validator promises exact
+   types, because Python's equality hides them.
+3. **Keep the guard-by-guard mutation check** for each new loader; this
+   round's eleven trials found the two gaps in seconds.
+
+### 222.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2D213-002`, `ARV2R211-001`, `ARV2D213-003`, `ARV2R220-001` | P3 | Documented. |
+| `ARV2R222-001` | P3 | Corrected in `bc1150a`. |
+
+### 222.7 Validation
+
+Each scope is stated separately. Runs used
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15).
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, in a byte-faithful export of the pushed head `7d078b9` with `artifacts/analyst_revisions_v2` copied in | **3 failed, 9522 passed, 11 skipped, 35 warnings in 7553.61s (2:05:53).** Exactly three failures, all export artifacts, each re-run green in the real checkout: `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` shells to `git check-attr`, and an export has no `.git` (the firewall file passes 173 there); `test_recover_cli_uses_only_retained_local_artifacts` and `test_a2_cli_read_prints_only_rejection_census` call scripts whose designated-worktree guard refuses any other directory (2 passed there). The eleven skips are the standing ones: seven Windows-only directory-junction tests, three document checks that need a mainline Git ref an export lacks, and one top-five-only profile case. The export predates the pins of `bc1150a`; their file is validated on the final tree below. |
+| Required gates and the new policy tests at the pushed head | firewall, ML boundary, whole-package closure, lane-record integrity, active-document consistency, `test_qc_six_universe_forward_construction_policy.py` (worktree at `7d078b9`) | 392 passed |
+| The file carrying the new pins | `test_qc_six_universe_forward_construction_policy.py` (worktree, final tree) | 58 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` (worktree, final tree) | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` (final tree) | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+The final tree differs from the pushed head `7d078b9` only by this round's
+Claude commits, the test-only `bc1150a` and this record commit. Not
+exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run, and section 221 records none.

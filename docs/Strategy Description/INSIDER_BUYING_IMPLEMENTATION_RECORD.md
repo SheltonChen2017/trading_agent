@@ -1,18 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 109 BUILDS THE OWNER-DELEGATED OFFLINE PREPARATION FOR
-BACKTEST GATES 1-5 IN ONE PRE-CLAUDE-REVIEW ROUND. CODE COMMIT `f47e031`
-PINS A HEADER-ONLY 82-QUARTER IB-1B PROFILE AND READ-ONLY PREFLIGHT,
-AN 82-MASTER REQUEST PLAN AND PURE WHOLE-INVENTORY RECONCILIATION,
-AN AS-FILED IB-1C..IB-1E DECLARATION CHECKPOINT, AND AN UNREGISTERED IB-5
-STUDY-INPUT CANDIDATE. THE RETAINED-ZIP PREFLIGHT READ 82 ZIPs AND MATCHED
-656/656 PHYSICAL HEADERS; IT DID NOT RUN IB-1B OR WRITE SNAPSHOTS.
-THE OTHER 80 MASTER INDEXES AND ~4 MILLION COMPLETE-PARENT/METADATA TARGETS
-HAVE NOT BEEN ACQUIRED. CANONICAL/PIT, OUTCOME RIGHTS/LOOK REGISTRATION,
-AND QC EXECUTION REMAIN BLOCKED: THIS LANE IS NOT BACKTEST-READY.
-CLAUDE REVIEWS THE EXACT ONE-PUSH SNAPSHOT NEXT, PER THE OWNER'S TIMING
-CHANGE. LOOKS 0/0/0; NO NEW SEC REQUEST, OUTCOME, QC JOB, BROKER,
-PAPER/LIVE, CAPITAL, ORDER OR TRADING ACTIVITY THIS ROUND.**
+Status: **SECTION 119 RECORDS CLAUDE'S REVIEW OF ALL 25 CODEX COMMITS IN
+`5d73e11..5a87bcf` (SECTIONS 108-118): ALL ACCEPTED, WITH TYPED-REFUSAL
+FIXES IN `5db165f` AND TEST-ONLY PINS IN `01a6b7e`. EVERY REAL-DATA FIGURE
+CODEX RECORDED REPRODUCES, INCLUDING THE 99,394 PARTITION AND THE STOPPED V3
+ROOT (1,846 OF 1,847). THREE P2 FINDINGS ARE OPEN AND FAIL CLOSED: IB-1C V1
+REFUSES 19 OF THE 82 REAL QUARTERS; RETAINED V3 CUSTODY IS BOUND TO THE
+CURRENT BYTES OF FOUR SOURCE FILES; THE EXACT MASTER RECONCILIATION RULE
+FAILS ON SIX REAL QUARTERS. THE JOURNALS SHOW 19,973 SEC REQUESTS, 372 OF
+THEM IN THREE STOPPED RUNS THE RECORD DOES NOT MENTION. ONLY 19,526 OF THE
+99,394 TWO-QUARTER PARENTS ARE HELD; THE LANE IS NOT BACKTEST-READY. CODEX
+COUNTER-REVIEW OF THE THREE CLAUDE COMMITS IS REQUIRED. NO OUTCOME/QC JOB,
+BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING ACTIVITY OCCURRED.
+LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -212,6 +212,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-28 | Codex owner-directed build-ahead | `a6b7595..c34555a` (section-106 record follows) | Exact-16 complete-text source and offline IB-1C compatibility; pure 82-quarter resource preflight | With the owner's standing scoped preauthorization, fetched only two SEC quarterly master indexes and their exact 16 selected complete `.txt` submissions into a new immutable outside-Git root after two fail-closed compatibility attempts. Added pinned journal/object/index/submission replay, a non-executable date-only 16-row IB-1C diagnostic, strict real `DD-MON-YYYY` upstream compatibility in v1, and caller-declared 82-quarter request/byte arithmetic. No shared file changed. | Final successful root: 18/18 HTTP 200 first attempts, 16/16 projections, report SHA `e3f22668...429421`; prior XML byte match 16/16; IB-1B versus master-index accession/form sets 35,550 and 63,844 with zero differences; real offline bridge 16/16, four amendments quarantined, 0 executable rules. Focused 14-file selection 714 passed; full suite not run by Codex. Looks 0/0/0. | Four P2s corrected red/green before new bridge/adapter commits; one existing real-date IB-1C P2 corrected in `c34555a`; initial master/index/SGML compatibility refusals corrected with red/green. Historical open P3s retained; no current open P0-P2 claimed. | One same-lane push after this record and final checks; Claude independently reviews every exact Codex commit since `40e9b20` and Codex counter-reviews every resulting Claude commit. Next: source-bound 82-quarter accession census/capacity plan and a reviewed complete-text source policy; no inference of canonical/PIT, outcomes, QC backtest or trading. |
 | 2026-09-28 | Claude review | `fdb32db` -> `52bcef1` (code correction) -> `fb2df3b` (test pins) -> this review record | Independent review of the section-103 counter-review, the exact-16 XML adapter, the IB-1C readiness report, and the section-106 complete-text source build-ahead (`f8877fe..fdb32db`, 14 commits, 0 merges) | Armed a watcher on `a6b7595` and started only after Codex pushed `fdb32db`. Dispositioned all 14 commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Replayed the three retained real roots read-only with aggregates only, and verified from the journals that the 22 new SEC requests stayed inside the recorded scope with no contact address in any Codex-written file. Probed malformed inputs in memory, ran 145 direct and 8 combined mutants, fixed two untyped failure paths, and pinned the untested guards. | Pushed `fdb32db`: complete suite **9,433 passed, 38 skipped, 0 failed in 479.61s**. Real roots: complete-text replay **16 of 16**, embedded XML equal **16 of 16**, master indexes vs IB-1B **0 missing, 0 extra, 0 form disagreements**, IB-1C bridge **16 of 16** with 4 quarantined. Red/green **4 failed then 4 passed** and **2 failed then 2 passed**. Mutation **54 to 86 of 98** (section 106) and **21 to 33 of 46** (sections 104-105), survivors classified. Lane gate **3,317 passed** on both Pythons. Final tree: complete suite **9,515 passed, 38 skipped, 0 failed in 442.78s**; compileall exit **0**. **0 looks**. | `IBSECCOM-CR01` P3 closed in `52bcef1` (missing document field raised KeyError). `IBSECCOM-CR02` P3 closed in `52bcef1` (corrupt master.gz raised zlib.error). `IBSECCOM-CR03` P3 closed in `fb2df3b` (broad refusal matches hid deleted guards). `IBSECCOM-OBS01` open (stale docstring; tagged-header branch synthetic-only for complete text). `IBSECACQ-CR03` open for real multi-owner headers; `IBSECACQ-CCR03` open, process. No open P0-P2. | Codex counter-reviews `52bcef1`, `fb2df3b`, and this record. The owner may wish to confirm that the section-106 preauthorization covers the 22 SEC requests, and should confirm the 82-quarter census explicitly before any crawl. No outcome, QC, paper, or trading step is inferred. |
 | 2026-09-29 | Codex counter-review and bounded implementation | `5d73e11..PUSHED_HEAD`; `e85cc24` census code and this section-108 record | Accept Claude's three-commit section-107 review and perform a source-bound, read-only 82-quarter retained-ZIP census | Accepted `52bcef1`, test-only `fb2df3b`, and record `5d73e11` separately. Added a versioned zero-I/O receipt that binds the exact retained CSV and 82 hash-checked ZIPs, validates one ZIP at a time and streams SUBMISSION records to count six forms and 4/4-A targets. Closed the stale complete-submission docstring. No high-volume crawl or real IB-1C advancement. | Claude's prior full-suite result is reviewer evidence only. Codex focused final selection **609 passed** on Python 3.12.14; new/preflight/import selection **43 passed**, record/active-document/import selection **144 passed**; three touched Python files compiled in memory; census run twice with identical hash `2c93041a...6bd83c33`; diff/show checks clean. No complete suite by Codex. Looks 0/0/0. | Incoming `IBSECCOM-CR01`/`CR02`/`CR03` closures accepted. Precommit `IBZIPC-R01`/`R02`/`R03` P2 fixed with red/green; typed-refusal P3 edge fixed; `IBSECCOM-OBS01` P3 closed. Historical open P3 and shared `IBSH-CR01` retained. No open current-lane P0-P2. | Make one same-lane push; Claude reviews every Codex commit in `5d73e11..PUSHED_HEAD` and Codex later counter-reviews every Claude commit. Before any broad crawl, review an accession-specific complete-text/acceptance-metadata manifest and a viable capacity/target policy. No canonical/PIT, outcome, QC, paper/live or trading authority follows. |
+| 2026-10-01 | Claude review | `5a87bcf` -> `5db165f` (code correction) -> `01a6b7e` (test pins) -> this review record | Independent review of the section-108 counter-review, the 82-quarter census, the gates 1-5 preparation, the SEC source runners and campaigns, the recovery and diagnostic modules, and the two QC entry files (`5d73e11..5a87bcf`, 25 commits, 0 merges) | Armed a watcher on `d478cfd` and started only after Codex pushed `5a87bcf`. Dispositioned all 25 commits. Ran every check in the designated worktree while Codex was idle, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Audited every new module line by line and verified each reported defect before acting. Replayed the retained roots read-only with aggregates only, reconciled 19,973 SEC requests from the journals, and ran three new real-data checks: 82 masters against the census, the IB-1C row rules against all 4,458,409 SUBMISSION rows, and the custody freeze. Fixed five untyped failure paths and pinned untested guards. | Pushed `5a87bcf`: complete suite **10,017 passed, 38 skipped, 0 failed in 611.34s**; every recorded hash and the 99,394 partition reproduce. Red/green **15 failed then 15 passed**. Mutation **66 to 94 of 139**. Lane gate **3,874 passed** on both Pythons. Retained roots replay identically after the fix commit. Final tree: complete suite **10,072 passed, 38 skipped, 0 failed in 611.80s**; compileall exit **0**. **0 looks**. | `IB1C-REAL-CR01` P2 open (IB-1C v1 refuses 19 of 82 real quarters). `IB1BCAMP-CR01` P2 open (v3 custody bound to current source bytes). `IBSRC-CR01` P2 open (exact master reconciliation fails on six quarters). `IBSECACQ-CR06`, `IBOFF-CR01`, `IBOFF-CR02` P3 closed in `5db165f`. `IBTEST-CR01`, `IBQC-CR01` P3 closed in `01a6b7e`. `IBREC-CR01..CR03`, `IB1BCAMP-CR02/CR03`, `IBSECACQ-CR05` and four observations open. No P0 or P1. | Codex counter-reviews `5db165f`, `01a6b7e`, and this record, adds its own ledger rows for sections 109-118 and a QC entry, and needs a decision on each open P2 before further acquisition. The owner may wish to confirm that the recorded directions covered all 19,973 requests. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -15326,3 +15327,261 @@ snapshot and Codex counter-reviews every incoming commit may a separately
 versioned v4 union/continuation be considered for the remaining 79,868;
 diagnostic acceptance alone does not authorize skipping them or launching
 the backtest.
+
+## 119. Claude review - sections 108 to 118: census, gates 1-5 preparation, SEC source campaigns, recovery, diagnostics, and the QC entry files (2026-10-01 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying`. No branch, worktree, fork, or handoff was
+created or switched to. On the owner's instruction this reviewer armed a
+watcher on the remote head `d478cfd` and started only after Codex's push
+`5a87bcf3e0d0d7fbffc7b6735f66e9589a3b0ad7` landed. After `git fetch`, local
+and remote were both `5a87bcf` and the worktree was clean. The remote stayed
+at `5a87bcf` for the whole review.
+
+Range: `5d73e11..5a87bcf`, **25 Codex commits, 0 merges**, 60 files, about
+25,000 added lines, and record sections 108 to 118.
+
+Validation: Codex was idle and the worktree clean, so every test, suite, and
+mutation run ran in the designated worktree on Python 3.13.15 and on Codex's
+Python 3.12.14 runtime. After every mutant the file was restored byte for
+byte. Six read-only audit passes covered every new module line by line; this
+reviewer verified each reported defect before acting on it. One push, gated
+on the record commit.
+
+Authority: sections 110, 113, 114, 116, and 118 record owner directions that
+this reviewer did not witness: reviewing only after the first backtest,
+"retry", a supplied SEC contact, "proceed", one ambiguous-parent diagnostic,
+and one push. Under them Codex made live SEC requests. This reviewer made no
+SEC request. What this review can verify, from the retained journals and
+read-only, is in 119.3: the requests stayed on the SEC Archives host, inside
+the recorded populations, with no retries and no contact address in any
+written metadata file. It also shows 372 requests in three stopped runs that
+the record does not mention (`IBREC-CR01`).
+
+### 119.1 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `e85cc24` | 82-quarter ZIP census; parser docstring | **Accepted after correction.** The receipt `2c93041a...` and 4,034,227 targets reproduce. One forged-input path raised `TypeError` (`IBOFF-CR01`, fixed in `5db165f`). |
+| `17d5382` | Section 108 | **Accepted.** Its dispositions of `52bcef1`, `fb2df3b`, and `5d73e11` are fair. |
+| `f47e031` | Schema profile, header preflight, 82-master plan, reconciliation, scale readiness, IB-5 candidate | **Accepted after correction, with two open real-data findings.** 656 of 656 headers and receipt `3736b032...` reproduce. The IB-5 candidate is unregistered: alpha 1/160 + 1/160 = 1/80, look flags literal false. Scale readiness had a `TypeError` path (`IBOFF-CR01`). Its accession-year rule and the exact reconciliation rule both fail on real quarters (`IB1C-REAL-CR01`, `IBSRC-CR01`). |
+| `d478cfd` | Section 109 | **Accepted.** Its status header is the one still at the top of the record (`IBREC-CR02`). |
+| `af8ef7b` | Master and selected runners; QC order skeleton | **Accepted with test pins.** The skeleton was first placed inside the offline package and passed the package guard there. |
+| `7a5d6bb` | Selected-parent bounds; skeleton moved out of the package; QC stock study | **Accepted with test pins.** Both QC files are inert by default (119.2). The record never names them (`IBREC-CR03`). |
+| `4505d05` | Selected-root replay; boundary hardening | **Accepted.** |
+| `93696cf` | Chunked transfer accepted; former-name header | **Accepted.** The chunked path is bounded: the decoder must agree, the read stops one byte over the cap, and the terminal chunk is demanded. It was added after a stopped run the record omits. |
+| `979a5c5` | Former name without a mail address | **Accepted.** Five of six parser mutants caught as pushed; six of six after a pin. |
+| `cb79218` | Two-quarter all-Form-4 locator manifest | **Accepted after correction.** Manifest `3e9a0f3d...` and 99,394 reproduce. One `TypeError` path fixed (`IBOFF-CR01`). |
+| `8759444` | Section 110 | **Accepted with `IBREC-CR01`.** Every figure it states reproduces. |
+| `d07b68a` | Streaming projection accounting | **Accepted.** |
+| `0dadf3f` | Full-parent campaign runner | **Accepted with open findings.** Fail-closed throughout. Two replay asymmetries and an orphan-file path are recorded, not fixed (`IB1BCAMP-CR02`, `CR03`), because the file is frozen by `IB1BCAMP-CR01`. |
+| `b64acd1` | Section 111 | **Accepted.** |
+| `bc974f5` | Section 112 | **Accepted.** 9,539 completed and 8,342 attempts reproduce. |
+| `629bdf7` | Refusal diagnostic, recovery preflight, union, inert plan | **Accepted with an observation.** The first diagnostic lacks two guards the later one has (`IBDIAG-OBS01`); its one-shot root is consumed. |
+| `20555de` | Short issuer CIK padded at the header target; offline correction | **Accepted.** The campaign stopped on Codex's own defect, not on the source. The diagnosis and the fix are correct, and the reverting mutant is caught. |
+| `c339ef6` | Section 114 | **Accepted.** |
+| `10f4916` | v3 executor and independent verifier | **Accepted with test pins.** No audit found a path to a false completion, a duplicate or early dispatch, or a retry after an ambiguous result. Its pacing rule had no test. |
+| `7dd4e50`, `aa0d635`, `e6a0d02` | Sections 115, 116, 117 | **Accepted.** 1,847 starts, 1,846 finishes, and all three anchors reproduce. |
+| `eee1bc8` | Observed v3 entry | **Accepted.** |
+| `b5a1408` | Ambiguous-parent diagnostic, verifier, partial verifier | **Accepted with test pins.** The verifier's external report anchor was untested. |
+| `5a87bcf` | Section 118 | **Accepted with `IBREC-CR02`.** |
+
+Ratings:
+
+- **Engineering: 7 of 10.** Every boundary fails closed, six audits found no
+  wrong accepted outcome, and every real-data figure Codex recorded
+  reproduces. Deductions: the full-parent campaign halted on Codex's own
+  unpadded-CIK defect after 8,342 requests; the custody design freezes four
+  source files; two rules were never checked against the real 82 quarters;
+  and 73 of 139 guard mutants survived the pushed tests.
+- **Record-keeping: 5 of 10.** Three stopped runs and 372 requests are
+  unrecorded, the status header is nine sections stale, sections 109 to 118
+  have no ledger row, and about 950 lines of QC algorithm code are not
+  mentioned.
+
+### 119.2 Real-data checks (read-only, aggregates only)
+
+Nothing was printed except counts, dates, and form types. All 82,630 files
+under the retained roots were byte-identical before and after.
+
+- **Recorded hashes.** All reproduce: the census receipt, the header
+  preflight, the selected-root report and journal, both campaign shard
+  reports and journals, the campaign plan, the v3 plan, the 5,539-file v3
+  event sequence, the pending-start event, and both diagnostic reports and
+  bodies (4,060 and 7,373 bytes).
+- **Partition replay.** The partial campaign, the source union, and the
+  partial v3 loaders reproduce 9,539 + 1 + 8,139 + 81,715 = 99,394 and 1,846
+  of 1,847. The output is identical before and after `5db165f`.
+- **82 masters against the census (new).** All 82 retained masters parse.
+  They hold 4,034,218 distinct Form 4/4-A accessions against the census's
+  4,034,227. In six quarters (2015Q4, 2022Q2, 2025Q1, 2025Q2, 2025Q3,
+  2026Q1), twelve dataset Form 4 filings have no Form 4 master row in their
+  own quarter: nine appear in none of the 82 masters, and three sit in an
+  earlier quarter's master. The exact whole-quarter rule of D23 would refuse
+  those quarters (`IBSRC-CR01`).
+- **IB-1C v1 row rules against all 4,458,409 real SUBMISSION rows (new).**
+  The reviewed IB-1C v1 module would refuse **19 of 82 quarters**:
+  - 146 rows in nine quarters, 2020Q4 to 2022Q4, carry an issuer CIK of four
+    to nine digits (132 are Form 4/4-A; three are in the pilot quarter
+    2022Q4);
+  - 15 rows in ten quarters have a filing year that differs from the
+    accession year.
+  All 82 quarters use the `DD-MON-YYYY` dialect. No filing date is outside
+  its quarter. The module itself confirms it, in memory and without building
+  a snapshot: its row validator refuses the retained 2022Q4 snapshot
+  ("upstream SUBMISSION issuer CIK is invalid") and accepts all 69,457
+  accessions of 2023Q1 (`IB1C-REAL-CR01`).
+- **Scale-readiness accession-year rule (new).** 13 Form 4/4-A rows in nine
+  quarters would refuse the 82-quarter checkpoint.
+- **Selected parents.** All 9,337 use the legacy header; 7,458 are Form 4 and
+  1,879 are Form 4/A; 962 carry two or more reporting owners, so real
+  multi-owner headers are now measured for this cohort.
+- **QC entry files.** As committed, both refuse in `initialize()` before any
+  subscription or order: the Object Store key is empty,
+  `RESEARCH_ENTRY_SHARES` is 0, and `RESEARCH_BACKTEST_ENABLED` is false.
+  Live mode is refused at start and again before every order. They import
+  only the LEAN entry point and the standard library. Nothing in the
+  repository can upload them.
+- **Custody freeze (new).** Appending one comment line to the campaign
+  runner changes the validator-source hash from `e47d595e...` to
+  `234e343e...`, and the retained v3 root then refuses to replay. The file
+  was restored byte for byte (`IB1BCAMP-CR01`).
+
+### 119.3 SEC request accounting from the retained journals
+
+| Root | Requests | Outcome | In the record |
+|---|---:|---|---|
+| `masters` | 24 | Halted: master index row fields malformed | No |
+| `masters-v2` | 41 | Halted: same reason | No |
+| `masters-v3` | 82 | Complete; report `9a7aca08...` | Yes, as "82 masters" |
+| `selected-parents-v1` | 307 | Halted: transport rejected response framing | No |
+| `selected-parents-v2` | 9,328 | Complete, plus 9 reuses | Yes |
+| `all-form4-parents` | 8,342 | Halted on the short-CIK defect | Yes |
+| `refused-parent-diagnostic-v1` | 1 | HTTP 200, 4,060 bytes | Yes |
+| `all-form4-parents-recovery-v3` | 1,847 | Stopped: TLS reset, one unresolved start | Yes |
+| `all-form4-parents-v3-ambiguous-diagnostic-v1` | 1 | HTTP 200, 7,373 bytes, accepted | Yes |
+| **Total** | **19,973** | 19,599 distinct artifacts | 19,601 recorded |
+
+- Every URL is under `https://www.sec.gov/Archives/`. No request was retried.
+  Every finished response is HTTP 200.
+- Each run is bound to a capture commit inside this range: `af8ef7b`,
+  `7a5d6bb`, `4505d05` (twice), `93696cf`, `b64acd1`, `629bdf7`, `aa0d635`,
+  and `b5a1408` as recorded in 118.1.
+- No metadata file in any root contains an email-like token. Both diagnostic
+  roots hold only mode 0600 files and 0700 directories.
+- 374 requests repeat an earlier one. The restarted runs downloaded 65
+  masters and all 307 selected parents again from scratch, and the two
+  diagnostics were authorized repeats. The campaign and v3 repeated nothing.
+- Pacing is enforced on the monotonic clock, with a hard refusal at dispatch
+  that is now pinned by tests. These journals record only UTC stamps taken at
+  event-write time. On those stamps, 5 gaps in `selected-parents-v2` and 214
+  in `all-form4-parents` fall between 498 and 500 ms; all other roots are
+  above 500 ms. That is consistent with journaling latency, but a replay can
+  no longer prove the rule (`IBSECACQ-CR05`).
+
+### 119.4 Mutation evidence (in the worktree, Python 3.12)
+
+139 direct mutants over 27 modules.
+
+| Scope | As pushed | After `01a6b7e` |
+|---|---|---|
+| Changed reviewed modules and the CIK fix (11) | 10 of 11 caught | 11 of 11 caught |
+| New modules (128) | **56 of 128** caught | **83 of 128** caught |
+
+In total, 66 of 139 were caught as pushed and 94 of 139 after the pins.
+
+The 45 survivors are all in the new modules and were not classified one by
+one this round. By the audits' reading, four are cross-checks or duplicates
+of a sibling guard: the final journal-against-memory comparisons in the
+campaign and the executor, the pinned schema-profile hash, and the stream
+accounting total. The other 41 are guards with no isolating test, left for
+Codex:
+
+- campaign: replay attempt cap; replay reuse binding; verifier event-name
+  digest;
+- selected runner, master runner, and adapter: chunked decoder disagreement;
+  reuse set mismatch; completed receipt re-derived on replay; halted report,
+  partial root, and non-pinned cohort in the adapter;
+- diagnostics: a non-200 response with a body; exactly one unfinished
+  attempt; extra objects in the root;
+- v3 executor, union, and verifiers: non-200 body ambiguity; root membership;
+  frozen denominator; committed shard with an unfinished attempt; object hash
+  on read; validator unchanged during replay; diagnostic fills the exact
+  refused request; event hash chain; both observed external anchors;
+  refused-parent attempt count;
+- offline package: three census guards; three header-preflight guards,
+  including a same-size ZIP change; two snapshot-runner guards; four
+  reconciliation guards; two locator guards; two stream guards; the
+  ten-digit CIK rule; the IB-5 parent-gate drift check.
+
+### 119.5 Validation
+
+- Pushed `5a87bcf`, complete repository suite in the worktree: **10,017
+  passed, 38 skipped, 28 warnings, 0 failed in 611.34s**.
+- Pushed `5a87bcf`, lane gate (60 Insider files plus four boundary files) on
+  Python 3.12.14: **3,819 passed**.
+- Red/green for `5db165f`, against the pushed module code: **15 failed, then
+  15 passed** (11 Content-Length cases, 4 typed-refusal cases).
+- Lane gate after `01a6b7e` (61 Insider files plus four boundary files):
+  **3,874 passed** on Python 3.12.14 and on 3.13.15.
+- Final tree after this record, in the worktree: complete suite **10,072
+  passed, 38 skipped, 28 warnings, 0 failed in 611.80s** (10,017 plus 15
+  regression cases plus 40 pin cases); `compileall` exit **0**;
+  `git diff --check` clean.
+
+### 119.6 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IB1C-REAL-CR01 | P2 | **OPEN** | `f47e031`; IB-1C v1 | `sec_edgar_acceptance_snapshot.py` `_submission_rows`; `sec_ib1c_e_scale_readiness.py` | IB-1C v1 requires a ten-digit issuer CIK and a filing year equal to the accession year, and refuses the whole quarter otherwise. Real data breaks both rules, so 19 of 82 quarters, including the pilot quarter 2022Q4, cannot be built. The scale-readiness checkpoint has the same two rules. Fail-closed. | 119.2. | A current-lane real-shape incompatibility that blocks the 82-quarter path. Not fixed here: how to represent a short CIK and whether to accept, quarantine, or refuse the 15 rows is an evidence-contract decision that must be one policy across IB-1C, the checkpoint, and the frozen parser, in line with D43. This reviewer accepted `c34555a` in section 107 without measuring the other row rules. | None. Recommended: pad only at comparison, keep the raw value in lineage, and preregister the accession-year treatment. | None. |
+| IB1BCAMP-CR01 | P2 | **OPEN** | `20555de`, `10f4916` | Union `_validator_source_sha256`; executor and verifier plans | The v3 plan embeds a receipt that hashes the current bytes of the campaign runner, the union, `sec_complete_submission.py`, and `sec_raw_parent_projection.py`. Replay recomputes it. Any edit to those files, including a bug fix or the next parser extension, makes the retained v3 root unreplayable. One parser extension was already needed for 1 of the first 1,493 real parents. | 119.2, proved end to end. | Design fragility in the custody chain; fail-closed. | None. Recommended: compare against the recorded receipt literal `615bc9c0...`, or version the validator. | None. |
+| IBSRC-CR01 | P2 | **OPEN** | `f47e031` | `sec_master_locator_reconciliation.py`, D23 | The exact whole-quarter rule was tested on synthetic data only. On the real sources it would refuse six quarters. | 119.2. | The code is correct; the rule is not satisfiable by these sources. A changed rule needs preregistration, not a silent tolerance. | None. | None. |
+| IBSECACQ-CR06 | P3 | **CLOSED in `5db165f`** | `8f7fca3`, `5cc897d`, `93696cf` | `_fetch_sec`, `_strict_response`, `_sec_transport`, `_selected_framing` | `str.isdigit()` accepts characters such as U+00B2, which `int()` rejects with a bare `ValueError`, and digits of other scripts, which `int()` converts. Such a Content-Length would crash a runner after its attempt-start was journaled, or be accepted. Every runner shares these helpers. The complete-text runner had this when this reviewer accepted it in section 107. | Probes; red 11, green 11. | Runners promise typed refusals and a recorded outcome. | One ASCII-only check at all four sites. | 11 regression cases; retained roots replay identically. |
+| IBOFF-CR01 | P3 | **CLOSED in `5db165f`** | `e85cc24`, `f47e031`, `cb79218` | Census headers; locator manifest; scale-readiness quarter | Three forged inputs raised `TypeError` instead of a typed refusal. Nothing wrong was accepted. | Probes; red 3, green 3. | Same standard Codex applied in `IB1BALL-R01` and `IB1CSTR-R01`. | Type checks before `set()` and `sum()`. | Three regression tests. |
+| IBOFF-CR02 | P3 | **CLOSED in `5db165f`** | `f47e031` | 82-quarter snapshot runner `_parse_envelope` | Deeply nested JSON inside the 16 KiB cap raised `RecursionError`. | Probe on both Pythons; red 1, green 1. | Typed refusals. | Catch `RecursionError`. | One regression test. |
+| IBTEST-CR01 | P3 | **CLOSED in `01a6b7e`** (test only) | Range | Ten test files | Many guards had no isolating test, including pacing in the master runner and the v3 executor, re-dispatch after a journaled denial on resume, the verifier's external report anchor, the dirty-tree clause of two commit gates, and the QC live-mode and share-count guards. | 119.4. | These guards bound live SEC requests and an order-placing algorithm. | Forty isolating test cases. No module change. | 119.4. |
+| IBQC-CR01 | P3 | **CLOSED in `01a6b7e`** (test only) | `af8ef7b`, `7a5d6bb` | Import boundary | No test stopped the offline package from importing a QC entry file, or a QC entry file from importing repository code. The skeleton once sat inside the package and passed the guard. | Audit; the reverting mutant is caught. | The boundary held only because LEAN is absent locally. | New lane boundary test, both directions, plus a transitive check over 12 network-capable lane modules. | Three tests on both Pythons. |
+| IB1BCAMP-CR02 | P3 | **OPEN** | `0dadf3f` | Campaign `_state` versus `_run_shard` | (a) A transport refusal sets one reason in the loop and a different one on replay, so the first pass refuses with "journal differs from in-memory state" and writes no shard report until a resume. (b) The attempt-ceiling reason is never derived on replay, so a committed ceiling shard later reads as "commit differs". Fail-closed; the messages are false. | Audit probes. | Not fixed: the file is frozen by `IB1BCAMP-CR01`. | None. Recommended: derive both reasons in `_state`. | None. |
+| IB1BCAMP-CR03 | P3 | **OPEN, operational** | `0dadf3f`, `10f4916` | Campaign, v3 executor, selected adapter | After a hard kill, an orphaned publisher temporary is found only after the shard's requests are spent and its commit is published. The root then refuses every resume until someone deletes the file by hand. | Source trace; not reproduced. | Could waste up to one shard of SEC requests. | None. Recommended: check member sets before the first dispatch and before the commit. | None. |
+| IBSECACQ-CR05 | P3 | **OPEN observation** | `af8ef7b` onward | All new journals | The monotonic marks the section-106 runner journaled are gone. | 119.3. | Auditability. | None. | None. |
+| IBREC-CR01 | P3 | **OPEN, record** | `8759444` | Section 110 | Three stopped runs and 372 SEC requests are unrecorded. The two changes they caused, Windows-1252 company names with blank non-target names and chunked transfer, have no ledger finding. | 119.3. | The record is the lane's handoff and its request log. | Recorded here; Codex to confirm. | 119.3. |
+| IBREC-CR02 | P3 | **Header CLOSED here; ledger rows OPEN** | `5a87bcf` | Status header; section-5 ledger | The status header still described section 109. Sections 109 to 118 have no ledger row. | Direct reading. | Handoff accuracy. | Header rewritten; one row added for this review. Codex to add its own rows. | Record tests pass. |
+| IBREC-CR03 | P3 | **OPEN, record** | `af8ef7b`, `7a5d6bb`, `4505d05` | Sections 109 to 110 | The two QC entry files, their tests, their default-off constants, and the move out of the package are not described anywhere. | Search of the record. | An order-placing algorithm must be in the handoff. | Facts recorded in 119.2; Codex to add its own entry. | None. |
+| IBDIAG-OBS01 | P3 | **OPEN observation** | `629bdf7`, `b5a1408` | Diagnostics and verifier | The first diagnostic has no production-transport seam guard and no lane recheck just before dispatch. The verifier replaces specific refusal reasons with two generic wrappers. Comments claim power-loss durability that plain `fsync` on macOS does not give. All response headers are retained privately. | Audit. | Latent or documentation-level. | None. | None. |
+| IBSEL-OBS01 | P3 | **OPEN observation** | `af8ef7b`, `7a5d6bb` | Selected and master runners; campaign entry | The selected runner binds identity only in the offline adapter. It has the same short-CIK latent refusal the campaign had; all 9,337 retained requests are ten-digit. Journal replay compares some integers without exact-type checks. The master resume lock and several entry paths raise sibling error types. | Audit; inventory scan. | Fail-closed. | None. | None. |
+| IBQC-OBS01 | P3 | **OPEN observation** | `7a5d6bb` | QC study and skeleton | The study's capacity preflight frees a slot on the exit day, but a cash account settles later, so a full study could abort on a refusal. A window ending on the last decision day can never complete. A repeated ticker is refused only at run time. `available_at_utc` is caller-asserted. | Audit. | Fail-closed; matters before any registered look. | None. | None. |
+| IBSECACQ-CR03, IBSECACQ-CCR03, IBSECACQ-CR04, IBSECACQ-R08/R09, IBSECREPLAY-OBS01, IB1BCAMP-OBS01, IB1BP-CR04/CR05, IB2CTX-CR02, IBZIP-CR02/CR03, IB2SRC-CR03 | P3 | **Retained as recorded** | earlier | earlier | As recorded in sections 94 to 118. Real multi-owner headers are now measured for 962 selected parents. | Earlier sections. | Unchanged. | None. | None new. |
+| Codex's findings in sections 108 to 118 | P1 to P3 | **CLOSED, accepted** | Range | Sections 108 to 118 | `IBZIPC-R01..R04`, `IB1B82-R01`, `IB1CE-R01`, `IBMASTER82-R01/R02`, `IBSECRP-R03`, `IB1BALL-R01`, `IB1CSTR-R01`, `IB1BCAMP-R01..R12`, `IB1BCAMP-OBS02`, `IB1BCAMP-V3AMB01..04`. | Their tests; 119.2. | Verified. | Codex's. | Their tests pass. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. Also out of lane: four package modules import `ml.immutable_io`, a standard-library-only helper. | Sections 68 to 72; audit. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no P0 or P1 finding. Three P2 findings are open. All three fail
+closed; none is an unsafe acceptance.
+
+### 119.7 Next action
+
+Codex counter-reviews `5db165f`, `01a6b7e`, and this record commit. It adds its own ledger rows for sections 109 to 118 and its own
+entry for the QC files. Before any further acquisition it needs a decision
+on each open P2:
+
+- one issuer-CIK and accession-year policy for IB-1C;
+- a custody binding that survives a code fix;
+- a preregistered rule for the filings the master indexes do not locate.
+
+For the owner:
+
+- confirm that the recorded directions covered all 19,973 requests,
+  including the 372 in the three unrecorded runs;
+- decide whether to continue the remaining 79,868 parents.
+
+The lane is **not** backtest-ready. Still missing: a complete parent corpus,
+an IB-1C that accepts the real quarters, authenticated amendment linkage,
+exact acceptance time and timezone, a PIT security master and calendar, and
+frozen outcome and look terms. No outcome, ETF, QC, paper, live, deployment,
+broker, capital, order, or trading authority follows from this section.
+
+No SEC request, network access, credential, licensed row, security master,
+outcome, ETF holding, QuantConnect, broker, operator database, scheduler,
+deployment, capital, order, live, or trading surface was used. Real bytes
+read, in memory and read-only, were the 82 retained ZIPs and the retained
+roots named in 119.3 and section 107.2. Authorized outcome looks: **0**.
+Consumed outcome looks: **0**. Research looks: **0**.

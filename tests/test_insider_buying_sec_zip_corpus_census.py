@@ -348,3 +348,13 @@ def test_unhashable_private_scope_refuses_typed(tmp_path: Path) -> None:
         _census_zip_corpus(
             tmp_path, expected_manifest_sha256="a" * 64, scope=[],  # type: ignore[arg-type]
         )
+
+
+# Section 119 (Claude review): regression for IBOFF-CR01. A forged header
+# tuple holding an unhashable value must refuse, not raise TypeError.
+def test_forged_unhashable_submission_header_is_a_typed_refusal(tmp_path: Path) -> None:
+    result = _run(tmp_path, _fixture(tmp_path))
+    quarter = result.quarters[0]
+    object.__setattr__(quarter, "submission_headers", ("ACCESSION_NUMBER", []))
+    with pytest.raises(SecZipCorpusCensusError, match="REFUSED"):
+        quarter.to_payload()

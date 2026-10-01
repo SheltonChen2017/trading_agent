@@ -238,3 +238,17 @@ def test_no_form4_in_one_quarter_still_checks_full_index_equality() -> None:
         build_ib1b_all_form4_parent_locator_manifest(
             (first, second_with_extra_form4)
         )
+
+
+# Section 119 (Claude review): regression for IBOFF-CR01. A forged
+# non-integer quarter count must refuse, not raise TypeError in sum().
+def test_forged_non_integer_quarter_count_is_a_typed_refusal() -> None:
+    from research.insider_buying.ib1b_all_form4_parent_locators import (
+        AllForm4ParentLocatorError,
+        build_ib1b_all_form4_parent_locator_manifest,
+    )
+
+    manifest = build_ib1b_all_form4_parent_locator_manifest(_all_inputs())
+    object.__setattr__(manifest.quarters[0], "form4_count", "4")
+    with pytest.raises(AllForm4ParentLocatorError, match="REFUSED"):
+        manifest.verify_digest()

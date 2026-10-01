@@ -241,7 +241,9 @@ def _parse_envelope(raw: bytes) -> dict[str, object]:
             or raw != (canonical_json(envelope) + "\n").encode("utf-8")
         ):
             _refuse("immutable receipt content or digest is invalid")
-    except (UnicodeError, TypeError, ValueError) as exc:
+    # RecursionError: deeply nested JSON inside the 16 KiB cap is neither
+    # a ValueError nor a TypeError and would otherwise escape untyped.
+    except (UnicodeError, TypeError, ValueError, RecursionError) as exc:
         if isinstance(exc, Ib1b82qSnapshotError):
             raise
         raise Ib1b82qSnapshotError("REFUSED: immutable receipt is not canonical JSON") from exc

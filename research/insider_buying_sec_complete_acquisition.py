@@ -40,6 +40,7 @@ from research.insider_buying.sec_complete_submission import (
 from research.insider_buying_sec_acquisition import (
     SecPilotCandidate,
     _EXPECTED_ACCESSIONS,
+    _ascii_decimal,
     _check_output_directory,
     _open_output_directory,
     _publish_immutable,
@@ -146,7 +147,7 @@ def _strict_response(result: SecHttpResult, *, max_bytes: int) -> bytes:
     lengths = [value for name, value in pairs if name.lower() == "content-length"]
     encodings = [value for name, value in pairs if name.lower() == "content-encoding"]
     transfers = [value for name, value in pairs if name.lower() == "transfer-encoding"]
-    if (len(lengths) != 1 or not lengths[0].isdigit()
+    if (len(lengths) != 1 or not _ascii_decimal(lengths[0])
             or int(lengths[0]) != len(result.body) or len(result.body) > max_bytes
             or len(encodings) > 1 or (encodings and encodings[0].lower() != "identity")
             or transfers):
@@ -168,7 +169,7 @@ def _sec_transport(url: str, headers: dict[str, str], max_bytes: int) -> SecHttp
         lengths = [value for name, value in response_headers if name.lower() == "content-length"]
         encodings = [value for name, value in response_headers if name.lower() == "content-encoding"]
         transfers = [value for name, value in response_headers if name.lower() == "transfer-encoding"]
-        if (len(lengths) != 1 or not lengths[0].isdigit()
+        if (len(lengths) != 1 or not _ascii_decimal(lengths[0])
                 or not 0 < int(lengths[0]) <= max_bytes
                 or len(encodings) > 1 or (encodings and encodings[0].lower() != "identity")
                 or transfers):

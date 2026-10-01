@@ -151,6 +151,9 @@ class DeclaredIb1ceQuarter:
         if type(self.filings) is not tuple or len(self.filings) > MAX_QUARTER_FILINGS or any(type(row) is not DeclaredIb1ceFiling for row in self.filings):
             raise SecIb1cEScaleReadinessError("REFUSED: quarter filings are not a bounded exact tuple")
         accessions = tuple(row.accession_number for row in self.filings)
+        # A forged unhashable accession must refuse, not raise TypeError.
+        if any(type(value) is not str for value in accessions):
+            raise SecIb1cEScaleReadinessError("REFUSED: quarter accession is not exact text")
         if accessions != tuple(sorted(set(accessions))):
             raise SecIb1cEScaleReadinessError("REFUSED: quarter accessions repeat or are unordered")
         year_suffix = self.period[2:4]

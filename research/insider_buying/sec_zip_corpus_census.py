@@ -372,8 +372,10 @@ def _expected_url(period: str) -> str:
 def _valid_submission_headers(headers: tuple[str, ...]) -> bool:
     return (
         0 < len(headers) <= MAX_HEADER_COLUMNS
-        and len(headers) == len(set(headers))
+        # Exact-text check first: set() on a forged unhashable header
+        # would escape as TypeError instead of a typed refusal.
         and all(type(value) is str and _HEADER.fullmatch(value) for value in headers)
+        and len(headers) == len(set(headers))
         and _REQUIRED_SUBMISSION_HEADERS <= set(headers)
     )
 

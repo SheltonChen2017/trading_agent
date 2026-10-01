@@ -1092,3 +1092,43 @@ def test_lane_package_stays_network_free_through_indirect_imports():
     )
     assert "research.insider_buying_sec_acquisition" in result.stdout.strip().split(",")
     assert "http.client" in result.stdout.strip().split(",")
+
+
+# Section 119 (Claude review): regression for IBSECACQ-CR06 in the first pilot
+# transport, using an invented in-memory connection; no SEC request.
+@pytest.mark.parametrize("declared", ["²", "٣", "１"])
+def test_non_ascii_content_length_is_a_typed_pilot_stop(monkeypatch, declared):
+    class _Response:
+        status = 200
+
+        def getheaders(self):
+            return [("Content-Length", declared)]
+
+        def read(self, size):
+            pytest.fail("body was read despite an unsafe declared length")
+
+    class _Connection:
+        def __init__(self, host, timeout):
+            assert host == "www.sec.gov"
+
+        def request(self, method, path, headers):
+            assert method == "GET"
+
+        def getresponse(self):
+            return _Response()
+
+        def close(self):
+            pass
+
+    monkeypatch.setattr(pilot.http.client, "HTTPSConnection", _Connection)
+    with pytest.raises(pilot.SecPilotError, match="Content-Length"):
+        pilot._fetch_sec(
+            "/Archives/edgar/data/123456/000099999922000001/invented.xml",
+            "InsiderBuyingResearch/0.1 (invented@example.test)",
+        )
+
+
+def test_ascii_decimal_accepts_only_bounded_ascii_digits():
+    assert pilot._ascii_decimal("0") and pilot._ascii_decimal("8388608")
+    for value in ("", "²", "٣", "１", "1 ", "+1", "1\n", "9" * 20, 1, None):
+        assert not pilot._ascii_decimal(value)

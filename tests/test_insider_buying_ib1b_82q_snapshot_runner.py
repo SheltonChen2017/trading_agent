@@ -285,3 +285,11 @@ def test_interrupted_receipt_temporaries_recover_only_from_matching_bytes(
         _run(source, destination, census)
     assert not journal.exists()
     assert wrong_temp.read_bytes() == b"foreign"
+
+
+# Section 119 (Claude review): regression for IBOFF-CR02. Deeply nested JSON
+# inside the receipt byte cap raises RecursionError, which must be a typed
+# refusal like every other malformed receipt.
+def test_deeply_nested_receipt_is_a_typed_refusal() -> None:
+    with pytest.raises(runner.Ib1b82qSnapshotError, match="not canonical JSON"):
+        runner._parse_envelope(("[" * 16000).encode("ascii"))

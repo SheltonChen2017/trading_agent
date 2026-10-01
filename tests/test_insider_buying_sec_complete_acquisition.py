@@ -635,3 +635,33 @@ def test_owner_scoped_pacing_and_request_budget_constants():
     assert runner.MAX_ATTEMPTS_PER_ARTIFACT == 3
     assert runner.MAX_DISTINCT_ARTIFACTS == 18
     assert runner.MAX_TOTAL_ATTEMPTS == 54
+
+
+# Section 119 (Claude review): regression for IBSECACQ-CR06. str.isdigit()
+# accepts "²", which int() rejects with a bare ValueError, and digits from
+# other scripts, which int() silently converts. http.client decodes header
+# bytes as Latin-1, so such a Content-Length can reach the framing check.
+@pytest.mark.parametrize("declared,body", [
+    ("²", b"x"), ("٣", b"xxx"), ("１", b"x"),
+])
+def test_non_ascii_content_length_is_a_typed_framing_refusal(declared, body):
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="framing"):
+        runner._strict_response(
+            runner.SecHttpResult(200, (("Content-Length", declared),), body),
+            max_bytes=100,
+        )
+
+
+def test_non_ascii_content_length_is_a_recorded_refusal(monkeypatch, tmp_path):
+    images = _images()
+    first = runner._MASTER_URLS["2022Q4"]
+    calls = []
+
+    def fetch(url, request_headers, max_bytes):
+        calls.append(url)
+        return runner.SecHttpResult(200, (("Content-Length", "²"),), images[url])
+
+    _, payload = _run(monkeypatch, tmp_path, fetch)
+    assert calls == [first]
+    assert "framing" in payload["halted_reason"]
+    assert all(row["status"] == "not_attempted" for row in payload["filings"])

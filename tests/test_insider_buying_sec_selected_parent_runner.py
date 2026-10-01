@@ -653,3 +653,11 @@ def test_crash_after_404_response_resumes_as_not_found_without_retry(monkeypatch
     result = _report(_run(plan, output, transport, resume=True))
     assert calls == [item.url for item in plan.requests]
     assert [row["status"] for row in result["rows"]] == ["not_found", "raw_acquired_noncanonical"]
+
+
+# Section 119 (Claude review): regression for IBSECACQ-CR06 in the selected
+# framing helper, which the campaign, v3 executor and both diagnostics share.
+@pytest.mark.parametrize("declared", ["²", "٣", "１"])
+def test_non_ascii_content_length_is_a_typed_selected_framing_refusal(declared):
+    with pytest.raises(runner.SecCompleteAcquisitionError, match="ambiguous or oversized"):
+        runner._selected_framing((("Content-Length", declared),), 100)

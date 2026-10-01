@@ -316,7 +316,14 @@ class AllForm4ParentLocatorManifest:
             or len(self.quarters) != 2
             or any(type(row) is not AllForm4ParentLocatorQuarter for row in self.quarters)
             or tuple(row.period for row in self.quarters) != _PERIODS
-            or type(self.form4_count) is not int
+        ):
+            _refuse("two-quarter locator digest or counts changed")
+        # Revalidate each quarter before summing its counts: a forged
+        # non-integer count would otherwise escape as TypeError.
+        for quarter in self.quarters:
+            quarter.verify_digest()
+        if (
+            type(self.form4_count) is not int
             or type(self.form4a_count) is not int
             or self.form4_count < 0
             or self.form4a_count < 0
@@ -327,8 +334,6 @@ class AllForm4ParentLocatorManifest:
             or _HASH.fullmatch(self.content_sha256) is None
         ):
             _refuse("two-quarter locator digest or counts changed")
-        for quarter in self.quarters:
-            quarter.verify_digest()
         if ({row.accession_number for row in self.quarters[0].locators}
                 & {row.accession_number for row in self.quarters[1].locators}):
             _refuse("cross-quarter accession duplicate")

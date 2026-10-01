@@ -25,6 +25,7 @@ from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying.sec_bulk_snapshot import SecBulkSnapshotError, _read_regular_bytes
 from research.insider_buying.sec_complete_submission import SecCompleteSubmissionTarget
 from research.insider_buying_sec_acquisition import (
+    _ascii_decimal,
     _check_output_directory,
     _open_output_directory,
     _plain_path,
@@ -126,7 +127,7 @@ def _selected_framing(headers: tuple[tuple[str, str], ...],
     encodings = [value for name, value in headers if name.lower() == "content-encoding"]
     if len(encodings) > 1 or (encodings and encodings[0].strip().lower() != "identity"):
         raise SecCompleteAcquisitionError("REFUSED: selected SEC response framing is compressed")
-    if len(lengths) == 1 and not transfers and lengths[0].isdigit():
+    if len(lengths) == 1 and not transfers and _ascii_decimal(lengths[0]):
         size = int(lengths[0])
         if 0 < size <= max_bytes:
             return "length", size

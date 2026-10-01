@@ -241,3 +241,12 @@ def test_quarter_and_total_filing_caps_refuse_before_composition(monkeypatch) ->
     checkpoint = append_declared_ib1ce_quarter(None, _quarter(0))
     with pytest.raises(SecIb1cEScaleReadinessError, match="total filing cap"):
         append_declared_ib1ce_quarter(checkpoint, _quarter(1))
+
+
+# Section 119 (Claude review): regression for IBOFF-CR01. A forged unhashable
+# accession must refuse, not raise TypeError in set().
+def test_forged_unhashable_accession_is_a_typed_refusal() -> None:
+    quarter = _quarter(0)
+    object.__setattr__(quarter.filings[0], "accession_number", [])
+    with pytest.raises(SecIb1cEScaleReadinessError, match="not exact text"):
+        quarter.__post_init__()

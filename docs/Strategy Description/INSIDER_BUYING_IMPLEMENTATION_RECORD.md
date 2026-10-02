@@ -1,20 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 120 COUNTER-REVIEWS CLAUDE'S EXACT THREE-COMMIT RANGE
-`5a87bcf..d6242f9`. THE REVIEWED IMPLEMENTATION IS CONDITIONALLY ACCEPTED
-WITH THREE OPEN FAIL-CLOSED P2 GATES; IT IS NOT AN ACCEPTED 82-QUARTER
-CORPUS OR BACKTEST CANDIDATE. THE 82-QUARTER EXACT MASTER GATE HAS
-SEVEN NONEXACT QUARTERS, INCLUDING A FILING-DATE CONFLICT CLAUDE DID NOT
-COUNT IN ITS SIX MISSING-ACCESSION QUARTERS. TEST-ONLY CORRECTIONS ARE LOCAL
-AND UNPUSHED. THE STOPPED V3 ROOT IS PRESERVED WITH 1,846 COMPLETED OF
-1,847 STARTS, AND ONLY 19,526 OF THE FROZEN 99,394 TWO-QUARTER PARENTS
-ARE SOURCE-BOUND; 79,868 WERE ORIGINALLY UNATTEMPTED. CLAUDE RECONCILED
-19,973 JOURNALED SEC REQUESTS, INCLUDING 372 IN THREE EARLIER STOPPED
-RUNS NOT PREVIOUSLY RECORDED. OWNER POLICY AND SOURCE/RIGHTS/PIT/MAPPING/
-LOOK/QC GATES BLOCK THE NEXT MILESTONE AND ANY PUSH. THE ONE-SHOT CLAUDE
-MONITOR IS PAUSED. NO NEW SEC OR PROVIDER REQUEST, LICENSED ROW, OUTCOME
-LOOK, QC JOB, BACKTEST, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR
-TRADING ACTION OCCURRED IN THIS COUNTER-REVIEW. LOOKS 0/0/0.**
+Status: **SECTION 121 RECORDS THE OWNER'S RESPONSE: THE HISTORICAL SCOPE
+OF 19,973 JOURNALED SEC REQUESTS, INCLUDING 372 PREVIOUSLY OMITTED
+STOPPED-RUN REQUESTS, IS UNCERTAIN AND NOT RETROACTIVELY CONFIRMED.
+UNDER THE OWNER'S DELEGATION, CODEX SELECTED A CONSERVATIVE VERSIONED
+IB-1C IDENTITY POLICY FOR FUTURE OFFLINE DESIGN; FROZEN V1 IS UNCHANGED,
+AND THE NEW POLICY IS NOT IMPLEMENTED OR INDEPENDENTLY REVIEWED. THE
+STRICT D23 82-QUARTER MASTER GATE STILL HAS SEVEN NONEXACT QUARTERS;
+ANY REPLACEMENT RULE OR V4 PATH REQUIRES A SEPARATE OWNER DECISION. THE
+STOPPED V3 ROOT REMAINS PRESERVED AT 1,846 OF 1,847 STARTS. ONLY 19,526
+OF THE FROZEN 99,394 TWO-QUARTER PARENTS ARE SOURCE-BOUND; 79,868 WERE
+ORIGINALLY UNATTEMPTED. COUNTER-REVIEW COMMIT `0d4b836` AND THIS RECORD
+REMAIN LOCAL AND UNPUSHED; THE ONE-SHOT MONITOR IS PAUSED. NO NEW SOURCE,
+PROVIDER, LICENSED-ROW, OUTCOME, QC, BACKTEST, BROKER, CAPITAL, ORDER,
+PAPER/LIVE, DEPLOYMENT OR TRADING AUTHORITY IS GRANTED. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -15719,3 +15718,114 @@ the production files have no diff. The stopped v3 root, original two-quarter
 denominator and 79,868 unattempted inventory were not modified. This is a
 local committed handoff only if the final precommit root/branch/HEAD/status
 checks succeed; it is not a remote push or authorization to continue.
+
+## 121. Owner response to counter-review gates; conservative policy selection and recommendations (2026-10-02 owner-local date; local only)
+
+At the start of this response, the designated worktree and branch were clean
+at local `0d4b836087bb958772bcabb369df1f22e04865d2`, one commit ahead of
+the fetched matching remote `d6242f9`. No branch or worktree was created.
+The owner answered the four questions in section 120 as follows: (1)
+historical request scope: **"uncertain"**; (2) IB-1C anomaly policy: **"use
+your best judgment but document it"**; (3) master reconciliation: requested
+Codex's recommendation; and (4) v4: requested Codex's recommendation.
+Items 3 and 4 are **not** owner approvals. In particular, uncertainty on
+item 1 is not retroactive authorization for the 19,973 prior SEC requests
+and grants no new request. `IBREC-CR01` remains open. A separate read-only
+authorization-provenance audit or owner-supplied earlier directions are
+needed before the historical scope can be classified as confirmed or not
+covered.
+
+### 121.1 Delegated IB-1C policy choice (specification only)
+
+Under item 2, Codex chooses a **new, versioned, offline source-identity
+policy candidate**, not an in-place weakening of frozen IB-1C v1, its
+P1 `IB1C-R04` date/quarter guard, the scale checkpoint, or stopped v3
+custody. This is a policy design decision only; no parser, snapshot,
+quarter digest or canonical event has been changed or accepted.
+
+1. Treat only a nonzero ASCII 1-to-10-digit `ISSUERCIK` as a valid *raw
+   source representation*. Preserve its exact text, row/hash lineage and
+   source quarter. A ten-digit zero-padded value is a comparison key only;
+   it must not replace raw bytes, change a request or receipt hash, or
+   authenticate issuer identity by itself. Compare it only against
+   independently source-bound issuer/header/XML evidence, when such evidence
+   exists; unresolved or conflicting identity is quarantined.
+2. Keep each accession number verbatim as an opaque source identifier. A
+   filing date must still be real and inside the source quarter. For all
+   15 observed accession-year disagreements, record an explicit mismatch
+   flag and raw source references, then require independent
+   accession-plus-form-plus-filing-date corroboration from existing
+   source-bound evidence before admitting even a source-only successor
+   candidate. Missing or conflicting corroboration quarantines the row
+   and withholds the whole-quarter completeness/digest; it never drops a
+   row, rewrites the accession year, substitutes the quarter date, or
+   silently declares the filing canonical/PIT. Even corroborated rows
+   remain noncanonical until separate official acceptance/publication,
+   amendment, rights and PIT gates are met.
+3. Any later implementation must preregister one coherent v2 rule across
+   the IB-1C successor, 82-quarter scale readiness and downstream pilot
+   contracts; inventory all year/CIK call sites, retain the old v1
+   replay unchanged, version the schema/receipt and evidence epoch, and
+   prove both success and refusal with focused red/green tests and Claude
+   review before promotion. The 146 short-CIK and 15 year-mismatch rows
+   are retained in coverage accounting, not erased from the frozen
+   denominator. `IB1C-REAL-CR01` stays **P2 OPEN** until this policy is
+   implemented and independently verified against the affected quarters.
+
+This selection is consistent with D43's comparison-only CIK padding but
+does not generalize D43's one-parent header fix into SEC authenticity or
+full-quarter acceptance. No new SEC/provider/credential/licensed-row
+access, QC processing, research look or backtest follows from it.
+
+### 121.2 Codex recommendations requested by the owner; not decisions
+
+**Item 3 — retain strict D23 now.** Do not whitelist or silently tolerate
+the seven nonexact quarters. The read-only comparison in section 120 found
+12 missing, 3 extra and 2 filing-date-conflicting records; 2026Q2 is
+nonexact solely because of a date conflict. D23 correctly withholds the
+whole 82-quarter locator digest. If the owner later wants a path to
+82-quarter promotion, first adjudicate each discrepancy against
+independently bound source/provenance and propose a separate versioned,
+preregistered reconciliation rule that preserves all raw rows and
+explicitly states any exception. Do not change D23, the 2022Q4-2023Q1
+source window, or the 99,394 denominator by inference. `IBSRC-CR01` and
+`IBSRC-CCR01` remain **P2 OPEN**. This 82-quarter promotion gate does not
+mechanically block the separate frozen two-quarter source-only inventory.
+
+**Item 4 — no v4 acquisition now.** A separately versioned, offline-only
+v4 custody/continuation design is the recommended later engineering step,
+but do not begin that next milestone while historical request scope is
+uncertain without an explicit owner direction. Any future design must
+replay the stopped v3 root against the exact historical validator code,
+keep the 7,373-byte diagnostic separate from the unresolved v3 start,
+account for the 19,526 source-bound and 79,868 originally unattempted
+parents inside the frozen 99,394, and exclude duplicate completed or
+ambiguous requests. It must not rewrite/resume v3 or create a new root
+that implies observed capture. A future SEC dispatch would require its
+own bounded scope, contact, capacity, rights and factual-gate approval;
+offline design alone would not grant one. `IB1BCAMP-CR01` remains **P2
+OPEN** until a safe historical-code binding is implemented and reviewed.
+
+**Next action:** resolve `IBREC-CR01` with a source-bound, read-only audit
+of the earlier owner directions or owner-supplied evidence; if that cannot
+establish scope, retain the uncertainty and obtain a fresh prospective
+decision before any further source acquisition. The owner can then decide
+whether to adopt the strict-D23 recommendation and authorize a specifically
+bounded offline v4 design. Stop before the next milestone and before any
+push. The local `0d4b836` counter-review has not reached origin; the
+one-shot heartbeat remains paused. No new source request, outcome look,
+QuantConnect job/upload, broker/operator-database/scheduler, deployment,
+capital, order, paper/live or trading action was taken here.
+
+### 121.3 Validation and exclusions
+
+This was a lane-record-only owner-response entry. The active-document and
+Insider implementation-record checks passed **71/71** on the edited tree;
+`git diff --check` was clean. The final document checks are rerun after
+this validation line. No production code, frozen policy file, test,
+retained source root, shared/project-wide document or root
+`docs/SESSION_HANDOFF.md` was changed. Codex did not run a complete lane
+or repository suite, make an SEC/provider request, use licensed rows,
+consume a look, or launch QC/backtest/trading. No commit or push of this
+section is implied until the final root/branch/HEAD/status and staged-diff
+checks complete; any commit remains local while the owner gates are open.

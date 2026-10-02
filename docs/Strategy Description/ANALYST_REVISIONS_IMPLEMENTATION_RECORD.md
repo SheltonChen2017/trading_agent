@@ -256,6 +256,12 @@ Section 230 is Claude's independent review of `7cbbe01..6b93020` (0 P0,
 0 P1, 0 P2, 1 P3): Codex's exact-byte checkout fix (`ARV2CR229-001`, a
 miss in earlier reviews) and the forward execution diagnostic are accepted,
 and the test-only `7ef4718` extends the checkout regression to every lane JSON.
+Section 231 counter-reviews both section-230 Claude commits, confirms the
+all-JSON regression, and corrects the digest-test sensitivity claim with an
+independent reconstruction of every matched-digest field. The reported
+export-based complete-suite run does not satisfy the designated-worktree
+validation invariant. Independent source evidence and compliant complete
+Claude validation remain concrete gates; no new readiness milestone begins.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1040,11 +1046,16 @@ shared weekly schedule, prior-session closing-price clock and declared
 execution settings; its diagnostic binds three supplied arm configurations
 to the recomputed common input. Section 230 is Claude's independent review
 of the exact pushed range `7cbbe01..6b93020` (section 229), with the
-test-only correction `7ef4718`. The immediate next step is that Codex
-counter-reviews section 230 and both Claude commits of this round. After
-that, independent security-master, own-ETF, vendor, score and price
-provenance must be bound before the no-order selector can become
-decision-ready.
+test-only correction `7ef4718`. Section 231 completes the source/test
+counter-review and corrects the claimed digest-test sensitivity. Claude
+must review section 231 and its exact pushed test/record snapshot, with
+the complete lane suite run from the designated worktree rather than an
+export or scratch clone. Complete validation acceptance remains withheld
+until that gate is satisfied or the owner gives an exact scoped exception.
+Independent vendor availability/version evidence, security-master and
+own-ETF identity, scores and RAW prices must then be authenticated before
+the no-order selector can become decision-ready. No further claims-only
+scaffold or premature formal-look binding is the authorized next milestone.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -2811,6 +2822,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-02 | Claude independent review of section 227: the counter-review of section 226 and the forward stock-selection/fallback freeze | `52f6608` -> `e76d074` -> this record commit | Section 228: one commit `377741c..52f6608` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 226 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned eight parent-verification conditions (`e76d074`, test-only, each red with its condition removed); verified the policy against the historical gate; section 4 names section 228, banner sentence added, this row appended; no production line changed | Required gates and policy tests at the pushed head, standing lane selection in a byte-faithful export of `52f6608` (six file groups after two interrupted runs), twenty-two mutation trials, `compileall`, `git diff --check`; exact counts in 228.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R228-001`): eight untested parent conditions (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 228 |
 | 2026-10-02 | Codex section-228 counter-review and common forward clock/execution binding diagnostic | `7cbbe01` -> this round's final record commit | Section 229 accepts both Claude commits and freezes one common preparation policy plus a three-arm no-order binding check; zero QC/provider calls, outcomes, orders, looks, evaluations or cells; floor 298/233/40/699. | Weekly first NYSE session, 09:20 New York input cutoff, same-session open-plus-one-minute planned order start, immediately prior-session closing-price clock and identical USD 1 million initial all-cash state, declared sizing and cost rules; recomputed input and per-arm configuration authentication. Lane-local JSON attributes preserve the parent and child byte pins. | Focused validation and exact final-tree results in 229.3; no complete Codex lane suite. | No new defect confirmed in the two Claude commits. Existing parent-lineage checkout defect `ARV2CR229-001` P2 corrected. Independent source/security/score/price provenance, executable selector/weights, actual execution parity, formal protocol, evidence, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 229 before the next Codex round. No paper/live/funded/broker/real-order authority. |
 | 2026-10-02 | Claude independent review of section 229: the counter-review of section 228, the exact-byte checkout rule, and the forward execution clock | `6b93020` -> `7ef4718` -> this record commit | Section 230: one commit `7cbbe01..6b93020` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 228 accepted, including `ARV2CR229-001`, a miss in earlier reviews; zero QC or provider calls, looks, evaluations, or cells | Extended the checkout regression to every tracked lane JSON (`7ef4718`, test-only, red under a narrowed attribute); reproduced the CRLF hash breakage; section 4 names section 230, banner sentence added, this row appended; no production line changed | Required gates and new tests at the pushed head, standing lane selection in a byte-faithful export of `6b93020` (six parallel file groups), twenty-three mutation trials, a scratch-repository attribute trial, `compileall`, `git diff --check`; exact counts in 230.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R230-001`): checkout regression scoped to five of 27 protected files (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 230 |
+| 2026-10-02 | Codex section-230 counter-review, digest regression and concrete external stop | `b499ab3` -> this round's final record commit | Section 231 accepts the test-only Claude commit and corrects the record/test sensitivity qualification; no new readiness milestone begins, zero QC/provider calls, outcomes, orders, looks, evaluations or cells; floor 298/233/40/699. | Independent digest reconstruction covers all fourteen fields and detects each hash-only price/configuration-pin omission; production policy/source/economics stay unchanged. Concrete provenance requirements and the designated-worktree full-validation gap are retained. | Exact reviewed-tree focus 197 passed; new execution file 110 passed; final affected checks recorded in 231.4. No complete Codex suite. | `ARV2CR231-001` P3 corrected; `ARV2CR231-002` P2 compliant complete Claude validation remains open. Independent source/security/score/RAW-price evidence blocks the next readiness milestone; formal stock/ETF gates and paper permit remain open. | One combined correction/record push on this lane for Claude review; no new implementation, formal look, provider/QC action or deployment around the gates. Monitor remains active and quiet while unchanged. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -32915,3 +32927,130 @@ Claude commits, the test-only `7ef4718` and this record commit. Not
 exercised here: no QuantConnect or provider endpoint, result read, or
 launcher was run, and section 229 records none. The checkout regressions
 were run on this macOS host's Git, not on a Windows runtime.
+
+## 231. Codex counter-review of section 230, digest sensitivity correction and concrete external stop, 2026-10-02
+
+**Exact new Claude range:** `6b93020ea8452e139afea4e5133042238d46c997`
+through `b499ab338883a5834a4e2c928fc0dacbde01069f`, two ordered commits.
+Codex verified the designated root, matching lane branch and clean status,
+fetched only that branch, verified review ancestry, and safely fast-forwarded
+(already up to date). Every Codex repository command and validation in this
+round used `/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2`.
+Neither previously handled section-228 commits nor Codex's own implementation
+push was reprocessed. The floor remains **298 shared / 233 development /
+40 infrastructure / 699 authenticated cells**; this round consumes none.
+
+### 231.1 Per-commit counter-review and acceptance limits
+
+| Claude commit | Disposition | Evidence / scope |
+|---|---|---|
+| `7ef4718f4f9a3251492d7c5c03953bcef89bbcb9` | accepted | Test-only all-tracked-JSON effective-attribute census is correct. There are 27 tracked lane JSON files, 26 with newlines; all have `text: unset`. A read-only in-memory simulation that narrows protection to the five previously checked files leaves those cases green and makes the new all-JSON case red. Actual checkout file has six passing tests. No production/economic behavior changes. |
+| `b499ab338883a5834a4e2c928fc0dacbde01069f` | accepted after the source/test evidence correction and validation qualification below | Record-only section 230 correctly disposes the one Codex implementation, preserves no-order/provenance/economic caveats, and reports its export scope explicitly. Its EX20/EX21 description overstates digest-test sensitivity; corrected prospectively in this section and the test. Its reported complete-suite results are not compliant designated-worktree evidence; complete lane validation acceptance is withheld, not silently waived. |
+
+`ARV2R230-001` is confirmed as the P3 protection-scope sensitivity gap
+corrected by Claude's test-only commit. Codex's exact reviewed-tree execution,
+checkout, lane-record and active-document selection passed **197 tests**.
+Read-only advisory Codex audits assist this counter-review; they do not
+replace Claude's independent review. No new production defect or P0/P1
+authority escape was found in either Claude commit. Review quality is **7/10**:
+the code/checkout analysis is useful, but an incidental mutation failure was
+presented as isolated digest evidence and the required validation path was
+not followed as reported.
+
+### 231.2 Findings and correction proof
+
+| ID | P | Origin / status | Evidence and correction |
+|---|---|---|---|
+| `ARV2CR231-001` | P3 | Weak test in `6b93020`; evidence overstatement in `b499ab3`; corrected in this round | EX20/EX21 removed fields from the production `body`, also losing required dataclass constructor arguments. That red result does not isolate hashing. Two separate in-memory mutations instead omitted only `reference_price_sha256` or `arm_configuration_sha256` from canonical digest input while retaining report fields; all 109 original tests remained green. Production currently includes both correctly. A new explicit independent fourteen-field digest reconstruction now fails at its digest equality assertion for each hash-only omission (one red failure per trial), and passes after finally-safe restoration. AST key census confirms all fourteen declared body keys are reconstructed, with no omission/extra. This is a test/record correction, not changed strategy behavior. |
+| `ARV2CR231-002` | P2 | Reported section-230 complete validation; open workflow gate, not a production-code defect | Section 230.3/230.7 reports mutation/full-suite execution from exports and copy-on-write scratch clones, outside the designated worktree. The owner's machine-wide lane agreement requires every repository command and validation from the designated root. Those counts remain Claude-reported, not independently reproduced by Codex and not evidence that the required worktree full suite passed. Claude must perform and record the complete lane selection from this designated root on the exact reviewed snapshot, or obtain an exact owner-scoped exception; broad research preauthorization is not that exception. Codex does not run or duplicate Claude's complete suite. |
+
+Claude's historical EX20/EX21 and export results are retained rather than
+rewritten. They are qualified here: the mutation trials demonstrate whole-body
+field removal is caught, not isolated digest sensitivity; the export run does
+not clear the designated-worktree validation gate. No exception is inferred
+from earlier rounds' similarly disclosed exports or earlier acceptance notes.
+
+### 231.3 Concrete external readiness gate; no next claims-only scaffold
+
+The next decision-ready milestone needs independently authenticated source
+evidence, not another decoder of self-asserted rows. Read-only inspection
+reconfirmed these unchanged checked-in trust roots:
+
+| Artifact | Measured state / SHA-256 |
+|---|---|
+| `research_source_authority.json` | `authority_mode=zero_access`, empty entries; `3152aca00c721f3822d1ef438c84c3ee855aeb866e35ba692527746b5d4c5805` |
+| `security_master_registry.json` | empty entries; `e8c1a2a7e0408d545e45f026cabf5b4ae23956fa64bc444769a8589f35f4a5fa` |
+| `reviewed_spec_registry.json` | empty entries; `23f23d19e681a03bacf6a1d132c732ed541747a5c6136d2dc0ac5ccafd273326` |
+
+The separately permitted exploratory historical QC work does not populate
+these formal trust roots. Sections 32.5/34.4 already explain why a generic
+evidence opener cannot prove publication, correction/deletion completeness,
+PIT identity or terminal payoff; this round does not reopen that scaffold.
+The existing predecision/execution diagnostics still authenticate caller
+bytes, not independent truth, and retain their named provenance/score/own-ETF/
+RAW-price/parity/epoch refusals and literal-false readiness/action fields.
+
+The missing external inputs are concrete:
+
+1. Vendor-origin immutable as-of exports or written availability/version/
+   completeness evidence, including original publication clocks, time zones,
+   stable IDs, prior versions, corrections and withdrawals/deletions. Future
+   predecision evidence must bind the actual 09:20 cutoff; formal historical
+   stock evidence separately needs the exact historical cutoff semantics.
+   October 1's local early-day receipt proves neither set of facts.
+2. An independently reviewed as-of security-master package binding exact QC
+   SIDs to permanent security/share-class identities, names, vendor identities
+   and each own ETF, with validity/availability intervals and ambiguity/reuse
+   refusals. ETF-versus-direct-stock identity collisions must refuse.
+3. Source-authenticated RAW prior-NYSE-close prices and score inputs bound
+   to those identities, the common cutoff and the reviewed method. Formal
+   stock-first evidence also retains the seven-role completeness and terminal
+   shareholder-payoff gates from sections 32.5/34.4; a final pre-delisting
+   quote is not an independently proven terminal recovery.
+
+Configured entitlement or a local SHA-256 cannot replace these artifacts.
+No vendor contact, purchase, credential change, private source-value read,
+provider/QC call or outcome access was made to manufacture their acceptance.
+They must be supplied/acquired with the required independent provenance and
+then admitted through a reviewed provider-specific contract. The owner's
+scoped research/preparation preauthorization is retained; this is an evidence
+stop, not a request to reauthorize already allowed preparation.
+
+Formal two-arm registration cannot bypass this stop: section 3A deliberately
+leaves formal-look dates, estimand, power-plan hash and epoch null and
+non-backfillable until ARV2-4/5/6/7/8 pass. The sole Analyst look retains total
+two-sided alpha **at most 1/80**, not that amount for each arm. The old stock
+Fama–MacBeth calibration's effect/power/session floor is not the power plan for
+these net ETF-arm contrasts, and 252 sessions is a target, not proof of power.
+No formal observation, alpha spend, look replacement or evidence epoch is
+created. R247 remains attempt-exhausted. The exact QC Paper project/mode/epoch
+permit remains separately required before deployment and is not inferred from
+any historical run. No funded/broker/real orders or live-efficacy claim follows.
+
+### 231.4 Focused validation and exact handoff
+
+Validation uses `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`
+(3.13.15), entirely in the designated worktree.
+
+| Check | Scope / actual result |
+|---|---|
+| Exact Claude-tree counter-review | Execution, checkout, lane-record and active-document files: **197 passed in 2.29s**. |
+| Corrected execution test file | **110 passed in 1.66s**; advisory audit independently obtained 110 passed after the two intended hash-only mutation failures and finally-safe restoration. |
+| Final affected selection | Execution, checkout, lane-record and active documents: **198 passed in 2.25s**, no failures/skips/warnings. |
+| Final record gates | Lane-record integrity and active-document checks: **82 passed in 0.96s** after recording the validation table. |
+| Compilation | Changed execution test file: `compileall -q` clean. |
+| Diff / scope | `git diff --check` clean; exactly the lane record and execution test changed. Root/shared records, production code, policy pins and the look floor remain unchanged. |
+| Pre-commit invariant | Designated root, lane branch, reviewed `b499ab338883a5834a4e2c928fc0dacbde01069f`, matching remote head and only the two authored round files are checked before commit; root/branch/clean status and remote head are rechecked before the single matching-lane push. |
+
+No production module, policy JSON, trust-root registry, shared document,
+shared attribute, private data, spent manifest or QC source is changed.
+
+**Next serialized action:** Claude must review section 231 and the exact
+pushed test/record snapshot, perform the complete lane suite from the designated
+worktree, and resolve the retained validation qualification. After that review
+and Codex counter-review, readiness implementation remains blocked until the
+independent source/identity/score/price evidence above is available. Do not
+advance an executable selector or fill formal nulls to improvise around it.
+The existing monitor remains active, quiet while unchanged, and triggers only
+on a new completed Claude review push; it is not paused and does not repeat
+already handled commits.

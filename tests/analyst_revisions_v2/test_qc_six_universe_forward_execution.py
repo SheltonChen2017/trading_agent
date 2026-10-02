@@ -376,6 +376,38 @@ def test_changed_but_valid_price_source_bytes_change_common_matched_digest():
     assert second.decision_ready is second.order_or_outcome_access is False
 
 
+def test_matched_digest_authenticates_every_declared_binding():
+    """Independently reconstruct the digest, retaining every report field.
+
+    Deleting a body field also loses a required report constructor argument;
+    that incidental TypeError does not prove the field participates in hashing.
+    This assertion detects hash-only omissions with report fields unchanged.
+    """
+    inputs = _inputs()
+    config = _configuration(inputs)
+    raw = canonical_json_bytes(config)
+    report = _run(inputs, config)
+    expected_body = {
+        "schema": "arv2-six-forward-matched-execution-diagnostic-v1",
+        "execution_policy_sha256": subject.FROZEN_POLICY_SHA256,
+        "stock_selection_policy_sha256": selection.FROZEN_POLICY_SHA256,
+        "construction_policy_sha256": subject.CONSTRUCTION_POLICY_SHA256,
+        "common_input_sha256": predecision.build_predecision_diagnostic(**inputs).common_input_sha256,
+        "decision_session": "2026-09-28",
+        "decision_cutoff_utc": "2026-09-28T13:20:00+00:00",
+        "planned_execution_session": "2026-09-28",
+        "planned_execution_time_utc": "2026-09-28T13:31:00+00:00",
+        "reference_price_session": "2026-09-25",
+        "reference_price_source_time_utc": "2026-09-25T20:00:00+00:00",
+        "reference_price_sha256": inputs["reference_price_sha256"],
+        "arm_configuration_sha256": _sha(raw),
+        "candidate_ids": ["ARV2_FORWARD_AR_OFF", "ARV2_FORWARD_AR_100", "ARV2_FORWARD_AR_200"],
+    }
+    expected_digest = _sha(canonical_json_bytes(expected_body))
+    assert report.matched_configuration_sha256 == expected_digest
+    assert {arm.matched_configuration_sha256 for arm in report.arms} == {expected_digest}
+
+
 def test_mutation_of_caller_input_after_source_validation_cannot_rebind_report(monkeypatch):
     inputs = _inputs()
     config = _configuration(inputs)

@@ -181,11 +181,21 @@ def _connection_patch(statement: ast.stmt) -> bool:
     return False
 
 
+_TRANSPORT_NAMES = frozenset({"_sec_transport", "_selected_sec_transport"})
+
+
 def _touches_real_transport(statement: ast.stmt) -> bool:
     for node in ast.walk(statement):
-        if isinstance(node, ast.Attribute) and node.attr in {"_sec_transport", "_selected_sec_transport"}:
+        if isinstance(node, ast.Attribute) and node.attr in _TRANSPORT_NAMES:
             return True
-        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "_fetch_sec":
+        # Section 127 (Claude review): a transport imported by its bare name
+        # is the same object as the attribute form.
+        if isinstance(node, ast.Name) and node.id in _TRANSPORT_NAMES:
+            return True
+        if isinstance(node, ast.Call) and (
+            (isinstance(node.func, ast.Attribute) and node.func.attr == "_fetch_sec")
+            or (isinstance(node.func, ast.Name) and node.func.id == "_fetch_sec")
+        ):
             return True
     return False
 
@@ -210,7 +220,8 @@ def _real_transport_tests_without_tripwire(sources: dict[str, str]) -> tuple[int
         # mentioning its name, or replacing its patch with a comment, is not.
         wire_patches = _wire_helper_patches(tree)
         for node in ast.walk(tree):
-            if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
+            if (isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+                    and node.name.startswith("test_")):
                 patched = False
                 for stmt in node.body:
                     if _touches_real_transport(stmt):
@@ -219,6 +230,10 @@ def _real_transport_tests_without_tripwire(sources: dict[str, str]) -> tuple[int
                             offenders.append(f"{name}::{node.name}")
                         break
                     call = _statement_call(stmt)
+                    if call is not None and _dotted_name(call.func) == "monkeypatch.undo":
+                        # Undoing every patch restores the real connection.
+                        patched = False
+                        continue
                     if _connection_patch(stmt) or (
                         wire_patches and call is not None
                         and isinstance(call.func, ast.Name) and call.func.id == "_fake_https_wire"
@@ -272,3 +287,55 @@ def test_tripwire_scan_checks_the_called_wire_helper_body(
         "    run(plan, tmp_path, runner._sec_transport)\n"
     )
     assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, offending)
+
+
+# Section 127 (Claude review). Controls for scanner rules that no earlier case
+# reached on its own, and for three forms the scanner did not see: a transport
+# imported by bare name, monkeypatch.undo() between the patch and the use, and
+# an async test. Each sample must be flagged.
+_PATCHED_WIRE_HELPER = (
+    "def _fake_https_wire(monkeypatch, wire):\n"
+    "    monkeypatch.setattr(runner.http.client, 'HTTPSConnection', Connection)\n"
+)
+_USE = "    run(plan, tmp_path, runner._sec_transport)\n"
+
+
+@pytest.mark.parametrize("source", (
+    # A patch of some other name, attribute or object is not a connection patch.
+    "def test_unsafe(tmp_path, monkeypatch):\n    monkeypatch.setattr('other.module.Connection', forbidden)\n" + _USE,
+    "def test_unsafe(tmp_path, monkeypatch):\n    monkeypatch.setattr(runner.http.client, 'HTTPConnection', forbidden)\n" + _USE,
+    "def test_unsafe(tmp_path, monkeypatch):\n    print('http.client.HTTPSConnection', forbidden)\n" + _USE,
+    "def test_unsafe(tmp_path, monkeypatch):\n    other.setattr(runner.http.client, 'HTTPSConnection', forbidden)\n" + _USE,
+    # The wire helper must be the one called, with the test's monkeypatch.
+    _PATCHED_WIRE_HELPER + "def test_unsafe(tmp_path, monkeypatch):\n    state = _fake_https_wire(other, b'')\n" + _USE,
+    _PATCHED_WIRE_HELPER + "def test_unsafe(tmp_path, monkeypatch):\n    state = unrelated(monkeypatch, b'')\n" + _USE,
+    # A second definition replaces the audited helper.
+    _PATCHED_WIRE_HELPER + "def _fake_https_wire(monkeypatch, wire):\n    pass\n"
+    + "def test_unsafe(tmp_path, monkeypatch):\n    state = _fake_https_wire(monkeypatch, b'')\n" + _USE,
+    # The first pilot transport is called, not passed.
+    "def test_unsafe(tmp_path):\n    pilot._fetch_sec('/Archives/invented', 'agent')\n",
+    # Bare-name imports of a transport.
+    "def test_unsafe(tmp_path):\n    run(plan, tmp_path, _sec_transport)\n",
+    "def test_unsafe(tmp_path):\n    run(plan, tmp_path, _selected_sec_transport)\n",
+    "def test_unsafe(tmp_path):\n    _fetch_sec('/Archives/invented', 'agent')\n",
+    # Undoing the patch before the transport is used.
+    "def test_unsafe(tmp_path, monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n"
+    "    monkeypatch.undo()\n" + _USE,
+    # Async tests are tests too.
+    "async def test_unsafe(tmp_path):\n" + _USE,
+))
+def test_tripwire_scan_flags_near_misses_and_unseen_forms(source: str) -> None:
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (
+        1, ["invented.py::test_unsafe"],
+    )
+
+
+@pytest.mark.parametrize("source", (
+    "def test_safe(tmp_path, monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n"
+    "    run(plan, tmp_path, _sec_transport)\n",
+    "def test_safe(tmp_path, monkeypatch):\n    monkeypatch.undo()\n"
+    "    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n" + _USE,
+    "async def test_safe(tmp_path, monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n" + _USE,
+))
+def test_tripwire_scan_still_accepts_a_patch_in_the_new_forms(source: str) -> None:
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, [])

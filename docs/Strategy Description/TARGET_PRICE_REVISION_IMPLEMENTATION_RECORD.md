@@ -10,8 +10,12 @@ SECTION 42.6'S TPR-OD-001 THROUGH TPR-OD-004 ARE RETAINED AS HISTORICAL
 CLAUDE PROPOSALS, NOT OPERATIVE AUTHORIZATION UNDER THE CURRENT OWNER
 MONITOR. TPR-D0 IS NOT AUTHORIZED: RETAINED LICENSED-ROW PROCESSING STILL
 NEEDS EXACT TARGET-PRICE SOURCE/ACCESS AUTHORITY. NO NEXT IMPLEMENTATION
-MILESTONE IS AUTHORIZED. CLAUDE NEXT REVIEWS THIS COUNTER-REVIEW SNAPSHOT;
-OWNER DIRECTION IS REQUIRED BEFORE DEVELOPMENT CAN ADVANCE. THE
+MILESTONE IS AUTHORIZED FOR STRATEGY DATA, SCORE, OR OUTCOME WORK. SECTION 44
+RECORDS THE OWNER'S NARROW SHARED-TEST CORRECTION AND TRUST/SOURCE DRAFTING
+SCOPE. THAT REMEDIATION CANDIDATE AWAITS CLAUDE REVIEW; IT DOES NOT CLOSE THE
+PRIOR SHARED REJECTION OR SELECT TRUST/DATA POLICIES. CLAUDE NEXT REVIEWS
+SECTIONS 43 AND 44. FURTHER OWNER DECISIONS AND FACTUAL GATES ARE REQUIRED
+BEFORE STRATEGY DEVELOPMENT CAN ADVANCE. THE
 COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT REMAINS COMPLETE. THE
 NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS CHECKPOINTED BUT REMAINS
 INCOMPLETE: ROLLBACK/REPLAY PROTECTION, PARENT-DIRECTORY CUSTODY, AND THE
@@ -379,6 +383,12 @@ Section 42.6's `TPR-OD-001`, `TPR-OD-002`, `TPR-OD-003`, and `TPR-OD-004`
 remain historical Claude proposals, not operative authorization. The current
 owner heartbeat grants counter-review and gated continuation, not licensed
 market rows, source facts, a security-policy choice, or QuantConnect work.
+The later owner instruction, "Scope the shared fix", "Draft the trust
+decisions", "Prepare the source checklist", and "start implementing",
+authorizes the narrow two-file shared-test correction and non-authorizing
+drafts in section 44. New remediation candidate awaits independent Claude
+review. This is not approval of a particular trust policy or source-access
+scope, and does not waive the prior rejection.
 The authoritative current open-issue register remains below in section 8,
 and Claude's comprehensive whole-lane audit remains complete. The
 non-authorizing TPR-TR0-I implementation candidate is checkpointed but remains
@@ -422,22 +432,29 @@ their exact points are in the section 10 ledger rows for those rounds.
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Integration into `main` does not authorize a coordinated edit from
-this target lane. TPR-TR0-I is only an incomplete non-authorizing checkpoint;
+this target lane. The present owner direction permits only the named shared
+guard correction in section 44; no other lane is modified or synchronized.
+TPR-TR0-I is only an incomplete non-authorizing checkpoint;
 no provisioning milestone or positive authority is authorized. TPR-1 remains blocked
 until a separately reviewed source-rights artifact proves
 entitlement, public-time semantics, correction completeness, target-horizon
 consistency, raw retention, derived processing, and QC-transfer rights, and
 the canonical TPR-0B remains blocked until reviewed TPR-1 and TPR-2 structural
 manifests exist. The TPR-D development route does not unblock, satisfy, or
-spend any canonical gate. No next implementation milestone is authorized.
+spend any canonical gate. No next implementation milestone is authorized for
+strategy data, score, or outcome work; the named shared remediation and
+decision/checklist drafts are the bounded exception, not a TPR milestone.
 TPR-D0 is not authorized: its retained-source audit would read and process
 licensed rows even without a provider request. It needs an exact owner scope
 and the applicable reviewed source-rights artifact; it is not silently split
 into a plan-only milestone. `TPR-OOL-011` still carries the section-40
-cumulative rejection and is documented, not fixed, in this lane. The trust
+cumulative rejection; section 44 implements a correction candidate awaiting
+independent review, without declaring that rejection resolved. The trust
 rollback pin, protected parent custody, and complete adversarial matrix also
-remain unresolved. **Exact next role action:** Claude next reviews section 43
-and this complete counter-review/correction snapshot. The owner must resolve
+remain unresolved. **Exact next role action:** Claude next reviews sections 43 and 44
+and every new Codex commit after the pushed Claude head `3de5bbef`, including
+the counter-review snapshot and this owner-scoped remediation/drafting round.
+The owner must resolve
 the exact development scope and remaining gates before another milestone.
 The monitor stays paused after this one round. No provider, credential,
 licensed-row, outcome, look, QuantConnect job, broker, paper, live,
@@ -542,7 +559,9 @@ free.
 The owner's standing session rule, 2026-08-29, restates this boundary in a
 second form: this session is dedicated to trading strategies, not the general
 health of the trading application. An issue outside trading strategy is
-documented here and deliberately not fixed.
+documented here and deliberately not fixed unless a later explicit owner
+exception names it. Section 44 is that bounded exception for only
+`TPR-OOL-011`'s two shared test files, with independent acceptance pending.
 
 | ID | Severity | External area / paths | Evidence and lane impact | Disposition / future route |
 |---|---|---|---|---|
@@ -585,7 +604,7 @@ resolved item or hide a newly routed one.
 | `TPR-OOL-008` | **Closed** | Shared exact-byte attributes and stale-checkout regression added; this host's two recurring ML-spec copies were repaired from exact index blobs during section 40 validation. |
 | `TPR-OOL-009` | **Closed** | Sleeve evaluation clock is injected and the notification cycle passes its own instant; section 39. |
 | `TPR-OOL-010` | **Closed** | Root `research/__init__.py` now resolves `text eol=lf`; section 39. |
-| `TPR-OOL-011` | **Open** | Shared runtime-stop guard can miss a newly written old-timestamp incident and misclassify prefix-colliding bases. |
+| `TPR-OOL-011` | **Open** | Section 44 implements the owner-scoped correction candidate for old-timestamp and path-prefix attribution; independent review and counter-review are pending. Prior rejection is not waived. |
 | `TPR-OOL-012` | **Open** | Shared archive still overstates F-8 as an identical four-lane cherry-pick. |
 | `TPR-OOL-013` | **Open** | Shared EOL regression detects line-ending drift but overclaims arbitrary byte equality. |
 | `TPR-OOL-014` | **Open** | Action Plan still has stale sibling-refreeze status; the proposed-milestone claim is qualified in `TPR-OOL-014-R1` and section 43. |
@@ -647,6 +666,7 @@ known.
 | 2026-10-02 | Claude review | `d54ce1b2c6816532ef82906c49998a93574172fc..ea97bd4fc03779b7947cf35cd8e4432b0b9fa516` reviewed; correction `174a546` and this record/guard commit on this same lane branch | Independent review of the section-40 counter-review, main merge `6590d890`, and the section-41 synchronization; no feature milestone in range | Reviewed all five first-parent commits individually and dispositioned the 627 merge-inherited commits by provenance class. Re-derived the merge and verified its one conflict resolution against both parents. Confirmed both shared-test findings from source and all three imported out-of-lane closures. Corrected fourteen host-dependent lane test failures in the test harness, restored the frozen Action Plan to the merge result, and strengthened the section-40 guard. Recorded owner decisions `TPR-OD-001` through `TPR-OD-004` under the owner's 2026-10-02 pre-authorization. | Complete suite on the pushed Codex head `ea97bd4f` in five shards: **17,643 passed, 823 skipped, 23 failed, 37 errors**; 14 failures are `TPR-CR14-001`, 4 are `TPR-OOL-015`, and the Analyst directory's 5 failures and 37 errors are `TPR-OOL-016`. Sixteen mutations of this round's guards all red. Final-tree validation is the next row. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | No P0 or P1. `TPR-CR14-001` (P2) and `TPR-CR14-003`, `TPR-CR14-004` (P3) closed by correction; `TPR-CR14-002` (P2) closed by `TPR-OD-001`; `TPR-CR14-005` (P3) closed by qualification. The six section-8 findings are unchanged; `TPR-OOL-011` through `TPR-OOL-013` stay open out of lane, `TPR-OOL-014` through `TPR-OOL-016` are added, and none gates the lane. | None to data, outcomes, looks, QuantConnect, broker, paper, live, capital, or trading. The outcome-free milestone TPR-D0 is authorized as the next step under `TPR-OD-004`; the trust root is parked under `TPR-OD-003`. | Make this round's one push. Codex then counter-reviews section 42 and every Claude commit, and implements only TPR-D0. |
 | 2026-10-02 | Claude validation | `299492af461d4f611bb4a32f899b6d5f94de92ed` -> `299492af461d4f611bb4a32f899b6d5f94de92ed` (exact tested tree; this validation-record commit follows) | Section-42 review round final validation | Validated the exact final tree after the test-harness correction, the Action Plan restoration, the strengthened guards, and the section-42 record. No production module changed in this round. | Lane and active-document guards **330 passed, 1 skipped** in 14.76s; fourteen document, boundary, and Target-Price-path modules **738 passed** in 175.63s; `compileall` exit 0; `git diff --check` clean; status clean. The complete suite was measured on the pushed Codex head and not re-run on this tree. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | No new finding. The five `TPR-CR14` findings are closed; six section-8 findings and `TPR-OOL-011` through `TPR-OOL-016` remain open. | None. | Make this round's one push. Codex counter-reviews section 42 and every Claude commit, then implements only the outcome-free TPR-D0. |
 | 2026-10-02 | Codex counter-review | `ea97bd4fc03779b7947cf35cd8e4432b0b9fa516..3de5bbef3a25d8a37647869ad840808543927a82` reviewed; test correction `b639ea46c8d184eb7971de67dcdc091659ad4d65`; this record commit completes the snapshot | Counter-review only; no new feature milestone | Individually reviewed all three Claude commits, removed autouse host-Git substitution/global skipping, retained missing-tool refusal, pinned inherited rejection and current zero-authority routing, and superseded unsupported OD/TPR-D0 grants while preserving historical evidence. Section 43 is the durable handoff. | Focused document/import/selected trust checks **126 passed, 1 skipped**; preregistration module **82 passed, 14 failed**, exactly the frozen Windows-Git macOS limitation; five current-authority/commit mutations red and restored; four shared `TPR-OOL-015` failures confirmed; target compileall and diff checks clean. No complete lane/repository suite run. Provider/row/outcome/QC accesses and authorized/spent looks **0**. | All three incoming commits accepted after correction; six new record/test findings closed with evidence, six pre-existing lane findings remain open, OOL003/004/006 remain closed, prior shared OOL011 rejection unchanged. | None. No delegated source, security, QC, broker, paper/live, or trading authority is inferred. | Make one matching-lane push of the stable counter-review snapshot; Claude reviews it. Owner resolves exact development/source scope and existing gates before another milestone. Heartbeat remains paused. |
+| 2026-10-02 | Codex owner-scoped remediation | `37598fa5b686a14e906c92dcea4c17b9d9b933b7` -> test correction `a8e4afefe3232f6515c17e9dbde1ae9781fe0776`; this record successor completes the candidate | Shared guard correction and trust/source drafts only; no Target-Price feature milestone | Corrected old-stamp and path-prefix attribution with an actual pre-collection incident baseline, exact path components and evidenced lifecycle expiration. Drafted four pending trust decisions and eight unestablished source-evidence requirements. Section 44 records exact scope and residual sampling limitations. | Combined focused checks **161 passed, 1 skipped**; meaningful original/reverse-mutation reds, four draft-authority mutations red/restored, compilation and diff checks clean. No complete suite or native Windows integration. Provider data/API, licensed-row, outcome and QC actions and looks **0**. | OOL011 correction candidate awaits independent review; prior rejection not waived. Two candidate self-review P2 findings corrected; six lane findings and all trust/source/manifest gates remain open. OOL003/004/006 remain closed. | Owner's narrow two-shared-test-file implementation exception only; no cross-lane synchronization, trust selection/provisioning or source/data/QC authority. | Make exactly one matching-lane push of both commits. Claude independently reviews every Codex commit after `3de5bbef`, including sections 43/44; Codex counter-reviews before any next milestone. Owner selects trust decisions and supplies exact source evidence. Monitor remains paused. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -4567,6 +4587,11 @@ looks: **0**.
 
 ## 43. Codex counter-review of Claude section 42 - 2026-10-02
 
+**Historical counter-review report.** Section 44 supersedes only this
+section's next-role/scope pointer for the later owner-directed shared
+remediation and drafting round. Its exact review dispositions, findings,
+validation, and unchanged strategy gates remain preserved.
+
 **Cumulative disposition: accepted after correction** for the three incoming
 Claude commits below. This accepts the corrected counter-review snapshot,
 not a new milestone, source-rights assumption, or waiver of section 40's
@@ -4778,3 +4803,399 @@ No credential, trust provisioning, broker, operator database, scheduler
 (other than pausing this authorized monitor), deployment, paper/live, capital,
 order, or trading action was taken. Execution-capable paths are out of scope;
 their operational readiness is not claimed.
+
+## 44. Owner-scoped shared remediation and decision drafts - 2026-10-02
+
+**Implementation candidate; independent review pending.** This is one
+bounded shared-test correction plus two non-authorizing decision/checklist
+drafts. It is not completion of TPR-TR0-I, TPR-1, TPR-2, TPR-0B, or TPR-D0.
+The base is the pushed, clean Codex counter-review handoff
+`37598fa5b686a14e906c92dcea4c17b9d9b933b7`; no intervening Claude review of
+that snapshot is claimed. The owner explicitly requested this bounded work
+before that review. Claude's next independent review must cover both rounds.
+
+### 44.1 Owner direction and exact scope
+
+Owner instruction in this chat, 2026-10-02:
+
+> 1. Scope the shared fix
+> 2. Draft the trust decisions
+> 3. Prepare the source checklist
+>
+> start implementing
+
+The implementation interpretation is explicit and narrow: correct the
+confirmed `TPR-OOL-011` test-isolation defects in `tests/conftest.py` and
+`tests/test_runtime_stop_leak_guard.py` in this existing Target-Price lane.
+These two shared test files are the one-time exception to the lane-only edit
+rule, not permission to change application containment behavior or repair
+unrelated shared findings. The associated lane record and its target-owned
+`test_document_consistency.py` guard are the only other changed files.
+No cross-lane synchronization is performed. No main checkout, sibling branch,
+new branch/worktree, shared Action Plan, Session Handoff, shared workflow,
+provider reader, trust implementation, or authority JSON is changed.
+
+The same absolute worktree and branch invariants remain in force for every
+command, edit, validation, commit, and the round's one matching-lane push.
+Shared integration to main and identical synchronization to affected lanes
+remain a later owner-coordinated action after review. This owner instruction
+authorizes drafting trust decisions and a source checklist, not selecting
+unknown security policies, provisioning trust, establishing vendor facts,
+reading retained licensed rows, or sending a provider request.
+
+### 44.2 Shared correction and acceptance plan
+
+The two confirmed counterexamples are unchanged from `TPR-OOL-011`: a new
+runtime incident may legitimately preserve an old semantic activation time,
+and `pytest-123` is not a descendant of `pytest-12`. The baseline must record
+actual pre-existing incident identities/content before covered test modules
+are collected, rather than infer write age from `activated_at`.
+Component-aware containment must
+attribute only origins under the session's exact base directory.
+
+The implemented correction candidate is read-only toward runtime state. It
+never clears a real stop, closes an incident, deletes a runtime file, or changes
+production fail-closed behavior. Focused validation redirects both the
+module-init runtime root and guard resolver to private temporary fixtures;
+all crafted-state writes and cleanup are confined to those fixtures. A
+genuinely pre-existing incident is exempt only while unchanged; observed
+removal or content/lifecycle change must not retain a reusable exemption.
+Unreadable or malformed guard evidence must be visible, not silently treated
+as an empty baseline. The exact final behavior and results follow in 44.6.
+A surviving changed `last_clear` receipt expires only its named incident's
+exemption. Global generation drift cannot attribute an unseen lifecycle to
+this session. An identical clear/re-add wholly hidden between reads with no
+surviving per-incident receipt is unobservable; no complete event-log claim
+is made. That limit must not be "fixed" by blaming concurrent sibling suites.
+
+Acceptance requires meaningful red/green evidence for newly written
+old-timestamp incidents, genuinely pre-existing unchanged incidents,
+same-identity changes and observed clear/re-add, sibling prefix separation,
+real descendants, missing/malformed timestamp handling, invalid/unreadable
+state, and absent-file no-op behavior. Validation must never repair actual
+operator runtime state as test cleanup. The old stale-incident test's
+timestamp-only expectation is replaced by a real pre-session baseline test;
+its legitimate pre-existing-incident protection is retained.
+
+The historic `pytest_configure` hook captures once before the covered test
+modules load, including a conftest discovered during root collection.
+`pytest_sessionstart` supplies a non-rebaselining fallback. Teardown compares
+incident identity and canonical content, expires only evidenced exemptions,
+and uses path-component containment. Root/read failures, invalid inventory,
+and a changed or missing session root baseline produce visible errors. The
+bound decoder remains independent of monkeypatched `json.loads`.
+
+Implementation self-review ledger (not independent acceptance):
+
+| Finding | Severity | Evidence and disposition |
+|---|---|---|
+| `TPR-REM1-001` | P2 | The initial candidate used aggregate generation drift to revoke a baseline exemption; a sibling's hidden clear/re-add falsely attributed an unchanged stale incident to this suite. Confirmed by a red focused regression. Corrected in candidate: use only observed identity/content disappearance/change or a changed incident-specific clear receipt. Sibling lifecycle regression is green; independent review pending. |
+| `TPR-REM1-002` | P2 | A session-start-only baseline hook can be missed when conftest is discovered later during collection. Confirmed from hook order. Corrected in candidate with historic configuration replay and a no-recapture fallback. The actual plugin-manager replay regression is green; a rebaseline mutation is red. Independent review pending. |
+
+No P0/P1 issue was found in this bounded self-review. Both findings are
+corrected candidates, not evidence that the prior shared rejection is
+independently closed. The hidden-lifecycle observability limit above remains
+explicit; no production event-log schema is added or changed.
+
+### 44.3 Trust decisions - DRAFT, not selected
+
+**No trust policy is adopted by this draft.** Existing section 25.3's reviewed
+design remains unchanged. New selections and implementation/provisioning
+scope remain pending; no trust finding is closed by this text.
+
+| Decision | Selection status | Proposed decision and still-required owner input |
+|---|---|---|
+| `TPR-TR-D1` | PENDING | Retain the frozen Windows Git/OpenSSH/ACL contract and designate a later native-validation host; alternatively commission a separately scoped macOS contract design. A host/path change needs explicit later worktree/host scope and does not change this round's physical invariant. The current macOS refusal is correct under the existing contract. |
+| `TPR-TR-D2` | PENDING | Approve or replace the external current-anchor pin and its controlled update/recovery lifecycle below. Design approval, implementation scope, and privileged provisioning are separate decisions. |
+| `TPR-TR-D3` | PENDING | Approve the protected-parent/pin custody extension and elevated lifecycle roles below, retaining the existing owner/DACL template rather than adding a non-admin writer. |
+| `TPR-TR-D4` | PENDING | Select reviewer-controlled signed review commits or a separately signed review receipt, and bind the exact reviewer principal/fingerprint, independent signing custody, verifier trust location, namespace, and canonical receipt format. Owner-attestation signatures alone do not prove reviewer identity. |
+
+Recommended current-anchor extension for `TPR-CCR10-012`:
+
+- Fixed external path `C:\ProgramData\CustomizedAgent\trust\tpr_registry_anchor`;
+  exactly one lowercase 40-hex registry-anchor commit ID plus LF. No
+  repository, environment, caller, or CLI override.
+- Require the authenticated signed registry anchor to equal this independently
+  custodied current pin. Missing, unreadable, malformed, stale, mismatched,
+  or changed pin refuses. Runtime verification is read-only.
+- Only an explicitly authorized elevated operator may update the pin. Block
+  positive authority before signer/pin changes; use atomic individual file
+  replacement, and remain blocked through partial updates or crashes until
+  the complete approved pair verifies. The durable blocked-state mechanism
+  and authorized restoration procedure must be concretely designed/reviewed
+  before provisioning; two atomic file writes are not one atomic transaction.
+- Record nonsecret old/new anchor IDs, key fingerprints, approval, and
+  verification evidence. Never automatically lower the pin to an older signed
+  snapshot. Recovery needs explicit approval of the exact recovery snapshot,
+  renewed review where integrity is uncertain, and a newly approved anchor.
+  Each second host needs independent provisioning; Git sync is not custody.
+
+Recommended parent-custody extension for `TPR-CCR10-013`:
+
+- Protect `C:\ProgramData\CustomizedAgent` as well as its trust directory,
+  signer file, and new pin, treating `C:\ProgramData` as the OS-controlled
+  boundary. Check ancestor permissions, not only reparse attributes.
+- Preserve the existing template: owner `BUILTIN\Administrators`; protected
+  DACL with no inherited ACEs; `SYSTEM` and Administrators full control;
+  `BUILTIN\Users` read/execute only; no additional ACE. Exact masks and
+  file/directory flags follow the existing adapter contract. Untrusted write,
+  delete-child/delete, ownership, ACL-control, or redirection refuses.
+- Provisioning and rotation are elevated operator actions. Preserve exactly
+  one runtime-trusted owner-attestation key. Prepare replacement outside
+  runtime trust, block, replace/verify the signer/pin pair, then restore only
+  under the approved lifecycle. Compromise removes the signer immediately;
+  old keys remain audit-only, never trusted through backdated validity.
+
+For `TPR-CCR2-011`, a separately signed receipt is the recommended review
+identity option because it can bind an already published review without
+rewriting history. It must bind the exact producing/reviewed commits, spec
+and policy identities, disposition, and review time. All mechanism-specific
+identity/custody/format choices remain PENDING. No private key, passphrase,
+or credential-derived hash enters runtime, agents, CI, fixtures, logs, or Git.
+
+`TPR-CCR10-016` requires one traceable final-candidate adversarial matrix:
+current good anchor; old valid replay; missing/corrupt/mismatched signer/pin;
+secure child under unsafe parent; redirection/inheritance/permission drift;
+routine rotation and interrupted updates; compromised-key removal; strict
+producing -> review -> signed-anchor ancestry; every spec/registry/policy
+byte layer and computed import inventory; signature/principal/namespace/key
+failures; configuration overrides and incomplete history; real Git/OpenSSH
+and native ACL integration; and an unprovisioned second host. Each negative
+must reach its intended check. Native evidence and independent review of the
+exact implementation precede acceptance; actual provisioning and positive
+registry admission still require separately authorized exact scope.
+
+### 44.4 Source evidence checklist - DRAFT, zero access
+
+**No source access is admitted by this checklist.** The exact candidate
+remains Massive/Benzinga Analyst Ratings, `GET /benzinga/v1/ratings`, schema
+`v1`, contract `massive-benzinga-target-revisions-v1`. Subscription presence,
+a matching Analyst endpoint, an API success, retained files, or an
+accepted-risk label is not Target-Price entitlement or processing authority.
+
+| Evidence item | Current state | Required evidence and owner input |
+|---|---|---|
+| `TPR-SRC-E1` | UNESTABLISHED | Nonsecret account-authority ID, licensee/use/audience classification, exact product/endpoint/field entitlement, effective/expiry dates, applicable agreements/amendments/partner terms and precedence. Never record account numbers or credentials. |
+| `TPR-SRC-E2` | UNESTABLISHED | Exact request or retained-inventory authority: purpose, allowed operations, endpoint/schema, dates/high-water or manifest IDs/hashes, readers, destinations, expiry/cancellation, and hard request/page/row/byte/time/cost/retry limits. Credential use, network capture, and retained-row processing are separate permissions. |
+| `TPR-SRC-E3` | UNESTABLISHED | Raw-retention clauses covering immutable response bytes/metadata, local storage/access, backups, duration, expiry/revocation/disposal and redistribution restrictions. |
+| `TPR-SRC-E4` | UNESTABLISHED | Permitted non-display parsing, normalization, joins, aggregates, derived signals/reports, audience/storage and processing restrictions. Hash verification alone does not admit retained-row use. |
+| `TPR-SRC-E5` | UNESTABLISHED | Separate vendor permission for each exact proposed raw, normalized, derived or precomputed QC representation, including third-party/cloud processing, project files, Object Store, logs, reports, backups, retention/deletion/access. No QC transfer or operation is proposed in this audit. |
+| `TPR-SRC-E6` | UNESTABLISHED | Documentary and subsequently authorized measured evidence for earliest public availability, timezone/DST, historical coverage, current-row/backfill behavior, stable record/firm/analyst IDs, correction/deletion/withdrawal versions and availability. |
+| `TPR-SRC-E7` | UNESTABLISHED | Raw/adjusted prior/new target basis and adjustment vintages, comparable horizons, currency, permanent security/share-class identity, ticker histories, split/FX/ADR lineage; auxiliary price/identity sources need their own exact rights/access evidence. |
+| `TPR-SRC-E8` | UNESTABLISHED | Owner-approved confidential evidence custody plus strict versioned artifact with redacted references/hashes, exact allowed/prohibited actions, expiry, owner scope, reviewer receipt and reviewed commit/dispositions; separately reviewed executable admission mechanism. A draft/schema/hash is not admission. |
+
+Applicable existing agreements may supply permission; a new provider letter
+is not automatically necessary. Ambiguous/conflicting clauses require
+clarification. Private agreements need owner-approved evidence custody and
+redaction that preserves every qualification needed to assess scope; no
+secret, licensed row, or credential-derived hash is placed in Git.
+
+Provider questions - drafted, not sent:
+
+1. Which exact account-specific clauses permit personal non-display
+   Target-Price research, raw retention, normalization/derived signals, and
+   separately each QC representation? Which Benzinga terms apply and which
+   agreement takes precedence?
+2. What do `date`, `time`, and `last_updated` measure? Is any field earliest
+   public release? How are late delivery, backfills, timezone/DST, corrected
+   timestamps, and historical vintages represented?
+3. Are original versions, corrections, deletions and withdrawals recoverable
+   with stable lineage and their own availability times, or only current rows?
+   What makes a high-water capture exhaustive?
+4. What adjusts current/prior targets, including splits and dividends? Can
+   later adjustments rewrite history? What effective/publication vintages
+   are retained?
+5. Are both prior and new target horizons explicit? How are horizon changes
+   represented? Missing evidence cannot silently mean a twelve-month target.
+6. How do firm/analyst/record identities behave under renaming, mergers,
+   reuse and duplicates? What supports permanent security/share-class,
+   historical ticker, currency and ADR/share-basis identity?
+7. What coverage, omitted-event, schema, null/missing-field and action-vocabulary
+   limitations distinguish unavailable history from an empty result?
+
+Public [endpoint documentation](https://massive.com/docs/rest/partners/benzinga/analyst-ratings)
+is background evidence for optional target fields and issued/updated clocks,
+not account-specific rights or proof of complete correction vintages. These
+questions deliberately leave provider facts unestablished. No authenticated
+request or retained capture is read by preparing this checklist.
+
+Staged zero-outcome audit proposal - execution NOT AUTHORIZED:
+
+| Stage | Entry gate | Output and exclusion |
+|---|---|---|
+| A: documentary preparation | Present drafting scope | This checklist, provider questions and proposed evidence/refusal inventory. No credentials or market rows. |
+| B: evidence/permit review | Exact account-specific evidence, owner-selected scope/budgets and independently reviewed admission mechanism | Reviewed artifact/permit identities and hashes, explicit allowed actions and expiry; missing, ambiguous, expired or unsupported permissions refuse. Review alone grants no access. |
+| C: bounded capture or retained-file audit | B satisfied for that exact action; all hard limits frozen | Permitted immutable raw pages, redacted metadata/fetch clocks, page inventory/hashes and raw-locator dispositions; no market-price/outcome join, scoring or QC. |
+| D: semantic/structural report | Exact capture identity and processing rights admitted | Counts, coverage, four-clock/basis findings, complete accepted/refused/missing accounting; insufficient evidence stays insufficient. |
+| E: canonical lane implementation | Separately scheduled TPR-1/TPR-2 work and exact source authority | Reviewed structural manifests may later support TPR-0B; this proposal or a pilot is not those manifests. |
+
+Before B/C, freeze exact code/worktree/config/schema/action-map identities,
+source-rights/owner/review/audit-permit hashes, new versus retained input,
+endpoint/dates/high-water or input manifests, destinations and every limit.
+Count successful, refused, failed, interrupted and retried attempts; refuse
+before any unbound/exhausted budget. No budget, date window, credential
+method, reviewer mechanism, custody policy, or rights exception is selected.
+The frozen first-request limit `50000` is a page-size contract, not an
+owner-approved sample/resource budget. A bounded pilot cannot establish the
+canonical all-history capture's completeness or silently replace it.
+
+The future audit must preserve exact finite-Decimal parsing, duplicate-key/
+type/action refusals, cursor/page replay protection, immutable raw locators,
+and exhaustive disposition totals. Keep event/effective, verified public,
+ingest, and version-availability clocks distinct. Precise timing requires
+publication evidence; otherwise the existing conservative date-only and
+second-exchange-open rule applies, without repairing missing correction
+lineage or final-state backfill. Measure target completeness, action/currency
+vocabulary, nonpositive/nonfinite values, raw/adjusted consistency, duplicates,
+late updates, and year-by-year coverage. Do not mix horizons, double-adjust
+targets, or substitute a vendor's previous target for reconstructed
+cutoff-valid lineage. TPR-2's price/identity/control/cost work needs its own
+reviewed prerequisites; any authorized pre-event price follows the frozen
+rule, never a subsequent return. Target-aligned future returns, formula
+rankings, tuning and the shared final holdout remain prohibited inputs.
+
+### 44.5 Remaining gates and serialized review
+
+TPR-OOL-011 remains open pending independent review and Codex counter-review
+of the exact correction. The prior section-40 rejection is not waived. This
+round neither accepts that defective patch retroactively nor synchronizes it
+to another lane. TPR-TR0-I remains incomplete; rollback/custody/matrix and
+reviewer-identity requirements remain open. TPR-1 remains blocked on exact
+reviewed source rights. TPR-0B still requires reviewed TPR-1/TPR-2 manifests.
+TPR-D0 is not authorized. The monitor remains paused; no automation is armed
+or changed by this round.
+
+Claude next independently reviews every Codex commit after `3de5bbef`,
+including sections 43 and 44 and both cumulative trees. Codex then
+counter-reviews every Claude commit before any next implementation milestone.
+Acceptance of this narrow shared correction does not close trust/source
+gates; decisions drafted above still need explicit owner selection and
+exact reviewed implementation/admission. Cross-lane shared synchronization
+requires later explicit owner coordination and identical reviewed bytes.
+
+### 44.6 Validation and handoff
+
+Validation is focused only; the complete lane/repository suite is not run.
+The existing fourteen frozen-Windows-Git integration limitations on macOS
+are not weakened, skipped, or redefined by this work. The Windows-junction
+platform skip remains a platform exclusion, not security completion.
+
+Python **3.12.14**, pytest **9.1.1**. Meaningful red/green and focused evidence:
+
+| Check | Result and qualification |
+|---|---|
+| New draft-authority guard before section 44 | **1 failed in 0.46s**, missing section as expected; green in the final focused set. |
+| Original shared guard against new old-stamp and prefix-collision cases | Initial red **2 failed in 0.42s**; final in-memory original-HEAD reverse mutation **2 failed in 0.40s**. Both regressions green after correction. No tracked source reversion. |
+| Initial generation heuristic against sibling lifecycle | **1 failed in 0.37s**; corrected candidate is green without aggregate-generation attribution. |
+| Final shared guard module | **26 passed in 0.94s**; includes real production old-stamp activation and activate/clear/identical-reactivation APIs with private state. |
+| Clear-receipt reverse mutation | **1 expected failure in 0.42s**; restored production-receipt regression green. |
+| Session-start rebaseline reverse mutation | **1 expected failure in 0.35s** against actual historic plugin-manager replay; restored snapshot-once regression green. |
+| Document/active-document/import/selected trust subset | **127 passed, 1 skipped in 1.65s**; Windows-junction exclusion unchanged. |
+| Four in-memory draft-authority mutations | Trust selection, source establishment, premature shared closure and removed source ceiling each red (**4/4**); baseline and restored guards green (**2/2**). No tracked-file mutation. |
+| Dispatch/ML compatibility subset | **8 passed in 0.45s**; real stop-generation, legacy old-stamp promotion, corrupt-state refusal, reentrant fence, and two direct ML boundary guards. |
+| Combined final candidate focused set | **161 passed, 1 skipped in 1.89s**; repeated after the evidence ledger was appended: **161 passed, 1 skipped in 2.47s**. This is the exact union listed below, not the complete lane/repository suite. |
+| Compilation and diff hygiene | Target code/tests and two shared files compile; `git diff --check` clean. Final committed-tree checks and exact correction commit are recorded before push. |
+
+All pytest invocations use an isolated in-process runner. Except for the
+initial red diagnostic qualified below, it narrowly intercepts the exact
+POSIX canonical-directory module-initialization paths,
+restores those import mocks immediately, then redirects both runtime-root
+resolvers before pytest's configuration hook. Reproduction from the
+designated worktree after its root/branch/HEAD/status preflight:
+
+```python
+import os, tempfile
+from pathlib import Path
+from unittest.mock import patch
+
+with tempfile.TemporaryDirectory(prefix="tpr-remediation-validation-") as isolated:
+    fake_root = Path(isolated)
+    fixed_root = f"/tmp/trading-agent-{os.getuid()}"
+    run_root = f"/run/user/{os.getuid()}"
+    original_mkdir, original_lstat, original_is_dir = os.mkdir, os.lstat, Path.is_dir
+    def isolated_mkdir(path, *args, **kwargs):
+        if os.fspath(path) == fixed_root:
+            return None
+        return original_mkdir(path, *args, **kwargs)
+    def isolated_lstat(path, *args, **kwargs):
+        if os.fspath(path) == fixed_root:
+            return fake_root.stat()
+        return original_lstat(path, *args, **kwargs)
+    def isolated_is_dir(path):
+        if os.fspath(path) == run_root:
+            return False
+        return original_is_dir(path)
+    with patch("os.mkdir", isolated_mkdir), patch("os.lstat", isolated_lstat), patch.object(Path, "is_dir", isolated_is_dir):
+        import assistant.dispatch_fence as fence
+    fence._canonical_runtime_root = lambda: fake_root
+    fence._RUNTIME_FENCE_ROOT = fake_root
+    import pytest
+    raise SystemExit(pytest.main([
+        "-q", "-p", "no:cacheprovider",
+        "tests/test_runtime_stop_leak_guard.py",
+        "tests/target_price_revisions/test_document_consistency.py",
+        "tests/test_active_document_consistency.py",
+        "tests/target_price_revisions/test_import_firewall.py",
+        "tests/target_price_revisions/test_trust_root.py::test_loader_autouse_fixtures_do_not_replace_the_frozen_git_program",
+        "tests/target_price_revisions/test_trust_root.py::test_public_verifier_uses_only_fixed_custody_and_trust_inputs",
+        "tests/target_price_revisions/test_trust_root.py::test_frozen_git_program_must_exist_as_an_unredirected_file",
+        "tests/test_dispatch_fence.py::test_dispatch_fence_is_reentrant_and_keeps_one_stable_lock_file",
+        "tests/test_dispatch_fence.py::test_runtime_stop_is_shared_across_databases_and_generation_bound",
+        "tests/test_dispatch_fence.py::test_pre_runtime_local_stop_is_promoted_across_databases",
+        "tests/test_dispatch_fence.py::test_runtime_stop_corruption_fails_closed",
+        "tests/test_ml_import_boundary.py::test_no_execution_capable_module_imports_ml",
+        "tests/test_ml_import_boundary.py::test_assistant_package_has_no_ml_import_except_the_future_shadow_adapter",
+        "--tb=short",
+    ]))
+```
+
+Compilation command:
+`python3 -m compileall -q tests/conftest.py tests/test_runtime_stop_leak_guard.py tests/target_price_revisions research/target_price_revisions`.
+No production trust path/tool/ACL substitution or native-integration claim
+is made. The fourteen preregistration failures measured in section 43 are
+not rerun here and remain the frozen Windows executable limitation; a green
+focused subset does not turn that measurement into a passing integration.
+
+Unchanged SHA-256 identities: governing PDF
+`f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`;
+candidate spec
+`17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a`;
+review registry
+`f7131a7c291dbeae988f769fe85b1e296c05bd6ba850e9007aefdddebbce31a5`;
+source manifest
+`9d926482c563a5a4feeb49ed393d36502a383364b5705c2742d9db5be1faa46f`;
+look ledger
+`0354c96d9e5e4b72400ee2e297e2ce01f3f5c650a87051db1210fd923abc19d6`.
+
+Quality assessment: **8/10 for this narrowly scoped correction/draft
+candidate**, pending independent review; not strategy, source, native trust,
+or operational readiness. Trust decisions/source inputs and the complete
+independent test run remain outstanding. The code/test commit and its
+record successor form one reviewable snapshot and receive one matching-lane
+non-force push; the exact final record hash and remote agreement are reported
+in this chat after commit, not guessed in a self-referential record.
+
+The three test-file changes are committed at
+`a8e4afefe3232f6515c17e9dbde1ae9781fe0776`. This record-only successor
+completes that intermediate test/record pair; no push occurs between them.
+Read-only parallel audits found no material issue in the final shared guard,
+trust draft, or source checklist, but are implementation self-review, not
+Claude's required independent review. Immediately before each commit the
+physical root, matching branch, HEAD, status and actual remote were checked;
+the remote remained at the base `37598fa5b686a14e906c92dcea4c17b9d9b933b7`.
+The record successor receives focused checks before commit; after commit,
+the exact complete tree receives the listed combined checks, compilation,
+artifact/diff/status and matching-remote checks before the one push.
+
+Provider data/API requests, credential accesses, licensed-row reads/processing,
+outcome accesses, authorized/spent looks, QC attempts/uploads/processing/jobs,
+broker/operator-database actions, trust provisioning, deployment, capital,
+orders and trading authority: **0**. Runtime-stop test state is fixture-only;
+no actual operator runtime-stop state or database is read, repaired, cleared,
+or deleted in this validation round. The first red diagnostic imported the
+existing canonical-directory initializer before redirecting the resolver
+(metadata/possible private-directory creation only, no stop-state access);
+all subsequent diagnostics intercept even that exact initialization and
+restore the import mocks immediately. This limitation is retained, not
+relabeled as full import-time isolation. No trust/source/look/registry
+artifact is changed.

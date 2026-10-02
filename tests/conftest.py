@@ -68,9 +68,26 @@ _DECODE_RUNTIME_STOP_STATE = __import__("json").JSONDecoder().decode
 _ENCODE_RUNTIME_STOP_INCIDENT = __import__("json").JSONEncoder(
     sort_keys=True, separators=(",", ":"), allow_nan=False
 ).encode
+# Bound once at import for the same reason as the decoder: this guard runs in
+# EVERY test's teardown, including tests that replace ``builtins.open`` and
+# ``Path.open`` with a must-not-run sentinel to prove a zero-I/O contract (the
+# insider SEC raw-parent projection test).  Raw descriptors consult neither.
+_OS_OPEN, _OS_READ, _OS_CLOSE = os.open, os.read, os.close
+_RUNTIME_STOP_READ_FLAGS = os.O_RDONLY | getattr(os, "O_BINARY", 0)
 _RUNTIME_STOP_SESSION_FILE: Path | None = None
 _RUNTIME_STOP_PREEXISTING: dict[str, tuple[str, str]] = {}
 _RUNTIME_STOP_PREVIOUS_CLEAR: tuple[str, str] | None = None
+
+
+def _read_runtime_stop_bytes(stop_file: Path) -> bytes:
+    descriptor = _OS_OPEN(stop_file, _RUNTIME_STOP_READ_FLAGS)
+    try:
+        chunks = []
+        while chunk := _OS_READ(descriptor, 65536):
+            chunks.append(chunk)
+    finally:
+        _OS_CLOSE(descriptor)
+    return b"".join(chunks)
 
 
 def _observe_runtime_stop() -> tuple[
@@ -88,7 +105,7 @@ def _observe_runtime_stop() -> tuple[
     except Exception as exc:
         raise AssertionError("runtime-stop leak guard cannot resolve its root") from exc
     try:
-        text = stop_file.read_text(encoding="utf-8")
+        text = _read_runtime_stop_bytes(stop_file).decode("utf-8")
     except FileNotFoundError:
         return stop_file, {}, None
     except (OSError, UnicodeError) as exc:

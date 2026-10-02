@@ -294,12 +294,12 @@ def test_guard_reports_read_failure_and_does_not_overwrite_state(tmp_path, runti
     guard, root = runtime_guard
     _write_stop(root, str(tmp_path.parent / "new_test0" / "assistant.db"))
     before = _stop_file(root).read_bytes()
-    real_read = Path.read_text
-    def unreadable(path, *args, **kwargs):
-        if path == _stop_file(root):
-            raise PermissionError("fixture read refusal")
-        return real_read(path, *args, **kwargs)
-    with patch.object(Path, "read_text", unreadable):
+    def unreadable(path):
+        assert path == _stop_file(root).resolve()
+        raise PermissionError("fixture read refusal")
+    # The guard reads through its own import-bound descriptor reader, so the
+    # refusal is injected at that seam rather than at a patchable Path method.
+    with patch.object(guard, "_read_runtime_stop_bytes", unreadable):
         with pytest.raises(AssertionError, match="cannot read"):
             guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
         with pytest.raises(AssertionError, match="cannot read"):
@@ -314,3 +314,24 @@ def test_guard_does_not_consult_monkeypatched_json_loads(tmp_path, runtime_guard
         raise AssertionError("json.loads must not run")
     monkeypatch.setattr(json, "loads", forbidden)
     guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+
+
+def test_guard_does_not_consult_monkeypatched_open(tmp_path, runtime_guard, monkeypatch):
+    """A zero-I/O test's ``open`` sentinel must neither trip nor blind the guard."""
+    import builtins
+    guard, root = runtime_guard
+    def forbidden(*args, **kwargs):
+        raise AssertionError("open must not run")
+    # Absent real state stays a quiet no-op under the sentinel ...
+    with monkeypatch.context() as sentinel:
+        sentinel.setattr(builtins, "open", forbidden)
+        sentinel.setattr(Path, "open", forbidden)
+        guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+    # ... and a real leak is still read and attributed under it.  The sentinel
+    # stays installed through this test's own teardown, as it does in the
+    # zero-I/O tests this protects.
+    _write_stop(root, str(tmp_path.parent / "leaking_test0" / "assistant.db"))
+    monkeypatch.setattr(builtins, "open", forbidden)
+    monkeypatch.setattr(Path, "open", forbidden)
+    with pytest.raises(AssertionError, match="REAL runtime emergency stop"):
+        guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)

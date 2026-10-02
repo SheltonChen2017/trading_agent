@@ -11,7 +11,6 @@ parent's complete hash.  No provider or outcome reader exists in this module.
 from __future__ import annotations
 
 import dataclasses
-import subprocess
 import threading
 import weakref
 from decimal import Decimal
@@ -40,6 +39,14 @@ from .canonical import (
     require_text,
     sha256_bytes,
 )
+from .trust_root import (
+    SIGNATURE_POLICY,
+    TrustRootError,
+    authority_git,
+    authority_is_ancestor,
+    computed_policy_repo_paths,
+    verify_signed_registry_anchor,
+)
 
 
 class PreregistrationError(ValueError):
@@ -48,7 +55,7 @@ class PreregistrationError(ValueError):
 
 CANDIDATE_STATUS = "algorithm_policy_frozen_pending_structural_bindings_and_review"
 REVIEWED_ALGORITHM_STATUS = "reviewed_algorithm_policy_frozen"
-REVIEW_REGISTRY_SCHEMA = "tpr-reviewed-algorithm-registry-v1"
+REVIEW_REGISTRY_SCHEMA = "tpr-reviewed-algorithm-registry-v2"
 SOURCE_AUTHORITY_SCHEMA = "tpr-research-source-authority-v1"
 PERMANENT_LOOK_AUTHORITY_SCHEMA = "tpr-permanent-look-authority-v1"
 ZERO_ACCESS_SOURCE_AUTHORITY_ID = "tpr-zero-access-no-source-authority"
@@ -67,6 +74,14 @@ FIXED_LANE_IDS = (
 ASSIGNED_LANE_ID = "target-price-revisions"
 SHARED_FAMILY_WISE_ALPHA = Decimal("0.05")
 WITHIN_LANE_ALPHA_CEILING = Decimal("0.0125")
+EMPTY_REVIEW_REGISTRY_BYTES = canonical_json_bytes(
+    {
+        "entries": [],
+        "schema": REVIEW_REGISTRY_SCHEMA,
+        "signature_policy": SIGNATURE_POLICY,
+    },
+    trailing_lf=True,
+)
 CANDIDATE_REPO_PATH = (
     "research/target_price_revisions/specs/tpr_round0a.candidate.json"
 )
@@ -76,6 +91,8 @@ POLICY_CODE_REPO_PATHS = (
     "research/target_price_revisions/canonical.py",
     "research/target_price_revisions/import_firewall.py",
     "research/target_price_revisions/preregistration.py",
+    "research/target_price_revisions/trust_root.py",
+    "research/target_price_revisions/windows_acl.py",
     "research/target_price_revisions/specs/.gitattributes",
 )
 
@@ -135,7 +152,8 @@ _LOOK_KEYS = frozenset(
         "cost_cell_hash",
     }
 )
-_REGISTRY_KEYS = frozenset({"schema", "entries"})
+_REGISTRY_KEYS = frozenset({"schema", "signature_policy", "entries"})
+_REGISTRY_SIGNATURE_POLICY_KEYS = frozenset(SIGNATURE_POLICY)
 _REGISTRY_ENTRY_KEYS = frozenset(
     {
         "spec_id",
@@ -1390,6 +1408,8 @@ class ReviewedAlgorithmSpec:
     source_path: str
     artifact_sha256: str
     review_commit: str
+    registry_anchor_commit: str
+    signing_key_fingerprint: str
     _authority: object = dataclasses.field(repr=False, compare=False)
 
     def cell(self, cell_id: str) -> object:
@@ -1758,12 +1778,12 @@ def _validate_dates_and_alpha(cells: tuple[PreregistrationCell, ...]) -> None:
     except CanonicalContractError as exc:
         raise _translate(exc) from exc
     if (
-        allocated_alpha != assigned_alpha
-        or empirical_alpha_value != allocated_alpha
+        empirical_alpha_value != allocated_alpha
         or acceptance_alpha_value != allocated_alpha
     ):
         raise PreregistrationError(
-            "family, structural-binding, allocation, and acceptance alpha must agree"
+            "structural-binding and acceptance alpha must equal the allocated "
+            "confirmatory alpha within the permanent family ceiling"
         )
 
 
@@ -1808,52 +1828,17 @@ def _repository_root(path: Path) -> Path:
 
 
 def _git(root: Path, *arguments: str, binary: bool = False) -> str | bytes:
-    command = [
-        "git",
-        "-c",
-        f"safe.directory={root}",
-        "-C",
-        str(root),
-        *arguments,
-    ]
     try:
-        completed = subprocess.run(
-            command,
-            check=True,
-            capture_output=True,
-            text=not binary,
-            encoding=None if binary else "utf-8",
-            shell=False,
-        )
-    except (OSError, subprocess.CalledProcessError, UnicodeError) as exc:
+        return authority_git(root, *arguments, binary=binary)
+    except TrustRootError as exc:
         raise PreregistrationError("review anchor Git verification failed") from exc
-    return completed.stdout
 
 
 def _git_is_ancestor(root: Path, ancestor: str, descendant: str) -> bool:
     try:
-        completed = subprocess.run(
-            [
-                "git",
-                "-c",
-                f"safe.directory={root}",
-                "-C",
-                str(root),
-                "merge-base",
-                "--is-ancestor",
-                ancestor,
-                descendant,
-            ],
-            check=False,
-            capture_output=True,
-            text=False,
-            shell=False,
-        )
-    except OSError as exc:
+        return authority_is_ancestor(root, ancestor, descendant)
+    except TrustRootError as exc:
         raise PreregistrationError("review ancestry verification failed") from exc
-    if completed.returncode not in (0, 1):
-        raise PreregistrationError("review ancestry verification failed")
-    return completed.returncode == 0
 
 
 def _committed_candidate(
@@ -1893,7 +1878,7 @@ def _review_anchor(
     spec_path: Path,
     raw: Mapping[str, object],
     spec_payload: bytes,
-) -> tuple[str, str, str]:
+) -> tuple[str, str, str, str, str]:
     """Bind reviewed algorithm bytes to an independent committed Git snapshot."""
     original_registry = REVIEWED_SPEC_REGISTRY_PATH.absolute()
     original_spec = spec_path.absolute()
@@ -1920,39 +1905,49 @@ def _review_anchor(
     candidate_relative = CANDIDATE_REPO_PATH
     if spec_relative == candidate_relative:
         raise PreregistrationError("reviewed artifact cannot overwrite its candidate")
-    status = str(
-        _git(
-            spec_root,
-            "status",
-            "--porcelain=v1",
-            "--untracked-files=all",
-            "--",
-            spec_relative,
-            registry_relative,
-            *POLICY_CODE_REPO_PATHS,
-        )
-    )
-    if status:
-        raise PreregistrationError("reviewed spec and registry must be committed and clean")
-    _git(spec_root, "ls-files", "--error-unmatch", "--", spec_relative)
-    _git(spec_root, "ls-files", "--error-unmatch", "--", registry_relative)
-    for policy_path in POLICY_CODE_REPO_PATHS:
-        _git(spec_root, "ls-files", "--error-unmatch", "--", policy_path)
     try:
         registry_payload = registry_path.read_bytes()
-        registry = require_canonical_json_bytes(registry_payload, "review registry")
-        require_exact_keys(registry, _REGISTRY_KEYS, "review registry")
-    except (OSError, CanonicalContractError) as exc:
-        raise _translate(exc) from exc
-    if registry["schema"] != REVIEW_REGISTRY_SCHEMA or not isinstance(
-        registry["entries"], list
-    ):
-        raise PreregistrationError("review registry schema or entries are invalid")
+    except OSError as exc:
+        raise PreregistrationError("review registry is unavailable") from exc
     committed_registry = bytes(
         _git(spec_root, "show", f"HEAD:{registry_relative}", binary=True)
     )
     if registry_payload != committed_registry:
         raise PreregistrationError("working review registry differs from committed bytes")
+    if registry_payload == EMPTY_REVIEW_REGISTRY_BYTES:
+        raise PreregistrationError("reviewed algorithm has no unique external review anchor")
+    try:
+        trusted_registry = verify_signed_registry_anchor(spec_root, registry_payload)
+        computed_policy_paths = computed_policy_repo_paths(spec_root)
+    except TrustRootError as exc:
+        raise PreregistrationError("signed review-registry trust root is invalid") from exc
+    if trusted_registry.registry_payload != registry_payload:
+        raise PreregistrationError("signed registry bytes differ from the parsed registry")
+    try:
+        registry = require_canonical_json_bytes(registry_payload, "review registry")
+        require_exact_keys(registry, _REGISTRY_KEYS, "review registry")
+    except CanonicalContractError as exc:
+        raise _translate(exc) from exc
+    if registry["schema"] != REVIEW_REGISTRY_SCHEMA or not isinstance(
+        registry["entries"], list
+    ):
+        raise PreregistrationError("review registry schema or entries are invalid")
+    try:
+        require_exact_keys(
+            registry["signature_policy"],
+            _REGISTRY_SIGNATURE_POLICY_KEYS,
+            "review registry signature_policy",
+        )
+    except CanonicalContractError as exc:
+        raise _translate(exc) from exc
+    if dict(registry["signature_policy"]) != SIGNATURE_POLICY:
+        raise PreregistrationError("review registry signature policy is not frozen")
+    if not registry["entries"]:
+        raise PreregistrationError("reviewed algorithm has no unique external review anchor")
+    if frozenset(computed_policy_paths) != frozenset(POLICY_CODE_REPO_PATHS):
+        raise PreregistrationError(
+            "signed policy inventory differs from the verifier import closure"
+        )
     matches: list[Mapping[str, object]] = []
     seen_ids: set[str] = set()
     for entry in registry["entries"]:
@@ -2031,15 +2026,29 @@ def _review_anchor(
         or artifact_hash != sha256_bytes(spec_payload)
     ):
         raise PreregistrationError("review anchor does not bind the complete algorithm spec")
-    _git(spec_root, "cat-file", "-e", f"{review_commit}^{{commit}}")
-    if not _git_is_ancestor(spec_root, review_commit, "HEAD"):
-        raise PreregistrationError("independent review commit is not an ancestor of HEAD")
+    registry_anchor_commit = trusted_registry.anchor_commit
+    head_commit = trusted_registry.head_commit
+    if (
+        review_commit == registry_anchor_commit
+        or not _git_is_ancestor(spec_root, review_commit, registry_anchor_commit)
+    ):
+        raise PreregistrationError(
+            "signed registry anchor must be a strict descendant of review_commit"
+        )
     for policy_path, expected_hash in policy_code_hashes.items():
         reviewed_policy_blob = bytes(
             _git(spec_root, "show", f"{review_commit}:{policy_path}", binary=True)
         )
+        anchored_policy_blob = bytes(
+            _git(
+                spec_root,
+                "show",
+                f"{registry_anchor_commit}:{policy_path}",
+                binary=True,
+            )
+        )
         head_policy_blob = bytes(
-            _git(spec_root, "show", f"HEAD:{policy_path}", binary=True)
+            _git(spec_root, "show", f"{head_commit}:{policy_path}", binary=True)
         )
         working_policy_path = (spec_root / Path(policy_path)).absolute()
         _reject_redirected_path_or_ancestor(
@@ -2052,12 +2061,13 @@ def _review_anchor(
             raise PreregistrationError("reviewed policy code is unavailable") from exc
         if (
             resolved_policy_path != working_policy_path
-            or sha256_bytes(reviewed_policy_blob) != expected_hash
-            or head_policy_blob != reviewed_policy_blob
-            or working_policy_blob != reviewed_policy_blob
+            or sha256_bytes(anchored_policy_blob) != expected_hash
+            or reviewed_policy_blob != anchored_policy_blob
+            or head_policy_blob != anchored_policy_blob
+            or working_policy_blob != anchored_policy_blob
         ):
             raise PreregistrationError(
-                "current policy code differs from the independently reviewed map"
+                "policy code differs among review, signed anchor, HEAD, and working tree"
             )
     _git(spec_root, "cat-file", "-e", f"{producing_commit}^{{commit}}")
     if (
@@ -2095,9 +2105,69 @@ def _review_anchor(
     reviewed_blob = bytes(
         _git(spec_root, "show", f"{review_commit}:{spec_relative}", binary=True)
     )
-    if reviewed_blob != spec_payload:
-        raise PreregistrationError("current algorithm spec differs from reviewed bytes")
-    return str(resolved_spec), artifact_hash, review_commit
+    anchored_blob = bytes(
+        _git(
+            spec_root,
+            "show",
+            f"{registry_anchor_commit}:{spec_relative}",
+            binary=True,
+        )
+    )
+    head_blob = bytes(
+        _git(spec_root, "show", f"{head_commit}:{spec_relative}", binary=True)
+    )
+    if (
+        reviewed_blob != anchored_blob
+        or anchored_blob != head_blob
+        or head_blob != spec_payload
+    ):
+        raise PreregistrationError(
+            "algorithm spec differs among review, signed anchor, HEAD, and working tree"
+        )
+    if str(
+        _git(
+            spec_root,
+            "rev-parse",
+            "--verify",
+            "HEAD^{commit}",
+        )
+    ) != f"{head_commit}\n":
+        raise PreregistrationError("HEAD changed during reviewed-algorithm verification")
+    try:
+        if registry_path.read_bytes() != trusted_registry.registry_payload:
+            raise PreregistrationError(
+                "review registry changed during reviewed-algorithm verification"
+            )
+        if resolved_spec.read_bytes() != spec_payload:
+            raise PreregistrationError(
+                "algorithm spec changed during reviewed-algorithm verification"
+            )
+        for policy_path, expected_hash in policy_code_hashes.items():
+            if sha256_bytes((spec_root / policy_path).read_bytes()) != expected_hash:
+                raise PreregistrationError(
+                    "policy code changed during reviewed-algorithm verification"
+                )
+    except OSError as exc:
+        raise PreregistrationError(
+            "reviewed authority bytes became unavailable during verification"
+        ) from exc
+    try:
+        terminal_policy_paths = computed_policy_repo_paths(spec_root)
+    except TrustRootError as exc:
+        raise PreregistrationError(
+            "signed policy import closure changed during verification"
+        ) from exc
+    if frozenset(terminal_policy_paths) != frozenset(POLICY_CODE_REPO_PATHS):
+        raise PreregistrationError(
+            "signed policy import closure changed during verification"
+        )
+    return (
+        str(resolved_spec),
+        artifact_hash,
+        review_commit,
+        registry_anchor_commit,
+        trusted_registry.signing_key_fingerprint,
+    )
 
 
 def _reviewed_fingerprint(spec: ReviewedAlgorithmSpec) -> tuple[object, ...]:
@@ -2116,6 +2186,8 @@ def _reviewed_fingerprint(spec: ReviewedAlgorithmSpec) -> tuple[object, ...]:
         spec.source_path,
         spec.artifact_sha256,
         spec.review_commit,
+        spec.registry_anchor_commit,
+        spec.signing_key_fingerprint,
     )
 
 
@@ -2137,6 +2209,8 @@ def _mint_reviewed_algorithm(
     source_path: str,
     artifact_sha256: str,
     review_commit: str,
+    registry_anchor_commit: str,
+    signing_key_fingerprint: str,
 ) -> ReviewedAlgorithmSpec:
     value = object.__new__(ReviewedAlgorithmSpec)
     for name, item in {
@@ -2151,6 +2225,8 @@ def _mint_reviewed_algorithm(
         "source_path": source_path,
         "artifact_sha256": artifact_sha256,
         "review_commit": review_commit,
+        "registry_anchor_commit": registry_anchor_commit,
+        "signing_key_fingerprint": signing_key_fingerprint,
         "_authority": _REVIEWED_AUTHORITY,
     }.items():
         object.__setattr__(value, name, item)
@@ -2185,7 +2261,13 @@ def load_reviewed_algorithm_spec(path: Path) -> ReviewedAlgorithmSpec:
     cells = _validate_cells(raw["cells"])
     _validate_dates_and_alpha(cells)
     looks = _validate_looks(raw["looks"])
-    source_path, artifact_hash, review_commit = _review_anchor(path, raw, payload)
+    (
+        source_path,
+        artifact_hash,
+        review_commit,
+        registry_anchor_commit,
+        signing_key_fingerprint,
+    ) = _review_anchor(path, raw, payload)
     # Assign validated scalar spellings back into the raw mapping used by the
     # private factory.  The canonical parser already detached it from callers.
     raw = dict(raw)
@@ -2201,6 +2283,8 @@ def load_reviewed_algorithm_spec(path: Path) -> ReviewedAlgorithmSpec:
         source_path=source_path,
         artifact_sha256=artifact_hash,
         review_commit=review_commit,
+        registry_anchor_commit=registry_anchor_commit,
+        signing_key_fingerprint=signing_key_fingerprint,
     )
 
 

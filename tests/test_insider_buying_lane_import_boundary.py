@@ -11,10 +11,11 @@ QuantConnect request is made.
 from __future__ import annotations
 
 import ast
-import re
 import subprocess
 import sys
 from pathlib import Path
+
+import pytest
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -113,35 +114,121 @@ def test_importing_the_whole_package_loads_no_network_capable_lane_module() -> N
     assert runners[0] in control.stdout.strip().split(",")
 
 
-# Section 124 (Claude review). A test that hands a real SEC transport object to
-# a runner, or calls one directly, exists to prove a guard stops it. If that
-# guard regresses, or a mutation run disables it, the test must fail at a
-# mocked connection rather than contact the SEC. The scan covers test
-# functions only; a transport passed through a module-level helper is not seen.
-_REAL_TRANSPORT = re.compile(
-    r"\b[A-Za-z_][A-Za-z0-9_.]*\._(?:selected_)?sec_transport\b"
-    r"|\b[A-Za-z_][A-Za-z0-9_.]*\._fetch_sec\("
-)
-_CONNECTION_TRIPWIRE = re.compile(r"HTTPSConnection|_fake_https_wire")
+# A bounded structural check, not a network sandbox: direct transport tests
+# need an unconditional connection patch before their first transport reference.
+# Aliased transports, dynamic patch targets and arbitrary helper control flow
+# are not proven here. Run tests/mutants with process-tree network denial too.
 # Kept at module level so the scan below does not flag its own control sample.
 _UNSAFE_SAMPLE = "def test_unsafe(tmp_path):\n    run(plan, tmp_path, runner._sec_transport)\n"
+_MISLEADING_TRIPWIRE_SAMPLES = (
+    "    # HTTPSConnection is not patched\n",
+    '    "HTTPSConnection is not patched"\n',
+    "    _fake_https_wire\n",
+    "    if False:\n        monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n",
+    "    def unused():\n        monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n",
+    "    monkeypatch.setattr(other, 'HTTPSConnection', forbidden)\n",
+)
+
+
+@pytest.mark.parametrize("marker", _MISLEADING_TRIPWIRE_SAMPLES)
+def test_tripwire_scan_rejects_nonblocking_markers(marker: str) -> None:
+    source = "def test_unsafe(tmp_path, monkeypatch):\n" + marker + (
+        "    run(plan, tmp_path, runner._sec_transport)\n"
+    )
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (
+        1, ["invented.py::test_unsafe"],
+    )
+
+
+def test_tripwire_scan_rejects_a_patch_after_transport_use() -> None:
+    source = _UNSAFE_SAMPLE + (
+        "    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n"
+    )
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (
+        1, ["invented.py::test_unsafe"],
+    )
+
+
+def _dotted_name(node: ast.AST) -> str:
+    if isinstance(node, ast.Name):
+        return node.id
+    if isinstance(node, ast.Attribute):
+        return _dotted_name(node.value) + "." + node.attr
+    return ""
+
+
+def _statement_call(statement: ast.stmt) -> ast.Call | None:
+    if isinstance(statement, (ast.Expr, ast.Assign, ast.AnnAssign)):
+        value = statement.value
+        if isinstance(value, ast.Call):
+            return value
+    return None
+
+
+def _connection_patch(statement: ast.stmt) -> bool:
+    call = _statement_call(statement)
+    if call is None or _dotted_name(call.func) != "monkeypatch.setattr":
+        return False
+    args = call.args
+    if len(args) == 2:
+        return isinstance(args[0], ast.Constant) and args[0].value == "http.client.HTTPSConnection"
+    if len(args) == 3:
+        target = _dotted_name(args[0])
+        return (
+            (target == "http.client" or target.endswith(".http.client"))
+            and isinstance(args[1], ast.Constant) and args[1].value == "HTTPSConnection"
+        )
+    return False
+
+
+def _touches_real_transport(statement: ast.stmt) -> bool:
+    for node in ast.walk(statement):
+        if isinstance(node, ast.Attribute) and node.attr in {"_sec_transport", "_selected_sec_transport"}:
+            return True
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute) and node.func.attr == "_fetch_sec":
+            return True
+    return False
+
+
+def _wire_helper_patches(tree: ast.Module) -> bool:
+    helpers = [node for node in tree.body if isinstance(node, ast.FunctionDef) and node.name == "_fake_https_wire"]
+    if len(helpers) != 1:
+        return False
+    for stmt in helpers[0].body:
+        if _connection_patch(stmt):
+            return True
+        if isinstance(stmt, (ast.Return, ast.Raise, ast.If, ast.For, ast.While, ast.Try, ast.With, ast.Match)):
+            return False
+    return False
 
 
 def _real_transport_tests_without_tripwire(sources: dict[str, str]) -> tuple[int, list[str]]:
     seen, offenders = 0, []
     for name, text in sorted(sources.items()):
-        lines = text.split("\n")
-        for node in ast.walk(ast.parse(text)):
+        tree = ast.parse(text)
+        # Only this existing, source-audited helper shape is recognized. Merely
+        # mentioning its name, or replacing its patch with a comment, is not.
+        wire_patches = _wire_helper_patches(tree)
+        for node in ast.walk(tree):
             if isinstance(node, ast.FunctionDef) and node.name.startswith("test_"):
-                body = "\n".join(lines[node.lineno - 1:node.end_lineno])
-                if _REAL_TRANSPORT.search(body):
-                    seen += 1
-                    if not _CONNECTION_TRIPWIRE.search(body):
-                        offenders.append(f"{name}::{node.name}")
+                patched = False
+                for stmt in node.body:
+                    if _touches_real_transport(stmt):
+                        seen += 1
+                        if not patched:
+                            offenders.append(f"{name}::{node.name}")
+                        break
+                    call = _statement_call(stmt)
+                    if _connection_patch(stmt) or (
+                        wire_patches and call is not None
+                        and isinstance(call.func, ast.Name) and call.func.id == "_fake_https_wire"
+                        and call.args and isinstance(call.args[0], ast.Name) and call.args[0].id == "monkeypatch"
+                    ):
+                        patched = True
     return seen, offenders
 
 
-def test_every_test_touching_a_real_sec_transport_blocks_the_connection() -> None:
+def test_direct_sec_transport_tests_install_a_connection_patch_before_use() -> None:
     sources = {
         path.name: path.read_text(encoding="utf-8")
         for path in (ROOT / "tests").glob("test_insider_buying*.py")
@@ -153,3 +240,35 @@ def test_every_test_touching_a_real_sec_transport_blocks_the_connection() -> Non
     assert _real_transport_tests_without_tripwire({"invented.py": _UNSAFE_SAMPLE}) == (
         1, ["invented.py::test_unsafe"],
     )
+
+
+@pytest.mark.parametrize("patch", (
+    "    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n",
+    "    monkeypatch.setattr(runner.http.client, 'HTTPSConnection', forbidden)\n",
+))
+def test_tripwire_scan_accepts_an_executable_connection_patch(patch: str) -> None:
+    source = "def test_safe(tmp_path, monkeypatch):\n" + patch + (
+        "    run(plan, tmp_path, runner._sec_transport)\n"
+    )
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, [])
+
+
+@pytest.mark.parametrize("helper_patch,prefix,offending", (
+    (True, "", []),
+    (False, "", ["invented.py::test_safe"]),
+    (True, "    return\n", ["invented.py::test_safe"]),
+    (True, "    if wire:\n        return\n", ["invented.py::test_safe"]),
+))
+def test_tripwire_scan_checks_the_called_wire_helper_body(
+    helper_patch: bool, prefix: str, offending: list[str],
+) -> None:
+    helper = "def _fake_https_wire(monkeypatch, wire):\n" + prefix + (
+        "    monkeypatch.setattr(runner.http.client, 'HTTPSConnection', Connection)\n"
+        if helper_patch else "    pass  # HTTPSConnection is not patched\n"
+    )
+    source = helper + (
+        "def test_safe(tmp_path, monkeypatch):\n"
+        "    state = _fake_https_wire(monkeypatch, b'')\n"
+        "    run(plan, tmp_path, runner._sec_transport)\n"
+    )
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, offending)

@@ -1,21 +1,19 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`ea97bd4f..3de5bbef`; SECTION 43 RECORDS THE EXACT RANGE, THREE DISPOSITIONS,
-VERIFIED FINDINGS, CORRECTIONS, AND REMAINING GATES. CUMULATIVE DISPOSITION:
-ACCEPTED AFTER CORRECTION FOR THAT CLAUDE RANGE, NOT ACCEPTANCE OF THE STILL
-REJECTED SHARED PATCH IN SECTION 40. THE HOST-GIT AUTOUSE SUBSTITUTION IS
-REMOVED; FOURTEEN WINDOWS-GIT INTEGRATION CASES REMAIN A macOS LIMITATION.
-SECTION 42.6'S TPR-OD-001 THROUGH TPR-OD-004 ARE RETAINED AS HISTORICAL
-CLAUDE PROPOSALS, NOT OPERATIVE AUTHORIZATION UNDER THE CURRENT OWNER
-MONITOR. TPR-D0 IS NOT AUTHORIZED: RETAINED LICENSED-ROW PROCESSING STILL
-NEEDS EXACT TARGET-PRICE SOURCE/ACCESS AUTHORITY. NO NEXT IMPLEMENTATION
-MILESTONE IS AUTHORIZED FOR STRATEGY DATA, SCORE, OR OUTCOME WORK. SECTION 44
-RECORDS THE OWNER'S NARROW SHARED-TEST CORRECTION AND TRUST/SOURCE DRAFTING
-SCOPE. THAT REMEDIATION CANDIDATE AWAITS CLAUDE REVIEW; IT DOES NOT CLOSE THE
-PRIOR SHARED REJECTION OR SELECT TRUST/DATA POLICIES. CLAUDE NEXT REVIEWS
-SECTIONS 43 AND 44. FURTHER OWNER DECISIONS AND FACTUAL GATES ARE REQUIRED
-BEFORE STRATEGY DEVELOPMENT CAN ADVANCE. THE
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`3de5bbef..9958a459` IN SECTION 45: THE SECTION-43 COUNTER-REVIEW AND THE
+OWNER-SCOPED SECTION-44 SHARED-TEST CORRECTION AND DRAFTS. CUMULATIVE
+DISPOSITION: ACCEPTED AFTER CORRECTION. THE SHARED RUNTIME-STOP GUARD
+CORRECTION IS ACCEPTED AFTER ONE CORRECTION; `TPR-OOL-011` STAYS OPEN ONLY FOR
+OWNER-COORDINATED SYNCHRONIZATION TO MAIN AND THE SIBLING LANES. THE HOST-GIT
+SUBSTITUTION STAYS REMOVED, AND THE FOURTEEN LOADER TESTS THAT FAIL ON THE
+macOS DEVELOPMENT HOST ARE NOW THE OPEN LANE FINDING `TPR-CR15-001`. SECTION
+42.6'S TPR-OD-001 THROUGH TPR-OD-004 REMAIN PROPOSALS, NOT OPERATIVE
+AUTHORIZATION: SECTION 45.6 RECORDS THAT THE OWNER GAVE CLAUDE AND CODEX
+CONFLICTING INSTRUCTIONS AND LISTS THE FIVE OWNER INPUTS THE LANE NOW WAITS
+ON. TPR-D0 IS NOT AUTHORIZED. NO NEXT IMPLEMENTATION MILESTONE IS AUTHORIZED
+FOR STRATEGY DATA, SCORE, OR OUTCOME WORK. CODEX NEXT COUNTER-REVIEWS SECTION
+45. THE
 COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT REMAINS COMPLETE. THE
 NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS CHECKPOINTED BUT REMAINS
 INCOMPLETE: ROLLBACK/REPLAY PROTECTION, PARENT-DIRECTORY CUSTODY, AND THE
@@ -368,27 +366,26 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-02:** Codex has counter-reviewed the exact
-Claude range
-`ea97bd4fc03779b7947cf35cd8e4432b0b9fa516..3de5bbef3a25d8a37647869ad840808543927a82`.
-Section 42 proves that Claude completed independent review of the exact
-published `ea97bd4f` Codex snapshot, including the cumulative range beginning
-after `d54ce1b2`. Section 43 dispositions all three incoming Claude commits
-separately and the cumulative tree. Its cumulative disposition is accepted
-after correction. The native-host Git autouse substitution is removed rather
-than weakening the frozen Windows trust contract to make this host green;
-the original fourteen frozen-Git integration failures remain a macOS
-limitation. The new unavailable-executable refusal remains meaningful.
+**Current qualification, 2026-10-02:** Claude has independently reviewed the
+exact Codex range
+`3de5bbef3a25d8a37647869ad840808543927a82..9958a459f5cd56c29cb9a0de13d38737e2c3412d`:
+the section-43 counter-review and the owner-scoped section-44 shared-test
+correction and drafts. Section 45 dispositions all four commits separately;
+its cumulative disposition is accepted after correction. The shared
+runtime-stop guard correction `a8e4afef` is accepted after correction
+(`TPR-CR15-004`, two commits) and cures the section-40 rejection for this lane's tree; `TPR-OOL-011` stays open only for
+owner-coordinated synchronization of the two shared test files to `main` and
+the sibling lanes. The native-host Git autouse substitution stays removed
+rather than weakening the frozen Windows trust contract to make this host
+green, and the fourteen frozen-Git loader tests that fail on the macOS
+development host are now the open lane finding `TPR-CR15-001`.
 Section 42.6's `TPR-OD-001`, `TPR-OD-002`, `TPR-OD-003`, and `TPR-OD-004`
-remain historical Claude proposals, not operative authorization. The current
-owner heartbeat grants counter-review and gated continuation, not licensed
-market rows, source facts, a security-policy choice, or QuantConnect work.
-The later owner instruction, "Scope the shared fix", "Draft the trust
-decisions", "Prepare the source checklist", and "start implementing",
-authorizes the narrow two-file shared-test correction and non-authorizing
-drafts in section 44. New remediation candidate awaits independent Claude
-review. This is not approval of a particular trust policy or source-access
-scope, and does not waive the prior rejection.
+remain historical Claude proposals, not operative authorization. Section 45.6
+records that the owner gave Claude and Codex conflicting instructions; only
+the owner can say which governs, and this record does not alternate between
+them. The owner instruction quoted in section 44.1 authorized the narrow
+two-file shared-test correction and the non-authorizing drafts, and nothing
+wider. It is not approval of a particular trust policy or source-access scope.
 The authoritative current open-issue register remains below in section 8,
 and Claude's comprehensive whole-lane audit remains complete. The
 non-authorizing TPR-TR0-I implementation candidate is checkpointed but remains
@@ -442,23 +439,18 @@ consistency, raw retention, derived processing, and QC-transfer rights, and
 the canonical TPR-0B remains blocked until reviewed TPR-1 and TPR-2 structural
 manifests exist. The TPR-D development route does not unblock, satisfy, or
 spend any canonical gate. No next implementation milestone is authorized for
-strategy data, score, or outcome work; the named shared remediation and
-decision/checklist drafts are the bounded exception, not a TPR milestone.
-TPR-D0 is not authorized: its retained-source audit would read and process
-licensed rows even without a provider request. It needs an exact owner scope
-and the applicable reviewed source-rights artifact; it is not silently split
-into a plan-only milestone. `TPR-OOL-011` still carries the section-40
-cumulative rejection; section 44 implements a correction candidate awaiting
-independent review, without declaring that rejection resolved. The trust
-rollback pin, protected parent custody, and complete adversarial matrix also
-remain unresolved. **Exact next role action:** Claude next reviews sections 43 and 44
-and every new Codex commit after the pushed Claude head `3de5bbef`, including
-the counter-review snapshot and this owner-scoped remediation/drafting round.
-The owner must resolve
-the exact development scope and remaining gates before another milestone.
-The monitor stays paused after this one round. No provider, credential,
-licensed-row, outcome, look, QuantConnect job, broker, paper, live,
-deployment, capital, or trading authority is added.
+strategy data, score, or outcome work. TPR-D0 is not authorized: its
+retained-source audit would read and process licensed rows even without a
+provider request, and it needs an exact owner scope. The lane is waiting on
+the owner inputs `TPR-OWN-1` through `TPR-OWN-5` listed in section 45.6. The
+trust rollback pin, protected parent custody, and complete adversarial matrix
+also remain unresolved. **Exact next role action:** Codex next counter-reviews
+section 45 and both Claude commits of this round. Neither role starts strategy
+work, reads a retained licensed row, sends a provider request, or opens a
+QuantConnect project until the owner has answered section 45.6 in a form both
+roles can read. Codex reports that its counter-review monitor is paused. No
+provider, credential, licensed-row, outcome, look, QuantConnect job, broker,
+paper, live, deployment, capital, or trading authority is added.
 
 ### Open-issue register
 
@@ -478,9 +470,10 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
+| `TPR-CR15-001` | P2 | A green lane suite and loader-regression detection on the macOS development host | Fourteen reviewed-loader tests run the frozen Windows Git and fail here. The remedy changes how the frozen trust contract is tested off Windows, which the owner's pending `TPR-TR-D1` selection decides and on which the two roles disagree (sections 43 and 45). |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty
-and no trust files exist, but both block any positive registry entry. The six
+and no trust files exist, but both block any positive registry entry. The seven
 open findings require an owner decision, an owner-authorized artifact rewrite,
 or a later bounded implementation/validation round.
 ### Historical progression (not the current resume instruction)
@@ -580,6 +573,7 @@ exception names it. Section 44 is that bounded exception for only
 | `TPR-OOL-012` | P3 | Shared `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` identity table | The shared record says every code commit is an identical four-lane cherry-pick, while its own method section and this lane's section 39 correctly identify F-8 as a Target-Price-owned variant: main expects the `committed and clean` refusal and this advanced lane expects `no unique external review anchor`. | **Open and owner-routed.** This lane corrects only its own section 39 under `TPR-CCR13-003`; qualify the shared archive in its next owner-coordinated documentation change. The mismatch changes no code or authority. |
 | `TPR-OOL-013` | P3 | Shared `tests/test_shared_research_eol_attributes.py` name and documentation | The test named `working_copy_matches_its_index_blob` compares only the `i/` and `w/` line-ending classifications from `git ls-files --eol`; arbitrary different LF content still passes. It correctly detected this host's two stale CRLF ML-spec copies and the documented remove-plus-checkout recovery restored their exact blob hashes, but the broader byte-equality claim is weak test sensitivity. | **Open and owner-routed.** Section 39 is qualified under `TPR-CCR13-005`. Strengthen or rename the shared guard in the shared owner lane; do not edit it here. |
 | `TPR-OOL-014` | P3 | Shared `docs/ACTION_PLAN_2026-08-20.md`, Target-Price block and table row | Section 42 restored this frozen file to the merge result, so its Target-Price block is the owner-directed 2026-09-04 text. Two of its statements are now stale: that no implementation milestone is authorized, and that the four-slot amendment is not yet re-frozen in the sibling lanes (`TPR-OOL-006`, closed in section 41). The block itself names section 8 of this record as the authoritative state, so no lane decision reads the stale sentences. | **Open and owner-routed.** A concise owner-coordinated amendment on `main`; Codex's wording at `0d07026`, without its role-pending sentences, is a usable starting text. Do not edit the file from this lane. |
+| `TPR-OOL-011-R1` | P2 resolution in this lane | `tests/conftest.py` and `tests/test_runtime_stop_leak_guard.py` on this lane only | The owner-scoped correction `a8e4afefe3232f6515c17e9dbde1ae9781fe0776` replaces timestamp inference with a pre-collection baseline of real incident identity and content and uses path-component containment. Section 45 accepts it after correction (`1a4fd37` and `c2c0672`, `TPR-CR15-004`: the guard no longer depends on patchable `open`, `os.open`, `os.name`, or per-teardown root resolution): both section-40 counterexamples are closed, 9 of 13 mutations are red, and the 4 green are redundant or defensive. This lane's copies of the two files now differ from `main` and from the sibling lanes, which still carry the defective guard. | The section-40 rejection is cured for this lane's tree. `TPR-OOL-011` stays open only until an owner-coordinated synchronization gives `main` and the sibling lanes the identical reviewed bytes. Two defensive branches (origin normalisation, duplicate incident identity) have no test and are left to the shared owner. |
 | `TPR-OOL-014-R1` | P3 qualification | Same shared Action Plan, unchanged | Section 43 confirms the stale sibling-refreeze statement, but the claim that "no implementation milestone is authorized" is stale is a false alarm under the current owner monitor and unclosed source/trust gates. Section 42's proposed TPR-D0 does not make that sentence false. | The original row is retained as historical evidence. `TPR-OOL-014` remains open only for verified shared-document drift; no shared file is changed. |
 | `TPR-OOL-015` | P2 | Shared repository guards against imported Analyst code: `tests/test_decimal_conversion_guard.py`, `tests/test_project_separation_entrypoints.py` | Four shared tests fail on the merged tree. `test_no_new_bare_decimal_str_conversion_outside_the_money_helpers` names bare `Decimal(str(...))` sites under `research/analyst_revisions_v2_qc/`; `test_every_script_is_classified_exactly_once` and `test_sep2_definition_of_done_is_reconstructed_not_self_asserted` find 21 unclassified `scripts/` entry points; `test_product_dependency_manifests_cover_actual_imports` finds undeclared import roots that are the QC projection modules' bare sibling imports. Every named path is Analyst-owned and byte-identical on `main` `9e834713`; no Target-Price path is named. Lane impact: the complete suite cannot be green on this branch for reasons outside it. | **Open and owner-routed.** Shared guards and the Analyst lane must be reconciled by their owners; nothing is changed here. |
 | `TPR-OOL-016` | P3 | Analyst Revisions V2 tests when run outside the Analyst worktree: `tests/analyst_revisions_v2/` | In this checkout the Analyst directory reports 37 errors and 5 failures that are not regressions of this lane. Five modules (`test_qc_qcom_exclusion_coverage10_study.py`, `test_qc_qcom_exclusion_three_name_study.py`, `test_qc_qcom_three_name_precreate_retry.py`, `test_qc_qcom_precreate_retry.py`, and `test_qc_qcom_exclusion_study.py`) error instead of skipping when the gitignored `artifacts/analyst_revisions_v2/` package is absent, while sibling modules skip on the same condition. Two tests of `test_qc_qcom_exclusion_tilt_study.py` fail, one on the same absent package and one because it requires the designated Analyst worktree. Three import-closure tests fail because `research/analyst_revisions_v2/forward_data_quality.py` imports `os` at the `main` snapshot `9e834713`. Section 42.8 gives the counts by cause. | **Open and owner-routed.** A fresh clone of `main` reproduces the artifact and closure cases; route to the Analyst lane. |
@@ -604,7 +598,7 @@ resolved item or hide a newly routed one.
 | `TPR-OOL-008` | **Closed** | Shared exact-byte attributes and stale-checkout regression added; this host's two recurring ML-spec copies were repaired from exact index blobs during section 40 validation. |
 | `TPR-OOL-009` | **Closed** | Sleeve evaluation clock is injected and the notification cycle passes its own instant; section 39. |
 | `TPR-OOL-010` | **Closed** | Root `research/__init__.py` now resolves `text eol=lf`; section 39. |
-| `TPR-OOL-011` | **Open** | Section 44 implements the owner-scoped correction candidate for old-timestamp and path-prefix attribution; independent review and counter-review are pending. Prior rejection is not waived. |
+| `TPR-OOL-011` | **Open** | Corrected in this lane by `a8e4afef`, `1a4fd37`, and `c2c0672` and accepted in section 45 (`TPR-OOL-011-R1`). Open only for owner-coordinated synchronization of the two shared test files to `main` and the sibling lanes. |
 | `TPR-OOL-012` | **Open** | Shared archive still overstates F-8 as an identical four-lane cherry-pick. |
 | `TPR-OOL-013` | **Open** | Shared EOL regression detects line-ending drift but overclaims arbitrary byte equality. |
 | `TPR-OOL-014` | **Open** | Action Plan still has stale sibling-refreeze status; the proposed-milestone claim is qualified in `TPR-OOL-014-R1` and section 43. |
@@ -667,6 +661,7 @@ known.
 | 2026-10-02 | Claude validation | `299492af461d4f611bb4a32f899b6d5f94de92ed` -> `299492af461d4f611bb4a32f899b6d5f94de92ed` (exact tested tree; this validation-record commit follows) | Section-42 review round final validation | Validated the exact final tree after the test-harness correction, the Action Plan restoration, the strengthened guards, and the section-42 record. No production module changed in this round. | Lane and active-document guards **330 passed, 1 skipped** in 14.76s; fourteen document, boundary, and Target-Price-path modules **738 passed** in 175.63s; `compileall` exit 0; `git diff --check` clean; status clean. The complete suite was measured on the pushed Codex head and not re-run on this tree. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | No new finding. The five `TPR-CR14` findings are closed; six section-8 findings and `TPR-OOL-011` through `TPR-OOL-016` remain open. | None. | Make this round's one push. Codex counter-reviews section 42 and every Claude commit, then implements only the outcome-free TPR-D0. |
 | 2026-10-02 | Codex counter-review | `ea97bd4fc03779b7947cf35cd8e4432b0b9fa516..3de5bbef3a25d8a37647869ad840808543927a82` reviewed; test correction `b639ea46c8d184eb7971de67dcdc091659ad4d65`; this record commit completes the snapshot | Counter-review only; no new feature milestone | Individually reviewed all three Claude commits, removed autouse host-Git substitution/global skipping, retained missing-tool refusal, pinned inherited rejection and current zero-authority routing, and superseded unsupported OD/TPR-D0 grants while preserving historical evidence. Section 43 is the durable handoff. | Focused document/import/selected trust checks **126 passed, 1 skipped**; preregistration module **82 passed, 14 failed**, exactly the frozen Windows-Git macOS limitation; five current-authority/commit mutations red and restored; four shared `TPR-OOL-015` failures confirmed; target compileall and diff checks clean. No complete lane/repository suite run. Provider/row/outcome/QC accesses and authorized/spent looks **0**. | All three incoming commits accepted after correction; six new record/test findings closed with evidence, six pre-existing lane findings remain open, OOL003/004/006 remain closed, prior shared OOL011 rejection unchanged. | None. No delegated source, security, QC, broker, paper/live, or trading authority is inferred. | Make one matching-lane push of the stable counter-review snapshot; Claude reviews it. Owner resolves exact development/source scope and existing gates before another milestone. Heartbeat remains paused. |
 | 2026-10-02 | Codex owner-scoped remediation | `37598fa5b686a14e906c92dcea4c17b9d9b933b7` -> test correction `a8e4afefe3232f6515c17e9dbde1ae9781fe0776`; this record successor completes the candidate | Shared guard correction and trust/source drafts only; no Target-Price feature milestone | Corrected old-stamp and path-prefix attribution with an actual pre-collection incident baseline, exact path components and evidenced lifecycle expiration. Drafted four pending trust decisions and eight unestablished source-evidence requirements. Section 44 records exact scope and residual sampling limitations. | Combined focused checks **161 passed, 1 skipped**; meaningful original/reverse-mutation reds, four draft-authority mutations red/restored, compilation and diff checks clean. No complete suite or native Windows integration. Provider data/API, licensed-row, outcome and QC actions and looks **0**. | OOL011 correction candidate awaits independent review; prior rejection not waived. Two candidate self-review P2 findings corrected; six lane findings and all trust/source/manifest gates remain open. OOL003/004/006 remain closed. | Owner's narrow two-shared-test-file implementation exception only; no cross-lane synchronization, trust selection/provisioning or source/data/QC authority. | Make exactly one matching-lane push of both commits. Claude independently reviews every Codex commit after `3de5bbef`, including sections 43/44; Codex counter-reviews before any next milestone. Owner selects trust decisions and supplies exact source evidence. Monitor remains paused. |
+| 2026-10-02 | Claude review | `3de5bbef3a25d8a37647869ad840808543927a82..9958a459f5cd56c29cb9a0de13d38737e2c3412d` reviewed; corrections `1a4fd37` and `c2c0672` and this record/guard commit on this same lane branch | Independent review of the section-43 counter-review and the owner-scoped section-44 shared-test correction and drafts; no feature milestone in range | Reviewed all four Codex commits individually. Confirmed two counter-review findings against the earlier host-Git fixture and one against the earlier guard. Accepted the shared runtime-stop guard correction after correcting four teardown regressions the complete suite exposed (`TPR-CR15-004`, two commits). Opened `TPR-CR15-001` for the fourteen loader tests that are red on this host and were tracked nowhere. Kept the section-42 owner decisions withdrawn and recorded the two conflicting owner instructions with five owner inputs. No production file changed. | Complete suite on the pushed Codex head `9958a459` in six shards: **17,667 passed, 823 skipped, 23 failed, 41 errors**; 14 failures are `TPR-CR15-001`, 4 are `TPR-OOL-015`, 5 failures and 37 errors are `TPR-OOL-016`, and 4 errors are `TPR-CR15-004`, fixed in `1a4fd37` and `c2c0672`. 17 shared-guard mutations (13 red) and 10 Codex-guard mutations (10 red). Final-tree validation is the next row. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No P0 or P1. `TPR-CR15-001` (P2) open and registered; `TPR-CR15-004` (P2) closed by correction; `TPR-CR15-002` and `TPR-CR15-003` (P3) closed by qualification. Seven lane findings open. `TPR-OOL-011` open only for synchronization; `TPR-OOL-012` through `TPR-OOL-016` unchanged. | None. `TPR-OD-001` through `TPR-OD-004` remain proposals; TPR-D0 is not authorized. | Make this round's one push. Codex counter-reviews section 45. The lane then waits on the owner inputs `TPR-OWN-1` through `TPR-OWN-5`. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -4806,6 +4801,10 @@ their operational readiness is not claimed.
 
 ## 44. Owner-scoped shared remediation and decision drafts - 2026-10-02
 
+**Historical implementation report.** Section 45 reviews this section and
+supersedes only its pending-review status and next-role pointer. Its owner
+quote, correction record, drafts, and validation are retained as written.
+
 **Implementation candidate; independent review pending.** This is one
 bounded shared-test correction plus two non-authorizing decision/checklist
 drafts. It is not completion of TPR-TR0-I, TPR-1, TPR-2, TPR-0B, or TPR-D0.
@@ -5199,3 +5198,210 @@ all subsequent diagnostics intercept even that exact initialization and
 restore the import mocks immediately. This limitation is retained, not
 relabeled as full import-time isolation. No trust/source/look/registry
 artifact is changed.
+
+## 45. Claude independent review of the counter-review and owner-scoped remediation - 2026-10-02
+
+**Disposition: accepted after correction.** All four Codex commits are
+accepted, three of them after correction. The counter-review's two findings
+against the host-Git fixture and its guard finding are confirmed. The shared
+runtime-stop guard correction closes both section-40 counterexamples in this
+lane's tree, but its rewrite made four unrelated tests error at teardown; the
+complete suite found them and this review corrects the guard twice. The trust and
+source texts are drafts and adopt nothing. One thing in the range was left
+untracked: fourteen lane tests
+are red again on the development host while every finding about them is marked
+closed. One thing cannot be settled by either role: the owner gave Claude and
+Codex instructions that conflict, and section 45.6 puts them side by side for
+the owner.
+
+### 45.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Branch | `codex/strategy-target-price-revisions` |
+| Codex range reviewed | `3de5bbef3a25d8a37647869ad840808543927a82..9958a459f5cd56c29cb9a0de13d38737e2c3412d` |
+| Codex commit 1 | `b639ea46c8d184eb7971de67dcdc091659ad4d65` - counter-review test corrections |
+| Codex commit 2 | `37598fa5b686a14e906c92dcea4c17b9d9b933b7` - counter-review record (section 43) |
+| Codex commit 3 | `a8e4afefe3232f6515c17e9dbde1ae9781fe0776` - shared runtime-stop guard correction and its guard |
+| Codex commit 4 | `9958a459f5cd56c29cb9a0de13d38737e2c3412d` - remediation record and decision drafts (section 44) |
+| Reachable commits in the range | 4, all first-parent; no merge |
+| Publication | Two Codex pushes without a Claude review between them: `37598fa5` (counter-review), then `9958a459` after the owner instruction quoted in section 44.1 |
+| Publication state at review start | local head and fetched remote head both exactly `9958a459f5cd56c29cb9a0de13d38737e2c3412d`, clean tree |
+| Host and interpreter | macOS (Darwin 25.6.0); `~/.venvs/trading_agent-py313`, Python 3.13.15, pytest 9.1.1 |
+
+### 45.2 Commit-by-commit dispositions
+
+| Codex commit | Disposition | Review basis |
+|---|---|---|
+| `b639ea46c8d184eb7971de67dcdc091659ad4d65` | **Accepted after correction** | `TPR-CCR14-002` is confirmed and was my defect: the module-wide fixture skipped every test in the file, pure serialization tests included, when the host had no Git. `TPR-CCR14-004` is confirmed: my strengthened guard pinned the inherited rows' identities but not their dispositions. `TPR-CCR14-001` is partially correct: a test that runs the loader through the host Git is logic coverage and must not be reported as frozen-tool integration coverage, and the fixture did not make that distinction. Removing it, however, returns fourteen lane tests to red on the development host with no open finding. That is corrected here by `TPR-CR15-001`. The new source-level guard and the retained refusal test are sound. |
+| `37598fa5b686a14e906c92dcea4c17b9d9b933b7` | **Accepted after correction** | Section 43 dispositions all three Claude commits, and its ledger arithmetic and guard pins verify. Its withdrawal of `TPR-OD-001` through `TPR-OD-004` is accepted as the operative state, for the reason in 45.6 and not because the decisions were unfounded. It marks `TPR-CCR14-001` closed while the tests it concerns fail, which `TPR-CR15-001` corrects. Its factual point about my citation is confirmed as `TPR-CR15-002`. |
+| `a8e4afefe3232f6515c17e9dbde1ae9781fe0776` | **Accepted after correction** | The owner-scoped correction of `TPR-OOL-011`. Both section-40 counterexamples are closed: a newly written incident with an old activation stamp is attributed, and `pytest-12` no longer claims `pytest-123`. The baseline is real incident identity and content captured before collection, not a timestamp, and the guard stays read-only toward runtime state. Its tests and 17 mutations support that (45.5). The rewrite also made every teardown depend on names that tests legitimately leave patched (`Path.open`, `os.open`, `os.name`) and on re-resolving the runtime root, which broke four unrelated tests; `TPR-CR15-004` corrects it in `1a4fd37` and `c2c0672`. The round validated 161 focused tests, and this guard runs in the teardown of every test in the repository. |
+| `9958a459f5cd56c29cb9a0de13d38737e2c3412d` | **Accepted** | Section 44 records the owner instruction, the correction, and two drafts. The trust table selects nothing and the source checklist establishes nothing; the guard pins both. 45.7 gives this review's assessment of the drafts for the owner. |
+
+**Cumulative disposition: accepted after correction.** No Target-Price
+production module, spec, authority artifact, or the governing PDF changed in
+the reviewed range or in this review. Two shared test files changed under the
+owner's one-time exception, in the range and again in this review's
+correction of it.
+
+### 45.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR15-001` | P2 | **Open** | `b639ea4`; status text in `37598fa` | `tests/target_price_revisions/test_preregistration.py`; section 8 register | Fourteen reviewed-loader tests fail on the macOS development host, and after this range nothing tracks it: `TPR-CR14-001` and `TPR-CCR14-001` are both marked closed, and the open-issue register does not list it. Section 8 calls it "a macOS limitation", which is a description, not a status. While it stands, a regression in the loader's anchor, registry, policy-inventory, or signature-policy logic is invisible on the only host where the lane is developed. One of the fourteen is the regression test for the earlier P2 `TPR-CR12-001`. | `pytest -q tests/target_price_revisions/test_preregistration.py` on `9958a459`: 82 passed, 14 failed, every failure `review anchor Git verification failed`. | A required lane gate that is red by construction detects nothing, and a red result that no register lists gets normalised. | Record-only in this round: the finding is opened and added to the section-8 register. No test is changed, because the two roles disagree on the remedy and the owner's pending `TPR-TR-D1` selection decides it. Proposed remedy for that decision: mark the fourteen as platform-conditional the way the lane already treats its Windows-junction regression, and add separately named host-Git logic coverage through an explicit, non-automatic fixture. | The register guard is green with the new row and red without it. |
+| `TPR-CR15-002` | P3 | **Closed by qualification** | `299492a` (Claude) | section 42.6, basis cell of `TPR-OD-002` | The cell cites Analyst record section 27 for a Massive-on-QuantConnect working rights assumption. Section 27 scopes that assumption to an outcome-free metadata candidate. The Analyst lane's authority to read provider rows and to create and run QuantConnect projects comes from later owner authorizations, each for a named action (its sections 30.1, 63.3, 65.3, and 72.2). | Analyst record section 27: "authority to implement the bounded, outcome-free ARV2-4D-B2 manifest/vintage/rights-evidence candidate only". | A decision's stated basis must not be wider than its source. | None to section 42, which is historical. This row qualifies the citation: the precedent is a series of exact per-action owner authorizations, not one standing assumption. | Not applicable. |
+| `TPR-CR15-003` | P3 | **Closed by qualification** | `37598fa` | sections 43.3 and 8 | Section 43 overrides the section-42 decisions by citing "the current owner heartbeat" and "this monitor", but the record nowhere quotes or dates that instruction or states its scope. It faults section 42 for resting on "a broad quoted pre-authorization" while resting on an unquoted one. Neither role can read the other's owner instruction. | Search of sections 43 and 44 for the heartbeat's text: only its name, `target-price-claude-push-counter-review`, and paraphrases. | An override should be as checkable as the thing it overrides. | None to Codex's text. Section 45.6 records both instructions as each role reports them and asks the owner to state which governs. | Not applicable. |
+| `TPR-CR15-004` | P2 | **Closed by correction** | `a8e4afe` | `tests/conftest.py`: `_observe_runtime_stop` and `_assert_test_left_no_incident_in_the_real_runtime_stop` | The rewritten guard runs in every test's teardown and there (a) reads the real runtime-stop file with `Path.read_text`, (b) re-resolves the runtime root through `dispatch_fence._canonical_runtime_root()`, and (c) builds paths with the `Path()` factory. Tests that leave `builtins.open` or `Path.open` replaced by a failing sentinel (zero-I/O and refuse-before-action contracts), or `os.name` patched to `"nt"` with an `os.open` sentinel (Windows-branch tests), therefore error at teardown although they leaked nothing: under `os.name == "nt"` a POSIX host cannot instantiate `Path()` at all. The previous guard returned on `stop_file.exists()` before any read and swallowed resolution failures. Synchronized to the sibling lanes as written, the correction would have turned one Insider and three Analyst tests red. | Complete suite on `9958a459`: four teardown errors absent from the same suite on `ea97bd4f`: `tests/test_insider_buying_sec_raw_parent_projection.py::test_derivation_and_serialization_perform_no_file_io`, `tests/analyst_revisions_v2/test_qc_fundamental_universe_discovery.py::test_discovery_path_and_create_dependencies_refuse_before_action[Path-open-None]`, and `tests/analyst_revisions_v2/test_power_calibration_receipt.py::test_windows_directory_sync_branch_is_an_explicit_noop` and `::test_atomic_recovery_removes_foreign_post_link_destination_inode`. The round's 161 focused tests included none of those modules. | A guard that runs in every teardown must not depend on names tests legitimately replace; the guard already binds its JSON decoder for exactly that reason. | `1a4fd37`: read through `os.open` and `os.read` bound at import. `c2c0672`: read the file baselined at configuration, re-resolve the root only to refuse a redirected root without a baseline, and do containment arithmetic with the `os.path` module object fixed at import instead of `Path()`. Two new tests pin quiet and attributing behaviour under an `open` sentinel and under `os.name == "nt"` with an `os.open` sentinel; the unresolvable-root test now asserts at baseline capture, where resolution matters. | With both fixes the guard module (28 tests), the Insider module, the power-calibration module, and the discovery test are 262 passed, 2 skipped. Reverting only the reader fails two guard tests and re-errors the Insider test; re-resolving at teardown or using the `Path()` factory each fails one guard test. |
+
+No P0 and no P1 arises from this range. The open-issue register now holds
+seven items: the six it held and `TPR-CR15-001`. Out of lane, `TPR-OOL-011`
+through `TPR-OOL-016` stay open; `TPR-OOL-011` is now open only for
+synchronization (45.4).
+
+### 45.4 Shared correction: status and what remains
+
+`a8e4afe` changes `tests/conftest.py` and `tests/test_runtime_stop_leak_guard.py`
+under the owner's one-time exception, and `1a4fd37` and `c2c0672` correct it
+within the same two files. With all three:
+
+- the cumulative rejection that section 40 recorded against `903a8574` is
+  cured for this lane's tree;
+- `TPR-OOL-011` stays open for one reason only: this lane's copies of the two
+  shared files now differ from `main` and from the three sibling lanes, which
+  still carry the defective guard. Identical bytes must reach them by an
+  owner-coordinated synchronization, and until then a merge of this lane
+  touches both files;
+- three behaviours are deliberate and worth the owner knowing. The guard now
+  ends the whole pytest run at configuration (exit code 2) when the real
+  runtime-stop state cannot be resolved, read, or decoded, where it used to
+  stay silent. It cannot see a clear and identical re-add that happens
+  entirely between two of its reads. And it leaves two defensive branches
+  unpinned (45.5).
+
+### 45.5 Mutation evidence
+
+Seventeen mutations of the shared guard as corrected by `1a4fd37` and
+`c2c0672`, each applied to a scratch clone and restored byte-for-byte, with
+`tests/test_runtime_stop_leak_guard.py` as the detector:
+
+- **13 red:** string-prefix containment, never expiring an exemption, ignoring
+  the clear receipt, re-baselining at session start, treating unreadable state
+  as empty, treating malformed state as empty, treating an unresolvable root as
+  nothing to guard, removing the root-change check, decoding through
+  `json.loads`, reading through `Path.read_text`, re-resolving the root at
+  teardown, building the session base with the `Path()` factory, and looking
+  `os.open` up at call time.
+- **2 green and redundant by construction:** exempting by identity alone is
+  already defeated by the loop that expires changed incidents, and swallowing
+  the configuration-time failure still fails every teardown on the missing
+  baseline.
+- **2 green and unpinned:** not normalising the incident origin, and
+  tolerating a duplicate incident identity. Production refuses both shapes
+  before they can be written, so these are defensive branches without a test,
+  not a hole in the correction. They are noted for the shared owner and not
+  changed here.
+
+Ten mutations of Codex's section-43 and section-44 guards, same method: 10 of
+10 red. They cover a flipped section-43 disposition, a section-43 grant of
+TPR-D0, a selected trust decision, an established source item, a removed
+no-synchronization sentence, a premature `TPR-OOL-011` closure in section 44.5
+and in the index, the inherited rejection flipped, a section-8 grant of
+TPR-D0, and a removed trust row.
+
+### 45.6 Two owner instructions that conflict
+
+Each role is acting on an owner instruction the other cannot read.
+
+- **To Claude, 2026-10-02, quoted in section 42.6:** the lane's goal is
+  QuantConnect backtesting and forward operation, the owner will be away, and
+  "For any owner decision or owner approval you might need, consider I
+  pre-authorize your action and trust your best judgment". Section 42.6 used
+  it to record `TPR-OD-001` through `TPR-OD-004`.
+- **To Codex, as its section-8 text at `37598fa5` reported it:** a monitor, named
+  `target-price-claude-push-counter-review`, that "grants counter-review and
+  gated continuation, not licensed market rows, source facts, a
+  security-policy choice, or QuantConnect work". Section 43 used it to
+  withdraw those four decisions.
+- **To Codex afterwards, quoted in section 44.1:** "1. Scope the shared fix
+  2. Draft the trust decisions 3. Prepare the source checklist" and "start
+  implementing".
+
+This review does not re-assert the section-42 decisions. The latest explicit
+owner instruction is the one in section 44.1, it is narrower than they are,
+and a record in which the two roles alternately grant and withdraw the same
+authority is worse than a lane that waits. The operative state is therefore
+the narrower one: **`TPR-OD-001` through `TPR-OD-004` remain proposals.**
+
+`TPR-OD-001` is moot in substance, because the owner had the shared defect
+fixed instead of waived. The other three are open questions for the owner, and
+the lane cannot advance its strategy work until they are answered in a form
+both roles can read: the owner speaking in each role's session, or an
+owner-written line in this record.
+
+| Owner input | What it decides | This review's recommendation |
+|---|---|---|
+| `TPR-OWN-1` | Whether the pre-authorization given to Claude covers lane decisions that Codex must then follow, or whether each decision needs the owner's own words. | The owner's call. Either answer works; the lane only needs one. |
+| `TPR-OWN-2` | Source scope: whether this lane may read and process the retained Massive ratings captures on this host, and make bounded read-only captures of the same endpoint, on the terms the owner already gave the Analyst lane action by action. This answers `TPR-SRC-E1` through `TPR-SRC-E5` and `TPR-SRC-E8`; `TPR-SRC-E6` and `TPR-SRC-E7` are measured by the audit itself. | Yes, for the retained captures first. Without it the lane has no data and no path to a QuantConnect backtest. The checklist's provider questions are worth sending, but waiting for answers before a structural audit would stall the lane on a vendor. |
+| `TPR-OWN-3` | Trust root: select among `TPR-TR-D1` through `TPR-TR-D4`, or select none. | Select none now and leave TPR-TR0-I parked. It guards only positive authority for the confirmatory look, whose validation period ends 2027-08-31, and it cannot run on this host. The drafts are sound if it is ever resumed. |
+| `TPR-OWN-4` | Next milestone: TPR-D0 as section 42.7 defines it, a plan-only first half, or something else. | TPR-D0 whole if `TPR-OWN-2` is yes; its plan-only half if not. |
+| `TPR-OWN-5` | `TPR-CR15-001`: how the fourteen frozen-tool tests should behave off Windows. | Platform-conditional marking plus separately named host-Git logic coverage, as described in the finding. |
+
+### 45.7 Assessment of the two drafts
+
+- **Trust decisions (44.3).** Accurate to the open findings they answer. The
+  current-anchor pin correctly notes that two atomic file writes are not one
+  transaction and leaves the blocked-state design open. The parent-custody
+  extension keeps the existing ACL template. Nothing in it is selected, and
+  nothing in it should be built before `TPR-OWN-3`.
+- **Source checklist (44.4).** The eight evidence items map onto the seven
+  unestablished facts of blueprint A22 plus custody. Its staging is correct in
+  one important respect: reading retained rows is processing and needs its own
+  permission, separate from a network request. Its weakness is sequencing.
+  Stage B asks for account-specific clause evidence before any row is read,
+  but the questions that most affect the strategy (what the clocks mean,
+  whether corrections are recoverable, whether a target horizon exists) are
+  answered by measurement in stages C and D or by the vendor, and the Analyst
+  lane already holds the vendor's written answers to several of them (its
+  section 65.3A). The checklist should cite those answers instead of treating
+  every item as unknown.
+
+### 45.8 Validation
+
+- **Complete repository suite on the exact pushed Codex head**
+  `9958a459f5cd56c29cb9a0de13d38737e2c3412d`: **17,667 passed, 823 skipped,
+  23 failed, 41 errors.** Six concurrent shards in a scratch clone of the lane
+  worktree (the lane's loader tests need a real `.git`): `tests` without
+  the Analyst directory and the Short-Interest modules, 8,886 passed, 38
+  skipped, 18 failed, 1 error in 890.15s; the Short-Interest modules, 759
+  passed in 3,315.09s; four round-robin Analyst shards, 1,883/376/1 failed/9
+  errors in 3,309.28s, 2,453/88/0/28 in 698.49s, 1,994/207/1/0 in 2,503.93s,
+  and 1,692/114/3/3 in 1,850.31s. Another session's pytest shared the CPU.
+- **Every failure and error is accounted for.** Against the previous head's
+  17,643 / 823 / 23 / 37, the 23 failures are unchanged in identity: 14 are
+  `TPR-CR15-001`, 4 are `TPR-OOL-015`, and 5 are `TPR-OOL-016`. Of the
+  41 errors, 37 are `TPR-OOL-016` and the 4 new ones are `TPR-CR15-004`,
+  all four green with the corrected guard.
+- **Lane baseline on the pushed head** in the designated worktree,
+  `pytest -q tests/target_price_revisions tests/test_active_document_consistency.py tests/test_runtime_stop_leak_guard.py`:
+  345 passed, 1 skipped, 14 failed in 10.07s.
+- **Mutations:** 17 of the corrected shared guard (13 red; 45.5), 10 of
+  Codex's section-43 and section-44 guards (10 red), and 12 of this
+  round's own section-45 and current-state guards (all red).
+- `git diff --check` is clean across the reviewed range and this round.
+- Validation of this round's exact final tree is appended by the
+  validation-record commit that follows this one.
+
+Provider requests: **0**. Licensed source-row reads or processing: **0**.
+Outcome accesses: **0**. Authorized or spent research looks: **0**.
+QuantConnect attempts, projects, uploads, and jobs: **0**. No trust file,
+broker action, deployment, capital, order, or trading authority was created.
+
+### 45.9 Milestone and authority decision
+
+**No next implementation milestone is authorized. TPR-D0 is not authorized.**
+The lane waits on the owner inputs `TPR-OWN-1` through `TPR-OWN-5`. Codex next
+counter-reviews section 45 and both Claude commits of this round. Neither role
+starts strategy data, score, or outcome work, reads a retained licensed row,
+sends a provider request, or opens a QuantConnect project until the owner has
+answered. The canonical ladder is unchanged: TPR-TR0-I incomplete, TPR-1
+blocked on its reviewed source-rights artifact, TPR-0B behind it.

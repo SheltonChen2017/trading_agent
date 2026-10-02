@@ -189,6 +189,21 @@ CURRENT_COUNTERREVIEWED_CLAUDE_COMMITS = (
     "299492af461d4f611bb4a32f899b6d5f94de92ed",
     "3de5bbef3a25d8a37647869ad840808543927a82",
 )
+# Claude's second 2026-10-02 review (section 45) covers the counter-review
+# snapshot and the owner-scoped shared remediation that followed it.
+SECTION45_REVIEWED_CODEX_BASE = "3de5bbef3a25d8a37647869ad840808543927a82"
+SECTION45_REVIEWED_CODEX_HEAD = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
+SECTION45_REVIEWED_CODEX_RANGE = (
+    f"{SECTION45_REVIEWED_CODEX_BASE}..{SECTION45_REVIEWED_CODEX_HEAD}"
+)
+SECTION45_REVIEWED_CODEX_SHORT_RANGE = "3de5bbef..9958a459"
+SECTION45_REVIEWED_CODEX_COMMITS = (
+    "b639ea46c8d184eb7971de67dcdc091659ad4d65",
+    "37598fa5b686a14e906c92dcea4c17b9d9b933b7",
+    "a8e4afefe3232f6515c17e9dbde1ae9781fe0776",
+    "9958a459f5cd56c29cb9a0de13d38737e2c3412d",
+)
+SECTION45_OWNER_INPUT_IDS = tuple(f"TPR-OWN-{index}" for index in range(1, 6))
 CURRENT_CLAUDE_REVIEWED_FIRST_PARENT_COMMITS = (
     "059c93e73cc17b4bc0b01c1d14ab637acf285b7e",
     "e74da9ef34fac111cef838dbbe9814030daf3cf4",
@@ -682,11 +697,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [CURRENT_COUNTERREVIEWED_CLAUDE_RANGE]
+    ) == [SECTION45_REVIEWED_CODEX_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact Claude range"
+        "Claude has independently reviewed the exact Codex range"
         in normalized_current
     )
     assert (
@@ -703,13 +718,17 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
     # TPR-CCR14: historical Claude proposals cannot become current grants.
-    assert "New remediation candidate awaits independent Claude review" in normalized_current
+    # Section 45 keeps that state and routes the open questions to the owner;
+    # the previous round's pending-review routing must be gone.
+    assert "awaits independent Claude review" not in normalized_current
+    assert "Claude next reviews sections 43 and 44" not in normalized_current
     assert "Codex next counter-reviews section 42" not in normalized_current
-    assert "Claude next reviews sections 43 and 44" in normalized_current
+    assert "Codex next counter-reviews section 45" in normalized_current
     assert "TPR-D0 is not authorized" in normalized_current
     assert "No next implementation milestone is authorized" in normalized_current
     assert "historical Claude proposals, not operative authorization" in normalized_current
-    assert "monitor stays paused" in normalized_current
+    assert "`TPR-CR15-001`" in normalized_current
+    assert "`TPR-OWN-1` through `TPR-OWN-5`" in normalized_current
     for decision in CURRENT_OWNER_DECISION_IDS:
         assert f"`{decision}`" in normalized_current
 
@@ -733,12 +752,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [CURRENT_COUNTERREVIEWED_CLAUDE_SHORT_RANGE]
+        ) == [SECTION45_REVIEWED_CODEX_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
-        assert "section 43" in normalized_summary_lower
-        assert "remediation candidate awaits claude review" in normalized_summary_lower
-        assert "section 44" in normalized_summary_lower
+        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
+        assert "section 45" in normalized_summary_lower
+        assert "awaits claude review" not in normalized_summary_lower
+        assert "codex next counter-reviews section 45" in normalized_summary_lower
         assert "tpr-d0 is not authorized" in normalized_summary_lower
         assert "no next implementation milestone is authorized" in normalized_summary_lower
         assert (
@@ -1576,3 +1595,91 @@ def test_owner_scoped_remediation_does_not_adopt_trust_or_source_drafts() -> Non
         "monitor remains paused",
     ):
         assert required in gates
+
+
+def test_section_45_review_records_the_exact_range_and_grants_nothing() -> None:
+    """TPR-CR15: pin this review, its open finding, and its owner routing.
+
+    The section accepts a shared-test correction and two drafts and must not
+    turn either the withdrawn section-42 proposals or its own recommendations
+    into authority.
+    """
+    section = _record_section(
+        "## 45. Claude independent review of the counter-review and "
+        "owner-scoped remediation"
+    )
+    assert SECTION45_REVIEWED_CODEX_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert ordered_commits == SECTION45_REVIEWED_CODEX_COMMITS
+    assert ordered_commits == tuple(
+        _git_lines("rev-list", "--reverse", SECTION45_REVIEWED_CODEX_RANGE)
+    )
+    dispositions = _bounded(
+        section,
+        "### 45.2 Commit-by-commit dispositions",
+        "### 45.3 P0-P3 ledger",
+        "section 45 dispositions",
+    )
+    rows = [
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (
+            match := re.match(
+                r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line
+            )
+        )
+    ]
+    assert tuple(commit for commit, _ in rows) == SECTION45_REVIEWED_CODEX_COMMITS
+    assert {disposition for _, disposition in rows} <= {
+        "accepted",
+        "accepted after correction",
+    }
+    assert "Cumulative disposition: accepted after correction" in section
+
+    ledger = _bounded(
+        section,
+        "### 45.3 P0-P3 ledger",
+        "### 45.4 Shared correction: status and what remains",
+        "section 45 ledger",
+    )
+    statuses = dict(
+        re.findall(r"^\| `(TPR-CR15-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M)
+    )
+    assert statuses == {
+        "TPR-CR15-001": "Open",
+        "TPR-CR15-002": "Closed by qualification",
+        "TPR-CR15-003": "Closed by qualification",
+        "TPR-CR15-004": "Closed by correction",
+    }
+
+    owner = _bounded(
+        section,
+        "### 45.6 Two owner instructions that conflict",
+        "### 45.7 Assessment of the two drafts",
+        "section 45 owner inputs",
+    )
+    owner_rows = tuple(
+        match.group(1)
+        for line in owner.splitlines()
+        if (match := re.match(r"\| `(TPR-OWN-[0-9])` \|", line))
+    )
+    assert owner_rows == SECTION45_OWNER_INPUT_IDS
+    normalized_owner = " ".join(owner.split())
+    assert "does not re-assert the section-42 decisions" in normalized_owner
+    assert "remain proposals" in normalized_owner
+
+    authority = " ".join(section.partition("### 45.9 Milestone and authority decision")[2].split())
+    for required in (
+        "No next implementation milestone is authorized",
+        "TPR-D0 is not authorized",
+        "Codex next counter-reviews section 45",
+        "retained licensed row",
+        "provider request",
+        "QuantConnect project",
+        "until the owner has answered",
+    ):
+        assert required in authority, required

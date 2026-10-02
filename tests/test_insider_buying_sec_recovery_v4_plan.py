@@ -237,3 +237,57 @@ def test_remaining_count_guard_with_total_fixed_at_99394(binding, full_denominat
         body = module.build_recovery_v4_offline_plan(requests, classes, p, d, binding).to_payload()
         assert body["class_counts"]["originally_unattempted"] == 79868
         assert sum(body["class_counts"].values()) == 99394
+
+
+# Section 124 (Claude review): isolate proposal guards that no earlier case
+# reached on its own. Each names its exact refusal, so a sibling guard
+# refusing the same input cannot hide a deleted check.
+@pytest.mark.parametrize("field,value", [
+    ("form_type", "5"), ("issuer_cik", "0"), ("issuer_cik", "12345678901"),
+    ("period", "2023Q2"), ("submission_row_id", "z" * 64), ("accession_number", "123"),
+])
+def test_request_identity_shape_refuses_with_its_own_reason(binding, field, value):
+    requests, classes, p, d = _inputs()
+    requests[0][field] = value
+    with pytest.raises(module.RecoveryV4PlanError, match="request source identity differs"):
+        _build(binding, (requests, classes, p, d))
+
+
+def test_unknown_original_class_refuses_with_its_own_reason(binding):
+    requests, classes, p, d = _inputs()
+    with pytest.raises(module.RecoveryV4PlanError, match="unknown original source class"):
+        _build(binding, (requests, (*classes[:-1], "v3_completed"), p, d))
+
+
+def test_diagnostic_must_directly_follow_the_completed_prefix(binding):
+    requests, classes, p, d = _inputs()
+    moved = ("prior_completed", "offline_corrected_diagnostic", "prior_completed", *classes[3:])
+    p["source_assignment_sha256"] = d["v3_source_assignment_sha256"] = hash_payload(list(moved))
+    with pytest.raises(module.RecoveryV4PlanError,
+                       match="original completed prefix or diagnostic ordinal differs"):
+        _build(binding, (requests, moved, p, d))
+
+
+def test_a_sealed_plan_cannot_stand_in_for_the_historical_binding(binding):
+    with pytest.raises(module.RecoveryV4PlanError,
+                       match="historical byte binding has the wrong kind"):
+        _build(_build(binding))
+
+
+def test_observed_scope_rechecks_scalar_custody_anchors_inside_the_builder(
+    binding, full_denominator_inputs, monkeypatch,
+):
+    # The anchor helper was tested directly; its call from the observed
+    # builder was not. Drift one anchor equally in both descriptors so only
+    # that call can refuse.
+    requests, classes, partial, diagnostic = full_denominator_inputs
+    monkeypatch.setattr(module, "OBSERVED_REQUEST_INVENTORY", hash_payload(list(requests)))
+    monkeypatch.setattr(module, "OBSERVED_SOURCE_ASSIGNMENT", hash_payload(list(classes)))
+    later = [i for i, name in enumerate(classes) if name == "later_unattempted"]
+    monkeypatch.setattr(module, "OBSERVED_LATER_INVENTORY",
+                        hash_payload([requests[i] for i in later]))
+    p, d = dict(partial), dict(diagnostic)
+    p["root_plan_sha256"] = d["v3_root_plan_sha256"] = "0" * 64
+    with pytest.raises(module.RecoveryV4PlanError,
+                       match="frozen observed custody anchors differ"):
+        module.build_recovery_v4_offline_plan(requests, classes, p, d, binding)

@@ -156,3 +156,14 @@ def test_empty_quarter_does_not_emit_identity_completeness():
     body = module.assess_ib1c_v2_quarter_identity(snapshot, census).to_payload()
     assert body["submission_count"] == 0
     assert body["whole_quarter_identity_sha256"] is None
+
+
+# Section 124 (Claude review): the existing 257-parent case repeats one parent,
+# so the duplicate rule refused it even with the count bound deleted.
+def test_parent_count_bound_refuses_with_its_own_reason():
+    snapshot, census = _inputs()
+    parent = _parent(snapshot.rows[0])
+    with pytest.raises(module.Ib1cIdentityV2Error, match="bounded exact tuple"):
+        module.assess_ib1c_v2_quarter_identity(
+            snapshot, census, (parent,) * (module.MAX_CORROBORATING_PARENTS + 1),
+        )

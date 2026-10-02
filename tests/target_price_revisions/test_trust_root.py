@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import base64
 import dataclasses
 import hashlib
@@ -617,6 +618,75 @@ def test_frozen_git_program_must_exist_as_an_unredirected_file(
     monkeypatch.setattr(trust_root, "GIT_PROGRAM", directory)
     with pytest.raises(trust_root.TrustRootError, match="canonical"):
         trust_root._canonical_frozen_git_program()
+
+
+def test_loader_autouse_fixtures_do_not_replace_the_frozen_git_program() -> None:
+    """Automatic test setup must not hide the public loader's frozen-tool gate.
+
+    Explicit missing-tool substitutions in individual negative tests remain
+    valid. Only automatic module-wide executable overrides are forbidden.
+    """
+    module_name = "research.target_price_revisions.trust_root"
+    source_path = Path(__file__).with_name("test_preregistration.py")
+    tree = ast.parse(source_path.read_text(encoding="utf-8"))
+    aliases = {module_name}
+    for node in tree.body:
+        if isinstance(node, ast.Import):
+            aliases.update(
+                name.asname or name.name
+                for name in node.names
+                if name.name == module_name
+            )
+        elif (
+            isinstance(node, ast.ImportFrom)
+            and node.module == "research.target_price_revisions"
+        ):
+            aliases.update(
+                name.asname or name.name
+                for name in node.names
+                if name.name == "trust_root"
+            )
+
+    overrides = []
+    for function in ast.walk(tree):
+        if not isinstance(function, (ast.FunctionDef, ast.AsyncFunctionDef)):
+            continue
+        automatic = any(
+            isinstance(decorator, ast.Call)
+            and isinstance(decorator.func, ast.Attribute)
+            and decorator.func.attr == "fixture"
+            and any(
+                keyword.arg == "autouse"
+                and isinstance(keyword.value, ast.Constant)
+                and keyword.value.value is True
+                for keyword in decorator.keywords
+            )
+            for decorator in function.decorator_list
+        )
+        if not automatic:
+            continue
+        for node in ast.walk(function):
+            if not (
+                isinstance(node, ast.Call)
+                and isinstance(node.func, (ast.Name, ast.Attribute))
+                and (
+                    node.func.id if isinstance(node.func, ast.Name) else node.func.attr
+                ) == "setattr"
+                and len(node.args) >= 2
+            ):
+                continue
+            object_target = (
+                ast.unparse(node.args[0]) in aliases
+                and isinstance(node.args[1], ast.Constant)
+                and node.args[1].value == "GIT_PROGRAM"
+            )
+            string_target = (
+                isinstance(node.args[0], ast.Constant)
+                and node.args[0].value == module_name + ".GIT_PROGRAM"
+            )
+            if object_target or string_target:
+                overrides.append((function.name, node.lineno))
+    assert overrides == [], f"autouse fixtures override frozen Git: {overrides}"
 
 
 def test_production_runner_disables_commit_graph_for_every_git_read(

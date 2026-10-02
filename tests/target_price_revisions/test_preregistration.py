@@ -2,8 +2,6 @@ from __future__ import annotations
 
 import hashlib
 import json
-import os
-import shutil
 import subprocess
 from dataclasses import fields
 from decimal import Decimal
@@ -51,31 +49,6 @@ EXPECTED_SPEC_HASH = (
 EXPECTED_ARTIFACT_SHA256 = (
     "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
-
-
-@pytest.fixture(autouse=True)
-def _authority_reads_use_this_hosts_git(monkeypatch: pytest.MonkeyPatch) -> None:
-    """TPR-CR14-001: keep the loader tests runnable off the frozen Windows host.
-
-    ``trust_root.GIT_PROGRAM`` is the owner-frozen Windows executable, so every
-    authority read refuses on a host where that path cannot exist.  That
-    refusal is the correct production behaviour and stays pinned by
-    ``test_reviewed_loader_refuses_when_the_frozen_git_is_unavailable``, but it
-    made fourteen tests of the loader's own logic fail on the lane's macOS
-    development host, where they could no longer detect a regression.
-
-    On a non-Windows host only, substitute this host's canonical Git for the
-    test process.  Windows is left untouched and keeps exercising the frozen
-    production path; no production module gains an override.
-    """
-    if os.name == "nt":
-        return
-    located = shutil.which("git")
-    if located is None:
-        pytest.skip("no Git executable on this host")
-    monkeypatch.setattr(
-        trust_root, "GIT_PROGRAM", Path(located).resolve(strict=True)
-    )
 
 
 def _canonical(value: object, *, trailing_lf: bool = True) -> bytes:
@@ -804,17 +777,8 @@ def test_reviewed_authority_cannot_be_forged_cloned_or_mutated(
 def test_reviewed_loader_refuses_when_the_frozen_git_is_unavailable(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
-    """TPR-CR14-001: a host without the frozen Git grants nothing.
-
-    The module fixture above substitutes the host Git off Windows.  This pins
-    the direction that substitution must never hide: with no usable frozen
-    executable an otherwise fully anchored reviewed spec still refuses, and
-    refuses at the Git read rather than later.
-    """
+    """An anchored spec refuses at the Git read when the frozen tool is absent."""
     spec_path = _anchored_reviewed_spec(tmp_path, monkeypatch)
-    assert load_reviewed_algorithm_spec(spec_path).status == (
-        preregistration.REVIEWED_ALGORITHM_STATUS
-    )
     monkeypatch.setattr(trust_root, "GIT_PROGRAM", tmp_path / "missing-git.exe")
     with pytest.raises(
         PreregistrationError, match="review anchor Git verification failed"

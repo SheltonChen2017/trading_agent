@@ -178,6 +178,17 @@ CURRENT_CLAUDE_REVIEWED_CODEX_RANGE = (
     f"{CURRENT_CLAUDE_REVIEWED_CODEX_HEAD}"
 )
 CURRENT_CLAUDE_REVIEWED_CODEX_SHORT_RANGE = "d54ce1b2..ea97bd4f"
+CURRENT_COUNTERREVIEWED_CLAUDE_BASE = "ea97bd4fc03779b7947cf35cd8e4432b0b9fa516"
+CURRENT_COUNTERREVIEWED_CLAUDE_HEAD = "3de5bbef3a25d8a37647869ad840808543927a82"
+CURRENT_COUNTERREVIEWED_CLAUDE_RANGE = (
+    f"{CURRENT_COUNTERREVIEWED_CLAUDE_BASE}..{CURRENT_COUNTERREVIEWED_CLAUDE_HEAD}"
+)
+CURRENT_COUNTERREVIEWED_CLAUDE_SHORT_RANGE = "ea97bd4f..3de5bbef"
+CURRENT_COUNTERREVIEWED_CLAUDE_COMMITS = (
+    "174a546c2d3ea6c8d9f41a38f42ecf2a197f6437",
+    "299492af461d4f611bb4a32f899b6d5f94de92ed",
+    "3de5bbef3a25d8a37647869ad840808543927a82",
+)
 CURRENT_CLAUDE_REVIEWED_FIRST_PARENT_COMMITS = (
     "059c93e73cc17b4bc0b01c1d14ab637acf285b7e",
     "e74da9ef34fac111cef838dbbe9814030daf3cf4",
@@ -671,11 +682,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [CURRENT_CLAUDE_REVIEWED_CODEX_RANGE]
+    ) == [CURRENT_COUNTERREVIEWED_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact cumulative Codex range"
+        "Codex has counter-reviewed the exact Claude range"
         in normalized_current
     )
     assert (
@@ -691,13 +702,14 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "pending Claude review of this Codex round" not in normalized_current
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
-    # TPR-CR14: the round is reviewed, so the previous round's pending-role
-    # routing must be gone and the next role, section, and milestone exact.
+    # TPR-CCR14: historical Claude proposals cannot become current grants.
     assert "awaits independent Claude review" not in normalized_current
-    assert "beginning after `d54ce1b2`" not in normalized_current
-    assert "Codex next counter-reviews section 42" in normalized_current
-    assert "TPR-D0" in normalized_current
-    assert "No next implementation milestone is authorized" not in normalized_current
+    assert "Codex next counter-reviews section 42" not in normalized_current
+    assert "Claude next reviews section 43" in normalized_current
+    assert "TPR-D0 is not authorized" in normalized_current
+    assert "No next implementation milestone is authorized" in normalized_current
+    assert "historical Claude proposals, not operative authorization" in normalized_current
+    assert "monitor stays paused" in normalized_current
     for decision in CURRENT_OWNER_DECISION_IDS:
         assert f"`{decision}`" in normalized_current
 
@@ -721,12 +733,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [CURRENT_CLAUDE_REVIEWED_CODEX_SHORT_RANGE]
+        ) == [CURRENT_COUNTERREVIEWED_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed" in normalized_summary_lower
-        assert "section 42" in normalized_summary_lower
+        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
+        assert "section 43" in normalized_summary_lower
         assert "awaits claude review" not in normalized_summary_lower
-        assert "tpr-d0" in normalized_summary_lower
+        assert "tpr-d0 is not authorized" in normalized_summary_lower
+        assert "no next implementation milestone is authorized" in normalized_summary_lower
         assert (
             "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
             in normalized_summary_lower
@@ -796,12 +809,13 @@ def test_current_counterreview_records_every_received_commit_and_provenance() ->
         for commit, disposition in first_parent_dispositions.items()
         if disposition == "rejected"
     } == {LATEST_RECEIVED_REJECTED_COMMIT}
-    assert set(first_parent_dispositions.values()) <= {
+    admitted_dispositions = {
         "accepted",
         "accepted after correction",
         "accepted after qualification",
         "rejected",
     }
+    assert set(first_parent_dispositions.values()) <= admitted_dispositions
 
     inherited = _bounded(
         section,
@@ -819,6 +833,24 @@ def test_current_counterreview_records_every_received_commit_and_provenance() ->
     assert set(inherited_rows) == reachable - set(
         LATEST_RECEIVED_FIRST_PARENT_COMMITS
     )
+    # The rejected shared patch also arrives through the merge.  Its row must
+    # retain the same disposition as the first-parent twin, not merely its ID.
+    inherited_dispositions = {
+        match.group(1): match.group(2).lower()
+        for line in inherited.splitlines()
+        if (
+            match := re.match(
+                r"\| `([0-9a-f]{40})` \| \*\*([a-z ]+)\*\* \|", line
+            )
+        )
+    }
+    assert set(inherited_dispositions) == set(inherited_rows)
+    assert set(inherited_dispositions.values()) <= admitted_dispositions
+    assert {
+        commit
+        for commit, disposition in inherited_dispositions.items()
+        if disposition == "rejected"
+    } == {"f4764671b9f3ee0de50ab36a7cf61854bca72c4f"}
 
 
 def test_current_main_sync_records_exact_merge_and_safe_conflict_union() -> None:
@@ -1375,6 +1407,8 @@ def test_current_claude_review_records_the_exact_range_and_owner_decisions() -> 
         "## 42. Claude independent review of the counter-review, main merge, "
         "and synchronization"
     )
+    assert "Historical review report." in section
+    assert "Section 43 supersedes" in section
     assert CURRENT_CLAUDE_REVIEWED_CODEX_RANGE in section
     ordered_commits = tuple(
         re.search(r"`([0-9a-f]{40})`", line).group(1)
@@ -1444,3 +1478,48 @@ def test_current_claude_review_records_the_exact_range_and_owner_decisions() -> 
         assert forbidden in normalized_authority, (
             f"the authority decision must name what stays closed: {forbidden}"
         )
+
+
+def test_current_counterreview_records_all_claude_commits_without_new_authority() -> None:
+    section = _record_section("## 43. Codex counter-review of Claude section 42")
+    assert CURRENT_COUNTERREVIEWED_CLAUDE_RANGE in section
+    table = _bounded(
+        section,
+        "### 43.2 Every incoming commit disposition",
+        "### 43.3 P0-P3 ledger",
+        "section 43 commit dispositions",
+    )
+    rows = [
+        (match.group(1), match.group(2).lower())
+        for line in table.splitlines()
+        if (match := re.match(
+            r"\| `([0-9a-f]{40})` \| \*\*([a-z ]+)\*\* \|", line, re.IGNORECASE
+        ))
+    ]
+    assert tuple(commit for commit, _ in rows) == CURRENT_COUNTERREVIEWED_CLAUDE_COMMITS
+    assert tuple(commit for commit, _ in rows) == tuple(
+        _git_lines("rev-list", "--reverse", CURRENT_COUNTERREVIEWED_CLAUDE_RANGE)
+    )
+    assert {disposition for _, disposition in rows} == {"accepted after correction"}
+    assert "Cumulative disposition: accepted after correction" in section
+    authority = " ".join(_bounded(
+        section,
+        "### 43.5 Milestone, gates, and next authorized action",
+        "### 43.6 Validation and exclusions",
+        "section 43 gate decision",
+    ).split())
+    for required in (
+        "No next implementation milestone is authorized",
+        "TPR-D0 is not authorized",
+        "retained licensed rows",
+        "review alone cannot authorize",
+        "TPR-OOL-011",
+        "rollback",
+        "parent custody",
+        "adversarial matrix",
+        "TPR-1",
+        "TPR-2",
+        "TPR-0B",
+        "monitor remains paused",
+    ):
+        assert required in authority

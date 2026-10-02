@@ -103,6 +103,37 @@ LATEST_COUNTERREVIEWED_RECEIVED_SHORT_RANGE = "49caa886..d54ce1b2"
 LATEST_CLAUDE_CORRECTION_COMMIT = (
     "dff9b11238f35c5c411669197bc078936fbf9c9a"
 )
+CURRENT_MAIN_SYNC_LANE_HEAD = (
+    "e74da9ef34fac111cef838dbbe9814030daf3cf4"
+)
+CURRENT_MAIN_SYNC_MAIN_HEAD = (
+    "9e834713cd8be0f184af730118199b2cab90336a"
+)
+CURRENT_MAIN_SYNC_MERGE_BASE = (
+    "df388ce64cd705f2ed26fab3442a0229f52a447b"
+)
+CURRENT_MAIN_SYNC_MERGE_COMMIT = (
+    "6590d890509f75d8b7b87fa9b665b48fa1dbd0aa"
+)
+CURRENT_MAIN_IMPORTED_CLOSURE_COMMITS = (
+    "e53ba26bec6f12861edeaff4383dce4db2ccd37e",
+    "37dc424fee28fd71fbd23951e267c6997088a889",
+    "3aedfffc05a3108f554555d3d22d7b58d8299175",
+    "89f385cd442ea16f39ae7599c738797c64a2fba1",
+    "64edf355cc5afce4df770100ef2772d024dc3649",
+    "c83218c7583c9cbfc7840f02324a431ab00a33ad",
+    "6baa13d2acbeac48e9dec3f81acbdeb1cae8c370",
+    "b3b202d2a8bf0ecc8a3613dcbfdb3690483ad767",
+    "2c392cd30ce4979d4f36d0b6e1b8b7323f8bc6ef",
+    "726c4dcf85fd71e0e175e5e01be5f614c76dab66",
+    "66f0fef4ac66f7d8f8805fa02ec0b918fbb10463",
+    "143b18859c923d183e657531d17d88833c995006",
+    "35c467e53a788d7a6416ee22c1d2ad53901cd2b1",
+    "0ebce0132b4cc60e518dff089ab982be74f14e89",
+    "d774195d4c62fc93c81e02b3887cd58bfa918629",
+    "9047375ece396ce39c48dec088e233313446daa3",
+    "22a889d03879b74c09bbccc80c6d4ef07a061bcf",
+)
 LATEST_RECEIVED_FIRST_PARENT_COMMITS = (
     "dff9b11238f35c5c411669197bc078936fbf9c9a",
     "e0270c8bbf425f85af43b13eda6cb6bb59b252f4",
@@ -542,7 +573,7 @@ def _current_integration_state(section: str) -> str:
     """Return section 8's current topology block, including both hard anchors."""
     return _bounded(
         section,
-        "**Integration state, 2026-08-31.**",
+        "**Integration state, 2026-10-02.**",
         # Date-independent: this heading carries the review date and moved
         # every round, so pinning it re-broke the extractor each time. The
         # opening anchor keeps its date because it names a fixed merge event.
@@ -621,6 +652,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "pending Claude review of this Codex round" not in normalized_current
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
     assert "beginning after `d54ce1b2`" in normalized_current
+    assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
+    assert "awaits independent Claude review" in normalized_current
 
     routing_row = next(
         line
@@ -630,13 +663,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in routing_row
     assert BLUEPRINT_CONTENT_SHA256 in routing_row.lower()
 
-    # The shared Session Handoff and Action Plan are frozen for lanes (owner
-    # direction 2026-09-04): section 8 of this record is the only per-round
-    # current-state pointer, and it is asserted above.
+    # The shared Session Handoff is frozen for lanes, while the Action Plan is
+    # changed only by an owner-coordinated concise status amendment. Section 8
+    # of this record remains the only per-round current-state pointer.
 
     for summary_pointer in (
         _record_preamble(),
-        # the shared handoff and Action Plan are frozen for lanes (owner direction 2026-09-04)
+        # the shared handoff remains frozen; Action Plan changes require owner coordination
     ):
         normalized_summary = " ".join(summary_pointer.split())
         normalized_summary_lower = normalized_summary.lower()
@@ -644,8 +677,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
         ) == [LATEST_COUNTERREVIEWED_RECEIVED_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex counter-reviewed the received range" in normalized_summary_lower
+        assert "latest completed codex counter-review remains" in normalized_summary_lower
         assert "section 40" in normalized_summary_lower
+        assert "section 41" in normalized_summary_lower
         assert (
             "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
             in normalized_summary_lower
@@ -696,11 +730,124 @@ def test_current_counterreview_records_every_received_commit_and_provenance() ->
     assert "No next implementation milestone is authorized" in section
 
 
+def test_current_main_sync_records_exact_merge_and_safe_conflict_union() -> None:
+    """The owner-directed sync must preserve both intended Action Plan updates."""
+    section = _record_section("## 41. Codex synchronization with current main")
+    for identity in (
+        CURRENT_MAIN_SYNC_LANE_HEAD,
+        CURRENT_MAIN_SYNC_MAIN_HEAD,
+        CURRENT_MAIN_SYNC_MERGE_BASE,
+        CURRENT_MAIN_SYNC_MERGE_COMMIT,
+        *CURRENT_MAIN_IMPORTED_CLOSURE_COMMITS,
+    ):
+        assert identity in section
+
+    merge_base = subprocess.run(
+        [
+            "git",
+            "merge-base",
+            CURRENT_MAIN_SYNC_LANE_HEAD,
+            CURRENT_MAIN_SYNC_MAIN_HEAD,
+        ],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    assert merge_base == CURRENT_MAIN_SYNC_MERGE_BASE
+
+    parents = subprocess.run(
+        ["git", "show", "-s", "--format=%P", CURRENT_MAIN_SYNC_MERGE_COMMIT],
+        cwd=ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.split()
+    assert parents == [CURRENT_MAIN_SYNC_LANE_HEAD, CURRENT_MAIN_SYNC_MAIN_HEAD]
+    assert subprocess.run(
+        [
+            "git",
+            "merge-base",
+            "--is-ancestor",
+            CURRENT_MAIN_SYNC_MERGE_COMMIT,
+            "HEAD",
+        ],
+        cwd=ROOT,
+        capture_output=True,
+    ).returncode == 0
+    for commit in CURRENT_MAIN_IMPORTED_CLOSURE_COMMITS:
+        assert subprocess.run(
+            [
+                "git",
+                "merge-base",
+                "--is-ancestor",
+                commit,
+                CURRENT_MAIN_SYNC_MAIN_HEAD,
+            ],
+            cwd=ROOT,
+            capture_output=True,
+        ).returncode == 0
+
+    target_paths = (
+        "research/target_price_revisions",
+        "tests/target_price_revisions",
+        "docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md",
+        "docs/Strategy Description/TARGET_PRICE_REVISION_ETF_ALPHA_RESEARCH_QC_BLUEPRINT_V2_EN.pdf",
+    )
+    assert subprocess.run(
+        [
+            "git",
+            "diff",
+            "--quiet",
+            CURRENT_MAIN_SYNC_LANE_HEAD,
+            CURRENT_MAIN_SYNC_MERGE_COMMIT,
+            "--",
+            *target_paths,
+        ],
+        cwd=ROOT,
+        capture_output=True,
+    ).returncode == 0
+
+    merge_blobs = {
+        relative: subprocess.run(
+            ["git", "show", f"{CURRENT_MAIN_SYNC_MERGE_COMMIT}:{relative}"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout
+        for relative in (
+            "docs/ACTION_PLAN_2026-08-20.md",
+            "docs/SESSION_HANDOFF.md",
+        )
+    }
+    merge_action_plan = merge_blobs["docs/ACTION_PLAN_2026-08-20.md"]
+    assert merge_action_plan.count(
+        "**Owner-directed Insider paper-stage sequencing amendment, 2026-09-18:**"
+    ) == 1
+    assert merge_action_plan.count("**Current bounded status, 2026-09-04:**") == 1
+    assert "**Current bounded status, 2026-08-30:**" not in merge_action_plan
+    assert merge_action_plan.count(
+        "**Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**"
+    ) == 1
+
+    action_plan = _doc("ACTION_PLAN_2026-08-20.md")
+    assert action_plan.count("**Current bounded status, 2026-10-02:**") == 1
+    assert "**Current bounded status, 2026-08-30:**" not in action_plan
+    assert (
+        "`TPR-OOL-003`, `TPR-OOL-004`, and the four-slot propagation finding"
+        in action_plan
+    )
+
+    for text in (*merge_blobs.values(), action_plan, _doc("SESSION_HANDOFF.md")):
+        assert not re.search(r"^(?:<<<<<<< |=======|>>>>>>> )", text, flags=re.MULTILINE)
+
+
 def test_out_of_lane_current_disposition_index_matches_integration_closures() -> None:
     """TPR-CCR13-001: historical rows cannot masquerade as current routing."""
     section = _record_section("## 9. Out-of-lane findings ledger")
     index_heading = (
-        "### Current disposition index (successor qualification, 2026-09-06)"
+        "### Current disposition index (successor qualification, 2026-10-02)"
     )
     assert section.count(index_heading) == 1
     index = section.partition(index_heading)[2]
@@ -732,7 +879,10 @@ def test_out_of_lane_current_disposition_index_matches_integration_closures() ->
     assert {identifier for identifier, status in dispositions.items() if status == "closed"} == {
         "TPR-OOL-001",
         "TPR-OOL-002",
+        "TPR-OOL-003",
+        "TPR-OOL-004",
         "TPR-OOL-005",
+        "TPR-OOL-006",
         "TPR-OOL-007",
         "TPR-OOL-008",
         "TPR-OOL-009",
@@ -744,7 +894,7 @@ def test_out_of_lane_ledger_has_unique_well_formed_ids() -> None:
     """TPR-CCR8-003/004: keep the owner-routing ledger unambiguous."""
     section = _record_section("## 9. Out-of-lane findings ledger")
     details = section.partition(
-        "### Current disposition index (successor qualification, 2026-09-06)"
+        "### Current disposition index (successor qualification, 2026-10-02)"
     )[0]
     rows = [
         line
@@ -807,9 +957,9 @@ def test_current_state_blocks_do_not_call_the_lane_unmerged() -> None:
     current_surfaces = {
         "record preamble": preamble,
         "record section 8 current qualification": next_step,
-        # SESSION_HANDOFF.md and ACTION_PLAN_2026-08-20.md are deliberately
-        # absent: both shared documents are frozen for lanes (owner direction
-        # 2026-09-04) and carry no lane-current pointer.
+        # SESSION_HANDOFF.md is deliberately absent because it is frozen for
+        # this lane. The Action Plan may receive owner-coordinated concise
+        # status amendments, but remains outside the per-round pointer set.
     }
     for name, block in current_surfaces.items():
         assert stale not in block.lower(), (

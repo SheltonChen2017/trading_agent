@@ -1,23 +1,31 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED THE RECEIVED RANGE
-`49caa886..d54ce1b2`; THE MIXED-ROLE PROVENANCE, EVERY FIRST-PARENT AND
-MERGE-INHERITED COMMIT DISPOSITION, AND THE P0-P3 LEDGER ARE IN SECTION 40.
-CLAUDE'S EXACT CORRECTION IS `dff9b112`; THE LATER COMMITS ARE OWNER-DIRECTED
-INTEGRATION, HANDOFF, AND MAIN-MERGE WORK AND ARE NOT ATTRIBUTED BY AUTHOR
-METADATA. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT REMAINS COMPLETE. THE
-NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS CHECKPOINTED BUT REMAINS
+Status: **THE CURRENT CODEX ROUND SYNCHRONIZED PRE-MERGE LANE HEAD `e74da9e`
+WITH CURRENT `origin/main` `9e834713` IN MERGE `6590d890`; SECTION 41 RECORDS
+THE SINGLE CONFLICT, SAFE UNION RESOLUTION, IMPORTED FINDING CLOSURES, AND
+VALIDATION. THE CUMULATIVE CODEX RANGE BEGINNING AFTER `d54ce1b2` AWAITS
+CLAUDE REVIEW. THE LATEST COMPLETED CODEX COUNTER-REVIEW REMAINS
+`49caa886..d54ce1b2`; ITS MIXED-ROLE PROVENANCE, EVERY FIRST-PARENT AND
+MERGE-INHERITED COMMIT DISPOSITION, AND P0-P3 LEDGER ARE IN SECTION 40.
+CLAUDE'S EXACT CORRECTION THERE IS `dff9b112`; THE LATER COMMITS ARE
+OWNER-DIRECTED INTEGRATION, HANDOFF, AND MAIN-MERGE WORK AND ARE NOT
+ATTRIBUTED BY AUTHOR METADATA. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT
+REMAINS COMPLETE. THE NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS
+CHECKPOINTED BUT REMAINS
 INCOMPLETE: ROLLBACK/REPLAY PROTECTION, PARENT-DIRECTORY CUSTODY, AND THE
 REQUIRED ADVERSARIAL VALIDATION MATRIX ARE OPEN. THE REVIEWED-SPEC REGISTRY IS
 THE CANONICAL EMPTY V2 REGISTRY. NO KEY PROVISIONING OR POSITIVE AUTHORITY IS
 AUTHORIZED. `TPR-CCR5-004`, `TPR-CCR2-011`, TPR-1, AND TPR-0B REMAIN BLOCKED;
 NO SIGNED ANCHOR, PROVIDER OR SOURCE RIGHT, OUTCOME ACCESS, RESEARCH LOOK, QC
 JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL, OR TRADING AUTHORITY EXISTS
-IN THE REPOSITORY. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
+FOR TARGET-PRICE REVISIONS. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN
+SECTION 37.**
 
 Sibling-lane changes and their independent reviews remain on their respective
-branches. Their integration into `main` grants this target branch visibility,
-not authority to alter sibling-owned artifacts.
+branches. Their integration into `main` grants this target branch visibility;
+the verified imported corrections can close the corresponding out-of-lane
+findings, but they grant no authority to alter sibling-owned artifacts or
+future sibling behavior.
 
 Branch: `codex/strategy-target-price-revisions`
 
@@ -337,14 +345,22 @@ paper deployment, or live deployment is authorized merely by this workflow.
 
 ## 8. Exact next step
 
-**Integration state, 2026-08-31.** All four strategy lanes were merged into
-`main` (PRs #321, #322, #323 and #325), and this lane was fast-forwarded to
-that integration point earlier on 2026-08-31. The histories later diverged;
-neither current tip contains the other. Live ahead/behind counts are omitted
-because every new lane commit invalidates them. The four-slot multiplicity
-amendment nevertheless remains unpropagated: see `TPR-OOL-006`.
+**Integration state, 2026-10-02.** The dedicated lane was first
+fast-forwarded to remote head
+`e74da9ef34fac111cef838dbbe9814030daf3cf4`, then synchronized with current
+`origin/main` `9e834713cd8be0f184af730118199b2cab90336a`. Their merge base was
+`df388ce64cd705f2ed26fab3442a0229f52a447b`, and merge
+`6590d890509f75d8b7b87fa9b665b48fa1dbd0aa` has parents in exactly that
+lane/main order. The lane now contains that exact main snapshot; live
+ahead/behind counts are omitted because every new commit invalidates them.
+The only textual conflict was this repository's Action Plan. The resolution
+retains main's 2026-09-18 Insider-only paper-stage amendment, the lane's newer
+2026-09-04 Target-Price status, and the common multiplicity block while
+discarding main's stale 2026-08-30 Target-Price status. The shared Session
+Handoff auto-merged without manual conflict resolution. Section 41 records the
+exact topology and checks.
 
-**Current qualification, 2026-09-06:** Codex has counter-reviewed the exact
+**Current qualification, 2026-10-02:** Codex has counter-reviewed the exact
 received cumulative range
 `49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3..d54ce1b2c6816532ef82906c49998a93574172fc`.
 Section 40 distinguishes Claude's one exact correction commit from the later
@@ -356,7 +372,10 @@ semantic `activated_at` value (`TPR-CCR13-002`, routed as `TPR-OOL-011`). That
 shared defect is documented, not fixed, under the target-only lane rule. The
 three correctable record defects are closed in this round. The authoritative
 current open-issue register remains below in section 8, and Claude's
-comprehensive whole-lane audit remains complete. The
+comprehensive whole-lane audit remains complete. The current Codex
+main-synchronization and record-correction round, including merge `6590d890`,
+awaits independent Claude review and does not rewrite section 40's completed
+counter-review. The
 non-authorizing TPR-TR0-I implementation candidate is checkpointed but remains
 incomplete at exact code commit
 `20e20d7f68d39d17af84d6a5c65e22b78dc57eb1`. It freezes the executable Git,
@@ -388,13 +407,13 @@ open until the trust-root implementation is complete, independently reviewed,
 provisioned, rollback-pinned, parent-custody protected, and satisfied by an
 exact signed registry anchor. Neither issue mints present authority.
 
-**Current branch relation, measured 2026-09-05:** the lane **contains**
-`origin/main` at `df388ce6` through the owner-directed merge `15bedb56`
-(section 39's pointer table names the two reconciled files); `main` does not
-yet contain this lane's commits, so a lane-to-main merge is conflict-free but
-has not happened. The 2026-08-31 fast-forward and the divergence measured
-afterwards are history; the exact points are in the section 10 ledger rows
-for those rounds.
+**Current branch relation, measured 2026-10-02:** the lane **contains** the
+exact fetched `origin/main` snapshot `9e834713` through merge `6590d890`.
+Main does not contain the lane-only commits. The merge resolved one Action
+Plan conflict and did not alter Target-Price code, tests, authority artifacts,
+the governing PDF, or this record relative to its first parent. Earlier
+fast-forwards, divergence measurements, and merge `15bedb56` remain history;
+their exact points are in the section 10 ledger rows for those rounds.
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Integration into `main` does not authorize a coordinated edit from
@@ -406,9 +425,10 @@ consistency, raw retention, derived processing, and QC-transfer rights. TPR-0B
 remains blocked until reviewed TPR-1 and TPR-2 structural manifests exist.
 No next implementation milestone is authorized. The reviewed range is rejected
 on the shared P2 above, and independent of that rejection the two owner-level
-trust choices and the exact source-rights gate remain unresolved. After the
-counter-review record is published, Claude reviews the exact new Codex
-correction range beginning after `d54ce1b2`. That review
+trust choices and the exact source-rights gate remain unresolved. After this
+main-synchronization record is published, Claude reviews the cumulative Codex
+range beginning after `d54ce1b2` through the pushed head, including merge
+`6590d890` and section 41. That review
 grants no source, outcome, look, QC, broker, paper, live, deployment, capital,
 or trading authority.
 
@@ -516,36 +536,36 @@ documented here and deliberately not fixed.
 | ID | Severity | External area / paths | Evidence and lane impact | Disposition / future route |
 |---|---|---|---|---|
 | `TPR-OOL-001` | P2 | Repository-wide Git plumbing: no `.gitattributes` exists at any level, and `core.autocrlf=true` is set in the system Git configuration | Git finds no NUL byte in the target-price blueprint, so it classifies the PDF as text and rewrites its 557 LF bytes to CRLF on checkout. The working file is 78,082 bytes and hashes to `6ee7ea5e...4330`, while the committed blob is 77,525 bytes and hashes to the pinned `9f00dd56...2633`. `pdftotext` reports a damaged xref table on the working copy. The other four PDFs contain NUL bytes early and check out byte-identically. Lane impact is `TPR-CR1-001`. | A `*.pdf binary` attribute is repository-wide plumbing rather than trading-strategy work, and `docs/Strategy Description/THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 requires a shared-file change to stop for one owner-coordinated common-baseline amendment. Documented, not fixed. Owner decision required. |
-| `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 1/60` while the fixed family now has four permanent `1/80` slots. Under the pre-amendment sibling allocations, exact arithmetic is `3 * (1/60) + 1/80 = 1/16 = 0.0625`, above the family ceiling `1/20 = 0.05`; the displayed `0.0167` is only a rounded rendering of `1/60`. | **Escalated 2026-08-31: this is now a contradiction inside one integrated tree.** With all four lanes merged into `main`, that single tree simultaneously states the analyst lane's "three-lane correction remains 3" with its prospective look carrying `1/60`, no alpha freeze at all in Insider Buying or Short Interest, and this lane's fixed four-slot family at `1/80` naming `analyst-revisions-v2` as one of its slots. Measured directly from the integrated tree, not inferred. The owner froze the four named slots permanently on 2026-08-30 (section 16): each lane's maximum is `1/80`; the named slot remains fixed while an unused or withdrawn allocation expires and is never redistributed or used to recompute the denominator. Sibling-lane corrections and their independent reviews/counter-reviews remain on their own long-lived branches. This target branch does not edit them, and no lane receives outcome authority from this directive. |
+| `TPR-OOL-006` | P2 | Sibling lane frozen preregistrations, principally `codex/strategy-analyst-revisions-v2` | That lane still freezes its selection-family alpha at `0.05 / 3 = 1/60` while the fixed family now has four permanent `1/80` slots. Under the pre-amendment sibling allocations, exact arithmetic is `3 * (1/60) + 1/80 = 1/16 = 0.0625`, above the family ceiling `1/20 = 0.05`; the displayed `0.0167` is only a rounded rendering of `1/60`. | **Historical disposition at discovery:** escalated on 2026-08-31 as a contradiction inside the then-integrated tree and routed to the three sibling lanes without editing them here. **Successor qualification, 2026-10-02: closed.** Current main imports the independently reviewed and counter-reviewed Analyst (`89f385cd`, `64edf355`, `c83218c7`, `6baa13d2`), Insider (`b3b202d2`, `2c392cd3`, `726c4dcf`), and Short-Interest (`66f0fef4`, `143b1885`, `35c467e5`, `0ebce013`, `d774195d`) four-slot re-freezes. Each pins `1/20` family FWER, permanent `1/80` maxima, expiry without redistribution or denominator recomputation, and zero outcome authority. The imported completion closes this finding but creates no cross-lane composition receipt, outcome access, or later-stage authority. |
 | `TPR-OOL-008` | P2 | `research/analyst_revisions_v2/specs/*.json`; `research/ml_specs/*.json` | On the integrated tree the analyst lane's checkout-bytes guard (`test_canonical_production_artifacts_survive_checkout_as_exact_bytes`) **failed on this Windows host**: `legacy_reproduction_registry.json` held CRLF bytes while its committed blob is LF, and `git status` reported clean because the stat cache hid it. Five artifacts were affected. The repository content is correct; only the checkout was stale, and restoring each file from its committed blob turned the test green with `git diff HEAD` empty. The root cause is an attribute strategy difference: the analyst lane protects those files with `*.json -text` only (`text: unset, eol: unspecified`), which lets a pre-existing CRLF working copy persist, whereas this lane now uses `text eol=lf` (`text: unset, eol: lf`) and does not drift. `research/ml_specs/*.json` carry no attribute at all (`text: unspecified`) and Git warns they will be re-converted to CRLF on the next checkout, so their restoration here is temporary and no test currently covers them. | Documented, not fixed. The remedy is to adopt `text eol=lf` in the sibling lanes and give `research/ml_specs` equivalent protection, which touches another lane's and the ML surface's owned files. Route as one owner-coordinated change. The local checkout repair performed during this review changed no committed content. **Recurrence measured 2026-09-02:** the same guard failed again in this worktree after the lane was fast-forwarded. A repo-wide sweep, rather than the test's first-offender report, found that of 909 tracked files 18 require exact bytes and 3 were stale: `legacy_reproduction_registry.json`, `permanent_look_authority.json` and `reviewed_spec_registry.json`. Restoring each from its committed blob left 0 stale and the module green at 39 passed. This is the second local repair of the same drift, which is the evidence that `*.json -text` alone does not converge an existing CRLF working copy; the routed remedy is unchanged and still belongs to an owner-coordinated change. |
 | `TPR-OOL-009` | P2 | `tests/test_sleeve_report.py`; `assistant` lot tax-mechanism path | **Claude corroboration of the existing finding, 2026-09-01, not a new identifier.** Both failures reproduce in isolation (`2 failed, 54 passed`), and the recorded diagnosis is exact: the test fixes its lot/snapshot clock at 2026-08-07 while the implementation reads the live UTC clock. A lot created with `days_ago=340` is therefore acquired 2025-09-01, which is exactly 365 days before the live date 2026-09-01 — precisely the one-year boundary, so `term_if_sold_now` stays `short` while the countdown collapses to `0`, failing `0 < days_to_long_term <= 30`. The failure is genuinely date-triggered and began when the live clock crossed that boundary; it is a real test/implementation clock mismatch, not a flake that will pass on retry. **Claude expansion evidence, 2026-09-01: this finding widens with the calendar and is not a fixed pair.** The counter-review measured two failures; this review measures three, the new one being `test_report_carries_no_action_shaped_field` failing `assert 2 == 1` on `lots_at_gain_review`. The module fixes `_NOW = datetime(2026, 8, 7, 15, 30, tzinfo=utc)` and builds lots at `_NOW - days_ago` while the implementation reads the live clock, now 25 days past the fixture, so every lot whose `days_ago` lies in the 340-365 window has since crossed the one-year boundary and that window widens by one day per day. The failure count is therefore a function of when the suite runs, which is why two reviewers on the same tree report different totals. | **Not fixed** — out-of-lane under the owner's scope rule and explicitly excluded from this branch. Route to the Trading App lane; the durable fix is to give the implementation the same injected clock the test fixes, not to loosen the assertion. Routing urgency is higher than a static pair implies: untouched assertions keep converting to failures. The durable fix injects the fixture clock into the implementation rather than loosening assertions. |
 | `TPR-OOL-007` | P3 | `docs/THREE_STRATEGY_PROJECT_DIRECTION.md:274-278` | The shared coordination pointer still presents a local TPR-0A candidate whose next action is one push/review; it omits the completed initial review, the six Claude commits through `2ec0fad`, their Codex counter-review, and the current v2.2 candidate at `bb8dfb6`. | Documented, not fixed. The file is shared coordination surface outside this target-only lane; route a concise current-state correction through the appropriate owner-coordinated shared-document round. |
 | `TPR-OOL-002` | P3 | `docs/Strategy Description/README.md` | The lane table and the surrounding prose describe a three-strategy program and omit Target-Price Revisions entirely, so a reader who starts at the directory README does not discover this lane, its branch, or its record. | That README is named in the parallel-workflow frozen-file list, so it needs the same owner-coordinated common-baseline amendment rather than a fourth competing edit. Documented, not fixed. |
 | `TPR-OOL-001-R1` | P2 resolution | Owner-coordinated repository Git plumbing | The owner approved the common fix. Root `.gitattributes` now declares `*.pdf binary`; Git resolves the blueprint as binary with text/diff/merge unset. The PDF was rebuilt from the intact Git blob plus the two-page owner addendum and reopened strictly as 28 pages at raw SHA-256 `55ce6703...ba14` at that time; the current artifact is the 29-page v2.2 blueprint at raw SHA-256 `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`, which supersedes that historical resolution state without reopening the finding. | Resolved under the explicit one-time owner coordination; this does not authorize later shared-file edits by inference. Raw-byte and resolved-attribute guards are target-owned. |
-| `TPR-OOL-003` | P2 | Analyst Revisions V2 preregistration loader: `research/analyst_revisions_v2/preregistration.py:465,487` | Both persisted JSON paths use ordinary `json.loads`, which accepts duplicate object keys with last-key-wins behavior. A content-addressed authority artifact can therefore have ambiguous human/parser meaning. TPR's strict loader rejects duplicate keys, but this external accepted lane remains unchanged. | Documented only. Route to the Analyst Revisions V2 lane before any outcome authority; add duplicate-key mutations there. |
-| `TPR-OOL-004` | P2 | Analyst Revisions V2 family contract: `research/analyst_revisions_v2/preregistration.py:56,931` and its draft/tests | The accepted draft/loader still names `three_lane_selection_correction` and requires value 3, while the owner has added TPR as the fourth shared family/attempt. The Analyst lane remains fail-closed and zero-access, so no current look is affected. | Documented only. Synchronize that lane's content-addressed artifact and tests to four before any Analyst outcome access; do not edit it from TPR. |
+| `TPR-OOL-003` | P2 | Analyst Revisions V2 preregistration loader: `research/analyst_revisions_v2/preregistration.py:465,487` | Both persisted JSON paths used ordinary `json.loads` at discovery, accepting duplicate object keys with last-key-wins behavior. A content-addressed authority artifact could therefore have ambiguous human/parser meaning. TPR's strict loader already refused duplicate keys, but the external lane then remained unchanged. | **Successor qualification, 2026-10-02: closed.** Analyst commit `e53ba26bec6f12861edeaff4383dce4db2ccd37e` applies `_reject_duplicate_keys` through `object_pairs_hook` at both persisted paths and adds the exact two-path regression; independent review `37dc424fee28fd71fbd23951e267c6997088a889` accepts that commit, and the subsequent counter-review retains it. Current main imports those exact bytes. No authority changes. |
+| `TPR-OOL-004` | P2 | Analyst Revisions V2 family contract: `research/analyst_revisions_v2/preregistration.py:56,931` and its draft/tests | The accepted draft/loader still named `three_lane_selection_correction` and required value 3 at discovery, while the owner had added TPR as the fourth shared family/attempt. The Analyst lane remained fail-closed and zero-access, so no look was affected. | **Successor qualification, 2026-10-02: closed.** Analyst ARV2-3Q-F commit `89f385cd442ea16f39ae7599c738797c64a2fba1`, Claude corrections/review `64edf355cc5afce4df770100ef2772d024dc3649` and `c83218c7583c9cbfc7840f02324a431ab00a33ad`, and Codex counter-review `6baa13d2acbeac48e9dec3f81acbdeb1cae8c370` freeze the exact four-lane `1/80` contract and tombstone the old `1/60` path. Current main imports the accepted chain with zero outcome authority. |
 | `TPR-OOL-010` | P3 | `research/__init__.py`, shared with the Analyst Revisions V2 lane | **Renumbered from a duplicate `TPR-OOL-008` by Claude review `TPR-CR7-004`, 2026-09-01.** Two different findings carried that identifier; every narrative reference in this record resolves to the P2 EOL-attribute finding, and this row had none, so this later row was renumbered rather than the referenced one. Original finding: `POLICY_CODE_REPO_PATHS` includes `research/__init__.py`, but this lane's new `research/target_price_revisions/.gitattributes` cannot pin a file outside its own subtree. The file is empty today, so newline translation cannot change its bytes and the anchor is unaffected. The moment it gains content on a `core.autocrlf` checkout it would break the reviewed-algorithm anchor exactly as `TPR-CR4-001` did. | Documented, not fixed. `test_policy_code_is_checked_out_as_exact_bytes` asserts the file is still empty and turns red rather than passing silently, which routes a shared `.gitattributes` amendment to the owner at the moment it is actually needed. |
 | `TPR-OOL-005` | P3 | Trading App Briefing smoke fixture and yfinance cache/provider path | The exact `ba01e98` complete-suite run timed out after 180 seconds in `test_ui_pages_smoke.py::test_page_renders_without_exception[Briefing]`; captured yfinance logs reported `OperationalError('unable to open database file')` for QQQ, SPY, NVDA, and AMD. The fixture patches only one recorded-bar seam, while Briefing still reaches direct benchmark and sample-holding yfinance paths. `c0ba616..ba01e98` changes none of the UI, fixture, provider, configuration, or dependency paths; the page imports no TPR module. The same exact test passed immediately in isolation in 14.42 seconds. | Confirmed pre-existing out-of-lane test-isolation/reliability gap exposed by host cache/load conditions. Documented, not fixed, under the owner's target-only rule; route to the Trading App test lane. Keep the exact full-suite result explicitly red. Focused TPR validation is unaffected and no provider authority is granted. |
 | `TPR-OOL-011` | P2 | Shared test infrastructure: `tests/conftest.py`, runtime-stop leak attribution | `903a857` excludes an incident when its caller-supplied semantic `activated_at` predates pytest's session start. A newly written containment state can legitimately preserve an older activation time, including promotion of an existing local kill switch, so a probe that wrote the file now under the current base temp with `activated_at=2000-01-01T00:00:00+00:00` returned without assertion. Raw normalized-string `startswith` also treats a sibling base such as `pytest-123` as inside `pytest-12`. The guard can therefore miss this session's machine-global stop leak or blame another concurrent suite. | **Open and owner-routed.** Rejected as `TPR-CCR13-002`; do not fix shared test infrastructure from this target-only lane. The shared owner should snapshot baseline incident identities at session start, flag newly appearing incidents, and use component-aware path containment, with both counterexamples as regressions. Production remains fail-closed; the risk is undetected test contamination and operator-runtime availability, not an authority escape. |
 | `TPR-OOL-012` | P3 | Shared `docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md` identity table | The shared record says every code commit is an identical four-lane cherry-pick, while its own method section and this lane's section 39 correctly identify F-8 as a Target-Price-owned variant: main expects the `committed and clean` refusal and this advanced lane expects `no unique external review anchor`. | **Open and owner-routed.** This lane corrects only its own section 39 under `TPR-CCR13-003`; qualify the shared archive in its next owner-coordinated documentation change. The mismatch changes no code or authority. |
 | `TPR-OOL-013` | P3 | Shared `tests/test_shared_research_eol_attributes.py` name and documentation | The test named `working_copy_matches_its_index_blob` compares only the `i/` and `w/` line-ending classifications from `git ls-files --eol`; arbitrary different LF content still passes. It correctly detected this host's two stale CRLF ML-spec copies and the documented remove-plus-checkout recovery restored their exact blob hashes, but the broader byte-equality claim is weak test sensitivity. | **Open and owner-routed.** Section 39 is qualified under `TPR-CCR13-005`. Strengthen or rename the shared guard in the shared owner lane; do not edit it here. |
 
-### Current disposition index (successor qualification, 2026-09-06)
+### Current disposition index (successor qualification, 2026-10-02)
 
 The detailed rows above preserve discovery-time evidence and therefore contain
 historical present-tense routing that became stale. This index is the current
-answer after section 39's owner-directed integration; its exact closed/open sets
-are target-guarded so the historical prose cannot reopen a resolved item or hide
-a newly routed one.
+answer after the owner-directed integrations through section 41; its exact
+closed/open sets are target-guarded so the historical prose cannot reopen a
+resolved item or hide a newly routed one.
 
 | ID | Current disposition | Current basis |
 |---|---|---|
 | `TPR-OOL-001` | **Closed** | Owner-approved binary PDF storage; resolution row `TPR-OOL-001-R1`. |
 | `TPR-OOL-002` | **Closed** | Shared strategy README now includes the Target-Price lane; section 39. |
-| `TPR-OOL-003` | **Open** | Analyst loader duplicate-key handling remains owned by that lane. |
-| `TPR-OOL-004` | **Open** | Analyst four-slot preregistration re-freeze remains owned by that lane. |
+| `TPR-OOL-003` | **Closed** | Imported Analyst strict duplicate-key parsing and exact regression were independently reviewed and counter-reviewed. |
+| `TPR-OOL-004` | **Closed** | Imported Analyst ARV2-3Q-F freezes the reviewed four-slot `1/80` contract and tombstones `1/60`. |
 | `TPR-OOL-005` | **Closed** | Owner-directed Briefing smoke isolation; section 39. |
-| `TPR-OOL-006` | **Open** | Sibling multiplicity re-freezes and their reviews remain external gates. |
+| `TPR-OOL-006` | **Closed** | Imported Analyst, Insider, and Short-Interest four-slot re-freezes completed their independent review/counter-review loops; no outcome authority follows. |
 | `TPR-OOL-007` | **Closed** | Shared coordination pointer updated under the owner-directed integration. |
 | `TPR-OOL-008` | **Closed** | Shared exact-byte attributes and stale-checkout regression added; this host's two recurring ML-spec copies were repaired from exact index blobs during section 40 validation. |
 | `TPR-OOL-009` | **Closed** | Sleeve evaluation clock is injected and the notification cycle passes its own instant; section 39. |
@@ -604,6 +624,7 @@ known.
 | 2026-09-03 | Claude review | `1981233424f25b48ebec2273fa4822c249e2a041..49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review round; no milestone in range | Reviewed both commits individually and the cumulative tree, and verified all five stated claims. Found one P2 and one P3, both about evidence provenance rather than conclusions: the round recorded a complete-suite run it did not perform, and it asserted a bundled-Poppler page render as a host-independent fact. Advanced the six current pointers and the guard so this Claude round does not repeat the `TPR-CCR12-001` defect it reviewed. No product, spec, artifact, gate, or authority changed. | Independent complete suite on the exact reviewed tip `49caa886`: **6,919 passed, 13 skipped, 3 failed, 25 warnings in 4,208.43s**, reproducing the recorded counts exactly with the same three out-of-lane `TPR-OOL-009` failures and no target failure. Target suite **253 passed, 3 skipped**; shared plus target document guards **87 passed**; both reproduce the recorded counts. Final-tree evidence is in section 38.6. Four mutations on the advanced guard each turned it red with byte-identical restores returning it green. Committed blobs for all four changed files verified pure LF. Provider/outcome accesses **0**; authorized/spent looks **0**. | Both commits accepted, the second after correction. No P0 and no P1. `TPR-CR13-001` (P2) and `TPR-CR13-002` (P3) closed by correction and qualification. The open register remains exactly the six section 8 findings, including inherited P1 `TPR-CCR10-012`/`TPR-CCR10-013`. Details in section 38. | None. No key, signed anchor, positive registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Codex counter-reviews the exact new Claude correction range beginning after `49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3`. No next milestone is authorized; TPR-TR0-I stays blocked by `TPR-CCR10-012`, `TPR-CCR10-013` and `TPR-CCR10-016`, and TPR-1 and TPR-0B remain blocked. |
 | 2026-09-06 | Codex counter-review | `49caa886a63c4a24b6be0a4d8dbd71d9d95e9ad3..d54ce1b2c6816532ef82906c49998a93574172fc` reviewed; this correction commit follows | Counter-review one Claude correction plus the subsequent owner-directed integration/main-merge interval; no feature milestone | Distinguished 25 first-parent lane commits from 16 commits inherited only through the main merge, reviewed and dispositioned every one, verified the merge resolution and stable patch identities, corrected the lane's current routing/OOL disposition state/integration wording/EOF hygiene, and added guards for the exact mixed-role range and current OOL index. This successor row closes the missing section-10 interval; section 39 retains its detailed integration evidence. | On the received tree, the changed focused set was **452 passed, 3 skipped, 2 failed in 150.29s**; both failures were the expected stale-CRLF ML-spec working copies. The documented bounded remove-plus-checkout repair restored exact index-blob hashes without a Git diff, after which the EOL module was **7 passed in 1.55s**. Exact correction-tree and complete-suite validation follows in section 40. Provider/outcome accesses **0**; authorized/spent looks **0**. | Cumulative range rejected because `903a857` / inherited twin `f476467` contains open shared P2 `TPR-CCR13-002` (`TPR-OOL-011`). `TPR-CCR13-001`, `003`, and `004` close in this record correction; `TPR-CCR13-005` routes shared P3 `TPR-OOL-013`. The six lane-open findings remain unchanged. | None. No trust provisioning, positive registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority. | Stop before a feature milestone: the reviewed range is rejected, and independently the Action Plan still withholds milestone authority pending the two exact trust decisions and source-rights artifact. After this record-only correction is published, Claude reviews the Codex range beginning after `d54ce1b2`. |
 | 2026-09-06 | Codex validation | `059c93e73cc17b4bc0b01c1d14ab637acf285b7e` exact tested correction tree -> this validation-record commit | Counter-review validation only | Ran the complete repository suite on the exact committed counter-review correction, then appended only its measured result. No code, test, strategy artifact, or authority file changes in this successor. | **6,943 passed, 13 skipped, 25 warnings in 2,655.33s (44:15)** on Python 3.13.14 / pytest 9.1.1. Changed surface before commit: **456 passed, 3 skipped**; target document guard after the measured-record append: **21 passed in 4.32s**. Target compilation and diff hygiene pass. Provider/outcome accesses **0**; authorized/spent looks **0**. | No new finding. Cumulative received range remains rejected on owner-routed shared `TPR-OOL-011`; the lane's six open findings and all feature gates remain unchanged. | None. No key, trust artifact, positive registry authority, provider row, outcome, look, QC, broker, paper/live, capital, or trading authority. | Publish at most once for this Codex round, then Claude reviews the record-only Codex range after `d54ce1b2`. No feature milestone starts without both acceptance and explicit gate resolution. |
+| 2026-10-02 | Codex main synchronization | Pre-merge lane `e74da9ef34fac111cef838dbbe9814030daf3cf4` plus current main `9e834713cd8be0f184af730118199b2cab90336a` -> merge `6590d890509f75d8b7b87fa9b665b48fa1dbd0aa`; this record/guard candidate follows | Main synchronization and conflict resolution only; no feature milestone | Fetched and fast-forwarded the dedicated worktree to its remote lane, merged current main, resolved the sole textual conflict in the Action Plan as the safe union of the newer Target-Price block and main's Insider amendment, preserved the auto-merged shared handoff, and reconciled imported closure evidence for `TPR-OOL-003`, `004`, and `006`. Section 41 records exact topology and exclusions. | On exact merge tree `6590d890`: broad focused set **349 passed, 1 skipped, 14 failed in 16.65s**; all 14 failures are the host-incompatible frozen Windows Git executable in `test_preregistration.py`, not changed by the merge. Green conflict/document/import subset **268 passed, 1 skipped in 13.12s**; exact imported closure regressions **7 passed in 0.78s**; repository compileall exit 0; artifact hashes, ancestry, diff hygiene, and conflict-marker checks pass. Python 3.12.14 / pytest 9.1.1. Provider/outcome accesses **0**; authorized/spent looks **0**. | No new lane finding. `TPR-OOL-003`, `004`, and `006` close on imported independently reviewed/counter-reviewed corrections. `TPR-OOL-011`, `012`, and `013` remain open; the lane's six section-8 findings and every feature gate remain unchanged. | None. No key, trust artifact, positive registry authority, source right, provider row, outcome, look, QuantConnect job, broker, paper/live, capital, or trading authority. | Make this Codex round's one push, then Claude reviews the cumulative Codex range beginning after `d54ce1b2` through the pushed head, including merge `6590d890` and section 41. No feature milestone starts. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
@@ -4116,3 +4137,140 @@ policies or admit provider rights.
 No key, allowed-signers file, trust directory, rollback pin, positive registry
 entry, provider row, outcome, research look, QuantConnect job, broker action,
 paper/live operation, deployment, capital, or trading authority was created.
+
+## 41. Codex synchronization with current main - 2026-10-02
+
+### 41.1 Exact scope and topology
+
+The owner directed Codex to synchronize this Target-Price lane into its
+distinctive worktree and to resolve its conflict with `main` before any
+development resumed. That direction authorized branch synchronization and
+conflict resolution, not a feature milestone, provider or outcome access, a
+QuantConnect launch, or any operational or trading action.
+
+Codex resolved the branch through `git worktree list`, stayed on
+`codex/strategy-target-price-revisions`, fetched that exact remote branch, and
+fast-forwarded to pre-merge lane head
+`e74da9ef34fac111cef838dbbe9814030daf3cf4`. Current fetched `origin/main` was
+`9e834713cd8be0f184af730118199b2cab90336a`; their merge base was
+`df388ce64cd705f2ed26fab3442a0229f52a447b`. Merge
+`6590d890509f75d8b7b87fa9b665b48fa1dbd0aa` has exactly those lane/main
+parents in that order. The lane contains that exact main snapshot, and this
+record uses no live ahead/behind count that a later commit would invalidate.
+
+### 41.2 Overlap and conflict disposition
+
+The two histories' change sets overlapped on only two paths:
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md`. Git auto-merged
+the shared Session Handoff. The Action Plan was the sole textual conflict.
+The resolved union keeps:
+
+- main's owner-directed 2026-09-18 Insider-only paper-stage amendment;
+- the lane's newer 2026-09-04 Target-Price bounded-status block; and
+- the common four-slot multiplicity amendment that follows both.
+
+It discards main's stale 2026-08-30 Target-Price block rather than replacing
+the newer lane state. No conflict marker remains. Against its first parent,
+merge `6590d890` changes no Target-Price source, test, authority artifact,
+governing PDF, or lane record. The current concise 2026-10-02 Action Plan
+refresh is a successor owner-coordinated status correction, not hidden merge
+resolution or a new per-round shared handoff dependency.
+
+### 41.3 Imported out-of-lane closures
+
+The imported main history supplies the previously external corrections and
+their independent review loops, so three historical findings can now close
+without editing sibling strategy code from this branch:
+
+- `TPR-OOL-003`: Analyst commit
+  `e53ba26bec6f12861edeaff4383dce4db2ccd37e` makes both persisted JSON paths
+  use duplicate-key refusal and adds the exact two-path regression. Independent
+  review `37dc424fee28fd71fbd23951e267c6997088a889` accepts the commit, and Codex
+  counter-review `3aedfffc05a3108f554555d3d22d7b58d8299175` retains that disposition.
+- `TPR-OOL-004`: Analyst ARV2-3Q-F implementation
+  `89f385cd442ea16f39ae7599c738797c64a2fba1`, Claude correction/review
+  `64edf355cc5afce4df770100ef2772d024dc3649` and
+  `c83218c7583c9cbfc7840f02324a431ab00a33ad`, and Codex counter-review
+  `6baa13d2acbeac48e9dec3f81acbdeb1cae8c370` freeze the four-slot contract and
+  make the old `1/60` route superseded-unspent.
+- `TPR-OOL-006`: the same Analyst chain, Insider implementation/review/
+  counter-review `b3b202d2a8bf0ecc8a3613dcbfdb3690483ad767`,
+  `2c392cd30ce4979d4f36d0b6e1b8b7323f8bc6ef`, and
+  `726c4dcf85fd71e0e175e5e01be5f614c76dab66`, plus Short-Interest
+  implementation/review/counter-review
+  `66f0fef4ac66f7d8f8805fa02ec0b918fbb10463`,
+  `143b18859c923d183e657531d17d88833c995006`,
+  `35c467e53a788d7a6416ee22c1d2ad53901cd2b1`, and
+  `0ebce0132b4cc60e518dff089ab982be74f14e89`, with completion records
+  `d774195d4c62fc93c81e02b3887cd58bfa918629`,
+  `9047375ece396ce39c48dec088e233313446daa3`, and
+  `22a889d03879b74c09bbccc80c6d4ef07a061bcf`, establish all four permanent
+  `1/80` maxima, expiration without reallocation or denominator recomputation,
+  and zero outcome authority.
+
+Every named commit is an ancestor of imported main `9e834713`. Exact focused
+regressions for duplicate-key refusal, four-family arithmetic, and slot expiry
+pass on the merged tree. This closes the three routed defects; it does not
+create the future cross-lane completion receipt, authorize a look, or accept
+any changed strategy economics. The successor section-9 index therefore marks
+`TPR-OOL-001` through `TPR-OOL-010` closed and only `TPR-OOL-011`,
+`TPR-OOL-012`, and `TPR-OOL-013` open.
+
+### 41.4 Validation and exclusions
+
+- Broad focused merge-tree validation: **349 passed, 1 skipped, 14 failed in
+  16.65s** on Python 3.12.14 / pytest 9.1.1. All 14 failures are confined to
+  `tests/target_price_revisions/test_preregistration.py` and have one host
+  cause: the frozen production Git path
+  `C:\\Program Files\\Git\\cmd\\git.exe` cannot exist on this macOS host, so
+  positive external-review-anchor tests refuse with `review anchor Git
+  verification failed`. The merge changed neither that code nor those tests;
+  the failures are recorded, not weakened or treated as regressions.
+- The conflict/document/import subset that does not require that Windows-only
+  executable is **268 passed, 1 skipped in 13.12s**. The exact seven imported
+  closure regressions are **7 passed in 0.78s**.
+- On the successor record/guard tree before this evidence-only append, the
+  same broad focused set is **350 passed, 1 skipped, 14 failed in 15.99s**:
+  exactly one added merge guard passed and the same 14 host-incompatible tests
+  remained. The green conflict/document/import subset is **269 passed,
+  1 skipped in 12.50s**; the document plus active-document guard is **91 passed
+  in 1.38s**; and the seven imported closure regressions are **7 passed in
+  0.63s**.
+- Repository `compileall` over production, research, scripts, and tests exits
+  0. `git diff --check` is clean, current main is an ancestor of the merge,
+  both conflicted documents contain no marker, and the merge itself leaves
+  every Target-Price code/spec/test/record path unchanged from its first
+  parent.
+- The governing PDF remains
+  `f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b`;
+  the candidate remains
+  `17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a`;
+  the empty reviewed registry remains
+  `f7131a7c291dbeae988f769fe85b1e296c05bd6ba850e9007aefdddebbce31a5`;
+  source and look authority remain
+  `9d926482c563a5a4feeb49ed393d36502a383364b5705c2742d9db5be1faa46f`
+  and `0354c96d9e5e4b72400ee2e297e2ce01f3f5c650a87051db1210fd923abc19d6`.
+- No complete repository suite was run: the standing lane workflow assigns
+  that independent run to Claude. No backtest candidate existed, so no
+  QuantConnect launch attempt was made.
+
+### 41.5 Milestone, authority, and next review
+
+**No feature milestone resumed.** Main synchronization does not accept this
+Codex round and does not cure the still-open shared P2 `TPR-OOL-011` that
+caused section 40's cumulative disposition to remain rejected. Independently,
+TPR-TR0-I still lacks the approved rollback pin, protected parent custody, and
+complete adversarial matrix; TPR-1 still lacks a separately reviewed exact
+source-rights artifact; TPR-0B still lacks reviewed TPR-1/TPR-2 structural
+manifests.
+
+Claude next reviews the cumulative Codex range beginning after
+`d54ce1b2c6816532ef82906c49998a93574172fc` through the pushed head, including
+merge `6590d890`, this conflict disposition, the successor OOL closures, and
+the documentation guard. Codex then counter-reviews every Claude commit before
+any later owner-authorized milestone.
+
+No key, allowed-signers file, trust directory, rollback pin, positive registry
+entry, source right, provider row, outcome, research look, QuantConnect job,
+broker action, paper/live operation, deployment, capital, order, or trading
+authority was created.

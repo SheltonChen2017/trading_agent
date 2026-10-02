@@ -64,16 +64,18 @@ lane record. This sequencing entry grants no data, provider, outcome,
 research-look, QuantConnect job/upload/processing, account, broker,
 deployment, capital, live, order, or trading authority.
 
-**Current bounded status, 2026-09-04:** the lane's authoritative current state
+**Current bounded status, 2026-10-02:** the lane's authoritative current state
 is section 8 of
 `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md`;
-this block is a concise reference refreshed on owner direction and is no
-longer edited per review round. The fixed-slot v2.2 PDF and the TPR-0A
+this block is a concise reference refreshed on owner direction after the lane
+merged current `main` at `6590d890`, and is not edited per review round. The
+fixed-slot v2.2 PDF and the TPR-0A
 snapshot at `bb8dfb6` remain the zero-access frozen candidate: the
 reviewed-spec registry is the canonical empty v2 registry, the candidate is
 unreviewed for its own registry, and every empirical child field and
-source/look authority remains unbound or zero. The same-branch Claude-review /
-Codex-counter-review loop has run through 2026-09-03 (record sections 22-38).
+source/look authority remains unbound or zero. The latest completed
+target-lane counter-review is section 40; the main-synchronization round is
+recorded in section 41 and awaits independent Claude review.
 A non-authorizing TPR-TR0-I trust-root implementation candidate is
 checkpointed but incomplete: rollback/replay protection, parent-directory
 custody, and its adversarial validation matrix are open, and no key
@@ -85,9 +87,12 @@ owner-directed worktree rule remains: resolve this lane from
 milestone is authorized: TPR-1 is blocked on a separately reviewed exact
 source-rights artifact, TPR-0B waits for reviewed TPR-1/TPR-2 structural
 manifests, and all outcome access and every operational stage remain blocked.
-The four-slot multiplicity amendment is not yet re-frozen in the sibling lanes
-(`TPR-OOL-006`). The shared application/test defects this lane had documented
-were fixed under the owner-directed 2026-09-04 integration
+Imported, independently reviewed sibling-lane corrections close
+`TPR-OOL-003`, `TPR-OOL-004`, and the four-slot propagation finding
+`TPR-OOL-006`; they grant no outcome authority. The only current out-of-lane
+findings are `TPR-OOL-011` through `TPR-OOL-013`, as qualified in the lane
+record. The older shared application/test defects were fixed under the
+owner-directed 2026-09-04 integration
 (`docs/Archive/Review/BUG_FIX_INTEGRATION_2026-09-04.md`).
 
 **Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**
@@ -254,7 +259,7 @@ handoff. This count is a measured snapshot, not a permanent invariant.
 | LEV (TQQQ take-profit/re-entry) | Preregistration frozen 2026-08-19; LEV-1 algorithm merged after review; LEV-2..4 not started |
 | SBP (Strong-Buy portfolio) | **SUPERSEDED 2026-08-20** while still a draft; never adopted or frozen, so no evidence is affected. Retained in full |
 | Analyst Revisions V2 (ACER successor) | Priority 1. A strict V2 contract/safety candidate is implemented but unaccepted pending Claude's review of the exact pushed snapshot and Codex's counter-review of Claude's exact reviewed push. Production research-source authority remains zero-access: no authenticated production accepted event, signal/score, cross-section, nonempty portfolio, real-outcome run, or QC result exists. |
-| Target-Price Revisions (TPR) | Separate fourth lane on `codex/strategy-target-price-revisions`; current state is section 8 of `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md` (this row is a concise reference refreshed 2026-09-04 on owner direction, not a per-round pointer). The sole-authority v2.2 PDF and the TPR-0A snapshot at `bb8dfb6` encode the permanent-four-slot contract: total two-sided FWER `0.05`, permanent maximum `1/80` per named lane, expiration without redistribution for unused/withdrawn allocations, and a within-lane confirmatory sum ceiling of `1/80`. The reviewed-spec registry is the canonical empty v2 registry and the candidate grants zero authority. Same-branch review/counter-review rounds have run through 2026-09-03; a non-authorizing TPR-TR0-I trust-root checkpoint is incomplete, and no key provisioning or positive registry authority exists. Open findings (two inert P1s, `TPR-CCR5-004` P2, three others) are in the record's section 8 register; sibling changes remain on sibling branches (`TPR-OOL-006`). No next implementation milestone is authorized: TPR-1 is blocked on exact reviewed source rights; TPR-0B, all outcome access, and every operational/trading stage remain blocked. |
+| Target-Price Revisions (TPR) | Separate fourth lane on `codex/strategy-target-price-revisions`; current state is section 8 of `docs/Strategy Description/TARGET_PRICE_REVISION_IMPLEMENTATION_RECORD.md` (this row is a concise reference refreshed 2026-10-02 on owner direction, not a per-round pointer). The sole-authority v2.2 PDF and the TPR-0A snapshot at `bb8dfb6` encode the permanent-four-slot contract: total two-sided FWER `0.05`, permanent maximum `1/80` per named lane, expiration without redistribution for unused/withdrawn allocations, and a within-lane confirmatory sum ceiling of `1/80`. The reviewed-spec registry is the canonical empty v2 registry and the candidate grants zero authority. The latest completed target-lane counter-review is section 40; the current main-synchronization round is section 41 and awaits independent Claude review. A non-authorizing TPR-TR0-I trust-root checkpoint is incomplete, and no key provisioning or positive registry authority exists. Open lane findings (two inert P1s, `TPR-CCR5-004` P2, three others) are in the record's section 8 register. Imported reviewed sibling corrections close `TPR-OOL-003`, `TPR-OOL-004`, and `TPR-OOL-006`; only `TPR-OOL-011` through `TPR-OOL-013` remain open out of lane, with no authority consequence. No next implementation milestone is authorized: TPR-1 is blocked on exact reviewed source rights; TPR-0B, all outcome access, and every operational/trading stage remain blocked. |
 | MPQ / HPQ | Proposed plans, **on hold** by owner decision 2026-08-19 |
 
 The project has **zero confirmed predictive signals**. The reviewed Stage 0

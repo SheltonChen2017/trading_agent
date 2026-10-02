@@ -1,19 +1,21 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 121 RECORDS THE OWNER'S RESPONSE: THE HISTORICAL SCOPE
-OF 19,973 JOURNALED SEC REQUESTS, INCLUDING 372 PREVIOUSLY OMITTED
-STOPPED-RUN REQUESTS, IS UNCERTAIN AND NOT RETROACTIVELY CONFIRMED.
-UNDER THE OWNER'S DELEGATION, CODEX SELECTED A CONSERVATIVE VERSIONED
-IB-1C IDENTITY POLICY FOR FUTURE OFFLINE DESIGN; FROZEN V1 IS UNCHANGED,
-AND THE NEW POLICY IS NOT IMPLEMENTED OR INDEPENDENTLY REVIEWED. THE
-STRICT D23 82-QUARTER MASTER GATE STILL HAS SEVEN NONEXACT QUARTERS;
-ANY REPLACEMENT RULE OR V4 PATH REQUIRES A SEPARATE OWNER DECISION. THE
-STOPPED V3 ROOT REMAINS PRESERVED AT 1,846 OF 1,847 STARTS. ONLY 19,526
-OF THE FROZEN 99,394 TWO-QUARTER PARENTS ARE SOURCE-BOUND; 79,868 WERE
-ORIGINALLY UNATTEMPTED. COUNTER-REVIEW COMMIT `0d4b836` AND THIS RECORD
-REMAIN LOCAL AND UNPUSHED; THE ONE-SHOT MONITOR IS PAUSED. NO NEW SOURCE,
-PROVIDER, LICENSED-ROW, OUTCOME, QC, BACKTEST, BROKER, CAPITAL, ORDER,
-PAPER/LIVE, DEPLOYMENT OR TRADING AUTHORITY IS GRANTED. LOOKS 0/0/0.**
+Status: **SECTION 122 RECORDS THE READ-ONLY OWNER-DIRECTION AUDIT AND
+THE DISPOSITION OF ITEMS 1-4. THE HISTORICAL SCOPE OF 19,973 JOURNALED
+SEC REQUESTS, INCLUDING 372 OMITTED STOPPED-RUN REQUESTS, REMAINS
+UNCONFIRMED: NO ORIGINAL HUMAN APPROVAL FOR THOSE THREE STOPPED ROOTS
+WAS LOCATED. THIS IS NOT A FINDING THAT THEY WERE UNAUTHORIZED. THE
+CONSERVATIVE VERSIONED IB-1C IDENTITY RULE REMAINS A SPECIFICATION,
+NOT AN IMPLEMENTED OR REVIEWED PARSER; FROZEN V1 IS UNCHANGED. STRICT
+D23 RETAINS SEVEN NONEXACT QUARTERS AND WITHHOLDS THE 82-QUARTER DIGEST.
+V4 HAS OFFLINE DESIGN ACCEPTANCE CRITERIA BUT NO IMPLEMENTATION OR
+DISPATCH. THE STOPPED V3 ROOT REMAINS PRESERVED AT 1,846 OF 1,847
+STARTS. ONLY 19,526 OF 99,394 FROZEN TWO-QUARTER PARENTS ARE
+SOURCE-BOUND; 79,868 WERE ORIGINALLY UNATTEMPTED. THE CODEX
+COUNTER-REVIEW AND OWNER-RESPONSE COMMITS REMAIN LOCAL AND UNPUSHED;
+THE ONE-SHOT MONITOR IS PAUSED. NO NEW SOURCE, PROVIDER, LICENSED-ROW,
+OUTCOME, QC, BACKTEST, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT
+OR TRADING AUTHORITY IS GRANTED. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -15829,3 +15831,141 @@ or repository suite, make an SEC/provider request, use licensed rows,
 consume a look, or launch QC/backtest/trading. No commit or push of this
 section is implied until the final root/branch/HEAD/status and staged-diff
 checks complete; any commit remains local while the owner gates are open.
+
+## 122. Items 1-4: authorization audit and offline dispositions (2026-10-02 owner-local date; local only)
+
+The owner then said **"ok, proceed to finish 1-4."** This directs completion
+of the bounded audit, conservative policy choice and recommendations in
+section 121. It does not itself supply missing historical instructions,
+ratify a prior request, authorize a new SEC/provider/credential/licensed-row
+request, waive a source/rights/PIT/mapping/QC/registered-look gate, or permit
+an outcome look or backtest. At the start of this check, the designated
+worktree was clean at local `6c71f851b762e330bc56b8e9169ac142be05afd9`,
+two commits ahead of fetched matching remote `d6242f9dc291804493aefbd8c573d04f94cf1704`,
+on `codex/strategy-insider-buying`. No branch, worktree, source root or
+shared/project-wide document was changed.
+
+### 122.1 Item 1 — historical SEC-request authorization audit
+
+Codex compared the original human directions available in this task with
+the section-119.3 journal inventory, rather than treating an agent-authored
+decision or retrospective ledger entry as an owner authorization. The
+closest original human turns are:
+
+| Human direction | What it establishes | What it does not establish |
+|---|---|---|
+| 2026-09-29 06:37:50 UTC, turn `01a0ebe2-4724-7991-8875-7c0aa74e5534`: "build 1-5. all previous rules apply"; Claude to review after implementation | Direction to work on the preceding five-gate plan under existing rules | No enumeration or express approval of the later `masters`, `masters-v2` or `selected-parents-v1` stopped requests |
+| 2026-09-30 07:05:58 UTC, turn `01a0f122-65bb-7653-8d57-741651c0b0c7`: "another lane has been doing everything you specified here. so proceed" | Permission to proceed in the then-current bounded lane context | No specific authorization of the three earlier omitted stopped roots or their restart downloads |
+| 2026-09-30 15:29:28 UTC, turn `01a0f2ef-5c67-7d43-8997-30986aa3129e`: "yes, authorized" | The later one-shot ambiguous-v3-parent diagnostic described in section 118 | No retrospective authorization of the earlier 372 requests |
+
+The three previously omitted roots are `masters` **24**, `masters-v2`
+**41**, and `selected-parents-v1` **307**, totaling **372** journaled SEC
+requests. The restarted runs downloaded **65** masters and **307** selected
+parents again; those are **372 of the 374** repeated requests in section
+119.3. Sections D30 and D37 and the retrospective section-5 rows record
+agent decisions and observed activity, not original human permission. No
+original human direction available to this audit names or clearly covers
+these three stopped roots, their duplicate downloads or their restart
+decision. The evidence supports **authorization provenance not
+established**, not a claim that the requests were unauthorized, and not
+retroactive approval. The audit is limited to available task messages and
+lane records; an unlinked earlier direction could change the historical
+classification if supplied and verified. `IBREC-CR01` stays **P3 OPEN**.
+
+### 122.2 Item 2 — delegated IB-1C identity policy, still offline only
+
+Section 121.1 is the selected conservative rule. The v1 IB-1C source
+validator, the scale-readiness check and pilot contracts all contain strict
+identity/year guards. The source validator inspects all six ownership-form
+classes, so the **15** accession-year disagreements matter to its stated
+quarter contract; **13** are Form 4/4-A. The 146 short-CIK rows and all
+15 accession-year disagreements remain in raw coverage accounting. Any
+future v2 must preserve a raw 1-to-10-digit nonzero ASCII issuer CIK and
+use zero-padding only as an independently corroborated comparison key;
+it must preserve the accession text and quarantine an uncorroborated
+year mismatch without dropping, rewriting or promoting the row. The
+quarter digest remains withheld when identity is unresolved. A versioned
+schema/evidence epoch, synthetic refusal and acceptance tests, real-source
+corroboration and independent Claude review are prerequisites to closing
+`IB1C-REAL-CR01` **P2 OPEN**. No v1/pilot/scale parser or evidence was
+edited, so this item is a documented policy decision, not a completed
+source-only or canonical IB-1C dataset.
+
+### 122.3 Item 3 — strict D23 master reconciliation retained
+
+The owner's instruction to proceed is applied conservatively: **retain**
+the current exact 82-quarter comparison and do not create an exception
+for any of the seven nonexact quarters. The read-only comparison remains
+**12 missing, 3 extra and 2 filing-date conflicts** across the affected
+quarters. No 82-quarter digest or promotion follows. `IBSRC-CR01` and
+`IBSRC-CCR01` remain **P2 OPEN** pending independent accession/date/source
+adjudication and any separately preregistered versioned rule the owner
+later chooses. The frozen 2022Q4-2023Q1 denominator and separate
+two-quarter source-only inventory are not redefined by this decision.
+
+### 122.4 Item 4 — v4 offline design acceptance criteria, no launch
+
+The recommended v4 path is a **separately versioned offline custody and
+continuation design**, not an observed source root or dispatch approval.
+Before any implementation could claim a safe plan, it would have to:
+
+1. Replay the exact old roots and request-bound reports read-only, retaining
+   the originally unresolved v3 start and the separately accepted
+   7,373-byte diagnostic as different evidence. Preserve the stopped v3
+   root and its 1,846 completed starts without resuming or rewriting it.
+2. Prove a disjoint, ordered partition of the frozen 99,394 locators:
+   **9,539 prior completed + 1 offline-corrected diagnostic + 8,139
+   selected reuse + 1,846 v3 completed + 1 separately accepted diagnostic
+   + 79,868 originally unattempted = 99,394**. Reject a missing, extra,
+   duplicated or reordered ordinal; a changed source blob or report; and
+   a proposed redispatch of completed or ambiguous requests.
+3. Bind historical replay to the **exact committed validator code**, not
+   only a receipt literal or the current source bytes, for the four v3
+   custody files: `insider_buying_sec_all_form4_parent_recovery_union.py`,
+   `insider_buying_sec_all_form4_parent_recovery_campaign.py`,
+   `sec_complete_submission.py`, and `sec_raw_parent_projection.py`.
+   Do not edit those four current-byte-hashed files in place.
+4. Version any future plan, receipt and evidence epoch; inventory dispatch
+   eligibility only for the **79,868 originally unattempted** parents;
+   demonstrate synthetic fail-closed cases for hash drift, ambiguous-start
+   redispatch, diagnostic mismatch, and 79,867/79,869 counts. Keep all
+   outputs source-only, noncanonical and explicitly not PIT, official
+   acceptance/publication, rights-cleared, QC-ready or backtest-ready.
+
+These are review criteria, not an implemented v4 contract. In particular,
+no plan/root implying observed capture was created and no new SEC request
+was dispatched. `IB1BCAMP-CR01` remains **P2 OPEN**. A later actual source
+continuation would also require fresh bounded scope/contact/capacity,
+rights and factual-gate approval and could not duplicate any completed or
+ambiguous request. The historical-scope uncertainty in 122.1 stops this
+round before that next milestone and before the single end-of-round push.
+
+### 122.5 Disposition, validation and owner action
+
+Items 2 and 3 have conservative policy dispositions; item 4 has explicit
+offline acceptance criteria; item 1's **audit is complete with an
+unestablished-provenance result**, not an authorization confirmation.
+All incoming Claude commits and their P0-P3 dispositions remain in
+sections 119-120; this section neither reopens resolved findings nor
+closes the open P2/P3 gates. The pending Codex commits and this record
+remain local; the one-shot Claude-review monitor stays paused. No complete
+lane or repository suite was run. The active-document and Insider
+implementation-record checks passed **71/71**; the exact Insider package
+guard plus the lane-local import-boundary checks passed **4/4**; `git diff
+--check` was clean. This is a documentation-only change, so no source
+compilation or red/green production test was applicable. There was no
+SEC/provider/credential or licensed-row access, QC upload/job, registered
+or outcome look,
+historical backtest, broker/operator-database/scheduler, capital, order,
+paper/live, deployment or trading action. **Looks 0/0/0.**
+
+**Owner action needed before the next milestone or push:** supply the
+original direction(s), if any, that covered the `masters` 24,
+`masters-v2` 41 and `selected-parents-v1` 307 requests and restart
+downloads; **or** explicitly accept "historical authorization provenance
+not established" as the final record classification and give a fresh,
+separately bounded *prospective* direction for any further offline
+implementation. The latter would not ratify prior requests or authorize
+source dispatch. Until then, retain the strict D23 refusal, frozen v1,
+stopped v3, 99,394 denominator and 79,868 unattempted inventory; do not
+push or start v4 acquisition or a backtest.

@@ -69,10 +69,15 @@ _ENCODE_RUNTIME_STOP_INCIDENT = __import__("json").JSONEncoder(
     sort_keys=True, separators=(",", ":"), allow_nan=False
 ).encode
 # Bound once at import for the same reason as the decoder: this guard runs in
-# EVERY test's teardown, including tests that replace ``builtins.open`` and
-# ``Path.open`` with a must-not-run sentinel to prove a zero-I/O contract (the
-# insider SEC raw-parent projection test).  Raw descriptors consult neither.
+# EVERY test's teardown, including tests that leave ``builtins.open``,
+# ``Path.open``, or ``os.open`` replaced by a must-not-run sentinel (zero-I/O
+# and refuse-before-action contracts) or ``os.name`` patched to ``"nt"``
+# (Windows-branch tests).  Raw descriptors consult none of those names, and
+# ``os.path`` is the platform module object fixed at import, so string path
+# arithmetic here never goes through the ``os.name``-dependent ``Path()``
+# factory.
 _OS_OPEN, _OS_READ, _OS_CLOSE = os.open, os.read, os.close
+_OS_PATH = os.path
 _RUNTIME_STOP_READ_FLAGS = os.O_RDONLY | getattr(os, "O_BINARY", 0)
 _RUNTIME_STOP_SESSION_FILE: Path | None = None
 _RUNTIME_STOP_PREEXISTING: dict[str, tuple[str, str]] = {}
@@ -90,20 +95,35 @@ def _read_runtime_stop_bytes(stop_file: Path) -> bytes:
     return b"".join(chunks)
 
 
-def _observe_runtime_stop() -> tuple[
-    Path, dict[str, tuple[str, str]], tuple[str, str] | None
-]:
-    """Read only; absence is empty, inability to inspect is not proof of no leak."""
+def _canonical_origin(origin: str) -> str:
+    return _OS_PATH.normcase(_OS_PATH.realpath(origin))
+
+
+def _origin_is_within(origin: str, base: str) -> bool:
+    """Path-component containment: ``pytest-123`` is not under ``pytest-12``."""
+    try:
+        return _OS_PATH.commonpath([origin, base]) == base
+    except ValueError:  # different drives or mixed absolute/relative on Windows
+        return False
+
+
+def _resolve_runtime_stop_file() -> Path:
     import assistant.dispatch_fence as dispatch_fence
 
     try:
-        stop_file = (
+        return (
             dispatch_fence._canonical_runtime_root()
             / dispatch_fence._STATE_DIRECTORY_NAME
             / dispatch_fence._EMERGENCY_STOP_FILE_NAME
         ).resolve()
     except Exception as exc:
         raise AssertionError("runtime-stop leak guard cannot resolve its root") from exc
+
+
+def _observe_runtime_stop(stop_file: Path) -> tuple[
+    Path, dict[str, tuple[str, str]], tuple[str, str] | None
+]:
+    """Read only; absence is empty, inability to inspect is not proof of no leak."""
     try:
         text = _read_runtime_stop_bytes(stop_file).decode("utf-8")
     except FileNotFoundError:
@@ -131,7 +151,7 @@ def _observe_runtime_stop() -> tuple[
             ):
                 raise ValueError("invalid or duplicate incident identity")
             incidents[identifier] = (
-                os.path.normcase(str(Path(origin).resolve())),
+                _canonical_origin(origin),
                 _ENCODE_RUNTIME_STOP_INCIDENT(incident),
             )
         last_clear = state.get("last_clear")
@@ -154,7 +174,9 @@ def _capture_runtime_stop_session_baseline() -> None:
     """Capture once before collection/tests, never lazily exempt a new incident."""
     global _RUNTIME_STOP_SESSION_FILE, _RUNTIME_STOP_PREEXISTING
     global _RUNTIME_STOP_PREVIOUS_CLEAR
-    stop_file, incidents, last_clear = _observe_runtime_stop()
+    stop_file, incidents, last_clear = _observe_runtime_stop(
+        _resolve_runtime_stop_file()
+    )
     _RUNTIME_STOP_SESSION_FILE = stop_file
     _RUNTIME_STOP_PREEXISTING = dict(incidents)
     _RUNTIME_STOP_PREVIOUS_CLEAR = last_clear
@@ -197,14 +219,28 @@ def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
     Missing baseline, unreadable state, and invalid inventory fail visibly.
     The guard never mutates the file: operator runtime state is not cleanup.
 
+    The file read here is the one baselined at configuration.  The root is
+    re-resolved only to refuse a redirected root that has no baseline; when a
+    test leaves ``os.name`` or the platform patched so that resolution itself
+    fails, the baselined real file is still the right one to read.
+
     Because it runs in fixture teardown, a leak is reported by pytest as an
     ERROR at teardown of the offending test, not as a FAIL: the test's own
     assertions may still show passed.
     """
     global _RUNTIME_STOP_PREVIOUS_CLEAR
-    stop_file, incidents, last_clear = _observe_runtime_stop()
-    assert stop_file == _RUNTIME_STOP_SESSION_FILE, (
+    assert _RUNTIME_STOP_SESSION_FILE is not None, (
         "runtime-stop leak guard has no session baseline for this root"
+    )
+    try:
+        current_file = _resolve_runtime_stop_file()
+    except AssertionError:
+        current_file = None
+    assert current_file is None or current_file == _RUNTIME_STOP_SESSION_FILE, (
+        "runtime-stop leak guard has no session baseline for this root"
+    )
+    stop_file, incidents, last_clear = _observe_runtime_stop(
+        _RUNTIME_STOP_SESSION_FILE
     )
     cleared_id = (
         last_clear[0]
@@ -215,10 +251,10 @@ def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
         if incidents.get(identifier) != content or identifier == cleared_id:
             del _RUNTIME_STOP_PREEXISTING[identifier]
     _RUNTIME_STOP_PREVIOUS_CLEAR = last_clear
-    session_base = Path(os.path.normcase(str(tmp_path.parent.resolve())))
+    session_base = _canonical_origin(str(tmp_path.parent))
     leaked = [
         origin for identifier, (origin, content) in incidents.items()
-        if Path(origin).is_relative_to(session_base)
+        if _origin_is_within(origin, session_base)
         and _RUNTIME_STOP_PREEXISTING.get(identifier) != (origin, content)
     ]
     assert not leaked, (

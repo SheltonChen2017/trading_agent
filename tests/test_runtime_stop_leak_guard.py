@@ -95,11 +95,18 @@ def test_guard_captures_once_before_collection_without_a_lazy_rebaseline(
 
 
 def test_guard_reports_an_unresolvable_root(runtime_guard, monkeypatch, tmp_path):
-    guard, _ = runtime_guard
+    """Resolution matters at baseline; afterwards the baselined file is read."""
+    guard, root = runtime_guard
     def unresolved():
         raise RuntimeError("fixture root refusal")
     monkeypatch.setattr(dispatch_fence, "_canonical_runtime_root", unresolved)
     with pytest.raises(AssertionError, match="cannot resolve"):
+        guard._capture_runtime_stop_session_baseline()
+    # A root that cannot be resolved at teardown does not blind the guard:
+    # the baselined real file is what it reads.
+    guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+    _write_stop(root, str(tmp_path.parent / "late_test0" / "assistant.db"))
+    with pytest.raises(AssertionError, match="REAL runtime emergency stop"):
         guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
 
 
@@ -333,5 +340,27 @@ def test_guard_does_not_consult_monkeypatched_open(tmp_path, runtime_guard, monk
     _write_stop(root, str(tmp_path.parent / "leaking_test0" / "assistant.db"))
     monkeypatch.setattr(builtins, "open", forbidden)
     monkeypatch.setattr(Path, "open", forbidden)
+    with pytest.raises(AssertionError, match="REAL runtime emergency stop"):
+        guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+
+
+def test_guard_survives_windows_name_and_os_open_left_patched(tmp_path, runtime_guard, monkeypatch):
+    """Windows-branch tests leave ``os.name == "nt"`` and an ``os.open`` sentinel.
+
+    Under that state ``Path()`` cannot be instantiated on a POSIX host and the
+    runtime root cannot be re-resolved.  The guard must stay quiet on absent
+    state and still attribute a real leak.
+    """
+    import os as os_module
+    guard, root = runtime_guard
+    def forbidden(*args, **kwargs):
+        raise AssertionError("os.open must not run")
+    with monkeypatch.context() as patched:
+        patched.setattr(os_module, "name", "nt")
+        patched.setattr(os_module, "open", forbidden)
+        guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)
+    _write_stop(root, str(tmp_path.parent / "windows_branch_test0" / "assistant.db"))
+    monkeypatch.setattr(os_module, "name", "nt")
+    monkeypatch.setattr(os_module, "open", forbidden)
     with pytest.raises(AssertionError, match="REAL runtime emergency stop"):
         guard._assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path)

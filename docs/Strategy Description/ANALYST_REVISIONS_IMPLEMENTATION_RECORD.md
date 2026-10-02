@@ -252,6 +252,10 @@ shared weekly forward clock/execution policy with a no-order matched-arm
 binding diagnostic. It freezes preparation choices before future outcomes;
 independent input provenance, executable selection/weights, actual fills,
 the formal protocol, evidence epoch and paper authority remain open.
+Section 230 is Claude's independent review of `7cbbe01..6b93020` (0 P0,
+0 P1, 0 P2, 1 P3): Codex's exact-byte checkout fix (`ARV2CR229-001`, a
+miss in earlier reviews) and the forward execution diagnostic are accepted,
+and the test-only `7ef4718` extends the checkout regression to every lane JSON.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1034,11 +1038,13 @@ pushed range `377741c..52f6608` (section 227), with the test-only
 correction `e76d074`. Section 229 accepts both Claude commits and freezes a
 shared weekly schedule, prior-session closing-price clock and declared
 execution settings; its diagnostic binds three supplied arm configurations
-to the recomputed common input. Claude must review section 229 and its
-exact pushed source/test/record snapshot independently as the immediate
-next step. After a new complete review push and Codex counter-review,
-independent security-master, own-ETF, vendor, score and price provenance
-must be bound before the no-order selector can become decision-ready.
+to the recomputed common input. Section 230 is Claude's independent review
+of the exact pushed range `7cbbe01..6b93020` (section 229), with the
+test-only correction `7ef4718`. The immediate next step is that Codex
+counter-reviews section 230 and both Claude commits of this round. After
+that, independent security-master, own-ETF, vendor, score and price
+provenance must be bound before the no-order selector can become
+decision-ready.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -1052,7 +1058,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 227 (section 228). Section 182 records the owner's exact
+the pushed range through section 229 (section 230). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -2804,6 +2810,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-01 | Codex section-226 counter-review and declarative future selection/fallback freeze | `377741c` -> this round's final record commit | Section 227 accepts both Claude commits, including the `ARV2R226-001` test correction, and freezes one adaptive, outcome-free forward rule child; zero QC/provider calls, outcomes, looks, evaluations, cells or orders; floor 298/233/40/699. | Distinct future hybrid: 25% name-count/cap-covered floors and five-name admission with a stricter 95–105% complete-book interval, cap-ranked/count-matched AR-on holdings, AR-off cap-only control, XLE cap-only entry, conditional exact-SID QCOM, own-ETF fallback and explicit false action authority. It is not an exact R232/R237 replay or an executable selector. | Focused policy/closure 114 passed; affected policy, input, snapshot, closure, dataset/ML import and record selection 526 passed; compilation and diff clean. No complete Codex lane suite. | No new defect in the two Claude commits. `ARV2D227-001` P3 initial QC-SID tie-break corrected to mapped security ID before push. Independent security names, own-ETF identity, vendor first-publication/crosswalk, scored input, execution, formal protocol, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 227 and the exact child/source/test/record snapshot before another Codex milestone. No paper/live/funded/broker/real-order authority. |
 | 2026-10-02 | Claude independent review of section 227: the counter-review of section 226 and the forward stock-selection/fallback freeze | `52f6608` -> `e76d074` -> this record commit | Section 228: one commit `377741c..52f6608` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 226 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned eight parent-verification conditions (`e76d074`, test-only, each red with its condition removed); verified the policy against the historical gate; section 4 names section 228, banner sentence added, this row appended; no production line changed | Required gates and policy tests at the pushed head, standing lane selection in a byte-faithful export of `52f6608` (six file groups after two interrupted runs), twenty-two mutation trials, `compileall`, `git diff --check`; exact counts in 228.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R228-001`): eight untested parent conditions (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 228 |
 | 2026-10-02 | Codex section-228 counter-review and common forward clock/execution binding diagnostic | `7cbbe01` -> this round's final record commit | Section 229 accepts both Claude commits and freezes one common preparation policy plus a three-arm no-order binding check; zero QC/provider calls, outcomes, orders, looks, evaluations or cells; floor 298/233/40/699. | Weekly first NYSE session, 09:20 New York input cutoff, same-session open-plus-one-minute planned order start, immediately prior-session closing-price clock and identical USD 1 million initial all-cash state, declared sizing and cost rules; recomputed input and per-arm configuration authentication. Lane-local JSON attributes preserve the parent and child byte pins. | Focused validation and exact final-tree results in 229.3; no complete Codex lane suite. | No new defect confirmed in the two Claude commits. Existing parent-lineage checkout defect `ARV2CR229-001` P2 corrected. Independent source/security/score/price provenance, executable selector/weights, actual execution parity, formal protocol, evidence, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 229 before the next Codex round. No paper/live/funded/broker/real-order authority. |
+| 2026-10-02 | Claude independent review of section 229: the counter-review of section 228, the exact-byte checkout rule, and the forward execution clock | `6b93020` -> `7ef4718` -> this record commit | Section 230: one commit `7cbbe01..6b93020` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 228 accepted, including `ARV2CR229-001`, a miss in earlier reviews; zero QC or provider calls, looks, evaluations, or cells | Extended the checkout regression to every tracked lane JSON (`7ef4718`, test-only, red under a narrowed attribute); reproduced the CRLF hash breakage; section 4 names section 230, banner sentence added, this row appended; no production line changed | Required gates and new tests at the pushed head, standing lane selection in a byte-faithful export of `6b93020` (six parallel file groups), twenty-three mutation trials, a scratch-repository attribute trial, `compileall`, `git diff --check`; exact counts in 230.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R230-001`): checkout regression scoped to five of 27 protected files (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 230 |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -32771,3 +32778,140 @@ its exact pushed source/test/record snapshot. Codex then counter-reviews
 each new Claude commit before one further bounded readiness step. The
 existing monitor stays active and quiet until a new complete review push;
 it does not reprocess section 228 or this Codex implementation push.
+
+## 230. Independent Claude review of section 229: the counter-review of section 228, the exact-byte checkout rule, and the forward execution clock, 2026-10-02
+
+**Range reviewed:** `7cbbe01..6b93020`, one Codex commit in one push,
+disposed in 230.1, plus this round's Claude lane commits (the test-only
+`7ef4718` and this record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called, and section 229 records none; the floor stays **298 / 233 / 40 /
+699**.
+
+**Codex's counter-review of section 228 (section 229) is accepted, including
+`ARV2CR229-001`, which my earlier reviews missed.** The lane's hash-pinned
+JSON files had no Git text attribute. Rewriting each line ending as CRLF, as
+a Windows `core.autocrlf=true` checkout does, reproduces the recorded wrong
+hashes exactly: the stock-selection policy becomes `9a4304eb…` instead of
+`b691699b…`, and the construction policy `9e491678…` instead of `7f1dbfe5…`.
+26 of the lane's 27 JSON files contain a newline, so every hash-pinned
+manifest, not only the forward policies, would have refused on such a
+checkout. Sections 222 and 228 accepted these files without checking how
+they survive checkout. Codex's lane-local `*.json -text` attribute fixes all
+of them; `ARV2D229-001`'s caller-mutation fix is also confirmed (`EX12`).
+
+**Verdict.** The one commit is accepted after correction; none is rejected.
+**0 P0, 0 P1, 0 P2, 1 P3.** No production line changed in this round; the
+test-only `7ef4718` extends the checkout regression to every tracked lane
+JSON. The required gates and the new tests pass at the pushed head, and
+section 229's banner sentence, ledger row and section-4 pointer are
+present.
+
+### 230.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `6b93020` | Section 229 counter-review; the lane `.gitattributes` and checkout regressions; the forward execution policy, its matched-arm diagnostic, tests and closure registration | accepted after correction | The attribute fix is right and lane-local; the root attributes are untouched. The diagnostic requires the first NYSE session of the ISO week, computes the 09:20 cutoff, the open-plus-one-minute order start and the exact prior close including early closes, recomputes the common predecision input from source bytes after copying the caller's inputs, requires an exact three-arm configuration, and binds all of it into one digest. It emits no holdings, weights, quantities or orders, and every capability is false. Every reachable guard is caught by a named test (230.3). The checkout regressions covered only five of the JSON files the attribute protects (`ARV2R230-001`, pinned in `7ef4718`). |
+
+### 230.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R230-001` | P3 | `6b93020` | The `*.json -text` attribute protects all 27 lane JSON files, and 26 of them contain a newline, but the checkout tests check only the four forward-policy parents and the new execution child. In a scratch Git repository built from the export, narrowing the attribute to exactly those five files left all five tests green while the other 21 hash-pinned manifests lost their protection. | Corrected in `7ef4718` (test-only): the text attribute must be unset for every tracked lane JSON; under the narrowed pattern the new test is the only failure. |
+
+### 230.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Required gates, the execution, checkout and stock-selection tests at the pushed head `6b93020` (worktree) | 502 passed |
+| CRLF reproduction | LF to CRLF rewriting gives `9a4304eb…` for the selection policy and `9e491678…` for the construction policy, exactly as section 229 records |
+| Attribute scope | `git check-attr` reports `text: unset` for old manifests and the new child alike; 26 of 27 lane JSON files contain a newline |
+| Checkout tests in a Git-less export | all five fail, as `git` cannot run there; they pass in the checkout and join the standing export-only set |
+| Look floor | unchanged at 298/233/40/699 |
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `EX1` | first-weekly-session refusal removed | red: 1 failed | `test_holiday_weekend_nonweekly_and_noncanonical_date_refuse[…NOT_FIRST…]` |
+| `EX2` | NYSE-session refusal removed | red: 2 failed | `test_holiday_weekend_nonweekly_and_noncanonical_date_refuse[…NOT_NYSE…]`, both cases |
+| `EX3` | empty prior-session refusal removed | green | none; unreachable: a 31-day lookback before any NYSE session always contains a prior session |
+| `EX4` | decision cutoff moved to 09:21 | red: 8 failed | `test_calendar_true_weekly_holiday_dst_and_prior_early_close[…]` |
+| `EX5` | orders start at the open, not one minute after | red: 8 failed | same |
+| `EX6` | prior-close price clock refusal removed | red: 3 failed | `test_old_or_just_wrong_prior_price_clock_refuses[…]` |
+| `EX7` | exact arm-configuration match removed | red: 47 failed | `test_each_arm_field_drift_refuses[…]` and others |
+| `EX8` | configuration pin mismatch admitted | red: 1 failed | `test_config_byte_pin_type_duplicate_nonfinite_refusals[…]` |
+| `EX9` | configuration canonical-bytes check removed | red: 3 failed | same test, duplicate and non-finite cases |
+| `EX10` | input key-set check removed | red: 2 failed | `test_forged_report_unknown_input_and_numeric_alias_refuse`, `test_mutation_at_copy_boundary_has_named_refusal_instead_of_raw_keyerror` |
+| `EX11` | input type check removed | red: 1 failed | `test_forged_report_unknown_input_and_numeric_alias_refuse` |
+| `EX12` | caller input no longer copied (`ARV2D229-001`) | red: 2 failed | `test_mutation_of_caller_input_after_source_validation_cannot_rebind_report`, `test_mutation_at_copy_boundary_has_named_refusal_instead_of_raw_keyerror` |
+| `EX13` | parent identity check removed | red: 2 failed | `test_parent_pin_change_refuses[…]` |
+| `EX14` to `EX17` | each parent authority condition removed in turn | red: 1 failed each | `test_parent_authority_check_refuses_each_drift[…]`, its own case each time |
+| `EX18` | policy canonical-bytes refusal removed | red: 1 failed | `test_policy_unknown_fields_and_corrupt_noncanonical_bytes_refuse` |
+| `EX19` | exact-type comparison weakened | red: 2 failed | `test_changed_policy_semantics_types_and_authority_refuse[…-0]` |
+| `EX20` | reference-price pin dropped from the matched digest | red: 8 failed | `test_calendar_true_weekly_holiday_dst_and_prior_early_close[…]` (pinned digests) |
+| `EX21` | arm-configuration pin dropped from the matched digest | red: 8 failed | same |
+| `EX22` | 32,768-byte configuration bound removed | green | none; redundant: the configuration must equal a roughly 2 KB expected structure exactly |
+| `EX23` | 16,384-byte policy bound removed | green | none; redundant: the policy file must match its frozen hash |
+
+All trials ran in a copy-on-write clone of the export of `6b93020` under the
+session scratchpad, never in the worktree, with failing test names captured;
+the module was restored byte-identical after every trial. The unmutated
+baseline was green (109 passed).
+
+### 230.4 Reading the round on the record's own terms
+
+- **The execution convention is new, and section 229 says so.** A 09:20
+  input cutoff, market orders from one minute after the open, and the prior
+  session's RAW close as reference price differ from the historical
+  next-session market-on-open path, so no historical return transfers to
+  this execution path.
+- **The economics are declarations.** Whole-share floor sizing, cash
+  retention of rounding residue, sells before buys and fee-inclusive cash
+  checks are text until a reviewed adapter enforces them; the diagnostic
+  proves only calendar, clock and configuration consistency.
+- **Portability is now part of every exact-byte artifact.** Any future
+  hash-pinned file must live under an attribute that disables newline
+  conversion, and the new test enforces that for the lane package.
+
+### 230.5 Improvement plan
+
+1. **Check checkout portability for every hash-pinned artifact**, not only
+   its hash; my reviews of sections 222 and 228 did not.
+2. **Scope each regression to the whole protected set**, as `7ef4718` now
+   does for the lane JSON attribute.
+3. **Next milestone:** independent security-master, own-ETF, vendor, score
+   and RAW price provenance bound to the common predecision input, then the
+   refusal-tested no-order selector.
+
+### 230.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2CR229-001` | P2 | Corrected by Codex in `6b93020`; scope extended by `7ef4718`. |
+| `ARV2D213-002`, `ARV2R211-001`, `ARV2D213-003`, `ARV2R220-001` | P3 | Documented. |
+| `ARV2R230-001` | P3 | Corrected in `7ef4718`. |
+
+### 230.7 Validation
+
+Each scope is stated separately. Runs used
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15).
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, in a byte-faithful export of the pushed head `6b93020` with `artifacts/analyst_revisions_v2` copied in, run as six file groups in parallel, each in its own copy-on-write clone of that export with its own pytest temp directory, together covering all 9,766 collected tests (a single run would exceed the two-hour background limit) | **8 failed, 9747 passed, 11 skipped, 35 warnings in six parallel file-group runs (each 0:19:30, 0:13:28, 0:10:18, 1:07:36, 0:29:34, 0:06:06).** Exactly eight failures, all export artifacts, each re-run green in the real checkout: the five Git-based tests of `test_qc_forward_policy_checkout.py` need a `.git` directory (its six tests pass there); `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` shells to `git check-attr`, and an export has no `.git` (the firewall file passes 173 there); `test_recover_cli_uses_only_retained_local_artifacts` and `test_a2_cli_read_prints_only_rejection_census` call scripts whose designated-worktree guard refuses any other directory (2 passed there). The eleven skips are the standing ones: seven Windows-only directory-junction tests, three document checks that need a mainline Git ref an export lacks, and one top-five-only profile case. The export predates the pin of `7ef4718`; its file is validated on the final tree below. |
+| Required gates and the new tests at the pushed head | firewall, ML boundary, whole-package closure, lane-record integrity, active-document consistency, the execution, checkout and stock-selection test files (worktree at `6b93020`) | 502 passed |
+| The file carrying the new pin | `test_qc_forward_policy_checkout.py` (worktree, final tree) | 6 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` (worktree, final tree) | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` (final tree) | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+The final tree differs from the pushed head `6b93020` only by this round's
+Claude commits, the test-only `7ef4718` and this record commit. Not
+exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run, and section 229 records none. The checkout regressions
+were run on this macOS host's Git, not on a Windows runtime.

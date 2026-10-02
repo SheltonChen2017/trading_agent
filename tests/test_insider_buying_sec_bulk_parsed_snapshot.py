@@ -4,6 +4,7 @@ from __future__ import annotations
 import csv
 import io
 import json
+import os
 import stat
 import warnings
 import zipfile
@@ -11,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor
 from contextlib import contextmanager
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -69,6 +71,19 @@ FOOTNOTE_HEADERS = ("ACCESSION_NUMBER", "FOOTNOTE_ID", "FOOTNOTE")
 ACCESSION_A = "0000123456-26-000001"
 ACCESSION_B = "0000123456-26-000002"
 ACCESSION_C = "0000123456-26-000003"
+
+
+def _stat_like(status, **overrides):
+    values = {
+        "st_dev": status.st_dev,
+        "st_ino": status.st_ino,
+        "st_mode": status.st_mode,
+        "st_size": status.st_size,
+        "st_mtime_ns": status.st_mtime_ns,
+        "st_file_attributes": getattr(status, "st_file_attributes", 0),
+    }
+    values.update(overrides)
+    return SimpleNamespace(**values)
 
 
 def _source(**overrides) -> SecBulkSource:
@@ -140,7 +155,9 @@ def _default_tables() -> dict[str, bytes]:
     }
 
 
-def _archive(tables: dict[str, bytes]) -> bytes:
+def _archive(
+    tables: dict[str, bytes], *, auxiliary_payloads: dict[str, bytes] | None = None
+) -> bytes:
     stream = io.BytesIO()
     with zipfile.ZipFile(stream, "w") as archive:
         for table_name in ALLOWED_SEC_TABLES:
@@ -156,6 +173,12 @@ def _archive(tables: dict[str, bytes]) -> bytes:
             with warnings.catch_warnings():
                 warnings.filterwarnings("ignore", message="Duplicate name")
                 archive.writestr(info, tables[table_name])
+        for name, payload in (auxiliary_payloads or {}).items():
+            info = zipfile.ZipInfo(name, date_time=(2026, 8, 20, 18, 0, 0))
+            info.compress_type = zipfile.ZIP_DEFLATED
+            info.create_system = 3
+            info.external_attr = 0o100600 << 16
+            archive.writestr(info, payload)
     return stream.getvalue()
 
 
@@ -344,6 +367,46 @@ def test_round_trip_preserves_exact_strings_quoted_text_and_lineage(tmp_path):
     for line in (parsed / "rows.jsonl").read_bytes().splitlines(keepends=True):
         value = json.loads(line)
         assert line == (canonical_json(value) + "\n").encode("utf-8")
+
+
+def test_parsed_snapshot_consumes_only_tables_from_auxiliary_bearing_raw_zip(
+    tmp_path,
+):
+    auxiliary_names = ("FORM_345_metadata.json", "FORM_345_readme.htm")
+    raw_root = tmp_path / "raw"
+    raw_identity = write_sec_bulk_snapshot(
+        _archive(
+            _default_tables(),
+            auxiliary_payloads={
+                auxiliary_names[0]: b"\xff\x00opaque metadata",
+                auxiliary_names[1]: b"\x00opaque readme\xfe",
+            },
+        ),
+        _source(),
+        raw_root,
+    )
+    expected_tables = (
+        "SUBMISSION.tsv",
+        "REPORTINGOWNER.tsv",
+        "NONDERIV_TRANS.tsv",
+    )
+    assert tuple(member.name for member in raw_identity.auxiliary_members) == auxiliary_names
+    assert tuple(member.name for member in raw_identity.members) == expected_tables
+    raw_directory = raw_root / raw_identity.snapshot_id
+    identity = build_sec_bulk_parsed_snapshot(
+        raw_directory,
+        tmp_path / "parsed",
+        schema_profile=_profile(),
+        parser_git_commit=PARSER_COMMIT,
+    )
+    loaded = load_sec_bulk_parsed_snapshot(
+        tmp_path / "parsed" / identity.snapshot_id,
+        raw_snapshot_directory=raw_directory,
+    )
+    assert loaded.identity == identity
+    assert identity.raw_lineage_hash == raw_identity.lineage_hash
+    assert tuple(table.table_name for table in identity.tables) == expected_tables
+    assert {row.table_name for row in loaded.rows} == set(expected_tables)
 
 
 def test_owner_rows_do_not_multiply_transaction_rows(tmp_path):
@@ -1445,3 +1508,91 @@ def test_parser_module_has_no_network_outcome_qc_or_execution_imports():
             "AlgorithmImports",
         }
     )
+
+
+@pytest.mark.parametrize(
+    "artifact",
+    (
+        "rows.jsonl",
+        "accessions.jsonl",
+        "manifest.json",
+        "snapshot.commit.json",
+    ),
+)
+def test_committed_parsed_artifact_with_a_hard_link_alias_refuses_load(
+    tmp_path, artifact
+):
+    """A second name for a committed artifact means it is not uniquely owned.
+
+    IB-1C and IB-1H already refused this; IB-1B did not, so the hardening the
+    later milestones adopted had not propagated back to the parsed boundary.
+    """
+    raw, parsed, _identity = _publish(tmp_path)
+
+    alias = tmp_path / f"alias-{artifact}"
+    try:
+        os.link(parsed / artifact, alias)
+    except (OSError, NotImplementedError, AttributeError):  # pragma: no cover
+        pytest.skip("hard links are unavailable on this filesystem")
+
+    with pytest.raises(
+        SecBulkParsedSnapshotError, match="regular immutable file"
+    ):
+        load_sec_bulk_parsed_snapshot(parsed, raw_snapshot_directory=raw)
+
+
+@pytest.mark.parametrize(
+    ("observation", "error_pattern"),
+    (
+        ("opened", "changed while it was opened"),
+        ("after_read", "changed while it was read"),
+        ("after_path", "changed while it was read"),
+    ),
+)
+def test_single_link_parsed_reader_refuses_every_observed_link_count_change(
+    monkeypatch, tmp_path, observation, error_pattern
+):
+    """Every sampled link count is part of the immutable-read invariant."""
+
+    path = tmp_path / "member.bin"
+    path.write_bytes(b"bounded bytes")
+    real_fstat = parsed_module.os.fstat
+    real_lstat = Path.lstat
+    fstat_calls = 0
+    lstat_calls = 0
+
+    def observed_fstat(descriptor):
+        nonlocal fstat_calls
+        fstat_calls += 1
+        status = real_fstat(descriptor)
+        if observation == "opened" and fstat_calls == 1:
+            return _stat_like(status, st_nlink=2)
+        if observation == "after_read" and fstat_calls == 2:
+            return _stat_like(status, st_nlink=2)
+        return status
+
+    def observed_lstat(candidate):
+        nonlocal lstat_calls
+        status = real_lstat(candidate)
+        if candidate == path:
+            lstat_calls += 1
+            if observation == "after_path" and lstat_calls == 2:
+                return _stat_like(status, st_nlink=2)
+        return status
+
+    monkeypatch.setattr(parsed_module.os, "fstat", observed_fstat)
+    monkeypatch.setattr(Path, "lstat", observed_lstat)
+    with pytest.raises(SecBulkParsedSnapshotError, match=error_pattern):
+        parsed_module._read_regular_bytes(
+            path,
+            label="synthetic committed member",
+            max_bytes=100,
+            require_single_link=True,
+        )
+
+
+def test_single_link_committed_parsed_snapshot_still_loads(tmp_path):
+    """The guard must refuse aliased artifacts without refusing ordinary ones."""
+    raw, parsed, identity = _publish(tmp_path)
+    loaded = load_sec_bulk_parsed_snapshot(parsed, raw_snapshot_directory=raw)
+    assert loaded.identity == identity

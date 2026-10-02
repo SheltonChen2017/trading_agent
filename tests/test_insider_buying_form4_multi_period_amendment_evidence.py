@@ -1,14 +1,17 @@
-"""IB-1E offline multi-period supplied-link-evidence tests.
+"""IB-1E supplied-link-evidence and IB-1G disposition-report tests.
 
 All records and XML images are synthetic.  The profile below is deliberately
-non-official: these tests establish a fail-closed composition boundary, not
-SEC provenance, complete amendment coverage, or canonical filtering.
+non-official: these tests establish fail-closed composition and provisional
+report boundaries, not SEC provenance, complete amendment coverage, canonical
+filtering, aggregation, outcomes, or trading authority.
 """
 from __future__ import annotations
 
 import ast
-from dataclasses import dataclass, replace
+import copy
+from dataclasses import dataclass, fields, replace
 from datetime import datetime, timedelta, timezone
+from decimal import Decimal
 from pathlib import Path
 
 import pytest
@@ -16,7 +19,10 @@ import pytest
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.insider_buying import (
     ClassificationOutcome,
+    Form4ProvisionalDisposition,
+    Form4ProvisionalDispositionReportError,
     Form4MultiPeriodEvidenceError,
+    ParsedTransaction,
     ProfileBoundForm4AmendmentEvidence,
     SecEdgarAcceptancePeriodInput,
     SecEdgarAcceptanceSnapshotIdentity,
@@ -29,9 +35,14 @@ from research.insider_buying import (
     SecForm4AmendmentEvidenceProfile,
     SecForm4XmlSource,
     assemble_sec_form4_multi_period_evidence,
+    build_filing_corpus,
+    build_form4_provisional_disposition_report,
 )
 from research.insider_buying import (
     form4_multi_period_amendment_evidence as evidence_module,
+)
+from research.insider_buying import (
+    form4_provisional_disposition_report as disposition_module,
 )
 from research.insider_buying.sec_edgar_acceptance_snapshot import (
     LoadedSecEdgarAcceptanceSnapshot,
@@ -819,8 +830,661 @@ def test_malformed_profile_document_hash_refuses(monkeypatch, baseline):
         _assemble(original, amendment, profile)
 
 
+def test_supplied_xml_issuer_must_agree_with_verified_acceptance_evidence(
+    monkeypatch,
+):
+    """Bind the parsed XML issuer to the CIK the verified IB-1C URL anchors.
+
+    Both supplied filings declare the same foreign issuer, so the corpus-level
+    original-versus-amendment issuer comparison stays satisfied and only the
+    XML-to-acceptance-evidence binding can refuse. Without it a caller could
+    file one issuer's XML under another issuer's verified accession and corrupt
+    the audit lineage that later QC evidence rests on.
+    """
+    foreign = b"<issuerCik>999999</issuerCik>"
+    original = _Spec(
+        ORIGINAL,
+        "4",
+        datetime(2026, 12, 29, 18, 0, tzinfo=timezone.utc),
+        _fixture("form4_original.xml").replace(
+            b"<issuerCik>123456</issuerCik>", foreign
+        ),
+    )
+    amendment = _Spec(
+        AMENDMENT,
+        "4/A",
+        datetime(2027, 1, 4, 18, 0, tzinfo=timezone.utc),
+        _fixture("form4_amendment.xml").replace(
+            b"<issuerCik>123456</issuerCik>", foreign
+        ),
+        ORIGINAL,
+    )
+    profile = _profile()
+    _install_loader(
+        monkeypatch,
+        (
+            _loaded_period(2026, 4, (original,), profile=profile),
+            _loaded_period(2027, 1, (amendment,), profile=profile),
+        ),
+    )
+
+    with pytest.raises(
+        Form4MultiPeriodEvidenceError,
+        match="XML issuer CIK disagrees with acceptance evidence",
+    ):
+        _assemble(original, amendment, profile)
+
+
 def test_ib1e_module_has_no_network_outcome_execution_or_ui_imports():
     module_path = Path(evidence_module.__file__)
+    tree = ast.parse(
+        module_path.read_text(encoding="utf-8"), filename=str(module_path)
+    )
+    imported: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported.update(alias.name.split(".", 1)[0] for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported.add(node.module.split(".", 1)[0])
+    forbidden = {
+        "assistant",
+        "backtest",
+        "execution",
+        "httpx",
+        "outcomes",
+        "quantconnect",
+        "requests",
+        "risk",
+        "signals",
+        "socket",
+        "strategies",
+        "streamlit",
+        "urllib",
+        "yfinance",
+    }
+    assert imported.isdisjoint(forbidden), imported & forbidden
+
+
+def _disposition_report(baseline, *, reverse: bool = False):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile, reverse=reverse)
+    return build_form4_provisional_disposition_report(
+        evidence,
+        builder_git_commit="f" * 40,
+    )
+
+
+def _custom_evidence(monkeypatch, original_xml: bytes):
+    original = _Spec(
+        ORIGINAL,
+        "4",
+        datetime(2026, 12, 29, 18, 0, tzinfo=timezone.utc),
+        original_xml,
+    )
+    amendment = _Spec(
+        AMENDMENT,
+        "4/A",
+        datetime(2027, 1, 4, 18, 0, tzinfo=timezone.utc),
+        _fixture("form4_amendment.xml"),
+        ORIGINAL,
+    )
+    profile = _profile()
+    _install_loader(
+        monkeypatch,
+        (
+            _loaded_period(2026, 4, (original,), profile=profile),
+            _loaded_period(2027, 1, (amendment,), profile=profile),
+        ),
+    )
+    return _assemble(original, amendment, profile)
+
+
+def test_provisional_report_is_deterministic_and_accounts_for_every_row(
+    baseline,
+):
+    forward = _disposition_report(baseline)
+    reverse = _disposition_report(baseline, reverse=True)
+
+    assert forward == reverse
+    assert forward.identity.report_id.startswith(
+        "form4-provisional-disposition-report-"
+    )
+    assert forward.identity.transaction_count == len(forward.rows) == 2
+    assert forward.identity.candidate_count == 1
+    assert forward.identity.quarantine_count == 1
+    assert forward.identity.authorized_outcome_looks == 0
+    assert forward.official_profile_compatibility_verified is False
+    assert forward.official_amendment_link_verified is False
+    assert forward.complete_amendment_coverage_verified is False
+    assert forward.point_in_time_security_identity_verified is False
+    assert forward.canonical_filter_authorized is False
+    assert forward.lot_aggregation_authorized is False
+    assert forward.outcomes_authorized is False
+    assert forward.identity.official_profile_compatibility_verified is False
+    assert forward.identity.official_amendment_link_verified is False
+    assert forward.identity.complete_amendment_coverage_verified is False
+    assert forward.identity.point_in_time_security_identity_verified is False
+    assert forward.identity.canonical_filter_authorized is False
+    assert forward.identity.lot_aggregation_authorized is False
+    assert forward.identity.outcomes_authorized is False
+
+    rows_by_accession = {row.accession_number: row for row in forward.rows}
+    original = rows_by_accession[ORIGINAL]
+    amendment = rows_by_accession[AMENDMENT]
+    assert original.disposition is (
+        Form4ProvisionalDisposition.PROVISIONAL_PRE_AGGREGATION_CANDIDATE
+    )
+    assert original.outcomes == (
+        ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,
+    )
+    assert amendment.disposition is (
+        Form4ProvisionalDisposition.PROVISIONAL_QUARANTINE
+    )
+    assert amendment.outcomes == (
+        ClassificationOutcome.EXCLUDE_AMENDED_FILING,
+    )
+    assert forward.to_payload() == reverse.to_payload()
+    assert canonical_json(forward.to_payload()) == canonical_json(
+        reverse.to_payload()
+    )
+
+    original_spec, amendment_spec, profile, _q4, _q1 = baseline
+    evidence = _assemble(original_spec, amendment_spec, profile)
+    transactions = {
+        (transaction.accession_number, transaction.row_index): transaction
+        for filing in evidence.as_filed_corpus.filings
+        for transaction in filing.transactions
+    }
+    assert set(transactions) == {
+        (row.accession_number, row.row_index) for row in forward.rows
+    }
+    for row in forward.rows:
+        transaction = transactions[(row.accession_number, row.row_index)]
+        assert row.outcomes == transaction.outcomes
+        assert row.diagnostics == transaction.diagnostics
+        assert row.transaction_payload_hash == hash_payload(
+            disposition_module._transaction_payload(transaction)
+        )
+        assert {
+            field.name for field in fields(ParsedTransaction)
+        } == set(disposition_module._transaction_payload(transaction))
+
+
+def test_provisional_report_reparses_instead_of_trusting_retained_rows(
+    baseline,
+):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile)
+    filing = evidence.as_filed_corpus.filing(ORIGINAL)
+    transaction = filing.transactions[0]
+    forged_transaction = replace(
+        transaction,
+        price_per_share=Decimal("1"),
+        purchase_value_usd=Decimal("5000"),
+    )
+    forged_filing = replace(
+        filing,
+        transactions=(forged_transaction, *filing.transactions[1:]),
+    )
+    forged_corpus = build_filing_corpus(
+        [
+            forged_filing
+            if item.envelope.accession_number == ORIGINAL
+            else item
+            for item in evidence.as_filed_corpus.filings
+        ]
+    )
+    forged_identity = copy.copy(evidence.identity)
+    object.__setattr__(
+        forged_identity,
+        "parsed_corpus_hash",
+        disposition_module._parsed_corpus_hash(forged_corpus),
+    )
+    start = forged_identity.period_inventory[0]
+    end = forged_identity.period_inventory[-1]
+    object.__setattr__(
+        forged_identity,
+        "evidence_id",
+        (
+            f"form4-multi-period-evidence-{start.year:04d}q{start.quarter}-"
+            f"{end.year:04d}q{end.quarter}-"
+            f"{hash_payload(forged_identity.lineage_payload())[:16]}"
+        ),
+    )
+    forged_evidence = copy.copy(evidence)
+    object.__setattr__(forged_evidence, "identity", forged_identity)
+    object.__setattr__(forged_evidence, "as_filed_corpus", forged_corpus)
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="reparsed corpus",
+    ):
+        build_form4_provisional_disposition_report(
+            forged_evidence,
+            builder_git_commit="f" * 40,
+        )
+
+
+@pytest.mark.parametrize(
+    "field_name,replacement",
+    [
+        ("period_inventory_hash", "0" * 64),
+        ("evidence_profile_hash", "0" * 64),
+        ("amendment_count", 0),
+    ],
+)
+def test_provisional_report_revalidates_the_complete_upstream_identity(
+    baseline,
+    field_name,
+    replacement,
+):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile)
+    forged_identity = copy.copy(evidence.identity)
+    object.__setattr__(forged_identity, field_name, replacement)
+    start = forged_identity.period_inventory[0]
+    end = forged_identity.period_inventory[-1]
+    object.__setattr__(
+        forged_identity,
+        "evidence_id",
+        (
+            f"form4-multi-period-evidence-{start.year:04d}q{start.quarter}-"
+            f"{end.year:04d}q{end.quarter}-"
+            f"{hash_payload(forged_identity.lineage_payload())[:16]}"
+        ),
+    )
+    forged_evidence = copy.copy(evidence)
+    object.__setattr__(forged_evidence, "identity", forged_identity)
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="upstream evidence revalidation",
+    ):
+        build_form4_provisional_disposition_report(
+            forged_evidence,
+            builder_git_commit="f" * 40,
+        )
+
+
+def test_provisional_report_revalidates_nested_period_identity(baseline):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile)
+    forged_period = copy.copy(evidence.identity.period_inventory[0])
+    object.__setattr__(forged_period, "record_count", -1)
+    forged_periods = (forged_period, *evidence.identity.period_inventory[1:])
+    forged_identity = copy.copy(evidence.identity)
+    object.__setattr__(forged_identity, "period_inventory", forged_periods)
+    object.__setattr__(
+        forged_identity,
+        "period_inventory_hash",
+        hash_payload([item.to_payload() for item in forged_periods]),
+    )
+    start = forged_periods[0]
+    end = forged_periods[-1]
+    object.__setattr__(
+        forged_identity,
+        "evidence_id",
+        (
+            f"form4-multi-period-evidence-{start.year:04d}q{start.quarter}-"
+            f"{end.year:04d}q{end.quarter}-"
+            f"{hash_payload(forged_identity.lineage_payload())[:16]}"
+        ),
+    )
+    forged_evidence = copy.copy(evidence)
+    object.__setattr__(forged_evidence, "identity", forged_identity)
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="upstream evidence revalidation",
+    ):
+        build_form4_provisional_disposition_report(
+            forged_evidence,
+            builder_git_commit="f" * 40,
+        )
+
+
+def test_provisional_report_revalidates_nested_link_evidence(baseline):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile)
+    forged_link = copy.copy(evidence.supplied_link_evidence[0])
+    object.__setattr__(forged_link, "metadata_source_sha256", "bad")
+    forged_links = (forged_link, *evidence.supplied_link_evidence[1:])
+    forged_identity = copy.copy(evidence.identity)
+    object.__setattr__(forged_identity, "supplied_link_evidence", forged_links)
+    object.__setattr__(
+        forged_identity,
+        "supplied_link_evidence_hash",
+        hash_payload([item.to_payload() for item in forged_links]),
+    )
+    start = forged_identity.period_inventory[0]
+    end = forged_identity.period_inventory[-1]
+    object.__setattr__(
+        forged_identity,
+        "evidence_id",
+        (
+            f"form4-multi-period-evidence-{start.year:04d}q{start.quarter}-"
+            f"{end.year:04d}q{end.quarter}-"
+            f"{hash_payload(forged_identity.lineage_payload())[:16]}"
+        ),
+    )
+    forged_evidence = copy.copy(evidence)
+    object.__setattr__(forged_evidence, "identity", forged_identity)
+    object.__setattr__(forged_evidence, "supplied_link_evidence", forged_links)
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="upstream evidence revalidation",
+    ):
+        build_form4_provisional_disposition_report(
+            forged_evidence,
+            builder_git_commit="f" * 40,
+        )
+
+
+def test_provisional_report_rebuilds_cached_xml_source_identity(baseline):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile)
+    forged_source = copy.copy(evidence.xml_sources[0])
+    object.__setattr__(
+        forged_source,
+        "xml_bytes",
+        forged_source.xml_bytes.replace(b"5000", b"5001", 1),
+    )
+    forged_evidence = copy.copy(evidence)
+    object.__setattr__(
+        forged_evidence,
+        "xml_sources",
+        (forged_source, *evidence.xml_sources[1:]),
+    )
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="source inventory",
+    ):
+        build_form4_provisional_disposition_report(
+            forged_evidence,
+            builder_git_commit="f" * 40,
+        )
+
+
+def test_provisional_report_checks_identity_type_before_invoking_validation(
+    baseline,
+):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile)
+    called = False
+
+    class ForeignIdentity:
+        def __post_init__(self, _token):
+            nonlocal called
+            called = True
+
+    forged_evidence = copy.copy(evidence)
+    object.__setattr__(forged_evidence, "identity", ForeignIdentity())
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="identity type",
+    ):
+        build_form4_provisional_disposition_report(
+            forged_evidence,
+            builder_git_commit="f" * 40,
+        )
+    assert called is False
+
+
+def test_provisional_report_checks_source_cap_before_rebuilding(
+    monkeypatch,
+    baseline,
+):
+    original, amendment, profile, _q4, _q1 = baseline
+    evidence = _assemble(original, amendment, profile)
+    forged_evidence = copy.copy(evidence)
+    object.__setattr__(
+        forged_evidence,
+        "xml_sources",
+        (evidence.xml_sources[0],) * 257,
+    )
+    monkeypatch.setattr(
+        disposition_module.ProfileBoundForm4AmendmentEvidence,
+        "__post_init__",
+        lambda *_args, **_kwargs: pytest.fail(
+            "upstream result rebuilding was reached"
+        ),
+    )
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="resource bound",
+    ):
+        build_form4_provisional_disposition_report(
+            forged_evidence,
+            builder_git_commit="f" * 40,
+        )
+
+
+def test_provisional_report_preserves_multiple_quarantine_reasons(monkeypatch):
+    xml_bytes = _fixture("form4_original.xml").replace(
+        b"<value>Common Stock</value>",
+        b"<value>Ordinary Shares</value>",
+        1,
+    ).replace(
+        b"<transactionCode>P</transactionCode>",
+        b"<transactionCode>S</transactionCode>",
+        1,
+    )
+    report = build_form4_provisional_disposition_report(
+        _custom_evidence(monkeypatch, xml_bytes),
+        builder_git_commit="f" * 40,
+    )
+    row = next(item for item in report.rows if item.accession_number == ORIGINAL)
+
+    assert row.disposition is (
+        Form4ProvisionalDisposition.PROVISIONAL_QUARANTINE
+    )
+    assert row.outcomes == (
+        ClassificationOutcome.EXCLUDE_NON_COMMON_STOCK,
+        ClassificationOutcome.EXCLUDE_SALE,
+    )
+    assert report.identity.transaction_count == len(report.rows) == 2
+
+
+@pytest.mark.parametrize("title", ["Ordinary Shares", "Common Shares"])
+def test_provisional_report_keeps_synthetic_share_variants_quarantined(
+    monkeypatch,
+    title,
+):
+    xml_bytes = _fixture("form4_original.xml").replace(
+        b"<value>Common Stock</value>",
+        f"<value>{title}</value>".encode(),
+        1,
+    )
+    report = build_form4_provisional_disposition_report(
+        _custom_evidence(monkeypatch, xml_bytes),
+        builder_git_commit="f" * 40,
+    )
+    row = next(item for item in report.rows if item.accession_number == ORIGINAL)
+
+    assert row.disposition is (
+        Form4ProvisionalDisposition.PROVISIONAL_QUARANTINE
+    )
+    assert row.outcomes == (
+        ClassificationOutcome.EXCLUDE_NON_COMMON_STOCK,
+    )
+
+
+def test_provisional_report_does_not_aggregate_subminimum_same_lot_rows(
+    monkeypatch,
+):
+    xml_bytes = _fixture("form4_original.xml").replace(
+        b"<transactionShares><value>5000</value></transactionShares>",
+        b"<transactionShares><value>1000</value></transactionShares>",
+        1,
+    )
+    start = xml_bytes.index(b"    <nonDerivativeTransaction>")
+    end = xml_bytes.index(b"    </nonDerivativeTransaction>") + len(
+        b"    </nonDerivativeTransaction>"
+    )
+    row_bytes = xml_bytes[start:end]
+    xml_bytes = xml_bytes.replace(
+        b"  </nonDerivativeTable>",
+        row_bytes + b"\n  </nonDerivativeTable>",
+        1,
+    )
+    report = build_form4_provisional_disposition_report(
+        _custom_evidence(monkeypatch, xml_bytes),
+        builder_git_commit="f" * 40,
+    )
+    original_rows = tuple(
+        row for row in report.rows if row.accession_number == ORIGINAL
+    )
+
+    assert len(original_rows) == 2
+    assert {row.row_index for row in original_rows} == {0, 1}
+    assert len({row.row_id for row in original_rows}) == 2
+    assert all(row.purchase_value_usd == Decimal("12500.00") for row in original_rows)
+    assert all(
+        row.disposition
+        is Form4ProvisionalDisposition.PROVISIONAL_PRE_AGGREGATION_CANDIDATE
+        for row in original_rows
+    )
+    assert report.identity.candidate_count == 2
+    assert not hasattr(report, "aggregated_lots")
+
+
+def test_provisional_report_identity_and_result_fail_closed_on_tampering(
+    baseline,
+):
+    report = _disposition_report(baseline)
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="factory-created",
+    ):
+        replace(report.identity)
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="factory-created",
+    ):
+        replace(report)
+    tampered_lineage = report.identity.lineage_payload()
+    tampered_lineage["row_inventory_hash"] = "0" * 64
+    tampered_identity = replace(
+        report.identity,
+        row_inventory_hash="0" * 64,
+        report_id=(
+            "form4-provisional-disposition-report-"
+            f"{hash_payload(tampered_lineage)[:16]}"
+        ),
+        _verified_factory_token=(
+            disposition_module._VERIFIED_IDENTITY_FACTORY_TOKEN
+        ),
+    )
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="inventory",
+    ):
+        replace(
+            report,
+            identity=tampered_identity,
+            _verified_factory_token=(
+                disposition_module._VERIFIED_REPORT_FACTORY_TOKEN
+            ),
+        )
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="row",
+    ):
+        replace(report.rows[0], row_id="0" * 64)
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="count",
+    ):
+        replace(
+            report,
+            rows=report.rows[:-1],
+            _verified_factory_token=(
+                disposition_module._VERIFIED_REPORT_FACTORY_TOKEN
+            ),
+        )
+
+
+@pytest.mark.parametrize(
+    "field_name,replacement",
+    [
+        ("official_profile_compatibility_verified", True),
+        ("official_amendment_link_verified", True),
+        ("complete_amendment_coverage_verified", True),
+        ("point_in_time_security_identity_verified", True),
+        ("canonical_filter_authorized", True),
+        ("lot_aggregation_authorized", True),
+        ("outcomes_authorized", True),
+        ("authorized_outcome_looks", 1),
+    ],
+)
+def test_provisional_report_identity_refuses_every_authority_claim(
+    baseline,
+    field_name,
+    replacement,
+):
+    report = _disposition_report(baseline)
+
+    with pytest.raises(
+        Form4ProvisionalDispositionReportError,
+        match="authority",
+    ):
+        replace(
+            report.identity,
+            **{field_name: replacement},
+            _verified_factory_token=(
+                disposition_module._VERIFIED_IDENTITY_FACTORY_TOKEN
+            ),
+        )
+
+
+def test_provisional_report_refuses_eligible_mixed_with_quarantine_reasons():
+    """A transaction may never be eligible and quarantined at the same time.
+
+    ``_classify`` cannot currently emit that tuple, so the guard is unreachable
+    from the parser and no end-to-end test exercises it. It is nonetheless the
+    defence that keeps candidate routing a singleton-equality decision: if a
+    future parser ever attached a reason code alongside the eligible outcome,
+    an ``in`` test would silently promote a quarantined row to a candidate.
+    """
+    mixed = ParsedTransaction(
+        event_id="a" * 64,
+        accession_number=ORIGINAL,
+        source_sha256="b" * 64,
+        row_index=0,
+        derivative=False,
+        security_title_raw="Common Stock",
+        transaction_date=datetime(2026, 8, 18, tzinfo=timezone.utc).date(),
+        transaction_code="P",
+        acquired_disposed_code="A",
+        shares=Decimal("5000"),
+        price_per_share=Decimal("12.50"),
+        purchase_value_usd=Decimal("62500"),
+        shares_owned_after=Decimal("15000"),
+        direct_indirect="D",
+        aff10b5_one=None,
+        footnote_ids=(),
+        footnote_texts=(),
+        outcomes=(
+            ClassificationOutcome.ELIGIBLE_FOR_LOT_AGGREGATION,
+            ClassificationOutcome.EXCLUDE_PRICE_RANGE,
+        ),
+        diagnostics=(),
+    )
+
+    with pytest.raises(
+        disposition_module.Form4ProvisionalDispositionReportError,
+        match="eligible outcome cannot coexist with quarantine reasons",
+    ):
+        disposition_module._transaction_payload(mixed)
+
+
+def test_ib1g_module_has_no_network_outcome_execution_or_ui_imports():
+    module_path = Path(disposition_module.__file__)
     tree = ast.parse(
         module_path.read_text(encoding="utf-8"), filename=str(module_path)
     )

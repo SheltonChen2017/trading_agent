@@ -1,0 +1,150 @@
+{
+  "acyclic_lineage": {
+    "edge_direction": "child_to_parent",
+    "existing_fold_manifest_reparenting": "forbidden",
+    "ordered_nodes": [
+      {
+        "node": "strategy_pdf",
+        "parents": []
+      },
+      {
+        "node": "qc_base",
+        "parents": [
+          "strategy_pdf"
+        ]
+      },
+      {
+        "node": "qc_plan",
+        "parents": [
+          "strategy_pdf",
+          "qc_base"
+        ]
+      },
+      {
+        "node": "stock_v1",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan"
+        ]
+      },
+      {
+        "node": "fold_manifest",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1"
+        ]
+      },
+      {
+        "node": "global_map",
+        "parents": [
+          "strategy_pdf"
+        ]
+      },
+      {
+        "node": "matched_contract",
+        "parents": [
+          "strategy_pdf",
+          "stock_v1",
+          "fold_manifest",
+          "global_map"
+        ]
+      },
+      {
+        "node": "stock_v2",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1",
+          "fold_manifest",
+          "global_map",
+          "matched_contract"
+        ]
+      }
+    ],
+    "successor_must_not_be_parent_of_any_bound_ancestor": true
+  },
+  "authority": "stock_contract_successor_only_no_provider_data_outcome_qc_or_deployment_authority",
+  "capabilities": {
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "evaluation_id": "arv2-eval-stock-historical-qc-001",
+  "existing_fold_manifest": {
+    "artifact_id": "arv2-stock-folds-1002155dbe8e3e87",
+    "artifact_sha256": "fecd984ad937fed57b860b15fdcb9cc994ff59ab62c3b72d5160ab62b342953c",
+    "bytes_and_parent_pins_changed": false,
+    "content_sha256": "1002155dbe8e3e87b220b7419039bff95f5c0812d2306c56a8ac51b76c5d7611"
+  },
+  "explicit_amendments": {
+    "execution_authorized": false,
+    "global_rating_map_definition_sha256": "aaf5830c3c3fb403b0e84f5ad22d1f20fa3f91df41cf3bd64f33695875d2e3d9",
+    "matched_row_contract_sha256": "b94a3457b848c4dc1f6dee77ef366002362573431eb9cc2fc3b8f530ec7f89c9",
+    "minimum_paired_coverage_definition_sha256": "b94a3457b848c4dc1f6dee77ef366002362573431eb9cc2fc3b8f530ec7f89c9",
+    "paired_constant_arm_rule": "exactly_one_constant_arm_totalizes_to_zero_both_constant_jointly_refuse",
+    "uncertainty_successor": "paired_centered_noncircular_moving_blocks_on_each_complete_fold_test_session_axis"
+  },
+  "external_bindings": {
+    "counter_review_commit": null,
+    "dataset_id": null,
+    "evaluation_receipt_id": null,
+    "independent_review_commit": null,
+    "outcome_artifact_sha256": null,
+    "power_plan_sha256": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "source_rights_receipt_id": null
+  },
+  "global_rating_map": {
+    "artifact_id": "arv2-global-rating-map-aaf5830c3c3fb403",
+    "artifact_sha256": "630cc822fa83d7aba15920cfb8f37863f6d6fffa262e26ac96074e8526391f4e",
+    "content_sha256": "aaf5830c3c3fb403b0e84f5ad22d1f20fa3f91df41cf3bd64f33695875d2e3d9"
+  },
+  "inheritance_contract": {
+    "fold_manifest_repin_or_reparent": "forbidden",
+    "global_benchmark_role_retained": "mandatory_non_rescuing_firm_specific_normalization_gate",
+    "new_scope": "paired_global_gate_only",
+    "predecessor_sections_retained_unless_explicitly_amended": true,
+    "single_arm_information_coefficient_date_refusal_retained": "fewer_than_20_rows_or_constant_score_or_constant_outcome"
+  },
+  "matched_comparison_contract": {
+    "artifact_id": "arv2-global-matched-b94a3457b848c4dc",
+    "artifact_sha256": "40b164e3e2944053eaaaaf1a651e34dfb335a4cbc8aeca2ee3f67ecdc9e8dffa",
+    "content_sha256": "b94a3457b848c4dc1f6dee77ef366002362573431eb9cc2fc3b8f530ec7f89c9"
+  },
+  "predecessor_stock_spec": {
+    "artifact_id": "arv2-stock-historical-c5ff2a6a0dcf341e",
+    "artifact_sha256": "34d1e71548bc6850a02590596594944dad3fadb38954067f2cc2d00dcaa86bc8",
+    "content_sha256": "c5ff2a6a0dcf341e3c7bad4ea56e4a3c00f20faab5896c0fcd3bd7c291835a0b"
+  },
+  "qc_first_plan": {
+    "artifact_id": "arv2-qc-first-plan-36e455e72b8750fe",
+    "artifact_sha256": "8339238dd5ce32ed7b351aab2662fb408cc7d9a3c62ff89bf8b1d14f20acd081",
+    "content_sha256": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc"
+  },
+  "remaining_gates": {
+    "authenticated_preoutcome_source_census": "required_before_coverage_claim",
+    "content_addressed_power_plan": "required_before_evaluation",
+    "counter_review": "required",
+    "independent_review": "required",
+    "outcome_and_QC_authority": "separate_exact_later_authority_required",
+    "source_and_processing_rights": "required"
+  },
+  "schema": "arv2-stock-historical-successor-structural-v2",
+  "spec_hash": "a9a2210b8f6582bc3ce9e533ce33e9b51ffc0a0b3203b62ad21d9d373ce06f95",
+  "spec_id": "arv2-stock-historical-successor-a9a2210b8f6582bc",
+  "status": "owner_approved_implementation_frozen_outcome_free_pending_independent_review",
+  "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193",
+  "superseded_qc_plan_base": {
+    "artifact_id": "arv2-round0-candidate-8d13a0a4577df322",
+    "artifact_sha256": "b40a76f5f2f7726f328f1e444a41ecb0670234055a7c9c7245a26ffab601af2f",
+    "content_sha256": "8d13a0a4577df3223c96c4c11722457e059b4ade63f578ab860ce7364494e847"
+  }
+}

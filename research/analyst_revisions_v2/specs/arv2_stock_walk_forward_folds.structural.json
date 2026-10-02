@@ -1,0 +1,547 @@
+{
+  "authority": "structural_folds_only_no_data_outcome_qc_or_deployment_authority",
+  "calendar_contract": {
+    "axis_encoding": "canonical_json_ordered_iso_session_array_no_terminator",
+    "axis_end_inclusive": "2026-08-28",
+    "axis_session_count": 3435,
+    "axis_sha256": "b303555af32bda7d3f2caf6c43f3ae1c43723613086ab3dc848cfb86ab88d732",
+    "axis_start_inclusive": "2013-01-02",
+    "calendar_implementation": "pandas_market_calendars.NYSE",
+    "exchange": "XNYS"
+  },
+  "capabilities": {
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "cross_boundary_common_event_contract": {
+    "component_count": null,
+    "component_inventory_sha256": null,
+    "cross_boundary_component_disposition": "refuse_entire_component_from_all_adjacent_samples",
+    "cross_date_component_disposition": "refuse_every_row_in_component_before_fold_assignment",
+    "current_data_access_authorized": false,
+    "membership": "deterministic_connected_components_of_security_decision_rows_and_all_admitted_common_event_ids",
+    "outcome_duplication": false
+  },
+  "evaluation_id": "arv2-eval-stock-historical-qc-001",
+  "external_bindings": {
+    "common_event_component_inventory_sha256": null,
+    "counter_review_commit": null,
+    "dataset_id": null,
+    "evaluation_receipt_id": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "review_commit": null,
+    "source_rights_receipt_id": null
+  },
+  "manifest_hash": "1002155dbe8e3e87b220b7419039bff95f5c0812d2306c56a8ac51b76c5d7611",
+  "manifest_id": "arv2-stock-folds-1002155dbe8e3e87",
+  "parent_history_section_sha256": "5db2a1bc09d7ecd2e8cb7e5044f0abc7f97b3eefb71803002d00f6b33cf984ca",
+  "parent_plan_artifact_sha256": "8339238dd5ce32ed7b351aab2662fb408cc7d9a3c62ff89bf8b1d14f20acd081",
+  "parent_plan_hash": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc",
+  "parent_plan_id": "arv2-qc-first-plan-36e455e72b8750fe",
+  "parent_stock_spec_artifact_sha256": "34d1e71548bc6850a02590596594944dad3fadb38954067f2cc2d00dcaa86bc8",
+  "parent_stock_spec_hash": "c5ff2a6a0dcf341e3c7bad4ea56e4a3c00f20faab5896c0fcd3bd7c291835a0b",
+  "parent_stock_spec_id": "arv2-stock-historical-c5ff2a6a0dcf341e",
+  "schema": "arv2-stock-walk-forward-fold-manifest-structural-v1",
+  "section_hashes": {
+    "calendar_contract": "c9e6700b8dbed829e9c76e28fea9e5d50c668f991f6ce6fd268d567de2dcf71f",
+    "cross_boundary_common_event_contract": "4e5226c8ee4f1c1a37917d34674ae4328bf336f223785e88e5aa53c4dda6850c",
+    "walk_forward_contract": "621d65cef55249327568c5a5d25597c50fe35aba73468eac6961569d9fbc9a89"
+  },
+  "status": "implementation_frozen_outcome_free_pending_independent_review",
+  "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193",
+  "walk_forward_contract": {
+    "calendar_anchor": "first_nyse_session_of_calendar_year",
+    "cross_boundary_common_event_component_refusals": "defined_in_cross_boundary_common_event_contract",
+    "current_execution_authorized": false,
+    "folds": [
+      {
+        "fold_id": "arv2-wf-test-2020",
+        "fold_sha256": "1b09ae34ed96325ea439a9076e70fe7937cd803750995435424e2d17280dfcef",
+        "horizon_boundaries": [
+          {
+            "embargo_sessions": 1,
+            "fold_id": "arv2-wf-test-2020-h1",
+            "horizon_sessions": 1,
+            "purge_sessions": 1,
+            "structural_fold_sha256": "74b689cd19389011f4ba0c1577448a3a1638c95d35b275f5c34b7d5f56dbba10",
+            "test_end_exclusive": "2021-01-04",
+            "test_start": "2020-01-03",
+            "train_end_exclusive": "2018-01-02",
+            "train_start": "2013-01-02",
+            "validation_end_exclusive": "2020-01-02",
+            "validation_start": "2018-01-03"
+          },
+          {
+            "embargo_sessions": 5,
+            "fold_id": "arv2-wf-test-2020-h5",
+            "horizon_sessions": 5,
+            "purge_sessions": 5,
+            "structural_fold_sha256": "d3d5805fb495d741efaee81be5e48a891409f9f2af087409bd214d07640c07e8",
+            "test_end_exclusive": "2021-01-04",
+            "test_start": "2020-01-09",
+            "train_end_exclusive": "2018-01-02",
+            "train_start": "2013-01-02",
+            "validation_end_exclusive": "2020-01-02",
+            "validation_start": "2018-01-09"
+          },
+          {
+            "embargo_sessions": 20,
+            "fold_id": "arv2-wf-test-2020-h20",
+            "horizon_sessions": 20,
+            "purge_sessions": 20,
+            "structural_fold_sha256": "9dcaa09e8f6b9b3786e016bb1db5c3d0ebfd918d49951e8de45dad3383c4fa5c",
+            "test_end_exclusive": "2021-01-04",
+            "test_start": "2020-01-31",
+            "train_end_exclusive": "2018-01-02",
+            "train_start": "2013-01-02",
+            "validation_end_exclusive": "2020-01-02",
+            "validation_start": "2018-01-31"
+          },
+          {
+            "embargo_sessions": 60,
+            "fold_id": "arv2-wf-test-2020-h60",
+            "horizon_sessions": 60,
+            "purge_sessions": 60,
+            "structural_fold_sha256": "8025e9726048b425bf934118b16e3fb66261620fab9dd17295eeafe599f9021f",
+            "test_end_exclusive": "2021-01-04",
+            "test_start": "2020-03-30",
+            "train_end_exclusive": "2018-01-02",
+            "train_start": "2013-01-02",
+            "validation_end_exclusive": "2020-01-02",
+            "validation_start": "2018-03-29"
+          }
+        ],
+        "nominal_test_interval": {
+          "end_exclusive": "2021-01-04",
+          "start_inclusive": "2020-01-02"
+        },
+        "nominal_train_interval": {
+          "end_exclusive": "2018-01-02",
+          "start_inclusive": "2013-01-02"
+        },
+        "nominal_validation_interval": {
+          "end_exclusive": "2020-01-02",
+          "start_inclusive": "2018-01-02"
+        },
+        "ordered_horizons_sessions": [
+          1,
+          5,
+          20,
+          60
+        ],
+        "test_year": 2020
+      },
+      {
+        "fold_id": "arv2-wf-test-2021",
+        "fold_sha256": "5d39393886380681e2f271e44c0dd638ee494202829a6830a5f693fb8c956a64",
+        "horizon_boundaries": [
+          {
+            "embargo_sessions": 1,
+            "fold_id": "arv2-wf-test-2021-h1",
+            "horizon_sessions": 1,
+            "purge_sessions": 1,
+            "structural_fold_sha256": "53bbc0bde69c3220927a440f6c38f7645621b02eedc9327705a3d5916238c20f",
+            "test_end_exclusive": "2022-01-03",
+            "test_start": "2021-01-05",
+            "train_end_exclusive": "2019-01-02",
+            "train_start": "2014-01-02",
+            "validation_end_exclusive": "2021-01-04",
+            "validation_start": "2019-01-03"
+          },
+          {
+            "embargo_sessions": 5,
+            "fold_id": "arv2-wf-test-2021-h5",
+            "horizon_sessions": 5,
+            "purge_sessions": 5,
+            "structural_fold_sha256": "f6724919aea09d5871f8b38740a8b4d2817008f53c214445497f44c2375873ed",
+            "test_end_exclusive": "2022-01-03",
+            "test_start": "2021-01-11",
+            "train_end_exclusive": "2019-01-02",
+            "train_start": "2014-01-02",
+            "validation_end_exclusive": "2021-01-04",
+            "validation_start": "2019-01-09"
+          },
+          {
+            "embargo_sessions": 20,
+            "fold_id": "arv2-wf-test-2021-h20",
+            "horizon_sessions": 20,
+            "purge_sessions": 20,
+            "structural_fold_sha256": "08100307b01071fe1689e3a8414532bc7ca1f6210a1b4520b22850f658402060",
+            "test_end_exclusive": "2022-01-03",
+            "test_start": "2021-02-02",
+            "train_end_exclusive": "2019-01-02",
+            "train_start": "2014-01-02",
+            "validation_end_exclusive": "2021-01-04",
+            "validation_start": "2019-01-31"
+          },
+          {
+            "embargo_sessions": 60,
+            "fold_id": "arv2-wf-test-2021-h60",
+            "horizon_sessions": 60,
+            "purge_sessions": 60,
+            "structural_fold_sha256": "866402a65ee0ae86e1c645043d8801eaa4d33e077d500741834db68b746642e7",
+            "test_end_exclusive": "2022-01-03",
+            "test_start": "2021-03-31",
+            "train_end_exclusive": "2019-01-02",
+            "train_start": "2014-01-02",
+            "validation_end_exclusive": "2021-01-04",
+            "validation_start": "2019-03-29"
+          }
+        ],
+        "nominal_test_interval": {
+          "end_exclusive": "2022-01-03",
+          "start_inclusive": "2021-01-04"
+        },
+        "nominal_train_interval": {
+          "end_exclusive": "2019-01-02",
+          "start_inclusive": "2014-01-02"
+        },
+        "nominal_validation_interval": {
+          "end_exclusive": "2021-01-04",
+          "start_inclusive": "2019-01-02"
+        },
+        "ordered_horizons_sessions": [
+          1,
+          5,
+          20,
+          60
+        ],
+        "test_year": 2021
+      },
+      {
+        "fold_id": "arv2-wf-test-2022",
+        "fold_sha256": "5f56a7215fa78cde28cdbee25e867ffce4ab567474bf4b907106effb631f3031",
+        "horizon_boundaries": [
+          {
+            "embargo_sessions": 1,
+            "fold_id": "arv2-wf-test-2022-h1",
+            "horizon_sessions": 1,
+            "purge_sessions": 1,
+            "structural_fold_sha256": "bd74f8dddf0d956862e195354f2a691ef898d01f6adecb24354c549659decbbc",
+            "test_end_exclusive": "2023-01-03",
+            "test_start": "2022-01-04",
+            "train_end_exclusive": "2020-01-02",
+            "train_start": "2015-01-02",
+            "validation_end_exclusive": "2022-01-03",
+            "validation_start": "2020-01-03"
+          },
+          {
+            "embargo_sessions": 5,
+            "fold_id": "arv2-wf-test-2022-h5",
+            "horizon_sessions": 5,
+            "purge_sessions": 5,
+            "structural_fold_sha256": "ecc9e036aa5842c3bab011397ae9df6a40f244d8f3b4f45d5133e2595b794966",
+            "test_end_exclusive": "2023-01-03",
+            "test_start": "2022-01-10",
+            "train_end_exclusive": "2020-01-02",
+            "train_start": "2015-01-02",
+            "validation_end_exclusive": "2022-01-03",
+            "validation_start": "2020-01-09"
+          },
+          {
+            "embargo_sessions": 20,
+            "fold_id": "arv2-wf-test-2022-h20",
+            "horizon_sessions": 20,
+            "purge_sessions": 20,
+            "structural_fold_sha256": "663aaf425cb29796530ae830381cd38f36fbc851e98e6a4abcc7c70883bc0039",
+            "test_end_exclusive": "2023-01-03",
+            "test_start": "2022-02-01",
+            "train_end_exclusive": "2020-01-02",
+            "train_start": "2015-01-02",
+            "validation_end_exclusive": "2022-01-03",
+            "validation_start": "2020-01-31"
+          },
+          {
+            "embargo_sessions": 60,
+            "fold_id": "arv2-wf-test-2022-h60",
+            "horizon_sessions": 60,
+            "purge_sessions": 60,
+            "structural_fold_sha256": "55fe735d374d64aad4fb8771b055e0bc3489f419665791239893e1a4f0121df9",
+            "test_end_exclusive": "2023-01-03",
+            "test_start": "2022-03-30",
+            "train_end_exclusive": "2020-01-02",
+            "train_start": "2015-01-02",
+            "validation_end_exclusive": "2022-01-03",
+            "validation_start": "2020-03-30"
+          }
+        ],
+        "nominal_test_interval": {
+          "end_exclusive": "2023-01-03",
+          "start_inclusive": "2022-01-03"
+        },
+        "nominal_train_interval": {
+          "end_exclusive": "2020-01-02",
+          "start_inclusive": "2015-01-02"
+        },
+        "nominal_validation_interval": {
+          "end_exclusive": "2022-01-03",
+          "start_inclusive": "2020-01-02"
+        },
+        "ordered_horizons_sessions": [
+          1,
+          5,
+          20,
+          60
+        ],
+        "test_year": 2022
+      },
+      {
+        "fold_id": "arv2-wf-test-2023",
+        "fold_sha256": "ebed6de3e92880546ddc892438ccbcb4c017296df3a431708b23d25e71ac9b3e",
+        "horizon_boundaries": [
+          {
+            "embargo_sessions": 1,
+            "fold_id": "arv2-wf-test-2023-h1",
+            "horizon_sessions": 1,
+            "purge_sessions": 1,
+            "structural_fold_sha256": "123e75225c41dd30f16f6c6d9b3c47d577aeab3e4ed2a31e2e28f4179c85cf9e",
+            "test_end_exclusive": "2024-01-02",
+            "test_start": "2023-01-04",
+            "train_end_exclusive": "2021-01-04",
+            "train_start": "2016-01-04",
+            "validation_end_exclusive": "2023-01-03",
+            "validation_start": "2021-01-05"
+          },
+          {
+            "embargo_sessions": 5,
+            "fold_id": "arv2-wf-test-2023-h5",
+            "horizon_sessions": 5,
+            "purge_sessions": 5,
+            "structural_fold_sha256": "03d887f635c68f06c77613bc6dfac80693e3e72d3faba55c9febb2d514a67c7e",
+            "test_end_exclusive": "2024-01-02",
+            "test_start": "2023-01-10",
+            "train_end_exclusive": "2021-01-04",
+            "train_start": "2016-01-04",
+            "validation_end_exclusive": "2023-01-03",
+            "validation_start": "2021-01-11"
+          },
+          {
+            "embargo_sessions": 20,
+            "fold_id": "arv2-wf-test-2023-h20",
+            "horizon_sessions": 20,
+            "purge_sessions": 20,
+            "structural_fold_sha256": "f7652b53db085b949f3019c2b94be90f912df3a24ea79fda08b58c228638a4f3",
+            "test_end_exclusive": "2024-01-02",
+            "test_start": "2023-02-01",
+            "train_end_exclusive": "2021-01-04",
+            "train_start": "2016-01-04",
+            "validation_end_exclusive": "2023-01-03",
+            "validation_start": "2021-02-02"
+          },
+          {
+            "embargo_sessions": 60,
+            "fold_id": "arv2-wf-test-2023-h60",
+            "horizon_sessions": 60,
+            "purge_sessions": 60,
+            "structural_fold_sha256": "cfaf48e3d09818a890c966cca8e2e625ed16722a781970049a4579582b7dc435",
+            "test_end_exclusive": "2024-01-02",
+            "test_start": "2023-03-30",
+            "train_end_exclusive": "2021-01-04",
+            "train_start": "2016-01-04",
+            "validation_end_exclusive": "2023-01-03",
+            "validation_start": "2021-03-31"
+          }
+        ],
+        "nominal_test_interval": {
+          "end_exclusive": "2024-01-02",
+          "start_inclusive": "2023-01-03"
+        },
+        "nominal_train_interval": {
+          "end_exclusive": "2021-01-04",
+          "start_inclusive": "2016-01-04"
+        },
+        "nominal_validation_interval": {
+          "end_exclusive": "2023-01-03",
+          "start_inclusive": "2021-01-04"
+        },
+        "ordered_horizons_sessions": [
+          1,
+          5,
+          20,
+          60
+        ],
+        "test_year": 2023
+      },
+      {
+        "fold_id": "arv2-wf-test-2024",
+        "fold_sha256": "9570dd6708c299df0253ea6b2326d6ab866f29f115476ed445f018e4ac398d3e",
+        "horizon_boundaries": [
+          {
+            "embargo_sessions": 1,
+            "fold_id": "arv2-wf-test-2024-h1",
+            "horizon_sessions": 1,
+            "purge_sessions": 1,
+            "structural_fold_sha256": "0fd7c832b01dc53838b21b27f9c439fc5990e696726f991fe9fe8e45692fa279",
+            "test_end_exclusive": "2025-01-02",
+            "test_start": "2024-01-03",
+            "train_end_exclusive": "2022-01-03",
+            "train_start": "2017-01-03",
+            "validation_end_exclusive": "2024-01-02",
+            "validation_start": "2022-01-04"
+          },
+          {
+            "embargo_sessions": 5,
+            "fold_id": "arv2-wf-test-2024-h5",
+            "horizon_sessions": 5,
+            "purge_sessions": 5,
+            "structural_fold_sha256": "ac69065e7c394976a1cf277cfc9779fd3358ea2dffed4dcd0d91bca8cf5f4147",
+            "test_end_exclusive": "2025-01-02",
+            "test_start": "2024-01-09",
+            "train_end_exclusive": "2022-01-03",
+            "train_start": "2017-01-03",
+            "validation_end_exclusive": "2024-01-02",
+            "validation_start": "2022-01-10"
+          },
+          {
+            "embargo_sessions": 20,
+            "fold_id": "arv2-wf-test-2024-h20",
+            "horizon_sessions": 20,
+            "purge_sessions": 20,
+            "structural_fold_sha256": "51b55a161641747d6ee7de7bb4d81efe3983e71596d6136a8428c8da47754852",
+            "test_end_exclusive": "2025-01-02",
+            "test_start": "2024-01-31",
+            "train_end_exclusive": "2022-01-03",
+            "train_start": "2017-01-03",
+            "validation_end_exclusive": "2024-01-02",
+            "validation_start": "2022-02-01"
+          },
+          {
+            "embargo_sessions": 60,
+            "fold_id": "arv2-wf-test-2024-h60",
+            "horizon_sessions": 60,
+            "purge_sessions": 60,
+            "structural_fold_sha256": "d84bc9965329b18329ad81b7f4e8da2a6bd070138335933b7c42bf4a0a515a5a",
+            "test_end_exclusive": "2025-01-02",
+            "test_start": "2024-03-28",
+            "train_end_exclusive": "2022-01-03",
+            "train_start": "2017-01-03",
+            "validation_end_exclusive": "2024-01-02",
+            "validation_start": "2022-03-30"
+          }
+        ],
+        "nominal_test_interval": {
+          "end_exclusive": "2025-01-02",
+          "start_inclusive": "2024-01-02"
+        },
+        "nominal_train_interval": {
+          "end_exclusive": "2022-01-03",
+          "start_inclusive": "2017-01-03"
+        },
+        "nominal_validation_interval": {
+          "end_exclusive": "2024-01-02",
+          "start_inclusive": "2022-01-03"
+        },
+        "ordered_horizons_sessions": [
+          1,
+          5,
+          20,
+          60
+        ],
+        "test_year": 2024
+      },
+      {
+        "fold_id": "arv2-wf-test-2025",
+        "fold_sha256": "0bca0526decc6b15274fe09c374d8b72e72386058700bd6384fb14872177130f",
+        "horizon_boundaries": [
+          {
+            "embargo_sessions": 1,
+            "fold_id": "arv2-wf-test-2025-h1",
+            "horizon_sessions": 1,
+            "purge_sessions": 1,
+            "structural_fold_sha256": "a388cf96d6eb4e6f1e0ccc13f02f39edc9c6921b03bb9fcb247682a53bcee869",
+            "test_end_exclusive": "2026-01-02",
+            "test_start": "2025-01-03",
+            "train_end_exclusive": "2023-01-03",
+            "train_start": "2018-01-02",
+            "validation_end_exclusive": "2025-01-02",
+            "validation_start": "2023-01-04"
+          },
+          {
+            "embargo_sessions": 5,
+            "fold_id": "arv2-wf-test-2025-h5",
+            "horizon_sessions": 5,
+            "purge_sessions": 5,
+            "structural_fold_sha256": "22f9af482316d488a3a6d37679dbc67f107499a57ebdc3ba885505f4dc1ad4e9",
+            "test_end_exclusive": "2026-01-02",
+            "test_start": "2025-01-10",
+            "train_end_exclusive": "2023-01-03",
+            "train_start": "2018-01-02",
+            "validation_end_exclusive": "2025-01-02",
+            "validation_start": "2023-01-10"
+          },
+          {
+            "embargo_sessions": 20,
+            "fold_id": "arv2-wf-test-2025-h20",
+            "horizon_sessions": 20,
+            "purge_sessions": 20,
+            "structural_fold_sha256": "65eb4913bc9f75ede4123a08a810de3666342b60521d2800e920e91fcb49c030",
+            "test_end_exclusive": "2026-01-02",
+            "test_start": "2025-02-03",
+            "train_end_exclusive": "2023-01-03",
+            "train_start": "2018-01-02",
+            "validation_end_exclusive": "2025-01-02",
+            "validation_start": "2023-02-01"
+          },
+          {
+            "embargo_sessions": 60,
+            "fold_id": "arv2-wf-test-2025-h60",
+            "horizon_sessions": 60,
+            "purge_sessions": 60,
+            "structural_fold_sha256": "5a1609901b948d06e141b047b69366e6c0e45d0d2b1447367abe029dc908db67",
+            "test_end_exclusive": "2026-01-02",
+            "test_start": "2025-04-01",
+            "train_end_exclusive": "2023-01-03",
+            "train_start": "2018-01-02",
+            "validation_end_exclusive": "2025-01-02",
+            "validation_start": "2023-03-30"
+          }
+        ],
+        "nominal_test_interval": {
+          "end_exclusive": "2026-01-02",
+          "start_inclusive": "2025-01-02"
+        },
+        "nominal_train_interval": {
+          "end_exclusive": "2023-01-03",
+          "start_inclusive": "2018-01-02"
+        },
+        "nominal_validation_interval": {
+          "end_exclusive": "2025-01-02",
+          "start_inclusive": "2023-01-03"
+        },
+        "ordered_horizons_sessions": [
+          1,
+          5,
+          20,
+          60
+        ],
+        "test_year": 2025
+      }
+    ],
+    "gap_semantics": "purge_is_train_end_exclusive_to_effective_validation_start_and_embargo_is_validation_end_exclusive_to_effective_test_start",
+    "half_open_train_validation_test_session_intervals": "materialized_in_each_fold_and_horizon_boundary",
+    "interval_semantics": "half_open_nyse_session_intervals",
+    "ordered_fold_ids": [
+      "arv2-wf-test-2020",
+      "arv2-wf-test-2021",
+      "arv2-wf-test-2022",
+      "arv2-wf-test-2023",
+      "arv2-wf-test-2024",
+      "arv2-wf-test-2025"
+    ],
+    "partial_2026_disposition": "excluded_from_fixed_cutoff_evaluation_locked_no_blind_extension",
+    "per_horizon_purge_and_embargo_intervals": "materialized_for_1_5_20_60_sessions_each_equal_to_horizon",
+    "rolling_or_expanding_rule": "rolling",
+    "step_years": 1,
+    "test_years": 1,
+    "train_years": 5,
+    "validation_years": 2
+  }
+}

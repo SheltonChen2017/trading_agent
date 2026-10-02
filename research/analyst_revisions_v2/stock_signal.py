@@ -36,6 +36,7 @@ from .canonical import (
 )
 from .firm_ontology import ReviewedFirmRatingOntology
 from .formulas import (
+    _stable_decimal_sum,
     ActivityAwareObservation,
     ActivityObservationState,
     FormulaError,
@@ -1035,7 +1036,9 @@ def _fraction_decimal(value: Fraction) -> Decimal:
 
 
 def _stable_sum(values: Iterable[Decimal]) -> Decimal:
-    return sum(sorted(values, key=lambda value: (abs(value), value)), Decimal("0"))
+    # One authoritative permutation-invariance rule: delegate to the formulas
+    # module rather than keeping a second copy that could drift.
+    return _stable_decimal_sum(values)
 
 
 def _refusal(

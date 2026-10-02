@@ -8,7 +8,7 @@ import subprocess
 import threading
 import uuid
 import weakref
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Mapping, Sequence
 
 from . import CANONICAL_EVENT_SCHEMA, DATASET_SCHEMA
@@ -105,8 +105,167 @@ class CleanGitLineage:
         require_git_object(self.producing_tree, "producing_tree")
 
 
-def _run_git(repository_root: Path, arguments: Sequence[str]) -> str:
-    command = ["git", "-C", str(repository_root), *arguments]
+_READ_ONLY_GIT_SUBCOMMANDS = frozenset(
+    {"cat-file", "ls-files", "rev-parse", "show", "status"}
+)
+
+
+def _is_canonical_git_path(value: str) -> bool:
+    """Return whether ``value`` is one inert repository-relative path."""
+
+    if (
+        type(value) is not str
+        or not value
+        or "\\" in value
+        or ":" in value
+        or any(character in value for character in "*?[")
+        or any(ord(character) < 32 or ord(character) == 127 for character in value)
+    ):
+        return False
+    path = PurePosixPath(value)
+    return (
+        not path.is_absolute()
+        and path.as_posix() == value
+        and all(part not in ("", ".", "..") for part in path.parts)
+    )
+
+
+def _is_canonical_commit(value: str) -> bool:
+    return (
+        type(value) is str
+        and len(value) in (40, 64)
+        and all(character in "0123456789abcdef" for character in value)
+    )
+
+
+def _is_commit_blob(value: str) -> bool:
+    if type(value) is not str or ":" not in value:
+        return False
+    commit, separator, path = value.partition(":")
+    return (
+        separator == ":"
+        and (commit == "HEAD" or _is_canonical_commit(commit))
+        and _is_canonical_git_path(path)
+    )
+
+
+def _require_read_only_git_arguments(arguments: Sequence[str]) -> tuple[str, ...]:
+    """Accept only the exact inert Git query shapes used by this lane."""
+
+    if isinstance(arguments, (str, bytes)):
+        raise DatasetVerificationError(
+            "Git arguments are not an approved read-only argument shape"
+        )
+    rendered = tuple(arguments)
+    if (
+        not rendered
+        or any(type(argument) is not str for argument in rendered)
+        or rendered[0] not in _READ_ONLY_GIT_SUBCOMMANDS
+    ):
+        raise DatasetVerificationError(
+            "Git subcommand is not on the read-only allowlist: "
+            f"{rendered[0] if rendered else '<empty>'}"
+        )
+
+    approved = False
+    if rendered[0] == "rev-parse":
+        approved = rendered in {
+            ("rev-parse", "--show-toplevel"),
+            ("rev-parse", "--verify", "HEAD"),
+            ("rev-parse", "--verify", "HEAD^{tree}"),
+        }
+    elif rendered[0] == "status":
+        prefix = ("status", "--porcelain=v1", "--untracked-files=all")
+        approved = rendered == prefix or (
+            len(rendered) > len(prefix) + 1
+            and rendered[: len(prefix)] == prefix
+            and rendered[len(prefix)] == "--"
+            and all(_is_canonical_git_path(path) for path in rendered[len(prefix) + 1 :])
+        )
+    elif rendered[0] == "ls-files":
+        approved = (
+            len(rendered) >= 4
+            and rendered[1:3] in (("-z", "--"), ("--error-unmatch", "--"))
+            and all(_is_canonical_git_path(path) for path in rendered[3:])
+        )
+    elif rendered[0] == "show":
+        approved = len(rendered) == 2 and _is_commit_blob(rendered[1])
+    elif rendered[0] == "cat-file":
+        approved = (
+            len(rendered) == 3
+            and rendered[1] == "-e"
+            and rendered[2].endswith("^{commit}")
+            and _is_canonical_commit(rendered[2][:-9])
+        )
+
+    if not approved:
+        raise DatasetVerificationError(
+            "Git arguments are not an approved read-only argument shape"
+        )
+    return rendered
+
+
+def _read_only_git_environment() -> dict[str, str]:
+    """Remove inherited Git controls and disable optional writes/prompts."""
+
+    environment = {
+        key: value
+        for key, value in os.environ.items()
+        if not key.upper().startswith("GIT_")
+    }
+    environment.update(
+        {
+            "GIT_NO_LAZY_FETCH": "1",
+            "GIT_NO_REPLACE_OBJECTS": "1",
+            "GIT_ATTR_NOSYSTEM": "1",
+            "GIT_CONFIG_GLOBAL": os.devnull,
+            "GIT_CONFIG_NOSYSTEM": "1",
+            "GIT_OPTIONAL_LOCKS": "0",
+            "GIT_PAGER": "cat",
+            "GIT_TERMINAL_PROMPT": "0",
+        }
+    )
+    return environment
+
+
+def _git_config_query_environment() -> dict[str, str]:
+    """Permit data-only config reads while blocking environment injection."""
+
+    environment = {
+        key: value
+        for key, value in os.environ.items()
+        if not key.upper().startswith("GIT_")
+    }
+    environment.update(
+        {
+            "GIT_NO_LAZY_FETCH": "1",
+            "GIT_NO_REPLACE_OBJECTS": "1",
+            "GIT_PAGER": "cat",
+            "GIT_TERMINAL_PROMPT": "0",
+        }
+    )
+    return environment
+
+
+def _effective_git_conversion_value(
+    repository_root: Path,
+    key: str,
+    *,
+    default: str,
+    aliases: Mapping[str, str],
+) -> str:
+    """Read and strictly normalize one non-executable checkout setting."""
+
+    command = [
+        "git",
+        "--no-optional-locks",
+        "--no-replace-objects",
+        "-C",
+        str(repository_root),
+        "config",
+        "--get",
+        key,
+    ]
     try:
         completed = subprocess.run(
             command,
@@ -116,6 +275,376 @@ def _run_git(repository_root: Path, arguments: Sequence[str]) -> str:
             encoding="utf-8",
             errors="strict",
             shell=False,
+            env=_git_config_query_environment(),
+        )
+    except (OSError, UnicodeError) as exc:
+        raise DatasetVerificationError(
+            "Git conversion configuration could not be read"
+        ) from exc
+    if completed.returncode == 1 and not completed.stdout:
+        return default
+    if completed.returncode != 0:
+        raise DatasetVerificationError(
+            "Git conversion configuration could not be read"
+        )
+    raw = completed.stdout.strip().lower()
+    try:
+        return aliases[raw]
+    except KeyError as exc:
+        raise DatasetVerificationError(
+            f"unsupported Git conversion configuration for {key}"
+        ) from exc
+
+
+def _refuse_local_git_filter_drivers(repository_root: Path) -> None:
+    """Refuse status when repository config can execute content filters."""
+
+    command = [
+        "git",
+        "--no-optional-locks",
+        "--no-replace-objects",
+        "-C",
+        str(repository_root),
+        "config",
+        "--includes",
+        "--name-only",
+        "--get-regexp",
+        r"^filter\.",
+    ]
+    try:
+        completed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="strict",
+            shell=False,
+            env=_read_only_git_environment(),
+        )
+    except (OSError, UnicodeError) as exc:
+        raise DatasetVerificationError(
+            "local Git filter configuration could not be audited"
+        ) from exc
+    if completed.returncode == 1 and not completed.stdout:
+        return
+    if completed.returncode != 0:
+        raise DatasetVerificationError(
+            "local Git filter configuration could not be audited"
+        )
+    executable_suffixes = (".clean", ".process", ".smudge")
+    if any(
+        name.strip().lower().endswith(executable_suffixes)
+        for name in completed.stdout.splitlines()
+    ):
+        raise DatasetVerificationError(
+            "local Git filter driver is forbidden at the read-only boundary"
+        )
+
+
+def _refuse_nonstandard_git_index_entries(repository_root: Path) -> None:
+    """Reject index flags that can make a changed working file look clean."""
+
+    command = [
+        "git",
+        "--no-optional-locks",
+        "--no-replace-objects",
+        "-c",
+        "core.commitGraph=false",
+        "-c",
+        "core.fsmonitor=false",
+        "-C",
+        str(repository_root),
+        "ls-files",
+        "-v",
+        "-z",
+        "--",
+    ]
+    try:
+        completed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            shell=False,
+            env=_read_only_git_environment(),
+        )
+    except OSError as exc:
+        raise DatasetVerificationError("Git index flags could not be audited") from exc
+    if completed.returncode != 0:
+        raise DatasetVerificationError("Git index flags could not be audited")
+    for entry in completed.stdout.split(b"\0"):
+        if not entry:
+            continue
+        if len(entry) < 3 or entry[:2] != b"H ":
+            raise DatasetVerificationError(
+                "nonstandard Git index flag is forbidden at the clean-lineage boundary"
+            )
+
+
+def _require_worktree_content_matches_index(
+    repository_root: Path, status_arguments: tuple[str, ...]
+) -> None:
+    """Hash tracked working bytes independently of Git's stat-cache shortcut."""
+
+    prefix = ("status", "--porcelain=v1", "--untracked-files=all")
+    requested_paths = (
+        status_arguments[len(prefix) + 1 :]
+        if len(status_arguments) > len(prefix)
+        else ()
+    )
+    inventory_command = [
+        "git",
+        "--no-optional-locks",
+        "--no-replace-objects",
+        "-c",
+        "core.fsmonitor=false",
+        "-C",
+        str(repository_root),
+        "ls-files",
+        "-s",
+        "-z",
+        "--",
+        *requested_paths,
+    ]
+    try:
+        inventory = subprocess.run(
+            inventory_command,
+            check=False,
+            capture_output=True,
+            shell=False,
+            env=_read_only_git_environment(),
+        )
+    except OSError as exc:
+        raise DatasetVerificationError(
+            "Git index content could not be audited"
+        ) from exc
+    if inventory.returncode != 0:
+        raise DatasetVerificationError("Git index content could not be audited")
+
+    entries: list[tuple[str, str]] = []
+    for entry in inventory.stdout.split(b"\0"):
+        if not entry:
+            continue
+        metadata, separator, raw_path = entry.partition(b"\t")
+        fields = metadata.split()
+        if separator != b"\t" or len(fields) != 3:
+            raise DatasetVerificationError("Git index content is malformed")
+        mode, raw_oid, stage = fields
+        try:
+            oid = raw_oid.decode("ascii", errors="strict")
+            relative_path = raw_path.decode("utf-8", errors="strict")
+        except UnicodeError as exc:
+            raise DatasetVerificationError(
+                "Git index path or object id is not canonical text"
+            ) from exc
+        if (
+            mode not in (b"100644", b"100755")
+            or stage != b"0"
+            or not _is_canonical_commit(oid)
+            or not _is_canonical_git_path(relative_path)
+        ):
+            raise DatasetVerificationError(
+                "Git index content is not a canonical regular-file inventory"
+            )
+        entries.append((relative_path, oid))
+
+    conversion_options = _read_only_git_global_options(
+        repository_root, include_conversion=True
+    )
+    try:
+        resolved_root = repository_root.resolve(strict=True)
+    except OSError as exc:
+        raise DatasetVerificationError("repository root is not accessible") from exc
+    for relative_path, _expected_oid in entries:
+        working_path = repository_root / PurePosixPath(relative_path)
+        try:
+            working_path.resolve(strict=True).relative_to(resolved_root)
+        except (OSError, ValueError) as exc:
+            raise DatasetVerificationError(
+                "tracked working file is absent or escapes the repository"
+            ) from exc
+        cursor = working_path
+        while cursor != repository_root:
+            if cursor.is_symlink() or (
+                cursor.is_junction() if hasattr(cursor, "is_junction") else False
+            ):
+                raise DatasetVerificationError(
+                    "tracked working file cannot cross a symlink or junction"
+                )
+            cursor = cursor.parent
+        if not working_path.is_file():
+            raise DatasetVerificationError(
+                "tracked working path is not a regular file"
+            )
+
+    if not entries:
+        return
+    attribute_command = [
+        "git",
+        *_read_only_git_global_options(repository_root, include_conversion=False),
+        "-C",
+        str(repository_root),
+        "check-attr",
+        "-z",
+        "--stdin",
+        "ident",
+    ]
+    encoded_paths = b"\0".join(
+        relative_path.encode("utf-8", errors="strict")
+        for relative_path, _oid in entries
+    ) + b"\0"
+    try:
+        attributes = subprocess.run(
+            attribute_command,
+            check=False,
+            capture_output=True,
+            input=encoded_paths,
+            shell=False,
+            env=_read_only_git_environment(),
+        )
+    except (OSError, UnicodeError) as exc:
+        raise DatasetVerificationError(
+            "tracked working attributes could not be audited"
+        ) from exc
+    attribute_fields = attributes.stdout.split(b"\0")
+    if attribute_fields and not attribute_fields[-1]:
+        attribute_fields.pop()
+    expected_attribute_fields: list[bytes] = []
+    for relative_path, _oid in entries:
+        expected_attribute_fields.extend(
+            (relative_path.encode("utf-8"), b"ident", b"unspecified")
+        )
+    if attributes.returncode != 0 or len(attribute_fields) != len(
+        expected_attribute_fields
+    ):
+        raise DatasetVerificationError(
+            "tracked working attributes could not be audited"
+        )
+    for offset in range(0, len(attribute_fields), 3):
+        actual_path, actual_name, actual_value = attribute_fields[offset : offset + 3]
+        expected_path = expected_attribute_fields[offset]
+        if actual_path != expected_path or actual_name != b"ident":
+            raise DatasetVerificationError(
+                "tracked working attributes could not be audited"
+            )
+        if actual_value not in (b"unspecified", b"unset"):
+            raise DatasetVerificationError(
+                "Git ident expansion is forbidden at the clean-lineage boundary"
+            )
+
+    command = [
+        "git",
+        *conversion_options,
+        "-C",
+        str(repository_root),
+        "hash-object",
+        "--stdin-paths",
+    ]
+    try:
+        hashed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            input="".join(f"{relative_path}\n" for relative_path, _oid in entries),
+            text=True,
+            encoding="utf-8",
+            errors="strict",
+            shell=False,
+            env=_read_only_git_environment(),
+        )
+    except (OSError, UnicodeError) as exc:
+        raise DatasetVerificationError(
+            "tracked working content could not be hashed"
+        ) from exc
+    actual_oids = hashed.stdout.splitlines()
+    if hashed.returncode != 0 or len(actual_oids) != len(entries):
+        raise DatasetVerificationError(
+            "tracked working content could not be hashed"
+        )
+    for (_relative_path, expected_oid), actual_oid in zip(entries, actual_oids):
+        if not _is_canonical_commit(actual_oid) or actual_oid != expected_oid:
+            raise DatasetVerificationError(
+                "tracked working content differs from the Git index"
+            )
+
+
+def _read_only_git_global_options(
+    repository_root: Path, *, include_conversion: bool
+) -> list[str]:
+    options = [
+        "--no-optional-locks",
+        "--no-replace-objects",
+        "-c",
+        "core.commitGraph=false",
+        "-c",
+        "core.fsmonitor=false",
+        "-c",
+        "core.ignoreStat=false",
+        "-c",
+        "core.untrackedCache=false",
+        "-c",
+        "diff.external=",
+    ]
+    if include_conversion:
+        autocrlf = _effective_git_conversion_value(
+            repository_root,
+            "core.autocrlf",
+            default="false",
+            aliases={
+                "0": "false",
+                "1": "true",
+                "false": "false",
+                "input": "input",
+                "no": "false",
+                "off": "false",
+                "on": "true",
+                "true": "true",
+                "yes": "true",
+            },
+        )
+        eol = _effective_git_conversion_value(
+            repository_root,
+            "core.eol",
+            default="native",
+            aliases={"crlf": "crlf", "lf": "lf", "native": "native"},
+        )
+        options.extend(
+            ("-c", f"core.autocrlf={autocrlf}", "-c", f"core.eol={eol}")
+        )
+    return options
+
+
+def _read_only_git_command(
+    repository_root: Path, arguments: Sequence[str]
+) -> list[str]:
+    return [
+        "git",
+        *_read_only_git_global_options(
+            repository_root, include_conversion=arguments[0] == "status"
+        ),
+        "-C",
+        str(repository_root),
+        *arguments,
+    ]
+
+
+def _run_git(repository_root: Path, arguments: Sequence[str]) -> str:
+    rendered = _require_read_only_git_arguments(arguments)
+    if rendered[0] == "status":
+        _refuse_local_git_filter_drivers(repository_root)
+        _refuse_nonstandard_git_index_entries(repository_root)
+        _require_worktree_content_matches_index(repository_root, rendered)
+    command = _read_only_git_command(repository_root, rendered)
+    try:
+        completed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="strict",
+            shell=False,
+            env=_read_only_git_environment(),
         )
     except (OSError, UnicodeError) as exc:
         raise DatasetVerificationError("Git lineage command could not run") from exc
@@ -126,13 +655,19 @@ def _run_git(repository_root: Path, arguments: Sequence[str]) -> str:
 
 
 def _run_git_bytes(repository_root: Path, arguments: Sequence[str]) -> bytes:
-    command = ["git", "-C", str(repository_root), *arguments]
+    rendered = _require_read_only_git_arguments(arguments)
+    if rendered[0] == "status":
+        _refuse_local_git_filter_drivers(repository_root)
+        _refuse_nonstandard_git_index_entries(repository_root)
+        _require_worktree_content_matches_index(repository_root, rendered)
+    command = _read_only_git_command(repository_root, rendered)
     try:
         completed = subprocess.run(
             command,
             check=False,
             capture_output=True,
             shell=False,
+            env=_read_only_git_environment(),
         )
     except OSError as exc:
         raise DatasetVerificationError("Git lineage command could not run") from exc
@@ -152,6 +687,52 @@ def read_git_bytes(repository_root: Path, arguments: Sequence[str]) -> bytes:
     return _run_git_bytes(repository_root, arguments)
 
 
+def _refuse_git_grafts(repository_root: Path) -> None:
+    """Reject legacy graft metadata that can forge commit ancestry."""
+
+    command = [
+        "git",
+        *_read_only_git_global_options(repository_root, include_conversion=False),
+        "-C",
+        str(repository_root),
+        "rev-parse",
+        "--path-format=absolute",
+        "--git-path",
+        "info/grafts",
+    ]
+    try:
+        completed = subprocess.run(
+            command,
+            check=False,
+            capture_output=True,
+            text=True,
+            encoding="utf-8",
+            errors="strict",
+            shell=False,
+            env=_read_only_git_environment(),
+        )
+    except (OSError, UnicodeError) as exc:
+        raise DatasetVerificationError("Git graft metadata could not be audited") from exc
+    lines = completed.stdout.splitlines()
+    if completed.returncode != 0 or len(lines) != 1 or not lines[0]:
+        raise DatasetVerificationError("Git graft metadata could not be audited")
+    grafts_path = Path(lines[0].replace("/", os.sep))
+    if not grafts_path.is_absolute():
+        grafts_path = repository_root / grafts_path
+    try:
+        grafts_path.parent.resolve(strict=True)
+    except OSError as exc:
+        raise DatasetVerificationError("Git graft metadata could not be audited") from exc
+    if (
+        grafts_path.exists()
+        or grafts_path.is_symlink()
+        or (grafts_path.is_junction() if hasattr(grafts_path, "is_junction") else False)
+    ):
+        raise DatasetVerificationError(
+            "legacy Git graft metadata is forbidden at the ancestry boundary"
+        )
+
+
 def git_commit_is_ancestor(
     repository_root: Path, ancestor: str, descendant: str
 ) -> bool:
@@ -159,10 +740,14 @@ def git_commit_is_ancestor(
     require_git_object(ancestor, "ancestor")
     if descendant != "HEAD":
         require_git_object(descendant, "descendant")
+    _refuse_git_grafts(repository_root)
     try:
         completed = subprocess.run(
             [
                 "git",
+                *_read_only_git_global_options(
+                    repository_root, include_conversion=False
+                ),
                 "-C",
                 str(repository_root),
                 "merge-base",
@@ -173,9 +758,11 @@ def git_commit_is_ancestor(
             check=False,
             capture_output=True,
             shell=False,
+            env=_read_only_git_environment(),
         )
     except OSError as exc:
         raise DatasetVerificationError("Git ancestry query could not run") from exc
+    _refuse_git_grafts(repository_root)
     if completed.returncode == 0:
         return True
     if completed.returncode == 1:

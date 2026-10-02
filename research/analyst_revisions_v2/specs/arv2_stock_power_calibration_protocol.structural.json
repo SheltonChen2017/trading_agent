@@ -1,0 +1,359 @@
+{
+  "acyclic_lineage": {
+    "edge_direction": "child_to_parent",
+    "fold_manifest_or_stock_v2_repin_or_reparent": "forbidden",
+    "ordered_nodes": [
+      {
+        "node": "strategy_pdf",
+        "parents": []
+      },
+      {
+        "node": "qc_base",
+        "parents": [
+          "strategy_pdf"
+        ]
+      },
+      {
+        "node": "qc_plan",
+        "parents": [
+          "strategy_pdf",
+          "qc_base"
+        ]
+      },
+      {
+        "node": "stock_v1",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan"
+        ]
+      },
+      {
+        "node": "fold_manifest",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1"
+        ]
+      },
+      {
+        "node": "global_map",
+        "parents": [
+          "strategy_pdf"
+        ]
+      },
+      {
+        "node": "matched_contract",
+        "parents": [
+          "strategy_pdf",
+          "stock_v1",
+          "fold_manifest",
+          "global_map"
+        ]
+      },
+      {
+        "node": "stock_v2",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1",
+          "fold_manifest",
+          "global_map",
+          "matched_contract"
+        ]
+      },
+      {
+        "node": "power_protocol",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1",
+          "fold_manifest",
+          "global_map",
+          "matched_contract",
+          "stock_v2"
+        ]
+      }
+    ],
+    "protocol_is_leaf": true,
+    "reviewed_ARV2_4C_nodes_and_edges_unchanged": true
+  },
+  "authority": "calibration_method_only_no_input_data_outcome_receipt_qc_or_deployment_authority",
+  "bound_ancestry": {
+    "existing_fold_manifest": {
+      "artifact_id": "arv2-stock-folds-1002155dbe8e3e87",
+      "artifact_sha256": "fecd984ad937fed57b860b15fdcb9cc994ff59ab62c3b72d5160ab62b342953c",
+      "content_sha256": "1002155dbe8e3e87b220b7419039bff95f5c0812d2306c56a8ac51b76c5d7611"
+    },
+    "global_rating_map": {
+      "artifact_id": "arv2-global-rating-map-aaf5830c3c3fb403",
+      "artifact_sha256": "630cc822fa83d7aba15920cfb8f37863f6d6fffa262e26ac96074e8526391f4e",
+      "content_sha256": "aaf5830c3c3fb403b0e84f5ad22d1f20fa3f91df41cf3bd64f33695875d2e3d9"
+    },
+    "matched_comparison_contract": {
+      "artifact_id": "arv2-global-matched-b94a3457b848c4dc",
+      "artifact_sha256": "40b164e3e2944053eaaaaf1a651e34dfb335a4cbc8aeca2ee3f67ecdc9e8dffa",
+      "content_sha256": "b94a3457b848c4dc1f6dee77ef366002362573431eb9cc2fc3b8f530ec7f89c9"
+    },
+    "predecessor_stock_spec": {
+      "artifact_id": "arv2-stock-historical-c5ff2a6a0dcf341e",
+      "artifact_sha256": "34d1e71548bc6850a02590596594944dad3fadb38954067f2cc2d00dcaa86bc8",
+      "content_sha256": "c5ff2a6a0dcf341e3c7bad4ea56e4a3c00f20faab5896c0fcd3bd7c291835a0b"
+    },
+    "qc_first_plan": {
+      "artifact_id": "arv2-qc-first-plan-36e455e72b8750fe",
+      "artifact_sha256": "8339238dd5ce32ed7b351aab2662fb408cc7d9a3c62ff89bf8b1d14f20acd081",
+      "content_sha256": "36e455e72b8750fe3f34773382870e10e62f3f40b5392ae587690bda081b85dc"
+    },
+    "stock_successor_v2": {
+      "artifact_id": "arv2-stock-historical-successor-a9a2210b8f6582bc",
+      "artifact_sha256": "51718ee5ae278d1254e8efb01b2acdd9c6cbe51741dd72d5b5969c3b48576647",
+      "content_sha256": "a9a2210b8f6582bc3ce9e533ce33e9b51ffc0a0b3203b62ad21d9d373ce06f95"
+    }
+  },
+  "calibration_source": {
+    "all_other_computed_or_intermediate_statistics": "forbidden_to_persist_or_disclose",
+    "allowed_numeric_receipt_outputs": [
+      "valid_beta_date_count",
+      "lag_pair_counts_0_through_20",
+      "long_run_variance",
+      "component_count_census_sha256",
+      "component_count_census_session_count",
+      "q05_components_per_date",
+      "raw_required_valid_dates",
+      "required_valid_dates",
+      "required_connected_components",
+      "fixed_capacity_disposition"
+    ],
+    "boundary_source": {
+      "first_test_session": "2020-01-31",
+      "fold_id": "arv2-wf-test-2020-h20",
+      "horizon_sessions": 20,
+      "structural_fold_sha256": "9dcaa09e8f6b9b3786e016bb1db5c3d0ebfd918d49951e8de45dad3383c4fa5c",
+      "validation_end_exclusive": "2020-01-02",
+      "validation_start_inclusive": "2018-01-31"
+    },
+    "complete_NYSE_session_axis": {
+      "first_session": "2018-01-31",
+      "last_session": "2019-12-31",
+      "session_axis_sha256": "22d38c7178f6863d4d9f5284eba9216b0f8499848b1188781316d1169b13a051",
+      "session_count": 483
+    },
+    "exclusive_use": "may_never_tune_effect_map_fold_threshold_period_seed_or_retry",
+    "forbidden_persisted_or_disclosed_outputs": [
+      "date_level_beta_values",
+      "beta_mean",
+      "beta_sign",
+      "information_coefficient",
+      "p_value",
+      "security_or_date_return",
+      "portfolio_return",
+      "PnL",
+      "strategy_performance",
+      "gate_result"
+    ],
+    "maturity_separation": {
+      "last_included_decision_session": "2019-12-31",
+      "last_included_h20_outcome_session": "2020-01-30",
+      "strictly_before_first_test_session": true,
+      "validation_end_boundary_h20_outcome_would_equal_first_test_session_and_is_excluded": true
+    },
+    "numeric_receipt_output_allowlist_is_closed": true,
+    "role": "nuisance_variance_dependence_and_preoutcome_component_calibration_only_not_an_evaluation"
+  },
+  "capabilities": {
+    "authoritative_power_receipt": false,
+    "calibration_input_access": false,
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "power_plan_binding": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "claim_scope": {
+    "claim": "nominal_asymptotic_planning_power_for_primary_gate_only",
+    "coefficient_unit": "20_session_arithmetic_gross_SPY_excess_return_per_plus_1_adjusted_score_unit",
+    "does_not_establish_power_for": [
+      "economic_net_sleeve_gate",
+      "firm_specific_vs_global_paired_IC_gate",
+      "three_gate_conjunction",
+      "exact_19999_replicate_bootstrap_test",
+      "the_strategy_lane_as_a_whole"
+    ],
+    "primary_gate_id": "bullish_20_session_fama_macbeth",
+    "regressor": "max(final_control_adjusted_score,0)"
+  },
+  "component_floor_protocol": {
+    "calibrated_pooled_requirement": "required_valid_dates*q05_components_per_date",
+    "component_definition": "firm_specific_primary_h20_Fama_MacBeth_design_connected_component_instances_per_complete_axis_session_built_from_all_point_in_time_eligible_security_decision_rows_including_structural_zero_neutral_rows_with_no_score_or_sign_filter_after_all_required_nonoutcome_eligibility_common_event_and_cross_date_component_refusals_before_outcome_join_and_before_global_comparator_matching_with_neutral_rows_as_singletons",
+    "fixed_rank_for_483_sessions": 25,
+    "honest_zero_count": "included_as_zero",
+    "input": "one_exact_session_and_nonnegative_integer_count_pair_for_each_of_483_sessions_ordered_by_the_complete_calibration_axis",
+    "method": "lower_tail_empirical_nearest_rank_without_interpolation",
+    "missing_duplicate_or_unverifiable_count": "INVALID_CALIBRATION_not_zero_and_not_excluded",
+    "one_based_rank": "max(1,ceil(session_count/20))",
+    "q05_components_per_date": "sorted_complete_axis_counts[24]",
+    "quantile": {
+      "denominator": 20,
+      "numerator": 1
+    },
+    "required_connected_components": "max(50,required_valid_dates*q05_components_per_date)",
+    "selection_role": "none_never_a_per_date_filter_and_never_drops_dates",
+    "stage": "authenticated_preoutcome_complete_axis_census"
+  },
+  "coverage_and_disposition": {
+    "adequate_sample_gate_failure": "FAIL_closes_family",
+    "calibration_invalid": "INVALID_CALIBRATION_no_fallback",
+    "coverage_inputs": "preoutcome_only_no_outcome_availability_value_or_dispersion",
+    "existing_five_19_over_20_ledgers": "unchanged_pooled_and_per_fold_exact_integer_cross_multiplication",
+    "post_join_honest_underfill": "INCONCLUSIVE_locked_no_extension",
+    "preoutcome_structural_shortfall": "INVALID_DATA_requires_new_owner_approved_content_addressed_policy_before_any_outcome_look",
+    "underfill_or_failure_rescue": "forbidden_no_alias_date_fold_period_seed_threshold_or_retry_change"
+  },
+  "deferred_ARV2_4D_B": {
+    "calibration_input_manifest": "future_content_addressed_child_of_this_protocol_binding_only_source_identity_hash_schema_rights_processing_lineage_exact_session_keys_and_counts_never_row_returns_or_date_level_betas",
+    "current_numeric_values": {
+      "calibration_input_manifest_sha256": null,
+      "component_count_census_session_count": null,
+      "component_count_census_sha256": null,
+      "long_run_variance": null,
+      "numeric_power_receipt_sha256": null,
+      "q05_components_per_date": null,
+      "raw_required_valid_dates": null,
+      "required_connected_components": null,
+      "required_valid_dates": null,
+      "stock_successor_v3_sha256": null
+    },
+    "exact_calibration_input_manifest_schema": "deferred_to_separately_authorized_and_independently_reviewed_ARV2-4D-B_child",
+    "numeric_power_receipt": "future_content_addressed_child_of_this_protocol_and_authenticated_input_manifest",
+    "required_receipt_fields": [
+      "protocol_id",
+      "protocol_hash",
+      "calibration_input_manifest_sha256",
+      "valid_beta_date_count",
+      "lag_pair_counts_0_through_20",
+      "long_run_variance",
+      "component_count_census_sha256",
+      "component_count_census_session_count",
+      "q05_components_per_date",
+      "raw_required_valid_dates",
+      "required_valid_dates",
+      "required_connected_components",
+      "fixed_capacity_disposition"
+    ],
+    "separate_authority_required": true,
+    "stock_successor_v3": "future_child_binding_the_numeric_receipt_without_editing_or_repinning_reviewed_ARV2-4C_artifacts"
+  },
+  "evaluation_id": "arv2-eval-stock-historical-qc-001",
+  "external_bindings": {
+    "calibration_input_manifest_sha256": null,
+    "counter_review_commit": null,
+    "dataset_id": null,
+    "evaluation_receipt_id": null,
+    "independent_review_commit": null,
+    "numeric_power_receipt_sha256": null,
+    "outcome_artifact_sha256": null,
+    "power_plan_sha256": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "source_rights_receipt_id": null
+  },
+  "h20_HAC_protocol": {
+    "arithmetic_context": {
+      "Emax": 999999,
+      "Emin": -999999,
+      "ambient_context_or_flags_may_not_change_result_or_leak": true,
+      "binary_float_bool_and_nonfinite_inputs": "forbidden",
+      "capitals": 1,
+      "clamp": 0,
+      "enabled_traps": [
+        "InvalidOperation",
+        "DivisionByZero",
+        "Overflow"
+      ],
+      "flags_cleared_before_use": true,
+      "fresh_local_context": true,
+      "precision": 50,
+      "rounding": "ROUND_HALF_EVEN"
+    },
+    "autocovariance": "gamma_l=stable_sum(x_t*x_(t-l)_over_exact_session_distance_l_valid_pairs)/N",
+    "autocovariance_denominator": "N_not_lag_pair_count",
+    "centered_value": "x_t=beta_t-transient_valid_date_mean",
+    "centering": "compute_mean_as_same_context_stable_sum_divided_by_exact_integer_N_then_subtract_in_that_context_transiently_for_covariance_only_and_never_persist_or_disclose_it",
+    "complete_axis_rule": "missing_or_refused_dates_remain_missing_at_their_exact_NYSE_axis_positions_never_compressed_or_zero_filled",
+    "date_series": "per_date_bullish_20_session_Fama_MacBeth_coefficients_under_exact_parent_preprocessing_weights_controls_and_refusals",
+    "implementation_stage": "ARV2-4D-B_only_after_separate_exact_calibration_input_authority",
+    "invalid_disposition": "INVALID_CALIBRATION_no_fallback_no_clamp_no_epsilon_no_absolute_value_no_alternate_variance",
+    "lag_pair_requirement": "at_least_one_exact_axis_valid_pair_at_every_lag_0_through_20",
+    "lag_weights": "Bartlett_weight_l=(21-l)/21_for_l_1_through_20",
+    "long_run_variance": "Omega=gamma_0+2*stable_sum(Bartlett_weight_l*gamma_l_for_l_1_through_20)",
+    "maximum_lag_sessions": 20,
+    "minimum_valid_date_count": 50,
+    "stable_sum": "sort_each_finite_Decimal_multiset_by_absolute_value_then_signed_value_before_sum_from_exact_zero",
+    "training_only_adjustment": "same_frozen_training_only_score_adjustment_as_future_evaluation",
+    "valid_date_count_symbol": "N",
+    "validity": "N_at_least_50_and_Omega_strictly_positive_and_finite_and_every_lag_pair_requirement_met"
+  },
+  "normal_planning_formula": {
+    "capacity_comparison": "required_valid_dates_less_than_or_equal_to_1388_is_within_capacity_greater_than_1388_is_underpowered",
+    "capacity_source": "sum_of_all_six_reviewed_complete_h20_test_session_axes",
+    "effect_return_per_score_unit": {
+      "denominator": 1000,
+      "numerator": 1
+    },
+    "evaluation_order": "inside_the_fresh_context_construct_exact_Decimal_constants_compute_effect_times_effect_then_Omega_times_squared_sum_then_divide_and_apply_ROUND_CEILING",
+    "fixed_h20_test_session_capacity": 1388,
+    "interpretation": "nominal_asymptotic_plugin_planning_approximation_aligned_in_effect_axis_and_dependence_not_exact_bootstrap_power",
+    "over_capacity": "UNDERPOWERED_FIXED_DESIGN_no_launch",
+    "over_capacity_rescue": "forbidden_no_period_extension_effect_weakening_alternate_variance_retry_or_peek",
+    "raw_required_valid_dates": "ceil(Omega*squared_sum/(1/1000)^2)",
+    "required_valid_dates": "max(50,raw_required_valid_dates)",
+    "squared_sum": "7.8488797343490889511625145685327253191071246220413",
+    "within_capacity": "FEASIBLE_FIXED_DESIGN_pending_authenticated_receipt",
+    "z_0_800": "0.84162123357291420517870612136324810062629753400888",
+    "z_0_975": "1.9599639845400542355245944305205515279555500778695"
+  },
+  "owner_policy": {
+    "decision": "2026-09-02_ARV2-4D-A_recommended_power_policy_approved",
+    "minimum_meaningful_effect": {
+      "basis_points": {
+        "denominator": 1,
+        "numerator": 10
+      },
+      "not": [
+        "annualized_return",
+        "log_return",
+        "daily_return",
+        "net_sleeve_return"
+      ],
+      "return_definition": "arithmetic_gross_20_session_open_to_open_SPY_excess_return",
+      "return_per_adjusted_score_unit": {
+        "denominator": 1000,
+        "numerator": 1
+      },
+      "score_change": {
+        "denominator": 1,
+        "numerator": 1
+      }
+    },
+    "minimums_are_frozen_before_calibration": true,
+    "post_outcome_weakening_or_reinterpretation": "forbidden",
+    "target_power": {
+      "denominator": 5,
+      "numerator": 4
+    },
+    "two_sided_size": {
+      "denominator": 20,
+      "numerator": 1
+    }
+  },
+  "protocol_hash": "0ba6b7d7457837967b5b8b7966cc22c2ddd00f4dbf4a7269b9aaa562baac757f",
+  "protocol_id": "arv2-stock-power-calibration-protocol-0ba6b7d745783796",
+  "schema": "arv2-stock-power-calibration-protocol-structural-v1",
+  "status": "owner_approved_protocol_frozen_outcome_free_pending_independent_review",
+  "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193"
+}

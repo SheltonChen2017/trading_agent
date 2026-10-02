@@ -1003,10 +1003,20 @@ def _same_file_version(first: os.stat_result, second: os.stat_result) -> bool:
     )
 
 
-def _read_regular_bytes(path: Path, *, label: str, max_bytes: int) -> bytes:
+def _read_regular_bytes(
+    path: Path,
+    *,
+    label: str,
+    max_bytes: int,
+    require_single_link: bool = False,
+) -> bytes:
     try:
         before = path.lstat()
-        if _status_is_redirect(before) or not stat.S_ISREG(before.st_mode):
+        if (
+            _status_is_redirect(before)
+            or not stat.S_ISREG(before.st_mode)
+            or (require_single_link and before.st_nlink != 1)
+        ):
             raise SecBulkParsedSnapshotError(
                 f"REFUSED: {label} must be a regular immutable file"
             )
@@ -1016,6 +1026,7 @@ def _read_regular_bytes(path: Path, *, label: str, max_bytes: int) -> bytes:
                 _status_is_redirect(opened)
                 or not stat.S_ISREG(opened.st_mode)
                 or not _same_file_identity(before, opened)
+                or (require_single_link and opened.st_nlink != 1)
             ):
                 raise SecBulkParsedSnapshotError(
                     f"REFUSED: {label} changed while it was opened"
@@ -1027,8 +1038,13 @@ def _read_regular_bytes(path: Path, *, label: str, max_bytes: int) -> bytes:
             raw = handle.read(max_bytes + 1)
             after_read = os.fstat(handle.fileno())
         after_path = path.lstat()
-        if not _same_file_version(opened, after_read) or not _same_file_version(
-            after_read, after_path
+        if (
+            not _same_file_version(opened, after_read)
+            or not _same_file_version(after_read, after_path)
+            or (
+                require_single_link
+                and (after_read.st_nlink != 1 or after_path.st_nlink != 1)
+            )
         ):
             raise SecBulkParsedSnapshotError(
                 f"REFUSED: {label} changed while it was read"
@@ -1062,10 +1078,19 @@ def _canonical_object(raw: bytes, *, label: str) -> dict[str, object]:
 
 
 def _read_canonical_object(
-    path: Path, *, label: str, max_bytes: int
+    path: Path,
+    *,
+    label: str,
+    max_bytes: int,
+    require_single_link: bool = False,
 ) -> dict[str, object]:
     return _canonical_object(
-        _read_regular_bytes(path, label=label, max_bytes=max_bytes),
+        _read_regular_bytes(
+            path,
+            label=label,
+            max_bytes=max_bytes,
+            require_single_link=require_single_link,
+        ),
         label=label,
     )
 
@@ -1628,6 +1653,7 @@ def _load_self_consistent_sec_bulk_parsed_snapshot(
         directory / _COMMIT_NAME,
         label="parsed commit marker",
         max_bytes=MAX_PARSED_COMMIT_BYTES,
+        require_single_link=True,
     )
     if set(commit) != {"kind", "snapshot_id", "members"}:
         raise SecBulkParsedSnapshotError(
@@ -1648,16 +1674,19 @@ def _load_self_consistent_sec_bulk_parsed_snapshot(
             directory / _ROWS_NAME,
             label="parsed rows artifact",
             max_bytes=MAX_ROWS_ARTIFACT_BYTES,
+            require_single_link=True,
         ),
         _ACCESSIONS_NAME: _read_regular_bytes(
             directory / _ACCESSIONS_NAME,
             label="parsed accessions artifact",
             max_bytes=MAX_ACCESSIONS_ARTIFACT_BYTES,
+            require_single_link=True,
         ),
         _MANIFEST_NAME: _read_regular_bytes(
             directory / _MANIFEST_NAME,
             label="parsed manifest",
             max_bytes=MAX_PARSED_MANIFEST_BYTES,
+            require_single_link=True,
         ),
     }
     if members != {name: hash_bytes(raw) for name, raw in payload_bytes.items()}:

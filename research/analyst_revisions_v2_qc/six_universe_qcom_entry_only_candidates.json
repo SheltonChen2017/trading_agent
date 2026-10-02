@@ -1,0 +1,59 @@
+{
+  "activation_manifest_sha256": "69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41",
+  "candidates": [
+    {
+      "arm": "ar_on0",
+      "backtest_name": "ARV2 R246 QCOM entry count zero weight 2021 2025",
+      "candidate_id": "R246",
+      "excluded_stock_security_id_sha256": "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f",
+      "kind": "order",
+      "matched_baseline_profile_sha256": "f03e7f0f9669e3d5168511a9c05cf5e0b9c2c88801fc87433d990537c333615d",
+      "meta_schema": "arv2-six-matched-qcom-excluded-meta-v1",
+      "profile_id": "arv2-six-matched-qcom-excluded-ar_on0-s0-profile-v1",
+      "profile_sha256": "86cde0605e404f0d0249ab8530921b6cff02aba55e2918aa7f01126000ac96ca",
+      "project_name": "ARV2 R246 QCOM ENTRY COUNT ZERO WEIGHT 2021 2025",
+      "projection_schema": "arv2-six-matched-qcom-excluded-entry-only-projection-v1",
+      "projection_sha256": "711bf00ec5dbefd45fda2e07c603800ec98e134d9e392582547f6f9186c43eff",
+      "reference_repair_enabled": true,
+      "role": "matched_qcom_excluded_ar_on0_s0",
+      "slippage_bps": 0,
+      "source_file_count": 17,
+      "source_files_sha256": "f9595793f837a40fbd9235821a39f9f39fe01a5121f6dc9f03b224df6b7b2649",
+      "statistic_names": [
+        "ARV2_SIX_GATE_ORDER_META",
+        "ARV2_SIX_GATE_ORDER_AGGREGATES",
+        "ARV2_SIX_GATE_ORDER_DIAGNOSTICS"
+      ],
+      "summary_schema": "arv2-six-matched-qcom-excluded-tilt0-summary-v1",
+      "tilt_fraction": "0.00",
+      "total_source_bytes": 405712
+    }
+  ],
+  "package_sha256": "7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f",
+  "protocol": {
+    "admission_leverage": "2",
+    "cadence": "weekly_prior_session_decision_next_open_MOO",
+    "capacity_search": false,
+    "comparison": "R231_AR_off_vs_R246_AR_entry_count_zero_weight_vs_R232_full_AR_on100",
+    "confirmation": false,
+    "control_candidate_ids": [
+      "R231",
+      "R232"
+    ],
+    "control_manifest_sha256": "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0",
+    "cost_bps_per_side": "10",
+    "decision_count": 261,
+    "excluded_stock_security_id_sha256": "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f",
+    "exclusion_rule": "qcom_stock_eligibility_after_coverage_v1",
+    "first_session": "2021-01-04",
+    "last_session": "2025-12-31",
+    "observation_count": 1255,
+    "selection_policy": "all_six_25pct_verified_subset_top10_equal_slots_residual_own_ETF",
+    "sensitivity_only": true,
+    "slippage_bps": [
+      0
+    ],
+    "target_gross_exposure": "0.98"
+  },
+  "schema": "arv2-six-qcom-excluded-entry-only-historical-study-v1"
+}

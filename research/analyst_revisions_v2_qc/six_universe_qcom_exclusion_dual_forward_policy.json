@@ -1,0 +1,58 @@
+{
+  "authority": "owner_selected_forward_development_rules_only_no_qc_or_outcome_authority",
+  "capabilities": {
+    "confirmatory_look_commitment": false,
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false
+  },
+  "control": {
+    "forward_candidate_id": "ARV2_FORWARD_AR_OFF",
+    "historical_candidate_id": "R231",
+    "historical_manifest_sha256": "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0",
+    "tilt_fraction": "0.00"
+  },
+  "effective_multiplicity_overlay_sha256": "2e9f390ec54f01e6635b67972711c38212a5f853489e16c1de2a508212278648",
+  "formal_lane_alpha": "1/80",
+  "formal_look_budget": 1,
+  "forward_candidates": [
+    {
+      "forward_candidate_id": "ARV2_FORWARD_AR_100",
+      "historical_candidate_id": "R232",
+      "historical_manifest_sha256": "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0",
+      "tilt_fraction": "1.00",
+      "tilt_percent": 100
+    },
+    {
+      "forward_candidate_id": "ARV2_FORWARD_AR_200",
+      "historical_candidate_id": "R237",
+      "historical_manifest_sha256": "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4",
+      "tilt_fraction": "2.00",
+      "tilt_percent": 200
+    }
+  ],
+  "forward_end_session": null,
+  "forward_evidence_epoch_sha256": null,
+  "forward_one_blinded_epoch_required": true,
+  "forward_shared_clock_cohort_data_cost_fill_required": true,
+  "forward_start_session": null,
+  "future_shared_execution_contract_sha256": null,
+  "future_universe_and_exclusion_policy_sha256": null,
+  "historical_provenance_rule": "parent_qcom_excluded_all_six_25pct_five_name_order_construction_not_automatically_a_future_universe_rule",
+  "historical_result_selection_authorized": false,
+  "owner_decision": "two_parallel_forward_development_candidates_no_post_hoc_winner_choice",
+  "paper_algorithm_sha256": null,
+  "parent_range_policy_sha256": "6de2649a80abe6660ae2399843f5b54ae24ebfcdae35ac863c0bd77ef4e4a98c",
+  "per_arm_confirmatory_alpha": null,
+  "schema": "arv2-qcom-excluded-dual-forward-ar-policy-v1",
+  "study_classification": "forward_development_rule_selection_only_not_confirmation",
+  "two_arm_confirmation_authorized": false,
+  "two_arm_confirmatory_multiplicity_protocol_sha256": null,
+  "two_arm_same_dates_universe_admission_and_costs_required": true,
+  "two_arm_separate_reporting_required": true,
+  "winner_selection_authorized": false
+}

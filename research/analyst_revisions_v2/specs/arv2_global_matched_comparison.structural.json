@@ -1,0 +1,365 @@
+{
+  "arm_contract": {
+    "fit_rule": "fit_each_arm_separately_on_the_same_training_census",
+    "global_direction_contract": {
+      "census": "firm_admitted_directional_event_instances_with_both_global_endpoints_mapped",
+      "diagnostic": "pooled_and_per_fold_expected_sign_opposite_sign_and_zero_delta_event_instance_counts",
+      "expected_sign_delta": "ACTIVE_use_exact_signed_global_delta",
+      "legacy_v1_difference": "only_exact_zero_delta_is_successor_totalized_opposite_sign_refusal_is_retained",
+      "opposite_sign_delta": "joint_global_direction_conflict_refusal_charged_to_coverage_no_contribution_either_arm",
+      "reason": "retain_legacy_direction_consistency_without_sign_flip_and_keep_joint_row_parity_through_named_refusal",
+      "zero_delta": "ACTIVE_global_tier_collapse_zero"
+    },
+    "global_tier_collapse_zero": {
+      "all_mass_zero_reliability": {
+        "denominator": 1,
+        "numerator": 0
+      },
+      "can_increase_N_eff": false,
+      "common_event_breadth_mass": {
+        "denominator": 1,
+        "numerator": 0
+      },
+      "diagnostic_required": true,
+      "event_state": "ACTIVE",
+      "institution_breadth_mass": {
+        "denominator": 1,
+        "numerator": 0
+      },
+      "only_collapse_events_security_date_state": "ACTIVE_zero_row_not_STRUCTURAL_ZERO_with_zero_reliability_preserved_into_paired_sector_normalization_and_fit_census",
+      "raw_score_mass": {
+        "denominator": 1,
+        "numerator": 0
+      }
+    },
+    "ordered_arm_ids": [
+      "firm_specific",
+      "global_legacy_39"
+    ],
+    "per_arm_derivations": [
+      "mapped_rating_delta",
+      "decayed_contribution_and_absolute_mass",
+      "raw_stock_score",
+      "institution_breadth_mass",
+      "common_event_breadth_mass",
+      "conservative_N_eff",
+      "sector_normalization",
+      "reliability",
+      "training_coefficients",
+      "held_out_residuals"
+    ],
+    "shared_inputs": [
+      "event_and_endpoint_identities",
+      "point_in_time_activity_evidence",
+      "q_data",
+      "NYSE_event_ages_and_decay_kernel",
+      "point_in_time_sector_and_industry",
+      "eligible_security_decision_census",
+      "common_event_graph",
+      "controls_and_walk_forward_folds",
+      "outcome_identity_and_value_once_separately_authorized_and_joined"
+    ]
+  },
+  "authority": "paired_comparison_definition_only_no_provider_data_outcome_qc_or_deployment_authority",
+  "bootstrap_contract": {
+    "allowed_starts": "integer_positions_0_through_N_f_minus_20_inclusive_noncircular",
+    "block_sessions": 20,
+    "centered_value": "x_t=d_t-D_on_available_valid_dates_only",
+    "draws_per_fold": "ceil(N_f/20)_uniform_with_replacement",
+    "fold_axis_summaries": [
+      {
+        "allowed_start_count": 214,
+        "blocks_drawn": 12,
+        "final_block_sessions_retained": 13,
+        "fold_id": "arv2-wf-test-2020-h20",
+        "session_axis_sha256": "6547133cb7292c1b94f0a25eb54c97b252aae3b8b273c5bf6175db92e6b218b2",
+        "session_count": 233,
+        "test_end_exclusive": "2021-01-04",
+        "test_start_inclusive": "2020-01-31"
+      },
+      {
+        "allowed_start_count": 213,
+        "blocks_drawn": 12,
+        "final_block_sessions_retained": 12,
+        "fold_id": "arv2-wf-test-2021-h20",
+        "session_axis_sha256": "e29e4bd66e3706bf0f339c5c3ec03f3eed59ca77345838d711cc855f010cf6d1",
+        "session_count": 232,
+        "test_end_exclusive": "2022-01-03",
+        "test_start_inclusive": "2021-02-02"
+      },
+      {
+        "allowed_start_count": 212,
+        "blocks_drawn": 12,
+        "final_block_sessions_retained": 11,
+        "fold_id": "arv2-wf-test-2022-h20",
+        "session_axis_sha256": "0a58fb5ac63cf6199f131ff64f558f10ca8d4f238d610cb368a5e1d6f4acdb63",
+        "session_count": 231,
+        "test_end_exclusive": "2023-01-03",
+        "test_start_inclusive": "2022-02-01"
+      },
+      {
+        "allowed_start_count": 211,
+        "blocks_drawn": 12,
+        "final_block_sessions_retained": 10,
+        "fold_id": "arv2-wf-test-2023-h20",
+        "session_axis_sha256": "76f0ed5e01babd1b376537e249f000fa35c1390ca9b2d1f446c54f7039111bed",
+        "session_count": 230,
+        "test_end_exclusive": "2024-01-02",
+        "test_start_inclusive": "2023-02-01"
+      },
+      {
+        "allowed_start_count": 213,
+        "blocks_drawn": 12,
+        "final_block_sessions_retained": 12,
+        "fold_id": "arv2-wf-test-2024-h20",
+        "session_axis_sha256": "9fab5c021d29fd02409b44a80ce770d9cb599a9432c943362e5a2365d7a235e0",
+        "session_count": 232,
+        "test_end_exclusive": "2025-01-02",
+        "test_start_inclusive": "2024-01-31"
+      },
+      {
+        "allowed_start_count": 211,
+        "blocks_drawn": 12,
+        "final_block_sessions_retained": 10,
+        "fold_id": "arv2-wf-test-2025-h20",
+        "session_axis_sha256": "a289bed633d8c12471dafa462c769d75fd1df0daf1f4c7c0497072421ab8722b",
+        "session_count": 230,
+        "test_end_exclusive": "2026-01-02",
+        "test_start_inclusive": "2025-02-03"
+      }
+    ],
+    "horizon_sessions": 20,
+    "lower_bound": "LCB95=D-q95",
+    "missing_or_refused_position": "adds_neither_zero_nor_denominator",
+    "observed_statistic": "D=equal_valid_date_mean(d_t)_pooled_across_folds",
+    "position_construction": "concatenate_blocks_in_draw_order_then_truncate_to_first_N_f_positions",
+    "quantile": {
+      "B_19999_exact": "0.9_times_ordered_18999_plus_0.1_times_ordered_19000_one_based",
+      "method": "Hyndman_Fan_Type_7",
+      "probability": {
+        "denominator": 20,
+        "numerator": 19
+      }
+    },
+    "replicate_statistic": "equal_occurrence_mean_of_all_available_centered_values_pooled_across_folds_not_equal_fold_mean",
+    "resamples": 19999,
+    "resampling_axis": "each_fold_complete_ordered_NYSE_h20_effective_test_session_axis_never_compressed",
+    "sampler": {
+      "domain": "arv2-paired-ic-noncircular-mbb-hash-counter-v1",
+      "draw_preimage": "domain_UTF8||00||seed_digest_raw32||uint64BE(resample)||uint64BE(fold)||uint64BE(block)||uint64BE(rejection)",
+      "ordinals": "zero_based_exact_nonnegative_uint64_bool_forbidden",
+      "rejection_overflow": "INVALID_DATA",
+      "seed_digest": "SHA256(seed_record_bytes)",
+      "seed_record_encoding": "canonical_sorted_compact_UTF8_JSON_plus_one_LF",
+      "seed_record_fields": [
+        "domain",
+        "successor_stock_spec_sha256",
+        "matched_row_contract_sha256",
+        "global_rating_map_sha256",
+        "fold_manifest_sha256",
+        "evaluation_id",
+        "sampler_version"
+      ],
+      "uniform_conversion": "reject_u_at_or_above_2^256-(2^256_mod_m)_then_u_mod_m",
+      "word": "unsigned_big_endian_full_SHA256_digest"
+    },
+    "sampling_multiplicity": "retained",
+    "zero_available_replicate": "INCONCLUSIVE_locked_no_extension_no_redraw"
+  },
+  "capabilities": {
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "contract_hash": "b94a3457b848c4dc1f6dee77ef366002362573431eb9cc2fc3b8f530ec7f89c9",
+  "contract_id": "arv2-global-matched-b94a3457b848c4dc",
+  "coverage_contract": {
+    "gate_aggregation": "each_separate_ledger_must_pass_19_over_20_both_pooled_globally_and_independently_in_every_nonempty_fold",
+    "honest_post_join_underfill": "INCONCLUSIVE_locked_no_extension",
+    "minimum_ratio": {
+      "denominator": 20,
+      "numerator": 19
+    },
+    "outcome_free_only_before_launch": true,
+    "outcome_identity_corruption_or_mismatch": "INVALID_DATA",
+    "outcome_informed_map_fold_period_seed_or_retry_change": "forbidden",
+    "paired_score_capable_date": "preoutcome_candidate_date_with_valid_both_arm_scores_and_not_both_arms_constant",
+    "post_join_requirements": {
+      "connected_components": "max(50,bound_power_plan.required_connected_components)",
+      "power_plan_binding_required_before_evaluation": true,
+      "valid_dates": "max(50,bound_power_plan.required_valid_dates)"
+    },
+    "preoutcome_candidate_date": "test_fold_session_with_exact_arm_key_parity_at_least_20_rows_and_all_required_non_outcome_inputs_score_dispersion_does_not_remove_denominator",
+    "preoutcome_shortfall": "INVALID_DATA_requires_new_owner_approved_content_addressed_policy_before_any_outcome_look",
+    "ratio_arithmetic": "exact_integer_cross_multiplication_no_rounding",
+    "separate_ledgers": {
+      "active_security_date_rows": "exact_paired_arm_security_date_row_instances_over_firm_arm_eligible_active_security_date_row_instances",
+      "common_event_components": "retained_paired_component_instances_over_firm_arm_component_instances",
+      "component_member_incidence": "retained_paired_component_member_incidence_instances_over_firm_arm_component_member_incidence_instances",
+      "endpoint_pair_mapping": "both_endpoints_global_resolvable_and_direction_admissible_expected_sign_or_zero_delta_directional_event_instance_occurrences_over_all_firm_admitted_directional_event_instance_occurrences_opposite_sign_is_denominator_only",
+      "score_capable_dates": "paired_score_capable_date_instances_over_preoutcome_candidate_date_instances"
+    },
+    "zero_denominator": "INVALID_DATA_not_ready"
+  },
+  "diagnostics_contract": {
+    "ratio_invariant": "each_numerator_and_denominator_use_identical_units_and_numerator_must_not_exceed_denominator",
+    "required_censuses": [
+      "mapped_measured_refusal_unknown_invalid_endpoint_event_instance_counts_with_exact_denominator",
+      "mapped_measured_refusal_unknown_invalid_endpoint_pair_event_instance_counts_with_exact_denominator",
+      "expected_sign_opposite_sign_and_zero_global_delta_event_instance_counts_with_exact_denominator"
+    ],
+    "required_ratios": [
+      {
+        "denominator": "paired_admitted_directional_event_instances_with_both_global_endpoints_mapped",
+        "id": "global_tier_collapse_zero_share",
+        "numerator": "paired_admitted_directional_event_instances_with_both_global_endpoints_mapped_and_zero_global_delta"
+      },
+      {
+        "denominator": "paired_admitted_directional_event_instances_with_both_global_endpoints_mapped",
+        "id": "global_direction_conflict_share",
+        "numerator": "paired_admitted_directional_event_instances_with_both_global_endpoints_mapped_and_opposite_sign_global_delta"
+      },
+      {
+        "denominator": "preoutcome_candidate_dates",
+        "id": "firm_totalized_zero_date_share",
+        "numerator": "preoutcome_candidate_dates_with_at_least_one_firm_arm_paired_sector_exact_zero_range_totalization"
+      },
+      {
+        "denominator": "preoutcome_candidate_dates",
+        "id": "global_totalized_zero_date_share",
+        "numerator": "preoutcome_candidate_dates_with_at_least_one_global_arm_paired_sector_exact_zero_range_totalization"
+      },
+      {
+        "denominator": "preoutcome_candidate_dates",
+        "id": "both_arms_constant_date_share",
+        "numerator": "preoutcome_candidate_dates_where_both_final_arm_score_vectors_are_constant"
+      },
+      {
+        "denominator": "exactly_19999_registered_bootstrap_replicates",
+        "id": "zero_available_bootstrap_replicate_share",
+        "numerator": "bootstrap_replicates_with_zero_available_centered_differences"
+      }
+    ],
+    "role": "labeled_non_rescuing_reporting_only",
+    "scope": "pooled_global_and_each_fold_where_applicable"
+  },
+  "evaluation_id": "arv2-eval-stock-historical-qc-001",
+  "existing_fold_manifest": {
+    "artifact_id": "arv2-stock-folds-1002155dbe8e3e87",
+    "artifact_sha256": "fecd984ad937fed57b860b15fdcb9cc994ff59ab62c3b72d5160ab62b342953c",
+    "content_sha256": "1002155dbe8e3e87b220b7419039bff95f5c0812d2306c56a8ac51b76c5d7611",
+    "relationship": "existing_reviewed_child_of_stock_v1_bound_without_reparenting_or_byte_change"
+  },
+  "external_bindings": {
+    "counter_review_commit": null,
+    "dataset_id": null,
+    "evaluation_receipt_id": null,
+    "independent_review_commit": null,
+    "outcome_artifact_sha256": null,
+    "power_plan_sha256": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "source_rights_receipt_id": null
+  },
+  "gate_contract": {
+    "adequate_sample_failure": "FAIL_closes_family",
+    "honest_underfill": "INCONCLUSIVE_locked_no_extension",
+    "interpretation": "operationally_equivalent_to_one_sided_superiority_boundary_in_nondegenerate_samples_exact_equality_passes",
+    "margin": {
+      "denominator": 1,
+      "numerator": 0
+    },
+    "name": "zero_margin_no_worse_with_confidence",
+    "pass": "D_greater_than_or_equal_zero_and_LCB95_greater_than_or_equal_zero",
+    "structural_invalidity": "INVALID_DATA"
+  },
+  "global_rating_map": {
+    "artifact_id": "arv2-global-rating-map-aaf5830c3c3fb403",
+    "artifact_sha256": "630cc822fa83d7aba15920cfb8f37863f6d6fffa262e26ac96074e8526391f4e",
+    "content_sha256": "aaf5830c3c3fb403b0e84f5ad22d1f20fa3f91df41cf3bd64f33695875d2e3d9"
+  },
+  "matched_row_contract": {
+    "duplicates": "INVALID_DATA",
+    "imputation": "forbidden",
+    "key_fields": [
+      "fold_id",
+      "decision_session",
+      "permanent_security_id",
+      "horizon_sessions"
+    ],
+    "one_arm_row_removal": "forbidden",
+    "outcome_dependent_membership": "forbidden",
+    "outcome_join": "later_single_authenticated_exact_identity_join_shared_by_both_arms",
+    "outcome_key_or_value_mismatch": "INVALID_DATA",
+    "parity": "exact_one_to_one_same_order_independent_membership_check",
+    "required_horizon_sessions": 20
+  },
+  "paired_metric_contract": {
+    "both_scores_constant": "joint_both_arms_constant_score_refusal_no_d_t",
+    "constant_shared_outcome": "joint_date_refusal",
+    "date_aggregation": "equal_weight_over_common_valid_dates",
+    "diagnostic_predicates": "independently_counted_non_rescuing_predicates_may_overlap_primary_disposition_is_exclusive_first_match",
+    "difference": "d_t=IC_firm_specific_t-IC_global_legacy_39_t",
+    "exactly_one_score_constant": "constant_arm_association_exact_zero_other_arm_ordinary_average_rank_Spearman",
+    "existing_single_arm_rule": "fewer_than_20_rows_or_constant_score_or_constant_outcome_refuses",
+    "fewer_than_20_identical_rows": "joint_date_refusal",
+    "neither_score_constant": "ordinary_average_rank_Spearman_for_both_arms",
+    "numerical_contract": {
+      "Spearman": "centered_rank_cross_product_sum_divided_by_square_root_of_product_of_centered_rank_sum_squares",
+      "ambient_decimal_context": "ignored_fresh_local_context_for_each_calculation",
+      "average_ranks": "exact_rational_midranks_then_convert_inside_frozen_decimal_context",
+      "binary_float": "forbidden",
+      "comparison": "exact_resulting_Decimal_against_exact_zero_no_epsilon_or_tolerance",
+      "decimal_Emax": 999999,
+      "decimal_Emin": -999999,
+      "decimal_capitals": 1,
+      "decimal_clamp": 0,
+      "decimal_flags": "cleared_before_each_calculation_and_never_used_as_result_authority",
+      "decimal_precision": 50,
+      "decimal_rounding": "ROUND_HALF_EVEN",
+      "decimal_traps": "InvalidOperation_DivisionByZero_Overflow_enabled_all_other_traps_disabled",
+      "finite_inputs_only": true,
+      "mean_and_centering": "same_context_stable_sum_divided_by_exact_integer_count",
+      "row_order": "permanent_security_id_ascending_before_rank_construction",
+      "square_root": "Decimal.sqrt_under_same_50_digit_HALF_EVEN_context",
+      "stable_sum": "sort_each_finite_Decimal_multiset_by_absolute_value_then_signed_value_before_sum_from_exact_zero",
+      "type_7_weights": "exact_Decimal_0.9_and_0.1"
+    },
+    "ordered_primary_date_disposition": [
+      "outcome_identity_invalid_or_duplicate_INVALID_DATA",
+      "fewer_than_20_identical_rows_joint_date_refusal",
+      "constant_shared_outcome_joint_date_refusal",
+      "both_scores_constant_joint_date_refusal",
+      "exactly_one_score_constant_totalize_constant_arm_to_zero",
+      "neither_score_constant_compute_both_Spearman"
+    ],
+    "paired_totalized_zero_is_single_arm_IC": false,
+    "row_floor": 20,
+    "scope": "firm_specific_vs_global_paired_gate_only"
+  },
+  "paired_sector_normalization": {
+    "epsilon_or_market_fallback": "forbidden",
+    "exact_zero_range_firm_arm": "paired_only_all_zero_standardized_scores_preserve_ACTIVE_vs_STRUCTURAL_ZERO_state_parent_single_arm_refusal_retained_outside_paired_gate",
+    "exact_zero_range_global_arm": "paired_only_all_zero_standardized_scores_preserve_ACTIVE_vs_STRUCTURAL_ZERO_state",
+    "minimum_active_names": 5,
+    "minimum_failure": "joint_named_refusal_charged_to_coverage",
+    "minimum_total_names": 20,
+    "nonzero_range_zero_MAD": "joint_zero_mad_nonzero_range_refusal_charged_to_coverage",
+    "one_arm_totalization_effect_on_other": "none",
+    "shared_control_zero_MAD": "parent_joint_refusal_retained"
+  },
+  "parent_stock_spec": {
+    "artifact_id": "arv2-stock-historical-c5ff2a6a0dcf341e",
+    "artifact_sha256": "34d1e71548bc6850a02590596594944dad3fadb38954067f2cc2d00dcaa86bc8",
+    "content_sha256": "c5ff2a6a0dcf341e3c7bad4ea56e4a3c00f20faab5896c0fcd3bd7c291835a0b"
+  },
+  "schema": "arv2-global-matched-comparison-structural-v1",
+  "status": "owner_approved_implementation_frozen_outcome_free_pending_independent_review",
+  "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193"
+}

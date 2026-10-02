@@ -18,14 +18,18 @@ from research.analyst_revisions_v2.firm_ontology import (
     load_reviewed_firm_rating_ontology,
 )
 from research.analyst_revisions_v2.formulas import (
+    NUMERICAL_ZERO,
     ActivityAwareObservation,
     ActivityObservationState,
     FormulaError,
+    ObservationState,
+    SignalObservation,
     analyst_reliability,
     analyst_decimal_context,
     derive_verified_analyst_policy,
     rating_decay_weight,
     robust_activity_group_normalize,
+    robust_group_normalize,
     stock_reliability,
 )
 from research.analyst_revisions_v2.ratings_ingest import (
@@ -616,6 +620,90 @@ def test_full_structural_candidate_revalidates_and_pins_pdf_equation(tmp_path, p
             forged,
             policy=policy,
             **revalidation_arguments,
+        )
+
+
+def test_positive_half_scale_preserves_full_stock_score_ranks_and_ties(
+    tmp_path, policy
+):
+    rows = []
+    for index in range(20):
+        age = index // 2
+        rows.extend(
+            (
+                _rating_row(
+                    f"scale-a-{index:03d}",
+                    index,
+                    age=age,
+                    firm_id="firm-1",
+                ),
+                _rating_row(
+                    f"scale-b-{index:03d}",
+                    index,
+                    age=age + 3,
+                    firm_id="firm-2",
+                ),
+            )
+        )
+    shared = {"rows": rows, "firms": ("firm-1", "firm-2")}
+    legacy = _build(
+        _chain(tmp_path / "legacy", scale_size=2, **shared), policy
+    )
+    aligned = _build(
+        _chain(tmp_path / "aligned", scale_size=3, **shared), policy
+    )
+    assert not legacy.refusals and not aligned.refusals
+    assert legacy.universe_security_ids == aligned.universe_security_ids
+
+    def contribution_key(row):
+        return row.provider_event_id, row.security_id, row.institution_id
+
+    old_contributions = {
+        contribution_key(row): row for row in legacy.contributions
+    }
+    new_contributions = {
+        contribution_key(row): row for row in aligned.contributions
+    }
+    assert old_contributions.keys() == new_contributions.keys()
+    for identity, old in old_contributions.items():
+        new = new_contributions[identity]
+        assert new.rating_change * 2 == old.rating_change
+        assert new.decay_weight == old.decay_weight
+        assert abs(new.decayed_value * 2 - old.decayed_value) <= NUMERICAL_ZERO
+
+    old_scores = {row.security_id: row for row in legacy.scores}
+    new_scores = {row.security_id: row for row in aligned.scores}
+    assert old_scores.keys() == new_scores.keys()
+    for security_id, old in old_scores.items():
+        new = new_scores[security_id]
+        assert new.raw_state is old.raw_state
+        assert abs(new.raw_score * 2 - old.raw_score) <= NUMERICAL_ZERO
+        assert new.q_data == old.q_data
+        for name in (
+            "institution_effective_n",
+            "catalyst_effective_n",
+            "independent_effective_n",
+            "reliability",
+            "sector_z",
+            "pdf_reliable_score",
+        ):
+            assert abs(getattr(new, name) - getattr(old, name)) <= NUMERICAL_ZERO
+
+    identifiers = tuple(sorted(old_scores))
+
+    def sign(value):
+        return (value > 0) - (value < 0)
+
+    def total_preorder(scores, field):
+        return tuple(
+            sign(getattr(scores[left], field) - getattr(scores[right], field))
+            for left in identifiers
+            for right in identifiers
+        )
+
+    for field in ("raw_score", "sector_z", "pdf_reliable_score"):
+        assert total_preorder(new_scores, field) == total_preorder(
+            old_scores, field
         )
 
 
@@ -1642,3 +1730,66 @@ def test_frozen_candidate_contract_rejects_weakened_records(tmp_path, policy):
             refusing,
             sector_normalizations=scoring.sector_normalizations,
         )
+
+
+def test_sector_normalization_density_threshold_is_pinned_and_load_bearing(policy):
+    """ARV2R74-001: the frozen MAD rule needs a strict majority of scored names.
+
+    R-053 returned 32/32 INCONCLUSIVE_UNDERFILLED with zero valid dates. The
+    decisive cause is arithmetic, not data: when a sector's cross-section
+    contains structural zeros for every name an analyst did not touch, the
+    median is zero and so is the median absolute deviation as soon as half or
+    more of the names are unscored. The evaluator then invalidates the whole
+    date because one sector refused. This test pins that threshold so the
+    feasibility of any complete-cross-section evaluation is a visible,
+    asserted property rather than something discovered by spending a look.
+    """
+
+    def group(total, scored):
+        values = [Decimal(0)] * (total - scored) + [
+            Decimal(index + 1) for index in range(scored)
+        ]
+        return [
+            SignalObservation(
+                security_id=f"S{index:04d}",
+                value=value,
+                state=(
+                    ObservationState.SIGNAL
+                    if value != 0
+                    else ObservationState.STRUCTURAL_ZERO
+                ),
+            )
+            for index, value in enumerate(values)
+        ]
+
+    # The sector refuses whenever unscored names strictly outnumber scored
+    # ones: the median is then zero and so is the median absolute deviation.
+    for scored, expected in ((5, False), (20, False), (24, False), (25, True), (30, True)):
+        result = robust_group_normalize(group(50, scored), policy=policy)
+        assert result.available is expected, (scored, result.reason)
+        if not expected:
+            assert result.reason == "zero_mad"
+            assert result.mad == 0
+
+    # The same boundary holds for an odd-sized group.
+    assert robust_group_normalize(group(51, 25), policy=policy).available is False
+    assert robust_group_normalize(group(51, 26), policy=policy).available is True
+
+    # The refusal must never be rescued by an epsilon or a market fallback:
+    # a sector in which only a handful of names were touched stays refused no
+    # matter how large those few scores are.
+    extreme = robust_group_normalize(
+        [
+            SignalObservation(
+                security_id=f"X{index:04d}",
+                value=Decimal("1000") if index < 5 else Decimal(0),
+                state=(
+                    ObservationState.SIGNAL if index < 5 else ObservationState.STRUCTURAL_ZERO
+                ),
+            )
+            for index in range(60)
+        ],
+        policy=policy,
+    )
+    assert extreme.available is False
+    assert extreme.reason == "zero_mad"

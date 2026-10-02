@@ -1,0 +1,449 @@
+{
+  "acyclic_lineage": {
+    "edge_direction": "child_to_parent",
+    "four_family_overlay_relationship": "independent_parallel_leaf_not_a_B1_parent",
+    "ordered_nodes": [
+      {
+        "node": "strategy_pdf",
+        "parents": []
+      },
+      {
+        "node": "qc_base",
+        "parents": [
+          "strategy_pdf"
+        ]
+      },
+      {
+        "node": "qc_plan",
+        "parents": [
+          "strategy_pdf",
+          "qc_base"
+        ]
+      },
+      {
+        "node": "stock_v1",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan"
+        ]
+      },
+      {
+        "node": "fold_manifest",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1"
+        ]
+      },
+      {
+        "node": "global_map",
+        "parents": [
+          "strategy_pdf"
+        ]
+      },
+      {
+        "node": "matched_contract",
+        "parents": [
+          "strategy_pdf",
+          "stock_v1",
+          "fold_manifest",
+          "global_map"
+        ]
+      },
+      {
+        "node": "stock_v2",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1",
+          "fold_manifest",
+          "global_map",
+          "matched_contract"
+        ]
+      },
+      {
+        "node": "power_protocol",
+        "parents": [
+          "strategy_pdf",
+          "qc_plan",
+          "stock_v1",
+          "fold_manifest",
+          "global_map",
+          "matched_contract",
+          "stock_v2"
+        ]
+      },
+      {
+        "node": "calibration_input_manifest_schema",
+        "parents": [
+          "power_protocol"
+        ]
+      }
+    ],
+    "reviewed_ARV2_4D_A_nodes_and_edges_unchanged": true,
+    "schema_direct_parent": "power_protocol",
+    "schema_is_leaf": true
+  },
+  "authority": "schema_and_synthetic_fixture_validation_only_no_production_manifest_input_outcome_calibration_receipt_qc_or_deployment_authority",
+  "bound_parent": {
+    "artifact_id": "arv2-stock-power-calibration-protocol-0ba6b7d745783796",
+    "artifact_sha256": "ff16117a258a1864438d11178a2b31af1b04a3f8b27d1f39c9c33552627f4a13",
+    "content_sha256": "0ba6b7d7457837967b5b8b7966cc22c2ddd00f4dbf4a7269b9aaa562baac757f"
+  },
+  "calibration_boundary_contract": {
+    "first_test_session": "2020-01-31",
+    "fold_id": "arv2-wf-test-2020-h20",
+    "horizon_sessions": 20,
+    "last_included_decision_session": "2019-12-31",
+    "last_included_h20_outcome_session": "2020-01-30",
+    "structural_fold_sha256": "9dcaa09e8f6b9b3786e016bb1db5c3d0ebfd918d49951e8de45dad3383c4fa5c",
+    "validation_end_exclusive": "2020-01-02",
+    "validation_start_inclusive": "2018-01-31"
+  },
+  "capabilities": {
+    "authoritative_power_receipt": false,
+    "calibration_input_access": false,
+    "funded_deployment": false,
+    "nuisance_calibration_compute": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "power_plan_binding": false,
+    "production_manifest_acceptance": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "count_contract": {
+    "all_counts": "exact_nonnegative_integer_bool_forbidden",
+    "declared_and_observed_counts_must_match": true,
+    "input_artifact_count": 2,
+    "required_manifest_count_fields": [
+      "input_artifact_count",
+      "rights_binding_count",
+      "lineage_node_count",
+      "session_key_count"
+    ],
+    "session_key_count": 483
+  },
+  "evaluation_id": "arv2-eval-stock-historical-qc-001",
+  "evidence_epoch_contract": {
+    "calibration_information_cutoff_session": "2020-01-30",
+    "capture_instant_format": "YYYY-MM-DDTHH:MM:SS.ffffffZ_strict_UTC",
+    "capture_instant_not_before_utc": "2020-01-31T00:00:00.000000Z",
+    "first_excluded_session": "2020-01-31",
+    "hash_scope": "syntactic_only_no_artifact_read_or_authentication",
+    "identifier_scope": "synthetic_prefixed_shape_only",
+    "post_cutoff_corrections_included": false,
+    "required_exact_fields": [
+      "evidence_epoch_id",
+      "artifact_id",
+      "semantic_sha256",
+      "artifact_sha256",
+      "capture_instant_utc",
+      "calibration_information_cutoff_session",
+      "first_excluded_session",
+      "post_cutoff_corrections_included"
+    ]
+  },
+  "external_bindings": {
+    "counter_review_commit": null,
+    "data_entitlement_audit_id": null,
+    "evaluation_receipt_id": null,
+    "independent_review_commit": null,
+    "numeric_power_receipt_sha256": null,
+    "outcome_artifact_sha256": null,
+    "owner_calibration_input_access_authority_id": null,
+    "owner_nuisance_calibration_authority_id": null,
+    "production_manifest_artifact_sha256": null,
+    "production_manifest_id": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "source_rights_receipt_id": null,
+    "stock_successor_v3_sha256": null
+  },
+  "forbidden_content": {
+    "closed_root_and_nested_key_sets_enforce_the_allowlist": true,
+    "manifest_may_not_contain": [
+      "provider_rows_or_payloads",
+      "security_or_date_returns",
+      "date_level_beta_values",
+      "beta_mean_or_sign",
+      "HAC_intermediate_products_or_autocovariances",
+      "information_coefficients_or_p_values",
+      "PnL_strategy_performance_or_gate_results",
+      "file_paths_URLs_queries_credentials_or_secrets"
+    ]
+  },
+  "future_production_gate": {
+    "first_outcome_bearing_manifest_or_receipt_must_add_independently_reviewed_four_family_overlay": true,
+    "input_artifact_loader_implemented": false,
+    "numeric_receipt_implemented": false,
+    "production_manifest_loader_implemented": false,
+    "separate_authenticated_rights_required": true,
+    "separate_nuisance_computation_authority_required": true,
+    "separate_owner_input_access_authority_required": true,
+    "this_schema_does_not_bind_the_four_family_overlay": true
+  },
+  "input_artifact_contracts": {
+    "component_count_census": {
+      "all_axis_sessions_required": true,
+      "artifact_schema": "arv2-power-calibration-component-count-input-v1",
+      "census_hash_recipe": "SHA256_canonical_compact_UTF8_session_count_inventory",
+      "count_type": "exact_nonnegative_integer_bool_forbidden",
+      "per_session_counts_in_manifest": "PERMITTED_metadata_only",
+      "required_exact_fields": [
+        "role",
+        "artifact_id",
+        "artifact_schema",
+        "content_sha256",
+        "artifact_sha256",
+        "byte_count",
+        "record_count",
+        "session_key_field",
+        "session_axis_sha256",
+        "session_count_inventory",
+        "component_count_census_sha256",
+        "component_count_census_session_count",
+        "missing_session_count",
+        "rights_binding_ids",
+        "lineage_node_id"
+      ]
+    },
+    "date_level_beta_series": {
+      "artifact_schema": "arv2-power-calibration-date-beta-input-v1",
+      "date_level_beta_values_in_manifest": "FORBIDDEN",
+      "required_exact_fields": [
+        "role",
+        "artifact_id",
+        "artifact_schema",
+        "content_sha256",
+        "artifact_sha256",
+        "byte_count",
+        "record_count",
+        "session_key_field",
+        "session_axis_sha256",
+        "session_state_inventory",
+        "valid_beta_date_count",
+        "missing_beta_date_count",
+        "refused_beta_date_count",
+        "state_census_sha256",
+        "rights_binding_ids",
+        "lineage_node_id"
+      ],
+      "session_states": [
+        "valid",
+        "missing",
+        "refused"
+      ],
+      "state_census_hash_recipe": "SHA256_canonical_compact_UTF8_session_state_inventory",
+      "state_counts_must_sum_to_session_count": true
+    },
+    "ordered_roles": [
+      "date_level_beta_series",
+      "component_count_census"
+    ]
+  },
+  "lineage_contract": {
+    "all_nodes_share_manifest_evidence_epoch": true,
+    "allowed_node_roles": [
+      "source_artifact",
+      "transformation",
+      "date_level_beta_series",
+      "component_count_census"
+    ],
+    "at_least_one_distinct_source_artifact_root": true,
+    "duplicate_unknown_parent_cycle_or_orphan": "REFUSED",
+    "every_input_terminal_has_nonempty_ancestry": true,
+    "every_nonroot_nonterminal_role": "transformation",
+    "every_root_role": "source_artifact",
+    "every_source_root_has_nonempty_valid_rights_bindings": true,
+    "every_terminal_ancestry_source_root_has_rights_for_terminal_role": true,
+    "graph": "ordered_child_to_parent_DAG_parents_must_precede_child",
+    "lineage_hash_recipe": "SHA256_canonical_compact_UTF8_ordered_nodes",
+    "required_exact_fields": [
+      "producing_commit",
+      "producing_tree",
+      "producer_code_sha256",
+      "build_recipe_id",
+      "build_recipe_sha256",
+      "config_sha256",
+      "ordered_nodes",
+      "lineage_sha256"
+    ],
+    "required_exact_node_fields": [
+      "node_id",
+      "role",
+      "artifact_id",
+      "schema_id",
+      "content_sha256",
+      "artifact_sha256",
+      "evidence_epoch_id",
+      "parent_node_ids",
+      "rights_binding_ids"
+    ],
+    "terminal_nodes_must_exactly_bind_the_two_input_artifacts": true
+  },
+  "manifest_field_contract": {
+    "canonical_encoding": "sorted_keys_indent_2_ensure_ascii_false_allow_nan_false_LF_terminated_strict_UTF8_no_BOM_no_duplicate_keys_no_floats",
+    "implemented_modes": [
+      "synthetic_fixture"
+    ],
+    "production_mode_current_disposition": "REFUSED_until_separate_input_access_rights_and_processing_authority_and_independent_review",
+    "recognized_modes": [
+      "synthetic_fixture",
+      "production_nuisance_calibration_input"
+    ],
+    "required_exact_binding_fields": [
+      "artifact_id",
+      "content_sha256",
+      "artifact_sha256"
+    ],
+    "required_exact_calibration_fold_fields": [
+      "fold_id",
+      "structural_fold_sha256",
+      "horizon_sessions",
+      "validation_start_inclusive",
+      "validation_end_exclusive",
+      "last_included_decision_session",
+      "last_included_h20_outcome_session",
+      "first_test_session"
+    ],
+    "required_exact_evidence_epoch_fields": [
+      "evidence_epoch_id",
+      "artifact_id",
+      "semantic_sha256",
+      "artifact_sha256",
+      "capture_instant_utc",
+      "calibration_information_cutoff_session",
+      "first_excluded_session",
+      "post_cutoff_corrections_included"
+    ],
+    "required_exact_root_fields": [
+      "schema",
+      "manifest_mode",
+      "status",
+      "authority",
+      "manifest_id",
+      "manifest_hash",
+      "schema_contract_binding",
+      "power_protocol_binding",
+      "evaluation_id",
+      "calibration_fold",
+      "evidence_epoch_binding",
+      "producing_lineage",
+      "complete_session_axis",
+      "input_artifacts",
+      "rights_bindings",
+      "manifest_counts",
+      "external_authorities",
+      "capabilities"
+    ],
+    "unknown_or_missing_field": "REFUSED"
+  },
+  "manifest_identity_contract": {
+    "artifact_sha256": "SHA256_of_exact_canonical_pretty_UTF8_bytes",
+    "calibration_input_manifest_sha256_means": "artifact_sha256",
+    "manifest_id": "prefix_plus_first_16_lower_hex_of_semantic_hash",
+    "manifest_id_prefix": "arv2-power-calibration-input-manifest-",
+    "manifest_schema": "arv2-stock-power-calibration-input-manifest-v1",
+    "semantic_hash": "SHA256_canonical_compact_UTF8_after_manifest_id_and_manifest_hash_are_set_to_null"
+  },
+  "processing_contract": {
+    "manifest_content_allowlist": "identities_hashes_rights_processing_lineage_exact_session_keys_and_counts_only",
+    "manifest_validation_computes_calibration": false,
+    "manifest_validation_reads_input_artifacts": false,
+    "synthetic_fixture_result_is_authoritative": false
+  },
+  "rights_contract": {
+    "copied_manifest_claim_grants_rights": false,
+    "every_input_role_must_be_covered": true,
+    "future_production_requirement": "authenticate_exact_receipt_bytes_data_entitlement_and_independent_approval_before_any_input_read",
+    "qc_transfer_redistribution_or_additional_storage": "never_inferred_requires_separate_exact_rights",
+    "required_exact_fields_per_binding": [
+      "binding_id",
+      "receipt_id",
+      "receipt_schema",
+      "receipt_content_sha256",
+      "receipt_artifact_sha256",
+      "data_entitlement_audit_id",
+      "processing_scope_id",
+      "applies_to_input_roles"
+    ],
+    "required_purpose": "nuisance_only_power_calibration_and_closed_aggregate_receipt"
+  },
+  "schema": "arv2-stock-power-calibration-input-manifest-schema-structural-v1",
+  "schema_contract_hash": "4032405d1773236e61938a88c6ec77e62bbbd71ff8e24eb615565023c07f8e24",
+  "schema_contract_id": "arv2-stock-power-calibration-input-schema-4032405d1773236e",
+  "session_axis_contract": {
+    "exchange": "XNYS",
+    "first_session": "2018-01-31",
+    "key_field": "decision_session",
+    "key_format": "YYYY-MM-DD",
+    "last_session": "2019-12-31",
+    "manifest_must_carry_all_ordered_session_keys": true,
+    "missing_duplicate_extra_or_reordered_key": "REFUSED",
+    "required_exact_fields": [
+      "exchange",
+      "key_field",
+      "key_format",
+      "ordered_session_keys",
+      "session_count",
+      "session_axis_sha256",
+      "first_session",
+      "last_session"
+    ],
+    "session_axis_sha256": "22d38c7178f6863d4d9f5284eba9216b0f8499848b1188781316d1169b13a051",
+    "session_count": 483
+  },
+  "status": "owner_authorized_schema_only_frozen_outcome_free_pending_independent_review",
+  "strategy_pdf_sha256": "eae7b9954aaf94212108505c52e31a558facd744967fd2526040d5147c616193",
+  "synthetic_fixture_contract": {
+    "capabilities": {
+      "authoritative_power_receipt": false,
+      "calibration_input_access": false,
+      "funded_deployment": false,
+      "nuisance_calibration_compute": false,
+      "orders": false,
+      "outcome_access": false,
+      "paper_deployment": false,
+      "power_plan_binding": false,
+      "production_manifest_acceptance": false,
+      "qc_compile": false,
+      "qc_launch": false,
+      "qc_upload": false,
+      "result_disposition": false,
+      "source_access": false
+    },
+    "external_authorities": {
+      "data_entitlement_audit_id": null,
+      "evaluation_receipt_id": null,
+      "numeric_power_receipt_sha256": null,
+      "outcome_artifact_sha256": null,
+      "owner_calibration_input_access_authority_id": null,
+      "owner_nuisance_calibration_authority_id": null,
+      "production_registry_entry_id": null,
+      "qc_project_id": null,
+      "qc_run_id": null,
+      "source_rights_authority_id": null,
+      "stock_successor_v3_sha256": null
+    },
+    "payload_source": "caller_supplied_canonical_bytes_in_memory_only",
+    "production_promotion": "PROHIBITED",
+    "rights_scope": "synthetic_fixture_no_legal_or_access_claim",
+    "supported": true,
+    "synthetic_prefixed_identifier_fields": [
+      "evidence_epoch_binding.evidence_epoch_id",
+      "evidence_epoch_binding.artifact_id",
+      "input_artifacts[].artifact_id",
+      "rights_bindings[].binding_id",
+      "rights_bindings[].receipt_id",
+      "rights_bindings[].data_entitlement_audit_id",
+      "producing_lineage.build_recipe_id",
+      "producing_lineage.ordered_nodes[].node_id",
+      "producing_lineage.ordered_nodes[].artifact_id"
+    ]
+  }
+}

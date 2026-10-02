@@ -1,0 +1,360 @@
+{
+  "admission_contract_hash": "ed654e32891851806af318ba7baf88f7f5b7ee3a151cecf07b126792755e670c",
+  "admission_contract_id": "arv2-stock-power-calibration-manifest-admission-ed654e3289185180",
+  "authority": "production_metadata_candidate_validation_only_no_input_outcome_calibration_receipt_qc_or_deployment_authority",
+  "bound_parents": {
+    "calibration_input_schema": {
+      "artifact_id": "arv2-stock-power-calibration-input-schema-4032405d1773236e",
+      "artifact_sha256": "e642d06531b6ca024c3ee438ee88a113eef1483f2f6fca9d0e120afcfc5ed2f1",
+      "content_sha256": "4032405d1773236e61938a88c6ec77e62bbbd71ff8e24eb615565023c07f8e24"
+    },
+    "four_family_multiplicity_overlay": {
+      "artifact_id": "arv2-four-family-multiplicity-54ab0bb69fb6fa16",
+      "artifact_sha256": "2e9f390ec54f01e6635b67972711c38212a5f853489e16c1de2a508212278648",
+      "content_sha256": "54ab0bb69fb6fa162ca3ba6764864b230136c68c017f1e6b669034dda75b806e"
+    }
+  },
+  "calibration_boundary": {
+    "first_test_session": "2020-01-31",
+    "fold_id": "arv2-wf-test-2020-h20",
+    "last_included_decision_session": "2019-12-31",
+    "last_included_h20_outcome_session": "2020-01-30",
+    "session_axis_sha256": "22d38c7178f6863d4d9f5284eba9216b0f8499848b1188781316d1169b13a051",
+    "session_count": 483,
+    "structural_fold_sha256": "9dcaa09e8f6b9b3786e016bb1db5c3d0ebfd918d49951e8de45dad3383c4fa5c",
+    "validation_end_exclusive": "2020-01-02",
+    "validation_start_inclusive": "2018-01-31"
+  },
+  "candidate_manifest_contract": {
+    "authority": "metadata_authentication_only_no_input_outcome_calibration_receipt_or_qc_authority",
+    "input_artifact_paths": "FORBIDDEN",
+    "input_artifact_reads": false,
+    "manifest_payload": "canonical_pretty_sorted_strict_UTF8_metadata_only",
+    "metadata_authentication_does_not_authenticate_input_artifacts": true,
+    "mode": "production_nuisance_calibration_input",
+    "numeric_values_permitted": "component_counts_only_as_frozen_by_B1",
+    "production_lineage_complete": false,
+    "production_manifest_acceptance_authority": false,
+    "production_metadata_candidate_loader_implemented": true,
+    "schema": "arv2-stock-power-calibration-input-manifest-v1",
+    "status": "production_metadata_candidate_pending_review_and_input_authority"
+  },
+  "capabilities": {
+    "authoritative_power_receipt": false,
+    "calibration_input_access": false,
+    "funded_deployment": false,
+    "nuisance_calibration_compute": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "power_plan_binding": false,
+    "production_manifest_acceptance": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false,
+    "result_disposition": false,
+    "source_access": false
+  },
+  "cross_binding_contract": {
+    "B1_manifest_external_authorities": "all_null",
+    "each_input_rights_equal_all_role_applicable_source_bindings": true,
+    "each_source_snapshot_binds_exactly_one_entitlement_audit": true,
+    "each_source_snapshot_binds_exactly_one_source_assumption_binding": true,
+    "lineage_roots_equal_source_snapshot_inventory": true,
+    "manifest_rights_equal_evidence_source_assumption_bindings": true,
+    "orphan_audits_rights_roots_or_nodes": "refuse",
+    "rights_receipt_schema_equals_evidence_bundle_schema": true,
+    "terminal_rights_equal_ancestor_root_rights": true
+  },
+  "entitlement_contract": {
+    "all_other_provider_product_endpoint_ids": "caller_declared_production_identifiers_pending_truth_authentication",
+    "analyst_ratings_endpoint_id": "benzinga-v1-ratings",
+    "analyst_ratings_product_id": "benzinga-analyst-ratings",
+    "analyst_ratings_provider_id": "massive",
+    "at_least_one_massive_benzinga_analyst_ratings_source": true,
+    "audit_inventory_order": "audit_id_ASCII_sorted_unique",
+    "credential_material_permitted": false,
+    "entitlement_truth_authenticated": false,
+    "every_declared_audit_and_source_assumption_binding_is_used": true,
+    "internal_or_derived_artifacts_are_lineage_transformations": true,
+    "massive_benzinga_audit_may_claim_only_analyst_ratings_role": true,
+    "one_exact_entitlement_audit_per_source_snapshot": true,
+    "one_exact_source_snapshot_per_entitlement_audit": true,
+    "one_snapshot_may_cover_multiple_source_roles": true,
+    "one_source_role_may_span_multiple_snapshot_partitions": true,
+    "required_ultimate_external_source_roles_and_input_dependencies": {
+      "analyst_ratings_events": [
+        "date_level_beta_series",
+        "component_count_census"
+      ],
+      "earnings_and_guidance_events": [
+        "date_level_beta_series",
+        "component_count_census"
+      ],
+      "market_prices_corporate_actions_and_total_returns": [
+        "date_level_beta_series",
+        "component_count_census"
+      ],
+      "point_in_time_fundamentals_and_control_inputs": [
+        "date_level_beta_series",
+        "component_count_census"
+      ],
+      "point_in_time_industry_sector_classification": [
+        "date_level_beta_series",
+        "component_count_census"
+      ],
+      "security_identity_and_listing_history": [
+        "date_level_beta_series",
+        "component_count_census"
+      ],
+      "terminal_returns_and_delisting_events": [
+        "date_level_beta_series"
+      ]
+    },
+    "source_role_coverage": "closed_nonempty_union_exact"
+  },
+  "evidence_bundle_contract": {
+    "authority": "owner_assumption_entitlement_and_vintage_metadata_only_no_input_or_qc_authority",
+    "copied_or_self_declared_bundle_grants_input_authority": false,
+    "owner_assumption_is_not_vendor_permission": true,
+    "required_exact_attestation_fields": [
+      "attestation_schema",
+      "attestation_id",
+      "attestation_content_sha256",
+      "attestation_artifact_sha256",
+      "attested_information_cutoff_exclusive_utc",
+      "source_snapshot_inventory_sha256",
+      "correction_inventory_artifact_id",
+      "correction_inventory_content_sha256",
+      "correction_inventory_artifact_sha256",
+      "cutoff_filter_recipe_id",
+      "cutoff_filter_recipe_sha256"
+    ],
+    "required_exact_entitlement_fields": [
+      "audit_id",
+      "source_roles",
+      "source_artifact_id",
+      "source_content_sha256",
+      "source_artifact_sha256",
+      "provider_id",
+      "product_id",
+      "endpoint_id",
+      "account_scope_sha256",
+      "observed_at_utc",
+      "endpoint_access_observed",
+      "historical_access_observed",
+      "credential_material_present",
+      "applies_to_input_roles"
+    ],
+    "required_exact_owner_decision_fields": [
+      "decision_id",
+      "decision_date",
+      "source",
+      "reported_evidence_basis",
+      "authorized_scope",
+      "vendor_written_permission_obtained",
+      "independent_web_verification_performed",
+      "legal_conclusion",
+      "input_read_authorized",
+      "nuisance_compute_authorized",
+      "qc_action_authorized",
+      "outcome_access_authorized"
+    ],
+    "required_exact_processing_rights_fields": [
+      "working_assumption_id",
+      "evidence_basis",
+      "owner_assumption_processing_scope_id",
+      "representation_scopes",
+      "owner_assumption_permitted_purpose",
+      "candidate_input_metadata_bindings",
+      "source_assumption_bindings",
+      "quantconnect_project_visibility",
+      "personal_noncommercial_use_only",
+      "massive_benzinga_private_qc_processing_under_owner_assumption",
+      "all_other_source_processing_authorized",
+      "redistribution_permitted",
+      "input_read_authorized",
+      "vendor_written_permission_obtained",
+      "independent_web_verification_performed",
+      "legal_conclusion"
+    ],
+    "required_exact_role_input_binding_fields": [
+      "role",
+      "artifact_id",
+      "content_sha256",
+      "artifact_sha256"
+    ],
+    "required_exact_root_fields": [
+      "schema",
+      "status",
+      "authority",
+      "bundle_id",
+      "bundle_hash",
+      "owner_decision",
+      "data_entitlement_evidence",
+      "processing_rights_evidence",
+      "vintage_evidence",
+      "capabilities"
+    ],
+    "required_exact_source_assumption_binding_fields": [
+      "binding_id",
+      "source_artifact_id",
+      "data_entitlement_audit_id",
+      "processing_scope_id",
+      "owner_working_assumption_applicable",
+      "applies_to_input_roles"
+    ],
+    "required_exact_source_snapshot_fields": [
+      "source_roles",
+      "artifact_id",
+      "schema_id",
+      "content_sha256",
+      "artifact_sha256",
+      "data_entitlement_audit_id",
+      "rights_binding_id"
+    ],
+    "required_exact_vintage_fields": [
+      "evidence_epoch_id",
+      "evidence_epoch_artifact_id",
+      "evidence_epoch_semantic_sha256",
+      "evidence_epoch_artifact_sha256",
+      "source_snapshot_capture_instant_utc",
+      "evidence_recorded_instant_utc",
+      "vintage_method",
+      "first_test_session_open_utc",
+      "max_included_availability_or_correction_instant_utc",
+      "source_snapshot_bindings",
+      "external_vintage_attestation",
+      "calibration_information_cutoff_session",
+      "first_excluded_session",
+      "correction_inventory_artifact_id",
+      "correction_inventory_content_sha256",
+      "correction_inventory_artifact_sha256",
+      "correction_inventory_record_count",
+      "cutoff_filter_recipe_id",
+      "cutoff_filter_recipe_sha256",
+      "correction_inventory_complete",
+      "included_post_cutoff_correction_count",
+      "immutable_snapshot"
+    ],
+    "schema": "arv2-power-calibration-admission-evidence-bundle-v1",
+    "status": "candidate_metadata_evidence_not_production_authority",
+    "structural_validation_is_not_rights_authorization": true,
+    "structural_validation_is_not_vintage_proof": true
+  },
+  "external_bindings": {
+    "counter_review_commit": null,
+    "evaluation_receipt_id": null,
+    "evidence_bundle_artifact_sha256": null,
+    "evidence_bundle_id": null,
+    "independent_review_commit": null,
+    "numeric_power_receipt_sha256": null,
+    "outcome_artifact_sha256": null,
+    "owner_calibration_input_access_authority_id": null,
+    "owner_nuisance_calibration_authority_id": null,
+    "production_manifest_artifact_sha256": null,
+    "production_manifest_id": null,
+    "qc_project_id": null,
+    "qc_run_id": null,
+    "stock_successor_v3_sha256": null
+  },
+  "identity_and_canonicalization_contract": {
+    "BOM_invalid_UTF8_CRLF_or_whitespace_variants": "refuse",
+    "artifact_identity": "SHA256_of_exact_canonical_pretty_sorted_UTF8_bytes",
+    "artifact_terminal_newline": "LF",
+    "binary_floats_and_nonfinite_numbers": "refuse",
+    "duplicate_keys": "refuse",
+    "links_nonregular_files_and_unstable_reads": "refuse",
+    "semantic_and_artifact_hashes_are_distinct_fields": true,
+    "semantic_identity": "SHA256_of_compact_sorted_UTF8_JSON_with_own_id_and_hash_null"
+  },
+  "lane_id": "analyst-revisions-v2",
+  "later_stage_gate": {
+    "independent_review_and_codex_counter_review_required": true,
+    "input_artifact_loader_implemented": false,
+    "nuisance_calibration_implemented": false,
+    "numeric_receipt_implemented": false,
+    "separate_owner_input_access_authority_required": true,
+    "separate_owner_nuisance_compute_authority_required": true,
+    "stock_successor_v3_implemented": false
+  },
+  "lineage_contract": {
+    "copied_merged_ancestor_DAG": false,
+    "declared_candidate_lineage_is_closed": true,
+    "direct_parents": [
+      "calibration_input_schema",
+      "four_family_multiplicity_overlay"
+    ],
+    "each_parent_reauthenticates_its_own_accepted_acyclic_lineage": true,
+    "production_lineage_complete": false,
+    "representation": "exact_direct_parent_bindings_not_copied_ancestry"
+  },
+  "owner_decision": {
+    "authorized_scope": "arv2_4d_b2_metadata_contract_only_no_input_read_or_qc_action",
+    "decision_date": "2026-09-06",
+    "decision_id": "arv2-owner-working-rights-assumption-2026-09-06",
+    "independent_web_verification_performed": false,
+    "input_read_authorized": false,
+    "legal_conclusion": false,
+    "nuisance_compute_authorized": false,
+    "outcome_access_authorized": false,
+    "qc_action_authorized": false,
+    "reported_evidence_basis": "owner_reported_multiple_public_user_cases",
+    "source": "owner_direction_in_current_analyst_lane_session",
+    "vendor_written_permission_obtained": false
+  },
+  "resource_bounds": {
+    "B2_owned_metadata_artifact_bytes_maximum": 4194304,
+    "already_loaded_parent_reauthentication_artifact_bytes_maximum": 4194304,
+    "cold_parent_construction_is_outside_B2_loader_scope": true,
+    "descriptor_nofollow_nonblock_fstat_regular_and_path_identity_required": true,
+    "entitlement_audits_maximum": 32,
+    "initial_and_revalidation_reads_bounded_to_maximum_plus_one": true,
+    "integer_maximum": 9223372036854775807,
+    "lineage_nodes_maximum": 4096,
+    "rights_bindings_maximum": 32
+  },
+  "rights_contract": {
+    "all_other_source_processing_authorized": false,
+    "all_other_source_scope_id": "metadata_only_no_source_processing_authority",
+    "input_read_authority": false,
+    "legal_conclusion": false,
+    "massive_benzinga_assumption_scope_id": "private_personal_noncommercial_quantconnect_research_massive_benzinga_working_assumption",
+    "massive_benzinga_owner_working_assumption_id": "arv2-owner-working-rights-assumption-2026-09-06",
+    "owner_assumption_permitted_purpose": "nuisance_only_power_calibration_and_closed_aggregate_receipt",
+    "personal_noncommercial_use_only": true,
+    "qc_transfer_or_action_authority": false,
+    "quantconnect_project_visibility": "private_owner_only",
+    "receipt_schema": "arv2-power-calibration-admission-evidence-bundle-v1",
+    "representation_scopes": [
+      "raw_analyst_ratings",
+      "normalized_analyst_ratings",
+      "derived_content_addressed_signals",
+      "immutable_historical_snapshots"
+    ],
+    "vendor_written_permission_obtained": false,
+    "working_assumption_applies_only_to_massive_benzinga_source": true
+  },
+  "schema": "arv2-stock-power-calibration-production-manifest-admission-structural-v1",
+  "status": "owner_authorized_outcome_free_candidate_pending_independent_review",
+  "vintage_contract": {
+    "accepted_vintage_methods": [
+      "contemporaneous_immutable_snapshot",
+      "externally_attested_as_of_reconstruction"
+    ],
+    "bare_post_cutoff_false_flag_is_insufficient": true,
+    "calibration_information_cutoff_session": "2020-01-30",
+    "complete_correction_inventory_hash_required": true,
+    "complete_empty_correction_inventory_permitted": true,
+    "contemporaneous_capture_window": "capture_at_or_after_2020_01_31_00_00_UTC_and_strictly_before_first_test_session_open",
+    "cutoff_filter_recipe_hash_required": true,
+    "evidence_recorded_must_not_precede_capture": true,
+    "first_excluded_session": "2020-01-31",
+    "first_test_session_open_utc": "2020-01-31T14:30:00.000000Z",
+    "immutable_snapshot_required": true,
+    "included_post_cutoff_correction_count": 0,
+    "manifest_capture_must_equal_evidence_capture": true,
+    "max_included_availability_or_correction_must_not_exceed_cutoff": true,
+    "reconstructed_vintage_requires_external_attestation": true
+  }
+}

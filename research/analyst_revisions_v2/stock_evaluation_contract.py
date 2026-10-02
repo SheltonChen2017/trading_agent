@@ -18,6 +18,10 @@ from typing import Any, Mapping
 
 from data.exchange_calendar import ExchangeCalendarError, resolve_nth_session_after
 
+from .canonical import (
+    capture_frozen_container_authority,
+    frozen_container_authority_is_current,
+)
 from .qc_first_plan import QcFirstStudyPlan, load_qc_first_study_plan
 
 
@@ -47,12 +51,18 @@ PRIMARY_OUTPUT_IDS = (
     "firm_specific_vs_global_map_paired_20_session_ic",
 )
 _LOADED_CONTRACT_AUTHORITY = object()
+_CONTRACT_FROZEN_FIELD_NAMES = (
+    "sections",
+    "section_hashes",
+    "external_bindings",
+)
 _CONTRACT_AUTHORITIES: dict[
     int,
     tuple[
         weakref.ReferenceType["StockEvaluationContract"],
         Path,
         Path,
+        tuple[object, ...],
         tuple[object, ...],
     ],
 ] = {}
@@ -612,14 +622,28 @@ def _content_payload(raw: Mapping[str, Any]) -> bytes:
 
 
 def _fingerprint_value(value: object) -> object:
-    if isinstance(value, Mapping):
-        return tuple(
-            (key, _fingerprint_value(item))
-            for key, item in sorted(value.items())
-        )
-    if isinstance(value, tuple):
-        return tuple(_fingerprint_value(item) for item in value)
-    return value
+    if type(value) is MappingProxyType:
+        pairs: list[tuple[str, object]] = []
+        for key, item in value.items():
+            if type(key) is not str:
+                raise StockEvaluationContractError(
+                    "stock evaluation contract has a noncanonical authority key"
+                )
+            pairs.append((key, _fingerprint_value(item)))
+        return ("mapping", tuple(sorted(pairs)))
+    if type(value) is tuple:
+        return ("tuple", tuple(_fingerprint_value(item) for item in value))
+    if type(value) is str:
+        return ("str", value)
+    if type(value) is bool:
+        return ("bool", value)
+    if type(value) is int:
+        return ("int", value)
+    if value is None:
+        return ("none", None)
+    raise StockEvaluationContractError(
+        "stock evaluation contract has noncanonical authority state"
+    )
 
 
 @dataclasses.dataclass(frozen=True, init=False)
@@ -661,14 +685,24 @@ class StockEvaluationContract:
 
 
 def _contract_fingerprint(contract: StockEvaluationContract) -> tuple[object, ...]:
-    return (
+    scalar_values = (
         contract.spec_id,
         contract.spec_hash,
         contract.parent_plan_id,
         contract.parent_plan_hash,
-        _fingerprint_value(contract.sections),
-        _fingerprint_value(contract.section_hashes),
-        _fingerprint_value(contract.external_bindings),
+    )
+    if any(type(item) is not str for item in scalar_values):
+        raise StockEvaluationContractError(
+            "stock evaluation contract has noncanonical authority state"
+        )
+    return tuple(
+        _fingerprint_value(item)
+        for item in (
+            *scalar_values,
+            contract.sections,
+            contract.section_hashes,
+            contract.external_bindings,
+        )
     )
 
 
@@ -708,6 +742,9 @@ def _loaded_contract(
     for name, item in fields.items():
         object.__setattr__(value, name, item)
     fingerprint = _contract_fingerprint(value)
+    frozen_container_authority = capture_frozen_container_authority(
+        fields[name] for name in _CONTRACT_FROZEN_FIELD_NAMES
+    )
     identity = id(value)
     reference = weakref.ref(
         value,
@@ -719,6 +756,7 @@ def _loaded_contract(
             source_path,
             qc_first_plan_path,
             fingerprint,
+            frozen_container_authority,
         )
     return value
 
@@ -740,8 +778,22 @@ def require_loaded_stock_evaluation_contract(
         raise StockEvaluationContractError(
             "stock evaluation contract loader authority is absent"
         )
-    _, source_path, qc_plan_path, fingerprint = authority
-    if _contract_fingerprint(contract) != fingerprint:
+    _, source_path, qc_plan_path, fingerprint, frozen_container_authority = authority
+    if not frozen_container_authority_is_current(
+        (getattr(contract, name, None) for name in _CONTRACT_FROZEN_FIELD_NAMES),
+        frozen_container_authority,
+    ):
+        raise StockEvaluationContractError(
+            "stock evaluation contract frozen field root changed after authentication "
+            "or descendant container changed"
+        )
+    try:
+        current_fingerprint = _contract_fingerprint(contract)
+    except AttributeError as exc:
+        raise StockEvaluationContractError(
+            "stock evaluation contract changed after authentication"
+        ) from exc
+    if current_fingerprint != fingerprint:
         raise StockEvaluationContractError(
             "stock evaluation contract changed after authentication"
         )
@@ -876,6 +928,12 @@ def load_stock_evaluation_contract(
     parent: QcFirstStudyPlan = load_qc_first_study_plan(qc_first_plan_path)
     if parent.plan_id != PARENT_PLAN_ID or parent.plan_hash != PARENT_PLAN_HASH:
         raise StockEvaluationContractError("QC-first parent identity changed")
+    try:
+        resolved_qc_first_plan = Path(qc_first_plan_path).resolve(strict=True)
+    except OSError as exc:
+        raise StockEvaluationContractError(
+            "QC-first parent changed or disappeared"
+        ) from exc
     history = raw["history_definition"]
     cutoff = history["outcome_cutoff_session"]
     for horizon, decision in history["last_mature_decision_session"].items():
@@ -897,5 +955,5 @@ def load_stock_evaluation_contract(
         section_hashes=_freeze(raw["section_hashes"]),
         external_bindings=_freeze(raw["external_bindings"]),
         source_path=resolved,
-        qc_first_plan_path=Path(qc_first_plan_path).resolve(strict=True),
+        qc_first_plan_path=resolved_qc_first_plan,
     )

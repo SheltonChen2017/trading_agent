@@ -1,0 +1,88 @@
+{
+  "authority": "outcome_free_rule_grid_only_no_qc_look_deployment_or_order_authority",
+  "capabilities": {
+    "confirmatory_look_commitment": false,
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false
+  },
+  "construction": {
+    "activation_manifest_sha256": "69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41",
+    "admission_leverage": "2",
+    "cadence": "weekly_prior_session_decision_next_open_MOO",
+    "cost_bps_per_side": "10",
+    "decision_count": 261,
+    "excluded_stock_security_id_sha256": "12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f",
+    "exclusion_rule": "qcom_stock_eligibility_after_coverage_v1",
+    "first_session": "2021-01-04",
+    "last_session": "2025-12-31",
+    "minimum_positive_score_count": 5,
+    "minimum_verified_stock_name_count": 5,
+    "observation_count": 1255,
+    "package_sha256": "7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f",
+    "reference_repair_enabled": true,
+    "selection_policy": "all_six_25pct_verified_subset_top10_equal_slots_residual_own_ETF",
+    "slippage_bps_per_side": 0,
+    "target_gross_exposure": "0.98"
+  },
+  "control": {
+    "candidate_id": "R231",
+    "manifest_sha256": "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0",
+    "tilt_fraction": "0.00"
+  },
+  "existing_arms": [
+    {
+      "candidate_id": "R235",
+      "manifest_sha256": "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4",
+      "tilt_fraction": "0.80",
+      "tilt_percent": 80
+    },
+    {
+      "candidate_id": "R232",
+      "manifest_sha256": "53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0",
+      "tilt_fraction": "1.00",
+      "tilt_percent": 100
+    },
+    {
+      "candidate_id": "R236",
+      "manifest_sha256": "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4",
+      "tilt_fraction": "1.20",
+      "tilt_percent": 120
+    },
+    {
+      "candidate_id": "R237",
+      "manifest_sha256": "3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4",
+      "tilt_fraction": "2.00",
+      "tilt_percent": 200
+    }
+  ],
+  "grid_percent": [
+    60,
+    80,
+    100,
+    120,
+    140,
+    160,
+    180,
+    200
+  ],
+  "historical_result_selection_authorized": false,
+  "interpolation_authorized": false,
+  "missing_unrun_percent": [
+    60,
+    140,
+    160,
+    180
+  ],
+  "primary_prospective_setting": {
+    "state": "owner_decision_pending",
+    "tilt_percent": null
+  },
+  "schema": "arv2-qcom-excluded-ar-weight-transfer-range-policy-v1",
+  "study_classification": "adaptive_exploratory_no_confirmatory_claim",
+  "tilt_definition": "rank_scaled_transfer_capacity_relative_to_each_stock_own_post_cap_baseline_weight"
+}

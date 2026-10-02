@@ -31,7 +31,10 @@ data/swap_*_result_*.json
 #   2. evidence capture (assistant/runtime_identity.py) refuses ANY
 #      untracked file, so one unignored artifact from a scheduled run
 #      would silently stop the evidence cadence.
-# Nothing under artifacts/ has ever been tracked; models and datasets are
+# Before the owner-approved Insider-only SEC transfer on 2026-09-24, nothing
+# under artifacts/ had ever been tracked. That exact exception force-tracks
+# 82 public quarterly ZIPs and their provenance CSV; all other artifacts,
+# including licensed data, remain ignored. Models and other datasets are
 # hash-verified at load instead of being version-controlled.
 artifacts/
 

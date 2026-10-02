@@ -25,3 +25,11 @@ def test_session_ledger_is_one_contiguous_markdown_table() -> None:
     assert all(line.strip() for line in lines)
     assert all(line.startswith("|") and line.endswith("|") for line in lines)
     assert all(line.count("|") == expected_pipes for line in lines)
+
+
+def test_context_revision_requires_focused_package_guard_not_implicit_full_suite() -> None:
+    raw = RECORD.read_text(encoding="utf-8")
+    section = raw[raw.index("## 83."):]
+    assert "tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports" in section
+    assert "Full lane suite is not authorized by inference" in section
+    assert "actual affected-quarter and accession counts are unmeasured" in section

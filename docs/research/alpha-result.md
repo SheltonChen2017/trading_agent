@@ -1180,3 +1180,4738 @@ before any rerun; reruns will be new R-numbers.
 - Every historical conclusion remains unusable. A clean rerun begins only
   from the final independently counter-reviewed pushed head and is appended
   as R-005 or later; no old statistic may be copied forward.
+
+## R-030 — Analyst Revisions V2 B5C data-free infrastructure smoke (SPENT; LOCKED AMBIGUOUS; NO OUTCOME)
+
+This entry records an already-spent action; it does not launch a run, grant
+access, or authorize a retry. The intended initialization-refusal smoke used
+no production input and is not evidence about the strategy.
+
+| Field | Value |
+|---|---|
+| **Purpose / classification** | `data_free_infrastructure_research_look`; B5C one-file initialization-refusal smoke only |
+| **Research-look accounting** | Counted once (shared run-level look count **30 → 31**; ARV2 infrastructure looks **0 → 1**). **Zero** development evaluations, permanent-family looks, confirmatory-alpha looks, or alpha cells; the lifetime alpha-cell exposure floor remains **452**. |
+| **Source identity** | B5C projection introduced at `19b52d6`, independently reviewed through `37e2e64`, and counter-reviewed at `4b5e4e6`; uploaded sole `main.py` 3,328 bytes, SHA-256 `327f126311c12e9f37297f229a3946a6cb1f2bbe26ed6c746cf140b26c2e6bf9` |
+| **QC project / compile / backtest** | Project `36418640`, `1 ARV2_B5B_REFUSAL_SMOKE - 20260911`; compile `5e6230184c123e9e72b693bbe372641b-3af05f1ebc45736c49793d84adf33bc1` (`BuildSuccess`); backtest `c27cacff90618a3277387096219ab2fb` |
+| **Execution interval (UTC)** | 2026-09-12T00:22:40.194284Z → 2026-09-12T00:22:47.656173Z |
+| **Receipt state** | `LOCKED_BACKTEST_STATUS_AMBIGUITY`: the statistics-free list envelope contained a forbidden result/statistic-shaped field, so the driver stopped before reading its value, terminal status, or logs. The expected initialization refusal was **not authenticated**. |
+| **Access exclusions** | No provider row, production input, Object Store object, market datum, outcome, performance statistic, result value, terminal backtest status, detail endpoint, or log was accessed; no order was permitted. |
+| **Durable evidence** | Driver: 34,882 bytes, SHA-256 `b19a489aca60394a2605363be5a1963a9401c37164c5f0da41ea2d45f39b70c0`. Receipt: 3,639 bytes, schema `arv2-qc-b5c-refusal-smoke-receipt-v1`, SHA-256 `6cef656b40ac988afb1d81cf81784fcfad3ca7381ccfea0baabe4e14a6740fb3`. Full evidence and endpoint counts are recorded in Analyst Revisions V2 section 68.2. |
+| **Retry / inference** | **No retry.** Ambiguity consumes the one infrastructure look. This is neither a formal ARV2 outcome nor evidence for or against alpha. |
+
+**Cumulative ledger state after R-030:** **31** run-level looks are recorded:
+the 30 prior real-market runs through R-029 plus this one data-free
+infrastructure look. The cross-sectional lifetime alpha-cell exposure floor
+remains **452**, and APQ's separate three-cell family is unchanged. For ARV2,
+one infrastructure look is spent; development evaluations and
+permanent-family looks remain zero; confirmatory alpha remains unspent; one
+prospective permanent look remains. This accounting grants no provider, QC,
+outcome, result, deployment, order, or trading authority.
+
+## R-031 through R-052 — Analyst Revisions V2 QC fundamental-universe discovery launches (RETROACTIVELY RECONCILED; NO OUTCOME READ)
+
+This additive reconciliation records every prior QC discovery backtest launch
+that had not yet been entered in the shared ledger. On 2026-09-14 the owner
+authorized the lane to proceed toward the first outcome-bearing evaluation.
+Before that evaluation, an authenticated, statistics-free inventory of the
+lane's discovery projects found 22 distinct backtest launches. The inventory
+read only project/run identities and terminal status: no performance
+statistics, result values, charts, logs, orders, provider rows, or strategy
+outcomes were requested or inspected. Attempts 5, 6, and 13 created projects
+but launched no backtest; attempts 16 and 17 stopped during local preparation.
+Those five attempts therefore consume no look and receive no R-number.
+
+| Entry | Discovery attempt | QC project | QC backtest | Terminal status |
+|---|---:|---:|---|---|
+| R-031 | 7 | `36536115` | `0014d18dc88f67f958d559a183079a86` | Runtime Error |
+| R-032 | 8 | `36536326` | `1054c989da3711446af17a557b637733` | Runtime Error |
+| R-033 | 9 | `36536574` | `73a386ec1c1b7b026afacb85a42fddba` | Runtime Error |
+| R-034 | 10 | `36536795` | `44d6fe47dfa9406b3b03215f4dae3306` | Runtime Error |
+| R-035 | 12 | `36544563` | `3711535499f0da3fee6977c66375acbf` | Runtime Error |
+| R-036 | 14 | `36548449` | `a7a5622f29a92bb18be0e52224683743` | Runtime Error |
+| R-037 | 15 | `36548598` | `526c6affd022a6d3ab95e54adc5d9eed` | Runtime Error |
+| R-038 | 18 | `36548747` | `5409fcd91a1f3618ce071425591750e5` | Runtime Error |
+| R-039 | 19 | `36548862` | `9493b882011a4b51cc1333b6709e14ad` | Runtime Error |
+| R-040 | 20 | `36549142` | `4937c65e0e7d442fd4268102d4cd0d42` | Runtime Error |
+| R-041 | 21 | `36549260` | `c2138164f23169cbd1188e8349b9558d` | Runtime Error |
+| R-042 | 22 | `36549367` | `c042d1cf806c5e28b291bb87e0673ac3` | Runtime Error |
+| R-043 | 23 | `36549502` | `962664739f6c769f7eea78083deee4d9` | Runtime Error |
+| R-044 | 24 | `36549608` | `736d365c3275b072246c47a92bb15752` | Runtime Error |
+| R-045 | 25 | `36549752` | `1501f80835f2a9f763343ca53e34db56` | Runtime Error |
+| R-046 | 26 | `36549861` | `564537e6ea7831465eaf2c37cb59190e` | Runtime Error |
+| R-047 | 27 | `36549947` | `3c0bd1ff2d1afa826ed1259b59064272` | Runtime Error |
+| R-048 | 28 | `36550029` | `18b9eb494c5e843a74ec62de2da831a6` | Runtime Error |
+| R-049 | 29 | `36550151` | `1db646acc22f79250827b5896f2b7824` | Runtime Error |
+| R-050 | 30 | `36550309` | `d81e7304db805a9d5fea3f8159bc23d6` | Runtime Error |
+| R-051 | 31 | `36550360` | `0cd205c129624cb83e0e87a580cd5b34` | Runtime Error |
+| R-052 | 32 | `36550482` | `1d1ee522af4176cdf8bfeae487d91e03` | Completed. |
+
+All 22 launches are conservatively classified as outcome-free QC
+fundamental-universe-discovery infrastructure research looks. Each is a
+distinct spent look and cannot be overwritten or retried under the same
+entry. The machine-readable successor ledger is
+`arv2_infrastructure_look_ledger.11987a12b72d06ea612b442e342ce0b1d2f28c503f0a3b1ca2cf721d8aaa7810.json`
+(40,360 bytes; SHA-256
+`b1018c54128b9cea5ff0c960e0c6adeab803b085b9dde359f323246d0f82e802`),
+which preserves R-030 and binds the statistics-free reconciliation receipt
+(SHA-256
+`67071bcafa3ec65912983ba0c0834a5980ffaac63c0c2c75bb2f4c3720460a15`).
+
+**Cumulative ledger state after R-052:** **53** run-level looks are recorded;
+ARV2 has spent **23** infrastructure looks. ARV2 development evaluations,
+permanent-family looks, and confirmatory-alpha looks remain zero. The
+cross-sectional lifetime alpha-cell exposure floor remains **452** and one
+prospective permanent ARV2 look remains. The next launched outcome-bearing
+ARV2 evaluation must be recorded as **R-053**, even if it refuses or errors.
+
+## R-053 — Analyst Revisions V2 accepted-risk preliminary stock IC (COMPLETED; INCONCLUSIVE UNDERFILLED)
+
+This is the first outcome-bearing Analyst Revisions V2 development evaluation.
+It is an accepted-risk preliminary stock-IC diagnostic, not the frozen formal
+ARV2 result, an ETF backtest, a leveraged test, or a deployment/trading run.
+
+| Field | Value |
+|---|---|
+| **Purpose / classification** | `development_evaluation`; `arv2-eval-stock-historical-qc-001`; preliminary current-vintage stock IC only |
+| **Research-look accounting** | Counted once (shared run-level look count **53 -> 54**; ARV2 development evaluations **0 -> 1**). ARV2 infrastructure looks remain **23**; permanent-family and confirmatory-alpha looks remain zero. The 32 authenticated preliminary cells raise the lifetime alpha-cell exposure floor **452 -> 484**. |
+| **Input package** | `arv2-preliminary-qc-package-c381be822c5082fa438fa79c`; SHA-256 `c381be822c5082fa438fa79c01f2f8191b8c93ff872239c49149413ce569d520`; six activation-ordered private QC Object Store objects |
+| **QC source projection** | `arv2-preliminary-qc-projection-ddc9747bc25d0cb275a7e165`; SHA-256 `ddc9747bc25d0cb275a7e165fc26b539189e75f2fb82c4e6fd086c515b85be84`; five files, 131,372 bytes; live compilation `BuildSuccess` |
+| **Execution identity** | Plan `arv2-preliminary-qc-submission-64c4b1877721635b4f4258f0`; execution permit `arv2-preliminary-qc-execution-permit-d679932f3b21a29b15bc1b97`; launch receipt `arv2-preliminary-qc-launch-c8417014e4a4291ddf83afcc` |
+| **QC project / compile / backtest** | Project `36561856`, `1 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260914_R053B_c381be82`; compile `c5a35b93b4cbd5f89ec2ead1290dc3b4-63219dfcf4a70009a48cec609faa255d`; backtest `f3bd9f3fc3c2627784e93d761382cd04`, `ARV2 R053 accepted-risk preliminary stock IC 2021-2025 c381be82` |
+| **Launch / terminal** | Launched `2026-09-15T05:20:50Z` at `In Queue...`; statistics-free polling authenticated `Completed.` after 6 polls; terminal receipt SHA-256 `17454854e39e1a0d6e05b714b9f1c2b6aeb9048c4732a8e23d1d71c3d4a02498` |
+| **Aggregate-only result** | Exactly 34 expected `ARV2_*` statistics authenticated once: 32 IC cells plus preliminary/runtime metadata. Result receipt `arv2-preliminary-qc-result-750f1ffe69523bb3adbf3ea6`, SHA-256 `750f1ffe69523bb3adbf3ea69bc64ccb5881169d4a9aa9385895d615e643993b`; custom-statistics SHA-256 `80cb59930b7c97c822fc92ec6a348240e29f3e51a9b066d8b31e786a28db2ac3`. |
+| **Windows / cells** | 2020-01-02 through 2025-12-31 primary preliminary window and owner-requested 2021-01-04 through 2025-12-31 descriptive sensitivity; two source views x two rating arms x four horizons x two windows = 32 cells |
+| **Result** | **32/32 `INCONCLUSIVE_UNDERFILLED`; 0 valid IC dates.** The primary window had 1,508 invalid dates per cell and the 2021-2025 sensitivity had 1,255. Consequently every IC and cross-sectional mean-return statistic is null; there is no favorable, unfavorable, or zero-alpha estimate to interpret. |
+| **Coverage diagnostics** | QC resolved 5,113 securities and retained 1,038 named security refusals. Current-row view: 41,628 eligible score rows; accepted outcome pairs H1/H5/H20/H60 = 38,178 / 38,141 / 38,006 / 37,646 (91.71% / 91.62% / 91.30% / 90.43%). Conservatively censored view: 31,940 eligible rows; accepted pairs = 29,252 / 29,220 / 29,125 / 28,902 (91.58% / 91.48% / 91.19% / 90.49%). The reviewed evaluator invalidates a whole date if any sector is refused, any eligible outcome pair is missing, or the cross-section is too small; those strict completeness conditions were not satisfied on any date. |
+| **Evidence limitations** | Inputs are current-vintage, non-pristine-PIT Massive rows and current-snapshot Sharadar identity/sector attributes under the owner's accepted-risk decision. The run omits a PIT security master, PIT sector history, measured session-specific quality, formal walk-forward residualization, terminal-payoff/successor authority, multiplicity inference, an economic portfolio, ETF construction, and leverage. |
+| **Access exclusions** | The result action selected no raw provider row, raw price row, security-level outcome, unrestricted log, chart, trade, order, deployment, broker action, or trading action. |
+| **Disposition** | **Technically valid completion; economically inconclusive because every cell was underfilled.** Do not treat `Completed.` as a strategy pass. Preserve R-053 as spent and send the exact lane snapshot and completeness behavior through independent Claude review before any corrected evaluation or later-window/ETF/leverage work. |
+
+A deterministic package-only diagnostic replay, performed without another QC
+or outcome read, reproduced the decisive refusal. In the current-row view,
+1,021 dates had all sectors refused and 487 were partially scored; in the
+conservatively censored view the counts were 1,132 and 376. Neither view had a
+single date on which every sector was admitted. All 16,101 current-row and
+16,212 censored sector-date refusals arose from zero sector MAD with
+nonconstant sparse scores, not from the total-name or active-name floors. The
+year 2020 had all eleven sectors refused on all 253 sessions, so it adds
+invalid dates and 1,044,899 refused member-sessions but no eligible or accepted
+outcome pairs. This explains why those pair totals match the 2021-2025
+sensitivity while the window date counts do not. The behavior matches the
+reviewed complete-cross-section rule and its isolated regression; changing
+that rule is a new preregistered evaluation and a new R-number, not a technical
+retry or reinterpretation of R-053.
+
+**Cumulative ledger state after R-053:** **54** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **1** development evaluation.
+The lifetime alpha-cell exposure floor is **484**. No permanent-family or
+confirmatory-alpha look has been spent, and no paper/live authority follows
+from this preliminary result.
+
+## R-054 — Analyst Revisions V2 sparse-signal accepted-risk stock IC (LAUNCHED; TECHNICAL RUNTIME ERROR; NO RESULT READ)
+
+R-054 was preregistered and launched as a new development evaluation. Its
+exact v2 rule normalizes each sector from its live analyst-signal names while
+retaining unscored names as structural zero, and excludes unavailable price
+pairs without imputation when at least 20 actual pairs remain. The 20-name / 5-
+active sector floors, complete-sector requirement, horizons, views, arms, and
+2020-2025 plus 2021-2025 windows stayed fixed.
+
+| Field | Recorded value |
+|---|---|
+| **Research-look accounting** | Counted once: shared run-level looks **54 -> 55** and ARV2 development evaluations **1 -> 2**. Because no aggregate result was authenticated or read, the lifetime alpha-cell exposure floor remains **484**, rather than rising to the preregistered conditional value of 516. |
+| **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| **Evaluator manifest** | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| **QC source projection** | `arv2-preliminary-qc-projection-1c017bc130a6da1903070220`; SHA-256 `1c017bc130a6da1903070220dc04fb3b685241c8d0a70e3cb6b64ab48b40de14`; five files, 131,880 bytes |
+| **Execution identity** | Plan `arv2-preliminary-qc-submission-c455edf2b3bf16085a5e27b7`, SHA-256 `c455edf2b3bf16085a5e27b73b9852816ac5a20bd99d8880a0792097afacddcc`; execution permit `arv2-preliminary-qc-execution-permit-4a31edebb6a005070bfde0ab`; launch receipt `arv2-preliminary-qc-launch-412cd2296e621e50581f98d3` |
+| **QC project / compile / backtest** | Project `36578018`, `2 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260915_R054A_e9851c2f`; compile `f9268585923d032f45dfa71adefd7b26-3f2c18c888039d6893340cd16f93eb1f`; backtest `30d1a096d2ef7c69c820460d7ad39971`, `ARV2 R054 sparse-signal accepted-risk preliminary stock IC 2021-2025 e9851c2f` |
+| **Launch / terminal** | The one-use permit began `2026-09-15T15:55:12Z`. The launch entered `In Queue...`; 104 statistics-free polls authenticated terminal `Runtime Error`. Terminal receipt `arv2-preliminary-qc-terminal-fab47d71f30c0f7e95684460`, SHA-256 `fab47d71f30c0f7e95684460e3a56caf79d54f5e22c3e3cf098c6c8de800d9a7`. |
+| **QC runtime evidence** | The QC terminal reported at 2026-05-26 16:00:00 that one algorithm time loop exceeded ten minutes (`Isolator.cs:line 190`). The UI later reported 3,186.19 seconds total runtime and 6,084,172 processed data points. These messages diagnose scheduling/runtime exhaustion, not an alpha result. |
+| **Outcome access** | `include_statistics=false` and `result_values_selected=false` throughout terminal polling. No result authority was rendered or signed; no aggregate statistic, valid-date count, security-level outcome, raw provider row, order, deployment, or trading action was read. |
+| **Disposition** | **Spent technical development evaluation; no economic result.** The tangible-evidence gate was not tested and remains unmet. No alpha sign, magnitude, sufficiency status, or underfill conclusion may be inferred from this runtime error. |
+
+The prior source-only feasibility replay remains valid evidence about the
+signal path: it found all 1,255 gate-window dates feasible in both source
+views and score arms, and the empty-history replay completed all 1,508 dates.
+Neither replay opened an outcome. The cloud run instead exhausted the QC
+execution schedule while advancing the same fixed workload through repeated
+`Train(...)` callbacks. Therefore the next action is a scheduling-only retry,
+not a strategy-rule relaxation.
+
+**Cumulative ledger state after R-054:** **55** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **2** development evaluations.
+The lifetime alpha-cell exposure floor remains **484**. No permanent-family or
+confirmatory-alpha look has been spent.
+
+## R-055 — Analyst Revisions V2 same-rule scheduling retry (COMPLETED; TANGIBLE PRELIMINARY STOCK-IC EVIDENCE)
+
+R-055 preserved R-054's exact package, evaluator, v2 signal rule, dates,
+views, rating arms, horizons, output inventory, and tangible-result gate. Its
+only substantive change was execution scheduling: bounded work slices ran
+directly from ordinary `OnData` calls instead of through `Train(...)`. The
+evaluator, input, score, return, threshold, window, and output cells remained
+byte-identical.
+
+| Field | Recorded value |
+|---|---|
+| **Purpose / classification** | `development_evaluation`; `arv2-eval-stock-historical-qc-001`; accepted-risk preliminary stock IC only, not a formal, confirmatory, ETF, economic-portfolio, deployment, or trading result |
+| **Research-look accounting** | Counted once: shared run-level looks **55 -> 56** and ARV2 development evaluations **2 -> 3**. ARV2 infrastructure looks remain **23**; permanent-family and confirmatory-alpha looks remain zero. The 32 authenticated preliminary cells raise the lifetime alpha-cell exposure floor **484 -> 516**. |
+| **Input package** | `arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; SHA-256 `e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9` |
+| **Evaluator manifest** | `arv2-preliminary-rating-manifest-58df928497bd907ea6401109`; SHA-256 `58df928497bd907ea64011093b2c6c3de06661ddecd9f56dd1e7e37811403a20` |
+| **QC source projection** | `arv2-preliminary-qc-projection-8d194f3486f961601111d49d`; SHA-256 `8d194f3486f961601111d49d5cabcdaba33c095f95858f03a1143280b76ef5bb`; five files, 132,028 bytes |
+| **Execution identity** | Plan `arv2-preliminary-qc-submission-d0fe1c6ae7ae01749426a187`, SHA-256 `d0fe1c6ae7ae01749426a1873692b2a264440d5b83f4cc516136a6954eecd68f`; execution permit `arv2-preliminary-qc-execution-permit-556ebf6e2d9ca90400d2f861`, SHA-256 `556ebf6e2d9ca90400d2f86163a7c97f3e77cd91c813bc19b7560eed2ea82035`; launch receipt `arv2-preliminary-qc-launch-6613f6a03413246c5a6ede3f`, SHA-256 `6613f6a03413246c5a6ede3f5a72dc128ea504e220036a41f8ecaaba6a9f86f0` |
+| **QC project / compile / backtest** | Project `36580858`, `3 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260915_R055B_e9851c2f`; compile `8d11a427fa02d5a3b7575e6e95673680-b411ae097d26f7fe858a57eb6b31ec73`, `BuildSuccess`; backtest `de2d5930528b5c3bdcc8a802f1332eaa`, `ARV2 R055B direct-runtime accepted-risk stock IC 2021-2025 e9851c2f` |
+| **Launch / terminal** | Permit began `2026-09-15T17:23:13Z`; 89 statistics-free polls authenticated exact `Completed.` Terminal receipt `arv2-preliminary-qc-terminal-7461e9c26ebc02d53d119af2`, SHA-256 `7461e9c26ebc02d53d119af2c78d20e503cad5416ca3e0b8dc3faf605ba22cf2`, records `include_statistics=false` and `result_values_selected=false`. |
+| **Aggregate-only result** | One-use result permit `arv2-preliminary-qc-result-permit-c8069ece67f6c52bb1a90cd8`, SHA-256 `c8069ece67f6c52bb1a90cd8ecfea836602a573e35b7ef59af134264fdb0bc3c`, made exactly one `backtests/read` call. Exactly 34 expected `ARV2_*` statistics were authenticated: 32 cells plus two metadata records. Result receipt `arv2-preliminary-qc-result-e670b7f94eb993969defc260`, semantic SHA-256 `e670b7f94eb993969defc260bc34932280fb6a9ec9bd12d7d61400b8725a91ec`; persisted-file SHA-256 `05e347c3f8fad101d4c195b3ae8003c73598533364f3c7e256cfda41a7cf5214`; custom-statistics SHA-256 `b37867f0d629714b9c9dede95bc87725585d647aa7dfb17502ae9a8e0f4f2e01`. |
+| **Runtime coverage** | QC resolved 5,113 securities and retained 1,038 named refusals, reconciling to 6,151 inputs; 12,244 contributions and all 400 evaluator callbacks completed. Compatibility field `training_slice_count=41`, although R-055 advanced through `OnData`, not `Train(...)`. |
+| **2021-2025 gate result** | **16/16 `PRELIMINARY_DESCRIPTIVE_AVAILABLE`; each has 1,255 valid dates, zero invalid dates, and all five preregistered IC/return aggregates non-null.** Accepted actual outcome pairs are 4,990,758 / 4,984,886 / 4,968,962 / 4,928,202 at H1/H5/H20/H60. Mean IC ranges across view/arm are 0.003910-0.004114 / 0.006235-0.006651 / 0.008213-0.009194 / 0.009774-0.011841; positive-IC date share ranges 56.18%-57.45% / 61.59%-62.63% / 63.82%-65.26% / 66.22%-69.08%. |
+| **2020-2025 companion** | **16/16 available; each has 1,508 valid and zero invalid dates.** Accepted pairs range from 5,823,350 at H1 to 5,759,773 at H60. Every mean and median IC is positive, but this companion period is not an independent confirmation of the owner-window result. |
+| **Return interpretation** | The authenticated actual-outcome fields exist, satisfying the tangible-evidence gate. Their cross-section mean SPY-excess returns at H1/H5/H20/H60 are -0.00010055 / -0.00116854 / -0.00672225 / -0.02626635 (medians -0.00040116 / -0.00225874 / -0.00876165 / -0.02449505). They are aggregate universe outcomes, identical across views/arms at a horizon, and **not** a score-sorted portfolio or ETF P&L. |
+| **Evidence limitations** | Metadata remains `formal_result=false`, `alpha_claim_authorized=false`, and `economic_portfolio_evaluation=false`. Inputs are current-vintage, non-pristine-PIT Massive rows and current-snapshot Sharadar identity/sector attributes. The run omits formal controls/inference, terminal-payoff/successor authority, an economic portfolio, ETF construction, and leverage. |
+| **Access exclusions** | The result action selected no raw provider row, raw price row, security-level outcome, unrestricted log, chart, trade, order, deployment, broker action, or trading action. |
+| **Disposition** | **Technically successful and tangibly populated preliminary stock-IC diagnostic.** The fixed count/status gate passes 16/16, so no counts-only relaxation is permitted or needed. This is encouraging ranking evidence, not yet an investable-return result or formal alpha acceptance. |
+
+The first signed `_01` control attempt failed locally before any QC request
+because generic organization discovery occurred after the formal transport had
+sealed its runtime namespace. It created no QC project or job and consumed no
+look or result. The successful `_02` path instead read the existing private
+host binding before importing the sealed transport; no guard was weakened.
+
+R-056's preregistered counts-only underfill contingency is **cancelled
+unlaunched and unspent** because R-055 passed the gate by counts and non-null
+availability. No observed alpha sign or magnitude selected that decision.
+R-056 is retired; any later new evaluation begins no earlier than R-057.
+
+**Cumulative ledger state after R-055:** **56** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **3** development evaluations.
+The lifetime alpha-cell exposure floor is **516**. No permanent-family or
+confirmatory-alpha look has been spent. Independent Claude review of the exact
+R-055 snapshot and Codex counter-review are required before later windows,
+ETF construction, actual or synthetic leverage, deployment, orders, or
+trading.
+
+## R-057 — Analyst Revisions V2 fixed 2019-2023 stock-IC diagnostic (COMPLETED)
+
+R-057 is a preregistered `development_evaluation`, evaluation
+`arv2-eval-stock-historical-qc-002`, over 2019-01-02 through 2023-12-29
+(1,258 decision sessions). It reused R-055 package
+`arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`, SHA-256
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`,
+and the exact R-055 score rule.
+
+| Field | Recorded value |
+|---|---|
+| **Accounting** | Shared run looks **56 -> 57**; ARV2 development evaluations **3 -> 4**; lifetime cell floor **516 -> 532**. Infrastructure remains 23; permanent and confirmatory looks remain zero. |
+| **QC identity** | Project `36588837`, `3 ARV2_REGIME_R057_2019_2023 - 20260915`; compile `5442e2cb06ed0f49d6bdbe42754877b2-f80a7ba5ecb832e38e3143452bf8befa`; backtest `067d22ef131633df7002057c796a67f6` |
+| **Signed execution chain** | Plan SHA-256 `6518eb27435c5966a1b837d63abbfe80a18adb22e8f5835a36654602a83a3b24`; permit `212ad3eb882ba82e81e75ed4eb3b8a30f448cd2c8f5295655a7620e476295c03`; launch `b11dee9bd901a673aef3fa25f4b3b373bdc7bb76cd21645163038ac3e8e6131c`; authenticated `Completed.` terminal `37b64f14e50896e2e4d96f8f2d7ec489379eb136214020407f417a2c39bc4e1e` after 42 statistics-free polls |
+| **Single aggregate read** | Result permit `817688ac5d53235360cb1e34bce547e314dc2189d806316125f2cbd9cce814f1`; exactly one `backtests/read`; exactly 18 expected statistics; result SHA-256 `2c69d6102e53ca4ab95e5c1e30565ba493882d85dc9ad2a9b6e952aa3a0512e6`; persisted file `ef18cbc613b661d9fa9b38ed341f0c44b02e7882103c1f13ef9da1cd1a9664f7`; custom-statistics `b94d132a96db401782a5f88ad9585bc3c5a31993968d270143fc390fa6530900` |
+| **Result** | All 16 cells available, each with 1,258 valid and zero invalid dates. H1/H5/H20/H60 mean-IC ranges: `.002342-.002609` / `.003686-.004090` / `.005211-.005831` / `.006073-.007705`; positive-date shares: `53.66%-55.41%` / `56.20%-57.31%` / `56.44%-57.63%` / `58.27%-59.86%`. Every mean and median IC is positive. |
+| **Conditioning** | Accepted pairs decline from 4,638,761 at H1 to 4,614,063 at H60; missing pairs rise from 902,126 to 926,824. The mutually exclusive census has zero benchmark refusals and is recorded in Analyst lane section 79. |
+| **Disposition** | **Technically successful, descriptively encouraging stock-ranking evidence.** This is not a formal alpha result, score-sorted portfolio, ETF return, or trading authority. |
+
+The QC editor later contained a literal `thanks` before the import in
+`main.py`, which the owner reported was probably accidental and removed. It
+caused four later editor-build errors and one later successful build, but did
+not alter the pinned compile or the sole launched R-057 backtest. It consumed
+no retry, duplicate run, read, or additional look.
+
+## R-058 — Analyst Revisions V2 fixed 2023-2025 stock-IC diagnostic (COMPLETED)
+
+R-058 is the conditional preregistered `development_evaluation`, evaluation
+`arv2-eval-stock-historical-qc-003`, over 2023-01-03 through 2025-12-31
+(752 decision sessions). Its plan was created only after R-057's authenticated
+aggregate receipt, with the same package and score rule.
+
+| Field | Recorded value |
+|---|---|
+| **Accounting** | Shared run looks **57 -> 58**; ARV2 development evaluations **4 -> 5**; lifetime cell floor **532 -> 548**. Infrastructure remains 23; permanent and confirmatory looks remain zero. |
+| **QC identity** | Project `36589846`, `4 ARV2_REGIME_R058_2023_2025 - 20260915`; compile `ea42ccbfa6ac47ee195bed14c3fd3027-d2282698abac486a07364fd59c3a90db`; backtest `f07ac3b86cd703103a2cf2ac48598fea` |
+| **Signed execution chain** | Plan SHA-256 `d4e12f2bc7c24c8088b9d4df555c06703ea7adb09e3d2841fd82ba24ab1b5bb4`; permit `239df091d4086728f21111585b36e7e7717304856762592d381c4d8fd75226b1`; launch `68176d778ba2241e73d2b812abaf08833745edec0cab53b59be6e452144c08d3`; authenticated `Completed.` terminal `8406b2295e5057db9550cad55ba483f4e8c5c553502cce41d038b992064ac181` after 26 statistics-free polls |
+| **Single aggregate read** | Result permit `b3b28065a79e415ded45a09d472649422e4676a35dbfa4221565d68e007dd928`; exactly one `backtests/read`; exactly 18 expected statistics; result SHA-256 `2c83071d8a6d5fb0637243db9457e83a4e6f70527648fb76ba247e3a62e773d0`; persisted file `a8e92f9cade96be133a390db29dbef4ef854d8d418487d9fae79807eba08e202`; custom-statistics `eb680ddc7f486ac7ab8d81ac6871404fdf2a709f2eef7548329bf00358b99854` |
+| **Result** | All 16 cells available, each with 752 valid and zero invalid dates. H1/H5/H20/H60 mean-IC ranges: `.003369-.003413` / `.004438-.004562` / `.004716-.005126` / `.003324-.004483`; positive-date shares: `55.85%-56.38%` / `59.18%-60.37%` / `57.31%-59.04%` / `52.66%-55.59%`. Every mean and median IC is positive. |
+| **Conditioning** | Accepted pairs decline from 3,004,567 at H1 to 2,948,639 at H60; missing pairs rise from 321,292 to 377,220. The mutually exclusive census has zero benchmark refusals and is recorded in Analyst lane section 79. |
+| **Disposition** | **Technically successful, descriptively encouraging recent-regime ranking evidence.** H5/H20 are strongest and H60 weakens; this is not a formal alpha result, portfolio return, ETF return, or trading authority. |
+
+## R-059 — Analyst Revisions V2 fixed 2013-2019 stock-IC diagnostic (COMPLETED; EFFECTIVE IC START 2015-09-29)
+
+R-059 is the conditional preregistered `development_evaluation`, evaluation
+`arv2-eval-stock-historical-qc-004`, nominally over 2013-01-02 through
+2019-12-31 (1,762 decision sessions). Its plan was created only after R-058's
+authenticated aggregate receipt, with the same package and score rule.
+
+| Field | Recorded value |
+|---|---|
+| **Accounting** | Shared run looks **58 -> 59**; ARV2 development evaluations **5 -> 6**; lifetime cell floor **548 -> 564**. Infrastructure remains 23; permanent and confirmatory looks remain zero. |
+| **QC identity** | Project `36590411`, `5 ARV2_REGIME_R059_2013_2019 - 20260915`; compile `96d0d401b9ce8c8bdf3dd327eb91cbfc-3a5aed546bf9f132b7fd3890c7cf89c6`; backtest `1d8c28f4279694c4389ec415a23d6d20` |
+| **Signed execution chain** | Plan SHA-256 `0b172beae8d9350dacd65cfe0296e6f807294fd0380ab78d1c6882796105f4fa`; permit `5e32b74278dd29d3371b36e1bd22be84a6158ef30af01e26b8d583658c2e10bf`; launch `228966a43d2f233ebe1c234bb7932a8051e487e82b50cf31821b52011ae6c551`; authenticated `Completed.` terminal `862ea6647dcdb6880f227209edf3a480500c5e15a1bc637b3a686f78ca01005e` after 26 statistics-free polls |
+| **Single aggregate read** | Result permit `4c41f2ff6411403869ae73c6c2af80afe8f76a18b6ad84236aa7cd29de49ccf1`; exactly one `backtests/read`; exactly 18 expected statistics; result SHA-256 `f6f6e841e1eae7b73d9fc62b5b8826de7efc70244d4899e2d6575ec7b2e2d016`; persisted file `480915b1bf42f30868c0ddbb6f74f973ab48fbd1571e219ec1e1a4a1fc2e15fa`; custom-statistics `93d6cd7fe4a6298347aa64335762f0397e633147e5c448ea4eb0644493d4cfa8` |
+| **Result** | All 16 cells available, each with 1,072 valid and 690 invalid dates. H1/H5/H20/H60 mean-IC ranges: `.001503-.001597` / `.001979-.002152` / `.003321-.003491` / `.004502-.004689`; positive-date shares: `53.64%-55.13%` / `54.94%-56.25%` / `54.85%-55.69%` / `59.33%-60.82%`. Every mean and median IC is positive. |
+| **Effective evidence period** | An outcome-free exact-input replay showed every date from 2013-01-02 through 2015-09-28 invalid because at least one sector had fewer than five active analyst signals. Every date from 2015-09-29 through 2019-12-31 was valid. The result therefore does not support an IC claim for 2013-2015. |
+| **Conditioning** | Accepted coverage is 74.30%-74.47%; missing coverage is 25.53%-25.70%, dominated by named FIGI refusals and unavailable entry prices. Benchmark refusals are zero. Exact censored/current census is in Analyst lane section 79. |
+| **Disposition** | **Technically successful and positive pre-AI robustness evidence from 2015-09-29 onward.** Large mean/median universe-return divergence warns of skew and outliers. It is not a formal result, portfolio P&L, ETF return, or trading authority. |
+
+Across R-057 through R-059, all 48 cells are populated and have positive mean
+and median IC. The association is small and horizon-sensitive: 2019-2023 and
+the effective pre-2020 sample strengthen toward H60, while 2023-2025 is
+strongest at H5/H20 and weakens at H60. This is evidence that the score has
+some ranking content across regimes, not proof that an investable portfolio
+survives turnover, costs, concentration, capacity, endpoint conditioning, or
+leverage.
+
+All three results remain current-vintage, non-pristine point-in-time,
+endpoint-conditioned accepted-risk diagnostics. They omit a PIT security
+master, terminal-payoff splice, formal controls and inference, economic
+portfolio construction, ETF mapping, transaction costs, and leverage. No raw
+row, security-level outcome, unrestricted log, chart, order, deployment,
+broker, paper, live, or trading action was selected.
+
+**Cumulative ledger state after R-059:** **59** run-level looks are recorded.
+ARV2 has spent **23** infrastructure looks and **6** development evaluations.
+The lifetime alpha-cell exposure floor is **564**. Permanent-family and
+confirmatory-alpha looks remain zero. Independent Claude review and Codex
+counter-review are required before unlevered ETF/economic-portfolio work;
+actual or synthetic 3x leverage remains conditional on that baseline.
+
+## R-060 — Analyst Revisions V2 unlevered ETF sector baseline (TECHNICAL FAILURE; NO RESULT READ)
+
+R-060 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-etf-sector-baseline-qc-001`. Before any ETF outcome read, commit
+`9164146` freezes a 54-fund unlevered US sector/industry sleeve, the exact
+conservative-censored firm-specific R-055 stock score, H1-observed QC
+constituents, 99% exact mapping, 20-session/$5 million liquidity, 90/70
+hysteresis, five 20% slots, constituent-look-through sector and transitive
+overlap-cluster caps, next-open execution, drift-adjusted turnover, and
+0/5/10/20 bps cost cases. The profile SHA-256 is
+`eadb6aba26495ceb8d11417364e80a18b9860a2488519ee9c692a7031cfa59dd`;
+the projection SHA-256 is
+`1e0a091aabed725f4a5ed598de488eaec098141866a6d5c015184baaa5b5778d`.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **59 -> 60**; ARV2 development evaluations **6 -> 7**. An authenticated aggregate read exposes three ETF IC cells plus four portfolio-cost cells and moves the lifetime cell floor **564 -> 571**. Until create succeeds or is ambiguous, the recorded totals remain 59 / 6 / 564. |
+| **Window** | Warmup 2020-12-01; 1,253 decisions from 2021-01-04 through 2025-12-29; returns through 2025-12-31; H5/H20/H60 outcomes mature by 2026-03-31. |
+| **QC identity** | Private project `6 ARV2_ETF_R060_2021_2025 - 20260915`; backtest `ARV2 R060 unlevered ETF sector baseline e9851c2f`. |
+| **Tangible-evidence gate** | Each IC cell must account for all decision dates. Portfolio evidence is descriptive only with at least 252 return sessions and 50 actually invested sessions; an all-cash result is underfilled. |
+| **Limitations** | Fixed sleeve rather than exhaustive reverse-index discovery; no reliable PIT AUM filter; no direct-stock or industry comparator; current-vintage non-pristine-PIT provider input; endpoint-conditioned outcomes; no terminal-payoff splice; not formal ARV2-5/6. |
+| **Access boundary** | One backtest create, statistics-free terminal polling, then at most one separately authorized read of nine aggregate custom statistics. No raw rows, raw constituents, security-level outcomes, unrestricted logs/charts, leverage, deployment, orders, broker access, paper/live state, or trading. |
+
+R-060 created project `36594932`, compiled successfully as
+`e7c3ccb5e7fff10ee31b8f0e4ad9048f-88cda038946ad60897ea6ba576eeec88`,
+and launched backtest `81c9e7fd7e667ad9f2d54c7208200d92`. Its first
+statistics-free poll authenticated `Runtime Error`: a constituent-only QC
+Slice and the later daily-bar Slice shared 2020-12-04, while the driver had
+incorrectly advanced both as full sessions. No result authority or aggregate
+outcome was opened, so the cell floor remains 564. The run nevertheless spends
+look **59 -> 60** and ARV2 development evaluation **6 -> 7**. One bounded
+technical diagnostic read selected only status/error/stack trace and no
+statistics, chart, order, log collection, provider row, or security outcome.
+
+## R-061 — Analyst Revisions V2 same-rule unlevered ETF retry (COMPLETED; TANGIBLE BUT ECONOMICALLY WEAK)
+
+R-061 changes only QC Slice scheduling: the daily SPY TradeBar is now the sole
+session clock, so constituent-only Slices cannot advance the strict evaluator.
+All section-80 economic rules, dates, inputs, metrics, and gates are unchanged.
+The corrected projection is
+`arv2-preliminary-qc-projection-1a6d0a13a16d418ca8e50b2a`, SHA-256
+`1a6d0a13a16d418ca8e50b2ab56d6c910d55fd4ff5de4261d5288ea5646c3b07`.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **60 -> 61**; ARV2 development evaluations **7 -> 8**. An authenticated aggregate read exposes the unchanged three ETF IC plus four portfolio-cost cells and moves the lifetime cell floor **564 -> 571**. |
+| **QC identity** | Private project `7 ARV2_ETF_R061_2021_2025 - 20260915`; backtest `ARV2 R061 unlevered ETF sector baseline retry e9851c2f`. |
+| **Unchanged evidence gate** | Every IC cell must census all 1,253 dates; portfolio availability still requires at least 252 return sessions and 50 invested sessions. |
+| **Access boundary** | One create/compile/backtest, statistics-free polling, then one separately signed read of exactly nine aggregate custom statistics only after `Completed.` |
+
+R-061 reached authenticated `Completed.` in project `36595261`, compile
+`b291aeb27dee2c005bc289635b522295-2f6bfb088f50f8b866262b820d626923`,
+backtest `e09e77390435ac6569d2ada4b4acef9f`. One separately signed read
+authenticated exactly nine statistics under result receipt SHA-256
+`d2e7e4ca4f38b5709c0a9b799df9e967b72e48a37708835c0d1310639c8cfb56`
+and custom-statistics SHA-256
+`ab094aeba34a4efc158a35bc1ac0ce4d98f31d16d57f14b842adcb120ec610ec`.
+
+All three IC cells account for 358 valid and 895 invalid dates. Mean IC is
+0.003093 / 0.009836 / 0.070551 at H5/H20/H60; positive-date shares are
+48.88% / 47.49% / 53.07%. The economic portfolio is invested on 358 of 1,254
+return sessions and holds 94.11% cash on average. Cumulative return is +2.58%
+at zero cost, +0.07% at 5 bps, **-2.38% at the primary 10 bps**, and -7.10%
+at 20 bps, versus SPY +91.50%. Primary-cost Sharpe is -0.194 and maximum
+drawdown is -7.01%.
+
+**Economic interpretation limitation:** a pre-push source-to-blueprint audit
+found that the five-ETF minimum for IC also gates portfolio admission. With
+one to four eligible ETFs, the implementation targets all cash, although
+blueprint section 20.3 does not specify that minimum. This is the historical
+P2 ARV2ETF82-002, so R-061 does not cleanly test the intended portfolio. A
+separately identified local correction removes the IC-count economic gate;
+it has not run in QC and does not rewrite this result.
+All cash earns zero interest, and the exact-prior-session holdings requirement
+is an additional conservative restriction beyond H1 availability. The
+recorded return is authentic for those implemented rules; it must not be
+presented as a definitive failure of the underlying analyst-revision strategy.
+
+The tangible-evidence gate passes, so no further counts-only easing is
+triggered. The result is nevertheless economically unattractive at the frozen
+primary cost and far behind SPY. It is not a formal alpha acceptance or a
+deployment/trading result. Shared run looks are now **61**, ARV2 development
+evaluations **8**, infrastructure looks **23**, and the lifetime exposed-cell
+floor **571**. Actual and synthetic 3x work remains a separately reviewed
+diagnostic after correction of the unlevered portfolio, not a presumed
+improvement to this baseline. A corrected specification/run would be a new
+prospective diagnostic; this record changes neither R-061 nor its accounting.
+The owner's latest next-phase direction is Claude review, Codex counter-review,
+then an individual-stock economic implementation and backtest using the
+existing analyst score, with ETFs retained as a backup research path. No
+additional run or look is created by the local correction or that direction.
+
+## R-062 — Analyst Revisions V2 direct-stock economic portfolio (TECHNICAL FAILURE; NO RESULT READ)
+
+R-062 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-economic-qc-001`. Commit `2dcd449` freezes the source and
+tests before any project creation, outcome read, or aggregate result. It
+reuses the exact R-055 conservative-censored firm-specific score and the
+authenticated package
+`arv2-preliminary-qc-package-e9851c2f3bc3f66d761dbff2`; it does not fit a new
+signal or select among variants after seeing portfolio returns.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **61 -> 62**; ARV2 development evaluations **8 -> 9**. A successful separately authorized aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **571 -> 575**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-2021-2025-v1`, SHA-256 `8cab242ae28cb29680b4053b7b19fa18f10b57bd21c48523b0d496794f63384b`; projection `arv2-preliminary-qc-projection-86b74c69844a63802b8291df`, SHA-256 `86b74c69844a63802b8291df3721f77922db52897d2f61deb93ae447f86424e3`. |
+| **Window** | 261 weekly decisions from 2021-01-04 through 2025-12-29; next-authenticated-open execution; 1,254 return sessions through 2025-12-31. |
+| **Portfolio rule** | At each first authenticated session of an ISO week, rank every resolvable score-bearing stock by the unchanged R-055 score; select the top decile, capped at 50, with score/security-ID tie order. Each selected stock targets 1.96%, for at most 98% gross; failed entries and any shortfall remain zero-yield cash. No absolute-positive-score gate, liquidity filter, leverage, order, or trade is introduced. |
+| **Comparators and costs** | SPY plus an equal-weight matched portfolio of all resolvable score-bearing names, targeted to the signal sleeve's actually executed gross. Cost scenarios are 0/5/10/20 bps per side; 10 bps is primary. |
+| **Missing outcomes** | Within-membership missing opens carry the last observed mark and defer that account's rebalance. An available membership-end open liquidates; an unavailable membership-end open uses a disclosed zero-recovery lower bound. Named FIGI refusals are excluded before ranking. |
+| **Tangible-evidence gate** | Exactly 1,254 return sessions and at least 50 signal-invested sessions. Every cell labels stale-price proxy, zero-recovery lower bound, and/or exposure underfill when present. No status is a formal accept/reject disposition. |
+| **QC identity** | Private project `8 ARV2_STOCK_R062_2021_2025 - 20260916`; backtest `ARV2 R062 direct stock portfolio e9851c2f`. |
+| **Access boundary** | One private project/create/upload/compile/backtest submission; statistics-free terminal polling; then at most one separately signed read of exactly six aggregate custom statistics (runtime metadata, portfolio metadata, and four cost cells). No raw provider row, security-level outcome, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action is authorized. |
+
+This period has already informed prior development and is not untouched
+confirmation evidence. R-062 is a practical, current-vintage,
+non-pristine-PIT economic diagnostic whose return may remain conditioned on
+price proxies and accepted vendor limitations. Its result will be appended
+without rewriting this prospective rule block.
+
+R-062 created project `36608248`, compiled successfully, and launched
+backtest `fbe0dded7ff5d252fc724c3fd9fa05f1`, but terminated with a runtime
+error after completing the economic computation: its metadata statistic was
+larger than the frozen 4,096-character transport bound. No aggregate result
+was read and no alpha cell was exposed. One bounded technical diagnostic read
+selected only terminal status, error and stack trace. R-062 therefore spends
+shared look **61 -> 62** and ARV2 development evaluation **8 -> 9**, while the
+lifetime cell floor remains **571**. This is a technical failure, not a
+positive or negative portfolio result.
+
+## R-063 — Analyst Revisions V2 same-economics direct-stock compact retry (COMPLETED; RESULT READ REFUSED)
+
+R-063 is the one-look technical successor to R-062. It preserves every
+economic input and rule, but versions the summary envelope and replaces the
+redundant 1.6-KiB embedded profile body with its exact ID and SHA-256. The
+complete profile is still authenticated by the projection and summary digest,
+and the result validator rehydrates the pinned profile before checking that
+digest. A regression requires at least 1,024 characters of headroom below the
+same 4,096-character ceiling.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **62 -> 63**; ARV2 development evaluations **9 -> 10**. A successful aggregate read exposes the unchanged four cost cells and moves the lifetime alpha-cell floor **571 -> 575**. |
+| **Profile** | `arv2-stock-long-only-2021-2025-r063-v1`, SHA-256 `9f0bf6044dbe181bed69ca76cf6ee0c2e453cbe507d8436d570a95e645aa4afc`; projection SHA-256 `fe5d534c0cd5569177ef2450547bedc89efc4846eb8273f74d94f087ae162801`. |
+| **Unchanged economics** | 2021-2025; exact R-055 score; weekly next-open top decile capped at 50; 1.96% per name and 98% maximum gross; zero-yield residual cash; matched eligible-stock and SPY comparators; 0/5/10/20 bps with 10 bps primary; unchanged missing-price and tangible-evidence rules. |
+| **QC identity** | Private project `9 ARV2_STOCK_R063_2021_2025 - 20260916`; backtest `ARV2 R063 direct stock compact retry e9851c2f`; plan SHA-256 `cff4e61683788a736b9ed33a5a59c26b0b60bf4835f0f9e521b16e40484a366f`. |
+| **Access boundary** | One create/compile/backtest; statistics-free terminal polling; after `Completed.`, one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, order, deployment, broker, paper/live state, or trading action. |
+
+The result will be appended without changing this prospective rule block.
+
+R-063 created project `36609362`, compiled, and reached authenticated
+`Completed.` after 68 statistics-free polls (backtest
+`3632b79548f0839f47fbf6e04f62f190`). Its compact metadata corrected R-062's
+transport failure. The separately signed one-use aggregate read nevertheless
+refused locally before returning or persisting any statistic: the evaluator's
+two derived return-difference strings used Python's default 28-digit Decimal
+precision, while the validator recomputed them with the lane's 50-digit
+financial context. The read permit is consumed and the run will not be read
+again. No return value is reported. R-063 spends shared look **62 -> 63** and
+development evaluation **9 -> 10**; the lifetime cell floor remains **571**.
+
+## R-064 — Analyst Revisions V2 same-economics exact-arithmetic retry (COMPLETED; TANGIBLE RESULT WITH INVALID MATCHED COMPARATOR)
+
+R-064 changes only those two derived fields, calculating both inside the
+existing 50-digit context. The underlying holdings, daily returns, costs,
+wealth paths and every frozen economic rule are unchanged. A high-precision
+regression now crosses the evaluator-to-validator seam, and the summary schema
+is versioned from v2 to v3.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **63 -> 64**; ARV2 development evaluations **10 -> 11**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **571 -> 575**. |
+| **Profile** | `arv2-stock-long-only-2021-2025-r064-v1`, SHA-256 `37d0b80181dc736365abbf0f6caedd6e4b6bc70f818905681ac5a29bdcce774b`; projection SHA-256 `052879a56d116b339be561da8125a91b16d238b0729b39c30434cf09ae48eb29`. |
+| **Unchanged economics** | Exact R-055 score and R-062/R-063 stock portfolio, date, execution, missing-price, benchmark, cost and tangible-evidence rules. |
+| **QC identity** | Private project `10 ARV2_STOCK_R064_2021_2025 - 20260916`; backtest `ARV2 R064 direct stock arithmetic retry e9851c2f`; plan SHA-256 `c3c61d26041e41ed72746a55b9c60e1c175013d8af5b9c5f740ddafd8f0645b8`. |
+| **Access boundary** | One create/compile/backtest; statistics-free terminal polling; after `Completed.`, one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, order, deployment, broker, paper/live state, or trading action. |
+
+The result will be appended without changing this prospective rule block.
+
+R-064 created project `36610457`, compiled successfully, and reached
+authenticated `Completed.` after 94 statistics-free polls (backtest
+`9318e40ca480437127b63d88d2dbcccb`). One separately signed result read
+authenticated exactly six aggregate statistics. The result receipt SHA-256 is
+`b26d6e828dea3b1a488fc8056f5ae9cf6bd105d120202bb7157ce1eb9bbab50f` and
+the custom-statistics SHA-256 is
+`f0a5a42eee6eaa7b761ce5b354737a09077c5d9d53f9d9b5e17612cbd49b0714`.
+
+| Cost per side | Signal return | Matched return | SPY return | Signal - matched | Signal - SPY | Sharpe | Max drawdown |
+|---:|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +27.1499% | +21.0818% | +94.2074% | +6.0681 pp | -67.0574 pp | 0.3238 | -33.9629% |
+| 5 bps | +25.6668% | +21.0196% | +94.2074% | +4.6472 pp | -68.5405 pp | 0.3137 | -34.4757% |
+| **10 bps primary** | **+24.2010%** | **+20.9575%** | **+94.2074%** | **+3.2435 pp** | **-70.0064 pp** | **0.3036** | **-34.9955%** |
+| 20 bps | +21.3200% | +20.8333% | +94.2074% | +0.4867 pp | -72.8873 pp | 0.2833 | -36.0228% |
+
+This is tangible portfolio evidence: 1,253 of 1,254 return sessions are
+invested, average gross exposure is 97.992%, average holdings are 49.993, and
+all 261 weekly decisions execute. Average daily two-sided turnover is 1.8725%
+(approximately 471.9% annualized). The signal itself has one stale-mark
+session and two zero-recovery membership-end exits.
+
+The matched comparator is substantially more conditioned: only two
+rebalances execute, 259 defer, 1,247 sessions use stale marks, and 585
+membership-end exits use zero recovery. The positive signal-minus-matched
+difference is therefore not clean alpha evidence. The signal is profitable
+after all frozen transaction-cost scenarios, but its primary +24.20% return,
+0.304 Sharpe, and -35.00% maximum drawdown compare poorly with SPY's +94.21%.
+R-064 does not justify promotion as a standalone strategy or a leveraged
+variant. It remains a preliminary, current-vintage, non-pristine-PIT,
+price-proxy-conditioned development evaluation with no formal acceptance or
+deployment implication.
+
+R-064 moves shared run looks **63 -> 64**, ARV2 development evaluations
+**10 -> 11**, and the lifetime exposed-cell floor **571 -> 575**.
+Infrastructure remains 23; permanent and confirmatory looks remain zero.
+
+The invalid matched comparator prevents attributing R-064's return difference
+to the analyst score. It does not erase the adverse evidence for the exact
+implemented construction: that sleeve still returned +24.20% against SPY's
++94.21%, with a 0.304 Sharpe and -35.00% maximum drawdown. R-065 changes only
+within-membership stale-price execution mechanics for both sleeves, correcting
+the comparator so the next diagnostic can separate ranking from construction
+more cleanly.
+
+## R-065 — Analyst Revisions V2 corrected matched-comparator attribution diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-065 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-portfolio-historical-qc-004`. It preserves the exact R-055
+conservative-censored firm-specific score, authenticated package, 2021-2025
+window, weekly next-open schedule, top-decile/capped-50 signal sleeve, 1.96%
+per-name cap, 98% target gross exposure, zero-yield cash, FIGI refusals, SPY,
+and membership-end zero-recovery lower bound. It does not fit or select a new
+signal after seeing R-064.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **64 -> 65**; ARV2 development evaluations **11 -> 12**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **575 -> 579**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-2021-2025-r065-v2`, SHA-256 `39773415f5d936166b3a224a5e26c55e4dc20a7e8052fb65c796f9fd3ce65678`; projection `arv2-preliminary-qc-projection-c67cee15e9972c595ebfa22a`, SHA-256 `c67cee15e9972c595ebfa22a7483b72c14d8e0f919364070cb269c06528ef1c5`, seven files, 232,391 total bytes and a 59,683-byte maximum. |
+| **Only economic correction** | A within-membership held name without a current price retains its prior mark and drifted weight. It books no impossible trade or turnover. Priceable holdings and targets continue to rebalance inside the remaining gross budget; missing new entries stay cash. When a price resumes, the cumulative prior-mark-to-current return is booked once. The same rule applies to signal and matched accounts. |
+| **Diagnostic output** | Exactly six aggregate statistics: compact runtime metadata, portfolio metadata, and one cell for each frozen 0/5/10/20-bps-per-side cost. The 10-bps cell remains primary. The validator requires cross-cell path invariance, monotone cost drag, and closed-form annual cost arithmetic from the 0-bps anchor. Each cell reports signal, corrected all-eligible matched comparator and SPY returns; signal-minus-matched and signal-minus-SPY; risk, drawdown, turnover, cash and explicit per-name stale/partial-rebalance counters. |
+| **QC identity if launched after review** | Private project `11 ARV2_STOCK_R065_2021_2025 - 20260916`; backtest `ARV2 R065 corrected comparator e9851c2f`. |
+| **Frozen decision rule** | An unreconciled result or failure of the authenticated stale/partial-counter relations is a technical failure. The zero account-wide-deferral and 261-execution checks remain round-trip integrity checks, not data-discriminating evidence. If primary-cost signal-minus-matched is non-positive, do not tune this same window. A positive difference is only a conditional selection effect for this construction, not formal alpha acceptance; SPY remains external absolute-return context. Leverage remains closed unless an unlevered construction first clears a credible benchmark gate. |
+| **Access boundary** | At most one reviewed create/compile/backtest and one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+This rule block is frozen before project creation, launch, or outcome read.
+This code/review round spends **zero** research looks and does not access QC or
+provider data. Claude review and Codex counter-review are complete before the
+one R-065 launch.
+
+## R-066 — Analyst Revisions V2 historical SPY-holdings eligibility diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-066 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-spy-holdings-qc-005`. It preserves the R-065 signal,
+portfolio, execution, missing-price, cost and result-integrity rules. Its only
+economic-scope change is to filter the score-bearing input securities before
+both top-decile ranking and matched-comparator construction to the exact
+authenticated security IDs in historical SPY ETF constituent snapshots. This
+is an **S&P 500 holdings proxy**, not official S&P 500 index membership.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **65 -> 66**; ARV2 development evaluations **12 -> 13**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **579 -> 583**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-spy-holdings-proxy-2021-2025-r066-v1`, SHA-256 `1bd852c327c50d7d410cdac870febcf6ae3b0fb39ddf0f3554363697d1b21660`; projection `arv2-preliminary-qc-projection-deb4ced481a55fd93f7a545f`, SHA-256 `deb4ced481a55fd93f7a545f32b652126fad6af0926435c422974811e8cda143`, seven files, 233,095 total bytes and a 59,683-byte maximum. |
+| **Eligibility authority** | QuantConnect US ETF Constituents for SPY. For each of the 261 weekly decisions, select the latest collection `EndTime` strictly before New York decision-date midnight. The collection and every positive-weight constituent `LastUpdate` must be no more than 10 calendar days old at the decision, and `LastUpdate` cannot follow its collection. Nullable, zero and negative finite weights are excluded; malformed or non-finite non-null weights refuse. The positive-weight snapshot must total 0.95-1.05 and at least 99% of that weight must map by exact QC security ID into the authenticated input universe. Missing, stale, malformed, duplicated or insufficiently mapped evidence refuses. |
+| **Diagnostic output** | Exactly six aggregate statistics: runtime metadata, portfolio metadata and four 0/5/10/20-bps cost cells, with 10 bps primary and the same cross-cell/path/cost checks as R-065. |
+| **QC identity** | Private project `12 ARV2_STOCK_R066_SPY_2021_2025 - 20260916`; backtest `ARV2 R066 SPY holdings proxy e9851c2f`. |
+| **Access boundary** | One create/compile/backtest with statistics-free terminal polling, followed only after `Completed.` by one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+## R-067 — Analyst Revisions V2 historical QQQ-holdings eligibility diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-067 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-qqq-holdings-qc-006`. It changes R-065 only by applying the
+same authenticated historical-constituent filter using QQQ. This is a
+**Nasdaq-100 holdings proxy**. It is explicitly **not all Nasdaq-listed
+stocks**, and no result may be described that way.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **66 -> 67**; ARV2 development evaluations **13 -> 14**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **583 -> 587**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-qqq-holdings-proxy-2021-2025-r067-v1`, SHA-256 `4c2fd34f2255bb05adfccec5afc5c7dd408b7c64d3ebc25854a39b92c78c2796`; projection `arv2-preliminary-qc-projection-d34ae49468b502c97b76a095`, SHA-256 `d34ae49468b502c97b76a09528eb607aed573a5851400a72f2337f49fb124d53`, seven files, 233,384 total bytes and a 59,683-byte maximum. |
+| **Eligibility authority** | QuantConnect US ETF Constituents for QQQ under the exact same strictly-prior, 10-calendar-day collection/`LastUpdate`, 0.95-1.05 positive-weight and 99%-mapped-weight rules frozen for R-066. The filter applies before both signal ranking and matched-comparator construction. |
+| **Diagnostic output** | Exactly six aggregate statistics: runtime metadata, portfolio metadata and four 0/5/10/20-bps cost cells, with 10 bps primary and the same cross-cell/path/cost checks as R-065. |
+| **QC identity** | Private project `13 ARV2_STOCK_R067_QQQ_2021_2025 - 20260916`; backtest `ARV2 R067 QQQ holdings proxy e9851c2f`. |
+| **Access boundary** | One create/compile/backtest with statistics-free terminal polling, followed only after `Completed.` by one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+## R-068 — Analyst Revisions V2 historical SPY-plus-QQQ union diagnostic (PROSPECTIVE; NOT YET LAUNCHED)
+
+R-068 is one accepted-risk `development_evaluation`, evaluation
+`arv2-eval-stock-spy-qqq-union-qc-007`. It changes R-065 only by filtering to
+the exact authenticated-QC-security-ID union of the R-066 SPY and R-067 QQQ
+snapshots at each decision. A name present in both is included once. This is a
+union of two ETF-holdings proxies, not official S&P 500 membership or all
+Nasdaq-listed stocks.
+
+| Field | Prospective value |
+|---|---|
+| **Accounting if created** | Shared run looks **67 -> 68**; ARV2 development evaluations **14 -> 15**. A successful aggregate read exposes four cost cells and moves the lifetime alpha-cell floor **587 -> 591**. Infrastructure stays 23; permanent and confirmatory looks stay zero. |
+| **Profile** | `arv2-stock-long-only-spy-qqq-union-2021-2025-r068-v1`, SHA-256 `333e26b9645a8f6c3d35886ec7e9cece172d3bb166db22e76037d7b2b9b740e1`; projection `arv2-preliminary-qc-projection-cff9302f23b98bc2bb174682`, SHA-256 `cff9302f23b98bc2bb174682aa48f46ad65ac4206418e19545a0167f0d9f107c`, seven files, 233,385 total bytes and a 59,683-byte maximum. |
+| **Eligibility authority** | Both SPY and QQQ snapshots must independently satisfy the exact R-066/R-067 time, source-vintage, weight and mapping rules. Their mapped security IDs are then unioned and sorted exactly before the filter is applied to signal and comparator. |
+| **Diagnostic output** | Exactly six aggregate statistics: runtime metadata, portfolio metadata and four 0/5/10/20-bps cost cells, with 10 bps primary and the same cross-cell/path/cost checks as R-065. |
+| **QC identity** | Private project `14 ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`; backtest `ARV2 R068 SPY QQQ union e9851c2f`. |
+| **Access boundary** | One create/compile/backtest with statistics-free terminal polling, followed only after `Completed.` by one separately signed read of exactly six aggregate statistics. No raw row, unrestricted log/chart, deployment, broker, paper/live state, order, or trading action. |
+
+R-066 through R-068 are descriptive same-window diagnostics, not a candidate
+tournament. Their outcomes will not be used to call the best of the three a
+winner, tune the score or silently promote a universe. Any promotion or
+holdout claim requires a separately preregistered future evaluation. All four
+runs retain the accepted-risk package's current-vintage/non-pristine-PIT
+Massive signal limitation. No leverage run is unlocked by merely completing
+them; leverage remains closed until an unlevered construction establishes a
+credible benchmark result. At this preregistration snapshot no R-065 through
+R-068 QC project has been created or launched, no result has been read, and
+accounting remains **64 shared looks, 11 ARV2 development evaluations, 23
+infrastructure looks, and a 575-cell lifetime floor**.
+
+## R-065 result and R-066 technical failure — 2026-09-16
+
+R-065 completed in private QuantConnect project `36628077` (backtest
+`e596fea2ac3c9182d63057fbbbf63e7f`) after 47 statistics-free polls. One
+separately signed read authenticated exactly the six preregistered aggregate
+statistics. The plan SHA-256 is
+`57c97a4d61b176654dbd3be5309240a1e3836801bf7428ecdd9b33ee7eba43cb`,
+the aggregate semantic SHA-256 is
+`989d4a671f947a8c52b150ba9a5994b1b15ffe3f23191ac7e7f348c16541a654`,
+and the custom-statistics SHA-256 is
+`eab8ed256005b83cfea3b5a2c97218274b18184b3ab3c69ace420c71bcb9f213`.
+
+| Cost per side | Signal return | Corrected matched return | SPY return | Signal - matched | Signal - SPY | Max drawdown |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +27.1499% | +28.3695% | +94.2074% | -1.2195 pp | -67.0574 pp | -33.9629% |
+| 5 bps | +25.6668% | +27.4429% | +94.2074% | -1.7760 pp | -68.5405 pp | -34.4757% |
+| **10 bps primary** | **+24.2010%** | **+26.5229%** | **+94.2074%** | **-2.3219 pp** | **-70.0064 pp** | **-34.9955%** |
+| 20 bps | +21.3200% | +24.7027% | +94.2074% | -3.3827 pp | -72.8873 pp | -36.0228% |
+
+The signal executes all 261 decisions, is invested for 1,253 of 1,254 return
+sessions, averages 97.9925% gross exposure and 50 selected names, and has
+about 471.86% annualized two-sided turnover. The corrected comparator also
+executes 261 times, rather than freezing after two as in R-064. It remains a
+conservative lower-bound implementation: all 259 post-opening comparator
+decisions are partial, average gross exposure is 95.3203%, 1,247 sessions
+carry at least one stale mark, and 893 membership ends receive zero recovery.
+Those limitations remain visible, but the central attribution result is now
+directionally adverse: the score-selected sleeve underperforms its matched
+all-eligible universe at every frozen cost. No same-window score tuning or
+positive alpha claim follows. The already-preregistered universe diagnostics
+remain descriptive construction tests, not a search for a winning result.
+
+R-066 then created private project `36629203`, compiled, and launched
+backtest `851ebbb854f7b262aa3cf48eb5426ca2`. It reached authenticated
+`Runtime Error` after two statistics-free polls. A bounded diagnostic read
+selected only its terminal error and stack, not statistics, charts, orders or
+provider rows: `constituent-history exact SID mapped weight is below 99%`.
+No result authority or result-read permit was issued and no aggregate value
+was read. The plan SHA-256 is
+`891b27729dec7464547f332e2c1ac108eeb59636a030d07a0632cabf8414830d`
+and terminal-receipt SHA-256 is
+`5c5d5dd3201db7c98326c898865a904b228047c4219c3c4c495b803f00d4ee9c`.
+R-066 therefore consumes shared look **65 -> 66** and development evaluation
+**12 -> 13**, but emits zero cells: the authenticated cell floor stays 579.
+It is immutable and will not be retried under the same identity.
+
+The failure revealed a specification error, not a QuantConnect entitlement or
+API failure. These diagnostics select score-bearing stocks that are members
+of the named ETF; they do not replicate the ETF. Requiring the score-bearing
+input census to cover 99% of the ETF's full weight incorrectly treats ordinary
+out-of-census ETF members as identifier failures. The corrected rule keeps the
+full 0.95-1.05 positive ETF-weight, time, freshness, uniqueness and exact-SID
+checks, then takes the nonempty exact-QC-SID intersection with the authenticated
+score-bearing census. Every selected name is therefore still a point-in-time
+member, while no ETF-replication coverage claim is made.
+
+## R-067, R-068 and R-069 corrected intersection diagnostics (PROSPECTIVE)
+
+The unlaunched R-067 and R-068 v1 projections are superseded before project
+creation. R-067 v2 and R-068 v2 use the corrected intersection rule. R-069 is
+the new technical successor to spent R-066. All three preserve R-065's signal,
+portfolio, comparator, price, cost and output rules, use the same accepted-risk
+Massive input, and remain current-vintage/non-pristine-PIT diagnostics.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-067`; `arv2-eval-stock-qqq-holdings-intersection-qc-006` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r067-v2`; `a771718c06854a52b58c9c703e88c7429ecea2e0d09b398f73fd983565992293` | `arv2-preliminary-qc-projection-31ae75cdad1693a93c1727fa`; `31ae75cdad1693a93c1727fa1f91d5819f2f0f7b54dbd9ceee45b049cae4a163`; 7 files, 233,473 total / 59,415 max bytes | looks 66 -> 67; evaluations 13 -> 14; cells 579 -> 583 |
+| `R-068`; `arv2-eval-stock-spy-qqq-intersection-union-qc-007` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2`; `0ba38928df68137f5fcbf224daacea505d805145d8882291384bc4f8a9b19a5b` | `arv2-preliminary-qc-projection-85f87db4615fd46f828a9b18`; `85f87db4615fd46f828a9b18c7ffc0fd189beb69b3f38e04c92cfda526039b17`; 7 files, 233,480 total / 59,415 max bytes | looks 67 -> 68; evaluations 14 -> 15; cells 583 -> 587 |
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1`; `2461aae1e9418a97ebcf2b45ad48f64cb3fc1ce9a44b21bc98567ccc4bae0521` | `arv2-preliminary-qc-projection-935d3980a826f1a0c8dfa041`; `935d3980a826f1a0c8dfa0417bcc568d148fe3fd53a146591b5726ac7a3880b6`; 7 files, 233,184 total / 59,415 max bytes | looks 68 -> 69; evaluations 15 -> 16; cells 587 -> 591 |
+
+R-067 remains a QQQ/Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks;
+R-068 is the exact-SID-deduplicated SPY-plus-QQQ union; R-069 is the SPY/S&P
+500 holdings proxy, not official index membership. Their private projects are
+prospectively `13 ARV2_STOCK_R067_QQQ_2021_2025 - 20260916`, `14
+ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`, and `15
+ARV2_STOCK_R069_SPY_2021_2025 - 20260916`. Their backtest names are `ARV2
+R067 QQQ intersection e9851c2f`, `ARV2 R068 SPY QQQ intersection union
+e9851c2f`, and `ARV2 R069 SPY intersection retry e9851c2f`.
+
+This block is frozen after the R-066 technical error was known but before any
+R-067, R-068 or R-069 project creation, launch or outcome read. The current
+accounting is **66 shared looks, 13 development evaluations, 23 infrastructure
+looks and a 579-cell floor**. The three runs remain descriptive and are not a
+same-window winner-selection exercise. Leverage, formal acceptance,
+deployment, orders, broker access, paper/live state and trading remain closed.
+
+## R-067 disposition and R-068/R-069/R-070 successors — 2026-09-16
+
+R-067 used its exact preregistered QQQ-intersection v2 projection. Private
+project `36630516`, backtest `82d7a83ec2b9aad77a65c0a56a10b9b3`, reached
+authenticated `Completed.` after three statistics-free polls. Its plan,
+launch, and terminal SHA-256 values are respectively
+`8a3e90228911980f002e8f7b84412edc07ad2b09c9b6d58e549f3c0a91ad05e2`,
+`30681dbb8f69c6b491a555d6d06047685ec876147cbd17d4487b43d66b3480bf`,
+and `ea4cf4089622d617e148681453e40d26cf5f946267a1a4dcccde30bb635ee7e7`.
+
+The first result action refused before a result permit existed because its
+local detached signature verifier was unavailable. A later authenticated
+attempt durably spent one-use result-read permit
+`e4dea6c1d7b23f2c1f487f2456fb2b63556d5560f494c462417bdbda0d54d19b`
+and then locked before an aggregate receipt existed. Local evidence cannot
+distinguish a pre-read capability failure, the sole bounded result call, strict
+aggregate parsing, or persistence. The permit makes ambiguity consuming and
+forbids retry. No result value or aggregate statistic was returned, persisted,
+or interpreted. R-067 therefore moves shared looks **66 -> 67** and
+development evaluations **13 -> 14**, but adds zero cells: the floor remains
+**579**.
+
+A bounded local correction retries exactly one direct `ChildProcessError`
+from the detached signature verifier once, with byte-identical inputs and a
+fresh process, before a permit is spent. It never retries timeouts,
+spawn/OS/cryptographic/integrity refusals and cannot recover an ambiguous
+post-permit result action. R-070 is therefore a fresh QQQ identity rather than
+a second read of R-067.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-068`; `arv2-eval-stock-spy-qqq-intersection-union-qc-007` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r068-v2`; `0ba38928df68137f5fcbf224daacea505d805145d8882291384bc4f8a9b19a5b` | `arv2-preliminary-qc-projection-e03eb991acce1ebc01b4fdc4`; `e03eb991acce1ebc01b4fdc44fbcaf0c4f50eb90d5eb50c456d2d4285b938a00`; 7 files, 233,480 total / 59,415 max bytes | looks 67 -> 68; evaluations 14 -> 15; cells 579 -> 583 |
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v1`; `2461aae1e9418a97ebcf2b45ad48f64cb3fc1ce9a44b21bc98567ccc4bae0521` | `arv2-preliminary-qc-projection-54cb25fe96d602fcd0bae047`; `54cb25fe96d602fcd0bae04798286225dbb93980592718b65586a52c3593f25f`; 7 files, 233,184 total / 59,415 max bytes | looks 68 -> 69; evaluations 15 -> 16; cells 583 -> 587 |
+| `R-070`; `arv2-eval-stock-qqq-holdings-intersection-qc-009` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v3`; `fd8debc451518a74e426b8c05fb50dc9fc936af2c193b7cbc91040e51e4bfed9` | `arv2-preliminary-qc-projection-d170fa99cfd3c01decc887a7`; `d170fa99cfd3c01decc887a7ce463baf81185545882fe9433c5e72a3b3005361`; 7 files, 233,473 total / 59,415 max bytes | looks 69 -> 70; evaluations 16 -> 17; cells 587 -> 591 |
+
+R-068 is the exact-SID-deduplicated SPY-plus-QQQ holdings-proxy union; R-069
+is the historical SPY/S&P 500 holdings proxy; R-070 is the historical
+QQQ/Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks. Their projects
+are prospectively `14 ARV2_STOCK_R068_SPY_QQQ_2021_2025 - 20260916`, `15
+ARV2_STOCK_R069_SPY_2021_2025 - 20260916`, and `16
+ARV2_STOCK_R070_QQQ_2021_2025 - 20260916`. Their backtests are `ARV2 R068 SPY
+QQQ intersection union e9851c2f`, `ARV2 R069 SPY intersection retry
+e9851c2f`, and `ARV2 R070 QQQ result retry e9851c2f`. This block is frozen
+before any of those three project creations or outcome reads. They remain
+descriptive diagnostics, not a winner-selection exercise; leverage, formal
+acceptance, deployment, broker access, orders, paper/live state and trading
+remain closed.
+
+## R-068 disposition and EndTime-only R-069/R-070/R-071 successors — 2026-09-16
+
+R-068 used its exact preregistered union-intersection v2 projection in private
+project `36631115`, backtest `204434a6f79f319613e9fc3fcdf3f988`. It reached
+authenticated `Runtime Error` after two statistics-free polls. Its plan,
+launch and terminal SHA-256 values are respectively
+`7d48c36a04fb7980e1359c76d0d8b7c965ba45b5ea2df6c535d7edfe47b17294`,
+`af866fdba83909626447c6b7286b61c356c011213589efa8b438a943115ebe26`,
+and `0e8a64ce0fad273ccd9e49b4657c1b5c5123c33ac5c8b8889eae3c1dccd5d423`.
+A bounded exact-run diagnostic read selected only the terminal error and
+stack, not statistics, charts, orders, provider rows or security outcomes:
+`constituent-history LastUpdate is after collection EndTime`. R-068 consumes
+shared look **67 -> 68** and development evaluation **14 -> 15**, but adds
+zero cells; live accounting is **68 shared looks, 15 development evaluations,
+23 infrastructure looks and a 579-cell floor**.
+
+The failure exposed a timestamp-semantics defect. QuantConnect's LEAN class
+defines collection `EndTime` as the availability time and nullable
+`LastUpdate` as the previous constituent-data update. The corrected successor
+contract never reads `LastUpdate`. It selects the latest collection `EndTime`
+strictly before each decision, applies the ten-calendar-day age limit to that
+collection per decision, and fully validates/caches only snapshots actually
+selected. A malformed selected snapshot refuses without fallback; an
+unselected future snapshot cannot poison an earlier decision. Exact
+row/collection `EndTime`, SID uniqueness and reverse mapping, total positive
+weight 0.95-1.05, and nonempty score-census intersection guards all remain.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-069`; `arv2-eval-stock-spy-holdings-intersection-qc-008` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r069-v2`; `83deb4aeb655c0fdfd4714e53e427a3df560c8f5caea40933ae6d76df8beae12` | `arv2-preliminary-qc-projection-38c2b264f42596481b232c06`; `38c2b264f42596481b232c06b445eb6533f08b691cc83b316ce68f6916e4898d`; 7 files, 232,168 total / 59,100 max bytes | looks 68 -> 69; evaluations 15 -> 16; cells 579 -> 583 |
+| `R-070`; `arv2-eval-stock-qqq-holdings-intersection-qc-009` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r070-v4`; `733d22be608aa13b55f5b218d6cf45484b9b2271a1812b59e3d9217de8e78979` | `arv2-preliminary-qc-projection-f751279256dbeeaf95723f63`; `f751279256dbeeaf95723f63ba7b74c7a0d7f8e1715cd5578f297000fdcd0e4e`; 7 files, 232,457 total / 59,100 max bytes | looks 69 -> 70; evaluations 16 -> 17; cells 583 -> 587 |
+| `R-071`; `arv2-eval-stock-spy-qqq-intersection-union-qc-010` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r071-v3`; `1f262bbef386d8291afc38e50a6706d4e80020702296b3423b4f2075a1858f87` | `arv2-preliminary-qc-projection-7fc71f66821ee3195bfa3738`; `7fc71f66821ee3195bfa37388a41906a6012b66a78b99ee4a143966e341af0d8`; 7 files, 232,464 total / 59,100 max bytes | looks 70 -> 71; evaluations 17 -> 18; cells 587 -> 591 |
+
+R-069 is a historical SPY/S&P 500 holdings proxy, not official index
+membership. R-070 is a QQQ/Nasdaq-100 holdings proxy, explicitly not all
+Nasdaq-listed stocks. R-071 is their exact-SID-deduplicated union. Their
+private projects are prospectively `15 ARV2_STOCK_R069_SPY_2021_2025 -
+20260916`, `16 ARV2_STOCK_R070_QQQ_2021_2025 - 20260916`, and `17
+ARV2_STOCK_R071_SPY_QQQ_2021_2025 - 20260916`; their backtests are `ARV2 R069
+SPY EndTime retry e9851c2f`, `ARV2 R070 QQQ EndTime retry e9851c2f`, and
+`ARV2 R071 SPY QQQ EndTime union retry e9851c2f`. This block is frozen before
+any of those project creations, launches or outcome reads. The diagnostics
+cannot select a same-window winner or unlock leverage, formal acceptance,
+deployment, broker access, orders, paper/live state or trading.
+
+## R-069 disposition and query-window R-072/R-073/R-074 successors — 2026-09-16
+
+R-069 used its exact preregistered SPY EndTime-only projection. A local
+signature check first refused before any permit, project or look; the exact
+resumable retry launched once. Private project `36633442`, backtest
+`9ca1e406f63145b969cca4d1034dbc02`, reached authenticated `Runtime Error`
+after two statistics-free polls. Its plan, launch and terminal SHA-256 values
+are respectively
+`ce8ed24649a8060e2a690967e08afafd530136a6a6f37af1d028ff19b31ea367`,
+`e65e2a9abe4ee4a7598884cb506d858721e18bace5c814e1e43e6fc1f1408386`,
+and `69545bccb68e3daeb13461fd04dfba7c86a2eb2279fe575563c75f993b8ebfd9`.
+A bounded exact-run diagnostic selected only the error and stack, not result
+statistics, charts, orders, provider rows or security outcomes:
+`constituent-history collection escaped query bounds`. R-069 consumes shared
+look **68 -> 69** and development evaluation **15 -> 16**, adds zero cells,
+and leaves the floor at **579**.
+
+The unflattened QC ETF-universe Series contained at least one collection
+outside the explicit history request. No frozen 2021-2025 decision can select
+such a collection. The corrected successor loader still authenticates the
+Series/index shape, universe identity and collection `EndTime` type, then
+ignores out-of-window collections before duplicate storage or row-payload
+traversal. It still requires in-range history and fully validates the latest
+strictly-prior selected snapshot without fallback. R-070 and R-071 were never
+launched and are superseded by fresh identities that bind this correction.
+
+| Ledger | Profile identity | Projection identity | Accounting on successful aggregate read |
+|---|---|---|---|
+| `R-072`; `arv2-eval-stock-spy-holdings-intersection-qc-011` | `arv2-stock-long-only-spy-holdings-intersection-2021-2025-r072-v3`; `6667bdeb213b6eaa7f53f56beba042a0aa82e78a664910c495008a7453184681` | `arv2-preliminary-qc-projection-4c2707b03e02f8d24fade31e`; `4c2707b03e02f8d24fade31e898604590250d1f11389cde5fbbf059d92c4f25f`; 7 files, 232,624 total / 59,100 max bytes | looks 69 -> 70; evaluations 16 -> 17; cells 579 -> 583 |
+| `R-073`; `arv2-eval-stock-qqq-holdings-intersection-qc-012` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r073-v5`; `2aaee2733ad8c7fcfa4cddcf4ed085ea2a6f082917d16c8ad27bc43de3bc02c2` | `arv2-preliminary-qc-projection-04992d775f0ed55e07a1f3c0`; `04992d775f0ed55e07a1f3c01fc2459a2b37c62447da5b0e13cd1d64084c3161`; 7 files, 232,913 total / 59,100 max bytes | looks 70 -> 71; evaluations 17 -> 18; cells 583 -> 587 |
+| `R-074`; `arv2-eval-stock-spy-qqq-intersection-union-qc-013` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r074-v4`; `a3f568e6c5be11c13a000206ba248a8430c5586aba4957253d374adff250c931` | `arv2-preliminary-qc-projection-231586bf20e5cd7cf57ec006`; `231586bf20e5cd7cf57ec006b11789c964a59bb0030bde3970fc098919a85e28`; 7 files, 232,920 total / 59,100 max bytes | looks 71 -> 72; evaluations 18 -> 19; cells 587 -> 591 |
+
+Their prospective private projects are `18 ARV2_STOCK_R072_SPY_2021_2025 -
+20260916`, `19 ARV2_STOCK_R073_QQQ_2021_2025 - 20260916`, and `20
+ARV2_STOCK_R074_SPY_QQQ_2021_2025 - 20260916`; their backtests are `ARV2 R072
+SPY query-window retry e9851c2f`, `ARV2 R073 QQQ query-window retry
+e9851c2f`, and `ARV2 R074 SPY QQQ query-window union retry e9851c2f`. This
+block is frozen before any creation, launch or outcome read. QQQ remains a
+Nasdaq-100 holdings proxy, not all Nasdaq-listed stocks. No result may select
+a same-window winner or unlock leverage, formal acceptance, deployment,
+broker access, orders, paper/live state or trading.
+
+## R-072 result, R-073 disposition, and R-075/R-076 successors — 2026-09-16
+
+R-072 completed in private QC project `36633844`, backtest
+`e1d3a802a65dad1abd1c07d66bc52722`, after 64 statistics-free polls. Plan,
+launch and terminal SHA-256 values are
+`bd0632ac8c2293dab9ac4adbee8582a2dda3ebbcddba547b3a33e6cabd338e82`,
+`735bbc75e668ced652cb73629b1883dce330099f3aea5c89038f92f0a0ac1927`,
+and `4ce7d3e1ec806d85fbd2b6d4d4b1412dcf81eb5b2cabc36bf1c8b1aeb4303236`.
+One signed read authenticated exactly six aggregate statistics. Aggregate
+receipt SHA-256 is
+`aa3380cee5b0d233b5ed5c01b4db37cbc42e9a25aee1e795708528ac0b4d24cf`;
+custom-statistics SHA-256 is
+`a2abd4b76eb6735b235c70e49f42a798550103115c6f5180d86278f18d899c79`.
+No raw provider row, unrestricted log, chart or order was selected.
+
+| Cost per side | Signal | Matched | SPY | Signal minus matched | Signal minus SPY | Maximum drawdown |
+|---:|---:|---:|---:|---:|---:|---:|
+| 0 bps | +76.5951% | +57.8850% | +94.2074% | +18.7101 pp | -17.6122 pp | -19.2593% |
+| 5 bps | +74.9613% | +57.3180% | +94.2074% | +17.6433 pp | -19.2460 pp | -19.3048% |
+| **10 bps primary** | **+73.3425%** | **+56.7530%** | **+94.2074%** | **+16.5895 pp** | **-20.8649 pp** | **-19.3502%** |
+| 20 bps | +70.1494% | +55.6291% | +94.2074% | +14.5203 pp | -24.0580 pp | -19.4410% |
+
+At the primary cost the signal's annualized arithmetic return is 12.3544%,
+zero-rate Sharpe is 0.7667, average cash is 8.3281%, and daily two-sided
+turnover is 1.48344% (about 373.83% under a simple 252-session
+annualization). It executes all 261 decisions at 91.6700% mean gross and
+about 46.77 holdings. The matched comparator also executes all 261. R-072 is
+positive selection evidence relative to that matched SPY-holdings-proxy
+universe (+16.5895 points at 10 bps), but it trails capitalization-weighted
+SPY by 20.8649 points. It remains preliminary, current-vintage/non-pristine-
+PIT, exposure-underfilled, without a terminal-payoff splice, and is not a
+formal alpha or promotion result.
+
+R-073 launched once in project `36635211`, backtest
+`c8295621931bcdca7e332179b3ae891a`, and reached authenticated `Runtime Error`
+after two polls: `constituent-history prior snapshot is stale`. Plan, launch
+and terminal SHA-256 values are
+`5120a91755b43b9e4aae7b32ad9c82962c5bc9dfb586ebe17d08614f98c60e12`,
+`a2b67edf7febbd16ba949ea74c58b41f361f5a4820edc05edccc6813784a5b49`,
+and `c1368a9e0615c6c66171f7e926956aa111c2e1e0aefa82909fc40a8261409619`.
+A bounded diagnostic selected only the error and stack. No result permit or
+outcome value exists. R-073 moves looks 70 -> 71 and evaluations 17 -> 18,
+adds zero cells, and leaves the floor at 583. R-074 was never launched and is
+superseded unspent.
+
+The failure showed that the ten-day rule treated absence of a newer full
+holdings file as expiration of the latest authenticated holdings state. The
+fresh profiles instead keep each strictly-prior collection-`EndTime` state
+effective only until a later collection supersedes it. This changes no signal
+or portfolio rule and retains every no-lookahead, identity, selected-state,
+weight and mapping guard. The correction is frozen before either successor
+launch:
+
+| Ledger | Profile and SHA-256 | Projection and SHA-256 | Accounting on successful read |
+|---|---|---|---|
+| `R-075`; `arv2-eval-stock-qqq-holdings-intersection-qc-014` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r075-v6`; `71b14b7d5508054f191e7d75114df7dfe680e815fafa52f0a49aa5bc64432667` | `arv2-preliminary-qc-projection-c7e6b9c750f167015a81227d`; `c7e6b9c750f167015a81227da89c3034833c00350f4ed104cd4f39305e5c11fc`; 7 files, 236,355 total / 59,872 max bytes | looks 71 -> 72; evaluations 18 -> 19; cells 583 -> 587 |
+| `R-076`; `arv2-eval-stock-spy-qqq-intersection-union-qc-015` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r076-v5`; `3fa2fcb4f21eea414b0ac425f623d1113d8a648538d5e3ac2bde7dc485aab821` | `arv2-preliminary-qc-projection-699a1b0c706a99e53e067b04`; `699a1b0c706a99e53e067b04aab247c2f197fe686ccece1a8e616bf39f82bc3a`; 7 files, 236,362 total / 59,872 max bytes | looks 72 -> 73; evaluations 19 -> 20; cells 587 -> 591 |
+
+Prospective projects are `21 ARV2_STOCK_R075_QQQ_2021_2025 - 20260916` and
+`22 ARV2_STOCK_R076_SPY_QQQ_2021_2025 - 20260916`; backtests are `ARV2 R075
+QQQ carried-state retry e9851c2f` and `ARV2 R076 SPY QQQ carried-state union
+retry e9851c2f`. QQQ is a Nasdaq-100 holdings proxy, not all Nasdaq-listed
+stocks; the union is an exact-security-ID-deduplicated SPY-plus-QQQ holdings
+proxy. Results cannot select a same-window winner, tune the score, or unlock
+leverage, formal acceptance, deployment, broker access, orders, paper/live
+state or trading.
+
+## R-075 failure and R-077/R-078 membership-census successors — 2026-09-16
+
+R-075 launched once in private project `36636665`, backtest
+`bf4e0fc5a2cfc9d9cd1bab6dab398606`, and reached authenticated `Runtime Error`
+after two statistics-free polls: `constituent-history total positive weight
+escaped bounds`. Its plan, launch and terminal SHA-256 values are
+`64f279da7ea692822e41d473026febabf8136952302e2273d473bd37b73936c2`,
+`710c08529237a6e8c6cfaca39fdd238783e30e8b8c0610734572adca350072f3`,
+and `e0af203a4b1b7f818f4b6cc1e6bc41311da5ad1a6ab601a85532d182567f980b`.
+A bounded exact-run diagnostic selected only identity, status, error and stack.
+No result permit or outcome value exists. R-075 moves looks 71 -> 72 and
+evaluations 18 -> 19, adds zero cells, and leaves the floor at 583. R-076 was
+not launched and is superseded unspent.
+
+The total-weight bound tests approximate ETF replication, but these profiles
+use the payload only to establish point-in-time membership and do not weight
+the portfolio by ETF constituent weight. Fresh R-077/R-078 therefore retain
+positive finite row evidence, strict-prior collection `EndTime`, state until
+superseded, unique SIDs, exact reverse mapping and nonempty score-census
+intersection, but replace the replication-weight sum with preregistered
+membership-shape bounds: QQQ 75-125 positive constituents and SPY 400-600.
+They make no official-index, coverage-completeness or ETF-replication claim.
+
+| Ledger | Profile and SHA-256 | Projection and SHA-256 | Accounting on successful read |
+|---|---|---|---|
+| `R-077`; `arv2-eval-stock-qqq-holdings-intersection-qc-016` | `arv2-stock-long-only-qqq-holdings-intersection-2021-2025-r077-v7`; `981ad7d698d792542bb68aeb31f18faea1e9c35328fb8b599b92849e07d8b9ee` | `arv2-preliminary-qc-projection-300f114d7a2663de82057b71`; `300f114d7a2663de82057b71994b5025cdd024ec3763edff7e23b5f021cad05d`; 7 files, 238,761 total / 59,444 max bytes | looks 72 -> 73; evaluations 19 -> 20; cells 583 -> 587 |
+| `R-078`; `arv2-eval-stock-spy-qqq-intersection-union-qc-017` | `arv2-stock-long-only-spy-qqq-intersection-union-2021-2025-r078-v6`; `04400da58aeaee37edba2685bcaaaf1878f88c542bfb342211698e308cf3d87d` | `arv2-preliminary-qc-projection-4d09391c29bdc20d93de40d1`; `4d09391c29bdc20d93de40d1faa35d075301e2ce3afd85ce2d100edce1736ea8`; 7 files, 238,768 total / 59,444 max bytes | looks 73 -> 74; evaluations 20 -> 21; cells 587 -> 591 |
+
+Prospective projects are `23 ARV2_STOCK_R077_QQQ_2021_2025 - 20260916` and
+`24 ARV2_STOCK_R078_SPY_QQQ_2021_2025 - 20260916`; backtests are `ARV2 R077
+QQQ membership-count retry e9851c2f` and `ARV2 R078 SPY QQQ membership-count
+union e9851c2f`. This block is frozen before either project creation, compile,
+launch or outcome read. QQQ remains a Nasdaq-100 holdings proxy, not all
+Nasdaq-listed stocks; the union remains an exact-SID SPY-plus-QQQ holdings
+proxy. Results cannot select a same-window winner, tune any rule, or unlock
+leverage, formal acceptance, deployment, broker access, orders, paper/live
+state or trading.
+
+## R-077/R-078 authenticated stock-universe results — 2026-09-16
+
+Both exact preregistered membership-census successors completed in private
+QC projects and received one separately signed aggregate-only result read.
+R-077 used project `36638005`, backtest
+`06584e75d6e90fa25018ae71e1d85468`; aggregate receipt SHA-256 is
+`f63f62550fbf36d6d4ee7d7b9a0e9e284ec3b1798e1420e238401a0f33e64dc3`.
+R-078 used project `36639211`, backtest
+`ecf704c925215b2196e7a8511546d27b`; aggregate receipt SHA-256 is
+`b1cbfc9c01ed67e0006b2aaba9a0157d301021911414b490e1e0d0ec5b032fec`.
+Each read selected exactly six custom aggregate statistics and no provider
+row, unrestricted log, chart or order.
+
+| Run / cost per side | Signal | Matched | SPY | Signal minus matched | Signal minus SPY | Maximum drawdown |
+|---|---:|---:|---:|---:|---:|---:|
+| R-077 / 0 bps | +9.0656% | +8.8625% | +94.2074% | +0.2031 pp | -85.1417 pp | -12.0150% |
+| R-077 / 5 bps | +8.7829% | +8.7594% | +94.2074% | +0.0235 pp | -85.4244 pp | -12.0691% |
+| **R-077 / 10 bps primary** | **+8.5010%** | **+8.6564%** | **+94.2074%** | **-0.1554 pp** | **-85.7064 pp** | **-12.1231%** |
+| R-077 / 20 bps | +7.9392% | +8.4507% | +94.2074% | -0.5115 pp | -86.2681 pp | -12.2312% |
+| R-078 / 0 bps | +70.9113% | +55.8818% | +94.2074% | +15.0295 pp | -23.2960 pp | -20.3325% |
+| R-078 / 5 bps | +69.2545% | +55.2942% | +94.2074% | +13.9602 pp | -24.9529 pp | -20.3785% |
+| **R-078 / 10 bps primary** | **+67.6135%** | **+54.7088%** | **+94.2074%** | **+12.9048 pp** | **-26.5938 pp** | **-20.4245%** |
+| R-078 / 20 bps | +64.3790% | +53.5444% | +94.2074% | +10.8346 pp | -29.8284 pp | -20.5992% |
+
+R-077 averaged nine holdings and only 17.64% gross exposure because its
+top-decile selection retained the frozen 1.96%-per-name cap; 82.36% average
+cash dominates its absolute result. Its matched comparator had the same gross
+exposure and the primary-cost spread is negative, so the run provides no
+convincing QQQ-proxy selection edge. R-078 averaged 47.71 holdings and 93.51%
+gross exposure. Its +12.9048-point primary-cost matched spread is tangible
+positive selection evidence inside the SPY-plus-QQQ holdings proxy, but it
+still trails SPY and is weaker than R-072's SPY-only matched spread.
+
+The matched QQQ and union accounts record respectively three and fourteen
+membership-end zero recoveries, versus zero for each signal account; that
+lower-bound asymmetry can overstate the apparent selection spread by an
+unknown amount. Inputs remain current-vintage/non-pristine-PIT, ETF holdings
+are proxies rather than official memberships, the terminal-payoff splice is
+absent, and these descriptive same-window results cannot select a winner or
+authorize tuning, leverage, promotion, deployment, broker access, orders,
+paper/live state or trading. Accounting is now **74 shared looks, 21 ARV2
+development evaluations, 23 infrastructure looks and a 591-cell floor**.
+
+## R-079 — Analyst Revisions V2 sampled PIT market-cap and ETF-membership coverage canary (PREREGISTERED; OUTCOME-FREE)
+
+R-079 is the next shared run-level entry if and only if the fresh canary reaches
+`backtests/create`. It is an outcome-free infrastructure diagnostic over
+sixteen preregistered 2025/2026 sessions. It may durably return only aggregate
+fundamental, positive-market-cap, SPY-membership, QQQ-membership and
+SOXX-membership counts plus bounded collection-availability timestamps. It
+cannot read or report prices, returns, statistics, charts, orders, holdings,
+security identifiers, constituent weights, raw market-cap values, or provider
+rows.
+
+The earlier submission identity created QC project `36642921` but refused on
+the platform-created `research.ipynb` before source upload, compile, or
+backtest launch. It therefore has no R-number and consumes no look. The fresh
+retry is project
+`26 ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE_RETRY - 20260917`, backtest
+`ARV2 outcome-free PIT market-cap and ETF-membership coverage retry 1`,
+projection
+`arv2-pit-market-cap-membership-projection-fc7b6963a4b665bcc16999fa`
+(SHA-256
+`fc7b6963a4b665bcc16999fa5543c314a9c284228d9e994c15590b90437c150b`),
+and submission plan
+`arv2-pit-market-cap-membership-probe-plan-b5d4385ef36764121aaf23ae`
+(SHA-256
+`b5d4385ef36764121aaf23ae4df4a4c08bca46a6137f6c8f3b047f207237698f`).
+This block is frozen before permit spend.
+
+Once launched, R-079 moves shared looks **74 -> 75** and infrastructure looks
+**23 -> 24**, even if its terminal state is a named refusal or runtime error.
+ARV2 development evaluations remain **21** and the lifetime alpha-cell floor
+remains **591**. No R-079 result may select a strategy, tune an economic rule,
+or unlock an outcome run, leverage, deployment, broker access, orders,
+paper/live state, or trading.
+
+## R-079 disposition and R-080 outcome-free summary-channel successor — 2026-09-17
+
+R-079 launched once in private QC project `36643367`, backtest
+`a2b58090c188fd040217af6c302751b8`, and reached authenticated `Completed.`
+after one statistics-free poll. Launch and terminal SHA-256 values are
+`334ec5d733f9fb40cb6a32f3d38da23539d64f6a3d6258be9b342c83f70fb300`
+and `ce92a3e69a21808e79fc379885ee8cd344064b68cee5fb6bd2138ec3cf6a4174`.
+The permitted API Object Store export then returned `success:false` before any
+bytes were delivered; a metadata-only check showed that the 798-byte terminal
+pointer exists inside QC. The output permit is consumed. R-079 spends shared
+look **74 -> 75** and infrastructure look **23 -> 24**, but yields no selected
+count, price, return, outcome, order, identifier or raw provider value. Its
+status is completed-run/output-unavailable, not coverage success or failure.
+
+The locally signed project-27 candidate made no permit, network call, project,
+compile, backtest or look and is superseded unspent. Fresh **R-080** is
+preregistered before any external action. It repeats the same sixteen sampled
+sessions under private project `28 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R080
+- 20260917`, backtest `ARV2 R080 outcome-free PIT market-cap and ETF-membership
+summary`, projection
+`arv2-pit-market-cap-membership-projection-6e4128b67ff7604551bf263a`
+(SHA-256
+`6e4128b67ff7604551bf263a7730a02d247af28d0e37fab5fda966b6882e225f`),
+source-set SHA-256
+`d511993d530a2ac223d6d9c02fcb303b58ff7ca86f4ae7bbe76509752190ae13`,
+and submission-plan SHA-256
+`8786f8fb98c52cf4f2292e0b2b7f88c8f0fe774913b642d1340fa8ef7b16ac08`.
+
+On launch, R-080 moves shared looks **75 -> 76** and infrastructure looks **24
+-> 25**; development evaluations remain **21** and the cell floor remains
+**591**. The full receipt remains inside QC. One separately permitted
+`backtests/read` may select only the canonical, at-most-4,096-character
+`ARV2_PIT_MARKET_CAP_MEMBERSHIP_COVERAGE` attestation. Success requires all
+sixteen sessions to have positive market-cap coverage plus nonempty and
+market-cap-covered SPY, QQQ and SOXX membership. The attestation may contain
+only aggregate counts, bounded availability extrema, lineage and internal
+object hashes/sizes; all raw rows, identifiers, weights, market-cap values,
+prices, returns, outcomes, orders and full-object export remain forbidden.
+R-080 cannot select a strategy, tune an economic rule, authorize leverage, or
+unlock deployment or trading.
+
+## R-080 disposition and R-081 corrected-timestamp successor — 2026-09-17
+
+R-080 launched once in private QC project `36644379`, backtest
+`3a9dbca993f41ac41177d2c15bb84450`, and reached authenticated `Completed.`
+after two statistics-free polls. Its one permitted `backtests/read` selected
+only a bounded named-refusal attestation, artifact SHA-256
+`0ca3b24f005475d912a8e74283aef112c9f93331991f8d97a8cc1441818bfcf3`:
+`pit_coverage_refused_ValueError_1b17331bb939b176`. The exact reviewed R-080
+runtime maps that digest to `ETF constituent row EndTime differs from
+collection`. No raw row, identifier, weight, market-cap value, price, return,
+outcome, holding or order was selected. R-080 is final and spends shared look
+**75 -> 76** and infrastructure look **24 -> 25**; development evaluations
+remain **21** and the cell floor remains **591**.
+
+That refusal is a runtime-semantics defect, not evidence of absent data. The
+corrected rule treats the unflattened history Series/multi-index collection
+timestamp as the sole availability time and never reads a constituent row's
+separate `EndTime`. Fresh outcome-free **R-081** is preregistered before any
+external action under project
+`29 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R081 - 20260917`, backtest
+`ARV2 R081 outcome-free PIT market-cap and ETF-membership summary retry 1`,
+contract SHA-256
+`32c0583525a2e3cbf677a5ac387b7cd589338146bd0bcaa03da3e0f2200b3525`,
+projection SHA-256
+`17d4cc56a0b3e2a28e442c74c4ff52bea1d57d45fa4cfd17c7da1b93c98887f3`,
+source-set SHA-256
+`db2cb863496f9c629361ad4fae68ab508bbc2fb30d46f1645dfb20582d420c34`,
+and submission-plan SHA-256
+`bfddaa18a7c11c38a6ec1b66f18a6904590b2bb71c67b00bf733525bd00838f8`.
+
+On launch, R-081 moves shared looks **76 -> 77** and infrastructure looks
+**25 -> 26**; development evaluations remain **21** and the cell floor
+remains **591**. It repeats the same sixteen sampled sessions and may select
+only the same bounded aggregate coverage attestation. It is not an alpha
+evaluation and grants no tuning, leverage, deployment or trading authority.
+
+## R-081 disposition and R-082 duplicate-SID coverage successor — 2026-09-17
+
+R-081 launched once in private QC project `36644829`, backtest
+`1cdc40ccd41877743ad907020a6e2e31`, and reached authenticated `Completed.`
+after two statistics-free polls. Its one permitted `backtests/read` selected
+only bounded named refusal
+`pit_coverage_refused_ValueError_bef7b6927d4aa871`, artifact SHA-256
+`4b12471d87f9a7ed918a6a292775e6bc2527deaabc27bda7b3e80c9a2a0af8a1`.
+The exact R-081 runtime resolves it to `fundamental collection duplicated an
+exact SID`. No raw row, identifier, weight, market-cap value, price, return,
+outcome, holding or order was selected. R-081 is final and spends shared look
+**76 -> 77** and infrastructure look **25 -> 26**; development evaluations
+remain **21** and the cell floor remains **591**.
+
+Fresh outcome-free **R-082** freezes a coverage-only duplicate policy before
+external action. Exact fundamental SIDs may collapse only when all repeated
+rows share one of four frozen coverage classes: positive, null, nonpositive,
+or invalid. Conflicting classes named-refuse; ETF duplicates still refuse.
+Duplicate values are neither compared with each other nor emitted, and this
+does not authorize production market-cap value selection. The v2 contract is
+`e402e58ac9073ee198654cdbc88267ff5795fb98ce9210172dbaf176cbc627d4`.
+The private project is
+`30 ARV2_PIT_MARKET_CAP_MEMBERSHIP_SUMMARY_R082 - 20260917`; the backtest is
+`ARV2 R082 outcome-free PIT market-cap and ETF-membership summary retry 2`.
+The plan is
+`arv2-pit-market-cap-membership-plan-c68f3356759c1d25abf324f3`
+(semantic SHA-256
+`108e035ecf8204501526de4fe7e8dac9390b004ef8fbb848a55a716a036a5990`,
+artifact SHA-256
+`97afe6f3b66afa2579737e040576f594ad365b5d85d2c72206f7a4d929d1cd6f`);
+the projection SHA-256 is
+`fb892cce42d48e658137843e5690177054c9b58470c7ee1937607b59591d6583`;
+the two-file source set SHA-256 is
+`9c71c5650813c4e9281f8746edd4ff2c658c1883a60f89d779cb75af6e7b812e`;
+the submission-plan SHA-256 is
+`dfdd5f9920bd245c72ed1609f696997f620cd2c4f40e0b62f897aa081b1b1ba9`;
+the review-claim semantic SHA-256 is
+`91d8b3ad867c6d53306b5dc5d308187691b739b245fd68260ac8982b00db2ee8`;
+and the unsigned execution-authority bytes SHA-256 is
+`d4ef0075939479f7b286c72017ee51cae35b16d2ad220aba6298b34330f5d0e9`.
+
+On launch, R-082 moves shared looks **77 -> 78** and infrastructure looks
+**26 -> 27**; development evaluations remain **21** and the cell floor
+remains **591**. It repeats the same sixteen sampled sessions and may select
+only the bounded aggregate v2 coverage attestation. It is not alpha evidence,
+does not authorize production market-cap ranking, and grants no tuning,
+leverage, deployment or trading authority.
+
+## R-082 completed PIT market-cap/membership coverage canary — 2026-09-17
+
+R-082 launched once in private QC project `36645473`, backtest
+`c90394212ee91c89f0428b3533de45d9`, and reached authenticated `Completed.`
+after one statistics-free poll. Its one permitted `backtests/read` selected
+only the 3,137-byte v2 aggregate attestation, artifact SHA-256
+`60e3e3185a301aec3de7b14d5f4ad58cd10dfc4b30c39d387083fea7db74895b`.
+All **16 of 16** sampled sessions passed. The canary processed 1,944,801
+source rows; aggregate fundamentals contained 169,080 rows and 169,078 exact
+SIDs, including two same-class redundant rows that the frozen v2 policy
+collapsed. It observed 74,405 positive-market-cap SIDs. Aggregate positive
+SPY/QQQ/SOXX membership was 8,434, with 8,200 market-cap covered and 234
+uncovered. Per-session member / covered ranges were SPY 501--503 / 494--497,
+QQQ 99--103 / 94--97, SOXX 30 / 24, and combined union 525--528 / 510--514.
+
+No individual SID, constituent weight, market-cap value, raw row, price,
+return, outcome, order, holding or portfolio statistic was emitted or read.
+This is positive physical-coverage evidence for building the later continuous
+point-in-time input; it is not alpha evidence and does not itself authorize a
+market-cap-ranked strategy run. R-082 spends shared look **77 -> 78** and
+infrastructure look **26 -> 27**. The append-only infrastructure ledger is now
+sequence 6, ledger SHA-256
+`4a726bcdd9b7232f34a1eaf891f7b8f83334002396aa48720b19abd22391305e`,
+artifact SHA-256
+`e837946d6fe9d31f16d4a901f878e965036f6931f8ed5bb1806fdb5a1c83cdd9`.
+
+## R-083 through R-090 — market-cap matrix and objective leverage diagnostics (PREREGISTERED; UNRUN) — 2026-09-17
+
+The owner authorized this exact next sequence after independent Claude review
+and Codex counter-review. The six unlevered point-in-time market-cap runs are
+R-083 through R-088; the two synthetic-leverage diagnostics are R-089 and
+R-090. This block is committed before any project creation, upload, compile,
+backtest launch, terminal inspection, or result read. The shared package
+SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`;
+the host-code-closure SHA-256 for every plan is
+`f2e114d751775a448017bd30b7d7dea68e3ab794ac5094bb9609ed4a20e49792`.
+
+| Run | Fixed profile and profile SHA-256 | Exact private project / backtest | Projection ID and SHA-256 | Source-set SHA-256 | Expected-names SHA-256 / count | Submission-plan ID and SHA-256 |
+|---|---|---|---|---|---|---|
+| R-083 | `arv2-market-cap-stock-qqq-2021-2025-v1` / `3025fff20f0742b60b5e75af22bc71230608fcc7a3af9b043c0c8865dfe0548e` | `31 ARV2_MARKET_CAP_QQQ_R083_2021_2025 - 20260917` / `ARV2 R083 market-cap QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-215cb2240321828f85195737` / `215cb2240321828f8519573717a356d2c1be590f502aa382817df15589d0faee` | `1880250e2bf83c100a77a6101e37c850a58fa38e2d9bb3d91ba92b4b18062f43` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-e2a33caa678ee14a2d7b83de` / `e2a33caa678ee14a2d7b83de345b2bc35ff515c81cbfd12d49d7c9e09b26cfb4` |
+| R-084 | `arv2-market-cap-stock-spy-2021-2025-v1` / `6dcb9a08790a40407622d5a6ec34e5cd8fab5978d8e4cdc0f1ba16fb984063d7` | `32 ARV2_MARKET_CAP_SPY_R084_2021_2025 - 20260917` / `ARV2 R084 market-cap SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-2d011b0a1ab1ba000463db32` / `2d011b0a1ab1ba000463db32611468a62b43e1c98fed1ac544cbb29af9b667ea` | `3f559680b795ec7e181618a631fc261941dd0282d0462283a13491c0791dc08d` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-077b7f9fe2ef4eebcc112908` / `077b7f9fe2ef4eebcc11290809e846c6d736fa266fd2b28911d39429c60053d0` |
+| R-085 | `arv2-market-cap-stock-qqq-2019-2023-v1` / `1069bb9717584632cc64a11394ff0cb7bef1d080d4ed0a79ca9eaaf1975596c0` | `33 ARV2_MARKET_CAP_QQQ_R085_2019_2023 - 20260917` / `ARV2 R085 market-cap QQQ 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-f63cc6775c370392bca6a113` / `f63cc6775c370392bca6a1137620d6587c21229161e64fddb20869da4f7e0d53` | `b921be6ac732312bdd31eb69d97f1acd607b0e03b22c412b83d349e19492cc0c` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-b961c522c05ab0ca6253b4e4` / `b961c522c05ab0ca6253b4e4dd104791685850e13f8634f7b260249e8b06ff2d` |
+| R-086 | `arv2-market-cap-stock-spy-2019-2023-v1` / `75f0841eeddbba74f4ac618b754a6d31698716bb5baf12d96461c8f10ea18cde` | `34 ARV2_MARKET_CAP_SPY_R086_2019_2023 - 20260917` / `ARV2 R086 market-cap SPY 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-9a2990b803405612085a9bfd` / `9a2990b803405612085a9bfdedb7a973508d3dcc72a1b740113967f89e34eaf5` | `dcf4e7110f75e62c1aa99fd29db0ee5568d9eaf0c0e9b8723dc8e9a5b67e12b9` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-ed5f7cba15734cac805887d7` / `ed5f7cba15734cac805887d70cafde094e15745ee3e27bd501a34c53673dadf0` |
+| R-087 | `arv2-market-cap-stock-qqq-2023-2025-v1` / `a6eeb831372894fd2ba2d95a6a23daefffe86555dd0d93a97a63d977fc27cc05` | `35 ARV2_MARKET_CAP_QQQ_R087_2023_2025 - 20260917` / `ARV2 R087 market-cap QQQ 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-a3130fd85e0864746bf40451` / `a3130fd85e0864746bf4045140e414f5de911dd5e2bac0e5217e6251866a9c4e` | `7ccd46bc8bebe39b8b46c15aa414836a265d3b492ed5f36cf509fce2d6ad718d` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-0bb219f78c806dafe912840b` / `0bb219f78c806dafe912840bfaba741432d5e495e6ef1f6f502bb56f5c784ce2` |
+| R-088 | `arv2-market-cap-stock-spy-2023-2025-v1` / `bbc3e88fd66cd8ad93ec1d3e48675c03df75460922e0c21d855dc8aa27ab68e4` | `36 ARV2_MARKET_CAP_SPY_R088_2023_2025 - 20260917` / `ARV2 R088 market-cap SPY 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-47653858e49c370c519d1ad0` / `47653858e49c370c519d1ad002906115657c5b2453c8d357fc7aeca1893c8ab7` | `5b38b95a465467a8f6a0ce4cb803fae8a3d2f8abe083368a28a51615a1f6d564` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-11b9c64a5b645e9679412164` / `11b9c64a5b645e96794121644c4ccf914fc9b690068febe92b31f75cd1483610` |
+| R-089 | `arv2-objective-synthetic-leverage-qqq-2021-2025-v1` / `e9ed4d6e1df27c38273958ddfc66b4d8d0adc62c5995bb2f5941d7d3540cc68e` | `37 ARV2_LEVERAGE_QQQ_R089_2021_2025 - 20260917` / `ARV2 R089 synthetic 2x3x QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-bb35ffb605a2825585c6d933` / `bb35ffb605a2825585c6d93387a368f5a21021de5cb438fa4eb8f1748ac11c76` | `1b297af2aedfa084943bdca46ea50237d705a62ef633f205f6033a16f0cf9407` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-11022a9c630bfd0593d74c45` / `11022a9c630bfd0593d74c45dd45ade000f69936546ee7e781df2554ba24efa5` |
+| R-090 | `arv2-objective-synthetic-leverage-spy-2021-2025-v1` / `ed7e3151daf3ae5868695e7753b0bb47119555124efe457cbca5db26a4208584` | `38 ARV2_LEVERAGE_SPY_R090_2021_2025 - 20260917` / `ARV2 R090 synthetic 2x3x SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-c8e4921fe7ba62d6722ee451` / `c8e4921fe7ba62d6722ee45147fd24c2c28ddc78ae45387adaa6914b1ae49321` | `67a9f4bd181c978ce2fedc883b0a467d69ea59e55d863e5679df17ca79ecccbc` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-dd65df97f35e2c1327d9e7ab` / `dd65df97f35e2c1327d9e7ab168e8371e9772bdb1bfc784b08da56e29741be70` |
+
+R-083 through R-088 each preserve the reviewed weekly R-055 score, select the
+top decile capped at fifty, and weight the selected sleeve and full eligible
+matched comparator separately by exact strictly-prior point-in-time market
+capitalization to 98% target gross. QQQ is the QQQ-holdings Nasdaq-100 proxy;
+SPY is the SPY-holdings S&P 500 proxy. They retain next-open execution,
+adjusted opens, per-name deferral, symmetric eligibility-exit sensitivity, and
+the fixed 0/5/10/20-bps-per-side ladder with 10 bps primary.
+
+Before any result is read, the interpretation is fixed as follows. A selected
+sleeve whose inverse-HHI effective holdings are below **10** is reported as a
+concentrated result with fewer than ten equally weighted holdings' worth of
+effective diversification; this is not a literal contributor count and does
+not by itself invalidate the run. Both accounts' zero-recovery counts are
+reported. The three windows overlap and are descriptive, not independent;
+their outcomes may not select a winning universe, period, or later rule.
+
+R-089/R-090 apply the already-reviewed whole-portfolio daily-reset 2x and 3x
+transforms to the corresponding 2021-2025 market-cap paths under the frozen
+primary (10-bps base path, 6% annual financing) and adverse (20-bps base path,
+10% annual financing) scenarios. Each full QC result has six authenticated
+statistics: four economic cells, evaluator meta, and runtime meta. There is no
+preregistered relative-return direction: daily resetting can widen, narrow, or
+reverse an unlevered selected-versus-context gap. Interpretation compares
+selected and matched paths under identical factors/scenarios and treats no
+amplification or reversal as validation by itself.
+
+Physical jobs are sequential on the one subscribed node: R-083 through R-088
+first, then R-089 and R-090. A launch spends one shared look and one development
+evaluation even if it later refuses; each authenticated result adds four cells.
+After all eight launches, accounting is **86 shared looks, 29 ARV2 development
+evaluations, 27 infrastructure looks, and a 623-cell floor**. A technical
+failure requires a fresh prospective identity; no observed economic result may
+choose a retry rule. Exactly one bounded aggregate result read is allowed per
+run. No raw provider row, security identifier, price row, log, chart, holding,
+order, deployment, broker state, paper/live state, or trading action is
+authorized.
+
+## R-083 disposition; R-084 through R-090 superseded unspent — 2026-09-17
+
+R-083 launched once in private project `36664366`, backtest
+`087f91701ac3fb19d9ab6433a03227e6`, and reached authenticated `Runtime Error`
+after two statistics-free polls. No aggregate result was read and no economic
+cell was emitted. One separately authorized, no-redirect technical diagnostic
+selected only the terminal error and stack frame: `PIT fundamentals history
+collection escaped request bounds`. No raw provider row, identifier, price,
+return, chart, order, holding, deployment, broker state, paper/live state, or
+trading action was selected.
+
+R-083 is final: shared looks **78 -> 79**, ARV2 development evaluations
+**21 -> 22**, infrastructure looks unchanged at **27**, and lifetime cell
+floor unchanged at **591**. A local signature revalidation refusal before
+network access spent no look. R-084 through R-090 did not launch and spend
+nothing; their physical plans are superseded unspent because the bounded
+runtime correction changes their projected-source and host-closure identities.
+
+The prospective correction validates each history collection's shape,
+universe identity, and timestamp, then ignores only collections outside the
+exact request interval before traversing their rows. In-window PIT and
+financial rules are unchanged. Fresh v2 profiles preserve the old v1 records
+and carry this policy explicitly. R-091 through R-098 are reserved as fresh
+technical successors, starting from **79 shared looks, 22 development
+evaluations, 27 infrastructure looks, and a 591-cell floor**. Exact physical
+identities must be committed before any external action.
+
+## R-091 through R-098 — corrected market-cap matrix and leverage diagnostics (PREREGISTERED; UNRUN) — 2026-09-17
+
+These are fresh technical successors after R-083's zero-cell runtime refusal.
+All eight are committed before external action. The common package SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`;
+the common host-closure SHA-256 is
+`7b940f4e3750a1929db388ce12c80113bf6faceea87e03ad23ae579cab29b164`.
+
+| Run | Fixed profile and SHA-256 | Exact private project / backtest | Projection ID / SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|---|
+| R-091 | `arv2-market-cap-stock-qqq-2021-2025-v2` / `71fe35e9a200e61c9c908fe839e244d97bcef89664a921ddaa3dfd09b8a09178` | `39 ARV2_MARKET_CAP_QQQ_R091_2021_2025 - 20260917` / `ARV2 R091 market-cap QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-18fdadac5cb448b213806815` / `18fdadac5cb448b21380681554f991be5cbdead42e06f69c59ef46e99cc6ac6b` | `abec99591d1c2e0996ad0806d366cc9cedf4f679969ea1645cc0edb187ba4c9f` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-351f3e6c8a1625d295eea49a` / `351f3e6c8a1625d295eea49ac18179469ee3f7d8cbaa0e06e125e936978748bd` |
+| R-092 | `arv2-market-cap-stock-spy-2021-2025-v2` / `0b6587206c68452b7468aff42432cb3b587a0f96cc078fbf57a6473f86feb59d` | `40 ARV2_MARKET_CAP_SPY_R092_2021_2025 - 20260917` / `ARV2 R092 market-cap SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-932e7d229cbf429a7af231be` / `932e7d229cbf429a7af231bed0583a92c0b1a0937cb15e4012059772518de092` | `3bbf168d3d13403e3437020fcbbfc72b67ef6bad263118acb7080e6b69e1e870` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-a5e6ee4c9ba783ab577cb95c` / `a5e6ee4c9ba783ab577cb95c14c415bbf6be8671b82644f4721585ae06a4a99c` |
+| R-093 | `arv2-market-cap-stock-qqq-2019-2023-v2` / `661d87e282f6c37cc258db7a3e814e5a261369209fc3fc4a96c1769edd71f83d` | `41 ARV2_MARKET_CAP_QQQ_R093_2019_2023 - 20260917` / `ARV2 R093 market-cap QQQ 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-633a2c795eabe6f6a256941a` / `633a2c795eabe6f6a256941a425e0a74903752cb5b4fe034b389faf31186f419` | `7584ee6347ef889bdcb1fc9fb38f6a3aa7ce68ecd31e9476ce80242b81772b90` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-698709a4f82df7539b1e8458` / `698709a4f82df7539b1e84585d6d51b2927f36ec6098dc1805057e859f150076` |
+| R-094 | `arv2-market-cap-stock-spy-2019-2023-v2` / `72a4b469d7f8fa79ea4ea62836b6b43000069b5e0a7dca6941af00124ca68f4a` | `42 ARV2_MARKET_CAP_SPY_R094_2019_2023 - 20260917` / `ARV2 R094 market-cap SPY 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-7ff8241567e40c3f4d562f35` / `7ff8241567e40c3f4d562f35990d39324cefdde0303d799a60f19a77f9cd1454` | `289faa5cda77982131097b496c84a5b82d66a59fc7cc31f602dda1cc3e493a39` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-821f783530f5ab6eaf88e73d` / `821f783530f5ab6eaf88e73d54794a5a290e881a4a8d138c844e51b043b001ad` |
+| R-095 | `arv2-market-cap-stock-qqq-2023-2025-v2` / `da7f4c75b9504c02f209362d2aebf69188d32cf608ac167fd543beb196067f93` | `43 ARV2_MARKET_CAP_QQQ_R095_2023_2025 - 20260917` / `ARV2 R095 market-cap QQQ 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-d81b0ae9587127588edf57e0` / `d81b0ae9587127588edf57e0885327b79017bb89c6ba91f1a873075b9b9a99e8` | `09bf5ff8bca26e6ed0651b6b5e330a720ac29102f3d96006a257f70c017a745a` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-fd1167f40d0a2930d06a2b17` / `fd1167f40d0a2930d06a2b1727de002015139d1efcad29b23b2618dc77d36550` |
+| R-096 | `arv2-market-cap-stock-spy-2023-2025-v2` / `e56aa1c7777720ec36b8414ae2525858d0911b7c7954adca292d211c767fa0b3` | `44 ARV2_MARKET_CAP_SPY_R096_2023_2025 - 20260917` / `ARV2 R096 market-cap SPY 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-f14bf8d0971f524918486cc3` / `f14bf8d0971f524918486cc398e1740cc591e36d93b34f71d3e881f2eba5cbdc` | `1f69f61835eab8ddf4af69aaf6b87761a2a489737f008055de55e5ca25883562` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-fda4d07a8cf411cdf0bd52d3` / `fda4d07a8cf411cdf0bd52d3b5dff55f8ab6241010981f8066cec7ac582cfb4c` |
+| R-097 | `arv2-objective-synthetic-leverage-qqq-2021-2025-v2` / `a800d1db535ca22fa1bcfc238fbcfabbb463e21b18cf3fc384b606542878192e` | `45 ARV2_LEVERAGE_QQQ_R097_2021_2025 - 20260917` / `ARV2 R097 synthetic 2x3x QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-c0219bb1e02b54a6e143feed` / `c0219bb1e02b54a6e143feedd02df52c933449c84f0f76f9389a8b9af9dc177a` | `5959a840f122571457dc89825a304da3a93f5e6121c6c4a6585a3557577175d9` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-24013e4ea723a3e4a44155b9` / `24013e4ea723a3e4a44155b96b6000f6032f6946e952fbe6980cd3350e0312a7` |
+| R-098 | `arv2-objective-synthetic-leverage-spy-2021-2025-v2` / `07106d52bed121064659b97173f66d1776adf5e72f0f231600d2b7b53299a014` | `46 ARV2_LEVERAGE_SPY_R098_2021_2025 - 20260917` / `ARV2 R098 synthetic 2x3x SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-bccf6d655077c63d8541a873` / `bccf6d655077c63d8541a8735bd243f0f990f4184b9bdcd3f14da30b83de967f` | `57e2f557101849a91dcab7fa17e2c56028a379d800e03e710db574a6f7fd4ddd` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-0b70a4cee19ddc24c6d8f295` / `0b70a4cee19ddc24c6d8f295c41e6dbbab43f836e018b9e47ca2e40a39802eb3` |
+
+Control directories are respectively
+`artifacts/analyst_revisions_v2/accepted_risk_market_cap_r091_20260917_01`
+through `...r096_20260917_01`, then
+`artifacts/analyst_revisions_v2/accepted_risk_leverage_r097_20260917_01`
+and `...r098_20260917_01`. R-091 through R-096 execute first in order;
+R-097/R-098 follow only after the unlevered sequence. The frozen overlap,
+effective-breadth, zero-recovery, matched-comparator, and no-leverage-direction
+interpretation rules from the R-083--R-090 block carry forward unchanged.
+
+Accounting transitions by launch/result are: R-091 **79 -> 80 / 22 -> 23 /
+591 -> 595**, R-092 **80 -> 81 / 23 -> 24 / 595 -> 599**, R-093 **81 -> 82 /
+24 -> 25 / 599 -> 603**, R-094 **82 -> 83 / 25 -> 26 / 603 -> 607**,
+R-095 **83 -> 84 / 26 -> 27 / 607 -> 611**, R-096 **84 -> 85 / 27 -> 28 /
+611 -> 615**, R-097 **85 -> 86 / 28 -> 29 / 615 -> 619**, and R-098
+**86 -> 87 / 29 -> 30 / 619 -> 623** for shared looks / development
+evaluations / cell floor. Infrastructure looks remain 27. A launch spends its
+look and evaluation even if it refuses; cells accrue only from an authenticated
+aggregate result. No raw rows, identifiers, prices, logs, charts, holdings,
+orders, deployment, broker access, paper/live state, or trading is authorized.
+
+## R-091 disposition; R-092 through R-098 superseded unspent — 2026-09-17
+
+R-091 launched once in private project `36669747`, backtest
+`9118721aa50cb6f5ac60eb1fbaa02fe9`, and reached authenticated
+`Runtime Error` after 48 statistics-free polls. No aggregate statistic or
+economic cell was emitted or read. The one bounded technical diagnostic
+selected only `SPY lacks a market-cap portfolio adjusted open` and its stack
+frame. The prefixed `2025-08-28 16:00:00` is the simulated failure time, not
+the absent observation's date.
+
+The driver had requested the fixed price range through `2026-03-30` before
+the QC simulated clock reached that date. The resulting cache was necessarily
+incomplete, and the evaluator correctly refused it. Counter-audit also found
+that an immature PIT fundamentals or ETF-membership chunk could otherwise look
+like a legitimate no-update interval and carry older state forward. The
+prospective correction gates every PIT chunk through its final decision date,
+then separately waits until the algorithm date is strictly later than the
+exact price-History request end. It permits at most four bounded work units per
+daily callback under the existing 240-second soft bound. It neither fills nor
+imputes a price and changes no economic rule. The longest profile's
+all-resolved worst case needs at most 349 post-maturity evaluator units; the
+frozen remaining calendar provides 456.
+
+R-091 is final: shared looks **79 -> 80**, ARV2 development evaluations
+**22 -> 23**, infrastructure looks unchanged at **27**, and cell floor
+unchanged at **591**. R-092 through R-098 did not launch and spend nothing;
+their plans are superseded unspent because projected-source and host-closure
+identities change. R-099 through R-106 are reserved in the same profile order,
+starting from **80 shared looks, 23 development evaluations, 27
+infrastructure looks, and a 591-cell floor**. Exact physical identities must
+be committed before external action. No raw provider row, identifier, price,
+return, log, chart, holding, order, deployment, broker state, paper/live state,
+or trading action was selected.
+
+## R-099 through R-106 — clock-gated market-cap matrix and leverage diagnostics (PREREGISTERED; UNRUN) — 2026-09-17
+
+These are the fresh technical successors to R-091. All eight are frozen before
+external action. Common package SHA-256:
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+Common host-closure SHA-256:
+`c725e9c80da75deb4e7389f1cc63cd31134f1b0551675b3163003b35bf5043f3`.
+
+| Run | Fixed profile | Exact private project / backtest | Projection SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|---|
+| R-099 | `arv2-market-cap-stock-qqq-2021-2025-v2` | `47 ARV2_MARKET_CAP_QQQ_R099_2021_2025 - 20260917` / `ARV2 R099 market-cap QQQ 2021-2025 e9851c2f` | `b4aaa521d24568ba294edb9f60b3e1a5756560c82e645894671e34376d009e71` | `bf2fccbf4fd968a53bbc4aed71c2cbab507f89a999258b4d3e50a18b6a744f2b` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-4e7956cfb620dea10a014894` / `4e7956cfb620dea10a014894b6835b159d1216fa5cee5b5718171b1cb7de438d` |
+| R-100 | `arv2-market-cap-stock-spy-2021-2025-v2` | `48 ARV2_MARKET_CAP_SPY_R100_2021_2025 - 20260917` / `ARV2 R100 market-cap SPY 2021-2025 e9851c2f` | `082f3711b9fc91e13e91337c8b5de2593c5ffd36828f42725371d8733121c2d3` | `47c09bd8372440660f100f74396236201b06bcef94c0ec915e5a8bc4ddf88f34` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-cbab031cf694c4e8a9a95a5f` / `cbab031cf694c4e8a9a95a5f8242df679ec6657cb9bf80cee172aec7a74f04d6` |
+| R-101 | `arv2-market-cap-stock-qqq-2019-2023-v2` | `49 ARV2_MARKET_CAP_QQQ_R101_2019_2023 - 20260917` / `ARV2 R101 market-cap QQQ 2019-2023 e9851c2f` | `681f0a9c4703d89aa20d3a968db1343896392308e85f1900ee85e143ef6e2de2` | `eba5ccad36b7565623b256623555138e1b17374b64cf7115568b55b0d9a24271` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-ee0f64f0b4f38e279b8213cc` / `ee0f64f0b4f38e279b8213cc063e285d440b46275735f2e84be35c07db205fb6` |
+| R-102 | `arv2-market-cap-stock-spy-2019-2023-v2` | `50 ARV2_MARKET_CAP_SPY_R102_2019_2023 - 20260917` / `ARV2 R102 market-cap SPY 2019-2023 e9851c2f` | `a85cbef7ae4bd87a7d6b02c53113e613849108c666402b6104b1da59bfd10dd8` | `4ed43740c6ddb91a94612ff2bc9bb812444e37a5eef305cd8fcf291b2692da10` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-dca5b01e7b033570acd4635c` / `dca5b01e7b033570acd4635cf280999710e16e1e9cb9429946fec7c41bfa3930` |
+| R-103 | `arv2-market-cap-stock-qqq-2023-2025-v2` | `51 ARV2_MARKET_CAP_QQQ_R103_2023_2025 - 20260917` / `ARV2 R103 market-cap QQQ 2023-2025 e9851c2f` | `66151b78ad5d86b317163534b12c4b559c4241e451b63386eae8eec9203e7edf` | `ac5fd5856319985da041704d8d0996c8021ee0c47a93a9ebcca10aebff317914` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-47a38e7697e5a34b7c6b6a75` / `47a38e7697e5a34b7c6b6a75030609500b9d249b66658e016e9272b7f57d5f8f` |
+| R-104 | `arv2-market-cap-stock-spy-2023-2025-v2` | `52 ARV2_MARKET_CAP_SPY_R104_2023_2025 - 20260917` / `ARV2 R104 market-cap SPY 2023-2025 e9851c2f` | `1af40154411f1268b351476a750aab91d478191e0a9f3812c3c87a7dff7c921a` | `e2a04227f1aa03e510b2aff2d6fea648d2dd9d7b8e5a6fd8b94cb59ad2d90b90` | `17b4b856849c77359c45f3252dcf0d870c61d25810044e447bf797a7eb5aa144` / 6 | `arv2-preliminary-qc-submission-55bcd6e85ca87a42b8b33b30` / `55bcd6e85ca87a42b8b33b302a751bd525e588e1ea8e98fe91272c1c3edac1ab` |
+| R-105 | `arv2-objective-synthetic-leverage-qqq-2021-2025-v2` | `53 ARV2_LEVERAGE_QQQ_R105_2021_2025 - 20260917` / `ARV2 R105 synthetic 2x3x QQQ 2021-2025 e9851c2f` | `cfe7ef21c3ed87fda713878ef652e6cbbc916b33ce5e4b2c96ffbde7145aaaba` | `3c1ee7562d23be4761ef82f42bd1fd74adb73f71bde2ee0487eec90970dcd400` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-ce5d859fe95202480034b30e` / `ce5d859fe95202480034b30e0de7b416ba40c7d3e2bf67236360b1bc96213fbe` |
+| R-106 | `arv2-objective-synthetic-leverage-spy-2021-2025-v2` | `54 ARV2_LEVERAGE_SPY_R106_2021_2025 - 20260917` / `ARV2 R106 synthetic 2x3x SPY 2021-2025 e9851c2f` | `3cab3fe5711943d8162ba54858cf7cf59487c33f6eedba6a8cab74b0f49c9af1` | `1ca9f6cc4c37271df191c5deb6d6dc8074a9814bd602212448e76387699951a7` | `5593312bfb9c79ecdb0ec9e6ebfa709655e7bb40acdfece13cf53c83a6f0a26d` / 6 | `arv2-preliminary-qc-submission-1f14645f77aa7fdaa75f635f` / `1f14645f77aa7fdaa75f635f1413c91011b4a7f5f6d061a94a47ba63dd77a102` |
+
+Control directories are `accepted_risk_market_cap_r099_20260917_01`
+through `...r104_20260917_01`, then `accepted_risk_leverage_r105_20260917_01`
+and `...r106_20260917_01`, all below the private lane artifact root. Execution
+is sequential: six unlevered runs first, then two leverage runs. Accounting
+transitions are R-099 **80 -> 81 / 23 -> 24 / 591 -> 595**, R-100 **81 -> 82 /
+24 -> 25 / 595 -> 599**, R-101 **82 -> 83 / 25 -> 26 / 599 -> 603**, R-102
+**83 -> 84 / 26 -> 27 / 603 -> 607**, R-103 **84 -> 85 / 27 -> 28 / 607 ->
+611**, R-104 **85 -> 86 / 28 -> 29 / 611 -> 615**, R-105 **86 -> 87 / 29 ->
+30 / 615 -> 619**, and R-106 **87 -> 88 / 30 -> 31 / 619 -> 623**, for
+shared looks / development evaluations / cell floor. Infrastructure looks stay
+27. A launch spends its look even on refusal; cells accrue only from an
+authenticated aggregate. No raw inputs, logs, charts, holdings, orders,
+deployment, broker state, paper/live state, or trading action is authorized.
+
+## R-099 disposition; R-100 through R-106 superseded unspent — 2026-09-17
+
+R-099 launched once in private project `36673484`, backtest
+`5150223203bd90ad8a0de4ac1ec1a3b6`, and reached authenticated
+`Runtime Error` after 69 statistics-free polls. No aggregate result or
+economic cell was emitted or read. A single bounded, no-redirect technical
+diagnostic selected only terminal status, error text, and stack frame. The
+reason was `market-cap stock custom summary exceeded compact bound` at
+simulated `2026-07-28 16:00:00`. Computation reached summary construction;
+the refusal was the 4,096-character QC limit on each custom-statistic value,
+not an observed portfolio outcome.
+
+The lossless technical correction leaves the complete logical summary,
+economics, Decimal strings, and summary digest unchanged. It transports the
+selected and matched 21-field account aggregates as two separate exact
+canonical statistics, rehydrates them on the host, and then applies the
+existing semantic and full-summary identity checks. Direct tests keep every
+market-cap statistic at or below 3,072 characters. The same split is applied
+prospectively to the unrun leverage envelope, whose fixture META was already
+4,079 characters before its production package identity. Historical leverage
+profiles are retained and fresh identities bind the changed exact base source.
+
+Before the successor freeze, counter-review corrected the adapter's stale
+hand-copied infrastructure count of 23. Look accounting now derives 27 from
+the authenticated ledger and refuses disagreement among its declared count,
+actual entries, and total. Direct red/green tests also isolate both compact
+result-size guards.
+
+R-099 spends shared looks **80 -> 81** and ARV2 development evaluations
+**23 -> 24**. Infrastructure looks remain **27** and the lifetime cell floor
+remains **591**. R-100 through R-106 never launched and are superseded unspent.
+R-107 through R-114 are reserved in the same sequence, starting from
+**81 shared looks, 24 development evaluations, 27 infrastructure looks, and
+591 cells**. Their exact physical identities must be committed before any
+external action. No raw row, identifier, price, return, log, chart, holding,
+order, deployment, broker state, paper/live state, or trading action was
+selected or authorized.
+
+## R-107 through R-114 — compact-transport successors (PREREGISTERED; UNRUN) — 2026-09-17
+
+These exact plans were derived from committed source `42a70d7` and are frozen
+before external action. Common package SHA-256:
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+Common host-closure SHA-256:
+`83b9ea687e427042d32b3ecfc818648d0b6a17976537ed97c01dae8636f79e52`.
+
+| Run | Fixed profile | Exact private project / backtest | Projection ID / SHA-256 | Source-set SHA-256 | Names SHA-256 / count | Plan ID / SHA-256 |
+|---|---|---|---|---|---|---|
+| R-107 | `arv2-market-cap-stock-qqq-2021-2025-v2` | `55 ARV2_MARKET_CAP_QQQ_R107_2021_2025 - 20260917` / `ARV2 R107 market-cap QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-f36adb56604326e16faaddfb` / `f36adb56604326e16faaddfbac2cb71f5efb95ca996d5fb828c4c8a2b4871cef` | `c7c191d70e9d657b6800743f216cf7850b3102e96eb1456e4c32ac9a3f68bd3a` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-eadda4e4740d365653ba06f4` / `eadda4e4740d365653ba06f42714c4453732ccd5e7221a086694e3fd749e2e06` |
+| R-108 | `arv2-market-cap-stock-spy-2021-2025-v2` | `56 ARV2_MARKET_CAP_SPY_R108_2021_2025 - 20260917` / `ARV2 R108 market-cap SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-a04a415ca15f4f21fcbdad68` / `a04a415ca15f4f21fcbdad687993201c4f2c58c4abbfef72b59beabd56aced99` | `81dfee62a7255db347a856aab9f03a71ceebeff8cc975b91c3bdbc96c52ace43` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-fd2b13a23ffedbbf10d7793c` / `fd2b13a23ffedbbf10d7793c3018ae8f179b1c15bfb72366411474dc56845c33` |
+| R-109 | `arv2-market-cap-stock-qqq-2019-2023-v2` | `57 ARV2_MARKET_CAP_QQQ_R109_2019_2023 - 20260917` / `ARV2 R109 market-cap QQQ 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-2c9640d0f3922cb4f7267796` / `2c9640d0f3922cb4f7267796d6db57eaba71d236310a62f8947a34d6da62c0ad` | `41a698afa9147ece3a156c7bbf422b1785a7af06007592537a439ae20812ec45` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-de216f4b8e4cbfe7a27f75f9` / `de216f4b8e4cbfe7a27f75f94d363f0878d1323cb6ae8dea7b37b1ee7739eedc` |
+| R-110 | `arv2-market-cap-stock-spy-2019-2023-v2` | `58 ARV2_MARKET_CAP_SPY_R110_2019_2023 - 20260917` / `ARV2 R110 market-cap SPY 2019-2023 e9851c2f` | `arv2-preliminary-qc-projection-a6ae308fe12fccc29e045af8` / `a6ae308fe12fccc29e045af8933d51901ca991ae4773cb726d7b729a7c626b57` | `8971a4f3135506d0b267f4464ef0d9099af44748f95dc06164ed54669718a45e` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-a5d38b3ee76d6175e4ff7fe7` / `a5d38b3ee76d6175e4ff7fe72102a7963cc0cc954457e0f2e7f5f78d96152033` |
+| R-111 | `arv2-market-cap-stock-qqq-2023-2025-v2` | `59 ARV2_MARKET_CAP_QQQ_R111_2023_2025 - 20260917` / `ARV2 R111 market-cap QQQ 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-0753f411be2df3978b5b57a9` / `0753f411be2df3978b5b57a949e1f459dca56db8368183bcebf91e6bafab391c` | `3e20a45171a31a26877f7a6457d74d0c77d9ef90ab22fe125d2fd95cf4fd68a9` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-424d9cdedac79722bd81ebb4` / `424d9cdedac79722bd81ebb4be391a64056d086cc20f0ded2bc8df1ae2edd067` |
+| R-112 | `arv2-market-cap-stock-spy-2023-2025-v2` | `60 ARV2_MARKET_CAP_SPY_R112_2023_2025 - 20260917` / `ARV2 R112 market-cap SPY 2023-2025 e9851c2f` | `arv2-preliminary-qc-projection-764e182dc5a5a74396e0fae7` / `764e182dc5a5a74396e0fae7cdfd0887b7815ab31ff4d186261506a0a0e34faf` | `40b7de4d536b10bcd167e9d661cb5b5f26b6df2e10cd0585e84058399b22b2bf` | `9d6fecefdaa6dc007ec10ef1b2f6bfe7d1630c1a00c7b6a3fd66f66d039c18dd` / 8 | `arv2-preliminary-qc-submission-2cdb3f970f775ea1a912fe8e` / `2cdb3f970f775ea1a912fe8eff5749969bb12fa4cead76e39c08383e1e4a512b` |
+| R-113 | `arv2-objective-synthetic-leverage-qqq-2021-2025-v3` | `61 ARV2_LEVERAGE_QQQ_R113_2021_2025 - 20260917` / `ARV2 R113 synthetic 2x3x QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-52907f340a720ec888edeb14` / `52907f340a720ec888edeb144a1d5b3e8e0cd95a3910402f3f74d30872aaad6b` | `c4355c7403af700218847381dc7ce49d4cc747b7ea0256df6ab920587be2ade4` | `5650cc7e2eb2a24c2ea9473247d642ecbf4979a7bd1551f60cc18a6a2ec94795` / 8 | `arv2-preliminary-qc-submission-792aa49935732f52ea569b79` / `792aa49935732f52ea569b79f22531e8666fdd2d363ace9a46e1142d3a624dae` |
+| R-114 | `arv2-objective-synthetic-leverage-spy-2021-2025-v3` | `62 ARV2_LEVERAGE_SPY_R114_2021_2025 - 20260917` / `ARV2 R114 synthetic 2x3x SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-d632fa55f2944af89dee416e` / `d632fa55f2944af89dee416e0f452e90a7e3ecad2d4644781a0fe7bd1e25322b` | `e1b106a37df7ed176829199ae4a9d8e598997145b0c70a42b545cc88665af9aa` | `5650cc7e2eb2a24c2ea9473247d642ecbf4979a7bd1551f60cc18a6a2ec94795` / 8 | `arv2-preliminary-qc-submission-5c7657556d6e0c80a66933ac` / `5c7657556d6e0c80a66933acfb7a9b254943128c9c16167711d62c18eb7f9c5d` |
+
+Control directories are respectively
+`accepted_risk_market_cap_r107_20260917_01` through
+`accepted_risk_market_cap_r112_20260917_01`, then
+`accepted_risk_leverage_r113_20260917_01` and
+`accepted_risk_leverage_r114_20260917_01`, below the private lane artifact
+root. R-107 is the mandatory first run; no later run launches unless its
+aggregate is tangible. After that gate, the six unlevered runs remain first
+and the two synthetic-leverage runs remain last, all sequentially on the one
+subscribed node.
+
+Accounting by launch/result is: R-107 **81 -> 82 / 24 -> 25 / 591 -> 595**,
+R-108 **82 -> 83 / 25 -> 26 / 595 -> 599**, R-109 **83 -> 84 / 26 -> 27 /
+599 -> 603**, R-110 **84 -> 85 / 27 -> 28 / 603 -> 607**, R-111 **85 -> 86 /
+28 -> 29 / 607 -> 611**, R-112 **86 -> 87 / 29 -> 30 / 611 -> 615**,
+R-113 **87 -> 88 / 30 -> 31 / 615 -> 619**, and R-114 **88 -> 89 / 31 -> 32 /
+619 -> 623**, for shared looks / development evaluations / lifetime cell
+floor. Infrastructure looks remain **27**. A launch spends its look and
+evaluation even on technical failure; cells accrue only after one
+authenticated aggregate read. No raw row, identifier, price, log, chart,
+holding, order, deployment, broker state, paper/live state, or trading action
+is authorized.
+
+## R-107 — QQQ 2021--2025 market-cap diagnostic (AUTHENTICATED; TANGIBLE) — 2026-09-17
+
+Private project `36681064`, backtest
+`c21434bbcbca52aa4d7e105e5612892b`, completed after 19 statistics-free
+polls. One bounded read authenticated result receipt
+`arv2-preliminary-qc-result-58e924566071b88a7f46b704`, SHA-256
+`58e924566071b88a7f46b704463221aea869a8df06989321dd2c0173aeb049ff`.
+Exactly eight preregistered aggregate statistics were selected; logs, charts,
+orders and raw provider rows were not selected.
+
+| Cost per side | Selected cumulative | Matched cumulative | Selected - matched | SPY cumulative | Selected - SPY |
+|---:|---:|---:|---:|---:|---:|
+| 0 bps | 72.09% | 116.44% | -44.35 pp | 95.67% | -23.58 pp |
+| 5 bps | 69.23% | 115.37% | -46.15 pp | 95.67% | -26.44 pp |
+| 10 bps | 66.41% | 114.31% | -47.90 pp | 95.67% | -29.25 pp |
+| 20 bps | 60.92% | 112.21% | -51.29 pp | 95.67% | -34.74 pp |
+
+At the primary 10-bps cost, selected annualized arithmetic return was 16.34%,
+annualized volatility 34.91%, Sharpe 0.468, Sortino 0.659, maximum drawdown
+-67.89%, average cash 2.00%, and average daily two-sided turnover 2.683%.
+Matched annualized return was 18.12%, volatility 23.64%, Sharpe 0.766,
+drawdown -35.34%, cash 2.00%, and daily turnover 0.789%. Costs do not explain
+the negative selection gap, and neither does cash.
+
+The profile averaged 82.64 point-in-time eligible names, 82.63 scored names,
+and 8.80 selected names. Selected effective breadth averaged only 3.26: the
+mean largest position was 48.30% and the observed maximum was 77.68%. Matched
+effective breadth was 12.63, with a 16.86% mean largest position and 22.45%
+maximum. This is preliminary evidence against the ranking under this exact
+market-cap QQQ-proxy construction; it is not a formal disposition, remains
+price-proxy conditioned, and QQQ is not all Nasdaq-listed stocks.
+
+The owner's tangible-result prerequisite is satisfied. R-107 moves accounting
+to **82 shared looks, 25 development evaluations, 27 infrastructure looks,
+and 595 cells**. R-108 is next; the remaining unlevered windows precede both
+synthetic-leverage runs. No deployment, broker, order, paper/live, or trading
+authority follows.
+
+## R-108 — SPY 2021--2025 market-cap diagnostic (AUTHENTICATED; TANGIBLE) — 2026-09-17
+
+Private project `36682033`, backtest
+`df4bc6f06e1e2bee0237c9b8296b502c`, completed after 63 statistics-free
+polls. One bounded read authenticated result receipt
+`arv2-preliminary-qc-result-e01efc5b388bdb3ccd280c86`, SHA-256
+`e01efc5b388bdb3ccd280c8670fc8d7e0c6f1f5ff14f444be3376dc390fbf8ff`.
+Exactly eight preregistered aggregate statistics were selected; logs, charts,
+orders and raw provider rows were not selected.
+
+| Cost per side | Selected cumulative | Matched cumulative | Selected - matched | SPY cumulative | Selected - SPY |
+|---:|---:|---:|---:|---:|---:|
+| 0 bps | 113.96% | 90.56% | +23.40 pp | 95.67% | +18.29 pp |
+| 5 bps | 111.15% | 89.66% | +21.49 pp | 95.67% | +15.49 pp |
+| 10 bps | 108.38% | 88.77% | +19.61 pp | 95.67% | +12.71 pp |
+| 20 bps | 102.94% | 87.01% | +15.94 pp | 95.67% | +7.28 pp |
+
+At 10 bps, selected annualized arithmetic return was 17.09%, volatility
+21.58%, Sharpe 0.792, Sortino 1.110, drawdown -29.99%, cash 2.00%, and average
+daily two-sided turnover 2.111%. Matched return was 14.16%, volatility 16.64%,
+Sharpe 0.851, drawdown -24.88%, cash 2.00%, and turnover 0.751%. Selection adds
+return across every frozen cost case but does not improve matched Sharpe or
+drawdown.
+
+The profile averaged 459.53 point-in-time eligible names, 459.52 scored names,
+and 46.52 selected names. Selected effective breadth averaged 10.76, mean
+largest position was 24.34%, and maximum position was 41.87%; matched values
+were 57.74, 7.21%, and 8.63%. The result is promising preliminary evidence for
+the broad SPY-universe construction, not formal acceptance, and remains
+price-proxy conditioned.
+
+R-108 moves accounting to **83 shared looks, 26 development evaluations, 27
+infrastructure looks, and 599 cells**. R-109 through R-114 stay unlaunched and
+unspent. The owner directs a push of this completed round before one common
+bounded benchmark-tilt QQQ/SPY implementation. No deployment, broker, order,
+paper/live, or trading authority follows.
+
+## R-115 and R-116 — sector-neutral bounded analyst-revision tilt (PREREGISTERED; UNRUN) — 2026-09-18
+
+These exact identities were derived from committed source `18762e5` before
+any external action. Common accepted-risk package SHA-256:
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`.
+Common host-closure ID / SHA-256:
+`arv2-preliminary-qc-host-closure-880f59420a7e544ebb58675a` /
+`880f59420a7e544ebb58675ab76ca2a40d975864a082489de91f8233e0d8578c`.
+Expected statistic-names SHA-256 / count:
+`f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f`
+/ 9.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256 | Source-set SHA-256 | Plan ID / SHA-256 |
+|---|---|---|---|---|---|
+| R-115 | `arv2-market-cap-stock-qqq-2021-2025-v3` / `9efa7e09241f0f20772260e4e6852bb8a71c46cdc77264cfd10e2b569a4b1b00` | `63 ARV2_BOUNDED_TILT_QQQ_R115_2021_2025 - 20260918` / `ARV2 R115 bounded-tilt QQQ 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-9a0e032ec3ff82f9460cfcbd` / `9a0e032ec3ff82f9460cfcbd2a2405cca6ab526b32c891debc3a08fbc48ac359` | `75ce6368243c08cfb6bce9b4ed43130eeb6947092a41b98bd9918ff082f8a831` | `arv2-preliminary-qc-submission-21e34eaadc8638d8613958b0` / `21e34eaadc8638d8613958b00280d655a022737091b6f759197e1c3696cb58cc` |
+| R-116 | `arv2-market-cap-stock-spy-2021-2025-v3` / `8ac07f9fe48d2d6448d4adeb5b2f53c364bad8d4ee3eacd8a23a40a509eb8e38` | `64 ARV2_BOUNDED_TILT_SPY_R116_2021_2025 - 20260918` / `ARV2 R116 bounded-tilt SPY 2021-2025 e9851c2f` | `arv2-preliminary-qc-projection-4eb39a51d842203d91d191de` / `4eb39a51d842203d91d191deb929c396a26a9a03bfc35de0a2b60416f3235516` | `53b226cff014c6533b85f11422af802f4fc2c3b8c065f88aee674b9100b9436f` | `arv2-preliminary-qc-submission-deb002cc0a33890211973d8e` / `deb002cc0a33890211973d8e4d6d36652cba708c5ed3c5aafbcedfc720a482b3` |
+
+Control directories are
+`accepted_risk_bounded_tilt_r115_20260918_01` and
+`accepted_risk_bounded_tilt_r116_20260918_01` below the private lane artifact
+root. R-109 through R-114 are superseded unlaunched and unspent; changed
+source/V3 identities named-refuse them before network while their historical
+validators remain available.
+
+The matched account is the full point-in-time eligible proxy universe at
+market-cap weights and exact frozen 98% gross. The R-055 firm-specific
+analyst-revision score is only a bounded overlay, never an admission gate.
+Missing/zero score means exact benchmark weight. A tilt requires at least 40
+ranked, 20 positive, and 20 negative names; all transfers stay within exact
+point-in-time sector. One-way active share is at most 4.9%, each name remains
+within 0.8x--1.2x benchmark weight, absolute overweight is at most 0.0049,
+and selected HHI is at most 1.44x benchmark HHI. Infeasible breadth or sector
+cross-funding yields exact benchmark / `TILT_UNDERFILLED`. Execution does not
+redistribute unavailable or stale-locked budget.
+
+Pre-observation diagnostic ranges are mean eligible count **60--110** and
+effective breadth **>=8** for R-115, and **350--550** / **>=35** for R-116;
+breadth cannot exceed eligible count. Frozen gross is exactly 98%. Executed
+gross may differ only through named missing-price sector underfill or
+above-target stale-lock exceptions. These are broad diagnostics, not return
+predictions. QQQ and SPY are point-in-time holdings proxies, not claims of
+official historical index membership; QQQ is not all Nasdaq-listed stocks.
+
+Each aggregate binds benchmark logical ID, total-return normalization,
+session-open observation, actual used first/last sessions, **1,254** used
+benchmark observations, **1,253** benchmark return intervals, exact Decimal
+canonicalization, a raw-observation digest, and a scale-invariant return-path
+digest. No raw benchmark price is emitted. The primary comparison is selected
+minus matched at 10 bps per side; the full 0/5/10/20-bps ladder, SPY reference,
+risk, breadth, bound, provenance, and execution-exception diagnostics are
+reported without winner selection.
+
+R-115 must terminally close and its single nine-statistic aggregate read must
+authenticate before R-116 launches on the one subscribed node. Accounting is
+R-115 **83 -> 84 looks / 26 -> 27 development evaluations / 599 -> 603
+cells**, then R-116 **84 -> 85 / 27 -> 28 / 603 -> 607**. Infrastructure
+looks remain 27. A launch spends one look/evaluation even on technical
+failure; cells accrue only after authenticated result read. No raw rows,
+identifiers, prices, returns, logs, charts, holdings, orders, deployment,
+broker, paper/live, or trading access is authorized.
+
+## R-115 terminal technical failure; R-116 superseded unspent — 2026-09-18
+
+R-115 launched once in private project `36700291`, backtest
+`71335e98ebdc333a7291cc4d8a33033d`, and reached authenticated `Runtime Error`
+after 64 statistics-free polls. Terminal receipt
+`arv2-preliminary-qc-terminal-0468412659f8dbd15f945f35`, SHA-256
+`0468412659f8dbd15f945f3512fa887984aab465f61b99cfeed9374b76b941b3`,
+records no selected result value. No result authority, result-read permit,
+aggregate, or economic cell exists.
+
+One bounded diagnostic selected only status, error, and stack. The exact
+refusal was `benchmark tilt membership mapping is not exhaustive`: the full
+cap-eligible point-in-time proxy includes structural-zero names outside the
+analyst package's sector-labelled security census. The prospective V4
+correction may assign a deterministic reserved sector only to an unmapped
+name that also has no R-055 score; that name stays at exact benchmark weight
+and cannot transfer weight. Mapped/scored names still require exact sectors,
+and scored-but-unmapped names refuse. This changes no observed economic value
+because none was emitted.
+
+R-115 moves accounting to **84 shared looks, 27 development evaluations, 27
+infrastructure looks, and 599 cells**. R-116 created no project/backtest and
+is superseded unspent. Fresh R-117/R-118 successors will move accounting
+**84 -> 85 / 27 -> 28 / 599 -> 603**, then **85 -> 86 / 28 -> 29 / 603 ->
+607**, if their result reads authenticate. No raw row, identifier, price,
+return, statistic, log, chart, holding, order, deployment, broker, paper/live,
+or trading access occurred.
+
+The prospective V4 implementation assigns the reserved structural-zero
+sector only to an unscored, unmapped eligible name; it preserves that name's
+exact benchmark weight and refuses any scored mapping gap. Active V4 profile
+SHA-256s are `40626bc6fa7391a0660d93fc553b288d3f1db8c5a1704d784597560a93c44be1`
+(QQQ) and `73629240645c04164b81d646ba982b9d8d767ea6d09c1b90e3276291bafa517d`
+(SPY). The fresh V4 projection ceiling is 268,000 bytes with at least 4,096
+bytes tested headroom; historical V1--V3 projections retain 260,000 bytes.
+Independent prelaunch audit accepted the corrected implementation with zero
+open findings after one P2 cap-scope correction and two P3 guard-isolation
+tests; its final combined rerun was **414 passed**. This records no additional
+research look or outcome.
+
+## R-117 and R-118 — corrected sector-neutral bounded tilt (PREREGISTERED; UNRUN) — 2026-09-18
+
+The exact V4 plans were derived from committed correction `bbd146b` before
+external action. Common package SHA-256 is
+`e9851c2f3bc3f66d761dbff2fcbd6d56ef94cf390e4f5ed30abf37ec89cab3d9`;
+common host-closure SHA-256 is
+`1a49740d46a2e78fcd165ed5bb3b6eeeb7afbbc6195a2f559a9ab4409d0c4cbd`
+over 138 sources; expected statistic-names SHA-256 / count is
+`f59ff651cb2ecaab093da08c9aeb4362197051364aee0b8ae762dc3e5f70745f`
+/ 9.
+
+| Run | Profile SHA-256 | Project / backtest | Projection SHA-256 | Source-set SHA-256 | Plan SHA-256 |
+|---|---|---|---|---|---|
+| R-117 QQQ | `40626bc6fa7391a0660d93fc553b288d3f1db8c5a1704d784597560a93c44be1` | `65 ARV2_BOUNDED_TILT_QQQ_R117_2021_2025 - 20260918` / `ARV2 R117 bounded-tilt QQQ 2021-2025 e9851c2f` | `9282078935951665f11d4dbb35e1acb3cf483c8c0343d5f21bc7cb0ec17427bb` | `9597182483e25ef95ac1cb3b16de6cd0c1274e39336ae48f7c0b3476364cdde8` | `01c401e5f454590352a066eb4882f601a3be8233dced87be71c05c678f3cdf80` |
+| R-118 SPY | `73629240645c04164b81d646ba982b9d8d767ea6d09c1b90e3276291bafa517d` | `66 ARV2_BOUNDED_TILT_SPY_R118_2021_2025 - 20260918` / `ARV2 R118 bounded-tilt SPY 2021-2025 e9851c2f` | `e2ed50ee4a31f1f1569d30d41bdbde7f13b384cd4f161f83ed09b0a0d4f2423a` | `a1eaaa3948d570270516ce2844385f3cf6b66bc0348d619fb5bb9a57a0169057` | `f813898c486e9b70176ab5cdbe6142b28cf6a8b7cd89c20217344b07e8481772` |
+
+Each projection is 259,810 bytes. R-117 must close and authenticate at most
+one aggregate read before R-118 launches. Planned accounting is R-117 **84 ->
+85 looks / 27 -> 28 development evaluations / 599 -> 603 cells**, then R-118
+**85 -> 86 / 28 -> 29 / 603 -> 607**. No outcome has yet been selected.
+
+## R-117 and R-118 — corrected sector-neutral bounded tilt (AUTHENTICATED; TANGIBLE PRELIMINARY) — 2026-09-18
+
+Both preregistered V4 runs reached authenticated terminal `Completed.` and
+each consumed exactly one aggregate-only result read selecting the nine
+expected custom statistics. No raw provider row, security identifier, price
+series, return series, log, chart, holding, or order was selected.
+
+| Run | Private QC identity | Result receipt | 10-bps selected | 10-bps matched | Selected - matched | SPY reference | Selected - SPY |
+|---|---|---|---:|---:|---:|---:|---:|
+| R-117 QQQ holdings proxy | project `36703035`; backtest `b58922a90d5c361212525375325a119b` | `arv2-preliminary-qc-result-4cf76e6155b6b13bce661a52`; SHA-256 `4cf76e6155b6b13bce661a523a096ddcd2ca753b9c593e37ec2d6415bc580f9c` | +115.3069% | +114.3127% | **+0.9942 pp** | +95.6663% | +19.6405 pp |
+| R-118 SPY holdings proxy | project `36704537`; backtest `ee3820c9459206957e6e824e5bfbb597` | `arv2-preliminary-qc-result-2d032398e9155c1a79727e98`; SHA-256 `2d032398e9155c1a79727e98c03534edc269020c6e1fae03169db4583c406704` | +89.5224% | +88.7752% | **+0.7471 pp** | +95.6663% | -6.1440 pp |
+
+R-117 terminal SHA-256 is
+`4811287d41a935db0b5e975fba5a20351b1c6fd5509ed7621badca7fe3c23b25`
+and its selected-statistics SHA-256 is
+`32458947e2b645f124293691f51e4a0d50561423818380219846a62d7f630725`.
+R-118 terminal SHA-256 is
+`21d91a79580e11f9fa1a10c741e8193b78cd2abf017bc7633367b7f648fad4ed`
+and its selected-statistics SHA-256 is
+`6c372c160e32119d6b808e7815299ae7291834c7e1c70c18e4fea21ee25de963`.
+
+At 10 basis points per side, R-117 reports 18.2303% annualized arithmetic
+return, 23.7224% annualized volatility, 0.7685 zero-rate Sharpe, 1.0880
+Sortino, and -35.5455% maximum drawdown. R-118 reports 14.2417%, 16.6788%,
+0.8539, 1.2175, and -25.0061%, respectively. Mean cash is approximately 2%
+for both; maximum one-way active share is 2.4382% for R-117 and 3.3106% for
+R-118.
+
+The bounded overlay added about 0.99 percentage point to its matched
+QQQ-holdings proxy and 0.75 percentage point to its matched SPY-holdings proxy
+over five years after modeled primary cost. R-117 did not include an actual
+QQQ ETF total-return comparator, so its selected-minus-SPY field is not a QQQ
+hurdle. R-118 lagged its SPY reference. These are modest, preliminary,
+single-window results and do not authorize leverage, paper/live use, or
+trading.
+
+The common SPY reference is bound to raw-observation SHA-256
+`8c10999f1754960868d7ca201c63fde386aab7a14e5c8ed6015696be01c7fe78`
+and return-path SHA-256
+`8c9c9296977070c78423bb35f8a3fb5f7538f62892b23d721703757d7b403762`.
+Its +95.6663% differs from the earlier +94.2074% data vintage; only comparisons
+inside one bound envelope share a basis. R-117 reports two partial rebalance
+decisions and 22 stale-mark sessions; R-118 reports five and 47. The recorded
+outputs preserve those conservative exceptions rather than hiding them.
+
+R-117 and R-118 close accounting at **86 shared looks, 29 ARV2 development
+evaluations, 27 infrastructure looks, and 607 cells**. No deployment, broker,
+paper/live, funded-account, or trading authority follows.
+
+## R-119 and R-120 — QQQ bounded-tilt simulated order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+No external action or outcome access occurred before this entry. Both physical
+identities were reconstructed from committed implementation `9dc044a`. Common
+delta package ID / SHA-256 / lineage SHA-256:
+`arv2-preliminary-qc-package-7803b84f0841f9685a4951de` /
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Expected aggregate-statistic inventory SHA-256 / count:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`
+/ 2.
+
+| Run | Profile ID / SHA-256 | Exact private project / backtest | Projection ID / SHA-256; source SHA-256 | Plan ID / SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-119 | `arv2-qqq-order-level-tilt-2026-cutoff-v1` / `f2418eafc7777a6a814d8c73fd4563f5e552aa3c9cc1f2fa8b1cd98a338c5a7f` | `67 ARV2_QQQ_ORDER_R119_2026_YTD - 20260918` / `ARV2 R119 QQQ order-level 2026 YTD 7803b84f` | `arv2-order-level-qc-projection-6774b3c7f8394a68e46c86e2` / `6774b3c7f8394a68e46c86e207a5e74f533f981b09d3dfd6ee0562bb72d6d024`; `c4cb758f4943df06dd2284276d59a3049b7ca3663c866fc52b1d0834e2fe39e4` | `arv2-order-level-plan-b0e00b70cb866c4a858b2eef` / `b0e00b70cb866c4a858b2eefb901f5d25b327e81cd80904e89dac1a3229e7287`; `6d3b5922fcd5074550fbeb4fe869d08882bc640ef621ef4e72b8aba9a92a79f9` |
+| R-120 | `arv2-qqq-order-level-tilt-2025-cutoff-v1` / `8a2d1ffbcf2fc6bd7a85931f390e58e77feac1bf26b9b840ba9cd727439df2b1` | `68 ARV2_QQQ_ORDER_R120_2025_NOW - 20260918` / `ARV2 R120 QQQ order-level 2025-now 7803b84f` | `arv2-order-level-qc-projection-ba032031df5c1e611961253f` / `ba032031df5c1e611961253f6c98a5250e1306a04f0b321938732c4fee2e6336`; `b4f84254bc609372145d58418450cfa3b93981e8df3a18bc08a3fff9d9284707` | `arv2-order-level-plan-344657ab3d9d871868405d91` / `344657ab3d9d871868405d9143ca9e23989e2dac120c3f08afb67b13aff6bcbc`; `99058ce096accd2ffcc60876686bf67df5088220e363b419cfde90427392b88b` |
+
+R-119 freezes 2026-01-02 through 2026-09-17, with first simulated
+market-on-open execution on 2026-01-05, 39 weekly decisions, 178 observations,
+and 177 return intervals. R-120 freezes 2025-01-02 through 2026-09-17, with
+first execution on 2025-01-03, 91 decisions, 428 observations, and 427
+intervals. Both stop new decisions on 2026-09-16. The selected account is the
+QQQ point-in-time holdings proxy plus the unchanged bounded sector-neutral
+R-055 tilt; its primary hurdle is an execution-matched 98%-QQQ / 2%-cash
+account entering at the same first open. Both use RAW prices, whole-share
+market-on-open simulation, exact QC fees, zero slippage, and the frozen
+10-basis-point-per-side modeled-cost check. No expected sign or winner was
+selected.
+
+R-119 launch moves accounting **86 -> 87 shared looks / 29 -> 30 development
+evaluations**, and an authenticated aggregate adds one cell **607 -> 608**.
+R-120 is sequential and, only on that authenticated baseline, moves **87 ->
+88 / 30 -> 31 / 608 -> 609**. Infrastructure looks remain 27. A technical
+failure still spends its look/evaluation and adds no cell; missing R-119 cell
+requires a fresh successor accounting entry before R-120. No raw provider or
+security row, raw order/fill, holding, price, return, log, chart, standard
+statistic, deployment, broker, paper/live, funded-account, or real-trading
+access is authorized.
+
+## R-119 — QQQ bounded-tilt 2026 simulated-order diagnostic (TERMINAL TECHNICAL FAILURE; ZERO CELLS) — 2026-09-18
+
+R-119 created private project `36714332` and backtest
+`d025d903f859e4825e657d8cbb268d3f`, then reached authenticated `Runtime
+Error` on its first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-7b5ef3f33095183afc1c489a`, SHA-256
+`7b5ef3f33095183afc1c489acd6bfa29d6b4b58e1dbb92358e81cc347e341baa`,
+contains no statistic. No result-read authority or result read exists.
+
+A separately bounded diagnostic selected only terminal status and error/stack
+fields. It read no statistic, chart, order, fill, holding, price, return, or
+provider/security row. The error was `order-level PIT fundamentals collection
+is outside the authenticated session axis` on the first 2026-01-02 decision:
+a legitimate 2026-01-01 holiday fundamental-availability collection was not
+itself an exchange-session key. This is a technical refusal before simulated
+orders or economic output, not positive or negative strategy evidence.
+
+R-119 spends **86 -> 87 shared looks** and **29 -> 30 ARV2 development
+evaluations** but adds zero cells, leaving **607 cells** and 27 infrastructure
+looks. R-120 created no project or backtest and is superseded unlaunched and
+unspent because its fixed 608-cell baseline and source identities are no
+longer true. The correction permits non-session availability mapping only for
+fundamentals, retains exact-session constituent evidence, and also closes the
+same latent defect in the unrun six-universe runtime. Fresh R-121/R-122 order
+successors require new committed identities and accounting; the unpreregistered
+six-universe pair moves to R-123/R-124.
+
+## R-121 and R-122 — corrected QQQ bounded-tilt simulated order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+These successors were derived from committed correction `0baa9f9` before any
+external action. Common package SHA-256 / lineage SHA-256:
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f` /
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`.
+Expected two-statistic inventory SHA-256:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-121 | `f2418eafc7777a6a814d8c73fd4563f5e552aa3c9cc1f2fa8b1cd98a338c5a7f` | `69 ARV2_QQQ_ORDER_R121_2026_YTD - 20260918` / `ARV2 R121 QQQ order-level 2026 YTD 7803b84f` | `8de56ffcd17937b35d5fdaa3d3ae2521082e6ad506eac75c4b67cf7cdf40c6ef`; `82adba43422f4df78c7a53e52964f473ba10d1734715ff807993543dd9f48189` | `fa14e323fca96b51a42c4df65d2201699a117620c8a395078104bd8f8b87019a`; `ff4261a648e05980d7b64f005e54b8854a13094a0caee9339555a78e07fb1f8f` |
+| R-122 | `8a2d1ffbcf2fc6bd7a85931f390e58e77feac1bf26b9b840ba9cd727439df2b1` | `70 ARV2_QQQ_ORDER_R122_2025_NOW - 20260918` / `ARV2 R122 QQQ order-level 2025-now 7803b84f` | `58eff6df2808f9eaed1b1f7564828f970c9c180bd258b66913126f7ebeb8fe03`; `34787c0f167b955679d50c2d3fd7e09c6246d1b13ead6b5e43b0d515ea80ab98` | `cb9c26389c563fab942d6764b56a646ca3537bfcf3c2a71349f40ba67d8fb5df`; `2ace00bb95cf12b89014c6e4d9398a7184077d8e0befc87604e215f7331e3a12` |
+
+R-121 uses the 2026-01-02 through 2026-09-17 window; R-122 uses
+2025-01-02 through 2026-09-17. Both preserve the section-111 QQQ PIT proxy,
+bounded sector-neutral R-055 tilt, weekly after-close decision, next-session
+whole-share market-on-open simulation, RAW prices, exact engine fees, zero
+slippage, 10-basis-point modeled-cost check, 98% target gross, and
+execution-matched QQQ hurdle. No expected sign or winner was selected.
+
+Starting accounting is **87 shared looks, 30 ARV2 development evaluations, 27
+infrastructure looks, and 607 cells**. R-121 launch moves to **88 / 31** and
+an authenticated aggregate to 608 cells. Only then may R-122 launch, moving to
+**89 / 32**, with its authenticated aggregate moving to 609 cells. A technical
+failure adds no cell and requires fresh successor accounting. No raw result,
+order/fill, or paper/live/trading access is authorized.
+
+## R-121 — corrected QQQ 2026 simulated-order diagnostic (TERMINAL COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-121 created private project `36714714` and backtest
+`72cdee2ca23378f8f36bbaae9df739d3`, then reached authenticated `Runtime
+Error` on its first statistics-free poll. Terminal receipt
+`arv2-order-level-terminal-6d0fe804193067cb7a05d5fd`, SHA-256
+`6d0fe804193067cb7a05d5fd9be77a7735bb4dd1ba14e3df37ba7410b708f652`,
+contains no statistic. No result-read authority or result read exists.
+
+A bounded diagnostic selected only terminal status and error/stack fields.
+The exact refusal was `order-level PIT QQQ market-cap constituent-weight
+coverage is below 99 percent` on 2026-01-02. It occurred before any simulated
+order or economic output and is not strategy evidence. R-121 spends **87 ->
+88 shared looks / 30 -> 31 development evaluations**, adds zero cells, and
+leaves **607 cells / 27 infrastructure looks**. R-122 created no project or
+backtest and is superseded unlaunched/unspent.
+
+The prospective successor versions the profile and lowers this outcome-free
+data-admission floor to 95%, while retaining exact achieved coverage and its
+path digest in the authenticated aggregate; below 95% still refuses. Covered
+market caps renormalize to 98% gross, so the result remains an accepted-risk
+QQQ proxy rather than pristine QQQ replication. Fresh
+R-123/R-124 order runs require committed identities and accounting. The
+unpreregistered six-universe pair moves to R-125/R-126.
+
+## R-123 and R-124 — versioned 95%-coverage QQQ simulated-order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+The V2-profile / V4-summary source was committed at `70b8e65` before physical
+identity derivation. Both runs use immutable package SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`
+and expected two-statistic inventory SHA-256
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-123 | `e79316b50d9a53f04418d971357278bca2dd5db43eea33e28da25cda785163dc` | `71 ARV2_QQQ_ORDER_R123_2026_YTD - 20260918` / `ARV2 R123 QQQ order-level 2026 YTD 7803b84f` | `5b131125e51007be32e2bd4d6adf52fe8ed277bcb07dd2cfdc7f2386cfb92b92`; `80aca057fcdfc3e0a5167cb311a29afd5895698708227da8c0f876f0950a8035` | `88bddb88428a50e221bfa527899fb7386256b4c33fef77d29252928bc4b42067`; `bed1fedd6eb1b61790bd6554b53b20c818b5b817df9f896748b6f58a848e4ea6` |
+| R-124 | `6d4b7c4fe50ca93a32fcdd113a3fcba607897f0e83e00c073f0fc0c9198826e8` | `72 ARV2_QQQ_ORDER_R124_2025_NOW - 20260918` / `ARV2 R124 QQQ order-level 2025-now 7803b84f` | `cf307d99646612ab3c443aac04a8ff610a2a331aa705359e7ac63110e2b16b00`; `f3ba0611d11b00f9c48dd5bf6dc0f698e2a179c11095d2f8d02daa117dfaa3a6` | `2e7906f9a17b1ad1f815574116c983af112df3597269efa10fabe68dd2a23a00`; `a7550739c93ecf4c742ddf12a242922098fefeab4f85118a80f438b6504db120` |
+
+R-123 covers 2026-01-02 through 2026-09-17. R-124 covers 2025-01-02
+through 2026-09-17 and is strictly sequential. The frozen 95%-coverage rule
+excludes uncovered names, discloses exact missing weight and path digest, and
+renormalizes covered market caps to 98% gross; these are accepted-risk QQQ
+proxies rather than pristine QQQ replication. No expected sign or winner was
+selected.
+
+Starting accounting is **88 shared looks, 31 ARV2 development evaluations, 27
+infrastructure looks, and 607 cells**. R-123 launch moves to **89 / 32** and an
+authenticated aggregate to 608 cells. Only then may R-124 launch, moving to
+**90 / 33**, with its aggregate moving to 609 cells. A technical failure adds
+no cell and requires a fresh successor. No raw result, order/fill, or
+paper/live/trading access is authorized.
+
+## R-123 — versioned 95%-coverage QQQ simulated-order diagnostic (TERMINAL COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-123 created private project `36714951` and backtest
+`7fb5cfba0fdb6ebe27c3a71376c239e6`, then reached `Runtime Error` on its
+first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-4b202bb06eabfb5e7689957a`, SHA-256
+`4b202bb06eabfb5e7689957a51e15719cbc3b31491991340d2608725cc16f3ae`,
+contains no statistic. No aggregate read or result-read authority exists. A
+bounded diagnostic selected only status/error/stack; no statistic, chart,
+order, fill, holding, price, return, or provider/security row was selected.
+
+The exact refusal was `order-level PIT QQQ market-cap constituent-weight
+coverage is below 95 percent` on 2026-01-02. The achieved ratio was not
+exposed by the failed V2 profile. No simulated order or economic output
+occurred; it is not signal evidence. R-123 spends **88 -> 89 shared looks / 31
+-> 32 development evaluations**, adds zero cells, and leaves **607 cells / 27
+infrastructure looks**. R-124 created no project or backtest and is
+superseded unlaunched/unspent.
+
+A prospective V3-profile/V5-summary successor sets a 90% cap-covered QQQ
+weight floor with exact ratio on refusal; below 90% still refuses. Above it,
+uncovered names are excluded and covered caps renormalize to 98% gross. This
+remains an accepted-risk QQQ proxy rather than pristine QQQ replication: 90%
+is relative to reported positive constituent weight, which can be 95% of
+notional, so absolute covered weight may be as low as **85.5%**. This is a
+preliminary diagnostic, not a formal or live-ready coverage claim.
+Fresh R-125/R-126 order runs require committed identities and accounting; the
+unpreregistered six-universe pair moves to R-127/R-128.
+
+## R-125 and R-126 — 90%-coverage QQQ simulated-order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+The V3/V5 order source was committed at `91a5240` before physical derivation.
+Common immutable package SHA-256:
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+expected two-statistic inventory SHA-256:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-125 | `6348a47e0fd8806dc5222b98f9ff7923e357adc46ae7c0a6a92e4efed1643158` | `73 ARV2_QQQ_ORDER_R125_2026_YTD - 20260918` / `ARV2 R125 QQQ order-level 2026 YTD 7803b84f` | `46d6e1789a7269ed0c4e9ac6ba4d7399ddff6e64f8e6a2cf39e0b111c7ab713c`; `19579eada5b8322af74f996436df0b79919d489613144c9e69689b7f019aa2ae` | `ddc6f0d070e8ad4f8d8e3934e253984a7263ee252732214eedf99846d5ea75f3`; `3ed7651579b06a4080dfe967c04768677aa9c91f30053299b5871c7a12280b85` |
+| R-126 | `564aa98ce9b78fa582a1ca586f03c8a78fee927da6e8b167e55512908209a79d` | `74 ARV2_QQQ_ORDER_R126_2025_NOW - 20260918` / `ARV2 R126 QQQ order-level 2025-now 7803b84f` | `0c4b83ecb7761954f922448f0c5a464ca4bb2e72bf7cbbd57b72a57f75d18628`; `ca19a8a6c5f9d5613250dc6578fdf2dffa8865071eacbc8fc2a4525219a352f2` | `ea5c4a9c6d5e2863bfaf6806d9bdfd6de68edd7dae92ec5d470b1f5e763912b1`; `79cc0c486b3b0bdf2ff59f86cd9cf7cbe060fb9b2909e2fc654a34d02bca2e22` |
+
+R-125 covers 2026-01-02 through 2026-09-17. R-126 covers 2025-01-02
+through 2026-09-17 and is strictly sequential. The frozen 90% floor is of
+reported positive constituent weight, so absolute covered notional can be
+85.5%; this is an exploratory QQQ holdings proxy, not pristine QQQ. Exact
+coverage and path digest remain aggregate fields; a sub-90% refusal now
+includes the exact ratio. No result sign or winner was selected.
+
+Starting accounting is **89 shared looks, 32 ARV2 development evaluations,
+27 infrastructure looks, and 607 cells**. R-125 launch moves to **90 / 33**
+and an authenticated aggregate to 608 cells. Only then may R-126 launch,
+moving to **91 / 34**, with an authenticated aggregate to 609 cells. A
+technical failure adds no cell and requires a fresh successor.
+
+## R-125 — 90%-coverage QQQ simulated-order diagnostic (TERMINAL MEASURED COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-125 created private project `36715111` and backtest
+`322314199b7a45edb3c95a8dbda05f95`, then reached `Runtime Error` on the
+first statistics-free status poll. Terminal receipt
+`arv2-order-level-terminal-8f75c54c8ef367cb15c2370f`, SHA-256
+`8f75c54c8ef367cb15c2370fcf01e0113e793ece2db8e873834ae29a55ac98e0`,
+contains no statistic. A bounded diagnostic selected only status/error/stack;
+no provider/security row, statistic, chart, order, fill, holding, price, or
+return was read. The first 2026-01-02 decision refused because exact cap-
+covered QQQ reported weight was **0.8592140785921407859214078592**, below
+the frozen 90% floor. No simulated order or economic output occurred. This
+measures missing cap-join coverage, not signal performance.
+
+R-125 spends **89 -> 90 shared looks / 32 -> 33 development evaluations**,
+adds zero cells, and leaves **607 cells / 27 infrastructure looks**. R-126
+created no project/backtest and is superseded unlaunched/unspent. The cap-
+weighted proxy will not lower its floor again blindly. A separate,
+prospectively versioned ETF-holdings-weight core plus bounded revision tilt
+would be a new economic construction with its own look/accounting; any such
+result remains preliminary because of current-snapshot FIGI identity and
+reported-weight coverage. Fresh order numbers R-127/R-128, six-universe
+numbers R-129/R-130, remain unpreregistered.
+
+## Separate V4 QQQ PIT ETF-weight order candidate (IMPLEMENTED; NOT YET PREREGISTERED OR RUN) — 2026-09-18
+
+R-125's 85.9214% cap-join coverage stopped the market-cap QQQ proxy; no
+further cap-floor reduction follows. V4 is a different economic construction:
+the QQQ ETF's own strictly prior, point-in-time positive constituent weights
+form the 98%-gross benchmark core, with the same bounded sector-neutral
+analyst-revision tilt. It omits the fundamental market-cap history call and
+requires at least 95% FIGI-resolved weight out of the reported positive
+total, which itself may be 95% of notional. Its minimum absolute resolved
+notional is therefore 90.25%, with uncovered weight excluded and the rest
+renormalized. This is preliminary accepted-risk evidence, not a pristine QQQ
+or live-ready result. A per-decision full-weight-map digest and a distinct
+aggregate path digest bind future data-vintage comparisons. The V4 profile
+and V6 aggregate schemas, strict-prior and 95%-coverage tests, and exact
+parser guard are implemented; no V4 outcome exists yet. Fresh R-127/R-128
+one-use physical identities must be committed before any QC action.
+
+## R-127 and R-128 — PIT QQQ ETF-weight simulated-order diagnostics (PREREGISTERED; UNRUN) — 2026-09-18
+
+The separate V4/V6 source was committed at `f86fe44` before physical
+derivation. Common immutable package SHA-256:
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+exact two-statistic inventory SHA-256:
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; execution-authority candidate SHA-256 |
+|---|---|---|---|---|
+| R-127 | `190637eb9145c4b3a9e844cb42eb84d24bb5b318afc56957f98bf9d413d8a3b6` | `75 ARV2_QQQ_ETF_WEIGHT_ORDER_R127_2026_YTD - 20260918` / `ARV2 R127 QQQ ETF-weight order 2026 YTD 7803b84f` | `697cfb357e9d87cad322d4eaa94f2ffd00a93d2490e899cf2a9eb5c6a382a734`; `d1b14807f0598922d880824eb8d6c0397ed247e72278dc2bf661278a7fe12634` | `187d2f1fa9746560f4d7b0a7b8a8ecff971d9bc22e03d31a0a84bc8eca50c61d`; `644c1f2ef219feb88ee3a10fd3b7d405e5c823b1a235c3ab908ffb5f54e9d673` |
+| R-128 | `43ea09abd2b6eb9aef23cfb05ec7cb0c19c50451fb41ac78c3aeeac8bd60e518` | `76 ARV2_QQQ_ETF_WEIGHT_ORDER_R128_2025_NOW - 20260918` / `ARV2 R128 QQQ ETF-weight order 2025-now 7803b84f` | `42d9ec0e68f44b58f7bbf7e9f92daa43adf29f43812fdd2dc661dbe9b3b73628`; `bcca83e45bf7d304ff12a71ed58375b0a03d6a4e266eb31aea21d840fee8bd3b` | `ea2ba2877aa4aefa3f5bc16d9c8e7e24136b128078ad94b85a529d7d6a12df70`; `7cb305b18b1931cacbf3fa5e0446e4709f72d00f1f17054b82e66a395a2a873e` |
+
+R-127 covers 2026-01-02 through 2026-09-17; R-128 covers 2025-01-02
+through 2026-09-17. Both retain the bounded revision tilt, 98%-gross core,
+whole-share simulated next-open execution, 10-basis-point fee check, and
+execution-matched QQQ hurdle, but use point-in-time ETF holdings weights
+rather than missing market caps. Minimum FIGI-resolved reported weight is
+95%, so absolute resolved notional can be 90.25% at the minimum reported
+total. No expected sign or winner was selected. This is a separate
+preliminary economic construction, not a retry of R-125.
+
+Starting accounting: **90 shared looks, 33 ARV2 development evaluations, 27
+infrastructure looks, 607 cells**. R-127 launch spends **90 -> 91 / 33 -> 34**
+and only one authenticated aggregate adds **607 -> 608 cells**. Only then may
+R-128 launch, spending **91 -> 92 / 34 -> 35**, with its aggregate adding
+**608 -> 609 cells**. A technical failure adds no cell and requires fresh
+accounting. No raw row, order/fill, or paper/live/trading access is authorized.
+
+## R-127 — PIT QQQ ETF-weight order diagnostic (TERMINAL IDENTITY-COVERAGE REFUSAL; ZERO CELLS) — 2026-09-18
+
+R-127 created private project `36715522` and backtest
+`6f06b0abd1dda90f813fd85ec2161dd6`; the first statistics-free status poll
+returned `Runtime Error`. Terminal receipt
+`arv2-order-level-terminal-9f57dc2ed110f41bd021edf2`, SHA-256
+`9f57dc2ed110f41bd021edf2b18dbf0f7ad6ab497c3565276b8e0ac87328fac5`,
+contains no statistic. A bounded diagnostic selected status/error/stack only;
+no provider/security row, aggregate, chart, order, fill, holding, price, or
+return was read. The first 2026-01-02 decision refused because the exact
+FIGI-resolved QC SID coverage of reported positive QQQ weight was
+`0.8618138186181381861813818618`, below the prospectively frozen 95% floor.
+The reported positive weight total had passed its 0.95--1.05 check. No
+simulated order or economic result occurred. **86.1814% is an identity-join
+coverage ratio, not a backtest return or an alpha estimate.**
+
+R-127 spends **90 -> 91 shared looks / 33 -> 34 development evaluations**,
+adds zero cells, and leaves **607 cells / 27 infrastructure looks**. R-128
+created no project/backtest and is superseded unlaunched/unspent. No subsequent
+six-universe diagnostic is preregistered. A read-only audit found no proven
+implementation defect; the aggregate cannot partition the missing 13.8186%
+weight among absent admission, named FIGI refusal, and SID mismatch. R-125's
+earlier cap join was only 0.2600 percentage points lower on the same decision.
+Do not weaken the spent R-127 guard or call an unrun successor a return. Any
+neutral-QQQ residual proxy or mapping census is a separately versioned,
+prospectively committed and authorized diagnostic.
+
+## V5/V7 neutral-QQQ residual simulated-order candidate (IMPLEMENTED; UNRUN) — 2026-09-18
+
+The next prospectively versioned construction holds exactly resolved QQQ
+constituent stocks at their reported immediately prior ETF weights and puts
+all unjoined reported weight into one unscored QQQ ETF position. Positive
+reported total remains 0.95--1.05 and exactly resolved stocks must represent
+at least 80% of that total; below the floor the run refuses with the exact
+ratio. The full reported weight is normalized to 98% gross. Only exactly
+resolved stocks can receive the unchanged bounded sector-neutral analyst
+revision tilt. This is an economically distinct proxy, **not a rerun of
+R-127** or exact QQQ replication: QQQ overlaps the stock holdings, so a
+portfolio-minus-QQQ difference cannot isolate analyst signal alpha.
+
+2026 profile SHA-256 `af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a`;
+2025 profile SHA-256 `c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d`.
+V7 separately authenticates residual-weight ratios, path digests, overlap
+disclosure, simulated order/fee lifecycle, and exact aggregate field inventory.
+The local focused/import-boundary battery passed 221 tests, the independent
+audit passed 210, and the projected ten-file source fits its per-file and
+fixed-closure limits. No QC run or economic cell exists under V5 yet. Starting
+accounting remains **91 shared looks, 34 development evaluations, 27
+infrastructure looks, 607 cells**. Fresh R-129/R-130 project/plan/authority
+identities must be committed before a launch; R-130 depends on R-129's first
+authenticated aggregate cell. Six-universe work remains unpreregistered.
+
+## R-129 and R-130 — prospectively frozen QQQ residual-proxy simulated-order runs (UNLAUNCHED) — 2026-09-18
+
+The separate V5/V7 source was committed at `9e2dff1` before either physical
+identity was derived. Immutable input-package SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`;
+two-statistic inventory SHA-256
+`c504e1cba05dd9c4dccae7e8d47eeb26839637c03b27da6f1c352d5912174d37`.
+Both exact projections have ten files and 273,393 bytes. Neither has a
+preselected sign or winner; their QQQ ETF residual overlaps mapped stocks.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source-inventory SHA-256 | Plan SHA-256; unsigned execution-authority SHA-256 |
+|---|---|---|---|---|
+| R-129 | `af5e102c5dcd62878eb1046ac63f259e6c4cddf9944cd09c6a5826144a8a914a` | `77 ARV2_QQQ_RESIDUAL_ORDER_R129_2026_YTD - 20260918` / `ARV2 R129 QQQ residual order 2026 YTD 7803b84f` | `628abd19f0aa86b1e9d34583cfde670d10199604196166e7079db826b547f824`; `400c90c56c2ff85fd62ca7de7541887df6ecb6331a4b4564e8a438a480c51306` | `53fd49e6fb52bdf7ca18d0bcfd413ce16a6df0a330045dab8771d51234237cd0`; `afd1f5985b535be1fe1ab5dbf153e69776ab0ba27891b07fa061ae025ba3f6df` |
+| R-130 | `c3faf484e37d312de849589668b76ea68fa80b48413eb01e636f7e1a4170c86d` | `78 ARV2_QQQ_RESIDUAL_ORDER_R130_2025_NOW - 20260918` / `ARV2 R130 QQQ residual order 2025-now 7803b84f` | `6c55f86c9d1d560790244b5e07c3b403d3063f11717566cd6aabc26c200fa235`; `84017d5273c370373d0e3962ef957ba762db229bbaf4ecd397c0fce44e40e3c5` | `b7642655b48481a7692166a829cc7a3286efb832b1a3e8f0caf5c329e51978c6`; `545ef39d4aa9795ebf2ea1f2660ad2ec4539c584b58ff6d7e7d813b2fc454e99` |
+
+R-129 spans 2026-01-02--2026-09-17; R-130 spans
+2025-01-02--2026-09-17. Starting accounting is **91 shared looks, 34
+development evaluations, 27 infrastructure looks, 607 cells**. R-129
+launch spends **91 -> 92 / 34 -> 35** and only its authenticated aggregate
+adds **607 -> 608 cells**. Only then may R-130 launch, spending
+**92 -> 93 / 35 -> 36** and adding at most one authenticated cell. A
+technical failure adds zero cells and invalidates R-130's fixed accounting.
+No six-universe look is preregistered.
+
+## R-129 — QQQ residual-proxy simulated-order diagnostic (TERMINAL ORDER-EVENT REFUSAL; ZERO CELLS) — 2026-09-18
+
+The prospectively frozen source at `920a4e7` passed the complete Analyst V2
+suite (6,497 passed, 8 skipped). One signed submission created private QC
+project `36718112`, compile
+`5fbb4de8a1a22fa36b101a68aeb43acd-6d8adeeb3b32a64b7a9e8be7068e946a`,
+and backtest `20a204b3921f9ddb20cd34b2bf99d03f`. The first
+statistics-disabled poll authenticated `Runtime Error`; terminal receipt
+`arv2-order-level-terminal-7c406102639c92d9b9382f85`, SHA-256
+`7c406102639c92d9b9382f853692dfd1c5a92f53b69860474281d3e575242195`.
+A bounded technical diagnostic selected only status/error/stack and found
+`order-level event references an unknown QC order` at the first Friday
+after-close decision (2026-01-02 16:00). A callback could occur before the
+MOO call returns its ticket and registers its ID; the existing tests did not
+cover that reentrancy. The diagnostic does not show the event status or why
+QC sent it. There was no aggregate, return, fill, price, or alpha cell.
+
+R-129 spends **91 -> 92 shared looks / 34 -> 35 ARV2 development
+evaluations**, adds **zero** cells, and leaves **607 cells / 27
+infrastructure looks**. R-130 is superseded unlaunched/unspent; its fixed
+starting accounting and first-cell contingency no longer hold. A new source
+version and separately preregistered run must correct/test the order-event
+race and validate next-session MOO timing. Do not retry R-129 or interpret
+its terminal failure as evidence for or against analyst revisions.
+
+## R-131 and R-132 — V6 preopen QQQ residual-proxy order diagnostics (PREREGISTERED; UNLAUNCHED) — 2026-09-18
+
+The corrected V6 source was committed at `5a430a9` before physical plan
+derivation. Its distinct stock-plus-unjoined-QQQ ETF proxy keeps the R-129
+80% identity-coverage floor, unchanged bounded analyst-revision tilt,
+98%-gross target and 10-bps-per-side modeled fee. It buffers synchronous
+order callbacks until exact ticket identity is known, then submits the
+frozen prior-close plan on the authenticated next session no later than
+09:27 New York time. QQQ extended-hours minute bars advance the backtest
+preopen clock; a late callback still refuses. This is a new source and
+numbered run, not a rerun of R-129. Input package SHA-256 remains
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`.
+
+| Run | Profile SHA-256 | Exact private project / backtest | Projection SHA-256; source inventory SHA-256 | Plan SHA-256; unsigned execution-authority SHA-256 |
+|---|---|---|---|---|
+| R-131 | `9d80f749ee84114397054d2305d316564d741179c36738dfcb300a7230569135` | `79 ARV2_QQQ_PREOPEN_ORDER_R131_2026_YTD - 20260918` / `ARV2 R131 QQQ preopen order 2026 YTD 7803b84f` | `4f06f82cf4bc44163700c8df561e8b3cc1e48eb50042842d5ed1cb9dcae89266`; `898c39efc8f14ec803e2249c5dd1d6d5257b4199971ba3b627634a47853eafa9` | `4c11ea59741bca071a00b3377e1edd769eaf1fb899ef4575d8fcd23e23be350b`; `a10010fcb002a1baa58955e92cf9aa281267fa640c389d6d71be28b382eca818` |
+| R-132 (contingent) | `f2f3afb724dee0de0143e1d8432cd75ae86609669f8fb10d86427139d28b57c1` | `80 ARV2_QQQ_PREOPEN_ORDER_R132_2025_NOW - 20260918` / `ARV2 R132 QQQ preopen order 2025-now 7803b84f` | `915258fd6daca4b7fdad7875dfe2bad7f0397e000f01db874d2d953aed9b5ebb`; `6dbf89009a40470e75ed5076410a4c0256a62595fc32d9e28709ec10d2e1bc61` | `9077315f43518cecc9e3e6ef8116e61c6d87966dca8e0c6def1f7450ed6e9aa8`; `0edda2bdbb8684d82fff3ffa89de2122c0187fc04f93b20f7dffec9b3645332c` |
+
+R-131 covers 2026-01-02 through the 2026-09-17 final execution date;
+R-132 covers 2025-01-02 through that same final session. Starting
+accounting: **92 shared looks, 35 ARV2 development evaluations, 27
+infrastructure looks, 607 cells**. R-131 launch spends **92 -> 93 / 35 ->
+36**, and only a separate one-time authenticated aggregate adds **607 ->
+608 cells**. R-132 may launch only after that cell, spending **93 -> 94 /
+36 -> 37** and adding at most one cell. If R-131 refuses technically,
+R-132 stays unlaunched and unspent. Neither a result sign nor a winner is
+chosen in advance; no six-universe, leverage, paper/live, funded, broker,
+deployment, or trading authority follows. No QC operation has yet occurred
+for either new run.
+
+## R-131 — preopen QQQ residual-proxy simulated-order diagnostic (TERMINAL STATUS-NORMALIZATION REFUSAL; ZERO CELLS) — 2026-09-18
+
+The signed, prospectively frozen R-131 plan created private QC project
+`36718956` and backtest `1ff7bfae8aea579e3176652e26041891` from the
+V6 source committed at `5a430a9`; the launch receipt SHA-256 is
+`f4f5232f06c921ae7c67339a57debb84709bb1494b22f82371726707875c7fb6`.
+The first statistics-disabled poll authenticated terminal `Runtime Error`,
+receipt SHA-256
+`272c5a48c4ce95cc0940d21fc326b411ba83d0ec7d9a8fa751f96ca18475f9a7`.
+One bounded exact-run diagnostic selected only status/error/stack. At
+`2026-01-05 09:20:00` simulated time, replay of an event emitted synchronously
+during MOO submission refused: `order-level QC event status is unsupported`.
+No aggregate statistic, raw order/fill/log, provider/security row, price,
+return, or alpha cell was read. QuantConnect documentation establishes that
+Python may stringify its order-status enum numerically, but the specific
+event value was not selected; this is a strongly supported diagnosis, not
+an observed-status claim.
+
+R-131 spends **92 -> 93 shared looks / 35 -> 36 ARV2 development
+evaluations** and adds **zero cells**, leaving **607 cells / 27
+infrastructure looks**. R-132 is superseded unlaunched/unspent because its
+authenticated-first-cell contingency and fixed starting accounting did not
+hold. A fresh numbered, preregistered source/plan must isolate the status
+boundary before any further QC execution. This terminal refusal is not an
+analyst-signal return estimate.
+
+## R-133 and R-134 — V7 numeric-status preopen QQQ order diagnostics (PREREGISTERED; UNLAUNCHED) — 2026-09-18
+
+The new source/tests at `99f4fe5` version only the exact QC order-status
+normalization. It keeps the previous point-in-time QQQ-weight stock core,
+neutral overlapping QQQ ETF residual, 80% identity-weight floor, bounded
+analyst-revision tilt, 98% gross, and 10-bps-per-side modeled fee. The
+unchanged input package is SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`.
+The exact private identities are frozen in lane-record section 129:
+
+| Run | Private project / backtest | Profile SHA-256 | Projection SHA-256; plan SHA-256 |
+|---|---|---|---|
+| R-133, 2026 YTD | `81 ARV2_QQQ_NUMERIC_ORDER_R133_2026_YTD - 20260918` / `ARV2 R133 QQQ numeric order 2026 YTD 7803b84f` | `a2429a1f19645f6aa937d73108f6660b52e2aab2230e39cb68a2e180b58bf826` | `8f9cacbef0ef4698096cc7e22c8bd4a2991878a3d42387db3d015d8952e41f50`; `7e08bcd5881e38b643333ec4be89a0bbfdd8086fae79ef37240c69401c4224d0` |
+| R-134, 2025-now contingent | `82 ARV2_QQQ_NUMERIC_ORDER_R134_2025_NOW - 20260918` / `ARV2 R134 QQQ numeric order 2025-now 7803b84f` | `48bb918df24a01507e0e8d79fc1a340f02215bb847ebc37a3cd8ac440dfa2f8c` | `fac8c6f47c0e4495ecdfe5a450e507bbd353a45906a982037a236ed8e4d26a5f`; `ebfef7a6b4f72ec66fdf5fb4ecc3a84544f9cadf296afc5f5b55df7a9ddaafae` |
+
+Each projected source has ten files and 283,576 bytes. Starting count is
+**93 shared looks, 36 development evaluations, 27 infrastructure looks,
+607 cells**. A single R-133 launch spends **93 -> 94 / 36 -> 37** and adds
+a cell only upon a separately authorized, authenticated aggregate read.
+R-134 can spend **94 -> 95 / 37 -> 38** only after an authenticated usable
+R-133 result (`run_valid` true); a technical or execution-invalid R-133
+ends the pair with R-134 unspent. Neither run has a preselected return or
+leverage decision. No QC action has yet occurred under these identities.
+
+## R-133 — V7 preopen QQQ order diagnostic (TERMINAL STATUS REFUSAL; ZERO CELLS) — 2026-09-18
+
+One signed submission from the exact plan at `aca883d` created private QC
+project `36719419` and backtest `b66d1843e8d001da8ec83a1ffaaa03e4`.
+The launch receipt SHA-256 is
+`30c033a2d5074da833a2236f198caff9eea7444557ae9281075afe71eaca2d1e`.
+The first statistics-disabled poll authenticated terminal `Runtime Error`,
+receipt SHA-256
+`7bb7057a2ade74236c1e0021901457401b78b20ca3c7b054f23e9f6a07e68b7d`.
+One bounded error/stack diagnosis found the same `order-level QC event
+status is unsupported` at simulated `2026-01-05 09:20:00`, during
+replay of the first synchronous MOO event. The event status value itself
+was not selected. No aggregate, raw order/fill/log, chart, provider row,
+price, return, or signal verdict was obtained. V7's exact numeric string
+mapping was not sufficient; a new enum-identity source and plan are
+required, not an R-133 replay.
+
+R-133 spends **93 -> 94 shared looks / 36 -> 37 development evaluations**
+and adds **zero cells**, leaving **607 cells / 27 infrastructure looks**.
+R-134 is superseded unlaunched/unspent because its contingent first usable
+aggregate was not produced. No 2025-now, six-universe, or leveraged run
+has followed this terminal refusal.
+
+## R-135 and R-136 — V8 direct-enum QQQ simulated-order diagnostics (PREREGISTERED; UNLAUNCHED) — 2026-09-18
+
+The prospective source at `6585d80` compares the QC `OrderStatus` members
+directly and preserves the previous signal, PIT QQQ weights/residual,
+80% resolved-weight floor, 98% gross, MOO schedule, and modeled 10-bps
+per-side fee. The same authenticated immutable input package has SHA-256
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`.
+Exact private project names, profile/projection/source/plan/authority hashes
+and the conditional order are frozen in lane-record section 132, before
+any new QC action. R-135 is the 2026-YTD one-use plan; R-136 is 2025-now
+and is contingent on an authenticated usable R-135 aggregate (`run_valid`
+true and no fee mismatch). The technical status refused by R-133 was not
+observed, so V8 remains a hypothesis to validate in QC, not a completed
+return estimate.
+
+Starting accounting is **94 shared looks, 37 ARV2 development evaluations,
+27 infrastructure looks, 607 cells**. R-135 launch spends **94 -> 95 /
+37 -> 38**; only its separately signed exact two-statistic aggregate can
+add **607 -> 608 cells**. Only then can R-136 launch, spending **95 -> 96 /
+38 -> 39** and adding at most one further cell. A technical refusal or
+execution-invalid R-135 leaves R-136 unlaunched/unspent. Neither result
+sign nor winner is selected, and no six-universe or leveraged run follows
+by inference. Statistics-disabled terminal inspection precedes any result
+read; raw QC orders, fills, logs, charts, provider/security rows, prices,
+and unrestricted outcomes remain outside this authority.
+
+## R-135 — V8 direct-enum 2026-YTD QQQ simulated-order diagnostic (OVERNIGHT-ACCOUNT TECHNICAL REFUSAL; ZERO CELLS) — 2026-09-18
+
+The exact source/plan at `6585d80` / `1e6a4a6` created private QC project
+`36720078`, backtest `995f7d8ff103fe2a705c5b56ad6eecac`, and launch
+receipt SHA-256
+`6f860889d3e514b0e6c5d72950a6b4766be5011ca418683f88115e396cde2ced`.
+The first statistics-disabled status poll authenticated `Runtime Error`,
+terminal receipt SHA-256
+`24dbab553a0c120ba8fb98499052af8958b1d72bcc65c743c52a45669e1b208b`.
+One bounded diagnostic selected only status/error/stacktrace for that run;
+at simulated `2026-02-10 09:20:00`, the prior-close versus preopen account
+guard refused `order-level overnight account changed after the decision`.
+It did not reveal whether cash, share quantity, or both changed, and did
+not select any aggregate statistic, raw account value, security/provider
+row, order/fill/log/chart, price, or return. This is not an alpha estimate.
+
+R-135 spends **94 -> 95 shared looks / 37 -> 38 development evaluations**
+and adds **zero cells**, leaving **607 cells / 27 infrastructure looks**.
+R-136 is superseded unlaunched/unspent because its contingent first usable
+aggregate was not produced. A cash-only known-at-preopen replan with frozen
+decision weights and a quantity-drift refusal is a prospective software
+candidate, not a reinterpretation or retry of R-135. No 2025-now,
+six-universe, or leveraged result follows.
+
+## R-137 — V9 cash-reconciled 2026-YTD QQQ simulated-order diagnostic (UNKNOWN-ORDER TECHNICAL REFUSAL; ZERO CELLS) — 2026-09-18
+
+The distinct signed V9 source/plan at `f0fa9eb` / `950cdbc` created private
+project `36720686`, backtest `b52ad152aa4964de4f8adfe472a252b2`, and
+launch receipt SHA-256
+`0892eaf8c4796f3b48b289651e34165a786de82ed5fe839220345465ac872e0e`.
+The first statistics-disabled terminal check authenticated `Runtime Error`,
+terminal receipt SHA-256
+`ab8f29ede56b4f4bc7c3cffefba84845695a1745e78601b0fac8c254f5cde7ed`.
+One bounded exact-run diagnosis selected only status and a redacted
+`order-level event references an unknown QC order` error/stack. It did not
+select or retain any result aggregate, raw order/fill/log/chart, account
+quantity/cash, security/provider row, price, return, or signal verdict.
+An internal staging-to-ticket-registration callback gap is a plausible local
+defect, but the error does not distinguish it from a late previous-ticket
+or engine-generated order. See lane-record section 136; no speculative
+economic interpretation is permitted.
+
+R-137 spends **95 -> 96 shared looks / 38 -> 39 ARV2 development
+evaluations** and adds **zero cells**, leaving **607 cells / 27 infrastructure
+looks**. R-138 is superseded unlaunched/unspent because the first usable
+aggregate was not produced. No order-level, 2025-now, six-universe, or
+leveraged result follows this technical refusal.
+
+## R-139–R-151 — owner-assisted QC order-debug runs in the existing R-131 project (RECONCILED; NO AUTHENTICATED RESULT CELL) — 2026-09-19
+
+An inventory-only check of private project `36718956` (`79
+ARV2_QQQ_PREOPEN_ORDER_R131_2026_YTD - 20260918`) found the already-recorded
+R-131 run plus **13 additional** 2026-09-19 backtests. These are separate
+research looks, not retries of R-131 and not retrospective authorizations of
+its signed source. In creation order, the additional exact run IDs and
+terminal states are:
+
+| Record | QC backtest ID | Terminal state |
+| --- | --- | --- |
+| R-139 | `7f539f16c8eaccba4fea6bc56b439404` | Runtime Error |
+| R-140 | `e8811688dd90e3a4a5c1bf520f9f0697` | Runtime Error |
+| R-141 | `e560fc6ca3ceabeb085f972d38c7a4b1` | Runtime Error |
+| R-142 | `6d51d70afa04e2c5f1d3a85183cc099f` | Runtime Error |
+| R-143 | `af275bfd2630f819b953569d3449bf63` | Runtime Error |
+| R-144 | `bbddb96b80a553c8eb5c5dfec3caf953` | Runtime Error |
+| R-145 | `7b108aa1bfadb441fb2da0f21f95dfab` | Runtime Error |
+| R-146 | `64059d74b526debb2277e57774080278` | Runtime Error |
+| R-147 | `fa37decc2fc18953a2f135e0aa840743` | Runtime Error |
+| R-148 | `1c7cba85b1ef27c8df3f33c17f056cda` | Runtime Error |
+| R-149 | `d3e36cdedae5000b540a27cd6e1788ab` | Runtime Error |
+| R-150 | `e3219152633f0139c2f0209dc447fd99` | Runtime Error |
+| R-151 | `94e317bafa1edc27b353da4cd83d5098` | Completed. |
+
+The owner reports that R-150 measured a 4,764-byte exact aggregate against
+the order runtime's self-imposed 4,096-byte statistic limit, and R-151
+completed after a cloud `main.py` patch raised that limit to 8,192. The
+metadata check verifies the two terminal states and the *current mutable*
+cloud source patch, not source provenance for either historical run. The owner
+reported R-151 net profit 16.824%, Sharpe 0.76, Sortino 1.011, drawdown
+11.6%, 2,456 orders, and $3,570.65 fees. No authenticated aggregate/result
+readback, full stored-statistic rendering, source-bound execution receipt, or
+formal outcome gate supports an ARV2 result claim yet; those figures are
+owner-observed diagnostics only. The cloud source also contains distinct
+status, dividend, delisting, and finalization shims that are **not** accepted
+as lane corrections by this accounting entry.
+
+Conservatively count all 13 as development evaluations: **96 -> 109 shared
+looks; 39 -> 52 ARV2 development evaluations; 27 infrastructure looks and
+607 authenticated cells unchanged.** R-138 remains unspent. A new order-based
+test needs a prospective, distinct source/plan/authority and result identity;
+neither a mutable cloud project nor this accounting supplies one retroactively.
+
+## R-152–R-165 — owner-assisted QC 81 order-debug runs (RECONCILED; NO AUTHENTICATED RESULT CELL) — 2026-09-20
+
+The owner edited private QC project `36719419` (`81
+ARV2_QQQ_NUMERIC_ORDER_R133_2026_YTD - 20260918`) in the browser. A
+statistics-disabled backtest inventory found its previously recorded R-133
+run plus **14 distinct later runs**. These are not R-133 retries under its
+one-use authority and cannot be retrospectively promoted to V10 results.
+In QC creation order:
+
+| Record | Exact backtest ID | Terminal metadata |
+| --- | --- | --- |
+| R-152 | `0b152a5fb681c02a128aa81468c319cd` | Runtime Error |
+| R-153 | `894a7fccb76766a6b80a13b0dbf08337` | Runtime Error |
+| R-154 | `205036a5dd527b70c451158929ab8d54` | Runtime Error |
+| R-155 | `6ec22972549f14943e488ba5147adfaf` | Runtime Error |
+| R-156 | `752500b061cb4ce58d9294b80ed1855a` | Runtime Error |
+| R-157 | `4ef2cb19391841523f40aaa458f2d856` | Runtime Error |
+| R-158 | `9b94d0b688de4edb38b3e6a4ed84fa4d` | Runtime Error |
+| R-159 | `179c3cd39c2e73b9cf1c1748e5f9cd39` | Runtime Error |
+| R-160 | `0bf3fce8fca9eb55a4f3be21d1daf4c3` | Runtime Error |
+| R-161 | `82b769fa2295a4ba9fa809931f6d22db` | Runtime Error |
+| R-162 | `a1ae2ff42a4a5a4bb6853c14facd9be1` | Runtime Error |
+| R-163 | `a68cc96d57b82c40e191d7c0bdaca847` | Runtime Error |
+| R-164 | `bdf6f0e7806e88a81735094266295104` | Completed. |
+| R-165 | `e6102250174c63e01960de58f24e158b` | Completed. |
+
+The owner reports that R-163 exposed a 4,764-byte aggregate against the
+runtime's own 4,096-byte statistic cap; raising it to 8,192 let execution
+reach a second bug. The cloud `accepted_risk_qqq_order_level_qc_summary.py`
+had compared `_sha(aggregates)` with `_sha(stored_aggregate_text)`, which
+JSON-quotes the text and makes the equality impossible. Its corrected
+read-back compares the meta digest with SHA-256 of the stored text's exact
+ASCII bytes. The owner reports two later runs with identical 16.824% net
+profit, 2,456 filled orders, and no runtime/mismatch log entries. Our
+read-only check independently verifies **only terminal identities/statuses**,
+not those values, all-fill state, complete stored-statistic readback, or
+historical source bytes. The mutable QC 81 source contains other substantive
+cash/delisting changes; a `Completed.` state is not a formal alpha gate.
+
+Count all 14 conservatively as development evaluations: **109 -> 123 shared
+looks; 52 -> 66 ARV2 development evaluations; 27 infrastructure looks and
+607 authenticated cells unchanged**. No new provider, broker, paper/live,
+funded-account, real-order, or trading authority follows.
+
+## R-166 — V11 reflected-enum 2026-YTD QQQ simulated-order diagnostic (ENGINE DELISTING REFUSAL; ZERO CELLS) — 2026-09-20
+
+The exact source/profile/plan at `5db458c` used V11 profile SHA-256
+`980759a4a5e996b21349ee53e9a5b6343e1a8b9914006907fec29de8e77c2307`,
+projection SHA-256
+`c7510f5864f9ffb68c924a3a82ba069180d2efd1ae4fd6dd5cd1f6729d0a101d`,
+and signed plan SHA-256
+`04948a1bd611b69756e786d3e64512af6718bffe7b4cf38aaddcb5042afda0a0`.
+It created private QC project `36781246` (`87
+ARV2_QQQ_CLR_ORDER_R166_2026_YTD - 20260920`) and backtest
+`c0f2d36774cc33a52b8788fcd93c1f16` (`ARV2 R166 QQQ CLR order 2026 YTD
+7803b84f`). The launch receipt SHA-256 is
+`f720f07dc22f16d8604656f57c67627c4f2eac6cf4d9dc8edf49ebfda3412e95`.
+The first statistics-disabled terminal poll authenticated `Runtime Error`;
+terminal receipt SHA-256 is
+`65ff1d208cccbeb0e0c004a2c4b56c43c434310779b26fa427d9838445683d8e`.
+
+One bounded error-only diagnosis selected the exact refusal
+`order-level event references an unknown QC order` at simulated
+2026-08-05. It selected no aggregate statistic, return, price, account value,
+raw order/fill/log/chart, security/provider row, or signal verdict. Source
+review against LEAN's direct delisting path identifies a prospective narrow
+cause: the engine creates its own full-liquidation market order and direct
+`Filled` event tagged `Liquidate from delisting`, outside the strategy's
+registered order-ID ledger. V11 correctly refused that unmodelled account
+change; a distinct source/profile may authenticate and separately account for
+only that exact engine event. R-166 spends **123 -> 124 shared looks / 66 ->
+67 ARV2 development evaluations** and adds **zero cells**, leaving **607
+authenticated cells / 27 infrastructure looks**. No paper/live deployment,
+funded account, real order, broker access, or trading authority follows.
+
+## R-167 — V12 exact-delisting 2026-YTD order run (END-CLOCK TECHNICAL REFUSAL; ZERO CELLS) — 2026-09-20
+
+Attempt 2 used exact committed/signed V12 profile SHA-256
+`15c52dcaafae36d7ab8785e95809781a14427c09288ddc7c5c0c859c8b1a2058`,
+projection SHA-256
+`2cedebfbc4cca2e7e5678850eda325d34f69add392a81ed22ad25a9d2fa1d88e`,
+and plan SHA-256
+`591fc6be31dce399ea84f7dce8f115d247fa2ed421cdd68e085cb41c59f4a9a7`.
+Private project `36783362` launched backtest
+`485c228a25d1bbc30804c4b401710ca0`; launch receipt
+`a04447f57085c23b16366f418153962888503b689825b6f20ae8eccff2a627c0`
+and terminal receipt
+`7664b137141915d5b1e2c2a76aff6e8073c4c4ca42042260a32caba1446342d2`
+bind `Runtime Error`. A bounded error-only read selected
+`order-level backtest ended outside the exact final session` at simulated
+`2026-09-18 00:00:00`; it selected no statistic or economic value. R-167
+spends **124 -> 125 shared looks / 67 -> 68 development evaluations**, adds
+**zero cells**, and leaves **27 infrastructure looks / 607 authenticated
+cells**.
+
+## R-168 — V13 rollover 2026-YTD order run (COMPLETED; FORMAL RESULT READ REFUSED; DIAGNOSTIC ONLY) — 2026-09-20
+
+Attempt 3/final used exact committed/signed V13 profile SHA-256
+`1f2778f9e98ffab7c2030b5cab8080248b2d561420cc4c9d769de89fa46e6fa1`,
+projection SHA-256
+`d1362c0a4095da7f8136bee08e04a04ce1b474fd4de0f3e5035885ae2539f13e`,
+and plan SHA-256
+`66c10c53cf84248642afba7462f7c69cda1243417286512ee124bf69e9ef8ba5`.
+Private project `36783836` launched backtest
+`d71155d2fde0f857a18081ad0fda80ea`; launch receipt
+`a78cd92fa50baa013c66e52072d7306d35ea84a6df1fb27cd7b8084a354d9572`
+and terminal receipt
+`1e0ee288239b92d106911ce91ead1142e6d3ec03b5ef524e1049e97812dd9b9b`
+bind `Completed.` after two statistics-disabled polls.
+
+The separately signed one-use formal read, control SHA-256
+`194ed2b87a01d87553422abc18612b4c5f13b880525c5947bb5623bd607094a1`,
+was consumed but refused `order-level QQQ ETF proxy accounting changed` and
+persisted no formal result receipt. The producer rounded one proxy-complement
+field under ambient Decimal precision while retaining its paired resolved
+field at 100 digits; the exact consumer correctly rejected their non-exact
+sum. Bounded diagnostic reads verified the expected two-statistic/profile
+identity and selected only aggregate fields. They are not additional runs,
+looks, evaluations, or cells.
+
+Diagnostic figures only: ending equity **$1,168,243.410845** from $1,000,000
+(QC-style net profit **+16.8243%**); custom strategy path **+16.8511%** versus
+execution-matched QQQ **+15.6283%**, a **+1.2228 pp** spread; maximum drawdown
+**-11.2506%** versus **-11.5012%**; zero-rate Sharpe **1.2123** versus
+**1.1131**. All 2,455 strategy orders filled with no cancel/invalid, and one
+separate exact engine-forced delisting fill was accounted. Modeled and engine
+fees both equal **$3,570.426155**.
+
+The aggregate is nevertheless `run_valid=false`: 39 decisions, 38 completed
+lifecycle records, zero forced-pending invalidations, and the runtime's sole
+successful path for that difference prove exactly one skipped-unpriced
+decision. The forced delisting may explain it, but the redacted record cannot
+establish causation. Therefore R-168 is not an authenticated alpha cell or a
+valid formal result. It spends **125 -> 126 shared looks / 68 -> 69 ARV2
+development evaluations**, adds **zero cells**, and leaves **27 infrastructure
+looks / 607 authenticated cells**. No fourth launch, leverage, deployment,
+broker, paper/live, funded-order, or trading authority follows.
+
+## ARV2 2026 Massive delta-input capture — retrospective lineage record (NO RESULT LOOK) — 2026-09-17
+
+This entry closes the documentation omission identified as `ARV2R150-002`;
+it does not create a new run or retrospectively change any result. Under the
+owner's standing authorization to use the configured Massive subscriptions
+for this lane's accepted-risk inputs and QuantConnect backtesting, the
+physical capture requested events from **2026-01-01 through 2026-09-16**
+after the final requested close. It started at
+`2026-09-17T05:18:36.493365Z`, completed at
+`2026-09-17T05:18:48.773522Z`, and used the
+`massive_https_bearer_default_session` transport.
+
+The resulting archive is
+`arv2-physical-accepted-risk-1678b925bc78e8b3f4fdf291`, SHA-256
+`1678b925bc78e8b3f4fdf2911e3e426327fb8a1307463d1ff2bd43f279a1cc77`.
+Its source manifest SHA-256 is
+`3384e9745c3093eb203997d4a98057ae2d066180add5e0367c4c3687a50d83ea`.
+The capture contains **75,110** source rows: 51,331 analyst ratings, 14,991
+earnings records, and 8,788 corporate-guidance records. Derivation admitted
+75,108 current-view rows and 73,832 censored-view rows, with 1,276
+disagreements. The accepted-risk pair is
+`arv2-accepted-risk-pair-0452a4811db397068b0dbd4c`, artifact SHA-256
+`696265dad63c8f67560bc9c8ffed46907ce75faf5e8ff2353b1cbcc25561ce57`,
+content SHA-256
+`0452a4811db397068b0dbd4c0e22db92c1597bcfcef93559e71647ee87228ea8`.
+The later order package authenticates **743 delta contributions** alongside
+12,244 parent contributions.
+
+This is input-acquisition lineage, not an outcome read. The retrospective
+recording itself made no provider call, selected no licensed row, and read no
+price, return, aggregate, order, log, or result. It therefore adds **zero
+shared looks, zero ARV2 development evaluations, zero infrastructure looks,
+and zero cells**: cumulative accounting remains **126 / 69 / 27 / 607**.
+The input remains current-vintage and non-pristine-PIT under the owner's
+accepted-risk decision; no live, broker, funded-order, deployment, or trading
+authority follows.
+
+## R-169 — V14 deterministic-proxy 2026-YTD order run (COMPLETED; FORMAL RESULT READ REFUSED; DIAGNOSTIC ONLY) — 2026-09-21
+
+The exact committed/signed V14 profile SHA-256
+`bfb77eacdaddb8566b649165eb4986ca038658bbc23d5eb95641f4cea13d0776`,
+projection SHA-256
+`382f2adc94b86a4d2394d065f812218f175340ae5960b1b5d96dbe6377ab0206`,
+replacement plan SHA-256
+`6af92e6be592a04d1265d88bd45b9b9acae79870748ab260693f3ad0751a2f33`,
+and signed execution-authority payload SHA-256
+`0a1a3fa3508e2dca2694e672337129eb8e1d9c7b48f130a8d3f1aab3687374b0`
+from lane-record section 152 created private QC project `36788090` and backtest
+`3767aed670b800f9bd78eb83f2d9545d`. The launch receipt SHA-256 is
+`cb173267833f5f2cd42f7576687d9f5501c26384c1df308de10e5aac753a1b45`;
+the first statistics-disabled terminal poll authenticated `Completed.` with
+receipt SHA-256
+`3b73a95f0cfe2ba1b2d16619a47c9d05a5e9a8418825f7acc5642f86943330b0`.
+
+The separately signed one-use result authority selected only the two exact
+custom statistics and was consumed once. The formal reader refused
+`order-level aggregate execution or coverage invariant changed` and persisted
+no result receipt or formal cell. Two bounded aggregate-only diagnostics
+isolated the refusal without another QC run, research look, development
+evaluation, or cell. The summary v9 / META v3 aggregate has SHA-256
+`c96f9a4f1dbc5a8c9022ad69e128be727e438e39b3ec40f58d4d7f8430d4d0c3`
+and `run_valid=false`: **39 decisions, 38 completed rebalances, one
+skipped-unpriced decision, 2,455 submitted/final-filled strategy orders, and
+one separately authenticated forced-delisting fill**.
+
+Diagnostic figures only: the custom path ended at **$1,168,510.983845**
+while the exact terminal QC account value was **$1,168,243.410845**, a
+**$267.573** mismatch. The custom return was **+16.8510983845%** versus
+execution-matched QQQ **+15.6282845052%**, a **+1.2228138793 pp** spread;
+strategy/QQQ maximum drawdown was **-11.2506256828% / -11.5012219385%**
+and zero-rate Sharpe was **1.2123298 / 1.1131428**. Modeled and engine fees
+matched at **$3,570.426155**. One 2026-08-10 skipped record maps under the
+current snapshot only to EA; that is not point-in-time identity proof.
+
+R-169 spends **126 -> 127 shared looks / 69 -> 70 ARV2 development
+evaluations**, adds **zero cells**, and leaves **27 infrastructure looks /
+607 authenticated cells**. It is a completed engine diagnostic, not an
+authenticated alpha result. A separately versioned V15 successor may address
+the exact delisting/account-reconciliation causes prospectively; R-169 itself
+will not be reread or relabelled. No leverage, six-universe expansion,
+deployment, broker, paper/live, funded-account, real-order, or trading
+authority follows.
+
+## R-170 — V15 account-reconciled 2026-YTD QQQ order run (COMPLETED; RESULT READ WITHHELD; ZERO CELLS) — 2026-09-21
+
+The exact production V15 profile SHA-256 is
+`13303b1940e3442f01d93020e62c43e196c88ec297ddace97a0f4dc024a14e7a`.
+The real accepted-risk package builds a 15-file, 362,488-byte projection with
+SHA-256
+`9453674a2ea882ae7e8b86e5141e7119e1454201e1f7b5085798bbed3a022efe`,
+distinct from the shorter deterministic-fixture projection recorded in the
+tests. The signed plan will have SHA-256
+`2e95705c5d3d1eb12467a4526e15bfb36a905da6ece54aa4dbed39c5da14c58e`
+and execution-authority payload SHA-256
+`9276d57089874a0070789e65fada750f79a250f1605ab2852a466669dc518b94`.
+It names private project `91 ARV2_QQQ_ACCOUNT_ORDER_R170_2026_YTD -
+20260921` and backtest `ARV2 R170 QQQ account order 2026 YTD 7803b84f`.
+
+V15 preserves V14's score, tilt, PIT QQQ universe, 98% gross exposure,
+market-on-open schedule, and modeled 10-bps-per-side cost. It prospectively
+changes only authenticated delisted-target retirement and final account/path
+reconciliation, as specified in lane-record sections 154–155. One submission
+is permitted before statistics-disabled terminal inspection. Only a terminal
+`Completed.` run may receive a separately committed and signed one-use
+aggregate-only result authority; formal admission requires parser acceptance
+and `run_valid=true`.
+
+At preregistration, R-170 attempt 1 was to spend **127 -> 128 shared looks /
+70 -> 71 ARV2 development evaluations** and could add at most one
+authenticated result cell (**607 -> 608**). The result sign is not selected. A failed attempt counts
+against the standing three-attempt maximum for this distinct candidate. No
+later period, six-universe expansion, leverage, live/paper deployment,
+broker, funded-account, real-order, or trading authority follows.
+
+The exact authority launched once. Private project `36789122` compiled as
+`bf9ab29a19d4bd2b1c71485a1ac8092e-032b4c0ea9d101b9534eeb3399fc8235`
+and created backtest `12961d9259f40e31ec618e4e832352cd`. Launch receipt
+SHA-256
+`be6b80d15c48f692aef706b735119abca7a1212160468b018ebcb1f9f62f9476`
+and terminal receipt SHA-256
+`33552261979f5be02db2bf62aa803c9f44fd7ba42d173c3d21ff88497fb3adb6`
+bind `Completed.` after the first statistics-disabled poll.
+
+Before any result authority or aggregate read, a local compatibility proof
+established that V15 still inherits independent rounding of mean gross and
+cash exposure. The exact R-169 counterexample totals
+`0.99999999999999999999999999923`, while the formal consumer requires exact
+one. V15 corrected its terminal pair but not the independently averaged
+means. The R-170 result read was therefore withheld rather than spending a
+known-incompatible formal gate. No statistic, aggregate, return, order/fill,
+log/chart, price, provider/security row, or signal verdict was selected.
+
+R-170 spends **127 -> 128 shared looks / 70 -> 71 ARV2 development
+evaluations**, adds **zero cells**, and leaves **27 infrastructure looks /
+607 authenticated cells**. V15 and the cloud run remain immutable. Only a
+separately versioned, preregistered successor may correct the producer; no
+later-period, six-universe, leverage, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.
+
+## R-171 — V16 exact-complement 2026-YTD QQQ order run (AUTHENTICATED VALID RESULT; ONE CELL) — 2026-09-21
+
+V16 preserves V15's score, PIT QQQ universe, sector-neutral tilt, 98% gross,
+market-on-open schedule, modeled 10-bps-per-side fee, forced-delisting target
+retirement, and terminal-account reconciliation. It changes only the emitted
+mean exposure representation: cash is the deterministic exact complement of
+the already-emitted gross mean. The exact R-169 counterexample is green
+through the real predecessor aggregate and formal parser, with no other
+economic field changed.
+
+The immutable V16 runtime source SHA-256 is
+`998cb19bfe7d48c37ec1dfb901399080ef206831df62a42cb339a464a638877e`;
+2026 profile SHA-256 is
+`f23417c65cd80daee2440350ca0598728a896816bd5f5d4412c9352f6ab45f3b`;
+the 16-file production projection SHA-256 is
+`02cb808a55899c42d2e5efd8f07798ac12fcbfb205093b2a563e0d95a8ebe95d`.
+Plan SHA-256
+`dc4dea12a5db7484f4848a8c97232090bef388a64d260778e1bd881ff7afe290`
+and execution-authority payload SHA-256
+`9eac5d89d30458df8cf0de8e5202e810a7f2a0b8c4a61fe52303a83811fea430`
+name private project `92 ARV2_QQQ_EXPOSURE_ORDER_R171_2026_YTD - 20260921`
+and backtest `ARV2 R171 QQQ exposure order 2026 YTD 7803b84f`.
+
+One simulated-order submission may precede statistics-disabled terminal
+inspection. A terminal `Completed.` run may receive only a separately
+committed and signed one-use read of the two named custom statistics; parser
+acceptance and `run_valid=true` are both required for a cell. Attempt 1 will
+spend **128 -> 129 shared looks / 71 -> 72 ARV2 development evaluations** and
+can add at most one cell (**607 -> 608**). The result sign is not selected.
+No later period, six-universe expansion, leverage, live/paper deployment,
+broker, funded-account, real-order, or trading authority follows.
+
+The exact authority launched once. Private project `36789750` compiled as
+`f2554122cb81735ffcc8cdc10b8374b3-f8500bb47d618a293586c668247cd8e1`
+and created backtest `1be162ae07a4d63c4f167be6dfe404f8`. Launch receipt
+SHA-256
+`8b37d72445bc83464836dc68926d2379b8c404a0e8de6cee3875b8718bf36355`
+and terminal receipt SHA-256
+`85f8e5c7e43b1fd1c756e7f26a78558d80e2a0b9de2c40b0771ca0ec4a8e0a09`
+bind `Completed.` after two statistics-disabled polls. No compile or runtime
+retry occurred.
+
+The separate one-use result authority had payload SHA-256
+`0aee21eba46c1a0e539427d7e3d54243d04571a6d3833cd548f9d36731a75bb1`
+and permits only one `backtests/read` selecting the two named custom ARV2
+statistics. Before its read, no outcome had been selected. The launch spends **128 -> 129
+shared looks / 71 -> 72 ARV2 development evaluations**; accounting remains
+**27 infrastructure looks / 607 authenticated cells** until the exact parser
+and `run_valid` gate both pass. No later period, six-universe expansion,
+leverage, live/paper deployment, broker, funded-account, real-order, or
+trading authority follows.
+
+That one-use authority was signed and consumed once. The parser accepted the
+two custom statistics and `run_valid=true`; result receipt SHA-256 is
+`eb8cf09adf5fb446953003eb45be06d9840418577eeac077e480b96c2b8bd746`,
+custom-statistics SHA-256 is
+`78df4b71a38c057d73dd373fbf9d25e0b07086465e3f24d13e836bc2a103bb2c`,
+and aggregate SHA-256 is
+`7c0bebf2c127553f79a8e38bc87d548424781d36cc962b6a1f05b6ace105d0ab`.
+
+The authenticated 2026-YTD cell has **39 decisions, zero skipped decisions,
+2,517 submitted and filled orders, zero cancellations/invalids, $3,646.285835
+modeled and engine fees, and $1,168,327.901165 ending equity**. After the
+frozen 10-bps-per-side cost, the strategy returned **+16.8327901165%** versus
+execution-matched QQQ **+15.6282845052%**, a **+1.2045056113 pp** spread.
+Maximum drawdown was **-11.2506256828%** versus **-11.5012219385%** and
+zero-rate Sharpe was **1.2115638963** versus **1.1131428101**. Mean gross
+exposure was **96.2794589008%** and mean one-way active share only
+**1.0552727757%**.
+
+QQQ's separately emitted calendar-close return was **+17.1809759916%**, so
+the strategy trails that buy-and-hold timing basis by about **0.3482 pp**.
+This cell supports a positive spread only on the preregistered execution-
+matched comparison, not a universal QQQ-beating or persistent-alpha claim.
+R-171 closes accounting at **129 shared looks / 72 ARV2 development
+evaluations / 27 infrastructure looks / 608 authenticated cells**. No
+production acceptance, leverage, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.
+
+## R-172 — V16 2025-now QQQ order run (THREE RUNTIME ERRORS; MIA DIAGNOSIS REQUIRED) — 2026-09-21
+
+R-172 is the unchanged-profile longer-window diagnostic that follows the valid
+R-171 2026-YTD cell. It keeps the exact V16 strategy economics and uses profile
+`arv2-qqq-order-level-tilt-2025-cutoff-v16`, SHA-256
+`0ac38709a0666a105e571953bdeb94304439c0c82fe3c3b647edb363b1c0b135`,
+for **2025-01-02 through 2026-09-16**. No return sign or winner is selected.
+
+The production projection contains **16 files / 370,919 bytes**, SHA-256
+`75027faaf39434a4e7a2fe5b1744feb857370d275e3f43531148283ac771f7ba`.
+Plan SHA-256
+`518e67942e1f549926512616ab0bc05596038751c2ba78b15da4c539581b777d`
+and execution-authority payload SHA-256
+`1cb87ed31e2d9c6cd45e76b0d06812fda5764885e9d5039d6a7ca259ca6642c0`
+name private project `93 ARV2_QQQ_EXPOSURE_ORDER_R172_2025_NOW - 20260921`
+and backtest `ARV2 R172 QQQ exposure order 2025 now 7803b84f`.
+
+One backtest submission and statistics-disabled terminal polling are
+permitted. A result read is not. Only authenticated `Completed.` may be
+followed by a separately committed and signed one-use read of the two exact
+custom statistics; parser acceptance and `run_valid=true` remain mandatory.
+Attempt 1 would spend **129 -> 130 shared looks / 72 -> 73 ARV2 development
+evaluations** and could add at most one authenticated cell (**608 -> 609**).
+No parameter tuning, leverage, six-universe expansion, live/paper deployment,
+broker, funded-account, real-order, or trading authority follows.
+
+Attempt 1 compiled the exact source in project `36790040` and launched
+backtest `8dd0ef77b927315beec2707474dfac43`. The first
+statistics-disabled terminal poll authenticated `Runtime Error`; terminal
+receipt SHA-256 is
+`e02e4aceb95a1924cb8aaf3e351e87d1d60b5e1731370425dfea8bb104bc0407`.
+No result, statistic, raw error log, order/fill, chart, price, provider row,
+return, or signal outcome was read. Attempt 1 therefore adds no cell and
+spends **129 -> 130 shared looks / 72 -> 73 ARV2 development evaluations**.
+
+Attempt 2 retains the exact source/profile/projection. Its fresh plan SHA-256
+is `44a8731f5c8ddaf0a0cb2be84079536c95016ff345a18621957ffdb85e7b01f4`
+and execution-authority payload SHA-256 is
+`0db997de042f424c4452d368dd1985e8dd2489f19263db9d2bde14002238f7eb`.
+It names private project
+`94 ARV2_QQQ_EXPOSURE_ORDER_R172_A2_2025_NOW - 20260921` and backtest
+`ARV2 R172A2 QQQ exposure order 2025 now 7803b84f`. A launch would spend
+**130 -> 131 shared looks / 73 -> 74 ARV2 development evaluations** and could
+add at most one cell (**608 -> 609**) only after a separate aggregate-only
+authority succeeds.
+
+Attempt 2 compiled the same 16 source files in project `36790123` and launched
+backtest `525305bda2dad7b145646f909ff63246`. It again reached `Runtime Error`
+on the first statistics-disabled poll; terminal-receipt SHA-256 is
+`6a7c278cc58b297fd3682c7c2461346053a8a3b5c1bfc4121a5919f743048e47`.
+No result, statistic, error log, raw row, order/fill, chart, return, or signal
+outcome was read. Accounting becomes **131 shared looks / 74 ARV2 development
+evaluations / 27 infrastructure looks / 608 authenticated cells**.
+
+The third and final allowed attempt remains byte-identical. Its plan SHA-256 is
+`5a1411714f2732ea367462277ff280aee01a62c9ed5fa82b7834bd1315254ad3`;
+execution-authority payload SHA-256 is
+`9a87500a595b04588f19332b3bb0c8c88b0ddfb9c0cdc97922d220f1c478d89b`.
+It names private project
+`95 ARV2_QQQ_EXPOSURE_ORDER_R172_A3_2025_NOW - 20260921` and backtest
+`ARV2 R172A3 QQQ exposure order 2025 now 7803b84f`. A third failure exhausts
+this candidate's launch budget and requires Mia or owner diagnosis rather than
+a fourth relaunch.
+
+Attempt 3 compiled the same source in project `36790168` and created backtest
+`4d357d28e8c69ba197d6977f0fe7afeb`. Its first statistics-disabled terminal
+poll authenticated `Runtime Error`; terminal-receipt SHA-256 is
+`63457a059da07e874072d2629735d0a5d39708e6d103ce220ecd50c8971cccad`.
+No result, statistic, error log, order/fill, chart, return, or signal outcome
+was read. R-172 closes at **132 shared looks / 75 ARV2 development evaluations
+/ 27 infrastructure looks / 608 authenticated cells** and zero new cells.
+
+The three-attempt budget is exhausted. Codex attempted the standing Mia
+recovery path, but the authenticated native QuantConnect browser was
+unavailable while the Mac was locked and the controllable browser was logged
+out. No fourth run is permitted. This is a technical runtime refusal, not an
+economic strategy result; Mia diagnosis and prospective correction are
+required before any successor launch.
+
+## R-172 addendum — fifteen owner-directed Mia launches in the reused attempt-3 project (NOT ADMISSIBLE; COUNTED) — 2026-09-21
+
+After the three byte-identical R-172 refusals, QuantConnect's built-in
+assistant Mia, at the owner's direction, launched **fifteen further
+backtests inside the reused attempt-3 project `36790168`** between 18:02:22
+and 22:04:26 QC time: four diagnostics, then successive "V17" through "V20"
+relaxations of the frozen census (date-keyed acceptance of served snapshot
+ages 2, 3, 5, 10 and 15; re-basing a frozen plan from a rounded split factor;
+rescaling a percent-scaled weight snapshot by 100). Only the sixteenth
+backtest in the project, `c88fb1b2cf91a714242d898078322b5b`, completed. The
+owner read an unlabelled standard statistic (about 39.2%) from it. Every Mia
+file and the modified `main.py` are refused by the lane's source firewall,
+the project was reused, and the source traded on stale and rescaled inputs,
+so that run is **NOT ADMISSIBLE** and creates no cell. This session read no
+statistic from it. Each launch is a QC launch and is counted: **132 -> 147
+shared looks / 75 -> 90 ARV2 development evaluations / 27 infrastructure
+looks / 608 authenticated cells**. Section 166 of the lane record holds the
+per-backtest chronology and the root cause: the V12 exact age-1 point-in-time
+constituent census refused deterministically at the first 2025 decision
+because the backtest serving path withheld the 2025-01-04 stamp.
+
+## R-173 — V17 fail-closed-skip 2025-now QQQ order run (DIAGNOSTIC LAUNCH; TERMINAL COMPOSITION REFUSAL; ZERO CELLS) — 2026-09-21
+
+R-173 is the owner-authorized diagnostic launch of the lane's immutable V17
+successor (`accepted_risk_qqq_order_level_v17_qc_runtime.py`, SHA-256
+`8049d90e5e04b3d80d61f106441e60e3de98eaf863cd3e569342d6186a6910e5`,
+committed at `5223ba8`; V16 blob unchanged
+`998cb19bfe7d48c37ec1dfb901399080ef206831df62a42cb339a464a638877e`) on
+profile `arv2-qqq-order-level-tilt-2025-cutoff-v17`, SHA-256
+`60af112e42e4bbdfe8949c360359399138cc94a6b24968db59026d9c874fb6b6`, window
+**2025-01-02 through 2026-09-16**. V17 changes no strategy economics: a
+stale point-in-time snapshot, an out-of-band positive weight total, or
+overnight holdings drift before the frozen preopen execution becomes a
+counted, recorded no-order skip with `run_valid=false`, instead of a whole-run
+refusal or any relaxation. No return sign or winner is selected.
+
+The launch used the plain repository client from the Windows host, not the
+POSIX-only signed protocol, so it is a diagnostic and not a formal cell.
+Fresh private project `96 ARV2_QQQ_SKIP_ORDER_R173_A1_2025_NOW - 20260921`
+(`36809007`); 17 files / 394,221 bytes (the 15 frozen R-172 modules
+byte-identical, V17, and a generated `main.py` differing from the frozen
+R-172 main only by the V17 binding and profile id), every file re-read and
+hash-verified after upload (content-manifest SHA-256
+`689738523c9ec7de7ca3aa5dc4d18cfa21828d916139fe976886cbfc98f288ae`);
+compile `a4ba2fd8811c6ccea4215fcf0d3b6d88-561c6ae42ece50278d631e92b3900012`
+`BuildSuccess`; backtest `ARV2 R173A1 QQQ skip order 2025 now 8049d90e`, id
+`0d4ff088d0b0ea144e9c0d27de3926d7`, created 23:10:06 UTC. Status-only
+polling (0.312, 0.885, terminal) reached `Runtime Error` at
+**2026-09-18 00:00:00**: `order-level terminal account composition changed`
+in V15's `_replace_terminal_account_observation`. The run therefore passed
+the entire 2025-now decision schedule under V17 and refused at the untouched
+V15 terminal identity `holdings + cash == equity`; the refusal carries no
+values and no statistic, chart, order, log, price, provider row or return
+was read.
+
+R-173 spends **147 -> 148 shared looks / 90 -> 91 ARV2 development
+evaluations**, keeps **27 infrastructure looks / 608 authenticated cells**,
+and uses one of the V17 candidate's three launches. No second attempt is
+made from this session; the next launch requires an owner-directed,
+preregistered successor that reports the terminal residual in a bounded way
+(`ARV2R166-009`), and a formal V17 cell also requires adapter registration
+(`ARV2R166-006`) and a Mac launch through the signed protocol. No result
+read, parameter tuning, leverage, six-universe expansion, deployment,
+broker, paper/live, funded-account, real-order, or trading authority
+follows.
+
+## R-173 addendum — five owner-directed Mia launches in the reused R-173 project (NOT ADMISSIBLE; COUNTED) — 2026-09-21
+
+After R-173 refused at V15's terminal identity, Mia, at the owner's
+direction, launched **five further backtests inside the reused R-173 project
+`36809007`** between 23:28:58 UTC on 2026-09-21 and 00:10:08 UTC on
+2026-09-22: a rerun, a settled-plus-unsettled cash override, two diagnostic
+runs that wrote the terminal account totals to the Object Store, and a
+final run whose `v18` file rebuilds equity as holdings plus cash so the
+identity holds by construction. Only the last, `7589e6599edba5f78e4d8266e4cb8515`,
+completed. Its diagnosis (a six-picodollar decimal-to-double residual with
+unsettled cash at zero) is correct and is confirmed in section 167 of the
+lane record; its fix is a tautology and its `main.py` diagnostics are
+firewall-refused, so that run is **NOT ADMISSIBLE** and creates no cell.
+This session read no statistic from it. Each launch is counted: **148 -> 153
+shared looks / 91 -> 96 ARV2 development evaluations / 27 infrastructure
+looks / 608 authenticated cells**.
+
+## R-174 — V18 bounded-boundary 2025-now QQQ order run (DIAGNOSTIC LAUNCH; COMPLETED; run_valid=false BY CONSTRUCTION; ZERO CELLS) — 2026-09-21
+
+R-174 is the owner-authorized diagnostic launch of the lane's immutable V18
+successor (`accepted_risk_qqq_order_level_v18_qc_runtime.py`, SHA-256
+`40d3832163db238a0a716277b93500fb38214d46b1c54b2611337426331c3bc1`,
+committed at `90a68ee`; V17 `8049d90e...10e5` and V16 `998cb19b...877e`
+unchanged) on profile `arv2-qqq-order-level-tilt-2025-cutoff-v18`, SHA-256
+`a1b263e741fc952c0e7912a79f782ad9869051e72770f08b8e67e57b350e37d2`, window
+**2025-01-02 through 2026-09-16**. V18 changes no strategy economics: it
+judges V15's terminal identity `holdings + cash == equity` against a
+1E-8-dollar bound derived from LEAN's decimal-to-double boundary below
+2**24 dollars, keeps the engine's equity authoritative, reports the
+residual, and still refuses any larger residual. No return sign or winner is
+selected.
+
+Plain repository client from the Windows host (diagnostic, not the signed
+protocol). Fresh private project `97 ARV2_QQQ_BOUNDARY_ORDER_R174_A1_2025_NOW - 20260921`
+(`36811274`); 18 files / 407,068 bytes hash-verified after upload
+(content-manifest SHA-256
+`756dfce3d723da5a5c182cd215023cce8441504289ececb59c84f3056078cbbb`); compile
+`6782dadac0ef5db6495a539c3925b8b5-37cf59d5e5ecccaa801aa115f07812b3`
+`BuildSuccess`; backtest `ARV2 R174A1 QQQ boundary order 2025 now 40d38321`,
+id `dade3f38e4caf179e305ca79db452cf3`, created 00:32:03 UTC on 2026-09-22,
+`Completed.` at 00:33:04 UTC. The two custom statistics were read once
+(meta SHA-256 `6d7cd74239368b6811789c75759dcb1f9c02de83ea74ed6324b8d14bf51fdcff`,
+aggregate SHA-256 `20506a337f757dca704b4fa41b059436972df22736fe767d6e6d48d8b23c8e0b`,
+reproduced from the meta's `aggregates_sha256`); nothing else was read.
+
+The v13 aggregate reports a terminal composition residual of exactly
+`0.000000000006` dollars within the `0.00000001` tolerance, terminal
+adjustment `-319.507`, **91 scheduled / 85 executed decisions / 84 completed
+rebalances**, **5 stale-snapshot skips (maximum age 15), 1 weight-total
+skip, 1 overnight-drift skip**, 67 tilt-enabled / 18 tilt-underfilled,
+**5,065 submitted / 5,065 filled / zero canceled or invalid**, modeled and
+engine fees agreeing at **$5,957.590315**, one delisted target retired to
+structural QQQ, and `run_valid=false` because the schedule is incomplete by
+design. Diagnostic figures only: strategy **+39.3399891603%** versus
+execution-matched QQQ **+39.5907114055%** (**-0.2507 pp**), calendar-close
+QQQ +41.3578%, drawdown -22.0166% / -22.3374%, zero-rate Sharpe 1.0007 /
+1.0049, mean gross exposure 96.7557%. The aggregate is 8,002 bytes of the
+8,192-byte transport (`ARV2R167-006`).
+
+R-174 spends **153 -> 154 shared looks / 96 -> 97 ARV2 development
+evaluations**, keeps **27 infrastructure looks / 608 authenticated cells**,
+and uses one of the V18 candidate's three launches. No second attempt is
+needed. A formal V18 cell requires adapter registration (`ARV2R167-007`), a
+transport-margin resolution (`ARV2R167-006`), and a Mac launch through the
+signed protocol. No result read beyond the two custom aggregates, parameter
+tuning, leverage, six-universe expansion, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.
+
+## R-175 — V19 corrected-evidence 2025-now QQQ order run (DIAGNOSTIC; COMPLETED; run_valid=false; ZERO CELLS) — 2026-09-21
+
+R-175 is the preregistered order-based diagnostic of immutable V19, SHA-256
+`f79ea5c77753ccce6a14e21c67fc619d7923ae8ed3a11f78cb3cab35258fcb68`,
+on the unchanged 2025-01-02 through 2026-09-16 window. V19 changes no strategy
+economics. It makes the terminal residual comparison context-independent,
+turns complete-census holding drift into the declared counted no-order skip,
+records actually submitted decisions, reconciles forced-exit-invalidated
+plans, explicitly refuses an all-skipped path, and raises only its exact
+profile's custom-statistic bound to 16,384 bytes.
+
+Fresh private project `98 ARV2_QQQ_V19_ORDER_R175_A1_2025_NOW - 20260921`
+(`36819225`), 19 files / 427,396 bytes, was read back byte-for-byte with
+manifest SHA-256
+`7b677a04469eda4e0e7fea9a27fa11d974b7fdafee7596434c84cc164c6b8c5b`.
+Compile `f9c2b9fbc5b3d8774042245a1aa1de56-831b6afe70ee37d73780cd28cd47b46f`
+was `BuildSuccess`; backtest `ARV2 R175A1 QQQ V19 order 2025 now f79ea5c7`,
+id `43867152786330f353bc485be3cbea5e`, completed on attempt one. One bounded
+read retained only the two custom statistics: 995-byte meta SHA-256
+`4567037c2a784eea968961e3837e375180affb8e1370a70a07d08e4b78bd2ced`
+and 8,138-byte aggregate SHA-256
+`dbe1d9ae0c94c7781f885566a2bf9a03793732a003626c04ec248002cdf76be3`.
+
+The corrected census reports 91 scheduled, 85 covered, **84 actually
+submitted**, and 84 completed decisions; 5 stale, 1 weight-total, and 1
+overnight-drift skip; 5,065 submitted and filled orders with zero
+canceled/invalid; modeled and engine fees both $5,957.590315. Strategy return
+is **+39.3399891603%** versus execution-matched QQQ **+39.5907114055%**
+(-0.2507222452 percentage points), with drawdown -22.0166% versus -22.3374%
+and zero-rate Sharpe 1.0007 versus 1.0049. The unchanged six-picodollar
+terminal residual is within the 1E-8-dollar bound. Because the seven skipped
+scheduled decisions make `schedule_complete=false` and `run_valid=false`,
+these remain diagnostic figures and add **zero cells**.
+
+R-175 spends **154 -> 155 shared looks / 97 -> 98 ARV2 development
+evaluations**, keeping **27 infrastructure looks / 608 authenticated cells**.
+No retry is needed. No formal acceptance, leverage, deployment, broker,
+paper/live, funded-account, real-order, or trading authority follows.
+
+## R-176 — SPY V1 2025-now order run (DIAGNOSTIC; COMPLETED; run_valid=false; ZERO CELLS) — 2026-09-22
+
+R-176 is the preregistered S&P 500 analogue of R-175: a point-in-time SPY ETF
+holdings-weight stock core plus the same bounded sector-neutral
+analyst-revision tilt, 98% target gross, weekly next-session market-on-open
+execution, 10 basis points per side, zero slippage, and no leverage from
+2025-01-02 through the 2026-09-17 final execution/mark. SPY holdings are a
+proxy and are not official historical S&P 500 index membership. This is not
+the top-decile analyst-revision gate used by R-108.
+
+Fresh private project `99 ARV2_SPY_V1_ORDER_R176_A1_2025_NOW - 20260921`
+(`36820512`) was created only after its exact name was proven absent. All 21
+files / 472,782 bytes were re-read byte-for-byte with source-manifest SHA-256
+`48573d2628bc3011a85ef3b4aeb6143368f772541c93a2d19e9e6cbe9c93c787`.
+Compile `86d0353b2b1a738c54da4f78698b89a6-e83974a1b5b11f8efcc53e69ac169372`
+was `BuildSuccess`; backtest `ARV2 R176A1 SPY V1 order 2025 now eaabfb25`,
+id `b3f07edc5d2c306a180f73a222b157c6`, completed on attempt one. The retained
+custom statistics are a 1,024-byte meta object (text SHA-256
+`d32040dae4e1f3d5fe63b663a7ea14c5931bda3de10c4e980030dc57e2505ac2`)
+and an 8,983-byte aggregate (text and canonical SHA-256
+`a62d3c5b48c55cb6dac18c6e1ad6f68bd98d97b71e890409626dd9008ba808c2`).
+
+The census reports 91 scheduled, 89 covered, **85 submitted**, and 85
+completed decisions; 2 stale-snapshot, 2 unpriced-decision, and 2
+overnight-drift skips; **10,750 submitted and filled orders** with zero
+canceled/invalid; and modeled/engine fees agreeing at **$3,919.4976805**.
+Strategy return is **+29.5563554266%** after costs versus execution-matched
+SPY **+30.9373349673%**, a **-1.3809795408 percentage-point** spread;
+calendar-close SPY is +32.3173234811%. Drawdown was -17.5147% versus
+-18.3796%, zero-rate Sharpe 1.0534 versus 1.0333, mean gross exposure 93.1996%,
+mean active share 1.8144%, and mean tilted-name count 244.72. The small tilt
+did not add absolute return in this window, although the diagnostic risk
+figures improved slightly.
+
+`schedule_complete=false` and `run_valid=false`, so the result creates zero
+cells. The first bounded result read retained no values because its ad hoc
+field list used an internal attribute-derived name rather than the emitted
+`forced_exit_invalidated_pending_rebalance_count`; one aggregate-only recovery
+read retained the exact two custom statistics. That deviation is
+`ARV2D169-001` (P3) and keeps R-176 diagnostic rather than formally
+preregistered evidence. R-176 spends **155 -> 156 shared looks / 98 -> 99
+ARV2 development evaluations**, with **27 infrastructure looks / 608 cells**
+unchanged. No retry, acceptance, leverage, deployment, broker, paper/live,
+funded-account, real-order, or trading authority follows.
+
+## R-177 — six-universe order family, three refused attempts plus nine later QC/Mia launches (RETROACTIVELY RECONCILED FROM THE LANE RECORD AND A QC CENSUS; ZERO CELLS) — 2026-09-24
+
+This entry is written by the Claude review of section 180 because the lane
+record (sections 170 through 172) recorded these launches without appending
+them here. R-177 is the owner-directed six-universe order family (six sleeves,
+98% long-only target, own-ETF fallback) in private project
+`100 ARV2_SIX_GATE_SIGNAL_R177_A1_2021_2025 - 20260922` (`36823601`). Codex's
+three permitted attempts all ended in `Runtime Error`:
+`f3618cc09fb9aa4370398542be783f2f` (A1), `c6c8358fa74131d0245a076af57fbfdf`
+(A2) and `d516663f39f13eb01d2d892528d76723` (A3); A1 and A2 exposed recording
+and fresh-input defects corrected prospectively, and A3 refused on 2023-07-03
+because one constituent callback had no positive weight. The attempt budget is
+exhausted; R-178 and R-179 were never created. Nine later launches in the
+same project by QC's Mia assistant or the owner (six `Runtime Error`, three
+`Completed.`: `04ff274f622641a0e4499d8512325a24`,
+`d43244b7e95c3b4820b9a7c71f7d5ef3`, `4f5a57ae3ab11bfc8c1e99a0f42dcc24`) are
+recorded in section 172.1; the owner-requested aggregate read of
+`04ff274f...` reported `run_valid=false` with 261 decisions and nine invalid
+orders, and its source is unproven. A 2026-09-24 administrative census of the
+project confirms exactly twelve backtests. Accounting: the three attempts
+spent **156 -> 159 shared looks / 99 -> 102 ARV2 development evaluations**
+(sections 170.8 through 170.10), and the nine later launches are counted
+here conservatively as **159 -> 168 shared looks / 102 -> 111 ARV2
+development evaluations**; infrastructure looks 27 and authenticated cells
+608 unchanged. No result is admissible and no cell was added.
+
+## R-180 — six-universe counts-only PIT coverage diagnostic, one Codex launch plus four later QC/Mia launches (RETROACTIVELY RECONCILED; INFRASTRUCTURE LOOKS; ZERO CELLS) — 2026-09-24
+
+Written by the section-180 review. R-180 is the prospective counts-only
+coverage diagnostic of section 173 in private project
+`103 ARV2 SIX COVERAGE R180 2021 2025` (`36854638`). Codex's A1
+`ca74d0514d72e49af83dacb4530d219d` refused at the end clock; Mia's one-file
+end-date correction was ported into the local projector (`38e998f`), and
+three later Mia-completed runs (`e06501daa3b345f95e65191404bad495`,
+`3d9e18970ac9c59f87c955a29b027414`, `2af50aacf72be8725f537d2a40740533`) were
+recorded in section 173.2, the last one read once for its seven canonical
+count statistics under an owner-approved, prior-time-corroborated exception
+(section 173.3). A 2026-09-24 administrative census finds a **fifth** launch
+the record does not know, `06bdcc2a5c4a2b395e35bc1f5dadf75e`, a QC
+default-named `Completed.` run created 2026-09-23 19:29:20 UTC (section
+180, `ARV2R180-003`); it was not read and is not evidence. Accounting: the
+five launches are counts-only diagnostics with no return and are counted as
+**27 -> 32 infrastructure looks**, zero ARV2 development evaluations and
+zero cells; shared research looks unchanged at 168.
+
+## R-181 — cap-90 six-universe signal-role order run, A1 upload refusal, A2 invalid, A3 valid under the owner's 2x admission bridge and signature waiver (EXPLORATORY; run_valid=true ON A3; ONE EXPLORATORY CELL) — 2026-09-24
+
+Written by the section-180 review. R-181 is the exploratory cap-90 signal
+role of sections 175 through 179 in private project
+`104 ARV2 SIX CAP90 SIGNAL R181 2021 2025` (`36891750`); the 90% coverage
+floor was chosen after the R-180 counts, so the family is exploratory
+(`ARV2CR174-005`). A1 refused before compile at QC's 64,000-character file
+limit and created no backtest. A2 `a74626d4d6ce7360ae95d2e1d7930910`
+completed with `run_valid=false` (6,289 submitted, 6,267 filled, 22 invalid
+pre-open buys for insufficient buying power, diagnosed by a bounded
+count-only order read). A3 `188e14446c4c33dcb045854da64e51c7`, under the
+owner-chosen research-only 2x order-admission bridge (98% target unchanged;
+cash, gross-exposure and tracking gates) and the owner's exploratory
+signature waiver, completed `run_valid=true`: cumulative return
+`0.96628735468236` (+96.63%), 6,315 orders all filled, minimum daily-close
+cash `15832.95614`, maximum end-day gross `0.9849784912822988`. Bridge
+runtime SHA-256
+`60b0e300393c1356e21de310fdfce1ff029632d77e6bf62efd7bb053de55b5ab`; A3
+projection SHA-256
+`f75725c37cb5e66f7db4070fcf89a05d5efe29cda60b6fc75086615d622cce0d`. The
+2026-09-24 census confirms exactly two backtests in the project. Accounting:
+A2 and A3 spend **168 -> 170 shared looks / 111 -> 113 ARV2 development
+evaluations**; the valid A3 read is counted as **608 -> 609 authenticated
+cells**, labelled exploratory (post-hoc cap floor, bridge, waived signature)
+and admissible only as a matched-comparison predecessor, never as a formal
+alpha result. The three-attempt budget is exhausted.
+
+## R-182 — cap-90 count-matched market-cap role, A1 valid plus one unrecorded rerun (EXPLORATORY; run_valid=true ON A1; ONE EXPLORATORY CELL) — 2026-09-24
+
+Written by the section-180 review. R-182 is the matched role in private
+project `105 ARV2 SIX CAP90 MATCHED R182 2021 2025` (`36909823`), launched
+only after R-181 A3 authenticated valid. A1
+`71ec4931f19d6c663345e9549335b911` completed `run_valid=true` under the
+same bridge policy: cumulative return `1.236191666261345` (+123.62%), 6,314
+orders all filled, baseline stock-target path SHA-256
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`;
+projection SHA-256
+`186cb2bb3dbd2a37358c9c0b2dbfa86e1e685203dba33795eb192f74faa9feeb`. The
+exploratory same-window comparison R-181 A3 minus R-182 A1 is
+**-26.9904311578985 percentage points**; three of six sleeves were own-ETF
+fallbacks throughout, so this measures the whole-portfolio policy, not
+analyst skill per universe. The 2026-09-24 census finds a **second, unrecorded
+launch** in the project, `78d6532ef3b02744f0188145c5d46686`
+(`ARV2 R182A1 ... 186cb2bb rerun`, `Completed.`, created 2026-09-24 18:09:39
+UTC), and a Mia research notebook saved at 18:47:09 UTC whose text embeds QC
+standard statistics for this run (section 180, `ARV2R180-002`); the rerun was
+not read by the lane and is not evidence, and it consumes R-182's second
+attempt slot conservatively. Accounting: A1 and the rerun spend **170 -> 172
+shared looks / 113 -> 115 ARV2 development evaluations**; the valid A1 read
+is **609 -> 610 authenticated cells**, exploratory.
+
+## R-184 — cap-90 matched-stock revision-weight tilt, A1 valid (EXPLORATORY; run_valid=true; ONE EXPLORATORY CELL) — 2026-09-24
+
+Written by the section-180 review. R-184 holds R-182's exact selected stock
+identities, counts, ETF fallbacks and six sleeve budgets and redistributes
+weight within each sleeve by analyst-revision rank, bounded to 20% of each
+stock's baseline weight, zero or missing scores neutral. Private project
+`107 ARV2 SIX CAP90 TILT R184 2021 2025` (`36910292`), A1
+`3c5f5a6cf78fa341a80160782488131c`, completed `run_valid=true` with its
+`matched_baseline_target_path_sha256` equal to R-182's `b825663b...cadbc`:
+cumulative return `1.2575741336207897` (+125.76%), **+2.13824673594447
+percentage points** over R-182 A1 after modeled costs; 6,313 orders all
+filled. Projection SHA-256
+`8fdb1e051c1e9620c1a126dd9d2bd09c1eb298d9dd8ae1d4e7d07ada61af9afc`, runtime
+SHA-256 `d6cd9f963e4754e134d1a6116ee300711ad7e28bc0e4b95f15e241d7e22f1489`,
+target builder SHA-256
+`b063c5bca9e4aa13e2deff66726cc4b6c12c405845921c1ee39bbe653f266506`. The
+tilt could act only in SPY, XLV and the stock-selected part of XLE, and the
+matched baseline still depends on positive R055 score coverage
+(`ARV2D179-005`), so this is a single-window exploratory observation, not
+statistical confirmation. The census confirms exactly one backtest.
+Accounting: **172 -> 173 shared looks / 115 -> 116 ARV2 development
+evaluations / 32 infrastructure looks / 610 -> 611 authenticated cells**.
+No R-183 basket run, leverage, deployment, broker, paper/live,
+funded-account, real-order or trading authority follows.
+
+## R-183 — cap-90 six-ETF basket under the matched 2x buying-power admission bridge, A1 valid (EXPLORATORY; run_valid=true; ONE EXPLORATORY CELL) — 2026-09-24
+
+The owner selected the versioned 14-file bridge rather than the original
+13-file/1x-admission basket, specifically waived R-183's detached signature,
+and authorized this shared-ledger entry before launch (Analyst lane section
+181.1). The separate private project is
+`106 ARV2 SIX CAP90 ETF R183 2021 2025` (`36931797`); exact A1 backtest
+`221353a5a0fe523992de6938eb942504` is
+`ARV2 R183A1 six cap90 bridge ETF basket 2021 2025 980528e2`.
+Projection SHA-256
+`980528e2ae982c7c8e19e07b856a15b7c386b338acf66336abe2766ff512de80`
+and profile SHA-256
+`7e4a108e378f59f5927225c919b2a7e9bae4ed3de6cfd89a31a8a416e3a00349`
+bind the 98%-target order-based ETF basket to the same research-only 2x
+*buying-power admission*, observed-cash, gross, target-tracking, and order
+validity gates as R-181 A3 and R-182 A1. This is not a 2x portfolio target.
+The one-use claim and launch receipts bind the owner's exact R-183 waiver to
+the launch-permit digest
+`97d482f38ea739dd4c614a901dce9e3f7d5851632288ae83da6d3ea6ca3a96bc`.
+The first status-only poll was `In Queue...`; later status-only polls reached
+`Completed.`. The single permitted custom META/AGGREGATES read then
+authenticated `run_valid=true`, aggregate SHA-256
+`31a0a03760dbcb458d07dae78ad182d154ac67722535d314e824629f33bb88ab`,
+all 261 rebalances, all 1,523 submitted orders filled, zero invalid and
+canceled orders, nonnegative observed cash (minimum daily close
+`15832.95614`), maximum end-day gross `0.9849784912822988248387557248`,
+and target tracking within the frozen bounds. Starting equity was
+`1000000`; ending equity `2063347.73436208`; after-modeled-cost cumulative
+return **+106.334773436208%**, maximum drawdown approximately **−21.27%**,
+annualized volatility approximately **19.83%**, and zero-rate Sharpe
+approximately **0.833**. Modeled and actual engine fees both report
+`8028.44136`. All 1,566 sleeve-decisions were six-ETF-basket decisions.
+No standard QC statistic, log, chart, order row, or provider/price row was
+retained. One `backtests/create` spends **173 -> 174 shared research looks /
+116 -> 117 ARV2 development evaluations**; infrastructure looks remain 32,
+and the valid one-time result read moves **611 -> 612 authenticated cells**,
+labelled exploratory. This is R-183's first of at most three QC attempts.
+On the matched execution-policy window, R-181 signal minus this ETF basket
+is **−9.706037967972 percentage points**; R-182 matched market-cap minus
+the basket is **+17.2843931899265 percentage points**. The primary
+R-181-minus-R-182 stock-selection comparison remains −26.9904311578985
+percentage points. The basket is secondary whole-portfolio context, not a
+clean analyst-selection comparator or formal alpha confirmation.
+
+## R-185 — stronger 40% matched-stock analyst-revision tilt, A1 valid (EXPLORATORY; run_valid=true; ONE EXPLORATORY CELL) — 2026-09-24
+
+The owner authorized an R-185-specific exploratory detached-signature waiver
+and this shared-ledger entry before launch (Analyst lane section 182). The
+new private order-based QC project
+`108 ARV2 SIX CAP90 TILT40 R185 2021 2025` (`36933404`) compiled the exact
+16-file projection SHA-256
+`2a9f9a2175e2765c1136d4aca3d86d617bbee970769eecae6dcab2e0f1127c7d`
+and profile SHA-256
+`a76cead2de5fef1176803f77b2a7efd3cc11fa24734dcdcf91a047f4ae552539`.
+Its only backtest attempt, A1 `273bc9592c54f158dde812b528d69e47`,
+reached `Completed.`. The one permitted META/AGGREGATES read reauthenticated
+the exact present source, waiver payload SHA-256
+`00193c4e2813334ae3dd0bebd564bac01e745cfd14e08785a06fbdbc96a530cc`,
+R-182's exact target-path SHA-256
+`b825663b4dfdee835f1c118a49fdd49e0a8d37387b8045060d77b5b3bbdcadbc`,
+and aggregate SHA-256
+`899aca607f8083a589185f10e3ab0c582369f9ee1707eb1f3e4d6a2062d49891`.
+It returned `run_valid=true` with 261/261 scheduled rebalances,
+6,324/6,324 submitted orders filled, and zero invalid or canceled orders.
+Observed minimum daily-close cash was `15832.95614`, minimum post-order-event
+cash `945.1112891750001`, maximum end-day gross `0.9849784912822988248387557248`,
+and mean/maximum target-tracking L1 error `0.004849416426936300731722565747`
+/ `0.010762069594720217858499386646228593179417086416781424508499515488143566639303284`,
+within the frozen 2%/5% bounds. The 2x setting is buying-power admission
+only; the target remains 98% long gross, not a 2x portfolio.
+
+Over 2021-01-04 through 2025-12-31, starting/ending equity was `1000000`
+/ `2277966.990445955`, with preliminary after-modeled-cost cumulative
+return **+127.7966990445955%** (`1.277966990445955`), maximum drawdown
+approximately **−21.2095%**, annualized volatility approximately **20.3496%**,
+and zero-rate Sharpe approximately **0.9149**. Modeled and actual engine
+fees both report `36376.6563843` under 10 bps per side. Against the frozen
+R-182 matched result (+123.6191666261345%), the R-185-minus-R-182 spread
+is **+4.1775324184610 percentage points**; against the frozen R-184 20%
+tilt (+125.75741336207897%), the added 20%-to-40% tilt is
+**+2.03928568251653 points**. R-185 uses the same selected stocks and ETF
+fallbacks as R-184: SPY and XLV supplied most full-stock sleeve decisions;
+QQQ, SOXX and REMX remained own-ETF fallbacks on all 261 decisions; XLE
+mixed partial stocks, positive-score-floor fallback, and coverage fallback.
+
+This is a parameter-strengthening choice made **after seeing R-184's
+positive result in the same window**. It is one additional development look,
+not untouched validation, six independent universe replications, formal
+alpha acceptance, or evidence that the extra 2.04 points will persist. The
+lowest observed post-order-event cash narrowed to about $945 on a $1m
+starting account; daily-close/event observations do not establish continuous
+intraday cash. No raw provider/price/order rows, standard QC statistics,
+logs, or charts were retained. Accounting: one A1 launch spends
+**174 -> 175 shared research looks / 117 -> 118 ARV2 development
+evaluations**, infrastructure looks remain **32**, and the valid bounded
+read moves **612 -> 613 authenticated cells**, labelled exploratory. R-185
+has used one of at most three attempts. No paper/live/funded order,
+broker, deployment, or trading authority follows.
+
+## R-186 — single 80% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+The owner authorized the exact R-186 private order-based research run and,
+after a direct question about its detached signature, authorized starting
+backtesting for this machine/session. Analyst lane section 183 records the
+distinct one-use R-186 A1 waiver and preregistered source/profile. Private
+project `109 ARV2 SIX CAP90 TILT80 R186 2021 2025` (`36935164`) read back
+and compiled the exact 16-file projection SHA-256
+`16240a1ead1dd8466961556ffcfcfc58a6c974d763e87b72c27cfdce72699604`
+and profile SHA-256
+`2fe851dd13421ea0d7d750d17ba509ee6f8407e25eb6a142725cf7c17f387036`.
+One A1 backtest `8aeb2084d160f3d13b2849540116f422` launched under
+waived permit SHA-256
+`1c95281540a153e6256843e41a9231813d81af55ff7ddae32f0f45ff75a4e37b`
+and terminated `Runtime Error`. The owner supplied the QC message
+`six-universe portfolio cash is outside its finite bound`; a value-free
+status-envelope classification located `_portfolio_cash` at
+`on_order_event`, consistent with a post-order-event finite/nonnegative
+cash refusal. The actual cash value was not read or inferred. No result
+aggregate, return, order row, provider/price row, chart, or log was read
+or retained. This is neither a successful backtest nor evidence of alpha.
+
+One A1 launch spends **175 -> 176 shared research looks / 118 -> 119 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. A1 consumes one of R-186's maximum
+three QC attempts. A byte-identical retry of the diagnosed cash refusal
+is not planned. Subsequent 70%/60%/50% candidates, if launched, are
+separate post-result development looks and cannot be relabelled as R-186
+retries, untouched validation, or authorization for leverage or trading.
+
+## R-187 — 70% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+The owner authorized the bounded same-session 70%/60%/50% order-based
+sensitivity ladder without additional narrow approval prompts. Analyst lane
+section 184 prospectively froze R-187's separate source, profile, private
+project name, and one-use waiver before QC mutation. Project
+`110 ARV2 SIX CAP90 TILT70 R187 2021 2025` (`36935685`) read back and
+compiled the exact 16-file projection SHA-256
+`3203481571307cbad000153542ac9529cb1e4a3ac1bac030f18150b6a22dcbe0`
+and profile SHA-256
+`6189373282c0e5652bda0317d0133e1ccc52057116035ed6a51428788d8e31f2`.
+The sole A1 backtest `d733c02345bafc5d857a2710a4635bb6` launched under
+waived-payload SHA-256
+`e42bad241af84594a2cfb834b912d4378ff4621dfa4d509c1c55bb531c8f22c4`
+and terminated `Runtime Error`. A value-free status-envelope classifier
+located `_portfolio_cash` during `on_order_event`, consistent with the
+unchanged finite/nonnegative event-cash refusal; the actual cash value
+was not read. No result aggregate, return, order row, provider/price row,
+chart, or log was read or retained. This is not a successful backtest or
+evidence of alpha.
+
+One A1 launch spends **176 -> 177 shared research looks / 119 -> 120 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. A1 consumes one of R-187's maximum
+three QC attempts. A byte-identical retry of this cash refusal is not
+planned. R-188 and R-189 have different preregistered tilt fractions and
+identities; each launch is a separate same-window exploratory look.
+
+## R-188 — 60% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+Analyst lane section 184 prospectively froze R-188's distinct 16-file
+projection SHA-256
+`3eed978da51ef82b0de3f44b2f3bb30311e27a8f628ed3f9b6663d902f78fc55`
+and profile SHA-256
+`82592bb4c82078496899f2e225c31f6c47a759b93997f464fac731eff99ed875`
+before QC mutation. The private project
+`111 ARV2 SIX CAP90 TILT60 R188 2021 2025` (`36935799`) read back and
+compiled those exact files. Its one A1 backtest
+`163a61a9c9b878e566030e6573310e10` launched under distinct
+waived-payload SHA-256
+`e4ef52f5ab99eedeb935bb874cd5ccae400181736db4b5be08ef3c5a03d561f4`
+and terminated `Runtime Error`. Statistics-disabled status-envelope
+classification again located `_portfolio_cash` during `on_order_event`;
+the actual value was not read. No result aggregate, return, raw provider/
+price/order row, chart, or log was read or retained. The refusal does not
+estimate alpha or justify weakening the cash guard.
+
+R-188 A1 spends **177 -> 178 shared research looks / 120 -> 121 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. It uses one of R-188's three attempt
+slots. The preregistered R-189 50% candidate is a separate exploratory
+look, not a retry of either cash-refused predecessor.
+
+## R-189 — 50% matched-stock analyst-revision tilt, A1 cash-bound runtime refusal (EXPLORATORY; NO RESULT CELL) — 2026-09-25
+
+Analyst lane section 184 prospectively froze R-189's separate 16-file
+projection SHA-256
+`e1f417b2a7e785e558ec0af83297083fa07c0bbc22c930447bb6e0e99a25f2d3`
+and profile SHA-256
+`5314cab14e8f50e38998c07dead583eb38b57eefcb0e2ad8768d5681adec116e`
+before QC mutation. Private project
+`112 ARV2 SIX CAP90 TILT50 R189 2021 2025` (`36935869`) read back and
+compiled the exact source. Its sole A1 backtest
+`35f0a10e81cd32980782ebe7e49b7542` launched under distinct
+waived-payload SHA-256
+`f457c276e76f36361cb51268a4ef8d9e0f8d56931b4697859d039f195e5ff8ff`
+and terminated `Runtime Error`. Value-free statistics-disabled status
+classification located `_portfolio_cash` during `on_order_event`; the
+actual cash amount was not read. No result aggregate, return, raw
+provider/price/order row, chart, or log was read or retained. This is
+neither a successful backtest nor an alpha estimate.
+
+R-189 A1 spends **178 -> 179 shared research looks / 121 -> 122 ARV2
+development evaluations**; infrastructure looks remain **32** and
+authenticated cells remain **613**. It uses one of R-189's maximum three
+attempt slots. The preregistered 70%/60%/50% ladder is complete, with
+all three cash-refused and no new result cell. Together with R-186 80%
+the four refusals are an execution-validity limitation under unchanged
+98%-gross/2x-admission/nonnegative-event-cash rules, not a comparative
+return curve. R-185 40% is the highest tested tilt in this family with a
+valid result; no unbounded follow-on sweep or retroactive rescue is
+authorized by these failures.
+
+## R-190 — owner/Mia post-R-186 settlement-cash repair census (FOUR LOOKS; NO ACCEPTED RESULT CELL) — 2026-09-25
+
+After R-186 A1's recorded cash-bound refusal, the owner worked with QC's
+Mia in the same private project `36935164`. An authenticated
+statistics-disabled backtest list shows four additional launches: the
+one-day `ARV2 MOO probe ABBV 2023-11-28`
+(`63718874d7ded09ef0e56c3039f9ab18`, `Completed.`), settlement-cash
+repair v1 (`96e893534c6cab2da9a9c53491e3c1d1`, `Runtime Error`),
+repair v2 (`62925e83f6be1933f73e4670c53de3fb`, `Runtime Error`), and
+repair v3 (`5d22091028f19f0787120bd7b4db3f2d`, `Completed.`).
+No result statistic, aggregate, order, log, chart, provider row, or raw
+price was read for this census. The probe is conservatively counted as
+a development evaluation until its exact snapshot and observation scope
+can be authenticated; no valid return cell follows from either
+`Completed.` status.
+
+The current QC project source differs from frozen R-186 in two cash/order
+files, not in the 80% target. Mia changed buy-fill-prefix cash refusal
+to final-settled cash refusal and admitted temporary negative event cash
+while a market-on-open order remains pending. That is a new execution
+policy. The original R-186 source/profile/reader cannot authenticate the
+new v3 run; in particular, the original reader requires nonnegative event
+cash and the old A1 backtest ID. The v3 run remains a **diagnostic**, with
+no return or alpha estimate imported into this ledger. Analyst lane
+section 185 records the full code comparison and separately prospective
+R-191 matched/R-192 80% settlement-policy test plan.
+
+All four post-A1 launches are counted conservatively: **179 -> 183 shared
+research looks / 122 -> 126 ARV2 development evaluations**; infrastructure
+looks remain **32** and authenticated cells remain **613**. This count
+includes Mia's launches even though Codex did not submit them. It neither
+rewrites the previous R-186 refusal nor treats the new policy as the
+original 80% test.
+
+## R-191 — settlement-policy same-selected-stock market-cap weights, A1 valid exploratory result — 2026-09-25
+
+Analyst lane section 185 prospectively pinned a distinct settlement-cash
+execution policy, exact 14-file source/profile, private project, and
+owner-waived one-use research launch before QC mutation. Private project
+`113 ARV2 SIX CAP90 SETTLED MATCHED R191 2021 2025` (`36957444`)
+read back and compiled the exact projection SHA-256
+`883fc448d6b5a3f7800921988a174995ad233e0c8eab5434f6b18874b189a5bb`.
+A1 backtest `a6e22bae6ee4279dd5272500442b3f59` completed. Its one
+claimed bounded custom-aggregate read authenticated the new source/profile,
+result digest, 261/261 rebalances, 6,314/6,314 filled orders, zero invalid
+or canceled, nonnegative event/final/daily cash, sub-1x end-day gross and
+the frozen target-tracking bounds. The after-modeled-cost 2021-2025
+cumulative return was **+123.6191666261345%**, equal to the earlier R-182
+matched-return figure; this is an exploratory same-window control, not a
+new alpha claim or full-path equivalence proof. The stock-selection gate
+still depends on positive analyst-score coverage; this control removes
+the *weight tilt*, not every analyst-data influence. No raw rows, logs, orders,
+or charts were read.
+
+The A1 launch spends **183 -> 184 shared research looks / 126 -> 127 ARV2
+development evaluations**. Infrastructure looks remain **32**; the one
+valid bounded result moves **613 -> 614 authenticated cells**. R-191 used
+one of at most three QC attempts. No broker, paper/live, funded order,
+deployment, or trading authority follows.
+
+## R-192 — settlement-policy 80% analyst-revision tilt, A1 valid exploratory result — 2026-09-25
+
+After R-191's valid receipt, the separately pinned 16-file R-192 80%-tilt
+source was uploaded, byte-read back and compiled in private project
+`114 ARV2 SIX CAP90 SETTLED TILT80 R192 2021 2025` (`36957707`). One A1
+backtest `a0f8440f5b57104f2f26b992ab7badcc` completed. Its one claimed,
+source-authenticated bounded custom-aggregate read accepted `run_valid=true`
+under aggregate SHA-256
+`0a15968da37cf6660efc9ed8a8c12ea384f5d77549b562e06d781f967e9dc0be`:
+261/261 rebalances, 6,195/6,195 orders filled, zero invalid or canceled,
+one explained same-session pending-SELL negative event-cash observation,
+zero unexplained negatives, nonnegative final/daily cash, sub-1x end-day
+gross, and 2%/5% tracking bounds. After-modeled-cost cumulative return
+was **+131.5199589587574%** over 2021-2025. Against the new-policy R-191
+matched return of +123.6191666261345%, the predeclared difference is
+**+7.900792332622900 percentage points**. This same-window, adaptively
+selected 80% parameter is exploratory, not an untouched alpha estimate.
+No raw provider/price/order rows, logs or charts were read.
+
+The A1 launch spends **184 -> 185 shared research looks / 127 -> 128 ARV2
+development evaluations**. Infrastructure looks remain **32**; the valid
+bounded read moves **614 -> 615 authenticated cells**. R-192 used one of
+at most three QC attempts. No broker, paper/live, funded-order,
+deployment, or trading authority follows.
+
+## R-193 — settlement-policy 100% analyst-revision tilt, A1 runtime error; no result — 2026-09-25
+
+Analyst lane section 186 prospectively pinned the separate 100% stock-
+weight-change candidate, exact 16-file source/profile/waiver, and one
+private order-based QC launch before any cloud mutation. Project
+`115 ARV2 SIX CAP90 SETTLED TILT100 R193 2021 2025` (`36958163`)
+read back and compiled the pinned source. A1 backtest
+`c185799f754b7b74592d98a033299480` reached **`Runtime Error`** under
+status-only polling. No aggregate, return, raw row, log, order, or chart
+was read. There is **no valid R-193 return** and no basis to say whether
+100% is better or worse than the valid 80% result. A zero-weight donor is
+a locally reproduced possible refusal, but the QC cause was not established
+from permitted evidence. A2/A3 remain unspent; no blind retry, 120%/140%
+sweep, or post-outcome rule change occurred.
+
+The A1 launch spends **185 -> 186 shared research looks / 128 -> 129 ARV2
+development evaluations**. Infrastructure looks stay **32** and
+authenticated cells stay **615**. No broker, paper/live, funded-order,
+deployment, or trading authority follows.
+
+## R-194 — one-time fourth R-193-lineage 100% tilt look; completed engine, refused result — 2026-09-25
+
+This append-only entry reconciles the two launches after the R-193 A1
+entry: in owner/Mia project `36958163`, A2
+`03339972a62ecdbffe66aaa2187653f9` and A3
+`8cf40956b404bcef885f864086a9c40c` each reached QC `Completed.`,
+but neither has a source-authenticated bounded result read. The owner's
+Mia-reported approximately +133% is **not** an accepted return cell.
+Those two launches spend **186 -> 188 shared looks / 129 -> 131 ARV2
+development evaluations** without changing the 615-cell floor. The
+R-193 A1 statement that A2/A3 were unspent described the state at that
+earlier entry; it is superseded for current accounting by this entry.
+
+At the owner's explicit one-time exception, the separately pinned local
+R-194 positive-residual 100% source was uploaded and byte-read back in
+new private project `116 ARV2 SIX CAP90 SETTLED TILT100 FLOOR R194 2021 2025`
+(`36961621`), compiled, and launched once. Backtest
+`364671e6478228b691b86d78aba51574` reached QC `Completed.`. The sole
+bounded META/AGGREGATES read rechecked the current uploaded project
+files against the pinned source and authenticated the summary digest,
+but refused `settlement tilt or matched target binding
+changed` before accepting an account result. Its one-use read claim is
+spent, and no result-valid receipt exists. A changed matched target-path
+digest is the leading **unconfirmed** explanation, not a measured one.
+No R-194 return, drawdown, Sharpe, matched spread, raw provider/price/order
+row, log, or chart is accepted from this run. Analyst lane section 188
+records the exact source/waiver pins, refusal, and review notes.
+
+The R-194 launch spends **188 -> 189 shared research looks / 131 -> 132
+ARV2 development evaluations**. Infrastructure looks remain **32** and
+authenticated cells remain **615**. R-194 is honestly the fourth look in
+the R-193 100% lineage; its one-time exception permits no automatic
+retry, fifth look, or result-reader bypass. No formal alpha, broker,
+paper/live, funded-order, deployment, or trading authority follows.
+
+## R-195 — guarded 100% revision tilt; A1 creation failure, A2 valid exploratory aggregate — 2026-09-25
+
+At the owner's prospective instruction, lane section 189 froze the new
+per-sleeve **and** aggregate 1e-30 donor floors, exact 16-file source
+SHA-256 `c20e2c13ef477e4c1619cb93aafb4fef58c2a36c95f5a514c62d015f5722e28d`,
+profile `ecdc210a6f65ea1ee8e2163e4dc3debaf8b0c0996a457c57299dbed1c4198561`,
+and private project `117 ARV2 SIX CAP90 SETTLED TILT100 GUARD R195 2021 2025`
+(`36963958`). The order-based 2021-01-04 through 2025-12-31 construction
+keeps 98% target gross, weekly next-open whole-share MOO execution,
+10-bps-per-side modeled costs, and 2x **order admission only**. The nominal
+100% label is a rank-scaled transfer capacity relative to each stock's
+matched weight, not account allocation or leverage.
+
+A1 uploaded/read back/compiled the exact source, but `backtests/create`
+failed before returning a run ID or launch receipt. Two statistics-disabled
+inventories listed zero runs; the project was idle with unchanged source.
+The specific transport cause remains unknown. A1 is spent and conservatively
+counts as a possible research look: **189 -> 190 shared looks / 132 -> 133
+ARV2 development evaluations**; 32 infrastructure looks and 615 cells
+unchanged. After a separately frozen one-use recovery, A2 reused that same
+private project and source, with no new project or upload, and launched
+backtest `5762679ab25e1661208762ceb16fd043`. It is the second of R-195's
+maximum three technical attempts and the conservative sixth 100%-lineage
+possible look; the failed A1 is not erased.
+
+A2 completed and its sole current-source-authenticated bounded aggregate
+read accepted `run_valid=true`: **+133.4663997983659% after modeled costs**,
+maximum drawdown approximately **-21.2207%**, annualized volatility
+**20.4158%**, zero-rate Sharpe **0.9368**, and **5,744/5,744** submitted
+orders filled. Modeled/engine fees both were `$38,884.7907116`. After the
+intervening R-196/R-197 launches, A2 spends **192 -> 193 shared looks /
+135 -> 136 development evaluations** and its accepted read moves
+**617 -> 618 authenticated aggregate cells**; infrastructure remains 32.
+This is an adaptive same-window exploratory result with independent review
+pending, not formal alpha, production selection, or validation of R-194's
+refused result. No raw rows, logs, orders, or charts were read.
+
+## R-196 — guarded 120% revision tilt; A1 valid exploratory aggregate — 2026-09-25
+
+Lane section 189 prospectively froze the distinct 120% candidate, projection
+SHA-256 `f8489764d1925f93ecd13092d5ef0d916f681385a12dc817f02115f66328f82e`
+and profile `cf9932e48e2f282713101d8d38dec2e702b08a7796ae8ccb503abff7f32234c1`.
+Private project `118 ARV2 SIX CAP90 SETTLED TILT120 GUARD R196 2021 2025`
+(`36963997`) read back/compiled the exact source and launched A1
+`3c293b5de792030fc8228c0002886bdf`. The completed run's sole authenticated
+bounded aggregate accepted `run_valid=true`: **+136.1123820392753% after
+modeled costs**, maximum drawdown approximately **-21.2125%**, and
+**5,656/5,656** orders filled, on the same window/economic constraints as
+R-195. It spends **190 -> 191 shared looks / 133 -> 134 development
+evaluations**, moving **615 -> 616 cells**; infrastructure remains 32.
+One of three technical attempts was used.
+
+Its historical read-time `comparison_valid=false` records the then-absent
+R-195 anchor. After R-195 A2 passed, a local receipt-only reauthentication
+accepted the predeclared comparison: **+2.6459822409094 percentage points**
+versus R-195 A2. No QC result was reread and no historical flag rewritten.
+The common matched-target-path SHA-256 is
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`.
+It proves matched decisions/lineage, not identical cloud price vintages or
+realized tilted target paths. This adaptive sensitivity has review pending;
+no pristine out-of-sample, formal alpha, leverage, or trading claim follows.
+
+## R-197 — guarded 140% revision tilt; A1 valid exploratory aggregate — 2026-09-25
+
+The separately frozen projection is
+`c3edcd8bae80446fd564e4d21a1a8ff3c8a35ee68af914b13de2a344ab596576`,
+profile `83893aca4ab0dd0b0a98eb39f51b8a8c2f77ef114a1cf231acd9214437c3287f`.
+Private project `119 ARV2 SIX CAP90 SETTLED TILT140 GUARD R197 2021 2025`
+(`36964125`) read back/compiled the exact source and launched A1
+`d9916c8906d1810eaeb8c89fec56a186`. Its completed, sole authenticated
+bounded aggregate accepted `run_valid=true`: **+138.28465642521377% after
+modeled costs**, maximum drawdown approximately **-21.1368%**, and
+**5,542/5,542** orders filled, under the R-195 window/economic constraints.
+It spends **191 -> 192 shared looks / 134 -> 135 development evaluations**,
+moving **616 -> 617 cells**; infrastructure remains 32. One of three
+technical attempts was used.
+
+The read-time `comparison_valid=false` remains historical. The later local
+receipt-only check accepted comparison to R-195 A2 using the same matched
+path digest as R-196: **+4.81825662684787 percentage points** versus 100%,
+and **+2.17227438593847 points** versus 120%. Receiver caps and positive
+donor floors can saturate these nominal transfer capacities; they are not
+portfolio leverage. The three same-window results are adaptive exploratory
+sensitivities, with no untouched confirmation or monotonicity guarantee.
+Across R-195 A1/A2 and R-196/R-197 A1, the cumulative floor is **193 shared
+research looks / 136 ARV2 development evaluations / 32 infrastructure
+looks / 618 authenticated aggregate cells**. All three accepted result
+reads are spent. No raw provider/price/order rows, logs, charts, broker,
+paper/live/funded account, deployment, or trading access occurred.
+
+## R-198 — guarded 160% revision tilt; A1 valid exploratory order result — 2026-09-25
+
+Owner-requested section 190 prospectively freezes the 160/180/200 ladder
+before any outcome, with unchanged six universes, selection, market-cap
+base, ETF fallback, 98% gross and 10-bps-per-side modeled costs. Source
+`97fdd9a4332ae2d973399535c2687153e08a81ccd2eb1e4a89daf4270c687a9f`
+and profile `7b4dac4771d1cfaf5851cb8d4c31448d01f8408baa652857292755fe88776a87`
+were uploaded/read back/compiled in private project
+`120 ARV2 SIX CAP90 SETTLED TILT160 GUARD R198 2021 2025` (`36975010`).
+A1 backtest `8886f3cccaa387bd019e8427899f4679` completed. Its sole
+source-authenticated bounded aggregate passes `run_valid=true` and
+`comparison_valid=true` against R-195 A2's exact matched path. Return
+**+139.8215252042003% after modeled costs**, drawdown **−21.0738847306476%**,
+volatility **20.5423257243235%**, zero-rate Sharpe **0.958551911562468**;
+5,436/5,436 orders filled and 261/261 rebalances, no invalid/canceled.
+Engine/modeled fees both `$40,572.6008493`; read claim spent.
+
+One of three technical attempts used. Look totals **193 → 194 shared /
+136 → 137 development**, infrastructure **32** unchanged; accepted cells
+**618 → 619**. Equal matched targets do not prove equal QC price vintages
+or realized tilted paths. Higher capacity is not portfolio leverage;
+donor floors/receiver caps can saturate it. This is an adaptive same-window
+sensitivity, not untouched confirmation or live-use authority. No raw rows,
+logs, orders, charts, broker, paper/live/funded account or trading accessed.
+
+## R-199 — guarded 180% revision tilt; A1 valid exploratory order result — 2026-09-25
+
+Section 190 freezes unchanged R-198 economics except capacity and candidate
+identity. Source `773787eac1cce21d27be7dd5256b917c453c3f8474a0a0d24e8b7ef9dd86d09d`,
+profile `46d6b61812c48d2d5797ac636e5919e160a6adca6e06005f2f31c596cdc7c778`.
+Private project `121 ARV2 SIX CAP90 SETTLED TILT180 GUARD R199 2021 2025`
+(`36975172`) uploaded/read back/compiled the exact source. A1 backtest
+`6661e97812562dea4941c77e095fef4d` completed; its sole bounded aggregate
+accepted `run_valid=true` and `comparison_valid=true` against the sole
+valid R-195 A2 matched-path anchor. After-modeled-cost return
+**+141.1760623485837%**, drawdown approximately **−21.011398%**, volatility
+**20.560856%**, zero-rate Sharpe **0.963386**. All **5,367/5,367** orders
+filled, 261/261 rebalances, no invalid/canceled; modeled/engine fees both
+`$40,960.2810356`. Exact source, signed cash, exposure, cost and tracking
+gates passed; one-use read spent. One of three attempts used.
+
+Totals **194 → 195 shared looks / 137 → 138 development evaluations**,
+infrastructure **32** unchanged, authenticated cells **619 → 620**.
+This remains adaptive same-window sensitivity, not out-of-sample alpha.
+Equal matched paths do not prove identical QC price or tilted-target paths;
+180% is transfer capacity, not leverage. No raw/provider/order/price rows,
+logs, charts, broker, paper/live/funded account or trading accessed.
+
+## R-200 — guarded 200% revision tilt; A1 valid exploratory order result — 2026-09-25
+
+The final owner-requested capacity uses exact source
+`e8cc677ad751362fe702949ab52daa24ec89ade8bc6b303779a815543ef213cb`,
+profile `3b6acc8e91cd674d267bde3985b8fc123a5c2fbc809c87acfb9c74b2c3ec215c`.
+Private project `122 ARV2 SIX CAP90 SETTLED TILT200 GUARD R200 2021 2025`
+(`36975331`) uploaded/read back/compiled the pinned source. A1 backtest
+`f976080aa39af6f8d060b562d3e7e35e` completed. Its sole bounded aggregate
+read accepted `run_valid=true` and `comparison_valid=true` against R-195
+A2's exact matched-path anchor. After-modeled-cost return **+142.6322318004882%**,
+drawdown approximately **−21.027256%**, volatility **20.575772%**, zero-rate
+Sharpe **0.968724**; **5,304/5,304** orders filled, 261/261 rebalances,
+zero invalid/canceled. Engine/modeled fees both `$41,241.0606886`.
+Source, digest, signed cash, exposure, cost and tracking gates passed;
+one-use result read spent. One of three attempts used; no retry.
+
+Totals **195 → 196 shared research looks / 138 → 139 development
+evaluations**, infrastructure **32** unchanged, authenticated cells
+**620 → 621**. All six 100–200% settings are adaptive same-window tests,
+not untouched validation; the common matched path is
+`cfa8d5c8ebcd4030a3664e3db994da8c874cb7fd1f9e98253c33735dba8a82e3`,
+not a QC price-vintage or realized-tilt-path proof. Returns did not peak
+within this bounded sweep; no 220% launch or production parameter selection
+is implied. Target gross stays 98%, and 200% means bounded AR transfer
+capacity, not portfolio leverage. No raw rows/logs/orders/charts, broker,
+paper/live/funded account, deployment or real trading accessed.
+
+## R-201 — guarded 250% revision tilt; A1 valid — 2026-09-25
+
+Owner-authorized section 191 prospectively extends the adaptive 2021–2025
+capacity sweep to 250/300%, preserving order-based execution, six universes,
+98% gross, 10-bps-per-side modeled costs, caps and both positive donor
+floors. Source `09af59032015e04b8e7a97a0f54f90a240cc87b38ed793700bf58bcedca98780`,
+profile `cd38f3589131bbec453aee57b726dd09ca4f7b77441db3fe2673bafa104d6ca6`,
+were frozen in `4808a5d` / `a80718a` before upload/read-back/compile in
+private project `123 ARV2 SIX CAP90 SETTLED TILT250 GUARD R201 2021 2025`
+(`36976935`). A1 `fa9d363b1f3348500d19f1e06a8c4b03` is launched; no
+outcome is inferred. One of three technical attempts spent. Counts
+**196 → 197 shared / 139 → 140 development / 32 infrastructure / 621
+authenticated cells** pending terminal and sole bounded aggregate read.
+This is capacity, not leverage; no live/trading authority follows.
+
+R-201 A1 subsequently completed. Its sole authenticated bounded read
+accepted **run_valid=true / comparison_valid=true**, aggregate SHA-256
+`14cd97ea712b1004fd8249e43c6221f055d491c6125cabec953e4228c7dbb613`.
+Return **+145.5074024902979% after modeled costs**, drawdown
+**−21.05455364129342%**, volatility **20.62827276454471%**, zero-rate
+Sharpe **0.978278005694657**; all 5,168 orders filled, all 261 rebalances,
+no invalid/canceled, engine/modeled fees `$41,781.3400106`. Matched path
+equals the valid R-195 A2 anchor; price-vintage limitations remain. Read
+spent, cells **621 → 622**; look counts stay **197 / 140 / 32**.
+
+## R-202 — guarded 300% revision tilt; A1 valid — 2026-09-25
+
+Section 191 and commits `4808a5d` / `a80718a` prospectively freeze 300%
+with all R-201 period/economics unchanged. Source
+`5eeaa095fe57f267cf8093525c01646717c3c77f235acbaf46d185224fead287`,
+profile `5c023ec203cd14753f1dcb049d1fbb85da5078f6b16b85fe03b78a22336f7714`.
+Private project `124 ARV2 SIX CAP90 SETTLED TILT300 GUARD R202 2021 2025`
+(`36977057`) uploaded/read back/compiled exact source and launched A1
+`314605525ec8f12185f79006a4a7b8b3`. One of three attempts spent.
+Totals **197 → 198 shared / 140 → 141 development / 32 infrastructure /
+622 authenticated cells** pending its terminal/sole aggregate-read gate.
+No outcome or production setting follows from launch; this is adaptive
+same-window research with unchanged 98% target gross, not 3× leverage.
+
+R-202 A1 subsequently completed; its sole source-authenticated bounded read
+passed **run_valid=true / comparison_valid=true**, aggregate SHA-256
+`24a12697c303dccf95f35fbba0c537428e20045b8f12c6ff0222f10bb7e43be5`.
+Return **+146.9997049244877% after modeled costs**, drawdown
+**−21.25079923748689%**, volatility **20.66859855462075%**, zero-rate
+Sharpe **0.982680581947944**. All 5,000 orders filled, 261 rebalances,
+no invalid/canceled; engine/modeled fees `$41,986.5684216`. Cash, gross
+and tracking gates passed; same R-195 A2 matched path, one-use read spent.
+Cells **622 → 623**; final counts **198 shared / 141 development /
+32 infrastructure / 623 cells**. Both new capacities succeeded on A1.
+Higher adaptive same-window return does not identify a production optimum.
+The six August-2025-to-September-25-2026 candidates remain unlaunched
+because fresh Analyst Ratings access returns HTTP 403; no missing-look
+entry or successful recent-period result is inferred from their reservation.
+
+## R-203 — guarded 100% revision tilt, recent period; A1 failed; Mia A2 valid — 2026-09-25
+
+Ratings access restored to HTTP 200. Owner-authorized section 192 and
+prospective commit `d5afc82` freeze all six 100–200% capacities before any
+new outcome: **2025-08-01–2026-09-25**, 290 observations / 289 returns /
+61 weekly decisions, same six universes, ETF fallback, 98% gross,
+10 bps per side, positive donor floors and order-based next-open execution.
+Authenticated new input package
+`2649577ac55ac39de37a4a70ab4337274f1887e1a113f0972beefab615121be1`
+preserves history and adds 12 recovered / 16 fresh eligible contributions.
+Exact six-object upload authenticated, activation last. Source
+`39793ae7247bae5282f93edfbaa5f6828bd4e49332f5b7909cf07baf92557b21`,
+profile `2a14727e763e5cbcbb6c32b08b1e051cf24af210761eacabc288f8e8ae140410`.
+Private project `125 ARV2 SIX CAP90 SETTLED TILT100 R203 202508 NOW`
+(`36978919`) launched A1 `61b3faad153e52b02cca15349924b594` after exact
+source read-back and compile. **One of three attempts used**, no retry.
+Totals **198 → 199 shared / 141 → 142 development / 32 infrastructure /
+623 authenticated cells**, pending terminal and sole bounded result read.
+This overlapping, adaptively chosen window is not untouched validation.
+R203 is a 100% capacity reference, not a new tilt-off account. No outcome,
+leverage, optimum or trading authority follows from launch.
+
+A1 reached **Runtime Error during initialization**: first activation
+manifest unavailable to the worker's existence/type guard. No orders,
+accepted aggregate, or result-read claim; counts remain **199 shared /
+142 development / 32 infrastructure / 623 cells**. Same-org backend
+metadata and Mia's read-only project inspection find the exact 4,523-byte
+manifest present; engine-local visibility and bool type remain unresolved.
+R204–R208 were stopped before launch to avoid repeating a common failure.
+Two R203 attempts remain, restricted to the same project and frozen
+economics. No fourth attempt or successful result is inferred.
+
+The owner/Mia subsequently completed actual **R203 attempt 2** in the same
+project, backtest `10769b9d9b285c5413823cd8dda3d64c`, snapshot 36980748,
+named `R203 A1 contains-key-fix rerun`. Its A1 label does not reset the
+budget; Codex's prepared same-source A2 was never claimed/launched.
+Conservative totals **199 -> 200 shared / 142 -> 143 development /
+32 infrastructure / 623 authenticated cells**, pending one-use imported
+aggregate validation. Current source differs only by removal of the
+redundant Object Store existence precheck; direct read, exact bytes and
+SHA-256 still enforce input integrity. Fifteen other files and all economic
+profiles are unchanged. Recovery projection
+`a5fff0112a08ca453fac5b01740a89eeb67bc72a1adecbfb1b9cbe686139ab26`.
+No historical-source cryptographic proof or accepted return is inferred
+from current read-back/timestamps/Completed alone. Section 192.4 freezes
+the separately corrected R204-R208 source identities before their launches.
+
+The sole R203 owner/Mia imported read passed **run_valid=true** with
+aggregate SHA-256 `013f4d9d5d7236766ac03feb6e4a166a3a36b9d4e263e2d861856075e15324ee`:
+**+51.0522340385% after modeled costs**, drawdown **−11.2230083664100%**,
+volatility **17.5742323730253%**, zero-rate Sharpe **2.13585197884188**,
+1,072 filled orders / 61 rebalances, no invalid/canceled, engine/model
+fees `$9,058.299615`. Cash/exposure/tracking gates passed. Cells
+**623 -> 624**, look totals **200 shared / 143 development / 32 infrastructure**.
+Separate Mia provenance and no historical snapshot byte proof retained;
+no invented Codex launch or waiver. Matched path
+`7710b02b7608ec2b5128ab4435351e5501ea1569dfcb69f69ddd6d9e4e189328`.
+
+## R-204 — corrected 120% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective commit `1744659` freezes the verified input direct-read
+correction before all remaining launches; economic settings and authenticated
+inputs remain unchanged from section 192.2. Exact 16-file source readback
+and compile in private project `36981341`,
+`126 ARV2 SIX CAP90 SETTLED TILT120 R204 202508 NOW`, precede A1 backtest
+`0842cd97750e0dd6bc026f4b3ec7d8a1`. Corrected projection
+`1aad7dc4b7083dd8d062d08f2ca3d239d142e9c5dc4e93e5fc50fbd6fa5a7b32`,
+profile `9e4d7a788e594834433ec34f957db25caf4f2847598fc8b3423957170195ccb9`.
+One of three technical attempts spent; launch counts **200 -> 201 shared /
+143 -> 144 development / 32 infrastructure / 624 cells**.
+Completed; sole bounded read passed **run_valid=true / comparison_valid=true**,
+aggregate SHA-256 `dc12131b29003374697ec12ea8b456bc94a6dbbaf363dda926cd0889ed3d165b`.
+Return **+51.226273341% after modeled costs**, drawdown **−11.2200602232%**,
+volatility **17.5929305337%**, zero-rate Sharpe **2.13948115551**,
+1,057 filled orders / 61 rebalances, no invalid/canceled; engine/model
+fees `$9,120.08659`; cash/gross/tracking passed. Matched path equals R203.
+Cells **624 -> 625**; final counts **201 / 144 / 32 / 625**.
+Only SPY/XLV stock sleeves are tilted on this period; QQQ/SOXX/REMX/XLE
+retain ETF fallback. Same-window adaptivity and PIT limits remain.
+
+## R-205 — corrected 140% revision tilt, recent period; A1 valid — 2026-09-26
+
+Exact source from prospective `1744659` uploaded, read back and compiled
+in private project **36981429**,
+`127 ARV2 SIX CAP90 SETTLED TILT140 R205 202508 NOW`; A1 backtest
+`0cbf0b03ad27d0e6328c324af4d45444`. Source
+`91747ad28ccf17784a3d40f4bc374a12c74c7289da7be3659739c7fa899ff4d0`,
+profile `f8e641731f322c67420c82ccf463cbb5e513fb08961330132855e667daacf271`.
+One of three attempts spent. Counts **201 -> 202 shared / 144 -> 145
+development / 32 infrastructure / 625 authenticated cells**; pending
+separate terminal and one-use bounded result validation.
+
+R205 completion: `Completed.`; sole source-authenticated bounded read
+**run_valid=true / comparison_valid=true**, aggregate SHA-256
+`23ed3042efc6b6fc3d46dfed4f672557c1571c3f217d46470894a11feedd2895`.
+After-cost return **+51.292307799%**, drawdown **−11.1991253331%**,
+volatility **17.6097562359%**, zero-rate Sharpe **2.13976681998**;
+1,022 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,188.79201`; cash/gross/tracking passed.
+Matched path equals R203; cells **625 -> 626**, totals **202 / 145 / 32 / 626**.
+Only SPY/XLV stock sleeves carry tilt; other four sleeves remain ETF fallback.
+
+## R-206 — corrected 160% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981490**,
+`128 ARV2 SIX CAP90 SETTLED TILT160 R206 202508 NOW`, A1 backtest
+`d550721731730c4dbbcd2f503cbca7f4`. One of three attempts spent; launch
+**202 -> 203 shared / 145 -> 146 development / 32 infrastructure / 626 cells**.
+Projection `d79ca9149f963079cbca4de91fbab670454910dc92d3921b97e28f565a6859ea`,
+profile `3ff5c516323b945eea28bd1104f3ebaa215ebfb3a70c1ab76f778ec033ada2c5`,
+source manifest `69628fb750f270d4de148e153bb709fdb85ccc0e84713a21451dd9939857e613`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `e5ac0b5af2a4dfbb010eb16b9fa331e3c044f55e9b4a4b996d70ae7da589225e`.
+2025-08-01–2026-09-25 after-cost return **+51.386924546%**, drawdown
+**−11.1665198634%**, volatility **17.6421226761%**, zero-rate Sharpe **2.13925424180**.
+996 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,257.05954`; cash/gross/tracking gates passed.
+Matched path equals the authenticated R203 recent reference; cells **626 -> 627**,
+totals **203 / 146 / 32 / 627**. SPY selects stocks on 45/61 decisions,
+XLV on 58/61; QQQ/SOXX/REMX/XLE remain ETF fallback on all 61.
+No same-period ETF benchmark return was read; repeated-window adaptivity remains.
+
+## R-207 — corrected 180% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981560**,
+`129 ARV2 SIX CAP90 SETTLED TILT180 R207 202508 NOW`, A1 backtest
+`9fbe2814b500db873b984b2751618299`. One of three attempts spent; launch
+**203 -> 204 shared / 146 -> 147 development / 32 infrastructure / 627 cells**.
+Projection `89461345526643e61be70badf7a9610d664434b092ba353fc7f534f050de4882`,
+profile `cbfc4c7ad196f50b0dfdd221572b4f26a3fddef6e3cd87781d03e192e2d7a214`,
+source manifest `22974f9ffc7ec011381f6a187960ad6ad77387483d7367597d1a018cbc9e5a13`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `e2dca03cc456a9deff0258c23071e6d8745b98c9f79b1c41eb342ba18a4040ca`.
+2025-08-01–2026-09-25 after-cost return **+51.4590932735%**, drawdown
+**−11.1689544091%**, volatility **17.6822881787%**, zero-rate Sharpe **2.13714668449**.
+991 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,339.177265`; cash/gross/tracking passed.
+Matched path equals R203; cells **627 -> 628**, totals **204 / 147 / 32 / 628**.
+Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
+No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.
+
+## R-220 — same-selection zero weight-tilt control; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998687**, A1 backtest
+`9f38b5c172f30d93c222c64aeadc7b32`. One of three attempts used. Exact source,
+profile and input pins: `six_universe_weight_ablation_candidates.json`.
+Order-based 2025-08-01–2026-09-25, 61 weekly decisions, 98% gross, 10 bps/side;
+zero weight transfers but AR entry/count retained outside XLE. Completed;
+sole bounded custom read valid, aggregate SHA
+`2f4ac136b1ca6d9ca026ac4475870c55daa11638adeeb549d414aba96224cf1f`.
+Net return **+55.2672684305%**, drawdown **−10.5819836762%**, volatility
+**18.1452359393%**, zero-rate Sharpe **2.20671238239**; 2,076 orders all filled,
+engine/model fees `$14,102.845695`, zero invalid/canceled/unexplained negative
+cash; cash/gross/tracking gates pass. Matched path equals R214 and the ladder:
+`e86d0ce6aa38a35cbae8eeedb317e895a71f30fc1bd27e7fbd77b9e6d490b006`.
+Launch **217 -> 218 shared / 158 -> 159 development / 34 infrastructure /
+639 cells**; accepted preliminary read **639 -> 640**. Result is not a fully
+AR-free control or proof of skill. Current floor **218 / 159 / 34 / 640**.
+
+## R-221 — fresh matched-selection 100% weight tilt; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998780**, A1 backtest
+`c76bd1544ee04df6bd94c3c046042bd9`. One of three attempts used, no retry.
+Exact R214 100% source reproduced, pins in the separate ablation manifest.
+Same order-based input/window, 61 decisions, 98% gross and 10 bps/side as R220.
+Completed; sole bounded read valid; aggregate SHA
+`592d2436072b63d2aa91119bccebaaa31dd5150ca1e64029b48d78ea495f4dad`
+is identical to R214, not merely a rounded-return replication. Net return
+**+54.8816924105%**, drawdown **−10.8136325554%**, volatility **18.4635271944%**,
+zero-rate Sharpe **2.16004362529**; 1,914 orders all filled, engine/model fees
+`$14,577.520895`, zero invalid/canceled/unexplained negative cash; all gates pass.
+Locally reauthenticated arm claims/raw summaries match each other's complete
+baseline path and sleeve diagnostics. Weight-tilt net spread versus R220 is
+**−0.385576020000 pp**; this window offers no incremental benefit for that
+100% overlay. AR entry/count remain in both; no entire-AR verdict or ETF
+comparison follows. Data-vintage/PIT/adaptive-window caveats remain.
+Launch **218 -> 219 shared / 159 -> 160 development / 34 infrastructure /
+640 cells**, valid read **640 -> 641**; floor **219 / 160 / 34 / 641**.
+
+## R-222 — all-six 25% coverage floors with 100% tilt; A1 valid — 2026-09-26
+
+Prospective source `4b00c2b`; private project **36998897**, A1 backtest
+`25d4689780c4d8db9fc1b0f9989d97e4`. One of three attempts used, no retry/Mia.
+Separate `six_universe_coverage25_candidates.json` pins the changed construction.
+Same package/activation and 2025-08-01–2026-09-25 window, 61 weekly decisions,
+98% gross and 10 bps/side; five verified names/positive-score entry outside
+XLE retained, all-six identified-budget scaling and own-ETF residuals.
+Completed; sole bounded read valid, aggregate SHA
+`c592f0703e8988bfb54852d7ea9193269269a2850896ff72b83b908f74cf3db2`.
+Net return **+53.6512129385%**, drawdown **−11.0951445171%**, volatility
+**18.5155660557%**, zero-rate Sharpe **2.11688653215**; 2,050 orders all filled,
+engine/model fees `$12,689.385615`, zero invalid/canceled/unexplained negative
+cash; all cash/gross/tracking gates pass. Matched path changed to
+`6ec82176adb5e29c94b2a3b3cd114862b322e26032b904afad1c9475f96be568`.
+Stock-entry decisions: SPY 58/61 (was45), QQQ55, SOXX53, XLV58, XLE58,
+REMX0. Return is **−1.230479472000 pp** versus R221, a construction comparison,
+not AR attribution: stock admission and residual budgets changed together.
+REMX still fails five-known-name coverage on60 dates, AR entry on the other.
+No fresh same-period ETF-basket result or live/formal acceptance is claimed.
+Launch **219 -> 220 shared / 160 -> 161 development / 34 infrastructure /
+641 cells**, valid read **641 -> 642**; final floor **220 / 161 / 34 / 642**.
+
+## R-209 — recent six-sleeve coverage counts and one transport recovery — 2026-09-26
+
+Owner-authorized count-only diagnostic, not an alpha/return evaluation.
+Source frozen at `8bb47ed`; private project **36982551**, A1 backtest
+`1e2b8175fa026c00c69f601c855e64fc` reached `Completed.`. Nine files /234,508 B,
+projection `5bd2733a5f05582845f707178992f56081e8fe78e615bb0294e9506c0e0b2690`,
+profile `854b469ad40667cc8e55a23a23da5593cfc247fca945cf6e1270d79d4096c4f9`.
+The first count read's old 16 KiB receipt writer refused the 30,199-byte
+seven-string envelope before saving/parsing. New finite 128 KiB artifact
+writer and exact one-time recovery frozen at `d587643`; original spent claim
+preserved, separate recovery claim, same exact run/source, no relaunch.
+Conservatively count launch **205 -> 206 shared / 148 development / 32 -> 33
+infrastructure / 629 cells**, recovery read **206 -> 207 shared / 148 development
+/ 33 -> 34 infrastructure / 629 cells**. No alpha/development look or cell added.
+Seven custom count summaries authenticated; no returns, prices, raw identifiers,
+orders, logs or standard statistics inspected. Coverage aggregate SHA
+`384db067a3fd7d6cd8c673b7924d77fb08d17678b8984a729d14a216d9e9202b`.
+Counts justify a separately frozen QQQ/SOXX 70%-member/80%-cap-weight/95%-total
+policy (55/58 of 61 coverage decisions); REMX 50%/50%/25% with five known names
+admits only one decision and leaves unresolved exposure in REMX. These are
+coverage, not AR-entry or return counts. Full decision/risk notes in lane 193.
+
+
+## R-210 — relaxed six-universe 20% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36982854**,
+A1 backtest `7ce855ca03066d9317ad825a9d57cff0`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`3d609445a484a25d8e48a8b88158f7a6ed844d53cd5f9b441bba8cc8e7d9a2c9`.
+Net return **+55.168949%**, drawdown
+**-10.629583%**, volatility **18.192717%**,
+zero-rate Sharpe **2.198383**; 2089 filled orders,
+fees `$14163.793475` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **207 -> 208 shared /
+148 -> 149 development / 34 infrastructure / 629 cells**;
+accepted preliminary read adds one cell, **629 -> 630**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **208 / 149 / 34 / 630**.
+
+
+## R-211 — relaxed six-universe 40% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36982955**,
+A1 backtest `29559dc652911e93a03465f84412765a`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`771cc81aae6b13840e0928308307e0e591d20a934c774340c77728264b0007b2`.
+Net return **+55.098631%**, drawdown
+**-10.683660%**, volatility **18.247446%**,
+zero-rate Sharpe **2.190163**; 2082 filled orders,
+fees `$14250.354145` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **208 -> 209 shared /
+149 -> 150 development / 34 infrastructure / 630 cells**;
+accepted preliminary read adds one cell, **630 -> 631**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **209 / 150 / 34 / 631**.
+
+
+## R-212 — relaxed six-universe 60% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983039**,
+A1 backtest `0966264e2ff7ddc042ac8e1129885196`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`df10566471fd7d12a5f1aac9179c999d8469796b407f4e29df66fa9979e81b02`.
+Net return **+54.974562%**, drawdown
+**-10.735042%**, volatility **18.314493%**,
+zero-rate Sharpe **2.178994**; 2075 filled orders,
+fees `$14356.056525` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **209 -> 210 shared /
+150 -> 151 development / 34 infrastructure / 631 cells**;
+accepted preliminary read adds one cell, **631 -> 632**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **210 / 151 / 34 / 632**.
+
+
+## R-213 — relaxed six-universe 80% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983111**,
+A1 backtest `11e54c1c7af7193fbe21f76292886636`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`5024964ab33dd19862324755bafa70c35c2e8691b03241de05cac988d8a5a417`.
+Net return **+54.950556%**, drawdown
+**-10.764413%**, volatility **18.382683%**,
+zero-rate Sharpe **2.170851**; 2049 filled orders,
+fees `$14470.287425` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **210 -> 211 shared /
+151 -> 152 development / 34 infrastructure / 632 cells**;
+accepted preliminary read adds one cell, **632 -> 633**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **211 / 152 / 34 / 633**.
+
+
+## R-214 — relaxed six-universe 100% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983178**,
+A1 backtest `4edc6954f573fd2624f7fd381a014fc3`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`592d2436072b63d2aa91119bccebaaa31dd5150ca1e64029b48d78ea495f4dad`.
+Net return **+54.881692%**, drawdown
+**-10.813633%**, volatility **18.463527%**,
+zero-rate Sharpe **2.160044**; 1914 filled orders,
+fees `$14577.520895` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **211 -> 212 shared /
+152 -> 153 development / 34 infrastructure / 633 cells**;
+accepted preliminary read adds one cell, **633 -> 634**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **212 / 153 / 34 / 634**.
+
+
+## R-215 — relaxed six-universe 120% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983239**,
+A1 backtest `78acf4051b06bb482d9cf002baf8c0b5`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`6a3b9e4f6805994a2f1e4b2cb9e25ea8ebbee2258add2d0a24ac332db414d82c`.
+Net return **+55.085975%**, drawdown
+**-10.754727%**, volatility **18.461410%**,
+zero-rate Sharpe **2.166500**; 1908 filled orders,
+fees `$14672.588135` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **212 -> 213 shared /
+153 -> 154 development / 34 infrastructure / 634 cells**;
+accepted preliminary read adds one cell, **634 -> 635**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **213 / 154 / 34 / 635**.
+
+
+## R-216 — relaxed six-universe 140% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983309**,
+A1 backtest `b9eee5b433c71b8f57faee629aaa37e3`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`c47a5356cb1b2498734f7414605e57e2ce896a5327320bb03b2535d82c928cfc`.
+Net return **+55.231199%**, drawdown
+**-10.701562%**, volatility **18.466941%**,
+zero-rate Sharpe **2.170327**; 1859 filled orders,
+fees `$14751.433495` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **213 -> 214 shared /
+154 -> 155 development / 34 infrastructure / 635 cells**;
+accepted preliminary read adds one cell, **635 -> 636**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **214 / 155 / 34 / 636**.
+
+
+## R-217 — relaxed six-universe 160% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983369**,
+A1 backtest `dff7b806e543a885e6b35a6c3487eb45`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`a62e438c6cb8c04b7ce66374e6ec1098563c8eef9ddf5db9424f2318e11dc98e`.
+Net return **+55.309408%**, drawdown
+**-10.628493%**, volatility **18.476952%**,
+zero-rate Sharpe **2.171625**; 1830 filled orders,
+fees `$14844.834645` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **214 -> 215 shared /
+155 -> 156 development / 34 infrastructure / 636 cells**;
+accepted preliminary read adds one cell, **636 -> 637**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **215 / 156 / 34 / 637**.
+
+
+## R-218 — relaxed six-universe 180% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983425**,
+A1 backtest `7aa218f6371c458ff3a250e43e0ef428`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`c0c73e617d0ca994727d00413d18ffd1d9ffe81b5e66583c78309840ac7ddfe5`.
+Net return **+55.424784%**, drawdown
+**-10.521886%**, volatility **18.481644%**,
+zero-rate Sharpe **2.174624**; 1806 filled orders,
+fees `$14924.10465` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **215 -> 216 shared /
+156 -> 157 development / 34 infrastructure / 637 cells**;
+accepted preliminary read adds one cell, **637 -> 638**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **216 / 157 / 34 / 638**.
+
+
+## R-219 — relaxed six-universe 200% AR tilt; A1 valid — 2026-09-26
+
+Prospective source `1d4de30`; private QC project **36983491**,
+A1 backtest `166f906ab5144ef84eee4107c0b3f670`; one of three attempts used.
+Same latest package and 2025-08-01–2026-09-25 period, 61 weekly decisions,
+98% target gross and 10 bps/side. Exact profile/projection/source pins are in
+`six_universe_relaxed_candidates.json`, not hand-copied into this ledger.
+Completed; sole custom read **run_valid=true**, aggregate SHA
+`8a33713d10509a0eb50ee047858cafeff9de68e230e505443d42c7cb82062f25`.
+Net return **+55.675177%**, drawdown
+**-10.444006%**, volatility **18.489376%**,
+zero-rate Sharpe **2.181392**; 1737 filled orders,
+fees `$14999.56159` match modeled fees, no invalid/canceled orders.
+Cash/gross/tracking gates pass. Launch **216 -> 217 shared /
+157 -> 158 development / 34 infrastructure / 638 cells**;
+accepted preliminary read adds one cell, **638 -> 639**.
+All ten have identical sleeve-admission counts and matched target path;
+QQQ/SOXX/XLE now select stocks, REMX remains ETF fallback. New policy is a
+combined coverage/XLE change; no clean AR-off or ETF-basket control is claimed.
+Total after this read: **217 / 158 / 34 / 639**.
+
+## R-223 — fully AR-off all-six 25% control; A1 valid — 2026-09-26
+
+Prospective source `8cc7e7c`; private project **37001346**, backtest
+`7651b2b7e8df020d1e34aa4f432a879f`, one of three attempts used. Exact mode,
+source/profile/protocol pins are in `six_universe_full_ar_ablation_candidates.json`.
+All-six 25% coverage, same authenticated input/identity catalog and
+2025-08-01–2026-09-25 period, 61 weekly pre-open order decisions, 98% target
+gross, 9.8% direct-name cap and modeled 10 bps/side. AR entry/count/weight
+disabled; five verified-cap names, partial scaled budget and own-ETF residual
+preserved. Not an independent full-security-master or ETF comparison.
+Launch **220 -> 221 shared / 161 -> 162 development / 34 infrastructure /
+642 cells**. Completed; sole custom read **run_valid=true**, aggregate SHA
+`b150621e2bc2d6daeb6d27d09f60382c478c678de4cedc72354d90da4f3e898e`.
+Net return **+53.7655799466%**, maximum drawdown **-10.8847003960%**,
+annualized volatility **17.8552601860%**, zero-rate Sharpe **2.19210042573**.
+2,415 orders all filled, engine/model fees `$13,083.082534`, zero invalid,
+canceled or unexplained-negative-cash events; 61 completed rebalances and
+cash/settlement/gross/tracking gates green. Valid read adds one cell,
+**642 -> 643**; floor **221 / 162 / 34 / 643**. No retry/Mia edit/repeated read.
+Economic AR-off remains conditional on the same accepted-risk input catalog;
+authenticated score clock/input validation retained, AR-positive diagnostic
+zero means not-used. Stock-entry decisions SPY 58, QQQ 55, SOXX 58, XLV 58,
+REMX 1, XLE 58 of 61; same coverage refusals, not invented identities.
+Fresh AR-on result and cached authenticated comparison follow separately.
+
+## R-224 — fresh all-six 25% AR-on 100% reference; A1 valid — 2026-09-26
+
+Prospective source `8cc7e7c`; private project **37001447**, backtest
+`4a703ad303007b317fb638cc6d3f63a9`, one of three attempts used. Exact R222
+cloud source/projection/profile reproduced inside the separately pinned
+full-AR ablation family. Same period/input/coverage/order/cost/exposure as R223;
+AR entry/count outside XLE and 100% weighting remain enabled. Launch
+**221 -> 222 shared / 162 -> 163 development / 34 infrastructure / 643 cells**.
+Completed; sole bounded read **run_valid=true**, aggregate SHA
+`c592f0703e8988bfb54852d7ea9193269269a2850896ff72b83b908f74cf3db2`,
+identical to R222's entire aggregate, not merely its rounded return.
+Net return **+53.6512129385%**, drawdown **-11.0951445171%**,
+annualized volatility **18.5155660557%**, zero-rate Sharpe **2.11688653215**.
+2,050 orders all filled; engine/model fees `$12,689.385615`, zero invalid,
+canceled or unexplained-negative-cash events, 61 completed rebalances;
+cash/settlement/gross/tracking gates green. Read adds one cell,
+**643 -> 644**; final floor **222 / 163 / 34 / 644**. No retry, Mia edit or
+repeated outcome read. Locally reauthenticated pair has identical non-AR
+coverage counts/reasons and input-collection census; intentionally different
+baseline paths and AR-dependent stocks/weights. Total AR-on-minus-off net
+spread **-0.114367008100 pp**; no incremental net return in this construction
+and window, not universal AR rejection or a fresh ETF-outperformance claim.
+The selected adaptive window, input/identity catalog, missing histories,
+PIT/vintage and lack of an independent price-series digest remain limitations.
+
+## R-208 — corrected 200% revision tilt, recent period; A1 valid — 2026-09-26
+
+Prospective source commit `1744659`; private project **36981612**,
+`130 ARV2 SIX CAP90 SETTLED TILT200 R208 202508 NOW`, A1 backtest
+`55cd303aa5010cd5ef76e76d0cac29b3`. One of three attempts spent; launch
+**204 -> 205 shared / 147 -> 148 development / 32 infrastructure / 628 cells**.
+Projection `8efe09156adddd25dab77f489220cc6a9aeb5e8481516c75fbd9f24bed6d76cc`,
+profile `c84a1a17d23e504044baf63807a83135b4d098062b7a2b98a041336234f1809a`,
+source manifest `ed0d135c1c150c489542c69eb027803b9d448d1cee14842ba27ac83aa233e875`.
+Completed; one bounded read **run_valid=true / comparison_valid=true**,
+aggregate `4fd041c198ba5ee173acac9f8a18ff4d9cf3924148191e29d5fce4293092e38e`.
+2025-08-01–2026-09-25 after-cost return **+51.5554638035%**, drawdown
+**−11.1821102836%**, volatility **17.7121758791%**, zero-rate Sharpe **2.13697297011**.
+984 filled orders / 61 completed rebalances, zero invalid/canceled,
+engine/model fees `$9,393.636965`; cash/gross/tracking passed.
+Matched path equals R203; cells **628 -> 629**, totals **205 / 148 / 32 / 629**.
+Stock selection remains SPY 45/61 and XLV 58/61, four other ETF fallbacks 61/61.
+No new-period ETF benchmark claim; adaptive-window/PIT limitations unchanged.
+
+## Provider-only vintage-drift checkpoint — 2026-09-26 (no new research look)
+
+Lane section 197 counter-reviews Claude section 196 and compares authenticated
+September 17 versus September 26 Massive snapshots over event dates
+2026-08-01–2026-09-16. Fresh capture `arv2-capture-1300846918a5689151d91c99`,
+manifest `653a6ffbf6a53e3498ef30d67f685507d3d6eedccffedc16734674ee4a7ccecf`,
+3 pages / 14,314 rows. **9,105 common ratings unchanged; five additional
+rating IDs; all 3,446 common earnings and 1,758 common guidance unchanged.**
+Zero disappeared or ambiguous IDs; no payload or last_updated-only changes.
+Count-only report `a86f3607e8be28ff433d242f6d842f195207dbf0bfb296cb5328d6cdeb946f4d`.
+This measures about nine days between captures, not original event-time truth
+or years of overwrite risk. Historical AR return attribution remains unproved;
+no QC launch/read, backtest input replacement or return calculation. Floor
+unchanged: **222 / 163 / 34 / 644**. Four corrected completion headings preserve
+their historical bodies and R203's failed-A1/valid-Mia-A2 distinction.
+
+## R-225 — matched historical AR-off, zero slippage; A1 runtime refusal — 2026-09-26
+
+Owner directed execution before another review of source `575b611`; lane
+section 198 prospectively freezes all six R225–R230 arms, unchanged manifest
+`8c7e79faf1b25603a110744ad4464cd22a439dfc65fa1fe312cbaddd6938e0e5`.
+Private project **37017548**, `147 ARV2 SIX MATCHED AR_OFF S0 R225 2021 2025`,
+A1 backtest `2eac544a09443faa044a14b30cf57524`. One of three attempts spent.
+2021-01-04–2025-12-31, fully AR-off cap-ranked top-ten equal slots plus
+own-ETF residuals, all-six 25% known-subset coverage, 98% gross target,
+10-bps fees / zero slippage per side, next-open MOO actual simulated orders.
+Launch **222 -> 223 shared / 163 -> 164 development / 34 infrastructure /
+644 cells**. A1 stopped at simulated **2022-10-03 16:00** because the RAW
+reference-price census for targets/current holdings was incomplete. The
+guard refused stale-price fallback. Exact terminal inventory/error inspected;
+no return/statistic read, no valid cell. Cause within the census is still
+under investigation; no blind unchanged-source retry. Current-vintage accepted-risk
+history; total AR ablation, not an independent confirmation or capacity winner.
+
+## R-226 — matched historical AR-on100, zero slippage; A1 runtime refusal — 2026-09-26
+
+Same prospective section-198 family/source `575b611`; private project
+**37017666**, `148 ARV2 SIX MATCHED AR_ON100 S0 R226 2021 2025`, A1 backtest
+`1ff10eae2ac4a03d202c0cc291dd784e`. One of three attempts spent. Same dates,
+input, coverage/exposure/order rules and 10-bps fees / zero slippage; AR entry,
+count and bounded 100% weight transfers active, XLE entry exception retained.
+Launch **223 -> 224 shared / 164 -> 165 development / 34 infrastructure /
+644 cells**. A1 stopped at simulated **2022-10-03 16:00**, with the same
+incomplete RAW reference-price census refusal as R225. Exact terminal/error
+inspected; no returns/statistics read, no cell. A valid individual arm would
+not clear the failed control or complete the six-arm matched comparison.
+
+## R-227 — matched historical actual six-ETF basket, zero slippage; A1 valid — 2026-09-26
+
+Original frozen source `575b611`, private project **37017790**,
+`149 ARV2 SIX MATCHED SIX_ETF_BASKET S0 R227 2021 2025`, A1 backtest
+`b9b45f646a567b5f688031e38cc5018e`. Same period, input and execution plumbing;
+equal six sleeve budgets apart from exact rounding residual, actual ETF
+orders only, 98% gross / 10-bps fees / zero slippage. One of three attempts
+spent. Launch **224 -> 225 shared / 165 -> 166 development / 34 infrastructure /
+644 cells**. Completed; sole bounded read **run_valid=true**, 1,255 observations,
+261 completed rebalances, **1,523 orders all filled**, zero invalid/canceled.
+Net account return **+106.334773436208%**, maximum drawdown **−21.273414804413%**,
+annualized volatility **19.828479860206%**, zero-rate Sharpe **0.833337465284**.
+Engine/model fees `$8,028.44136`, starting equity `$1,000,000`; no leverage
+exposure claim. Linked diagnostic is 4,818 bytes; source/panel/annual censuses
+accepted. Read adds one cell, **644 -> 645**, floor **225 / 166 / 34 / 645**.
+The stock controls remain invalid; no matched AR spread is claimed from this
+partial family. This ETF account is a simulated construction, not live returns.
+
+## R-225 A2 — same-project missing-reference diagnostic refused — 2026-09-26
+
+Prospective diagnostic source `f8b2830`, successor manifest
+`2718100d6c3863ebd7959142afaca58323360372d03a346961d04657102de4b3`;
+economic/profile/package pins unchanged. Same private project **37017548**,
+A2 backtest `80babe5d0bde49438921b19e5445d706`. Two of three attempts spent;
+A1 remains immutable. Adds only bounded missing-ID hashes/roles/counts to
+the strict refusal, no replacement quote or economics. Conservatively count
+this unchanged-economic run as development: **225 -> 226 shared /
+166 -> 167 development / 34 infrastructure / 645 cells**. No result read.
+Terminal `Runtime Error` at **2022-10-03 16:00**: 46 required prices,
+45 received; one missing target-and-held identity, quantity 136, delisted
+false. Hashed identity `12e2fb85270ad4370a284866d825f3a6cf121a92c997c3557861e6d08a7a6a1f`
+resolves within the authenticated local package to QCOM. No quote or
+partial-period return exported. One final allowed R225 slot remains;
+it requires a prospective tested price-source correction, not a stale mark.
+
+## R-230 — matched historical actual six-ETF basket, five-bps slippage; A1 invalid — 2026-09-26
+
+Diagnostic-only prospective source `f8b2830`, manifest
+`2718100d6c3863ebd7959142afaca58323360372d03a346961d04657102de4b3`,
+private project **37018137**, `152 ARV2 SIX MATCHED SIX_ETF_BASKET S5 R230 2021 2025`,
+A1 backtest `400c867869102efc76af5193db539117`. Same 2021-01-04–2025-12-31
+period, actual ETF orders, 98% gross, ten-bps fees plus five-bps adverse
+slippage per side. One of three attempts spent. Launch **226 -> 227 shared /
+167 -> 168 development / 34 infrastructure / 645 cells**.
+Terminal `Completed.` is **not acceptance**: sole bounded read reports
+**run_valid=false / execution_failure=true**. All 1,516 orders filled and
+261 rebalances completed, but modeled fees `$8,012.82988829` differ from
+engine fees `$8,012.29576`. The difference is `$0.53412829`; do not round it
+away or disable the fee invariant. Diagnostic net return **+105.757567201312%**
+and drawdown **−21.289982830798%** are retained as invalid-run context only,
+not an accepted cell or matched spread. No second external result read.
+Prospective fee-basis diagnosis/correction is required before A2. Current
+floor **227 / 168 / 34 / 645**; no additional valid cell.
+
+## R-225 A3 — final same-project corrected-source attempt failed — 2026-09-26
+
+Prospective source **`e006757`**, closing-minute/fee manifest
+`be23fba84bf233d3e667a649bf8f288d45c277cba4c9ebc6cfcbcda1d7759fe5`,
+same private project **37017548**, backtest `5e2255a7bb0e28f8cb404907551393a2`.
+Third of three slots consumed; no fourth Codex attempt or candidate alias.
+Only strictly fresh same-session RAW minute references may repair missing
+daily History; profile and v2 count/path-hash disclosure version that change.
+Signed installed-slippage MOO fee basis is also pinned (zero-slip unchanged).
+AR-off, dates/input/coverage/exposure/order rules and ten-bps fee rate remain.
+Launch **227 -> 228 shared / 168 -> 169 development / 34 infrastructure /
+645 cells**. Terminal `Runtime Error` at **2021-01-05 11:20:00**:
+`Arv2TenBpsFeeModel.get_order_fee() takes 2 positional arguments but 3 were given`.
+This new cloud callback failure prevents reaching the prior QCOM date; local
+tests did not reproduce QC's overload behavior. No outcome read or cell.
+R225's three Codex slots are exhausted. Mia recovery is being checked;
+remaining candidates are held rather than knowingly repeating this failure.
+
+## R-225 independent Mia recovery — verified callback source, launched — 2026-09-26
+
+After all three Codex attempts failed, Mia independently launched one
+recovery in the same private project **37017548**, backtest
+`b3d9e0b65d6c5c3b34ef306b10255416`, snapshot **37019605**, created
+2026-09-27 03:40:28 UTC. Not an A4, renamed candidate or rewritten A3.
+Only `main.py` changed: SHA-256
+`5b009507cc68a0689c47f22b58b01679579037a7f45beed631c98cd9d79f0a49`,
+8,127 bytes; other sixteen files equal the original A3 closure. The fix
+supports LEAN's synthetic MARKET fee valuation with the prior RAW-open
+ten-bps estimate; signed-slippage MOO execution fees/rules remain unchanged.
+Source attested before launch; eight actual-cloud class cases passed.
+Same historical period/input/coverage/98%-gross total-AR-off study arm.
+Conservatively count another development look: **228 -> 229 shared /
+169 -> 170 development / 34 infrastructure / 645 cells**. Only terminal
+status/error inspected so far; no outcome read or accepted cell. Mia
+recovery provenance and its one-time bounded read are separate from the
+three immutable failed Codex receipts. Completion alone will not accept it.
+
+Terminal update: `Runtime Error` at **2022-10-03 16:00**, past the fee
+callback failure. The same missing active held+target QCOM has no exact
+same-session closing-minute cache replacement; 46 prices required, 45
+received. No custom-statistic read or valid cell. The native QC panel
+inadvertently displayed partial engine performance while reporting failure;
+invalid partial outcomes are excluded and not represented as an accepted
+result. Floor remains **229 / 170 / 34 / 645**. Mia is diagnosing only;
+there is no fourth Codex attempt or further automatic Mia launch.
+
+## R-230 A2 — corrected fee-callback ETF cost control launched — 2026-09-26
+
+Source **`f9ee4e1`**, prospective manifest
+`ed48433443670d5e04ce53188d2bfb5b3a67b78946a7e9ef642bb38dff55b35b`,
+same private project **37018137**, backtest `83aa1868a48cdbbe43cee6ef2bc0d7c4`.
+Two of this candidate's three slots consumed; A1 stays invalid/immutable.
+Same 2021-01-04–2025-12-31 actual six-ETF basket, 98% gross, ten-bps fees
+plus five-bps slippage per side. Fee model now supports legitimate synthetic
+MARKET valuation; actual MOO fees use signed installed slippage. No selection
+or invariant relaxation. Upload/readback/compile passed. Conservatively
+**229 -> 230 shared / 170 -> 171 development / 34 infrastructure / 645 cells**.
+No result read yet. This ETF-only control does not depend on the unresolved
+QCOM stock-reference failure; stock arms are held, not blindly retried.
+
+Terminal update: `Completed.`; sole bounded custom read **run_valid=true**,
+**+105.758712420075%** net, **−21.289990498226%** maximum drawdown,
+annualized volatility **19.828188193774%**, zero-rate Sharpe
+**0.830511667729**. 261 rebalances and **1,516 / 1,516** filled orders;
+zero invalid/canceled. Engine/model fees match exactly at **`$8,012.73234237`**.
+Membership/cap and six-ETF RAW-panel digests equal valid R227; zero stock
+reference repairs. Compared with R227, five-bps slippage costs **0.576061016133
+percentage points** net; this is ETF cost sensitivity, not AR attribution.
+One accepted cell **645 -> 646**, floor **230 / 171 / 34 / 646**. A1 stays
+invalid and is not retrospectively repaired or re-read.
+
+## R-225 independent Mia metadata diagnostic 2 — launched — 2026-09-27
+
+Owner requested continuation ("try again?"). R225's three failed Codex
+attempts remain exhausted; this is one separately attributed Mia diagnostic,
+not A4 or a new candidate. Existing private project **37017548**, backtest
+**`21158b807cfa8f45ef50a0e14b90ffbc`**, snapshot **37046054**, created
+2026-09-27 17:41:46 UTC. Same 2021-01-04–2025-12-31 AR-off economic path;
+expected original QCOM missing-price refusal, no automatic retry.
+Only `main.py` adds bounded simulated-clock/cache/current-slice metadata:
+SHA **`c523a4629c994935a8db7e00819a4c3f3bd866a1d34da92f369d559bebe0180f`**,
+19,816 bytes; other sixteen files unchanged. Exact source was attested
+before launch and reverified after it. No extra History request, replacement
+price, selection/exposure/order/fee change or result-statistic call. Focused
+actual-source checks and independent audit passed; original exception stays.
+Period metadata rounds seconds, observer capture lacks a separate SID filter,
+and the output cap is appended-only; none weakens the authoritative guard.
+Inspect terminal/error and metadata only; no performance/order/log read.
+Conservatively another development look: **230 -> 231 shared / 171 -> 172
+development / 34 infrastructure / 646 cells**. No valid cell or stock spread.
+
+Terminal: `Runtime Error` at **2022-10-03 16:00**, preserving the original
+refusal. Bounded metadata confirms the cached same-SID, non-fill-forward
+TradeBar is **2022-09-30 15:59–16:00**, not Monday's closing minute;
+algorithm and current-slice clocks both equal Monday 16:00. No timezone
+equality problem or daily-period cache overwrite is established. A diagnostic
+`AttributeError` occurs before subscription/slice details complete; source
+uses `config.fill_forward`, while LEAN exposes `FillDataForward`. That is a
+diagnostic-reader defect, not permission to accept the stale reference.
+API retained only terminal/error and parsed metadata, discarding other
+response fields. The native automatic error/result view subsequently exposed
+invalid partial performance and terminal log text during Mia navigation;
+both are excluded and no custom result read or valid cell is claimed. This
+run is not represented as wholly outcome-unseen. Floor **231 / 172 / 34 / 646**.
+
+## R-225 independent Mia metadata diagnostic 3 — launched — 2026-09-27
+
+Same exhausted R225 candidate, private project **37017548**; not a fourth
+Codex attempt. Mia independently launched one run
+**`9a695522aa929d3fcc104e32f14b2dac`**, snapshot **37046837**, created
+**2026-09-27 18:01:35 UTC**, named
+`ARV2 R225 Mia metadata diagnostic3 2021 2025`.
+`main.py` SHA **`ba9a221b2babc77b64df54e7930503aee5b78a9a4eceba6a1ec7733641892f70`**,
+21,647 ASCII bytes; other sixteen files unchanged. Fixes only metadata-reader
+CLR property names, collector isolation and exact period comparison; adds
+a post-refusal one-minute RAW/non-fill-forward History probe, at most two
+missing securities, timestamp/count/identity output only. Probe prices never
+enter valuation or orders. Original refusal and economic path remain intact.
+No performance/order/log inspection or automatic retry requested. Prelaunch
+source attested; focused actual-source checks and independent audit passed.
+Conservative development look: **231 -> 232 shared / 172 -> 173 development /
+34 infrastructure / 646 cells**. Expected refusal is diagnostic evidence,
+not a valid stock result or matched spread; zero new accepted cells.
+
+Terminal: expected original `Runtime Error` at 2022-10-03 16:00. All
+diagnostic collectors complete: same-SID cached bar is still Sep30;
+Oct3 current slice and 15:59 observer contain no QCOM TradeBar. Both
+TradeBar/QuoteBar subscriptions are RAW minute, regular hours, fill-forward
+off. The one exact 15:59–16:00 RAW minute History probe returns zero bars
+without exception. The 16:00 `OnData` observer has not run at the scheduled
+refusal. This establishes absence in the requested paths, not dataset-wide
+absence or a safe stale-price substitute. Source inventory/timestamps match
+the prelaunch pin. Bounded terminal/error metadata retained privately;
+performance/custom-statistic/order/log response fields discarded. No native
+result view revisited. No accepted cell, altered study economics or stock
+spread; floor **232 / 173 / 34 / 646**. Stock arms remain held.
+
+## R-231 A1 — QCOM-excluded AR-off stock sensitivity launched — 2026-09-27
+
+This is a new **post-hoc exploratory sensitivity**, not an R-225 retry or a
+repair of its missing QCOM reference. Exact committed prospective source
+`51194b4`, four-arm manifest SHA-256
+`53b4ec88db97007ee9ffa4f950935df935cda68ac6f68ee7a446cbee019492c0`;
+2021-01-04–2025-12-31, all-six 25% coverage, QCOM excluded only from
+direct-stock eligibility in every sleeve from the first decision, with raw
+membership/coverage retained. R-231 is fully AR-off, 98% gross, two-times
+buying-power admission, ten-bps modeled fees per side, zero modeled slippage,
+weekly prior-session decisions and next-open MOO orders. The original R-225
+three-attempt failure and R-227/R-230 ETF controls are unchanged.
+
+New private project **37059318**, `153 ARV2 SIX QCOM EXCLUSION AR_OFF S0 R231
+2021 2025`; exact 17-file readback and QC compile passed. Backtest
+`c8583a3fdbb78a99684668b230440e8e` is launched, with only queue/progress
+status inspected so far. No result is accepted or read yet. One of three
+R-231 attempts spent: **232 -> 233 shared research looks / 173 -> 174 ARV2
+development evaluations / 34 infrastructure looks / 646 cells**. A later
+terminal or bounded-read update must not reinterpret mere `Completed.` as
+run-valid.
+
+R-231 terminal update: `Completed.` and the sole receipt-bound custom-statistic
+read passed `run_valid=true`. Cumulative return **+143.74911021917653%** after
+modeled fees, maximum drawdown **−21.757819663952834%**, annualized
+volatility **20.51364896743773%**, zero-rate Sharpe **0.97555463376627**.
+All **261** weekly rebalances executed; **10,812 / 10,812** submitted orders
+filled, zero invalid/canceled. Modeled and actual engine fee fields match at
+**$64,498.1188949**. No closing-minute reference repair was used. This is
+one exploratory AR-off stock cell, not a paired AR effect or validation of
+R-225's original universe. Authenticated cell floor **646 -> 647**; totals
+**233 / 174 / 34 / 647**. No second outcome read is authorized or needed.
+
+## R-232 A1 — QCOM-excluded AR-on stock sensitivity launched — 2026-09-27
+
+Same prospective R-231–R-234 manifest, 2021–2025 package, exclusion ID,
+membership/coverage, order timing, 98% gross, ten-bps fees and zero modeled
+slippage as R-231. R-232 alone enables the analyst-revision entry/count
+logic and 100% stock-weight overlay, with its own frozen profile/source.
+New private project **37059623**, `154 ARV2 SIX QCOM EXCLUSION AR_ON100 S0
+R232 2021 2025`; exact 17-file readback and QC compile passed. Backtest
+`78fd77c07f46512eb413aa1a0cf2d652` launched; no outcome or custom
+statistic read yet. R-232 attempt **one of three** spends another exploratory
+development look: **233 -> 234 shared / 174 -> 175 development / 34
+infrastructure / 647 cells**. A `Completed.` terminal alone will not be
+counted as a valid AR comparison.
+
+R-232 terminal update: `Completed.` and its sole receipt-bound custom-statistic
+read passed `run_valid=true`. Cumulative return **+159.9507341441203%**
+after modeled fees, maximum drawdown **−21.784261140342733%**,
+annualized volatility **20.99727709431368%**, zero-rate Sharpe
+**1.0194809691779258**. All **261** weekly rebalances executed; **9,432 /
+9,432** submitted orders filled. The paired zero-slippage AR-on minus AR-off
+cumulative-return difference is **+16.20162392494377 percentage points**
+on this QCOM-excluded, current-vintage historical package. It is exploratory,
+post-hoc, and not a causal or out-of-sample alpha estimate. Authenticated
+cell floor **647 -> 648**; totals **234 / 175 / 34 / 648**. No second
+outcome read is authorized or needed.
+
+## R-233 A1 — QCOM-excluded AR-off 5-bps-slippage sensitivity launched — 2026-09-27
+
+Same frozen four-arm manifest, historical package, QCOM-direct-stock
+exclusion, AR-off rule, order cadence, 98% gross, two-times buying-power
+admission, and ten-bps modeled fees per side as R-231; R-233 changes only
+the prospective modeled slippage to five bps per side. New private project
+**37059950**, `155 ARV2 SIX QCOM EXCLUSION AR_OFF S5 R233 2021 2025`;
+backtest **`d45faa459397596ef80c31f4e018e828`** launched after exact
+17-file readback and QC compile. No outcome read yet. One of three attempts
+spent; research floor **235 shared / 176 development / 34 infrastructure /
+648 cells**. A terminal completion is not by itself a valid result.
+
+R-233 terminal update: `Completed.` and sole authenticated bounded read
+passed `run_valid=true`: **+139.330970595487%** cumulative return after
+fees/slippage, **−21.80578426418867%** maximum drawdown, 20.51589391932637%
+annualized volatility, 0.95754150327163 zero-rate Sharpe; 261 completed
+rebalances and 10,852 / 10,852 filled orders. One exploratory cell accepted;
+totals **235 / 176 / 34 / 649**. No second result read.
+
+## R-234 A1 — QCOM-excluded AR-on100 5-bps-slippage sensitivity — 2026-09-27
+
+Same prospective four-arm manifest and shared order inputs as R-233, with
+AR entry/count and 100% stock-weight overlay enabled. New private project
+**37060007**, `156 ARV2 SIX QCOM EXCLUSION AR_ON100 S5 R234 2021 2025`,
+backtest **`694dca3d158e1fdc69fe28527c631035`**. Exact 17-file readback
+and QC compile passed. One of three attempts spent, one development look:
+floor **236 / 177 / 34 / 649** before result validation.
+
+R-234 terminal update: `Completed.` and sole authenticated bounded read
+passed `run_valid=true`: **+154.82082529635523%** cumulative return,
+**−21.85688490340542%** maximum drawdown, 21.00331554608409% annualized
+volatility, 1.00016494680033 zero-rate Sharpe; 261 completed rebalances,
+9,434 / 9,434 filled orders. One exploratory cell accepted; floor
+**236 / 177 / 34 / 650**. The cached, fully authenticated four-arm comparison
+now passes: R-232 − R-231 is **+16.20162392494377 pp** at zero modeled
+slippage; R-234 − R-233 is **+15.48985470086823 pp** with five bps per side.
+This is a post-hoc QCOM-excluded sensitivity on current-vintage analyst data,
+not a repaired R-225, out-of-sample edge, or deployment evidence. The first
+local comparator call failed because its fixture invented a nonexistent
+`execution.decision_count`; local code/test corrected it to the two actual
+submitted/completed rebalance counts, without a new QC attempt or look.
+
+## R-235–R-237 A1 — QCOM-excluded 25%-coverage AR-on weight ladder — 2026-09-27
+
+Three settings **80%/120%/200%** were frozen together before outcome access
+in separate manifest SHA-256
+`3a5532ebcda49695fcf29e964af5ca7c79e7c29cec773f2814d17408af0ddbb4`.
+The percentage scales transfers from matched stock weights; it is **not**
+gross leverage. All retain the exact R231–R234 historical package, 25%
+minimum coverage, QCOM direct-stock exclusion, AR entry/count, 98% gross,
+ten-bps/side fees, zero modeled slippage, next-open physical MOO orders and
+one-use result transport. Valid R-231 AR-off is the contextual matched
+control. These settings followed prior result observation, so this is an
+adaptive exploratory sensitivity, not a confirmatory capacity search.
+
+R-235 AR-on80 private project **37060424**, backtest
+`584c34d7a20510b0cecbc9110da3c352`, and R-236 AR-on120 private project
+**37060449**, backtest `10058e4a01806844ace709c773f220fe`, passed exact
+17-file source readback and QC compilation on A1. Both were `In Progress...`
+at this entry; no result read. R-237 AR-on200 A1 created private project
+**37060477**, with upload/readback and compile complete, but the bounded
+`backtests/create` request failed before a receipt. The adapter exposes no
+underlying error detail, so its cause is not asserted. This counts as **one
+of three** allowed R-237 attempts and no valid result. Wait for other node
+work before a prospectively justified A2; do not disguise a fourth launch.
+Three conservative development looks: floor **236 -> 239 shared / 177 ->
+180 development / 34 infrastructure / 650 cells**. No raw orders, provider
+rows or result logs inspected.
+
+R-235's only QC outcome read initially failed local parsing because the
+frozen plain order runtime emitted the shared META transport schema, whereas
+the new manifest expected a tilt-specific META schema. The bounded custom
+statistics had already been retained by the one-use reader. An exact-source
+and family-scoped parser correction authenticated those retained strings
+**locally, without a second QC result read or new look**. R-235 A1 is valid:
+**+155.0715704271942%** cumulative return, **−21.79467853235618%**
+maximum drawdown, 20.88135086396085% annualized volatility, 1.005732416052
+zero-rate Sharpe, 261 rebalances, 10,222 filled orders. Versus the same
+QCOM-excluded 25%-floor AR-off R-231, +11.32246020801767 pp. One
+exploratory cell; floor **239 / 180 / 34 / 651**.
+
+R-236 A1 `Completed.` and its sole bounded read passed the corrected parser:
+**+164.1642341075784%** cumulative return, **−22.01194134932266%**
+maximum drawdown, 21.11998007970799% annualized volatility, 1.03009296929968
+zero-rate Sharpe, 261 rebalances, 9,316 filled orders. Versus R-231,
++20.41512388840187 pp. One exploratory cell; floor **239 / 180 / 34 /
+652**. This remains a post-hoc settings ladder on current-vintage analyst
+history, not evidence of a tuned optimum or live readiness.
+
+R-237 A2's initial **local** CLI call was refused before QC mutation because
+the generic retry guard required an A1 terminal receipt, which a pre-create
+failure did not have. That call was not another QC attempt/look. An exact
+R-237/A2-only retry path now verifies its A1 claim, project **37060477**,
+17 pinned source files, and two explicit empty statistics-free remote
+backtest inventories; any early or delayed orphan stops the retry. A2 then
+launched backtest **`a7cbe7e3fea4ba46f02865539141be99`** in the original
+project without reupload, spending its second of three QC attempts and one
+additional development look. It was still running at this update; no R-237
+cell yet. Floor **240 / 181 / 34 / 652**.
+
+R-237 A2 terminal `Completed.`; sole bounded custom-statistic read passed
+`run_valid=true`: **+166.8224071798157%** cumulative return,
+**−22.08205274435079%** maximum drawdown, 21.31573162540370% annualized
+volatility, 1.03204173624957 zero-rate Sharpe, 261 rebalances and 8,607
+filled orders. One exploratory cell; floor **240 / 181 / 34 / 653**.
+Authenticated cached R-231/R-235/R-236/R-237 comparison passes: AR-on
+80%/120%/200% minus R-231 AR-off = **+11.32246020801767 /
++20.41512388840187 / +23.07329696063917 percentage points**, respectively.
+This is a current-vintage, QCOM-excluded 2021–2025 adaptive sensitivity,
+not a reliable optimized setting, original R-225 repair, or formal alpha.
+
+## R-238–R-241 — prospective QCOM-excluded 10%-minimum-coverage study — frozen before launch
+
+Owner clarification: make direct-stock admission easier by lowering each
+of the six universes' **minimum** mapping, market-cap-weight coverage and
+reported-total-weight floors from 25% to 10%; do **not** raise a minimum to
+50%, which would tighten the gate. Five verified names remain mandatory;
+unknown names are not guessed, and missing stock budget remains in each
+sleeve's own ETF. R-238 AR-off and R-239/R-240/R-241 AR-on80/120/200 use the
+same QCOM-excluded 2021–2025 order inputs, 98% gross, two-times buying-power
+admission, ten-bps/side fees, zero slippage and next-open MOO execution.
+Separate four-arm source manifest SHA-256
+`cd078ea5c0ce1d5a706ab82cb76139f29a04e8a98477d18a7f9cce0aed8a7c2b`;
+all profiles/source digests and the actual emitted META schemas frozen before
+any 10%-floor outcome. This is exploratory, adaptive and not a formal
+confirmation; 25%-floor arms are contextual rather than assumed identical.
+No launch, attempt or look charged in this prelaunch entry.
+
+R-238 A1 AR-off 10%-floor control: private project **37061484**, backtest
+`389af03172e979375612269ff1c526bd`. R-239 A1 AR-on80: private project
+**37061511**, backtest `d65472592672f7e8f6dee8bc9989463d`.
+Both passed exact 17-file source readback and QC compile, and were running
+without an outcome read at this entry. One of three attempts spent on each;
+two exploratory development looks, **240 -> 242 shared / 181 -> 183
+development / 34 infrastructure / 653 cells**. R-240/R-241 were held until
+a node frees; no speculative result is claimed from a launch receipt.
+
+R-238/R-239 terminal `Completed.` and sole receipt-bound custom reads
+passed `run_valid=true`: AR-off R-238 **+143.74911021917653%** cumulative
+return, **−21.757819663952834%** drawdown, 261 rebalances and 10,812 filled
+orders; AR-on80 R-239 **+155.0715704271942%**, **−21.79467853235618%**
+drawdown, 261 rebalances and 10,222 filled orders. Both account results,
+orders-filled counts and source-panel digests equal their respective
+25%-floor R-231/R-235 counterparts exactly. The looser floor removes many
+REMX numeric-coverage refusal reasons, but **258/261** REMX decisions still
+lack five verified market-cap names, so its valid-admission count remains
+zero; other universes' selection counts remain unchanged. These two cells
+do not demonstrate added stock exposure from the 10% change. Cell floor
+**653 -> 655**; research floor **242 / 183 / 34 / 655**.
+
+R-240 A1 AR-on120: private project **37061716**, backtest
+`13db599e6e55c03cf5484f818d9404be`. R-241 A1 AR-on200: private project
+**37061748**, backtest `311e32bae8ef605f83512306e2ba963c`.
+Both passed exact 17-file upload/readback and QC compilation and were
+running at this entry, with no outcome read. One attempt and conservative
+development look each; floor **244 shared / 185 development / 34
+infrastructure / 655 cells**. No additional threshold tweak is inferred.
+
+R-240/R-241 terminal `Completed.` and sole bounded reads passed
+`run_valid=true`: R-240 AR-on120 **+164.1642341075784%** cumulative,
+**−22.01194134932266%** drawdown, 261 rebalances and 9,316 filled orders;
+R-241 AR-on200 **+166.8224071798157%**, **−22.08205274435079%** drawdown,
+261 rebalances and 8,607 filled orders. Each aggregate account metric,
+selected-count vector, fallback-count vector, filled-order count and
+membership-cap digest equals its 25%-floor R-236/R-237 counterpart.
+The authenticated within-10% AR-on80/120/200-minus-R-238 AR-off spreads
+are **+11.32246020801767 / +20.41512388840187 /
++23.07329696063917 pp**. Each 10%-minus-25% counterpart difference is
+**zero** at recorded precision. Lowering the numeric floors alone did not
+change this period's admitted stock selections or returns; REMX remains
+ETF-only because it still fails the five-verified-name requirement on
+258/261 decisions. Two accepted exploratory cells; closing floor
+**244 shared / 185 development / 34 infrastructure / 657 cells**.
+These are adaptive, QCOM-excluded current-vintage sensitivities, not an
+unbiased alpha estimate or live-trading gate.
+
+## R-242–R-245 — prospective QCOM-excluded three-name/three-positive-score sensitivity — frozen before launch
+
+The owner requested further easing after R-238–R-241's 10% numeric floors
+changed no selected stocks. R-242 AR-off and R-243/R-244/R-245 AR-on
+80%/120%/200% retain the identical 2021–2025 historical package, 10%
+mapping/cap/total coverage floors, 98% gross target, 2x buying-power
+admission, ten-bps/side modeled fees, zero modeled slippage and next-open
+physical MOO execution. A separately versioned rule reduces the six sleeves'
+verified-ID/name/PIT-cap count from five to three and, only for non-XLE AR-on
+entry, the minimum positive analyst-score count from five to three. AR-off
+remains score-independent. Missing identities/caps cannot be selected, QCOM
+remains excluded from direct stock eligibility, and unallocated stock budget
+stays in each sleeve's ETF. Existing aggregates cannot determine how many
+three-name decisions will qualify; no post-result threshold is preselected.
+
+Frozen four-arm manifest SHA-256
+`6fad66b2ca4ee909c3018c7f008fbf7c232de4e727e4e63d67ea892a659e5eef`;
+distinct projection/profile/source identities and result schemas are pinned
+there. R-238–R-241 are authenticated same-window context, not an assumed
+unchanged-stock comparator. At most three QC launches per new candidate;
+every attempted launch counts conservatively. This is adaptive exploratory
+research, not confirmation or trading authority. Prelaunch floor remains
+**244 shared research looks / 185 ARV2 development evaluations / 34
+infrastructure looks / 657 accepted exploratory cells**; this entry itself
+spends **zero** looks and records no result.
+
+R-242 A1 AR-off exact 17-file source readback/compile succeeded; private QC
+project **37065880**, backtest `c331f640f1a14299af58f0f06a8aecd3`.
+R-243 A1 AR-on80 likewise launched in private project **37065881**,
+backtest `db969eb51df7b67c4869f57d84f77868`. Both reached `In Progress...`
+at an earlier status-only check; no result had yet been read. The
+contemporaneous operator observation was R-244 A1 AR-on120 exact source
+uploaded/compiled in project **37065932**, and R-245 A1 AR-on200 in project
+**37065931**, but each `backtests/create` call failed before a launch receipt.
+The local artifact chain retains A1 claims and project receipts, not compile
+or create responses. A contemporaneous statistics-free remote inventory
+counted **zero** runs in each project, but that response was not separately
+retained. These failures consumed A1; the cause is
+not established and no outcome or cell exists for them. Four conservative
+attempt looks raise the floor to **248 shared / 189 ARV2 development / 34
+infrastructure / 657 accepted cells**. No A2 is claimed or attempted by
+this entry.
+
+R-242/R-243 terminal `Completed.` and each sole receipt-bound aggregate read
+passed `run_valid=true`, with 261 submitted/completed weekly rebalances and
+zero invalid/canceled orders. R-242 AR-off: **+142.98445011517648%**
+cumulative return after modeled fees, **−21.766037476727435%** maximum
+drawdown, 11,223 filled orders. R-243 AR-on80: **+155.5564211621942%**,
+**−21.79467853235618%**, 10,255 filled orders. Three-name admission gave
+R-242 REMX valid coverage on **125/261** decisions and 375 selected-name
+slots, versus zero valid REMX decisions in R-238. R-243 had those same 125
+coverage-valid REMX decisions but **zero direct REMX stocks**: all 125 failed
+the active three-positive-score entry floor. SOXX selected-name slots rose
+from R-239's 1,947 to R-243's 2,020. These are two valid exploratory cells,
+not a four-arm comparison or a REMX analyst-signal result. No new launch/look
+from the reads; floor **248 / 189 / 34 / 659**.
+
+Before any R-244/R-245 A2 launch, Codex froze an exact, same-project
+pre-create recovery: only projects **37065932** and **37065931**, respectively,
+with pinned source identities, unchanged private/idle project and cloud files,
+no local A1 launch/terminal/result, and two fresh statistics-free remote
+inventories showing zero runs. A late A1 run refuses A2. It does not create a
+new project or reupload source. The R-237 exception remains separately
+tested; focused recovery tests **23 passed**. This code preparation spends
+**zero** looks and produces no result. Floor remains **248 / 189 / 34 / 659**.
+
+R-244 A2 launched after both exact zero-run censuses in existing private
+project **37065932**, backtest `87ebfe187639b46890f77db16f23b188`.
+R-245 A2 similarly launched in project **37065931**, backtest
+`2d16f40c686b0f700615133dc2d25c67`. Each was `In Progress...` at an
+initial status-only check. Two more development looks raise the conservative
+floor to **250 / 191 / 34 / 659**. No result cell was read at this point.
+
+R-244/R-245 then reached `Completed.`. Their sole authenticated reads passed
+`run_valid=true`, 261 submitted/completed rebalances and zero invalid or
+canceled orders. R-244 AR-on120: **+164.5224424555784%** cumulative return
+after modeled fees, **−22.01194134932266%** maximum drawdown, 9,333 filled
+orders. R-245 AR-on200: **+167.1580814588157%**, **−22.08205274435079%**
+drawdown, 8,633 filled orders. The four new arms and four R-238–R-241
+same-arm context receipts share raw membership/cap SHA-256
+`b3233cf7b2a0a85cee81c2cefd891c8a4f6a57491ec9ce0bc33e50d1968c2063`;
+the four new arms share the six-ETF panel digest
+`89d9c6387c0cf47fa70a8a0c9c3108cae263436e0b8e503fc127ecbe9deeff66`.
+The local comparison now refuses a cross-family digest mismatch. R-243/244/245
+minus R-242 AR-off differences are **+12.57197104701772 / +21.53799234040192 /
++24.17363134363922 percentage points**, combining score admission and
+weighting, not isolating tilt. Three-name minus five-name same-arm differences
+are **−0.76466010400005 / +0.484850735 / +0.358208348 / +0.335674279
+points** in AR-off/80/120/200 order. REMX passed raw coverage on 125
+decisions in all new arms but admitted no direct REMX stock in any AR-on arm:
+only 31 positive-score observations across those 125 decisions, insufficient
+for the three-score entry rule. Four accepted exploratory cells total bring
+the floor to **250 shared / 191 development / 34 infrastructure / 661 cells**.
+No additional look was spent by the result reads. This is adaptive,
+current-vintage, zero-modeled-slippage sensitivity, not formal alpha evidence
+or a live-trading rule.
+
+## R-246 A1 — QCOM-excluded AR admission/count with zero weight transfer — 2026-09-28
+
+Owner-directed, separately versioned **exploratory development evaluation**
+after Claude section 206 and Codex counter-review 207. This is an order-based
+2021-01-04–2025-12-31 arm on the frozen R231/R232 all-six 25%/five-name,
+QCOM-direct-stock-excluded construction. It preserves R232's AR-positive-score
+admission/count and market-cap-selected stock identities but sets within-stock
+AR weight transfer to exactly zero. It is not an AR-off arm, a new paper
+epoch, or a confirmatory test. Private QC project **37072332**, backtest
+`01f626d4143a123ec61ec7224d4d7f2b`; manifest SHA-256
+`117a1c9524d3f2dd5f4f2ee6a7308e947d602e0c5efc88d8925205c152f301ad`,
+projection SHA-256 `711bf00ec5dbefd45fda2e07c603800ec98e134d9e392582547f6f9186c43eff`.
+Exact 17-file source was read back and compiled before A1 launch. A1 reached
+`Completed.` and the one receipt-bound custom-statistic read authenticated
+`run_valid=true`, 261 completed/261 submitted weekly rebalances, 10,325
+filled/10,325 submitted orders, and zero invalid/canceled orders. The account
+returned **+136.8727949437265%** cumulative after modeled 10-bps-per-side
+fees, with **−21.7534105323991%** maximum drawdown and 0.94686 zero-rate
+Sharpe. One launch/look and one valid exploratory cell move the conservative
+floor from **250/191/34/661** to **251 shared research looks / 192 ARV2
+development evaluations / 34 infrastructure looks / 662 accepted cells**.
+
+The cached receipt-bound three-arm comparison passed its source, result and
+same-AR-on-baseline-path checks: R231 AR-off +143.74911021917653%, R246
+AR-entry/count-only +136.8727949437265%, R232 full AR-on100
++159.9507341441203%. AR entry/count/fallback versus fully off is
+**−6.87631527545003 percentage points**; AR weight transfer on the same
+entry/count baseline is **+23.0779392003938 points**; total full AR versus
+off is **+16.20162392494377 points**. All are net policy differences with
+modeled fees; no identical full stock minute-fill tape is proven across jobs.
+The weight overlay was not positive in every annual slice. This historical
+current-vintage, QCOM-excluded, zero-slippage decomposition neither verifies
+point-in-time analyst revisions nor selects a 60%–200% rule, proves future
+alpha, or authorizes paper/live/funded orders. The private raw/result receipts
+remain in the ignored lane artifact tree; the shared ledger holds no provider,
+stock-price, or order rows.

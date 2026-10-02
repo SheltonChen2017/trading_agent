@@ -39,3 +39,23 @@ def test_new_execution_child_inherits_exact_byte_checkout_rule():
         cwd=ROOT, check=True, capture_output=True, text=True,
     ).stdout.strip()
     assert output == path + ": text: unset"
+
+
+def test_every_tracked_lane_json_is_exempt_from_newline_conversion():
+    """The attribute protects every hash-pinned lane manifest, not only the
+    five forward policies above; nearly all of them contain a newline, so a
+    narrowed pattern would break their pins on a Windows-style checkout."""
+    listed = subprocess.run(
+        ["git", "ls-files", "-z", "--", PACKAGE + "*.json"],
+        cwd=ROOT, check=True, capture_output=True,
+    ).stdout.decode("utf-8").split("\0")
+    paths = sorted(path for path in listed if path)
+    assert PACKAGE + "six_universe_forward_execution.json" in paths
+    assert len(paths) > 5
+    fields = subprocess.run(
+        ["git", "check-attr", "-z", "text", "--", *paths],
+        cwd=ROOT, check=True, capture_output=True,
+    ).stdout.decode("utf-8").split("\0")
+    rows = [fields[index:index + 3] for index in range(0, len(fields) - 1, 3)]
+    assert sorted(row[0] for row in rows) == paths
+    assert {row[0]: row[2] for row in rows} == {path: "unset" for path in paths}

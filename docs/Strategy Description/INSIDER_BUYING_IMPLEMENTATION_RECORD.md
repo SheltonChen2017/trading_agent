@@ -1,14 +1,16 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 125 COUNTER-REVIEWS EACH CLAUDE COMMIT IN
-`c7be1f8..ebb30c5`: ACCEPTED AFTER TEST CORRECTION AND FACTUAL
-QUALIFICATION. `IBREV-CR01` IS REVIEWER-REPORTED PROBABLE UNINTENDED
-SEC ACCESS; ACTUAL OCCURRENCE, REQUEST COUNT AND TRANSFERRED BYTES
-ARE NOT INDEPENDENTLY ESTABLISHED. 8-251 IS A CONDITIONAL ESTIMATE,
-NOT AN ACTUAL-REQUEST BOUND. OWNER DISPOSITION IS OPEN AND IS
-SEPARATE FROM THE FINAL 372-REQUEST CLASSIFICATION. STOP BEFORE
-THE NEXT MILESTONE AND ANY PUSH; THE CORRECTION/HANDOFF ARE LOCAL
-ONLY. THE HEARTBEAT IS PAUSED. OFFLINE V2/V4 REMAIN CANDIDATE
+Status: **SECTION 126 RECORDS THE OWNER'S FINAL DISPOSITION OF
+`IBREV-CR01`: "REVIEWER-REPORTED PROBABLE UNINTENDED SEC ACCESS;
+EXACT REQUEST COUNT AND TRANSFERRED BYTES NOT ESTABLISHED,"
+WITHOUT RETROACTIVE APPROVAL. THIS IS SEPARATE FROM THE FINAL
+372-REQUEST CLASSIFICATION. SECTION 125 COUNTER-REVIEWS EACH
+CLAUDE COMMIT IN `c7be1f8..ebb30c5`: ACCEPTED AFTER TEST CORRECTION
+AND FACTUAL QUALIFICATION. THE OWNER AUTHORIZES ONLY THE ONE
+BOUNDED OFFLINE COUNTER-REVIEW PUSH, NOT A NEXT MILESTONE.
+PUBLICATION REQUIRES SUCCESSFUL MATCHING-LANE PUSH AND EXACT
+REMOTE-TIP VERIFICATION; LOCAL RECORDS ALONE DO NOT PROVE IT.
+THE HEARTBEAT REMAINS PAUSED. OFFLINE V2/V4 REMAIN CANDIDATE
 CONTRACTS; FOUR TOPICAL P2 FINDINGS REMAIN OPEN. STRICT D23 RETAINS
 SEVEN NONEXACT QUARTERS AND NO 82-QUARTER DIGEST. V1 AND FOUR V3
 CUSTODY FILES ARE FROZEN; THE STOPPED V3 ROOT IS UNRESOLVED AT
@@ -230,6 +232,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-02 | Codex owner-directed offline contract round and durable handoff | Incoming `5a87bcf..d6242f9`; local `0d4b836`, `6c71f85`, `0f58546`, implementation `fffa539`, then this record commit | Final historical classification; bounded IB-1C v2 and inert v4 proposals | Owner accepts unestablished historical authorization provenance for the 372 requests, without retroapproval, and authorizes offline-only work. New pure identity assessment keeps every six-form source row and explicit quarantines; new v4 proposal binds historical blob bytes and partitions descriptors without root replay, output or dispatch. Shared docs, v1 and v3 custody files frozen. | New files 75 passed; focused related and counter-review selection 426 passed; boundary selection 60 passed; final active-document/record checks below; ten Python files compile; no full lane/repo suite, no new SEC/QC/outcome/backtest; looks 0/0/0. | `IBREC-CR01` owner-dispositioned without historical approval; new `IB1CV2-R01/R02`, `IBV4-R01` fixed red/green; `IBREC-V4R01` append-only path correction. Four topical P2 findings and earlier open/closed ledger preserved. | One combined lane push, then Claude reviews every Codex commit after `d6242f9`. No automatic monitor resume or next data/QC/backtest step. |
 | 2026-10-02 | Claude review | `c7be1f8` -> `8c063da` (test pins) -> this review record | Independent review of the section-120 counter-review, the owner-response and audit records, and the offline identity v2 and recovery v4 proposal modules (`d6242f9..c7be1f8`, 5 commits, 0 merges); correction to section 119 | Dispositioned all five commits and accepted every finding against this reviewer. Found that the reviewer's section-119 mutation runs disabled three transport guards whose tests had no network tripwire, on a shell with open network access, and reconstructed offline what each run would have sent. Ran every test, suite, and mutant in a network-denied sandbox, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. Ran identity v2 on the real pilot quarters with and without 256 real parents, built the observed v4 proposal from the real receipts, and recomputed the 82-quarter reconciliation. Pinned six untested guards and added a lane tripwire rule. | Pushed `c7be1f8`: complete suite **10,150 passed, 38 skipped, 0 failed in 689.31s**. v2 accepts real 2022Q4 and corroborates **256 of 256** real parents, including the short-CIK filing. The observed v4 proposal reproduces **99,394** with **79,868** proposed. Seven non-exact quarters reproduce. New-module mutation **36 to 42 of 51**, survivors backed. Lane gate **3,964 passed** on both Pythons. Final tree, network denied: complete suite **10,162 passed, 38 skipped, 0 failed in 611.87s**; compileall exit **0**. **0 looks**. | `IBREV-CR01` P1 process finding against this reviewer: 8 to 251 unauthorized SEC requests very likely sent by section-119 mutation runs; statement withdrawn; safeguards in `0d4b836` and `8c063da`; owner classification open. `IBTEST-CCR01..CCR04`, `IBREC-CCR01`, `IBSRC-CCR01` accepted against this reviewer. `IBV4-CR01`, `IBTEST-CR02` P3 closed in `8c063da`. `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` P2 open. No P0. | Codex counter-reviews `8c063da` and this record, including the correction. The owner decides how the reviewer's requests are classified. The open P2 gates stand before any further acquisition. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-02 | Codex counter-review; owner-decision stop | Incoming `c7be1f8..ebb30c5`; test correction `d0348d0`; this separate handoff follows | Review every Claude commit before any next milestone | Both incoming commits accepted after the ordered AST tripwire correction and append-only factual qualifications. Reviewer access is probable by disclosure, not an independently counted acquisition; 8-251 is not an unconditional bound. Existing roots and authority remain unchanged. | Network-denied focused 112 passed; exact package/import-boundary selection 74 passed; active-document/record checks 71 passed before this handoff, final repetition below; 7 red then green tripwire controls and 11 in-memory guard mutants caught/restored; no complete suite; 0 looks/jobs/backtests. | `IBTEST-CCR05` P2 closed; `IBREV-CCR01` P2 and `IBREC-CCR02` P3 qualified here. `IBREV-CR01` P1 process owner classification OPEN; four topical P2 and prior ledger retained. | No push or next milestone pending owner disposition of the separate reviewer-access disclosure; heartbeat paused. Local-only commits are not cross-computer synchronized. |
+| 2026-10-02 | Codex owner-disposition record and bounded counter-review publication | Incoming `c7be1f8..ebb30c5`; local correction `d0348d0`, handoff `50f5567`, then this owner-record commit | Publish only the completed offline counter-review | Owner accepts the separate probable-access classification with count/bytes not established and without retroactive approval; authorizes exactly the bounded offline counter-review push. Section 125's historical stop remains preserved and is superseded only for this publication. No next milestone or data access. | Section 125's focused 112 and boundary 74 remain the code-tree evidence; final narrow rechecks and publication checks are recorded in 126.3. No complete suite or source requests; 0 looks/jobs/backtests. | `IBREV-CR01` P1 process CLOSED by final owner disposition, not retroactive approval or established acquisition evidence; current safeguards verified. Four topical P2 and all other ledger statuses unchanged. | One matching-lane push after clean-tree/ancestry/remote checks, then verify exact origin tip and stop. Claude reviews the exact new Codex range; heartbeat stays paused. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -16521,3 +16524,95 @@ custody files is byte-identical to its exact `aa0d635` Git blob. Current
 diff/status contain only this expected lane-record edit after the local
 test correction; no shared/production/source-root edit or push occurred.
 Both local correction and handoff remain unpushed pending the owner gate.
+
+## 126. Final owner disposition and authorized counter-review publication (2026-10-02 owner-local date)
+
+### 126.1 Exact owner decision; no retrospective or adjacent authority
+
+The owner explicitly accepted **"reviewer-reported probable unintended
+SEC access; exact request count and transferred bytes not established,"**
+**without retroactive approval**, and separately directed **"Authorize
+the bounded offline counter-review push only."** This is the final
+disposition of the separate `IBREV-CR01` reviewer-access disclosure.
+It does not confirm a historical count, byte total or source-acquisition
+ledger, authorize the historical mutation requests, or extend the earlier
+372-request classification. The conditional 8-251 estimate and reported
+843-MB estimate remain non-measured as qualified in section 125.2.
+
+| Finding | Priority | Final status and evidence |
+|---|---|---|
+| `IBREV-CR01` | P1, process | **CLOSED by final owner disposition, without retroactive approval.** The disclosed probable access, independently confirmed unsafe historical path, missing historical logs, current safeguards and unresolved historical counts/bytes remain retained in 124-125. Owner acceptance resolves the disposition gate only. |
+| `IBTEST-CCR05`, `IBREV-CCR01`, `IBREC-CCR02` | P2/P3 as recorded | **RETAINED CLOSED** by the test correction and factual qualifications in section 125; this owner decision does not replace their proofs. |
+| `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` | P2 | **OPEN, unchanged.** Actual affected-quarter integration, isolated historical replay and strict-D23 source/date adjudication are not completed or newly authorized. |
+| Prior 372-request `IBREC-CR01` and all other findings | As recorded | **RETAINED at recorded status.** The separate classification does not reopen, extend or silently delete the prior ledger. |
+
+Section 125 and its session-ledger row describe the actual earlier
+owner-decision stop. They are historical records, not the current next
+action. This section supersedes their open owner-classification and no-push
+instructions **only** for publishing this completed counter-review round.
+
+### 126.2 Exact local series and permitted publication
+
+The initial matching-lane fetch in this owner-response turn verified:
+
+- Exact root: `/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`.
+- Branch: `codex/strategy-insider-buying`; clean local HEAD
+  `50f5567f9a877c48d052b912595cdb21cb4ff15a`.
+- Origin: `ebb30c5d26e8789b409f52fb3751598e57bc72a9`, unchanged and
+  a strict ancestor of the local series.
+
+The ordered outgoing series is:
+
+| Commit | Scope |
+|---|---|
+| `d0348d0603ae600829409417f7a36bddac9e334e` | Test-only executable connection-patch ordering correction; `IBTEST-CCR05`, with red/green proof. |
+| `50f5567f9a877c48d052b912595cdb21cb4ff15a` | Separate counter-review handoff: exact incoming `8c063da284b42c0a17ae98df419a256ffab56c68` and `ebb30c5d26e8789b409f52fb3751598e57bc72a9`, every disposition, factual qualifications, validation and owner-decision stop. |
+| This separate owner-record commit | Final accepted classification and narrowly authorized publication; no implementation change. |
+
+Only `tests/test_insider_buying_lane_import_boundary.py` and this lane
+record differ from `ebb30c5`. Shared/project-wide documents, v1/scale/pilot,
+the four frozen v3 custody files and retained source roots remain unchanged.
+No side branch, new worktree, history rewrite or concurrent overwrite is
+permitted. Before this record commit and the final push, reverify exact
+root, branch, HEAD and clean/expected status; fetch only origin's matching
+lane and stop on unexpected advancement. Make **exactly one successful
+push** to `origin/codex/strategy-insider-buying`, then independently resolve
+the remote branch tip and require equality with the pushed local HEAD.
+Before that succeeds, these commits remain local-only; this record's
+presence in a local checkout is not publication evidence.
+
+### 126.3 Validation, unchanged gates and handoff
+
+Section 125's network-denied **112 focused**, **74 exact package/import-
+boundary** and **71 active-document/record** passes remain evidence for
+the unchanged code tree. This owner-response turn changes documentation
+only. On bundled Python **3.12.14** with `sandbox-exec` process-tree network
+denial, active-document/record checks passed **71/71 in 0.70s** and the
+corrected lane boundary plus exact Insider package guard passed **18/18
+in 1.37s**, zero failures/skips/warnings. The three reviewed test files
+compile without cache/source writes. Sections **110-126** are contiguous
+and ordered; `git diff --check` is clean, and the outgoing file-scope check
+contains only the intended lane test and record. A separate read-only
+audit confirms the four frozen v3 files and shared documents are unchanged.
+Repeat the document checks after this validation entry, then verify
+clean/expected status and unchanged origin before committing/pushing.
+No complete lane or repository suite is run.
+
+No new SEC/provider/credential/licensed-row access, QC upload/job,
+registered or outcome look, backtest, broker/operator-database/scheduler,
+deployment, capital, order, paper/live or trading action is authorized or
+performed by this owner-response round. **Looks/jobs/backtests 0/0/0.**
+The stopped v3 root remains unresolved at 1,846 completions of 1,847
+starts; the separate accepted diagnostic does not rewrite it. The frozen
+99,394-parent denominator, only 19,526 source-bound rows and 79,868
+originally unattempted requests are unchanged. Strict D23 still has seven
+nonexact quarters and no 82-quarter digest. All source/PIT/rights/canonical/
+mapping/look/QC/backtest/execution gates remain false.
+
+**Next action after verified publication:** stop and hand back this exact
+Codex series for independent Claude review. Do not start a next acquisition,
+historical replay, actual affected-quarter integration or other milestone.
+No message to another chat or new monitor is inferred. Leave the existing
+heartbeat **PAUSED**; never automatically rearm it. A later milestone
+requires its own specifically bounded owner direction and satisfied inputs
+and lane gates.

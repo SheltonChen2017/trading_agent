@@ -1,0 +1,70 @@
+{
+  "candidate_ids": [
+    "ARV2_FORWARD_AR_OFF",
+    "ARV2_FORWARD_AR_100",
+    "ARV2_FORWARD_AR_200"
+  ],
+  "capabilities": {
+    "confirmatory_look_commitment": false,
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false
+  },
+  "construction_policy_sha256": "7f1dbfe54f8179add6db9b15abdf343e55253ba50541175a5764e4c15dc644d4",
+  "convention_disclosure": "new_prospective_convention_not_historical_after_close_next_session_MOO_replay",
+  "decision_ready": false,
+  "declared_adapter_requirements": {
+    "buy_cash_gate": "actual_reconciled_cash_including_fees_required_before_buys",
+    "leverage_allowed": false,
+    "policy_text_enforces_adapter_rules": false,
+    "rounding_residue": "cash",
+    "sell_state": "actual_reconciled_sell_state_required_before_buy_budget",
+    "sequence": "sells_before_buys",
+    "share_rounding": "whole_share_floor_NAV_times_target_weight_divided_by_RAW_reference_price",
+    "short_positions_allowed": false,
+    "target_gross_exposure": "0.98"
+  },
+  "declared_economics": {
+    "AR_100_and_200_are_weight_transfer_fractions_not_leverage": true,
+    "baseline_adverse_slippage_bps": "0",
+    "fee_bps_per_side": "10"
+  },
+  "execution_adapter_implemented": false,
+  "initial_simulated_account": {
+    "cash_usd": "1000000",
+    "currency": "USD",
+    "nav_usd": "1000000",
+    "positions": []
+  },
+  "pending_bindings": {
+    "actual_fill_source_sha256": null,
+    "confirmatory_protocol_sha256": null,
+    "independent_execution_parity_sha256": null,
+    "matched_predecision_input_sha256": null,
+    "order_adapter_sha256": null,
+    "paper_epoch_sha256": null,
+    "qc_paper_project_mode_epoch_permit_sha256": null,
+    "raw_reference_price_source_sha256": null,
+    "stock_selection_target_implementation_sha256": null
+  },
+  "reference_price": {
+    "clock": "immediately_prior_NYSE_session_actual_close",
+    "identical_source_bytes_for_all_arms": true,
+    "independent_origin_proven": false,
+    "normalization": "RAW"
+  },
+  "schedule": {
+    "decision_cutoff": "same_session_09:20:00_America/New_York",
+    "input_and_valuation_frequency": "daily_NYSE_sessions",
+    "planned_execution_session": "same_as_decision_session",
+    "planned_market_order_start": "actual_NYSE_open_plus_one_minute",
+    "planned_start_is_actual_fill_claim": false,
+    "rebalance_frequency": "first_NYSE_session_of_each_ISO_week"
+  },
+  "schema": "arv2-six-universe-forward-execution-policy-v1",
+  "stock_selection_policy_sha256": "b691699baf506f8d7ef142439094527a936c73b37d3a2d39ed075315888bfcd0"
+}

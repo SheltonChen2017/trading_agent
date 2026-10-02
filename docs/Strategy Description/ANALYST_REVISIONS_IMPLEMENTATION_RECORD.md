@@ -247,6 +247,11 @@ Section 228 is Claude's independent review of `377741c..52f6608` (0 P0,
 0 P1, 0 P2, 1 P3): the declarative stock-selection/fallback policy is
 verified against the historical gate and accepted, and the test-only
 `e76d074` pins eight parent-verification conditions.
+Section 229 counter-reviews both section-228 Claude commits and adds a
+shared weekly forward clock/execution policy with a no-order matched-arm
+binding diagnostic. It freezes preparation choices before future outcomes;
+independent input provenance, executable selection/weights, actual fills,
+the formal protocol, evidence epoch and paper authority remain open.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1026,10 +1031,14 @@ Section 227 counter-reviews both section-226 Claude commits and freezes only
 the outcome-free selection/fallback rule; it does not prove inputs or make a
 forward decision. Section 228 is Claude's independent review of the exact
 pushed range `377741c..52f6608` (section 227), with the test-only
-correction `e76d074`. The immediate next step is that Codex counter-reviews
-section 228 and both Claude commits of this round, then binds genuine
-security-master, own-ETF, vendor, score and price provenance to a common
-predecision input for a refusal-tested no-order selector.
+correction `e76d074`. Section 229 accepts both Claude commits and freezes a
+shared weekly schedule, prior-session closing-price clock and declared
+execution settings; its diagnostic binds three supplied arm configurations
+to the recomputed common input. Claude must review section 229 and its
+exact pushed source/test/record snapshot independently as the immediate
+next step. After a new complete review push and Codex counter-review,
+independent security-master, own-ETF, vendor, score and price provenance
+must be bound before the no-order selector can become decision-ready.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -2794,6 +2803,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-01 | Claude independent review of section 225: the counter-review of section 224, the holdings-identity input, and the October 1 capture | `b753476` -> `8096a51` -> this record commit | Section 226: one commit `2f5cc92..b753476` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 224 accepted, including `ARV2CR225-001`, a miss in section 224; zero QC or provider calls, looks, evaluations, or cells in this review | Pinned the padded-QC-SID refusal (`8096a51`, test-only, red with the check removed); verified the October 1 capture by hash and validated receipt; section 4 names section 226, banner sentence added, this row appended; no production line changed | Required gates and affected tests at the pushed head, standing lane selection in a byte-faithful export of `b753476`, fourteen mutation trials, blueprint 17.2 and 18.1 read, `compileall`, `git diff --check`; exact counts in 226.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R226-001`): one untested identity guard (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 226 |
 | 2026-10-01 | Codex section-226 counter-review and declarative future selection/fallback freeze | `377741c` -> this round's final record commit | Section 227 accepts both Claude commits, including the `ARV2R226-001` test correction, and freezes one adaptive, outcome-free forward rule child; zero QC/provider calls, outcomes, looks, evaluations, cells or orders; floor 298/233/40/699. | Distinct future hybrid: 25% name-count/cap-covered floors and five-name admission with a stricter 95–105% complete-book interval, cap-ranked/count-matched AR-on holdings, AR-off cap-only control, XLE cap-only entry, conditional exact-SID QCOM, own-ETF fallback and explicit false action authority. It is not an exact R232/R237 replay or an executable selector. | Focused policy/closure 114 passed; affected policy, input, snapshot, closure, dataset/ML import and record selection 526 passed; compilation and diff clean. No complete Codex lane suite. | No new defect in the two Claude commits. `ARV2D227-001` P3 initial QC-SID tie-break corrected to mapped security ID before push. Independent security names, own-ETF identity, vendor first-publication/crosswalk, scored input, execution, formal protocol, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 227 and the exact child/source/test/record snapshot before another Codex milestone. No paper/live/funded/broker/real-order authority. |
 | 2026-10-02 | Claude independent review of section 227: the counter-review of section 226 and the forward stock-selection/fallback freeze | `52f6608` -> `e76d074` -> this record commit | Section 228: one commit `377741c..52f6608` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 226 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned eight parent-verification conditions (`e76d074`, test-only, each red with its condition removed); verified the policy against the historical gate; section 4 names section 228, banner sentence added, this row appended; no production line changed | Required gates and policy tests at the pushed head, standing lane selection in a byte-faithful export of `52f6608` (six file groups after two interrupted runs), twenty-two mutation trials, `compileall`, `git diff --check`; exact counts in 228.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R228-001`): eight untested parent conditions (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 228 |
+| 2026-10-02 | Codex section-228 counter-review and common forward clock/execution binding diagnostic | `7cbbe01` -> this round's final record commit | Section 229 accepts both Claude commits and freezes one common preparation policy plus a three-arm no-order binding check; zero QC/provider calls, outcomes, orders, looks, evaluations or cells; floor 298/233/40/699. | Weekly first NYSE session, 09:20 New York input cutoff, same-session open-plus-one-minute planned order start, immediately prior-session closing-price clock and identical USD 1 million initial all-cash state, declared sizing and cost rules; recomputed input and per-arm configuration authentication. Lane-local JSON attributes preserve the parent and child byte pins. | Focused validation and exact final-tree results in 229.3; no complete Codex lane suite. | No new defect confirmed in the two Claude commits. Existing parent-lineage checkout defect `ARV2CR229-001` P2 corrected. Independent source/security/score/price provenance, executable selector/weights, actual execution parity, formal protocol, evidence, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 229 before the next Codex round. No paper/live/funded/broker/real-order authority. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -32633,3 +32643,131 @@ The final tree differs from the pushed head `52f6608` only by this round's
 Claude commits, the test-only `e76d074` and this record commit. Not
 exercised here: no QuantConnect or provider endpoint, result read, or
 launcher was run, and section 227 records none.
+
+## 229. Codex counter-review of section 228 and common forward clock/execution preparation, 2026-10-02
+
+**Exact Claude range:** `52f660822fc18c4cdc4fcf14b60ae0beda897085` through
+`7cbbe01122c0f3674562e5e449bfea6b60744e04`, two commits. The remote review
+push was detected, the designated root and branch were verified clean,
+only that lane branch was fetched, and an ancestor-checked fast-forward
+was already up to date. No other checkout, branch or worktree was used.
+This round adds no provider/QC call, outcome read, selection evaluation,
+paper observation, research look or authenticated cell. The floor remains
+**298 shared / 233 development / 40 infrastructure / 699 cells**.
+
+### 229.1 Per-commit counter-review
+
+| Claude commit | Disposition | Evidence and limits |
+|---|---|---|
+| `e76d0744f63b5ef0496ddcb2c709d4456ae9568a` | accepted | Test-only isolation of eight existing parent-policy conditions. Each case changes the named field and reaches its intended refusal. A read-only same-round audit independently reproduced all eight red/green conditions in memory by removing only the corresponding guard. No production or economic rule changed. |
+| `7cbbe01122c0f3674562e5e449bfea6b60744e04` | accepted | Record-only section 228 correctly disposes the preceding Codex commit, preserves the adaptive construction and provenance caveats, updates the banner/pointer/ledger, and separates the six-group export results from checkout checks. The complete suite totals remain Claude's reported validation; Codex did not repeat that suite or independently authenticate its historical execution logs. |
+
+`ARV2R228-001` is confirmed as a P3 test-sensitivity gap corrected by
+Claude's `e76d074`. No new P0-P3 defect was confirmed in either Claude
+commit. The reviewed policy and live record checks passed **130/130** on
+the exact reviewed tree. A same-round Codex audit assists this counter-review;
+it is not a substitute for Claude's independent review of the next push.
+
+| ID | Priority | Origin / status | Evidence and reason | Correction / verification |
+|---|---|---|---|---|
+| `ARV2CR229-001` | P2 | Existing frozen forward-policy lineage, including Codex's construction/selection files; corrected in this round, not introduced by either Claude commit | These exact-byte JSON artifacts had unspecified Git text/eol attributes. Read-only `git -c core.autocrlf=true -c core.eol=crlf cat-file --filters` produced CRLF bytes; selection hash became `9a4304eb08648f36c08dda00a38214003db84aa1713573c2266734818b60d9dc` rather than `b691699baf506f8d7ef142439094527a936c73b37d3a2d39ed075315888bfcd0`, and construction became `9e491678ae02059e030fcda7015cf937f2d32ea2e4ac99b7a206a3062f5cfe8e` rather than its frozen pin. Windows-style checkout therefore breaks loading an unchanged reviewed policy, which must be portable. | A new lane-local `research/analyst_revisions_v2_qc/.gitattributes` sets JSON to `-text`; root/shared attributes and all existing policy bytes stay unchanged. Five regressions were red before the attribute and green after: four real Git-filter checks for range/dual/construction/selection and one new-child effective-attribute check. This checks conversion on this host, not a full Windows runtime. |
+| `ARV2D229-001` | P3 | New uncommitted diagnostic draft; corrected before commit | The draft reread caller-owned input fields after upstream source validation. Its first correction still counted keys before copying, allowing a mutation in that gap to produce a raw `KeyError`. These are source-binding/refusal defects, not action-authority escapes. | The final implementation checks the exact dictionary type, copies it, and validates only retained immutable bytes/strings. Regressions prove post-validation caller replacement cannot rebind the report and mutation at the copy boundary gives the named input refusal. A read-only Codex audit independently reproduced the latter correction. |
+
+### 229.2 Decisions and implemented preparation scope
+
+The next bounded choice is the common schedule/execution policy and a
+binding diagnostic. Section 228's proposed executable selector depends on
+independent names, own-ETF identities, vendor publication/crosswalk, scores
+and prices that have not been supplied as accepted evidence. This round
+does not label caller claims or October 1's machine receipt as that proof.
+It advances the remaining execution/clock freeze under the owner's scoped
+research/preparation preauthorization, leaving the parent construction and
+stock-selection bytes unchanged.
+
+The additive child authenticates both reviewed parent hashes and declares:
+
+- One rebalance on the first NYSE session of each ISO week; daily input
+  capture and valuation remain the intended future observation cadence.
+  The historical helper's forced extra terminal rebalance is not inherited.
+- A common same-session **09:20 America/New_York** input cutoff and a
+  planned market-order start **one minute after the actual NYSE open**.
+  This is a new prospective execution convention. Historical runs planned
+  after the preceding close and used next-session market-on-open; R279
+  established the 09:20 callback mechanism, not this new fill path.
+- A common RAW immediately preceding NYSE closing reference-price set.
+  The diagnostic checks its claimed timestamp against the calendar's exact
+  prior close, including holidays and early closes. Source identity,
+  RAW normalization, security coverage and actual price freshness/origin
+  still require independent evidence.
+- The historical **USD 1,000,000** simulated initial cash/NAV with no
+  positions, **98%** target gross, whole-share floor sizing, cash retention
+  of rounding residue, no shorts or leverage, and sell-before-buy ordering
+  with reconciled proceeds and fee-inclusive cash required by the future
+  adapter. Each arm may later develop its own NAV; the shared sizing rule
+  does not force equal later account values.
+- The historical base convention of **10 bps per side** and **zero modeled
+  base slippage**, identical across the control, 100% and 200% arms. This
+  does not establish actual costs or liquidity. Adverse-slippage and
+  participation sensitivity, at the named account size, stays a separate
+  preregistration. The AR transfer percentages are not leverage ratios.
+
+The pure diagnostic recomputes the existing claimed predecision diagnostic
+from its pinned input bytes rather than trusting a caller-created dataclass.
+It resolves the real trading session, weekly eligibility, decision cutoff,
+planned order-start instant and previous close; then authenticates exactly
+three ordered supplied arm configurations against those values, the
+common input and child policy. Changed candidate IDs, session/clock fields,
+input/policy hashes or initial account state refuse. The immutable common
+digest binds the parents, execution policy, input and arm configurations.
+There are no emitted holdings, weights, quantities, sides, orders or fills.
+
+The valid diagnostic retains named refusals for vendor first-publication,
+holdings identity, crosswalk review, price provenance/freshness, RAW price
+evidence, scores, own-ETF identity, execution parity and evidence epoch.
+All action capabilities and decision readiness remain false. The monetary,
+cost and cash rules above are declarations for a future adapter; this
+diagnostic does not execute or prove those rules. No first formal observation
+or alpha commitment follows from loading or binding the policy.
+
+### 229.3 Validation, remaining gates and next authorized action
+
+The frozen child-policy SHA-256 is
+`817d7db82da6f657af4344539689b91a084494f4c9ecb1ad68d1b19c66e193a1`.
+The construction/selection parent bytes and their pins are unchanged.
+Validation used `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`
+(3.13.15), entirely from the designated lane worktree. No complete lane or
+repository suite was run by Codex.
+
+| Check | Scope / result |
+|---|---|
+| Exact reviewed-tree counter-review | Selection-policy, lane-record and active-document checks: **130 passed**. |
+| Initial checkout regression | Four parent real Git-filter checks plus new-child attribute check: **5 failed before correction; 5 passed after**. |
+| Initial new-module closure integration | **73 passed, 1 failed**: exact boundary-edge inventory lacked the new module's canonical-helper edge. The missing exact edge was registered; no guard was removed or broadened. |
+| New module after both draft corrections | **109 passed**; synthetic source inputs, every field in each of three arms, source/config/parent pins, false authority, calendar/holiday/DST/prior-half-day, immutable output and both caller-mutation regressions. A same-round read-only audit found no unresolved defect; it does not replace Claude review. |
+| Combined focused implementation and document selection | New execution and checkout tests, parent construction/selection, predecision, whole-package object-store/import closure, dataset/import firewall, ML import boundary, lane-record integrity and active documents: **621 passed, 1 failed in 100.92s**. The only failure was the handoff grammar gate, whose exact pattern did not recognize “Claude independently reviews.” The text now directs “Claude must review section 229” independently; production/test code was unchanged after this run. Final document-gate results are recorded below. |
+| Final document gates | Lane-record integrity and active documents after the wording correction: **82 passed in 0.88s**. Together with the unchanged code/boundary results above, all **622 distinct focused checks** are green; this is not a claim of a single all-green combined rerun or the complete lane suite. |
+| Changed Python compilation | New execution module and tests, checkout test and closure test: `compileall -q` clean. |
+| Whitespace and scope | `git diff --check` clean; only lane module/policy/tests/attributes/record changed. No shared/root handoff, action-plan, shared attributes, existing policy, provider payload or evaluation artifact was edited. |
+| Pre-commit invariant | Exact designated root, branch `codex/strategy-analyst-revisions-v2`, reviewed `HEAD` `7cbbe01122c0f3674562e5e449bfea6b60744e04`, matching remote head, and only the seven authored round files verified. Commit and the single final push must repeat the root/branch/status checks and target only this remote lane. |
+
+No QC candidate was launched, so no attempt was consumed;
+no provider endpoint or outcome was read and no money/order path was run.
+
+The concrete external evidence gate is still independent predecision
+vendor/security-master/own-ETF/crosswalk/score/RAW-price provenance. The
+retained development capture does not resolve it. A future selector must
+also refuse an ETF security identity colliding with a direct-stock identity.
+Actual weight transfer, quantity/order adapters and execution parity,
+same-epoch dates, preregistered two-arm estimands/power/missing-data/stops
+and multiplicity within one formal Analyst look and total two-sided alpha
+at most **1/80**, formal ARV2-4 through ARV2-8 stock/ETF evidence, capacity
+and independent dossier gates remain open. R247 stays attempt-exhausted;
+this round does not create a replacement QC input attempt or reopen spent
+candidate gates. The exact QC Paper project/mode/epoch permit remains a
+separate pre-deployment gate.
+
+**Next serialized action:** Claude independently reviews section 229 and
+its exact pushed source/test/record snapshot. Codex then counter-reviews
+each new Claude commit before one further bounded readiness step. The
+existing monitor stays active and quiet until a new complete review push;
+it does not reprocess section 228 or this Codex implementation push.

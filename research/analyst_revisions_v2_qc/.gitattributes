@@ -1,0 +1,3 @@
+# Lane-owned content-addressed JSON is authenticated as exact committed bytes.
+# Disable checkout and staging newline conversion, including Windows autocrlf.
+*.json -text

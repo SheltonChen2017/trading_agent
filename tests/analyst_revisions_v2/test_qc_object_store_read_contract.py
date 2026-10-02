@@ -193,6 +193,7 @@ _PINNED_QC_PACKAGE_SOURCES = tuple(
     refusal_smoke_projection.py run_contract.py runtime_shard_projection.py
     six_universe_cap90_submission.py six_universe_coverage_submission.py
     six_universe_forward_construction_policy.py
+    six_universe_forward_execution.py
     six_universe_forward_predecision.py
     six_universe_forward_stock_selection_policy.py
     six_universe_matched_study.py six_universe_qcom_entry_only_projection.py
@@ -706,6 +707,16 @@ _HOST_ONLY_ADAPTER_IMPORTS = {
         """
         hashlib json pathlib types research.analyst_revisions_v2_qc
         research.analyst_revisions_v2_qc.six_universe_qcom_exclusion_dual_forward_policy
+        """.split()
+    ),
+    "six_universe_forward_execution.py": tuple(
+        """
+        hashlib json dataclasses datetime pathlib types zoneinfo
+        data.exchange_calendar research.analyst_revisions_v2.canonical
+        research.analyst_revisions_v2_qc
+        research.analyst_revisions_v2_qc.six_universe_forward_construction_policy
+        research.analyst_revisions_v2_qc.six_universe_forward_predecision
+        research.analyst_revisions_v2_qc.six_universe_forward_stock_selection_policy
         """.split()
     ),
     "six_universe_forward_predecision.py": tuple(
@@ -1770,6 +1781,9 @@ _HOST_ONLY_ADAPTER_IO_SURFACE = {
         "call:read_bytes", "import:pathlib",
     ),
     "six_universe_forward_construction_policy.py": (
+        "call:read_bytes", "import:pathlib",
+    ),
+    "six_universe_forward_execution.py": (
         "call:read_bytes", "import:pathlib",
     ),
     "six_universe_forward_predecision.py": (),
@@ -4341,6 +4355,10 @@ _PINNED_REPOSITORY_BOUNDARY_EDGES = tuple(
             "research.quantconnect",
         ),
         (
+            "research.analyst_revisions_v2_qc.six_universe_forward_execution",
+            "research.analyst_revisions_v2.canonical",
+        ),
+        (
             "research.analyst_revisions_v2_qc.six_universe_forward_predecision",
             "research.analyst_revisions_v2",
         ),
@@ -4991,6 +5009,7 @@ def test_whole_qc_package_transitive_import_and_no_io_closure_is_pinned():
         "research.analyst_revisions_v2_qc.six_universe_cap90_submission",
         "research.analyst_revisions_v2_qc.six_universe_coverage_submission",
         "research.analyst_revisions_v2_qc.six_universe_forward_construction_policy",
+        "research.analyst_revisions_v2_qc.six_universe_forward_execution",
         "research.analyst_revisions_v2_qc.six_universe_forward_predecision",
         "research.analyst_revisions_v2_qc.six_universe_forward_stock_selection_policy",
         "research.analyst_revisions_v2_qc.six_universe_matched_study",

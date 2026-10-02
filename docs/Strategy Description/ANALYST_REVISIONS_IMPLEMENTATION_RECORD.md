@@ -243,6 +243,10 @@ Section 227 counter-reviews both section-226 Claude commits and freezes a
 distinct, development-only forward stock-selection/fallback policy. Its
 historically informed choice is adaptive; input provenance, executable
 weights, execution, confirmatory evidence and paper authority remain open.
+Section 228 is Claude's independent review of `377741c..52f6608` (0 P0,
+0 P1, 0 P2, 1 P3): the declarative stock-selection/fallback policy is
+verified against the historical gate and accepted, and the test-only
+`e76d074` pins eight parent-verification conditions.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1020,8 +1024,12 @@ Section 226 is Claude's independent review of the exact pushed range
 `2f5cc92..b753476` (section 225), with the test-only correction `8096a51`.
 Section 227 counter-reviews both section-226 Claude commits and freezes only
 the outcome-free selection/fallback rule; it does not prove inputs or make a
-forward decision. Claude will review section 227 and its exact pushed
-source/test/record range before Codex advances another bounded milestone.
+forward decision. Section 228 is Claude's independent review of the exact
+pushed range `377741c..52f6608` (section 227), with the test-only
+correction `e76d074`. The immediate next step is that Codex counter-reviews
+section 228 and both Claude commits of this round, then binds genuine
+security-master, own-ETF, vendor, score and price provenance to a common
+predecision input for a refusal-tested no-order selector.
 
 Earlier recent-window R223/R224 were both valid on A1:
 AR-off +53.76558%, AR-on +53.65121%,
@@ -1035,7 +1043,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 225 (section 226). Section 182 records the owner's exact
+the pushed range through section 227 (section 228). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -2785,6 +2793,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-01 | Codex section-224 counter-review, separate claimed holdings-security mapping and one pre-cutoff development capture | `2f5cc92` -> this round's final commit | Section 225 accepts both Claude commits and closes `ARV2R224-001/-002`; prospectively corrects `ARV2CR225-001` P2 without rewriting the six-universe construction policy or spent artifacts. One read-only provider capture and quality receipt, zero QC calls, outcomes, orders, paper looks, research evaluations or cells; floor remains 298/233/40/699. | A canonical, hash-pinned, as-of claimed security-identity input now supplies the exact 99% ETF holdings weight check; vendor analyst mapping stays separate. Private October 1 capture/receipt hashes and redacted timestamps/counts are in 225.3. The diagnostic remains refusal-only and non-decision-ready. | Focused tests, import/record gates, compilation, diff and status in 225.4; no complete Codex lane suite. | `ARV2CR225-001` P2: prior code conflated holdings identity with analyst-vendor coverage, corrected here. Independent identity provenance, first-publication availability, execution, stock-selection/fallback, protocol, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 225 and its source/test/record range before the next bounded Codex round. No paper/live/funded/broker/real-order authority. |
 | 2026-10-01 | Claude independent review of section 225: the counter-review of section 224, the holdings-identity input, and the October 1 capture | `b753476` -> `8096a51` -> this record commit | Section 226: one commit `2f5cc92..b753476` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 224 accepted, including `ARV2CR225-001`, a miss in section 224; zero QC or provider calls, looks, evaluations, or cells in this review | Pinned the padded-QC-SID refusal (`8096a51`, test-only, red with the check removed); verified the October 1 capture by hash and validated receipt; section 4 names section 226, banner sentence added, this row appended; no production line changed | Required gates and affected tests at the pushed head, standing lane selection in a byte-faithful export of `b753476`, fourteen mutation trials, blueprint 17.2 and 18.1 read, `compileall`, `git diff --check`; exact counts in 226.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R226-001`): one untested identity guard (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 226 |
 | 2026-10-01 | Codex section-226 counter-review and declarative future selection/fallback freeze | `377741c` -> this round's final record commit | Section 227 accepts both Claude commits, including the `ARV2R226-001` test correction, and freezes one adaptive, outcome-free forward rule child; zero QC/provider calls, outcomes, looks, evaluations, cells or orders; floor 298/233/40/699. | Distinct future hybrid: 25% name-count/cap-covered floors and five-name admission with a stricter 95–105% complete-book interval, cap-ranked/count-matched AR-on holdings, AR-off cap-only control, XLE cap-only entry, conditional exact-SID QCOM, own-ETF fallback and explicit false action authority. It is not an exact R232/R237 replay or an executable selector. | Focused policy/closure 114 passed; affected policy, input, snapshot, closure, dataset/ML import and record selection 526 passed; compilation and diff clean. No complete Codex lane suite. | No new defect in the two Claude commits. `ARV2D227-001` P3 initial QC-SID tie-break corrected to mapped security ID before push. Independent security names, own-ETF identity, vendor first-publication/crosswalk, scored input, execution, formal protocol, dossier and exact QC Paper permit remain open. | Exactly one final same-lane push; Claude independently reviews section 227 and the exact child/source/test/record snapshot before another Codex milestone. No paper/live/funded/broker/real-order authority. |
+| 2026-10-02 | Claude independent review of section 227: the counter-review of section 226 and the forward stock-selection/fallback freeze | `52f6608` -> `e76d074` -> this record commit | Section 228: one commit `377741c..52f6608` disposed (0 accepted, 1 accepted after correction, 0 rejected); Codex's counter-review of section 226 accepted; zero QC or provider calls, looks, evaluations, or cells | Pinned eight parent-verification conditions (`e76d074`, test-only, each red with its condition removed); verified the policy against the historical gate; section 4 names section 228, banner sentence added, this row appended; no production line changed | Required gates and policy tests at the pushed head, standing lane selection in a byte-faithful export of `52f6608` (six file groups after two interrupted runs), twenty-two mutation trials, `compileall`, `git diff --check`; exact counts in 228.7 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R228-001`): eight untested parent conditions (corrected) | Single push of this round's Claude commits; Codex counter-reviews section 228 |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -32495,3 +32504,132 @@ alpha <=1/80, formal ARV2-4 through ARV2-8 evidence, capacity, parity,
 paper algorithm and independent dossier remain open. Exact QC Paper
 project/mode/epoch permission is separately required before deployment.
 No funded/broker/real orders or live-efficacy claim are authorized.
+
+## 228. Independent Claude review of section 227: the counter-review of section 226 and the forward stock-selection/fallback freeze, 2026-10-02
+
+**Range reviewed:** `377741c..52f6608`, one Codex commit in one push,
+disposed in 228.1, plus this round's Claude lane commits (the test-only
+`e76d074` and this record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called, and section 227 records none; the floor stays **298 / 233 / 40 /
+699**.
+
+**Codex's counter-review of section 226 (section 227) is accepted.** It
+accepts both Claude commits and confirms `ARV2R226-001` as corrected.
+
+**Verdict.** The one commit is accepted after correction; none is rejected.
+**0 P0, 0 P1, 0 P2, 1 P3.** No production line changed in this round; the
+test-only `e76d074` pins eight parent-verification conditions. The required
+gates and the new policy tests pass at the pushed head, and section 227's
+banner sentence, ledger row and section-4 pointer are present. The complete
+lane selection was interrupted twice, once by a session end and once at 41%
+by this session's limit on one background job, so 228.7's counts come from
+the same 9,644 collected tests run as six file groups.
+
+### 228.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `52f6608` | Section 227 counter-review; the declarative forward stock-selection and ETF-fallback policy, its loader, tests and closure registration | accepted after correction | The policy restates the historical gate faithfully (228.3) and departs from it only where it says so: the total-reported-weight floor rises from 25% to the diagnostic's 95%. Every binding that would make it executable is null, `stock_selection_executable` and `decision_ready` are false, and all eight action capabilities are false. Fallbacks route only to a sleeve's own ETF. The loader matches the construction-policy loader and now carries numeric-alias tests. Eight of the fifteen parent-verification conditions had no test (`ARV2R228-001`, pinned in `e76d074`). |
+
+### 228.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R228-001` | P3 | `52f6608` | The parent check refuses a changed construction parent through fifteen conditions, but the combined test changed only six of them. The independent-confirmation flag, the QCOM display-ticker, alias-repair and required-evidence rules, the control ID and fraction, the arm IDs and the arm entry flag could each be removed with all 40 tests green (`SS3`, `SS6` to `SS9`, `SS11`, `SS13`, `SS14`). They back up the parent's own hash pin, so they fire only if the parent loader misbehaves, which is exactly what the mocked-parent test simulates. | Corrected in `e76d074` (test-only): one parametrized case per condition, each red with its condition removed. |
+
+### 228.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Required gates, the stock-selection and construction-policy tests at the pushed head `52f6608` (worktree) | 438 passed |
+| Five-name admission floor | `accepted_risk_six_universe_gate.MINIMUM_POSITIVE_SCORE_COUNT = 5` |
+| Holdings rank and count | the gate's matched holdings are all verified-cap names sorted by `(-pit_market_cap, security_id)`, cut to the positive-score count, up to the slot count; the policy's `positive_market_cap_desc_then_exact_security_id` and `min_10_eligible_positive_score_count` match |
+| Tie-break correction `ARV2D227-001` | confirmed: the historical sort key ends in the mapped `security_id`, not the QC SID |
+| XLE exception | `six_universe_relaxed_selection_source` cap-ranks XLE's top ten independently of AR and applies the five-name entry floor only outside XLE; the policy's `xle_all_arms` matches |
+| Scaled slot weight | the relaxed gate scales a sleeve's slot by `min(1, cap_ratio × total_reported_weight)` and floors to the weight quantum only below one; the policy's rule matches |
+| Look floor | unchanged at 298/233/40/699 |
+
+| Trial | Production change | Result | Named failing tests |
+|---|---|---|---|
+| `SS1` | parent identity pin check removed | red: 1 failed | `test_parent_identity_cohort_qcom_signal_and_authority_guards` |
+| `SS2` | parent capabilities check removed | red: 1 failed | same |
+| `SS3` | parent independent-confirmation check removed | **green** → pinned by `e76d074`; afterwards red | `test_each_remaining_parent_condition_refuses_alone[…authority…]` |
+| `SS4` | parent cohort check removed | red: 1 failed | `test_parent_identity_cohort_qcom_signal_and_authority_guards` |
+| `SS5` | parent QCOM special-exclusion check removed | red: 1 failed | same |
+| `SS6` | parent QCOM display-ticker check removed | **green** → pinned; afterwards red | `test_each_remaining_parent_condition_refuses_alone[…QCOM…]` |
+| `SS7` | parent QCOM alias-repair check removed | **green** → pinned; afterwards red | same test, its own case |
+| `SS8` | parent QCOM required-evidence check removed | **green** → pinned; afterwards red | same test, its own case |
+| `SS9` | parent control ID check removed | **green** → pinned; afterwards red | `test_each_remaining_parent_condition_refuses_alone[…signal…]` |
+| `SS10` | parent control entry check removed | red: 1 failed | `test_parent_identity_cohort_qcom_signal_and_authority_guards` |
+| `SS11` | parent control fraction check removed | **green** → pinned; afterwards red | `test_each_remaining_parent_condition_refuses_alone[…signal…]` |
+| `SS12` | parent arm-count check removed | green | none; redundant: the arm-ID tuple comparison already refuses any change in the number of arms |
+| `SS13` | parent arm-ID check removed | **green** → pinned; afterwards red | `test_each_remaining_parent_condition_refuses_alone[…signal…]` |
+| `SS14` | parent arm entry check removed | **green** → pinned; afterwards red | same test, its own case |
+| `SS15` | parent arm fraction check removed | red: 1 failed | `test_parent_identity_cohort_qcom_signal_and_authority_guards` |
+| `SS16` | exact-type comparison weakened | red: 4 failed | `test_numeric_type_aliases_refuse[…]` |
+| `SS17` | canonical-bytes refusal removed | red: 1 failed | `test_unknown_field_and_rehashed_noncanonical_bytes_refuse` |
+| `SS18` | duplicate-key refusal removed | red: 1 failed | `test_rehashed_duplicate_or_nonfinite_json_refuses[…duplicate…]` |
+| `SS19` | non-finite refusal removed | red: 1 failed | `test_rehashed_duplicate_or_nonfinite_json_refuses[…NaN…]` |
+| `SS20` | nested freezing removed | red: 2 failed | `test_exact_child_freezes_distinct_hybrid_without_action_authority`, `test_cap_selected_count_matched_ar_arms_xle_and_safe_fallback_are_exact` |
+| `SS21` | parent loader failure no longer wrapped | red: 1 failed | `test_parent_loader_failure_refuses` |
+| `SS22` | 16,384-byte bound removed | green | none; redundant: any file must match the frozen hash, and the bytes are read in full before the bound is checked |
+
+All trials ran in a separate export of `52f6608` under the session
+scratchpad, never in the worktree, with failing test names captured; the
+module was restored byte-identical after every trial. The unmutated
+baseline was green (40 passed; 48 with the pin).
+
+### 228.4 Reading the policy on the record's own terms
+
+- **It is a faithful restatement plus one disclosed tightening.** Admission,
+  rank, count, tie-break, the XLE exception and slot scaling all match the
+  historical gate; raising the total-reported-weight floor to 95% aligns it
+  with the predecision diagnostic and is disclosed as an adaptive hybrid.
+- **AR chooses how many names, never which names.** Within an admitted
+  sleeve, holdings are cap-ranked across all verified names, so the AR arms
+  differ from the control only in count and in the unbound weight transfer.
+- **Nothing here can trade.** There is no selector or target producer, every
+  input binding is null, and a missing own-ETF identity or price is a named
+  refusal rather than a target.
+
+### 228.5 Improvement plan
+
+1. **Give every condition of a compound refusal its own isolating case**, as
+   `e76d074` now does for the parent check.
+2. **Next milestone:** bind genuine security-master, name, own-ETF, vendor,
+   crosswalk, score and price provenance to a common predecision input, and
+   build the refusal-tested no-order selector, including the ETF-versus-stock
+   identity collision refusal that section 227 names.
+
+### 228.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2D213-002`, `ARV2R211-001`, `ARV2D213-003`, `ARV2R220-001` | P3 | Documented. |
+| `ARV2R228-001` | P3 | Corrected in `e76d074`. |
+
+### 228.7 Validation
+
+Each scope is stated separately. Runs used
+`~/.venvs/trading_agent-py313/bin/python` (3.13.15).
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, in a byte-faithful export of the pushed head `52f6608` with `artifacts/analyst_revisions_v2` copied in, run as six file groups that together cover all 9,644 collected tests: groups 1 to 4 in turn in that export (group 4 restarted with a two-hour limit), groups 5 and 6 in parallel in copy-on-write clones of it, each with its own pytest temp directory | **3 failed, 9630 passed, 11 skipped, 35 warnings in six file-group runs (each 0:15:43, 0:10:28, 0:05:07, 1:15:20, 0:27:30, 0:04:49).** Exactly three failures, all export artifacts, each re-run green in the real checkout: `test_canonical_production_artifacts_survive_checkout_as_exact_bytes` shells to `git check-attr`, and an export has no `.git` (the firewall file passes 173 there); `test_recover_cli_uses_only_retained_local_artifacts` and `test_a2_cli_read_prints_only_rejection_census` call scripts whose designated-worktree guard refuses any other directory (2 passed there). The eleven skips are the standing ones: seven Windows-only directory-junction tests, three document checks that need a mainline Git ref an export lacks, and one top-five-only profile case. The export predates the pin of `e76d074`; its file is validated on the final tree below. |
+| Required gates and the policy tests at the pushed head | firewall, ML boundary, whole-package closure, lane-record integrity, active-document consistency, the stock-selection and construction-policy test files (worktree at `52f6608`) | 438 passed |
+| The file carrying the new pin | `test_qc_six_universe_forward_stock_selection_policy.py` (worktree, final tree) | 48 passed |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` (worktree, final tree) | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` (final tree) | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+The final tree differs from the pushed head `52f6608` only by this round's
+Claude commits, the test-only `e76d074` and this record commit. Not
+exercised here: no QuantConnect or provider endpoint, result read, or
+launcher was run, and section 227 records none.

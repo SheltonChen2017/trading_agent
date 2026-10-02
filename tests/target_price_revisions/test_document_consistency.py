@@ -703,9 +703,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
     # TPR-CCR14: historical Claude proposals cannot become current grants.
-    assert "awaits independent Claude review" not in normalized_current
+    assert "New remediation candidate awaits independent Claude review" in normalized_current
     assert "Codex next counter-reviews section 42" not in normalized_current
-    assert "Claude next reviews section 43" in normalized_current
+    assert "Claude next reviews sections 43 and 44" in normalized_current
     assert "TPR-D0 is not authorized" in normalized_current
     assert "No next implementation milestone is authorized" in normalized_current
     assert "historical Claude proposals, not operative authorization" in normalized_current
@@ -737,7 +737,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
         assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
         assert "section 43" in normalized_summary_lower
-        assert "awaits claude review" not in normalized_summary_lower
+        assert "remediation candidate awaits claude review" in normalized_summary_lower
+        assert "section 44" in normalized_summary_lower
         assert "tpr-d0 is not authorized" in normalized_summary_lower
         assert "no next implementation milestone is authorized" in normalized_summary_lower
         assert (
@@ -1523,3 +1524,55 @@ def test_current_counterreview_records_all_claude_commits_without_new_authority(
         "monitor remains paused",
     ):
         assert required in authority
+
+
+def test_owner_scoped_remediation_does_not_adopt_trust_or_source_drafts() -> None:
+    """A shared-test exception and decision draft cannot mint adjacent authority."""
+    section = _record_section("## 44. Owner-scoped shared remediation and decision drafts")
+    normalized = " ".join(section.split())
+    assert "37598fa5b686a14e906c92dcea4c17b9d9b933b7" in normalized
+    assert "start implementing" in normalized
+    assert "Implementation candidate; independent review pending" in normalized
+    scope = _bounded(
+        section,
+        "### 44.1 Owner direction and exact scope",
+        "### 44.2 Shared correction and acceptance plan",
+        "section 44 owner scope",
+    )
+    assert "tests/conftest.py" in scope
+    assert "tests/test_runtime_stop_leak_guard.py" in scope
+    assert "No cross-lane synchronization is performed" in " ".join(scope.split())
+    trust = _bounded(
+        section,
+        "### 44.3 Trust decisions - DRAFT, not selected",
+        "### 44.4 Source evidence checklist - DRAFT, zero access",
+        "section 44 trust draft",
+    )
+    trust_rows = re.findall(r"\| `(TPR-TR-D[1-4])` \| ([A-Z]+) \|", trust)
+    assert trust_rows == [(f"TPR-TR-D{i}", "PENDING") for i in range(1, 5)]
+    assert "No trust policy is adopted by this draft" in " ".join(trust.split())
+    source = _bounded(
+        section,
+        "### 44.4 Source evidence checklist - DRAFT, zero access",
+        "### 44.5 Remaining gates and serialized review",
+        "section 44 source checklist",
+    )
+    source_rows = re.findall(r"\| `(TPR-SRC-E[1-8])` \| ([A-Z]+) \|", source)
+    assert source_rows == [(f"TPR-SRC-E{i}", "UNESTABLISHED") for i in range(1, 9)]
+    assert "No source access is admitted by this checklist" in " ".join(source.split())
+    gates = " ".join(_bounded(
+        section,
+        "### 44.5 Remaining gates and serialized review",
+        "### 44.6 Validation and handoff",
+        "section 44 gates",
+    ).split())
+    for required in (
+        "TPR-OOL-011 remains open pending independent review",
+        "prior section-40 rejection is not waived",
+        "TPR-D0 is not authorized",
+        "TPR-TR0-I remains incomplete",
+        "TPR-1 remains blocked",
+        "TPR-0B still requires reviewed TPR-1/TPR-2 manifests",
+        "monitor remains paused",
+    ):
+        assert required in gates

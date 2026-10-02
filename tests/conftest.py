@@ -65,31 +65,97 @@ def _isolate_execution_runtime_authority(tmp_path, monkeypatch):
 # sentinel (the insider SEC nesting-cap tests).  A bound JSONDecoder.decode
 # never consults ``json.loads``, so the guard cannot trip those sentinels.
 _DECODE_RUNTIME_STOP_STATE = __import__("json").JSONDecoder().decode
+_ENCODE_RUNTIME_STOP_INCIDENT = __import__("json").JSONEncoder(
+    sort_keys=True, separators=(",", ":"), allow_nan=False
+).encode
+_RUNTIME_STOP_SESSION_FILE: Path | None = None
+_RUNTIME_STOP_PREEXISTING: dict[str, tuple[str, str]] = {}
+_RUNTIME_STOP_PREVIOUS_CLEAR: tuple[str, str] | None = None
 
-# Session start, for attributing runtime-stop incidents to THIS run.  Bound at
-# import so every teardown compares against the same instant.
-_SESSION_STARTED_AT = __import__("datetime").datetime.now(
-    __import__("datetime").timezone.utc
-)
 
+def _observe_runtime_stop() -> tuple[
+    Path, dict[str, tuple[str, str]], tuple[str, str] | None
+]:
+    """Read only; absence is empty, inability to inspect is not proof of no leak."""
+    import assistant.dispatch_fence as dispatch_fence
 
-def _incident_predates_this_session(activated_at: object) -> bool:
-    """True only for an incident stamped strictly before this session began.
-
-    Anything unparseable or naive returns False so the incident stays
-    attributed by path: an unreadable timestamp must not hide a leak.
-    """
-    from datetime import datetime
-
-    if not isinstance(activated_at, str):
-        return False
     try:
-        stamped = datetime.fromisoformat(activated_at.replace("Z", "+00:00"))
-    except ValueError:
-        return False
-    if stamped.tzinfo is None or stamped.utcoffset() is None:
-        return False
-    return stamped < _SESSION_STARTED_AT
+        stop_file = (
+            dispatch_fence._canonical_runtime_root()
+            / dispatch_fence._STATE_DIRECTORY_NAME
+            / dispatch_fence._EMERGENCY_STOP_FILE_NAME
+        ).resolve()
+    except Exception as exc:
+        raise AssertionError("runtime-stop leak guard cannot resolve its root") from exc
+    try:
+        text = stop_file.read_text(encoding="utf-8")
+    except FileNotFoundError:
+        return stop_file, {}, None
+    except (OSError, UnicodeError) as exc:
+        raise AssertionError("runtime-stop leak guard cannot read its state") from exc
+    try:
+        state = _DECODE_RUNTIME_STOP_STATE(text)
+        if not isinstance(state, dict):
+            raise ValueError("state must be an object")
+        generation = state.get("generation")
+        raw_incidents = state.get("open_incidents")
+        if type(generation) is not int or generation < 0 or not isinstance(raw_incidents, list):
+            raise ValueError("invalid generation or incident inventory")
+        incidents = {}
+        for incident in raw_incidents:
+            if not isinstance(incident, dict):
+                raise ValueError("incident must be an object")
+            identifier = incident.get("incident_id")
+            origin = incident.get("origin_database")
+            if (
+                not isinstance(identifier, str) or not identifier
+                or identifier in incidents
+                or not isinstance(origin, str) or not origin
+            ):
+                raise ValueError("invalid or duplicate incident identity")
+            incidents[identifier] = (
+                os.path.normcase(str(Path(origin).resolve())),
+                _ENCODE_RUNTIME_STOP_INCIDENT(incident),
+            )
+        last_clear = state.get("last_clear")
+        if last_clear is not None:
+            if (
+                not isinstance(last_clear, dict)
+                or not isinstance(last_clear.get("incident_id"), str)
+                or not last_clear["incident_id"]
+            ):
+                raise ValueError("invalid incident clear receipt")
+            last_clear = (
+                last_clear["incident_id"], _ENCODE_RUNTIME_STOP_INCIDENT(last_clear)
+            )
+    except (ValueError, TypeError, OSError, RuntimeError) as exc:
+        raise AssertionError("runtime-stop leak guard cannot decode its state") from exc
+    return stop_file, incidents, last_clear
+
+
+def _capture_runtime_stop_session_baseline() -> None:
+    """Capture once before collection/tests, never lazily exempt a new incident."""
+    global _RUNTIME_STOP_SESSION_FILE, _RUNTIME_STOP_PREEXISTING
+    global _RUNTIME_STOP_PREVIOUS_CLEAR
+    stop_file, incidents, last_clear = _observe_runtime_stop()
+    _RUNTIME_STOP_SESSION_FILE = stop_file
+    _RUNTIME_STOP_PREEXISTING = dict(incidents)
+    _RUNTIME_STOP_PREVIOUS_CLEAR = last_clear
+
+
+def pytest_configure(config) -> None:
+    # This historic hook also runs when conftest is discovered during collection
+    # (e.g. `pytest` from the repository root), before its test modules load.
+    # Never rebaseline: collection itself can publish a containment incident.
+    if _RUNTIME_STOP_SESSION_FILE is None:
+        try:
+            _capture_runtime_stop_session_baseline()
+        except AssertionError as exc:
+            pytest.exit(str(exc), returncode=2)
+
+
+def pytest_sessionstart(session) -> None:
+    pytest_configure(session.config)
 
 
 def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
@@ -103,48 +169,40 @@ def _assert_test_left_no_incident_in_the_real_runtime_stop(tmp_path) -> None:
     every sibling lane's checkout (Insider lane R-09/R-18/R-22: 42 debris
     incidents were observed, all from pytest temp databases).
 
-    Only incidents whose origin database sits under THIS session's pytest
-    base temp AND whose ``activated_at`` is not before this session started
-    are attributed here.  The path test keeps concurrent suites from other
-    sessions on the same host from tripping the guard; the time test keeps a
-    stale incident left under a reused fixed ``--basetemp`` by an earlier run
-    from erroring every test of the next run.  An incident without a
-    parseable ``activated_at`` is attributed by path alone (fail closed).
-    The guard reads the real file and never mutates it: operator runtime
-    state is not test cleanup.
+    Attribute new/changed incidents by exact path components, not string
+    prefixes or semantic activation timestamps. Unchanged incidents captured
+    before collection are exempt, including old incidents under a reused
+    fixed basetemp. An exemption expires when its incident disappears/changes;
+    a changed per-incident last-clear receipt also expires that incident's
+    exemption. Global generation changes cannot identify whose lifecycle
+    changed. A lifecycle wholly hidden between reads without a surviving
+    per-incident receipt is not observable by this guard.
+    Missing baseline, unreadable state, and invalid inventory fail visibly.
+    The guard never mutates the file: operator runtime state is not cleanup.
 
     Because it runs in fixture teardown, a leak is reported by pytest as an
     ERROR at teardown of the offending test, not as a FAIL: the test's own
     assertions may still show passed.
     """
-    import os
-
-    import assistant.dispatch_fence as dispatch_fence
-
-    try:
-        real_root = dispatch_fence._canonical_runtime_root()
-    except Exception:  # platform without a resolvable root: nothing to guard
-        return
-    stop_file = (
-        real_root
-        / dispatch_fence._STATE_DIRECTORY_NAME
-        / dispatch_fence._EMERGENCY_STOP_FILE_NAME
+    global _RUNTIME_STOP_PREVIOUS_CLEAR
+    stop_file, incidents, last_clear = _observe_runtime_stop()
+    assert stop_file == _RUNTIME_STOP_SESSION_FILE, (
+        "runtime-stop leak guard has no session baseline for this root"
     )
-    if not stop_file.exists():
-        return
-    try:
-        state = _DECODE_RUNTIME_STOP_STATE(stop_file.read_text(encoding="utf-8"))
-    except (OSError, ValueError):
-        return  # unreadable real state is the runtime's own fail-closed concern
-    session_base = os.path.normcase(str(tmp_path.parent.resolve()))
+    cleared_id = (
+        last_clear[0]
+        if last_clear is not None and last_clear != _RUNTIME_STOP_PREVIOUS_CLEAR
+        else None
+    )
+    for identifier, content in list(_RUNTIME_STOP_PREEXISTING.items()):
+        if incidents.get(identifier) != content or identifier == cleared_id:
+            del _RUNTIME_STOP_PREEXISTING[identifier]
+    _RUNTIME_STOP_PREVIOUS_CLEAR = last_clear
+    session_base = Path(os.path.normcase(str(tmp_path.parent.resolve())))
     leaked = [
-        incident.get("origin_database")
-        for incident in state.get("open_incidents", []) or []
-        if isinstance(incident, dict)
-        and os.path.normcase(str(incident.get("origin_database", ""))).startswith(
-            session_base
-        )
-        and not _incident_predates_this_session(incident.get("activated_at"))
+        origin for identifier, (origin, content) in incidents.items()
+        if Path(origin).is_relative_to(session_base)
+        and _RUNTIME_STOP_PREEXISTING.get(identifier) != (origin, content)
     ]
     assert not leaked, (
         "this test (or a child process it spawned) wrote a containment incident "

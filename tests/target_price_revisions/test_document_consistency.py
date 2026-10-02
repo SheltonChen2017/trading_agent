@@ -161,6 +161,45 @@ LATEST_RECEIVED_FIRST_PARENT_COMMITS = (
     "9ee3b3ed8a62b4533b44c038dbcdac16c3d899e0",
     "d54ce1b2c6816532ef82906c49998a93574172fc",
 )
+# The one commit section 40 rejects; every other first-parent row is accepted,
+# accepted after correction, or accepted after qualification.
+LATEST_RECEIVED_REJECTED_COMMIT = "903a857455c4525097b60aa18d06c8e9ef8d2111"
+# Claude's 2026-10-02 review (section 42) covers the cumulative Codex range
+# that followed the mixed-role interval: the counter-review, its validation
+# record, the main merge, and the two synchronization-record commits.
+CURRENT_CLAUDE_REVIEWED_CODEX_BASE = (
+    "d54ce1b2c6816532ef82906c49998a93574172fc"
+)
+CURRENT_CLAUDE_REVIEWED_CODEX_HEAD = (
+    "ea97bd4fc03779b7947cf35cd8e4432b0b9fa516"
+)
+CURRENT_CLAUDE_REVIEWED_CODEX_RANGE = (
+    f"{CURRENT_CLAUDE_REVIEWED_CODEX_BASE}.."
+    f"{CURRENT_CLAUDE_REVIEWED_CODEX_HEAD}"
+)
+CURRENT_CLAUDE_REVIEWED_CODEX_SHORT_RANGE = "d54ce1b2..ea97bd4f"
+CURRENT_CLAUDE_REVIEWED_FIRST_PARENT_COMMITS = (
+    "059c93e73cc17b4bc0b01c1d14ab637acf285b7e",
+    "e74da9ef34fac111cef838dbbe9814030daf3cf4",
+    "6590d890509f75d8b7b87fa9b665b48fa1dbd0aa",
+    "0d070266d84a05dc73a2c7b405c0f337ca7c3c97",
+    "ea97bd4fc03779b7947cf35cd8e4432b0b9fa516",
+)
+CURRENT_OWNER_DECISION_IDS = (
+    "TPR-OD-001",
+    "TPR-OD-002",
+    "TPR-OD-003",
+    "TPR-OD-004",
+)
+# Role-pending wording that makes a shared, non-per-round surface go stale the
+# moment the named role acts (TPR-CR14-003).
+PER_ROUND_PENDING_PHRASES = (
+    "awaits independent claude review",
+    "awaits claude review",
+    "awaits codex counter-review",
+    "claude next reviews",
+    "codex next counter-reviews",
+)
 # The superseded pointer token that must no longer appear in current blocks.
 PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD = (
     "5f98c3aa757f420efac13f682f4e210fa9688e5b"
@@ -632,11 +671,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [LATEST_COUNTERREVIEWED_RECEIVED_RANGE]
+    ) == [CURRENT_CLAUDE_REVIEWED_CODEX_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact received cumulative range"
+        "Claude has independently reviewed the exact cumulative Codex range"
         in normalized_current
     )
     assert (
@@ -651,9 +690,16 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "reviewed-spec registry remains empty" in normalized_current
     assert "pending Claude review of this Codex round" not in normalized_current
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
-    assert "beginning after `d54ce1b2`" in normalized_current
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
-    assert "awaits independent Claude review" in normalized_current
+    # TPR-CR14: the round is reviewed, so the previous round's pending-role
+    # routing must be gone and the next role, section, and milestone exact.
+    assert "awaits independent Claude review" not in normalized_current
+    assert "beginning after `d54ce1b2`" not in normalized_current
+    assert "Codex next counter-reviews section 42" in normalized_current
+    assert "TPR-D0" in normalized_current
+    assert "No next implementation milestone is authorized" not in normalized_current
+    for decision in CURRENT_OWNER_DECISION_IDS:
+        assert f"`{decision}`" in normalized_current
 
     routing_row = next(
         line
@@ -675,11 +721,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [LATEST_COUNTERREVIEWED_RECEIVED_SHORT_RANGE]
+        ) == [CURRENT_CLAUDE_REVIEWED_CODEX_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "latest completed codex counter-review remains" in normalized_summary_lower
-        assert "section 40" in normalized_summary_lower
-        assert "section 41" in normalized_summary_lower
+        assert "claude has independently reviewed" in normalized_summary_lower
+        assert "section 42" in normalized_summary_lower
+        assert "awaits claude review" not in normalized_summary_lower
+        assert "tpr-d0" in normalized_summary_lower
         assert (
             "the non-authorizing tpr-tr0-i implementation candidate is checkpointed but remains incomplete"
             in normalized_summary_lower
@@ -728,6 +775,50 @@ def test_current_counterreview_records_every_received_commit_and_provenance() ->
     assert ordered_commits == LATEST_RECEIVED_FIRST_PARENT_COMMITS
     assert "Cumulative disposition: rejected" in section
     assert "No next implementation milestone is authorized" in section
+
+    # TPR-CR14-004: the order pin above let a flipped disposition and a deleted
+    # merge-inherited row through.  Pin the one rejection and derive the
+    # inherited set from Git so "every received commit" is checked, not named.
+    first_parent_dispositions = {
+        match.group(1): match.group(2).lower()
+        for line in first_parent.splitlines()
+        if (
+            match := re.match(
+                r"\| `([0-9a-f]{40})` \| \*\*([a-z ]+)\*\* \|", line
+            )
+        )
+    }
+    assert set(first_parent_dispositions) == set(
+        LATEST_RECEIVED_FIRST_PARENT_COMMITS
+    )
+    assert {
+        commit
+        for commit, disposition in first_parent_dispositions.items()
+        if disposition == "rejected"
+    } == {LATEST_RECEIVED_REJECTED_COMMIT}
+    assert set(first_parent_dispositions.values()) <= {
+        "accepted",
+        "accepted after correction",
+        "accepted after qualification",
+        "rejected",
+    }
+
+    inherited = _bounded(
+        section,
+        "### 40.3 Merge-inherited commit dispositions",
+        "### 40.4 P0-P3 ledger",
+        "section 40 merge-inherited dispositions",
+    )
+    inherited_rows = [
+        re.match(r"\| `([0-9a-f]{40})` \|", line).group(1)
+        for line in inherited.splitlines()
+        if line.startswith("| `")
+    ]
+    reachable = set(_git_lines("rev-list", LATEST_COUNTERREVIEWED_RECEIVED_RANGE))
+    assert len(inherited_rows) == len(set(inherited_rows))
+    assert set(inherited_rows) == reachable - set(
+        LATEST_RECEIVED_FIRST_PARENT_COMMITS
+    )
 
 
 def test_current_main_sync_records_exact_merge_and_safe_conflict_union() -> None:
@@ -831,13 +922,24 @@ def test_current_main_sync_records_exact_merge_and_safe_conflict_union() -> None
         "**Owner multiplicity amendment, 2026-08-30 — affects all four strategy lanes:**"
     ) == 1
 
+    # TPR-CR14-003: the merge blob above is immutable, but the working Action
+    # Plan is a shared document that is frozen on lanes (parallel workflow
+    # section 2; owner direction 2026-09-04, record section 39).  Section 42
+    # restored it to the merge result.  Pin only what must stay true across a
+    # later owner-coordinated amendment: one target block, no revived stale
+    # block, and no role-pending sentence that the next round falsifies.
     action_plan = _doc("ACTION_PLAN_2026-08-20.md")
-    assert action_plan.count("**Current bounded status, 2026-10-02:**") == 1
+    assert action_plan.count("**Current bounded status,") == 1
     assert "**Current bounded status, 2026-08-30:**" not in action_plan
-    assert (
-        "`TPR-OOL-003`, `TPR-OOL-004`, and the four-slot propagation finding"
-        in action_plan
-    )
+    for name, surface in (
+        ("Action Plan target block", _action_current()),
+        ("Action Plan target row", _action_tpr_row()),
+    ):
+        normalized_surface = " ".join(surface.lower().split())
+        for phrase in PER_ROUND_PENDING_PHRASES:
+            assert phrase not in normalized_surface, (
+                f"{name} carries per-round role state: {phrase!r}"
+            )
 
     for text in (*merge_blobs.values(), action_plan, _doc("SESSION_HANDOFF.md")):
         assert not re.search(r"^(?:<<<<<<< |=======|>>>>>>> )", text, flags=re.MULTILINE)
@@ -875,6 +977,9 @@ def test_out_of_lane_current_disposition_index_matches_integration_closures() ->
         "TPR-OOL-011",
         "TPR-OOL-012",
         "TPR-OOL-013",
+        "TPR-OOL-014",
+        "TPR-OOL-015",
+        "TPR-OOL-016",
     }
     assert {identifier for identifier, status in dispositions.items() if status == "closed"} == {
         "TPR-OOL-001",
@@ -1256,3 +1361,86 @@ def test_latest_claude_review_records_the_exact_codex_range() -> None:
     assert ordered_commits == LATEST_REVIEWED_CODEX_COMMITS
     assert "Cumulative disposition: accepted after correction" in section
     assert "No next implementation milestone is authorized" in section
+
+
+def test_current_claude_review_records_the_exact_range_and_owner_decisions() -> None:
+    """TPR-CR14: pin this round's review section and the decisions it records.
+
+    The reviewed range is one merge wide and 627 commits deep, so the section
+    dispositions the five first-parent commits individually and the inherited
+    commits by provenance class.  Both the order and the totals are derived
+    from Git here, not restated, so the section cannot drift from the graph.
+    """
+    section = _record_section(
+        "## 42. Claude independent review of the counter-review, main merge, "
+        "and synchronization"
+    )
+    assert CURRENT_CLAUDE_REVIEWED_CODEX_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert ordered_commits == CURRENT_CLAUDE_REVIEWED_FIRST_PARENT_COMMITS
+    assert ordered_commits == tuple(
+        _git_lines(
+            "rev-list",
+            "--first-parent",
+            "--reverse",
+            CURRENT_CLAUDE_REVIEWED_CODEX_RANGE,
+        )
+    )
+
+    reachable = len(_git_lines("rev-list", CURRENT_CLAUDE_REVIEWED_CODEX_RANGE))
+    inherited = reachable - len(ordered_commits)
+    classes = _bounded(
+        section,
+        "### 42.3 Merge-inherited commits by provenance class",
+        "### 42.4 P0-P3 ledger",
+        "section 42 inherited classes",
+    )
+    class_counts = [
+        int(match.group(1))
+        for line in classes.splitlines()
+        if (
+            match := re.match(
+                r"\| [^|]+ \| ([0-9]+) \| \*\*(?:accepted|rejected)\*\*", line
+            )
+        )
+    ]
+    assert class_counts and sum(class_counts) == inherited
+    assert f"**{inherited}**" in classes
+
+    assert "Cumulative disposition: accepted after correction" in section
+    decisions = _bounded(
+        section,
+        "### 42.6 Owner direction and decisions taken under pre-authorization",
+        "### 42.7 Milestone and authority decision",
+        "section 42 owner decisions",
+    )
+    decision_rows = [
+        match.group(1)
+        for line in decisions.splitlines()
+        if (match := re.match(r"\| `(TPR-OD-[0-9]{3})` \|", line))
+    ]
+    assert tuple(decision_rows) == CURRENT_OWNER_DECISION_IDS
+    authority = _bounded(
+        section,
+        "### 42.7 Milestone and authority decision",
+        "### 42.8 Validation",
+        "section 42 authority decision",
+    )
+    normalized_authority = " ".join(authority.split())
+    assert "TPR-D0" in normalized_authority
+    assert "outcome-free" in normalized_authority
+    for forbidden in (
+        "QuantConnect job",
+        "provider request",
+        "broker",
+        "paper",
+        "live",
+        "trading authority",
+    ):
+        assert forbidden in normalized_authority, (
+            f"the authority decision must name what stays closed: {forbidden}"
+        )

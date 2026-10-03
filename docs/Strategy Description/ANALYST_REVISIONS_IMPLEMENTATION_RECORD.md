@@ -312,6 +312,9 @@ policy, test, registry or readiness change follows.
 Section 246 is Claude's independent review of `cf465504..e56c6e3e` (0 P0,
 0 P1, 0 P2, 0 P3): the citation correction `ARV2CR245-001` is accepted and
 regression-pinned by test-only commit `ce0e69bb`.
+Section 247 accepts both Claude commits with no new P0/P1/P2/P3 finding.
+Codex corroborates the citation pin and its in-memory sensitivity checks;
+no readiness implementation or external evidence is introduced.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1119,9 +1122,10 @@ independent review of the exact pushed range `62c2eda2..6f73952a` (section
 243). Section 245 accepts its one Claude record commit after correcting a
 minor validation cross-reference. Section 246 is Claude's independent
 review of the exact pushed range `cf465504..e56c6e3e` (section 245) and adds
-regression pin `ce0e69bb`. The immediate next step is that Codex
-counter-reviews section 246 and this round's two Claude commits, unless the
-owner explicitly changes this workflow.
+regression pin `ce0e69bb`. Section 247 accepts both Claude commits after
+counter-review. The immediate next step is that Claude must review section
+247 and its exact pushed record snapshot, unless the owner explicitly
+changes this workflow.
 The owner may suppress acknowledgement-only rounds while retaining active
 monitoring; no such exception or monitor pause has been inferred.
 The next readiness step is the independent evidence acquisition/admission
@@ -2913,6 +2917,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-03 | Claude independent review of section 243: the counter-review of section 242 and the network-evidence qualification | `6f73952a` -> this record commit | Section 244: one record-only commit `62c2eda2..6f73952a` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | No code changed; confirmed only the record changed, the trust roots are unchanged, and section 243's union arithmetic and warning attribution hold; section 4 names section 244, banner sentence added, this row appended | Complete lane selection in the designated worktree with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 244.5 | 0 P0, 0 P1, 0 P2, 0 P3 | Single push of this round's Claude commit; Codex counter-reviews section 244 unless the owner changes the workflow |
 | 2026-10-03 | Codex section-244 counter-review | `cf465504` -> this round's final record commit | Section 245 accepts the one Claude record commit after a P3 documentation correction; no provider/QC launcher, capture, result read, order, look, evaluation or cell; floor 298/233/40/699. | Corrected only the section-244 sandbox-evidence citation from nonexistent 244.6 to actual 244.5. No code, test, policy, trust-root, authority, cadence or readiness change. | Strict-network-denied focused record checks, red/green citation diagnostic, actual trust-root hashes and final scope checks in 245.3; no complete Codex suite. | `ARV2CR245-001` P3 corrected; no new P0/P1/P2. All carried evidence/source/formal/paper gates remain. | Exactly one matching-lane record push; await Claude section-245 review unless the owner changes the workflow. Monitor active and quiet while unchanged. |
 | 2026-10-03 | Claude independent review of section 245: the counter-review of section 244 and its citation correction | `e56c6e3e` -> this record commit | Section 246: one record-only commit `cf465504..e56c6e3e` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | Test-only pin `ce0e69bb` adds two record-integrity tests for parenthesized subsection citations (`ARV2CR245-001`), proved red on `cf465504` and by two in-memory mutations; no production code changed; section 4 names section 246, banner sentence added, this row appended | Complete lane selection at `e56c6e3e` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check; record gates, `compileall` and `git diff --check` on the final tree; exact counts in 246.5 | 0 P0, 0 P1, 0 P2, 0 P3 new; `ARV2CR245-001` accepted and pinned | Single push of this round's two Claude commits; Codex counter-reviews section 246 unless the owner changes the workflow |
+| 2026-10-03 | Codex section-246 counter-review | `625742af` -> this round's final record commit | Section 247 accepts both Claude commits; no provider/QC launcher, capture, result read, order, look, evaluation or cell; floor 298/233/40/699. | Citation regression pin accepted and its historical red plus both in-memory mutations corroborated. Codex changes only the lane record; no production, policy, trust-root, authority, cadence or readiness change. | Strict-network-denied focused record checks and citation trials, actual trust-root hashes and final scope checks in 247.3; no complete Codex suite. | No new P0/P1/P2/P3. `ARV2CR245-001` corrected and regression-pinned; all carried source/formal/paper gates remain. | Exactly one matching-lane record push; await Claude section-247 review unless the owner changes the workflow. Monitor active and quiet while unchanged. |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -34418,3 +34423,88 @@ row runs on the final tree.
 
 The final tree differs from the pushed head `e56c6e3e` by the pin and this
 record commit only.
+
+## 247. Codex counter-review of section 246 and citation regression pin, 2026-10-03
+
+**Exact new Claude range:** after
+`e56c6e3e300e2a4ebf6d7bfe875d2caf9b7bad01` through
+`625742af68af3c1643c9e3028500fabdf68bf405`, two ordered commits below.
+The exact designated root, branch and clean status were verified. Only the
+matching remote lane was fetched; ancestry was confirmed and safe
+fast-forward was already up to date. Every repository command and check used
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2`.
+Previously handled commits were not reprocessed.
+
+### 247.1 Per-commit and finding dispositions
+
+| Claude commit | Disposition | Evidence / limits |
+|---|---|---|
+| `ce0e69bbc3883f1c39742fb6d02c14175b528e4e` | accepted; no issue found | Complete message/diff reviewed: 40 test-only additions to the lane record-integrity file. The live-record test catches the historical dangling citation, while the classifier fixture separately guards the section floor and existing-parent-section condition. Focused checks and in-memory trials below corroborate sensitivity without modifying source files. |
+| `625742af68af3c1643c9e3028500fabdf68bf405` | accepted; no issue found | Complete message/diff reviewed: 117 record additions and 3 deletions, accepting the exact `cf465504..e56c6e3e` range. Handoff, banner, ledger, finding dispositions and validation scope are consistent with the test-only pin and unchanged trust roots. |
+
+**0 new P0, P1, P2 or P3; review quality 9/10.** The read-only advisory
+audit agrees. `ARV2CR245-001` remains corrected by Codex and now has a durable
+regression pin. The classifier deliberately covers only parenthesized
+three-digit section / one- or two-digit subsection references inside sections
+100 onward, and only when the cited parent section exists. It is not a general
+Markdown-reference validator or a guarantee about unparenthesized references.
+No broader parser, production or policy change is needed for this finding.
+
+Section 246.5 explicitly attributes the complete selection to `e56c6e3e`,
+before the pin: 11 strict local-server refusals, 9,749 passes, 8 skips and
+35 warnings, followed by 73 loopback-only passes and two warnings. Of those
+73, 62 repeat strict passes, giving **9,760 distinct passes and 8 skips**
+for that baseline, not 9,822 passes. The final-tree row separately runs the
+modified test file with active-document checks: 84 passes. Do not describe
+the baseline full run as a complete-suite rerun of the final pin tree.
+Full-suite durations, loopback probe, compilation and the 1,782-file artifact
+census remain Claude-reported; Codex independently runs only the focused
+checks and citation trials below. Warning counts remain attributed to their
+separate runs. Other carried findings retain their recorded statuses.
+
+### 247.2 Scope and retained stop
+
+Actual trust-root hashes and bytes still match 231.3: source authority is
+`zero_access`, and all three registries have empty entries. No qualifying
+vendor-origin immutable as-of/version/publication/completeness artifact,
+reviewed security-master/QC SID/share-class/own-ETF/vendor identity and
+availability package, or authenticated RAW prior-NYSE-close price/score
+input arrived. Historical stock-first seven-role completeness and terminal
+shareholder payoff remain separate gates. Existing scoped research/preparation
+and the 235.2 acquisition qualification remain; no new credentials, rights,
+spending, vendor-contact, gated provider/QC, outcome or deployment authority
+is inferred.
+
+Codex changes only this lane record. No readiness implementation, claims-only
+scaffold, selector, quantity/order adapter, execution parity or fill proof
+starts around the source stop. Frozen construction and declarative 227/229
+policies, all false readiness/action flags and named refusals, ARV2-4 through
+ARV2-8, non-backfillable formal bindings and the exact binding QC Paper
+permit remain. **R247 remains attempt-exhausted**; section number 247 is a
+counter-review record, not a candidate relaunch. No provider/QC launcher,
+capture, result read, order, look, evaluation or cell occurred; the floor
+stays **298 / 233 / 40 / 699**, with total two-sided Analyst alpha at most
+1/80. Steps 2–5 are not complete and no live-efficacy claim follows.
+Historical network-contact qualifications remain; denied reachability does
+not count attempted connections. The optional connection tripwire and
+acknowledgement-loop recommendation grant no workflow exception or monitor
+pause, and no unchanged workflow-choice request is repeated.
+
+### 247.3 Focused validation and handoff
+
+Python `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python` (3.13.15),
+entirely in the designated worktree. Every pytest and in-memory mutation
+process uses strict `(version 1)(allow default)(deny network*)`. No complete
+Codex suite, transport rerun, executable correction or new compilation claim.
+
+| Check | Actual result / scope |
+|---|---|
+| Exact Claude-tree record checks | Lane-record integrity, including both new tests, and active-document checks: **84 passed in 0.81s**, no failures/skips/warnings. |
+| Citation trials | G0: both tests green on exact `e56c6e3e` record bytes. R1: the live test refuses exact `cf465504` bytes, with only dangling `(244, '244.6')`. M1: removing the floor is caught by the classifier test. M2: removing parent-section existence is caught by that same test. Both original tests remain green after restoration; all trials are in memory, without a file mutation. |
+| Final focused record checks | Same two files after this record update: **84 passed in 0.80s**, no failures/skips/warnings; repeated after recording this result. |
+| Scope / trust checks | Only this lane record changes in Codex's round; actual trust-root hashes/bytes match 231.3. Diff, added-line secret-shape and exact root/branch/HEAD/status checks precede one matching-lane push. |
+
+**Next serialized action:** Claude must review section 247 and its exact
+pushed record snapshot unless the owner explicitly changes the workflow.
+Monitor remains active while blocked, quiet for unchanged state or Codex's
+own push, and does not reprocess section 246 or earlier handled commits.

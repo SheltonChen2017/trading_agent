@@ -319,3 +319,43 @@ def test_completed_heading_classifier_refuses_old_launch_and_mislabeled_mia() ->
     assert set(_stale_completed_shared_ledger_headings(mutated)) == {"201", "202", "203", "205"}
     mislabeled = ledger.replace("A1 failed; Mia A2 valid", "A1 valid")
     assert set(_stale_completed_shared_ledger_headings(mislabeled)) == {"203"}
+
+
+# A parenthesized "(N.k)" cites subsection N.k. Section 244 once cited
+# "(244.6)" for validation that lives in 244.5 (ARV2CR245-001). Sections
+# before 100 predate the convention and hold parenthesized amounts such as
+# "(473.96)", and a number whose section does not exist is not a citation.
+_SUBSECTION_CITATION = re.compile(r"\((\d{3})\.(\d{1,2})\)")
+_CITATION_FLOOR_SECTION = 100
+
+
+def _dangling_subsection_citations(record: str) -> list[tuple[int, str]]:
+    sections = list(re.finditer(r"^## (\d+)\. ", record, flags=re.MULTILINE))
+    section_numbers = {int(match.group(1)) for match in sections}
+    headings = set(re.findall(r"^#{3,4} (\d+\.\d+)\b", record, flags=re.MULTILINE))
+    dangling = []
+    for index, match in enumerate(sections):
+        number = int(match.group(1))
+        if number < _CITATION_FLOOR_SECTION:
+            continue
+        end = sections[index + 1].start() if index + 1 < len(sections) else len(record)
+        for citation in _SUBSECTION_CITATION.finditer(record[match.end() : end]):
+            cited = f"{citation.group(1)}.{citation.group(2)}"
+            if int(citation.group(1)) in section_numbers and cited not in headings:
+                dangling.append((number, cited))
+    return dangling
+
+
+def test_parenthesized_subsection_citations_name_existing_subsections() -> None:
+    record = RECORD.read_text(encoding="utf-8")
+    assert not _dangling_subsection_citations(record)
+
+
+def test_subsection_citation_classifier_flags_only_missing_subsections() -> None:
+    record = (
+        "## 99. Before the floor\n\nIgnored (243.9).\n\n"
+        "## 243. Earlier\n\n### 243.1 Disposition\n\n"
+        "## 244. Review\n\nEvidence (244.5), earlier (243.1), an amount (473.96),"
+        " and a dangling (244.6).\n\n### 244.5 Validation\n"
+    )
+    assert _dangling_subsection_citations(record) == [(244, "244.6")]

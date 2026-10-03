@@ -1,0 +1,121 @@
+{
+  "adaptive_selection_disclosure": "chosen_after_observed_historical_25pct_and_10pct_families_distinct_future_hybrid_not_an_untouched_holdout_or_R232_R237_replay",
+  "allocation_and_overlap": {
+    "cross_sleeve_redistribution": false,
+    "direct_stock_aggregate_weight_cap": "0.098",
+    "duplicate_security_rule": "aggregate_exact_security_once_in_frozen_six_sleeve_order_cap_direct_stock_and_return_each_excess_to_contributing_own_etf",
+    "equal_sleeve_budget_rule": "floor_first_five_of_gross_divided_by_six_to_1e-24_assign_exact_residual_to_final_XLE_sleeve",
+    "scaled_stock_slot_rule": "if_scale_below_one_floor_1e-24_of_[(sleeve_budget/10)*min(1,cap_ratio*total_reported_weight)];otherwise_exact_sleeve_budget/10",
+    "target_gross_exposure": "0.98"
+  },
+  "capabilities": {
+    "confirmatory_look_commitment": false,
+    "funded_deployment": false,
+    "orders": false,
+    "outcome_access": false,
+    "paper_deployment": false,
+    "qc_compile": false,
+    "qc_launch": false,
+    "qc_upload": false
+  },
+  "decision_ready": false,
+  "eligibility": {
+    "maximum_stock_slots_per_sleeve": 10,
+    "maximum_total_reported_weight": "1.05",
+    "minimum_cap_covered_reported_weight_ratio": "0.25",
+    "minimum_claimed_valid_security_mapped_weight_ratio": "0.99",
+    "minimum_sid_and_name_mapped_member_ratio": "0.25",
+    "minimum_total_reported_weight": "0.95",
+    "minimum_verified_cap_identity_names": 5,
+    "valid_security_mapping_separate_from_analyst_coverage": true
+  },
+  "fallback": {
+    "identity_or_coverage_invalid": "full_own_etf_fallback",
+    "missing_verified_own_etf_sid_or_price": "named_refusal_no_target",
+    "non_xle_ar_positive_count_below_five": "full_own_etf_fallback",
+    "own_etf_target_requires": "independently_verified_exact_own_etf_qc_sid_and_positive_tradable_predecision_reference_price_no_display_ticker_join",
+    "unfilled_top_ten_slots": "residual_own_etf_fallback",
+    "verified_cap_identity_names_below_five": "full_own_etf_fallback"
+  },
+  "parent_construction_policy_sha256": "7f1dbfe54f8179add6db9b15abdf343e55253ba50541175a5764e4c15dc644d4",
+  "pending_bindings": {
+    "common_predecision_input_contract_sha256": null,
+    "etf_eligibility_source_sha256": null,
+    "independent_as_of_security_id_mapping_sha256": null,
+    "independent_holdings_security_master_sha256": null,
+    "independent_vendor_crosswalk_sha256": null,
+    "independent_vendor_first_publication_sha256": null,
+    "order_quantity_rounding_contract_sha256": null,
+    "own_etf_security_identity_source_sha256": null,
+    "paper_epoch_sha256": null,
+    "score_input_contract_sha256": null,
+    "security_name_source_sha256": null,
+    "shared_execution_contract_sha256": null,
+    "weight_transfer_implementation_sha256": null
+  },
+  "qcom_stock_admission": {
+    "exact_qc_sid_required": true,
+    "positive_cap_weight_and_tradable_reference_price_required": true,
+    "special_exclusion": false,
+    "ticker_alias_repair": false
+  },
+  "schema": "arv2-six-universe-forward-stock-selection-policy-v1",
+  "stock_selection": {
+    "ar_off_control": {
+      "ar_entry_count_enabled": false,
+      "ar_score_economic_usage": "none_for_entry_count_or_weights",
+      "candidate_id": "ARV2_FORWARD_AR_OFF",
+      "non_xle_selection_count": "min_10_verified_cap_identity_names",
+      "non_xle_selection_rank": "positive_market_cap_desc_then_exact_security_id",
+      "positive_score_count_required": 0
+    },
+    "ar_on_arms": [
+      {
+        "ar_entry_count_enabled": true,
+        "ar_score_economic_usage": "entry_count_and_unbound_weight_transfer",
+        "candidate_id": "ARV2_FORWARD_AR_100",
+        "non_xle_selection_count": "min_10_eligible_positive_score_count",
+        "non_xle_selection_rank": "positive_market_cap_desc_then_exact_security_id",
+        "positive_score_count_required": 5
+      },
+      {
+        "ar_entry_count_enabled": true,
+        "ar_score_economic_usage": "entry_count_and_unbound_weight_transfer",
+        "candidate_id": "ARV2_FORWARD_AR_200",
+        "non_xle_selection_count": "min_10_eligible_positive_score_count",
+        "non_xle_selection_rank": "positive_market_cap_desc_then_exact_security_id",
+        "positive_score_count_required": 5
+      }
+    ],
+    "eligible_positive_score_definition": "strictly_positive_finite_authenticated_AR_score_for_exact_as_of_QC_SID_with_valid_security_name_and_positive_market_cap_after_reviewed_vendor_crosswalk_and_PIT_gate",
+    "non_xle_selected_holdings_pool": "all_verified_cap_eligible_exact_security_id_names_not_only_positive_score_names",
+    "non_xle_universe": [
+      "SPY",
+      "QQQ",
+      "SOXX",
+      "XLV",
+      "REMX"
+    ],
+    "unresolved_or_ambiguous_ar_event": "named_refusal_no_contribution_never_fabricated_zero",
+    "xle_all_arms": {
+      "candidate_ids": [
+        "ARV2_FORWARD_AR_OFF",
+        "ARV2_FORWARD_AR_100",
+        "ARV2_FORWARD_AR_200"
+      ],
+      "positive_score_count_required": 0,
+      "selection_count": "min_10_verified_cap_identity_names",
+      "selection_rank": "positive_market_cap_desc_then_exact_security_id",
+      "xle_ar_on_weight_overlay_disabled": false
+    }
+  },
+  "stock_selection_executable": false,
+  "universe_ids": [
+    "SPY",
+    "QQQ",
+    "SOXX",
+    "XLV",
+    "REMX",
+    "XLE"
+  ]
+}

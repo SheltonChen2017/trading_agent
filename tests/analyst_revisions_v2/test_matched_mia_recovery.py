@@ -76,6 +76,83 @@ def read(recovery):
     return sut.read_result_once(plan, evidence, sut.adapter._sha(evidence), api)
 
 
+@pytest.fixture
+def snapshot_recovery(recovery, monkeypatch):
+    """The completed Mia job owns a saved QC source snapshot, not live files."""
+    plan, evidence, api, originals = recovery
+    notebook = '{"cells":[],"nbformat":4}\n'
+    monkeypatch.setattr(sut, "NOTEBOOK_SHA256", hashlib.sha256(notebook.encode()).hexdigest())
+    monkeypatch.setattr(sut, "NOTEBOOK_BYTES", len(notebook))
+    evidence.pop("source_attested_at")
+    evidence.update({"schema": sut.SNAPSHOT_SCHEMA,
+        "backtest_id": sut.COMPLETED_MIA_BACKTEST_ID,
+        "backtest_name": sut.COMPLETED_MIA_BACKTEST_NAME,
+        "snapshot_id": sut.COMPLETED_MIA_SNAPSHOT_ID,
+        "snapshot_retrieved_at": "2026-09-26T12:05:00+00:00"})
+    api["files"].append({"projectId": sut.COMPLETED_MIA_SNAPSHOT_ID,
+        "name": "mia.ipynb", "content": notebook,
+        "modified": "2026-09-26T12:04:00"})
+    for row in api["files"]:
+        row["projectId"] = sut.COMPLETED_MIA_SNAPSHOT_ID
+        # Saved snapshot source can be retrieved after job creation.
+        row["modified"] = "2026-09-26T12:04:00"
+    evidence["source_files"] = sorted([row["name"],
+        hashlib.sha256(row["content"].encode("ascii")).hexdigest(),
+        len(row["content"].encode("ascii"))] for row in api["files"])
+    for key in ("listed", "outcome"):
+        api[key].update({"backtestId": sut.COMPLETED_MIA_BACKTEST_ID,
+            "name": sut.COMPLETED_MIA_BACKTEST_NAME,
+            "snapshotId": sut.COMPLETED_MIA_SNAPSHOT_ID})
+    api["project"]["name"] = "renamed after saved backtest"
+    api["project"]["codeRunning"] = True
+    return plan, evidence, api, originals
+
+
+def test_completed_mia_run_authenticates_saved_snapshot_not_mutable_project(
+        snapshot_recovery):
+    plan, evidence, api, originals = snapshot_recovery
+    result = read(snapshot_recovery)
+    assert result["run_valid"] is True
+    assert api["calls"][1] == ("files/read", {"projectId": 37101502})
+    assert all(path.read_bytes() == value for path, value in originals.items())
+    assert sum(endpoint == "backtests/read" for endpoint, _ in api["calls"]) == 1
+    assert sut.authenticated_cached_result(plan, evidence, sut.adapter._sha(evidence)) == result
+
+
+@pytest.mark.parametrize("defect", ["wrong_snapshot_id", "wrong_row_project",
+    "changed_module", "changed_module_and_evidence", "changed_notebook",
+    "changed_notebook_and_evidence", "extra_python", "missing_python",
+    "precreation_snapshot_claim", "unowned_current_project"])
+def test_completed_mia_snapshot_refuses_wrong_identity_or_source_before_result(
+        snapshot_recovery, defect):
+    plan, evidence, api, _ = snapshot_recovery
+    if defect == "wrong_snapshot_id":
+        evidence["snapshot_id"] += 1
+    elif defect == "wrong_row_project":
+        api["files"][0]["projectId"] = sut.PROJECT_ID
+    elif defect in {"changed_module", "changed_module_and_evidence"}:
+        api["files"][1]["content"] += "# changed\n"
+    elif defect in {"changed_notebook", "changed_notebook_and_evidence"}:
+        next(row for row in api["files"] if row["name"] == "mia.ipynb")["content"] += " "
+    elif defect == "extra_python":
+        api["files"].append({"projectId": sut.COMPLETED_MIA_SNAPSHOT_ID,
+            "name": "unexpected.py", "content": "x = 1\n", "modified": "2026-09-26T12:04:00"})
+    elif defect == "missing_python":
+        api["files"].pop(1)
+    elif defect == "unowned_current_project":
+        api["project"]["owner"] = False
+    else:
+        evidence["snapshot_retrieved_at"] = "2026-09-26T12:00:00+00:00"
+    if defect in {"changed_module_and_evidence", "changed_notebook_and_evidence"}:
+        evidence["source_files"] = sorted([row["name"],
+            hashlib.sha256(row["content"].encode("ascii")).hexdigest(),
+            len(row["content"].encode("ascii"))] for row in api["files"])
+    with pytest.raises(ValueError):
+        read(snapshot_recovery)
+    assert not sut._path(plan, "read-claim").exists()
+    assert all(endpoint != "backtests/read" for endpoint, _ in api["calls"])
+
+
 def test_valid_import_keeps_failed_attempts_unchanged_and_reads_only_custom_stats(recovery):
     plan, evidence, api, originals = recovery
     result = read(recovery)

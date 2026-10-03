@@ -446,3 +446,28 @@ def test_comparator_refuses_unmatched_or_invalid_results(frozen, defect):
         bad["aggregates"]["account"]["cumulative_return"] = "NaN"
     with pytest.raises((ValueError, study.diagnostics._base.AcceptedRiskSixUniverseOrderQcRuntimeError)):
         study.compare_results(results)
+
+
+@pytest.mark.parametrize("key", (
+    "pit_callback_source_row_count",
+    "fundamental_snapshot_unavailable_decision_count",
+    "constituent_collection_unavailable_decision_count",
+    "constituent_collection_unavailable_universe_counts",
+))
+def test_comparison_refuses_each_non_ar_source_census_mismatch(frozen, key):
+    assert study._COMMON_SOURCE_CENSUS == (
+        "pit_callback_source_row_count",
+        "fundamental_snapshot_unavailable_decision_count",
+        "constituent_collection_unavailable_decision_count",
+        "constituent_collection_unavailable_universe_counts",
+    )
+    results = comparison_fixture(frozen)
+    assert study.compare_results(copy.deepcopy(results))["comparison_valid"] is True
+    aggregate = results["R237"]["aggregates"]
+    value = aggregate[key]
+    if type(value) is dict:
+        value[sorted(value)[0]] += 1
+    else:
+        aggregate[key] = value + 1
+    with pytest.raises(ValueError, match="non-AR source census differs"):
+        study.compare_results(results)

@@ -132,6 +132,10 @@ _SLEEVE_FIELDS = (
     "coverage_refusal_reason_counts", "selection_status_counts",
 )
 _UNIVERSES = ("SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
+# A separately versioned host-parser contract only. The six-universe default
+# above is immutable; an eight-universe caller must opt in explicitly.
+_EIGHT_UNIVERSES = _UNIVERSES + ("XLI", "XLF")
+_EIGHT_SLEEVE_SCHEMA = "arv2-eight-universe-order-sleeve-summary-table-v1"
 _COVERAGE_REASONS = frozenset({
     "TOTAL_REPORTED_WEIGHT_OUT_OF_RANGE", "SID_NAME_MAPPING_BELOW_MINIMUM",
     "MARKET_CAP_WEIGHT_COVERAGE_BELOW_MINIMUM",
@@ -1340,8 +1344,14 @@ def _bounded_counts(value: object, *, maximum: int = 1_000_000,
 def _project_aggregate(
     aggregate: dict, *, bridge: bool = False,
     expected_geometry: tuple[str, str, int, int] | None = None,
+    eight_universe: bool = False,
 ) -> dict:
     """Retain bounded comparison diagnostics, never arbitrary nested fields."""
+    if type(eight_universe) is not bool:
+        _fail("cap-90 aggregate universe contract is not authorized")
+    universes = _EIGHT_UNIVERSES if eight_universe else _UNIVERSES
+    sleeve_schema = (_EIGHT_SLEEVE_SCHEMA if eight_universe
+                     else "arv2-six-universe-order-sleeve-summary-table-v1")
     if expected_geometry is None:
         start, end = runtime.EVALUATION_START_SESSION, runtime.EVALUATION_END_SESSION
         observations, decisions = runtime.EXPECTED_SESSION_COUNT, runtime.EXPECTED_DECISION_COUNT
@@ -1372,9 +1382,9 @@ def _project_aggregate(
         ))
         or (account["zero_rate_sharpe"] is not None and not _finite_decimal(account["zero_rate_sharpe"]))
         or type(sleeves) is not dict
-        or sleeves.get("schema") != "arv2-six-universe-order-sleeve-summary-table-v1"
+        or sleeves.get("schema") != sleeve_schema
         or sleeves.get("fields") != list(_SLEEVE_FIELDS)
-        or type(sleeves.get("rows")) is not list or len(sleeves["rows"]) != 6
+        or type(sleeves.get("rows")) is not list or len(sleeves["rows"]) != len(universes)
         or type(execution) is not dict
         or execution.get("schema") != "arv2-simulated-moo-executor-summary-v1"
         or execution.get("decision_count") != decisions
@@ -1394,7 +1404,7 @@ def _project_aggregate(
     ):
         _fail("cap-90 nested aggregate identity changed")
     clean_rows = []
-    for ticker, row in zip(_UNIVERSES, sleeves["rows"]):
+    for ticker, row in zip(universes, sleeves["rows"]):
         if (
             type(row) is not list or len(row) != len(_SLEEVE_FIELDS)
             or row[0] != ticker or row[1] != ticker
@@ -1422,10 +1432,10 @@ def _project_aggregate(
         "modeled_fee_amount", "actual_engine_fee_amount", "total_filled_notional",
     )
     if (
-        not _bounded_counts(counts, maximum=6 * decisions, keys=_SELECTION_STATUSES)
-        or sum(counts.values()) != 6 * decisions
-        or not _bounded_counts(unavailable, maximum=decisions, keys=frozenset(_UNIVERSES))
-        or set(unavailable) != set(_UNIVERSES)
+        not _bounded_counts(counts, maximum=len(universes) * decisions, keys=_SELECTION_STATUSES)
+        or sum(counts.values()) != len(universes) * decisions
+        or not _bounded_counts(unavailable, maximum=decisions, keys=frozenset(universes))
+        or set(unavailable) != set(universes)
         or any(type(aggregate.get(key)) is not int or aggregate[key] < 0 for key in count_keys)
         or any(not _finite_decimal(aggregate.get(key)) for key in (
             "mean_gross_exposure", "maximum_gross_exposure",

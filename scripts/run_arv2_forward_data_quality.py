@@ -19,6 +19,7 @@ if str(ROOT) not in sys.path:
 
 from research.analyst_revisions_v2.canonical import CanonicalEvidenceError
 from research.analyst_revisions_v2 import forward_data_quality as quality
+from scripts import capture_arv2_massive as capture
 
 
 DEFAULT_OUTPUT_ROOT = (
@@ -26,17 +27,62 @@ DEFAULT_OUTPUT_ROOT = (
 )
 
 
+def build_receipt(
+    artifact_path: Path,
+    expected_manifest_sha256: str,
+    *,
+    first_event_date: str,
+    last_event_date: str,
+    expected_transport: str = capture.PRODUCTION_TRANSPORT,
+) -> tuple[bytes, str]:
+    """Compose the pure receipt derivation with the authenticated capture bridge."""
+
+    def visit_authenticated_pages(visit_page):
+        return capture._visit_authenticated_massive_capture_pages_for_bridge(
+            Path(artifact_path),
+            expected_transport=expected_transport,
+            visit_page=visit_page,
+        )
+
+    return quality.build_receipt_from_authenticated_pages(
+        visit_authenticated_pages,
+        expected_manifest_sha256,
+        first_event_date=first_event_date,
+        last_event_date=last_event_date,
+        expected_transport=expected_transport,
+    )
+
+
+def publish_receipt(payload: bytes, expected_sha256: str, output_root: Path) -> Path:
+    """Write once inside the private artifact tree; never replace old bytes."""
+    quality._require_receipt(payload, expected_sha256)
+    root = Path(output_root).absolute()
+    capture._require_operational_artifact_scope(root)
+    _, descriptor = capture._open_directory_path(
+        root, create=True, name="forward quality receipt root"
+    )
+    try:
+        name = f"forward-quality-{expected_sha256}.json"
+        capture._exclusive_private_write_at(
+            descriptor, name, payload, "forward quality receipt"
+        )
+        os.fsync(descriptor)
+    finally:
+        os.close(descriptor)
+    return root / name
+
+
 def _read_pinned_receipt(path: Path, expected_sha256: str) -> bytes:
     quality.require_sha256(expected_sha256, "external forward receipt pin")
     candidate = Path(path).absolute()
     if candidate.name != f"forward-quality-{expected_sha256}.json":
         raise quality.ForwardDataQualityError("forward receipt filename is not pinned")
-    quality.capture._require_operational_artifact_scope(candidate.parent)
-    _, descriptor = quality.capture._open_directory_path(
+    capture._require_operational_artifact_scope(candidate.parent)
+    _, descriptor = capture._open_directory_path(
         candidate.parent, create=False, name="forward receipt directory"
     )
     try:
-        payload, _ = quality.capture._read_and_pin_private_regular_at(
+        payload, _ = capture._read_and_pin_private_regular_at(
             descriptor,
             candidate.name,
             maximum_bytes=quality.MAX_RECEIPT_BYTES,
@@ -51,7 +97,7 @@ def _read_pinned_receipt(path: Path, expected_sha256: str) -> bytes:
 def main(
     argv: list[str] | None = None,
     *,
-    _expected_transport: str = quality.capture.PRODUCTION_TRANSPORT,
+    _expected_transport: str = capture.PRODUCTION_TRANSPORT,
 ) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     commands = parser.add_subparsers(dest="command", required=True)
@@ -70,14 +116,14 @@ def main(
     args = parser.parse_args(argv)
     try:
         if args.command == "build":
-            payload, digest = quality.build_receipt(
+            payload, digest = build_receipt(
                 args.capture_path,
                 args.capture_manifest_sha256,
                 first_event_date=args.first_event_date,
                 last_event_date=args.last_event_date,
                 expected_transport=_expected_transport,
             )
-            path = quality.publish_receipt(payload, digest, args.output_root)
+            path = publish_receipt(payload, digest, args.output_root)
             receipt = quality._require_receipt(payload, digest)
             result = {
                 "purpose": quality.PURPOSE,
@@ -102,7 +148,7 @@ def main(
             ):
                 raise quality.ForwardDataQualityError("comparison window does not match exact request")
     except (CanonicalEvidenceError, quality.ForwardDataQualityError,
-            quality.capture.MassiveCaptureError, OSError, ValueError):
+            capture.MassiveCaptureError, OSError, ValueError):
         print("REFUSED: forward data-quality authentication failed", file=sys.stderr)
         return 2
     print(json.dumps(result, sort_keys=True, separators=(",", ":")))

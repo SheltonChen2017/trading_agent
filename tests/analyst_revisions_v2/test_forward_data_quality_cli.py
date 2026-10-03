@@ -24,7 +24,7 @@ def _build_args(source, output_root):
 def _build(source, output_root, capsys):
     assert cli.main(
         _build_args(source, output_root),
-        _expected_transport=cli.quality.capture.TEST_TRANSPORT,
+        _expected_transport=cli.capture.TEST_TRANSPORT,
     ) == 0
     result = json.loads(capsys.readouterr().out)
     assert result["purpose"] == cli.quality.PURPOSE
@@ -40,13 +40,13 @@ def test_build_and_compare_two_exact_pinned_captures_without_provider_or_qc(
     before_source = offline._capture(tmp_path)
     after_source = offline._capture(tmp_path, newer=True)
     allowed = tmp_path / "allowed"
-    monkeypatch.setattr(cli.quality.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
+    monkeypatch.setattr(cli.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
 
     def no_provider(*_args, **_kwargs):
         raise AssertionError("CLI attempted provider access")
 
-    monkeypatch.setattr(cli.quality.capture, "capture_massive_history", no_provider)
-    monkeypatch.setattr(cli.quality.capture, "_api_key", no_provider)
+    monkeypatch.setattr(cli.capture, "capture_massive_history", no_provider)
+    monkeypatch.setattr(cli.capture, "_api_key", no_provider)
     before = _build(before_source, allowed / "receipts", capsys)
     after = _build(after_source, allowed / "receipts", capsys)
     assert cli.main([
@@ -60,7 +60,7 @@ def test_build_and_compare_two_exact_pinned_captures_without_provider_or_qc(
     ]) == 0
     output = capsys.readouterr().out
     result = json.loads(output)
-    rating = result["roles"][cli.quality.capture.ROLE_ORDER[0].value]
+    rating = result["roles"][cli.capture.ROLE_ORDER[0].value]
     assert rating["same_id_different_version_between_receipts"] == 1
     assert rating["old_only_id_cause_unknown"] == 1
     assert rating["new_only_id_cause_unknown"] == 1
@@ -74,10 +74,10 @@ def test_build_and_compare_two_exact_pinned_captures_without_provider_or_qc(
 def test_build_refuses_wrong_manifest_pin_and_never_publishes(tmp_path, monkeypatch, capsys):
     source = offline._capture(tmp_path)
     allowed = tmp_path / "allowed"
-    monkeypatch.setattr(cli.quality.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
+    monkeypatch.setattr(cli.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
     args = _build_args(source, allowed / "receipts")
     args[args.index("--capture-manifest-sha256") + 1] = "0" * 64
-    assert cli.main(args, _expected_transport=cli.quality.capture.TEST_TRANSPORT) == 2
+    assert cli.main(args, _expected_transport=cli.capture.TEST_TRANSPORT) == 2
     captured = capsys.readouterr()
     assert captured.out == ""
     assert captured.err == "REFUSED: forward data-quality authentication failed\n"
@@ -89,11 +89,11 @@ def test_same_receipt_cannot_be_republished_and_wrong_comparison_window_refuses(
 ):
     source = offline._capture(tmp_path)
     allowed = tmp_path / "allowed"
-    monkeypatch.setattr(cli.quality.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
+    monkeypatch.setattr(cli.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
     first = _build(source, allowed / "receipts", capsys)
     assert cli.main(
         _build_args(source, allowed / "receipts"),
-        _expected_transport=cli.quality.capture.TEST_TRANSPORT,
+        _expected_transport=cli.capture.TEST_TRANSPORT,
     ) == 2
     assert capsys.readouterr().out == ""
     newer = _build(offline._capture(tmp_path, newer=True), allowed / "receipts", capsys)
@@ -111,7 +111,7 @@ def test_same_receipt_cannot_be_republished_and_wrong_comparison_window_refuses(
 @pytest.mark.parametrize("side", ("before", "after"))
 def test_compare_refuses_unpinned_name_or_digest(tmp_path, monkeypatch, capsys, side):
     allowed = tmp_path / "allowed"
-    monkeypatch.setattr(cli.quality.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
+    monkeypatch.setattr(cli.capture, "REPOSITORY_ARTIFACTS_ROOT", allowed)
     before = _build(offline._capture(tmp_path), allowed / "receipts", capsys)
     after = _build(offline._capture(tmp_path, newer=True), allowed / "receipts", capsys)
     args = [

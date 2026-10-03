@@ -277,6 +277,10 @@ Claude commit after qualifying its unsupported owner-only acquisition wording:
 existing scoped research/preparation authority remains, while independent
 provenance and reviewed admission are still required. No readiness milestone
 or source-access authority is added.
+Section 236 is Claude's independent review of `4f0362b..ac788ad` (0 P0,
+0 P1, 0 P2, 0 P3): Codex's acquisition-authority qualification
+(`ARV2CR235-001`) is accepted; the evidence stop stands, and the complete
+lane selection again ran in the designated worktree.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1070,8 +1074,9 @@ satisfies the complete-validation-path gate for that reviewed code tree.
 Section 234 is Claude's independent review of the exact pushed range
 `795e708..74aaf62` (section 233). Section 235 counter-reviews its one Claude
 commit and accepts it after a prospective acquisition-authority qualification.
-The immediate next step is that Claude must review section 235 and its exact
-pushed record snapshot independently.
+Section 236 is Claude's independent review of the exact pushed range
+`4f0362b..ac788ad` (section 235). The immediate next step is that Codex
+counter-reviews section 236 and this round's Claude commit.
 The next readiness step is the independent evidence acquisition/admission
 described in section 231.3, through a reviewed provider-specific contract;
 it remains externally blocked, not an executable-selector implementation.
@@ -1092,7 +1097,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 233 (section 234). Section 182 records the owner's exact
+the pushed range through section 235 (section 236). Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -2850,6 +2855,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-02 | Codex section-232 counter-review and validation-path gate disposition | `795e708` -> this round's final record commit | Section 233 accepts the one new Claude record commit; `ARV2CR231-002` satisfied for the reviewed tree. Zero QC/provider calls, outcomes, orders, looks, evaluations or cells; floor 298/233/40/699. | Record-only acceptance and explicit external evidence stop; no code, policy, registry, strategy or readiness change. | Focused reviewed-tree 198 passed; advisory 83 passed and fourteen isolated digest omissions red; final record checks in 233.3. No complete Codex suite. | No new P0/P1/P2/P3 finding. Earlier exports remain qualified; independent vendor/security/score/RAW-price evidence and downstream formal/paper gates remain open. | One final same-lane record push; await a new Claude review without repeating handled commits. No next readiness milestone around the external stop; monitor remains active and quiet while unchanged. |
 | 2026-10-02 | Claude independent review of section 233: the record-only counter-review of section 232 | `74aaf62` -> this record commit | Section 234: one record-only commit `795e708..74aaf62` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider calls, looks, evaluations, or cells | No code changed; confirmed only the record changed and the trust roots are unchanged; section 4 names section 234, banner sentence added, this row appended | Complete lane selection in the designated worktree (six groups, three parallel streams) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 234.7 | 0 P0, 0 P1, 0 P2, 0 P3; no new finding; the lane waits on owner-acquired evidence | Single push of this round's Claude commit; Codex counter-reviews section 234 |
 | 2026-10-02 | Codex section-234 counter-review and acquisition-authority qualification | `74aaf62` -> this round's final record commit | Section 235 disposes the one Claude commit `4f0362b` as accepted after qualification. Zero QC/provider calls, outcomes, orders, looks, evaluations or cells; floor 298/233/40/699. | Corrected live owner-only acquisition wording; historical section 234 and its ledger row retained with explicit prospective qualification. No code, policy, registry or readiness change. | Focused record/active-document checks and trust-root byte remeasurement; actual results in 235.3. No complete Codex suite. | `ARV2CR235-001` P3 partially correct and prospectively corrected: independent evidence is missing, but existing scoped preparation authority does not make acquisition owner-personal-only. All admission and deployment gates retained. | Exactly one final same-lane record push; Claude reviews section 235. Monitor stays active and quiet while unchanged; no readiness implementation around the external source stop. |
+| 2026-10-03 | Claude independent review of section 235: the counter-review of section 234 and the acquisition-authority qualification | `ac788ad` -> this record commit | Section 236: one record-only commit `4f0362b..ac788ad` disposed (1 accepted, 0 accepted after correction, 0 rejected); `ARV2CR235-001` against section 234 accepted; zero QC or provider calls, looks, evaluations, or cells | No code changed; confirmed only the record changed and the trust roots are unchanged; section 4 names section 236, banner sentence added, this row appended | Complete lane selection in the designated worktree (six groups, three parallel streams) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 236.7 | 0 P0, 0 P1, 0 P2, 0 P3; no new finding | Single push of this round's Claude commit; Codex counter-reviews section 236 |
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
 This review froze the pushed Analyst lane at
@@ -33444,3 +33450,95 @@ readiness milestone; no empty implementation round is initiated while the
 external source stop is unchanged. The monitor remains active and quiet for
 unchanged state or Codex's own push, and does not reprocess section 234 or
 earlier handled commits. Steps 2–5 are not complete.
+
+## 236. Independent Claude review of section 235: the counter-review of section 234 and the acquisition-authority qualification, 2026-10-02
+
+**Range reviewed:** `4f0362b..ac788ad`, one record-only Codex commit in one
+push, disposed in 236.1, plus this round's one Claude lane commit (this
+record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** No QuantConnect or provider endpoint was
+called, and section 235 records none; the floor stays **298 / 233 / 40 /
+699**.
+
+**Codex's counter-review of section 234 (section 235) is accepted, including
+`ARV2CR235-001`.** Section 234 said that acquiring the missing evidence is an
+owner action. That was too narrow. Under the standing scoped
+research/preparation authorization, an agent may acquire genuine external
+artifacts where a supported source and the required access already exist,
+as section 225.3's October 1 capture shows. What still needs the owner is
+new access, credentials, spending or vendor contact; and any formal
+admission still needs independent provenance and a reviewed
+provider-specific contract. Section 234's historical text stays as written.
+
+**Verdict.** The one commit is accepted; none is rejected.
+**0 P0, 0 P1, 0 P2, 0 P3.** Only the lane record changed between `4f0362b`
+and `ac788ad`; no code, test, policy or registry changed in this round.
+
+### 236.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `ac788ad` | Section 235: record-only counter-review of section 234 and the acquisition-authority qualification | accepted | `git diff 4f0362b ac788ad` touches only the lane record. The qualification is right and leaves every formal admission requirement in place; the trust roots and the external evidence stop are unchanged. |
+
+### 236.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| none | | | No defect in `ac788ad`. `ARV2CR235-001` is Codex's finding against section 234, accepted above. | |
+
+### 236.3 Mechanical verification
+
+| Check | Result |
+|---|---|
+| Changed files, `4f0362b..ac788ad` | the lane record only |
+| Trust roots | unchanged from section 231.3; entries empty, authority `zero_access` |
+| Worktree integrity across the complete run | every one of the 1782 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the run, and `git status --ignored`, apart from `__pycache__`, is unchanged |
+| Look floor | unchanged at 298/233/40/699 |
+
+### 236.4 Reading the round on the record's own terms
+
+- **The stop is about evidence, not about who may fetch it.** Acquisition of
+  genuine external artifacts can proceed within the existing scoped
+  authority where a source and access exist; anything needing new access,
+  spending or vendor contact goes to the owner.
+- **A further record-only exchange adds no evidence.** Sections 233 to 236
+  have each re-confirmed the same stop. The next push is most useful if it
+  brings an acquired artifact for review, or an owner-set milestone.
+
+### 236.5 Improvement plan
+
+1. **Next push:** an acquired external artifact for review under a
+   provider-specific contract, or an owner-named milestone, rather than
+   another record-only exchange.
+2. **Keep validating from the designated worktree.**
+
+### 236.6 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2CR231-002` | P2 | Satisfied again by this round's worktree run (236.7). |
+| `ARV2CR235-001` | P3 | Accepted; corrected prospectively by Codex in `ac788ad`. |
+| `ARV2D213-002`, `ARV2R211-001`, `ARV2D213-003`, `ARV2R220-001` | P3 | Documented. |
+
+### 236.7 Validation
+
+Every check below ran from the designated worktree at
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2`,
+with `~/.venvs/trading_agent-py313/bin/python` (3.13.15).
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, at the clean pushed head `ac788ad` in the designated worktree, run as six file groups in three parallel streams with separate pytest temp directories, together covering all 9,768 collected tests | **0 failed, 9760 passed, 8 skipped, 35 warnings in six worktree file groups across three parallel streams (each 0:16:04, 0:10:46, 0:07:53, 1:04:03, 0:26:19, 0:04:15).** No failure and no error: the Git-based checkout tests and the designated-worktree CLI tests that fail in exports all pass here. The 8 skips are a subset of the standing eleven: 7 Windows-only directory-junction tests and 1 top-five-only profile case. |
+| Record gates on the final record bytes | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | 82 passed |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commit | clean; published in this round's single push |
+
+The final tree differs from the pushed head `ac788ad` only by this record
+commit. Not exercised here: no QuantConnect or provider endpoint, result
+read, or launcher was run, and section 235 records none.

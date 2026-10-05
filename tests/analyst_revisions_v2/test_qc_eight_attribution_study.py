@@ -86,19 +86,41 @@ def test_annual_factorial_contrasts_pin_the_common_calendar_axis():
             [str(year), 250 + (year == 2021), year != 2021,
              f"{year}-01-04", f"{year}-12-31", value, "-0.1", "0.2", "0.5"]
             for year in range(2021, 2026)]}}
+    # D is chosen so that D-C differs from B-A: the interaction contrast must
+    # then differ from the plain weight contrast, which pins its formula.
     arms = {"cap_base": arm("0"), "cap_AR_weight": arm("0.1"),
-            "AR_entry_base_weight": arm("0.2"), "AR_entry_AR_weight": arm("0.4")}
+            "AR_entry_base_weight": arm("0.2"), "AR_entry_AR_weight": arm("0.5")}
     annual, uncertainty = study._annual_contrasts(arms)
     assert len(annual) == 5
     assert Decimal(annual[0]["AR_weight_on_cap_holdings_pp"]) == 10
     assert Decimal(annual[0]["AR_entry_count_at_base_weights_pp"]) == 20
-    assert Decimal(annual[0]["AR_weight_on_AR_entry_holdings_pp"]) == 20
-    assert Decimal(annual[0]["entry_weight_interaction_pp"]) == 10
-    assert Decimal(annual[0]["full_minus_cap_base_pp"]) == 40
+    assert Decimal(annual[0]["AR_weight_on_AR_entry_holdings_pp"]) == 30
+    assert Decimal(annual[0]["entry_weight_interaction_pp"]) == 20
+    assert Decimal(annual[0]["full_minus_cap_base_pp"]) == 50
     assert uncertainty["full_minus_cap_base_pp"]["t_over_five_years"] is None
     arms["AR_entry_AR_weight"]["diagnostics"]["annual_account_rows"][2][4] = "2023-12-28"
     with pytest.raises(adapter.RelaxedQcSubmissionError, match="annual axes differ"):
         study._annual_contrasts(arms)
+
+
+def test_tampered_attribution_manifest_is_refused_before_use(tmp_path, monkeypatch):
+    # A shape-identical manifest with one changed byte must refuse on the
+    # frozen digest, and the launcher must refuse a study pin that drifted.
+    raw = study.MANIFEST_PATH.read_bytes()
+    assert hashlib.sha256(raw).hexdigest() == study.FROZEN_MANIFEST_SHA256
+    tampered = tmp_path / study.MANIFEST_PATH.name
+    tampered.write_bytes(raw.replace(b"2021-01-04", b"2021-01-05", 1))
+    assert tampered.read_bytes() != raw
+    monkeypatch.setattr(study, "MANIFEST_PATH", tampered)
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="manifest changed"):
+        study.frozen_manifest()
+    monkeypatch.setattr(study, "MANIFEST_PATH", tampered.with_name("missing.json"))
+    with pytest.raises(OSError):
+        study.frozen_manifest()
+    monkeypatch.setattr(study, "MANIFEST_PATH", tampered)
+    monkeypatch.setattr(study, "FROZEN_MANIFEST_SHA256", hashlib.sha256(tampered.read_bytes()).hexdigest())
+    with pytest.raises(adapter.RelaxedQcSubmissionError, match="manifest pin changed"):
+        adapter._eight_attribution_manifest()
 
 
 @pytest.mark.parametrize("unavailable", [True, False])

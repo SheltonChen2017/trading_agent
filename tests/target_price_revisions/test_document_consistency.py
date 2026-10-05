@@ -204,6 +204,29 @@ SECTION45_REVIEWED_CODEX_COMMITS = (
     "9958a459f5cd56c29cb9a0de13d38737e2c3412d",
 )
 SECTION45_OWNER_INPUT_IDS = tuple(f"TPR-OWN-{index}" for index in range(1, 6))
+# The Codex range this Claude round (section 48) reviewed.
+SECTION48_CODEX_BASE = "c0bfb21393180d44c16c10be1e667ea741098531"
+SECTION48_CODEX_HEAD = "c5c060e6712afa75c0eeb05482ef469322d311cf"
+SECTION48_CODEX_RANGE = f"{SECTION48_CODEX_BASE}..{SECTION48_CODEX_HEAD}"
+SECTION48_CODEX_SHORT_RANGE = "c0bfb213..c5c060e6"
+SECTION48_CODEX_COMMITS = (
+    "cf11788f39a2148d7bc3b801e88807bd2caca5ea",
+    "8dcfb71851ff22db6f0727395e18292c19f080ef",
+    "c5c060e6712afa75c0eeb05482ef469322d311cf",
+)
+# TPR-CR16-002: commit identities section 8 may name besides its own range.
+# Stable identities change only when that artifact changes; branch-relation
+# commits change only when the lane is synchronized with main.  Both are
+# deliberate, reviewed edits -- never a per-round routing update.
+SECTION8_STABLE_COMMITS = frozenset({
+    "20e20d7f68d39d17af84d6a5c65e22b78dc57eb1",  # TPR-TR0-I code checkpoint
+    "bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e",  # reviewed TPR-0A snapshot
+})
+SECTION8_BRANCH_RELATION_COMMITS = frozenset({"9e834713", "6590d890", "15bedb56"})
+SECTION8_ROLE_STATEMENT = (
+    r"\b(?:Claude|Codex) has (?:independently )?(?:reviewed|counter-reviewed)\b"
+)
+SECTION8_NEXT_ACTION_STATEMENT = r"\b(?:Claude|Codex) next (?:reviews|counter-reviews)\b"
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
 SECTION46_CLAUDE_HEAD = "c0bfb21393180d44c16c10be1e667ea741098531"
 SECTION46_CLAUDE_RANGE = f"{SECTION46_CLAUDE_BASE}..{SECTION46_CLAUDE_HEAD}"
@@ -717,11 +740,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION46_CLAUDE_RANGE]
+    ) == [SECTION48_CODEX_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact Claude range"
+        "Claude has independently reviewed the exact Codex range"
         in normalized_current
     )
     assert (
@@ -739,11 +762,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
     # The owner directly selected bounded D0 decisions on 2026-10-05.
     # Historical wait states cannot override that scope or widen it to outcomes.
-    assert "awaits independent Claude review" in normalized_current
+    assert "awaits Codex counter-review" in normalized_current
+    assert "awaits independent Claude review" not in normalized_current
     assert "Claude next reviews sections 43 and 44" not in normalized_current
     assert "Codex next counter-reviews section 42" not in normalized_current
     assert "Codex next counter-reviews section 45" not in normalized_current
-    assert "Claude next reviews sections 46 and 47" in normalized_current
+    assert "Claude next reviews sections 46 and 47" not in normalized_current
+    assert "Codex next counter-reviews section 48" in normalized_current
     assert "TPR-D0 is authorized" in normalized_current
     assert "TPR-D0 is not authorized" not in normalized_current
     assert "No next implementation milestone is authorized" not in normalized_current
@@ -775,12 +800,13 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION46_CLAUDE_SHORT_RANGE]
+        ) == [SECTION48_CODEX_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
-        assert "section 46" in normalized_summary_lower
+        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
+        assert "section 48" in normalized_summary_lower
         assert "awaits claude review" not in normalized_summary_lower
-        assert "claude next reviews the counter-review and tpr-d0" in normalized_summary_lower
+        assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
+        assert "codex next counter-reviews section 48" in normalized_summary_lower
         assert "tpr-d0 is authorized" in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
         assert "no next implementation milestone is authorized" not in normalized_summary_lower
@@ -1060,6 +1086,7 @@ def test_out_of_lane_current_disposition_index_matches_integration_closures() ->
         "TPR-OOL-015",
         "TPR-OOL-016",
         "TPR-OOL-017",
+        "TPR-OOL-018",
     }
     assert {identifier for identifier, status in dispositions.items() if status == "closed"} == {
         "TPR-OOL-001",
@@ -1730,3 +1757,53 @@ def test_section_46_reviews_every_claude_commit_and_pins_owner_scope() -> None:
         assert required.lower() in owner.lower(), required
     assert "13 of 17 mutations" in _record_section("## 9. Out-of-lane findings ledger")
     assert "9 of 13 mutations" not in _record_section("## 9. Out-of-lane findings ledger")
+
+
+def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
+    """TPR-CR16-002: a stale routing sentence cannot sit beside the current one.
+
+    Section 8 is the lane's only per-round current-state pointer.  Its range
+    singleton catches a REPLACED range, but a superseded role sentence, routing
+    sentence or short range could coexist with the correct text.  Phrase lists
+    needed appending every round and lapsed, so this rule needs no per-round
+    edit: exactly one role and one next-action statement, and every commit
+    named must be an endpoint of the block's own range or a known stable or
+    branch-relation identity.
+    """
+    current = _current_qualification(_record_section("## 8. Exact next step"))
+    normalized = " ".join(current.split())
+    roles = re.findall(SECTION8_ROLE_STATEMENT, normalized)
+    assert len(roles) == 1, f"section 8 must state one current role: {roles}"
+    next_actions = re.findall(SECTION8_NEXT_ACTION_STATEMENT, normalized)
+    assert len(next_actions) == 1, f"section 8 must name one next action: {next_actions}"
+    ranges = re.findall(r"`([0-9a-f]{40})\.{2}([0-9a-f]{40})`", normalized)
+    assert len(ranges) == 1, ranges
+    allowed = {*ranges[0], *SECTION8_STABLE_COMMITS}
+    full = set(re.findall(r"(?<![0-9a-f])([0-9a-f]{40})(?![0-9a-f])", normalized))
+    assert full <= allowed, f"section 8 names a stale commit: {sorted(full - allowed)}"
+    short = set(re.findall(r"`([0-9a-f]{7,12})`", normalized))
+    stale_short = {
+        token for token in short
+        if token not in SECTION8_BRANCH_RELATION_COMMITS
+        and not any(identity.startswith(token) for identity in allowed)
+    }
+    assert not stale_short, f"section 8 names a stale commit: {sorted(stale_short)}"
+    assert re.findall(r"`[0-9a-f]{7,12}\.{2}[0-9a-f]{7,12}`", normalized) == [], (
+        "section 8 names its range in full; a short range there is stale"
+    )
+
+
+def test_claude_review_of_the_d0_round_is_exact() -> None:
+    """TPR-CR16-001/002: pin this Claude round's exact range and commits."""
+    section = _record_section(
+        "## 48. Claude independent review of the Codex D0 round"
+    )
+    assert SECTION48_CODEX_RANGE in section
+    commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert commits == SECTION48_CODEX_COMMITS
+    assert "Cumulative disposition: accepted after correction" in section
+    assert "TPR-D1 is not authorized" in section

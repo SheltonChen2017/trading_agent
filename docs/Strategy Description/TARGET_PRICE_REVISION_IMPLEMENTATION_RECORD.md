@@ -1,11 +1,12 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`9958a459..c0bfb213` IN SECTION 46. CUMULATIVE DISPOSITION: ACCEPTED AFTER
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`c0bfb213..c5c060e6` IN SECTION 48. CUMULATIVE DISPOSITION: ACCEPTED AFTER
 CORRECTION. THE OWNER'S 2026-10-05 "OK, DO 1 2 3" RESOLVES TPR-OWN-1 THROUGH
 TPR-OWN-5 WITH THE EXACT BOUNDED SELECTIONS IN SECTION 46.2. TPR-D0 IS
 AUTHORIZED FOR ITS DEVELOPMENT PLAN AND ONE LOCAL RETAINED STRUCTURAL AUDIT;
-ITS IMPLEMENTATION CANDIDATE AWAITS INDEPENDENT CLAUDE REVIEW. NATIVE WINDOWS
+ITS IMPLEMENTATION CANDIDATE HAS COMPLETED INDEPENDENT CLAUDE REVIEW AND
+AWAITS CODEX COUNTER-REVIEW. NATIVE WINDOWS
 GIT TESTS AND EXPLICIT HOST-GIT LOGIC TESTS ARE NOW SEPARATELY NAMED;
 TPR-CR15-001 IS CLOSED FOR TEST COVERAGE, NOT NATIVE SIGNER/ACL VALIDATION.
 THE SHARED RUNTIME-STOP CORRECTIONS ARE ACCEPTED; TPR-OOL-011 STILL REQUIRES
@@ -16,8 +17,7 @@ AUTHORITY IS AUTHORIZED. THE EMPTY REGISTRY, CANONICAL CANDIDATE, SOURCE/LOOK
 AUTHORITIES, PERMANENT 1/80 CEILING AND SHARED HOLDOUT KEEP THEIR EXACT BYTES.
 TPR-1 AND TPR-0B REMAIN BLOCKED. NO NEW PROVIDER REQUEST, PRICE/OUTCOME ACCESS,
 RESEARCH LOOK, QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING
-AUTHORITY IS GRANTED. CLAUDE NEXT REVIEWS THE COUNTER-REVIEW AND TPR-D0
-CANDIDATE. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
+AUTHORITY IS GRANTED. CODEX NEXT COUNTER-REVIEWS SECTION 48. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Their integration into `main` grants this target branch visibility;
@@ -358,11 +358,12 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-05:** Codex has counter-reviewed the exact
-Claude range
-`9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`.
-Section 46 dispositions all four commits separately; its cumulative
-disposition is accepted after correction. The shared runtime-stop corrections
+**Current qualification, 2026-10-05:** Claude has independently reviewed the
+exact Codex range
+`c0bfb21393180d44c16c10be1e667ea741098531..c5c060e6712afa75c0eeb05482ef469322d311cf`.
+Section 48 dispositions all three commits separately; its cumulative
+disposition is accepted after correction, and section 46 remains the
+counter-review it followed. The shared runtime-stop corrections
 are accepted within the previous exact two-file exception; `TPR-OOL-011`
 stays open only for owner-coordinated synchronization. This round changes no
 shared or sibling code. `TPR-CR15-001` is closed by the owner-selected explicit
@@ -428,11 +429,12 @@ consistency, raw retention, derived processing, and QC-transfer rights, and
 the canonical TPR-0B remains blocked until reviewed TPR-1 and TPR-2 structural
 manifests exist. The TPR-D development route does not unblock, satisfy, or
 spend any canonical gate. TPR-D0 is authorized as the current bounded
-development milestone. Its candidate awaits independent Claude review; no
-later TPR-D milestone starts automatically. The trust rollback pin, protected
+development milestone. Its candidate completed independent Claude review in
+section 48 and awaits Codex counter-review; no later TPR-D milestone starts
+automatically. The trust rollback pin, protected
 parent custody, reviewer identity and adversarial matrix remain unresolved
-and parked. **Exact next role action:** Claude next reviews sections 46 and
-47 and every Codex commit in this round. The retained-read scope expires
+and parked. **Exact next role action:** Codex next counter-reviews section 48
+and every Claude commit in this round. The retained-read scope expires
 2026-10-12 and permits no network request, auxiliary price/identity join,
 outcome access, QC project/upload/job, broker, paper/live, deployment, capital
 or trading action. This round creates or resumes no monitor; it does not
@@ -567,6 +569,7 @@ exception names it. Section 44 is that bounded exception for only
 | `TPR-OOL-016` | P3 | Analyst Revisions V2 tests when run outside the Analyst worktree: `tests/analyst_revisions_v2/` | In this checkout the Analyst directory reports 37 errors and 5 failures that are not regressions of this lane. Five modules (`test_qc_qcom_exclusion_coverage10_study.py`, `test_qc_qcom_exclusion_three_name_study.py`, `test_qc_qcom_three_name_precreate_retry.py`, `test_qc_qcom_precreate_retry.py`, and `test_qc_qcom_exclusion_study.py`) error instead of skipping when the gitignored `artifacts/analyst_revisions_v2/` package is absent, while sibling modules skip on the same condition. Two tests of `test_qc_qcom_exclusion_tilt_study.py` fail, one on the same absent package and one because it requires the designated Analyst worktree. Three import-closure tests fail because `research/analyst_revisions_v2/forward_data_quality.py` imports `os` at the `main` snapshot `9e834713`. Section 42.8 gives the counts by cause. | **Open and owner-routed.** A fresh clone of `main` reproduces the artifact and closure cases; route to the Analyst lane. |
 
 | `TPR-OOL-017` | P2 | Imported Analyst QC host portability: `research/analyst_revisions_v2_qc/formal_run_protocol.py:19` and `tests/analyst_revisions_v2/` | On the current Windows/Python 3.13.14 tree, standard pytest terminates with 110 collection errors before any test executes. The imported Analyst formal-run module unconditionally imports POSIX-only `fcntl`; the exact completed collection report and attribution are in section 47. No Target-Price file changes that module or admits an outcome. | **Open and owner-routed.** The Analyst owner must select supported hosts and provide a correctly reviewed locking/portability contract or honest platform admission. Do not weaken locking, stub `fcntl`, or edit Analyst/shared code in this lane. |
+| `TPR-OOL-018` | P2 | Cross-lane Windows behavior of the integrated tree: Analyst `research/analyst_revisions_v2_qc/` byte-pinned sources, Insider `tests/test_insider_buying_sec_acquisition.py` and `tests/test_insider_buying_sec_pilot_projection_adapter.py`, Short-Interest `tests/test_short_interest_stock_percentile.py` | Measured 2026-10-05 by a complete exact-cover run of all 14,268 collected tests on this Windows host (section 48.6): 629 tests fail or error outside this lane, in four classes. (1) `core.autocrlf` byte identity: Git for Windows checks pinned sources out with CRLF. `pit_market_cap_membership_probe_runtime.py` has a pure-LF committed blob that matches its pin, while the working copy holds 916 CRLF and the file carries no `text` or `eol` attribute. This is the defect this lane closed for itself as `TPR-CR4-001`, and it also reaches one Short-Interest verbatim-approval test. (2) POSIX-only paths: `dirfd` and no-follow capture, and a hard-coded `/usr/bin/ssh-keygen`. (3) Windows symlink-creation privilege. (4) Insider temporary-directory `PermissionError` setup errors. The classes checked on a pristine checkout of `c5c060e6` reproduce identically, and no Target-Price test is among them. `TPR-OOL-015`, `TPR-OOL-016` and `TPR-OOL-017` already route the shared guards, Analyst portability and `fcntl` collection; this row adds the Insider and Short-Interest instances and the concrete byte-identity mechanism. | **Open and owner-routed.** Each owning lane should pin its byte-compared artifacts against checkout translation, as `TPR-CR4-001` did with a lane-scoped `.gitattributes`, and decide its supported hosts for POSIX-only paths. Documented, not fixed, under the target-only rule. |
 
 ### Current disposition index (successor qualification, 2026-10-02)
 
@@ -595,6 +598,7 @@ resolved item or hide a newly routed one.
 | `TPR-OOL-015` | **Open** | Four shared repository guards are red against imported Analyst code; section 42. |
 | `TPR-OOL-016` | **Open** | Analyst tests error or fail outside the Analyst worktree and at the imported main snapshot; section 42. |
 | `TPR-OOL-017` | **Open** | Imported Analyst `fcntl` dependency blocks Windows collection; measured in section 47, not fixed here. |
+| `TPR-OOL-018` | **Open** | Cross-lane Windows failure profile of the integrated tree, measured in section 48.6; adds the Insider and Short-Interest instances and the `core.autocrlf` byte-identity mechanism. |
 
 ## 10. Session / commit ledger
 
@@ -654,6 +658,7 @@ known.
 | 2026-10-02 | Codex owner-scoped remediation | `37598fa5b686a14e906c92dcea4c17b9d9b933b7` -> test correction `a8e4afefe3232f6515c17e9dbde1ae9781fe0776`; this record successor completes the candidate | Shared guard correction and trust/source drafts only; no Target-Price feature milestone | Corrected old-stamp and path-prefix attribution with an actual pre-collection incident baseline, exact path components and evidenced lifecycle expiration. Drafted four pending trust decisions and eight unestablished source-evidence requirements. Section 44 records exact scope and residual sampling limitations. | Combined focused checks **161 passed, 1 skipped**; meaningful original/reverse-mutation reds, four draft-authority mutations red/restored, compilation and diff checks clean. No complete suite or native Windows integration. Provider data/API, licensed-row, outcome and QC actions and looks **0**. | OOL011 correction candidate awaits independent review; prior rejection not waived. Two candidate self-review P2 findings corrected; six lane findings and all trust/source/manifest gates remain open. OOL003/004/006 remain closed. | Owner's narrow two-shared-test-file implementation exception only; no cross-lane synchronization, trust selection/provisioning or source/data/QC authority. | Make exactly one matching-lane push of both commits. Claude independently reviews every Codex commit after `3de5bbef`, including sections 43/44; Codex counter-reviews before any next milestone. Owner selects trust decisions and supplies exact source evidence. Monitor remains paused. |
 | 2026-10-02 | Claude review | `3de5bbef3a25d8a37647869ad840808543927a82..9958a459f5cd56c29cb9a0de13d38737e2c3412d` reviewed; corrections `1a4fd37` and `c2c0672` and this record/guard commit on this same lane branch | Independent review of the section-43 counter-review and the owner-scoped section-44 shared-test correction and drafts; no feature milestone in range | Reviewed all four Codex commits individually. Confirmed two counter-review findings against the earlier host-Git fixture and one against the earlier guard. Accepted the shared runtime-stop guard correction after correcting four teardown regressions the complete suite exposed (`TPR-CR15-004`, two commits). Opened `TPR-CR15-001` for the fourteen loader tests that are red on this host and were tracked nowhere. Kept the section-42 owner decisions withdrawn and recorded the two conflicting owner instructions with five owner inputs. No production file changed. | Complete suite on the pushed Codex head `9958a459` in six shards: **17,667 passed, 823 skipped, 23 failed, 41 errors**; 14 failures are `TPR-CR15-001`, 4 are `TPR-OOL-015`, 5 failures and 37 errors are `TPR-OOL-016`, and 4 errors are `TPR-CR15-004`, fixed in `1a4fd37` and `c2c0672`. 17 shared-guard mutations (13 red) and 10 Codex-guard mutations (10 red). Final-tree validation is the next row. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No P0 or P1. `TPR-CR15-001` (P2) open and registered; `TPR-CR15-004` (P2) closed by correction; `TPR-CR15-002` and `TPR-CR15-003` (P3) closed by qualification. Seven lane findings open. `TPR-OOL-011` open only for synchronization; `TPR-OOL-012` through `TPR-OOL-016` unchanged. | None. `TPR-OD-001` through `TPR-OD-004` remain proposals; TPR-D0 is not authorized. | Make this round's one push. Codex counter-reviews section 45. The lane then waits on the owner inputs `TPR-OWN-1` through `TPR-OWN-5`. |
 | 2026-10-02 | Claude validation | `29c87ae` -> `29c87ae` (exact tested tree; this validation-record commit follows) | Section-45 review round final validation | Validated the exact final tree after the two shared-guard corrections, the register and record update, and the rotated guards. No production module changed in this round. | Complete suite on the final tree, six shards: **17,670 passed, 823 skipped, 23 failed, 37 errors**; every failure and error is `TPR-CR15-001`, `TPR-OOL-015`, or `TPR-OOL-016`, and the four `TPR-CR15-004` errors are gone. Designated-worktree focused set **582 passed, 3 skipped, 14 failed** (the 14 are `TPR-CR15-001`); document guards **95 passed**; `compileall` exit 0; `git diff --check` clean; status clean. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No new finding. `TPR-CR15-001` open; seven lane findings open; `TPR-OOL-011` open for synchronization only. | None. | Make this round's one push. Codex counter-reviews section 45; the lane then waits on `TPR-OWN-1` through `TPR-OWN-5`. |
+| 2026-10-05 | Claude review | `c0bfb21393180d44c16c10be1e667ea741098531..c5c060e6712afa75c0eeb05482ef469322d311cf` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review and TPR-D0 round; no milestone added | Reviewed all three commits individually and the cumulative tree. Verified the D0 auditor line by line, both artifacts' content addresses and lineage, and that the committed report is aggregate-only by a full key and leaf census. Did not re-read the retained source: TPR-OWN-2 grants one audit. Re-probed the accepted shared runtime-stop redesign on a redirected root: zero defects. Closed two in-lane guard gaps test-only, so no production byte changed and the recorded audit lineage stays valid. | D0 package **107 passed, 1 skipped**; mutation and suite evidence in section 48.6. Provider/outcome accesses **0**; authorized/spent looks **0**; retained-source reads by this reviewer **0**. | All three commits accepted, `8dcfb718` after correction. `TPR-CR16-001` (P2) and `TPR-CR16-002` (P3) closed by correction. No P0 or P1. The open register remains the six section 8 findings. | None. No key, signed anchor, registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority; TPR-D1 is not authorized. | Codex counter-reviews every Claude commit after `c5c060e6712afa75c0eeb05482ef469322d311cf`. The retained-read scope expires 2026-10-12; any later D-step needs its own exact owner scope. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -5704,3 +5709,166 @@ does not make the history pristine, establish profitability, or turn trading
 on. Claude review comes next; a separately scoped D1 can then decide which
 events are usable and how conservatively to time them. No monitor is armed,
 no sibling/main file is corrected, and no later milestone is started here.
+
+## 48. Claude independent review of the Codex D0 round - 2026-10-05
+
+**Disposition: accepted after correction.** All three Codex commits are
+accepted, the D0 implementation after two test-only corrections. The
+auditor is careful, its committed report is genuinely aggregate-only, and
+the counter-review's acceptance of the shared runtime-stop redesign holds
+under independent probing. Both findings are gaps in what the tests
+enforce, not defects in what was produced.
+
+### 48.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Branch | `codex/strategy-target-price-revisions` |
+| Codex range reviewed | `c0bfb21393180d44c16c10be1e667ea741098531..c5c060e6712afa75c0eeb05482ef469322d311cf` |
+| Codex commit 1 | `cf11788f39a2148d7bc3b801e88807bd2caca5ea` - counter-review Claude's corrections and bind the bounded D0 decisions |
+| Codex commit 2 | `8dcfb71851ff22db6f0727395e18292c19f080ef` - implement the bounded TPR-D0 plan and retained structural audit |
+| Codex commit 3 | `c5c060e6712afa75c0eeb05482ef469322d311cf` - record the D0 validation limits and review handoff |
+| Publication state at review start | local head and fetched remote head both exactly `c5c060e6712afa75c0eeb05482ef469322d311cf`, clean tree |
+| Ancestry | `c0bfb21393180d44c16c10be1e667ea741098531` is an ancestor of the fetched head |
+| Interpreter | the lane venv, Python 3.13.14, pytest 9.1.1; frozen `C:\Program Files\Git\cmd\git.exe` present |
+
+Scope came from section 8 and the last ledger row, which route every commit
+after `c0bfb213` to Claude. Sections 41-45 and their commits were reviewed
+and counter-reviewed by earlier rounds. A review this reviewer had prepared
+for `d54ce1b2..e74da9ef` was never published, because section 42 reviewed
+that range first; its measured complete suite on `e74da9ef` reproduced
+Codex's recorded **6,943 passed, 13 skipped, 25 warnings, 0 failed** exactly.
+
+### 48.2 Commit-by-commit dispositions
+
+| Commit | Disposition | Review basis |
+|---|---|---|
+| `cf11788f39a2148d7bc3b801e88807bd2caca5ea` | **Accepted** | Records the owner's direct "OK, do 1 2 3" and five bounded selections that the record itself distinguishes from five separate owner decisions. The `native_windows` / `host_git_logic` split is explicit, not autouse; the native leg asserts the frozen executable and skips only off Windows; host substitution is proven to restore even when the body raises. Every prior assertion survives. The accepted shared runtime-stop redesign reproduces cleanly (48.4). |
+| `8dcfb71851ff22db6f0727395e18292c19f080ef` | **Accepted after correction** | The auditor is hash-first, strict, bounded and aggregate-only by construction, and its committed report is clean (48.3). Its aggregate-only test did not close the report's key tree, so a new key could have published derived row data with every behavioral test green (`TPR-CR16-001`). |
+| `c5c060e6712afa75c0eeb05482ef469322d311cf` | **Accepted** | Records honestly that the standard suite could not run on Windows: 110 Analyst `fcntl` collection errors, zero tests executed, not called green. 48.6 supplies totals for everything that does collect. |
+
+**Cumulative disposition: accepted after correction.** No production byte,
+spec, artifact, gate, or authority changed in this review.
+
+### 48.3 D0 data boundary, verified without a second audit
+
+`TPR-OWN-2` grants one local structural audit of the retained snapshot. This
+reviewer therefore did not read, hash, or list the retained source; an
+independent reproduction of the audit would be a second audit and needs its
+own owner scope. Instead:
+
+- No code or test path names the retained directory. The CLI requires an
+  explicit `--capture-root`; `plan.py` names only the snapshot ID.
+- Both artifacts are content-addressed: SHA-256 of the bytes equals the
+  digest in each file name, each is one canonical line ending in LF, and the
+  ignore rule releases only these two kinds from `artifacts/`.
+- Lineage is exact: the report's `plan_sha256` equals the plan artifact's
+  digest, and all four auditor code hashes equal both the committed blobs and
+  the bytes on disk, so this report came from exactly this code.
+- The committed report is aggregate-only by census: 24,675 bytes, 1,201
+  integer counts, 3 booleans, and 20 strings, of which 6 are lineage hashes
+  and 14 are fixed labels or prose. Its 103 distinct keys are years, nine ISO
+  currency codes, category names, and auditor module paths. No ticker,
+  provider ID, analyst, firm, or raw target value appears as a key or value.
+- The self-reported zeros are structurally true. The auditor imports only
+  the standard library with no network module, reads target, action,
+  currency, clock and horizon-presence fields only, holds provider IDs as
+  SHA-256 digests in memory and emits only four counts, and raises fixed
+  messages that cannot echo row content.
+- Scope expiry is enforced in code against the clock the caller supplies;
+  the CLI, the only production caller, supplies wall-clock UTC. That is a
+  precise statement of the guarantee, not a defect.
+
+### 48.4 Independent check of the accepted runtime-stop redesign
+
+`cf11788f` accepts the shared runtime-stop corrections. Against the earlier
+guard, this reviewer had reproduced both directions of `TPR-CCR13-002`: an
+incident stamped with a historical `activated_at`, including this
+repository's own frozen test clock, escaped attribution, and `pytest-123` was
+blamed on `pytest-12`. The redesigned guard attributes by session baseline
+and path components instead. Re-probed on a redirected root, with the
+operator's real stop file never read or written:
+
+| Case | Attributed | Expected |
+|---|---|---|
+| New incident, own base, stamped now | yes | yes |
+| New incident, own base, repo frozen test clock `2026-08-07T15:30:00+00:00` | yes | yes |
+| New incident, own base, `2000-01-01T00:00:00+00:00` | yes | yes |
+| New incident, sibling base `pytest-123` | no | no |
+| New incident, unrelated base `pytest-13` | no | no |
+| Baselined incident, unchanged | no | no |
+
+Zero defects. The acceptance stands.
+
+### 48.5 P0-P3 ledger
+
+| ID | Priority | Status | Location | Finding, evidence, and disposition |
+|---|---|---|---|---|
+| `TPR-CR16-001` | P2 | **Closed by correction** | `tests/target_price_revisions_development/test_d0.py`, `test_boundary_and_artifacts.py`, new `conftest.py` | `test_report_is_complete_aggregate_only_and_zero_authority` pins selected counts, the exact `identifiers` block, and the absence of raw IDs, tickers, firms and raw targets. It never closed the report's key tree. The auditor holds per-row provider-ID SHA-256 digests in memory; a mutation adding them as a new top-level key passed every behavioral test (89 passed). A digest of a provider ID is derived row data that anyone holding the dataset can join back, and the failure direction is publishing it to the remote, which cannot be undone. The real-audit lineage test is no defense: it fails for any auditor edit, but re-running the audit satisfies it again with the leaky report. P2 rather than P1 because the committed report is clean. Corrected test-only, so no production byte changed and no second audit is needed: a shared `aggregate_only` contract closes the top-level keys, the exact sub-blocks, every year bucket's key tree against a frozen literal, and the leaf types, and both the synthetic report and the committed real report must pass it. A drift test fails if the auditor's bucket ever diverges from the frozen literal, and seven parametrized cases prove each leak shape is refused, including an integer-encoded one. |
+| `TPR-CR16-002` | P3 | **Closed by correction** | `tests/target_price_revisions/test_document_consistency.py`; section 8 | Section 8 is the lane's only per-round current-state pointer, but its guard caught only a REPLACED range. On `c5c060e6`, a stale role sentence, a stale routing sentence naming `d54ce1b2`, a stale short range, and this round's own routing once superseded each sat beside the current text with the guard green. The ad hoc not-in phrases added each round only ever covered the phrasings someone remembered, and the earlier stale-claims list left with the frozen shared documents. Corrected with a rule that needs no per-round edit: exactly one role statement and one next-action statement, and every commit section 8 names must be an endpoint of its own range, a stable identity, or a branch-relation commit. This reviewer first observed the gap against `e74da9ef` on 2026-09-29, in the unpublished review noted in 48.1. |
+
+No P0 or P1. `TPR-OOL-018` documents the measured cross-lane Windows
+failure profile, not fixed here. The open register remains exactly the six
+section 8 findings, including the inherited P1 `TPR-CCR10-012` and
+`TPR-CCR10-013`. ID
+`TPR-CR15-*` belongs to section 45, so this round uses `TPR-CR16-*`.
+
+### 48.6 Validation
+
+- D0 package: **107 passed, 1 skipped**, the skip being Windows directory-
+  symlink permission. The received tip measured **99 passed, 1 skipped**,
+  matching Codex's 89 plus 10.
+- Mutations on the D0 auditor, run against the behavioral module only because
+  the real-audit lineage test pins auditor code hashes and turns red for any
+  edit. Before the correction, adding provider-ID digests as a new top-level
+  key passed all 89 behavioral tests; adding them inside `identifiers`, adding
+  raw tickers, disabling scope expiry, disabling the symlink/junction guard, and
+  allowing an immutable overwrite each turned them **red**. After the
+  correction the top-level leak is **red** (8 failed), a new key in the
+  auditor's bucket is **red** (9 failed: the contract plus the drift test), and
+  neutering the contract fails all seven rejection cases, so they are not
+  vacuous. Every restore was byte-identical and **green**.
+- Mutations on the section 8 rule, in a scratch clone with this round's edits
+  applied: a stale role sentence, a stale routing sentence naming `d54ce1b2`, a
+  stale short range, a second next-action statement, and an unallowlisted full
+  commit each turned it **red**; the restore was **green**. Document guards
+  with every edit applied: **95 passed, 4 skipped** in the clone and **206
+  passed, 1 skipped** together with the D0 package in this worktree.
+- Complete repository suite on this round's code tree: **13,656 passed,
+  487 failed, 93 skipped, 32 test errors, 27 warnings**, exactly the 14,268
+  collected tests, plus **110 collection errors** (`TPR-OOL-017`). **No
+  Target-Price test failed or errored.** The 629 failures and errors are
+  Analyst 570, Insider 54, Short-Interest 1 and the four shared repository
+  guards (`TPR-OOL-015`, `TPR-OOL-016`, `TPR-OOL-017`, new `TPR-OOL-018`). The
+  shared-guard failures, the Insider acquisition module, and an Analyst
+  hash-pin failure reproduce identically on a pristine checkout of
+  `c5c060e6`; the Analyst byte-identity mechanism was confirmed by comparing
+  committed blobs with working copies.
+- Method, because it bears on what the numbers mean: one uninterrupted run
+  exceeds this environment's ten-minute background limit, so the suite ran as
+  shards, with slow files split down to single tests. Only runs that reached a
+  pytest summary and an exit line count. Superseded, diagnostic and ambiguous
+  runs are excluded by name, and the remaining 130 runs cover every collected
+  test exactly once. Three process errors were caught and kept out of the
+  evidence: a time-limit stop did not kill pytest, so orphaned runs finished
+  late and overlapped their re-splits; editing the shard runner while copies
+  were executing corrupted eight runs' outputs (`EXIT 127`, no tests run); and
+  one reused shard name made its output unattributable. One collected ID,
+  `test_unsafe_object_keys_are_refused[a//b]`, appears twice in pytest's own
+  collection list. After that run, only this record's text, the
+  `TPR-OOL-018` rows, and that ID's entry in the guard's expected set changed;
+  the Target-Price, D0 and active-document suites were then re-run on the
+  committed tree at **462 passed, 5 skipped**.
+- `compileall -q` over the standard paths exited 0, and `git diff --check` is
+  clean.
+
+### 48.7 Milestone and authority decision
+
+TPR-D0 is complete and independently reviewed. TPR-D1 is not authorized; any
+later D-step needs its own exact owner scope and review. The retained-read
+scope expires 2026-10-12. TPR-TR0-I stays parked and incomplete; TPR-1 and the
+canonical TPR-0B remain blocked. No key or trust file was provisioned, no
+provider or outcome was accessed, the retained source was not read by this
+reviewer, no QuantConnect work was run, and no broker, paper, live, capital,
+or trading authority was created. Provider accesses: **0**. Outcome
+accesses: **0**. Authorized or spent research looks: **0**.

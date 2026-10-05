@@ -275,6 +275,55 @@ def test_four_arm_comparison_and_25pct_context_allow_changed_membership_digest()
         study.compare_results(results, context)
 
 
+@pytest.mark.parametrize("key", (
+    "pit_callback_source_row_count",
+    "fundamental_snapshot_unavailable_decision_count",
+    "constituent_collection_unavailable_decision_count",
+    "constituent_collection_unavailable_universe_counts",
+))
+def test_four_arm_comparison_refuses_each_non_ar_source_census_mismatch(key):
+    assert study._COMMON_SOURCE_CENSUS == (
+        "pit_callback_source_row_count",
+        "fundamental_snapshot_unavailable_decision_count",
+        "constituent_collection_unavailable_decision_count",
+        "constituent_collection_unavailable_universe_counts",
+    )
+    results = result_fixture()
+    assert study.compare_results(copy.deepcopy(results))["comparison_valid"] is True
+    aggregate = results["R241"]["aggregates"]
+    value = aggregate[key]
+    if type(value) is dict:
+        value[sorted(value)[0]] += 1
+    else:
+        aggregate[key] = value + 1
+    with pytest.raises(ValueError, match="coverage10 non-AR source census differs"):
+        study.compare_results(results)
+
+
+@pytest.mark.parametrize("key", (
+    "pit_callback_source_row_count",
+    "fundamental_snapshot_unavailable_decision_count",
+    "constituent_collection_unavailable_decision_count",
+    "constituent_collection_unavailable_universe_counts",
+))
+def test_25pct_context_refuses_each_non_ar_source_census_mismatch(key):
+    results, context = result_fixture(), context_fixture()
+    assert study.compare_results(copy.deepcopy(results), copy.deepcopy(context))[
+        "context_25pct"]["compatible"] is True
+    for result in results.values():
+        aggregate = result["aggregates"]
+        value = aggregate[key]
+        if type(value) is dict:
+            value[sorted(value)[0]] += 1
+        else:
+            aggregate[key] = value + 1
+    # Both four-arm families remain internally coherent; only the cross-
+    # family context comparison should refuse the changed source census.
+    assert study.compare_results(copy.deepcopy(results))["comparison_valid"] is True
+    with pytest.raises(ValueError, match="matched source panel or census"):
+        study.compare_results(results, context)
+
+
 def test_comparison_refuses_wrong_identity_and_unsupported_fourth_attempt():
     results = result_fixture()
     results["R240"]["manifest_sha256"] = adapter.FROZEN_QCOM_EXCLUSION_TILT_MANIFEST_SHA256

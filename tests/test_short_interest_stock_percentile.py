@@ -1213,6 +1213,50 @@ def test_row_and_batch_payloads_reject_direct_authority_sabotage():
         forged_batch.to_payload()
 
 
+def test_source_batch_lineage_equals_the_p0_batch_own_hash():
+    source = _inventory()
+    projection = _projection()
+    expected_sha256 = source.sha256
+    assert projection.source_score_order_batch_sha256 == expected_sha256
+    payload = projection.to_payload()
+    assert payload["source_score_order_batch"] == source.to_payload()
+    assert all(
+        item["source_score_order_batch_sha256"] == expected_sha256
+        for item in payload["dispositions"]
+    )
+
+
+def test_coherently_rebound_row_is_rejected_by_the_complete_batch():
+    projection = _projection()
+    rows = projection.dispositions
+    index = next(
+        index for index, item in enumerate(rows) if item.score is not None
+    )
+    row = rows[index]
+    other_batch_sha256 = "f" * 64
+    rebound_record_id = hash_payload(
+        {
+            "percentile_slot_id": row.percentile_slot_id,
+            "source_score_order_batch_sha256": other_batch_sha256,
+            "source_score_order_disposition_sha256": (
+                row.source_score_order_disposition_sha256
+            ),
+        }
+    )
+    rebound = _clone_disposition(
+        row,
+        source_score_order_batch_sha256=other_batch_sha256,
+        _bound_source_score_order_batch_sha256=other_batch_sha256,
+        percentile_record_id=rebound_record_id,
+    )
+    forged = _clone_batch(
+        projection,
+        dispositions=rows[:index] + (rebound,) + rows[index + 1 :],
+    )
+    with pytest.raises(StockPercentileError, match="references another source batch"):
+        forged.to_payload()
+
+
 def test_percentile_row_binds_its_policy_gate_and_production_flag():
     """Each row must name the frozen percentile policy, the SI-0M gate and stay non-production."""
     scored = next(

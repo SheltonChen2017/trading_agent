@@ -6,7 +6,11 @@ CORRECTION (SECTION 79). THE TWO PREVIOUSLY LOCAL CLAUDE REGRESSIONS IN
 ADVISORY AND FORMAL INDEPENDENT REVIEW REMAINS DUE ON THE PUBLISHED SNAPSHOT.
 THE OWNER NOW DIRECTS ONE COMBINED PUSH AT THE END OF EVERY COMPLETED LANE
 ROUND (SECTION 81), SUPERSEDING THE OLD SOURCE-BLOCKER NO-PARTIAL-PUSH RULE.
-THIS ALSO AUTHORIZES PUBLICATION OF THE ACCUMULATED LOCAL RANGE. UNDER THE OWNER'S
+THE ACCUMULATED CHECKPOINT WAS PUSHED THROUGH `889f7ab` AND REMOTE-VERIFIED.
+NYSE SALES HAS NOW REPLIED WITH PUBLIC SPECIFICATION/SAMPLE LINKS AND
+INDICATIVE PRICING, BUT NO HISTORICAL-VINTAGE OR LICENSE ANSWER (SECTION 82).
+NASDAQ HAS ROUTED THE INQUIRY; TWO SUPPORT ACKNOWLEDGMENTS ALSO ARRIVED.
+NO SOURCE GATE CLOSED. UNDER THE OWNER'S
 "do 1234" FALLBACK INSTRUCTION, CODEX SENT ONE NYSE AND ONE NASDAQ FOLLOW-UP
 WITH ALTERNATE SUPPORT CONTACTS COPIED, AND ONE METADATA-ONLY INQUIRY EACH
 TO QUOTEMEDIA AND INTRINIO (SECTION 80). THE RESPONSE DEADLINE IS
@@ -202,6 +206,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-05 | Codex counter-review + source assessment (local-only session; no push) | Remote `a31805a`; local code/test merge `e00aa35` preserves `7cd39a0`; this record commit follows | Accepted latest Claude record; preserved-regression countercheck; current NYSE/Nasdaq qualification | Accepted pushed record `a31805a` unchanged; advisory retention of the two previously local tests after independent red/green checks; direct inquiry-thread reads and received/bounce searches found only the two original sent inquiries; public metadata did not clear the three source P2s. Conditional PIT adapter/backtest step remains blocked. | Restored regressions **2 passed, 53 deselected in 107.39s**; isolated serializer/batch-guard mutants **1 failed in 81.86s** and **1 failed in 104.51s**; focused protocol/preflight/import/document selection **126 passed in 4.71s**; collection only **817 in 2.78s**; active-document **69 passed**; compileall exit 0; diff clean. No full lane/repository execution by Codex. Authorized/consumed outcome looks **0/0**. | No new confirmed code defect. `SI-CR14-001`, `SI-CR14-006` and `SI-CR15-002` closed; commitment advisory `SI-CR15-001` retained narrowly; source P2s `SI-SRC-20260928-001..003` and shared P2 remain open. | Keep exact validated checkpoint local under the existing no-partial-push gate. A new direct checkpoint instruction is required before one push; then Claude reviews the preserved test commit, sync merge and this record. Source evidence must clear before PIT ingest or outcomes. |
 | 2026-10-05 | Codex source fallback (local-only session; no push) | Local `165ffb3`; last fetched remote `a31805a`; this record commit follows | Owner-directed fallback steps 1–4 | Sent one NYSE and one Nasdaq follow-up with alternate contacts copied, plus one metadata-only inquiry each to QuoteMedia and Intrinio; set October 19 response deadline; screened alternatives; documented exhaustive correction-exclusion and prospective raw-archive activation requirements. No code or actual collection. | Active-document checks **69 passed in 13.33s**, then **69 passed in 2.93s** after ledger edits; lane compilation exit 0; diff clean. No full lane/repository suite. Authorized/consumed outcome looks **0/0**. | Source P2s `SI-SRC-20260928-001..003` remain open; no source admitted. Current Compustat replacement concept excluded. Commitment advisory and shared out-of-lane P2 unchanged. | Assess qualifying metadata/archive or exhaustive correction inventory; establish concrete local archival rights and acquisition contract before prospective collection. No reminder/monitor restarted; no checkpoint push authorized. |
 | 2026-10-05 | Codex owner-directed round-end publication | Fresh remote `a31805a`; local `bb9c688`; this instruction/handoff record commit follows | Standing one-push rule and accumulated five-commit checkpoint | Recorded the owner's verbatim direction to push after every completed lane round, superseding only the old source-blocker publication stop. Fresh lane-only fetch found no new remote commit; preserved all four accumulated commits and their review limits. | Section-80 final documentation **69 passed in 4.47s**, compile exit 0; latest record checks and exact remote equality are verified at publication and reported in the handoff. No new code/test change or full lane/repository run. | All source P2s, the prospective commitment advisory and shared out-of-lane P2 remain unchanged; authorized/consumed outcome looks **0/0**. | One normal combined push to the dedicated lane ref, verify remote equality, then Claude reviews every commit in `a31805a..published HEAD`. Future completed rounds follow the same standing push rule. |
+| 2026-10-05 | Codex received-response assessment | Local/remote base `889f7ab`; this record commit follows | NYSE sales reply and other exchange receipts | Classified NYSE public-specification/sample links and indicative pricing as unqualified sales information; distinguished Nasdaq routing and two support acknowledgments; rechecked public metadata; recorded no source-gate closure. Private bodies, personal contacts and quote amount are not published. | Exact document/diff checks and remote equality verified at handoff. No code/test change or full lane/repository run. Authorized/consumed looks **0/0**. | All three source P2s, prospective commitment advisory and shared out-of-lane P2 unchanged. No purchase, samples, new correspondence or data admission. | One standing-authorized lane push; Claude reviews the extended exact snapshot. Obtain original/latest-vintage and rights clarification before source-specific implementation or procurement. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -10885,3 +10890,82 @@ unchanged; authorized/consumed outcome looks **0/0**. No vendor email,
 provider/QC account, scheduler, broker or trading action was added in this
 publication round. Git fetch and the expressly authorized push are the only
 external operations in this round.
+
+## 82. Received exchange responses: sales information, not source admission — 2026-10-05
+
+### 82.1 Receipt classification and privacy boundary
+
+Following the owner's notification of a received response, Codex read the
+four existing inquiry threads and searched received messages across spam/trash
+for the relevant vendors and short-interest terms. The bounded search returned
+four received messages and no continuation page. Direct reads distinguish:
+
+| Received message | Type | Qualification disposition |
+|---|---|---|
+| NYSE sales reply, 2026-10-05T19:28:47Z; message `1a10d8a71daf49c3`, existing NYSE inquiry thread | Human sales/product response linking the public v1.7 specification and a sample-data location, with indicative content-month pricing. | Genuine response received; original/correction archive, actual availability, exhaustive inventory and applicable rights were not answered. No source admitted. |
+| Nasdaq sales response, 2026-10-05T19:00:25Z; message `1a10d706c08df680`, existing Nasdaq inquiry thread | Human routing of the inquiry to another colleague. | Routing only, with no substantive source or license answer. |
+| NYSE support acknowledgment; message `1a10d653a792906b` | Automated case-opening receipt. | Administrative receipt, not an archive, coverage or entitlement guarantee. |
+| Nasdaq support acknowledgment; message `1a10d6491b39b98a` | Automated case submission/support-channel information. | Administrative receipt, not an archive, coverage or entitlement guarantee. |
+
+QuoteMedia and Intrinio threads still contained only their outgoing inquiries
+at this check. This observation is bounded to the connected mailbox and the
+specified search/thread reads; it is not a guarantee about future replies.
+
+Only de-identified receipt/qualification summaries and opaque message
+references are recorded here. Private message bodies, individual contacts,
+phone numbers, support-case contents and the commercial quote amount are not
+published in Git. No attachment image or sample file was opened or downloaded;
+the received MIME images are not treated as data evidence. The sample link
+is an invitation to inspect data, not archival or QC-processing permission.
+
+### 82.2 Public metadata check and persistent gates
+
+The linked [NYSE v1.7 specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf)
+was checked as public schema/delivery metadata only. It documents scheduled
+2 p.m. ET delivery, settlement-dated filenames, a prior-period revision flag,
+symbols/CUSIPs and current market codes including NYSE Texas. Those fields do
+not establish original-file retention, every revision's availability or an
+effective-dated historical identity archive. The [public catalog](https://www.nyse.com/data-products/catalog/nyse-group-short-interest)
+advertises historical NYSE/Arca/American coverage; the exact historical scope,
+delisted retention and Texas transition still need reconciliation.
+
+| Existing finding | Priority | Effect of the new replies |
+|---|---|---|
+| `SI-SRC-20260928-001` | P2 | Still open: no authenticated historical release/correction availability or delay-exception manifest. Authenticated dates with conservative next-open treatment remain a possible route; exact intraday precision is not invented. |
+| `SI-SRC-20260928-002` | P2 | Still open: no preserved original/all-correction archive or exhaustive affected-release inventory. Sample access and a revision flag do not qualify either route. |
+| `SI-SRC-20260928-003` | P2 | Still open: exact historical population/identity, companion PIT inputs and terminal values, local archival rights and separate QC-processing permissions remain unverified. |
+| `SI-CR15-001` | P3 | Retained: indicative pricing is now present, but no purchase, trial or contract acceptance occurred. A concrete commitment would need its exact scope/terms and applicable owner authorization; metadata assessment remains permitted. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Shared/out of lane, unchanged and unfixed. |
+
+The quoted content-month unit is not a confirmed recurring subscription or an
+approved procurement budget. Its historical range, supplied versions, delivery,
+minimum purchase and additional fees remain unspecified; no total cost is
+extrapolated or accepted. Pricing does not establish data suitability.
+
+### 82.3 Next clarification and completed-round handoff
+
+The next useful NYSE clarification is a direct original-versus-latest-history
+answer, followed by a metadata-only settlement/version/availability manifest
+or exhaustive correction inventory, full historical scope and applicable
+local archival/retention/QC terms. The content-month unit and included versions
+must be clarified before any procurement decision. These are qualification
+questions, not a request to activate access or accept the quote. No new email,
+draft, form, account, purchase, trial or terms acceptance was made this round.
+The October 19 deadline and stopped-monitor state are unchanged.
+
+The lane-only fetch found no new remote commit: clean local and remote base
+are both `889f7ab01730268516ec0c0f18112a35fc62c06d`. This round changes only
+this record; no code/test or frozen project-wide document is modified. The
+initial active-document check passed **69 tests in 16.15s**, with no pytest
+warnings; `git diff --check` is clean. Final post-count-edit documentation and
+status checks precede the single standing-authorized round-end push; their
+results and exact remote hash are reported in the conversation handoff.
+No full lane/repository suite is run by Codex.
+
+No source is admitted, exclusion applied, collector implemented/activated,
+market row or return accessed, QC job run, or later milestone completed.
+Source/outcome/holdout/QC/broker/deployment/order/trading gates remain closed;
+authorized/consumed outcome looks **0/0**. Claude's pending exact review range
+extends from `a31805a` through the newly published record head, including this
+received-response disposition. Receipt of a sales quote does not constitute
+independent review or satisfy the factual source gates.

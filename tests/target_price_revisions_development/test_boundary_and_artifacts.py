@@ -53,7 +53,7 @@ def test_transitive_development_import_escape_refuses(tmp_path, forbidden) -> No
         )
 
 
-def test_recorded_real_audit_binds_current_code_and_zero_outcome_contract() -> None:
+def test_recorded_real_audit_binds_current_code_and_zero_outcome_contract(aggregate_only) -> None:
     plans = list(ARTIFACTS.glob("tpr-d0-plan.*.json"))
     reports = list(ARTIFACTS.glob("tpr-d0-structure.*.json"))
     assert len(plans) == len(reports) == 1
@@ -62,6 +62,8 @@ def test_recorded_real_audit_binds_current_code_and_zero_outcome_contract() -> N
     assert plans[0].name == f"tpr-d0-plan.{plan.sha256}.json"
     report_bytes = reports[0].read_bytes()
     report = strict_artifact(report_bytes)
+    # TPR-CR16-001: the pushed report itself must satisfy the closed contract.
+    aggregate_only(report)
     assert reports[0].name == f"tpr-d0-structure.{digest(report_bytes)}.json"
     assert report["plan_sha256"] == plan.sha256
     assert report["source_manifest_sha256"] == SOURCE_PROFILE["manifest_sha256"]

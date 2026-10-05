@@ -6672,3 +6672,39 @@ authenticated cells 699 unchanged. R-281 has now had three launches and no
 further R-281 attempt may be made. Closing reconciled floor after this
 review: **313 shared looks / 239 ARV2 development evaluations / 49
 infrastructure looks / 699 authenticated cells**.
+
+## Analyst section-249 counter-review qualifications and identity cross-references — 2026-10-05
+
+This append-only correction qualifies the section-248 reconciliation above.
+R281's project has **two actual QC backtests**, A2 and the unrecorded rerun;
+the pre-create A1 failed before a backtest identity. They consume **three
+attempt slots**, and the conservative additional rerun look remains +1.
+The earlier "third backtest" / "three launches" wording conflated these
+units. No research-look or result count changes here.
+
+The reported current Runtime Error for R280 A1 and R281 A2 is consistent
+with post-read shutdown/status drift but does not prove the historical
+read path or timing. The reader's two Completed. checks establish permitted
+behavior; authentic terminal/read-claim/raw-custom/result and source identity
+metadata must establish actual behavior. Those private artifacts are absent
+from the Windows counter-review checkout. The two stress cells are
+conditionally retained under ARV2R248-002, and the four-arm five-bps
+comparison remains under review. No historical result is reread, actor
+inferred or QC look spent. Unknown-source extra runs have no tracked admitted
+result here; that cannot establish that no other tool/operator read them.
+
+The six failed R177 Mia backtests were already counted among the nine later
+runs in the original R177 ledger entry and named in lane section 173.
+Their omitted shared-ledger identities are appended here, all reported
+Runtime Error: `866be9f453cbe55ae4a4ea17381b85f5`,
+`98a200dcce8438bcaad2fb97bdedbf12`, `4f2f8499eee532b9fe02f328e4894980`,
+`7cca37faf2999d229027a6907557d7a2`, `8e49867d1bac164a8d553c6792b02407`,
+and `e75d54492a9c431820c8f8743510387f`. This identity repair adds zero looks.
+Lane section 249 also lists the twelve R210-R221 identities already present
+here, closing the opposite omission without counting them twice.
+
+Closing conservative floor stays **313 shared / 239 ARV2 development /
+49 infrastructure / 699 booked cells**, including two stress cells whose
+retained receipt provenance remains under review. Unknown-source run
+classifications remain conservative, not independently authenticated.
+No source, outcome, paper or trading authority follows.

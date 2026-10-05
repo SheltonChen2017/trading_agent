@@ -321,6 +321,13 @@ test-only correction, a third QC census reconciling fifteen unrecorded
 launches into the shared ledger at **313 / 239 / 49 / 699**, and QC's
 current `Runtime Error` status for R280 A1 and R281 A2 plus an unrecorded
 R-281 rerun recorded for Codex to resolve from its receipts.
+Section 249 counter-reviews all three section-248 commits. The test pin is
+accepted; the ledger and record are accepted after three prospective P3
+documentation corrections. Fifteen unique added IDs and +15/+6/+9 accounting
+reproduce. The two stress cells remain under review: this Windows checkout
+has no retained control receipts or delta package, so post-read status drift,
+operator attribution and cloud-source identity are not independently established.
+No new look or readiness milestone occurs.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1132,10 +1139,15 @@ regression pin `ce0e69bb`. Section 247 accepts both Claude commits after
 counter-review. Section 248 is the Windows-host Claude session's independent
 review of the exact pushed range `b212048e..f0318d6f` (sections 219–247),
 with a third QC census and status-only reads of the stress backtests. The
-immediate next step is that Codex must counter-review section 248 and its
-three commits, answer `ARV2R248-002`, `-003` and `-004` from its retained
-receipts, and confirm or correct the reconciled floor **313 / 239 / 49 /
-699**, unless the owner explicitly changes this workflow.
+immediate next step is that Claude must review section 249 and its exact
+pushed documentation snapshot. Section 249 has reviewed all three new
+Claude commits and confirmed the conservative floor **313 / 239 / 49 /
+699**. `ARV2R248-002`, `-003` and `-004` remain open until the machine
+holding the original receipts authenticates the stress reads, establishes
+the extra launch paths and compares exact retained/cloud source identities.
+The 699 booked cells include two stress cells under review; their four-arm
+comparison is conditional pending that evidence. No new QC read or rerun
+is inferred from this handoff.
 The owner may suppress acknowledgement-only rounds while retaining active
 monitoring; no such exception or monitor pause has been inferred.
 The next readiness step is the independent evidence acquisition/admission
@@ -2929,6 +2941,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-03 | Claude independent review of section 245: the counter-review of section 244 and its citation correction | `e56c6e3e` -> this record commit | Section 246: one record-only commit `cf465504..e56c6e3e` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | Test-only pin `ce0e69bb` adds two record-integrity tests for parenthesized subsection citations (`ARV2CR245-001`), proved red on `cf465504` and by two in-memory mutations; no production code changed; section 4 names section 246, banner sentence added, this row appended | Complete lane selection at `e56c6e3e` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check; record gates, `compileall` and `git diff --check` on the final tree; exact counts in 246.5 | 0 P0, 0 P1, 0 P2, 0 P3 new; `ARV2CR245-001` accepted and pinned | Single push of this round's two Claude commits; Codex counter-reviews section 246 unless the owner changes the workflow |
 | 2026-10-03 | Codex section-246 counter-review | `625742af` -> this round's final record commit | Section 247 accepts both Claude commits; no provider/QC launcher, capture, result read, order, look, evaluation or cell; floor 298/233/40/699. | Citation regression pin accepted and its historical red plus both in-memory mutations corroborated. Codex changes only the lane record; no production, policy, trust-root, authority, cadence or readiness change. | Strict-network-denied focused record checks and citation trials, actual trust-root hashes and final scope checks in 247.3; no complete Codex suite. | No new P0/P1/P2/P3. `ARV2CR245-001` corrected and regression-pinned; all carried source/formal/paper gates remain. | Exactly one matching-lane record push; await Claude section-247 review unless the owner changes the workflow. Monitor active and quiet while unchanged. |
 | 2026-10-05 | Claude (Windows host) independent review of `b212048e..f0318d6f`, third QC-census reconciliation, and the stress arms' current QC status | `f0318d6f` -> `28bcc887` -> `8f87018e` -> this record commit | Review of the forty commits pushed since `b212048e` (sections 219–247): the fourteen Claude review sections and their Codex counter-reviews confirmed by this host's gates, section 247 reviewed for the first time, and a census of every lane QC project reconciled into the look ledger (section 248) | Synced the lane clone by fast-forward on this Windows host. Immutability of V16–V19 and the cap-90 bridge runtime re-verified from committed blobs; section 247's diff scope, citation trials, trust-root hashes and validation arithmetic reproduced. An administrative census (zero looks) of 188 lane projects and 281 backtests found fifteen launches in five projects that neither the record nor the shared ledger knows, including an unrecorded R-281 rerun; status-only reads show QC now lists R280 A1 and R281 A2 as `Runtime Error` after their recorded `Completed.` reads. Appended five ledger entries and reconciled the totals from 298/233/40/699 to **313/239/49/699**; one test case and one fixture change added, no production line changed. | Real tree at `f0318d6f`: `compileall` exit 0; `git diff --check` clean; record and active-document gates **84 passed**; final record bytes **84 passed**. Guarded LF worktree: standing gates 26 failed (firewall host class), 242 passed; complete Analyst lane suite: **not complete at push time**: the owner directed this push before the detached run finished (started 11:21 local on 2026-10-05, at 52% of 9,580 collected tests when the push was made); its counts are to be recorded in the next round. The previous complete run on this host, at `b212048e` on 2026-09-29, ended 1074 failed, 6591 passed, 922 skipped, 698 errors in 2:24:02, every failure and error in the host classes of `ARV2R165-001`. Mutation trials on the attribution study: six of six mutations red with the correction; A2 (interaction contrast) and A3 (manifest digest) survived the committed tests. QC access: administrative census, status-only reads and file inventory; no result, statistic, chart, order, log, price, provider row, return or Object Store payload read. | 0 P0, 0 P1. `ARV2R248-001` (P2, corrected): fifteen unrecorded launches reconciled. `ARV2R248-002` (P2, open for Codex): R280 A1 and R281 A2 now `Runtime Error` at QC. `ARV2R248-003` (P2, open): unrecorded R-281 rerun and later file saves. `ARV2R248-004` (P2, open): `R247A4`–`A9` launches past the frozen limit. `ARV2R248-005` (P3, corrected): stale banner and section-4 anchors. `ARV2R248-006`/`-007`/`-008`/`-010` (P3, documented). `ARV2R248-009` (P3, corrected, test-only): two unpinned attribution-study guards. | Codex counter-reviews section 248 and its commits, answers `ARV2R248-002`, `-003` and `-004` with receipts, and confirms or corrects the reconciled classification. No stress successor, further sweep, R-247 or R-281 attempt, levered target, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
+| 2026-10-05 | Codex counter-review of every unreviewed section-248 commit | `f0318d6f` -> `c2112b11` -> this record commit | One test commit accepted; ledger and record accepted after prospective documentation corrections. Fifteen distinct added IDs and look arithmetic verified; no new QC/provider look or result cell. | Corrected R281 attempt-versus-backtest wording, qualified unproven post-read status drift and named the test correction's actual snapshot; appended missing R210-R221 and R177 identity cross-references without counting them again. No production or test source changed. | Native Windows record checks and separately qualified in-memory attribution verification in 249.4; final diff/scope checks. No complete Codex suite or production POSIX-path validation. | Three P3 documentation findings corrected prospectively. ARV2R248-002/-003/-004 remain open because retained receipts and source package are absent here. Out-of-lane findings remain documented and unfixed. | One same-lane documentation push after validation. Claude must review section 249; obtain original retained metadata/source evidence before resolving stress validity or extra launch attribution. No further R247/R281 attempt or readiness implementation. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -34780,3 +34793,130 @@ corrected. No stress successor, further sweep, R-247 or R-281 attempt,
 levered target, paper/live deployment, broker, funded-account, real-order
 or trading action is authorised, and the external evidence stop of 231.3
 stands. `ARV2CR28-008` remains out of lane.
+
+## 249. Codex counter-review of all unreviewed section-248 commits, 2026-10-05
+
+### 249.1 Exact scope and commit dispositions
+
+The owner requested review of all unreviewed commits. The fetched remote and
+local head both resolve to `c2112b114a3dde0cb0e794c9223c19efecf695ba`, on
+`codex/strategy-analyst-revisions-v2`, in the designated Windows worktree
+`C:\git\customizedAgent\trading_agent_analyst_revisions`. The starting tree
+is clean. The earlier forty-commit range already has section 248's review;
+the unreviewed range is exactly `f0318d6f..c2112b11`, three ordered Claude
+commits. The previously uncommitted attribution edits are now exactly the
+tracked correction in the first commit; there is no separate dirty patch.
+Codex read every complete commit message/diff, the cumulative three-file
+tree, review/process contracts, affected tests and production helpers.
+Read-only advisory audits corroborate the checks below; they do not replace
+the independent Claude role or create external evidence.
+
+| Commit | Disposition | Evidence and limitation |
+|---|---|---|
+| `28bcc887288e494216b2edb34f03b8ee423b0090` | accepted; no source defect found | Test-only change makes the factorial fixture non-degenerate and checks tampered/missing manifests plus an independently pinned launcher. The interaction is 20 pp while the plain weight contrast is 10 pp. No production, manifest, economic or action boundary changes. Verification is qualified by Windows import limitations in 249.4. |
+| `8f87018e031213c2648f3a4ec75da7fac28e3591` | accepted after prospective documentation correction | All fifteen added full IDs and eight-character prefixes are unique and absent from both parent documents. +15 shared, +6 development and +9 infrastructure reproduces 313/239/49/699. R281 has two actual backtests and three consumed attempt slots; post-read status drift awaits original receipts. The shared-ledger appendix corrects these claims without rewriting historical entries or adding looks. |
+| `c2112b114a3dde0cb0e794c9223c19efecf695ba` | accepted after prospective documentation correction | Record links, test correction and arithmetic agree. The 14-tests-at-f0318d6f claim, attempt/backtest wording and categorical status-drift inference are qualified below. QC census/status observations, actor/source provenance and unfinished complete suite remain Claude-reported rather than independently reproduced here. |
+
+**Verdict: accepted after documentation correction; 0 new P0/P1/P2 and
+3 new P3 findings. Review quality: 8/10.** The test pin and conservative
+look accounting are useful; external evidence is insufficient to close the
+three existing P2 provenance findings. This verdict accepts the correction
+commits, not the disputed stress-result interpretation or forward readiness.
+No new implementation milestone is started.
+
+### 249.2 Findings and exact dispositions
+
+| ID | Priority | Status | Commit / location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|
+| `ARV2CR249-001` | P3 | Corrected prospectively | `8f87018e`, R281 ledger addendum; `c2112b11`, 248.5 | "Third backtest" and "three launches" conflate a failed pre-create attempt with an actual QC run. | Section 219 records zero remote runs for A1; 248.4 lists two backtests in project 37165262. | Attempt budgets and remote censuses use different units. | Two backtests, A2/rerun; three consumed slots, A1/A2/rerun. Additional rerun look stays +1. | Tracked IDs, pre-create refusal and unchanged arithmetic checked. |
+| `ARV2CR249-002` | P3 | Corrected prospectively; underlying P2 open | `8f87018e` status addendum; `c2112b11`, 248.2/248.5 | Post-read drift and historical read/actor exclusions exceed available evidence. | Reader requires Completed. at receipt and response checks; this proves permitted behavior, not which historical path executed. Private control receipts are absent here. | Code cannot prove past execution, timing, source or operator. | Drift is consistent with reported shutdown errors but unproven. Extra runs have no tracked admitted read; operator/source/other reads remain unknown. | Both guards inspected; artifact absence checked; no remote/outcome read. |
+| `ARV2CR249-003` | P3 | Corrected prospectively | `c2112b11`, 248.6/248.7 | "14/14 at f0318d6f" names a committed thirteen-case tree; scratch results do not establish native worktree validation. | 28bcc887 adds the fourteenth case; 248.7 itself reports thirteen committed/fourteen corrected and an unfinished complete run. | Validation must name actual bytes, host accommodation and completion status. | Fourteen belongs to 28bcc887 and later or a disclosed correction overlay; complete validation remains pending. | Native record checks plus qualified isolated-function trials in 249.4. |
+| `ARV2R248-002` | P2 | Open | R280-A1/R281-A2 receipt chain | Reported current Runtime Error differs from recorded Completed. reads. | Guards intact; original receipt/source chain absent here. | Authenticate exact historical reads before clearing the stress comparison. | Obtain terminal/read-claim/raw-custom/result identity/status and source metadata, plus original read-time evidence; file modification times cannot manufacture it. | No return reread or cell withdrawal justified by available evidence. |
+| `ARV2R248-003` | P2 | Open | R281 rerun and later file saves | Operator and run-specific source identity unknown. | Save times do not prove launch-time bytes or actor. | Current cloud content cannot authenticate a prior rerun alone. | Require original launch-path evidence and immutable seventeen-file manifest comparison; distinguish current-source from launch-time proof. | No QC/credential/private source access exercised here. |
+| `ARV2R248-004` | P2 | Open | Seven later R247 probes | Exhaustion and later probes need path/operator reconciliation. | Committed launcher capped at A3; names do not identify operator/tool. | Avoid unsupported attribution to Codex, Claude, Mia or owner. | Require original tool/host history and scoped authority; retain exhaustion and exclude probes from forward evidence. | No A4 route or retry added; no actor inferred. |
+
+`ARV2R248-001` is confirmed as conservative bookkeeping: fifteen new IDs,
+no new cells. Unknown-source/default-named runs' +6/+9 classifications
+remain conservative classifications, not authenticated source descriptions.
+The 188-project/281-backtest census and current QC status projections remain
+Claude-reported; tracked reconciliation is verifiable without credentials.
+Heuristic project selection does not prove completeness for every renamed
+or otherwise undiscovered lane project.
+
+`ARV2R248-005` and `-009` stay corrected. `-007` stays documented: the gate
+checks candidate headings rather than every run. `-008` remains a Windows
+host limitation; no port is made. `-010` is future runtime-pin debt, not a
+retroactive change to spent R278. Out-of-lane `ARV2CR28-008` is not fixed.
+
+### 249.3 Cross-document identity closure and unchanged accounting
+
+These twelve IDs already exist in the shared ledger; the append-only table
+closes their omission from this record. No new launch/look/read is recorded.
+
+| Candidate | Existing backtest ID |
+|---|---|
+| R210 | `7ce855ca03066d9317ad825a9d57cff0` |
+| R211 | `29559dc652911e93a03465f84412765a` |
+| R212 | `0966264e2ff7ddc042ac8e1129885196` |
+| R213 | `11e54c1c7af7193fbe21f76292886636` |
+| R214 | `4edc6954f573fd2624f7fd381a014fc3` |
+| R215 | `78acf4051b06bb482d9cf002baf8c0b5` |
+| R216 | `b9eee5b433c71b8f57faee629aaa37e3` |
+| R217 | `dff7b806e543a885e6b35a6c3487eb45` |
+| R218 | `7aa218f6371c458ff3a250e43e0ef428` |
+| R219 | `166f906ab5144ef84eee4107c0b3f670` |
+| R220 | `9f38b5c172f30d93c222c64aeadc7b32` |
+| R221 | `c76bd1544ee04df6bd94c3c046042bd9` |
+
+The six Runtime Error R177 Mia IDs in section 173 are appended by identity
+to the shared ledger. Its original R177 entry already counted all nine
+later runs, including those six; adding looks again would double-count.
+`ARV2R248-006` closes as an identity repair with no accounting change.
+Floor remains **313 / 239 / 49 / 699**. The last column includes two
+stress cells under review (`ARV2R248-002`); values are conditionally retained,
+not independently cleared here. The four-arm five-bps comparison remains
+under review pending receipt authentication.
+
+### 249.4 Validation on the actual Windows host
+
+Main-agent repository commands/checks use the designated lane worktree.
+Python is 3.13.14; the Windows Store AppExecLink requires the approved
+execution path. Test processes block socket connect/connect_ex and
+create_connection in memory. No production or test source is changed for
+a mutation or committed in this round.
+
+| Check | Result and limitation |
+|---|---|
+| Native record/active-document tests on exact c2112b11 | **84 passed in 3.65s**, no failures/skips/warnings. |
+| Native combined attribution/record collection | **1 collection error in 6.76s**, missing fcntl; no test count claimed. |
+| fcntl import refusal shim alone | **1 collection error in 7.98s**, absent os.register_at_fork; lock primitives refuse if called. |
+| Exact isolated original/corrected test functions | **13 original and 14 corrected pass**. In-memory fixture paths, a refusing fcntl shim, and removal of unavailable register_at_fork from an in-memory formal-adapter sealing inventory permit isolated Windows loading. This is not native integration or physical-layer validation; durations were not instrumented. |
+| Isolated mutations | Replacing the annual interaction with the plain weight contrast leaves original thirteen green but fails the corrected interaction assertion (10 versus 20). Removing only the manifest-digest check likewise leaves thirteen green but fails the new expected-refusal test. A launcher-pin-only mutation fails its third phase. All functions restored in finally blocks; no source-file mutation. |
+| Independent bookkeeping | Fifteen distinct full IDs/prefixes; zero prior prefix occurrences in either parent document; +15/+6/+9 exact. Six R177 identities already included in prior totals. |
+| Full suite | Not rerun by Codex under the focused-check lane rule. Section 248's detached Windows complete run remains pending; no complete final-tree validation is asserted. |
+| Final native record gates | **84 passed in 14.17s** after both documentation edits, no failures/skips/warnings; rerun after recording this result before commit. |
+| Final integrity checks | Diff checks clean; only the two documentation files change. Three actual trust-root hashes remain 3152aca0..., e8c1a2a7... and 23f23d19..., matching 231.3; no production, test, manifest or registry changed. Exact branch/HEAD/remote and staged scope are rechecked before the single push. |
+
+The isolated trials corroborate the two test pins only. They do not exercise
+POSIX archive/locking behavior, authenticate QC processing or historical
+read receipts, or upgrade section 248's scratch suite to compliant native
+designated-worktree validation. Historical Mac suite evidence remains
+attributed to its exact earlier tree. No full-suite exception is inferred.
+
+### 249.5 Handoff and next evidence action
+
+Claude must review section 249 and this documentation-only correction
+snapshot. All three new section-248 commits have been reviewed; older
+handled commits are not reopened merely to repeat an acknowledgement.
+The owner's serialized cadence and monitor remain unchanged. The original
+host must authenticate R280-A1/R281-A2 retained metadata/source/read evidence
+and reconcile the R281/R247 extra launch paths. Neither remote timestamps
+nor Git authorship alone establish those facts.
+
+No new QC/provider call, credential value, licensed row, return, order,
+Object Store payload, deployment or trading action occurs here. R247/R281
+remain attempt-exhausted. Vendor availability, security/own-ETF identity,
+scores and RAW-price evidence remains the separate readiness stop in 231.3;
+steps 2-5 are incomplete. Formal bindings, the sole Analyst look with total
+two-sided alpha at most 1/80 and the exact QC Paper permit remain unchanged.
+No next milestone, stress successor or outcome authority follows.

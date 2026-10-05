@@ -3,7 +3,10 @@
 Status: **CODEX ACCEPTED CLAUDE'S PUSHED RECORD COMMIT `a31805a` WITHOUT
 CORRECTION (SECTION 79). THE TWO PREVIOUSLY LOCAL CLAUDE REGRESSIONS IN
 `7cd39a0` REMAIN PRESERVED BY SYNC MERGE `e00aa35`; THEIR COUNTERCHECK IS
-ADVISORY UNTIL THEY ENTER A PUSHED REVIEW SNAPSHOT. UNDER THE OWNER'S
+ADVISORY AND FORMAL INDEPENDENT REVIEW REMAINS DUE ON THE PUBLISHED SNAPSHOT.
+THE OWNER NOW DIRECTS ONE COMBINED PUSH AT THE END OF EVERY COMPLETED LANE
+ROUND (SECTION 81), SUPERSEDING THE OLD SOURCE-BLOCKER NO-PARTIAL-PUSH RULE.
+THIS ALSO AUTHORIZES PUBLICATION OF THE ACCUMULATED LOCAL RANGE. UNDER THE OWNER'S
 "do 1234" FALLBACK INSTRUCTION, CODEX SENT ONE NYSE AND ONE NASDAQ FOLLOW-UP
 WITH ALTERNATE SUPPORT CONTACTS COPIED, AND ONE METADATA-ONLY INQUIRY EACH
 TO QUOTEMEDIA AND INTRINIO (SECTION 80). THE RESPONSE DEADLINE IS
@@ -23,12 +26,12 @@ ADMISSION, LICENSED ROWS, ACTUAL PRICES/OUTCOMES, HOLDOUT, WINNER SELECTION,
 PRODUCTION SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
 PURCHASE, BROKER, DEPLOYMENT, PAPER/LIVE, ORDER AND TRADING GATES REMAIN CLOSED.**
 
-The counter-review/source-assessment and fallback record are local-only:
-last fetched remote remains `a31805afd7720c700527a6f3e42912e850deffa8`;
-`7cd39a0`, sync merge `e00aa35`, `165ffb3` and this record's new commit are
-unpublished. No fetch was made during the fallback task. The source-gate
-no-partial-push rule in sections 66.1 and 76.4-76.6 remains in force; the
-2026-09-30 checkpoint exception does not authorize another checkpoint push.
+Current publication rule (owner direction, 2026-10-05): finish each bounded
+lane round with **one combined push** to `origin/codex/strategy-short-interest`
+and verify the exact remote head. Sections 79-80's local-only/no-push statements
+describe those earlier rounds; section 81 supersedes their publication stop.
+Factual source, provider, outcome, QC, financial/contractual and trading gates
+remain unchanged. No branch switch, alternate branch or force push is allowed.
 
 Branch: `codex/strategy-short-interest`
 
@@ -198,6 +201,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-30 | Claude review | `614214a` -> `d528615` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review, the verbatim-provenance rebinding, the QC reply and the exchange-archive inquiries | Verified the protocol's new owner binding equals `git show 0e31505:<record>`; that each of the six owner quotations occurs exactly once there as a blockquote and in none of the old `b13e9be` blob, so the new test is load-bearing; and that the new protocol identity recomputes and reaches the preflight and cohort without a stale literal. Replaced the stale status block and reconstructed the missing Codex push-ledger row above. | Exact pushed tree `d528615`, clean, no mutation in flight: eighteen-file lane **815 passed in 3,259.82s** (unchanged from 815: the new assertions sit inside an existing test); compileall exit 0; active-document 69 passed; import boundary 9 passed; `git diff --check` clean. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR14-001` (P2) closed by correction. `SI-CR14-006` (P3) closed, resolved by the owner's quoted choice of scope and duration. **`SI-CR15-001` (P3, open, time-sensitive owner advisory): before any NYSE or Nasdaq reply is acted on, the owner should state whether the standing delegation covers purchases, subscriptions, trials, license or data terms, or any other financial or contractual commitment.** `SI-CR15-002` (P3, closed by record correction: Codex's round left the status block stale and added no push-ledger row). Source P2s and shared `SI-CR5-005` stay open. | Codex counter-reviews this record commit. `SI-CR15-001` needs a quoted owner answer before any vendor reply is acted on. No source is admitted; every outcome, holdout, ranking, seed, ETF, QuantConnect history/project/job/backtest, purchase, broker and trading gate remains closed. |
 | 2026-10-05 | Codex counter-review + source assessment (local-only session; no push) | Remote `a31805a`; local code/test merge `e00aa35` preserves `7cd39a0`; this record commit follows | Accepted latest Claude record; preserved-regression countercheck; current NYSE/Nasdaq qualification | Accepted pushed record `a31805a` unchanged; advisory retention of the two previously local tests after independent red/green checks; direct inquiry-thread reads and received/bounce searches found only the two original sent inquiries; public metadata did not clear the three source P2s. Conditional PIT adapter/backtest step remains blocked. | Restored regressions **2 passed, 53 deselected in 107.39s**; isolated serializer/batch-guard mutants **1 failed in 81.86s** and **1 failed in 104.51s**; focused protocol/preflight/import/document selection **126 passed in 4.71s**; collection only **817 in 2.78s**; active-document **69 passed**; compileall exit 0; diff clean. No full lane/repository execution by Codex. Authorized/consumed outcome looks **0/0**. | No new confirmed code defect. `SI-CR14-001`, `SI-CR14-006` and `SI-CR15-002` closed; commitment advisory `SI-CR15-001` retained narrowly; source P2s `SI-SRC-20260928-001..003` and shared P2 remain open. | Keep exact validated checkpoint local under the existing no-partial-push gate. A new direct checkpoint instruction is required before one push; then Claude reviews the preserved test commit, sync merge and this record. Source evidence must clear before PIT ingest or outcomes. |
 | 2026-10-05 | Codex source fallback (local-only session; no push) | Local `165ffb3`; last fetched remote `a31805a`; this record commit follows | Owner-directed fallback steps 1–4 | Sent one NYSE and one Nasdaq follow-up with alternate contacts copied, plus one metadata-only inquiry each to QuoteMedia and Intrinio; set October 19 response deadline; screened alternatives; documented exhaustive correction-exclusion and prospective raw-archive activation requirements. No code or actual collection. | Active-document checks **69 passed in 13.33s**, then **69 passed in 2.93s** after ledger edits; lane compilation exit 0; diff clean. No full lane/repository suite. Authorized/consumed outcome looks **0/0**. | Source P2s `SI-SRC-20260928-001..003` remain open; no source admitted. Current Compustat replacement concept excluded. Commitment advisory and shared out-of-lane P2 unchanged. | Assess qualifying metadata/archive or exhaustive correction inventory; establish concrete local archival rights and acquisition contract before prospective collection. No reminder/monitor restarted; no checkpoint push authorized. |
+| 2026-10-05 | Codex owner-directed round-end publication | Fresh remote `a31805a`; local `bb9c688`; this instruction/handoff record commit follows | Standing one-push rule and accumulated five-commit checkpoint | Recorded the owner's verbatim direction to push after every completed lane round, superseding only the old source-blocker publication stop. Fresh lane-only fetch found no new remote commit; preserved all four accumulated commits and their review limits. | Section-80 final documentation **69 passed in 4.47s**, compile exit 0; latest record checks and exact remote equality are verified at publication and reported in the handoff. No new code/test change or full lane/repository run. | All source P2s, the prospective commitment advisory and shared out-of-lane P2 remain unchanged; authorized/consumed outcome looks **0/0**. | One normal combined push to the dedicated lane ref, verify remote equality, then Claude reviews every commit in `a31805a..published HEAD`. Future completed rounds follow the same standing push rule. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -10806,3 +10810,78 @@ not a new checkpoint override of the specific no-partial-push rule. The prior
 local range plus this record stays unpublished; frozen project-wide documents
 are untouched. Independent Claude review remains due on the next expressly
 authorized exact pushed snapshot.
+
+## 81. Standing round-end push instruction and accumulated handoff — 2026-10-05
+
+### 81.1 Verbatim owner direction and durable publication rule
+
+After Codex stated that `bb9c688` was local-only under the old no-partial-push
+rule, the owner instructed:
+
+> everytime you finished a round, push
+
+`SI-AUTH-20261005-02` records a **standing Short Interest lane publication
+instruction**: after each completed, documented and validated bounded round,
+make one combined push of that round's accumulated committed range. This
+includes a completed counter-review, implementation, documentation or
+source-qualification round whose next milestone is factually blocked. A
+separate checkpoint push request is no longer required. The instruction also
+authorizes publication now of the previously accumulated local range.
+
+This later owner instruction supersedes the source-blocker **publication**
+restrictions in sections 66.1, 76.4-76.6, 79.5 and 80.6. It does not declare a
+blocked implementation complete, relax validation, accept an unreviewed
+snapshot, or establish source rights/coverage. All provider/market-row,
+outcome/look/holdout, QC, financial/contractual, broker, database, deployment,
+order and trading gates remain as recorded. The single-push-per-round rule,
+dedicated worktree/branch, frozen project-wide documents and serialized
+Claude-independent-review/Codex-counter-review workflow remain binding.
+No branch is switched or created and no history is rewritten.
+
+### 81.2 Exact accumulated range and verification boundary
+
+Before this documentation-only instruction record, the tree is clean at
+`bb9c6882a02ac956cd1911afdeeaf6478133b385`. A fetch of **only**
+`refs/heads/codex/strategy-short-interest`, without tags, confirms that the
+remote head is unchanged at
+`a31805afd7720c700527a6f3e42912e850deffa8`. No new Claude commit appeared,
+so the counter-review in section 79 is not silently reopened or extended.
+
+The accumulated unpublished range, in topological order, is:
+
+| Commit | Scope and existing evidence |
+|---|---|
+| `7cd39a0c8987e3a0a7c862d93b80f58281cc0ea6` | Preserved local Claude percentile-regression tests; advisory red/green countercheck in 79.2/79.4; formal review still due after publication. |
+| `e00aa3591acfa6783527292230f5f54da5677e46` | Same-branch sync merge preserving both histories and the local tests; merge conflict resolution and focused checks in section 78. |
+| `165ffb351b0191eba53e9a9148bf97f9f1a54b31` | Accepted counter-review of pushed `a31805a`, retained-test countercheck and unresolved vendor source evidence, section 79. |
+| `bb9c6882a02ac956cd1911afdeeaf6478133b385` | Four verified metadata-only emails, October 19 response deadline, alternative-source screening and conditional exclusion/prospective archival requirements, section 80. |
+| This instruction/handoff record commit | Standing push direction, current status and exact handoff; no code/test change. |
+
+Publish this complete range **once**, using a normal non-force push of the
+current validated `HEAD` to only `refs/heads/codex/strategy-short-interest`.
+Verify remote-head equality and a clean worktree afterward. If concurrent
+remote work prevents a fast-forward, preserve it and stop to reconcile;
+never force publication. The committed record authorizes this operation;
+actual push success and exact final hash must be established from Git's
+response and the remote check, not assumed in advance.
+
+### 81.3 Validation and review handoff
+
+This instruction record changes only this lane document. The code/test tree
+remains the same as the section-80 checkpoint. Its exact-final documentation
+check was **69 passed in 4.47s**, with lane compilation **exit 0** and a clean
+diff check. The first check of this latest instruction record and ledger
+passed **69 tests in 13.86s**, with no pytest warnings. The final
+post-count-edit check and final remote hash are reported in the conversation
+handoff. No full lane/repository suite is run by Codex; the source and test
+checks in sections 78-79 retain their original attribution and limits.
+
+Claude's next review covers **every commit in
+`a31805a..published HEAD`**, including the preserved test commit and the sync
+merge result. The snapshot contains no new source adapter, real collection,
+backtest or empirical result. Source P2s `SI-SRC-20260928-001..003`, shared
+out-of-lane P2 and the prospective financial/contractual advisory remain
+unchanged; authorized/consumed outcome looks **0/0**. No vendor email,
+provider/QC account, scheduler, broker or trading action was added in this
+publication round. Git fetch and the expressly authorized push are the only
+external operations in this round.

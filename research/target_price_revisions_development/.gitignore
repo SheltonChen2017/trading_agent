@@ -1,0 +1,4 @@
+!artifacts/
+artifacts/*
+!artifacts/tpr-d0-plan.*.json
+!artifacts/tpr-d0-structure.*.json

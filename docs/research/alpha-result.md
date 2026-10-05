@@ -6560,3 +6560,115 @@ development evidence, not independent alpha, forward efficacy, capacity,
 or a live-trading claim; the comparison consumes **no additional QC
 look** beyond the five stress attempts already counted (R280 A1,
 R281 A1/A2, R282 A1 and R283 A1).
+
+## R-053 project addendum — one unrecorded QC default-named launch (RETROACTIVELY RECONCILED FROM A QC CENSUS; NOT ADMISSIBLE) — 2026-10-05
+
+Written by the Claude review of section 248 on the Windows host. A
+2026-10-05 administrative census (zero looks: `projects/read` and
+`backtests/list` only) of every lane project finds a second backtest in the
+R-053 project `1 ARV2_ACCEPTED_RISK_PRELIMINARY - 20260914_R053B_c381be82`
+(`36561856`): `3724c5ef7b2a1801400a25d8b9d28c1a`, QC default-named
+`Energetic Yellow Green Penguin`, `Completed.`, created 2026-09-15 06:44:28
+UTC, eighty-three minutes after the recorded R-053 backtest
+`f3bd9f3fc3c2627784e93d761382cd04`. It appears in neither the lane record
+nor this ledger, was not launched through a committed launcher, its source
+is unproven, and the lane never read it. It is counted conservatively as
+one run of lane source over the research window: **298 -> 299 shared
+looks / 233 -> 234 ARV2 development evaluations**; infrastructure looks 40
+and authenticated cells 699 unchanged.
+
+## R-188 addendum — two unrecorded later launches in the R-188 project (RETROACTIVELY RECONCILED FROM A QC CENSUS; NOT ADMISSIBLE) — 2026-10-05
+
+Written by the Claude review of section 248. The same census (first taken
+on 2026-09-29, repeated 2026-10-05) finds three backtests in private
+project `111 ARV2 SIX CAP90 TILT60 R188 2021 2025` (`36935799`), not the
+one A1 cash-bound refusal recorded in section 184.2: two later launches on
+2026-09-25, `b6f6f9c2982a77e65ea65a229c624a03` (`ARV2 R188A1 ...
+cash-bound-fix`, `Runtime Error`, 21:51:16 UTC) and
+`a3641087140055bd45c3cda53c7fff58` (`ARV2 R188A1 ... plan-order-ledger`,
+`Completed.`, 22:02:13 UTC). Neither appears in the lane record or this
+ledger, neither was launched through a committed launcher, the completed
+run's source is unproven, and neither was read by the lane. They are
+counted conservatively as two order-based launches: **299 -> 301 shared
+looks / 234 -> 236 ARV2 development evaluations**; infrastructure looks 40
+and authenticated cells 699 unchanged. R-188's three attempt slots are now
+treated as spent.
+
+## R-225/R-226 matched-study project addendum — four unrecorded diagnostic launches (RETROACTIVELY RECONCILED; NOT ADMISSIBLE) — 2026-10-05
+
+Written by the Claude review of section 248. The matched historical study's
+private project `Systematic Weekly Large-Cap Equity` (`37017548`, sections
+198 and 199) holds eleven backtests; seven are recorded. Four launches on
+2026-09-27 are in neither the lane record nor this ledger:
+`fec7190dd22fdc729b7f23eea8831590` (`ARV2 R225 Mia recovery rerun 2021
+2025`, `Runtime Error`, 19:46:18 UTC), `8f953b104d921e0ddbea8968826775c6`
+(QC default-named `Hipster Magenta Hornet`, `Runtime Error`, 21:07:22 UTC),
+`2a8997349e5b52f8d394c939401f7dc4` and `c406bb01a6abce8cf4d32259993daee8`
+(`ARV2 dataset probe QCOM 20221003` and `... v2`, `Runtime Error`, 22:14:46
+and 22:19:19 UTC). They coincide with the owner-directed Mia
+reference-price tracing of section 199. All four refused at runtime; none
+was read. Every launch is one shared look. The two order-shaped runs are
+**301 -> 303 shared looks / 236 -> 238 ARV2 development evaluations**, and
+the two dataset probes are **303 -> 305 shared looks / 40 -> 42
+infrastructure looks**; cells unchanged at 699.
+
+## R-247 addendum — seven unrecorded launches after the three-attempt exhaustion (RETROACTIVELY RECONCILED; INFRASTRUCTURE LOOKS) — 2026-10-05
+
+Written by the Claude review of section 248. Section 212.6 closes R-247 as
+exhausted after A1, A2 and A3 in private project `ARV2 R247 FRESH SIX INPUT
+20260925` (`37097547`), and section 219.1 states "there is no R247 A4". The
+census finds ten backtests in that project: the three recorded attempts and
+**seven later launches on 2026-09-28**, none in the lane record or this
+ledger: `b3f993e79f4134ee9fc35b4a704ed8c6` (`ARV2 R247A4 ... clock
+diagnostics`, 20:39:34 UTC), `ffba0396842f1b64f58814d0fec1d8a4` (`R247A5
+... extended end date`, 20:42:24), `96fe4bce06c5cc3148c51dc19861b3bf`
+(`R247A6 ... morning pulse probe`, 20:43:59),
+`0966123feff2425fb383650942a0416b` (`R247A7 ... fire-time observation`,
+20:45:55), `2980321c46f19cf3d4ec62ed67671af3` (`R247A8 ... clock probe
+object store`, 20:49:03), `2549dc5a78e4601dec8d4950f18fc52d` (`R247A9 ...
+replica clock check`, 20:50:48), all `Runtime Error`, and
+`614b1b8b4ff0e968d642e3e8d0bfb515` (`ARV2 fresh-six persist fix verify`,
+`Completed.`, 20:58:59 UTC). Their names follow the launcher's attempt
+convention past the frozen A3, so they were launched outside the committed
+one-use path; whether by the owner through Mia or otherwise is not
+recorded. The lane read none of them, the completed run's source is
+unproven, and R-247's forward-input gate is unchanged. As input-only probes
+they are counted as **305 -> 312 shared looks / 42 -> 49 infrastructure
+looks**; development evaluations 238 and cells 699 unchanged.
+
+## R-280 A1 / R-281 A2 terminal-status drift and the unrecorded R-281 rerun (RETROACTIVELY RECONCILED; NOT ADMISSIBLE) — 2026-10-05
+
+Written by the Claude review of section 248. Status-only `backtests/read`
+projections on 2026-10-05 (name, status, completed flag, progress, error
+text, creation time and node; no statistic, chart, order, log or return)
+show that QuantConnect now lists R-280 A1 `f507db76969da35be849b71599077ba5`
+and R-281 A2 `2007f9f73fcbfa7fb5ba95abdb094831` as **`Runtime Error`**,
+each with `progress` 1, `completed` true and `hasInitializeError` false, and
+an engine shutdown-phase error (a `websocat` socket-leak message; for R-280
+also a failed `cloud/backtest/status/read` request and a ten-second
+`Execution Security Error` while shutting down Python). The entries above
+record both as `Completed.`. The lane's adapter writes its terminal receipt
+from the status it polls and refuses the one-use result read unless both
+that receipt and the live `backtests/read` response say `Completed.`, so the
+recorded results could only have been read while QC reported completion;
+the status drifted afterwards. The recorded figures and the two
+authenticated cells are retained pending Codex's confirmation from the
+retained terminal, read-claim and raw-custom receipts (section 248,
+`ARV2R248-002`); if the read happened under any other status, both cells
+must be withdrawn. R-282 A1 and R-283 A1 remain `Completed.`.
+
+The same project `ARV2 EIGHT EXECUTION STRESS R281 2021 2025` (`37165262`)
+holds a third backtest the record does not know:
+`44a66ce2bcf573b69902b4641eb56293`, named `ARV2 R281 fixed100 five-bps
+execution stress 2021 2025 A2 rerun after websocat infra error`,
+`Completed.`, created 2026-09-30 22:20:59 UTC, fourteen and a half hours
+after A2 and inside the section-220 review window; thirteen of the
+project's seventeen files carry a later modified timestamp, 2026-09-30
+22:57:42 UTC. It was not launched through the committed one-use path, the
+lane never read it, and its source is unverified from this host (section
+248.5). It is one further order-based launch: **312 -> 313 shared looks /
+238 -> 239 ARV2 development evaluations**; infrastructure looks 49 and
+authenticated cells 699 unchanged. R-281 has now had three launches and no
+further R-281 attempt may be made. Closing reconciled floor after this
+review: **313 shared looks / 239 ARV2 development evaluations / 49
+infrastructure looks / 699 authenticated cells**.

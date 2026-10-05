@@ -68,6 +68,7 @@ MIN_REQUEST_INTERVAL_SECONDS = 0.5
 _CONTACT_RE = re.compile(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,63}\Z")
 _XML_NAME_RE = re.compile(r"[A-Za-z0-9][A-Za-z0-9_-]*(?:\.[A-Za-z0-9_-]+)*\.xml\Z")
 _DATE_RE = re.compile(r"([0-9]{2})-([A-Z]{3})-([0-9]{4})\Z")
+_ASCII_DECIMAL_RE = re.compile(r"[0-9]{1,19}\Z")
 _MONTHS = {name: index for index, name in enumerate(
     ("JAN", "FEB", "MAR", "APR", "MAY", "JUN", "JUL", "AUG", "SEP", "OCT", "NOV", "DEC"), 1
 )}
@@ -84,6 +85,17 @@ _EXPECTED_ACCESSIONS = (
     "0000002178-23-000022", "0000002178-23-000023", "0000002178-23-000024",
     "0000016058-23-000011", "0000019745-23-000002",
 )
+
+
+def _ascii_decimal(value: object) -> bool:
+    """True only for ASCII digits.
+
+    ``str.isdigit()`` also accepts characters such as "\u00b2" that ``int()``
+    rejects, and digits from other scripts that ``int()`` silently converts.
+    http.client decodes header bytes as Latin-1, so both can reach a
+    Content-Length check; neither may escape as ValueError or be accepted.
+    """
+    return type(value) is str and _ASCII_DECIMAL_RE.fullmatch(value) is not None
 
 
 class SecPilotError(ValueError):
@@ -638,7 +650,7 @@ def _fetch_sec(path: str, user_agent: str) -> tuple[int, bytes]:
         lengths = [value for key, value in headers if key.lower() == "content-length"]
         encodings = [value for key, value in headers if key.lower() == "content-encoding"]
         transfers = [value for key, value in headers if key.lower() == "transfer-encoding"]
-        if len(lengths) != 1 or not lengths[0].isdigit() or int(lengths[0]) > MAX_BODY_BYTES:
+        if len(lengths) != 1 or not _ascii_decimal(lengths[0]) or int(lengths[0]) > MAX_BODY_BYTES:
             raise SecPilotGlobalStop("REFUSED: SEC response Content-Length is missing, duplicate or oversized")
         if len(encodings) > 1 or (encodings and encodings[0].lower() != "identity"):
             raise SecPilotGlobalStop("REFUSED: SEC response uses unsupported compression")

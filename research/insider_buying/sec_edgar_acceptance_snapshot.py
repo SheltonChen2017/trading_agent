@@ -82,6 +82,11 @@ _GIT_COMMIT_RE = re.compile(r"^[0-9a-f]{40}$")
 _IDENTIFIER_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._-]{0,127}$")
 _FIELD_NAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9_.-]{0,127}$")
 _FILING_DATE_RE = re.compile(r"^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+_UPSTREAM_LEGACY_FILING_DATE_RE = re.compile(r"^[0-9]{2}-[A-Z]{3}-[0-9]{4}$")
+_UPSTREAM_MONTHS = {
+    "JAN": 1, "FEB": 2, "MAR": 3, "APR": 4, "MAY": 5, "JUN": 6,
+    "JUL": 7, "AUG": 8, "SEP": 9, "OCT": 10, "NOV": 11, "DEC": 12,
+}
 _ACCEPTED_AT_RE = re.compile(
     r"^[0-9]{4}-[0-9]{2}-[0-9]{2}T"
     r"[0-9]{2}:[0-9]{2}:[0-9]{2}[+-][0-9]{2}:[0-9]{2}$"
@@ -877,6 +882,34 @@ def _parse_source_json(
     )
 
 
+def _upstream_submission_filing_date(value: str) -> tuple[date, str]:
+    """Parse one raw SUBMISSION date without rewriting its source row."""
+    if not isinstance(value, str):
+        raise SecEdgarAcceptanceSnapshotError(
+            "REFUSED: upstream SUBMISSION filing date is not text"
+        )
+    if _FILING_DATE_RE.fullmatch(value) is not None:
+        try:
+            return date.fromisoformat(value), "iso"
+        except ValueError as exc:
+            raise SecEdgarAcceptanceSnapshotError(
+                "REFUSED: upstream SUBMISSION filing date is invalid"
+            ) from exc
+    if _UPSTREAM_LEGACY_FILING_DATE_RE.fullmatch(value) is not None:
+        day_text, month_text, year_text = value.split("-")
+        month = _UPSTREAM_MONTHS.get(month_text)
+        if month is not None:
+            try:
+                return date(int(year_text), month, int(day_text)), "legacy"
+            except ValueError as exc:
+                raise SecEdgarAcceptanceSnapshotError(
+                    "REFUSED: upstream SUBMISSION filing date is invalid"
+                ) from exc
+    raise SecEdgarAcceptanceSnapshotError(
+        "REFUSED: upstream SUBMISSION filing date has an unsupported spelling"
+    )
+
+
 def _submission_rows(
     loaded: LoadedSecBulkParsedSnapshot,
 ) -> dict[str, tuple[object, str, date, str]]:
@@ -900,6 +933,7 @@ def _submission_rows(
         if row.table_name == "SUBMISSION.tsv"
     }
     result: dict[str, tuple[object, str, date, str]] = {}
+    filing_date_dialect: str | None = None
     for accession in loaded.accessions:
         row = by_row_id.get(accession.submission_row_id)
         if row is None:
@@ -915,16 +949,14 @@ def _submission_rows(
                 "REFUSED: parsed accession disagrees with its submission source row"
             )
         filing_date_text = values[filing_date_index]
-        if _FILING_DATE_RE.fullmatch(filing_date_text) is None:
+        filing_date, row_dialect = _upstream_submission_filing_date(
+            filing_date_text
+        )
+        if filing_date_dialect is not None and row_dialect != filing_date_dialect:
             raise SecEdgarAcceptanceSnapshotError(
-                "REFUSED: upstream SUBMISSION filing date is not canonical ISO text"
+                "REFUSED: upstream SUBMISSION filing date dialects are mixed"
             )
-        try:
-            filing_date = date.fromisoformat(filing_date_text)
-        except ValueError as exc:
-            raise SecEdgarAcceptanceSnapshotError(
-                "REFUSED: upstream SUBMISSION filing date is invalid"
-            ) from exc
+        filing_date_dialect = row_dialect
         filing_quarter = (filing_date.month - 1) // 3 + 1
         accession_year = int(accession.accession_number[11:13])
         if (

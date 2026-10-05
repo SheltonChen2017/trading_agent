@@ -1,16 +1,19 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE'S PUSHED RECORD COMMIT `a31805a`
-AND ACCEPTED IT WITHOUT CORRECTION (SECTION 79). THE TWO PREVIOUSLY LOCAL
-CLAUDE REGRESSIONS IN `7cd39a0` ARE PRESERVED BY SYNC MERGE `e00aa35`;
-THEIR COUNTERCHECK IS ADVISORY UNTIL THEY ARE IN THE NEXT PUSHED REVIEW
-SNAPSHOT. THE 2026-10-05 MAILBOX CHECK FOUND ONLY THE ORIGINAL SENT NYSE
-AND NASDAQ INQUIRIES, WITH NO REPLY OR MATCHING BOUNCE. PUBLIC PRODUCT
-DOCUMENTS ALSO DO NOT ESTABLISH HISTORICAL AS-PUBLISHED/CORRECTION VINTAGES,
-ACTUAL RELEASE TIMES, COMPLETE PIT COVERAGE OR ACCOUNT-SPECIFIC LOCAL/QC
-RIGHTS. ALL THREE SOURCE P2S REMAIN OPEN, SO THE REQUESTED CONDITIONAL PIT
-ADAPTER AND HISTORICAL STOCK TEST CANNOT START. THE EXISTING SYNTHETIC SI-5
-PROTOCOL, COHORT AND BLOCKED PREFLIGHT REMAIN THE CURRENT SOFTWARE.
+Status: **CODEX ACCEPTED CLAUDE'S PUSHED RECORD COMMIT `a31805a` WITHOUT
+CORRECTION (SECTION 79). THE TWO PREVIOUSLY LOCAL CLAUDE REGRESSIONS IN
+`7cd39a0` REMAIN PRESERVED BY SYNC MERGE `e00aa35`; THEIR COUNTERCHECK IS
+ADVISORY UNTIL THEY ENTER A PUSHED REVIEW SNAPSHOT. UNDER THE OWNER'S
+"do 1234" FALLBACK INSTRUCTION, CODEX SENT ONE NYSE AND ONE NASDAQ FOLLOW-UP
+WITH ALTERNATE SUPPORT CONTACTS COPIED, AND ONE METADATA-ONLY INQUIRY EACH
+TO QUOTEMEDIA AND INTRINIO (SECTION 80). THE RESPONSE DEADLINE IS
+2026-10-19 17:00 AMERICA/LOS_ANGELES; NO MONITOR OR REMINDER WAS RESTARTED.
+COMPLETE CORRECTION EXCLUSION AND PROSPECTIVE RAW-ARCHIVE REQUIREMENTS ARE
+DOCUMENTED, BUT NO EXHAUSTIVE INVENTORY OR ARCHIVAL RIGHTS WERE ESTABLISHED.
+ALL THREE SOURCE P2S REMAIN OPEN; NO SOURCE IS QUALIFIED. ACTUAL COLLECTION,
+THE CONDITIONAL PIT ADAPTER AND THE HISTORICAL STOCK TEST CANNOT START.
+THE EXISTING SYNTHETIC SI-5 PROTOCOL, COHORT AND BLOCKED PREFLIGHT REMAIN
+THE CURRENT SOFTWARE; NO CODE CHANGES WERE MADE.
 `SI-CR14-001`, `SI-CR14-006` AND `SI-CR15-002` REMAIN CLOSED. `SI-CR15-001`
 IS RETAINED FOR ANY CONCRETE FINANCIAL/CONTRACTUAL OFFER; IT DOES NOT BLOCK
 THE OWNER-AUTHORIZED READ-ONLY SOURCE QUALIFICATION. THE SHARED P2
@@ -20,9 +23,10 @@ ADMISSION, LICENSED ROWS, ACTUAL PRICES/OUTCOMES, HOLDOUT, WINNER SELECTION,
 PRODUCTION SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
 PURCHASE, BROKER, DEPLOYMENT, PAPER/LIVE, ORDER AND TRADING GATES REMAIN CLOSED.**
 
-This counter-review/source-assessment round is local-only: remote remains
-`a31805afd7720c700527a6f3e42912e850deffa8`; `7cd39a0`, sync merge `e00aa35`
-and this record's commit are unpublished. The source-gate
+The counter-review/source-assessment and fallback record are local-only:
+last fetched remote remains `a31805afd7720c700527a6f3e42912e850deffa8`;
+`7cd39a0`, sync merge `e00aa35`, `165ffb3` and this record's new commit are
+unpublished. No fetch was made during the fallback task. The source-gate
 no-partial-push rule in sections 66.1 and 76.4-76.6 remains in force; the
 2026-09-30 checkpoint exception does not authorize another checkpoint push.
 
@@ -193,6 +197,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-30 | Codex counter-review + source qualification (row reconstructed by Claude in section 77 from section 76; Codex's round added none) | `614214a` -> `d528615` (record `0e31505`, provenance correction `d6f8abe`, owner-directed checkpoint record `d528615`) | Counter-review of section 75, verbatim owner provenance, QC reply and NYSE/Nasdaq pre-purchase inquiries | Per section 76: accepted `eb2f3ea`, and accepted `614214a` after stating that SI-0M is a research-software gate; committed six verbatim owner quotations; rebound the SI-5 protocol's owner source to `0e31505`, changing the protocol identity to `bfa06b28...` as a new synthetic provenance epoch; recorded QC's latest-only FINRA history answer; sent one pre-purchase email each to NYSE and Nasdaq Data Sales; pushed once under the owner's "push then" (`SI-AUTH-20260930-02`). | Codex-reported, focused only: the new quotation regression was red against the old binding (1 failed, 33 deselected); protocol, preflight, Short Interest import-boundary and active-document selection 126 passed in 1.13s; two cohort cases 2 passed, 6 deselected in 181.84s. No complete lane or repository suite. Authorized looks 0, consumed looks 0. | `SI-CR14-001` marked partially corrected; `SI-CR14-006` kept open; source P2s `SI-SRC-20260928-001`, `-002` and `-003` open; shared `SI-CR5-005` / `SI-CCR16-007` open. | Claude reviews the pushed checkpoint (section 77). |
 | 2026-09-30 | Claude review | `614214a` -> `d528615` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review, the verbatim-provenance rebinding, the QC reply and the exchange-archive inquiries | Verified the protocol's new owner binding equals `git show 0e31505:<record>`; that each of the six owner quotations occurs exactly once there as a blockquote and in none of the old `b13e9be` blob, so the new test is load-bearing; and that the new protocol identity recomputes and reaches the preflight and cohort without a stale literal. Replaced the stale status block and reconstructed the missing Codex push-ledger row above. | Exact pushed tree `d528615`, clean, no mutation in flight: eighteen-file lane **815 passed in 3,259.82s** (unchanged from 815: the new assertions sit inside an existing test); compileall exit 0; active-document 69 passed; import boundary 9 passed; `git diff --check` clean. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR14-001` (P2) closed by correction. `SI-CR14-006` (P3) closed, resolved by the owner's quoted choice of scope and duration. **`SI-CR15-001` (P3, open, time-sensitive owner advisory): before any NYSE or Nasdaq reply is acted on, the owner should state whether the standing delegation covers purchases, subscriptions, trials, license or data terms, or any other financial or contractual commitment.** `SI-CR15-002` (P3, closed by record correction: Codex's round left the status block stale and added no push-ledger row). Source P2s and shared `SI-CR5-005` stay open. | Codex counter-reviews this record commit. `SI-CR15-001` needs a quoted owner answer before any vendor reply is acted on. No source is admitted; every outcome, holdout, ranking, seed, ETF, QuantConnect history/project/job/backtest, purchase, broker and trading gate remains closed. |
 | 2026-10-05 | Codex counter-review + source assessment (local-only session; no push) | Remote `a31805a`; local code/test merge `e00aa35` preserves `7cd39a0`; this record commit follows | Accepted latest Claude record; preserved-regression countercheck; current NYSE/Nasdaq qualification | Accepted pushed record `a31805a` unchanged; advisory retention of the two previously local tests after independent red/green checks; direct inquiry-thread reads and received/bounce searches found only the two original sent inquiries; public metadata did not clear the three source P2s. Conditional PIT adapter/backtest step remains blocked. | Restored regressions **2 passed, 53 deselected in 107.39s**; isolated serializer/batch-guard mutants **1 failed in 81.86s** and **1 failed in 104.51s**; focused protocol/preflight/import/document selection **126 passed in 4.71s**; collection only **817 in 2.78s**; active-document **69 passed**; compileall exit 0; diff clean. No full lane/repository execution by Codex. Authorized/consumed outcome looks **0/0**. | No new confirmed code defect. `SI-CR14-001`, `SI-CR14-006` and `SI-CR15-002` closed; commitment advisory `SI-CR15-001` retained narrowly; source P2s `SI-SRC-20260928-001..003` and shared P2 remain open. | Keep exact validated checkpoint local under the existing no-partial-push gate. A new direct checkpoint instruction is required before one push; then Claude reviews the preserved test commit, sync merge and this record. Source evidence must clear before PIT ingest or outcomes. |
+| 2026-10-05 | Codex source fallback (local-only session; no push) | Local `165ffb3`; last fetched remote `a31805a`; this record commit follows | Owner-directed fallback steps 1–4 | Sent one NYSE and one Nasdaq follow-up with alternate contacts copied, plus one metadata-only inquiry each to QuoteMedia and Intrinio; set October 19 response deadline; screened alternatives; documented exhaustive correction-exclusion and prospective raw-archive activation requirements. No code or actual collection. | Active-document checks **69 passed in 13.33s**, then **69 passed in 2.93s** after ledger edits; lane compilation exit 0; diff clean. No full lane/repository suite. Authorized/consumed outcome looks **0/0**. | Source P2s `SI-SRC-20260928-001..003` remain open; no source admitted. Current Compustat replacement concept excluded. Commitment advisory and shared out-of-lane P2 unchanged. | Assess qualifying metadata/archive or exhaustive correction inventory; establish concrete local archival rights and acquisition contract before prospective collection. No reminder/monitor restarted; no checkpoint push authorized. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -10573,3 +10578,231 @@ the preserved Claude test commit `7cd39a0`, the sync merge `e00aa35` and this
 record commit. The exact head and ordered range must be rechecked before any
 single push. That publication would enable review of the local snapshot; it
 would not admit a source or complete the conditional PIT-adapter milestone.
+
+## 80. Source fallback execution and prospective archival readiness — 2026-10-05
+
+### 80.1 Exact instruction, scope and administrative deadline
+
+After Codex recommended (1) bounded follow-up through alternate official
+contacts, (2) parallel alternative licensed-archive qualification, (3) complete
+correction exclusion if an authenticated exhaustive inventory exists, and
+(4) prospective as-acquired collection if historical originals cannot be
+obtained and suitable rights exist, the owner instructed:
+
+> do 1234
+
+`SI-AUTH-20261005-01` records this bounded fallback instruction, alongside
+the standing delegation quoted in 76.2. It authorizes the non-secret
+metadata-only outreach and readiness assessment below. The third and fourth
+routes retain their factual conditions; the instruction cannot establish an
+archive, inventory or license. No response is not proof that originals do
+not exist. No account, trial, purchase, subscription or contractual acceptance
+is initiated. Any concrete commitment remains subject to `SI-CR15-001`.
+
+`SI-DEC-20261005-01` sets the response deadline to **2026-10-19 17:00
+America/Los_Angeles (2026-10-20T00:00:00Z)**: ten Monday–Friday administrative
+days after October 5, without implying an exchange/vendor holiday calendar.
+All four messages request a response by October 19. At the deadline, lack of
+evidence keeps a candidate unqualified; it neither proves permanent
+unavailability nor permits a substitute backtest. Alternatives are pursued
+now, rather than waiting for the deadline. No automation, recurring monitor,
+reminder, calendar event or collection scheduler was created; the previously
+stopped monitor remains stopped.
+
+Initial tree: clean `codex/strategy-short-interest` at
+`165ffb351b0191eba53e9a9148bf97f9f1a54b31`, three ahead of the last fetched
+remote `a31805afd7720c700527a6f3e42912e850deffa8`. This is an administrative
+source-qualification/design record, not a new formal review range or a
+completed empirical/software milestone. No branch switch or new branch.
+
+### 80.2 Verified outgoing inquiries and bounded mailbox observation
+
+Before sending, direct reads of both original exchange threads contained only
+their original sent inquiry. An `in:anywhere after:2026/09/29 -in:sent
+-in:drafts` received search covering short-interest terms and the NYSE,
+Nasdaq and ICE sender domains returned zero matches, with no continuation
+page. This is a bounded observation, not a delivery guarantee.
+
+Gmail returned `SENT` for each action below. Subsequent direct thread reads
+verified subjects, recipients, copied contacts, content and send dates:
+
+| Action | Recipient and alternate route | UTC sent | Message / thread IDs |
+|---|---|---|---|
+| One NYSE follow-up, replying to the existing inquiry | `datasales@nyse.com`; cc `support@nyse.com` | 2026-10-05T18:47:18Z | message `1a10d6447ad68a59`; thread `1a0f0d951513b761` |
+| One Nasdaq follow-up, replying to the existing inquiry | `datasales@nasdaq.com`; cc `dataproducts@nasdaq.com` | 2026-10-05T18:47:22Z | message `1a10d645bed501c9`; thread `1a0f0d9ae9fda1e6` |
+| One QuoteMedia alternative-archive inquiry | `sales@quotemedia.com` | 2026-10-05T18:49:47Z | message/thread `1a10d668ead37067` |
+| One Intrinio alternative-archive inquiry | `sales@intrinio.com` | 2026-10-05T18:49:42Z | message/thread `1a10d667a3035a5b` |
+
+The alternate exchange contacts are supported by the
+[NYSE SI v1.7 specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf)
+and [Nasdaq's 2026 contact notice](https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-6).
+Alternative recipients were verified on the current official
+[QuoteMedia contact page](https://quotemedia.com/contact) and
+[Intrinio consultation page](https://intrinio.com/request-a-consultation).
+QuoteMedia's publicly encoded sales email was resolved from that official
+page by the read-only metadata researcher; no private address was inferred.
+
+All messages ask for first-disseminated/corrected versions and availability
+evidence, an exhaustive affected-release inventory if originals are absent,
+historical listed/delisted coverage and effective-dated identity, prospective
+raw-file archival/retention rights, local research and separate QC Cloud
+processing terms. Authenticated dates with conservative next-open handling
+are explicitly allowed as a timing possibility. Intrinio is asked to confirm
+the upstream official source; its endpoint name is not treated as proof.
+All four explicitly prohibit sending market rows, opening accounts,
+activating trials, starting purchases/subscriptions or treating the inquiry
+as acceptance of terms. No credential, account identifier, repository code,
+licensed row or outcome was sent. A requested quote is for later consideration
+only. No further outreach, form submission or phone call was made.
+
+### 80.3 Alternative-source screening: candidates, not admission
+
+`SI-DEC-20261005-02` prioritizes QuoteMedia and Intrinio for this bounded
+inquiry, with ORTEX's official component as a third lead. NYSE/Nasdaq are
+not mandatory canonical vendors. Equivalent authenticated evidence may come
+from documented archives and applicable terms without a salesperson replying.
+
+| Candidate | Primary metadata evidence | Disposition and unresolved facts |
+|---|---|---|
+| QuoteMedia | [Official support](https://support.quotemedia.com/support/solutions/articles/13000053834-short-interest-data) describes twice-monthly exchange-sourced SI with Nasdaq/NYSE/Arca/American entitlements and excludes OTC. | Inquiry sent. Historical SI depth, delisted/effective-dated identity, first-vintage/correction retention and actual availability, exhaustive exclusion inventory and local/QC rights remain unverified. Current-value access or display entitlement is insufficient. |
+| Intrinio | [Historical SI endpoint schema](https://data.intrinio.com/documentation/web_api/get_security_short_interest_v2) documents settlement date, current/previous short shares and security identifier options. | Inquiry sent. Upstream official source, exchange/history scope, effective-dated identities, original/correction availability and retention, complete inventory and archival/QC rights remain unverified. No API request was made. |
+| ORTEX official component | [Official SI endpoint](https://docs.ortex.com/reference/stock_official_short_interest_list) documents officially filed SI including US coverage and settlement-date queries. | Third metadata lead only; not contacted. Earliest dates, full listed/delisted scope, original/corrected vintages, availability and rights remain unverified. Its daily estimates are not substitutes. |
+| Current Compustat `SEC_SHORTINT` | [S&P replacement advisory](https://www.support.marketplace.spglobal.com/en/datasets/compustat/naandglobal/compustat-short-interest-data-replacement-service-advisory.pdf) states that on February 24, 2025 the prior twice-monthly data, including all history, was replaced with Total Demand Quantity (quantity on loan). | Exclude this replacement concept from canonical-source candidates. The familiar field/schema does not preserve the official-snapshot semantic. This does not reject all S&P products or assert the state of every separately retained legacy copy. |
+
+The indexed legacy QuoteMedia `ShortInterestBySymbol` brochure URL returned
+404 when checked by the metadata researcher; that endpoint name is not pinned
+as a current acquisition contract. S&P's separate legacy Public Datafeed,
+FactSet/S3 raw components and LSEG exchange-source content are lower-priority
+leads requiring specific current confirmation; blended forecasts, lending
+measures and model ranks themselves cannot replace official snapshots. No
+examined public document authenticates a complete first-vintage archive or
+exhaustive correction inventory. This is unresolved qualification, not proof
+that no vendor has one.
+
+### 80.4 Complete correction-exclusion feasibility contract
+
+The existing permitted alternative to original-vintage retention remains
+conditional on a comprehensive authenticated correction inventory. None was
+obtained in this round. Before any exclusion-based source is admitted:
+
+1. Bind the full proposed dates/security population and every expected release
+   to source/version identities. Reconcile corrections, including late or
+   backdated corrections, against the complete release inventory.
+2. Establish that an unflagged item is unchanged over the relevant history;
+   today's flag alone is insufficient. FINRA describes latest-only corrected
+   values; NYSE's flag concerns the prior reporting period. Neither reviewed
+   specification guarantees the necessary exhaustive inventory.
+3. Freeze exclusions and retain release-level refusals/counts before outcomes.
+   Audit S1's authenticated **immediate prior-cycle** dependency; do not bridge
+   missing prior evidence to an older cycle. A later decision may legitimately
+   use a correction known by its cutoff, so dependency closure is evaluated
+   against availability rather than blindly excluding every adjacent release.
+4. Preserve authentic percentile populations. Removing selected corrected
+   stocks does not automatically authenticate the original release's ranking.
+   Compare eligibility candidates on the required common cohort; no convenient
+   replenishment or post-result sample change.
+5. Evaluate release-level coverage and power from the frozen metadata and
+   permitted assumptions before returns. An inadequate remaining sample is a
+   no-go, not a license to relax the exclusions.
+
+Primary revision descriptions:
+[FINRA catalog](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+and [NYSE specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf).
+No exclusion was applied, empirical cohort was constructed or return was read.
+
+### 80.5 Prospective collection readiness and activation conditions
+
+The fourth route is prepared as a **conditional design**, not running
+collection. Qualified local archival rights may allow a local route without
+QC processing; QC permission remains separately necessary before QC use.
+No product or local retention entitlement is established today. No historical
+archive's nonexistence is inferred from the missing emails.
+
+Reuse the existing lane `CollectionManifest`, `ReleaseCalendarEntry`,
+`ShortInterestSnapshot` and `ShortInterestVintage` contracts and the existing
+immutable publication helper. They already bind schema/source/version,
+retrieval/observation clocks, raw-artifact hashes, normalized revision lineage,
+content identities and named refusals. This is reuse analysis only; no shared
+helper or import boundary changed.
+
+Before a source-specific collector is implemented/activated, its reviewed
+contract must specify:
+
+- The exact licensed/public product, authenticated origin and transport,
+  source schema/version, applicable local archive/retention rights and their
+  limits. Public accessibility alone is not processing permission.
+- An immutable **raw-byte acquisition artifact** binding source/file/version,
+  retrieval start and verified completion times, original bytes/checksum,
+  provenance and rights receipt to the normalized vintage. Existing
+  `write_vintage` persists normalized manifest/calendar/snapshots/refusals,
+  not the original transport file. A checksum proves byte integrity, not
+  authentic origin or original-publication status.
+- Expected releases, conservative acquisition/retry policy, gaps, timeouts,
+  schema changes and corrections, with refusals preserved. Periodic polling
+  cannot prove versions that appeared and disappeared between captures;
+  any original-vintage claim needs an adequate delivery/version guarantee.
+- A prospective usable cutoff no earlier than verified acquisition completion
+  and all source/input availability bounds. Current
+  `snapshot_execution_cohort` computes publication/revision/volume/denominator
+  availability, not operational receipt completion; it must not alone be used
+  to backdate a prospective decision to a scheduled publication time.
+- PIT security identities, denominators and candidate-window price/volume
+  coverage, with corporate-action/delisting/terminal treatment before empirical
+  outcomes. A newly collected SI file does not establish its companion inputs.
+
+Date-only originals can retain conservative following-open semantics; no
+precise correction instant is invented to fill a timestamp field. Collection
+begins with actual authorized acquisition and cannot recreate prior originals.
+Power, dates and research looks must be frozen separately before outcomes;
+the synthetic protocol's source/outcome/QC/trading authority remains false.
+No generic collector, provider adapter or scheduler is added while transport,
+versioning and rights are unresolved. Existing source-contract fields may
+require a reviewed source-specific extension; no new enum value is presumed.
+
+### 80.6 Gate ledger, validation and next handoff
+
+No new confirmed defect in the current synthetic code is claimed. The raw-byte
+and acquisition-time items above are requirements before prospective admission,
+not evidence of an active live collector defect. Current dispositions remain:
+
+| Finding | Priority | Current evidence / disposition |
+|---|---|---|
+| `SI-SRC-20260928-001` | P2 | Open: actual historical release/correction availability is unverified. Four metadata inquiries do not authenticate it. |
+| `SI-SRC-20260928-002` | P2 | Open: no original/correction archive or comprehensive affected-release inventory established; exclusion is not yet feasible. |
+| `SI-SRC-20260928-003` | P2 | Open: historical coverage/identity, companion PIT inputs, terminal values and account-specific local/QC rights remain unverified. Prospective local archival rights are also unbound. |
+| `SI-CR15-001` | P3 | Prospective commitment advisory retained. No concrete offer/acceptance, purchase or trial occurred. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Shared/out of lane, unchanged and unfixed. |
+
+The initial active-document consistency check passed **69 tests in 13.33s**,
+with no pytest warnings, using the verified installed user launcher (CPython
+**3.13.14**, pytest **9.1.1**). The bundled runtime lacked pytest and direct
+Store-package execution was unavailable; the existing launcher worked under
+approved execution. No dependency was installed or changed. After the ledger
+edits, the active-document checks passed **69 tests in 2.93s**, again without
+pytest warnings. Lane-scoped compilation exited **0**. `git diff --check`
+is clean; the sole changed file is this lane record. A read-only
+implementation-time quality check found no inaccurate source-admission,
+exclusion, collection, deadline, monitor, purchase or push claim; it is not
+formal independent review of a local snapshot. No code/test file changed;
+source screening and readiness
+are not described as a completed next empirical milestone. No full
+lane/repository suite is run by Codex. This record is committed locally; the
+exact commit identifier is reported at handoff rather than self-embedded.
+
+No source, licensed market row, actual price/return, outcome, final holdout,
+QC history/project/upload/compile/job, broker, operator database, deployment,
+order or trading access was used. No account/trial/subscription/purchase or
+terms acceptance occurred. Allocated alpha **0**; permanent look IDs **none**;
+authorized/consumed outcome looks **0/0**. Only the four separately authorized
+administrative emails changed an external account; no scheduler was changed.
+
+Next: evaluate qualifying metadata/terms and authentic archive or exclusion
+evidence when supplied. For prospective-only availability, establish local
+archival rights and the exact acquisition contract before implementation or
+collection. Silence at the recorded deadline keeps sources unqualified and
+routes the decision to other evidence paths; it does not create market
+evidence or trading authority. **No push:** `do 1234` approves fallback work,
+not a new checkpoint override of the specific no-partial-push rule. The prior
+local range plus this record stays unpublished; frozen project-wide documents
+are untouched. Independent Claude review remains due on the next expressly
+authorized exact pushed snapshot.

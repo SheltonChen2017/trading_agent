@@ -655,6 +655,7 @@ known.
 | 2026-10-02 | Claude review | `3de5bbef3a25d8a37647869ad840808543927a82..9958a459f5cd56c29cb9a0de13d38737e2c3412d` reviewed; corrections `1a4fd37` and `c2c0672` and this record/guard commit on this same lane branch | Independent review of the section-43 counter-review and the owner-scoped section-44 shared-test correction and drafts; no feature milestone in range | Reviewed all four Codex commits individually. Confirmed two counter-review findings against the earlier host-Git fixture and one against the earlier guard. Accepted the shared runtime-stop guard correction after correcting four teardown regressions the complete suite exposed (`TPR-CR15-004`, two commits). Opened `TPR-CR15-001` for the fourteen loader tests that are red on this host and were tracked nowhere. Kept the section-42 owner decisions withdrawn and recorded the two conflicting owner instructions with five owner inputs. No production file changed. | Complete suite on the pushed Codex head `9958a459` in six shards: **17,667 passed, 823 skipped, 23 failed, 41 errors**; 14 failures are `TPR-CR15-001`, 4 are `TPR-OOL-015`, 5 failures and 37 errors are `TPR-OOL-016`, and 4 errors are `TPR-CR15-004`, fixed in `1a4fd37` and `c2c0672`. 17 shared-guard mutations (13 red) and 10 Codex-guard mutations (10 red). Final-tree validation is the next row. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No P0 or P1. `TPR-CR15-001` (P2) open and registered; `TPR-CR15-004` (P2) closed by correction; `TPR-CR15-002` and `TPR-CR15-003` (P3) closed by qualification. Seven lane findings open. `TPR-OOL-011` open only for synchronization; `TPR-OOL-012` through `TPR-OOL-016` unchanged. | None. `TPR-OD-001` through `TPR-OD-004` remain proposals; TPR-D0 is not authorized. | Make this round's one push. Codex counter-reviews section 45. The lane then waits on the owner inputs `TPR-OWN-1` through `TPR-OWN-5`. |
 | 2026-10-02 | Claude validation | `29c87ae` -> `29c87ae` (exact tested tree; this validation-record commit follows) | Section-45 review round final validation | Validated the exact final tree after the two shared-guard corrections, the register and record update, and the rotated guards. No production module changed in this round. | Complete suite on the final tree, six shards: **17,670 passed, 823 skipped, 23 failed, 37 errors**; every failure and error is `TPR-CR15-001`, `TPR-OOL-015`, or `TPR-OOL-016`, and the four `TPR-CR15-004` errors are gone. Designated-worktree focused set **582 passed, 3 skipped, 14 failed** (the 14 are `TPR-CR15-001`); document guards **95 passed**; `compileall` exit 0; `git diff --check` clean; status clean. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No new finding. `TPR-CR15-001` open; seven lane findings open; `TPR-OOL-011` open for synchronization only. | None. | Make this round's one push. Codex counter-reviews section 45; the lane then waits on `TPR-OWN-1` through `TPR-OWN-5`. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
+| 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
 
@@ -5665,3 +5666,41 @@ to this record's current section 8 and are routed in `TPR-OOL-014`.
 Quality assessment: **8/10 for the bounded D0 implementation candidate**.
 Its local software path and lineage are concrete and tested; provider/PIT
 limitations and later research/QC permission remain material constraints.
+
+### 47.5 Exact Codex snapshot and independent-review handoff
+
+Ordered completed code commits in this round:
+
+1. `cf11788f39a2148d7bc3b801e88807bd2caca5ea` — Claude counter-review,
+   locale-correct Git guards, explicit native/host tests and bounded owner
+   selections, section 46.
+2. `8dcfb71851ff22db6f0727395e18292c19f080ef` — TPR-D0 implementation,
+   immutable plan/report, synthetic tests and section 47. The full auditor
+   code hashes are in the report; they match the corresponding Git blobs.
+
+This record-only validation successor follows those two commits. Its own
+identity is obtained from Git, not self-embedded in a file it hashes. The
+handoff range begins **exclusively** after
+`c0bfb21393180d44c16c10be1e667ea741098531` and ends **inclusively** at the
+exact pushed lane tip, including this successor. Claude must review each
+commit and the cumulative tree, not only the two code snapshots or artifact
+names. Internal Codex QA is not Claude acceptance.
+
+Final record/active-document/artifact guard reprise: **107 passed, 0 skipped,
+0 failures, 0 warnings**. The last measured reprise before this record-only
+successor was 6.92s. Canonical and shared paths remain unchanged. This
+successor updates only the lane record, not the code tested in section 47.3.
+
+Technically, D0 now has a reproducible outcome-free software path and a
+content-addressed retained-source structural result. The measured counts
+support only field/timing/basis dispositions; they contain no return study,
+event eligibility decision, price join, portfolio result or alpha claim.
+The Windows whole-repository collection blocker and incomplete continuation
+coverage remain explicit limitations, not test passes.
+
+In plain language, the retained ratings are now inventoried and checked, so
+the next design can use measured data defects instead of assumptions. This
+does not make the history pristine, establish profitability, or turn trading
+on. Claude review comes next; a separately scoped D1 can then decide which
+events are usable and how conservatively to time them. No monitor is armed,
+no sibling/main file is corrected, and no later milestone is started here.

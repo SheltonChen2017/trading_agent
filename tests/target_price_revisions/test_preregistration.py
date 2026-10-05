@@ -2,11 +2,14 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
+import shutil
 import subprocess
+from contextlib import contextmanager
 from dataclasses import fields
 from decimal import Decimal
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Iterator
 
 import pytest
 
@@ -49,6 +52,66 @@ EXPECTED_SPEC_HASH = (
 EXPECTED_ARTIFACT_SHA256 = (
     "17a2a902060031ee9680c7d07f6102b0da47b0b593a2c89569d782023942650a"
 )
+FROZEN_GIT_PROGRAM = trust_root.GIT_PROGRAM
+
+
+@contextmanager
+def _host_git_logic() -> Iterator[Path]:
+    """Explicit test-only Git substitution; never native trust integration."""
+    host_git = shutil.which("git")
+    if host_git is None:
+        pytest.skip("host Git is unavailable for explicit loader logic coverage")
+    original = trust_root.GIT_PROGRAM
+    try:
+        with pytest.MonkeyPatch.context() as patch:
+            program = Path(host_git).resolve(strict=True)
+            patch.setattr(trust_root, "GIT_PROGRAM", program)
+            yield program
+    finally:
+        assert trust_root.GIT_PROGRAM == original
+
+
+@pytest.fixture(params=["native_windows", "host_git_logic"])
+def reviewed_loader_git(request: pytest.FixtureRequest) -> Iterator[None]:
+    """Separate frozen Windows Git evidence from mocked-trust host logic.
+
+    Only anchored-loader tests explicitly request this fixture. Both legs use
+    the helper's synthetic signed-registry verifier; neither proves native
+    signer custody or ACL integration. Missing frozen Git fails on Windows.
+    """
+    if request.param == "native_windows":
+        if os.name != "nt":
+            pytest.skip("frozen Windows Git integration requires native Windows")
+        assert trust_root.GIT_PROGRAM == FROZEN_GIT_PROGRAM
+        yield
+    else:
+        assert request.param == "host_git_logic"
+        with _host_git_logic():
+            yield
+    assert trust_root.GIT_PROGRAM == FROZEN_GIT_PROGRAM
+
+
+@pytest.mark.parametrize("raise_in_body", [False, True])
+def test_host_git_logic_restores_production_git_after_exit(
+    tmp_path: Path,
+    raise_in_body: bool,
+) -> None:
+    original = trust_root.GIT_PROGRAM
+    # A distinct outer value proves restoration even when host Git happens to
+    # equal the production path on Windows.
+    sentinel = tmp_path / "outer-frozen-git-sentinel.exe"
+    with pytest.MonkeyPatch.context() as outer:
+        outer.setattr(trust_root, "GIT_PROGRAM", sentinel)
+        if raise_in_body:
+            with pytest.raises(RuntimeError, match="synthetic body failure"):
+                with _host_git_logic() as program:
+                    assert trust_root.GIT_PROGRAM == program != sentinel
+                    raise RuntimeError("synthetic body failure")
+        else:
+            with _host_git_logic() as program:
+                assert trust_root.GIT_PROGRAM == program != sentinel
+        assert trust_root.GIT_PROGRAM == sentinel
+    assert trust_root.GIT_PROGRAM == original == FROZEN_GIT_PROGRAM
 
 
 def _canonical(value: object, *, trailing_lf: bool = True) -> bytes:
@@ -734,6 +797,7 @@ def test_alpha_accounting_allows_underallocation_but_refuses_overspend() -> None
         )
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_git_anchored_reviewed_parent_still_cannot_reach_outcomes(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -749,6 +813,7 @@ def test_git_anchored_reviewed_parent_still_cannot_reach_outcomes(
         authorize_outcome_access(reviewed, _request())
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_reviewed_authority_cannot_be_forged_cloned_or_mutated(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -815,6 +880,7 @@ def _bare_tmp_path_refusal(tmp_path: Path) -> str:
     return "share one repository"
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_self_declared_review_and_registry_substitution_refuse(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -878,6 +944,7 @@ def test_self_declared_review_and_registry_substitution_refuse(
         ),
     ],
 )
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_review_registry_signature_policy_is_exact(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -906,6 +973,7 @@ def test_review_registry_signature_policy_is_exact(
         load_reviewed_algorithm_spec(spec_path)
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_positive_registry_requires_the_external_signed_trust_root(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -919,6 +987,7 @@ def test_positive_registry_requires_the_external_signed_trust_root(
         load_reviewed_algorithm_spec(spec_path)
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_nonempty_registry_is_authenticated_before_json_parsing(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -948,6 +1017,7 @@ def test_nonempty_registry_is_authenticated_before_json_parsing(
         load_reviewed_algorithm_spec(spec_path)
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_signed_policy_inventory_must_equal_the_computed_import_closure(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1004,6 +1074,7 @@ def test_decimal_text_rejects_alternate_or_nonfinite_spellings(value: str) -> No
         ("candidate_artifact_sha256", HASH_B),
     ],
 )
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_review_registry_must_bind_the_exact_producing_candidate(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1034,6 +1105,7 @@ def test_review_registry_must_bind_the_exact_producing_candidate(
         load_reviewed_algorithm_spec(spec_path)
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_review_registry_policy_code_map_cannot_be_substituted(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1063,6 +1135,7 @@ def test_review_registry_policy_code_map_cannot_be_substituted(
         load_reviewed_algorithm_spec(spec_path)
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_policy_code_changed_after_review_cannot_retain_authority(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1088,6 +1161,7 @@ def test_policy_code_changed_after_review_cannot_retain_authority(
         load_reviewed_algorithm_spec(spec_path)
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_every_registry_entry_is_typed_before_duplicate_detection(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:
@@ -1139,6 +1213,7 @@ def test_zero_access_authority_rejects_a_symlinked_ancestor(
         require_zero_access_source_authority()
 
 
+@pytest.mark.usefixtures("reviewed_loader_git")
 def test_reviewed_spec_rejects_a_symlinked_artifact_path(
     tmp_path: Path, monkeypatch: pytest.MonkeyPatch
 ) -> None:

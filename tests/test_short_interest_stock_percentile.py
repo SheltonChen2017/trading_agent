@@ -2,10 +2,13 @@
 from __future__ import annotations
 
 from copy import deepcopy
-from dataclasses import FrozenInstanceError
+from dataclasses import FrozenInstanceError, replace
 from fractions import Fraction
 from functools import lru_cache
+from hashlib import sha256
 import inspect
+from pathlib import Path
+import subprocess
 
 import pytest
 
@@ -48,6 +51,8 @@ from research.short_interest_etf.stock_score_order import (
 )
 from tests.test_short_interest_stock_normalization import (
     _fresh_non_affine_scores,
+    _scores,
+    _single_sector_specs,
     _single_sector_scores,
 )
 from tests.test_short_interest_stock_score_order import (
@@ -144,8 +149,11 @@ def test_percentile_policy_is_exact_content_addressed_owner_freeze():
         "minimum_threshold_classification_population",
         "normalization_policy_sha256",
         "outcome_access_authorized",
+        "owner_directive_commit",
         "owner_directive_date",
         "owner_directive_id",
+        "owner_directive_path",
+        "owner_directive_sha256",
         "percentile_formula",
         "policy_id",
         "population_scope",
@@ -164,13 +172,16 @@ def test_percentile_policy_is_exact_content_addressed_owner_freeze():
     assert STOCK_PERCENTILE_POLICY.sha256 == hash_payload(payload)
     assert STOCK_PERCENTILE_POLICY.sha256 == STOCK_PERCENTILE_POLICY_SHA256
     assert STOCK_PERCENTILE_POLICY_SHA256 == (
-        "08899fe5a586fe9472da859cfa9d89934b7771d47d8c3f552031ad1012c4f9d7"
+        "0e521b8275c5f813c11b578e1b9a6aefa3c8ba13ae57a53ad32393682efcd180"
     )
     assert require_stock_percentile_policy(STOCK_PERCENTILE_POLICY) == (
         STOCK_PERCENTILE_POLICY_SHA256
     )
     assert payload["policy_id"] == STOCK_PERCENTILE_POLICY_ID
-    assert payload["owner_directive_id"] == "si3ep1a-owner-freeze-2026-09-14"
+    assert payload["owner_directive_id"] == (
+        "si3ep1a-owner-approval-recorded-2026-09-26"
+    )
+    assert payload["owner_directive_date"] == "2026-09-26"
     assert payload["blueprint_path"] == SHORT_INTEREST_BLUEPRINT_PATH
     assert payload["blueprint_sha256"] == SHORT_INTEREST_BLUEPRINT_SHA256
     assert payload["preregistration_sha256"] == PREREGISTRATION.sha256
@@ -212,6 +223,59 @@ def test_percentile_policy_is_exact_content_addressed_owner_freeze():
     assert payload["seed_selection_authorized"] is False
     assert payload["outcome_access_authorized"] is False
     assert payload["production_authoritative"] is False
+
+
+def test_percentile_policy_binds_committed_verbatim_owner_approval():
+    payload = STOCK_PERCENTILE_POLICY.to_payload()
+    directive_path = (
+        "docs/Strategy Description/SHORT_INTEREST_OWNER_DECISIONS_2026-09-26.md"
+    )
+    directive_commit = "c329d6f9aa616ea48776d6fbe75c36413b81d19b"
+    assert payload["owner_directive_path"] == directive_path
+    assert payload["owner_directive_commit"] == directive_commit
+    assert payload["owner_directive_sha256"] == (
+        "0172439871e3ace82cd0fe5fcd3526c7b20989185b10e334d169e16c50427bc3"
+    )
+    repository_root = Path(__file__).resolve().parents[1]
+    committed_bytes = subprocess.run(
+        ["git", "show", f"{directive_commit}:{directive_path}"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert sha256(committed_bytes).hexdigest() == payload["owner_directive_sha256"]
+    assert (repository_root / directive_path).read_bytes() == committed_bytes
+    directive = committed_bytes.decode("utf-8")
+    assert (
+        "> yes this works. Approved. Freeze the proposed defaults and implement "
+        "SI-2B offline, then complete the round with one push to the Short Interest "
+        "lane only. With one change, tho. candidate lookbacks first"
+    ) in directive
+    assert "**20, 60, 120, and 252 trading sessions**" in directive
+    assert "There is no selected lookback winner at this stage." in directive
+    assert "equivalently `(2*L+E)/(2*N)`." in directive
+    assert "Inclusive pressure `p >= 0.90` and covering `p <= 0.10`" in directive
+    assert "Keep whole tie groups; never split or force exactly 10%" in directive
+    assert "Fewer than 10 eligible stocks produces no seeds" in directive
+
+
+@pytest.mark.parametrize(
+    "field,value",
+    (
+        ("owner_directive_path", "docs/another-owner-record.md"),
+        ("owner_directive_commit", "0" * 40),
+        ("owner_directive_sha256", "0" * 64),
+    ),
+)
+def test_percentile_policy_refuses_rebound_owner_provenance(field, value):
+    forged = object.__new__(StockPercentilePolicy)
+    for name in StockPercentilePolicy.__dataclass_fields__:
+        object.__setattr__(forged, name, getattr(STOCK_PERCENTILE_POLICY, name))
+    object.__setattr__(forged, field, value)
+    with pytest.raises(StockPercentileError, match="wrong owner directive"):
+        require_stock_percentile_policy(forged)
+    with pytest.raises(StockPercentileError, match="wrong owner directive"):
+        forged.to_payload()
 
 
 @pytest.mark.parametrize(
@@ -500,6 +564,70 @@ def test_every_exact_tie_group_is_indivisible_without_quota_fill():
         assert len({item.role_percentile for item in group}) == 1
         assert len({item.candidate_state for item in group}) == 1
         assert len({item.threshold_candidate for item in group}) == 1
+
+
+@pytest.mark.parametrize("top_tie_size", (4, 5))
+def test_authenticated_public_boundary_ties_include_whole_groups_and_allow_empty_pressure(
+    top_tie_size,
+):
+    # Alter authentic source facts, then traverse the complete normalization,
+    # covering, order and percentile chain; no projected row is fabricated.
+    specs = tuple(
+        replace(spec, current_shares=50, prior_shares=200)
+        if spec.index < 4
+        else replace(spec, current_shares=200, prior_shares=100)
+        if spec.index >= 20 - top_tie_size
+        else spec
+        for spec in _single_sector_specs(20)
+    )
+    projection = build_stock_percentile_projection(
+        build_stock_score_order_inventory(
+            build_pit_stock_covering_scores(_scores(specs))
+        )
+    )
+    payload = projection.to_payload()
+    pressure = [
+        row for row in payload["dispositions"]
+        if row["role"] == StockScoreOrderRole.PRESSURE.value
+        and row["role_percentile"] is not None
+    ]
+    covering = [
+        row for row in payload["dispositions"]
+        if row["role"] == StockScoreOrderRole.COVERING.value
+        and row["role_percentile"] is not None
+    ]
+    assert len(pressure) == len(covering) == 20
+    assert {row["scoreable_count"] for row in (*pressure, *covering)} == {20}
+    bottom_ids = {f"sec-si3c-{index:03d}" for index in range(4)}
+    top_ids = {
+        f"sec-si3c-{index:03d}" for index in range(20 - top_tie_size, 20)
+    }
+    pressure_top = [row for row in pressure if row["security_id"] in top_ids]
+    covering_bottom = [row for row in covering if row["security_id"] in bottom_ids]
+    expected_top = Fraction(9, 10) if top_tie_size == 4 else Fraction(7, 8)
+    for row in pressure_top:
+        assert row["equal_count"] == top_tie_size
+        assert Fraction(**row["role_percentile"]) == expected_top
+        assert row["threshold_candidate"] is (top_tie_size == 4)
+    assert len({row["source_equivalence_group_sha256"] for row in pressure_top}) == 1
+    for row in covering_bottom:
+        assert row["equal_count"] == 4
+        assert Fraction(**row["role_percentile"]) == Fraction(9, 10)
+        assert Fraction(**row["pressure_percentile"]) == Fraction(1, 10)
+        assert row["threshold_candidate"] is True
+    assert len({row["source_equivalence_group_sha256"] for row in covering_bottom}) == 1
+    pressure_candidate_ids = {
+        row["security_id"] for row in pressure if row["threshold_candidate"]
+    }
+    covering_candidate_ids = {
+        row["security_id"] for row in covering if row["threshold_candidate"]
+    }
+    assert pressure_candidate_ids == (top_ids if top_tie_size == 4 else set())
+    assert covering_candidate_ids == bottom_ids
+    assert Fraction(len(covering_candidate_ids), len(covering)) == Fraction(1, 5)
+    assert Fraction(len(pressure_candidate_ids), len(pressure)) == (
+        Fraction(1, 5) if top_tie_size == 4 else 0
+    )
 
 
 def test_terminal_rows_are_retained_without_percentile_or_classification():
@@ -1126,4 +1254,60 @@ def test_coherently_rebound_row_is_rejected_by_the_complete_batch():
         dispositions=rows[:index] + (rebound,) + rows[index + 1 :],
     )
     with pytest.raises(StockPercentileError, match="references another source batch"):
+        forged.to_payload()
+
+
+def test_percentile_row_binds_its_policy_gate_and_production_flag():
+    """Each row must name the frozen percentile policy, the SI-0M gate and stay non-production."""
+    scored = next(
+        item for item in _projection_rows() if item.role_percentile is not None
+    )
+    cases = (
+        ({"percentile_policy_sha256": "0" * 64}, "another percentile policy"),
+        ({"research_gate_sha256": "0" * 64}, "not bound to the SI-0M gate"),
+        ({"production_authoritative": True}, "must remain non-production"),
+    )
+    for changes, message in cases:
+        with pytest.raises(StockPercentileError, match=message):
+            _clone_disposition(scored, **changes).to_payload()
+
+
+def test_percentile_batch_binds_its_policy_gate_and_structural_authority():
+    """The batch must name the frozen policy, the SI-0M gate and the structural authority."""
+    projection = _projection()
+    cases = (
+        ({"percentile_policy_sha256": "0" * 64}, "another percentile policy"),
+        ({"research_gate_sha256": "0" * 64}, "not bound to the SI-0M gate"),
+        (
+            {"authority": "production_stock_percentile_batch"},
+            "wrong structural authority",
+        ),
+    )
+    for changes, message in cases:
+        with pytest.raises(StockPercentileError, match=message):
+            _clone_batch(projection, **changes).to_payload()
+
+
+def test_percentile_row_identities_are_content_bound():
+    """Slot and record identities must be recomputed, not trusted from the row."""
+    scored = next(
+        item for item in _projection_rows() if item.role_percentile is not None
+    )
+    with pytest.raises(StockPercentileError, match="wrong slot identity"):
+        _clone_disposition(scored, percentile_slot_id="0" * 64).to_payload()
+    with pytest.raises(StockPercentileError, match="wrong record identity"):
+        _clone_disposition(scored, percentile_record_id="0" * 64).to_payload()
+
+
+def test_terminal_percentile_row_cannot_be_given_a_percentile():
+    """A terminal source row must never acquire an invented percentile."""
+    rows = _projection_rows()
+    terminal = next(item for item in rows if item.role_percentile is None)
+    scored = next(item for item in rows if item.role_percentile is not None)
+    forged = _clone_disposition(
+        terminal,
+        role_percentile=scored.role_percentile,
+        pressure_percentile=scored.pressure_percentile,
+    )
+    with pytest.raises(StockPercentileError, match="cannot carry a percentile"):
         forged.to_payload()

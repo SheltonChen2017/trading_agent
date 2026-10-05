@@ -51,8 +51,15 @@ STRUCTURAL_STOCK_PERCENTILE_BATCH_AUTHORITY = (
     "synthetic_structural_stock_percentile_batch_only"
 )
 
-_OWNER_DIRECTIVE_ID = "si3ep1a-owner-freeze-2026-09-14"
-_OWNER_DIRECTIVE_DATE = "2026-09-14"
+_OWNER_DIRECTIVE_ID = "si3ep1a-owner-approval-recorded-2026-09-26"
+_OWNER_DIRECTIVE_DATE = "2026-09-26"
+_OWNER_DIRECTIVE_PATH = (
+    "docs/Strategy Description/SHORT_INTEREST_OWNER_DECISIONS_2026-09-26.md"
+)
+_OWNER_DIRECTIVE_COMMIT = "c329d6f9aa616ea48776d6fbe75c36413b81d19b"
+_OWNER_DIRECTIVE_SHA256 = (
+    "0172439871e3ace82cd0fe5fcd3526c7b20989185b10e334d169e16c50427bc3"
+)
 _PERCENTILE_FORMULA = "(2*L+E)/(2*N)"
 _BOUNDARY_COMPARISON = "inclusive"
 _TIE_POLICY = "exact_equivalence_group_indivisible"
@@ -202,6 +209,9 @@ class StockPercentilePolicy:
     policy_id: str
     owner_directive_id: str
     owner_directive_date: str
+    owner_directive_path: str
+    owner_directive_commit: str
+    owner_directive_sha256: str
     blueprint_path: str
     blueprint_sha256: str
     preregistration_sha256: str
@@ -239,6 +249,9 @@ class StockPercentilePolicy:
             "policy_id": STOCK_PERCENTILE_POLICY_ID,
             "owner_directive_id": _OWNER_DIRECTIVE_ID,
             "owner_directive_date": _OWNER_DIRECTIVE_DATE,
+            "owner_directive_path": _OWNER_DIRECTIVE_PATH,
+            "owner_directive_commit": _OWNER_DIRECTIVE_COMMIT,
+            "owner_directive_sha256": _OWNER_DIRECTIVE_SHA256,
             "blueprint_path": SHORT_INTEREST_BLUEPRINT_PATH,
             "blueprint_sha256": SHORT_INTEREST_BLUEPRINT_SHA256,
             "preregistration_sha256": _PREREGISTRATION_SHA256,
@@ -333,6 +346,9 @@ class StockPercentilePolicy:
             "outcome_access_authorized": self.outcome_access_authorized,
             "owner_directive_date": self.owner_directive_date,
             "owner_directive_id": self.owner_directive_id,
+            "owner_directive_path": self.owner_directive_path,
+            "owner_directive_commit": self.owner_directive_commit,
+            "owner_directive_sha256": self.owner_directive_sha256,
             "percentile_formula": self.percentile_formula,
             "policy_id": self.policy_id,
             "population_scope": self.population_scope,
@@ -371,6 +387,9 @@ STOCK_PERCENTILE_POLICY = StockPercentilePolicy(
     policy_id=STOCK_PERCENTILE_POLICY_ID,
     owner_directive_id=_OWNER_DIRECTIVE_ID,
     owner_directive_date=_OWNER_DIRECTIVE_DATE,
+    owner_directive_path=_OWNER_DIRECTIVE_PATH,
+    owner_directive_commit=_OWNER_DIRECTIVE_COMMIT,
+    owner_directive_sha256=_OWNER_DIRECTIVE_SHA256,
     blueprint_path=SHORT_INTEREST_BLUEPRINT_PATH,
     blueprint_sha256=SHORT_INTEREST_BLUEPRINT_SHA256,
     preregistration_sha256=_PREREGISTRATION_SHA256,

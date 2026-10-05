@@ -1059,6 +1059,7 @@ def test_out_of_lane_current_disposition_index_matches_integration_closures() ->
         "TPR-OOL-014",
         "TPR-OOL-015",
         "TPR-OOL-016",
+        "TPR-OOL-017",
     }
     assert {identifier for identifier, status in dispositions.items() if status == "closed"} == {
         "TPR-OOL-001",

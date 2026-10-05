@@ -435,7 +435,8 @@ and parked. **Exact next role action:** Claude next reviews sections 46 and
 47 and every Codex commit in this round. The retained-read scope expires
 2026-10-12 and permits no network request, auxiliary price/identity join,
 outcome access, QC project/upload/job, broker, paper/live, deployment, capital
-or trading action. The monitor remains paused; this round creates no monitor.
+or trading action. This round creates or resumes no monitor; it does not
+reassert an unverified external automation state.
 
 ### Open-issue register
 
@@ -456,8 +457,11 @@ and are deliberately not listed here.
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
 
-No open finding is P0. The two P1 findings are inert while the registry is empty
-and no trust files exist, but both block any positive registry entry. The six
+No open finding is P0. The two P1 findings are inert while the registry is empty,
+but both block any positive registry entry. Read-only checks on this Windows
+host on 2026-10-05 found neither `tpr_allowed_signers` nor `tpr_registry_anchor`
+under the frozen `C:\ProgramData\CustomizedAgent\trust` path; no key or
+trust-file provisioning was performed. The six
 open findings require an owner decision, an owner-authorized artifact rewrite,
 or a later bounded implementation/validation round.
 ### Historical progression (not the current resume instruction)
@@ -562,6 +566,8 @@ exception names it. Section 44 is that bounded exception for only
 | `TPR-OOL-015` | P2 | Shared repository guards against imported Analyst code: `tests/test_decimal_conversion_guard.py`, `tests/test_project_separation_entrypoints.py` | Four shared tests fail on the merged tree. `test_no_new_bare_decimal_str_conversion_outside_the_money_helpers` names bare `Decimal(str(...))` sites under `research/analyst_revisions_v2_qc/`; `test_every_script_is_classified_exactly_once` and `test_sep2_definition_of_done_is_reconstructed_not_self_asserted` find 21 unclassified `scripts/` entry points; `test_product_dependency_manifests_cover_actual_imports` finds undeclared import roots that are the QC projection modules' bare sibling imports. Every named path is Analyst-owned and byte-identical on `main` `9e834713`; no Target-Price path is named. Lane impact: the complete suite cannot be green on this branch for reasons outside it. | **Open and owner-routed.** Shared guards and the Analyst lane must be reconciled by their owners; nothing is changed here. |
 | `TPR-OOL-016` | P3 | Analyst Revisions V2 tests when run outside the Analyst worktree: `tests/analyst_revisions_v2/` | In this checkout the Analyst directory reports 37 errors and 5 failures that are not regressions of this lane. Five modules (`test_qc_qcom_exclusion_coverage10_study.py`, `test_qc_qcom_exclusion_three_name_study.py`, `test_qc_qcom_three_name_precreate_retry.py`, `test_qc_qcom_precreate_retry.py`, and `test_qc_qcom_exclusion_study.py`) error instead of skipping when the gitignored `artifacts/analyst_revisions_v2/` package is absent, while sibling modules skip on the same condition. Two tests of `test_qc_qcom_exclusion_tilt_study.py` fail, one on the same absent package and one because it requires the designated Analyst worktree. Three import-closure tests fail because `research/analyst_revisions_v2/forward_data_quality.py` imports `os` at the `main` snapshot `9e834713`. Section 42.8 gives the counts by cause. | **Open and owner-routed.** A fresh clone of `main` reproduces the artifact and closure cases; route to the Analyst lane. |
 
+| `TPR-OOL-017` | P2 | Imported Analyst QC host portability: `research/analyst_revisions_v2_qc/formal_run_protocol.py:19` and `tests/analyst_revisions_v2/` | On the current Windows/Python 3.13.14 tree, standard pytest terminates with 110 collection errors before any test executes. The imported Analyst formal-run module unconditionally imports POSIX-only `fcntl`; the exact completed collection report and attribution are in section 47. No Target-Price file changes that module or admits an outcome. | **Open and owner-routed.** The Analyst owner must select supported hosts and provide a correctly reviewed locking/portability contract or honest platform admission. Do not weaken locking, stub `fcntl`, or edit Analyst/shared code in this lane. |
+
 ### Current disposition index (successor qualification, 2026-10-02)
 
 The detailed rows above preserve discovery-time evidence and therefore contain
@@ -588,6 +594,7 @@ resolved item or hide a newly routed one.
 | `TPR-OOL-014` | **Open** | Action Plan still has stale sibling-refreeze status; the proposed-milestone claim is qualified in `TPR-OOL-014-R1` and section 43. |
 | `TPR-OOL-015` | **Open** | Four shared repository guards are red against imported Analyst code; section 42. |
 | `TPR-OOL-016` | **Open** | Analyst tests error or fail outside the Analyst worktree and at the imported main snapshot; section 42. |
+| `TPR-OOL-017` | **Open** | Imported Analyst `fcntl` dependency blocks Windows collection; measured in section 47, not fixed here. |
 
 ## 10. Session / commit ledger
 
@@ -5491,6 +5498,170 @@ intended with all originals restored. Cumulative validation is in section 47.
 
 Claude next independently reviews every Codex commit of this round and the
 exact pushed head; subsequent Codex counter-review precedes a newly scoped
-milestone. One non-force push ends this round. The monitor stays paused.
+milestone. One non-force push ends this round. This round creates or resumes
+no monitor and does not reassert an unverified external automation state.
 No main/sibling synchronization, provider request, price/outcome read, QC,
 broker or deployment action occurs in this round.
+
+## 47. TPR-D0 development plan and retained-source structural audit - 2026-10-05
+
+### 47.1 Implemented candidate and definition of done
+
+**Implementation candidate; independent Claude review pending.** The
+counter-review/owner-decision commit is
+`cf11788f39a2148d7bc3b801e88807bd2caca5ea`. This section implements the bounded
+TPR-D0 selected in 46.2, not canonical TPR-1 or a confirmatory study.
+
+`research.target_price_revisions_development` is a separate target-owned
+package. It uses standard-library-only strict JSON, exact type checks,
+Decimal parsing for provider numbers, hash-first file verification, immutable
+atomic/no-replace publication and aggregate-only reports. It imports neither
+canonical TPR nor Analyst code; test-only traversal verifies its complete
+local dependency closure and eight forbidden transitive imports. Its empty
+shared `research` parent remains byte-identical.
+
+The strict content-addressed plan freezes TPR-D0 through TPR-D5: retained
+structure; event timing/basis dispositions; outcome-free score/universe/ETF
+contracts; exact source/price/identity and run/ledger admission; a bounded
+local development study; separately rights-admitted QC development parity.
+Only D0 is authorized. Each later step needs independent review and exact
+action/source scope. The plan freezes an append-only reservation **before
+every outcome attempt**, binding plan/code/data/config/fold/window/risk
+lineage; success, failure, interruption and retry all count. Terminal records
+append rather than replace. The actual outcome loader and ledger implementation
+belong to later D3/D4 and do not exist in D0.
+
+Acceptance labels are current-row/accepted-risk/non-pristine-PIT development.
+Confirmatory alpha is zero. No result can establish edge, rescue a canonical
+null, satisfy canonical prerequisites, or permit trading. The canonical PDF,
+candidate, registry and source/look declarations keep their five exact
+digests; the canonical policy package has no changed file.
+
+The auditor preflights manifest identity, exact years/pages/rows/bytes,
+endpoint, natural pagination, safe unique contiguous paths and source clocks.
+Every bounded raw page is size/hash verified before parsing. Unknown or bad
+targets/actions/currencies/clocks retain named counts; nothing is silently
+dropped or normalized into a signal. Page/count/hash/clock/path/budget failure
+refuses the whole operation; no partial report is published. Source files are
+opened read-only. Report lineage binds the UTC audit clock, plan, source
+manifest and four auditor code hashes, checked again before publication.
+
+### 47.2 Exact artifacts and physical audit
+
+Plan artifact:
+`research/target_price_revisions_development/artifacts/tpr-d0-plan.15e0b00978d4060ae3d6b827474e320df2003c9ceee529c8a8436b31570b7bcb.json`.
+Plan SHA-256:
+`15e0b00978d4060ae3d6b827474e320df2003c9ceee529c8a8436b31570b7bcb`.
+
+Report artifact:
+`research/target_price_revisions_development/artifacts/tpr-d0-structure.fbe99ce620689c61052330a220b9f989b29a8ea732a45204d88b02e6f5648148.json`.
+Report SHA-256:
+`fbe99ce620689c61052330a220b9f989b29a8ea732a45204d88b02e6f5648148`.
+Both are canonical JSON with exactly one LF; names contain the full digest.
+The report's UTC audit clock is `2026-10-05T18:41:42.205011+00:00`.
+Only these two approved aggregate/plan kinds escape the lane's local artifact
+ignore rule. No raw page was copied, uploaded or committed.
+
+One physical retained audit completed, covering all 596 pages, 587,046 rows
+and 415,780,520 bytes. Every raw page matched the original manifest; observed
+counts matched the declared graph. There were 587,046 unique provider IDs,
+zero missing/invalid IDs and zero repeated captured IDs. This describes this
+snapshot; it does not reconstruct overwritten historical versions.
+
+| Target field | Missing | Zero | Positive finite | Invalid/nonfinite/negative/null |
+|---|---:|---:|---:|---:|
+| `price_target` | 71,087 | 6 | 515,953 | 0 |
+| `previous_price_target` | 169,187 | 1 | 417,858 | 0 |
+| `adjusted_price_target` | 71,054 | 6 | 515,986 | 0 |
+| `previous_adjusted_price_target` | 169,050 | 1 | 417,995 | 0 |
+
+413,820 rows have positive finite raw target pairs; 413,949 have adjusted
+pairs. All raw pairs also have adjusted pairs. Their directions agree on
+413,595 and disagree on 225. Named raw-pair action conflicts are 307 raises,
+404 lowers and 24 maintains. These are arithmetic/category observations, not
+proof of split-error provenance; adjustment vintages and comparable horizons
+remain unestablished. No twelve-month horizon or split factor is invented.
+
+All 587,046 event time strings have valid HH:MM:SS shape. The update instants
+parse as timezone-aware values; 39 update UTC days precede the nominal event
+day, 557,748 equal it and 29,259 follow it. Zero updates occur after capture.
+The comparison does not establish the event date's timezone or earliest
+public availability, and a last-touch timestamp is not a correction lineage.
+The full report retains per-year field states, action/currency buckets,
+direction checks, horizon presence probes and clock counts. No price, return,
+performance statistic or formula ranking is present.
+
+### 47.3 Software validation and candidate corrections
+
+Synthetic D0 behavior: 89 passed, 1 skipped; the skip is Windows symlink
+creation permission. Tests cover strict/rehash/type/duplicate/float rejection,
+detached caller values, Decimal directions, all target states, inventory and
+pagination, hash-before-parser, preflight/resource/expiry/time refusal,
+canonical/code drift, safe publication failure and immutable retries.
+Three in-memory mutations (raw hash check, plan semantic authority equality,
+and code-drift detection) were killed and restored controls were green.
+Artifact/import checks: 10 passed, including eight transitive escape cases.
+
+During pre-publication QA, an overflowing UTC conversion and malformed/deep
+JSON could escape as native errors. They now produce fixed refusal/invalid
+states, with regressions. Publication failures also produce fixed messages.
+The first closure test omitted the valid empty `research` parent from its
+expected set; it was corrected and now separately pins that parent empty.
+No production authority or valid test was weakened.
+
+Corrections plus initial D0/document checks: 214 passed, 1 skipped.
+Cumulative TPR/D0, active-document, runtime-stop and ML import-boundary suite:
+**491 passed, 5 skipped in 198.50s**, with zero failures or warnings. All five
+skips are Windows symlink-creation permissions; native-Windows anchored
+loader cases ran. Repository compileall, including `research`, exited 0.
+Python **3.13.14**, pytest **9.1.1**. Diff hygiene is clean; canonical TPR,
+Action Plan, Session Handoff and the Analyst formal-run module are unchanged.
+A separate staged-byte check confirmed both artifact identities, all four
+auditor Git blobs against report hashes, and all five canonical freezes.
+
+Standard final-production-tree pytest was run without collection bypass.
+It ended with **0 executed passes, 0 executed failures, 0 skips, 110 collection
+errors, 0 warnings in 95.27s** (JUnit duration 95.263s). This is not a green
+repository suite. All 110 errors are under `tests/analyst_revisions_v2`,
+each with the sole terminal cause `ModuleNotFoundError: No module named 'fcntl'`
+at `formal_run_protocol.py:19`; this is `TPR-OOL-017`.
+No Target-Price collection error occurred. The earlier attempt likewise
+reported 110 collection errors, in 148.83s.
+
+An optional sequential continuation was stopped and replaced by four disjoint
+continuation shards covering the inventory of 465 test files. Those diagnostics
+were capped at approximately 30 minutes; no shard completed. Their partial
+output is **not** counted or presented as a completed full-suite result.
+Broader execution coverage and exhaustive failure attribution remain incomplete.
+No `fcntl` stub, platform-policy weakening, test deselection or out-of-lane fix
+was used to manufacture a green result. After the final routing and artifact
+guard changes, document/active-document/D0 boundary checks were **107 passed,
+0 skipped, 0 failures, 0 warnings in 7.62s**. The artifact guard now pins the
+exact four-file auditor inventory and exact integer types for zero access
+counts, not Python's bool/int equality. No auditor code or physical artifact
+changed after the real audit. Exact implementation commits are recorded in
+the final handoff below.
+
+### 47.4 Resume and remaining authority
+
+Claude next reviews every Codex commit after `c0bfb213` through this round's
+exact pushed head, sections 46/47, both artifacts, and the cumulative tree.
+Review the physical audit as structural software/data evidence, not alpha.
+Only after review and Codex counter-review should a separately scoped TPR-D1
+candidate begin. Its first task is explicit event eligibility/dispositions
+and conservative timing/basis rules, using D0's measured defects and the
+provider's documented limits; outcome and QC work remain later steps.
+
+Provider requests **0**; auxiliary source/price joins **0**; outcome accesses
+**0**; authorized/spent canonical looks **0**; development outcome looks **0**;
+QC projects/uploads/jobs **0**; broker/orders/deployment/trading actions **0**.
+Retained licensed rows structurally processed in this round: **587,046**,
+within the exact owner working-assumption scope in 46.2. No claim of verified
+vendor rights, canonical source admission, market edge or independent
+acceptance is made. Six canonical findings stay open and parked. The root
+Action Plan and Session Handoff remain frozen; their stale summaries yield
+to this record's current section 8 and are routed in `TPR-OOL-014`.
+
+Quality assessment: **8/10 for the bounded D0 implementation candidate**.
+Its local software path and lineage are concrete and tested; provider/PIT
+limitations and later research/QC permission remain material constraints.

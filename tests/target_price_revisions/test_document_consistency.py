@@ -294,6 +294,32 @@ SECTION55_CODEX_COMMITS = (
     "f5b54bb6be4fbcdea79ce60fdb4ac0b289f804ff",
     "fa2838de5acfa66d37f65305c88ed35534f4f572",
 )
+SECTION56_CLAUDE_BASE = "fa2838de5acfa66d37f65305c88ed35534f4f572"
+SECTION56_CLAUDE_HEAD = "b78c51385a321b80404e484b3b161d8516f07138"
+SECTION56_CLAUDE_RANGE = f"{SECTION56_CLAUDE_BASE}..{SECTION56_CLAUDE_HEAD}"
+SECTION56_CLAUDE_SHORT_RANGE = "fa2838de..b78c5138"
+SECTION56_CLAUDE_COMMITS = ("b78c51385a321b80404e484b3b161d8516f07138",)
+SECTION57_OWNER_D2_SCOPE = (
+    "After an accepted counter-review, implement one fixture-only TPR-D2 candidate "
+    "using synthetic fixtures and the committed D0 aggregate report only. "
+    "No additional data, outcomes or QuantConnect access. Push once and stop for Claude review."
+)
+SECTION57_OWNER_CONTINUATION_SCOPE = (
+    'and by "build towards until project completion or the lane is ready for backtesting", '
+    "i mean no interruptions. just build in single round until done"
+)
+SECTION57_SCOPE_BOUNDARIES = {
+    "Development": "One continuous pre-backtest software round",
+    "Inputs": "Synthetic fixtures and committed D0 aggregate report only",
+    "Additional data access": "Forbidden",
+    "Retained audit": "Spent; not renewed",
+    "Outcomes/QuantConnect/trading": "Forbidden",
+    "Owner choices": "Delegated; record evidence and scope",
+    "Intermediate push/review": "Forbidden in this round",
+    "Final publication": "One matching-lane non-force push",
+    "Final handoff": "Stop for independent Claude review",
+    "Monitor": "Paused during development and at final handoff",
+}
 SECTION50_OWNER_SCOPE = (
     "Counter-review both Claude commits. If accepted, implement one fixture-only "
     "TPR-D1 candidate using synthetic fixtures and the committed D0 aggregate "
@@ -840,11 +866,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION55_CODEX_RANGE]
+    ) == [SECTION56_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact Codex range"
+        "Codex has counter-reviewed the exact Claude range"
         in normalized_current
     )
     assert (
@@ -862,7 +888,6 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
     # The owner directly selected bounded D0 decisions on 2026-10-05.
     # Historical wait states cannot override that scope or widen it to outcomes.
-    assert "awaits independent Claude review" not in normalized_current
     assert "Fixture-only TPR-D1 candidate awaits independent Claude review" not in normalized_current
     assert "fixture-only TPR-D1 candidate is accepted" in normalized_current
     assert "Claude next reviews sections 43 and 44" not in normalized_current
@@ -874,10 +899,12 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "Claude next reviews section 52" not in normalized_current
     assert "Codex next counter-reviews section 53" not in normalized_current
     assert "Claude next reviews section 54" not in normalized_current
-    assert "Codex next counter-reviews section 55" in normalized_current
+    assert "Codex next counter-reviews section 55" not in normalized_current
+    assert "Claude next reviews sections 56 and 57" in normalized_current
     assert "TPR-D1 is authorized only as a fixture-only candidate" in normalized_current
     assert "D0's one completed audit is not renewed" in normalized_current
-    assert "TPR-D2 is not authorized" in normalized_current
+    assert "TPR-D2 is authorized only as a fixture-only candidate" in normalized_current
+    assert "TPR-D2 is not authorized" not in normalized_current
     assert "TPR-D0 is not authorized" not in normalized_current
     assert "No next implementation milestone is authorized" not in normalized_current
     assert "remain historical proposals" in normalized_current
@@ -908,11 +935,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION55_CODEX_SHORT_RANGE]
+        ) == [SECTION56_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
-        assert "section 55" in normalized_summary_lower
-        assert "awaits claude review" not in normalized_summary_lower
+        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
+        assert "section 56" in normalized_summary_lower
+        assert "fixture-only tpr-d1 candidate awaits claude review" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
         assert "claude next reviews sections 49 and 50" not in normalized_summary_lower
@@ -920,8 +947,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "claude next reviews section 52" not in normalized_summary_lower
         assert "codex next counter-reviews section 53" not in normalized_summary_lower
         assert "claude next reviews section 54" not in normalized_summary_lower
-        assert "codex next counter-reviews section 55" in normalized_summary_lower
-        assert "tpr-d2 is not authorized" in normalized_summary_lower
+        assert "codex next counter-reviews section 55" not in normalized_summary_lower
+        assert "claude next reviews sections 56 and 57" in normalized_summary_lower
+        assert "tpr-d2 is authorized only as a fixture-only candidate" in normalized_summary_lower
+        assert "tpr-d2 is not authorized" not in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
         assert "no next implementation milestone is authorized" not in normalized_summary_lower
         assert (
@@ -2423,3 +2452,84 @@ def test_section_55_review_records_the_exact_range_and_grants_nothing() -> None:
     assert re.search(
         r"(?:^|[.!?])\s*(?:TPR-D2|real-row D1)\s+is\s+authorized\b", authority, re.I,
     ) is None
+
+
+def test_section_56_counterreviews_the_exact_claude_record_commit() -> None:
+    """Pin the completed counter-review independently of the new owner scope."""
+    section = _record_section("## 56.")
+    assert SECTION56_CLAUDE_RANGE in section
+    table = _bounded(section, "### 56.2", "### 56.3", "section 56 dispositions")
+    rows = tuple(
+        (match.group(1), match.group(2).strip("*").lower())
+        for line in table.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| ([^|]+?) \|", line))
+    )
+    assert rows == tuple(
+        (commit, "accepted after correction") for commit in SECTION56_CLAUDE_COMMITS
+    )
+    assert tuple(commit for commit, _ in rows) == tuple(
+        _git_lines("rev-list", "--reverse", SECTION56_CLAUDE_RANGE)
+    )
+    assert "Cumulative disposition: accepted after correction" in section
+
+
+def test_section_57_preserves_single_round_owner_scope() -> None:
+    """Pin the exact authorization table, not arbitrary prose or readiness."""
+    section = _record_section("## 57.")
+    normalized = " ".join(re.sub(r"(?m)^\s*> ?", "", section).split())
+    assert SECTION57_OWNER_D2_SCOPE in normalized
+    assert SECTION57_OWNER_CONTINUATION_SCOPE in normalized
+    boundary = _bounded(
+        section,
+        "<!-- TPR-CONTINUOUS-SCOPE:START -->",
+        "<!-- TPR-CONTINUOUS-SCOPE:END -->",
+        "section 57 continuous-round scope",
+    )
+    scope_lines = tuple(line.strip() for line in boundary.splitlines() if line.strip())
+    message = (
+        "the closed continuous-round boundary cannot add, remove, duplicate or grant a scope"
+    )
+    assert len(scope_lines) == len(SECTION57_SCOPE_BOUNDARIES) + 2, message
+    assert scope_lines[0] == "| Boundary | Scope |", message
+    assert re.fullmatch(r"\|\s*:?-+:?\s*\|\s*:?-+:?\s*\|", scope_lines[1]), message
+    rows = tuple(
+        tuple(cell.strip() for cell in line.split("|")[1:-1])
+        if line.startswith("|") and line.endswith("|") else ()
+        for line in scope_lines[2:]
+    )
+    assert rows == tuple(SECTION57_SCOPE_BOUNDARIES.items()), message
+
+
+@pytest.mark.parametrize(
+    ("original", "replacement"),
+    [
+        (
+            "| Additional data access | Forbidden |",
+            "| Additional data access | Permitted |",
+        ),
+        (
+            "| Intermediate push/review | Forbidden in this round |",
+            "| Intermediate push/review | Permitted |",
+        ),
+        (
+            "| Final handoff | Stop for independent Claude review |",
+            "| Final handoff | Continue without independent review |",
+        ),
+    ],
+)
+def test_section_57_scope_guard_refuses_data_intermediate_push_or_review_bypass(
+    monkeypatch, original: str, replacement: str,
+) -> None:
+    """Exercise the actual table guard only after its clean control passes."""
+    test_section_57_preserves_single_round_owner_scope()
+    original_section = _record_section
+    section = original_section("## 57.")
+    assert section.count(original) == 1
+    mutated = section.replace(original, replacement, 1)
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 57.")
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match="closed continuous-round boundary"):
+        test_section_57_preserves_single_round_owner_scope()

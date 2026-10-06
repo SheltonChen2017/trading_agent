@@ -23,7 +23,7 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
     modules = _validate_import_closure(
         ROOT, package_name="research.target_price_revisions_development",
         forbidden_prefixes=DEFAULT_FORBIDDEN_IMPORT_PREFIXES | {"research.target_price_revisions"},
-        allowed_stdlib_roots=DEFAULT_ALLOWED_STDLIB_ROOTS | {"argparse", "collections", "tempfile", "time"},
+        allowed_stdlib_roots=DEFAULT_ALLOWED_STDLIB_ROOTS | {"argparse", "collections", "tempfile", "time", "fractions"},
         allowed_local_prefixes=("research.target_price_revisions_development",),
     )
     assert set(modules) == {
@@ -33,6 +33,9 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.plan",
         "research.target_price_revisions_development.structural",
         "research.target_price_revisions_development.events",
+        "research.target_price_revisions_development.scoring",
+        "research.target_price_revisions_development.readiness",
+        "research.target_price_revisions_development.simulation",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -123,3 +126,32 @@ def test_d0_aggregate_defects_are_context_not_new_source_evidence(aggregate_only
         assert sum(bucket["pairs"][name] for bucket in buckets) == expected
     assert report["point_in_time_data"] is False and report["canonical_admission"] is False
     assert report["interpretation"]["horizon"] == "presence probes do not prove explicit comparable prior/new horizons"
+
+
+@pytest.mark.parametrize("name", ["scoring", "readiness", "simulation"])
+def test_continuous_fixture_modules_have_only_pure_closed_dependencies(name) -> None:
+    """New software must not reach D0's reader or any external authority path."""
+    source = (ROOT / f"research/target_price_revisions_development/{name}.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    allowed = {"__future__", "dataclasses", "datetime", "decimal", "fractions",
+               "hashlib", "json", "re", "typing", "collections"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all(alias.name.split(".")[0] in allowed for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            # Pure D1 enrichment, or the simulator's precomputed target
+            # contract, is the only permitted local dependency.
+            local = node.level == 1 and node.module in ({"scoring"} if name == "simulation" else {"events"})
+            assert local or (node.level == 0 and node.module.split(".")[0] in allowed)
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            assert node.func.id not in {"open", "__import__", "eval", "exec", "compile", "input"}
+
+
+def test_readiness_binds_only_the_two_approved_d0_aggregate_identities() -> None:
+    from research.target_price_revisions_development import readiness
+
+    assert readiness.D0_PLAN_SHA256 == "15e0b00978d4060ae3d6b827474e320df2003c9ceee529c8a8436b31570b7bcb"
+    assert readiness.D0_REPORT_SHA256 == "fbe99ce620689c61052330a220b9f989b29a8ea732a45204d88b02e6f5648148"
+    assert digest((ARTIFACTS / f"tpr-d0-plan.{readiness.D0_PLAN_SHA256}.json").read_bytes()) == readiness.D0_PLAN_SHA256
+    assert digest((ARTIFACTS / f"tpr-d0-structure.{readiness.D0_REPORT_SHA256}.json").read_bytes()) == readiness.D0_REPORT_SHA256
+    assert all(key not in readiness.REQUIREMENTS for key in ("approved_by_owner", "preauthorized"))

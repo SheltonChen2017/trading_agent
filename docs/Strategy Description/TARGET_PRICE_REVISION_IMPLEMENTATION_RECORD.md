@@ -1,12 +1,13 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`c0bfb213..c5c060e6` IN SECTION 48. CUMULATIVE DISPOSITION: ACCEPTED AFTER
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
+`c5c060e6..c15dfee5` IN SECTION 49. CUMULATIVE DISPOSITION: ACCEPTED AFTER
 CORRECTION. THE OWNER'S 2026-10-05 "OK, DO 1 2 3" RESOLVES TPR-OWN-1 THROUGH
 TPR-OWN-5 WITH THE EXACT BOUNDED SELECTIONS IN SECTION 46.2. TPR-D0 IS
-AUTHORIZED FOR ITS DEVELOPMENT PLAN AND ONE LOCAL RETAINED STRUCTURAL AUDIT;
-ITS IMPLEMENTATION CANDIDATE HAS COMPLETED INDEPENDENT CLAUDE REVIEW AND
-AWAITS CODEX COUNTER-REVIEW. NATIVE WINDOWS
+COMPLETE AND INDEPENDENTLY REVIEWED; ITS ONE COMPLETED AUDIT IS NOT RENEWED.
+TPR-D1 IS AUTHORIZED ONLY AS A FIXTURE-ONLY CANDIDATE USING SYNTHETIC FIXTURES
+AND THE COMMITTED D0 AGGREGATE REPORT. NO ADDITIONAL DATA ACCESS.
+THE FIXTURE-ONLY TPR-D1 CANDIDATE AWAITS CLAUDE REVIEW. NATIVE WINDOWS
 GIT TESTS AND EXPLICIT HOST-GIT LOGIC TESTS ARE NOW SEPARATELY NAMED;
 TPR-CR15-001 IS CLOSED FOR TEST COVERAGE, NOT NATIVE SIGNER/ACL VALIDATION.
 THE SHARED RUNTIME-STOP CORRECTIONS ARE ACCEPTED; TPR-OOL-011 STILL REQUIRES
@@ -17,7 +18,8 @@ AUTHORITY IS AUTHORIZED. THE EMPTY REGISTRY, CANONICAL CANDIDATE, SOURCE/LOOK
 AUTHORITIES, PERMANENT 1/80 CEILING AND SHARED HOLDOUT KEEP THEIR EXACT BYTES.
 TPR-1 AND TPR-0B REMAIN BLOCKED. NO NEW PROVIDER REQUEST, PRICE/OUTCOME ACCESS,
 RESEARCH LOOK, QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING
-AUTHORITY IS GRANTED. CODEX NEXT COUNTER-REVIEWS SECTION 48. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
+AUTHORITY IS GRANTED. CLAUDE NEXT REVIEWS SECTIONS 49 AND 50. TPR-D2 IS NOT
+AUTHORIZED. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Their integration into `main` grants this target branch visibility;
@@ -358,12 +360,11 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-05:** Claude has independently reviewed the
-exact Codex range
-`c0bfb21393180d44c16c10be1e667ea741098531..c5c060e6712afa75c0eeb05482ef469322d311cf`.
-Section 48 dispositions all three commits separately; its cumulative
-disposition is accepted after correction, and section 46 remains the
-counter-review it followed. The shared runtime-stop corrections
+**Current qualification, 2026-10-05:** Codex has counter-reviewed the exact Claude range
+`c5c060e6712afa75c0eeb05482ef469322d311cf..c15dfee552eafb5489bdc545d0150b85ca96ef52`.
+Section 49 dispositions both commits separately; its cumulative disposition
+is accepted after correction. TPR-D0's independent review and counter-review
+are complete. The shared runtime-stop corrections
 are accepted within the previous exact two-file exception; `TPR-OOL-011`
 stays open only for owner-coordinated synchronization. This round changes no
 shared or sibling code. `TPR-CR15-001` is closed by the owner-selected explicit
@@ -371,11 +372,14 @@ native-Windows/host-Git test split. Production Git/OpenSSH/ACL policy is frozen;
 the named host-Git fixture is test-only, not an autouse substitution and not
 native signer custody evidence. Section 42.6's `TPR-OD-001`, `TPR-OD-002`,
 `TPR-OD-003`, and `TPR-OD-004` remain historical proposals. The owner's direct
-2026-10-05 instruction supersedes the section-45 wait with the bounded
-selections for `TPR-OWN-1` through `TPR-OWN-5` in section 46.2. It authorizes
-TPR-D0 only, including local structural processing of the exact retained
-manifest, under the identified owner working assumption rather than a claim
-of vendor-attested rights. Source-quality facts are measured, never granted.
+2026-10-05 instruction superseded the section-45 wait with the bounded
+selections for `TPR-OWN-1` through `TPR-OWN-5` in section 46.2. That historical
+D0 scope permitted one local structural audit of the exact retained manifest,
+under the identified owner working assumption rather than a claim of
+vendor-attested rights. D0's one completed audit is not renewed. The later
+direct scope in section 50 permits synthetic fixtures and the committed D0
+aggregate report only, with no additional data access. Source-quality facts
+are measured, never granted.
 The authoritative current open-issue register remains below in section 8,
 and Claude's comprehensive whole-lane audit remains complete. The
 non-authorizing TPR-TR0-I implementation candidate is checkpointed but remains
@@ -428,14 +432,15 @@ entitlement, public-time semantics, correction completeness, target-horizon
 consistency, raw retention, derived processing, and QC-transfer rights, and
 the canonical TPR-0B remains blocked until reviewed TPR-1 and TPR-2 structural
 manifests exist. The TPR-D development route does not unblock, satisfy, or
-spend any canonical gate. TPR-D0 is authorized as the current bounded
-development milestone. Its candidate completed independent Claude review in
-section 48 and awaits Codex counter-review; no later TPR-D milestone starts
-automatically. The trust rollback pin, protected
+spend any canonical gate. TPR-D1 is authorized only as a fixture-only candidate.
+Fixture-only TPR-D1 candidate awaits independent Claude review; this is not
+real-data D1 completion. No later TPR-D milestone starts automatically and
+TPR-D2 is not authorized. The trust rollback pin, protected
 parent custody, reviewer identity and adversarial matrix remain unresolved
-and parked. **Exact next role action:** Codex next counter-reviews section 48
-and every Claude commit in this round. The retained-read scope expires
-2026-10-12 and permits no network request, auxiliary price/identity join,
+and parked. **Exact next role action:** Claude next reviews sections 49 and 50
+and every Codex commit in this round. The historical retained-read scope expires
+2026-10-12; the fixture-only instruction permits no new retained read,
+network request, auxiliary price/identity join,
 outcome access, QC project/upload/job, broker, paper/live, deployment, capital
 or trading action. This round creates or resumes no monitor; it does not
 reassert an unverified external automation state.
@@ -571,6 +576,12 @@ exception names it. Section 44 is that bounded exception for only
 | `TPR-OOL-017` | P2 | Imported Analyst QC host portability: `research/analyst_revisions_v2_qc/formal_run_protocol.py:19` and `tests/analyst_revisions_v2/` | On the current Windows/Python 3.13.14 tree, standard pytest terminates with 110 collection errors before any test executes. The imported Analyst formal-run module unconditionally imports POSIX-only `fcntl`; the exact completed collection report and attribution are in section 47. No Target-Price file changes that module or admits an outcome. | **Open and owner-routed.** The Analyst owner must select supported hosts and provide a correctly reviewed locking/portability contract or honest platform admission. Do not weaken locking, stub `fcntl`, or edit Analyst/shared code in this lane. |
 | `TPR-OOL-018` | P2 | Cross-lane Windows behavior of the integrated tree: Analyst `research/analyst_revisions_v2_qc/` byte-pinned sources, Insider `tests/test_insider_buying_sec_acquisition.py` and `tests/test_insider_buying_sec_pilot_projection_adapter.py`, Short-Interest `tests/test_short_interest_stock_percentile.py` | Measured 2026-10-05 by a complete exact-cover run of all 14,268 collected tests on this Windows host (section 48.6): 629 tests fail or error outside this lane, in four classes. (1) `core.autocrlf` byte identity: Git for Windows checks pinned sources out with CRLF. `pit_market_cap_membership_probe_runtime.py` has a pure-LF committed blob that matches its pin, while the working copy holds 916 CRLF and the file carries no `text` or `eol` attribute. This is the defect this lane closed for itself as `TPR-CR4-001`, and it also reaches one Short-Interest verbatim-approval test. (2) POSIX-only paths: `dirfd` and no-follow capture, and a hard-coded `/usr/bin/ssh-keygen`. (3) Windows symlink-creation privilege. (4) Insider temporary-directory `PermissionError` setup errors. The classes checked on a pristine checkout of `c5c060e6` reproduce identically, and no Target-Price test is among them. `TPR-OOL-015`, `TPR-OOL-016` and `TPR-OOL-017` already route the shared guards, Analyst portability and `fcntl` collection; this row adds the Insider and Short-Interest instances and the concrete byte-identity mechanism. | **Open and owner-routed.** Each owning lane should pin its byte-compared artifacts against checkout translation, as `TPR-CR4-001` did with a lane-scoped `.gitattributes`, and decide its supported hosts for POSIX-only paths. Documented, not fixed, under the target-only rule. |
 
+Counter-review qualification, 2026-10-05 (`TPR-CCR17-004`): the historical
+`TPR-OOL-018` discovery row's "629 tests" means **629 failure/error events**:
+519 executed failures/test errors plus 110 collection errors. The cross-lane
+classifications and pristine-reproduction claims remain attributed Claude
+evidence; only their count arithmetic is independently checked here.
+
 ### Current disposition index (successor qualification, 2026-10-02)
 
 The detailed rows above preserve discovery-time evidence and therefore contain
@@ -661,6 +672,10 @@ known.
 | 2026-10-05 | Claude review | `c0bfb21393180d44c16c10be1e667ea741098531..c5c060e6712afa75c0eeb05482ef469322d311cf` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review and TPR-D0 round; no milestone added | Reviewed all three commits individually and the cumulative tree. Verified the D0 auditor line by line, both artifacts' content addresses and lineage, and that the committed report is aggregate-only by a full key and leaf census. Did not re-read the retained source: TPR-OWN-2 grants one audit. Re-probed the accepted shared runtime-stop redesign on a redirected root: zero defects. Closed two in-lane guard gaps test-only, so no production byte changed and the recorded audit lineage stays valid. | D0 package **107 passed, 1 skipped**; mutation and suite evidence in section 48.6. Provider/outcome accesses **0**; authorized/spent looks **0**; retained-source reads by this reviewer **0**. | All three commits accepted, `8dcfb718` after correction. `TPR-CR16-001` (P2) and `TPR-CR16-002` (P3) closed by correction. No P0 or P1. The open register remains the six section 8 findings. | None. No key, signed anchor, registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority; TPR-D1 is not authorized. | Codex counter-reviews every Claude commit after `c5c060e6712afa75c0eeb05482ef469322d311cf`. The retained-read scope expires 2026-10-12; any later D-step needs its own exact owner scope. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
+
+| 2026-10-05 | Codex counter-review correction | Reviewed `c5c060e6712afa75c0eeb05482ef469322d311cf..c15dfee552eafb5489bdc545d0150b85ca96ef52`; correction `1e6365917c292c2e1ada5b1f837ed8d069cc697d` | Both Claude D0-review commits | Accepted both after narrow aggregate privacy/accounting and stale-routing guard corrections; qualified declared lineage and failure/error arithmetic without replaying the retained audit. Section 49 owns every disposition and proof. | D0 focused 121 passed; document/core 171 passed, 1 skipped after routing update; meaningful leaf/accounting/grammar reds; no provider, retained-row, outcome or look access. | CCR17-001 through 004 closed by correction/qualification; six canonical findings remain open and parked; no shared/sibling fix. | None; exact new fixture-only owner scope follows in section 50, not additional data authority. | Accumulate this correction with one fixture-only D1 candidate and the final record; one combined matching-lane push, then Claude review. |
+| 2026-10-05 | Codex fixture candidate | `1e6365917c292c2e1ada5b1f837ed8d069cc697d` -> `7baddbbc303e76ef91850b3e4a53cfe4030f4fea` | One fixture-only TPR-D1 candidate, not real-data D1 completion | Added pure in-memory as-of version selection, exact target/action normalization, compatibility refusals, synthetic timing and immutable zero-authority results. No D0 auditor/artifact or canonical byte changed. Section 50 owns scope and limitations. | 65 D1 plus 123 D0/artifact/import cases: 188 passed; final focused union 359 passed, 1 existing Windows-junction skip, zero failures/errors/warnings; two timing mutations red and restored; compilation/diff clean. | D1-001 through 006 self-QA issues closed with focused red/green; real calendars/source/PIT/trust facts remain unproved. | Synthetic fixtures and approved committed aggregate report only; no renewed retained audit, provider/price/outcome/QC/trading authority or D2 scope. | Stop for independent Claude review of every Codex commit after `c15dfee5` and the cumulative tree; no next development milestone. |
+| 2026-10-05 | Codex durable handoff | `7baddbbc303e76ef91850b3e4a53cfe4030f4fea` -> this following record-only commit | Exact counter-review and fixture-candidate handoff | Rotated the single current pointer, preserved historical evidence, froze the ten-row fixture-only scope and recorded exact code commits, focused validation, exclusions, quality assessment and next role. Shared Action Plan/Session Handoff remain frozen. | Sections 49/50 record exact test paths, counts, host, timing mutation proof and unchanged hashes; final working-byte reprise 359 passed, 1 skipped. All access/look/QC/trading counts zero. | No new open in-lane finding; six canonical and owner-routed shared/sibling blockers remain. | None beyond the quoted bounded synthetic candidate instruction. | Make exactly one non-force push to HEAD:refs/heads/codex/strategy-target-price-revisions, verify local/actual remote agreement, then stop for Claude review. |
 
 ## 11. Claude independent review - 2026-08-29 (documentation planning snapshot)
 
@@ -5712,6 +5727,11 @@ no sibling/main file is corrected, and no later milestone is started here.
 
 ## 48. Claude independent review of the Codex D0 round - 2026-10-05
 
+**Historical Claude report.** Section 49 records Codex's counter-review and
+qualifies the lineage, guard-coverage, and failure-count wording below.
+Section 50 records a later direct fixture-only owner instruction; the old
+next-role and D1 authorization statements are historical, not current grants.
+
 **Disposition: accepted after correction.** All three Codex commits are
 accepted, the D0 implementation after two test-only corrections. The
 auditor is careful, its committed report is genuinely aggregate-only, and
@@ -5872,3 +5892,330 @@ provider or outcome was accessed, the retained source was not read by this
 reviewer, no QuantConnect work was run, and no broker, paper, live, capital,
 or trading authority was created. Provider accesses: **0**. Outcome
 accesses: **0**. Authorized or spent research looks: **0**.
+
+## 49. Codex counter-review of the Claude D0 review - 2026-10-05
+
+### 49.1 Exact range and commit dispositions
+
+Fetched, clean review head:
+`c15dfee552eafb5489bdc545d0150b85ca96ef52`. Exact incoming range:
+`c5c060e6712afa75c0eeb05482ef469322d311cf..c15dfee552eafb5489bdc545d0150b85ca96ef52`.
+Local HEAD and actual matching remote agreed before review. Both incoming
+commits and their complete diffs were reviewed separately, then cumulatively.
+
+| Commit | Disposition | Independently verified basis |
+|---|---|---|
+| `ff05d6b2fdf7fc56bd7164de5192ad72ec3581db` | **Accepted after correction** | Closed key trees and clean-first negative cases genuinely reject their listed shapes. Corrected uncovered substitutions into existing prose/schema/alpha/count leaves; froze independent literals and count bounds/accounting. Production auditor and artifacts stay byte-identical; no second retained audit. |
+| `c15dfee552eafb5489bdc545d0150b85ca96ef52` | **Accepted after correction** | Exact three-commit Codex range, aggregate census and content bindings match. Corrected guard coverage for unquoted short ranges and alternate recognized role grammar. Qualified declared lineage versus execution provenance and executed-test versus collection-error counts. Section 48's independent test runs remain attributed reviewer evidence, not reproduced totals. |
+
+**Cumulative disposition: accepted after correction.** This permits only the
+owner's later fixture-only candidate in section 50. It does not admit retained
+rows, canonical source rights, registry authority, outcomes, QC or trading.
+
+### 49.2 P0-P3 ledger and material-claim qualifications
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CCR17-001` | P2 | **Closed by correction** | `ff05d6b2` | D0 aggregate-only test contract | Existing allowed string/count leaves could carry derived identifier data while the privacy regression stayed green; no committed or production leak was found. | Four clean-first substitutions of a synthetic-ID digest into interpretation, schema, alpha and an existing horizon count fail to raise on the received guard. | A publication privacy regression must detect replacement of permitted fields as well as new keys. | Independently frozen literal labels/prose/alpha, per-bucket bounds and partitions, pair/year/identifier accounting; narrow guarantee excludes arbitrary covert encodings or recomputation of actual source counts. | Red **4 failed in 0.44s**; corrected D0 subset **121 passed in 0.62s**, including nine accounting cases and committed aggregate artifact. |
+| `TPR-CCR17-002` | P3 | **Closed by correction** | `c15dfee5` | Section-8 routing grammar | An unquoted stale short range and an alternate completed-role sentence evaded the advertised stale-claim guard. | Both actual-guard clean-first regressions fail to raise before correction. | Current routing must not depend on backticks or only one equivalent recognized role spelling. | Detect quoted/unquoted lowercase commit words/ranges and optional has/independently grammar; explicitly not an arbitrary-prose classifier. | Red **2 failed in 0.68s**; corrected document/core subset **163 passed, 1 skipped in 2.49s**. |
+| `TPR-CCR17-003` | P3 | **Closed by qualification** | `c15dfee5` | Section 48.3 lineage claim | Matching code hashes do not independently prove that a report was executed from that code. | The two artifact content addresses and four declared auditor hashes match; no retained-source replay was authorized or performed. | Content binding and execution provenance are different evidence. | The section-48 phrase "so this report came from exactly this code" is qualified: verified declared lineage and matching bytes, not independent execution reproduction. | Independent aggregate census and source-file hash comparison below; no second audit. |
+| `TPR-CCR17-004` | P3 | **Closed by qualification** | `c15dfee5` | Section 48.6 and OOL018 totals | 629 failure/error events include 110 collection errors, not 629 executed failing tests. | 13,656 + 487 + 93 + 32 = 14,268 collected/completed pytest outcomes, including skips; 487 + 32 = 519 executed failures/test errors; 519 + 110 = 629 failure/error events. | Collection errors cannot be mislabeled as executed test results. | Historical totals retained, with exact executed-versus-collection distinction here. Analyst 570 + Insider 54 + Short-Interest 1 + shared 4 = 629 attribution events. | Arithmetic verified; Windows shard completeness/reproductions remain Claude-reported evidence, not rerun on this host. |
+
+No new P0/P1 issue was found. The two inherited P1 trust findings remain
+open and inert while the registry is empty. `TPR-CR16-001` is confirmed but
+its received correction was incomplete until the existing-leaf cases above.
+`TPR-CR16-002` is partially correct: the canonical-format cases worked, but
+the original all-claims wording exceeded the recognized grammar. Neither
+claim is discarded as a false alarm. No verified out-of-lane issue is fixed.
+
+The committed D0 report was independently checked without reading retained
+input: **24,675 bytes, 1,201 integer leaves, 3 booleans, 20 strings and 103
+distinct keys**. Its artifact SHA-256 is
+`fbe99ce620689c61052330a220b9f989b29a8ea732a45204d88b02e6f5648148`.
+The report/plan content addresses, declared plan binding and four current
+auditor source hashes match. This proves those content identities only;
+actual data acquisition/audit execution remains the earlier recorded work.
+
+### 49.3 Focused verification and exclusions
+
+All pytest runs use the section-44 isolated in-process runtime-root runner,
+with the exact module-initialization paths intercepted before importing the
+dispatch fence and both runtime roots redirected before configuration.
+No actual operator stop state/database or retained capture is read.
+
+Commands are `python3 -c <isolated runner calling pytest.main([...])>` with
+`-q -p no:cacheprovider --tb=short` and these focused paths:
+
+- `tests/target_price_revisions_development/test_d0.py` and
+  `test_boundary_and_artifacts.py`: **121 passed in 0.62s**.
+- Target `test_document_consistency.py`, shared active-document tests, Target
+  import firewall, runtime-stop leak guard, the two direct ML-boundary tests,
+  and `test_host_git_logic_restores_production_git_after_exit`:
+  **163 passed, 1 skipped in 2.49s**. The skip is the existing Windows-junction
+  platform exclusion.
+
+Reverse-mutation proof used only in-memory substitution, restored when the
+process ended: the received aggregate guard makes all four new existing-leaf
+and nine accounting regression cases red (**13 failed in 0.50s**, each failing
+to raise). Corrected controls, including the fixture-scope positive and six
+permission-widening negatives, are **20 passed in 0.37s**. After the section-8
+pointer rotation and closed section-50 scope, the same document/core module
+set is **171 passed, 1 skipped in 2.04s**. The two section-8 grammar regressions
+and six scope negatives execute the actual guards after clean positive
+controls; they do not merely search for an invented sentinel phrase.
+
+This is not the complete lane/repository suite. Claude's native-Windows
+and whole-repository/shard evidence is retained with its host and limits,
+not rebranded as current macOS validation. The owner-selected native-Windows
+loader tests are separately named and remain unavailable here; no frozen
+Git/OpenSSH/ACL contract is substituted in production. Six canonical lane
+findings and all existing source/look gates remain open and parked. OOL003,
+004 and 006 remain closed; OOL011 still needs owner-coordinated shared sync.
+Compilation, final focused reprise, exact commits and hygiene follow in
+section 50 before the single matching-lane non-force push.
+
+## 50. Fixture-only TPR-D1 candidate - 2026-10-05
+
+### 50.1 Direct owner scope and candidate ceiling
+
+Owner instruction in this chat:
+
+> Counter-review both Claude commits. If accepted, implement one fixture-only TPR-D1 candidate using synthetic fixtures and the committed D0 aggregate report. No additional data access. Stop for Claude review.
+
+**Fixture-only candidate implemented; independent review pending.** This is
+not real-data D1 completion. The later direct instruction authorizes a
+software candidate after the accepted counter-review, not a second D0 audit
+or continuation of the expiring retained-read permission. Approved input is
+only synthetic fixtures and the committed aggregate report at SHA-256
+`fbe99ce620689c61052330a220b9f989b29a8ea732a45204d88b02e6f5648148`.
+D0's one completed audit is not renewed. Fixture-only TPR-D1 candidate awaits
+independent Claude review. Final evidence and handoff are recorded below.
+
+<!-- TPR-D1-FIXTURE-SCOPE:START -->
+| Boundary | Scope |
+|---|---|
+| Inputs | Synthetic fixtures and the committed D0 aggregate report only |
+| Additional data access | Forbidden |
+| Retained-row processing | Forbidden |
+| Provider requests | Forbidden |
+| Price/outcome access | Forbidden |
+| QuantConnect | Forbidden |
+| Trust provisioning | Forbidden |
+| Real raw/normalized row publication | Forbidden |
+| TPR-D2 | Not authorized |
+| Review handoff | Stop for independent Claude review |
+<!-- TPR-D1-FIXTURE-SCOPE:END -->
+
+No additional data access is authorized or performed. No retained rows,
+new provider request, credentials, price/identity joins, outcomes, research
+look, QC operation, trust provisioning or broker/trading action is permitted.
+There is no real normalized-event publication, file-input command, CLI or
+raw-data artifact. TPR-D2 is not authorized. The four D0 auditor files, two
+approved D0 artifacts, canonical policy package/five freezes, shared Action
+Plan, Session Handoff, sibling/main files and workflow remain unchanged.
+
+The blueprint's timing/action/basis rules inform synthetic cases; this
+development candidate does not satisfy canonical TPR-1/TPR-2/TPR-0B gates.
+The D0 report supplies measured defect categories only: its direction
+disagreements, action conflicts, missing targets/horizons and clocks cannot
+prove vendor basis, correction lineage, public availability or entitlement.
+Unknown horizon, identity, currency or basis remains a named refusal, not an
+invented twelve-month horizon, split factor, FX conversion or PIT claim.
+
+### 50.2 Candidate behavior and limitations
+
+Added one pure standard-library module,
+`research/target_price_revisions_development/events.py`, and its synthetic
+tests. The sole public operation is
+`normalize_fixture_events(versions, *, decision_cutoff_utc, sessions)`.
+It accepts at most 1,024 explicitly supplied versions and 3,660 synthetic
+session opens, returns frozen scalar dataclasses/tuples, and performs no I/O.
+There is no CLI, loader, persistence, adapter, migration, source connector,
+price join or live-assistant consumer. No existing assistant behavior changes.
+
+Version headers require visibly synthetic event/version identifiers and an
+explicit timezone-aware version clock. Future versions are accounted as
+`not_visible` before their payload is inspected. Among visible versions,
+exact flat duplicates collapse with occurrence counts; conflicting identities
+or availability ties refuse the lineage. The latest visible version is the
+only selection candidate. A latest bad, withdrawn, unavailable or uncaptured
+version blocks fallback to an older valid target. Effective date remains
+descriptive and never moves availability earlier. Missing framing clocks
+raise fixed errors; invalid visible financial/evidence payloads receive named
+refusals, not a reconstructed final-state event.
+
+Finite positive decimal strings are compared exactly, without float money,
+context-rounded arithmetic, percentage changes or a price denominator.
+Raises/cuts require the matching positive/negative direction; compatible
+unchanged targets are an explicit `valid_zero`, not missing data. Sets and
+announcements are separate ineligible initiation diagnostics; visible
+withdrawal never becomes numeric zero. A selected pair must have matching
+synthetic security/share-class identity, explicit comparable synthetic
+horizon, same allowlisted currency, raw basis and no-adjustment vintage.
+The nine fixture currency codes are USD, CAD, EUR, GBP, CHF, JPY, AUD, CNY and
+HKD, matching the D0 aggregate vocabulary, not granting a provider contract.
+Unknowns, mismatches and adjusted pairs refuse; there is no split/FX/ADR
+repair, double adjustment, institution-independence claim or canonical PIT
+admission. An initiation's diagnostic label is not pair acceptance.
+
+The chosen synthetic open is strictly after the decision cutoff and the
+visible public/version/capture information. Date-only fixtures use no earlier
+than the supplied calendar's second open after the declared public day;
+declared weekend/holiday gaps and offset/DST examples remain fixtures. This
+candidate conservatively requires public availability no later than version
+availability and version availability no later than capture. Date-only
+contradiction checks explicitly use UTC dates. Those ordering and UTC-date
+choices are bounded fixture proposals, not established vendor clock semantics
+or approval of an embargo/pre-release policy. Actual exchange calendar/DST,
+public/correction clocks, target horizon and security/basis provenance remain
+unverified. Supplied schedules and cutoffs do not prove the canonical
+prior-session 18:00 America/New_York cutoff.
+
+Every framed input has an occurrence-bearing disposition; visible duplicate
+count excludes future payloads, which remain uninspected individual inputs.
+Selected events are synthetic only. All five result authority flags are
+false: canonical admission, point-in-time data, outcomes, QC and trading.
+The frozen output and `SYNTHETIC-` labels are not an OS sandbox, provenance
+attestation, signer custody or a license to pass real rows to this API.
+
+The committed D0 report is used only as aggregate defect context. Its year
+buckets total 225 direction disagreements, 307 raise conflicts, 404 lower
+conflicts and 24 maintain conflicts. A new artifact test binds those counts
+to the exact approved report and its false canonical/PIT declarations; it
+does not regenerate the audit or infer source semantics from counts. The
+D0 auditor/code-map tests still bind exactly the same four auditor files;
+`events.py` is deliberately separate. The package's import-closure test now
+covers the new module and refuses canonical/provider/execution dependencies.
+A dedicated D1 AST allowlist and inert-ancestor checks exclude local or I/O
+imports; a scoped runtime sentinel rejects common file/socket entry points
+while a valid fixture normalizes. These prove the inspected fixture path,
+not arbitrary native/system-call isolation.
+
+### 50.3 Candidate self-review and focused proof
+
+Tests preceded the new module: **0 executed tests, 1 collection error in
+0.06s** (`ModuleNotFoundError` for the absent fixture API). Initial behavior
+then passed **55 tests in 0.43s**. Adverse QA below deliberately exposed
+candidate defects before correction; none involved a real row or authority.
+
+| ID | Priority | Status | Defect and reason | Correction | Red evidence |
+|---|---|---|---|---|---|
+| `TPR-D1-001` | P2 | **Closed by correction** | Matching `ZZZ` passed a three-letter syntax check despite unknown units. | Explicit nine-code fixture allowlist; no FX repair. | Clean synthetic pair incorrectly selected; **1 of 2 failed in 0.44s**. |
+| `TPR-D1-002` | P2 | **Closed by correction** | Capture could precede current-version availability. | Conservative public-only fixture ordering; no provider semantic claim. | Clean synthetic pair incorrectly selected; **1 of 2 failed in 0.44s**. |
+| `TPR-D1-003` | P2 | **Closed by correction** | Date-only publication day could follow version/capture dates and still be selected. | Named contradiction refusal under explicit synthetic UTC-day semantics. | Both cases incorrectly selected; **2 of 4 failed in 0.45s**. |
+| `TPR-D1-004` | P3 | **Closed by correction** | Sets/announces without prior metadata were obscured by pair-comparability refusals. | After visible clocks/evidence and valid new target, label initiation as ineligible before pair comparison; never selected. | Two cases refused as missing identity instead of initiation; **2 of 4 failed in 0.45s**. |
+| `TPR-D1-005` | P2 | **Closed by correction** | A custom visible action object could execute caller equality before literal-payload rejection. | Admit only bounded flat primitive payloads before action/schema comparisons. | Actual callback ran; **1 failed in 0.27s**. |
+| `TPR-D1-006` | P2 | **Closed by correction** | Header/calendar set comparisons could invoke custom-key equality before fixed framing refusal. | Require exact string keys before set comparison. | Temporarily removed these generalized guards after adding clean regressions; both actual callbacks ran: **2 failed in 0.25s**; then restored. This is reverse-mutation proof, not an original tests-first sequence. |
+
+Stable D1 plus D0/artifact/boundary control: **188 passed in 0.55s**, comprising
+65 D1 fixture cases and 123 D0/artifact/import cases. Two additional in-memory
+mutations of the actual `_select` function, restored in `finally`, were each
+**1 failed in 0.24s**: replacing strict `opened > threshold` with `>=` admits
+the equal cutoff open; replacing `later[1]` with `later[0]` chooses the first
+later open rather than the date-only second-open floor. No tracked file was
+reverted or overwritten for those two probes. The corrected final combined
+control is **359 passed, 1 skipped, 0 failed/errors/warnings in 2.12s**.
+
+Final combined pytest invocation uses the same isolated runtime-root runner
+as section 49.3, `pytest.main([...])`, `-q -p no:cacheprovider --tb=short`, and
+exactly these focused paths/nodes:
+
+```text
+tests/target_price_revisions/test_document_consistency.py
+tests/test_active_document_consistency.py
+tests/target_price_revisions/test_import_firewall.py
+tests/test_runtime_stop_leak_guard.py
+tests/test_ml_import_boundary.py::test_no_execution_capable_module_imports_ml
+tests/test_ml_import_boundary.py::test_assistant_package_has_no_ml_import_except_the_future_shadow_adapter
+tests/target_price_revisions/test_preregistration.py::test_host_git_logic_restores_production_git_after_exit
+tests/target_price_revisions_development/test_d1.py
+tests/target_price_revisions_development/test_d0.py
+tests/target_price_revisions_development/test_boundary_and_artifacts.py
+```
+
+Host: macOS, bundled Python **3.12.14**, pytest **9.1.1**. The one skip is
+the existing Windows-junction case, not a weakened timing or privacy test.
+The historical 14 native preregistration tests require the frozen Windows
+Git executable: section 46's explicit native/host split remains intact,
+and this round's one restoration node is host-logic proof only. No native
+Windows signer/ACL/custody validation is claimed. No complete canonical lane
+or repository suite is run; Claude owns independent full-lane validation.
+No retained replay or backtest is performed.
+
+Scoped compilation exited 0:
+
+```text
+python3 -m compileall -q research/target_price_revisions_development tests/target_price_revisions_development tests/target_price_revisions/test_document_consistency.py
+git diff --check
+```
+
+The two approved D0 content addresses, all four declared D0 auditor hashes
+and all five canonical artifact hashes are independently unchanged.
+`events.py` SHA-256:
+`7402270cb6fd4be89aea937f53eb3e1250d37d6f28e310c65ad3073d7eff3bc5`.
+`test_d1.py` SHA-256:
+`e6e838c395b1418630473415a01376b8d818b4108c7889265230329217256c11`.
+The exact seven changed paths are this record, the target document guard,
+D0 aggregate contract/test, development boundary test, and the two new D1
+files. Shared, sibling and canonical production bytes remain unchanged.
+Exact code commits and handoff are recorded in section 50.5 before this
+round's one matching-lane non-force push.
+
+### 50.4 Handoff ceiling and next authorized role
+
+Implementation-quality assessment: **8/10 for this bounded fixture candidate**,
+not an empirical strategy rating. Exact decimal comparisons, latest-visible
+selection, named refusals, no-fallback behavior, timing boundaries, accounting,
+immutability and dependency exclusions have focused proof. Independent Claude
+review is still required; this does not complete real-data TPR-D1 or the
+blueprint's empirical structural/availability manifests. Actual calendars,
+provider semantics, institution identity/independence, source entitlements,
+trust custody/replay protection and statistical/backtest behavior are outside
+this candidate and remain unverified or parked.
+
+**Stop for independent Claude review.** Claude next reviews sections 49 and
+50, every Codex commit after `c15dfee552eafb5489bdc545d0150b85ca96ef52` through
+the exact single pushed tip, and the cumulative tree on this same lane.
+Claude may perform the independent full-lane checks; Codex does not run them
+by inference. Codex later counter-reviews every resulting Claude commit.
+TPR-D2 is not authorized, and no later data or development step starts
+automatically. Any proposed real-row normalization requires a new exact
+owner scope and independently verified source/timing/basis facts; it cannot
+reuse D0's spent audit or the synthetic evidence labels.
+
+Provider/credential accesses, retained-row reads, price/outcome access,
+research/development looks, QC attempts, broker actions and trading authority
+in this round: **0**. No trust file/key is provisioned and no registry, source
+or look artifact changes. Shared/project-wide documentation and sibling/main
+behavior remain frozen. No monitor or other chat is messaged, resumed or
+changed by this round.
+
+### 50.5 Exact implementation commits and publication handoff
+
+This round is accumulated locally in the designated physical worktree
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`
+on `codex/strategy-target-price-revisions`:
+
+| Commit | Scope |
+|---|---|
+| `1e6365917c292c2e1ada5b1f837ed8d069cc697d` | Counter-review corrections: target document guard, D0 aggregate contract and focused privacy/accounting regressions. |
+| `7baddbbc303e76ef91850b3e4a53cfe4030f4fea` | Fixture-only D1 events API, 65 synthetic tests and development import/artifact boundaries. |
+| The following record-only commit | This durable handoff, exact current routing, ledger and evidence; its own commit identity cannot be embedded recursively. |
+
+Before each code commit, physical root, Git toplevel, branch, HEAD, staged
+paths, diff hygiene and actual matching remote were verified. Actual remote
+remained `c15dfee552eafb5489bdc545d0150b85ca96ef52`; both commits are linear
+descendants. No side branch, reset, checkout, force push or concurrent-work
+overwrite occurred. Before the exact-commit and ledger append, the combined
+focused control passed again: **359 passed, 1 skipped in 1.91s**. This final
+handoff text is checked again before publication. At this record-writing
+checkpoint all code changes are committed; only this record remains for
+the final record-only commit.
+
+Publish this stable three-commit round exactly once, non-force, from this
+same worktree to `HEAD:refs/heads/codex/strategy-target-price-revisions`,
+after verifying the clean committed tree and unchanged matching remote.
+Verify actual remote and local heads agree afterward and report the exact
+pushed head in this chat. That identity defines Claude's full review range
+after `c15dfee552eafb5489bdc545d0150b85ca96ef52`. A push is not independent
+acceptance. Stop here for Claude; no additional milestone or data operation.

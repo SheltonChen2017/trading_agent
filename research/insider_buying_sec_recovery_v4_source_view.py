@@ -675,12 +675,16 @@ def run_observed_historical_source_view_replay(*, expected_head, timeout_seconds
 
 
 if __name__ == "__main__":
+    # Section 133 (Claude review): run by script path, sys.path[0] is research/
+    # and the stdlib-only base cannot be imported; the lane root must be on the
+    # path, and an import failure must be a refusal, not a traceback.
+    sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
     try:
         parser = argparse.ArgumentParser(description="Offline historical source-view custody replay")
         parser.add_argument("--expected-head", required=True)
         args = parser.parse_args()
         receipt = run_observed_historical_source_view_replay(expected_head=args.expected_head)
         print(_base()._canonical({"receipt_sha256": receipt.sha256, "receipt": receipt.to_payload()}).decode("ascii"))
-    except HistoricalSourceViewError:
+    except (HistoricalSourceViewError, ImportError):
         sys.stderr.write("REFUSED: bounded historical source-view replay failed\n")
         raise SystemExit(1) from None

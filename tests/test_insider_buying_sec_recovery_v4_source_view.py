@@ -2,10 +2,12 @@
 from __future__ import annotations
 
 from dataclasses import replace
+import base64
 import copy
 import json
 from pathlib import Path
 import re
+import subprocess
 import sys
 from types import FunctionType, ModuleType, SimpleNamespace
 
@@ -782,3 +784,142 @@ def test_public_entrypoint_refuses_an_oversized_source_bundle_before_mocked_work
     with pytest.raises(module.HistoricalSourceViewError, match="cap"):
         module.run_observed_historical_source_view_replay(expected_head=mock_entrypoint.head)
     assert not mock_entrypoint.calls
+
+
+# Section 133 (Claude review): regression tests for rules that no earlier case
+# reached alone, and for the script-path entry. Invented views and workers only.
+def test_script_path_entry_refuses_with_a_typed_message_and_no_traceback():
+    # An all-zero head refuses before any worker launch; the script-path form
+    # used to die on the base import because the lane root was not on sys.path.
+    root = Path(__file__).resolve().parents[1]
+    result = subprocess.run(
+        (str(Path(sys.executable).resolve()), "-B", str(root / module._WORKER_PATH),
+         "--expected-head", "0" * 40),
+        cwd=root, env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"},
+        capture_output=True, text=True, timeout=60,
+    )
+    assert result.returncode == 1
+    assert result.stdout == ""
+    assert result.stderr == "REFUSED: bounded historical source-view replay failed\n"
+
+
+def test_bootstrap_installs_the_base_audit_hook_before_the_worker_body_runs(monkeypatch):
+    # The real bootstrap with an invented worker: the captured base's audit hook
+    # must already refuse a socket and an in-place exec when _worker_main starts.
+    # The sandbox launcher is stripped because a sandbox cannot be nested under
+    # the network-denied pytest parent; the child inherits that denial.
+    root = Path(__file__).resolve().parents[1]
+    base_raw = (root / module._BASE_PATH).read_bytes()
+    worker_raw = (
+        "import json, os, socket, sys\n"
+        "def _worker_main(bundle):\n"
+        "    out = {}\n"
+        "    for name, action in (\n"
+        "        ('socket', lambda: socket.socket()),\n"
+        "        ('exec', lambda: os.execv(sys.executable, (sys.executable, '-c', 'raise SystemExit(99)'))),\n"
+        "    ):\n"
+        "        try:\n"
+        "            action()\n"
+        "            out[name] = 'allowed'\n"
+        "        except Exception as error:\n"
+        "            out[name] = type(error).__name__\n"
+        "    sys.stdout.write(json.dumps(out, sort_keys=True))\n"
+    ).encode()
+    bundle = {
+        "current_sources": base._encode_sources(((module._BASE_PATH, base_raw),)),
+        "base_source_sha256": hash_bytes(base_raw),
+        "worker_source_b64": base64.b64encode(worker_raw).decode("ascii"),
+        "worker_source_sha256": hash_bytes(worker_raw),
+    }
+    real_popen = subprocess.Popen
+    monkeypatch.setattr(module.subprocess, "Popen",
+                        lambda command, **kwargs: real_popen(command[3:], **kwargs))
+    result = module._run_isolated_worker(base._canonical(bundle), 30)
+    assert result.returncode == 0
+    assert json.loads(result.stdout) == {"exec": "HistoricalReplayError", "socket": "HistoricalReplayError"}
+
+
+def test_a_same_code_twin_with_copied_globals_reads_real_paths_not_the_captured_view(invented_view):
+    # Code identity alone must not bind a frame; its globals must be the union's.
+    fixture = invented_view
+    for relative, _ in fixture.blobs:
+        (fixture.root / relative).write_bytes(b"MARKER = 'invented current drift'\n")
+    fn = fixture.union._validator_source_sha256
+    with module.HistoricalSourceView(fixture.blobs, fixture.union) as view:
+        assert fn() == fixture.validator_sha256
+        twin = FunctionType(fn.__code__, dict(fixture.union.__dict__))
+        assert twin() != fixture.validator_sha256
+        assert view.proof()["ordered_read_cycles"] == 1
+
+
+def test_source_view_refuses_a_same_named_validator_with_different_code(invented_view):
+    fixture = invented_view
+    exec(compile("def _validator_source_sha256():\n    return 'invented'\n",
+                 fixture.union.__file__, "exec", dont_inherit=True), fixture.union.__dict__)
+    with pytest.raises(module.HistoricalSourceViewError):
+        module.HistoricalSourceView(fixture.blobs, fixture.union)
+
+
+def test_restoring_the_diagnostic_early_is_refused_at_exit(invented_view):
+    fixture = invented_view
+    view = module.HistoricalSourceView(fixture.blobs, fixture.union)
+    with pytest.raises(module.HistoricalSourceViewError, match="binding changed"):
+        with view:
+            fixture.union._validator_source_sha256()
+            fixture.union.diagnostic = fixture.diagnostic
+    assert fixture.union.diagnostic is fixture.diagnostic
+    with pytest.raises(module.HistoricalSourceViewError):
+        view.proof()
+
+
+def test_source_view_rechecks_the_hash_helper_code_during_reads(invented_view, monkeypatch):
+    fixture = invented_view
+    with pytest.raises(module.HistoricalSourceViewError, match="binding changed"):
+        with module.HistoricalSourceView(fixture.blobs, fixture.union):
+            monkeypatch.setattr(hash_bytes, "__code__", (lambda raw: "0" * 64).__code__)
+            fixture.union._validator_source_sha256()
+    assert fixture.union.diagnostic is fixture.diagnostic
+
+
+def test_a_retained_facade_cannot_read_the_view_after_exit(invented_view):
+    fixture = invented_view
+    view = module.HistoricalSourceView(fixture.blobs, fixture.union)
+    with view:
+        fixture.union._validator_source_sha256()
+        facade = fixture.union.diagnostic
+    fixture.union.diagnostic = facade
+    try:
+        with pytest.raises(module.HistoricalSourceViewError, match="outside the bound validator callsite"):
+            fixture.union._validator_source_sha256()
+    finally:
+        fixture.union.diagnostic = fixture.diagnostic
+    assert view.proof()["ordered_read_cycles"] == 1
+
+
+def test_an_interrupted_cycle_cannot_be_resumed_by_a_later_validator_call(invented_view):
+    fixture = invented_view
+    reads = 0
+
+    def abort_after_second_read(frame, event, arg):
+        nonlocal reads
+        if (event == "return" and frame.f_globals is module.__dict__
+                and frame.f_code.co_name == "read_bytes"):
+            reads += 1
+            if reads == 2:
+                raise RuntimeError("invented interruption")
+
+    view = module.HistoricalSourceView(fixture.blobs, fixture.union)
+    with pytest.raises(module.HistoricalSourceViewError, match="did not complete an ordered read cycle"):
+        with view:
+            previous = sys.getprofile()
+            try:
+                sys.setprofile(abort_after_second_read)
+                with pytest.raises(RuntimeError, match="invented interruption"):
+                    fixture.union._validator_source_sha256()
+            finally:
+                sys.setprofile(previous)
+            with pytest.raises(module.HistoricalSourceViewError, match="missing, repeated or reordered"):
+                fixture.union._validator_source_sha256()
+            with pytest.raises(module.HistoricalSourceViewError):
+                view.proof()
+    assert fixture.union.diagnostic is fixture.diagnostic

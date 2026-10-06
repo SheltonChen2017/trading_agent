@@ -30,6 +30,7 @@ MAX_SIGNALS = 20_000
 MAX_SESSIONS = 6_000
 ROLES = ("source_manifest", "security_master", "calendar", "authorization",
          "outcome", "rights", "qc_entitlement", "delisting", "adjustments", "protocol")
+STREAM_ROLES = ROLES + ("common_equity_exceptions", "stock_context")
 _SHA = re.compile(r"[0-9a-f]{64}\Z")
 _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,79}\Z")
 _TICKER = re.compile(r"[A-Z][A-Z0-9.]{0,9}\Z")
@@ -184,6 +185,23 @@ class StudyTrustRoots:
         return dict(self.role_hashes)
 
 
+@dataclass(frozen=True, slots=True)
+class StreamStudyTrustRoots:
+    """Versioned twelve-role extension; the legacy ten-role roots stay frozen."""
+
+    trust_scope: str
+    role_hashes: tuple[tuple[str, str], ...]
+
+    def hashes(self) -> dict[str, str]:
+        _require(type(self) is StreamStudyTrustRoots and type(self.trust_scope) is str
+                 and self.trust_scope in {"fixture", "production"}, "exact streaming study roots required")
+        _require(type(self.role_hashes) is tuple and len(self.role_hashes) == len(STREAM_ROLES), "incomplete streaming roles")
+        for row, role in zip(self.role_hashes, STREAM_ROLES):
+            _require(type(row) is tuple and len(row) == 2 and row[0] == role, "streaming root order differs")
+            _digest(row[1], role)
+        return dict(self.role_hashes)
+
+
 def verify_signal_manifest(raw: bytes) -> dict:
     """Pure equivalent of the pinned standalone stock-study manifest contract.
 
@@ -245,13 +263,25 @@ def verify_signal_manifest(raw: bytes) -> dict:
     return value
 
 
-def _verify_evidence(artifacts: dict[str, bytes], roots: StudyTrustRoots, manifest: dict) -> tuple[dict, dict]:
-    _require(type(roots) is StudyTrustRoots, "exact study trust roots required")
-    hashes = roots.hashes()
-    _require(type(artifacts) is dict and set(artifacts) == set(ROLES), "artifact roles incomplete or unknown")
-    objects = {role: _decode(artifacts[role], hashes[role]) for role in ROLES}
-    scope = roots.trust_scope
-    source, master, calendar = (objects[role] for role in ROLES[:3])
+def _verify_source(source: dict, scope: str, *, pipeline: dict | None = None) -> None:
+    if pipeline is not None and pipeline.get("kind") == "insider-stock-stream-pipeline-v2":
+        _artifact(source, "insider-backtest-source-population-v2",
+                  {"origin", "scope_sha256", "expected_periods", "quarters"}, scope)
+        _digest(source["scope_sha256"], "stream source scope")
+        _require(source["origin"] == {"fixture": "invented-complete-submission", "production": "sec-original-complete-submission"}[scope],
+                 "stream source origin differs")
+        _require(type(source["expected_periods"]) is list and 1 <= len(source["expected_periods"]) <= 82
+                 and type(source["quarters"]) is list and len(source["quarters"]) == len(source["expected_periods"]),
+                 "stream source quarter inventory differs")
+        for period, quarter in zip(source["expected_periods"], source["quarters"], strict=True):
+            _fields(quarter, {"period", "coverage_sha256", "parent_count", "ordered_parent_inventory_sha256"}, "stream quarter")
+            _require(type(period) is str and quarter["period"] == period and type(quarter["parent_count"]) is int
+                     and quarter["parent_count"] >= 0, "stream source quarter order/count differs")
+            _digest(quarter["coverage_sha256"], "stream coverage")
+            _digest(quarter["ordered_parent_inventory_sha256"], "stream parent inventory")
+        _require(sum(quarter["parent_count"] for quarter in source["quarters"]) == pipeline["stream_corroborated_form4_count"],
+                 "stream source full-population count differs")
+        return
     _artifact(source, "insider-backtest-source-manifest-v1", {"coverage_sha256", "origin", "parents"}, scope)
     _digest(source["coverage_sha256"], "source coverage")
     _require(source["origin"] == {"fixture": "invented-complete-submission", "production": "sec-original-complete-submission"}[scope],
@@ -280,6 +310,17 @@ def _verify_evidence(artifacts: dict[str, bytes], roots: StudyTrustRoots, manife
         identity = (target["period"], target["accession_number"])
         _require(identity not in parent_ids, "duplicate parent evidence")
         parent_ids.add(identity)
+
+
+def _verify_evidence(artifacts: dict[str, bytes], roots: StudyTrustRoots, manifest: dict,
+                     *, pipeline: dict | None = None) -> tuple[dict, dict]:
+    _require(type(roots) is StudyTrustRoots, "exact study trust roots required")
+    hashes = roots.hashes()
+    _require(type(artifacts) is dict and set(artifacts) == set(ROLES), "artifact roles incomplete or unknown")
+    objects = {role: _decode(artifacts[role], hashes[role]) for role in ROLES}
+    scope = roots.trust_scope
+    source, master, calendar = (objects[role] for role in ROLES[:3])
+    _verify_source(source, scope, pipeline=pipeline)
     _artifact(master, "insider-backtest-security-master-v1", {"mappings", "source_exclusions"}, scope)
     _require(type(master["source_exclusions"]) is list and len(master["source_exclusions"]) <= MAX_SIGNALS,
              "source exclusion inventory unbounded")
@@ -449,7 +490,7 @@ def _seal_package(payload: bytes, files: tuple[tuple[str, bytes], ...]) -> Backt
 
 def build_backtest_study_package(*, pipeline_result: object, candidate_source: bytes,
                                 evidence_artifacts: dict[str, bytes],
-                                trust_roots: StudyTrustRoots) -> BacktestStudyPackage:
+                                trust_roots: StudyTrustRoots | StreamStudyTrustRoots) -> BacktestStudyPackage:
     """Bind admitted/scored pipeline output to real content and disabled QC bytes.
 
     The pipeline result must be its exact validated factory object, not caller
@@ -458,10 +499,24 @@ def build_backtest_study_package(*, pipeline_result: object, candidate_source: b
     # This is the lane's pure deterministic pipeline, NOT a LEAN entry point.
     from research.insider_buying.backtest_evidence_pipeline import validate_evidence_pipeline
 
-    pipeline = validate_evidence_pipeline(pipeline_result)
+    extended_hashes = None
+    if type(trust_roots) is StreamStudyTrustRoots:
+        from research.insider_buying.backtest_stream_pipeline import validate_stream_stock_pipeline
+        pipeline = validate_stream_stock_pipeline(pipeline_result)
+        extended_hashes = trust_roots.hashes()
+        _require(type(evidence_artifacts) is dict and set(evidence_artifacts) == set(STREAM_ROLES), "incomplete streaming evidence roles")
+        for role in STREAM_ROLES[len(ROLES):]:
+            _decode(evidence_artifacts[role], extended_hashes[role])
+            _require(pipeline[role + "_sha256"] == extended_hashes[role], "stream pipeline additional evidence differs")
+        evidence_artifacts = {role: evidence_artifacts[role] for role in ROLES}
+        trust_roots = StudyTrustRoots(trust_roots.trust_scope, tuple((role, extended_hashes[role]) for role in ROLES))
+    else:
+        pipeline = validate_evidence_pipeline(pipeline_result)
     raw = pipeline_result.signal_manifest_bytes()
     manifest = verify_signal_manifest(raw)
-    objects, hashes = _verify_evidence(evidence_artifacts, trust_roots, manifest)
+    objects, hashes = _verify_evidence(evidence_artifacts, trust_roots, manifest, pipeline=pipeline)
+    if extended_hashes is not None:
+        hashes = extended_hashes
     _require(type(candidate_source) is bytes and _sha(candidate_source) == QC_CANDIDATE_SHA256,
              "standalone QC source is not the pinned candidate")
     _require(pipeline["trust_scope"] == trust_roots.trust_scope and

@@ -1,6 +1,8 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 139-140 RECORD THE OWNER'S EXPLICIT CLAUDE-WAIT WAIVER
+Status: **SECTION 141 COMPLETES THE CONTINUOUS OFFLINE SOURCE-SCALE,
+CAUSAL-FIRST-OPEN, REGISTERED-ANALYSIS AND NATIVE-QC ENGINEERING ROUND.
+SECTIONS 139-140 RECORD THE OWNER'S EXPLICIT CLAUDE-WAIT WAIVER
 AND BACKTESTING-READINESS BUILD (NOT FORWARD-LOOKING RESEARCH).
 SECTION 136 COUNTER-REVIEW IS ACCEPTED AFTER QUALIFICATION; SECTION 138'S
 COMMITTED 2006Q1 PREPARATION/QUARANTINE RESULT STANDS. V2 SCALE/PILOT
@@ -18992,3 +18994,418 @@ custody byte identities and all five product-source compilations. Diff
 whitespace checks passed. Only this handoff document is uncommitted after
 the observed candidate run; matching remote no-advancement and exact local
 HEAD checks follow immediately before its commit and the one final push.
+
+## 141. Continuous build: streaming, causal clock, study-scale analysis and native export (2026-10-06)
+
+### 141.1 Scope and decisions before any outcome or cloud action
+
+The owner reiterated for the fourth time: build toward project completion
+or backtesting readiness. This supersedes section 140's decision to end the
+build while safe offline engineering remained. It retains section 139's
+explicit no-Claude-wait exception and delegated engineering decisions, not
+an invented independent review. No new incoming Claude commit is present at
+the initial exact matching-lane fetch. Starting local and origin head is
+`1bfe1b1f18a56fb77ce80ade723e5e482ea2cb80`, clean on the same designated
+Insider worktree and branch. This is a new continuous round, not a second
+push of the preceding round. Accumulate changes and publish once at its end.
+
+Ordinary decisions below are exercised under the owner's delegation instead
+of being re-asked. No new SEC, provider, credential, licensed-row, outcome,
+registered-look, QC upload/job, backtest or execution action is substituted
+for absent factual evidence. Source/reference rights and account entitlement
+cannot be manufactured by naming an artifact or hashing fixture bytes.
+
+| Decision | Selected pre-outcome engineering policy |
+|---|---|
+| IBDEC-141-01 | Continue all safe source-scaling, temporal, analysis and export work now, without a Claude monitor/wait or a routine approval interruption. Preserve historical review and exact execution lineage. |
+| IBDEC-141-02 | Add a separately versioned streaming original-parent successor. The old v2 assessor stays bounded at 256; genuine uncorroborated v2 bookkeeping is corroborated anew by the stream, not by raising an old cap or forging a seal. All source ordinals/forms and preceding quarantine counts remain. |
+| IBDEC-141-03 | Require exactly the contiguous quarters touched by the verified 30-session calendar window. Content-check every original, including later identities, but expose only already-public facts; future amendments cannot erase earlier signals. Raw images are released between records and finite compact-content limits stay explicit. |
+| IBDEC-141-04 | Implement a separate literal first regular open strictly after public acceptance clock. Do not relabel the accepted daily-close candidate or coerce its dates. Pre-open, exact-open and after-close cases have distinct full-instant tests. |
+| IBDEC-141-05 | Keep the provisional XML classifier frozen. Only its singleton non-common-title outcome may be resolved by an exact PIT issuer/title/share-class/SID ordinary-share exception. Restricted/preferred/ADR/derivative titles and other economic filters cannot be cleared. Require every stock's complete preceding 60-session context, price >=$5 and 20-session mean dollar volume >=$2M, including no-filing securities. |
+| IBDEC-141-06 | Refuse potentially eligible transaction dates earlier than the complete source scope unless separately bound historical economic-lot context exists. A filing-window census alone cannot prove an older lot's post-aggregation value. |
+| IBDEC-141-07 | Freeze an explicitly new analysis engineering candidate before outcomes: 20-session matched factor-adjusted stock primary at 10bps per side; alpha 1/160, nontransferable ETF reserve 1/160; 5/60-session and 0/5/10/20bps views descriptive. The candidate uses PIT industry-exact matching, preceding 252-session six-factor OLS, issuer/actual-entry-date clustered inference with stated asymptotic/overlap limitations, date-block bootstrap diagnostics and chronological splits. Specific power planning is a pre-outcome design assumption, not a measured production variance or a universal sample threshold. Production evaluation remains unavailable under the unchanged zero-look gate. |
+| IBDEC-141-08 | Adapt supplied native QC exports and compiled-source bytes only through an externally anchored capture inventory. Native order/log pagination, order events, tags, SID, fill time/quantity and source/object-store parity are substantive checks. Missing native compile association, data-vintage/engine/default-cost evidence stays explicit rather than being inferred from Completed. Reuse the three-attempt/Mia boundary without launching anything. |
+| IBDEC-141-09 | Freeze each owner/security/transaction-date lot at its first $50,000 crossing's first open, incorporating only additional members public before that open. Never reset/retrade a lot after entry; merge same-issuer/same-entry lots before inference. Known amendments act prospectively, not by erasing earlier events. This causal engineering policy is explicitly bound into the new registration. |
+| IBDEC-141-10 | Require a separately versioned per-entry known/active full PIT cohort and complete price/liquidity context. Later-known/listed securities cannot enter an earlier control universe. Hash-bind one-pass reference records with finite 128-MiB individual / 128-GiB aggregate bounds; retain compact eligibility/earnings/regime receipts, not all raw 60-session frames. The old bounded nested-reference profile remains separate. |
+| IBDEC-141-11 | Generate a new default-disabled standalone canonical-clock candidate from exactly pinned legacy source bytes, preserving the old file. Queue MOO orders two minutes before the anchored open, with only already-known source/mapping/context facts and prior-session prices. Refuse an entire incompatible event population, never silently omit or delay events. Deterministically partition every event before outcomes into fixed-capital/capacity children; all children must complete under one parent study/look before analysis. Child capital is not a pooled-portfolio assertion. |
+| IBDEC-141-12 | Complete safe supplied-ledger risk/capacity and alternate-execution diagnostic arithmetic without acquiring any data or activating production evaluation. Distinguish exact input requirements, unknown actual engine/corporate-action parity and unobserved empirical results from software completion. No fixture policy/hash is factual rights, entitlement or registered-look evidence. |
+| IBDEC-141-13 | Primary matched controls exclude the subject issuer and contemporaneous entry-date event issuers, with all matching features known before entry; choose three nearest distinct issuers by PIT features, never outcomes. Do not use later filings to claim tradeable PIT selection. A retrospective +/-60-session uncontaminated-control variant needs a separately complete source-event census, which the bounded event manifest alone cannot establish at its boundaries. Cross-date control-event contamination remains an explicit limitation, not a fabricated measured correction. |
+| IBDEC-141-14 | Make the first stock study reachable across enough independent dates: compose genuinely sealed, adjacent source/event windows into one externally pinned, preregistered parent collection, preserving child epochs and deduplicating repeated-quarter custody counts. Do not call a <=two-quarter child a sufficient 320-date study. Consume large outcome panels as separately hash-bound one-pass entry-date records and release prior raw/features/outcomes between dates; retain only compact aggregate-analysis facts. These are offline software successors, not new source access, an actual 82-quarter publication, a look or a data-completeness promotion. |
+| IBDEC-141-15 | Add a separately versioned stock-context-v3 first-listing provenance contract, not inference from a mapping's start date. A genuinely complete young listing's existing history is checked and its insufficient-60-session context retained as a named exclusion; missing older bars still refuse. Exact document/record/vintage/root bindings and pre-entry publication/knowledge are necessary, not source authentication by this validator. V2 remains unchanged. |
+| IBDEC-141-16 | Resolve the primary calibration/sample policy before any actual outcomes: this first primary candidate requires at least 253 prior regular sessions of listing seasoning and all 252 actual prior instrument open intervals. Exclude younger v3 securities from this explicitly seasoned-stock candidate before outcomes with named counts/SIDs, retaining complete source accounting; do not synthesize prelisting returns or imply the candidate validates all young-stock economics. Listing age is necessary, not proof that actual calibration bars exist. Production causal references require explicit v3 listing provenance; bounded fixture-v2 compatibility remains separate. |
+
+### 141.2 Verified implementation and corrected draft findings
+
+The original-parent stream's genuine 300-parent test starts from the old
+assessor's missing-parent coverage; no test patches its 256-parent cap.
+The 270-record weak-reference control proves each prior raw record is
+released before the iterator yields another. Cross-quarter scope, all-six-
+form accounting, future originals/amendments, original header/XML identity
+and ambiguous/nonexistent Eastern acceptance controls are exercised.
+Amendment identity is parsed, but economic amendment linkage/eligibility
+stays explicitly unevaluated, not a fabricated original accession or zero.
+The new stream has 68 green cases; combined with the unchanged v2 assessor
+and downstream contracts: **167 passed in 2.06s**, no skips/warnings.
+
+`IBSSTREAM-R01` (P2, corrected): repeated references to a large shared
+footnote could expand a small original XML into a large compact transaction
+list before the aggregate guard. A one-byte per-parent compact-limit
+negative was **1 failed / 58 deselected in 0.67s**, `DID NOT RAISE`; the
+incremental 16-MiB per-parent guard made it **1 passed / 58 deselected in
+0.47s**. A genuine 300-row/64-KiB shared-footnote fixture tests expansion.
+An in-memory reversal of the future-as-of flag produced **1 failed in
+0.33s** at a leaked amended-issuer fact, then was restored safely.
+
+The root's event-clock/PIT-class/context cases passed **45 in 1.60s**.
+The first run's **1 failed / 44 passed in 1.48s** was duplicate-JSON
+error-message wrapping, not duplicate acceptance; specific safe refusal
+messages now survive wrapping. Streaming source→context/classification→
+stock score→disabled QC package plus legacy package/event-clock controls
+passed **202 in 5.38s**. The source package has a separate twelve-role root
+type rather than changing the old ten-role contract or serializing every
+raw parent into a bounded package. Full factory lineage is still required.
+
+`IBSTREAMPIPE-R01` (P2, corrected): peer verification supplied an original
+January filing for a December transaction with a valid older PIT mapping.
+The draft accepted its value despite complete source coverage starting in
+January, so an earlier same-economic-lot member could be missing. The
+genuine factory-path negative was **1 failed / 32 deselected in 0.56s**,
+`DID NOT RAISE`. Refusing potential economic lots preceding source context
+made that case and two positive source-window controls **3 passed / 30
+deselected in 0.90s**. This is corrected input-completeness behavior, not a
+claim that retained real signals or a ready manifest previously escaped.
+
+New native-export and registered-analysis code received separate inspection
+by collaborating Codex agents and main, not an independent Claude review.
+Intermediate runs below are draft-tree evidence, not the final integrated
+tree. All tests/probes are synthetic
+and execute under effective OS process-tree network denial, minimal env,
+disabled plugins/cache and Python `-B`. No complete lane/repository suite,
+retained data change, empirical research look or cloud job has occurred.
+Final integrated counts, exact hashes and remaining factual limits are
+recorded separately below; the committed handoff identifies exact hashes.
+
+Additional inspected corrections are being retained in the same round:
+`IBCLOCK-R01` (P2) rejects a direct claimed-eligible restricted-stock title
+instead of trusting the caller's outcome label; red **1 failed / 45
+deselected in 0.68s**, corrected event-clock plus stream controls **79
+passed in 3.75s**. `IBQCEXPORT-R01` (P2) fixes Python bool/integer equality
+letting a flattened event inventory differ from its native ordered source;
+red **5 failed / 98 deselected in 0.61s**, typed-equality green **5 passed /
+98 deselected in 0.57s**. `IBANALYSIS-R01` (P3) fixes ambient Decimal
+precision rounding a numerical domain-bound check; red **1 failed / 1
+passed / 98 deselected in 0.61s**, using exact `copy_abs()` in both bounds.
+The frozen analysis/native-adapter pair passed **240 in 3.75s** before the
+later per-entry-control successor and diagnostic additions.
+
+`IBCAUSAL-R01` (P2) was independently reproduced by a peer: an externally
+reanchored SID mapping first known on February 1 entered a January 16
+reference/control cohort. The corrected per-entry cohort/control contract
+refuses this future mapping; a faithful in-memory reversal was caught by
+its durable negative (**1 failed in 0.57s**). That reversal is not relabeled
+as an observed draft pre-fix test execution. This is
+not permission to claim old fixtures establish complete real US coverage.
+The new canonical candidate also needs its own export submission-clock
+profile; the earlier after-close native adapter is not coerced into it.
+
+Main inspection of that new native profile found `IBQC-CANON-R01` (P2):
+formatting a genuine `14:30:00.500000Z` callback to whole seconds could
+misrepresent it as the exact open. The full invented-native factory-path
+negative was **1 failed / 63 deselected in 0.67s**. Preserving the full UTC
+ISO instant made it **1 passed / 63 deselected in 0.64s**; strict parent
+completion now refuses the fractional callback, not a relabeled timestamp.
+`IBQCEXPORT-R02` (P3) independently confirms the native share cap could be
+rounded under ambient Decimal precision: both signs of 1,000,000,000,001
+passed a 1e12 bound at precision five. Red **2 failed / 140 deselected in
+0.52s**, exact `copy_abs()` green **2 passed / 140 deselected in 0.53s**.
+An initial missing test import was collection/setup failure, not behavioral
+proof. Main's independent completed earlier stream/clock/legacy-package/
+native-export selection passed **412 in 8.67s**; later causal-manifest
+selection passed **49 in 3.09s**, before final candidate additions.
+
+`IBQC-CANON-R02` (P2, corrected): a fixed 100-digit cash context could still
+erase unsupported native scientific fees of `1e-100` from a $10,000 exact
+reserve. A peer's genuine twenty-entry export independently reproduced the
+failure (**1 failed / 130 passed in 5.14s**). Durable focused red **1 failed /
+78 deselected in 0.88s**, explicit USD magnitude <=1e12 / scale <=28 profile
+green **1 passed / 78 deselected in 0.65s**. Unsupported precision refuses;
+the largest supported `1e-28` fees are retained under ambient precision
+three. Bounded money/share/count arithmetic then fits the candidate's
+100-digit context; no silent zero-fee rounding is accepted.
+
+`IBSTREAMPIPE-R02` (P3, corrected): equal mutable byte facades could pass
+the draft pipeline seal check, although later content changes were already
+refused. Main's exact factory negative was **1 failed / 33 deselected in
+0.60s**, `DID NOT RAISE`; an exact immutable-byte type guard made that
+case and the preceding-source economic-lot control **2 passed / 32
+deselected in 0.51s**. No changed economics or actual authorization escaped.
+
+Final genuine-clock/native source generation includes a 41-issuer fixture
+partitioned before outcomes into children of 20/20/1 events; all 82 invented
+native fills are required before parent completion. Missing/reordered child
+inventories refuse. The candidate/native pair passed **229 in 3.86s**
+(87 canonical, 142 legacy-native controls), with four faithful in-memory
+guard reversals caught and disk identities rechecked. This is not a QC run.
+The final successors below supersede this intermediate count. QC's final
+88 canonical + 142 native-v1 + 23 collection tests passed **253 in 20.26s**.
+The plan/export exact-byte guards were already in the frozen source;
+splitting their regressions gave **2 passed / 86 deselected in 0.58s**.
+Restoring both pre-guard conditions in memory only gave **2 failed / 86
+deselected in 0.44s**, with disk hashes unchanged; not a new on-disk defect.
+
+`IBCAUSAL-R02` (P2, corrected) removes quadratic rescanning of all earlier
+members when updating one economic lot. A genuine 300-member factory test
+was **1 failed / 49 deselected in 1.06s**; incremental exact two-value
+summation made it **1 passed / 49 deselected in 0.93s**, preserving $15M.
+Compact entry-prerequisite facts received **2 failed / 50 deselected in
+0.69s**, then **2 passed / 50 deselected in 0.64s**. This is finite source
+processing, not proof of any real positive eligible lot.
+
+`IBANALYSIS-R02/R03/R04` (P2, corrected) respectively repair opening-cashflow
+timing in time-weighted returns, the fractional empirical 5% expected-
+shortfall tail, and inconsistent cross-horizon entry prices. Genuine draft
+negatives were **3 failed / 133 deselected in 0.50s**: old flow return
+about .008899918 instead of .017308959; old ES -.00505 instead of -.00910;
+and real entry-price drift did not refuse. Other inspected corrections
+retain exact entry plus split-adjusted exit traded-notional fees (not fees
+on dividends), refuse repeated signals even after their earlier position
+closed, and bound USD scale/magnitude and share counts before 100-digit
+financial arithmetic. Those findings came from code inspection, not an
+invented pre-fix red run. Final positive/danger tests prove .0779/.0758
+cost results and precision boundaries. Separately labeled in-memory
+reversals of precision, signal uniqueness and external record hashing each
+produced **1 failed / 170 deselected in 0.33s, 0.31s and 0.33s**. Exact
+Decimal economic-price comparison permits `100` and `100.00` while their
+distinct original byte hashes remain; a text-comparison reversal gave
+**1 failed / 171 deselected in 0.45s**. No disk mutation survives.
+
+### 141.3 Completed continuous engineering behavior and sample-scale proof
+
+The new source stream corroborates genuine originals beyond the old
+256-parent limit without changing it. Full quarter census/original accession
+receipts retain all six forms and preceding quarantine accounting. The
+daily-close stream/package is a separate compatible successor; it is not
+backdated into the canonical first-open study. The separate event clock
+requires literal first regular open strictly after complete public
+availability, immutable PIT ordinary-share exceptions and every known
+stock's preceding liquidity/price context. Missing history is not zero.
+
+The causal factory freezes a lot at its first $50,000 crossing's first
+open, adds only members available before that open, never resets/retrades
+late members, and merges issuer/entry-date lots. Known amendments act
+prospectively. Each entry date independently checks the then-known active
+PIT stock universe; future-known controls cannot enter it. Hash-bound,
+one-pass reference records release raw prior-price frames between dates.
+The final v3 successor independently binds explicit first-listing record/
+document/vintage provenance and pre-entry knowledge; a mapping start is not
+listing birth. Verified young histories must include every existing prior
+session, including a genuine first-day empty history; prices/ADV unavailable
+from too few actual observations remain `null`, not zero. Missing/reordered
+older history still refuses. V2's exact-60-session contract remains unchanged.
+
+Under delegated pre-outcome decision IBDEC-141-16, this first primary
+candidate explicitly targets seasoned stocks with at least **253 prior
+regular listing sessions**, independently retaining all **252 actual prior
+open-to-open calibration intervals**. Listing-age lower bounds do not
+prove actual price observations. Young v3 SIDs remain in the full reference
+and source accounting but receive named primary calibration-seasoning
+exclusions from both events and controls before outcomes. This is an
+explicit restricted candidate population, not a universal young-stock
+strategy validation or a hidden performance-based row drop. Production
+causal references require v3 provenance; fixture-v2 compatibility does not
+assert real listing age. A genuinely empty known-earnings list is retained
+only for an already-excluded v3 SID with a named unavailable/`null` distance;
+primary-eligible SIDs still require complete nonempty known calendars.
+Listing and excluded-security earnings knowledge both remain in the sealed
+latest prerequisite used by the MOO cutoff. These choices do not create
+source authentication, licensing, look registration or QC authority.
+The final clock/causal/source/collection selection passed **246 in 23.21s**
+(93/62/68/23 cases). Genuine v3 252/253-session source-event boundary cases
+retain two original source events and emit one/two primary events with
+explicit seasoning exclusions of one/zero. Excluded first-day listing
+metadata at 14:29 remains binding against a 14:28 MOO cutoff. A faithful
+in-memory reversal of that latest-listing-metadata integration gave
+**1 failed / 61 deselected in 0.41s**, then was restored. Zero/19/59/60
+history, future/simultaneous listing knowledge, missing/reordered old bars,
+first-listing/document/record/vintage/type/root and empty-earnings controls
+all pass. This is a new explicit contract, not a claim the old v2 missing-
+history refusal was a bug. Fixture-v2 and eligible-v3 empty earnings still
+refuse. Weak-reference tests cover empty final-history record release.
+
+`backtest_event_study_collection.py` combines genuinely sealed adjacent
+windows under one fixed candidate/look/policy/source-reference epoch, not
+one alpha allocation per child. Calendar gaps/overlaps, reused economic
+lots/members, changed child descriptors and cross-quarter duplicate
+accessions refuse. Identical repeated-quarter custody is counted once;
+detached original per-child counts, exclusion receipts and provenance also
+remain. Explicit complete below-threshold zero-event windows preserve
+continuity; missing originals/all-quarantine windows cannot masquerade as
+zero, and an entirely empty collection never becomes ready. Inventory is
+bounded at 4MiB, child count 1,250, aggregate child bytes 128GiB, unique
+source rows 5M, events 20,000 and sealed parent envelope 256MiB. Old child
+limits remain unchanged.
+
+A six-window/six-invented-quarter genuine-factory fixture reaches **390
+literal entry dates**, not a forged seal or relaxed date threshold. It
+deliberately has one issuer and does **not** prove adequate independent
+issuer clusters. A genuine below-threshold middle-quarter control retains
+195 unique source rows, 130 events and 195 compact prerequisite dates.
+Repeated-quarter accounting tests show four unique source rows, not eight.
+The source/causal/collection/canonical selection passed **230 in 23.05s**
+before the final additional canonical guard case. In-memory reversals of
+the repeated-quarter and continuity guards were caught (**1 failed / 15
+deselected in 0.55s**, **1 failed in 0.61s**). Restored disk identities and
+genuine composition→disabled-QC compatibility were independently checked.
+
+The registered-analysis successor processes one externally hashed panel
+record per actual entry date. It checks the full PIT feature universe but
+reads future histories only for the three independently selected distinct
+issuer controls; it releases raw/features/outcome maps between dates and
+retains compact derived calculations. The single permanent registration
+and alpha allocation cannot change between records. A **321 distinct
+fixture issuers/dates × 6,000 control features** matrix reaches the exact
+320-count design without shrinking it or imposing the old 1,000-stock
+fixed-cohort cap. This is synthetic software statistical adequacy, not a
+measured variance calibration or real historical sample. Analysis focused
+integration passed **453 in 39.68s** before the final seasoning descriptor;
+its updated selection passed **460 in 39.11s**, including a genuine small
+causal→disabled candidate→invented native MOO→exact terminal→current-
+implementation-hash-bound analysis path. These separate fixtures are not
+misrepresented as one observed 390-date source-to-cloud research study.
+
+Implemented calculations include preceding 252-open-interval six-factor
+OLS, distinct-issuer industry-exact PIT matching, issuer/date CR1 inference,
+registered development/validation/confirmation splits, 5/20/60-session
+and cost views, deterministic date-block bootstrap, earnings/regime/year,
+score/buyer breadth and nonoverlap diagnostics. Supplied full order/cash
+ledgers additionally compute exact cash/position/mark/fee/flow reconciliation,
+time-weighted returns, risk/turnover/capacity. Independently supplied
+next-open/next-close/one-session-delay order exports compare their actual
+bound times, prices, fees and source epoch, not inferred execution prices.
+Shuffled-date/security schedules and source-bound code-A/stale placebo
+validators exist; their fresh price/census inputs remain required.
+
+Canonical QC source is generated default-disabled from the exact legacy
+`c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87`
+bytes. MOO orders queue two minutes before the anchored open using only
+known prerequisites and exact prior regular-close bar context. Any event
+or prerequisite later than that cutoff refuses the entire population, not
+a conveniently dropped/delayed row. Deterministic fixed-20-slot children
+retain separate $100,000 capital/$4,500 slots/$10,000 reserve and the
+existing three-attempt/pending/completed/Mia ledger boundary. All children
+and every event must complete. Native captures bind source, object-store
+content, SID/tags, pagination/counts, order events and fees. Full fractional
+callback timestamps are preserved. Native opening callbacks may be within
+the first minute, but strict analysis still requires the exact anchored
+open; no rounding or automatic engine parity is asserted. Default source
+is disabled, production accounting/configuration/native completion and
+analysis remain fact/registration-gated, and no actual job was launched.
+
+### 141.4 Final integrated validation, identities and exclusions
+
+Main's final integrated focused selection passed **1,234 in 82.53s**,
+with no failures, skips or warnings. All twenty-one named targets ran
+against the final clock/listing, causal, collection, analysis and QC tree.
+Before the final v3 listing/seasoning successor, the same named focused
+selection passed **1,171 in 81.26s**, no failures/skips/warnings. Do not
+attribute that earlier count to the later source bytes. Tests execute from
+base HEAD `1bfe1b1f18a56fb77ce80ade723e5e482ea2cb80` plus the explicitly
+hashed uncommitted source/test tree; the later implementation commit did
+not already exist during these executions.
+It includes the nine affected source profiles and their focused tests,
+old identity-v2/downstream/isolation and evidence/package compatibility,
+the exact Insider package guard, lane/ML/overlay/project import boundaries,
+active-document and lane-record checks. This is **not** a complete lane or
+repository suite. Every test/guard reversal ran under effective OS
+process-tree network denial, minimal environment, disabled pytest plugin
+autoload/cache and Python `-B` on bundled Python 3.12.14. All eighteen
+affected source/test files compile in memory under network **and all file-
+write denial**; diff-check is clean. The four frozen v3 files are byte-equal
+to exact historical `aa0d635d00b64825bf8003289e0a60279bd52e73` via Git
+comparison. No retained-root replay was repeated in this round; section
+140's real negative observation remains attributed there.
+The exact package guard is
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`,
+not a similarly named broad test selection. Old identity-v2/downstream/
+isolation, legacy evidence/package and lane/ML/overlay/project/document
+targets remain part of the same 1,234-case result. Publication checks
+repeat the document/record and exact guard after this final record update.
+
+| Implementation file under `research/insider_buying/` | Final SHA-256 |
+|---|---|
+| `backtest_event_clock.py` | `d0aea8bc621f34783781cb8787beb203086420ff716c22b7ef8b4c31d3d3c225` |
+| `backtest_source_stream.py` | `bec99e3f9efda66e0bad3e237d13001ebcd5474403717223d18e93ffd2337aef` |
+| `backtest_stream_pipeline.py` | `ce5bc67561a5202a291d4449cb08146d272641753d9960eda2c97a1ac70aa0b7` |
+| `backtest_event_study_manifest.py` | `aca0abca806cffbce8ac23094a44d72d457e39614ae6f8dacdc04ba77bdfed6b` |
+| `backtest_event_study_collection.py` | `9e35f73e9785918cbaed1e7fdd677d2e078e5444e75dbf14af57250b3236a538` |
+| `backtest_registered_analysis.py` | `0b32e50432a3fd6801b92c64b0a49316ced3dbe2bd2b877dd8768f372545be19` |
+| `backtest_qc_export_adapter.py` | `9793309e08c0c570549ec6723409d685c64514cd1ea4cbde5acea8ea4377c3b4` |
+| `backtest_qc_canonical_candidate.py` | `d1522e777c216715709c8342f8d8dbe3cdfbddf696b12cb834edb738a3ecfd4a` |
+| `backtest_study_package.py` | `4fdd7ed16e6b7b1541efdd0aa656db04dc51f1e7301e66b9f14bce004f30af6d` |
+
+| Affected focused test file under `tests/` | Final SHA-256 |
+|---|---|
+| `test_insider_buying_backtest_event_clock.py` | `777c7508c1cd08af1b98a51f07d600d7d9b83fcf34a2bfbe121381ae9cef6d0c` |
+| `test_insider_buying_backtest_source_stream.py` | `6c895c164fdccb09ae4f44b33bea212c4bbfa0be03bbc9ea2d84707500e035aa` |
+| `test_insider_buying_backtest_stream_pipeline.py` | `7746c9600107aed36027ee4324a322069d71675ba23d4dfcfe44491f6739fa29` |
+| `test_insider_buying_backtest_event_study_manifest.py` | `c8e3a5dadc8bbc4ac0e9785143ffeacce2e98574aae63b791e8b68553341703a` |
+| `test_insider_buying_backtest_event_study_collection.py` | `74772fad3c76487ce245df3b080d5b0eed9a47d828a9e80024ffd3b72b8edee0` |
+| `test_insider_buying_backtest_registered_analysis.py` | `506b6a467e90cfd539ee7c9f7688f2391fd1e50ec2c15858e2920a6e0e2869a1` |
+| `test_insider_buying_backtest_qc_export_adapter.py` | `8265d4a84648fdad4e6674a5b567da124773874a3e192c045882c50bbcd6d723` |
+| `test_insider_buying_backtest_qc_canonical_candidate.py` | `ebb98679994bde4f4a75c02f7a2988ea390bbfc416bfc1142052a6eae82d698f` |
+| `test_insider_buying_backtest_study_package.py` (unchanged) | `8b9820ca6190924bc8577f1402c0e36ebc3188f4fa8494c2fac6fc27e91ffd6b` |
+
+### 141.5 Remaining real-input boundary, preserved ledger and next action
+
+This round removes additional **engineering** blockers; it does not meet the
+requested actual project-complete/backtest-ready endpoint. The inspected
+supplied roots still do not establish the nineteen substantive IB-5 input
+declarations listed in 138.3. No new factual input was acquired this round.
+The actual 2006Q1 upstream/downstream observation still retains/quarantines
+all 83,657 rows and yields no eligible canonical population; fixture
+originals or positive fixture statistics cannot replace its 71,679 missing
+relevant parents. No private evidence outside the inspected roots is
+claimed absent. Remaining required work is input-driven:
+
+| Real prerequisite | Required consequence before activation |
+|---|---|
+| Complete relevant original parents/official timing and affected-quarter identities | Corroborate actual history; missing/quarantined rows cannot become a complete-zero window or be silently omitted. Strict D23 seven-nonexact-quarter disposition remains separate. |
+| Audited PIT issuer/share-class/SID master, first-listing provenance, regular-session calendar and per-entry price/liquidity/features/earnings/regime context | Populate genuine causal event/control collections. Complete young histories have named context/primary-seasoning exclusions, not fabricated prelisting bars; missing older bars or older economic-lot source context still refuse. The explicit seasoned first candidate does not validate universal US-stock economics. |
+| Outcome vintage/coverage, adjustment and terminal-delisting semantics plus applicable processing rights | Bind actual 5/20/60-session, prior-factor and control/diagnostic inputs. No fresh outcomes were viewed; no empirical selection, variance calibration or required diagnostic result exists from these fixtures. |
+| Account/dataset/representation-specific QC entitlement and permanent candidate/look registration with genuine implementation/data roots | Establish factual activation evidence before production configuration, upload or first attempt. A generated source/hash, candidate method decision or caller `production` label is not evidence. |
+| Actual native compile/source association, complete child terminal exports and real engine/data/corporate-action parity | Verify actual completed order-based runs subject to three attempts/Mia, not just invented-native adapter tests. Exact-open/cutoff incompatibility or nontrivial 20-session corporate-action parity currently refuses rather than changing economics. |
+
+No ordinary engineering-policy approval or Claude-wait condition is being
+returned to the owner. The owner delegation resolves the choices in 141.1;
+it cannot create missing source/PIT/licensing/account facts or spend an
+unregistered look. Actual activation adapters that require those facts
+remain deliberately withheld; the software candidates are not labeled
+production-complete. Further real-input verification/activation uses the
+same lane and documented decisions without a routine review pause when
+the substantive evidence is actually available; absent it, do not change
+literal-false gates or launch a job merely to manufacture completion.
+
+All prior P0-P3 entries and resolved findings remain. Four topical P2
+findings **IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 remain
+OPEN** at their precise factual/legacy/frozen scopes; the new contract,
+streaming and analysis tests do not close them. Frozen IB-1C v1/scale/pilot
+and all four v3 custody files remain unchanged, with no thaw. Stopped v3
+stays unresolved at 1,846 completed/1,847 starts. Frozen 2022Q4-2023Q1
+Form 4/4-A denominator remains **99,394 = 9,539 + 1 + 8,139 + 1,846 + 1 +
+79,868**, only **19,526 source-bound**, not a completed corpus. The separate
+7,373-byte diagnostic/report
+`206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`
+does not resolve the original unmatched start or establish SEC/PIT/rights.
+The 372-request classification remains **historical authorization provenance
+not established**; the separate reviewer incident remains **reviewer-
+reported probable unintended SEC access; exact request count and transferred
+bytes not established**, distinct and without retroactive approval.
+
+Shared documents, Action Plan and Session Handoff are unchanged. No new
+SEC/provider/credential/licensed-row access, QC upload/job, registered or
+outcome look, backtest, broker/operator-database/scheduler, deployment,
+capital/order/paper/live/trading action occurred. **Looks/jobs/backtests
+0/0/0**, all real source/PIT/rights/canonical/mapping/look/QC/backtest/
+execution authority gates false. One combined matching-lane push follows
+the separate exact-hash handoff and final no-advancement verification;
+heartbeat stays PAUSED, no Claude wait/rearm/message is inserted.

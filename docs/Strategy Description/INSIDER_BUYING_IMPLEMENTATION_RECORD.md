@@ -1,20 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTIONS 128-129 RECORD CODEX'S ACCEPTED COUNTER-REVIEW OF BOTH
-CLAUDE COMMITS IN `ad41bd9..ffcf05f` AND THE NEXT BOUNDED OFFLINE HISTORICAL
-CUSTODY REPLAY CANDIDATE IN `1027104`. THE RETAINED-ROOT REPLAY EXECUTED
-SUCCESSFULLY; THE NEW IMPLEMENTATION AND SEPARATE HANDOFF REQUIRE CLAUDE'S
-INDEPENDENT REVIEW BEFORE ANOTHER MILESTONE. `IBREV-CR01` IS CLOSED BY THE
-OWNER'S DISPOSITION RECORDED IN 126.1:
-"REVIEWER-REPORTED PROBABLE UNINTENDED SEC ACCESS; EXACT REQUEST COUNT AND
-TRANSFERRED BYTES NOT ESTABLISHED," WITHOUT RETROACTIVE APPROVAL AND SEPARATE
-FROM THE 372-REQUEST CLASSIFICATION. OFFLINE V2/V4 AND THE MIXED HISTORICAL/
+Status: **SECTION 130 RECORDS CLAUDE'S REVIEW OF THE TWO CODEX COMMITS IN
+`ffcf05f..32d061ef` (SECTIONS 128-129 AND THE HISTORICAL CUSTODY REPLAY
+CANDIDATE): BOTH ACCEPTED, `1027104` AFTER CORRECTION IN `1c4f7a06` (A SECOND
+EXEC LITERAL FOR A FRAMEWORK INTERPRETER'S RELAUNCH; SEVEN REFUSAL RULES
+PINNED). THE OBSERVED REPLAY REPRODUCED ON THE COMMITTED HEAD WITH EVERY
+128.4 HASH EQUAL. `IBREV-CR01` REMAINS CLOSED BY THE OWNER'S DISPOSITION IN
+126.1 WITHOUT RETROACTIVE APPROVAL. OFFLINE V2/V4 AND THE MIXED HISTORICAL/
 CURRENT-SOURCE REPLAY REMAIN CANDIDATES, NOT FULL HISTORICAL-ENVIRONMENT REPLAY;
 FOUR P2 FINDINGS REMAIN OPEN AND FAIL CLOSED. STRICT D23 RETAINS SEVEN
 NON-EXACT QUARTERS AND NO 82-QUARTER DIGEST. V1 AND THE FOUR V3 CUSTODY FILES
 ARE FROZEN; THE STOPPED V3 ROOT IS UNRESOLVED AT 1,846 OF 1,847 STARTS. ONLY
-19,526 OF 99,394 PARENTS ARE SOURCE-BOUND. NOT BACKTEST-READY. NO NEW
-SEC/PROVIDER/CREDENTIAL/LICENSED-ROW, OUTCOME, QC, BACKTEST,
+19,526 OF 99,394 PARENTS ARE SOURCE-BOUND. NOT BACKTEST-READY. CODEX
+COUNTER-REVIEW OF THE TWO CLAUDE COMMITS IS REQUIRED; NO NEXT MILESTONE IS
+AUTHORIZED. NO NEW SEC/PROVIDER/CREDENTIAL/LICENSED-ROW, OUTCOME, QC, BACKTEST,
 BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING AUTHORITY. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
@@ -232,6 +231,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-02 | Codex owner-disposition record and bounded counter-review publication | Incoming `c7be1f8..ebb30c5`; local correction `d0348d0`, handoff `50f5567`, then this owner-record commit | Publish only the completed offline counter-review | Owner accepts the separate probable-access classification with count/bytes not established and without retroactive approval; authorizes exactly the bounded offline counter-review push. Section 125's historical stop remains preserved and is superseded only for this publication. No next milestone or data access. | Section 125's focused 112 and boundary 74 remain the code-tree evidence; final narrow rechecks and publication checks are recorded in 126.3. No complete suite or source requests; 0 looks/jobs/backtests. | `IBREV-CR01` P1 process CLOSED by final owner disposition, not retroactive approval or established acquisition evidence; current safeguards verified. Four topical P2 and all other ledger statuses unchanged. | One matching-lane push after clean-tree/ancestry/remote checks, then verify exact origin tip and stop. Claude reviews the exact new Codex range; heartbeat stays paused. |
 | 2026-10-02 | Claude review | `ad41bd9` -> `ed6892a` (scan hardening and controls) -> this review record | Independent review of the section-125 counter-review, the connection-patch scan rewrite, and the section-126 owner-disposition record (`ebb30c5..ad41bd9`, 3 commits, 0 merges) | Dispositioned all three commits and accepted all three findings against this reviewer after reproducing each: the old scan is fooled by 7 of 7 misleading samples, the retry scenario gives 246, 3 and 3 requests per run, and both pilot quarters have zero accession-year mismatches. Mutation-tested the rewritten scan, added three forms it did not see, and pinned its untested rules. Every run was network-denied, on Python 3.13.15 and on Codex's Python 3.12.14 runtime. | Pushed `ad41bd9`, network denied: complete suite **10,175 passed, 38 skipped, 0 failed in 541.54s**. Scan mutants **7 of 14** as pushed, **18 of 18** after; five controls red on `d0348d0`. Lane gate **3,993 passed** on both Pythons. Final tree, network denied: complete suite **10,191 passed, 38 skipped, 0 failed in 533.26s**. **0 looks**. | `IBTEST-CCR05` P2, `IBREV-CCR01` P2, `IBREC-CCR02` P3 accepted against this reviewer. `IBTEST-CR03` P3 closed in `ed6892a`. `IBREV-CR01` P1 closed by owner disposition as recorded in 126.1, not witnessed. `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` P2 open. No open P0 or P1. | Codex counter-reviews `ed6892a` and this record. No next milestone is authorized. The open P2 gates stand before any further acquisition. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-02 | Codex counter-review and next bounded offline candidate | Incoming `ad41bd9..ffcf05f`; implementation `1027104bbb2fd836f48d15b0698af174549ea78d`; this separate handoff | Accepted section-127 review, then executed historical v3 custody replay | Owner restores counter-review plus next milestone and proceeds within offline-only scope. Both incoming commits accepted separately. Fresh source-only worker executes exact historical four Git blobs plus inventoried later verifiers, replays all retained sources before/after and produces only a sealed count/hash receipt. No current-byte decoupling or thaw. | Focused 205 passed; package/boundary/docs 161 passed; 3 sources compile; actual OS denials verified; observed replay succeeds in 530.80s with receipt `4368a59c...`; final document rechecks in 129. No full suite; SEC/looks/jobs/backtests 0/0/0/0. | `IBHRV-R01/R02/R03` corrected with controls and actual replay; four topical P2 OPEN, prior owner dispositions and resolved ledger retained. Only 19,526 source-bound of 99,394; 79,868 unattempted. | Exactly one combined lane push, verify exact origin tip, then Claude reviews both new commits. Counter-review that push before another milestone; keep four custody files and original v3 frozen, all downstream gates false, monitor PAUSED. |
+| 2026-10-06 | Claude review | `32d061ef` -> `1c4f7a06` (relaunch literal and 29 pins) -> this review record | Independent review of the historical custody replay candidate and sections 128-129 (`ffcf05f..32d061ef`, 2 commits, 0 merges) | Dispositioned both commits. Reproduced the observed replay on the committed head: every 128.4 hash equal, receipt differing only by HEAD. Probed the worker profile for EPERM refusals on both Pythons. Found that the lane venv interpreter could not start the worker (single exec literal; fixed) and that seven refusal rules had no isolating test (pinned). 27 faithful mutants. Every pytest and mutation run network-denied. | Pushed `32d061ef`: new tests **120 passed**, gate **181 passed**, both Pythons. Replay on 3.12.14 **446 s**, receipt `7289a014...`. Mutants **15 of 26** caught as pushed, **24 of 27** after (3 redundant by construction). After the fix: **149 passed** both Pythons, gate **181**, compileall and diff-check clean. Replay on 3.13.15 after the fix **497 s**, retained-root hashes equal. No complete suite, by owner instruction. **0 looks**. | `IBHRV-CR01` P3 and `IBHRV-CR02` P3 closed in `1c4f7a06`. `IBHRV-OBS01` recorded. `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` P2 open. No open P0 or P1. | Codex counter-reviews `1c4f7a06` and this record. No next milestone is authorized. The open P2 gates stand before any further acquisition. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -17019,3 +17019,181 @@ request, and never broaden the source window. Any later missing-evidence,
 policy or owner-decision gate must be recorded and brought to the owner
 before that next step or push. Heartbeat stays **PAUSED**, without automatic
 rearm or inferred messaging to another chat.
+
+## 130. Claude review - sections 128-129 and the historical custody replay candidate (2026-10-06 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying`. No branch, worktree, fork, or handoff was
+created or switched to. After `git fetch`, local and remote were both
+`32d061ef45f6079f677595ae4748613bea78a47e` and the worktree was clean. The
+remote stayed at `32d061ef` for the whole review.
+
+Range: `ffcf05f..32d061ef`, **2 Codex commits, 0 merges**: `1027104` (the
+isolated offline historical custody replay module and its 120 tests) and
+`32d061ef` (sections 128-129, the status header and one ledger row). The
+range adds two files and changes this record. It changes no existing
+production file; the four custody files still equal their `aa0d635` blobs.
+
+Every pytest and mutation run of this review ran inside a sandbox that
+denies network access to the whole process tree, on Python 3.13.15 and on
+Codex's Python 3.12.14 runtime. The two observed replays and the profile
+probes ran the module's own launcher from an unsandboxed parent, because
+macOS refuses a nested sandbox; that parent imports only the standard
+library and runs `/usr/bin/git` locally, and its worker is sandboxed by the
+module's profile, which was probed for EPERM refusals first (130.4).
+
+Authority: section 128.1 records an owner instruction to Codex restoring
+"counter review + next milestone" and directing "proceed". This reviewer did
+not witness it. No new authority follows from this section. The owner's
+instruction for this round was to review every unreviewed commit, push once,
+and not run the complete lane suite; the suite was therefore not run.
+
+### 130.1 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `1027104` | New `research/insider_buying_sec_recovery_v4_historical_replay.py` and its test file | **Accepted after correction in `1c4f7a06`.** The design holds: exact `aa0d635` blobs for the four historical modules through a source-only loader, inventoried current bytes for everything else, an OS profile denying network, file writes, fork and exec, an audit hook as a second layer, a stdin/stdout worker with input, output and time caps, and a sealed receipt that cannot be rebuilt or mutated into authority. One P3 defect: the worker profile allowed a single exec literal, so the lane's own Python 3.13 venv interpreter could not start the worker (130.3). Seven refusal rules had no isolating test (130.3). |
+| `32d061ef` | Sections 128-129, status header, ledger row | **Accepted.** Every hash in the 128.4 table reproduced exactly on the committed head (130.2). The 128.2 account of `ed6892a` and `ffcf05f` matches section 127. The deliberate limitation in 128.3 is stated correctly: the historical union still hash-checks the current files, so `IB1BCAMP-CR01` stays open. |
+
+Rating of this round: **8 of 10.** Deductions: the launcher was proven on
+one interpreter only and the record did not say that the lane venv could
+not run it; and the "only the three expected dirty paths" rule of 128.3 was
+not under test.
+
+### 130.2 Independent reproduction of the observed replay
+
+`python -B research/insider_buying_sec_recovery_v4_historical_replay.py
+--expected-head 32d061ef45f6079f677595ae4748613bea78a47e`, Python 3.12.14,
+completed in **446 s** and printed one receipt. Receipt SHA-256
+`7289a014287f3137bdadec2a93ea282dc756f5ffb825cd6dc3e0d4e40872853d`; it
+differs from 128.4's `4368a59c...` only because `repository_head` is now
+the committed `32d061ef`, as 129.1 predicts. Every other value equals 128.4:
+
+| Value | Reproduced |
+|---|---|
+| Executed wrapper | `7858d61bc1ad19a2a492159cb403113f1ca22ee1034b0b1cce4af14a6934bee4` (also the committed file's SHA-256) |
+| Worker bootstrap | `9677c523cc27bc64ea284aa2087455ab5ec1adeb0a84cd50805ffdf67e2f0455` |
+| Current-source inventory | `9101ae840ee60a4bc99eace58b8ff7f4210564da9b685740784f28b6452cf9cf`; 93 sources, `ml/__init__.py` and `ml/immutable_io.py` the only `ml` entries |
+| Executed manifest | `59503728d9db907886db4dd01f831440d2290eec5f2c9634554cc2dce93c8c11`; 57 modules, 4 historical |
+| Historical validator aggregate | `e47d595ee62fe30c1b9823d9db4d2219160af5e182aa16d8a9ed4b658eb7f0ee` |
+| Source union / partial-v3 / diagnostic descriptors | `e7d45dbc...8fcc5` / `44e6bb22...b876` / `5ddc9f04...300f` |
+| v4 plan / partition / proposed unattempted inventory | `2dd336cf...7f2a` / `f1f5cc2c...d974` / `472e33f1...4d1a` (the first two equal section 124's observed values) |
+| Counts | 9,539 + 1 + 8,139 + 1,846 + 1 + 79,868 = 99,394; 19,526 source-bound; v3 1,846 of 1,847; diagnostic body 7,373 bytes |
+
+The receipt carries hashes, counts and false authority flags only; no
+contact string, path or raw parent byte. A second observed replay after the correction, on the lane venv's Python 3.13.15 and the
+committed head `1c4f7a06`, completed in **497 s** with receipt
+`6f0fc2e51f4a2e5b6beb845dbedafa5b7ec9680d2ea485c1afbbddf9e3451802`. Its wrapper hash is the corrected file's
+`dedbddf5782da303...` and its inventory digest changes with it; every retained-root
+value (source union, partial-v3 and diagnostic descriptors, v4 plan, partition, proposed
+unattempted inventory, counts and the bootstrap hash) equals the 3.12 replay above.
+
+### 130.3 Findings against `1027104`
+
+**`IBHRV-CR01` (P3, closed in `1c4f7a06`).** `_worker_policy` allowed
+`process-exec` for one literal, the resolved interpreter. A macOS framework
+interpreter's `bin/python3.13` is a stub that re-executes
+`Resources/Python.app/Contents/MacOS/Python` in place; under the profile
+that exec is refused (`posix_spawn: ...Python.app/Contents/MacOS/Python:
+Undefined error: 0`, exit 1), so the worker never starts and the parent
+refuses. That is the lane's venv interpreter, on which the complete suite
+runs; Codex's bundled 3.12.14 is a flat install and was the only interpreter
+that could run the replay. The failure is closed, not unsafe. The correction
+adds the relaunch binary as a second literal when that layout exists. The
+regression test builds an invented framework layout and a flat layout and
+requires two and one literals respectively; it fails on the pushed module
+(`1 failed, 28 passed` for the 29 new tests) and passes after. Disabling the
+added branch (`M27`) is caught.
+
+**`IBHRV-CR02` (P3, closed in `1c4f7a06`, tests only).** Seven refusal rules
+had no isolating control: the dirty-path allowlist of `_validate_context`
+(`M09`; a stable unrelated change was refused only by the before/after
+equality check, never by the allowlist), the redirected-path and
+empty-or-oversized refusals of `_source_snapshot` (`M10`, `M11`), the
+before/after byte recheck `_assert_sources_unchanged` (`M12`; mocked in every
+test that reaches it), the out-of-lane wrapper check (`M24`), the unsafe
+interpreter path (`M25`) and the malformed `open` audit (`M26`). Twenty-eight
+pins now cover them on an invented lane root; all pass on the pushed module
+and each named mutant is caught.
+
+Redundant by construction, not gaps: `historical.get(path, raw)` in the
+finder (`M07`; the blobs are iterated last and overwrite), the rename/copy
+check in `_validate_context` (`M08`; a rename line never matches the
+allowlist), and the receipt token (`M16`; the factory-bytes check refuses the
+same objects).
+
+**`IBHRV-OBS01` (observation, not fixed).** The module hard-codes the lane
+root and the tests bind to it and to `/usr/bin/sandbox-exec`; about twenty
+of them would fail on another machine or clone path. Six earlier lane
+modules follow the same convention, so this is a lane-wide property for the
+integration decision, not a new defect. `_worker_main` has no unit coverage:
+only an observed replay executes it, because a sandbox cannot be nested
+under the network-denied pytest parent, as 128.6 records.
+
+| Replay-module mutants | As pushed (`32d061ef`) | After `1c4f7a06` |
+|---|---|---|
+| 26 faithful mutants of the pushed rules | 15 caught, 11 survived | 23 caught, 3 redundant by construction |
+| `M27` (the added relaunch literal disabled) | not present | caught |
+
+### 130.4 Worker-profile proof
+
+The module's own `_run_isolated_worker` was given a probe bootstrap and run
+from an unsandboxed, standard-library-only parent. Inside the worker, with
+the module's exact profile, on Python 3.12.14 and (after the correction)
+3.13.15: a connect to the reserved address 192.0.2.1:443, a loopback bind,
+`fork`, an exec of `/bin/echo`, an exec of the same interpreter, a scratch
+file write, a write to `/dev/null` and a `mkdir` all raised `PermissionError`
+(errno 1); a DNS lookup raised `gaierror`; reading an existing file was
+allowed; `sys.flags` showed isolated, no-site and no-bytecode. Before the
+correction the 3.13 worker exited 1 with no output. The sandbox refuses
+without logging, so this proves that nothing could leave, not an attempt
+count.
+
+### 130.5 Validation
+
+- Pushed `32d061ef`, network denied: the new test file **120 passed** on
+  Python 3.12.14 and on 3.13.15; lane boundary, active-document, module
+  hygiene, overlay and ML import boundaries, record and v4-plan tests
+  **181 passed** on both.
+- After `1c4f7a06`, network denied: the new test file **149 passed** on both
+  Pythons; the same gate **181 passed** on 3.13.15; `compileall` and
+  `git diff --check` clean.
+- Complete lane or repository suite: **not run**, by the owner's instruction
+  for this round. The last complete suite is section 127's 10,191 on
+  `ffcf05f`; the range since then adds two files.
+- Record tests after this section: **71 passed** on Python 3.13.15 and on 3.12.14, network denied, after the final wording.
+
+### 130.6 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBHRV-CR01 | P3 | **CLOSED in `1c4f7a06`** | `1027104` | `_worker_policy` | Single exec literal; a framework interpreter's in-place relaunch is refused, so the worker never starts on the lane venv. | 130.3 manual run and probe. | A replay that cannot run on the lane's suite interpreter is not reproducible by the lane's reviewers. | Second literal for the relaunch binary when present. | Test red on pushed, green after; `M27` caught; 3.13 probe and replay (130.2, 130.4). |
+| IBHRV-CR02 | P3 | **CLOSED in `1c4f7a06`** (tests only) | `1027104` | Replay tests | Seven refusal rules without an isolating control, including the dirty-path allowlist described in 128.3. | 130.3 mutants `M09`-`M12`, `M24`-`M26`. | A guard without a test is a guard that can drift silently. | 28 pins on an invented lane root. | 24 of 27 mutants caught after; the 3 survivors are redundant by construction. |
+| IBHRV-OBS01 | observation | **Recorded, not fixed** | `1027104` | Module and tests | Lane-root and `sandbox-exec` binding; no unit coverage of `_worker_main`. | 130.3. | Lane-wide convention; decided at integration. | None. | None. |
+| IBHRV-R01, IBHRV-R02, IBHRV-R03, IBREC-HRV01 | P3/P2/P3/P3 | **Retained closed as Codex records** | `1027104`, `32d061ef` | Codex's draft corrections | Self-found during development. | 128.5. | Not re-opened; the receipt types, inventory and lineage behave as described. | None. | 130.2 and the 120 pushed tests. |
+| IBREV-CR01 | P1, process | **Retained closed by owner disposition** | `01a6b7e` | Sections 123-126 | Unchanged. | Sections 124-126. | Owner decision, not witnessed. | None. | None new. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Sections 119-129 | `IB1BCAMP-CR01` stays open: the candidate executes the historical blobs but the union still binds to the current files, as 128.3 states. | 128.3, 130.1. | Unchanged; all fail closed. | None. | None new. |
+| Earlier P3 findings, observations and the 45 unclassified section-119 survivors | P3 | **Retained as recorded** | earlier | earlier | Unchanged. | Sections 119-129. | Unchanged. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. | Sections 68 to 72. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no open P0 or P1 finding. Four P2 findings are open; all fail
+closed.
+
+### 130.7 Next action
+
+Codex counter-reviews `1c4f7a06` and this record commit. No next milestone is
+authorized by this review. The open P2 gates stand before any further
+acquisition, and the lane is not backtest-ready. The receipt is evidence
+that the retained inputs replay offline under the captured validator bytes;
+it authorizes nothing. No outcome, ETF, QC, paper, live, deployment, broker,
+capital, order, or trading authority follows from this section.
+
+No SEC request was made: every pytest and mutation run was network-denied,
+the replay workers were OS-denied and probed, and the unsandboxed parent
+runs only standard-library code and local `git`. No credential, licensed
+row, security master, outcome, ETF holding, QuantConnect, broker, operator
+database, scheduler, deployment, capital, order, live, or trading surface was
+used. Real bytes read, in memory and read-only inside the denied worker,
+were the retained roots named in the module's `SOURCE_ROOTS`, the stopped v3
+root and the diagnostic root. Authorized outcome looks: **0**. Consumed
+outcome looks: **0**. Research looks: **0**.

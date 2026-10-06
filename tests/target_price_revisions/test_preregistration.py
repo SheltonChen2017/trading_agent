@@ -1311,8 +1311,14 @@ def test_under_cap_allocation_still_refuses_through_the_public_loader(
     )
 
 
-def test_empty_registry_guard_is_reachable_for_the_committed_registry() -> None:
+def test_empty_registry_guard_is_reachable_for_the_committed_registry(
+    reviewed_loader_git: None,
+) -> None:
     """The empty-registry refusal must not be dead code.
+
+    TPR-CR17-001: this test reads the committed registry through the lane's
+    authority Git, so it takes the same native-Windows / host-Git split as
+    the other anchored-loader tests instead of staying red off Windows.
 
     `EMPTY_REVIEW_REGISTRY_BYTES` is compared byte-for-byte against the stored
     registry, but this lane's canonical contract requires exactly one LF

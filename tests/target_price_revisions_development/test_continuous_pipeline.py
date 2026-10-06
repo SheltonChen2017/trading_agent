@@ -144,11 +144,17 @@ def test_complete_synthetic_pipeline_cannot_grant_real_backtest_readiness():
     })
     inventory = tuple({"requirement_id": name, "fixture_id": "SYNTHETIC-PIPELINE", "fixture_sha256": identity}
                       for name in readiness.REQUIREMENTS)
-    report = readiness.evaluate_fixture_readiness(frozen, inventory, as_of_utc="2026-10-06T00:00:00Z")
+    report = readiness.evaluate_fixture_readiness(
+        frozen, inventory, as_of_utc="2026-10-06T00:00:00Z",
+        software_review_policy=readiness.SOFTWARE_REVIEW_OWNER_WAIVED,
+    )
     assert report.real_backtest_ready is False
     assert report.actual_qc_attempts == report.actual_outcome_reads == 0
-    assert all(row.status == "synthetic-not-admission" for row in report.requirements)
-    assert "owner_scope_for_data_outcomes_qc_missing" in report.blockers
+    assert report.independent_review_required is False
+    assert all(row.status == "synthetic-not-admission" for row in report.requirements
+               if row.requirement_id != "reviewed_candidate")
+    assert "current_fixture_scope_excludes_data_outcomes_qc" in report.blockers
+    assert "independent_software_review_required" not in report.blockers
 
 
 def execute_continuous(targets, portfolio=None):

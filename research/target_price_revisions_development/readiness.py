@@ -26,6 +26,13 @@ REQUIREMENTS = ("reviewed_candidate", "target_source_rights", "derived_processin
                 "horizon_currency_share_basis", "cost_inputs", "reviewed_structural_manifests",
                 "look_authority", "order_engine_completion", "exact_outcome_access_scope")
 QC_REQUIREMENTS = ("qc_transfer_rights", "exact_qc_processing_launch_scope")
+SOFTWARE_REVIEW_DEFAULT = "independent-review"
+SOFTWARE_REVIEW_OWNER_WAIVED = "owner-directed-no-review-stops"
+# Scheduling provenance only: this human instruction is not evidence admission,
+# a reviewer signature, entitlement or permission to process real inputs.
+OWNER_NO_REVIEW_INSTRUCTION = (
+    "i told you to build towards completion without review. why are you referring to claude review?"
+)
 _TARGETS = ("synthetic-local-order-based", "synthetic-qc-order-based")
 _LINEAGE = {"candidate_sha256", "code_sha256", "data_sha256", "config_sha256", "fold_sha256"}
 _SPEC_KEYS = {"schema", "run_id", "target", "created_at_utc", "expires_at_utc", "lineage",
@@ -70,6 +77,8 @@ class FixtureReadiness:
     sha256: str
     real_backtest_ready: bool = False
     independent_review_required: bool = True
+    software_review_policy: str = SOFTWARE_REVIEW_DEFAULT
+    owner_instruction_sha256: str | None = None
     actual_qc_attempts: int = 0
     actual_outcome_reads: int = 0
     authority: tuple[tuple[str, bool], ...] = tuple((key, False) for key in AUTHORITY_KEYS)
@@ -339,8 +348,20 @@ def close_fixture_attempt(ledger: tuple, *, attempt_id: str, status: str, at_utc
 
 
 def evaluate_fixture_readiness(spec: FrozenFixtureRunSpec, inventory: Any, ledger: tuple = (), *,
-                               as_of_utc: str) -> FixtureReadiness:
-    """Inventory software prerequisites; synthetic claims never admit real input."""
+                               as_of_utc: str,
+                               software_review_policy: str = SOFTWARE_REVIEW_DEFAULT) -> FixtureReadiness:
+    """Keep software scheduling separate from factual evidence/execution gates.
+
+    The exact owner waiver removes only a development-review stop. Legacy
+    callers keep their prior scheduling policy. Neither option admits a source,
+    establishes canonical review identity or grants outcome/QC/trading access.
+    """
+    if (type(software_review_policy) is not str or software_review_policy not in
+            (SOFTWARE_REVIEW_DEFAULT, SOFTWARE_REVIEW_OWNER_WAIVED)):
+        raise ReadinessError("invalid software review policy")
+    review_waived = software_review_policy == SOFTWARE_REVIEW_OWNER_WAIVED
+    owner_hash = (hashlib.sha256(OWNER_NO_REVIEW_INSTRUCTION.encode("utf-8")).hexdigest()
+                  if review_waived else None)
     run = _spec_body(spec)
     now = _clock(as_of_utc)
     attempts, _, head, last_clock = _replay(ledger)
@@ -356,11 +377,18 @@ def evaluate_fixture_readiness(spec: FrozenFixtureRunSpec, inventory: Any, ledge
         if type(requirement) is not str or requirement not in required or requirement in fixtures:
             raise ReadinessError("invalid synthetic inventory requirement")
         fixtures[requirement] = (_id(item["fixture_id"]), _hash(item["fixture_sha256"]))
-    dispositions = tuple(RequirementDisposition(item, "synthetic-not-admission" if item in fixtures else "missing",
-                                               (fixtures[item][0],) if item in fixtures else ()) for item in required)
-    blockers = tuple(("synthetic_not_admitted:" if item in fixtures else "missing:") + item for item in required)
-    blockers += ("owner_scope_for_data_outcomes_qc_missing", "spent_d0_audit_not_renewable",
-                 "independent_software_review_required")
+    dispositions = tuple(
+        RequirementDisposition(item, "software-review-waived-not-evidence", ())
+        if review_waived and item == "reviewed_candidate" else
+        RequirementDisposition(item, "synthetic-not-admission" if item in fixtures else "missing",
+                               (fixtures[item][0],) if item in fixtures else ())
+        for item in required
+    )
+    blockers = tuple(("synthetic_not_admitted:" if item in fixtures else "missing:") + item
+                     for item in required if not (review_waived and item == "reviewed_candidate"))
+    blockers += ("current_fixture_scope_excludes_data_outcomes_qc", "spent_d0_audit_not_renewable")
+    if not review_waived:
+        blockers += ("independent_software_review_required",)
     if not _clock(run["created_at_utc"]) <= now <= _clock(run["expires_at_utc"]):
         blockers += ("run_spec_not_current",)
     candidate = run["lineage"]["candidate_sha256"]
@@ -374,16 +402,18 @@ def evaluate_fixture_readiness(spec: FrozenFixtureRunSpec, inventory: Any, ledge
     bound_inventory = [{"requirement_id": item, "fixture_id": fixtures[item][0],
                         "fixture_sha256": fixtures[item][1]} for item in required if item in fixtures]
     dossier = {
-        "schema": "tpr-synthetic-readiness-dossier-v1", "run_spec_sha256": spec.sha256,
+        "schema": "tpr-synthetic-readiness-dossier-v2", "run_spec_sha256": spec.sha256,
         "as_of_utc": now.isoformat(), "ledger_head_sha256": head, "inventory": bound_inventory,
         "requirements": [{"requirement_id": item.requirement_id, "status": item.status,
                           "fixture_ids": list(item.fixture_ids)} for item in dispositions],
         "blockers": list(blockers), "mia_recovery_required": mia,
-        "real_backtest_ready": False, "independent_review_required": True,
+        "real_backtest_ready": False, "independent_review_required": not review_waived,
+        "software_review_policy": software_review_policy, "owner_instruction_sha256": owner_hash,
         "actual_qc_attempts": 0, "actual_outcome_reads": 0,
         "authority": {key: False for key in AUTHORITY_KEYS},
         "mode": "synthetic-contract-only-not-TPR-D3-admission",
     }
     payload = _canonical(dossier)
     return FixtureReadiness(spec.sha256, dispositions, blockers, mia, payload,
-                            hashlib.sha256(payload).hexdigest())
+                            hashlib.sha256(payload).hexdigest(), independent_review_required=not review_waived,
+                            software_review_policy=software_review_policy, owner_instruction_sha256=owner_hash)

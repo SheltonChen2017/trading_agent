@@ -352,7 +352,10 @@ SECTION8_BRANCH_RELATION_COMMITS = frozenset({"9e834713", "6590d890", "15bedb56"
 SECTION8_ROLE_STATEMENT = (
     r"\b(?:Claude|Codex) (?:has )?(?:independently )?(?:reviewed|counter-reviewed)\b"
 )
-SECTION8_NEXT_ACTION_STATEMENT = r"\b(?:Claude|Codex) next (?:reviews|counter-reviews)\b"
+SECTION8_NEXT_ACTION_STATEMENT = (
+    r"\b(?:(?:Claude|Codex) next (?:reviews|counter-reviews)|"
+    r"Codex continues without Claude review stops)\b"
+)
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
 SECTION46_CLAUDE_HEAD = "c0bfb21393180d44c16c10be1e667ea741098531"
 SECTION46_CLAUDE_RANGE = f"{SECTION46_CLAUDE_BASE}..{SECTION46_CLAUDE_HEAD}"
@@ -900,7 +903,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "Codex next counter-reviews section 53" not in normalized_current
     assert "Claude next reviews section 54" not in normalized_current
     assert "Codex next counter-reviews section 55" not in normalized_current
-    assert "Claude next reviews sections 56 and 57" in normalized_current
+    assert "Claude next reviews sections 56 and 57" not in normalized_current
+    assert "Codex continues without Claude review stops" in normalized_current
+    assert "section 58" in normalized_current
     assert "TPR-D1 is authorized only as a fixture-only candidate" in normalized_current
     assert "D0's one completed audit is not renewed" in normalized_current
     assert "TPR-D2 is authorized only as a fixture-only candidate" in normalized_current
@@ -948,7 +953,9 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "codex next counter-reviews section 53" not in normalized_summary_lower
         assert "claude next reviews section 54" not in normalized_summary_lower
         assert "codex next counter-reviews section 55" not in normalized_summary_lower
-        assert "claude next reviews sections 56 and 57" in normalized_summary_lower
+        assert "claude next reviews sections 56 and 57" not in normalized_summary_lower
+        assert "codex continues without claude review stops" in normalized_summary_lower
+        assert "section 58" in normalized_summary_lower
         assert "tpr-d2 is authorized only as a fixture-only candidate" in normalized_summary_lower
         assert "tpr-d2 is not authorized" not in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
@@ -1906,7 +1913,8 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
     """TPR-CR16-002: refuse stale identities and duplicate recognized routing.
 
     The recognized role grammar is Claude/Codex, optional has/independently,
-    and reviewed/counter-reviewed; next actions use next reviews/counter-reviews.
+    and reviewed/counter-reviewed; next actions use next reviews/counter-reviews
+    or the exact owner-directed continuous no-review role.
     This is an explicit grammar, not an arbitrary-prose classifier. Exactly
     one recognized role and next-action statement must occur in the current
     block. Lowercase 7-12 or 40-hex commit identities, quoted or unquoted,
@@ -1946,6 +1954,14 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
         (
             "Codex independently counter-reviewed the prior snapshot.",
             "one current role",
+        ),
+        (
+            "Claude next reviews the software.",
+            "one next action",
+        ),
+        (
+            "Codex continues without Claude review stops.",
+            "one next action",
         ),
     ],
 )
@@ -2533,3 +2549,100 @@ def test_section_57_scope_guard_refuses_data_intermediate_push_or_review_bypass(
     )
     with pytest.raises(AssertionError, match="closed continuous-round boundary"):
         test_section_57_preserves_single_round_owner_scope()
+
+
+SECTION58_SCOPE = (
+    ("Development", "Continuous; no Claude review stop"),
+    ("Software scheduling review", "Waived by direct owner instruction"),
+    ("Inputs", "Synthetic fixtures and committed D0 aggregate report only"),
+    ("Data/outcomes/QuantConnect/trading", "No new authority"),
+    ("Evidence and custody", "Factual gates retained; never supplied by waiver"),
+    ("Owner decisions", "Delegated; document every exercised choice"),
+    ("Real backtest readiness", "False; factual gates unchanged"),
+    ("Monitor", "Consumed and paused; not a development prerequisite"),
+)
+
+
+def test_section_58_keeps_review_scheduling_separate_from_factual_gates():
+    section = _record_section("## 58.")
+    quote = "i told you to build towards completion without review. why are you referring to claude review?"
+    assert quote in " ".join(re.sub(r"(?m)^\s*> ?", "", section).split())
+    block = _bounded(section, "<!-- TPR-NO-REVIEW:START -->", "<!-- TPR-NO-REVIEW:END -->",
+                     "section 58 no-review scope")
+    lines = tuple(line.strip() for line in block.splitlines() if line.strip())
+    assert lines[0] == "| Boundary | Scope |"
+    assert re.fullmatch(r"\|\s*:?-+:?\s*\|\s*:?-+:?\s*\|", lines[1])
+    rows = tuple(tuple(cell.strip() for cell in line.split("|")[1:-1]) for line in lines[2:])
+    assert rows == SECTION58_SCOPE, "closed no-review scope cannot waive factual gates or reintroduce Claude waits"
+
+
+@pytest.mark.parametrize(("old", "new"), [
+    ("| Software scheduling review | Waived by direct owner instruction |",
+     "| Software scheduling review | Wait for Claude |"),
+    ("| Evidence and custody | Factual gates retained; never supplied by waiver |",
+     "| Evidence and custody | Waived |"),
+    ("| Real backtest readiness | False; factual gates unchanged |",
+     "| Real backtest readiness | True |"),
+])
+def test_section_58_guard_rejects_stale_review_or_false_admission(monkeypatch, old, new):
+    test_section_58_keeps_review_scheduling_separate_from_factual_gates()
+    original = _record_section
+    section = original("## 58.")
+    assert section.count(old) == 1
+    mutated = section.replace(old, new, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+                        lambda heading: mutated if heading.startswith("## 58.") else original(heading))
+    with pytest.raises(AssertionError, match="closed no-review scope"):
+        test_section_58_keeps_review_scheduling_separate_from_factual_gates()
+
+
+SECTION59_SCOPE = (
+    ("Target", "Backtesting; not forward-looking operation"),
+    ("Software deliverable", "Runnable built-in synthetic local order-based backtest"),
+    ("Review scheduling", "No Claude wait"),
+    ("Inputs", "Generated synthetic fixtures; committed D0 aggregate identity is context only"),
+    ("External files and data", "No input paths; no retained/provider/outcome access"),
+    ("Report", "Hash-bound accounting transcript; partial/refused sessions retained"),
+    ("Readiness", "Synthetic software completion is not real-data readiness"),
+    ("Real backtest readiness", "False; factual evidence and access gates unchanged"),
+    ("QuantConnect and trading", "No launch, upload, processing, broker or order authority"),
+    ("D0", "Spent; no audit renewal"),
+    ("Custody", "Supplied in-memory checkpoints are not protected external custody"),
+    ("Publication", "One matching-lane non-force push; no review stop"),
+)
+
+
+def test_section_59_pins_backtesting_target_without_factual_escalation():
+    section = _record_section("## 59.")
+    normalized = " ".join(re.sub(r"(?m)^\s*> ?", "", section).split())
+    assert "sorry, not forward looking but backtesting" in normalized
+    block = _bounded(section, "<!-- TPR-BACKTEST-SCOPE:START -->",
+                     "<!-- TPR-BACKTEST-SCOPE:END -->", "section 59 backtest scope")
+    lines = tuple(line.strip() for line in block.splitlines() if line.strip())
+    assert lines[0] == "| Boundary | Scope |"
+    assert re.fullmatch(r"\|\s*:?-+:?\s*\|\s*:?-+:?\s*\|", lines[1])
+    rows = tuple(tuple(cell.strip() for cell in line.split("|")[1:-1]) for line in lines[2:])
+    assert rows == SECTION59_SCOPE, "closed backtest scope cannot change the target or grant access"
+    assert "python -m research.target_price_revisions_development.fixture_backtest" in section
+    assert "TPR-OWN-18" in section and "TPR-OWN-19" in section
+
+
+@pytest.mark.parametrize(("old", "new"), [
+    ("| Target | Backtesting; not forward-looking operation |",
+     "| Target | Forward-looking operation |"),
+    ("| Review scheduling | No Claude wait |", "| Review scheduling | Wait for Claude |"),
+    ("| Real backtest readiness | False; factual evidence and access gates unchanged |",
+     "| Real backtest readiness | True |"),
+    ("| External files and data | No input paths; no retained/provider/outcome access |",
+     "| External files and data | Read retained rows |"),
+])
+def test_section_59_guard_refuses_target_review_or_access_drift(monkeypatch, old, new):
+    test_section_59_pins_backtesting_target_without_factual_escalation()
+    original = _record_section
+    section = original("## 59.")
+    assert section.count(old) == 1
+    mutated = section.replace(old, new, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+                        lambda heading: mutated if heading.startswith("## 59.") else original(heading))
+    with pytest.raises(AssertionError, match="closed backtest scope"):
+        test_section_59_pins_backtesting_target_without_factual_escalation()

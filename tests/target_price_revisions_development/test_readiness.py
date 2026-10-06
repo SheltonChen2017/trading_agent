@@ -102,7 +102,7 @@ def test_forged_all_true_inventory_never_grants_real_readiness():
     assert len(report.requirements) == len(ready.REQUIREMENTS)
     assert all(item.status == "synthetic-not-admission" for item in report.requirements)
     assert all("synthetic_not_admitted:" + item in report.blockers for item in ready.REQUIREMENTS)
-    assert "owner_scope_for_data_outcomes_qc_missing" in report.blockers
+    assert "current_fixture_scope_excludes_data_outcomes_qc" in report.blockers
     assert report.authority == tuple((key, False) for key in ready.AUTHORITY_KEYS)
     forged = dict(inventory[0], entitled=True, reviewed=True, point_in_time_data=True)
     with pytest.raises(ready.ReadinessError, match="inventory"):
@@ -333,3 +333,53 @@ def test_readiness_dossier_and_ledger_are_inert_without_io(monkeypatch):
     ledger = close(reserve(run))
     report = ready.evaluate_fixture_readiness(run, (), ledger, as_of_utc="2026-10-06T00:02:00Z")
     assert report.real_backtest_ready is False
+
+
+def test_owner_no_review_policy_removes_only_the_software_scheduling_stop():
+    inventory = tuple({"requirement_id": requirement, "fixture_id": "SYNTHETIC-EVIDENCE",
+                       "fixture_sha256": "7" * 64} for requirement in ready.REQUIREMENTS)
+    report = ready.evaluate_fixture_readiness(
+        spec(), inventory, as_of_utc="2026-10-06T00:00:00Z",
+        software_review_policy="owner-directed-no-review-stops",
+    )
+    body = json.loads(report.payload)
+    assert report.independent_review_required is False
+    assert "independent_software_review_required" not in report.blockers
+    assert not any(item.endswith(":reviewed_candidate") for item in report.blockers)
+    review = next(item for item in report.requirements if item.requirement_id == "reviewed_candidate")
+    assert review.status == "software-review-waived-not-evidence" and review.fixture_ids == ()
+    assert body["software_review_policy"] == "owner-directed-no-review-stops"
+    instruction = "i told you to build towards completion without review. why are you referring to claude review?"
+    assert body["owner_instruction_sha256"] == hashlib.sha256(instruction.encode()).hexdigest()
+    assert body["schema"] == "tpr-synthetic-readiness-dossier-v2"
+    assert report.real_backtest_ready is False
+    assert report.actual_qc_attempts == report.actual_outcome_reads == 0
+    assert all(flag is False for _, flag in report.authority)
+    assert "current_fixture_scope_excludes_data_outcomes_qc" in report.blockers
+    for item in report.requirements:
+        if item.requirement_id != "reviewed_candidate":
+            assert item.status == "synthetic-not-admission"
+            assert "synthetic_not_admitted:" + item.requirement_id in report.blockers
+
+
+def test_software_policy_changes_dossier_identity_not_source_or_look_history():
+    run = spec()
+    ledger = close(reserve(run))
+    args = dict(as_of_utc="2026-10-06T00:02:00Z")
+    original = ready.evaluate_fixture_readiness(run, (), ledger, **args)
+    waived = ready.evaluate_fixture_readiness(
+        run, (), ledger, software_review_policy="owner-directed-no-review-stops", **args,
+    )
+    assert original.independent_review_required is True
+    assert waived.independent_review_required is False and original.sha256 != waived.sha256
+    assert original.real_backtest_ready is waived.real_backtest_ready is False
+    assert json.loads(original.payload)["ledger_head_sha256"] == json.loads(waived.payload)["ledger_head_sha256"]
+    assert json.loads(original.payload)["owner_instruction_sha256"] is None
+    assert ledger == close(reserve(run))
+
+
+@pytest.mark.parametrize("policy", [None, True, "waive-all-evidence", "", 0])
+def test_software_review_policy_is_closed_and_cannot_waive_factual_gates(policy):
+    with pytest.raises(ready.ReadinessError, match="software review policy"):
+        ready.evaluate_fixture_readiness(spec(), (), as_of_utc="2026-10-06T00:00:00Z",
+                                         software_review_policy=policy)

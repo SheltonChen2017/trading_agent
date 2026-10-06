@@ -36,6 +36,8 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.scoring",
         "research.target_price_revisions_development.readiness",
         "research.target_price_revisions_development.simulation",
+        "research.target_price_revisions_development.backtesting",
+        "research.target_price_revisions_development.fixture_backtest",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -128,20 +130,32 @@ def test_d0_aggregate_defects_are_context_not_new_source_evidence(aggregate_only
     assert report["interpretation"]["horizon"] == "presence probes do not prove explicit comparable prior/new horizons"
 
 
-@pytest.mark.parametrize("name", ["scoring", "readiness", "simulation"])
+@pytest.mark.parametrize("name", ["scoring", "readiness", "simulation", "backtesting", "fixture_backtest"])
 def test_continuous_fixture_modules_have_only_pure_closed_dependencies(name) -> None:
     """New software must not reach D0's reader or any external authority path."""
     source = (ROOT / f"research/target_price_revisions_development/{name}.py").read_text(encoding="utf-8")
     tree = ast.parse(source)
     allowed = {"__future__", "dataclasses", "datetime", "decimal", "fractions",
                "hashlib", "json", "re", "typing", "collections"}
+    if name == "fixture_backtest":
+        allowed.add("argparse")  # Fixed built-in demo, no file/path arguments.
+    local_dependencies = {
+        "scoring": {"events"},
+        "readiness": {"events"},
+        "simulation": {"scoring"},
+        "backtesting": {"simulation", "scoring", "readiness"},
+        "fixture_backtest": {"events", "scoring", "simulation", "readiness", "backtesting"},
+    }
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             assert all(alias.name.split(".")[0] in allowed for alias in node.names)
         elif isinstance(node, ast.ImportFrom):
-            # Pure D1 enrichment, or the simulator's precomputed target
-            # contract, is the only permitted local dependency.
-            local = node.level == 1 and node.module in ({"scoring"} if name == "simulation" else {"events"})
+            # Every pure-module edge is explicit; no D0 I/O facade or
+            # canonical/provider/operator/engine authority is reachable.
+            local = node.level == 1 and (
+                node.module in local_dependencies[name]
+                or (node.module is None and all(alias.name in local_dependencies[name] for alias in node.names))
+            )
             assert local or (node.level == 0 and node.module.split(".")[0] in allowed)
         elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
             assert node.func.id not in {"open", "__import__", "eval", "exec", "compile", "input"}

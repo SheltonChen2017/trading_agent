@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–251 retain the milestone, review, preregistration, QC
+strategy. Sections 1–253 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -343,6 +343,11 @@ Section 252 is Claude's independent review of `4e1c0a64..b83cf6c0` (0 P0,
 0 P1, 0 P2, 0 P3): the counter-review and its retained-receipt audit
 reproduce in full on the original Mac; the three provenance findings stay
 open for owner-supplied records.
+Section 253 accepts section 252's one Claude record commit after counter-review
+with no new P0-P3 finding. Its complete-validation union is 9,765 passes and
+8 skips at `b83cf6c0`, still Claude-reported evidence; Codex uses focused
+checks only. No original history artifact, scope approval or readiness
+clearance arrived, so no new substantive implementation starts.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1160,8 +1165,11 @@ regression pin `4496d241`. Section 251 accepts both new Claude commits and
 performs the permitted original-Mac local metadata/hash/source audit.
 Section 252 is Claude's independent review of the exact pushed range
 `4e1c0a64..b83cf6c0` (section 251), which reproduces that audit. The
-immediate next step is that Codex counter-reviews section 252 and this
-round's Claude commit, unless the owner explicitly changes this workflow.
+section-253 counter-review accepts its one Claude record commit with no
+new finding. Claude must review section 253 and its exact pushed record
+snapshot. No original history artifact or new scope approval has arrived;
+the next substantive reconciliation remains blocked, not a reason to repeat
+the already-completed local audit or start an empty implementation.
 The floor stays **313 / 239 / 49 / 699**. Retained R280 A1/R281 A2 status
 envelopes say `Completed.` and their source lists match independently
 regenerated frozen projections, but these locally written envelopes contain
@@ -2973,6 +2981,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Claude independent review of section 249: the counter-review of section 248 and its identity cross-references | `afb29176` -> `4496d241` -> this record commit | Section 250: one Codex commit `c2112b11..afb29176` disposed (0 accepted, 1 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | Verified section 249's twelve R210-R221 and six R-177 identity repairs, attempt and test-count corrections and floor from tracked bytes; corrected the 249.3 citation of section 173 to 172 and appended a shared-ledger erratum; test-only pin `4496d241` requires every lane-record backtest ID in the shared ledger; section 4 names section 250, banner sentence added, this row appended | Owner directed focused checks without the complete lane suite: record gates at `afb29176` 84 passed; native attribution study 14 passed with both in-memory mutations red; pin trials in memory; record gates, `compileall` and `git diff --check` on the final tree; every pytest network-denied; exact counts in 250.4 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R250-001`, corrected); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's two Claude commits; Codex counter-reviews section 250 unless the owner changes the workflow |
 | 2026-10-06 | Codex counter-review of section 250 and local retained stress provenance audit | `afb29176` -> `4496d241` -> `4e1c0a64` -> this record commit | Both new Claude commits accepted; no new P0-P3 finding or research look/cell. Local receipt/source consistency established, historical provenance reconciliation remains incomplete. | Confirmed the section-172 citation correction; reproduced the identity pin's historical red and three classifier mutations in memory; checked retained R280 A1/R281 A2 identity/status/hash envelopes and regenerated both frozen 17-file source projections from the exact local delta package, reporting hashes only. No production, test, policy, registry or shared-ledger edit. | Strict-network-denied focused selection and offline metadata/source checks; final counts in 251.5; diff/status/scope checks. No complete Codex suite or QC/provider operation. | ARV2R250-001 accepted as corrected. ARV2R248-002/-003/-004 remain open: original timestamped server/read evidence and later launch/operator/source histories unavailable in the inspected lane artifacts. Two stress cells remain conditional; floor 313/239/49/699 unchanged. | Claude must review section 251. Owner to supply original audit records or scope exact original host/session-history inspection. Keep monitor active while blocked; no new outcome read, R247/R281 attempt, successor or readiness implementation. |
 | 2026-10-06 | Claude independent review of section 251: the counter-review of section 250 and the retained stress-receipt audit | `b83cf6c0` -> this record commit | Section 252: one record-only commit `4e1c0a64..b83cf6c0` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | No code changed. Reproduced section 251's local audit: twelve retained fingerprints, file modes, canonical JSON, Completed. status and identity bindings, META equality, the adapter's local-envelope write path, the R280 and R281 offline source regeneration and the R281/R247 filename inventory; section 4 names section 252, banner sentence added, this row appended | Complete lane selection at `b83cf6c0` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 252.4 | 0 P0, 0 P1, 0 P2, 0 P3; `ARV2R248-002`, `-003` and `-004` remain open for owner-supplied records | Single push of this round's Claude commit; Codex counter-reviews section 252 unless the owner changes the workflow |
+| 2026-10-06 | Codex counter-review of section 252 | `b83cf6c0` -> `a146ae57` -> this record commit | The one Claude record commit is accepted; no new P0-P3 finding, look, evaluation or cell. No next substantive milestone starts around the unchanged history/source gates. | Verified complete record diff, preserved receipt-audit limits, strict/loopback distinct-union arithmetic and unchanged formal trust roots. Clarified the existing preparation-versus-new-scope distinction prospectively in 253.3; no historical rewrite or code/test/policy/registry change. | Strict-network-denied record/active-document checks: 86 reviewed-head passes and 86 final-tree passes; exact results in 253.4. No complete Codex suite or repeated artifact/source audit. | ARV2R248-002/-003/-004 and two conditional stress cells remain open; floor 313/239/49/699 unchanged. No original audit record or scoped history-access approval supplied; existing request is not repeated. | Exactly one final matching-lane record push. Claude must review section 253; monitor remains active and quiet while unchanged, with no new QC/provider/outcome read, R247/R281 attempt or readiness implementation. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -35395,3 +35404,125 @@ over a tree that contains the test-only commits `ce0e69bb`, `28bcc887` and
 
 The final tree differs from the pushed head `b83cf6c0` only by this record
 commit.
+
+## 253. Codex counter-review of section 252; retained-history gate unchanged, 2026-10-06
+
+**Exact range:** `b83cf6c0560d8e4289203ab98a2fd6c14e133206` through
+`a146ae5794ca04e712a28c806093055923c8bcde`, exactly one newly completed
+Claude independent-review commit. The designated root and matching lane
+branch were verified clean, only that remote branch was fetched, ancestry
+was checked, and the safe fast-forward was already up to date. No older
+Claude commit or historical forty-commit range was reprocessed.
+
+**Verdict: accepted; 0 new P0, P1, P2 or P3 findings. Quality: 9/10.**
+The review correctly preserves the distinction between locally consistent
+receipts/regenerated source and unproven historical observation, execution,
+operator and launch-time bytes. This round records the required disposition
+only. No missing original artifact or scope approval has arrived; no next
+substantive implementation, repeated local audit or readiness scaffold is
+started around that gate. Only this lane record changes.
+
+### 253.1 Per-commit disposition and findings
+
+| Claude commit | Disposition | Independent basis |
+|---|---|---|
+| `a146ae5794ca04e712a28c806093055923c8bcde` | accepted; no issue found | Full message and complete one-file diff inspected. Section 252 reviews the exact `4e1c0a64..b83cf6c0` record-only Codex round, preserves all three provenance gates and two conditional cells, adds no authority or accounting change, and correctly reports its complete-selection union at the reviewed head. Active banner, section 4 and contiguous ledger identify its review. |
+
+| ID | Priority | Status | Evidence and disposition |
+|---|---|---|---|
+| none new | none | accepted | No concrete new defect found in the reviewed documentation commit. |
+| `ARV2R248-002`, `-003`, `-004` | P2 | carried open | Original timestamped QC read/status and later launch/operator/source histories remain unavailable in the scoped evidence. Local consistency did not close them. |
+| `ARV2R250-001`, `ARV2CR249-001`, `-002`, `-003` | P3 | retained corrected/accepted | No new contradiction or regression is introduced in their prior disposition. |
+
+No production, test, manifest, shared ledger, trust-root or execution
+behavior changes in the Claude commit or this counter-review. Other carried
+findings in 252.5 remain as recorded; this round does not re-prove their
+underlying implementation, execution or economic behavior.
+
+### 253.2 Validation evidence and exact distinct-union arithmetic
+
+Section 252 reports the first complete selected run containing all three
+test pins `ce0e69bb`, `28bcc887` and `4496d241`, from this exact designated
+Mac worktree at the clean reviewed head `b83cf6c0`. The six strict file
+groups reportedly cover all 9,773 collected cases across three streams,
+with separate pytest temporary directories. The result is **9,754 passed,
+11 failed, 8 skipped, 35 warnings**. All eleven failures are reported
+loopback-server EPERM refusals; its separate loopback-only transport run
+reports **73 passed, 2 warnings**.
+
+The distinct union is **9,754 + 11 = 9,765 passes**, **8 skips**, **0
+failures** across **9,773 cases**. The other 62 transport rerun passes are
+duplicates; adding all 73 to the strict count would incorrectly give
+9,827. The five-pass increment over the earlier 9,760 baseline agrees with
+two citation tests, one attribution test and two identity-closure tests
+added since that baseline. Warning counts belong to their respective runs;
+no deduplicated warning total is inferred.
+
+This arithmetic and the exact commit/scope are independently checked;
+the actual complete-suite execution, sandbox probe, twelve receipt
+fingerprints, full source regeneration, `freeze_manifest()` equality and
+1,782-file pre/post integrity comparison remain **Claude-reported
+evidence** in 252.3-252.4. Codex has not rerun that complete suite or the
+already-completed section-251 local audit. The final Claude tree differs
+only in record bytes and reports 86 final focused record checks, not a
+second complete-suite run at `a146ae57`.
+
+The three checked-in formal trust-root hashes were remeasured unchanged:
+`3152aca00c721f3822d1ef438c84c3ee855aeb866e35ba692527746b5d4c5805`,
+`e8c1a2a7e0408d545e45f026cabf5b4ae23956fa64bc444769a8589f35f4a5fa`
+and `23f23d19e681a03bacf6a1d132c732ed541747a5c6136d2dc0ac5ccafd273326`.
+Source authority remains zero-access and registry entries empty. Network
+denial constrains reachability, not logged attempt counts, and does not
+retroactively establish zero contact in earlier unsandboxed processes.
+
+### 253.3 No new artifact, authority or milestone
+
+Section 252's wording about records the owner can supply or authorize is
+read in its specific context: unavailable original records or inspection
+outside the designated lane require a source/access decision. It is not
+an owner-personal-only acquisition rule. Agents may acquire genuine
+artifacts within existing scoped research/preparation when supported
+sources and required access are available. No reauthorization of that
+existing preparation is requested. Any exact expansion beyond the lane,
+new credentials/rights, gated QC/provider/outcome operation or deployment
+still requires the applicable owner authorization. This clarification
+changes no gate or policy and rewrites no historical record; no concrete
+authority narrowing was demonstrated, so no new P3 is asserted.
+
+The three provenance findings retain the precise original-evidence
+requirements of 251.4. The existing history-record/access request remains
+pending and is not asked again. No original history outside this lane, new
+QC/provider read, result payload, launch or private source was inspected.
+No artifact was synthesized to fill the historical gap. The booked floor
+remains **313 shared looks / 239 development / 49 infrastructure / 699
+cells**, including two conditional stress cells; neither their acceptance
+nor withdrawal follows from the unchanged drift uncertainty.
+
+R247 and R281 remain attempt-exhausted. Independent vendor publication/
+version/completeness, permanent/QC SID/share-class/own-ETF identity and
+source-authenticated RAW prior-NYSE-close price/score inputs remain the
+separate forward source stop. All false readiness/action flags and named
+refusals are preserved. No selector, quantity/order adapter, stress
+successor, premature formal-look binding, paper/live deployment, funded
+account, broker, real order or efficacy claim follows.
+
+### 253.4 Focused checks and serialized handoff
+
+All Codex pytest processes used the strict profile
+`(version 1)(allow default)(deny network*)` with
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`, in the exact
+designated worktree. No loopback exception or complete Codex suite was used.
+
+| Check | Result |
+|---|---|
+| Reviewed Claude record tree | `test_lane_record_integrity.py` and `test_active_document_consistency.py`: **86 passed in 0.88s**, zero failures/skips/warnings. |
+| Final record tree | The same focused two-file selection: **86 passed**, zero failures/skips/warnings. |
+| Scope and diff | Full one-file Claude diff inspected; `git diff --check` clean; added-text secret-shape scan; exact root/branch/head/status and staged-byte checks before commit/final push. Only this lane record changes. |
+
+**Next serialized action:** Claude must review section 253 and this exact
+pushed record snapshot. After an accepted review, a substantive history
+reconciliation may start only when original artifacts and the necessary
+scoped access are actually available. Until then the monitor remains active
+at its existing cadence, quiet while unchanged; it does not repeat the
+unchanged owner request, rerun the local audit or initiate an empty readiness
+milestone. No acknowledgement-cadence exception or monitor pause is inferred.

@@ -1,10 +1,12 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 139 RECORDS THE OWNER'S EXPLICIT CLAUDE-WAIT WAIVER AND
-CONTINUOUS BACKTESTING-READINESS BUILD (NOT FORWARD-LOOKING RESEARCH).
+Status: **SECTIONS 139-140 RECORD THE OWNER'S EXPLICIT CLAUDE-WAIT WAIVER
+AND BACKTESTING-READINESS BUILD (NOT FORWARD-LOOKING RESEARCH).
 SECTION 136 COUNTER-REVIEW IS ACCEPTED AFTER QUALIFICATION; SECTION 138'S
 COMMITTED 2006Q1 PREPARATION/QUARANTINE RESULT STANDS. V2 SCALE/PILOT
-CONSUMERS AND AN EVIDENCE-BOUND BACKTEST PIPELINE ARE NOW IN IMPLEMENTATION.
+CONSUMERS AND THE BOUNDED EVIDENCE-BOUND BACKTEST PIPELINE ARE IMPLEMENTED
+AND FOCUSED-VALIDATED. ACTUAL READ-ONLY DOWNSTREAM REPLAY PASSED: ALL 83,657
+ROWS RETAINED, ALL QUARANTINED, NO SOURCE IDENTITY OR READY MANIFEST.
 NO POSITIVE SOURCE/PIT/RIGHTS/QC/LOOK EVIDENCE HAS BEEN CREATED BY THE WAIVER.
 FOUR TOPICAL P2 FINDINGS AND LEGACY/THAW BOUNDARIES REMAIN OPEN. STRICT D23
 HAS SEVEN NONEXACT QUARTERS AND NO 82-QUARTER DIGEST. V1/SCALE/PILOT AND
@@ -239,6 +241,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Claude review | `cb06065c` -> this review record (no code change) | Independent review of the section-134 counter-review (`ca12bf1f..cb06065c`, 1 commit, 0 merges, documentation only) | Dispositioned the commit and accepted all four qualifications of section 133 after verifying them: twelve lane modules hash current source bytes (none on the replay path), the inventory reads the four files while the identity hash no longer depends on them, 133.4's identities were the pre-correction snapshot, and the latest run took 595 s. Reproduced the corrected source-view and inventory identities. | `cb06065c`: record tests **71 passed** on both Pythons, network denied. Code tree byte-identical to `672c80ba` outside docs, so section 133's complete suite (**10,543 passed, 38 skipped, 0 failed**) stands. Record tests after this section **71 passed** on both Pythons. **0 looks**. | `IBREC-HSVCCR01` P3 accepted against this reviewer. All earlier closures retained. `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` P2 open. No open P0 or P1. | Codex counter-reviews this record commit. The next offline deliverable needs owner scoping (134.6); nothing is started. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-06 | Codex counter-review; owner-decision stop, local only | Incoming `cb06065cd823a22e845e79fcabf79c1afa21e930..d05e0bc454a846cd2dc712f4232bfe5b61ffeb60`; this local lane-record handoff | Accept documentation-only review after source-site count qualification | Complete one-commit range reviewed separately; twelve explicitly listed hash sites occupy eleven modules. Replay-call boundaries and corrected snapshot identities verified; no code change. Qualifying pushed review paused heartbeat before counter-review. No next milestone is inferred. | Independent network-denied document/record **71 passed**, exact package/import/hygiene/project boundaries **90 passed**; metadata/callsite checks reproduce. Final compilation/document/diff/status checks in 136. No full suite or retained-root replay. | `IBREC-HSVCCR02` P3 corrected by append-only qualification; all earlier closed findings retained; four topical P2 and legacy/frozen boundary OPEN. Both owner classifications unchanged without retroactive approval; source/PIT/rights/look/QC/backtest/execution false. | Stop before next implementation or push. Owner may scope one already-retained real affected-quarter raw/parsed input and v2 quarantine assessment, with immutable versioning, no new source request, no thaw and no completeness promotion. This is a proposal, not granted scope. Counter-review record remains local, origin `d05e0bc4`; heartbeat PAUSED. |
 | 2026-10-06 | Codex owner-authorized combined build round | Incoming `cb06065c..d05e0bc4` accepted in `6d7743711e57afdf5bc1c11d6b94eed9aab6d05f`; implementation/preregistration `b0efb31262d0eca6c972673ca36403fee20a34cb`; this separate evidence handoff | Actual earliest affected-quarter input preparation and all-six-form v2 quarantine | Owner approved the one-quarter scope, delegated engineering decisions and then requested one uninterrupted build round. Fixed 2006Q1 source-only worker prepared all eight tables and retained all 83,657 filing rows; public raw-bound reparse and exact assessment regeneration passed. No intermediate review pause or guessed approval was inserted. | Final focused/document/boundary selection **334 passed in 22.02s**; candidate document repeat **71 passed**; actual output 63,409,968-byte assessment, completion SHA `d05e0345...`, 751,590 table rows, 1 mismatch, all filing rows quarantined, 0 parent corroborations. No full suite, new SEC request, outcome/QC/backtest; looks 0/0/0. | Three draft P3 guard/API issues corrected with red/green; four topical P2 OPEN and previous ledger/owner classifications retained. No whole-quarter/canonical/PIT/rights/QC/readiness promotion; 0/19 substantive IB-5 input declarations bound in inspected supplied roots. | One final combined matching-lane push after expected-status/no-advancement checks; independently verify exact remote tip. Claude reviews every outgoing commit. Readiness remains blocked by real source/PIT/outcome/rights/entitlement inputs, not routine owner decisions; no fabrication, source acquisition or frozen-file thaw. |
+| 2026-10-06 | Codex owner-waived continuous backtesting build | Published start `932f30c6e55dbf8d978ad8dee7c8721921133fbc`; implementation/preregistration `b406c5b8600fa54f4181a9ecf73da827878c072e`; this separate observed handoff | Real v2 downstream bookkeeping and bounded evidence-to-score-to-QC-package integration, without Claude waiting | Explicit later owner review waiver honored; original 2006Q1 producer remains b0efb312 with all 95 original non-launcher dependencies byte-identical. New genuine-byte test paths and real all-quarantine negative path preserved. Source/event/primary/cohort/calendar/lineage defects corrected; no fake admission. | Main focused **734 passed in 28.53s**, all denied-network; actual read-only replay from clean b406c5b8 passed with 100-source capture/48-module execution. All 83,657 rows retained/quarantined, 71,679 relevant rows lack parents; wire SHA `7d5d13af...`. No data writes, new source/outcomes/QC/backtest or full suite. | New P2/P3 draft findings corrected with red/green; four topical P2 remain OPEN at precise scopes; all prior closures/classifications/denominators preserved. Genuine IB-5 evidence remains unbound; bounded 256-parent software candidate is not full historical readiness. | One combined matching-lane push and exact remote-tip verification. No Claude wait or rearmed monitor. Establish genuine existing source/PIT/calendar/rights/outcome-header/QC/protocol bindings before input-driven full-scale/temporal/statistical/parity activation; do not invent evidence or broaden named access scope. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -18831,3 +18834,161 @@ the replay, do not edit source or durable records. After observed completion,
 record current consumer commit/inventory/trace hashes separately from the
 unchanged original producer context and commit the durable handoff separately.
 There is no Claude-wait gate or independent-review claim for this round.
+
+## 140. Observed read-only downstream replay and separate backtesting-build handoff (2026-10-06)
+
+### 140.1 Exact committed range and actual execution lineage
+
+This round starts at published
+`932f30c6e55dbf8d978ad8dee7c8721921133fbc`; no new incoming review commit
+was present at the exact matching-lane fetches. The completed counter-review
+of `d05e0bc454a846cd2dc712f4232bfe5b61ffeb60` in section 136 remains accepted
+after qualification. The later owner's explicit no-Claude-wait direction
+allowed this new implementation without waiting for another independent
+review. No Claude review was invented or attributed to the new code.
+
+| Outgoing commit | Scope / disposition |
+|---|---|
+| `b406c5b8600fa54f4181a9ecf73da827878c072e` | Five changed/new lane product sources, five new test files, owner decisions/preregistered boundaries and section-139 self-review proof. Main's focused gate passed 734 cases before commit. Bounded engineering candidate accepted under the owner waiver; not source/data or empirical promotion. |
+| This separate handoff commit | Observed real read-only result, exact execution/output identities, remaining factual/engineering limits, exclusions and one final combined publication. No additional product behavior. |
+
+The actual invoked entry was the **stdlib-only isolation launcher**, using
+`--preparation-root`, exact clean committed HEAD `b406c5b8`, the retained
+raw root and section 138's exact preparation directory. No code or record
+was edited during execution. The parent verified current root/branch/HEAD,
+clean status and every current source against that commit's Git blob;
+the worker rechecked/served captured Python source only. Post-run root,
+branch, HEAD, source and clean-status checks passed.
+
+The original producer remains exact `b0efb31262d0eca6c972673ca36403fee20a34cb`
+with its original 96-source inventory. **All 95 non-launcher producer
+dependencies matched their original bytes.** The revised launcher/new
+consumers were inventoried separately; no later commit was relabeled as the
+original producer or as having existed during section 138's run. This is
+compatible current-consumer execution, not a full historical-environment
+reconstruction or another historical-v3 root replay.
+
+### 140.2 Actual measured replay result
+
+The fresh worker process tree denied network, **all file writes**, fork and
+extra exec; the audit hook additionally denied network/process/ctypes
+operations. The trusted parent performed only local Git/code/path capture
+and launch. The worker publicly reloaded the parsed snapshot with its exact
+raw upstream and regenerated the entire original assessment/completion byte
+images before feeding the current sealed v2 consumers and negative backtest
+handoff. No publisher/recovery routine was invoked and no new data root was
+created. Only bounded scalar metadata was returned; raw filing rows were not
+printed or committed. Elapsed replay time was not independently instrumented.
+
+| Observed binding | Exact result |
+|---|---|
+| Consumer commit | `b406c5b8600fa54f4181a9ecf73da827878c072e` |
+| Current source count / inventory | **100** / `585a600031deb106d37c3207233e60c6449a1245699445c3d13606a476a84a9b` |
+| Observed executing modules / trace digest | **48** / `4365b4dc105fb74b9cd90f45612794a84687be3cfd326765b60793366032cdac` |
+| Executed launcher / read-only bootstrap | `73294a0b4eb0ff982a72532f721349386426c22773e06838d51f32f95d185e12` / `b0086137b5ff4f5d82721b5ba08782dad6e6797b4034e922620d53b28cd584a6` |
+| Original producer inventory | `7b34fdfe67d408d4435ff610d9fc672bc181f7b257c6a487b64df546053fe3e0` (96 original sources; 95 non-launcher matches) |
+| Complete stdout wire receipt / bytes | `7d5d13af23f111cea2a7fa9143b4dcc9fa68f5a77cf9d7320e7f94f6268aa0c7` / **9,586**, including canonical trailing newline |
+| Complete all-row pilot ledger digest | `a5417bb2d084850945d49dc55c35d41b2ea9b2ec1587c51e87c1932bd3ceaeb7` |
+| Quarter coverage digest | `303fd4081dbb7c9c0cd724a7ad25b37da81d4c47358fd7db195d67f7af91f7ec` |
+| Selected one-quarter / partial 82-quarter scope digests | `342a0bf25b9d25c4952bb6a78bf8e5173096e4eaf5c63c07fd3598fb16b67e2d` / `6a067798fc55888d1bfb5ec1f45603e46c6c956a4722f792187d72fb9fa2062d` |
+| Negative backtest-pipeline handoff digest | `3ca4f66c8a8ed488922a48e3fb77d8fee7a8df1386175c50efe79d7450c4770e` |
+| Source rows / relevant Form-4/4-A rows | **83,657 / 71,679** |
+| Missing complete-parent / unsupported-form quarantine counts | **71,679 / 11,978**; conflict count **0** |
+| Year mismatches / short CIKs / source-only admissions | **1 / 0 / 0** |
+| Full pilot ledger / quarantined rows | **83,657 / 83,657** |
+| Whole-quarter source identity / backtesting readiness | **withheld (`null`) / false** |
+
+The selected one-quarter bookkeeping scope is complete; the retained
+82-quarter scope explicitly has 81 missing quarters. Neither has complete
+source identity or canonical/scale promotion authority. Financial event
+eligibility remains **not evaluated** and candidate signal count remains
+`null`; the actual negative pipeline does not manufacture an empty ready
+manifest. Its four missing source/PIT/calendar/authorization evidence roles
+are explicit. Research looks, QC jobs and SEC dispatches remain zero.
+An independent post-run read-only/network-denied check confirmed the selected
+manifest/ZIP and both original envelope hashes remained identical. The
+producer/raw/parsed/census/profile hashes and local-unverified timestamps in
+138.2 remain unchanged.
+
+### 140.3 What is completed, what still prevents actual backtesting
+
+Technical milestone: completed real v2 downstream all-row scale/pilot
+bookkeeping plus a bounded evidence→eligible-event→frozen-score→QC-package
+software path, exact parser parity, default-disabled/configured-source
+lineage, terminal order-path checks and three-attempt bookkeeping. Main
+validated the new code and performed the actual read-only negative integration.
+The owner's workflow waiver removed the review wait, not data requirements.
+
+Plain-language milestone: the lane can now preserve the real filings all the
+way through the downstream checks and exercise a genuine byte-derived success
+path with invented test evidence. It correctly refuses to turn missing parent
+corroboration into signals. It is more than a declaration checklist, but it
+is **not yet the complete historical sample or a backtest-ready project**.
+
+The material activation boundary is still substantive, not an ordinary owner
+approval: no genuine complete-source/official-timing/PIT master/calendar,
+applicable rights, outcome-vintage/coverage/adjustment/delisting, QC entitlement
+and permanent registered-look/protocol artifacts were newly supplied. The
+previous inspected-root audit of **0/19 independently bound IB-5 inputs**
+is not changed by synthetic trust roots. The external trust-root arguments
+must be established independently of the untrusted artifacts they anchor;
+this code does not authenticate them merely because hashes parse.
+
+Remaining production engineering must be driven by those genuine inputs:
+full-quarter streaming above the retained 256-parent/64-MiB bound, source
+composition across a 30-session cross-quarter window, ordinary-share/manual
+exception admission beyond the old parser's narrower title grammar, exact
+registered statistical implementations and actual QC-export/data-vintage/
+engine/cost parity. The current candidate's daily-close timing is explicitly
+not literal first-open-after-each-acceptance timing. Configured candidate bytes
+do not certify a statistical recipe, empirical result or those parity facts.
+No input cap, old source window, zero-look gate or frozen caller was silently
+relaxed to force readiness, and no differently scoped acquisition was inferred.
+
+The next meaningful action is to establish genuine existing source/reference/
+rights/outcome-header/entitlement/protocol bindings for the frozen study
+population, then complete the input-driven streaming/temporal/analysis/parity
+path. Claude waiting is **not** that next action. No routine decision needs
+to be re-asked: choices and approvals exercised are listed in 139.1. Missing
+factual records cannot be supplied by Codex on the owner's behalf, and no new
+SEC/provider/credential/QC/outcome access was substituted for them.
+
+### 140.4 Retained ledger, exclusions and single publication
+
+All new confirmed wire/semantic/lineage/factory defects in 139 are corrected
+before publication. The four topical P2 findings remain **OPEN** at their
+precise scopes: IB1C-REAL's downstream bookkeeping component is now observed,
+but full affected-quarter admission/scale integration is not complete;
+IB1BCAMP's accepted historical source-view engineering and exact legacy/
+current-byte/frozen-file boundary are retained; IBSRC-CR01 and IBSRC-CCR01
+are not closed by contract tests. All earlier resolved findings and shared
+out-of-lane observations remain preserved without shared behavior changes.
+
+Frozen v1/scale/pilot and four custody files remain unchanged. The stopped v3
+root remains **1,846 completed of 1,847 starts**; separate 7,373-byte diagnostic
+and report `206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`
+do not resolve the unmatched start. The **99,394 = 19,526 + 79,868** frozen
+parent partition, seven nonexact D23 quarters and withheld 82-quarter
+promotion digest remain. Both final historical-access classifications remain
+distinct without retroactive approval.
+
+No complete lane/repository suite, additional retained-root historical replay,
+SEC/provider/credential/licensed-row access, outcome/registered look, QC
+upload/job, backtest, broker/operator database/scheduler, deployment/capital/
+order/paper/live/trading action occurred. No raw data was changed or committed.
+Shared/project-wide documents, Action Plan and SESSION_HANDOFF stay frozen.
+Repeat the exact focused document/package/boundary and scope/frozen checks,
+verify designated root/branch/exact HEAD and expected doc-only status, and
+fetch only the matching lane before this separate handoff commit. Then make
+**exactly one successful combined push** of this round to the matching origin
+lane and independently verify the exact remote tip. The monitor stays PAUSED;
+no automatic Claude wait, rearm or message to another chat is part of this
+owner-waived build.
+
+Final handoff repeat passed **734 in 21.94s**, no failures/skips/warnings.
+Independent read-only/network-denied scope verification confirmed exactly
+11 changed lane-owned files, the fixed root/branch, all four historical
+custody byte identities and all five product-source compilations. Diff
+whitespace checks passed. Only this handoff document is uncommitted after
+the observed candidate run; matching remote no-advancement and exact local
+HEAD checks follow immediately before its commit and the one final push.

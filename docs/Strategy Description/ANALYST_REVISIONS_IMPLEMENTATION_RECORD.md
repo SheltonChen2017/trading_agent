@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–256 retain the milestone, review, preregistration, QC
+strategy. Sections 1–257 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1192,8 +1192,11 @@ them. The approved local-history audit in 255.3 adds original command timing
 but does not recover the missing raw server or later launch histories.
 The prospective receipt fix is `0766faa08de39b003e5b0eb4cdc42b2ed1d10d58`.
 Section 256 records the newly authenticated scoped QC/Mia audit and the
-separately versioned captured-clock correction `06f3e8d4`. Claude must review section 256
-and this round's final snapshot; that independent final review is not an
+separately versioned captured-clock correction `06f3e8d4`. Section 257 resumes
+the interrupted exact R281 retained-source audit after access is restored:
+its 17 displayed filenames match the frozen local inventory, but exact source
+bytes and original operator/compile/save evidence remain unverified.
+Claude must review section 257 and this round's final snapshot; that independent final review is not an
 intermediate checkpoint or a prerequisite for admissible continuing build.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
@@ -3021,6 +3024,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Claude independent review of section 253: the record-only acceptance of section 252 | `eadfd584` -> this record commit | Section 254: one record-only commit `a146ae57..eadfd584` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | No code changed; confirmed only the record changed, the full commit and trust-root hashes and the union arithmetic; accepted the 253.3 reading of section 252's wording; section 4 names section 254, banner sentence added, this row appended | Complete selection not rerun because no file outside the record changed since its run at `b83cf6c0` in 252.4; record gates and the shared-ledger reader `test_alpha_stage1_replications.py` at `eadfd584`, record gates, `compileall` and `git diff --check` on the final tree, all network-denied; exact counts in 254.4 | 0 P0, 0 P1, 0 P2, 0 P3; `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's Claude commit; Codex counter-reviews section 254 unless the owner changes the workflow |
 | 2026-10-06 | Codex section-254 counter-review, owner-directed continuous round, scoped original-history audit and prospective QC response observations | `eadfd584` -> `a205ebf7` -> `0766faa0` -> this record commit | One Claude commit accepted after two P3 qualifications; no new launch, result evaluation, research look or cell; floor 313/239/49/699 | Documented each delegated decision, extracted only scoped historical metadata, and implemented retention of private append-only response observations for existing authorized QC list/read calls; historical envelopes and source/attempt freezes unchanged | Strict-network-denied focused validation and mutation restoration in 255.6; compilation/diff/root/branch/status checks. No complete Codex suite, fresh QC/provider request or old artifact/source-audit repetition | ARV2CR255-001 exact validation exception; ARV2CR255-002 prospective correction of the Stage-1 ledger-reader claim. Three historical P2s and two conditional cells remain open; formal independent-source gates remain blocked | One final same-lane push at the concrete external evidence/access stop, not an intermediate cadence pause. Claude must review section 255. Resume substantive build when genuine required evidence/access becomes available, under the saved continuous-work authorization |
 | 2026-10-06 | Codex resumed continuous work after authenticated QC/Mia became available | `ac73a660` -> `06f3e8d4` -> this record commit | Section 256: no new Claude push or replay; qualified original Mia tool-path evidence, prospective clock correction; floor 313/239/49/699 unchanged | Read only the scoped project histories, declined cloud edits, versioned the captured-clock source fix without changing R247/R279 bytes/manifests or adding a launcher; all delegated decisions recorded | Strict-network-denied focused clock/source/closure/record checks in 256.4; no complete Codex suite. Authenticated QC UI/history reads and displayed current IDE builds disclosed, not a zero-contact claim | ARV2I256-001 P2 prospective correction. ARV2R248-002/-003/-004 remain open with partial new evidence; two conditional cells and independent formal source gates unchanged | One final matching-lane push at the concrete remaining artifact/access stop; no intermediate Claude wait. Final independent review remains due; quiet monitor stays active |
+| 2026-10-06 | Codex resumed interrupted R281 retained Code audit after Mac access restored | `d5e841be` -> this record commit | Section 257: no new Claude push or replay; exact rerun Code view and 17-name inventory corroborated; floor 313/239/49/699 unchanged | Read only the already-booked rerun's supported Code view and local control metadata; no source mutation, launch, result export or historical authorization inference | Strict-network-denied focused record/active-document validation in 257.3; no complete suite or new code validation claimed | All three historical P2s remain open; run-bound rendered source is not a 17-file byte/compile/operator/save chain or formal vendor evidence | One final matching-lane push at the remaining original-artifact/source-access barrier; Mac lock no longer the active blocker, no intermediate Claude wait, monitor remains active |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -36057,3 +36061,110 @@ relaunch R247/R281, manufacture a claims-only scaffold or use irrelevant
 backtests to pretend the external gates are cleared. Final independent review
 of this implementation remains due and is not claimed from same-round
 advisory agents.
+
+## 257. Restored QC access and exact R281 rerun retained-source inspection, 2026-10-06
+
+**Resumed baseline:** `d5e841be84f44e7ca094eff01e81386db882739f`, the
+published section-256 snapshot containing `06f3e8d4`. Designated root,
+`codex/strategy-analyst-revisions-v2`, local/remote head and clean status were
+verified. No new Claude commit was present; no prior review, Mac-history
+audit, frozen source regeneration or booked research identity is replayed.
+The human asked why work stopped. The previous stop was the actual Mac lock
+during source-only navigation, not a reviewer or routine-approval checkpoint.
+A fresh native Safari observation now confirms authenticated QC access.
+Codex resumes the interrupted substantive audit immediately under 255.2/256.1.
+
+### 257.1 Decisions and supported new evidence
+
+`ARV2OD257-A`: resume only the already-scoped supported retained Code view for
+project `37165262`, rerun `44a66ce2bcf573b69902b4641eb56293`, named
+`ARV2 R281 fixed100 five-bps execution stress 2021 2025 A2 rerun after websocat infra error`.
+Do not launch, compile, clone, publish, modify source, ask Mia for another
+history read, or download performance results to substitute for source.
+
+The exact rerun result tab remains selected and its run-specific result-tab
+links name that ID. The **Code** tab loads `main.py`; its file dropdown lists
+17 Python filenames. This is the supported retained run-source view, not the
+separate current `main.py` editor. [QuantConnect's Project Files documentation](https://www.quantconnect.com/docs/v2/cloud-platform/backtesting/results)
+describes this tab as the files used to run the backtest. The documented
+Download Results function exports statistics/charts/Overview/Orders, not a
+source-only byte export; it was not invoked.
+
+Root compares the complete displayed filename set with the metadata-only
+`source_files` list in
+`artifacts/analyst_revisions_v2/eight_execution_stress_qc_control_20260929/R281-A2-claim.json`:
+**17 names match, no missing or extra displayed name**. That claim file's
+remeasured SHA-256 is
+`71bd8d7154abbaf6005e826e70cbddb05f65a33d2109f13873d2b7748834ee40`.
+The local expected `main.py` is 10,507 bytes with hash
+`023b66aa7c4fa674c8ef641a2fcbcf315c2497fcf5da32f893b7e9604930b8d0`.
+These are **local comparison identities**, not hashes of the displayed cloud
+text. Native accessibility exposes rendered/tokenized editor text, not a
+lossless 17-file byte export; no cloud hash or byte-for-byte match is claimed.
+No source package is saved or committed. Existing licensed source/input rows
+are not regenerated, printed or exported.
+
+The original local A2 launch binds run
+`2007f9f73fcbfa7fb5ba95abdb094831`, project `37165262` and compile
+`cacaafd33575b4a2da91328aa1f4f6e7-c4bed1af2c9e71f41b2644a9f84a2c9a`.
+Neither that compile identity nor its frozen byte inventory automatically
+belongs to the later `44a66...` rerun. Rendered source, filename equality and
+the prior Mia tool-path link partially corroborate context only.
+
+`ARV2OD257-B`: retain `ARV2R248-003` open. Even a future lossless full match
+would not by itself establish the original operator/explicit authority,
+immutable launch/compile chain or thirteen later saves. Preserve `-002` and
+`-004`, both conditional stress cells and the conditional four-arm comparison.
+Do not relaunch R281/R247 or obtain unrelated outcomes to reconstruct history.
+
+### 257.2 Actual boundaries and remaining dependency
+
+The Mac lock is **no longer the active blocker at this observation**. Supported
+native controls permit the new retained Code inspection; they have not supplied
+a source-only lossless export or original raw audit records. The missing
+original status/read request-response records, operator/authority, complete
+rerun compile/source and save chain, and six R247 create paths remain external
+artifact/access dependencies. No current-file substitution, hidden browser
+state extraction or unsupported credential/session transfer is attempted.
+
+QC UI/source access occurred; zero network contact or processing is not
+claimed. No build/backtest/live control, source write, new Mia message or
+result/log download was requested. The previously displayed current IDE build
+line remains visible and is not promoted to an original compile identity.
+Old financial fields/charts are incidentally present above Code, but are not
+exported, evaluated, compared or admitted. No new research look, cell, candidate,
+attempt or alpha spend occurs. The floor stays **313 / 239 / 49 / 699**.
+
+The separate independent vendor as-of/version/publication/correction/deletion
+completeness, reviewed permanent/SID/share-class/vendor/own-ETF identity and
+availability intervals, and authenticated RAW prior-NYSE-close price/score
+packages in 231.3 remain missing. Stock seven-role/terminal-payoff gates and
+ARV2-4 through ARV2-8 are unchanged. No readiness flag, registry, selector,
+order adapter, formal date/estimand/power hash/epoch or deployment permit is
+created by this source view. Broad continuing authority is retained, but
+does not manufacture independent evidence or retroactive approval.
+
+### 257.3 Validation and continuing-work handoff
+
+Only this lane record changes; production/test code, frozen source, formal
+trust-root registries, shared ledger and root/shared documents are untouched.
+Focused record/active-document validation from the designated root under
+`(version 1)(allow default)(deny network*)`, Python 3.13.15, passed:
+**86 passed in 1.38s**, no skips, failures or warnings, after the new audit
+content and live pointers. `git diff --check` is clean. The selection is
+`test_lane_record_integrity.py` plus `test_active_document_consistency.py`,
+not the Stage-1 constants tests or a full lane suite. A same-round advisory
+wording check found no verified material issue; it is not independent Claude
+review. After the validation paragraph, the same final record selection
+again passed **86 tests in 1.26s**, no skips, failures or warnings.
+There is no complete Codex suite, source regeneration, QC run validation or
+independent Claude review in this audit round.
+
+Continue immediately when a genuinely supported source-only byte/audit path
+or independent source package becomes available, with no intermediate Claude
+or routine approval wait. End this resumed round only at the concrete
+remaining external dependency; do not request another Mac unlock while this
+access is available, repeat old histories, start an empty scaffold or launch
+irrelevant/exhausted backtests. The existing active monitor is updated to
+supersede its stale lock blocker while preserving its quiet cadence and scope.
+Final independent dossier/review evidence remains required, not self-awarded.

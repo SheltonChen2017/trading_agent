@@ -1,21 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 136 COMPLETES CODEX COUNTER-REVIEW OF THE SINGLE CLAUDE
-COMMIT `d05e0bc4` AFTER `cb06065c`: ACCEPTED AFTER APPEND-ONLY QUALIFICATION
-OF TWELVE LISTED SOURCE-HASH SITES IN ELEVEN MODULES, NOT TWELVE MODULES.
-THE BOUNDED SOURCE-VIEW ENGINEERING MILESTONE REMAINS ACCEPTED; THE FOUR
-TOPICAL P2 FINDINGS AND PRECISE LEGACY/THAW BOUNDARY REMAIN OPEN. CODE IS
-UNCHANGED SINCE `672c80ba`; EARLIER REPLAY/FULL-SUITE RESULTS ARE ATTRIBUTED,
-NOT NEW CODEX EXECUTIONS. STRICT D23 RETAINS SEVEN NONEXACT QUARTERS AND NO
-82-QUARTER DIGEST. V1 AND THE FOUR V3 CUSTODY FILES STAY FROZEN; STOPPED V3
-IS UNRESOLVED AT 1,846 OF 1,847 STARTS. ONLY 19,526 OF 99,394 PARENTS ARE
-SOURCE-BOUND. NOT BACKTEST-READY. THIS COUNTER-REVIEW HANDOFF IS LOCAL ONLY;
-ORIGIN'S REVIEWED TIP IS `d05e0bc4`. NO NEXT MILESTONE OR PUSH IS STARTED
-WITHOUT OWNER SCOPING/INPUTS. THE QUALIFYING PUSH PAUSED THE HEARTBEAT BEFORE
-COUNTER-REVIEW; IT STAYS PAUSED. BOTH FINAL ACCESS CLASSIFICATIONS STAND
-WITHOUT RETROACTIVE APPROVAL. NO NEW SEC/PROVIDER/CREDENTIAL/LICENSED-ROW,
-OUTCOME, QC, BACKTEST, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING
-AUTHORITY. LOOKS 0/0/0.**
+Status: **SECTION 136 COUNTER-REVIEW IS ACCEPTED AFTER QUALIFICATION; SECTION
+137 RECORDS THE OWNER'S ONE-QUARTER APPROVAL AND CONTINUING ENGINEERING
+DELEGATION. THE NEW 2006Q1 INPUT/QUARANTINE RUNNER IS A LOCAL CANDIDATE,
+NOT YET AN OBSERVED REAL-QUARTER RUN OR INDEPENDENTLY ACCEPTED MILESTONE.
+ALL SIX FORMS AND RAW ROWS ARE RETAINED; MISSING PARENT EVIDENCE MUST STAY
+QUARANTINED. FOUR TOPICAL P2 FINDINGS AND THE PRECISE LEGACY/THAW BOUNDARY
+REMAIN OPEN. STRICT D23 HAS SEVEN NONEXACT QUARTERS AND NO 82-QUARTER DIGEST.
+V1/ SCALE/PILOT AND FOUR V3 CUSTODY FILES STAY FROZEN; STOPPED V3 REMAINS
+1,846 OF 1,847 STARTS, WITH ONLY 19,526 OF 99,394 PARENTS SOURCE-BOUND.
+NOT BACKTEST-READY. BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT
+RETROACTIVE APPROVAL. DELEGATED DECISIONS CANNOT SUPPLY MISSING EVIDENCE,
+RIGHTS, ENTITLEMENTS OR INDEPENDENT REVIEW. NO NEW SOURCE/OUTCOME/QC/
+BACKTEST/EXECUTION ACTION IS TAKEN. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -18240,3 +18237,152 @@ retained roots are unchanged. No SEC/provider/credential/licensed-row
 access, QC upload/job, registered/outcome look, backtest, broker/operator-
 database/scheduler, deployment, capital, order, paper/live or trading action
 was taken. **Looks 0/0/0**.
+
+## 137. Owner-approved affected-quarter scope and delegated engineering decisions (2026-10-06)
+
+After the section-136 proposal, the owner said **"yes approved. proceed"**.
+This specifically activates the recommended one already-retained affected
+quarter input/preparation and existing v2 quarantine assessment, with one
+combined push including local counter-review commit
+`6d7743711e57afdf5bc1c11d6b94eed9aab6d05f`. It narrowly supersedes the
+historical scope/push stop in 136.4; it does not erase that earlier stop.
+The clean starting local HEAD was that commit; matching origin remained
+`d05e0bc454a846cd2dc712f4232bfe5b61ffeb60`, a strict ancestor.
+
+The owner subsequently directed **counter-review, then continuing lane
+development until project completion or backtest readiness**, preauthorized
+engineering moves and delegated necessary decisions to Codex's best
+judgment, with every decision/approval documented. This is standing
+direction for serialized, bounded lane development, not a manufactured
+positive rights/PIT/entitlement gate or waived independent Claude review.
+CLAUDE.md's named safety boundaries remain binding. No source, outcome,
+credential, QC, broker, capital or trading action is inferred from this
+broad delegation. Factual missing inputs stay missing. Earlier final
+historical access classifications are not retroactively approved.
+
+### 137.1 Decisions made on the owner's behalf before publication
+
+| ID | Delegated decision / rationale | Authority or evidence boundary |
+|---|---|---|
+| IBDEC-137-01 | Select **2006Q1**, the first chronological retained period, whose measured nonzero accession-year mismatch makes it deterministically the earliest affected quarter. Read one ZIP only; validate the complete 82-row manifest metadata. | No other ZIP publication, old 82-quarter route, window change or corpus completion. |
+| IBDEC-137-02 | Retain all eight tables and all six ownership forms using the unchanged raw/parsed publishers, pinned header-only candidate profile and public parsed loader with its committed raw upstream. | No frozen v1/scale/pilot or schema/key/cap relaxation; incompatible real input refuses. |
+| IBDEC-137-03 | Supply an **empty complete-parent tuple** for this quarter. Existing bound parent inventories cover only 2022Q4/2023Q1. All rows remain quarantined, including unsupported Forms 3/5; no whole-quarter identity digest. | Not a claim that arbitrary external evidence cannot exist, an acquisition request, or source admission. |
+| IBDEC-137-04 | Use a separately versioned, fresh private output namespace outside repository/source roots; complete assessment capped at 128 MiB, small completion receipt published last, no resume route. | Replaying completed outputs is read-only and regenerates every assessment row; incomplete outputs do not imply success. |
+| IBDEC-137-05 | Capture tracked source bytes against a clean exact Git HEAD before real execution; isolate the worker with process-tree OS network denial, source-only imports, extra-process denial and writes limited to its private output. Recheck code/context afterward. | Current-source lineage only, not reconstructed historical environment or SEC authenticity; no test-only transport patch stands in for isolation. |
+| IBDEC-137-06 | Continue one reviewed milestone at a time. After independent review/counter-review, prioritize separately versioned v2 downstream quarantine integration and retained discrepancy evidence before any positive research gate. | No silent D23 tolerance, frozen-file thaw, missing evidence/rights assertion, unregistered look, or backtest execution. |
+
+### 137.2 Exact selected inputs and preregistered output contract
+
+Selected retained input directory: this designated lane's
+`artifacts/sec_insider/raw`; filename `2006q1_form345.zip`.
+Intake CSV SHA-256
+`dc254e4e023bf9990028e085450fc4a5c1c2ae22e1d562f2efc4ada532f9f76d`,
+34,381 bytes, binds all 82 chronological metadata rows and capture commit
+`a4192546b168470ff1e9c421d8bd53531a1b3c05`. ZIP SHA-256
+`62becdadbe5eaff68f03edefe2ba2357c8bb498a1f825b697003e087cf98e6ce`,
+17,306,804 bytes. Pinned profile SHA-256
+`ee2f201362d4002a70819e4d7123eea300aafddb8820c6a0ab9761b0ed8cdd41`;
+selected header-receipt SHA-256
+`32e35230f653736fa702c6e8e98ba5254e0f247169c212ea8a85e832174463cf`.
+Read-only scouting measured **83,657 SUBMISSION rows, one Form-4
+accession-year mismatch, zero invalid/short CIKs and out-of-quarter dates**;
+eight headers match and expanded tables total **97,956,413 bytes**, below
+the unchanged 256-MiB parser input cap. These are preflight observations,
+not yet observed IB-1B preparation/identity-assessment completion.
+
+The runner must bind manifest/ZIP/header/profile/census identities, actual
+clean parser commit and captured source inventory, raw and parsed snapshot
+IDs/lineage, original unverified local clock plus its normalized legacy
+representation, all-six-form counts and full assessment byte digest.
+No filesystem last-write clock is described as a verified SEC retrieval,
+acceptance or publication time. Actual child-key uniqueness, orphan joins,
+row/field caps, immutable publication and raw-bound public reload remain
+execution checks. The complete assessment remains separately stored;
+only scalar counts/hashes appear on stdout and in the small completion
+receipt. Regenerated canonical completion/assessment bytes must match
+exactly, including boolean/int types; self-rehashed altered rows refuse.
+
+### 137.3 Later single-round direction
+
+The owner clarified: **"by 'build towards until project completion or the
+lane is ready for backtesting', i mean no interruptions. just build in
+single round until done"**. This later explicit direction supersedes
+IBDEC-137-06's proposed pauses between implementation milestones for this
+build round: complete the already accepted counter-review, accumulate
+safe bounded engineering work in this same branch/worktree, do not stop
+for routine discretionary decisions, and make one final combined push.
+Every delegated choice remains recorded. Independent acceptance of the
+final new implementation is still evidence to obtain, not a fact Codex
+can self-declare. The earlier one-quarter permission does not become an
+old 82-quarter promotion or an acquisition command. Missing source/PIT/
+rights/entitlement facts cannot be supplied by choosing a policy, and
+CLAUDE.md's named access/freeze boundaries are not lifted by a broad
+completion request. A factual inability to reach readiness must be
+precisely reported, without inventing completion or positive authority.
+
+This preregistration accompanies the implementation candidate so the real
+run can use a clean committed source snapshot. It is not a completion
+entry. Exact implementation hash, real output path/result or precise
+refusal, focused validation and final durable handoff follow separately.
+Four topical P2 findings stay OPEN; source-view engineering acceptance,
+strict D23, frozen v3 state/counts and prior ledger dispositions are retained.
+
+### 137.4 Candidate validation before the committed real-input run
+
+The new test file exercises genuine raw/parsed writers and the public
+raw-bound parsed reload on invented six-form quarter bytes. Main-agent
+final new-file checks: **125 passed**, zero skips/warnings (the full named
+focused/boundary selection below is repeated before committing). Earlier
+main-agent three-file core/profile/identity selection: **80 passed in
+2.10s**; the interim named focused/document/package selection was **260
+passed in 22.07s** before the last launcher controls were added. These
+are focused selections, not a complete lane/repository suite. All tests
+use minimal environment, disabled plugin autoload, no pytest cache,
+`-B` and effective OS process-tree network denial.
+
+Final main-agent combined selection: **334 passed in 22.02s**, zero
+failures/skips/warnings: `test_insider_buying_ib1c_v2_affected_quarter_runner.py`,
+`test_insider_buying_sec_ib1c_identity_v2.py`,
+`test_insider_buying_sec_ib1b_82q_schema_profile.py`,
+`test_insider_buying_ib1b_82q_snapshot_runner.py`,
+`test_insider_buying_lane_import_boundary.py`,
+`test_active_document_consistency.py`,
+`test_insider_buying_implementation_record.py`,
+`test_ml_import_boundary.py`, `test_overlay_import_boundary.py`,
+`test_module_hygiene.py`, `test_project_separation_boundary.py`,
+`test_project_separation_entrypoints.py` (all under `tests/`) and exact
+`tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`.
+The document/record pair is repeated after this validation entry before
+the clean source commit. No complete suite or outcome/QC job was run.
+
+| Draft finding | Priority / status | Red/green evidence |
+|---|---|---|
+| IB1CV2AQ-R01 | P3, CORRECTED before commit | A quarter header receipt has no aggregate `.sha256` property. Independent test agent: one failure in 0.62s; runner now hashes its canonical quarter payload. Existing header class unchanged; genuine publication/reload tests pass. |
+| IB1CV2AQ-R02 | P3, CORRECTED before commit | Four compromised-assessor defense-in-depth controls exposed integer/boolean equality and dropped-row summary gaps. Main independently reproduced **4 failures / 39 deselected in 0.64s**, then required exact count types, canonical authority identity and complete accounting/row length. All four now pass. Existing sealed assessor remains unchanged; this is not an untrusted external-input exploit claim. |
+| IB1CV2AQ-R03 | P3, CORRECTED before commit | Independent test agent reproduced **3 failures / 48 deselected in 0.73s** for integer false/true or a missing worker authority field. Parent now requires exact receipt schema and literal-false/int-zero types, hashes, snapshot IDs and quarantine counts. Main final new-file suite independently passes these controls. |
+
+All three new Python files compile in memory without cache/source writes.
+Launcher SHA-256
+`79da5be9d2db4c4487bcdc5f35a1824de74a7c2bec4d5175abf407e60948f76f`;
+core SHA-256
+`b8ca19a7858016025db258dc2f63ffb2654fbedd09f172270156eea3d78b32bf`;
+tests SHA-256
+`618acb710b33fa5586c6d820bf27c9e6f188881ac7fbbd9fd365d193730048a5`.
+All four frozen custody files independently remain byte-exact against
+their `aa0d635d00b64825bf8003289e0a60279bd52e73` blobs. Main-agent actual
+CLI dirty-HEAD control refuses **before output creation**. Independent
+launcher QA observed EPERM 1 for input write, outside-output write,
+loopback bind, fork and extra subprocess under the exact generated worker
+OS policy; private output write/readback succeeds. Installed audit-hook
+controls independently refuse socket creation, subprocess, fork,
+in-place interpreter exec and ctypes loading. Those synthetic OS probes
+are attributed QA evidence, not the yet-unrun actual quarter preparation.
+
+Readiness inspection also finds **0/19 substantive IB-5 input declarations
+independently bound in the inspected supplied lane/known custody roots**:
+outcome dataset/vintage/manifest/session coverage, rights, PIT security
+master, bound study calendar, delisting/adjustment semantics, eligible
+signal manifest and QC processing entitlement. Existing source custody,
+calendar code and caller-declared/synthetic contracts are not those
+artifacts. This does not claim private evidence cannot exist elsewhere.
+No positive readiness flag can be supplied by the delegated policy choice.

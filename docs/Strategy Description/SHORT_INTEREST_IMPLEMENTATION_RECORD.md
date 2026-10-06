@@ -1,26 +1,25 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED THE SOLE CLAUDE COMMIT `5275b7d5`
-IN `249c6e45..5275b7d5` (SECTION 90): ACCEPTED, WITH NO NEW ISSUE FOUND.
-THE RESTORED NO-BRANCH-SWITCH/NO-FORCE-PUSH HEADER SENTENCE CORRECTLY
-CLOSES THE INHERITED P3 `SI-CR18-001`; THE RULE ITSELF WAS NEVER LOST.
-EARLIER CONFIRMED AND FALSE-ALARM FINDINGS ARE RETAINED. THE CURRENT-TREE
-PRIVACY REDACTION AND APPENDED UTC ERRATUM STAND; PUBLISHED PRIVACY HISTORY
-IS UNCHANGED, WITH NO REWRITE AUTHORIZED. NO CODE OR TEST CHANGED.
-CLAUDE'S PRIOR COMPLETE-LANE RESULT IS 817 PASSED AT `dad1252`, ON
-BYTE-IDENTICAL CODE/TESTS; CODEX RUNS ONLY FOCUSED VALIDATION. THE THREE
-SOURCE P2S, SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND PROSPECTIVE
-COMMITMENT ADVISORY `SI-CR15-001` REMAIN OPEN. THE NEXT SOURCE-SPECIFIC PIT
-ADAPTER/HISTORICAL-STOCK MILESTONE IS STILL BLOCKED ON AUTHENTIC ARCHIVE,
-AVAILABILITY, COVERAGE AND RIGHTS EVIDENCE; NO SUBSTITUTE IS IMPLEMENTED.
-NASDAQ'S ACTUAL LEGAL/SUBSCRIBER ENTITY REMAINS A MISSING OWNER FACT.
-THIS ONE-SHOT COUNTER-REVIEW ENDS WITH ONE FINAL PUSH AND DELETION OF ITS
-CLAUDE-PUSH MONITOR; THE EXCHANGE-REPLY MONITOR
-STAYS PAUSED. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED AND REAL OUTCOME LOOKS
-REMAIN 0/0. PROVIDER DATA, LICENSED/ACTUAL MARKET ROWS, OUTCOMES, HOLDOUT,
-PRODUCTION RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
-PURCHASE, BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS
-AND TRADING REMAIN GATED.**
+Status: **CODEX ACCEPTED CLAUDE'S SOLE `5275b7d5` COMMIT IN
+`249c6e45..5275b7d5` (SECTION 90); NO NEW CLAUDE COMMIT HAS APPEARED AT
+THE MATCHING REMOTE `cb4a8e6c`. THE OWNER NOW EXPLICITLY AUTHORIZES ONE
+CONTINUOUS ACCELERATED BUILD ROUND (SECTION 92), NOT ROUTINE APPROVAL
+PAUSES. SYNTHETIC ORDER ACCOUNTING AND GROSS R20 DIAGNOSTIC REHEARSALS ARE
+IN DEVELOPMENT; THEY DO NOT ADMIT A SOURCE OR CHANGE THE FROZEN EMPIRICAL
+PROTOCOL. CLAUDE'S HISTORICAL 817-PASS RUN IS NOT VALIDATION OF THIS NEW
+CODE. CODEX SENT AND VERIFIED THREE METADATA-ONLY CLARIFICATIONS TO NYSE,
+NASDAQ AND INTRINIO; ACTUAL SUBSCRIBER/ENTITY/ACCESS FACTS ARE NOT GUESSED.
+NO PURCHASE, ACCOUNT ACTIVATION OR TERMS ACCEPTANCE OCCURRED. THE THREE
+SOURCE P2S, SHARED P2 AND PROSPECTIVE COMMITMENT ADVISORY STAY OPEN;
+AUTHENTIC ARCHIVES/AVAILABILITY/COVERAGE/RIGHTS STILL BLOCK THE PIT
+ADAPTER AND HISTORICAL BACKTEST. THIS IS NOT LANE COMPLETION OR REAL
+BACKTESTING READINESS. CLOSED FINDINGS, FALSE ALARMS, PRIVACY REDACTION
+AND UTC ERRATUM ARE RETAINED; NO PUBLISHED HISTORY IS REWRITTEN.
+LOOKBACKS 20/60/120/252 REMAIN UNSELECTED, REAL OUTCOME LOOKS 0/0.
+ACTUAL MARKET DATA/OUTCOMES, HOLDOUT, PRODUCTION RANKING/SEEDS, ETF,
+QUANTCONNECT PROCESSING/JOBS, PURCHASES, BROKER, DATABASE, DEPLOYMENT,
+PAPER/LIVE, CAPITAL AND TRADING REMAIN GATED. THE CLAUDE ONE-SHOT IS
+DELETED AND THE EXCHANGE-REPLY MONITOR STAYS PAUSED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -207,6 +206,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex counter-review | Pinned Claude `dad1252..4c08f595`; this record commit follows | Complete record-only counter-review before the next milestone | Sole Claude commit accepted after two P3 citation/preservation qualifications; privacy redaction independently verified; append-only UTC correction closes SI-CR17-002. No code/test changes or next milestone implementation. | Record/tree identity, privacy before/after counts, exact author/committer UTC times, numstat and code blobs verified; focused active-document **69 passed**; lane compilation exit 0; historical record preservation proof passed; diff clean; no full lane/repository suite. Real looks **0/0**. | SI-CCR27-001..002 confirmed and closed; prior confirmed/false-alarm findings retained; source P2s, shared P2 and commitment advisory unchanged. Published privacy history is not rewritten. | One final push, then rearm the existing five-minute Claude-push monitor for the exact published snapshot under SI-AUTH-20261006-01. Exchange monitor stays paused. Source-specific PIT adapter remains blocked. |
 | 2026-10-06 | Claude review | `4c08f59` -> `249c6e4` reviewed from the published head after the push watcher fired; **record-only correction (restored header no-force sentence)**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 87 | Confirmed `SI-CCR27-001` (wrong subsection cited) and `SI-CCR27-002` (the merge also replaced the publication-rule paragraph). Found that paragraph lost the sentence forbidding branch switches and force pushes, still authoritative in section 81, and restored it. Verified +221/-22, code/test identity with `dad1252`, the UTC erratum, the redaction and the new row. | Pushed tree `249c6e4`, clean, network-denied: active-document, ML boundary, lane boundary and SI-5 protocol **123 passed**; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. Complete lane not rerun: 817 passed on byte-identical code/tests at `dad1252`. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR18-001` (P3, closed by correction: merge `23a5428` dropped the header's no-branch-switch/no-force sentence). `SI-CCR27-001`, `-002` confirmed against Claude. `SI-CR17-001` and `-002` closed. Source P2s, shared P2 and `SI-CR15-001` stay open. | Codex counter-reviews this record commit. The owner answers the Nasdaq entity question and decides on history removal. The PIT adapter milestone stays blocked; every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-06 | Codex counter-review | Pinned Claude `249c6e45..5275b7d5`; this record commit follows | One-shot counter-review of section 89 and restored header prohibition | Sole Claude commit accepted; no new issue. Verified SI-CR18-001's historical omission and exact header-only restoration, prior record/ledger preservation, UTC dates and code/test identity. No code/test correction or next milestone. | Focused active-document **69 passed**; lane compilation exit 0; mechanical before/after header, preservation and scope checks pass; diff clean; no full lane/repository suite; real looks **0/0**. | SI-CR18-001 closure accepted; prior confirmed/false-alarm findings retained; three source P2s, shared P2 and commitment advisory unchanged. | One final non-force lane push under section 81 / SI-AUTH-20261006-01, then delete the completed one-shot Claude monitor. Exchange monitor stays paused. Next implementation remains blocked on actual source evidence. |
+| 2026-10-06 | Codex source qualification / accelerated authorization | Local/remote base `cb4a8e6c`; decision-record commit follows | Three verified metadata clarifications and later continuous-build scope | NYSE clarification; truthful preliminary Nasdaq reply without invented entity/access; conditional Intrinio Business-tier technical screening with zero commercial commitment. Section 92 records the later accelerated offline build and delegated choices; no source admission or real backtest. | SENT/content/thread/recipient readbacks verified; initial record checks 69 passed; final round checks recorded after implementation. Real looks **0/0**. | Three source P2s, shared P2 and commitment advisory unchanged. No confidential mail body/contact/entity/amount added to Git. | Build/test the remaining source-neutral synthetic order/diagnostic components in one round; actual adapter/empirical freeze/QC depend on authenticated facts. One combined final push, no monitor rearm. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -12095,3 +12095,230 @@ compile/job/backtest, purchases/terms, broker, operator database, deployment,
 paper/live, capital, orders and trading remain untouched and gated. Shared/
 project-wide documents and SESSION_HANDOFF remain frozen; no trading
 scheduler, evidence epoch or history rewrite changes.
+
+## 91. Owner-directed NYSE metadata clarification; initial Nasdaq factual hold — 2026-10-06
+
+### 91.1 Authorization and exact bounded scope
+
+After Codex recommended answering Nasdaq's entity question and sending
+targeted NYSE/Nasdaq source-qualification follow-ups, the owner instructed
+**"proceed"**. **`SI-AUTH-20261006-02`** records direct authorization for these
+bounded administrative inquiries, not source admission, data acquisition,
+purchase, trial, terms acceptance or implementation. The owner did not supply
+the missing factual answer about the subscriber/legal entity or existing
+short-interest access. Standing delegation cannot manufacture those facts.
+
+Codex inspected the two existing inquiry threads without opening attachments,
+sample links or market-data files. NYSE's latest message still supplied sales
+links/indicative pricing only; Nasdaq's latest message still requested current
+dataset access and entity information. No new archive, timing, coverage or
+rights evidence was supplied. This observation is limited to those threads,
+not a mailbox-wide absence claim.
+
+### 91.2 Completed NYSE action and held Nasdaq action
+
+| Action | Verification / disposition |
+|---|---|
+| NYSE clarification sent | Message `1a11275a8bf4024d`, thread `1a0f0d951513b761`; read-back verifies **SENT**, the existing reply thread, intended existing-thread recipients and exact authored-body prefix followed by the connector's quoted prior reply. Sent **2026-10-06T18:24:23Z** (October 6, 11:24:23 America/Los_Angeles). |
+| Nasdaq reply at this early phase | **Not yet sent.** The owner was asked for personal versus company capacity (company legal name/country if applicable), and whether any short-interest dataset is already accessed and through which provider/entity. The later truthful preliminary reply in 92.2 supersedes the overall hold without supplying these missing facts. |
+
+The NYSE clarification asks for:
+
+- Exact first-disseminated originals and every corrected/replacement version
+  versus latest-only history; immutable version identities and a metadata-only
+  manifest, or an exhaustive historical affected-release/security correction
+  inventory if originals are unavailable.
+- Actual public-release/correction dates/times/timezones and provenance where
+  available, explicitly distinct from settlement, nominal schedules and
+  customer delivery/receipt. Authenticated date-only evidence and delayed/
+  corrected-release exceptions must be identified rather than inventing time.
+- Historical venues, security classes and dates, delisted retention and
+  effective-dated identifier/listing histories, including companion routes.
+- Local raw archival/retention, internal computation and derived-statistic
+  rights, including after license termination; separately, rights for raw,
+  normalized or derived representations in QuantConnect Cloud.
+- Future first-release/all-correction delivery and receipt semantics if
+  historical originals are unavailable, and quote scope (included versions,
+  content months, minimums and additional fees) for later evaluation only.
+
+The request retains October 19, 2026 as the response date and explicitly
+declines sample/market-data files, accounts, trial activation, purchases,
+subscriptions and acceptance of any quote or terms. A missing archive or
+inventory may be reported as unavailable. No public availability, checksum,
+sales price or reply is treated as admission evidence by itself.
+
+Private message bodies, individual names/contacts, account/entity details,
+commercial amounts and reply signatures stay outside Git. Only the
+de-identified action summary and opaque message/thread references are retained.
+No private-name history cleanup occurs.
+
+### 91.3 Validation, retained gates and next handoff
+
+Before the record edit, physical/Git root, branch and clean local/tracking/
+actual remote were verified at
+`cb4a8e6c84c94bb5e9467f1fe2c55414c0c96ed4`. The sole repository change is
+this lane record. No code/test/schema/import change or implementation milestone
+is claimed in this early phase. Initial document checks were **69 passed in
+0.58s**, with no failures, skips or warnings; lane compilation exited **0**
+and the diff check was clean. These preceded the later implementation scope
+and do not validate that code. Exact final-round checks follow in the round
+handoff; Codex does not run a complete lane/repository suite.
+
+`SI-SRC-20260928-001..003` remain **open P2 factual gates**; shared
+`SI-CR5-005` / `SI-CCR16-007` remains open/out of lane; `SI-CR15-001` remains
+the prospective commitment advisory. Closed findings and false alarms are
+unchanged. Asking questions does not qualify an archive, reconstruct original
+vintages, establish PIT coverage or grant local/QC rights. No new delegated
+financial, empirical-design or source-admission decision is exercised.
+
+The bounded completed action is the NYSE clarification; the broader
+qualification and Nasdaq factual answer are **not completed**. The owner still
+needs to supply actual entity/current-access facts. Section 92 records a
+subsequent truthful technical reply while leaving the actual facts explicit.
+Keep private entity details out of Git. Written
+vendor evidence must be independently evaluated before the source-specific
+PIT adapter; coverage, evaluation/power/date/look registration and a separate
+QC route remain later independent gates. The deadline remains October 19 at
+17:00 America/Los_Angeles. No substitute collector, parser or empirical
+milestone is started.
+
+Section 81 authorizes one final non-force push of this completed bounded
+administrative-action record, after root/branch/HEAD/status and matching
+actual-remote checks. All unreviewed Codex record commits since Claude's last
+review head belong to the next review range: **`5275b7d5..published HEAD`**,
+including `cb4a8e6c` and this record. Publication does not complete data
+qualification or independently accept this record. No monitor is rearmed:
+the Claude one-shot is deleted and the exchange-email monitor stays paused.
+
+Candidate lookbacks **20/60/120/252** remain unselected; structural
+normalization and release-next-open reranking are unchanged. Allocated alpha
+**0**, permanent look IDs **none**, real outcome looks **0/0**. No market-row
+request, licensed/actual prices/outcomes, holdout, production ranking/seeds,
+ETF, QC history/project/processing/upload/compile/job/backtest, purchase,
+terms acceptance, broker, operator database, deployment, paper/live, capital,
+orders or trading action. At this early phase one Gmail send was the only
+new external write; section 92 records the two later authorized sends;
+no attachment/sample is opened, no credentials are exposed, no scheduler or
+evidence epoch changes, and shared/project-wide documents stay frozen.
+
+## 92. Owner-directed single continuous build and delegated decision inventory — 2026-10-06
+
+### 92.1 Newest explicit instruction and precedence
+
+The owner now instructed:
+
+> counter review
+
+> continuing build this lane until project completion or the lane is ready for backtesting .
+
+> during the process, consider i preauthorize every move of yours. if an owner decision is needed, please use your best judmgent to make the decision on my behalf. document every decision/approval
+
+The owner then clarified:
+
+> and by "build towards until project completion or the lane is ready for backtesting", i mean no interruptions. just build in single round until done
+
+`SI-AUTH-20261006-03` records renewed standing lane delegation: do not pause
+for routine owner-controlled design/approval choices; document each exercised
+choice and approval. `SI-AUTH-20261006-04` records the explicit **one continuous
+multi-step implementation round** before independent Claude review. This
+supersedes section 90's monitor-only scope and section 91's administrative-only
+scope for this later owner-triggered round, and renews section 66's accelerated
+workflow exception. It does not invent external facts or change the one
+designated worktree/branch, shared-document freeze or one-final-push rule.
+The source-specific adapter/collector prohibitions remain: no invented source
+contract or substitute empirical test. The new source-neutral synthetic engine
+is explicitly additional software work, not a workaround that clears a gate.
+
+The last Claude range is still exactly **`249c6e45..5275b7d5`**, one commit
+accepted in section 90. The actual matching remote was rechecked at
+`cb4a8e6c84c94bb5e9467f1fe2c55414c0c96ed4`; no later Claude commit exists
+in that observed snapshot. No self-review is called independent review and
+the range is not silently enlarged. Prior P0–P3 ledger rows, classifications,
+closed findings and false alarms remain unchanged.
+
+### 92.2 Completed source-admin actions under the renewed delegation
+
+| Action / receipt | Exact verification and scope |
+|---|---|
+| NYSE follow-up | Section 91 receipt `1a11275a8bf4024d`, thread `1a0f0d951513b761`, sent `2026-10-06T18:24:23Z`. Verified SENT, intended recipients, authored prefix and existing thread. |
+| Nasdaq preliminary technical clarification | Message `1a1127e0946712a4`, thread `1a0f0d9ae9fda1e6`, sent `2026-10-06T18:33:31Z`. Verified SENT, intended recipients, authored prefix and existing thread. This lane has not acquired Nasdaq historical SI; no existing entitlement is claimed. Actual subscriber/entity and other existing access arrangements are explicitly being confirmed, not answered by inference. Questions distinguish individual versus legal-entity routes without choosing a factual identity. |
+| Intrinio conditional technical screening | Message `1a1127e0bd5b71b1`, thread `1a10d667a3035a5b`, sent `2026-10-06T18:33:32Z`. Verified SENT, intended recipient, authored prefix and existing thread. Quoted Business-tier pricing is not ruled out for preliminary technical consideration **if** PIT/archive requirements are met; zero committed budget/spend, no purchase order, subscription, acceptance or activation. A cheaper package excluding official SI is not a substitute. |
+
+The observed Intrinio human reply `1a111d51dcec4bd3` asserts that Short Interest
+requires its Business tier rather than Individual/Startup and supplies an
+indicative commercial quote. It does **not** answer the original/correction,
+release timing, upstream source, coverage or rights questions. This is a
+pricing/package assertion, not a verified license or admitted source. Its
+[public pricing page](https://intrinio.com/pricing) uses Enterprise terminology
+for custom packages; exact product/package mapping, included history, minimum
+term, fees and local/QC rights need written clarification. No private quote
+amount, personal contact/name/signature or entity details are committed.
+The exact QuoteMedia alternative thread `1a10d668ead37067` contained only its
+sent inquiry when read; this is a thread-bounded observation, not a mailbox-
+wide absence claim. No additional QuoteMedia message was sent this round.
+
+All three messages request metadata only: immutable first releases and every
+correction (or exhaustive affected-release inventory), actual public
+availability distinct from settlement/schedules/customer receipt, historical
+listed/delisted identity/coverage, local retention and derived-computation
+rights, and **separate** QC representation/processing rights. They retain
+the October 19 response date and expressly decline rows/files, samples,
+accounts, trials, subscriptions, purchases and acceptance of terms. Future
+original/correction capture is conditional on its delivery and rights contract.
+No source gate cleared; NYSE/Nasdaq/Intrinio/QuoteMedia remain candidates.
+
+### 92.3 Delegated decisions actually exercised in this round
+
+| ID | Decision / approval exercised | Limit and reason |
+|---|---|---|
+| `SI-AUTH-20261006-02` | Direct "proceed" authorization for targeted metadata-only follow-ups. | Section 91; no source/data/financial admission. |
+| `SI-AUTH-20261006-03` | Renewed preauthorization and best-judgment delegation for owner-controlled choices in this lane. | No fabricated entity identity, vendor facts, data integrity or platform rights. No funded/live/trading expansion. |
+| `SI-AUTH-20261006-04` | One continuous accelerated build through safe offline steps before Claude's independent review. | No intermediate push/review pause; stop at a genuinely non-substitutable external fact dependency rather than claim readiness. |
+| `SI-DEC-20261006-01` | Send Nasdaq a truthful preliminary technical reply, leaving actual entity/access facts explicitly unconfirmed. | Advances qualification without inventing personal/company status or entitlement; factual subscriber answer still needed before a contract. |
+| `SI-DEC-20261006-02` | Keep Intrinio's quoted SI-containing Business route under conditional technical consideration; reject non-SI package substitution. | No committed financial amount or accepted terms. Verify exact scope/rights before any commitment; `SI-CR15-001` remains prospective. |
+| `SI-DEC-20261006-03` | Build an exact source-neutral **fixed-fixture-only** order-event cashflow rehearsal now. | Missing order engine is a genuine software gap. Public API cannot take arbitrary rows or caller-asserted synthetic/PIT flags. Existing `SI5OfflineProtocol` cashflow/terminal fields stay `None`; a demonstration policy is not the empirical freeze. |
+| `SI-DEC-20261006-04` | Demonstration-only unlevered long/avoidance, self-financing fractional-share allocations; fees reserve cash before full raw-open buys/sells; exact rational share/cash arithmetic. | Fractional quantities are fixture accounting, not an admitted source's lot/fill policy. Avoided high-pressure names are not shorted. 10 bps primary and 0/5/20 sensitivities follow existing prospective terms. No leverage, fallback quote or fabricated partial execution. |
+| `SI-DEC-20261006-05` | Demonstrate split quantity changes, dividends locked on pre-ex-open holdings and later cash payment, and explicit known terminal payouts including zero. | Pending entitlements survive sells. Unknown payout, unavailable open/suspension or incomplete settlement produces a named refusal, not silent row exclusion, carry-forward price or assumed terminal zero. No actual corporate-action claim. |
+| `SI-DEC-20261006-06` | Build fixed-fixture gross split-adjusted/dividend-excluded `R(20)` and equal-weight-release low-minus-high contrast arithmetic, separately from costed next-release order cashflows. | Existing prospective offline design is unchanged: all four candidates retained, common population/original tails not reranked, incomplete common outcomes block comparison, no winner or power/sample sufficiency inferred. This diagnostic exception to order-based evaluation is disclosed before its synthetic run: it tests the blueprint's fixed 20-session price statistic, not investable P&L. |
+
+These are a running inventory, not a claim that the lane/project is complete.
+The eventual completion inventory must include the earlier authorizations and
+decisions in sections 66–81 as well as this round. No new production cutoff,
+winner, actual financial forecast, date/power/look allocation or ETF/operational
+promotion decision is made. Existing gates cannot be reduced to approval
+checkboxes. Exact source facts still control the admitted adapter and real run.
+
+### 92.4 Planned verification and remaining completion boundary
+
+The new private kernels and public fixed-scenario runners must have focused
+dangerous-direction tests, fixed fixture/policy content hashes, immutable
+detached receipts and denied-network smoke runs. Freeze demonstration decisions
+to this committed record before publication and verify the binding in tests.
+Use lane/ML import-boundary, active-document, lane compilation, staged diff,
+privacy and worktree/actual-remote checks; **no full lane/repository suite**.
+Claude's old 817-pass result is historical and cannot validate changed code.
+Final implementation hashes, actual red/green and exact counts are appended
+after execution. No software completion is claimed by this decision record.
+
+The target is to finish all fact-independent software work in this single
+round. Still required before real backtesting: authenticated SI originals/all
+corrections or complete inventory; actual availability, listed/delisted PIT
+identity and companion price/volume/corporate-action/terminal coverage; local
+rights; source-specific immutable acquisition/normalization adapter; prospective
+evaluation dates/power and permanent look freeze; and an independently verified
+exact QC project/dataset/representation route before any QC processing/run.
+Delegation removes routine owner-choice interruptions, not these dependencies.
+No generic parser/collector or latest-only/ETF substitute is implemented.
+
+Outcome looks **0/0**, allocated alpha **0**, permanent looks **none**;
+20/60/120/252 remain unselected. No provider market rows, actual/licensed
+prices or outcomes, holdout, QC history/project/upload/compile/job/backtest,
+broker, operator database, deployment, paper/live, funded capital or trading.
+Only the three verified metadata emails are new external account writes.
+No monitor/scheduler is rearmed or changed: the Claude one-shot is deleted,
+the exchange-reply monitor stays paused. No published history or shared file
+is changed. Section 81 permits one final non-force lane push after the complete
+round is documented and validated, even if authentic source facts still block
+the empirical destination. The next independent Claude range begins at
+`5275b7d5` and includes **every** subsequent Codex record/implementation commit,
+including `cb4a8e6c`; the final exact range follows in the handoff.

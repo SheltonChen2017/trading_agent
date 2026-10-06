@@ -1,21 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 136 COUNTER-REVIEW IS ACCEPTED AFTER QUALIFICATION.
-SECTION 138 RECORDS AN OBSERVED, COMMITTED-SOURCE 2006Q1 INPUT/PARSED
-PREPARATION AND V2 QUARANTINE ASSESSMENT: 751,590 TABLE ROWS, 83,657
-SUBMISSION ROWS, ONE YEAR MISMATCH, ZERO CORROBORATED, ALL 83,657
-QUARANTINED, NO WHOLE-QUARTER IDENTITY DIGEST. INDEPENDENT RAW-BOUND
-READBACK PASSED. NEW IMPLEMENTATION AWAITS CLAUDE REVIEW, NOT ENGINEERING
-SELF-ACCEPTANCE. OWNER DELEGATION AND LATER SINGLE-ROUND DIRECTION ARE
-RECORDED; NO ROUTINE APPROVAL IS OUTSTANDING. READINESS IS FACTUALLY BLOCKED:
-0/19 IB-5 INPUT FIELDS INDEPENDENTLY BOUND IN THE INSPECTED SUPPLIED ROOTS,
-NO CANONICAL SIGNAL OR POSITIVE RIGHTS/PIT/QC/LOOK GATE. FOUR TOPICAL P2
-FINDINGS AND PRECISE LEGACY/THAW BOUNDARY REMAIN OPEN. STRICT D23 HAS SEVEN
-NONEXACT QUARTERS AND NO 82-QUARTER DIGEST. V1/SCALE/PILOT AND FOUR V3 FILES
-STAY FROZEN; V3 REMAINS 1,846 OF 1,847 STARTS, WITH ONLY 19,526 OF 99,394
-FROZEN-WINDOW PARENTS SOURCE-BOUND. NOT BACKTEST-READY OR PROJECT-COMPLETE.
-BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT RETROACTIVE APPROVAL.
-NO NEW SOURCE/OUTCOME/QC/BACKTEST/EXECUTION ACTION. LOOKS 0/0/0.**
+Status: **SECTION 139 RECORDS THE OWNER'S EXPLICIT CLAUDE-WAIT WAIVER AND
+CONTINUOUS BACKTESTING-READINESS BUILD (NOT FORWARD-LOOKING RESEARCH).
+SECTION 136 COUNTER-REVIEW IS ACCEPTED AFTER QUALIFICATION; SECTION 138'S
+COMMITTED 2006Q1 PREPARATION/QUARANTINE RESULT STANDS. V2 SCALE/PILOT
+CONSUMERS AND AN EVIDENCE-BOUND BACKTEST PIPELINE ARE NOW IN IMPLEMENTATION.
+NO POSITIVE SOURCE/PIT/RIGHTS/QC/LOOK EVIDENCE HAS BEEN CREATED BY THE WAIVER.
+FOUR TOPICAL P2 FINDINGS AND LEGACY/THAW BOUNDARIES REMAIN OPEN. STRICT D23
+HAS SEVEN NONEXACT QUARTERS AND NO 82-QUARTER DIGEST. V1/SCALE/PILOT AND
+FOUR V3 FILES STAY FROZEN; V3 REMAINS 1,846 OF 1,847 STARTS, WITH ONLY
+19,526 OF 99,394 FROZEN-WINDOW PARENTS SOURCE-BOUND. NOT YET BACKTEST-READY
+OR PROJECT-COMPLETE. BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT
+RETROACTIVE APPROVAL. NO NEW SOURCE/OUTCOME/QC/BACKTEST/EXECUTION ACTION.
+LOOKS/JOBS/BACKTESTS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -29,6 +26,9 @@ agents work serially on this same branch and follow
 agent may edit `docs/ACTION_PLAN_2026-08-20.md` or shared coordination files
 without an explicit owner-directed common amendment; `docs/SESSION_HANDOFF.md`
 stays frozen and this record is the lane's status and handoff.
+The later explicit owner exception in section 139 removes Claude waiting
+for this continuous Codex build; the historical review entries remain
+historical evidence, not a claim that a new independent review occurred.
 
 ## 1. Canonical V1 contract
 
@@ -18582,3 +18582,252 @@ counter-reviews every incoming review commit. The single-round requested
 readiness objective remains factually blocked as above, not silently
 completed. Existing heartbeat remains **PAUSED**; no new monitor or message
 to another chat is inferred from the no-interruptions build direction.
+
+## 139. Explicit review-wait waiver and continuous backtesting build (2026-10-06; implementation in progress)
+
+### 139.1 Owner direction and delegated decisions before execution
+
+The owner explicitly reiterated "proceed without claude review" and "no
+need to wait for claude," then corrected "forward looking" to
+**backtesting**. This is a scoped workflow exception under the standing
+"unless a later explicit owner direction says otherwise" rule. Codex will
+not wait for Claude, automatically arm another review monitor, or present
+review acceptance as an outstanding approval. Section 138's earlier
+review-dependent next-action text is superseded for this build only;
+completed counter-review and actual execution-time lineage are not rewritten.
+No independent review of this new implementation is claimed.
+
+Starting local and origin HEAD is
+`932f30c6e55dbf8d978ad8dee7c8721921133fbc`, with no new incoming review
+commit at the initial matching-lane check. The same designated worktree
+and branch remain binding. Owner delegation covers documented engineering
+choices and one continuous implementation round with one final lane push.
+It does not turn missing rights, provenance, PIT coverage or account-specific
+entitlement into a fact, approve prior access retroactively, authorize a
+new source request, access outcomes, register a look or launch a QC job.
+
+| Decision | Selected policy / effect |
+|---|---|
+| IBDEC-139-01 | Remove the Claude-wait gate for this owner-requested continuous build; retain explicit self-verification and honest review provenance. |
+| IBDEC-139-02 | Correct the endpoint to first stock-level **backtesting readiness**, not prospective/forward-looking work, ETF promotion or paper/live execution. |
+| IBDEC-139-03 | Build separately versioned v2 downstream consumers rather than thawing or coercing the old v1/scale/pilot models. Retain all six ownership forms and every source ordinal; source corroboration and financial eligibility stay distinct. |
+| IBDEC-139-04 | Use section 138's exact 2006Q1 artifacts for a read-only real-data integration. Preserve producer commit/inventory; inventory new consumer code separately. All worker network, file writes and extra processes are denied at OS level. |
+| IBDEC-139-05 | Continue available source-to-event-to-score-to-study-package engineering, not another declaration-only readiness checklist. Success paths must verify substantive artifact bytes against external trust anchors; test-only anchors are explicitly synthetic and confer no production permission. |
+| IBDEC-139-06 | For this separately versioned stock-score candidate, use a verified regular-close daily decision snapshot followed by the next session open; freshness starts at the first verified close at/after the latest eligible lot member's public availability. Require at least 31 prior verified sessions. After-close filings wait for the following decision close, adding conservative delay relative to literal first-open-after-acceptance timing. This is explicitly not timing-equivalent to the blueprint event clock and must be registered before any outcome study. |
+| IBDEC-139-07 | Normalize over the externally anchored complete eligible stock universe, including no-filing structural zeros. Missing relevant Form-4 evidence refuses the population; Forms 3/5 remain retained named exclusions rather than making original-Form-4 admission impossible. |
+| IBDEC-139-08 | The stock primary includes all positive eligible stock-event scores, not a top-decile/two-buyer-filtered population. Seeds and buyer-cluster flags are separate diagnostics. Capacity above the fixed 20 simultaneous stock slots refuses rather than silently selecting convenient names. |
+| IBDEC-139-09 | Keep default QC bundles disabled. A separately sealed, externally bound production configuration may render enabled candidate bytes with a new exact package/source identity; it still performs no upload/launch. Bind rights/entitlement to the actual native minute/raw equity and SPY clock representation, not an arbitrary price-dataset label. |
+
+### 139.2 Preregistered v2 consumer scope and real-input validation
+
+The new pure quarter and scope contracts consume a factory-sealed v2
+assessment plus an external producer binding. They retain all source rows
+in a detached pilot ledger; the admitted view contains only
+`corroborated_noncanonical` rows, never merely a non-null corroboration
+descriptor. An identity-conflicting parent stays quarantined. Explicit
+ordered scopes support a one-quarter complete **bookkeeping** checkpoint
+and an 82-quarter partial checkpoint without inferring source identity,
+canonical events or promotion. The original 500,000-row quarter / 5,000,000
+aggregate resource caps and frozen source window are retained.
+
+The separate read-only loader must publicly reload the parsed snapshot with
+its exact raw upstream, regenerate every original assessment/completion
+byte, verify the fixed envelope hashes/byte count in 138.2, and preserve
+`b0efb31262d0eca6c972673ca36403fee20a34cb` plus original 96-source
+inventory `7b34fdfe67d408d4435ff610d9fc672bc181f7b257c6a487b64df546053fe3e0`.
+It must not call a publisher/recovery routine, manufacture parents, read
+other ZIPs, rewrite the legacy parser-verified flag or replace provenance
+with today's source glob. The parent captures the original producer Git
+inventory and checks all 95 non-launcher dependencies byte-for-byte;
+the revised launcher and newly added consumers are separately inventoried.
+This is compatible current-consumer replay, not reconstruction of an
+entire historical Python environment.
+
+Expected actual result is all 83,657 source rows retained, one year mismatch,
+zero corroborated/admitted and 83,657 quarantined; whole-quarter identity is
+withheld. Pure summaries explicitly say `artifact_loading_verified_here=False`;
+only the loader's separate executed validation receipt may establish that
+raw-bound reloading occurred. Pilot financial event eligibility remains
+unevaluated, not zero inferred eligible signals or an empty ready manifest.
+The real read-only worker must run from a clean committed candidate and
+complete without any source/input/preparation writes; no run is claimed
+before that evidence exists.
+
+### 139.2a Draft v2 corrections and validation already observed
+
+`IB1CV2DS-R01` (P2, corrected before commit): independent worker-wire
+negative tests found that the first read-only parent guard accepted unknown
+promotion fields, wrong/dropped nested scope counts, bool/int substitutions,
+changed producer identities and an invented artifact-loading attestation.
+The captured loader itself still rederived actual artifacts; this was a
+defense-in-depth output-protocol defect, not a reported source request or
+production signal. The initial bounded selection was **12 failed, 1 passed
+in 0.47s**, with the dangerous cases reporting `DID NOT RAISE`. Exact
+canonical nested quarter/binding/scope/pilot comparisons now enforce every
+field, all form/reason counts, missing-period identities, quarter hashes,
+original producer bindings and literal authority types. Read-only sandbox
+mode is also an exact boolean. Final new isolation selection is **81 passed**.
+
+The genuine synthetic raw/parsed publication/readback integration passed
+**63 cases in 2.72s**; its later combined repeat with 81 isolation and 125
+unchanged writer cases passed **269 in 3.77s**, no skips/warnings. A faithful
+in-memory mutant substituting the private self-consistent parsed loader for
+the public raw-bound reload produced **1 failed in 0.38s** at the spy's missing
+call assertion. A preceding exploratory mutant named the wrong private
+helper and raised ImportError; it is explicitly **not** guard evidence.
+No on-disk product source was mutated for either probe.
+
+The new pure-consumer suite passed **69 cases**; combined with unchanged
+identity-v2 tests it passed **99 in 1.08s**. An in-memory mutant admitting
+rows by corroboration-descriptor presence instead of disposition produced
+**1 failed / 68 deselected in 0.49s** against a genuinely reparsed conflicting
+parent. Main independently ran the 125 writer / 63 loader / 69 pure-consumer
+selection: **257 passed in 4.13s**. Exact Insider package guard, lane/ML/overlay
+imports, project separation, active documents and record checks passed
+**153 in 17.47s**. These are focused selections, not a complete lane or repo
+suite. Tests/mutants used a minimal environment, bundled Python 3.12, `-B`,
+disabled plugin autoload/cache, and OS process-tree network denial. The new
+sources compile in memory with network and all file writes denied.
+
+The pure-consumer draft first had a collection-time unmatched parenthesis,
+corrected before its first successful run. A parent guard policy-identity
+literal was caught by direct comparison to the actual frozen identity
+constants and corrected before the positive protocol test. Neither is
+counted as a behavioral mutation proof. No retained inputs, preparation
+roots, frozen files or external state were changed by these checks.
+
+### 139.3 Remaining engineering and factual exclusions
+
+Existing IB-2 economics and IB-3 equation diagnostics are useful but do not
+yet connect evidence-bound real events to a nonempty immutable QC study
+manifest. The old IB-3 fixture factories are not relabeled real-event
+admission. The continuous build will add a separate positive verification
+path, deterministic stock score/cohort/seed composition, and offline
+study-package/parity/result-analysis interfaces with bounded adversarial
+tests. Actual retained inputs may produce only a refusal/quarantine result.
+Fixture success demonstrates software behavior, not source authenticity,
+rights, PIT semantics, outcome coverage, account entitlement or study success.
+
+The four topical P2 findings remain OPEN at their existing scopes; no
+contract test closes them. V1/scale/pilot and four v3 custody files remain
+unchanged, all earlier resolved findings are retained, and shared behavior
+and project-wide documents remain frozen. The frozen 99,394/19,526/79,868
+partition, unresolved 1,846/1,847 v3 starts, diagnostic 7,373-byte/report
+identity and seven nonexact D23 quarters do not change. Both owner-accepted
+access classifications remain distinct without retroactive approval.
+No source, provider, credential, outcome, QC, broker or execution action is
+added by this record. Validation and exact committed identities will be
+appended after the corresponding behavior has actually been observed.
+
+### 139.4 Bounded event/score/package candidate and semantic corrections
+
+The new event pipeline reparses each exact complete parent and ownership XML,
+checks source/projection/header/XML hashes against both the v2 row and the
+externally anchored source inventory, independently converts the SEC header's
+Eastern acceptance timestamp to the pinned UTC observation (ambiguous,
+nonexistent and date-only times refuse), and matches owner/security/title/
+ticker/share-class knowledge and trade-horizon intervals. Future accepted
+parents refuse rather than changing an earlier decision. Any publicly supplied
+amendment conservatively excludes its issuer family; joint owners are excluded
+without arbitrarily choosing one. This is an explicit conservative bounded
+candidate, not complete amendment supersession or all-quarter canonical policy.
+
+Only actual parsed eligible lots are aggregated by owner/security/transaction
+date. The USD 50,000 minimum is applied after exact aggregation, using the
+latest member's public availability. Frozen primitive IB-3 equations,
+50-digit Decimal context, type-7 1/99% winsorization and population z-score are
+used directly; real events are not cast into old fixture objects. Complete
+eligible-universe zeros, seed/tie diagnostics and buyer breadth are kept
+separate from the stock-primary sample. Unavailable normalization/seed
+diagnostics remain named unavailable rather than deleting primary events.
+
+| Finding | Disposition and proof |
+|---|---|
+| IBPIPE-R01 (P2) | Corrected: the draft cohort admitted only source issuers, omitting eligible no-filing stocks. Independent faithful in-memory reversal refused the 18-no-filing-zero fixture: **1 failed in 0.41s**. |
+| IBPIPE-R02 (P2) | Corrected: the draft primary silently applied the separate two-buyer cluster filter. Independent reversal refused the one-buyer stock-primary fixture: **1 failed in 0.41s**. |
+| IBPIPE-R03 (P2) | Corrected: truncated calendar history clamped old availability to age zero. Independent reversal accepted the shortened calendar: **1 failed (`DID NOT RAISE`) in 0.42s**. At least 31 verified prior sessions and explicit old-event handling now prevent this. |
+| IBPIPE-R04 (P2) | Corrected: a `None` exclusion reason could silently exclude an ordinary US common-stock source issuer. Exact reason/type validation added; genuine semantic negative was **1 failed / 64 deselected in 0.68s** before correction. |
+| IBPIPE-R05 (P2) | Corrected: verified calendar history alone did not bind the previous/next quarter's source inventory. Both a Jan-20 previous-quarter lookback and an Apr-28 next-quarter decision were accepted by the draft. Main observed **2 failed / 732 passed in 27.27s**, both `DID NOT RAISE`; the author's narrowed red was **2 failed / 74 deselected in 0.82s**. The complete 30-session source lookback and decision now must fit inside the supplied quarter; cross-quarter composition is not inferred. Corrected pipeline selection: **76 passed in 2.67s**. |
+| IBPKG-R01 (P2) | Corrected before commit: enabled rendered QC source initially retained the disabled package/source identity. Configuration now creates a separate sealed package with updated exact source/file/package hashes, used by attempt accounting and terminal parity. No arbitrary dual-hash acceptance. |
+| IBPIPE/IBPKG factory hardening (P3) | Exact weak-reference object/byte registrations prevent reconstructed or resealed dataclasses from bypassing genuine pipeline/package factories. Package reconstruction negative was **1 failed in 0.71s**, then **1 passed in 0.59s**. This is integrity-contract hardening, not a claimed hostile Python-process security boundary. |
+| IBPKG-R02 (P3) | Corrected: a compile failure could not represent a legitimately absent backtest ID, preventing unsuccessful-attempt accounting. Red **1 failed in 0.58s**; corrected lifecycle control **1 passed in 0.52s**. A compile failure remains an attempt and is not called a completed run. |
+
+The three independent pipeline reversals were followed by **3 passed / 71
+deselected in 0.48s** on the current restored source. Final pipeline selection
+is **74 passed in 2.29s**. All were in-memory probes or synthetic evidence
+tests with effective OS network denial; no live source file was reversed.
+Initial synthetic SGML wrappers lacked the XML newline required before the
+standalone `</TEXT>` tag, causing fixture setup failures; those are not counted
+as behavioral guard proof. A later malicious-Unicode fixture helper used ASCII
+encoding and was corrected to UTF-8; that setup failure is not a production
+acceptance defect. Original parser behavior and frozen files were unchanged.
+
+The package requires the exact registered pipeline object and rechecks ten
+external content roots: source, security master, calendar, authorization,
+outcome header, rights, QC entitlement, delisting, adjustments and protocol.
+It checks full calendar instants, nonempty derived signals, exact subject/
+vintage/coverage/representation/account cross-bindings, frozen stock/ETF alpha,
+null closure and holdout boundaries. Its pure exporter is tested against the
+exact captured standalone QC manifest/gate parsers; it does not import LEAN or
+the QC entry point into the offline package. Candidate source remains pinned
+and all exported file hashes are explicit.
+
+Terminal validation requires exact package/source/look/vintage bindings, all
+sessions, distinct entry/exit orders, full paired quantities and no residual
+positions/errors. `Completed` alone is INVALID_DATA without that path;
+even a valid path stays **UNADJUDICATED**, never automatic IB-5 PASS.
+An anchored immutable attempt ledger blocks an ambiguous pending attempt or a
+completed candidate and allows at most three unsuccessful attempts; the third
+requires Mia recovery rather than another relaunch. These are pure offline
+contracts, not a QC client, live export retriever or actual attempt history.
+
+External trust roots are an application trust boundary. Constructing hashes
+from untrusted artifacts or changing a `trust_scope` string cannot authenticate
+their provenance. Tests that simulate production schemas remain invented
+trusted-configuration controls, not genuine SEC, licensing, entitlement or
+look-registration evidence. Outcome headers are inspected; no outcome rows,
+registered statistical implementation or empirical primary result is verified.
+The positive event candidate is bounded to one quarter, 256 supplied parents /
+64 MiB and 10,000 event/universe rows. A full-quarter streaming successor is
+still required above those limits; the source assessor's cap is not silently
+lifted. The actual 2006Q1 inputs remain a negative integration, not an empty
+ready study or a completed full-population backtest lane.
+
+### 139.5 Final committed-candidate preflight; actual read-only replay pending
+
+Main's exact named focused selection passed **734 in 28.53s**, no failures,
+skips or warnings, after IBPIPE-R05 was corrected and all contributor files
+were frozen. It includes 125 unchanged affected-quarter writer cases, all new
+v2 consumer/read-only tests, 76 event-pipeline cases, 125 package cases,
+unchanged identity-v2 cases and the exact Insider package/import/document/
+project-separation checks. This is not the complete lane or repository suite.
+The preceding main selection's **2 failed / 732 passed in 27.27s** is retained
+as the real missing source-window guard red, not hidden as a flaky run.
+
+The package author's final repeat after the peer's source-window correction
+passed **129 in 3.57s** (125 package plus four exact access/import guards).
+Pure exporter outputs agree with the frozen `c80ff4f5` QC public manifest/gate
+parsers; production-branch simulations use invented trusted configuration,
+not actual account permissions. Two valid shifted-June controls independently
+refused insufficient calendar context and old-event empty-primary admission;
+the earlier malformed-XML probe is not counted as their evidence.
+All five changed/new product sources compile in memory, with network and
+all file writes denied. The four v3 custody files are byte-identical to exact
+historical `aa0d635d00b64825bf8003289e0a60279bd52e73`.
+
+| Candidate source | Exact SHA-256 |
+|---|---|
+| `research/insider_buying_affected_quarter_isolation.py` | `73294a0b4eb0ff982a72532f721349386426c22773e06838d51f32f95d185e12` |
+| `research/insider_buying_ib1c_v2_downstream_runner.py` | `2d6db2e7157421afe2e1f6a101b66b5e7480a9fbf33b58cd2e161e158a2c56db` |
+| `research/insider_buying/sec_ib1c_v2_downstream.py` | `d96f77cd39d171263c75873c2467cb0ee8434c2a31fab007e88001a63ff45f93` |
+| `research/insider_buying/backtest_evidence_pipeline.py` | `87c78aab1f2d61fb0ab6285b9ecabb59134dadb8f6fe6a0c09c79bf2523c13a2` |
+| `research/insider_buying/backtest_study_package.py` | `6dc5319eea765f74489efc3952daf762703ad61fcb399473cfe0ae8ceb4d3bf7` |
+
+No retained root has been read by the new actual worker at this checkpoint.
+Commit this candidate from the exact designated root/branch after matching
+remote no-advancement and expected-scope checks; then invoke the stdlib-only
+launcher with `--preparation-root` from that clean committed snapshot. During
+the replay, do not edit source or durable records. After observed completion,
+record current consumer commit/inventory/trace hashes separately from the
+unchanged original producer context and commit the durable handoff separately.
+There is no Claude-wait gate or independent-review claim for this round.

@@ -28,6 +28,10 @@ LANE_BRANCH = "codex/strategy-insider-buying"
 _WORKER_PATH = "research/insider_buying_affected_quarter_isolation.py"
 _CORE_PATH = "research/insider_buying_ib1c_v2_affected_quarter_runner.py"
 _CORE_MODULE = "research.insider_buying_ib1c_v2_affected_quarter_runner"
+_CONSUMER_PATH = "research/insider_buying_ib1c_v2_downstream_runner.py"
+_CONSUMER_MODULE = "research.insider_buying_ib1c_v2_downstream_runner"
+_PRODUCER_COMMIT = "b0efb31262d0eca6c972673ca36403fee20a34cb"
+_PRODUCER_INVENTORY_SHA256 = "7b34fdfe67d408d4435ff610d9fc672bc181f7b257c6a487b64df546053fe3e0"
 _MAX_SOURCE_BYTES = 2 * 1024 * 1024
 _MAX_INPUT_BYTES = 32 * 1024 * 1024
 _MAX_OUTPUT_BYTES = 64 * 1024
@@ -246,7 +250,9 @@ def _check_output(output_root: Path, identity: tuple[int, int]) -> None:
         _refuse("private output directory identity or mode changed")
 
 
-def _worker_policy(output_root: Path, python: str | None = None) -> str:
+def _worker_policy(output_root: Path, python: str | None = None, *, readonly: bool = False) -> str:
+    if type(readonly) is not bool:
+        _refuse("read-only sandbox mode must be an exact boolean")
     executable = Path(python or sys.executable).resolve()
     targets = [executable]
     if len(executable.parents) > 1:
@@ -258,7 +264,8 @@ def _worker_policy(output_root: Path, python: str | None = None) -> str:
                 or any(ord(char) < 32 for char in str(path))):
             _refuse("sandbox interpreter or output path is unsafe")
     return ("(version 1)(allow default)(deny network*)(deny file-write*)"
-            f'(allow file-write* (subpath "{output_root}"))'
+            + ("" if readonly else f'(allow file-write* (subpath "{output_root}"))')
+            +
             "(deny process-fork)(deny process-exec)"
             + "".join(f'(allow process-exec (literal "{path}"))' for path in targets))
 
@@ -455,12 +462,14 @@ def _worker_failure(stderr: bytes) -> str:
     return "isolated preparation refused without a valid redacted diagnostic"
 
 
-def _run_worker(raw: bytes, output_root: Path, timeout_seconds: int = _MAX_RUNTIME_SECONDS):
+def _run_worker(raw: bytes, output_root: Path, timeout_seconds: int = _MAX_RUNTIME_SECONDS,
+                *, readonly: bool = False):
     if (type(raw) is not bytes or not 0 < len(raw) <= _MAX_INPUT_BYTES
             or type(timeout_seconds) is not int or not 1 <= timeout_seconds <= _MAX_RUNTIME_SECONDS):
         _refuse("worker input or runtime bound is malformed")
-    command = ("/usr/bin/sandbox-exec", "-p", _worker_policy(output_root),
-               str(Path(sys.executable).resolve()), "-I", "-S", "-B", "-c", _BOOTSTRAP,
+    bootstrap = _READONLY_BOOTSTRAP if readonly else _BOOTSTRAP
+    command = ("/usr/bin/sandbox-exec", "-p", _worker_policy(output_root, readonly=readonly),
+               str(Path(sys.executable).resolve()), "-I", "-S", "-B", "-c", bootstrap,
                str(LANE_ROOT / _WORKER_PATH))
     deadline = time.monotonic() + timeout_seconds
     proc = subprocess.Popen(command, cwd=LANE_ROOT, env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"},
@@ -511,6 +520,303 @@ def _run_worker(raw: bytes, output_root: Path, timeout_seconds: int = _MAX_RUNTI
         for handle in (proc.stdin, proc.stdout, proc.stderr):
             if handle is not None and not handle.closed:
                 handle.close()
+
+
+_READONLY_BOOTSTRAP = _BOOTSTRAP.replace("m._worker_main(b)", "m._readonly_worker_main(b)")
+
+
+def _producer_inventory(sources: tuple[tuple[str, bytes], ...]) -> list[dict[str, str]]:
+    """Capture original producer inventory; do not rename today's added files as it."""
+    names = _git("ls-tree", "-r", "--name-only", _PRODUCER_COMMIT).decode("utf-8").splitlines()
+    paths = sorted(name for name in names if (
+        name.startswith("data/") and name.count("/") == 1 and name.endswith(".py")
+        or name.startswith("research/insider_buying") and name.count("/") == 1 and name.endswith(".py")
+        or name.startswith("research/insider_buying/") and name.count("/") == 2 and name.endswith(".py")
+        or name in {"ml/__init__.py", "ml/immutable_io.py", "research/__init__.py"}))
+    inventory = [{"path": path, "sha256": _sha(_git("cat-file", "blob", f"{_PRODUCER_COMMIT}:{path}"))}
+                 for path in paths]
+    _compatible_producer_sources(sources, inventory)
+    return inventory
+
+
+def _compatible_producer_sources(sources, inventory) -> None:
+    current = dict(sources)
+    if (type(inventory) is not list or len(inventory) != 96
+            or any(type(row) is not dict or set(row) != {"path", "sha256"}
+                   or type(row["path"]) is not str or type(row["sha256"]) is not str
+                   or _SHA.fullmatch(row["sha256"]) is None for row in inventory)
+            or [row["path"] for row in inventory] != sorted({row["path"] for row in inventory})
+            or _digest(inventory) != _PRODUCER_INVENTORY_SHA256):
+        _refuse("original producer inventory differs from its observed 96-source identity")
+    for row in inventory:
+        _module_name(row["path"])
+        if row["path"] not in current:
+            _refuse("an original producer dependency is missing from the consumer capture")
+        # The revised launcher is explicitly inventoried as new consumer code.
+        # All other original parsing/assessment dependencies remain byte-exact.
+        if row["path"] != _WORKER_PATH and _sha(current[row["path"]]) != row["sha256"]:
+            _refuse("an original producer dependency differs from its committed bytes")
+
+
+def _readonly_paths(input_root: Path, preparation_root: Path) -> tuple[tuple[int, int], tuple[int, int]]:
+    _plain_directory(input_root, must_exist=True)
+    _plain_directory(preparation_root, must_exist=True)
+    if _overlap(input_root, preparation_root) or _overlap(LANE_ROOT, preparation_root):
+        _refuse("retained preparation overlaps input or repository")
+    identities = (_directory_identity(input_root), _directory_identity(preparation_root))
+    if any(identity is None for identity in identities):
+        _refuse("read-only input identity is unavailable")
+    return identities
+
+
+def _readonly_worker_main(bundle: object) -> None:
+    stage = "capture"
+    try:
+        sys.dont_write_bytecode = True
+        sys.addaudithook(_audit_event)
+        if (type(bundle) is not dict or set(bundle) != {
+                "sources", "worker_source_b64", "worker_source_sha256",
+                "source_inventory_sha256", "expected_commit", "input_root",
+                "preparation_root", "producer_inventory"}
+                or type(bundle["expected_commit"]) is not str
+                or _COMMIT.fullmatch(bundle["expected_commit"]) is None):
+            _refuse("read-only consumer bundle is malformed")
+        sources = _decode_sources(bundle["sources"])
+        current = dict(sources)
+        if (_sha(current.get(_WORKER_PATH, b"")) != bundle["worker_source_sha256"]
+                or current.get(_WORKER_PATH) != base64.b64decode(bundle["worker_source_b64"], validate=True)
+                or _CONSUMER_PATH not in current
+                or _digest(_inventory(sources)) != bundle["source_inventory_sha256"]):
+            _refuse("read-only source or inventory image differs")
+        _compatible_producer_sources(sources, bundle["producer_inventory"])
+        if any(name.split(".")[0] in _BLOCKED_ROOTS for name in sys.modules):
+            _refuse("read-only worker inherited repository code")
+        paths = (Path(bundle["input_root"]), Path(bundle["preparation_root"]))
+        before = _readonly_paths(*paths)
+        _assert_sources_unchanged(sources)
+        finder = _SourceFinder(sources)
+        finder.executed.append({"path": _WORKER_PATH, "sha256": bundle["worker_source_sha256"]})
+        sys.meta_path.insert(0, finder)
+        stage = "replay"
+        core = importlib.import_module(_CONSUMER_MODULE)
+        receipt = core.build_retained_2006_handoff(*paths)
+        stage = "trace"
+        if _readonly_paths(*paths) != before:
+            _refuse("read-only directory identities changed")
+        _assert_sources_unchanged(sources)
+        raw = _canonical({"receipt": receipt, "executed_modules": finder.executed})
+        if not 0 < len(raw) + 1 <= _MAX_OUTPUT_BYTES:
+            _refuse("read-only receipt exceeds its output cap")
+        sys.stdout.buffer.write(raw + b"\n")
+        sys.stdout.buffer.flush()
+    except BaseException as exc:
+        name = type(exc).__name__
+        if re.fullmatch(r"[A-Za-z_][A-Za-z_0-9]{0,79}", name) is None:
+            name = "WorkerError"
+        sys.stderr.write(f"REFUSED: isolated affected-quarter stage={stage} error={name}\n")
+        raise SystemExit(1) from None
+
+
+def _consumer_receipt(value: object) -> dict[str, object]:
+    if (type(value) is not dict or set(value) != {
+            "kind", "quarter", "selected_scope", "retained_82_partial_scope", "pilot",
+            "artifact_validation", "authority", "backtest_pipeline"}
+            or value["kind"] != "INSETF-IB1C-V2-RETAINED-DOWNSTREAM-READBACK-v1"):
+        _refuse("read-only downstream receipt shape differs")
+    for body in (value, value["quarter"], value["selected_scope"], value["retained_82_partial_scope"]):
+        if (type(body) is not dict or type(body.get("authority")) is not dict
+                or set(body["authority"]) != set(_AUTHORITY)
+                or any(type(body["authority"][key]) is not type(expected)
+                       or body["authority"][key] != expected for key, expected in _AUTHORITY.items())):
+            _refuse("downstream receipt has missing or nonzero financial authority")
+    quarter, selected, partial, pilot = (value[key] for key in (
+        "quarter", "selected_scope", "retained_82_partial_scope", "pilot"))
+    binding = quarter.get("preparation_binding")
+    if (type(binding) is not dict or binding.get("producer_commit") != _PRODUCER_COMMIT
+            or binding.get("producer_source_inventory_sha256") != _PRODUCER_INVENTORY_SHA256
+            or binding.get("assessment_envelope_sha256") != "402fa1860bd9549f6d0eadcf7dc9a956cc0dc006d91f038290c294c102083ad5"
+            or binding.get("completion_envelope_sha256") != "d05e0345124b96599fbbd82a81828452ea63d39a90b3be28b599ef1e462bbfd0"
+            or type(binding.get("assessment_envelope_bytes")) is not int
+            or binding["assessment_envelope_bytes"] != 63_409_968
+            or quarter.get("artifact_loading_verified_here") is not False
+            or quarter.get("source_identity_complete") is not False
+            or quarter.get("source_identity_sha256") is not None
+            or type(quarter.get("submission_count")) is not int or quarter["submission_count"] != 83_657
+            or type(quarter.get("quarantined_count")) is not int or quarter["quarantined_count"] != 83_657
+            or type(quarter.get("corroborated_count")) is not int or quarter["corroborated_count"] != 0
+            or type(quarter.get("accession_year_mismatch_count")) is not int or quarter["accession_year_mismatch_count"] != 1
+            or selected.get("loaded_scope_complete") is not True
+            or selected.get("missing_periods") != []
+            or selected.get("expected_periods") != ["2006Q1"]
+            or selected.get("loaded_periods") != ["2006Q1"]
+            or partial.get("loaded_scope_complete") is not False
+            or partial.get("loaded_periods") != ["2006Q1"]
+            or type(partial.get("missing_periods")) is not list or len(partial["missing_periods"]) != 81
+            or type(pilot) is not dict or pilot.get("event_eligibility") != "not_evaluated"
+            or pilot.get("candidate_signal_count") is not None
+            or type(pilot.get("row_count")) is not int or pilot["row_count"] != 83_657
+            or type(pilot.get("quarantined_count")) is not int or pilot["quarantined_count"] != 83_657
+            or type(pilot.get("source_only_admitted_count")) is not int or pilot["source_only_admitted_count"] != 0
+            or pilot.get("ledger_sha256") != quarter.get("rows_sha256")
+            or type(pilot.get("ledger_sha256")) is not str or _SHA.fullmatch(pilot["ledger_sha256"]) is None):
+        _refuse("observed retained all-row quarantine or producer binding differs")
+    for body in (selected, partial):
+        if body.get("source_identity_complete") is not False or body.get("source_identity_sha256") is not None:
+            _refuse("incomplete downstream source identity was promoted")
+    expected_validation = {
+        "public_raw_bound_parsed_reload": True, "complete_assessment_rederived": True,
+        "complete_completion_rederived": True, "producer_lineage_preserved": True,
+        "source_only": True, "publisher_or_recovery_called": False,
+    }
+    if (type(value["artifact_validation"]) is not dict
+            or set(value["artifact_validation"]) != set(expected_validation)
+            or any(value["artifact_validation"][key] is not flag for key, flag in expected_validation.items())):
+        _refuse("read-only artifact replay validation differs")
+    # Every nested scalar is part of the wire protocol. Reject unknown fields,
+    # bool/int substitution, dropped scope accounting and any inferred authority
+    # even though the source-only consumer itself is independently captured.
+    expected_binding = {
+        "period": "2006Q1", "producer_commit": _PRODUCER_COMMIT,
+        "producer_source_inventory_sha256": _PRODUCER_INVENTORY_SHA256,
+        "completion_envelope_sha256": "d05e0345124b96599fbbd82a81828452ea63d39a90b3be28b599ef1e462bbfd0",
+        "assessment_envelope_sha256": "402fa1860bd9549f6d0eadcf7dc9a956cc0dc006d91f038290c294c102083ad5",
+        "assessment_envelope_bytes": 63_409_968,
+        "raw_snapshot_id": "sec-insider-bulk-2006q1-afe9a4b0bd20acce",
+        "raw_lineage_sha256": "afe9a4b0bd20acce459c2f0fe7989b20c5422f333395ec03e0a737feac357f23",
+        "parsed_snapshot_id": "sec-insider-parsed-2006q1-777136638dc6a1e5",
+        "parsed_lineage_sha256": "777136638dc6a1e5794bdd7878672ac9c08e33226b09306ccd262c6511c6de84",
+        "profile_sha256": "ee2f201362d4002a70819e4d7123eea300aafddb8820c6a0ab9761b0ed8cdd41",
+        "census_quarter_sha256": "047b92bdcd8fe82b21d76cddc05c8cca1ec31d7dec6e9c5186a1312e4cd4c5a2",
+    }
+    if _canonical(binding) != _canonical(expected_binding):
+        _refuse("downstream producer binding fields or exact original identities differ")
+    policy = {"evidence_epoch": "INSETF-IB1C-V2-DOWNSTREAM-SOURCE-ONLY-v1",
+              "policy_version": "INSETF-IB1C-SUPPLIED-SOURCE-IDENTITY-v2",
+              "policy_epoch": "INSETF-IB1C-SUPPLIED-SOURCE-IDENTITY-v2-candidate"}
+    counts = {"submission_count": 83_657, "corroborated_count": 0, "quarantined_count": 83_657,
+              "short_cik_count": 0, "accession_year_mismatch_count": 1}
+    forms = {"3": 5694, "3/A": 534, "4": 68520, "4/A": 3159, "5": 5539, "5/A": 211}
+    reasons = {"complete_parent_identity_conflict": 0, "complete_parent_corroboration_missing": 71_679,
+               "unsupported_parent_corroboration_form": 11_978}
+    expected_quarter = {
+        "kind": "INSETF-IB1C-V2-DOWNSTREAM-QUARTER-v1", **policy,
+        "period": "2006Q1", "preparation_binding": expected_binding,
+        "assessment_sha256": "3000a184944aa1718854dba90842ec774032c269fc36740dc46ddbe90c1f1525",
+        "rows_sha256": pilot["ledger_sha256"], **counts,
+        "form_counts": forms, "quarantine_reason_counts": reasons,
+        "source_identity_complete": False, "source_identity_sha256": None,
+        "artifact_loading_verified_here": False, "binding_is_external_attestation": False,
+        "authority": _AUTHORITY,
+    }
+    if _canonical(quarter) != _canonical(expected_quarter):
+        _refuse("downstream quarter accounting protocol differs")
+    periods = [f"{year}Q{part}" for year in range(2006, 2027) for part in range(1, 5)
+               if (year, part) <= (2026, 2)]
+    for body, expected_periods in ((selected, ["2006Q1"]), (partial, periods)):
+        expected_scope = {
+            "kind": "INSETF-IB1C-V2-DOWNSTREAM-SCOPE-v1", **policy,
+            "expected_periods": expected_periods, "loaded_periods": ["2006Q1"],
+            "missing_periods": expected_periods[1:], "loaded_scope_complete": len(expected_periods) == 1,
+            "source_identity_complete": False, "source_identity_sha256": None,
+            "quarter_bindings": [{"period": "2006Q1", "coverage_sha256": _digest(quarter),
+                                  "source_identity_sha256": None}], **counts,
+            "form_counts": forms, "quarantine_reason_counts": reasons,
+            "artifact_loading_verified_here": False, "authority": _AUTHORITY,
+        }
+        if _canonical(body) != _canonical(expected_scope):
+            _refuse("downstream scope accounting protocol differs")
+    if _canonical(pilot) != _canonical({
+            "row_count": 83_657, "ledger_sha256": quarter["rows_sha256"],
+            "source_only_admitted_count": 0, "quarantined_count": 83_657,
+            "event_eligibility": "not_evaluated", "candidate_signal_count": None}):
+        _refuse("downstream pilot accounting protocol differs")
+    expected_pipeline = {
+        "kind": "INSETF-IB-BACKTEST-EVIDENCE-PIPELINE-v1-coverage-handoff",
+        "coverage_sha256": _digest(quarter), "period": "2006Q1", **{
+            key: counts[key] for key in ("submission_count", "corroborated_count", "quarantined_count")},
+        "form_counts": forms, "quarantine_reason_counts": reasons,
+        "source_identity_complete": False, "source_identity_sha256": None,
+        "relevant_form4_count": 71_679, "relevant_form4_identity_complete": False,
+        "eligible_events_evaluated": False, "admitted_event_count": 0,
+        "backtesting_ready": False,
+        "missing_evidence": [
+            "externally_anchored_complete_source_manifest_and_original_parents",
+            "externally_anchored_point_in_time_security_master",
+            "externally_anchored_regular_session_open_close_calendar",
+            "externally_anchored_single_study_authorization_and_rights"],
+        "source_authenticated": False, "qc_jobs": 0, "research_looks": 0,
+    }
+    if _canonical(value["backtest_pipeline"]) != _canonical(expected_pipeline):
+        _refuse("unresolved actual source coverage was dropped or promoted in the backtest pipeline")
+    return value
+
+
+def run_readonly_consumer(input_root: Path, preparation_root: Path,
+                          expected_commit: str) -> dict[str, object]:
+    """Replay retained preparation with all worker file writes and network denied."""
+    try:
+        before = _repository_snapshot(expected_commit)
+        identities = _readonly_paths(input_root, preparation_root)
+        if not Path("/usr/bin/sandbox-exec").is_file():
+            _refuse("required OS process sandbox is unavailable")
+        sources = _source_snapshot()
+        current = dict(sources)
+        if not {_WORKER_PATH, _CORE_PATH, _CONSUMER_PATH} <= set(current):
+            _refuse("read-only consumer sources are missing")
+        _verify_committed_sources(sources, expected_commit)
+        producer_inventory = _producer_inventory(sources)
+        inventory_sha = _digest(_inventory(sources))
+        bundle = {"sources": [{"path": path, "sha256": _sha(raw),
+                    "source_b64": base64.b64encode(raw).decode("ascii")} for path, raw in sources],
+                  "worker_source_b64": base64.b64encode(current[_WORKER_PATH]).decode("ascii"),
+                  "worker_source_sha256": _sha(current[_WORKER_PATH]),
+                  "source_inventory_sha256": inventory_sha, "expected_commit": expected_commit,
+                  "input_root": str(input_root), "preparation_root": str(preparation_root),
+                  "producer_inventory": producer_inventory}
+        _assert_sources_unchanged(sources)
+        if _repository_snapshot(expected_commit) != before:
+            _refuse("lane context changed before read-only replay")
+        result = _run_worker(_canonical(bundle), preparation_root, readonly=True)
+        if (_readonly_paths(input_root, preparation_root) != identities
+                or _repository_snapshot(expected_commit) != before):
+            _refuse("lane or retained directory identity changed during replay")
+        _assert_sources_unchanged(sources)
+        if result.returncode != 0:
+            _refuse(_worker_failure(result.stderr))
+        if result.stderr or not 0 < len(result.stdout) <= _MAX_OUTPUT_BYTES:
+            _refuse("read-only worker output is unavailable or oversized")
+        payload = json.loads(result.stdout)
+        if (type(payload) is not dict or set(payload) != {"receipt", "executed_modules"}
+                or result.stdout != _canonical(payload) + b"\n"):
+            _refuse("read-only worker returned a noncanonical receipt")
+        receipt = _consumer_receipt(payload["receipt"])
+        trace, seen = payload["executed_modules"], set()
+        if type(trace) is not list or not 3 <= len(trace) <= len(sources):
+            _refuse("read-only executed source inventory is malformed")
+        for row in trace:
+            if (type(row) is not dict or set(row) != {"path", "sha256"}
+                    or type(row["path"]) is not str or row["path"] in seen
+                    or row["path"] not in current or row["sha256"] != _sha(current[row["path"]])):
+                _refuse("read-only executed source differs from its capture")
+            seen.add(row["path"])
+        if not {_WORKER_PATH, _CORE_PATH, _CONSUMER_PATH} <= seen:
+            _refuse("required read-only consumer execution was not observed")
+        return {"receipt": receipt, "consumer_commit": expected_commit,
+                "consumer_source_inventory_sha256": inventory_sha,
+                "consumer_source_count": len(sources),
+                "producer_dependency_compatibility_count": 95,
+                "producer_inventory_sha256": _PRODUCER_INVENTORY_SHA256,
+                "worker_source_sha256": _sha(current[_WORKER_PATH]),
+                "worker_bootstrap_sha256": _sha(_READONLY_BOOTSTRAP.encode("utf-8")),
+                "executed_source_inventory_sha256": _digest(trace), "executed_source_count": len(trace),
+                "os_network_denied": True, "os_all_file_writes_denied": True,
+                "os_process_fork_denied": True, "audit_additional_processes_denied": True,
+                "source_only_lane_imports": True}
+    except AffectedQuarterIsolationError:
+        raise
+    except (OSError, UnicodeError, ValueError, KeyError, TypeError, RecursionError,
+            subprocess.SubprocessError) as exc:
+        raise AffectedQuarterIsolationError("REFUSED: read-only downstream boundary failed") from exc
 
 
 def run_isolated(input_root: Path, output_root: Path, expected_commit: str) -> dict[str, object]:
@@ -586,11 +892,15 @@ def run_isolated(input_root: Path, output_root: Path, expected_commit: str) -> d
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--input-root", type=Path, required=True)
-    parser.add_argument("--output-root", type=Path, required=True)
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--output-root", type=Path)
+    mode.add_argument("--preparation-root", type=Path)
     parser.add_argument("--expected-commit", required=True)
     args = parser.parse_args()
     try:
-        result = run_isolated(args.input_root, args.output_root, args.expected_commit)
+        result = (run_readonly_consumer(args.input_root, args.preparation_root, args.expected_commit)
+                  if args.preparation_root is not None else
+                  run_isolated(args.input_root, args.output_root, args.expected_commit))
     except AffectedQuarterIsolationError as exc:
         sys.stderr.write(str(exc) + "\n")
         raise SystemExit(1) from None

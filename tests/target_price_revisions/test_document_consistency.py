@@ -222,6 +222,17 @@ SECTION49_CLAUDE_COMMITS = (
     "ff05d6b2fdf7fc56bd7164de5192ad72ec3581db",
     "c15dfee552eafb5489bdc545d0150b85ca96ef52",
 )
+# Claude's 2026-10-05 review (section 51) of the Codex counter-review and the
+# fixture-only TPR-D1 candidate.
+SECTION51_CODEX_BASE = "c15dfee552eafb5489bdc545d0150b85ca96ef52"
+SECTION51_CODEX_HEAD = "01e703906df838fd9cbb91a2d1fd03ce7d18f288"
+SECTION51_CODEX_RANGE = f"{SECTION51_CODEX_BASE}..{SECTION51_CODEX_HEAD}"
+SECTION51_CODEX_SHORT_RANGE = "c15dfee5..01e70390"
+SECTION51_CODEX_COMMITS = (
+    "1e6365917c292c2e1ada5b1f837ed8d069cc697d",
+    "7baddbbc303e76ef91850b3e4a53cfe4030f4fea",
+    "01e703906df838fd9cbb91a2d1fd03ce7d18f288",
+)
 SECTION50_OWNER_SCOPE = (
     "Counter-review both Claude commits. If accepted, implement one fixture-only "
     "TPR-D1 candidate using synthetic fixtures and the committed D0 aggregate "
@@ -768,11 +779,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION49_CLAUDE_RANGE]
+    ) == [SECTION51_CODEX_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact Claude range"
+        "Claude has independently reviewed the exact Codex range"
         in normalized_current
     )
     assert (
@@ -790,16 +801,18 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
     # The owner directly selected bounded D0 decisions on 2026-10-05.
     # Historical wait states cannot override that scope or widen it to outcomes.
-    assert "awaits Codex counter-review" not in normalized_current
-    assert "Fixture-only TPR-D1 candidate awaits independent Claude review" in normalized_current
+    assert "awaits independent Claude review" not in normalized_current
+    assert "Fixture-only TPR-D1 candidate awaits independent Claude review" not in normalized_current
+    assert "fixture-only TPR-D1 candidate is accepted" in normalized_current
     assert "Claude next reviews sections 43 and 44" not in normalized_current
     assert "Codex next counter-reviews section 42" not in normalized_current
     assert "Codex next counter-reviews section 45" not in normalized_current
     assert "Claude next reviews sections 46 and 47" not in normalized_current
-    assert "Codex next counter-reviews section 48" not in normalized_current
-    assert "Claude next reviews sections 49 and 50" in normalized_current
+    assert "Claude next reviews sections 49 and 50" not in normalized_current
+    assert "Codex next counter-reviews section 51" in normalized_current
     assert "TPR-D1 is authorized only as a fixture-only candidate" in normalized_current
     assert "D0's one completed audit is not renewed" in normalized_current
+    assert "TPR-D2 is not authorized" in normalized_current
     assert "TPR-D0 is not authorized" not in normalized_current
     assert "No next implementation milestone is authorized" not in normalized_current
     assert "remain historical proposals" in normalized_current
@@ -830,15 +843,16 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION49_CLAUDE_SHORT_RANGE]
+        ) == [SECTION51_CODEX_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
-        assert "section 49" in normalized_summary_lower
-        assert "fixture-only tpr-d1 candidate awaits claude review" in normalized_summary_lower
+        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
+        assert "section 51" in normalized_summary_lower
+        assert "awaits claude review" not in normalized_summary_lower
+        assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
-        assert "codex next counter-reviews section 48" not in normalized_summary_lower
-        assert "claude next reviews sections 49 and 50" in normalized_summary_lower
-        assert "tpr-d1 is authorized only as a fixture-only candidate" in normalized_summary_lower
+        assert "claude next reviews sections 49 and 50" not in normalized_summary_lower
+        assert "codex next counter-reviews section 51" in normalized_summary_lower
+        assert "tpr-d2 is not authorized" in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
         assert "no next implementation milestone is authorized" not in normalized_summary_lower
         assert (
@@ -1962,3 +1976,69 @@ def test_section_50_scope_guard_rejects_added_or_widened_permissions(
     )
     with pytest.raises(AssertionError, match="closed fixture-only boundary"):
         test_section_50_preserves_exact_fixture_only_owner_scope()
+
+
+def test_section_51_review_records_the_exact_range_and_grants_nothing() -> None:
+    """TPR-CR17: pin this review of the counter-review and the D1 candidate."""
+    section = _record_section(
+        "## 51. Claude independent review of the counter-review and the "
+        "fixture-only TPR-D1 candidate"
+    )
+    assert SECTION51_CODEX_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert ordered_commits == SECTION51_CODEX_COMMITS
+    assert ordered_commits == tuple(
+        _git_lines("rev-list", "--reverse", SECTION51_CODEX_RANGE)
+    )
+    dispositions = _bounded(
+        section,
+        "### 51.2 Commit-by-commit dispositions",
+        "### 51.3 P0-P3 ledger",
+        "section 51 dispositions",
+    )
+    rows = [
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (
+            match := re.match(
+                r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line
+            )
+        )
+    ]
+    assert tuple(commit for commit, _ in rows) == SECTION51_CODEX_COMMITS
+    assert {disposition for _, disposition in rows} <= {
+        "accepted",
+        "accepted after correction",
+    }
+    assert "Cumulative disposition: accepted after correction" in section
+    ledger = _bounded(
+        section,
+        "### 51.3 P0-P3 ledger",
+        "### 51.4 Mutation evidence",
+        "section 51 ledger",
+    )
+    statuses = dict(
+        re.findall(r"^\| `(TPR-CR17-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M)
+    )
+    assert statuses == {
+        "TPR-CR17-001": "Closed by correction",
+        "TPR-CR17-002": "Closed by correction",
+        "TPR-CR17-003": "Closed by qualification",
+    }
+    authority = " ".join(
+        section.partition("### 51.6 Milestone and authority decision")[2].split()
+    )
+    for required in (
+        "fixture-only TPR-D1 candidate is accepted",
+        "TPR-D2 is not authorized",
+        "Codex next counter-reviews section 51",
+        "retained row",
+        "provider request",
+        "QuantConnect",
+        "trading authority",
+    ):
+        assert required in authority, required

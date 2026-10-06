@@ -1,6 +1,11 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX ACCEPTED CLAUDE'S SOLE `5275b7d5` COMMIT IN
+Status: **OWNER RENEWED CONTINUOUS BUILD AFTER THE `587bda71` HANDOFF.
+SECTION 94 RECORDS THREE NEW VERIFIED METADATA EMAILS, THE REMOVAL OF
+DUPLICATE RIGHTS-LETTER PAPERWORK AND A PLANNED FIXED-FIXTURE
+RANKING/COHORT-TO-ORDER INTEGRATION REHEARSAL. THIS IS ADDITIONAL OFFLINE
+SOFTWARE WORK, NOT A SOURCE ADMISSION OR REAL-BACKTEST READINESS CLAIM.
+CODEX ACCEPTED CLAUDE'S SOLE `5275b7d5` COMMIT IN
 `249c6e45..5275b7d5` (SECTION 90); NO NEW CLAUDE COMMIT HAS APPEARED AT
 THE MATCHING REMOTE `cb4a8e6c`. THE OWNER NOW EXPLICITLY AUTHORIZES ONE
 CONTINUOUS ACCELERATED BUILD ROUND (SECTIONS 92–93), NOT ROUTINE APPROVAL
@@ -12511,3 +12516,121 @@ publication are the only authorized external writes in this round. Private
 contacts, entity facts, quote amounts and mail bodies stay outside Git; prior
 privacy history is preserved. Shared/project-wide documents and
 SESSION_HANDOFF remain frozen.
+
+## 94. Renewed continuous build, direct qualification and integration decisions — 2026-10-06
+
+### 94.1 Owner instruction, scope and exact starting state
+
+After the section-93 handoff the owner removed item 3 of the proposed action
+list: **"3 is not necessary"**. Codex treats this as removing a separate
+vendor rights-confirmation letter and repeated approval request, not as proof
+that an unknown or explicitly restricted use is permitted. Existing applicable
+subscription terms can establish permitted use; clarification is needed only
+for a material ambiguity or conflict. The owner accepted the practical
+Sharadar/archive qualification route with **"yes this works"**, then explicitly
+renewed the continuous-build instruction:
+
+> why did you stop. i told you to build continuously
+
+The section-92 standing delegation and accelerated single-round exception
+remain active. Do not stop at advice, request routine approval again or require
+a manually supplied screenshot before exhausting safe metadata checks. Owner
+affiliation information was subsequently supplied directly and forwarded
+without guessing; the private fact and contact details are not copied to Git.
+This is not approval for a purchase, new account, trial, terms acceptance,
+provider market rows, real outcomes, QC processing or trading.
+
+Physical/Git root, branch, clean status and local/tracking/actual matching
+remote were verified at **`587bda714747413ec57095d61817f197f69c36a8`**.
+The matching remote remained unchanged when rechecked: no new Claude commit
+exists in that observed range. The last completed counter-review remains
+section 90's accepted sole commit `249c6e45..5275b7d5`. The next independent
+Claude range still starts at **`5275b7d5`** and includes every subsequent
+Codex commit, including this resumed build. Codex's advisory checks are not
+Claude's independent review. No fetch, sync, branch/worktree change or history
+rewrite is needed or performed while the matching remote is unchanged.
+
+### 94.2 Completed metadata actions and bounded factual observations
+
+The four existing exchange/vendor inquiry threads were read without opening
+attachments or sample-data links. NYSE supplied a new affiliation question,
+not archive/version/timing evidence; Nasdaq and Intrinio still had the earlier
+responses and subsequent outgoing clarifications, and QuoteMedia still had
+only its outgoing inquiry in the observed thread. This is not a mailbox-wide
+absence claim. Narrow Sharadar subscription/receipt and prior-correspondence
+searches found no entitlement receipt or prior Sharadar support conversation;
+this does not negate the owner's reported subscription. No credentials or
+market-row endpoint was accessed. A normal browser metadata check is separate
+from dataset admission; unrelated pre-existing pages/results are not evidence
+for this lane and are not analyzed or carried into its research.
+
+| Completed action | Verified receipt and limits |
+|---|---|
+| New Sharadar companion-data qualification | Message/thread `1a112e5cf7756030`, sent **2026-10-06T20:26:52Z**. Readback verifies SENT, intended official database/platform support recipients, subject and exact authored HTML body. Requests existing SEP/TICKERS/ACTIONS/INDICATORS entitlements and metadata only: historical coverage/identities, original/revised values and availability, raw-open/volume reconstruction, dividend dates and terminal cash treatment. No separate rights letter, rows/samples, account/trial, upgrade or purchase requested. |
+| NYSE affiliation answer and archive routing | Message `1a112e671c36dc81`, existing thread `1a0f0d951513b761`, sent **2026-10-06T20:27:34Z**. Readback verifies SENT, intended existing-thread recipient, thread and exact authored prefix. Forwards the owner's actual affiliation answer and requests archive/product engineering routing, original/all-correction versions or exhaustive inventory, timing and coverage metadata. No guessed entity or new permission-letter requirement. |
+| Nasdaq affiliation clarification | Message `1a112e67503f4613`, existing thread `1a0f0d9ae9fda1e6`, sent **2026-10-06T20:27:35Z**. Readback verifies SENT, intended existing-thread recipient, thread and exact authored prefix. Forwards actual owner affiliation and distinguishes reported Sharadar companion subscriptions from unacquired Nasdaq SI history. No existing SI entitlement or company identity claimed. |
+
+Primary public metadata establishes Sharadar as a **candidate**, not an
+admitted source. [Stocks](https://sharadar.com/docs/stocks) documents
+split-adjusted OHLCV, adjusted/unadjusted close and an update date;
+[tickers](https://sharadar.com/docs/tickers) documents permanent identity,
+delisted status and reference fields; [actions](https://sharadar.com/docs/actions)
+documents corporate-action fields. These descriptions do not establish
+original/corrected history, historically effective classification versions,
+separate dividend payment dates or complete terminal cash. Missing documented
+guarantees are **unverified**, not assertions that the provider cannot supply
+them. The [Bundle catalog](https://sharadar.com/bundle) lists companion data,
+not a short-interest archive. Official support routing was independently
+verified through the [Nasdaq SEP documentation](https://data.nasdaq.com/databases/SEP/documentation?anchor=sample-data).
+Private addresses, mail bodies, affiliation/entity details, account identifiers
+and commercial amounts remain outside Git. No duplicate exchange inquiry or
+monitor rearm occurs.
+
+### 94.3 Delegated approval/decision inventory for the resumed round
+
+| ID | Exercised approval or decision | Limit and rationale |
+|---|---|---|
+| `SI-AUTH-20261006-05` | Direct owner removal of separate item-3 confirmation paperwork. | Existing applicable terms may establish use; explicit restrictions and factual source integrity remain. No unknown permission is marked verified by owner assertion. |
+| `SI-AUTH-20261006-06` | Renewed continuous building plus the accepted existing-subscription/archive route under standing delegation. | No routine approval interruption; one final combined push from the designated lane. External facts and independent review cannot be fabricated. |
+| `SI-DEC-20261006-07` | Eliminate a separate rights-letter request and repeated owner approval from qualification. | Verify applicable existing terms when exact use requires them; do not impose generic extra permission paperwork. |
+| `SI-DEC-20261006-08` | Send one Sharadar metadata qualification and answer existing exchange affiliation questions using only the supplied owner fact. | No credential/row request, commercial commitment, invented legal entity or SI access claim. Read back every send before recording completion. |
+| `SI-DEC-20261006-09` | Build a new **fixed-ID, caller-free synthetic integration rehearsal** through the genuine typed eligibility/binding/ranking/cohort builders and the existing exact private order kernel. | Current section-93 rehearsal uses hand-authored baskets/memberships; it does not test this wiring. No generic provider parser/collector, external rows, caller-asserted PIT flag, source admission or empirical substitute. Keep every prior fixture/policy/receipt hash unchanged. |
+| `SI-DEC-20261006-10` | Demonstration-only routing: 20 fixed synthetic securities, one cap refusal, three fabricated release cycles; preserve structural normalization, full eligible ranks and original common-cohort tails; use stable identity only, all four lookbacks and 0/5/10/20 costs. | Execute every comparable release that has an authenticated synthetic successor. Warm-up/refused releases and the final release with no successor stay visible as no-order results. Low-pressure identities are long and high-pressure identities avoided, never shorted. A missing common price, identity mismatch or changed lineage refuses without a partial ledger. No lookback winner or outcome look. |
+| `SI-DEC-20261006-11` | Use separately named fixed synthetic instruction/evidence time and canonical cohort entry open; derive exit from the next authenticated synthetic release's permitted open, not an arbitrary horizon. | Cohort `decision_at` is the entry open; the accounting kernel requires an earlier instruction time. Preserve both clocks explicitly and require entry-cohort fixture evidence before instruction. This is plumbing/accounting evidence only, not production latency, actual provider release scheduling or fill authority. Final no-successor releases cannot disappear. |
+
+### 94.4 Planned verification and persistent gates
+
+The integration factory must be lane-owned and caller-free, with no import of
+tests or runtime dependence on test-fixture paths. Pin its synthetic recipe and
+generated source/reference/price identities. Authenticate exact typed ranking
+and cohort provenance, retain refusal releases, and bind routing, scenario,
+policy, cost and resulting ledger hashes in detached immutable receipts. The
+public API accepts only the exact built-in scenario ID and never a source,
+price, membership or authority argument. New outputs remain synthetic, memory-
+only, no winner/alpha/permanent look, source/outcome/QC/trading authority false
+and actual outcome looks **0/0**. Existing empirical protocol and all prior
+public rehearsal identities stay unchanged.
+
+Use material focused routing/identity/clock/missing-price and retained-receipt
+regressions, relevant prior order/protocol checks, import-boundary, active-
+document, compilation and diff/status checks only. Validate with network
+denied; Claude owns the full lane/repository suite. Implementation and exact
+execution evidence follow in the final handoff; this decision record alone
+does not claim the bridge exists or that bridge validation passed. Initial
+decision-record active-document checks were **69 passed in 0.89s**, with no
+failures, skips or warnings; diff/privacy checks were clean. The final text
+is checked again before committing the decision anchor.
+
+Keep all prior confirmed, partial and false-alarm rows. Source P2s
+`SI-SRC-20260928-001..003`, shared/out-of-lane `SI-CR5-005` /
+`SI-CCR16-007` and prospective advisory `SI-CR15-001` remain open. The new
+metadata sends establish neither archives nor coverage. Authentic SI originals/
+corrections or complete inventory, availability, PIT identity/price/volume/
+terminal coverage, actual adapter, prospective evaluation/power/date/look
+freeze and exact QC route still precede real backtesting. No latest-only,
+ETF, assumed terminal zero or placeholder source contract is substituted.
+Shared/project-wide documents and SESSION_HANDOFF remain frozen; the deleted
+Claude one-shot and paused exchange monitor are unchanged. Accumulate this
+round locally and publish exactly once after complete documentation and
+focused validation, rechecking the matching actual remote before each commit
+and final push. No partial/interim push or history rewrite.

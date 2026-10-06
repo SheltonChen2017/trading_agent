@@ -328,6 +328,10 @@ reproduce. The two stress cells remain under review: this Windows checkout
 has no retained control receipts or delta package, so post-read status drift,
 operator attribution and cloud-source identity are not independently established.
 No new look or readiness milestone occurs.
+Section 250 is Claude's independent review of `c2112b11..afb29176` (0 P0,
+0 P1, 0 P2, 1 P3): the counter-review is accepted after one citation
+correction, `ARV2R250-001`, and test-only commit `4496d241` pins every
+lane-record backtest ID to the shared look ledger.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1138,9 +1142,12 @@ review of the exact pushed range `cf465504..e56c6e3e` (section 245) and adds
 regression pin `ce0e69bb`. Section 247 accepts both Claude commits after
 counter-review. Section 248 is the Windows-host Claude session's independent
 review of the exact pushed range `b212048e..f0318d6f` (sections 219–247),
-with a third QC census and status-only reads of the stress backtests. The
-immediate next step is that Claude must review section 249 and its exact
-pushed documentation snapshot. Section 249 has reviewed all three new
+with a third QC census and status-only reads of the stress backtests.
+Section 250 is Claude's independent review of the exact pushed range
+`c2112b11..afb29176` (section 249), with one citation correction and
+regression pin `4496d241`. The immediate next step is that Codex
+counter-reviews section 250 and this round's two Claude commits, unless the
+owner explicitly changes this workflow. Section 249 has reviewed all three new
 Claude commits and confirmed the conservative floor **313 / 239 / 49 /
 699**. `ARV2R248-002`, `-003` and `-004` remain open until the machine
 holding the original receipts authenticates the stress reads, establishes
@@ -1170,7 +1177,8 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 247 (section 248). Section 182 records the owner's exact
+the pushed range through section 249 (section 250); for section 250 the owner
+directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
 review is deferred, not canceled; the valid exploratory result is not formal
@@ -2942,6 +2950,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-03 | Codex section-246 counter-review | `625742af` -> this round's final record commit | Section 247 accepts both Claude commits; no provider/QC launcher, capture, result read, order, look, evaluation or cell; floor 298/233/40/699. | Citation regression pin accepted and its historical red plus both in-memory mutations corroborated. Codex changes only the lane record; no production, policy, trust-root, authority, cadence or readiness change. | Strict-network-denied focused record checks and citation trials, actual trust-root hashes and final scope checks in 247.3; no complete Codex suite. | No new P0/P1/P2/P3. `ARV2CR245-001` corrected and regression-pinned; all carried source/formal/paper gates remain. | Exactly one matching-lane record push; await Claude section-247 review unless the owner changes the workflow. Monitor active and quiet while unchanged. |
 | 2026-10-05 | Claude (Windows host) independent review of `b212048e..f0318d6f`, third QC-census reconciliation, and the stress arms' current QC status | `f0318d6f` -> `28bcc887` -> `8f87018e` -> this record commit | Review of the forty commits pushed since `b212048e` (sections 219–247): the fourteen Claude review sections and their Codex counter-reviews confirmed by this host's gates, section 247 reviewed for the first time, and a census of every lane QC project reconciled into the look ledger (section 248) | Synced the lane clone by fast-forward on this Windows host. Immutability of V16–V19 and the cap-90 bridge runtime re-verified from committed blobs; section 247's diff scope, citation trials, trust-root hashes and validation arithmetic reproduced. An administrative census (zero looks) of 188 lane projects and 281 backtests found fifteen launches in five projects that neither the record nor the shared ledger knows, including an unrecorded R-281 rerun; status-only reads show QC now lists R280 A1 and R281 A2 as `Runtime Error` after their recorded `Completed.` reads. Appended five ledger entries and reconciled the totals from 298/233/40/699 to **313/239/49/699**; one test case and one fixture change added, no production line changed. | Real tree at `f0318d6f`: `compileall` exit 0; `git diff --check` clean; record and active-document gates **84 passed**; final record bytes **84 passed**. Guarded LF worktree: standing gates 26 failed (firewall host class), 242 passed; complete Analyst lane suite: **not complete at push time**: the owner directed this push before the detached run finished (started 11:21 local on 2026-10-05, at 52% of 9,580 collected tests when the push was made); its counts are to be recorded in the next round. The previous complete run on this host, at `b212048e` on 2026-09-29, ended 1074 failed, 6591 passed, 922 skipped, 698 errors in 2:24:02, every failure and error in the host classes of `ARV2R165-001`. Mutation trials on the attribution study: six of six mutations red with the correction; A2 (interaction contrast) and A3 (manifest digest) survived the committed tests. QC access: administrative census, status-only reads and file inventory; no result, statistic, chart, order, log, price, provider row, return or Object Store payload read. | 0 P0, 0 P1. `ARV2R248-001` (P2, corrected): fifteen unrecorded launches reconciled. `ARV2R248-002` (P2, open for Codex): R280 A1 and R281 A2 now `Runtime Error` at QC. `ARV2R248-003` (P2, open): unrecorded R-281 rerun and later file saves. `ARV2R248-004` (P2, open): `R247A4`–`A9` launches past the frozen limit. `ARV2R248-005` (P3, corrected): stale banner and section-4 anchors. `ARV2R248-006`/`-007`/`-008`/`-010` (P3, documented). `ARV2R248-009` (P3, corrected, test-only): two unpinned attribution-study guards. | Codex counter-reviews section 248 and its commits, answers `ARV2R248-002`, `-003` and `-004` with receipts, and confirms or corrects the reconciled classification. No stress successor, further sweep, R-247 or R-281 attempt, levered target, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-10-05 | Codex counter-review of every unreviewed section-248 commit | `f0318d6f` -> `c2112b11` -> this record commit | One test commit accepted; ledger and record accepted after prospective documentation corrections. Fifteen distinct added IDs and look arithmetic verified; no new QC/provider look or result cell. | Corrected R281 attempt-versus-backtest wording, qualified unproven post-read status drift and named the test correction's actual snapshot; appended missing R210-R221 and R177 identity cross-references without counting them again. No production or test source changed. | Native Windows record checks and separately qualified in-memory attribution verification in 249.4; final diff/scope checks. No complete Codex suite or production POSIX-path validation. | Three P3 documentation findings corrected prospectively. ARV2R248-002/-003/-004 remain open because retained receipts and source package are absent here. Out-of-lane findings remain documented and unfixed. | One same-lane documentation push after validation. Claude must review section 249; obtain original retained metadata/source evidence before resolving stress validity or extra launch attribution. No further R247/R281 attempt or readiness implementation. |
+| 2026-10-06 | Claude independent review of section 249: the counter-review of section 248 and its identity cross-references | `afb29176` -> `4496d241` -> this record commit | Section 250: one Codex commit `c2112b11..afb29176` disposed (0 accepted, 1 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | Verified section 249's twelve R210-R221 and six R-177 identity repairs, attempt and test-count corrections and floor from tracked bytes; corrected the 249.3 citation of section 173 to 172 and appended a shared-ledger erratum; test-only pin `4496d241` requires every lane-record backtest ID in the shared ledger; section 4 names section 250, banner sentence added, this row appended | Owner directed focused checks without the complete lane suite: record gates at `afb29176` 84 passed; native attribution study 14 passed with both in-memory mutations red; pin trials in memory; record gates, `compileall` and `git diff --check` on the final tree; every pytest network-denied; exact counts in 250.4 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R250-001`, corrected); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's two Claude commits; Codex counter-reviews section 250 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -34868,7 +34877,7 @@ closes their omission from this record. No new launch/look/read is recorded.
 | R220 | `9f38b5c172f30d93c222c64aeadc7b32` |
 | R221 | `c76bd1544ee04df6bd94c3c046042bd9` |
 
-The six Runtime Error R177 Mia IDs in section 173 are appended by identity
+The six Runtime Error R177 Mia IDs in section 172 are appended by identity
 to the shared ledger. Its original R177 entry already counted all nine
 later runs, including those six; adding looks again would double-count.
 `ARV2R248-006` closes as an identity repair with no accounting change.
@@ -34920,3 +34929,139 @@ scores and RAW-price evidence remains the separate readiness stop in 231.3;
 steps 2-5 are incomplete. Formal bindings, the sole Analyst look with total
 two-sided alpha at most 1/80 and the exact QC Paper permit remain unchanged.
 No next milestone, stress successor or outcome authority follows.
+
+## 250. Independent Claude review of section 249: the counter-review of section 248 and its identity cross-references, 2026-10-05
+
+**Range reviewed:** `c2112b11..afb29176`, one Codex commit in one push,
+disposed in 250.1, plus this round's two Claude lane commits: the test-only
+regression pin `4496d241` and this record commit, which also carries one
+citation correction. Commits `28bcc887`, `8f87018e` and `c2112b11` are the
+Windows-host Claude session's own round (section 248), which section 249
+counter-reviews; they are not re-reviewed here. This Mac session's
+unfinished review of `f0318d6f` was superseded by section 248, which
+reviewed `b212048e..f0318d6f`, and is withdrawn without a record.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review ran no QuantConnect or
+provider launcher, capture script, command or result read, and section 249
+records none. Every pytest process ran inside the strict sandbox of 242.6,
+which refuses every connection. The floor stays at section 249's
+conservative **313 / 239 / 49 / 699**, which includes the two stress cells
+still under review.
+
+**Owner direction for this round:** review the unreviewed commits, push
+once, and do not run the complete lane suite. Validation is therefore
+focused (250.4); no complete-selection result is claimed for `afb29176` or
+for the final tree.
+
+**Verdict.** The one Codex commit is accepted after correction; none is
+rejected. **0 P0, 0 P1, 0 P2, 1 P3.** Section 249's three P3 corrections of
+section 248, its twelve R210–R221 identity cross-references and its six
+R-177 identity repairs all check out; one section citation in that repair
+is wrong and is corrected here.
+
+### 250.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `afb29176` | Section 249 and its shared-ledger appendix: counter-review of the three section-248 commits | accepted after correction | It changes only the lane record and the shared look ledger; no code, test, policy, manifest or registry. Its identity, attempt, test-count and floor statements reproduce (250.3), and the native attribution run on this Mac confirms the test pin it accepted. One wrong section citation is corrected (250.2). |
+
+### 250.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R250-001` | P3 | `afb29176` | Section 249.3 and the section-249 shared-ledger appendix say the six R-177 `Runtime Error` backtest IDs are named in lane section 173. They are named in section 172, in the 172.1 table of nine later QC/Mia launches; section 173 is the R-180 counts-only diagnosis and holds none of them. The error is navigational: the identities, their earlier inclusion among the nine counted R-177 runs and the floor are right. | Corrected: lane 249.3 now cites section 172. The shared ledger is append-only, so it receives a one-paragraph erratum rather than an in-place edit. Regression pin `4496d241` guards the identity closure itself (250.3). |
+
+### 250.3 What was checked, and the regression pin
+
+Every check below used tracked bytes only; no credential, QC call or
+private artifact was needed.
+
+- **Scope and trust roots.** `afb29176` changes the lane record and
+  `docs/research/alpha-result.md` only. The three trust roots keep
+  `3152aca0…`, `e8c1a2a7…` and `23f23d19…`, the hashes of section 231.3.
+- **Twelve R210–R221 identities.** Each appears exactly once in the shared
+  ledger beside its own candidate and was absent from the lane record at
+  `c2112b11`; the 249.3 table closes that omission without adding looks.
+- **Six R-177 identities** (`866be9f4…`, `98a200dc…`, `4f2f8499…`,
+  `7cca37fa…`, `8e49867d…`, `e75d5449…`). Each is listed as
+  `Runtime Error` in 172.1, was absent from the shared ledger at `c2112b11`
+  and is present after `afb29176`. The original R-177 ledger entry counted
+  all nine later launches, 159 → 168 shared looks, so adding zero looks is
+  right.
+- **`ARV2CR249-001`.** Section 248.4 lists two backtests in project
+  `37165262`, A2 and the unrecorded rerun; two backtests and three attempt
+  slots is the correct reading.
+- **`ARV2CR249-003`.** `test_qc_eight_attribution_study.py` has 8 test
+  functions and 13 cases at `f0318d6f`, and 9 functions and 14 cases from
+  `28bcc887`; "14/14 at `f0318d6f`" named the wrong snapshot.
+- **`ARV2CR249-002`** narrows section 248's status-drift and actor wording
+  to what the record supports. It needs no new evidence and is accepted.
+- **Native attribution run.** Section 249.4 could verify `28bcc887` only in
+  isolation, because Windows lacks `fcntl`. On this Mac the file runs
+  natively in the designated worktree: **14 passed**. With the annual
+  interaction replaced in memory by the plain weight contrast, exactly
+  `test_annual_factorial_contrasts_pin_the_common_calendar_axis` fails, 10
+  against 20. With the frozen-manifest digest check removed in memory,
+  exactly `test_tampered_attribution_manifest_is_refused_before_use` fails;
+  the tampered bytes are then refused by manifest validation with a
+  different message, so the test pins the digest refusal specifically.
+
+**Regression pin `4496d241`.** It adds two tests to
+`tests/analyst_revisions_v2/test_lane_record_integrity.py`. The first
+requires every standalone 32-hex backtest ID in the lane record to appear
+as a standalone token in the shared look ledger; compile IDs, which are
+hyphenated, and longer digests are excluded. The second pins those limits,
+including that an ID the ledger holds only inside a compile ID still counts
+as missing. At `afb29176` all 198 recorded IDs are in the ledger; at
+`c2112b11` exactly the six R-177 IDs were not. The pin narrows the gap
+documented as `ARV2R248-007`, which checks candidate headings rather than
+runs, in one direction only: an ARV2 run present in the ledger but absent
+from the lane record, as R210–R221 were, is not detected.
+
+Every trial below ran in memory, with the module loaded from the worktree
+source and patched in the interpreter, inside the strict sandbox; no file
+was edited.
+
+| Trial | Change | Result | Caught by |
+|---|---|---|---|
+| G0 | none, on `afb29176`'s record and ledger | green | both tests |
+| R1 | record and ledger paths pointed at `c2112b11`'s bytes | red: the six R-177 IDs | live-record test |
+| M1 | hyphen exclusion dropped from the ID pattern | red | both tests |
+| M2 | substring membership instead of exact ledger tokens | red | classifier test only |
+| M3 | ID-pattern boundaries dropped | red | both tests |
+
+### 250.4 Validation
+
+Every check ran from the designated worktree at
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2`,
+with `~/.venvs/trading_agent-py313/bin/python` (3.13.15), each pytest
+process under the strict profile `(version 1)(allow default)(deny network*)`.
+
+| Check | Scope | Result |
+|---|---|---|
+| Complete lane selection | not run, by owner direction for this round | no complete-selection claim |
+| Record gates at the reviewed head | `test_lane_record_integrity.py` and `test_active_document_consistency.py` at `afb29176` | **84 passed** |
+| Attribution study, native | `tests/analyst_revisions_v2/test_qc_eight_attribution_study.py` at `afb29176`, unmodified and under the two in-memory mutations of 250.3 | **14 passed**; each mutation **1 failed, 13 passed** |
+| Record gates with the pin | the same two files after the pin commit, before this record commit | **86 passed**, including the two pinned tests |
+| Record gates on the final tree | the same two files on the final record and ledger bytes | **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc`, on the final tree | clean |
+| `git diff --check` | each of this round's two commits | clean |
+| `git status --short --branch` | after this round's commits | clean; published in this round's single push |
+
+### 250.5 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open: the host holding the original receipts must authenticate the stress reads, the extra R-281 and R-247 launch paths and the exact source identities. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2R248-006` | P3 | Closed by the identity repair in `afb29176`; regression-pinned by `4496d241`. |
+| `ARV2R248-007` | P3 | Documented; narrowed in one direction by `4496d241`. |
+| `ARV2CR249-001`, `-002`, `-003` | P3 | Corrected by Codex in `afb29176`; accepted. |
+| `ARV2R250-001` | P3 | Corrected in this record commit. |
+| `ARV2CR245-001`, `ARV2R242-001` | P3 | Corrected and pinned, as recorded. |
+
+The final tree differs from the pushed head `afb29176` by the pin and this
+record commit only.

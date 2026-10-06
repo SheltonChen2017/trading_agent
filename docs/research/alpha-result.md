@@ -6708,3 +6708,13 @@ Closing conservative floor stays **313 shared / 239 ARV2 development /
 retained receipt provenance remains under review. Unknown-source run
 classifications remain conservative, not independently authenticated.
 No source, outcome, paper or trading authority follows.
+
+## Analyst section-250 erratum to the section-249 identity paragraph — 2026-10-05
+
+The section-249 paragraph above says the six failed R177 Mia backtests are
+"named in lane section 173". They are named in lane section 172, in its
+table of nine later QC/Mia launches; section 173 is the R-180 counts-only
+diagnosis. The six identities, their earlier inclusion among the nine
+later runs counted in the original R177 entry, and the closing floor
+**313 shared / 239 ARV2 development / 49 infrastructure / 699 booked
+cells** are unchanged. This erratum adds zero looks and no authority.

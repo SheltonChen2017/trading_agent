@@ -261,6 +261,15 @@ SECTION52_SCOPE_BOUNDARIES = {
     "Publication": "One matching-lane non-force push",
     "Monitor": "One completed Claude review of this published counter-review",
 }
+# Claude's 2026-10-06 review (section 53) of the section-52 counter-review.
+SECTION53_CODEX_BASE = "67aade0e47d6f4d6c6290018bbe7b52831a465c7"
+SECTION53_CODEX_HEAD = "38f52a95b64fc765ca1075863b8986774b9eb705"
+SECTION53_CODEX_RANGE = f"{SECTION53_CODEX_BASE}..{SECTION53_CODEX_HEAD}"
+SECTION53_CODEX_SHORT_RANGE = "67aade0e..38f52a95"
+SECTION53_CODEX_COMMITS = (
+    "9bb1e775321fa014341209a8c20fa240e4a243df",
+    "38f52a95b64fc765ca1075863b8986774b9eb705",
+)
 SECTION50_OWNER_SCOPE = (
     "Counter-review both Claude commits. If accepted, implement one fixture-only "
     "TPR-D1 candidate using synthetic fixtures and the committed D0 aggregate "
@@ -807,11 +816,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION52_CLAUDE_RANGE]
+    ) == [SECTION53_CODEX_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Codex has counter-reviewed the exact Claude range"
+        "Claude has independently reviewed the exact Codex range"
         in normalized_current
     )
     assert (
@@ -838,7 +847,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "Claude next reviews sections 46 and 47" not in normalized_current
     assert "Claude next reviews sections 49 and 50" not in normalized_current
     assert "Codex next counter-reviews section 51" not in normalized_current
-    assert "Claude next reviews section 52" in normalized_current
+    assert "Claude next reviews section 52" not in normalized_current
+    assert "Codex next counter-reviews section 53" in normalized_current
     assert "TPR-D1 is authorized only as a fixture-only candidate" in normalized_current
     assert "D0's one completed audit is not renewed" in normalized_current
     assert "TPR-D2 is not authorized" in normalized_current
@@ -872,16 +882,17 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION52_CLAUDE_SHORT_RANGE]
+        ) == [SECTION53_CODEX_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
-        assert "section 52" in normalized_summary_lower
+        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
+        assert "section 53" in normalized_summary_lower
         assert "awaits claude review" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
         assert "claude next reviews sections 49 and 50" not in normalized_summary_lower
         assert "codex next counter-reviews section 51" not in normalized_summary_lower
-        assert "claude next reviews section 52" in normalized_summary_lower
+        assert "claude next reviews section 52" not in normalized_summary_lower
+        assert "codex next counter-reviews section 53" in normalized_summary_lower
         assert "tpr-d2 is not authorized" in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
         assert "no next implementation milestone is authorized" not in normalized_summary_lower
@@ -2192,3 +2203,67 @@ def test_section_52_scope_guard_rejects_added_authority(
     )
     with pytest.raises(AssertionError, match="closed counter-review boundary"):
         test_section_52_counterreviews_every_incoming_commit_and_stops()
+
+
+def test_section_53_review_records_the_exact_range_and_grants_nothing() -> None:
+    """TPR-CR18: pin this review of the section-52 counter-review."""
+    section = _record_section(
+        "## 53. Claude independent review of the section-52 counter-review"
+    )
+    assert SECTION53_CODEX_RANGE in section
+    ordered_commits = tuple(
+        re.search(r"`([0-9a-f]{40})`", line).group(1)
+        for line in section.splitlines()
+        if re.match(r"[|] Codex commit [0-9]+ [|]", line)
+    )
+    assert ordered_commits == SECTION53_CODEX_COMMITS
+    assert ordered_commits == tuple(
+        _git_lines("rev-list", "--reverse", SECTION53_CODEX_RANGE)
+    )
+    dispositions = _bounded(
+        section,
+        "### 53.2 Commit-by-commit dispositions",
+        "### 53.3 P0-P3 ledger",
+        "section 53 dispositions",
+    )
+    rows = tuple(
+        (match.group(1), match.group(2).lower())
+        for line in dispositions.splitlines()
+        if (
+            match := re.match(
+                r"\| `([0-9a-f]{40})` \| \*\*([A-Za-z ]+)\*\* \|", line
+            )
+        )
+    )
+    assert rows == tuple(zip(SECTION53_CODEX_COMMITS, ("accepted", "accepted after qualification")))
+    assert "Cumulative disposition: accepted after qualification" in section
+    ledger = _bounded(
+        section,
+        "### 53.3 P0-P3 ledger",
+        "### 53.4 Validation",
+        "section 53 ledger",
+    )
+    statuses = dict(
+        re.findall(r"^\| `(TPR-CR18-[0-9]{3})` \| P[0-3] \| \*\*([^*]+)\*\*", ledger, re.M)
+    )
+    assert statuses == {"TPR-CR18-001": "Closed by qualification"}
+    authority = " ".join(
+        _bounded(
+            section,
+            "### 53.5 Milestone and authority decision",
+            "### 53.6 Recommendation to the owner",
+            "section 53 authority",
+        ).split()
+    )
+    for required in (
+        "TPR-D2 is not authorized",
+        "no real-row D1 is authorized",
+        "Codex next counter-reviews section 53",
+        "provider request",
+        "QuantConnect",
+        "trading authority",
+    ):
+        assert required in authority, required
+    assert re.search(
+        r"(?:^|[.!?])\s*(?:TPR-D2|real-row D1)\s+is\s+authorized\b", authority, re.I,
+    ) is None

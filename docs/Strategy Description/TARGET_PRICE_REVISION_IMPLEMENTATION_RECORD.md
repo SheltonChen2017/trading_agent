@@ -1,15 +1,13 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
-`01e70390..67aade0e` IN SECTION 52, INCLUDING BOTH TEST CORRECTIONS AND THE
-RECORD/GUARD COMMIT. CUMULATIVE DISPOSITION: ACCEPTED AFTER CORRECTION.
-THE FIXTURE-ONLY TPR-D1 CANDIDATE IS ACCEPTED; TPR-D2 IS NOT
-AUTHORIZED AND NO REAL-ROW D1 IS AUTHORIZED. TPR-D0 IS COMPLETE AND
-INDEPENDENTLY REVIEWED; ITS ONE COMPLETED AUDIT IS NOT RENEWED. THE ONE
-ANCHORED-LOADER TEST THAT THE NATIVE/HOST-GIT SPLIT HAD MISSED NOW TAKES IT
-(`TPR-CR17-001`); THREE UNTESTED D1 GUARDS ARE PINNED (`TPR-CR17-002`).
-CLAUDE NEXT REVIEWS SECTION 52. THE OWNER REQUESTED ONE COUNTER-REVIEW PUSH,
-THEN A MONITOR FOR CLAUDE'S SUBSEQUENT COMPLETED REVIEW OF THAT EXACT SNAPSHOT.
+Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
+`67aade0e..38f52a95` IN SECTION 53: THE SECTION-52 COUNTER-REVIEW AND ITS
+GUARD CORRECTIONS. CUMULATIVE DISPOSITION: ACCEPTED AFTER QUALIFICATION. THE
+FIXTURE-ONLY TPR-D1 CANDIDATE IS ACCEPTED; TPR-D2 IS NOT AUTHORIZED AND NO
+REAL-ROW D1 IS AUTHORIZED. TPR-D0 IS COMPLETE AND INDEPENDENTLY REVIEWED; ITS
+ONE COMPLETED AUDIT IS NOT RENEWED. THE LANE SUITE IS GREEN ON THE macOS
+DEVELOPMENT HOST UNDER THE NATIVE/HOST-GIT SPLIT. CODEX NEXT COUNTER-REVIEWS
+SECTION 53; THE NEXT MILESTONE WAITS FOR THE OWNER'S WORDS.
 THE SHARED RUNTIME-STOP CORRECTIONS ARE ACCEPTED; TPR-OOL-011 STILL REQUIRES
 OWNER-COORDINATED SYNCHRONIZATION. THE COMPREHENSIVE CLAUDE WHOLE-LANE AUDIT
 REMAINS COMPLETE. THE NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS
@@ -359,12 +357,13 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-06:** Codex has counter-reviewed the exact Claude range
-`01e703906df838fd9cbb91a2d1fd03ce7d18f288..67aade0e47d6f4d6c6290018bbe7b52831a465c7`.
-Section 52 dispositions all three incoming commits separately, including
-the record/guard commit. Its cumulative disposition is accepted after
-correction: test/document wording and narrow historical-disposition/authority
-guards, with no production change. The fixture-only TPR-D1 candidate is accepted; this is not
+**Current qualification, 2026-10-06:** Claude has independently reviewed the
+exact Codex range
+`67aade0e47d6f4d6c6290018bbe7b52831a465c7..38f52a95b64fc765ca1075863b8986774b9eb705`:
+the section-52 counter-review and its guard, docstring and comment
+corrections. Section 53 dispositions both commits separately; its cumulative
+disposition is accepted after qualification, with no code, test or record
+correction needed. The fixture-only TPR-D1 candidate is accepted; this is not
 real-data D1 completion. TPR-D0's independent review and counter-review are
 complete and D0's one completed audit is not renewed. The shared runtime-stop
 corrections are accepted within the previous exact two-file exception;
@@ -441,17 +440,13 @@ completion. No later TPR-D milestone starts automatically, TPR-D2 is not
 authorized, and no real-row D1 is authorized without a new exact owner scope.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Claude next reviews section 52 and every Codex commit in this counter-review
-round. The owner requested a push, then a one-shot monitor for the subsequent
-completed Claude review of that exact published snapshot. That monitor grants
-counter-review only, not a next implementation milestone; section 51.6's
-recommendation remains non-authorizing. The historical retained-read
-scope expires 2026-10-12; no new retained read, network request, auxiliary
-price/identity join, outcome access, QC project/upload/job, broker,
-paper/live, deployment, capital or trading action is permitted by this
-round. The existing heartbeat is verified paused before this round's push;
-it is rearmed only after actual remote/local publication agreement, with the
-new exact pushed head as baseline. No earlier monitor result is inferred.
+Codex next counter-reviews section 53, then stops for the owner's next bounded
+scope; section 53.6 records this review's recommendation without granting it.
+The historical retained-read scope expires 2026-10-12; no new retained read,
+network request, auxiliary price/identity join, outcome access, QC
+project/upload/job, broker, paper/live, deployment, capital or trading action
+is permitted by this round. This round creates or resumes no monitor; Codex
+reports its own heartbeat state in section 52.6.
 
 ### Open-issue register
 
@@ -679,6 +674,7 @@ known.
 | 2026-10-02 | Claude validation | `29c87ae` -> `29c87ae` (exact tested tree; this validation-record commit follows) | Section-45 review round final validation | Validated the exact final tree after the two shared-guard corrections, the register and record update, and the rotated guards. No production module changed in this round. | Complete suite on the final tree, six shards: **17,670 passed, 823 skipped, 23 failed, 37 errors**; every failure and error is `TPR-CR15-001`, `TPR-OOL-015`, or `TPR-OOL-016`, and the four `TPR-CR15-004` errors are gone. Designated-worktree focused set **582 passed, 3 skipped, 14 failed** (the 14 are `TPR-CR15-001`); document guards **95 passed**; `compileall` exit 0; `git diff --check` clean; status clean. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No new finding. `TPR-CR15-001` open; seven lane findings open; `TPR-OOL-011` open for synchronization only. | None. | Make this round's one push. Codex counter-reviews section 45; the lane then waits on `TPR-OWN-1` through `TPR-OWN-5`. |
 | 2026-10-05 | Claude review | `c0bfb21393180d44c16c10be1e667ea741098531..c5c060e6712afa75c0eeb05482ef469322d311cf` reviewed; corrections on this same lane branch | Independent review of the Codex counter-review and TPR-D0 round; no milestone added | Reviewed all three commits individually and the cumulative tree. Verified the D0 auditor line by line, both artifacts' content addresses and lineage, and that the committed report is aggregate-only by a full key and leaf census. Did not re-read the retained source: TPR-OWN-2 grants one audit. Re-probed the accepted shared runtime-stop redesign on a redirected root: zero defects. Closed two in-lane guard gaps test-only, so no production byte changed and the recorded audit lineage stays valid. | D0 package **107 passed, 1 skipped**; mutation and suite evidence in section 48.6. Provider/outcome accesses **0**; authorized/spent looks **0**; retained-source reads by this reviewer **0**. | All three commits accepted, `8dcfb718` after correction. `TPR-CR16-001` (P2) and `TPR-CR16-002` (P3) closed by correction. No P0 or P1. The open register remains the six section 8 findings. | None. No key, signed anchor, registry entry, source, outcome, look, QC, broker, paper/live, capital, or trading authority; TPR-D1 is not authorized. | Codex counter-reviews every Claude commit after `c5c060e6712afa75c0eeb05482ef469322d311cf`. The retained-read scope expires 2026-10-12; any later D-step needs its own exact owner scope. |
 | 2026-10-05 | Claude review | `c15dfee552eafb5489bdc545d0150b85ca96ef52..01e703906df838fd9cbb91a2d1fd03ce7d18f288` reviewed; corrections `3e2be6bc` and `40f849b2` and this record/guard commit on this same lane branch | Independent review of the section-49 counter-review and the section-50 fixture-only TPR-D1 candidate; no feature milestone beyond the accepted fixture candidate | Reviewed all three Codex commits individually. Confirmed both counter-review findings against section 48. Ran 24 mutations of the D1 events module (18 red, 3 redundant, 3 gaps now pinned), 4 of the tightened D0 aggregate contract (4 red) and 1 of the section-49 guard (red). Gave the one anchored-loader test the native/host split had missed that split. Accepted the fixture-only D1 candidate; qualified its UTC-day cutoff semantics for the real-row scope. No production file changed. | Complete suite on the pushed Codex head `01e70390`, six network-denied shards: **17,876 passed, 841 skipped, 21 failed, 37 errors**; 11 failures are the Analyst loopback-server module under the strict profile (73 passed under the loopback-only profile), 1 is `TPR-CR17-001`, 4 are `TPR-OOL-015`, and 5 failures plus 37 errors are `TPR-OOL-016`. Final tree, designated worktree: lane, development, active-document and leak-guard set **570 passed, 20 skipped**; development package 191 passed; compileall 0; diff hygiene clean. 24 events mutations (18 red before, 21 after the new tests), 4 contract mutations and 1 guard mutation red, 12 own-guard mutations red. Python 3.13.15 / pytest 9.1.1. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No P0 or P1. `TPR-CR17-001` (P2) and `TPR-CR17-002` (P3) closed by correction; `TPR-CR17-003` (P3) closed by qualification. Six lane findings open; `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The fixture-only TPR-D1 candidate is accepted; TPR-D2 and any real-row D1 are not authorized. | Make this round's one push. Codex counter-reviews section 51, then stops for the owner's next bounded scope. |
+| 2026-10-06 | Claude review | `67aade0e47d6f4d6c6290018bbe7b52831a465c7..38f52a95b64fc765ca1075863b8986774b9eb705` reviewed; this record/guard commit on this same lane branch | Independent review of the section-52 counter-review; no feature milestone | Reviewed both Codex commits individually. Confirmed all seven counter-review findings as correct or correctly qualified; five mutations of the new section 51/52 guards all red. One P3 qualification on severity and classification wording. No code or test changed. | Lane, development, active-document, leak-guard and ML-boundary set on the pushed head, designated worktree, network-denied: **588 passed, 20 skipped**; document guards green on the final record; `compileall` exit 0; `git diff --check` clean. The complete suite was not re-run: the range and this round change tests, guards and the record only, and the last complete run (section 51.7) precedes only test/record commits. Provider/outcome accesses **0**; licensed-row reads **0**; authorized/spent looks **0**. | No P0 or P1. `TPR-CR18-001` (P3) closed by qualification. Six lane findings open; `TPR-OOL-011` through `TPR-OOL-018` unchanged. | None. The fixture-only TPR-D1 candidate stays accepted; TPR-D2 and any real-row D1 are not authorized. | Make this round's one push. Codex counter-reviews section 53, then stops for the owner's next bounded scope. |
 | YYYY-MM-DD | Role | `<start>` -> `<end>` | TPR-N | Concise durable change | Exact tests, artifacts, evidence epoch, and look count | Open/resolved P0-P3 items and blockers | Exact authority added or `none` | Exact next bounded step |
 | 2026-10-05 | Codex counter-review and TPR-D0 implementation | Reviewed `9958a459f5cd56c29cb9a0de13d38737e2c3412d..c0bfb21393180d44c16c10be1e667ea741098531`; corrections/decisions `cf11788f39a2148d7bc3b801e88807bd2caca5ea`; D0 implementation `8dcfb71851ff22db6f0727395e18292c19f080ef`; this record-only handoff follows | Four-commit Claude counter-review, five bounded owner selections, strict D0 plan and one retained structural audit | Accepted the cumulative Claude range after three record/encoding corrections; selected explicit native/host test variants without changing production trust policy. Implemented the separate standard-library D0 package and immutable aggregate artifacts; retained-source inventory/hashes and all canonical freezes match. Sections 46/47 contain exact dispositions, scope, evidence and remaining limitations. | Cumulative focused suite 491 passed, 5 symlink-permission skips; final routing/artifact guards 107 passed. Standard suite blocked by 110 Analyst `fcntl` collection errors, with zero tests executed. Optional continuation diagnostics capped and incomplete, not reported as totals. Compileall exit 0; diff hygiene clean; Python 3.13.14 / pytest 9.1.1. | CCR16-001/002/003 closed; no new in-lane P0/P1/P2. Six canonical findings remain open and parked. TPR-OOL-017 opened for Windows Analyst collection, documented only. | Exact local retained-structure scope only, expiring 2026-10-12; 587,046 retained rows audited. Provider/outcome/QC/development-look/trading counts zero. No vendor-rights attestation or canonical admission. | One matching-branch non-force push of this Codex round, then independent Claude review of every commit after `c0bfb213` through the exact pushed tip. No automatic D1; later action/source scope must be selected after review and counter-review. |
 
@@ -6413,6 +6409,10 @@ broker action, deployment, capital, order, or trading authority was created.
 
 ## 52. Codex counter-review of the fixture-only TPR-D1 review - 2026-10-06
 
+**Historical counter-review report.** Section 53 reviews this section and
+supersedes only its next-role pointer. Its owner quotes, dispositions,
+findings, validation and heartbeat plan are retained as written.
+
 ### 52.1 Direct owner scope and exact snapshot
 
 Owner instructions in this chat:
@@ -6661,3 +6661,86 @@ focused and fixture-only. The next action is independent Claude review of
 the entire two-commit counter-review snapshot, not a development milestone.
 Keep the app/computer running for the local follow-up; no other chat or
 provider is contacted by the monitor.
+
+## 53. Claude independent review of the section-52 counter-review - 2026-10-06
+
+**Disposition: accepted after qualification.** Both Codex commits are
+accepted. The seven counter-review findings against my section-51 round are
+each correct or correctly qualified, and the two guard corrections hold under
+mutation. Nothing in this range needed a code, test or record correction; one
+qualification concerns how two of the findings are graded and classified.
+
+### 53.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Branch | `codex/strategy-target-price-revisions` |
+| Codex range reviewed | `67aade0e47d6f4d6c6290018bbe7b52831a465c7..38f52a95b64fc765ca1075863b8986774b9eb705` |
+| Codex commit 1 | `9bb1e775321fa014341209a8c20fa240e4a243df` - section 51/52 guards, fixture docstring and D1 comment qualifications |
+| Codex commit 2 | `38f52a95b64fc765ca1075863b8986774b9eb705` - record section 52, pointers, ledger |
+| Reachable commits in the range | 2, both first-parent; no merge |
+| Publication state at review start | the push watcher fired on `38f52a95` at 00:53 PDT; local head and fetched remote head both exactly that commit, clean tree |
+| Changed paths | `tests/target_price_revisions/test_document_consistency.py`, `tests/target_price_revisions/test_preregistration.py` (docstring), `tests/target_price_revisions_development/test_d1.py` (comment), and this record; no production, canonical, D0, shared-document or shared-test byte |
+| Host and interpreter | macOS (Darwin 25.6.0); ``/.venvs/trading_agent-py313`, Python 3.13.15, pytest 9.1.1; every pytest and mutation run under `sandbox-exec -p '(version 1)(allow default)(deny network*)'` |
+
+### 53.2 Commit-by-commit dispositions
+
+| Codex commit | Disposition | Review basis |
+|---|---|---|
+| `9bb1e775321fa014341209a8c20fa240e4a243df` | **Accepted** | `TPR-CCR18-004` is confirmed: my section-51 pin admitted a drift from "accepted after correction" to "accepted" and an added affirmative grant. The replacement pins the exact per-commit dispositions and refuses a sentence-initial `TPR-D2` or `real-row D1` `is authorized`; Codex's own four in-test regressions and my five scratch-clone trials (drifted section-52 disposition, removed scope row, altered owner quote, inserted section-51 grant, stale section-8 next role) are all red. `TPR-CCR18-001` and `-002` are confirmed: the fixture docstring overstated which consumers use the synthetic verifier, and my D1 comment could be read as saying the new tests passed under mutation. Both rewordings are accurate. |
+| `38f52a95b64fc765ca1075863b8986774b9eb705` | **Accepted after qualification** | Section 52 dispositions all three commits of my round, its shard arithmetic reconciles, its scope table is closed and guarded, and its heartbeat text is a plan, not a claim of arming. `TPR-CCR18-003`, `-005`, `-006` and `-007` are each correct in substance; `TPR-CR18-001` qualifies the grading of two of them. |
+
+**Cumulative disposition: accepted after qualification.** No production
+module, canonical artifact, D0 artifact, shared document or shared test
+changed in the reviewed range or in this review; this review changes only the
+record and its lane guard.
+
+### 53.3 P0-P3 ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| `TPR-CR18-001` | P3 | **Closed by qualification** | `38f52a95` | section 52.3, `TPR-CCR18-003` and `TPR-CCR18-005` | `TPR-CCR18-003` grades as P2 "incorrect durable state" the phrase "both Claude commits of this round" in section 51.6 and section 8. The round's third commit was the record commit that carried that sentence, which cannot name itself; every earlier round used the same phrasing, and section 52 itself counter-reviewed all three commits, so no commit escaped review. The defect is real but is inaccurate documentation, P3 under the rubric. `TPR-CCR18-005` classifies part of `TPR-CR17-003` as a false alarm for "interpreting it as a bug in the explicitly UTC-day fixture contract"; `TPR-CR17-003` said the opposite ("None to the fixture candidate ... qualified here for the real-row D1 scope") and was closed by qualification, so there was no fixture-bug claim to refute. Its inclusive-boundary correction (rollover begins at 20:00 EDT / 19:00 EST, not after) is right and is accepted. | Section 51.3 row for `TPR-CR17-003`; section 51.6 and the section-8 text at `67aade0e`; the review rubric's P2 and P3 definitions. | Severity and classification labels are durable and feed later counts. | None to Codex's text, which is otherwise accurate; this row records the qualification. Future rounds should write "every Claude commit of this round" so the record commit is included without naming itself. | Not applicable. |
+
+No P0 and no P1 arises from this range. The open-issue register is unchanged
+at six items. Out of lane, `TPR-OOL-011` through `TPR-OOL-018` are unchanged.
+
+### 53.4 Validation
+
+- **Pushed head `38f52a95` in the designated worktree, network-denied:**
+  `pytest -q tests/target_price_revisions tests/target_price_revisions_development tests/test_active_document_consistency.py tests/test_runtime_stop_leak_guard.py tests/test_ml_import_boundary.py`
+  is **588 passed, 20 skipped** in 21.94s: the 581 of section 51.7 plus the
+  seven guard tests this range adds. The skips are the Windows-junction
+  exclusion and the native-Windows legs of the anchored-loader tests.
+- **Final tree:** the document and active-document guards pass on this
+  record; `compileall -q` over the production, research, script and test
+  trees exits 0; `git diff --check` over `67aade0e..HEAD` is clean; the
+  worktree is clean.
+- **Mutations:** five trials of the range's new guards, all red (53.2).
+- **Not re-run:** the complete repository suite. The reviewed range and this
+  round change tests, guards and the record only; the last complete run is
+  section 51.7 on `01e70390`, and every commit since is a test or record
+  commit.
+
+Provider requests: **0**. Licensed source-row reads or processing: **0**.
+Outcome accesses: **0**. Authorized or spent research looks: **0**.
+QuantConnect attempts, projects, uploads and jobs: **0**.
+
+### 53.5 Milestone and authority decision
+
+The fixture-only TPR-D1 candidate stays accepted. TPR-D2 is not authorized,
+and no real-row D1 is authorized. Codex next counter-reviews section 53 and
+this round's one record/guard commit, then stops for the owner's next bounded
+scope. No retained row, provider request, price or outcome access,
+QuantConnect project, upload or job, broker action, paper or live deployment,
+capital, or trading authority is granted or used by this review.
+
+### 53.6 Recommendation to the owner
+
+The owner's 2026-10-05 instruction quoted in section 52.1, "start the
+counterreview before moving to the next milestone", reads as an intent to
+proceed, but Codex requires the next scope in the owner's own words and this
+review grants nothing. Recommended wording for Codex's session, unchanged
+from section 51.6: authorize fixture-only TPR-D2 (the plan's outcome-free
+score, universe and ETF contracts on synthetic inputs), and separately decide
+whether a real-row D1 may read the retained `benzinga-ratings-20260820T233055Z`
+pages again under a renewed bounded scope.

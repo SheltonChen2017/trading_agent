@@ -1,25 +1,29 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE REVIEWED THE THREE-COMMIT CHECKPOINT `614214a..d528615` IN
-SECTION 77. CODEX COUNTER-REVIEWED CLAUDE'S SOLE COMMIT `a31805a` IN SECTION 78
-AND ACCEPTED IT AFTER RECORD-ONLY QUALIFICATION. CLAUDE FOUND NO NEW P0–P2;
-ITS `SI-CR15-002` P3 RECORD CORRECTION MAKES `d528615` ACCEPTED AFTER
-CORRECTION, NOT UNQUALIFIED ACCEPTANCE. `SI-CR14-001` IS CLOSED BY THE
-VERBATIM-OWNER PROVENANCE CORRECTION. QUANTCONNECT SUPPORT REPORTED ONE HISTORY
-VALUE PER SETTLEMENT DATE AND NO DOCUMENTED FIELD OR API TO RECONSTRUCT PRIOR
-CORRECTION OR PUBLIC-RELEASE VINTAGES; IT DID NOT ESTABLISH WHETHER INTERNAL
-PRIOR VERSIONS EXIST. ALL THREE SOURCE-ADMISSION P2s REMAIN OPEN.
-`SI-CR15-001` (P3) REMAINS OPEN FOR ANY PURCHASE, SUBSCRIPTION, TRIAL, LICENSE
-ACCEPTANCE OR OTHER BINDING FINANCIAL/CONTRACTUAL COMMITMENT; READ-ONLY
-EVALUATION OF VENDOR REPLIES IS ALREADY AUTHORIZED. CLAUDE REPORTED 815 PASSED
-IN THE EXACT EIGHTEEN-FILE LANE; CODEX RAN FOCUSED CHECKS ONLY. THE SHARED P2
-`SI-CR5-005` / `SI-CCR16-007` REMAINS OPEN. NO PERMANENT CELL OR LOOK HAS BEEN
-ALLOCATED; AUTHORIZED AND CONSUMED REAL OUTCOME LOOKS REMAIN 0/0. ALL PROVIDER
-MARKET-ROW, LICENSED-DATA, ACTUAL-PRICE, OUTCOME, HOLDOUT, LOOKBACK-SELECTION,
-RANKING, SEED, ETF, QUANTCONNECT HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
-PURCHASE, BROKER, OPERATOR-DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDER AND
-TRADING GATES REMAIN CLOSED. THE SECTION-78 COUNTER-REVIEW IS LOCAL-ONLY; NO
-CODEX PUSH IS MADE WHILE THE SOURCE GATES REMAIN OPEN.**
+Status: **MACOS RECONCILIATION PRESERVES LOCAL `212d645` AND ALL EIGHT
+REMOTE COMMITS THROUGH `85e61a4` ON THE EXISTING LANE (SECTION 85).
+REMOTE SECTIONS 78–83 ARE RETAINED; THE EARLIER MACOS COUNTER-REVIEW AND
+SI-CCR25-001..004 LEDGER ARE PRESERVED IN SECTION 84. CLAUDE'S TWO LATEST
+COMMITS `d7f0f0a` AND `85e61a4` AWAIT CODEX COUNTER-REVIEW, INCLUDING
+SI-CR16-001. SYNCHRONIZATION DOES NOT ACCEPT THEM. QC SUPPORT REPORTED ONE
+HISTORY VALUE PER SETTLEMENT DATE AND NO DOCUMENTED AS-OF VINTAGE ROUTE;
+INTERNAL PRIOR-VERSION RETENTION WAS NOT ESTABLISHED. ALL THREE SOURCE P2S,
+THE PROSPECTIVE COMMITMENT ADVISORY AND THE SHARED OUT-OF-LANE P2 REMAIN OPEN.
+NYSE HAS SUPPLIED SALES INFORMATION; NASDAQ'S LATER REPLY ASKS WHICH ENTITY
+AND ACCESS ROUTE THE INQUIRY CONCERNS. NEITHER QUALIFIES A SOURCE. THE
+EXCHANGE-REPLY MONITOR IS PAUSED AT THE OWNER'S REQUEST. LOOKBACKS
+20/60/120/252 REMAIN UNSELECTED; AUTHORIZED/CONSUMED REAL OUTCOME LOOKS
+REMAIN 0/0. LICENSED/ACTUAL MARKET ROWS, OUTCOMES, HOLDOUT, PRODUCTION
+RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
+BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND
+TRADING REMAIN GATED.**
+
+Current publication rule (owner direction, 2026-10-05): finish each completed
+bounded lane round with **one combined push** to
+`origin/codex/strategy-short-interest`, verifying the actual remote head.
+Sections 79–80 and preserved section 84 describe earlier local-only rounds;
+section 81 supersedes their publication stop. No empirical source authority
+is inferred from that publication rule.
 
 Branch: `codex/strategy-short-interest`
 
@@ -187,6 +191,12 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-09-29 | Claude review | `985743e` -> `0f501db` reviewed from the published head; **test-only correction at `eb2f3ea`**; this record commit follows, so the round has two Claude commits | Independent review of the fifteen-commit accelerated SI-5 round: counter-review of section 63, owner horizon interpretation, delegated SI-5 design, synthetic-only SI-5 protocol and cohort projection, metadata-only source preflight, QC source-route audit and support inquiry, and the dual-gate handoff | Waited for Codex's own push and watched it stage and commit section 74 as `0f501db` rather than racing it in the shared worktree, then reviewed that published head. Verified all three new modules keep every authority flag false with zero allocated alpha, no permanent look and no selected lookback, and that none imports a network, subprocess or credential surface. Verified the SI-5 protocol's owner binding equals the record blob at `b13e9be`, and found that sections 66, 71 and 72 contain no quoted owner words while sections 59.1 and 65 do. Confirmed blueprint section 8.4 names 20 sessions the fixed primary horizon, which overturns my prior `SI-CR13-001`. Attributed ten unpinned protocol fields, ten preflight guards and the cohort intersection individually and probed survivors for fail-open. | Baseline on `0f501db`, clean, no mutation in flight: eighteen-file lane **805 passed in 3,083.20s**, reconciling exactly to 759 plus 24, 14 and 8 new SI-5 cases; compileall **exit 0**; active-document **69 passed**; import boundary **9 passed**. Final tree `eb2f3ea`: lane **815 passed in 3,006.52s**, reconciling exactly to 805 plus the 10 new protocol cases; protocol file **34 passed**. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | **`SI-CR14-001` (P2, open, owner action): authorizations for already-taken external actions and for a standing open-ended delegation are paraphrased, not quoted, while the frozen SI-0M gate still records those access classes unauthorized.** `SI-CR14-002` (P3, closed, test-only at `eb2f3ea`: ten protocol fields pinned). `SI-CR14-003` (P3, closed, non-defect: preflight survivors are layered by deliberate builder-and-receipt double validation). `SI-CR14-004` (P3, closed, positive: cohort intersection is pinned). `SI-CR14-005` (P3, self-reported: I nearly misreported a preflight fail-open from a wrong test value). `SI-CR14-006` (P3, open, owner advisory: the standing delegation lets the implementer choose hypotheses and pre-approve its own lane actions; recommend a quoted scope and expiry with outward actions named individually). My `SI-CR13-001` is withdrawn. Shared `SI-CR5-005` stays open. | Codex counter-reviews `eb2f3ea` and this record commit once its own second gate, the substantive QC reply, is met. `SI-CR14-001` needs a quoted owner statement. No source is admitted; every outcome, holdout, ranking, seed, ETF, QuantConnect project/upload/compile/job/backtest, broker and trading gate remains closed. |
 | 2026-09-30 | Codex counter-review + source qualification (row reconstructed by Claude in section 77 from section 76; Codex's round added none) | `614214a` -> `d528615` (record `0e31505`, provenance correction `d6f8abe`, owner-directed checkpoint record `d528615`) | Counter-review of section 75, verbatim owner provenance, QC reply and NYSE/Nasdaq pre-purchase inquiries | Per section 76: accepted `eb2f3ea`, and accepted `614214a` after stating that SI-0M is a research-software gate; committed six verbatim owner quotations; rebound the SI-5 protocol's owner source to `0e31505`, changing the protocol identity to `bfa06b28...` as a new synthetic provenance epoch; recorded QC's latest-only FINRA history answer; sent one pre-purchase email each to NYSE and Nasdaq Data Sales; pushed once under the owner's "push then" (`SI-AUTH-20260930-02`). | Codex-reported, focused only: the new quotation regression was red against the old binding (1 failed, 33 deselected); protocol, preflight, Short Interest import-boundary and active-document selection 126 passed in 1.13s; two cohort cases 2 passed, 6 deselected in 181.84s. No complete lane or repository suite. Authorized looks 0, consumed looks 0. | `SI-CR14-001` marked partially corrected; `SI-CR14-006` kept open; source P2s `SI-SRC-20260928-001`, `-002` and `-003` open; shared `SI-CR5-005` / `SI-CCR16-007` open. | Claude reviews the pushed checkpoint (section 77). |
 | 2026-09-30 | Claude review | `614214a` -> `d528615` reviewed from the published head; **no code or test correction**; this record commit is the only Claude commit | Independent review of Codex's counter-review, the verbatim-provenance rebinding, the QC reply and the exchange-archive inquiries | Verified the protocol's new owner binding equals `git show 0e31505:<record>`; that each of the six owner quotations occurs exactly once there as a blockquote and in none of the old `b13e9be` blob, so the new test is load-bearing; and that the new protocol identity recomputes and reaches the preflight and cohort without a stale literal. Replaced the stale status block and reconstructed the missing Codex push-ledger row above. | Exact pushed tree `d528615`, clean, no mutation in flight: eighteen-file lane **815 passed in 3,259.82s** (unchanged from 815: the new assertions sit inside an existing test); compileall exit 0; active-document 69 passed; import boundary 9 passed; `git diff --check` clean. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR14-001` (P2) closed by correction. `SI-CR14-006` (P3) closed, resolved by the owner's quoted choice of scope and duration. **`SI-CR15-001` (P3, open, time-sensitive owner advisory): before any NYSE or Nasdaq reply is acted on, the owner should state whether the standing delegation covers purchases, subscriptions, trials, license or data terms, or any other financial or contractual commitment.** `SI-CR15-002` (P3, closed by record correction: Codex's round left the status block stale and added no push-ledger row). Source P2s and shared `SI-CR5-005` stay open. | Codex counter-reviews this record commit. `SI-CR15-001` needs a quoted owner answer before any vendor reply is acted on. No source is admitted; every outcome, holdout, ranking, seed, ETF, QuantConnect history/project/job/backtest, purchase, broker and trading gate remains closed. |
+| 2026-10-05 | Codex counter-review + source assessment (local-only session; no push) | Remote `a31805a`; local code/test merge `e00aa35` preserves `7cd39a0`; this record commit follows | Accepted latest Claude record; preserved-regression countercheck; current NYSE/Nasdaq qualification | Accepted pushed record `a31805a` unchanged; advisory retention of the two previously local tests after independent red/green checks; direct inquiry-thread reads and received/bounce searches found only the two original sent inquiries; public metadata did not clear the three source P2s. Conditional PIT adapter/backtest step remains blocked. | Restored regressions **2 passed, 53 deselected in 107.39s**; isolated serializer/batch-guard mutants **1 failed in 81.86s** and **1 failed in 104.51s**; focused protocol/preflight/import/document selection **126 passed in 4.71s**; collection only **817 in 2.78s**; active-document **69 passed**; compileall exit 0; diff clean. No full lane/repository execution by Codex. Authorized/consumed outcome looks **0/0**. | No new confirmed code defect. `SI-CR14-001`, `SI-CR14-006` and `SI-CR15-002` closed; commitment advisory `SI-CR15-001` retained narrowly; source P2s `SI-SRC-20260928-001..003` and shared P2 remain open. | Keep exact validated checkpoint local under the existing no-partial-push gate. A new direct checkpoint instruction is required before one push; then Claude reviews the preserved test commit, sync merge and this record. Source evidence must clear before PIT ingest or outcomes. |
+| 2026-10-05 | Codex source fallback (local-only session; no push) | Local `165ffb3`; last fetched remote `a31805a`; this record commit follows | Owner-directed fallback steps 1–4 | Sent one NYSE and one Nasdaq follow-up with alternate contacts copied, plus one metadata-only inquiry each to QuoteMedia and Intrinio; set October 19 response deadline; screened alternatives; documented exhaustive correction-exclusion and prospective raw-archive activation requirements. No code or actual collection. | Active-document checks **69 passed in 13.33s**, then **69 passed in 2.93s** after ledger edits; lane compilation exit 0; diff clean. No full lane/repository suite. Authorized/consumed outcome looks **0/0**. | Source P2s `SI-SRC-20260928-001..003` remain open; no source admitted. Current Compustat replacement concept excluded. Commitment advisory and shared out-of-lane P2 unchanged. | Assess qualifying metadata/archive or exhaustive correction inventory; establish concrete local archival rights and acquisition contract before prospective collection. No reminder/monitor restarted; no checkpoint push authorized. |
+| 2026-10-05 | Codex owner-directed round-end publication | Fresh remote `a31805a`; local `bb9c688`; this instruction/handoff record commit follows | Standing one-push rule and accumulated five-commit checkpoint | Recorded the owner's verbatim direction to push after every completed lane round, superseding only the old source-blocker publication stop. Fresh lane-only fetch found no new remote commit; preserved all four accumulated commits and their review limits. | Section-80 final documentation **69 passed in 4.47s**, compile exit 0; latest record checks and exact remote equality are verified at publication and reported in the handoff. No new code/test change or full lane/repository run. | All source P2s, the prospective commitment advisory and shared out-of-lane P2 remain unchanged; authorized/consumed outcome looks **0/0**. | One normal combined push to the dedicated lane ref, verify remote equality, then Claude reviews every commit in `a31805a..published HEAD`. Future completed rounds follow the same standing push rule. |
+| 2026-10-05 | Codex received-response assessment | Local/remote base `889f7ab`; this record commit follows | NYSE sales reply and other exchange receipts | Classified NYSE public-specification/sample links and indicative pricing as unqualified sales information; distinguished Nasdaq routing and two support acknowledgments; rechecked public metadata; recorded no source-gate closure. Private bodies, personal contacts and quote amount are not published. | Exact document/diff checks and remote equality verified at handoff. No code/test change or full lane/repository run. Authorized/consumed looks **0/0**. | All three source P2s, prospective commitment advisory and shared out-of-lane P2 unchanged. No purchase, samples, new correspondence or data admission. | One standing-authorized lane push; Claude reviews the extended exact snapshot. Obtain original/latest-vintage and rights clarification before source-specific implementation or procurement. |
+| 2026-10-05 | Claude review | `a31805a` -> `673aad4` reviewed from the published head; **test-only correction at `d7f0f0a`**; this record commit follows, so the round has two Claude commits | Independent review of the preserved percentile regressions, the sync merge, Codex's counter-review, the source-fallback record, the standing round-end push rule and the received-response disposition | Reviewed all six commits individually in the single Windows lane worktree, which is now this session's primary directory; local `HEAD` equalled the fetched remote with a clean tree at `889f7ab`, and Codex pushed the record-only `673aad4` mid-review without changing the code/test tree. Disclosed that `7cd39a0` was authored by this same session on 2026-09-14 and accepted it on re-executed evidence: both test bodies are byte-identical at `889f7ab`, each turns red when its target is mutated at the published head and both pass restored. Verified the merge is exactly the remote tree plus 44 test lines and the record, that the production and test blobs Codex recorded persist unchanged, and that every record claim I could execute from sections 78-81 reproduces: 817 collected, 126 in the focused selection, 44 remote commits, 37 unique test functions, the six reused contract names, the deadline arithmetic and the completed push. Accepted Codex's narrower attribution of the lineage test. The first full lane run on this host since 2026-09-14 surfaced one deterministic host-dependent test failure from an earlier round, corrected in the lane test file only. Mailbox, vendor and public-metadata actions were not reproduced. | Exact eighteen-file lane on `889f7ab`: 1 failed, 816 passed in 11,389.90s (3:09:49); the one failure is the host-dependent assertion corrected at `d7f0f0a`, after which the complete percentile file is 55 passed in 384.09s; focused red/green at head: M2 serializer drift **1 failed in 77.61s**, M1 batch binding removed **1 failed in 63.88s**, restored **2 passed in 75.46s**; corrected test green **1 passed**, red under a one-byte worktree drift **1 failed**; Codex selection **126 passed in 4.22s**; active-document **69 passed** before and **69 passed in 9.85s** after this record; import boundary **9 passed**; compileall exit 0; `git diff --check` clean. The eleven-file lane launched on 2026-09-14 against `7cd39a0`'s own tree completed after that session ended: **617 passed**. No complete-repository suite. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0/P1/P2 in lane. `SI-CR16-002` (P3, closed, test-only): the owner-approval binding test compared working-tree bytes to the bound blob and cannot pass on an autocrlf checkout; replaced with HEAD-blob equality plus a terminator-normalized worktree check, proved red under a one-byte drift. `SI-CR16-003` (P3, withdrawn before commit, self-reported): a draft claim that `673aad4` had not refreshed the status block was disproved by the block's own text. `SI-CR16-001` (P3, process, open for Codex): the reviewing session authored `7cd39a0`, so its formal independent check is Codex's countercheck, to be confirmed on the published snapshot. `SI-CR15-001`, `SI-SRC-20260928-001..003` and shared `SI-CR5-005` unchanged. | Codex counter-reviews `d7f0f0a` and this record commit and confirms or contests `SI-CR16-001`; the vendor deadline of 2026-10-19 stands; every source, outcome, QC, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. |
+| 2026-10-05 | Codex macOS reconciliation | Local `212d645` + eight remote commits through `85e61a4`; this merge commit follows | Owner-directed same-branch sync and monitor stop | Preserved both histories; retained remote sections 78–83 and relocated the complete historical macOS review/ledger to section 84. Imported code/test bytes equal the remote. | Focused percentile/import selection **12 passed in 24.35s**; active-document **69 passed**; lane compilation exit 0; imported-tree and retained-section fidelity checks pass; diff clean. No full lane/repository suite. | SI-CCR25 qualifications retained; new Claude `d7f0f0a` / `85e61a4` counter-review remains pending. Source P2s, prospective commitment advisory and shared P2 unchanged; looks **0/0**. | Counter-review both Claude commits and assess the gated adapter milestone, then one final combined push under section 81. Exchange monitor is paused. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -10293,9 +10303,921 @@ reply or the exchange emails.
    deployment, paper/live and trading actions. The shared final holdout remains
    sealed.
 
-## 78. Codex counter-review of Claude's checkpoint review — 2026-09-30 UTC
+## 78. Windows lane synchronization and recommended next steps — 2026-10-05
 
-### 78.1 Exact range and disposition
+This is synchronization at the owner's request, not an independent review or
+another implementation milestone. Work remains in
+`C:\git\customizedAgent\trading_agent_short_interest` on
+`codex/strategy-short-interest`; no branch was switched or created.
+
+### 78.1 Exact histories and preserved local work
+
+| Item | Exact value |
+|---|---|
+| Initial local head | `7cd39a0c8987e3a0a7c862d93b80f58281cc0ea6` |
+| Common ancestor | `7844c81145acf5d2bfc8ea9bb8d7bcabca6674f2` |
+| Fetched remote head | `a31805afd7720c700527a6f3e42912e850deffa8` |
+| Divergence after lane-only fetch | 1 local commit and 44 remote commits |
+| Local work preserved | `7cd39a0`, Claude's two test-only P0-lineage/batch-rebinding regressions |
+| Sync method | Same-branch merge preserving both histories; no reset, rebase, force push or discarded commit |
+| Push state | Local merge/record only; no push for this sync request |
+
+The only conflict was two append operations in
+`tests/test_short_interest_stock_percentile.py`. Resolution retains the entire
+remote test file and inserts both local test functions unchanged, for exactly
+44 added lines relative to `a31805a`. All other product/code/test files equal
+the remote tree; the only additional change is this lane record. The merge
+commit carries this record so the local synchronization state is durable.
+
+### 78.2 Verification and honest scope
+
+Validation on the merged code/test tree, before the merge commit:
+
+- Six focused percentile regressions: **6 passed, 49 deselected in 112.43s**.
+  These cover both preserved local tests and all four remote tests added at
+  the overlapping file tail.
+- SI-5 protocol, blocked source preflight, Short Interest import boundary and
+  active-document checks: **126 passed in 4.85s**.
+- Lane modules and affected tests: compileall **exit 0**.
+- `git diff --check`: **clean**. No warning was emitted by the pytest checks.
+- Host: Windows, CPython **3.13.14**, pytest **9.1.1**.
+
+A separate read-only resolution audit confirmed that removing exactly the 44
+local added lines reconstructs the full remote percentile test file; both
+preserved local function bodies match `7cd39a0` verbatim, all 37 test function
+names are unique, and no conflict marker remains. Every tracked file besides
+that test file and this record matches `a31805a`.
+
+No complete lane or repository suite is claimed for synchronization. Section
+77's **815 lane passes** remains Claude-reported evidence on the remote code
+snapshot; preserving two tests adds two collected cases but is not a claim
+that the combined 817-case lane has been executed here. No remote commit is
+accepted by inference from synchronization.
+
+### 78.3 Current context and recommended sequence
+
+The lane has progressed through candidate-window investability, eligible
+population binding and reranking into synthetic SI-5 protocol, common-cohort
+and source-preflight software. SI-5 empirical research remains blocked on
+source evidence. The substantive QC reply is already recorded: Cloud access
+exists, but its FINRA History contains one value per settlement date without
+original/correction vintages or authenticated release timestamps. The old
+wait-for-QC-response condition has therefore been met; latest-only history
+still fails canonical PIT source admission.
+
+Recommended next actions, in order:
+
+1. Counter-review Claude's record-only commit `a31805a`, particularly the
+   reconstructed push-ledger row and its provenance/authority dispositions.
+   Include the preserved, previously local `7cd39a0` in the next explicit
+   review scope rather than treating these two tests as reviewed by the remote
+   series.
+2. Read and assess any existing NYSE/Nasdaq replies to the already-sent
+   pre-purchase inquiries against authentic release timing, as-published and
+   correction vintages, exchange/delisted coverage, stable identifiers and
+   local/QC processing rights. No vendor mailbox was accessed during this sync,
+   so whether replies have arrived is not asserted here.
+3. Clear the three factual source P2s `SI-SRC-20260928-001..003` using written
+   evidence and PIT price/volume, identity and terminal coverage. The owner's
+   standing delegation permits lane decisions and previously scoped
+   administrative qualification; it cannot establish missing source facts.
+4. If a concrete vendor offer requires purchase, subscription, trial or license
+   acceptance, resolve that specific financial/contractual scope
+   (`SI-CR15-001`) before committing to it. Reading a reply or assessing
+   metadata does not itself accept an offer.
+5. Once a source qualifies, freeze the development dates, power/minimum-effect
+   design and permanent confirmatory cell/look specification before the
+   historical stock test. Keep the four 20/60/120/252 candidate windows,
+   order-based evaluation and sealed holdout under the recorded owner rules.
+
+`SI-CR14-001` and `SI-CR14-006` were closed in section 77; this sync does not
+reopen them. `SI-CR5-005` / `SI-CCR16-007` remains shared/out of lane. No
+source, actual-price/outcome join, permanent look, QC history/project/upload/
+compile/job/backtest, production seed, ETF or trading authority is opened.
+Authorized and consumed actual outcome looks remain **0/0**. Git fetch was the
+only external action in this sync; no provider, QC account, vendor message,
+license, broker, operator database, scheduler or deployment was accessed.
+
+## 79. Codex counter-review and current source-qualification check — 2026-10-05
+
+The owner instructed **"do 123"**, referring to the preceding recommendations:
+counter-review the latest Claude record and preserved local regressions; assess
+NYSE/Nasdaq replies; and implement the PIT source adapter/backtest preparation
+once the source requirements clear. This round completes the first two checks.
+The third remains conditional on facts that are still unavailable. Nothing in
+the request or the standing delegation supplies missing provider facts.
+
+### 79.1 Exact snapshots and commit dispositions
+
+| Item | Exact value |
+|---|---|
+| Dedicated worktree / branch | `C:\git\customizedAgent\trading_agent_short_interest` / `codex/strategy-short-interest` |
+| Claude review base | `d528615a5e2b32286abb27451cb6ab3f8f7d1982` |
+| Fetched/pinned Claude head | `a31805afd7720c700527a6f3e42912e850deffa8` |
+| Formal Claude range | `d528615..a31805a`: one record-only commit |
+| Current reconciled code/test snapshot | `e00aa3591acfa6783527292230f5f54da5677e46` |
+| Preserved local Claude test commit | `7cd39a0c8987e3a0a7c862d93b80f58281cc0ea6` |
+
+| Commit | Scope | Disposition |
+|---|---|---|
+| `a31805a` | Section-77 review, status replacement and reconstructed Codex push row | **Accepted.** The complete diff is lane-record-only. The reconstructed row agrees with `0e31505`, `d6f8abe` and `d528615`; source gates, zero looks and checkpoint scope are accurate. No correction is required. |
+| `7cd39a0` | Two preserved test-only P0-lineage/batch-rebinding regressions | **Advisory countercheck: retain without correction.** Both exact test bodies are unchanged through `e00aa35`. Independent failure-direction checks are documented below. This commit was local-only when reviewed, so this is not a formal acceptance of an already-pushed snapshot; Claude must review it in the next exact remote range. |
+| `e00aa35` | Same-branch non-destructive synchronization | Codex-authored sync, not independently self-accepted. It retains both histories and both test sets; section 78 records the conflict resolution and checks. |
+
+The raw `git show 0e31505:<record>` bytes independently hash to
+`3f7a31a7b3955b31bc6f29d312e1c74f4a923302b70121aa5e91a45d5fddf9d6`.
+Each of the six quoted owner sentences occurs once as a blockquote in that
+blob, and none occurs in the previously bound `b13e9be` blob. The current
+protocol payload independently hashes to
+`bfa06b282132a0b5ceef4e9e4e3900f0dea6ffaadad8e00e22f5c8f837022972`.
+The source-preflight and cohort modules obtain this identity through the
+current protocol; no superseded identity or binding remains in lane source or
+tests. The reconstructed row preserves Codex-reported validation as such and
+does not turn Claude's reported 815-pass lane run into a new Windows run.
+
+### 79.2 Retained P0-P3 ledger and scope qualifications
+
+No new confirmed in-lane code defect was found. Resolved findings and the
+existing factual/owner advisories remain visible.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for correction or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR15-002 | P3 | Closed; counter-review accepted | `a31805a` | section-5 reconstructed row and status | The preceding Codex round omitted its status replacement and push row. Claude repaired both without rewriting older rows. | Complete diffs of `0e31505`, `d6f8abe`, `d528615` and `a31805a`; the new row matches section 76's exact evidence. | Restore the lane's chronology and current summary. | Claude's existing record correction is accepted unchanged. | Independent diff/row/provenance check; active-document validation below. |
+| SI-CR14-001 | P2 | Closed by correction; closure accepted | `d6f8abe`, `a31805a` | SI-5 owner provenance | Missing durable owner quotations were supplied and bound by exact committed-byte digest. | Six blockquotes once in `0e31505`, absent from `b13e9be`; current semantic digest recomputes. | A broad approval still needs an auditable citation and stated scope. | No further correction. | Independent hash/quote checks above and focused provenance suite below. |
+| SI-CR14-006 | P3 | Closed by explicit owner choice; closure accepted | `a31805a` | delegation scope/duration | The owner explicitly chose delegated judgment and preauthorization in this lane until further notice. | Section 76.2's immutable quotations. | Do not invent a shorter expiry or require the same approval again. | No further correction. | Counter-review of the quote chain and software-versus-administrative gate scope. |
+| SI-CR15-001 | P3 | Retained prospective advisory; limited to a concrete commitment | `a31805a` | potential vendor financial/contractual offers | A purchase, trial, subscription or license acceptance has not occurred. The advisory addresses what to do if an offer requires a commitment. | Both existing inquiries explicitly request metadata and prohibit initiating a purchase/subscription or sending market rows; current searches found no vendor offer. | Preserve the commitment question without treating it as a blocker to the current authorized read-only qualification task. | No code or hypothetical owner-choice change. | Read-only mailbox evidence in 79.3; no outward action this round. |
+| SI-SRC-20260928-001 | P2 | Open factual gate | N/A (existing) | historical release/correction availability | A scheduled release time does not establish the actual dissemination/cutoff of each historical vintage. | Product schedules plus absent vendor answers. | Canonical features must not be available before public dissemination. | No source admitted. | Evidence matrix in 79.3. |
+| SI-SRC-20260928-002 | P2 | Open factual gate | N/A (existing) | original/correction vintages | A revision flag or latest value does not establish retained original and correction files or a complete affected-release exclusion. | Current public specifications do not supply that archive evidence; no written reply or manifest arrived. | Later corrections must not contaminate historical decisions. | No source admitted. | Evidence matrix in 79.3. |
+| SI-SRC-20260928-003 | P2 | Open factual gate | N/A (existing) | coverage, PIT inputs and rights | Exact historical venues/security identity, delisted coverage, PIT daily prices/volumes, terminal values and account-specific local/QC rights remain unproven. | Product-level metadata and source inquiry questions; no executed entitlement or coverage receipt. | A parser or Cloud entitlement cannot authenticate the required input population or processing rights. | No adapter, ingest or empirical test started. | Evidence matrix in 79.3. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared/out of lane | N/A (existing) | shared integration history | The recorded shared-history owner sentence remains absent from lane-visible shared history. | Retained sections 41, 43-77. | This lane documents shared findings without changing shared files. | None in this lane. | Open; not expanded into a new shared audit. |
+
+The local lineage test is specifically a check that P1A's callback-free P0
+serializer equals P0's own public payload/hash. It is not claimed to detect
+removal of the enclosing batch's source-digest refusal. The coherent-rebinding
+test instead isolates the complete batch's row-to-source-batch binding after
+the standalone row's public hash, private bound hash and record identity have
+all been changed coherently. This narrower attribution supersedes any reading
+of `7cd39a0`'s message as coverage of the separate enclosing-digest guard.
+
+Prior non-defect dispositions `SI-CR14-003` (layered preflight guards) and
+`SI-CR14-005` (incorrect reviewer probe) remain retained and closed.
+
+### 79.3 Current mailbox and public metadata evidence
+
+At the 2026-10-05 check (UTC clock observation **18:18:53**), direct reads of
+both exact Gmail threads returned one message each: the original `SENT`
+inquiry, with no received response or attachment:
+
+| Inquiry | Exact message/thread ID | Sent time (UTC) | Current observed contents |
+|---|---|---|---|
+| NYSE Group Short Interest historical vintages and license | `1a0f0d951513b761` | `2026-09-30T05:46:09Z` | Original inquiry only; no reply |
+| Nasdaq Short Interest Report historical vintages and license | `1a0f0d9ae9fda1e6` | `2026-09-30T05:46:33Z` | Original inquiry only; no reply |
+
+Mailbox searches used `in:anywhere after:2026/09/29` for the exact
+pre-purchase subjects, any received `short interest`/`short-interest` message,
+and mailer-daemon/postmaster messages mentioning either sales recipient. The
+subject query returned only the two sent inquiries; received-message and
+matching-bounce queries returned zero, with no pagination token. Earlier
+sender-domain searches likewise returned zero. This is a bounded observation
+of the connected mailbox, not proof of vendor receipt or permanent absence of
+a reply. No new email, draft, label or follow-up was sent or changed.
+
+Current official public documents were also checked without requesting market
+rows, entering a subscription flow or accepting any terms:
+
+| Requirement | Observed product metadata | Why the source gate remains open |
+|---|---|---|
+| Actual historical availability | [NYSE v1.7 specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf) gives a scheduled 2 p.m. ET release; [Nasdaq Trader](https://www.nasdaqtrader.com/trader.aspx?id=ShortInterest) describes release after 4 p.m. ET. | Schedules do not authenticate actual first-dissemination/correction timestamps or historical exceptions. |
+| Preserved vintages | NYSE documents a flag indicating prior-period revisions and settlement-dated filenames. | The reviewed specification does not establish immutable original files, all correction versions, their actual times, or a complete affected-release exclusion. This is an unresolved evidence requirement, not a claim that the vendor has no such archive. |
+| Historical population and identity | [NYSE catalog](https://www.nyse.com/data-products/catalog/nyse-group-short-interest) advertises historical NYSE/Arca/American data; v1.7 also lists a market code for NYSE Texas and includes symbols/CUSIPs. | Historical venue scope needs reconciliation; delisted retention, effective-dated identity and full eligible-population coverage are not demonstrated by field names. |
+| Rights and other PIT inputs | Public product/specification descriptions are available; no account-specific executed license, source manifest or daily-price/volume coverage evidence was supplied. | Local retention and QC third-party processing rights, PIT candidate windows and terminal values remain unverified. |
+
+### 79.4 Validation, authority accounting and quality
+
+Exact validation on the unchanged `e00aa35` code/test snapshot:
+
+- Preserved local regressions in an unmutated process: **2 passed, 53
+  deselected in 107.39s**.
+- Coherent callback-free P0 serializer drift, isolated in memory: the lineage
+  test became **1 failed in 81.86s**, at its independent source-hash equality
+  assertion. The changed helper was restored in `finally`.
+- Removal of only the complete-batch row-binding guard, isolated in memory:
+  the coherent-rebinding test became **1 failed in 104.51s**, because no
+  exception was raised. The original method was restored in `finally`.
+- SI-5 protocol, blocked preflight, import boundary and active-document
+  selection: **126 passed in 4.71s**.
+- Eighteen-file lane **collection only: 817 tests in 2.78s**, exactly the
+  remote 815 plus the two retained local cases. This is not an 817-pass run.
+- Active-document checks after the initial section-79 update: **69 passed in
+  4.21s**; final post-record verification: **69 passed in 2.15s**.
+- Lane-scoped compilation: **exit 0**; `git diff --check`: **clean**.
+- Production and percentile-test Git blobs remain byte-identical to
+  `e00aa35`: `17cc51cfa628ce9aad8b88269cb8e8a6074ba3a2` and
+  `0dd039adba38e6a03e8807896b686a0d11a65101`, respectively.
+- Windows host: CPython **3.13.14**, pytest **9.1.1**. The checks emitted no
+  pytest warnings.
+
+All mutations are process-local; no source file was edited, and no
+test/mutation process shared altered module state. The two red/green checks
+confirm the specific claims in 79.2 rather than claiming a new whole-lane
+audit or blanket coverage of every percentile guard.
+
+No full lane or repository suite is run by Codex, under the owner rule that
+Claude owns the complete lane suite. The current code/test snapshot equals
+`e00aa35`; this round changes only the lane record. Read-only public metadata
+and the already-sent inquiry threads were accessed. No credential value, QC
+account/history, licensed row, price/outcome, final holdout, market-row request,
+provider acquisition, contract acceptance, broker, operator database,
+scheduler, deployment or order was accessed or changed. **Allocated alpha: 0.
+Permanent look IDs: none. Authorized outcome looks: 0. Consumed outcome looks:
+0.**
+
+**Claude's bounded record submission quality: 9/10.** The exact row, quoted
+provenance, supported closures and stated test limits check out. Its financial
+advisory is useful prospectively, while its broad wording about acting on
+replies must not be used to reopen already-granted read-only authorization.
+**Preserved local regressions: advisory quality 9/10**, with the narrower
+serializer-fidelity attribution above; formal independent review remains due
+after publication. This round supplies no evidence of predictive efficacy.
+
+### 79.5 Conditional third step and next review handoff
+
+No factual source gate cleared, so the third requested step cannot start.
+Existing protocol fields remain unbound for development/validation dates,
+terminal-value and order-cashflow rules, power, source rights and actual PIT
+coverage. The four candidate lookbacks remain unselected. No actual return is
+read to choose a lookback or infer power.
+
+The concrete next evidence is a written vendor reply, metadata-only
+version/availability manifest, historical coverage/identity description and
+applicable license/entitlement evidence. A source adapter may then be defined
+against that authenticated contract. Its review and the coverage/power/dated
+look specification must precede any actual-outcome or QC run. A generic parser
+with invented timestamp/vintage conventions would not complete the requested
+PIT adapter.
+
+The completed work is counter-review, retained-test countercheck and source
+assessment. The source blocker and advisory/independent-review boundaries must
+remain explicit in the next handoff. Claude should review the exact local
+regression commit, sync merge and this record at the next pushed snapshot,
+including the merge result and the unchanged source gates.
+
+**No push in this round.** The current instruction authorizes checks and the
+conditional third step, but does not expressly replace the more specific
+no-partial-push rule preserved at this factual source gate in sections 66.1,
+76.4 and 76.5. Section 76.6's explicit checkpoint exception is limited to the
+2026-09-30 push and expressly grants no second push. The completed local
+counter-review/assessment record is committed for a concrete handoff; a new
+direct checkpoint instruction is required to publish it while the source
+blocker persists. The session-ledger row is explicitly labelled local-only;
+it records no new push.
+
+The next checkpoint review range, if authorized, is `a31805a..local HEAD`:
+the preserved Claude test commit `7cd39a0`, the sync merge `e00aa35` and this
+record commit. The exact head and ordered range must be rechecked before any
+single push. That publication would enable review of the local snapshot; it
+would not admit a source or complete the conditional PIT-adapter milestone.
+
+## 80. Source fallback execution and prospective archival readiness — 2026-10-05
+
+### 80.1 Exact instruction, scope and administrative deadline
+
+After Codex recommended (1) bounded follow-up through alternate official
+contacts, (2) parallel alternative licensed-archive qualification, (3) complete
+correction exclusion if an authenticated exhaustive inventory exists, and
+(4) prospective as-acquired collection if historical originals cannot be
+obtained and suitable rights exist, the owner instructed:
+
+> do 1234
+
+`SI-AUTH-20261005-01` records this bounded fallback instruction, alongside
+the standing delegation quoted in 76.2. It authorizes the non-secret
+metadata-only outreach and readiness assessment below. The third and fourth
+routes retain their factual conditions; the instruction cannot establish an
+archive, inventory or license. No response is not proof that originals do
+not exist. No account, trial, purchase, subscription or contractual acceptance
+is initiated. Any concrete commitment remains subject to `SI-CR15-001`.
+
+`SI-DEC-20261005-01` sets the response deadline to **2026-10-19 17:00
+America/Los_Angeles (2026-10-20T00:00:00Z)**: ten Monday–Friday administrative
+days after October 5, without implying an exchange/vendor holiday calendar.
+All four messages request a response by October 19. At the deadline, lack of
+evidence keeps a candidate unqualified; it neither proves permanent
+unavailability nor permits a substitute backtest. Alternatives are pursued
+now, rather than waiting for the deadline. No automation, recurring monitor,
+reminder, calendar event or collection scheduler was created; the previously
+stopped monitor remains stopped.
+
+Initial tree: clean `codex/strategy-short-interest` at
+`165ffb351b0191eba53e9a9148bf97f9f1a54b31`, three ahead of the last fetched
+remote `a31805afd7720c700527a6f3e42912e850deffa8`. This is an administrative
+source-qualification/design record, not a new formal review range or a
+completed empirical/software milestone. No branch switch or new branch.
+
+### 80.2 Verified outgoing inquiries and bounded mailbox observation
+
+Before sending, direct reads of both original exchange threads contained only
+their original sent inquiry. An `in:anywhere after:2026/09/29 -in:sent
+-in:drafts` received search covering short-interest terms and the NYSE,
+Nasdaq and ICE sender domains returned zero matches, with no continuation
+page. This is a bounded observation, not a delivery guarantee.
+
+Gmail returned `SENT` for each action below. Subsequent direct thread reads
+verified subjects, recipients, copied contacts, content and send dates:
+
+| Action | Recipient and alternate route | UTC sent | Message / thread IDs |
+|---|---|---|---|
+| One NYSE follow-up, replying to the existing inquiry | `datasales@nyse.com`; cc `support@nyse.com` | 2026-10-05T18:47:18Z | message `1a10d6447ad68a59`; thread `1a0f0d951513b761` |
+| One Nasdaq follow-up, replying to the existing inquiry | `datasales@nasdaq.com`; cc `dataproducts@nasdaq.com` | 2026-10-05T18:47:22Z | message `1a10d645bed501c9`; thread `1a0f0d9ae9fda1e6` |
+| One QuoteMedia alternative-archive inquiry | `sales@quotemedia.com` | 2026-10-05T18:49:47Z | message/thread `1a10d668ead37067` |
+| One Intrinio alternative-archive inquiry | `sales@intrinio.com` | 2026-10-05T18:49:42Z | message/thread `1a10d667a3035a5b` |
+
+The alternate exchange contacts are supported by the
+[NYSE SI v1.7 specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf)
+and [Nasdaq's 2026 contact notice](https://www.nasdaqtrader.com/TraderNews.aspx?id=ETA2026-6).
+Alternative recipients were verified on the current official
+[QuoteMedia contact page](https://quotemedia.com/contact) and
+[Intrinio consultation page](https://intrinio.com/request-a-consultation).
+QuoteMedia's publicly encoded sales email was resolved from that official
+page by the read-only metadata researcher; no private address was inferred.
+
+All messages ask for first-disseminated/corrected versions and availability
+evidence, an exhaustive affected-release inventory if originals are absent,
+historical listed/delisted coverage and effective-dated identity, prospective
+raw-file archival/retention rights, local research and separate QC Cloud
+processing terms. Authenticated dates with conservative next-open handling
+are explicitly allowed as a timing possibility. Intrinio is asked to confirm
+the upstream official source; its endpoint name is not treated as proof.
+All four explicitly prohibit sending market rows, opening accounts,
+activating trials, starting purchases/subscriptions or treating the inquiry
+as acceptance of terms. No credential, account identifier, repository code,
+licensed row or outcome was sent. A requested quote is for later consideration
+only. No further outreach, form submission or phone call was made.
+
+### 80.3 Alternative-source screening: candidates, not admission
+
+`SI-DEC-20261005-02` prioritizes QuoteMedia and Intrinio for this bounded
+inquiry, with ORTEX's official component as a third lead. NYSE/Nasdaq are
+not mandatory canonical vendors. Equivalent authenticated evidence may come
+from documented archives and applicable terms without a salesperson replying.
+
+| Candidate | Primary metadata evidence | Disposition and unresolved facts |
+|---|---|---|
+| QuoteMedia | [Official support](https://support.quotemedia.com/support/solutions/articles/13000053834-short-interest-data) describes twice-monthly exchange-sourced SI with Nasdaq/NYSE/Arca/American entitlements and excludes OTC. | Inquiry sent. Historical SI depth, delisted/effective-dated identity, first-vintage/correction retention and actual availability, exhaustive exclusion inventory and local/QC rights remain unverified. Current-value access or display entitlement is insufficient. |
+| Intrinio | [Historical SI endpoint schema](https://data.intrinio.com/documentation/web_api/get_security_short_interest_v2) documents settlement date, current/previous short shares and security identifier options. | Inquiry sent. Upstream official source, exchange/history scope, effective-dated identities, original/correction availability and retention, complete inventory and archival/QC rights remain unverified. No API request was made. |
+| ORTEX official component | [Official SI endpoint](https://docs.ortex.com/reference/stock_official_short_interest_list) documents officially filed SI including US coverage and settlement-date queries. | Third metadata lead only; not contacted. Earliest dates, full listed/delisted scope, original/corrected vintages, availability and rights remain unverified. Its daily estimates are not substitutes. |
+| Current Compustat `SEC_SHORTINT` | [S&P replacement advisory](https://www.support.marketplace.spglobal.com/en/datasets/compustat/naandglobal/compustat-short-interest-data-replacement-service-advisory.pdf) states that on February 24, 2025 the prior twice-monthly data, including all history, was replaced with Total Demand Quantity (quantity on loan). | Exclude this replacement concept from canonical-source candidates. The familiar field/schema does not preserve the official-snapshot semantic. This does not reject all S&P products or assert the state of every separately retained legacy copy. |
+
+The indexed legacy QuoteMedia `ShortInterestBySymbol` brochure URL returned
+404 when checked by the metadata researcher; that endpoint name is not pinned
+as a current acquisition contract. S&P's separate legacy Public Datafeed,
+FactSet/S3 raw components and LSEG exchange-source content are lower-priority
+leads requiring specific current confirmation; blended forecasts, lending
+measures and model ranks themselves cannot replace official snapshots. No
+examined public document authenticates a complete first-vintage archive or
+exhaustive correction inventory. This is unresolved qualification, not proof
+that no vendor has one.
+
+### 80.4 Complete correction-exclusion feasibility contract
+
+The existing permitted alternative to original-vintage retention remains
+conditional on a comprehensive authenticated correction inventory. None was
+obtained in this round. Before any exclusion-based source is admitted:
+
+1. Bind the full proposed dates/security population and every expected release
+   to source/version identities. Reconcile corrections, including late or
+   backdated corrections, against the complete release inventory.
+2. Establish that an unflagged item is unchanged over the relevant history;
+   today's flag alone is insufficient. FINRA describes latest-only corrected
+   values; NYSE's flag concerns the prior reporting period. Neither reviewed
+   specification guarantees the necessary exhaustive inventory.
+3. Freeze exclusions and retain release-level refusals/counts before outcomes.
+   Audit S1's authenticated **immediate prior-cycle** dependency; do not bridge
+   missing prior evidence to an older cycle. A later decision may legitimately
+   use a correction known by its cutoff, so dependency closure is evaluated
+   against availability rather than blindly excluding every adjacent release.
+4. Preserve authentic percentile populations. Removing selected corrected
+   stocks does not automatically authenticate the original release's ranking.
+   Compare eligibility candidates on the required common cohort; no convenient
+   replenishment or post-result sample change.
+5. Evaluate release-level coverage and power from the frozen metadata and
+   permitted assumptions before returns. An inadequate remaining sample is a
+   no-go, not a license to relax the exclusions.
+
+Primary revision descriptions:
+[FINRA catalog](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+and [NYSE specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf).
+No exclusion was applied, empirical cohort was constructed or return was read.
+
+### 80.5 Prospective collection readiness and activation conditions
+
+The fourth route is prepared as a **conditional design**, not running
+collection. Qualified local archival rights may allow a local route without
+QC processing; QC permission remains separately necessary before QC use.
+No product or local retention entitlement is established today. No historical
+archive's nonexistence is inferred from the missing emails.
+
+Reuse the existing lane `CollectionManifest`, `ReleaseCalendarEntry`,
+`ShortInterestSnapshot` and `ShortInterestVintage` contracts and the existing
+immutable publication helper. They already bind schema/source/version,
+retrieval/observation clocks, raw-artifact hashes, normalized revision lineage,
+content identities and named refusals. This is reuse analysis only; no shared
+helper or import boundary changed.
+
+Before a source-specific collector is implemented/activated, its reviewed
+contract must specify:
+
+- The exact licensed/public product, authenticated origin and transport,
+  source schema/version, applicable local archive/retention rights and their
+  limits. Public accessibility alone is not processing permission.
+- An immutable **raw-byte acquisition artifact** binding source/file/version,
+  retrieval start and verified completion times, original bytes/checksum,
+  provenance and rights receipt to the normalized vintage. Existing
+  `write_vintage` persists normalized manifest/calendar/snapshots/refusals,
+  not the original transport file. A checksum proves byte integrity, not
+  authentic origin or original-publication status.
+- Expected releases, conservative acquisition/retry policy, gaps, timeouts,
+  schema changes and corrections, with refusals preserved. Periodic polling
+  cannot prove versions that appeared and disappeared between captures;
+  any original-vintage claim needs an adequate delivery/version guarantee.
+- A prospective usable cutoff no earlier than verified acquisition completion
+  and all source/input availability bounds. Current
+  `snapshot_execution_cohort` computes publication/revision/volume/denominator
+  availability, not operational receipt completion; it must not alone be used
+  to backdate a prospective decision to a scheduled publication time.
+- PIT security identities, denominators and candidate-window price/volume
+  coverage, with corporate-action/delisting/terminal treatment before empirical
+  outcomes. A newly collected SI file does not establish its companion inputs.
+
+Date-only originals can retain conservative following-open semantics; no
+precise correction instant is invented to fill a timestamp field. Collection
+begins with actual authorized acquisition and cannot recreate prior originals.
+Power, dates and research looks must be frozen separately before outcomes;
+the synthetic protocol's source/outcome/QC/trading authority remains false.
+No generic collector, provider adapter or scheduler is added while transport,
+versioning and rights are unresolved. Existing source-contract fields may
+require a reviewed source-specific extension; no new enum value is presumed.
+
+### 80.6 Gate ledger, validation and next handoff
+
+No new confirmed defect in the current synthetic code is claimed. The raw-byte
+and acquisition-time items above are requirements before prospective admission,
+not evidence of an active live collector defect. Current dispositions remain:
+
+| Finding | Priority | Current evidence / disposition |
+|---|---|---|
+| `SI-SRC-20260928-001` | P2 | Open: actual historical release/correction availability is unverified. Four metadata inquiries do not authenticate it. |
+| `SI-SRC-20260928-002` | P2 | Open: no original/correction archive or comprehensive affected-release inventory established; exclusion is not yet feasible. |
+| `SI-SRC-20260928-003` | P2 | Open: historical coverage/identity, companion PIT inputs, terminal values and account-specific local/QC rights remain unverified. Prospective local archival rights are also unbound. |
+| `SI-CR15-001` | P3 | Prospective commitment advisory retained. No concrete offer/acceptance, purchase or trial occurred. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Shared/out of lane, unchanged and unfixed. |
+
+The initial active-document consistency check passed **69 tests in 13.33s**,
+with no pytest warnings, using the verified installed user launcher (CPython
+**3.13.14**, pytest **9.1.1**). The bundled runtime lacked pytest and direct
+Store-package execution was unavailable; the existing launcher worked under
+approved execution. No dependency was installed or changed. After the ledger
+edits, the active-document checks passed **69 tests in 2.93s**, again without
+pytest warnings. Lane-scoped compilation exited **0**. `git diff --check`
+is clean; the sole changed file is this lane record. A read-only
+implementation-time quality check found no inaccurate source-admission,
+exclusion, collection, deadline, monitor, purchase or push claim; it is not
+formal independent review of a local snapshot. No code/test file changed;
+source screening and readiness
+are not described as a completed next empirical milestone. No full
+lane/repository suite is run by Codex. This record is committed locally; the
+exact commit identifier is reported at handoff rather than self-embedded.
+
+No source, licensed market row, actual price/return, outcome, final holdout,
+QC history/project/upload/compile/job, broker, operator database, deployment,
+order or trading access was used. No account/trial/subscription/purchase or
+terms acceptance occurred. Allocated alpha **0**; permanent look IDs **none**;
+authorized/consumed outcome looks **0/0**. Only the four separately authorized
+administrative emails changed an external account; no scheduler was changed.
+
+Next: evaluate qualifying metadata/terms and authentic archive or exclusion
+evidence when supplied. For prospective-only availability, establish local
+archival rights and the exact acquisition contract before implementation or
+collection. Silence at the recorded deadline keeps sources unqualified and
+routes the decision to other evidence paths; it does not create market
+evidence or trading authority. **No push:** `do 1234` approves fallback work,
+not a new checkpoint override of the specific no-partial-push rule. The prior
+local range plus this record stays unpublished; frozen project-wide documents
+are untouched. Independent Claude review remains due on the next expressly
+authorized exact pushed snapshot.
+
+## 81. Standing round-end push instruction and accumulated handoff — 2026-10-05
+
+### 81.1 Verbatim owner direction and durable publication rule
+
+After Codex stated that `bb9c688` was local-only under the old no-partial-push
+rule, the owner instructed:
+
+> everytime you finished a round, push
+
+`SI-AUTH-20261005-02` records a **standing Short Interest lane publication
+instruction**: after each completed, documented and validated bounded round,
+make one combined push of that round's accumulated committed range. This
+includes a completed counter-review, implementation, documentation or
+source-qualification round whose next milestone is factually blocked. A
+separate checkpoint push request is no longer required. The instruction also
+authorizes publication now of the previously accumulated local range.
+
+This later owner instruction supersedes the source-blocker **publication**
+restrictions in sections 66.1, 76.4-76.6, 79.5 and 80.6. It does not declare a
+blocked implementation complete, relax validation, accept an unreviewed
+snapshot, or establish source rights/coverage. All provider/market-row,
+outcome/look/holdout, QC, financial/contractual, broker, database, deployment,
+order and trading gates remain as recorded. The single-push-per-round rule,
+dedicated worktree/branch, frozen project-wide documents and serialized
+Claude-independent-review/Codex-counter-review workflow remain binding.
+No branch is switched or created and no history is rewritten.
+
+### 81.2 Exact accumulated range and verification boundary
+
+Before this documentation-only instruction record, the tree is clean at
+`bb9c6882a02ac956cd1911afdeeaf6478133b385`. A fetch of **only**
+`refs/heads/codex/strategy-short-interest`, without tags, confirms that the
+remote head is unchanged at
+`a31805afd7720c700527a6f3e42912e850deffa8`. No new Claude commit appeared,
+so the counter-review in section 79 is not silently reopened or extended.
+
+The accumulated unpublished range, in topological order, is:
+
+| Commit | Scope and existing evidence |
+|---|---|
+| `7cd39a0c8987e3a0a7c862d93b80f58281cc0ea6` | Preserved local Claude percentile-regression tests; advisory red/green countercheck in 79.2/79.4; formal review still due after publication. |
+| `e00aa3591acfa6783527292230f5f54da5677e46` | Same-branch sync merge preserving both histories and the local tests; merge conflict resolution and focused checks in section 78. |
+| `165ffb351b0191eba53e9a9148bf97f9f1a54b31` | Accepted counter-review of pushed `a31805a`, retained-test countercheck and unresolved vendor source evidence, section 79. |
+| `bb9c6882a02ac956cd1911afdeeaf6478133b385` | Four verified metadata-only emails, October 19 response deadline, alternative-source screening and conditional exclusion/prospective archival requirements, section 80. |
+| This instruction/handoff record commit | Standing push direction, current status and exact handoff; no code/test change. |
+
+Publish this complete range **once**, using a normal non-force push of the
+current validated `HEAD` to only `refs/heads/codex/strategy-short-interest`.
+Verify remote-head equality and a clean worktree afterward. If concurrent
+remote work prevents a fast-forward, preserve it and stop to reconcile;
+never force publication. The committed record authorizes this operation;
+actual push success and exact final hash must be established from Git's
+response and the remote check, not assumed in advance.
+
+### 81.3 Validation and review handoff
+
+This instruction record changes only this lane document. The code/test tree
+remains the same as the section-80 checkpoint. Its exact-final documentation
+check was **69 passed in 4.47s**, with lane compilation **exit 0** and a clean
+diff check. The first check of this latest instruction record and ledger
+passed **69 tests in 13.86s**, with no pytest warnings. The final
+post-count-edit check and final remote hash are reported in the conversation
+handoff. No full lane/repository suite is run by Codex; the source and test
+checks in sections 78-79 retain their original attribution and limits.
+
+Claude's next review covers **every commit in
+`a31805a..published HEAD`**, including the preserved test commit and the sync
+merge result. The snapshot contains no new source adapter, real collection,
+backtest or empirical result. Source P2s `SI-SRC-20260928-001..003`, shared
+out-of-lane P2 and the prospective financial/contractual advisory remain
+unchanged; authorized/consumed outcome looks **0/0**. No vendor email,
+provider/QC account, scheduler, broker or trading action was added in this
+publication round. Git fetch and the expressly authorized push are the only
+external operations in this round.
+
+## 82. Received exchange responses: sales information, not source admission — 2026-10-05
+
+### 82.1 Receipt classification and privacy boundary
+
+Following the owner's notification of a received response, Codex read the
+four existing inquiry threads and searched received messages across spam/trash
+for the relevant vendors and short-interest terms. The bounded search returned
+four received messages and no continuation page. Direct reads distinguish:
+
+| Received message | Type | Qualification disposition |
+|---|---|---|
+| NYSE sales reply, 2026-10-05T19:28:47Z; message `1a10d8a71daf49c3`, existing NYSE inquiry thread | Human sales/product response linking the public v1.7 specification and a sample-data location, with indicative content-month pricing. | Genuine response received; original/correction archive, actual availability, exhaustive inventory and applicable rights were not answered. No source admitted. |
+| Nasdaq sales response, 2026-10-05T19:00:25Z; message `1a10d706c08df680`, existing Nasdaq inquiry thread | Human routing of the inquiry to another colleague. | Routing only, with no substantive source or license answer. |
+| NYSE support acknowledgment; message `1a10d653a792906b` | Automated case-opening receipt. | Administrative receipt, not an archive, coverage or entitlement guarantee. |
+| Nasdaq support acknowledgment; message `1a10d6491b39b98a` | Automated case submission/support-channel information. | Administrative receipt, not an archive, coverage or entitlement guarantee. |
+
+QuoteMedia and Intrinio threads still contained only their outgoing inquiries
+at this check. This observation is bounded to the connected mailbox and the
+specified search/thread reads; it is not a guarantee about future replies.
+
+Only de-identified receipt/qualification summaries and opaque message
+references are recorded here. Private message bodies, individual contacts,
+phone numbers, support-case contents and the commercial quote amount are not
+published in Git. No attachment image or sample file was opened or downloaded;
+the received MIME images are not treated as data evidence. The sample link
+is an invitation to inspect data, not archival or QC-processing permission.
+
+### 82.2 Public metadata check and persistent gates
+
+The linked [NYSE v1.7 specification](https://www.nyse.com/publicdocs/nyse/data/NYSE_Group_Short_Interest_Client_Specification_v1.7.pdf)
+was checked as public schema/delivery metadata only. It documents scheduled
+2 p.m. ET delivery, settlement-dated filenames, a prior-period revision flag,
+symbols/CUSIPs and current market codes including NYSE Texas. Those fields do
+not establish original-file retention, every revision's availability or an
+effective-dated historical identity archive. The [public catalog](https://www.nyse.com/data-products/catalog/nyse-group-short-interest)
+advertises historical NYSE/Arca/American coverage; the exact historical scope,
+delisted retention and Texas transition still need reconciliation.
+
+| Existing finding | Priority | Effect of the new replies |
+|---|---|---|
+| `SI-SRC-20260928-001` | P2 | Still open: no authenticated historical release/correction availability or delay-exception manifest. Authenticated dates with conservative next-open treatment remain a possible route; exact intraday precision is not invented. |
+| `SI-SRC-20260928-002` | P2 | Still open: no preserved original/all-correction archive or exhaustive affected-release inventory. Sample access and a revision flag do not qualify either route. |
+| `SI-SRC-20260928-003` | P2 | Still open: exact historical population/identity, companion PIT inputs and terminal values, local archival rights and separate QC-processing permissions remain unverified. |
+| `SI-CR15-001` | P3 | Retained: indicative pricing is now present, but no purchase, trial or contract acceptance occurred. A concrete commitment would need its exact scope/terms and applicable owner authorization; metadata assessment remains permitted. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Shared/out of lane, unchanged and unfixed. |
+
+The quoted content-month unit is not a confirmed recurring subscription or an
+approved procurement budget. Its historical range, supplied versions, delivery,
+minimum purchase and additional fees remain unspecified; no total cost is
+extrapolated or accepted. Pricing does not establish data suitability.
+
+### 82.3 Next clarification and completed-round handoff
+
+The next useful NYSE clarification is a direct original-versus-latest-history
+answer, followed by a metadata-only settlement/version/availability manifest
+or exhaustive correction inventory, full historical scope and applicable
+local archival/retention/QC terms. The content-month unit and included versions
+must be clarified before any procurement decision. These are qualification
+questions, not a request to activate access or accept the quote. No new email,
+draft, form, account, purchase, trial or terms acceptance was made this round.
+The October 19 deadline and stopped-monitor state are unchanged.
+
+The lane-only fetch found no new remote commit: clean local and remote base
+are both `889f7ab01730268516ec0c0f18112a35fc62c06d`. This round changes only
+this record; no code/test or frozen project-wide document is modified. The
+initial active-document check passed **69 tests in 16.15s**, with no pytest
+warnings; `git diff --check` is clean. Final post-count-edit documentation and
+status checks precede the single standing-authorized round-end push; their
+results and exact remote hash are reported in the conversation handoff.
+No full lane/repository suite is run by Codex.
+
+No source is admitted, exclusion applied, collector implemented/activated,
+market row or return accessed, QC job run, or later milestone completed.
+Source/outcome/holdout/QC/broker/deployment/order/trading gates remain closed;
+authorized/consumed outcome looks **0/0**. Claude's pending exact review range
+extends from `a31805a` through the newly published record head, including this
+received-response disposition. Receipt of a sales quote does not constitute
+independent review or satisfy the factual source gates.
+
+## 83. Claude independent review — 2026-10-05 UTC (preserved percentile regressions, sync merge, counter-review, source fallback, standing push rule and received exchange responses)
+
+Reviewer: Claude, in the single named lane worktree
+`C:\git\customizedAgent\trading_agent_short_interest` on
+`codex/strategy-short-interest`, Windows, CPython 3.13.14 / pytest 9.1.1. The
+worktree is now this session's primary working directory. `git worktree list`
+reported exactly this worktree; no branch, detached, temporary, forked or
+handed-off worktree was created. Governing documents: `CLAUDE.md`,
+`docs/process/GENERAL_CODE_REVIEW_INSTRUCTIONS.md`, the parallel-workflow
+contract, the owner blueprint, the lane-owned owner-decision record, and the
+owner's standing round-end push instruction quoted in section 81.1.
+
+**Disposition: accepted after one test-only correction.** All six commits are
+accepted and no P0, P1 or P2 was found. Codex pushed the sixth, record-only
+`673aad4`, while this review's lane run was in progress; it is reviewed here
+rather than deferred, and it does not change the code/test tree the lane run
+validated. The full lane run on the published
+head surfaced one deterministic, host-dependent test failure introduced in an
+earlier, already-reviewed round; it is corrected in the lane test file only
+(`SI-CR16-002`). One P3 process note is raised about the provenance of the
+review itself: the preserved test commit in this range was authored by the
+same session that is reviewing it, so its acceptance rests on re-executed
+evidence and on Codex's countercheck rather than on this reviewer's judgment
+alone (`SI-CR16-001`). Nothing here admits a source, opens a look, sends a
+message or grants a purchase.
+
+### 83.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review head / record commit | `d528615a5e2b32286abb27451cb6ab3f8f7d1982` reviewed in section 77; record commit `a31805afd7720c700527a6f3e42912e850deffa8` |
+| Reviewed remote head | `673aad4c7e7d3fd4f7a0451753f5779a24654c32` |
+| Ordered reviewed range | `a31805a..673aad4` (6 commits: `7cd39a0`, merge `e00aa35`, `165ffb3`, `bb9c688`, `889f7ab`, `673aad4`) |
+| Ancestry | `a31805a` is an ancestor of the remote head; at review start the local branch equalled the remote at `889f7ab` with a clean tree; Codex then committed and pushed `673aad4` from this same worktree while the lane run was in progress, and the correction commit below sits directly on it |
+| Code/test tree at `673aad4` | identical to `889f7ab`: the commit changes only the lane record, so the lane run on `889f7ab` validates both |
+| Code/test delta across the range | `tests/test_short_interest_stock_percentile.py` +44/-0, entirely from `7cd39a0` through the merge; no other non-record file changed |
+| Production blob at `e00aa35` and `889f7ab` | `stock_percentile.py` `17cc51cfa628ce9aad8b88269cb8e8a6074ba3a2`, matching section 79.4 |
+| Test blob at `e00aa35` and `889f7ab` | `tests/test_short_interest_stock_percentile.py` `0dd039adba38e6a03e8807896b686a0d11a65101`, matching section 79.4 |
+| Claude commits this round | `d7f0f0a` (changes only `tests/test_short_interest_stock_percentile.py`, +11/-1) and this record commit |
+
+### 83.2 Commit dispositions
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `7cd39a0` | Two test-only P0-lineage / batch-rebinding regressions, authored by this session on 2026-09-14 | **accepted on re-executed evidence**, self-authorship disclosed (`SI-CR16-001`) |
+| 2 | `e00aa35` | Same-branch sync merge preserving `7cd39a0` against 44 remote commits | **accepted** |
+| 3 | `165ffb3` | Section 79: counter-review of `a31805a`, retained-test countercheck, mailbox and metadata check | **accepted** |
+| 4 | `bb9c688` | Section 80: four metadata-only vendor messages, response deadline, screening, exclusion and prospective-archive requirements | **accepted** |
+| 5 | `889f7ab` | Section 81: verbatim standing push instruction, accumulated range, publication | **accepted** |
+| 6 | `673aad4` | Section 82: first exchange replies classified as sales information, privacy boundary, gates unchanged | **accepted** |
+
+`7cd39a0`: see 83.3. `e00aa35`: the first-parent diff against `a31805a` is the
+lane record (+104/-2) and the test file (+44/-0) and nothing else; the test
+file at the merge equals the remote file plus exactly my 44 lines; the 37 test
+functions are unique; the eighteen-file lane collects 817 cases, which is the
+remote 815 plus 2. `165ffb3`, `bb9c688`, `889f7ab`: each is record-only, each
+replaced the status block and appended its own push-ledger row (rows for
+2026-10-05 are present three times), section numbering 78-81 is monotonic,
+and the owner's words "do 123", "do 1234" and "everytime you finished a round,
+push" are quoted verbatim where they are relied upon. The push section 81
+authorized actually happened: the remote head read back as `889f7ab` before
+this review began, and as `673aad4` after Codex's mid-review push. `673aad4`:
+record-only (+85/-1, no other file); it classifies one human NYSE sales reply
+with indicative pricing, one Nasdaq routing reply and two automated
+acknowledgments as information rather than evidence, publishes no message
+body, contact or quote amount, accepts nothing, keeps all three source P2s
+and `SI-CR15-001` open, appends its own push-ledger row, refreshes the status
+block with the reply classification while correctly keeping the statement that
+formal review of `7cd39a0` remained due (this review had not yet been
+published), and states that its lane-only fetch found the remote still at
+`889f7ab`, which matches the graph. No issue found; see `SI-CR16-003` for a
+draft finding against it that I withdrew. The test failure corrected under `SI-CR16-002` was
+introduced by `3ebddf2` on 2026-09-26, outside this range, and is not a
+finding against any of these six commits.
+
+### 83.3 The preserved test commit and the limits of reviewing it here
+
+`7cd39a0` was committed by this session in this worktree on 2026-09-14 as the
+test-only correction of my SI-3E-P1A review. It was never pushed: the
+eleven-file lane run that was to validate it outlasted the session, and the
+section-49 review of SI-3E-P1A was later written by the macOS lane session
+instead. Codex found the commit local when it synchronized the Windows
+worktree, preserved it by a non-destructive merge (section 78), and
+countered it in memory (section 79.4) while noting that a formal independent
+review was still due once published.
+
+What I can add independently is execution, not judgment:
+
+- Both function bodies at `889f7ab` are byte-identical to `7cd39a0` (AST
+  source segments, 11 and 29 lines).
+- On the published head, with byte-exact restore verified by blob id
+  (`17cc51cf...` before and after each run): drifting one literal in the
+  re-implemented P0 serializer turns the lineage test red (**1 failed, 54
+  deselected in 77.61s**); deleting the batch-level row-to-batch binding guard
+  turns the rebinding test red (**1 failed, 54 deselected in 63.88s**); both
+  pass on the restored tree (**2 passed, 53 deselected in 75.46s**). The
+  module changed once since my commit (`3ebddf2`, owner-approval binding);
+  both anchors still occur exactly once.
+- The eleven-file lane run I launched on 2026-09-14 against `7cd39a0`'s own
+  tree did complete after the session had ended: **617 passed in
+  63,958.57s** of wall time, the machine having slept for most of it. That is
+  615 plus my 2 on the pre-merge tree, and it is historical evidence for the
+  commit, not for the merged head; the merged head is covered by 83.6.
+
+I accept Codex's narrowing in section 79.2: the lineage test pins the
+callback-free serializer's equality with P0's own public payload and hash; it
+does not detect removal of the enclosing batch's source-digest refusal, and my
+commit message should not be read as claiming that. The rebinding test is the
+one that isolates the batch guard.
+
+Because the author and the reviewer are the same session, the independent
+check of this commit is Codex's. Its 79.4 countercheck was performed on the
+exact bytes now published, so it can be confirmed as formal in the next
+counter-review without rerunning anything; `SI-CR16-001` asks for that
+confirmation explicitly rather than letting the acceptance here stand alone.
+
+### 83.4 Claims executed rather than read
+
+- Section 78.1: the divergence was 1 local and 44 remote commits
+  (`git rev-list --count 7844c81..a31805a` = 44); the resolution added exactly
+  44 lines relative to `a31805a`.
+- Section 79.4: the focused selection reproduces (**126 passed in 4.22s**),
+  collection reproduces (**817 tests**), both blobs reproduce, and the two
+  in-memory red/green claims are reproduced here in file-based form with the
+  same outcomes.
+- Section 80.1: ten Monday-Friday days after 2026-10-05 is 2026-10-19, and
+  17:00 America/Los_Angeles on that date is `2026-10-20T00:00:00Z` under
+  daylight time, as recorded.
+- Section 80.5: the six lane contracts and helpers it proposes to reuse exist
+  by those names in `contracts.py`, `dataset.py` and `availability.py`.
+- Section 81.2: the five-commit accumulated range is exactly the topological
+  range I reviewed, and the remote head equals the local head.
+- On the published head before any run: active-document **69 passed**, import
+  boundary **9 passed**, lane-scoped compileall **exit 0**, `git diff --check
+  a31805a 889f7ab` **clean**.
+
+Not reproduced, and recorded as Codex's reported actions: the two Gmail
+thread reads, the four sent messages and their message identifiers, the
+public vendor and exchange documents cited in 79.3 and 80.2-80.3, and the
+QuantConnect state. This review opened no mailbox, sent nothing, visited no
+vendor page and authenticated to nothing.
+
+### 83.5 P0-P3 issue ledger
+
+No P0, P1 or P2 in the lane. Resolved and advisory items are retained.
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR16-001 | P3 | **Open; for Codex's counter-review** | `7cd39a0`, this record | review provenance, sections 79.1, 81.2, 83.3 | The Claude review range contains a commit authored by the reviewing session. Accepting one's own commit is not independent review, and the record would otherwise show it as formally reviewed by Claude alone. | Reflog and commit authorship in this worktree; sections 78-79 already name it as previously local Claude work. | The process requires an independent check; Codex's section 79.4 countercheck ran on the exact published bytes. | None to code. This section discloses the authorship and supplies re-executed evidence at the head; Codex is asked to confirm its countercheck as the formal independent review of `7cd39a0` or to contest it. | Mutation red/green and body identity in 83.3. |
+| SI-CR16-002 | P3 | **Closed by correction** | `3ebddf2` (pre-existing; surfaced while validating `889f7ab`) | `tests/test_short_interest_stock_percentile.py::test_percentile_policy_binds_committed_verbatim_owner_approval` | After pinning the owner-decision record to commit `c329d6f` by digest, the test also asserted that the working-tree copy is byte-identical to the committed blob. Git renders that pure-LF blob as CRLF on a `core.autocrlf=true` checkout, so the assertion fails on this Windows host on every run and can never pass here, while the macOS host never sees it. A lane whose suite is red on one of its two hosts cannot be validated there. | Full lane on `889f7ab`: **1 failed, 816 passed in 11,389.90s**; isolated rerun fails identically at the worktree assertion (`At index 56 diff: CR != LF`). The blob at `c329d6f` and at HEAD carries 0 CR bytes; the worktree copy carries 73 on 73 lines; the file is unchanged in history since `c329d6f`. Sweep: this is the only worktree-versus-blob byte comparison in the eighteen lane test files; the two other `git show` bindings compare committed bytes only. | `CLAUDE.md` section 9 requires tests to prove the behaviour they assert on the supported Windows environment; the intent (the owner record has not drifted since the binding) is preserved by comparing committed revisions. | Replaced the single worktree byte-equality with two host-independent assertions: `git show HEAD:<path>` equals the bound blob, and the worktree bytes equal the committed bytes after normalizing line terminators on both sides. The digest assertion and the seven verbatim-quotation assertions are unchanged. No production code changed. | Corrected test: **1 passed in 1.24s**; a one-byte edit to the worktree owner record turns it red (**1 failed in 1.54s**), restored byte-exact with the worktree blob equal to the HEAD blob `1fbc1883...`; complete percentile file on `d7f0f0a`: **55 passed in 384.09s**. |
+| SI-CR16-003 | P3 | **Withdrawn before commit; false alarm, self-reported** | `673aad4` (draft finding) | top status block | A draft of this section claimed that `673aad4` had not refreshed the status block. It had: the block at `673aad4` carries the NYSE reply, indicative pricing, Nasdaq routing, two acknowledgments and "no source gate closed", and its "formal independent review remains due" sentence was accurate until this review was published. I had read only the block's first and last lines. | The deletion side of this commit's own status replacement lists those sentences. | Verify a claim against the whole artifact before recording it; the same discipline this record applies to the implementer. | None to the record beyond this row; the ID is retained rather than reused. | This diff. |
+| SI-CR15-001 | P3 | Retained prospective advisory | `a31805a`, `bb9c688`, `673aad4` | any concrete vendor financial or contractual offer | Unchanged in substance. Section 80 sent metadata-only inquiries that explicitly decline accounts, trials, purchases and terms; section 82 records an indicative content-month price in the NYSE reply and accepts nothing. The owner scope statement matters more now that a price exists. | Section 80.2 as recorded; not independently reproduced. | Owner scope statement still useful before any offer is accepted. | None. | N/A. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open, correctly | N/A (existing) | source admission | Unchanged. Four inquiries and public metadata do not establish historical availability, vintages, coverage, identity, companion PIT inputs or rights. | Sections 79.3, 80.3-80.6. | Factual gates that only written evidence can clear. | None. | N/A. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A (pre-existing) | shared integration history | Unchanged. | Sections 41, 43-81. | Owner decision; this lane documents without changing shared files. | None. | N/A. |
+
+### 83.6 Validation
+
+All runs are on this Windows lane worktree with CPython 3.13.14 / pytest
+9.1.1. No file in the tree was edited while any run was in progress; the two
+mutation runs restored the production file byte-exactly before the lane run
+started, and the correction was applied only after the lane run had finished.
+
+- Exact eighteen-file Short Interest lane on the published head `889f7ab`,
+  launched as a detached process with the machine held awake: **1 failed, 816 passed in 11,389.90s (3:09:49)**.
+  `673aad4` changes only the record, so this run validates its code/test tree
+  too. The
+  single failure is `SI-CR16-002`, deterministic and host-dependent; no other
+  test failed and no pytest warning was emitted.
+- Complete percentile file on the corrected tree `d7f0f0a`: **55 passed in 384.09s**.
+  The correction touches one test file, so the other seventeen lane files are
+  unchanged from the run above and were not rerun.
+- Preserved regressions at the head: M2 **1 failed in 77.61s**, M1 **1 failed
+  in 63.88s**, restored **2 passed in 75.46s** (83.3).
+- Codex's focused selection (SI-5 protocol, blocked preflight, import boundary,
+  active-document): **126 passed in 4.22s**. Collection: **817 tests**.
+- Active-document consistency: **69 passed in 2.14s** before this record and
+  **69 passed in 9.85s** after it. Import boundary: **9 passed in 1.76s**.
+- Lane-scoped compileall over `research/short_interest_etf` and `tests`:
+  exit **0**. `git diff --check`: clean before and after this record.
+- Historical, for `7cd39a0`'s own pre-merge tree: eleven-file lane **617
+  passed in 63,958.57s** wall time including machine sleep (83.3).
+- No complete-repository suite was run, per the dedicated-lane direction.
+
+All work used tracked documents and synthetic/offline fixtures. No credential,
+network, provider, mailbox, vendor page, licensed row, price, outcome, shared
+holdout, ETF data, QuantConnect artifact or account, broker, operator
+database, scheduler, deployment, paper/live, order or trading surface was
+accessed. **Permanent Short Interest cell/look: unallocated. Authorized
+outcome looks: 0. Consumed outcome looks: 0.**
+
+### 83.7 Quality, scope and limits
+
+**Codex's section 79 counter-review: 9/10.** Accurate dispositions, exact blob
+and collection figures, a correct and useful narrowing of my test's claim, and
+a bounded mailbox observation stated as such. The point withheld is that its
+in-memory mutation method, while sound, cannot be reproduced from the record
+alone; the file-based reproduction here closes that. **Section 80: 9/10.**
+The fallback is executed exactly as the owner's "do 1234" directs, every
+message is bounded against commitments, the deadline is derived not asserted,
+and the exclusion and prospective-archive requirements are precise. The point
+withheld is that none of its external evidence can be verified from the
+repository. **Section 81: 10/10.** The owner's words are quoted, the
+accumulated range is exact, and the push it authorizes was made and reads back.
+**Section 82: 10/10.** The replies are classified soberly, the privacy boundary
+is exactly right, the status block was refreshed, and nothing is accepted.
+
+**This round's own quality: 8/10.** Every executable claim was reproduced, the
+full lane was run on this host for the first time since 2026-09-14, and the
+one failure it surfaced was classified by mechanism and corrected with a
+red/green proof. Points are withheld because the range includes my own commit,
+because the 2026-09-14 lane run outlasted the session that launched it, and
+because a draft of this section carried a false finding against `673aad4`
+that the diff of my own edit exposed before commit (`SI-CR16-003`); all three
+are disclosed above.
+
+Limits: everything reviewed is documentation and software behaviour on
+synthetic fixtures and says nothing about predictive value. I cannot verify
+what the owner said to Codex beyond the verbatim quotations committed in the
+record, and I did not reproduce any mailbox, vendor or QuantConnect
+observation. The lane suite now takes about three hours on this host; a run
+that long must be launched detached from the session and the machine held
+awake, or its result is lost with the session, as happened on 2026-09-14.
+
+### 83.8 Remaining gates and next authorized step
+
+1. Codex counter-reviews `d7f0f0a` and this record commit, and confirms or
+   contests `SI-CR16-001`. The NYSE clarification questions in section 82.3
+   stand as the next qualification step; none of them activates access or
+   accepts the quote.
+2. The vendor response deadline of 2026-10-19 17:00 America/Los_Angeles
+   stands; silence keeps every candidate unqualified and permits no substitute
+   backtest. Any concrete offer remains subject to `SI-CR15-001`.
+3. No source is admitted: `SI-SRC-20260928-001`, `-002` and `-003` stay open.
+   Do not substitute daily short-sale volume, and do not backtest latest-only
+   values.
+4. `SI-CR5-005` / `SI-CCR16-007` remains an owner question.
+5. Still gated: any QuantConnect history request, project, upload, compile,
+   job or backtest; every outcome join and look; lookback selection;
+   production ranking; seeds; SI-4 ETF work; portfolio stages; any purchase;
+   broker, deployment, paper/live and trading actions. The shared final holdout
+   remains sealed.
+6. Per the standing rule in section 81.1, this completed round ends with one
+   push of `d7f0f0a` and this record commit.
+
+## 84. Codex counter-review of Claude's checkpoint review — 2026-09-30 UTC
+
+Preserved from local commit `212d645a3d2f4a621171c912f2a32fd6167e9058`,
+where this was section 78. Only its headings are renumbered to avoid the
+published sections 78–83; the original review, ledger and validation text
+below is retained. Its local-only publication statements and waiting-monitor
+observation describe 2026-09-30, not the current state. Section 81 supersedes
+that publication restriction, and the owner stopped the exchange monitor on
+2026-10-05. The qualifications remain applicable: section 79's unqualified
+acceptance shorthand does not erase this disposition or the SI-CCR25 ledger.
+These are historical macOS results, not validation of the newer remote tree.
+
+### 84.1 Exact range and disposition
 
 The physical designated worktree, lane branch and clean local tree were checked
 before inspecting the remote. The exact pushed Claude range after
@@ -10312,7 +11234,7 @@ is **815 passed in 3,259.82s**. Codex did not rerun that full suite.
 |---|---|---|
 | `a31805afd7720c700527a6f3e42912e850deffa8` | Review section 77, current status and reconstructed append-only push-ledger row | **Accepted after record-only qualification.** `SI-CR15-002` is confirmed and its reconstructed `614214a..d528615` row matches section 76 and the pushed three-commit range. The four P3 precision findings below are corrected in the current status and this superseding counter-review; Claude's original review text and append-only push ledger are retained for audit. No code or test correction is needed. |
 
-### 78.2 Persistent P0–P3 counter-review ledger
+### 84.2 Persistent P0–P3 counter-review ledger
 
 No new P0–P2 arose from `a31805a`. The three source-admission P2s and the
 shared out-of-lane P2 remain open; “no P0, P1 or P2 in the lane” in section
@@ -10335,7 +11257,7 @@ commitment is not made under the general standing delegation. The source P2s
 `SI-SRC-20260928-001`, `-002` and `-003`, and shared out-of-lane P2
 `SI-CR5-005` / `SI-CCR16-007`, remain open without a lane fix.
 
-### 78.3 Focused verification, exclusions and next step
+### 84.3 Focused verification, exclusions and next step
 
 On the exact `a31805a` code tree, Codex ran only the SI-5 offline protocol and
 Short Interest import-boundary files: **43 passed in 0.97s**. The corrected
@@ -10358,3 +11280,90 @@ obtain exact scoped authority and independently verify the offered facts and
 rights. No new delegated approval or decision was exercised in this
 counter-review. Claude's full-lane validation remains Claude-reported, not
 independently rerun by Codex.
+
+## 85. macOS lane reconciliation — 2026-10-05
+
+### 85.1 Exact owner direction and preserved histories
+
+The owner instructed:
+
+> disarm the monitor. then sync the lane and let me know what the next step is
+
+After the divergence was reported, the owner instructed:
+
+> reconcile the one local commit with the 8 remote commits. then suggest the next steps
+
+`SI-AUTH-20261005-MAC-SYNC` records this direct synchronization authority.
+`SI-DEC-20261005-MAC-SYNC` records the routine document-layout choice to retain
+remote sections 78–83 and relocate the complete earlier macOS review to
+section 84. No financial, source, look or execution choice changes.
+
+| Graph item | Exact value |
+|---|---|
+| Physical worktree | `/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest` |
+| Existing branch | `codex/strategy-short-interest` |
+| Local parent | `212d645a3d2f4a621171c912f2a32fd6167e9058` |
+| Matching fetched remote parent | `85e61a4dd7755d21fcd25a037f4da9c2d233fd3e` |
+| Common ancestor | `a31805afd7720c700527a6f3e42912e850deffa8` |
+| Divergence | 1 local / 8 remote commits |
+| Method | Same-branch merge preserving both histories; no reset, rebase or force push |
+
+All eight remote commits are imported intact; this table records scope, not
+a new review disposition:
+
+| Commit | Imported scope |
+|---|---|
+| `7cd39a0c8987e3a0a7c862d93b80f58281cc0ea6` | Two preserved percentile regressions |
+| `e00aa3591acfa6783527292230f5f54da5677e46` | Previous Windows synchronization |
+| `165ffb351b0191eba53e9a9148bf97f9f1a54b31` | Counter-review and source assessment |
+| `bb9c6882a02ac956cd1911afdeeaf6478133b385` | Source fallback inquiries and archive gates |
+| `889f7ab01730268516ec0c0f18112a35fc62c06d` | Standing round-end push rule |
+| `673aad4c7e7d3fd4f7a0451753f5779a24654c32` | Exchange-response qualification record |
+| `d7f0f0ad080b16fad2d973f48d5932d88f94e964` | Checkout-independent owner-binding test |
+| `85e61a4dd7755d21fcd25a037f4da9c2d233fd3e` | Claude section-83 review and ledger |
+
+The only conflict is this lane record's current status and appended sections.
+All published remote sections and previous push-ledger rows remain intact.
+The local section-78 body, four SI-CCR25 findings and original macOS results
+are retained in section 84 with only heading renumbering and a provenance note.
+Its qualifications supersede contradictory historical shorthand in section 79
+without rewriting that history. Every code/test and shared file equals the
+remote `85e61a4` tree; no new production or test behavior is introduced.
+
+### 85.2 Verification and continued round
+
+The two preserved percentile regressions, imported owner-binding test and
+import-boundary selection passed **12 tests in 24.35s**. Active-document
+consistency passed **69 tests**. Lane compilation exited **0**; retained-section
+fidelity, remote code/test equality and diff checks passed. The final record
+wording is rechecked before commit. Host: macOS, CPython **3.13.15**.
+No complete lane or repository suite is run by Codex.
+
+The owner then instructed:
+
+> ok, after you are done reconciling, proceed to counter review claude's commits, then implement the next milestone. let me know if any owner decision/approval is needed
+
+`SI-AUTH-20261005-MAC-ROUND` records this next-stage authority. The merge is
+committed locally first, followed by counter-review of both `d7f0f0a` and
+`85e61a4` and the SI-CR16-001 independence question. A next milestone starts
+only when its factual gates permit. The completed bounded round ends with one
+normal push under section 81, with root, branch, HEAD, status and the matching
+remote rechecked. No intermediate push is made.
+
+### 85.3 Vendor context and monitor state
+
+NYSE's sales reply is already recorded in section 82. The interrupted monitor
+check also read the later Nasdaq message `1a10f256cd9e08e8`, sent at
+`2026-10-06T02:57:21Z` (October 5 locally). It asks whether the requester
+already accesses this or similar data and through which entity. This is a
+business clarification, not evidence of archive vintages, coverage, availability
+or rights. Only this de-identified summary is recorded; private bodies,
+personal contacts and quote amount remain outside Git.
+
+The exchange-reply monitor is **PAUSED** at the owner's request, verified by
+the automation tool. This reconciliation sends no email and accepts no
+purchase, trial, account or terms. It opens no sample, provider market rows,
+QC job or outcome. The existing October 19 vendor deadline remains in force;
+stopping the monitor does not qualify a source. All three source P2s and the
+shared P2 remain open; candidate windows **20/60/120/252** remain unselected
+and authorized/consumed real outcome looks remain **0/0**.

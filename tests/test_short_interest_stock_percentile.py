@@ -244,7 +244,17 @@ def test_percentile_policy_binds_committed_verbatim_owner_approval():
         capture_output=True,
     ).stdout
     assert sha256(committed_bytes).hexdigest() == payload["owner_directive_sha256"]
-    assert (repository_root / directive_path).read_bytes() == committed_bytes
+    head_bytes = subprocess.run(
+        ["git", "show", f"HEAD:{directive_path}"],
+        cwd=repository_root,
+        check=True,
+        capture_output=True,
+    ).stdout
+    assert head_bytes == committed_bytes
+    worktree_bytes = (repository_root / directive_path).read_bytes()
+    assert worktree_bytes.replace(b"\r\n", b"\n") == committed_bytes.replace(
+        b"\r\n", b"\n"
+    )
     directive = committed_bytes.decode("utf-8")
     assert (
         "> yes this works. Approved. Freeze the proposed defaults and implement "
@@ -1211,6 +1221,50 @@ def test_row_and_batch_payloads_reject_direct_authority_sabotage():
     forged_batch = _clone_batch(projection, production_authoritative=True)
     with pytest.raises(StockPercentileError, match="non-production"):
         forged_batch.to_payload()
+
+
+def test_source_batch_lineage_equals_the_p0_batch_own_hash():
+    source = _inventory()
+    projection = _projection()
+    expected_sha256 = source.sha256
+    assert projection.source_score_order_batch_sha256 == expected_sha256
+    payload = projection.to_payload()
+    assert payload["source_score_order_batch"] == source.to_payload()
+    assert all(
+        item["source_score_order_batch_sha256"] == expected_sha256
+        for item in payload["dispositions"]
+    )
+
+
+def test_coherently_rebound_row_is_rejected_by_the_complete_batch():
+    projection = _projection()
+    rows = projection.dispositions
+    index = next(
+        index for index, item in enumerate(rows) if item.score is not None
+    )
+    row = rows[index]
+    other_batch_sha256 = "f" * 64
+    rebound_record_id = hash_payload(
+        {
+            "percentile_slot_id": row.percentile_slot_id,
+            "source_score_order_batch_sha256": other_batch_sha256,
+            "source_score_order_disposition_sha256": (
+                row.source_score_order_disposition_sha256
+            ),
+        }
+    )
+    rebound = _clone_disposition(
+        row,
+        source_score_order_batch_sha256=other_batch_sha256,
+        _bound_source_score_order_batch_sha256=other_batch_sha256,
+        percentile_record_id=rebound_record_id,
+    )
+    forged = _clone_batch(
+        projection,
+        dispositions=rows[:index] + (rebound,) + rows[index + 1 :],
+    )
+    with pytest.raises(StockPercentileError, match="references another source batch"):
+        forged.to_payload()
 
 
 def test_percentile_row_binds_its_policy_gate_and_production_flag():

@@ -414,6 +414,7 @@ actions = (
     lambda: socket.socket(),
     lambda: socket.getaddrinfo('blocked.invalid', 443),
     lambda: subprocess.Popen([sys.executable, '-c', 'raise SystemExit(99)']),
+    lambda: os.execv(sys.executable, (sys.executable, '-I', '-S', '-B', '-c', 'raise SystemExit(99)')),
     lambda: path.write_text('must never replace custody'),
     lambda: path.unlink(),
 )
@@ -433,7 +434,7 @@ print(json.dumps({'denied': denied, 'read_preserved': True}))
         cwd=ROOT, env={"PATH": "/usr/bin:/bin", "LC_ALL": "C"},
         capture_output=True, text=True, check=True, timeout=30,
     )
-    assert json.loads(result.stdout) == {"denied": 5, "read_preserved": True}
+    assert json.loads(result.stdout) == {"denied": 6, "read_preserved": True}
     assert sentinel.read_text() == "invented custody"
 
 

@@ -3,9 +3,10 @@
 Status: **CODEX ACCEPTED CLAUDE'S SOLE `5275b7d5` COMMIT IN
 `249c6e45..5275b7d5` (SECTION 90); NO NEW CLAUDE COMMIT HAS APPEARED AT
 THE MATCHING REMOTE `cb4a8e6c`. THE OWNER NOW EXPLICITLY AUTHORIZES ONE
-CONTINUOUS ACCELERATED BUILD ROUND (SECTION 92), NOT ROUTINE APPROVAL
-PAUSES. SYNTHETIC ORDER ACCOUNTING AND GROSS R20 DIAGNOSTIC REHEARSALS ARE
-IN DEVELOPMENT; THEY DO NOT ADMIT A SOURCE OR CHANGE THE FROZEN EMPIRICAL
+CONTINUOUS ACCELERATED BUILD ROUND (SECTIONS 92–93), NOT ROUTINE APPROVAL
+PAUSES. SYNTHETIC ORDER ACCOUNTING, GROSS R20 AND THEIR COMPOSED REHEARSAL
+ARE IMPLEMENTED AT `e1437b5c`, WITH 236 FOCUSED CHECKS PASSING; THEY
+DO NOT ADMIT A SOURCE OR CHANGE THE FROZEN EMPIRICAL
 PROTOCOL. CLAUDE'S HISTORICAL 817-PASS RUN IS NOT VALIDATION OF THIS NEW
 CODE. CODEX SENT AND VERIFIED THREE METADATA-ONLY CLARIFICATIONS TO NYSE,
 NASDAQ AND INTRINIO; ACTUAL SUBSCRIBER/ENTITY/ACCESS FACTS ARE NOT GUESSED.
@@ -207,6 +208,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Claude review | `4c08f59` -> `249c6e4` reviewed from the published head after the push watcher fired; **record-only correction (restored header no-force sentence)**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 87 | Confirmed `SI-CCR27-001` (wrong subsection cited) and `SI-CCR27-002` (the merge also replaced the publication-rule paragraph). Found that paragraph lost the sentence forbidding branch switches and force pushes, still authoritative in section 81, and restored it. Verified +221/-22, code/test identity with `dad1252`, the UTC erratum, the redaction and the new row. | Pushed tree `249c6e4`, clean, network-denied: active-document, ML boundary, lane boundary and SI-5 protocol **123 passed**; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. Complete lane not rerun: 817 passed on byte-identical code/tests at `dad1252`. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR18-001` (P3, closed by correction: merge `23a5428` dropped the header's no-branch-switch/no-force sentence). `SI-CCR27-001`, `-002` confirmed against Claude. `SI-CR17-001` and `-002` closed. Source P2s, shared P2 and `SI-CR15-001` stay open. | Codex counter-reviews this record commit. The owner answers the Nasdaq entity question and decides on history removal. The PIT adapter milestone stays blocked; every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-06 | Codex counter-review | Pinned Claude `249c6e45..5275b7d5`; this record commit follows | One-shot counter-review of section 89 and restored header prohibition | Sole Claude commit accepted; no new issue. Verified SI-CR18-001's historical omission and exact header-only restoration, prior record/ledger preservation, UTC dates and code/test identity. No code/test correction or next milestone. | Focused active-document **69 passed**; lane compilation exit 0; mechanical before/after header, preservation and scope checks pass; diff clean; no full lane/repository suite; real looks **0/0**. | SI-CR18-001 closure accepted; prior confirmed/false-alarm findings retained; three source P2s, shared P2 and commitment advisory unchanged. | One final non-force lane push under section 81 / SI-AUTH-20261006-01, then delete the completed one-shot Claude monitor. Exchange monitor stays paused. Next implementation remains blocked on actual source evidence. |
 | 2026-10-06 | Codex source qualification / accelerated authorization | Local/remote base `cb4a8e6c`; decision-record commit follows | Three verified metadata clarifications and later continuous-build scope | NYSE clarification; truthful preliminary Nasdaq reply without invented entity/access; conditional Intrinio Business-tier technical screening with zero commercial commitment. Section 92 records the later accelerated offline build and delegated choices; no source admission or real backtest. | SENT/content/thread/recipient readbacks verified; initial record checks 69 passed; final round checks recorded after implementation. Real looks **0/0**. | Three source P2s, shared P2 and commitment advisory unchanged. No confidential mail body/contact/entity/amount added to Git. | Build/test the remaining source-neutral synthetic order/diagnostic components in one round; actual adapter/empirical freeze/QC depend on authenticated facts. One combined final push, no monitor rearm. |
+| 2026-10-06 | Codex continuous offline build | `cb4a8e6c..e1437b5c`, plus this final handoff | Fixed-fixture order cashflows, gross R20 and composed software rehearsal | Three source-admin clarifications; pinned delegated decision policy; exact long/avoidance cashflows and atomic refusals; common-cohort gross R20/release aggregation; four candidates and zero real authority. Implemented, not independently accepted and not historical-backtesting ready. | Final implementation focused **236 passed in 15.41s**, compilation exit 0, denied-network composed smoke completed; 113 new cases plus 123 relevant prior checks. Seven confirmed draft issues have red/green proofs and corrections. Final record checks below; no full lane/repository suite. | SI-CCR28-001..007 corrected/retained; no inherited Claude correction needed. Three source P2s, shared P2 and prospective commitment advisory stay open. | One combined final lane push. Claude reviews every commit from `5275b7d5` through the published head. Source-specific adapter/empirical freeze and QC wait for authentic facts; no monitor rearm. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -12322,3 +12324,190 @@ round is documented and validated, even if authentic source facts still block
 the empirical destination. The next independent Claude range begins at
 `5275b7d5` and includes **every** subsequent Codex record/implementation commit,
 including `cb4a8e6c`; the final exact range follows in the handoff.
+
+## 93. Continuous SI-5 synthetic software build; real backtesting factually blocked — 2026-10-06
+
+### 93.1 Exact range, counter-review and review handoff
+
+All repository work, tests and commits in this round use only
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+on `codex/strategy-short-interest`. Local base/tracking/actual remote was
+`cb4a8e6c84c94bb5e9467f1fe2c55414c0c96ed4`; the matching actual remote
+was rechecked unchanged before both local commits. There was no fetch/sync,
+branch/worktree change, rebase, reset or history rewrite in this round.
+The completed Claude counter-review is section 90's exact sole-commit
+`249c6e45..5275b7d5`: **accepted, no new issue found**. No newer Claude
+commit appeared, so there is no invented additional independent review.
+
+| Ordered commit for the next Claude review | Disposition / bounded scope |
+|---|---|
+| `cb4a8e6c84c94bb5e9467f1fe2c55414c0c96ed4` | Codex's previously pushed section-90 counter-review record. Claude must review it, not infer its own acceptance from Codex's completed counter-review. |
+| `e19f0873ea13c01cb24469a23053abc8125d2b9e` | Decision/admin record: sections 91–92, three verified metadata follow-ups and the owner's later single-round delegation. New demonstration policy pins these exact committed bytes. Not a source admission. |
+| `e1437b5c3f6d910271779278657919ad27a21501` | Implemented after draft corrections; **pending independent Claude review**. Four lane-owned modules and three focused test files; no existing source, policy, ranking or shared file is changed. |
+| This final record commit | Exact implementation, retained draft findings, validation, exclusions and blocked next action. Publication is checked after committing rather than asserted ahead of Git's response. |
+
+The next complete independent range is **`5275b7d5..published HEAD`**,
+four Codex commits including this handoff. Every documentation and code/test
+commit requires a disposition. Implementation-time advisory audits by Codex's
+helpers informed corrections; they are **not** Claude's independent review.
+The owner explicitly waived intermediate milestone/review pauses, not the
+eventual independent review. Review quality remains provisional; no full
+lane acceptance or market-performance evidence is claimed.
+
+### 93.2 Implemented behavior and contract inventory
+
+Technical: `si5_synthetic_orders.py` supplies strict private synthetic
+event/scenario contracts and a public fixed-scenario runner with an immutable,
+reauthenticated receipt. Exact decimal inputs and rational cash/shares reserve
+fees before full buys, charge sell fees symmetrically, retain split quantities
+and dividend entitlements across sales, settle explicit terminal cash including
+zero and refuse unsupported fills, missing opens, suspensions, unknown terminal
+cash and positive unpaid dividends atomically. Costs are bound to the pinned
+demonstration policy and unchanged SI-5 protocol. `si5_synthetic_diagnostic.py`
+executes split-adjusted, dividend-excluded gross R20 across the real XNYS
+20th-later-open calendar, preserving all four fabricated full memberships and
+their common cohort/original tails; missing common outcomes block every
+candidate's aggregate rather than dropping rows. Release contrasts are equally
+weighted, not pooled as independent ticker observations. The source-specific
+ranking/order join is **not implemented or admitted** by these fabricated
+fixtures. `si5_synthetic_policy.py` authenticates the committed section-92
+decisions; `si5_synthetic_rehearsal.py` composes both fixed runners and explicitly
+lists factual and source-dependent software blockers. No dependency, existing
+export, production schema, execution path or legacy protocol digest changes.
+
+Plain language: the new code rehearses a small invented stock portfolio and
+checks that buying costs, stock splits, cash dividends and worthless delistings
+are accounted for correctly. It separately checks the blueprint's 20-session
+price comparison without calling that price-only number an investable return.
+Missing evidence stops a comparison instead of quietly removing an awkward
+stock. The rehearsal is repeatable and cannot accept outside prices through
+its public entry points. It proves software arithmetic only—not that the
+strategy makes money, that any historical data is usable, or that a real
+backtest is ready to run. Independent Claude review is still required.
+
+| Contract / public entry point | Exact identity / boundary |
+|---|---|
+| Demonstration policy | SHA-256 `ab4a0e5c080324100143417469d845144c3417273e95bf5abf410db3c51e07eb`; binds section 92 in commit `e19f0873` by raw record-byte SHA-256 `820bab37ce299e74351e2fba47b4d65c81fc2589b0384c975ed4b1ee9b8a8e35`. Tests verify the actual continuous-build/delegation quotation and substantive accounting choices. |
+| `run_si5_synthetic_order_scenario()` | Only exact built-in ID `si5-synthetic-order-accounting-v1`, fixture SHA-256 `10dfa9cd677a7c6fb5c4513f16a7c683bc57c1c93a9937c10c1472c264b8fa0e`. Runs 0/5/10/20 bps cases. Explicit avoided-stock entry/exit prices are available but no avoided/short order is created. |
+| `run_si5_synthetic_diagnostic_scenario()` | Only exact built-in ID `si5-gross-r20-arithmetic-rehearsal-v1`, fixture SHA-256 `bdd8fe1d208384fa01de88812366713b606e98cf0a9861b035ebbdf177c3707d`. Ten/twenty-name distinct-score toy memberships give one/two original tail members; no authentic market ranking is claimed. |
+| `run_si5_synthetic_rehearsal()` | No external arguments. Composed receipt SHA-256 `f535597577caac1276949d1c1d01f0f99e4ae99dd4612c0347a1349b24f9667d`; `software_rehearsal_complete=true`, **`real_backtesting_ready=false`**. Four order cost runs and four R20 candidate projections complete. |
+| Existing empirical protocol | Unchanged SHA-256 `bfa06b282132a0b5ceef4e9e4e3900f0dea6ffaadad8e00e22f5c8f837022972`; cashflow/terminal rules `None`, dates unbound, no winner, source/coverage/power/outcome/QC/production/trading authority false. |
+
+New outputs are memory-only, content-addressed synthetic receipts. No provider
+file, disk artifact, account, SQL record, permanent research-look registry or
+execution system is written. The gross diagnostic exception to order-based
+evaluation was recorded in **SI-DEC-20261006-06 before execution**: it tests
+the fixed blueprint price statistic, not costed/dividend-inclusive investable
+P&L. Neither a toy date nor a toy result freezes real evaluation dates/power.
+
+### 93.3 Retained P0–P3 ledger and material red/green evidence
+
+These are findings in Codex's **unpublished implementation draft**, not defects
+attributed to Claude's unchanged documentation commit. All are retained; no
+historical issue row or false alarm is deleted.
+
+| ID | Priority | Classification / status | Issue, correction and verification |
+|---|---|---|---|
+| `SI-CCR28-001` | P3 | Confirmed / closed | Diagnostic retained-result dict equality accepted a false flag mutated to integer 0. Fresh canonical output prevented authority escape, but silently repaired noncanonical state. The regression was **1 failed, 36 deselected in 1.06s** before correction; canonical payload hashing plus exact retained field types now refuse the mutation. Corrected diagnostic file **37 passed in 5.45s**. |
+| `SI-CCR28-002` | P2 | Confirmed / closed | Positive unpaid dividends were marked complete and included in a field called realized P&L. Require actual synthetic settlement; a positive remaining receivable now produces named atomic refusal with no partial ledger/P&L. Zero entitlement remains a valid no-value case, and selling before a later verified payment preserves the locked amount. |
+| `SI-CCR28-003` | P2 | Confirmed / closed | Raw UTC string ordering reversed whole-second versus microsecond dividend timing: an invalid pre-entitlement payment reached KeyError, while a valid later payment was refused. All chronology comparisons now use parsed UTC instants. Both failure directions are covered. |
+| `SI-CCR28-004` | P2 | Confirmed / closed | A mutable global authority dict could produce a public synthetic receipt with source/real-backtest flags true. Each result now derives fresh literal closed-authority fields; the same mutation regression either refuses or preserves exact false values, never admits a source. |
+| `SI-CCR28-005` | P2 | Confirmed / closed | A valid policy hash alone did not bind local primary/sensitivity/allowed cost knobs. Changing any could mint a receipt inconsistent with its frozen policy. Exact type/value comparisons now bind local costs to both the authenticated demonstration policy and unchanged SI-5 protocol before execution. Three independent knob-drift regressions refuse. |
+| `SI-CCR28-006` | P3 | Partially correct chronology concern; policy mismatch confirmed / closed | Paying exactly at entitlement time was arithmetically ordered, not inherently a financial error, but violated this demonstration's **later-payment** rule. It now returns a named refusal; no claim about an actual provider's payout convention is made. |
+| `SI-CCR28-007` | P3 | Confirmed evidence gap / closed | The public fixture originally omitted avoided-stock prices, so only a private test proved no avoided orders despite available opens. Added explicit avoided entry/exit opens and intentionally repinned the still-unpublished v1 fixture. Public regression proves the ignored prices cannot create orders/cash exposure. |
+| `SI-SRC-20260928-001..003` | P2 | Open factual gates | No authenticated original/correction archive or exhaustive correction inventory, actual availability, listed/delisted PIT identity/companion coverage/terminal facts or applicable rights were supplied. Synthetic software does not clear any of them. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Open shared/out-of-lane | Preserved with no shared behavior/document edit. |
+| `SI-CR15-001` | P3 | Open prospective commitment advisory | Conditional consideration of an indicative package is not acceptance. Exact product, scope, rights, term/fees and real subscriber identity still precede any commitment. No amount was committed. |
+
+The four regressions for `-002..004` were **4 failed, 64 deselected in
+0.51s** on the uncorrected draft, including the expected KeyError and unsafe
+flag outputs. After the fixes, combined focused validation was **231 passed
+in 16.49s**. The later five cases for `-005..007` were **5 failed, 68
+deselected in 0.38s** before their corrections. The corrected exact
+implementation then passed **236 tests in 15.41s**, with zero failures,
+skips or warnings. No red case passed through an earlier unrelated refusal:
+each reached its intended cashflow, timing, cost, fixture or flag behavior.
+
+### 93.4 Focused final validation and limits
+
+The 236-test command comprised **73 new order-event cases, 37 new diagnostic
+cases, 3 composed-rehearsal cases**, plus **34 existing SI-5 protocol, 9 lane
+import-boundary, 11 ML import-boundary and 69 active-document checks**.
+All ran network-denied with `sandbox-exec`, existing CPython **3.13.15** /
+pytest **9.1.1**. Targeted compilation of the lane package and three added
+test files exited **0**. `git diff --check` was clean. Before implementation
+commit, the seven staged lane files matched the exact tested working bytes;
+email/private-key/token-shape checks on those additions were clean. No
+dependency or package export was added; import-boundary checks cover the new
+dependency direction. Execution/ML authority paths are otherwise untouched.
+
+A separate denied-network composed API smoke completed and reproduced the
+receipt hash above, with four cost runs/four candidate projections, software
+completion true, real readiness false and real looks **0/0**. This is **not**
+a QC compile/backtest or a market-data validation. Claude owns the full lane
+suite; Codex did not run it, and Claude's historical 817-pass run at `dad1252`
+is not represented as current validation. The final code/record focused rerun
+was **236 passed in 14.64s**, again with zero failures, skips or warnings;
+compilation exited **0**. Mechanical verification proves that every prior
+committed body section and ledger row is verbatim, the no-switch/no-force
+header prohibition is present and the immutable decision-record byte digest
+matches. Added record text has no email/secret-shape matches. Only this record
+changed after the implementation commit. This validation-text update receives
+a final active-document check before commit; no code changed after either
+236-pass run.
+
+### 93.5 Approvals, decisions, exact remaining blocker and publication
+
+The exercised authorization/decision inventory for this round is exactly
+**SI-AUTH-20261006-02..04** and **SI-DEC-20261006-01..06** in section 92.3,
+plus section 81's standing **SI-AUTH-20261005-02** publication rule. No
+additional routine owner approval is needed for those completed actions.
+The earlier inventory in sections 66–81 remains applicable and must be
+consolidated at genuine project completion. Nothing in a draft fix creates a
+new source entitlement, financial commitment, production cutoff or winner.
+
+This uninterrupted round finishes the described fact-independent software
+rehearsal. It **cannot finish the lane/project or reach real-backtest readiness**
+without evidence that is still unavailable:
+
+1. An authenticated source contract for first releases/all corrections (or
+   complete affected-release inventory), actual availability and licensed
+   historical listed/delisted identity/coverage. A sales quote, revision flag
+   or latest-only endpoint does not provide this.
+2. Verified local retention/computation rights and PIT companion price/volume,
+   corporate-action and terminal coverage. Actual subscriber/legal-entity and
+   existing-access facts remain unconfirmed; delegation cannot choose them.
+3. Once those facts exist, the reviewed source-specific immutable adapter and
+   actual ranking/cohort-to-order/price bridge, with prospectively frozen
+   cashflow/fill/terminal rules, development/validation dates, power and
+   permanent look accounting **before** actual outcomes.
+4. Separately authenticated exact QC project/datasets/representation rights,
+   parity and a bounded order-based QC candidate. No QC launch occurred, so
+   no three-attempt candidate allowance was spent.
+
+This is a factual completion blocker, not an interruption for a discretionary
+owner approval. No placeholder source contract, generic parser/collector,
+latest-only backtest, invented identity/date/power or ETF substitute is added.
+Evaluate the already-requested evidence when actually supplied; the response
+deadline remains **2026-10-19 17:00 America/Los_Angeles**. Any actual source
+receipt and future implementation epoch need exact independent review. No
+actual financial number or market-performance conclusion is inferred here.
+
+One final non-force push is authorized after this record is committed and
+root/branch/HEAD/status plus matching actual remote are checked again. Push
+only **`HEAD:refs/heads/codex/strategy-short-interest`**, with no tag/interim/
+other-branch push. Verify clean status and local/tracking/actual-remote equality
+afterward; report the exact hash and section-93 review link. All accumulation
+stays in this worktree. No automation is created/rearmed: the completed
+Claude-push one-shot stays deleted and the exchange-email monitor stays paused.
+
+Real outcome looks **0/0**, alpha allocation **0**, permanent looks **none**;
+20/60/120/252 unselected. No provider/FINRA/SEC/market-row request, actual or
+licensed price/outcome, holdout, production rank/seed, ETF, QC history/project/
+processing/upload/compile/job/backtest, purchase/subscription/trial/terms,
+broker, operator database, deployment, paper/live, funded capital, actual
+orders or trading access. The three metadata emails and the final Git
+publication are the only authorized external writes in this round. Private
+contacts, entity facts, quote amounts and mail bodies stay outside Git; prior
+privacy history is preserved. Shared/project-wide documents and
+SESSION_HANDOFF remain frozen.

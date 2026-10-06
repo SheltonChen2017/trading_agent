@@ -214,6 +214,34 @@ SECTION48_CODEX_COMMITS = (
     "8dcfb71851ff22db6f0727395e18292c19f080ef",
     "c5c060e6712afa75c0eeb05482ef469322d311cf",
 )
+SECTION49_CLAUDE_BASE = "c5c060e6712afa75c0eeb05482ef469322d311cf"
+SECTION49_CLAUDE_HEAD = "c15dfee552eafb5489bdc545d0150b85ca96ef52"
+SECTION49_CLAUDE_RANGE = f"{SECTION49_CLAUDE_BASE}..{SECTION49_CLAUDE_HEAD}"
+SECTION49_CLAUDE_SHORT_RANGE = "c5c060e6..c15dfee5"
+SECTION49_CLAUDE_COMMITS = (
+    "ff05d6b2fdf7fc56bd7164de5192ad72ec3581db",
+    "c15dfee552eafb5489bdc545d0150b85ca96ef52",
+)
+SECTION50_OWNER_SCOPE = (
+    "Counter-review both Claude commits. If accepted, implement one fixture-only "
+    "TPR-D1 candidate using synthetic fixtures and the committed D0 aggregate "
+    "report. No additional data access. Stop for Claude review."
+)
+SECTION50_D0_REPORT_SHA256 = (
+    "fbe99ce620689c61052330a220b9f989b29a8ea732a45204d88b02e6f5648148"
+)
+SECTION50_SCOPE_BOUNDARIES = {
+    "Inputs": "Synthetic fixtures and the committed D0 aggregate report only",
+    "Additional data access": "Forbidden",
+    "Retained-row processing": "Forbidden",
+    "Provider requests": "Forbidden",
+    "Price/outcome access": "Forbidden",
+    "QuantConnect": "Forbidden",
+    "Trust provisioning": "Forbidden",
+    "Real raw/normalized row publication": "Forbidden",
+    "TPR-D2": "Not authorized",
+    "Review handoff": "Stop for independent Claude review",
+}
 # TPR-CR16-002: commit identities section 8 may name besides its own range.
 # Stable identities change only when that artifact changes; branch-relation
 # commits change only when the lane is synchronized with main.  Both are
@@ -224,7 +252,7 @@ SECTION8_STABLE_COMMITS = frozenset({
 })
 SECTION8_BRANCH_RELATION_COMMITS = frozenset({"9e834713", "6590d890", "15bedb56"})
 SECTION8_ROLE_STATEMENT = (
-    r"\b(?:Claude|Codex) has (?:independently )?(?:reviewed|counter-reviewed)\b"
+    r"\b(?:Claude|Codex) (?:has )?(?:independently )?(?:reviewed|counter-reviewed)\b"
 )
 SECTION8_NEXT_ACTION_STATEMENT = r"\b(?:Claude|Codex) next (?:reviews|counter-reviews)\b"
 SECTION46_CLAUDE_BASE = "9958a459f5cd56c29cb9a0de13d38737e2c3412d"
@@ -740,11 +768,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION48_CODEX_RANGE]
+    ) == [SECTION49_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact Codex range"
+        "Codex has counter-reviewed the exact Claude range"
         in normalized_current
     )
     assert (
@@ -762,14 +790,16 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
     # The owner directly selected bounded D0 decisions on 2026-10-05.
     # Historical wait states cannot override that scope or widen it to outcomes.
-    assert "awaits Codex counter-review" in normalized_current
-    assert "awaits independent Claude review" not in normalized_current
+    assert "awaits Codex counter-review" not in normalized_current
+    assert "Fixture-only TPR-D1 candidate awaits independent Claude review" in normalized_current
     assert "Claude next reviews sections 43 and 44" not in normalized_current
     assert "Codex next counter-reviews section 42" not in normalized_current
     assert "Codex next counter-reviews section 45" not in normalized_current
     assert "Claude next reviews sections 46 and 47" not in normalized_current
-    assert "Codex next counter-reviews section 48" in normalized_current
-    assert "TPR-D0 is authorized" in normalized_current
+    assert "Codex next counter-reviews section 48" not in normalized_current
+    assert "Claude next reviews sections 49 and 50" in normalized_current
+    assert "TPR-D1 is authorized only as a fixture-only candidate" in normalized_current
+    assert "D0's one completed audit is not renewed" in normalized_current
     assert "TPR-D0 is not authorized" not in normalized_current
     assert "No next implementation milestone is authorized" not in normalized_current
     assert "remain historical proposals" in normalized_current
@@ -800,14 +830,15 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION48_CODEX_SHORT_RANGE]
+        ) == [SECTION49_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
-        assert "section 48" in normalized_summary_lower
-        assert "awaits claude review" not in normalized_summary_lower
+        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
+        assert "section 49" in normalized_summary_lower
+        assert "fixture-only tpr-d1 candidate awaits claude review" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
-        assert "codex next counter-reviews section 48" in normalized_summary_lower
-        assert "tpr-d0 is authorized" in normalized_summary_lower
+        assert "codex next counter-reviews section 48" not in normalized_summary_lower
+        assert "claude next reviews sections 49 and 50" in normalized_summary_lower
+        assert "tpr-d1 is authorized only as a fixture-only candidate" in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
         assert "no next implementation milestone is authorized" not in normalized_summary_lower
         assert (
@@ -1760,15 +1791,15 @@ def test_section_46_reviews_every_claude_commit_and_pins_owner_scope() -> None:
 
 
 def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
-    """TPR-CR16-002: a stale routing sentence cannot sit beside the current one.
+    """TPR-CR16-002: refuse stale identities and duplicate recognized routing.
 
-    Section 8 is the lane's only per-round current-state pointer.  Its range
-    singleton catches a REPLACED range, but a superseded role sentence, routing
-    sentence or short range could coexist with the correct text.  Phrase lists
-    needed appending every round and lapsed, so this rule needs no per-round
-    edit: exactly one role and one next-action statement, and every commit
-    named must be an endpoint of the block's own range or a known stable or
-    branch-relation identity.
+    The recognized role grammar is Claude/Codex, optional has/independently,
+    and reviewed/counter-reviewed; next actions use next reviews/counter-reviews.
+    This is an explicit grammar, not an arbitrary-prose classifier. Exactly
+    one recognized role and next-action statement must occur in the current
+    block. Lowercase 7-12 or 40-hex commit identities, quoted or unquoted,
+    must be range endpoints or known stable/branch-relation identities.
+    Short ranges cannot duplicate the current block's single full range.
     """
     current = _current_qualification(_record_section("## 8. Exact next step"))
     normalized = " ".join(current.split())
@@ -1781,16 +1812,51 @@ def test_section_8_carries_one_current_role_and_no_stale_commit() -> None:
     allowed = {*ranges[0], *SECTION8_STABLE_COMMITS}
     full = set(re.findall(r"(?<![0-9a-f])([0-9a-f]{40})(?![0-9a-f])", normalized))
     assert full <= allowed, f"section 8 names a stale commit: {sorted(full - allowed)}"
-    short = set(re.findall(r"`([0-9a-f]{7,12})`", normalized))
+    short = set(re.findall(r"\b([0-9a-f]{7,12})\b", normalized))
     stale_short = {
         token for token in short
         if token not in SECTION8_BRANCH_RELATION_COMMITS
         and not any(identity.startswith(token) for identity in allowed)
     }
     assert not stale_short, f"section 8 names a stale commit: {sorted(stale_short)}"
-    assert re.findall(r"`[0-9a-f]{7,12}\.{2}[0-9a-f]{7,12}`", normalized) == [], (
+    assert re.findall(r"\b[0-9a-f]{7,12}\.{2}[0-9a-f]{7,12}\b", normalized) == [], (
         "section 8 names its range in full; a short range there is stale"
     )
+
+
+@pytest.mark.parametrize(
+    ("stale_sentence", "failure"),
+    [
+        (
+            "Earlier pending review d54ce1b2..ea97bd4f.",
+            "stale commit",
+        ),
+        (
+            "Codex independently counter-reviewed the prior snapshot.",
+            "one current role",
+        ),
+    ],
+)
+def test_section_8_guard_refuses_unquoted_or_alternate_stale_claims(
+    monkeypatch, stale_sentence: str, failure: str,
+) -> None:
+    """Exercise the actual rule after proving the unmodified pointer is valid."""
+    test_section_8_carries_one_current_role_and_no_stale_commit()
+    original_section = _record_section
+    section = original_section("## 8. Exact next step")
+    mutated = section.replace(
+        "\n### Historical progression",
+        f"\n{stale_sentence}\n\n### Historical progression",
+        1,
+    )
+    assert mutated != section
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading == "## 8. Exact next step"
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match=failure):
+        test_section_8_carries_one_current_role_and_no_stale_commit()
 
 
 def test_claude_review_of_the_d0_round_is_exact() -> None:
@@ -1807,3 +1873,92 @@ def test_claude_review_of_the_d0_round_is_exact() -> None:
     assert commits == SECTION48_CODEX_COMMITS
     assert "Cumulative disposition: accepted after correction" in section
     assert "TPR-D1 is not authorized" in section
+
+
+def test_section_49_counterreviews_both_claude_commits_after_correction() -> None:
+    """The new owner scope starts only after both incoming commits are accepted."""
+    section = _record_section("## 49.")
+    assert SECTION49_CLAUDE_RANGE in section
+    table = _bounded(section, "### 49.1", "### 49.2", "section 49 dispositions")
+    rows = tuple(
+        (match.group(1), match.group(2).strip("*").lower())
+        for line in table.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| ([^|]+?) \|", line))
+    )
+    assert rows == tuple(
+        (commit, "accepted after correction") for commit in SECTION49_CLAUDE_COMMITS
+    )
+    assert tuple(commit for commit, _ in rows) == tuple(
+        _git_lines("rev-list", "--reverse", SECTION49_CLAUDE_RANGE)
+    )
+    assert "Cumulative disposition: accepted after correction" in section
+
+
+def test_section_50_preserves_exact_fixture_only_owner_scope() -> None:
+    """Freeze this development authorization, not a new retained-data permit."""
+    section = _record_section("## 50.")
+    normalized = " ".join(re.sub(r"(?m)^\s*> ?", "", section).split())
+    assert SECTION50_OWNER_SCOPE in normalized
+    assert SECTION50_D0_REPORT_SHA256 in section
+    assert "D0's one completed audit is not renewed" in normalized
+    assert "No additional data access is authorized" in normalized
+    assert "TPR-D2 is not authorized" in normalized
+    assert "Fixture-only TPR-D1 candidate awaits independent Claude review" in normalized
+    boundary = _bounded(
+        section,
+        "<!-- TPR-D1-FIXTURE-SCOPE:START -->",
+        "<!-- TPR-D1-FIXTURE-SCOPE:END -->",
+        "section 50 fixture-only scope",
+    )
+    rows = tuple(re.findall(r"^\| ([^|]+) \| ([^|]+) \|$", boundary, re.M))
+    assert rows == (("Boundary", "Scope"), *SECTION50_SCOPE_BOUNDARIES.items()), (
+        "the closed fixture-only boundary cannot add, remove, duplicate or grant a scope"
+    )
+
+
+@pytest.mark.parametrize(
+    ("original", "replacement"),
+    [
+        (
+            "| Additional data access | Forbidden |",
+            "| Additional data access | Permitted |",
+        ),
+        (
+            "| Retained-row processing | Forbidden |",
+            "| Retained-row processing | Permitted |",
+        ),
+        (
+            "| TPR-D2 | Not authorized |",
+            "| TPR-D2 | Authorized |",
+        ),
+        (
+            "| Review handoff | Stop for independent Claude review |",
+            "| Review handoff | Stop for independent Claude review |\n"
+            "| New provider capture | Permitted |",
+        ),
+        (
+            "| QuantConnect | Forbidden |",
+            "| QuantConnect | Forbidden |\n| QuantConnect | Permitted |",
+        ),
+        (
+            "| Provider requests | Forbidden |",
+            "",
+        ),
+    ],
+)
+def test_section_50_scope_guard_rejects_added_or_widened_permissions(
+    monkeypatch, original: str, replacement: str,
+) -> None:
+    """Prove the real guard is sensitive after its unchanged record passes."""
+    test_section_50_preserves_exact_fixture_only_owner_scope()
+    original_section = _record_section
+    section = original_section("## 50.")
+    assert section.count(original) == 1
+    mutated = section.replace(original, replacement, 1)
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading == "## 50."
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match="closed fixture-only boundary"):
+        test_section_50_preserves_exact_fixture_only_owner_scope()

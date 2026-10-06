@@ -513,3 +513,52 @@ def test_frozen_bucket_shape_matches_the_auditor(frozen_bucket_contract):
     """TPR-CR16-001: any change to the auditor's bucket must edit the contract."""
     shape, key_tree = frozen_bucket_contract
     assert key_tree(structural._bucket()) == shape
+
+
+@pytest.mark.parametrize("leak", [
+    "interpretation_value", "schema", "confirmatory_alpha", "existing_integer_count",
+])
+def test_aggregate_only_contract_rejects_existing_leaf_substitution(capture, aggregate_only, leak):
+    """Replacing an existing allowed leaf must not evade the publication guard."""
+    report = plans.strict_artifact(audit(capture))
+    aggregate_only(report)
+    row_digest = plans.digest(BASE["benzinga_id"].encode())
+    if leak == "interpretation_value":
+        report["interpretation"]["next"] = row_digest
+    elif leak in ("schema", "confirmatory_alpha"):
+        report[leak] = row_digest
+    else:
+        report["years"]["2012"]["horizon_probes"]["price_target_horizon_present"] = int(row_digest, 16)
+    with pytest.raises(AssertionError):
+        aggregate_only(report)
+
+
+@pytest.mark.parametrize("broken", [
+    "target_partition", "action_partition", "currency_partition", "time_partition",
+    "direction_partition", "pair_bounds", "year_rows", "identifier_rows", "identifier_repeats",
+])
+def test_aggregate_only_contract_checks_count_accounting(capture, aggregate_only, broken):
+    """Plausible integer leaves still have to satisfy aggregate accounting."""
+    report = plans.strict_artifact(audit(capture))
+    aggregate_only(report)
+    bucket = report["years"]["2012"]
+    if broken == "target_partition":
+        bucket["targets"]["price_target"]["positive"] = 0
+    elif broken == "action_partition":
+        bucket["actions"]["raises"] = 0
+    elif broken == "currency_partition":
+        bucket["currencies"]["USD"] = 0
+    elif broken == "time_partition":
+        bucket["clocks"]["event_time_valid"] = 0
+    elif broken == "direction_partition":
+        bucket["pairs"]["direction_agrees"] = 0
+    elif broken == "pair_bounds":
+        bucket["pairs"]["positive_adjusted"] = 0
+    elif broken == "year_rows":
+        report["input"]["rows"] = 2
+    elif broken == "identifier_rows":
+        report["identifiers"]["unique"] = 0
+    else:
+        report["identifiers"]["repeated_groups"] = 1
+    with pytest.raises(AssertionError):
+        aggregate_only(report)

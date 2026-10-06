@@ -4,9 +4,10 @@ The report is committed and pushed, so it may carry counts, lineage hashes and
 fixed labels only.  Checking that raw provider values are absent is not
 enough: the auditor holds per-row identifier digests in memory, and a digest
 is derived row-level data that anyone holding the dataset can join back.
-This contract closes the report's whole key tree and leaf types instead, and
-both the synthetic behavioral test and the committed real artifact must pass
-it.
+This contract closes the report's key tree, fixed labels, and leaf types, and
+checks aggregate bounds and accounting. Both synthetic output and the
+committed real artifact must pass it. It is not a proof against arbitrary
+covert encodings or a recomputation of the counts from retained rows.
 """
 from __future__ import annotations
 
@@ -33,6 +34,14 @@ _AUDITOR_MODULES = frozenset(
     for name in ("__init__.py", "plan.py", "structural.py", "__main__.py")
 )
 _SHA256 = re.compile(r"[0-9a-f]{64}")
+_FROZEN_INTERPRETATION = {
+    "targets": "field states and positive-pair directions only; no price or return joins",
+    "adjustment": "direction agreement does not prove adjustment-vintage or split consistency",
+    "clocks": "nominal unzoned event day versus UTC last-touch day; not public availability",
+    "horizon": "presence probes do not prove explicit comparable prior/new horizons",
+    "identifiers": "repeated captured IDs do not reconstruct overwritten correction history",
+    "next": "independent review and later exact TPR-D1 scope; no automatic promotion",
+}
 # Frozen literal, deliberately NOT derived from ``structural._bucket()``: a
 # shape derived from the code would follow any production change, including a
 # new key that smuggles data.  ``test_frozen_bucket_shape_matches_the_auditor``
@@ -64,17 +73,37 @@ def _key_tree(value: Any) -> Any:
     return {key: _key_tree(child) for key, child in value.items()} if type(value) is dict else None
 
 
-def _assert_counts(value: Any, path: tuple[str, ...]) -> None:
+def _assert_counts(value: Any, path: tuple[str, ...], maximum: int | None = None) -> None:
     if type(value) is dict:
         for key, child in value.items():
-            _assert_counts(child, (*path, key))
+            _assert_counts(child, (*path, key), maximum)
         return
     # ``type`` rather than ``isinstance``: a bool must not pass as a count.
     assert type(value) is int and value >= 0, f"non-count leaf at {'.'.join(path)}"
+    if maximum is not None:
+        assert value <= maximum, f"count exceeds rows at {'.'.join(path)}"
+
+
+def _assert_bucket_accounting(bucket: dict[str, Any], year: str) -> None:
+    rows = bucket["rows"]
+    _assert_counts(bucket, ("years", year), maximum=rows)
+    for counts in bucket["targets"].values():
+        assert sum(counts.values()) == rows, f"year {year} target partition"
+    for category in ("actions", "currencies"):
+        assert sum(bucket[category].values()) == rows, f"year {year} {category} partition"
+    clocks = bucket["clocks"]
+    assert sum(clocks[key] for key in ("event_time_missing", "event_time_invalid", "event_time_valid")) == rows, f"year {year} event-time partition"
+    pairs = bucket["pairs"]
+    assert pairs["direction_agrees"] + pairs["direction_disagrees"] == pairs["both_positive"], f"year {year} direction partition"
+    assert pairs["both_positive"] <= min(pairs["positive_raw"], pairs["positive_adjusted"]), f"year {year} pair bounds"
 
 
 def assert_aggregate_only(report: dict[str, Any]) -> None:
-    """Refuse any report shape that could carry row-level or derived row data."""
+    """Pin permitted fields and labels; check count types, bounds and partitions.
+
+    This prevents the exercised row-data substitutions, not arbitrary covert
+    channels or incorrect calculations that preserve these invariants.
+    """
     assert set(report) == REPORT_TOP_LEVEL_KEYS, sorted(set(report) ^ REPORT_TOP_LEVEL_KEYS)
     for key, expected in _EXACT_KEYS.items():
         assert set(report[key]) == expected, key
@@ -85,6 +114,12 @@ def assert_aggregate_only(report: dict[str, Any]) -> None:
         assert _key_tree(bucket) == FROZEN_BUCKET_SHAPE, f"year {year} bucket shape changed"
     for key in ("input", "identifiers", "years"):
         _assert_counts(report[key], (key,))
+    for year, bucket in report["years"].items():
+        _assert_bucket_accounting(bucket, year)
+    assert sum(bucket["rows"] for bucket in report["years"].values()) == report["input"]["rows"], "year row accounting"
+    identifiers = report["identifiers"]
+    assert identifiers["missing_or_invalid"] + identifiers["unique"] + identifiers["extra_occurrences"] == report["input"]["rows"], "identifier row accounting"
+    assert identifiers["repeated_groups"] <= min(identifiers["unique"], identifiers["extra_occurrences"]), "identifier repetition bounds"
     for key in ("outcome_reads", "provider_requests", "qc_attempts", "development_looks"):
         assert type(report[key]) is int, key
     for key in ("canonical_admission", "point_in_time_data", "trading_authority"):
@@ -95,9 +130,10 @@ def assert_aggregate_only(report: dict[str, Any]) -> None:
     assert set(report["auditor_code_sha256"]) == _AUDITOR_MODULES
     assert all(type(v) is str and _SHA256.fullmatch(v) for v in report["auditor_code_sha256"].values())
     assert report["accepted_risks"] == plans.ACCEPTED_RISKS
-    assert all(type(text) is str for text in report["interpretation"].values())
-    for key in ("schema", "audit_as_of_utc", "confirmatory_alpha"):
-        assert type(report[key]) is str, key
+    assert report["interpretation"] == _FROZEN_INTERPRETATION
+    assert report["schema"] == "tpr-d0-structural-report-v1"
+    assert report["confirmatory_alpha"] == "0"
+    assert type(report["audit_as_of_utc"]) is str
 
 
 @pytest.fixture

@@ -7483,3 +7483,33 @@ processing/jobs/backtests, broker actions, operator database/state access,
 paper/live deployments, capital/orders/trading: **0**. Synthetic transition
 fills/receipts are fictitious test objects, not real orders, research receipts
 or QC launches. All frozen canonical/D0/D1 artifacts retain exact bytes.
+
+### 57.7 Stable implementation commit and publication handoff
+
+Implementation/counter-review commit:
+`896c66727de488f28779d76842c04d81a64a815f`, parent
+`b78c51385a321b80404e484b3b161d8516f07138`. It changes exactly the ten
+target-owned paths listed in 57.5 (nine code/test paths and this record).
+Before staging/commit, verified physical root/toplevel/branch/exact HEAD,
+status, actual matching remote b78c5138 and staged diff; nine recorded new
+code/test hashes equal the staged blobs. Section 55's historical body is
+unchanged. Every author/auditor released writes before the commit.
+
+Stable working-byte reprise after the final preamble compatibility correction:
+**551 passed, 3 skipped in 4.12s**. Exact committed-tree reprise on
+`896c66727de488f28779d76842c04d81a64a815f`: **551 passed, 3 skipped in
+4.23s**, no failure, error or warning, same exact focused paths/arguments and
+isolated runtime root. Scoped compilation and cumulative diff check exit 0;
+tree is clean and the matching actual remote remains b78c5138, with one
+unpublished local commit. This is not a full lane/repository suite or an
+actual backtest. No frozen or shared behavior changed.
+
+This following record-only commit captures exact stable identity/evidence and
+completes the single continuous round. It cannot embed its own recursively
+computed SHA; the actual two-commit range and final pushed head are reported
+in this chat after verification. Final record/tree is checked again before
+one non-force `HEAD:refs/heads/codex/strategy-target-price-revisions` push;
+afterward actual remote and local HEAD must agree with clean status.
+No intermediate push was made. Stop for Claude independent review; the
+consumed heartbeat remains paused. Real backtest readiness remains false at
+the exact factual blockers in 57.6, with every exercised choice in 57.2.

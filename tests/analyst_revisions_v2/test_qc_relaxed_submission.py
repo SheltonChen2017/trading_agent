@@ -229,6 +229,229 @@ def test_result_one_read_bounded_custom_only(frozen):
     assert sum(endpoint == "backtests/read" for endpoint, _ in fake.calls) == 1
 
 
+def _response_observations(plan, operation):
+    return sorted(plan.control_directory.glob(
+        f"{plan.candidate_id}-A{plan.attempt}-qc-{operation}-response-*.json"))
+
+
+def test_status_observation_is_actual_response_not_cached_backfill(frozen, monkeypatch):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    ticks = iter((1_000_000_000, 2_000_000_000))
+    monkeypatch.setattr(sut.time, "time_ns", lambda: next(ticks))
+    fake.status = "Completed."
+    before = len(fake.calls)
+    assert sut.poll_status(plan, launch, fake) == "Completed."
+    paths = _response_observations(plan, "status")
+    assert len(paths) == 1
+    observation = json.loads(paths[0].read_bytes())
+    assert observation["request_started_at_utc"] == "1970-01-01T00:00:01.000000000Z"
+    assert observation["response_received_at_utc"] == "1970-01-01T00:00:02.000000000Z"
+    assert observation["observed_status"] == "Completed."
+    assert observation["observed_identity_matches"] is True
+    assert observation["launch_receipt_sha256"] == sut._sha(launch)
+    assert observation["endpoint"] == "backtests/list"
+    assert paths[0].stat().st_mode & 0o777 == 0o600
+    assert len(fake.calls) == before + 1
+    assert sut.poll_status(plan, launch, fake) == "Completed."
+    assert len(fake.calls) == before + 1
+    assert _response_observations(plan, "status") == paths
+
+
+def test_read_observation_retains_metadata_not_economic_fields(frozen, monkeypatch):
+    plan, projection, fake, row = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    sut.poll_status(plan, launch, fake)
+    fake.statistics = {**coverage_stats(row), "Net Profit": "PRIVATE ECONOMIC VALUE"}
+    ticks = iter((3_000_000_000, 4_000_000_000))
+    monkeypatch.setattr(sut.time, "time_ns", lambda: next(ticks))
+    before = sum(endpoint == "backtests/read" for endpoint, _ in fake.calls)
+    result = sut.read_result_once(plan, launch, fake)
+    assert result["run_valid"] is True
+    paths = _response_observations(plan, "read")
+    assert len(paths) == 1
+    raw = paths[0].read_text()
+    assert all(value not in raw for value in (
+        "PRIVATE ECONOMIC VALUE", "Net Profit", "NOT RETAINED", "statistics", "orders"))
+    observation = json.loads(raw)
+    assert observation["observed_status"] == "Completed."
+    assert observation["observed_identity_matches"] is True
+    assert observation["requested_backtest_id"] == launch["backtest_id"]
+    assert observation["clock_source"] == "local_client_system_clock"
+    assert observation["server_time_authenticated"] is False
+    assert observation["operator_authenticated"] is False
+    response = {"backtest": {"projectId": 123, "backtestId": "run-1",
+        "name": fake.backtest_name, "status": "Completed.",
+        "statistics": fake.statistics, "orders": "NOT RETAINED"}}
+    assert observation["canonical_parsed_response_sha256"] == sut._sha(response)
+    assert sum(endpoint == "backtests/read" for endpoint, _ in fake.calls) == before + 1
+
+
+@pytest.mark.parametrize("change", ["status", "identity"])
+def test_read_observation_precedes_drift_refusal_and_keeps_claim_spent(frozen, monkeypatch, change):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    sut.poll_status(plan, launch, fake)
+    real_post = fake.post
+    def changed(api, endpoint, body):
+        response = real_post(api, endpoint, body)
+        if endpoint == "backtests/read":
+            response["backtest"]["status" if change == "status" else "projectId"] = (
+                "Runtime Error" if change == "status" else 999)
+        return response
+    monkeypatch.setattr(sut.common, "_post", changed)
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="result identity"):
+        sut.read_result_once(plan, launch, fake)
+    observation = json.loads(_response_observations(plan, "read")[0].read_bytes())
+    assert observation["observed_status"] == ("Runtime Error" if change == "status" else "Completed.")
+    assert observation["observed_identity_matches"] is (change == "status")
+    assert sut._path(plan, "read-claim").exists()
+    assert not sut._path(plan, "raw-custom").exists()
+    assert not sut._path(plan, "result").exists()
+    with pytest.raises(sut.common.SixUniverseSettlementSubmissionError):
+        sut.read_result_once(plan, launch, fake)
+    assert sum(endpoint == "backtests/read" for endpoint, _ in fake.calls) == 1
+
+
+@pytest.mark.parametrize("operation", ["status", "read"])
+def test_observation_write_failure_prevents_fresh_terminal_or_result(frozen, monkeypatch, operation):
+    plan, projection, fake, row = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    fake.statistics = coverage_stats(row)
+    if operation == "read":
+        sut.poll_status(plan, launch, fake)
+    real_write = sut.common._write
+    def refuse(path, value):
+        if "-qc-" in path.name:
+            raise sut.common.SixUniverseSettlementSubmissionError("observation refused")
+        return real_write(path, value)
+    monkeypatch.setattr(sut.common, "_write", refuse)
+    with pytest.raises(sut.common.SixUniverseSettlementSubmissionError, match="observation refused"):
+        (sut.poll_status if operation == "status" else sut.read_result_once)(plan, launch, fake)
+    assert not sut._path(plan, "result").exists()
+    if operation == "status":
+        assert not sut._path(plan, "terminal").exists()
+    else:
+        assert sut._path(plan, "read-claim").exists()
+
+
+def test_response_clock_regression_refuses_publication(frozen, monkeypatch):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    ticks = iter((2_000_000_000, 1_000_000_000))
+    monkeypatch.setattr(sut.time, "time_ns", lambda: next(ticks))
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="observation clock"):
+        sut.poll_status(plan, launch, fake)
+    assert not sut._path(plan, "terminal").exists()
+    assert not _response_observations(plan, "status")
+
+
+def test_response_observation_is_append_only_and_collision_refuses(frozen, monkeypatch):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    monkeypatch.setattr(sut.time, "time_ns", lambda: 1_000_000_000)
+    assert sut.poll_status(plan, launch, fake) == "In Progress..."
+    path = _response_observations(plan, "status")[0]
+    original = path.read_bytes()
+    fake.status = "Completed."
+    with pytest.raises(sut.common.SixUniverseSettlementSubmissionError):
+        sut.poll_status(plan, launch, fake)
+    assert path.read_bytes() == original
+    assert not sut._path(plan, "terminal").exists()
+
+
+def test_legacy_cached_terminal_never_gains_a_backfilled_observation(frozen):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    sut.common._write(sut._path(plan, "terminal"), {
+        "candidate_id": plan.candidate_id, "attempt": plan.attempt,
+        "project_id": launch["project_id"], "backtest_id": launch["backtest_id"],
+        "status": "Completed."})
+    before = list(fake.calls)
+    assert sut.poll_status(plan, launch, fake) == "Completed."
+    assert fake.calls == before
+    assert not _response_observations(plan, "status")
+
+
+def test_interrupted_terminal_write_preserves_observation_and_can_retry(frozen, monkeypatch):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    real_write = sut.common._write
+    def interrupted(path, value):
+        if path == sut._path(plan, "terminal"):
+            raise sut.common.SixUniverseSettlementSubmissionError("terminal write interrupted")
+        return real_write(path, value)
+    monkeypatch.setattr(sut.common, "_write", interrupted)
+    with pytest.raises(sut.common.SixUniverseSettlementSubmissionError, match="interrupted"):
+        sut.poll_status(plan, launch, fake)
+    first = _response_observations(plan, "status")[0]
+    original = first.read_bytes()
+    monkeypatch.setattr(sut.common, "_write", real_write)
+    assert sut.poll_status(plan, launch, fake) == "Completed."
+    assert len(_response_observations(plan, "status")) == 2
+    assert first.read_bytes() == original
+
+
+def test_project_filtered_status_without_explicit_project_id_is_qualified(frozen, monkeypatch):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    real_post = fake.post
+    def missing(api, endpoint, body):
+        response = real_post(api, endpoint, body)
+        if endpoint == "backtests/list":
+            for row in response["backtests"]:
+                row.pop("projectId")
+        return response
+    monkeypatch.setattr(sut.common, "_post", missing)
+    assert sut.poll_status(plan, launch, fake) == "Completed."
+    observation = json.loads(_response_observations(plan, "status")[0].read_bytes())
+    assert observation["observed_identity_matches"] is False
+    assert observation["requested_project_id"] == 123
+
+
+@pytest.mark.parametrize("ticks", [(True, 2), (0, 2), (1, None),
+    (1.0, 2), (1, 253402300800000000000)])
+def test_response_observation_clock_type_and_range_refusals(frozen, monkeypatch, ticks):
+    plan, projection, fake, _ = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    values = iter(ticks)
+    monkeypatch.setattr(sut.time, "time_ns", lambda: next(values))
+    with pytest.raises(sut.RelaxedQcSubmissionError, match="observation clock"):
+        sut.poll_status(plan, launch, fake)
+    assert not sut._path(plan, "terminal").exists()
+    assert not _response_observations(plan, "status")
+
+
+@pytest.mark.parametrize("failure", ["clock", "encoding"])
+def test_failed_read_observation_keeps_one_use_claim_and_no_result(frozen, monkeypatch, failure):
+    plan, projection, fake, row = frozen
+    launch = sut.launch(plan, projection, fake)
+    fake.status = "Completed."
+    sut.poll_status(plan, launch, fake)
+    fake.statistics = coverage_stats(row)
+    if failure == "clock":
+        ticks = iter((2_000_000_000, 1_000_000_000))
+        monkeypatch.setattr(sut.time, "time_ns", lambda: next(ticks))
+    else:
+        fake.statistics["not_selected"] = float("nan")
+    with pytest.raises(sut.RelaxedQcSubmissionError, match=f"observation {failure}"):
+        sut.read_result_once(plan, launch, fake)
+    assert sut._path(plan, "read-claim").exists()
+    assert not sut._path(plan, "raw-custom").exists()
+    assert not sut._path(plan, "result").exists()
+    assert not _response_observations(plan, "read")
+    with pytest.raises(sut.common.SixUniverseSettlementSubmissionError):
+        sut.read_result_once(plan, launch, fake)
+    assert sum(endpoint == "backtests/read" for endpoint, _ in fake.calls) == 1
+
+
 def test_source_changed_refuses_before_outcome_read(frozen):
     plan, projection, fake, row = frozen
     launch = sut.launch(plan, projection, fake)

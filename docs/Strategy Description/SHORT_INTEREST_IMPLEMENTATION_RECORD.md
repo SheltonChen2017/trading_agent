@@ -1,31 +1,31 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER RENEWED CONTINUOUS BUILD AFTER THE `587bda71` HANDOFF.
-SECTION 94 RECORDS THREE NEW VERIFIED METADATA EMAILS, THE REMOVAL OF
-DUPLICATE RIGHTS-LETTER PAPERWORK AND A PLANNED FIXED-FIXTURE
-RANKING/COHORT-TO-ORDER INTEGRATION REHEARSAL. THIS IS ADDITIONAL OFFLINE
-SOFTWARE WORK, NOT A SOURCE ADMISSION OR REAL-BACKTEST READINESS CLAIM.
-CODEX ACCEPTED CLAUDE'S SOLE `5275b7d5` COMMIT IN
-`249c6e45..5275b7d5` (SECTION 90); NO NEW CLAUDE COMMIT HAS APPEARED AT
-THE MATCHING REMOTE `cb4a8e6c`. THE OWNER NOW EXPLICITLY AUTHORIZES ONE
-CONTINUOUS ACCELERATED BUILD ROUND (SECTIONS 92–93), NOT ROUTINE APPROVAL
-PAUSES. SYNTHETIC ORDER ACCOUNTING, GROSS R20 AND THEIR COMPOSED REHEARSAL
-ARE IMPLEMENTED AT `e1437b5c`, WITH 236 FOCUSED CHECKS PASSING; THEY
-DO NOT ADMIT A SOURCE OR CHANGE THE FROZEN EMPIRICAL
-PROTOCOL. CLAUDE'S HISTORICAL 817-PASS RUN IS NOT VALIDATION OF THIS NEW
-CODE. CODEX SENT AND VERIFIED THREE METADATA-ONLY CLARIFICATIONS TO NYSE,
-NASDAQ AND INTRINIO; ACTUAL SUBSCRIBER/ENTITY/ACCESS FACTS ARE NOT GUESSED.
-NO PURCHASE, ACCOUNT ACTIVATION OR TERMS ACCEPTANCE OCCURRED. THE THREE
-SOURCE P2S, SHARED P2 AND PROSPECTIVE COMMITMENT ADVISORY STAY OPEN;
-AUTHENTIC ARCHIVES/AVAILABILITY/COVERAGE/RIGHTS STILL BLOCK THE PIT
-ADAPTER AND HISTORICAL BACKTEST. THIS IS NOT LANE COMPLETION OR REAL
-BACKTESTING READINESS. CLOSED FINDINGS, FALSE ALARMS, PRIVACY REDACTION
-AND UTC ERRATUM ARE RETAINED; NO PUBLISHED HISTORY IS REWRITTEN.
-LOOKBACKS 20/60/120/252 REMAIN UNSELECTED, REAL OUTCOME LOOKS 0/0.
-ACTUAL MARKET DATA/OUTCOMES, HOLDOUT, PRODUCTION RANKING/SEEDS, ETF,
-QUANTCONNECT PROCESSING/JOBS, PURCHASES, BROKER, DATABASE, DEPLOYMENT,
-PAPER/LIVE, CAPITAL AND TRADING REMAIN GATED. THE CLAUDE ONE-SHOT IS
-DELETED AND THE EXCHANGE-REPLY MONITOR STAYS PAUSED.**
+Status: **CONTINUOUS BUILD RESUMED AND THE FIXED SYNTHETIC TYPED
+RANKING/COHORT-TO-ORDER BRIDGE IS IMPLEMENTED AT `0a7a3544`.
+SECTION 95 RECORDS 295 NETWORK-DENIED FOCUSED CHECKS PASSING, TWO
+CONFIRMED DRAFT CORRECTIONS AND A RETAINED TEST-CONTRACT FALSE ALARM.
+SECTION 94 RECORDS THREE NEW VERIFIED METADATA EMAILS AND REMOVAL OF
+DUPLICATE RIGHTS-LETTER PAPERWORK; THEY ARE DISTINCT FROM SECTION 92'S
+EARLIER CORRESPONDENCE. NO ROUTINE OWNER APPROVAL PAUSE IS REQUIRED.
+THIS IS OFFLINE SOFTWARE EVIDENCE, NOT SOURCE ADMISSION, PROJECT/LANE
+COMPLETION OR REAL-BACKTEST READINESS. CODEX'S LAST CLAUDE COUNTER-REVIEW
+REMAINS THE ACCEPTED SOLE `5275b7d5` COMMIT IN `249c6e45..5275b7d5`
+(SECTION 90); NO NEW CLAUDE COMMIT APPEARED AT THE OBSERVED MATCHING
+REMOTE `587bda71`. THE COMPLETE NEXT CLAUDE RANGE STARTS AT `5275b7d5`
+AND INCLUDES EVERY SUBSEQUENT CODEX COMMIT. CLAUDE'S HISTORICAL 817-PASS
+RUN DOES NOT VALIDATE THIS NEW CODE. THE ORIGINAL SYNTHETIC ORDER/R20/
+COMPOSED RECEIPTS AND FROZEN EMPIRICAL PROTOCOL ARE UNCHANGED.
+AUTHENTIC SI ARCHIVES, ACTUAL AVAILABILITY AND LISTED/DELISTED PIT
+COMPANION COVERAGE STILL BLOCK THE ACTUAL ADAPTER AND HISTORICAL
+BACKTEST; EXISTING APPLICABLE TERMS, NOT AN EXTRA PERMISSION LETTER,
+GOVERN RIGHTS. SOURCE P2S, SHARED P2S AND PROSPECTIVE COMMITMENT ADVISORY
+REMAIN OPEN. PRIOR LEDGERS, FALSE ALARMS, PRIVACY REDACTION AND UTC ERRATUM
+ARE PRESERVED; NO PUBLISHED HISTORY IS REWRITTEN. LOOKBACKS 20/60/120/252
+REMAIN UNSELECTED, REAL OUTCOME LOOKS 0/0, ALPHA 0 AND PERMANENT LOOKS
+NONE. NO ACTUAL DATA/OUTCOMES, HOLDOUT, PRODUCTION RANKS/SEEDS, ETF, QC
+PROCESSING/JOB, PURCHASE/TERMS, BROKER/DATABASE, DEPLOYMENT, PAPER/LIVE,
+CAPITAL OR TRADING ACTION OCCURRED. THE CLAUDE ONE-SHOT STAYS DELETED
+AND THE EXCHANGE-REPLY MONITOR STAYS PAUSED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -12634,3 +12634,221 @@ Claude one-shot and paused exchange monitor are unchanged. Accumulate this
 round locally and publish exactly once after complete documentation and
 focused validation, rechecking the matching actual remote before each commit
 and final push. No partial/interim push or history rewrite.
+
+## 95. Continuous typed ranking-to-order integration and factual completion boundary — 2026-10-06
+
+### 95.1 Exact range, dispositions and independent review handoff
+
+All repository commands, validation and commits use only
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+on `codex/strategy-short-interest`. Starting local/tracking/actual remote was
+`587bda714747413ec57095d61817f197f69c36a8`; the matching actual remote
+remained at that exact hash before the decision-anchor and implementation
+commits. No fetch/sync,
+alternate worktree/branch, reset, rebase, published-history rewrite or force
+push was performed. The last completed Claude counter-review is still
+section 90's sole-commit `249c6e45..5275b7d5`: **accepted, no new issue**.
+No newer Claude range exists in these observations; do not manufacture an
+additional counter-review or confuse these Codex changes with Claude's push.
+
+The complete next independent Claude range is **`5275b7d5..published HEAD`**,
+seven ordered Codex commits including this final record commit:
+
+| Commit | Disposition / scope for Claude |
+|---|---|
+| `cb4a8e6c84c94bb5e9467f1fe2c55414c0c96ed4` | Prior Codex section-90 counter-review record; pending Claude's independent disposition. |
+| `e19f0873ea13c01cb24469a23053abc8125d2b9e` | Sections 91–92 delegation/admin anchor; pending independent review. |
+| `e1437b5c3f6d910271779278657919ad27a21501` | Original fixed synthetic order/R20/rehearsal implementation; pending independent review. |
+| `587bda714747413ec57095d61817f197f69c36a8` | Section-93 implementation/validation handoff; pending independent review. |
+| `782e85ecd2867537f5f7e93abe4d9ab66eb9bddc` | Section-94 resumed-build decisions and three verified metadata actions; exact byte anchor for the new bridge policy. Pending independent review. |
+| `0a7a3544d2e45fcb5c1282af7ee6eb1621d2752f` | New lane-owned bridge and 59 focused cases, implemented after verified draft corrections; pending independent review. |
+| This final record commit | Completed scoped integration, retained ledger, actual validation, approval inventory and external blockers; pending independent review. |
+
+Every documentation, code and test commit needs a Claude disposition. Codex
+helper audits are implementation-time advisory reviews, **not independent
+Claude acceptance**. The owner's accelerated single-round exception removed
+intermediate review/approval pauses, not the eventual independent review.
+
+### 95.2 Implemented milestone and exact contract inventory
+
+Technical: `si5_synthetic_ranked_orders.py` constructs a fixed code-owned
+synthetic source/reference/liquidity fixture with three release cycles and
+runs the genuine investability → eligible population → population binding →
+S1 eligible ranking → SI-5 cohort builders. Structural normalization keeps
+all 20 peers while one cap refusal leaves 19 eligible common identities. Each
+candidate retains its full original ranking, pressure/covering row hashes and
+original low/high common-cohort tails. Stable-identity-verified price pairs
+cover the **whole** common cohort before selection; low tails route to long
+buy/sell orders and high tails to avoidance, never short sales or reranking.
+The existing exact private accounting kernel completes 4 lookbacks × 4 frozen
+costs = **16 order books** for the comparable release with an authenticated
+successor. Every book has two buys/two sells, fee-reserved sizing, nonnegative
+cash/positions and no ending position. These integration fixtures use ordinary
+opens; split/dividend/terminal accounting remains covered by the unchanged
+earlier kernel's separate focused regressions, not a newly admitted provider
+corporate-action path. The warm-up release and final comparable release with
+no successor retain all four explicit no-order windows. Entry membership
+facts precede the separately named instruction time; cohort `decision_at`
+remains the permitted entry open and exit comes from the next authenticated
+synthetic release's permitted open. Future prices/successor information is
+accounting-fixture information, not entry-selection evidence or a production
+latency claim.
+
+Plain language: this closes a real gap in the earlier rehearsal: the stock
+ranker now feeds the order-accounting engine instead of using hand-written
+baskets. It checks that the intended stocks—not merely matching ticker text—
+are bought, that avoided stocks never become shorts, and that a missing price
+for an untraded comparison stock still stops the entire comparison. Incomplete
+release intervals remain visible. These are invented-data software checks;
+they do not demonstrate profits or make a historical backtest ready.
+
+| Contract | SHA-256 / public boundary |
+|---|---|
+| Public runner | `run_si5_synthetic_ranked_order_scenario()` accepts only exact built-in ID `si5-synthetic-ranked-order-routing-v1`; no rows, prices, dates, memberships, source/PIT assertion or authority arguments. |
+| Decision anchor | Commit `782e85ecd2867537f5f7e93abe4d9ab66eb9bddc`, raw record SHA-256 `a2c8e49681dd890583255f336c838b79b415dd70c8a078e221f41a9f05fde177`; tests authenticate its owner quotation and decisions `SI-DEC-20261006-09..11`. |
+| Bridge policy | `85704221bb8e7333f2bdbb45751f030fe7cbd8a4a17fedc8dc0615d1c4bd9eda` |
+| Fixed fixture recipe | `a3d72cc3d9f4218bd1873169ce2d61a021dc866561b87c0c2f95bce31f74c58a` |
+| Synthetic source vintage | `b07a41c47140782a48bb0ede4b078abaa3fd6758ae2f38771042b881ae6c117c` |
+| Synthetic reference / market history | `eb99f39b997c7d6e1c17e93ab85989bce16ea8822e84fad5473c655a3ea5f417` / `8babc07835793cd8548154f83b5b90eb173ca277441f3d3b98cc587c7cffe71e` |
+| Population / binding | `6c87ad29bd97014251ff42e20de8dbbe399e58385fb76ad403aded40d4ddb392` / `6980e9e6067a755be10f16a4e0a53e61494274f88a9297cfae6e8bd2c93e89d7` |
+| Ranking / cohort | `04a4304e2d62c5fd2d8b5a8bcdc44fd70b011c77ea03c9466465f6e0b268e577` / `9dd99147ecf303399288faba11b522acf171aa8df44b93c5a8852da3a58a33bb` |
+| Routing / result receipt | `93d68e02851413686277916a09e20fd012f643d81f153e60a1af0e53493841bb` / `9d2ce7bbdf716623adab59722478eee5e6d4550ac9108880f6a60c7e092055c2` |
+
+Every public run reauthenticates the fixed recipe, real typed pipeline outputs
+and pinned result. Retained canonical JSON is hash-checked; exports are fresh
+detached objects and changed retained content refuses rather than being
+silently repaired. The factory imports no tests and reads no external/test
+fixture file. Receipts are memory-only. All source, actual PIT, outcome,
+production, QC and trading authority remains false; lookbacks stay unselected,
+real looks **0/0**, alpha **0**, permanent looks **none**. Original policy
+`ab4a0e5c...`, empirical protocol `bfa06b28...` and composed receipt
+`f5355975...` are unchanged and verified. Earlier section-93 completion language
+described that scoped hand-authored rehearsal, not this bridge or all project
+software. This appended qualification does not declare project/lane completion
+or assume that all remaining source-dependent software is implemented.
+
+### 95.3 Persistent P0–P3 ledger and material correction evidence
+
+These findings concern Codex's unpublished integration draft, **not Claude's
+unchanged documentation commit**. All older confirmed, partial, false-alarm,
+privacy and erratum rows remain verbatim; no historical finding is removed.
+
+| ID | Priority | Classification / status | Evidence and disposition |
+|---|---|---|---|
+| `SI-CCR29-001` | P2 | Confirmed / closed | The draft validated only tail opens through the kernel; malformed non-tail common opens could survive the price projection. Eight direct seam cases for missing, zero, negative and NaN entry/exit values failed **DID NOT RAISE**. Canonical positive open validation now covers every common member before routing, and a genuine-cohort routing spy proves a missing middle-member price cannot reach any partial order book. This semantic proof does not rely on an earlier recipe-pin refusal. |
+| `SI-CCR29-002` | P2 | Confirmed / closed | A different stable identity with the same `security_id` could receive that ID's fixture price. The direct substitution regression failed **DID NOT RAISE**; exact recipe identity equality now refuses the mismatch, independently of public content pinning. |
+| `SI-CCR29-003` | P3 | False alarm / closed, test corrected | After price validation was added, the private seam propagated the existing exact `SI5SyntheticOrderError`; eight tests incorrectly demanded the new bridge exception. The public entry already wraps ValueError as `SI5SyntheticRankedOrderError`. Corrected the private test to accept either exact named refusal type, without changing or weakening public behavior. The intermediate **8 failed, 2 passed, 48 deselected in 0.46s** reflected exception-type expectations, not acceptance of malformed prices. |
+| `SI-SRC-20260928-001..003` | P2 | Open factual gates | No archive/actual-availability/coverage admission is inferred from the new code or metadata sends. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Open shared/out-of-lane | Retained, no shared behavior or document changed. |
+| `SI-CR15-001` | P3 | Open prospective commitment advisory | No quote, new subscription, trial, terms or financial commitment accepted. |
+
+The initial material red command was **9 failed, 35 deselected in 0.66s**:
+eight malformed whole-common prices and one stable-identity substitution.
+After the correction and exact private-exception qualification, the same nine
+cases plus an independent valid positive control were **10 passed, 48
+deselected in 0.55s**. Four strict clock/late-evidence cases passed separately
+in **4.33s**; all are included in the completed final focused run. No new P0/P1
+finding or verified shared correction was identified in this scoped work.
+
+### 95.4 Actual focused validation and immutable tested bytes
+
+Codex's final network-denied command completed **295 passed in 578.00s
+(0:09:38)**, with zero failures, skips or warnings: **59 new bridge cases**,
+73 prior order cases, 37 prior diagnostic cases, 3 composed-rehearsal cases,
+34 existing protocol cases, 9 lane import-boundary, 11 ML import-boundary and
+69 active-document cases. It uses existing CPython **3.13.15** / pytest
+**9.1.1** with `sandbox-exec` denying network. The slow portion is deliberate
+fresh typed-provenance reconstruction: the public run plus a separately
+rebuilt cohort, not a provider request, QC run or complete lane suite. The
+earlier 236-case check also passed in **17.68s**. Codex did not execute the
+full lane/repository suite or claim Claude's historical 817-pass result as
+current validation.
+
+Tests compare the independently rebuilt source/reference/history and
+binding/ranking/cohort hashes, original per-window tails and row lineage,
+unchanged 20-peer normalization versus 19 eligible identities, whole-common
+price coverage, successor exit, evidence/instruction/entry ordering, every
+cost book, self-financing long-only orders and closed authority. Public input,
+recipe/policy drift, retained-content mutation and committed decision-byte
+regressions are included. Existing rehearsal identity is unchanged.
+
+Targeted compilation of the new module/test exits **0**. Staged whitespace
+checks are clean; email/private-key/token-shape checks on new code/tests have
+no matches. The exact tested and staged SHA-256 bytes are module
+`74f59bd2f8650f2550f4058452eb2505aa0066df8dc3d371107f80cd72982676`
+and test file
+`c5fe0d5d61d499e7588f05347453e2f98a656e57cd16666f8f90197347aa5164`.
+Only those two lane-owned files enter implementation commit `0a7a3544`.
+No dependency, package export, shared schema or existing module changed.
+Final record active-document checks passed **69 tests in 0.61s**; diff checks
+were clean and mechanical body hashing verified every pre-section-95 body
+section/ledger verbatim (SHA-256 `50b4b5643616e5a2121692b82e13a45ec23d2b1e9001fe4d04a29a67fb78cd9f`).
+This validation-text update receives another active-document/privacy/status
+check before commit. No code changed after the 295-pass run.
+
+### 95.5 Approvals, remaining evidence and exact publication boundary
+
+The exercised resumed-round inventory is **SI-AUTH-20261006-05..06** and
+**SI-DEC-20261006-07..11** in section 94.3, plus section 81's standing
+**SI-AUTH-20261005-02** publication rule. Earlier approvals/decisions in
+sections 66–92 remain retained for the eventual project-completion inventory.
+No further routine owner approval or discretionary owner decision is needed
+for these completed actions. The affiliation answer forwarded in the existing
+threads was an owner-supplied fact, not a fact invented under delegation;
+private affiliation/entity/contact/account details remain outside Git.
+
+A subsequent bounded read of the Sharadar, NYSE and Nasdaq inquiry threads
+still ended at their respective outgoing receipts in section 94.2, with no
+later reply in the returned messages. This is not a mailbox-wide absence or
+proof that a vendor cannot supply the requested archive. The normal existing-
+subscription browser route showed a signed-out session; an existing-account
+sign-in was requested without passwords/API keys, while software work
+continued. No authentication bypass, account creation or sample attachment
+access occurred.
+
+Real historical backtesting is still **factually blocked**, not awaiting
+another routine approval:
+
+1. Authenticate SI first releases/all corrections (or an exhaustive affected-
+   release inventory), actual publication/availability and historical listed/
+   delisted identity/coverage. Evaluate the requested vendor metadata rather
+   than substituting the QC latest-stored settlement series.
+2. Qualify the existing companion products' PIT price/volume, effective
+   identity, corporate-action and terminal-cash coverage. Apply existing
+   applicable terms and explicit restrictions; an extra permission letter is
+   **not required**. The owner-reported Bundle remains a candidate, not an
+   independently verified archive or terminal-cash guarantee.
+3. With authentic source facts, implement and review the actual immutable
+   acquisition/normalization and ranking-to-order/outcome adapter; freeze
+   actual cashflow/terminal/fill rules, covered evaluation dates/power and
+   permanent looks before outcomes, using the standing owner delegation.
+4. Independently verify the exact QC datasets/project/representation route
+   and parity before a bounded order-based historical candidate. No QC
+   attempt was made; the three-attempt/Mia recovery rule remains unused.
+
+The renewed instruction caused real additional building and qualification,
+not another advice-only stop. It cannot establish missing provider facts;
+no generic parser/collector, assumed source contract, latest-only historical
+substitute, financial cutoff/lookback winner or forward/ETF milestone is
+invented. The response deadline remains **2026-10-19 17:00 America/Los_Angeles**.
+Independent Claude review of the complete seven-commit range remains pending.
+
+Accumulate all new commits locally, then make exactly **one final non-force
+push** of the genuinely completed scoped integration/documentation round to
+**`HEAD:refs/heads/codex/strategy-short-interest`**, with follow-tags disabled.
+Reverify root, branch, HEAD, status and matching actual remote immediately
+before this final record commit and push. Verify clean status and local/
+tracking/actual-remote equality afterward; only then report the exact hash
+and section-95 review-note link. This record does not assert a successful push
+before Git confirms it. No interim/tag/other-branch push or history rewrite.
+
+Source/actual PIT/outcome/production/QC/trading authority remains closed;
+looks **0/0**, alpha **0**, permanent looks **none**, all four windows unselected.
+No market rows, licensed/actual prices or outcomes, holdout, QC history/project/
+upload/processing/compile/job/backtest, purchase/trial/terms, broker/operator
+database, deployment, paper/live, funded capital or trading occurred. The three
+section-94 metadata sends are the completed external account writes; the
+single final Git publication is the sole remaining authorized external write
+in this resumed round. Shared/project-wide documents and
+SESSION_HANDOFF stay frozen. The deleted Claude one-shot and paused exchange
+monitor remain unchanged; neither is rearmed by this build.

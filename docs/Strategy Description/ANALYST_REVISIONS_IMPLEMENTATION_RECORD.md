@@ -339,6 +339,10 @@ consistent, but original QC read times/responses and the later R281/R247 launch
 paths remain unproven. The three provenance findings and two conditional stress
 cells remain open; original audit records or exact owner-scoped history access
 are needed, not another backtest or readiness scaffold.
+Section 252 is Claude's independent review of `4e1c0a64..b83cf6c0` (0 P0,
+0 P1, 0 P2, 0 P3): the counter-review and its retained-receipt audit
+reproduce in full on the original Mac; the three provenance findings stay
+open for owner-supplied records.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1154,7 +1158,10 @@ Section 250 is Claude's independent review of the exact pushed range
 `c2112b11..afb29176` (section 249), with one citation correction and
 regression pin `4496d241`. Section 251 accepts both new Claude commits and
 performs the permitted original-Mac local metadata/hash/source audit.
-Claude must review section 251 and its exact pushed documentation snapshot.
+Section 252 is Claude's independent review of the exact pushed range
+`4e1c0a64..b83cf6c0` (section 251), which reproduces that audit. The
+immediate next step is that Codex counter-reviews section 252 and this
+round's Claude commit, unless the owner explicitly changes this workflow.
 The floor stays **313 / 239 / 49 / 699**. Retained R280 A1/R281 A2 status
 envelopes say `Completed.` and their source lists match independently
 regenerated frozen projections, but these locally written envelopes contain
@@ -1190,7 +1197,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 249 (section 250); for section 250 the owner
+the pushed range through section 251 (section 252); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -2965,6 +2972,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-05 | Codex counter-review of every unreviewed section-248 commit | `f0318d6f` -> `c2112b11` -> this record commit | One test commit accepted; ledger and record accepted after prospective documentation corrections. Fifteen distinct added IDs and look arithmetic verified; no new QC/provider look or result cell. | Corrected R281 attempt-versus-backtest wording, qualified unproven post-read status drift and named the test correction's actual snapshot; appended missing R210-R221 and R177 identity cross-references without counting them again. No production or test source changed. | Native Windows record checks and separately qualified in-memory attribution verification in 249.4; final diff/scope checks. No complete Codex suite or production POSIX-path validation. | Three P3 documentation findings corrected prospectively. ARV2R248-002/-003/-004 remain open because retained receipts and source package are absent here. Out-of-lane findings remain documented and unfixed. | One same-lane documentation push after validation. Claude must review section 249; obtain original retained metadata/source evidence before resolving stress validity or extra launch attribution. No further R247/R281 attempt or readiness implementation. |
 | 2026-10-06 | Claude independent review of section 249: the counter-review of section 248 and its identity cross-references | `afb29176` -> `4496d241` -> this record commit | Section 250: one Codex commit `c2112b11..afb29176` disposed (0 accepted, 1 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | Verified section 249's twelve R210-R221 and six R-177 identity repairs, attempt and test-count corrections and floor from tracked bytes; corrected the 249.3 citation of section 173 to 172 and appended a shared-ledger erratum; test-only pin `4496d241` requires every lane-record backtest ID in the shared ledger; section 4 names section 250, banner sentence added, this row appended | Owner directed focused checks without the complete lane suite: record gates at `afb29176` 84 passed; native attribution study 14 passed with both in-memory mutations red; pin trials in memory; record gates, `compileall` and `git diff --check` on the final tree; every pytest network-denied; exact counts in 250.4 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R250-001`, corrected); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's two Claude commits; Codex counter-reviews section 250 unless the owner changes the workflow |
 | 2026-10-06 | Codex counter-review of section 250 and local retained stress provenance audit | `afb29176` -> `4496d241` -> `4e1c0a64` -> this record commit | Both new Claude commits accepted; no new P0-P3 finding or research look/cell. Local receipt/source consistency established, historical provenance reconciliation remains incomplete. | Confirmed the section-172 citation correction; reproduced the identity pin's historical red and three classifier mutations in memory; checked retained R280 A1/R281 A2 identity/status/hash envelopes and regenerated both frozen 17-file source projections from the exact local delta package, reporting hashes only. No production, test, policy, registry or shared-ledger edit. | Strict-network-denied focused selection and offline metadata/source checks; final counts in 251.5; diff/status/scope checks. No complete Codex suite or QC/provider operation. | ARV2R250-001 accepted as corrected. ARV2R248-002/-003/-004 remain open: original timestamped server/read evidence and later launch/operator/source histories unavailable in the inspected lane artifacts. Two stress cells remain conditional; floor 313/239/49/699 unchanged. | Claude must review section 251. Owner to supply original audit records or scope exact original host/session-history inspection. Keep monitor active while blocked; no new outcome read, R247/R281 attempt, successor or readiness implementation. |
+| 2026-10-06 | Claude independent review of section 251: the counter-review of section 250 and the retained stress-receipt audit | `b83cf6c0` -> this record commit | Section 252: one record-only commit `4e1c0a64..b83cf6c0` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | No code changed. Reproduced section 251's local audit: twelve retained fingerprints, file modes, canonical JSON, Completed. status and identity bindings, META equality, the adapter's local-envelope write path, the R280 and R281 offline source regeneration and the R281/R247 filename inventory; section 4 names section 252, banner sentence added, this row appended | Complete lane selection at `b83cf6c0` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 252.4 | 0 P0, 0 P1, 0 P2, 0 P3; `ARV2R248-002`, `-003` and `-004` remain open for owner-supplied records | Single push of this round's Claude commit; Codex counter-reviews section 252 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -35270,3 +35278,120 @@ review, a changed blocker or an actual required owner decision. After that
 review is accepted, continue only an owner-scoped evidence reconciliation
 whose original artifacts/access are available; do not manufacture a readiness
 milestone or repeat the unchanged history-access request while blocked.
+
+## 252. Independent Claude review of section 251: the counter-review of section 250 and the retained stress-receipt audit, 2026-10-06
+
+**Range reviewed:** `4e1c0a64..b83cf6c0`, one record-only Codex commit in one
+push, disposed in 252.1, plus this round's one Claude lane commit (this
+record commit).
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review ran no QuantConnect or
+provider launcher, capture script, command or result read, and section 251
+records none. Its local checks read the retained control files and rebuilt
+two source projections offline, printing only hashes, counts, identity
+fields and true/false results; every process ran inside the strict sandbox
+of 242.6 (252.4). The floor stays **313 / 239 / 49 / 699**.
+
+**Verdict.** The one Codex commit is accepted; none is rejected.
+**0 P0, 0 P1, 0 P2, 0 P3.** Every local statement in section 251 that this
+Mac can check reproduces (252.3). The audit establishes what the retained
+files can and cannot prove; it does not close `ARV2R248-002`, `-003` or
+`-004`, which still need records only the owner can supply or authorize.
+
+### 252.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `b83cf6c0` | Section 251: counter-review of section 250 and the retained R280 A1 and R281 A2 receipt and source audit | accepted | Only the lane record changed. Its acceptance of `4496d241` and `4e1c0a64` is right, and its local audit reproduces in full on this Mac (252.3). |
+
+### 252.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| none | | | No defect in `b83cf6c0`. | |
+
+### 252.3 What this review reproduced, and what it does not establish
+
+- **Retained envelopes.** In `eight_execution_stress_qc_control_20260929`
+  the directory is 0700 and every file is 0600 and owned by the current
+  user. All twelve distinct SHA-256 fingerprints in 251.2 match the current
+  bytes, terminal and read-claim bytes are identical for each run, and all
+  fourteen R280 and R281 control and project files are canonical JSON. For
+  R280 A1 (project `37163942`, backtest `f507db76…`) and R281 A2 (project
+  `37165262`, backtest `2007f9f7…`), the terminal, read-claim, raw-custom
+  and result envelopes all say `Completed.` and bind the same candidate,
+  attempt, project and backtest. The launch inherits every claim field, the
+  project receipts agree, the result's manifest and projection equal the
+  claim's, and the raw META statistic equals the saved result META.
+- **What the envelopes cannot show.** The terminal envelope has exactly five
+  fields, and no envelope has a timestamp, operator or host. The stress
+  study imports `six_universe_relaxed_submission.py` as its adapter. There
+  `poll_status()` writes those five local fields, and `read_result_once()`
+  refuses unless the server reports `Completed.`, then writes `raw-custom`
+  and `result` from its own local `expected` envelope. Their `Completed.` is
+  the code's own value, not an archived server response, as section 251
+  says.
+- **Source regeneration.** Loading the pinned delta package (package
+  `7803b84f…`, lineage `54723703…`) and calling `build_projection()` offline
+  gives R280 projection `4cc0a420…` with source list `bf8ad26e…` (17 files,
+  402,219 bytes) and R281 projection `7a725fe4…` with source list
+  `8aa4cee2…` (17 files, 407,224 bytes), all as in 251.3. Every path, hash
+  and length triple equals the retained R280 A1, R281 A1 and R281 A2
+  claims; the R281 A1 and A2 claims differ only in `attempt`; and
+  `freeze_manifest()` on the package equals the frozen manifest
+  `1e1754c6…`. No source or other file was written.
+- **Inventory.** The lane artifacts hold the R281 A1 and A2 controls and
+  nine R247 A1–A3 claim, launch and terminal files. No file is named for an
+  R281 A3 or rerun, R247 A4–A9 or a persist-fix verification, and none for
+  a history, transcript, operator or audit record.
+- **What remains.** These checks confirm that the retained files agree with
+  each other and with the frozen source. They cannot show when QuantConnect
+  was read, what it returned, who launched the later R281 and R247 runs, or
+  what source those runs used. `ARV2R248-002`, `-003` and `-004` stay open
+  and the two stress cells stay conditional, as section 251 says. Closing
+  them needs the original timestamped records or an owner-scoped
+  inspection of the original host or session histories; that is the
+  owner's decision.
+
+### 252.4 Validation
+
+Every check below ran from the designated worktree at
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2`,
+with `~/.venvs/trading_agent-py313/bin/python` (3.13.15), each process under
+one of the two `sandbox-exec` profiles of 242.6. Before use, a probe again
+confirmed that the loopback-only profile allows a loopback bind and connect
+and refuses a connection to the reserved documentation address `192.0.2.1`
+with `EPERM`. The owner's focused-only direction applied to section 250's
+round. This round runs the complete selection again, the first complete run
+over a tree that contains the test-only commits `ce0e69bb`, `28bcc887` and
+`4496d241`.
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection, strict profile | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, at the clean pushed head `b83cf6c0`, run as six file groups in three parallel streams with separate pytest temp directories, together covering all 9,773 collected tests | **11 failed, 9754 passed, 8 skipped, 35 warnings in six strict-profile worktree file groups across three parallel streams (each 0:29:43, 0:15:46, 0:15:49, 1:26:05, 0:38:31, 0:05:33).** No error. Every failure is `PermissionError: [Errno 1] Operation not permitted` in one of the 11 tests of `test_qc_formal_qc_transport.py` that start HTTP servers on `127.0.0.1`, because the strict profile also refuses loopback. The 8 skips are a subset of the standing eleven: 7 Windows-only directory-junction tests and 1 top-five-only profile case. |
+| The loopback-server file, loopback-only profile | `tests/analyst_revisions_v2/test_qc_formal_qc_transport.py`, all 73 tests, at the same head | **73 passed, 2 warnings in 11.65s**, exit 0: the 11 loopback-server tests pass once loopback is allowed and every other address is refused |
+| Every collected test, remote network refused | the two rows above together | **0 failed, 9,765 passed, 8 skipped** across all 9,773 collected tests; the strict profile covers 9,754 of the passes and the loopback-only profile the other 11 |
+| Local audit reproduction | the retained R280 and R281 controls, the relaxed adapter source and the pinned delta package, at `b83cf6c0` | every check in 252.3 reproduces; outputs limited to hashes, counts, identity fields and true/false results |
+| Record gates on the final record bytes, strict profile | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| Worktree integrity across the complete run and the audit | `artifacts/analyst_revisions_v2` and `git status --ignored` | every one of the 1782 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the run and the audit, and `git status --ignored`, apart from `__pycache__`, is unchanged |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commit | clean; published in this round's single push |
+
+### 252.5 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open; they need original timestamped QuantConnect read and launch records, or an owner-scoped inspection of the original host or session histories. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2R250-001` | P3 | Corrected in `4e1c0a64`; accepted by Codex in section 251. |
+| `ARV2R248-006` | P3 | Closed; regression-pinned by `4496d241`, accepted in section 251. |
+| `ARV2R248-007` | P3 | Documented; narrowed in one direction by `4496d241`. |
+| `ARV2CR249-001`, `-002`, `-003` | P3 | Corrected by Codex in `afb29176`; accepted. |
+| `ARV2CR245-001`, `ARV2R242-001` | P3 | Corrected and pinned, as recorded. |
+
+The final tree differs from the pushed head `b83cf6c0` only by this record
+commit.

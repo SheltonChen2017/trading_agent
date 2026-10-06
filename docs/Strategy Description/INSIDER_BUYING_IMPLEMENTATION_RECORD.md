@@ -1,20 +1,19 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 134 COMPLETES CODEX COUNTER-REVIEW OF BOTH CLAUDE COMMITS
-IN `1f913741..ca12bf1f`: `672c80ba` ACCEPTED; `ca12bf1f` ACCEPTED AFTER
-APPEND-ONLY SOURCE-READ, SNAPSHOT-IDENTITY AND TIMING QUALIFICATIONS. THE
-BOUNDED HISTORICAL SOURCE-VIEW ENGINEERING MILESTONE IS ACCEPTED; THIS IS
-NOT THAW, FULL HISTORICAL-ENVIRONMENT RECONSTRUCTION, A COMPLETED CORPUS OR
-BACKTEST READINESS. FOUR TOPICAL P2 FINDINGS REMAIN OPEN WITH THE PRECISE
-LEGACY/FROZEN BOUNDARY RETAINED; THE ACCEPTED SOURCE VIEW IS NOT DESCRIBED
-AS UNIMPLEMENTED. STRICT D23 RETAINS SEVEN NONEXACT QUARTERS AND NO
-82-QUARTER DIGEST. V1 AND THE FOUR V3 CUSTODY FILES STAY FROZEN; THE STOPPED
-V3 ROOT IS UNRESOLVED AT 1,846 OF 1,847 STARTS. ONLY 19,526 OF 99,394 PARENTS
-ARE SOURCE-BOUND. THE OWNER REQUESTED PUBLICATION OF THE COMPLETED WORK AND
-THEN A NEW CLAUDE-REVIEW MONITOR; NO FURTHER MILESTONE IS INVENTED WHERE ITS
-SCOPE/INPUTS ARE MISSING. BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT
-RETROACTIVE APPROVAL. NO NEW SEC/PROVIDER/CREDENTIAL/LICENSED-ROW, OUTCOME,
-QC, BACKTEST, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING
+Status: **SECTION 135 RECORDS CLAUDE'S REVIEW OF THE ONE CODEX COMMIT IN
+`ca12bf1f..cb06065c` (SECTION 134, DOCUMENTATION ONLY): ACCEPTED. THE FOUR
+QUALIFICATIONS OF SECTION 133 ARE ACCEPTED AGAINST THE REVIEWER; THE CORRECTED
+SOURCE-VIEW AND INVENTORY IDENTITIES REPRODUCE. THE CODE TREE IS UNCHANGED
+SINCE `672c80ba`, SO SECTION 133'S COMPLETE SUITE STANDS. THE BOUNDED SOURCE-VIEW
+ENGINEERING MILESTONE IS ACCEPTED; `IB1BCAMP-CR01` STAYS OPEN AT THE THAW AND
+LEGACY-CALLER BOUNDARY. FOUR P2 FINDINGS REMAIN OPEN AND FAIL CLOSED. STRICT
+D23 RETAINS SEVEN NON-EXACT QUARTERS AND NO 82-QUARTER DIGEST. V1 AND THE FOUR
+V3 CUSTODY FILES ARE FROZEN; THE STOPPED V3 ROOT IS UNRESOLVED AT 1,846 OF
+1,847 STARTS. ONLY 19,526 OF 99,394 PARENTS ARE SOURCE-BOUND. NOT
+BACKTEST-READY. THE NEXT OFFLINE DELIVERABLE NEEDS OWNER SCOPING (134.6); CODEX
+COUNTER-REVIEWS THIS RECORD COMMIT. BOTH FINAL ACCESS CLASSIFICATIONS STAND
+WITHOUT RETROACTIVE APPROVAL. NO NEW SEC/PROVIDER/CREDENTIAL/LICENSED-ROW,
+OUTCOME, QC, BACKTEST, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING
 AUTHORITY. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
@@ -236,6 +235,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex counter-review and next bounded offline source-view candidate | Incoming `32d061ef..2478c189`; audit control `22d95f4055ddbf621ffa40d9f177dd8c7ae667a6`; source view `a53fb5ea17e48fd98354e7c77f009d8d0a1af136`; this separate handoff | Accept both Claude commits, then decouple historical source-identity reads without thaw | Incoming code accepted, record qualified for OS/audit exec layers, relative code paths and hash/owner scope. New exact-code facade redirects only ordered historical source reads; source-only denied worker produces a new v4.1 receipt, without changing four frozen files or old wrapper. | Final focused 429 passed, boundary/package/docs 161 passed; four sources compile; actual replay 431.15s, receipt `e8fd7752...`, four read cycles/16 reads; final handoff checks in 132. No full suite, SEC/looks/jobs/backtests 0/0/0/0. | `IBHRV-CCR01`, `IBREC-HRVCCR01` qualified; draft `IBHSV-R01/R02` corrected with red/green evidence, independent review pending. Four topical P2 OPEN, prior resolved findings/owner dispositions retained; 19,526/99,394 source-bound, 79,868 unattempted. | One combined matching-lane push and exact remote-tip verification, then Claude reviews all three outgoing commits. Counter-review before a further bounded milestone, if gates permit; no thaw or broader source/research authority. Heartbeat stays PAUSED. |
 | 2026-10-06 | Claude review | `1f913741` -> `672c80ba` (script-path refusal and 8 pins) -> this review record | Independent review of the historical source-view candidate and sections 131-132 (`2478c189..1f913741`, 3 commits, 0 merges) | Dispositioned all three commits and accepted both qualifications of section 130 after reproducing them (in-place exec is OS-allowed and audit-refused; the receipt carries relative code paths). Reproduced every 131.6 hash by computation and the retained-root replay on the lane venv. Found the script-path entry tracing back (fixed) and eight refusal rules without an isolating test (pinned). 23 faithful mutants. Every pytest and mutation run network-denied. | Pushed `1f913741`: two new files **344 passed**, gate **181 passed**, both Pythons. Mutants **11 of 23** caught as pushed, **19 of 23** after (4 redundant by construction). After the fix: **352 passed** both Pythons, gate **181**, compileall and diff-check clean. Source-view replay on 3.13.15 alone **595 s**, every retained-root hash equal to 131.6. **0 looks**. | `IBHSV-CR01` P3 and `IBHSV-CR02` P3 closed in `672c80ba`. `IBHSV-OBS01` recorded. `IBHRV-CCR01`, `IBREC-HRVCCR01` P3 accepted against this reviewer. `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` P2 open. No open P0 or P1. | Codex counter-reviews `672c80ba` and this record. No next milestone is authorized by this review. The open P2 gates stand before any further acquisition. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 | 2026-10-06 | Codex counter-review and owner-requested review handoff | Incoming `1f913741333b03e51e6c7acee67c8e23ad31741d..ca12bf1f6fb6ac9e538352602986096b780851da`; this separate lane-record commit | Accept both Claude commits, qualify documentation and finish source-view acceptance | `672c80ba` accepted; `ca12bf1f` accepted after append-only qualifications. Independent CLI red/green, eight targeted guard reversals and source/inventory hashes support the correction. Source view is accepted as bounded engineering, not thaw; no new milestone is substituted where factual inputs and active scope are absent. | Focused **437 passed**, boundary/package/docs **161 passed**, all network-denied; independent predecessor controls **1 failed / 7 passed**, corrected **8 passed**, eight guard reversals caught. Compilation and final record checks in 134. No complete suite or actual retained-root replay in this counter-review. | `IBREC-HSVCCR01` P3 corrected by qualification; `IBHSV-CR01/CR02`, `IBHSV-R01/R02` accepted closed. Four topical P2 retained with precise legacy/frozen scope; prior owner dispositions and all earlier resolved findings/observations retained. Source/PIT/rights/QC/backtest/execution remain false. | Owner explicitly requested push then arm a subsequent Claude-review monitor. Verify one matching-lane publication, then arm on its exact tip/range. Claude reviews this documentation commit too; counter-review before any next specifically defined offline step. Next-step scope and affected-quarter v2 inputs remain required; no broader access or thaw. |
+| 2026-10-06 | Claude review | `cb06065c` -> this review record (no code change) | Independent review of the section-134 counter-review (`ca12bf1f..cb06065c`, 1 commit, 0 merges, documentation only) | Dispositioned the commit and accepted all four qualifications of section 133 after verifying them: twelve lane modules hash current source bytes (none on the replay path), the inventory reads the four files while the identity hash no longer depends on them, 133.4's identities were the pre-correction snapshot, and the latest run took 595 s. Reproduced the corrected source-view and inventory identities. | `cb06065c`: record tests **71 passed** on both Pythons, network denied. Code tree byte-identical to `672c80ba` outside docs, so section 133's complete suite (**10,543 passed, 38 skipped, 0 failed**) stands. Record tests after this section **71 passed** on both Pythons. **0 looks**. | `IBREC-HSVCCR01` P3 accepted against this reviewer. All earlier closures retained. `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` P2 open. No open P0 or P1. | Codex counter-reviews this record commit. The next offline deliverable needs owner scoping (134.6); nothing is started. The lane is not backtest-ready. No outcome, QC, paper, or trading step is inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -17939,3 +17939,118 @@ review. Keep the monitor quiet for unchanged/nonqualifying origin and local
 dirt alone, and notify only meaningful completion/failure or required owner
 action. After one Claude-triggered round leave it paused unless the owner
 explicitly rearms it again. Do not message another chat.
+
+## 135. Claude review - section 134 (2026-10-06 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying`. No branch, worktree, fork, or handoff was
+created or switched to. The watcher armed on `ca12bf1f` reported the push at
+00:46 local time; after `git fetch`, local and remote were both
+`cb06065cd823a22e845e79fcabf79c1afa21e930` and the worktree was clean. The
+remote stayed at `cb06065c` for the whole review.
+
+Range: `ca12bf1f..cb06065c`, **1 Codex commit, 0 merges**, documentation only
+(this record: 242 insertions, 14 deletions). `git diff 672c80ba cb06065c`
+outside `docs/` is empty, so the code tree is the one section 133 validated;
+the four custody files still equal their `aa0d635` blobs.
+
+Authority: no new authority follows from this section. Section 134.6 asks
+the owner to define the next offline deliverable; that is owner scoping, not
+a reviewer matter.
+
+### 135.1 Commit disposition
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `cb06065c` | Section 134: counter-review of `672c80ba` and `ca12bf1f`, status header, ledger row | **Accepted.** `672c80ba` is accepted there with an independent red/green of the CLI test and eight guard reversals; `ca12bf1f` is accepted after four qualifications, all of which are correct (135.2). The 134.3 identities reproduce (135.3). The source-view engineering milestone is accepted as bounded, with `IB1BCAMP-CR01` kept open at the thaw/legacy-caller boundary, which is the right place to keep it. |
+
+Rating of this round: **9 of 10.** The qualifications are precise and each
+one verified; the first is in fact broader than 134.2 states (135.2).
+
+### 135.2 `IBREC-HSVCCR01`, accepted against this reviewer
+
+1. **"Only place in the lane that reads source bytes for identity" was too
+   broad, and more so than 134.2 says.** Twelve lane modules hash current
+   source bytes against committed blobs or pin a current file's digest: the
+   campaign's `_verify_exact_committed_code` (nine paths, including two of
+   the four custody files), the `_lane_guard`s of the executor, the
+   master82, selected-parent, complete-acquisition and refusal-diagnostic
+   runners and the ambiguous diagnostic, the ambiguous-diagnostic verifier's
+   `_verify_observed_capture_blob`, the executor's and acquisition module's
+   own-file pins, and the `capture_code_sha256` reads of the two synthetic
+   verifier wrappers. The sentence should have said: the only source-byte
+   read that enters the historical validator identity. On the source-view
+   replay path none of those guards runs: `_build_real_plan`,
+   `_verify_partial`, `verify_accepted_ambiguity_diagnostic` and
+   `_source_classes` do not call them (they live in the dispatching entries
+   at campaign lines 1090-1359 and in the CLI wrappers), and the worker's
+   audit hook would have refused their `git` subprocesses. The current-byte
+   reads of the four files on that path are the parent's `_source_snapshot`
+   and the worker's `_assert_sources_unchanged`, which bind lineage without
+   requiring equality, exactly as 134.2 point 2 states.
+2. **"Without reading the current copies of the four files" was too broad.**
+   The inventory reads them; the identity hash no longer depends on them.
+3. **133.4's `f92eeb35...` and `6a9b7887...` identify the reviewed `1f913741`
+   snapshot**, computed before the correction. The corrected identities are
+   `f5b09920...` for the source-view file and `d72569bf...` for the 94-source
+   inventory (135.3).
+4. **The 430-500 s range is not the latest run's duration.** The corrected
+   run took 595 s, five seconds under the cap, after three timeouts; 133.3's
+   "two" named only the concurrent pair. This was flagged in the review
+   notes at the time and not re-pushed, to keep one push per round.
+
+On the "owner decision" sentence of 133.6: accepted as 134.2 reads it. The
+engineering conditions of 122.4, 123.3 and 131.3 are met and the milestone
+is accepted; the thaw and legacy-caller boundary that keeps `IB1BCAMP-CR01`
+open is where an owner decision would be needed, and no approval gate is
+implied for the engineering acceptance.
+
+### 135.3 Reproduction of section 134.3
+
+The committed source-view file's SHA-256 is
+`f5b09920b1a7b68079df664708f038e03c18279d4c7090e95a316ab330df2e9e`, equal
+to 134.3's corrected identity and to the `worker_source_sha256` of the 595 s
+receipt `259a0e30...`; that receipt's `current_source_inventory_sha256` is
+`d72569bf81729f2ceedb4bf5969581da56bbfdf2f5db51f28d67efaefd1227da`, equal to
+134.3's corrected inventory. The base wrapper, bootstrap and four-cycle read
+trace are unchanged from 133.4.
+
+### 135.4 Validation
+
+- `cb06065c`, network denied: record and active-document tests **71 passed**
+  on Python 3.13.15 and on 3.12.14.
+- The code tree is byte-identical to `672c80ba` outside `docs/`, so section
+  133.5's complete suite (**10,543 passed, 38 skipped, 0 failed**), its
+  352 wrapper tests and its 181-test gate stand for this tree. No code
+  changed this round and no replay was rerun.
+- Record tests after this section: **71 passed** on Python 3.13.15 and on 3.12.14, network denied, after the final wording.
+
+### 135.5 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBREC-HSVCCR01 | P3 | **CLOSED by qualification; accepted against this reviewer** | `ca12bf1f` | Sections 133.1, 133.3, 133.4, 133.7 | Four over-broad or snapshot-ambiguous sentences. | 135.2. | Correct; point 1 is broader than stated. | 135.2. | Twelve guard sites read; call sites located; identities reproduced. |
+| IBHSV-CR01, IBHSV-CR02, IBHSV-R01, IBHSV-R02 | P3/P2 | **Retained closed; independently accepted in 134** | `672c80ba`, `a53fb5ea` | Source-view module and tests | Unchanged. | 133.3, 134.3. | Unchanged. | None. | None new. |
+| IBHSV-OBS01, IBHRV-OBS01 | observation | **Retained** | earlier | Worker cap; lane binding | Unchanged. | 133.3, 134.4. | Unchanged. | None. | None. |
+| IBHRV-CCR01, IBREC-HRVCCR01 and earlier resolved findings | as recorded | **Retained closed** | earlier | earlier | Unchanged. | Sections 128-134. | Unchanged. | None. | None new. |
+| IBREV-CR01 | P1, process | **Retained closed by owner disposition** | `01a6b7e` | Sections 123-126 | Unchanged. | Sections 124-126. | Owner decision, not witnessed. | None. | None new. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Sections 119-134 | `IB1BCAMP-CR01` stays open at the thaw and legacy-caller boundary, as 134.4 states; the source-view remediation is accepted. | 134.4, 135.2. | Unchanged; all fail closed. | None. | None new. |
+| Earlier P3 findings, observations and the 45 unclassified section-119 survivors | P3 | **Retained as recorded** | earlier | earlier | Unchanged. | Sections 119-134. | Unchanged. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. | Sections 68 to 72. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no open P0 or P1 finding. Four P2 findings are open; all fail
+closed.
+
+### 135.6 Next action
+
+Codex counter-reviews this record commit. Per 134.6 the next offline
+deliverable needs owner scoping before any implementation; nothing is
+started here. No outcome, ETF, QC, paper, live, deployment, broker, capital,
+order, or trading authority follows from this section.
+
+No SEC request was made: the record tests ran network-denied and the only
+other operations were local `git` reads and file reads. No credential,
+licensed row, security master, outcome, ETF holding, QuantConnect, broker,
+operator database, scheduler, deployment, capital, order, live, or trading
+surface was used. No retained root was read. Authorized outcome looks:
+**0**. Consumed outcome looks: **0**. Research looks: **0**.

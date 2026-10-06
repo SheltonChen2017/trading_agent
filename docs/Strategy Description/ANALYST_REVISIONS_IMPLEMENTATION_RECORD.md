@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–253 retain the milestone, review, preregistration, QC
+strategy. Sections 1–256 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -356,6 +356,12 @@ owner's continuous-round/delegated-decision and necessary-QC authorization,
 audits the specifically approved original Mac histories, and implements
 prospective response-observation sidecars. No historical P2 finding or
 formal source gate is cleared; the floor stays 313/239/49/699.
+Section 256 resumes under the owner's explicit no-intermediate-Claude-wait
+direction after Safari QC authentication became available. Original R281/R247
+Mia conversations partially reconcile tool paths, not all historical operators,
+authority or immutable launch bytes. The verified repeated-decision-clock
+defect is corrected only in a separately versioned offline source projection;
+frozen R247/R279 sources and the three historical P2 dispositions are preserved.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1185,18 +1191,26 @@ decision are in 255.2; the older intermediate-review cadence does not override
 them. The approved local-history audit in 255.3 adds original command timing
 but does not recover the missing raw server or later launch histories.
 The prospective receipt fix is `0766faa08de39b003e5b0eb4cdc42b2ed1d10d58`.
-Further substantive readiness work is externally blocked by the actual missing
-evidence in 255.5, not by an unapproved next move or an intermediate Claude
-checkpoint. Claude must review section 255 and this round's final snapshot;
-this final handoff does not reinstate intermediate review pauses.
+Section 256 records the newly authenticated scoped QC/Mia audit and the
+separately versioned captured-clock correction `06f3e8d4`. Claude must review section 256
+and this round's final snapshot; that independent final review is not an
+intermediate checkpoint or a prerequisite for admissible continuing build.
+The human explicitly reiterated "build until the project is ready for forward
+looking" and "no need to wait for Claude." No routine approval or
+acknowledgement push is awaited. Missing independent evidence and supported
+audit access, not reviewer cadence, remain the substantive gates.
 The floor stays **313 / 239 / 49 / 699**. Retained R280 A1/R281 A2 status
 envelopes say `Completed.` and their source lists match independently
 regenerated frozen projections, but these locally written envelopes contain
 no read times or archived server responses. The extra R281/R247 launch
 operators, tools, authority and launch-time source remain unproven.
 `ARV2R248-002`, `-003` and `-004` therefore remain open, with original local
-command chronology now partially established. Original QC/Mia/other-host
-status/read and launch records remain unavailable in the inspected histories.
+command chronology now partially established. Original QC/Mia/other-host raw
+status/read and complete launch records remain unavailable in the inspected
+histories. The newly accessible R281 conversation links the later rerun to
+Mia's `create_backtest`; R247's conversation links the persist verification
+and source edits, but not original A4–A9 create calls. These partial tool-path
+links are qualified in 256.2, not finding closure.
 Necessary lane-scoped acquisition and research QC operations may proceed under
 255.2 when an actual supported source/access path exists; no repeated approval
 request is needed. Today’s authority is not historical launch authorization.
@@ -1238,14 +1252,16 @@ question about R-186's detached signature, the owner
 explicitly authorized starting the backtest and extended research-backtest
 authorization for this machine/session. Section 183 records the R-186-only
 one-use waiver chosen for this launch; the R-185 waiver is not reused.
-Each distinct backtest candidate has a hard maximum of three QC attempts.
-A compile failure, runtime error, or any other unsuccessful terminal run each
-counts as one attempt. After the third failure Codex makes no further code
-change or relaunch for that candidate and invokes QuantConnect's Mia directly
-when its authenticated browser interface is controllable; otherwise Codex
-stops and lets the owner use Mia. Any Mia-completed source must then be
-retrieved, compared with the local candidate, and documented; only verified
-lane-specific corrections may be ported.
+The older three-attempt default is superseded for necessary prospective
+research-only work by the later exact authority in 255.2: three unsuccessful
+attempts is a documented diagnostic/Mia recovery checkpoint, not a fixed total
+quota. Each compile failure, runtime error or other unsuccessful terminal run
+still counts; a justified continuation needs its own recorded delegated
+decision and coherent source/attempt protocol. Existing frozen R247/R281
+exhaustion/evidence gates are not rewritten or evaded by replacements. Any
+Mia-completed source must be retrieved, compared with the exact local candidate
+and documented; port only verified lane-owned corrections, not unrelated edits
+or changed economics. Historical unknown launches are not approved retroactively.
 
 Historical review-timing exceptions are recorded here so this live handoff
 can stay short. Each was limited to the named same-round work, not a standing
@@ -3004,6 +3020,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex counter-review of section 252 | `b83cf6c0` -> `a146ae57` -> this record commit | The one Claude record commit is accepted; no new P0-P3 finding, look, evaluation or cell. No next substantive milestone starts around the unchanged history/source gates. | Verified complete record diff, preserved receipt-audit limits, strict/loopback distinct-union arithmetic and unchanged formal trust roots. Clarified the existing preparation-versus-new-scope distinction prospectively in 253.3; no historical rewrite or code/test/policy/registry change. | Strict-network-denied record/active-document checks: 86 reviewed-head passes and 86 final-tree passes; exact results in 253.4. No complete Codex suite or repeated artifact/source audit. | ARV2R248-002/-003/-004 and two conditional stress cells remain open; floor 313/239/49/699 unchanged. No original audit record or scoped history-access approval supplied; existing request is not repeated. | Exactly one final matching-lane record push. Claude must review section 253; monitor remains active and quiet while unchanged, with no new QC/provider/outcome read, R247/R281 attempt or readiness implementation. |
 | 2026-10-06 | Claude independent review of section 253: the record-only acceptance of section 252 | `eadfd584` -> this record commit | Section 254: one record-only commit `a146ae57..eadfd584` disposed (1 accepted, 0 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | No code changed; confirmed only the record changed, the full commit and trust-root hashes and the union arithmetic; accepted the 253.3 reading of section 252's wording; section 4 names section 254, banner sentence added, this row appended | Complete selection not rerun because no file outside the record changed since its run at `b83cf6c0` in 252.4; record gates and the shared-ledger reader `test_alpha_stage1_replications.py` at `eadfd584`, record gates, `compileall` and `git diff --check` on the final tree, all network-denied; exact counts in 254.4 | 0 P0, 0 P1, 0 P2, 0 P3; `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's Claude commit; Codex counter-reviews section 254 unless the owner changes the workflow |
 | 2026-10-06 | Codex section-254 counter-review, owner-directed continuous round, scoped original-history audit and prospective QC response observations | `eadfd584` -> `a205ebf7` -> `0766faa0` -> this record commit | One Claude commit accepted after two P3 qualifications; no new launch, result evaluation, research look or cell; floor 313/239/49/699 | Documented each delegated decision, extracted only scoped historical metadata, and implemented retention of private append-only response observations for existing authorized QC list/read calls; historical envelopes and source/attempt freezes unchanged | Strict-network-denied focused validation and mutation restoration in 255.6; compilation/diff/root/branch/status checks. No complete Codex suite, fresh QC/provider request or old artifact/source-audit repetition | ARV2CR255-001 exact validation exception; ARV2CR255-002 prospective correction of the Stage-1 ledger-reader claim. Three historical P2s and two conditional cells remain open; formal independent-source gates remain blocked | One final same-lane push at the concrete external evidence/access stop, not an intermediate cadence pause. Claude must review section 255. Resume substantive build when genuine required evidence/access becomes available, under the saved continuous-work authorization |
+| 2026-10-06 | Codex resumed continuous work after authenticated QC/Mia became available | `ac73a660` -> `06f3e8d4` -> this record commit | Section 256: no new Claude push or replay; qualified original Mia tool-path evidence, prospective clock correction; floor 313/239/49/699 unchanged | Read only the scoped project histories, declined cloud edits, versioned the captured-clock source fix without changing R247/R279 bytes/manifests or adding a launcher; all delegated decisions recorded | Strict-network-denied focused clock/source/closure/record checks in 256.4; no complete Codex suite. Authenticated QC UI/history reads and displayed current IDE builds disclosed, not a zero-contact claim | ARV2I256-001 P2 prospective correction. ARV2R248-002/-003/-004 remain open with partial new evidence; two conditional cells and independent formal source gates unchanged | One final matching-lane push at the concrete remaining artifact/access stop; no intermediate Claude wait. Final independent review remains due; quiet monitor stays active |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -35837,3 +35854,206 @@ intermediate acknowledgement push if genuine required evidence becomes
 available. It stays quiet on unchanged blockers and resumes substantive work
 only when a supported evidence/access path enables it. No further claims-only
 scaffold, repeated old audit or irrelevant QC relaunch is the next step.
+
+## 256. Continuous authorized work: authenticated Mia audit and prospective single-firing-clock correction, 2026-10-06
+
+**Resumed baseline:** `ac73a660e19828ed53078838a78c8e652c7efff2`, containing
+section 255 and `0766faa08de39b003e5b0eb4cdc42b2ed1d10d58`. Local and the
+matching remote lane were at that exact head; no new Claude commit was present.
+This round therefore does not counter-review section 254 again or treat
+Codex's own push as a new review. Every repository operation uses
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2`
+on `codex/strategy-analyst-revisions-v2`. No other checkout, export, branch or
+worktree is used. The round resumes substantive work because the human made
+an authenticated QC Safari session available, not because of an acknowledgement.
+
+### 256.1 Human direction and delegated decisions
+
+The human asked whether Codex could operate Mia, indicated the session was
+ready, and explicitly reiterated continuous build until genuine forward
+readiness with **no need to wait for Claude**. This retains and clarifies
+255.2; an intermediate independent-review wait is not a stopping condition.
+A final independently reviewed dossier is still evidence Codex cannot create
+by labeling its own implementation reviewed.
+
+| Decision | Exercised authority / limitation |
+|---|---|
+| `ARV2OD256-A` | Resume lane-scoped continuous work immediately from the matching baseline with no routine approval or intermediate Claude checkpoint. Retain one successful final matching-lane push for this resumed round. |
+| `ARV2OD256-B` | Use authenticated Safari QC/Mia only for the exact R280/R281/R247 original histories in the existing audit scope. Inspect their project conversations and the already-booked R281 rerun's supported retained Code view. Do not enumerate unrelated account chats, fetch new research outcomes, clone projects or launch replacement runs. |
+| `ARV2OD256-C` | Decline proposed cloud import edits and change the two inspected Mia sessions from Full Auto to Ask Before Edits. Metadata-only audit prompts forbid code edits, new runs/compiles and fresh result/data/log APIs; bounded original conversation reads are allowed. This is not a claim that prompts enforce a transport boundary. |
+| `ARV2OD256-D` | Reproduce Mia's repeated-clock diagnosis locally, then correct that verified lane-owned defect in a new host-only source projection. Preserve all frozen R247/R279 source/manifests; create no QC candidate, launcher, waiver, deployment, run or replacement attempt. Do not port Mia's unrelated cloud edits or its historical end-date changes wholesale. |
+| `ARV2OD256-E` | When QC's two-coding-session limit prevented opening R247, stop only the R280 IDE coding session just opened for this audit. No backtest is stopped, no source changes are lost and no paid resource upgrade is purchased. Existing unrelated browser tabs are untouched. |
+| `ARV2OD256-F` | Carry all historical P2s and formal source gates open unless the exact missing original or independently authenticated evidence is recovered. Today's general authority is not retrospective approval of historical unknown launches, vendor rights, a budget/subscription or formal source admission. |
+
+### 256.2 Authenticated original Mia histories: partial tool-path reconciliation
+
+These are native Safari UI observations of the named projects' retained
+conversations plus Mia's bounded reconstruction of that conversation, **not
+exported raw signed tool/server logs**. The current authenticated account label
+does not identify the original human/operator. Chat display dates have no
+stated timezone and must not be equated with UTC launch timestamps. Original
+Mac audit and retained-source regeneration from 255/251 were not repeated.
+
+| Project / original conversation | New supported observation | Missing evidence / disposition |
+|---|---|---|
+| R280 `37163942`, `ARV2 EIGHT EXECUTION STRESS R280 2021 2025` | Browse Chats shows no chats. No empty new conversation was started. | No original QC status/read envelope recovered. `ARV2R248-002` remains open. |
+| R281 `37165262`, `AnalyzeWebsocketSocketLeakError`, display `Completed - 9/30/2026, 10:20:27 PM` | Visible history and bounded reconstruction link the later exact rerun `44a66ce2bcf573b69902b4641eb56293` to `create_backtest`, with name `ARV2 R281 fixed100 five-bps execution stress 2021 2025 A2 rerun after websocat infra error`. The retained create response exposes the run ID and compiler warnings, not compile ID, call timestamp or a full launch-source manifest. | Partial tool-path reconciliation of `ARV2R248-003` only. Original operator/explicit rerun authority, immutable 17-file launch/compile binding and the thirteen later saves remain unavailable. No original A2 ~08:07 UTC raw server read was recovered, so `-002` remains open. |
+| R247 `37097547`, `Snapshot Decision Cutoff Adjustment`, display `Completed - 9/28/2026, 8:35:47 PM` | Retained conversation links the persist verification `614b1b8b4ff0e968d642e3e8d0bfb515` to a `create_backtest` response for this project, and records snapshot/main source edits. A later completion packet is present, with no original call timestamp/compile/hash binding. | Partial tool-path reconciliation of `ARV2R248-004` only. A4–A9 have archived error/result packets, not their original create calls; neither their launcher nor approval/source identity follows from a run name or a later read. |
+
+R281's retained conversation reports the original tool sequence
+`read_all_messages`, `list_backtests`, one `create_backtest`, a rerun
+`read_backtest` and a rerun `search_backtest_logs`. Its `list_backtests` packet
+names A2 `2007f9f73fcbfa7fb5ba95abdb094831` and `snapshotId=37165828`;
+the snapshot ID's semantics and immutable source binding are not established
+by that packet alone. Project `37165262` is also named in a later system
+status packet. The initiating user-role message quotes a websocat error with
+time `2026-09-30 07:52:04`; that error timestamp is not the user's call time,
+and its timezone is unstated. No original user identity or explicit rerun
+approval is exposed. A single newly allowed `read_all_messages` returned
+empty; its reported semantics are messages since the last call, not an
+original audit-log export. No original message/call IDs were recovered.
+
+R247's six later named probes remain the already-booked identities:
+`b3f993e79f4134ee9fc35b4a704ed8c6`,
+`ffba0396842f1b64f58814d0fec1d8a4`,
+`96fe4bce06c5cc3148c51dc19861b3bf`,
+`0966123feff2425fb383650942a0416b`,
+`2980321c46f19cf3d4ec62ed67671af3`, and
+`2549dc5a78e4601dec8d4950f18fc52d`. Their archived packets describe cutoff
+refusals or missing persistence; simulated error times and differing source
+line numbers do not authenticate wall-clock launch time or source bytes.
+The retained edit sequence describes clock normalization/passed firing time,
+an Object Store suffix change, generated-main propagation and a clean main
+restore. Success flags, linter warnings and later current code are not a
+historical immutable source/compile chain. The original initiating request
+was not available verbatim. The persist-verification path cannot be used
+to attribute every A4–A9 launch to Mia or the owner.
+
+**Audit-protocol qualification:** R247's new audit prompt allowed one bounded
+`read_all_messages` call only. Mia's answer reports **two** such calls in that
+turn, both limited to the same chat and delivering archived packets. No
+independent raw call-count record was exposed. This is a reported deviation,
+not proof that the one-call budget was enforced. No further R247 tool request
+is issued to work around it. Prompts and Ask Before Edits are not a verified
+remote-network sandbox; the local pytest sandbox does not constrain QC's Mia.
+
+The supported R281 Backtests Results view was opened for the exact named
+rerun to find its retained Code tab. Its landing UI incidentally renders old
+economic fields/charts; they are not exported, evaluated, compared or admitted
+as new research evidence. The subsequent source-only navigation was interrupted
+when the Mac locked. The tool required manual unlock and Codex told the human;
+no unlock/credential/security bypass was attempted. No run-source package
+was obtained by that interrupted path.
+
+Opening/messaging these IDE views was accompanied by displayed cloud-build
+lines for Lean `2.5.0.0.18165`: R281 `7:33:47` / `10bb8b-c4bed1`, R280
+`7:41:34` / `6011b9-e51702`, R247 `7:42:54` / `a0226a-84074c`, R247
+`7:45:45` / `8d05c8-84074c`, and R281 `7:50:14` / `6bef8a-c4bed1`.
+These are current IDE display observations with no stated date/timezone,
+not original September launch/compile bindings. Codex did not click a build,
+backtest or live control, but does **not** claim zero QC processing or zero
+network calls: authenticated UI/history access and these displayed build
+side effects occurred. No new backtest was requested or observed during this
+audit. The source-edit suggestions were declined; no cloud source edit was
+requested by Codex. No funded-account, broker, paper/live or real-order action
+was taken.
+
+### 256.3 Verified prospective defect and separately versioned correction
+
+`ARV2I256-001` (**P2, prospective correction; historical findings unchanged**):
+the generated `_at_decision` reads `self.time` for the date check, while
+`persist_at_decision` independently reads `algorithm.time` again for its cutoff.
+A property returning 09:20 on the first access and 10:00 on the second
+reproduces `snapshot decision cutoff changed`. This is a fail-closed capture
+availability defect, not an accepted alpha result, data leak or proof of the
+original cloud run's first clock reading.
+
+The new host-only `fresh_six_universe_captured_clock.py` authenticates the exact
+R279 A2 two-file source and applies five exact-anchor transformations: split
+clock-value normalization from clock acquisition, require the captured firing
+time in persistence, normalize that value rather than reacquiring the clock,
+import the normalizer into generated main, and capture/pass one `self.time`
+value through date selection and persistence. NY timezone conversion and the
+existing explicit **seconds-resolution** normalization remain; fractional
+seconds are not newly authenticated or claimed to be a subsecond cutoff.
+The firing time is required, never an optional fallback or initializer cache.
+An arbitrary caller-supplied time is still caller evidence, not independent
+publication or actual QC firing proof.
+
+Implementation commit: `06f3e8d4790f7b0b128c9220caf8d1e80c02881e`.
+It is a prospective offline correction, not a cloud deployment or a newly
+QC-validated backtest. Its versioned byte identities are:
+
+| Projected source | SHA-256 / bytes |
+|---|---|
+| `fresh_six_universe_snapshot.py` | `05b1efcdee316c3183a38cdc5fb9a99f3c57494b5deb0bfbc80dca9be477bc98` / 17,365 |
+| `main.py` | `277803f84faa3deaab76946c28f765f0a424de76aab9404de847319274b0e02e` / 1,766 |
+| Two-file inventory manifest | `77f6a80901f867f822b7b9913679a944c3755e1fea87a6777ff2e50123652ea5` |
+
+The old runtime/module, R247 A1/A2/A3, R279 A1/A2, their source hashes, attempt
+manifests and launch/result records remain unchanged. The projected `.gz`
+Object Store key, schema, seven-source and source-EndTime rules, size/digest/
+read-back refusals, and every literal-false vendor/readiness/order flag are
+preserved. The new projector exposes source/identity preview only: no client,
+transport, candidate, plan, attempt, cloud write, launcher or deployment API.
+Its exact imports and compile-only direct I/O surface are registered in the
+existing exhaustive host-only package-closure test; transitive parent loading
+remains explicitly host-only, not a zero-I/O exemption.
+
+### 256.4 Validation and continuing-work handoff
+
+No complete Codex suite is authorized or run. All local pytest/mutation
+processes use Python 3.13.15 in the designated
+root with `(version 1)(allow default)(deny network*)`; this boundary does not
+retroactively establish historical contact or count QC UI actions.
+
+| Focused check | Actual result / limitation |
+|---|---|
+| Initial new projection tests | **14 passed in 2.06s**, implementation agent; 13-test advisory result preceded the final loader-type test and is not described as a final-tree run. |
+| Existing five-file selection | **142 passed in 2.53s**: snapshot, snapshot submission, R279 A1, R279 A2 and forward-predecision test files; implementation agent. |
+| Final six-file source/clock selection | **156 passed in 2.38s** by the implementation agent and independently **156 passed in 2.38s** by Codex root, including all 14 new tests. No skips, failures or warnings; this is not a complete lane suite or actual QC run. |
+| Package-boundary focused selection | Initial broad-import draft: 3 passed in 4.77s. Narrowing to three bound parent symbols correctly made the old import pin red: **1 failed, 73 deselected in 2.48s**. The pin was updated to the actual exact imports, not weakened to a package exemption. Final three closure/guard checks: **3 passed, 71 deselected in 4.48s**. A prior combined draft command selected only those three and deselected the new projection tests; its 3 passes are not a 17-test combined run. |
+| Three in-memory behavioral mutations | Root independently bypassed only output byte pins in memory to reach behavior: persistence clock reacquisition gave the expected cutoff error; main's second read failed the read-count assertion; replacing normalization with raw `.date()` failed the invalid-clock refusal contract. **All three caught**, finally-safe function restoration, original projected bytes equal and both behavioral checks green afterward. No file was mutated and no QC call was made. |
+| Record/active-document and Stage-1 selection | Draft: **106 passed in 1.34s**. After the implementation hash, validation and final external-stop evidence were recorded: **106 passed in 1.44s**. Stage-1's 20 remain behavior/constants checks, not ledger-edit authentication; no complete suite is inferred. |
+| Compilation and scope | Three changed Python files and both projected runtime files compile. `git diff --check` clean; code commit contains only the new projector/new tests/exhaustive closure registration. No frozen source, registry, shared ledger, policy or unrelated/root record changed. |
+
+The source/clock 156, package-boundary 3 and record/Stage-1 106 are
+**265 distinct focused tests**, not one combined complete-suite run.
+The three formal trust-root hashes/empty entries were remeasured exactly as
+in 231.3/255.5; source authority remains `zero_access`. No new independent
+review or formal readiness is claimed from the advisory checks.
+
+The booked floor remains **313 shared / 239 development / 49 infrastructure /
+699 cells**. All original IDs above are already in the reconciled ledger;
+none is counted again. The same two stress cells and four-arm comparison stay
+conditional, not cleared or withdrawn on an unproven status-drift inference.
+`ARV2R248-002`, `-003` and `-004` remain open with the partial new tool-path
+evidence explicitly qualified. There is no new candidate, economic evaluation,
+research backtest, formal look, alpha spend or cell.
+
+Forward readiness still requires the concrete independent packages in 231.3:
+immutable vendor as-of/version/publication/correction/deletion completeness,
+reviewed SID/permanent/share-class/vendor/own-ETF availability identity, and
+authenticated RAW prior-NYSE-close prices/scores, plus the stock seven-role
+and terminal-payoff evidence. QC account authentication and Mia history are
+not those artifacts. No selector/order adapter is improvised around the gate,
+no formal dates/estimand/power hash/epoch are filled and no registry is populated
+by assertion. ARV2-4 through ARV2-8 and the remaining formal readiness/dossier
+definitions of done are not complete.
+
+This resumed continuous round reaches a **concrete external evidence/access
+barrier**, not project completion and not a Claude-review pause. A final UI
+check still reports the Mac locked; manual unlock is required to finish the
+already-scoped supported R281 retained-source inspection. Even a recovered
+run snapshot would not supply all original operator/authority/status/read
+and thirteen-save records, nor the independent formal source packages.
+No safe currently supported local alternative supplies those missing facts.
+
+Continue substantive authorized work when the remaining original audit/source
+path or genuine independent package becomes available. Do not wait for an
+intermediate Claude acknowledgement or ask to reauthorize the existing scope.
+Keep the monitor active and quiet while unchanged; do not repeat Mac audits,
+relaunch R247/R281, manufacture a claims-only scaffold or use irrelevant
+backtests to pretend the external gates are cleared. Final independent review
+of this implementation remains due and is not claimed from same-round
+advisory agents.

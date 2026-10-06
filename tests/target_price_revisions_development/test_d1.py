@@ -357,8 +357,9 @@ def test_custom_framing_keys_are_rejected_before_caller_callbacks(framing):
         normalize(row, sessions=sessions)
 
 
-# TPR-CR17-002: three guards the first round left without a test. Each case
-# below passed with the guard removed in a scratch-clone mutation trial.
+# TPR-CR17-002: three guards the preceding suite left without a test. That
+# suite stayed green when each guard was removed; each new case below turns
+# red under its corresponding mutation.
 
 
 def test_matching_but_malformed_horizon_is_not_a_comparable_horizon():

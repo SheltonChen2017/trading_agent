@@ -233,6 +233,34 @@ SECTION51_CODEX_COMMITS = (
     "7baddbbc303e76ef91850b3e4a53cfe4030f4fea",
     "01e703906df838fd9cbb91a2d1fd03ce7d18f288",
 )
+SECTION51_CODEX_DISPOSITIONS = (
+    "accepted", "accepted after correction", "accepted after correction",
+)
+SECTION52_CLAUDE_BASE = "01e703906df838fd9cbb91a2d1fd03ce7d18f288"
+SECTION52_CLAUDE_HEAD = "67aade0e47d6f4d6c6290018bbe7b52831a465c7"
+SECTION52_CLAUDE_RANGE = f"{SECTION52_CLAUDE_BASE}..{SECTION52_CLAUDE_HEAD}"
+SECTION52_CLAUDE_SHORT_RANGE = "01e70390..67aade0e"
+SECTION52_CLAUDE_COMMITS = (
+    "3e2be6bcaf06ff4b1f806a04d61bf8895e83ce38",
+    "40f849b2d1a956ea3abf6a2c60f453f3b703f302",
+    "67aade0e47d6f4d6c6290018bbe7b52831a465c7",
+)
+SECTION52_OWNER_REVIEW_SCOPE = (
+    "Claude reviewed, start the counterreview before moving to the next milestone"
+)
+SECTION52_OWNER_HANDOFF_SCOPE = (
+    "when you are done. push. then arm a monitor for Claude's subsequent review"
+)
+SECTION52_SCOPE_BOUNDARIES = {
+    "Counter-review": "Every incoming Claude commit and cumulative tree",
+    "Next milestone": "Not authorized",
+    "Data inputs": "Synthetic fixtures and committed D0 aggregate report only",
+    "Additional data access": "Forbidden",
+    "Trust provisioning": "Forbidden",
+    "Outcome/QC/trading": "Forbidden",
+    "Publication": "One matching-lane non-force push",
+    "Monitor": "One completed Claude review of this published counter-review",
+}
 SECTION50_OWNER_SCOPE = (
     "Counter-review both Claude commits. If accepted, implement one fixture-only "
     "TPR-D1 candidate using synthetic fixtures and the committed D0 aggregate "
@@ -779,11 +807,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION51_CODEX_RANGE]
+    ) == [SECTION52_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact Codex range"
+        "Codex has counter-reviewed the exact Claude range"
         in normalized_current
     )
     assert (
@@ -809,7 +837,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "Codex next counter-reviews section 45" not in normalized_current
     assert "Claude next reviews sections 46 and 47" not in normalized_current
     assert "Claude next reviews sections 49 and 50" not in normalized_current
-    assert "Codex next counter-reviews section 51" in normalized_current
+    assert "Codex next counter-reviews section 51" not in normalized_current
+    assert "Claude next reviews section 52" in normalized_current
     assert "TPR-D1 is authorized only as a fixture-only candidate" in normalized_current
     assert "D0's one completed audit is not renewed" in normalized_current
     assert "TPR-D2 is not authorized" in normalized_current
@@ -843,15 +872,16 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION51_CODEX_SHORT_RANGE]
+        ) == [SECTION52_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
-        assert "section 51" in normalized_summary_lower
+        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
+        assert "section 52" in normalized_summary_lower
         assert "awaits claude review" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
         assert "claude next reviews sections 49 and 50" not in normalized_summary_lower
-        assert "codex next counter-reviews section 51" in normalized_summary_lower
+        assert "codex next counter-reviews section 51" not in normalized_summary_lower
+        assert "claude next reviews section 52" in normalized_summary_lower
         assert "tpr-d2 is not authorized" in normalized_summary_lower
         assert "tpr-d0 is not authorized" not in normalized_summary_lower
         assert "no next implementation milestone is authorized" not in normalized_summary_lower
@@ -1979,7 +2009,12 @@ def test_section_50_scope_guard_rejects_added_or_widened_permissions(
 
 
 def test_section_51_review_records_the_exact_range_and_grants_nothing() -> None:
-    """TPR-CR17: pin this review of the counter-review and the D1 candidate."""
+    """Pin exact dispositions and reject two recognized affirmative grants.
+
+    The grant rule recognizes affirmative TPR-D2/Real-row D1 followed by is
+    authorized at a sentence start, case-insensitively. Embedded negative
+    clauses are not grants. This is not an arbitrary-prose classifier.
+    """
     section = _record_section(
         "## 51. Claude independent review of the counter-review and the "
         "fixture-only TPR-D1 candidate"
@@ -2009,11 +2044,9 @@ def test_section_51_review_records_the_exact_range_and_grants_nothing() -> None:
             )
         )
     ]
-    assert tuple(commit for commit, _ in rows) == SECTION51_CODEX_COMMITS
-    assert {disposition for _, disposition in rows} <= {
-        "accepted",
-        "accepted after correction",
-    }
+    assert tuple(rows) == tuple(zip(SECTION51_CODEX_COMMITS, SECTION51_CODEX_DISPOSITIONS)), (
+        "exact section 51 dispositions must retain every correction qualification"
+    )
     assert "Cumulative disposition: accepted after correction" in section
     ledger = _bounded(
         section,
@@ -2029,9 +2062,13 @@ def test_section_51_review_records_the_exact_range_and_grants_nothing() -> None:
         "TPR-CR17-002": "Closed by correction",
         "TPR-CR17-003": "Closed by qualification",
     }
-    authority = " ".join(
-        section.partition("### 51.6 Milestone and authority decision")[2].split()
-    )
+    authority = " ".join(_bounded(
+        section, "### 51.6 Milestone and authority decision", "### 51.7 Validation",
+        "section 51 authority",
+    ).split())
+    assert re.search(
+        r"(?:^|[.!?])\s*(?:TPR-D2|real-row D1)\s+is\s+authorized\b", authority, re.I,
+    ) is None, "contradictory section 51 authority grants a prohibited next scope"
     for required in (
         "fixture-only TPR-D1 candidate is accepted",
         "TPR-D2 is not authorized",
@@ -2042,3 +2079,116 @@ def test_section_51_review_records_the_exact_range_and_grants_nothing() -> None:
         "trading authority",
     ):
         assert required in authority, required
+
+
+@pytest.mark.parametrize(
+    "commit",
+    [
+        "7baddbbc303e76ef91850b3e4a53cfe4030f4fea",
+        "01e703906df838fd9cbb91a2d1fd03ce7d18f288",
+    ],
+)
+def test_section_51_guard_refuses_disposition_drift(monkeypatch, commit: str) -> None:
+    """Exercise the actual review pin after its unchanged record passes."""
+    test_section_51_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 51.")
+    original = f"| `{commit}` | **Accepted after correction** |"
+    assert section.count(original) == 1
+    mutated = section.replace(original, f"| `{commit}` | **Accepted** |", 1)
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 51.")
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match="exact section 51 dispositions"):
+        test_section_51_review_records_the_exact_range_and_grants_nothing()
+
+
+@pytest.mark.parametrize(
+    "added_grant",
+    ["TPR-D2 is authorized.", "Real-row D1 is authorized."],
+)
+def test_section_51_guard_refuses_contradictory_authority(
+    monkeypatch, added_grant: str,
+) -> None:
+    """A recognized affirmative grant cannot coexist with the required refusal."""
+    test_section_51_review_records_the_exact_range_and_grants_nothing()
+    original_section = _record_section
+    section = original_section("## 51.")
+    mutated = section.replace(
+        "\n### 51.7 Validation",
+        f"\n{added_grant}\n\n### 51.7 Validation",
+        1,
+    )
+    assert mutated != section
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 51.")
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match="contradictory section 51 authority"):
+        test_section_51_review_records_the_exact_range_and_grants_nothing()
+
+
+def test_section_52_counterreviews_every_incoming_commit_and_stops() -> None:
+    """The completed counter-review adds publication/monitoring, not development."""
+    section = _record_section("## 52.")
+    assert SECTION52_CLAUDE_RANGE in section
+    normalized = " ".join(re.sub(r"(?m)^\s*> ?", "", section).split())
+    assert SECTION52_OWNER_REVIEW_SCOPE in normalized
+    assert SECTION52_OWNER_HANDOFF_SCOPE in normalized
+    table = _bounded(section, "### 52.2", "### 52.3", "section 52 dispositions")
+    rows = tuple(
+        (match.group(1), match.group(2).strip("*").lower())
+        for line in table.splitlines()
+        if (match := re.match(r"\| `([0-9a-f]{40})` \| ([^|]+?) \|", line))
+    )
+    assert rows == tuple(
+        (commit, "accepted after correction") for commit in SECTION52_CLAUDE_COMMITS
+    )
+    assert tuple(commit for commit, _ in rows) == tuple(
+        _git_lines("rev-list", "--reverse", SECTION52_CLAUDE_RANGE)
+    )
+    assert "Cumulative disposition: accepted after correction" in section
+    boundary = _bounded(
+        section,
+        "<!-- TPR-CCR18-SCOPE:START -->",
+        "<!-- TPR-CCR18-SCOPE:END -->",
+        "section 52 counter-review scope",
+    )
+    scope_rows = tuple(re.findall(r"^\| ([^|]+) \| ([^|]+) \|$", boundary, re.M))
+    assert scope_rows == (("Boundary", "Scope"), *SECTION52_SCOPE_BOUNDARIES.items()), (
+        "the closed counter-review boundary cannot add, remove, duplicate or grant a scope"
+    )
+
+
+@pytest.mark.parametrize(
+    ("original", "replacement"),
+    [
+        (
+            "| Next milestone | Not authorized |",
+            "| Next milestone | Authorized |",
+        ),
+        (
+            "| Additional data access | Forbidden |",
+            "| Additional data access | Permitted |",
+        ),
+    ],
+)
+def test_section_52_scope_guard_rejects_added_authority(
+    monkeypatch, original: str, replacement: str,
+) -> None:
+    """Run the actual closed guard after proving the unmodified scope is valid."""
+    test_section_52_counterreviews_every_incoming_commit_and_stops()
+    original_section = _record_section
+    section = original_section("## 52.")
+    assert section.count(original) == 1
+    mutated = section.replace(original, replacement, 1)
+    monkeypatch.setitem(
+        globals(), "_record_section",
+        lambda heading: mutated if heading.startswith("## 52.")
+        else original_section(heading),
+    )
+    with pytest.raises(AssertionError, match="closed counter-review boundary"):
+        test_section_52_counterreviews_every_incoming_commit_and_stops()

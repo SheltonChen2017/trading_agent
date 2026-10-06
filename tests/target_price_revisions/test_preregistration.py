@@ -75,9 +75,11 @@ def _host_git_logic() -> Iterator[Path]:
 def reviewed_loader_git(request: pytest.FixtureRequest) -> Iterator[None]:
     """Separate frozen Windows Git evidence from mocked-trust host logic.
 
-    Only anchored-loader tests explicitly request this fixture. Both legs use
-    the helper's synthetic signed-registry verifier; neither proves native
-    signer custody or ACL integration. Missing frozen Git fails on Windows.
+    Only anchored-loader tests explicitly request this fixture. Positive
+    anchored fixtures use the helper's synthetic signed-registry verifier;
+    the empty-registry reachability case refuses before signed verification.
+    Neither leg proves native signer custody or ACL integration. Missing
+    frozen Git fails on Windows.
     """
     if request.param == "native_windows":
         if os.name != "nt":

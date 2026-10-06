@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–247 retain the milestone, review, preregistration, QC
+strategy. Sections 1–251 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -332,6 +332,13 @@ Section 250 is Claude's independent review of `c2112b11..afb29176` (0 P0,
 0 P1, 0 P2, 1 P3): the counter-review is accepted after one citation
 correction, `ARV2R250-001`, and test-only commit `4496d241` pins every
 lane-record backtest ID to the shared look ledger.
+Section 251 accepts both section-250 Claude commits after counter-review and
+performs the owner-requested local retained-receipt audit. The original R280
+A1/R281 A2 envelopes and regenerated 17-file source projections are internally
+consistent, but original QC read times/responses and the later R281/R247 launch
+paths remain unproven. The three provenance findings and two conditional stress
+cells remain open; original audit records or exact owner-scoped history access
+are needed, not another backtest or readiness scaffold.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1145,16 +1152,22 @@ review of the exact pushed range `b212048e..f0318d6f` (sections 219–247),
 with a third QC census and status-only reads of the stress backtests.
 Section 250 is Claude's independent review of the exact pushed range
 `c2112b11..afb29176` (section 249), with one citation correction and
-regression pin `4496d241`. The immediate next step is that Codex
-counter-reviews section 250 and this round's two Claude commits, unless the
-owner explicitly changes this workflow. Section 249 has reviewed all three new
-Claude commits and confirmed the conservative floor **313 / 239 / 49 /
-699**. `ARV2R248-002`, `-003` and `-004` remain open until the machine
-holding the original receipts authenticates the stress reads, establishes
-the extra launch paths and compares exact retained/cloud source identities.
-The 699 booked cells include two stress cells under review; their four-arm
-comparison is conditional pending that evidence. No new QC read or rerun
-is inferred from this handoff.
+regression pin `4496d241`. Section 251 accepts both new Claude commits and
+performs the permitted original-Mac local metadata/hash/source audit.
+Claude must review section 251 and its exact pushed documentation snapshot.
+The floor stays **313 / 239 / 49 / 699**. Retained R280 A1/R281 A2 status
+envelopes say `Completed.` and their source lists match independently
+regenerated frozen projections, but these locally written envelopes contain
+no read times or archived server responses. The extra R281/R247 launch
+operators, tools, authority and launch-time source remain unproven.
+`ARV2R248-002`, `-003` and `-004` therefore remain open. The owner is asked
+to supply original timestamped QC status/read and launch audit records, or
+authorize inspection of exact original host/session histories for those
+identities. Existing scoped preparation is not being reauthorized. No
+outside-lane history inspection, new remote QC/provider read or outcome access
+has been inferred. The 699 booked cells still include two stress cells under
+review; their four-arm comparison remains conditional, not cleared or withdrawn
+from an unproven status-drift inference. R247 and R281 remain attempt-exhausted.
 The owner may suppress acknowledgement-only rounds while retaining active
 monitoring; no such exception or monitor pause has been inferred.
 The next readiness step is the independent evidence acquisition/admission
@@ -2951,6 +2964,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-05 | Claude (Windows host) independent review of `b212048e..f0318d6f`, third QC-census reconciliation, and the stress arms' current QC status | `f0318d6f` -> `28bcc887` -> `8f87018e` -> this record commit | Review of the forty commits pushed since `b212048e` (sections 219–247): the fourteen Claude review sections and their Codex counter-reviews confirmed by this host's gates, section 247 reviewed for the first time, and a census of every lane QC project reconciled into the look ledger (section 248) | Synced the lane clone by fast-forward on this Windows host. Immutability of V16–V19 and the cap-90 bridge runtime re-verified from committed blobs; section 247's diff scope, citation trials, trust-root hashes and validation arithmetic reproduced. An administrative census (zero looks) of 188 lane projects and 281 backtests found fifteen launches in five projects that neither the record nor the shared ledger knows, including an unrecorded R-281 rerun; status-only reads show QC now lists R280 A1 and R281 A2 as `Runtime Error` after their recorded `Completed.` reads. Appended five ledger entries and reconciled the totals from 298/233/40/699 to **313/239/49/699**; one test case and one fixture change added, no production line changed. | Real tree at `f0318d6f`: `compileall` exit 0; `git diff --check` clean; record and active-document gates **84 passed**; final record bytes **84 passed**. Guarded LF worktree: standing gates 26 failed (firewall host class), 242 passed; complete Analyst lane suite: **not complete at push time**: the owner directed this push before the detached run finished (started 11:21 local on 2026-10-05, at 52% of 9,580 collected tests when the push was made); its counts are to be recorded in the next round. The previous complete run on this host, at `b212048e` on 2026-09-29, ended 1074 failed, 6591 passed, 922 skipped, 698 errors in 2:24:02, every failure and error in the host classes of `ARV2R165-001`. Mutation trials on the attribution study: six of six mutations red with the correction; A2 (interaction contrast) and A3 (manifest digest) survived the committed tests. QC access: administrative census, status-only reads and file inventory; no result, statistic, chart, order, log, price, provider row, return or Object Store payload read. | 0 P0, 0 P1. `ARV2R248-001` (P2, corrected): fifteen unrecorded launches reconciled. `ARV2R248-002` (P2, open for Codex): R280 A1 and R281 A2 now `Runtime Error` at QC. `ARV2R248-003` (P2, open): unrecorded R-281 rerun and later file saves. `ARV2R248-004` (P2, open): `R247A4`–`A9` launches past the frozen limit. `ARV2R248-005` (P3, corrected): stale banner and section-4 anchors. `ARV2R248-006`/`-007`/`-008`/`-010` (P3, documented). `ARV2R248-009` (P3, corrected, test-only): two unpinned attribution-study guards. | Codex counter-reviews section 248 and its commits, answers `ARV2R248-002`, `-003` and `-004` with receipts, and confirms or corrects the reconciled classification. No stress successor, further sweep, R-247 or R-281 attempt, levered target, paper/live deployment, broker, funded-account, real-order or trading action is authorised. |
 | 2026-10-05 | Codex counter-review of every unreviewed section-248 commit | `f0318d6f` -> `c2112b11` -> this record commit | One test commit accepted; ledger and record accepted after prospective documentation corrections. Fifteen distinct added IDs and look arithmetic verified; no new QC/provider look or result cell. | Corrected R281 attempt-versus-backtest wording, qualified unproven post-read status drift and named the test correction's actual snapshot; appended missing R210-R221 and R177 identity cross-references without counting them again. No production or test source changed. | Native Windows record checks and separately qualified in-memory attribution verification in 249.4; final diff/scope checks. No complete Codex suite or production POSIX-path validation. | Three P3 documentation findings corrected prospectively. ARV2R248-002/-003/-004 remain open because retained receipts and source package are absent here. Out-of-lane findings remain documented and unfixed. | One same-lane documentation push after validation. Claude must review section 249; obtain original retained metadata/source evidence before resolving stress validity or extra launch attribution. No further R247/R281 attempt or readiness implementation. |
 | 2026-10-06 | Claude independent review of section 249: the counter-review of section 248 and its identity cross-references | `afb29176` -> `4496d241` -> this record commit | Section 250: one Codex commit `c2112b11..afb29176` disposed (0 accepted, 1 accepted after correction, 0 rejected); zero QC or provider launchers, captures, looks, evaluations, or cells | Verified section 249's twelve R210-R221 and six R-177 identity repairs, attempt and test-count corrections and floor from tracked bytes; corrected the 249.3 citation of section 173 to 172 and appended a shared-ledger erratum; test-only pin `4496d241` requires every lane-record backtest ID in the shared ledger; section 4 names section 250, banner sentence added, this row appended | Owner directed focused checks without the complete lane suite: record gates at `afb29176` 84 passed; native attribution study 14 passed with both in-memory mutations red; pin trials in memory; record gates, `compileall` and `git diff --check` on the final tree; every pytest network-denied; exact counts in 250.4 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R250-001`, corrected); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's two Claude commits; Codex counter-reviews section 250 unless the owner changes the workflow |
+| 2026-10-06 | Codex counter-review of section 250 and local retained stress provenance audit | `afb29176` -> `4496d241` -> `4e1c0a64` -> this record commit | Both new Claude commits accepted; no new P0-P3 finding or research look/cell. Local receipt/source consistency established, historical provenance reconciliation remains incomplete. | Confirmed the section-172 citation correction; reproduced the identity pin's historical red and three classifier mutations in memory; checked retained R280 A1/R281 A2 identity/status/hash envelopes and regenerated both frozen 17-file source projections from the exact local delta package, reporting hashes only. No production, test, policy, registry or shared-ledger edit. | Strict-network-denied focused selection and offline metadata/source checks; final counts in 251.5; diff/status/scope checks. No complete Codex suite or QC/provider operation. | ARV2R250-001 accepted as corrected. ARV2R248-002/-003/-004 remain open: original timestamped server/read evidence and later launch/operator/source histories unavailable in the inspected lane artifacts. Two stress cells remain conditional; floor 313/239/49/699 unchanged. | Claude must review section 251. Owner to supply original audit records or scope exact original host/session-history inspection. Keep monitor active while blocked; no new outcome read, R247/R281 attempt, successor or readiness implementation. |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -35065,3 +35079,194 @@ process under the strict profile `(version 1)(allow default)(deny network*)`.
 
 The final tree differs from the pushed head `afb29176` by the pin and this
 record commit only.
+
+## 251. Codex counter-review of section 250 and original-Mac retained receipt/source audit, 2026-10-06
+
+**Exact review range:** `afb291763e977cba52bc1b4747109f40c43e1325`
+through `4e1c0a6411a1c87d97fd1e37229e3c3012a5dc82`, exactly the two Claude
+commits below. The designated root and branch were verified clean, only the
+matching remote lane was fetched, ancestry was checked, and the safe
+fast-forward was already up to date. The older section-248 three-commit and
+forty-commit ranges are not reprocessed.
+
+**Scope and verdict:** both new commits accepted; no new concrete P0-P3
+finding. After acceptance, the owner's rearmed-monitor instruction triggered
+one bounded local retained metadata/hash/source audit for `ARV2R248-002`,
+`-003` and `-004`. This is substantive evidence checking, not an empty
+readiness implementation. It establishes local consistency and exact source
+regeneration, but does not complete historical provenance reconciliation or
+clear the three P2 gates. This round changes only this lane record.
+
+### 251.1 Every Claude commit and finding
+
+| Commit | Disposition | Independent basis |
+|---|---|---|
+| `4496d2419ce5fd387fab94d18918a959c15adbb6` | accepted | The complete test-only diff adds one-way lane-record-to-shared-ledger identity closure and a synthetic classifier boundary fixture. Exact lowercase 32-hex tokens exclude hyphen-adjacent compile identities and longer hex digests; the hidden-inside-compile case cannot satisfy standalone ledger membership. The historical red and all three classifier mutations reproduce in memory (251.5). |
+| `4e1c0a6411a1c87d97fd1e37229e3c3012a5dc82` | accepted | The complete record/shared-ledger diff correctly replaces the section-249 citation of 173 with 172. Section 172.1 actually contains the six R-177 Runtime Error identities; 173 is the R-180 counts-only diagnosis. The append-only shared-ledger erratum preserves old entries and adds no looks. Section 250 explicitly qualifies its owner-directed focused-only validation. |
+
+`ARV2R250-001` is confirmed and accepted as corrected. Section 249's three
+prospective P3 corrections remain accepted. The new identity pin proves
+token presence, not historical execution, source provenance, correct
+classification or a complete census, and is not ledger-to-record closure.
+Claude's section-250 focused-only exception applies to that exact review
+round, not future complete-validation path/cadence exceptions. Codex's
+100-check reproduction is focused, not a complete lane suite.
+
+### 251.2 Retained original-run envelopes
+
+The audit inspected the existing private local controls under
+`artifacts/analyst_revisions_v2/eight_execution_stress_qc_control_20260929`.
+It emitted allowlisted identity/status metadata and hashes only, never
+economic values, private source text, licensed rows, secrets or credentials.
+Raw custom statistic strings were hashed without interpreting their
+aggregate/diagnostic economics; result envelope/meta fields and opaque
+content bindings were checked, not a new result read or performance run.
+
+| Retained run | Project | Backtest | Terminal/read-claim/raw-custom/result envelope |
+|---|---|---|---|
+| R280 A1 | `37163942` | `f507db76969da35be849b71599077ba5` | All four say `Completed.` and bind the same candidate, attempt, project and backtest. |
+| R281 A2 | `37165262` | `2007f9f73fcbfa7fb5ba95abdb094831` | All four say `Completed.` and bind the same candidate, attempt, project and backtest. |
+
+Each run's six attempt-scoped controls (claim, launch, terminal, read-claim,
+raw-custom and result) and separate project receipt are currently regular,
+current-user-owned, 0600 canonical JSON, within the adapter's byte bounds;
+the control directory is currently 0700. Terminal and read-claim bytes are
+identical for each run.
+The launch inherits every claim field, project receipts match, raw META equals
+saved result META, raw aggregate/diagnostic text digests match META, saved
+diagnostic content matches its digest, and saved manifest/projection plus
+META profile/package/activation fields match the claim. Ten direct
+cross-envelope/content checks pass for each original run. These current
+file properties and hashes do not establish origin, past immutability or
+historical operator identity.
+
+The retained result envelopes contain `run_valid=true`; that stored flag is
+not independently re-established economic validity in this metadata audit.
+Critically, none of these envelopes records a read timestamp, operator or
+host. The actual `backtests/read` response, HTTP/server timestamp and status
+observation history are not retained in these attempt-scoped control schemas. Source
+inspection shows `poll_status()` saves five local identity/status fields,
+while `read_result_once()` checks the response but writes `raw-custom` and
+`result` with its own local `expected` envelope. Their `Completed.` field is
+therefore not an archived server response or timestamp. The code describes
+the intended guarded path; it cannot prove the historical path executed.
+
+No fresh cloud status or source read was made. Section 248's later reported
+Runtime Error remains reported evidence. The local files neither prove nor
+disprove post-read status drift. No read under a non-Completed status has
+been demonstrated, so there is no basis here to escalate to P1 or withdraw
+the two cells; neither cell or the four-arm comparison is independently
+cleared. `ARV2R248-002` remains open pending original observation/read evidence.
+
+Current retained byte fingerprints, for subsequent exact comparisons:
+
+| Artifact suffix | R280 A1 SHA-256 | R281 A2 SHA-256 |
+|---|---|---|
+| claim | `8e63f2cfdb62216a6462ae5fbe3c64d8e603ab670cafdea5da998d505dc50725` | `71bd8d7154abbaf6005e826e70cbddb05f65a33d2109f13873d2b7748834ee40` |
+| project | `c94774cb704f63e861479cf3b5e42fa22ff09eaabb8f0386a9a90f2ec76a53c3` | `7dea62a653d2fabd1d7e4e7232ba5e2e2ebe30ae148a6aff361bc7683e9ff1f2` |
+| launch | `a02f0ecbd3e785749c0a170097a3f3cbab98c73dcf15d7cfbacfbefc227f9117` | `96746d20953006080d1f0e5feddd1beebe32bd358e9b8158217fabf5ba817128` |
+| terminal and read-claim | `ca7538fe7385c3c780f36dff69e3f913903454f4da6043cf6b2d0a0890963272` | `f7a81e1f8c6da1bcc2d9e5ab375e10d406516bbc960425bf4cffadc51cec9fad` |
+| raw-custom | `367368dfaa5d0f8b64b705545c8af9611586dccce8862c38c6face2db13d2a9c` | `8bb891d3c2064e1027e07e058fa8faa87703ede135354996ce489cebf219fd9f` |
+| result | `6fe61d106addd1de71b616b203874556b9a1793a4beae1c0922d9c6040b25e98` | `9881a1e2f64b0c4a42098bfeb3acfd3b2379d00cc79d4a9ea3a0d06faa61c8c0` |
+
+### 251.3 Exact offline source regeneration, not historical cloud proof
+
+The three retained claims (R280 A1 and R281 A1/A2) match the frozen stress
+manifest `1e1754c6bf46aceeb03aadb80647c11524094063c0fe0d59ae5121a2a5d7f5fa`,
+candidate-row hashes, projection/profile pins, package and activation roots,
+and their 17 unique sorted path/hash/length triples. R281 A1 and A2 claims
+differ only in attempt number. A1's launch, terminal, read-claim, raw-custom
+and result files are absent; this is consistent with the pre-create record,
+not independent proof of historical zero remote backtests.
+
+After the metadata checks, Codex reopened the exact retained package with
+`load_accepted_risk_delta_order_package()` and its existing out-of-band
+package/lineage pins, then called only pure `build_projection()` for R280 and
+R281. The held-descriptor package loader authenticated the existing payloads
+and reconstructed lineage; retained licensed input records stayed within
+that offline process and were not printed or exported. No parent outcome
+comparison, submission adapter, remote operation or new data acquisition was
+invoked. Every regenerated source byte hash and length matched the retained
+17-file claim exactly; no source was saved or changed.
+
+| Candidate | Regenerated projection SHA-256 | Retained/regenerated source-list SHA-256 | File count / total bytes |
+|---|---|---|---|
+| R280 | `4cc0a420bc4c0ed48c65aef1d27be49b840913f0045beed23f92ec28a3f3ffdd` | `bf8ad26e49b0cb4a77fe8c2773b7276b0342870b17854d08946bcb3715ebd7d9` | 17 / 402,219 |
+| R281 | `7a725fe4dc8d913cf56916b1f3d87409e6019a0cb01c7f1c73231e679fdddc2d` | `8aa4cee20367332d894205b9b389d4bd896bfb7b31be08096b212426fb755a1a` | 17 / 407,224 |
+
+The existing delta package root remains
+`7803b84f0841f9685a4951de58fbccf82f3f647cef7beffce31cb4865ea14e1f`,
+reconstructed lineage
+`54723703380d5011420d8a364cf857a9978092b6b1d0daaa4d367dc1c65fb129`,
+and transport-byte/activation SHA-256
+`69b663c35b245e965b2d4e1f8402b3b14432d6d713f387eacb888f6756e78a41`.
+The loader's provider/QC/outcome-access, orders and trading flags are false.
+Reopening this historical accepted-risk package grants no new formal source
+authority, independent PIT/vendor evidence or admission. Regeneration proves
+the retained claims agree with the frozen local source, not that those bytes
+were uploaded, compiled or executed at any historical launch. It does not
+authenticate the extra rerun's source or the later thirteen cloud saves.
+
+### 251.4 Remaining evidence and owner-scoped next action
+
+Filename inventory of lane artifacts finds the R281 A1/A2 controls and nine
+R247 A1-A3 claim/launch/terminal files, but no filename naming an R281 A3/rerun,
+R247 A4-A9 or the later persist-fix verification, and no matching original
+history/transcript/operator/read-time audit file. This limited inventory is
+not proof such evidence never existed or is absent from all machines.
+No original host/session history outside this lane was inspected.
+
+| Gate | What this round establishes | Exact remaining requirement |
+|---|---|---|
+| `ARV2R248-002` (P2) | Current original-run local envelopes consistently name Completed and exact frozen source; content/meta hashes agree. | Original timestamped QC terminal/status observations and bounded-read request/response metadata for R280 A1/R281 A2, bound to their run identities and chronology. Current status, local mtimes and current green guard tests cannot reconstruct read-time status. |
+| `ARV2R248-003` (P2) | Original R281 A1/A2 claims and source regenerate exactly; no retained later-rerun receipt identified by this inventory. | Original launch/tool/operator/authority audit for the already-booked rerun plus immutable launch-time compile/source binding, and the later file-save history. Current cloud content would establish current hashes only, not launch-time bytes. |
+| `ARV2R248-004` (P2) | Only the original spent A1-A3 receipt filenames are found in the inspected R247 inventory. | Original host/tool/operator/authority records for all seven already-booked later probes. Names, Git authorship and guard code cannot identify who launched them. |
+
+The owner is asked to provide those original audit records, or authorize
+inspection of specifically identified original Codex/Claude/QC/Mia host or
+session histories for these projects/runs. That would expand beyond the
+designated lane artifact inspection and must be scoped before access. No
+blanket credentials, provider, outcome, new QC read, launch or trading
+authority is requested or inferred. A fresh statistics-disabled QC metadata
+read, if separately approved and useful, cannot by itself recover missing
+historical read times or source/operator evidence. Existing scoped research
+preparation remains authorized and is not owner-personal-only.
+
+All fifteen census identities remain booked once: **313 shared looks / 239
+development / 49 infrastructure / 699 cells**, including the two conditional
+stress cells. This round adds zero looks/evaluations/cells and changes no
+classification or shared-ledger row. R247 and R281 remain attempt-exhausted;
+this section is not an attempt, relaunch or stress successor. Forward
+readiness is separately stopped by the independent vendor/publication/
+identity/RAW-price/score evidence in 231.3. All three formal registries remain
+empty, source authority zero-access, action/readiness flags false and named
+refusals intact. No selector, quantity adapter, paper algorithm, formal-look
+binding, deployment or order is implemented or admitted.
+
+### 251.5 Focused validation and serialized handoff
+
+Every test/mutation and offline artifact/source-verification process used
+the strict profile `(version 1)(allow default)(deny network*)` with
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python`, from the exact
+designated Mac worktree. Network denial is not logged attempt counting or
+retroactive proof about earlier unsandboxed runs. No loopback fixture
+exception was needed in this round.
+
+| Check | Result and limitation |
+|---|---|
+| Reviewed Claude tree | Record/active-document selection (86) plus native attribution selection (14): **100 passed in 4.87s**, zero failures/skips/warnings. Focused, not complete lane validation. |
+| Identity pin, in memory | G0 at `afb29176`: 2 passed. Historical `c2112b11`: 1 passed, 1 expected failed, exactly six missing R-177 IDs. M1 hyphen exclusion removed: 2 expected failed; M2 substring membership: 1 passed, 1 expected failed; M3 boundaries removed: 2 expected failed. Finally-restored live module: 2 passed. No tracked source changed. |
+| Local metadata/content audit | Ten cross-envelope/hash checks pass per original run; three claims match the frozen manifest/source lists. Allowlisted outputs only. |
+| Initial exploratory saved-aggregate digest assumption | One ad hoc assertion failed: a canonical saved aggregate was incorrectly assumed byte-identical to the raw aggregate text. Source inspection confirms the existing parser intentionally retains/compacts a selected aggregate, omitting raw fields; this was an invalid diagnostic expectation, not a reproduced product defect. Raw-text-to-META binding and retained diagnostic/meta bindings were then checked correctly. No economic parser or regression test was weakened. |
+| Offline package/source verification | Existing held-descriptor delta loader succeeds; R280/R281 regenerated projections and every one of their 17 source hash/length triples match. No source text or input rows exported; not historical cloud authentication. |
+| Final focused tree | The same three-file selection: **100 passed**, zero failures/skips/warnings. No complete Codex suite. |
+| Diff/scope/status | `git diff --check`, added-text secret-shape scan, final one-file diff and exact root/branch/head/status checks before commit/push. Only this lane record changes. |
+
+**Next serialized action:** Claude must review section 251 and this exact
+pushed documentation snapshot, including both counter-review dispositions,
+the receipt/source consistency evidence and its limits. The monitor remains
+active at its existing cadence, quiet while unchanged. Notify only for a new
+review, a changed blocker or an actual required owner decision. After that
+review is accepted, continue only an owner-scoped evidence reconciliation
+whose original artifacts/access are available; do not manufacture a readiness
+milestone or repeat the unchanged history-access request while blocked.

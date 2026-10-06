@@ -1,18 +1,22 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **MACOS RECONCILIATION PRESERVES LOCAL `212d645` AND ALL EIGHT
-REMOTE COMMITS THROUGH `85e61a4` ON THE EXISTING LANE (SECTION 85).
-REMOTE SECTIONS 78–83 ARE RETAINED; THE EARLIER MACOS COUNTER-REVIEW AND
-SI-CCR25-001..004 LEDGER ARE PRESERVED IN SECTION 84. CLAUDE'S TWO LATEST
-COMMITS `d7f0f0a` AND `85e61a4` AWAIT CODEX COUNTER-REVIEW, INCLUDING
-SI-CR16-001. SYNCHRONIZATION DOES NOT ACCEPT THEM. QC SUPPORT REPORTED ONE
-HISTORY VALUE PER SETTLEMENT DATE AND NO DOCUMENTED AS-OF VINTAGE ROUTE;
-INTERNAL PRIOR-VERSION RETENTION WAS NOT ESTABLISHED. ALL THREE SOURCE P2S,
+Status: **THE MACOS LANE IS RECONCILED THROUGH MERGE `23a54281`,
+PRESERVING LOCAL `212d645` AND ALL EIGHT REMOTE COMMITS THROUGH `85e61a4`.
+CODEX COUNTER-REVIEWED BOTH CLAUDE COMMITS IN `673aad4..85e61a4`
+(SECTION 86): `d7f0f0a` ACCEPTED; `85e61a4` ACCEPTED AFTER TWO MINOR
+RECORD QUALIFICATIONS. THE PUBLISHED `7cd39a0` REGRESSIONS HAVE AN
+INDEPENDENT CODEX RED/GREEN CHECK; SI-CR16-001 IS CLOSED. SI-CR16-002'S
+CHECKOUT FIX IS VERIFIED WITHOUT WEAKENING THE IMMUTABLE DIGEST.
+REMOTE SECTIONS 78–83 AND THE EARLIER MACOS REVIEW/LEDGER IN SECTION 84
+ARE RETAINED. NO NEW P0–P2 WAS FOUND; ALL THREE EXISTING SOURCE P2S,
 THE PROSPECTIVE COMMITMENT ADVISORY AND THE SHARED OUT-OF-LANE P2 REMAIN OPEN.
-NYSE HAS SUPPLIED SALES INFORMATION; NASDAQ'S LATER REPLY ASKS WHICH ENTITY
-AND ACCESS ROUTE THE INQUIRY CONCERNS. NEITHER QUALIFIES A SOURCE. THE
-EXCHANGE-REPLY MONITOR IS PAUSED AT THE OWNER'S REQUEST. LOOKBACKS
-20/60/120/252 REMAIN UNSELECTED; AUTHORIZED/CONSUMED REAL OUTCOME LOOKS
+QC SUPPORT REPORTED ONE HISTORY VALUE PER SETTLEMENT DATE AND NO
+DOCUMENTED AS-OF VINTAGE ROUTE; INTERNAL RETENTION WAS NOT ESTABLISHED.
+NYSE'S SALES INFORMATION AND NASDAQ'S ENTITY/ACCESS QUESTION DO NOT
+QUALIFY A SOURCE. THE NEXT SOURCE-SPECIFIC PIT ADAPTER/HISTORICAL-STOCK
+MILESTONE IS BLOCKED ON AUTHENTIC ARCHIVE, AVAILABILITY, COVERAGE AND RIGHTS
+EVIDENCE; NO SUBSTITUTE IMPLEMENTATION IS CLAIMED. THE EXCHANGE MONITOR
+IS PAUSED. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED AND REAL OUTCOME LOOKS
 REMAIN 0/0. LICENSED/ACTUAL MARKET ROWS, OUTCOMES, HOLDOUT, PRODUCTION
 RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST, PURCHASE,
 BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS AND
@@ -197,6 +201,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-05 | Codex received-response assessment | Local/remote base `889f7ab`; this record commit follows | NYSE sales reply and other exchange receipts | Classified NYSE public-specification/sample links and indicative pricing as unqualified sales information; distinguished Nasdaq routing and two support acknowledgments; rechecked public metadata; recorded no source-gate closure. Private bodies, personal contacts and quote amount are not published. | Exact document/diff checks and remote equality verified at handoff. No code/test change or full lane/repository run. Authorized/consumed looks **0/0**. | All three source P2s, prospective commitment advisory and shared out-of-lane P2 unchanged. No purchase, samples, new correspondence or data admission. | One standing-authorized lane push; Claude reviews the extended exact snapshot. Obtain original/latest-vintage and rights clarification before source-specific implementation or procurement. |
 | 2026-10-05 | Claude review | `a31805a` -> `673aad4` reviewed from the published head; **test-only correction at `d7f0f0a`**; this record commit follows, so the round has two Claude commits | Independent review of the preserved percentile regressions, the sync merge, Codex's counter-review, the source-fallback record, the standing round-end push rule and the received-response disposition | Reviewed all six commits individually in the single Windows lane worktree, which is now this session's primary directory; local `HEAD` equalled the fetched remote with a clean tree at `889f7ab`, and Codex pushed the record-only `673aad4` mid-review without changing the code/test tree. Disclosed that `7cd39a0` was authored by this same session on 2026-09-14 and accepted it on re-executed evidence: both test bodies are byte-identical at `889f7ab`, each turns red when its target is mutated at the published head and both pass restored. Verified the merge is exactly the remote tree plus 44 test lines and the record, that the production and test blobs Codex recorded persist unchanged, and that every record claim I could execute from sections 78-81 reproduces: 817 collected, 126 in the focused selection, 44 remote commits, 37 unique test functions, the six reused contract names, the deadline arithmetic and the completed push. Accepted Codex's narrower attribution of the lineage test. The first full lane run on this host since 2026-09-14 surfaced one deterministic host-dependent test failure from an earlier round, corrected in the lane test file only. Mailbox, vendor and public-metadata actions were not reproduced. | Exact eighteen-file lane on `889f7ab`: 1 failed, 816 passed in 11,389.90s (3:09:49); the one failure is the host-dependent assertion corrected at `d7f0f0a`, after which the complete percentile file is 55 passed in 384.09s; focused red/green at head: M2 serializer drift **1 failed in 77.61s**, M1 batch binding removed **1 failed in 63.88s**, restored **2 passed in 75.46s**; corrected test green **1 passed**, red under a one-byte worktree drift **1 failed**; Codex selection **126 passed in 4.22s**; active-document **69 passed** before and **69 passed in 9.85s** after this record; import boundary **9 passed**; compileall exit 0; `git diff --check` clean. The eleven-file lane launched on 2026-09-14 against `7cd39a0`'s own tree completed after that session ended: **617 passed**. No complete-repository suite. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | No P0/P1/P2 in lane. `SI-CR16-002` (P3, closed, test-only): the owner-approval binding test compared working-tree bytes to the bound blob and cannot pass on an autocrlf checkout; replaced with HEAD-blob equality plus a terminator-normalized worktree check, proved red under a one-byte drift. `SI-CR16-003` (P3, withdrawn before commit, self-reported): a draft claim that `673aad4` had not refreshed the status block was disproved by the block's own text. `SI-CR16-001` (P3, process, open for Codex): the reviewing session authored `7cd39a0`, so its formal independent check is Codex's countercheck, to be confirmed on the published snapshot. `SI-CR15-001`, `SI-SRC-20260928-001..003` and shared `SI-CR5-005` unchanged. | Codex counter-reviews `d7f0f0a` and this record commit and confirms or contests `SI-CR16-001`; the vendor deadline of 2026-10-19 stands; every source, outcome, QC, purchase and trading gate remains closed. Push once at the end of this round per the standing rule. |
 | 2026-10-05 | Codex macOS reconciliation | Local `212d645` + eight remote commits through `85e61a4`; this merge commit follows | Owner-directed same-branch sync and monitor stop | Preserved both histories; retained remote sections 78–83 and relocated the complete historical macOS review/ledger to section 84. Imported code/test bytes equal the remote. | Focused percentile/import selection **12 passed in 24.35s**; active-document **69 passed**; lane compilation exit 0; imported-tree and retained-section fidelity checks pass; diff clean. No full lane/repository suite. | SI-CCR25 qualifications retained; new Claude `d7f0f0a` / `85e61a4` counter-review remains pending. Source P2s, prospective commitment advisory and shared P2 unchanged; looks **0/0**. | Counter-review both Claude commits and assess the gated adapter milestone, then one final combined push under section 81. Exchange monitor is paused. |
+| 2026-10-05 | Codex macOS counter-review and factual stop | Pinned Claude `673aad4..85e61a4`; reconciled local merge `23a54281`; this record commit follows | Review both Claude commits, confirm preserved regression independence, assess next milestone | `d7f0f0a` accepted; `85e61a4` accepted after two P3 record qualifications; independent published `7cd39a0` red/green check closes SI-CR16-001. Source-specific adapter milestone remains blocked on authenticated provider facts. | Focused percentile/import **12 passed**; eight parent/fix binding scenarios matched; two preserved tests red under isolated targeted mutations and green restored; active-document **69 passed**; compile exit 0; diff and unchanged code blobs verified. No full lane/repository suite. | SI-CCR26-001..002 closed by qualification, -003 false alarm; source P2s, commitment advisory and shared P2 remain open. Real looks **0/0**. | One combined publication under section 81; Claude reviews `85e61a4..published HEAD`. Obtain vendor archive/rights facts and actual Nasdaq entity before the next adapter milestone. Monitor remains paused. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -11367,3 +11372,159 @@ QC job or outcome. The existing October 19 vendor deadline remains in force;
 stopping the monitor does not qualify a source. All three source P2s and the
 shared P2 remain open; candidate windows **20/60/120/252** remain unselected
 and authorized/consumed real outcome looks remain **0/0**.
+
+## 86. Codex counter-review and next-milestone factual stop — 2026-10-05
+
+### 86.1 Exact pushed review range and per-commit dispositions
+
+The single lane ref was fetched and pinned at
+`85e61a4dd7755d21fcd25a037f4da9c2d233fd3e`. The complete latest Claude
+range after Codex checkpoint `673aad4c7e7d3fd4f7a0451753f5779a24654c32`
+is exactly two commits. The owner-directed merge
+`23a5428181fed1fdd1069bf12e135abda816a6c8` preserves both the older local
+record and that remote history. Every code/test file equals the pinned
+remote tree; the merge record is not treated as an independently reviewed
+implementation. Remote advancement is checked before this record is committed
+and before the one final push.
+
+| Claude commit | Complete scope | Codex disposition |
+|---|---|---|
+| `d7f0f0ad080b16fad2d973f48d5932d88f94e964` | +11/-1 in the percentile owner-approval binding test; no production change | **Accepted; no new issue found.** Immutable bound bytes still determine SHA-256; HEAD must equal that blob exactly; only the worktree rendering comparison permits CRLF/LF equivalence. Parent/fix failure directions are verified below. |
+| `85e61a4dd7755d21fcd25a037f4da9c2d233fd3e` | Current status, append-only Claude push row and complete section-83 review | **Accepted after record qualification.** Exact graph, six reviewed dispositions, source gates and test attribution are supported. Two P3 precision corrections are documented in 86.2 and the current status; the historical Claude text is retained. No code correction is required. |
+
+The independently reviewed additional test commit is
+`7cd39a0c8987e3a0a7c862d93b80f58281cc0ea6`: **accepted on the published
+snapshot**, resolving `SI-CR16-001`. Its two exact function bodies at
+`85e61a4` equal those in `7cd39a0`; both pass unmodified, each detects
+its intended mutation, and both pass after process-local restoration. This
+acceptance comes from Codex's own check, not Claude's self-review.
+
+### 86.2 Persistent P0–P3 ledger
+
+No new P0–P2 arose from either Claude commit. The source-admission P2s and
+shared out-of-lane P2 are existing open gates. There is no newly partially
+correct finding in this range; earlier partial and false-alarm dispositions
+remain preserved in the record.
+
+| ID | Priority | Classification / status | Commit and evidence | Reason / correction | Verification |
+|---|---|---|---|---|---|
+| `SI-CCR26-001` | P3 | Confirmed; closed by qualification | `85e61a4`, section 83.2 reports the `a31805a..e00aa35` record delta as +104/-2. Exact numstat is **+102/-2**; test delta +44/-0 is correct. | The reconciliation inventory must be accurate. This section supplies the correct statistic without rewriting the historical review or changing its substantive acceptance. | Direct `git diff --numstat a31805a e00aa35`; only record and percentile test changed. |
+| `SI-CCR26-002` | P3 | Confirmed; closed by qualification | `85e61a4` current summary, section 83.5 and its push row say no P0/P1/P2 in the lane while retaining three source P2s and a shared P2. | As with SI-CCR25-004, this means **no new P0–P2 findings in the reviewed range**, not zero open P2s. The current status and this ledger preserve all unresolved gates. | Full section-83 ledger and sections 80–82; no authority flag changes. |
+| `SI-CCR26-003` | P3 concern | Closed as false alarm; no code change | Normalizing worktree CRLF could appear to weaken the content-addressed owner approval in `d7f0f0a`. | Digest verification still uses the exact historical blob, and HEAD must equal it before normalization. Semantic edits, changed HEAD, BOM, bare CR and missing final newline still fail. | Eight parent/fix scenarios in 86.3. |
+| `SI-CR16-001` | P3 | Confirmed provenance limitation; closed by independent Codex review | Claude authored the preserved `7cd39a0` tests and disclosed that it could not independently accept its own judgment. | Codex now formally accepts the exact published test bodies after its own sensitivity checks. The original advisory countercheck and Claude's self-authorship remain historically disclosed. | Function-body identity plus unmutated/mutated/restored checks in 86.3. |
+| `SI-CR16-002` | P3 | Confirmed prior defect; closure accepted | Parent test fails for an otherwise identical CRLF checkout; `d7f0f0a` corrects only that test. | Preserve immutable approval bytes while permitting host rendering. No shared Git attributes or production behavior change is needed. | CRLF parent red / fix green; altered HEAD and semantic worktree remain red. |
+| `SI-CR16-003` | P3 | Retained closed false alarm | Claude withdrew its draft stale-status claim against `673aad4`. | The complete parent status was refreshed; retain the withdrawn ID rather than reuse it. | Exact `85e61a4` deletion side and section 82. |
+| `SI-SRC-20260928-001..003` | P2 | Open factual gates | Historic availability; preserved original/all-correction vintages or exhaustive correction inventory; coverage/identity/PIT inputs/rights remain unqualified. | No source-specific adapter, collection or empirical milestone is started without its authenticated contract. | Existing source record and the received reply classifications. |
+| `SI-CR15-001` | P3 | Retained prospective commitment advisory | No vetted purchase or license offer with exact total scope has been accepted. | No new purchase approval is requested merely to complete this review. Evaluate any concrete commitment after suitability and terms are known. | No purchase, subscription, trial or terms action in this round. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Open, shared/out of lane | Existing shared-history issue unchanged. | Documented only; no shared-file fix. | Shared/project-wide files equal the fetched remote. |
+
+All SI-CCR25 findings remain closed under the preserved section 84.
+The unsupported inference that QC has no internally retained prior versions
+is not restored. Source admission remains denied because a usable, documented
+historical decision-vintage route has not been established.
+
+### 86.3 Focused verification and exact limits
+
+On the code/test tree identical to `85e61a4`, the three relevant percentile
+tests plus the nine import-boundary cases passed **12 tests in 24.35s**.
+Lane-scoped compilation exited **0**. Active-document checks passed
+**69 tests** after reconciliation, and are rerun after the final review record.
+No complete lane or repository suite is run by Codex.
+
+For `d7f0f0a`, Codex extracted the exact owner-binding test function from
+its parent `673aad4` and the fixed commit via AST, then executed those
+unchanged bodies with controlled Git/path I/O and the real bound approval blob.
+The eight scenarios all matched these expected outcomes:
+
+| Scenario | Parent test | Fixed test |
+|---|---|---|
+| Exact LF worktree / unchanged HEAD | Pass | Pass |
+| Identical text rendered as CRLF | Fail | Pass |
+| One-byte semantic worktree change | Fail | Fail |
+| Changed HEAD blob / original worktree | Pass | Fail |
+| Altered historical bound blob | Fail | Fail |
+| BOM inserted | Fail | Fail |
+| Bare-CR line endings | Fail | Fail |
+| Final newline removed | Fail | Fail |
+
+The digest and all verbatim-quotation assertions executed in these bodies.
+No file, owner record or Git configuration was changed.
+
+For `7cd39a0`, Codex compared the AST source segments at that commit and
+the published `85e61a4`, confirming exact body identity. Its independent
+process-local sensitivity check on the published code was:
+
+- Unmodified pair: **2 passed in 25.17s**.
+- Replace only the callback-free source serializer's
+  `independent_return_evaluation_required` literal with false: the lineage
+  equality test gives the expected **assertion failure in 3.70s**.
+- Remove only the unique complete-batch row-to-source-batch comparison
+  (`row.source_score_order_batch_sha256 != self.source_score_order_batch_sha256`)
+  by AST transformation: the coherent-rebinding test gives the expected
+  **DID NOT RAISE failure in 4.35s**.
+- Restore both original callables in `finally`, clear projection caches and
+  rerun: **2 passed in 7.00s**. Callable identities are verified restored.
+
+These are targeted sensitivity experiments, not additional pytest-suite
+failure counts. The lineage test checks fidelity of the reimplemented P0
+serializer; it is not claimed to isolate the enclosing digest-refusal guard.
+The rebinding test isolates the batch guard. No source/test file was mutated.
+
+Production and test blobs after the proof are respectively
+`17cc51cfa628ce9aad8b88269cb8e8a6074ba3a2` and
+`ba40092ea5e71f9e8dd97cf54e1fb441d104285a`, exactly matching the pinned
+remote. The earlier `889f7ab..673aad4` code/test equality and 44-commit
+ancestry count are independently confirmed. Claude's full-lane result remains
+reported as **1 failed / 816 passed**, followed by **55 passed** for the
+corrected percentile file; there is no claim that Codex ran a final 817-pass
+lane. No warnings were emitted by the focused pytest checks.
+
+Quality: **9/10** for the test correction and **8/10** for the review record.
+The correction preserves provenance and closes a host-specific test failure.
+The record accurately discloses self-authorship and suite limits; its minor
+delta-count and open-gate wording needed the qualifications above. This
+evidence establishes software behavior only.
+
+### 86.4 Next milestone, missing facts and owner inventory
+
+The owner's request authorizes implementation after accepted counter-review.
+The next planned milestone is the **source-specific PIT adapter and historical
+stock-test preparation**. It cannot begin on the current facts: sections
+66.2, 68.4, 79.5 and 80.4–80.5 require authenticated source/version/transport,
+original and correction availability (or the exhaustive exclusion route),
+historical population/identity and companion PIT inputs, plus applicable
+local retention and separate QC processing rights. NYSE's sales links and
+Nasdaq's entity/access question clear none of those gates. No generic parser,
+collector or substitute milestone is implemented.
+
+No further owner-controlled internal design approval is needed under the
+standing delegation. The actual legal/subscriber entity requested by Nasdaq
+is a missing fact, not a judgment call; the owner has been asked whether the
+inquiry uses personal name Xiao Chen or an exact company legal name/country.
+No entity, existing Nasdaq entitlement or wider personal data usage is guessed.
+A purchase decision is not yet ripe because product suitability, included
+versions, total price scope and applicable terms remain unverified.
+
+The next concrete qualification work is to obtain NYSE's original/latest
+history answer, version/availability manifest or complete correction
+inventory, historical coverage and local/QC terms; answer Nasdaq's routing
+question with verified entity and data-route facts; then authenticate the
+contract before adapter implementation. No outbound reply is sent in this
+round. The vendor deadline remains **2026-10-19 17:00 America/Los_Angeles**.
+The exchange monitor remains paused.
+
+Inventory exercised this round: direct synchronization and continuation
+authority `SI-AUTH-20261005-MAC-SYNC` /
+`SI-AUTH-20261005-MAC-ROUND`; routine layout decision
+`SI-DEC-20261005-MAC-SYNC`; the existing standing one-push authority
+`SI-AUTH-20261005-02`. No delegated financial cutoff, winner, source
+entitlement, procurement or empirical-look decision is exercised.
+
+The round's unpublished graph includes old local `212d645`, merge
+`23a54281`, and this counter-review/handoff commit. After final focused
+document/diff/status checks, publish the complete range once to
+`HEAD:refs/heads/codex/strategy-short-interest` and verify local, tracking and
+actual remote equality. Claude's next exact review range is
+`85e61a4..published HEAD`, including the preserved macOS record, merge
+resolution and this record. The next implementation milestone remains
+**blocked**, not completed. Real outcome looks remain **0/0**.

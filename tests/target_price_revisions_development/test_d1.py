@@ -355,3 +355,24 @@ def test_custom_framing_keys_are_rejected_before_caller_callbacks(framing):
     expected = "invalid synthetic version header" if framing == "header" else "invalid synthetic calendar"
     with pytest.raises(FixtureNormalizationError, match=expected):
         normalize(row, sessions=sessions)
+
+
+# TPR-CR17-002: three guards the first round left without a test. Each case
+# below passed with the guard removed in a scratch-clone mutation trial.
+
+
+def test_matching_but_malformed_horizon_is_not_a_comparable_horizon():
+    assert only_reason(normalize(version(new_horizon="SYNTHETIC-OTHER", prior_horizon="SYNTHETIC-OTHER"))) == ("invalid_horizon",)
+
+
+def test_public_instant_after_version_availability_is_contradictory():
+    # Public availability later than the version we already hold is the
+    # pre-release shape the conservative fixture ordering refuses.
+    assert only_reason(normalize(version(public_available_at_utc="2026-10-05T16:05:00Z"))) == ("contradictory_availability_clocks",)
+
+
+def test_unknown_key_in_place_of_the_optional_target_is_still_refused():
+    row = version()
+    row["payload"].pop("new_target")
+    row["payload"]["SYNTHETIC-PRIVATE-UNKNOWN"] = "SYNTHETIC-SECRET"
+    assert only_reason(normalize(row)) == ("invalid_payload",)

@@ -1,21 +1,19 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CODEX COUNTER-REVIEWED CLAUDE'S SOLE PUSHED COMMIT `4c08f595`
-AFTER `dad1252` (SECTION 88): ACCEPTED AFTER TWO P3 RECORD QUALIFICATIONS,
-WITH NO NEW P0-P2 OR CODE/TEST DEFECT. CLAUDE'S ONE-LINE PRIVACY REDACTION
-IS VERIFIED; THE UNNECESSARY PERSONAL NAME IS ABSENT FROM THE CURRENT TREE,
-BUT STILL PRESENT IN PUBLISHED HISTORY. NO HISTORY REWRITE IS AUTHORIZED.
-THE UTC LEDGER-DATE ERROR `SI-CR17-002` IS CLOSED BY AN APPENDED CORRECTION,
-WITHOUT REWRITING PRIOR ROWS. EARLIER CONFIRMED AND FALSE-ALARM FINDINGS
-ARE RETAINED. CLAUDE REPORTS 817 PASSED FOR THE COMPLETE EIGHTEEN-FILE LANE
-ON `dad1252`; THE CODE/TEST TREE REMAINS IDENTICAL, AND CODEX DOES NOT RERUN
-THE COMPLETE LANE. THE THREE SOURCE P2S, THE SHARED P2 `SI-CR5-005` /
-`SI-CCR16-007` AND PROSPECTIVE COMMITMENT ADVISORY `SI-CR15-001` REMAIN OPEN.
-THE NEXT SOURCE-SPECIFIC PIT ADAPTER/HISTORICAL-STOCK MILESTONE IS STILL
-BLOCKED ON AUTHENTIC ARCHIVE, AVAILABILITY, COVERAGE AND RIGHTS EVIDENCE;
-NO SUBSTITUTE MILESTONE IS CLAIMED. NASDAQ'S ACTUAL LEGAL/SUBSCRIBER ENTITY
-REMAINS A MISSING OWNER FACT. THE OWNER REQUESTED ONE FINAL PUSH AND THEN
-A CLAUDE-REVIEW MONITOR FOR THAT EXACT SNAPSHOT; THE EXCHANGE-REPLY MONITOR
+Status: **CLAUDE HAS REVIEWED CODEX'S ONE COMMIT IN `4c08f59..249c6e4`
+(SECTION 89) AND ACCEPTS IT. BOTH OF ITS FINDINGS AGAINST CLAUDE'S SECTION 87
+ARE CONFIRMED. `SI-CR18-001` (P3) IS CLOSED BY THIS RECORD COMMIT: THE
+RECONCILIATION MERGE `23a5428` HAD DROPPED THE HEADER SENTENCE FORBIDDING
+BRANCH SWITCHES AND FORCE PUSHES; IT IS RESTORED BELOW. THE PERSONAL NAME
+REDACTED IN SECTION 86.4 STAYS ABSENT FROM THE CURRENT TREE BUT REMAINS IN
+PUBLISHED HISTORY; NO HISTORY REWRITE IS AUTHORIZED. `SI-CR17-002` IS CLOSED BY
+CODEX'S APPENDED UTC ERRATUM. NO CODE OR TEST CHANGED; THE COMPLETE
+EIGHTEEN-FILE LANE PASSED 817 ON `dad1252`, WHOSE CODE AND TESTS ARE
+BYTE-IDENTICAL TO THIS TREE. THE THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005`
+/ `SI-CCR16-007` AND THE PROSPECTIVE COMMITMENT ADVISORY `SI-CR15-001` REMAIN
+OPEN. THE SOURCE-SPECIFIC PIT ADAPTER MILESTONE REMAINS BLOCKED ON AUTHENTIC
+ARCHIVE, AVAILABILITY, COVERAGE AND RIGHTS EVIDENCE; NASDAQ'S LEGAL OR
+SUBSCRIBER ENTITY REMAINS A MISSING OWNER FACT. THE EXCHANGE-REPLY MONITOR
 STAYS PAUSED. LOOKBACKS 20/60/120/252 REMAIN UNSELECTED AND REAL OUTCOME LOOKS
 REMAIN 0/0. PROVIDER DATA, LICENSED/ACTUAL MARKET ROWS, OUTCOMES, HOLDOUT,
 PRODUCTION RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
@@ -27,7 +25,8 @@ bounded lane round with **one combined push** to
 `origin/codex/strategy-short-interest`, verifying the actual remote head.
 Sections 79–80 and preserved section 84 describe earlier local-only rounds;
 section 81 supersedes their publication stop. No empirical source authority
-is inferred from that publication rule.
+is inferred from that publication rule. No branch switch, alternate branch or
+force push is allowed; section 81 governs publication.
 
 Branch: `codex/strategy-short-interest`
 
@@ -204,6 +203,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-05 | Codex macOS counter-review and factual stop | Pinned Claude `673aad4..85e61a4`; reconciled local merge `23a54281`; this record commit follows | Review both Claude commits, confirm preserved regression independence, assess next milestone | `d7f0f0a` accepted; `85e61a4` accepted after two P3 record qualifications; independent published `7cd39a0` red/green check closes SI-CR16-001. Source-specific adapter milestone remains blocked on authenticated provider facts. | Focused percentile/import **12 passed**; eight parent/fix binding scenarios matched; two preserved tests red under isolated targeted mutations and green restored; active-document **69 passed**; compile exit 0; diff and unchanged code blobs verified. No full lane/repository suite. | SI-CCR26-001..002 closed by qualification, -003 false alarm; source P2s, commitment advisory and shared P2 remain open. Real looks **0/0**. | One combined publication under section 81; Claude reviews `85e61a4..published HEAD`. Obtain vendor archive/rights facts and actual Nasdaq entity before the next adapter milestone. Monitor remains paused. |
 | 2026-10-06 | Claude review | `85e61a4` -> `dad1252` reviewed from the published head; **record-only correction (one-line privacy redaction in section 86.4)**; this record commit is the only Claude commit | Independent review of the preserved macOS counter-review of section 77, the macOS reconciliation merge, and Codex's counter-review of section 83 with the next-milestone factual stop | Confirmed all four `SI-CCR25` findings against my section 77. Verified section 84 equals local section 78 except for renumbered headings and the provenance note; the merge's parents, base, 1/8 divergence and record-only scope; the `+102/-2` numstat and the production/test blobs; and that the eight-scenario table matches `d7f0f0a`. Redacted a personal name from section 86.4 in this public repository. | Exact pushed tree `dad1252`, clean, Codex idle, every pytest network-denied (EPERM probe): eighteen-file lane **817 passed in 4,391.21s** (no skips or warnings; 815 plus the two preserved `7cd39a0` regressions); compileall exit 0; active-document 69 passed; ML import boundary 11 passed; worktree status unchanged by the run; `git diff --check` clean. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR17-001` (P3, closed by correction: personal name published in section 86.4; still in history at `dad1252`, history rewrite is the owner's call). `SI-CR17-002` (P3, open erratum: this round's two Codex rows are dated 2026-10-05 but were made at 05:05 and 05:13 UTC on 2026-10-06). `SI-CCR25-001..004` and `SI-CCR26-001..003` confirmed and closed; `SI-CR16-001` closure accepted. Source P2s, shared P2 and `SI-CR15-001` stay open. | Codex counter-reviews this record commit. The owner answers the Nasdaq entity question and decides on history removal. The PIT adapter milestone stays blocked; every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 | 2026-10-06 | Codex counter-review | Pinned Claude `dad1252..4c08f595`; this record commit follows | Complete record-only counter-review before the next milestone | Sole Claude commit accepted after two P3 citation/preservation qualifications; privacy redaction independently verified; append-only UTC correction closes SI-CR17-002. No code/test changes or next milestone implementation. | Record/tree identity, privacy before/after counts, exact author/committer UTC times, numstat and code blobs verified; focused active-document **69 passed**; lane compilation exit 0; historical record preservation proof passed; diff clean; no full lane/repository suite. Real looks **0/0**. | SI-CCR27-001..002 confirmed and closed; prior confirmed/false-alarm findings retained; source P2s, shared P2 and commitment advisory unchanged. Published privacy history is not rewritten. | One final push, then rearm the existing five-minute Claude-push monitor for the exact published snapshot under SI-AUTH-20261006-01. Exchange monitor stays paused. Source-specific PIT adapter remains blocked. |
+| 2026-10-06 | Claude review | `4c08f59` -> `249c6e4` reviewed from the published head after the push watcher fired; **record-only correction (restored header no-force sentence)**; this record commit is the only Claude commit | Independent review of Codex's counter-review of section 87 | Confirmed `SI-CCR27-001` (wrong subsection cited) and `SI-CCR27-002` (the merge also replaced the publication-rule paragraph). Found that paragraph lost the sentence forbidding branch switches and force pushes, still authoritative in section 81, and restored it. Verified +221/-22, code/test identity with `dad1252`, the UTC erratum, the redaction and the new row. | Pushed tree `249c6e4`, clean, network-denied: active-document, ML boundary, lane boundary and SI-5 protocol **123 passed**; compileall exit 0; final-tree active-document 69 passed; `git diff --check` clean. Complete lane not rerun: 817 passed on byte-identical code/tests at `dad1252`. Synthetic/offline only; **authorized looks 0, consumed looks 0**. | `SI-CR18-001` (P3, closed by correction: merge `23a5428` dropped the header's no-branch-switch/no-force sentence). `SI-CCR27-001`, `-002` confirmed against Claude. `SI-CR17-001` and `-002` closed. Source P2s, shared P2 and `SI-CR15-001` stay open. | Codex counter-reviews this record commit. The owner answers the Nasdaq entity question and decides on history removal. The PIT adapter milestone stays blocked; every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -11865,3 +11865,130 @@ outcomes, sealed holdout, production ranking/seeds, ETF, QC history/project/
 upload/compile/job/backtest, purchases, broker, operator database, deployment,
 paper/live, capital, orders and trading remain gated. No shared/project-wide
 document, code, test, credential, evidence epoch or trading scheduler changed.
+
+## 89. Claude independent review — 2026-10-06 UTC (counter-review of section 87)
+
+Reviewer: Claude, the macOS session, in the designated lane worktree on
+`codex/strategy-short-interest`, CPython 3.13.15 / pytest 9.1.1, every pytest
+run network-denied with the profile described in subsection 87.7. I armed a
+watcher on the remote head `4c08f59` and began only when Codex's push of
+`249c6e4` landed at 00:43 PDT; the worktree was then clean and equal to the
+remote.
+
+**Disposition: the one Codex commit is accepted.** Both of its findings
+against my section 87 are confirmed. Checking the second one exposed a
+sentence that the reconciliation merge `23a5428` dropped from the record
+header. I missed it in section 87, and this commit restores it (`SI-CR18-001`).
+No code or test changed. Nothing here admits a source, opens a look, sends a
+message or accepts a purchase or terms.
+
+### 89.1 Exact reviewed snapshot
+
+| Item | Exact value |
+|---|---|
+| Lane branch | `codex/strategy-short-interest` |
+| Previous Claude review record | `4c08f595ef6afc697fc35cfed6f6ad4542341b1f` (section 87) |
+| Reviewed remote head | `249c6e45ddd5dc5a69ee15f9920f9a3edc61df6d` |
+| Ordered reviewed range | `4c08f59..249c6e4` (1 Codex commit) |
+| Record delta | +153/-15, lane record only; deletions fall only inside the status paragraph |
+| Code/test tree | byte-identical to `dad1252`, where the complete lane passed 817 in subsection 87.7 |
+| Claude commits this round | this record commit only |
+
+| # | Commit | Scope | Disposition |
+|---|---|---|---|
+| 1 | `249c6e4` | Section 88: counter-review of section 87, append-only UTC erratum, status and ledger row | **accepted** |
+
+### 89.2 Both findings against section 87 are right
+
+- **`SI-CCR27-001`, confirmed.** The superseded `+104/-2` sits in subsection
+  83.2, in the paragraph about `e00aa35`; 83.1 is the snapshot table. My
+  subsection 87.5 cited the wrong subsection. The corrected statistic,
+  `+102/-2`, is unaffected.
+- **`SI-CCR27-002`, confirmed.** Subsection 87.4 said nothing outside the status
+  paragraph was deleted by the merge. The first hunk of
+  `git diff 85e61a4 23a5428` also replaces the "Current publication rule"
+  paragraph. My check excluded that whole hunk as "the status", which is
+  how I missed it.
+
+Codex's qualification of `SI-CCR27-002` says the replacement preserved the
+one-push rule. That is true, but it is not the whole change: the paragraph at
+`85e61a4` also said "Factual source, provider, outcome, QC,
+financial/contractual and trading gates remain unchanged. No branch switch,
+alternate branch or force push is allowed." Neither sentence survives in the
+header. The gates sentence is covered by the status paragraph's full gate
+list. The no-branch-switch and no-force sentence is not restated anywhere in
+the header. Its authority survives in section 81, which requires "a normal
+non-force push" and to "never force publication", and in the parallel-workflow
+contract, which says "Never force-push" and gives each lane one branch, so no
+rule was lost. The at-a-glance summary of the rule did lose it.
+
+### 89.3 The rest of section 88 reproduces
+
+- `git diff --numstat dad1252 4c08f59` is +221/-22, as stated in subsection
+  88.1, and no non-record path differs between `dad1252` and `249c6e4`.
+- The UTC erratum is correct: `23a5428` and `dad1252` carry author and
+  committer times 2026-10-06T05:05:01Z and 2026-10-06T05:13:27Z. Closing
+  `SI-CR17-002` with an appended erratum instead of rewriting the rows is the
+  right treatment for an append-only ledger.
+- The privacy redaction stands: the name occurs zero times in the record at
+  `249c6e4`, and section 88 does not repeat it.
+- Codex's new ledger row has eight columns and the correct UTC date; `249c6e4`
+  was committed at 07:43 UTC on 2026-10-06.
+- My row for `SI-CCR26-001..003` said "Closed; verified". It did not reclassify
+  `-003`, which stays a closed false alarm, as subsection 88.2 asks.
+
+### 89.4 P0-P3 issue ledger
+
+New this round, counted from the table below: 0 P0, 0 P1, 0 P2 and 1 P3
+(`SI-CR18-001`, closed by correction). Still open from earlier rounds: four
+P2s (`SI-SRC-20260928-001`, `-002`, `-003` and the shared `SI-CR5-005` /
+`SI-CCR16-007`) and one P3 advisory (`SI-CR15-001`).
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or closure | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| SI-CR18-001 | P3 | **Closed by correction in this commit** | `23a5428` | record header, "Current publication rule" paragraph | Confirmed. The merge resolution replaced the header's publication-rule paragraph and dropped its sentence "No branch switch, alternate branch or force push is allowed." Added at `889f7ab`, the sentence is present at the remote parent `85e61a4` and absent at both `212d645` and the merge. No authority was lost, since section 81 and the workflow contract still forbid force pushes and branch switches. But the paragraph that readers treat as the current rule now omits the prohibition. | `git log -S` for the sentence; occurrence counts at `889f7ab`, `85e61a4`, `212d645`, `23a5428`. | The header is the at-a-glance current rule; a dropped safety sentence should be restored, not left to be inferred. Missed in subsection 87.4. | This commit appends "No branch switch, alternate branch or force push is allowed; section 81 governs publication." to the header paragraph and changes nothing else in it. No regression test: the lane has no record-integrity test, and the only document test is the shared active-document test, which this lane may not change. | The sentence occurs once in the header; active-document **69 passed** on the final tree. |
+| SI-CCR27-001, -002 | P3 | Closed; confirmed against Claude | `4c08f59` | subsections 87.5 and 87.4 | See 89.2. | 89.2. | Accepted. | None further; section 88 carries the qualified wording. | Closed. |
+| SI-CR17-001 | P3 | Closed (current tree); history unchanged | `dad1252` | section 86.4 | Codex accepts the redaction. Removing the name from published history remains the owner's decision. | 89.3. | Accepted. | None. | Closed. |
+| SI-CR17-002 | P3 | Closed by Codex's appended UTC erratum | `23a5428`, `dad1252` | section-5 ledger | Accepted. | 89.3. | Accepted. | None. | Closed. |
+| SI-CR15-001 | P3 | Open, prospective owner advisory | `0e31505` | standing delegation and vendor replies | Unchanged. | Section 88.2. | Retained. | None. | Open. |
+| SI-SRC-20260928-001, -002, -003 | P2 | Open, existing factual gates | prior rounds | source admission | Unchanged. | Section 88.4. | Facts no delegation can supply. | None. | Open. |
+| SI-CR5-005 / SI-CCR16-007 | P2 | Open, shared, out of lane | N/A | shared integration history | Unchanged. | Section 88.2. | Owner decision; documented only. | None on this lane. | Open. |
+
+No out-of-lane finding is new this round.
+
+### 89.5 Validation
+
+- On the pushed tree `249c6e4`, clean, network-denied: active-document, the
+  repository ML import boundary, the lane's import boundary and the SI-5
+  protocol file **123 passed in 4.45s** (69 + 11 + 9 + 34). compileall of
+  `research` and the two lane test files: **exit 0**.
+- Final tree after this record: active-document **69 passed**;
+  `git diff --check` **clean**.
+- The complete eighteen-file lane was **not** rerun. Its **817 passed** in
+  subsection 87.7 was on `dad1252`, and every code and test file at `249c6e4`
+  and at this commit is byte-identical to `dad1252`. No lane test reads the
+  working-tree record: the protocol, ranking and percentile bindings read
+  committed blobs.
+- No mutation trial, since no code changed. No complete-repository suite.
+  Synthetic/offline only. **Authorized outcome looks: 0. Consumed outcome
+  looks: 0.**
+
+### 89.6 Quality and next step
+
+**`249c6e4`: 9/10.** Both findings are correct and carry their evidence, and
+the erratum handles the append-only ledger properly. The point withheld is for
+describing the publication-paragraph replacement as preserving the rule
+without noting the dropped no-force sentence.
+
+1. Codex counter-reviews this record commit, including the restored header
+   sentence.
+2. The owner answers the Nasdaq entity question and decides whether to remove
+   the personal name from published history.
+3. The source-specific PIT adapter milestone stays **blocked** on authentic
+   archive, availability, coverage and rights evidence; vendor deadline
+   2026-10-19 17:00 America/Los_Angeles.
+4. Still gated: provider data, licensed or actual market rows, outcomes and
+   looks, the sealed holdout, lookback selection, production ranking and
+   seeds, ETF work, any QuantConnect history/project/upload/compile/job/
+   backtest, purchases, broker, operator database, deployment, paper/live,
+   capital, orders and trading.

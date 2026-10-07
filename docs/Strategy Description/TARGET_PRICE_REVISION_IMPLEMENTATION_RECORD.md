@@ -8502,3 +8502,24 @@ do not reset credentials or invent provider facts. No review task, monitor
 rearm, side branch/worktree/clone, source/outcome/QC access or intermediate push
 is introduced. Software diagnosis/handoff are complete; real-data backtesting
 and canonical project completion are not claimed.
+
+### 61.7 Exact implementation identity and stable-tree reprise
+
+Implementation commit `7aec62f5a9eca921531f677ab6b06ca5fcb95db8`, parent
+`9cc45dd5ca2a4de68d441e0c9871c4d016468889`, retains the exact seven paths
+above. Precise staged names and all six code/test/artifact hashes matched the
+record before commit; actual matching remote was the published parent, no
+foreign stage or unstaged work existed, diff hygiene clean. Both executed
+collector and frozen original-auditor bytes remain exact; no uncommitted
+execution is falsely attributed to an older committed parent.
+
+Exact committed-tree focused reprise on `7aec62f5`: **799 passed, 3 skipped
+in 6.05s**, no failure/error/warning, identical 21 selections, flags, host and
+isolated runner in 61.6. Cumulative diff check exit 0; tree clean and actual
+matching remote unchanged at the published parent. This following record-only
+handoff retains that evidence; the final tree is checked again before the one combined
+matching-lane non-force push. The current metadata-contract blocker
+`TPR-SD22-005` remains open; no credential reset, guessed parser correction,
+fresh provider retry, source-rights admission, empirical outcome read or QC
+job follows. This is the next immediate blocker requested by the owner,
+not a Claude scheduling stop or new demand for general software approval.

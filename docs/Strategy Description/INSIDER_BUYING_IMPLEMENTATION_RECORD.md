@@ -245,6 +245,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex owner-authorized combined build round | Incoming `cb06065c..d05e0bc4` accepted in `6d7743711e57afdf5bc1c11d6b94eed9aab6d05f`; implementation/preregistration `b0efb31262d0eca6c972673ca36403fee20a34cb`; this separate evidence handoff | Actual earliest affected-quarter input preparation and all-six-form v2 quarantine | Owner approved the one-quarter scope, delegated engineering decisions and then requested one uninterrupted build round. Fixed 2006Q1 source-only worker prepared all eight tables and retained all 83,657 filing rows; public raw-bound reparse and exact assessment regeneration passed. No intermediate review pause or guessed approval was inserted. | Final focused/document/boundary selection **334 passed in 22.02s**; candidate document repeat **71 passed**; actual output 63,409,968-byte assessment, completion SHA `d05e0345...`, 751,590 table rows, 1 mismatch, all filing rows quarantined, 0 parent corroborations. No full suite, new SEC request, outcome/QC/backtest; looks 0/0/0. | Three draft P3 guard/API issues corrected with red/green; four topical P2 OPEN and previous ledger/owner classifications retained. No whole-quarter/canonical/PIT/rights/QC/readiness promotion; 0/19 substantive IB-5 input declarations bound in inspected supplied roots. | One final combined matching-lane push after expected-status/no-advancement checks; independently verify exact remote tip. Claude reviews every outgoing commit. Readiness remains blocked by real source/PIT/outcome/rights/entitlement inputs, not routine owner decisions; no fabrication, source acquisition or frozen-file thaw. |
 | 2026-10-06 | Codex owner-waived continuous backtesting build | Published start `932f30c6e55dbf8d978ad8dee7c8721921133fbc`; implementation/preregistration `b406c5b8600fa54f4181a9ecf73da827878c072e`; this separate observed handoff | Real v2 downstream bookkeeping and bounded evidence-to-score-to-QC-package integration, without Claude waiting | Explicit later owner review waiver honored; original 2006Q1 producer remains b0efb312 with all 95 original non-launcher dependencies byte-identical. New genuine-byte test paths and real all-quarantine negative path preserved. Source/event/primary/cohort/calendar/lineage defects corrected; no fake admission. | Main focused **734 passed in 28.53s**, all denied-network; actual read-only replay from clean b406c5b8 passed with 100-source capture/48-module execution. All 83,657 rows retained/quarantined, 71,679 relevant rows lack parents; wire SHA `7d5d13af...`. No data writes, new source/outcomes/QC/backtest or full suite. | New P2/P3 draft findings corrected with red/green; four topical P2 remain OPEN at precise scopes; all prior closures/classifications/denominators preserved. Genuine IB-5 evidence remains unbound; bounded 256-parent software candidate is not full historical readiness. | One combined matching-lane push and exact remote-tip verification. No Claude wait or rearmed monitor. Establish genuine existing source/PIT/calendar/rights/outcome-header/QC/protocol bindings before input-driven full-scale/temporal/statistical/parity activation; do not invent evidence or broaden named access scope. |
 | 2026-10-06 | Codex continuous owner-waived build | Published start `1bfe1b1f18a56fb77ce80ade723e5e482ea2cb80`; implementation/decisions `f276f2f684c6378347cfae5636612b7fd078a0b0`; this separate exact-hash handoff | Study-scale original-source streaming, causal first-open population, registered analysis and native QC candidates | No new incoming Claude commit; prior counter-review remains accepted. Owner no-wait direction and delegated choices exercised through sixteen recorded decisions, including explicit seasoned-stock primary scope, without a review pause or guessed factual approval. Existing contracts/frozen files remain. | Main final focused integration **1,234 passed in 82.53s**; eighteen in-memory compilations and hash bindings pass; 72 final document/exact-package controls passed before implementation commit. Genuine fixture scaling: 390 source dates separately from 321 issuers/dates x 6,000 controls; no actual cloud or research observation. | Corrected draft P2/P3 findings retain genuine red/green vs inspected/reversal provenance. Four topical P2 OPEN, prior closures/classifications/denominators unchanged. Missing genuine source/PIT/rights/outcome/QC facts still block actual readiness; no fixture promotion. | One combined matching-lane push after separate handoff and final remote/status checks. No Claude wait or monitor rearm. Bind actual missing input evidence before factual activation; no fabricated source/licensing/entitlement/registered look, no new acquisition, outcome, QC or trading action. |
+| 2026-10-07 | Codex owner-waived provider integration | Published start `59ef662062e91e09d9449aeb3f23cb5812ce7142`; implementation and separate handoff follow | Capability journal, supplied current-reference triage and private rights evidence | QC authentication HTTP 200; Massive public status HTTP 200 is not Benzinga entitlement. Supplied Sharadar ZIP/hash/header verified without interpreting rows or opening actions/fundamentals. No incoming review or Claude wait. | Final focused **510 passed in 2.61s**, eight memory compilations, frozen historical equality and independent eight-leaf private journal verification. Two fixed metadata requests, 424 response bytes; zero Sharadar/SEC requests, looks, uploads, compiles, jobs or backtests. | `IBMETA-R01..R05` corrected with genuine red/green; shared QC documented-envelope issue recorded without shared edits. Four topical P2 and prior dispositions/classifications/denominators unchanged. Credentials do not establish readiness. | One combined matching-lane push after separate exact-hash handoff. No review wait or monitor rearm. Bind real original-parent/PIT/listing/reference/rights/product/vintage evidence before production activation; no ordinary owner choice is deferred. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -19499,3 +19500,217 @@ review claim is inserted. The heartbeat remains PAUSED and no chat is
 messaged or automatically rearmed. Actual source/PIT/rights/canonical/
 mapping/look/QC/backtest/execution authority stays false, with **looks/jobs/
 backtests 0/0/0**.
+
+## 143. Provider capability and supplied-reference integration (2026-10-07 UTC; 2026-10-06 owner-local)
+
+### 143.1 Exact scope and delegated decisions
+
+Starting local and repeatedly fetched origin tip is
+`59ef662062e91e09d9449aeb3f23cb5812ce7142`, in the designated
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+worktree on `codex/strategy-insider-buying`. Ordered incoming range is
+**`59ef662062e91e09d9449aeb3f23cb5812ce7142..59ef662062e91e09d9449aeb3f23cb5812ce7142`
+(empty)**. No new Claude commit is omitted or guessed accepted. Prior
+accepted counter-reviews and the explicit owner waiver of waiting remain.
+The initially clean worktree contained no unidentified work; Codex and its
+delegated local agents created the eight new code/test files this round.
+
+Latest owner direction places QC, Sharadar and Massive-Benzinga access in
+scope and directs continued building. The supplied Sharadar location is
+the exact retained artifact
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`.
+It is inspected as an explicitly supplied read-only artifact, not a checkout
+fallback. Every repository command/test/edit/commit/push still used the
+Insider worktree. Its manifest says the key and redirect URL were not
+persisted; no key was found in recognized process/launchd variables. No
+home-wide secret scan, sibling `.env`, sample-key or Nasdaq fallback occurred.
+
+| Decision | Documented best-judgment disposition |
+|---|---|
+| IBDEC-143-01 | Exercise the named-service direction through bounded non-research capability checks, not inferred licensing, source/PIT, outcome-look, upload or job authority. Two fixed metadata requests only; missing Sharadar credentials cause zero requests. |
+| IBDEC-143-02 | Separate lane-owned runner instead of the QC smoke command, which creates/updates/compiles/launches. Shared QC client/allowlist and project-wide documents stay frozen. |
+| IBDEC-143-03 | Fsync one-attempt reservation before loading credentials; fixed HTTPS method/origin/body, default TLS, no proxy environment/redirects, 15-second timeout, bounded body and no retry/resume. Persist sanitized facts/digests, not secrets, auth headers, upstream errors or raw bodies. |
+| IBDEC-143-04 | Verify existing Sharadar reference ZIP/header custody without interpreting actual rows or opening ACTIONS/FUNDAMENTALS. Opaque compressed bytes are read; the precise exclusion is zero interpreted rows, not zero bytes. |
+| IBDEC-143-05 | Retain every supplied current-reference row/alias/conflict in future triage; no ticker/name/CUSIP/FIGI heuristic, first-price date or last-updated timestamp releases exact title, SID, first listing or historical knowledge. |
+| IBDEC-143-06 | Authentication, account identity, purchased product entitlement, coverage and processing permissions are separate. Missing contract facts mean UNMEASURED, not REFUSED/GRANTED. Hash consistency alone is not licence authentication. |
+| IBDEC-143-07 | No QC raw-data extraction through logs/Object Store/orders/API. Normal strategy outputs and independently purchased download rights are distinct. No licence acceptance, purchase, provider correspondence or job inferred. |
+| IBDEC-143-08 | Continue without Claude or another ordinary approval question; record real external facts still needed. Do not manufacture licences, subscriptions, original parents or PIT history on the owner's behalf. |
+
+Direct Sharadar is distinct from Nasdaq Data Link; TICKERS is a current
+snapshot and permaticker is a provider share-class identity, not PIT/listing
+proof. [Direct guidance](https://sharadar.com/llms.txt),
+[TICKERS specification](https://sharadar.com/docs/tickers).
+QC terms v1.4 dated October 2, 2026 restrict Platform Data exports, including
+agent-driven extraction; normal strategy outputs do not permit local native-
+price panels. [QC terms, section 2.6](https://www.quantconnect.com/terms).
+Public Sharadar personal-use and Massive individual/business terms are not
+proof of this account's purchased rights or QC transfer permissions.
+[Sharadar terms](https://sharadar.com/terms),
+[Massive terms index](https://massive.com/legal/terms).
+
+### 143.2 Actual observation, custody and execution-time lineage
+
+Private audit:
+`artifacts/insider_buying/provider_metadata/ib-provider-metadata-20261006-capability-once`.
+Reserved **2026-10-07T05:08:37.104126Z**, completed
+**2026-10-07T05:08:38.087004Z**; its ID uses the owner-local date, not a
+backdated UTC observation. Complete-record SHA-256:
+**`186490eae17161a79aceab56717212993067e1d209d9df2c563619878e6e44cb`**.
+All eight leaves, exact receipt profiles, reservation/start/completion links,
+modes/link counts and actual hashes independently verified afterward with
+network and all file writes denied. Artifact ignore coverage verified; no
+private artifact, row or key is staged.
+
+| Fixed request | Actual result | Raw response bytes / SHA-256 | Factual limit |
+|---|---|---|---|
+| QC POST `/api/v2/authenticate`, body `{}` | HTTP 200; literal success true | 16 / `c955e57777ec0d73639dca6748560d00aa5eb8e12f13ebb2ed9656add3908f97` | Configured-pair authentication observed, not dataset/account-organization/product/coverage/rights entitlement. |
+| Massive GET `/v1/marketstatus/now` | HTTP 200; bounded public-status schema | 408 / `f1b543b73924da321e374cc19db215a426c34438cb85fdadc9b31fe776915be7` | Public/status access; does not prove key validity/necessity, Benzinga purchase or historical publication vintages. |
+| Direct Sharadar bulk-status profile | `credentials-missing`; no transport | 0 / null | No Sharadar request, sample fallback, signed download or Nasdaq call. Supplied capture inspected separately. |
+
+These are **two actual fixed metadata requests / 424 response bytes**, not
+historical rows, strategy outcomes or launch attempts. Public documentation
+browsing is separate. [QC authentication](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/authentication),
+[Massive status](https://massive.com/docs/rest/stocks/market-operations/market-status).
+No billing cards, projects, brokerage credentials, upload/file/compile/job,
+Object Store or previous research result was accessed.
+
+Execution used base HEAD `59ef662062e91e09d9449aeb3f23cb5812ce7142` plus
+explicit uncommitted runner
+**`3ba03e85a65e154aa817c705a7e7df0aca14e2f0aa23ca77c9e0433f09d1412c`**,
+transport **`09a7159cab2778572e03f756de795db3ba71989614ebcb410df8b0b9680dff93`**,
+and unchanged shared auth helpers
+**`7a12fdb68194ee10f6e8c3d7c0fc49c08b34166d056bd5ea2a72937dd03be373`**.
+The later typed-negative and ancestor-path fixes changed the final runner
+hash; **no actual probe was repeated**. Do not relabel the later commit as
+already existing during execution. Raw bodies were transient, not retained
+for replay: counts/digests/sanitized observations are bound, not independently
+repeated provider authentication or retained-body evidence.
+
+Supplied capture manifest SHA
+**`94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b`**
+and 4,937,076-byte TICKERS ZIP SHA
+**`a7b129f159631ee50f1eefd2be8d4215c1c7818880570c0ad0a79c76c25e51bf`**
+match. One declared 24,939,614-byte `tickers.csv` member has the 28 documented
+columns; consumed header SHA
+**`c9186ed191f4e51d5142287016dc99e3f80ecebed49aa63c3fa1ecf09e5d26f7`**.
+The ZIP is read opaquely and only its header consumed; no row interpreted,
+no ACTIONS/FUNDAMENTALS opened. Manifest-reported row count/member digest
+are not relabeled independently parsed/rehashed proof. Current snapshot
+semantics do not establish source authenticity, exact title/SID, first
+listing, historical knowledge, applicable rights or canonical release.
+
+### 143.3 Completed engineering, findings and validation
+
+Technical milestone: four lane-owned modules provide import-inert fixed
+metadata transport; a fsynced one-shot/custody-checked private journal;
+streaming supplied current-reference/SEC-title triage; and exact private
+account/product/document/clause rights-evidence admission. Core offline
+Insider imports no network runner. Supplied assessments distinguish
+UNMEASURED/REFUSED/GRANTED, applicability/expiry and cross-hashes. Optional
+native rights projection is not entitlement, authenticated truth, legal
+interpretation, look allocation or canonical production activation; private
+document bytes are not retained by detached reports.
+
+Plain language: the credentials were exercised where a safe non-research
+check exists rather than merely detected. QC authentication works. Massive's
+public response and the retained current Sharadar capture do not prove
+subscriptions or historical trading facts. The build can bind genuine
+reference/contract evidence without silently promoting today's metadata.
+Passing software/authentication checks is not completed historical readiness.
+
+| Finding | Priority/status | Genuine evidence and correction |
+|---|---|---|
+| IBMETA-R01 | P3 corrected | Symlinked parents leaked an OS exception. **3 failed / 24 passed, 0.37s**, sanitized refusal then **27 passed, 0.25s**. No outside writes. |
+| IBMETA-R02 | P2 corrected | Modified reservation/start could coexist with false completion. Included in genuine **17 failed / 35 deselected, 0.31s**. Recheck held directory/leafset/mode 600/single-link/actual byte hashes around transport/publication. |
+| IBMETA-R03 | P2 corrected | Reconstructed/injected receipts could persist private fields/false readiness. Same 17-case red; exact typed whitelisted facts and false-authority checks, **52 passed, 0.30s** green. Local defense-in-depth, not observed disclosure. |
+| IBMETA-R04 | P3 corrected | Safe QC `success:false` incorrectly became ambiguous. **1 failed / 52 deselected, 0.36s**; exact typed negative now completes without authentication/rights. Intermediate integration **507 passed, 2.74s**. No real negative call. |
+| IBMETA-R05 | P2 corrected | Same-user concurrent ancestor rename could move the held journal out of its path. **3 failed / 53 deselected, 0.33s**; reopen full no-follow chain and compare current/held parent inodes, **56 passed, 0.29s**; independent **56, 0.28s**. No actual journal moved or API retry. |
+| IBMETA-TRANSPORT-R01 | P3 corrected | Malformed invented dispositions produced TypeError. **2 failed / 132 deselected, 0.27s**; exact type guard corrected before real access. |
+| IBREC-143-R01 | P3 corrected | Initial new session row was separated from the contiguous ledger by a blank line. Active record check genuinely gave **1 failed / 71 passed in 1.05s**; removed only that blank separator, retaining the entire row and prior ledger. Final narrow green recorded in the handoff. |
+| IBQC-SHARED-META01 | P2 OPEN; shared/out-of-lane | Universal shared-client `success is True` requirement rejects the documented successful orders/length envelope. Independently reproduced with one invented local transport call, zero external calls. Not a live orders failure; shared behavior unchanged. Any future permitted lane export capture must handle exact native envelopes safely. |
+
+Shared finding source:
+[official orders response](https://www.quantconnect.com/docs/v2/cloud-platform/api-reference/backtest-management/read-backtest/orders).
+No new P0/P1. Four topical P2 remain OPEN: **IB1C-REAL-CR01, IB1BCAMP-CR01,
+IBSRC-CR01, IBSRC-CCR01**. Accepted source-view engineering is not called
+unimplemented; the old direct/base current-byte path/frozen boundary remains.
+All previous resolved ledger dispositions are retained.
+
+Main final selection **510 passed in 2.61s**, no failures/skips/warnings:
+
+```text
+tests/test_insider_buying_provider_metadata_audit.py
+tests/test_insider_buying_provider_metadata_transport.py
+tests/test_insider_buying_provider_reference_identity.py
+tests/test_insider_buying_provider_rights_evidence.py
+tests/test_quantconnect_client.py
+tests/test_insider_buying_lane_import_boundary.py
+tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports
+tests/test_active_document_consistency.py
+tests/test_insider_buying_implementation_record.py
+```
+
+Every test/reversal used OS process-tree `(deny network*)`, minimal environment,
+Python 3.12.14 `-B`, disabled plugin autoload/cache. Peer independently read
+all four sources; reference **44 in 0.37s**, rights **92 in 0.59s**. Genuine
+1,024-row invented current-reference fixture proves no inherited 256 cap;
+not a real row assessment. Faithful in-memory reversals caught proxy/redirect
+(one each), reference digest/SEC host/exact-byte seal (one/four/one), rights
+private-account/metadata promotion (one/six); restored hashes rechecked.
+Those reversals are not represented as historical pre-fix red runs. Eight
+files compile in memory with network/all writes denied. A combined Git-show
+harness could not launch Git with all writes denied; separate compilation
+succeeds and network-denied Git comparisons prove the four historical frozen
+files unchanged. This is a harness limitation, not product/test failure.
+No complete lane/repository suite or retained-root replay ran.
+
+| Final file | SHA-256 |
+|---|---|
+| `research/insider_buying_provider_metadata_audit.py` | `181d696a9135466a00ebe94fb0ee4ed7a739b8da7a298d08644245c6e4aa4211` |
+| `research/insider_buying_provider_metadata_transport.py` | `09a7159cab2778572e03f756de795db3ba71989614ebcb410df8b0b9680dff93` |
+| `research/insider_buying_provider_reference_identity.py` | `18bd3b22f4b01adfd574132e755a34f05a6751499c3adfbbe497a515435c9187` |
+| `research/insider_buying_provider_rights_evidence.py` | `8b0387632059b46b6ef8bebf46904db0354ac4d53f5e2a47a6972ab90e26d857` |
+| `tests/test_insider_buying_provider_metadata_audit.py` | `4f028cde1f0802c6c103e9869e14bdb9c8d6fdbdbe657a5220033f5aade0a850` |
+| `tests/test_insider_buying_provider_metadata_transport.py` | `d02b05f4bb82f84b9f3c66f51ea2baf9e9cfd01276a4efa79c86a88d26a6d9ce` |
+| `tests/test_insider_buying_provider_reference_identity.py` | `15800d3aa1507e72526607ce24392979549087d8ee5753b9e93de7715f1f1c04` |
+| `tests/test_insider_buying_provider_rights_evidence.py` | `87e069f2b3dcef17fe240e8b2ae457949af0ffb7cce60f08dd0336bcd93f6e55` |
+
+### 143.4 Precise factual blockers and next action, not another ordinary approval
+
+**No routine owner decision is pending.** The missing materials are real
+complete original-parent evidence; corroborated historical validity/knowledge/
+closure/exact title/QC SID and first-listing/predecessor facts; dated earnings
+scheduling/calendars; exact account/product/vintage/representation/coverage
+and applicable local/QC processing permissions. Authentication supplies none
+of them. The supplied current TICKERS capture does not replace them. Prior
+observed 2006Q1's 83,657 quarantined rows/71,679 missing relevant parents are
+preserved prior evidence, not a newly repeated result. No actual eligible
+manifest or permanently registered production study is created.
+
+Next integration needs those hash-bound source/reference/contract inputs,
+then input-driven canonical production configuration and permitted export/
+analysis parity. Section 141's canonical attempt/completion/analysis routes
+remain fixture-only until genuine registered source exists; this round does
+not claim production activation implemented/completed. A parser cannot
+authenticate a licence or buy a subscription on the owner's behalf. No
+source window, population, legacy caller, budget, thaw or purchase is changed.
+
+Frozen v1/scale/pilot and the four v3 custody files remain exact
+`aa0d635d00b64825bf8003289e0a60279bd52e73` bytes. Stopped v3 remains unresolved
+**1,846/1,847**. **99,394 = 9,539 + 1 + 8,139 + 1,846 + 1 + 79,868**,
+only **19,526 source-bound**. Separate 7,373-byte diagnostic/report
+`206e6db9677fb169455f62357ce966384926080b6eba582094e9536e88d705b7`
+does not resolve/rewrite the original unmatched start. D23 retains seven
+nonexact quarters/no 82-quarter promotion digest. Final **historical
+authorization provenance not established** for 372 requests and separate
+**reviewer-reported probable unintended SEC access; exact request count and
+transferred bytes not established** stay distinct, without retroapproval.
+
+No new SEC/Sharadar/licensed-row acquisition, historical price/fundamental/
+earnings read, QC upload/compile/job, registered/outcome look, backtest,
+broker/operator-database/scheduler/deployment/capital/paper/live/order/trading
+action occurred. Actual source/PIT/rights/canonical/mapping/look/QC/backtest/
+execution authority remains false; **looks/jobs/backtests 0/0/0**. Heartbeat
+stays PAUSED, no chat messaged. One combined matching-lane push with separate
+exact-hash handoff closes this authorized round, not the project or factual
+readiness. No new blanket approval is requested as a substitute for evidence.

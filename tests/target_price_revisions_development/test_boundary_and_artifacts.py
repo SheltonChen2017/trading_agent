@@ -22,8 +22,14 @@ ARTIFACTS = ROOT / "research/target_price_revisions_development/artifacts"
 def test_development_import_closure_cannot_reach_canonical_or_other_authority() -> None:
     modules = _validate_import_closure(
         ROOT, package_name="research.target_price_revisions_development",
-        forbidden_prefixes=DEFAULT_FORBIDDEN_IMPORT_PREFIXES | {"research.target_price_revisions"},
-        allowed_stdlib_roots=DEFAULT_ALLOWED_STDLIB_ROOTS | {"argparse", "collections", "tempfile", "time", "fractions"},
+        # Only the separately guarded source_audit module may use this narrow
+        # standard-library network capability; canonical policy is unchanged.
+        forbidden_prefixes=(DEFAULT_FORBIDDEN_IMPORT_PREFIXES - {"http", "ssl", "urllib"})
+                           | {"research.target_price_revisions"},
+        allowed_stdlib_roots=DEFAULT_ALLOWED_STDLIB_ROOTS | {
+            "argparse", "collections", "tempfile", "time", "fractions", "http", "ssl",
+            "pwd", "stat", "signal", "contextlib", "urllib", "uuid",
+        },
         allowed_local_prefixes=("research.target_price_revisions_development",),
     )
     assert set(modules) == {
@@ -38,6 +44,7 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.simulation",
         "research.target_price_revisions_development.backtesting",
         "research.target_price_revisions_development.fixture_backtest",
+        "research.target_price_revisions_development.source_audit",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -169,3 +176,90 @@ def test_readiness_binds_only_the_two_approved_d0_aggregate_identities() -> None
     assert digest((ARTIFACTS / f"tpr-d0-plan.{readiness.D0_PLAN_SHA256}.json").read_bytes()) == readiness.D0_PLAN_SHA256
     assert digest((ARTIFACTS / f"tpr-d0-structure.{readiness.D0_REPORT_SHA256}.json").read_bytes()) == readiness.D0_REPORT_SHA256
     assert all(key not in readiness.REQUIREMENTS for key in ("approved_by_owner", "preauthorized"))
+
+
+def test_source_auditor_is_separate_from_pure_fixtures_and_authority_packages() -> None:
+    """Its explicit I/O capability must not widen any pure-module dependencies."""
+    source = (ROOT / "research/target_price_revisions_development/source_audit.py").read_text(encoding="utf-8")
+    tree = ast.parse(source)
+    allowed = {"__future__", "hashlib", "http", "json", "os", "pwd", "re", "signal",
+               "ssl", "stat", "subprocess", "threading", "time", "uuid", "contextlib",
+               "dataclasses", "datetime", "decimal", "pathlib", "typing", "urllib"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all(alias.name.split(".")[0] in allowed for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            assert node.level == 0 and node.module.split(".")[0] in allowed
+    # Importing constants/type declarations is not permission to activate I/O.
+    # All top-level calls are inert constructors of fixed objects, not providers.
+    for node in tree.body:
+        if isinstance(node, ast.Expr):
+            assert isinstance(node.value, ast.Constant) and type(node.value.value) is str
+        if isinstance(node, (ast.Assign, ast.AnnAssign)):
+            for child in ast.walk(node):
+                if isinstance(child, ast.Call):
+                    assert isinstance(child.func, ast.Name)
+                    assert child.func.id in {"Path", "AuditRequest"}
+    assert "api.massive.com" in source and "api.sharadar.com" in source
+    initializer = ast.parse((ROOT / "research/target_price_revisions_development/__init__.py").read_text(encoding="utf-8"))
+    assert all(isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
+               and type(node.value.value) is str for node in initializer.body)
+    for path in (ROOT / "research/target_price_revisions_development").glob("*.py"):
+        if path.name == "source_audit.py":
+            continue
+        for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
+            names = ([alias.name for alias in node.names] if isinstance(node, ast.Import)
+                     else [node.module or ""] if isinstance(node, ast.ImportFrom) else [])
+            assert not any(name.split(".")[0] in {"http", "ssl", "urllib"}
+                           or "source_audit" in name.split(".") for name in names)
+            if isinstance(node, ast.ImportFrom) and node.module is None:
+                assert all(alias.name != "source_audit" for alias in node.names)
+
+
+def test_committed_source_probe_is_exact_non_authorizing_aggregate_not_a_retry() -> None:
+    """Read only the approved public plan/report; never activate the collector."""
+    import hashlib
+    import json
+    from research.target_price_revisions_development.source_audit import AuditPlan
+
+    plan_sha = "cdee4d603e8d2b232759f8f4e557d8786dea62393b0dc489d449a6970164048b"
+    report_sha = "7688106002c12f1460b05fd0aaa39f0d8b5970d73326289774933a137c420cb2"
+    plan_payload = (ARTIFACTS / f"tpr-source-audit-plan.{plan_sha}.json").read_bytes()
+    report_payload = (ARTIFACTS / f"tpr-source-audit-report.{report_sha}.json").read_bytes()
+    assert hashlib.sha256(plan_payload).hexdigest() == plan_sha
+    assert hashlib.sha256(report_payload).hexdigest() == report_sha
+    plan = AuditPlan(plan_payload, plan_sha).body()
+    body = json.loads(report_payload)
+    assert body["plan_sha256"] == plan_sha
+    source_sha = hashlib.sha256((ROOT / "research/target_price_revisions_development/source_audit.py").read_bytes()).hexdigest()
+    assert body["code_sha256"] == plan["code_sha256"] == source_sha
+    assert plan["git_sha"] == body["git_sha"] == "683bdc4a21c4374d0091d5958d8ddb98b9f00d3a"
+    assert body["mode"] == "production" and body["status"] == "COMPLETED"
+    assert body["provider_requests"] == 2 and body["fixture_transport_calls"] == 0
+    assert body["response_bytes"] == 1237 and body["response_bytes_complete"] is True
+    massive, sharadar = body["providers"]
+    assert massive["provider"] == "massive" and massive["http_status"] == 200
+    assert massive["rows_observed"] == 1 and massive["disposition"] == "field_presence_observed"
+    assert massive["field_presence"]["price_target"] == 1
+    assert massive["field_presence"]["price_target_horizon"] == 0
+    assert massive["field_presence"]["previous_price_target_horizon"] == 0
+    assert set(massive) == {"provider", "http_status", "disposition", "authenticated_access_observed",
+                            "response_bytes", "response_bytes_complete", "response_sha256",
+                            "rows_observed", "field_presence"}
+    assert sharadar["provider"] == "sharadar" and sharadar["http_status"] == 200
+    assert sharadar["disposition"] == "body_schema_refused"
+    assert sharadar["metadata"] == {"metadata_shape_observed": False, "size_bytes": None, "snapshot_utc": None}
+    assert set(sharadar) == {"provider", "http_status", "disposition", "authenticated_access_observed",
+                            "response_bytes", "response_bytes_complete", "response_sha256", "metadata"}
+    assert all(value is False for value in body["authority"].values())
+    assert body["outcome_reads"] == body["qc_attempts"] == body["development_looks"] == 0
+    assert body["real_development_backtest_ready"] is False
+    assert body["license_entitlement"] == body["point_in_time_facts"] == "unestablished"
+    assert body["canonical_admission"] is False and body["d0_renewed"] is False
+    assert datetime.fromisoformat(plan["created_utc"]) <= datetime.fromisoformat(body["started_utc"]) < datetime.fromisoformat(plan["expires_utc"])
+    assert set(body) == {"schema", "audit_id", "mode", "status", "started_utc", "plan_sha256",
+                         "code_sha256", "git_sha", "owner_instruction_sha256", "providers",
+                         "provider_requests", "fixture_transport_calls", "response_bytes",
+                         "response_bytes_complete", "authority", "license_entitlement",
+                         "point_in_time_facts", "working_assumption", "real_development_backtest_ready",
+                         "canonical_admission", "d0_renewed", "outcome_reads", "qc_attempts", "development_looks"}

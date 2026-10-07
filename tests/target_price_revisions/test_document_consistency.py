@@ -2646,3 +2646,55 @@ def test_section_59_guard_refuses_target_review_or_access_drift(monkeypatch, old
                         lambda heading: mutated if heading.startswith("## 59.") else original(heading))
     with pytest.raises(AssertionError, match="closed backtest scope"):
         test_section_59_pins_backtesting_target_without_factual_escalation()
+
+
+SECTION60_SCOPE = (
+    ("Target", "Development backtesting readiness; no Claude wait"),
+    ("Source audit", "One fixed one-shot outcome-free audit; not D0 renewal"),
+    ("Massive", "One fixed-date ratings GET; limit one; no pagination"),
+    ("Sharadar", "One TICKERS status GET; metadata only; no rows or download"),
+    ("Bounds", "Two attempts; 65536 bytes each; no redirects or retries"),
+    ("Credentials", "Existing process environment or Sharadar Keychain; never published"),
+    ("Publication", "Frozen plan and sanitized aggregate only; no raw values"),
+    ("Rights", "Owner working structural-audit assumption; access is not license proof"),
+    ("Development gates", "Exact source and empirical admission remain required"),
+    ("Canonical gates", "Windows trust and separately reviewed manifests stay parked"),
+    ("Outcomes and QuantConnect", "No outcome access; no QC API, upload, job or backtest"),
+    ("Trading", "No broker, operator database, deployment, capital or orders"),
+)
+
+
+def test_section_60_freezes_new_source_audit_without_conflating_canonical_gates():
+    section = _record_section("## 60.")
+    block = _bounded(section, "<!-- TPR-SOURCE-AUDIT:START -->",
+                     "<!-- TPR-SOURCE-AUDIT:END -->", "section 60 source audit")
+    lines = tuple(line.strip() for line in block.splitlines() if line.strip())
+    assert lines[0] == "| Boundary | Scope |"
+    assert re.fullmatch(r"\|\s*:?-+:?\s*\|\s*:?-+:?\s*\|", lines[1])
+    rows = tuple(tuple(cell.strip() for cell in line.split("|")[1:-1]) for line in lines[2:])
+    assert rows == SECTION60_SCOPE, "closed source-audit scope cannot renew access or waive facts"
+    assert "not prerequisites to every accepted-risk development study" in section
+    assert "Missing horizons are not silently assigned twelve months" in section
+    assert "TPR-OWN-21" in section and "TPR-OWN-24" in section
+
+
+@pytest.mark.parametrize(("old", "new"), [
+    ("| Source audit | One fixed one-shot outcome-free audit; not D0 renewal |",
+     "| Source audit | Renew D0 |"),
+    ("| Bounds | Two attempts; 65536 bytes each; no redirects or retries |",
+     "| Bounds | Unlimited retries |"),
+    ("| Outcomes and QuantConnect | No outcome access; no QC API, upload, job or backtest |",
+     "| Outcomes and QuantConnect | Launch backtest |"),
+    ("| Rights | Owner working structural-audit assumption; access is not license proof |",
+     "| Rights | API success proves rights |"),
+])
+def test_section_60_guard_refuses_source_scope_escalation(monkeypatch, old, new):
+    test_section_60_freezes_new_source_audit_without_conflating_canonical_gates()
+    original = _record_section
+    section = original("## 60.")
+    assert section.count(old) == 1
+    mutated = section.replace(old, new, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+                        lambda heading: mutated if heading.startswith("## 60.") else original(heading))
+    with pytest.raises(AssertionError, match="closed source-audit scope"):
+        test_section_60_freezes_new_source_audit_without_conflating_canonical_gates()

@@ -20056,3 +20056,76 @@ The next actual operations are the fixed native probe after manual unlock and
 fresh bounded SEC capture after genuine contact/cross-capture journal inputs.
 These are missing operational/factual inputs, not routine permission requests
 or a Claude-review wait. Keep the existing heartbeat PAUSED.
+
+## 146. Exact-hash acquisition/reuse handoff (2026-10-07 owner-local)
+
+Published starting snapshot and matching fetched origin were
+`f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`. Ordered incoming range was empty:
+there is no new Claude commit to disposition and no invented review acceptance.
+Prior counter-review dispositions remain in their original entries. The later
+explicit owner continuous-build/no-Claude-wait direction and confirmations in
+145.1 govern this round; the heartbeat stays PAUSED.
+
+Implementation/decision/reviewed-draft commit is
+**`3e21c6db617ea3b17a2e44bc9f15f3a167de5135`** (parent
+`f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`): three import-inert lane-specific
+tools, their six files' exact hashes in 145.6, and section 145's durable record.
+This separate commit is the handoff only. Actual provider execution and both
+full retained-source audits occurred at starting HEAD with explicitly hashed
+uncommitted implementation bytes, **not** at this later implementation commit.
+The final read-only peer inspection reported no new material defect or tracked
+secret/row leakage; two record-only wording qualifications were adopted.
+
+Validation: integrated **658 passed / 4.33s** and six in-memory compilations
+as recorded in 145.6. After final section 145 content, the active-document,
+record, import-boundary and exact Insider package-guard selection passed
+**105 / 2.67s**; after peer wording qualifications the same selection passed
+**105 / 2.75s**. Both used effective process-tree network denial, minimal
+environment, Python -B and disabled plugin/cache paths. No full suite or
+retained-root historical replay ran in this round. Diff checks, immutable
+four-file historical equality, no shared-client changes and exact candidate
+hashes passed before implementation commit. That commit left the lane clean;
+the remote had not advanced. Reverify the same controls after this handoff and
+before the single combined matching-lane push; independently verify its tip.
+
+Completed actual operations: full byte/schema/count verification of all three
+owner-supplied Sharadar archives and 3,989,156 rows; one fixed purchased
+Earnings request (HTTP 200, 389 bytes) with private request-bound journal and
+independent raw-schema replay. The exact native QC probe is prepared/tested,
+not executed. The owner-authenticated Safari flow created one new coding
+workspace, project 37465795, and QC automatically compiled its default
+template. Mac locking then blocked control; no default-code replacement,
+Research probe execution, native History query or backtest is asserted.
+
+**Next actual action:** owner manually unlocks the Mac, then continue inside
+that new QC project with the exact bounded 145.5 probe, keeping Symbols/data
+inside QC and observing only count/status metadata. Owner supplies a genuine
+SEC contact email for the identifying User-Agent; no configured address was
+found, so do not guess one. Fresh SEC access then requires a separately
+committed bounded capture and genuinely replayed originally-unattempted
+partition/exclusive cross-journal claims, never a resumed stopped-v3 command.
+Neither missing input is a request for another routine scope decision or for
+Claude review. Original SEC documents need no subscription; observed purchased
+Earnings access needs no duplicate purchase. Its pre-2010/original-version
+coverage gap remains factual and cannot be substituted by modern schedules.
+
+Exclusions and blockers: source/PIT/title/listing/rights/canonical/look/QC-
+backtest/execution readiness remains false; actual affected-quarter source
+integration, full scale historical mapping and as-known calendar are not
+complete. No fresh SEC or Sharadar bulk request, licensed-row QC upload/raw
+QC export, registered/outcome look, strategy backtest, broker/operator database,
+scheduler, deployment, capital, paper/live order or trading action. Private
+licensed response bytes stay ignored and out of Git. Shared/project-wide
+documents and shared behavior stay unchanged. All prior P0–P3 closures, four
+topical OPEN P2s, shared `IBQC-SHARED-META01`, frozen file/denominator/D23
+boundaries and both non-retroactive final access classifications are preserved.
+This is a completed bounded acquisition/reuse checkpoint, **not project
+completion or backtesting readiness**. Publish implementation plus this exact
+handoff once from the designated worktree to its matching lane only; no monitor
+rearm, Claude wait or other-chat message.
+
+After this separate handoff was added, the same active-document/record/
+import-boundary/exact-package selection passed **105 in 2.78s**, no failures,
+skips or warnings, under the same network-denied minimal environment. Only the
+expected lane record is modified at implementation HEAD `3e21c6db...`; all
+six source/test bytes remain the exact hashes recorded in 145.6.

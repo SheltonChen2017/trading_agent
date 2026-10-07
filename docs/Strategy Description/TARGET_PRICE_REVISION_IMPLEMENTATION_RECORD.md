@@ -22,7 +22,10 @@ AUTHORITY IS AUTHORIZED. THE EMPTY REGISTRY, CANONICAL CANDIDATE, SOURCE/LOOK
 AUTHORITIES, PERMANENT 1/80 CEILING AND SHARED HOLDOUT KEEP THEIR EXACT BYTES.
 TPR-1 AND TPR-0B REMAIN BLOCKED. SECTION 60'S TWO FIXED AUTHENTICATED
 SOURCE-AUDIT REQUESTS ARE SPENT. SECTION 61 RECORDS THE OWNER'S FOLLOW-UP
-AUTHORITY FOR ONE FRESH SHARADAR METADATA-ONLY DIAGNOSTIC; NO PRICE/OUTCOME ACCESS, RESEARCH
+AUTHORITY FOR ONE FRESH SHARADAR METADATA-ONLY DIAGNOSTIC, NOW SPENT. SECTION 62
+RECORDS THE OWNER-APPROVED RICHER INSPECTION, ALSO SPENT, AND ITS CONFIRMED
+DESIGN LIMITATION. A PURE PROJECTION CORRECTION IS TESTED BUT NO PARSER MAPPING
+IS VERIFIED. NO EXTRA REQUEST IS INFERRED OR PERFORMED. NO PRICE/OUTCOME ACCESS, RESEARCH
 LOOK, QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
 IS GRANTED. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
 
@@ -495,6 +498,16 @@ flat metadata fields are missing and no whitelisted API-error field is
 present. Credential validity remains unproven. The immediate blocker is the
 current metadata response contract, not evidence that the machine needs a
 reset. Section 61.5 records the exact next factual input and exclusions.
+Section 62 supersedes the current flat-only diagnosis: the additional field
+is a one-item `files` array, but its descriptor remained opaque due to our
+inspection design. The new pure projection fixes that software gap on
+synthetic fixtures only and is not connected to a production collector.
+No raw response exists to replay, no actual metadata mapping is verified,
+and no spent operation is rearmed. An additional status-only request was
+asked of the owner explicitly; a reply is not assumed. The next input is
+descriptor schema evidence, not another general software/review approval,
+credential reset or Windows migration. See section 62 for the actual result,
+corrective candidate and exact authorization boundary.
 
 ### Open-issue register
 
@@ -514,7 +527,7 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
-| `TPR-SD22-005` | P2 | Sharadar metadata mapping/admission | The stable direct status response differs from the documented flat schema; the diagnostic has one unmapped field and no retained raw body. A verified current response contract is required before selecting a mapping. No credential reset or guessed file-wrapper normalization closes it. See section 61.5. |
+| `TPR-SD22-005` | P2 | Sharadar metadata mapping/admission | Sections 61/62 did not establish the descriptor contract. The extra root field is now observed as a one-item files array, but our inspection hid the child fields and no raw body remains. Pure projection is corrected; verified descriptor evidence or a separately approved status-only request is still needed before mapping. No reset or guessed normalization closes it. See section 62. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -8523,3 +8536,233 @@ matching-lane non-force push. The current metadata-contract blocker
 fresh provider retry, source-rights admission, empirical outcome read or QC
 job follows. This is the next immediate blocker requested by the owner,
 not a Claude scheduling stop or new demand for general software approval.
+
+## 62. Owner-approved richer Sharadar shape inspection and verified mapping - 2026-10-07
+
+### 62.1 Direct instruction and prospective operation scope
+
+The owner asked for the recommended action after section 61's underpowered
+flat-field diagnostic. Codex recommended one richer metadata-only inspection,
+followed by a parser fix only if observed nesting supports it, with credentials
+unchanged, no data download/market rows/outcomes/QC job, and synthetic regression
+proof. The owner directly accepted:
+
+> go ahead
+
+This scope is recorded **before** any new provider operation. Section 61's
+unknown-field count alone did not establish a current contract. This fresh
+inspection is explicitly owner-authorized, not an automatic retry or renewal
+of D0 or sections 60/61. The existing consumed heartbeat stays paused.
+
+<!-- TPR-SHARADAR-SHAPE:START -->
+| Boundary | Scope |
+|---|---|
+| Target | Verify current Sharadar metadata nesting; no Claude wait |
+| Authority | Go ahead with richer inspection; prior audits remain spent |
+| Request | One fixed TICKERS status GET; zero table rows or download |
+| Budget | One attempt; 65536 body bytes; no retry or redirect |
+| Credentials | Existing resolver unchanged; no reset or disclosure |
+| Outputs | Known nested metadata field types and closed structural counts; no arbitrary keys or values |
+| Correction | Verified metadata parser only; synthetic regression proof |
+| Evidence | Metadata coherence is not authentication, rights, PIT or backtest admission |
+| Excluded | No retained captures, market rows, outcomes, QC access or trading |
+| Publication | One stable matching-lane push; no review stop |
+<!-- TPR-SHARADAR-SHAPE:END -->
+
+### 62.2 Exercised decisions and immutable prior evidence
+
+`TPR-OWN-27`: use new one-shot ID `TPR-SHARADAR-SHAPE-20261007-001`, with a
+prospective code/Git/owner/clock-bound plan and exclusive private spent claim
+before credential lookup. The only operation is the same fixed direct TICKERS
+status GET. Reuse frozen verified HTTPS/deadline/privacy/private-publication
+primitives, not the original spent collector's claim. Keep the audited source
+and section-61 diagnostic immutable. Never follow a returned download URL.
+Whitelisted metadata envelope names/types may be inspected in memory; arbitrary
+keys, filenames, URLs, values and raw body remain unpublished and unretained.
+Bounded JSON parsing may necessarily decode unsolicited fields; opaque
+row-like arrays are not semantically inspected, joined or retained. Metadata
+descriptor arrays are bounded and must match a closed metadata-only shape.
+
+`TPR-OWN-28`: select a parser correction only after fresh evidence supports
+its exact schema. Use a separate pure mapping module if needed, preserving the
+executed collector's exact bytes and prior artifacts. No credential reset,
+account/subscription mutation, provider message or inferred license is chosen.
+Observed metadata size/modified values, if validated, describe a bulk-file
+snapshot only, not original public time or permanent identity/PIT coverage.
+Canonical TR0/TPR-1/TPR-0B gates and accepted-risk development factual gates
+remain separate. No actual price/control/calendar/cost inventory or outcome
+admission is invented. No additional data access or QC job is authorized here.
+
+Root/toplevel/branch/HEAD/status are guarded before every repository action;
+the published parent is `82461d40aae88fba4f928a94552245c4b9000fed` in the same
+designated lane worktree. All shared/main/sibling behavior and project-wide
+documents remain frozen. Advisory parallel internal QA is not Claude review.
+
+### 62.3 Pre-operation proof and result placeholder
+
+Tests-first prospective section-62 scope guard: **1 failed in 0.67s** because
+section 62 did not exist. The closed scope above is now present; guarded
+negative mutations must refuse budget/output/correction escalation. Actual
+plan, code identity, safe result, focused tests and next factual blocker will
+be recorded only after their verification. No operation is claimed yet.
+
+Final pre-operation focused 22-selection union (section 61.6's 21 selections
+plus `test_sharadar_shape.py`): **869 passed, 3 skipped in 9.58s**, no failure,
+error or warning; same isolated in-process runtime-root runner, Python
+3.12.14/pytest 9.1.1, macOS 26.6.2 arm64, flags
+`-q -p no:cacheprovider --tb=short`. Independent advisory QA ran the three
+collector test modules: **212 passed in 1.89s**, protected by actual credential,
+HTTPS and socket sentinels. Row opacity also passed clean -> guard removed
+only in memory red -> finally-safe restore green. No full suite was run.
+
+Frozen new plan SHA-256
+`5c71dd12612d267d5e16e991c6c3875a9bd27e71f19ad2d51840261914bbe436`,
+public path `research/target_price_revisions_development/artifacts/tpr-sharadar-shape-plan.5c71dd12612d267d5e16e991c6c3875a9bd27e71f19ad2d51840261914bbe436.json`.
+Created **2026-10-07T07:15:43.338156+00:00**, expiry
+**2026-10-08T07:15:43.338156+00:00**. Exact executed-source candidate SHA-256
+`247d5f391b6218b199d4bab82b5a522a06f070d1feab9aa6c45d14a07ed05ab2`;
+exact owner instruction SHA-256
+`d44fcf731c17b28d746d1558dedab8e8540162ee63b87e10e8b9918037c277ee`.
+Source is content-frozen but uncommitted at activation; the published parent
+is not falsely claimed to contain it. Frozen original source SHA-256 remains
+`9f2674a47d0d62bb09e2dd5ba1ce7f37eed3c68dce254e40e0d11d1218f46960`,
+prior diagnostic SHA-256
+`9269c55120d1197843094dc1a252ae11334568b6a8f85d771d72e936ab3437a1`.
+Their private sanitized claim/terminal/report bytes were measured before
+activation; no spent state is removed, reset or rearmed. All writers released
+their files, actual matching remote remains the published parent and no
+new-ID spent claim exists. Only now is the one fixed operation activated.
+
+### 62.4 Actual result and inspection-design failure
+
+Actual execution began **2026-10-07T07:16:17.593050+00:00**. One request,
+HTTP **200**, **233 complete response-body bytes**, command **1.07 seconds**;
+no retry, redirect or download. New sanitized report SHA-256
+`5912ff27e6da8c4ebf0abe60367e83c7d7158b9490bd3e55541dfcbb1e021f88`,
+public path `research/target_price_revisions_development/artifacts/tpr-sharadar-shape-report.5912ff27e6da8c4ebf0abe60367e83c7d7158b9490bd3e55541dfcbb1e021f88.json`.
+Root is a `table` string with exact lowercase `tickers` and a **one-element
+`files` array**. Root unknown-key count is zero. The descriptor-array whitelist
+made that array opaque, so no child kind, key type or metadata component was
+observed. Its raw-body digest is correctly suppressed. The new body cannot
+be claimed identical to the prior body merely because both have 233 bytes.
+
+This is a **confirmed inspection-design limitation**, not evidence that
+Sharadar credentials are invalid or a new provider defect. The operation is
+protocol-complete but did not deliver enough structure to verify a parser fix.
+No raw response is retained and no second request can be spent under this
+plan. The executed collector stays exact and immutable. The inherited
+`TPR-SD22-005` remains open, qualified by this direct evidence of `files`
+nesting; no flat-field/case reset, guessed metadata normalization or admission
+is claimed. Owner was told the limitation explicitly and asked whether to
+authorize **one additional** status-only request with corrected type projection.
+No reply/extra request is claimed at this checkpoint. A separately tested
+pure projection can correct the software gap without data access while that
+specific question is pending.
+
+### 62.5 Internal findings and retained evidence
+
+No Claude review or counter-review occurs in this round. Internal advisory
+QA findings are not substituted for independent Claude review.
+
+| ID | Priority | Status | Evidence, correction and verification |
+|---|---|---|---|
+| `TPR-SS23-001` | P2 | **Confirmed; closed by correction before activation** | Root independently reproduced a synthetic row-like `data` object reaching `_components`; advisory QA found the same. Known row markers now stop object semantics before metadata validation. Writer's three added root/QA cases plus selector coverage were **11 failed, 38 passed in 0.33s**, then **49 passed in 0.48s**; independent row-gate in-memory reversal turns the permanent test red, finally restores green. |
+| `TPR-SS23-002` | P3 | **Confirmed; closed by correction before activation** | Root independently reproduced custom non-string table equality causing positive metadata observation. Exact string type is now required before equality/classification/admission. Same permanent red/green set above; decoded JSON and synthetic API both remain fail-closed. |
+| `TPR-SS23-003` | P2 | **Confirmed; closed by correction before activation** | Publishing a digest for opaque/unknown/row-shaped or budget-truncated input would unnecessarily retain an identity of unclassified unsolicited material. Four new tests were **4 failed, 61 passed in 0.49s**, corrected **65 passed in 0.99s**; exact clean metadata preserves its hash. Frozen source primitives are unchanged; digest omission is in this new wrapper. |
+| `TPR-SS23-004` | P2 | **Confirmed; closed as software gap only** | The supposedly richer operation hid every file-descriptor field whenever any child key was unrecognized or the child was not an object. Actual one-item `files` array is opaque and its child type is unknown; compatibility cannot be inferred. New pure projector publishes bounded element types and known field types despite unknown siblings, with no arbitrary names/values and no unrecognized-object component semantics. **17 passed in 0.37s**; old hiding behavior restored only in memory makes the behavioral regression red, finally-safe restoration green. Executed bytes remain frozen; actual schema/mapping still unverified and SD22-005 stays open. |
+| `TPR-SS23-005` | P3 | **Confirmed; closed by correction before activation** | New collector originally read source bytes before fstat regular-file/size refusal. A synthetic descriptor test was red before correction, green afterward, and proves close-on-refusal without reading a nonregular file. Included in the 11-case red/green set above. |
+| `TPR-SS23-006` | P2 | **Confirmed; closed in pure corrective candidate** | Advisory QA found the pure projector's root row refusal did not prevent later file component processing. Root's permanent patched-component regression was **1 failed in 0.53s** on the uncorrected candidate. Root refusal now returns before file traversal; corrected pure module **18 passed in 0.35s**. No actual response or operator state is used. |
+
+Original section-60 private claim/terminal/report hashes and section-61
+claim/terminal/report hashes remain frozen. New sanitized private spent,
+terminal and aggregate must be checked for exact identity, owner UID, 0600,
+nonsymlink and bounded content. No credentials or arbitrary response values
+were emitted, retained or committed. Provider market-row, retained-capture,
+outcome, look, QC, operator, broker, deployment, order and trading actions
+are **0**; this section's one Sharadar status request is **spent**.
+
+### 62.6 Corrective candidate, next input and validation
+
+New `sharadar_projection.py` is a pure, bounded **unconnected candidate**:
+no I/O, credential handling, raw identity, clock/size extraction, arbitrary
+keys/values, download or authority. The first eight file elements are counted
+by primitive type with an explicit incomplete-count flag above that bound.
+Object descriptors project fixed known field types and unknown-type counts;
+unknown siblings no longer hide the known fields. Nested values are not
+traversed. Row-marked objects refuse before field/value/component processing.
+Only an exact four-field metadata profile can produce component booleans,
+never canonical admission. It is not a verified production adapter and is
+not imported by the frozen executed collector. Test-first missing-module
+collection error **1 in 0.09s**, then **17 passed in 0.37s**; writer's pure
+old-behavior reversal is green -> red (KeyError for hidden known field) ->
+finally restored green, no file/data/network operation.
+
+Actual root separately verified all six prior private sanitized artifact
+hashes unchanged, plus owner UID, regular/nonsymlink 0600 new files and
+0700 private root. New spent/terminal SHA-256 respectively
+`7da7859c542d65e2e27fa904d92203f19bec930b0b8714737031640f5824b171` and
+`62c9d4a7ef21cf6c1d438004baeb1da242732b0964d9cc76db869a682ae694aa`;
+aggregate matches the exact public report hash. No private file is staged.
+
+Next input: **the current files descriptor schema**, obtained from provider
+documentation/evidence or one additional, newly owner-approved status-only
+request. The specific asynchronous question is pending; generic prior
+delegation is not used to silently renew this accepted one-request scope.
+No parser is corrected without that evidence. Do not claim the remaining
+unknown child field is a provider defect or authentication failure. This
+round delivers the sanitized observation and corrected projection candidate,
+not the originally hoped-for verified mapping or real-data backtest readiness.
+Exact retention/derived-processing rights, comparable prior/current target
+horizon/share basis, real identity/price/control/calendar/cost coverage and
+run/look/outcome admission remain separately unestablished (section 60.5).
+Canonical TR0/TPR-1/TPR-0B stay parked; source bytes, empty authorities,
+permanent 1/80 and untouched holdout remain exact. No new milestone or Claude
+wait/monitor is introduced. No complete lane/repository suite is run.
+
+`TPR-OWN-29`: spend no extra request under generic delegation. Correct the
+verified inspection software defect and preserve immutable executed evidence;
+request a specific new metadata-only scope instead of treating a new code hash
+as renewed permission. The asynchronous owner choice remains unanswered at
+this handoff checkpoint. No provider contact, credential reset or account
+mutation is inferred. This is a scope/observability limit, not missing general
+development permission or a fresh source-rights approval.
+
+Final working focused union: **888 passed, 3 skipped in 8.39s**, no failure,
+error or warning, exact 23 selections: the 21 paths in section 61.6 plus
+`tests/target_price_revisions_development/test_sharadar_shape.py` and
+`tests/target_price_revisions_development/test_sharadar_projection.py`.
+Same flags/isolated runner/host as 62.3; original operator stop/database state
+is never read or changed. The three existing native-Windows skips and the
+14 frozen-Windows-Git preregistration limitations remain unchanged; this macOS
+run establishes no Windows signer/ACL/parent custody. Scoped compileall over
+the six code/test paths below and diff hygiene exit 0. Frozen canonical/D0/
+old audit/diagnostic code and public-artifact identities are verified by the
+focused guards; all prior private sanitized artifacts were checked separately.
+
+| New/changed code/test | Exact final SHA-256 |
+|---|---|
+| `research/target_price_revisions_development/sharadar_shape.py` | `247d5f391b6218b199d4bab82b5a522a06f070d1feab9aa6c45d14a07ed05ab2` |
+| `research/target_price_revisions_development/sharadar_projection.py` | `938f6b73ac0ea6b1ac4fca4b6cd230b3f10833b149458480dc274b36d798cfbf` |
+| `tests/target_price_revisions_development/test_sharadar_shape.py` | `ce9def271c89301e7eb822faec5653714a6a0ecad07a4984ffdafcdb3a414da7` |
+| `tests/target_price_revisions_development/test_sharadar_projection.py` | `2bee82fd45973233ed56b0e0f314df3e93bf3d62acba5e3815f3c3e383b7ff8d` |
+| `tests/target_price_revisions_development/test_boundary_and_artifacts.py` | `480da90366ee7e67abc295fe658dd6abd29b24407fbc649ed0ff097a57754a10` |
+| `tests/target_price_revisions/test_document_consistency.py` | `13105bb2a630a2a5ec7c04633c68bf19740dec2151a38d8b2ab0ec9fe3a70bed` |
+
+Publication contains exactly nine lane-owned paths: the six above, this
+record and the two new sanitized public plan/report JSON files. The private
+root/claims/reports are ignored and never staged. Actual matching remote,
+physical root/toplevel/branch/HEAD/status and precise staged names/hashes are
+verified before each commit and final push. Accumulate implementation plus
+record-only exact-identity handoff, make exactly one successful non-force
+push to `HEAD:refs/heads/codex/strategy-target-price-revisions`, then verify
+actual local/remote heads agree and tree is clean. No side branch, checkout,
+clone, worktree, reset, force push, shared edit or concurrent overwrite.
+
+Final independent advisory reprise of source-audit, prior diagnostic, new
+shape, pure projection and artifact-boundary tests: **254 passed in 1.37s**,
+no failure/skip/error/warning. Root-row permanent regression also passes
+clean -> exact early refusal removed only in memory red -> finally restored
+green. Executed collector remains exactly `247d5f391b6218b199d4bab82b5a522a06f070d1feab9aa6c45d14a07ed05ab2`;
+pure projector is the final `938f6b73ac0ea6b1ac4fca4b6cd230b3f10833b149458480dc274b36d798cfbf`.
+No extra production adapter, actual descriptor, outcome or operator action
+was used by this QA. The specific fresh-request choice remains pending.

@@ -2745,3 +2745,50 @@ def test_section_61_guard_refuses_diagnostic_escalation(monkeypatch, old, new):
                         lambda heading: mutated if heading.startswith("## 61.") else original(heading))
     with pytest.raises(AssertionError, match="closed diagnostic scope"):
         test_section_61_freezes_fresh_metadata_diagnostic_without_renewing_old_scope()
+
+
+SECTION62_SCOPE = (
+    ("Target", "Verify current Sharadar metadata nesting; no Claude wait"),
+    ("Authority", "Go ahead with richer inspection; prior audits remain spent"),
+    ("Request", "One fixed TICKERS status GET; zero table rows or download"),
+    ("Budget", "One attempt; 65536 body bytes; no retry or redirect"),
+    ("Credentials", "Existing resolver unchanged; no reset or disclosure"),
+    ("Outputs", "Known nested metadata field types and closed structural counts; no arbitrary keys or values"),
+    ("Correction", "Verified metadata parser only; synthetic regression proof"),
+    ("Evidence", "Metadata coherence is not authentication, rights, PIT or backtest admission"),
+    ("Excluded", "No retained captures, market rows, outcomes, QC access or trading"),
+    ("Publication", "One stable matching-lane push; no review stop"),
+)
+
+
+def test_section_62_freezes_richer_shape_inspection_without_scope_renewal():
+    section = _record_section("## 62.")
+    block = _bounded(section, "<!-- TPR-SHARADAR-SHAPE:START -->",
+                     "<!-- TPR-SHARADAR-SHAPE:END -->", "section 62 shape scope")
+    lines = tuple(line.strip() for line in block.splitlines() if line.strip())
+    assert lines[0] == "| Boundary | Scope |"
+    assert re.fullmatch(r"\|\s*:?-+:?\s*\|\s*:?-+:?\s*\|", lines[1])
+    rows = tuple(tuple(cell.strip() for cell in line.split("|")[1:-1]) for line in lines[2:])
+    assert rows == SECTION62_SCOPE, "closed shape scope cannot renew or escalate access"
+    assert "> go ahead" in section
+    assert "TPR-OWN-27" in section and "TPR-OWN-28" in section
+
+
+@pytest.mark.parametrize(("old", "new"), [
+    ("| Budget | One attempt; 65536 body bytes; no retry or redirect |",
+     "| Budget | Retry until parsed |"),
+    ("| Outputs | Known nested metadata field types and closed structural counts; no arbitrary keys or values |",
+     "| Outputs | Retain raw JSON |"),
+    ("| Correction | Verified metadata parser only; synthetic regression proof |",
+     "| Correction | Assume nested schema and download rows |"),
+])
+def test_section_62_guard_refuses_shape_escalation(monkeypatch, old, new):
+    test_section_62_freezes_richer_shape_inspection_without_scope_renewal()
+    original = _record_section
+    section = original("## 62.")
+    assert section.count(old) == 1
+    mutated = section.replace(old, new, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+                        lambda heading: mutated if heading.startswith("## 62.") else original(heading))
+    with pytest.raises(AssertionError, match="closed shape scope"):
+        test_section_62_freezes_richer_shape_inspection_without_scope_renewal()

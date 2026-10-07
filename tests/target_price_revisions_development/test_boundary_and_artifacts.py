@@ -46,6 +46,8 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.fixture_backtest",
         "research.target_price_revisions_development.source_audit",
         "research.target_price_revisions_development.sharadar_diagnostic",
+        "research.target_price_revisions_development.sharadar_shape",
+        "research.target_price_revisions_development.sharadar_projection",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -206,15 +208,15 @@ def test_source_auditor_is_separate_from_pure_fixtures_and_authority_packages() 
     assert all(isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
                and type(node.value.value) is str for node in initializer.body)
     for path in (ROOT / "research/target_price_revisions_development").glob("*.py"):
-        if path.name in {"source_audit.py", "sharadar_diagnostic.py"}:
+        if path.name in {"source_audit.py", "sharadar_diagnostic.py", "sharadar_shape.py"}:
             continue
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             names = ([alias.name for alias in node.names] if isinstance(node, ast.Import)
                      else [node.module or ""] if isinstance(node, ast.ImportFrom) else [])
             assert not any(name.split(".")[0] in {"http", "ssl", "urllib"}
-                           or set(name.split(".")) & {"source_audit", "sharadar_diagnostic"} for name in names)
+                           or set(name.split(".")) & {"source_audit", "sharadar_diagnostic", "sharadar_shape"} for name in names)
             if isinstance(node, ast.ImportFrom) and node.module is None:
-                assert all(alias.name not in {"source_audit", "sharadar_diagnostic"} for alias in node.names)
+                assert all(alias.name not in {"source_audit", "sharadar_diagnostic", "sharadar_shape"} for alias in node.names)
 
 
 def test_sharadar_diagnostic_can_only_compose_the_frozen_source_primitives() -> None:
@@ -288,6 +290,87 @@ def test_committed_sharadar_diagnostic_pins_the_observed_shape_without_credentia
         "diagnosis", "credential_state", "provider_requests", "fixture_transport_calls", "authority",
         "license_entitlement", "point_in_time_facts", "real_development_backtest_ready", "canonical_admission",
         "d0_renewed", "original_audit_renewed", "outcome_reads", "qc_attempts", "development_looks"}
+
+
+def test_richer_shape_collector_is_inert_and_only_composes_frozen_primitives():
+    path = ROOT / "research/target_price_revisions_development/sharadar_shape.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    allowed = {"__future__", "os", "re", "stat", "dataclasses", "datetime",
+               "decimal", "pathlib", "typing"}
+    helper_names = {"AUTHORITY", "LANE_BRANCH", "LANE_ROOT", "PRIVATE_ROOT", "REQUESTS",
+                    "SourceAuditError", "_canonical", "_clock", "_digest", "_https_get",
+                    "_private_directory", "_production_credential", "_publish", "_reduce_response",
+                    "_source_object", "_valid_credential", "_verify_execution_identity"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all(alias.name.split(".")[0] in allowed for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                assert node.level == 1 and node.module == "source_audit"
+                assert {alias.name for alias in node.names} <= helper_names
+            else:
+                assert node.module.split(".")[0] in allowed
+    for node in tree.body:
+        if isinstance(node, ast.Expr):
+            assert isinstance(node.value, ast.Constant) and type(node.value.value) is str
+        elif isinstance(node, (ast.Assign, ast.AnnAssign)):
+            for child in ast.walk(node):
+                if isinstance(child, ast.Call):
+                    assert isinstance(child.func, ast.Name) and child.func.id == "frozenset"
+                    assert len(child.args) == 1 and not child.keywords
+                    assert isinstance(child.args[0], ast.Tuple)
+                    assert all(isinstance(item, ast.Constant) and type(item.value) is str
+                               for item in child.args[0].elts)
+
+
+def test_committed_richer_inspection_records_opaque_failure_not_verified_mapping():
+    import hashlib
+    import json
+    from research.target_price_revisions_development.sharadar_shape import ShapePlan
+
+    plan_sha = "5c71dd12612d267d5e16e991c6c3875a9bd27e71f19ad2d51840261914bbe436"
+    report_sha = "5912ff27e6da8c4ebf0abe60367e83c7d7158b9490bd3e55541dfcbb1e021f88"
+    plan_payload = (ARTIFACTS / f"tpr-sharadar-shape-plan.{plan_sha}.json").read_bytes()
+    report_payload = (ARTIFACTS / f"tpr-sharadar-shape-report.{report_sha}.json").read_bytes()
+    assert hashlib.sha256(plan_payload).hexdigest() == plan_sha
+    assert hashlib.sha256(report_payload).hexdigest() == report_sha
+    plan = ShapePlan(plan_payload, plan_sha).body()
+    report = json.loads(report_payload)
+    source_sha = hashlib.sha256((ROOT / "research/target_price_revisions_development/sharadar_shape.py").read_bytes()).hexdigest()
+    assert report["code_sha256"] == plan["code_sha256"] == source_sha
+    assert report["plan_sha256"] == plan_sha
+    assert report["git_sha"] == plan["git_sha"] == "82461d40aae88fba4f928a94552245c4b9000fed"
+    assert report["status"] == "COMPLETED" and report["mode"] == "production"
+    assert report["provider_requests"] == 1 and report["fixture_transport_calls"] == 0
+    assert report["provider"]["http_status"] == 200
+    assert report["provider"]["response_bytes"] == 233
+    assert report["provider"]["response_bytes_complete"] is True
+    assert report["provider"]["response_sha256"] is None
+    diagnosis = report["diagnosis"]
+    assert diagnosis["classification"] == "metadata_shape_unmapped"
+    assert diagnosis["profile"] == "unmapped" and diagnosis["table_literal"] == "lower"
+    assert diagnosis["application_error"] is None and diagnosis["shape_budget_refused"] is False
+    assert diagnosis["metadata"] == {"metadata_shape_observed": False, "size_bytes": None, "snapshot_utc": None}
+    assert len(diagnosis["nodes"]) == 2
+    root, files = diagnosis["nodes"]
+    assert root == {"path": "root", "kind": "object", "fields": dict.fromkeys(
+        ("code", "downloadUrl", "download_url", "error", "filename", "lastModified", "last_modified",
+         "link", "message", "modified", "name", "path", "size", "sizeLabel", "size_label", "status",
+         "type", "url", "years"), "absent") | {"table": "string"}, "unknown_key_count": 0,
+        "unknown_types": {}, "components": dict.fromkeys(
+            ("modified_utc_valid", "name_valid", "size_label_valid", "size_valid"), False), "selector": "not_selector"}
+    assert files == {"kind": "array", "length": 1, "opaque": True, "path": "root/files"}
+    assert report["credential_state"] == "not_proven"
+    assert report["license_entitlement"] == report["point_in_time_facts"] == "unestablished"
+    assert report["real_development_backtest_ready"] is False and report["canonical_admission"] is False
+    assert report["d0_renewed"] is report["original_audit_renewed"] is report["previous_diagnostic_renewed"] is False
+    assert report["outcome_reads"] == report["qc_attempts"] == report["development_looks"] == 0
+    assert all(value is False for value in report["authority"].values())
+    assert set(report) == {"schema", "shape_id", "mode", "status", "started_utc", "plan_sha256", "code_sha256",
+        "auditor_code_sha256", "git_sha", "owner_instruction_sha256", "provider", "diagnosis", "credential_state",
+        "provider_requests", "fixture_transport_calls", "authority", "license_entitlement", "point_in_time_facts",
+        "real_development_backtest_ready", "canonical_admission", "d0_renewed", "original_audit_renewed",
+        "previous_diagnostic_renewed", "outcome_reads", "qc_attempts", "development_looks"}
 
 
 def test_committed_source_probe_is_exact_non_authorizing_aggregate_not_a_retry() -> None:

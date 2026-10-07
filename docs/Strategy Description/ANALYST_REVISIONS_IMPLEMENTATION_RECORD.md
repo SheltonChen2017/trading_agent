@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–259 retain the milestone, review, preregistration, QC
+strategy. Sections 1–260 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1203,8 +1203,12 @@ Section 259 records the owner's explicit Massive-provider clarification and
 a distinct six-day-later vintage comparison: 11 shared rating IDs change
 version and one earlier ID is absent, without inferring correction/deletion
 cause, publication time or historical look-ahead. No immediate pull is repeated.
-Claude must review section 259 and this round's final snapshot; that independent final review is not an
-intermediate checkpoint or a prerequisite for admissible continuing build.
+Section 260 proceeds on the human's subsequent "ok, proceed": one targeted
+information-only Massive support inquiry and a metadata-only Sharadar/identity/
+RAW-price evidence audit, without another provider pull or historical replay.
+Claude must review section 260 and this round's final snapshot; that independent
+final review is not an intermediate checkpoint or a prerequisite for admissible
+continuing build.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
 acknowledgement push is awaited. Missing independent evidence and supported
@@ -3036,6 +3040,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex resumed interrupted R281 retained Code audit after Mac access restored | `d5e841be` -> this record commit | Section 257: no new Claude push or replay; exact rerun Code view and 17-name inventory corroborated; floor 313/239/49/699 unchanged | Read only the already-booked rerun's supported Code view and local control metadata; no source mutation, launch, result export or historical authorization inference | Strict-network-denied focused record/active-document validation in 257.3; no complete suite or new code validation claimed | All three historical P2s remain open; run-bound rendered source is not a 17-file byte/compile/operator/save chain or formal vendor evidence | One final matching-lane push at the remaining original-artifact/source-access barrier; Mac lock no longer the active blocker, no intermediate Claude wait, monitor remains active |
 | 2026-10-06 | Codex owner-directed monitor disarm and forward-vintage acquisition | `b6d38960` -> `264067ef` -> this round's final record commit | Section 258: one bounded current-version development capture, 3 pages / 700 rows; no historical replay or strategy evaluation; floor 313/239/49/699 | Existing automation paused with its prompt, cadence and target preserved; exact provider window and private receipt protocol committed before provider access; pinned private receipt published with all false capabilities | Strict-network-denied focused validation and actual acquisition disposition in 258.3; no complete suite | Source/formal/history gates remain; private current-version acquisition is not independent publication or completeness proof; direct-feed rights/completeness unverified | One final matching-lane push at the concrete independent-source/access barrier; monitor remains disarmed, no intermediate Claude wait |
 | 2026-10-06 | Codex Massive clarification and six-day vintage comparison | `43bae982` -> `2f3f8f00` -> this round's final record commit | Section 259: one new Oct1-window capture, 3 pages / 250 rows; 11 shared rating IDs change version and one earlier ID is absent; no economic evaluation or new look/cell | Provider identity is Massive, not direct Benzinga; pinned old/new private receipts compared value-free; no immediate repeat of Oct5–6 or new scheduler | Strict-network-denied focused results and actual capture/comparison disposition in 259.3; no complete suite | Current-version differences cannot establish correction cause, publication history or deletion completeness; formal/source/history gates remain | One final same-lane push at the concrete independent-source/access stop; monitor remains PAUSED and no Claude/routine-approval checkpoint is imposed |
+| 2026-10-07 | Codex owner-authorized Massive support acquisition inquiry | `672961e7` -> this round's record commits | Section 260: frozen one-message information-only inquiry and bounded local identity/price metadata audit; no new provider data pull, QC run, outcome, look or cell | Support destination verified against official contact page; authenticated mail connector; no raw licensed rows, attachments, credentials or spending authorization | Focused record/source checks and actual message disposition to be recorded in 260.3; no complete suite | Support reply and independent source/security-master/RAW-price packages remain required; contacting a vendor is not admission or readiness | One final same-lane push when this scoped work reaches the concrete external evidence barrier; monitor stays PAUSED |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -36508,3 +36513,63 @@ This actual acquisition/comparison finishes at that concrete external source
 package/access barrier, not a routine approval or intermediate review wait.
 Proceed immediately on genuine supported evidence/access; do not claim
 project completion or forward readiness from these development receipts.
+
+## 260. Owner-authorized Massive provenance inquiry and local identity/RAW-price audit, 2026-10-07
+
+**Baseline:** `672961e7390f974512d16d41a40e89ca2eb69082`, clean designated
+root and `codex/strategy-analyst-revisions-v2`, exact matching local/remote
+heads after fetching only this remote branch. No new Claude commit is present.
+No disposed review, earlier QC/Mac/source audit or booked research identity is
+replayed. October 7 below uses America/Los_Angeles; the prior capture's Oct7
+UTC timestamps remain distinct from its Oct6 local date.
+
+### 260.1 Scope and frozen information-only support request
+
+The human asks for the next recommendation and, after the recommendation to
+request independent Massive source history while checking identity/RAW inputs,
+answers **"ok, proceed"**. `ARV2OD260-A`: exercise that authority for **one**
+targeted information-only email to `support@massive.com`, verified on Massive's
+[official contact page](https://massive.com/contact), through the existing
+authenticated Gmail connector. A narrow 30-day sent-mail search of this exact
+destination and as-of/revision/PIT subjects finds no matching earlier request;
+this scoped result is not an account-wide absence claim. No unrelated mail or
+conversations are read. No new account, paid access, upgrade, subscription,
+credentials, public receiver or direct Benzinga connection is requested.
+
+Freeze subject **"Benzinga ratings: auditable as-of and revision-history
+availability"**. Ask for (1) original Benzinga publication, Massive ingestion
+and first customer availability, clock/timezone/precision, not just issuance
+and last update; (2) immutable prior row versions, stable revision identities
+and ordered history; (3) corrections, withdrawals, actual deletions/tombstones,
+ID replacements and event-date moves; (4) supported 2021–2025 and prospective
+as-of exports, cutoff/filter/coverage/retention semantics, generation times,
+manifest counts/checksums and completeness/omission qualifications; (5) outage,
+missed-update, late-arrival and reconstruction-gap recovery, including any
+change-feed replay/sequence guarantees; and (6) supported APIs/exports, existing
+entitlement, written provenance/completeness and research/storage rights.
+
+The message uses only 259.2's non-sensitive aggregate observation and UTC
+capture dates, explicitly preserving unknown timing/cause and no proven
+deletion/backfill/trading bias. No raw record IDs, rating rows, prices,
+economic results, private artifact, attachment or API key is included. It
+distinguishes prior analyst positions in `previous_rating`/`previous_price_target`
+from prior database versions and does not equate `rating_action=removes` with
+a tombstone. These fields are described by the
+[official ratings schema](https://massive.com/docs/rest/partners/benzinga/analyst-ratings),
+which alone does not establish the needed immutable archive. Request an
+explicit limitation if records/guarantees do not exist. This is not purchase
+consent or permission for account changes. Send once; an ambiguous send must
+be reconciled through its exact subject/destination, not automatically retried.
+
+`ARV2OD260-B`: in parallel, inspect only the existing completed local Sharadar
+capture's manifest, ZIP byte hashes/sizes, source-authority/trust roots and
+reviewed identity/RAW-price contracts under strict network denial. No licensed
+ZIP rows, new download, private QC call, outcome/score/price evaluation or
+caller-asserted provenance is admitted. Current capture consistency is not
+independent PIT identity, publication or price evidence. No new scaffold,
+selector, registry entry, frozen source or shared/root edit is authorized.
+
+The booked floor stays **313 / 239 / 49 / 699**. No research/return/paper look,
+development evaluation, infrastructure launch, cell or formal-alpha spend is
+added by this support request/metadata audit. All readiness/action flags and
+formal/history gates remain unchanged; the human-disarmed monitor stays PAUSED.

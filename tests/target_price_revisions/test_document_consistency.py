@@ -2698,3 +2698,50 @@ def test_section_60_guard_refuses_source_scope_escalation(monkeypatch, old, new)
                         lambda heading: mutated if heading.startswith("## 60.") else original(heading))
     with pytest.raises(AssertionError, match="closed source-audit scope"):
         test_section_60_freezes_new_source_audit_without_conflating_canonical_gates()
+
+
+SECTION61_SCOPE = (
+    ("Target", "Resolve Sharadar refusal; no Claude wait"),
+    ("Authority", "New owner follow-up; not renewal of any spent audit"),
+    ("Request", "One fixed TICKERS status GET; zero table rows or download"),
+    ("Budget", "One attempt; 65536 body bytes; no retries or redirects"),
+    ("Credentials", "Existing local resolver; no reset, overwrite or disclosure"),
+    ("Outputs", "Closed key/type presence and refusal classes; sanitized metadata only"),
+    ("Prior audits", "D0 and section 60 audit remain spent and byte frozen"),
+    ("Evidence", "HTTP 200 is not authentication, license, rights or PIT proof"),
+    ("Excluded", "No outcomes, price/identity joins, QC API/upload/jobs or trading"),
+    ("Publication", "One stable matching-lane push; no review stop"),
+)
+
+
+def test_section_61_freezes_fresh_metadata_diagnostic_without_renewing_old_scope():
+    section = _record_section("## 61.")
+    block = _bounded(section, "<!-- TPR-SHARADAR-DIAGNOSTIC:START -->",
+                     "<!-- TPR-SHARADAR-DIAGNOSTIC:END -->", "section 61 diagnostic scope")
+    lines = tuple(line.strip() for line in block.splitlines() if line.strip())
+    assert lines[0] == "| Boundary | Scope |"
+    assert re.fullmatch(r"\|\s*:?-+:?\s*\|\s*:?-+:?\s*\|", lines[1])
+    rows = tuple(tuple(cell.strip() for cell in line.split("|")[1:-1]) for line in lines[2:])
+    assert rows == SECTION61_SCOPE, "closed diagnostic scope cannot renew audits or grant adjacent access"
+    assert "then proceed until you meet the next immediate blocker" in section
+    assert "TPR-OWN-25" in section and "TPR-OWN-26" in section
+
+
+@pytest.mark.parametrize(("old", "new"), [
+    ("| Budget | One attempt; 65536 body bytes; no retries or redirects |",
+     "| Budget | Retry until success |"),
+    ("| Credentials | Existing local resolver; no reset, overwrite or disclosure |",
+     "| Credentials | Reset Keychain |"),
+    ("| Evidence | HTTP 200 is not authentication, license, rights or PIT proof |",
+     "| Evidence | HTTP 200 proves authentication |"),
+])
+def test_section_61_guard_refuses_diagnostic_escalation(monkeypatch, old, new):
+    test_section_61_freezes_fresh_metadata_diagnostic_without_renewing_old_scope()
+    original = _record_section
+    section = original("## 61.")
+    assert section.count(old) == 1
+    mutated = section.replace(old, new, 1)
+    monkeypatch.setitem(globals(), "_record_section",
+                        lambda heading: mutated if heading.startswith("## 61.") else original(heading))
+    with pytest.raises(AssertionError, match="closed diagnostic scope"):
+        test_section_61_freezes_fresh_metadata_diagnostic_without_renewing_old_scope()

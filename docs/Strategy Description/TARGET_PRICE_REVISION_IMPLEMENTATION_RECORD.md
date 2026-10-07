@@ -20,8 +20,9 @@ REMAINS COMPLETE. THE NON-AUTHORIZING TPR-TR0-I IMPLEMENTATION CANDIDATE IS
 CHECKPOINTED BUT REMAINS INCOMPLETE AND PARKED. NO KEY PROVISIONING OR POSITIVE
 AUTHORITY IS AUTHORIZED. THE EMPTY REGISTRY, CANONICAL CANDIDATE, SOURCE/LOOK
 AUTHORITIES, PERMANENT 1/80 CEILING AND SHARED HOLDOUT KEEP THEIR EXACT BYTES.
-TPR-1 AND TPR-0B REMAIN BLOCKED. ONLY SECTION 60'S TWO FIXED AUTHENTICATED
-SOURCE-AUDIT REQUESTS ARE NEWLY AUTHORIZED; NO PRICE/OUTCOME ACCESS, RESEARCH
+TPR-1 AND TPR-0B REMAIN BLOCKED. SECTION 60'S TWO FIXED AUTHENTICATED
+SOURCE-AUDIT REQUESTS ARE SPENT. SECTION 61 RECORDS THE OWNER'S FOLLOW-UP
+AUTHORITY FOR ONE FRESH SHARADAR METADATA-ONLY DIAGNOSTIC; NO PRICE/OUTCOME ACCESS, RESEARCH
 LOOK, QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
 IS GRANTED. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
 
@@ -485,6 +486,15 @@ succeeded, Sharadar returned HTTP 200 but its status metadata was refused by
 the exact schema, and no real-data backtest is admitted. Section 60.5 owns the
 remaining factual source checklist; neither another Claude wait nor a Windows
 host is the universal next prerequisite for accepted-risk development.
+Section 61 records the later owner direction to proceed through the immediate
+Sharadar diagnostic until the next factual blocker. It is one new scoped
+metadata operation, not a reset or renewal of the spent section-60/D0 audits.
+The section-61 diagnostic is now spent. The stable 233-byte HTTP-200 response
+has only the admitted `table` field plus one unmapped field; four expected
+flat metadata fields are missing and no whitelisted API-error field is
+present. Credential validity remains unproven. The immediate blocker is the
+current metadata response contract, not evidence that the machine needs a
+reset. Section 61.5 records the exact next factual input and exclusions.
 
 ### Open-issue register
 
@@ -504,14 +514,17 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
+| `TPR-SD22-005` | P2 | Sharadar metadata mapping/admission | The stable direct status response differs from the documented flat schema; the diagnostic has one unmapped field and no retained raw body. A verified current response contract is required before selecting a mapping. No credential reset or guessed file-wrapper normalization closes it. See section 61.5. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
 host on 2026-10-05 found neither `tpr_allowed_signers` nor `tpr_registry_anchor`
 under the frozen `C:\ProgramData\CustomizedAgent\trust` path; no key or
-trust-file provisioning was performed. The six
+trust-file provisioning was performed. The six canonical
 open findings require an owner decision, an owner-authorized artifact rewrite,
-or a later bounded implementation/validation round.
+or a later bounded implementation/validation round. The additional section-61
+development-source finding is a current metadata-contract factual blocker,
+not a newly opened canonical trust gate.
 ### Historical progression (not the current resume instruction)
 
 The remainder of this section preserves how the earlier v2.1 and v2.2
@@ -8209,3 +8222,283 @@ No Claude review wait or new automation follows. Real-data readiness stays
 false for the factual checklist in 60.5; canonical trust/manifests remain
 parked separately. The owner's delegated policy selections and the diagnostic
 credential-lookup incident remain explicit, not hidden behind a green run.
+
+## 61. Owner-follow-up Sharadar metadata diagnostic - 2026-10-06
+
+### 61.1 Owner instruction and pre-operation freeze
+
+After asking whether Sharadar must be reset on this machine, the owner
+received the evidence-backed answer that HTTP 200 plus parser refusal does
+not establish broken credentials or valid authentication. The proposed next
+step was one bounded metadata-only diagnostic, not a reset or data download.
+The owner then directly instructed:
+
+> then proceed until you meet the next immediate blocker
+
+Exact UTF-8 instruction SHA-256:
+`1b8c7093136ebe3d2abccb90aff937273acc8806714d3036eab3bb56469cd0ce`.
+This is instruction provenance, not a license or credential authentication.
+This section and its operation limits are written before the new request.
+No source-rights, outcome or QuantConnect permission is inferred.
+
+<!-- TPR-SHARADAR-DIAGNOSTIC:START -->
+| Boundary | Scope |
+|---|---|
+| Target | Resolve Sharadar refusal; no Claude wait |
+| Authority | New owner follow-up; not renewal of any spent audit |
+| Request | One fixed TICKERS status GET; zero table rows or download |
+| Budget | One attempt; 65536 body bytes; no retries or redirects |
+| Credentials | Existing local resolver; no reset, overwrite or disclosure |
+| Outputs | Closed key/type presence and refusal classes; sanitized metadata only |
+| Prior audits | D0 and section 60 audit remain spent and byte frozen |
+| Evidence | HTTP 200 is not authentication, license, rights or PIT proof |
+| Excluded | No outcomes, price/identity joins, QC API/upload/jobs or trading |
+| Publication | One stable matching-lane push; no review stop |
+<!-- TPR-SHARADAR-DIAGNOSTIC:END -->
+
+### 61.2 Exercised owner decisions and diagnostic contract
+
+`TPR-OWN-25`: choose exactly one new Sharadar-only diagnostic with constant ID
+`TPR-SHARADAR-DIAGNOSTIC-20261006-001`. Reuse the unchanged audited HTTPS
+transport, existing local credential resolver and original 0700 dirfd-anchored
+private directory. A distinct exclusive 0600 spent claim is written before
+credential lookup; the section-60/D0 claims and all frozen bytes remain
+untouched. The frozen new plan binds this new module's content, original
+auditor SHA-256
+`9f2674a47d0d62bb09e2dd5ba1ce7f37eed3c68dce254e40e0d11d1218f46960`,
+current published Git parent, physical root/toplevel/branch, exact owner
+instruction and actual UTC validity clocks. The request is only the existing
+HTTPS GET `api.sharadar.com/v1.0/data/tickers?status=True` with its existing key
+added in memory. One attempt, 10-second whole-request deadline, 64 KiB
+response-body cap, no redirect/retry/pagination/bulk/file download. This is
+one explicit fresh follow-up, not changed-hash automatic renewal.
+
+`TPR-OWN-26`: diagnose before changing configuration. No credential reset,
+Keychain overwrite, reinstallation, purchase, subscription/account mutation,
+supplier message or browser credential exposure is chosen. A new bounded
+pure reducer publishes only whitelisted key presence/primitive types,
+unknown-key counts, fixed metadata clause failures, fixed recognized API-error
+categories and explicitly labeled safe bulk metadata if verified. It never
+publishes arbitrary field names, raw names/table values, messages, URLs or
+market/account identifiers. Raw and decoded-JSON credential echoes are refused
+before hashing; invalid bodies get no raw-body hash. HTTP 200 remains only
+transport success until the actual shape/error evidence is classified.
+
+If a lane-owned parser contract issue is verified, correct it with focused
+red/green fixtures and evidence; do not guess the live payload, weaken the
+canonical source contract or rewrite the historical failed report. If the
+response establishes a missing credential/account/source fact, stop at that
+exact blocker and report the necessary owner/provider action. No further
+request follows this one-shot diagnostic. Offline mode requires explicit
+synthetic callbacks and a non-production directory; tests install credential,
+transport and socket sentinels before any test invocation. Internal parallel
+QA remains advisory, not independent Claude acceptance by substitution.
+
+### 61.3 Baseline and documentary evidence
+
+Published local/actual matching remote parent:
+`9cc45dd5ca2a4de68d441e0c9871c4d016468889`; clean worktree before this round.
+All repository checks, edits, tests, commits and the one final matching-lane
+push remain on the same hard physical worktree and branch. Main/sibling
+behavior, shared Action Plan and Session Handoff remain frozen.
+
+Official public sources checked without authenticated market-data operations:
+https://sharadar.com/docs/tickers documents the direct status-only object;
+https://sharadar.com/docs/auth describes query-key authentication and key
+secrecy. The existing sibling capture code uses the same direct API and
+Keychain service; it was inspected but not executed/imported as an operational
+dependency. Neither the public example nor a sibling history proves this
+account's current payload, entitlement or prospective processing rights.
+
+Section 60's current ratings access result is preserved; there is no new
+Massive call or retained source read. Comparable target horizons, local
+retention/derived-processing rights and real identity/price/control/calendar/
+cost inventory remain factual gates. Canonical Windows custody and reviewed
+TPR-1/TPR-2 manifests remain parked separately, not universal prerequisites
+to every accepted-risk development diagnostic. No outcomes/research look,
+QC API/upload/project/job/backtest, broker/operator database, paper/live
+deployment, capital/orders/trading access is granted or performed.
+
+### 61.4 Operation, validation and next blocker
+
+Tests-first section-61 scope guard: **1 failed in 0.71s** because the section
+did not exist. This pre-operation record establishes scope, not an observed
+provider result. Frozen plan, actual safe aggregate, any verified correction,
+focused validation and exact next blocker will be appended after execution.
+
+Frozen new plan:
+`research/target_price_revisions_development/artifacts/tpr-sharadar-diagnostic-plan.59db4a4bb61d6f24b3127a171e1eeef9d80ff20a7b11b21991db408cc2211ca8.json`,
+SHA-256 `59db4a4bb61d6f24b3127a171e1eeef9d80ff20a7b11b21991db408cc2211ca8`.
+Created **2026-10-07T06:17:31.733606+00:00**, expiry
+**2026-10-08T06:17:31.733606+00:00**, actual published parent
+`9cc45dd5ca2a4de68d441e0c9871c4d016468889`, new collector SHA-256
+`9269c55120d1197843094dc1a252ae11334568b6a8f85d771d72e936ab3437a1`.
+The exact collector source was content-frozen but uncommitted at execution;
+the later implementation commit retains it. Parent 9cc45dd5 is not claimed
+to contain that new module. Frozen original source SHA stays
+`9f2674a47d0d62bb09e2dd5ba1ce7f37eed3c68dce254e40e0d11d1218f46960`.
+
+Production execution began **2026-10-07T06:17:58.509461+00:00**, completed in
+the **0.32-second** command, **one** authenticated fixed-status request,
+HTTP **200**, **233 response-body bytes**, complete body accounting. This is
+decoded HTTP body consumption, not full wire/header/TLS/DNS traffic. Public
+sanitized report:
+`research/target_price_revisions_development/artifacts/tpr-sharadar-diagnostic-report.a547f0aed14af2cef2ad3bdcbb2e233fb937be417181829552d7219485ff178b.json`,
+SHA-256 `a547f0aed14af2cef2ad3bdcbb2e233fb937be417181829552d7219485ff178b`.
+New private spent claim, terminal and aggregate were verified exact plan/report
+identities, nonsymlink, owner UID, 0600 and bounded JSON. Original section-60
+private claim/terminal/aggregate were hashed before and after, byte-identical;
+their claim/terminal hashes remain respectively
+`594ede8be36fc0692cc6aa3651f196bf82deed45aa675140f9442218c338e8ad` and
+`a8b2b2d8157c723afe020309878917adae484c0db5d2dc05797974eb510f4bd5`.
+No existing state/credential was overwritten, reset, or rearmed.
+
+The diagnostic's observed safe shape is:
+
+| Observation | Result | Interpretation limit |
+|---|---|---|
+| Known table literal | Lowercase `tickers`; string | A casing-only fix is not supported. This is not a security-master row or paid-history entitlement. |
+| Expected name/size/sizeLabel/modified | All four absent at top level | The current flat status schema cannot admit this response. No guessed nesting/alias is normalized. |
+| Unknown top-level keys | Exactly 1, not named or serialized | The diagnostic does not establish the new field's name, primitive type, child layout or meaning; do not falsely call it a proven file wrapper. |
+| Known status/code/error/message | All absent | No recognized application/authentication error was found, not proof that no unrecognized or nested error exists. |
+| Raw body identity | `f03a9474e80224ccbef720ee7a78c21a259cfe355d17ed6388446f631ea5dd9c` | Byte-identical to section 60's response despite a new observation time, proving a stable refusal shape rather than a transient payload change; contents are not retained or reconstructed. |
+| Admission | `metadata_schema_mismatch`, `body_schema_refused`; credential_state `not_proven` | Protocol completion is not validated metadata, authentication, rights, PIT data or real backtest readiness. |
+
+No additional provider request follows this one-shot diagnostic, even before
+expiry; no raw body, unknown key/value, credential/account identifier or
+authenticated URL is retained/published. The existing resolver is used only
+for this actual Sharadar operation, never invoked by the protected offline
+tests. Massive/provider rows/retained captures/price or identity joins/outcomes/
+looks/QC/operator/broker/deployment/capital/orders/trading accesses in this
+round are **0**; Sharadar metadata request attempts **1**, table rows **0**.
+
+#### Internal QA findings and retained dispositions
+
+No new Claude commit exists in this round. The prior accepted-after-correction
+counter-review range remains section 56; this is Codex implementation with
+advisory parallel internal QA, not independent Claude review by substitution.
+
+| ID | Priority | Disposition/status | Evidence, correction and verification |
+|---|---|---|---|
+| `TPR-SD22-001` | P2 | **Confirmed; closed by correction** | Initial diagnostic conflated complete semantic rejection with incomplete byte capture. Tests-first **3 failed, 51 passed in 0.36s**, then **54 passed in 0.27s** after separating body completeness from metadata admission and retaining unknown/truncated transport flags. Actual mismatch now honestly records 233 complete bytes, not an invented truncation. |
+| `TPR-SD22-002` | P3 | **Confirmed; closed by correction** | Initial `error=False`, empty string and zero could be called active application rejection; substring matching could misclassify negated/quoted credential wording. Fixed closed active-error primitive rules and exact-message category matching; ambiguity is unclassified. Subsequent classifier/identity test-first **9 failed, 56 passed in 0.32s**, corrected **65 passed in 0.38s**. |
+| `TPR-SD22-003` | P3 | **Confirmed; closed by correction** | New-source identity needed exact lane path, nofollow/open/source-hash/FD-cleanup controls in addition to inherited old Git/root/hash checks. Added explicit path and cleanup, with positive and rejected-source controls in the same 65-case set. Source/root drift cannot reach private claim or credentials. |
+| `TPR-SD22-004` | P3 | **Investigated; closed as false alarm** | A case-only table mapping was considered. Actual literal is already exact lowercase `tickers`; no case normalization fixes the missing/unmapped fields. No fabricated adapter correction or credential reset is claimed. |
+| `TPR-SD22-005` | P2 | **Open factual blocker, not verified code fix** | Flat documented metadata schema is incompatible with the observed response; safe evidence lacks the unmapped field's current contract. No body is retained. Need authoritative current status-schema/envelope/alias evidence or a separately frozen, appropriately scoped shape inspection before selecting a verified mapping. Do not guess a file wrapper, infer paid entitlement, or call HTTP 200 successful authentication. |
+| `TPR-SD22-006` | P3 | **Confirmed; closed by record correction** | First post-operation document reprise **1 failed, 798 passed, 3 skipped in 6.21s** caught the new open SD22-005 row missing from the single current register. Added the exact P2/block/reason row and qualified six existing canonical findings versus the additional development-source blocker; no valid guard is weakened. |
+
+Initial new-module test collection red: **1 collection error in 0.07s** before
+the module existed. Independent advisory QA validated the new/frozen-audit
+union: **147 passed in 0.39s**, same isolated in-process runtime root, with
+credential/HTTPS/socket sentinels. Pure escaped-secret digest proof passed
+clean -> inherited privacy gate removed in memory red -> restored green;
+no tracked mutation or actual credential/provider action. Every writer
+released its exact files before final activation/staging. Main pre-operation
+focused union **798 passed, 3 skipped in 5.80s**; post-operation artifact guard
+adds one case. No P0/P1 finding is opened; six existing canonical findings
+remain unchanged, with the additional development-source blocker registered.
+
+### 61.5 Exact next immediate blocker and required input
+
+The machine does **not** have a demonstrated reset/reinstallation/Keychain
+failure. The current immediate blocker is **the direct Sharadar status
+response contract**: the documented flat five-field form is not what this
+account received. The required next fact is the authoritative definition of
+the additional top-level field and how its metadata/error representation maps
+to the name/size/modified fields. No current contract for that field can be
+derived from its count or response hash. Public TICKERS/auth docs, the official
+AI index https://sharadar.com/llms.txt and public bulk-doc page were inspected;
+none established this account's unmapped-field structure. Their public schema
+routes describe table columns, not proof of this status envelope. No account
+or subscription is guessed/reset, no raw credential is requested from owner,
+and no guessed parser normalization is implemented.
+
+That fact can be supplied by the provider's current status-response schema or
+resolved with a separately frozen richer shape-only inspection. It is not
+another broad software approval or a Claude scheduling pause. Stop this
+round at the identified factual blocker as the owner requested; any later
+collection must have its own prospective exact scope and cannot reuse this
+spent diagnostic. No raw/retained capture is consulted as a workaround.
+
+The other section-60 factual gates remain: exact local derived-processing/
+retention rights, comparable prior/current target horizon and share basis,
+source-native identities and real price/control/calendar/cost inventories,
+and real run/look/outcome admission. Missing horizon is not assigned twelve
+months. No real backtest or QC operation is authorized or launched. Future
+separately admitted evaluation keeps order-based default, at most three
+unsuccessful QC attempts per distinct candidate and then the Mia recovery rule.
+Canonical TR0 Windows custody/source manifests remain parked separately.
+
+### 61.6 Final validation and publication handoff
+
+Final exact focused selection, hashes, stable commit and actual remote/local
+agreement are verified before this round's one matching-lane non-force push.
+Only this record, the new diagnostic and its tests, Target-Price-owned doc/
+boundary guards and the two sanitized plan/report JSON artifacts change.
+Shared/project-wide/sibling documents and code stay frozen. No full lane or
+repository suite is run. macOS POSIX collection is not proof of Windows
+signer/ACL/parent custody or Windows collection portability. The existing
+native-Windows/host-Git split and 14 frozen-Git preregistration requirements,
+missing-frozen-Git refusal and restoration controls remain unchanged.
+
+Final working focused union: **799 passed, 3 skipped in 5.96s**, no failure,
+error or warning. Python 3.12.14 / pytest 9.1.1, macOS 26.6.2 arm64; flags
+`-q -p no:cacheprovider --tb=short`, exact 21 selections:
+
+- `tests/target_price_revisions/test_document_consistency.py`
+- `tests/test_active_document_consistency.py`
+- `tests/target_price_revisions/test_import_firewall.py`
+- `tests/test_runtime_stop_leak_guard.py`
+- `tests/test_ml_import_boundary.py::test_no_execution_capable_module_imports_ml`
+- `tests/test_ml_import_boundary.py::test_assistant_package_has_no_ml_import_except_the_future_shadow_adapter`
+- `tests/target_price_revisions/test_preregistration.py::test_host_git_logic_restores_production_git_after_exit`
+- `tests/target_price_revisions/test_preregistration.py::test_empty_registry_guard_is_reachable_for_the_committed_registry`
+- `tests/target_price_revisions/test_preregistration.py::test_reviewed_loader_refuses_when_the_frozen_git_is_unavailable`
+- `tests/target_price_revisions/test_preregistration.py::test_nonempty_registry_is_authenticated_before_json_parsing`
+- `tests/target_price_revisions_development/test_d1.py`
+- `tests/target_price_revisions_development/test_d0.py`
+- `tests/target_price_revisions_development/test_boundary_and_artifacts.py`
+- `tests/target_price_revisions_development/test_d2.py`
+- `tests/target_price_revisions_development/test_readiness.py`
+- `tests/target_price_revisions_development/test_simulation.py`
+- `tests/target_price_revisions_development/test_continuous_pipeline.py`
+- `tests/target_price_revisions_development/test_backtesting.py`
+- `tests/target_price_revisions_development/test_fixture_backtest.py`
+- `tests/target_price_revisions_development/test_source_audit.py`
+- `tests/target_price_revisions_development/test_sharadar_diagnostic.py`
+
+Same isolated in-process runtime-root runner as sections 49/52, patched before
+dispatch fence/config import; no actual operator stop state/database read.
+New diagnostic and frozen original-audit tests install actual credential,
+HTTPS and socket refusal sentinels automatically. All 65 new diagnostic
+cases are synthetic; this is a focused union, not a complete lane/repository
+suite. Compilation of new diagnostic plus three changed test modules and
+`git diff --check` exit 0. Both new public artifacts match content-addressed
+filenames; all old canonical/D0/source-audit code/artifact hashes are verified
+unchanged by the existing focused guards. No production-source retry follows.
+
+| New/changed code/test | SHA-256 |
+|---|---|
+| `research/target_price_revisions_development/sharadar_diagnostic.py` | `9269c55120d1197843094dc1a252ae11334568b6a8f85d771d72e936ab3437a1` |
+| `tests/target_price_revisions_development/test_sharadar_diagnostic.py` | `35eccc1940faad842b710c6e1718371dd933dfee656ddd2ce074a8df97b8016d` |
+| `tests/target_price_revisions_development/test_boundary_and_artifacts.py` | `33fda2476561b3078793e2ec076fea08ef02118286c11fdfca11fcba2a1a5b50` |
+| `tests/target_price_revisions/test_document_consistency.py` | `873e65eacea64e8f99d253d3b6747f7b1e821f4e3482e5357c20bc3d3741326f` |
+
+Only seven lane-owned paths are staged: this record, the four code/test files
+above and the two new public sanitized plan/report artifacts. Ignored private
+claims/reports are not staged. The round begins at exact published parent
+`9cc45dd5ca2a4de68d441e0c9871c4d016468889`. Actual matching remote is
+verified against that parent before each commit and final push. One stable
+implementation commit plus a record-only exact-identity handoff are
+accumulated, then exactly one successful non-force push to
+`HEAD:refs/heads/codex/strategy-target-price-revisions`. Root/toplevel/branch/
+HEAD/status and precise staged path/hash set are verified before mutation;
+remote/local agreement and clean status are verified after publication.
+
+Next role: the owner-directed no-Claude-stop loop has reached the requested
+next factual blocker SD22-005. Obtain the current status-response contract
+before a verified metadata mapping or any fresh separately scoped inspection;
+do not reset credentials or invent provider facts. No review task, monitor
+rearm, side branch/worktree/clone, source/outcome/QC access or intermediate push
+is introduced. Software diagnosis/handoff are complete; real-data backtesting
+and canonical project completion are not claimed.

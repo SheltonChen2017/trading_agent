@@ -22,7 +22,7 @@ ARTIFACTS = ROOT / "research/target_price_revisions_development/artifacts"
 def test_development_import_closure_cannot_reach_canonical_or_other_authority() -> None:
     modules = _validate_import_closure(
         ROOT, package_name="research.target_price_revisions_development",
-        # Only the separately guarded source_audit module may use this narrow
+        # Only the separately guarded source collectors may use this narrow
         # standard-library network capability; canonical policy is unchanged.
         forbidden_prefixes=(DEFAULT_FORBIDDEN_IMPORT_PREFIXES - {"http", "ssl", "urllib"})
                            | {"research.target_price_revisions"},
@@ -45,6 +45,7 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.backtesting",
         "research.target_price_revisions_development.fixture_backtest",
         "research.target_price_revisions_development.source_audit",
+        "research.target_price_revisions_development.sharadar_diagnostic",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -205,15 +206,88 @@ def test_source_auditor_is_separate_from_pure_fixtures_and_authority_packages() 
     assert all(isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
                and type(node.value.value) is str for node in initializer.body)
     for path in (ROOT / "research/target_price_revisions_development").glob("*.py"):
-        if path.name == "source_audit.py":
+        if path.name in {"source_audit.py", "sharadar_diagnostic.py"}:
             continue
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             names = ([alias.name for alias in node.names] if isinstance(node, ast.Import)
                      else [node.module or ""] if isinstance(node, ast.ImportFrom) else [])
             assert not any(name.split(".")[0] in {"http", "ssl", "urllib"}
-                           or "source_audit" in name.split(".") for name in names)
+                           or set(name.split(".")) & {"source_audit", "sharadar_diagnostic"} for name in names)
             if isinstance(node, ast.ImportFrom) and node.module is None:
-                assert all(alias.name != "source_audit" for alias in node.names)
+                assert all(alias.name not in {"source_audit", "sharadar_diagnostic"} for alias in node.names)
+
+
+def test_sharadar_diagnostic_can_only_compose_the_frozen_source_primitives() -> None:
+    """A separate scoped I/O command is not a facade for pure feature modules."""
+    path = ROOT / "research/target_price_revisions_development/sharadar_diagnostic.py"
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    allowed = {"__future__", "json", "os", "re", "stat", "dataclasses", "datetime",
+               "decimal", "pathlib", "typing"}
+    helper_names = {"AUTHORITY", "LANE_BRANCH", "LANE_ROOT", "PRIVATE_ROOT", "REQUESTS",
+                    "SourceAuditError", "_canonical", "_clock", "_digest", "_https_get",
+                    "_private_directory", "_production_credential", "_publish", "_reduce_response",
+                    "_source_object", "_valid_credential", "_verify_execution_identity"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all(alias.name.split(".")[0] in allowed for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                assert node.level == 1 and node.module == "source_audit"
+                assert {alias.name for alias in node.names} <= helper_names
+            else:
+                assert node.module.split(".")[0] in allowed
+    for node in tree.body:
+        if isinstance(node, ast.Expr):
+            assert isinstance(node.value, ast.Constant) and type(node.value.value) is str
+        elif isinstance(node, (ast.Assign, ast.AnnAssign)):
+            assert not any(isinstance(child, ast.Call) for child in ast.walk(node))
+
+
+def test_committed_sharadar_diagnostic_pins_the_observed_shape_without_credentials():
+    import hashlib
+    import json
+    from research.target_price_revisions_development.sharadar_diagnostic import DiagnosticPlan
+
+    plan_sha = "59db4a4bb61d6f24b3127a171e1eeef9d80ff20a7b11b21991db408cc2211ca8"
+    report_sha = "a547f0aed14af2cef2ad3bdcbb2e233fb937be417181829552d7219485ff178b"
+    plan_payload = (ARTIFACTS / f"tpr-sharadar-diagnostic-plan.{plan_sha}.json").read_bytes()
+    report_payload = (ARTIFACTS / f"tpr-sharadar-diagnostic-report.{report_sha}.json").read_bytes()
+    assert hashlib.sha256(plan_payload).hexdigest() == plan_sha
+    assert hashlib.sha256(report_payload).hexdigest() == report_sha
+    plan = DiagnosticPlan(plan_payload, plan_sha).body()
+    body = json.loads(report_payload)
+    assert body["plan_sha256"] == plan_sha
+    assert body["git_sha"] == plan["git_sha"] == "9cc45dd5ca2a4de68d441e0c9871c4d016468889"
+    source_sha = hashlib.sha256((ROOT / "research/target_price_revisions_development/sharadar_diagnostic.py").read_bytes()).hexdigest()
+    assert body["code_sha256"] == plan["code_sha256"] == source_sha
+    assert body["auditor_code_sha256"] == "9f2674a47d0d62bb09e2dd5ba1ce7f37eed3c68dce254e40e0d11d1218f46960"
+    assert body["mode"] == "production" and body["status"] == "COMPLETED"
+    assert body["provider_requests"] == 1 and body["fixture_transport_calls"] == 0
+    assert body["provider"]["http_status"] == 200
+    assert body["provider"]["response_bytes"] == 233
+    assert body["provider"]["response_bytes_complete"] is True
+    assert body["provider"]["response_sha256"] == "f03a9474e80224ccbef720ee7a78c21a259cfe355d17ed6388446f631ea5dd9c"
+    diagnosis = body["diagnosis"]
+    assert diagnosis["classification"] == "metadata_schema_mismatch"
+    assert diagnosis["application_error"] is None
+    assert diagnosis["table_literal"] == "lower"
+    assert diagnosis["clauses"] == ["unexpected_keys", "missing_modified", "missing_name", "missing_size", "missing_sizeLabel"]
+    assert diagnosis["shape"] == {"fields": {"table": "string", **dict.fromkeys(
+        ("name", "size", "sizeLabel", "modified", "status", "code", "error", "message"), "absent")},
+        "unknown_key_count": 1}
+    assert diagnosis["metadata"] == {"metadata_shape_observed": False, "size_bytes": None, "snapshot_utc": None}
+    assert body["credential_state"] == "not_proven"
+    assert body["license_entitlement"] == body["point_in_time_facts"] == "unestablished"
+    assert body["real_development_backtest_ready"] is False
+    assert body["d0_renewed"] is False and body["original_audit_renewed"] is False
+    assert body["outcome_reads"] == body["qc_attempts"] == body["development_looks"] == 0
+    assert all(value is False for value in body["authority"].values())
+    assert datetime.fromisoformat(plan["created_utc"]) <= datetime.fromisoformat(body["started_utc"]) < datetime.fromisoformat(plan["expires_utc"])
+    assert set(body) == {"schema", "diagnostic_id", "mode", "status", "started_utc", "plan_sha256",
+        "code_sha256", "auditor_code_sha256", "git_sha", "owner_instruction_sha256", "provider",
+        "diagnosis", "credential_state", "provider_requests", "fixture_transport_calls", "authority",
+        "license_entitlement", "point_in_time_facts", "real_development_backtest_ready", "canonical_admission",
+        "d0_renewed", "original_audit_renewed", "outcome_reads", "qc_attempts", "development_looks"}
 
 
 def test_committed_source_probe_is_exact_non_authorizing_aggregate_not_a_retry() -> None:

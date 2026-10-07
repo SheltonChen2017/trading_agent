@@ -1220,7 +1220,8 @@ says the current-state API has no immutable history/as-of archive. The human
 then cancels the proposed written clarifications and directs immediate use of
 existing Sharadar access. The completed reply monitor is retired; the old
 Claude-review monitor stays paused. Bounded research-only RAW-price capture
-proceeds under 262.4 without claiming formal source/identity readiness. Claude must review
+completes in 262.6: all seven October 6 rows are retained privately and locally
+reauthenticated, without claiming formal source/identity readiness. Claude must review
 section 262 and this round's final snapshot; that independent review is not an
 intermediate checkpoint or prerequisite for admissible continuing build.
 The human explicitly reiterated "build until the project is ready for forward
@@ -3056,7 +3057,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex Massive clarification and six-day vintage comparison | `43bae982` -> `2f3f8f00` -> this round's final record commit | Section 259: one new Oct1-window capture, 3 pages / 250 rows; 11 shared rating IDs change version and one earlier ID is absent; no economic evaluation or new look/cell | Provider identity is Massive, not direct Benzinga; pinned old/new private receipts compared value-free; no immediate repeat of Oct5–6 or new scheduler | Strict-network-denied focused results and actual capture/comparison disposition in 259.3; no complete suite | Current-version differences cannot establish correction cause, publication history or deletion completeness; formal/source/history gates remain | One final same-lane push at the concrete independent-source/access stop; monitor remains PAUSED and no Claude/routine-approval checkpoint is imposed |
 | 2026-10-07 | Codex owner-authorized Massive support acquisition inquiry | `672961e7` -> `56b6e242` -> this round's final record commit | Section 260: one information-only email sent after scope freeze; local Sharadar ZIP hashes/sizes match manifest but no independent identity/RAW-price package is admitted; no new look/cell | Official support destination and authenticated mail connector; no raw licensed rows, attachments, credentials or spending authorization | Strict-network-denied focused record/active-document checks and actual message/metadata disposition in 260.3; no complete suite | Vendor reply/delivery and independent source/security-master/RAW-price packages remain unproven; contacting support is not readiness | One final matching-lane push at the actual vendor-artifact/independent-evidence stop; monitor remains PAUSED, no routine approval or Claude checkpoint |
 | 2026-10-07 | Claude independent review of sections 255-260: delegated continuous work, response observations, the captured-clock projector, provider captures and the Massive inquiry | `33958eaa` -> this record commit | Section 261: eleven Codex commits `a205ebf7..33958eaa` disposed (11 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser actions, looks, evaluations, or cells | No code changed by Claude. Reproduced the local evidence of sections 255-260 (claim and source identities, tool hashes, capture manifests, row counts, receipt flags, the vintage comparison and the Sharadar ZIP hashes); native in-memory mutation trials on both code commits; a scratch probe confirming `ARV2R261-001`; accepted `ARV2CR255-001` and `ARV2CR255-002` against section 254; section 4 names section 261, banner sentence added, this row appended | Complete lane selection at `33958eaa` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 261.6 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R261-001`, documented for Codex); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's Claude commit; Codex counter-reviews section 261 unless the owner changes the workflow |
-| 2026-10-07 | Codex section-261 counter-review, reply monitor and owner-directed immediate RAW-price acquisition | `b80149b8` -> this round's commits | Section 262: one new Claude commit accepted after scratch-probe qualification; actual Massive reply read; human cancels clarification drafts and directs bounded Sharadar research-price capture | New reply monitor created then retired because the original is answered and follow-up cancelled; old review monitor remains paused; no shared/frozen/registry edits, new look/cell or paid/live action | Strict-network-denied focused adapter/observation/record checks and actual capture disposition in 262; no complete Codex suite | Immutable Massive history unavailable per vendor reply; independent source/identity/formal gates unchanged; other-lane use does not prove them | One final matching-lane push when this continuous round reaches actual completion/forward readiness or a concrete safe-in-scope barrier; no routine approval/review wait |
+| 2026-10-07 | Codex section-261 counter-review, reply monitor and owner-directed immediate RAW-price acquisition | `b80149b8` -> `2f5ddf4b` + final record commit | Section 262: one new Claude commit accepted after scratch-probe qualification; actual Massive reply read; human cancels clarification drafts; bounded direct Sharadar capture completes all seven October 6 rows | New reply monitor created then retired because the original is answered and follow-up cancelled; old review monitor remains paused; no shared/frozen/registry edits, new look/cell or paid/live action | 263 distinct focused passes under strict network denial; actual two-GET private capture and pinned offline readback; no complete Codex suite | Current RAW-price access step completed; immutable availability and independent identity/formal packages remain unavailable, not cleared by other-lane use | One final matching-lane push at this concrete source-evidence boundary; no routine approval/review wait; resume supported substantive evidence work when available |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -37072,3 +37073,105 @@ failure was not an implementation defect. The three trust-root registry hashes
 remain exactly 231.3's zero-access/empty identities. Record/active-document
 checks pass **86 tests** before contact; these are focused checks, not a full
 suite or provider/QC validation.
+
+### 262.6 Actual direct source acquisition and offline readback
+
+The frozen implementation/protocol commit is
+`2f5ddf4b84a69959693f18e383d3fcb33332af20`, committed at
+**2026-10-07T16:47:25Z**, before contact. Root verifies the exact designated
+root/branch/HEAD and clean worktree, then executes the frozen command once.
+It completes successfully (exit 0), with two exact direct source GETs and
+**seven** expected rows (QCOM stock plus six ETF funds), no retries/redirects.
+Local receipt interval is **2026-10-07T16:47:30.430845Z through
+16:47:30.791956Z**. Those are unsigned client times, not original vendor
+publication or raw server-envelope timestamps.
+
+Private artifact, under the designated worktree:
+
+`artifacts/analyst_revisions_v2/sharadar_price_capture/arv2-sharadar-prices-20261007T164730430845Z`
+
+| Retained identity | Exact value |
+|---|---|
+| Manifest SHA-256 | `2f5d71683a43d1118420c52677fcbb6bdd539c7c621004b4632beed9b03f6702` |
+| Capture identity SHA-256 | `f0a09c6c7f992a9501c0d59588b7d322fbda85cbc7471e85af6375c2796a3bb9` |
+| `stocks.csv` | 1 row / 68 bytes / `f7b69af2407e40e675e801dbdfdfafdbcd700dce584a0e54aa61707ded5c1bc2` |
+| `funds.csv` | 6 rows / 232 bytes / `da0fc6d9939d87dfe1f272542a7215018d73b855c5ce6178180c4ea149a5f8b2` |
+| Requested prior-close session | `2026-10-06` |
+| Transport | `sharadar_raw_close_direct_https_owned_session` |
+
+Root invokes the pinned offline loader under strict network denial, explicitly
+supplying the manifest digest above. Canonical manifest, both raw CSV hashes/
+lengths, exact ticker/date census, private exact inventory and final held-file
+identities reproduce. Directory is **0700**; its four files are **0600** and
+single-linked. `git check-ignore` confirms both CSVs excluded; no licensed row,
+price or credential is placed in Git, stdout or the lane record. Every named
+formal/PIT/independent-source/identity/session/decision/paper/order/deployment/
+outcome-evaluation flag remains false. The provider call necessarily accesses
+source price values; this is not zero financial-data/source-value access.
+It performs no returns/performance/strategy-outcome evaluation and no QC
+source upload, compile, job, status poll, log/result export or order action.
+
+The prior-close acquisition step is genuinely completed: current vendor
+`closeunadj` rows now exist locally instead of only a plan/documentation path.
+Their receipt after the October 7 cutoff cannot backfill a 09:20 observation.
+Current-ticker fields and `lastupdated` dates do not supply permanent share-class/
+QC SID mapping or original publication/revision/deletion-completeness evidence.
+No source-registry entry, formal selector/target/score/weights, predecision
+freshness assertion or independent-review label is inferred from capture success.
+
+### 262.7 Continuous-round boundary, final validation and next action
+
+The exact Codex continuation begins at `b80149b830b9e9dae13800e41f6a74fa8317434b`:
+
+| Commit | Purpose / disposition for the next independent review |
+|---|---|
+| `2f5ddf4b84a69959693f18e383d3fcb33332af20` | Two new source-only files, focused proof and pre-contact protocol; section-261 counter-review and factual vendor/monitor/owner-direction record. Pending Claude review, not self-labelled independently accepted. |
+| This final record commit | Actual successful private seven-row acquisition, pinned offline readback and final checks/handoff; implementation bytes unchanged. Pending Claude review. |
+
+Only the two new script/test files and this lane record differ from the
+baseline. All frozen historical projections/manifests, shared ledger/root
+policy and source/security-master/reviewed-spec registries remain unchanged.
+The trust-root hashes remain `3152aca00c721f3822d1ef438c84c3ee855aeb866e35ba692527746b5d4c5805`,
+`e8c1a2a7e0408d545e45f026cabf5b4ae23956fa64bc444769a8589f35f4a5fa`
+and `23f23d19e681a03bacf6a1d132c732ed541747a5c6136d2dc0ac5ccafd273326`;
+all are still zero-access/empty as applicable. Floor stays **313 shared looks /
+239 development / 49 infrastructure / 699 cells**. No new strategy look/cell
+or formal-alpha spend and no relaunch/recount of an already-booked identity.
+
+No clarification email is sent and no routine approval/Claude wait is imposed.
+The concrete remaining forward-readiness boundary is independent immutable
+availability/completeness and reviewed permanent/QC identity/source packages,
+not lack of present-day RAW-price acquisition access. Massive explicitly lacks
+the requested historical version/as-of route; the current Sharadar responses
+do not create the missing formal packages. Safe checks and this actual supported
+acquisition have narrowed the access gap but cannot manufacture those records.
+Historical P2s/conditional cells remain qualified. Do not retrofit formal
+dates/power hash/epoch, substitute current rows for PIT evidence, create another
+claims-only readiness scaffold or infer paper/live rights. Resume substantive
+admissible source/identity work when genuinely supported evidence is available;
+independent review remains necessary evidence for a final dossier but is not an
+intermediate build checkpoint. Both the retired completed reply monitor and
+paused old review monitor retain the lifecycle described in 262.4; no broad
+monitor is rearmed implicitly.
+
+Final focused validation results:
+
+| Root check | Exact scope / result |
+|---|---|
+| Strict-network-denied combined selection | New Sharadar price 99 + existing Sharadar 61 + lane record/active documents 86 + existing outcome-free package closure 1: **247 passed in 3.78s**, no failures/skips/warnings |
+| Strict-network-denied QC observation selection | `test_qc_relaxed_submission.py -k observation`: **16 passed / 35 deselected in 3.08s**, no failures/skips/warnings |
+| Distinct focused union | **263 passes**; no overlap between the two rows; repeated earlier runs/advisory checks/mutation failures are not added |
+| Compilation / static scope / diff | Only the two new files compiled; direct-import AST scope and existing transitive closure checked; `git diff --check` clean |
+| Actual retained capture | Pinned offline authentication reproduces exact 1+6 census, hashes/bytes, private modes, inventory and all false action/readiness flags in 262.6; no repeated provider call |
+| Changed-file and protected identity scope | Only new script/test and lane record; implementation/test/helper and all three registry hashes unchanged after capture and final tests |
+
+The tests/parser/mutation processes refuse all remote and loopback network;
+no fixture requires a local server here. The actual authorised source capture
+is network-enabled and is not disguised as network-denied or zero-contact.
+No complete Codex suite is run; Claude's 261.6 full-selection result remains
+its reported earlier-snapshot evidence, not full validation of this new adapter.
+Final record-only footer is rechecked before commit. Verify exact designated
+root/branch/HEAD/status, fetch only the matching branch, refuse unexplained
+concurrent change/divergence and push exactly once to
+`origin/codex/strategy-analyst-revisions-v2`. No intermediate push occurred;
+the final committed tree and remote equality must be checked after that push.

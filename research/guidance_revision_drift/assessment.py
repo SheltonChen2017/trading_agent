@@ -12,8 +12,8 @@ from decimal import Decimal
 
 from research.guidance_revision_drift.events import EventBook, EventCandidate, EventError
 from research.guidance_revision_drift.timing import (
-    Availability, NY, PinnedSchedule, _utc, availability_refusals,
-    decision_cutoff, entry_window,
+    Availability, NY, PinnedSchedule, _utc, decision_cutoff, entry_window,
+    opportunity_availability_refusals,
 )
 from research.guidance_revision_drift.universe import DatedSecurity, RawDailyBar, evaluate_universe
 
@@ -105,10 +105,11 @@ def assess_candidate(
                 raise EventError("exact dated security reference required")
             if _visible_input(reference.availability, cutoff):
                 selected_references.append(reference)
-        event_reasons = []
-        for name, record in (("payload", candidate.current), ("predecessor", candidate.previous)):
-            event_reasons.extend(availability_refusals(Availability(
-                name, record.published_at, record.received_at, record.validated_at), cutoff))
+        event_inputs = tuple(Availability(name, record.published_at, record.received_at, record.validated_at)
+                             for name, record in (("payload", candidate.current),
+                                                  ("predecessor", candidate.previous)))
+        event_reasons = list(opportunity_availability_refusals(
+            event_inputs, cutoff, is_final_opportunity=opportunity == opportunities[-1]))
         universe = evaluate_universe(
             schedule=schedule, entry_session=opportunity, opportunity_id=disclosure_id,
             permanent_security_id=permanent_security_id, references=tuple(selected_references),

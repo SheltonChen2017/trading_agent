@@ -190,6 +190,44 @@ def availability_refusals(value: Availability, cutoff: datetime) -> tuple[str, .
     return tuple(reasons)
 
 
+def _availability_inputs(inputs: tuple[Availability, ...]) -> dict[str, Availability]:
+    if type(inputs) is not tuple:
+        raise TimingError("inputs must be immutable")
+    by_name = {}
+    for value in inputs:
+        if type(value) is not Availability:
+            raise TimingError("inputs must contain exact Availability objects")
+        Availability.__post_init__(value)
+        if value.name in by_name:
+            raise TimingError("duplicate availability input names")
+        by_name[value.name] = value
+    return by_name
+
+
+def opportunity_availability_refusals(
+    inputs: tuple[Availability, ...], cutoff: datetime, *, is_final_opportunity: bool,
+) -> tuple[str, ...]:
+    """Share per-opportunity clocks and the final payload-receipt expiry label.
+
+    Callers own their required input names and opportunity iteration: composed
+    assessment must also evaluate each opportunity's dated universe, whereas
+    the clock-only API checks its fixed required names. Neither can choose a
+    later eligible opportunity after an earlier fully eligible one was missed.
+    This helper does not own consumed order attempts or infer announcement dates.
+    """
+    _utc(cutoff, "cutoff")
+    if type(is_final_opportunity) is not bool:
+        raise TimingError("final opportunity flag must be an exact bool")
+    by_name = _availability_inputs(inputs)
+    reasons = tuple(reason for name in sorted(by_name)
+                    for reason in availability_refusals(by_name[name], cutoff))
+    payload = by_name.get("payload")
+    if (is_final_opportunity and payload is not None and payload.received_at is not None
+            and payload.received_at > cutoff):
+        reasons += ("stale_event",)
+    return reasons
+
+
 def historical_update_refusals(last_update: datetime | date | None, cutoff: datetime) -> tuple[str, ...]:
     """Conservative historical censor only; a pass cannot establish PIT status."""
     _utc(cutoff, "cutoff")
@@ -227,16 +265,9 @@ def select_entry_opportunity(
     to their later defensible date; an absent date refuses without guessing.
     """
     schedule.validate()
-    if type(inputs) is not tuple or type(attempt_already_made) is not bool:
+    if type(attempt_already_made) is not bool:
         raise TimingError("inputs must be immutable and attempt flag an exact bool")
-    by_name = {}
-    for value in inputs:
-        if type(value) is not Availability:
-            raise TimingError("inputs must contain exact Availability objects")
-        Availability.__post_init__(value)
-        if value.name in by_name:
-            raise TimingError("duplicate availability input names")
-        by_name[value.name] = value
+    by_name = _availability_inputs(inputs)
     if announcement_date is None:
         return TimingDecision((), None, None, ("unresolved_announcement_date",), (), schedule.sha256)
     opportunities = entry_window(schedule, announcement_date)
@@ -249,15 +280,12 @@ def select_entry_opportunity(
     missed = []
     for opportunity in opportunities:
         cutoff = decision_cutoff(schedule, opportunity)
-        reasons = missing + tuple(reason for name in sorted(by_name)
-                                  for reason in availability_refusals(by_name[name], cutoff))
+        reasons = missing + opportunity_availability_refusals(
+            inputs, cutoff, is_final_opportunity=opportunity == opportunities[-1])
         if not reasons:
             return TimingDecision(opportunities, opportunity, cutoff, (), tuple(missed), schedule.sha256)
         missed.append((opportunity, reasons))
-    final = list(missed[-1][1])
-    if payload is not None and payload.received_at is not None and payload.received_at > decision_cutoff(schedule, opportunities[-1]):
-        final.append("stale_event")
-    return TimingDecision(opportunities, None, None, tuple(final), tuple(missed), schedule.sha256)
+    return TimingDecision(opportunities, None, None, missed[-1][1], tuple(missed), schedule.sha256)
 
 
 @dataclass(frozen=True, slots=True)

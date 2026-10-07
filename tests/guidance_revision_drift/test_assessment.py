@@ -4,9 +4,9 @@ from decimal import Decimal
 import unittest
 
 from research.guidance_revision_drift.assessment import assess_candidate
-from research.guidance_revision_drift.events import NormalizedDisclosure
+from research.guidance_revision_drift.events import EventBook, NormalizedDisclosure
 from research.guidance_revision_drift.fixtures import example_corpus, fixture_instant
-from research.guidance_revision_drift.timing import Availability
+from research.guidance_revision_drift.timing import Availability, decision_cutoff, entry_window
 
 
 class AssessmentTests(unittest.TestCase):
@@ -39,6 +39,44 @@ class AssessmentTests(unittest.TestCase):
         mapping = replace(self.corpus.references[0], issuer_id="SYN-OTHER", availability=availability)
         result = self.assess(bars=self.corpus.bars + (revision,), references=self.corpus.references + (mapping,))
         self.assertEqual(result, original)
+
+    def test_late_first_receipt_records_stale_event_only_at_final_opportunity(self):
+        opportunities = entry_window(self.corpus.schedule, date(2025, 4, 1))
+        cutoff = decision_cutoff(self.corpus.schedule, opportunities[-1])
+        body = self.corpus.archive.entries[-1][0].to_dict()
+        for delay in (timedelta(0), timedelta(microseconds=1)):
+            with self.subTest(delay=delay):
+                received = cutoff + delay
+                clock = received.isoformat().replace("+00:00", "Z")
+                body.update(received_at=clock, validated_at=clock)
+                book = EventBook(self.corpus.archive.book.entries[:1]).ingest(
+                    NormalizedDisclosure.from_dict(body))
+                result = self.assess(book=book, as_of=fixture_instant(opportunities[-1], 10))
+                if not delay:
+                    self.assertEqual(result.eligible_session, opportunities[-1])
+                    self.assertFalse(any("stale_event" in reasons for _, reasons in result.refusals))
+                else:
+                    self.assertIsNone(result.eligible_session)
+                    self.assertIn("stale_event", result.refusals[-1][1])
+                    self.assertFalse(any("stale_event" in reasons for _, reasons in result.refusals[:-1]))
+                    self.assertIn("payload:received_at_after_cutoff", result.refusals[-1][1])
+
+    def test_first_fully_eligible_universe_opportunity_is_not_replaced_by_later_price(self):
+        # The event clock is ready on E, but a required historical bar is not.
+        # Its later arrival permits E+1, not a retry after E+1 was missed.
+        received = fixture_instant(date(2025, 4, 4), 12)
+        bars = tuple(replace(bar, availability=replace(bar.availability,
+            received_at=received, ingested_at=received))
+            if bar.session_date == date(2025, 4, 3) else bar for bar in self.corpus.bars)
+        first = self.assess(bars=bars)
+        self.assertIsNone(first.eligible_session)
+        second = self.assess(bars=bars, as_of=fixture_instant(date(2025, 4, 7), 10))
+        self.assertEqual(second.eligible_session, date(2025, 4, 7))
+        self.assertEqual(second.refusals[0][0], date(2025, 4, 4))
+        third = self.assess(bars=bars, as_of=fixture_instant(date(2025, 4, 8), 10))
+        self.assertIsNone(third.eligible_session)
+        self.assertEqual(third.refusals[-1],
+            (date(2025, 4, 7), ("earlier_eligible_opportunity_was_missed",)))
 
     def test_future_withdrawal_is_not_seen_early_but_invalidates_after_receipt(self):
         body = self.corpus.archive.entries[-1][0].to_dict()

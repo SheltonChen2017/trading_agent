@@ -8,7 +8,7 @@ from research.guidance_revision_drift.qc_adapter import (
     QcAdapterError, QcFixtureAdapter, QcQuoteSnapshot, QcTradeSnapshot,
     SecurityBinding, adapter_manifest,
 )
-from research.guidance_revision_drift.simulation import Quote, Session, Simulation
+from research.guidance_revision_drift.simulation import Quote, Session, Simulation, SimulationError
 
 
 D = Decimal
@@ -80,6 +80,24 @@ class AdapterTests(unittest.TestCase):
         with self.assertRaises(QcAdapterError):
             self.callback()
         self.assertEqual(self.adapter.receipt_hashes, ())
+
+    def test_binding_uses_new_york_date_without_permitting_extended_hours(self):
+        # 00:01 UTC on Apr-4 is still Apr-3 in New York. A valid Apr-3 mapping
+        # reaches the regular-session gate; a UTC-only Apr-4 mapping must not.
+        quote = replace(self.quote, start_utc=at(4, 0, 0), end_utc=at(4, 0, 1))
+        trade = replace(self.trade, start_utc=quote.start_utc, end_utc=quote.end_utc)
+        before = self.sim.snapshot()
+        for bound_day, error, message in (
+            (date(2025, 4, 3), SimulationError, "regular-session"),
+            (date(2025, 4, 4), QcAdapterError, "dated validity"),
+        ):
+            with self.subTest(bound_day=bound_day):
+                self.adapter = QcFixtureAdapter(self.sim, (replace(self.bindings[0],
+                    valid_from=bound_day, valid_through=bound_day),))
+                with self.assertRaisesRegex(error, message):
+                    self.callback(quote=quote, trade=trade)
+                self.assertEqual(self.sim.snapshot(), before)
+                self.assertEqual(self.adapter.receipt_hashes, ())
 
     def test_mutating_original_binding_cannot_redirect_market_data(self):
         self.sim.submit_entry("SYN-EVENT", "SYN-ISSUER", "tech", at(4, 14, 0),

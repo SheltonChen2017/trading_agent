@@ -17,6 +17,7 @@ from data.financial_primitives import decimal_text
 from data.hashing import hash_payload
 from research.guidance_revision_drift.controls import refuse_external_action
 from research.guidance_revision_drift.simulation import Minute, Simulation
+from research.guidance_revision_drift.timing import NY
 
 
 class QcAdapterError(ValueError):
@@ -141,7 +142,7 @@ class QcFixtureAdapter:
         if len(mapping) != 1:
             raise QcAdapterError("unknown or ambiguous security ID")
         binding = mapping[0]
-        if not binding.valid_from <= quote.end_utc.date() <= binding.valid_through:
+        if not binding.valid_from <= quote.end_utc.astimezone(NY).date() <= binding.valid_through:
             raise QcAdapterError("security mapping is outside its dated validity")
         digest = hash_payload({
             "security_id": quote.security_id, "issuer_id": binding.issuer_id,

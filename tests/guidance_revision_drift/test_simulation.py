@@ -593,6 +593,22 @@ class SimulationTests(unittest.TestCase):
         self.assertIsNotNone(self.sim.submit_entry("SYN-E4", "SYN-D", "energy", self.at(2),
                                                    Quote(self.at(2, 9, 59), D("99.9"), D("100")), ADV, valuation_quotes=later))
 
+    def test_active_sell_without_scheduled_exit_refuses_entry_with_fresh_quotes(self):
+        # Isolate the active-order arm: a requested exit need not have come
+        # from close_session's scheduled-exit map. A scheduled trim would
+        # mask removal of this separate precedence guard.
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("100")})
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"], {})
+        order = self.sim.request_exit("SYN-A", self.at(1), "guidance_invalidation", ADV)
+        self.assertEqual(order.side, "sell")
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"], {})
+        fresh = {"SYN-A": Quote(self.at(1, 9, 59), D("100"), D("100"))}
+        quote = Quote(self.at(1, 9, 59), D("99.9"), D("100"))
+        self.assertIsNone(self.sim.submit_entry("SYN-E2", "SYN-B", "energy", self.at(1),
+                                               quote, ADV, valuation_quotes=fresh))
+        self.assertEqual(self.sim.snapshot()["refusals"][-1]["reason"], "exits_must_precede_entries")
+
     def test_receivable_does_not_settle_on_a_pre_open_tick_of_its_pay_session(self):
         # Sale proceeds are receivables until the explicit pay session has
         # opened; a clock tick earlier on that date must not settle them.

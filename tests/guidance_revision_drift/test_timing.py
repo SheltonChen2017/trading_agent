@@ -79,6 +79,8 @@ class TimingTests(unittest.TestCase):
         self.assertIsNone(stale.eligible_session)
         self.assertIn("stale_event", stale.refusal_reasons)
         self.assertEqual(len(stale.missed_opportunities), 3)
+        self.assertEqual(stale.refusal_reasons, stale.missed_opportunities[-1][1])
+        self.assertFalse(any("stale_event" in reasons for _, reasons in stale.missed_opportunities[:-1]))
 
     def test_missing_required_and_additional_inputs_gate_and_receipt_ingestion_both_matter(self):
         fixture = schedule()

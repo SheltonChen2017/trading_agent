@@ -66,6 +66,19 @@ import research.guidance_revision_drift.contracts
 import research.guidance_revision_drift.formulas
 import research.guidance_revision_drift.readiness
 import research.guidance_revision_drift.__main__
+import research.guidance_revision_drift.archive
+import research.guidance_revision_drift.artifacts
+import research.guidance_revision_drift.assessment
+import research.guidance_revision_drift.comparison
+import research.guidance_revision_drift.controls
+import research.guidance_revision_drift.events
+import research.guidance_revision_drift.fixtures
+import research.guidance_revision_drift.qc_adapter
+import research.guidance_revision_drift.reporting
+import research.guidance_revision_drift.scenario
+import research.guidance_revision_drift.simulation
+import research.guidance_revision_drift.timing
+import research.guidance_revision_drift.universe
 blocked = {'assistant', 'risk', 'execution', 'ml', 'config', 'requests', 'httpx', 'alpaca', 'quantconnect'}
 print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in blocked)))
 """
@@ -129,6 +142,7 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertIn("codex/strategy-guidance-revision-drift", record)
         self.assertIn("independent review pending", record)
         self.assertIn("does not mark GDR-0 complete", record)
+        self.assertLess((ROOT / "docs/SESSION_HANDOFF.md").stat().st_size, 50000)
         candidate = load_candidate()
         self.assertIn(candidate.sha256, record)
         for document in candidate.to_dict()["source_documents"]:

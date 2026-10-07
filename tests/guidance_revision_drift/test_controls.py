@@ -41,6 +41,19 @@ class ControlTests(unittest.TestCase):
             with self.subTest(callback=callback), self.assertRaises(ResearchControlError):
                 callback()
 
+    def test_broken_previous_hash_link_is_refused_with_intact_sequence_and_epoch(self):
+        # The sequence and epoch checks alone would accept a receipt whose
+        # previous_sha256 no longer names its predecessor; the chain link must
+        # be verified in its own right, in memory and on decode.
+        done = self.ledger.start("fixture-a", "base", "d" * 64).finish("fixture-a", output_sha256="e" * 64)
+        broken = replace(done.receipts[1], previous_sha256="f" * 64)
+        with self.assertRaisesRegex(ResearchControlError, "broken receipt chain"):
+            FixtureLedger(self.epoch, (done.receipts[0], broken))
+        body = done.to_dict()
+        body["receipts"][1]["previous_sha256"] = "f" * 64
+        with self.assertRaises(ResearchControlError):
+            FixtureLedger.from_bytes(json.dumps(body).encode())
+
     def test_immutable_projections_and_forged_objects_revalidated(self):
         ledger = self.ledger.start("fixture-a", "base", "d" * 64)
         with self.assertRaises(FrozenInstanceError):

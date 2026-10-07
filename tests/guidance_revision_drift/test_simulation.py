@@ -530,6 +530,165 @@ class SimulationTests(unittest.TestCase):
         self.assertEqual(snapshot["missing_valuation_sessions"], [self.sessions[0].day.isoformat()])
         self.assertTrue(snapshot["completion_blocked"])
 
+    def test_program_drawdown_stop_is_inclusive_at_exactly_fifteen_percent(self):
+        # Ten 50-share fills at 99.0495 (ask 99 plus 5 bp) leave settled cash
+        # 50465.25; a raw close of 69.0695 values the 500 shares at 34534.75,
+        # so NAV is exactly 85% of the 100000 high-water mark. The proposed
+        # stop is "at or below" 15% drawdown: exactly 85% must stop the
+        # program, and one tick above must not.
+        for mark, stopped in ((D("69.0695"), True), (D("69.0696"), False)):
+            with self.subTest(mark=mark):
+                engine = Simulation(self.sessions)
+                for n in range(10):
+                    order = self.entry(engine, issuer=f"SYN-A{n}", event=f"SYN-E{n}", sector=f"sector{n}", ask="99", bid="98.9")
+                    self.assertEqual(order.quantity, 50)
+                for n in range(10):
+                    fill = engine.process_minute(self.minute(issuer=f"SYN-A{n}", ask="99", bid="98.9"))[0]
+                    self.assertEqual((fill.quantity, fill.price), (50, D("99.0495")))
+                self.assertEqual(engine.snapshot()["settled_cash"], "50465.25")
+                record = engine.close_session(self.sessions[0].day, {f"SYN-A{n}": mark for n in range(10)})
+                self.assertEqual(record["nav"], D("85000") if stopped else D("85000.05"))
+                self.assertIs(record["stopped"], stopped)
+                reasons = {due["reason"] for due in engine.snapshot()["scheduled_exits"].values()}
+                self.assertEqual(reasons, {"program_drawdown"} if stopped else {"position_stop"})
+
+    def test_position_stop_is_inclusive_at_exactly_ninety_percent_of_entry_cost(self):
+        # The entry fills 49 shares at 100.0500, so 90.0450 is exactly 90% of
+        # the per-share entry cost. The proposed stop is "at or below": the
+        # exact boundary must schedule the exit and one tick above must not.
+        for mark, scheduled in ((D("90.0450"), True), (D("90.0451"), False)):
+            with self.subTest(mark=mark):
+                engine = Simulation(self.sessions)
+                order = self.entry(engine)
+                fill = engine.process_minute(self.minute())[0]
+                self.assertEqual(mul(fill.price, D("0.9")), D("90.0450"))
+                engine.close_session(self.sessions[0].day, {"SYN-A": mark})
+                due = engine.snapshot()["scheduled_exits"]
+                if scheduled:
+                    self.assertEqual(due["SYN-A"]["reason"], "position_stop")
+                    self.assertEqual(due["SYN-A"]["quantity"], order.quantity)
+                else:
+                    self.assertEqual(due, {})
+
+    def test_due_exit_or_active_sell_refuses_new_entry_for_that_reason_even_with_fresh_quotes(self):
+        # "Process exits and trims before entries." The refusal must come from
+        # the precedence rule itself, not incidentally from a later check such
+        # as a missing portfolio quote, so fresh valuation quotes are supplied.
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        at = self.at(1)
+        fresh = {"SYN-A": Quote(self.at(1, 9, 59), D("200"), D("200"))}
+        quote = Quote(self.at(1, 9, 59), D("99.9"), D("100"))
+        self.assertIn("SYN-A", self.sim.snapshot()["scheduled_exits"])
+        self.assertIsNone(self.sim.submit_entry("SYN-E2", "SYN-B", "energy", at, quote, ADV, valuation_quotes=fresh))
+        self.assertEqual(self.sim.snapshot()["refusals"][-1]["reason"], "exits_must_precede_entries")
+        trims = self.sim.execute_due_exits(at, {"SYN-A": ADV})
+        self.assertEqual(len(trims), 1)
+        self.assertIsNone(self.sim.submit_entry("SYN-E3", "SYN-C", "energy", at, quote, ADV, valuation_quotes=fresh))
+        self.assertEqual(self.sim.snapshot()["refusals"][-1]["reason"], "exits_must_precede_entries")
+        self.sim.process_minute(self.minute(session=1, bid="200", ask="200.1"))
+        self.sim.close_session(self.sessions[1].day, {"SYN-A": D("200")})
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"], {})
+        later = {"SYN-A": Quote(self.at(2, 9, 59), D("200"), D("200"))}
+        self.assertIsNotNone(self.sim.submit_entry("SYN-E4", "SYN-D", "energy", self.at(2),
+                                                   Quote(self.at(2, 9, 59), D("99.9"), D("100")), ADV, valuation_quotes=later))
+
+    def test_receivable_does_not_settle_on_a_pre_open_tick_of_its_pay_session(self):
+        # Sale proceeds are receivables until the explicit pay session has
+        # opened; a clock tick earlier on that date must not settle them.
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("100")})
+        self.sim.request_exit("SYN-A", self.at(1), "guidance_invalidation", ADV)
+        self.sim.process_minute(self.minute(session=1))
+        cash = D(self.sim.snapshot()["settled_cash"])
+        self.sim.advance(self.at(2, 9, 0))
+        self.assertEqual(D(self.sim.snapshot()["settled_cash"]), cash)
+        self.assertEqual(len(self.sim.snapshot()["receivables"]), 1)
+        self.sim.advance(self.sessions[2].opens_at)
+        self.assertEqual(self.sim.snapshot()["receivables"], [])
+        self.assertGreater(D(self.sim.snapshot()["settled_cash"]), cash)
+
+    def test_explicit_cancel_request_keeps_reserved_cash_until_acknowledged(self):
+        # "Release unused reservations exactly once after confirmed terminal
+        # fill/cancellation, never on a cancel request alone." The scheduled
+        # 10:05 path is covered elsewhere; this pins the explicit request path.
+        order = self.entry()
+        reserved = D(self.sim.snapshot()["reserved_cash"])
+        self.assertEqual(reserved, add(order.reserved_notional, order.reserved_fee))
+        requested = self.sim.request_cancel(order.order_id, self.at(0, 10, 1))
+        self.assertEqual(requested.status, "cancel_requested")
+        self.assertEqual(D(self.sim.snapshot()["reserved_cash"]), reserved)
+        self.assertEqual(self.sim.orders[0].reserved_notional, order.reserved_notional)
+        self.sim.acknowledge_cancel(order.order_id, self.at(0, 10, 2))
+        self.assertEqual(self.sim.snapshot()["reserved_cash"], "0")
+
+    def test_position_stop_stays_price_based_after_a_partial_trim(self):
+        # The stop compares the mark against the split-adjusted entry cost per
+        # original share. Trimming 23 of 49 shares must not shrink that basis:
+        # a mark above 90% of the entry price must not stop the 26 remaining
+        # shares, and a mark exactly at 90% still must.
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {"SYN-A": D("200")})
+        trim = self.sim.execute_due_exits(self.at(1), {"SYN-A": ADV})[0]
+        self.assertEqual(trim.quantity, 23)
+        self.sim.process_minute(self.minute(session=1, bid="200", ask="200.1"))
+        self.assertEqual(self.sim.positions[0].quantity, 26)
+        self.assertEqual(self.sim.positions[0].reference_quantity, D("49"))
+        self.sim.close_session(self.sessions[1].day, {"SYN-A": D("95")})
+        self.assertEqual(self.sim.snapshot()["scheduled_exits"], {})
+        self.sim.close_session(self.sessions[2].day, {"SYN-A": D("90.0450")})
+        due = self.sim.snapshot()["scheduled_exits"]["SYN-A"]
+        self.assertEqual((due["reason"], due["quantity"]), ("position_stop", 26))
+
+    def test_missing_prior_close_mark_refuses_entry_for_that_reason_despite_fresh_quotes(self):
+        # A daily valuation gap pauses new entries even when the caller can
+        # supply a fresh quote for the holding; the refusal must name the gap.
+        self.held()
+        self.sim.close_session(self.sessions[0].day, {})
+        fresh = {"SYN-A": Quote(self.at(1, 9, 59), D("100"), D("100"))}
+        quote = Quote(self.at(1, 9, 59), D("99.9"), D("100"))
+        self.assertIsNone(self.sim.submit_entry("SYN-E2", "SYN-B", "energy", self.at(1), quote, ADV, valuation_quotes=fresh))
+        self.assertEqual(self.sim.snapshot()["refusals"][-1]["reason"], "missing_valuation")
+
+    def test_minute_at_or_after_1005_converts_an_open_entry_to_cancel_requested(self):
+        # Belt-and-braces for "cancel the unfilled remainder at 10:05": even
+        # when the scheduled cancellation call is missed, executable market
+        # data at or after 10:05 must mark the open buy as cancel_requested so
+        # that only the documented racing fills remain possible until the
+        # acknowledgment. A quote above the limit isolates the status change
+        # from any fill. (A zero-volume minute carries no capacity and is
+        # skipped before this conversion; the explicit 10:05 path covers it.)
+        order = self.entry()
+        self.assertEqual(self.sim.process_minute(self.minute(minute=4, bid="100.9", ask="101")), ())
+        self.assertEqual(self.sim.orders[0].status, "open")
+        self.assertEqual(self.sim.process_minute(self.minute(minute=5, bid="100.9", ask="101")), ())
+        self.assertEqual(self.sim.orders[0].status, "cancel_requested")
+        self.assertNotEqual(self.sim.snapshot()["reserved_cash"], "0")
+        self.sim.acknowledge_cancel(order.order_id, self.at(0, 10, 6))
+        self.assertEqual(self.sim.orders[0].status, "cancelled")
+        self.assertEqual(self.sim.snapshot()["reserved_cash"], "0")
+
+    def test_skipped_previous_session_close_refuses_entry_for_that_reason_despite_fresh_quotes(self):
+        # If the previous session was never closed, its drawdown and stop
+        # evaluation never ran; a new entry must be refused for exactly that
+        # reason even when fresh quotes would allow NAV sizing.
+        self.held()
+        fresh = {"SYN-A": Quote(self.at(1, 9, 59), D("100"), D("100"))}
+        quote = Quote(self.at(1, 9, 59), D("99.9"), D("100"))
+        self.assertIsNone(self.sim.submit_entry("SYN-E2", "SYN-B", "energy", self.at(1), quote, ADV, valuation_quotes=fresh))
+        self.assertEqual(self.sim.snapshot()["refusals"][-1]["reason"], "missing_previous_session_valuation")
+
+    def test_terminal_payout_without_a_held_position_is_refused_atomically(self):
+        # A pending, unfilled entry is not an entitlement. Crediting terminal
+        # proceeds for shares never held would invent cash; the refusal must
+        # be a SimulationError that leaves the order, cash and journal intact.
+        self.entry()
+        before = self.sim.snapshot()
+        with self.assertRaisesRegex(SimulationError, "without a held entitlement"):
+            self.sim.terminal_settlement("SYN-TERM", "SYN-A", self.at(0, 10, 1), D("1000"), self.sessions[1].day)
+        self.assertEqual(self.sim.snapshot(), before)
+        self.assertEqual(self.sim.orders[0].status, "open")
+
     def test_arithmetic_independent_of_ambient_decimal_context(self):
         with localcontext() as context:
             context.prec = 2

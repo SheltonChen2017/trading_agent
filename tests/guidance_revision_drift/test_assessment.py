@@ -59,6 +59,23 @@ class AssessmentTests(unittest.TestCase):
             self.at, self.at)) if b.session_date == date(2025, 4, 3) else b for b in self.corpus.bars)
         self.assertIsNone(self.assess(bars=bars).eligible_session)
 
+    def test_entry_window_uses_new_york_announcement_date_not_utc_date(self):
+        # 2025-04-02T01:00Z is 21:00 New York on 2025-04-01, so D is 04-01 and
+        # E is 04-04. A UTC date would delay the window to 04-07 and refuse
+        # the 04-04 decision as not yet reached.
+        body = self.corpus.archive.entries[-1][0].to_dict()
+        body.update(disclosure_id="SYN-LATE-RAISE", published_at="2025-04-02T01:00:00Z",
+                    received_at="2025-04-02T01:01:00Z", validated_at="2025-04-02T01:02:00Z")
+        body["periods"][0]["revenue"] = {"lower": "104.04", "upper": "104.04", "kind": "point"}
+        body["periods"][0]["eps"] = {"lower": "1.1025", "upper": "1.1025", "kind": "point"}
+        book = self.corpus.archive.book.ingest(NormalizedDisclosure.from_dict(body))
+        self.assertEqual(book.decisions[-1].disposition, "candidate")
+        result = self.assess(book=book, disclosure_id="SYN-LATE-RAISE")
+        self.assertEqual(result.eligible_session, date(2025, 4, 4))
+        self.assertEqual(result.refusals, ())
+        self.assertIsNone(self.assess(book=book, disclosure_id="SYN-LATE-RAISE",
+                                      as_of=fixture_instant(date(2025, 4, 3), 10)).eligible_session)
+
     def test_before_event_or_entry_no_backdating_and_corpus_hash_stable(self):
         self.assertIsNone(self.assess(as_of=fixture_instant(date(2025, 3, 31), 10)).candidate)
         self.assertIsNone(self.assess(as_of=fixture_instant(date(2025, 4, 3), 10)).eligible_session)

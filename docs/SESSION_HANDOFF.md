@@ -1,7 +1,7 @@
 # Session handoff — current project state
 
-Latest generic-workflow update: **2026-10-06, Guidance Revision Drift
-offline GDR-0A candidate**, recorded in section 0E below. Existing
+Latest generic-workflow update: **2026-10-07, Guidance Revision Drift
+ENG-1..ENG-6 engineering candidates**, recorded in section 0E below. Existing
 strategy-lane implementation state remains in each lane's own record.
 
 Historical baseline preparation: 2026-08-29 by Codex after the owner directed a separate
@@ -13,28 +13,29 @@ deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
 their lane-owned artifacts.
 
-## 0E. Guidance Revision Drift lane, 2026-10-06
+## 0E. Guidance Revision Drift lane, 2026-10-07
 
-Owner requested an isolated lane and implementation. Work only on
+ENG-1..ENG-6 implemented as offline candidates; independent review pending,
+not original GDR-0..6 completion. Codex works only on
 `codex/strategy-guidance-revision-drift` in
 `/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`.
-Base: `ff0bb2098d1a06184d41bf1dcc1bb113aaac2174`; plan import:
-`cc614d33042caac9a463a3df95c8f7ead70358f9`; implementation:
-`9775e284d2ed9b785fb173b2aaf52affb29efb4c`.
-Record: `docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`.
+Base: `ff0bb2098d1a06184d41bf1dcc1bb113aaac2174`;
+code: `dc4743923f9890a6682dade4a5f3d6c23e8805a6`;
+record: `6ca9892a6b3169537f14a9568b05f7e0d2fd39f5`.
+Read `docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`
+sections 7-11 for commits, corrected findings, limits and resume scope.
 
-Implemented proposed contracts, Decimal arithmetic and blocked inspection
-CLI, not a trading strategy or completed GDR-0. Python 3.12.14/macOS: 59
-focused tests passed, 0 failures/skips/warnings; compilation and diff checks
-passed. Full suites/Windows/QC not run. Author-QA P2 GDR-QA-001 corrected;
-independent review pending. No other lane or shared behavior changed.
-Provider/outcome/QC/order access and research looks remain zero.
+191 focused tests passed, zero failures/skips/warnings; Python 3.12.14/macOS.
+Compilation/import/document/diff checks passed. Base/stress fixtures settle
+with 93 paired dates. Full suites/Windows/QC not run. No shared
+behavior changed; no data/QC/broker/paper/live access or empirical looks.
 
-**Local-only: no push, PR or merge; another computer cannot fetch this lane.**
-Next: owner-authorized publication and independent review of the exact
-snapshot, then resolve GDR-0 freeze/authority gates. Details, source hashes,
-exclusions and resume instructions are in the record. No next milestone starts
-automatically.
+One authorized matching-lane push includes this handoff. Prepared pre-push:
+fetchability requires remote confirmation of this commit. No PR/merge.
+Next: Claude reviews the exact
+fetched head, every commit from the base (including initial GDR-0A and both new
+docs commits), and runs the full lane suite. Stop here; no automatic next
+milestone or research authority.
 
 ## 0D. Fundamental Inflection Alpha design, 2026-09-14
 

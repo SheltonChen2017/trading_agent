@@ -16,11 +16,12 @@ from research.guidance_revision_drift.readiness import preflight
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("command", choices=("show-candidate", "preflight", "synthetic-demo", "adapter-manifest"))
-    parser.add_argument("--output-dir", type=Path, help="existing local directory; synthetic-demo only")
+    parser.add_argument("command", choices=("show-candidate", "preflight", "synthetic-demo", "adapter-manifest",
+                                            "review-release", "launch-preflight"))
+    parser.add_argument("--output-dir", type=Path, help="existing local directory; synthetic-demo/review-release only")
     args = parser.parse_args(argv)
-    if args.output_dir is not None and args.command != "synthetic-demo":
-        parser.error("--output-dir is supported only for synthetic-demo")
+    if args.output_dir is not None and args.command not in ("synthetic-demo", "review-release"):
+        parser.error("--output-dir is supported only for synthetic-demo or review-release")
     try:
         candidate = load_candidate()
         verify_source_documents(candidate, Path(__file__).resolve().parents[2])
@@ -34,6 +35,22 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "adapter-manifest":
             from research.guidance_revision_drift.qc_adapter import adapter_manifest
             print(canonical_json(adapter_manifest()))
+            return 0
+        if args.command == "launch-preflight":
+            from research.guidance_revision_drift.release import launch_preflight
+            print(canonical_json(launch_preflight()))
+            return 2
+        if args.command == "review-release":
+            from research.guidance_revision_drift.artifacts import publish_fixture
+            from research.guidance_revision_drift.release import build_release
+            report = build_release()
+            raw = canonical_json(report).encode("utf-8")
+            if args.output_dir is not None:
+                artifact = publish_fixture(args.output_dir, raw)
+                print(canonical_json({"status": report["status"], "artifact": str(artifact),
+                                      "external_authority": False, "qc_attempts": 0}))
+            else:
+                print(raw.decode("utf-8"))
             return 0
         if args.command == "synthetic-demo":
             from research.guidance_revision_drift.artifacts import publish_fixture

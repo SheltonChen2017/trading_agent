@@ -47,6 +47,37 @@ def reasons(comparator):
 
 
 class ComparatorTests(unittest.TestCase):
+    def test_split_refuses_pending_orders_or_fractional_tranches_without_state_change(self):
+        comparator = fixture()
+        comparator.record_entry("SYN-FILL-A", source(), quote=quote(), adv20=ADV)
+        before = comparator.snapshot()
+        with self.assertRaisesRegex(ComparisonError, "reconciled"):
+            comparator.apply_split("SYN-SPLIT", Decimal("2"), at("2024-03-12", 30, 9))
+        self.assertEqual(comparator.snapshot(), before)
+        comparator.process_minute(minute())
+        before = comparator.snapshot()
+        with self.assertRaisesRegex(ComparisonError, "fractional"):
+            comparator.apply_split("SYN-SPLIT", Decimal("0.5"), at("2024-03-12", 30, 9))
+        self.assertEqual(comparator.snapshot(), before)
+
+    def test_action_retries_conflicts_and_terminal_reopening_refuse(self):
+        comparator = fixture()
+        entries(comparator)
+        comparator.apply_split("SYN-SPLIT", Decimal("2"), at("2024-03-12", 30, 9))
+        before = comparator.snapshot()
+        comparator.apply_split("SYN-SPLIT", Decimal("2"), at("2024-03-12", 30, 9))
+        self.assertEqual(comparator.snapshot(), before)
+        with self.assertRaisesRegex(ComparisonError, "conflicting"):
+            comparator.apply_split("SYN-SPLIT", Decimal("3"), at("2024-03-12", 30, 9))
+        self.assertEqual(comparator.snapshot(), before)
+        comparator.terminal_settlement("SYN-END", at("2024-03-13", 30, 9), None, None)
+        before = comparator.snapshot()
+        self.assertIsNone(comparator.mark_nav(Decimal("999999")))
+        with self.assertRaisesRegex(ComparisonError, "terminal"):
+            comparator.record_entry("SYN-NEW", source(day="2024-03-13", order="SYN-NEW-ORDER"),
+                quote=quote(at("2024-03-13")), adv20=ADV)
+        self.assertEqual(comparator.snapshot(), before)
+
     def test_entry_budget_includes_source_fee_and_rounding_cash_is_retained(self):
         comparator = fixture()
         fills = entries(comparator)

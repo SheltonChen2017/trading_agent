@@ -1,0 +1,196 @@
+"""Small Python shim executes the real source callbacks, NOT LEAN bindings.
+
+It intentionally cannot certify engine scheduling, fees, subscriptions,
+buying power, data reader integration, .NET conversions or cloud completion.
+"""
+from datetime import datetime, timezone
+from decimal import Decimal
+import importlib
+import sys
+from types import ModuleType, SimpleNamespace as NS
+import unittest
+from unittest.mock import patch
+
+from data.financial_primitives import exact_decimal_multiply, exact_decimal_sum
+from research.guidance_revision_drift.lean_bridge import BridgeError, fixture_frames, fixture_stream
+
+
+class CashAmount:
+    def __init__(self, amount, currency):
+        self.amount, self.currency = Decimal(amount), currency
+
+
+class OrderFee:
+    def __init__(self, value):
+        self.value = value
+
+
+class OrderEvent:
+    def __init__(self, order, at, fee):
+        self.order_id, self.utc_time, self.order_fee = order.id, at, fee
+        self.fill_quantity, self.fill_price, self.status, self.id = 0, 0, order.status, 0
+
+
+class Portfolio(dict):
+    cash = Decimal(0)
+
+
+class Slice(dict):
+    def contains_key(self, symbol):
+        return symbol in self
+
+
+class QCAlgorithm:
+    live_mode = False
+
+    def __init__(self):
+        self.portfolio = Portfolio()
+        self.native_orders = []
+        self.log = []
+
+    def set_time_zone(self, value):
+        self.zone = value
+
+    def set_start_date(self, *value):
+        self.start = value
+
+    def set_end_date(self, *value):
+        self.end = value
+
+    def set_cash(self, value):
+        self.portfolio.cash = Decimal(value)
+
+    def set_benchmark(self, value):
+        self.benchmark = value
+
+    def add_data(self, data_class, ticker, *args):
+        self.asserted_subscription = (data_class, ticker, args)
+        self.portfolio[ticker] = NS(quantity=Decimal(0))
+        security = NS(symbol=ticker)
+        security.set_fill_model = lambda model: setattr(self, "fill_model", model)
+        security.set_fee_model = lambda model: setattr(self, "fee_model", model)
+        security.set_settlement_model = lambda model: setattr(self, "settlement_model", model)
+        return security
+
+    def _order(self, symbol, quantity, kind, tag):
+        order = NS(id=len(self.native_orders) + 1, status="submitted", quantity=quantity,
+                   symbol=symbol, kind=kind, tag=tag, event_sequence=0)
+        self.native_orders.append(order)
+        # Exercise synchronous submission callback before bridge.bind.
+        self.on_order_event(OrderEvent(order, self.utc_time, OrderFee(CashAmount(0, "USD"))))
+        ticket = NS(order_id=order.id)
+        def cancel(reason):
+            order.event_sequence += 1
+            event = OrderEvent(order, self.utc_time, OrderFee(CashAmount(0, "USD")))
+            event.status, event.id = "canceled", order.event_sequence
+            self.on_order_event(event)
+            return NS(is_success=True)
+        ticket.cancel = cancel
+        return ticket
+
+    def limit_order(self, symbol, quantity, limit, tag):
+        return self._order(symbol, quantity, "limit", tag)
+
+    def market_order(self, symbol, quantity, asynchronous, tag):
+        if asynchronous is not True:
+            raise AssertionError("market order must be asynchronous")
+        return self._order(symbol, quantity, "market", tag)
+
+    def debug(self, value):
+        self.log.append(value)
+
+
+def sdk_shim():
+    module = ModuleType("AlgorithmImports")
+    values = dict(QCAlgorithm=QCAlgorithm, PythonData=Slice, FillModel=type("FillModel", (), {}),
+        OrderEvent=OrderEvent, OrderFee=OrderFee, CashAmount=CashAmount,
+        OrderStatus=NS(SUBMITTED="submitted", FILLED="filled", PARTIALLY_FILLED="partial", CANCELED="canceled"),
+        Resolution=NS(MINUTE="minute"), TimeZones=NS(UTC="UTC"),
+        ConstantFeeModel=lambda fee: ("constant", fee), ImmediateSettlementModel=lambda: "immediate",
+        SubscriptionTransportMedium=NS(LOCAL_FILE="local"),
+        SubscriptionDataSource=lambda path, medium: (path, medium))
+    module.__dict__.update(values)
+    return module
+
+
+class LeanSourceTests(unittest.TestCase):
+    def setUp(self):
+        self.patch_sdk = patch.dict(sys.modules, {"AlgorithmImports": sdk_shim()})
+        self.patch_sdk.start()
+        self.name = "research.guidance_revision_drift.lean.main"
+        sys.modules.pop(self.name, None)
+        self.source = importlib.import_module(self.name)
+
+    def tearDown(self):
+        sys.modules.pop(self.name, None)
+        self.patch_sdk.stop()
+
+    def initialize(self):
+        algo = self.source.GuidanceRevisionDriftAlgorithm()
+        with patch.object(self.source, "_read_regular_file", return_value=fixture_stream()):
+            algo.initialize()
+        return algo
+
+    def test_real_callbacks_submit_native_orders_emit_exact_fees_and_finish(self):
+        algo = self.initialize()
+        for frame in fixture_frames():
+            algo.utc_time = datetime.fromisoformat(frame["at"]).replace(tzinfo=None)
+            algo.on_data(Slice({algo.symbol: {"frame_index": frame["index"]}}))
+            for order in algo.native_orders:
+                method = algo.fill_model.limit_fill if order.kind == "limit" else algo.fill_model.market_fill
+                event = method(None, order)
+                if not event.fill_quantity:
+                    continue
+                order.event_sequence += 1
+                event.id = order.event_sequence
+                algo.portfolio[algo.symbol].quantity += event.fill_quantity
+                algo.portfolio.cash = exact_decimal_sum((algo.portfolio.cash,
+                    -exact_decimal_multiply(Decimal(event.fill_quantity), event.fill_price),
+                    -event.order_fee.value.amount))
+                algo.on_order_event(event)
+                self.assertEqual(method(None, order).fill_quantity, 0)
+        algo.on_end_of_algorithm()
+        self.assertEqual([o.kind for o in algo.native_orders], ["limit", "market"])
+        self.assertEqual(algo.fee_model, ("constant", 0))
+        self.assertEqual(algo.settlement_model, "immediate")
+        self.assertEqual(algo.benchmark, "SYN-GDR")
+        self.assertEqual(algo.portfolio.cash, Decimal(algo.bridge.finish()["strategy"]["settled_cash"]))
+        self.assertIn("no empirical", algo.log[-1])
+        algo.portfolio.cash += Decimal(1)
+        with self.assertRaisesRegex(BridgeError, "cash mismatch"):
+            algo.on_end_of_algorithm()
+
+    def test_live_or_changed_sidecar_cannot_initialize(self):
+        algo = self.source.GuidanceRevisionDriftAlgorithm()
+        algo.live_mode = True
+        with self.assertRaisesRegex(BridgeError, "live"):
+            algo.initialize()
+        algo.live_mode = False
+        with patch.object(self.source, "_read_regular_file", return_value=b"replacement"), self.assertRaises(BridgeError):
+            algo.initialize()
+
+    def test_reader_only_accepts_exact_known_frames_and_local_nonlive_source(self):
+        reader = self.source.GuidanceSyntheticData()
+        config = NS(symbol="SYN-GDR")
+        day = datetime(2025, 1, 2)
+        line = fixture_stream().splitlines()[0].decode()
+        point = reader.reader(config, line, day, False)
+        self.assertEqual(point["frame_index"], 0)
+        self.assertIsNone(reader.reader(config, line, datetime(2025, 1, 3), False))
+        with self.assertRaises(BridgeError):
+            reader.reader(config, line.replace('"50"', '"51"'), day, False)
+        with self.assertRaises(BridgeError):
+            reader.get_source(config, day, True)
+        self.assertEqual(reader.get_source(config, day, False)[1], "local")
+
+    def test_missing_frame_and_native_cash_drift_are_visible_failures(self):
+        algo = self.initialize()
+        algo.utc_time = datetime.fromisoformat(fixture_frames()[1]["at"])
+        with self.assertRaises(BridgeError):
+            algo.on_data(Slice({algo.symbol: {"frame_index": 1}}))
+        with self.assertRaises(BridgeError):
+            algo.on_end_of_algorithm()
+
+
+if __name__ == "__main__":
+    unittest.main()

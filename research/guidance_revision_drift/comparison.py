@@ -2,7 +2,7 @@
 
 Each supplied strategy Fill is an input assertion from a fixture engine, not
 proof of an external execution. This module supplies no market evidence, cloud
-parity, corporate-action adjustment, statistical inference, or authorization. It models
+parity, verified corporate-action economics, statistical inference, or authorization. It models
 cash and whole-share tranches with its limitations explicit in every report.
 """
 from __future__ import annotations
@@ -71,7 +71,8 @@ class MatchedComparator:
                        "orders": {}, "source_receipts": {}, "source_identities": {}, "strategy_remaining": {},
                        "minutes": {}, "daily_used": {}, "receivables": [],
                        "fills": [], "blockers": [], "navs": [], "last_close": None,
-                       "missing_session_closes": []}
+                       "missing_session_closes": [], "actions": {}, "corporate_action_inputs": {},
+                       "terminal": False, "unresolved_terminal": False, "source_terminals": {}}
 
     def _session(self, at):
         _at(at)
@@ -150,6 +151,8 @@ class MatchedComparator:
             if prior != fingerprint:
                 raise ComparisonError("conflicting source fill replay")
             return self._state["tranches"][fill_id]
+        if self._state["terminal"] or source.issuer in self._state["source_terminals"]:
+            raise ComparisonError("terminal identity cannot reopen comparator exposure")
         identity = (source.order_id, source.at, source.side)
         if identity in self._state["source_identities"]:
             raise ComparisonError("source order/minute fill identity was already assigned another fill_id")
@@ -204,6 +207,8 @@ class MatchedComparator:
             if prior != fingerprint:
                 raise ComparisonError("conflicting source fill replay")
             return tuple(o for o in self._state["orders"].values() if o["source_fill_id"] == fill_id)
+        if self._state["terminal"] or source.issuer in self._state["source_terminals"]:
+            raise ComparisonError("terminal identity has no supported source-fill exit schedule")
         identity = (source.order_id, source.at, source.side)
         if identity in self._state["source_identities"]:
             raise ComparisonError("source order/minute fill identity was already assigned another fill_id")
@@ -243,6 +248,8 @@ class MatchedComparator:
             if prior != minute:
                 raise ComparisonError("conflicting comparator minute replay")
             return ()
+        if self._state["terminal"]:
+            raise ComparisonError("terminal comparator security cannot trade")
         session = self._session(minute.at)
         if not session.opens_at < minute.at <= session.closes_at or minute.at.second or minute.at.microsecond:
             raise ComparisonError("completed regular-session minute boundary required")
@@ -313,6 +320,118 @@ class MatchedComparator:
         """Only advance time and settle recorded receivables; never deposit funds."""
         self._tick(at)
 
+    def _action(self, action_id, fingerprint, at):
+        _id(action_id, "action_id")
+        prior = self._state["actions"].get(action_id)
+        if prior is not None:
+            if prior != fingerprint:
+                raise ComparisonError("conflicting corporate-action replay")
+            return False
+        session = self._session(at)
+        if at != session.opens_at:
+            raise ComparisonError("corporate actions require explicit session open")
+        self._tick(at)
+        self._state["actions"][action_id] = fingerprint
+        return True
+
+    def _pay_session(self, pay_session, at):
+        if (type(pay_session) is not date or pay_session not in self._sessions
+                or pay_session < self._session(at).day):
+            raise ComparisonError("known nonpast payment session required")
+
+    @_atomic
+    def apply_source_split(self, action_id: str, issuer: str, ratio: Decimal, at: datetime):
+        """Adjust remaining strategy-share denominator, never historical fills."""
+        _id(issuer, "issuer"), _money(ratio, "source split ratio")
+        if not self._action(action_id, ("source_split", issuer, ratio, at), at):
+            return
+        if issuer in self._state["source_terminals"]:
+            raise ComparisonError("source identity is terminal")
+        held = self._state["strategy_remaining"].get(issuer, 0)
+        if not held:
+            raise ComparisonError("missing matched source split entitlement")
+        affected = {key for key, tranche in self._state["tranches"].items()
+                    if tranche["strategy_issuer"] == issuer}
+        if any(o["status"] == "open" and o["tranche_id"] in affected for o in self._state["orders"].values()):
+            raise ComparisonError("source split requires reconciled comparator orders")
+        shares = mul(Decimal(held), ratio)
+        whole = _floor_ratio(shares, Decimal("1"))
+        if shares != Decimal(whole):
+            raise ComparisonError("fractional source split is unsupported")
+        _integer(whole, "post-split source quantity")
+        self._state["strategy_remaining"][issuer] = whole
+
+    @_atomic
+    def record_source_terminal(self, action_id: str, issuer: str, at: datetime, resolved: bool):
+        """Retain unmatched SPY exposure: terminal cash is not an exit Fill.
+
+        No comparator liquidation timing is invented. A later separately
+        reviewed terminal-schedule contract is required for interpretation.
+        """
+        _id(issuer, "issuer")
+        if type(resolved) is not bool:
+            raise ComparisonError("exact terminal resolution flag required")
+        if not self._action(action_id, ("source_terminal", issuer, at, resolved), at):
+            return
+        self._state["source_terminals"][issuer] = action_id
+        self._block(action_id, "source_terminal_comparator_schedule_unsupported", at)
+
+    @_atomic
+    def apply_split(self, action_id: str, ratio: Decimal, at: datetime):
+        _money(ratio, "comparator split ratio")
+        if not self._action(action_id, ("split", ratio, at), at):
+            return
+        if self._state["terminal"] or any(o["status"] == "open" for o in self._state["orders"].values()):
+            raise ComparisonError("split requires nonterminal comparator and reconciled orders")
+        if not any(t["quantity"] for t in self._state["tranches"].values()):
+            raise ComparisonError("split requires held comparator entitlement")
+        for tranche in self._state["tranches"].values():
+            shares = mul(Decimal(tranche["quantity"]), ratio)
+            whole = _floor_ratio(shares, Decimal("1"))
+            if shares != Decimal(whole):
+                raise ComparisonError("fractional comparator tranche/cash-in-lieu is unsupported")
+            _integer(whole, "post-split comparator quantity", zero=not tranche["quantity"])
+            tranche["quantity"] = whole
+
+    @_atomic
+    def credit_dividend(self, action_id: str, per_share: Decimal, at: datetime, pay_session: date):
+        _money(per_share, "comparator dividend", zero=True)
+        if not self._action(action_id, ("dividend", per_share, at, pay_session), at):
+            return
+        self._pay_session(pay_session, at)
+        quantity = sum(t["quantity"] for t in self._state["tranches"].values())
+        if self._state["terminal"] or not quantity:
+            raise ComparisonError("dividend requires held nonterminal comparator entitlement")
+        self._state["receivables"].append({"action_id": action_id, "kind": "dividend",
+            "amount": mul(per_share, Decimal(quantity)), "settlement_session": pay_session})
+
+    @_atomic
+    def terminal_settlement(self, action_id: str, at: datetime, proceeds: Decimal | None,
+                            pay_session: date | None):
+        if proceeds is not None:
+            _money(proceeds, "comparator terminal proceeds", zero=True)
+        if (proceeds is None) != (pay_session is None):
+            raise ComparisonError("terminal amount and payment session must be supplied together")
+        if not self._action(action_id, ("terminal", at, proceeds, pay_session), at):
+            return
+        if self._state["terminal"] or not any(t["quantity"] for t in self._state["tranches"].values()):
+            raise ComparisonError("terminal action requires held nonterminal comparator entitlement")
+        if proceeds is not None:
+            self._pay_session(pay_session, at)
+        self._state["terminal"] = True
+        for order in self._state["orders"].values():
+            if order["status"] == "open":
+                order["status"], order["reserved"] = "cancelled", ZERO
+        if proceeds is None:
+            self._state["unresolved_terminal"] = True
+            self._block(action_id, "unresolved_comparator_terminal_economics", at)
+        else:
+            for tranche in self._state["tranches"].values():
+                tranche["quantity"] = 0
+            self._state["receivables"].append({"action_id": action_id, "kind": "terminal",
+                "amount": proceeds, "settlement_session": pay_session})
+        self._block(action_id, "comparator_terminal_ends_matched_schedule", at)
+
     def mark_nav(self, mark: Decimal | None) -> Decimal | None:
         """Read-only whole-sleeve NAV including idle cash and sale receivables.
 
@@ -321,6 +440,8 @@ class MatchedComparator:
         """
         if mark is not None:
             _money(mark, "comparator raw mark")
+        if self._state["unresolved_terminal"]:
+            return None
         quantity = sum(t["quantity"] for t in self._state["tranches"].values())
         if quantity and mark is None:
             return None
@@ -371,14 +492,21 @@ class MatchedComparator:
             "clock": state["clock"], "tranches": list(state["tranches"].values()),
             "orders": list(state["orders"].values()), "fills": [asdict(f) for f in state["fills"]],
             "receivables": state["receivables"], "permanent_parity_blockers": state["blockers"],
+            "corporate_actions": list(state["actions"].items()),
+            "corporate_action_inputs": state["corporate_action_inputs"],
+            "strategy_remaining": state["strategy_remaining"],
+            "terminal": state["terminal"], "unresolved_terminal": state["unresolved_terminal"],
+            "source_terminals": state["source_terminals"],
             "navs": state["navs"], "missing_session_closes": state["missing_session_closes"],
             "source_fill_count": len(state["source_receipts"]),
             "synthetic_schedule_parity_blocked": bool(state["blockers"] or pending),
             "study_completion_blocked": bool(pending or state["receivables"] or any(t["quantity"] for t in state["tranches"].values())
                                               or any(state["strategy_remaining"].values())
+                                              or state["unresolved_terminal"] or state["source_terminals"]
                                               or state["missing_session_closes"]
                                               or any(row["nav"] is None for row in state["navs"])),
-            "limitations": ["No corporate-action adjustments", "No statistical inference",
+            "limitations": ["Only supplied whole-share splits and explicit cash actions; no invented fractional/noncash economics",
+                "Source terminal payouts have no supported comparator exit schedule", "No statistical inference",
                 "One comparator entry order per source fill and exit order per affected tranche",
                 "Only explicitly supplied synthetic sessions and settlement dates", "Whole-share rounding cash is retained"],
         }))

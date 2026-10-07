@@ -100,5 +100,6 @@ def run_fixture_report() -> dict:
         "ledger": ledger.to_dict(), "adapter": adapter_manifest(), "runs": reports,
         "limitations": ["invented_data_and_schedule", "no_source_rights_or_PIT_audit", "no_LEAN_or_QC_run",
                         "no_independent_review", "no_confirmatory_allocation_or_power_assessment",
-                        "comparator_corporate_actions_not_supported", "no_paper_or_live_authority"],
+                        "only_explicit_whole_share_and_cash_actions_supported",
+                        "source_terminal_comparator_schedule_unsupported", "no_paper_or_live_authority"],
     }

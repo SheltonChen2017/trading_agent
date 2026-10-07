@@ -23,7 +23,9 @@ def source_manifest() -> dict[str, str]:
     """
     package = Path(__file__).resolve().parent
     root = package.parents[1]
-    paths = sorted(package.glob("*.py")) + [root / "data/hashing.py", root / "data/financial_primitives.py"]
+    paths = sorted(package.rglob("*.py")) + [
+        package / "specs/gdr0a.draft.json", root / "research/__init__.py", root / "data/__init__.py",
+        root / "data/hashing.py", root / "data/financial_primitives.py"]
     return {p.relative_to(root).as_posix(): hash_bytes(_read_regular_file(p, MAX_SOURCE_DOCUMENT_BYTES))
             for p in paths}
 

@@ -1,15 +1,17 @@
 # Guidance Revision Drift — offline engineering candidate
 
-GDR-0A plus ENG-1 through ENG-6 are implemented for independent review. This
+GDR-0A plus ENG-1 through ENG-16 are implemented as offline review candidates. This
 is **invented-data software**, not a completed research study or deployable
 QuantConnect strategy. Original GDR-0 review/freeze and GDR-1..GDR-6 research,
 data, cloud and operating gates remain closed. The original plan/PDF and
 proposed parameter hash are unchanged.
 
-The package imports only the Python standard library, its own modules and the
+The offline core imports only the Python standard library, its own modules and the
 unchanged product-neutral `data.hashing` / `data.financial_primitives` helpers.
-It has no provider, outcome-fetch, SDK, broker, operator-database, scheduler or
-live-assistant integration. No other lane's budget or permissions are inherited.
+It has no provider, outcome-fetch, broker, operator-database, scheduler or
+live-assistant integration. The isolated `lean/main.py` source imports the
+LEAN SDK; the offline core never imports it. No SDK/native/cloud run has been
+verified. No other lane's budget or permissions are inherited.
 
 ## Implemented surfaces
 
@@ -21,6 +23,13 @@ live-assistant integration. No other lane's budget or permissions are inherited.
 | ENG-4 | `simulation` | Incremental orders, quote-side fills, partial-fill capacity, fees, cash reservations, cancellation acknowledgment/races, settlement, stops, time exits, trims and bounded corporate actions |
 | ENG-5 | `qc_adapter` | Strict paired raw quote/trade snapshots mapped into the local order engine; no LEAN deployment or SDK bridge |
 | ENG-6 | `controls`, `artifacts`, `comparison`, `reporting`, `fixtures`, `scenario` | Separate base/stress lineage, local content-addressed reports, matched synthetic SYN-SPY tranches, complete paired NAV diagnostics and built-in end-to-end run |
+| ENG-7 | `specification` | Executable proposed semantics, unchanged pins and unresolved owner/rights matrix |
+| ENG-8/9 | `vendor_payloads`, `lineage` | Public-schema-shaped synthetic payloads, explicit missing semantics, exact units, raw provenance, receipt-order/as-of correction/withdrawal replay |
+| ENG-10/11 | `market_inputs`, `corporate_actions`, `comparison` | Dated permanent IDs, calendar-bound raw quote/trade inputs, freshness, atomic paired whole-share/cash accounting and explicit unsupported terminal parity |
+| ENG-12/13 | `persistence`, `recovery` | Local no-overwrite command journal, durable publication/checkpoints, fresh-engine replay and pending-order/cancel/reservation reconciliation |
+| ENG-14 | `lean_bridge`, `lean/main.py` | Actual order-based algorithm source and strict native receipt protocol; local Python callback tests, no installed SDK or cloud-parity claim |
+| ENG-15 | `integration` | Stitched invented provider-to-market-to-paired-order journal/restart scenarios, stress and refusal checks |
+| ENG-16 | `release` | Actual source/candidate/contract/calendar/engine fingerprints, reproducible report verification, always-blocked launch preflight |
 
 Positive entries require a predecessor captured before publication. Later
 comparable cuts reduce risk when known even if the original raise was received
@@ -54,6 +63,8 @@ python -B -m research.guidance_revision_drift show-candidate
 python -B -m research.guidance_revision_drift preflight
 python -B -m research.guidance_revision_drift adapter-manifest
 python -B -m research.guidance_revision_drift synthetic-demo
+python -B -m research.guidance_revision_drift review-release
+python -B -m research.guidance_revision_drift launch-preflight
 python -B -m research.guidance_revision_drift synthetic-demo --output-dir /absolute/existing/owned-directory
 ```
 
@@ -62,8 +73,9 @@ schedule. It accepts no external input file. Base and stress each simulate an
 entry, 20-session-interval exit, settlement and the entire paired daily NAV
 calendar. The schedule is a test fixture, **not an audited NYSE calendar**.
 
-`show-candidate`, `adapter-manifest` and a successful demo exit 0, which means
-only that the local command completed. `preflight` deliberately exits 2 with
+`show-candidate`, `adapter-manifest`, a successful demo or review release exit 0,
+which means only that the local command completed. `preflight` and
+`launch-preflight` deliberately exit 2 with
 `status=blocked`. Invalid/missing candidate or source files exit 1, as does a
 failed demo/export. Unsupported commands/flags exit 2. No command downloads,
 captures data, launches QC or accesses an account. All commands verify the
@@ -97,13 +109,32 @@ global research-look registry. It always records zero empirical looks/QC
 attempts. New source/code hashes mean a new fixture epoch, not permission to
 observe outcomes. There is no caller-supplied approval/PIT override.
 
-Unsupported: real vendor payload normalization/PIT audit; source and QC
+The vendor-shaped decoder follows the public [Massive guidance schema](https://massive.com/docs/rest/partners/benzinga/corporate-guidance),
+but accepts only invented SYN identities and 2024–2025 observations. Public
+fields do not establish units, publication timezone, immutable provider
+versions/receipts or correction semantics: explicit synthetic context supplies
+them, with no evidence claim. Previous-value fields are never captured priors.
+Exact redelivery retains its first clocks; conflicting identity remaps block
+replay rather than silently changing the security.
+
+`LocalJournal` is separate from the small report publisher: it fsyncs content
+and directory entries, publishes immutable numbered hash-chain records without
+overwrite, and detects stale writers. Ambiguous post-publication errors require
+reload. Recovery replays allowed public commands from pinned genesis; it does
+not deserialize private snapshots. Caller-retained hashes detect truncation
+relative to those anchors, not malicious rollback without an external trust
+root. This is a bounded research journal, not a broker or operator database.
+
+Unsupported: real vendor ingestion/PIT audit; source and QC
 processing rights; audited historical identifier/calendar/terminal coverage;
-fractional split cash-in-lieu and noncash mergers; comparator corporate
-actions; production restart/reconciliation; LEAN/QC compilation or completion;
+fractional split cash-in-lieu and noncash mergers; source-terminal comparator
+exit-schedule parity; production restart/reconciliation; LEAN/QC runtime compilation or completion;
 statistical allocation/power/confirmation; paper/live operation. Supported
-synthetic corporate actions are whole-share splits, explicit dividend
+synthetic corporate actions include whole-share splits, explicit dividend
 receivables and supplied terminal cash or a visible unresolved terminal state.
+Source terminal events never invent a matched SPY sale: the comparator retains
+its position and permanent named parity blocker. Native algorithm limitations,
+later authorized packaging and the three-attempt/Mia rule are in `lean/README.md`.
 Adapter fields were checked against official [US-equity data documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/handling-data)
 and [fill-model concepts](https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/trade-fills/key-concepts)
 on 2026-10-07; this is documentation alignment, not cloud parity.

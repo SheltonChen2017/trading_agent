@@ -23,7 +23,7 @@ NEUTRAL_MODULES = {"data.hashing", "data.financial_primitives"}
 
 class GuidanceBoundaryTests(unittest.TestCase):
     def test_transitive_local_dependencies_are_only_lane_and_neutral_primitives(self):
-        pending = list(PACKAGE.glob("*.py"))
+        pending = list(PACKAGE.rglob("*.py"))
         pending.extend([ROOT / "research/__init__.py", ROOT / "data/__init__.py"])
         visited = set()
         while pending:
@@ -41,6 +41,8 @@ class GuidanceBoundaryTests(unittest.TestCase):
                 else:
                     continue
                 for name in names:
+                    if name == "AlgorithmImports" and path == PACKAGE / "lean/main.py":
+                        continue  # isolated unexecuted SDK source, no core edge
                     if name == "__future__" or name.split(".")[0] in sys.stdlib_module_names:
                         continue
                     self.assertTrue(
@@ -48,6 +50,7 @@ class GuidanceBoundaryTests(unittest.TestCase):
                         f"unapproved local/third-party dependency from {path.name}: {name}",
                     )
                     dependency = ROOT.joinpath(*name.split(".")).with_suffix(".py")
+                    self.assertNotEqual(dependency, PACKAGE / "lean/main.py", "offline core must not load SDK")
                     self.assertTrue(dependency.is_file(), name)
                     pending.append(dependency)
             for node in ast.walk(tree):
@@ -79,7 +82,18 @@ import research.guidance_revision_drift.scenario
 import research.guidance_revision_drift.simulation
 import research.guidance_revision_drift.timing
 import research.guidance_revision_drift.universe
+import research.guidance_revision_drift.specification
+import research.guidance_revision_drift.vendor_payloads
+import research.guidance_revision_drift.lineage
+import research.guidance_revision_drift.market_inputs
+import research.guidance_revision_drift.corporate_actions
+import research.guidance_revision_drift.persistence
+import research.guidance_revision_drift.recovery
+import research.guidance_revision_drift.lean_bridge
+import research.guidance_revision_drift.integration
+import research.guidance_revision_drift.release
 blocked = {'assistant', 'risk', 'execution', 'ml', 'config', 'requests', 'httpx', 'alpaca', 'quantconnect'}
+blocked.update({'AlgorithmImports', 'clr', 'QuantConnect'})
 print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in blocked)))
 """
         completed = subprocess.run(

@@ -3,8 +3,9 @@
 Status: **SECTION 147 RECORDS ONE COMPLETED BOUNDED QC-NATIVE RESEARCH
 ACCESS DIAGNOSTIC: THREE HISTORY CALLS, SOURCE TRADE/QUOTE COUNTS 12/116
 AND CLOCK COUNT 390; ZERO BACKTEST LAUNCHES OR ECONOMIC-VALUE EXPORT.
-CONNECTED PROFILE RESOLVES SEC CONTACT. FRESH FIRST-64 V4 CAPTURE IS
-VALIDATED/PREPARING COMMITTED EXECUTION, NOT YET DISPATCHED. SUPPLIED
+CONNECTED PROFILE RESOLVES SEC CONTACT. FRESH FIRST-64 V4 CAPTURE COMPLETED
+64 REQUEST-BOUND BODIES/504,050 BYTES AND INDEPENDENT JOURNAL REPLAY;
+OWNERSHIP-XML PROJECTION IS THE NEXT OFFLINE CHECK. SUPPLIED
 SHARADAR AUDIT AND ONE PURCHASED EARNINGS ACCESS REMAIN AS RECORDED.
 CONTINUOUS BUILD/CLAUDE-WAIT WAIVER REMAINS; NO SOURCE/PIT/RIGHTS/LOOK OR
 READINESS PROMOTION IS INFERRED. EARLIER 83,657-ROW ALL-QUARANTINE RESULT,
@@ -242,7 +243,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex continuous owner-waived build | Published start `1bfe1b1f18a56fb77ce80ade723e5e482ea2cb80`; implementation/decisions `f276f2f684c6378347cfae5636612b7fd078a0b0`; this separate exact-hash handoff | Study-scale original-source streaming, causal first-open population, registered analysis and native QC candidates | No new incoming Claude commit; prior counter-review remains accepted. Owner no-wait direction and delegated choices exercised through sixteen recorded decisions, including explicit seasoned-stock primary scope, without a review pause or guessed factual approval. Existing contracts/frozen files remain. | Main final focused integration **1,234 passed in 82.53s**; eighteen in-memory compilations and hash bindings pass; 72 final document/exact-package controls passed before implementation commit. Genuine fixture scaling: 390 source dates separately from 321 issuers/dates x 6,000 controls; no actual cloud or research observation. | Corrected draft P2/P3 findings retain genuine red/green vs inspected/reversal provenance. Four topical P2 OPEN, prior closures/classifications/denominators unchanged. Missing genuine source/PIT/rights/outcome/QC facts still block actual readiness; no fixture promotion. | One combined matching-lane push after separate handoff and final remote/status checks. No Claude wait or monitor rearm. Bind actual missing input evidence before factual activation; no fabricated source/licensing/entitlement/registered look, no new acquisition, outcome, QC or trading action. |
 | 2026-10-07 | Codex owner-waived provider integration | Published start `59ef662062e91e09d9449aeb3f23cb5812ce7142`; implementation `195012fd471f028f5b2a196e4b97419197bafc68`; this separate exact-hash handoff | Capability journal, supplied current-reference triage and private rights evidence | QC authentication HTTP 200; Massive public status HTTP 200 is not Benzinga entitlement. Supplied Sharadar ZIP/hash/header verified without interpreting rows or opening actions/fundamentals. No incoming review or Claude wait. | Final focused **510 passed in 2.61s**, eight memory compilations, frozen historical equality and independent eight-leaf private journal verification. Two fixed metadata requests, 424 response bytes; zero Sharadar/SEC requests, looks, uploads, compiles, jobs or backtests. | `IBMETA-R01..R05` corrected with genuine red/green; shared QC documented-envelope issue recorded without shared edits. Four topical P2 and prior dispositions/classifications/denominators unchanged. Credentials do not establish readiness. | One combined matching-lane push after separate exact-hash handoff. No review wait or monitor rearm. Bind real original-parent/PIT/listing/reference/rights/product/vintage evidence before production activation; no ordinary owner choice is deferred. |
 | 2026-10-07 | Codex owner-confirmed acquisition/reuse | Published start `f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`; exact implementation and separate handoff follow | Actual retained Sharadar audit and one-shot purchased Earnings access; bounded QC probe prepared | User confirms QC/identity/Sharadar work and purchased Earnings; Safari authentication verified. All three retained archives and all 3,989,156 rows independently match manifest hashes/counts. One fixed Earnings request HTTP 200, 389 bytes, one row, privately replayed. No financial arithmetic/price-return join/look. | Focused and final integrated checks in 145.6; genuine red/green fixes and peer audit. Native QC code prepared but not run; new owned coding workspace/template auto-build only. SEC requests zero; no broad suite or new acquisition of completed/ambiguous parents. | Draft Sharadar, Earnings custody/credential/count, and QC cell/frontier defects corrected. Four topical P2 and shared issue remain OPEN; all prior closures/classifications preserved. Public Earnings history does not cover pre-2010 segment or prove schedule versions. | Complete authorized bounded acquisition/reuse checkpoint with one matching-lane push. Manual Mac unlock permits exact native QC probe; genuine SEC contact and separately committed fresh capture permit original-parent acquisition. No purchase, review wait, monitor rearm, raw QC export or readiness fabrication. |
-| 2026-10-07 | Codex continuous owner-waived source/native build | Published start `4c204aa60951896a8ba02570321d19227a8aebe7`; incoming range empty; exact candidate implementation and separate observed handoff follow | One hosted native-count diagnostic and fresh first-64 SEC candidate | Connected profile contact used privately; exact existing QC cell executed once with 12/116/390 series counts, three History completions, no economic values exported. Fresh SEC code remains pre-dispatch until committed genuine partition replay. No Claude pause or inferred routine approval. | Focused/compile/document/hash checks and genuine draft red/green in 147.3; actual native count-copy and screenshot hashes retained. No full suite or strategy backtest. | Contact-screen/custody/seal defects corrected before dispatch; four topical P2 and shared issue remain OPEN. Both historical access classifications unchanged. Observed native access is not entitlement/PIT/class/population readiness. | Continue clean committed isolated selection then one capped fresh capture; stop first refusal/ambiguity, never retry/resume v3. Independent offline journal replay before any integration/count promotion. One combined matching-lane push after separate exact-hash handoff; no monitor rearm. |
+| 2026-10-07 | Codex continuous owner-waived source/native build | Published start `4c204aa60951896a8ba02570321d19227a8aebe7`; incoming range empty; first-prefix candidate `e900c7a90d326cd81df952684b0c583ad8ffb639`; exact projection implementation and separate observed handoff follow | One hosted native-count diagnostic, actual fresh first-64 SEC capture and read-only projection candidate | Connected profile contact used privately; exact existing QC cell executed once with 12/116/390 counts, three History completions, no economic values exported. Committed isolated partition replay then 64 HTTP-200 bodies/504,050 bytes, independently replayed; no old-v3 write/retry or Claude pause. | Main focused 852 passed; final narrow 72 passed; four memory compilations, historical equality. Actual 59-module selector/four historical modules/16 source-view reads; 345.127s fresh dispatch span; journal replay 0.26s. Further projection evidence in 147.5 onward. No full suite or strategy backtest. | Contact-screen/custody/seal defects corrected before dispatch; four topical P2 and shared issue remain OPEN. Both historical access classifications unchanged. Access/header capture is not entitlement/PIT/class/full-population readiness. | Finish bounded offline XML projection before any integration/count promotion. Preserve all actual source rows/quarantines and final factual blocker; one combined matching-lane push after separate exact-hash handoff. No monitor rearm or duplicate purchase. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -20336,3 +20337,161 @@ limitation, not a source difference. Separate network-denied read-only Git
 blob equality passed for all four historical modules. Diff checks pass.
 The remote remains exact starting HEAD, with only the four named new files
 and this record as expected dirt before candidate commit.
+
+### 147.4 Actual isolated selection and new one-shot SEC capture
+
+After 72 final active-document/record/exact-package checks passed in 1.34s,
+commit the four exact candidate files and this preregistration separately as
+`e900c7a90d326cd81df952684b0c583ad8ffb639`. Verify the designated root,
+branch, HEAD and clean tree. Execute only the committed new CLI with capture
+ID `ib-sec-v4-first64-20261007-once`, maximum 64 and that exact expected HEAD.
+No intervening edits, tests, source additions or commits during the actual
+selection or capture. This is a real run from an already-existing commit,
+not a relabeled later hash or receipt-only historical invocation.
+
+The isolated retained-root selector actually returned a genuine prefix after
+reconstructing the frozen 99,394-parent partition. It executed 59 inventoried
+modules, including the four exact historical modules together with recorded
+later dependencies, not a complete historical environment. Historical source
+view observed four ordered cycles/16 reads, trace SHA-256
+`360fb5f7a574747b7c724b87df1bef6b64f4748db46b62ac2cdc50df15701523`.
+Current-source inventory digest is
+`79253cb7cab395bb6c03e528096c1961ac159d87c48131afef06224ec0ab35fd`.
+Its source union/partial/diagnostic/v4 plan/partition/unattempted anchors
+reproduce the accepted values; original class counts remain
+9,539/1/8,139/1,846/1/79,868. Source files and repository state rechecked
+unchanged before and after. Only then did the CLI reach getpass. Supply the
+connected profile email privately once; no literal contact appeared in output.
+
+Observed capture facts, not forecasts or inferred transferred bytes:
+
+| Item | Actual observation |
+|---|---|
+| SEC dispatches / retained request-bound bodies | 64 / 64, all HTTP 200 |
+| reserved requests / reserved not attempted | 64 / 0 |
+| retained raw bytes | 504,050 |
+| first / last selected global index | 11,506 / 11,574 (not a contiguous range; exact 64-row prefix hash below) |
+| journal start / final finish UTC | 2026-10-07T17:02:41.255228+00:00 / 2026-10-07T17:08:26.380789+00:00 |
+| measured dispatch span | 345.126979042 seconds, first start to final result, not total selector wall time |
+| retries / old-v3 writes / looks / backtests | 0 / 0 / 0 / 0 |
+| selection SHA-256 | `c3c4a4dd6899e2ef681937adf4a61c76f5f69a5f866e05fe515d81bd50fa12c8` |
+| exact selected prefix SHA-256 | `48e5c2da08418e66d8b33c554a33048ac1b43bc66f3246304bbbc5beb1a22e70` |
+| completed report SHA-256 | `f93c844f2866fddedb96fb4277d74089be7bfa46abbbc2421945bfc648750ff6` |
+
+Private mode-700/600 journal lives only in the new ignored
+`artifacts/insider_buying/sec_recovery_v4/runs/ib-sec-v4-first64-20261007-once`
+namespace with permanent separate accession claims. No old stopped-root or
+completed/ambiguous request was dispatched. Original 79,868 is the historical
+partition baseline, not a claim these new 64 remain unattempted afterward.
+Do not sum 19,526+64 as an independently accepted combined union; no combined
+union or corpus promotion was performed. All literal source authenticity,
+official timing/PIT, rights/canonical/corpus/QC/backtest/execution claims remain
+false. Bounded named acquisition scope is true for this authorized new run,
+not retroactive approval of either historical access incident.
+
+Independent exact-report-anchored journal replay passed in 0.26s in a fresh
+interpreter, with OS network/all-write/fork/exec denial and only the initial
+interpreter exec allowed; all hashes, claims, ordered attempts, spacing,
+inventories and request-bound bodies/counts reproduced. An initial launcher
+put `/usr/bin/env` inside exec denial and was refused before Python/root reads;
+move environment clearing before sandbox-exec, preserving every deny rule.
+No acquisition was retried or root changed by this launcher correction.
+
+### 147.5 Next bounded offline projection preregistration
+
+Continue without Claude waiting or another routine approval: build a new
+read-only v4 projection receipt, not an old loader relabeled compatible.
+Bind the actual report hash above and existing capture commit, independently
+replay all journal custody at start/end, then sequentially reparse only the
+retained parent bytes using unchanged `SecCompleteSubmissionTarget` and
+`project_sec_complete_submission`. Bind every global index/request/body and
+header/XML child hash. No invented `index.json`, raw child persistence,
+financial-value output/score/return join, acquisition or union promotion.
+Unsupported grammar gets an explicit per-parent quarantine, not fake zero
+children or admission; integrity mismatch refuses the whole receipt. Preserve
+all 64-parent accounting. Commit validated exact new candidate before its
+actual isolated read-only execution. Record actual projection counts and
+remaining factual readiness blocker afterward; no result is asserted here.
+
+### 147.6 Factual study-scale coverage boundary, not another approval request
+
+The supplied FUNDAMENTALS archive is already Sharadar SF1-alias data, with
+all AR/MR dimensions in 145.2. Do not ask for another SF1 subscription or
+duplicate Earnings purchase. Its manifest explicitly describes ART date
+fields without intraday availability, TICKERS as a capture-time current
+active/delisted snapshot (not a PIT master), and ACTIONS as current full-
+history discovery metadata (not terminal payoff/admission evidence).
+As-reported dimensions excluding restatements and indexed to Form-10 filing
+dates are useful candidates, not proof of pre-open availability or every
+original revision. [Sharadar specification](https://sharadar.com/docs/fundamentals).
+
+The original full-study inputs are still missing at their factual boundaries:
+actual 2006Q1 retains all 83,657 filings in quarantine and lacks 71,679
+relevant original-parent corroborations; this new later two-quarter prefix
+cannot repair that quarter or complete the 82-quarter population. Seven D23
+nonexact quarters remain. A native one-CIK/day access diagnostic is not full
+historical share-class/issuer/SID/first-listing/PIT/cohort/calendar/seasoning/
+liquidity coverage or corporate-action/terminal parity. Purchased Earnings
+starts 2010-04-30 and `last_updated` is a last-record update, not original
+schedule knowledge; it does not supply 2006–2010-04-29 or original as-known
+event versions. [Earnings specification](https://massive.com/docs/rest/partners/benzinga/earnings).
+
+Missing for activation: admitted source/availability and boundary-lot
+evidence across the frozen population; exact historical identity/cohort and
+pre-entry reference/features; as-known full-window earnings/calendar;
+applicable processing/representation facts and permanently bound protocol/
+look/data roots; then actual order-based QC compilation/completion and
+exact-clock factor/control/cost/adjustment/delisting parity. The current
+Sharadar capture has no SEP price archive; native access is deliberately
+not replaced by unauthorized local raw export. Account credentials, owner
+preauthorization and public product coverage descriptions do not manufacture
+those data facts. No ordinary engineering/policy choice is being deferred
+for permission and no Claude wait is being inserted. Do not silently shrink
+the frozen study, label current-reference dates as PIT, or admit quarantined
+rows to declare readiness. Finish the actual bounded projection/custody work
+above; any full positive backtesting-readiness claim remains blocked by
+these missing substantive inputs, not another routine approval.
+
+### 147.7 Projection candidate validation before actual execution
+
+New source-only CLI captures current source bytes, byte-compiles the pinned
+accepted replay base, installs its audit hook and captured-source finder,
+then reimports the exact new worker without lane `.pyc` fallback. It labels
+current bytes matching the four historical digests as current images, not
+new Git acquisition or full historical-environment reconstruction. Receipt
+consumer HEAD is an external declaration, explicitly not independently Git
+verified by the denied worker; main verifies root/branch/HEAD/clean state and
+committed byte identities before/after execution. OS denial is enforced by
+the actual external launcher, not falsely attested by the receipt itself.
+The launcher first reads and hashes the exact new script image before
+compiling it, binding the initial entry image as well as captured imports.
+
+Draft exact-token issue corrected: a genuine invented factory receipt accepted
+an equality-compatible substituted token. Genuine regression red one failed/
+four passed/17 deselected, then strict identity comparison green 22 passed;
+final 24 cases include source-only/no-pyc and audit socket/write/fork/import
+refusals using an invented child callback, never actual roots. Child inherits
+the tests' OS network denial; those tests prove the audit controls, not an
+independent OS all-write/fork execution. Inventory SHA recipe was corrected
+to the accepted base canonical recipe after inspection (not misreported as
+genuine red/green). Legacy fixture/ordinal/newline expectation repairs are
+test-fixture corrections, not production findings. No actual result is
+asserted by invented tests. All prior issue closures/P0–P3 ledger remain.
+
+Engineer integration **211 passed in 7.32s** (24 new plus 187 selector/capture),
+independent peer **24 passed in 3.79s**, exact hashes unchanged; no remaining
+material audit finding. Main integrated focused selection **876 passed in
+23.31s**, zero failures/skips/warnings, using the same OS network-denied,
+minimal-environment, Python 3.12.14 -B, plugin/cache-disabled harness as 147.3.
+Includes all three new components, accepted replay/source view, transport/
+header, QC diagnostic, document/record/import/hygiene and exact package guard;
+not a complete lane/repository suite. Two new files compiled in memory under
+network/all-write denial; diff checks pass. Final candidate hashes:
+
+| File | SHA-256 |
+|---|---|
+| research/insider_buying_sec_recovery_v4_projection.py | `8c78395b8a10fa5ffe3a8b556251dfddffd554ee08c625ead7f53e35775d3c08` |
+| tests/test_insider_buying_sec_recovery_v4_projection.py | `37c8904b3a10711aa8b73a3d09db3f4b2b28d36f9706ced70f4c05597cfa98f8` |
+
+Actual projection follows a separate committed candidate and clean-state
+check; preserve source freeze during execution. No further SEC call occurs.

@@ -24,8 +24,9 @@ TPR-1 AND TPR-0B REMAIN BLOCKED. SECTION 60'S TWO FIXED AUTHENTICATED
 SOURCE-AUDIT REQUESTS ARE SPENT. SECTION 61 RECORDS THE OWNER'S FOLLOW-UP
 AUTHORITY FOR ONE FRESH SHARADAR METADATA-ONLY DIAGNOSTIC, NOW SPENT. SECTION 62
 RECORDS THE OWNER-APPROVED RICHER INSPECTION, ALSO SPENT, AND ITS CONFIRMED
-DESIGN LIMITATION. A PURE PROJECTION CORRECTION IS TESTED BUT NO PARSER MAPPING
-IS VERIFIED. NO EXTRA REQUEST IS INFERRED OR PERFORMED. NO PRICE/OUTCOME ACCESS, RESEARCH
+DESIGN LIMITATION. SECTION 63 RECORDS THE OWNER'S EXPLICIT APPROVAL OF THE
+FRESH STATUS FOLLOW-UP AND CONTINUOUS DEVELOPMENT TOWARD BACKTEST READINESS.
+NO PREVIOUS SPENT REQUEST IS RENEWED. NO PRICE/OUTCOME ACCESS, RESEARCH
 LOOK, QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
 IS GRANTED. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
 
@@ -502,12 +503,13 @@ Section 62 supersedes the current flat-only diagnosis: the additional field
 is a one-item `files` array, but its descriptor remained opaque due to our
 inspection design. The new pure projection fixes that software gap on
 synthetic fixtures only and is not connected to a production collector.
-No raw response exists to replay, no actual metadata mapping is verified,
-and no spent operation is rearmed. An additional status-only request was
-asked of the owner explicitly; a reply is not assumed. The next input is
-descriptor schema evidence, not another general software/review approval,
-credential reset or Windows migration. See section 62 for the actual result,
-corrective candidate and exact authorization boundary.
+No raw response exists to replay and no spent operation is rearmed.
+The owner explicitly approved the fresh status-only follow-up and directed
+continuous development until backtest readiness or a concrete blocker;
+section 63 supersedes the pending-question state in section 62. Routine
+development decisions remain delegated, without another Claude review stop.
+Section 63 owns the new operation, proxy candidate, evidence and remaining
+factual boundary; older one-shot scopes remain historical and spent.
 
 ### Open-issue register
 
@@ -527,7 +529,7 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
-| `TPR-SD22-005` | P2 | Sharadar metadata mapping/admission | Sections 61/62 did not establish the descriptor contract. The extra root field is now observed as a one-item files array, but our inspection hid the child fields and no raw body remains. Pure projection is corrected; verified descriptor evidence or a separately approved status-only request is still needed before mapping. No reset or guessed normalization closes it. See section 62. |
+| `TPR-RR24-001` | P2 | Actual development data activation | Exact Massive/Benzinga addon applicability for local retained/derived-strategy processing is unresolved between public guidance and incorporated terms. No admitted private rights/source/calendar/price/action bundle exists for this candidate. Section 63 records the evidence and precise next input; software and routine choices are not waiting for Claude. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -8397,7 +8399,7 @@ advisory parallel internal QA, not independent Claude review by substitution.
 | `TPR-SD22-002` | P3 | **Confirmed; closed by correction** | Initial `error=False`, empty string and zero could be called active application rejection; substring matching could misclassify negated/quoted credential wording. Fixed closed active-error primitive rules and exact-message category matching; ambiguity is unclassified. Subsequent classifier/identity test-first **9 failed, 56 passed in 0.32s**, corrected **65 passed in 0.38s**. |
 | `TPR-SD22-003` | P3 | **Confirmed; closed by correction** | New-source identity needed exact lane path, nofollow/open/source-hash/FD-cleanup controls in addition to inherited old Git/root/hash checks. Added explicit path and cleanup, with positive and rejected-source controls in the same 65-case set. Source/root drift cannot reach private claim or credentials. |
 | `TPR-SD22-004` | P3 | **Investigated; closed as false alarm** | A case-only table mapping was considered. Actual literal is already exact lowercase `tickers`; no case normalization fixes the missing/unmapped fields. No fabricated adapter correction or credential reset is claimed. |
-| `TPR-SD22-005` | P2 | **Open factual blocker, not verified code fix** | Flat documented metadata schema is incompatible with the observed response; safe evidence lacks the unmapped field's current contract. No body is retained. Need authoritative current status-schema/envelope/alias evidence or a separately frozen, appropriately scoped shape inspection before selecting a verified mapping. Do not guess a file wrapper, infer paid entitlement, or call HTTP 200 successful authentication. |
+| `TPR-SD22-005` | P2 | **Closed for schema mapping by section 63; no source admission** | Historical flat documented metadata schema was incompatible with the response and section 62 hid the child contract. The explicitly approved section-63 request now measures the exact eight-field descriptor, core validity and auxiliary type multiset; a separate pure mapper is tested against that measured profile. Actual size/timestamp/auxiliary values were not retained or replayed. Rights, authenticated account entitlement and price/action coverage remain unproved; no credential reset or guessed wrapper is used. |
 | `TPR-SD22-006` | P3 | **Confirmed; closed by record correction** | First post-operation document reprise **1 failed, 798 passed, 3 skipped in 6.21s** caught the new open SD22-005 row missing from the single current register. Added the exact P2/block/reason row and qualified six existing canonical findings versus the additional development-source blocker; no valid guard is weakened. |
 
 Initial new-module test collection red: **1 collection error in 0.07s** before
@@ -8798,3 +8800,302 @@ infer provider fault, renew spent claims or wait for Claude as a build gate.
 After this one stable publication, report the confirmed limitation and the
 exact new metadata-only scope needed to verify a mapping. Final published
 head/local-remote agreement will be verified and reported in this chat.
+
+## 63. Approved Sharadar follow-up and native-input development candidate - 2026-10-07
+
+### 63.1 Direct authority and prospective decisions
+
+The owner answered the specific follow-up request:
+
+> yes, approved. do not stop at the test tho. build until the lane is ready for backtesting.
+
+During implementation the owner reiterated continuous development until
+backtesting readiness or another blocker, preauthorized necessary actions,
+delegated decisions to Codex's best judgment, and required documentation.
+This supersedes section 62's unanswered-question state and OWN29's pending
+approval, not the immutable spent identities. It also supersedes routine
+milestone/review pauses. This is implementation and author/advisory QA, not
+an independent Claude review or a new canonical authority grant.
+
+| Decision | Delegated selection | Boundary and reason |
+|---|---|---|
+| `TPR-OWN-30` | Execute one fresh `TPR-SHARADAR-FOLLOWUP-20261007-001` after prospective code/projector/plan freeze. | Exactly one fixed status GET, 64 KiB, ten-second deadline, no redirects/retries/downloads. Reuse existing credential resolution without reset. Claim precedes credentials. Old D0/audit/diagnostic/shape identities stay spent. |
+| `TPR-OWN-31` | Publish bounded direct metadata schema identifiers and fixed-alias component evidence, not source values or nested rows. | The prior whitelist hid the very contract being inspected. ASCII schema identifiers <=64 characters, <=32/object, <=8 descriptors are enough to identify a new alias. Unknown values/URLs/filenames/IDs remain suppressed; credential echoes are refused before projection. A provider could misuse a value-like word as a field name; this limited structural exposure is explicit, not a zero-arbitrary-key claim. |
+| `TPR-OWN-32` | Build separately named `TPR-DEV-RAWREV-v1`, a stock-only raw target-change proxy with unknown horizon retained. | Section 60 OWN24 permits this distinct hypothesis. No twelve-month assumption, canonical price-scaled comparability, ETF promotion, alpha allocation or primary null rescue. Parked canonical Windows trust is not a universal local-development blocker. |
+| `TPR-OWN-33` | Conservative USD/common-stock/native-ID admission; second-session timing; censored-last-touch view; unique current snapshot identity and explicit action/ambiguity exclusions. | Current-row history is not historical vintages or earliest public availability. Unknown raw share basis/horizon and current/restated ticker risks remain visible. No fixture identity is reused for real rows. |
+| `TPR-OWN-34` | Order-based, cash-only long stock diagnostic; frozen costs/capacity, pre-cutoff quantity sizing, lagged liquidity, explicit partial/unfilled orders and missing marks. | No short borrowing, leverage, broker, QC parity or calibrated profitability claim. Freeze policy before any outcomes; absent inputs refuse rather than invent evidence. |
+| `TPR-OWN-35` | Build private bundle admission and one-shot local run accounting; activate only against exact factual source/rights/inventory evidence. | No blanket subscription-to-license inference or outcome read while applicability is unresolved. Development custody is local cooperative accounting, not externally protected canonical rollback authority. All real source captures/outcome reads/QC launches remain zero in this software build unless separately recorded below. |
+
+The same physical root, branch and baseline
+`95767305d0a5b4b69aa10edbf62754b8a2a84616` are verified before operations.
+Shared/main/sibling files remain frozen. All changes accumulate for one
+matching-lane non-force push. No monitor, review wait, credential reset,
+account mutation, external message or subscription purchase is introduced.
+
+### 63.2 Source evidence checked before activation
+
+Current public primary documentation was checked on 2026-10-07:
+
+- [Massive ratings schema](https://massive.com/docs/rest/partners/benzinga/analyst-ratings)
+  supplies raw/adjusted pairs, UTC issue time and last-system-touch time, not
+  comparable horizons or complete correction/tombstone vintages. Analyst
+  section 65.3A's overwrite/restamp answers remain attributed vendor history.
+- [Sharadar personal terms](https://sharadar.com/terms) contemplate personal
+  backtests and non-reconstructive outputs, with personal-use and deletion
+  duties. This is documentary evidence, not inspection of the owner's exact
+  account agreement or paid dataset inventory.
+- [Massive personal-use guidance](https://massive.com/knowledge-base/article/which-plan-do-i-need-to-show-massive-data-in-my-app)
+  describes personal research/scripts/trading and includes Benzinga expansions.
+  [Market Data Terms](https://massive.com/legal/market-data-terms-of-service)
+  sections 2/5 also impose display defaults and require licensing for
+  non-display/derived-strategy uses. Exact addon/agreement applicability is
+  unresolved: neither automatic prohibition nor legal clearance is asserted.
+  An API 200 is not that agreement. No vendor contact is made on the owner's
+  behalf and no contradictory term is silently treated as absent.
+
+Software construction continues despite this factual activation boundary.
+No current licensed row, retained capture, outcome or actual operator state
+is read for these checks. Synthetic inputs and the already committed D0
+aggregate remain the implementation/test evidence.
+
+### 63.3 Validation and operation record
+
+Before activation: follow-up/projector focused tests **95 passed in 0.46s**
+using the isolated in-process runtime-root runner, synthetic credentials and
+production credential/transport/socket sentinels. No provider was called by
+tests. Earlier executed source/diagnostic/shape files remain unchanged.
+
+Frozen prospective status plan SHA-256
+`16a0810353f54743f8bdfa93bdf208534f1501c6fe4ee907fcb65692d968ae6d`,
+created `2026-10-07T16:34:19.557696+00:00`, expires 24 hours later.
+Owner instruction UTF-8 identity
+`20dccf0e2c94da8750e5ffb6fa85b5d9aba5bf6ce3f343afcd3f8c3a398f31d8`.
+Wrapper SHA-256
+`894fce7a156250c43eb55749fe8c3da3e50412bd3f9a18b0b4acccce75e49872`;
+projector SHA-256
+`e55febd9a1d75638068f50a53e6cf1165d28e8d5adde2c42edd5c2e80958ac0a`.
+The separately pinned original transport/privacy implementation is
+`9f2674a47d0d62bb09e2dd5ba1ce7f37eed3c68dce254e40e0d11d1218f46960`.
+No outcome/retained/QC operation is part of this plan. Its observed result
+and subsequent software validation are recorded below after execution.
+
+One actual request completed at `2026-10-07T16:34:58.811271+00:00`, command
+wall time 0.32 seconds: HTTP 200, 233 complete body bytes, no redirect/retry.
+Report SHA-256
+`2562e6a9e843ec3e7bf5883232d543698ff746048325963526c5a77855f3463e`.
+Root is exactly `table`/`files`, literal `tickers`, singleton object descriptor.
+Complete direct descriptor keys are `available`, `history`, `historyLabel`,
+`key`, `modified`, `name`, `size`, `sizeLabel`. Core name/size/label/UTC-clock
+checks are true; `key` is a string. The three auxiliary fields have one
+boolean and two strings in aggregate; this report does not assign each type
+to a specific key or retain their values. No entitlement conclusion follows.
+The generic projector correctly refuses extraction on these previously
+unknown siblings, while recording enough schema evidence to write the exact
+separate `sharadar_metadata.py` mapper. That mapper ignores their semantics,
+checks the measured multiset, and never treats `available` as a rights grant.
+
+The raw body, file name/key, actual byte-size/timestamp values and raw digest
+are not retained. Therefore **the measured schema/core component checks and
+synthetic mapping are verified; a replay of the actual full response through
+the new mapper is not claimed**. No additional request is needed or made for
+this software fix. SD22-005's schema blocker is closed, not source admission.
+Metadata/import/artifact/document focused checks: **131 passed in 2.44s**.
+
+Private new spent/terminal SHA-256 respectively:
+`a9f5b4082f4f8fc6b392349be9ab9ccb7cdafcee7be486bf6d319b2684655969`,
+`8cec6e2a18651bdc0c23eb8a765e863fd569ce9769419b35d5119169528a00d8`.
+Owner-only regular 0600 files were measured. The exact sanitized plan/report
+are the only new public operational JSON artifacts; private claims remain
+ignored. Executed wrapper/projector/old collectors are now immutable.
+
+### 63.4 Candidate behavior, evidence limits and findings
+
+`TPR-DEV-RAWREV-v1` is a different exploratory stock diagnostic, not a
+substitute for the canonical ETF strategy. Fixed pre-outcome choices:
+2025-01-02 through 2025-03-31 study window; source/calendar buffer no earlier
+than 2024-08-01; censored-last-touch view only; raw new/prior minus one,
+clipped to [-1,1], 20-session half-life and maximum age 80. Distinct native
+events aggregate by median within firm/security/eligible session, decay and
+sum within firm, then median across firms. Weekly first-session decisions
+use prior-session 18:00 New York cutoffs. Only already-eligible events enter
+the cutoff; an event becoming eligible at that weekly execution open waits
+for the next decision. Rank positive scores, break ties by source-native
+security ID, select at most ten names at 0.10 each and retain residual cash.
+No sector/catalyst neutrality, short side, estimator, significance or alpha
+claim is made. These choices are diagnostic, not calibrated from outcomes.
+
+The normalizer retains native typed event/firm IDs, positive exact-rational
+raw pairs and named duplicate/conflict/currency/action/identity/timing
+refusals. Unique current-snapshot mappings are not a historical master;
+current-delisted exclusions imply survivorship risk, unknown horizon and
+raw adjustment basis remain explicit, and censoring does not reconstruct
+overwritten rows. No real identifier is relabelled SYNTHETIC. The source
+bundle must prove its calendar/inventory externally; a supplied calendar is
+not authenticated by its timestamp shape.
+
+The pure order engine sizes whole shares from pre-cutoff prior-close marks,
+not execution opens; sells before buys; models fixed 10 bps per side plus
+$0.01/share and 1% cutoff-known lagged-volume capacity; limits buy fills to
+10% current open NAV without rewriting requested quantities. Price changes
+can later move held weights above 10%; no continuous-cap promise is made.
+Missing marks preserve unknown equity and held positions. Missing liquidity,
+nontradability, gaps, partial fills and day-only pending orders are explicit.
+No hidden liquidation or automatic pending-order retry occurs. This is not
+MOO/QC parity or a calibrated capacity model.
+
+Corporate-action accounting is deliberately not fabricated. Any action in
+the frozen study window currently refuses the **whole run**, before outcomes,
+rather than choosing a survivor subset using future actions or ignoring
+dividends/splits/delistings. An admitted inventory showing such actions will
+require verified action-accounting work; the candidate must not be described
+as a general market-ready engine. No real inventory has yet been inspected.
+
+| ID | Priority | Status | Location / evidence | Correction or required resolution |
+|---|---|---|---|---|
+| `TPR-RR24-001` | P2 | **Open factual activation blocker** | Massive public personal-use guidance and Market Data Terms have unresolved exact-addon applicability; no private admitted source/rights/calendar/price/action bundle exists. | Bind the owner's applicable Benzinga dataset agreement or written provider clarification for local raw retention and personal derived-strategy processing, with deletion duties. Then build a prospectively scoped immutable native input inventory. No extra generic implementation approval or Claude wait is required. |
+| `TPR-RR24-002` | P2 | **Closed by correction** | Prior projection hid unknown descriptor schema; advisory v2 prospective tests 28 failed/23 passed, later seven row-case/table adversaries red. | Bounded schema identifiers plus component/clock evidence; final 95 green, then actual one-shot schema evidence above. Unknown values remain private; executed files frozen. |
+| `TPR-RR24-003` | P2 | **Closed by correction** | Truncated normalizer calendar shifted the second eligible open; one red/53 green. | Explicit calendar-anchor refusal; final normalizer 55 green, seven independent in-memory reverse probes killed and restored. |
+| `TPR-RR24-004` | P2 | **Closed by correction** | Order-engine missing hold-day/open marks, cash-funded dust exits, ambiguous order IDs and gap-driven name-cap errors were reproduced in three red/green groups. | Unknown valuation blocks additions, priced zero exits remain possible, unambiguous IDs and execution-time buy risk caps; final engine 40 green, cost mutation red/restored. |
+| `TPR-RR24-005` | P2 | **Closed by correction** | Advisory integration: six red/26 green covered unvalidated buffer bars, missing window endpoints, inherited Decimal rounding and primitive-subclass callbacks. | Validate all buffer bars through the engine, filter cash-only warmup from study output, require exact endpoints/types and fresh Decimal context; root reproduced 32 green in 1.43s. |
+
+No independent Claude acceptance is claimed for this author/advisory QA.
+Further admission checks and final validation/publication are recorded next.
+
+The five subsequent integration regressions (35 prior greens) identified
+missing prior-bar framing and ratings outside the frozen source window.
+Explicit flat-bar/source-window checks now refuse those before semantic use;
+root reproduced **40 passed in 0.71s**. Final advisory integration adds the
+session-ID primitive guard: **41 passed in 0.67s**, eight actual in-memory
+reversals detected and finally restored, including aggregation and top-ten
+rules. No actual source rows or outcome returns were used.
+
+| ID | Priority | Status | Location / evidence | Correction or required resolution |
+|---|---|---|---|---|
+| `TPR-RR24-006` | P2 | **Closed by correction** | Controller initially admitted structure that the pure candidate already knew was invalid, opening outcomes before finding missing endpoints/incomplete actions. | Full pure source/target preparation, including nonempty positive exposure, now precedes reservation and any outcome stat/open/hash/parse. Five sentinel tests red, corrected controls green; independent in-memory verification agrees. |
+| `TPR-RR24-007` | P2 | **Closed by correction** | Public offline mode could bypass the fixed production root while reading native-shaped private inputs. | Public execution is production-only; explicit private test seam records zero empirical looks and one fixture run. Red public-mode test proves no root opening; independent reproduction confirms the correction. This is a public API boundary, not a malicious-Python sandbox. |
+
+### 63.5 Durable private-run path and exact next blocker
+
+The prospective private controller binds all four candidate/normalizer/
+order/controller code hashes, fixed config/window/view, exact rights,
+structure and outcome hashes, and a maximum 48-hour spec. A fixed candidate
+spent identity cannot be renewed by changing a spec or hash. Owner-only
+0700/0600 regular nonsymlink/single-link inputs are bounded and hash checked
+before strict JSON parsing. No raw source or price is written to Git.
+Rights and outcome-free source/target validation precede the immutable
+reservation. Outcome opening/hash/parse happens only after its fsynced
+reservation. Completed, failed and interrupted attempts retain terminal
+records; no retry is silently authorized. A completed computation can still
+report incomplete fills/unknown valuation; it is not automatic evidence
+acceptance. Local owner-controlled custody cannot prove external antirollback
+protection, vendor entitlement, Windows ACLs or a canonical look receipt.
+
+The rights contract accepts applicable Sharadar published terms as evidence;
+it does not invent a universal account-contract requirement. For Massive's
+conflicting public clauses, exact account/addon agreement or written vendor
+clarification remains needed. The JSON manifest binds such evidence but
+does not itself prove that its statements are legally true. No positive
+rights manifest or production run spec is manufactured in this round.
+
+Measured public production `preflight()` returned:
+`ready=false`, `reason=rights_missing`, all three fixed private inputs
+unavailable, `outcomes_read=false`, `development_looks=0`. No private study
+root, rights document, source/outcome bundle, reservation or run was created
+by that check. The connected controller's successful end-to-end test uses
+invented native-schema values and a private fixture receipt, not an empirical
+look or market result. It exercises the actual candidate and generates
+hypothetical orders/fills; it does not establish actual backtest readiness.
+
+**Current endpoint: not yet ready for a real-data backtest.** The next
+immediate factual input is the applicable Benzinga/Massive agreement or
+vendor clarification covering this owner's local personal raw retention
+and derived-strategy backtests, including deletion duties. No extra generic
+approval, Sharadar reset, Claude wait or Windows migration is requested.
+Once that fact is available, the existing delegated authority permits the
+next bounded capture/inventory implementation: exact source records,
+identity/calendar/actions and unadjusted execution/lagged-liquidity data,
+immutable private manifests, source-quality checks and prospectively frozen
+run identity. Any in-window corporate actions must receive verified
+accounting before outcomes; this code currently refuses them, so we do not
+misrepresent all remaining work as paperwork. The sealed 2027-09-01 through
+2029-08-31 holdout and canonical 2026-09-01 through 2027-08-31 validation are
+untouched; the candidate window ends March 2025. QC transfer/processing,
+upload/project/job and actual backtesting are not performed. No live or
+paper trade, broker, operator database, order or capital action occurs.
+
+No new Claude commit arrived during this round: actual matching remote
+remained baseline `95767305d0a5b4b69aa10edbf62754b8a2a84616` at preflight.
+There is therefore no incoming review range to disposition. This is author
+implementation with advisory QA; historical accepted reviews retain their
+recorded scope. Quality assessment: **7/10 for the scoped software candidate**,
+not for real-data readiness. The important limitations are explicit source
+rights/inventory, non-PIT/censored history, unknown basis/horizon, diagnostic
+costs and unsupported corporate-action accounting, not review scheduling.
+
+### 63.6 Final validation and publication
+
+Final combined focused run: **1,192 passed, 3 skipped in 9.10s**, no
+failures, errors or warnings. Host: Python 3.12.14, pytest 9.1.1,
+Darwin 25.6.0 arm64. The isolated in-process runtime-root runner from
+sections 49/52 imported the dispatch fence only while its root operations
+were redirected to a temporary fixture root. No actual operator stop state
+or database was read. Exact selections, with
+`-q -p no:cacheprovider --tb=short`:
+
+```text
+tests/target_price_revisions/test_document_consistency.py
+tests/test_active_document_consistency.py
+tests/target_price_revisions/test_import_firewall.py
+tests/test_runtime_stop_leak_guard.py
+tests/test_ml_import_boundary.py::test_no_execution_capable_module_imports_ml
+tests/test_ml_import_boundary.py::test_assistant_package_has_no_ml_import_except_the_future_shadow_adapter
+tests/target_price_revisions/test_preregistration.py::test_host_git_logic_restores_production_git_after_exit
+tests/target_price_revisions/test_preregistration.py::test_empty_registry_guard_is_reachable_for_the_committed_registry
+tests/target_price_revisions/test_preregistration.py::test_reviewed_loader_refuses_when_the_frozen_git_is_unavailable
+tests/target_price_revisions/test_preregistration.py::test_nonempty_registry_is_authenticated_before_json_parsing
+tests/target_price_revisions_development/test_d1.py
+tests/target_price_revisions_development/test_d0.py
+tests/target_price_revisions_development/test_boundary_and_artifacts.py
+tests/target_price_revisions_development/test_d2.py
+tests/target_price_revisions_development/test_readiness.py
+tests/target_price_revisions_development/test_simulation.py
+tests/target_price_revisions_development/test_continuous_pipeline.py
+tests/target_price_revisions_development/test_backtesting.py
+tests/target_price_revisions_development/test_fixture_backtest.py
+tests/target_price_revisions_development/test_source_audit.py
+tests/target_price_revisions_development/test_sharadar_diagnostic.py
+tests/target_price_revisions_development/test_sharadar_shape.py
+tests/target_price_revisions_development/test_sharadar_projection.py
+tests/target_price_revisions_development/test_sharadar_followup.py
+tests/target_price_revisions_development/test_sharadar_metadata.py
+tests/target_price_revisions_development/test_raw_revision.py
+tests/target_price_revisions_development/test_raw_backtest.py
+tests/target_price_revisions_development/test_raw_candidate.py
+tests/target_price_revisions_development/test_raw_run.py
+```
+
+This was a focused dependency/admission/document union, not the complete
+lane or repository suite. Three existing native-Windows skips remain.
+The 14 preregistration tests requiring the frozen Windows Git executable
+were not run or weakened. Explicit host-Git restoration and frozen-Git
+refusal checks passed; this macOS run does not prove Windows signer,
+ACL or protected-parent custody.
+
+All 16 changed Python source/test files compiled in memory without errors.
+Active-document/import boundaries and frozen canonical/D0/collector guards
+passed in that run. All twelve existing/current sanitized private evidence
+files retained their expected hashes, owner identity and restrictive modes;
+no retained market captures were listed, read or hashed. `git diff --check`
+was clean. The public CLI
+`python -m research.target_price_revisions_development.raw_run --preflight`
+independently returned the same `rights_missing`, zero-look, no-outcome
+readiness result as the callable preflight. No `--run` invocation occurred.
+
+Only lane-owned source/tests, this record and the two exact sanitized
+follow-up plan/report artifacts are included for publication. Shared and
+project-wide documents remain frozen. There was one spent metadata request,
+zero source-row captures, zero empirical development looks, zero outcomes
+read, zero QC attempts and zero trading/operator actions in this round.
+The delegated decisions are recorded in 63.1; no independent-review
+acceptance, provider fact or canonical gate closure is inferred from the
+tests. Final exact commit identity and publication handoff follow in 63.7.

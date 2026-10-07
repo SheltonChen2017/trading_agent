@@ -2792,3 +2792,16 @@ def test_section_62_guard_refuses_shape_escalation(monkeypatch, old, new):
                         lambda heading: mutated if heading.startswith("## 62.") else original(heading))
     with pytest.raises(AssertionError, match="closed shape scope"):
         test_section_62_freezes_richer_shape_inspection_without_scope_renewal()
+
+
+def test_section_63_records_fresh_approval_proxy_limits_and_factual_blocker():
+    section = _record_section("## 63.")
+    for required in ("yes, approved", "TPR-SHARADAR-FOLLOWUP-20261007-001",
+        "TPR-DEV-RAWREV-v1", "TPR-OWN-30", "TPR-OWN-35", "TPR-RR24-001",
+        "2025-01-02", "2025-03-31", "unknown horizon", "rights_missing",
+        "not a", "canonical", "no extra", "outcomes"):
+        assert required.lower() in section.lower()
+    assert "16a0810353f54743f8bdfa93bdf208534f1501c6fe4ee907fcb65692d968ae6d" in section
+    assert "2562e6a9e843ec3e7bf5883232d543698ff746048325963526c5a77855f3463e" in section
+    assert "TPR-SD22-005" not in _open_issue_register()
+    assert "TPR-RR24-001" in _open_issue_register()

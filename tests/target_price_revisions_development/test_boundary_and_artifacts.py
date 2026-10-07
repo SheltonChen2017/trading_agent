@@ -28,7 +28,7 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
                            | {"research.target_price_revisions"},
         allowed_stdlib_roots=DEFAULT_ALLOWED_STDLIB_ROOTS | {
             "argparse", "collections", "tempfile", "time", "fractions", "http", "ssl",
-            "pwd", "stat", "signal", "contextlib", "urllib", "uuid",
+            "pwd", "stat", "signal", "contextlib", "urllib", "uuid", "zoneinfo",
         },
         allowed_local_prefixes=("research.target_price_revisions_development",),
     )
@@ -48,6 +48,12 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.sharadar_diagnostic",
         "research.target_price_revisions_development.sharadar_shape",
         "research.target_price_revisions_development.sharadar_projection",
+        "research.target_price_revisions_development.sharadar_followup",
+        "research.target_price_revisions_development.sharadar_metadata",
+        "research.target_price_revisions_development.raw_revision",
+        "research.target_price_revisions_development.raw_backtest",
+        "research.target_price_revisions_development.raw_candidate",
+        "research.target_price_revisions_development.raw_run",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -208,15 +214,15 @@ def test_source_auditor_is_separate_from_pure_fixtures_and_authority_packages() 
     assert all(isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
                and type(node.value.value) is str for node in initializer.body)
     for path in (ROOT / "research/target_price_revisions_development").glob("*.py"):
-        if path.name in {"source_audit.py", "sharadar_diagnostic.py", "sharadar_shape.py"}:
+        if path.name in {"source_audit.py", "sharadar_diagnostic.py", "sharadar_shape.py", "sharadar_followup.py"}:
             continue
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             names = ([alias.name for alias in node.names] if isinstance(node, ast.Import)
                      else [node.module or ""] if isinstance(node, ast.ImportFrom) else [])
             assert not any(name.split(".")[0] in {"http", "ssl", "urllib"}
-                           or set(name.split(".")) & {"source_audit", "sharadar_diagnostic", "sharadar_shape"} for name in names)
+                           or set(name.split(".")) & {"source_audit", "sharadar_diagnostic", "sharadar_shape", "sharadar_followup"} for name in names)
             if isinstance(node, ast.ImportFrom) and node.module is None:
-                assert all(alias.name not in {"source_audit", "sharadar_diagnostic", "sharadar_shape"} for alias in node.names)
+                assert all(alias.name not in {"source_audit", "sharadar_diagnostic", "sharadar_shape", "sharadar_followup"} for alias in node.names)
 
 
 def test_sharadar_diagnostic_can_only_compose_the_frozen_source_primitives() -> None:
@@ -420,3 +426,90 @@ def test_committed_source_probe_is_exact_non_authorizing_aggregate_not_a_retry()
                          "response_bytes_complete", "authority", "license_entitlement",
                          "point_in_time_facts", "working_assumption", "real_development_backtest_ready",
                          "canonical_admission", "d0_renewed", "outcome_reads", "qc_attempts", "development_looks"}
+
+
+@pytest.mark.parametrize("name,edges", [("raw_revision", set()), ("raw_backtest", set()),
+    ("raw_candidate", {"raw_revision", "raw_backtest"}),
+    ("sharadar_metadata", {"sharadar_projection"}), ("sharadar_projection", set())])
+def test_native_development_pure_modules_do_not_gain_input_openers(name, edges):
+    tree = ast.parse((ROOT / f"research/target_price_revisions_development/{name}.py").read_text(encoding="utf-8"))
+    allowed = {"__future__", "dataclasses", "datetime", "decimal", "fractions",
+               "re", "collections", "zoneinfo", "hashlib"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all(alias.name.split(".")[0] in allowed for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            assert (node.level == 1 and node.module in edges) or (
+                node.level == 0 and node.module.split(".")[0] in allowed)
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            assert node.func.id not in {"open", "__import__", "eval", "exec", "compile", "input"}
+
+
+def test_followup_only_composes_explicit_frozen_helpers_and_projector():
+    tree = ast.parse((ROOT / "research/target_price_revisions_development/sharadar_followup.py").read_text(encoding="utf-8"))
+    allowed = {"__future__", "os", "re", "stat", "dataclasses", "datetime", "pathlib", "typing"}
+    helpers = {"AUTHORITY", "LANE_BRANCH", "LANE_ROOT", "PRIVATE_ROOT", "REQUESTS", "SourceAuditError",
+        "_canonical", "_clock", "_digest", "_https_get", "_private_directory", "_production_credential",
+        "_publish", "_reduce_response", "_source_object", "_valid_credential", "_verify_execution_identity"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all(alias.name.split(".")[0] in allowed for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                assert node.level == 1
+                assert (node.module == "source_audit" and {a.name for a in node.names} <= helpers) or (
+                    node.module is None and {a.name for a in node.names} == {"sharadar_projection"})
+            else:
+                assert node.module.split(".")[0] in allowed
+
+
+def test_committed_followup_pins_executed_code_and_observed_descriptor_contract():
+    import hashlib
+    import json
+    from research.target_price_revisions_development.sharadar_followup import FollowupPlan
+    from research.target_price_revisions_development.sharadar_metadata import OBSERVATION_SHA256, DESCRIPTOR_FIELDS
+
+    plan_sha = "16a0810353f54743f8bdfa93bdf208534f1501c6fe4ee907fcb65692d968ae6d"
+    payload = (ARTIFACTS / f"tpr-sharadar-followup-plan.{plan_sha}.json").read_bytes()
+    frozen = FollowupPlan(payload, plan_sha).body()
+    report_bytes = (ARTIFACTS / f"tpr-sharadar-followup-report.{OBSERVATION_SHA256}.json").read_bytes()
+    assert hashlib.sha256(report_bytes).hexdigest() == OBSERVATION_SHA256
+    report = json.loads(report_bytes)
+    for field, filename in (("code_sha256", "sharadar_followup.py"), ("projector_sha256", "sharadar_projection.py")):
+        assert frozen[field] == report[field] == hashlib.sha256((ROOT / "research/target_price_revisions_development" / filename).read_bytes()).hexdigest()
+    assert report["plan_sha256"] == plan_sha
+    assert report["status"] == "COMPLETED" and report["provider_requests"] == 1
+    assert report["provider"]["http_status"] == 200 and report["provider"]["response_bytes"] == 233
+    assert report["provider"]["response_sha256"] is None
+    descriptor = report["projection"]["files"]["descriptors"][0]
+    assert set(descriptor["schema_identifiers"]) == DESCRIPTOR_FIELDS
+    assert descriptor["schema_identifiers_complete"] is True
+    assert descriptor["fields"]["key"] == "string"
+    assert descriptor["unknown_key_count"] == 3 and descriptor["unknown_types"] == {"boolean": 1, "string": 2}
+    assert descriptor["known_components"] == dict.fromkeys(("name", "size", "sizeLabel", "modified"), True)
+    assert descriptor["clock_formats"] == {"modified": "iso_utc"}
+    assert report["projection"]["selected_metadata"]["recognized"] is False
+    assert report["credential_state"] == "not_proven" and report["license_entitlement"] == "unestablished"
+    assert report["outcome_reads"] == report["development_looks"] == report["qc_attempts"] == 0
+    assert report["previous_shape_renewed"] is report["canonical_admission"] is False
+    assert all(value is False for value in report["authority"].values())
+
+
+def test_private_native_run_controller_has_no_provider_operator_or_canonical_imports():
+    tree = ast.parse((ROOT / "research/target_price_revisions_development/raw_run.py").read_text(encoding="utf-8"))
+    allowed = {"__future__", "argparse", "dataclasses", "datetime", "fractions", "hashlib", "json",
+        "os", "pathlib", "re", "stat", "subprocess", "uuid"}
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            assert all(alias.name.split(".")[0] in allowed for alias in node.names)
+        elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                assert node.level == 1 and node.module == "raw_candidate"
+                assert {a.name for a in node.names} <= {"build_target_frames", "run_raw_candidate"}
+            else:
+                assert node.module.split(".")[0] in allowed
+    from research.target_price_revisions_development import raw_run
+    assert raw_run.CODE_FILES == ("raw_candidate.py", "raw_revision.py", "raw_backtest.py", "raw_run.py")
+    assert raw_run.CONFIG["start_date"] == "2025-01-02" and raw_run.CONFIG["end_date"] == "2025-03-31"
+    assert raw_run.CONFIG["view"] == "censored"
+    assert raw_run.CONFIG["quantconnect"] is raw_run.CONFIG["canonical_admission"] is False

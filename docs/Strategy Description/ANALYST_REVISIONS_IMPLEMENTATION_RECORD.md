@@ -1196,8 +1196,9 @@ separately versioned captured-clock correction `06f3e8d4`. Section 257 resumes
 the interrupted exact R281 retained-source audit after access is restored:
 its 17 displayed filenames match the frozen local inventory, but exact source
 bytes and original operator/compile/save evidence remain unverified.
-Section 258 records the later owner's monitor-disarm direction and a new
-bounded forward-vintage acquisition protocol; no historical audit is replayed.
+Section 258 records the later owner's monitor-disarm direction, a new bounded
+700-row forward-vintage capture and supported direct-feed acquisition paths;
+no historical audit is replayed. This is development evidence, not readiness.
 Claude must review section 258 and this round's final snapshot; that independent final review is not an
 intermediate checkpoint or a prerequisite for admissible continuing build.
 The human explicitly reiterated "build until the project is ready for forward
@@ -3029,7 +3030,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex section-254 counter-review, owner-directed continuous round, scoped original-history audit and prospective QC response observations | `eadfd584` -> `a205ebf7` -> `0766faa0` -> this record commit | One Claude commit accepted after two P3 qualifications; no new launch, result evaluation, research look or cell; floor 313/239/49/699 | Documented each delegated decision, extracted only scoped historical metadata, and implemented retention of private append-only response observations for existing authorized QC list/read calls; historical envelopes and source/attempt freezes unchanged | Strict-network-denied focused validation and mutation restoration in 255.6; compilation/diff/root/branch/status checks. No complete Codex suite, fresh QC/provider request or old artifact/source-audit repetition | ARV2CR255-001 exact validation exception; ARV2CR255-002 prospective correction of the Stage-1 ledger-reader claim. Three historical P2s and two conditional cells remain open; formal independent-source gates remain blocked | One final same-lane push at the concrete external evidence/access stop, not an intermediate cadence pause. Claude must review section 255. Resume substantive build when genuine required evidence/access becomes available, under the saved continuous-work authorization |
 | 2026-10-06 | Codex resumed continuous work after authenticated QC/Mia became available | `ac73a660` -> `06f3e8d4` -> this record commit | Section 256: no new Claude push or replay; qualified original Mia tool-path evidence, prospective clock correction; floor 313/239/49/699 unchanged | Read only the scoped project histories, declined cloud edits, versioned the captured-clock source fix without changing R247/R279 bytes/manifests or adding a launcher; all delegated decisions recorded | Strict-network-denied focused clock/source/closure/record checks in 256.4; no complete Codex suite. Authenticated QC UI/history reads and displayed current IDE builds disclosed, not a zero-contact claim | ARV2I256-001 P2 prospective correction. ARV2R248-002/-003/-004 remain open with partial new evidence; two conditional cells and independent formal source gates unchanged | One final matching-lane push at the concrete remaining artifact/access stop; no intermediate Claude wait. Final independent review remains due; quiet monitor stays active |
 | 2026-10-06 | Codex resumed interrupted R281 retained Code audit after Mac access restored | `d5e841be` -> this record commit | Section 257: no new Claude push or replay; exact rerun Code view and 17-name inventory corroborated; floor 313/239/49/699 unchanged | Read only the already-booked rerun's supported Code view and local control metadata; no source mutation, launch, result export or historical authorization inference | Strict-network-denied focused record/active-document validation in 257.3; no complete suite or new code validation claimed | All three historical P2s remain open; run-bound rendered source is not a 17-file byte/compile/operator/save chain or formal vendor evidence | One final matching-lane push at the remaining original-artifact/source-access barrier; Mac lock no longer the active blocker, no intermediate Claude wait, monitor remains active |
-| 2026-10-06 | Codex owner-directed monitor disarm and forward-vintage preparation | `b6d38960` -> this round's final record commit | Section 258: one bounded current-version development capture protocol, no historical replay or strategy evaluation; floor 313/239/49/699 | Existing automation paused with its prompt, cadence and target preserved; freeze exact new provider window and private receipt protocol before provider access | Focused final validation and actual acquisition disposition will be recorded in 258.3; no complete suite | Source/formal/history gates remain; private current-version acquisition is not independent publication or completeness proof | One final matching-lane push at completion or a concrete source/access barrier; monitor remains disarmed, no intermediate Claude wait |
+| 2026-10-06 | Codex owner-directed monitor disarm and forward-vintage acquisition | `b6d38960` -> `264067ef` -> this round's final record commit | Section 258: one bounded current-version development capture, 3 pages / 700 rows; no historical replay or strategy evaluation; floor 313/239/49/699 | Existing automation paused with its prompt, cadence and target preserved; exact provider window and private receipt protocol committed before provider access; pinned private receipt published with all false capabilities | Strict-network-denied focused validation and actual acquisition disposition in 258.3; no complete suite | Source/formal/history gates remain; private current-version acquisition is not independent publication or completeness proof; direct-feed rights/completeness unverified | One final matching-lane push at the concrete independent-source/access barrier; monitor remains disarmed, no intermediate Claude wait |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -36243,17 +36244,99 @@ economics, formal binding, order or deployment permit changes.
 
 ### 258.2 Actual acquisition and source-path evidence
 
-Pre-acquisition protocol recorded above; the actual terminal disposition,
-private artifact/receipt identity and limitations are pending this one
-bounded invocation. No successful capture or gate clearance is claimed yet.
+The protocol above was committed as `264067ef` **before** the sole provider
+invocation. It succeeded without retry: private artifact
+`arv2-massive-three-role-20261007T045551935807Z`, captured from
+`2026-10-07T04:55:51.935807Z` through `2026-10-07T04:55:52.861882Z`
+(October 6, 21:55:51–21:55:52 America/Los_Angeles). This is after both event
+days' 09:20 New York cutoff, not a predecision receipt or complete-day claim.
+Three terminal pages contain **700 rows**: **662 ratings / 12 earnings /
+26 guidance**. All three dataset responses passed the existing capture
+transport/schema checks; this confirms observed access for these requests,
+not an independent licensing certificate or formal source admission.
+
+| Local immutable identity | SHA-256 |
+|---|---|
+| Physical manifest | `e61f4a46558bff42d2bdfbdc57c0a3aeaed74e173a23530ff6bdd9c6444cba1b` |
+| Physical capture | `d2ec25b03f56acde1fa373eeb1cee4734cf49792bc2e7a7c66c2f2c107568661` |
+| Published forward-quality receipt | `132981c6873bcba0e38f4ee7d65894a326f367318f2f957350539478c15148ea` |
+
+The unchanged offline builder authenticated this exact manifest/window into
+one private receipt with deduplicated role-event counts **662 / 12 / 26**.
+Saved receipt reauthentication confirms `point_in_time_proven=false`,
+`paper_look_committed=false`, `outcome_reads=0`, `qc_calls=0`; file/parent
+modes are 0600/0700. Both artifacts are Git-ignored and remain local-only.
+No rows or raw IDs are printed, selected for performance, uploaded to QC or
+committed. No second capture/comparison or recurring job is created. Source
+first-publication, overwritten earlier versions, deletion completeness and
+independent as-of identity/price/score evidence remain unproven.
+
+A public-documentation acquisition check, not a private feed connection,
+documents two candidate acquisition paths beyond current-version polling:
+
+- [Benzinga Ratings Stream](https://docs.benzinga.com/ws-reference/data-websocket/get-calendar-ratings-stream)
+  documents creation, modification and removal messages with record/message
+  identities. [Supported Actions](https://docs.benzinga.com/ws-reference/actions)
+  limits replay to at most 100 cached messages, possibly fewer. This is not a
+  documented durable complete version archive; disconnect/overflow gaps cannot
+  be declared repaired by a local counter.
+- [Data Webhook Engine](https://docs.benzinga.com/webhook-reference/webhook-engine)
+  documents created/updated/removed deliveries, retry behavior and generation
+  timestamps, not first-publication timestamps. [Webhook Overview](https://docs.benzinga.com/webhook-reference/overview)
+  describes exact-body HMAC-SHA256 and account provisioning of a public HTTPS
+  receiver. Because the secret holder can forge deliveries, this is not
+  independent public-key nonrepudiation.
+
+`ARV2OD258-C`: these are candidate acquisition routes only. Direct Benzinga
+entitlement/configuration and completeness/recovery evidence are not verified;
+do not reuse the Massive credential, create a receiver, install a connector,
+connect a stream, purchase access or change shared transport permissions by
+inference. Relevant vendor plugin discovery returned no matches in this
+catalog, not proof that no integration exists elsewhere. The owner was asked
+only for non-secret existing entitlement/export details or a private original
+artifact location, not routine permission to repeat approved preparation.
+The owner answers "you mean analyst ratings? yes"; this confirms the subject
+but does not distinguish the already observed Massive access from a direct
+Benzinga stream/webhook entitlement. That provider-only clarification is
+requested; no direct entitlement is inferred from the ambiguous answer.
+No direct-feed credential was read or transferred. Any actual supported
+acquisition must retain all updates/removals privately and qualify real gaps;
+these public docs alone close no formal gate. The missing genuine independent
+source/identity/RAW input package remains the concrete forward-readiness stop.
+
+The owner's later path question was answered from filename metadata only:
+the completed local Sharadar snapshot is
+`artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`;
+unfinished sibling `.incomplete` directories are not that completed snapshot.
+No Sharadar ZIP or licensed row was opened, reaudited or admitted here.
 
 ### 258.3 Focused validation and continuing-work handoff
 
 Before acquisition, the unchanged existing forward-quality test file passed
-**19 tests in 0.68s**, no failures/skips/warnings, Python 3.13.15 in the
-designated root under `(version 1)(allow default)(deny network*)`. Final
-record checks and exact range will be recorded after the acquisition
-disposition. Only this lane record is edited; no complete suite or independent
-review is claimed. All three historical P2s, both conditional stress cells,
-independent vendor/security-master/RAW price-score and stock-first formal
-gates remain open; current-version development bytes cannot close them.
+**19 tests in 0.68s** and record/active-document checks passed **86 tests in
+1.25s**, no failures/skips/warnings, Python 3.13.15 in the designated root
+under `(version 1)(allow default)(deny network*)`. Receipt derivation and
+private metadata parsing also use strict network denial; the permitted
+capture itself makes actual provider contact, not a zero-contact claim.
+Final focused selection is the same forward-quality, lane-record integrity
+and active-document files, **105 distinct tests**, not a complete suite or
+new code/QC validation: **105 passed in 1.35s**, no failures/skips/warnings.
+After the validation/owner-answer wording, the same selection passed **105
+tests in 1.09s**. `git diff --check` is clean; the final record is rechecked
+before commit. The read-only advisory scope check found no material issue;
+its suggested candidate-path wording is retained, not independent review.
+
+**Exact round range:** `b6d38960ae8e9168889de0af1c5290fdf0db1b8c..HEAD`:
+`264067ef` pre-acquisition record freeze, then this final record commit.
+Claude must review both commits individually and the retained acquisition
+limits; same-round advisory agents do not supply independent final review.
+Only this lane record is edited; no production/test/frozen source/registry,
+shared ledger or root document changes. All three historical P2s, both
+conditional stress cells, independent vendor/security-master/RAW price-score
+and stock-first formal gates remain open; current-version development bytes
+cannot close them. No new look/cell or formal-alpha spend; floor **313 / 239 /
+49 / 699**. Continue admissible substantive acquisition on actual supported
+rights/access or independent artifacts, without a Claude/routine-approval
+checkpoint; stop this round at that concrete missing evidence/access. The
+monitor remains PAUSED at the human's explicit direction, not obsolete or
+automatically rearmed. No claim of project completion or forward readiness.

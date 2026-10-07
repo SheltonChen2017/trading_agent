@@ -6,6 +6,17 @@ owner replaced the Strong-Buy portfolio program with the Analyst-Consensus ETF
 Rotation program (ACER), which is now priority 1.** The predecessor is archived, not deleted: it remains
 the record of how everything below became true.
 
+**Owner-directed Guidance Revision Drift lane, 2026-10-06:** the owner
+requested a dedicated worktree/branch and the start of implementation.
+`codex/strategy-guidance-revision-drift` now owns bounded offline GDR-0A
+contract/arithmetic preparation under
+`docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`.
+The original design remains an unreviewed proposed-parameter snapshot; this
+step does not complete GDR-0's review/freeze gate, allocate another research
+family slot, borrow protected dates, or authorize provider/outcome access,
+capture, QC, broker, paper/live orders or capital. Existing lanes and their
+sequencing remain unchanged. Stop at the bounded candidate for review.
+
 **Current sequencing amendment, 2026-08-26:** SEP-3 remains frozen at its
 independently accepted eighth dry run and grants no physical-migration
 authority. The owner has now authorized a three-lane strategy-development

@@ -8,9 +8,10 @@ slot at the root of `docs/`.
 
 Current queued plans:
 
-- `GUIDANCE_REVISION_DRIFT_RESEARCH_PLAN_2026-10-06.md` - owner-requested
-  guidance-revision stock research design; independently unreviewed, not
-  scheduled, with no inherited family allocation or outcome/trading authority.
+- `GUIDANCE_REVISION_DRIFT_RESEARCH_PLAN_2026-10-06.md` - original unreviewed
+  guidance-revision design snapshot. Bounded offline GDR-0A preparation is
+  active under the Guidance Revision Drift implementation record; the full
+  program remains queued/unfrozen, without family or outcome/trading authority.
 - `AI_DEBATE_DESIGN.md` — design only; not scheduled.
 - `AI_STRATEGY_AUTHORING_IMPLEMENTATION_PLAN.md` — future advisory authoring
   work; no execution authority.

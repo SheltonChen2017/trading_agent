@@ -1,7 +1,7 @@
 # Session handoff — current project state
 
 Latest generic-workflow update: **2026-10-07, Guidance Revision Drift
-ENG-1..ENG-6 engineering candidates**, recorded in section 0E below. Existing
+ENG-7..ENG-16 engineering candidates**, recorded in section 0E below. Existing
 strategy-lane implementation state remains in each lane's own record.
 
 Historical baseline preparation: 2026-08-29 by Codex after the owner directed a separate
@@ -15,27 +15,25 @@ their lane-owned artifacts.
 
 ## 0E. Guidance Revision Drift lane, 2026-10-07
 
-ENG-1..ENG-6 implemented as offline candidates; independent review pending,
-not original GDR-0..6 completion. Codex works only on
+Claude's completed review push `c1be751a` is accepted after Codex correction.
+ENG-7..16 implemented as offline candidates; independent review pending, not
+original GDR-0..6 completion. Work only on
 `codex/strategy-guidance-revision-drift` in
 `/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`.
-Base: `ff0bb2098d1a06184d41bf1dcc1bb113aaac2174`;
-code: `dc4743923f9890a6682dade4a5f3d6c23e8805a6`;
-record: `6ca9892a6b3169537f14a9568b05f7e0d2fd39f5`.
 Read `docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`
-sections 7-11 for commits, corrected findings, limits and resume scope.
+sections 13-15 for exact commits/dispositions, corrections, evidence and limits.
+Batch code: `0d32ebb813f11c4a5136de0a507a16bfe5487b6b`.
 
-191 focused tests passed, zero failures/skips/warnings; Python 3.12.14/macOS.
-Compilation/import/document/diff checks passed. Base/stress fixtures settle
-with 93 paired dates. Full suites/Windows/QC not run. No shared
-behavior changed; no data/QC/broker/paper/live access or empirical looks.
+96 focused counter-review checks and 148 batch checks passed; Python3.12.14/macOS.
+Seven stitched scenarios retain 93 dates and exact journal replay, including
+explicit refusal/parity blockers. LEAN source/shim callbacks are not a verified
+SDK/cloud run. Shared/main findings remain recorded, not repaired. No full
+lane/repository suite, provider/outcome/QC/broker/paper/live action or empirical look.
 
-One authorized matching-lane push includes this handoff. Prepared pre-push:
-fetchability requires remote confirmation of this commit. No PR/merge.
-Next: Claude reviews the exact
-fetched head, every commit from the base (including initial GDR-0A and both new
-docs commits), and runs the full lane suite. Stop here; no automatic next
-milestone or research authority.
+One authorized matching-lane push includes this handoff; verify its remote HEAD.
+Next: Claude reviews every commit in `c1be751a..HEAD` and runs the full lane
+suite. No PR/merge or automatic next milestone. Original rights/freeze/research/
+QC/account/capital gates remain closed; this one-cycle monitor stops here.
 
 ## 0D. Fundamental Inflection Alpha design, 2026-09-14
 

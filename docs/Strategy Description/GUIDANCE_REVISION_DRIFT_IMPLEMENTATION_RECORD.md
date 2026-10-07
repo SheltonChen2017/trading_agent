@@ -1,10 +1,10 @@
 # Guidance Revision Drift - lane implementation record
 
 Status: **Claude's two pushed review commits are accepted after Codex correction
-in section 13 (2026-10-07). ENG-7..ENG-16 are the next owner-authorized offline
-engineering batch defined in section 14; not yet implemented or independently
-reviewed. Original GDR-0..6 research and operational gates remain closed.**
-Current scope/evidence are sections 13 and 14. Sections 2 through 6 preserve
+in section 13 (2026-10-07). ENG-7..ENG-16 are implemented as offline review
+candidates under section 14, with evidence and limitations in section 15;
+independent review remains pending. Original GDR-0..6 gates remain closed.**
+Current scope/evidence are sections 13-15. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -729,3 +729,228 @@ numeric settings and original Markdown/PDF/candidate bytes are unchanged;
 protected dates, four-lane allocations and every provider/outcome/account gate
 remain closed. Source access and real QC completion are deliberately outside
 these offline definitions, not silently counted as finished.
+
+## 15. Ten-increment offline delivery and review handoff, 2026-10-07
+
+The section-14 deliverables are implemented and author-validated, not
+independently accepted or owner-frozen. This is the authorized combined
+counter-review/batch round triggered by `c1be751ac403b5906428cbf9f86673e1bc23527e`.
+No new Claude trigger is inferred from the eventual Codex push. Original
+GDR-0..6 stages remain incomplete; no shared milestone ledger is marked done.
+
+### 15.1 Delivered behavior, technical and plain-language
+
+**ENG-7 — executable proposed specification.** `specification.py` binds the
+unchanged candidate/source hashes, runs exact threshold/calendar witnesses,
+and inventories eleven unresolved owner decisions plus closed action rights.
+Correction-predecessor, no-tolerance trim, fee, cutoff and synthetic settlement
+semantics are explicit; there is no approval/freeze operation.
+
+In plain language: the proposed rules are inspectable and checked against
+the implementation, but the software cannot sign off the owner's decisions.
+
+**ENG-8 — vendor-shaped synthetic normalization.** `vendor_payloads.py` parses
+one invented Massive/Benzinga-shaped record with exact JSON decimal numbers,
+strict keys, ranges, units, annual period, basis, identities and clocks. Raw
+bytes and synthetic-context hashes survive normalization. Missing provider
+semantics require explicit synthetic context; previous-value fields never
+become captured predecessors. Zero-revenue cuts remain valid risk information.
+
+In plain language: the parser can reject malformed examples without pretending
+that undocumented units, receipt times or correction rules were verified from
+a subscription. It has no API client or licensed-data route.
+
+**ENG-9 — receipt lineage and as-of replay.** `lineage.py` retains at most 128
+raw/context receipts, hashes/checkpoints their immutable order, deduplicates
+economic redeliveries without resetting first capture, and replays corrections,
+withdrawals and conflicts through the existing event model. Identity remaps
+remain evidence in the journal but block replay rather than inventing a mapping.
+
+In plain language: later edits cannot masquerade as earlier knowledge. This
+demonstrates invented-version handling, not a real capture service or PIT proof.
+
+**ENG-10 — dated market-input contracts.** `market_inputs.py` binds raw paired
+quote/trade snapshots and permanent synthetic references to an explicit
+calendar/session, source and receipt/validation clocks. Fresh quote inspection
+allows at most 60 seconds; executable-minute preparation requires availability
+at that minute's actual end, preventing delayed receipts from backdating fills.
+
+In plain language: stale, adjusted, mismatched or not-yet-known data is refused.
+The 93-session schedule remains a test fixture, not an audited exchange calendar.
+
+**ENG-11 — paired corporate-action accounting.** `corporate_actions.py` applies
+explicit whole-share splits, independent cash dividends and terminal inputs
+atomically to affected sleeves. Comparator source-share denominators adjust
+without rewriting original fill receipts. Duplicate action success requires
+both affected domain receipts to match; pending/fractional/noncash unsupported
+cases refuse without partial mutation.
+
+In plain language: stock splits and declared cash can be reconciled. A source
+terminal payout does not justify an invented SPY sale: that comparator position
+remains visible with a permanent unsupported-schedule blocker. No terminal
+economics or new exit-timing rule was invented.
+
+**ENG-12 — bounded durable research journal.** `persistence.py` publishes
+immutable numbered commands by no-overwrite hard link, verifies content,
+genesis/predecessor/sequence/IDs, and synchronizes file and directory entries.
+Stale writers refuse. A lost post-link acknowledgment is explicitly uncertain;
+idempotent retry/recovery must complete synchronization before acknowledgment.
+Limits are 1,024 commands and 64 KiB per record.
+
+In plain language: an interrupted local write is not silently treated as absent
+or complete. Retained hashes detect corruption/truncation relative to those
+anchors; there is no adversarial rollback root or cross-platform power-loss
+guarantee, and this is not an operator database.
+
+**ENG-13 — deterministic paired recovery.** `recovery.py` constructs fresh
+event/strategy/comparator engines from pinned genesis and allowlisted public
+commands. It verifies every result/post-state hash and checkpoint while
+reconciling partial fills, reservations, cancellation races, settlement and
+corporate actions. Comparator commands reference actual strategy-fill indices.
+Correction/withdrawal/conflict chains survive restart. Snapshots are reports,
+never trusted private-state restore images.
+
+In plain language: restarting the invented engine produces the same state and
+does not repeat an acknowledged order effect. There is no broker connection or
+production recovery claim; the release caller verifies supplied source hashes.
+
+**ENG-14 — actual order-based LEAN source.** Isolated `lean/main.py` contains
+`QCAlgorithm`, custom `PythonData` and `FillModel` classes. Deterministic
+decisions issue native limit/async market orders; exact receipts drive native
+fees and order-event reconciliation. `lean_bridge.py` rejects missing, shifted,
+conflicting or unacknowledged callbacks. Only the exact generated synthetic
+sidecar and custom SYN benchmark are accepted; live initialization refuses.
+
+In plain language: actual algorithm methods are wired and locally exercised,
+but AlgorithmImports/QuantConnect/Python.NET are not installed here. The shim
+does not prove LEAN overloads, reader integration or native fill scheduling.
+Native cash uses an explicitly immediate-settlement envelope while shadow
+dated settlement controls spending; this is not cash-account parity. Native
+comparator/corporate-action parity is also unverified. No SDK/cloud run occurred.
+
+**ENG-15 — stitched input/action/restart integration.** `integration.py` composes
+the actual synthetic vendor parser, as-of lineage, eligibility, dated market
+contracts, durable paired command engine, actions and checkpoint/recovery.
+Seven scenarios each retain 93 paired dates: base/stress actions, missing input,
+stale input, underfill, source terminal, and missing historical NAV. Restarted
+and uninterrupted histories reproduce exact state/head/report identities.
+
+In plain language: supported split/dividend cases settle both sleeves. Refusal
+and underfill cases deliberately keep their blockers instead of passing by
+dropping bad dates or inventing trades. These are software checks, not returns
+from market data or completed QuantConnect backtests.
+
+**ENG-16 — reproducible pre-QC review release.** `release.py` fingerprints actual
+recursive source bytes (including native entrypoint and neutral helpers),
+candidate, proposed specification, contracts, calendar, generated sidecar,
+Python environment and original/stitch reports. Verification reconstructs
+canonical bytes, so rehashed omitted fields, bool/int aliases or forged launch
+flags cannot self-certify. The CLI publishes a content-addressed synthetic
+manifest; `launch-preflight` always exits 2 with all authority closed.
+
+In plain language: Claude can reproduce what was checked and see exactly what
+was not. `lean/README.md` specifies later separately authorized order-based
+evaluation, exact source/runtime receipts and the three-failed-attempt/Mia rule.
+No upload, job, source access, paper/live deployment or financial promise follows.
+
+### 15.2 Author-QA finding ledger
+
+This is implementation QA, not Claude's independent review. No P0/P1 was found.
+Section 13 retains every Claude finding/disposition and the unresolved P2
+shared/main issues; none was hidden by this new batch or repaired out of lane.
+
+| ID | Priority / final state | Evidence and correction |
+|---|---|---|
+| GDR-ENGQA-001 | P2 / corrected | Parser-only revenue-positive restriction could suppress a zero-revenue risk cut. Removed it; finite/bounded range validation remains; risk-cut regression passes. |
+| GDR-ENGQA-002 | P2 / corrected | A fresh delayed market receipt must not create a backdated fill. Quote inspection and exact-minute executable preparation now have separate checks; focused regression passes. |
+| GDR-ENGQA-003 | P2 / corrected | A readable linked journal record did not alone prove directory-sync acknowledgment. Duplicate append and recovery now re-synchronize; lost-ack tests pass. Both removed-sync mutants fail and safely restored originals pass. |
+| GDR-ENGQA-004 | P2 / corrected | Python equality could alias boolean/integer command retries. Retry identity now compares exact canonical bytes; alias mutant fails and restored regression passes. |
+| GDR-ENGQA-005 | P2 / corrected | Duplicate action acknowledgment trusted only the comparator receipt and could accept an untouched replacement strategy. Both affected domain fingerprints are required; mixed-engine duplicate refuses without mutation. |
+| GDR-ENGQA-006 | P3 / corrected | Direct bridge dictionary equality accepted `False` as frame index zero. Strict integer type required; native reader already had this guard. |
+| GDR-ENGQA-007 | P2 / corrected | Initial release schema did not satisfy the existing synthetic-only publisher. Narrowed to `gdr.synthetic.review-release.v1`; real CLI output-directory/idempotent-publication regression passes. |
+| GDR-ENGQA-008 | P2 / corrected | Rehashed release `False`/`0` substitutions could survive dict comparison. Verifier now compares reconstructed canonical bytes; both alias regressions refuse. |
+| GDR-ENGQA-009 | P2 / explicitly unverified runtime boundary | LEAN native scheduling, SDK binding and cash-account settlement parity are not demonstrated by local callback tests. Runtime/version/completion flags stay false, native limitations are documented, and external launch preflight is closed. No claim of actual QC completion. |
+
+Additional targeted mutation evidence: disabling USD-unit scaling and exact
+redelivery suppression each made its focused parser/lineage regression fail;
+both were restored and rerun green. Counter-review's separately reproduced
+fourteen mutants remain documented in section 13. No broad mutation battery or
+full suite is claimed.
+
+### 15.3 Validation and release evidence
+
+Python 3.12.14/macOS; all repository execution used the designated worktree and
+branch. Final selected new/affected modules: **134 tests passed in 15.092 s**
+(specification, vendor payloads, lineage, market inputs, corporate actions,
+persistence, recovery, LEAN bridge/source shim, comparator, reporting, scenario,
+and lane boundaries). Stitched integration: **8 passed in 70.124 s**. Release
+reconstruction/export/gate checks: **6 passed in 109.534 s**. Total **148 distinct
+batch-focused checks**, zero failures/errors/skips. These are selected modules,
+not the complete lane or repository suite. Counter-review separately passed
+its 96-check selection. Additional author-QA independently reran five targeted
+durability/recovery checks, all passing; these are not added to the unique total.
+
+Lane/test compilation and `git diff --check` passed. Original Markdown, PDF
+and candidate hash verification remains unchanged. Full lane/repository suites,
+Windows behavior and LEAN/QC execution were not run. Actual provider/outcome
+reads, empirical looks and QC launch attempts: **zero**. Root coordination edits
+are limited to this GDR status/next-action reference; shared behavior, sibling
+lanes, broker/operator/scheduler state and workflow instructions are unchanged.
+
+Post-document checks: six lane boundary tests passed again (0.115 s), including
+fresh-process imports of every new core module without SDK/provider/execution
+packages. Three selected unchanged shared active-document guards passed (0.45 s)
+under normal pytest isolation with network denied: docs-root inventory, bounded
+unique handoff, and both review topologies. The root handoff stays below 50,000
+bytes. These three shared checks are additional to the 148 batch checks.
+
+Committed content-addressed release artifact:
+`research/guidance_revision_drift/releases/fccbef76a0921015e120dbaa73cf09f07ef6d20ac8d42839c7d4f47bce79f305.json`.
+Its filename is its exact-byte SHA-256. The successful actual CLI publication
+returned zero external authority and zero QC attempts. Reproduction requires
+the recorded CPython 3.12.14 environment; environment changes are a different
+release, not permission to relabel the old one.
+
+| Release identity | SHA-256 |
+|---|---|
+| Actual source manifest | `27bf1f0edf93c339e8705ef9aa818d3767f7c04b1d4fc3e12efaabceb5e40757` |
+| Executable proposed specification | `35ed8fcad1a61961b1e7a468c5a49efe6069db08b730fdbca42318f7eba5340c` |
+| Original base/stress fixture report | `d5b5d304f0dcc024dd9414b60924ebba5ba188a79788fd5e4c516b52c2997503` |
+| Seven-scenario stitched integration report | `e0a974f3230daa2378c2214e9c056141f2b5ac995086b6e13b22830ca916fbeb` |
+| Generated native synthetic sidecar (43,135 bytes, not uploaded) | `8f35d56a335d3f7d9dad016e1e2236de7fcd2635e5c463c30081f97b7b944458` |
+
+### 15.4 Exact range, one publication and Claude resume instructions
+
+The completed Claude review target was baseline
+`8424a2b393b4d0803172b87aaa4d494776b977cc`; its two pushed commits through
+`c1be751ac403b5906428cbf9f86673e1bc23527e` have the section-13 per-commit
+dispositions. Codex's next independently reviewable range begins **after**
+that trigger, `c1be751ac403b5906428cbf9f86673e1bc23527e..HEAD`, where HEAD is
+the enclosing final handoff/publication commit on this lane:
+
+1. `9d6f2037951266c283c6c3672f622daf373e05de` — verified counter-review
+   clock, test-isolation, package and mapping consistency corrections.
+2. `9630ac3221182a1dff83a9b788dd86202d567199` — all Claude dispositions,
+   shared-finding qualification and ten pre-implementation definitions of done.
+3. `0d32ebb813f11c4a5136de0a507a16bfe5487b6b` — ENG-7..16 source/tests,
+   package documentation and exact release JSON. This is the final code snapshot.
+4. The enclosing handoff commit — this section and the concise GDR-only root
+   Session Handoff/Action Plan coordination update, with no source change.
+
+Prepared for exactly one successful non-force push, from the designated
+worktree to only `refs/heads/codex/strategy-guidance-revision-drift`. The remote
+was rechecked at `c1be751a` before final publication preparation; the publishing
+session must verify its final remote HEAD and record the resulting exact hash
+in thread/monitor completion state. Do not interpret pre-push text alone as
+proof of fetchability. No PR, merge, second push or next batch is authorized.
+
+Claude: fetch the exact resulting lane head, read current CLAUDE/AGENTS, this
+record sections 13-15, original plan, Action Plan GDR entry and root handoff0E.
+Review every commit above and every retained finding with P0-P3 dispositions;
+independently run the full lane suite and adversarially examine source lineage,
+paired actions, crash boundaries, replay and native callback assumptions.
+Do not infer SDK/cloud success from shim/fixture passes. Source rights, owner
+freeze, research-family allocation, protected dates, provider/capture/QC job,
+account/paper/live and capital gates remain closed. Codex stops here; the
+one-cycle monitor is paused after remote verification. A later review/development
+round requires the owner's next instruction, not our own push as a trigger.

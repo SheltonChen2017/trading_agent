@@ -7,9 +7,10 @@ Rotation program (ACER), which is now priority 1.** The predecessor is archived,
 the record of how everything below became true.
 
 **Owner-directed Guidance Revision Drift lane, amended 2026-10-07:** after
-GDR-0A, the owner authorized six offline engineering increments, ENG-1 through
-ENG-6. That engineering batch is implemented for one combined publication
-followed by independent Claude review; no next milestone starts automatically. Definitions,
+GDR-0A/ENG-1..6, Claude's completed push `c1be751a` was counter-reviewed and
+accepted after lane-local correction. The owner-authorized next ten offline
+increments, ENG-7..16, are implemented as review candidates for one combined
+publication, then independent Claude review; no next milestone starts automatically. Definitions,
 implementation status and remaining gates for
 `codex/strategy-guidance-revision-drift` are recorded under
 `docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`.

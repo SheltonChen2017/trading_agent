@@ -1,31 +1,28 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CONTINUOUS BUILD RESUMED AND THE FIXED SYNTHETIC TYPED
-RANKING/COHORT-TO-ORDER BRIDGE IS IMPLEMENTED AT `0a7a3544`.
-SECTION 95 RECORDS 295 NETWORK-DENIED FOCUSED CHECKS PASSING, TWO
-CONFIRMED DRAFT CORRECTIONS AND A RETAINED TEST-CONTRACT FALSE ALARM.
-SECTION 94 RECORDS THREE NEW VERIFIED METADATA EMAILS AND REMOVAL OF
-DUPLICATE RIGHTS-LETTER PAPERWORK; THEY ARE DISTINCT FROM SECTION 92'S
-EARLIER CORRESPONDENCE. NO ROUTINE OWNER APPROVAL PAUSE IS REQUIRED.
-THIS IS OFFLINE SOFTWARE EVIDENCE, NOT SOURCE ADMISSION, PROJECT/LANE
-COMPLETION OR REAL-BACKTEST READINESS. CODEX'S LAST CLAUDE COUNTER-REVIEW
-REMAINS THE ACCEPTED SOLE `5275b7d5` COMMIT IN `249c6e45..5275b7d5`
-(SECTION 90); NO NEW CLAUDE COMMIT APPEARED AT THE OBSERVED MATCHING
-REMOTE `587bda71`. THE COMPLETE NEXT CLAUDE RANGE STARTS AT `5275b7d5`
-AND INCLUDES EVERY SUBSEQUENT CODEX COMMIT. CLAUDE'S HISTORICAL 817-PASS
-RUN DOES NOT VALIDATE THIS NEW CODE. THE ORIGINAL SYNTHETIC ORDER/R20/
-COMPOSED RECEIPTS AND FROZEN EMPIRICAL PROTOCOL ARE UNCHANGED.
-AUTHENTIC SI ARCHIVES, ACTUAL AVAILABILITY AND LISTED/DELISTED PIT
-COMPANION COVERAGE STILL BLOCK THE ACTUAL ADAPTER AND HISTORICAL
-BACKTEST; EXISTING APPLICABLE TERMS, NOT AN EXTRA PERMISSION LETTER,
-GOVERN RIGHTS. SOURCE P2S, SHARED P2S AND PROSPECTIVE COMMITMENT ADVISORY
-REMAIN OPEN. PRIOR LEDGERS, FALSE ALARMS, PRIVACY REDACTION AND UTC ERRATUM
-ARE PRESERVED; NO PUBLISHED HISTORY IS REWRITTEN. LOOKBACKS 20/60/120/252
-REMAIN UNSELECTED, REAL OUTCOME LOOKS 0/0, ALPHA 0 AND PERMANENT LOOKS
-NONE. NO ACTUAL DATA/OUTCOMES, HOLDOUT, PRODUCTION RANKS/SEEDS, ETF, QC
-PROCESSING/JOB, PURCHASE/TERMS, BROKER/DATABASE, DEPLOYMENT, PAPER/LIVE,
-CAPITAL OR TRADING ACTION OCCURRED. THE CLAUDE ONE-SHOT STAYS DELETED
-AND THE EXCHANGE-REPLY MONITOR STAYS PAUSED.**
+Status: **OWNER-PURCHASED MASSIVE STOCKS STARTER IS VERIFIED ACTIVE;
+SECTION 96 RECORDS THE DOCUMENTED SHORT-INTEREST ENTITLEMENT, ONE VERIFIED
+METADATA-ONLY SUPPORT INQUIRY AND THE OWNER-SUPPLIED SHARADAR CAPTURE'S
+BYTE-IDENTITY CHECK. THIS IS SOURCE QUALIFICATION, NOT AN ADMITTED PIT
+ARCHIVE, PROJECT/LANE COMPLETION OR REAL-BACKTEST READINESS. THE FIXED
+SYNTHETIC TYPED BRIDGE AT `0a7a3544` AND SECTION 95'S 295 FOCUSED CHECKS
+ARE UNCHANGED; NO NEW CODE OR EMPIRICAL RUN IS ADDED. STARTING LOCAL,
+TRACKING AND MATCHING ACTUAL REMOTE ARE `99b4ef0e`; NO NEW CLAUDE RANGE
+APPEARED. THE LAST ACCEPTED CLAUDE COUNTER-REVIEW REMAINS SECTION 90'S
+SOLE `5275b7d5` COMMIT; THE NEXT INDEPENDENT RANGE STARTS AT `5275b7d5`
+AND INCLUDES EVERY SUBSEQUENT CODEX COMMIT. AUTHENTIC ORIGINAL/CORRECTION
+VINTAGES, ACTUAL AVAILABILITY, LISTED/DELISTED PIT COMPANION COVERAGE AND
+THE APPLICABLE COMPUTATION/QC ROUTE REMAIN UNQUALIFIED. NO ROUTINE OWNER
+APPROVAL PAUSE OR EXTRA GENERIC RIGHTS LETTER IS REQUIRED; EXPLICIT USE
+RESTRICTIONS AND SOURCE FACTS CANNOT BE INVENTED. SOURCE P2S, SHARED P2S
+AND THE PROSPECTIVE COMMITMENT ADVISORY REMAIN OPEN. HISTORICAL LEDGERS,
+FALSE ALARMS, REDACTIONS AND ERRATA ARE PRESERVED. LOOKBACKS 20/60/120/252
+REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE. THE
+PURCHASE WAS THE OWNER'S ACTION; CODEX MADE NO PURCHASE OR BILLING CHANGE,
+ACCEPTED NO TERMS AND REQUESTED NO MARKET ROWS, OUTCOMES, HOLDOUT OR QC
+PROCESSING/JOB. NO BROKER/DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL OR
+TRADING ACTION. THE CLAUDE ONE-SHOT STAYS DELETED AND THE EXCHANGE-REPLY
+MONITOR STAYS PAUSED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -12852,3 +12849,198 @@ single final Git publication is the sole remaining authorized external write
 in this resumed round. Shared/project-wide documents and
 SESSION_HANDOFF stay frozen. The deleted Claude one-shot and paused exchange
 monitor remain unchanged; neither is rearmed by this build.
+
+## 96. Owner-purchased Massive Starter activation and source qualification — 2026-10-07
+
+### 96.1 Exact scope, snapshot and review boundary
+
+The owner's newest instruction is:
+
+> stocks start purchased. proceed
+
+Codex verified the existing signed-in **Stocks Starter / Individual** product
+in the normal subscription UI. It showed access until **2026-11-06**, with
+renewal cancellation already pending. No subscription, renewal, cancellation,
+payment, account classification or legal agreement was changed by Codex. This
+updates the current source-candidate status; it does not backdate acquisition
+into section 95 or turn a paid product into a PIT or QC admission receipt.
+No secret, payment detail, account identifier or private contact is recorded.
+
+All repository work uses only
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+on `codex/strategy-short-interest`. Physical/Git root, branch, clean status,
+HEAD and the matching actual remote were verified at
+`99b4ef0e1fea255ad83c60a3ba395b0aaeea59c6`; no fetch or sync was needed.
+This round changes **only this implementation record**, with no code/test
+change. The scoped range is **`99b4ef0e..this record commit`**. The last
+accepted Claude range remains the sole `249c6e45..5275b7d5` commit in section
+90; no newer Claude push exists in these observations and no Codex commit is
+misrepresented as an independent Claude review.
+
+Claude's complete next range is **`5275b7d5..published HEAD`**, eight ordered
+Codex commits: the first six exact commits in section 95.1, the section-95
+record at `99b4ef0e1fea255ad83c60a3ba395b0aaeea59c6`, and this new record.
+Every commit, including both record commits, remains **pending Claude's
+independent disposition**. Implementation-time helper checks are not that
+review. No formal new counter-review or empirical milestone is claimed.
+
+### 96.2 Verified product documentation versus unresolved source facts
+
+The [official Short Interest endpoint](https://massive.com/docs/rest/stocks/fundamentals/short-interest)
+documents FINRA-reported twice-monthly outstanding positions. Every paid
+Stocks tier has all available endpoint history, beginning **2017-12-29**;
+the free tier has two years. Starter's separate price/bar history limit does
+not truncate that documented SI entitlement. Activation plus documentation
+establishes a candidate access route, **not a successfully queried endpoint
+or a complete historical listed-stock universe**. No authenticated market-row
+request, sample response, ZIP export or price join was made.
+
+The documented SI row fields are `ticker`, `settlement_date`,
+`short_interest`, `avg_daily_volume` and `days_to_cover`. Public documentation
+does not establish retained first releases/all correction versions, actual
+historical public/API availability clocks, or stable-ID/effective-listing
+bindings. These facts remain **unverified**, not claims that the provider
+cannot supply them. All-history depth alone does not prove NYSE/Nasdaq or
+delisted coverage throughout that period. Settlement time, the date a file is
+downloaded, a planned calendar and a request ID cannot substitute for the
+required historical release/correction evidence. Short volume is not used as
+a replacement for outstanding positions.
+
+The [Market Data Terms](https://massive.com/legal/market-data-terms-of-service),
+dated **2025-08-28**, contain personal-use limits, a display-use default and
+section 5(d)'s restriction on unlicensed non-display/derived use. The official
+[QuantConnect integration](https://www.massive.com/blog/integration-quantconnect)
+advertises research/backtesting, but does not establish the precise SI/custom-
+data representation under this purchase. This is a **material existing-terms
+ambiguity**, not a demand for a separate blanket permission letter or a claim
+that all personal research is prohibited. Applicable product terms or a
+specific clarification may resolve it; no permission or prohibition for the
+exact local/QC route is invented. Retention after the paid period also needs
+the applicable contract, not an assumption that cancellation or continued
+Basic access permits indefinite historical use.
+
+### 96.3 Completed Massive support inquiry and receipt
+
+A narrow existing-correspondence search found no matching SI/QC/non-display
+thread in the returned results; this is not a mailbox-wide absence claim.
+Codex sent **one metadata-only inquiry** through the authenticated Gmail
+connector to the officially documented Massive support route. Readback
+verified SENT, intended recipient, exact subject and authored HTML body,
+without attachments. Exact message/thread **`1a1153833ffd0eff`**, sent
+**`2026-10-07T07:16:06Z`**. Private addresses, headers, affiliation information
+and the message body remain outside Git. The support UI was viewed but no
+chat message was submitted; no duplicate support send occurred.
+
+The six questions request the upstream product and exchange/listed/delisted/
+zero-versus-missing coverage; immutable original/all-correction versions or a
+complete affected-release inventory; actual public/API release and correction
+clocks; stable security/share-class and effective ticker/listing mapping; the
+existing-plan local archive/non-display research/retention terms; and the
+specific private QC custom-data or non-reconstructible-signal processing
+route. The message expressly requests **metadata/documentation only**, no
+rows/files/samples, upgrade, trial, new agreement, paid service or purchase.
+This records a completed inquiry, **not a substantive provider response or
+source acceptance**. A subsequent bounded read of that exact thread returned
+only the sent message, with no later reply in the returned messages; this is
+not a mailbox-wide absence claim. No monitor is armed or changed by sending it.
+
+### 96.4 Existing Sharadar companion capture: byte evidence, not PIT admission
+
+The owner supplied the immutable input directory
+`arv2-sharadar-source-20260914T003329843989Z` beneath the analyst-revisions
+lane's artifact tree. Its narrow read-only use is as an input, **not another
+working checkout**: no other-lane code, credential/configuration or document
+is executed, changed or synchronized. The implementation-time helper repeated
+the metadata/byte checks from the designated SI working directory, with a
+clean `99b4ef0e` guard before each check.
+
+| Immutable file | Verified bytes | SHA-256 |
+|---|---:|---|
+| `manifest.json` | 5,998 | `94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b` |
+| `01-tickers-years-full.zip` | 4,937,076 | `a7b129f159631ee50f1eefd2be8d4215c1c7818880570c0ad0a79c76c25e51bf` |
+| `02-actions-years-full.zip` | 10,386,585 | `aa455ade19fb96f907c03b399c6254ff9ec03f067cb2a19aeea2792062dca520` |
+| `03-fundamentals-years-full.zip` | 660,340,539 | `ac432104db2af7139c9b7a82f871b46b2b335a62e9ab4ac7ec57ddc430f1ab30` |
+
+The manifest digest matches its sidecar; archive byte hashes/sizes match the
+manifest. ZIP central-directory listings confirm one CSV member per archive.
+No archive is decompressed or member/market row read. The logical capture
+hash, declared row counts and member-content hashes are **not recomputed**
+and are not reported as independently verified.
+
+Declared semantics identify tickers as a current active/delisted snapshot,
+explicitly not historical PIT identity; actions as a current history export
+for event discovery; and fundamentals as a multi-dimension export with an
+other-lane ART/date-only admission declaration. That declaration is not SI
+admission or proof of intraday availability. The capture has **no SI or SEP
+daily price/volume archive** and deliberately persists no API key. Byte
+integrity therefore advances companion provenance without proving original
+vintages, effective classifications, raw opens, dividend payment economics or
+complete terminal cash. No fresh Sharadar/provider or QC request occurred.
+
+### 96.5 Exercised approvals, decisions and retained ledger
+
+| ID | Exercised approval / decision | Exact boundary |
+|---|---|---|
+| `SI-AUTH-20261007-01` | Owner reports Starter acquired and directly instructs "proceed". | Authorizes the existing-plan qualification continuation under standing delegation; the purchase itself was the owner, not a Codex purchase/terms action. No adjacent outcome/QC/trading permission inferred. |
+| `SI-AUTH-20261007-02` | Record the previously owner-supplied companion artifact path's narrow read-only scope. | Recording date is not a claim about when the earlier owner utterance occurred. Metadata/byte integrity only; not other-checkout work, key retrieval or actual row/outcome admission. |
+| `SI-DEC-20261007-01` | Keep the acquired Starter route as the primary low-cost candidate without another tier or annual commitment. | More expensive paid tiers document no additional SI history or revision/publication contract; no new spending, renewal or cancellation action. |
+| `SI-DEC-20261007-02` | Send and verify one targeted Massive metadata/support inquiry through Gmail. | Resolves concrete source/terms questions rather than requesting generic extra paperwork; no sample/data acquisition or contract acceptance. |
+| `SI-DEC-20261007-03` | Preserve the existing PIT claim and four-lookback protocol; do not silently replace it with a latest-revised exploratory test. | A different research claim would require its own prospective scope/epoch and accounting; neither the purchase nor delegation restores missing original values. |
+
+| Retained finding | Priority | Current evidence / disposition |
+|---|---|---|
+| `SI-SRC-20260928-001` | P2 | Open: the documented settlement field and inquiry do not authenticate historical public/correction availability. |
+| `SI-SRC-20260928-002` | P2 | Open: no immutable original/all-correction archive or exhaustive affected-release inventory is supplied by Starter activation. |
+| `SI-SRC-20260928-003` | P2 | Open, qualification advanced: product activation and companion byte identity are verified; effective listed/delisted identity, PIT price/volume/terminal integrity and exact computation/QC route remain unqualified. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Shared/out-of-lane, open and unchanged; no shared behavior or document changed. |
+| `SI-CR15-001` | P3 | Retained as a prospective advisory for any later paid upgrade/trial/agreement. It does not misclassify the owner's scoped Starter purchase as an unauthorized Codex commitment. |
+
+All prior confirmed, partial, false-alarm, resolved and historical rows remain
+verbatim. No new software defect, P0/P1 finding or correction is claimed;
+red/green and import-boundary reruns are not manufactured for a record-only
+change. Section 95's tests retain their original attribution and limits.
+
+### 96.6 Focused validation, publication and exact next action
+
+The network-denied active-document check completed **69 passed in 0.94s**,
+with zero failures, skips or warnings; provider/QC credential variables were
+removed from the test environment. Diff checks are clean and the code/test
+tree is unchanged. Byte comparison verified every historical body/ledger
+from section 1 through section 95 verbatim against `99b4ef0e`, SHA-256
+`82a8986a1eeb53944ad5a70e4d0d0140545984fe6f631d6f5dde476841bf92f6`.
+This final validation-text edit receives another active-document, privacy,
+diff/status and history-preservation check before commit. No full lane/
+repository suite, compilation or new import test is claimed; no executable
+or import changed.
+
+Section 81's **SI-AUTH-20261005-02** permits one final non-force push after
+this scoped source-qualification record is documented and validated, even
+though the empirical milestone remains blocked. Recheck physical/Git root,
+branch, HEAD, status and the matching actual remote before commit and push;
+publish only **`HEAD:refs/heads/codex/strategy-short-interest`**, with follow-
+tags disabled. Verify clean status and local/tracking/actual-remote equality
+afterward. This text does not assert push success in advance.
+
+Next: assess the exact Massive inquiry thread's substantive response against
+the official product/terms and authenticated source evidence; complete the
+existing companion-data qualification. If the response establishes only
+latest-corrected history, the original-vintage route remains refused until a
+complete original/correction or exhaustive exclusion contract exists. Do not
+invent revision IDs/publication timestamps, build a generic placeholder
+parser, relabel the synthetic runner as empirical, or substitute forward/ETF
+work. Once actual source facts are supplied, reuse the canonical immutable
+vintage/identity contracts for the provider-specific adapter, then freeze the
+covered dates/power/cashflow/look protocol and verify the exact QC route before
+any order-based historical candidate. No new routine owner choice is required
+for the completed qualification; the remaining dependency is factual evidence.
+
+Candidate lookbacks **20/60/120/252** remain unselected; structural
+normalization and release-next-open eligible-stock reranking unchanged;
+authorized/consumed real outcome looks **0/0**, alpha **0**, permanent looks
+**none**, QC launch attempts **0**. No provider/FINRA/SEC market rows, licensed
+prices, outcomes, sealed holdout, production rankings/seeds, ETF, QC history/
+project/upload/processing/compile/job/backtest, purchase/trial/terms, broker,
+operator database, deployment, paper/live, capital, orders or trading action
+occurred. The one verified support email and eventual one lane push are the
+only external writes of this round. Shared/project-wide documents and
+SESSION_HANDOFF stay frozen; no monitor/scheduler is rearmed or changed.

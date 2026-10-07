@@ -1,22 +1,18 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 141 COMPLETES THE CONTINUOUS OFFLINE SOURCE-SCALE,
-CAUSAL-FIRST-OPEN, REGISTERED-ANALYSIS AND NATIVE-QC ENGINEERING ROUND.
-SECTIONS 139-140 RECORD THE OWNER'S EXPLICIT CLAUDE-WAIT WAIVER
-AND BACKTESTING-READINESS BUILD (NOT FORWARD-LOOKING RESEARCH).
-SECTION 136 COUNTER-REVIEW IS ACCEPTED AFTER QUALIFICATION; SECTION 138'S
-COMMITTED 2006Q1 PREPARATION/QUARANTINE RESULT STANDS. V2 SCALE/PILOT
-CONSUMERS AND THE BOUNDED EVIDENCE-BOUND BACKTEST PIPELINE ARE IMPLEMENTED
-AND FOCUSED-VALIDATED. ACTUAL READ-ONLY DOWNSTREAM REPLAY PASSED: ALL 83,657
-ROWS RETAINED, ALL QUARANTINED, NO SOURCE IDENTITY OR READY MANIFEST.
-NO POSITIVE SOURCE/PIT/RIGHTS/QC/LOOK EVIDENCE HAS BEEN CREATED BY THE WAIVER.
-FOUR TOPICAL P2 FINDINGS AND LEGACY/THAW BOUNDARIES REMAIN OPEN. STRICT D23
-HAS SEVEN NONEXACT QUARTERS AND NO 82-QUARTER DIGEST. V1/SCALE/PILOT AND
-FOUR V3 FILES STAY FROZEN; V3 REMAINS 1,846 OF 1,847 STARTS, WITH ONLY
-19,526 OF 99,394 FROZEN-WINDOW PARENTS SOURCE-BOUND. NOT YET BACKTEST-READY
-OR PROJECT-COMPLETE. BOTH FINAL ACCESS CLASSIFICATIONS STAND WITHOUT
-RETROACTIVE APPROVAL. NO NEW SOURCE/OUTCOME/QC/BACKTEST/EXECUTION ACTION.
-LOOKS/JOBS/BACKTESTS 0/0/0.**
+Status: **SECTION 145 RECORDS OWNER-CONFIRMED ACQUISITION/REUSE: ALL THREE
+SUPPLIED SHARADAR ARCHIVES AND 3,989,156 ROWS INDEPENDENTLY VERIFIED;
+BENZINGA EARNINGS PRODUCT ACCESS OBSERVED HTTP 200 IN ONE FIXED REQUEST.
+THE BOUNDED NATIVE QC RESEARCH PROBE IS PREPARED, NOT EXECUTED; SAFARI IS
+AUTHENTICATED BUT MAC LOCKING BLOCKS CONTROL. SEC NEEDS A GENUINE CONTACT
+AND A FRESH BOUNDED CAPTURE, NOT A SUBSCRIPTION OR RESUMED V3. CONTINUOUS
+BUILD/CLAUDE-WAIT WAIVER REMAINS; NO SOURCE/PIT/RIGHTS/LOOK OR READINESS
+PROMOTION IS INFERRED. EARLIER 83,657-ROW ALL-QUARANTINE RESULT, FOUR
+TOPICAL P2 FINDINGS, SEVEN D23 NONEXACT QUARTERS AND BOTH FINAL ACCESS
+CLASSIFICATIONS STAND. FOUR V3 FILES AND V1/SCALE/PILOT STAY FROZEN;
+V3 REMAINS 1,846/1,847, ONLY 19,526/99,394 FROZEN-WINDOW PARENTS SOURCE-BOUND.
+ONE NEW QC CODING WORKSPACE/AUTOMATIC TEMPLATE COMPILE, NO NATIVE HISTORY
+PROCESSING, STRATEGY LOOK, BACKTEST LAUNCH OR TRADING. NOT BACKTEST-READY.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -246,6 +242,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex owner-waived continuous backtesting build | Published start `932f30c6e55dbf8d978ad8dee7c8721921133fbc`; implementation/preregistration `b406c5b8600fa54f4181a9ecf73da827878c072e`; this separate observed handoff | Real v2 downstream bookkeeping and bounded evidence-to-score-to-QC-package integration, without Claude waiting | Explicit later owner review waiver honored; original 2006Q1 producer remains b0efb312 with all 95 original non-launcher dependencies byte-identical. New genuine-byte test paths and real all-quarantine negative path preserved. Source/event/primary/cohort/calendar/lineage defects corrected; no fake admission. | Main focused **734 passed in 28.53s**, all denied-network; actual read-only replay from clean b406c5b8 passed with 100-source capture/48-module execution. All 83,657 rows retained/quarantined, 71,679 relevant rows lack parents; wire SHA `7d5d13af...`. No data writes, new source/outcomes/QC/backtest or full suite. | New P2/P3 draft findings corrected with red/green; four topical P2 remain OPEN at precise scopes; all prior closures/classifications/denominators preserved. Genuine IB-5 evidence remains unbound; bounded 256-parent software candidate is not full historical readiness. | One combined matching-lane push and exact remote-tip verification. No Claude wait or rearmed monitor. Establish genuine existing source/PIT/calendar/rights/outcome-header/QC/protocol bindings before input-driven full-scale/temporal/statistical/parity activation; do not invent evidence or broaden named access scope. |
 | 2026-10-06 | Codex continuous owner-waived build | Published start `1bfe1b1f18a56fb77ce80ade723e5e482ea2cb80`; implementation/decisions `f276f2f684c6378347cfae5636612b7fd078a0b0`; this separate exact-hash handoff | Study-scale original-source streaming, causal first-open population, registered analysis and native QC candidates | No new incoming Claude commit; prior counter-review remains accepted. Owner no-wait direction and delegated choices exercised through sixteen recorded decisions, including explicit seasoned-stock primary scope, without a review pause or guessed factual approval. Existing contracts/frozen files remain. | Main final focused integration **1,234 passed in 82.53s**; eighteen in-memory compilations and hash bindings pass; 72 final document/exact-package controls passed before implementation commit. Genuine fixture scaling: 390 source dates separately from 321 issuers/dates x 6,000 controls; no actual cloud or research observation. | Corrected draft P2/P3 findings retain genuine red/green vs inspected/reversal provenance. Four topical P2 OPEN, prior closures/classifications/denominators unchanged. Missing genuine source/PIT/rights/outcome/QC facts still block actual readiness; no fixture promotion. | One combined matching-lane push after separate handoff and final remote/status checks. No Claude wait or monitor rearm. Bind actual missing input evidence before factual activation; no fabricated source/licensing/entitlement/registered look, no new acquisition, outcome, QC or trading action. |
 | 2026-10-07 | Codex owner-waived provider integration | Published start `59ef662062e91e09d9449aeb3f23cb5812ce7142`; implementation `195012fd471f028f5b2a196e4b97419197bafc68`; this separate exact-hash handoff | Capability journal, supplied current-reference triage and private rights evidence | QC authentication HTTP 200; Massive public status HTTP 200 is not Benzinga entitlement. Supplied Sharadar ZIP/hash/header verified without interpreting rows or opening actions/fundamentals. No incoming review or Claude wait. | Final focused **510 passed in 2.61s**, eight memory compilations, frozen historical equality and independent eight-leaf private journal verification. Two fixed metadata requests, 424 response bytes; zero Sharadar/SEC requests, looks, uploads, compiles, jobs or backtests. | `IBMETA-R01..R05` corrected with genuine red/green; shared QC documented-envelope issue recorded without shared edits. Four topical P2 and prior dispositions/classifications/denominators unchanged. Credentials do not establish readiness. | One combined matching-lane push after separate exact-hash handoff. No review wait or monitor rearm. Bind real original-parent/PIT/listing/reference/rights/product/vintage evidence before production activation; no ordinary owner choice is deferred. |
+| 2026-10-07 | Codex owner-confirmed acquisition/reuse | Published start `f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`; exact implementation and separate handoff follow | Actual retained Sharadar audit and one-shot purchased Earnings access; bounded QC probe prepared | User confirms QC/identity/Sharadar work and purchased Earnings; Safari authentication verified. All three retained archives and all 3,989,156 rows independently match manifest hashes/counts. One fixed Earnings request HTTP 200, 389 bytes, one row, privately replayed. No financial arithmetic/price-return join/look. | Focused and final integrated checks in 145.6; genuine red/green fixes and peer audit. Native QC code prepared but not run; new owned coding workspace/template auto-build only. SEC requests zero; no broad suite or new acquisition of completed/ambiguous parents. | Draft Sharadar, Earnings custody/credential/count, and QC cell/frontier defects corrected. Four topical P2 and shared issue remain OPEN; all prior closures/classifications preserved. Public Earnings history does not cover pre-2010 segment or prove schedule versions. | Complete authorized bounded acquisition/reuse checkpoint with one matching-lane push. Manual Mac unlock permits exact native QC probe; genuine SEC contact and separately committed fresh capture permit original-parent acquisition. No purchase, review wait, monitor rearm, raw QC export or readiness fabrication. |
 
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
@@ -19784,3 +19781,278 @@ After this separate handoff was added, the same active-document/record/exact-
 package selection passed **72 in 1.01s**, with no failures/skips/warnings.
 Only the expected lane record is modified at implementation HEAD
 `195012fd471f028f5b2a196e4b97419197bafc68`; final code/test bytes are unchanged.
+
+## 145. Owner-confirmed acquisition and retained-data reuse (2026-10-07 owner-local)
+
+### 145.1 Current direction and pre-access decisions
+
+Designated root/branch remain
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__insider_buying`
+and `codex/strategy-insider-buying`. Clean starting HEAD and fetched matching
+origin are `f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`; the ordered incoming
+range is empty. No independent review is invented. The owner's continued
+build/no-Claude-wait direction remains active, with one combined push and a
+separate exact-hash handoff. Shared/project-wide documents remain frozen.
+
+The owner asks whether SEC originals can be acquired now and need a
+subscription, confirms proceeding with historical identity/QC-native data/
+Sharadar reuse, and states that Benzinga Earnings has already been purchased.
+Later clarification identifies the authenticated QC browser as **Safari**.
+These are recorded human directions and owner-confirmed access/purchase,
+not silently relabeled authenticated contract or complete PIT coverage.
+
+| Decision | Pre-access disposition |
+|---|---|
+| IBDEC-145-01 | SEC originals are public/free; no subscription purchase is needed. A genuine SEC contact is absent from the checked environment/lane configuration and is requested privately/nonblocking. Do not invent an email or use a placeholder. No SEC request occurs before that input and a separately committed, bounded fresh acquisition implementation exist. |
+| IBDEC-145-02 | Preserve stopped v3, its unmatched start and every completed/ambiguous request. Existing v3 executor is not a v4 command. Any first fresh continuation must reverify the accepted historical source-view partition and select only originally unattempted identities, with exclusive cross-journal claims and fsynced starts. No old root, 81,715-target recipe, or receipt literal is used as acquisition authority. |
+| IBDEC-145-03 | Consume the explicitly supplied existing Sharadar capture locally for independent full archive/member/schema/count verification. All numeric fields remain opaque strings; no strategy join, score, return, financial arithmetic or raw-row export. Retain non-admitted MR dimensions; ART is only a candidate, not intraday-as-known proof. No new download/key is required for the existing capture. |
+| IBDEC-145-04 | Confirm the purchased Earnings product through exactly one fixed 2010-04-30 source-schema/access page, limit 1, sorted by date. No retry, pagination, redirect, proxy, price/return join, surprise evaluation, look, QC upload or job. The response can contain financial fields; do not claim zero financial bytes. Store only a validated successful raw response privately at mode 600 for independent replay; never persist an error body or credential. Purchase stays owner-reported; HTTP access does not prove all history or original schedule versions. |
+| IBDEC-145-05 | Public Earnings documentation starts at 2010-04-30, leaving the 2006 through 2010-04-29 study segment uncovered by this product. Do not silently narrow the frozen 82-quarter source window, backfill it from today's schedule or turn last_updated into original-publication history. This is a factual coverage gap, not a request for another routine approval or duplicate subscription. |
+| IBDEC-145-06 | QC-native processing stays inside the owner's authenticated Safari Research workspace. Any bounded data-access diagnostic is separate from a strategy/backtest/look, uses fixed predeclared CIK/date/clock inputs, exports no raw bars/reference master and places no order. Do not purchase local-download products or infer permission for arbitrary local conversion/export from native access. No live/funded/broker/operator/scheduler action. |
+| IBDEC-145-07 | Owner confirmation authorizes the named acquisition/reuse work; it does not fabricate exact historical validity/knowledge/listing, intraday fundamental availability, original Earnings vintages, private contract evidence, a permanent registered look or observed completed engine runs. Preserve both final historical access classifications without retroactive approval and the complete P0-P3 ledger. |
+
+Primary acquisition references rechecked before provider access:
+[SEC developer resources](https://www.sec.gov/about/developer-resources),
+[Earnings history/schema](https://massive.com/docs/rest/partners/benzinga/earnings),
+[Sharadar as-reported dimensions](https://sharadar.com/docs/fundamentals),
+[QC native equities](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/algoseek/us-equities),
+[QC terms section 2.6](https://www.quantconnect.com/terms).
+Public documentation reads are separate from authenticated acquisition calls.
+
+### 145.2 Independently observed supplied Sharadar contents
+
+The exact supplied capture from section 143 is retained read-only in the
+Analyst lane artifact location explicitly supplied by the owner; no repository
+command or checkout switched to that sibling. Its externally pinned manifest
+hash remains `94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b`.
+The first full offline audit used base HEAD `f0c5b48d...` and uncommitted
+audit source `1f323e33ac851c7bf76ea2ed99f436775c24567933eeb50b484a22f1c91ec6b7`,
+not a later commit. It enforced OS process-tree network, all-write and fork
+denial with a minimal environment and Python -B.
+
+| Actual source | Independently counted rows | Uncompressed bytes | Independently matched member SHA-256 |
+|---|---|---|---|
+| TICKERS | 74,150 | 24,939,614 | `562577ea331805c4d50229b783e37216c9422c09d921b17dc950cf267ecf7697` |
+| ACTIONS | 698,455 | 48,873,252 | `d61ec8a8ceb1a8b1333c74687b127ef4d20139e522151e75e2038ed3b35c7174` |
+| FUNDAMENTALS | 3,216,551 | 2,414,966,531 | `59b7a5eb64c83339ab4363a85cb8a6483e68ecc69ee8685c48f544ddaeadae27` |
+
+All three compressed archive hashes/byte counts and complete decompressed
+member hashes, headers/widths/row counts/CRC metadata independently match the
+supplied manifest. Total rows **3,989,156**, compressed bytes **675,664,200**,
+uncompressed bytes **2,488,779,397**. This replaces the earlier header-only
+observation for this new execution, without rewriting section 143's history.
+Current TICKERS flags: **23,718 N / 37,178 Y / 13,254 unknown**. Fundamentals
+dimensions: **ARQ 681,533 / ART 688,264 / ARY 186,630 / MRQ 718,901 /
+MRT 737,886 / MRY 203,337**. Exactly **446,254** ART rows have date text in
+2006-01-01 through 2026-06-30; this is not an eligible event count, complete
+historical population or pre-open availability assertion. ACTIONS metadata
+dates span 1997-12-31..2026-09-15, FUNDAMENTALS date fields
+1990-06-06..2026-09-11; both have zero invalid date strings. Later/current
+rows are not supplied to a historical decision by this audit. No financial
+field was evaluated, no raw row exported, no original parent or PIT master
+manufactured, and no provider request/look/job/backtest launched by this audit.
+
+### 145.3 Draft findings and validation before external acquisition
+
+New code is outside the offline Insider package; import remains inert.
+Confirmed draft issues are fixed rather than hidden behind the real input's
+successful hash match. Prior resolved findings stay in their original entries.
+
+| ID | Priority/status | Evidence, reason and correction |
+|---|---|---|
+| IBSHAR-AUD01 | P3 corrected | Boolean manifest row_count=True compared equal to one observed row. Genuine red 1 failed in 0.47s; require exact-int counts throughout archive/member/dimension/flag/total metadata; green 16 passed in 0.23s. This is malformed-schema admission, not an invalidation of correctly typed real counts. |
+| IBSHAR-AUD02 | P3 corrected | Deflate failure and OS read faults escaped the sanitized boundary; a growing archive was checked only after EOF. Genuine combined red 3 failed/16 deselected in 0.38s. Catch narrow I/O/decompression faults and enforce the opened-size cap on every compressed read; green 19 passed in 0.51s. |
+| IBSHAR-AUD03 | P3 corrected | A FIFO could block before the file-type check. Genuine red 1 failed in 0.68s, releasing the invented FIFO before test exit. Validate named regular/single-link/size first and open nonblocking/nofollow against substitution; final Sharadar focus 20 passed in 0.39s. |
+
+All draft tests used effective process-tree network denial, minimal env,
+Python 3.12.14 -B, disabled pytest plugin autoload/cache. No complete lane or
+repository suite. External observations, final integrated checks, exclusions
+and precise next step follow after the one-shot execution, not before it.
+
+### 145.4 Actual Earnings access, private custody and independent replay
+
+The preregistered fixed request was executed exactly once at base HEAD
+`f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27` with uncommitted final runner
+`f43f8eaaf174c67d6e0bd29323add46702a6a8d5e858f9bf9e0c0abfb6a4aa4d`.
+No later implementation commit existed during this run. Other directly used
+metadata/shared auth sources remain section 143's unchanged current bytes.
+Private output:
+`artifacts/insider_buying/benzinga_earnings_access/ib-earnings-access-20261007-owner-confirmed-once`.
+Completion UTC **2026-10-07T07:22:16.205704Z**, actual non-injected transport.
+HTTP **200**, complete body **389 bytes**, **one** record with schedule date
+**2010-04-30**, last_updated **2014-10-27T05:00:51Z**. The latter is not
+original schedule publication. No pagination, retry or second request.
+Only actual_eps/actual_revenue column presence was examined; those values
+were transmitted/retained privately but not evaluated or printed. No price,
+return, strategy result, outcome join, look or backtest was accessed.
+
+| Private leaf | Independently reverified SHA-256 |
+|---|---|
+| reservation.json | `63eeced18e64a0b684c091eefa5cacb1778609bc431f307e836502b978681f76` |
+| started.json | `a2979484c870e452c937235414afb2ade15deb275a45aa8ca0b650ec7e7af726` |
+| successful-response.json | `11032221048364fd88e1b35d1a92790274719503f91c4a028827da9cdb50e945` |
+| complete.json | `81bd2401ff26251428fb1ed278960a174d626f9ed8446902509464122de910ba` |
+
+All four leaves mode 600/single-link and exact hashes independently verified
+with process-tree network and all file writes denied. Replaying the genuine
+389-byte successful response through the separate pure schema boundary
+reproduced the captured count/date/update/column facts. No key, raw financial
+value or licensed row is in Git. Owner-confirmed purchase plus observed
+product access is not authenticated complete coverage, contract applicability,
+PIT schedule, exact time-zone interpretation or QC upload permission.
+
+| ID | Priority/status | Verified evidence, reason and correction |
+|---|---|---|
+| IBEARN-ACCESS01 | P2 corrected | JSON-escaped credential echo could evade literal-byte screening before private raw retention. Genuine red 2 failed/81 deselected in 0.55s; screen decoded strings/URL query as well, green retained in final focus. No actual credential was echoed or persisted. |
+| IBEARN-ACCESS02 | P3 corrected | Opaque financial-number parsing also obscured bad envelope count values. Genuine red 4 failed/83 deselected in 0.64s; exact lexical integer 0/1 count must match bounded results, without calculating financial numbers. |
+| IBEARN-ACCESS03 | P2 corrected | Initial identity I/O could escape sanitization and named journal leaves could be replaced while an old FD was hashed. Genuine red 5 failed/87 deselected in 0.71s; sanitize identity faults, compare named/FD regular-file versions before/after nonblocking nofollow reads, and recheck canonical full ancestor/audit identity after all leaf reads. Final 94 passed in 0.80s; peer 94 in 0.79s. Final-ancestor guard reversal genuinely failed 1/93 deselected in 0.40s, distinguished from pre-fix red. |
+
+The final full Sharadar audit also repeated under network/all-write/fork
+denial on corrected source
+`82987132d45dfe8a59d6d96d0ec0ab51d525f7b855e3ee2f4da148958662f02b`;
+all counts/hashes/date bounds in 145.2 independently reproduced. This is a
+second offline audit, not a second network acquisition or a later-commit run.
+
+### 145.5 Fixed native QC diagnostic, exact input and operational stop
+
+The deterministic first completed sixteen-parent capture is reprojected under
+network/write denial: accession **0000002178-22-000091**, issuer CIK
+**0000002178**, exact XML title **Common stock**, filing date **2022-11-17**,
+header acceptance 20221117161137 (Eastern-policy 2022-11-17T21:11:37Z).
+Retained parent **4,604 bytes**, SHA
+`5593bead9d1829f26c8d88ccd20472eeb95896cd3e1856be56ddc0c84f0d47cf`,
+XML SHA `25fed177f10d23995bd90d7791f9686607304062ddc42f9abab32b53cb7da218`.
+Existing root is `insider_buying_sec_complete_16_9ab2ed0`, existing capture
+commit `9ab2ed09e6a547feebb93bd5f9f8579bc7d15877`, report SHA
+`e3f226683c7a6878f25e7efd8d87a8d81083e5a686308bd6ad20ec0298229421`,
+inventory-file SHA
+`32a97340632d603a9e8b01f9719d08bcbf21136464e103addd307b6a2d4cabe8`.
+No transaction values or reporting-owner names were output; no request repeated.
+
+Prepared hosted probe source
+`ea1c7e79c23d4bb0dcfdbe47c5c85fcd6520bad33c07c21f37bc8d5d832af496`
+pins that CIK and the pre-filing **2022-11-16..2022-11-17** NY interval.
+QuantBook frontier is END (November 17 midnight), resolver date remains START
+(November 16), so LEAN does not clip the interval to zero. All native Symbols
+remain inside QC; at most four candidates, nine typed TradeBar/QuoteBar/clock
+requests, at most 1,440 bars per series. Output is count/status metadata only;
+no OHLC, quotes, financial values, SID/ticker arrays, raw/reference exports,
+ObjectStore, direct HTTP/network-client calls, orders or strategy evaluation.
+This deliberately regular-hours raw/minute/fill-forward-false access profile
+is **not** canonical study-clock parity (production's stock extended argument
+is omitted and its SPY clock uses extended hours). It cannot close master/PIT/
+listing/title/rights/look/canonical readiness gates.
+
+| ID | Priority/status | Genuine evidence and correction |
+|---|---|---|
+| IBQCACCESS-R01 | P2 corrected | Repasting a full cell reset the once guard. Genuine red 1 failed/32 deselected in 0.53s; preserve prior kernel guard value, exact False only; narrow green 1 passed/32 deselected in 0.32s. Kernel reset remains an external journal/operator boundary, not durable acquisition permission. |
+| IBQCACCESS-R02 | P2 corrected | QuantBook's start-date frontier at START clips history at START. Verified official semantics and faithful fixture red 1 failed/33 deselected in 0.55s; set frontier END, unchanged requested window; narrow green 1 passed/33 deselected in 0.41s. Final 34 passed in 0.35s, independent peer 34 in 0.45s. No false empty-data access observation is promoted. |
+
+Safari genuinely shows the owner authenticated, active organization tier
+RESEARCHER. A new private/owned coding workspace was created by the default
+template flow: project **37465795**, initial generated name **Adaptable Light
+Brown Pony**. QC automatically compiled that default template with engine
+2.5.0.0.18166, compile ID **ff2516-6b0744**. This is **not** compilation of
+the prepared probe and **not** a launched/completed backtest or permanent look.
+No unrelated existing project was changed or inspected for research results.
+Before replacing the generated template or opening/running a Research cell,
+native control reported the Mac locked and unable to unlock. A nonblocking
+manual-unlock request was made; no unlock/security bypass or guessed password.
+The compound edit did not establish successful replacement: do not claim the
+generated main.py was changed or the Research probe executed. Native history
+requests **0**, Research probe sessions **0**, backtest launches **0**.
+
+Current exact continuation is manual unlock, safe replacement of this newly
+created default main.py, and one recorded exact-source Research probe—not a
+strategy run. No further ordinary scope/purchase approval is requested. SEC
+contact remains a separate genuine input; originals are free, but no old
+acquisition root is resumed and no source window/ambiguous request is broadened.
+
+### 145.6 Final validation, completion boundary and precise next action
+
+The integrated focused run completed **658 passed in 4.33s**, no failures,
+skips or warnings, under effective process-tree network denial and a clean
+environment with pytest plugin autoload disabled. Its preceding run was
+**1 failed / 657 passed in 4.44s**: `IBREC-145-R01` (P3 corrected) was a blank
+line separating the new session-ledger row from the contiguous table; remove
+only that separator and rerun the same exact targets. This is document
+evidence, not a source or provider failure. No full lane/repository suite ran.
+
+Exact targets:
+
+- `tests/test_insider_buying_supplied_sharadar_audit.py`
+- `tests/test_insider_buying_benzinga_earnings_access.py`
+- `tests/test_insider_buying_qc_native_access_probe.py`
+- `tests/test_insider_buying_provider_metadata_audit.py`
+- `tests/test_insider_buying_provider_metadata_transport.py`
+- `tests/test_insider_buying_provider_reference_identity.py`
+- `tests/test_insider_buying_provider_rights_evidence.py`
+- `tests/test_quantconnect_client.py`
+- `tests/test_insider_buying_lane_import_boundary.py`
+- `tests/test_insider_buying_form4.py::test_package_has_no_provider_outcome_execution_or_scheduler_imports`
+- `tests/test_active_document_consistency.py`
+- `tests/test_insider_buying_implementation_record.py`
+
+All six new files compiled in memory with network and all writes denied;
+exact source/test hashes were independently recomputed. Frozen historical
+four-file equality to `aa0d635d00b64825bf8003289e0a60279bd52e73` and no local
+change to those files or shared `research/quantconnect.py` passed. Diff checks
+and private Earnings-raw ignore checks passed. Final tracked candidate bytes:
+
+| File | SHA-256 |
+|---|---|
+| research/insider_buying_supplied_sharadar_audit.py | `82987132d45dfe8a59d6d96d0ec0ab51d525f7b855e3ee2f4da148958662f02b` |
+| tests/test_insider_buying_supplied_sharadar_audit.py | `f0a57041e9238792d73213060816ce10fddff4e2632c985d2599f6b011473cb5` |
+| research/insider_buying_benzinga_earnings_access.py | `f43f8eaaf174c67d6e0bd29323add46702a6a8d5e858f9bf9e0c0abfb6a4aa4d` |
+| tests/test_insider_buying_benzinga_earnings_access.py | `70199715c611f313fa92ba18e1011ec4e85e3b8ca137694d34a8fc276e7cf699` |
+| research/insider_buying_qc_native_access_probe.py | `ea1c7e79c23d4bb0dcfdbe47c5c85fcd6520bad33c07c21f37bc8d5d832af496` |
+| tests/test_insider_buying_qc_native_access_probe.py | `363bd77d43d8d9a09c954ccbf726f53fc8143987b4674cd7bd8719cbffb2cf62` |
+
+**Technical completion:** supplied Sharadar full-byte/row audit and the one
+actual purchased Earnings product-access/schema diagnostic are completed
+bounded acquisition/reuse deliverables. QC-native implementation is prepared
+and tested but **not cloud-executed**. A later Safari availability check again
+reported the Mac locked; no repeated UI write or security bypass followed.
+Nothing here constitutes historical as-known calendar construction, actual
+affected-quarter integration, full identity mapping, v4 parent acquisition,
+canonical candidate registration or completed order-based QC backtesting.
+
+**Plain-language completion:** all supplied Sharadar archives were checked
+completely without purchasing or fetching them again. The already purchased
+Earnings endpoint works, so no duplicate subscription is proposed. QC is
+signed in, but finishing its small data-access check needs the computer
+unlocked; public SEC original acquisition needs a genuine contact address and
+a new safely journaled capture, not a restarted ambiguous old campaign.
+
+Preserve all prior P0–P3 dispositions and resolved findings. The four topical
+P2s `IB1C-REAL-CR01`, `IB1BCAMP-CR01`, `IBSRC-CR01`, `IBSRC-CCR01` remain OPEN,
+as does shared `IBQC-SHARED-META01`; no shared behavior was changed. Frozen
+v1/scale/pilot and four v3 files stay frozen. V3 remains unresolved at 1,846
+completions / 1,847 starts, the two-quarter denominator is still 99,394 with
+19,526 source-bound and 79,868 originally unattempted. The separate diagnostic
+does not resolve or rewrite the unmatched start. Strict D23 still has seven
+nonexact quarters and no 82-quarter promotion digest. Both owner classifications
+and their absence of retroactive approval remain unchanged.
+
+Actual access accounting this round: **one** Earnings request; **zero** SEC
+requests or new Sharadar bulk requests; **zero** QC-native history requests,
+Research probe sessions, registered/outcome looks, backtests or trading
+actions. **One** new QC coding workspace with an automatic default-template
+compile occurred, so this is not a zero-QC-interaction claim. Source/PIT/
+rights/canonical/mapping/look/QC-backtest/execution readiness remains false.
+
+Final read-only peer audit independently matched all six candidate hashes and
+found no material new issue or real credential/licensed-row leakage in the
+proposed tracked files. Its two wording qualifications are adopted: native
+History uses QC's own data machinery, so only direct HTTP/network-client calls
+are excluded, and completion is not inferred for all source/reference layers.
+The peer did not reproduce the actual provider/browser observations or rerun
+tests during that final read-only audit; those remain attributed above.
+
+Publish this completed bounded acquisition/reuse checkpoint and prepared
+native probe in the lane's single combined push with a separate exact-hash
+handoff. Do not label the project or all requested source/reference layers complete.
+The next actual operations are the fixed native probe after manual unlock and
+fresh bounded SEC capture after genuine contact/cross-capture journal inputs.
+These are missing operational/factual inputs, not routine permission requests
+or a Claude-review wait. Keep the existing heartbeat PAUSED.

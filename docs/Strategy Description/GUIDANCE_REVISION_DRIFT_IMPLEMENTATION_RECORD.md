@@ -1,10 +1,10 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **GDR-0A and ENG-1..ENG-6 independently reviewed by Claude in section 12
-(2026-10-07): every commit accepted, twelve lane regression tests added, two P2
-items documented (one lane process, one shared-main gate state) and no
-production defect found; Codex counter-review of section 12 pending.**
-Current scope/evidence are sections 7 through 12 (2026-10-07). Sections 2 through 6 preserve
+Status: **Claude's two pushed review commits are accepted after Codex correction
+in section 13 (2026-10-07). ENG-7..ENG-16 are the next owner-authorized offline
+engineering batch defined in section 14; not yet implemented or independently
+reviewed. Original GDR-0..6 research and operational gates remain closed.**
+Current scope/evidence are sections 13 and 14. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -627,3 +627,105 @@ deferred remediation routing, not lane work. No GDR-1 or empirical, data, QC, br
 or live step starts from this review. `docs/ACTION_PLAN_2026-08-20.md` and
 `docs/SESSION_HANDOFF.md` were not edited in this round and remain frozen for
 this lane pending the owner's decision under GDR-CR12-001.
+
+## 13. Codex counter-review of the completed Claude push, 2026-10-07
+
+Trigger: remote lane head changed from
+`8424a2b393b4d0803172b87aaa4d494776b977cc` to
+`c1be751ac403b5906428cbf9f86673e1bc23527e`, observed at the 17:40 UTC
+monitor check, then fetched explicitly. Baseline ancestry, exact review target
+in section 12, both complete commit diffs, clean designated worktree and matching
+local/remote heads were verified. Earlier dirty/local-only review work was not
+used to start implementation. This is the one triggering review for automation
+`guidance-claude-push-counter-review`; later Codex publication is not a new
+Claude trigger. No other branch or worktree was used.
+
+| Exact reviewed commit | Disposition | Evidence / correction |
+|---|---|---|
+| `2dc6fd9cf9208d0acfcc53bb92434567c69aabbe` | Accepted after correction | All twelve added tests pass; all thirteen documented targeted mutants independently caught, with thirteen restored originals green. CCR13-001 adds an isolated active-sell regression. No production defect in these additions. |
+| `c1be751ac403b5906428cbf9f86673e1bc23527e` | Accepted after correction | Complete review record and status-test diff inspected. The historical report is retained; this section qualifies its process, correction-lineage and out-of-lane attribution claims, and records lane-owned follow-ups below. |
+
+Counter-review code/test correction commit:
+`9d6f2037951266c283c6c3672f622daf373e05de` (local-only until this combined
+round's single publication). The following record commit also removes the
+redundant lane handoff-size assertion and updates the current-status guard.
+
+### 13.1 Retained P0-P3 finding dispositions
+
+No P0/P1 was found. Prior findings remain in section 12 rather than being
+deleted. These are counter-review conclusions, not a claim to have rerun
+Claude's full suite or all sixty mutation trials.
+
+| Finding | Priority / disposition | Evidence, action and verification |
+|---|---|---|
+| GDR-CR12-001 | P2 / partially correct; unauthorized-edit conclusion not established | The four shared-document edits occurred. However, root AGENTS and parallel-workflow sections 1-2 explicitly name the three original lanes; the machine-wide rule does not itself freeze the root handoff. The quoted review-session instruction is retained as Claude's reported provenance, not a new human instruction to this session. The current explicit owner heartbeat requires this round's GDR root handoff and Action Plan sequencing reference. No shared revert or general freeze override follows. Updates are limited to that coordination scope; shared behavior, sibling documents and workflow files stay unchanged. |
+| GDR-CR12-002 | P3 / accepted, corrected by Claude | Inclusive drawdown/position boundaries and post-trim reference basis verified; M01/M02/M03/M24 independently caught. |
+| GDR-CR12-003 | P3 / accepted after CCR13-001 | Missing-valuation, skipped-close and scheduled-exit refusal isolation verified; M12/M25/M58 caught. Independent active-sell arm needs the additional test below. |
+| GDR-CR12-004 | P3 / accepted, corrected by Claude | Explicit cancel preserves reserves; pre-open settlement refuses; executable 10:05 data requests cancellation; terminal payout without entitlement refuses atomically. M11/M14/M52/M60 caught. Zero-volume limitation is correctly disclosed. |
+| GDR-CR12-005 | P3 / accepted, corrected by Claude | Receipt previous-hash chain guard is isolated; M47 caught. |
+| GDR-CR12-006 | P3 / accepted, corrected by Claude | NY publication date determines D+3; M56 caught. |
+| GDR-CR12-007 | P3 / partially correct, corrected | Clock/stale labeling duplication confirmed. Assessment cannot have an announcement-before-publication mismatch because it derives the date; consumed attempts belong to simulation. A shared per-opportunity availability helper now serves timing and assessment, including final `stale_event`; dated-universe iteration remains in assessment so first clock eligibility is not confused with first full eligibility. New late-receipt test was red before the correction; first-universe-opportunity invariance stays green. |
+| GDR-CR12-008 | P3 / confirmed, corrected | Removed only the redundant lane assertion of shared handoff size. The unchanged project-wide `test_current_handoff_is_a_bounded_unique_resume_snapshot` still enforces its 50,000-byte bound. Source/status consistency checks remain. |
+| GDR-CR12-009 | P3 / accepted design observation, no economic change | No-tolerance whole-share trims match the proposal. A tolerance band remains an unresolved owner parameter choice, not a counter-review fix. |
+| GDR-CR12-010 | P3 / mechanics accepted, wording qualified | Explicit corrections never directly create/re-time a positive entry, but their corrected economics intentionally become the predecessor for later genuine disclosures. Existing `test_corrected_predecessor_is_used_and_withdrawn_predecessor_not_skipped` pins this. A 102/1.05 disclosure corrected to 90/.90 followed by fresh 92/.95 news can qualify against the corrected baseline. No new quarantine or economics is introduced. |
+| GDR-CR12-011 | P3 / latent maintenance risk corrected | Added the lane test package marker; package-qualified imports pass. No existing basename collision was claimed. |
+| GDR-CR12-012 | P3 / confirmed consistency issue, corrected | Binding lookup now uses the explicit NY date. Regular-session behavior is unchanged; new midnight-boundary tests still refuse extended-hours data atomically and retain no receipt. The old UTC mapping produced two wrong-exception errors in that regression. |
+| GDR-CR12-013 | P2 / shared-main finding retained, attribution corrected | Four exact shared guards independently fail on pre-existing surfaces: 22 Analyst QC bare Decimal conversions, 27 unclassified scripts, and 39 undeclared Analyst QC import roots. GDR changed none of those source/guard/manifest bytes. Claude's full totals and ten Insider path/branch refusals remain reviewer-reported, not rerun. The additional reproduced Target-Price refusal is a macOS/Windows-Git compatibility problem: its trusted runner pins `C:\\Program Files\\Git\\cmd\\git.exe`, and authentication fails before the empty-registry guard. It is not a demonstrated Target-Price worktree-location refusal. No shared or sibling correction is authorized here. |
+| GDR-CCR13-001 | P3 / confirmed, corrected | Claude's due-exit/active-sell test retained a due-map entry during both assertions; deleting just the active-sell arm survived. Added `test_active_sell_without_scheduled_exit_refuses_entry_with_fresh_quotes`, using a direct exit with an empty due map and fresh held quotes. Guard removed: one failure (new buy incorrectly admitted); restored: one pass. No production change. |
+
+### 13.2 Validation and authority disposition
+
+Bundled Python 3.12.14/macOS. Read-only counter-review selected seven existing
+event/timing/assessment/adapter/document tests: seven passed. Claude's twelve
+new tests: twelve passed, zero failed/skipped (0.097 s). Thirteen in-memory
+mutants were caught and thirteen restored single-test reruns passed; the new
+active-sell mutant also fails and restores green. Corrections selection:
+13 timing + 8 assessment + 8 adapter + 2 import-boundary tests = 31 passed;
+seven changed files compiled in memory and three package-qualified test imports
+passed. The six lane boundary tests passed before correction. Final cumulative
+focused checks and exact correction commit are recorded below before publication.
+Final cumulative selection (simulation, controls, timing, assessment, adapter
+and lane boundaries): **96 passed, zero failures/errors/skips in 0.741 s**;
+lane compilation and `git diff --check` passed. No full lane or repository
+suite was run by Codex.
+
+Shared diagnostic checks used the normal pytest conftest/isolation under a
+network-denied process: four selected shared checks failed (4.25 s), and the
+one Target-Price environment diagnostic failed (0.44 s). Those failures are
+reported, not hidden or repaired from this lane. The affected pre-existing
+modules are outside this package's permitted dependency closure and do not
+block the approved offline engineering work. Original research/operation
+readiness remains blocked. Counter-review acceptance grants no source rights,
+PIT claim, empirical look, parameter freeze, QC attempt or trading authority.
+
+## 14. Owner-authorized next ten offline increments, 2026-10-07
+
+The owner explicitly directed waiting for Claude's completed push, then
+counter-review, then **ten** increments before the next independent Claude
+review. This expands the approved offline direction; it does not start the
+original GDR-1..6 research stages. Several commits, exactly one combined
+non-force push to this lane from its designated worktree after the batch.
+No partial/checkpoint publication, PR, merge, or second branch/worktree.
+
+Definitions of done recorded before implementation:
+
+| Increment | Bounded deliverable | Required focused evidence / limitation |
+|---|---|---|
+| ENG-7 | Executable proposal/specification inventory binding the unchanged candidate and design hashes, explicit event/clock/trim/correction/fee/settlement semantics and per-action decision/rights matrix. | Mutation/refusal and consistency tests; all eleven original sign-offs remain unresolved and external permissions false. This is freeze-ready, not owner-frozen. |
+| ENG-8 | Strict provider-shaped guidance payload decoder using invented values and documented public fields, explicit normalized units/FY/basis/identity/receipt inputs, immutable raw provenance and named refusals. | Malformed/missing/unknown fields, invalid numeric ranges/units/basis/period/time checks. No credentials, licensed rows, download or claim that public fields establish private entitlement or original receipt. |
+| ENG-9 | Provider identity/version receipt lineage with duplicate/conflict/correction/withdrawal handling and cutoff replay into the synthetic event model. | Exact replay, delayed/out-of-order receipts, immutable projections, changed predecessor and withdrawal tests. Source consistency only: no real capture service or PIT attestation. |
+| ENG-10 | Dated raw market/reference input contracts bound to permanent synthetic identities, explicit exchange/session calendar and as-of availability. | Missing/stale/future/ambiguous mapping, raw-vs-adjusted price, quote/trade/calendar alignment fixtures; no fetch route or claim of an audited historical calendar. |
+| ENG-11 | One explicit corporate-action input path for strategy and matched comparator, integrating whole-share splits, cash dividends and supplied terminal economics. | NAV/cash/position reconciliation, idempotence, pending-order/action ordering and unsupported fractional/noncash/missing-terminal refusal. Never invent cash-in-lieu or a terminal payout. |
+| ENG-12 | Bounded local research-only immutable command/event journal and checkpoint contracts with no-overwrite publication, content/sequence/epoch checks and crash acknowledgment semantics. | Corruption, incomplete publication, competing/stale append, checkpoint and crash-boundary tests. Owner-controlled synthetic store only; no operator database, external anti-rollback authority or unproved power-loss guarantee. |
+| ENG-13 | Reconstruct the synthetic engine from verified committed command history; reconcile attempts, partial fills, cancellation requests/acks, reservations and settlement exactly once. | Restart vs uninterrupted state equality, retry/conflicting-ID/racing-fill/recovery refusal tests. Snapshots are reports, not trusted recovery state; no broker reconciliation claim. |
+| ENG-14 | Isolated actual LEAN `QCAlgorithm` source package connecting deterministic decisions to order submission/events, explicit synthetic input, fill/fee/settlement model assumptions and local callback contract checks. | Prove local order/callback wiring and fail-closed unsupported/live paths; compile source locally. If SDK/LEAN is unavailable, state that explicitly. No upload/job, hosted dataset access, deployment, SDK execution or cloud completion claim. |
+| ENG-15 | Repeatable local strategy/comparator integration across the new input/action/persistence boundaries, with an explicit complete expected calendar and retained refusals/underfills. | Base/stress, missing data, actions, restart and parity-blocker fixtures; report native-engine limitations. Local fixture success never substitutes for an actual completed QC backtest. |
+| ENG-16 | Pre-QC release manifest/report package binding actual source/candidate/input/calendar/engine contracts, reproducible fixture checks and unconditional closed launch preflight. | Tamper/omitted-manifest/different-epoch/report reproducibility/refusal tests, import/document/compilation/diff/status checks. Later separately authorized order-based QC run instructions retain max-three-failed-attempt/Mia recovery rule. |
+
+Stop any increment whose required work needs a material unresolved economic
+choice or new external authority; do not declare it complete or split the push.
+Report the blocker to the owner and pause the one-cycle monitor. Proposed
+numeric settings and original Markdown/PDF/candidate bytes are unchanged;
+protected dates, four-lane allocations and every provider/outcome/account gate
+remain closed. Source access and real QC completion are deliberately outside
+these offline definitions, not silently counted as finished.

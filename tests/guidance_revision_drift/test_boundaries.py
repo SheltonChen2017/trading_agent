@@ -142,9 +142,10 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
         self.assertIn("codex/strategy-guidance-revision-drift", record)
         # Review-state phrase: rotate it in the same commit as each new review
         # or counter-review section so the status block cannot go stale.
-        self.assertIn("Codex counter-review of section 12 pending", record)
+        self.assertIn("accepted after Codex correction", record.split("## 1.", 1)[0])
         self.assertIn("does not mark GDR-0 complete", record)
-        self.assertLess((ROOT / "docs/SESSION_HANDOFF.md").stat().st_size, 50000)
+        # Shared handoff size belongs to the project-wide active-document
+        # guard, not this lane's contract/source consistency check.
         candidate = load_candidate()
         self.assertIn(candidate.sha256, record)
         for document in candidate.to_dict()["source_documents"]:

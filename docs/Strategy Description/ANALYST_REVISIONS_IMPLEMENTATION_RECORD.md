@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–258 retain the milestone, review, preregistration, QC
+strategy. Sections 1–259 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1199,7 +1199,9 @@ bytes and original operator/compile/save evidence remain unverified.
 Section 258 records the later owner's monitor-disarm direction, a new bounded
 700-row forward-vintage capture and supported direct-feed acquisition paths;
 no historical audit is replayed. This is development evidence, not readiness.
-Claude must review section 258 and this round's final snapshot; that independent final review is not an
+Section 259 records the owner's explicit Massive-provider clarification and
+a distinct six-day-later vintage comparison, not an immediate repeated pull.
+Claude must review section 259 and this round's final snapshot; that independent final review is not an
 intermediate checkpoint or a prerequisite for admissible continuing build.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
@@ -3031,6 +3033,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex resumed continuous work after authenticated QC/Mia became available | `ac73a660` -> `06f3e8d4` -> this record commit | Section 256: no new Claude push or replay; qualified original Mia tool-path evidence, prospective clock correction; floor 313/239/49/699 unchanged | Read only the scoped project histories, declined cloud edits, versioned the captured-clock source fix without changing R247/R279 bytes/manifests or adding a launcher; all delegated decisions recorded | Strict-network-denied focused clock/source/closure/record checks in 256.4; no complete Codex suite. Authenticated QC UI/history reads and displayed current IDE builds disclosed, not a zero-contact claim | ARV2I256-001 P2 prospective correction. ARV2R248-002/-003/-004 remain open with partial new evidence; two conditional cells and independent formal source gates unchanged | One final matching-lane push at the concrete remaining artifact/access stop; no intermediate Claude wait. Final independent review remains due; quiet monitor stays active |
 | 2026-10-06 | Codex resumed interrupted R281 retained Code audit after Mac access restored | `d5e841be` -> this record commit | Section 257: no new Claude push or replay; exact rerun Code view and 17-name inventory corroborated; floor 313/239/49/699 unchanged | Read only the already-booked rerun's supported Code view and local control metadata; no source mutation, launch, result export or historical authorization inference | Strict-network-denied focused record/active-document validation in 257.3; no complete suite or new code validation claimed | All three historical P2s remain open; run-bound rendered source is not a 17-file byte/compile/operator/save chain or formal vendor evidence | One final matching-lane push at the remaining original-artifact/source-access barrier; Mac lock no longer the active blocker, no intermediate Claude wait, monitor remains active |
 | 2026-10-06 | Codex owner-directed monitor disarm and forward-vintage acquisition | `b6d38960` -> `264067ef` -> this round's final record commit | Section 258: one bounded current-version development capture, 3 pages / 700 rows; no historical replay or strategy evaluation; floor 313/239/49/699 | Existing automation paused with its prompt, cadence and target preserved; exact provider window and private receipt protocol committed before provider access; pinned private receipt published with all false capabilities | Strict-network-denied focused validation and actual acquisition disposition in 258.3; no complete suite | Source/formal/history gates remain; private current-version acquisition is not independent publication or completeness proof; direct-feed rights/completeness unverified | One final matching-lane push at the concrete independent-source/access barrier; monitor remains disarmed, no intermediate Claude wait |
+| 2026-10-06 | Codex Massive clarification and frozen six-day vintage comparison | `43bae982` -> this round's final record commit | Section 259 freezes one new Oct1-window capture and value-free comparison to the actual Oct1 pre-cutoff receipt; no economic evaluation or new look/cell | Provider identity is Massive, not direct Benzinga; no immediate repeat of Oct5–6 or new scheduler | Final focused results and actual capture/comparison disposition in 259.3; no complete suite | Current-version differences cannot establish correction cause, publication history or deletion completeness; formal/source/history gates remain | One final same-lane push at completion or concrete evidence/access stop; monitor remains PAUSED and no Claude/routine-approval checkpoint is imposed |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -36340,3 +36343,85 @@ rights/access or independent artifacts, without a Claude/routine-approval
 checkpoint; stop this round at that concrete missing evidence/access. The
 monitor remains PAUSED at the human's explicit direction, not obsolete or
 automatically rearmed. No claim of project completion or forward readiness.
+
+## 259. Massive-provider clarification and distinct forward-vintage comparison, 2026-10-06
+
+**Baseline:** `43bae982954214eaf3fb5a814bc34c3790401b25`, clean designated
+worktree and matching lane branch/local/remote heads; only this remote lane
+branch is fetched. No new Claude push or independent formal source package
+is present. The human answers **"massive"** and **"proceed"**, resolving
+258.2's provider question. This is not direct Benzinga stream/webhook
+entitlement, paper authority or a scheduler-rearm request.
+
+### 259.1 Frozen acquisition and comparison protocol
+
+`ARV2OD259-A`: proceed only through the existing reviewed Massive transport.
+The new Oct5–6 first-receipt baseline in 258.2 stays immutable; do not repeat
+it immediately merely to fabricate a two-capture comparison. Instead, use
+225.3's retained **2026-10-01..2026-10-01** early-day receipt and one new
+capture of that exact window about six calendar days later. This is a
+substantive separated-vintage observation of source quality, not a new
+strategy, performance look or historical QC audit.
+
+Before new provider access, the existing receipt authenticates under the
+unchanged offline reader:
+
+| Frozen before identity / metadata | Value |
+|---|---|
+| Receipt SHA-256 | `501accd9cb2a7eea35bd41dcff3751c4412d0c708e7ca5f0b630af8d1c16e5ed` |
+| Bound physical manifest SHA-256 | `d33c21ac4968a0a72b0927057c03164891f78aa27983bccef5acd68ba5cd9f3b` |
+| Local capture interval UTC | `2026-10-01T12:18:52.557622Z` through `2026-10-01T12:18:53.216868Z` |
+| Exact event-date window | `2026-10-01..2026-10-01` |
+| Source rows / deduplicated role events | 59 rows; 52 ratings / 5 earnings / 0 guidance events |
+| Transport / authorities | `massive_https_bearer_default_session`; PIT and paper false, zero QC calls/outcome reads |
+
+Freeze **one** new production capture invocation, no automatic retry, exact
+Oct1 window, page limit 1,000, all three roles and the existing private ignored
+artifact root. Reuse the exact tool hashes and bounds in 258.1, not new
+credentials, endpoint allowlists, field substitutions or a different source.
+The adapter must enforce authenticated default-TLS transport, no redirects,
+terminal pages, private atomic persistence and complete three-role success;
+failure is a retained refusal, not permission to omit a role or keep pulling.
+After successful capture, authenticate the physical manifest and publish one
+new content-addressed private quality receipt under strict network denial.
+
+`ARV2OD259-B`: compare the two exact externally supplied receipt hashes using
+the existing pure comparison/host reader under strict network denial. Freeze
+the observation unit as a role-scoped Benzinga ID and full canonical row
+version, not a ticker return or independent trading day. Inspect only role
+counts of same version, different version, multiple-version ambiguity and
+old-only/new-only IDs. Do not print licensed row values, IDs, ratings, scores
+or economic outcomes. A changed row hash does not identify which field changed
+or the reason. New-only observations mix ordinary later-day arrival with any
+later backfill; the before capture was early-day, not a final-day snapshot.
+Old-only does not prove deletion, and zero changes cannot clear PIT or past
+look-ahead concerns. This comparison cannot infer a drift rate for 2021–2025.
+
+No research/alpha/QC look, development evaluation, infrastructure launch,
+cell, formal registration or shared-ledger amendment is added by this
+provider-only source-quality observation, following 208/210/225.3. The
+conservative floor remains **313 / 239 / 49 / 699**. Preserve all false
+readiness/action flags, source/formal/history gates, both conditional stress
+cells and frozen QC manifests. No order, live/funded/broker access, direct
+Benzinga connection, new collector/scaffold, immediate repeated window or
+recurring capture is authorized here. The existing monitor stays PAUSED.
+
+### 259.2 Actual separated-vintage evidence
+
+Protocol frozen above before new access. Actual one-shot acquisition and
+comparison terminal states, identities and counts remain pending; no success
+or readiness is claimed before they are observed.
+
+### 259.3 Focused validation and continuing-work handoff
+
+Use focused forward-quality and record/active-document checks only, under
+strict network denial from the designated root; record their exact final
+results after this acquisition. Only this lane record changes. The single
+final matching-lane push will contain the pre-access freeze and final actual
+disposition, with no intermediate push or Claude-review pause. Independent
+final review remains due and cannot be supplied by same-round advisory agents.
+Formal readiness still requires the genuine independent as-of/version/
+publication/correction/deletion completeness, reviewed SID/permanent/share-
+class/own-ETF identity/availability and authenticated RAW prior-close price/
+score packages in 231.3, plus stock seven-role/terminal-payoff and later gates.
+Massive's confirmed current-row access does not manufacture that evidence.

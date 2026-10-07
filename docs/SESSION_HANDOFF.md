@@ -1,7 +1,7 @@
 # Session handoff — current project state
 
-Latest generic-workflow update: **2026-09-14, Fundamental Inflection Alpha
-four-version design candidate**, recorded in section 0D below. Existing
+Latest generic-workflow update: **2026-10-06, Guidance Revision Drift
+offline GDR-0A candidate**, recorded in section 0E below. Existing
 strategy-lane implementation state remains in each lane's own record.
 
 Historical baseline preparation: 2026-08-29 by Codex after the owner directed a separate
@@ -12,6 +12,29 @@ generic-workflow handoff for the root project and preserves the 2026-08-28
 deferred-remediation state below. The original three strategy lanes remain
 independent; this amendment changes shared coordination only and does not edit
 their lane-owned artifacts.
+
+## 0E. Guidance Revision Drift lane, 2026-10-06
+
+Owner requested an isolated lane and implementation. Work only on
+`codex/strategy-guidance-revision-drift` in
+`/Users/sheltonchen/.codex/worktrees/guidance-revision-drift/trading_agent`.
+Base: `ff0bb2098d1a06184d41bf1dcc1bb113aaac2174`; plan import:
+`cc614d33042caac9a463a3df95c8f7ead70358f9`; implementation:
+`9775e284d2ed9b785fb173b2aaf52affb29efb4c`.
+Record: `docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`.
+
+Implemented proposed contracts, Decimal arithmetic and blocked inspection
+CLI, not a trading strategy or completed GDR-0. Python 3.12.14/macOS: 59
+focused tests passed, 0 failures/skips/warnings; compilation and diff checks
+passed. Full suites/Windows/QC not run. Author-QA P2 GDR-QA-001 corrected;
+independent review pending. No other lane or shared behavior changed.
+Provider/outcome/QC/order access and research looks remain zero.
+
+**Local-only: no push, PR or merge; another computer cannot fetch this lane.**
+Next: owner-authorized publication and independent review of the exact
+snapshot, then resolve GDR-0 freeze/authority gates. Details, source hashes,
+exclusions and resume instructions are in the record. No next milestone starts
+automatically.
 
 ## 0D. Fundamental Inflection Alpha design, 2026-09-14
 

@@ -160,6 +160,20 @@ changed to make the new lane run.
 
 ## 6. Next bounded action and handoff
 
+Local committed snapshot:
+
+| Commit | Scope | Independent disposition |
+|---|---|---|
+| `cc614d33042caac9a463a3df95c8f7ead70358f9` | Import original Markdown/PDF proposal and index | Pending review |
+| `9775e284d2ed9b785fb173b2aaf52affb29efb4c` | Offline GDR-0A candidate, tests, status and author-QA correction | Pending review |
+
+The implementation range is
+`ff0bb2098d1a06184d41bf1dcc1bb113aaac2174..9775e284d2ed9b785fb173b2aaf52affb29efb4c`;
+the following documentation-only handoff commit must also be included in any
+eventual exact-snapshot review. All are local-only: no push, PR or merge, and
+another computer cannot retrieve this new lane with `git fetch`. All changes
+are committed in this dedicated lane; no unrelated dirty work was present.
+
 After the GDR-0A candidate is committed, stop for owner-directed publication
 and independent review of that exact snapshot. No push or PR is authorized
 by the present request. Resolve and freeze the outstanding GDR-0 decisions

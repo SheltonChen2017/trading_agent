@@ -1204,8 +1204,10 @@ a distinct six-day-later vintage comparison: 11 shared rating IDs change
 version and one earlier ID is absent, without inferring correction/deletion
 cause, publication time or historical look-ahead. No immediate pull is repeated.
 Section 260 proceeds on the human's subsequent "ok, proceed": one targeted
-information-only Massive support inquiry and a metadata-only Sharadar/identity/
-RAW-price evidence audit, without another provider pull or historical replay.
+information-only Massive support inquiry is sent and the metadata-only local
+Sharadar/identity/RAW-price audit confirms the remaining independent-source
+gaps, without another provider pull or historical replay. Vendor reply/delivery
+is not established by the mail connector's successful SENT response.
 Claude must review section 260 and this round's final snapshot; that independent
 final review is not an intermediate checkpoint or a prerequisite for admissible
 continuing build.
@@ -3040,7 +3042,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex resumed interrupted R281 retained Code audit after Mac access restored | `d5e841be` -> this record commit | Section 257: no new Claude push or replay; exact rerun Code view and 17-name inventory corroborated; floor 313/239/49/699 unchanged | Read only the already-booked rerun's supported Code view and local control metadata; no source mutation, launch, result export or historical authorization inference | Strict-network-denied focused record/active-document validation in 257.3; no complete suite or new code validation claimed | All three historical P2s remain open; run-bound rendered source is not a 17-file byte/compile/operator/save chain or formal vendor evidence | One final matching-lane push at the remaining original-artifact/source-access barrier; Mac lock no longer the active blocker, no intermediate Claude wait, monitor remains active |
 | 2026-10-06 | Codex owner-directed monitor disarm and forward-vintage acquisition | `b6d38960` -> `264067ef` -> this round's final record commit | Section 258: one bounded current-version development capture, 3 pages / 700 rows; no historical replay or strategy evaluation; floor 313/239/49/699 | Existing automation paused with its prompt, cadence and target preserved; exact provider window and private receipt protocol committed before provider access; pinned private receipt published with all false capabilities | Strict-network-denied focused validation and actual acquisition disposition in 258.3; no complete suite | Source/formal/history gates remain; private current-version acquisition is not independent publication or completeness proof; direct-feed rights/completeness unverified | One final matching-lane push at the concrete independent-source/access barrier; monitor remains disarmed, no intermediate Claude wait |
 | 2026-10-06 | Codex Massive clarification and six-day vintage comparison | `43bae982` -> `2f3f8f00` -> this round's final record commit | Section 259: one new Oct1-window capture, 3 pages / 250 rows; 11 shared rating IDs change version and one earlier ID is absent; no economic evaluation or new look/cell | Provider identity is Massive, not direct Benzinga; pinned old/new private receipts compared value-free; no immediate repeat of Oct5–6 or new scheduler | Strict-network-denied focused results and actual capture/comparison disposition in 259.3; no complete suite | Current-version differences cannot establish correction cause, publication history or deletion completeness; formal/source/history gates remain | One final same-lane push at the concrete independent-source/access stop; monitor remains PAUSED and no Claude/routine-approval checkpoint is imposed |
-| 2026-10-07 | Codex owner-authorized Massive support acquisition inquiry | `672961e7` -> this round's record commits | Section 260: frozen one-message information-only inquiry and bounded local identity/price metadata audit; no new provider data pull, QC run, outcome, look or cell | Support destination verified against official contact page; authenticated mail connector; no raw licensed rows, attachments, credentials or spending authorization | Focused record/source checks and actual message disposition to be recorded in 260.3; no complete suite | Support reply and independent source/security-master/RAW-price packages remain required; contacting a vendor is not admission or readiness | One final same-lane push when this scoped work reaches the concrete external evidence barrier; monitor stays PAUSED |
+| 2026-10-07 | Codex owner-authorized Massive support acquisition inquiry | `672961e7` -> `56b6e242` -> this round's final record commit | Section 260: one information-only email sent after scope freeze; local Sharadar ZIP hashes/sizes match manifest but no independent identity/RAW-price package is admitted; no new look/cell | Official support destination and authenticated mail connector; no raw licensed rows, attachments, credentials or spending authorization | Strict-network-denied focused record/active-document checks and actual message/metadata disposition in 260.3; no complete suite | Vendor reply/delivery and independent source/security-master/RAW-price packages remain unproven; contacting support is not readiness | One final matching-lane push at the actual vendor-artifact/independent-evidence stop; monitor remains PAUSED, no routine approval or Claude checkpoint |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -36573,3 +36575,106 @@ The booked floor stays **313 / 239 / 49 / 699**. No research/return/paper look,
 development evaluation, infrastructure launch, cell or formal-alpha spend is
 added by this support request/metadata audit. All readiness/action flags and
 formal/history gates remain unchanged; the human-disarmed monitor stays PAUSED.
+
+### 260.2 Actual support send and bounded local evidence
+
+The scope freeze is committed as
+`56b6e242e39a359fbfe89bf478e08c87cc92079e` before the one send. The existing
+authenticated connector returns successful message/thread identity
+`1a1152f92ec889c1` and `SENT`, with no error, during the client UTC interval
+**2026-10-07 07:06:40–07:06:41** (October 7 **00:06:40–00:06:41 PDT**).
+Recipient and subject are exactly 260.1's frozen values; no CC/BCC or
+attachment. The UTF-8 plain-text message composed before HTML rendering hashes
+to `303e2dadf7e86871476e6cf3e554bf804da9bc98b375f1d8337179754254a32f`;
+the HTML body supplied to the connector hashes to
+`f94677722467de292031a0f692a533543b6d637dbb868492df55a8caa5a455eb`.
+These authenticate supplied local text, not raw MIME/wire bytes or vendor
+receipt. No second send, reply/delivery assertion, paid upgrade or recurring
+follow-up is made. Sending uses actual mail service contact; it is not a
+zero-network-contact claim. No vendor API/QC/outcome call occurs.
+
+The metadata-only local audit concerns the completed capture
+`artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`.
+Its physical manifest hash is
+`94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b`,
+matching the sidecar. Capture interval is September 14
+`00:33:29.843989Z..00:34:13.087369Z`; 3,989,156 source rows is a **manifest
+claim**, not a new licensed row parse. Actual ZIP byte hashes/sizes match:
+
+| Retained archive | Actual bytes | SHA-256 |
+|---|---|---|
+| `01-tickers-years-full.zip` | 4,937,076 | `a7b129f159631ee50f1eefd2be8d4215c1c7818880570c0ad0a79c76c25e51bf` |
+| `02-actions-years-full.zip` | 10,386,585 | `aa455ade19fb96f907c03b399c6254ff9ec03f067cb2a19aeea2792062dca520` |
+| `03-fundamentals-years-full.zip` | 660,340,539 | `ac432104db2af7139c9b7a82f871b46b2b335a62e9ab4ac7ec57ddc430f1ab30` |
+
+Files remain 0600, capture directory 0700 and Git-ignored/local-only. No ZIP
+rows are opened, printed, evaluated or exported. TICKERS is explicitly a
+capture-time current active/delisted snapshot, not PIT; ACTIONS is discovery
+evidence, not terminal shareholder payoff; ART fundamentals have date fields
+but no intraday availability. The three-archive capture has no SEP/SFP daily
+price export; a fundamentals price field is not a source-authenticated daily
+RAW prior-NYSE-close archive. This scoped result does not assert that no
+package exists elsewhere or that all Sharadar entitlements are unavailable.
+
+The existing `research/analyst_revisions_v2_qc/accepted_risk_security_master_admission.py`
+emits `qc_sid_available=false`, `point_in_time=false` and
+`independently_reviewed=false`. `scripts/build_arv2_historical_preopen_bridge.py`
+uses "Reviewed" for mechanical byte/source revalidation, not human review;
+the latter flags remain false. The caller-pinned price/crosswalk contract in
+`research/analyst_revisions_v2_qc/six_universe_forward_predecision.py` keeps
+`CROSSWALK_INDEPENDENT_REVIEW_UNPROVEN`,
+`REFERENCE_PRICE_PROVENANCE_UNPROVEN` and `PRICE_FRESHNESS_UNPROVEN`.
+Its positive price/pre-cutoff checks cannot authenticate original publication,
+an immediately preceding NYSE close, normalization or independent identity.
+The root inspects these exact contracts and manifest/trust-root metadata;
+the read-only advisory performs the ZIP hash/size check under strict network
+denial. Advisory drafting/auditing is not independent formal review.
+
+All three formal trust roots are remeasured byte-identical to 231.3: zero-access
+research-source authority and empty source/security-master/reviewed-spec
+registries, hashes respectively `3152aca00c721f3822d1ef438c84c3ee855aeb866e35ba692527746b5d4c5805`,
+`e8c1a2a7e0408d545e45f026cabf5b4ae23956fa64bc444769a8589f35f4a5fa`,
+and `23f23d19e681a03bacf6a1d132c732ed541747a5c6136d2dc0ac5ccafd273326`.
+No source is admitted by hash consistency or an outbound support message.
+
+### 260.3 Focused validation and next substantive acquisition
+
+Pre-send lane-record integrity/active-document selection passes **86 tests in
+1.37s**, no failures/skips/warnings, Python 3.13.15 from the designated root
+under `(version 1)(allow default)(deny network*)`. Private metadata/hash parsers
+also run under strict network denial. This is not a complete suite, code/QC
+validation or retroactive zero-contact proof for the permitted support send.
+Post-send record/active-document checks pass **86 tests in 1.32s**, with no
+failures/skips/warnings. The final focused selection is the same two files,
+**86 distinct tests**, not an additive 172/258-test result or a complete suite;
+it is rerun after this validation wording before committing. `git diff --check`
+is clean. No production code changes, so no new code-compilation, import-boundary
+or QC-validation claim is made.
+
+**Exact round range:** `672961e7390f974512d16d41a40e89ca2eb69082..HEAD`,
+scope-freeze `56b6e242` then this final actual-disposition record commit. Claude
+must review both new commits individually; no older review is replayed. Only
+the lane record changes, not code/tests/frozen sources/formal registries/shared
+ledger/root documents. No P0–P3 code defect is alleged from missing external
+evidence. All three historical P2s, two conditional stress cells and the
+**313 / 239 / 49 / 699** floor remain. The automation's saved status is read
+as PAUSED, unchanged; no scheduled follow-up or rearm is made.
+
+The next substantive input is Massive's actual supported archive/entitlement
+answer and vendor-origin immutable original-availability/version/correction/
+deletion-completeness package. Separately obtain an independently reviewed
+QC SID/permanent security/share-class/vendor/own-ETF crosswalk with validity
+and availability intervals, followed by authenticated unadjusted immediately
+prior NYSE-close rows and scores bound to those identities, session, common
+cutoff and reviewed method. A new current price pull alone cannot supply that
+whole package. Freeze any later licensed-row acquisition protocol before
+inspection; retain ambiguity/reuse/collision and provenance refusals. Do not
+reprocess old accepted-risk artifacts to relabel them independently reviewed.
+No present supported artifact establishes those facts, so this round ends at
+the concrete vendor-artifact/independent-evidence barrier, not a missing
+routine approval or intermediate Claude wait. No immediate mailbox polling,
+extra backtest or claims-only scaffold can resolve it. Continue immediately
+when genuine supported evidence is available, while preserving stock-first
+seven-role/terminal-payoff, ARV2-4..8, capacity, formal one-look/alpha, paper
+algorithm/permit and final independent-dossier gates. Neither completion nor
+forward readiness is claimed.

@@ -1,9 +1,15 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Offline engineering batch ENG-1..ENG-6 implemented; independent review pending.**
-Current scope/evidence are sections 7 through 11 (2026-10-07). Sections 2 through 6 preserve
+Status: **GDR-0A and ENG-1..ENG-6 independently reviewed by Claude in section 12
+(2026-10-07): every commit accepted, twelve lane regression tests added, two P2
+items documented (one lane process, one shared-main gate state) and no
+production defect found; Codex counter-review of section 12 pending.**
+Current scope/evidence are sections 7 through 12 (2026-10-07). Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
-supersedes only its stop-for-review and no-push sequencing for this batch.
+supersedes only its stop-for-review and no-push sequencing for this batch, and
+section 12 records the owner's 2026-10-07 application of the standing lane
+review workflow (same branch and worktree, lane-record-only findings, one push
+per review round) to this lane.
 The owner requested a distinct development lane and the start of
 implementation on 2026-10-06. This record defines the first bounded scope;
 it does not mark GDR-0 complete or adopt a research/trading mandate.
@@ -450,3 +456,174 @@ Copyable review scope:
 > isolation requirements; retain resolved and open findings and exact per-commit
 > dispositions. No data/QC/broker/paper/live/merge authority is granted by this
 > review handoff. All fixture success remains non-empirical.
+
+## 12. Independent Claude review of `ff0bb209..8424a2b3`, 2026-10-07
+
+### 12.1 Scope, topology and method
+
+Reviewed range: every commit from base `ff0bb2098d1a06184d41bf1dcc1bb113aaac2174`
+through the fetched remote head `8424a2b3` (ten Codex commits, no Claude
+commit before this section). The worktree was clean (zero dirty paths) and
+equal to `origin/codex/strategy-guidance-revision-drift` at the start.
+
+Owner instruction received in the review session chat on 2026-10-07: this
+session is dedicated to this lane and branch; "review all unreviewed commits,
+apply corrections where necessary, push once when done." That applies the
+owner's standing strategy-lane review workflow (2026-09-06, "any later lane")
+to Guidance Revision Drift: Claude reviews and corrects on the same branch and
+worktree, records findings only in this lane record, and makes exactly one push
+per review round. It supersedes the section 1 and section 11 statements that no
+same-branch Claude exception was inferred. Codex counter-reviews every Claude
+commit next, under the same workflow.
+
+Method: every commit read individually (`git show`), every lane module and
+test module read in full, the record's hashes and counts reproduced, each
+suspected gap probed by an in-memory mutant before a finding was written.
+Host: macOS, Homebrew Python 3.13.15 in a virtualenv built from the pinned
+`requirements.txt`, pytest 9.1.1. Every pytest and mutation process ran
+network-denied under `sandbox-exec -p '(version 1)(allow default)(deny network*)'`;
+the profile was proved first by a refused connect to 192.0.2.1:443 (EPERM).
+All validation ran in the designated worktree except the per-commit
+informational runs in 12.4, which used `git archive` exports under the review
+scratchpad and are labelled as such. No provider, QC, broker, paper or live
+system was contacted; research looks consumed: 0; QC attempts: 0.
+
+### 12.2 Commit dispositions
+
+Vocabulary: accepted / accepted after correction / rejected. Corrections in
+this round are tests only; no production module changed, so every hash in
+section 9 still reproduces (12.4).
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `cc614d33` | Original Markdown/PDF proposal and index | Accepted | Blobs identical to design commit `4b8447ed` (parent `e1a0efe6`, matching the plan's recorded base); Markdown and PDF SHA-256 match the candidate pins |
+| `9775e284` | GDR-0A contracts, exact arithmetic, blocked readiness | Accepted | Candidate canonical hash `b52aedd6...` reproduces; 59 tests; mutants M36, M37, M49 caught; shared-file edit noted in GDR-CR12-001 |
+| `ab15d5a1` | Initial lane root handoff | Accepted | Documentation only; shared-file edit noted in GDR-CR12-001 |
+| `40003585` | ENG-1/2 normalization, archive, event lifecycle | Accepted | Mutants M38-M41, M48 caught, including the GDR-QA-007 delayed-receipt gate; GDR-CR12-010 documented |
+| `1fb696d3` | ENG-3 timing, eligibility, as-of composition, corpus | Accepted after correction | One test added for the New York announcement date in `assessment.py` (GDR-CR12-006); M27-M35 caught; GDR-CR12-007 documented |
+| `bcfdb02a` | ENG-4 simulation and ENG-6 comparator | Accepted after correction | Ten simulation tests added (GDR-CR12-002/003/004); comparator mutants M43, M44, M55 caught; GDR-CR12-009 documented |
+| `78914637` | ENG-5 adapter and ENG-6 controls/ledger | Accepted after correction | One ledger chain-link test added (GDR-CR12-005); M46, M50 caught; GDR-CR12-012 documented |
+| `dc474392` | ENG-6 integration, report, artifact CLI, README | Accepted | Report, epoch, manifest, corpus, schedule and ledger hashes reproduce; CLI exit codes 0/2/0/0 as documented |
+| `6ca9892a` | Sections 7-11, Action Plan and index update | Accepted | Counts consistent (191 focused plus 59 GDR-0A less 17 shared equals the 233 collected); shared-file edit noted in GDR-CR12-001 |
+| `8424a2b3` | Root handoff section 0E | Accepted | Documentation only; shared-file edit noted in GDR-CR12-001; GDR-CR12-008 documented |
+
+### 12.3 Findings ledger
+
+IDs are `GDR-CR12-NNN` (Claude review, section 12). Priorities follow the
+repository's P0-P3 scale. "Corrected" means a lane test now fails without the
+pinned behaviour; the production behaviour was already correct in every case.
+Resolved items stay in this table.
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR12-001 | P2 / documented, not fixed | `9775e284`, `ab15d5a1`, `6ca9892a`, `8424a2b3`; `docs/ACTION_PLAN_2026-08-20.md`, `docs/SESSION_HANDOFF.md` | Four lane commits edited the two shared coordination documents that `THREE_STRATEGY_PARALLEL_WORKFLOW.md` section 2 and the owner's machine-wide lane rule freeze during parallel strategy development. Section 1 shows this was deliberate: Codex followed the root `CLAUDE.md` handoff rule and declined to infer the lane exception. With the owner's 2026-10-07 instruction the lane workflow now applies, so both files are frozen for this lane from this round on. No revert was made here: a revert would itself edit the frozen files and would remove the Action Plan's owner-directed sequencing entry. Owner to confirm at integration: (a) the 2026-10-06 lane and implementation-start direction cited in the status block; (b) the six code-only increments and single-push authorization in section 7; (c) the Action Plan amendment text dated 2026-10-07; and (d) whether the two shared-file edits stand or are re-applied as one common-baseline amendment. |
+| GDR-CR12-002 | P3 / corrected | `bcfdb02a`, `simulation.py::close_session`; `test_simulation.py` | The program-drawdown and position-stop tests used marks far below their thresholds, so the inclusive boundaries were untested: mutants M01 (`<=` to `<`), M02 (0.85 to 0.84), M03 (`<=` to `<`) and M24 (basis `reference_quantity` to current `quantity`) survived the original selection. Added `test_program_drawdown_stop_is_inclusive_at_exactly_fifteen_percent` (ten 50-share fills at 99.0495 and a 69.0695 close give NAV exactly 85,000; 69.0696 must not stop), `test_position_stop_is_inclusive_at_exactly_ninety_percent_of_entry_cost` (90.0450 stops, 90.0451 does not) and `test_position_stop_stays_price_based_after_a_partial_trim` (26 of 49 shares retained after a 23-share trim: 95 must not stop, 90.0450 must). All four mutants now fail; the real code passes. |
+| GDR-CR12-003 | P3 / corrected | `bcfdb02a`, `simulation.py::submit_entry`; `test_simulation.py` | Three refusals were asserted only as a `None` return, and in every existing fixture a later check (`missing_current_portfolio_quotes`) refused anyway, so removing the guard was invisible: `exits_must_precede_entries` (M12), `missing_valuation` (M25) and `missing_previous_session_valuation` (M58). Added three tests that supply fresh valuation quotes for the holding and assert the exact refusal reason, including the positive case that the same entry is admitted the next session once the trim has filled and no exit is due. All three mutants now fail. |
+| GDR-CR12-004 | P3 / corrected | `bcfdb02a`, `simulation.py::request_cancel`, `_tick`, `process_minute`, `terminal_settlement`; `test_simulation.py` | Reservation and settlement lifecycle gaps: releasing reserves on an explicit `request_cancel` (M14), settling a receivable on a pre-open tick of its pay session (M11), dropping the in-loop 10:05 conversion of an open buy to `cancel_requested` (M52), and crediting a terminal payout to an issuer with only a pending entry (M60; the real code refuses "without a held entitlement", the mutant would raise `KeyError` after popping a missing position) all survived. Added four tests. Note for readers: the 10:05 conversion sits inside the fill loop after the capacity check, so a zero-volume minute at or after 10:05 leaves the status `open`; that is harmless because no fill is possible without capacity and `cancel_entry_remainders` is the explicit path, and the new test therefore uses an executable minute priced above the limit. |
+| GDR-CR12-005 | P3 / corrected | `78914637`, `controls.py::FixtureLedger.__post_init__`; `test_controls.py` | The `previous_sha256` chain-link check was redundant with the sequence and epoch checks in every existing fixture (M47 survived: reversed receipts and a wrong sequence are caught earlier). Added `test_broken_previous_hash_link_is_refused_with_intact_sequence_and_epoch`, covering construction and `from_bytes`. M47 now fails. |
+| GDR-CR12-006 | P3 / corrected | `1fb696d3`, `assessment.py::assess_candidate`; `test_assessment.py` | The entry window is derived from the New York date of publication, but every assessment fixture publishes at 12:00Z, where the UTC date is the same, so M56 (UTC date) survived although `events._nearest` has such a test. Added `test_entry_window_uses_new_york_announcement_date_not_utc_date`: a raise published 2025-04-02T01:00Z (21:00 New York on 04-01) must be eligible on 04-04 and not yet reached on 04-03. M56 now fails. |
+| GDR-CR12-007 | P3 / documented | `1fb696d3`, `timing.py::select_entry_opportunity`, `assessment.py::assess_candidate` | The composed assessment re-implements the per-opportunity clock loop instead of calling `select_entry_opportunity`; the composed path can therefore never emit the plan's `stale_event`, `entry_attempt_already_consumed` or `announcement_precedes_publication_date` labels (it emits the underlying `*_after_cutoff` reasons instead). One rule at two call sites can drift. Not changed in review; Codex to decide whether to route the assessment through the timing function or retire the unused labels. |
+| GDR-CR12-008 | P3 / documented | `8424a2b3`, `test_boundaries.py::test_active_document_references_agree_on_lane_and_draft_sources` | The lane gate binds to the size of the frozen shared `docs/SESSION_HANDOFF.md` (`< 50000` bytes); at this head the file is 49,887 bytes, 113 bytes of headroom. Any later handoff edit on `main` or another lane turns this lane's gate red without a lane change. Not changed (the handoff is frozen and the guard is Codex's); recommend dropping the size assertion or binding it to a lane-owned file. |
+| GDR-CR12-009 | P3 / documented, design observation | `bcfdb02a`, `simulation.py::close_session` trim scheduling | Plan section 5 schedules a risk-reducing trim for any drift above the 5% position ceiling with no tolerance band. A position sized at 5% of NAV that appreciates slightly relative to the sleeve is trimmed by one or two shares at the next 10:00 with the USD 1 commission floor charged per trim order. The code matches the plan; the owner may want a tolerance band in the GDR-0 parameter freeze. |
+| GDR-CR12-010 | P3 / documented | `40003585`, `events.py::_replay` version gate | The forced conflict for a same-ID later version applies only to `kind == "disclosure"`: a version 2 record of kind correction or withdrawal under an existing disclosure ID passes the gate, and a version 2 correction with changed economics replaces the effective predecessor without quarantine. Corrections and withdrawals can only invalidate candidates, so no positive entry can be created or re-timed; documented for the GDR-0 contract rather than fixed. |
+| GDR-CR12-011 | P3 / documented | `9775e284`, `tests/guidance_revision_drift/` | The lane's test directory has no `__init__.py`, unlike `tests/analyst_revisions_v2/` and `tests/target_price_revisions/`; pytest imports its modules as top-level names (`test_events`, `test_contracts`, ...). No basename collision exists in the repository today; a later same-named test file in another package-less directory would collide. Not changed. |
+| GDR-CR12-012 | P3 / documented | `78914637`, `qc_adapter.py::QcFixtureAdapter.on_minute` | The dated security binding is checked against `quote.end_utc.date()`, the UTC calendar date, while the rest of the package uses the New York date. Regular-session minutes (13:30-21:00 UTC) have equal UTC and New York dates, so no behaviour differs today; the inconsistency is noted for the eventual licensed bridge, where extended-hours bars would not. |
+| GDR-CR12-013 | P2 / documented, out of lane | `origin/main` `ff0bb209`; `tests/test_decimal_conversion_guard.py`, `tests/test_project_separation_entrypoints.py`; Insider and Target-Price worktree guards | The repository suite excluding Analyst V2 is red on fifteen tests at this lane's head, and the four shared-gate failures are red on `origin/main` itself after the four lane merges (`#329`, `#343`, `#344`, `#345`): 22 Analyst QC `Decimal(str(...))` sites, a `scripts/` classification manifest 27 entries behind, and Analyst QC bare sibling imports counted as undeclared roots. The other eleven are Insider and Target-Price tests that refuse outside their own worktrees and cannot pass in any other checkout. None involves a lane file (12.4 note). Shared/main work: reported here, not fixed in this lane; the owner's deferred shared-remediation routing applies. |
+
+Scripted count from this table: P0 0, P1 0, P2 2, P3 11; corrected 5, documented 8.
+
+### 12.4 Validation
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane selection at the pushed head `8424a2b3` | worktree, network-denied | 233 passed, 849 subtests, 7.68 s |
+| Lane selection after the twelve added tests | worktree, network-denied | 245 passed, 853 subtests, 7.40 s |
+| Lane selection per code commit (informational, `git archive` exports) | `9775e284` / `40003585` / `1fb696d3` / `bcfdb02a` / `78914637` / `dc474392` | 59 / 107 / 137 / 197 / 212 / 233 passed, 0 failed |
+| Repository suite excluding `tests/analyst_revisions_v2` | worktree at `8424a2b3` plus uncommitted lane tests, network-denied | 15 failed, 11,122 passed, 56 skipped, 28 warnings, 849 subtests, 1:05:58; all fifteen failures attributed outside this lane in the note below and in GDR-CR12-013; none names a lane file |
+| `tests/analyst_revisions_v2` | not run | out of lane, see note below |
+| `python -m compileall -q research/guidance_revision_drift tests/guidance_revision_drift` | worktree | passed |
+| `git diff --check` | worktree | passed |
+| CLI exit codes (`show-candidate`, `preflight`, `adapter-manifest`, `synthetic-demo`) | worktree, network-denied | 0 / 2 / 0 / 0; `preflight` printed `status=blocked` |
+| Section 9 identities | `synthetic-demo` output | all six reproduce: report `b51d2ef2...`, epoch `f9fa3d80...`, code manifest `feb4a5eb...`, corpus `a707af71...`, schedule `b3fa4cbf...`, ledger `4d8b47f4...`; 22,056 bytes before the trailing LF |
+| Design-source identities | worktree | Markdown `26478c3b...` and PDF `f8d7855b...` match the candidate; `cc614d33` blobs identical to `4b8447ed` |
+
+The fifteen repository-suite failures fall into two classes, neither touched
+by this range. (1) Four shared gates that are already red on `origin/main`
+(`ff0bb209`): the same four tests fail identically in a `git archive` export of
+that commit. `test_decimal_conversion_guard.py` lists 22 bare `Decimal(str(...))`
+sites, all under `research/analyst_revisions_v2_qc/`; `grep` finds none in this
+lane. `test_project_separation_entrypoints.py` reports a stale `scripts/`
+classification manifest (27 unclassified scripts, first
+`scripts/run_out_of_sample_check.py`) and undeclared "third-party" roots that
+are Analyst QC bare sibling imports (`accepted_risk_*`). (2) Eleven tests of
+the Insider Buying and Target-Price lanes that refuse outside their own
+designated worktrees: ten Insider tests fail with `REFUSED: ... outside the
+designated lane`, `offline validator module is not from the designated lane` or
+`exact clean committed Insider lane is required` before reaching the behaviour
+they assert, and `target_price_revisions/test_preregistration.py` fails with
+`review anchor Git verification failed`. Re-running those eleven alone on this
+worktree reproduced the same eleven refusals (11 failed, 135 passed in the
+five files); the tree then differed from the committed head only by this
+record and `test_boundaries.py`, and no refusal mentions head or status.
+
+The Analyst Revisions V2 test directory was deliberately not run in this
+review. No file it reads is touched by this range, and in any worktree other
+than the Analyst lane's it is known to error rather than skip: its six-universe
+modules load the gitignored `artifacts/analyst_revisions_v2/` package and
+twelve of its scripts refuse unless the worktree name is
+`trading_agent__analyst_revisions_v2` (documented on the Target-Price lane as
+`TPR-OOL-015` and `TPR-OOL-016`). Running it here would produce only those
+known out-of-lane errors. The repository suite row above therefore excludes
+that directory and covers every shared gate the lane could affect, including
+the active-document consistency, docs-root, module-hygiene and import-boundary
+tests. Windows and LEAN/QC execution remain untested, as section 9 states.
+
+### 12.5 Mutation trials
+
+Sixty single-behaviour in-memory mutants (source rewrite of one function at
+pytest configure time; no repository file edited) were each run against the
+whole lane selection in a separate network-denied process. Caught means at
+least one lane test failed.
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's original tests | 46 | M04-M10, M13, M15-M23, M26-M46, M48-M51, M53-M55, M59 |
+| Survived the original tests, now caught by added tests | 13 | M01, M02, M03, M11, M12, M14, M24, M25, M47, M52, M56, M58, M60 |
+| Unreachable by construction, no test added | 1 | M57: fill ordering sells-before-buys within one minute; an issuer can never hold both an active buy and an active sell (`submit_entry` refuses while a sell is active and `_exit` refuses while a buy is active), so the ordering never decides anything |
+
+Representative caught mutants: adverse impact removed (M16), commission floor
+removed (M15), limit protection removed (M17), same-bar fills (M09), E moved to
+D+2 (M27), cutoff moved to 19:00 (M28), publication-equals-cutoff accepted
+(M29), time exit on session 20 (M30), ADV and price thresholds off by one unit
+(M31, M32), future bars visible (M34), missed-opportunity guard removed (M35),
+raise and EPS-floor comparisons made strict (M36, M37), predecessor-capture and
+delayed-receipt risk gates removed (M38, M39), protected-date boundary moved
+(M46), archive checkpoint and candidate hash pins removed (M48, M49), external
+refusal turned into a no-op (M50). Section 10 claims GDR-QA-007, QA-008,
+QA-009 and QA-020 were mutation-verified; M39, M29, M34 and the reporting
+calendar test reproduce those catches.
+
+### 12.6 Record maintenance
+
+The status block now names this section and the pending counter-review. The
+lane gate in `test_boundaries.py` pinned the phrase "independent review
+pending", which is no longer true; it now pins "Codex counter-review of section
+12 pending" and carries a comment that the phrase rotates with each review
+section. The handoff size assertion is unchanged (GDR-CR12-008).
+
+### 12.7 Commits, publication and next action
+
+| Commit | Scope |
+|---|---|
+| `2dc6fd9c` | Twelve lane regression tests (GDR-CR12-002 through GDR-CR12-006) |
+| This record commit | Section 12, status block, `test_boundaries.py` pin rotation |
+
+One push of this round after both commits exist, to
+`origin codex/strategy-guidance-revision-drift`, guarded on the remote head
+still being `8424a2b3`; never force. Next: Codex counter-reviews section 12 and
+both Claude commits, rotates the `test_boundaries.py` phrase, and answers
+GDR-CR12-007 and GDR-CR12-008. GDR-CR12-013 is shared-main state for the owner's
+deferred remediation routing, not lane work. No GDR-1 or empirical, data, QC, broker, paper
+or live step starts from this review. `docs/ACTION_PLAN_2026-08-20.md` and
+`docs/SESSION_HANDOFF.md` were not edited in this round and remain frozen for
+this lane pending the owner's decision under GDR-CR12-001.

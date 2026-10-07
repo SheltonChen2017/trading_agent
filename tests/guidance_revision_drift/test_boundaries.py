@@ -140,7 +140,9 @@ print(json.dumps(sorted(name for name in sys.modules if name.split('.')[0] in bl
             self.assertIn(record_path, text)
             self.assertIn("GDR-0A", text)
         self.assertIn("codex/strategy-guidance-revision-drift", record)
-        self.assertIn("independent review pending", record)
+        # Review-state phrase: rotate it in the same commit as each new review
+        # or counter-review section so the status block cannot go stale.
+        self.assertIn("Codex counter-review of section 12 pending", record)
         self.assertIn("does not mark GDR-0 complete", record)
         self.assertLess((ROOT / "docs/SESSION_HANDOFF.md").stat().st_size, 50000)
         candidate = load_candidate()

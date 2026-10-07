@@ -13044,3 +13044,153 @@ operator database, deployment, paper/live, capital, orders or trading action
 occurred. The one verified support email and eventual one lane push are the
 only external writes of this round. Shared/project-wide documents and
 SESSION_HANDOFF stay frozen; no monitor/scheduler is rearmed or changed.
+
+## 97. Separate latest-revised exploratory build: prospective decisions — 2026-10-07
+
+### 97.1 Owner direction and exact boundary
+
+The owner removed the proposed repeated licensing inquiry:
+
+> 2 is not ncecessary. other lanes have been using massive subscription with no issue.
+
+> build towards backtest ready
+
+The owner also renewed the completion condition:
+
+> remember to build until project is ready for backtesting. do not stop until you hit this milestone or i tell you to
+
+The latest clarification explicitly permits a genuine blocker:
+
+> build towards lane completion until the lane is ready for backtesting. do not stop until you hit this milestone or hit another blocker.
+
+> Consider i preauthorize to do anything necessary. you are free to make any decision using your best judgment. just document the decisions you made.
+
+`SI-AUTH-20261007-03` records this continuous-build instruction under the
+standing delegation in section 92. No new support/sales inquiry, generic
+permission-letter demand or routine approval pause is required. Other lanes'
+use is context, not a substitute for this dataset's applicable terms or a
+waiver of an explicit provider restriction. This round does not access actual
+market rows or outcomes, move a licensed representation into QC, or run QC.
+
+The scoped starting snapshot is
+`274f81cb0143355fdcd5cdca90cbb78111ea9f3f` on the same designated absolute
+worktree and `codex/strategy-short-interest`. Existing strict-PIT and fixed-
+synthetic contracts, receipt hashes, source admissions and alpha/look
+authorities stay unchanged. The last independent Claude disposition remains
+section 90; implementation-time checks are not a new independent review.
+
+### 97.2 Substantive Massive answer and the changed research claim
+
+The exact existing inquiry thread supplied a substantive reply, message
+`1a116fd591df2863`, received **2026-10-07T15:31:03Z**. The authenticated
+thread read established its provider origin; no attachment, sample or market
+row was requested or read. Support states that corrections overwrite the
+ticker/settlement record, originals are not retained, there is no complete
+correction-period inventory, and historical public/API/correction availability
+timestamps are absent. The public endpoint schema is consistent with those
+missing fields. Consequently this endpoint is **refused for the current
+strict-PIT historical protocol**, not merely waiting for a reply.
+
+Support's assertion of historical exchange-listed coverage, illustrated by
+one Nasdaq-listed security, does not prove full listed/delisted population
+coverage. Missing records are not zero. The suggested FIGI/reference/event
+join is a candidate identity route, not proof of effective share-class
+mapping. CIK is issuer-level and cannot substitute for share-class identity.
+The reply's phrase linking publication to settlement is not adopted: FINRA's
+official reporting calendar distinguishes those dates. A scheduled publication
+date supplies hypothetical replay timing, not an observed availability clock,
+and a longer lag does not restore an overwritten original value.
+
+No account-specific legal interpretation or amendment was supplied. The
+existing published individual and market-data terms remain controlling.
+The owner removes another inquiry; no affirmative local/QC-rights fact is
+invented. The structural build below can proceed without reading actual
+licensed inputs, while the actual empirical execution boundary remains
+explicit.
+
+### 97.3 Frozen exploratory software specification before outcomes
+
+This is a **separate latest-revised exploratory study**, with evidence epoch
+`latest-revised-exploratory-si-v1`; it is not acceptance, replacement, repair
+or completion of the canonical historical-PIT SI-5 study. The design is
+frozen before any actual price/return read. Its purpose is a reproducible
+file-fed feasibility replay, with revision/availability/reference limitations
+mandatory in every output and no confirmatory significance or promotion.
+
+* Evaluation entry sessions: **2023-01-03 through 2026-08-31**, inclusive;
+  earlier calendar/price observations supply warm-up only. The end precedes
+  the shared validation/final-holdout periods. These dates are a prospective
+  exploratory choice, not a coverage or power claim.
+* Canonical S1 arithmetic is retained: current SI/current shares minus the
+  immediately prior scheduled settlement's SI/prior shares for the same
+  share-class identity. Missing prior observations never leapfrog. Global
+  exact Type-7 p01/p99 clipping uses structural sectors with at least 20 peers;
+  sector median/MAD uses scale `7413/5000`, zero epsilon, and a whole-sector
+  refusal for zero MAD. Reference versions may be latest-revised and are not
+  labelled historical-availability-safe.
+* All candidate lookbacks **20/60/120/252** remain unselected. Eligibility uses
+  the existing **USD 300M** cap and **USD 10M** median raw-close-times-volume
+  limits, every required completed XNYS session strictly before entry, and
+  explicit mapping/reference/history refusals. Structural normalization is
+  never recomputed over the investable subset.
+* Each candidate ranks its complete eligible scoreable population using exact
+  `(2 * strictly_lower + equal) / (2 * population)` percentiles and inclusive
+  pressure/covering 0.90 tails. Ties are indivisible; fewer than ten names
+  refuses tails. The common four-candidate identity intersection preserves
+  the original per-candidate tails without reranking, including tail loss.
+* The continuous long-only replay carries **48 cash books**: four lookbacks,
+  four per-side costs **0/5/10/20 bps** (10 primary), and three fixed allocation
+  roles: equal-weight common-population baseline, avoid the original high-
+  pressure tail, and long the original low-pressure tail. Each starts with
+  **USD 100,000** demonstration capital; exact fractional quantities and
+  fee-reserved raw-open allocations are self-financing. No actual capital,
+  leverage, short order or broker authority is granted.
+* Exit/rebalance is at the next calendar release's following XNYS open. The
+  final release exits the preceding basket but cannot create an entry without
+  a successor. Warm-up, empty, refused and final releases remain visible.
+  Every common member's required open is checked, not just selected tails;
+  missing outcomes cannot shrink the comparison or change ranks.
+* Raw-open cashflows include split quantity changes, dividend entitlements
+  fixed before ex-open and cash only at payment, and explicit terminal cash
+  including an evidenced zero. Missing/suspended opens, unknown terminal
+  economics and unpaid positive receivables yield an incomplete replay, not
+  a fabricated price, zero terminal value or cumulative P&L.
+
+Input files must have byte hashes verified before parsing, strict finite JSON
+schemas, complete advertised pagination, exact row/source linkage, date-
+bounded share-class mappings and immutable detached stage receipts. No
+network/provider client belongs in the package. Reports derive, rather than
+accept caller overrides for, `point_in_time_data=false`, strict
+`source_admitted=false`, `confirmatory_eligible=false`, no selected lookback,
+and no QC/production/trading authority. Existing public synthetic runners
+cannot accept these external files or be relabelled as market research.
+
+### 97.4 Delegated inventory and completion criteria
+
+| ID | Exercised approval / decision | Boundary |
+|---|---|---|
+| `SI-AUTH-20261007-03` | Remove the repeated item-2 inquiry and continue building in one round until the genuine readiness milestone or a non-substitutable factual boundary. | No routine owner-choice pause; no provider-rights fact, original vintage, independent acceptance or QC access invented. |
+| `SI-AUTH-20261007-04` | Renew all necessary owner-controlled approvals and best-judgment decisions, with a documented actual-readiness or genuine-blocker stop condition. | No invented external facts, vendor-license waiver, source integrity or operational/trading authority. |
+| `SI-DEC-20261007-04` | Separate latest-revised exploratory feasibility from canonical historical-PIT research; refuse Massive's endpoint for the latter on its substantive reply. | Neither a calendar join nor a lag cures revisions; no strict gate is weakened. |
+| `SI-DEC-20261007-05` | Freeze the dates, S1/normalization/eligibility/ranking rules and 48 continuous demonstration cash books above. | Prospective descriptive protocol only; no winner, power assertion, confirmatory alpha or outcome look. |
+| `SI-DEC-20261007-06` | Build exact external-file source, ranking, order and immutable CLI/artifact stages, keeping the existing strict/synthetic tree untouched. | Concrete documented provider fields and explicit companion contracts, not invented source/publication fields or a generic placeholder parser. |
+| `SI-DEC-20261007-07` | Do not send another licensing inquiry or use other lanes' success as this lane's license evidence. | Applicable existing terms may establish use; an explicit unresolved restriction is not converted into permission. |
+
+This prospective anchor does **not** claim these stages exist, tests pass, a
+look is registered or a backtest is ready. Completion requires a connected
+file-fed run and dangerous-direction regressions, immutable input/output
+lineage, separate look accounting before any actual outcome, compilation,
+import-boundary/document/diff/status checks and one final documented push.
+Focused tests only; Claude owns the full lane suite and every new commit's
+independent review. No interim push. Implementation results and the final
+definition-of-done assessment follow after execution, without rewriting this
+anchor or any historical finding.
+
+Strict research accounting remains actual authorized/consumed looks **0/0**,
+allocated alpha **0**, permanent looks **none**, QC launch attempts **0**.
+No exploratory real look is consumed by constructing or exercising fabricated
+external inputs. Existing P0-P3 ledger entries remain preserved. The original
+vintage/timing findings `SI-SRC-20260928-001..002` are now materially failed
+for this specific endpoint; they remain open for the strict study's eventual
+alternative source. Coverage/identity/companion/terms `..003`, shared/out-of-
+lane issues and the prospective purchase advisory remain unresolved.

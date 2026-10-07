@@ -8766,3 +8766,35 @@ green. Executed collector remains exactly `247d5f391b6218b199d4bab82b5a522a06f07
 pure projector is the final `938f6b73ac0ea6b1ac4fca4b6cd230b3f10833b149458480dc274b36d798cfbf`.
 No extra production adapter, actual descriptor, outcome or operator action
 was used by this QA. The specific fresh-request choice remains pending.
+
+### 62.7 Exact implementation identity and stable handoff
+
+Implementation commit `9ebed06ba32feef8a91fbed581b63709f1e38cbe`, parent
+`82461d40aae88fba4f928a94552245c4b9000fed`, contains the exact nine paths in
+62.6. Staged names were checked as an exact set, no foreign/unstaged change
+existed, narrow secret-value scan and staged diff hygiene were clean, actual
+matching remote was the parent immediately before commit. Executed-source
+SHA, sanitized public/private identities and prior frozen bytes remain exact.
+This record-only handoff names the implementation without falsely placing
+the new collector in its older operation-parent snapshot.
+
+Last pre-commit working reprise after all record edits: **888 passed, 3 skipped
+in 9.55s**, no failure/error/warning. Exact committed implementation-tree
+reprise on `9ebed06b`: **888 passed, 3 skipped in 8.46s**, no failure/error/warning,
+with the same 23 selections and isolated runner. The
+record-only final tree receives a further reprise before the one combined
+non-force matching-lane push. Cumulative diff hygiene is clean; all six
+code/test hashes in 62.6 match final bytes. No full suite or extra provider
+request occurs during publication.
+
+The actual result is **not a verified parser fix**: one-item files nesting
+is measured, descriptor type/fields are still unobserved. The pure inspection
+candidate is corrected and tested, but cannot reconstruct the discarded
+response. SD22-005 remains open and six canonical open findings remain
+unchanged. No source-rights, comparable-horizon, PIT, outcome/look or QC gate
+is closed. Owner's specifically requested additional-request choice remains
+pending and is not presumed from the earlier go-ahead. Do not reset Sharadar,
+infer provider fault, renew spent claims or wait for Claude as a build gate.
+After this one stable publication, report the confirmed limitation and the
+exact new metadata-only scope needed to verify a mapping. Final published
+head/local-remote agreement will be verified and reported in this chat.

@@ -1,28 +1,26 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **OWNER-PURCHASED MASSIVE STOCKS STARTER IS VERIFIED ACTIVE;
-SECTION 96 RECORDS THE DOCUMENTED SHORT-INTEREST ENTITLEMENT, ONE VERIFIED
-METADATA-ONLY SUPPORT INQUIRY AND THE OWNER-SUPPLIED SHARADAR CAPTURE'S
-BYTE-IDENTITY CHECK. THIS IS SOURCE QUALIFICATION, NOT AN ADMITTED PIT
-ARCHIVE, PROJECT/LANE COMPLETION OR REAL-BACKTEST READINESS. THE FIXED
-SYNTHETIC TYPED BRIDGE AT `0a7a3544` AND SECTION 95'S 295 FOCUSED CHECKS
-ARE UNCHANGED; NO NEW CODE OR EMPIRICAL RUN IS ADDED. STARTING LOCAL,
-TRACKING AND MATCHING ACTUAL REMOTE ARE `99b4ef0e`; NO NEW CLAUDE RANGE
-APPEARED. THE LAST ACCEPTED CLAUDE COUNTER-REVIEW REMAINS SECTION 90'S
-SOLE `5275b7d5` COMMIT; THE NEXT INDEPENDENT RANGE STARTS AT `5275b7d5`
-AND INCLUDES EVERY SUBSEQUENT CODEX COMMIT. AUTHENTIC ORIGINAL/CORRECTION
-VINTAGES, ACTUAL AVAILABILITY, LISTED/DELISTED PIT COMPANION COVERAGE AND
-THE APPLICABLE COMPUTATION/QC ROUTE REMAIN UNQUALIFIED. NO ROUTINE OWNER
-APPROVAL PAUSE OR EXTRA GENERIC RIGHTS LETTER IS REQUIRED; EXPLICIT USE
-RESTRICTIONS AND SOURCE FACTS CANNOT BE INVENTED. SOURCE P2S, SHARED P2S
-AND THE PROSPECTIVE COMMITMENT ADVISORY REMAIN OPEN. HISTORICAL LEDGERS,
-FALSE ALARMS, REDACTIONS AND ERRATA ARE PRESERVED. LOOKBACKS 20/60/120/252
-REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE. THE
-PURCHASE WAS THE OWNER'S ACTION; CODEX MADE NO PURCHASE OR BILLING CHANGE,
-ACCEPTED NO TERMS AND REQUESTED NO MARKET ROWS, OUTCOMES, HOLDOUT OR QC
-PROCESSING/JOB. NO BROKER/DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL OR
-TRADING ACTION. THE CLAUDE ONE-SHOT STAYS DELETED AND THE EXCHANGE-REPLY
-MONITOR STAYS PAUSED.**
+Status: **SECTION 98 COMPLETES THE SEPARATE LATEST-REVISED EXPLORATORY
+SOFTWARE BUILD AT `6f0fc887`: EXTERNAL-FILE SOURCE, S1 NORMALIZATION,
+FOUR-WINDOW ORIGINAL-TAIL RANKING, 48 CONTINUOUS LONG-ONLY CASH BOOKS AND
+AN IMMUTABLE CLI REPORT. CODEX'S FINAL FOCUSED RUN PASSED 382 TESTS;
+THE PINNED FABRICATED FILE REHEARSAL COMPLETED ALL 48 BOOKS. THIS IS
+SOFTWARE VALIDATION, NOT ACTUAL BACKTEST READINESS OR LANE COMPLETION.
+MASSIVE'S SUBSTANTIVE ANSWER REFUSES ITS LATEST-ONLY ENDPOINT FOR THE
+CANONICAL PIT STUDY: ORIGINAL/CORRECTION VINTAGES AND AVAILABILITY CLOCKS
+ARE ABSENT. THE SEPARATE EXPLORATORY ROUTE STILL NEEDS QUALIFIED ACTUAL
+COMPANION COVERAGE AND APPLICABLE LOCAL/QC PROCESSING FACTS. NO REPEATED
+LICENSING INQUIRY OR ROUTINE OWNER-APPROVAL PAUSE. SECTION 97 IS THE
+PROSPECTIVE DECISION ANCHOR; SECTION 98 RECORDS THE ACTUAL BUILD, FOUR
+CORRECTED DEFECTS, A RETAINED FALSE ALARM AND THE FACTUAL STOP CONDITION.
+THE LAST ACCEPTED CLAUDE REVIEW REMAINS SECTION 90'S SOLE `5275b7d5`;
+EVERY LATER CODEX COMMIT STILL REQUIRES INDEPENDENT REVIEW. HISTORICAL
+LEDGERS, REDACTIONS AND ERRATA ARE PRESERVED; SOURCE/SHARED P2S AND THE
+LATER-COMMITMENT ADVISORY REMAIN OPEN. LOOKBACKS 20/60/120/252 ARE
+UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE, QC ATTEMPTS 0.
+NO ACTUAL MARKET ROWS/OUTCOMES, HOLDOUT, PURCHASE/TERMS, QC JOB, BROKER,
+DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL OR TRADING ACTION THIS ROUND.
+THE CLAUDE ONE-SHOT STAYS DELETED; THE EXCHANGE-REPLY MONITOR STAYS PAUSED.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -13194,3 +13192,269 @@ vintage/timing findings `SI-SRC-20260928-001..002` are now materially failed
 for this specific endpoint; they remain open for the strict study's eventual
 alternative source. Coverage/identity/companion/terms `..003`, shared/out-of-
 lane issues and the prospective purchase advisory remain unresolved.
+
+## 98. Connected latest-revised exploratory software; actual backtesting blocked — 2026-10-07
+
+### 98.1 Exact series, review dispositions and publication boundary
+
+The round began at **`274f81cb0143355fdcd5cdca90cbb78111ea9f3f`**. All
+repository reads, edits, focused tests, compilation, local commits and the
+final push use the designated physical/Git root
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`
+and branch `codex/strategy-short-interest`. Repeated matching-only actual
+remote checks remained at that starting hash throughout implementation.
+No fetch, branch/worktree switch, rebase, reconciliation, reset, published
+history rewrite, force push or other-checkout repository work was performed.
+
+This three-commit Codex series is `274f81cb..HEAD`, where the closing commit
+is the commit carrying this section:
+
+| Commit | Role / review status |
+|---|---|
+| `b034cda27075d48eca42b943db0e45af6024b53d` | Prospective section-97 exploratory decisions, committed before any actual market input/outcome. Pending Claude independent review. |
+| `6f0fc887fce35984a2d2f415fc0dce86edc47917` | Eleven new lane-owned implementation/CLI/focused-test files, including the verified corrections below. Pending Claude independent review. |
+| Closing commit containing section 98 | Final validation, ledger, decision inventory, factual definition-of-done and one-push handoff. Pending Claude independent review. |
+
+No new Claude commit was supplied or inferred during this round. The exact
+last counter-reviewed Claude range remains
+`249c6e45ddd5dc5a69ee15f9920f9a3edc61df6d..5275b7d5fd0d3769b6c27dcc252d8389869e969a`:
+its sole commit **`5275b7d5fd0d3769b6c27dcc252d8389869e969a` remains accepted**,
+as individually dispositioned in section 90. No implementation/helper test
+is relabelled independent Claude review, and no new acceptance is asserted.
+
+Claude's next complete ordered range is
+`5275b7d5fd0d3769b6c27dcc252d8389869e969a..HEAD` at this pushed checkpoint:
+**eleven Codex commits**, including all eight listed in sections 95–96,
+the prospective anchor, implementation and this closing record. Review
+every documentation and code/test commit; do not review only the last diff.
+The final full pushed hash and verified local/tracking/actual-remote equality
+are reported after publication, not invented inside a self-referential commit.
+
+### 98.2 Implemented behavior and plain-language milestone
+
+The technical deliverable is a separate, file-fed, **latest-revised descriptive
+software path**, not an empirical adapter into the canonical SI-5 PIT contracts.
+The concrete documented Massive SI envelope is parsed with strict finite JSON,
+byte-verified files and complete advertised pagination; duplicate/malformed SI
+rows remain explicit refusals. Supplied calendar, share-class references, raw
+bars and corporate events use explicit bounded contracts without asserting
+that a provider has supplied or authenticated them. Detached immutable source,
+ranking and replay receipts recompute their exact input/protocol bindings.
+The S1 formula, structural peer floor, global clipping, sector MAD, capitalization
+and all four liquidity windows follow the section-97 freeze. Original
+candidate ranks and indivisible tails precede the common identity intersection;
+no missing name is promoted or reranked. The 48 exact fractional long-only
+books carry cash across release-next-open rebalances, reserve fees before
+sizing, process split quantities and dividend entitlement/payment separately,
+and require explicit terminal economics, including an evidenced zero.
+
+In plain language, the new command can take the committed public demonstration
+files all the way from source checks through ranking, portfolios and a durable
+report. It is no longer only a disconnected arithmetic example. It still
+cannot truthfully test the market: the demonstration identities, calendar,
+prices and returns are invented, and the real-source route has unresolved
+factual prerequisites. A complete cash ledger across visible skipped releases
+is accounting completion, not complete market coverage, a trading edge or an
+accepted research result.
+
+Implementation inventory:
+
+* `latest_revised_protocol.py`: separate evidence epoch, dates, math, costs and
+  allocation roles, bound to the exact prospective section-97 commit/record.
+  The existing `SI5OfflineProtocol`, strict/synthetic runners and package
+  initializer remain byte-identical to the starting checkpoint.
+* `latest_revised_source.py`: SHA-before-parse, exact captured manifest fence,
+  complete page chain, preserved source-file and canonical parsed-row hashes,
+  immediate-calendar records and date-bounded share-class FIGI mappings.
+  Missing SI/ADV/DTC stays missing; daily short-sale volume cannot become SI.
+  Issuer CIK, ticker reuse, ambiguous mapping, adjusted bars and false PIT
+  fields are refused. Supplied availability claims are explicitly unverified.
+* `latest_revised_rankings.py`: exact S1/normalization/eligibility, original
+  full-cohort ranks, common membership, lost-tail records and every calendar
+  release. Mixed taxonomy refuses before normalization/investability. The
+  entire release refuses new entries when the common cohort is below ten or
+  any candidate lacks a surviving original common high/low tail. Partial
+  attrition with both tails surviving is retained, never filled with a new name.
+* `latest_revised_orders.py`: four lookbacks × four costs × three continuous
+  allocation roles. Previous holdings exit even at a refused successor;
+  known eligibility refusals hold cash instead of opening new positions.
+  Missing common-member opens, unresolved actions/terminal cash or unpaid
+  positive receivables suppress the cumulative financial result. Final
+  releases exit only; no invented successor, leverage or short position.
+* `latest_revised_fixture.py`, `latest_revised_runner.py` and
+  `scripts/run_short_interest_exploratory.py`: a pinned public fabricated
+  external-file recipe, exclusive/idempotent publication, exact current-code
+  hashes, start receipt, connected replay and immutable report. Unknown/actual
+  manifests refuse **before member/outcome reads**; no caller-supplied
+  `synthetic`, `rights_verified`, PIT or authority override is accepted.
+
+The blueprint PDF formula audit informed retained normalization and stock-first
+scope; it did not create data rights or empirical authority. No canonical
+threshold, winner, strict research gate or shared behavior was changed.
+
+### 98.3 Persistent P0–P3 ledger and material red/green evidence
+
+All historical sections 1–97, their confirmed/partial/false-alarm findings,
+closed rows, privacy corrections and appended errata remain verbatim. The
+header refresh and this appended section do not rewrite earlier classifications.
+
+| ID | Priority | Classification / disposition | Evidence and correction |
+|---|---|---|---|
+| `SI-EXP-001` | P2 | Confirmed / corrected in this new path | Mixed taxonomy groups could share the global clipping distribution. Helper RED: **2 failed, 20 deselected in 4.45s**, including a cap-ineligible second taxonomy proving post-filter repair is invalid. Whole raw-complete structural-cohort refusal now precedes normalization/cap checks. Helper GREEN: **22 passed in 27.84s** at that stage; root's final consolidated run includes both regressions. |
+| `SI-EXP-002` | P1 | Confirmed / corrected; no open P1 | Runner checked the manifest then the loader reread a replaceable path. Root RED: the manifest-swap regression **failed in 0.73s**, reaching a forbidden member reader. The loader now checks the exact captured bytes against the expected pinned digest before JSON/member reads; runner supplies that digest. Root's targeted pair subsequently passed this test, and the final runner/consolidated checks pass. No actual/private member was read in the fabricated regression. |
+| `SI-EXP-003` | P3 | Confirmed / corrected | Ambient Decimal precision changed the fixed recipe. Root RED: precision regression failed in the **1 failed, 1 passed / 0.95s** pair. Exact existing decimal helpers make the recipe independent of ambient precision; the pinned manifest hash is unchanged. Root runner GREEN **15 passed in 21.93s**, including precision, race, tamper and immutable retry/publication checks; final consolidated run passes. |
+| `SI-EXP-004` | P2 | Confirmed / corrected | Whole high/low-tail loss or a common cohort below ten still appeared ready and could open books. Root cross-stage RED: **3 failed, 1 partial-attrition passed, 31 deselected in 7.17s**. Helper ranking RED: **3 failed, 2 partial-survivor passed, 22 deselected in 5.61s**; its separate nine-common case retains adequate full ranks and both tails, isolating the intersection floor. The release-level guard now blocks all new entries without reranking. Helper GREEN **27 passed in 36.09s**; root's final consolidated run passes the four order regressions. |
+| `SI-EXP-005` | P2 | False alarm / overbroad correction rejected | Blanket refusal of every partially lost tail would change the frozen original-tail comparison unnecessarily. Existing strict cohort behavior permits partial attrition when common membership is sufficient and both original tails survive. Controlled partial-high/partial-low regressions remain ready with original ranks/lost IDs intact; no replacement or blanket refusal was introduced. |
+| `SI-SRC-20260928-001..002` | P2 | Strict-study gates open; this Massive endpoint failed/refused | The substantive provider reply and public schema lack originals/all corrections or exhaustive correction inventory and historical publication/API/correction clocks. A lag or FINRA scheduled date cannot restore these facts. The exploratory epoch does not close or waive the strict findings. |
+| `SI-SRC-20260928-003` | P2 | Open; actual exploratory admission also not established | Broad listed-stock support assertion is not measured historical listed/delisted/share-class/companion/terminal coverage. Existing artifact byte identity and other lanes' usage are not this lane's effective mapping or exact local/QC processing qualification. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Shared/out-of-lane, open and unchanged | Evidence retained only; no shared behavior or project-wide document changed. |
+| `SI-CR15-001` | P3 | Retained prospective later-commitment advisory | Owner's Starter purchase stays correctly attributed. Codex made no purchase, upgrade, trial, billing or terms-acceptance action this round. |
+
+Helpers' red/green executions above are attributed to implementation-time
+team checks, not Claude review or root execution. Root independently ran the
+material manifest/precision/order reds and the consolidated final green.
+No P0 was found; all four new confirmed code defects are corrected, while
+the factual/shared P2s remain unresolved. This is not independent acceptance.
+
+### 98.4 Root validation and reproducible immutable rehearsal
+
+Root's final focused command passed **382 tests in 104.01s**, with zero
+failures, skips or warnings. It includes the four new test files (**112
+cases**) plus existing lane import-boundary, research-gate, SI-5 offline-
+protocol and active-document checks. This is not the full lane/repository
+suite. The earlier pre-tail-correction run **373 passed in 94.74s** is retained
+as an intermediate check, not substituted for final validation.
+
+Execution used CPython **3.13.15** from the qualified existing lane virtual
+environment, provider/QC credential variables removed, and macOS
+`sandbox-exec` with `(deny network*)`. No package installation or credentials
+were needed. Explicit compilation of the seven new implementation/CLI files
+and four test files exited **0**. Staged diff/whitespace, no-unstaged-change,
+private-contact scan, physical/Git root, branch, HEAD and matching actual-
+remote checks passed. Only eleven new lane files and this handoff record
+change across the round; existing strict/synthetic code/tests, shared files,
+action plan and Session Handoff stay frozen. After this record was written,
+the separate network-denied active-document check passed **69 in 0.85s**.
+Byte comparison preserved every historical body/ledger from section 1 through
+section 97 against `6f0fc887`, SHA-256
+`64d09af4e8ea766a04768732cd92c940edda4ab7a60dda877302d2b0940b45d1`.
+Final validation-text, privacy, preservation and diff checks are repeated
+before the closing commit; no future push success is asserted here.
+
+The actual CLI invocation, also network-denied, was:
+
+```text
+python -m scripts.run_short_interest_exploratory \
+  --demo-dir artifacts/short_interest_exploratory/rehearsal-20261007/raw \
+  --output-dir artifacts/short_interest_exploratory/rehearsal-20261007/reports
+```
+
+It exited **0**, with **48 complete books**, 96 rebalanced release/book
+records, **5,120 fabricated ledger orders**, 16 fabricated arithmetic
+comparisons, and no final positions. Inputs contain 4 calendar releases,
+160 fabricated SI observations, 320 fabricated reference rows, 21,640
+fabricated raw bars and no corporate events; the focused tests separately
+exercise actions and refusals. These counts are not actual market activity.
+
+| Immutable identity | SHA-256 |
+|---|---|
+| Prospective record at `b034cda2` | `d67ef69de29d797fde7ea5f9b2793eac3ceec9c8726978a7c3b6696d636e6d8b` |
+| Separate frozen exploratory protocol | `b88060aee6cecb232f68f2fe415b3981215ea6f53374fb86a79dbae2efc981c6` |
+| Fixed fabricated manifest / all member-byte binding | `3e9b3547151d68e0d3ec743981f7ab157374d14776b92cb0e07cccacb666c77a` |
+| Exact seven implementation/CLI file hashes aggregate | `25f907b1891fddbe8f4fc68c150e499dbd21cac8f979b9315f66d3f24e612fdb` |
+| Source bundle | `69258ad7d3f058124206097b84f7eafe27d9b0fab26a4513517bbb3f9fe97ba1` |
+| Rankings | `ef06f49582b392fcb912bdc5ee62d91b5f2753c4ca194b9f6372bf3f220dbcf3` |
+| Continuous order replay | `2426f0907b4f3c17cca0be2d0056cec7096f02a1f61a990b00e37da8fbe58f9a` |
+| Run identity | `8622c0465631117331f98de3ec890ffa2f03b92f7c6c0fb52707b687bce41b0a` |
+| Report payload, excluding its self-hash field | `3eea0ae427df877cd9ed58fc929e78b7c62a449e14c9d8f0947c164bc7ab1866` |
+| Published complete report bytes | `4559a80de7945ddf88c4df82b32bb56f497362af07602848595cfb6c1e241c81` |
+
+The report is local, ignored reproducible evidence at
+`artifacts/short_interest_exploratory/rehearsal-20261007/reports/3eea0ae427df877cd9ed58fc929e78b7c62a449e14c9d8f0947c164bc7ab1866.report.json`.
+The committed recipe and command reproduce it; an ignored artifact path is
+not cross-computer source admission. The code identity claims exact captured
+implementation bytes, not an unverified clean-commit identity. The report
+explicitly says `ready_for_empirical_backtest=false`, all non-latest-revised
+authority flags false, allocated alpha 0, no selected lookback, zero actual
+looks and no strict-PIT repair.
+
+### 98.5 Exercised delegation, exclusions and genuine completion boundary
+
+Section 97 prospectively records **SI-AUTH-20261007-03..04** and
+**SI-DEC-20261007-04..07**. They were exercised: continued building without
+routine approval questions, kept the acquired Starter candidate, separated
+the revised exploratory claim, froze its math/dates/48 books, implemented
+the connected path and sent no repeated licensing inquiry. Prior inventory
+IDs in sections 66–97 remain authoritative and are not overwritten.
+
+Additional exercised decision **`SI-DEC-20261007-08`**: implement the existing
+minimum-common-population and surviving-original-tail comparison guard,
+retain valid partial attrition, and restrict the public launcher to the
+byte-pinned fabricated recipe while actual-data facts are missing. This is
+the smallest verified correction and launch boundary; no new winner,
+economics threshold, empirical look or terms interpretation is chosen.
+Publication uses standing **SI-AUTH-20261005-02**, not a new spending or
+execution approval. The remaining stop is factual, not a request for another
+routine owner decision.
+
+**Software definition of done is satisfied for this separate exploratory
+path. The lane is not yet ready for an actual historical backtest.**
+Non-substitutable remaining evidence/design is:
+
+1. **Actual source and companion qualification:** the currently proposed
+   reference/price/volume/action/terminal representation has not been supplied
+   and authenticated for historical listed/delisted share classes, effective
+   identities, raw bars, complete required sessions and terminal treatment.
+   The existing Sharadar capture's hashes do not prove that qualification.
+   Even the revised exploratory study cannot silently drop missing/delisted
+   members or substitute issuer CIKs, current constituents or adjusted prices.
+2. **Applicable use and processing facts:** the public
+   [Individual Terms](https://massive.com/legal/individuals-terms-of-service)
+   incorporate additional market-data terms. The
+   [Market Data Terms](https://massive.com/legal/market-data-terms-of-service)
+   section 2's display-only default and section 5(d)'s licensed non-display/
+   derivative-use provision leave this exact computational/retention route
+   unestablished; support supplied no account-specific amendment. This is not
+   a blanket claim that personal research is prohibited or a demand for an
+   extra generic letter. The owner's removed inquiry stays removed; usage in
+   another lane does not erase the explicit unresolved restriction. The
+   exact QC data/signal representation and cloud-processing route also remain
+   unverified. No credential use, upload, QC project/compile/job/history or
+   local/cloud parity is claimed by this offline software build.
+3. **Data-bound empirical readiness after those facts:** authenticate the
+   permitted representation/coverage, bind actual input hashes and covered
+   population to this prospective protocol, register a separate actual
+   exploratory look before its first outcome, independently review the exact
+   candidate and implement/validate the exact permitted QC order/parity
+   adapter. These owner-controlled choices can use the standing delegation;
+   they are not routine approvals awaiting an answer. A permanent look cannot
+   be fabricated against an unavailable actual input/route or backdated after
+   outcomes. The current report has no actual-data or QC execution override.
+
+For the **canonical strict-PIT study**, the additional original/all-correction
+archive or exhaustive correction inventory and actual availability clocks
+remain indispensable. Massive's latest-only SI endpoint is definitively
+refused for that claim on its answer, irrespective of tier or a longer lag.
+FINRA's scheduled calendar is not a reconstruction of overwritten values.
+This separate study therefore does not constitute completion of canonical
+SI-5, authorize ETF work or rescue a stock null, or select a production lookback.
+
+Authorized/consumed actual outcome looks remain **0/0**, exploratory actual
+looks **0**, alpha **0**, permanent look IDs **none**, QC launch attempts **0**.
+No actual provider/FINRA/SEC market rows, licensed prices/outcomes, credentials,
+holdout, production ranking/seed, ETF, purchase/terms, broker, operator database,
+deployment, paper/live, real capital/orders or trading action occurred. The
+one existing-thread reply was read for qualification; no mail was sent this
+round. No monitor was armed/changed: the Claude one-shot remains deleted and
+the exchange-reply monitor remains paused.
+
+The owner explicitly permits a genuine blocker as this continuous round's
+terminal condition; further toy, forward-looking or shared work is not
+substituted for missing facts. Publish the genuinely completed software/
+review checkpoint once, after the final guards, only as
+`HEAD:refs/heads/codex/strategy-short-interest` with follow-tags disabled and
+no force/interim push. Verify clean local status and equal local, tracking
+and matching actual remote afterward. Claude should independently review
+the eleven-commit range above; actual implementation/execution beyond this
+boundary requires the factual input/processing qualification, not another
+general preauthorization request.

@@ -1200,7 +1200,9 @@ Section 258 records the later owner's monitor-disarm direction, a new bounded
 700-row forward-vintage capture and supported direct-feed acquisition paths;
 no historical audit is replayed. This is development evidence, not readiness.
 Section 259 records the owner's explicit Massive-provider clarification and
-a distinct six-day-later vintage comparison, not an immediate repeated pull.
+a distinct six-day-later vintage comparison: 11 shared rating IDs change
+version and one earlier ID is absent, without inferring correction/deletion
+cause, publication time or historical look-ahead. No immediate pull is repeated.
 Claude must review section 259 and this round's final snapshot; that independent final review is not an
 intermediate checkpoint or a prerequisite for admissible continuing build.
 The human explicitly reiterated "build until the project is ready for forward
@@ -3033,7 +3035,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-06 | Codex resumed continuous work after authenticated QC/Mia became available | `ac73a660` -> `06f3e8d4` -> this record commit | Section 256: no new Claude push or replay; qualified original Mia tool-path evidence, prospective clock correction; floor 313/239/49/699 unchanged | Read only the scoped project histories, declined cloud edits, versioned the captured-clock source fix without changing R247/R279 bytes/manifests or adding a launcher; all delegated decisions recorded | Strict-network-denied focused clock/source/closure/record checks in 256.4; no complete Codex suite. Authenticated QC UI/history reads and displayed current IDE builds disclosed, not a zero-contact claim | ARV2I256-001 P2 prospective correction. ARV2R248-002/-003/-004 remain open with partial new evidence; two conditional cells and independent formal source gates unchanged | One final matching-lane push at the concrete remaining artifact/access stop; no intermediate Claude wait. Final independent review remains due; quiet monitor stays active |
 | 2026-10-06 | Codex resumed interrupted R281 retained Code audit after Mac access restored | `d5e841be` -> this record commit | Section 257: no new Claude push or replay; exact rerun Code view and 17-name inventory corroborated; floor 313/239/49/699 unchanged | Read only the already-booked rerun's supported Code view and local control metadata; no source mutation, launch, result export or historical authorization inference | Strict-network-denied focused record/active-document validation in 257.3; no complete suite or new code validation claimed | All three historical P2s remain open; run-bound rendered source is not a 17-file byte/compile/operator/save chain or formal vendor evidence | One final matching-lane push at the remaining original-artifact/source-access barrier; Mac lock no longer the active blocker, no intermediate Claude wait, monitor remains active |
 | 2026-10-06 | Codex owner-directed monitor disarm and forward-vintage acquisition | `b6d38960` -> `264067ef` -> this round's final record commit | Section 258: one bounded current-version development capture, 3 pages / 700 rows; no historical replay or strategy evaluation; floor 313/239/49/699 | Existing automation paused with its prompt, cadence and target preserved; exact provider window and private receipt protocol committed before provider access; pinned private receipt published with all false capabilities | Strict-network-denied focused validation and actual acquisition disposition in 258.3; no complete suite | Source/formal/history gates remain; private current-version acquisition is not independent publication or completeness proof; direct-feed rights/completeness unverified | One final matching-lane push at the concrete independent-source/access barrier; monitor remains disarmed, no intermediate Claude wait |
-| 2026-10-06 | Codex Massive clarification and frozen six-day vintage comparison | `43bae982` -> this round's final record commit | Section 259 freezes one new Oct1-window capture and value-free comparison to the actual Oct1 pre-cutoff receipt; no economic evaluation or new look/cell | Provider identity is Massive, not direct Benzinga; no immediate repeat of Oct5–6 or new scheduler | Final focused results and actual capture/comparison disposition in 259.3; no complete suite | Current-version differences cannot establish correction cause, publication history or deletion completeness; formal/source/history gates remain | One final same-lane push at completion or concrete evidence/access stop; monitor remains PAUSED and no Claude/routine-approval checkpoint is imposed |
+| 2026-10-06 | Codex Massive clarification and six-day vintage comparison | `43bae982` -> `2f3f8f00` -> this round's final record commit | Section 259: one new Oct1-window capture, 3 pages / 250 rows; 11 shared rating IDs change version and one earlier ID is absent; no economic evaluation or new look/cell | Provider identity is Massive, not direct Benzinga; pinned old/new private receipts compared value-free; no immediate repeat of Oct5–6 or new scheduler | Strict-network-denied focused results and actual capture/comparison disposition in 259.3; no complete suite | Current-version differences cannot establish correction cause, publication history or deletion completeness; formal/source/history gates remain | One final same-lane push at the concrete independent-source/access stop; monitor remains PAUSED and no Claude/routine-approval checkpoint is imposed |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -36408,20 +36410,101 @@ recurring capture is authorized here. The existing monitor stays PAUSED.
 
 ### 259.2 Actual separated-vintage evidence
 
-Protocol frozen above before new access. Actual one-shot acquisition and
-comparison terminal states, identities and counts remain pending; no success
-or readiness is claimed before they are observed.
+Pre-access protocol committed as `2f3f8f00` before the sole new provider
+invocation. It succeeds without retry, with private capture
+`arv2-massive-three-role-20261007T060759880331Z`, interval
+`2026-10-07T06:07:59.880331Z` through `2026-10-07T06:08:00.603816Z`
+(October 6, 23:07:59–23:08:00 America/Los_Angeles). Three terminal pages contain
+**250 rows: 234 ratings / 5 earnings / 11 guidance**, with the same deduplicated
+event counts. All three role requests passed the unchanged adapter's transport
+and schema controls. This is a later current-version observation, not another
+October 1 pre-cutoff or complete-day capture.
+
+| New local immutable identity | SHA-256 |
+|---|---|
+| Physical manifest | `90aac2c7fbcd9deeb55812c01ceb4aeee519ee228b2bf043d781196d2f6c38d9` |
+| Physical capture | `e04e6281e903156817d688f08d57933018449431bc5c890bdfe30c265ea295d2` |
+| Published quality receipt | `3449fe74b16d1123938017bf8064759b0889697ad1e60046ec6d48326e8ee5e6` |
+
+The offline builder authenticates this exact manifest/window and the existing
+comparison authenticates both supplied receipt hashes, distinct ordered
+capture intervals, exact matching window and transport. Only these value-free
+counts are observed:
+
+| Role | Shared ID / same version | Shared ID / different version | Shared ID / multiple-version ambiguity | Before-only ID / cause unknown | After-only ID / cause unknown |
+|---|---|---|---|---|---|
+| Ratings | 40 | 11 | 0 | 1 | 183 |
+| Earnings | 2 | 1 | 2 | 0 | 0 |
+| Guidance | 0 | 0 | 0 | 0 | 11 |
+
+Ratings reconcile **52 before IDs = 40 + 11 + 1**, and **234 after IDs =
+40 + 11 + 183**. Earnings reconcile five IDs on both sides, with two ambiguous
+because a receipt contains multiple row versions; the seven before earnings
+rows are not seven independent IDs. Guidance starts from zero before IDs.
+All artifacts stay private, Git-ignored and local-only; no raw IDs or licensed
+values are printed, copied to the record or committed. Receipt derivation,
+authentication and comparison use strict network denial. Actual provider
+contact occurred in the capture; no QC or outcome access, return look,
+paper look, alpha spend or order occurred. Output retains PIT/paper false.
+
+`ARV2OD259-C`: preserve the first-received local vintage, rather than silently
+substituting today's event-date query for it. This measurement confirms that
+11 of the 51 common rating IDs have different full row versions between the
+two receipts, not which field changed, when it changed, or its cause. The
+before-only ID does **not** prove a vendor deletion: event-date moves, scope
+or other causes are not resolved. After-only IDs do not identify backfill;
+normal later-session arrival and any later update/backfill are confounded.
+The initial capture preceded 09:20 by about an hour, so changed rows could
+have changed before that cutoff; no specific decision contamination, vendor
+first-publication chronology, complete correction/deletion archive or
+2021–2025 bias rate is inferred. Historical result/stress classifications
+remain exactly as qualified previously, not newly cleared or withdrawn.
+
+Massive's [ratings documentation](https://massive.com/docs/rest/partners/benzinga/analyst-ratings)
+describes event-date and last-update fields/filters and current row responses;
+the inspected contract does not establish immutable as-of versions or deletion
+completeness. That missing package is not cured by more current-row pulls.
+No credential is repurposed for direct Benzinga, new subscription purchased,
+collector or selector scaffold added, frozen source edited, or formal registry
+entry admitted. The owner's Massive clarification resolves the access-provider
+question, not the independent-source gate. Further source quality work must
+have a distinct prospective purpose; do not turn unchanged evidence into an
+immediate polling loop or rearm the disarmed monitor.
 
 ### 259.3 Focused validation and continuing-work handoff
 
-Use focused forward-quality and record/active-document checks only, under
-strict network denial from the designated root; record their exact final
-results after this acquisition. Only this lane record changes. The single
-final matching-lane push will contain the pre-access freeze and final actual
-disposition, with no intermediate push or Claude-review pause. Independent
-final review remains due and cannot be supplied by same-round advisory agents.
+Pre-access forward-quality and record/active-document selection passed
+**105 tests in 1.53s**, no failures/skips/warnings, Python 3.13.15 under strict
+network denial from the designated root. Final affected selection is the same
+three files (105 distinct focused tests), not a complete suite or new code/QC
+validation: **105 passed in 1.57s**, no failures/skips/warnings. The final
+record is rechecked before commit. `git diff --check` is clean. The read-only
+advisory confirms count reconciliation and the timing/cause qualifications;
+it is not independent final review. Private metadata
+and receipt parsers also ran under strict network denial, which is not a claim
+of zero contact for the permitted provider capture.
+
+**Exact round range:** `43bae982954214eaf3fb5a814bc34c3790401b25..HEAD`,
+`2f3f8f00` pre-access protocol freeze then this final record disposition.
+Claude must review both commits individually. Only this lane record changes;
+all program/test/frozen source/registry/shared-ledger/root bytes are untouched.
+The single final matching-lane push contains the freeze and actual disposition,
+with no intermediate push or Claude-review pause. Independent final review
+remains due and cannot be supplied by same-round advisory agents. No new
+P0–P3 code defect is alleged from a source-row version difference. All three
+historical P2s, two conditional stress cells and **313 / 239 / 49 / 699** floor
+remain. The monitor remains PAUSED by the human's explicit instruction.
 Formal readiness still requires the genuine independent as-of/version/
 publication/correction/deletion completeness, reviewed SID/permanent/share-
 class/own-ETF identity/availability and authenticated RAW prior-close price/
 score packages in 231.3, plus stock seven-role/terminal-payoff and later gates.
 Massive's confirmed current-row access does not manufacture that evidence.
+The required acquisition is an actual vendor-origin immutable version/as-of
+package or supported archive entitlement with original availability, stable
+version identities, correction/withdrawal/tombstone and completeness evidence;
+neither repeated polling nor a new parser can substitute for it. No vendor
+support message, credential/subscription change or purchase is made here.
+This actual acquisition/comparison finishes at that concrete external source
+package/access barrier, not a routine approval or intermediate review wait.
+Proceed immediately on genuine supported evidence/access; do not claim
+project completion or forward readiness from these development receipts.

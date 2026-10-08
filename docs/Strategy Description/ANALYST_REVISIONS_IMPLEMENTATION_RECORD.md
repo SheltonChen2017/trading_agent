@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–262 retain the milestone, review, preregistration, QC
+strategy. Sections 1–263 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1222,8 +1222,15 @@ existing Sharadar access. The completed reply monitor is retired; the old
 Claude-review monitor stays paused. Bounded research-only RAW-price capture
 completes in 262.6: all seven October 6 rows are retained privately and locally
 reauthenticated, without claiming formal source/identity readiness. Claude must review
-section 262 and this round's final snapshot; that independent review is not an
+section 262 and its final snapshot; that independent review is not an
 intermediate checkpoint or prerequisite for admissible continuing build.
+Section 263 starts the human-approved next step: current identity checks for
+QCOM and the six own-ETF securities, bound to the retained October 6 prices.
+Private Sharadar rows stay local; independently obtained public OpenFIGI
+identifiers are the only external reference values proposed for a new
+no-order QC identity diagnostic. No source request or QC run is claimed
+before its actual receipt. Claude must review section 263 and the final
+pushed snapshot; no intermediate reviewer checkpoint is introduced.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
 acknowledgement push is awaited. Missing independent evidence and supported
@@ -3058,6 +3065,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex owner-authorized Massive support acquisition inquiry | `672961e7` -> `56b6e242` -> this round's final record commit | Section 260: one information-only email sent after scope freeze; local Sharadar ZIP hashes/sizes match manifest but no independent identity/RAW-price package is admitted; no new look/cell | Official support destination and authenticated mail connector; no raw licensed rows, attachments, credentials or spending authorization | Strict-network-denied focused record/active-document checks and actual message/metadata disposition in 260.3; no complete suite | Vendor reply/delivery and independent source/security-master/RAW-price packages remain unproven; contacting support is not readiness | One final matching-lane push at the actual vendor-artifact/independent-evidence stop; monitor remains PAUSED, no routine approval or Claude checkpoint |
 | 2026-10-07 | Claude independent review of sections 255-260: delegated continuous work, response observations, the captured-clock projector, provider captures and the Massive inquiry | `33958eaa` -> this record commit | Section 261: eleven Codex commits `a205ebf7..33958eaa` disposed (11 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser actions, looks, evaluations, or cells | No code changed by Claude. Reproduced the local evidence of sections 255-260 (claim and source identities, tool hashes, capture manifests, row counts, receipt flags, the vintage comparison and the Sharadar ZIP hashes); native in-memory mutation trials on both code commits; a scratch probe confirming `ARV2R261-001`; accepted `ARV2CR255-001` and `ARV2CR255-002` against section 254; section 4 names section 261, banner sentence added, this row appended | Complete lane selection at `33958eaa` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 261.6 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R261-001`, documented for Codex); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's Claude commit; Codex counter-reviews section 261 unless the owner changes the workflow |
 | 2026-10-07 | Codex section-261 counter-review, reply monitor and owner-directed immediate RAW-price acquisition | `b80149b8` -> `2f5ddf4b` + final record commit | Section 262: one new Claude commit accepted after scratch-probe qualification; actual Massive reply read; human cancels clarification drafts; bounded direct Sharadar capture completes all seven October 6 rows | New reply monitor created then retired because the original is answered and follow-up cancelled; old review monitor remains paused; no shared/frozen/registry edits, new look/cell or paid/live action | 263 distinct focused passes under strict network denial; actual two-GET private capture and pinned offline readback; no complete Codex suite | Current RAW-price access step completed; immutable availability and independent identity/formal packages remain unavailable, not cleared by other-lane use | One final matching-lane push at this concrete source-evidence boundary; no routine approval/review wait; resume supported substantive evidence work when available |
+| 2026-10-07 | Codex owner-directed seven-security identity preparation | `96318ebc` -> this continuous round | Section 263: source protocol and prospective no-order QC identity diagnostic; actual contacts and terminal dispositions recorded below before any completion claim | New bounded adapters only; private Sharadar identity rows remain local, public FIGIs independently sourced; no historical replay or formal admission | Strict-network-denied focused checks and exact actual-operation evidence recorded in section 263; no complete Codex suite | Current cross-provider identity is not historical availability, independent formal review or forward readiness | Continue through supported acquisition and diagnostic without routine approval/Claude wait; exactly one final matching-lane push |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -37175,3 +37183,167 @@ root/branch/HEAD/status, fetch only the matching branch, refuse unexplained
 concurrent change/divergence and push exactly once to
 `origin/codex/strategy-analyst-revisions-v2`. No intermediate push occurred;
 the final committed tree and remote equality must be checked after that push.
+
+## 263. Owner-directed current seven-security identity acquisition and no-order QC diagnostic, 2026-10-07
+
+### 263.1 Scope, baseline and delegated decisions
+
+The human accepts the recommended identity step with **"ok, get started"**:
+resolve QCOM plus SPY, QQQ, SOXX, XLV, REMX and XLE across the current source
+and QC identities, bind the dispositions to the already retained RAW-price
+bytes, and retain missing/conflicting identities rather than silently selecting
+a candidate. This is seven **securities**, not completion of the seven formal
+data roles or an ETF-constituent universe. No new email or clarification wait
+is requested. The completed reply monitor stays retired and the old review
+monitor stays paused; neither is rearmed by this work.
+
+The designated root and branch are verified at baseline
+`96318ebc4b4985f2617ebf0252e0365f4eca7ac8`, initially clean. Fetch only
+`origin/codex/strategy-analyst-revisions-v2`: local/remote match, zero ahead
+or behind. No new Claude commit has arrived, so there is no old review replay.
+All repository work, tests and commits stay in the designated lane worktree.
+
+| Decision | Prospective exercised scope under the owner's section-255 delegation |
+|---|---|
+| `ARV2OD263-A` | Acquire one bounded present-day Sharadar TICKERS capture and one bounded public OpenFIGI capture for exactly these seven names, after committing the exact protocol and tested collector bytes. The old price response is authenticated locally, not pulled again. |
+| `ARV2OD263-B` | Keep licensed Sharadar rows, names, CUSIPs, permanent IDs and source FIGIs local. Upload no vendor CSV or price to QC. Independently obtain public-domain FIGI strings from OpenFIGI using only already-public ticker labels; require equality with Sharadar locally before those public strings enter the QC diagnostic. |
+| `ARV2OD263-C` | Prepare new R284 A1 solely to test public-reference FIGI to QC identity and exact reverse matching inside QC. A no-order exception is necessary because orders cannot establish identifier equivalence and would add unnecessary market/outcome access. No performance interpretation follows. Freeze exact source/input/profile/package hashes before the single launch attempt; compile errors, runtime errors and ambiguous submissions spend their attempt. No automatic replacement or historical R247/R281 retry. |
+| `ARV2OD263-D` | If an actual R284 attempt begins, append only its lane-owned identity, attempt/status and conservative look accounting to `docs/research/alpha-result.md`. This is the specifically applicable coordination decision for the mandatory shared look census, not authority to change any other lane, historical row, strategy policy or shared code. Before that event, the shared ledger and 313/239/49/699 floor remain unchanged. |
+
+The [Sharadar terms](https://sharadar.com/terms) restrict redistribution of
+source data; existing access and other-lane use are not a cloud-redistribution
+permit. [OpenFIGI terms, section 1](https://www.openfigi.com/docs/terms-of-service)
+expressly allow reuse and transmission of the identifier strings. This route
+therefore uses independently retrieved public FIGIs, not renamed vendor rows.
+The [QC data-use guidance](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+supports in-cloud validation against an external reference with only check
+results returned. QC-derived SID/FIGI values, mapping tables and identifier
+hashes are not exported. Current equality still cannot prove historical
+validity, first availability, correction/deletion completeness or independent
+formal security-master review.
+
+### 263.2 Frozen source-request protocol before contact
+
+The one Sharadar invocation permits at most two direct HTTPS GETs to
+`https://api.sharadar.com/v1.0/data/tickers`, using the existing local source
+credential and an owned verified-TLS, zero-retry, no-proxy/no-redirect session.
+Queries are fixed: `format=csv`, `sort=ticker.asc`, `skip=0`, `limit=100`;
+first `table=stocks&ticker=QCOM`, then
+`table=funds&ticker=SPY,QQQ,SOXX,XLV,REMX,XLE`. Exact requested fields:
+
+`table,ticker,permaticker,name,exchange,isdelisted,category,figi,cusips,currency,firstadded,firstpricedate,lastpricedate,lastupdated`
+
+No `from`, `to`, `lastupdated`, bulk years, paging or fallback is permitted.
+[TICKERS documentation](https://sharadar.com/docs/tickers) describes a current
+security snapshot; its date filters bound pricing dates, not historical
+publication/as-of state. Require strict UTF-8 CSV, exact unique requested
+headers, fewer than 100 rows and at most 1 MiB per response. Keep all seven
+requested-name dispositions, including missing, ambiguous, malformed,
+wrong-category/exchange/currency and cross-name permanent-ID/FIGI collisions.
+Every member of a collision refuses, including a direct-stock/own-ETF collision.
+Permaticker identifies the vendor security/share class, not a permanent issuer.
+Pricing/metadata dates do not become validity or availability intervals.
+
+Before credentials or contact, authenticate section-262's exact price artifact
+and manifest `2f5d71683a43d1118420c52677fcbb6bdd539c7c621004b4632beed9b03f6702`,
+including both CSVs and the one-stock/six-fund October 6 census. All identity
+capture bytes stay in private ignored owner-only artifacts, with externally
+pinned manifest, exclusive allocation, no-follow/single-link/readback controls
+and a last-published completion marker. No source values or credential appear
+in stdout, Git or this record. Retain unsigned client receipt intervals and
+HTTP entity hashes; these are not signed publication or original raw wire proof.
+
+The one public OpenFIGI invocation permits **two POSTs, five jobs then two**,
+to `https://api.openfigi.com/v3/mapping`, without API key. Ordered tickers are
+`QCOM,SPY,QQQ,SOXX,XLV` followed by `REMX,XLE`; each job uses
+`idType=TICKER`, `idValue=<ticker>`, `exchCode=US`, `currency=USD`,
+`marketSecDes=Equity`.
+The [official API documentation](https://www.openfigi.com/api/documentation)
+contradicts itself with unauthenticated maxima of ten and five jobs; this
+protocol obeys the stricter five rather than testing a larger request.
+No retry, redirect, enumeration, pagination, API-key acquisition or paid
+access. Each response is bounded to 1 MiB, parsed strictly, matched to request
+order/cardinality, and retained privately. Errors/warnings, absent metadata,
+ambiguous composite/share-class mappings or cross-name collisions refuse.
+Current classification requires QCOM Common Stock and the six funds ETP,
+supported by [FIGI allocation rules](https://www.openfigi.com/about/allocation-rules),
+not a guessed ETF API enum. Source descriptions remain local; only independently
+returned composite FIGI strings and the existing requested ticker/role labels
+can enter a canonical seven-row QC input after all seven local vendor/public
+comparisons match. That input binds both capture manifests and the price
+manifest; hashes authenticate supplied bytes, not independent formal admission.
+
+These source/reference requests are input-identity acquisition, not an economic
+evaluation. They add no strategy look, result cell or formal-alpha spend.
+All PIT, independent-review, formal-source, decision, paper, order and deployment
+capabilities remain false. Current captures cannot backfill the elapsed Oct7
+09:20 cutoff or a historical launch. No source registry is populated.
+
+### 263.3 Prospective QC protocol and accounting
+
+R284 A1 is a new current-identity infrastructure diagnostic, not a renamed
+R247/R281 run or an executable selector. Use a fresh private project named
+`ARV2 R284 PUBLIC SEVEN IDENTITY 20261007` and backtest
+`ARV2 R284A1 public FIGI identity only 20261007`. Read organization metadata
+only from the already-known project `37165262`; do not enumerate the account
+or modify that old project's files/runs. Verify the newly returned project's
+ownership, collaborators and idle status. Only its generated default
+`research.ipynb` may be deleted; its `main.py` is updated and read back exactly
+before compilation. No other project is touched.
+
+The one-file source uses the 2026-10-07 one-day engine interval, NY timezone,
+USD1m cash and a constant benchmark, with no security subscriptions, history,
+seeded prices, universe, Object Store, notifications, network code or orders.
+QC's supported `composite_figi` forward and reverse methods check the seven
+public strings inside the cloud; USA/Equity identity, exact reverse equality
+and distinct SID groups are required. All collision members refuse.
+Only a bounded canonical custom summary of requested ticker/role match/refusal
+dispositions, counts and local source/profile/input binding hashes is read.
+No QC mapping value/hash, price, financial statistic, order, log or chart is
+exported/evaluated. Default financial fields may exist in the returned envelope;
+they are not used or retained as results.
+
+Before contact, privately prepare and record exact source/input/profile/package
+hashes. The launch claim is spent before cloud mutation; no automatic retry.
+Freeze project/compile/backtest identities from actual responses, retain bounded
+append-only sanitized response observations, and require exact source readback.
+Status is statistics-disabled and bounded; the custom metadata reader is one-use
+and checks fresh completion as well as the local terminal binding. Failed
+persistence, encoding or backwards client clock refuses a fresh result. Local
+client times and parsed-response hashes do not prove signed server time/operator.
+
+Baseline is **313 shared looks / 239 development / 49 infrastructure / 699
+cells**. Upon the actual first attempt, conservatively add one shared and one
+infrastructure look even if it fails before a run ID; thereafter
+**314 / 239 / 50 / 699**, exactly once. A compilation/runtime/ambiguous failure
+is retained, not erased. No formal alpha or cell is spent. This protocol does
+not yet claim a source response, cloud project, completed run or matching result;
+actual receipts and focused validation are appended below before final handoff.
+
+### 263.4 Sharadar pre-contact code freeze
+
+Root reads the complete new collector and tests. Exact implementation
+`scripts/capture_arv2_sharadar_identities.py` SHA-256:
+`c2c9160f3a8e3db699580e6007a2b20e7f45750ee14d1977c715aec902648825`.
+Exact `tests/analyst_revisions_v2/test_sharadar_identity_capture_adapter.py`
+SHA-256: `9c5ee15e3644a3ee8b564dbff3a2ac3076cedfe0b9aedd3fc3ea5b0a7df09814`.
+Root's strict-network-denied selection initially gives **272 passed**
+(87 new, 99 existing price, 86 record/active-document). Four final test-only
+boundary pins are then added; root reads those and reruns the exact final new
+file: **91 passed in 1.01s**, with implementation bytes unchanged. The distinct
+union is **276**, not the sum of repeated runs. Both new files compile under
+strict network denial and `git diff --check` is clean. The implementing advisory
+agent also reports an in-memory collision-guard omission caught by three tests,
+with finally-safe restoration and 91 passes; this is same-round advisory,
+not independent Claude review or actual provider evidence.
+
+Commit these two new files and the lane protocol before executing exactly once:
+
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -m scripts.capture_arv2_sharadar_identities`
+
+No argument can substitute a different price receipt or ticker set. No source
+request, key read or QC operation has yet occurred in this section. The public
+collector and QC runner are still separate in-progress untracked work at this
+freeze and are not included in or authorized by this first code commit. Their
+own tested source/input hashes must be frozen before their external calls.
+One final matching-lane push is retained for the continuous round.

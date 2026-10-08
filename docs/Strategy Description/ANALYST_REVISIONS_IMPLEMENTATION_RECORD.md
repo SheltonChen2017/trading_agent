@@ -1,7 +1,7 @@
 # Analyst Revisions ETF Strategy V2 — implementation and session record
 
 Status: **Analyst Revisions V2 remains a research lane, not a live-trading
-strategy. Sections 1–263 retain the milestone, review, preregistration, QC
+strategy. Sections 1–264 retain the milestone, review, preregistration, QC
 run, finding, and correction history; the active cross-project look ledger
 is `docs/research/alpha-result.md`. R-117/R-118 have authenticated but
 preliminary bounded-tilt results. R-119 through R-168 include sequential
@@ -1237,6 +1237,14 @@ all integrity checks stay enforced, and the exact local metadata barrier is
 recorded in 263.13–263.14. Independent formal source gates remain separate.
 Claude must review section 263 and the final pushed snapshot; no intermediate
 reviewer checkpoint is introduced.
+Section 264 resumes on the human's subsequent "proceed": first diagnose
+publication using bounded synthetic metadata-only fixtures on this worktree's
+filesystem. Preserve both failed production directories and every integrity
+check. A production recovery protocol must be separately frozen and verified
+before any new publication or QC preparation/contact; no routine approval or
+Claude-review wait is introduced.
+Claude must review section 264 and its final pushed snapshot.
+That review must be independent; same-round advisory checks do not qualify.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
 acknowledgement push is awaited. Missing independent evidence and supported
@@ -3072,6 +3080,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Claude independent review of sections 255-260: delegated continuous work, response observations, the captured-clock projector, provider captures and the Massive inquiry | `33958eaa` -> this record commit | Section 261: eleven Codex commits `a205ebf7..33958eaa` disposed (11 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser actions, looks, evaluations, or cells | No code changed by Claude. Reproduced the local evidence of sections 255-260 (claim and source identities, tool hashes, capture manifests, row counts, receipt flags, the vintage comparison and the Sharadar ZIP hashes); native in-memory mutation trials on both code commits; a scratch probe confirming `ARV2R261-001`; accepted `ARV2CR255-001` and `ARV2CR255-002` against section 254; section 4 names section 261, banner sentence added, this row appended | Complete lane selection at `33958eaa` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 261.6 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R261-001`, documented for Codex); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's Claude commit; Codex counter-reviews section 261 unless the owner changes the workflow |
 | 2026-10-07 | Codex section-261 counter-review, reply monitor and owner-directed immediate RAW-price acquisition | `b80149b8` -> `2f5ddf4b` + final record commit | Section 262: one new Claude commit accepted after scratch-probe qualification; actual Massive reply read; human cancels clarification drafts; bounded direct Sharadar capture completes all seven October 6 rows | New reply monitor created then retired because the original is answered and follow-up cancelled; old review monitor remains paused; no shared/frozen/registry edits, new look/cell or paid/live action | 263 distinct focused passes under strict network denial; actual two-GET private capture and pinned offline readback; no complete Codex suite | Current RAW-price access step completed; immutable availability and independent identity/formal packages remain unavailable, not cleared by other-lane use | One final matching-lane push at this concrete source-evidence boundary; no routine approval/review wait; resume supported substantive evidence work when available |
 | 2026-10-07 | Codex owner-directed seven-security identity preparation | `96318ebc` -> `79883200` + final record commit | Section 263: bounded current identity/public FIGI captures complete; source continuity comparisons run but local publication refuses twice, with the second locating output-manifest ctime drift; no QC attempt/look/cell | New bounded adapters, versioned continuity projection and prepared-only QC runner; four pre-contact P2 corrections; original source refusals retained, private Sharadar rows local and partial artifacts preserved | Root 785 focused strict-network-denied passes, closure and final record checks in 263.15; no complete Codex suite or QC validation | ARV2E263-001 local publication-integrity barrier; independent immutable source/security-master/price/score gates and historical P2s remain; not forward ready | Exactly one final matching-lane push at the concrete artifact-integrity/evidence stop; no routine approval/Claude wait or monitor rearm |
+| 2026-10-08 | Codex owner-directed publication diagnosis and conditional identity diagnostic continuation | `f72b1cfb` -> this continuous round | Section 264 begins with synthetic metadata-only diagnosis; no new source/QC operation is implied by code or local fixtures | Preserve original failed artifacts, immutable source pins and all integrity gates; new production recovery requires its own evidence and freeze | Strict-network-denied focused checks and actual diagnostic outcomes recorded below; no complete Codex suite | ARV2E263-001 and formal independent-source gates remain until genuine evidence addresses their exact requirements | Continuous authorized work without routine approval/Claude wait; exactly one final matching-lane push |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -37898,3 +37907,97 @@ lane is seven commits ahead and zero behind. No new Claude push is present.
 Verify root/branch/HEAD/status again, commit only this final lane record, and
 perform exactly one final matching-lane push. The eight-commit final snapshot
 is pending independent Claude review, not forward-ready or QC-run validated.
+
+## 264. Owner-directed publication diagnosis and conditional R284 continuation, 2026-10-08
+
+### 264.1 Baseline, scope and diagnostic decision
+
+The human says **"proceed"** after section 263's exact publication barrier.
+Root verifies the designated worktree and `codex/strategy-analyst-revisions-v2`
+at clean `f72b1cfb7cd027dbc859687e1af28a570e5b762a`. Matching-branch-only
+fetch reports zero ahead/behind and no new Claude review. Earlier reviews and
+historical audit findings are not replayed. The continuous-build delegation
+remains; the specific section-263-J single retry remains exhausted and is not
+silently reused. No monitor is rearmed.
+
+**ARV2OD264-A (prospective delegated synthetic diagnostic):** freeze one small
+metadata-only diagnostic and run it once under strict network denial in the
+exclusive private directory
+`artifacts/analyst_revisions_v2/publication_metadata/R264-20261008-A`.
+Use only fixed, clearly synthetic JSON bytes, not licensed source inputs or
+either failed continuity package. Compare three methods, three repetitions
+each: direct exclusive final write (diagnostic control only); the current
+pending-file fsync / exclusive link / unlink / child-and-parent sync sequence;
+and that same sequence with final-file fsync before the held verification
+baseline. Sample after named operations and at cumulative 0, 0.01, 0.1, 0.5,
+1 and 2 seconds after the baseline, with a 30-second total deadline. This is
+a bounded observation window, not perpetual stability or crash-safety proof.
+
+Preserve all synthetic leaves and write one private canonical report of phase,
+fixed metadata-dimension differences, hash/readback/mode/link/identity checks
+and optional before/after Boolean `com.apple.provenance` presence. Numeric
+synthetic fixture stat values may be retained only in the private diagnostic
+report; stdout contains counts and the report hash, not raw metadata. Anchor
+the immutable held identity immediately after the read-only open and before
+the optional metadata probe, then compare the zero-time observation against
+that original identity. Record actual elapsed as well as scheduled offsets.
+No xattr value or arbitrary xattr name is exported. If Python lacks
+`os.listxattr`, use the supported `/usr/bin/xattr` names-only read on the exact
+synthetic leaf, timeout at most 0.5 seconds and the remaining budget; a present
+but descriptor-unsupported function remains unknown, without CLI fallback.
+Report unsupported/failure as unknown. The overall deadline is cooperative
+between filesystem operations, not a guaranteed preemption of a blocked syscall.
+Rewalk the named directory chain without following symlinks before path-based
+inspection/report publication and verify it against the held directory identity.
+No credential/provider/QC access, directory overwrite, metadata stripping,
+permission weakening, source artifact mutation or research look is authorized
+by this diagnostic. Any post-baseline drift must remain refused, not trigger
+rebaselining. All figures are synthetic infrastructure observations only.
+
+The direct-write control is not an admissible replacement for atomic marker
+publication. Apple documents link/unlink/rename as ctime-changing operations
+([stat](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/stat.2.html));
+file fsync flushes modified data/attributes but does not lock future changes
+([fsync](https://raw.githubusercontent.com/apple-oss-distributions/xnu/main/bsd/man/man2/fsync.2)).
+These documents explain experiment choices, not the actor/cause of the prior
+held-interval change. Any production correction requires concrete evidence,
+regression tests and a new explicit source/publication freeze. R284 A1 remains
+unprepared/unlaunched; floor **313/239/49/699**, formal gates, original source
+pins/refusals, independent-review requirements and false action flags stay
+unchanged.
+
+### 264.2 Pre-invocation review and validation
+
+Same-round advisory review and root inspection correct the synthetic probe
+before invocation: anchor identity before optional provenance inspection;
+retain any initial-read drift instead of absorbing it; record actual elapsed
+time and incomplete deadlines; verify the no-follow named ancestor chain;
+include during-read and final post-provenance changes in refusal status.
+Tests use only synthetic temporary fixtures and virtual observation clocks.
+These are diagnostic-preflight corrections, not a reproduced cause or fix for
+`ARV2E263-001`. No production source package has been published or repaired.
+
+Two draft document runs each returned **85 passed / 1 failed** because the
+active-review parser did not recognize "must independently review". Root
+corrected the prose to the unambiguous "Claude must review section 264" and
+retained the independent-review requirement in the following sentence; no
+test or review gate was weakened. Corrected record/active-document checks are
+**86 passed in 1.23s**. The unchanged production bridge baseline separately
+passes **129 focused tests in 4.17s**. All use strict remote-network denial.
+
+Frozen synthetic-only implementation:
+
+| File | SHA-256 |
+| --- | --- |
+| `scripts/diagnose_arv2_publication_metadata.py` | `b4d0573c85d302944b4fc2ac7e4502f9aed77874e4bfaf4a1ae90808817c3327` |
+| `tests/analyst_revisions_v2/test_publication_metadata_diagnostic.py` | `b8ef815d4ff4295e1b6bfb865112e2615406023003f374c791cafbc57339e7ec` |
+
+Root's combined probe/record/active-document check is **113 passed in 1.98s**
+(27 probe plus 86 document checks); no complete suite. This is not added to
+the overlapping draft/repeated counts. Each of the nine fixtures has six
+scheduled observations plus a separately counted final verification after the
+last optional provenance query. Refused observations/final checks are retained
+as diagnostic data, never admitted source evidence. The actual frozen target
+and QC control directory are both absent before this commit; the production
+bridge and QC runner remain byte-identical to section 263. Commit this
+protocol before the one actual synthetic invocation; no push occurs yet.

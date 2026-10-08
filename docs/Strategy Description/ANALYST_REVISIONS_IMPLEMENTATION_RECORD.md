@@ -1226,11 +1226,17 @@ section 262 and its final snapshot; that independent review is not an
 intermediate checkpoint or prerequisite for admissible continuing build.
 Section 263 starts the human-approved next step: current identity checks for
 QCOM and the six own-ETF securities, bound to the retained October 6 prices.
-Private Sharadar rows stay local; independently obtained public OpenFIGI
-identifiers are the only external reference values proposed for a new
-no-order QC identity diagnostic. No source request or QC run is claimed
-before its actual receipt. Claude must review section 263 and the final
-pushed snapshot; no intermediate reviewer checkpoint is introduced.
+Bounded current Sharadar and public OpenFIGI captures complete; a separate
+versioned bridge compares the seven current/vintage identities while retaining
+original missing-FIGI and parser/range qualifications. Private Sharadar rows
+stay local. Two offline publication invocations roll back their manifest markers;
+the bounded diagnostic identifies the new output manifest's ctime changing
+during held verification. No usable continuity package, QC preparation, QC
+contact, attempt or look is produced. Both partial artifacts are preserved,
+all integrity checks stay enforced, and the exact local metadata barrier is
+recorded in 263.13–263.14. Independent formal source gates remain separate.
+Claude must review section 263 and the final pushed snapshot; no intermediate
+reviewer checkpoint is introduced.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
 acknowledgement push is awaited. Missing independent evidence and supported
@@ -3065,7 +3071,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex owner-authorized Massive support acquisition inquiry | `672961e7` -> `56b6e242` -> this round's final record commit | Section 260: one information-only email sent after scope freeze; local Sharadar ZIP hashes/sizes match manifest but no independent identity/RAW-price package is admitted; no new look/cell | Official support destination and authenticated mail connector; no raw licensed rows, attachments, credentials or spending authorization | Strict-network-denied focused record/active-document checks and actual message/metadata disposition in 260.3; no complete suite | Vendor reply/delivery and independent source/security-master/RAW-price packages remain unproven; contacting support is not readiness | One final matching-lane push at the actual vendor-artifact/independent-evidence stop; monitor remains PAUSED, no routine approval or Claude checkpoint |
 | 2026-10-07 | Claude independent review of sections 255-260: delegated continuous work, response observations, the captured-clock projector, provider captures and the Massive inquiry | `33958eaa` -> this record commit | Section 261: eleven Codex commits `a205ebf7..33958eaa` disposed (11 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser actions, looks, evaluations, or cells | No code changed by Claude. Reproduced the local evidence of sections 255-260 (claim and source identities, tool hashes, capture manifests, row counts, receipt flags, the vintage comparison and the Sharadar ZIP hashes); native in-memory mutation trials on both code commits; a scratch probe confirming `ARV2R261-001`; accepted `ARV2CR255-001` and `ARV2CR255-002` against section 254; section 4 names section 261, banner sentence added, this row appended | Complete lane selection at `33958eaa` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 261.6 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R261-001`, documented for Codex); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's Claude commit; Codex counter-reviews section 261 unless the owner changes the workflow |
 | 2026-10-07 | Codex section-261 counter-review, reply monitor and owner-directed immediate RAW-price acquisition | `b80149b8` -> `2f5ddf4b` + final record commit | Section 262: one new Claude commit accepted after scratch-probe qualification; actual Massive reply read; human cancels clarification drafts; bounded direct Sharadar capture completes all seven October 6 rows | New reply monitor created then retired because the original is answered and follow-up cancelled; old review monitor remains paused; no shared/frozen/registry edits, new look/cell or paid/live action | 263 distinct focused passes under strict network denial; actual two-GET private capture and pinned offline readback; no complete Codex suite | Current RAW-price access step completed; immutable availability and independent identity/formal packages remain unavailable, not cleared by other-lane use | One final matching-lane push at this concrete source-evidence boundary; no routine approval/review wait; resume supported substantive evidence work when available |
-| 2026-10-07 | Codex owner-directed seven-security identity preparation | `96318ebc` -> this continuous round | Section 263: source protocol and prospective no-order QC identity diagnostic; actual contacts and terminal dispositions recorded below before any completion claim | New bounded adapters only; private Sharadar identity rows remain local, public FIGIs independently sourced; no historical replay or formal admission | Strict-network-denied focused checks and exact actual-operation evidence recorded in section 263; no complete Codex suite | Current cross-provider identity is not historical availability, independent formal review or forward readiness | Continue through supported acquisition and diagnostic without routine approval/Claude wait; exactly one final matching-lane push |
+| 2026-10-07 | Codex owner-directed seven-security identity preparation | `96318ebc` -> `79883200` + final record commit | Section 263: bounded current identity/public FIGI captures complete; source continuity comparisons run but local publication refuses twice, with the second locating output-manifest ctime drift; no QC attempt/look/cell | New bounded adapters, versioned continuity projection and prepared-only QC runner; four pre-contact P2 corrections; original source refusals retained, private Sharadar rows local and partial artifacts preserved | Root 785 focused strict-network-denied passes, closure and final record checks in 263.15; no complete Codex suite or QC validation | ARV2E263-001 local publication-integrity barrier; independent immutable source/security-master/price/score gates and historical P2s remain; not forward ready | Exactly one final matching-lane push at the concrete artifact-integrity/evidence stop; no routine approval/Claude wait or monitor rearm |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -37782,3 +37788,113 @@ strict-network-denied selection is **785 passed in 16.44s** (129 continuity;
 other six-file counts unchanged). This replaces 775 as the final selection,
 not an additional distinct count. `git diff --check` passes. Commit this local
 diagnostic freeze before the one bounded new-directory invocation above.
+
+### 263.14 Exact bounded retry result and current stop
+
+At `79883200145da8ca715029f2d0001eed230df5b9`, root verifies the exact
+root/branch/clean HEAD and absent B directory, then performs the one allowed
+new-directory invocation under strict network denial. It exits 1 with:
+
+`continuity evidence identity check refused; scope=output artifact=R284A1-20261008-B leaf=manifest.json held_changed=ctime_ns named_changed=ctime_ns provenance_before=unknown provenance_after=unknown`.
+
+This identifies `ARV2E263-001`: both the held and named new output manifest
+have changed ctime during verification. The diagnostic reports no change to
+device, inode, size or mtime. Optional provenance presence is **unknown**,
+not false; the earlier post-failure xattr observations do not establish this
+failure's cause. Do not attribute it to macOS, another agent or a specific
+process without evidence. The original controls correctly refuse publication.
+
+Both source reconstruction/comparison passes before publication and the final
+reconstruction reached their verification stages. This is local comparison
+evidence for seven equal permanent-ID and public/vintage-FIGI bindings and
+seven populated old/current CUSIP candidate sets, with QQQ/REMX original
+parser limitations preserved. It is not a successfully published package,
+immutable historical availability or independently accepted identity evidence.
+No source rows are altered or refetched, and no CUSIP/checksum authority is
+inferred from valid-shape set equality.
+
+The builder again rolls back only its own manifest marker. Root confirms the
+B directory has only 986-byte `input.json` and 65-byte `manifest.sha256`, and
+the QC control directory remains absent. Retained non-admitted forensic pins:
+
+| Failed private publication directory | Input SHA-256 | Retained intended-manifest digest (marker absent) |
+| --- | --- | --- |
+| `identity_continuity/R284A1-20261008` | `d43d9607b317f7c3f2ad41c9841ac115fd68a3e6c182503b5c6a0187435f4f59` | `0c02f902a002e851a44f42224277e748416d9efcba0559e9eb0c46d36436f687` |
+| `identity_continuity/R284A1-20261008-B` | `37b04a6ddc6c45d85699410e730c0979ba24575f4814fc57c197594092376859` | `b663c15a83aa81a26f5f97de19dd728e1b105c799b36c3ab684ed93bd6dde068` |
+
+Paths are under `artifacts/analyst_revisions_v2/`. Different artifact IDs change
+the manifest and therefore input pins; neither digest is a publication claim.
+Both partial directories are retained without overwriting, deleting, restoring
+their markers, stripping security attributes or relaxing ctime checks. No
+further publication invocation is made under ARV2OD263-J.
+
+There has been **no QC client/key access, project creation, source upload,
+compile, backtest, terminal/result read, economic evaluation or new look/cell**
+in section 263. R284 A1 has not spent a QC attempt; prospective runner code is
+not an actual prepared package or launch. The shared ledger is unchanged and
+the floor remains **313 shared / 239 development / 49 infrastructure / 699
+cells**. The old review monitor remains paused; the reply monitor stays retired.
+
+Next authorized work is bounded metadata-only diagnosis of the local artifact
+stability failure and an actually supported stable publication path before any
+new protocol/publication or QC preparation. There is no routine approval or
+Claude-review wait. Even if that infrastructure check succeeds later, the
+separate formal evidence stop remains: Massive's confirmed current-row API does
+not provide immutable availability/version/tombstone/as-of completeness, and
+current/vintage Sharadar comparisons do not provide independently reviewed dated
+QC/permanent/vendor identities or cutoff-authenticated RAW-price/score inputs.
+All formal trust roots, readiness/action flags, seven-role/terminal-payoff gates,
+ARV2-4..8, formal estimand/power/alpha gates and independent final dossier remain
+unchanged. No selector, formal epoch, paper algorithm deployment, replacement
+historical run or claims-only readiness scaffold is introduced. Historical
+ARV2R248-002/-003/-004 remain separate and open; their audits are not replayed.
+
+### 263.15 Round accounting, review handoff and final validation
+
+Exact new implementation range before the final record commit is
+`96318ebc4b4985f2617ebf0252e0365f4eca7ac8..79883200145da8ca715029f2d0001eed230df5b9`.
+No new Claude commit arrived at the start, and no old review is reprocessed.
+The following are root's implementation/verification dispositions, **not**
+independent Claude acceptance:
+
+| Commit | Per-commit disposition |
+| --- | --- |
+| `80dc0ce291e25c1d5ccd09d880b5ba0a4dda276e` | Fourteen-field source protocol/adapter/test frozen before actual refusal; original schema remains strict. |
+| `72e2357ba0558a3cb757e18d4c0c7500f0e1528f` | Actual first schema refusal retained; one bounded header diagnostic frozen, then executed as recorded. |
+| `174dd28398631b555255089036f193365eae14fc` | Public-only capture and one-use no-order QC infrastructure runner; hash-seed defect corrected before any preparation/contact. Actual public capture succeeds; runner never contacts QC this round. |
+| `1eba3dec4431246d3368a517103cf9ba1ff9c232` | Explicit thirteen-field current capture v2, no automatic fallback/backfill; actual capture succeeds with original refusals preserved. |
+| `7c8011a3e00790c20499c7761d7fc087400888b8` | Separately qualified continuity bridge plus cross-vintage-collision and exact-LF integration corrections; first actual offline comparison refuses the unrecognized multi-value representation before allocation. |
+| `fc7c5e05e431117ef03c97fdf3a9b0a536bfb954` | Manifest-v2 raw candidate parser correction, unchanged frozen captures/full binder; source comparisons proceed but first publication rolls back on unexplained metadata change. |
+| `79883200145da8ca715029f2d0001eed230df5b9` | Metadata-only refusal diagnostics with every original check retained; bounded second publication identifies output-manifest ctime drift and rolls back. No further retry under that protocol. |
+
+`ARV2I263-001` (hash-seed source nondeterminism), `-002` (merged ownership
+collision) and `-003` (input terminal-LF disagreement) are prospectively
+corrected and regression/mutation checked as recorded. `ARV2I263-004` is
+corrected only in the separate versioned continuity interpretation; original
+capture refusal codes and parsers stay frozen. `ARV2E263-001` remains an actual
+publication-integrity barrier, not a fabricated code diagnosis or a cleared gate.
+Same-round advisory reviews improve coverage but are not the independent
+review/final dossier. Claude must review this exact final pushed snapshot.
+
+Root's final implementation selection is the **785 focused passes** in 263.13,
+not a complete suite and not a sum of draft runs. Final closure/document checks,
+scope and matching-lane push verification are recorded below. Source acquisition
+is real; QC completion and forward readiness are explicitly not claimed.
+
+Final root checks on the completed record: **88 passed in 2.42s**, consisting
+of the same 86 record/active-document checks plus two pure-package
+closure/authority checks. Together with 263.13 this is **787 distinct focused
+tests**, not 873; overlap is not counted twice. All run under strict remote
+network denial. Targeted `compileall` for the eight changed script/test files
+and `git diff --check` pass. No complete suite, source refresh, QC request or
+historical source audit is hidden in validation.
+
+The complete round changes only this lane record, four new host-only scripts
+and their four test files. No shared ledger/root handoff/action plan, frozen
+historical manifest/source, trust registry, shared behavior or transport
+allowlist changes. The matching-branch-only final fetch still returns baseline
+`96318ebc4b4985f2617ebf0252e0365f4eca7ac8`; before this final record commit the
+lane is seven commits ahead and zero behind. No new Claude push is present.
+Verify root/branch/HEAD/status again, commit only this final lane record, and
+perform exactly one final matching-lane push. The eight-commit final snapshot
+is pending independent Claude review, not forward-ready or QC-run validated.

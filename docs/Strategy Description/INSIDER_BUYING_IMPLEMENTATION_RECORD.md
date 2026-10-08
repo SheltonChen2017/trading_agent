@@ -1,22 +1,32 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 149 IS THE AUTHORIZED COMBINED-V4/CONTINUATION AND
-VERSIONED EARNINGS-SEPARATION ROUND IN PROGRESS; ACTUAL NEW REPLAY/CAPTURE
-RESULTS MUST BE RECORDED BEFORE ITS COUNTS ARE PROMOTED. SECTION 147
+Status: **SECTION 151 ADDS THE READ-ONLY TWO-RUN RECONCILIATION CANDIDATE,
+SEPARATE INTERVAL-EARNINGS DIAGNOSTIC AND FACT-BOUND CANONICAL QC
+CONFIGURATION/NATIVE-EVIDENCE SUCCESSOR; ACTUAL POST-320 REPLAY IS PENDING.
+SECTION 149 COMPLETED THE ORIGINAL-PARTITION/FIRST64 COMBINED
+REPLAY AND A FRESH 256-PARENT CAPTURE: 256 HTTP-200 BODIES, 2,011,446
+RETAINED BYTES, 256 SUCCESSFUL OFFLINE PROJECTIONS, ZERO GRAMMAR QUARANTINES.
+THE PRE-CAPTURE COMBINED REPLAY ESTABLISHED 19,590 REQUEST-BOUND PARENTS;
+THE SUBSEQUENT 256 ARE SEPARATELY VERIFIED, NOT A REPLAYED POST-256 UNION.
+VERSIONED EARNINGS SEPARATION REMOVES FORECAST DATA FROM PRIMARY CAUSAL
+PREREQUISITES, NOT THE REQUIRED ACTUAL-RELEASE DIAGNOSTIC. SECTION 147
 RECORDS ONE COMPLETED BOUNDED QC-NATIVE RESEARCH
 ACCESS DIAGNOSTIC: THREE HISTORY CALLS, SOURCE TRADE/QUOTE COUNTS 12/116
 AND CLOCK COUNT 390; ZERO BACKTEST LAUNCHES OR ECONOMIC-VALUE EXPORT.
 CONNECTED PROFILE RESOLVES SEC CONTACT. FRESH FIRST-64 V4 CAPTURE COMPLETED
 64 REQUEST-BOUND BODIES/504,050 BYTES AND INDEPENDENT JOURNAL REPLAY;
 ALL 64 OWNERSHIP-XML PROJECTIONS PASSED READ-ONLY REPLAY, ZERO QUARANTINES.
-FULL-STUDY READINESS REMAINS BLOCKED BY 147.6'S SUBSTANTIVE HISTORICAL
-SOURCE/PIT/IDENTITY/CALENDAR INPUTS, NOT ROUTINE APPROVAL OR CLAUDE. SUPPLIED
+FULL-STUDY READINESS REMAINS BLOCKED BY SUBSTANTIVE HISTORICAL
+SOURCE/PIT/IDENTITY/ACTUAL-RELEASE INPUTS, AS QUALIFIED IN 149.8,
+NOT ROUTINE APPROVAL OR CLAUDE. SUPPLIED
 SHARADAR AUDIT AND ONE PURCHASED EARNINGS ACCESS REMAIN AS RECORDED.
 CONTINUOUS BUILD/CLAUDE-WAIT WAIVER REMAINS; NO SOURCE/PIT/RIGHTS/LOOK OR
 READINESS PROMOTION IS INFERRED. EARLIER 83,657-ROW ALL-QUARANTINE RESULT,
 FOUR TOPICAL P2 FINDINGS, SEVEN D23 NONEXACT QUARTERS AND BOTH FINAL ACCESS
 CLASSIFICATIONS STAND. FOUR V3 FILES AND V1/SCALE/PILOT STAY FROZEN;
-V3 REMAINS 1,846/1,847, ONLY 19,526/99,394 FROZEN-WINDOW PARENTS SOURCE-BOUND.
+V3 REMAINS 1,846/1,847; ORIGINAL UNION BASELINE IS 19,526/99,394.
+320 NEW V4 PARENTS ARE CAPTURED/PROJECTED ACROSS TWO RUNS; REQUEST
+ACCOUNTING LEAVES 79,548 ORIGINALLY-UNATTEMPTED PARENTS WITHOUT NEW DISPATCH.
 NO STRATEGY LOOK, BACKTEST LAUNCH OR TRADING. NOT BACKTEST-READY.**
 
 Branch: `codex/strategy-insider-buying`
@@ -249,7 +259,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex owner-waived provider integration | Published start `59ef662062e91e09d9449aeb3f23cb5812ce7142`; implementation `195012fd471f028f5b2a196e4b97419197bafc68`; this separate exact-hash handoff | Capability journal, supplied current-reference triage and private rights evidence | QC authentication HTTP 200; Massive public status HTTP 200 is not Benzinga entitlement. Supplied Sharadar ZIP/hash/header verified without interpreting rows or opening actions/fundamentals. No incoming review or Claude wait. | Final focused **510 passed in 2.61s**, eight memory compilations, frozen historical equality and independent eight-leaf private journal verification. Two fixed metadata requests, 424 response bytes; zero Sharadar/SEC requests, looks, uploads, compiles, jobs or backtests. | `IBMETA-R01..R05` corrected with genuine red/green; shared QC documented-envelope issue recorded without shared edits. Four topical P2 and prior dispositions/classifications/denominators unchanged. Credentials do not establish readiness. | One combined matching-lane push after separate exact-hash handoff. No review wait or monitor rearm. Bind real original-parent/PIT/listing/reference/rights/product/vintage evidence before production activation; no ordinary owner choice is deferred. |
 | 2026-10-07 | Codex owner-confirmed acquisition/reuse | Published start `f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`; exact implementation and separate handoff follow | Actual retained Sharadar audit and one-shot purchased Earnings access; bounded QC probe prepared | User confirms QC/identity/Sharadar work and purchased Earnings; Safari authentication verified. All three retained archives and all 3,989,156 rows independently match manifest hashes/counts. One fixed Earnings request HTTP 200, 389 bytes, one row, privately replayed. No financial arithmetic/price-return join/look. | Focused and final integrated checks in 145.6; genuine red/green fixes and peer audit. Native QC code prepared but not run; new owned coding workspace/template auto-build only. SEC requests zero; no broad suite or new acquisition of completed/ambiguous parents. | Draft Sharadar, Earnings custody/credential/count, and QC cell/frontier defects corrected. Four topical P2 and shared issue remain OPEN; all prior closures/classifications preserved. Public Earnings history does not cover pre-2010 segment or prove schedule versions. | Complete authorized bounded acquisition/reuse checkpoint with one matching-lane push. Manual Mac unlock permits exact native QC probe; genuine SEC contact and separately committed fresh capture permit original-parent acquisition. No purchase, review wait, monitor rearm, raw QC export or readiness fabrication. |
 | 2026-10-07 | Codex continuous owner-waived source/native build | Published start `4c204aa60951896a8ba02570321d19227a8aebe7`; incoming range empty; first-prefix candidate `e900c7a90d326cd81df952684b0c583ad8ffb639`; projection candidate `23c7a11d53a8d1c457bac34bdebe977d3d567d00`; this separate observed handoff | One hosted native-count diagnostic, actual fresh first-64 SEC capture and completed read-only projection | Connected profile contact used privately; exact QC cell executed once with 12/116/390 counts/three History completions. Committed isolated partition replay then 64 HTTP-200 bodies/504,050 bytes, independently replayed; all 64 XML projections passed, zero quarantines. No economic export, old-v3 write/retry or Claude pause. | Main integrated focused 876 passed; six memory compilations, historical equality; final boundary/document135 passed14.05s. Actual59-module selector/16 source-view reads,345.127s dispatch span,journal0.26s,source-onlyprojection0.512s/55entries54paths; hashes/custody in147. No full suite or strategy backtest. | Engineering findings corrected as147.8; four topical P2/shared issue OPEN, both historical access classifications unchanged. Partial capture/projection is not PIT/class/full-population/calendar readiness; no combined union promotion. | Completed available bounded source/native steps; real full-study missing inputs in147.6 block readiness, not another approval. Preserve frozen window/quarantines and document delegated no-fabrication disposition; one combined matching-lane push after exact-hash handoff. No monitor rearm, duplicate purchase or claim of project completion. |
-| 2026-10-08 | Codex authorized continuous source/causal build | Published start `1c50d1ba2045e66e3bf714be94a9ee89c6da547d`; incoming range empty; exact candidate/handoff hashes follow execution | Combined first64 closure, next256 one-shot continuation, separately versioned retrospective earnings sensitivity | Owner authorized the concrete next steps; no new Claude wait or review invented. Before execution, full original replay and new capture remain unobserved; old first64 facts unchanged. | Main focused310 capture/selector and406 earnings/affected checks passed;135 boundaries passed;10 files memory-compiled; four historical bytes unchanged. Detailed red/green and scope in149. | Draft source-binding, journal/CLI consistency, precision and ordering defects corrected. Four topical P2/shared finding remain OPEN. Earnings correction does not manufacture historical actual releases or activate production outcomes. | Commit exact candidate, execute isolated combined replay, acquire only its exact new prefix once if valid, independently replay/project retained results, then record actual disposition and one combined lane push. No old-v3 resume, monitor rearm or readiness claim. |
+| 2026-10-08 | Codex authorized continuous source/causal build | Published start `1c50d1ba2045e66e3bf714be94a9ee89c6da547d`; incoming range empty; implementation `16d60b2b915c708e3c3d792c312cec6031f1d060`; unpublished section150 checkpoint | Actual combined first64 closure, next256 one-shot continuation, separately versioned retrospective earnings sensitivity | Full original/first64 replay establishes19590 request-bound parents and79804 remaining before capture; fresh256 allHTTP200,2011446 retained bytes; independent replay projects256/256 with zero grammar quarantines. No post256 full union was run in149. | Main focused310 capture/selector and406 earnings/affected checks passed;135 boundaries passed;10 files memory-compiled; four historical bytes unchanged. Actual receipts and precise execution lineage in149.7. | Draft source-binding, journal/CLI consistency, precision and ordering defects corrected. Four topical P2/shared finding remain OPEN. Earnings correction does not manufacture historical actual releases or activate production outcomes. | Continued in151 under the same authorization and single-push round. Remaining substantive inputs and supplier qualification in149.8; not another routine approval or Claude wait. No old-v3 resume, monitor rearm or readiness claim. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -20658,7 +20668,7 @@ origin remains 4c204aa6 and local HEAD remains 23c7a11d, with only this expected
 record modified; the exact outgoing implementation range is the two hashes
 above. Recheck the final staged record and status before the one combined push.
 
-## 149. Owner-authorized combined v4 inventory and fresh continuation (2026-10-07 owner-local; in progress)
+## 149. Owner-authorized combined v4 inventory and fresh continuation (2026-10-07 owner-local; observed completion below)
 
 ### 149.1 Scope and decisions before execution
 
@@ -20815,8 +20825,10 @@ Draft defects corrected before acquisition, with genuine fixture red/green:
   summary before requesting the private contact. Its test mocks CLI plumbing
   with an invented selection; it is not an observed retained-root replay.
 - `IBV4-149-R02` (P2 custody defense, corrected): the independent journal
-  verifier checked lock identity but omitted exact lock-byte contents. It
-  now binds and rereads the required lock bytes as well as the inode/version.
+  verifier included the lock in namespace checks but omitted dedicated
+  lock-byte/inode-version custody. It now binds and rereads both the required
+  lock bytes and inode/version. This qualification follows the final
+  read-only audit of the exact predecessor and corrected implementation.
 - `IBV4-149-R03` (P3 refusal consistency, corrected): malformed request
   identity could escape the new selector as an older exception family.
   Three genuine controls failed before the typed boundary correction.
@@ -20925,3 +20937,494 @@ No shared/project-wide file or frozen v1/scale/pilot file changed.
 Peer reviews are internal Codex verification, not independent Claude review.
 The source/test edit freeze now spans the actual replay, capture and read-only
 projection; no later commit is represented as existing during execution.
+
+### 149.7 Observed committed combined replay, next256 capture and projection
+
+Commit the ten validated source/test files and preregistration as
+**`16d60b2b915c708e3c3d792c312cec6031f1d060`**, parent
+`1c50d1ba2045e66e3bf714be94a9ee89c6da547d`. Exact root, branch, HEAD,
+clean status and source hashes were verified before actual execution and
+remained unchanged throughout. Unlike earlier execution-time uncommitted
+candidates, this commit already existed during this entire actual run.
+Final precommit active-document/record/exact-package checks passed **72 in
+1.41s**. No push occurred before acquisition or projection.
+
+The full isolated combined selector actually reconstructed all 99,394
+original requests, replayed all required original roots and the first64
+journal/receipt, freshly projected those64 and proved exact original-prefix
+membership. Observed classes were **9,539 / 1 / 8,139 / 1,846 / 1 / 64 /
+79,804**, respectively prior completed, corrected diagnostic, selected reuse,
+v3 completed, separate ambiguous-parent diagnostic, fresh v4 completed and
+remaining originally unattempted. Thus the observed pre-capture combined
+request-bound custody count is **19,590**, not just arithmetic from two
+unreplayed reports. This proves bounded custody, not source authenticity,
+official public-availability/PIT, rights, canonical admission or full corpus.
+
+The supervisor was observed starting around 2026-10-08 07:07:47 UTC and
+reaching the valid selection/private-contact prompt by 07:18:48 UTC. This is
+an observer interval including polling, **not a measured worker runtime**.
+The worker inventoried **121 current sources**, executed **62 entries / 62
+distinct paths**, and observed the four ordered historical source-view cycles
+(16 identity reads). These are four exact historical validator images with
+explicit later dependencies, not the entire historical environment.
+
+| Combined selection evidence | SHA-256 |
+|---|---|
+| combined partition | `45c5ee07cae3f97cf22124d15f281aec5bdf6e41c16944d5234713f002007049` |
+| remaining79,804 inventory | `799e48e70207d2921bdc08651643e4fc71d6e111ea3861cd826fdf4928989cce` |
+| selected next256 prefix | `4866773eda2eb2d73406b9e289738dd35b1e86deb9b8f5104c0f2d5c45ce52a3` |
+| sealed selection | `66b36a9422129ebc99abeda965b5b5206cbeba6c095eaa9899660d4e0a159019` |
+| prior64 claim inventory | `1f70b5d310a62d3e9851f223a6b5050ebcede4f1c58892471f23f75a0c1ecc27` |
+| current121-source inventory | `a8d9100a2d67f28c08e12a12f9874bc69da6273e732c8686f7b16a7babbfa222` |
+| combined worker bootstrap | `87874eafd3e6ed7983d3ab6bd07684dc82b2fa1751973d3f0b43ac6d9f90b3c3` |
+| historical source-view trace | `360fb5f7a574747b7c724b87df1bef6b64f4748db46b62ac2cdc50df15701523` |
+| historical validator digest | `e47d595ee62fe30c1b9823d9db4d2219160af5e182aa16d8a9ed4b658eb7f0ee` |
+
+Only after successful selection did the private contact enter the non-echoing
+prompt. No contact was written to argv/environment/output/Git/journals. The
+fresh capture `ib-sec-v4-continuation256-20261008-once` reserved exactly256
+permanent claims, then dispatched each request once. **256 HTTP200 responses,
+256 request-bound bodies, 2,011,446 retained raw body bytes, zero reserved-
+not-attempted requests; batch completed.** First/last selected global indices
+11,575/11,836 are endpoints of the hashed prefix, not a contiguous range.
+First start was **2026-10-08T07:18:50.016615+00:00**, final result
+**2026-10-08T07:23:10.190796+00:00**; monotonic dispatch span
+**260.160121833 seconds**, excluding the preceding selector.
+
+The 33,319-byte completion report is
+`3112a6d841bf9307f72f69249185c85798e00ea94efd7b28f1cb2f59ebf18854`.
+It lives in the fresh private ignored run directory
+`artifacts/insider_buying/sec_recovery_v4/runs/ib-sec-v4-continuation256-20261008-once`.
+Run directory is mode700 and report mode600. No retries, old-v3 writes or
+redispatch of previously completed/ambiguous parents occurred. Counts refer
+to retained body bytes, not an independently measured wire-transfer total.
+Shared claims now total **320** across two completed runs. Request accounting
+leaves **79,548** of the original79,868 without a new dispatch. A complete
+post256 combined union was **not** rerun: do not relabel19,846 as such an
+observed union or invoke this first64-only profile again to bypass its refusal
+of additional claims. A successor must explicitly reconcile the new256.
+
+An independent fresh interpreter then replayed the exact report, entire
+journal, reservations, permanent claims, body hashes and timing, and projected
+the retained parents: **256 header-bound / 256 complete-parent projected /
+0 grammar quarantines**. Tool wall time was **1.141734125 seconds**, not
+historical-selector duration. Projection rows digest is
+`c98ba1440ce7dac91b1a55bfa6a160c15a179887c4a621c2f80687b8d6aac037`.
+The 157,714-byte complete receipt has SHA-256
+`86398e3915dac12fadbd8e9e2fffd03ef018a22339948bf8fc9cb3324cb63acd`;
+it is saved mode600 under the mode700 ignored directory
+`artifacts/insider_buying/sec_recovery_v4_projection/ib-sec-v4-projection-continuation256-20261008-once/receipt.json`.
+
+Actual projection used OS process-tree network/all-write/fork/exec denial,
+allowing only initial Python3.12.14 interpreter execution, minimal environment,
+`-I -S -B`, captured-source imports and the accepted audit hook. Current source
+snapshots were rechecked before/after. It inventories121 source images and
+records57 execution entries/56 unique paths: the explicit bootstrap and
+subsequent captured import execute the accepted historical-replay bootstrap
+twice. This is disclosed, not deduplicated or called57 different modules.
+The exact 2,314-byte external bootstrap was executed using `-c` and saved
+byte-for-byte afterward alongside the receipt as `bootstrap.py`, mode600,
+SHA-256 `137aa987379f91f00917aeba997f15112d72df07d9ac729c001321272c68861e`.
+Consumer HEAD16d60b2b is externally verified before/after, not independently
+Git-verified inside the denied worker. No full historical-environment claim.
+All three saved hashes, modes and ignore coverage were independently reread.
+
+### 149.8 Qualified remaining inputs and next substantive action
+
+Section149.5 supersedes only the old as-known-earnings requirement in147.6
+for the new causal/retrospective version. The primary orders no longer need
+an earnings forecast; the required retrospective sensitivity still needs
+genuine actual-release coverage for every frozen source event and its
+boundary sessions. Do not perpetuate the old forecast prerequisite as a new
+owner-approval blocker, and do not mark the entire study ready merely because
+the primary path is now separable. Neither the existing purchased one-row
+Earnings diagnostic nor current reference snapshots provide that full archive.
+
+Further primary-source qualification identifies alternatives, not a proved
+absence of historical products or a required duplicate purchase:
+
+- QC's [EODHD Upcoming Earnings](https://www.quantconnect.com/docs/v2/writing-algorithms/datasets/eod-historical-data/upcoming-earnings)
+  starts in1998, so saying QC has no pre2010 calendar would be false. Its
+  [published data class](https://github.com/QuantConnect/Lean.DataSource.EODHD/blob/master/EODHDUpcomingEarnings.cs)
+  represents predetermined report dates/times and estimates. This is not
+  independently verified actual-release/revision evidence, and QC login does
+  not itself establish a direct EODHD API subscription.
+- Direct [EODHD Calendar](https://eodhd.com/financial-apis/calendar-upcoming-earnings-ipos-and-splits)
+  documents historical actual report dates, nullable before/after-market
+  labels and actual EPS, with older history through symbol-specific queries.
+  Its [historical update](https://eodhd.com/financial-apis-blog/huge-historical-earnings-eps-update)
+  gives earlier US coverage examples; these are not proof of the frozen
+  cohort's complete history. API access belongs to its specified paid feed
+  products and requires a token; coverage, terms and exact response semantics
+  must be checked before qualification. No provider row was acquired here.
+- WSH remains a concrete alternative via149.2, subject to actual supplied
+  archive boundaries, revision/actual-release semantics and applicable terms.
+  No vendor message, signup or purchase occurred. Existing Sharadar SF1 and
+  purchased Benzinga Earnings are not purchased again.
+
+Only four exact conventional EODHD environment names were checked for
+nonempty presence (none), without printing values. A bounded supplier/
+subscription/API inbox search returned no messages. Those observations do
+not prove no account exists elsewhere, and no broad credential search or
+mailbox sweep was performed. The immediate external evidence gap is an
+accessible, qualified actual-release archive covering the frozen early
+study and boundary sessions. Supply an existing archive/product access if
+available; do not infer entitlement or buy an unqualified product solely from
+a marketing start date. No fresh routine approval or Claude review is needed.
+
+Current diagnosticv1 requires actual release instants; date/BMO/AMC/null
+records must not be turned into invented instants. A separately registered
+interval-timing successor could admit only exclusions invariant across all
+evidence-consistent reaction sessions and otherwise report UNAVAILABLE.
+That possible engineering alternative is **not implemented or accepted here**;
+the eventual received source's semantics determine whether it is appropriate.
+The two prespecified +/-2 and +/-5 diagnostics and full population may not be
+silently dropped to evade the missing-data problem.
+
+Separately, original source admission, historical identity/share-class/SID/
+listing/PIT and pre-entry reference coverage are unfinished. Actual2006Q1
+still has83,657 quarantined filings and71,679 missing relevant parent
+corroborations; new2022Q4–2023Q1 bodies do not repair it or complete82quarters.
+The next acquisition engineering step is explicit combined reconciliation of
+both fresh runs before any new originally-unattempted prefix, preserving all
+permanent claims. The self-imposed256 per-run cap is not an external blocker
+or a request for more owner permission. Missing historical evidence is not
+fixed by increasing a batch limit, and additional implementation remains
+possible while the external archive is unresolved. After factual source/
+identity/reference integration, bind the actual dataset/protocol/rights/look
+roots before a fixed order-based QC candidate; prioritize real QC completion
+when those gates pass, with the three-attempt rule. No outcome is inspected
+to select data, policies or code in this round.
+
+## 150. Unpublished combined source/earnings checkpoint (2026-10-08 UTC)
+
+**Technical completion:** implementation/decision/test commit
+`16d60b2b915c708e3c3d792c312cec6031f1d060` completes the new combined-v4
+selection/continuation families and separately versioned causal/realized-
+earnings contracts, with exact ten-file hashes in149.6. Actual execution from
+that already-existing clean commit reconstructed the original+first64
+partition, captured the next256 parents once and independently verified and
+projected every retained body. This unpublished documentation checkpoint records
+the observed results, corrections, delegated choices, qualifications and
+remaining inputs. No production outcome activation, actual full study
+integration, post256 union, strategy backtest or shared behavior change.
+
+**Plain-language completion:** another256 original filings were retrieved
+and checked successfully. The code no longer unnecessarily requires an
+advance-known earnings calendar to build primary orders, but still requires
+real historical earnings announcements for the promised sensitivity check.
+The entire historical dataset and its identity/timing evidence are not yet
+complete. This is useful tested progress, not project completion or
+backtesting readiness, and the remaining gap is evidence rather than another
+routine permission or Claude-wait requirement.
+
+Published baseline and fetched remote are
+`1c50d1ba2045e66e3bf714be94a9ee89c6da547d`. Incoming review range is empty;
+there is no new Claude commit to accept or silently omit. Prior per-commit
+review dispositions and resolved findings are retained. Internal Codex
+peer checks do not substitute for or claim an independent Claude review.
+The explicit owner no-Claude-wait/continuous-build direction governs, and
+the owner's latest instruction confirms exactly one push when done.
+
+Validation evidence is attributed, overlapping and not added into a full-
+suite count: main **310 capture/selector**, **406 earnings/affected** and
+**135 boundary/document/hygiene/package** passes; ten files memory-compiled;
+72 final preregistration checks before implementation commit. Exact counts,
+durations and genuine red/green findings are in149.4–149.6. Actual replay and
+capture evidence is in149.7, not inferred from those fixture tests. Tests and
+offline operations enforce OS network denial and their stated isolation;
+the separate authorized SEC transport is the only online source acquisition.
+No full lane/repository suite, QC job, strategy/outcome look, backtest,
+broker/operator-database/scheduler/deployment/capital/paper/live/trading action
+occurred in this round. No other supplier row request, subscription purchase,
+email send/modification or existing credential value disclosure occurred.
+
+Retain four topical P2s **OPEN**: IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01,
+IBSRC-CCR01; retain shared IBQC-SHARED-META01 and every prior closure. The
+accepted historical source-view engineering remains accepted. Four v3 files
+remain current-byte equal to historical `aa0d635d00b64825bf8003289e0a60279bd52e73`;
+no thaw of them or frozenv1/scale/pilot. Stoppedv3 stays1,846/1,847. The separate
+7,373-byte diagnostic/report206e6db9 does not resolve the unmatched start.
+StrictD23 retains seven nonexact quarters/no82-quarter promotion. Preserve
+both final classifications without retroactive approval: the372 earlier
+requests are "historical authorization provenance not established"; the
+reviewer incident is "reviewer-reported probable unintended SEC access;
+exact request count and transferred bytes not established."
+
+Main's post-observation active-document/record/import/hygiene/exact-package
+selection passed **135 in 17.67s**, using the denied-network harness.
+Exact ten-file hashes, historical four-file equality and diff checks passed;
+matching origin was unchanged at1c50d1ba, localHEAD16d60b2b with only this
+expected record modified. **No push or handoff commit occurred here.**
+The final audit correctly distinguishes the external archive gap from
+unfinished production engineering. Continue the available work in151 under
+the existing owner direction; do not misrepresent that gap as requiring all
+engineering to stop. Shared/project documents, Action Plan and SESSION_HANDOFF
+stay frozen. Final publication remains exactly one combined lane push after
+the completed round and separate exact-hash handoff. Heartbeat stays PAUSED.
+
+## 151. Continued reconciliation and production-path engineering (2026-10-08 UTC; in progress)
+
+### 151.1 Scope and delegated pre-outcome decisions
+
+The owner reiterated: "when done, push only once." No push has occurred in
+this round. The standing continuous-build direction remains active; no new
+routine permission or independent-review wait is inserted. The missing
+historical earnings archive limits actual readiness, but does not prohibit
+available offline engineering. The section150 draft is an unpublished
+checkpoint, not a claim the continuous request is complete.
+
+Next reconcile **both** observed fresh capture runs against the original
+99,394-request partition, all320 permanent claims and their anchored reports/
+projection receipts. Preserve exact chronology, original-prefix membership
+and the old unresolved1846/1847 root. Unrecognized, incomplete or ambiguous
+claims refuse; they are not skipped or reopened. A separately versioned
+read-only successor must prove the post256 union by actual isolated execution,
+not add receipt literals or coerce a token into the original selector family.
+No observed19,846 union is claimed before that execution.
+
+Build a separately registered interval/session earnings diagnostic for
+qualified actual report dates with before-market, after-market or unknown
+timing. Preserve old exact-instant APIs. A supplemental policy/code/source-
+semantics registration must be fixed before first outcome access and report
+its distinct effective identity, not pretend the old diagnostic-code digest
+was satisfied. For every release, consider all evidence-consistent reaction
+sessions and admit only invariant membership in **both** fixed +/-2 and +/-5
+windows; otherwise the complete diagnostic is UNAVAILABLE. No invented UTC
+instant, inferred actual status from a schedule, primary-population change,
+selective missing-event drop, alpha change or outcome-based policy choice.
+
+Assess the smallest fact-bound production configuration/native-evidence
+successor for the currently fixture-only canonical QC/analysis path. Do not
+turn a scope string, test factory, local hash or broad owner authorization
+into source/PIT/licensing/entitlement/native-run provenance. Any implementable
+successor remains default-disabled until its genuine factual inputs pass;
+this work launches no QC job or outcome look. Exact scoped implementation,
+red/green results and actual executions will be appended as observed.
+
+A nonblocking question asks only whether an existing direct EODHD or WSH
+archive/account-access location is available, without soliciting a secret in
+chat. Work continues while that factual input is unresolved. No vendor
+contact, new account or subscription purchase is inferred from the question.
+
+An internal peer independently rehashed the actual256 report, reservation,
+selection, receipt/bootstrap, descriptor/start/result links and source
+inventory, reproducing the149.7 counts/timing/identities and57/56 trace
+qualification. It did not reread raw parents or rerun the historical worker,
+tests or providers. The sole record correction was149.4 R02's predecessor
+lock-check wording; no new production defect or secret/raw-row disclosure
+was found. This is internal Codex verification, not a Claude review.
+
+### 151.2 Concrete canonical configuration successor, before implementation
+
+The audit confirms a useful bounded implementation beyond another preflight:
+a new canonical configured-source/attempt/native-v2 adapter. Do not reuse
+the legacy daily-close package's production configurator to bypass the
+canonical first-open contract. Consume a genuine sealed causal-v2 plan and
+externally anchored rights, account/native-profile entitlement and permanent
+pre-outcome registration receipts bound to the **complete** child inventory.
+The external roots are application trust anchors, not cryptographic proof of
+SEC, provider, account or cloud provenance from hash shape or a scope label.
+The actual existing counts-only probe and320 parents do not supply those
+production activation facts.
+
+The configured object must be separately sealed: each generated child's
+effective source/gate/manifest identities are exact, and enabling changes
+only the guarded research switch rather than strategy economics. There is
+no network/upload/dispatch method. Provide pure three-attempt accounting,
+including compile failures, pending/ambiguous freeze and exact source binding,
+plus supplied native-v2 capture validation against those configured identities.
+Completed alone is insufficient; missing sessions/orders, residual positions,
+changed source, partial child populations and incompatible native evidence
+must refuse. Preserve the explicit minute-callback/exact-open distinction;
+do not claim engine/data/auction/cost parity or remove the registered-analysis
+zero-look gate. Focused invented production-schema tests prove only software
+contract behavior, never actual activation, a QC run or account entitlement.
+
+### 151.3 Read-only original-plus320 reconciliation candidate
+
+The new `research/insider_buying_sec_recovery_v4_reconciliation.py` leaves
+all predecessor selectors/capture contracts and frozen custody files intact.
+Its externally specified canonical two-run inventory is 2,200 bytes without
+a trailing newline, SHA-256
+`f5ff043859da29f40b271edb026e93e050b5b30f468cfdae46b7747a4bd72a3f`.
+It pins the distinct original producer and saved projection-consumer HEADs,
+source inventories, report/selection/prefix identities, original receipt
+sizes/hashes and projected-row hashes. It never relabels the new consumer as
+having produced those earlier records.
+
+The source-only isolated worker reconstructs the full original99,394 plan,
+old union/stopped-root/separate diagnostic and both fresh completed journals.
+It freshly hashes/projects all320 bodies, proves exact concatenated membership
+in the original unattempted prefix, accounts for the entire320-claim/two-run
+registry, and repeats original/fresh custody checks before returning a sealed
+receipt. Unknown, incomplete, ambiguous, additional or changed claims refuse;
+saved receipt literals alone do not establish execution. All output remains
+request-bound noncanonical custody. The next256 preview is metadata only,
+not a dispatch token. A third run needs its explicitly supported journal
+successor, not weakening this exact observed profile or bypassing old checks.
+
+Worker controls retain OS network/all-write/fork/exec denial, captured-source
+imports, exact current-byte checks, bounded32MiB input/1MiB output and900-second
+deadline. The Git/source supervisor requires the exact clean committed lane.
+The executed worker bootstrap SHA-256 is
+`78e3365241162d690532906fc0566315c0580e7f62f6d7bef3150d7a7d8bbfd1`.
+Actual post320 replay is still pending at this preregistration point;
+19,846/79,548 are expected accounting, not yet observed union results.
+
+Internal author corrections, preserved with genuine red/green evidence:
+
+- **IB151-RECON-R01 (P3, corrected):** copied accepted combined-source pin
+  omitted five hex characters. The known-source check failed1 in0.54s before
+  correcting the literal; corrected focused suite passes.
+- **IB151-RECON-R02 (P3, corrected):** list/dict profile or class values could
+  raise TypeError rather than the declared refusal. Four new negatives failed
+  with54 deselected in0.93s; exact string guards now refuse them.
+- **IB151-RECON-R03 (P2, corrected):** retained body mutation during final saved
+  receipt reread was not detected by the final registry-only check. The new
+  adversary failed1 with58 deselected in1.00s; final byte-size/SHA scans now
+  recheck every body through retained directory handles.
+
+The author ran59 focused passes in3.37s and two memory-compilation checks;
+an independent internal peer read the complete code/tests, matched hashes
+and reran59 in3.19s under the denied-network harness. No remaining material
+finding was confirmed. The positive320-row fixture is explicitly a pure
+descriptor/real-parser overlay, not an observed sealed320-journal replay;
+the genuine two-journal negative intentionally has the wrong global prefix.
+Only the forthcoming clean committed actual replay can establish the observed
+two-run union. These are Codex peer checks, not a new Claude review.
+
+### 151.4 Separately registered interval-timing earnings diagnostic
+
+The new pure `backtest_realized_earnings_interval_diagnostic.py` preserves
+the strict exact-UTC diagnostic and all primary selection/economics/alpha.
+It binds a genuine sealed primary-v2 result, parent registration/full source
+event population/look/candidate and externally qualified source-semantics
+receipt to a distinct pre-outcome supplemental registration. The old exact
+UTC diagnostic is explicitly **not satisfied** by this successor; the
+effective analysis identity includes its new policy and implementation hash.
+
+Qualified actual report dates are interpreted in America/New_York with
+BeforeMarket, AfterMarket or null timing. BMO maps to that regular close;
+AMC is recorded no earlier than that close and maps to the next close.
+Null timing considers the whole civil date and all possible reaction sessions,
+including possibilities outside either exclusion window. Every release must
+have invariant membership in both fixed +/-2 and +/-5 session exclusions;
+otherwise the entire diagnostic is UNAVAILABLE, even if another release would
+already exclude the event. This deliberately conservative decision is fixed
+before outcomes, not an optimized missing-data rule. Non-null timing on a
+closed day refuses; no convenient UTC instant or reaction-session clamp is
+invented. Corrections/retractions and complete lineage remain bound.
+
+Source coverage must include the full entry-minus6 through entry-plus5 civil
+date range and an as-of no earlier than midnight after its end, so the prior
+closed-day release is not lost. Missing coverage cannot become a successful
+empty query. Decimal reductions retain explicit50-digit precision. Production
+still refuses before primary/source decode; no real source rows, economic
+outcomes, provider calls or new archive entitlement were consumed here.
+
+**IB151-EARN-R01 (P2, corrected):** main found that the draft could admit an
+actual AMC revision recorded one second before the bound regular close.
+The author's regression genuinely failed1 with78 deselected in1.34s before
+requiring each AMC lineage revision's recorded instant to be at/after that
+close. Corrected79 tests passed in5.87s; old exact-UTC plus new tests passed
+134 in11.05s. Main independently repeated the same134 in9.84s. Six in-memory
+guard reversals were caught (AMC same-close, null first-session shortcut,
+post-outcome supplement, missing prior closed day, forecast semantics and
+AMC pre-close chronology). These are scoped guard probes, not full mutation
+coverage or a production source test.
+
+### 151.5 Fact-bound configured canonical source and supplied native evidence
+
+The new `backtest_qc_canonical_activation.py` consumes the genuine sealed
+causal-v2 plan and ProviderRightsEvidence factory, separately rooted account/
+product/calendar coverage, and complete permanent child/source/gate/manifest
+registration. The registration binds the parent's original first-outcome
+instant; it cannot move that instant later to make a retrospective policy
+appear prospective. Rights are evaluated at configuration registration,
+account evidence precedes it, and the separately bound operational launch/
+capture receipt uses real-operation timestamps rather than simulated fill
+dates. This parser does not authenticate those external observations.
+
+Only the exact single disabled research switch changes in generated source.
+No network, credentials, upload, dispatch or statistical calculation exists in
+the new module. Default candidate behavior and old interfaces remain intact.
+The supplied native adapter checks source/object hashes, full native pages,
+orders/events, individual entry/exit quantities, cash/position checks and
+completion markers against the configured children. All children must complete;
+exact-open bridging is explicit. Fractional/open-plus-minute callbacks remain
+their actual timestamps and cannot be relabelled exact-open observations.
+Engine/data/auction/cost parity remains unverified and statistical gates remain
+UNADJUDICATED. Production analysis still refuses before outcomes.
+
+The pure attempt state machine includes compile failures in the three-attempt
+limit and refuses pending, completed, mismatched or exhausted continuations.
+An external permanent service must prove no earlier attempts before creating
+an initial ledger, publish starts before dispatch and anchor its latest bytes.
+This in-memory transformer has no anti-rollback registry: calling the new-ledger
+method again is not authority to reset actual attempts. Failure evidence is
+externally rooted, not independently observed by the parser. Compile failures
+need no invented backtest ID. Native launch/capture evidence is likewise
+externally supplied and does not become authenticated because it hashes.
+
+**IB151-QC-R01 (P2, corrected):** independent peer identified rights validity
+at registration versus later operation expiry. The author constructed genuine
+rights factory evidence valid at registration but expiring one minute later;
+the next-day supplied launch was accepted by the draft. The new negative
+genuinely failed1 with54 deselected in1.39s before the fix. The sealed plan
+now carries the original contract validity window and the adapter requires
+launch and capture inside its effective-inclusive/expiry-exclusive interval.
+No old rights factory or shared behavior was changed.
+
+Adversarial guard reversals separately demonstrate parent first-access binding
+(1failed/8passed/31deselected,1.19s), operational chronology
+(2failed/4passed/48deselected,1.31s) and per-event full quantities
+(1failed/53deselected,1.19s). The quantity probe uses the real typed native
+parser on an invented four-order population with aggregate-SID cancellation,
+then reverses the new per-event guard; it is not proof that a whole genuine
+sealed old production result bypassed its existing downstream pair check.
+These tests use invented externally declared production-shaped records through
+the genuine factories. They do not establish actual provider terms, account
+identity, source/PIT facts, cloud chronology, any real QC run or readiness.
+
+### 151.6 Frozen candidate validation and actual-replay preregistration
+
+Final new source/test identities before clean candidate commit:
+
+| File | Bytes | SHA-256 |
+|---|---:|---|
+| `research/insider_buying_sec_recovery_v4_reconciliation.py` | 52639 | `025b96273284f1330d2f9714717c95ad10525824984c4128bb2f42c2c8176a0f` |
+| `tests/test_insider_buying_sec_recovery_v4_reconciliation.py` | 22502 | `63c8e0d245137207e0622aa4a9166fc2ba3fd4f76f3b626ab0d5468f77af9bb9` |
+| `research/insider_buying/backtest_realized_earnings_interval_diagnostic.py` | 22074 | `206569c3d21f04fb36e425788c867d6afcf5c0ffbcfcb2d90ef7890e711ad2be` |
+| `tests/test_insider_buying_backtest_realized_earnings_interval_diagnostic.py` | 18740 | `5d43f7a8cb7ec06feb40cc3410ae0a654fdd8784afa0f90b9bab2731ee506549` |
+| `research/insider_buying/backtest_qc_canonical_activation.py` | 27778 | `19aa9a401e75499a47458b69002f4eba1c235db65ea4b50240165deb6dde3fe4` |
+| `tests/test_insider_buying_backtest_qc_canonical_activation.py` | 22806 | `fc263f07a595769ebe1b0766627a658252d4e32b5e562ec629a179889c8e61e6` |
+
+Main's independent focused runs passed **182 in62.63s** for reconciliation,
+combined selector, continuation and projection; **236 in8.52s** for new
+activation, prior canonical candidate and rights evidence; and **134 in9.84s**
+for interval plus exact-UTC diagnostic. The boundary/active-document/record/
+hygiene/exact-Insider-package selection passed **135 in24.67s**. Each used
+minimal environment, OS process-tree network denial, Python3.12 `-B`, disabled
+pytest plugin autoload/cache. Six files compiled in memory with network and
+all writes denied. Exact frozen four-file comparison against historical
+aa0d635d00b64825bf8003289e0a60279bd52e73 and diff checks passed. These scoped,
+overlapping counts are not a full suite or additive unique-test total.
+
+The activation author ran56 in3.49s. Independent internal peer read all source/
+tests, matched final hashes and reran56 in4.09s. Its in-memory expiry-guard
+reversal made both durable expiry tests fail; restoring the guard passed both
+in0.87s. This separately verifies the author's actual red/green correction,
+without editing files, launching QC or claiming authentication of fixture facts.
+
+A separate metadata-only actual preflight passed in0.041s under network,
+all-write/fork/exec denial: both original reports/receipts match their external
+sizes/hashes and the namespace contains exactly320 private single-link claims
+and two expected run directories. Whole-claim inventory digest is
+`b77caa4c7839d416d4be6354961bff014727b064f79ec6f5769694c0903fb292`.
+It did not read raw parents or execute original roots. Main now commits these
+candidate bytes and this preregistration before the single genuine isolated
+post320 replay. Do not edit source or the tracked record during that execution.
+The forthcoming receipt must retain its real already-existing candidate HEAD,
+new current-source inventory, executed source trace and measured run duration;
+neither fixture passes nor expected counts substitute for it.

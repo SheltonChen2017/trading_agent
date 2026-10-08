@@ -457,8 +457,9 @@ def test_unknown_fields_and_custom_primitive_subclasses_refuse_without_callbacks
 def test_commission_is_reserved_before_the_last_affordable_buy_so_cash_never_goes_negative():
     """TPR-CR20-002: at a gapped-up open, ten frozen nine-share orders leave the
     last buyer with cash for nine shares' notional but not for their commission.
-    The engine must fill eight and keep cash non-negative; dropping the
-    per-share commission from affordability would borrow the shortfall."""
+    Both affordability and the independent name cap limit the final fill to
+    eight. This case pins the cash-refusal diagnostic, not an isolated proof
+    of negative-cash prevention; the sparse-cash case below isolates that."""
     sids = tuple(f"NATIVE:{letter}" for letter in "ABCDEFGHIJ")
     inventory = tuple({"security_id": sid, "asset_type": "common-stock"} for sid in sids)
     result = run(security_inventory=inventory, frame=target(tuple((sid, "0.1") for sid in sids)),
@@ -468,3 +469,27 @@ def test_commission_is_reserved_before_the_last_affordable_buy_so_cash_never_goe
     assert "insufficient_cash" in {r.reason for r in result.exclusions} and result.complete is False
     assert result.final_cash == "11.0684455" and result.total_commission == "0.89"
     assert Decimal(result.final_cash) >= 0 and all(Decimal(s.cash) >= 0 for s in result.sessions)
+
+
+def test_commission_affordability_refuses_sparse_cash_before_negative_accounting():
+    """A priced but nontradable prior holding cannot fund the new purchase.
+
+    Available cash covers one share's slipped notional, but not its fee. The
+    name cap permits the share, so affordability must refuse it normally;
+    dropping the fee instead reaches the independent negative-accounting
+    exception rather than returning an order/refusal report.
+    """
+    result = run(
+        cash="10.01", positions=positions(("NATIVE:B", 100)),
+        frame=target((("NATIVE:A", "0.1"), ("NATIVE:B", "0"))),
+        rows=(bar("NATIVE:A"), bar("NATIVE:B", tradable=False)),
+    )
+    assert result.fills == ()
+    assert result.final_cash == "10.01" and result.total_commission == "0"
+    assert result.complete is False
+    assert [(order.security_id, order.requested_quantity, order.pending_quantity)
+            for order in result.orders] == [("NATIVE:B", 100, 100), ("NATIVE:A", 10, 10)]
+    assert {(row.security_id, row.reason) for row in result.exclusions} == {
+        ("NATIVE:B", "nontradable"), ("NATIVE:A", "insufficient_cash"),
+    }
+    assert quantities(result) == {"NATIVE:B": 100}

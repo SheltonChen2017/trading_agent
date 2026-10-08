@@ -1,11 +1,21 @@
 # Target-Price Revision ETF Strategy - implementation and session record
 
-Status: **CLAUDE HAS INDEPENDENTLY REVIEWED EVERY CODEX COMMIT IN
-`b78c5138..002a5cc6` IN SECTION 66. CUMULATIVE DISPOSITION: ACCEPTED AFTER
-CORRECTION: THREE REGRESSION TESTS, NO PRODUCTION BYTE CHANGED, ONE P2
-(`TPR-CR20-001`, HOST-PORTABILITY OF THE DEVELOPMENT CUSTODY CHECKS) OPEN FOR
-CODEX. CODEX NEXT COUNTER-REVIEWS SECTION 66 AND THIS ROUND'S TWO CLAUDE
-COMMITS, THEN CONTINUES THE OWNER'S CONTINUOUS BUILD. THE FIXTURE-ONLY TPR-D1 CANDIDATE IS
+Status: **CODEX HAS COUNTER-REVIEWED EVERY CLAUDE COMMIT IN
+`002a5cc6..530e95a5` IN SECTION 67. CUMULATIVE DISPOSITION: ACCEPTED AFTER
+CORRECTION, WITH FOCUSED VERIFICATION RECORDED IN SECTION 67.
+ALL THREE CLAUDE COMMITS HAVE DISPOSITIONS; HISTORICAL SECTION-66 EVIDENCE
+IS QUALIFIED, NOT ERASED. TPR-CR20-001 IS CLOSED BY SUCCESSOR QUALIFICATION:
+THE OWNER'S EXACT PHYSICAL-ROOT PIN REMAINS REQUIRED, AND FUTURE PORTABILITY
+IS NOT A CURRENT BUILD GATE. SECTION 68 RECORDS ALL SIX OWNER-NAMED UNIVERSES:
+FIVE VERIFIED ORDER-BASED QC RUNS AND ONE ZERO-TRADE REMX DIAGNOSTIC.
+ALL SIX CONFIGURATIONS WERE FROZEN TOGETHER BEFORE NEW OUTCOMES. SEVEN QC
+LAUNCHES AND TWO HISTORICAL LOCAL LOOKS REMAIN VISIBLE; SPY'S FIRST FAILED
+DIAGNOSTIC IS NOT ERASED. CLAUDE NEXT REVIEWS THIS CODEX ROUND INDEPENDENTLY.
+THE FULL SIX-CASE ORDER-BASED OBJECTIVE IS NOT ACHIEVED: REMX HAS NO POSITIVE
+ADMITTED TARGET IN THE FROZEN WINDOW. FULL CANONICAL ETF READINESS IS NOT
+CLAIMED. THE COUNTER-REVIEW ITSELF DID NOT CONSUME A NEW OUTCOME.
+THE HEARTBEAT IS PAUSED; THIS CONTINUOUS ROUND HAS ONE FINAL PUSH.
+THE FIXTURE-ONLY TPR-D1 CANDIDATE IS
 ACCEPTED; TPR-D2 IS AUTHORIZED ONLY AS A FIXTURE-ONLY CANDIDATE AND NO REAL-ROW
 D1 IS AUTHORIZED. THE OWNER DIRECTED ONE CONTINUOUS PRE-BACKTEST SOFTWARE
 ROUND IN SECTION 57, WITH NO INTERMEDIATE PUSH OR REVIEW STOP. TPR-D0 IS
@@ -43,7 +53,9 @@ UNFILLED DAY ORDERS KEEP ENGINE_COMPLETE FALSE. THIS IS AN EXPLORATORY
 NOMINAL-REVISION PROXY, NOT CANONICAL ETF VALIDATION, A PROVEN EDGE OR QC
 COMPLETION. ALL PRIOR FAILURES, RESULTS AND SPENT RECEIPTS REMAIN INTACT.
 NO QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
-IS GRANTED BY THAT LOCAL SCOPE. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN
+IS GRANTED BY THAT HISTORICAL LOCAL SCOPE. SECTION 67 RECORDS THE LATER
+OWNER-AUTHORIZED EXPLORATORY QC ROUTE; IT GRANTS NO BROKER, PAPER/LIVE,
+CAPITAL OR TRADING AUTHORITY. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN
 SECTION 37.**
 
 Sibling-lane changes and their independent reviews remain on their respective
@@ -54,9 +66,10 @@ future sibling behavior.
 
 Branch: `codex/strategy-target-price-revisions`
 
-Worktree: the checkout `git worktree list` registers for this branch.
-This lane is developed from more than one host, so no absolute directory
-is pinned; see `TPR-CR4-002`.
+Historical multi-host worktree policy: the checkout `git worktree list`
+registers for this branch (`TPR-CR4-002`). The current owner's exact
+session-long physical-root mandate below supersedes portability routing;
+it is not permission to discover and authorize another checkout.
 
 Current-round owner pin (exact absolute path in section 56.1):
 the designated lane is a hard physical-root/toplevel invariant for every repository check/edit,
@@ -396,15 +409,15 @@ discarding main's stale 2026-08-30 Target-Price status. The shared Session
 Handoff auto-merged without manual conflict resolution. Section 41 records the
 exact topology and checks.
 
-**Current qualification, 2026-10-08:** Claude has independently reviewed the exact Codex range
-`b78c51385a321b80404e484b3b161d8516f07138..002a5cc648a0c10a369ba79a42728aa75c7051d3`:
-the fifteen commits of sections 56 through 65, from the section-56
-counter-review through the two local order-based development backtests.
-Section 66 dispositions every commit and the cumulative tree accepted after
-correction. The corrections are three regression tests; no production,
-canonical or shared byte changed. One P2, `TPR-CR20-001`, stays open for
-Codex: two development modules pin one physical lane path and thirteen of
-their tests pass only inside it.
+**Current qualification, 2026-10-08:** Codex has counter-reviewed the exact Claude range
+`002a5cc648a0c10a369ba79a42728aa75c7051d3..530e95a554a9d06e954cf86df44d3a591d6d4996`:
+three commits, including the regression tests, record/guard and final
+validation handoff. Section 67 dispositions each commit and the cumulative
+tree accepted after correction, with this round's focused proof in section 67.
+No production, canonical or shared byte changes for the counter-review.
+`TPR-CR20-001` is closed by qualification, not by removing the owner's exact
+physical-root custody pin. Historical path-dependent evidence is retained;
+portability is not a prerequisite to this owner-pinned development round.
 The fixture-only TPR-D1 candidate is accepted;
 this is not real-data D1 completion. TPR-D0's independent review and
 counter-review are complete and D0's one completed audit is not renewed. The
@@ -490,21 +503,27 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Codex next counter-reviews section 66 and this round's two Claude commits,
-then resumes the owner's continuous build under sections 58/59/60; the
-owner's no-stop instruction still governs Codex's development, and this
-review was requested by the owner for the pushed range, not imposed as a
-prerequisite. Section 57 preserves prior implementation evidence; section 58
+Claude next reviews this Codex round independently at its single final pushed
+snapshot. Codex completed the continuous development allowed by the owner's
+latest six-universe QC instruction in section 67 and the continuous-build
+decisions in sections 58/59/60, without an intermediate review stop or push.
+Section 68 records five verified order-based QC runs and one zero-trade REMX diagnostic.
+The latter is a genuine frozen-input/signal limitation, not successful trading
+execution or a reason to manufacture orders. The full six-case order-based
+objective and original canonical ETF strategy remain incomplete.
+Section 57 preserves prior implementation evidence; section 58
 corrects current scheduling and distinguishes it from the factual endpoint.
 Section 59 supersedes the forward-looking wording: the target is backtesting,
 with a runnable generated-fixture local order-based candidate, not TPR-9 shadow.
 Routine scheduling is delegated;
 source rights, provenance and custody cannot be manufactured by approval.
 The historical retained-read scope expires 2026-10-12 but is already spent;
-section 60 does not renew it. Only the two fixed source-audit requests in
-section 60 are authorized. No retained read, auxiliary price/identity join,
-outcome access, QC project/upload/job, broker, paper/live, deployment, capital
-or trading action is permitted. The existing heartbeat was armed for exactly
+section 60 does not renew it. Only the two fixed source-audit requests were
+authorized by section 60. That historical audit granted no retained read,
+auxiliary price/identity join, outcome access, QC project/upload/job, broker,
+paper/live, deployment, capital or trading action. Section 67 supersedes its
+old access ceiling only for fresh bounded six-universe development and QC
+operations, with no canonical or operational promotion. The existing heartbeat was armed for exactly
 this completed Claude review and paused before counter-review; it stays
 paused as a consumed historical monitor, not a prerequisite for development.
 Section 60's one-shot audit is now spent: the current Massive ratings request
@@ -546,14 +565,30 @@ corrected Q1-2025 run returns approximately -39.36% with 39.60% drawdown,
 complete sixty-session valuation and zero unresolved actions. Its unfilled
 day-order constraints are retained, not bypassed. This completes the narrow
 private exploratory local execution milestone; it is not canonical ETF or
-QuantConnect readiness. Finish the stable handoff and make one matching-lane
-push. There is no remaining subscription reset, rights-paperwork or Claude
+QuantConnect readiness. That completed local round already made its one push.
+There is no remaining subscription reset, rights-paperwork or Claude
 wait for this completed local run. Further strategy evaluation must preserve
 the two-look history and the disclosed current-vintage/source limitations.
-Section 66 reproduced both results exactly from the private files, ran the
-complete repository suite on the pushed head in a scratch clone, and found
-that the thirteen path-bound tests are the only reds beyond the known
-out-of-lane set.
+Section 66 reports private-result reproduction and a complete-suite run in
+a scratch clone. Those are attributed reviewer observations, not this
+counter-review's reproduced evidence or compliance with the designated-root
+rule; section 67 records the exact qualifications and corrected counts.
+The latest owner scope requested actual order-based QC tests for S&P 500 /
+U.S. large-cap stocks, Healthcare, Energy, NASDAQ, Semiconductors, and Rare
+Earth and Strategic Metals. Section 68 freezes all six before new outcomes
+and preserves exact cloud IDs, source hashes, coverage, costs, fills and
+negative results. Seven cloud launches consumed two SPY attempts and one
+attempt for each other case; the two previous local looks remain immutable.
+Five cases meet exploratory execution checks, while REMX has zero orders
+because none of its admitted scores is positive. Retrying the unchanged
+candidate or modifying the frozen window/eligibility to force trades would
+not resolve this factual limitation. Remaining attempt capacity is not reset
+or exhausted by implication. Any successor research design needs a fresh
+pre-result freeze and must retain this observed history, not overwrite it.
+These are constituent-stock proxies, not complete ETF/holdings validation or
+unbiased point-in-time official-index tests. The single final matching-lane
+push carries this stable reviewable endpoint; the heartbeat remains paused.
+No broker, paper/live, capital or trading authority is added.
 
 ### Open-issue register
 
@@ -573,7 +608,6 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
-| `TPR-CR20-001` | P2 | Reproduction of the development custody and source-audit tests on any other checkout or host | `raw_run.py` and `source_audit.py` pin one physical lane path and thirteen tests pass only inside it. Those module bytes are hash-bound into spent reservations and published results, so the redesign (root resolved from the executing checkout, injected in tests) belongs to Codex's next candidate, not to an in-review edit. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -581,9 +615,10 @@ host on 2026-10-05 found neither `tpr_allowed_signers` nor `tpr_registry_anchor`
 under the frozen `C:\ProgramData\CustomizedAgent\trust` path; no key or
 trust-file provisioning was performed. The six canonical
 open findings require an owner decision, an owner-authorized artifact rewrite,
-or a later bounded implementation/validation round. The one open development
-finding, `TPR-CR20-001`, concerns host portability of the development custody
-checks and their tests; it is not a data-validity, canonical or trust gate.
+or a later bounded implementation/validation round. The development
+portability finding `TPR-CR20-001` is closed by section 67's successor
+qualification; it is not a data-validity, canonical or trust gate. Its
+historical evidence remains in section 66, and no executed module is rewritten.
 ### Historical progression (not the current resume instruction)
 
 The remainder of this section preserves how the earlier v2.1 and v2.2
@@ -10131,7 +10166,7 @@ and this record changed.
 
 | ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix | Correction | Verification |
 |---|---|---|---|---|---|---|---|---|---|
-| `TPR-CR20-001` | P2 | **Open** | `3e02974e`, `3df960bf` | `source_audit.py:37`, `raw_run.py:25`, thirteen tests in `test_source_audit.py`, `test_sharadar_diagnostic.py`, `test_sharadar_followup.py`, `test_sharadar_shape.py`, `test_raw_source_capture.py` | Both modules hard-code `LANE_ROOT` as one absolute macOS path and refuse to run unless the current directory, the Git toplevel and the branch equal it. The thirteen tests do not inject that root, so they pass only when pytest runs inside that exact checkout. The lane's own preamble says no absolute directory is pinned (`TPR-CR4-002`), and Codex's section-56.1 pin was an owner pin for one session, not a module constant. Consequence: the custody proofs cannot be reproduced on the owner's Windows host, in a clone, or by the sibling Claude session; `_verify_lane` itself had no test of its refusal branches. | Complete suite in a scratch clone of `002a5cc6`: the thirteen tests fail with `source audit requires the designated physical lane`, `capture code custody mismatch` or `... code identity mismatch`; the same tests pass in the designated worktree. Mutation U1 (lane cwd check removed) survived the original `test_raw_run.py`. | Review evidence that depends on one machine is not independent evidence; a custody check whose refusal branches are untested can be removed without any test noticing. | Not corrected in review: both module byte sets are hash-bound into spent reservations and published results, so editing them would break the lineage of the completed runs. Codex's next candidate should resolve the lane root from the executing checkout (`git rev-parse --show-toplevel` of the module's own tree) and let tests inject it; the thirteen tests should inject the root the way the new `_verify_lane` test does. The refusal branches of `_verify_lane` are now covered by `test_lane_verification_refuses_foreign_cwd_toplevel_or_branch` in `e5bbdf3f` with an injected root. | The new test is red under mutations U1 and U1b (66.4). The thirteen path-bound tests remain as they are. |
+| `TPR-CR20-001` | P2 | **Closed by qualification in section 67** | `3e02974e`, `3df960bf` | `source_audit.py:37`, `raw_run.py:25`, thirteen tests in `test_source_audit.py`, `test_sharadar_diagnostic.py`, `test_sharadar_followup.py`, `test_sharadar_shape.py`, `test_raw_source_capture.py` | Both modules hard-code `LANE_ROOT` as one absolute macOS path and refuse to run unless the current directory, the Git toplevel and the branch equal it. The thirteen tests do not inject that root, so they pass only when pytest runs inside that exact checkout. The lane's own preamble says no absolute directory is pinned (`TPR-CR4-002`), and Codex's section-56.1 pin was an owner pin for one session, not a module constant. Consequence: the custody proofs cannot be reproduced on the owner's Windows host, in a clone, or by the sibling Claude session; `_verify_lane` itself had no test of its refusal branches. | Complete suite in a scratch clone of `002a5cc6`: the thirteen tests fail with `source audit requires the designated physical lane`, `capture code custody mismatch` or `... code identity mismatch`; the same tests pass in the designated worktree. Mutation U1 (lane cwd check removed) survived the original `test_raw_run.py`. | Review evidence that depends on one machine is not independent evidence; a custody check whose refusal branches are untested can be removed without any test noticing. | Not corrected in review: both module byte sets are hash-bound into spent reservations and published results, so editing them would break the lineage of the completed runs. Codex's next candidate should resolve the lane root from the executing checkout (`git rev-parse --show-toplevel` of the module's own tree) and let tests inject it; the thirteen tests should inject the root the way the new `_verify_lane` test does. The refusal branches of `_verify_lane` are now covered by `test_lane_verification_refuses_foreign_cwd_toplevel_or_branch` in `e5bbdf3f` with an injected root. | The new test is red under mutations U1 and U1b (66.4). The thirteen path-bound tests remain as they are. |
 | `TPR-CR20-002` | P2 | **Closed by correction** | `30341bbb` | `raw_backtest.py:476` | No test proved that buy affordability reserves the per-share commission. With that term removed the engine fills one share too many whenever the last buyer's cash covers notional but not commission, and cash goes negative. The production runs did not trip it, but a borrowed cent is a wrong NAV. | Mutation B13 (`affordable = int(cash // unit)`) survived all 66 tests. | The engine's cash invariant (never negative) was unproven at the exact boundary. | `test_commission_is_reserved_before_the_last_affordable_buy_so_cash_never_goes_negative` in `e5bbdf3f`: ten frozen nine-share orders at an open of 11.0905 leave the tenth buyer 99.9611695 of cash, enough for nine shares' notional (99.90431) but not their commission (99.99431); the engine fills eight, records `insufficient_cash` and one pending share, and keeps cash at 11.0684455. | Red under B13, green on the real engine; hand-checked with exact fractions. |
 | `TPR-CR20-003` | P3 | **Closed by correction** | `3df960bf` | `raw_run.py:176` (`_open_root`), `raw_run.py:151-160` (`_verify_lane`) | The owner-only (0o700) custody check on the private run root and the three refusal branches of the lane check had no negative tests; the controller's tests stub both. | Mutations U2 (mode check removed) and U1 survived `test_raw_run.py`. | A custody check without a failing test is a comment. | `test_private_root_without_owner_only_mode_is_refused` (0o750 root refused) and the parametrized `_verify_lane` test, both in `e5bbdf3f`. | Red under U2, U1 and U1b; green on the real code. |
 | `TPR-CR20-004` | P3 | **Documented, not corrected** | `3e02974e` through `3e3183ff` | `research/target_price_revisions_development/.gitignore` | The package ignore file negates only the two D0 artifacts, yet 31 of the 33 tracked report JSONs match its `artifacts/*` rule; they were force-added. The ignore file therefore no longer describes what is published, and a future count-only report needs `git add -f` while a future private file is protected only by the operator's care. | `git ls-files` 33 versus `git check-ignore --no-index` 31. | Ignore rules should describe the tracked set. | None in review; Codex may widen the negation to the committed report-name pattern or document the force-add convention. | Not applicable. |
@@ -10232,3 +10267,937 @@ Codex (1) resolve `TPR-CR20-001` so the custody proofs run on both hosts and
 in a clone, and (2) decide the `TPR-CR20-006` view policy explicitly. The
 next development look should then be spent on a frozen, preregistered
 question rather than on a retune of the proxy.
+
+## 67. Codex counter-review and continuous six-universe QC scope - 2026-10-08
+
+### 67.1 Exact trigger, custody and review boundary
+
+The completed Claude review at
+`530e95a554a9d06e954cf86df44d3a591d6d4996` covers exact Codex snapshot
+`002a5cc648a0c10a369ba79a42728aa75c7051d3`. Section 66 explicitly dispositions
+both commits in the monitored Codex round
+`30341bbb853ab82d03f088d0273e412424910265..002a5cc648a0c10a369ba79a42728aa75c7051d3`,
+including `3e3183ffd32b48a396ef7b63079f37bf1bd89a97` and its exact handoff.
+Claude additionally reviewed the full fifteen-commit continuous range
+`b78c51385a321b80404e484b3b161d8516f07138..002a5cc648a0c10a369ba79a42728aa75c7051d3`.
+The durable dispositions and completion record, not the author label or a
+changed tip alone, qualify this trigger. The incoming review range is
+`002a5cc648a0c10a369ba79a42728aa75c7051d3..530e95a554a9d06e954cf86df44d3a591d6d4996`.
+It contains three commits, all reviewed separately below and cumulatively.
+
+Every current repository operation remains in
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__target_price_revisions`
+on `codex/strategy-target-price-revisions`, with physical root, Git toplevel,
+branch, HEAD and status checked before operations. This exact owner pin
+supersedes historical multi-host routing for this round. A root discovered
+from whatever checkout happens to execute is not self-authorizing.
+The shared worktree already equalled the pushed review head; no reset,
+alternate checkout or concurrent-work overwrite was needed. The heartbeat
+`target-price-claude-push-counter-review` was paused before counter-review
+and remains PAUSED throughout and after this one triggered round.
+
+### 67.2 Every incoming commit and cumulative disposition
+
+| Claude commit | Disposition | Independent basis and correction |
+|---|---|---|
+| `e5bbdf3f997e41c4637e6abc3ad34d86651355f4` | **Accepted after correction** | The affordability and custody regressions address real test-sensitivity gaps without changing production economics. Strengthen exact financial assertions and synthetic custody evidence as recorded in this round's focused proof; retain no-negative-cash and named-refusal behavior. |
+| `5af0897f6cbfd158e32b836a42dba1f34e60bb48` | **Accepted after correction** | Every historical Codex disposition and all six CR20 findings remain visible. Correct current three-commit routing and root-pin interpretation; qualify historical mutation/artifact counts, arithmetic, reported scratch-clone evidence and portability recommendations below. New current-scope guards must not inherit the obsolete no-QC ceiling. |
+| `530e95a554a9d06e954cf86df44d3a591d6d4996` | **Accepted after correction** | Record-only validation follow-up. Its 2,196 total is arithmetically consistent, but the 2,184 baseline is Claude's section-66 received-tree run, not section 65's 919 focused checks. Include this third commit in current handoff routing and keep reported execution distinct from current reproduction. |
+
+**Cumulative disposition: accepted after correction.** This round's focused
+verification of the corrected tests and record is recorded below. It does not promote the
+historical proxy results to canonical or ETF acceptance. No frozen production
+module, executed source, canonical artifact, D0 artifact or spent receipt is
+rewritten by the counter-review. Only lane-owned tests and this handoff change.
+
+### 67.3 Retained findings and successor qualifications
+
+| ID | Priority | Status | Evidence, reason and correction |
+|---|---|---|---|
+| `TPR-CCR20-003` | P3 | **Closed by correction** | Section 66 and its current pointers omit the final record-only Claude commit. Git proves three incoming commits. Current preamble/section 8 and section 67.2 now name the entire exact range and every disposition; historical section-66 wording remains qualified rather than silently rewritten. |
+| `TPR-CCR20-004` | P3 | **Closed by qualification** | The historical artifact/mutation census and affordability prose contain transcription errors. Git path inventories and exact-rational arithmetic give the corrected values below. These corrections do not replace executed artifacts, rerun outcomes or change strategy economics. |
+| `TPR-CCR20-005` | P2 | **Closed by qualification** | Claude reports a scratch-clone complete suite despite the exact designated-worktree rule. That procedure was not compliant. Its figures remain attributed history, not current in-lane validation; Codex uses only the designated lane, isolated runtime roots and focused checks. No repeat full suite or scratch-clone run is authorized by this correction. |
+| `TPR-CCR20-006` | P3 | **Closed by qualification** | CR20-001's portability observation is partly correct but independence does not require a different checkout, and this owner explicitly requires one physical root. Its suggested auto-discovered root cannot replace authorization. The current finding row/register are closed by this qualification; future portability remains a disclosed limitation, not a required milestone or permission to rewrite frozen modules. CR20-004's default-deny artifact policy and CR20-005/006 limitations are qualified below. |
+| `TPR-CCR20-007` | P3 | **Closed by correction** | The incoming regression tests need durable exact-money and custody sensitivity evidence, not only plausible rounded prose or a nonempty refusal. Lane-owned tests are strengthened in this round and their red/green or safe in-memory reverse-mutation proof must be recorded before empirical continuation. No existing valid financial or trust expectation is weakened. |
+
+All six historical CR20 findings receive an explicit disposition:
+
+- `TPR-CR20-001`: **partially correct, closed by qualification**. Frozen
+  `LANE_ROOT` constants and path-dependent fixtures exist; the reported
+  thirteen failures are reviewer-attributed. The runtime pin enforces this
+  owner's current mandate, not an in-lane defect. Synthetic tests may inject
+  a root without granting runtime authority. No Windows portability or
+  protected Windows custody is claimed, and no automatic-root redesign is
+  required before the authorized local QC route. Only the historical row's
+  current status changes; its original evidence and recommendation remain.
+- `TPR-CR20-002`: **confirmed test gap, corrected**. Production affordability
+  already includes commission. The regression is appropriate; exact prose
+  is corrected below. The claim that historical private runs did not trip
+  the gap remains Claude-attributed unless separately reproduced.
+- `TPR-CR20-003`: **confirmed test gap, corrected**. Root-mode and lane
+  refusal branches deserve negative tests. This round strengthens their
+  observation and keeps synthetic inputs and restoration explicit.
+- `TPR-CR20-004`: **partially correct, documented**. There are 33 tracked
+  JSON artifacts, 31 matching the package's default-deny ignore rule. The
+  deliberate publication convention is explicit-path `git add -f` only
+  after confirming a count/hash/summary-only artifact belongs in Git.
+  Ignore rules are not a confidentiality boundary; widening a wildcard
+  negation is not a security improvement and is not performed here.
+- `TPR-CR20-005`: **confirmed bounded hardening observations, documented**.
+  `_round8` accepts `Fraction(float)` but current calls supply exact values;
+  bounded provider error text/schema identifiers remain untrusted content.
+  U6 survives without a forced UUID collision; that alone does not prove
+  unsafe destination publication, which still uses a non-overwriting hard
+  link. No frozen executed module changes and no secret leak is established.
+- `TPR-CR20-006`: **confirmed research limitation, documented**. A
+  `censored` historical event set depends on later edit timestamps; the
+  `current` view uses captured payloads rather than historical vintages.
+  Neither is point-in-time. A new candidate must freeze its view policy
+  before new outcomes; this counter-review chooses no new empirical policy.
+
+Corrected evidence metadata, independently checked without private rows:
+
+- The fifteen-commit range changes **57 development paths: 26 Python modules
+  and 31 JSON artifacts**, not 57 modules plus 32 artifacts. The cumulative
+  package contains 31 Python modules and 33 JSON artifacts. `30341bbb`
+  changes 12 JSON artifacts, not 14; `3e3183ff` changes 11, not 10.
+- Section 66.4 itemizes **26 red, four survivors and one not-applicable
+  slot**: 30 actual initial mutants among 31 listed slots. B13, U1 and U2
+  are the three original survivors addressed by the new tests; U1b is
+  additional sensitivity proof. U7 is not a surviving executed mutation.
+- At the fixture open 11.0905 and 0.001 slippage, the unit fill price is
+  11.1015905. Nine-share notional is **99.9143145** and commission-inclusive
+  cost **100.0043145**, not 99.90431 and 99.99431. The tenth buyer's available
+  cash **99.9611695** and eight-share-fill final cash **11.0684455** are
+  correct. Exact `Fraction` arithmetic independently verifies these figures.
+- Reported full-suite shards sum to **19,471 passed, 842 skipped, 33 failed,
+  37 errors**. Reported final lane count is 2,184 + 7 regression cases + 5
+  guard cases = **2,196**, with 20 skips. Correct arithmetic is not proof of
+  shard exact coverage, network-denial enforcement, all diagnoses, or
+  compliance with the physical-root rule.
+- Committed aggregate reports agree with section 66's historical return,
+  drawdown, orders/fills, fees, NAV and published private-result hashes.
+  This record-review check reads public committed aggregates only; Claude's
+  private-series recomputation is attributed, not reproduced by that check.
+
+No new production P0/P1 finding is established. Six canonical findings stay
+open and parked. OOL003/004/006 remain closed; OOL011 is corrected/accepted
+in lane and still awaits owner-coordinated shared synchronization. Neither
+its shared synchronization nor canonical trust/source gates are silently
+declared complete by these exploratory-development dispositions.
+
+### 67.4 Latest owner authority, decisions and next action
+
+The latest direct owner instruction, preserving its wording, is:
+
+> claude is reviewing, arm a monitor for its next push.
+>
+> when it pushes, counter review first.
+>
+> then:
+>
+> 1. build the project until ready for qc backtesting
+> 2. testing the following 6 universes
+>
+> S&P 500 / U.S. large-cap stocks
+>
+> Healthcare
+>
+> Energy
+>
+> NASDAQ
+>
+> Semiconductors
+>
+> Rare Earth and Strategic Metals
+
+Together with the standing uninterrupted-build, delegated-decision and
+one-push instructions, this authorizes necessary bounded source integration,
+private QC uploads/processing, project creation, compilation and actual
+order-based QC development backtests for these six cases after accepted
+counter-review. It supersedes obsolete fixture-only/no-data/no-QC ceilings,
+not provider facts or restrictions. The owner's separate-rights-paperwork
+waiver remains a working authorization, not vendor attestation. Do not
+fabricate source availability, rights, correction history or point-in-time
+membership, and do not bypass a known access restriction.
+
+Decisions exercised by the counter-review are `TPR-CCR20-DEC-01` (retain the
+exact owner-pinned root rather than infer portable runtime authority),
+`TPR-CCR20-DEC-02` (preserve section 66 as attributed history with explicit
+successor corrections), and `TPR-CCR20-DEC-03` (treat the latest six-universe
+QC instruction as the prospective development route, with one final push).
+Their provenance is the direct owner instruction plus this counter-review's
+evidence. They are agent-delegated choices, not separately human- or
+Claude-approved decisions. Alternatives rejected are rewriting frozen
+executed sources, claiming clone evidence as compliant, and retaining a
+stale no-QC ceiling. No future universe membership, dates, parameters,
+provider operation or candidate configuration is chosen by this section.
+
+Next, complete focused counter-review proof, then freeze ALL SIX exact
+universe/configuration definitions together before new outcomes. Resolve
+S&P 500 versus a large-cap proxy, Nasdaq-100 versus Nasdaq-listed, sector
+and rare-earth/strategic-metals boundaries explicitly. Distinguish the stock
+proxy from the intended ETF strategy; never relabel one as the other's
+completion. Record fresh bounded manifests/access/look receipts and every
+delegated decision before operations. Preserve both previous local looks,
+spent D0/other receipts, frozen historical artifacts, canonical allocation
+and sealed holdout. Do not tune later cases after seeing earlier results.
+
+Continue one round with no routine intermediate Claude stop or checkpoint
+push until actual interpretable QC evidence exists for all six or a genuine
+external/factual/safety blocker is exhausted and documented. At most three
+QC attempts per distinct frozen candidate; failures count and renaming does
+not reset them. After the third failure use authenticated controllable Mia,
+or report the precise owner recovery if inaccessible. Compare any Mia cloud
+source with the exact local candidate and port only verified lane corrections.
+No completed-without-data/orders run is automatic readiness.
+
+No broker, operator database, paper/live deployment, capital, order or trading
+authority is granted. No purchase, subscription mutation or credential
+rotation is authorized. Canonical TPR-TR0-I, TPR-1 and TPR-0B gates remain
+unchanged. Shared ACTION_PLAN, SESSION_HANDOFF, workflows and sibling code
+stay frozen. Finish with one stable reviewable snapshot and exactly one
+non-force push to the matching lane; verify actual remote/local agreement.
+Leave the heartbeat paused. A later independent Claude review is the next
+review role after that final publication, not an intermediate build gate.
+
+### 67.5 Current validation boundary
+
+Counter-review validation is focused, never a complete lane/repository
+suite. Use the section-49/52 in-process isolated runtime-root runner before
+dispatch-fence/configuration imports. Actual operator stop state/database is
+not test input. Preserve the fourteen frozen-Windows-Git cases and the
+native/host split; macOS does not establish native Windows signing, ACLs or
+parent custody. Record this round's exact test and reverse-mutation counts,
+compile/diff checks and exclusions before empirical continuation.
+
+Root independently reports **159 focused tests passed in 0.37s** for the
+received/corrected regression proof. The documentation worker's isolated
+runner returned **103 passed in 2.00s** for
+`tests/target_price_revisions/test_document_consistency.py`, including five
+in-test mutations of the section-67 guard: each omitted incoming commit and
+each adjacent canonical/live authority grant is refused after a green
+control. These counts are distinct invocations, not an additive suite total.
+The first documentation invocation found **102 passed, 1 failed in 2.28s**:
+two proposed finding IDs already existed in section 56. The duplicate-row
+guard correctly rejected them; current new IDs are `TPR-CCR20-003` through
+`TPR-CCR20-007`, leaving the historical IDs intact. A preceding shell quoting
+error raised `SyntaxError` before Python execution/pytest collection; zero
+tests or runtime-state reads occurred in that failed wrapper. No complete
+lane/repository suite, provider call or private-row read is performed by
+these documentation checks. No QC run or new empirical result is claimed
+by the counter-review; the following separately frozen scope is prospective.
+After section 68.1 was recorded, the combined lane-record and active-document
+check returned **172 passed in 2.87s** with the same isolated runner.
+`py_compile` of the changed guard and `git diff --check` both exited zero.
+
+## 68. Six-universe QuantConnect development round - 2026-10-08
+
+### 68.1 Delegated decisions and simultaneous freeze
+
+After the accepted counter-review, the new candidate family is
+`TPR-QC6-20261008-v1`. The exact prospective specification is
+`research/target_price_revisions_qc/six_universe_freeze.json`; root records
+its measured content hash with the bounded-access receipt before empirical
+operations. All six configurations are selected together, before any new
+outcomes in this round. This is a new exploratory constituent-stock QC
+candidate, **not the complete ETF/holdings strategy and not canonical
+stock-primary acceptance**. The fact that membership comes from ETFs does
+not make the traded stock portfolios ETF strategy tests.
+
+The following are agent-delegated decisions under the latest direct owner
+instruction quoted in section 67.4 and the standing best-judgment delegation.
+None is separately human-approved or Claude-approved; independent review of
+this new candidate is pending. The scope is six private QC development tests,
+not deployment, canonical admission or a source-quality attestation.
+
+| Decision | Chosen option and rationale | Alternatives and factual limitations |
+|---|---|---|
+| `TPR-OWN-48` | Freeze all six membership/benchmark definitions below using historical QC US ETF constituent callbacks, with a seven-calendar-day minimum lag, maximum age 21 days and receipt by the prior-session cutoff. This gives an auditable common membership mechanism and avoids present-day lists masquerading as historical membership. | Reject silent substitution between an official index, ETF proxy and broad sector. Historical callback availability/coverage must be measured, not presumed. Missing snapshots refuse a decision; unavailable constituents remain explicit missing/refused coverage, never zero signals. Current Sharadar identity still makes the combined candidate non-PIT. |
+| `TPR-OWN-49` | Fresh bounded read of exactly the section-64 `structure.json` identified by SHA-256 `509047244d47ec489e5a8e1dfbf74e0d0104b51c7dfff19ae7283abba1e9ccd5`; use all admitted source identities and all fourteen weekly score frames, not the old global 43 winners. Preserve the censored-last-touch view and frozen nominal target-change formula for a clearly labelled continuation. | No D0 access, old outcomes, source refresh or spent-receipt renewal. A current-row view would introduce a different revision policy; censored view is selected for continuity, not claimed to eliminate look-ahead. Later edits alter historical inclusion; vintage/horizon/share-basis comparability remains unverified. |
+| `TPR-OWN-50` | Freeze Q1-2025, USD100,000 cash, positive top ten within each lagged universe at 10% each/residual cash, frozen fourteen weekly decisions, whole-share prior-close sizing and genuine QC MOO orders at 09:20 New York; cancel remaining day orders at 09:35. Fees are USD0.01/share, slippage0.001/side, submitted quantity capped at 1% of prior completed-session raw volume; use 3% opening-gap cash reserve, do not assume pending sells finance buys, leverage1. | Do not silently replicate the local simulator's partial fills/open-NAV cap or indefinite dividend receivables. QC RAW/native split/dividend/delisting and immediate-settlement handling change those economics. Adjust cached prior close/volume for splits; refuse ambiguous basis. Record these differences before results; compare coverage/orders/accounting rather than claiming exact local/QC NAV parity. |
+| `TPR-OWN-51` | Create at most six new lane-owned private QC projects. Upload hash-checked immutable compressed source-packet chunks, each <=30,000 bytes and at most20, plus loader/main. Fresh access identity is `TPR-QC6-ACCESS-20261008-001`; timeout30s/request, max1,000 API requests, response cap16MiB, no automatic retry. | No unrelated project overwrite, public dataset/source publication, raw QC market export, credential exposure, purchase, subscription mutation or broker/live/paper action. Use existing account access only; availability and private custody must be verified before use. |
+| `TPR-OWN-52` | Reserve each genuine universe candidate attempt before compile, retain attempts across fixes/sessions, maximum three per candidate; unsuccessful compilation/runtime/terminal runs count. Every cloud backtest launch prospectively consumes a development look, including failures; no refund or incidental renaming. | After three failures use accessible authenticated Mia only, or report the precise owner recovery. Retrieve and compare all Mia changes before porting verified lane-owned fixes. Zero-data/orders Completed is diagnostic, not successful backtesting. |
+| `TPR-OWN-53` | Freeze status/dates, coverage counts/weights, orders/fills/trades, costs, target/submitted/filled shortfalls, cash/gross exposure, return/drawdown, NAV residual, hashes and project/compile/backtest IDs. Preserve two prior local looks and the already observed corrected -39.35818894% return/39.60072803% drawdown; all six are correlated exploratory tests with confirmatory alpha0. | Do not retune later cases after earlier outcomes, pool them as independent confirmation, select profitable dates or access the sealed holdout. The same Q1 window/economics applies across cases unless a necessary exception is documented before execution. Native QC corporate-action/cash treatment and membership differences limit comparisons with old local results. |
+
+| Frozen case / candidate | Membership and contextual benchmark | Exact scope and rejected substitution |
+|---|---|---|
+| S&P 500 / U.S. large-cap; `TPR-QC6-SPY-v1` | SPY | Historical QC-covered US-equity SPY constituents: an S&P500 ETF proxy, not all US large-caps or an unbiased official index replication. |
+| Healthcare; `TPR-QC6-XLV-v1` | XLV | S&P500 healthcare sleeve, not every healthcare stock. Chosen for a consistent liquid US-equity sector constituent mechanism rather than undocumented manual sector membership. |
+| Energy; `TPR-QC6-XLE-v1` | XLE | S&P500 energy sleeve, not all energy or clean-energy equities. No later substitution based on outcomes. |
+| NASDAQ; `TPR-QC6-QQQ-v1` | QQQ | Nasdaq-100 constituent proxy, explicitly **not all Nasdaq-listed stocks**. The narrower established basket resolves the owner's ambiguous shorthand prospectively. |
+| Semiconductors; `TPR-QC6-SOXX-v1` | SOXX | QC-covered US-equity semiconductor manufacturers/equipment sleeve selected by this ETF, not the whole technology sector. |
+| Rare Earth and Strategic Metals; `TPR-QC6-REMX-v1` | REMX | QC-covered US-equity thematic constituents intersecting admitted domestic common-stock identities. Foreign/unavailable holdings remain excluded with explicit coverage counts/weights; this is not complete global thematic exposure, broad mining, gold or uranium. No renormalization turns the US subset into a full global book. |
+
+SPY overlaps XLV/XLE/QQQ/SOXX and QQQ overlaps SOXX. Record these dependencies
+and each missing/refused identity/signal separately. ETF benchmark returns
+provide context only, not proof of total-return replication or actual ETF
+strategy holdings. The freeze specifies intentions, not verified provider
+facts or evidence that any run completed. Subsequent implementation,
+hash/access receipts, exact validation and actual per-universe outcomes
+must be recorded before final one-push handoff.
+
+### 68.2 Pre-operation transport refinement and counter-review proof
+
+Before any new source read, credential use or QC request, `TPR-OWN-54`
+refines OWN51's initially proposed packet transport only. The official
+[QC Security and IP documentation](https://www.quantconnect.com/docs/v2/cloud-platform/security-and-ip)
+requires readable code and recommends Object Store for users' own reference
+inputs. Use one plaintext canonical JSON object (maximum 16 MiB) in the
+new lane-owned content-addressed private namespace
+`tpr-qc6/TPR-QC6-20261008-v1/<sha256>.json`, plus readable algorithm/configuration
+source. Do not use compressed/encoded Python modules. This is a prospective
+agent-delegated compliance choice under the existing private-upload authority,
+not separate owner or Claude approval. Its alternative was source-module
+chunk packaging, rejected before execution; neither strategy economics,
+membership, candidate IDs, attempt limits nor dates change. The initial
+unexecuted freeze hash was
+`9070033a1d1c289a215f0fbb8cc0a22055d8923ecd311e72641782dc6912f2e8`;
+the measured amended hash is recorded with the access receipt below. No
+spent authority or result is overwritten by this pre-operation refinement.
+The shared QC client stays unchanged; a narrowly scoped lane transport may
+upload only our plaintext input, not read/export QC market data. Official
+privacy documentation states projects are private by default; verify fresh
+ownership/collaborators and never call sharing endpoints.
+
+The received commission mutation turned the original test red only through
+`execution_name_cap` versus `insufficient_cash`, with unchanged eight-share
+fill and cash. The added sparse-cash case isolates fee affordability: the
+real engine returns no fill, while B13 raises the existing independent
+negative-accounting refusal. No returned negative-cash escape is established.
+The old foreign-cwd mutation exhausted mock Git answers (`StopIteration`);
+matching synthetic Git answers now show an actual `DID NOT RAISE` failure
+when cwd validation is removed, and the real refusal makes zero Git calls.
+Current in-memory reverse probes (restored in `finally`): B13 one failure,
+U1 one failure/four passes, U1b two failures/three passes, U2 one failure.
+Corrected/restored two-module tests pass 159 cases; root separately reproduced
+159 in 0.37s. Host Python 3.12.14, pytest 9.1.1, macOS 26.6.2 arm64. No
+private/source/outcome read, provider request, QC attempt or actual operator
+state was used for these proofs. The frozen order-engine and run-controller
+hashes remain respectively `628fd39fc467707aee3b998ec491fb66ffe59a71df7a07c65593126617aeb93f`
+and `fe00c1ebcda0edb9e69ec7079f648ff060e101a2d18d10c94aa1e9fbc8bd7260`.
+
+### 68.3 Pre-execution implementation details and operational custody
+
+The amended simultaneous freeze SHA-256 is
+`3cf40af7325265b15f7de5e03f0667a1554c889fdd2db02de228a01b2fa97ccf`.
+`TPR-OWN-55` uses an untraded SPY extended-hours minute subscription solely
+as the common engine clock, so the 09:20 MOO submission and 16:01 audit are
+not deferred to the next regular-hours bar. Each case retains its frozen
+ETF benchmark and trades only its selected constituent stocks. Prior-close
+NAV is cached at the previous 16:01 audit, starting from USD100,000; current
+settled cash separately bounds buys. This avoids adding today's ex-dividend
+cash to yesterday's cum-dividend marks when estimating prior-close NAV.
+The alternative of a regular-hours-only clock risks deferred callbacks;
+recomputing prior-close NAV with today's cash risks double counting.
+This is a pre-outcome implementation detail under OWN50, not an economic
+retuning or separate human/Claude approval. Independent review is pending.
+
+The new `research/target_price_revisions_qc/` package is a successor adapter,
+outside the frozen development package's import boundary. Its operations
+controller fixes the physical/Git root, branch and reviewed baseline, and
+creates owner-only private receipts before any source read, credential use,
+request or attempt. These cooperative macOS receipts are **not** canonical
+protected-parent, signer, antirollback or independent-custody evidence.
+The bounded access receipt and exact source hashes must be recorded below
+before real operations; no tests authorize a request by themselves.
+
+The fresh private access receipt is now created at
+`artifacts/target_price_qc6/TPR-QC6-20261008-v1/access.json`, SHA-256
+`5469cb3f54ad27d3f822aceb45d0facd20ed85e227e70eedb68967c03ea6b2d5`,
+binding operations source
+`ef820b7b0031c962a5537976abd49a00176480fb537d553652b180816b4b6920`
+and the amended freeze above. It expires after 48 hours and does not renew
+D0 or either historical local look. Source reads are capped at one exact
+structure input, with no source refresh, old-outcome read or D0 read.
+Root reproduced **88 focused operations tests passed in 0.38s** before
+creating it. At this receipt boundary there have been zero authenticated
+requests, source reads, cloud projects, compiles, backtests or new outcomes.
+Actual operations are reported separately below; reservation is not success.
+
+### 68.4 Actual source preparation and pre-launch corrections
+
+Authenticated QC access succeeded. The exact authorized structure read
+completed once and matched its frozen hash. No D0, old outcome file or
+additional provider capture was read. The plaintext private packet is
+7,722,978 bytes, SHA-256
+`4dd3a9d800b7c1cb8114272c829ee18239972cc0a15c71e47a3e86ed6491a316`;
+its private preparation receipt is
+`926564e1981016b8854e823b03ed6c0ea0d395c1d4a615b8006a1acc0a487c28`.
+It retains 3,798 identities (2,289 eligible under the frozen current-snapshot
+policy) and fourteen frames. Across all identity/frame pairs: 26,370 scored,
+4,275 no-admissible-event, 1,401 unknown-input, 21,126 identity-ineligible.
+These are source preparation counts, **not trading results or additional
+outcome looks**. Builder SHA-256 is
+`7e1b80faaa478b9161f3bdba916333a983794813d8fe96115ce617a44c5eb190`.
+Private bytes remain ignored and must not enter Git or public review logs.
+
+The following findings concern the new, previously unexecuted adapter, not
+the frozen historical engine. They were corrected before any cloud compile
+or backtest, with the same candidate identities and economics:
+
+| Finding | Evidence, correction and disposition |
+|---|---|
+| `TPR-QC6-P01` P2 | Confirmed: packaging alone accepted an altered valid-looking structure hash, although the builder correctly bound actual bytes. Add exact frozen structure hash and pre-hash size bounds; the new red test failed `DID NOT RAISE`, then 56 packet/boundary tests passed. Corrected. |
+| `TPR-QC6-P02` P2 | Confirmed: initial cloud admission checked source hashes only syntactically and allowed any recent prior 18:00 cutoff. Bind the exact three source hashes and all fourteen exact cutoffs to the same frozen producer contract. Corrected before upload. |
+| `TPR-QC6-P03` P2 | Confirmed: same-slice dividend/split audit used post-split shares and omitted native fractional split cash. Synthetic ten pre-split shares with USD0.20 dividend/2:1 split produced ledger1004 rather than1002; three shares/reverse-split factor2 omitted USD10 cash-in-lieu. An independent fill-driven quantity ledger now applies dividends before splits and reconstructs native cash-in-lieu; tests now produce1002/1010 and detect quantity drift. Corrected. |
+| `TPR-QC6-P04` P2 | Confirmed: an up-to-seven-day-old mark/NAV could substitute for the exact prior exchange session, including January2 input at the January6 decision despite a January3 cutoff. Require the exact frame-cutoff session for lagged prices/volume and cached NAV. Corrected. |
+| `TPR-QC6-P05` P2 | Confirmed: draft connection construction could fail without a terminal receipt, and generic create/launch calls could bypass typed reservations. Move construction inside sanitized handling; enforce typed single-use project and compile/backtest stages, source/attempt/compile binding, and one specialized own-input upload. Root reproduced88 focused tests after correction. |
+
+Independent subagent counter-check reproduced **97 focused tests passed in
+1.07s** for packet/boundary/cloud behavior after these corrections. This is
+Codex-team checking, not a substitute for independent Claude review. The
+cash and quantity reconstruction is independent bookkeeping; NAV reconciliation
+still uses native QC marked holdings, **not independently sourced prices**.
+The current operations controller is now an executed, hash-bound artifact:
+do not edit it or silently renew its receipt. Its caller must verify cloud
+source equality and `BuildSuccess` before launch. Malformed project-response
+shapes remain a caller-caught sanitized refusal path, never an implicit retry
+or successful project claim. Native Windows custody gates remain unproved.
+
+First fresh private project: `37524929`, `TPR-QC6-SPY-v1-private`, reported
+owner true, no non-owner collaborator, max file size64,000 bytes, LEAN version
+18171. Creation and API authentication are not compile/backtest completion.
+
+### 68.5 First actual QC attempt: failed interpretability diagnostic and pre-attempt2 decisions
+
+This entry records the root implementer's actual API/readback evidence;
+the documentation worker has not performed another private-result read or
+empirical run. Authentication succeeded, and the fresh private SPY project
+is `37524929` with reported maxFileSize64,000 and LEAN version18171. The
+7,722,978-byte plaintext own-input packet, SHA-256
+`4dd3a9d800b7c1cb8114272c829ee18239972cc0a15c71e47a3e86ed6491a316`,
+was uploaded at **2026-10-08 10:51:54 UTC**. It remains private. The executed
+operations controller hash is still
+`ef820b7b0031c962a5537976abd49a00176480fb537d553652b180816b4b6920`;
+this artifact and its spent access receipt must not be edited or renewed.
+
+All six v1 source configurations were bundled and frozen before the first
+new outcome: all-six source-bundle v1 SHA-256
+`c6c3acd2451ff467f64842dec1e74236e405ee1739901997787efc2844cad7e0`,
+with cloud template SHA-256
+`3fa48df5b7d52d40bae38d0ce6e52a7b4a485550b136470a5e91628f422a4d0f`.
+Whole-source cloud readback matched both uploaded source files before
+compilation; the default `research.ipynb` was left unchanged. These checks
+establish the submitted source identity, not independent acceptance of its
+economics or runtime behavior. Retain the executed v1 bytes and hashes;
+runtime corrections must use an explicitly identified successor.
+
+| SPY attempt1 evidence | Observed value and disposition |
+|---|---|
+| Frozen candidate / project | `TPR-QC6-SPY-v1` / `37524929`; the common frozen Q1-2025 configuration remains in force. |
+| Compile ID | `3a47310e04850d795104be1be0e78304-aaf4ad5d3d07a82f8a2fc27074167d65`; `BuildSuccess`. Stub/type warnings concerned Decimal, CultureInfo and dictionary types; there was no BuildError. BuildSuccess does not prove these warnings harmless in all execution paths. |
+| Backtest ID | `fef81367c2306d10a3e07c9463d88274`; API terminal `Completed`, completed=true, progress1. |
+| Retrieved result SHA-256 | `fe29af1f251908a9d795e09c5b9d807fe5c1d45ea3309fe61c318e171d70c24b`. |
+| Orders and fills | 103 orders, 103 fill events, 3,633 filled shares; reported fees USD36.33. Fill-event count is not a separately verified completed-trade count. |
+| Reported performance | Start NAV USD100,000; end NAV USD88,602.36; reported net return -11.398%, drawdown17.8%. These negative outcomes remain visible and are exploratory diagnostic observations, not accepted research results. |
+| Decision/membership coverage | Fourteen decisions, zero whole-decision refusals, ten selected targets in every frame, 502/503 reported members. Nevertheless, 31 missing-security/missing-mark observations remain; zero whole-decision refusals must not be relabelled complete execution coverage. |
+| Accounting evidence | Maximum absolute cash/NAV reconciliation residual USD31.50; position-quantity mismatches0. Zero quantity mismatch does not close a cash or marking discrepancy. |
+| Execution/audit defects | The first January2 frame submitted zero orders despite ten targets. NAV logs contain 61 distinct dates, including a spurious April1 `on_end` audit beyond the frozen March31 evaluation end. |
+| Acceptance | `meaningful_execution=false`. This is a **failed interpretability diagnostic**, despite a Completed terminal status and real orders/fills; it is not an accepted successful SPY evaluation or proof of six-universe QC readiness. |
+
+The default/root order metadata reports 100 orders with
+priceAdjustmentMode0 and three RCL orders with mode1. This alone does
+**not** prove that all actual fills used Adjusted prices: the v1 primary
+handler cached the first subscription configuration, which can be internal,
+rather than establishing the active non-internal traded subscription.
+An apparently missing March14 dividend cash event is under investigation;
+no provider fault or final root cause is established by this entry. The
+remaining coverage, exposure, underfill and accounting interpretation must
+be resolved rather than inferred from the terminal status or headline P&L.
+
+| Frozen universe candidate | Attempts consumed at this entry | Actual QC disposition |
+|---|---:|---|
+| S&P500 / U.S. large-cap, `TPR-QC6-SPY-v1` | 1 of3 | Attempt1 completed with real orders but failed interpretability/accounting gates; not accepted. |
+| Healthcare, `TPR-QC6-XLV-v1` | 0 of3 | Not launched; no actual QC outcome claimed. |
+| Energy, `TPR-QC6-XLE-v1` | 0 of3 | Not launched; no actual QC outcome claimed. |
+| NASDAQ, `TPR-QC6-QQQ-v1` | 0 of3 | Not launched; no actual QC outcome claimed. |
+| Semiconductors, `TPR-QC6-SOXX-v1` | 0 of3 | Not launched; no actual QC outcome claimed. |
+| Rare Earth and Strategic Metals, `TPR-QC6-REMX-v1` | 0 of3 | Not launched; no actual QC outcome claimed. |
+
+Exactly one new cloud development look has been observed so far, in
+addition to the two immutable historical local looks: **three observed
+runs in total**, not three independent confirmatory observations. SPY's
+first attempt is permanently consumed. A v2 implementation correction
+does not create a new universe candidate or reset that count. There has
+been no attempt2 at this entry, and no other universe has been tested.
+
+Before attempt2, the prospective successor implementation will explicitly
+AddSecurity using each actual Symbol with RAW normalization for every
+target/held name at09:20, validate the active non-internal minute
+configuration, and retain a bounded set of ever-selected subscriptions
+(at most140 per case). Its final audit must use the last actual evaluation
+date rather than invent an April1 record. These are pending engineering
+corrections, not yet verified successful runtime behavior. Preserve v1
+and the negative attempt1 evidence; do not change the frozen universes,
+source packet, dates, scoring/ranking or economic assumptions in response
+to the observed loss. Investigate the dividend/cash residual before
+claiming accounting parity.
+
+The following decisions are exercised under the latest direct owner
+instruction in section67.4, the standing best-judgment delegation, and
+the measured attempt1/project evidence above. They are agent-delegated
+choices, **not separately human-approved or Claude-approved**. Both the
+successor implementation and these choices remain pending independent
+review; neither grants canonical acceptance or trading authority.
+
+| Decision | Chosen option and rationale | Alternatives, scope and limitations |
+|---|---|---|
+| `TPR-OWN-56` | Permit a successor readable-source code cap of60,000 bytes only when the actual project's reported maxFileSize is at least60,000 bytes. Project37524929 reports64,000. The earlier30,000-byte cap was a conservative local choice, not an established provider limit; the larger bounded readable adapter can contain the required runtime/accounting corrections. | Reject splitting into compressed/encoded code, buying capacity, changing subscriptions, or weakening strategy economics to fit an invented30KB provider limit. This changes packaging capacity only, not source-packet authority, membership, economics or attempt limits. Check each actual project's quota; do not assume all future projects share this limit. |
+| `TPR-OWN-57` | Continue using SPY as the first shared-runtime canary while its first failed diagnostic is corrected, before spending the other five candidates' launch attempts. A common subscription/accounting defect should be addressed once rather than knowingly replicated across six runs. | Reject launching all remaining cases through the known diagnostic defect merely to count six terminal statuses, and reject selecting another universe because SPY lost money. All six configurations remain frozen and all five other cases still require their own actual QC evidence. This is execution sequencing, not outcome-based tuning, an attempt refund or permission to exceed three attempts for SPY. |
+
+The uninterrupted round and single final-push instruction remain active,
+with the heartbeat paused. Nothing in this entry closes canonical
+TPR-TR0-I/TPR-1/TPR-0B gates, changes the sealed holdout or authorizes
+broker/live/paper activity. The next in-scope action is focused successor
+validation and the remaining bounded QC work, not an intermediate push or
+a claim that attempt2 or all six tests already succeeded.
+
+### 68.6 SPY attempt2: successor verification and usable order-based QC execution
+
+Following section68.5's failed diagnostic, the explicitly identified v2
+successor implemented the already documented subscription/audit corrections.
+The v1 source and negative attempt1 results remain immutable and visible;
+v2 does not reset any candidate's attempt counter. The same frozen six
+universe definitions, Q1-2025 dates, source packet, signal/ranking and
+economics apply. This is an engineering correction within OWN56/OWN57,
+not a change selected to improve the observed return.
+
+| Successor identity | SHA-256 / evidence |
+|---|---|
+| v2 cloud source | `00f4f3a55ddca276a954e78bb550eaeaafc4b1b95051b3a7f64554edbae464e3` |
+| Pure `bundle_v2.py` successor | `dc63ddbe682c638ce7f62fdb1ac7acded75d7bf86e7c15339213f62e1d9cd639` |
+| All-six v2 source-bundle receipt | `96bba5d5252c27a3911fc26fbdea381e46f26bd9d7c3eedb31ac78b3ee4e4931` |
+| Exact rendered SPY main source | `354dbf613017dc7fbf819e9557668de96a39729b4d5acd07b59b6472c5f7877d` |
+| Exact rendered SPY configuration module | `7301a43536b0a23ae32930222360612f0952648f76311ad4b4a5a58bd2b29838` |
+| SPY configuration JSON | `d3d80d20e410a77aa0b98e0eb6bad3dafff4bf4d6ffa13de3ae33279c979ac83` |
+
+The successor explicitly adds each selected/held actual Symbol with RAW
+normalization, checks the active non-internal minute subscription
+configuration, retains at most140 ever-selected subscriptions per case,
+and ends NAV auditing on the last actual evaluation date. The pure bundle
+successor requires an exact-integer project maxFileSize of at least60,000
+from actual metadata, and applies its fixed60,000-byte UTF-8 per-file cap
+both before and after hash-placeholder rendering. Six candidate identities,
+freeze/packet bindings and AST policy checks remain unchanged. No encoded
+or compressed code, v1 global mutation, quota purchase or subscription
+change is introduced.
+
+Root and a Codex peer reproduced the focused108-case successor/control
+check: 31 cloud-v2 tests, 36 bundle-v2 tests and 41 v1 controls; the peer
+reported **108 passed in 0.97s**. The bundle worker separately reported
+**36 passed in 0.33s** after restoring an in-memory reverse mutation:
+removing only the quota guard produced two `DID NOT RAISE` failures for
+valid source with None/59,999 quota. These are distinct focused invocations,
+not an additive full-suite count. They neither read operator state nor
+constitute independent Claude review or proof of cloud completion.
+
+| Runtime finding | Evidence, successor correction and disposition |
+|---|---|
+| `TPR-QC6-P06` P2 | Confirmed adapter admission/configuration defect: v1 could rely on automatic membership subscriptions and cache the first, potentially internal configuration rather than establish the actual traded RAW minute subscription; attempt1 had missing-security/mark observations and no January2 orders despite ten targets. The v2 explicit selected/held Symbol admission and active-configuration guard are implemented and focused-tested. Attempt2 has genuine execution and zero reported accounting/quantity residual. **Corrected in the successor**; do not infer from the original order metadata that every historical fill was Adjusted, or claim a uniquely proved dividend-provider root cause. |
+| `TPR-QC6-P07` P2 | Confirmed audit-boundary defect: v1 emitted a spurious April1 on-end NAV entry beyond the frozen March31 end, producing61 distinct valuation dates. The successor anchors final auditing to the last actual evaluation date; attempt2 reports60 valuation days ending March31. **Corrected in the successor**; the v1 log is retained, not rewritten. |
+
+Root observed the following actual SPY attempt2 evidence. The documentation
+worker has not reopened private results or performed another empirical run;
+root's peer audit of coverage/orders is ongoing at this entry.
+
+| SPY attempt2 evidence | Actual observation |
+|---|---|
+| Candidate / project | `TPR-QC6-SPY-v1` / `37524929`; second attempt of the same candidate, using the v2 implementation. |
+| Compile ID / terminal | `c57e6aa7ae66065ae7b0c96e9a3c34de-c123c58bf2a180664afadcc8ae81ff65`; `BuildSuccess`. |
+| Backtest ID / terminal | `e7f8e6f25c4f9a36b0b7df3dfbef5cc3`; `Completed`, error=None. |
+| Private retrieved result SHA-256 | `0d6d0ffb7fc1e7cd4963c37fa2f13449b38a79c2ac79f11918e49725c2fe0a47`. |
+| Execution | 118 orders and118 fill events, 2,891 filled shares; fees USD28.91. A separately verified completed-trade count is not inferred from fill-event count. |
+| Performance | End NAV USD90,504.39 from USD100,000; reported net return -9.496%, drawdown17.6%. The negative return is retained; interpretable execution is not an alpha or profitability claim. |
+| Decisions / valuation dates | Fourteen decisions, zero whole-decision refusals, 60 valuation days, final valuation March31. |
+| Subscription custody | 31 manually retained selected/held subscriptions, within the140-per-case bound. This is subscription coverage, not proof that all benchmark constituents have usable source signals. |
+| Accounting | Maximum reported cash/NAV reconciliation residual0 and position-quantity mismatches0. |
+| Requested / submitted | 5,119 requested shares and2,891 submitted shares; requested-minus-submitted shortfall2,228 shares. Emitted reason counters are cash_buffer35 and complete130; these are diagnostic reason counts, not additional orders or fill events. |
+| Run interpretability | `meaningful_execution=true`: real data/orders/fills and reconciled bookkeeping now support a usable SPY exploratory QC run, subject to the ongoing peer coverage/order audit and the source/universe limitations already frozen. |
+
+The apparent March14 GRMN dividend/cash mechanism remains a plausible
+explanation of part of v1's discrepancy, **not a historically proved
+causal diagnosis**. No new dividend source data was obtained to establish
+it. The zero successor residual is actual accounting evidence under the
+successor's admitted subscriptions; it does not retroactively establish
+which historical provider/configuration path caused every v1 difference.
+NAV reconciliation uses native QC marked holdings, not independently
+sourced prices. Current-identity survivorship, censored-source inclusion,
+limited membership/signal coverage and changed local-versus-QC accounting
+economics still constrain interpretation. This remains a constituent-stock
+proxy test, not the complete original ETF/holdings strategy or canonical
+research acceptance.
+
+SPY has now consumed **two of three attempts** and two new cloud looks.
+Together with the two immutable historical local looks, there are **four
+observed runs to date**. Attempt1 remains the failed diagnostic in
+section68.5; it is neither erased nor refunded by attempt2's usable
+execution. Healthcare/XLV, Energy/XLE, Nasdaq-100/QQQ,
+Semiconductors/SOXX and Rare Earth/Strategic Metals/REMX each remain at
+zero attempts and have not yet been launched at this entry. The next
+authorized empirical step is their own bounded QC evaluations using the
+same frozen v2 economics and all-six bundle, with separate real completion,
+coverage, orders/fills, accounting and limitation evidence. Do not claim
+all six tested from this SPY result.
+
+Independent Claude review remains the next review role after the single
+final publication, not a routine intermediate gate in this uninterrupted
+round. The heartbeat remains paused, no checkpoint push is authorized,
+and canonical gates, the sealed holdout and all no-trading restrictions
+remain unchanged.
+
+### 68.7 Final six-case QC evidence: five meaningful runs and one zero-trade diagnostic
+
+All six frozen cases now have actual QC terminal results. **Five have
+verified, meaningful order-based execution; REMX is a zero-trade diagnostic,
+not a sixth successful order-based evaluation.** The failed SPY attempt1
+in section68.5 remains visible and consumed. The final cases below use
+SPY attempt2 and each other universe's attempt1, with the same frozen v2
+economics and original candidate identities. Every final compile result
+reports BuildSuccess; every final backtest result reports Completed,
+completed=true, progress1 and error=null. Those API fields alone are not
+the basis for the five meaningful-execution dispositions.
+
+The documentation worker independently read only the new permitted
+project/attempt/result/final-source metadata and measured its hashes.
+A Codex peer audited the six final logs/results and verified order pages;
+root independently repeated the completion, timing, cash, share and
+coverage assertions. These are Codex-team checks, not independent Claude
+review. No source packet, licensed source rows, D0 capture or old local
+outcome file was reopened for this aggregate audit. Reading the same
+retained run's receipt/log/order evidence is not a new empirical launch
+or an additional development look.
+
+Root's private completion-audit receipt SHA-256 is
+`a8eb5569e4aeb5c6b552bf49372e5ef1a517761d6a7f1bcdf2c8c25edfd70898`.
+The final private evidence index binds 90 attempt/result/log/order/source-
+verification receipts, including failed and loading responses, under SHA-256
+`3390f7b17abf2ffce7d32bad744aa2067bb870bde164b6438f597158f1412550`.
+It was built from those own-run receipts without reopening the signal packet.
+All six final-source receipts establish exact cloud readback of the
+respective main/configuration source, with no unrelated project overwrite.
+Every project reports maxFileSize64,000, owner=true and LEAN version18171.
+The default unchanged notebook hash is
+`212a51a9f8eb8c29ef77442c5b3db3cc0fe308d7c18f9f2c6ecf7ed86186778e`.
+Private market inputs and detailed results remain ignored; only aggregate
+evidence and content identities belong in this record/Git.
+
+#### 68.7.1 Exact runs and frozen source identities
+
+| Case / final attempt | Project ID | Compile ID | Backtest ID |
+|---|---|---|---|
+| SPY /2 | `37524929` | `c57e6aa7ae66065ae7b0c96e9a3c34de-c123c58bf2a180664afadcc8ae81ff65` | `e7f8e6f25c4f9a36b0b7df3dfbef5cc3` |
+| XLV /1 | `37539994` | `ea1364a070008312c0916d0bbd55fcbc-ef43c037e4a3c2215b2e25674d79283c` | `d11f84102aac39c1170751db374b23ca` |
+| XLE /1 | `37540034` | `a6aa25b42418a841fb175291e901def2-3233c4371e9851136df75e08d3705f9f` | `3e72313e117f1effad95c73a9c4cce39` |
+| QQQ /1 | `37540080` | `789e602487e3e293544a75458d05323f-5e677e453dacc97496bea0cea02824bf` | `8e2ea5c0dedfda23e4406fe4f55ab23c` |
+| SOXX /1 | `37540122` | `13d8b6b561fd81fe28f5982911a4861f-7cab17e4a40b97f3596e00a79366bc0d` | `462469d5411baee6d771a45fd17a3ded` |
+| REMX /1 | `37540166` | `6ea119c0de2c212cbda7e06191df28dd-19771afa5fe2d8ce4d9b9a6ee4a88498` | `b4f867f657b98fa29a070be9f7942693` |
+
+The launch-stage receipts initially record InQueue/launched; the separate
+compile-result receipts establish BuildSuccess and the final result
+receipts establish Completed. Preserve both stages, rather than editing
+an initial launch receipt into a success claim. The final common bindings
+are freeze SHA-256
+`3cf40af7325265b15f7de5e03f0667a1554c889fdd2db02de228a01b2fa97ccf`,
+private packet SHA-256
+`4dd3a9d800b7c1cb8114272c829ee18239972cc0a15c71e47a3e86ed6491a316`,
+v2 template SHA-256
+`00f4f3a55ddca276a954e78bb550eaeaafc4b1b95051b3a7f64554edbae464e3`,
+pure bundle-v2 source SHA-256
+`dc63ddbe682c638ce7f62fdb1ac7acded75d7bf86e7c15339213f62e1d9cd639`,
+and all-six `source-bundle.v2.json` SHA-256
+`96bba5d5252c27a3911fc26fbdea381e46f26bd9d7c3eedb31ac78b3ee4e4931`.
+The exact authorized source-structure and executed operations hashes
+remain those frozen in sections68.3–68.4; neither was changed after use.
+
+| Case | Rendered `main.py` SHA-256 | Rendered configuration module `signal_packet.py` SHA-256 | Configuration JSON SHA-256 |
+|---|---|---|---|
+| SPY | `354dbf613017dc7fbf819e9557668de96a39729b4d5acd07b59b6472c5f7877d` | `7301a43536b0a23ae32930222360612f0952648f76311ad4b4a5a58bd2b29838` | `d3d80d20e410a77aa0b98e0eb6bad3dafff4bf4d6ffa13de3ae33279c979ac83` |
+| XLV | `4b106b43999de26f0cede140eb4690d705578e593573f3a18fc3b394f3dcb971` | `dc73d3e9de7165d79b1c2f2e013ef918c894fe6648498a405c2d6b0e4e51e534` | `6fa02c8abe9f38423d5b4fcee4c4da711a1b6a7f4523e1470b745d37d6565a34` |
+| XLE | `0c9da3bbc98446828bf087cfbf9008a9281518ae581bad1c1b42e48182e19bcd` | `a233c19616fef41dc0ea71e0418ebbcaabe9dc70726fbf4ba64e2fa4131eb564` | `a5c364c16f5e3b7695ca3aeb7b5b01e2e1a6cecd2695a764fd98505b2d5c8578` |
+| QQQ | `2f0477b59eeb66432d79a3265afbdd7eec4cc5b31845f300360dae3dea25009d` | `0108fd3b28c17ebc60f7e5edab916a734791f39de0a5b5ba67873091ee906145` | `4f4573f8178f048bd1c07065e263b81fef2212d9a4b20e35efcab68d85f2e8a0` |
+| SOXX | `7ed35c91aacb343557c7b81446a420a4657009e15de43fd247d7a2039082b151` | `d00f938cb10812e0039cfce2b5508a16ec23bea0fc43c2c322ff9cb3f3af8fa7` | `33a478fe45521384278930dc6956239792fe7672d888ce1f0b1402ac5cb9ac86` |
+| REMX | `a672462ecd33fe9a48813ac420bbac7dca7afd3c87904c2f84bacc1989c5618a` | `734954d7b195a7560fceadef9b0c1d9d260a98e0db07a186a2430177d5cfecc9` | `a121283a0f208e745667d8fd05cf70b7039f5d59c1148ced4e73485c8ed61311` |
+
+The module named `signal_packet.py` is readable configuration referring
+to the private plaintext Object Store input; the table does not publish
+the underlying licensed signal rows.
+
+| Case | Final result receipt SHA-256 | Final exact-cloud-source verification receipt SHA-256 |
+|---|---|---|
+| SPY | `0d6d0ffb7fc1e7cd4963c37fa2f13449b38a79c2ac79f11918e49725c2fe0a47` | `e9083964c2548ea782fb845cd10a863c53f28adad4c6fdf56c1c4d8848e6f2f3` |
+| XLV | `3a0f681287a021e59cbf8675f6531d8bae1901ac15642b5efe480d20432b1229` | `4bb8834fc29ebc599b10da4c8624134ab228b749d5ec5b1a395e55a6a69546a0` |
+| XLE | `c609567a11e5ef4592fae0a6f996fb9d8be28a43c12c385a02309d4c83ca7745` | `43e3a66f572c3dc584dfd971b05053c470528b3d9f3ab163e6b83bf45a8658f7` |
+| QQQ | `7180af8d7aaf23d1e38553bb54cc92c28be54e2831bb48e53def003db040be92` | `e30d92aceb5d6d899421ca45df1d8f2deef138d050e61e5c49ed35a911264174` |
+| SOXX | `be6edb713c2c5564021e366dc9aa0aff9584feff5d5c5c5b427abf0e921ac29f` | `5227c8a3fbcf261be196abded1b174a17c7b800b3df048622b69e9a2f7e40449` |
+| REMX | `b1ba4098312790157cdbc391036e2c135cb159944c3e0d4fc91c0efbcc44b858` | `501b2f7600b260b03f8fd23329d59cf75e7afce5adeb9fae62e1adff30f02502` |
+
+#### 68.7.2 Actual execution, performance and accounting
+
+All six use the frozen January2–March31,2025 evaluation window, USD100,000
+initial cash, fourteen exact frozen decision dates and sixty NYSE-session
+daily-close valuations. January9/20 and February17 are excluded session
+dates. Final valuation is March31; the engine's subsequent end callback
+does not create an April1 evaluation NAV. The final order pages are complete
+and deduplicated: SPY, XLV and QQQ use verified pages0/99; XLE, SOXX and
+REMX use page0. All nonzero orders have unique IDs, Filled status3, MOO
+type4, RAW priceAdjustmentMode0, USD currency and summary-matching shares.
+Observed fees equal exactly USD0.01 per filled share. Every submitted
+order filled; there are no unfilled submitted quantities in these final
+runs. This does not eliminate deliberately unsubmitted target shortfalls.
+
+| Case | Final exact NAV USD | Return from audit NAV % | QC drawdown % | Daily-close audit drawdown % | Orders / fill events / closed trades | Filled shares / fees USD | Disposition |
+|---|---:|---:|---:|---:|---|---|---|
+| SPY | 90,504.386005 | -9.495613995 | 17.6 | 16.90372499 | 118 /118 /71 | 2,891 /28.91 | Meaningful exploratory order-based run; prior failed attempt retained. |
+| XLV | 100,337.9359025 | +0.3379359025 | 9.3 | 9.10311504 | 107 /107 /58 | 4,296 /42.96 | Meaningful exploratory order-based run. |
+| XLE | 103,685.084655 | +3.685084655 | 9.0 | 8.57213443 | 77 /77 /48 | 1,744 /17.44 | Meaningful exploratory order-based run. |
+| QQQ | 91,537.64637 | -8.46235363 | 21.1 | 20.88179431 | 110 /110 /68 | 2,454 /24.54 | Meaningful exploratory order-based run. |
+| SOXX | 87,946.36387 | -12.05363613 | 15.3 | 14.01941128 | 47 /47 /23 | 874 /8.74 | Meaningful exploratory order-based run. |
+| REMX | 100,000 | 0 | 0 | 0 | 0 /0 /0 | 0 /0 | Zero-selection/zero-trade diagnostic only; meaningful_execution=false. |
+
+QC's displayed end-equity/return rounding differs from the exact retained
+audit NAV. Its reported drawdown and the independently recomputed maximum
+drawdown over sixty daily-close audits also differ; both are retained.
+No chart-sampling or intraday cause has been independently proved, so do
+not explain the difference by assumption or silently substitute one
+definition for the other. Closed trades are QC's separately checked
+closed-trade inventory, not an inference from orders/fill-event counts.
+
+All order submissions occurred at09:20 New York and all fills occurred
+before the09:35 cancellation boundary on the same decision day. SPY has
+116 fills at09:31 and two at09:33; XLV has106 at09:31 and one at09:32;
+the other nonzero cases fill at09:31. The peer's initial overstrict
+assertion that every fill was at09:31 failed; it was replaced by the
+observation-based same-decision-day/before-cancellation check. That audit
+assertion failure is retained, not a hidden extra launch or a new market
+look, and the exact cause of the delayed fills is not established.
+
+| Case | Requested / submitted shares | Unsubmitted share shortfall | Planner reason counts |
+|---|---|---:|---|
+| SPY | 5,119 /2,891 | 2,228 | cash_buffer35; complete130 |
+| XLV | 5,426 /4,296 | 1,130 | cash_buffer25; complete128 |
+| XLE | 1,744 /1,744 | 0 | complete80 |
+| QQQ | 3,415 /2,454 | 961 | cash_buffer32; complete125 |
+| SOXX | 874 /874 | 0 | complete61 |
+| REMX | 0 /0 | 0 | No planner intents/reasons. |
+
+The shortfalls sum share units across names and are plan-level unsubmitted
+quantities, **not partial exchange fills**. `complete` includes zero-delta
+planner intents and is not a fill count. No final-run reason is a volume
+cap. The frozen cash rule reserves3% of available pretrade cash and excludes
+anticipated sell proceeds; it is not a constant3%-of-NAV cash floor and
+can create path-dependent cash drag. The configured slippage assumption
+is0.001 per side; fees and executed fill cash were checked, but this audit
+does not independently source historical execution prices to isolate
+realized spread/slippage/market-impact costs.
+
+| Case | Gross exposure % min / daily mean / max / end | Cash USD min / daily mean / max / end |
+|---|---|---|
+| SPY | 67.59240830 /83.62797268 /98.64903304 /79.79044242 | 1,264.292535 /16,304.231147 /32,651.477450 /18,290.536005 |
+| XLV | 69.95809807 /88.98285958 /98.94433603 /89.06494757 | 1,080.3425325 /11,491.591379 /31,523.9028625 /10,972.0059025 |
+| XLE | 39.75151484 /53.19577472 /68.79872870 /50.18210688 | 31,399.349205 /48,297.263046 /62,372.793485 /51,653.724655 |
+| QQQ | 67.08935565 /85.81126046 /98.71057387 /78.91616495 | 1,338.267370 /14,385.820371 /33,415.887850 /19,299.646370 |
+| SOXX | 19.15028536 /42.45523145 /60.26465682 /49.51372414 | 37,401.202830 /56,357.932761 /81,328.381110 /44,400.843870 |
+| REMX | 0 /0 /0 /0 | 100,000 /100,000 /100,000 /100,000 |
+
+Means are arithmetic means of the sixty daily-close observations; cash
+means are rounded to six decimals. All cash is nonnegative and gross
+exposure lies in[0,1]. For every final run, maximum reported cash/NAV ledger
+residual and position-quantity mismatches are zero. Independently rebuilding
+cash from signed own fill notionals and fees implies net nontrade cash of
+SPY182.05, XLV75.03, XLE380.14, QQQ48.78, SOXX92.01 and REMX0 USD. This is
+inferred aggregate net corporate cash, not an independently itemized
+dividend/split audit. The cash/share reconstruction is independent; NAV
+still uses native QC marked holdings rather than independently sourced
+prices. Section68.5's failed residual and the unproved historical GRMN
+mechanism are not retroactively erased by these zero successor residuals.
+
+#### 68.7.3 Measured membership and signal coverage
+
+Every final run has fourteen exact decisions and no whole-decision
+refusals. Peer checks confirm membership receipt<=cutoff and effective
+snapshot age7–21 calendar days. Coverage category counts sum to the
+callback member count; selected count is at most10 and retained manual
+subscriptions at most140. The following ranges span the fourteen
+decisions. Parentheses are **summed reported ETF weights in percentage
+points**, not percentages renormalized to the returned callback subset.
+Extrema in different columns need not occur on the same date.
+
+| Case | Callback members / total reported weight % | Scored count (weight %) | Ineligible count (weight %) | Unknown-input count (weight %) | Missing-identity / no-admissible-event count (weight %) |
+|---|---|---|---|---|---|
+| SPY | 502–503 /99.591578–99.870691 | 331–342 (69.732875–72.429177) | 131 (22.302300–22.878996) | 19–28 (4.391951–6.065137) | Missing8 (0.666281–0.747553); no-event1–4 (0.046806–0.208531) |
+| XLV | 61 /99.374147–99.845332 | 53–54 (73.254727–76.913628) | 6 (10.578337–11.478315) | 1–2 (11.431372–15.889275) | Missing0; no-event0 |
+| XLE | 22 /98.848180–99.697419 | 15–16 (75.025077–79.608752) | 4 (10.124473–10.677563) | 1–2 (7.921051–12.148616) | Missing0; no-event1 (1.536044–1.899393) |
+| QQQ | 100–101 /97.203–100.001 | 74–76 (78.722–80.328) | 20–21 (13.937–17.347) | 4–5 (2.775–3.684) | Missing0; no-event0–1 (0–0.351) |
+| SOXX | 30 /99.7–99.85 | 20 (69.49–70.83) | 9 (24.86–26) | 1 (3.87–4.49) | Missing0; no-event0 |
+| REMX | 8–9 /37.33–45.11 | 1 (2.85–4.01) | 7–8 (34.45–41.16) | 0 | Missing0–1 (0–2.80); no-event0 |
+
+Unknown-weight counts are zero for all six; only SPY has zero-weight
+members, varying0–1. QQQ's reported total reaches100.001%; neither rounding
+nor the coverage/composition explanation is independently established.
+Preserve the reported sums rather than manufacturing exact100% coverage.
+Current source identity remains non-PIT/survivorship-biased; historical
+callbacks do not turn these into unbiased official-index backtests.
+
+SPY, XLV and QQQ select ten names at every decision. XLE selects
+6,6,6,6,6,5,4,5,6,7,5,4,4,5; SOXX selects
+2,2,2,2,4,4,4,5,5,6,6,6,6,5. REMX selects zero throughout. Positive-score
+count is not directly logged: the frozen ranking code makes selected<10
+equal the positive scored count among admitted weighted members, while
+selected10 establishes only at least10 positives, not their exact total.
+Missing identities, ineligible identities and unknown inputs remain
+distinct from zero signals in both this interpretation and the evidence.
+
+#### 68.7.4 REMX diagnostic and bounded stopping decision
+
+REMX's returned callback weight is only37.33–45.11% of unit ETF weight;
+the remaining54.89–62.67% is not compositionally explained by this evidence.
+Do not infer its holdings, signal direction or returns, and do not
+renormalize the available slice into full global thematic coverage.
+The single admitted scored member has2.85–4.01% reported weight on each
+date; seven or eight ineligible members carry34.45–41.16%, and zero or
+one missing identity carries0–2.80%. There are no unknown-input/no-event,
+unknown-weight or zero-weight cases in the returned REMX snapshots.
+
+The frozen ranker includes positive, scored, eligible weighted members
+before applying the top-ten cap. Its zero selections with exactly one
+admitted scored member establish that member's score was **nonpositive**
+at each decision; aggregate evidence cannot distinguish zero from
+negative. This conclusion uses the frozen ranking logic and aggregate
+counts, not reopened private packet rows. There are no REMX order
+requests, subscription/mark refusals or execution errors to fix: manual
+subscriptions, planner intents, submitted shares and fills are all zero,
+and all sixty cash/NAV observations are USD100,000. The zero-trade outcome
+is explained by the frozen available coverage/eligibility and signal
+selection, not accepted as successful order-based thematic validation.
+
+`TPR-OWN-58` records the delegated decision to stop this unchanged REMX
+candidate after its one explained diagnostic rather than spend its two
+unused attempts. Provenance is the owner's continuous-round/best-judgment
+direction together with the prospective no-after-outcome-tuning freeze
+and the actual coverage/selection evidence above. Chosen option: preserve
+the diagnostic, unused attempt capacity, negative/nonpositive selection
+and limitation in the stable final handoff. Rationale: repeating identical
+inputs cannot create evidence of intended orders, while changing a
+frozen universe, forcing trades or substituting a different signal after
+seeing results changes the experiment. Alternatives rejected are an
+unchanged rerun merely to exhaust capacity, invented/fixture trades,
+post-outcome eligibility loosening, or silently switching to ETF trading.
+Scope is this bounded exploratory round only; no source facts or rights
+are manufactured and no canonical gate is bypassed. This is an
+agent-delegated decision, not separately human- or Claude-approved;
+independent review remains pending.
+
+Consequently, the full six-meaningful-order-based objective and full
+original ETF/holdings strategy are **not complete**. REMX is a genuine
+factual coverage/signal limitation under the frozen design, not an access
+paperwork gate or an excuse to use a parked canonical milestone as a
+development blocker. Any successor seeking materially broader thematic
+evidence needs an explicitly fresh, pre-result-frozen design with
+admissible data/membership evidence and its own bounded operations/look
+receipts; it cannot silently replace this observed case. No further
+launch is authorized by a stale heartbeat or a self-triggered publication.
+
+### 68.8 Stable aggregate handoff and next independent-review role
+
+This round's attempt counts are SPY2, XLV1, XLE1, QQQ1, SOXX1, REMX1:
+**seven actual cloud launches/development looks**, plus the two retained
+historical local looks, for **nine observed runs to date**. Each compile
+and associated backtest belongs to its already reserved attempt; they
+are not counted as two attempts when they are stages of the same launch
+attempt. The failed first SPY run counts and remains visible. No candidate
+reached three unsuccessful attempts, so the Mia recovery rule was not
+triggered and no Mia intervention or cloud-source mutation is claimed.
+Remaining capacity is not permission to rerun after this final handoff.
+
+Readiness is now differentiated: a lane-owned readable LEAN/QC entrypoint,
+private signal integration, simultaneous universe/run freeze, bounded
+operational receipts, exact source readbacks and actual order/fill/accounting
+evidence exist. Five constituent-stock cases have verified usable QC
+execution; REMX has only the explained zero-trade diagnostic. Positive
+XLV/XLE returns do not outweigh or conceal negative SPY/QQQ/SOXX results,
+the failed SPY diagnostic, source-vintage limitations or shared-universe
+overlap. These are correlated exploratory results with confirmatory
+alpha0, not independent confirmatory alpha or deployment approval.
+The original ETF strategy, complete global thematic coverage and unbiased
+point-in-time official-index tests are not established.
+
+The durable review basis is the accepted-after-correction counter-review
+of all three incoming Claude commits in section67, then the continuous
+Codex successor build/verification and all empirical attempts in section68.
+The next independent reviewer is **Claude**, reviewing every final Codex
+commit separately and the cumulative range from exact incoming snapshot
+`530e95a554a9d06e954cf86df44d3a591d6d4996` through the final Codex published
+snapshot. The right boundary is the actual final commit reported in this
+chat and verified by `git rev-parse HEAD`/matching remote after the one
+push, not a fabricated self-referential hash in this uncommitted record.
+Root must append final validation and publication evidence; this entry
+does **not** claim that a commit or push has already succeeded.
+
+Claude should independently reproduce the appropriate lane suite in the
+designated worktree, review every decision OWN48–OWN58 and all correction
+and failed-run evidence, verify the exact source/receipt identities and
+five-versus-one classification, and assess the still-qualified financial
+and source-validity claims. No alternate clone/checkout is authorized for
+that validation. Codex used focused/import-boundary/document/compilation
+checks rather than a complete lane/repository suite. In particular the
+final current-routing document guard first failed as expected against its
+stale prior wording (one failure in6.14s), then passed after its pointer
+was corrected (one pass in0.50s). Retain that red/green history. The final
+combined focused validation is separately root-owned and not pre-claimed
+here.
+
+The six canonical open findings remain exactly `TPR-CCR1-006`,
+`TPR-CCR2-011`, `TPR-CCR5-004`, `TPR-CCR10-012`, `TPR-CCR10-013` and
+`TPR-CCR10-016`; this exploratory success closes none of them.
+TPR-TR0-I stays parked/incomplete and TPR-1/TPR-0B admission gates remain
+unclosed. OOL011 is corrected/accepted in this lane while shared
+synchronization remains owner-coordinated; OOL003/004/006 stay closed.
+Shared Action Plan, Session Handoff, workflows and sibling behavior remain
+frozen. The sealed holdout, frozen historical artifacts and research
+allocation are unchanged. macOS evidence proves no native Windows signer,
+ACL or protected-parent custody; the fourteen frozen-Windows-Git cases
+and isolated runtime-root testing rules remain intact.
+
+The heartbeat stays **PAUSED** during and after the one final successful
+non-force publication to the matching lane only; do not rearm it or
+trigger on Codex's own push. Root must reverify the physical/Git root,
+branch, HEAD, staged diff, status and actual matching remote before
+commits/push, then actual local/remote equality and clean status afterward.
+No live/paper deployment, funded account, broker action, purchase,
+subscription change, operator-database read, public dataset publication
+or actual trading authority was granted or inferred.
+
+### 68.9 Final focused validation before publication
+
+Root's final isolated-runtime-root validation preserves both unsuccessful
+invocations: an incorrect guessed pytest node caused a collection error
+with zero tests executed in0.04s; after the node was corrected, the173-case
+focused selection returned **168 passed, 5 failed in2.93s**. Those five
+failures exposed this round's next-role wording, whose adverb placement
+was outside the existing closed documentation grammar.
+The prose and its new pointer assertion were corrected to `Claude next
+reviews this Codex round independently`; the closed grammar/regex was
+**not weakened**. The corrected selection then returned **173 passed
+in2.70s**: 103 lane-document cases, 69 active-document cases and one packet
+import-boundary case. These are separate invocations, not a combined
+success total; neither validation failure was a QC launch, a new empirical
+look or a cancelled strategy test.
+
+Root additionally AST-compiled fourteen QC source/test modules, reconfirmed
+fourteen frozen artifact hashes, verified that the private payload remains
+ignored, and reconciled the private operational census to **91 QC API
+requests, six new projects and seven reserved attempts/actual backtest
+launches**. The seven launches are the seven looks already counted in
+section68.8, not seven additional looks. The heartbeat's saved TOML status
+was verified PAUSED. The documentation worker's preceding post-append
+focused check returned103 passed in2.06s and `git diff --check` exited zero.
+
+These checks are focused Codex validation, not a complete lane/repository
+suite or independent Claude acceptance. The native-Windows and fourteen
+frozen-Windows-Git exclusions remain as previously stated; no production
+trust boundary was weakened for host-green tests. Root still owns the
+last record review, final document/diff/status checks, exact commit-range
+capture and one successful matching-lane non-force push with post-push
+head equality/clean-status verification. Publication has **not** been
+claimed by this pre-commit validation entry.

@@ -598,7 +598,7 @@ def test_private_root_without_owner_only_mode_is_refused(bundle):
 
 
 @pytest.mark.parametrize("cwd_is_lane,git_values,message", [
-    (False, None, "designated physical lane"),
+    (False, (None, controller.LANE_BRANCH), "designated physical lane"),
     (True, ("/SYNTHETIC/other-toplevel", controller.LANE_BRANCH), "lane identity mismatch"),
     (True, (None, "codex/SYNTHETIC-other-branch"), "lane identity mismatch"),
     (True, OSError, "lane identity unavailable"),
@@ -613,9 +613,11 @@ def test_lane_verification_refuses_foreign_cwd_toplevel_or_branch(monkeypatch, t
     monkeypatch.setattr(controller, "LANE_ROOT", lane.resolve())
     monkeypatch.chdir(lane if cwd_is_lane else tmp_path / "other")
     answers = iter(git_values if isinstance(git_values, tuple) else ())
+    git_calls = []
 
     def fake_run(command, **kwargs):
         assert kwargs["cwd"] == controller.LANE_ROOT and kwargs["capture_output"] and kwargs["check"]
+        git_calls.append(command)
         if git_values is OSError:
             raise OSError("synthetic git failure")
         value = next(answers)
@@ -627,3 +629,9 @@ def test_lane_verification_refuses_foreign_cwd_toplevel_or_branch(monkeypatch, t
     else:
         with pytest.raises(controller.RawRunError, match=message):
             controller._verify_lane()
+    if not cwd_is_lane:
+        # Valid lane Git answers must not launder a foreign current directory.
+        assert git_calls == []
+    else:
+        expected = [["git", "rev-parse", "--show-toplevel"], ["git", "branch", "--show-current"]]
+        assert git_calls == (expected[:1] if git_values is OSError else expected)

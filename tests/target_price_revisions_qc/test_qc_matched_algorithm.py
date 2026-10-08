@@ -1,0 +1,532 @@
+"""Synthetic-only matched construction, custody and control-independence proofs."""
+from copy import deepcopy
+from datetime import date, datetime, timedelta, timezone
+from decimal import Decimal, localcontext
+from fractions import Fraction
+import hashlib
+import json
+from pathlib import Path
+import sys
+from types import ModuleType, SimpleNamespace
+
+import pytest
+
+ROOT = Path(__file__).resolve().parents[2]
+LANE = ROOT / "research/target_price_revisions_qc"
+FREEZE_SHA = "a0645dce96d1153de4a6709b4d39c1d8cc0c583950a76421220e00539a9521d0"
+CORE_SHA = "00f4f3a55ddca276a954e78bb550eaeaafc4b1b95051b3a7f64554edbae464e3"
+
+
+@pytest.fixture
+def matched(monkeypatch):
+    api = ModuleType("AlgorithmImports")
+    api.FeeModel = type("FeeModel", (), {})
+    api.QCAlgorithm = type("QCAlgorithm", (), {})
+    api.SplitType = SimpleNamespace(SPLIT_OCCURRED="occurred")
+    api.OrderStatus = SimpleNamespace(INVALID="invalid", CANCELED="canceled")
+    api.Universe = SimpleNamespace(UNCHANGED="unchanged")
+    api.Resolution = SimpleNamespace(MINUTE="minute", DAILY="daily")
+    api.TickType = SimpleNamespace(TRADE="trade", QUOTE="quote")
+    api.DataNormalizationMode = SimpleNamespace(RAW=0, ADJUSTED=1)
+    api.SecurityType = SimpleNamespace(EQUITY="equity", BASE="base")
+    api.TradeBar = type("TradeBar", (), {})
+    api.ConstantSlippageModel = lambda value: ("slippage", value)
+    api.ImmediateSettlementModel = lambda: "immediate"
+    monkeypatch.setitem(sys.modules, "AlgorithmImports", api)
+    core = ModuleType("proxy_core")
+    source = LANE / "cloud_algorithm_v2.py"
+    exec(compile(source.read_bytes(), str(source), "exec"), core.__dict__)
+    monkeypatch.setitem(sys.modules, "proxy_core", core)
+    module = ModuleType("matched_algorithm")
+    source = LANE / "matched_algorithm.py"
+    exec(compile(source.read_bytes(), str(source), "exec"), module.__dict__)
+    return module
+
+
+class Symbol:
+    def __init__(self, identifier, value=None):
+        self.id, self.value = identifier, value or identifier
+
+
+class Security:
+    def __init__(self, symbol):
+        self.symbol, self.has_data = symbol, True
+        self.type = "equity"
+        self.subscriptions = [SimpleNamespace(data_normalization_mode=0,
+            is_internal_feed=False, resolution="minute", tick_type="trade")]
+
+    @property
+    def data_normalization_mode(self):
+        return self.subscriptions[0].data_normalization_mode
+
+    def set_data_normalization_mode(self, mode):
+        for config in self.subscriptions:
+            config.data_normalization_mode = mode
+
+    def set_leverage(self, value):
+        self.leverage = value
+
+    def set_fee_model(self, value):
+        self.fee = value
+
+    def set_slippage_model(self, value):
+        self.slippage = value
+
+    def set_settlement_model(self, value):
+        self.settlement = value
+
+
+def encoded(body):
+    text = json.dumps(body, sort_keys=True, separators=(",", ":"))
+    return text, hashlib.sha256(text.encode()).hexdigest()
+
+
+def config(matched, arm="tpr_on", cost="baseline"):
+    candidate, slippage = matched.CANDIDATES[arm, cost]
+    return {"schema": "tpr-qc-matched-config-v1", "study_id": matched.STUDY,
+            "freeze_sha256": FREEZE_SHA, "candidate_id": candidate,
+            "arm": arm, "cost": cost, "slippage": slippage}
+
+
+def member(identifier, weight="0.1", ticker=None):
+    return {"symbol": Symbol(identifier, ticker), "ticker": ticker or identifier, "weight": weight}
+
+
+def algorithm(matched, arm="tpr_off"):
+    algo = matched.TargetPriceMatchedAlgorithm()
+    algo.live_mode, algo.is_warming_up = False, False
+    algo.time, algo.utc_time = datetime(2025, 1, 2, 9, 20), datetime(2025, 1, 2, 14, 20)
+    algo._config = config(matched, arm)
+    algo._identities, algo._frames = {}, {}
+    algo._snapshots = {etf: [] for etf in matched.ETFS}
+    algo._symbols, algo._split_factors, algo._custody_since = {}, {}, {}
+    algo._delisted_ids, algo._manual_symbols, algo._valuation_days = set(), set(), set()
+    algo._targets, algo._target_weights, algo._decision_coverage, algo._tickets = {}, {}, {}, []
+    algo._attempted_days, algo._reasons = set(), {}
+    algo._cash_ledger, algo._quantity_ledger, algo._dividend_keys = Fraction(100000), {}, set()
+    algo._prior_close_nav, algo._prior_close_day = Fraction(100000), None
+    algo._fees, algo._fill_events, algo._submitted = Fraction(0), 0, 0
+    algo._requested_shares = algo._submitted_shares = algo._filled_shares = 0
+    algo._max_cash_residual = algo._max_nav_residual = Fraction(0)
+    algo._decision_count = algo._refused_count = algo._position_ledger_mismatches = 0
+    algo._risk_breaches, algo._name_soft_cap_breaches = 0, 0
+    algo._max_name_exposure = Fraction(0)
+    algo._sleeve_selected_decisions = {etf: 0 for etf in matched.ETFS}
+    algo._etf_symbols = {etf: Symbol("ETF-" + etf, etf) for etf in matched.ETFS}
+    algo.securities = {}
+    algo.subscription_manager = SimpleNamespace(subscription_data_config_service=SimpleNamespace(
+        get_subscription_data_configs=lambda symbol, internal: list(algo.securities[symbol].subscriptions)))
+    algo.portfolio = SimpleNamespace(cash="100000", total_portfolio_value="100000",
+                                    total_holdings_value="0", values=lambda: [])
+    algo.logs, algo.orders, algo.add_calls = [], [], []
+    algo.log = algo.logs.append
+    algo.market_on_open_order = lambda symbol, quantity, **kwargs: algo.orders.append((symbol, quantity)) or "ticket"
+    def add_security(symbol, resolution, **kwargs):
+        algo.add_calls.append((symbol, resolution, kwargs))
+        return algo.securities.setdefault(symbol, Security(symbol))
+    algo.add_security = add_security
+    class History:
+        def __getitem__(self, kind):
+            return lambda symbol, count, resolution: [SimpleNamespace(
+                time=datetime(2024, 12, 31, 9, 30), end_time=datetime(2024, 12, 31, 16),
+                close="100", volume="100000")]
+    algo.history = History()
+    return algo
+
+
+def snapshots_for_first_decision(algo, matched):
+    cutoff = matched.core._clock(matched.CUTOFFS[0])
+    for etf in matched.ETFS:
+        algo._snapshots[etf] = [{"effective": cutoff - timedelta(days=7),
+            "received": cutoff - timedelta(days=6), "members": [member("COMMON")]}]
+
+
+def complete_evidence(algo, matched):
+    algo._attempted_days = set(matched.DECISIONS)
+    algo._decision_count, algo._fill_events = 14, 1
+    algo._decision_coverage = {day: {"sleeves": {etf: {} for etf in matched.ETFS}}
+                               for day in matched.DECISIONS}
+    start = date(2025, 1, 2)
+    holidays = {"2025-01-09", "2025-01-20", "2025-02-17"}
+    algo._valuation_days = {(start + timedelta(days=offset)).isoformat() for offset in range(89)
+        if (start + timedelta(days=offset)).weekday() < 5
+        and (start + timedelta(days=offset)).isoformat() not in holidays}
+    assert len(algo._valuation_days) == 60
+    algo._prior_close_day = date(2025, 3, 31)
+    algo.time, algo.utc_time = datetime(2025, 4, 1), datetime(2025, 4, 1, 4)
+
+
+def summary(algo):
+    algo.on_end_of_algorithm()
+    return json.loads(algo.logs[-1].split(" ", 1)[1])
+
+
+def test_exact_freeze_and_executed_core_remain_immutable(matched):
+    assert hashlib.sha256((LANE / "matched_freeze.json").read_bytes()).hexdigest() == FREEZE_SHA
+    assert hashlib.sha256((LANE / "cloud_algorithm_v2.py").read_bytes()).hexdigest() == CORE_SHA
+    assert matched.DECISIONS == matched.core.DECISIONS and matched.CUTOFFS == matched.core.CUTOFFS
+
+
+def test_all_six_exact_configs_admitted(matched):
+    for arm, cost in matched.CANDIDATES:
+        body = config(matched, arm, cost)
+        text, digest = encoded(body)
+        assert matched.validate_config(text, digest, FREEZE_SHA) == body
+
+
+@pytest.mark.parametrize("field,value", [
+    ("schema", "old"), ("study_id", "renamed"), ("freeze_sha256", "1" * 64),
+    ("candidate_id", "TPR-MATCHED-OFF-BASE-v1"), ("arm", "ar_on"),
+    ("cost", "free"), ("slippage", "0"), ("slippage", "0.0010")])
+def test_configuration_mutations_refuse(matched, field, value):
+    body = config(matched)
+    body[field] = value
+    text, digest = encoded(body)
+    with pytest.raises(ValueError, match="frozen matched"):
+        matched.validate_config(text, digest, FREEZE_SHA)
+
+
+def test_config_hash_unknown_field_and_duplicate_key_refuse(matched):
+    body = config(matched)
+    text, digest = encoded(body)
+    with pytest.raises(ValueError, match="hash"):
+        matched.validate_config(text + " ", digest, FREEZE_SHA)
+    body["extra"] = True
+    text, digest = encoded(body)
+    with pytest.raises(ValueError, match="closed schema"):
+        matched.validate_config(text, digest, FREEZE_SHA)
+    text = text[:-1] + ',"arm":"tpr_on"}'
+    with pytest.raises(ValueError, match="duplicate"):
+        matched.validate_config(text, hashlib.sha256(text.encode()).hexdigest(), FREEZE_SHA)
+
+
+def test_neutral_rank_uses_weight_native_id_not_input_order_or_tpr(matched):
+    members = [member(f"ID-{i:02}", "0.1", f"TICK-{99-i}") for i in reversed(range(12))]
+    members += [member("UNKNOWN", None), member("ZERO", "0")]
+    selected, coverage = matched.rank_neutral_members(members)
+    assert tuple(selected) == tuple(f"ID-{i:02}" for i in range(10))
+    assert coverage["known_weight"] == {"count": 12, "weight": Fraction(6, 5)}
+    assert coverage["unknown_weight"]["count"] == coverage["zero_weight"]["count"] == 1
+    members[-3]["weight"] = "0.5"
+    assert next(iter(matched.rank_neutral_members(members)[0])) == members[-3]["symbol"].id
+
+
+@pytest.mark.parametrize("members", [
+    [member("A"), member("A")], [member("A", ticker="SAME"), member("B", ticker="SAME")],
+    [member("A", "-0.1")], [member("A", "1.01")], [member("A", "NaN")]])
+def test_membership_ambiguity_and_invalid_weight_refuse(matched, members):
+    with pytest.raises(ValueError):
+        matched.rank_neutral_members(members)
+
+
+def test_signal_rank_keeps_frozen_source_ties_missing_states_and_positive_rule(matched):
+    identities = {sid: {"ticker": ticker, "eligible": eligible} for sid, ticker, eligible in
+                  [("SOURCE-A", "A", True), ("SOURCE-Z", "Z", True), ("REFUSED", "R", False)]}
+    frame = {"states": [
+        {"security_id": "SOURCE-A", "state": "scored", "score": ".5"},
+        {"security_id": "SOURCE-Z", "state": "scored", "score": ".5"},
+        {"security_id": "REFUSED", "state": "identity_ineligible", "score": None}]}
+    members = [member("NATIVE-Z", ticker="A"), member("NATIVE-A", ticker="Z"),
+               member("REFUSED", ticker="R"), member("MISSING"), member("UNKNOWN", None)]
+    selected, coverage = matched.rank_signal_members(identities, frame, members)
+    assert tuple(selected) == ("NATIVE-Z", "NATIVE-A")  # source-ID, not native-ID score tie
+    assert coverage["ineligible"]["count"] == coverage["missing_identity"]["count"] == 1
+    assert coverage["unknown_weight"]["count"] == 1
+    frame["states"][0]["score"] = "0"
+    assert tuple(matched.rank_signal_members(identities, frame, members)[0]) == ("NATIVE-A",)
+
+
+def test_overlapping_sleeves_consolidate_exact_id_and_leave_missing_slots_cash(matched):
+    same = Symbol("SAME")
+    selected = {etf: {same.id: same} for etf in matched.ETFS}
+    symbols, weights = matched.consolidate_slots(selected)
+    assert symbols == {"SAME": same} and weights == {"SAME": Fraction(1, 10)}
+    selected["REMX"] = {}
+    assert matched.consolidate_slots(selected)[1] == {"SAME": Fraction(1, 12)}
+    selected["SPY"] = {"FOREIGN": same}
+    with pytest.raises(ValueError, match="identity mismatch"):
+        matched.consolidate_slots(selected)
+    with pytest.raises(ValueError, match="six sleeves"):
+        matched.consolidate_slots({})
+
+
+def test_weighted_sizing_is_exact_consolidated_sells_first_without_recycling(matched):
+    orders = matched.plan_weighted_orders({"A": Fraction(1, 60)}, {"Z": 100},
+        {"A": ("10", "100000"), "Z": ("10", "100000")}, "60000", "0", "0.001")
+    assert orders == [
+        {"security_id": "Z", "requested": -100, "submitted": -100, "reason": "complete"},
+        {"security_id": "A", "requested": 100, "submitted": 0, "reason": "cash_buffer"}]
+    assert matched.plan_weighted_orders({"A": Fraction(1, 10)}, {}, {"A": (10, 100000)},
+        60000, 60000, "0.001")[0]["requested"] == 600
+    with localcontext() as context:
+        context.prec = 2
+        assert matched.plan_weighted_orders({"A": Fraction(1, 60)}, {}, {"A": (10, 100000)},
+            60000, 60000, "0.001")[0]["requested"] == 100
+
+
+def test_cash_volume_slippage_and_missing_marks_are_not_substitution(matched):
+    baseline = matched.plan_weighted_orders({"A": Fraction(1, 10)}, {}, {"A": (100, 10000)},
+        100000, 10011, "0.001")
+    adverse = matched.plan_weighted_orders({"A": Fraction(1, 10)}, {}, {"A": (100, 10000)},
+        100000, 10011, "0.0015")
+    assert baseline[0]["submitted"] == 97 and adverse[0]["submitted"] == 96
+    assert baseline[0]["submitted"] * Fraction("100.11") <= Fraction("9710.67")
+    assert adverse[0]["submitted"] * Fraction("100.16") <= Fraction("9710.67")
+    capped = matched.plan_weighted_orders({"A": Fraction(1, 10)}, {}, {"A": (100, 500)},
+        100000, 100000, "0.001")
+    assert capped[0] == {"security_id": "A", "requested": 100, "submitted": 5, "reason": "volume_cap"}
+    missing = matched.plan_weighted_orders({"A": Fraction(1, 10)}, {}, {}, 100000, 100000, "0.001")
+    assert missing == [{"security_id": "A", "requested": None, "submitted": 0, "reason": "missing_mark"}]
+
+
+def test_etf_cap_difference_is_deliberate_and_closed(matched):
+    weights = {"ETF": Fraction(1, 6)}
+    with pytest.raises(ValueError, match="target weights"):
+        matched.plan_weighted_orders(weights, {}, {"ETF": (100, 100000)}, 60000, 60000, ".001")
+    assert matched.plan_weighted_orders(weights, {}, {"ETF": (100, 100000)},
+        60000, 60000, ".001", etf_arm=True)[0]["requested"] == 100
+
+
+@pytest.mark.parametrize("value", [True, None, "NaN", "Infinity", float("inf"), "-Infinity"])
+def test_native_invalid_number_refuses(matched, value):
+    with pytest.raises(ValueError):
+        matched.native_fraction(value)
+
+
+def test_native_numeric_boundary_is_decimal_capture_then_rational(matched):
+    assert matched.native_fraction(Decimal("0.1")) == matched.native_fraction("0.1") == Fraction(1, 10)
+    assert matched.native_fraction(0.1) == Fraction(1, 10)
+
+
+@pytest.mark.parametrize("arm", ["tpr_off", "etf_basket"])
+def test_neutral_and_etf_prepare_never_read_tpr_identity_state_or_score(matched, arm):
+    algo = algorithm(matched, arm)
+    class Forbidden(dict):
+        def __getitem__(self, key):
+            raise AssertionError("TPR input was read")
+        def values(self):
+            raise AssertionError("TPR identity was read")
+    algo._frames = algo._identities = Forbidden()
+    snapshots_for_first_decision(algo, matched)
+    algo._prepare_targets(matched.DECISIONS[0])
+    if arm == "tpr_off":
+        assert algo._target_weights == {"COMMON": Fraction(1, 10)}
+    else:
+        assert len(algo._target_weights) == 6 and set(algo._target_weights.values()) == {Fraction(1, 6)}
+    assert set(algo._decision_coverage[matched.DECISIONS[0]]["sleeves"]) == set(matched.ETFS)
+
+
+def test_missing_one_membership_does_not_replace_existing_targets_or_liquidate(matched):
+    algo = algorithm(matched)
+    snapshots_for_first_decision(algo, matched)
+    algo._snapshots["REMX"] = []
+    algo._targets, algo._target_weights = {"HELD": Symbol("HELD")}, {"HELD": Fraction(1, 60)}
+    algo._rebalance()
+    algo._rebalance()
+    assert set(algo._targets) == {"HELD"} and algo.orders == []
+    assert algo._decision_count == algo._refused_count == 1
+    assert algo._decision_coverage[matched.DECISIONS[0]] is None
+
+
+def test_etf_positions_are_not_filtered_by_absent_constituent_inputs(matched):
+    algo = algorithm(matched, "etf_basket")
+    # No constituent callbacks at all: still exactly the six frozen ETF targets.
+    algo._prepare_targets(matched.DECISIONS[0])
+    assert len(algo._target_weights) == 6
+    assert set(algo._target_weights.values()) == {Fraction(1, 6)}
+    reports = algo._decision_coverage[matched.DECISIONS[0]]["sleeves"]
+    assert all(row["membership_available"] is False and row["member_count"] is None
+               and row["snapshot_hash"] is None and row["selected_count"] == 1
+               for row in reports.values())
+    assert algo._reasons == {}
+
+
+def test_cutoff_and_membership_future_receipt_refuse_before_orders(matched):
+    algo = algorithm(matched)
+    algo.utc_time = matched.core._clock(matched.CUTOFFS[0]).replace(tzinfo=None)
+    with pytest.raises(ValueError, match="not yet available"):
+        algo._prepare_targets(matched.DECISIONS[0])
+    assert algo.orders == [] and algo._decision_coverage == {}
+    cutoff = matched.core._clock(matched.CUTOFFS[0])
+    future = {"effective": cutoff - timedelta(days=7), "received": cutoff + timedelta(seconds=1)}
+    assert matched.core.select_snapshot([future], cutoff) is None
+
+
+def test_no_default_split_basis_until_prior_action_custody_is_proven(matched):
+    cutoff = matched.core._clock(matched.CUTOFFS[0])
+    early = cutoff - timedelta(days=7)
+    assert matched.split_basis_with_custody(None, cutoff, None) is None
+    assert matched.split_basis_with_custody(early + timedelta(seconds=1), cutoff, None) is None
+    assert matched.split_basis_with_custody(early, cutoff, None) == 1
+    assert matched.split_basis_with_custody(early, cutoff, 2) == 2
+    assert matched.split_basis_with_custody(early, cutoff, 0) is None
+    assert matched.split_basis_with_custody(early, cutoff, None, delisted=True) is None
+
+
+def test_new_subscription_reverse_split_red_control_refuses_then_custody_green(matched):
+    algo = algorithm(matched)
+    symbol = Symbol("A")
+    algo.securities[symbol] = Security(symbol)
+    # Original method supplies factor=1 for a newly subscribed name whose
+    # ex-date reverse split was never delivered; successor refuses that mark.
+    algo._frames = {"2025-01-02": {"cutoff_utc": matched.CUTOFFS[0]}}
+    assert matched.core.TargetPriceSixUniverseAlgorithm._prior_mark(algo, symbol) == (100, 100000)
+    assert algo._prior_mark(symbol) is None and algo._reasons["missing_action_custody"] == 1
+    algo._custody_since["A"] = matched.core._clock(matched.CUTOFFS[0]) - timedelta(days=7)
+    algo._split_factors["A", "2025-01-02"] = Fraction(2)
+    assert algo._prior_mark(symbol) == (200, 50000)
+    assert matched.plan_weighted_orders({"A": Fraction(1, 10)}, {}, {"A": algo._prior_mark(symbol)},
+        100000, 100000, ".001")[0]["requested"] == 50
+
+
+def test_custody_persistent_raw_subscription_is_not_restarted_on_repeat(matched):
+    algo, symbol = algorithm(matched), Symbol("A")
+    security = Security(symbol)
+    algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
+    original = algo._custody_since["A"]
+    algo.utc_time += timedelta(days=1)
+    algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
+    assert algo._custody_since["A"] == original and len(algo.add_calls) == 1
+    algo.securities[symbol].subscriptions[0].data_normalization_mode = 1
+    with pytest.raises(ValueError, match="RAW minute"):
+        algo._ensure_raw_subscription(symbol)
+
+
+def test_custom_universe_security_is_not_attached_to_equity_custody(matched):
+    algo = algorithm(matched)
+    class ContextSecurity:
+        type = "base"
+        @property
+        def symbol(self):
+            raise AssertionError("custom feed treated as tradable equity")
+    algo.on_securities_changed(SimpleNamespace(added_securities=[ContextSecurity()]))
+    assert algo._manual_symbols == set() and algo._custody_since == {} and algo.add_calls == []
+
+
+def test_callback_preregisters_members_without_signal_and_etf_does_not_subscribe_stocks(matched):
+    for arm in ("tpr_off", "tpr_on", "etf_basket"):
+        algo = algorithm(matched, arm)
+        symbol = Symbol("MEMBER")
+        rows = [SimpleNamespace(symbol=symbol, weight=Decimal(".2"), end_time=algo.utc_time)]
+        selected = algo._constituents_for("SPY", rows)
+        assert selected == ([] if arm == "etf_basket" else [symbol])
+        assert len(algo._snapshots["SPY"]) == 1
+
+
+def test_delisting_is_retained_and_not_zero_signal_or_replacement(matched):
+    algo = algorithm(matched)
+    algo.on_data(SimpleNamespace(dividends={}, splits={}, delistings={"d": SimpleNamespace(symbol=Symbol("COMMON"))}))
+    assert algo._delisted_ids == {"COMMON"} and algo._reasons == {"delisting_event": 1}
+    snapshots_for_first_decision(algo, matched)
+    algo._prepare_targets(matched.DECISIONS[0])
+    assert algo._targets == {} and algo._target_weights == {}
+    assert algo._decision_coverage[matched.DECISIONS[0]]["unallocated_target_cash"] == "1"
+
+
+def test_daily_audit_reports_soft_name_cap_and_unlevered_risk_separately(matched):
+    algo = algorithm(matched)
+    symbol = Symbol("A")
+    algo.securities[symbol] = Security(symbol)
+    held = SimpleNamespace(symbol=symbol, invested=True, quantity=110, holdings_value="11000")
+    algo._quantity_ledger, algo._cash_ledger = {"A": Fraction(110)}, Fraction(89000)
+    algo.portfolio = SimpleNamespace(cash="89000", total_portfolio_value="100000",
+        total_holdings_value="11000", values=lambda: [held])
+    algo._daily_audit()
+    log = json.loads(algo.logs[-1].split(" ", 1)[1])
+    assert log["risk_within_unlevered_account"] is True
+    assert log["max_name_exposure"] == "0.11" and algo._name_soft_cap_breaches == 1
+    assert algo._risk_breaches == 0 and algo._max_cash_residual == algo._max_nav_residual == 0
+    algo.time += timedelta(days=1)
+    algo.portfolio.cash, algo.portfolio.total_holdings_value = "-1", "100001"
+    algo._daily_audit()
+    assert algo._risk_breaches == 1
+
+
+def test_invalid_and_cancel_events_retained_in_real_handler_and_summary(matched):
+    for status, reason in (("invalid", "qc_invalid_order"), ("canceled", "qc_canceled_order")):
+        algo = algorithm(matched)
+        complete_evidence(algo, matched)
+        event = SimpleNamespace(fill_quantity=0, fill_price=0, symbol=Symbol("A"),
+            order_fee=SimpleNamespace(value=SimpleNamespace(amount="0")), status=status)
+        algo.on_order_event(event)
+        assert algo._reasons[reason] == 1 and summary(algo)["meaningful_execution"] is False
+
+
+@pytest.mark.parametrize("reason", ["missing_mark", "missing_action_custody", "unpriced_held_nav",
+    "missing_prior_close_nav", "qc_invalid_order", "qc_canceled_order", "delisting_event", "delisting_target_refused"])
+def test_action_order_and_input_failures_disqualify_meaningful(matched, reason):
+    algo = algorithm(matched)
+    complete_evidence(algo, matched)
+    assert summary(algo)["meaningful_execution"] is True
+    algo._reasons[reason] = 1
+    assert summary(algo)["meaningful_execution"] is False
+
+
+@pytest.mark.parametrize("fault", ["cash", "nav", "positions", "risk", "coverage", "decisions", "days", "last", "fills"])
+def test_incomplete_evidence_never_claims_completed_matched_execution(matched, fault):
+    algo = algorithm(matched)
+    complete_evidence(algo, matched)
+    if fault == "cash":
+        algo._max_cash_residual = Fraction(".02")
+    elif fault == "nav":
+        algo._max_nav_residual = Fraction(".02")
+    elif fault == "positions":
+        algo._position_ledger_mismatches = 1
+    elif fault == "risk":
+        algo._risk_breaches = 1
+    elif fault == "coverage":
+        algo._decision_coverage[matched.DECISIONS[0]]["sleeves"].pop("REMX")
+    elif fault == "decisions":
+        algo._attempted_days.remove(matched.DECISIONS[0])
+    elif fault == "days":
+        algo._valuation_days.remove("2025-02-03")
+    elif fault == "last":
+        algo._prior_close_day = date(2025, 3, 28)
+    else:
+        algo._fill_events = 0
+    assert summary(algo)["meaningful_execution"] is False
+
+
+def test_summary_never_invents_april_nav_sleeve_pnl_or_positive_remx(matched):
+    algo = algorithm(matched, "tpr_on")
+    complete_evidence(algo, matched)
+    algo._sleeve_selected_decisions = {etf: 14 if etf != "REMX" else 0 for etf in matched.ETFS}
+    result = summary(algo)
+    assert result["last_valuation_session"] == "2025-03-31" and result["valuation_days"] == 60
+    assert result["zero_selection_sleeve_diagnostics"] == ["REMX"]
+    assert result["canonical_admission"] is result["independent_sleeve_pnl_observed"] is False
+    assert not any(line.startswith("MATCHED_NAV ") for line in algo.logs)
+
+
+@pytest.mark.parametrize("arm", ["tpr_off", "etf_basket"])
+def test_neutral_initialization_does_not_touch_packet_or_old_initialize(matched, monkeypatch, arm):
+    algo = algorithm(matched, arm)
+    body = config(matched, arm)
+    config_json, digest = encoded(body)
+    matched.EXPECTED_MATCHED_CONFIG_SHA256, matched.EXPECTED_MATCHED_FREEZE_SHA256 = digest, FREEZE_SHA
+    config_module = ModuleType("matched_config")
+    config_module.CONFIG_JSON = config_json
+    monkeypatch.setitem(sys.modules, "matched_config", config_module)
+    monkeypatch.delitem(sys.modules, "signal_packet", raising=False)
+    def forbidden(*args, **kwargs):
+        raise AssertionError("TPR packet or original initializer accessed")
+    monkeypatch.setattr(matched.core.TargetPriceSixUniverseAlgorithm, "initialize", forbidden)
+    algo.object_store = SimpleNamespace(contains_key=forbidden, read=forbidden)
+    for name in ("set_start_date", "set_end_date", "set_time_zone", "set_account_currency", "set_cash",
+                 "add_security_initializer", "add_universe", "set_benchmark", "set_warm_up"):
+        setattr(algo, name, lambda *args, **kwargs: None)
+    algo.universe_settings = SimpleNamespace()
+    algo.universe = SimpleNamespace(etf=lambda *args, **kwargs: None)
+    algo.add_equity = lambda etf, resolution, **kwargs: SimpleNamespace(symbol=Symbol(etf))
+    algo.schedule = SimpleNamespace(on=lambda *args: None)
+    algo.date_rules = SimpleNamespace(every_day=lambda symbol: None)
+    algo.time_rules = SimpleNamespace(at=lambda *args: None)
+    algo.initialize()
+    assert algo._identities == algo._frames == {} and set(algo._etf_symbols) == set(matched.ETFS)
+
+
+def test_live_refusal_precedes_configuration_and_all_api_access(matched):
+    algo = matched.TargetPriceMatchedAlgorithm()
+    algo.live_mode = True
+    with pytest.raises(ValueError, match="live refused"):
+        algo.initialize()

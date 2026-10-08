@@ -338,6 +338,14 @@ SECTION69_CODEX_HEAD = "505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78"
 SECTION69_CODEX_RANGE = f"{SECTION69_CODEX_BASE}..{SECTION69_CODEX_HEAD}"
 SECTION69_CODEX_SHORT_RANGE = "530e95a5..505f7a3d"
 SECTION69_CODEX_COMMITS = ("505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78",)
+SECTION70_CLAUDE_RANGE = "505f7a3da265214cc3c0b7e6c2238cbd1c9c1d78..32016848bc9ce4dfab3f52ddb5bb34e105e445dc"
+SECTION70_CLAUDE_SHORT_RANGE = "505f7a3d..32016848"
+SECTION70_CLAUDE_COMMITS = (
+    "6c8ebdef04b9fa276c9e645d6c14028e8fea8eba",
+    "30ad18a5b620d74acad5e623affa608d415761f0",
+    "597a3902c58275625af51acc86e52a2c0b96c86d",
+    "32016848bc9ce4dfab3f52ddb5bb34e105e445dc",
+)
 SECTION57_OWNER_D2_SCOPE = (
     "After an accepted counter-review, implement one fixture-only TPR-D2 candidate "
     "using synthetic fixtures and the committed D0 aggregate report only. "
@@ -908,11 +916,11 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "29-page v2.2" in normalized_current
     assert re.findall(
         r"`([0-9a-f]{40}\.{2}[0-9a-f]{40})`", normalized_current
-    ) == [SECTION69_CODEX_RANGE]
+    ) == [SECTION70_CLAUDE_RANGE]
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_HEAD not in normalized_current
     assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_current
     assert (
-        "Claude has independently reviewed the exact Codex range"
+        "Codex has counter-reviewed the exact Claude range"
         in normalized_current
     )
     assert (
@@ -925,8 +933,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
     assert "TPR-TR0" in normalized_current
     assert "TPR-1 remains blocked" in normalized_current
     assert "reviewed-spec registry remains empty" in normalized_current
-    assert "Claude next reviews this Codex round independently" not in normalized_current
-    assert "Codex next counter-reviews section 69" in normalized_current
+    assert "Claude next reviews this Codex round independently" in normalized_current
+    assert "Codex next counter-reviews section 69" not in normalized_current
     assert "comprehensive whole-lane audit remains complete" in normalized_current.lower()
     assert CURRENT_MAIN_SYNC_MERGE_COMMIT[:8] in current
     # The owner directly selected bounded D0 decisions on 2026-10-05.
@@ -983,10 +991,10 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         normalized_summary_lower = normalized_summary.lower()
         assert re.findall(
             r"`([0-9a-f]{8}\.{2}[0-9a-f]{8})`", normalized_summary
-        ) == [SECTION69_CODEX_SHORT_RANGE]
+        ) == [SECTION70_CLAUDE_SHORT_RANGE]
         assert PREVIOUS_COUNTERREVIEWED_CLAUDE_SHORT_HEAD not in normalized_summary
-        assert "claude has independently reviewed every codex commit" in normalized_summary_lower
-        assert "section 69" in normalized_summary_lower
+        assert "codex has counter-reviewed every claude commit" in normalized_summary_lower
+        assert "section 70" in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate awaits claude review" not in normalized_summary_lower
         assert "fixture-only tpr-d1 candidate is accepted" in normalized_summary_lower
         assert "claude next reviews the counter-review and tpr-d0" not in normalized_summary_lower
@@ -999,8 +1007,8 @@ def test_exact_next_step_names_the_current_artifacts() -> None:
         assert "claude next reviews sections 56 and 57" not in normalized_summary_lower
         assert "codex continues without claude review stops" not in normalized_summary_lower
         assert "five verified order-based qc runs and one zero-trade remx diagnostic" in normalized_summary_lower
-        assert "claude next reviews this codex round independently" not in normalized_summary_lower
-        assert "codex next counter-reviews section 69" in normalized_summary_lower
+        assert "claude next reviews this codex round independently" in normalized_summary_lower
+        assert "codex next counter-reviews section 69" not in normalized_summary_lower
         assert "codex next counter-reviews section 66" not in normalized_summary_lower
         assert "all six owner-named universes" in normalized_summary_lower
         assert "section 58" in normalized_summary_lower
@@ -3132,32 +3140,114 @@ def test_section_67_guard_rejects_adjacent_authority(monkeypatch, grant):
         test_section_67_counterreview_pins_all_three_commits_and_bounded_qc_scope()
 
 
+def _default_pytest_test_module_name(path):
+    """Default prepend/append imports use contiguous __init__.py packages."""
+    names, parent = [path.stem], path.parent
+    while parent.name.isidentifier() and (parent / "__init__.py").is_file():
+        names.insert(0, parent.name)
+        parent = parent.parent
+    return ".".join(names)
+
+
 def test_lane_test_module_basenames_do_not_collide_with_the_shared_tests_tree() -> None:
-    """TPR-CR21-001: pytest imports a test module from a directory without
-    __init__.py under its bare basename, so a lane module that reuses a shared
-    module's basename aborts collection of the complete suite before any test
-    runs (`import file mismatch`). Every lane test directory without a package
-    marker must therefore use basenames unique across the whole tests tree."""
+    """TPR-CR21-001: detect duplicate default pytest import names involving
+    this lane, including nested files and collisions between lane directories.
+    Packaged modules can safely share a basename when their qualified names
+    differ; a package-less file uses its bare basename."""
     tests_root = ROOT / "tests"
-    lane_dirs = tuple(
-        child.name for child in tests_root.iterdir()
-        if child.is_dir() and child.name.startswith("target_price_revisions")
-        and not (child / "__init__.py").exists()
-    )
-    assert lane_dirs, "the lane's package-less test directories were not found"
-    shared = {}
+    modules, lane_paths = {}, set()
     for path in tests_root.rglob("test_*.py"):
-        relative = path.relative_to(tests_root)
-        if relative.parts[0] in lane_dirs:
+        if not path.is_file():
             continue
-        shared.setdefault(path.name, []).append(relative.as_posix())
+        relative = path.relative_to(tests_root)
+        relative_name = relative.as_posix()
+        modules.setdefault(_default_pytest_test_module_name(path), []).append(relative_name)
+        if relative.parts[0].startswith("target_price_revisions"):
+            lane_paths.add(relative_name)
+    assert lane_paths, "the lane's test modules were not found"
     collisions = sorted(
-        f"{lane}/{path.name} vs {shared[path.name]}"
-        for lane in lane_dirs
-        for path in (tests_root / lane).glob("test_*.py")
-        if path.name in shared
+        f"{name} vs {sorted(paths)}"
+        for name, paths in modules.items()
+        if len(paths) > 1 and lane_paths.intersection(paths)
     )
-    assert collisions == [], f"lane test basenames collide with shared modules: {collisions}"
+    assert collisions == [], f"lane test import names collide: {collisions}"
+
+
+class _MemoryTestPath:
+    """Filesystem-free test inventory for the actual collection guard."""
+    def __init__(self, tree, key=""):
+        from pathlib import PurePosixPath
+        self.tree, self.key = tree, key
+        self.relative = PurePosixPath(key)
+
+    @property
+    def name(self):
+        return self.relative.name
+
+    @property
+    def stem(self):
+        return self.relative.stem
+
+    @property
+    def parent(self):
+        key = self.relative.parent.as_posix()
+        return _MemoryTestPath(self.tree, "" if key == "." else key)
+
+    def __truediv__(self, child):
+        return _MemoryTestPath(self.tree, (self.key + "/" + str(child)).strip("/"))
+
+    def exists(self):
+        return self.key in self.tree
+
+    def is_dir(self):
+        return self.tree.get(self.key) == "dir"
+
+    def is_file(self):
+        return self.tree.get(self.key) == "file"
+
+    def iterdir(self):
+        from pathlib import PurePosixPath
+        return [_MemoryTestPath(self.tree, key) for key in self.tree
+                if PurePosixPath(key).parent.as_posix() == self.key]
+
+    def relative_to(self, root):
+        return self.relative.relative_to(root.relative)
+
+    def rglob(self, pattern):
+        import fnmatch
+        return [_MemoryTestPath(self.tree, key) for key, kind in self.tree.items()
+                if kind == "file" and key.startswith(self.key + "/")
+                and fnmatch.fnmatch(_MemoryTestPath(self.tree, key).name, pattern)]
+
+    def glob(self, pattern):
+        import fnmatch
+        return [path for path in self.iterdir()
+                if path.is_file() and fnmatch.fnmatch(path.name, pattern)]
+
+
+@pytest.mark.parametrize("files,markers,collides", [
+    (["target_price_revisions_qc/test_duplicate.py", "test_duplicate.py"], [], True),
+    (["target_price_revisions_qc/test_duplicate.py", "target_price_revisions_development/test_duplicate.py"], [], True),
+    (["target_price_revisions_qc/nested/test_duplicate.py", "test_duplicate.py"], [], True),
+    (["target_price_revisions_qc/test_duplicate.py", "analyst_revisions_v2/test_duplicate.py"], ["analyst_revisions_v2"], False),
+    (["target_price_revisions_qc/test_duplicate.py", "test_duplicate.py"], ["target_price_revisions_qc"], False),
+    (["target_price_revisions_qc/nested/test_duplicate.py", "test_duplicate.py"], ["target_price_revisions_qc/nested"], False),
+])
+def test_collection_guard_observes_actual_import_identity(monkeypatch, files, markers, collides):
+    from pathlib import PurePosixPath
+    tree = {"tests": "dir"}
+    for relative in [*files, *(marker + "/__init__.py" for marker in markers)]:
+        path = PurePosixPath("tests") / relative
+        tree[path.as_posix()] = "file"
+        for parent in path.parents:
+            if parent.as_posix() != ".":
+                tree[parent.as_posix()] = "dir"
+    monkeypatch.setitem(globals(), "ROOT", _MemoryTestPath(tree))
+    if collides:
+        with pytest.raises(AssertionError, match="collide"):
+            test_lane_test_module_basenames_do_not_collide_with_the_shared_tests_tree()
+    else:
+        test_lane_test_module_basenames_do_not_collide_with_the_shared_tests_tree()
 
 
 def test_section_69_review_records_the_exact_range_and_grants_nothing() -> None:
@@ -3205,15 +3295,17 @@ def test_section_69_review_records_the_exact_range_and_grants_nothing() -> None:
     )
     assert statuses == {
         "TPR-CR21-001": "Closed by correction",
-        "TPR-CR21-002": "Open",
-        "TPR-CR21-003": "Open (owner decision)",
+        "TPR-CR21-002": "Closed prospectively; historical limitation qualified in section70",
+        "TPR-CR21-003": "Closed by section70 authorization qualification",
         "TPR-CR21-004": "Documented, not corrected",
         "TPR-CR21-005": "Closed by correction",
         "TPR-CR21-006": "Documented, not corrected",
         "TPR-CR21-007": "Documented; counter-review item rejected as applied",
     }
-    register = _open_issue_register()
-    assert "`TPR-CR21-002`" in register and "`TPR-CR21-003`" in register
+    # This historical review's statuses are pinned above. The current register
+    # follows section70's counter-review rather than reopening superseded gates.
+    successor = _record_section("## 70.")
+    assert "TPR-CR21-003" in successor and "false alarm" in successor.lower()
     authority = " ".join(
         _bounded(
             section,
@@ -3235,6 +3327,51 @@ def test_section_69_review_records_the_exact_range_and_grants_nothing() -> None:
         r"(?:^|[.!?])\s*(?:canonical admission|real-row canonical D1|TPR-1|TPR-0B|live trading)\s+is\s+authorized\b",
         authority, re.I,
     ) is None, "contradictory section 69 authority"
+
+
+def test_section_70_counterreview_pins_every_incoming_commit_and_scope():
+    section = _record_section("## 70. Codex counter-review")
+    assert SECTION70_CLAUDE_RANGE in section
+    table = _bounded(section, "### 70.2 Per-commit", "### 70.3 Complete", "section70 dispositions")
+    rows = tuple(re.findall(r"^[|] `([0-9a-f]{40})` [|] [*][*]([^*]+)[*][*] [|]", table, re.M))
+    assert rows == tuple((commit, "Accepted after correction") for commit in SECTION70_CLAUDE_COMMITS), "exact section70 dispositions"
+    assert tuple(_git_lines("rev-list", "--reverse", SECTION70_CLAUDE_RANGE)) == SECTION70_CLAUDE_COMMITS
+    assert "Current counter-review disposition is **accepted after correction**" in section
+    assert "PARTIAL" in section and "not a recovered consolidated historical driver" in section
+    assert "provider attestation" in section.lower()
+    assert all(f"TPR-CR21-{number:03d}" in section for number in range(1, 8))
+    register_ids = dict(re.findall(REGISTER_ROW, _open_issue_register(), re.M))
+    assert "TPR-CR21-002" not in register_ids and "TPR-CR21-003" not in register_ids
+    assert "six canonical findings remain open/parked" in section
+    assert "complete lane/" in section and "native Windows trust validation" in section
+    assert "No live trading is authorized." in section
+    assert "Canonical admission is not authorized." in section
+    assert re.search(r"(?:^|[.!?])\s*(?:canonical admission|live trading)\s+is\s+authorized\b", section, re.I) is None, "contradictory section70 authority"
+
+
+def test_section_70_guard_refuses_a_skipped_commit(monkeypatch):
+    test_section_70_counterreview_pins_every_incoming_commit_and_scope()
+    original = _record_section
+    section = original("## 70.")
+    changed = section.replace(
+        "| `" + SECTION70_CLAUDE_COMMITS[-1] + "` | **Accepted after correction** |",
+        "| `" + SECTION70_CLAUDE_COMMITS[-1] + "` | **Accepted** |", 1)
+    assert changed != section
+    monkeypatch.setitem(globals(), "_record_section", lambda heading:
+        changed if heading.startswith("## 70.") else original(heading))
+    with pytest.raises(AssertionError, match="exact section70 dispositions"):
+        test_section_70_counterreview_pins_every_incoming_commit_and_scope()
+
+
+@pytest.mark.parametrize("grant", ["Canonical admission is authorized.", "Live trading is authorized."])
+def test_section_70_guard_refuses_adjacent_authority(monkeypatch, grant):
+    test_section_70_counterreview_pins_every_incoming_commit_and_scope()
+    original = _record_section
+    section = original("## 70.")
+    monkeypatch.setitem(globals(), "_record_section", lambda heading:
+        section + "\n" + grant if heading.startswith("## 70.") else original(heading))
+    with pytest.raises(AssertionError, match="contradictory section70 authority"):
+        test_section_70_counterreview_pins_every_incoming_commit_and_scope()
 
 
 def test_section_69_guard_refuses_disposition_drift(monkeypatch) -> None:

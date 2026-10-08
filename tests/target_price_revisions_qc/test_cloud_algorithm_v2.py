@@ -373,19 +373,27 @@ def test_other_incomplete_evidence_cannot_claim_success(modules, fault):
     assert summary(algo)["meaningful_execution"] is False
 
 
-def test_signal_cutoff_at_or_after_the_decision_clock_is_refused_before_membership(modules):
-    """TPR-CR21-005: the only behavioural proof of the look-ahead guard. A frame
+def test_signal_cutoff_at_or_after_the_decision_clock_is_refused_before_membership(modules, monkeypatch):
+    """TPR-CR21-005: behavioural proof of the look-ahead guard. A frame
     whose cutoff equals or follows the 09:20 engine clock must refuse before any
-    membership or mark is read; one second earlier proceeds to the membership
-    step and, with no snapshot, records a refused decision rather than a trade."""
+    membership is read; one second earlier reaches membership selection and,
+    with no snapshot, records missing coverage without issuing an order."""
     for module in modules:
         algo = algorithm(module)
+        membership_reads = []
+        original_select = module.select_snapshot
+        def observed_selection(snapshots, cutoff, original=original_select):
+            membership_reads.append((snapshots, cutoff))
+            return original(snapshots, cutoff)
+        monkeypatch.setattr(module, "select_snapshot", observed_selection)
         for cutoff in ("2025-01-02T14:20:00+00:00", "2025-01-02T14:20:01+00:00"):
             algo._frames["2025-01-02"]["cutoff_utc"] = cutoff
             with pytest.raises(ValueError, match="not yet available"):
                 algo._prepare_targets("2025-01-02")
+            assert membership_reads == [] and algo._decision_coverage == {}
         algo._frames["2025-01-02"]["cutoff_utc"] = "2025-01-02T14:19:59+00:00"
         algo._prepare_targets("2025-01-02")
+        assert membership_reads == [(algo._snapshots, datetime(2025, 1, 2, 14, 19, 59, tzinfo=timezone.utc))]
         assert algo._decision_coverage["2025-01-02"] is None and algo.orders == []
 
 

@@ -15,20 +15,23 @@ from types import ModuleType, SimpleNamespace
 import pytest
 
 from research.quantconnect import QuantConnectClient, QuantConnectCredentials
+from research.analyst_revisions_v2.canonical import canonical_json_bytes
 from scripts import run_arv2_identity_qc as subject
 
 
-@pytest.fixture
-def package(tmp_path, monkeypatch):
+@pytest.fixture(params=(subject.INPUT_SCHEMA, subject.CONTINUITY_INPUT_SCHEMA), ids=("v1", "continuity_v2"))
+def package(tmp_path, monkeypatch, request):
     artifact_root = tmp_path / "private-artifacts"
     artifact_root.mkdir(mode=0o700)
     monkeypatch.setattr(subject, "ARTIFACT_ROOT", artifact_root)
-    value = {"schema": subject.INPUT_SCHEMA,
+    value = {"schema": request.param,
              "rows": [{"ticker": ticker, "role": subject.ROLES[ticker], "composite_figi": f"BBG{index:09d}"}
                       for index, ticker in enumerate(subject.TICKERS, 1)],
              "price_manifest_sha256": "1" * 64, "public_reference_sha256": "2" * 64,
              "sharadar_identity_manifest_sha256": "3" * 64}
-    raw = subject.canonical(value)
+    if request.param == subject.CONTINUITY_INPUT_SCHEMA:
+        value.update(continuity_manifest_sha256="4" * 64, vintage_manifest_sha256="5" * 64)
+    raw = subject.canonical_input(value)
     input_path = tmp_path / "public-input.json"
     input_path.write_bytes(raw)
     input_path.chmod(0o600)
@@ -237,7 +240,7 @@ def test_prepare_is_offline_private_pinned(package, monkeypatch):
 def test_input_refuses_unpinned_or_nonpublic_row_shape(package, change):
     value = copy.deepcopy(package.value)
     change(value)
-    raw = subject.canonical(value)
+    raw = subject.canonical_input(value)
     with pytest.raises(subject.IdentityQcError):
         subject.validate_input(raw, subject.sha(raw))
 
@@ -251,6 +254,175 @@ def test_noncanonical_or_ambiguous_json_refused(raw):
 def test_input_byte_pin_refused(package):
     with pytest.raises(subject.IdentityQcError):
         subject.validate_input(package.raw, "0" * 64)
+
+
+def test_input_matches_research_canonical_bytes_without_normalizing_or_repinning(package):
+    research_raw = canonical_json_bytes(package.value)
+    assert package.raw == subject.canonical_input(package.value) == research_raw
+    assert package.raw.endswith(b"\n") and not package.raw.endswith(b"\n\n")
+    assert subject.validate_input(research_raw, subject.sha(research_raw)) == package.value
+    assert (package.control / "input.json").read_bytes() == research_raw
+    assert package.prepared["input_sha256"] == subject.sha(research_raw)
+    no_linefeed_pin = subject.sha(subject.canonical(package.value))
+    assert no_linefeed_pin != package.prepared["input_sha256"]
+    with pytest.raises(subject.IdentityQcError, match="input_bytes"):
+        subject.validate_input(research_raw, no_linefeed_pin)
+    with pytest.raises(subject.IdentityQcError, match="input_bytes"):
+        subject.render_source(package.value, no_linefeed_pin)
+
+
+@pytest.mark.parametrize("kind", ["missing_lf", "multiple_lf", "crlf", "trailing_space",
+                                 "space_before_lf", "leading_lf", "pretty_json", "unsorted_keys"])
+def test_input_requires_exactly_one_lf_and_no_other_canonical_relaxation(package, kind, monkeypatch):
+    raw = package.raw
+    if kind == "missing_lf":
+        raw = raw[:-1]
+    elif kind == "multiple_lf":
+        raw += b"\n"
+    elif kind == "crlf":
+        raw = raw[:-1] + b"\r\n"
+    elif kind == "trailing_space":
+        raw += b" "
+    elif kind == "space_before_lf":
+        raw = raw[:-1] + b" \n"
+    elif kind == "leading_lf":
+        raw = b"\n" + raw
+    elif kind == "pretty_json":
+        raw = json.dumps(package.value, sort_keys=True, indent=2).encode("ascii") + b"\n"
+    else:
+        reversed_value = dict(reversed(sorted(package.value.items())))
+        raw = json.dumps(reversed_value, separators=(",", ":"), ensure_ascii=True).encode("ascii") + b"\n"
+    assert raw != package.raw
+    source_path = package.input.with_name("malformed-input.json")
+    source_path.write_bytes(raw)
+    source_path.chmod(0o600)
+    control = package.control.with_name("invalid-input")
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No API on refused input"))
+    with pytest.raises(subject.IdentityQcError):
+        subject.validate_input(raw, subject.sha(raw))
+    with pytest.raises(subject.IdentityQcError):
+        subject.prepare(source_path, subject.sha(raw), control)
+    assert not control.exists()
+
+
+def test_input_lf_does_not_relax_internal_control_or_metadata_json(package, qc):
+    for raw in (subject.canonical(package.prepared), subject.canonical(qc.fake.meta)):
+        assert subject._json(raw) == json.loads(raw)
+        with pytest.raises(subject.IdentityQcError, match="noncanonical_json"):
+            subject._json(raw + b"\n")
+    with pytest.raises(subject.IdentityQcError):
+        subject.validate_meta(subject.canonical(qc.fake.meta).decode("ascii") + "\n", package.prepared)
+
+
+def test_original_v1_profile_and_key_contract_remain_unchanged():
+    assert subject.PROFILE_SHA256 == "8a96514a71799763673e31a180f970692a512c51cb7a53dfa3230e362de98811"
+    assert subject._input_keys(subject.INPUT_SCHEMA) == {"schema", "rows", "price_manifest_sha256", "public_reference_sha256", "sharadar_identity_manifest_sha256"}
+    assert subject._profile(subject.INPUT_SCHEMA) == (subject.PROFILE, subject.PROFILE_SHA256)
+    assert subject._profile(subject.CONTINUITY_INPUT_SCHEMA) == (subject.CONTINUITY_PROFILE, subject.CONTINUITY_PROFILE_SHA256)
+    assert subject.PROFILE_SHA256 != subject.CONTINUITY_PROFILE_SHA256
+
+
+def test_every_mode_binds_selected_profile_and_never_claims_complete_identity(package, monkeypatch):
+    _, meta = run_runtime(package, monkeypatch)
+    profile, profile_sha256 = subject._profile(package.value["schema"])
+    assert package.prepared["input_schema"] == package.value["schema"]
+    assert package.prepared["profile"] == profile
+    assert package.prepared["profile_sha256"] == profile_sha256
+    assert meta["input_schema"] == package.value["schema"]
+    assert meta["profile_sha256"] == profile_sha256
+    assert meta["source_binding_mode"] == profile["mode"]
+    assert all(package.prepared[key] is False and meta[key] is False for key in subject._RUNTIME_FALSE_FLAGS)
+    if package.value["schema"] == subject.CONTINUITY_INPUT_SCHEMA:
+        assert profile["source_qualifications_retained_private_host_only"] is True
+        assert profile["current_vendor_figi_missing_refusal_preserved"] is True
+        assert "qualified_vintage_current_continuity" in profile["mode"]
+        assert meta["continuity_manifest_sha256"] == package.value["continuity_manifest_sha256"]
+        assert meta["vintage_manifest_sha256"] == package.value["vintage_manifest_sha256"]
+    else:
+        assert "continuity_manifest_sha256" not in meta and "vintage_manifest_sha256" not in meta
+
+
+@pytest.mark.parametrize("kind", ["unknown_schema", "mixed_keys", "missing_pin", "invalid_pin", "host_qualifications"])
+def test_variant_schema_keys_and_pins_exact_no_mixed_admission(package, kind):
+    value = copy.deepcopy(package.value)
+    if kind == "unknown_schema":
+        value["schema"] = "arv2-seven-public-figi-continuity-input-v999"
+    elif kind == "mixed_keys":
+        value["schema"] = subject.INPUT_SCHEMA if value["schema"] == subject.CONTINUITY_INPUT_SCHEMA else subject.CONTINUITY_INPUT_SCHEMA
+    elif kind == "missing_pin":
+        value.pop("vintage_manifest_sha256" if value["schema"] == subject.CONTINUITY_INPUT_SCHEMA else "public_reference_sha256")
+    elif kind == "invalid_pin":
+        value["continuity_manifest_sha256" if value["schema"] == subject.CONTINUITY_INPUT_SCHEMA else "public_reference_sha256"] = True
+    else:
+        value["rows"][0]["source_refusal_codes"] = ["FIGI_INVALID_OR_MISSING"]
+    raw = subject.canonical_input(value)
+    with pytest.raises(subject.IdentityQcError):
+        subject.validate_input(raw, subject.sha(raw))
+
+
+@pytest.mark.parametrize("kind", ["input_schema", "profile", "profile_sha256", "extra_pin", "qualification_flag"])
+def test_prepared_selected_schema_profile_and_flags_cannot_mix_before_contact(package, qc, kind):
+    path = package.control / "prepared.json"
+    value = json.loads(path.read_bytes())
+    other = subject.INPUT_SCHEMA if package.value["schema"] == subject.CONTINUITY_INPUT_SCHEMA else subject.CONTINUITY_INPUT_SCHEMA
+    if kind == "input_schema":
+        value["input_schema"] = other
+    elif kind == "profile":
+        value["profile"] = subject._profile(other)[0]
+    elif kind == "profile_sha256":
+        value["profile_sha256"] = subject._profile(other)[1]
+    elif kind == "qualification_flag":
+        value["complete_price_identity_binding"] = True
+    elif package.value["schema"] == subject.INPUT_SCHEMA:
+        value["continuity_manifest_sha256"] = "4" * 64
+    else:
+        value.pop("continuity_manifest_sha256")
+    raw = subject.canonical(value)
+    new_pin = subject.sha(raw)
+    path.write_bytes(raw)
+    (package.control / "prepared.sha256").write_bytes(new_pin.encode("ascii"))
+    (package.control / "prepared-complete.json").write_bytes(subject.canonical({"prepared_sha256": new_pin}))
+    with pytest.raises(subject.IdentityQcError):
+        subject.launch(package.control, new_pin, qc.api)
+    assert qc.fake.calls == [] and not (package.control / "attempt-claim.json").exists()
+
+
+@pytest.mark.parametrize("kind", ["input_schema", "profile_hash", "binding_mode", "continuity_pin", "vintage_pin", "qualified_flag"])
+def test_metadata_selected_variant_and_continuity_binding_exact(package, qc, kind):
+    value = copy.deepcopy(qc.fake.meta)
+    other = subject.INPUT_SCHEMA if package.value["schema"] == subject.CONTINUITY_INPUT_SCHEMA else subject.CONTINUITY_INPUT_SCHEMA
+    if kind == "input_schema":
+        value["input_schema"] = other
+    elif kind == "profile_hash":
+        value["profile_sha256"] = subject._profile(other)[1]
+    elif kind == "binding_mode":
+        value["source_binding_mode"] = subject._profile(other)[0]["mode"]
+    elif kind == "qualified_flag":
+        value["complete_price_identity_binding"] = True
+    else:
+        value["continuity_manifest_sha256" if kind == "continuity_pin" else "vintage_manifest_sha256"] = "6" * 64
+    with pytest.raises(subject.IdentityQcError):
+        subject.validate_meta(subject.canonical(value).decode("ascii"), package.prepared)
+
+
+@pytest.mark.parametrize("kind", ["binding_schema", "profile_hash", "continuity_pin", "vintage_pin", "qualified_flag"])
+def test_launch_and_terminal_refuse_mixed_variant_receipt_before_status_contact(package, qc, kind):
+    subject.launch(package.control, package.pin, qc.api)
+    path = package.control / "launch.json"
+    value = json.loads(path.read_bytes())
+    if kind == "binding_schema":
+        value["input_schema"] = subject.INPUT_SCHEMA if package.value["schema"] == subject.CONTINUITY_INPUT_SCHEMA else subject.CONTINUITY_INPUT_SCHEMA
+    elif kind == "profile_hash":
+        value["profile_sha256"] = "6" * 64
+    elif kind == "qualified_flag":
+        value["historical_identity_authenticated"] = True
+    else:
+        value["continuity_manifest_sha256" if kind == "continuity_pin" else "vintage_manifest_sha256"] = "6" * 64
+    path.write_bytes(subject.canonical(value))
+    before = len(qc.fake.calls)
+    with pytest.raises(subject.IdentityQcError):
+        subject.status(package.control, package.pin, qc.api)
+    assert len(qc.fake.calls) == before
 
 
 def test_generated_source_identical_across_python_hash_seeds(package):
@@ -271,7 +443,7 @@ def test_runtime_seven_roundtrips_no_market_or_identifier_export(package, monkey
     instance, meta = run_runtime(package, monkeypatch)
     assert meta["matched_count"] == 7 and meta["refused_count"] == 0
     assert [row["ticker"] for row in meta["rows"]] == list(subject.TICKERS)
-    assert all(meta[key] is False for key in subject._FALSE_FLAGS)
+    assert all(meta[key] is False for key in subject._RUNTIME_FALSE_FLAGS)
     assert instance.settings.seed_initial_prices is False
     assert instance.operations == [("timezone", ("America/New_York",)), ("start", (2026, 10, 7)),
                                    ("end", (2026, 10, 7)), ("cash", (1000000,)), ("constant_benchmark", (1,))]
@@ -339,6 +511,7 @@ def test_launch_status_read_exact_chain_and_sanitized_observations(package, qc):
     for index, response in enumerate(qc.fake.responses, 1):
         observation = json.loads((package.control / f"observation-{index:03d}.json").read_bytes())
         assert observation["parsed_response_sha256"] == subject.sha(subject.canonical(response))
+        assert subject._bound(observation, subject._bind(package.prepared, package.pin))
         assert observation["server_time_authenticated"] is False and observation["operator_authenticated"] is False
         assert observation["wall_clock_ordered"] is True and observation["monotonic_elapsed_ns"] >= 0
         assert subject._utc(observation["client_end_utc"]) >= subject._utc(observation["client_start_utc"])

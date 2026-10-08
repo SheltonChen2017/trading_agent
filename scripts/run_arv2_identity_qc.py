@@ -34,6 +34,7 @@ PROJECT_NAME = "ARV2 R284 PUBLIC SEVEN IDENTITY 20261007"
 BACKTEST_NAME = "ARV2 R284A1 public FIGI identity only 20261007"
 META_NAME = "ARV2_R284_PUBLIC_IDENTITY_META"
 INPUT_SCHEMA = "arv2-seven-public-figi-identity-input-v1"
+CONTINUITY_INPUT_SCHEMA = "arv2-seven-public-figi-continuity-input-v2"
 PREPARED_SCHEMA = "arv2-r284-prepared-identity-diagnostic-v1"
 META_SCHEMA = "arv2-r284-public-identity-meta-v1"
 OBSERVATION_SCHEMA = "arv2-r284-response-observation-v1"
@@ -49,8 +50,15 @@ _HEX = re.compile(r"[0-9a-f]{64}\Z")
 _FIGI = re.compile(r"[A-Z0-9]{12}\Z")
 _ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,255}\Z")
 _INPUT_KEYS = {"schema", "rows", "price_manifest_sha256", "public_reference_sha256", "sharadar_identity_manifest_sha256"}
+_CONTINUITY_INPUT_KEYS = _INPUT_KEYS | {"continuity_manifest_sha256", "vintage_manifest_sha256"}
 _FALSE_FLAGS = {"point_in_time": False, "independently_reviewed": False, "decision_ready": False,
                 "paper_authorized": False, "orders_authorized": False, "formal_source_admitted": False}
+_QUALIFICATION_FALSE_FLAGS = {"complete_price_identity_binding": False,
+                            "historical_identity_authenticated": False,
+                            "independent_price_identity_binding_authenticated": False,
+                            "cusip_corroboration_complete": False,
+                            "vintage_price_range_admitted": False}
+_RUNTIME_FALSE_FLAGS = {**_FALSE_FLAGS, **_QUALIFICATION_FALSE_FLAGS}
 _REASONS = {"matched", "resolution_unavailable", "not_usa_equity", "reverse_figi_mismatch", "sid_collision", "mapping_exception"}
 _SOURCE_TEMPLATE_TOKEN = "__R284_SOURCE_TEMPLATE_SHA256__"
 PROFILE = {"schema": "arv2-r284-public-seven-identity-profile-v1", "candidate_id": CANDIDATE_ID,
@@ -78,7 +86,40 @@ def sha(raw):
     return hashlib.sha256(raw).hexdigest()
 
 
+def canonical_input(value):
+    """Match the research binders: compact ASCII JSON plus exactly one LF."""
+    return canonical(value) + b"\n"
+
+
 PROFILE_SHA256 = sha(canonical(PROFILE))
+CONTINUITY_PROFILE = {**PROFILE, "schema": "arv2-r284-public-seven-continuity-profile-v2",
+                      "input_schema": CONTINUITY_INPUT_SCHEMA,
+                      "mode": "research_only_no_order_qualified_vintage_current_continuity",
+                      "source_binding_semantics": "qualified_continuity_not_complete_price_identity",
+                      "source_qualifications_retained_private_host_only": True,
+                      "current_vendor_figi_missing_refusal_preserved": True,
+                      **_QUALIFICATION_FALSE_FLAGS}
+CONTINUITY_PROFILE_SHA256 = sha(canonical(CONTINUITY_PROFILE))
+
+
+def _input_keys(schema):
+    if type(schema) is not str:
+        _fail("input_schema")
+    if schema == INPUT_SCHEMA:
+        return _INPUT_KEYS
+    if schema == CONTINUITY_INPUT_SCHEMA:
+        return _CONTINUITY_INPUT_KEYS
+    _fail("input_schema")
+
+
+def _input_hashes(value):
+    return {key: value[key] for key in sorted(_input_keys(value["schema"]) - {"schema", "rows"})}
+
+
+def _profile(schema):
+    _input_keys(schema)
+    profile = PROFILE if schema == INPUT_SCHEMA else CONTINUITY_PROFILE
+    return profile, sha(canonical(profile))
 
 
 def _hash(value, name):
@@ -118,11 +159,16 @@ def validate_input(raw, expected_sha256):
     _hash(expected_sha256, "input")
     if type(raw) is not bytes or not 0 < len(raw) <= MAX_FILE_BYTES or sha(raw) != expected_sha256:
         _fail("input_bytes")
-    value = _json(raw)
-    if type(value) is not dict or set(value) != _INPUT_KEYS or value["schema"] != INPUT_SCHEMA:
+    # Inputs have the research canonical terminal LF. Internal controls,
+    # response hashes and cloud metadata deliberately remain strict no-LF.
+    # Authenticate supplied bytes first; never normalize or silently repin.
+    if not raw.endswith(b"\n"):
+        _fail("input_canonical_linefeed")
+    value = _json(raw[:-1])
+    if type(value) is not dict or set(value) != _input_keys(value.get("schema")):
         _fail("input_schema")
-    for key in _INPUT_KEYS - {"schema", "rows"}:
-        _hash(value[key], key)
+    for key, digest in _input_hashes(value).items():
+        _hash(digest, key)
     rows = value["rows"]
     if type(rows) is not list or len(rows) != 7:
         _fail("input_census")
@@ -145,13 +191,15 @@ def validate_input(raw, expected_sha256):
 
 def render_source(value, input_sha256):
     """Pure one-file public-reference source projection; no market rows."""
-    validate_input(canonical(value), input_sha256)
+    validate_input(canonical_input(value), input_sha256)
+    profile, profile_sha256 = _profile(value["schema"])
     rows_by_ticker = {row["ticker"]: row for row in value["rows"]}
     refs = [(ticker, ROLES[ticker], rows_by_ticker[ticker]["composite_figi"]) for ticker in TICKERS]
     # This dictionary is embedded with repr, not canonical JSON. Its order
     # must be independent of the per-process Python hash seed.
-    bindings = {key: value[key] for key in sorted(_INPUT_KEYS - {"schema", "rows"})}
-    bindings.update({"input_sha256": input_sha256, "profile_sha256": PROFILE_SHA256})
+    bindings = _input_hashes(value)
+    bindings.update({"input_sha256": input_sha256, "input_schema": value["schema"],
+                     "source_binding_mode": profile["mode"], "profile_sha256": profile_sha256})
     # A source cannot embed its own byte hash. Its digest with this one
     # manifest field replaced by a declared sentinel binds the runtime
     # projection; exact host upload/readback receipts bind complete bytes.
@@ -209,7 +257,7 @@ class ARV2PublicSevenIdentity(QCAlgorithm):
             raise ValueError("R284 identity initialization did not complete")
         matched = sum(row["matched"] for row in self._r284_rows)
         meta = ''' + repr({"schema": META_SCHEMA, "candidate_id": CANDIDATE_ID, "attempt": 1,
-                           "session": SESSION, **bindings, **_FALSE_FLAGS}) + '''
+                           "session": SESSION, **bindings, **_RUNTIME_FALSE_FLAGS}) + '''
         meta.update({"input_count": 7, "matched_count": matched, "refused_count": 7 - matched, "rows": self._r284_rows})
         self.set_summary_statistic("''' + META_NAME + '''", json.dumps(meta, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False))
 ''').encode("ascii")
@@ -374,15 +422,14 @@ def prepare(input_path, input_sha256, control_directory):
     except OSError:
         _fail("input_file")
     value = validate_input(raw, input_sha256)
+    profile, profile_sha256 = _profile(value["schema"])
     source = render_source(value, input_sha256)
     prepared = {"schema": PREPARED_SCHEMA, "candidate_id": CANDIDATE_ID, "attempt": 1,
                 "control_directory": str(control_directory),
-                "profile": PROFILE, "profile_sha256": PROFILE_SHA256, "input_sha256": input_sha256,
+                "input_schema": value["schema"], "profile": profile, "profile_sha256": profile_sha256, "input_sha256": input_sha256,
                 "source_sha256": sha(source), "source_byte_count": len(source),
                 "source_template_sha256": source_template_sha256(source),
-                "price_manifest_sha256": value["price_manifest_sha256"],
-                "public_reference_sha256": value["public_reference_sha256"],
-                "sharadar_identity_manifest_sha256": value["sharadar_identity_manifest_sha256"]}
+                **_input_hashes(value), **_RUNTIME_FALSE_FLAGS}
     prepared_raw = canonical(prepared)
     with _Directory(control_directory, create=True) as directory:
         if directory.names():
@@ -406,13 +453,14 @@ def _prepared(directory, expected_sha256):
     if type(value) is not dict or value.get("schema") != PREPARED_SCHEMA:
         _fail("prepared_schema")
     input_value = validate_input(directory.read("input.json"), value.get("input_sha256"))
+    profile, profile_sha256 = _profile(input_value["schema"])
     source = render_source(input_value, value["input_sha256"])
     expected = {"schema": PREPARED_SCHEMA, "candidate_id": CANDIDATE_ID, "attempt": 1,
                 "control_directory": str(directory.path),
-                "profile": PROFILE, "profile_sha256": PROFILE_SHA256, "input_sha256": value["input_sha256"],
+                "input_schema": input_value["schema"], "profile": profile, "profile_sha256": profile_sha256, "input_sha256": value["input_sha256"],
                 "source_sha256": sha(source), "source_byte_count": len(source),
                 "source_template_sha256": source_template_sha256(source),
-                **{key: input_value[key] for key in _INPUT_KEYS - {"schema", "rows"}}}
+                **_input_hashes(input_value), **_RUNTIME_FALSE_FLAGS}
     if not _same(value, expected) or directory.read("main.py") != source:
         _fail("prepared_source_or_profile_changed")
     return value, source
@@ -444,7 +492,7 @@ def _utc(value):
     return parsed
 
 
-def _post(directory, api, endpoint, payload):
+def _post(directory, api, endpoint, payload, binding):
     """Persist sanitized observations before exposing any fresh response."""
     allowed = {"authenticate", "projects/read", "projects/create", "files/read", "files/delete", "files/update",
                "compile/create", "compile/read", "backtests/create", "backtests/list", "backtests/read"}
@@ -464,7 +512,7 @@ def _post(directory, api, endpoint, payload):
             or _utc(end) < start_clock):
         _fail("monotonic_interval")
     parsed = canonical(response)
-    observation = {"schema": OBSERVATION_SCHEMA, "candidate_id": CANDIDATE_ID, "attempt": 1,
+    observation = {"schema": OBSERVATION_SCHEMA, **binding,
                    "endpoint": endpoint, "client_start_utc": start, "client_end_utc": end,
                    "monotonic_elapsed_ns": stop - tick, "wall_clock_ordered": True,
                    "request_sha256": sha(canonical(payload)), "parsed_response_sha256": sha(parsed),
@@ -507,10 +555,14 @@ def _files(response):
 
 
 def _bind(prepared, prepared_sha256):
+    profile, profile_sha256 = _profile(prepared["input_schema"])
     return {"candidate_id": CANDIDATE_ID, "attempt": 1, "prepared_sha256": prepared_sha256,
+            "input_schema": prepared["input_schema"], "source_binding_mode": profile["mode"],
             "input_sha256": prepared["input_sha256"], "source_sha256": prepared["source_sha256"],
             "source_template_sha256": prepared["source_template_sha256"],
-            "profile_sha256": PROFILE_SHA256, "price_manifest_sha256": prepared["price_manifest_sha256"]}
+            "profile_sha256": profile_sha256,
+            **{key: prepared[key] for key in sorted(_input_keys(prepared["input_schema"]) - {"schema", "rows"})},
+            **_RUNTIME_FALSE_FLAGS}
 
 
 def launch(control_directory, prepared_sha256, api=None):
@@ -520,29 +572,29 @@ def launch(control_directory, prepared_sha256, api=None):
         binding = _bind(prepared, prepared_sha256)
         directory.write("attempt-claim.json", canonical({**binding, "claimed_at_utc": _instant()}))
         api = _api(api)
-        _post(directory, api, "authenticate", {})
-        _, organization = _project(_post(directory, api, "projects/read", {"projectId": REFERENCE_PROJECT_ID}), REFERENCE_PROJECT_ID)
-        project_id, _ = _project(_post(directory, api, "projects/create", {"name": PROJECT_NAME, "language": "Py", "organizationId": organization}), None, PROJECT_NAME, organization)
+        _post(directory, api, "authenticate", {}, binding)
+        _, organization = _project(_post(directory, api, "projects/read", {"projectId": REFERENCE_PROJECT_ID}, binding), REFERENCE_PROJECT_ID)
+        project_id, _ = _project(_post(directory, api, "projects/create", {"name": PROJECT_NAME, "language": "Py", "organizationId": organization}, binding), None, PROJECT_NAME, organization)
         if project_id == REFERENCE_PROJECT_ID:
             _fail("new_project_reused_reference_id")
         directory.write("project-created.json", canonical({**binding, "project_id": project_id, "organization_id": organization}))
-        _project(_post(directory, api, "projects/read", {"projectId": project_id}), project_id, PROJECT_NAME, organization, fresh=True)
-        initial = _files(_post(directory, api, "files/read", {"projectId": project_id}))
+        _project(_post(directory, api, "projects/read", {"projectId": project_id}, binding), project_id, PROJECT_NAME, organization, fresh=True)
+        initial = _files(_post(directory, api, "files/read", {"projectId": project_id}, binding))
         if "main.py" not in initial or set(initial) - {"main.py", "research.ipynb"}:
             _fail("new_project_defaults")
         if "research.ipynb" in initial:
-            _post(directory, api, "files/delete", {"projectId": project_id, "name": "research.ipynb"})
-        _post(directory, api, "files/update", {"projectId": project_id, "name": "main.py", "content": source.decode("ascii")})
-        if _files(_post(directory, api, "files/read", {"projectId": project_id})) != {"main.py": source.decode("ascii")}:
+            _post(directory, api, "files/delete", {"projectId": project_id, "name": "research.ipynb"}, binding)
+        _post(directory, api, "files/update", {"projectId": project_id, "name": "main.py", "content": source.decode("ascii")}, binding)
+        if _files(_post(directory, api, "files/read", {"projectId": project_id}, binding)) != {"main.py": source.decode("ascii")}:
             _fail("cloud_source_readback")
-        compile_response = _post(directory, api, "compile/create", {"projectId": project_id})
+        compile_response = _post(directory, api, "compile/create", {"projectId": project_id}, binding)
         compile_id = compile_response.get("compileId")
         if (type(compile_id) is not str or _ID.fullmatch(compile_id) is None
                 or type(compile_response.get("projectId")) is not int or compile_response["projectId"] != project_id):
             _fail("compile_id")
         directory.write("compile-created.json", canonical({**binding, "project_id": project_id, "compile_id": compile_id}))
         for ordinal in range(MAX_COMPILE_POLLS):
-            response = _post(directory, api, "compile/read", {"projectId": project_id, "compileId": compile_id})
+            response = _post(directory, api, "compile/read", {"projectId": project_id, "compileId": compile_id}, binding)
             if (("projectId" in response and (type(response["projectId"]) is not int or response["projectId"] != project_id)) or response.get("compileId") != compile_id
                     or response.get("state") not in {"InQueue", "BuildSuccess", "BuildError"}):
                 _fail("compile_response_identity")
@@ -557,10 +609,10 @@ def launch(control_directory, prepared_sha256, api=None):
             _fail("compile_poll_budget")
         # A fresh owned project is still subject to concurrent owner edits.
         # Refuse visible source changes after compilation, before launch.
-        if _files(_post(directory, api, "files/read", {"projectId": project_id})) != {"main.py": source.decode("ascii")}:
+        if _files(_post(directory, api, "files/read", {"projectId": project_id}, binding)) != {"main.py": source.decode("ascii")}:
             _fail("cloud_source_changed_after_compile")
         directory.write("backtest-create-claim.json", canonical({**binding, "project_id": project_id, "compile_id": compile_id}))
-        response = _post(directory, api, "backtests/create", {"projectId": project_id, "compileId": compile_id, "backtestName": BACKTEST_NAME})
+        response = _post(directory, api, "backtests/create", {"projectId": project_id, "compileId": compile_id, "backtestName": BACKTEST_NAME}, binding)
         row = response.get("backtest")
         if (type(row) is not dict or type(row.get("projectId")) is not int or row.get("projectId") != project_id or row.get("name") != BACKTEST_NAME
                 or type(row.get("backtestId")) is not str or _ID.fullmatch(row["backtestId"]) is None
@@ -613,7 +665,7 @@ def status(control_directory, prepared_sha256, api=None):
             _fail("status_poll_budget")
         directory.write(f"status-claim-{len(polls) + 1:03d}.json", canonical(receipt))
         api = _api(api)
-        response = _post(directory, api, "backtests/list", {"projectId": receipt["project_id"], "includeStatistics": False})
+        response = _post(directory, api, "backtests/list", {"projectId": receipt["project_id"], "includeStatistics": False}, _bind(prepared, prepared_sha256))
         rows = response.get("backtests")
         if (type(rows) is not list or len(rows) != 1 or any(type(row) is not dict for row in rows)
                 or ("count" in response and (type(response["count"]) is not int or response["count"] != len(rows)))):
@@ -635,10 +687,12 @@ def validate_meta(raw, prepared):
     if type(raw) is not str or not raw.isascii() or not 0 < len(raw) <= MAX_META_BYTES:
         _fail("metadata_bytes")
     value = _json(raw.encode("ascii"))
+    profile, profile_sha256 = _profile(prepared["input_schema"])
     expected = {"schema": META_SCHEMA, "candidate_id": CANDIDATE_ID, "attempt": 1, "session": SESSION,
-                "input_sha256": prepared["input_sha256"], "profile_sha256": PROFILE_SHA256,
+                "input_sha256": prepared["input_sha256"], "input_schema": prepared["input_schema"],
+                "source_binding_mode": profile["mode"], "profile_sha256": profile_sha256,
                 "source_template_sha256": prepared["source_template_sha256"],
-                **{key: prepared[key] for key in _INPUT_KEYS - {"schema", "rows"}}, **_FALSE_FLAGS}
+                **{key: prepared[key] for key in sorted(_input_keys(prepared["input_schema"]) - {"schema", "rows"})}, **_RUNTIME_FALSE_FLAGS}
     if (type(value) is not dict or set(value) != set(expected) | {"input_count", "matched_count", "refused_count", "rows"}
             or not _bound(value, expected) or value["input_count"] != 7
             or any(type(value[key]) is not int or not 0 <= value[key] <= 7 for key in ("input_count", "matched_count", "refused_count"))):
@@ -667,7 +721,7 @@ def read(control_directory, prepared_sha256, api=None):
             _fail("result_not_completed")
         directory.write("result-read-claim.json", canonical(receipt))
         api = _api(api)
-        response = _post(directory, api, "backtests/read", {"projectId": receipt["project_id"], "backtestId": receipt["backtest_id"]})
+        response = _post(directory, api, "backtests/read", {"projectId": receipt["project_id"], "backtestId": receipt["backtest_id"]}, _bind(prepared, prepared_sha256))
         row = response.get("backtest")
         if (type(row) is not dict or type(row.get("projectId")) is not int or row.get("projectId") != receipt["project_id"]
                 or row.get("backtestId") != receipt["backtest_id"] or row.get("name") != BACKTEST_NAME
@@ -676,7 +730,7 @@ def read(control_directory, prepared_sha256, api=None):
                 or type(row.get("statistics")) is not dict):
             _fail("result_run_identity")
         meta = validate_meta(row["statistics"].get(META_NAME), prepared)
-        result = {**receipt, "metadata": meta, "metadata_sha256": sha(canonical(meta)), **_FALSE_FLAGS}
+        result = {**receipt, "metadata": meta, "metadata_sha256": sha(canonical(meta)), **_RUNTIME_FALSE_FLAGS}
         directory.write("result.json", canonical(result))
         return result
 
@@ -695,12 +749,16 @@ def main(argv=None):
                 _fail("prepare_arguments")
             value = prepare(args.input, args.input_sha256, args.control_directory)
             output = {"candidate_id": CANDIDATE_ID, "prepared_sha256": sha(canonical(value)),
-                      "source_sha256": value["source_sha256"], "input_count": 7, **_FALSE_FLAGS}
+                      "source_sha256": value["source_sha256"], "input_count": 7,
+                      "input_schema": value["input_schema"], "profile_sha256": value["profile_sha256"],
+                      "source_binding_mode": value["profile"]["mode"], **_RUNTIME_FALSE_FLAGS}
         else:
             if args.prepared_sha256 is None or args.input is not None or args.input_sha256 is not None:
                 _fail("action_arguments")
             value = {"launch": launch, "status": status, "read": read}[args.action](args.control_directory, args.prepared_sha256)
             output = {key: value[key] for key in ("candidate_id", "attempt", "project_id", "compile_id", "backtest_id")}
+            output.update({key: value[key] for key in ("input_schema", "profile_sha256", "source_binding_mode")})
+            output.update(_RUNTIME_FALSE_FLAGS)
             if "status" in value:
                 output["status"] = value["status"]
             if "metadata" in value:

@@ -37589,3 +37589,89 @@ only query change is the explicitly versioned omission of `figi` from requested
 fields. This can acquire refused current metadata, not admit all seven identities.
 The continuity bridge and v2 QC profile remain separate in-progress work and
 are not authorized for cloud contact by this source freeze.
+
+### 263.10 Actual current thirteen-field receipt
+
+At freeze `1eba3dec4431246d3368a517103cf9ba1ff9c232`, root re-verifies the
+designated root/branch/HEAD/status and invokes `--without-figi` exactly once.
+Both GETs complete; private artifact:
+`artifacts/analyst_revisions_v2/sharadar_identity_capture/arv2-sharadar-identities-20261008T052336423396Z`.
+Manifest SHA-256 `7dc79cfe045b857e7751dcfee72a73b56b93417a7712672be1395f18704b2bff`;
+capture SHA-256 `2de7c5e4f6b3f478332250f57900b55b67f51cee83765a55c70b50f609e83be6`.
+Client interval `2026-10-08T05:23:36.423396Z..2026-10-08T05:23:36.816238Z`.
+One stock row/247 bytes hash to
+`d496efea32cb6b41f2a0950fd51ccb0c659ab7af998ec193e4306d0a89422413`;
+six fund rows/936 bytes hash to
+`774653448503862137a74ff9a6598cf63a6ef8a9f8f9b2d171a6391e1c41f3a8`.
+
+Root's independent invocation of the production loader under strict network
+denial reauthenticates the physical current and price bytes. All seven names
+remain **refused_current_candidate**, not matched/admitted: seven
+`COMPOSITE_FIGI_INVALID_OR_MISSING`; QQQ and REMX additionally retain
+`CUSIP_CANDIDATES_INVALID_OR_MISSING`. There are no other census refusals.
+This confirms actual data receipt and named missing fields, not an independently
+reviewed source or seven fully verified identities. Source values remain private;
+only row counts, hashes, times and dispositions are emitted. No QC/private-QC
+API, new look, economic evaluation or cell has occurred. Accounting is still
+313 shared / 239 development / 49 infrastructure / 699 cells.
+
+### 263.11 Continuity implementation, pre-contact corrections and local freeze
+
+Actual pinned read-only comparison by the advisory author confirms seven of
+seven old/current permanent IDs equal and seven of seven actual public FIGIs
+equal actual vintage FIGIs; the five populated old/current CUSIP sets agree.
+No actual conflict was found. Root retains this as source-comparison evidence,
+not independent formal acceptance; the production builder reauthenticates these
+facts again when it publishes the qualified local input.
+
+Two further P2 defects were reproduced and corrected before any actual bridge
+publication, prepared QC package or QC contact:
+
+- `ARV2I263-002`: separate-vintage CUSIP uniqueness missed a cross-vintage
+  stock/fund collision when opposite sides were missing. A merged old/current
+  ownership map now refuses every cross-name conflict. Both direction
+  regressions catch omission of that guard; the in-memory mutation yields two
+  expected failures and finally-safe restoration yields three targeted passes.
+- `ARV2I263-003`: root proves the research builders emit compact JSON plus one
+  LF, while the initial QC input reader required no LF. Exact input bytes now
+  require the research one-LF convention, authenticated before parsing. Runtime
+  metadata, observations and internal controls retain their strict no-LF
+  convention. No normalization, relaxed whitespace or silent repinning occurs.
+  Integration tests run both actual synthetic producer shapes through QC
+  preparation with unchanged supplied-byte pins.
+
+Root reads the complete builder/tests, QC changes and integration corrections.
+Final SHA-256 pins:
+
+| File | SHA-256 |
+| --- | --- |
+| `scripts/build_arv2_identity_continuity.py` | `20ecab935587cbfa929bcbb677043923f149c790be5b87fc7b941d17885d325e` |
+| `tests/analyst_revisions_v2/test_identity_continuity.py` | `4684cb65acda3d26f504cfa07b70816371132a4eab3ecc8b1e9cba4ba546b77b` |
+| `scripts/run_arv2_identity_qc.py` | `251c7da7a537de0f2058a7c5fcff9eb1406d1afde5784fa725cba1e283d0f008` |
+| `tests/analyst_revisions_v2/test_identity_qc_diagnostic.py` | `74656d05ac906f59858212dc81054e794c9cc923bc2b8279df33bad360724e80` |
+
+Root's final strict-network-denied seven-file selection: **732 passed in
+18.19s** (76 continuity, 263 QC, 125 current identity, 83 public reference,
+99 existing price, 86 record/active-document). Earlier 703 and 712 combined
+passes were draft selections before all final corrections/tests, not final
+snapshot evidence and not extra distinct tests. Two outcome-free package
+closure/authority checks also pass; host scripts remain outside the pure
+package and no allowlist or source registry is changed. This is focused
+validation, not a complete lane suite or cloud validation. Same-round advisory
+reviews cannot constitute the independent final dossier.
+
+The original full-identity binder still refuses the same thirteen-field source
+even where the separate continuity builder succeeds. Every source refusal is
+retained; vintage row hashes are explicitly fourteen-field projections, with
+the exact whole-member hash separately pinned. No missing FIGI is inserted into
+the current rows. QC receives only public reference values and aggregate pins.
+
+Commit this code and record before one network-denied production bridge build.
+Use the exact public/current/price/vintage artifact paths and external pins in
+263.8, 263.10, 263.2 and 263.6; write only the new private directory
+`artifacts/analyst_revisions_v2/identity_continuity/R284A1-20261008`.
+Then prepare offline using its actual input hash and a new exact private control
+directory `artifacts/analyst_revisions_v2/identity_qc/R284A1-20261008`.
+Record the resulting continuity/input/source/profile/prepared hashes before
+the first launch claim. These offline operations add no QC attempt, look or
+cell, and they do not make the seven source identities fully admitted.

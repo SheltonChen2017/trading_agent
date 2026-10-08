@@ -37257,7 +37257,7 @@ The one public OpenFIGI invocation permits **two POSTs, five jobs then two**,
 to `https://api.openfigi.com/v3/mapping`, without API key. Ordered tickers are
 `QCOM,SPY,QQQ,SOXX,XLV` followed by `REMX,XLE`; each job uses
 `idType=TICKER`, `idValue=<ticker>`, `exchCode=US`, `currency=USD`,
-`marketSecDes=Equity`.
+`marketSecDes=Equity`, `includeUnlistedEquities=false`.
 The [official API documentation](https://www.openfigi.com/api/documentation)
 contradicts itself with unauthenticated maxima of ten and five jobs; this
 protocol obeys the stricter five rather than testing a larger request.
@@ -37347,3 +37347,43 @@ collector and QC runner are still separate in-progress untracked work at this
 freeze and are not included in or authorized by this first code commit. Their
 own tested source/input hashes must be frozen before their external calls.
 One final matching-lane push is retained for the continuous round.
+
+### 263.5 Actual first source refusal and bounded schema diagnosis
+
+The first freeze is `80dc0ce291e25c1d5ccd09d880b5ba0a4dda276e`, committed
+**2026-10-08T05:03:20Z** (October 7 local). Root re-verifies root/branch/HEAD
+and the expected untracked concurrent lane-owned work, then executes the
+frozen collector exactly once. Its first QCOM request reaches the provider
+but refuses **`identity CSV header differs from frozen fields`**, exit 1.
+The second/funds request does not occur. No CSV or completion manifest is
+published; only the empty private attempt directory
+`artifacts/analyst_revisions_v2/sharadar_identity_capture/arv2-sharadar-identities-20261008T050326429293Z`
+exists. This is an actual source contact and a failed capture, not seven
+admitted identities, a QC attempt or zero network activity. The original
+14-field parser guard remains correct to refuse an unrecognized interface.
+No returned row was printed, evaluated or admitted. The missing original
+response/header cannot be reconstructed from this refusal message.
+
+`ARV2OD263-E`: under the delegated owner decision, authorize a **separate,
+single stock-header diagnostic GET**, not an automatic retry of the failed
+two-response capture. Use the identical QCOM TICKERS query and bounded owned
+transport, authenticate the pinned price receipt first, and inspect only a
+strictly bounded first CSV header. Permit output only of field-name tokens
+matching `[A-Za-z][A-Za-z0-9_]{0,63}` (at most 64 unique names), body byte length/
+hash and unsigned receipt interval. Never print/store body rows or issue the
+funds request in this diagnostic. Preserve every default capture-schema guard;
+no broader parser or changed data query is inferred from a header observation.
+Any actual schema correction and next capture require their own prospective
+source/protocol record before contact. This one added contact adds no research
+look/cell and does not hide the first failed invocation.
+
+The diagnostic-only source revision is
+`bbf7a682bd0ab78e36ed7f61961d98efa97ed10673f4025495c5fc2f3b08e398`;
+test SHA-256 `c823cd57a46ffa9a03e6984ebd64a858dfe8ef6b69a95304d237c7cf957ff98e`.
+Root reads the complete diff and runs strict-network-denied focused tests:
+**192 passed in 1.64s** (106 collector/diagnostic + 86 record/active-document).
+No complete suite. The diagnostic does not call the data-row parser, create
+an artifact or run the ordinary capture as a fallback. Freeze the following
+single command in this prospective commit before execution:
+
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -m scripts.capture_arv2_sharadar_identities --inspect-stock-header`

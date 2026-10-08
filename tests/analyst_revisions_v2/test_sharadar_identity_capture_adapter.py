@@ -567,3 +567,79 @@ def test_synthetic_seam_does_not_accept_production_shaped_key(tmp_path):
             clock=clock(), api_key="production-shaped-but-not-secret-key",
         )
     assert session.calls == []
+
+
+def test_header_diagnostic_one_exact_get_no_body_or_row_persistence(tmp_path, monkeypatch):
+    fields = adapter.FIELDS + ("extra_schema_field",)
+    values = {**row("QCOM"), "extra_schema_field": "DO_NOT_PRINT_PRIVATE_ROW_VALUE"}
+    payload = csv_bytes([values], fields=fields, bom=True)
+    response = Response(payload)
+    session = Session([response])
+    monkeypatch.setattr(adapter, "_parse_csv", lambda *_args: pytest.fail("no data-row parser"))
+    monkeypatch.setattr(adapter.source, "_write_private_bytes", lambda *_args: pytest.fail("no body persistence"))
+    result = adapter._inspect_stock_header_for_test(session=session, clock=clock(), api_key=KEY)
+    assert len(session.calls) == 1 and response.close_count == 1
+    url, options = session.calls[0]
+    assert url == "https://api.sharadar.com/v1.0/data/tickers"
+    assert options["params"] == {**adapter._query("stocks"), "api_key": KEY}
+    assert result.header_fields == fields and result.body_byte_count == len(payload)
+    assert result.body_sha256 == sha256_bytes(payload)
+    assert result.body_persisted is False and result.source_capture_published is False
+    assert result.point_in_time_proven is False and result.formal_source_admitted is False
+    assert "DO_NOT_PRINT_PRIVATE_ROW_VALUE" not in repr(result)
+    assert list(tmp_path.iterdir()) == []
+
+
+def test_header_only_diagnostic_does_not_parse_later_csv_records():
+    payload = b"table,ticker,extra\n\"unclosed private second record"
+    assert adapter._stock_header(payload) == ("table", "ticker", "extra")
+
+
+@pytest.mark.parametrize("payload", [
+    b"", b"\xff", b"ticker,ticker\n", b"ticker,name with space\n",
+    b"ticker,private/unsafe\n", b"ticker,100001\n", b"ticker,\"unclosed\n",
+    b"ticker,\x00field\n", ("ticker," + "a" * 65 + "\n").encode(),
+    (",".join("field" + str(index) for index in range(65)) + "\n").encode(),
+])
+def test_header_diagnostic_refuses_non_schema_or_unbounded_names(payload):
+    with pytest.raises(adapter.SharadarIdentityCaptureError):
+        adapter._stock_header(payload)
+
+
+def test_diagnostic_does_not_weaken_default_exact_fields(tmp_path):
+    fields = adapter.FIELDS + ("extra_schema_field",)
+    values = {**row("QCOM"), "extra_schema_field": "private-value"}
+    payload = csv_bytes([values], fields=fields)
+    assert adapter._stock_header(payload) == fields
+    session = Session([Response(payload), valid_responses()[1]])
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="header differs"):
+        capture(tmp_path, session=session)
+    assert len(session.calls) == 1 and not list((tmp_path / "identity").glob("*/manifest.json"))
+
+
+def test_header_diagnostic_clock_and_credentials_fail_closed():
+    session = Session([valid_responses()[0]])
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="clock moved backwards"):
+        adapter._inspect_stock_header_for_test(session=session, clock=clock(backwards=True), api_key=KEY)
+    assert len(session.calls) == 1
+    session = Session([valid_responses()[0]])
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="synthetic test credential"):
+        adapter._inspect_stock_header_for_test(session=session, clock=clock(), api_key="not-secret-real-shaped-key")
+    assert session.calls == []
+
+
+def test_header_diagnostic_cli_prints_only_safe_schema_and_receipt(monkeypatch, capsys):
+    payload = csv_bytes([row("QCOM")])
+    result = adapter._inspect_stock_header_for_test(
+        session=Session([Response(payload)]), clock=clock(), api_key=KEY,
+    )
+    monkeypatch.setattr(adapter, "inspect_sharadar_stock_header", lambda: result)
+    monkeypatch.setattr(adapter, "capture_sharadar_identities", lambda: pytest.fail("no capture fallback"))
+    assert adapter._main(["--inspect-stock-header"]) == 0
+    output = capsys.readouterr()
+    value = json.loads(output.out)
+    assert value["header_fields"] == list(adapter.FIELDS) and value["body_sha256"] == sha256_bytes(payload)
+    assert not value["body_persisted"] and not value["source_capture_published"]
+    for private in (KEY, "Synthetic issuer", "BBG000000001", "SYN000001"):
+        assert private not in output.out
+    assert output.err == ""

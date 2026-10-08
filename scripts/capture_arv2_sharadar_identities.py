@@ -120,6 +120,23 @@ class LoadedSharadarIdentityCapture:
         return len(self.identities) - self.matched_count
 
 
+@dataclasses.dataclass(frozen=True)
+class StockHeaderDiagnostic:
+    schema: str
+    header_fields: tuple[str, ...]
+    body_byte_count: int
+    body_sha256: str
+    request_query_sha256: str
+    client_started_at: str
+    client_completed_at: str
+    body_persisted: bool = False
+    source_capture_published: bool = False
+    point_in_time_proven: bool = False
+    formal_source_admitted: bool = False
+    decision_ready: bool = False
+    orders_enabled: bool = False
+
+
 def _query(role: str) -> dict[str, str]:
     return {
         "format": "csv", "table": role,
@@ -186,7 +203,7 @@ def _parse_csv(payload: bytes, role: str) -> tuple[dict[str, str], ...]:
     return tuple(observed)
 
 
-def _response_bytes(session: object, role: str, key: str) -> bytes:
+def _bounded_response_bytes(session: object, role: str, key: str) -> bytes:
     endpoint = source.BASE_URL + "/v1.0/data/tickers"
     params = {**_query(role), "api_key": key}
     response = None
@@ -219,7 +236,6 @@ def _response_bytes(session: object, role: str, key: str) -> bytes:
             raise SharadarIdentityCaptureError("identity response length differs from header")
         if any(encoded in payload for encoded in source._credential_encodings(key)):
             raise SharadarIdentityCaptureError("provider echoed a credential; refusing persistence")
-        _parse_csv(payload, role)
         return payload
     except SharadarIdentityCaptureError:
         raise
@@ -228,6 +244,58 @@ def _response_bytes(session: object, role: str, key: str) -> bytes:
     finally:
         if response is not None:
             source._close_response(response)
+
+
+def _response_bytes(session: object, role: str, key: str) -> bytes:
+    payload = _bounded_response_bytes(session, role, key)
+    _parse_csv(payload, role)
+    return payload
+
+
+def _stock_header(payload: bytes) -> tuple[str, ...]:
+    """Inspect the first CSV record only; never parse or expose data records."""
+    if type(payload) is not bytes or not 0 < len(payload) <= MAX_RESPONSE_BYTES:
+        raise SharadarIdentityCaptureError("stock header response violates byte bound")
+    try:
+        text = payload.decode("utf-8-sig", errors="strict")
+        header = tuple(next(csv.reader(io.StringIO(text, newline=""), strict=True), ()))
+    except (UnicodeError, csv.Error):
+        raise SharadarIdentityCaptureError("stock header is not strict UTF-8 CSV") from None
+    if (not 1 <= len(header) <= 64 or len(set(header)) != len(header)
+            or any(re.fullmatch(r"[A-Za-z][A-Za-z0-9_]{0,63}", name) is None for name in header)):
+        raise SharadarIdentityCaptureError("stock header fields are not bounded unique schema names")
+    return header
+
+
+def _inspect_stock_header_core(
+    session: object, key: str, clock: Callable[[], datetime], *, close_owned_session: bool,
+) -> StockHeaderDiagnostic:
+    try:
+        started = source._now_utc(clock)
+        payload = _bounded_response_bytes(session, "stocks", key)
+        header = _stock_header(payload)
+        if close_owned_session:
+            try:
+                session.close()
+            except Exception:
+                raise SharadarIdentityCaptureError("owned header session closure failed; details redacted") from None
+        completed = source._now_utc(clock)
+        if parse_utc_timestamp(completed, "completed") < parse_utc_timestamp(started, "started"):
+            raise SharadarIdentityCaptureError("stock header diagnostic clock moved backwards")
+        return StockHeaderDiagnostic(
+            "arv2-sharadar-stock-header-diagnostic-v1", header, len(payload), sha256_bytes(payload),
+            sha256_bytes(canonical_json_bytes(_query("stocks"))), started, completed,
+        )
+    except SharadarIdentityCaptureError:
+        raise
+    except Exception:
+        raise SharadarIdentityCaptureError("stock header diagnostic failed; details redacted") from None
+    finally:
+        if close_owned_session:
+            try:
+                session.close()
+            except Exception:
+                pass
 
 
 def _date(value: str) -> str | None:
@@ -555,11 +623,8 @@ def _capture_core(
             os.close(root_fd)
 
 
-def capture_sharadar_identities() -> LoadedSharadarIdentityCapture:
-    """Production entry first pins existing price bytes, then owns key/Session."""
-    binding = _price_binding(PRICE_ARTIFACT_PATH, PRICE_MANIFEST_SHA256, synthetic=False)
-    source._preflight_root(DEFAULT_ARTIFACT_ROOT)
-    key = source._api_key()
+def _owned_session() -> object:
+    """Create only the reviewed exact, verified, no-proxy/no-retry Session."""
     raw = source._new_session()
     owned = source._OwnedSessionGuard(raw)
     try:
@@ -575,12 +640,7 @@ def capture_sharadar_identities() -> LoadedSharadarIdentityCapture:
         raw.hooks.clear()
         raw.adapters.clear()
         raw.mount("https://", HTTPAdapter(max_retries=0))
-        return _capture_core(
-            artifact_root=DEFAULT_ARTIFACT_ROOT, price_artifact_path=PRICE_ARTIFACT_PATH,
-            price_binding=binding, session=owned, key=key,
-            clock=lambda: datetime.now(timezone.utc), transport=PRODUCTION_TRANSPORT,
-            close_owned_session=True,
-        )
+        return owned
     except BaseException as exc:
         try:
             owned.close()
@@ -589,6 +649,35 @@ def capture_sharadar_identities() -> LoadedSharadarIdentityCapture:
         if isinstance(exc, SharadarIdentityCaptureError) or not isinstance(exc, Exception):
             raise
         raise SharadarIdentityCaptureError("identity transport setup failed; details redacted") from None
+
+
+def capture_sharadar_identities() -> LoadedSharadarIdentityCapture:
+    """Production entry first pins existing price bytes, then owns key/Session."""
+    binding = _price_binding(PRICE_ARTIFACT_PATH, PRICE_MANIFEST_SHA256, synthetic=False)
+    source._preflight_root(DEFAULT_ARTIFACT_ROOT)
+    key = source._api_key()
+    return _capture_core(
+        artifact_root=DEFAULT_ARTIFACT_ROOT, price_artifact_path=PRICE_ARTIFACT_PATH,
+        price_binding=binding, session=_owned_session(), key=key,
+        clock=lambda: datetime.now(timezone.utc), transport=PRODUCTION_TRANSPORT,
+        close_owned_session=True,
+    )
+
+
+def inspect_sharadar_stock_header() -> StockHeaderDiagnostic:
+    """One exact QCOM GET; no artifact creation, body persistence or row output."""
+    _price_binding(PRICE_ARTIFACT_PATH, PRICE_MANIFEST_SHA256, synthetic=False)
+    key = source._api_key()
+    return _inspect_stock_header_core(
+        _owned_session(), key, lambda: datetime.now(timezone.utc), close_owned_session=True,
+    )
+
+
+def _inspect_stock_header_for_test(
+    *, session: object, clock: Callable[[], datetime], api_key: str,
+) -> StockHeaderDiagnostic:
+    key = source._validated_api_key(api_key, synthetic=True)
+    return _inspect_stock_header_core(session, key, clock, close_owned_session=False)
 
 
 def _capture_sharadar_identities_for_test(
@@ -605,8 +694,14 @@ def _capture_sharadar_identities_for_test(
 
 
 def _main(argv: list[str] | None = None) -> int:
-    argparse.ArgumentParser(description=__doc__).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--inspect-stock-header", action="store_true")
+    args = parser.parse_args(argv)
     try:
+        if args.inspect_stock_header:
+            diagnostic = inspect_sharadar_stock_header()
+            print(canonical_json_bytes(dataclasses.asdict(diagnostic)).decode("utf-8"), end="")
+            return 0
         result = capture_sharadar_identities()
     except SharadarIdentityCaptureError as exc:
         print(f"refused={exc}", file=sys.stderr)

@@ -1,7 +1,8 @@
 # Guidance Revision Drift - lane implementation record
 
 Status: **Section 16 counter-review accepted after correction; ENG-17..ENG-26
-offline backtest-preparation batch in progress (section 17). Native LEAN/QC
+offline backtest-preparation batch implemented, pending independent Claude
+review of this round's exact pushed snapshot (section 17). Native LEAN/QC
 execution and empirical backtest readiness remain unverified/blocked. Original
 GDR-0..6 gates remain closed.**
 Current scope/evidence are sections 16 and 17. Sections 2 through 6 preserve
@@ -1222,8 +1223,8 @@ Plain language: successful packaging means the package was prepared, not that
 the strategy is ready to trade or permitted to start a backtest.
 
 **ENG-26 technical:** The final source epoch is rebuilt into a content-addressed
-v2 review release plus a separate source bundle. Final hashes, reproduction
-checks and publication range are recorded below when verification completes.
+v2 review release plus a separate source bundle. Exact reconstruction and
+published portable-content verification passed; final hashes and range are below.
 
 Plain language: Claude receives one stable review snapshot and explicit
 remaining blockers, without confusing fixture completion with market evidence.
@@ -1239,7 +1240,7 @@ remaining blockers, without confusing fixture completion with market evidence.
 | Active-document guard via normal pytest/conftest | 69 passed in 1.06s |
 | Python compilation | 63 lane source/test files compiled in memory, no bytecode publication; SDK imports not executed |
 | Original proposal, candidate and root documents | Candidate/source pins verified; root Action Plan, Session Handoff and Feature Milestone Record unchanged |
-| Exact release reconstruction/publication | 6 tests passed in 181.215s, including actual reconstruction; CLI local bundle/review publication both exit 0; published-artifact portable verification running below |
+| Exact release reconstruction/publication | 6 tests passed in 181.215s, including actual reconstruction; CLI local bundle/review publication both exit 0; published artifact portable-content reconstruction passed with changed interpreter label, runtime parity still false |
 
 Temporary test failures in bundle/CLI assertions were macOS `/var` versus
 resolved `/private/var` path expectations; tests were corrected to compare
@@ -1249,9 +1250,69 @@ repository suite, Windows validation, SDK/native/QC run, provider read or
 outcome access was performed. Source/provider, outcome, QC upload/job, broker,
 paper/live and capital gates remain closed.
 
-Source epoch is now frozen at code-manifest SHA-256
+Source epoch is frozen at code-manifest SHA-256
 `19175ad06bdb4b8e63b00e60181d0fa5d3e96c97c58cef0a552f57983ca49ecf`.
-The source implementation commit contains the counter-review, ENG-17..25 and
-the ENG-26 release machinery/validation. A closing record/artifact commit will
-name that source commit, record final verification and finish ENG-26 before
-the sole push. No intermediate push is permitted.
+The source implementation commit is
+`eba0fe5212726e95c01e61d3a30067c7518a91ee`, containing the counter-review,
+ENG-17..25 and ENG-26 release machinery/validation. This closing record/artifact
+commit finishes ENG-26; it changes no producing source. No intermediate push
+was made. The sole push follows final root/branch/HEAD/status, diff and remote
+head checks and targets only `codex/strategy-guidance-revision-drift`.
+
+### 17.6 Exact release, exclusions and next action
+
+Closing verification: 2026-10-08, 07:00 UTC. Final combined active-document
+and lane-boundary selection: **75 passed in 1.19s**. Both published filenames
+match their bytes; release/current-source identity and source-bundle
+reconstruction were checked again after the producing-source commit.
+
+Reviewed Claude range:
+`d522fad7c3b849f008a369a7a6f458dfdcdc797c..a6cc4035361e883ad1ce60e18f2b456b06992de3`.
+New producing-source range:
+`a6cc4035361e883ad1ce60e18f2b456b06992de3..eba0fe5212726e95c01e61d3a30067c7518a91ee`.
+Claude must review that source commit **and this closing record/artifact
+commit** at the final pushed lane HEAD; the exact published SHA is also in the
+owner-facing handoff and Git remote. No claim of independent acceptance of
+this new batch is made.
+
+All artifact paths below are under `research/guidance_revision_drift/releases/`:
+
+| Identity | Value |
+|---|---|
+| Review JSON filename/SHA-256 | `0f22e92a7e9627d8b72b4ffc9aba4372225ab8c692e235952f17de71750ff029.json` (26,152 bytes) |
+| Source bundle filename/SHA-256 | `4dd53e405596d8169d0fd4f83ae2166bb9c56102090e509b5e3a59b86b76fe69.zip` (423,249 bytes, 38 members) |
+| Portable release content SHA-256 | `260096a102a672c74670fc113c4de4da4f02a99950bb4db62219b0b5ef9fec2c` |
+| Interpreter environment SHA-256 | `8494750c6fbf1d47fb632bfe24d2d82cd401cc86b45cffbf9725613739a553e3` (CPython 3.12.14) |
+| Original base/stress fixture report SHA-256 | `5012f6bc81cc7f9b6fe95bf51917f281b65b64ac97941445cb0c02e0d1839b3b` |
+| Integrated fixture report SHA-256 | `c9efe5e08be5f38d9335f395c8c983e97474d889db937ef82cafb0b62785d120` |
+
+Report hashes change with the producing source epoch even when fixture
+economics do not. Original candidate, MD/PDF, calendar and sidecar pins remain
+unchanged. The preceding `fccbef76...json` release is retained as historical
+evidence; it is not claimed to reproduce against this new source.
+
+Published JSON verification rebuilt all bounded recipes with a patched
+descriptive Python-version label (`3.13.15`), retained the portable identity,
+and reported `environment_matches=false`, `runtime_parity_verified=false` and
+`qc_launch_allowed=false`. This tests label separation, **not** execution under
+Python 3.13. Exact-environment reconstruction was separately tested. Every
+artifact hash matches its filename; the source bundle reproduces current
+source without extraction or execution. It intentionally excludes planning
+documents and the SDK, so it is neither a standalone release-regeneration
+checkout nor a ready-to-upload QC project.
+
+No provider credentials/data, historical/protected outcomes, statistical
+allocation, operator database, broker, scheduler, paper/live deployment,
+PR/main merge, force push, SDK installation or QuantConnect attempt occurred.
+This is ten implemented offline engineering increments, **not ready for an
+empirical backtest** and not completion of original GDR-0..GDR-6 stages.
+
+Next: Claude independently reviews the exact combined pushed snapshot and
+performs the full lane validation; Codex counter-reviews every resulting
+commit. After that, the owner must separately scope a pinned synthetic-engine
+integration evaluation and/or zero-outcome source/rights audit before those
+activities start. Real-data evaluation additionally needs the unresolved
+freeze, dated inputs, engine/comparator/settlement contracts, evidence windows
+and look/family allocation. No new implementation batch or monitor cycle
+starts automatically. Both agents continue lane-record-only handoffs; root
+documents remain frozen and historical edits remain for later integration review.

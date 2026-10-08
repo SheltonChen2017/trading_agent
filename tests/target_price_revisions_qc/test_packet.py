@@ -265,3 +265,33 @@ def test_hostile_decimal_context_does_not_change_frozen_scores(monkeypatch):
         context.rounding = ROUND_DOWN
         actual = packet.build_signal_packet(payload, **kwargs)
     assert actual == baseline
+
+
+def test_packet_bound_to_a_different_freeze_hash_is_refused(monkeypatch):
+    """TPR-CR21-005: the packet's own freeze binding, independent of the upload path."""
+    result = build(monkeypatch)
+    packet.validate_packet(result)
+    result["freeze_sha256"] = "0" * 64
+    with pytest.raises(packet.PacketError, match="frozen policy mismatch"):
+        packet.validate_packet(result)
+
+
+def test_scored_state_above_the_score_bound_is_refused(monkeypatch):
+    """TPR-CR21-005: |score| must stay within the closed 100,000 bound."""
+    result = build(monkeypatch)
+    scored = next(state for frame in result["frames"] for state in frame["states"] if state["state"] == "scored")
+    scored["score"] = "100000"
+    packet.validate_packet(result)
+    scored["score"] = "-100000.5"
+    with pytest.raises(packet.PacketError, match="out-of-bound score"):
+        packet.validate_packet(result)
+
+
+def test_two_eligible_identities_sharing_one_ticker_are_refused(monkeypatch):
+    """TPR-CR21-005: an eligible ticker must map to exactly one packet identity."""
+    result = build(monkeypatch)
+    eligible = [row for row in result["identities"] if row["eligible"]]
+    assert len(eligible) >= 2
+    eligible[1]["ticker"] = eligible[0]["ticker"]
+    with pytest.raises(packet.PacketError, match="ambiguous eligible ticker"):
+        packet.validate_packet(result)

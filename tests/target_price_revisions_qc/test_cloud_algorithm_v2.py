@@ -371,3 +371,39 @@ def test_other_incomplete_evidence_cannot_claim_success(modules, fault):
     else:
         algo._fill_events = 0
     assert summary(algo)["meaningful_execution"] is False
+
+
+def test_signal_cutoff_at_or_after_the_decision_clock_is_refused_before_membership(modules):
+    """TPR-CR21-005: the only behavioural proof of the look-ahead guard. A frame
+    whose cutoff equals or follows the 09:20 engine clock must refuse before any
+    membership or mark is read; one second earlier proceeds to the membership
+    step and, with no snapshot, records a refused decision rather than a trade."""
+    for module in modules:
+        algo = algorithm(module)
+        for cutoff in ("2025-01-02T14:20:00+00:00", "2025-01-02T14:20:01+00:00"):
+            algo._frames["2025-01-02"]["cutoff_utc"] = cutoff
+            with pytest.raises(ValueError, match="not yet available"):
+                algo._prepare_targets("2025-01-02")
+        algo._frames["2025-01-02"]["cutoff_utc"] = "2025-01-02T14:19:59+00:00"
+        algo._prepare_targets("2025-01-02")
+        assert algo._decision_coverage["2025-01-02"] is None and algo.orders == []
+
+
+def test_plan_orders_lists_every_sell_before_any_buy_regardless_of_identity_order(modules):
+    """TPR-CR21-005: sells precede buys even when the buy identity sorts first."""
+    for module in modules:
+        orders = module.plan_orders({"A"}, {"Z": 10}, {"A": ("50", "100000"), "Z": ("100", "100000")}, "100000", "1000")
+        submitted = [(row["security_id"], row["submitted"]) for row in orders if row["submitted"]]
+        assert submitted == [("Z", -10), ("A", 19)]
+
+
+def test_meaningful_execution_requires_exactly_sixty_valuation_days(modules):
+    """TPR-CR21-005: a missing mid-window valuation day, with 2025-03-31 still
+    present, cannot be labelled a complete run."""
+    algo = algorithm(modules[1])
+    complete_evidence(algo, modules[1])
+    assert summary(algo)["meaningful_execution"] is True
+    algo._valuation_days.remove("2025-02-03")
+    assert summary(algo)["meaningful_execution"] is False
+    algo._valuation_days.update({"2025-02-03", "2025-01-09"})
+    assert summary(algo)["meaningful_execution"] is False

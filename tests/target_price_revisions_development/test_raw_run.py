@@ -5,6 +5,7 @@ import json
 import os
 from pathlib import Path
 import socket
+from types import SimpleNamespace
 
 import pytest
 
@@ -584,3 +585,45 @@ def test_cli_refusals_and_failures_are_closed_safe_json(monkeypatch, capsys, fai
     captured = capsys.readouterr()
     assert json.loads(captured.out)["status"] == expected_status
     assert "PRIVATE" not in captured.out + captured.err and captured.err == ""
+
+
+def test_private_root_without_owner_only_mode_is_refused(bundle):
+    """TPR-CR20-003: a group- or world-accessible private root is refused before any input is read."""
+    bundle.chmod(0o750)
+    try:
+        with pytest.raises(controller.RawRunError, match="owner-only custody"):
+            controller._open_root(bundle, "offline-fixture")
+    finally:
+        bundle.chmod(0o700)
+
+
+@pytest.mark.parametrize("cwd_is_lane,git_values,message", [
+    (False, None, "designated physical lane"),
+    (True, ("/SYNTHETIC/other-toplevel", controller.LANE_BRANCH), "lane identity mismatch"),
+    (True, (None, "codex/SYNTHETIC-other-branch"), "lane identity mismatch"),
+    (True, OSError, "lane identity unavailable"),
+    (True, (None, controller.LANE_BRANCH), None),
+])
+def test_lane_verification_refuses_foreign_cwd_toplevel_or_branch(monkeypatch, tmp_path, cwd_is_lane, git_values, message):
+    """TPR-CR20-001 evidence: the lane check is exercised with an injected root,
+    so the proof does not depend on the one physical path the module pins."""
+    lane = tmp_path / "lane"
+    lane.mkdir()
+    (tmp_path / "other").mkdir()
+    monkeypatch.setattr(controller, "LANE_ROOT", lane.resolve())
+    monkeypatch.chdir(lane if cwd_is_lane else tmp_path / "other")
+    answers = iter(git_values if isinstance(git_values, tuple) else ())
+
+    def fake_run(command, **kwargs):
+        assert kwargs["cwd"] == controller.LANE_ROOT and kwargs["capture_output"] and kwargs["check"]
+        if git_values is OSError:
+            raise OSError("synthetic git failure")
+        value = next(answers)
+        return SimpleNamespace(stdout=(str(controller.LANE_ROOT) if value is None else value).encode("ascii"))
+
+    monkeypatch.setattr(controller.subprocess, "run", fake_run)
+    if message is None:
+        controller._verify_lane()
+    else:
+        with pytest.raises(controller.RawRunError, match=message):
+            controller._verify_lane()

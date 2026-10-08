@@ -3,7 +3,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from dataclasses import FrozenInstanceError
-from decimal import localcontext
+from decimal import Decimal, localcontext
 
 import pytest
 
@@ -452,3 +452,19 @@ def test_unknown_fields_and_custom_primitive_subclasses_refuse_without_callbacks
     frame["weights"] = ({"security_id": Evil("NATIVE:A"), "weight": "0.1"},)
     with pytest.raises(bt.RawBacktestError):
         run(frame=frame)
+
+
+def test_commission_is_reserved_before_the_last_affordable_buy_so_cash_never_goes_negative():
+    """TPR-CR20-002: at a gapped-up open, ten frozen nine-share orders leave the
+    last buyer with cash for nine shares' notional but not for their commission.
+    The engine must fill eight and keep cash non-negative; dropping the
+    per-share commission from affordability would borrow the shortfall."""
+    sids = tuple(f"NATIVE:{letter}" for letter in "ABCDEFGHIJ")
+    inventory = tuple({"security_id": sid, "asset_type": "common-stock"} for sid in sids)
+    result = run(security_inventory=inventory, frame=target(tuple((sid, "0.1") for sid in sids)),
+                 rows=tuple(bar(sid, open="11.0905", close="11.0905") for sid in sids))
+    assert [(f.security_id, f.quantity) for f in result.fills] == [(sid, 9) for sid in sids[:-1]] + [("NATIVE:J", 8)]
+    assert result.orders[-1].security_id == "NATIVE:J" and result.orders[-1].pending_quantity == 1
+    assert "insufficient_cash" in {r.reason for r in result.exclusions} and result.complete is False
+    assert result.final_cash == "11.0684455" and result.total_commission == "0.89"
+    assert Decimal(result.final_cash) >= 0 and all(Decimal(s.cash) >= 0 for s in result.sessions)

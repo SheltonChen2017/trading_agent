@@ -1237,12 +1237,19 @@ all integrity checks stay enforced, and the exact local metadata barrier is
 recorded in 263.13–263.14. Independent formal source gates remain separate.
 Claude must review section 263 and the final pushed snapshot; no intermediate
 reviewer checkpoint is introduced.
-Section 264 resumes on the human's subsequent "proceed": first diagnose
-publication using bounded synthetic metadata-only fixtures on this worktree's
-filesystem. Preserve both failed production directories and every integrity
-check. A production recovery protocol must be separately frozen and verified
-before any new publication or QC preparation/contact; no routine approval or
-Claude-review wait is introduced.
+Section 264 completes two bounded synthetic metadata experiments on the
+human's subsequent "proceed": all 17 fixtures show held/named ctime drift with
+unchanged bytes. Extra fsync, retaining the writer and omitting optional xattr
+inspection do not produce a stable path; all eight reopened consumers also
+refuse. The targeted system-log command cannot run inside required denial,
+so attribution remains unavailable, not zero activity. Preserve both failed
+production packages, both diagnostic packages and every integrity check.
+Next requires supported host-level evidence/access that can identify and
+resolve this actual metadata-change boundary without disabling protections or
+moving the designated worktree. No further source publication or QC preparation
+is supported by these results. After genuine resolution, separately freeze
+and verify a production recovery protocol before use. No routine approval or
+Claude-review wait is introduced; independent formal source gates remain.
 Claude must review section 264 and its final pushed snapshot.
 That review must be independent; same-round advisory checks do not qualify.
 The human explicitly reiterated "build until the project is ready for forward
@@ -3080,7 +3087,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Claude independent review of sections 255-260: delegated continuous work, response observations, the captured-clock projector, provider captures and the Massive inquiry | `33958eaa` -> this record commit | Section 261: eleven Codex commits `a205ebf7..33958eaa` disposed (11 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser actions, looks, evaluations, or cells | No code changed by Claude. Reproduced the local evidence of sections 255-260 (claim and source identities, tool hashes, capture manifests, row counts, receipt flags, the vintage comparison and the Sharadar ZIP hashes); native in-memory mutation trials on both code commits; a scratch probe confirming `ARV2R261-001`; accepted `ARV2CR255-001` and `ARV2CR255-002` against section 254; section 4 names section 261, banner sentence added, this row appended | Complete lane selection at `33958eaa` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 261.6 | 0 P0, 0 P1, 0 P2, 1 P3 (`ARV2R261-001`, documented for Codex); `ARV2R248-002`, `-003` and `-004` remain open | Single push of this round's Claude commit; Codex counter-reviews section 261 unless the owner changes the workflow |
 | 2026-10-07 | Codex section-261 counter-review, reply monitor and owner-directed immediate RAW-price acquisition | `b80149b8` -> `2f5ddf4b` + final record commit | Section 262: one new Claude commit accepted after scratch-probe qualification; actual Massive reply read; human cancels clarification drafts; bounded direct Sharadar capture completes all seven October 6 rows | New reply monitor created then retired because the original is answered and follow-up cancelled; old review monitor remains paused; no shared/frozen/registry edits, new look/cell or paid/live action | 263 distinct focused passes under strict network denial; actual two-GET private capture and pinned offline readback; no complete Codex suite | Current RAW-price access step completed; immutable availability and independent identity/formal packages remain unavailable, not cleared by other-lane use | One final matching-lane push at this concrete source-evidence boundary; no routine approval/review wait; resume supported substantive evidence work when available |
 | 2026-10-07 | Codex owner-directed seven-security identity preparation | `96318ebc` -> `79883200` + final record commit | Section 263: bounded current identity/public FIGI captures complete; source continuity comparisons run but local publication refuses twice, with the second locating output-manifest ctime drift; no QC attempt/look/cell | New bounded adapters, versioned continuity projection and prepared-only QC runner; four pre-contact P2 corrections; original source refusals retained, private Sharadar rows local and partial artifacts preserved | Root 785 focused strict-network-denied passes, closure and final record checks in 263.15; no complete Codex suite or QC validation | ARV2E263-001 local publication-integrity barrier; independent immutable source/security-master/price/score gates and historical P2s remain; not forward ready | Exactly one final matching-lane push at the concrete artifact-integrity/evidence stop; no routine approval/Claude wait or monitor rearm |
-| 2026-10-08 | Codex owner-directed publication diagnosis and conditional identity diagnostic continuation | `f72b1cfb` -> this continuous round | Section 264 begins with synthetic metadata-only diagnosis; no new source/QC operation is implied by code or local fixtures | Preserve original failed artifacts, immutable source pins and all integrity gates; new production recovery requires its own evidence and freeze | Strict-network-denied focused checks and actual diagnostic outcomes recorded below; no complete Codex suite | ARV2E263-001 and formal independent-source gates remain until genuine evidence addresses their exact requirements | Continuous authorized work without routine approval/Claude wait; exactly one final matching-lane push |
+| 2026-10-08 | Codex owner-directed publication diagnosis | `f72b1cfb` -> final section-264 snapshot | Two frozen synthetic experiments reproduce ctime drift in all 17 fixtures; B's eight consumer reopens also refuse | No supported fix from extra fsync, writer retention or omitted optional provenance; preserve both diagnostic and failed production packages, original sources and all guards | 27 A / 21 B / 129 unchanged bridge / 86 document / 2 closure focused checks; final union recorded below, no complete suite | ARV2E263-001 remains a reproduced local publication barrier; targeted attribution unavailable under required denial; separate independent formal source gates remain | Supported host-level attribution/resolution is needed before a separately frozen production recovery; no routine approval/Claude wait, monitor stays disarmed, one final lane push |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -38090,3 +38097,122 @@ initial/during/final/consumer drift, no rebaseline, replacement/path refusal,
 cooperative deadlines and exclusive bounded private reporting. A implementation
 and report pins are unchanged; B and QC targets remain absent before the
 prospective freeze commit. Execute B once only after this commit; no push yet.
+
+### 264.4 Actual B result: neither proposed lifecycle factor resolves drift
+
+At clean `171a5b08154851f93cd6c96cdb8a7cabc1ac5e02`, root rechecks exact
+root/branch/HEAD and absent B target, then executes its sole frozen invocation
+under strict network denial. The report completes in **32.093536 seconds**:
+**8 cases / 96 scheduled observations / 77 refused observations / 8 refused
+final checks / 8 refused reopened-consumer checks**. Private report SHA-256:
+`7c383cdc72bd36f0203a28571dfe6eee9c138503d88a4541da2360280e690376`.
+The synthetic payload remains the exact A payload; no source bytes are used.
+
+Every case has a valid initial baseline, then ctime-only drift during its
+first window. The retained-writer cases already drift **before** writer close;
+the provenance-off cases perform no xattr API/CLI query and nevertheless drift.
+All 48 second-window observations and all eight fresh consumer comparisons
+refuse the unchanged original baseline. Every readback still matches the
+synthetic payload. Enabled provenance is present before/after; disabled is
+deliberately unobserved, not absent. No metadata value is stripped or rewritten.
+
+| Writer / optional provenance | First-window refused observations (two cases) | Second-window refusals | Fresh-consumer refusals |
+| --- | --- | --- | --- |
+| Early close / on | 3, 3 | 12 of 12 | 2 of 2 |
+| Early close / off | 3, 5 | 12 of 12 | 2 of 2 |
+| Retained open / on | 3, 5 | 12 of 12 | 2 of 2 |
+| Retained open / off | 3, 4 | 12 of 12 | 2 of 2 |
+
+The first changed samples occur at actual elapsed 0.011871334–0.505527042
+seconds; this does not identify exact mutation times. There is no evidence
+here that early writer close or the optional probe is required for the drift.
+Neither retaining the writer nor omitting optional observation supplies a
+stable path in these tests. The grouped-order and finite-window limits remain;
+no actor, operating-system defect, security-component cause or licensed-source
+tampering is inferred. A/B remain immutable retained diagnostic packages.
+
+**ARV2OD264-C (bounded read-only attribution check):** inspect supported local
+unified-log metadata once, last 20 minutes, filtered only to messages containing
+`R264-20261008-A` or `R264-20261008-B`. Return only matching-event count,
+timestamp, process basename/ID, subsystem and category; do not print message
+bodies, unrelated events or credentials. Run under strict network denial, with
+no privilege escalation, permission changes, audit configuration or system
+trace installation. Unsupported/denied/empty output is an access/coverage
+limitation, not proof of no activity or an identified actor. This is limited
+to today's synthetic fixtures, not a replay of prior Mac/QC history audits.
+
+The C command returns **exit 64: "log: Cannot run while sandboxed"**.
+Pipeline `pipefail` retains that failure. The downstream parser's empty array
+and zero count are **not a successful log observation** and establish no
+absence of activity. No actor is identified. No unsandboxed retry, privilege
+escalation, protection change, wider history search or trace installation is
+performed. This concrete attribution-access limitation is recorded without
+claiming that every possible external diagnostic has been exhausted.
+
+### 264.5 Disposition, exclusions and final handoff
+
+The original publication barrier is now reproduced on fixed synthetic bytes,
+independent of licensed data and without changing the production bridge.
+The tested supported local variations do not resolve it; unsafe alternatives
+are not substituted. In particular: no ctime exception, rebaseline after
+observed drift, wait-until-passing loop, direct-write completion marker,
+unverified rename/overwrite, xattr removal, security-setting change or path
+relocation is authorized or implemented. A new production package cannot be
+honestly claimed usable from these results, so no third source-publication
+attempt or R284 preparation is made. Actual completion/forward readiness
+remains unproven, not blocked on routine owner approval or Claude cadence.
+
+The concrete next dependency is supported host-level attribution/resolution
+of metadata changes in this designated worktree's filesystem, retaining the
+required security/network boundary and original identity checks. An original
+target-specific event/trace or a safely resolved host condition can support
+the next separately frozen recovery protocol; broad permission alone cannot
+supply that evidence. No standing monitor is rearmed: the review monitor stays
+paused and the email monitor retired under the later human directions.
+
+No provider/QC client or credential access, source refresh/inspection,
+project creation, upload, compile, backtest, result read, economic evaluation,
+paper/live/funded account or order occurred in section 264. R284 remains
+unprepared and unlaunched. The shared ledger stays unchanged at **313 shared /
+239 development / 49 infrastructure / 699 cells**. No frozen source, original
+capture/refusal, strategy/selector, root/shared policy, trust registry or false
+readiness/action flag changes. Massive's confirmed immutable-history limitation,
+the independently reviewed dated identity/RAW-price/score requirements,
+ARV2-4..8, formal preregistration/alpha/epoch, stock-first seven-role/payoff and
+independent final dossier gates remain separate. Historical
+ARV2R248-002/-003/-004 are not replayed or cleared.
+
+Exact new code range before this final record commit:
+`f72b1cfb7cd027dbc859687e1af28a570e5b762a..171a5b08154851f93cd6c96cdb8a7cabc1ac5e02`.
+Root implementation/verification dispositions (not independent acceptance):
+
+| Commit | Disposition |
+| --- | --- |
+| `56404cad0d30045d7ed84c79c2489d3a086de2e0` | A protocol and synthetic-only script/tests frozen before its sole invocation; all nine final checks refuse ctime drift, so no production fix is inferred. |
+| `171a5b08154851f93cd6c96cdb8a7cabc1ac5e02` | A actual result retained and B factorial/lifecycle protocol frozen before its sole invocation; all eight final and reopened-consumer checks refuse, excluding the proposed changes as supported remedies in this experiment. |
+| This final section-264 record commit | Retains B results, denied attribution access, exact exclusions, final focused validation and the concrete next dependency; no production or readiness change. |
+
+Claude must review section 264 and the final pushed snapshot independently.
+Same-round advisory reviews and focused tests are not that review. No old
+Claude commit is reprocessed and no acknowledgement-only push is required.
+Only the two synthetic diagnostic scripts, their two test files and this lane
+record change. Final focused validation and exact matching-lane push checks
+are recorded below; no complete suite or QC completion is claimed.
+
+Root's final focused union is **265 passed in 7.66s** under strict network
+denial: 27 A + 21 B + 129 unchanged production-bridge baseline + 86
+record/active-document + 2 import-closure/authority tests. This is this round's
+distinct selected union, not a full suite, a sum of repeat runs, or the separate
+section-256 union that also happened to total 265. Targeted compilation of the
+four new script/test files and staged/unstaged diff checks pass.
+
+Final retention check reproduces both failed source-package input hashes from
+263.14 and both synthetic report hashes above; neither failed manifest marker
+has been restored and the QC preparation directory remains absent. No original
+licensed rows or old cloud histories are reprocessed. The matching-branch-only
+fetch still reports remote `f72b1cfb7cd027dbc859687e1af28a570e5b762a`, with
+two local commits ahead / zero behind before this final record commit. No new
+Claude review is present. Verify exact root/branch/HEAD/status, commit only this
+record, recheck the pinned record and make exactly one final matching-lane push.
+The resulting snapshot remains pending independent review and stopped at the
+concrete publication/source-evidence barriers, not complete or forward-ready.

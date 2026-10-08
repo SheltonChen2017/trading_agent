@@ -1,12 +1,12 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Section 17 (Codex counter-review of section 16 and ENG-17..ENG-26)
-independently reviewed by Claude in section 18 (2026-10-08): both commits
-accepted, three lane regression pins added, no production defect found.
-Codex counter-review of section 18 pending. Native LEAN/QC execution and
-empirical backtest readiness remain unverified/blocked. Original GDR-0..6
-gates remain closed.**
-Current scope/evidence are sections 16 through 18. Sections 2 through 6 preserve
+Status: **Section 18 counter-review accepted after correction. Per-frame
+native-account enforcement and identity-policy test decoupling are implemented
+as local-only preparation in section 19, pending independent review.
+Owner-scoped native engine evaluation is required before continuation or the
+single combined push. Native LEAN/QC execution and empirical backtest
+readiness remain unverified/blocked. Original GDR-0..6 gates remain closed.**
+Current scope/evidence are sections 17 through 19. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -1421,3 +1421,154 @@ empirical backtest, data, QC, broker, paper or live step starts from this
 review; each needs the owner's separate scope, as section 17.6 states.
 `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
 in this round and stay frozen for both agents.
+
+## 19. Codex counter-review and remaining readiness work, 2026-10-08
+
+### 19.1 Exact trigger and authorized scope
+
+The monitor consumed completed Claude review head
+`c0137c518277c8a9a87af51f52add3eccd088617`, fetched from the matching lane
+ref and equal to the clean designated worktree HEAD. Its exact ancestor is
+Codex baseline `b3d5477740534da9a2428e9c44e4f4303bb33ff0`. The ordered
+review range contains `73084917deaf5ec129b3d459b5afa2386a67624f` and
+`c0137c518277c8a9a87af51f52add3eccd088617`; section 18 explicitly hands the
+completed review back to Codex. Earlier monitor baselines are historical.
+
+The owner's 2026-10-08 instruction is to counter-review this push and build
+until backtest-ready, without another artificial milestone quota. It permits
+substantive offline software preparation, not a native engine installation,
+evaluation, provider/rights audit, outcome look or QC launch. Only this record
+and lane-owned source/tests/documentation may change. Root documents remain
+frozen. All changes accumulate for one final combined push; an owner-input
+blocker pauses publication rather than publishing a partial round.
+
+### 19.2 Remaining gaps and definitions of done before implementation
+
+Current source checks native inventory/cash only at the final callback. A
+temporary mismatch that disappears before the end can therefore evade that
+check. This is a concrete integration gap that can be addressed with the
+existing exact synthetic accounting, without choosing financial assumptions.
+
+| Work | Bounded definition of done and evidence |
+|---|---|
+| Review corrections | Counter-review both Claude commits and every CR18 finding; reproduce the three regression pins with focused tests/mutants; retain per-commit dispositions and P0-P3 ledger. Correct minor commit attribution: the ZIP attribute is in `73084917`, its boundary-test pin is in `c0137c51`. |
+| Identity-policy test ownership | Replace the historical release dependency of CR18-004 with a minimal explicit unit body. Preserve hostile identity/authority/type mutations and keep actual release reconstruction owned by its existing separate tests. No production identity policy change. |
+| Native account checkpoints | Before each native callback advances the bridge, verify whole native SYN-GDR inventory and immediate-envelope cash against the acknowledged shadow state. Cash equals settled cash plus exact outstanding receivables, never available cash or reservation-adjusted cash. Reject malformed/unequal input or pending acknowledgements without index/trace/state effects. Trace successful observations, preserve existing end checks, and test partial fills, transient drift, unsettled sale proceeds and later dated settlement. This verifies adapter enforcement only, not native cash-account settlement. |
+| Reviewable local handoff | Focused source/bridge/identity regressions, import/document checks, compilation, exact frozen-document/candidate checks and diff/status; current source evidence and next exact gate retained here. No complete lane/repository suite. |
+
+Dependencies still required for actual order-based empirical readiness are a
+pinned native LEAN/Python-.NET evaluation, separately designed native matched
+SPY/account/corporate-action integration, validated equity settlement and
+rights-cleared dated guidance/market/reference/action inputs. The original
+parameter freeze, source audit, family/look allocation and evidence windows
+are unresolved. A stronger synthetic checkpoint cannot close any of these.
+No runtime is installed or run under this work definition. Once the safe
+offline changes above are verified, the next necessary external/owner gate
+must be presented to the owner before continuing or publishing.
+
+### 19.3 Counter-review dispositions and retained findings
+
+| Claude commit | Disposition | Evidence |
+|---|---|---|
+| `73084917deaf5ec129b3d459b5afa2386a67624f` | accepted | Complete diff and affected contracts inspected. Three exact correction regressions passed; all three guard-removal mutants failed at the intended guard and restored green. No production logic changed. |
+| `c0137c518277c8a9a87af51f52add3eccd088617` | accepted-after-correction | Complete record/test diff inspected; baseline ancestry and completed handoff verified. Section 18 is retained. This section corrects minor commit attribution and CR18-004's test ownership. Claude's full-suite results remain attributed to Claude; Codex did not repeat them. |
+
+| ID | Priority / status | Evidence, reason and disposition |
+|---|---|---|
+| GDR-CR18-001 | P3 / accepted, corrected | `*.zip binary` is a valid lane-local byte contract. The exact boundary pin fails without it; artifact bytes and hashes are unchanged. The attribute is in `73084917`, but the boundary pin is in `c0137c51`. |
+| GDR-CR18-002 | P3 / accepted, corrected | The tampered destination regression requires definite `different bytes` refusal, not uncertain publication. Removing the conflict guard makes it fail; no overwrite occurs. This distinguishes a retryable ambiguous result from an immutable conflict. |
+| GDR-CR18-003 | P3 / accepted, corrected | A fill before submission acknowledgement is refused with pending receipt/trace/state retained; acknowledgement then permits the exact receipt. Removing the acknowledgement guard makes the pin fail. |
+| GDR-CR18-004 | P3 / corrected here | Identity-policy tests depended on a historical artifact unrelated to their unit contract. Replaced it with an explicit representative body, retaining all hostile mutations. Added filesystem-independent fixture and canonical Boolean/integer type checks. Restored-file and loose-equality mutants fail; actual release reconstruction remains separately owned. Historical releases are not deleted. |
+| GDR-CR18-005 | P2 / accepted as reported, out of lane | Claude's fifteen shared/Insider/Target-Price failures remain reported, not fixed or rerun here. Review range changes only lane files and this record; it cannot correct other lanes' worktree restrictions or shared contracts. |
+| GDR-CCR19-001 | P3 / corrected documentation attribution | Section 18.7 and `73084917` message group attribute and boundary pin under the first commit; actual diff places the pin in the second. Exact ownership is recorded above without rewriting history. |
+| GDR-CCR19-002 | P2 / corrected source candidate | End-only native cash/inventory checks miss temporary drift. Two new tests reproduced six failing subcases before implementation. Per-frame draft checkpoint enforcement now refuses transient mismatch, nonfinite/fractional/negative scalars, aliases, partial inputs and trace exhaustion without consuming effects. Immediate cash includes receivables; original proposed economics remain unchanged. |
+| GDR-CCR19-003 | P2 / owner-input blocker | No pinned native runtime/binding run exists; no native matched-SPY/actions/equity-settlement or rights-cleared real-data adapter exists. Python/shim checks cannot establish these. Need the next exact owner scope before platform work or publication, not another synthetic completion claim. |
+
+No P0/P1 issue was identified. CR18 findings retain P0 0, P1 0, P2 1,
+P3 4; this counter-review adds one corrected P3 and two P2 items (one
+corrected source candidate, one blocked validation requirement). Shared
+failures and the blocker remain visible. Review-quality assessment: 8/10 for
+the bounded offline scope; no empirical/native-readiness rating is implied.
+
+### 19.4 Implemented behavior and current boundary
+
+Technical: native `on_data` supplies cash/inventory to bridge `step`. Exact
+checks run before shadow advancement and only after prior receipts clear.
+Checkpoint and frame trace publication occur on the same draft, preserving
+atomic refusal even if the second trace record exceeds capacity. The native
+source requires all 372 checkpoints at completion; base native-source trace
+count is 752. Offline protocol-only diagnostics remain explicit (zero account
+checks / 380 base trace records). Settlement parity stays false. The unit
+identity fixture no longer depends on retained release availability.
+
+Plain language: the fixture now detects an unexplained balance or share
+change immediately, even if it later disappears. Money waiting to settle is
+still accounted for, but it is not treated as spendable by the shadow engine.
+This makes software checks stronger; it does not show that the real engine
+works or that the strategy makes money.
+
+The new source epoch supersedes the section-17 source bundle for current-source
+verification. Old content-addressed artifacts remain historical and must
+refuse current-source verification. No provider/account credential, operator
+database, broker, scheduler, protected outcome, research look, QC job, PR or
+main merge was used. The dependency audit found CPython 3.12.14; AlgorithmImports,
+QuantConnect and clr absent, and no dotnet, Docker or LEAN executable on PATH.
+No dependency installation or supported-Windows/native run was attempted.
+
+### 19.5 Focused validation, local state and resume handoff
+
+| Check | Result |
+|---|---|
+| Three exact Claude regression pins | 3 passed in 1.32s; three guard-removal mutants failed at their intended checks and restored green |
+| New temporal checkpoint regressions before correction | Six failing subcases (cash/inventory drift plus fractional, NaN, infinite and negative account values); no fail-open acceptance after correction |
+| Source callbacks and bridge protocol, final producing tree | 24 passed, 40 subtests, 52.07s; full 372-frame base and partial/cancel scans, sale-to-settlement continuity, exact fee/cash checks, temporal drift and draft rollback |
+| Identity-policy fixture | 6 passed, 18 subtests, 0.60s; filesystem-dependency and loose Boolean/integer-equality mutants failed and restored green |
+| Active documents, lane imports/boundaries and identity tests | 81 passed, 18 subtests, 1.48s under normal pytest isolation |
+| Python compilation | 63 source/test files compiled in memory; no SDK imports or bytecode publication |
+| Current source bundle | Built/verified in memory, 426,246 bytes, 38 members; old `4dd53e40...zip` correctly refuses as not reproducing current source; no extraction or publication |
+| Frozen candidate/plan/root documents | Original candidate and MD/PDF pins verified; Action Plan, Session Handoff, Feature Milestone Record, CLAUDE and AGENTS byte-unchanged against the baseline |
+| Git attributes/diff/status | ZIP binary set, text/diff/merge unset; diff check passed; only intended lane files/record changed |
+
+The identity-mutation harness's first loose-type trial was cancelled when a
+copied-global seam bypassed its mock and began local synthetic reconstruction;
+the corrected live-global, unit-isolated trial caught the mutant. This was not
+an empirical look or QC attempt. No full lane/repository suite was rerun, and
+Claude's earlier full-suite results are not relabelled as Codex validation.
+
+Producing-source commit is local-only
+`8e5714a2a2ff89c50a01cbe958d298f0ade39e9b`. Its range is
+`c0137c518277c8a9a87af51f52add3eccd088617..8e5714a2a2ff89c50a01cbe958d298f0ade39e9b`.
+Source manifest SHA-256 is
+`4e9389e994c0e7063d68430052d2cef2280e0f31356ce2fc5f855878351f9afc`.
+The in-memory deterministic bundle SHA-256 is
+`1c18e76bc3e61edde2ac119de22eab1c9a9afe4eded9c743f545b48279b990f3`;
+it was not saved as a new release. The candidate canonical identity remains
+`b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`.
+The exact closing record commit follows and is identified by local Git HEAD.
+
+**Publication remains withheld: zero pushes this round.** The remote lane
+still names consumed Claude head `c0137c51`, not the new local source. This
+record/test-pin commit is a durable local checkpoint, not a completed remote
+handoff or backtest-ready release. Monitor state must retain the consumed
+trigger and pause for owner input; it must not re-review that same push or
+treat a future Codex publication as a Claude trigger.
+
+Next required decision: scope a pinned **synthetic-only native-engine
+integration evaluation**, specifying local runtime setup/execution versus
+QuantConnect upload/job, exact candidate/source and allowed packaging. The
+recommended authoritative target is order-based QC after exact-source Claude
+review, limited to the fixed invented sidecar, no provider data or empirical
+outcomes, every launch retained, maximum three unsuccessful attempts before
+Mia/owner recovery. This paragraph grants no such action. The owner must also
+decide how to publish the review snapshot at this blocker without changing the
+one-push agreement by inference; no partial publication occurs automatically.
+
+Resume in the exact worktree/branch in section 1. First verify local HEAD,
+remote head and clean status; read sections 18 and 19. Keep the two Claude
+dispositions and all corrected/open findings, preserve the local source and
+closing-record commits, and continue this same cycle only after the owner
+provides its exact next scope. Do not repeat ENG-1..26, install a runtime,
+access credentials/data/outcomes, create a new branch, switch worktrees or
+push while this blocker is unresolved. Native comparator/actions, cash-account
+settlement, rights/availability audit, candidate freeze, evidence dates and
+family/look allocation remain necessary before empirical readiness.

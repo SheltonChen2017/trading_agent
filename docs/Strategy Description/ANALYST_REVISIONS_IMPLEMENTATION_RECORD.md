@@ -38001,3 +38001,92 @@ as diagnostic data, never admitted source evidence. The actual frozen target
 and QC control directory are both absent before this commit; the production
 bridge and QC runner remain byte-identical to section 263. Commit this
 protocol before the one actual synthetic invocation; no push occurs yet.
+
+### 264.3 Actual synthetic A result and bounded factorial follow-up
+
+At clean `56404cad0d30045d7ed84c79c2489d3a086de2e0`, root verifies the exact
+root/branch and absent target, then executes the one frozen A invocation under
+strict network denial. It completes in **18.116847333 seconds**, with **9
+cases / 54 scheduled observations / 36 refused observations / 9 final checks /
+9 refused final checks**. Private report SHA-256 is
+`aff19216562da4f0e5efd40c9cb5bb7d7dd2f02fc79ea1ee7aed11796ba2fe8f`;
+synthetic payload SHA-256 is
+`fa084938d8b05a5d3b737acf02a56203bb671f921cfb1c5577d30785b86f74e1`.
+
+All three methods, all three repetitions, show post-baseline **ctime-only**
+changes on held and named leaves. Device/inode/size/mtime, mode, owner and
+link-count comparisons remain unchanged; every sampled readback matches the
+fixed synthetic bytes, with no held/named mismatch. The first refused sample
+occurs at actual elapsed **0.011592166 to 0.505460916 seconds**, depending on
+the fixture. These are observed sample times, not exact change timestamps.
+Optional `com.apple.provenance` is present both before and after in all cases;
+its contents are never read. This does not identify the actor or establish
+that provenance caused the change. All fixtures/report are retained.
+
+The actual reproduction rules out neither all possible causes nor future
+drift, but it supplies concrete evidence that adding final-file fsync alone
+does **not** resolve this synthetic failure. Direct writes also fail; replacing
+atomic marker publication with direct writes would both lose atomicity and
+lack supporting evidence. No production change or new source publication is
+made from A. `ARV2E263-001` remains open.
+
+**ARV2OD264-B (new prospective synthetic factorial diagnostic):** distinguish
+two remaining code-observable factors without changing security settings:
+early writer close versus retaining the exact read/write writer descriptor,
+and optional provenance observation enabled versus completely disabled.
+Use two repetitions of each of the four combinations (eight synthetic files),
+exclusive directory
+`artifacts/analyst_revisions_v2/publication_metadata/R264-20261008-B`.
+The pending write/fsync and exclusive link/unlink sequence stays identical;
+the retained-writer arm keeps its descriptor open through the first two-second
+window. A separate read-only visitor captures one original post-publication
+identity before optional probing. Observe the same six offsets as A, then
+close the retained writer (a no-op in the early-close arm) and observe the same
+offsets for another two seconds **against the original baseline**, never a
+replacement baseline. Finally close the original read-only visitor, reopen
+the exact named leaf read-only and compare again against that same original
+baseline, including bytes and named/held identity. Merely postponing metadata
+drift until writer close would not be a production fix: required final closure
+occurs before caller use, and a later consumer may not rebaseline a previously
+observed change. Disabled provenance means no xattr API/CLI calls,
+including at the end; absence is not inferred from unobserved metadata.
+
+The cooperative total deadline is 50 seconds. Reuse A's private bounded
+metadata/readback/path guards and fixed synthetic payload; preserve A's
+implementation and artifacts unchanged. Retain all B fixtures and a private
+canonical report, counts/hash-only stdout, and fail closed on identity/path
+changes without cleanup/retry. Test and freeze the exact new implementation
+before one actual invocation. This is a targeted follow-up to reproduced
+failure, not a production retry or source-admission waiver. No source input,
+old partial package, credentials, provider/QC calls, attempt or look/cell is
+authorized by B. Any useful publication correction still needs its own
+regressions and separately recorded production protocol before use.
+
+B additionally binds the original writer allocation's device/inode through
+write/fsync, pending/final link transition and the visitor baseline; a same-byte
+replacement before sampling must not silently change the writer-lifecycle
+factor. Intentional link/unlink ctime changes precede the immutable baseline.
+The fixed grouped order is early-close/provenance-on, early-close/off,
+retained/on, retained/off, with two repetitions each. This is association-only
+evidence subject to run-time/environment/order confounding, not causal or
+indefinite stability proof. The final consumer is sampled while open and then
+closed; no later unobserved stability is claimed. Same-round advisory review
+is not independent Claude acceptance. Root's two import-closure/authority
+checks pass under strict network denial (**2 passed in 2.24s**).
+
+Frozen B implementation and test pins:
+
+| File | SHA-256 |
+| --- | --- |
+| `scripts/diagnose_arv2_publication_writer_lifecycle.py` | `219b6738bb92dddf8fd57db4c80baad0bc18b2bd80aec86d7a1dd0cc948a7dc6` |
+| `tests/analyst_revisions_v2/test_publication_writer_lifecycle_diagnostic.py` | `d3756ec3db2ab91e99362898001b241a96af469773e30ed7c53a3ef782017a11` |
+
+Root inspects the complete source/tests and runs **134 focused passes in
+2.29s** under strict network denial: 21 B tests, 27 unchanged A tests and 86
+record/active-document tests. This is overlapping validation, not an additional
+134 distinct tests beyond earlier runs. B tests verify actual descriptor
+access/lifecycle ordering, original-allocation binding, no queries in off arms,
+initial/during/final/consumer drift, no rebaseline, replacement/path refusal,
+cooperative deadlines and exclusive bounded private reporting. A implementation
+and report pins are unchanged; B and QC targets remain absent before the
+prospective freeze commit. Execute B once only after this commit; no push yet.

@@ -32,6 +32,58 @@ def run(tmp_path, *, clock=None):
     return path, report, digest, clock
 
 
+def test_initial_inherited_group_different_from_process_is_pinned(tmp_path, monkeypatch):
+    original = subject._metadata
+    inherited_group = os.getgid() + 1
+
+    def metadata(info):
+        # Model filesystem inheritance without chown, an outside-root probe,
+        # or assuming this account can allocate a second real group.
+        return {**original(info), "gid": inherited_group}
+
+    monkeypatch.setattr(subject, "_metadata", metadata)
+    _path, report, _digest, _clock = run(tmp_path)
+    assert report["refused_initial_integrity_count"] == 0
+    assert report["refused_integrity_observation_count"] == 0
+    for case in report["cases"]:
+        assert case["allocation"]["gid"] == inherited_group
+        assert case["baseline"]["held"]["gid"] == inherited_group
+        assert case["baseline"]["named"]["gid"] == inherited_group
+        assert case["baseline_reset"] is False
+
+
+def test_allocated_group_change_before_baseline_is_refused(tmp_path, monkeypatch):
+    original_metadata = subject._metadata
+    original_write = subject.probe.private._write_all
+    inherited_group = os.getgid() + 1
+    changed = False
+
+    def metadata(info):
+        return {**original_metadata(info), "gid": inherited_group + int(changed)}
+
+    def write(*args, **kwargs):
+        nonlocal changed
+        original_write(*args, **kwargs)
+        changed = True
+
+    monkeypatch.setattr(subject, "_metadata", metadata)
+    monkeypatch.setattr(subject.probe.private, "_write_all", write)
+    with pytest.raises(subject.probe.private.SharadarCaptureError, match="allocation changed"):
+        run(tmp_path)
+    path = tmp_path / "private" / "synthetic-test-flags"
+    assert (path / "direct_final" / "final.json").exists()
+    assert not (path / "report.json").exists()
+
+
+@pytest.mark.parametrize("dimension,value", [("uid", os.getuid() + 1), ("mode", 0o640)])
+def test_allocated_owner_and_private_mode_still_required(tmp_path, monkeypatch, dimension, value):
+    original = subject._metadata
+    monkeypatch.setattr(subject, "_metadata", lambda info: {**original(info), dimension: value})
+    with pytest.raises(subject.probe.private.SharadarCaptureError, match="allocation changed"):
+        run(tmp_path)
+    assert not (tmp_path / "private" / "synthetic-test-flags" / "report.json").exists()
+
+
 def test_two_fixed_private_cases_roundrobin_thirty_second_window(tmp_path, monkeypatch):
     monkeypatch.setattr(subject.probe, "_provenance", lambda *_args: pytest.fail("no attribute/protection calls"))
     monkeypatch.setattr(subject.os, "listxattr", lambda *_args: pytest.fail("no attribute calls"), raising=False)
@@ -42,6 +94,8 @@ def test_two_fixed_private_cases_roundrobin_thirty_second_window(tmp_path, monke
     assert report["maximum_seconds"] == 45 and all(0 < value <= 10 for value in clock.sleeps)
     assert report["source_profile_sha256"] == subject.PROFILE_SHA256
     assert report["source_profile"] == subject.PROFILE
+    assert report["schema"] == "arv2-synthetic-publication-flags-v2"
+    assert report["source_profile"]["allocation_policy"] == "exclusive_created_file_dev_ino_gid_pinned_before_write"
     assert report["synthetic_only"] and not report["production_integrity_waiver"]
     assert not report["security_attributes_queried"] and not report["provider_or_qc_contact"]
     assert not report["proves_perpetual_stability"] and report["fixture_mode"] == "offline_test_double"
@@ -58,7 +112,7 @@ def test_two_fixed_private_cases_roundrobin_thirty_second_window(tmp_path, monke
         leaf = fixture / "final.json"
         assert leaf.read_bytes() == subject.probe.PAYLOAD
         assert stat.S_IMODE(leaf.stat().st_mode) == 0o600 and leaf.stat().st_nlink == 1
-        assert case["allocation"] == {"dev": leaf.stat().st_dev, "ino": leaf.stat().st_ino}
+        assert case["allocation"] == {"dev": leaf.stat().st_dev, "ino": leaf.stat().st_ino, "gid": leaf.stat().st_gid}
         assert case["baseline_reset"] is False
         assert set(case["baseline"]["held"]) == set(subject.STAT_FIELDS)
         assert [row["offset_seconds"] for row in case["observations"]] == list(subject.OFFSETS)
@@ -114,7 +168,7 @@ def test_both_cases_established_before_roundrobin_and_writers_closed_before_visi
     assert events[6:] == [name for _offset in subject.OFFSETS for name in ("poll-0", "poll-1")]
 
 
-@pytest.mark.parametrize("dimension", ["flags", "ctime_ns", "gid", "birthtime_ns", "birthtime_seconds"])
+@pytest.mark.parametrize("dimension", ["flags", "ctime_ns", "gid", "uid", "mode", "birthtime_ns", "birthtime_seconds"])
 def test_stat_drift_refused_named_and_held_without_reset(tmp_path, monkeypatch, dimension):
     original = subject._metadata
     active = False
@@ -170,7 +224,8 @@ def test_initial_baseline_is_before_read_and_readtime_drift_poisons_following_ch
     assert report["refused_initial_integrity_count"] == 1
 
 
-def test_during_read_temporary_drift_is_not_hidden_by_restored_after_metadata(tmp_path, monkeypatch):
+@pytest.mark.parametrize("dimension", ["ctime_ns", "gid", "uid", "mode"])
+def test_during_read_temporary_drift_is_not_hidden_by_restored_after_metadata(tmp_path, monkeypatch, dimension):
     original_sample, original_metadata = subject._sample, subject._metadata
     polling, position = False, 0
 
@@ -183,7 +238,7 @@ def test_during_read_temporary_drift_is_not_hidden_by_restored_after_metadata(tm
             # Only the pre-read named observation drifts; afterwards every
             # value equals the original baseline again. No result is forged.
             if position == 2:
-                result["ctime_ns"] += 1
+                result[dimension] += 1
         return result
 
     def sample(*args, **kwargs):
@@ -204,7 +259,42 @@ def test_during_read_temporary_drift_is_not_hidden_by_restored_after_metadata(tm
         for row in case["observations"]:
             assert row["held_changed"] == row["named_changed"] == row["held_named_mismatch"] == []
             assert row["during_read_held_changed"] == []
-            assert row["during_read_named_changed"] == ["ctime_ns"]
+            assert row["during_read_named_changed"] == [dimension]
+            assert row["readback_matches"] and not row["integrity_unchanged"]
+    assert report["refused_integrity_observation_count"] == 22
+
+
+def test_named_group_differs_from_held_without_rebaseline(tmp_path, monkeypatch):
+    original_sample, original_metadata = subject._sample, subject._metadata
+    polling, position = False, 0
+
+    def metadata(info):
+        nonlocal position
+        result = original_metadata(info)
+        if polling:
+            position += 1
+            if position in (2, 4):  # Named stat before and after the read.
+                result["gid"] += 1
+        return result
+
+    def sample(*args, **kwargs):
+        nonlocal polling, position
+        polling, position = "baseline_ok" in kwargs, 0
+        try:
+            return original_sample(*args, **kwargs)
+        finally:
+            polling = False
+
+    monkeypatch.setattr(subject, "_metadata", metadata)
+    monkeypatch.setattr(subject, "_sample", sample)
+    _path, report, _digest, _clock = run(tmp_path)
+    assert report["refused_initial_integrity_count"] == 0
+    for case in report["cases"]:
+        assert case["baseline_reset"] is False
+        for row in case["observations"]:
+            assert row["held_changed"] == row["during_read_held_changed"] == []
+            assert row["during_read_named_changed"] == []
+            assert row["named_changed"] == row["held_named_mismatch"] == ["gid"]
             assert row["readback_matches"] and not row["integrity_unchanged"]
     assert report["refused_integrity_observation_count"] == 22
 

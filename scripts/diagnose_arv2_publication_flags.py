@@ -9,16 +9,19 @@ from pathlib import Path
 
 from scripts import diagnose_arv2_publication_metadata as probe
 
+# The historical exclusive destination remains spent. This prospective source
+# correction does not authorize another observation or reinterpret its v1 report.
 ARTIFACT_PATH = probe.ARTIFACT_PATH.with_name("R266-20261008-A")
 CASES = ("direct_final", "pending_link")
 OFFSETS = (0, 0.01, 0.1, 0.5, 1, 2, 3, 5, 10, 20, 30)
 MAX_SECONDS = 45
 MAX_REPORT_BYTES = 256 * 1024
-SCHEMA = "arv2-synthetic-publication-flags-v1"
+SCHEMA = "arv2-synthetic-publication-flags-v2"
 STAT_FIELDS = ("dev", "ino", "size", "mtime_ns", "ctime_ns", "mode", "uid", "gid", "nlink",
                "regular", "flags", "birthtime_ns", "birthtime_seconds")
 PROFILE = {"cases": list(CASES), "offsets_seconds": list(OFFSETS), "maximum_seconds": MAX_SECONDS,
            "stat_fields": list(STAT_FIELDS), "fixture_sha256": probe.sha256_bytes(probe.PAYLOAD),
+           "allocation_policy": "exclusive_created_file_dev_ino_gid_pinned_before_write",
            "baseline_policy": "first_held_and_named_stat_before_any_read_never_reset",
            "xattr_acl_or_protection_queries": False, "metadata_changes_permitted": False}
 PROFILE_SHA256 = probe.sha256_bytes(probe.canonical_json_bytes(PROFILE))
@@ -31,8 +34,8 @@ def _metadata(info):
 
 
 def _safe(row, allocated, links=1):
-    return ((row["dev"], row["ino"]) == allocated and row["regular"] and row["mode"] == 0o600
-            and row["uid"] == os.getuid() and row["gid"] == os.getgid() and row["nlink"] == links
+    return ((row["dev"], row["ino"], row["gid"]) == allocated and row["regular"] and row["mode"] == 0o600
+            and row["uid"] == os.getuid() and row["nlink"] == links
             and row["size"] == len(probe.PAYLOAD))
 
 
@@ -64,7 +67,11 @@ def _establish(root, root_fd, name):
     try:
         leaf = "final.json" if name == "direct_final" else "pending.json"
         writer = probe.private._new_private_file(child, leaf, "synthetic flags writer")
-        allocated = probe.private._directory_identity(os.fstat(writer))
+        # A new file may inherit its directory's group rather than the process
+        # group. Pin that allocated group, never a later rebaseline; the private
+        # owner/mode and held/named equality requirements remain independent.
+        allocated_metadata = _metadata(os.fstat(writer))
+        allocated = tuple(allocated_metadata[key] for key in ("dev", "ino", "gid"))
         probe.private._write_all(writer, probe.PAYLOAD, "synthetic flags bytes")
         os.fsync(writer)
         if not all(_safe(_metadata(row), allocated) for row in
@@ -87,7 +94,7 @@ def _establish(root, root_fd, name):
         if not all(_safe(row, allocated) for row in baseline.values()):
             raise probe.private.SharadarCaptureError("synthetic flags visitor allocation changed")
         initial = _sample(child, visitor, baseline, allocated)
-        result = {"case": name, "allocation": {"dev": allocated[0], "ino": allocated[1]},
+        result = {"case": name, "allocation": {"dev": allocated[0], "ino": allocated[1], "gid": allocated[2]},
                   "baseline": baseline, "initial_verification": initial,
                   "baseline_integrity_unchanged": initial["integrity_unchanged"],
                   "observations": [], "baseline_reset": False}

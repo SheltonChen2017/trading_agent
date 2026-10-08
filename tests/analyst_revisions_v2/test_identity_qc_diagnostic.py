@@ -24,12 +24,14 @@ def package(tmp_path, monkeypatch, request):
     artifact_root = tmp_path / "private-artifacts"
     artifact_root.mkdir(mode=0o700)
     monkeypatch.setattr(subject, "ARTIFACT_ROOT", artifact_root)
-    value = {"schema": request.param,
+    declared_production = request.param == "synthetic-production-declaration"
+    schema = subject.CONTINUITY_INPUT_SCHEMA if declared_production else request.param
+    value = {"schema": schema,
              "rows": [{"ticker": ticker, "role": subject.ROLES[ticker], "composite_figi": f"BBG{index:09d}"}
                       for index, ticker in enumerate(subject.TICKERS, 1)],
              "price_manifest_sha256": "1" * 64, "public_reference_sha256": "2" * 64,
              "sharadar_identity_manifest_sha256": "3" * 64}
-    if request.param == subject.CONTINUITY_INPUT_SCHEMA:
+    if schema == subject.CONTINUITY_INPUT_SCHEMA:
         # Exercise a genuinely published synthetic builder package, not an
         # invented input dictionary or a patched authentication boundary.
         from . import test_identity_continuity as producer
@@ -38,6 +40,19 @@ def package(tmp_path, monkeypatch, request):
         input_path = loaded.input_path
         raw = input_path.read_bytes()
         value = json.loads(raw)
+        if declared_production:
+            # Only this fresh synthetic fixture declares the production mode,
+            # with matching pins. This exercises the mechanical mode check;
+            # it does not establish real source provenance or source truth.
+            manifest = json.loads((loaded.artifact_path / "manifest.json").read_bytes())
+            manifest["source_mode"] = "production_source_bytes_offline"
+            manifest_raw = canonical_json_bytes(manifest)
+            digest = subject.sha(manifest_raw)
+            value["continuity_manifest_sha256"] = digest
+            raw = subject.canonical_input(value)
+            producer.write_private(loaded.artifact_path / "manifest.json", manifest_raw)
+            producer.write_private(loaded.artifact_path / "manifest.sha256", (digest + "\n").encode("ascii"))
+            producer.write_private(input_path, raw)
     else:
         raw = subject.canonical_input(value)
         input_path = tmp_path / "public-input.json"
@@ -204,15 +219,14 @@ def qc(package, monkeypatch):
     api = QuantConnectClient(QuantConnectCredentials("synthetic-user", "synthetic-token"),
                              transport=subject.boundary._bounded_transport, clock=lambda: 1791331200)
     production_api = subject._api
+    production_continuity = subject._require_production_continuity
     # Synthetic published continuity fixtures cannot enter the real production
-    # mode gate. This explicitly fake seam retains exact client-shape checks.
-    def synthetic_api(candidate, prepared):
-        if prepared["input_schema"] == subject.CONTINUITY_INPUT_SCHEMA:
-            return subject._api_client(candidate)
-        return production_api(candidate, prepared)
-    monkeypatch.setattr(subject, "_api", synthetic_api)
+    # mode gate. Replace only that gate for offline orchestration tests, leaving
+    # client construction/checks intact. Real-boundary tests restore it below.
+    monkeypatch.setattr(subject, "_require_production_continuity", lambda _prepared: None)
     monkeypatch.setattr(subject.boundary, "production_client", lambda: api)
-    return SimpleNamespace(fake=fake, api=api, production_api=production_api)
+    return SimpleNamespace(fake=fake, api=api, production_api=production_api,
+                           production_continuity=production_continuity)
 
 
 def completed(package, qc):
@@ -416,6 +430,7 @@ def test_pending_control_also_blocks_post_if_created_after_action_entry(package,
 @pytest.mark.parametrize("supplied_api", [False, True])
 @pytest.mark.parametrize("package", [subject.CONTINUITY_INPUT_SCHEMA], indirect=True)
 def test_real_api_refuses_synthetic_publication_before_credentials_or_supplied_client(package, qc, monkeypatch, supplied_api):
+    monkeypatch.setattr(subject, "_require_production_continuity", qc.production_continuity)
     monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No production credentials for test-mode package"))
     monkeypatch.setattr(subject.boundary, "_client", lambda *_args: pytest.fail("No supplied client validation before source-mode refusal"))
     with pytest.raises(subject.IdentityQcError, match="continuity_production_source_mode"):
@@ -433,11 +448,81 @@ def test_all_real_actions_apply_production_source_mode_gate(package, qc, monkeyp
             # status path to exercise its production API boundary.
             (package.control / "terminal.json").rename(package.control / "synthetic-terminal-retained.json")
     before = list(qc.fake.calls)
+    before_files = {path.name: path.read_bytes() for path in package.control.iterdir()}
     monkeypatch.setattr(subject, "_api", qc.production_api)
+    monkeypatch.setattr(subject, "_require_production_continuity", qc.production_continuity)
     monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No production credentials for test-mode package"))
     with pytest.raises(subject.IdentityQcError, match="continuity_production_source_mode"):
         getattr(subject, action)(package.control, package.pin)
     assert qc.fake.calls == before
+    assert {path.name: path.read_bytes() for path in package.control.iterdir()} == before_files
+
+
+def action_claim(package, qc, action):
+    if action == "launch":
+        return "attempt-claim.json"
+    completed(package, qc)
+    if action == "status":
+        (package.control / "terminal.json").rename(package.control / "synthetic-terminal-retained.json")
+        return "status-claim-002.json"
+    return "result-read-claim.json"
+
+
+@pytest.mark.parametrize("action", ["launch", "status", "read"])
+@pytest.mark.parametrize("package", ["synthetic-production-declaration"], indirect=True)
+def test_declared_mode_fixture_passes_real_preclaim_and_postclaim_authentication(package, qc, monkeypatch, action):
+    claim = action_claim(package, qc, action)
+    checks = []
+
+    def check(prepared):
+        qc.production_continuity(prepared)
+        checks.append((package.control / claim).exists())
+
+    monkeypatch.setattr(subject, "_require_production_continuity", check)
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("Only supplied offline client"))
+    before = len(qc.fake.calls)
+    getattr(subject, action)(package.control, package.pin, qc.api)
+    assert checks == [False, True]
+    assert len(qc.fake.calls) > before
+
+
+@pytest.mark.parametrize("phase", ["before_claim", "after_claim"])
+@pytest.mark.parametrize("action", ["launch", "status", "read"])
+@pytest.mark.parametrize("package", ["synthetic-production-declaration"], indirect=True)
+def test_real_continuity_reauthentication_refuses_drift_without_releasing_claim(package, qc, monkeypatch, action, phase):
+    claim = action_claim(package, qc, action)
+    before_calls = list(qc.fake.calls)
+    before_files = {path.name: path.read_bytes() for path in package.control.iterdir()}
+    manifest = package.input.parent / "manifest.json"
+    checks = []
+
+    def check(prepared):
+        claimed = (package.control / claim).exists()
+        checks.append(claimed)
+        if claimed == (phase == "after_claim"):
+            manifest.write_bytes(manifest.read_bytes() + b" ")
+        qc.production_continuity(prepared)
+
+    monkeypatch.setattr(subject, "_require_production_continuity", check)
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No credentials after changed source"))
+    monkeypatch.setattr(subject.boundary, "_client", lambda *_args: pytest.fail("No client after changed source"))
+    with pytest.raises(subject.IdentityQcError, match="continuity_production_source_mode"):
+        getattr(subject, action)(package.control, package.pin, qc.api)
+    assert checks == ([False] if phase == "before_claim" else [False, True])
+    after_files = {path.name: path.read_bytes() for path in package.control.iterdir()}
+    assert qc.fake.calls == before_calls
+    if phase == "before_claim":
+        assert after_files == before_files
+    else:
+        assert set(after_files) - set(before_files) == {claim}
+        assert {name: after_files[name] for name in before_files} == before_files
+        assert after_files[claim]
+    # A new call cannot consume another claim or contact on the bad package.
+    # In particular, the postclaim refusal never unlinks its spent claim.
+    with pytest.raises(subject.IdentityQcError, match="continuity_publication"):
+        getattr(subject, action)(package.control, package.pin, qc.api)
+    assert {path.name: path.read_bytes() for path in package.control.iterdir()} == after_files
+    assert qc.fake.calls == before_calls
 
 
 @pytest.mark.parametrize("stage", ["launch", "status", "read"])

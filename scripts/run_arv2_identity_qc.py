@@ -558,8 +558,13 @@ def _api_client(api):
     return api
 
 
-def _api(api, prepared):
-    """Refuse test-mode continuity bytes before credentials or QC contact."""
+def _require_production_continuity(prepared):
+    """Authenticate declared production mode without constructing a client.
+
+    Reuse this before a claim and again afterward at the client boundary.
+    Preflight avoids spending a claim on an already-invalid package; it
+    cannot eliminate later drift, whose refusal must leave the claim spent.
+    """
     if prepared["input_schema"] == CONTINUITY_INPUT_SCHEMA:
         try:
             with continuity.authenticated_identity_continuity_input(
@@ -569,6 +574,11 @@ def _api(api, prepared):
                 pass
         except continuity.IdentityContinuityError:
             _fail("continuity_production_source_mode")
+
+
+def _api(api, prepared):
+    """Refuse test-mode continuity bytes before credentials or QC contact."""
+    _require_production_continuity(prepared)
     return _api_client(api)
 
 
@@ -666,6 +676,7 @@ def launch(control_directory, prepared_sha256, api=None):
     with _Directory(control_directory) as directory:
         prepared, source = _prepared(directory, prepared_sha256)
         binding = _bind(prepared, prepared_sha256)
+        _require_production_continuity(prepared)
         directory.write("attempt-claim.json", canonical({**binding, "claimed_at_utc": _instant()}))
         api = _api(api, prepared)
         _post(directory, api, "authenticate", {}, binding)
@@ -759,6 +770,7 @@ def status(control_directory, prepared_sha256, api=None):
         polls = [name for name in directory.names() if re.fullmatch(r"status-claim-\d{3}\.json", name)]
         if len(polls) >= MAX_STATUS_POLLS:
             _fail("status_poll_budget")
+        _require_production_continuity(prepared)
         directory.write(f"status-claim-{len(polls) + 1:03d}.json", canonical(receipt))
         api = _api(api, prepared)
         response = _post(directory, api, "backtests/list", {"projectId": receipt["project_id"], "includeStatistics": False}, _bind(prepared, prepared_sha256))
@@ -809,12 +821,13 @@ def validate_meta(raw, prepared):
 
 
 def read(control_directory, prepared_sha256, api=None):
-    """Exactly one custom-metadata read; every failure spends its claim."""
+    """One custom-metadata read; failure after claiming leaves it spent."""
     with _Directory(control_directory) as directory:
         prepared, _ = _prepared(directory, prepared_sha256)
         receipt = _launch(directory, prepared, prepared_sha256)
         if not _same(directory.json("terminal.json"), {**receipt, "status": "Completed."}):
             _fail("result_not_completed")
+        _require_production_continuity(prepared)
         directory.write("result-read-claim.json", canonical(receipt))
         api = _api(api, prepared)
         response = _post(directory, api, "backtests/read", {"projectId": receipt["project_id"], "backtestId": receipt["backtest_id"]}, _bind(prepared, prepared_sha256))

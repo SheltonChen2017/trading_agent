@@ -110,6 +110,46 @@ class LeanBridgeTests(unittest.TestCase):
         with self.assertRaises(BridgeError):
             bridge.finish()
 
+    def test_native_fill_processed_at_a_shifted_minute_is_refused_before_issue(self):
+        # README contract: native fill evaluation must occur in the exact
+        # minute of the shadow receipt. A fill model invoked one minute later
+        # (or earlier) must not receive the receipt, and the receipt must stay
+        # pending so the correctly timed invocation can still issue it once.
+        bridge = SyntheticOrderBridge()
+        native = None
+        for frame in fixture_frames():
+            actions = bridge.step(frame)
+            for order in actions["submit"]:
+                native = 1
+                bridge.bind(order.order_id, native)
+            if bridge._pending:
+                break
+        self.assertIsNotNone(native)
+        pending_at = next(iter(bridge._pending.values())).at
+        for shift in (timedelta(minutes=1), -timedelta(minutes=1), timedelta(seconds=1)):
+            with self.subTest(shift=shift), self.assertRaisesRegex(BridgeError, "shifted"):
+                bridge.issue_fill(native, pending_at + shift)
+        self.assertEqual(len(bridge._pending), 1)
+        fill = bridge.issue_fill(native, pending_at)
+        self.assertEqual(fill.at, pending_at)
+        self.assertIsNone(bridge.issue_fill(native, pending_at))
+
+    def test_finish_refuses_a_report_while_the_shadow_strategy_is_incomplete(self):
+        # After the entry fills, every later minute carries no capacity, so the
+        # time exit can never execute: the run ends with an open position and
+        # an active sell. finish() must refuse rather than emit a report whose
+        # lineage counts happen to reconcile.
+        original = Simulation.process_minute
+
+        def starve_exits(engine, minute):
+            if engine.positions:
+                minute = replace(minute, volume=0)
+            return original(engine, minute)
+
+        with patch.object(Simulation, "process_minute", starve_exits):
+            with self.assertRaisesRegex(BridgeError, "incomplete"):
+                drive()
+
     def test_unknown_duplicate_binding_and_unrequested_cancel_refuse(self):
         bridge, fill, native = drive(stop_at_fill=True)
         for name, number in ((fill.order_id, native), ("SYN-UNKNOWN", 2), (fill.order_id, True)):

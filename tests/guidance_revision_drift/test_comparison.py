@@ -78,6 +78,19 @@ class ComparatorTests(unittest.TestCase):
                 quote=quote(at("2024-03-13")), adv20=ADV)
         self.assertEqual(comparator.snapshot(), before)
 
+    def test_source_split_refuses_fractional_remaining_shares_without_flooring(self):
+        # The paired coordinator reaches this only after the strategy engine
+        # has accepted a whole-share split, but the method is public: a direct
+        # caller must not have the remaining source shares silently floored.
+        comparator = fixture()
+        entries(comparator)
+        before = comparator.snapshot()
+        with self.assertRaisesRegex(ComparisonError, "fractional source split"):
+            comparator.apply_source_split("SYN-SRC-SPLIT", "SYN-A", Decimal("0.25"), at("2024-03-12", 30, 9))
+        self.assertEqual(comparator.snapshot(), before)
+        comparator.apply_source_split("SYN-SRC-SPLIT-2", "SYN-A", Decimal("2"), at("2024-03-12", 30, 9))
+        self.assertEqual(comparator.snapshot()["strategy_remaining"]["SYN-A"], 20)
+
     def test_entry_budget_includes_source_fee_and_rounding_cash_is_retained(self):
         comparator = fixture()
         fills = entries(comparator)

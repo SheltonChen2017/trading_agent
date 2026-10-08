@@ -1,6 +1,13 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **SECTION 98 COMPLETES THE SEPARATE LATEST-REVISED EXPLORATORY
+Status: **SECTION 99 RECORDS THE OWNER-APPROVED NO-NEW-SUBSCRIPTION ROUTE:
+MASSIVE REMAINS THE EXPLORATORY CANDIDATE; FINRA'S FREE INDIVIDUAL/PUBLIC
+QUERY API IS THE CROSS-CHECK CANDIDATE, NOT WEBSITE SCRAPING. PUBLIC API
+TERMS SUPPORT NONCOMMERCIAL ANALYSIS, BUT NO ACTIVATED FINRA CREDENTIAL
+IS AVAILABLE IN THE CHECKED SESSION. NO ACTUAL CROSS-CHECK HAS RUN.
+NEW MASSIVE PERSONAL-RESEARCH GUIDANCE IS RECORDED WITHOUT CLAIMING A
+CONTRACT AMENDMENT OR QC CLOUD RIGHTS. SECTION 98 COMPLETES THE
+SEPARATE LATEST-REVISED EXPLORATORY
 SOFTWARE BUILD AT `6f0fc887`: EXTERNAL-FILE SOURCE, S1 NORMALIZATION,
 FOUR-WINDOW ORIGINAL-TAIL RANKING, 48 CONTINUOUS LONG-ONLY CASH BOOKS AND
 AN IMMUTABLE CLI REPORT. CODEX'S FINAL FOCUSED RUN PASSED 382 TESTS;
@@ -13458,3 +13465,127 @@ and matching actual remote afterward. Claude should independently review
 the eleven-commit range above; actual implementation/execution beyond this
 boundary requires the factual input/processing qualification, not another
 general preauthorization request.
+
+## 99. Approved zero-additional-subscription source route; FINRA activation needed — 2026-10-07
+
+### 99.1 Scope, exact state and exercised decisions
+
+The owner approved proceeding with the existing Massive subscription and free
+FINRA cross-check rather than buying another dataset: **"approved. proceed"**.
+`SI-AUTH-20261007-05` records that approval under the existing continuous-build
+delegation. This is source qualification, not an outcome look or a new claim
+that latest-revised history was knowable at each historical decision.
+
+The starting local and matching actual remote head is
+`dccc564e341a097260ee774676e9a78510353aaa`; the designated physical/Git root
+and branch were verified clean. No new Claude commit exists. Section 90's
+accepted sole Claude commit `5275b7d5fd0d3769b6c27dcc252d8389869e969a` and
+the eleven pending Codex commits through `dccc564e` retain their dispositions.
+The closing documentation commit carrying this section extends Claude's
+pending ordered range to twelve commits; it is not independent acceptance.
+
+* **SI-DEC-20261007-09:** spend nothing further; retain Massive for the separate
+  latest-revised study. Do not buy ORTEX, ChartExchange or another feed merely
+  to obtain another version of the same revised history.
+* **SI-DEC-20261007-10:** qualify FINRA through its expressly licensed Public
+  Query API for an individual, not by treating free website downloads as
+  unrestricted computational inputs. Do not select a paid Firm/Organization
+  credential or claim an institutional affiliation.
+* **SI-DEC-20261007-11:** record the stronger Massive personal-research guidance
+  below and preserve the distinction between provider guidance, contractual
+  qualification, current account entitlement and QC Cloud processing.
+* **SI-DEC-20261007-12:** stop before actual source comparison because no
+  activated FINRA credential is present in the checked environment. Request
+  only its existing location/variable names, or the owner's free account
+  activation; never request a secret in chat or bypass authenticated access.
+
+### 99.2 Verified public-source facts and limits
+
+**FINRA access route.** Its [API FAQ](https://developer.finra.org/support)
+permits Individual users to create Public credentials, at zero charge with
+a 10 GB monthly download cap. A Mock credential is not production access.
+The [Equity-specific API terms](https://developer.finra.org/specific-terms-equity-data)
+cover the `otcMarket` group, permit noncommercial personal/professional use
+in section 2.2 and derivative/resultant data in section 2.4. They require valid
+API credentials; the [general API terms](https://developer.finra.org/finra-api-terms-service)
+place Specific Terms first and require using the licensed API and safeguarding
+access credentials. This establishes a documented candidate local-use route,
+not proof that this owner has activated it. No institutional affiliation is
+required for the Individual route. The website's separate
+[terms](https://www.finra.org/terms-of-use) restrict bulk extraction, database
+creation and specified algorithmic uses absent other express permission;
+the earlier chat suggestion of simply using free files needs this qualification.
+
+**FINRA source semantics.** The [dataset catalog](https://www.finra.org/finra-data/browse-catalog/equity-short-interest)
+describes listed and OTC securities, five rolling years through its grid/API,
+revision flags and latest corrected values only. Its
+[historical-files description](https://www.finra.org/finra-data/browse-catalog/equity-short-interest/files)
+says pre-June-2021 observations are OTC-only. The
+[API documentation](https://developer.finra.org/docs)
+lists Public access to `consolidatedShortInterest` and delivery by 4:40 p.m.
+Eastern on the scheduled publication date, but still uses OTC wording in its
+summary. Neither wording nor scheduled delivery proves actual historical
+listed/delisted completeness, original versions, or correction-availability
+timestamps. Agreement with Massive would test distributor consistency for a
+shared underlying source, not independently validate FINRA's original filings
+or establish historical PIT integrity.
+
+**Massive guidance.** The current official
+[individual-plan FAQ](https://massive.com/knowledge-base/article/which-plan-do-i-need-to-show-massive-data-in-my-app)
+expressly includes the subscriber's own research and scripts within personal
+use, while distinguishing access by other people. This is materially stronger
+evidence than another lane's usage; a blanket assertion that all personal
+scripted research is prohibited would be overbroad. It does not expressly
+amend the [Market Data Terms](https://massive.com/legal/market-data-terms-of-service)
+sections 2/5(d), their section-9 precedence, or section-8 termination/deletion
+obligations. No account-specific amendment, perpetual retention right,
+redistribution right or exact QC Cloud route was established. The existing
+restriction on another licensing inquiry remains respected. Private local
+qualification and cloud processing must not be conflated.
+
+### 99.3 Actual execution, retained ledger and next action
+
+Only public documentation and repository instructions/status were read.
+Credential inspection printed environment-variable names only: a Massive key
+variable was present and no FINRA-named variable was present. No lane `.env*`
+file was found by the bounded filename check. This is not a claim that no
+FINRA credential exists elsewhere on the machine. No secret value, account
+identifier or market row was read, printed, requested or committed. No account
+was created, terms accepted, inquiry sent, subscription purchased, monitor
+changed, dataset captured or source comparison executed. No code or research
+protocol was changed. Further fixture-only work is not substituted for the
+missing access prerequisite.
+
+The retained ledger is unchanged in severity: `SI-SRC-20260928-001..002` stay
+open for the strict study; both proposed feeds are latest-revised, not a cure.
+`SI-SRC-20260928-003` now has a documented free FINRA API-use candidate and
+stronger Massive personal-use guidance, but actual access, companion coverage
+and the exact processing route are not accepted. Shared `SI-CR5-005` /
+`SI-CCR16-007` and the `SI-CR15-001` later-commitment advisory remain unchanged.
+No new software defect, red/green correction or empirical result is claimed.
+All historical ledger rows and sections 1–98 are preserved verbatim.
+
+Next factual prerequisite: an activated **Individual account / Public API
+credential**, located locally without exposing its values. After that, freeze
+a bounded overlapping settlement sample and reconcile raw current/previous
+short quantities, coverage and revision flags without reading prices or
+returns. Record missing/duplicate/ambiguous rows explicitly; ticker/settlement
+comparison is not stable-identity admission. No price/outcome join or automatic
+runner override follows from a matching sample. Actual backtesting still needs
+the section-98 companion/route/look/review qualifications; canonical PIT remains
+blocked independently. Lookbacks remain 20/60/120/252 with no winner, actual
+looks 0/0, exploratory actual looks 0, alpha 0 and QC attempts 0.
+
+This is a completed public-metadata qualification/decision record, not completed
+cross-check implementation or backtest readiness. The lane handoff is the only
+changed file; all shared documents remain frozen. The focused active-document
+check passed **69 tests in 0.52s**, with no failures, skips or warnings, using
+existing CPython 3.13.15, an empty inherited environment (only an explicit
+system PATH and bytecode-disable flag), and `sandbox-exec` denying network.
+`git diff --check` passed; the zero-context diff contains only a status-header
+update and the section-99 append, preserving historical sections/ledgers.
+No private contact or credential value was added. The document check and
+diff/status guards are rerun after this validation paragraph before the one
+authorized final publication. No full suite or code compilation is warranted
+by this doc-only change. The exchange monitor remains paused and the Claude
+one-shot deleted.

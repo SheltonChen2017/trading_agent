@@ -171,17 +171,25 @@ def _connection_patch(statement: ast.stmt) -> bool:
         return False
     args = call.args
     if len(args) == 2:
-        return isinstance(args[0], ast.Constant) and args[0].value == "http.client.HTTPSConnection"
+        return isinstance(args[0], ast.Constant) and args[0].value in _CONNECTION_SEAMS
     if len(args) == 3:
         target = _dotted_name(args[0])
+        if ((target == "http.client" or target.endswith(".http.client"))
+                and isinstance(args[1], ast.Constant) and args[1].value == "HTTPSConnection"):
+            return True
+        # Section 153 (Claude review): the provider and earnings transports open
+        # through urllib; patching the opener factory is their connection patch.
         return (
-            (target == "http.client" or target.endswith(".http.client"))
-            and isinstance(args[1], ast.Constant) and args[1].value == "HTTPSConnection"
+            (target == "urllib.request" or target.endswith(".request"))
+            and isinstance(args[1], ast.Constant) and args[1].value == "build_opener"
         )
     return False
 
 
-_TRANSPORT_NAMES = frozenset({"_sec_transport", "_selected_sec_transport"})
+_CONNECTION_SEAMS = frozenset({"http.client.HTTPSConnection", "urllib.request.build_opener"})
+# Section 153 (Claude review): the urllib-based provider and earnings transports
+# share the `_default_transport` name; a test that reaches them is a direct test.
+_TRANSPORT_NAMES = frozenset({"_sec_transport", "_selected_sec_transport", "_default_transport"})
 
 
 def _touches_real_transport(statement: ast.stmt) -> bool:
@@ -338,4 +346,31 @@ def test_tripwire_scan_flags_near_misses_and_unseen_forms(source: str) -> None:
     "async def test_safe(tmp_path, monkeypatch):\n    monkeypatch.setattr('http.client.HTTPSConnection', forbidden)\n" + _USE,
 ))
 def test_tripwire_scan_still_accepts_a_patch_in_the_new_forms(source: str) -> None:
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, [])
+
+
+# Section 153 (Claude review): the urllib transports are direct transports too.
+_URLLIB_USE = "    m._default_transport(item)\n"
+
+
+@pytest.mark.parametrize("source", (
+    "def test_unsafe(tmp_path):\n" + _URLLIB_USE,
+    "def test_unsafe(tmp_path):\n    _default_transport(item)\n",
+    # Patching urlopen does not reach an opener built by build_opener.
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr(m.request, 'urlopen', opener)\n" + _URLLIB_USE,
+    "def test_unsafe(monkeypatch):\n    monkeypatch.setattr(m.other, 'build_opener', opener)\n" + _URLLIB_USE,
+    "def test_unsafe(monkeypatch):\n" + _URLLIB_USE + "    monkeypatch.setattr(m.request, 'build_opener', opener)\n",
+))
+def test_tripwire_scan_flags_an_unpatched_urllib_transport(source: str) -> None:
+    assert _real_transport_tests_without_tripwire({"invented.py": source}) == (
+        1, ["invented.py::test_unsafe"],
+    )
+
+
+@pytest.mark.parametrize("source", (
+    "def test_safe(monkeypatch):\n    monkeypatch.setattr(m.request, 'build_opener', opener)\n" + _URLLIB_USE,
+    "def test_safe(monkeypatch):\n    monkeypatch.setattr(urllib.request, 'build_opener', opener)\n" + _URLLIB_USE,
+    "def test_safe(monkeypatch):\n    monkeypatch.setattr('urllib.request.build_opener', opener)\n" + _URLLIB_USE,
+))
+def test_tripwire_scan_accepts_an_opener_patch_before_a_urllib_transport(source: str) -> None:
     assert _real_transport_tests_without_tripwire({"invented.py": source}) == (1, [])

@@ -440,17 +440,22 @@ def reconcile_invented_capture_inventory(original_requests, original_partition, 
 Unlike a declaration sealer this consumes complete supplied invented journals,
 freshly projects their bodies and proves exact source-prefix membership first.
 """
-    inventory = _inventory(capture_inventory_raw, expected_capture_inventory_sha256, observed=False)
-    closed, verified, registry = _run_closures(Path(root).resolve(), inventory, observed=False)
-    reconciled = _reconcile_partition(original_requests, original_partition, closed,
-        maximum_preview_requests=maximum_preview_requests)
-    body = {"kind": VERSION, "scope": "invented_test_only", "repository_head": "a" * 40,
-        "worker_source_sha256": "0" * 64, "worker_bootstrap_sha256": "0" * 64, "current_source_inventory_sha256": "0" * 64,
-        "executed_modules": [], "source_view": None, "replay_anchors": {}, "capture_inventory": inventory,
-        "capture_inventory_sha256": expected_capture_inventory_sha256, "verified_runs": verified,
-        "stopped_v3_disposition": "not-observed-fixture", "source_bound_union_scope": "invented_test_only",
-        **registry, **reconciled, "authority": _authority()}
-    _validate_body(body, observed=False)
+    # Section 153 (Claude review): like the observed entry, a filesystem or
+    # decoding fault inside the closures is a typed refusal, not a raw OSError.
+    try:
+        inventory = _inventory(capture_inventory_raw, expected_capture_inventory_sha256, observed=False)
+        closed, verified, registry = _run_closures(Path(root).resolve(), inventory, observed=False)
+        reconciled = _reconcile_partition(original_requests, original_partition, closed,
+            maximum_preview_requests=maximum_preview_requests)
+        body = {"kind": VERSION, "scope": "invented_test_only", "repository_head": "a" * 40,
+            "worker_source_sha256": "0" * 64, "worker_bootstrap_sha256": "0" * 64, "current_source_inventory_sha256": "0" * 64,
+            "executed_modules": [], "source_view": None, "replay_anchors": {}, "capture_inventory": inventory,
+            "capture_inventory_sha256": expected_capture_inventory_sha256, "verified_runs": verified,
+            "stopped_v3_disposition": "not-observed-fixture", "source_bound_union_scope": "invented_test_only",
+            **registry, **reconciled, "authority": _authority()}
+        _validate_body(body, observed=False)
+    except ReconciliationV4Error: raise
+    except Exception: raise ReconciliationV4Error("REFUSED: bounded invented-v4 reconciliation failed") from None
     raw = _canonical(body); receipt = InventedReconciledV4Receipt(raw, _TEST_TOKEN); _IMAGES[receipt] = raw
     return receipt
 

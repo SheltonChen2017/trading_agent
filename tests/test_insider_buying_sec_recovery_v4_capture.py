@@ -412,3 +412,13 @@ def test_parent_persistence_failure_preserves_consumed_start_not_misreported_as_
     output = directories(tmp_path)[2]
     assert (output / "request-000-start.json").exists()
     assert not (output / "request-000-result.json").exists() and not (output / "complete.json").exists()
+
+
+# Section 153 (Claude review): the observed-mode guard had no isolating control.
+def test_observed_capture_refuses_an_invented_selection_before_any_journal(tmp_path):
+    chosen = selection.make_invented_test_selection((request(),))
+    with pytest.raises(m.FreshV4CaptureError, match="fixed genuine selection/transport/root"):
+        m._capture(chosen, "fixture-first", chosen.to_payload()["repository_head"], CONTACT, root=tmp_path.resolve(),
+                   transport=lambda *args: pytest.fail("No request"), guard=lambda: None, observed=True)
+    base, _, _ = directories(tmp_path)
+    assert not base.exists()

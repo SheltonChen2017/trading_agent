@@ -299,3 +299,18 @@ def test_v3_fixture_authority_is_not_accepted_as_production_first_listing_eviden
         row["first_listing_evidence_sha256"]=hash_bytes(enc(row["first_listing_evidence"]))
     args.update(trust_scope="production",context_raw=enc(body),context_sha256=hash_bytes(enc(body)))
     with pytest.raises(m.EventClockError,match="fixture/production profile"):m.verify_pit_stock_context_v3(**args)
+
+
+# Section 153 (Claude review): two point-in-time guards had no isolating control.
+def test_mapping_known_after_public_availability_cannot_classify():
+    args = classification_args()
+    args["mapping"]["knowledge_at_utc"] = "2023-01-13T15:00:01Z"  # one second after availability
+    with pytest.raises(m.EventClockError, match="mapping unavailable"):
+        m.classify_pit_common_equity(**args)
+
+
+def test_v3_history_bar_knowledge_simultaneous_with_cutoff_refuses():
+    args = context_v3_args(60)
+    cutoff = args["decision_cutoff_utc"]
+    with pytest.raises(m.EventClockError, match="simultaneous or future"):
+        m.verify_pit_stock_context_v3(**edit_context(args, lambda b: b["rows"][1]["history"][-1].update(knowledge_at_utc=cutoff)))

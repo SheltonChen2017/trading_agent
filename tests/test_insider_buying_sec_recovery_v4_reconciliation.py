@@ -341,3 +341,15 @@ def test_exact_bounded_worker_launcher_and_source_bootstrap_with_invented_child(
 def test_exact900_second_timeout_refuses_before_launch(monkeypatch, timeout):
     monkeypatch.setattr(m.subprocess, "Popen", lambda *a, **k: pytest.fail("No process launch"))
     with pytest.raises(m.ReconciliationV4Error, match="timeout"): m._run_worker(b"{}", timeout)
+
+
+# Section 153 (Claude review): a same-count registry whose claim names differ from
+# the completed runs' own claims had no isolating control.
+def test_claim_registry_with_same_count_but_foreign_claim_name_refuses(tmp_path):
+    originals, partition, inventory, raw = fixture(tmp_path)
+    claims = tmp_path.resolve().joinpath(*capture.ARTIFACT_PARTS, "claims")
+    victim = sorted(claims.iterdir())[0]
+    victim.rename(claims / ("f" * 64 + ".json"))
+    with pytest.raises(m.ReconciliationV4Error):
+        m.reconcile_invented_capture_inventory(originals, partition, root=tmp_path.resolve(), capture_inventory_raw=raw,
+            expected_capture_inventory_sha256=m._sha(raw), maximum_preview_requests=3)

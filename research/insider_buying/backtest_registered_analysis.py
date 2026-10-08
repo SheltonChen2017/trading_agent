@@ -30,6 +30,8 @@ from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation, localcontext
 from statistics import NormalDist
 
+from data.financial_primitives import to_decimal
+
 
 SCHEMA = "insider-registered-stock-analysis-v1"
 SCHEMA_V2 = "insider-registered-stock-analysis-v2"
@@ -273,8 +275,10 @@ def frozen_analysis_policy() -> dict:
 def required_independent_count() -> int:
     """Specific preregistered normal-design count, not a universal threshold."""
     policy = frozen_analysis_policy()
-    z_alpha = Decimal(str(NormalDist().inv_cdf(1 - 1 / 320)))
-    z_power = Decimal(str(NormalDist().inv_cdf(float(policy["target_power"]))))
+    # Section 153 (Claude review): the repository's money helper, not a bare
+    # Decimal(str(...)); it refuses non-finite values instead of comparing them.
+    z_alpha = to_decimal(NormalDist().inv_cdf(1 - 1 / 320), name="z_alpha")
+    z_power = to_decimal(NormalDist().inv_cdf(float(policy["target_power"])), name="z_power")
     with localcontext() as ctx:
         ctx.prec = 50
         n = (z_alpha + z_power) ** 2 * Decimal(policy["planning_variance_upper_bound"]) \
@@ -770,7 +774,7 @@ def _student_critical(df: int) -> Decimal:
             low = mid
         else:
             high = mid
-    return Decimal(str(high))
+    return to_decimal(high, name="student critical value")
 
 
 def clustered_inference(rows: tuple[tuple[str, str, Decimal], ...]) -> dict:

@@ -366,6 +366,12 @@ Section 261 is Claude's independent review of `a205ebf7..33958eaa` (0 P0,
 0 P1, 0 P2, 1 P3): all eleven Codex commits of sections 255-260 are
 accepted, one edge of the new QC response observation is documented as
 `ARV2R261-001`, and Codex's two findings against section 254 are accepted.
+Section 265 is Claude's independent review of `b80149b8..098bb317` (0 P0,
+0 P1, 2 P2, 3 P3): all thirteen Codex commits are accepted, two gaps on the
+path to an R284 launch are documented for closure before any R284
+preparation, and the ARV2E263-001 metadata drift is traced to the system
+marking new files under ~/Documents as tracked, with a recommended fix in
+265.5 for Codex to read before acting.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
 PRODUCTION-EXECUTABLE.**
@@ -1235,7 +1241,7 @@ during held verification. No usable continuity package, QC preparation, QC
 contact, attempt or look is produced. Both partial artifacts are preserved,
 all integrity checks stay enforced, and the exact local metadata barrier is
 recorded in 263.13–263.14. Independent formal source gates remain separate.
-Claude must review section 263 and the final pushed snapshot; no intermediate
+Section 265 is Claude's independent review of section 263; no intermediate
 reviewer checkpoint is introduced.
 Section 264 completes two bounded synthetic metadata experiments on the
 human's subsequent "proceed": all 17 fixtures show held/named ctime drift with
@@ -1250,7 +1256,12 @@ moving the designated worktree. No further source publication or QC preparation
 is supported by these results. After genuine resolution, separately freeze
 and verify a production recovery protocol before use. No routine approval or
 Claude-review wait is introduced; independent formal source gates remain.
-Claude must review section 264 and its final pushed snapshot.
+Section 265 is Claude's independent review of the exact pushed range
+`b80149b8..098bb317` (sections 262-264), including the ARV2E263-001
+investigation. The immediate next step is that Codex counter-reviews section
+265 and this round's Claude commit, and reads the recommended fix in 265.5
+before acting on ARV2E263-001, unless the owner explicitly changes this
+workflow.
 That review must be independent; same-round advisory checks do not qualify.
 The human explicitly reiterated "build until the project is ready for forward
 looking" and "no need to wait for Claude." No routine approval or
@@ -1298,7 +1309,7 @@ execution, corrected coverage comparison and the retained input/clock plumbing.
 During development and QC diagnosis, Codex uses only relevant focused checks.
 Claude runs the complete Analyst V2 lane suite during independent review;
 Codex runs it only if the owner explicitly requests it. Claude has reviewed
-the pushed range through section 260 (section 261); for section 250 the owner
+the pushed range through section 264 (section 265); for section 250 the owner
 directed focused checks without the complete suite. Section 182 records the owner's exact
 exception: the bounded R-185 stronger-tilt backtest was completed before
 Claude reviews sections 181–182 and their pushed source and results. That
@@ -3088,6 +3099,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex section-261 counter-review, reply monitor and owner-directed immediate RAW-price acquisition | `b80149b8` -> `2f5ddf4b` + final record commit | Section 262: one new Claude commit accepted after scratch-probe qualification; actual Massive reply read; human cancels clarification drafts; bounded direct Sharadar capture completes all seven October 6 rows | New reply monitor created then retired because the original is answered and follow-up cancelled; old review monitor remains paused; no shared/frozen/registry edits, new look/cell or paid/live action | 263 distinct focused passes under strict network denial; actual two-GET private capture and pinned offline readback; no complete Codex suite | Current RAW-price access step completed; immutable availability and independent identity/formal packages remain unavailable, not cleared by other-lane use | One final matching-lane push at this concrete source-evidence boundary; no routine approval/review wait; resume supported substantive evidence work when available |
 | 2026-10-07 | Codex owner-directed seven-security identity preparation | `96318ebc` -> `79883200` + final record commit | Section 263: bounded current identity/public FIGI captures complete; source continuity comparisons run but local publication refuses twice, with the second locating output-manifest ctime drift; no QC attempt/look/cell | New bounded adapters, versioned continuity projection and prepared-only QC runner; four pre-contact P2 corrections; original source refusals retained, private Sharadar rows local and partial artifacts preserved | Root 785 focused strict-network-denied passes, closure and final record checks in 263.15; no complete Codex suite or QC validation | ARV2E263-001 local publication-integrity barrier; independent immutable source/security-master/price/score gates and historical P2s remain; not forward ready | Exactly one final matching-lane push at the concrete artifact-integrity/evidence stop; no routine approval/Claude wait or monitor rearm |
 | 2026-10-08 | Codex owner-directed publication diagnosis | `f72b1cfb` -> final section-264 snapshot | Two frozen synthetic experiments reproduce ctime drift in all 17 fixtures; B's eight consumer reopens also refuse | No supported fix from extra fsync, writer retention or omitted optional provenance; preserve both diagnostic and failed production packages, original sources and all guards | 27 A / 21 B / 129 unchanged bridge / 86 document / 2 closure focused checks; final union recorded below, no complete suite | ARV2E263-001 remains a reproduced local publication barrier; targeted attribution unavailable under required denial; separate independent formal source gates remain | Supported host-level attribution/resolution is needed before a separately frozen production recovery; no routine approval/Claude wait, monitor stays disarmed, one final lane push |
+| 2026-10-08 | Claude independent review of sections 262-264 and the ARV2E263-001 investigation | `098bb317` -> this record commit | Section 265: thirteen Codex commits `b80149b8..098bb317` disposed (13 accepted, 0 accepted after correction, 0 rejected); zero QC, provider, mail or browser requests, looks, evaluations, or cells | No code changed by Claude. Reproduced the capture, identity and diagnostic artifacts of sections 262-264; reproduced `ARV2R265-001` with the retained refused input; measured file metadata in temporary folders outside the repository, tracing the drift to the system setting UF_TRACKED and one further write on new files under ~/Documents, with a recommended fix in 265.5; section 4 names section 265, banner sentence added, this row appended | Complete lane selection at `098bb317` with every remote address refused (strict sandbox for the six groups, three parallel streams; loopback-only sandbox for the 11 loopback-server tests) with an artifact and status integrity check, `compileall`, `git diff --check`; exact counts in 265.7 | 0 P0, 0 P1, 2 P2, 3 P3 (`ARV2R265-001` to `-005`, documented for Codex; the two P2s to close before any R284 preparation) | Single push of this round's Claude commit; Codex counter-reviews section 265 unless the owner changes the workflow |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -38216,3 +38228,251 @@ Claude review is present. Verify exact root/branch/HEAD/status, commit only this
 record, recheck the pinned record and make exactly one final matching-lane push.
 The resulting snapshot remains pending independent review and stopped at the
 concrete publication/source-evidence barriers, not complete or forward-ready.
+
+## 265. Independent Claude review of sections 262–264 and investigation of ARV2E263-001, 2026-10-08
+
+**Range reviewed:** `b80149b8..098bb317`, thirteen Codex commits: the Sharadar
+unadjusted-close and identity captures, the OpenFIGI capture, the R284
+identity QC runner, the identity-continuity builder, the two
+publication-metadata diagnostics and their records (sections 262–264), each
+disposed in 265.1, plus this round's one Claude lane commit (this record
+commit). Sections 265.4 and 265.5 answer Codex's investigation request for
+`ARV2E263-001`, with the recommended fix in 265.5.
+
+**Zero research looks, development evaluations, infrastructure looks, and
+authenticated cells in this round.** This review made no provider,
+QuantConnect, mail or browser request. Its checks read repository and
+artifact bytes, printing only hashes, counts, identity fields and true/false
+results. The file-metadata probes in 265.4 wrote only small synthetic files
+in temporary folders outside the repository, each deleted afterwards, and
+one read-only unified-log query ran outside the sandbox. Codex's sections
+also add no look or cell: R284 is unprepared and unlaunched, and the floor
+stays **313 / 239 / 49 / 699**.
+
+**Verdict.** All thirteen Codex commits are accepted; none is rejected.
+**0 P0, 0 P1, 2 P2, 3 P3.** The two P2s are gaps on the path to an R284
+launch and must be closed before any R284 preparation (265.2). They and the
+P3s are documented for Codex rather than corrected here, because each
+correction changes an interface or test-fixture contract in code Codex is
+still developing, and none of the affected paths has run.
+
+### 265.1 Per-commit disposition
+
+| Commit | What it is | Disposition | Basis |
+|---|---|---|---|
+| `2f5ddf4b` | Sharadar unadjusted-close adapter, tests and pre-contact protocol | accepted | The pinned script and test hashes `e33ba763…` and `a76290ce…` reproduce and are unchanged since; the commit time, 16:47:25 UTC, precedes the capture, 16:47:30 UTC. A static review found the transport, CSV refusals and publication sound. |
+| `96318ebc` | Section 262: the price capture record | accepted | Manifest `2f5d7168…`, `stocks.csv` 68 bytes `f7b69af2…` and `funds.csv` 232 bytes `da0fc6d9…` reproduce; files are 0600, single-linked, in a 0700 directory, and both CSVs are Git-ignored. |
+| `80dc0ce2` | Sharadar identity adapter and protocol | accepted | The collision gap `ARV2R265-003` is documented. |
+| `72e2357b` | Bounded stock-header diagnostic after a schema refusal | accepted | Diagnostic only; the price pin is checked before credentials. |
+| `174dd283` | OpenFIGI capture and the R284 identity QC runner | accepted | No order, live or paper path exists: three allowlists exclude every such endpoint, the generated source refuses live mode, and `backtests/create` is the only run-creating call. `ARV2R265-002` and `ARV2R265-005` are documented. |
+| `1eba3dec` | Missing-FIGI metadata under the v2 profile | accepted | The v2 profile always adds the FIGI refusal. |
+| `7c8011a3` | Identity-continuity builder and runner corrections | accepted | The builder requires matching FIGIs and a unique, equal permanent ID per ticker and never picks one CUSIP from a set. `ARV2R265-001` is documented. |
+| `fc7c5e05` | Multi-CUSIP qualification without rewriting captures | accepted | It qualifies only refused space-separated lists and keeps full-set equality. |
+| `79883200` | Diagnosis of held-metadata refusals | accepted | Verification is not weakened: `_held` still runs the same identity check, only the refusal message is extended. The diagnostic's gaps are `ARV2R265-004`. |
+| `f72b1cfb` | Section 263: identity captures and the publication refusal | accepted | OpenFIGI manifest `75ce7cba…` and batches, Sharadar identity manifest `7dc79cfe…` and CSVs, and both refused continuity inputs `d43d9607…` and `37b04a6d…` with their retained manifest digests `0c02f902…` and `b663c15a…` reproduce, and neither package has a `manifest.json`. |
+| `56404cad` | Synthetic publication-metadata experiment A | accepted | Synthetic bytes only; report `aff19216…` reproduces. |
+| `171a5b08` | Writer-lifecycle experiment B | accepted | Synthetic bytes only; report `7c383cdc…` reproduces. |
+| `098bb317` | Section 264: results, exclusions and handoff | accepted | Its conclusion, that no tested writer variation removes the drift, is consistent with 265.4. |
+
+### 265.2 Findings
+
+| ID | P | Introduced by | Finding | Disposition |
+|---|---|---|---|---|
+| `ARV2R265-001` | P2 | `7c8011a3`, `174dd283` | A refused continuity build leaves its `input.json`, and the QC runner's `prepare()` accepts it. `_build` writes `input.json` before the manifest is published and its refusal rollback removes only the `manifest.json` marker; `prepare()` checks only the file, its caller-supplied hash and the schema. With the hash recorded in 263.14, the retained input of the refused `R284A1-20261008-B` package passes the runner's `validate_input` (continuity v2 schema, seven rows) although that package has no `manifest.json`. The publication refusal is therefore not enforced on the way to a QC package. | Documented for Codex; close before any R284 preparation. Either stage `input.json` as a pending file published with the manifest and removed on refusal, or make `prepare()` authenticate the continuity package (published manifest whose digest equals `continuity_manifest_sha256`). Regression test: a refusal after the input write, then `prepare()` on the leftover file, must refuse. |
+| `ARV2R265-002` | P2 | `174dd283` | The R284 one-attempt rule is enforced per control directory, not per candidate. `_Directory` accepts any leaf under `identity_qc/`, `launch()` writes its one-use `attempt-claim.json` inside that leaf, and the project name, backtest name, candidate and `attempt: 1` are constants. A fresh `prepare()` into a second leaf, such as the `-B` pattern used in 263.14, permits a second R284 A1 launch that no code stops, which would leave an unreconciled first run and an undercounted look ledger. | Documented for Codex; close before any R284 preparation. Add a candidate-level exclusive claim under `ARTIFACT_ROOT`, or pin the leaf in code. Regression test: a second leaf for R284 must refuse before any client is built or request is sent. |
+| `ARV2R265-003` | P3 | `80dc0ce2`, `1eba3dec` | The identity adapter registers a CUSIP for collision checks only when a row's whole `cusips` field parses, so a member whose field is malformed or space-separated is not counted, and the other member of a real collision can come out matched. `_cusips` also strips whitespace inside the field instead of refusing it. Today's data is not affected: the v2 profile refuses every name on the FIGI check, and the continuity builder re-parses space lists and checks cross-vintage CUSIP ownership. | Documented for Codex. |
+| `ARV2R265-004` | P3 | `7c8011a3`, `79883200` | The builder's refusal diagnostic cannot see the actual cause. `_provenance_presence` uses `os.listxattr`, which this host's Python does not provide, so it always reports `unknown`; and `_IDENTITY_DIMENSIONS` compares device, inode, size, `mtime` and `ctime` but not `st_flags`, which is the field that changes (265.4). | Documented for Codex. |
+| `ARV2R265-005` | P3 | `174dd283` | The runner writes each control file directly under its one-use final name, with no temporary file and link, so a crash mid-write leaves a partial `launch.json`, `terminal.json` or `result.json` whose name is spent; and a crash between the `backtests/create` response and the `launch.json` write keeps no backtest ID locally. Both fail closed, so the cost is lost evidence. | Documented for Codex. |
+
+### 265.3 Codex's findings against Claude's section 261
+
+- **`ARV2CR262-001` (P3) is accepted.** Section 261.6 said every check ran
+  from the designated worktree, but its `ARV2R261-001` probe was a test file
+  in the scratchpad; it is a diagnostic, not compliant lane evidence.
+- **`ARV2R261-001` is closed by Codex's contract decision**, which keeps
+  strict canonical response hashing and the wall-clock refusal (262.1).
+  That is Codex's decision to make, and it is accepted.
+
+### 265.4 ARV2E263-001: findings
+
+**Measurements.** Each probe wrote a fresh 12-byte file with an exclusive
+create, `fsync` and close, then sampled `stat` every 2–5 ms. Some probes then
+published the file the way the builder does, linking it to a final name and
+unlinking the pending name. Most ran under the strict sandbox; the
+scratchpad was also run unsandboxed. None used held descriptors or the lane
+code, and every probe folder sat outside the repository and was deleted.
+
+| Location | Result |
+|---|---|
+| The scratchpad, `/private/tmp` (13 files) | No change in 2–10 s, including after a write, link and unlink; flags stay `0x0`. |
+| A folder in the home folder, outside `~/Documents` (5 files) | No change in 2–10 s, including after a write, link and unlink; flags stay `0x0`. |
+| Temporary folders beside the worktree, under `~/Documents` (21 files) | Every file's `ctime` moves within 0.21 s; in the 17 files whose flags were recorded, the flags go from `0x0` to `0x40` (`UF_TRACKED`) at that moment. The 9 files watched for 4–12 s in normally named folders change once more, at 2.0–3.1 s, with no visible change. |
+| The same, published only after 5 s with no change (2 files) | The second change did not come during the 5 s; after the link and unlink, one file changed 6.8 s later and the other not within 10 s. |
+| The same, with the writer setting `UF_TRACKED` itself first (3 files) | The first change disappears; the second still comes at 1.8–2.0 s. |
+
+Across every changed file, device, inode, mode, link count, owner, size,
+`mtime`, birth time, the extended-attribute names and the provenance value
+stay the same, and no ACL entry appears. Every file, inside or outside
+`~/Documents`, already carries `com.apple.provenance` at the first `stat`,
+so that attribute is not the cause. The `~/Documents` folder itself carries
+`com.apple.file-provider-domain-id` and `com.apple.fileprovider.detached#B`.
+An earlier run in dot-named folders also showed `0x8000` (hidden), which the
+visible-folder reruns show was caused by the folder name, not by the
+service.
+
+**Answers to the five questions.**
+
+1. **The diagnostic baselines and bindings are not the cause.** The same
+   `ctime`-only change appears with a plain write and a path `stat`, with no
+   held descriptor or diagnostic code involved. The diagnostics' blind spot
+   is that they compare no `st_flags`, so they saw `ctime` alone.
+2. **The lane's own operations do not explain it.** No lane script sets file
+   flags, extended attributes, ACLs or times; they set modes only when a file
+   is created, before any baseline. The change happens to files the code has
+   finished with, and only under `~/Documents`.
+3. **Strict `ctime` equality is a sound check, but this host breaks its
+   premise.** `ctime` is the one timestamp that catches an in-place rewrite
+   with a restored `mtime`. Its premise is that nothing but the writer
+   changes the file's metadata, and under `~/Documents` the system changes it
+   once quickly and once more at a variable delay, 2 s to at least 7 s after
+   a namespace change. Strict equality therefore refuses whenever a
+   verification window overlaps those writes. That is a race, which fits the
+   record: earlier captures with short verification windows published, while
+   the continuity builder, which reconstructs its expected contents while
+   holding the files open, refused.
+4. **Host evidence identifies the first operation, not the process.** The
+   first change is the system setting `UF_TRACKED`, the flag macOS uses to
+   track documents in managed locations, consistent with the File Provider
+   attributes on `~/Documents`. A read-only unified-log query outside the
+   sandbox, matching the probe folder's unique name, found no daemon event
+   naming the path; the second write is invisible to `stat`, extended
+   attributes and ACLs. Naming the process would need privileged tracing such
+   as `fs_usage` or DTrace, which was not attempted.
+5. **Smallest evidence-backed correction:** see 265.5.
+
+These are small samples (2–21 files per condition, at most a 12-second
+watch) on this Mac at this time; they do not prove the service's behaviour
+in general.
+
+### 265.5 ARV2E263-001: recommended fix, for Codex to read before acting
+
+**Do not** retry the publication as it is, rerun the A or B diagnostics into
+their existing directories, or rely on a fixed waiting period: one file
+changed 6.8 s after a 5-second quiet period ended. Either of the two fixes
+below removes the false refusals; the choice between them is the owner's.
+
+**Fix 1, no code change: move the worktree out of `~/Documents`.** Outside
+`~/Documents` no probe file changed, even after a full write, link and
+unlink, so the existing strict contract would hold as written. Because the
+designated worktree path is owner-set and section 264.5 rules out relocation
+by the agent, this needs the owner's decision. Before choosing it:
+
+- keep the directory name `trading_agent__analyst_revisions_v2`, which 19
+  lane files check, and move the whole worktree, not only `artifacts/`:
+  operational captures must stay under the repository's own `artifacts/`,
+  and symlinked paths are refused;
+- check what breaks first: 171 retained artifact files contain the current
+  absolute worktree path, and it is not established whether their loaders
+  compare it, so confirm that the existing evidence still re-authenticates
+  after a move;
+- before any production use, run a synthetic probe at the new location
+  (write, `fsync`, link, unlink, then watch `st_flags` and `ctime` for at
+  least 30 s) and require no change.
+
+**Fix 2, if the worktree stays: make a `ctime` change trigger a full
+re-authentication instead of a refusal.** This changes the integrity
+contract, so Codex should freeze it before implementing it. It applies to
+every publisher and loader that uses the shared identity check in
+`scripts/capture_arv2_sharadar.py`, not only the continuity builder.
+
+- Keep strict equality, by held descriptor and by name, on device, inode,
+  mode, link count, owner, group, size and `mtime`.
+- Record `ctime` and `st_flags` as well. When either changes while all the
+  strict fields are equal, re-read the whole leaf from the held descriptor
+  and require its SHA-256 to equal the pinned digest. Then record the
+  transition (old and new `ctime`, old and new flags, when it was seen) in
+  that publication's evidence, take the new values as current, and
+  continue. A change to any strict field, a digest mismatch or a read error
+  still refuses.
+- Integrity argument: a replacement changes the device or inode; an append
+  or truncation changes the size; an in-place rewrite changes the bytes,
+  which the re-hash catches even if `mtime` was restored; a hard link,
+  `chmod` or `chown` changes the link count, mode or owner. What is given up
+  is detecting a modification that is fully reverted before the next check.
+  That leaves the authenticated bytes unchanged, and making it requires
+  same-user write access to 0600 files in a 0700 directory, which could
+  already forge any other evidence. Every tolerated change is recorded, so
+  nothing is dropped silently.
+- Regression tests: a `ctime` and flag change with unchanged bytes is
+  accepted and recorded; a `ctime`-only change with unchanged bytes is
+  accepted and recorded; changed bytes with a restored `mtime` refuse; a
+  change of size, inode, device, mode, link count, owner or group refuses; a
+  read error during the re-hash refuses; a loader started after publication
+  re-authenticates the same way.
+
+**Not recommended:** a fixed settle window before the baseline (shown
+unreliable above); presetting `UF_TRACKED` (the second write remains);
+allowing only the `UF_TRACKED` transition (the second write changes nothing
+visible); dropping `ctime` without the re-hash; rebaselining after drift;
+retrying until a check passes; stripping attributes; or changing security
+settings.
+
+**Do first, whichever fix is chosen:** add `st_flags` to the diagnostic
+identity and replace `os.listxattr` with a check that works on macOS
+(`ARV2R265-004`), so that any future refusal names the field that actually
+changed.
+
+**Still unknown:** which process makes the two writes, what triggers the
+second one, and whether `~/Desktop` or a future macOS update behaves the
+same way.
+
+### 265.6 Owner directions in Codex's sections
+
+Section 262 records the owner's directions to arm an email monitor, then
+that "other lanes have been using it" and to start right away, which
+cancelled two drafted vendor emails before sending and started the Sharadar
+price capture. Sections 263 and 264 are recorded as owner-directed. These
+come from Codex's conversation and cannot be verified from this review.
+
+### 265.7 Validation
+
+Every check ran from the designated worktree at
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2`,
+with `~/.venvs/trading_agent-py313/bin/python` (3.13.15), each pytest
+process under one of the two `sandbox-exec` profiles of 242.6. Before use, a
+probe again confirmed that the loopback-only profile allows a loopback bind
+and connect and refuses a connection to the reserved documentation address
+`192.0.2.1` with `EPERM`. The 265.4 measurements are diagnostics outside the
+repository, not lane evidence.
+
+| Check | Scope | Result |
+|---|---|---|
+| Standing lane selection, strict profile | `tests/analyst_revisions_v2`, `tests/test_analyst_revisions_v2_contracts.py`, `tests/test_analyst_revisions_v2_legacy_quarantine.py`, `tests/test_analyst_revisions_v2_preregistration.py`, `tests/test_analyst_revisions_v2_statistics.py`, `tests/test_active_document_consistency.py`, at the clean pushed head `098bb317`, run as six file groups with separate pytest temp directories, together covering all 10,552 collected tests. Other lanes' suites had this 10-core Mac about four times oversubscribed (load average 40), so group 4's first run was stopped at about 10% after 32 minutes and its 41 files were rerun as four parallel sub-shards; the stopped run's partial log is kept and not counted | **11 failed, 10533 passed, 8 skipped, 35 warnings in six strict-profile worktree file groups, the slowest rerun as four parallel sub-shards (each 0:24:15, 0:26:08, 0:11:23, 0:57:59, 0:09:21, 0:36:41, 0:12:02, 0:49:23, 0:06:59).** No error. Every failure is `PermissionError: [Errno 1] Operation not permitted` in one of the 11 tests of `test_qc_formal_qc_transport.py` that start HTTP servers on `127.0.0.1`, because the strict profile also refuses loopback. The 8 skips are a subset of the standing eleven: 7 Windows-only directory-junction tests and 1 top-five-only profile case. |
+| The loopback-server file, loopback-only profile | `tests/analyst_revisions_v2/test_qc_formal_qc_transport.py`, all 73 tests, at the same head | **73 passed, 2 warnings in 8.88s**, exit 0: the 11 loopback-server tests pass once loopback is allowed and every other address is refused |
+| Every collected test, remote network refused | the two rows above together | **0 failed, 10,544 passed, 8 skipped** across all 10,552 collected tests; the strict profile covers 10,533 of the passes and the loopback-only profile the other 11 |
+| `ARV2R265-001` reproduction | the runner's `validate_input` on the retained refused input, at `098bb317` | accepted with the recorded hash although no `manifest.json` exists |
+| Local evidence reproduction | the artifacts named in 265.1 | every listed hash, size, mode and absence reproduces |
+| Record gates on the final record bytes, strict profile | `test_lane_record_integrity.py` and `test_active_document_consistency.py` | **86 passed** |
+| `python -m compileall -q` | the standard package list plus `research/analyst_revisions_v2_qc` | clean |
+| Worktree integrity across the complete run and the checks | `artifacts/analyst_revisions_v2` and `git status --ignored` | every one of the 1836 files under `artifacts/analyst_revisions_v2` has the same SHA-256 before and after the run and the audit, and `git status --ignored` is unchanged apart from `__pycache__` and one git-ignored Claude Code scheduled-task lock, `.claude/scheduled_tasks.lock`, that another local Claude Code session created at 01:01 PDT; that lock is outside the lane's evidence and was left in place |
+| `git diff --check` | final tree | clean |
+| `git status --short --branch` | after this round's commit | clean; published in this round's single push |
+
+### 265.8 Carried-open findings
+
+| ID | P | Status |
+|---|---|---|
+| `ARV2R265-001`, `ARV2R265-002` | P2 | Open for Codex; close before any R284 preparation. |
+| `ARV2E263-001` | — | Investigated (265.4); recommended fix in 265.5, an owner or Codex decision. |
+| `ARV2R248-002`, `ARV2R248-003`, `ARV2R248-004` | P2 | Open; partly reconciled by sections 255–257. |
+| `ARV2R196-001` | P2 | Open; the historical AR effect has the same two-year signature in every family. |
+| `ARV2D212-001` | P2 | Clock mechanism resolved by R279; forward input readiness and vendor availability remain open. |
+| `ARV2CR185-001`, `ARV2CR187-001`, `-003`, `ARV2D188-001` | P2 | Open as recorded. |
+| `ARV2R265-003`, `ARV2R265-004`, `ARV2R265-005` | P3 | Open for Codex. |
+| `ARV2CR262-001`, `ARV2R261-001` | P3 | Accepted and closed (265.3). |
+| `ARV2I256-001` | P2 | Corrected prospectively by `06f3e8d4`. |
+| `ARV2CR255-001`, `ARV2CR255-002`, `ARV2R250-001`, `ARV2R248-006`, `ARV2CR249-001`, `-002`, `-003`, `ARV2CR245-001`, `ARV2R242-001` | P3 | Corrected or accepted, as recorded. |
+| `ARV2R248-007` | P3 | Documented; narrowed in one direction by `4496d241`. |
+
+The final tree differs from the pushed head `098bb317` only by this record
+commit.

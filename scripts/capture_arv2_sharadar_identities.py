@@ -28,6 +28,7 @@ from research.analyst_revisions_v2.canonical import (
 
 SharadarIdentityCaptureError = source.SharadarCaptureError
 SCHEMA = "arv2-sharadar-seven-current-identities-v1"
+SCHEMA_WITHOUT_FIGI = "arv2-sharadar-seven-current-identities-v2"
 PRODUCTION_TRANSPORT = "sharadar_current_identities_direct_https_owned_session"
 TEST_TRANSPORT = "offline_test_double"
 DEFAULT_ARTIFACT_ROOT = (
@@ -43,6 +44,7 @@ FIELDS = (
     "category", "figi", "cusips", "currency", "firstadded", "firstpricedate",
     "lastpricedate", "lastupdated",
 )
+FIELDS_WITHOUT_FIGI = tuple(field for field in FIELDS if field != "figi")
 ROLE_TICKERS = prices.ROLE_TICKERS
 MAX_RESPONSE_BYTES = 1024 * 1024
 MAX_MANIFEST_BYTES = 256 * 1024
@@ -110,6 +112,8 @@ class LoadedSharadarIdentityCapture:
     price_close_session: str
     responses: tuple[IdentityCsvBinding, ...]
     identities: tuple[CurrentIdentityDisposition, ...]
+    manifest_schema: str = SCHEMA
+    requested_fields: tuple[str, ...] = FIELDS
 
     @property
     def matched_count(self) -> int:
@@ -137,10 +141,17 @@ class StockHeaderDiagnostic:
     orders_enabled: bool = False
 
 
-def _query(role: str) -> dict[str, str]:
+def _fields(schema: str) -> tuple[str, ...]:
+    if type(schema) is not str or schema not in (SCHEMA, SCHEMA_WITHOUT_FIGI):
+        raise SharadarIdentityCaptureError("identity schema profile is not supported")
+    return FIELDS if schema == SCHEMA else FIELDS_WITHOUT_FIGI
+
+
+def _query(role: str, *, schema: str = SCHEMA) -> dict[str, str]:
+    fields = _fields(schema)
     return {
         "format": "csv", "table": role,
-        "ticker": ",".join(dict(ROLE_TICKERS)[role]), "fields": ",".join(FIELDS),
+        "ticker": ",".join(dict(ROLE_TICKERS)[role]), "fields": ",".join(fields),
         "sort": "ticker.asc", "skip": "0", "limit": str(REQUEST_ROW_LIMIT),
     }
 
@@ -168,7 +179,8 @@ def _price_binding(
     }
 
 
-def _parse_csv(payload: bytes, role: str) -> tuple[dict[str, str], ...]:
+def _parse_csv(payload: bytes, role: str, *, schema: str = SCHEMA) -> tuple[dict[str, str], ...]:
+    fields = _fields(schema)
     if type(payload) is not bytes or not 0 < len(payload) <= MAX_RESPONSE_BYTES:
         raise SharadarIdentityCaptureError("identity CSV exceeds the bounded byte contract")
     try:
@@ -182,12 +194,12 @@ def _parse_csv(payload: bytes, role: str) -> tuple[dict[str, str], ...]:
     try:
         reader = csv.reader(io.StringIO(text, newline=""), strict=True)
         header = tuple(next(reader, ()))
-        if len(header) != len(FIELDS) or set(header) != set(FIELDS):
+        if len(header) != len(fields) or set(header) != set(fields):
             raise SharadarIdentityCaptureError("identity CSV header differs from frozen fields")
         for values in reader:
             if len(observed) + 1 >= REQUEST_ROW_LIMIT:
                 raise SharadarIdentityCaptureError("identity CSV reached the request row limit")
-            if len(values) != len(FIELDS) or any(
+            if len(values) != len(fields) or any(
                 len(value) > MAX_FIELD_CHARS
                 or any(ord(character) < 0x20 or ord(character) == 0x7F for character in value)
                 for value in values
@@ -203,9 +215,9 @@ def _parse_csv(payload: bytes, role: str) -> tuple[dict[str, str], ...]:
     return tuple(observed)
 
 
-def _bounded_response_bytes(session: object, role: str, key: str) -> bytes:
+def _bounded_response_bytes(session: object, role: str, key: str, *, schema: str = SCHEMA) -> bytes:
     endpoint = source.BASE_URL + "/v1.0/data/tickers"
-    params = {**_query(role), "api_key": key}
+    params = {**_query(role, schema=schema), "api_key": key}
     response = None
     try:
         response = session.get(
@@ -246,9 +258,9 @@ def _bounded_response_bytes(session: object, role: str, key: str) -> bytes:
             source._close_response(response)
 
 
-def _response_bytes(session: object, role: str, key: str) -> bytes:
-    payload = _bounded_response_bytes(session, role, key)
-    _parse_csv(payload, role)
+def _response_bytes(session: object, role: str, key: str, *, schema: str = SCHEMA) -> bytes:
+    payload = _bounded_response_bytes(session, role, key, schema=schema)
+    _parse_csv(payload, role, schema=schema)
     return payload
 
 
@@ -316,7 +328,9 @@ def _cusips(value: str) -> tuple[str, ...] | None:
 
 def _census(
     role_rows: tuple[tuple[str, tuple[dict[str, str], ...]], ...],
+    *, schema: str = SCHEMA,
 ) -> tuple[CurrentIdentityDisposition, ...]:
+    _fields(schema)
     rows_by_ticker: dict[str, list[dict[str, str]]] = defaultdict(list)
     roles = {ticker: role for role, tickers in ROLE_TICKERS for ticker in tickers}
     for role, rows in role_rows:
@@ -332,7 +346,7 @@ def _census(
         owners: dict[str, set[str]] = defaultdict(set)
         for ticker, rows in rows_by_ticker.items():
             for row in rows:
-                if pattern.fullmatch(row[field]) is not None:
+                if pattern.fullmatch(row.get(field, "")) is not None:
                     owners[row[field]].add(ticker)
         for members in owners.values():
             if len(members) > 1:
@@ -362,13 +376,15 @@ def _census(
             codes.add("CURRENT_IDENTITY_MISSING")
         elif len(candidates) != 1:
             codes.add("CURRENT_IDENTITY_AMBIGUOUS")
+        if schema == SCHEMA_WITHOUT_FIGI:
+            codes.add("COMPOSITE_FIGI_INVALID_OR_MISSING")
         if row is not None:
             allowed_tables = {role, "SEP" if role == "stocks" else "SFP"}
             if row["table"] not in allowed_tables:
                 codes.add("SOURCE_TABLE_UNRECOGNIZED")
             if _PERMANENT_ID.fullmatch(row["permaticker"]) is None:
                 codes.add("PERMANENT_SHARE_CLASS_ID_INVALID")
-            if _FIGI.fullmatch(row["figi"]) is None:
+            if _FIGI.fullmatch(row.get("figi", "")) is None:
                 codes.add("COMPOSITE_FIGI_INVALID_OR_MISSING")
             if not row["name"]:
                 codes.add("ISSUER_NAME_MISSING")
@@ -397,7 +413,7 @@ def _census(
             if first is not None and last is not None and not first <= PRICE_CLOSE_SESSION <= last:
                 codes.add("BOUND_PRICE_DATE_OUTSIDE_SOURCE_PRICING_RANGE")
         def field(name: str) -> str | None:
-            return row[name] if row is not None and row[name] else None
+            return row.get(name) if row is not None and row.get(name) else None
         dispositions.append(CurrentIdentityDisposition(
             ticker, role, "refused_current_candidate" if codes else "matched_current_candidate",
             len(candidates), tuple(sha256_bytes(canonical_json_bytes(candidate)) for candidate in candidates),
@@ -421,15 +437,17 @@ def _artifact_id(started: str) -> str:
 def _manifest(
     started: str, completed: str, transport: str, price_binding: dict[str, object],
     csv_bytes: tuple[tuple[str, bytes], ...],
+    *, schema: str = SCHEMA,
 ) -> dict[str, object]:
+    fields = _fields(schema)
     if transport not in (PRODUCTION_TRANSPORT, TEST_TRANSPORT):
         raise SharadarIdentityCaptureError("identity transport is not supported")
     if parse_utc_timestamp(completed, "completed") < parse_utc_timestamp(started, "started"):
         raise SharadarIdentityCaptureError("identity capture clock moved backwards")
     if tuple(role for role, _payload in csv_bytes) != ("stocks", "funds"):
         raise SharadarIdentityCaptureError("identity response role order changed")
-    rows = tuple((role, _parse_csv(payload, role)) for role, payload in csv_bytes)
-    dispositions = _census(rows)
+    rows = tuple((role, _parse_csv(payload, role, schema=schema)) for role, payload in csv_bytes)
+    dispositions = _census(rows, schema=schema)
     bindings = tuple(IdentityCsvBinding(role, role + ".csv", sha256_bytes(payload),
                                         len(payload), len(dict(rows)[role]))
                      for role, payload in csv_bytes)
@@ -438,13 +456,13 @@ def _manifest(
         "capture_started_at": started, "capture_completed_at": completed,
         "capture_transport": transport, **price_binding,
         "responses": [{**dataclasses.asdict(binding), "endpoint_path": "/v1.0/data/tickers",
-                       "request_query": _query(binding.role)} for binding in bindings],
+                       "request_query": _query(binding.role, schema=schema)} for binding in bindings],
         "identities": [dataclasses.asdict(row) for row in dispositions],
     }
     return {
-        "schema": SCHEMA, "artifact_id": _artifact_id(started), **identity,
+        "schema": schema, "artifact_id": _artifact_id(started), **identity,
         "capture_sha256": sha256_bytes(canonical_json_bytes(identity)),
-        "fields": list(FIELDS), "request_count": 2, "requested_name_count": 7,
+        "fields": list(fields), "request_count": 2, "requested_name_count": 7,
         "source_row_count": sum(binding.row_count for binding in bindings),
         "matched_current_candidate_count": sum(not row.refusal_codes for row in dispositions),
         "refused_current_candidate_count": sum(bool(row.refusal_codes) for row in dispositions),
@@ -502,6 +520,8 @@ def load_sharadar_identity_capture(
         if type(manifest) is not dict:
             raise SharadarIdentityCaptureError("identity manifest must be an object")
         try:
+            schema = manifest["schema"]
+            fields = _fields(schema)
             transport = manifest["capture_transport"]
             binding = _price_binding(
                 price_artifact_path, manifest["price_manifest_sha256"],
@@ -510,15 +530,16 @@ def load_sharadar_identity_capture(
             rebuilt = _manifest(
                 manifest["capture_started_at"], manifest["capture_completed_at"], transport, binding,
                 tuple((role, captured[role + ".csv"]) for role, _tickers in ROLE_TICKERS),
+                schema=schema,
             )
         except KeyError:
             raise SharadarIdentityCaptureError("identity manifest lacks required bindings") from None
         if canonical_json_bytes(rebuilt) != captured["manifest.json"] or root.name != rebuilt["artifact_id"]:
             raise SharadarIdentityCaptureError("identity manifest/path differs from reauthenticated census")
-        dispositions = _census(tuple((role, _parse_csv(captured[role + ".csv"], role))
-                                      for role, _tickers in ROLE_TICKERS))
+        dispositions = _census(tuple((role, _parse_csv(captured[role + ".csv"], role, schema=schema))
+                                      for role, _tickers in ROLE_TICKERS), schema=schema)
         bindings = tuple(IdentityCsvBinding(role, role + ".csv", sha256_bytes(captured[role + ".csv"]),
-                                            len(captured[role + ".csv"]), len(_parse_csv(captured[role + ".csv"], role)))
+                                            len(captured[role + ".csv"]), len(_parse_csv(captured[role + ".csv"], role, schema=schema)))
                          for role, _tickers in ROLE_TICKERS)
         for name, descriptor, identity, maximum in held:
             source._require_open_leaf_identity(root_fd, name, descriptor, identity,
@@ -528,7 +549,7 @@ def load_sharadar_identity_capture(
             root, digest, rebuilt["capture_sha256"], transport,
             rebuilt["capture_started_at"], rebuilt["capture_completed_at"],
             binding["price_manifest_sha256"], binding["price_capture_sha256"],
-            binding["price_close_session"], bindings, dispositions,
+            binding["price_close_session"], bindings, dispositions, schema, fields,
         )
     except CanonicalEvidenceError:
         raise SharadarIdentityCaptureError("identity manifest is not canonical evidence") from None
@@ -542,11 +563,12 @@ def load_sharadar_identity_capture(
 def _capture_core(
     *, artifact_root: Path, price_artifact_path: Path, price_binding: dict[str, object],
     session: object, key: str, clock: Callable[[], datetime], transport: str,
-    close_owned_session: bool,
+    close_owned_session: bool, schema: str = SCHEMA,
 ) -> LoadedSharadarIdentityCapture:
     root_fd = child_fd = None
     marker_identity = None
     try:
+        _fields(schema)
         started = source._now_utc(clock)
         artifact_id = _artifact_id(started)
         root, root_fd = source._open_directory_path(artifact_root, create=True, name="identity artifact root")
@@ -558,7 +580,7 @@ def _capture_core(
         child_fd = source._open_child_directory(root_fd, artifact_id, "identity capture")
         responses: list[tuple[str, bytes]] = []
         for role, _tickers in ROLE_TICKERS:
-            payload = _response_bytes(session, role, key)
+            payload = _response_bytes(session, role, key, schema=schema)
             source._write_private_bytes(child_fd, role + ".csv", payload, "identity CSV")
             responses.append((role, payload))
         if close_owned_session:
@@ -567,7 +589,7 @@ def _capture_core(
             except Exception:
                 raise SharadarIdentityCaptureError("owned identity session closure failed; details redacted") from None
         completed = source._now_utc(clock)
-        manifest = _manifest(started, completed, transport, price_binding, tuple(responses))
+        manifest = _manifest(started, completed, transport, price_binding, tuple(responses), schema=schema)
         payload = canonical_json_bytes(manifest)
         if len(payload) > MAX_MANIFEST_BYTES:
             raise SharadarIdentityCaptureError("identity manifest exceeds byte limit")
@@ -651,8 +673,8 @@ def _owned_session() -> object:
         raise SharadarIdentityCaptureError("identity transport setup failed; details redacted") from None
 
 
-def capture_sharadar_identities() -> LoadedSharadarIdentityCapture:
-    """Production entry first pins existing price bytes, then owns key/Session."""
+def _capture_production(schema: str) -> LoadedSharadarIdentityCapture:
+    _fields(schema)
     binding = _price_binding(PRICE_ARTIFACT_PATH, PRICE_MANIFEST_SHA256, synthetic=False)
     source._preflight_root(DEFAULT_ARTIFACT_ROOT)
     key = source._api_key()
@@ -660,8 +682,18 @@ def capture_sharadar_identities() -> LoadedSharadarIdentityCapture:
         artifact_root=DEFAULT_ARTIFACT_ROOT, price_artifact_path=PRICE_ARTIFACT_PATH,
         price_binding=binding, session=_owned_session(), key=key,
         clock=lambda: datetime.now(timezone.utc), transport=PRODUCTION_TRANSPORT,
-        close_owned_session=True,
+        close_owned_session=True, schema=schema,
     )
+
+
+def capture_sharadar_identities() -> LoadedSharadarIdentityCapture:
+    """Default strict fourteen-field capture; never retries a different profile."""
+    return _capture_production(SCHEMA)
+
+
+def capture_sharadar_identities_without_figi() -> LoadedSharadarIdentityCapture:
+    """Explicit thirteen-field profile; missing FIGI remains a named refusal."""
+    return _capture_production(SCHEMA_WITHOUT_FIGI)
 
 
 def inspect_sharadar_stock_header() -> StockHeaderDiagnostic:
@@ -683,26 +715,34 @@ def _inspect_stock_header_for_test(
 def _capture_sharadar_identities_for_test(
     *, artifact_root: Path, price_artifact_path: Path, expected_price_manifest_sha256: str,
     session: object, clock: Callable[[], datetime], api_key: str,
+    without_figi: bool = False,
 ) -> LoadedSharadarIdentityCapture:
+    if type(without_figi) is not bool:
+        raise SharadarIdentityCaptureError("synthetic profile selector must be a bool")
+    schema = SCHEMA_WITHOUT_FIGI if without_figi else SCHEMA
     binding = _price_binding(price_artifact_path, expected_price_manifest_sha256, synthetic=True)
     key = source._validated_api_key(api_key, synthetic=True)
     source._preflight_root(artifact_root)
     return _capture_core(
         artifact_root=artifact_root, price_artifact_path=price_artifact_path, price_binding=binding,
         session=session, key=key, clock=clock, transport=TEST_TRANSPORT, close_owned_session=False,
+        schema=schema,
     )
 
 
 def _main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--inspect-stock-header", action="store_true")
+    profile = parser.add_mutually_exclusive_group()
+    profile.add_argument("--inspect-stock-header", action="store_true")
+    profile.add_argument("--without-figi", action="store_true")
     args = parser.parse_args(argv)
     try:
         if args.inspect_stock_header:
             diagnostic = inspect_sharadar_stock_header()
             print(canonical_json_bytes(dataclasses.asdict(diagnostic)).decode("utf-8"), end="")
             return 0
-        result = capture_sharadar_identities()
+        result = (capture_sharadar_identities_without_figi() if args.without_figi
+                  else capture_sharadar_identities())
     except SharadarIdentityCaptureError as exc:
         print(f"refused={exc}", file=sys.stderr)
         return 1

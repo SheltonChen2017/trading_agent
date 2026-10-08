@@ -37493,3 +37493,99 @@ prepared input/source pins and a recorded pre-contact freeze. A tested runner
 does not create a project, compile or attempt by itself. The thirteen-field
 collector remains separate in-progress work and is not authorized for contact
 by this code freeze. No intermediate push is made.
+
+### 263.8 Actual public receipt, retained identities and continuity-only decision
+
+Public collector freeze `174dd28398631b555255089036f193365eae14fc` executes
+once after root/branch/HEAD/status verification. Both no-key POSTs complete and
+all seven references pass the exact current US/Equity role/census checks.
+Private artifact:
+`artifacts/analyst_revisions_v2/openfigi_identity_capture/arv2-openfigi-identities-20261008T051923284895Z`.
+Manifest SHA-256 `75ce7cba40d063d227c0f273593c54622eb612144e9733c57335b31a00e7cb18`;
+capture SHA-256 `97bc59f19b6f6175887431f511da2ea26547244100f0b5898c682babae824386`.
+Client interval `2026-10-08T05:19:23.284895Z..2026-10-08T05:19:24.288410Z`.
+Five-job batch: 1,344 bytes,
+`b11437bc2701497d913203bdf36fb7231b1409281d2765023b406ced09a84dc1`;
+two-job batch: 538 bytes,
+`31334b480014659424aebfb38fa7d6dd3610698b41bd97231557385fd29e3c78`.
+Root's network-denied production-loader readback authenticates all bytes and
+prints only receipt hashes/counts/times, not identifier/descriptive rows.
+No QC contact, look or cell follows from capture success.
+
+The scoped advisory offline inspection of the pinned September TICKERS archive
+finds one safe 24,939,614-byte CSV member, whole-member SHA-256
+`562577ea331805c4d50229b783e37216c9422c09d921b17dc950cf267ecf7697`.
+Its 28-field/291-byte header hash is
+`c9186ed191f4e51d5142287016dc99e3f80ecebed49aa63c3fa1ecf09e5d26f7`.
+Exactly one applicable stock/SEP QCOM row and one funds/SFP row for each ETF
+have valid nonempty FIGIs/permanent IDs and active/category/exchange/USD checks;
+two QCOM other-table rows are excluded. No cross-name collision is found.
+Five names have valid CUSIP candidates; QQQ/REMX lack them. All seven old pricing
+intervals end before the October 6 price date and therefore retain
+`BOUND_PRICE_DATE_OUTSIDE_SOURCE_PRICING_RANGE`; QQQ/REMX also retain
+`CUSIP_CANDIDATES_INVALID_OR_MISSING`. No identifier values are emitted.
+These are actual vintage rows, not current/PIT/independently admitted identities.
+
+The public issuer-CUSIP alternative was explored read-only. It has inconsistent
+date/access completeness (including an old QQQ reference and a 2020 REMX
+change notice); it does not supply a complete seven-name current package.
+No CUSIP is submitted externally and no arbitrary source-rights assumption is
+made. Prefer the already retained vendor FIGIs and actual public FIGIs for the
+following narrowly qualified comparison.
+
+`ARV2OD263-H`: authorize a **separately versioned, continuity-only diagnostic
+bridge**, not satisfaction or relaxation of the original full-identity binder.
+Authenticate exact vintage/current/public/price external pins and physical bytes.
+Require exact seven-role censuses; actual public composite equals actual vintage
+FIGI; old/current permanent share-class ID and role/category/USD match; all
+relevant IDs are distinct, active and unambiguous. Where both vintages have
+CUSIPs, require exact set equality; retain missing old/current CUSIP qualifications
+by name rather than inventing them or claiming complete corroboration. Current
+price-range checks must pass. The vintage range limitation stays explicit and
+does not become coverage of October 6. Preserve every vendor missing-FIGI/CUSIP
+refusal and every formal/action false flag; do not relabel the source candidates
+as admitted or rewrite the original capture. Any actual conflict refuses the
+diagnostic input, including ETF/direct-stock identity collisions.
+
+Keep per-name source qualifications in a private host-side continuity manifest.
+The separate public-only input schema is
+`arv2-seven-public-figi-continuity-input-v2`, with the existing public rows and
+three binding hashes plus `continuity_manifest_sha256` and
+`vintage_manifest_sha256`. No licensed values or per-row source hashes go to QC.
+The prospective R284 profile must distinguish this limited comparison from
+full identity admission, before the first launch claim. The engine can test
+public FIGI roundtrips, not missing CUSIPs, source availability or independent
+identity. Record exact prepared bytes and their source semantics before contact.
+This decision permits implementation/validation of that alternative without
+routine approval; source mismatch remains a real stop, not authority to bypass it.
+
+### 263.9 Explicit thirteen-field source freeze
+
+Root reads the complete v2 collector/test diff. Source SHA-256
+`87150b5c3007bead273ceb3259e083370b9bdc56018bee566eb25d24b16c4751`;
+test SHA-256 `eb655117b0807de72c3ae9c376eba12d82a8d90df5acfaf2848943829fd0a21c`.
+The new schema is `arv2-sharadar-seven-current-identities-v2`, with exactly
+thirteen fields; absent FIGI remains `None`, every name retains
+`COMPOSITE_FIGI_INVALID_OR_MISSING`, and source-row hashes cover actual
+thirteen-field dictionaries, not fabricated fourteen-field reconstructions.
+Default v1 remains strict fourteen-field, header mode unchanged, no fallback.
+Loader pins the declared schema/query/fields and rebuilds every refusal from
+physical bytes. The original full-identity public binder remains strict.
+
+Root's strict-network-denied focused selection is **294 passed in 2.00s**
+(125 identity, 83 public/binder, 86 record/active-document). A first invocation
+used the nonexistent `tests/test_active_documents.py` path and exited 4 with
+zero tests; corrected to `tests/test_active_document_consistency.py` before
+the reported successful run. No complete suite or provider contact occurs in
+these checks. No previous test selection is summed twice.
+
+Commit this profile and record before exactly one explicit invocation under
+ARV2OD263-G:
+
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -m scripts.capture_arv2_sharadar_identities --without-figi`
+
+Both requests retain the original scope/limits and pinned price receipt; the
+only query change is the explicitly versioned omission of `figi` from requested
+fields. This can acquire refused current metadata, not admit all seven identities.
+The continuity bridge and v2 QC profile remain separate in-progress work and
+are not authorized for cloud contact by this source freeze.

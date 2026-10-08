@@ -96,19 +96,20 @@ def csv_bytes(rows, *, fields=adapter.FIELDS, bom=False):
     return (b"\xef\xbb\xbf" if bom else b"") + output.getvalue().encode("utf-8")
 
 
-def valid_responses(*, edits=None):
+def valid_responses(*, edits=None, fields=adapter.FIELDS):
     edits = edits or {}
-    return [Response(csv_bytes([{**row(ticker), **edits.get(ticker, {})} for ticker in tickers]))
+    return [Response(csv_bytes([{**row(ticker), **edits.get(ticker, {})} for ticker in tickers], fields=fields))
             for role, tickers in adapter.ROLE_TICKERS]
 
 
-def capture(tmp_path, *, session=None, price=None, capture_clock=None):
+def capture(tmp_path, *, session=None, price=None, capture_clock=None, without_figi=False):
     price = price or price_capture(tmp_path)
-    session = session or Session(valid_responses())
+    fields = adapter.FIELDS_WITHOUT_FIGI if without_figi else adapter.FIELDS
+    session = session or Session(valid_responses(fields=fields))
     loaded = adapter._capture_sharadar_identities_for_test(
         artifact_root=tmp_path / "identity", price_artifact_path=price.artifact_path,
         expected_price_manifest_sha256=price.manifest_sha256,
-        session=session, clock=capture_clock or clock(), api_key=KEY,
+        session=session, clock=capture_clock or clock(), api_key=KEY, without_figi=without_figi,
     )
     return loaded, price, session
 
@@ -524,9 +525,9 @@ def test_offline_loader_rechecks_leaf_identity_after_census(tmp_path, monkeypatc
     loaded, price, _session = capture(tmp_path)
     original = adapter._census
     calls = 0
-    def replace_after_census(rows):
+    def replace_after_census(rows, **kwargs):
         nonlocal calls
-        value = original(rows)
+        value = original(rows, **kwargs)
         calls += 1
         if calls == 2:
             leaf = loaded.artifact_path / "stocks.csv"
@@ -643,3 +644,170 @@ def test_header_diagnostic_cli_prints_only_safe_schema_and_receipt(monkeypatch, 
     for private in (KEY, "Synthetic issuer", "BBG000000001", "SYN000001"):
         assert private not in output.out
     assert output.err == ""
+
+
+def test_explicit_thirteen_field_profile_preserves_all_seven_figi_refusals(tmp_path):
+    loaded, price, session = capture(tmp_path, without_figi=True)
+    assert loaded.manifest_schema == adapter.SCHEMA_WITHOUT_FIGI
+    assert loaded.requested_fields == adapter.FIELDS_WITHOUT_FIGI
+    assert len(loaded.requested_fields) == 13 and "figi" not in loaded.requested_fields
+    assert loaded.matched_count == 0 and loaded.refused_count == 7
+    assert tuple(item.ticker for item in loaded.identities) == ALL
+    assert all(item.composite_figi is None for item in loaded.identities)
+    assert all(item.refusal_codes == ("COMPOSITE_FIGI_INVALID_OR_MISSING",)
+               for item in loaded.identities)
+    value = document(loaded)
+    assert value["schema"] == adapter.SCHEMA_WITHOUT_FIGI
+    assert value["fields"] == list(adapter.FIELDS_WITHOUT_FIGI)
+    assert value["refusal_reason_counts"] == {"COMPOSITE_FIGI_INVALID_OR_MISSING": 7}
+    assert all(value[flag] is False for flag in adapter.FALSE_FLAGS)
+    for (role, tickers), (url, options) in zip(adapter.ROLE_TICKERS, session.calls, strict=True):
+        assert url == "https://api.sharadar.com/v1.0/data/tickers"
+        assert options["params"] == {
+            "format": "csv", "table": role, "ticker": ",".join(tickers),
+            "fields": ",".join(adapter.FIELDS_WITHOUT_FIGI), "sort": "ticker.asc",
+            "skip": "0", "limit": "100", "api_key": KEY,
+        }
+        assert options["allow_redirects"] is False and options["verify"] is True
+        payload = (loaded.artifact_path / (role + ".csv")).read_bytes()
+        parsed = adapter._parse_csv(payload, role, schema=adapter.SCHEMA_WITHOUT_FIGI)
+        assert all("figi" not in candidate for candidate in parsed)
+        for candidate in parsed:
+            item = next(item for item in loaded.identities if item.ticker == candidate["ticker"])
+            actual_hash = sha256_bytes(canonical_json_bytes(candidate))
+            assert item.source_row_sha256s == (actual_hash,)
+            assert actual_hash != sha256_bytes(canonical_json_bytes({**candidate, "figi": ""}))
+    assert load(loaded, price) == loaded
+    assert "BBG" not in repr(loaded) and "Synthetic issuer" not in repr(loaded)
+
+
+def test_default_fourteen_field_contract_remains_unchanged(tmp_path):
+    loaded, price, session = capture(tmp_path)
+    assert loaded.manifest_schema == adapter.SCHEMA and loaded.requested_fields == adapter.FIELDS
+    assert loaded.matched_count == 7 and loaded.refused_count == 0
+    assert adapter._query("stocks")["fields"] == ",".join(adapter.FIELDS)
+    assert document(loaded)["schema"] == adapter.SCHEMA
+    assert "figi" in document(loaded)["fields"]
+    assert len(session.calls) == 2 and load(loaded, price) == loaded
+
+
+@pytest.mark.parametrize("without_figi", [False, True])
+def test_mismatched_profile_header_refuses_without_fallback_or_second_get(tmp_path, without_figi):
+    fields = adapter.FIELDS if without_figi else adapter.FIELDS_WITHOUT_FIGI
+    session = Session(valid_responses(fields=fields))
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="header differs"):
+        capture(tmp_path, session=session, without_figi=without_figi)
+    assert len(session.calls) == 1
+    assert session.calls[0][1]["params"]["fields"] == ",".join(
+        adapter.FIELDS_WITHOUT_FIGI if without_figi else adapter.FIELDS)
+    assert not list((tmp_path / "identity").glob("*/*.csv"))
+    assert not list((tmp_path / "identity").glob("*/manifest.json"))
+
+
+@pytest.mark.parametrize("mutation", ["schema", "fields", "query", "figi", "qc", "formal"])
+def test_thirteen_profile_loader_refuses_rehashed_contract_or_admission_changes(tmp_path, mutation):
+    loaded, price, _session = capture(tmp_path, without_figi=True)
+    value = document(loaded)
+    if mutation == "schema":
+        value["schema"] = adapter.SCHEMA
+    elif mutation == "fields":
+        value["fields"] = list(adapter.FIELDS)
+    elif mutation == "query":
+        value["responses"][0]["request_query"]["fields"] = ",".join(adapter.FIELDS)
+    elif mutation == "figi":
+        value["identities"][0]["composite_figi"] = row("QCOM")["figi"]
+    elif mutation == "qc":
+        value["qc_sid_resolved"] = True
+    else:
+        value["formal_source_admitted"] = True
+    digest = repin_manifest(loaded, value)
+    with pytest.raises(adapter.SharadarIdentityCaptureError):
+        load(loaded, price, digest=digest)
+
+
+@pytest.mark.parametrize("mutation", ["permaticker", "cusips"])
+def test_thirteen_profile_preserves_every_collision_member(tmp_path, mutation):
+    edits = {"SPY": {mutation: row("QCOM")[mutation]}, "QQQ": {mutation: row("QCOM")[mutation]}}
+    responses = valid_responses(fields=adapter.FIELDS_WITHOUT_FIGI, edits=edits)
+    loaded, price, _session = capture(tmp_path, session=Session(responses), without_figi=True)
+    expected = ("CROSS_NAME_PERMANENT_ID_COLLISION" if mutation == "permaticker"
+                else "CROSS_NAME_CUSIP_CANDIDATE_COLLISION")
+    for item in loaded.identities:
+        assert "COMPOSITE_FIGI_INVALID_OR_MISSING" in item.refusal_codes
+        if item.ticker in {"QCOM", "SPY", "QQQ"}:
+            assert expected in item.refusal_codes
+            assert "DIRECT_STOCK_OWN_ETF_IDENTITY_COLLISION" in item.refusal_codes
+        else:
+            assert item.refusal_codes == ("COMPOSITE_FIGI_INVALID_OR_MISSING",)
+    assert load(loaded, price) == loaded
+
+
+def test_thirteen_profile_missing_ambiguous_bad_source_metadata_remain_refusals(tmp_path):
+    responses = [Response(csv_bytes([], fields=adapter.FIELDS_WITHOUT_FIGI)),
+                 Response(csv_bytes([row(name) for name in ALL[1:]] +
+                                    [{**row("SPY"), "permaticker": row("QQQ")["permaticker"]}],
+                                    fields=adapter.FIELDS_WITHOUT_FIGI))]
+    loaded, price, _session = capture(tmp_path, session=Session(responses), without_figi=True)
+    by_name = {item.ticker: item for item in loaded.identities}
+    assert by_name["QCOM"].refusal_codes == ("COMPOSITE_FIGI_INVALID_OR_MISSING", "CURRENT_IDENTITY_MISSING")
+    assert "CURRENT_IDENTITY_AMBIGUOUS" in by_name["SPY"].refusal_codes
+    assert "CROSS_NAME_PERMANENT_ID_COLLISION" in by_name["SPY"].refusal_codes
+    assert "CROSS_NAME_PERMANENT_ID_COLLISION" in by_name["QQQ"].refusal_codes
+    assert loaded.refused_count == 7 and load(loaded, price) == loaded
+    bad = valid_responses(fields=adapter.FIELDS_WITHOUT_FIGI, edits={"QCOM": {"table": "SF1", "category": "ADR", "currency": "CAD"}})
+    rejected, _price, _session = capture(tmp_path / "bad", session=Session(bad), without_figi=True)
+    assert set(rejected.identities[0].refusal_codes) == {
+        "COMPOSITE_FIGI_INVALID_OR_MISSING", "SOURCE_TABLE_UNRECOGNIZED",
+        "INSTRUMENT_CATEGORY_UNRECOGNIZED", "USD_CURRENCY_UNPROVEN",
+    }
+
+
+def test_thirteen_profile_holds_external_price_and_capture_path_pins(tmp_path, monkeypatch):
+    loaded, price, _session = capture(tmp_path, without_figi=True)
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="pinned digest"):
+        load(loaded, price, digest="0" * 64)
+    moved = loaded.artifact_path.with_name(loaded.artifact_path.name + "-other")
+    loaded.artifact_path.rename(moved)
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="manifest/path"):
+        adapter.load_sharadar_identity_capture(moved, expected_manifest_sha256=loaded.manifest_sha256,
+                                               price_artifact_path=price.artifact_path)
+    monkeypatch.setattr(adapter, "PRICE_ARTIFACT_PATH", price.artifact_path)
+    monkeypatch.setattr(adapter.source, "_api_key", lambda: pytest.fail("price pin before credentials"))
+    monkeypatch.setattr(adapter, "_owned_session", lambda: pytest.fail("price pin before transport"))
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="pinned digest"):
+        adapter.capture_sharadar_identities_without_figi()
+
+
+def test_thirteen_profile_rejects_non_bool_selector_before_source_or_contact(tmp_path):
+    session = Session(valid_responses(fields=adapter.FIELDS_WITHOUT_FIGI))
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="selector must be a bool"):
+        adapter._capture_sharadar_identities_for_test(
+            artifact_root=tmp_path / "identity", price_artifact_path=tmp_path / "no-price",
+            expected_price_manifest_sha256="0" * 64, session=session, clock=clock(),
+            api_key=KEY, without_figi=1,
+        )
+    assert session.calls == [] and list(tmp_path.iterdir()) == []
+
+
+def test_thirteen_profile_cli_is_explicit_safe_and_excludes_header_mode(tmp_path, monkeypatch, capsys):
+    loaded, _price, _session = capture(tmp_path, without_figi=True)
+    monkeypatch.setattr(adapter, "capture_sharadar_identities_without_figi", lambda: loaded)
+    monkeypatch.setattr(adapter, "capture_sharadar_identities", lambda: pytest.fail("no default fallback"))
+    monkeypatch.setattr(adapter, "inspect_sharadar_stock_header", lambda: pytest.fail("no diagnostic fallback"))
+    assert adapter._main(["--without-figi"]) == 0
+    output = capsys.readouterr()
+    assert "requested=7 matched=0 refused=7" in output.out
+    assert "COMPOSITE_FIGI_INVALID_OR_MISSING:7" in output.out
+    assert "qc_sid_resolved=false" in output.out
+    for private in (KEY, "100001", "BBG000000001", "Synthetic issuer", "SYN000001"):
+        assert private not in output.out
+    assert output.err == ""
+    with pytest.raises(SystemExit) as caught:
+        adapter._main(["--without-figi", "--inspect-stock-header"])
+    assert caught.value.code == 2
+
+
+@pytest.mark.parametrize("schema", ["unknown", None, 2])
+def test_unknown_schema_profile_never_constructs_query_or_reads_source(schema):
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="profile is not supported"):
+        adapter._query("stocks", schema=schema)

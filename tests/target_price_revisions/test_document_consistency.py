@@ -3123,3 +3123,31 @@ def test_section_67_guard_rejects_adjacent_authority(monkeypatch, grant):
     monkeypatch.setitem(globals(), "_record_section", lambda heading: mutated if heading.startswith("## 67.") else original(heading))
     with pytest.raises(AssertionError, match="contradictory section 67 authority"):
         test_section_67_counterreview_pins_all_three_commits_and_bounded_qc_scope()
+
+
+def test_lane_test_module_basenames_do_not_collide_with_the_shared_tests_tree() -> None:
+    """TPR-CR21-001: pytest imports a test module from a directory without
+    __init__.py under its bare basename, so a lane module that reuses a shared
+    module's basename aborts collection of the complete suite before any test
+    runs (`import file mismatch`). Every lane test directory without a package
+    marker must therefore use basenames unique across the whole tests tree."""
+    tests_root = ROOT / "tests"
+    lane_dirs = tuple(
+        child.name for child in tests_root.iterdir()
+        if child.is_dir() and child.name.startswith("target_price_revisions")
+        and not (child / "__init__.py").exists()
+    )
+    assert lane_dirs, "the lane's package-less test directories were not found"
+    shared = {}
+    for path in tests_root.rglob("test_*.py"):
+        relative = path.relative_to(tests_root)
+        if relative.parts[0] in lane_dirs:
+            continue
+        shared.setdefault(path.name, []).append(relative.as_posix())
+    collisions = sorted(
+        f"{lane}/{path.name} vs {shared[path.name]}"
+        for lane in lane_dirs
+        for path in (tests_root / lane).glob("test_*.py")
+        if path.name in shared
+    )
+    assert collisions == [], f"lane test basenames collide with shared modules: {collisions}"

@@ -11439,7 +11439,7 @@ under TPR's own delegated development scope.
 | `TPR-CR21-001` | P2 confirmed, corrected | Actual bare `test_operations` collision; rename remains. New guard correction `TPR-CCR21-001` below prevents the broader collection failure class. |
 | `TPR-CR21-002` | P2 confirmed, corrected prospectively and closed by historical qualification | Generic executed controller did not bind uploaded content or verify BuildSuccess itself. Four exact available conversation command fragments are preserved in `historical_driver_fragments.json`, SHA256 `59bd14793de7ee4a821765f1f1f91b8fff32ac1658bdfaf7ab65a40c4bf3f02e`. This is explicitly PARTIAL, not a recovered consolidated historical driver. Committed-source successor driver, immutable source bundles/readback and matching BuildSuccess enforcement resolve future execution; past execution on a dirty530 baseline is not relabeled clean-commit replay. |
 | `TPR-CR21-003` | P2 false alarm as additional owner-authorization gate; provider facts unverified | Owner section64/67.4 and latest direct instruction explicitly authorize scoped private QC uploads/processing and waive separate rights paperwork. No new owner answer is needed for this scoped operation. This is working authorization, NOT provider attestation or permission to bypass a known restriction. Retention is unchanged; no deletion is inferred. The packet contains nominal target-price-revision scores, not AR rating-action alpha. |
-| `TPR-CR21-004` | P2 partly correct, successor correction/qualification | Missing observed split factor defaults1 in v2; delistings/order failure counters lack completion handling. Correct successor custody/refusal and explicit failure diagnostics. Prior-close10% sizing is expressly a SOFT TARGET in the freeze: a1% idiosyncratic gap can exceed10%, not only "roughly3%". Cash-only leverage1 does not prove gross>100%; no historical breach is invented. `str(native_decimal)` alone does not prove binary-float monetary corruption. LEAN slippage double boundary is visible and disclosed; native represented precision remains an evidence limit. |
+| `TPR-CR21-004` | P2 partly correct, successor correction/qualification | Missing observed split factor defaults1 in v2; delistings/order failure counters lack completion handling. Correct successor custody/refusal and explicit failure diagnostics. Prior-close10% sizing is expressly a SOFT TARGET in the freeze: a1% idiosyncratic gap can exceed10%, not only "roughly3%". Cash-only leverage1 does not prove gross>100%; no historical breach is invented. `str(native_decimal)` alone does not prove binary-float monetary corruption. The implementation used a Python float slippage boundary, but its claimed necessity is corrected in71.3: the native constructor accepts Decimal. Native represented market precision remains an evidence limit. |
 | `TPR-CR21-005` | P3 confirmed, corrected | Six reverse guard-removal mutants red; tests retained. Cutoff ordering was separately strengthened by `TPR-CCR21-002`. |
 | `TPR-CR21-006` | P3 confirmed bounded hardening limits | Successor redacts both credential fields and uses an explicit request wall deadline. Cooperative receipts/local clocks are not hostile antirollback custody. Old spent baseline refusal is expected and remains immutable. |
 | `TPR-CR21-007` | P3 partly correct historically, current objection rejected by qualification | Old shared root-discovery and scratch workflow exists, but the latest direct owner exact-root/no-alternate-validation instruction expressly supersedes it, including section68.8 Claude routing. An alleged separate Claude exception is attributed, not verified trusted human authority. Scratch-clone figures retained, not used as current exact-lane validation. |
@@ -11588,3 +11588,105 @@ native market bars or prove their vintage. Order/fill/cash ledger agreement
 is execution/accounting evidence, not independently verified market-price
 truth. Daily-close versus QCheadline drawdown sampling remains unreconciled
 unless independently demonstrated. These limitations are frozen before results.
+
+### 71.3 Native execution and retained attempt history
+
+The source/counter-review/freeze implementation was committed locally at
+`3dbcceafd78536708f7f18013f1381d8ebd64f64`, without a push or intermediate
+Claude stop. Fresh operation `TPR-MATCHED-ACCESS-20261008-001` pins that
+clean HEAD, manifest SHA256
+`be24dcccc0c314581bb916879d5987954d2dcb8ff01e22070d55dd824fb1d380`,
+readable source-bundle SHA256
+`89c9a8df358ab498cbda33c51c8e2db5db208279580f7ab86ef858f4fdb371cb`.
+Its one explicit original-derived-packet read and one fresh private ObjectStore
+copy completed with the frozen packet hash. No provider or D0 capture was read.
+
+ON-BASE attempt1 was reserved before compilation. Fresh private project
+`37547067` reports owner=true, file quota64000 and LEAN version18175;
+cloud source read-back matched all four hashes. Compile
+`96a5449498764f56cd9f1806ce495302-f1b20c84827928060495ac411ca837c4`
+was independently read as BuildSuccess before backtest
+`8cab89fbac806255f1685e0b0c39e3ee` launched. Terminal status is
+**Runtime Error**, not success: at warm-up `2024-12-02 00:00:00`,
+`_ensure_raw_subscription` called the active RAW-minute invariant before
+native warm-up subscription setup had become execution-ready. Orders/fills,
+decision observations and valuation observations are all0. Collection round1
+retains source verification, original result/log/order responses and a
+diagnostic interpreted result. Attempt1 remains consumed; one new cloud look
+brings the historical+new observed-run count to10 (no new economic outcome).
+Other matched candidates have no attempts yet. The exact executed template
+`matched_algorithm.py`, operation001 bundle and receipts remain immutable.
+
+`TPR-OWN-69`: use a separately identified `matched_algorithm_v2.py` successor
+to correct the native warm-up lifecycle without changing freeze, candidate,
+signal, dates, costs or attempt cap. Chosen under delegated lane correction
+authority; alternatives are weakening the actual trade-time invariant or
+relaunching unchanged, both rejected. RAW/exact-identity custody and postwarm
+RAW-minute checks remain mandatory; focused red/green evidence follows.
+Independent-review status: pending final Claude review.
+
+`TPR-OWN-70`: correct the false statement that ConstantSlippageModel requires
+a double. [Official LEAN source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Orders/Slippage/ConstantSlippageModel.cs)
+declares a Decimal constructor. The successor will pass invariant-culture
+Decimal parsed directly from the frozen .001/.0015 text. This changes transport,
+not economics, and does not assert extra market-price precision. Preserve the
+executed old Python-float source. Agent-delegated correction, not separately
+human/Claude-approved; final independent review pending.
+
+`TPR-OWN-71`: after the verified successor correction and local commit, create
+fresh bounded operation `TPR-MATCHED-ACCESS-20261008-002` pinning its exact
+HEAD/source hashes. Explicitly authorize one separately receipted read of the
+same original-derived packet required by the committed prepare step, not D0
+or provider capture access. Reuse the already uploaded, exact hash-keyed private
+matched ObjectStore copy under the new manifest's fixed input scope; no second
+upload/overwrite is needed. ON-BASE uses the same project37547067 and attempt2,
+not a renamed candidate. Other five candidates remain prospectively frozen
+and unlaunched. Alternative of extending operation001 by implication is
+rejected; its spent source/attempt/look receipts remain immutable. Chosen under
+delegated correction/execution authority; final independent review pending.
+
+Read-only delegated audit independently checked15 allowed own source/result/
+log/order/compile/reservation/index receipts for attempt1, recomputed13 index
+entries, verified raw BuildSuccess/source-readback references and reproduced
+the pure interpreted audit fields. Interpreted receipt SHA256
+`ab8b7c9d3146afcaa874cd74ddebfacfedade3c934e9baf8aea89de02cd2b3b2`.
+No packet/capture/credential/network access or new development look occurred.
+Two initial audit-harness assertions assumed the wrong metadata wrappers;
+corrected harness assumptions, not new runtime defects. The generic native
+exception does not independently distinguish DAILY warm-up resolution from
+pre-final-registration timing; the successor must handle both transient states
+without treating either as trade-ready custody.
+
+Successor template `matched_algorithm_v2.py` SHA256
+`a6c295e5e00364f6c91d6d33c750b45a3ce7c9264c4dfc2f325e9a76f394c612`
+is32066bytes and preserves the original construction/scoring/calendar/economics.
+Its76 focused checks pass; seven lifecycle/transport reverse mutations each
+fail, with seven original/restored checks green. Warm-up RAW daily and empty
+registries are pending only, not custody; actual observed RAW bars/actions
+start custody. `on_warmup_finished` reattaches and strictly validates native
+minute RAW feeds, and postwarm marks/orders/audits still refuse bad feeds.
+An initial test expectation wrongly assumed an unqualified-custody prior mark
+would reach registry validation; corrected fixture demonstrates both the
+custody refusal and subsequent empty-registry refusal explicitly.
+
+`TPR-OWN-72`: preserve executed `matched_audit.py` and use pure
+`matched_audit_v2.py`, SHA256
+`81d8b5f8f6ae6f03b89f7a61731d52aa9690d5a23c7efa6f8a41ee9b86d98a77`,
+to require the successor's typed warm-up-completion and observed-custody proof
+in addition to every original source/order/NAV check and adapter verdict.
+Alternative of assuming new runtime flags from old evidence is rejected.
+Metrics, membership sequence hashing and economics remain unchanged; missing
+custody stays unknown.21 focused checks pass; reverse guards produce4/6/1/1
+failures. Delegated lane correction, pending independent review.
+
+Root reproduced the focused successor union: **520passed/1existingplatformskip
+in4.89s**, not a complete lane/repository suite. One old structured-collector
+test first failed/.23s because its synthetic summary lacked the new required
+proof; supplying explicit synthetic warm-up/custody evidence restored it.
+Executed first matched main/auditor, both original engines, packet/freeze and
+spent operation artifacts remain unchanged. Source routing now uses identified
+v2 main/audit and will be locally committed before operation002, without push.
+Staged diff hygiene caught one extra EOF blank line omitted from the earlier
+untracked-file diff check; removing it changed only the unexecuted successor's
+draft hash1015dd81 to the finala6c295e5 above, with no economic/source-input
+change or cloud attempt.

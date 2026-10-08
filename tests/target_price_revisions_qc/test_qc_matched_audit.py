@@ -185,6 +185,8 @@ def test_etf_account_fills_do_not_prove_all_six_instruments_traded():
 def test_driver_consumes_structured_collection_and_persists_only_aggregate_audit():
     from research.target_price_revisions_qc import matched_driver
     args = fixture()
+    change_log(args, "MATCHED_SUMMARY ", lambda row: row.update(
+        warmup_finished_minute_validated=True, observed_action_custody_symbols=6))
     class Controller:
         def __init__(self):
             self.saved = []

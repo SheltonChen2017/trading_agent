@@ -38,7 +38,7 @@ def matched(monkeypatch):
     exec(compile(source.read_bytes(), str(source), "exec"), core.__dict__)
     monkeypatch.setitem(sys.modules, "proxy_core", core)
     module = ModuleType("matched_algorithm")
-    source = LANE / "matched_algorithm.py"
+    source = LANE / "matched_algorithm_v2.py"
     exec(compile(source.read_bytes(), str(source), "exec"), module.__dict__)
     return module
 
@@ -100,6 +100,7 @@ def algorithm(matched, arm="tpr_off"):
     algo._identities, algo._frames = {}, {}
     algo._snapshots = {etf: [] for etf in matched.ETFS}
     algo._symbols, algo._split_factors, algo._custody_since = {}, {}, {}
+    algo._warmup_finished_minute_validated = False
     algo._delisted_ids, algo._manual_symbols, algo._valuation_days = set(), set(), set()
     algo._targets, algo._target_weights, algo._decision_coverage, algo._tickets = {}, {}, {}, []
     algo._attempted_days, algo._reasons = set(), {}
@@ -142,6 +143,7 @@ def snapshots_for_first_decision(algo, matched):
 
 
 def complete_evidence(algo, matched):
+    algo._warmup_finished_minute_validated = True
     algo._attempted_days = set(matched.DECISIONS)
     algo._decision_count, algo._fill_events = 14, 1
     algo._decision_coverage = {day: {"sleeves": {etf: {} for etf in matched.ETFS}}
@@ -164,6 +166,7 @@ def summary(algo):
 def test_exact_freeze_and_executed_core_remain_immutable(matched):
     assert hashlib.sha256((LANE / "matched_freeze.json").read_bytes()).hexdigest() == FREEZE_SHA
     assert hashlib.sha256((LANE / "cloud_algorithm_v2.py").read_bytes()).hexdigest() == CORE_SHA
+    assert hashlib.sha256((LANE / "matched_algorithm.py").read_bytes()).hexdigest() == "ca3de46384d5aefe384245273bb697f59587e7f34528e139602f9f2fca02fa1f"
     assert matched.DECISIONS == matched.core.DECISIONS and matched.CUTOFFS == matched.core.CUTOFFS
 
 
@@ -383,13 +386,153 @@ def test_custody_persistent_raw_subscription_is_not_restarted_on_repeat(matched)
     algo, symbol = algorithm(matched), Symbol("A")
     security = Security(symbol)
     algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
+    assert algo._custody_since == {}  # Configuration alone is not custody.
+    algo.on_data(SimpleNamespace(bars={"bar": SimpleNamespace(symbol=symbol)},
+        dividends={}, splits={}, delistings={}))
     original = algo._custody_since["A"]
     algo.utc_time += timedelta(days=1)
     algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
     assert algo._custody_since["A"] == original and len(algo.add_calls) == 1
     algo.securities[symbol].subscriptions[0].data_normalization_mode = 1
-    with pytest.raises(ValueError, match="RAW minute"):
+    with pytest.raises(ValueError, match="non-RAW configurations"):
         algo._ensure_raw_subscription(symbol)
+
+
+def test_executed_v1_warmup_minute_refusal_red_control_then_successor_transition(matched):
+    original = ModuleType("executed_matched_algorithm")
+    source = LANE / "matched_algorithm.py"
+    exec(compile(source.read_bytes(), str(source), "exec"), original.__dict__)
+    old, new = algorithm(original), algorithm(matched)
+    symbol = Symbol("SYNTHETIC")
+    for algo in (old, new):
+        algo.is_warming_up = True
+        algo.utc_time = datetime(2024, 12, 2)
+        security = Security(symbol)
+        security.subscriptions[0].resolution = "daily"
+        algo.securities[symbol] = security
+        changes = SimpleNamespace(added_securities=[security])
+        if algo is old:
+            with pytest.raises(ValueError, match="active RAW minute trade subscription required"):
+                algo.on_securities_changed(changes)
+        else:
+            algo.on_securities_changed(changes)
+    assert new._custody_since == {} and new._warmup_finished_minute_validated is False
+    # A genuine observed RAW warm-up bar, not manager presence, starts custody.
+    new.on_data(SimpleNamespace(bars={"synthetic": SimpleNamespace(symbol=symbol)},
+        dividends={}, splits={}, delistings={}))
+    observed = new._custody_since[symbol.id]
+    assert observed == datetime(2024, 12, 2, tzinfo=timezone.utc)
+    assert new._quantity_ledger == {} and new._cash_ledger == 100000
+    assert new._valuation_days == set() and new.orders == []
+    # Model the native completed-warm-up registry transition explicitly.
+    new.is_warming_up = False
+    new.utc_time = datetime(2025, 1, 2)
+    new.securities[symbol].subscriptions[0].resolution = "minute"
+    new.on_warmup_finished()
+    assert new._warmup_finished_minute_validated is True
+    assert new._assert_raw_subscriptions(symbol) is new.securities[symbol]
+    assert new._custody_since[symbol.id] == observed
+    assert new.add_calls[-1][1] == "minute"
+
+
+def test_empty_warmup_registry_is_pending_not_action_custody_or_postwarm_permission(matched):
+    algo, symbol = algorithm(matched), Symbol("SYNTHETIC")
+    algo.is_warming_up = True
+    security = Security(symbol)
+    algo.securities[symbol] = security
+    algo.subscription_manager.subscription_data_config_service.get_subscription_data_configs = lambda *args: []
+    algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
+    assert algo._assert_raw_subscriptions(symbol) is security
+    algo.on_data(SimpleNamespace(bars={"synthetic": SimpleNamespace(symbol=symbol)},
+        dividends={}, splits={}, delistings={}))
+    assert algo._custody_since == {}
+    algo.is_warming_up = False
+    with pytest.raises(ValueError, match="no RAW configurations"):
+        algo.on_warmup_finished()
+    assert algo._warmup_finished_minute_validated is False
+    assert algo._prior_mark(symbol) is None  # Missing custody itself refuses a usable mark.
+    algo._custody_since[symbol.id] = matched.core._clock(matched.CUTOFFS[0]) - timedelta(days=7)
+    with pytest.raises(ValueError, match="no RAW configurations"):
+        algo._prior_mark(symbol)
+    assert algo.orders == []
+
+
+@pytest.mark.parametrize("state,message", [
+    ("config", "non-RAW configurations count=1"),
+    ("security", "non-RAW security normalization"),
+    ("missing", "missing exact security"),
+    ("identity", "changed exact security identity")])
+def test_positive_raw_or_identity_failures_refuse_even_during_warmup(matched, state, message):
+    algo, symbol = algorithm(matched), Symbol("SYNTHETIC")
+    algo.is_warming_up = True
+    security = Security(symbol)
+    algo.securities[symbol] = security
+    if state == "config":
+        security.subscriptions[0].data_normalization_mode = 1
+    elif state == "security":
+        security.subscriptions[0].data_normalization_mode = 1
+        raw = SimpleNamespace(data_normalization_mode=0, is_internal_feed=False,
+            resolution="daily", tick_type="trade")
+        algo.subscription_manager.subscription_data_config_service.get_subscription_data_configs = lambda *args: [raw]
+    elif state == "missing":
+        del algo.securities[symbol]
+    else:
+        security.symbol = Symbol("FOREIGN")
+    with pytest.raises(ValueError, match=message):
+        algo._assert_raw_subscriptions(symbol)
+    assert algo._custody_since == {} and algo.orders == []
+
+
+@pytest.mark.parametrize("resolution,internal,tick,active,daily,internals", [
+    ("daily", False, "trade", 1, 1, 0),
+    ("minute", True, "trade", 0, 0, 1),
+    ("minute", False, "quote", 1, 0, 0)])
+def test_postwarm_registry_failure_has_aggregate_diagnosis_not_data(matched, resolution, internal, tick, active, daily, internals):
+    algo, symbol = algorithm(matched), Symbol("PRIVATE_SENTINEL_DO_NOT_LOG")
+    security = Security(symbol)
+    security.subscriptions[0].resolution = resolution
+    security.subscriptions[0].is_internal_feed = internal
+    security.subscriptions[0].tick_type = tick
+    algo.securities[symbol] = security
+    algo._symbols[symbol.id] = symbol
+    expected = f"no minute trade; active={active}; daily_trade={daily}; internal={internals}"
+    with pytest.raises(ValueError, match=expected) as error:
+        algo.on_warmup_finished()
+    assert symbol.value not in str(error.value)
+    assert algo._warmup_finished_minute_validated is False
+    assert algo._custody_since == {} and algo.orders == []
+
+
+def test_premature_warmup_finished_callback_never_claims_validation(matched):
+    algo = algorithm(matched)
+    algo.is_warming_up = True
+    with pytest.raises(ValueError, match="before completion"):
+        algo.on_warmup_finished()
+    assert algo._warmup_finished_minute_validated is False
+
+
+@pytest.mark.parametrize("cost,exact", [("baseline", Fraction(1, 1000)), ("adverse", Fraction(3, 2000))])
+def test_native_slippage_uses_invariant_dotnet_decimal_without_float(matched, monkeypatch, cost, exact):
+    calls, culture = [], object()
+    system, globalization = ModuleType("System"), ModuleType("System.Globalization")
+    class NetDecimal:
+        @staticmethod
+        def Parse(text, provider):
+            calls.append((text, provider))
+            return Decimal(text)
+    system.Decimal = NetDecimal
+    globalization.CultureInfo = SimpleNamespace(InvariantCulture=culture)
+    monkeypatch.setitem(sys.modules, "System", system)
+    monkeypatch.setitem(sys.modules, "System.Globalization", globalization)
+    algo, security = algorithm(matched), Security(Symbol("SYNTHETIC"))
+    algo._config = config(matched, "tpr_off", cost)
+    algo._initialize_security(security)
+    assert calls == [(algo._config["slippage"], culture)]
+    assert security.slippage[0] == "slippage"
+    assert isinstance(security.slippage[1], Decimal)
+    assert Fraction(security.slippage[1]) == exact
+    assert security.leverage == 1 and isinstance(security.fee, matched.core.CentPerShareFee)
+    assert security.settlement == "immediate"
 
 
 def test_custom_universe_security_is_not_attached_to_equity_custody(matched):
@@ -462,7 +605,7 @@ def test_action_order_and_input_failures_disqualify_meaningful(matched, reason):
     assert summary(algo)["meaningful_execution"] is False
 
 
-@pytest.mark.parametrize("fault", ["cash", "nav", "positions", "risk", "coverage", "decisions", "days", "last", "fills"])
+@pytest.mark.parametrize("fault", ["cash", "nav", "positions", "risk", "coverage", "decisions", "days", "last", "fills", "warmup"])
 def test_incomplete_evidence_never_claims_completed_matched_execution(matched, fault):
     algo = algorithm(matched)
     complete_evidence(algo, matched)
@@ -482,6 +625,8 @@ def test_incomplete_evidence_never_claims_completed_matched_execution(matched, f
         algo._valuation_days.remove("2025-02-03")
     elif fault == "last":
         algo._prior_close_day = date(2025, 3, 28)
+    elif fault == "warmup":
+        algo._warmup_finished_minute_validated = False
     else:
         algo._fill_events = 0
     assert summary(algo)["meaningful_execution"] is False

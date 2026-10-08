@@ -1,13 +1,14 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 151 ADDS THE READ-ONLY TWO-RUN RECONCILIATION CANDIDATE,
-SEPARATE INTERVAL-EARNINGS DIAGNOSTIC AND FACT-BOUND CANONICAL QC
-CONFIGURATION/NATIVE-EVIDENCE SUCCESSOR; ACTUAL POST-320 REPLAY IS PENDING.
+Status: **SECTION 151 COMPLETES THE ACTUAL ORIGINAL-PLUS320 REPLAY:
+19,846 REQUEST-BOUND CUSTODY RECORDS / 99,394, WITH 79,548 UNATTEMPTED.
+IT ALSO ADDS A SEPARATE INTERVAL-EARNINGS DIAGNOSTIC AND FACT-BOUND
+CANONICAL QC CONFIGURATION/NATIVE-EVIDENCE SUCCESSOR.
 SECTION 149 COMPLETED THE ORIGINAL-PARTITION/FIRST64 COMBINED
 REPLAY AND A FRESH 256-PARENT CAPTURE: 256 HTTP-200 BODIES, 2,011,446
 RETAINED BYTES, 256 SUCCESSFUL OFFLINE PROJECTIONS, ZERO GRAMMAR QUARANTINES.
 THE PRE-CAPTURE COMBINED REPLAY ESTABLISHED 19,590 REQUEST-BOUND PARENTS;
-THE SUBSEQUENT 256 ARE SEPARATELY VERIFIED, NOT A REPLAYED POST-256 UNION.
+THE SUBSEQUENT 256 WERE SEPARATELY VERIFIED AND THEN RECONCILED IN151.
 VERSIONED EARNINGS SEPARATION REMOVES FORECAST DATA FROM PRIMARY CAUSAL
 PREREQUISITES, NOT THE REQUIRED ACTUAL-RELEASE DIAGNOSTIC. SECTION 147
 RECORDS ONE COMPLETED BOUNDED QC-NATIVE RESEARCH
@@ -17,7 +18,7 @@ CONNECTED PROFILE RESOLVES SEC CONTACT. FRESH FIRST-64 V4 CAPTURE COMPLETED
 64 REQUEST-BOUND BODIES/504,050 BYTES AND INDEPENDENT JOURNAL REPLAY;
 ALL 64 OWNERSHIP-XML PROJECTIONS PASSED READ-ONLY REPLAY, ZERO QUARANTINES.
 FULL-STUDY READINESS REMAINS BLOCKED BY SUBSTANTIVE HISTORICAL
-SOURCE/PIT/IDENTITY/ACTUAL-RELEASE INPUTS, AS QUALIFIED IN 149.8,
+SOURCE/PIT/IDENTITY/ACTUAL-RELEASE INPUTS, AS QUALIFIED IN149.8 AND152,
 NOT ROUTINE APPROVAL OR CLAUDE. SUPPLIED
 SHARADAR AUDIT AND ONE PURCHASED EARNINGS ACCESS REMAIN AS RECORDED.
 CONTINUOUS BUILD/CLAUDE-WAIT WAIVER REMAINS; NO SOURCE/PIT/RIGHTS/LOOK OR
@@ -260,6 +261,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex owner-confirmed acquisition/reuse | Published start `f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`; exact implementation and separate handoff follow | Actual retained Sharadar audit and one-shot purchased Earnings access; bounded QC probe prepared | User confirms QC/identity/Sharadar work and purchased Earnings; Safari authentication verified. All three retained archives and all 3,989,156 rows independently match manifest hashes/counts. One fixed Earnings request HTTP 200, 389 bytes, one row, privately replayed. No financial arithmetic/price-return join/look. | Focused and final integrated checks in 145.6; genuine red/green fixes and peer audit. Native QC code prepared but not run; new owned coding workspace/template auto-build only. SEC requests zero; no broad suite or new acquisition of completed/ambiguous parents. | Draft Sharadar, Earnings custody/credential/count, and QC cell/frontier defects corrected. Four topical P2 and shared issue remain OPEN; all prior closures/classifications preserved. Public Earnings history does not cover pre-2010 segment or prove schedule versions. | Complete authorized bounded acquisition/reuse checkpoint with one matching-lane push. Manual Mac unlock permits exact native QC probe; genuine SEC contact and separately committed fresh capture permit original-parent acquisition. No purchase, review wait, monitor rearm, raw QC export or readiness fabrication. |
 | 2026-10-07 | Codex continuous owner-waived source/native build | Published start `4c204aa60951896a8ba02570321d19227a8aebe7`; incoming range empty; first-prefix candidate `e900c7a90d326cd81df952684b0c583ad8ffb639`; projection candidate `23c7a11d53a8d1c457bac34bdebe977d3d567d00`; this separate observed handoff | One hosted native-count diagnostic, actual fresh first-64 SEC capture and completed read-only projection | Connected profile contact used privately; exact QC cell executed once with 12/116/390 counts/three History completions. Committed isolated partition replay then 64 HTTP-200 bodies/504,050 bytes, independently replayed; all 64 XML projections passed, zero quarantines. No economic export, old-v3 write/retry or Claude pause. | Main integrated focused 876 passed; six memory compilations, historical equality; final boundary/document135 passed14.05s. Actual59-module selector/16 source-view reads,345.127s dispatch span,journal0.26s,source-onlyprojection0.512s/55entries54paths; hashes/custody in147. No full suite or strategy backtest. | Engineering findings corrected as147.8; four topical P2/shared issue OPEN, both historical access classifications unchanged. Partial capture/projection is not PIT/class/full-population/calendar readiness; no combined union promotion. | Completed available bounded source/native steps; real full-study missing inputs in147.6 block readiness, not another approval. Preserve frozen window/quarantines and document delegated no-fabrication disposition; one combined matching-lane push after exact-hash handoff. No monitor rearm, duplicate purchase or claim of project completion. |
 | 2026-10-08 | Codex authorized continuous source/causal build | Published start `1c50d1ba2045e66e3bf714be94a9ee89c6da547d`; incoming range empty; implementation `16d60b2b915c708e3c3d792c312cec6031f1d060`; unpublished section150 checkpoint | Actual combined first64 closure, next256 one-shot continuation, separately versioned retrospective earnings sensitivity | Full original/first64 replay establishes19590 request-bound parents and79804 remaining before capture; fresh256 allHTTP200,2011446 retained bytes; independent replay projects256/256 with zero grammar quarantines. No post256 full union was run in149. | Main focused310 capture/selector and406 earnings/affected checks passed;135 boundaries passed;10 files memory-compiled; four historical bytes unchanged. Actual receipts and precise execution lineage in149.7. | Draft source-binding, journal/CLI consistency, precision and ordering defects corrected. Four topical P2/shared finding remain OPEN. Earnings correction does not manufacture historical actual releases or activate production outcomes. | Continued in151 under the same authorization and single-push round. Remaining substantive inputs and supplier qualification in149.8; not another routine approval or Claude wait. No old-v3 resume, monitor rearm or readiness claim. |
+| 2026-10-08 | Codex continued source/earnings/native engineering and actual reconciliation | Implementation `e52c7388de142c473787aac649dc11436d0fe9db`; separate section152 handoff; no incoming review | Read-only original-plus320 reconciliation, registered interval diagnostic, fact-bound canonical configured-source/native successor | Actual clean committed replay passed738.111955875s;19,846/99,394 request-bound custody,79,548 remaining;320 complete projections across two exact runs, whole-claim inventory preserved. No dispatch in this replay. | Main182 reconciliation/affected,236 activation/affected,134 interval/affected and135 boundary/document checks pass; six memory compilations;72 final preregistration checks. Internal peer59 reconciliation and56 activation pass. Actual124-source inventory/64-path trace and receipt in151.7. | Genuine source-pin, typed-refusal, final-body-custody, AMC chronology and operation-expiry findings corrected; separate guard reversals attributed. Initial nested-Seatbelt launch refused before replay; unchanged intended topology then passed. Four topical P2/shared issue stay OPEN. | Publish all accumulated commits once after this separate exact-hash handoff. Genuine archive/source/identity/entitlement inputs remain necessary; no invented time, narrowed population, retroactive approval, old-v3 resume, new Claude wait or readiness claim. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -21163,7 +21165,7 @@ engineering to stop. Shared/project documents, Action Plan and SESSION_HANDOFF
 stay frozen. Final publication remains exactly one combined lane push after
 the completed round and separate exact-hash handoff. Heartbeat stays PAUSED.
 
-## 151. Continued reconciliation and production-path engineering (2026-10-08 UTC; in progress)
+## 151. Continued reconciliation and production-path engineering (2026-10-08 UTC; observed completion below)
 
 ### 151.1 Scope and delegated pre-outcome decisions
 
@@ -21428,3 +21430,194 @@ post320 replay. Do not edit source or the tracked record during that execution.
 The forthcoming receipt must retain its real already-existing candidate HEAD,
 new current-source inventory, executed source trace and measured run duration;
 neither fixture passes nor expected counts substitute for it.
+
+### 151.7 Observed clean committed original-plus320 replay
+
+The preregistered six files and preceding record were committed as
+`e52c7388de142c473787aac649dc11436d0fe9db`. Final preregistration active-document/
+record/exact-package checks passed72 in1.74s. Exact root, branch, HEAD, clean
+status and matching origin1c50d1ba were verified before execution. All sources
+and the tracked record remained frozen throughout the successful replay.
+
+The first launch was a **main harness failure**, not a data or source-code
+finding: an unnecessary outer Seatbelt network sandbox prevented the intended
+child `sandbox-exec` from applying its policy. A minimal outer-denied-sandbox
+to inner-denied-sandbox `/usr/bin/true` reproduction returned71 with
+`sandbox_apply: Operation not permitted`. The supervisor refused without a
+valid receipt; no retained-root worker result or count promotion came from
+that launch. No source change was made. This is not a QC launch attempt.
+
+The corrected launch used the established trusted minimal-environment local
+Git/source supervisor, with an additional socket/urllib audit prohibition,
+and **one** OS-network/all-write/fork/exec-denied captured-source worker. The
+supervisor is not described as running under the child's OS sandbox. All
+retained-root replay/parent parsing occurred inside that denied worker; local
+Git/source assembly and receipt verification were outside it. No provider
+request, data write or source edit occurred during replay.
+
+Actual successful supervisor interval:
+**2026-10-08T08:18:16.762917+00:00 through
+2026-10-08T08:30:34.876633+00:00**, measured monotonic duration
+**738.111955875007 seconds**, including local supervisor overhead. The
+already-existing consumer commit is e52c7388, not this later handoff commit.
+Its124-current-source inventory digest is
+`c5a18dea7471fd4b65d90dbda4ba0bc8be65ee07c3b8ef56c04cf0326e0f2267`;
+executed trace contains64 entries/64 distinct paths. Four exact historical
+aa0d635d modules execute with explicitly inventoried later dependencies, not
+a reconstructed whole historical environment. Historical source view records
+four ordered cycles/16 reads and trace digest
+`360fb5f7a574747b7c724b87df1bef6b64f4748db46b62ac2cdc50df15701523`.
+The current-byte requirement remains binding.
+
+The receipt establishes **19,846 request-bound noncanonical custody records**
+in the unchanged99,394 denominator:9,539 prior +1 offline-corrected diagnostic
++8,139 selected reuse +1,846 old-v3 completed +1 separate accepted ambiguous
+diagnostic +320 fresh completed. **79,548 remain originally unattempted.**
+Both fresh runs were independently replayed/projected and rechecked, all320
+permanent claims were accounted for, and no extra/incomplete run was skipped.
+This is an actual post320 combined replay, superseding the pre-replay
+qualification in149–150, not arithmetic promoted from saved report literals.
+It remains custody-only: no canonical population, SEC-authenticity/PIT/rights,
+complete corpus, direct IB-1C ingestion, dispatch or readiness is conferred.
+Stoppedv3 remains unresolved1,846/1,847; the separate diagnostic never closes
+or rewrites its original unmatched start.
+
+Exact resulting identities:
+
+- Combined partition:
+  `34a4bf517eb554468ef175161fb51f8aab3c3746f4ad7cd0bbf0c9a73de2dafa`.
+- Remaining original inventory:
+  `4036fc70a9458ed9496943ade1150dfaa1dbdfa27d420323e6c1d2cc1a12e2af`.
+- Completed ordered rows:
+  `30dd345caf5402747afd9a698a5ef688ba0960ff0ae6135130d7d73e34470dad`.
+- Metadata-only next256 preview:
+  `7e4320d782c7e20e7a239915026e0e72d08bb53de97b941c7b26e47a75871417`;
+  first/last global indices11,837/12,126 are endpoints, not a contiguous
+  request range. No dispatch-capable selection or new requests were created.
+
+The worker's canonical no-newline receipt is248,947 bytes, SHA-256
+`69cbb44bb74192e31245fead2da35f0fc4c4745f61afb2612df75a5060d08e40`.
+After completion it was saved with one explicit newline as248,948 bytes,
+SHA-256 `fed0540d3f7dd91444020308802fb236c4c2d617b427efdd12ce9a0705689e0f`,
+under the ignored private directory
+`artifacts/insider_buying/sec_recovery_v4_reconciliation/ib-sec-v4-reconcile320-20261008-once/receipt.json`.
+The exact1,126-byte supervisor observer executed with `-c` was saved afterward
+as `observer.py`, SHA-256
+`2cd72364df98d711937710a978cea803ecbf11d9bc460749a67c0219b3c2b424`.
+The1,104-byte execution metadata `execution.json` is
+`0388274bbb0238ca99af5b8eadbb714530ae70b7008e430991e7d3960d54ad77`.
+These are not new execution-time commits or preexisting file executions.
+The directory is0700 and all three files0600. Independent denied-network/
+all-write metadata reread reproduced canonical and saved identities, current
+124-source inventory, trace and schema; it did not rerun the historical roots
+or reconstruct a new factory seal. Ignore coverage and clean status passed.
+
+## 152. Single-push continuous-round handoff and factual readiness boundary (2026-10-08 UTC)
+
+**Technical completion:** published baseline
+`1c50d1ba2045e66e3bf714be94a9ee89c6da547d` has no new incoming Claude range.
+All prior review dispositions/closures remain; the owner's explicit review-
+wait waiver governs this continuous build. The two exact implementation
+commits below and this separate documentation handoff form one accumulated
+round, to be published in exactly one matching-lane push after final checks.
+Actual source acquisition and both full replay stages are independently
+observed, with execution-time commit lineage and separate immutable receipts.
+The added earnings and native configuration contracts passed focused tests
+but have not been activated with actual complete study data.
+
+**Plain-language completion:** another256 original filings were retrieved and
+checked, and all320 new filings now reconcile with the older retained records.
+The earnings checks can conservatively handle qualified coarse release times,
+and the QC preparation path now binds rights, source, attempt and native-run
+evidence without claiming those real-world facts from a login or test. The
+lane is **not backtest-ready**. It is missing indispensable historical data,
+not another routine approval or a Claude-review turn.
+
+| Commit | Disposition and exact contribution |
+|---|---|
+| `16d60b2b915c708e3c3d792c312cec6031f1d060` | Implemented and self/peer-checked combined original+first64 selection, separate one-shot continuation and causal-v2/realized-earnings contracts. Actual replay/capture/projection subsequently executed from this already-existing clean commit; full evidence149.7. No post256 union existed at that stage. |
+| `e52c7388de142c473787aac649dc11436d0fe9db` | Implemented and self/peer-checked full two-run read-only reconciliation, separate registered interval diagnostic and fact-bound configured canonical/native successor; exact six-file identities151.6. Actual post320 replay subsequently completed from this clean committed image in151.7. |
+| This separate handoff | Records actual results, corrected harness topology, all new findings/decisions, test attribution, immutable receipt hashes, exclusions and precise remaining requirements. No claim of new independent Claude review, strategy completion or backtest readiness. |
+
+### 152.1 Remaining facts and next useful action
+
+The next indispensable external input is an **accessible qualified historical
+actual-earnings-release archive** covering the frozen early cohort and its
+boundary dates, plus applicable product/use evidence. The purchased Massive
+[Earnings endpoint](https://massive.com/docs/rest/partners/benzinga/earnings)
+advertises April30,2010 as its start; it is not a complete2006-era substitute.
+Existing Sharadar SF1 has already been retained/audited; do not buy it again.
+Direct EODHD or WSH historical archives are concrete candidates qualified
+in149.8, not proof of an existing paid account, complete cohort coverage or
+actual-release semantics. QC Upcoming Earnings is not silently reclassified
+as an actual-release archive. Only bounded credential-name presence and
+supplier inbox checks were made; absence there does not prove no account
+exists. The factual request remains an existing archive path or account
+configuration location, **not an API secret in chat** or fresh routine approval.
+
+Section151 implements the interval successor that149.8 described as possible;
+it does not manufacture the source dates/status/lineage or waive complete
+coverage. The owner-delegated decision is to preserve both prescribed earnings
+diagnostics, frozen population and causal ordering rather than invent times,
+silently narrow dates, skip unavailable rows or certify source terms. No
+unqualified subscription was purchased and no vendor message was sent.
+
+In parallel, original-parent admission and historical issuer/share-class/SID/
+listing/PIT/pre-entry reference integration remain unfinished. The actual
+2006Q1 assessment still retains83,657 quarantined filings with71,679 missing
+relevant parents. The2022Q4–2023Q1 custody union is not its replacement and
+does not complete82quarters. Further acquisition engineering is possible;
+79,548 remaining requests or the256 preview cap are **not** themselves external
+approval blockers. This checkpoint does not claim all engineering is exhausted.
+They also do not remove the indispensable archive/identity/coverage gap or
+justify promoting the study to ready. Once genuine inputs are available, the
+next useful work is source/identity/actual-release integration against those
+inputs, binding applicable rights/account/native profile and permanent full-
+population protocol/look evidence before a fixed order-based QC candidate.
+The production attempt journal/actual operational evidence must be real and
+append-only; pure new-ledger bytes cannot reset past attempts. Prioritize
+native completion when factual gates pass, with the maximum-three-attempt/Mia
+rule. No new outcome was accessed to choose any policy or code in this round.
+
+Four topical P2s remain **OPEN**: IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01,
+IBSRC-CCR01. Shared IBQC-SHARED-META01 and all prior resolved findings remain
+as recorded. New151 findings are corrected with the attributed red/green and
+guard-reversal evidence; no full lane/repository suite was run. Four historical
+v3 files and frozenv1/scale/pilot remain unchanged. StrictD23 keeps seven
+nonexact quarters/no82-quarter promotion. Both final access classifications
+remain distinct without retroactive approval:372 earlier requests have
+"historical authorization provenance not established"; the separate reviewer
+incident is "reviewer-reported probable unintended SEC access; exact request
+count and transferred bytes not established."
+
+The only online source acquisition in this round was the authorized one-shot
+256-parent continuation in149.7. Section151 performed no new SEC/provider
+request, QC upload/job, registered/outcome look or backtest. No broker/operator
+database/scheduler, deployment, capital, paper/live/order/trading action,
+shared/project document change, Action Plan change or root handoff change.
+No heartbeat rearm, other-chat message, secret disclosure or duplicated request.
+Final verification and one combined push remain to be performed after this
+record is saved; publication success is reported only after remote-tip check.
+
+### 152.2 Final validation before the single publication
+
+Main's completed-record active-document/record/import/hygiene/exact-Insider-
+package selection passed **135 in17.55s**, under the denied-network harness.
+Historical four-file Git comparison and whitespace checks passed; no source
+changed after the actual e52c7388 replay. Root/branch/HEAD and expected record-
+only status were reverified. Fetching only the matching lane still returned
+`1c50d1ba2045e66e3bf714be94a9ee89c6da547d`; no incoming review or advancement
+was omitted. The final handoff is a separate documentation commit after both
+exact implementation commits. The single push includes all three commits,
+not a separate intermediate publication. Its exact remote tip is verified
+after success and reported to the owner; this pre-push record does not invent
+an already successful push or its future commit hash.
+
+The final72 active-document/record/exact-package checks passed in1.42s after
+the completed handoff text. An independent internal peer then reread151.7/152
+and all three saved metadata files, reproduced their hashes/sizes/modes/ignore
+coverage, current124-code inventory, all64 distinct execution-path hashes,
+all receipt counts/claims/partition/preview identities and the measured
+supervisor interval. No accuracy correction was needed. That verification
+performed no raw-parent read, full replay, tests, edits or provider call, and
+does not independently authenticate SEC/account facts or claim Claude review.

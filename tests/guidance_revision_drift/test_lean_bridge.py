@@ -172,6 +172,34 @@ class LeanBridgeTests(unittest.TestCase):
             with self.subTest(native_id=native_id, instant=instant), self.assertRaises(BridgeError):
                 bridge.issue_fill(native_id, instant)
 
+    def test_fill_receipt_without_submission_acknowledgement_is_unsolicited(self):
+        # Protocol order: a native order must be acknowledged as submitted
+        # before any fill receipt for it can be accepted. A fill that arrives
+        # for a bound but never-acknowledged order is refused, the shadow
+        # receipt stays pending, and the trace does not advance.
+        bridge = SyntheticOrderBridge()
+        native = None
+        for frame in fixture_frames():
+            actions = bridge.step(frame)
+            for order in actions["submit"]:
+                native = 1
+                bridge.bind(order.order_id, native)
+            if bridge._pending:
+                break
+        fill = bridge.issue_fill(native, bridge.current_at)
+        self.assertIsNotNone(fill)
+        before = bridge.engine.snapshot(), bridge.protocol_trace()
+        receipt = dict(native_id=native, event_id=1, status="filled", at=fill.at,
+                       quantity=fill.quantity, price=fill.price, fee=fill.fee)
+        with self.assertRaisesRegex(BridgeError, "unsolicited"):
+            bridge.order_event(**receipt)
+        self.assertEqual((bridge.engine.snapshot(), bridge.protocol_trace()), before)
+        self.assertEqual(len(bridge._pending), 1)
+        bridge.order_event(native_id=native, event_id=0, status="submitted", at=bridge.current_at,
+                           quantity=0, price=Decimal(0), fee=Decimal(0))
+        bridge.order_event(**receipt)
+        self.assertEqual(bridge._pending, {})
+
     def test_cancel_pending_keeps_reservations_until_ordered_terminal_ack(self):
         original = Simulation.process_minute
         with patch.object(Simulation, "process_minute",

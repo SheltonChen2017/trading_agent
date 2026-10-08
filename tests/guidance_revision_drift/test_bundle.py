@@ -230,8 +230,11 @@ class BundleTests(unittest.TestCase):
             root = Path(temporary).resolve()
             path = bundle.publish_bundle(root, self.raw)
             path.write_bytes(b"tampered")
-            with self.assertRaises(bundle.BundleError):
+            with self.assertRaisesRegex(bundle.BundleError, "different bytes") as caught:
                 bundle.publish_bundle(root, self.raw)
+            # A conflicting immutable destination is a definite refusal, not an
+            # ambiguous publication that a caller should verify and retry.
+            self.assertNotIsInstance(caught.exception, bundle.BundlePublicationUncertain)
             self.assertEqual(path.read_bytes(), b"tampered")
             self.assertEqual(list(root.iterdir()), [path])
 

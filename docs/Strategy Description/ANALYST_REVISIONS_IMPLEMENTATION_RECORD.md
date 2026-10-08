@@ -37387,3 +37387,109 @@ an artifact or run the ordinary capture as a fallback. Freeze the following
 single command in this prospective commit before execution:
 
 `/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -m scripts.capture_arv2_sharadar_identities --inspect-stock-header`
+
+### 263.6 Actual schema observation and scoped retained-source alternative
+
+At freeze `72e2357ba0558a3cb757e18d4c0c7500f0e1528f`, the single header
+diagnostic succeeds. Client interval is `2026-10-08T05:08:00.453112Z` through
+`2026-10-08T05:08:00.739678Z`; 247 entity bytes hash to
+`d496efea32cb6b41f2a0950fd51ccb0c659ab7af998ec193e4306d0a89422413`.
+The query hash is `dc7c282587bf84fe262ff24ce1a0959d77a545e4ae6975ba765766daf2699cd0`.
+The thirteen returned header names are `table,ticker,permaticker,name,exchange,
+isdelisted,category,cusips,currency,firstadded,firstpricedate,lastpricedate,lastupdated`.
+The requested/documented `figi` field is absent. No source values/body persist
+and no funds query occurs. Documentation still lists FIGI; the cause of the
+actual omission is not established. Do not turn this into a nullable admission,
+invent a mapping or infer entitlement from the omission. Accounting is unchanged.
+
+`ARV2OD263-F`: permit a strictly offline, network-denied inspection of only
+section-260's exact retained `01-tickers-years-full.zip` from
+`artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z`.
+Authenticate manifest SHA-256
+`94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b` and ZIP
+size 4,937,076/SHA-256
+`a7b129f159631ee50f1eefd2be8d4215c1c7818880570c0ad0a79c76c25e51bf`, owner-only
+regular/single-link/no-follow files, and bounded member metadata before reading.
+First inspect only the schema. If FIGI is absent, stop before reading data rows.
+If present, project only the seven requested labels and applicable stock/fund
+table rows, retaining ambiguity/refusal counts locally; never emit identifier
+values or source rows. Do not inspect ACTIONS/FUNDAMENTALS or unrelated identities.
+This tests a concrete retained crosswalk path, not a repeat metadata audit or
+a claim that the September snapshot is current, independently reviewed, PIT or
+sufficient for QC admission. Any subsequent bridge/capture needs a separately
+frozen source and exact comparison protocol. Supported public schema documentation
+may also be read without credentials; no additional private request is authorized
+by this decision. All readiness/action flags remain false.
+
+The explicitly documented public schema URL
+`https://api.sharadar.com/v1.0/schema/tickers?format=sqlite` was inaccessible
+through the web reader, then read once by bounded no-key HTTPS GET (20-second,
+64-KiB cap). Its displayed schema date is 2026-08-18 and it includes nullable
+`figi TEXT`. This supports the documentation discrepancy, not a cause or a
+license/entitlement diagnosis. No data endpoint, credential or source row was
+involved in that public read.
+
+`ARV2OD263-G`: implement and prospectively freeze an explicit **separate
+thirteen-field current-metadata profile**, selecting exactly the existing
+fourteen fields minus `figi`. Keep the default fourteen-field contract and all
+historical claims unchanged; never silently retry or switch profile. After its
+own code/test freeze, permit one new two-GET invocation (QCOM stocks, then six
+funds), with the same row/byte/transport/private-artifact limits and exact pinned
+price receipt. Version the manifest and bind the exact requested fields. Missing
+FIGI stays missing and the existing FIGI refusal remains on every affected name;
+retained non-FIGI metadata is not an accepted cross-provider identity. This
+acquires the actual current source identifiers for a possible independent
+public-origin CUSIP comparison without sending any Sharadar value outside the
+host. Source receipt and local comparison add no strategy look or cell.
+
+In parallel, read only official issuer/security public pages for the seven
+requested instruments to determine whether they independently publish current
+CUSIPs. Any later mapping request must select its identifiers from those public
+sources, not from licensed Sharadar rows. OpenFIGI's ordinary response has no
+CUSIP field, so a ticker-only mapping cannot establish a CUSIP equality test.
+An issuer-CUSIP route requires its own exact source/pin/protocol freeze and
+local match/refusal checks; this decision does not authorize an improvised
+ticker-only match, a QC launch or claim that current identity is PIT evidence.
+
+### 263.7 Public-reference collector and offline-tested QC source freeze
+
+Root reads the complete public collector/binder and QC runner/tests, including
+their final boundary corrections. Exact SHA-256 pins are:
+
+| File | SHA-256 |
+| --- | --- |
+| `scripts/capture_arv2_openfigi_identity.py` | `1dfa3d4a617f43fffc08e2ee68f130534defb1cc5f872edb747e2bbb2e2dccc7` |
+| `tests/analyst_revisions_v2/test_openfigi_identity_capture.py` | `982ec0bc49f41f19fc93b89513337e47f0dd9c3f7dbeebbe5f4465e513b402cf` |
+| `scripts/run_arv2_identity_qc.py` | `a4b74d80f7c82cb9af4380b25480a028a521bc6b66a44368027ed034fdda79b3` |
+| `tests/analyst_revisions_v2/test_identity_qc_diagnostic.py` | `cc3f198e55041be1bb46043112e19938eb3532ff5f59d750af5eb79a2cbf9e30` |
+
+Root's final joint selection gives **184 passed in 8.63s**, strict network
+denied: 83 public collector/binder and 101 QC diagnostic tests. Advisory agents
+also review each other's code; this is not independent Claude acceptance.
+Three isolated in-memory QC mutations (UTC validation, SID collision refusal,
+pre-contact attempt claim) each fail the targeted check and are restored in
+`finally`, with all three restored targets passing. They are subsets, not extra
+distinct tests or QC execution evidence.
+
+`ARV2I263-001` (P2, corrected before any QC contact): root reproduces that set
+iteration could change generated source bytes between processes with different
+Python hash seeds. Sorted embedded binding keys fix the defect; a three-seed
+subprocess regression proves exact byte stability. The newly created project
+also explicitly refuses the known reference-project ID before any cloud file
+mutation. UTC order/nonfinite parsed responses refuse rather than weaken an
+observation to fit a platform response. All public-file pathname, held-file and
+publication checks remain fail-closed. No source or run is independently reviewed.
+
+Commit these four files and this record before invoking the already frozen
+two-batch public ticker protocol once:
+
+`/Users/sheltonchen/.venvs/trading_agent-py313/bin/python -m scripts.capture_arv2_openfigi_identity capture`
+
+This obtains an independent current public reference even while the private
+FIGI bridge is unresolved. It is not a QC launch and does not transmit Sharadar
+rows/CUSIPs. Do not run the original binder against refused vendor candidates.
+QC execution still requires an actual seven-name evidence chain, separately
+prepared input/source pins and a recorded pre-contact freeze. A tested runner
+does not create a project, compile or attempt by itself. The thirteen-field
+collector remains separate in-progress work and is not authorized for contact
+by this code freeze. No intermediate push is made.

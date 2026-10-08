@@ -1262,9 +1262,15 @@ Claude-review wait is introduced; independent formal source gates remain.
 Section 265 is Claude's independent review of the exact pushed range
 `b80149b8..098bb317` (sections 262-264), including the ARV2E263-001
 investigation. Section 266 counter-reviews its sole commit `64b5a355`,
-implements the verified control corrections, and freezes ARV2OD266-A before
-its one bounded in-place observation. Continue that protocol and its focused
-validation without an intermediate acknowledgement push. Claude must review
+implements the verified control corrections, and completes the once-frozen
+ARV2OD266-A in-place observation. Both files show a flags/ctime change and a
+later ctime-only change, without a source-integrity remedy or actor identity.
+The concrete remaining blocker is safe publication at the fixed path, not a
+routine approval or reviewer wait. A coordinated relocation trial requires
+an explicit exception to that path invariant; a versioned output-only
+alternative would instead need an evidence-backed security/consumed-byte
+contract, not the unqualified shared rehash proposal. No move, new diagnostic,
+publication retry or QC preparation is authorized by this result. Claude must review
 section 266 and the exact final pushed snapshot; same-round advisory checks
 are not independent final review. The owner rearmed the matching-lane review
 monitor after section 264; keep it active and quiet on unchanged state.
@@ -38624,11 +38630,95 @@ unlaunched; the booked floor remains **313 / 239 / 49 / 699**.
 
 ### 266.5 Observation, final validation and handoff
 
-Pending the frozen invocation and final focused checks; no actual diagnostic
-result is claimed at this protocol commit. All earlier failed production
-packages, old synthetic reports, original source captures, root/shared
-records and empty formal trust registries are preserved. Historical P2s,
-conditional stress cells and independent vendor/security-master/RAW-price/
-score/terminal-payoff evidence gates remain open. This round will make one
-successful final matching-lane push at its genuine completion or concrete
-external barrier, not an intermediate acknowledgement push.
+Protocol/source were committed at
+`e9e94bf6c3a53b295c15e2cf0aa3ddb3010d82d9` before the sole actual invocation,
+with the six known control/builder/identity implementation files still dirty
+and not used by the frozen diagnostic. The strict-network-denied process
+completed once, exit 0, with both cases, two passing initial checks and all
+22 scheduled observations in **30.014152417 seconds**. Of the 22 observations,
+**16 refuse unchanged-integrity** (eight per file). Both original baselines
+remain unchanged. The private report is 35,090 bytes, SHA-256
+`9f4f2a73bb99ade3261db03975f95aecabedf09c0711b9c9dd12d9dbe312a8ba`, at
+`artifacts/analyst_revisions_v2/publication_metadata/R266-20261008-A/report.json`.
+Its profile SHA-256 is
+`f39c9e966d54bb462af2cfa84531523cdcb2394e47be52c9f0d6e2b90104908e`.
+
+| Case | First newly observed transition | Second newly observed transition | Sampled content and binding |
+|---|---|---|---|
+| direct-final | At the 0.5 s poll (actual 0.5107455 s), ctime changes and flags change 0 to 64; the 0.1 s poll was unchanged | At the 5 s poll (actual 5.0113666 s), ctime changes again with flags still 64; the 3 s poll retained the earlier ctime | All sampled bytes match the fixed 48-byte payload; held/named metadata agree at every observation; no within-read metadata change sampled |
+| pending-link-unlink | At the 0.5 s poll (actual 0.5111227 s), ctime changes and flags change 0 to 64; the 0.1 s poll was unchanged | At the 5 s poll (actual 5.0121430 s), ctime changes again with flags still 64; the 3 s poll retained the earlier ctime | Same qualifications; all other observed stat dimensions remain unchanged |
+
+Poll times are observation times, not exact mutation times, authenticated
+server clocks or operator identity. This independently corroborates the
+reported flags correlation at the permitted path, not the outside-root
+counts, process attribution, ACL/xattr stability, continuous byte stability
+or a general remedy. No security attributes were queried by the probe.
+Neither original section-264 report changed (hashes still `aff19216…` and
+`7c383cdc…`); they were not rerun. The new synthetic files/report remain
+private and Git-ignored, not source-admitted or retried. No actual continuity
+build, R284 preparation, credential, provider/QC request, outcome evaluation,
+new look or cell occurred in this round; actual public documentation and Git
+access are not described as zero network activity.
+
+**ARV2I266-001 (P2, corrected before contact):** advisory cross-review found
+that the new atomic writer's failed observation or terminal pending leaf
+could otherwise cause a subsequent status invocation to contact QC before
+discovering the spent persistence slot. Four v1/v2 synthetic cases reproduced
+an extra fake `backtests/list` call. All post-prepare consumers now reject any
+retained `.pending` control at entry and every `_post` checks again before
+contact. The exact interrupted bytes remain preserved, no status claim is
+added by that rejected retry, and there is no pending-file cleanup/recovery.
+The pre-mode focused runner selection is **323 passed in 28.11 s**.
+
+**ARV2I266-002 (P2, corrected before contact):** the new publication consumer
+could mechanically authenticate a labelled synthetic package without a
+production-client mode check. The real client boundary now requires the
+original held, externally pinned continuity package to declare
+`production_source_bytes_offline` before credential/client construction.
+Synthetic fixture testing stays explicitly offline; its false flags and
+retained label are not a route to the production client. Original input,
+cloud projection and profile bytes remain unchanged. This enforces the
+declared production mode, not independent truth of a caller's supplied pins.
+
+Root's final combined strict-network-denied selection is **750 passed in
+36.00 s**, with no skips or warnings: 154 continuity-builder, 328 runner,
+160 identity-adapter, 21 flags-diagnostic, 86 record/active-document, and
+one transitive package-import-closure check. Earlier isolated/advisory
+passes overlap and are not added to this distinct total. All eight changed
+Python files compile; `git diff --check` is clean. An AST comparison against
+`64b5a355` confirms unchanged executable `render_source`, `_profile`,
+`source_template_sha256` and historical `_cusips` (apart from its added
+docstring). The shared source helpers, frozen A/B diagnostic source, formal
+registries/authority and root/shared records are unchanged. The authority
+still declares zero access with no entries, and security-master/reviewed-spec
+registries still have no entries; research access is not admission.
+
+This round consists of protocol/diagnostic commit
+`e9e94bf6c3a53b295c15e2cf0aa3ddb3010d82d9` and this final section-266
+implementation/observation/record commit, both based on `64b5a355`. The first
+commit was local-only; both will be included in exactly one matching-lane
+final push. Reverify root, branch, HEAD, status and matching remote before
+that push, and never overwrite a concurrent change. No independent final
+review is claimed from these same-round checks.
+
+The active barrier
+remains **ARV2E263-001**: no supported in-scope observation identified a
+security-preserving production remedy at the immutable designated path.
+Repeated waits, fresh artifact names, weakened checks, rebaselines and
+protection changes are not remedies. Decision **266-D3** leaves the guard
+unchanged and stops actual publication/QC preparation; it does not close the
+project or wait for a routine reviewer acknowledgement. A separately
+authorized coordinated relocation trial would have to preserve the full
+worktree and audit embedded absolute-path bindings; the small outside-root
+Claude probes cannot guarantee it succeeds. No move is performed. An
+alternative contract still requires the explicit evidence and tests in
+266.3. Keep the rearmed monitor active for genuinely new review/evidence,
+quiet otherwise; never repeat this probe to reconfirm unchanged state.
+
+All earlier failed production packages, old synthetic reports, original
+source captures, root/shared records and empty formal trust registries are
+preserved. Historical P2s, conditional stress cells and independent
+vendor/security-master/RAW-price/score/terminal-payoff evidence gates remain
+open. All readiness/action flags stay false and the booked floor is still
+**313 shared / 239 development / 49 infrastructure / 699 cells**. No funded,
+broker, paper/live deployment or real-order authority is created.

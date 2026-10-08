@@ -29,6 +29,7 @@ from research.analyst_revisions_v2.canonical import (
 SharadarIdentityCaptureError = source.SharadarCaptureError
 SCHEMA = "arv2-sharadar-seven-current-identities-v1"
 SCHEMA_WITHOUT_FIGI = "arv2-sharadar-seven-current-identities-v2"
+SCHEMA_STRICT_CUSIPS = "arv2-sharadar-seven-current-identities-v3"
 PRODUCTION_TRANSPORT = "sharadar_current_identities_direct_https_owned_session"
 TEST_TRANSPORT = "offline_test_double"
 DEFAULT_ARTIFACT_ROOT = (
@@ -54,6 +55,7 @@ TIMEOUT_SECONDS = 60
 _PERMANENT_ID = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,63}")
 _FIGI = re.compile(r"[A-Z0-9]{12}")
 _CUSIP = re.compile(r"[A-Z0-9]{9}")
+_CUSIP_COLLISION_TOKEN = re.compile(r"(?<![A-Za-z0-9])[A-Z0-9]{9}(?![A-Za-z0-9])")
 _ARTIFACT_ID = re.compile(r"arv2-sharadar-identities-\d{8}T\d{12}Z")
 _COMMON_CATEGORIES = frozenset({
     "domestic common stock", "domestic common stock primary class",
@@ -142,9 +144,9 @@ class StockHeaderDiagnostic:
 
 
 def _fields(schema: str) -> tuple[str, ...]:
-    if type(schema) is not str or schema not in (SCHEMA, SCHEMA_WITHOUT_FIGI):
+    if type(schema) is not str or schema not in (SCHEMA, SCHEMA_WITHOUT_FIGI, SCHEMA_STRICT_CUSIPS):
         raise SharadarIdentityCaptureError("identity schema profile is not supported")
-    return FIELDS if schema == SCHEMA else FIELDS_WITHOUT_FIGI
+    return FIELDS_WITHOUT_FIGI if schema == SCHEMA_WITHOUT_FIGI else FIELDS
 
 
 def _query(role: str, *, schema: str = SCHEMA) -> dict[str, str]:
@@ -318,6 +320,7 @@ def _date(value: str) -> str | None:
 
 
 def _cusips(value: str) -> tuple[str, ...] | None:
+    """Frozen v1/v2 interpretation; historical manifests must still reproduce."""
     if not value:
         return None
     parts = tuple(part.strip() for part in value.split(","))
@@ -326,11 +329,30 @@ def _cusips(value: str) -> tuple[str, ...] | None:
     return tuple(sorted(parts))
 
 
+def _strict_cusips(value: str) -> tuple[str, ...] | None:
+    """Prospective v3 admission accepts exact comma-separated shape tokens only."""
+    parts = tuple(value.split(","))
+    if any(_CUSIP.fullmatch(part) is None for part in parts) or len(set(parts)) != len(parts):
+        return None
+    return tuple(sorted(parts))
+
+
+def _cusip_collision_tokens(value: str) -> tuple[str, ...]:
+    """Refusal-only tokens: never repair a field or admit an extracted candidate.
+
+    Exact nine-character tokens bounded by non-ASCII-alphanumeric characters
+    still poison cross-name ownership when the surrounding field is malformed.
+    Shape matches are not checksum or independent identity verification.
+    """
+    return tuple(sorted(set(_CUSIP_COLLISION_TOKEN.findall(value))))
+
+
 def _census(
     role_rows: tuple[tuple[str, tuple[dict[str, str], ...]], ...],
     *, schema: str = SCHEMA,
 ) -> tuple[CurrentIdentityDisposition, ...]:
     _fields(schema)
+    parse_cusips = _strict_cusips if schema == SCHEMA_STRICT_CUSIPS else _cusips
     rows_by_ticker: dict[str, list[dict[str, str]]] = defaultdict(list)
     roles = {ticker: role for role, tickers in ROLE_TICKERS for ticker in tickers}
     for role, rows in role_rows:
@@ -357,7 +379,9 @@ def _census(
     cusip_owners: dict[str, set[str]] = defaultdict(set)
     for ticker, rows in rows_by_ticker.items():
         for row in rows:
-            for cusip in _cusips(row["cusips"]) or ():
+            tokens = (_cusip_collision_tokens(row["cusips"]) if schema == SCHEMA_STRICT_CUSIPS
+                      else parse_cusips(row["cusips"]) or ())
+            for cusip in tokens:
                 cusip_owners[cusip].add(ticker)
     for members in cusip_owners.values():
         if len(members) > 1:
@@ -400,7 +424,7 @@ def _census(
                 codes.add("USD_CURRENCY_UNPROVEN")
             if any(value != value.strip() for value in row.values()):
                 codes.add("SOURCE_FIELD_OUTER_WHITESPACE")
-            parsed_cusips = _cusips(row["cusips"])
+            parsed_cusips = parse_cusips(row["cusips"])
             if parsed_cusips is None:
                 codes.add("CUSIP_CANDIDATES_INVALID_OR_MISSING")
             else:
@@ -474,6 +498,10 @@ def _manifest(
         "price_binding_semantics": "local_ticker_role_and_byte_binding_not_independent_historical_identity",
         "response_bytes_semantics": "requests_HTTP_entity_CSV_not_wire_or_signed_vendor_proof",
         "client_clock_semantics": "unsigned_local_receipt_interval_not_original_publication",
+        **({
+            "cusip_parser_semantics": "exact_comma_separated_ASCII_shape_tokens_without_whitespace_normalization",
+            "cusip_collision_semantics": "bounded_shape_tokens_from_every_row_for_refusal_only_not_admission",
+        } if schema == SCHEMA_STRICT_CUSIPS else {}),
         "private_artifact": True, "provider_io_read_only": True,
         "current_snapshot_candidates_only": True, "redirects_permitted": False,
         "retries_permitted": False, **dict.fromkeys(FALSE_FLAGS, False),
@@ -696,6 +724,11 @@ def capture_sharadar_identities_without_figi() -> LoadedSharadarIdentityCapture:
     return _capture_production(SCHEMA_WITHOUT_FIGI)
 
 
+def capture_sharadar_identities_strict_cusips() -> LoadedSharadarIdentityCapture:
+    """Explicit prospective v3 fourteen-field profile; never migrate old captures."""
+    return _capture_production(SCHEMA_STRICT_CUSIPS)
+
+
 def inspect_sharadar_stock_header() -> StockHeaderDiagnostic:
     """One exact QCOM GET; no artifact creation, body persistence or row output."""
     _price_binding(PRICE_ARTIFACT_PATH, PRICE_MANIFEST_SHA256, synthetic=False)
@@ -715,11 +748,14 @@ def _inspect_stock_header_for_test(
 def _capture_sharadar_identities_for_test(
     *, artifact_root: Path, price_artifact_path: Path, expected_price_manifest_sha256: str,
     session: object, clock: Callable[[], datetime], api_key: str,
-    without_figi: bool = False,
+    without_figi: bool = False, strict_cusips: bool = False,
 ) -> LoadedSharadarIdentityCapture:
-    if type(without_figi) is not bool:
+    if type(without_figi) is not bool or type(strict_cusips) is not bool:
         raise SharadarIdentityCaptureError("synthetic profile selector must be a bool")
-    schema = SCHEMA_WITHOUT_FIGI if without_figi else SCHEMA
+    if without_figi and strict_cusips:
+        raise SharadarIdentityCaptureError("synthetic profiles are mutually exclusive")
+    schema = (SCHEMA_STRICT_CUSIPS if strict_cusips else
+              SCHEMA_WITHOUT_FIGI if without_figi else SCHEMA)
     binding = _price_binding(price_artifact_path, expected_price_manifest_sha256, synthetic=True)
     key = source._validated_api_key(api_key, synthetic=True)
     source._preflight_root(artifact_root)
@@ -735,13 +771,16 @@ def _main(argv: list[str] | None = None) -> int:
     profile = parser.add_mutually_exclusive_group()
     profile.add_argument("--inspect-stock-header", action="store_true")
     profile.add_argument("--without-figi", action="store_true")
+    profile.add_argument("--strict-cusips", action="store_true",
+                         help="prospective v3 fourteen-field profile; no existing capture migration")
     args = parser.parse_args(argv)
     try:
         if args.inspect_stock_header:
             diagnostic = inspect_sharadar_stock_header()
             print(canonical_json_bytes(dataclasses.asdict(diagnostic)).decode("utf-8"), end="")
             return 0
-        result = (capture_sharadar_identities_without_figi() if args.without_figi
+        result = (capture_sharadar_identities_strict_cusips() if args.strict_cusips
+                  else capture_sharadar_identities_without_figi() if args.without_figi
                   else capture_sharadar_identities())
     except SharadarIdentityCaptureError as exc:
         print(f"refused={exc}", file=sys.stderr)

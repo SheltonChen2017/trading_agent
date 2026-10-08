@@ -30,12 +30,20 @@ def package(tmp_path, monkeypatch, request):
              "price_manifest_sha256": "1" * 64, "public_reference_sha256": "2" * 64,
              "sharadar_identity_manifest_sha256": "3" * 64}
     if request.param == subject.CONTINUITY_INPUT_SCHEMA:
-        value.update(continuity_manifest_sha256="4" * 64, vintage_manifest_sha256="5" * 64)
-    raw = subject.canonical_input(value)
-    input_path = tmp_path / "public-input.json"
-    input_path.write_bytes(raw)
-    input_path.chmod(0o600)
-    control = artifact_root / "r284-a1"
+        # Exercise a genuinely published synthetic builder package, not an
+        # invented input dictionary or a patched authentication boundary.
+        from . import test_identity_continuity as producer
+        pins = producer.fixture(tmp_path)
+        loaded = producer.build(tmp_path, pins)
+        input_path = loaded.input_path
+        raw = input_path.read_bytes()
+        value = json.loads(raw)
+    else:
+        raw = subject.canonical_input(value)
+        input_path = tmp_path / "public-input.json"
+        input_path.write_bytes(raw)
+        input_path.chmod(0o600)
+    control = artifact_root / subject.CONTROL_LEAF
     prepared = subject.prepare(input_path, subject.sha(raw), control)
     return SimpleNamespace(value=value, raw=raw, input=input_path, control=control,
                            prepared=prepared, pin=subject.sha(subject.canonical(prepared)))
@@ -195,7 +203,16 @@ def qc(package, monkeypatch):
     monkeypatch.setattr(subject.time, "sleep", lambda seconds: None)
     api = QuantConnectClient(QuantConnectCredentials("synthetic-user", "synthetic-token"),
                              transport=subject.boundary._bounded_transport, clock=lambda: 1791331200)
-    return SimpleNamespace(fake=fake, api=api)
+    production_api = subject._api
+    # Synthetic published continuity fixtures cannot enter the real production
+    # mode gate. This explicitly fake seam retains exact client-shape checks.
+    def synthetic_api(candidate, prepared):
+        if prepared["input_schema"] == subject.CONTINUITY_INPUT_SCHEMA:
+            return subject._api_client(candidate)
+        return production_api(candidate, prepared)
+    monkeypatch.setattr(subject, "_api", synthetic_api)
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: api)
+    return SimpleNamespace(fake=fake, api=api, production_api=production_api)
 
 
 def completed(package, qc):
@@ -209,21 +226,308 @@ def assert_no_result(package):
     assert not (package.control / "result.json").exists()
 
 
-def test_prepare_is_offline_private_pinned(package, monkeypatch):
+def test_refused_continuity_leftover_cannot_be_prepared(tmp_path, monkeypatch):
+    root = tmp_path / "qc-controls"
+    root.mkdir(mode=0o700)
+    monkeypatch.setattr(subject, "ARTIFACT_ROOT", root)
+    refused = tmp_path / "refused-continuity"
+    refused.mkdir(mode=0o700)
+    value = {"schema": subject.CONTINUITY_INPUT_SCHEMA,
+             "rows": [{"ticker": ticker, "role": subject.ROLES[ticker], "composite_figi": f"BBG{index:09d}"}
+                      for index, ticker in enumerate(subject.TICKERS, 1)],
+             "price_manifest_sha256": "1" * 64, "public_reference_sha256": "2" * 64,
+             "sharadar_identity_manifest_sha256": "3" * 64,
+             "continuity_manifest_sha256": "4" * 64, "vintage_manifest_sha256": "5" * 64}
+    raw = subject.canonical_input(value)
+    input_path = refused / "input.json"
+    input_path.write_bytes(raw)
+    input_path.chmod(0o600)
+    (refused / "manifest.sha256").write_bytes(b"4" * 64 + b"\n")
+    (refused / "manifest.sha256").chmod(0o600)
+    control = root / "R284A1-20261008"
+    # Reproduce the rollback shape after the input write: no completion marker.
+    assert not (refused / "manifest.json").exists()
+    assert subject.validate_input(raw, subject.sha(raw)) == value
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No credentials on refusal"))
+    with pytest.raises(subject.IdentityQcError):
+        subject.prepare(input_path, subject.sha(raw), control)
+    assert not control.exists()
+    assert input_path.read_bytes() == raw and not (refused / "manifest.json").exists()
+
+
+def test_second_r284_leaf_cannot_be_prepared(package, monkeypatch):
+    second = package.control.with_name("R284A1-20261008-B")
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No client for another leaf"))
+    with pytest.raises(subject.IdentityQcError):
+        subject.prepare(package.input, subject.sha(package.raw), second)
+    assert not second.exists()
+
+
+@pytest.mark.parametrize("name", ["launch.json", "terminal.json", "result.json", "attempt-claim.json",
+                                 "backtest-create-claim.json", "result-read-claim.json"])
+def test_interrupted_control_write_never_publishes_partial_final(package, monkeypatch, name):
+    original = subject.os.write
+    calls = []
+    def interrupted(fd, raw):
+        calls.append(fd)
+        if len(calls) == 1:
+            return original(fd, raw[:1])
+        raise OSError("synthetic interrupted control persistence")
+    monkeypatch.setattr(subject.os, "write", interrupted)
+    with subject._Directory(package.control) as directory:
+        with pytest.raises(subject.IdentityQcError):
+            directory.write(name, b'{"synthetic":"receipt"}')
+        assert not (package.control / name).exists()
+        assert (package.control / (name + ".pending")).read_bytes() == b"{"
+        monkeypatch.setattr(subject.os, "write", original)
+        with pytest.raises(subject.IdentityQcError):
+            directory.write(name, b'{"synthetic":"receipt"}')
+        assert not (package.control / name).exists()
+
+
+def test_pending_attempt_blocks_restart_before_client_or_contact(package, qc, monkeypatch):
+    pending = package.control / "attempt-claim.json.pending"
+    pending.write_bytes(b"{")
+    pending.chmod(0o600)
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No client after interrupted claim"))
+    with pytest.raises(subject.IdentityQcError):
+        subject.launch(package.control, package.pin)
+    assert qc.fake.calls == [] and not (package.control / "attempt-claim.json").exists()
+    assert pending.read_bytes() == b"{"
+
+
+def test_control_publication_conflict_preserves_original_and_spends_pending(package, monkeypatch):
+    original = subject.os.link
+    target = package.control / "launch.json"
+    def race(src, dst, **kwargs):
+        target.write_bytes(b'{"synthetic":"other-complete"}')
+        target.chmod(0o600)
+        return original(src, dst, **kwargs)
+    monkeypatch.setattr(subject.os, "link", race)
+    with subject._Directory(package.control) as directory:
+        with pytest.raises(subject.IdentityQcError):
+            directory.write("launch.json", b'{"synthetic":"new"}')
+    assert target.read_bytes() == b'{"synthetic":"other-complete"}'
+    assert (package.control / "launch.json.pending").read_bytes() == b'{"synthetic":"new"}'
+
+
+def test_crash_between_control_link_and_unlink_is_complete_but_refused(package, monkeypatch):
+    original = subject.os.unlink
+    def interrupted(name, *args, **kwargs):
+        if name == "launch.json.pending":
+            raise OSError("synthetic namespace interruption")
+        return original(name, *args, **kwargs)
+    monkeypatch.setattr(subject.os, "unlink", interrupted)
+    raw = b'{"synthetic":"complete"}'
+    with subject._Directory(package.control) as directory:
+        with pytest.raises(subject.IdentityQcError):
+            directory.write("launch.json", raw)
+        assert (package.control / "launch.json").read_bytes() == raw
+        assert (package.control / "launch.json").stat().st_nlink == 2
+        with pytest.raises(subject.IdentityQcError, match="private_file"):
+            directory.read("launch.json")
+        with pytest.raises(subject.IdentityQcError):
+            directory.write("launch.json", raw)
+
+
+def test_backtest_response_persistence_loss_retains_claims_and_never_retries(package, qc, monkeypatch):
+    original = subject._Directory.write
+    def interrupted(self, name, raw):
+        if name.startswith("observation-") and json.loads(raw)["endpoint"] == "backtests/create":
+            subject._fail("control_write")
+        return original(self, name, raw)
+    monkeypatch.setattr(subject._Directory, "write", interrupted)
+    with pytest.raises(subject.IdentityQcError):
+        subject.launch(package.control, package.pin, qc.api)
+    assert sum(endpoint == "backtests/create" for endpoint, _ in qc.fake.calls) == 1
+    assert (package.control / "attempt-claim.json").exists()
+    assert (package.control / "backtest-create-claim.json").exists()
+    assert not (package.control / "launch.json").exists()
+    before = list(qc.fake.calls)
+    with pytest.raises(subject.IdentityQcError):
+        subject.launch(package.control, package.pin, qc.api)
+    assert qc.fake.calls == before
+
+
+@pytest.mark.parametrize("failed_receipt", ["observation", "terminal"])
+def test_status_pending_receipt_blocks_repeat_before_any_new_contact(package, qc, monkeypatch, failed_receipt):
+    subject.launch(package.control, package.pin, qc.api)
+    qc.fake.state = "Completed."
+    original = subject._Directory.write
+    retained = []
+
+    def interrupted(self, name, raw):
+        is_target = (name == "terminal.json" if failed_receipt == "terminal" else
+                     name.startswith("observation-") and json.loads(raw)["endpoint"] == "backtests/list")
+        if is_target:
+            pending = package.control / (name + ".pending")
+            fd = os.open(pending, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600)
+            try:
+                os.write(fd, b"{")
+            finally:
+                os.close(fd)
+            retained.append(pending)
+            subject._fail("control_write")
+        return original(self, name, raw)
+
+    monkeypatch.setattr(subject._Directory, "write", interrupted)
+    with pytest.raises(subject.IdentityQcError):
+        subject.status(package.control, package.pin, qc.api)
+    assert sum(endpoint == "backtests/list" for endpoint, _ in qc.fake.calls) == 1
+    assert (package.control / "status-claim-001.json").exists()
+    assert len(retained) == 1 and retained[0].read_bytes() == b"{"
+    monkeypatch.setattr(subject._Directory, "write", original)
+    before = list(qc.fake.calls)
+    with pytest.raises(subject.IdentityQcError):
+        subject.status(package.control, package.pin, qc.api)
+    assert qc.fake.calls == before
+    assert retained[0].read_bytes() == b"{" and not (package.control / "status-claim-002.json").exists()
+
+
+@pytest.mark.parametrize("action", ["launch", "status", "read"])
+@pytest.mark.parametrize("pending_name", ["observation-001.json.pending", "terminal.json.pending", "unexpected-control.pending"])
+def test_any_retained_pending_blocks_all_postprepare_actions_before_client(package, qc, monkeypatch, action, pending_name):
+    if action in {"status", "read"}:
+        completed(package, qc)
+    pending = package.control / pending_name
+    pending.write_bytes(b"{\"synthetic\":")
+    pending.chmod(0o600)
+    before = list(qc.fake.calls)
+    original_names = {leaf.name for leaf in package.control.iterdir()}
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No client after any interrupted control"))
+    with pytest.raises(subject.IdentityQcError, match="interrupted_control_pending"):
+        getattr(subject, action)(package.control, package.pin)
+    assert qc.fake.calls == before
+    assert {leaf.name for leaf in package.control.iterdir()} == original_names
+    assert pending.read_bytes() == b"{\"synthetic\":"
+
+
+def test_pending_control_also_blocks_post_if_created_after_action_entry(package, qc, monkeypatch):
+    pending = package.control / "observation-001.json.pending"
+    pending.write_bytes(b"{")
+    pending.chmod(0o600)
+    monkeypatch.setattr(subject, "_instant", lambda: pytest.fail("No fresh observation after pending control"))
+    with subject._Directory(package.control) as directory:
+        with pytest.raises(subject.IdentityQcError, match="interrupted_control_pending"):
+            subject._post(directory, qc.api, "backtests/list", {"projectId": 12345}, {})
+    assert qc.fake.calls == [] and pending.read_bytes() == b"{"
+
+
+@pytest.mark.parametrize("supplied_api", [False, True])
+@pytest.mark.parametrize("package", [subject.CONTINUITY_INPUT_SCHEMA], indirect=True)
+def test_real_api_refuses_synthetic_publication_before_credentials_or_supplied_client(package, qc, monkeypatch, supplied_api):
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No production credentials for test-mode package"))
+    monkeypatch.setattr(subject.boundary, "_client", lambda *_args: pytest.fail("No supplied client validation before source-mode refusal"))
+    with pytest.raises(subject.IdentityQcError, match="continuity_production_source_mode"):
+        qc.production_api(qc.api if supplied_api else None, package.prepared)
+    assert qc.fake.calls == []
+
+
+@pytest.mark.parametrize("action", ["launch", "status", "read"])
+@pytest.mark.parametrize("package", [subject.CONTINUITY_INPUT_SCHEMA], indirect=True)
+def test_all_real_actions_apply_production_source_mode_gate(package, qc, monkeypatch, action):
+    if action in {"status", "read"}:
+        completed(package, qc)
+        if action == "status":
+            # Preserve the synthetic cached terminal while forcing a fresh
+            # status path to exercise its production API boundary.
+            (package.control / "terminal.json").rename(package.control / "synthetic-terminal-retained.json")
+    before = list(qc.fake.calls)
+    monkeypatch.setattr(subject, "_api", qc.production_api)
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No production credentials for test-mode package"))
+    with pytest.raises(subject.IdentityQcError, match="continuity_production_source_mode"):
+        getattr(subject, action)(package.control, package.pin)
+    assert qc.fake.calls == before
+
+
+@pytest.mark.parametrize("stage", ["launch", "status", "read"])
+@pytest.mark.parametrize("leaf", ["manifest.json", "manifest.sha256", "input.json"])
+@pytest.mark.parametrize("package", [subject.CONTINUITY_INPUT_SCHEMA], indirect=True)
+def test_continuity_source_package_reauthenticated_before_every_contact(package, qc, stage, leaf):
+    if stage in {"status", "read"}:
+        completed(package, qc)
+    source_leaf = package.input.parent / leaf
+    source_leaf.write_bytes(source_leaf.read_bytes() + b" ")
+    before = list(qc.fake.calls)
+    with pytest.raises(subject.IdentityQcError, match="continuity_publication"):
+        getattr(subject, stage)(package.control, package.pin, qc.api)
+    assert qc.fake.calls == before
+    if stage == "launch":
+        assert not (package.control / "attempt-claim.json").exists()
+    if stage == "read":
+        assert not (package.control / "result-read-claim.json").exists()
+
+
+@pytest.mark.parametrize("package", [subject.CONTINUITY_INPUT_SCHEMA], indirect=True)
+def test_continuity_change_during_copy_never_publishes_prepared_completion(package, monkeypatch, tmp_path):
+    root = tmp_path / "separate-synthetic-candidate-root"
+    root.mkdir(mode=0o700)
+    monkeypatch.setattr(subject, "ARTIFACT_ROOT", root)
+    control = root / subject.CONTROL_LEAF
+    original = subject._Directory.write
+    def change(self, name, raw):
+        result = original(self, name, raw)
+        if name == "prepared.sha256":
+            manifest = package.input.parent / "manifest.json"
+            manifest.write_bytes(manifest.read_bytes() + b" ")
+        return result
+    monkeypatch.setattr(subject._Directory, "write", change)
+    with pytest.raises(subject.IdentityQcError, match="continuity_publication"):
+        subject.prepare(package.input, subject.sha(package.raw), control)
+    assert (control / "input.json").read_bytes() == package.raw
+    assert not (control / "prepared-complete.json").exists()
+    assert not (control / "attempt-claim.json").exists()
+
+
+@pytest.mark.parametrize("package", [subject.CONTINUITY_INPUT_SCHEMA], indirect=True)
+def test_continuity_source_path_is_private_control_metadata_only(package):
+    assert package.prepared["schema"] == subject.CONTINUITY_PREPARED_SCHEMA
+    assert package.prepared["continuity_input_path"] == str(package.input)
+    source = (package.control / "main.py").read_bytes()
+    assert str(package.input).encode() not in source
+    assert "continuity_input_path" not in subject._bind(package.prepared, package.pin)
+    assert "continuity_input_path" not in package.value
+
+
+def test_fixed_candidate_leaf_rejects_rebound_prepared_copy_before_client(package, qc, monkeypatch):
+    replay = package.control.with_name("R284A1-20261008-B")
+    shutil.copytree(package.control, replay)
+    value = json.loads((replay / "prepared.json").read_bytes())
+    value["control_directory"] = str(replay)
+    raw = subject.canonical(value)
+    pin = subject.sha(raw)
+    (replay / "prepared.json").write_bytes(raw)
+    (replay / "prepared.sha256").write_bytes(pin.encode("ascii"))
+    (replay / "prepared-complete.json").write_bytes(subject.canonical({"prepared_sha256": pin}))
+    monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No second candidate client"))
+    with pytest.raises(subject.IdentityQcError, match="candidate_control_leaf"):
+        subject.launch(replay, pin)
+    assert qc.fake.calls == [] and not (replay / "attempt-claim.json").exists()
+
+
+def test_prepare_is_offline_private_pinned(package, monkeypatch, tmp_path):
     monkeypatch.setattr(subject.boundary, "production_client", lambda: pytest.fail("No credentials or client before launch"))
     monkeypatch.setattr(subject, "_instant", lambda: pytest.fail("No clock before launch"))
-    second = package.control.with_name("offline-second")
-    result = subject.prepare(package.input, subject.sha(package.raw), second)
-    assert {key: value for key, value in result.items() if key != "control_directory"} == {key: value for key, value in package.prepared.items() if key != "control_directory"}
-    second_pin = subject.sha(subject.canonical(result))
-    assert second_pin != package.pin and result["control_directory"] == str(second)
-    assert set(path.name for path in second.iterdir()) == {"input.json", "main.py", "prepared.json", "prepared.sha256", "prepared-complete.json"}
-    assert stat.S_IMODE(second.stat().st_mode) == 0o700
-    assert all(stat.S_IMODE(path.stat().st_mode) == 0o600 for path in second.iterdir())
-    with subject._Directory(second) as directory:
-        prepared, source = subject._prepared(directory, second_pin)
-    assert prepared == result and subject.sha(source) == result["source_sha256"]
-    assert subject.source_template_sha256(source) == result["source_template_sha256"]
+    # A separate synthetic fixture root preserves the fresh-prepare offline
+    # assertion without creating a second leaf in one production candidate.
+    root = tmp_path / "fresh-offline-fixture-root"
+    root.mkdir(mode=0o700)
+    monkeypatch.setattr(subject, "ARTIFACT_ROOT", root)
+    control = root / subject.CONTROL_LEAF
+    result = subject.prepare(package.input, subject.sha(package.raw), control)
+    pin = subject.sha(subject.canonical(result))
+    assert result["control_directory"] == str(control)
+    assert {key: value for key, value in result.items() if key != "control_directory"} == {
+        key: value for key, value in package.prepared.items() if key != "control_directory"}
+    assert set(path.name for path in control.iterdir()) == {"input.json", "main.py", "prepared.json", "prepared.sha256", "prepared-complete.json"}
+    assert stat.S_IMODE(control.stat().st_mode) == 0o700
+    assert all(stat.S_IMODE(path.stat().st_mode) == 0o600 for path in control.iterdir())
+    with subject._Directory(control) as directory:
+        prepared, source = subject._prepared(directory, pin)
+    assert prepared == result and subject.sha(source) == prepared["source_sha256"]
+    assert subject.source_template_sha256(source) == prepared["source_template_sha256"]
+    with pytest.raises(subject.IdentityQcError, match="prepare_directory_not_empty"):
+        subject.prepare(package.input, subject.sha(package.raw), control)
 
 
 @pytest.mark.parametrize("change", [

@@ -14,6 +14,7 @@ import dataclasses
 import io
 import os
 import re
+import subprocess
 import sys
 import zipfile
 from pathlib import Path
@@ -48,6 +49,27 @@ FALSE_FLAGS = tuple(dict.fromkeys(public.FALSE_FLAGS + current.FALSE_FLAGS + (
     "independent_price_identity_binding_authenticated", "current_identity_admitted",
     "vintage_identity_admitted", "vintage_price_range_covers_bound_close",
 )))
+_PUBLICATION_MANIFEST_KEYS = frozenset(FALSE_FLAGS) | {
+    "schema", "artifact_id", "diagnostic_purpose", "source_mode", "public_reference_sha256",
+    "sharadar_identity_manifest_sha256", "price_manifest_sha256", "vintage_manifest_sha256",
+    "price_close_session", "vintage_source", "current_identity_schema", "current_requested_fields",
+    "vintage_projected_fields", "source_row_hash_semantics", "requested_name_count",
+    "vintage_missing_cusip_count", "current_missing_cusip_count", "rows",
+    "vintage_legacy_cusip_parser_qualified_count", "current_legacy_cusip_parser_qualified_count",
+    "populated_cusip_set_equality_count", "bridge_cusip_representation_contract",
+    "private_host_qualifications_only", "original_full_identity_binder_unchanged",
+    "source_semantics", "qc_input_semantics",
+}
+_PUBLICATION_ROW_KEYS = frozenset(FALSE_FLAGS) | {
+    "ticker", "role", "diagnostic_status", "vintage_source_row_sha256s", "current_source_row_sha256s",
+    "vintage_source_refusal_codes", "current_source_refusal_codes", "qualification_codes",
+    "excluded_vintage_other_table_rows", "public_figi_equals_actual_vintage_figi",
+    "vendor_permanent_id_continuity_equal", "category_role_currency_continuity_equal",
+    "current_price_range_covers_bound_close", "cusip_continuity", "vintage_cusip_absent",
+    "current_cusip_absent", "vintage_cusip_representation", "current_cusip_representation",
+    "vintage_cusip_candidate_count", "current_cusip_candidate_count",
+    "vintage_legacy_cusip_parser_qualified", "current_legacy_cusip_parser_qualified",
+}
 
 
 @dataclasses.dataclass(frozen=True)
@@ -129,12 +151,34 @@ def _legacy_cusip_parser_qualified(disposition, parsed: ParsedCusipCandidates) -
     return refused and parsed.representation == "ascii_space_list"
 
 
-def _provenance_presence(descriptor: int) -> bool | None:
+def _flags(metadata) -> int | None:
+    value = getattr(metadata, "st_flags", None)
+    return value if type(value) is int and value >= 0 else None
+
+
+def _provenance_presence(descriptor: int, *, root=None, root_fd=None, name=None) -> bool | None:
     """Optional fixed-name presence only; never obtains any xattr value."""
     reader = getattr(os, "listxattr", None)
-    if reader is None:
-        return None
     try:
+        if reader is None:
+            # macOS Python can omit listxattr. Use the supported names-only
+            # command on this exact held/named leaf, never an attribute value.
+            if root is None or root_fd is None or name is None:
+                return None
+            source._safe_leaf(name, "diagnostic leaf")
+            public._pinned_directory_path(root, root_fd)
+            before = source._entry_identity(os.fstat(descriptor))
+            named = os.stat(name, dir_fd=root_fd, follow_symlinks=False)
+            if source._entry_identity(named) != before:
+                return None
+            result = subprocess.run(["/usr/bin/xattr", "-s", str(root / name)],
+                stdout=subprocess.PIPE, stderr=subprocess.DEVNULL, timeout=0.5, check=False)
+            public._pinned_directory_path(root, root_fd)
+            if (result.returncode != 0 or len(result.stdout) > 8192
+                    or source._entry_identity(os.fstat(descriptor)) != before
+                    or source._entry_identity(os.stat(name, dir_fd=root_fd, follow_symlinks=False)) != before):
+                return None
+            return b"com.apple.provenance" in result.stdout.splitlines()
         names = reader(descriptor)
         if type(names) not in (list, tuple) or any(type(name) is not str for name in names):
             return None
@@ -144,13 +188,17 @@ def _provenance_presence(descriptor: int) -> bool | None:
         return None
 
 
-def _changed_dimensions(identity, metadata) -> str:
-    return ",".join(dimension for dimension, before, after in
+def _changed_dimensions(identity, metadata, flags_before=None) -> str:
+    dimensions = [dimension for dimension, before, after in
                     zip(_IDENTITY_DIMENSIONS, identity, source._entry_identity(metadata), strict=True)
-                    if before != after) or "none"
+                    if before != after]
+    if flags_before is not None and _flags(metadata) != flags_before:
+        dimensions.append("st_flags")
+    return ",".join(dimensions) or "none"
 
 
-def _identity_failure_diagnostic(root, root_fd, name, descriptor, identity, provenance_before, scope) -> str:
+def _identity_failure_diagnostic(root, root_fd, name, descriptor, identity, provenance_before, scope,
+                                 flags_before=None) -> str:
     artifact = root.name if _DIAGNOSTIC_BASENAME.fullmatch(root.name) else "redacted"
     leaf = name if name in _DIAGNOSTIC_LEAVES else "redacted"
     scope = scope if scope in {"vintage", "current", "output"} else "unknown"
@@ -158,7 +206,7 @@ def _identity_failure_diagnostic(root, root_fd, name, descriptor, identity, prov
     for label, observe in (("held", lambda: os.fstat(descriptor)),
                            ("named", lambda: os.stat(name, dir_fd=root_fd, follow_symlinks=False))):
         try:
-            dimensions = _changed_dimensions(identity, observe())
+            dimensions = _changed_dimensions(identity, observe(), flags_before)
         except Exception:
             dimensions = "unknown"
         changed.append(f"{label}_changed={dimensions}")
@@ -166,7 +214,7 @@ def _identity_failure_diagnostic(root, root_fd, name, descriptor, identity, prov
         return "unknown" if value is None else ("true" if value else "false")
     return (f"continuity evidence identity check refused; scope={scope} artifact={artifact} leaf={leaf} "
             + " ".join(changed)
-            + f" provenance_before={presence(provenance_before)} provenance_after={presence(_provenance_presence(descriptor))}")
+            + f" provenance_before={presence(provenance_before)} provenance_after={presence(_provenance_presence(descriptor, root=root, root_fd=root_fd, name=name))}")
 
 
 @contextlib.contextmanager
@@ -183,25 +231,27 @@ def _held(path: Path, names: dict[str, int], *, exact_inventory: bool = False, s
         for name, maximum in names.items():
             descriptor = source._open_private_regular(root_fd, name, maximum=maximum, label="continuity evidence")
             try:
+                flags_before = _flags(os.fstat(descriptor))
                 payload, identity = source._read_open_private_regular(descriptor, maximum=maximum, label="continuity evidence")
             except BaseException:
                 os.close(descriptor)
                 raise
-            held.append((name, descriptor, identity, maximum, _provenance_presence(descriptor)))
+            held.append((name, descriptor, identity, maximum,
+                         _provenance_presence(descriptor, root=root, root_fd=root_fd, name=name), flags_before))
             captured[name] = payload
         yield root, root_fd, captured
-        for name, descriptor, identity, maximum, provenance_before in held:
+        for name, descriptor, identity, maximum, provenance_before, flags_before in held:
             try:
                 source._require_open_leaf_identity(root_fd, name, descriptor, identity,
                                                    maximum=maximum, label="continuity evidence")
             except IdentityContinuityError:
                 raise IdentityContinuityError(_identity_failure_diagnostic(
-                    root, root_fd, name, descriptor, identity, provenance_before, scope)) from None
+                    root, root_fd, name, descriptor, identity, provenance_before, scope, flags_before)) from None
         if exact_inventory:
             public._inventory(root_fd, set(names))
         public._pinned_directory_path(root, root_fd)
     finally:
-        for _name, descriptor, _identity, _maximum, _provenance in held:
+        for _name, descriptor, _identity, _maximum, _provenance, _flags_before in held:
             os.close(descriptor)
         if root_fd is not None:
             os.close(root_fd)
@@ -451,6 +501,84 @@ def _documents(*, public_artifact_path, expected_public_manifest_sha256,
     if len(manifest_bytes) > MAX_MANIFEST_BYTES or len(input_bytes) > MAX_INPUT_BYTES:
         raise IdentityContinuityError("continuity diagnostic documents exceed byte limits")
     return manifest_bytes, input_bytes
+
+
+@contextlib.contextmanager
+def authenticated_identity_continuity_input(input_path: Path, expected_input_sha256: str,
+                                            expected_continuity_manifest_sha256: str, *,
+                                            expected_source_mode: str | None = None):
+    """Bind a caller-pinned input to its published, still-held package.
+
+    This checks publication, original byte pins, declared lineage and false
+    capabilities. It does not repeat `_load`'s full source reconstruction or
+    authenticate a caller's pins as independent source authority. Test-mode
+    packages remain labelled test-mode; neither mode grants formal admission.
+    """
+    try:
+        if expected_source_mode is not None and (type(expected_source_mode) is not str or expected_source_mode not in {
+                "offline_test_double", "production_source_bytes_offline"}):
+            raise IdentityContinuityError("continuity publication requested source mode refused")
+        require_sha256(expected_input_sha256, "expected continuity input pin")
+        require_sha256(expected_continuity_manifest_sha256, "expected published continuity pin")
+        if (type(input_path) is not type(Path()) or not input_path.is_absolute()
+                or input_path.name != "input.json" or ".." in input_path.parts):
+            raise IdentityContinuityError("continuity input must name its exact published leaf")
+        names = {"manifest.json": MAX_MANIFEST_BYTES, "manifest.sha256": 65, "input.json": MAX_INPUT_BYTES}
+        with _held(input_path.parent, names, exact_inventory=True, scope="output") as (root, _fd, captured):
+            raw = captured["input.json"]
+            manifest_raw = captured["manifest.json"]
+            if (sha256_bytes(raw) != expected_input_sha256
+                    or sha256_bytes(manifest_raw) != expected_continuity_manifest_sha256
+                    or captured["manifest.sha256"] != (expected_continuity_manifest_sha256 + "\n").encode("ascii")):
+                raise IdentityContinuityError("continuity publication differs from its external byte pins")
+            value = require_canonical_json_bytes(raw, "published continuity input")
+            manifest = require_canonical_json_bytes(manifest_raw, "published continuity manifest")
+            keys = {"schema", "rows", "price_manifest_sha256", "public_reference_sha256",
+                    "sharadar_identity_manifest_sha256", "continuity_manifest_sha256", "vintage_manifest_sha256"}
+            if (type(value) is not dict or set(value) != keys or value["schema"] != INPUT_SCHEMA
+                    or value["continuity_manifest_sha256"] != expected_continuity_manifest_sha256
+                    or type(manifest) is not dict or set(manifest) != _PUBLICATION_MANIFEST_KEYS
+                    or manifest.get("schema") != SCHEMA
+                    or manifest.get("artifact_id") != root.name
+                    or manifest.get("source_mode") not in {"offline_test_double", "production_source_bytes_offline"}
+                    or manifest.get("diagnostic_purpose") != "current_public_QC_roundtrip_with_qualified_vendor_vintage_continuity"
+                    or type(manifest.get("requested_name_count")) is not int or manifest["requested_name_count"] != 7
+                    or manifest.get("private_host_qualifications_only") is not True
+                    or manifest.get("original_full_identity_binder_unchanged") is not True
+                    or any(manifest.get(flag) is not False for flag in FALSE_FLAGS)):
+                raise IdentityContinuityError("continuity publication schema or capability binding refused")
+            if expected_source_mode is not None and manifest["source_mode"] != expected_source_mode:
+                raise IdentityContinuityError("continuity publication source mode differs from required mode")
+            for key in keys - {"schema", "rows", "continuity_manifest_sha256"}:
+                require_sha256(value[key], "published continuity lineage")
+                if manifest.get(key) != value[key]:
+                    raise IdentityContinuityError("continuity publication lineage differs from input")
+            input_rows, manifest_rows = value["rows"], manifest.get("rows")
+            if (type(input_rows) is not list or type(manifest_rows) is not list
+                    or len(input_rows) != 7 or len(manifest_rows) != 7):
+                raise IdentityContinuityError("continuity publication row census refused")
+            for ticker, row, declared in zip(public.TICKERS, input_rows, manifest_rows, strict=True):
+                role = "stock" if ticker == "QCOM" else "fund"
+                if (type(row) is not dict or set(row) != {"ticker", "role", "composite_figi"}
+                        or row.get("ticker") != ticker or row.get("role") != role
+                        or type(row.get("composite_figi")) is not str
+                        or re.fullmatch(r"[A-Z0-9]{12}", row["composite_figi"]) is None
+                        or type(declared) is not dict or set(declared) != _PUBLICATION_ROW_KEYS
+                        or declared.get("ticker") != ticker
+                        or declared.get("role") != role
+                        or declared.get("diagnostic_status") != "continuity_qualified_not_admitted"
+                        or any(declared.get(flag) is not False for flag in FALSE_FLAGS)
+                        or any(declared.get(flag) is not True for flag in (
+                            "public_figi_equals_actual_vintage_figi", "vendor_permanent_id_continuity_equal",
+                            "category_role_currency_continuity_equal", "current_price_range_covers_bound_close"))):
+                    raise IdentityContinuityError("continuity publication role or qualification binding refused")
+            if len({row["composite_figi"] for row in input_rows}) != 7:
+                raise IdentityContinuityError("continuity publication public identity collision refused")
+            # The caller must finish copying/validating before leaving this
+            # context; all three original descriptors are checked afterwards.
+            yield raw
+    except CanonicalEvidenceError:
+        raise IdentityContinuityError("continuity publication canonical contract refused") from None
 
 
 def _load(artifact_path, expected_continuity_manifest_sha256, *, synthetic, **pins):

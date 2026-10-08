@@ -359,10 +359,10 @@ def test_real_builder_and_original_binder_bytes_prepare_qc_without_normalizing_o
     root.mkdir(mode=0o700)
     monkeypatch.setattr(runner, "ARTIFACT_ROOT", root)
     monkeypatch.setattr(runner.boundary, "production_client", lambda: pytest.fail("prepare cannot read credentials"))
-    prepared = runner.prepare(loaded.input_path, loaded.input_sha256, root / "r284-a1")
+    prepared = runner.prepare(loaded.input_path, loaded.input_sha256, root / runner.CONTROL_LEAF)
     assert prepared["input_sha256"] == loaded.input_sha256
-    assert (root / "r284-a1" / "input.json").read_bytes() == raw
-    assert not (root / "r284-a1" / "attempt-claim.json").exists()
+    assert (root / runner.CONTROL_LEAF / "input.json").read_bytes() == raw
+    assert not (root / runner.CONTROL_LEAF / "attempt-claim.json").exists()
 
 
 @pytest.mark.parametrize("ending", [b"", b"\n\n", b"\r\n", b"\n "])
@@ -547,6 +547,26 @@ def test_no_provider_or_credentials_while_preparing(tmp_path, monkeypatch):
     assert build(tmp_path, pins).row_count == 7
 
 
+def test_actual_builder_rollback_input_cannot_prepare_qc(tmp_path, monkeypatch):
+    from scripts import run_arv2_identity_qc as runner
+    pins = fixture(tmp_path)
+    def refused(*args, **kwargs):
+        raise adapter.IdentityContinuityError("synthetic post-publication identity refusal")
+    monkeypatch.setattr(adapter, "_load", refused)
+    with pytest.raises(adapter.IdentityContinuityError):
+        build(tmp_path, pins)
+    root = tmp_path / "output" / "continuity-r284"
+    assert {entry.name for entry in root.iterdir()} == {"input.json", "manifest.sha256"}
+    original = {entry.name: entry.read_bytes() for entry in root.iterdir()}
+    control = tmp_path / "identity_qc"
+    monkeypatch.setattr(runner, "ARTIFACT_ROOT", control)
+    monkeypatch.setattr(runner.boundary, "production_client", lambda: pytest.fail("no QC client"))
+    with pytest.raises(runner.IdentityQcError):
+        runner.prepare(root / "input.json", sha256_bytes(original["input.json"]), control / runner.CONTROL_LEAF)
+    assert not control.exists()
+    assert {entry.name: entry.read_bytes() for entry in root.iterdir()} == original
+
+
 @pytest.mark.parametrize("filename", ["manifest.json", "manifest.sha256", "input.json"])
 def test_bundle_tamper_permissions_links_and_foreign_inventory_refused(tmp_path, filename):
     pins = fixture(tmp_path)
@@ -657,6 +677,132 @@ def test_identity_diagnostic_classifies_only_fixed_dimension_names_not_values(di
     after[index] += 999999999
     metadata = SimpleNamespace(**dict(zip(("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns"), after, strict=True)))
     assert adapter._changed_dimensions(tuple(values), metadata) == dimension
+
+
+def test_flags_diagnostic_names_observed_transition_without_changing_strict_identity_contract():
+    metadata = SimpleNamespace(st_dev=1, st_ino=2, st_size=3, st_mtime_ns=4, st_ctime_ns=6, st_flags=64)
+    assert adapter._changed_dimensions((1, 2, 3, 4, 5), metadata, 0) == "ctime_ns,st_flags"
+    assert adapter.source._entry_identity(metadata) == (1, 2, 3, 4, 6)
+    del metadata.st_flags
+    assert adapter._flags(metadata) is None
+
+
+@pytest.mark.parametrize("result,expected", [
+    (SimpleNamespace(returncode=0, stdout=b"com.apple.provenance\nPRIVATE_NAME\n"), True),
+    (SimpleNamespace(returncode=0, stdout=b"PRIVATE_NAME\n"), False),
+    (SimpleNamespace(returncode=1, stdout=b"com.apple.provenance\n"), None),
+    (SimpleNamespace(returncode=0, stdout=b"x" * 8193), None),
+])
+def test_mac_names_only_fallback_bounded_and_exact_held_leaf(tmp_path, monkeypatch, result, expected):
+    root = tmp_path / "metadata"
+    root.mkdir(mode=0o700)
+    write_private(root / "input.json", b"fixed")
+    monkeypatch.delattr(adapter.os, "listxattr", raising=False)
+    calls = []
+    def command(argv, **options):
+        calls.append((argv, options))
+        return result
+    monkeypatch.setattr(adapter.subprocess, "run", command)
+    _, directory = adapter.source._open_directory_path(root, create=False, name="test")
+    descriptor = adapter.source._open_private_regular(directory, "input.json", maximum=100, label="test")
+    try:
+        assert adapter._provenance_presence(descriptor, root=root, root_fd=directory, name="input.json") is expected
+    finally:
+        os.close(descriptor)
+        os.close(directory)
+    assert calls[0][0] == ["/usr/bin/xattr", "-s", str(root / "input.json")]
+    assert calls[0][1]["timeout"] == 0.5 and calls[0][1]["check"] is False
+    assert "-p" not in calls[0][0]
+
+
+def test_mac_names_only_fallback_drift_unknown_not_authenticated(tmp_path, monkeypatch):
+    root = tmp_path / "metadata"
+    root.mkdir(mode=0o700)
+    leaf = root / "input.json"
+    write_private(leaf, b"fixed")
+    monkeypatch.delattr(adapter.os, "listxattr", raising=False)
+    def changed(argv, **options):
+        before = leaf.stat()
+        os.utime(leaf, ns=(before.st_atime_ns, before.st_mtime_ns + 1000000))
+        return SimpleNamespace(returncode=0, stdout=b"com.apple.provenance\n")
+    monkeypatch.setattr(adapter.subprocess, "run", changed)
+    with pytest.raises(adapter.IdentityContinuityError):
+        with adapter._held(root, {"input.json": 100}):
+            pass
+
+
+def test_published_input_authentication_holds_all_files_until_consumer_finishes(tmp_path):
+    pins = fixture(tmp_path)
+    loaded = build(tmp_path, pins)
+    with pytest.raises(adapter.IdentityContinuityError):
+        with adapter.authenticated_identity_continuity_input(
+                loaded.input_path, loaded.input_sha256, loaded.continuity_manifest_sha256) as raw:
+            assert sha256_bytes(raw) == loaded.input_sha256
+            (loaded.artifact_path / "manifest.json").unlink()
+
+
+@pytest.mark.parametrize("leaf", ["manifest.json", "manifest.sha256"])
+def test_published_input_authentication_requires_completion_and_digest(tmp_path, leaf):
+    pins = fixture(tmp_path)
+    loaded = build(tmp_path, pins)
+    (loaded.artifact_path / leaf).unlink()
+    with pytest.raises(adapter.IdentityContinuityError):
+        with adapter.authenticated_identity_continuity_input(
+                loaded.input_path, loaded.input_sha256, loaded.continuity_manifest_sha256):
+            pytest.fail("unpublished input was yielded")
+
+
+@pytest.mark.parametrize("required_mode", ["production_source_bytes_offline", "unknown", [], True])
+def test_published_test_input_refuses_production_or_invalid_source_mode(tmp_path, required_mode):
+    loaded = build(tmp_path, fixture(tmp_path))
+    with pytest.raises(adapter.IdentityContinuityError):
+        with adapter.authenticated_identity_continuity_input(
+                loaded.input_path, loaded.input_sha256, loaded.continuity_manifest_sha256,
+                expected_source_mode=required_mode):
+            pytest.fail("test package reached a forbidden source mode")
+    with adapter.authenticated_identity_continuity_input(
+            loaded.input_path, loaded.input_sha256, loaded.continuity_manifest_sha256,
+            expected_source_mode="offline_test_double") as raw:
+        assert sha256_bytes(raw) == loaded.input_sha256
+
+
+@pytest.mark.parametrize("mutation", ["lineage", "capability", "row_capability", "row_identity", "artifact", "input_hash",
+                                     "extra_manifest", "missing_manifest", "extra_row", "missing_row", "float_count"])
+def test_published_input_binding_refuses_self_pinned_inconsistent_package(tmp_path, mutation):
+    pins = fixture(tmp_path)
+    loaded = build(tmp_path, pins)
+    manifest, value = documents(loaded)
+    if mutation == "lineage":
+        manifest["public_reference_sha256"] = "a" * 64
+    elif mutation == "capability":
+        manifest["formal_source_admitted"] = True
+    elif mutation == "row_capability":
+        manifest["rows"][0]["formal_source_admitted"] = True
+    elif mutation == "row_identity":
+        manifest["rows"][0]["ticker"] = "SPY"
+    elif mutation == "artifact":
+        manifest["artifact_id"] = "different"
+    elif mutation == "extra_manifest":
+        manifest["unexpected"] = False
+    elif mutation == "missing_manifest":
+        del manifest["source_semantics"]
+    elif mutation == "extra_row":
+        manifest["rows"][0]["unexpected"] = False
+    elif mutation == "missing_row":
+        del manifest["rows"][0]["qualification_codes"]
+    elif mutation == "float_count":
+        manifest["requested_name_count"] = 7.0
+    manifest_raw = canonical_json_bytes(manifest)
+    manifest_pin = sha256_bytes(manifest_raw)
+    value["continuity_manifest_sha256"] = manifest_pin
+    input_raw = canonical_json_bytes(value)
+    write_private(loaded.artifact_path / "manifest.json", manifest_raw)
+    write_private(loaded.artifact_path / "manifest.sha256", (manifest_pin + "\n").encode())
+    write_private(loaded.input_path, input_raw)
+    input_pin = "b" * 64 if mutation == "input_hash" else sha256_bytes(input_raw)
+    with pytest.raises(adapter.IdentityContinuityError):
+        with adapter.authenticated_identity_continuity_input(loaded.input_path, input_pin, manifest_pin):
+            pytest.fail("inconsistent publication was yielded")
 
 
 @pytest.mark.parametrize("scope", ["output", "vintage", "current"])

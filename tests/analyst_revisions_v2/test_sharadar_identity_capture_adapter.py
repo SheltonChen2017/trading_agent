@@ -102,14 +102,15 @@ def valid_responses(*, edits=None, fields=adapter.FIELDS):
             for role, tickers in adapter.ROLE_TICKERS]
 
 
-def capture(tmp_path, *, session=None, price=None, capture_clock=None, without_figi=False):
+def capture(tmp_path, *, session=None, price=None, capture_clock=None, without_figi=False, strict_cusips=False):
     price = price or price_capture(tmp_path)
     fields = adapter.FIELDS_WITHOUT_FIGI if without_figi else adapter.FIELDS
     session = session or Session(valid_responses(fields=fields))
     loaded = adapter._capture_sharadar_identities_for_test(
         artifact_root=tmp_path / "identity", price_artifact_path=price.artifact_path,
         expected_price_manifest_sha256=price.manifest_sha256,
-        session=session, clock=capture_clock or clock(), api_key=KEY, without_figi=without_figi,
+        session=session, clock=capture_clock or clock(), api_key=KEY,
+        without_figi=without_figi, strict_cusips=strict_cusips,
     )
     return loaded, price, session
 
@@ -811,3 +812,175 @@ def test_thirteen_profile_cli_is_explicit_safe_and_excludes_header_mode(tmp_path
 def test_unknown_schema_profile_never_constructs_query_or_reads_source(schema):
     with pytest.raises(adapter.SharadarIdentityCaptureError, match="profile is not supported"):
         adapter._query("stocks", schema=schema)
+
+
+def census_rows(*, edits=None, schema=adapter.SCHEMA, extra_funds=()):
+    edits = edits or {}
+    return tuple((role, tuple(
+        {field: candidate[field] for field in adapter._fields(schema)}
+        for candidate in [
+            *({**row(ticker), **edits.get(ticker, {})} for ticker in tickers),
+            *(extra_funds if role == "funds" else ()),
+        ]
+    )) for role, tickers in adapter.ROLE_TICKERS)
+
+
+@pytest.mark.parametrize("value", [
+    "SYN000001,broken", "broken,SYN000001", "SYN000001 SYN000002",
+    "SYN000002  SYN000001", "SYN000001,,SYN000002", "[SYN000001]",
+    "SYN000001;broken", "SYN000001,SYN000001",
+])
+def test_v3_malformed_cusip_field_poisons_all_collision_members(value):
+    rows = census_rows(edits={"SPY": {"cusips": value}})
+    by_name = {item.ticker: item for item in adapter._census(rows, schema=adapter.SCHEMA_STRICT_CUSIPS)}
+    assert "CUSIP_CANDIDATES_INVALID_OR_MISSING" in by_name["SPY"].refusal_codes
+    assert by_name["SPY"].cusip_candidates == ()
+    for ticker in ("QCOM", "SPY"):
+        assert "CROSS_NAME_CUSIP_CANDIDATE_COLLISION" in by_name[ticker].refusal_codes
+        assert "DIRECT_STOCK_OWN_ETF_IDENTITY_COLLISION" in by_name[ticker].refusal_codes
+        assert by_name[ticker].status == "refused_current_candidate"
+    assert by_name["XLE"].status == "matched_current_candidate"
+
+
+@pytest.mark.parametrize("value", [
+    "SYN000008, SYN000009", "SYN000008 ,SYN000009", " SYN000008", "SYN000008 ",
+    "SYN000008,\tSYN000009", "SYN000008,\u00a0SYN000009",
+])
+def test_v3_cusip_whitespace_refuses_without_normalization(value):
+    by_name = {item.ticker: item for item in adapter._census(
+        census_rows(edits={"SPY": {"cusips": value}}), schema=adapter.SCHEMA_STRICT_CUSIPS,
+    )}
+    assert "CUSIP_CANDIDATES_INVALID_OR_MISSING" in by_name["SPY"].refusal_codes
+    assert by_name["SPY"].cusip_candidates == ()
+
+
+@pytest.mark.parametrize("schema,value,expected", [
+    (adapter.SCHEMA, "SYN000001,broken", "5e93e720beddcf142773898f8f0451119b32ceb73c2bb10f9a1b3ab8575081f6"),
+    (adapter.SCHEMA, "SYN000008, SYN000009", "b37abaa1d2738aef437c84c4cc0267df8e3567dffe3c849ff490934bdac59b50"),
+    (adapter.SCHEMA_WITHOUT_FIGI, "SYN000001,broken", "c3d195d8838c8fe04585cd4779a839b1e6664c5b4f11513a17775f96ec2741ce"),
+    (adapter.SCHEMA_WITHOUT_FIGI, "SYN000008, SYN000009", "80713fdb2bbd581f63ed526f18cd70399af9234cc989c948d130890f8f272590"),
+])
+def test_frozen_v1_v2_cusip_interpretations_keep_exact_disposition_bytes(schema, value, expected):
+    # Baseline 64b5a355 synthetic dispositions, including the historical limitations.
+    result = adapter._census(census_rows(edits={"SPY": {"cusips": value}}, schema=schema), schema=schema)
+    assert sha256_bytes(canonical_json_bytes([dataclasses.asdict(item) for item in result])) == expected
+
+
+@pytest.mark.parametrize("value", ["SYN0000010", "0SYN000001", "xSYN000001", "SYN000001x", "SYN000 001"])
+def test_v3_does_not_extract_substrings_or_join_split_cusips(value):
+    by_name = {item.ticker: item for item in adapter._census(
+        census_rows(edits={"SPY": {"cusips": value}}), schema=adapter.SCHEMA_STRICT_CUSIPS,
+    )}
+    assert by_name["QCOM"].refusal_codes == ()
+    assert by_name["SPY"].refusal_codes == ("CUSIP_CANDIDATES_INVALID_OR_MISSING",)
+    assert by_name["SPY"].cusip_candidates == ()
+
+
+def test_v3_ambiguous_invalid_row_still_poisons_every_stock_and_fund_owner():
+    ambiguous = {**row("SPY"), "cusips": "broken,SYN000001 SYN000003", "category": "CEF"}
+    by_name = {item.ticker: item for item in adapter._census(
+        census_rows(extra_funds=(ambiguous,)), schema=adapter.SCHEMA_STRICT_CUSIPS,
+    )}
+    assert "CURRENT_IDENTITY_AMBIGUOUS" in by_name["SPY"].refusal_codes
+    assert by_name["SPY"].cusip_candidates == ()
+    for ticker in ("QCOM", "SPY", "QQQ"):
+        assert "CROSS_NAME_CUSIP_CANDIDATE_COLLISION" in by_name[ticker].refusal_codes
+    for ticker in ("QCOM", "SPY"):
+        assert "DIRECT_STOCK_OWN_ETF_IDENTITY_COLLISION" in by_name[ticker].refusal_codes
+    assert "DIRECT_STOCK_OWN_ETF_IDENTITY_COLLISION" not in by_name["QQQ"].refusal_codes
+
+
+def test_v3_exact_comma_list_admission_and_collision_refusals():
+    by_name = {item.ticker: item for item in adapter._census(census_rows(edits={
+        "QCOM": {"cusips": "SYN000009,SYN000008"},
+        "SPY": {"cusips": "SYN000010,SYN000003"},
+    }), schema=adapter.SCHEMA_STRICT_CUSIPS)}
+    assert by_name["QCOM"].cusip_candidates == ("SYN000008", "SYN000009")
+    assert by_name["QCOM"].refusal_codes == ()
+    for ticker in ("SPY", "QQQ"):
+        assert by_name[ticker].refusal_codes == ("CROSS_NAME_CUSIP_CANDIDATE_COLLISION",)
+
+
+def test_v3_capture_roundtrip_preserves_raw_rows_and_declares_prospective_semantics(tmp_path):
+    edits = {"SPY": {"cusips": "SYN000001,broken"}, "XLE": {"cusips": "SYN000008, SYN000009"}}
+    loaded, price, session = capture(tmp_path, session=Session(valid_responses(edits=edits)), strict_cusips=True)
+    assert loaded.manifest_schema == adapter.SCHEMA_STRICT_CUSIPS
+    assert loaded.requested_fields == adapter.FIELDS
+    assert loaded.matched_count == 4 and loaded.refused_count == 3
+    value = document(loaded)
+    assert value["schema"] == "arv2-sharadar-seven-current-identities-v3"
+    assert value["cusip_parser_semantics"] == "exact_comma_separated_ASCII_shape_tokens_without_whitespace_normalization"
+    assert value["cusip_collision_semantics"] == "bounded_shape_tokens_from_every_row_for_refusal_only_not_admission"
+    assert all(value[flag] is False for flag in adapter.FALSE_FLAGS)
+    for role, _tickers in adapter.ROLE_TICKERS:
+        payload = (loaded.artifact_path / (role + ".csv")).read_bytes()
+        parsed = adapter._parse_csv(payload, role, schema=adapter.SCHEMA_STRICT_CUSIPS)
+        for candidate in parsed:
+            item = next(item for item in loaded.identities if item.ticker == candidate["ticker"])
+            assert item.source_row_sha256s == (sha256_bytes(canonical_json_bytes(candidate)),)
+            if candidate["ticker"] in edits:
+                assert candidate["cusips"] == edits[candidate["ticker"]]["cusips"]
+    for (role, _tickers), (_url, options) in zip(adapter.ROLE_TICKERS, session.calls, strict=True):
+        assert options["params"] == {**adapter._query(role), "api_key": KEY}
+    assert len(session.calls) == 2 and load(loaded, price) == loaded
+
+
+@pytest.mark.parametrize("mutation", ["schema", "parser", "collision", "refusal"])
+def test_v3_loader_rejects_rehashed_semantic_or_disposition_changes(tmp_path, mutation):
+    loaded, price, _session = capture(tmp_path, strict_cusips=True)
+    value = document(loaded)
+    if mutation == "schema":
+        value["schema"] = adapter.SCHEMA
+    elif mutation == "parser":
+        del value["cusip_parser_semantics"]
+    elif mutation == "collision":
+        value["cusip_collision_semantics"] = "whole_field_only"
+    else:
+        value["identities"][0]["refusal_codes"] = ["invented"]
+    with pytest.raises(adapter.SharadarIdentityCaptureError):
+        load(loaded, price, digest=repin_manifest(loaded, value))
+
+
+def test_v3_fourteen_field_profile_has_no_thirteen_field_fallback(tmp_path):
+    session = Session(valid_responses(fields=adapter.FIELDS_WITHOUT_FIGI))
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="header differs"):
+        capture(tmp_path, session=session, strict_cusips=True)
+    assert len(session.calls) == 1
+    assert not list((tmp_path / "identity").glob("*/manifest.json"))
+
+
+@pytest.mark.parametrize("strict_cusips,without_figi", [(1, False), (True, True)])
+def test_v3_invalid_selector_refuses_before_price_or_provider(tmp_path, strict_cusips, without_figi):
+    session = Session(valid_responses())
+    with pytest.raises(adapter.SharadarIdentityCaptureError, match="selector must be a bool|mutually exclusive"):
+        adapter._capture_sharadar_identities_for_test(
+            artifact_root=tmp_path / "identity", price_artifact_path=tmp_path / "absent-price",
+            expected_price_manifest_sha256="0" * 64, session=session, clock=clock(), api_key=KEY,
+            strict_cusips=strict_cusips, without_figi=without_figi,
+        )
+    assert session.calls == [] and list(tmp_path.iterdir()) == []
+
+
+def test_v3_public_api_explicitly_selects_only_v3(monkeypatch):
+    calls = []
+    monkeypatch.setattr(adapter, "_capture_production", lambda schema: calls.append(schema) or "synthetic")
+    assert adapter.capture_sharadar_identities_strict_cusips() == "synthetic"
+    assert calls == [adapter.SCHEMA_STRICT_CUSIPS]
+
+
+def test_v3_cli_requires_explicit_profile_and_never_prints_identifiers(tmp_path, monkeypatch, capsys):
+    loaded, _price, _session = capture(tmp_path, strict_cusips=True)
+    monkeypatch.setattr(adapter, "capture_sharadar_identities_strict_cusips", lambda: loaded)
+    monkeypatch.setattr(adapter, "capture_sharadar_identities", lambda: pytest.fail("no default fallback"))
+    monkeypatch.setattr(adapter, "capture_sharadar_identities_without_figi", lambda: pytest.fail("no v2 fallback"))
+    assert adapter._main(["--strict-cusips"]) == 0
+    output = capsys.readouterr()
+    assert "requested=7 matched=7 refused=0" in output.out
+    assert "qc_sid_resolved=false" in output.out
+    for private in (KEY, "100001", "BBG000000001", "Synthetic issuer", "SYN000001"):
+        assert private not in output.out
+    assert output.err == ""
+    for other in ("--without-figi", "--inspect-stock-header"):
+        with pytest.raises(SystemExit) as caught:
+            adapter._main(["--strict-cusips", other])
+        assert caught.value.code == 2

@@ -10,6 +10,7 @@ offline-prepared package and spend durable claims before contact.
 from __future__ import annotations
 
 import argparse
+import contextlib
 import hashlib
 import json
 import os
@@ -21,6 +22,7 @@ from pathlib import Path
 
 from research.analyst_revisions_v2_qc import six_universe_coverage_submission as boundary
 from research.quantconnect import API_BASE, QuantConnectClient
+from scripts import build_arv2_identity_continuity as continuity
 
 
 class IdentityQcError(ValueError):
@@ -36,11 +38,13 @@ META_NAME = "ARV2_R284_PUBLIC_IDENTITY_META"
 INPUT_SCHEMA = "arv2-seven-public-figi-identity-input-v1"
 CONTINUITY_INPUT_SCHEMA = "arv2-seven-public-figi-continuity-input-v2"
 PREPARED_SCHEMA = "arv2-r284-prepared-identity-diagnostic-v1"
+CONTINUITY_PREPARED_SCHEMA = "arv2-r284-prepared-continuity-diagnostic-v2"
 META_SCHEMA = "arv2-r284-public-identity-meta-v1"
 OBSERVATION_SCHEMA = "arv2-r284-response-observation-v1"
 TICKERS = ("QCOM", "SPY", "QQQ", "SOXX", "XLV", "REMX", "XLE")
 ROLES = {ticker: "stock" if ticker == "QCOM" else "fund" for ticker in TICKERS}
 ARTIFACT_ROOT = Path(__file__).absolute().parents[1] / "artifacts" / "analyst_revisions_v2" / "identity_qc"
+CONTROL_LEAF = "R284A1-20261008"
 MAX_FILE_BYTES = 256 * 1024
 MAX_META_BYTES = 8 * 1024
 MAX_COMPILE_POLLS = 20
@@ -290,6 +294,8 @@ class _Directory:
         root = ARTIFACT_ROOT
         if not path.is_relative_to(root) or path == root:
             _fail("control_root")
+        if path != root / CONTROL_LEAF:
+            _fail("candidate_control_leaf")
         self.path, self.fd = path, None
         self.ancestors = []
         descriptor = os.open("/", os.O_RDONLY | os.O_DIRECTORY)
@@ -376,13 +382,25 @@ class _Directory:
         return bytes(raw)
 
     def write(self, name, raw):
+        """Atomic no-overwrite publication; an interrupted pending name is spent.
+
+        Never remove failed pending files or retry a remote operation because a
+        final receipt is missing. A crash after a remote response but before
+        persistence can still lose its identity; this is not exactly-once RPC.
+        """
         self._verify()
-        if type(name) is not str or re.fullmatch(r"[A-Za-z0-9_.-]+", name) is None:
+        if (type(name) is not str or re.fullmatch(r"[A-Za-z0-9_.-]+", name) is None
+                or name.endswith(".pending")):
             _fail("control_name")
         if type(raw) is not bytes or not 0 < len(raw) <= MAX_FILE_BYTES:
             _fail("control_write_bound")
         try:
-            fd = os.open(name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fd)
+            # The final or pending name is an exclusive one-use reservation.
+            # Keeping a failed pending leaf makes crash/restart fail closed.
+            if name in self.names():
+                _fail("one_use_control_spent_or_write_failed")
+            pending_name = name + ".pending"
+            fd = os.open(pending_name, os.O_WRONLY | os.O_CREAT | os.O_EXCL | os.O_NOFOLLOW, 0o600, dir_fd=self.fd)
             try:
                 view = memoryview(raw)
                 while view:
@@ -391,8 +409,21 @@ class _Directory:
                         _fail("control_write")
                     view = view[written:]
                 os.fsync(fd)
+                staged = os.fstat(fd)
             finally:
                 os.close(fd)
+            if self.read(pending_name) != raw:
+                _fail("control_write_readback")
+            self._verify()
+            if _metadata(os.stat(pending_name, dir_fd=self.fd, follow_symlinks=False)) != _metadata(staged):
+                _fail("file_identity_changed")
+            os.link(pending_name, name, src_dir_fd=self.fd, dst_dir_fd=self.fd, follow_symlinks=False)
+            named = os.stat(name, dir_fd=self.fd, follow_symlinks=False)
+            if (named.st_dev, named.st_ino) != (staged.st_dev, staged.st_ino):
+                _fail("file_identity_changed")
+            # A crash before unlink leaves two links and refuses consumption;
+            # no consumer can observe partial bytes under the final name.
+            os.unlink(pending_name, dir_fd=self.fd)
             os.fsync(self.fd)
         except OSError:
             _fail("one_use_control_spent_or_write_failed")
@@ -403,8 +434,43 @@ class _Directory:
         return _json(self.read(name))
 
 
+def _require_no_pending_controls(directory):
+    """An interrupted publication blocks consumers; never repair or retry it."""
+    names = directory.names()
+    if any(name.endswith(".pending") for name in names):
+        _fail("interrupted_control_pending")
+    return names
+
+
+@contextlib.contextmanager
+def _published_input(input_path, raw, input_sha256, value):
+    """Authenticate continuity publication, not independent source admission."""
+    if value["schema"] != CONTINUITY_INPUT_SCHEMA:
+        yield raw
+        return
+    if (type(input_path) is not type(Path()) or not input_path.is_absolute()
+            or ".." in input_path.parts or input_path.name != "input.json"):
+        _fail("continuity_input_path")
+    try:
+        with continuity.authenticated_identity_continuity_input(
+                input_path, input_sha256, value["continuity_manifest_sha256"]) as authenticated:
+            if type(authenticated) is not bytes or authenticated != raw:
+                _fail("continuity_input_binding")
+            yield authenticated
+    except continuity.IdentityContinuityError:
+        _fail("continuity_publication")
+
+
+def _prepared_source_path(input_path, value):
+    if value["schema"] == CONTINUITY_INPUT_SCHEMA:
+        return {"continuity_input_path": str(input_path)}
+    return {}
+
+
 def prepare(input_path, input_sha256, control_directory):
     """Offline publication; no credentials, clock, provider or QC calls."""
+    if control_directory != ARTIFACT_ROOT / CONTROL_LEAF:
+        _fail("candidate_control_leaf")
     try:
         before = input_path.lstat()
         if not stat.S_ISREG(before.st_mode) or before.st_nlink != 1 or not 0 < before.st_size <= MAX_FILE_BYTES:
@@ -424,25 +490,31 @@ def prepare(input_path, input_sha256, control_directory):
     value = validate_input(raw, input_sha256)
     profile, profile_sha256 = _profile(value["schema"])
     source = render_source(value, input_sha256)
-    prepared = {"schema": PREPARED_SCHEMA, "candidate_id": CANDIDATE_ID, "attempt": 1,
+    prepared = {"schema": CONTINUITY_PREPARED_SCHEMA if value["schema"] == CONTINUITY_INPUT_SCHEMA else PREPARED_SCHEMA,
+                "candidate_id": CANDIDATE_ID, "attempt": 1,
                 "control_directory": str(control_directory),
+                **_prepared_source_path(input_path, value),
                 "input_schema": value["schema"], "profile": profile, "profile_sha256": profile_sha256, "input_sha256": input_sha256,
                 "source_sha256": sha(source), "source_byte_count": len(source),
                 "source_template_sha256": source_template_sha256(source),
                 **_input_hashes(value), **_RUNTIME_FALSE_FLAGS}
     prepared_raw = canonical(prepared)
-    with _Directory(control_directory, create=True) as directory:
-        if directory.names():
-            _fail("prepare_directory_not_empty")
-        directory.write("input.json", raw)
-        directory.write("main.py", source)
-        directory.write("prepared.json", prepared_raw)
-        directory.write("prepared.sha256", sha(prepared_raw).encode("ascii"))
+    with _published_input(input_path, raw, input_sha256, value) as authenticated:
+        with _Directory(control_directory, create=True) as directory:
+            if directory.names():
+                _fail("prepare_directory_not_empty")
+            directory.write("input.json", authenticated)
+            directory.write("main.py", source)
+            directory.write("prepared.json", prepared_raw)
+            directory.write("prepared.sha256", sha(prepared_raw).encode("ascii"))
+    # The source visitor must finish its held-file checks before completion.
+    with _Directory(control_directory) as directory:
         directory.write("prepared-complete.json", canonical({"prepared_sha256": sha(prepared_raw)}))
     return prepared
 
 
 def _prepared(directory, expected_sha256):
+    _require_no_pending_controls(directory)
     _hash(expected_sha256, "prepared")
     raw = directory.read("prepared.json")
     if sha(raw) != expected_sha256 or directory.read("prepared.sha256") != expected_sha256.encode("ascii"):
@@ -450,23 +522,33 @@ def _prepared(directory, expected_sha256):
     if directory.json("prepared-complete.json") != {"prepared_sha256": expected_sha256}:
         _fail("prepared_completion")
     value = _json(raw)
-    if type(value) is not dict or value.get("schema") != PREPARED_SCHEMA:
+    if type(value) is not dict or value.get("schema") not in (PREPARED_SCHEMA, CONTINUITY_PREPARED_SCHEMA):
         _fail("prepared_schema")
-    input_value = validate_input(directory.read("input.json"), value.get("input_sha256"))
+    input_raw = directory.read("input.json")
+    input_value = validate_input(input_raw, value.get("input_sha256"))
+    source_path = directory.path / "input.json"
+    if input_value["schema"] == CONTINUITY_INPUT_SCHEMA:
+        if type(value.get("continuity_input_path")) is not str:
+            _fail("continuity_input_path")
+        source_path = Path(value["continuity_input_path"])
     profile, profile_sha256 = _profile(input_value["schema"])
     source = render_source(input_value, value["input_sha256"])
-    expected = {"schema": PREPARED_SCHEMA, "candidate_id": CANDIDATE_ID, "attempt": 1,
+    expected = {"schema": CONTINUITY_PREPARED_SCHEMA if input_value["schema"] == CONTINUITY_INPUT_SCHEMA else PREPARED_SCHEMA,
+                "candidate_id": CANDIDATE_ID, "attempt": 1,
                 "control_directory": str(directory.path),
+                **_prepared_source_path(source_path, input_value),
                 "input_schema": input_value["schema"], "profile": profile, "profile_sha256": profile_sha256, "input_sha256": value["input_sha256"],
                 "source_sha256": sha(source), "source_byte_count": len(source),
                 "source_template_sha256": source_template_sha256(source),
                 **_input_hashes(input_value), **_RUNTIME_FALSE_FLAGS}
     if not _same(value, expected) or directory.read("main.py") != source:
         _fail("prepared_source_or_profile_changed")
+    with _published_input(source_path, input_raw, value["input_sha256"], input_value):
+        pass
     return value, source
 
 
-def _api(api):
+def _api_client(api):
     if api is None:
         api = boundary.production_client()
     boundary._client(api)
@@ -474,6 +556,20 @@ def _api(api):
             or "request" in vars(api) or api.request.__func__ is not QuantConnectClient.request):
         _fail("client_override")
     return api
+
+
+def _api(api, prepared):
+    """Refuse test-mode continuity bytes before credentials or QC contact."""
+    if prepared["input_schema"] == CONTINUITY_INPUT_SCHEMA:
+        try:
+            with continuity.authenticated_identity_continuity_input(
+                    Path(prepared["continuity_input_path"]), prepared["input_sha256"],
+                    prepared["continuity_manifest_sha256"],
+                    expected_source_mode="production_source_bytes_offline"):
+                pass
+        except continuity.IdentityContinuityError:
+            _fail("continuity_production_source_mode")
+    return _api_client(api)
 
 
 def _instant():
@@ -498,7 +594,7 @@ def _post(directory, api, endpoint, payload, binding):
                "compile/create", "compile/read", "backtests/create", "backtests/list", "backtests/read"}
     if endpoint not in allowed:
         _fail("endpoint_not_allowed")
-    names = directory.names()
+    names = _require_no_pending_controls(directory)
     observations = [name for name in names if re.fullmatch(r"observation-\d{3}\.json", name)]
     if len(observations) >= MAX_OBSERVATIONS:
         _fail("observation_budget")
@@ -571,7 +667,7 @@ def launch(control_directory, prepared_sha256, api=None):
         prepared, source = _prepared(directory, prepared_sha256)
         binding = _bind(prepared, prepared_sha256)
         directory.write("attempt-claim.json", canonical({**binding, "claimed_at_utc": _instant()}))
-        api = _api(api)
+        api = _api(api, prepared)
         _post(directory, api, "authenticate", {}, binding)
         _, organization = _project(_post(directory, api, "projects/read", {"projectId": REFERENCE_PROJECT_ID}, binding), REFERENCE_PROJECT_ID)
         project_id, _ = _project(_post(directory, api, "projects/create", {"name": PROJECT_NAME, "language": "Py", "organizationId": organization}, binding), None, PROJECT_NAME, organization)
@@ -664,7 +760,7 @@ def status(control_directory, prepared_sha256, api=None):
         if len(polls) >= MAX_STATUS_POLLS:
             _fail("status_poll_budget")
         directory.write(f"status-claim-{len(polls) + 1:03d}.json", canonical(receipt))
-        api = _api(api)
+        api = _api(api, prepared)
         response = _post(directory, api, "backtests/list", {"projectId": receipt["project_id"], "includeStatistics": False}, _bind(prepared, prepared_sha256))
         rows = response.get("backtests")
         if (type(rows) is not list or len(rows) != 1 or any(type(row) is not dict for row in rows)
@@ -720,7 +816,7 @@ def read(control_directory, prepared_sha256, api=None):
         if not _same(directory.json("terminal.json"), {**receipt, "status": "Completed."}):
             _fail("result_not_completed")
         directory.write("result-read-claim.json", canonical(receipt))
-        api = _api(api)
+        api = _api(api, prepared)
         response = _post(directory, api, "backtests/read", {"projectId": receipt["project_id"], "backtestId": receipt["backtest_id"]}, _bind(prepared, prepared_sha256))
         row = response.get("backtest")
         if (type(row) is not dict or type(row.get("projectId")) is not int or row.get("projectId") != receipt["project_id"]

@@ -13,6 +13,7 @@ import csv
 import dataclasses
 import io
 import os
+import re
 import sys
 import zipfile
 from pathlib import Path
@@ -27,13 +28,15 @@ from research.analyst_revisions_v2.canonical import (
 )
 
 IdentityContinuityError = source.SharadarCaptureError
-SCHEMA = "arv2-seven-current-continuity-diagnostic-manifest-v1"
+SCHEMA = "arv2-seven-current-continuity-diagnostic-manifest-v2"
 INPUT_SCHEMA = "arv2-seven-public-figi-continuity-input-v2"
 DEFAULT_ARTIFACT_ROOT = source.REPOSITORY_ARTIFACTS_ROOT / "analyst_revisions_v2" / "identity_continuity"
 MAX_MEMBER_BYTES = 64 * 1024 * 1024
 MAX_HEADER_BYTES = 8192
 MAX_MANIFEST_BYTES = 128 * 1024
 MAX_INPUT_BYTES = public.MAX_INPUT_BYTES
+MAX_CUSIP_CANDIDATES = 32
+_CUSIP = re.compile(r"[A-Z0-9]{9}")
 VINTAGE_PATH = source.DEFAULT_ARTIFACT_ROOT / "arv2-sharadar-source-20260914T003329843989Z"
 VINTAGE_MANIFEST_SHA256 = "94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b"
 FALSE_FLAGS = tuple(dict.fromkeys(public.FALSE_FLAGS + current.FALSE_FLAGS + (
@@ -69,8 +72,57 @@ class LoadedContinuityDiagnostic:
     row_count: int
     vintage_missing_cusip_count: int
     current_missing_cusip_count: int
+    vintage_legacy_cusip_parser_qualified_count: int = 0
+    current_legacy_cusip_parser_qualified_count: int = 0
+    populated_cusip_set_equality_count: int = 0
     complete_price_identity_binding: bool = False
     formal_source_admitted: bool = False
+
+
+@dataclasses.dataclass(frozen=True)
+class ParsedCusipCandidates:
+    candidates: tuple[str, ...] = dataclasses.field(repr=False)
+    representation: str
+
+    @property
+    def absent(self) -> bool:
+        return self.representation == "absent"
+
+
+def _parse_cusip_candidates(value: object) -> ParsedCusipCandidates:
+    """Bridge-v2 valid-shape tokens only, not checksum-validated identities.
+
+    This interpretation never rewrites the original capture parser.
+    """
+    if type(value) is not str or not value.isascii() or len(value) > 10 * MAX_CUSIP_CANDIDATES - 1:
+        raise IdentityContinuityError("continuity CUSIP representation is invalid or exceeds bounds")
+    if value == "":
+        return ParsedCusipCandidates((), "absent")
+    if value != value.strip():
+        raise IdentityContinuityError("continuity CUSIP representation has forbidden outer whitespace")
+    if "," in value:
+        if " " in value:
+            raise IdentityContinuityError("continuity CUSIP representation mixes delimiters")
+        parts, representation = value.split(","), "comma_list"
+    elif " " in value:
+        parts, representation = value.split(" "), "ascii_space_list"
+    else:
+        parts, representation = [value], "single_code"
+    if (len(parts) > MAX_CUSIP_CANDIDATES or any(_CUSIP.fullmatch(part) is None for part in parts)
+            or len(set(parts)) != len(parts)):
+        raise IdentityContinuityError("continuity CUSIP representation has malformed, repeated or unsupported tokens")
+    return ParsedCusipCandidates(tuple(sorted(parts)), representation)
+
+
+def _legacy_cusip_parser_qualified(disposition, parsed: ParsedCusipCandidates) -> bool:
+    """Keep the original refusal; only the observed exact-space format qualifies."""
+    refused = "CUSIP_CANDIDATES_INVALID_OR_MISSING" in disposition.refusal_codes
+    if refused:
+        if parsed.representation not in {"absent", "ascii_space_list"} or disposition.cusip_candidates:
+            raise IdentityContinuityError("continuity CUSIP refusal is not the observed absent/parser-limited representation")
+    elif parsed.absent or parsed.representation == "ascii_space_list" or disposition.cusip_candidates != parsed.candidates:
+        raise IdentityContinuityError("continuity CUSIP capture/refusal binding is inconsistent")
+    return refused and parsed.representation == "ascii_space_list"
 
 
 @contextlib.contextmanager
@@ -216,22 +268,22 @@ def _vintage_rows(pins: VintagePins, *, synthetic: bool):
     return result
 
 
-def _current_cusip_missing(loaded):
+def _current_cusip_candidates(loaded):
     names = {binding.csv_file: current.MAX_RESPONSE_BYTES for binding in loaded.responses}
     with _held(loaded.artifact_path, names) as (_root, _fd, captured):
-        missing = {}
+        parsed = {}
         for binding in loaded.responses:
             payload = captured[binding.csv_file]
             if len(payload) != binding.csv_byte_count or sha256_bytes(payload) != binding.csv_sha256:
                 raise IdentityContinuityError("current identity CSV differs from its authenticated binding")
             rows = current._parse_csv(payload, binding.role, schema=current.SCHEMA_WITHOUT_FIGI)
             for row in rows:
-                if row["ticker"] in missing:
+                if row["ticker"] in parsed:
                     raise IdentityContinuityError("current raw identity projection is ambiguous")
-                missing[row["ticker"]] = row["cusips"] == ""
-        if set(missing) != set(public.TICKERS):
+                parsed[row["ticker"]] = _parse_cusip_candidates(row["cusips"])
+        if set(parsed) != set(public.TICKERS):
             raise IdentityContinuityError("current raw identity projection census is incomplete")
-    return missing
+    return parsed
 
 
 def _documents(*, public_artifact_path, expected_public_manifest_sha256,
@@ -255,31 +307,38 @@ def _documents(*, public_artifact_path, expected_public_manifest_sha256,
             or tuple((item.role, item.row_count) for item in price.responses) != (("stocks", 1), ("funds", 6))):
         raise IdentityContinuityError("continuity current identities do not bind the pinned seven-name price source")
     old, old_raw, excluded, vintage = _vintage_rows(vintage_pins, synthetic=synthetic)
-    missing_current = _current_cusip_missing(vendor)
+    parsed_current = _current_cusip_candidates(vendor)
     if any(tuple(item.ticker for item in rows) != public.TICKERS for rows in (old, vendor.identities, ref.identities)):
         raise IdentityContinuityError("continuity source censuses are not the exact seven roles")
     if (len({item.permanent_share_class_id for item in old}) != 7
             or len({item.permanent_share_class_id for item in vendor.identities}) != 7
             or len({item.composite_figi for item in old}) != 7):
         raise IdentityContinuityError("continuity source contains a cross-name identity collision")
+    if any(item.source_row_count != 1 for item in old + vendor.identities):
+        raise IdentityContinuityError("continuity source is missing or ambiguous")
+    parsed_old = {ticker: _parse_cusip_candidates(row["cusips"]) for ticker, row in old_raw.items()}
+    if set(parsed_old) != set(public.TICKERS):
+        raise IdentityContinuityError("continuity vintage raw candidate census is not exact")
     # Missing values in opposite snapshots must not mask known cross-vintage
     # ownership conflicts, including a direct stock versus its own ETF label.
     cusip_owners = {}
-    for item in old + vendor.identities:
-        for candidate in item.cusip_candidates:
-            cusip_owners.setdefault(candidate, set()).add(item.ticker)
+    for projection in (parsed_old, parsed_current):
+        for ticker, parsed in projection.items():
+            for candidate in parsed.candidates:
+                cusip_owners.setdefault(candidate, set()).add(ticker)
     if any(len(owners) > 1 for owners in cusip_owners.values()):
         raise IdentityContinuityError("continuity cross-vintage CUSIP ownership collision is refused")
     qualified = []
     allowed_old = {"BOUND_PRICE_DATE_OUTSIDE_SOURCE_PRICING_RANGE", "CUSIP_CANDIDATES_INVALID_OR_MISSING"}
     allowed_current = {"COMPOSITE_FIGI_INVALID_OR_MISSING", "CUSIP_CANDIDATES_INVALID_OR_MISSING"}
     for past, now, pub in zip(old, vendor.identities, ref.identities, strict=True):
-        old_missing = old_raw.get(past.ticker, {}).get("cusips") == ""
+        past_cusips, now_cusips = parsed_old[past.ticker], parsed_current[now.ticker]
+        old_missing, current_missing = past_cusips.absent, now_cusips.absent
+        old_parser_qualified = _legacy_cusip_parser_qualified(past, past_cusips)
+        current_parser_qualified = _legacy_cusip_parser_qualified(now, now_cusips)
         if (past.source_row_count != 1 or now.source_row_count != 1
                 or set(past.refusal_codes) - allowed_old or set(now.refusal_codes) - allowed_current
-                or "COMPOSITE_FIGI_INVALID_OR_MISSING" not in now.refusal_codes
-                or ("CUSIP_CANDIDATES_INVALID_OR_MISSING" in past.refusal_codes and not old_missing)
-                or ("CUSIP_CANDIDATES_INVALID_OR_MISSING" in now.refusal_codes and not missing_current[now.ticker])):
+                or "COMPOSITE_FIGI_INVALID_OR_MISSING" not in now.refusal_codes):
             raise IdentityContinuityError("continuity source has an actual invalid/ambiguous/conflicting identity")
         if (past.composite_figi != pub.composite_figi or now.composite_figi is not None
                 or past.permanent_share_class_id != now.permanent_share_class_id
@@ -288,7 +347,7 @@ def _documents(*, public_artifact_path, expected_public_manifest_sha256,
                 or past.first_price_date > past.last_price_date
                 or not now.first_price_date <= price.close_session <= now.last_price_date):
             raise IdentityContinuityError("continuity FIGI/permanent-class/role/category/currency/price-range comparison conflicts")
-        if not old_missing and not missing_current[now.ticker] and past.cusip_candidates != now.cusip_candidates:
+        if not old_missing and not current_missing and past_cusips.candidates != now_cusips.candidates:
             raise IdentityContinuityError("continuity populated CUSIP candidate sets conflict")
         codes = {"CURRENT_FIGI_NOT_SOURCE_PROVIDED", "VINTAGE_NOT_CURRENT_OR_POINT_IN_TIME",
                  "INDEPENDENT_PRICE_IDENTITY_BINDING_NOT_AUTHENTICATED"}
@@ -296,8 +355,12 @@ def _documents(*, public_artifact_path, expected_public_manifest_sha256,
             codes.add("VINTAGE_PRICE_RANGE_DOES_NOT_COVER_BOUND_CLOSE")
         if old_missing:
             codes.add("VINTAGE_CUSIP_ABSENT_CONTINUITY_UNKNOWN")
-        if missing_current[now.ticker]:
+        if current_missing:
             codes.add("CURRENT_CUSIP_ABSENT_CONTINUITY_UNKNOWN")
+        if old_parser_qualified:
+            codes.add("VINTAGE_LEGACY_CUSIP_PARSER_LIMITATION_QUALIFIED_NOT_CLEARED")
+        if current_parser_qualified:
+            codes.add("CURRENT_LEGACY_CUSIP_PARSER_LIMITATION_QUALIFIED_NOT_CLEARED")
         qualified.append({"ticker": pub.ticker, "role": pub.role,
             "diagnostic_status": "continuity_qualified_not_admitted",
             "vintage_source_row_sha256s": list(past.source_row_sha256s),
@@ -306,8 +369,12 @@ def _documents(*, public_artifact_path, expected_public_manifest_sha256,
             "qualification_codes": sorted(codes), "excluded_vintage_other_table_rows": excluded[pub.ticker],
             "public_figi_equals_actual_vintage_figi": True, "vendor_permanent_id_continuity_equal": True,
             "category_role_currency_continuity_equal": True, "current_price_range_covers_bound_close": True,
-            "cusip_continuity": "unknown_missing" if old_missing or missing_current[now.ticker] else "equal_populated_sets",
-            "vintage_cusip_absent": old_missing, "current_cusip_absent": missing_current[now.ticker],
+            "cusip_continuity": "unknown_missing" if old_missing or current_missing else "equal_populated_sets",
+            "vintage_cusip_absent": old_missing, "current_cusip_absent": current_missing,
+            "vintage_cusip_representation": past_cusips.representation, "current_cusip_representation": now_cusips.representation,
+            "vintage_cusip_candidate_count": len(past_cusips.candidates), "current_cusip_candidate_count": len(now_cusips.candidates),
+            "vintage_legacy_cusip_parser_qualified": old_parser_qualified,
+            "current_legacy_cusip_parser_qualified": current_parser_qualified,
             **dict.fromkeys(FALSE_FLAGS, False)})
     manifest = {"schema": SCHEMA, "artifact_id": output_name, "diagnostic_purpose": "current_public_QC_roundtrip_with_qualified_vendor_vintage_continuity",
         "source_mode": "offline_test_double" if synthetic else "production_source_bytes_offline",
@@ -319,6 +386,10 @@ def _documents(*, public_artifact_path, expected_public_manifest_sha256,
         "source_row_hash_semantics": "vintage_actual_fourteen_field_projections_and_current_physical_thirteen_field_rows_not_full_vintage_twenty_eight_field_rows",
         "requested_name_count": 7, "vintage_missing_cusip_count": sum(row["vintage_cusip_absent"] for row in qualified),
         "current_missing_cusip_count": sum(row["current_cusip_absent"] for row in qualified), "rows": qualified,
+        "vintage_legacy_cusip_parser_qualified_count": sum(row["vintage_legacy_cusip_parser_qualified"] for row in qualified),
+        "current_legacy_cusip_parser_qualified_count": sum(row["current_legacy_cusip_parser_qualified"] for row in qualified),
+        "populated_cusip_set_equality_count": sum(row["cusip_continuity"] == "equal_populated_sets" for row in qualified),
+        "bridge_cusip_representation_contract": "bounded_unique_nine_ASCII_alphanumerics_single_ASCII_space_or_comma_only_no_mixed_or_outer_whitespace",
         "private_host_qualifications_only": True, "original_full_identity_binder_unchanged": True,
         "source_semantics": "local_physical_byte_and_candidate_continuity_not_immutable_historical_availability_or_independent_identity",
         "qc_input_semantics": "public_origin_FIGI_strings_and_aggregate_artifact_hashes_only",
@@ -345,7 +416,9 @@ def _load(artifact_path, expected_continuity_manifest_sha256, *, synthetic, **pi
             raise IdentityContinuityError("continuity artifact differs from source evidence or external pin")
         manifest = require_canonical_json_bytes(manifest_bytes, "continuity manifest")
         result = LoadedContinuityDiagnostic(root, expected_continuity_manifest_sha256, root / "input.json",
-            sha256_bytes(input_bytes), 7, manifest["vintage_missing_cusip_count"], manifest["current_missing_cusip_count"])
+            sha256_bytes(input_bytes), 7, manifest["vintage_missing_cusip_count"], manifest["current_missing_cusip_count"],
+            manifest["vintage_legacy_cusip_parser_qualified_count"], manifest["current_legacy_cusip_parser_qualified_count"],
+            manifest["populated_cusip_set_equality_count"])
     return result
 
 
@@ -438,6 +511,7 @@ def _main(argv=None):
     print(f"artifact={loaded.artifact_path}\ncontinuity_manifest_sha256={loaded.continuity_manifest_sha256}")
     print(f"input={loaded.input_path}\ninput_sha256={loaded.input_sha256}\nrows={loaded.row_count}")
     print(f"vintage_missing_cusip_count={loaded.vintage_missing_cusip_count} current_missing_cusip_count={loaded.current_missing_cusip_count}")
+    print(f"vintage_legacy_cusip_parser_qualified_count={loaded.vintage_legacy_cusip_parser_qualified_count} current_legacy_cusip_parser_qualified_count={loaded.current_legacy_cusip_parser_qualified_count} populated_cusip_set_equality_count={loaded.populated_cusip_set_equality_count}")
     print("complete_price_identity_binding=false formal_source_admitted=false independently_reviewed=false decision_ready=false paper_ready=false orders_enabled=false")
     return 0
 

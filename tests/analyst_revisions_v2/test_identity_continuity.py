@@ -124,6 +124,171 @@ def documents(loaded):
     return json.loads((loaded.artifact_path / "manifest.json").read_bytes()), json.loads(loaded.input_path.read_bytes())
 
 
+SPACE_CANDIDATES = {
+    "QQQ": ("100000003", "200000003", "300000003"),
+    "REMX": ("100000006", "200000006", "300000006", "400000006"),
+}
+
+
+def candidate_lists(rows, *, separator=" ", reverse=False):
+    for row in rows:
+        if row["ticker"] in SPACE_CANDIDATES:
+            candidates = SPACE_CANDIDATES[row["ticker"]]
+            row["cusips"] = separator.join(reversed(candidates) if reverse else candidates)
+
+
+@pytest.mark.parametrize("value,representation,count", [
+    ("", "absent", 0), ("000000001", "single_code", 1),
+    ("200000003,100000003,300000003", "comma_list", 3),
+    ("300000003 100000003 200000003", "ascii_space_list", 3),
+    ("400000006 200000006 100000006 300000006", "ascii_space_list", 4),
+    (" ".join(f"{index:09d}" for index in range(32)), "ascii_space_list", 32),
+])
+def test_candidate_parser_accepts_exact_bounded_valid_shape_not_checksum_claims(value, representation, count):
+    parsed = adapter._parse_cusip_candidates(value)
+    assert parsed.representation == representation and parsed.absent is (count == 0)
+    assert len(parsed.candidates) == count and parsed.candidates == tuple(sorted(parsed.candidates))
+    assert "candidates=" not in repr(parsed)
+    for token in parsed.candidates:
+        assert token not in repr(parsed)
+
+
+@pytest.mark.parametrize("value", [None, 1, b"000000001", " ", " 000000001", "000000001 ",
+    "000000001  000000002", "000000001\t000000002", "000000001\n000000002",
+    "000000001\r000000002", "000000001\u00a0000000002", "000000001, 000000002",
+    "000000001,000000002 000000003", "000000001;000000002", "000000001|000000002",
+    "000000001,", ",000000001", "000000001,,000000002", "000000001 000000001",
+    "000000001,000000001", "00000000", "0000000000", "00000000a", "00000000é",
+    " ".join(f"{index:09d}" for index in range(33))])
+def test_candidate_parser_refuses_invalid_or_unrecognized_nonempty_representations(value):
+    with pytest.raises(adapter.IdentityContinuityError):
+        adapter._parse_cusip_candidates(value)
+
+
+def test_observed_three_and_four_candidate_lists_authenticate_all_seven_without_admitting(tmp_path):
+    assert len(" ".join(SPACE_CANDIDATES["QQQ"])) == 29
+    assert len(" ".join(SPACE_CANDIDATES["REMX"])) == 39
+    pins = fixture(tmp_path, old_missing=(), current_missing=(), old_change=candidate_lists,
+                   current_change=lambda rows: candidate_lists(rows, reverse=True))
+    loaded = build(tmp_path, pins)
+    assert load(loaded, pins) == loaded
+    assert loaded.vintage_missing_cusip_count == loaded.current_missing_cusip_count == 0
+    assert loaded.vintage_legacy_cusip_parser_qualified_count == loaded.current_legacy_cusip_parser_qualified_count == 2
+    assert loaded.populated_cusip_set_equality_count == 7
+    document, public_input = documents(loaded)
+    assert document["schema"] == "arv2-seven-current-continuity-diagnostic-manifest-v2"
+    for row in document["rows"]:
+        assert row["cusip_continuity"] == "equal_populated_sets"
+        assert row["vintage_cusip_absent"] is row["current_cusip_absent"] is False
+        assert all(row[flag] is False for flag in adapter.FALSE_FLAGS)
+        assert not any("ABSENT" in code for code in row["qualification_codes"])
+        if row["ticker"] in SPACE_CANDIDATES:
+            for side in ("vintage", "current"):
+                assert row[f"{side}_cusip_representation"] == "ascii_space_list"
+                assert row[f"{side}_cusip_candidate_count"] == len(SPACE_CANDIDATES[row["ticker"]])
+                assert row[f"{side}_legacy_cusip_parser_qualified"] is True
+                assert "CUSIP_CANDIDATES_INVALID_OR_MISSING" in row[f"{side}_source_refusal_codes"]
+                assert f"{side.upper()}_LEGACY_CUSIP_PARSER_LIMITATION_QUALIFIED_NOT_CLEARED" in row["qualification_codes"]
+        assert "COMPOSITE_FIGI_INVALID_OR_MISSING" in row["current_source_refusal_codes"]
+        assert "BOUND_PRICE_DATE_OUTSIDE_SOURCE_PRICING_RANGE" in row["vintage_source_refusal_codes"]
+    assert all(document[flag] is False for flag in adapter.FALSE_FLAGS)
+    assert public_input["schema"] == adapter.INPUT_SCHEMA
+    assert b"cusip" not in loaded.input_path.read_bytes().lower()
+    # Candidate values themselves stay out of both new documents, even the private manifest.
+    for candidates in SPACE_CANDIDATES.values():
+        for candidate in candidates:
+            assert candidate.encode() not in loaded.input_path.read_bytes()
+            assert candidate.encode() not in (loaded.artifact_path / "manifest.json").read_bytes()
+    original_output = tmp_path / "original-input.json"
+    with pytest.raises(adapter.public.OpenFigiIdentityCaptureError):
+        adapter.public._bind_public_identity_input_for_test(output_path=original_output,
+            public_artifact_path=pins["public_artifact_path"], expected_public_manifest_sha256=pins["expected_public_manifest_sha256"],
+            sharadar_identity_artifact_path=pins["current_artifact_path"],
+            expected_sharadar_identity_manifest_sha256=pins["expected_current_manifest_sha256"],
+            price_artifact_path=pins["price_artifact_path"], expected_price_manifest_sha256=pins["expected_price_manifest_sha256"])
+    assert not original_output.exists()
+
+
+@pytest.mark.parametrize("space_side", ["old", "current"])
+def test_exact_comma_vs_space_candidate_sets_and_reordering_are_equivalent_not_source_rewrites(tmp_path, space_side):
+    pins = fixture(tmp_path, old_missing=(), current_missing=(),
+        old_change=lambda rows: candidate_lists(rows, separator=" " if space_side == "old" else ",", reverse=True),
+        current_change=lambda rows: candidate_lists(rows, separator=" " if space_side == "current" else ","))
+    loaded = build(tmp_path, pins)
+    assert loaded.populated_cusip_set_equality_count == 7
+    assert loaded.vintage_missing_cusip_count == loaded.current_missing_cusip_count == 0
+    assert loaded.vintage_legacy_cusip_parser_qualified_count == (2 if space_side == "old" else 0)
+    assert loaded.current_legacy_cusip_parser_qualified_count == (2 if space_side == "current" else 0)
+    doc, _input = documents(loaded)
+    for row in doc["rows"]:
+        if row["ticker"] in SPACE_CANDIDATES:
+            assert ("CUSIP_CANDIDATES_INVALID_OR_MISSING" in row["vintage_source_refusal_codes"]) is (space_side == "old")
+            assert ("CUSIP_CANDIDATES_INVALID_OR_MISSING" in row["current_source_refusal_codes"]) is (space_side == "current")
+
+
+@pytest.mark.parametrize("side", ["old", "current"])
+def test_authenticated_nonempty_malformed_lists_refuse_instead_of_becoming_absent(tmp_path, side):
+    def malformed(rows):
+        candidate_lists(rows)
+        rows[2]["cusips"] = "100000003  200000003 300000003"
+    pins = fixture(tmp_path, old_missing=(), current_missing=(),
+        old_change=malformed if side == "old" else candidate_lists,
+        current_change=malformed if side == "current" else candidate_lists)
+    with pytest.raises(adapter.IdentityContinuityError, match="malformed"):
+        build(tmp_path, pins)
+    assert not (tmp_path / "output").exists()
+
+
+@pytest.mark.parametrize("side", ["old", "current"])
+def test_populated_multicandidate_set_mismatch_refuses_with_legacy_parser_refusal_retained(tmp_path, side):
+    def changed(rows):
+        candidate_lists(rows)
+        rows[2]["cusips"] = "100000003 200000003 900000003"
+    pins = fixture(tmp_path, old_missing=(), current_missing=(),
+        old_change=changed if side == "old" else candidate_lists,
+        current_change=changed if side == "current" else candidate_lists)
+    with pytest.raises(adapter.IdentityContinuityError, match="populated CUSIP"):
+        build(tmp_path, pins)
+    assert not (tmp_path / "output").exists()
+
+
+@pytest.mark.parametrize("collision_mode", ["old_same_snapshot", "current_same_snapshot",
+    "old_stock_current_fund", "current_stock_old_fund"])
+def test_multicandidate_merged_ownership_guards_stock_fund_collisions_hidden_from_legacy_parser(tmp_path, collision_mode):
+    def changed(rows):
+        candidate_lists(rows)
+        rows[2]["cusips"] = "000000001 200000003 300000003"
+    if collision_mode == "old_same_snapshot":
+        options = dict(old_change=changed, current_change=candidate_lists)
+    elif collision_mode == "current_same_snapshot":
+        options = dict(old_change=candidate_lists, current_change=changed)
+    elif collision_mode == "old_stock_current_fund":
+        options = dict(old_change=candidate_lists, current_change=changed, current_missing=("QCOM",))
+    else:
+        options = dict(old_change=changed, current_change=candidate_lists, old_missing=("QCOM",))
+    options.setdefault("old_missing", ())
+    options.setdefault("current_missing", ())
+    pins = fixture(tmp_path, **options)
+    with pytest.raises(adapter.IdentityContinuityError, match="cross-vintage CUSIP"):
+        build(tmp_path, pins)
+    assert not (tmp_path / "output").exists()
+
+
+def test_v1_continuity_manifest_cannot_be_silently_accepted_under_new_v2_pin(tmp_path):
+    pins = fixture(tmp_path)
+    loaded = build(tmp_path, pins)
+    document, public_input = documents(loaded)
+    document["schema"] = "arv2-seven-current-continuity-diagnostic-manifest-v1"
+    payload = canonical_json_bytes(document)
+    digest = sha256_bytes(payload)
+    public_input["continuity_manifest_sha256"] = digest
+    write_private(loaded.artifact_path / "manifest.json", payload)
+    write_private(loaded.artifact_path / "manifest.sha256", (digest + "\n").encode())
+    write_private(loaded.input_path, canonical_json_bytes(public_input))
+    with pytest.raises(adapter.IdentityContinuityError):
+        load(loaded, pins, digest)
+
+
 def test_actual_source_row_pins_public_only_input_and_all_refusals_retained(tmp_path):
     pins = fixture(tmp_path)
     loaded = build(tmp_path, pins)
@@ -481,7 +646,7 @@ def test_held_current_csv_replacement_refused_after_parse(tmp_path, monkeypatch)
         expected_manifest_sha256=pins["expected_current_manifest_sha256"], price_artifact_path=pins["price_artifact_path"])
     monkeypatch.setattr(adapter.current, "_parse_csv", changed)
     with pytest.raises(adapter.IdentityContinuityError):
-        adapter._current_cusip_missing(vendor)
+        adapter._current_cusip_candidates(vendor)
 
 
 def test_production_cannot_use_synthetic_vintage_or_evidence(tmp_path, monkeypatch):

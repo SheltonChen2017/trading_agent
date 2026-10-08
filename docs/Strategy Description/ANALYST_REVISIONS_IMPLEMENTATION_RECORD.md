@@ -37675,3 +37675,60 @@ directory `artifacts/analyst_revisions_v2/identity_qc/R284A1-20261008`.
 Record the resulting continuity/input/source/profile/prepared hashes before
 the first launch claim. These offline operations add no QC attempt, look or
 cell, and they do not make the seven source identities fully admitted.
+
+### 263.12 Actual offline refusal and bounded representation correction
+
+At `7c8011a3e00790c20499c7761d7fc087400888b8`, root executes the frozen
+production bridge once under strict network denial. It exits 1 with
+`continuity source has an actual invalid/ambiguous/conflicting identity`,
+before output allocation/publication. No prepared package, QC client, key
+access, cloud operation, attempt, look or cell results from this refusal.
+
+Exact pinned-source inspection identifies `ARV2I263-004` (P2): the historical
+capture parser recognizes comma-separated CUSIPs only, while the authenticated
+QQQ and REMX vintage fields contain respectively three and four nine-character
+uppercase alphanumeric tokens separated by single ASCII spaces. The fields
+are nonempty (29 and 39 characters). Both current rows retain the same
+`CUSIP_CANDIDATES_INVALID_OR_MISSING` code, but their actual normalized equality
+must still be checked by the corrected production bridge. No identifier values
+are printed or submitted elsewhere. The bridge's fail-closed refusal worked;
+the earlier five-set comparison did not establish absence of the other two.
+
+This qualifies the wording in 263.10 and 263.11: the refusal code alone did not
+prove missing CUSIPs. Those paragraphs remain historical observations rather
+than being silently rewritten. Public Sharadar TICKERS documentation describes
+`cusips` as text but does not establish the observed separator convention.
+The bounded representation support below is based on authenticated source
+bytes, not an asserted vendor documentation guarantee.
+
+**ARV2OD263-I (delegated decision, before corrected publication):** version only
+the separate continuity manifest to v2 and accept either the existing exact
+comma-list representation or the observed exact single-ASCII-space-list
+representation. Require bounded, unique, nine-character uppercase ASCII
+alphanumeric tokens; reject mixed delimiters, duplicate/malformed tokens,
+outer/repeated/other whitespace. Authenticate and parse the raw old and current
+fields, compare all seven sets, and apply merged cross-vintage ownership
+collision checks. Preserve original capture refusal codes with an explicit
+parser-representation limitation for recognized nonempty space lists. Truly
+empty data remains unknown and malformed data still refuses. Do not modify
+either frozen capture parser, any original manifest, the original full binder,
+or any formal admission requirement. No new provider request is authorized or
+needed for this correction. Freeze and test the corrected bridge before a new
+offline publication attempt; the QC input v2 remains public-only and its actual
+new aggregate manifest/input hashes must be frozen before any QC contact.
+
+Root reads the complete correction and its tests. Final bridge source SHA-256
+`08092eeae3d3d5614a6e4cfd4ba59e25ecb9695d96569da9b1bd1eb78306a907`;
+test SHA-256
+`c05eee9b20965bfd1e78ff3083ab0d95acdafccb54188655342cb2d4bd157684`.
+Root's strict-network-denied final seven-file focused selection is **775 passed
+in 16.48s**: 119 continuity, 263 QC, 125 current identity, 83 public reference,
+99 price and 86 record/active-document. These supersede the draft 732-selection
+for the modified bridge, not additional distinct tests. Token validation is
+shape validation, not a checksum or independent identifier authority claim.
+The current/public capture scripts and QC runner retain their 263.9/263.8/263.11
+hashes; the original full binder continues refusing the same incomplete current
+source in regression tests. Root confirms both proposed output directories are
+absent after the failed build and `git diff --check` passes. Freeze this corrected
+code and record before the same explicitly scoped offline build/prepare steps
+in 263.11. No contact or attempt follows from local test success alone.

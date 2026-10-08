@@ -1,34 +1,22 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 151 COMPLETES THE ACTUAL ORIGINAL-PLUS320 REPLAY:
-19,846 REQUEST-BOUND CUSTODY RECORDS / 99,394, WITH 79,548 UNATTEMPTED.
-IT ALSO ADDS A SEPARATE INTERVAL-EARNINGS DIAGNOSTIC AND FACT-BOUND
-CANONICAL QC CONFIGURATION/NATIVE-EVIDENCE SUCCESSOR.
-SECTION 149 COMPLETED THE ORIGINAL-PARTITION/FIRST64 COMBINED
-REPLAY AND A FRESH 256-PARENT CAPTURE: 256 HTTP-200 BODIES, 2,011,446
-RETAINED BYTES, 256 SUCCESSFUL OFFLINE PROJECTIONS, ZERO GRAMMAR QUARANTINES.
-THE PRE-CAPTURE COMBINED REPLAY ESTABLISHED 19,590 REQUEST-BOUND PARENTS;
-THE SUBSEQUENT 256 WERE SEPARATELY VERIFIED AND THEN RECONCILED IN151.
-VERSIONED EARNINGS SEPARATION REMOVES FORECAST DATA FROM PRIMARY CAUSAL
-PREREQUISITES, NOT THE REQUIRED ACTUAL-RELEASE DIAGNOSTIC. SECTION 147
-RECORDS ONE COMPLETED BOUNDED QC-NATIVE RESEARCH
-ACCESS DIAGNOSTIC: THREE HISTORY CALLS, SOURCE TRADE/QUOTE COUNTS 12/116
-AND CLOCK COUNT 390; ZERO BACKTEST LAUNCHES OR ECONOMIC-VALUE EXPORT.
-CONNECTED PROFILE RESOLVES SEC CONTACT. FRESH FIRST-64 V4 CAPTURE COMPLETED
-64 REQUEST-BOUND BODIES/504,050 BYTES AND INDEPENDENT JOURNAL REPLAY;
-ALL 64 OWNERSHIP-XML PROJECTIONS PASSED READ-ONLY REPLAY, ZERO QUARANTINES.
-FULL-STUDY READINESS REMAINS BLOCKED BY SUBSTANTIVE HISTORICAL
-SOURCE/PIT/IDENTITY/ACTUAL-RELEASE INPUTS, AS QUALIFIED IN149.8 AND152,
-NOT ROUTINE APPROVAL OR CLAUDE. SUPPLIED
-SHARADAR AUDIT AND ONE PURCHASED EARNINGS ACCESS REMAIN AS RECORDED.
-CONTINUOUS BUILD/CLAUDE-WAIT WAIVER REMAINS; NO SOURCE/PIT/RIGHTS/LOOK OR
-READINESS PROMOTION IS INFERRED. EARLIER 83,657-ROW ALL-QUARANTINE RESULT,
-FOUR TOPICAL P2 FINDINGS, SEVEN D23 NONEXACT QUARTERS AND BOTH FINAL ACCESS
-CLASSIFICATIONS STAND. FOUR V3 FILES AND V1/SCALE/PILOT STAY FROZEN;
-V3 REMAINS 1,846/1,847; ORIGINAL UNION BASELINE IS 19,526/99,394.
-320 NEW V4 PARENTS ARE CAPTURED/PROJECTED ACROSS TWO RUNS; REQUEST
-ACCOUNTING LEAVES 79,548 ORIGINALLY-UNATTEMPTED PARENTS WITHOUT NEW DISPATCH.
-NO STRATEGY LOOK, BACKTEST LAUNCH OR TRADING. NOT BACKTEST-READY.**
+Status: **SECTION 153 RECORDS CLAUDE'S REVIEW OF THE 17 CODEX COMMITS IN
+`d05e0bc4..444c9a73` (SECTIONS 136-152, THE OWNER-WAIVED CONTINUOUS BUILD): ALL
+ACCEPTED, THREE AFTER CORRECTION IN `117de00d` (CANONICAL DECIMAL HELPER IN THE
+REGISTERED ANALYSIS; TYPED REFUSAL IN THE INVENTED RECONCILIATION ENTRY;
+TRIPWIRE RULE EXTENDED TO THE URLLIB TRANSPORTS; THREE GUARDS PINNED). THE
+PUSHED HEAD FAILED THREE REPOSITORY GUARDS THAT CODEX'S SELECTIONS NEVER RAN; ONE
+IS FIXED HERE, TWO REMAIN RED UNTIL INTEGRATION ADDS THE HOSTED `QuantConnect`/
+`IPython` IMPORTS TO THE SEP-2 MANIFEST (`IBSH-CR02`, SHARED, LANE-CAUSED). BOTH
+FRESH SEC CAPTURE JOURNALS (64 AND 256 PARENTS) REPLAY INDEPENDENTLY; NO
+CONTACT STRING IS IN GIT OR THE JOURNALS. 19,846 OF 99,394 PARENTS ARE
+REQUEST-BOUND, 79,548 UNATTEMPTED; V3 REMAINS 1,846 OF 1,847; THE FOUR V3
+CUSTODY FILES AND V1/SCALE/PILOT STAY FROZEN; STRICT D23 RETAINS SEVEN
+NON-EXACT QUARTERS. NOT BACKTEST-READY (147.6, 149.8, 152.1). CODEX
+COUNTER-REVIEWS THE TWO CLAUDE COMMITS. BOTH FINAL ACCESS CLASSIFICATIONS STAND
+WITHOUT RETROACTIVE APPROVAL. NO NEW SEC/PROVIDER/CREDENTIAL/LICENSED-ROW,
+OUTCOME, QC, BACKTEST, BROKER, CAPITAL, ORDER, PAPER/LIVE, DEPLOYMENT OR TRADING
+AUTHORITY. LOOKS 0/0/0.**
 
 Branch: `codex/strategy-insider-buying`
 
@@ -262,6 +250,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex continuous owner-waived source/native build | Published start `4c204aa60951896a8ba02570321d19227a8aebe7`; incoming range empty; first-prefix candidate `e900c7a90d326cd81df952684b0c583ad8ffb639`; projection candidate `23c7a11d53a8d1c457bac34bdebe977d3d567d00`; this separate observed handoff | One hosted native-count diagnostic, actual fresh first-64 SEC capture and completed read-only projection | Connected profile contact used privately; exact QC cell executed once with 12/116/390 counts/three History completions. Committed isolated partition replay then 64 HTTP-200 bodies/504,050 bytes, independently replayed; all 64 XML projections passed, zero quarantines. No economic export, old-v3 write/retry or Claude pause. | Main integrated focused 876 passed; six memory compilations, historical equality; final boundary/document135 passed14.05s. Actual59-module selector/16 source-view reads,345.127s dispatch span,journal0.26s,source-onlyprojection0.512s/55entries54paths; hashes/custody in147. No full suite or strategy backtest. | Engineering findings corrected as147.8; four topical P2/shared issue OPEN, both historical access classifications unchanged. Partial capture/projection is not PIT/class/full-population/calendar readiness; no combined union promotion. | Completed available bounded source/native steps; real full-study missing inputs in147.6 block readiness, not another approval. Preserve frozen window/quarantines and document delegated no-fabrication disposition; one combined matching-lane push after exact-hash handoff. No monitor rearm, duplicate purchase or claim of project completion. |
 | 2026-10-08 | Codex authorized continuous source/causal build | Published start `1c50d1ba2045e66e3bf714be94a9ee89c6da547d`; incoming range empty; implementation `16d60b2b915c708e3c3d792c312cec6031f1d060`; unpublished section150 checkpoint | Actual combined first64 closure, next256 one-shot continuation, separately versioned retrospective earnings sensitivity | Full original/first64 replay establishes19590 request-bound parents and79804 remaining before capture; fresh256 allHTTP200,2011446 retained bytes; independent replay projects256/256 with zero grammar quarantines. No post256 full union was run in149. | Main focused310 capture/selector and406 earnings/affected checks passed;135 boundaries passed;10 files memory-compiled; four historical bytes unchanged. Actual receipts and precise execution lineage in149.7. | Draft source-binding, journal/CLI consistency, precision and ordering defects corrected. Four topical P2/shared finding remain OPEN. Earnings correction does not manufacture historical actual releases or activate production outcomes. | Continued in151 under the same authorization and single-push round. Remaining substantive inputs and supplier qualification in149.8; not another routine approval or Claude wait. No old-v3 resume, monitor rearm or readiness claim. |
 | 2026-10-08 | Codex continued source/earnings/native engineering and actual reconciliation | Implementation `e52c7388de142c473787aac649dc11436d0fe9db`; separate section152 handoff; no incoming review | Read-only original-plus320 reconciliation, registered interval diagnostic, fact-bound canonical configured-source/native successor | Actual clean committed replay passed738.111955875s;19,846/99,394 request-bound custody,79,548 remaining;320 complete projections across two exact runs, whole-claim inventory preserved. No dispatch in this replay. | Main182 reconciliation/affected,236 activation/affected,134 interval/affected and135 boundary/document checks pass; six memory compilations;72 final preregistration checks. Internal peer59 reconciliation and56 activation pass. Actual124-source inventory/64-path trace and receipt in151.7. | Genuine source-pin, typed-refusal, final-body-custody, AMC chronology and operation-expiry findings corrected; separate guard reversals attributed. Initial nested-Seatbelt launch refused before replay; unchanged intended topology then passed. Four topical P2/shared issue stay OPEN. | Publish all accumulated commits once after this separate exact-hash handoff. Genuine archive/source/identity/entitlement inputs remain necessary; no invented time, narrowed population, retroactive approval, old-v3 resume, new Claude wait or readiness claim. |
+| 2026-10-08 | Claude review | `444c9a73` -> `117de00d` (Decimal helper, typed refusal, tripwire extension, 3 pins) -> this review record | Independent review of the owner-waived continuous build, sections 136-152 (`d05e0bc4..444c9a73`, 17 commits, 0 merges, 31 modules and 30 test files) | Read every record section; read the SEC capture loop, entry points, verifier and CLI, the event clock, the provider transport and the reconciliation refusals line by line; the rest by tests, mutants, hashes and replays. Replayed both fresh capture journals read-only (64/64/504,050 B; 256/256/2,011,446 B), hashed every private receipt and the 2006Q1 envelopes against the record, verified no contact string in Git or journals, reconciled 54 file hashes. 18 guard mutants. | Pushed `444c9a73`, network denied: complete suite (3.13) **12,812 passed, 3 failed, 38 skipped**; the 30 new test files (3.12) **2,272 passed**. Mutants **12 of 18** caught as pushed, **15 of 18** after (3 redundant). After the fix: affected files **449 passed** both Pythons, gate **137** both, compileall and diff-check clean. Final code tree, complete suite (3.13) **12825 passed, 2 failed (both `IBSH-CR02` manifest guards), 38 skipped**. **0 looks**. | `IBSUITE-CR01` P2 closed in `117de00d`; `IBSH-CR02` P2 shared/lane-caused OPEN (two repository guards red until the SEP-2 manifest names the hosted imports); `IBTEST-CR04`, `IBREC-V4-CR01`, `IBTEST-CR05` P3 closed; `IBREC-HSVCCR02` accepted against this reviewer. Four topical P2 open. No open P0 or P1. | Codex counter-reviews `117de00d` and this record. The two manifest guards stay red until integration; the lane must not edit `architecture/`. Not backtest-ready for the factual reasons in 147.6, 149.8 and 152.1. No outcome, QC, paper, or trading step is inferred. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -21621,3 +21610,227 @@ all receipt counts/claims/partition/preview identities and the measured
 supervisor interval. No accuracy correction was needed. That verification
 performed no raw-parent read, full replay, tests, edits or provider call, and
 does not independently authenticate SEC/account facts or claim Claude review.
+
+## 153. Claude review - sections 136-152: the owner-waived continuous build (2026-10-08 UTC)
+
+Reviewer: Claude, in the lane worktree `trading_agent__insider_buying` on
+`codex/strategy-insider-buying`. No branch, worktree, fork, or handoff was
+created or switched to. The watcher armed after the section-135 push saw one
+push land at 01:38 local time; after `git fetch`, local and remote were both
+`444c9a737dfc8f4a2c4d96c0469d98708105f529` and the worktree was clean. The
+remote stayed at `444c9a73` for the whole review.
+
+Range: `d05e0bc4..444c9a73`, **17 Codex commits, 0 merges**, pushed by Codex
+in several rounds under the owner's recorded waiver of waiting for review
+(139.1). It adds 31 research modules and 30 test files (about 31,000 lines)
+and changes this record; it changes no existing production file, and the
+four custody files still equal their `aa0d635` blobs. No tracked file under
+`artifacts/` was added; every private receipt named below is git-ignored.
+
+Authority: sections 137, 139, 141, 145, 147 and 149 record owner directions
+("yes approved. proceed", "proceed without claude review", "build in single
+round until done", "proceed. you should have my inbox", "authorized. plz
+proceed", "when done, push only once"). This reviewer witnessed none of them
+and takes them as recorded. Under them Codex made **320 fresh SEC requests**
+(64 + 256, sections 147.4 and 149.7) with the owner's connected-profile
+address as the identifying contact, **one** purchased-Earnings request
+(145.4), **two** provider metadata requests (143.2) and **one** hosted QC
+Research cell with three native History calls (147.2). No new authority
+follows from this section.
+
+### 153.1 Review depth, stated plainly
+
+Every record section (136-152) was read in full. Code read line by line: the
+SEC capture dispatch loop and entry points (`_capture`, the observed and
+invented entries, the read-only journal verifier and the CLI; 355 lines), the
+event clock (all 371 lines), the provider transport's `_default_transport`,
+the reconciliation refusals around its registry and preview checks, and the
+tripwire scan. The remaining modules were reviewed through their tests, the
+suites in 153.5, hash reconciliation, boundary greps, independent receipt
+replays and 18 guard mutants, not line by line. That is less depth per line
+than earlier rounds, which is the cost of reviewing seventeen commits at
+once; the owner's waiver changed when the review happened, not whether.
+
+### 153.2 Commit dispositions
+
+| Commit | Change | Claude disposition |
+|---|---|---|
+| `6d774371` | Section 136 (counter-review of 135) | **Accepted.** `IBREC-HSVCCR02` is correct against this reviewer: twelve source-hash sites in eleven modules (the executor contributes two), not twelve modules. |
+| `b0efb312` | 2006Q1 preparation candidate, launcher, 125 tests, section 137 | **Accepted.** |
+| `932f30c6` | Section 138 (observed 2006Q1 preparation) | **Accepted.** The private root exists (486 MB); the assessment and completion envelopes hash to 138.2's `402fa186...` (63,409,968 bytes) and `d05e0345...` (3,334 bytes). |
+| `b406c5b8` | Evidence pipeline, study package, v2 downstream, isolation launcher, section 139 | **Accepted.** |
+| `1bfe1b1f` | Section 140 (observed read-only downstream replay) | **Accepted.** |
+| `f276f2f6` | Event clock, source stream, stream pipeline, manifest, collection, registered analysis, QC export adapter, QC canonical candidate, package extension, section 141 | **Accepted after correction in `117de00d`.** Three bare `Decimal(str(...))` sites in the registered analysis fail the repository's Decimal guard (153.3, `IBSUITE-CR01`). Event clock read in full; two of its PIT guards had no isolating test (153.4). |
+| `59ef6620` | Section 142 | **Accepted.** |
+| `195012fd` | Provider metadata transport/audit, reference identity, rights evidence, section 143 | **Accepted after the test-rule extension in `117de00d`.** These transports open through `urllib`; the lane's connection-tripwire rule only knew the SEC transports and `http.client` patches (153.4, `IBTEST-CR04`). |
+| `f0c5b48d` | Section 144 | **Accepted.** |
+| `3e21c6db` | Supplied Sharadar audit, Benzinga earnings access, QC native probe, section 145 | **Accepted; one lane-caused shared-guard failure recorded, not fixed here.** The hosted probe imports `QuantConnect` and `IPython` inside its QC-only functions; the repository's dependency-manifest guard refuses them as undeclared (153.3, `IBSH-CR02`). |
+| `4c204aa6` | Section 146 | **Accepted.** |
+| `e900c7a9` | v4 selection and first-prefix capture, section 147.1-147.4 | **Accepted.** Dispatch loop read in full (153.6); journal replayed independently (153.5). |
+| `23c7a11d` | v4 projection, section 147.5-147.8 | **Accepted.** Receipt hash reproduced. |
+| `1c50d1ba` | Section 148 | **Accepted.** |
+| `16d60b2b` | Combined selector, continuation capture, realized-earnings diagnostic, causal/earnings separation, section 149 | **Accepted.** Continuation journal replayed independently with reprojection (153.5). |
+| `e52c7388` | Reconciliation, interval-timing diagnostic, QC canonical activation, section 151 | **Accepted after correction in `117de00d`.** The invented reconciliation entry let a filesystem error escape untyped (153.4, `IBREC-V4-CR01`). |
+| `444c9a73` | Section 152 | **Accepted.** Its request accounting (320 new parents, 19,846 of 99,394 request-bound, 79,548 unattempted) matches the replayed receipts. |
+
+Rating of this round: **7 of 10.** The engineering is careful and its
+limits are stated honestly throughout; the deductions are that the pushed
+branch fails three repository guards that Codex's focused selections never
+ran (the complete suite is the lane's only backstop and Codex does not run
+it), and that two acquisition-side and two PIT-side guards had no test.
+
+### 153.3 Findings that fail repository guards
+
+**`IBSUITE-CR01` (P2, closed in `117de00d`).** `backtest_registered_analysis.py`
+lines 276, 277 and 773 used bare `Decimal(str(...))`, which
+`tests/test_decimal_conversion_guard.py` forbids outside the money helpers
+(`Decimal` accepts NaN and Infinity literals and raises on comparison). The
+correction uses `data.financial_primitives.to_decimal`, which keeps the
+`str()` path and refuses non-finite values. The guard test is the regression:
+it fails on `444c9a73` and passes after; the 1,235 registered-analysis tests
+still pass.
+
+**`IBSH-CR02` (P2, shared/out of lane, lane-caused; OPEN).**
+`insider_buying_qc_native_access_probe.py` imports `QuantConnect` and
+`IPython` inside its hosted-only functions. `test_project_separation_entrypoints.py::test_product_dependency_manifests_cover_actual_imports`
+walks every import node of the `strategy_research` product and refuses them
+as undeclared third-party roots, and
+`test_sep2_definition_of_done_is_reconstructed_not_self_asserted` fails with
+it. The declaration belongs in
+`architecture/entry_points.json` (`platform_provided_imports.strategy_research`,
+which already lists `AlgorithmImports`); that file has never been edited on a
+lane branch and is a shared SEP-2 artifact, so the two-name addition is
+recorded for integration rather than made here. Until then the complete
+suite is red by exactly these two tests on both Pythons.
+
+### 153.4 Findings corrected in `117de00d`
+
+**`IBTEST-CR04` (P3, tests only).** The connection-tripwire rule
+(`test_insider_buying_lane_import_boundary.py`) recognized only the two SEC
+transport names, `_fetch_sec`, and `http.client.HTTPSConnection` patches.
+The provider and earnings transports share the name `_default_transport` and
+open through `urllib.request.build_opener`, so a test reaching them without a
+patch would not have been flagged. The rule now treats `_default_transport`
+as a direct transport and a `build_opener` patch (attribute or dotted-string
+form) as its connection patch; patching `urlopen` does not count, because the
+transports open through the opener they build. Eight controls (five must-flag,
+three must-accept) fail on the pushed scan and pass after; the real scan still
+finds every direct transport test and no offender.
+
+**`IBREC-V4-CR01` (P3).** `reconcile_invented_capture_inventory` did not wrap
+unexpected exceptions, unlike the observed entry: with a registry of the
+right count but one completed run's claim renamed, the capture verifier's
+`FileNotFoundError` escaped untyped. The invented entry now refuses with
+`ReconciliationV4Error` like the observed one; the renamed-claim test fails
+on the pushed module and passes after.
+
+**`IBTEST-CR05` (P3, tests only).** Four guards had no isolating control: the
+observed-mode check that `_capture` runs only with a genuinely replayed
+selection and the real SEC transport (`C05`), the event clock's requirement
+that a security mapping be known no later than public availability (`E02`, a
+point-in-time guard), the v3 context rule that a history bar known exactly
+at the decision cutoff is refused (`E03`), and the reconciliation registry
+and preview refusals (`R01`, `R02`; see below). Pins now catch `C05`, `E02`
+and `E03`.
+
+Redundant by construction, not gaps: `E04` (the calendar already orders
+opens, so the first open after acceptance is preceded by one at or before
+it), `R01` and `R02` (each completed run's claims are verified by the capture
+replay before the registry comparison, and the preview is drawn from the
+remaining partition class, which excludes claimed requests), and `B01` (the
+raw-byte credential screen precedes decoded-string screens that catch every
+echo form the suite exercises).
+
+| Guard mutants (18) | As pushed (`444c9a73`) | After `117de00d` |
+|---|---|---|
+| Capture, continuation, reconciliation, event clock, activation, interval, provider, earnings | 12 caught, 6 survived | 15 caught, 3 redundant by construction |
+
+### 153.5 Independent reproduction and validation
+
+- **Private receipts (contents never printed):** both capture run roots exist
+  (mode 700, 194 and 770 files), git-ignored; `complete.json` hashes
+  `f93c844f...` (9,101 bytes) and `3112a6d8...` (33,319 bytes); projection
+  receipts `3a53e91b...` (94,936 bytes) and `86398e39...` (157,714 bytes);
+  reconciliation receipt `fed0540d...` (248,948 bytes); QC counts copy
+  `e2424a4e...` (2,493 bytes); Earnings `complete.json` `81bd2401...`; the
+  provider audit root has its eight leaves. All equal the record. The
+  journals and receipts contain **no email-like string**; the record and the
+  tracked tree gained none.
+- **Journal replays, network denied, read-only:**
+  `verify_observed_fresh_v4_capture` reproduces 64 dispatches, 64 bodies,
+  504,050 bytes, batch complete; `verify_observed_continuation_capture` with
+  reprojection reproduces 256 / 256 / 2,011,446 bytes, batch complete, in
+  0.91 s.
+- **File identities:** all 54 new files whose final hash the record names
+  match it; the launcher/core labels of 137.4 map to the isolation module and
+  runner respectively; five test files and the runner's final hash are not
+  named by file, which is an omission, not a mismatch.
+- **Pushed `444c9a73`, network denied:** complete suite on Python 3.13.15
+  **12,812 passed, 3 failed, 38 skipped, 28 warnings in 923.57s** (the three
+  guard failures of 153.3); the 30 new test files on Python 3.12.14
+  **2,272 passed**; lane gate 125 passed on 3.13.
+- **After `117de00d`, network denied:** the affected lane files
+  (registered analysis, event clock, capture, reconciliation, boundary)
+  **449 passed** on Python 3.12.14 and on 3.13.15; lane gate with the Decimal guard and the exact package guard
+  **137 passed** on both Pythons; `compileall` and `git diff --check` clean.
+- Final code tree `117de00d` (this record still uncommitted), complete repository suite
+  in the worktree, network denied, Python 3.13.15: **12825 passed, 2 failed, 38
+  skipped, 28 warnings in 745.49s**. The 2 failures are exactly the two SEP-2
+  manifest guards of `IBSH-CR02`; the Decimal guard now passes. Count: 12,812 + 1 (Decimal
+  guard) + 8 (tripwire controls) + 4 (pins) = 12825.
+- Record tests after this section: **71 passed** on Python 3.13.15 and on 3.12.14, network denied, after the final wording.
+
+### 153.6 Notes on the acquisition code
+
+`_capture` reserves a permanent claim per request before any dispatch,
+fsyncs each start, dispatches once with a fixed `User-Agent` naming the
+contact, waits at least 500 ms after each completion, retains only an HTTP
+200 body that passes the strict header validation and the contact-echo
+screen, and stops at the first non-retained outcome; an exception from the
+transport is an ambiguous failure that consumes the claim and is never
+retried. The contact enters through `getpass` or a pipe, never argv or the
+environment, and appears in no journal (`contact_present: true` only). The
+read-only verifier re-derives every count from the journal. This matches
+sections 147.3 and 149.1. The 500 ms spacing is five times slower than the
+SEC's published ten-requests-per-second limit.
+
+### 153.7 Retained P0-P3 finding ledger
+
+| ID | Priority | Status | Commit | Location | Issue and impact | Evidence | Reason for fix or disposition | Correction | Verification |
+|---|---|---|---|---|---|---|---|---|---|
+| IBSUITE-CR01 | P2 | **CLOSED in `117de00d`** | `f276f2f6` | `backtest_registered_analysis.py` | Three bare `Decimal(str(...))` sites fail the repository Decimal guard. | 153.3. | NaN/Infinity literals must be refused, not compared. | `to_decimal`. | Guard red on pushed, green after; 1,235 analysis tests pass. |
+| IBSH-CR02 | P2, shared/out of lane, lane-caused | **OPEN** | `3e21c6db` | `architecture/entry_points.json` | Hosted `QuantConnect`/`IPython` imports undeclared; two repository guards red. | 153.3. | Shared SEP-2 artifact; integration decision. | None here; add the two names to `platform_provided_imports.strategy_research`. | Both guards fail identically on 3.12 and 3.13. |
+| IBTEST-CR04 | P3 | **CLOSED in `117de00d`** (tests only) | `195012fd` | Lane boundary test | Tripwire rule blind to the urllib transports. | 153.4. | A safeguard for a P1 incident must cover every transport family. | `_default_transport` and `build_opener` recognized. | 8 controls red on pushed scan, green after. |
+| IBREC-V4-CR01 | P3 | **CLOSED in `117de00d`** | `e52c7388` | Invented reconciliation entry | Untyped `FileNotFoundError` escape. | 153.4. | Refusals must be typed like the observed entry's. | Wrapped. | Renamed-claim test red on pushed, green after. |
+| IBTEST-CR05 | P3 | **CLOSED in `117de00d`** (tests only) | `e900c7a9`, `f276f2f6` | Capture and event clock tests | Observed-mode and two PIT guards without isolating tests. | 153.4 mutants. | A guard without a test can drift silently. | Three pins. | `C05`, `E02`, `E03` caught after. |
+| IBREC-HSVCCR02 | P3 | **CLOSED by qualification; accepted against this reviewer** | `d05e0bc4` | Section 135.2 | Twelve sites in eleven modules, not twelve modules. | 136.2. | Correct. | 153.2. | Executor contributes two sites. |
+| Codex's R-series findings of 137-151 | P2/P3 as recorded | **Retained closed as Codex records** | range | range | Self-found during development. | Sections 137-151. | Not re-opened; the guards they describe behave as described where mutated here. | None. | 153.4 mutants. |
+| IBHSV-*, IBHRV-*, IBREC-* and earlier resolved findings | as recorded | **Retained closed** | earlier | earlier | Unchanged. | Sections 128-136. | Unchanged. | None. | None new. |
+| IBREV-CR01 | P1, process | **Retained closed by owner disposition** | `01a6b7e` | Sections 123-126 | Unchanged. | Sections 124-126. | Owner decision, not witnessed. | None. | None new. |
+| IB1C-REAL-CR01, IB1BCAMP-CR01, IBSRC-CR01, IBSRC-CCR01 | P2 | **OPEN, retained** | earlier | Sections 119-152 | Unchanged at their recorded scopes; the 320 new parents and the 2006Q1 assessment do not close them. | Sections 138, 141.5, 147.6, 152.1. | Unchanged; all fail closed. | None. | None new. |
+| IBQC-SHARED-META01 | P2, shared/out of lane | **OPEN, retained** | `195012fd` | Shared QC client | As Codex records in 143.3. | 143.3. | Out of lane. | None here. | None. |
+| Earlier P3 findings, observations and the 45 unclassified section-119 survivors | P3 | **Retained as recorded** | earlier | earlier | Unchanged. | Sections 119-152. | Unchanged. | None. | None new. |
+| IBSH-CR01 | P3, shared/out of lane | **OPEN, non-blocking, retained** | `226c4c1` | Shared coordination documents | Reconcile the Insider-only paper clause once at main integration. | Sections 68 to 72. | Out of lane. | None here. | This range changes no shared document. |
+
+There is no open P0 or P1 finding. Five P2 findings are open (four
+topical, one lane-caused shared); all fail closed.
+
+### 153.8 Next action
+
+Codex counter-reviews `117de00d` and this record commit. Two repository guards
+stay red until integration adds the two hosted import names to the SEP-2
+manifest (`IBSH-CR02`); the lane should not edit that file. The lane is not
+backtest-ready for the factual reasons sections 147.6, 149.8 and 152.1
+state, and nothing in this review changes that. No outcome, ETF, QC, paper,
+live, deployment, broker, capital, order, or trading authority follows from
+this section.
+
+No SEC or provider request was made by this review: every pytest and
+mutation run was OS network-denied, and the journal replays are read-only
+functions of the private journals. No credential, licensed row, security
+master, outcome, ETF holding, QuantConnect, broker, operator database,
+scheduler, deployment, capital, order, live, or trading surface was used by
+the reviewer. Real bytes read, read-only: the private capture journals and
+receipts, the 2006Q1 envelopes, and the retained raw parents through the
+verifiers' reprojection. Authorized outcome looks: **0**. Consumed outcome
+looks: **0**. Research looks: **0**.

@@ -1,11 +1,12 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Section 16 counter-review accepted after correction; ENG-17..ENG-26
-offline backtest-preparation batch implemented, pending independent Claude
-review of this round's exact pushed snapshot (section 17). Native LEAN/QC
-execution and empirical backtest readiness remain unverified/blocked. Original
-GDR-0..6 gates remain closed.**
-Current scope/evidence are sections 16 and 17. Sections 2 through 6 preserve
+Status: **Section 17 (Codex counter-review of section 16 and ENG-17..ENG-26)
+independently reviewed by Claude in section 18 (2026-10-08): both commits
+accepted, three lane regression pins added, no production defect found.
+Codex counter-review of section 18 pending. Native LEAN/QC execution and
+empirical backtest readiness remain unverified/blocked. Original GDR-0..6
+gates remain closed.**
+Current scope/evidence are sections 16 through 18. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -1316,3 +1317,107 @@ freeze, dated inputs, engine/comparator/settlement contracts, evidence windows
 and look/family allocation. No new implementation batch or monitor cycle
 starts automatically. Both agents continue lane-record-only handoffs; root
 documents remain frozen and historical edits remain for later integration review.
+
+## 18. Independent Claude review of `a6cc4035..b3d54777`, 2026-10-08
+
+### 18.1 Scope and method
+
+Reviewed range: the two Codex commits after the section-16 push, `eba0fe52`
+(section-17 counter-review, ENG-17..ENG-25 and the ENG-26 release machinery)
+and `b3d54777` (section 17 closing record, the v2 review release JSON and the
+source bundle ZIP), the fetched remote head. The worktree was clean and equal
+to the remote head at the start, and no frozen root document was touched in
+this range. Host, isolation and method are as in 12.1 and 16.1: every commit
+read individually, every new or changed module and test read in full, every
+pytest and mutation process network-denied under the proved `sandbox-exec`
+profile, all validation in the designated worktree except the per-commit
+informational run in a `git archive` export. No provider, QC, broker, paper or
+live system was contacted; research looks 0; QC attempts 0. No LEAN SDK is
+installed here, so native scheduling, bindings and cloud completion remain
+unverified exactly as section 17 states.
+
+### 18.2 Disposition of the section-17 counter-review
+
+| Section-17 item | Claude disposition |
+|---|---|
+| Owner answer "Lane record only; freeze root documents" | Accepted as reported by Codex; it matches the reading under which Claude has worked since section 12. GDR-CR16-001 is closed for future rounds: both agents leave `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` frozen, this record is the handoff for both, and the historical edits stay for integration review. This range confirms it: neither file changed. |
+| `5f7dc308` accepted, `a6cc4035` accepted after correction | Accepted. |
+| GDR-CCR17-001 (zero-fee `QCC` control receipts) | Accepted and verified: fills remain USD-only, control receipts admit the null-currency sentinel only with zero quantity, price and fee; the shim regression covers both directions. |
+| GDR-CCR17-002 (`CancelPending` protocol) | Accepted and verified: a pending acknowledgement is required before the terminal cancellation, reservations are retained until then, duplicates are idempotent and out-of-order event IDs refuse (mutants Q01, Q02, Q05 caught). |
+| GDR-CCR17-003 (multiday reader) | Accepted and verified: the reader keys every record to its own timestamp and all 372 frames reach the shim. |
+| GDR-CCR17-004 (receipt-ordered as-of ingestion) | Accepted; it supersedes my GDR-CR16-007 wording, which proposed a date-only timezone substitution where availability order was the right rule. Durable-journal regressions pin night, weekend, delayed, tied and post-decision receipts. |
+| GDR-CCR17-005 (portable content identity) | Accepted: `verify_release` stays strict and `verify_release_content` permits differences only in the two interpreter labels (18.5 reproduces the committed v2 artifact here that way). |
+| GDR-CCR17-006 (unresolved native execution limitation) | Accepted as stated; nothing in this review changes it. |
+
+### 18.3 Commit dispositions
+
+| Commit | Scope | Disposition | Notes |
+|---|---|---|---|
+| `eba0fe52` | Section 17.1-17.5, ENG-17..ENG-25 source and tests, release v2 machinery | Accepted after correction | Two test pins added against its modules (GDR-CR18-002, GDR-CR18-003); 15 of the 24 round-three mutants targeting it were caught by its own tests, 7 are redundant by construction, 2 are now pinned |
+| `b3d54777` | Section 17.6, v2 release JSON, source bundle ZIP | Accepted after correction | Both artifacts content-addressed and reproduced (18.5); the ZIP lacked a Git attribute (GDR-CR18-001, corrected in-lane) |
+
+### 18.4 Findings ledger
+
+| ID | Priority / status | Location | Finding, disposition and verification |
+|---|---|---|---|
+| GDR-CR18-001 | P3 / corrected | `b3d54777`, `research/guidance_revision_drift/.gitattributes`, `releases/4dd53e40...zip`; `test_boundaries.py` | The committed content-addressed ZIP had no Git attribute (`git check-attr -a` printed nothing), unlike the JSON artifacts under `*.json -text`; its byte identity relied on Git's binary heuristic rather than on the lane's declared contract. Added `*.zip binary` and pinned it in `test_source_byte_contract_has_lane_scoped_eol_rules`, which fails with the line removed. The attribute changes no tracked bytes and no hash. |
+| GDR-CR18-002 | P3 / corrected | `eba0fe52`, `bundle.py::publish_bundle`; `test_bundle.py` | With the overwrite comparison removed (mutant P06), a tampered existing bundle still refused, but as `BundlePublicationUncertain` from the post-sync verification instead of the definite conflict, and the existing test accepted either. A caller that treats "uncertain" as "verify and retry" would loop on a destination it can never match. The tampered-bundle test now requires the "different bytes" message and asserts the exception is not the uncertain subtype. P06 now fails. |
+| GDR-CR18-003 | P3 / corrected | `eba0fe52`, `lean_bridge.py::SyntheticOrderBridge.order_event`; `test_lean_bridge.py` | The new requirement that a fill receipt follow the order's submission acknowledgement had no test (mutant Q03 survived; `finish` would only have caught it at the end of the run). Added `test_fill_receipt_without_submission_acknowledgement_is_unsolicited`: the fill is refused with the shadow receipt still pending and the trace unchanged, and is accepted once the submission is acknowledged. Q03 now fails. |
+| GDR-CR18-004 | P3 / documented | `eba0fe52`, `test_release_identity.py` | The identity-policy tests use the retained historical release `releases/fccbef76...json` as their fixture body. That is a sound choice today, but it binds the test to a historical artifact that section 17.6 describes as evidence, not as a maintained fixture; if that file is ever retired, the tests fail for a reason unrelated to the verifier. A copy under `tests/` or a built-in minimal body would decouple them. Not changed. |
+| GDR-CR18-005 | P2 / documented, out of lane | repository suite | The repository suite excluding Analyst V2 is red on the same fifteen tests as at `8424a2b3` and `d522fad7`: four shared gates already red on `origin/main` (Analyst QC `Decimal(str(...))` sites, the stale `scripts/` classification manifest, Analyst QC bare sibling imports), ten Insider tests that refuse outside their own worktree, and the Target-Price Windows Git trust-root test (GDR-CR16-002). None involves a lane file and this range changed no shared file at all. Shared/main work, reported here and not fixed in this lane, as in GDR-CR12-013 and GDR-CR16-008. |
+
+Scripted count from this table: P0 0, P1 0, P2 1, P3 4; corrected 3, documented 2.
+
+### 18.5 Validation
+
+| Check | Scope | Result |
+|---|---|---|
+| Lane selection at the pushed head `b3d54777` | worktree, network-denied | 401 passed, 1,110 subtests, 7:36 (under concurrent load) |
+| Lane selection per commit (informational, `git archive` export) | `eba0fe52` | 401 passed, 1,110 subtests, 0 failed |
+| Lane selection after the corrections | worktree, network-denied | 402 passed, 1,110 subtests, 14:05 (under concurrent load); an earlier run of the same tree failed only the lane gate because the status block had wrapped the pinned phrase across two lines, corrected by reflowing the status block |
+| Repository suite excluding `tests/analyst_revisions_v2` | worktree at `b3d54777`, network-denied | 15 failed, 11,290 passed, 56 skipped, 28 warnings, 1,110 subtests, 1:42:37 under concurrent load; the fifteen failures are byte-identical to the sets in sections 12.4 and 16.5, and the pass count rose by exactly the 44 lane tests added since `d522fad7` |
+| `python -m compileall -q research/guidance_revision_drift tests/guidance_revision_drift` | worktree | passed |
+| `git diff --check` | worktree | passed |
+| CLI `verify-bundle` on the committed ZIP with its filename as anchor | worktree, network-denied | exit 0, `verified_offline_content_only`, 423,249 bytes, bundle source manifest `19175ad0...`, preflight `blocked`; a wrong anchor exits 1 with `offline_command_failed` |
+| Committed artifacts | `releases/0f22e92a...json` (26,152 bytes), `releases/4dd53e40...zip` (423,249 bytes, 38 stored members) | both filenames equal the SHA-256 of their bytes; no absolute path or user name in either; the v2 release rebuilt here differs in exactly two fields, `engine.python_version` (3.12.14 vs 3.13.15) and `identities.environment_sha256`; `code_sha256` `19175ad0...`, the portable content projection and `source_bundle.sha256` are identical; `verify_release_content` accepts the committed JSON with `environment_matches=false` and `runtime_parity_verified=false`, and the strict `verify_release` refuses it as designed |
+| Analyst V2 directory | not run | out of lane, as in section 12.4 |
+
+### 18.6 Mutation trials
+
+Twenty-four single-behaviour in-memory mutants over the bundle, bridge protocol,
+reader, release identity and ingestion changes, each run network-denied against
+the test files that own the mutated module.
+
+| Class | Count | Mutants |
+|---|---:|---|
+| Caught by Codex's tests | 15 | P03, P04, P05, P07, P08, Q01, Q02, Q04, Q05, Q07, R01, R02, R03, R04, I02 |
+| Survived, now caught by added pins | 2 | P06 (tampered bundle reported as uncertain), Q03 (fill before submission acknowledgement) |
+| Redundant by construction, no test added | 7 | P01 traversal parts (the path regex and the exact member set refuse first); P02 member set (the exact member comparison refuses any extra or missing member); P09 member date and P10 manifest canonical form (the canonical re-encode and member comparison refuse); Q06 finish acknowledgement count (every terminal order state already requires the acknowledgement per receipt); I01 archive prefix extension (an as-of replay archive can only grow as the decision advances); I03 durable count/head (the recovery engine's per-command result and post-state hashes already bind the archive) |
+
+Representative caught mutants: compression accepted before read (P03),
+altered source member accepted (P04), noncanonical archive encoding accepted
+(P05), anchor unchecked (P07), inventory extension accepted (P08), event IDs out
+of order (Q01), terminal cancel without the pending acknowledgement (Q02), trace
+published before validation (Q04), repeated cancel-pending (Q05), malformed
+fill request (Q07), `LEAN_version` dropped from the portable projection (R01),
+content rebuild comparison removed (R02), identity or portable anchor unchecked
+(R03, R04), ingestion looking one day ahead (I02).
+
+### 18.7 Record maintenance, commits and next action
+
+The status block names this section; the `test_boundaries.py` review-state
+phrase is rotated to "Codex counter-review of section 18 pending".
+
+| Commit | Scope |
+|---|---|
+| `73084917` | ZIP binary attribute and its pin (GDR-CR18-001); tampered-bundle refusal type (GDR-CR18-002); fill-before-submission-acknowledgement refusal (GDR-CR18-003) |
+| This record commit | Section 18, status block, `test_boundaries.py` pin rotation |
+
+One push of this round after both commits exist, guarded on the remote head
+still being `b3d54777`; never force. Next: Codex counter-reviews section 18 and
+both Claude commits and rotates the pin. The lane remains an offline
+engineering candidate: no GDR-1 source audit, synthetic-engine evaluation,
+empirical backtest, data, QC, broker, paper or live step starts from this
+review; each needs the owner's separate scope, as section 17.6 states.
+`docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were not edited
+in this round and stay frozen for both agents.

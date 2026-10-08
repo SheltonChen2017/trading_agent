@@ -10014,3 +10014,32 @@ both development looks and prospectively record its own scope and assumptions;
 the observed result is not a valid reason to relabel the data pristine or to
 promote to canonical, QC, paper/live or trading readiness. No further data
 operation or strategy tuning is included in this completed snapshot.
+
+### 65.9 Exact implementation identity and one-push closure
+
+Implementation range:
+`30341bbb853ab82d03f088d0273e412424910265..3e3183ffd32b48a396ef7b63079f37bf1bd89a97`.
+It contains exactly one implementation commit,
+`3e3183ffd32b48a396ef7b63079f37bf1bd89a97`
+(`Complete frozen target-price exploratory backtest with bounded data corrections`).
+
+| Commit | Scope | Internal disposition |
+|---|---|---|
+| `3e3183ffd32b48a396ef7b63079f37bf1bd89a97` | Four separately frozen controllers, their synthetic tests, eleven public aggregate/plan/audit artifacts and updated lane handoff/guards | Accepted after the documented pre-execution corrections and actual-run audit; not an independent Claude review. All seven section-65 findings have explicit resolved/qualified dispositions. |
+| This subsequent documentation-only handoff commit | Names the exact implementation identity, validation and final publication procedure | Accepted as documentation-only; no candidate, artifact or executed source changes. |
+
+The final post-evidence documentation check passed **161 tests in 3.39s**;
+the staged 23-file implementation scope was checked exactly, with no
+unstaged/concurrent change and clean cached diff. Immediately before the
+implementation commit, physical root, Git toplevel, branch, HEAD and status
+matched the designated lane and actual origin was still
+`30341bbb853ab82d03f088d0273e412424910265`. No push occurred at commit time.
+
+Both commits form this single round. Publication is one non-force
+`git push origin HEAD:refs/heads/codex/strategy-target-price-revisions`
+after another root/branch/HEAD/status/actual-remote check. Verify actual remote
+and local heads agree afterward; the chat delivery owns that final push-result
+confirmation because this record is committed before the push. Leave the
+consumed monitor paused. The exact source/input/result fingerprints and
+two-look history above are the durable reproducibility boundary; changing a
+commit head does not renew a spent runtime plan.

@@ -2,10 +2,12 @@
 
 Status: **Section 18 counter-review accepted after correction. Per-frame
 native-account enforcement and identity-policy test decoupling are implemented
-as local-only preparation in section 19, pending independent review.
-Owner-scoped native engine evaluation is required before continuation or the
-single combined push. Native LEAN/QC execution and empirical backtest
-readiness remain unverified/blocked. Original GDR-0..6 gates remain closed.**
+as offline preparation in section 19, pending independent review. Section 19.6
+records the owner's approval to publish this checkpoint in the round's single
+push, then perform a synthetic-only order-based QuantConnect evaluation after
+Claude's exact-source review and Codex counter-review. Native LEAN/QC execution
+and empirical backtest readiness remain unverified/blocked. The original
+economic, data, empirical, account and trading gates remain closed.**
 Current scope/evidence are sections 17 through 19. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
@@ -1482,7 +1484,7 @@ must be presented to the owner before continuing or publishing.
 | GDR-CR18-005 | P2 / accepted as reported, out of lane | Claude's fifteen shared/Insider/Target-Price failures remain reported, not fixed or rerun here. Review range changes only lane files and this record; it cannot correct other lanes' worktree restrictions or shared contracts. |
 | GDR-CCR19-001 | P3 / corrected documentation attribution | Section 18.7 and `73084917` message group attribute and boundary pin under the first commit; actual diff places the pin in the second. Exact ownership is recorded above without rewriting history. |
 | GDR-CCR19-002 | P2 / corrected source candidate | End-only native cash/inventory checks miss temporary drift. Two new tests reproduced six failing subcases before implementation. Per-frame draft checkpoint enforcement now refuses transient mismatch, nonfinite/fractional/negative scalars, aliases, partial inputs and trace exhaustion without consuming effects. Immediate cash includes receivables; original proposed economics remain unchanged. |
-| GDR-CCR19-003 | P2 / owner-input blocker | No pinned native runtime/binding run exists; no native matched-SPY/actions/equity-settlement or rights-cleared real-data adapter exists. Python/shim checks cannot establish these. Need the next exact owner scope before platform work or publication, not another synthetic completion claim. |
+| GDR-CCR19-003 | P2 / native validation pending | No pinned native runtime/binding run exists; no native matched-SPY/actions/equity-settlement or rights-cleared real-data adapter exists. Python/shim checks cannot establish these. At the paused checkpoint this required owner scope before platform work or publication. Section 19.6 now resolves authorization narrowly for publication and post-review synthetic QC evaluation, not the missing validation or empirical readiness. |
 
 No P0/P1 issue was identified. CR18 findings retain P0 0, P1 0, P2 1,
 P3 4; this counter-review adds one corrected P3 and two P2 items (one
@@ -1546,8 +1548,8 @@ it was not saved as a new release. The candidate canonical identity remains
 `b52aedd6ca6dea4a14bc46ddb6c09a6d36bbf994fc21edb9ddb916194f03ad3c`.
 The exact closing record commit follows and is identified by local Git HEAD.
 
-**Publication remains withheld: zero pushes this round.** The remote lane
-still names consumed Claude head `c0137c51`, not the new local source. This
+**At the paused checkpoint, publication was withheld: zero pushes this round.**
+The remote lane still named consumed Claude head `c0137c51`, not the new local source. This
 record/test-pin commit is a durable local checkpoint, not a completed remote
 handoff or backtest-ready release. Monitor state must retain the consumed
 trigger and pause for owner input; it must not re-review that same push or
@@ -1572,3 +1574,71 @@ access credentials/data/outcomes, create a new branch, switch worktrees or
 push while this blocker is unresolved. Native comparator/actions, cash-account
 settlement, rights/availability audit, candidate freeze, evidence dates and
 family/look allocation remain necessary before empirical readiness.
+
+### 19.6 Owner approval, publication closure and next exact review gate
+
+On 2026-10-08 the owner answered **yes** to: "May I publish this checkpoint
+as the round's single push for Claude, then—after review—perform a
+synthetic-only QuantConnect upload/run, with no real data and at most three
+unsuccessful attempts?" This supersedes only section 19.5's publication and
+synthetic-engine authorization blocker. It permits the accumulated checkpoint
+to be published now, despite empirical readiness remaining blocked, without
+an intermediate or second push in this round. It is not a specification
+freeze, data/rights audit authorization, empirical outcome look or permission
+to run the proposed strategy on market data.
+
+The publication range starts at consumed Claude head
+`c0137c518277c8a9a87af51f52add3eccd088617` and includes producing source
+`8e5714a2a2ff89c50a01cbe958d298f0ade39e9b`, closing record/test pin
+`ad075cf2dae64729d1d10f8e9e43c838c1f2a89f`, and this documentation-only
+approval closure. The closure's Git HEAD identifies the exact review snapshot;
+the monitor retains the verified remote publication SHA. Source manifest,
+in-memory bundle and original candidate identities remain those in section
+19.5. No new artifact or code is generated by this approval. Read-only final
+publication audit confirmed lane-only changes, unchanged candidate/plan/root
+documents and the exact source manifest SHA; no execution/data authority or
+secret values were added to source. The documentation-only approval closure
+passed focused active-document and lane-boundary checks: 75 passed in 1.12s;
+`git diff --check` passed. No source suite or cloud action was repeated.
+
+Next authorized sequence: verify root, branch, HEAD/status and unchanged remote
+`c0137c51`; make exactly one non-force push only to the matching lane ref;
+verify that remote head; re-arm the existing monitor with that exact new
+baseline; wait for Claude's explicit completed pushed review of it; then
+counter-review every review commit and finding in the same serialized lane.
+A local commit, dirty work, partial review or this Codex push is not a trigger.
+Do not start implementation or QC while Claude owns the lane or ownership is
+ambiguous. Claude retains full independent lane validation; Codex uses focused
+checks, not a full lane/repository suite.
+
+Only after that review is accepted or accepted-after-correction may Codex
+package/upload the exact reviewed source and fixed invented 372-frame sidecar
+for a **synthetic-only order-based QuantConnect integration evaluation**.
+Record source/package hashes, project, compile/run IDs, engine/binding details,
+every launch and terminal result. No provider credentials, source capture,
+market/reference/action download, empirical/protected outcomes or real data
+may enter this evaluation. No local runtime/dependency installation is
+authorized by this cloud-only approval. Existing authenticated QC access may
+be used for the scoped upload/run; unavailable access, required purchase or
+broader rights/account changes return to the owner.
+
+The attempt ledger starts at zero. A compile failure, runtime error or other
+unsuccessful terminal launch counts; stop after at most three unsuccessful
+attempts for this exact candidate. Then use authenticated controllable Mia
+when available, otherwise ask the owner to use Mia. Retrieve and diff Mia's
+source against the exact local candidate before accepting or porting only
+verified lane-specific corrections. Do not accept economic changes by
+inference. A completed synthetic QC job validates only the tested integration;
+it cannot establish matched-SPY/action/settlement parity, point-in-time data,
+GDR-0..6 completion, empirical backtest readiness or market edge.
+
+The immutable draft's null decisions, false permissions and zero allocated
+looks remain unchanged; this external human authorization is retained here,
+not self-certified into the proposed research candidate. All other source,
+rights, data, family/look, protected-date, account, paper/live, broker and
+capital gates stay closed. No operator database, broker, scheduler, PR,
+main merge, cross-lane mutation or force push is permitted. Pause the monitor
+after the scoped cycle completes or an owner-input blocker; stay quiet for
+unchanged/non-actionable remote state. A subsequent round retains its own
+single-push agreement; this closure does not authorize a second publication
+of the current round.

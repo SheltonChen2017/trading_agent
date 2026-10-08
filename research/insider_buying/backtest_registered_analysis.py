@@ -22,15 +22,17 @@ import json
 import math
 import random
 import re
+import weakref
 from collections import defaultdict
 from collections.abc import Iterator
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import date, datetime, timedelta
 from decimal import Decimal, InvalidOperation, localcontext
 from statistics import NormalDist
 
 
 SCHEMA = "insider-registered-stock-analysis-v1"
+SCHEMA_V2 = "insider-registered-stock-analysis-v2"
 ROLES = ("registration", "manifest", "terminal", "panel")
 HORIZONS = (5, 20, 60)
 COSTS = (0, 5, 10, 20)
@@ -48,10 +50,62 @@ SHA = re.compile(r"[0-9a-f]{64}\Z")
 IDENTIFIER = re.compile(r"[A-Za-z0-9][A-Za-z0-9._:-]{0,100}\Z")
 NUMERIC = re.compile(r"-?(?:0|[1-9]\d*)(?:\.\d+)?\Z")
 METHOD = "issuer-entrydate-cr1-student-t-v1"
+_V2_TOKEN = object()
+_V2_RESULTS: dict[int, tuple[weakref.ReferenceType, bytes]] = {}
 
 
 class RegisteredAnalysisError(ValueError):
     """Missing, ambiguous or cross-epoch evidence refused before calculations."""
+
+
+@dataclass(frozen=True, slots=True, weakref_slot=True)
+class RegisteredStudyV2Result:
+    """Aggregate-only public report; compact derived returns remain in memory.
+
+    A factory identity registry prevents reconstructed/reanchored objects from
+    becoming diagnostic inputs. There is no outcome/price JSON export method.
+    This is fixture software evidence, never a registered or spent actual look.
+    """
+    _raw: bytes = field(repr=False)
+    _token: object = field(repr=False, compare=False)
+
+    def _body(self):
+        sealed = _V2_RESULTS.get(id(self))
+        _need(type(self) is RegisteredStudyV2Result and self._token is _V2_TOKEN
+              and sealed is not None and sealed[0]() is self
+              and type(self._raw) is bytes and sealed[1] == self._raw,
+              "registered v2 result reconstructed or altered")
+        return json.loads(self._raw)
+
+    def to_payload(self) -> dict:
+        return self._body()["report"]
+
+    @property
+    def sha256(self):
+        return self.to_payload()["report_sha256"]
+
+
+def _seal_registered_v2_result(*, report, context, derived):
+    events = context["manifest"]["events"]
+    by_id = {row["event"]["signal_id"]: row for row in derived}
+    _need(len(by_id) == len(derived) == len(events)
+          and set(by_id) == {event["signal_id"] for event in events},
+          "sealed diagnostic result population missing/duplicate/foreign")
+    # A valid flat manifest may be nonchronological. Preserve its exact bound
+    # inventory order by identity, not the report's independently sorted rows.
+    # The stream's final seal is outside the report arithmetic context, so own
+    # precision here rather than inheriting a caller's ambient Decimal state.
+    with localcontext() as arithmetic:
+        arithmetic.prec = 50
+        body = {"report": report, "registration": context["registration"], "manifest": context["manifest"],
+                "event_results": [{"signal_id": event["signal_id"],
+                    "matched_net10_20s": _text(by_id[event["signal_id"]]["returns"][20]["matched_factor_adjusted"]
+                        - _notional_cost(by_id[event["signal_id"]]["stock"]["exit_notional_ratio"][20]))}
+                    for event in events]}
+    raw = canonical_bytes(body)
+    result = RegisteredStudyV2Result(raw, _V2_TOKEN)
+    _V2_RESULTS[id(result)] = (weakref.ref(result, lambda _, key=id(result): _V2_RESULTS.pop(key, None)), raw)
+    return result
 
 
 def _need(condition: bool, message: str) -> None:
@@ -246,17 +300,49 @@ def analysis_plan_descriptors(*, implementation_sha256: str) -> dict:
             for role, (identity, definition) in methods.items()}
 
 
-def _manifest_fields(schema: object) -> set[str]:
-    _need(type(schema) is str and schema in {"insider-stock-event-study-manifest-v1", "insider-stock-event-study-manifest-v2"},
+def frozen_analysis_policy_v2() -> dict:
+    """Separate pre-outcome epoch: actual-release sensitivity is retrospective.
+
+    Primary event selection, matching, economics and alpha are unchanged.
+    Future realized earnings NEVER enter causal reference or execution clocks.
+    Required descriptive +/-2/5 session comparisons remain unavailable until
+    complete externally anchored actual-public-release evidence is supplied.
+    """
+    policy = frozen_analysis_policy()
+    policy.update(version=SCHEMA_V2,
+        earnings_confounder_policy="retrospective-actual-public-release-reaction-session-exclude-inclusive-plusminus2-and5-v1",
+        earnings_release_session="first-regular-session-close-strictly-after-actual-public-release-instant",
+        earnings_diagnostic_windows_sessions=[2, 5],
+        earnings_used_for_primary_event_selection=False,
+        earnings_used_for_execution_clock=False,
+        earnings_missing_coverage="explicit-unavailable-no-empty-as-none-no-partial-acceptance")
+    return policy
+
+
+def analysis_plan_descriptors_v2(*, implementation_sha256: str,
+                                 realized_earnings_implementation_sha256: str) -> dict:
+    _digest(realized_earnings_implementation_sha256)
+    methods = analysis_plan_descriptors(implementation_sha256=implementation_sha256)
+    methods["earnings_confounder"] = {
+        "method_id": "ib-stock-retrospective-actual-release-plusminus2and5-v1",
+        "definition": "Required descriptive comparison only: actual public earnings releases; first regular close strictly after release; inclusive +/-2/5 session windows; complete source-event issuer coverage; missing is unavailable. Never primary selection, order clock, confirmatory alpha or a new look.",
+        "implementation_sha256": realized_earnings_implementation_sha256}
+    return methods
+
+
+def _manifest_fields(schema: object, *, v2: bool = False) -> set[str]:
+    allowed = {"insider-stock-event-study-manifest-v3"} if v2 else {
+        "insider-stock-event-study-manifest-v1", "insider-stock-event-study-manifest-v2"}
+    _need(type(schema) is str and schema in allowed,
           "unsupported event-study manifest schema")
     fields = {"schema", "trust_scope", "registration_sha256", "source_manifest_sha256", "security_master_sha256",
               "calendar_sha256", "outcome_vintage_sha256", "sessions", "eligible_control_security_ids", "events"}
-    return fields | ({"eligible_control_security_ids_by_entry_session"} if schema.endswith("v2") else set())
+    return fields | ({"eligible_control_security_ids_by_entry_session"} if schema.endswith(("v2", "v3")) else set())
 
 
 def _control_inventories(manifest: dict) -> dict[str, list[str]]:
     """Global v2 union is bookkeeping, never an earlier date's future universe."""
-    dynamic = manifest["schema"] == "insider-stock-event-study-manifest-v2"
+    dynamic = manifest["schema"] in {"insider-stock-event-study-manifest-v2", "insider-stock-event-study-manifest-v3"}
     union = manifest["eligible_control_security_ids"]
     _need(type(union) is list and 3 <= len(union) <= (MAX_POOL if dynamic else MAX_LEGACY_POOL),
           "control universe absent/unbounded")
@@ -277,10 +363,10 @@ def _control_inventories(manifest: dict) -> dict[str, list[str]]:
     return {day: list(members) for day, members in cohorts.items()}
 
 
-def verify_registered_analysis_manifest(*, registration_raw: bytes, manifest_raw: bytes,
+def _verify_registered_analysis_manifest(*, registration_raw: bytes, manifest_raw: bytes,
                                         expected_registration_sha256: str,
                                         expected_manifest_sha256: str,
-                                        expected_implementation_sha256: str) -> dict:
+                                        expected_implementation_sha256: str, v2: bool = False) -> dict:
     """Validate an anchored manifest before any outcome panel is consumed.
 
     Metadata validation does not perform source authentication or grant a look.
@@ -292,23 +378,28 @@ def verify_registered_analysis_manifest(*, registration_raw: bytes, manifest_raw
     _fields(registration, {"schema", "trust_scope", "registered_look_id", "candidate_id", "policy", "analysis_plan",
                             "registered_at_utc", "first_outcome_access_utc", "implementation_sha256",
                             "source_manifest_sha256", "security_master_sha256", "calendar_sha256",
-                            "outcome_vintage_sha256", "rights_sha256", "prior_variance_calibration_sha256"}, "registration")
-    _need(registration["schema"] == "insider-stock-analysis-registration-v1"
+                            "outcome_vintage_sha256", "rights_sha256", "prior_variance_calibration_sha256"}
+            | ({"realized_earnings_implementation_sha256"} if v2 else set()), "registration")
+    _need(registration["schema"] == ("insider-stock-analysis-registration-v2" if v2 else "insider-stock-analysis-registration-v1")
           and registration["trust_scope"] in {"fixture", "production"}, "registration scope/schema drift")
     _digest(expected_implementation_sha256)
     _need(registration["implementation_sha256"] == expected_implementation_sha256,
           "registration executable implementation mismatch")
-    _need(canonical_bytes(registration["analysis_plan"]) == canonical_bytes(analysis_plan_descriptors(
-        implementation_sha256=expected_implementation_sha256)), "analysis methods are not implemented exact registry")
-    _need(canonical_bytes(registration["policy"]) == canonical_bytes(frozen_analysis_policy()), "pre-outcome policy drift")
+    descriptors = analysis_plan_descriptors_v2 if v2 else analysis_plan_descriptors
+    policy = frozen_analysis_policy_v2 if v2 else frozen_analysis_policy
+    method_roots = {"implementation_sha256": expected_implementation_sha256}
+    if v2:
+        method_roots["realized_earnings_implementation_sha256"] = registration["realized_earnings_implementation_sha256"]
+    _need(canonical_bytes(registration["analysis_plan"]) == canonical_bytes(descriptors(**method_roots)), "analysis methods are not implemented exact registry")
+    _need(canonical_bytes(registration["policy"]) == canonical_bytes(policy()), "pre-outcome policy drift")
     _need(_utc(registration["registered_at_utc"]) < _utc(registration["first_outcome_access_utc"]),
           "registration not before outcome access")
     for field in registration:
         if field.endswith("sha256"): _digest(registration[field])
     for field in ("registered_look_id", "candidate_id"): _id(registration[field])
     manifest = _decode(manifest_raw, expected_manifest_sha256, max_bytes=MAX_DYNAMIC_MANIFEST_BYTES)
-    _fields(manifest, _manifest_fields(manifest.get("schema")), "manifest")
-    _need(len(manifest_raw) <= MAX_BYTES or manifest["schema"] == "insider-stock-event-study-manifest-v2",
+    _fields(manifest, _manifest_fields(manifest.get("schema"), v2=v2), "manifest")
+    _need(len(manifest_raw) <= MAX_BYTES or manifest["schema"] in {"insider-stock-event-study-manifest-v2", "insider-stock-event-study-manifest-v3"},
           "legacy fixed manifest exceeds its unchanged bounded profile")
     _need(manifest["trust_scope"] == registration["trust_scope"]
           and manifest["registration_sha256"] == expected_registration_sha256, "manifest registration epoch mismatch")
@@ -330,7 +421,8 @@ def verify_registered_analysis_manifest(*, registration_raw: bytes, manifest_raw
     ids, issuer_days = set(), set()
     for event in events:
         _fields(event, {"signal_id", "issuer_id", "security_id", "available_at_utc", "entry_session", "exit_session",
-                        "source_event_sha256", "buyer_ids", "score", "earnings_distance_sessions", "regime"}, "event")
+                        "source_event_sha256", "buyer_ids", "score", "regime"}
+                | (set() if v2 else {"earnings_distance_sessions"}), "event")
         sid, issuer, _ = (_id(event[key]) for key in ("signal_id", "issuer_id", "security_id"))
         available = _utc(event["available_at_utc"])
         _digest(event["source_event_sha256"])
@@ -348,7 +440,7 @@ def verify_registered_analysis_manifest(*, registration_raw: bytes, manifest_raw
         for buyer in buyers: _id(buyer)
         _need(len(set(buyers)) == len(buyers), "buyer identities duplicated")
         _decimal(event["score"])
-        _need(type(event["earnings_distance_sessions"]) is int and abs(event["earnings_distance_sessions"]) <= 1_000,
+        _need(v2 or (type(event["earnings_distance_sessions"]) is int and abs(event["earnings_distance_sessions"]) <= 1_000),
               "earnings distance invalid")
         _need(type(event["regime"]) is str and event["regime"] in {"bull", "bear", "sideways"}, "unknown regime")
     _control_inventories(manifest)
@@ -356,6 +448,18 @@ def verify_registered_analysis_manifest(*, registration_raw: bytes, manifest_raw
             "registration_sha256": expected_registration_sha256, "manifest_sha256": expected_manifest_sha256,
             "canonical_event_clock_verified": True, "source_authentication_performed": False,
             "look_authority": False, "implementation_execution_identity_verified_here": False}
+
+
+def verify_registered_analysis_manifest(**kwargs) -> dict:
+    """Unchanged v1 registration/manifest admission; successor epochs refuse."""
+    _need("v2" not in kwargs, "public profile override forbidden")
+    return _verify_registered_analysis_manifest(**kwargs)
+
+
+def verify_registered_analysis_manifest_v2(**kwargs) -> dict:
+    """Strict separately registered no-earnings causal manifest-v3 admission."""
+    _need("v2" not in kwargs, "public profile override forbidden")
+    return _verify_registered_analysis_manifest(**kwargs, v2=True)
 
 
 def analysis_manifest_to_qc_manifest(*, registration_raw: bytes, manifest_raw: bytes,
@@ -1160,17 +1264,19 @@ def compare_supplied_execution_variants(*, variants_raw: bytes, expected_variant
 
 def _prepare_registered_study(*, registration_raw: bytes, manifest_raw: bytes,
                               terminal_raw: bytes, trust_roots: RegisteredAnalysisTrustRoots,
-                              expected_implementation_sha256: str) -> dict:
+                              expected_implementation_sha256: str, v2: bool = False) -> dict:
     _need(type(trust_roots) is RegisteredAnalysisTrustRoots, "exact trust roots required")
     hashes = trust_roots.hashes()
     registration = _decode(registration_raw, hashes["registration"])
     _fields(registration, {"schema", "trust_scope", "registered_look_id", "candidate_id", "policy", "analysis_plan",
                             "registered_at_utc", "first_outcome_access_utc", "implementation_sha256",
                             "source_manifest_sha256", "security_master_sha256", "calendar_sha256",
-                            "outcome_vintage_sha256", "rights_sha256", "prior_variance_calibration_sha256"}, "registration")
-    _need(registration["schema"] == "insider-stock-analysis-registration-v1"
+                            "outcome_vintage_sha256", "rights_sha256", "prior_variance_calibration_sha256"}
+            | ({"realized_earnings_implementation_sha256"} if v2 else set()), "registration")
+    _need(registration["schema"] == ("insider-stock-analysis-registration-v2" if v2 else "insider-stock-analysis-registration-v1")
           and registration["trust_scope"] == trust_roots.trust_scope, "registration scope/schema drift")
-    _need(canonical_bytes(registration["policy"]) == canonical_bytes(frozen_analysis_policy()), "pre-outcome policy drift")
+    _need(canonical_bytes(registration["policy"]) == canonical_bytes(
+        frozen_analysis_policy_v2() if v2 else frozen_analysis_policy()), "pre-outcome policy drift")
     _need(_utc(registration["registered_at_utc"]) < _utc(registration["first_outcome_access_utc"]),
           "registration not before outcome access")
     for field in registration:
@@ -1180,9 +1286,9 @@ def _prepare_registered_study(*, registration_raw: bytes, manifest_raw: bytes,
         _id(registration[field])
     # This is a hard actual gate, not an authorization claim in an artifact.
     _need(trust_roots.trust_scope == "fixture", "production analysis blocked by unchanged zero-look gate")
-    verified = verify_registered_analysis_manifest(registration_raw=registration_raw, manifest_raw=manifest_raw,
+    verified = _verify_registered_analysis_manifest(registration_raw=registration_raw, manifest_raw=manifest_raw,
                 expected_registration_sha256=hashes["registration"], expected_manifest_sha256=hashes["manifest"],
-                expected_implementation_sha256=expected_implementation_sha256)
+                expected_implementation_sha256=expected_implementation_sha256, v2=v2)
 
     manifest = verified["manifest"]
     terminal = _decode(terminal_raw, hashes["terminal"])
@@ -1214,7 +1320,8 @@ def _prepare_registered_study(*, registration_raw: bytes, manifest_raw: bytes,
     indexed = {}
     for event in events:
         _fields(event, {"signal_id", "issuer_id", "security_id", "available_at_utc", "entry_session", "exit_session",
-                        "source_event_sha256", "buyer_ids", "score", "earnings_distance_sessions", "regime"}, "event")
+                        "source_event_sha256", "buyer_ids", "score", "regime"}
+                | (set() if v2 else {"earnings_distance_sessions"}), "event")
         sid, issuer, security = (_id(event[key]) for key in ("signal_id", "issuer_id", "security_id"))
         available = _utc(event["available_at_utc"])
         _digest(event["source_event_sha256"])
@@ -1231,7 +1338,7 @@ def _prepare_registered_study(*, registration_raw: bytes, manifest_raw: bytes,
               len(event["buyer_ids"]) == len(set(event["buyer_ids"])), "buyer identities absent/duplicated")
         for buyer in event["buyer_ids"]: _id(buyer)
         _decimal(event["score"])
-        _need(type(event["earnings_distance_sessions"]) is int and abs(event["earnings_distance_sessions"]) <= 1_000,
+        _need(v2 or (type(event["earnings_distance_sessions"]) is int and abs(event["earnings_distance_sessions"]) <= 1_000),
               "earnings distance invalid")
         _need(event["regime"] in {"bull", "bear", "sideways"}, "unknown preregistered regime")
         indexed[sid] = (event, entry, opens[entry])
@@ -1258,7 +1365,7 @@ def _prepare_registered_study(*, registration_raw: bytes, manifest_raw: bytes,
     for event, entry, _ in indexed.values(): incidence[event["issuer_id"]].add(entry)
     return {"registration": registration, "manifest": manifest, "hashes": hashes, "sessions": sessions,
             "dates": dates, "indexed": indexed, "fills": fills, "inventories": inventories, "incidence": incidence,
-            "dynamic": manifest["schema"] == "insider-stock-event-study-manifest-v2"}
+            "v2": v2, "dynamic": manifest["schema"] in {"insider-stock-event-study-manifest-v2", "insider-stock-event-study-manifest-v3"}}
 
 
 def _derive_registered_date(*, day: str, rows: list, candidates: list, outcomes: list | None,
@@ -1368,7 +1475,10 @@ def _registered_study_report(*, context: dict, derived: list[dict]) -> dict:
                                   "mean_matched_net10": _text(_mean([row["returns"][20]["matched_factor_adjusted"] - _notional_cost(row["stock"]["exit_notional_ratio"][20])
                                                                    for row in derived if abs(row["event"]["earnings_distance_sessions"]) > window]))
                                   if any(abs(row["event"]["earnings_distance_sessions"]) > window for row in derived) else None}
-                    for window in (2, 5)}
+                    for window in (2, 5)} if not context["v2"] else {
+                        "available": False, "disposition": "UNAVAILABLE",
+                        "reason": "complete-externally-bound-actual-public-release-coverage-not-supplied",
+                        "required_windows_sessions": [2, 5], "primary_selection_depends_on_earnings": False}
         bootstrap = _block_bootstrap([(row["event"]["entry_session"], row["returns"][20]["matched_factor_adjusted"] - _notional_cost(row["stock"]["exit_notional_ratio"][20]))
                                      for row in primary], dates) if primary else {"available": False, "reason": "no-confirmation-events", "confidence_interval": None}
         def size_bucket(market_cap: Decimal) -> str:
@@ -1387,9 +1497,9 @@ def _registered_study_report(*, context: dict, derived: list[dict]) -> dict:
         for row in derived: issuer_counts[row["event"]["issuer_id"]] += 1
         entry_notional = sum((_decimal(fill["price"], positive=True) * fill["quantity"] for (signal, side), fill in fills.items() if side == "entry"), Decimal(0))
         exit_notional = sum((_decimal(fill["price"], positive=True) * -fill["quantity"] for (signal, side), fill in fills.items() if side == "exit"), Decimal(0))
-        report = {"schema": SCHEMA, "trust_scope": "fixture", "registered_look_id": registration["registered_look_id"],
+        report = {"schema": SCHEMA_V2 if context["v2"] else SCHEMA, "trust_scope": "fixture", "registered_look_id": registration["registered_look_id"],
                   "candidate_id": registration["candidate_id"], "artifact_sha256s": hashes,
-                  "policy_sha256": _sha(canonical_bytes(frozen_analysis_policy())),
+                  "policy_sha256": _sha(canonical_bytes(registration["policy"])),
                   "registered_implementation_sha256": registration["implementation_sha256"],
                   "implementation_execution_identity_verified_here": False,
                   "order_path_verified": True, "outcome_bytes_supplied": True, "actual_outcome_access_performed": False,
@@ -1440,6 +1550,11 @@ def _registered_study_report(*, context: dict, derived: list[dict]) -> dict:
                   "backtesting_ready": False, "source_authority": False, "rights_authority": False,
                   "qc_authority": False, "broker_authority": False, "qc_jobs_launched": 0}
         report["report_sha256"] = _sha(canonical_bytes(report))
+        if context["v2"]:
+            report.pop("report_sha256")
+            report["missing_required_diagnostic_inputs"].append("complete-source-event-bound-realized-earnings-release-coverage")
+            report["report_sha256"] = _sha(canonical_bytes(report))
+            return _seal_registered_v2_result(report=report, context=context, derived=derived)
         return report
 
 
@@ -1452,13 +1567,13 @@ def _panel_context_binding(body: dict, context: dict) -> None:
     _digest(body["matched_control_coverage_sha256"])
 
 
-def analyze_registered_stock_study(*, registration_raw: bytes, manifest_raw: bytes,
+def _analyze_registered_stock_study(*, registration_raw: bytes, manifest_raw: bytes,
                                    terminal_raw: bytes, panel_raw: bytes,
                                    trust_roots: RegisteredAnalysisTrustRoots,
-                                   expected_implementation_sha256: str) -> dict:
+                                   expected_implementation_sha256: str, v2: bool = False):
     """Bounded flat compatibility profile; production refuses before outcomes."""
     context = _prepare_registered_study(registration_raw=registration_raw, manifest_raw=manifest_raw,
-        terminal_raw=terminal_raw, trust_roots=trust_roots, expected_implementation_sha256=expected_implementation_sha256)
+        terminal_raw=terminal_raw, trust_roots=trust_roots, expected_implementation_sha256=expected_implementation_sha256, v2=v2)
     panel = _decode(panel_raw, context["hashes"]["panel"])
     dynamic, inventories = context["dynamic"], context["inventories"]
     _fields(panel, {"schema", "trust_scope", "registration_sha256", "manifest_sha256", "outcome_vintage_sha256",
@@ -1490,10 +1605,10 @@ class SuppliedPanelRecord:
     raw: bytes
 
 
-def analyze_registered_stock_study_stream(*, registration_raw: bytes, manifest_raw: bytes,
+def _analyze_registered_stock_study_stream(*, registration_raw: bytes, manifest_raw: bytes,
                                           terminal_raw: bytes, panel_descriptor_raw: bytes, panel_records,
                                           trust_roots: RegisteredAnalysisTrustRoots,
-                                          expected_implementation_sha256: str) -> dict:
+                                          expected_implementation_sha256: str, v2: bool = False):
     """Exactly one externally anchored record per entry date, one-pass only.
 
     Descriptor and all record byte lengths/digests bind the entire complete
@@ -1505,7 +1620,7 @@ def analyze_registered_stock_study_stream(*, registration_raw: bytes, manifest_r
     Current production refuses before even calling iter(panel_records).
     """
     context = _prepare_registered_study(registration_raw=registration_raw, manifest_raw=manifest_raw,
-        terminal_raw=terminal_raw, trust_roots=trust_roots, expected_implementation_sha256=expected_implementation_sha256)
+        terminal_raw=terminal_raw, trust_roots=trust_roots, expected_implementation_sha256=expected_implementation_sha256, v2=v2)
     _need(context["dynamic"], "stream requires dynamic per-entry manifest-v2")
     descriptor = _decode(panel_descriptor_raw, context["hashes"]["panel"])
     _fields(descriptor, {"schema", "trust_scope", "registration_sha256", "manifest_sha256", "outcome_vintage_sha256",
@@ -1560,11 +1675,36 @@ def analyze_registered_stock_study_stream(*, registration_raw: bytes, manifest_r
     else:
         raise RegisteredAnalysisError("REFUSED: extra panel record")
     del iterator
-    report = _registered_study_report(context=context, derived=derived)
+    result = _registered_study_report(context=context, derived=derived)
+    report = result.to_payload() if v2 else result
     report.pop("report_sha256")
     report["panel_processing_profile"] = "one-pass-per-entry-record-v1"
     report["panel_stream"] = {"records": len(records), "aggregate_bytes": consumed_bytes,
         "maximum_record_bytes": max(item["byte_length"] for item in records), "full_raw_records_retained": 0,
         "cross_date_control_or_outcome_cache_retained": False, "one_parent_look_no_per_record_alpha": True}
     report["report_sha256"] = _sha(canonical_bytes(report))
-    return report
+    return _seal_registered_v2_result(report=report, context=context, derived=derived) if v2 else report
+
+
+def analyze_registered_stock_study(**kwargs) -> dict:
+    """Unchanged flat v1 API, rejecting successor registration epochs."""
+    _need("v2" not in kwargs, "public profile override forbidden")
+    return _analyze_registered_stock_study(**kwargs)
+
+
+def analyze_registered_stock_study_v2(**kwargs) -> RegisteredStudyV2Result:
+    """Strict no-earnings causal profile; aggregate-only sealed fixture result."""
+    _need("v2" not in kwargs, "public profile override forbidden")
+    return _analyze_registered_stock_study(**kwargs, v2=True)
+
+
+def analyze_registered_stock_study_stream(**kwargs) -> dict:
+    """Unchanged one-pass v1 API, rejecting successor registration epochs."""
+    _need("v2" not in kwargs, "public profile override forbidden")
+    return _analyze_registered_stock_study_stream(**kwargs)
+
+
+def analyze_registered_stock_study_stream_v2(**kwargs) -> RegisteredStudyV2Result:
+    """Same bounded one-pass math under explicit no-earnings causal epoch."""
+    _need("v2" not in kwargs, "public profile override forbidden")
+    return _analyze_registered_stock_study_stream(**kwargs, v2=True)

@@ -34,6 +34,7 @@ from research.insider_buying.backtest_event_study_manifest import (
 
 
 VERSION = "insider-canonical-qc-batch-plan-v1"
+VERSION_V2 = "insider-canonical-qc-batch-plan-v2"
 MANIFEST_SCHEMA = "insider-qc-canonical-open-study-v2"
 GATE_SCHEMA = "insider-qc-canonical-open-gate-v2"
 LEGACY_SOURCE_SHA256 = "c80ff4f585d59d1b8e4ecd0d6199605fee727de9df0a13b74e987fe4d2819f87"
@@ -387,7 +388,7 @@ class CanonicalQcBatchPlan:
 
     def to_payload(self):
         body = self._body()
-        return {"kind": VERSION, "parent_study_id": body["parent_study_id"], "registered_look_id": body["registered_look_id"],
+        return {"kind": body["version"], "parent_study_id": body["parent_study_id"], "registered_look_id": body["registered_look_id"],
             "plan_sha256": body["plan_sha256"], "source_event_study_sha256": body["source_event_study_sha256"],
             "source_event_manifest_sha256": body["source_event_manifest_sha256"], "event_count": sum(len(row) for row in body["batches"]),
             "batch_count": len(body["batches"]), "batch_ids": [self._batch_id(n) for n in range(len(body["batches"]))],
@@ -508,9 +509,9 @@ class CanonicalQcBatchPlan:
         return raw
 
 
-def build_canonical_qc_batch_plan(*, source_events: SourceEventStudyManifest, legacy_source: bytes,
+def _build_canonical_qc_batch_plan(*, source_events: SourceEventStudyManifest, legacy_source: bytes,
                                  security_master: bytes, entry_reference: bytes, registration: bytes,
-                                 parent_study_id: str) -> CanonicalQcBatchPlan:
+                                 parent_study_id: str, v2=False) -> CanonicalQcBatchPlan:
     """Plan every sealed causal event BEFORE outcomes; no enabled source route."""
     _id(parent_study_id)
     _need(type(legacy_source) is bytes and _sha(legacy_source) == LEGACY_SOURCE_SHA256, "captured legacy source differs")
@@ -518,8 +519,13 @@ def build_canonical_qc_batch_plan(*, source_events: SourceEventStudyManifest, le
         metadata = validate_source_event_study_manifest(source_events)
     except ValueError as exc:
         raise CanonicalQcCandidateError("REFUSED: exact sealed source-event manifest required") from exc
+    from research.insider_buying import backtest_event_study_manifest as causal
+    from research.insider_buying import backtest_event_study_collection as collection
+    _need(metadata["kind"] in ({causal.VERSION_V2, collection.VERSION_V2} if v2 else {causal.VERSION, collection.VERSION}),
+          "canonical candidate source causal epoch differs")
     raw = source_events.manifest_bytes()
-    checked = analysis.verify_registered_analysis_manifest(registration_raw=registration, manifest_raw=raw,
+    validator = analysis.verify_registered_analysis_manifest_v2 if v2 else analysis.verify_registered_analysis_manifest
+    checked = validator(registration_raw=registration, manifest_raw=raw,
         expected_registration_sha256=metadata["registration_sha256"], expected_manifest_sha256=_sha(raw),
         expected_implementation_sha256=metadata["analysis_implementation_sha256"])
     manifest, registered = checked["manifest"], checked["registration"]
@@ -552,7 +558,7 @@ def build_canonical_qc_batch_plan(*, source_events: SourceEventStudyManifest, le
     signals.sort(key=lambda row: (row["entry_session"], row["issuer_id"], row["signal_id"]))
     batches = _partition(signals, dates)
     _need(sorted(row["signal_id"] for batch in batches for row in batch) == sorted(row["signal_id"] for row in events), "batch partition changed complete event population")
-    body = {"version": VERSION, "trust_scope": metadata["trust_scope"], "parent_study_id": parent_study_id,
+    body = {"version": VERSION_V2 if v2 else VERSION, "trust_scope": metadata["trust_scope"], "parent_study_id": parent_study_id,
         "candidate_id": registered["candidate_id"], "registered_look_id": registered["registered_look_id"],
         "registration_sha256": metadata["registration_sha256"], "source_event_study_sha256": source_events.sha256,
         "source_event_manifest_sha256": _sha(raw), "rights_sha256": registered["rights_sha256"],
@@ -566,6 +572,18 @@ def build_canonical_qc_batch_plan(*, source_events: SourceEventStudyManifest, le
     # Compile the exact first child now; every child has the same guarded spans.
     result.batch_files(0)
     return result
+
+
+def build_canonical_qc_batch_plan(**kwargs) -> CanonicalQcBatchPlan:
+    """Unchanged v1 source epoch; no generic future-reference override."""
+    _need("v2" not in kwargs, "public canonical profile override forbidden")
+    return _build_canonical_qc_batch_plan(**kwargs)
+
+
+def build_canonical_qc_batch_plan_v2(**kwargs) -> CanonicalQcBatchPlan:
+    """Explicit causal-v2 profile, same MOO economics and native clock checks."""
+    _need("v2" not in kwargs, "public canonical profile override forbidden")
+    return _build_canonical_qc_batch_plan(**kwargs, v2=True)
 
 
 def _completion(plan, terminals, digests):

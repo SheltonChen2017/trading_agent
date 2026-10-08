@@ -1,6 +1,9 @@
 # Insider Buying ETF Strategy — implementation and session record
 
-Status: **SECTION 147 RECORDS ONE COMPLETED BOUNDED QC-NATIVE RESEARCH
+Status: **SECTION 149 IS THE AUTHORIZED COMBINED-V4/CONTINUATION AND
+VERSIONED EARNINGS-SEPARATION ROUND IN PROGRESS; ACTUAL NEW REPLAY/CAPTURE
+RESULTS MUST BE RECORDED BEFORE ITS COUNTS ARE PROMOTED. SECTION 147
+RECORDS ONE COMPLETED BOUNDED QC-NATIVE RESEARCH
 ACCESS DIAGNOSTIC: THREE HISTORY CALLS, SOURCE TRADE/QUOTE COUNTS 12/116
 AND CLOCK COUNT 390; ZERO BACKTEST LAUNCHES OR ECONOMIC-VALUE EXPORT.
 CONNECTED PROFILE RESOLVES SEC CONTACT. FRESH FIRST-64 V4 CAPTURE COMPLETED
@@ -246,6 +249,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex owner-waived provider integration | Published start `59ef662062e91e09d9449aeb3f23cb5812ce7142`; implementation `195012fd471f028f5b2a196e4b97419197bafc68`; this separate exact-hash handoff | Capability journal, supplied current-reference triage and private rights evidence | QC authentication HTTP 200; Massive public status HTTP 200 is not Benzinga entitlement. Supplied Sharadar ZIP/hash/header verified without interpreting rows or opening actions/fundamentals. No incoming review or Claude wait. | Final focused **510 passed in 2.61s**, eight memory compilations, frozen historical equality and independent eight-leaf private journal verification. Two fixed metadata requests, 424 response bytes; zero Sharadar/SEC requests, looks, uploads, compiles, jobs or backtests. | `IBMETA-R01..R05` corrected with genuine red/green; shared QC documented-envelope issue recorded without shared edits. Four topical P2 and prior dispositions/classifications/denominators unchanged. Credentials do not establish readiness. | One combined matching-lane push after separate exact-hash handoff. No review wait or monitor rearm. Bind real original-parent/PIT/listing/reference/rights/product/vintage evidence before production activation; no ordinary owner choice is deferred. |
 | 2026-10-07 | Codex owner-confirmed acquisition/reuse | Published start `f0c5b48ddc9c60f8051ee4026f79c592c2cdfa27`; exact implementation and separate handoff follow | Actual retained Sharadar audit and one-shot purchased Earnings access; bounded QC probe prepared | User confirms QC/identity/Sharadar work and purchased Earnings; Safari authentication verified. All three retained archives and all 3,989,156 rows independently match manifest hashes/counts. One fixed Earnings request HTTP 200, 389 bytes, one row, privately replayed. No financial arithmetic/price-return join/look. | Focused and final integrated checks in 145.6; genuine red/green fixes and peer audit. Native QC code prepared but not run; new owned coding workspace/template auto-build only. SEC requests zero; no broad suite or new acquisition of completed/ambiguous parents. | Draft Sharadar, Earnings custody/credential/count, and QC cell/frontier defects corrected. Four topical P2 and shared issue remain OPEN; all prior closures/classifications preserved. Public Earnings history does not cover pre-2010 segment or prove schedule versions. | Complete authorized bounded acquisition/reuse checkpoint with one matching-lane push. Manual Mac unlock permits exact native QC probe; genuine SEC contact and separately committed fresh capture permit original-parent acquisition. No purchase, review wait, monitor rearm, raw QC export or readiness fabrication. |
 | 2026-10-07 | Codex continuous owner-waived source/native build | Published start `4c204aa60951896a8ba02570321d19227a8aebe7`; incoming range empty; first-prefix candidate `e900c7a90d326cd81df952684b0c583ad8ffb639`; projection candidate `23c7a11d53a8d1c457bac34bdebe977d3d567d00`; this separate observed handoff | One hosted native-count diagnostic, actual fresh first-64 SEC capture and completed read-only projection | Connected profile contact used privately; exact QC cell executed once with 12/116/390 counts/three History completions. Committed isolated partition replay then 64 HTTP-200 bodies/504,050 bytes, independently replayed; all 64 XML projections passed, zero quarantines. No economic export, old-v3 write/retry or Claude pause. | Main integrated focused 876 passed; six memory compilations, historical equality; final boundary/document135 passed14.05s. Actual59-module selector/16 source-view reads,345.127s dispatch span,journal0.26s,source-onlyprojection0.512s/55entries54paths; hashes/custody in147. No full suite or strategy backtest. | Engineering findings corrected as147.8; four topical P2/shared issue OPEN, both historical access classifications unchanged. Partial capture/projection is not PIT/class/full-population/calendar readiness; no combined union promotion. | Completed available bounded source/native steps; real full-study missing inputs in147.6 block readiness, not another approval. Preserve frozen window/quarantines and document delegated no-fabrication disposition; one combined matching-lane push after exact-hash handoff. No monitor rearm, duplicate purchase or claim of project completion. |
+| 2026-10-08 | Codex authorized continuous source/causal build | Published start `1c50d1ba2045e66e3bf714be94a9ee89c6da547d`; incoming range empty; exact candidate/handoff hashes follow execution | Combined first64 closure, next256 one-shot continuation, separately versioned retrospective earnings sensitivity | Owner authorized the concrete next steps; no new Claude wait or review invented. Before execution, full original replay and new capture remain unobserved; old first64 facts unchanged. | Main focused310 capture/selector and406 earnings/affected checks passed;135 boundaries passed;10 files memory-compiled; four historical bytes unchanged. Detailed red/green and scope in149. | Draft source-binding, journal/CLI consistency, precision and ordering defects corrected. Four topical P2/shared finding remain OPEN. Earnings correction does not manufacture historical actual releases or activate production outcomes. | Commit exact candidate, execute isolated combined replay, acquire only its exact new prefix once if valid, independently replay/project retained results, then record actual disposition and one combined lane push. No old-v3 resume, monitor rearm or readiness claim. |
 ## 6. Claude review - shared remediation synchronization (2026-08-28)
 
 Reviewer: Claude, dedicated Insider Buying lane review session, working in an
@@ -20653,3 +20657,271 @@ edits only clarify whitespace in this record. Before handoff commit, matching
 origin remains 4c204aa6 and local HEAD remains 23c7a11d, with only this expected
 record modified; the exact outgoing implementation range is the two hashes
 above. Recheck the final staged record and status before the one combined push.
+
+## 149. Owner-authorized combined v4 inventory and fresh continuation (2026-10-07 owner-local; in progress)
+
+### 149.1 Scope and decisions before execution
+
+The owner answered the concrete next-step description with "authorized. plz
+proceed". Existing continuous-build and no-Claude-wait directions remain in
+force. Start from clean `1c50d1ba2045e66e3bf714be94a9ee89c6da547d` in the
+designated Insider worktree and `codex/strategy-insider-buying`; fetching only
+the matching remote lane reproduced that exact tip and an empty incoming
+range. No independent review is invented. Shared behavior, shared documents,
+Action Plan, SESSION_HANDOFF and frozen historical files remain untouched.
+
+The first concrete deliverable is a genuinely executed offline combined v4
+partition. Reconstruct the complete original 99,394-request partition with
+the accepted isolated historical source view; independently replay the
+first64 journal, raw parents and original projection receipt; freshly
+reproject those parents; prove their exact membership in the original
+unattempted prefix. Preserve the old classes and stopped-v3 disposition and
+add the new capture as a separate source overlay. Inspect the permanent
+accession claims: an unrecognized, incomplete or ambiguous claim blocks
+continuation rather than being silently skipped. The expected arithmetic
+19,526 + 64 = 19,590 source-bound and 79,868 - 64 = 79,804 remaining is only
+an expectation until that complete observed replay succeeds. None of these
+counts establishes canonical/PIT admission or source authenticity.
+
+Delegated engineering choice: create a separately versioned combined
+selection and continuation capture, preserving the original first-prefix
+selection/capture/projection contracts. After actual replay succeeds, the
+next actual batch is the exact next **256** original unattempted requests
+in frozen order, with one permanent claim and at most one SEC attempt each.
+Its new immutable capture ID is `ib-sec-v4-continuation256-20261008-once`
+(UTC identifier; the authorization was recorded on the owner's October 7).
+Cap each body at 8 MiB, reserve the batch's worst-case 2 GiB plus 8 GiB free
+space, keep at least 500 ms between completion and the next request, and stop
+at the first refusal, invalid response, persistence failure or ambiguity.
+Reserve all selected claims before dispatch; never release or redispatch
+them after a partial batch. Use the established fixed SEC transport and
+private contact screening. The connected Gmail profile again supplies the
+contact privately; no contact value goes in Git, arguments, environment,
+journals or output, and no message is sent or modified.
+
+Commit the exact validated candidate before the actual combined replay and
+capture. Freeze source files during both operations and independently replay
+any new journal afterward under effective process-tree network denial.
+All tests and offline replays retain required isolation. No original
+first-prefix command is rerun to bypass claims, and no stopped-v3 root is
+resumed or modified. Record actual counts and any failure without promoting
+expected counts, estimated transfers or source-declared dates into facts.
+There is no strategy/outcome look or backtest in this source continuation.
+
+In parallel, verify a concrete supplier route for original as-known earnings
+calendar evidence across the original study, including its pre-2010 segment.
+Public product descriptions are discovery evidence; neither supplier claims
+nor owner approval substitute for received timestamped data and applicable
+use terms. Existing Sharadar and purchased Earnings access are not purchased
+again. Any required external supplier interaction is reported separately
+from available lane engineering work.
+
+### 149.2 Calendar-source discovery and a narrower substantive requirement
+
+Primary supplier descriptions identify a feasible archival route, without
+establishing an existing entitlement or received dataset. Wall Street Horizon
+describes historical data generally from 2006, varying by dataset, and its
+2023 announcement identifies earnings-date daily snapshots and date revisions
+as subscription products. Exact earliest dates, historical/delisted issuer
+coverage and processing terms still require evidence. Sources:
+[historical data](https://www.wallstreethorizon.com/historical-data) and
+[archive announcement](https://wallstreethorizon.com/news/Wall-Street-Horizon-Expands-Historical-Corporate-Event-Data).
+A bounded connected-mail query for that supplier and subscription/licence/
+historical records returned no messages; this establishes only the search
+result, not absence of a purchase or account. No supplier is contacted and
+no subscription is purchased in this discovery.
+
+The blueprint's earnings-window exclusion/comparison diagnostic must be
+distinguished from an advance-known calendar used for trading. Source
+inspection found that `backtest_registered_analysis.py` builds the primary
+confirmation statistic before its separate +/-2 and +/-5-session earnings
+sensitivity summaries. Yet `backtest_event_study_manifest.py` requires
+pre-open earnings knowledge for every referenced master SID and includes
+those timestamps in the prerequisite clock consumed by the QC candidate.
+This is an additional implementation restriction; a forecast-vintage archive
+must not be represented as the only possible way to meet a retrospective
+diagnostic. `IBCAL-149-R01` (P2, OPEN pending versioned correction) records
+this coupling. No existing contract is weakened or marked corrected here.
+
+A valid alternative must bind verified actual earnings-release events to
+the frozen source-derived event population and preserve all missing-coverage
+dispositions. It must leave the primary population, signals, controls and
+orders independent of subsequently known earnings dates. Actual release
+events are not interchangeable with projected schedules, conference calls or
+Form 10-Q filing dates. Required archive coverage includes each relevant
+entry's +/-5 verified trading sessions, including any needed boundary dates
+outside the first/last study quarter. This narrows the data requirement by
+its scientific use; it does not shorten the study or infer missing events.
+
+### 149.3 Delegated pre-outcome earnings separation decision
+
+Adopt a separately versioned successor under the owner's delegated judgment:
+the primary causal event/collection/QC path will not require an earnings
+calendar, while a separately bound retrospective diagnostic evaluates the
+blueprint's two fixed +/-2 and +/-5-session exclusions. Keep every existing
+v1 schema/API and known-calendar policy strict; no silent relaxation of a
+previous candidate and no mixed-version collection. Preserve original
+source dates, event construction, matching, score, order economics, primary
+statistic, alpha allocation and look accounting. A new registration binds
+the successor policy and implementation before any outcome access.
+
+The realized-earnings input must cover the exact frozen source-derived event
+IDs and genuine release/session identities, with external hashes, provenance,
+explicit completeness and missing-event dispositions. Future-known release
+dates must never enter primary signals, eligibility, controls, sizing or
+orders. Both prespecified diagnostic windows are always retained, with no
+selection of whichever result looks best. A primary report without the
+required completed diagnostic cannot claim completed study evidence or
+readiness. Source release dates remain factual inputs; a missing archive is
+not replaced by a zero distance, an empty invented calendar or modern data.
+
+This corrects an unnecessary causal prerequisite rather than granting an
+outcome look or concluding the diagnostic passes. No real outcome, earnings
+archive or QC job is used to choose this design. Focused regressions must
+prove that the successor can build identical primary economic orders without
+an earnings forecast, that later release metadata cannot change those orders,
+and that absent/duplicate/mismatched event coverage cannot produce a completed
+diagnostic. The implementation and measured validation follow separately.
+
+### 149.4 Continuation candidate verification before any new request
+
+The separate combined selector reconstructs the old partition and verifies
+the saved first64 receipt against fresh complete-parent projection. The
+source-only worker explicitly binds the accepted selector to its already
+captured bootstrap; it does not conceal duplicate source executions. The
+supervisor also verifies the exact historical acquisition-executor Git blob
+and diagnostic-capture Git image, in addition to all current committed
+sources and the four historical validators. The shared claim namespace must
+contain exactly the completed first64 run before the next prefix is sealed.
+
+The continuation has its own strict selection family and journal version,
+not a relabelled original first-prefix token. It acquires the shared lock,
+checks all existing claims and runs, permanently reserves every selected
+accession before any HTTP request, and binds each fsynced start/result/body
+to the exact new reservation. Source/Git context and retained-byte custody
+are checked at every request boundary. Expensive immutable Git-blob checks
+occur initially and finally; live HEAD, branch, status and current-source
+checks are not cached away. Failures consume their start/claim and stop the
+batch. A nonprogressing spacing clock refuses the second start rather than
+dispatching too soon. A separate verifier replays the entire journal and
+can project retained parents without making any request.
+
+Draft defects corrected before acquisition, with genuine fixture red/green:
+
+- `IBV4-149-R01` (P3, corrected): the CLI summary used a nonexistent combined
+  count key. Along with the independent-verifier lock-byte omission below,
+  the two controls were red **2 failed / 42 deselected in 0.95s**, then green
+  **2 passed / 42 deselected in 0.94s**. The CLI now prints the real selection
+  summary before requesting the private contact. Its test mocks CLI plumbing
+  with an invented selection; it is not an observed retained-root replay.
+- `IBV4-149-R02` (P2 custody defense, corrected): the independent journal
+  verifier checked lock identity but omitted exact lock-byte contents. It
+  now binds and rereads the required lock bytes as well as the inode/version.
+- `IBV4-149-R03` (P3 refusal consistency, corrected): malformed request
+  identity could escape the new selector as an older exception family.
+  Three genuine controls failed before the typed boundary correction.
+- `IBV4-149-R04` (P2 consistency defense, corrected): artificially reanchored
+  result metadata could contradict its HTTP refusal/body disposition. The
+  two fixture controls were red **2 failed / 49 deselected in 0.73s**; the
+  corrected targeted group passed **9 / 42 deselected in 0.79s**. This is not
+  evidence of an observed journal attack or source failure.
+
+An in-memory guard reversal also proved that removing the explicit captured
+bootstrap binding causes two real bootstrap executions in the source-only
+fixture; the corrected implementation executes it once. No production
+observed factory is minted from invented descriptors in these tests.
+
+Main-agent independent validation of the new combined/continuation files and
+the unchanged first-prefix selection/capture/projection tests passed **310
+in 41.14s**. The separate final component runs were **47 in 5.29s** for the
+combined selector and **52 in 40.85s** for continuation. These are overlapping
+focused selections, not additive coverage claims or a full lane suite.
+All ran with effective OS process-tree network denial, minimal environment,
+Python 3.12.14 `-B`, plugin autoload disabled and pytest cache disabled.
+No new SEC request or actual combined-root replay has occurred at this point.
+Retained response-body bytes are not asserted to equal network-transferred
+bytes, particularly for refusals and ambiguous transport failures.
+
+### 149.5 Versioned causal/retrospective earnings separation
+
+`IBCAL-149-R01` is corrected in the new version only. The existing v1
+registration/manifest/collection/QC APIs retain their strict old epochs and
+known-calendar requirements. New explicit v2 entry points require the new
+registration and manifest-v3/reference schemas; they refuse old or mixed
+children. Earnings fields are absent, not imputed, in the causal successor.
+Primary event construction, matching, MOO order economics, full-public-
+availability clock, listing seasoning, original study split and alpha
+allocation are unchanged. The diagnostic implementation digest is itself
+fixed in the new pre-outcome registration, separately from the analysis code.
+
+The new pure realized-earnings diagnostic consumes only a genuine factory-
+sealed v2 primary result and externally anchored supplied coverage bytes.
+It requires every exact source-event identity, issuer and security, actual
+public-release lineage and the complete +/-5-session interval. Corrections
+and retractions are explicit; projected dates, conference calls, SEC filing
+timestamps and unbound empty responses cannot stand in for releases. The
+delegated reaction-session convention is the first regular close strictly
+after the actual release instant: pre-open/intraday maps to that session;
+at/after-close or weekend maps to the next. This convention is registered
+before outcomes, not chosen from a profitable result.
+
+Both fixed inclusive +/-2 and +/-5 exclusions use all source events, as the
+previous descriptive formula did, with the same 20-session matched net
+traded-notional 10-bps-per-side return. They do not change primary selection,
+controls or orders, spend additional alpha, or export per-event returns.
+Any unavailable event makes the whole diagnostic `UNAVAILABLE`; no partial
+subset masquerades as complete coverage. Current production analysis and
+diagnostic execution still refuse before outcome iteration/source decoding;
+these fixture contracts do not by themselves activate a registered look.
+
+Two draft defects were independently reproduced before correction:
+
+- `IBCAL-149-R02` (P2, corrected): the stream's final sealing pass recomputed
+  retained return arithmetic outside the report's precision context. Low
+  ambient Decimal precision changed the diagnostic despite identical primary
+  report evidence. The seal now owns precision 50.
+- `IBCAL-149-R03` (P3, corrected): a valid reordered manifest could pass
+  analysis but fail its diagnostic because report sorting reordered derived
+  rows. The seal now proves exact unique signal-ID membership and joins into
+  the original externally bound manifest order, with no drops or duplicates.
+
+The two durable controls were genuinely red **2 failed / 53 deselected in
+0.99s**, then the complete new focused file passed **55 in 3.27s**. A separate
+peer repeated those **55 in 3.73s**, including the low-precision control, and
+found no remaining material issue in the five-module change. Existing
+affected focused tests had passed **351 in 88.76s** before the new control
+additions. These overlapping runs are attributed, not added together; the
+main-agent integrated final run is recorded separately. All used the denied-
+network harness. End-to-end evidence is invented causal source -> disabled
+generated MOO candidate -> invented sealed native completion -> v2 primary
+calculation -> realized-release diagnostic, not an actual QC run or real
+outcome look. No provider data or actual return was used to make the decision.
+
+### 149.6 Exact pre-execution validation and candidate bytes
+
+Main independently ran the new realized-earnings file plus the four affected
+manifest/collection/QC/registered-analysis files: **406 passed in 84.73s**.
+The separate import/document/hygiene/project-boundary selection including the
+exact Insider package guard passed **135 in 13.55s**. Both use the same
+OS-denied-network, minimal-environment, no-bytecode/plugin/cache harness.
+No complete lane/repository suite ran. All ten source/test files compiled
+in memory under OS network and all-write denial. `git diff --check` passed;
+the four frozen custody files remain byte-equal to historical `aa0d635d`.
+No shared/project-wide file or frozen v1/scale/pilot file changed.
+
+| Candidate file | SHA-256 |
+|---|---|
+| `research/insider_buying/backtest_registered_analysis.py` | `ab95ddbb86a784ab400abcf33abc03262a159ea89f1761dfbfca9c79e100bb12` |
+| `research/insider_buying/backtest_event_study_manifest.py` | `413c646dcca4d391da35aa9b8194b65fc78d7d38ebba10ddeb7e4c695c9f24cd` |
+| `research/insider_buying/backtest_event_study_collection.py` | `b66e9aec042aee3141889a60cba0d348d88d80d4d0a237cb9746ec8ecfb710ab` |
+| `research/insider_buying/backtest_qc_canonical_candidate.py` | `9c22964a86c08ff3319535670ada159c50a2f923ad60bcd6d6c0c2316f332430` |
+| `research/insider_buying/backtest_realized_earnings_diagnostic.py` | `53b585b425969e947069155e91290e43ad7878bc76066d229639691080a3383d` |
+| `research/insider_buying_sec_recovery_v4_combined.py` | `09bcd9a10136db28ce509c6020f88cbd8d1ad42cc88e1d1a68b1a7e37192c34f` |
+| `research/insider_buying_sec_recovery_v4_continuation_capture.py` | `8a6699c272342716603c4a748b9ed6409528d2c01212bc77fc3d6393c423fcdc` |
+| `tests/test_insider_buying_backtest_realized_earnings_diagnostic.py` | `40a63ea1432f6e52f9dfbd3b28434ef94ebd70a05375f4c37f65dd82054dd1ad` |
+| `tests/test_insider_buying_sec_recovery_v4_combined.py` | `cfa6199ffc4ad00637d96a930073ca57fd20d09802d84ca939713bfae5ce60fd` |
+| `tests/test_insider_buying_sec_recovery_v4_continuation_capture.py` | `d82bbef6e81e3cd878ceed1598b07a7c7bd12922f9688e4a16879076363e5af6` |
+
+Peer reviews are internal Codex verification, not independent Claude review.
+The source/test edit freeze now spans the actual replay, capture and read-only
+projection; no later commit is represented as existing during execution.

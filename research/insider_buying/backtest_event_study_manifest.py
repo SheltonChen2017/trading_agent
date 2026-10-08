@@ -39,6 +39,8 @@ from research.insider_buying.backtest_source_stream import (
 
 VERSION = "insider-source-causal-firstopen-manifest-v1"
 ZERO_WINDOW_VERSION = "insider-source-causal-firstopen-zero-window-v1"
+VERSION_V2 = "insider-source-causal-firstopen-manifest-v2"
+ZERO_WINDOW_VERSION_V2 = "insider-source-causal-firstopen-zero-window-v2"
 EVENT_POPULATION_POLICY = "causal-owner-security-transaction-date-first50k-crossing-firstopen-snapshot-no-late-reset-issuer-entrydate-merge-v1"
 PRIMARY_SEASONING_EXCLUSION = "primary_factor_calibration_listing_seasoning_below_253_sessions"
 MAX_REFERENCE_BYTES = analysis.MAX_BYTES
@@ -158,14 +160,17 @@ def _seal_validated_manifest(body: dict, *, max_bytes: int = MAX_OUTPUT_BYTES) -
 
 def _reference(raw: bytes, roots: EventStudyManifestTrustRoots, mappings: list[dict],
                calendar: bytes, sessions: list[str], opens: list, closes: list,
-               entry_reference_records: Iterator[EntryReferenceRecord] | None) -> tuple[dict, dict, dict]:
+               entry_reference_records: Iterator[EntryReferenceRecord] | None,
+               *, v2: bool = False) -> tuple[dict, dict, dict]:
     _need(type(raw) is bytes and 0 < len(raw) <= MAX_REFERENCE_BYTES,
           "entry reference bytes exceed finite bound")
     body = analysis._decode(raw, roots.entry_reference_sha256)
     analysis._fields(body, {"schema", "trust_scope", "calendar_sha256", "security_master_sha256",
                            "event_population_policy", "eligible_control_security_ids", "entries"}, "entry reference")
-    streaming = body["schema"] == "insider-event-entry-pit-reference-stream-v2"
-    _need(body["schema"] in {"insider-event-entry-pit-reference-v1", "insider-event-entry-pit-reference-stream-v2"}
+    nested_schema = "insider-event-entry-causal-reference-v2" if v2 else "insider-event-entry-pit-reference-v1"
+    stream_schema = "insider-event-entry-causal-reference-stream-v3" if v2 else "insider-event-entry-pit-reference-stream-v2"
+    streaming = body["schema"] == stream_schema
+    _need(body["schema"] in {nested_schema, stream_schema}
           and body["trust_scope"] == roots.trust_scope
           and body["calendar_sha256"] == roots.calendar_sha256
           and body["security_master_sha256"] == roots.security_master_sha256
@@ -213,8 +218,9 @@ def _reference(raw: bytes, roots: EventStudyManifestTrustRoots, mappings: list[d
             except (ValueError, UnicodeError, RecursionError) as exc:
                 raise EventStudyManifestError("REFUSED: malformed streamed entry reference") from exc
             analysis._fields(entry, {"schema", "trust_scope", "entry_session", "knowledge_at_utc", "regime",
-                                    "stock_context", "stock_context_sha256", "earnings_rows"}, "streamed entry record")
-            _need(entry["schema"] == "insider-event-entry-pit-reference-record-v2"
+                                    "stock_context", "stock_context_sha256"}
+                            | (set() if v2 else {"earnings_rows"}), "streamed entry record")
+            _need(entry["schema"] == ("insider-event-entry-causal-reference-record-v3" if v2 else "insider-event-entry-pit-reference-record-v2")
                   and entry["trust_scope"] == roots.trust_scope
                   and entry["entry_session"] == descriptor["entry_session"]
                   and analysis.canonical_bytes(entry) == reference_blob,
@@ -226,7 +232,7 @@ def _reference(raw: bytes, roots: EventStudyManifestTrustRoots, mappings: list[d
             reference_digest = hash_payload(entry)
             total_reference_bytes += len(canonical_json(entry).encode("utf-8"))
         analysis._fields(entry, {"entry_session", "knowledge_at_utc", "regime", "stock_context",
-                                "stock_context_sha256", "earnings_rows"}, "entry PIT reference")
+                                "stock_context_sha256"} | (set() if v2 else {"earnings_rows"}), "entry PIT reference")
         day = entry["entry_session"]
         _need(type(day) is str and day in sessions and (previous is None or previous < day),
               "entry reference dates absent, duplicate or reordered")
@@ -278,10 +284,11 @@ def _reference(raw: bytes, roots: EventStudyManifestTrustRoots, mappings: list[d
         eligible = {sid for sid in all_sids if sid in observed_eligible}
         _need(3 <= len(eligible) <= analysis.MAX_POOL,
               "complete eligible per-entry control cohort is absent or exceeds its finite bound")
-        earnings_rows = entry["earnings_rows"]
-        _need(type(earnings_rows) is list and len(earnings_rows) == len(all_sids), "complete earnings reference universe differs")
+        earnings_rows = [] if v2 else entry["earnings_rows"]
+        _need(v2 or (type(earnings_rows) is list and len(earnings_rows) == len(all_sids)), "complete earnings reference universe differs")
         earnings = {}
-        for sid, row in zip(all_sids, earnings_rows, strict=True):
+        row = None
+        for sid, row in zip(() if v2 else all_sids, earnings_rows, strict=True):
             analysis._fields(row, {"qc_symbol_id", "known_earnings_sessions", "knowledge_at_utc"}, "earnings reference")
             _need(row["qc_symbol_id"] == sid and base._utc(row["knowledge_at_utc"]) < opens[index],
                   "earnings reference identity/knowledge differs")
@@ -333,12 +340,13 @@ def _reference(raw: bytes, roots: EventStudyManifestTrustRoots, mappings: list[d
                             "raw_records_retained": 0}
 
 
-def build_source_event_study_manifest(
+def _build_source_event_study_manifest(
     *, source_evidence: StreamSourceEvidence, security_master: bytes, calendar: bytes,
     common_equity_exceptions: bytes, entry_reference: bytes, registration: bytes,
     trust_roots: EventStudyManifestTrustRoots, event_first_session: str, event_last_session: str,
     entry_reference_records: Iterator[EntryReferenceRecord] | None = None,
     allow_zero_event_window: bool = False,
+    v2: bool = False,
 ) -> SourceEventStudyManifest:
     """Build a causal nonempty source-derived manifest before outcome access.
 
@@ -367,7 +375,7 @@ def build_source_event_study_manifest(
     mappings = base._mappings(master, sessions, source_cutoff, set(source["as_of_issuer_ciks"]))
     verify_common_equity_exceptions(raw=common_equity_exceptions, digest=trust_roots.common_equity_exceptions_sha256, scope=scope)
     reference, entry_contexts, reference_receipt = _reference(
-        entry_reference, trust_roots, mappings, calendar, sessions, opens, closes, entry_reference_records)
+        entry_reference, trust_roots, mappings, calendar, sessions, opens, closes, entry_reference_records, v2=v2)
     registered = analysis._decode(registration, trust_roots.registration_sha256)
     # A separately sealed zero-event coverage window cannot be passed through
     # the analysis validator's deliberately nonempty manifest contract. It
@@ -375,12 +383,17 @@ def build_source_event_study_manifest(
     analysis._fields(registered, {"schema", "trust_scope", "registered_look_id", "candidate_id", "policy", "analysis_plan",
         "registered_at_utc", "first_outcome_access_utc", "implementation_sha256", "source_manifest_sha256",
         "security_master_sha256", "calendar_sha256", "outcome_vintage_sha256", "rights_sha256",
-        "prior_variance_calibration_sha256"}, "causal registration")
-    _need(registered["schema"] == "insider-stock-analysis-registration-v1"
+        "prior_variance_calibration_sha256"} | ({"realized_earnings_implementation_sha256"} if v2 else set()), "causal registration")
+    descriptors = analysis.analysis_plan_descriptors_v2 if v2 else analysis.analysis_plan_descriptors
+    policy = analysis.frozen_analysis_policy_v2 if v2 else analysis.frozen_analysis_policy
+    method_roots = {"implementation_sha256": trust_roots.analysis_implementation_sha256}
+    if v2:
+        method_roots["realized_earnings_implementation_sha256"] = registered["realized_earnings_implementation_sha256"]
+    _need(registered["schema"] == ("insider-stock-analysis-registration-v2" if v2 else "insider-stock-analysis-registration-v1")
           and registered["implementation_sha256"] == trust_roots.analysis_implementation_sha256
           and analysis.canonical_bytes(registered["analysis_plan"]) == analysis.canonical_bytes(
-              analysis.analysis_plan_descriptors(implementation_sha256=trust_roots.analysis_implementation_sha256))
-          and analysis.canonical_bytes(registered["policy"]) == analysis.canonical_bytes(analysis.frozen_analysis_policy())
+              descriptors(**method_roots))
+          and analysis.canonical_bytes(registered["policy"]) == analysis.canonical_bytes(policy())
           and analysis._utc(registered["registered_at_utc"]) < analysis._utc(registered["first_outcome_access_utc"]),
           "causal registration methods, implementation, policy or timing differs")
     for field in registered:
@@ -527,13 +540,15 @@ def build_source_event_study_manifest(
         event = {"signal_id": digest[:32], "issuer_id": issuer, "security_id": sid, "available_at_utc": available,
                  "entry_session": day, "exit_session": sessions[index + 20], "source_event_sha256": digest,
                  "buyer_ids": sorted({lot["owner_cik"] for lot in member_lots}), "score": str(score),
-                 "earnings_distance_sessions": context["earnings"][sid], "regime": context["regime"]}
+                 "regime": context["regime"]}
+        if not v2:
+            event["earnings_distance_sessions"] = context["earnings"][sid]
         events.append(event)
         lineage.append({"signal_id": event["signal_id"], "payload": payload, "source_event_sha256": digest})
     per_entry_controls = {day: sorted(entry_contexts[day]["eligible_security_ids"])
                           for day in sorted({event["entry_session"] for event in events})}
     complete_control_union = sorted(set().union(*(set(ids) for ids in per_entry_controls.values())))
-    manifest = {"schema": "insider-stock-event-study-manifest-v2", "trust_scope": scope,
+    manifest = {"schema": "insider-stock-event-study-manifest-v3" if v2 else "insider-stock-event-study-manifest-v2", "trust_scope": scope,
         "registration_sha256": trust_roots.registration_sha256,
         "source_manifest_sha256": trust_roots.source_population_sha256,
         "security_master_sha256": trust_roots.security_master_sha256,
@@ -542,10 +557,11 @@ def build_source_event_study_manifest(
         "eligible_control_security_ids_by_entry_session": per_entry_controls, "events": events}
     manifest_raw = analysis.canonical_bytes(manifest)
     if events:
-        analysis.verify_registered_analysis_manifest(registration_raw=registration, manifest_raw=manifest_raw,
+        validator = analysis.verify_registered_analysis_manifest_v2 if v2 else analysis.verify_registered_analysis_manifest
+        validator(registration_raw=registration, manifest_raw=manifest_raw,
             expected_registration_sha256=trust_roots.registration_sha256, expected_manifest_sha256=hash_bytes(manifest_raw),
             expected_implementation_sha256=trust_roots.analysis_implementation_sha256)
-    summary = {"kind": VERSION if events else ZERO_WINDOW_VERSION, **roots, "event_population_policy": EVENT_POPULATION_POLICY,
+    summary = {"kind": (VERSION_V2 if events else ZERO_WINDOW_VERSION_V2) if v2 else (VERSION if events else ZERO_WINDOW_VERSION), **roots, "event_population_policy": EVENT_POPULATION_POLICY,
         "source_stream_sha256": source_evidence.sha256, "source_submission_count": source["source_submission_count"],
         "stream_corroborated_form4_count": source["stream_corroborated_form4_count"],
         "source_window_start": source["source_start"], "source_window_end": source["source_end"],
@@ -575,9 +591,28 @@ def build_source_event_study_manifest(
         "prior_listing_session_lower_bound_by_security_id": entry_contexts[day]["prior_listing_session_lower_bound_by_security_id"],
         "latest_prerequisite_knowledge_at_utc": entry_contexts[day]["latest_prerequisite_knowledge_at_utc"]}
         for day in sorted(per_entry_controls if events else entry_contexts)]
+    if v2:
+        for item in compact_references:
+            item.pop("earnings_distance_sessions_by_security_id")
     return _seal_validated_manifest({"summary": summary, "manifest": manifest, "lineage": lineage,
                                      "entry_references": compact_references})
 
 
+def build_source_event_study_manifest(**kwargs) -> SourceEventStudyManifest:
+    """Unchanged v1 profile: known earnings references remain mandatory."""
+    _need("v2" not in kwargs, "public causal profile override forbidden")
+    return _build_source_event_study_manifest(**kwargs)
+
+
+def build_source_event_study_manifest_v2(**kwargs) -> SourceEventStudyManifest:
+    """Explicit new epoch: earnings are absent from causal/reference clocks.
+
+    The required realized-release diagnostic is separate and retrospective;
+    absence here is not evidence that an issuer has no earnings events.
+    """
+    _need("v2" not in kwargs, "public causal profile override forbidden")
+    return _build_source_event_study_manifest(**kwargs, v2=True)
+
+
 __all__ = ["EventStudyManifestError", "EventStudyManifestTrustRoots", "SourceEventStudyManifest",
-           "EntryReferenceRecord", "build_source_event_study_manifest", "validate_source_event_study_manifest", "EVENT_POPULATION_POLICY"]
+           "EntryReferenceRecord", "build_source_event_study_manifest", "build_source_event_study_manifest_v2", "validate_source_event_study_manifest", "EVENT_POPULATION_POLICY"]

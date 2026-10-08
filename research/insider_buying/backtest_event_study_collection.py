@@ -21,6 +21,8 @@ from research.insider_buying.backtest_source_stream import StreamSourceEvidence,
 
 VERSION = "insider-source-causal-firstopen-collection-v1"
 INVENTORY_SCHEMA = "insider-causal-study-collection-inventory-v1"
+VERSION_V2 = "insider-source-causal-firstopen-collection-v2"
+INVENTORY_SCHEMA_V2 = "insider-causal-study-collection-inventory-v2"
 MAX_CHILDREN = 1_250
 MAX_INVENTORY_BYTES = 4 * 1024 * 1024
 MAX_TOTAL_CHILD_BYTES = 128 * 1024 * 1024 * 1024
@@ -67,12 +69,13 @@ class CausalStudyChildRecord:
               "exact sealed causal/source child and bounded registration required")
 
 
-def _child(record):
+def _child(record, *, v2=False):
     _need(type(record) is CausalStudyChildRecord, "non-child record in immutable collection")
     record.__post_init__()
     metadata = causal.validate_source_event_study_manifest(record.event_manifest)
     source = validate_stream_source_evidence(record.source_evidence)
-    _need(metadata["kind"] in {causal.VERSION, causal.ZERO_WINDOW_VERSION}
+    kinds = {causal.VERSION_V2, causal.ZERO_WINDOW_VERSION_V2} if v2 else {causal.VERSION, causal.ZERO_WINDOW_VERSION}
+    _need(metadata["kind"] in kinds
           and metadata["source_stream_sha256"] == record.source_evidence.sha256
           and metadata["source_population_sha256"] == source["population_manifest_sha256"]
           and metadata["trust_scope"] == source["trust_scope"]
@@ -81,13 +84,14 @@ def _child(record):
     registration = analysis._decode(record.registration_raw, metadata["registration_sha256"])
     manifest = json.loads(manifest_raw)
     if metadata["event_count"]:
-        checked = analysis.verify_registered_analysis_manifest(registration_raw=record.registration_raw,
+        validator = analysis.verify_registered_analysis_manifest_v2 if v2 else analysis.verify_registered_analysis_manifest
+        checked = validator(registration_raw=record.registration_raw,
             manifest_raw=manifest_raw, expected_registration_sha256=metadata["registration_sha256"],
             expected_manifest_sha256=metadata["manifest_sha256"],
             expected_implementation_sha256=metadata["analysis_implementation_sha256"])
         registration, manifest = checked["registration"], checked["manifest"]
     else:
-        _need(metadata["kind"] == causal.ZERO_WINDOW_VERSION and metadata["zero_event_window_complete"]
+        _need(metadata["kind"] == (causal.ZERO_WINDOW_VERSION_V2 if v2 else causal.ZERO_WINDOW_VERSION) and metadata["zero_event_window_complete"]
               and manifest["events"] == [] and metadata["standalone_analysis_population_nonempty"] is False,
               "zero-event window is not genuine complete source/reference coverage")
     quarters = record.source_evidence.quarter_receipts()
@@ -110,10 +114,23 @@ def describe_causal_child(record: CausalStudyChildRecord) -> dict:
     return _child(record)[0]
 
 
+def describe_causal_child_v2(record: CausalStudyChildRecord) -> dict:
+    """New homogeneous no-earnings causal epoch; old children refuse."""
+    return _child(record, v2=True)[0]
+
+
 def collection_provenance(value: causal.SourceEventStudyManifest) -> dict:
     """Detached original child receipts and deduplicated quarter accounting."""
     metadata = causal.validate_source_event_study_manifest(value)
     _need(metadata["kind"] == VERSION, "exact composed causal collection required")
+    body = value._body()
+    return {"child_receipts": body["child_receipts"],
+            "unique_source_quarter_receipts": body["unique_source_quarter_receipts"]}
+
+
+def collection_provenance_v2(value: causal.SourceEventStudyManifest) -> dict:
+    metadata = causal.validate_source_event_study_manifest(value)
+    _need(metadata["kind"] == VERSION_V2, "exact composed causal collection-v2 required")
     body = value._body()
     return {"child_receipts": body["child_receipts"],
             "unique_source_quarter_receipts": body["unique_source_quarter_receipts"]}
@@ -126,9 +143,9 @@ def _epoch(registration):
             if key not in {"source_manifest_sha256", "registered_at_utc"}}
 
 
-def build_source_event_study_collection(*, child_records: Iterator[CausalStudyChildRecord],
+def _build_source_event_study_collection(*, child_records: Iterator[CausalStudyChildRecord],
         collection_inventory: bytes, parent_registration: bytes,
-        trust_roots: EventStudyCollectionTrustRoots) -> causal.SourceEventStudyManifest:
+        trust_roots: EventStudyCollectionTrustRoots, v2=False) -> causal.SourceEventStudyManifest:
     """Compose exactly one complete, nonempty parent without touching outcomes."""
     _need(type(trust_roots) is EventStudyCollectionTrustRoots, "exact external collection roots required")
     trust_roots.__post_init__()
@@ -137,7 +154,7 @@ def build_source_event_study_collection(*, child_records: Iterator[CausalStudyCh
     inventory = analysis._decode(collection_inventory, trust_roots.collection_inventory_sha256)
     analysis._fields(inventory, {"schema", "trust_scope", "origin", "event_first_session", "event_last_session", "children"},
                      "causal child collection inventory")
-    _need(inventory["schema"] == INVENTORY_SCHEMA and inventory["trust_scope"] == trust_roots.trust_scope
+    _need(inventory["schema"] == (INVENTORY_SCHEMA_V2 if v2 else INVENTORY_SCHEMA) and inventory["trust_scope"] == trust_roots.trust_scope
           and inventory["origin"] == {"fixture": "invented-sealed-causal-window-collection",
               "production": "externally-anchored-sealed-causal-window-collection"}[trust_roots.trust_scope],
           "collection source/reference profile or scope differs")
@@ -149,7 +166,7 @@ def build_source_event_study_collection(*, child_records: Iterator[CausalStudyCh
     analysis._fields(parent, {"schema", "trust_scope", "registered_look_id", "candidate_id", "policy", "analysis_plan",
         "registered_at_utc", "first_outcome_access_utc", "implementation_sha256", "source_manifest_sha256",
         "security_master_sha256", "calendar_sha256", "outcome_vintage_sha256", "rights_sha256",
-        "prior_variance_calibration_sha256"}, "parent preregistration")
+        "prior_variance_calibration_sha256"} | ({"realized_earnings_implementation_sha256"} if v2 else set()), "parent preregistration")
     _need(parent["source_manifest_sha256"] == trust_roots.collection_inventory_sha256
           and parent["trust_scope"] == trust_roots.trust_scope
           and parent["implementation_sha256"] == trust_roots.analysis_implementation_sha256
@@ -169,7 +186,7 @@ def build_source_event_study_collection(*, child_records: Iterator[CausalStudyCh
             record = next(child_records)
         except StopIteration as exc:
             raise EventStudyCollectionError("REFUSED: declared causal child is missing") from exc
-        descriptor, metadata, source, quarters, registration, manifest = _child(record)
+        descriptor, metadata, source, quarters, registration, manifest = _child(record, v2=v2)
         _need(supplied_descriptor == descriptor and type(supplied_descriptor) is dict
               and canonical_json(supplied_descriptor) == canonical_json(descriptor),
               "immutable child inventory is reordered, altered or incomplete")
@@ -269,7 +286,7 @@ def build_source_event_study_collection(*, child_records: Iterator[CausalStudyCh
     lineage_by_id = {row["signal_id"]: row for row in lineages}
     lineages = [lineage_by_id[event["signal_id"]] for event in events]
     controls_union = sorted(set().union(*(set(ids) for ids in per_date_controls.values())))
-    parent_manifest = {"schema": "insider-stock-event-study-manifest-v2", "trust_scope": trust_roots.trust_scope,
+    parent_manifest = {"schema": "insider-stock-event-study-manifest-v3" if v2 else "insider-stock-event-study-manifest-v2", "trust_scope": trust_roots.trust_scope,
         "registration_sha256": trust_roots.parent_registration_sha256,
         "source_manifest_sha256": trust_roots.collection_inventory_sha256,
         "security_master_sha256": parent["security_master_sha256"], "calendar_sha256": parent["calendar_sha256"],
@@ -277,10 +294,11 @@ def build_source_event_study_collection(*, child_records: Iterator[CausalStudyCh
         "eligible_control_security_ids": controls_union,
         "eligible_control_security_ids_by_entry_session": dict(sorted(per_date_controls.items())), "events": events}
     parent_raw = analysis.canonical_bytes(parent_manifest)
-    analysis.verify_registered_analysis_manifest(registration_raw=parent_registration, manifest_raw=parent_raw,
+    validator = analysis.verify_registered_analysis_manifest_v2 if v2 else analysis.verify_registered_analysis_manifest
+    validator(registration_raw=parent_registration, manifest_raw=parent_raw,
         expected_registration_sha256=trust_roots.parent_registration_sha256, expected_manifest_sha256=hash_bytes(parent_raw),
         expected_implementation_sha256=trust_roots.analysis_implementation_sha256)
-    summary = {"kind": VERSION, **common, "source_population_sha256": trust_roots.collection_inventory_sha256,
+    summary = {"kind": VERSION_V2 if v2 else VERSION, **common, "source_population_sha256": trust_roots.collection_inventory_sha256,
         "collection_inventory_sha256": trust_roots.collection_inventory_sha256,
         "entry_reference_sha256": trust_roots.collection_inventory_sha256,
         "entry_reference_profile": "immutable-causal-child-source-and-reference-collection-inventory-v1",
@@ -305,5 +323,18 @@ def build_source_event_study_collection(*, child_records: Iterator[CausalStudyCh
         max_bytes=MAX_COLLECTION_BYTES)
 
 
+def build_source_event_study_collection(**kwargs) -> causal.SourceEventStudyManifest:
+    """Unchanged homogeneous v1 collection epoch; successor children refuse."""
+    _need("v2" not in kwargs, "public collection profile override forbidden")
+    return _build_source_event_study_collection(**kwargs)
+
+
+def build_source_event_study_collection_v2(**kwargs) -> causal.SourceEventStudyManifest:
+    """Complete adjacent no-earnings causal windows under one fixed look."""
+    _need("v2" not in kwargs, "public collection profile override forbidden")
+    return _build_source_event_study_collection(**kwargs, v2=True)
+
+
 __all__ = ["EventStudyCollectionError", "EventStudyCollectionTrustRoots", "CausalStudyChildRecord",
-           "describe_causal_child", "collection_provenance", "build_source_event_study_collection"]
+           "describe_causal_child", "describe_causal_child_v2", "collection_provenance", "collection_provenance_v2",
+           "build_source_event_study_collection", "build_source_event_study_collection_v2"]

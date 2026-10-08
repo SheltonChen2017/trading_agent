@@ -115,6 +115,47 @@ def test_all_duplicate_ticker_settlement_rows_are_refused(tmp_path):
     assert {row["reason"] for row in payload["refusals"]} == {"duplicate_ticker_settlement"}
 
 
+@pytest.mark.parametrize("changes", [
+    {"short_interest": -1},
+    {"short_interest": True},
+    {"avg_daily_volume": "NaN"},
+    {"days_to_cover": "NaN"},
+    {"unexpected_field": "invented"},
+    {"short_sale_volume": 42},
+])
+@pytest.mark.parametrize("malformed_first", [False, True])
+@pytest.mark.parametrize("across_pages", [False, True])
+def test_identifiable_malformed_duplicate_cannot_admit_its_valid_peer(
+    tmp_path, changes, malformed_first, across_pages,
+):
+    documents = fixture_documents(security_count=1)
+    results = documents["si-page-1.json"]["results"]
+    valid = results[0].copy()
+    malformed = {**valid, **changes}
+    pair = [malformed, valid] if malformed_first else [valid, malformed]
+    if across_pages:
+        documents["si-page-1.json"]["results"] = [pair[0], *results[1:]]
+        documents["si-page-1.json"]["next_url"] = "https://example.invalid/si-page-2.json"
+        documents["si-page-2.json"] = {"status": "OK", "results": [pair[1]]}
+    else:
+        documents["si-page-1.json"]["results"] = [*pair, *results[1:]]
+    payload = load_latest_revised_bundle(write_fixture(tmp_path, documents)).to_payload()
+    key = valid["ticker"], valid["settlement_date"]
+    assert all((row["ticker"], row["settlement_date"]) != key
+               for row in payload["observations"])
+    assert len(payload["observations"]) == 2
+    assert len(payload["refusals"]) == 2
+    assert all("duplicate_ticker_settlement" in row["reason"]
+               for row in payload["refusals"])
+    assert {row["row_index"] for row in payload["refusals"]} == (
+        {0, 3} if across_pages else {0, 1}
+    )
+    assert {row["raw_record_sha256"] for row in payload["refusals"]} == {
+        hash_payload(valid), hash_payload(malformed),
+    }
+    assert any("REFUSED:" in row["reason"] for row in payload["refusals"])
+
+
 @pytest.mark.parametrize("changes,reason", [
     ({"short_sale_volume": 42}, "daily_short_volume_forbidden"),
     ({"short_interest": True}, "exact integer"),

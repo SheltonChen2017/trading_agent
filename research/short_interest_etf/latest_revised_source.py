@@ -501,6 +501,7 @@ def load_latest_revised_bundle(
     releases = _calendar(companion["calendar"], manifest["calendar"]["sha256"])
     settlements = {row["settlement_date"] for row in releases}
     observations, refusals, slots = [], [], {}
+    raw_slot_counts, raw_slots_by_index = {}, {}
     row_index = 0
     for page_index, descriptor in enumerate(pages):
         response = _read_bound(root, descriptor)
@@ -518,6 +519,17 @@ def load_latest_revised_bundle(
             origin = {"kind": "short_interest", "row_index": row_index,
                       "raw_record_sha256": hash_payload(raw), "source_file_sha256": descriptor["sha256"]}
             row_index += 1
+            # Identify collisions before financial/schema validation: a bad
+            # copy must not make an otherwise valid duplicate unambiguous.
+            if type(raw) is dict:
+                try:
+                    raw_slot = (_text(raw.get("ticker"), "ticker"),
+                                _date(raw.get("settlement_date"), "settlement_date"))
+                except (TypeError, ValueError):
+                    pass  # The full row validation below records its refusal.
+                else:
+                    raw_slot_counts[raw_slot] = raw_slot_counts.get(raw_slot, 0) + 1
+                    raw_slots_by_index[origin["row_index"]] = raw_slot
             try:
                 if type(raw) is dict and any(key in raw for key in ("short_volume", "short_sale_volume", "trade_date")):
                     raise _refuse("daily_short_volume_forbidden")
@@ -535,11 +547,16 @@ def load_latest_revised_bundle(
                 slots.setdefault(slot, []).append((row, origin))
             except (TypeError, ValueError) as exc:
                 refusals.append({**origin, "reason": str(exc)})
-    for values in slots.values():
-        if len(values) != 1:
+    for slot, values in slots.items():
+        if raw_slot_counts[slot] != 1:
             refusals.extend({**origin, "reason": "duplicate_ticker_settlement"} for _, origin in values)
         else:
             observations.append(values[0][0])
+    for refusal in refusals:
+        raw_slot = raw_slots_by_index.get(refusal["row_index"])
+        if (raw_slot is not None and raw_slot_counts[raw_slot] > 1
+                and refusal["reason"] != "duplicate_ticker_settlement"):
+            refusal["reason"] = "duplicate_ticker_settlement; " + refusal["reason"]
     normalized = {}
     for kind, validator in (("references", _reference), ("bars", _bar), ("events", _event)):
         normalized[kind] = [{**validator(raw), **_origin(raw, manifest[kind]["sha256"])} for raw in companion[kind]]

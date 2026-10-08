@@ -331,6 +331,28 @@ def test_missing_middle_price_never_reranks_or_drops_only_the_missing_name(tmp_p
         assert record["status"] == "incomplete_common_cohort"
 
 
+@pytest.mark.parametrize("role", ALLOCATION_ROLES)
+def test_successor_after_evaluation_end_refuses_even_if_every_holding_terminates(role):
+    securities = [f"figi:BBG{index:09d}" for index in range(10)]
+    records = [{
+        "settlement_date": "2026-07-31", "entry_session": "2026-08-14",
+        "entry_at": "2026-08-14T13:30:00Z", "exit_session": "2026-09-02",
+        "exit_at": "2026-09-02T13:30:00Z", "status": "ready",
+        "common_security_ids": securities, "high_tail_security_ids": securities[-2:],
+        "low_tail_security_ids": securities[:2], "refusal_reasons": [],
+    }]
+    bars = {(security, "2026-08-14"): {"open": "10"} for security in securities}
+    events = [{
+        "event_id": f"fabricated-terminal-{index}", "security_id": security,
+        "kind": "terminal", "at": "2026-08-20T13:00:00Z", "cash_per_share": "10",
+    } for index, security in enumerate(securities)]
+    book = orders_module._book(records, bars, events, 20, 0, role)
+    assert book["complete"] is False
+    assert book["refusal_reasons"] == ["successor_exit_after_evaluation_end"]
+    assert book["financial_result"] is None
+    assert "orders" not in book and "cashflows" not in book
+
+
 def test_warmup_and_final_no_successor_records_are_retained(ordinary):
     records = _book(ordinary[3])["release_records"]
     assert [row["status"] for row in records] == ["warmup", "ready", "final_no_successor"]

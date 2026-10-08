@@ -119,7 +119,12 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
         frame = fixture_frames()[int(index_value)]
         if utc(self.utc_time) != datetime.fromisoformat(frame["at"]):
             raise BridgeError("engine callback clock differs from fixture")
-        actions = self.bridge.step(frame)
+        # Prior native receipts must be fully acknowledged before this boundary.
+        # Immediate native cash includes the shadow's unsettled receivables;
+        # reservations and spendable settled cash remain shadow-only authority.
+        actions = self.bridge.step(frame,
+            native_quantity=to_decimal(self.portfolio[self.symbol].quantity),
+            native_cash=to_decimal(self.portfolio.cash))
         for order in actions["submit"]:
             self.submitting = True
             try:
@@ -164,6 +169,8 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
 
     def on_end_of_algorithm(self):
         report = self.bridge.finish()
+        if report["native_account_checkpoints"] != len(fixture_frames()):
+            raise BridgeError("incomplete native account checkpoint sequence")
         if to_decimal(self.portfolio[self.symbol].quantity) != 0:
             raise BridgeError("native inventory remains after shadow liquidation")
         expected = to_decimal(report["strategy"]["settled_cash"])

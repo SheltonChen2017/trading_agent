@@ -11,6 +11,7 @@ from datetime import date, datetime, timezone
 from decimal import Decimal
 import json
 
+from data.financial_primitives import exact_decimal_sum, to_decimal
 from data.hashing import canonical_json, hash_bytes
 from research.guidance_revision_drift.assessment import assess_candidate
 from research.guidance_revision_drift.fixtures import example_corpus, fixture_instant, fixture_projection
@@ -69,6 +70,7 @@ class SyntheticOrderBridge:
         self._cancel_pending_acks: set[str] = set()
         self._last_event_ids: dict[int, int] = {}
         self._acknowledged = 0
+        self._account_checkpoints = 0
         self._trace_genesis = canonical_json({"schema": "gdr.lean.protocol-genesis.v1",
             "mode": mode, "fixture_sha256": hash_bytes(fixture_stream()),
             "native_runtime_verified": False}).encode("utf-8")
@@ -109,7 +111,8 @@ class SyntheticOrderBridge:
             raise BridgeError("no callback frame")
         return datetime.fromisoformat(self._frames[self._index]["at"])
 
-    def step(self, frame: dict) -> dict:
+    def step(self, frame: dict, *, native_quantity: Decimal | None = None,
+             native_cash: Decimal | None = None) -> dict:
         if self._pending or self._cancels:
             raise BridgeError("prior native fill/cancel acknowledgement missing")
         next_index = self._index + 1
@@ -117,10 +120,44 @@ class SyntheticOrderBridge:
                 or next_index >= len(self._frames) or frame != self._frames[next_index]):
             raise BridgeError("missing, duplicated, reordered or modified synthetic frame")
         draft = deepcopy(self)
+        if native_quantity is not None or native_cash is not None:
+            draft._check_account(frame, native_quantity, native_cash)
         result = draft._step(frame)
         draft._publish_trace(draft._prepare_trace("frame", frame))
         self.__dict__ = draft.__dict__
         return result
+
+    def _check_account(self, frame: dict, quantity: Decimal, cash: Decimal) -> None:
+        """Compare an acknowledged single-security immediate-cash envelope.
+
+        This is not native settled buying power: outstanding shadow sale
+        receivables are already cash in the immediate-settlement native model.
+        Checks run on step's draft before any new shadow fill is booked, and
+        only after the prior frame's fill/cancel acknowledgements are complete.
+        The no-observation path remains available for offline bridge diagnostics.
+        """
+        if (type(quantity) is not Decimal or type(cash) is not Decimal
+                or not quantity.is_finite() or not cash.is_finite()
+                or quantity < 0 or cash < 0
+                or quantity != quantity.to_integral_value()):
+            raise BridgeError("malformed native account observation")
+        snapshot = self.engine.snapshot()
+        if any(position["issuer"] != "SYN-ISSUER-A" for position in snapshot["positions"]):
+            raise BridgeError("native account checkpoint supports only the fixed source identity")
+        expected_quantity = sum(position["quantity"] for position in snapshot["positions"])
+        expected_cash = exact_decimal_sum((to_decimal(snapshot["settled_cash"]),
+            *(to_decimal(item["amount"]) for item in snapshot["receivables"])))
+        if quantity != expected_quantity:
+            raise BridgeError("native/shadow inventory mismatch before frame")
+        if cash != expected_cash:
+            raise BridgeError("native/shadow cash mismatch before frame")
+        raw = self._prepare_trace("account_checkpoint", {"before_frame_index": frame["index"],
+            "at": frame["at"], "quantity": quantity, "immediate_cash": cash,
+            "shadow_settled_cash": snapshot["settled_cash"],
+            "shadow_receivables": snapshot["receivables"],
+            "settlement_parity_verified": False})
+        self._publish_trace(raw)
+        self._account_checkpoints += 1
 
     def _step(self, frame: dict) -> dict:
         self._index = frame["index"]
@@ -259,6 +296,8 @@ class SyntheticOrderBridge:
             raise BridgeError("native/shadow order lineage incomplete")
         return {"schema": "gdr.lean.callback-contract.v1", "strategy": snapshot,
                 "acknowledged_fills": self._acknowledged, "native_orders": len(self._bindings),
+                "native_account_checkpoints": self._account_checkpoints,
+                "settlement_parity_verified": False,
                 "fixture_sha256": hash_bytes(fixture_stream()), "runtime_verified": False,
                 "cloud_completed": False, "empirical_evidence": False,
                 "protocol_trace_count": len(self._trace_records),

@@ -165,6 +165,11 @@ receivables and supplied terminal cash or a visible unresolved terminal state.
 Source terminal events never invent a matched SPY sale: the comparator retains
 its position and permanent named parity blocker. Native algorithm limitations,
 later authorized packaging and the three-attempt/Mia rule are in `lean/README.md`.
+Section 19's native-source preparation adds per-frame inventory/immediate-cash
+checks against acknowledged shadow receipts, including unsettled receivables.
+It does not add a native comparator, action handling, equity settlement or a
+real-data route. The new source epoch makes the retained section-17 bundles
+historical; verification against current source must reject those old bundles.
 Adapter fields were checked against official [US-equity data documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/securities/asset-classes/us-equity/handling-data)
 and [fill-model concepts](https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/trade-fills/key-concepts)
 on 2026-10-07; this is documentation alignment, not cloud parity.

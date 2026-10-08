@@ -17,6 +17,15 @@ reservations; a subsequent ordered `Canceled` receipt performs the release.
 Exact event-ID redeliveries are idempotent; conflicting or out-of-order events
 and unsolicited transitions refuse.
 
+Before each frame advances, the algorithm also compares native whole-share
+inventory and cash with the fully acknowledged shadow state. Native cash must
+equal shadow settled cash plus outstanding receivables because the native
+model is immediate settlement. Cash reservations do not reduce this envelope.
+Any discrepancy refuses before consuming a frame or trace record, even if it
+would disappear by the final callback. Prior pending fill/cancel receipts must
+be acknowledged first. No account observation is taken inside the receipt
+callback, where native portfolio-update ordering remains unverified.
+
 This is **source plus local contract-test coverage, not a verified LEAN/QC
 execution**. AlgorithmImports, QuantConnect and the Python/.NET runtime were
 not installed on this machine for author validation. The Python SDK shim in
@@ -55,6 +64,13 @@ next-minute eligibility, partial-fill capacity, spread/slippage, commission
 floors, dated settlement and spending reservations. The custom native fill
 model emits those receipts once; `on_order_event` must acknowledge them before
 advancing. The native fee model is zero because each receipt supplies its fee.
+
+The native source must record one successful account checkpoint for every
+frame (372 in the fixed fixture); its base transcript now has 752 records.
+The offline bridge can still run without account observations for protocol
+diagnostics (380 base records). Those diagnostics cannot satisfy the native
+source's end-of-run checkpoint-count requirement. Observations record the
+immediate envelope, settled cash and receivables, with settlement parity false.
 
 Native settlement is explicitly immediate. It is a cash reconciliation
 envelope, **not cash-account settlement parity**: only the shadow's dated

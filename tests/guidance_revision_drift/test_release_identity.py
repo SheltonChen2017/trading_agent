@@ -1,7 +1,8 @@
-"""Unit-isolated identity policy using the retained reviewed release as content.
+"""Unit-isolated identity policy using an explicit representative content body.
 
 test_release.py owns actual current-source/report reconstruction. These tests
 avoid rerunning seven integration recipes for each one-field hostile mutation.
+The policy body is not a release artifact or evidence of engine execution.
 """
 from copy import deepcopy
 from pathlib import Path
@@ -10,18 +11,48 @@ from unittest.mock import patch
 
 from data.hashing import canonical_json, hash_bytes
 from research.guidance_revision_drift import release
-from research.guidance_revision_drift.contracts import _decode
 
 
 class ReleaseIdentityTests(unittest.TestCase):
     def setUp(self):
-        anchor = "fccbef76a0921015e120dbaa73cf09f07ef6d20ac8d42839c7d4f47bce79f305"
-        path = Path(__file__).resolve().parents[2] / "research/guidance_revision_drift/releases" / (anchor + ".json")
-        raw = path.read_bytes()
-        self.assertEqual(hash_bytes(raw), anchor)
-        self.body = _decode(raw)
-        self.body["schema"] = "gdr.synthetic.review-release.v2"
+        # Include every field mutated below, with the same scalar types as an
+        # actual release. The separate reconstruction tests own release shape,
+        # source/report contents and historical artifact availability.
+        self.body = {
+            "schema": "gdr.synthetic.review-release.v2",
+            "engine": {"python_implementation": "CPython", "python_version": "3.12.14",
+                       "LEAN_version": None, "SDK_binding_verified": False, "QC_completed": False,
+                       "native_settlement": "immediate_cash_envelope_not_equity_cash_account_parity"},
+            "preflight": {"qc_attempts": 0, "empirical_looks": 0, "qc_upload_allowed": False,
+                          "qc_launch_allowed": False, "provider_access_allowed": False,
+                          "paper_live_allowed": False},
+            "calendar": {"session_count": 93, "audited_exchange_calendar": False},
+            "reports": {"integration_sha256": "1" * 64},
+            "source_manifest": {"research/guidance_revision_drift/lean/main.py": "2" * 64},
+            "market_evidence": False, "point_in_time_evidence": False,
+            "independent_review_complete": False,
+        }
         self.body["identities"] = release._identities(self.body)
+
+    def test_policy_fixture_needs_no_release_file_and_preserves_scalar_types(self):
+        with patch.object(Path, "read_bytes", side_effect=AssertionError("fixture file read forbidden")), \
+             patch.object(Path, "read_text", side_effect=AssertionError("fixture file read forbidden")):
+            self.setUp()
+            self.assertIs(self.body["engine"]["QC_completed"], False)
+            self.assertIs(type(self.body["preflight"]["qc_attempts"]), int)
+            with patch.object(release, "build_release", return_value=self.body):
+                self.assertTrue(self.verify(self.body)["environment_matches"])
+                # Python compares these pairs equal, but their canonical JSON
+                # types must remain distinct after rehashing hostile input.
+                for section, key, alias in (("engine", "QC_completed", 0),
+                                            ("preflight", "qc_attempts", False)):
+                    body = deepcopy(self.body)
+                    self.assertEqual(body[section][key], alias)
+                    self.assertIsNot(type(body[section][key]), type(alias))
+                    body[section][key] = alias
+                    body["identities"] = release._identities(body)
+                    with self.subTest(section=section, key=key), self.assertRaisesRegex(ValueError, "reproduce"):
+                        self.verify(body)
 
     def verify(self, body):
         raw = canonical_json(body).encode()

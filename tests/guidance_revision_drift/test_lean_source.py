@@ -143,6 +143,7 @@ class LeanSourceTests(unittest.TestCase):
 
     def test_real_callbacks_submit_native_orders_emit_exact_fees_and_finish(self):
         algo = self.initialize()
+        unsettled_seen = False
         for frame in fixture_frames():
             algo.utc_time = datetime.fromisoformat(frame["at"]).replace(tzinfo=None)
             algo.on_data(Slice({algo.symbol: {"frame_index": frame["index"]}}))
@@ -159,15 +160,28 @@ class LeanSourceTests(unittest.TestCase):
                     -event.order_fee.value.amount))
                 algo.on_order_event(event)
                 self.assertEqual(method(None, order).fill_quantity, 0)
+            snapshot = algo.bridge.engine.snapshot()
+            if snapshot["receivables"]:
+                unsettled_seen = True
+                self.assertGreater(algo.portfolio.cash, Decimal(snapshot["settled_cash"]))
+                self.assertEqual(algo.portfolio.cash, exact_decimal_sum((
+                    Decimal(snapshot["settled_cash"]),
+                    *(Decimal(item["amount"]) for item in snapshot["receivables"]))))
         algo.on_end_of_algorithm()
+        self.assertTrue(unsettled_seen, "exercise the sale-to-dated-settlement boundary")
         self.assertEqual([o.kind for o in algo.native_orders], ["limit", "market"])
         self.assertEqual(algo.fee_model, ("constant", 0))
         self.assertEqual(algo.settlement_model, "immediate")
         self.assertEqual(algo.benchmark, "SYN-GDR")
         self.assertEqual(algo.portfolio.cash, Decimal(algo.bridge.finish()["strategy"]["settled_cash"]))
         self.assertIn("no empirical", algo.log[-1])
-        self.assertIn("trace_count=380", algo.log[-1])
+        self.assertEqual(algo.bridge.finish()["native_account_checkpoints"], 372)
+        self.assertFalse(algo.bridge.finish()["settlement_parity_verified"])
+        self.assertIn("trace_count=752", algo.log[-1])
         self.assertIn(algo.bridge.finish()["protocol_trace_head_sha256"], algo.log[-1])
+        with patch.object(algo.bridge, "_account_checkpoints", 371), \
+             self.assertRaisesRegex(BridgeError, "incomplete native account checkpoint"):
+            algo.on_end_of_algorithm()
         algo.portfolio.cash += Decimal(1)
         with self.assertRaisesRegex(BridgeError, "cash mismatch"):
             algo.on_end_of_algorithm()
@@ -238,6 +252,62 @@ class LeanSourceTests(unittest.TestCase):
             algo.on_data(Slice({algo.symbol: {"frame_index": 1}}))
         with self.assertRaises(BridgeError):
             algo.on_end_of_algorithm()
+
+    def test_transient_native_account_drift_refuses_before_frame_commit(self):
+        # A mismatch which self-corrects before the final callback must still
+        # refuse at the next frame; no shadow/trace effects may be consumed.
+        for field in ("cash", "quantity"):
+            with self.subTest(field=field):
+                algo = self.initialize()
+                first, second = fixture_frames()[:2]
+                algo.utc_time = datetime.fromisoformat(first["at"])
+                algo.on_data(Slice({algo.symbol: {"frame_index": first["index"]}}))
+                account = algo.portfolio if field == "cash" else algo.portfolio[algo.symbol]
+                previous = getattr(account, field)
+                setattr(account, field, previous + Decimal(1))
+                before = algo.bridge.engine.snapshot(), algo.bridge.protocol_trace()
+                algo.utc_time = datetime.fromisoformat(second["at"])
+                with self.assertRaisesRegex(BridgeError, "native.*mismatch"):
+                    algo.on_data(Slice({algo.symbol: {"frame_index": second["index"]}}))
+                self.assertEqual((algo.bridge.engine.snapshot(), algo.bridge.protocol_trace()), before)
+                self.assertEqual(algo.bridge.current_at, datetime.fromisoformat(first["at"]))
+                setattr(account, field, previous)
+                algo.on_data(Slice({algo.symbol: {"frame_index": second["index"]}}))
+                self.assertEqual(algo.bridge.current_at, datetime.fromisoformat(second["at"]))
+
+    def test_native_account_checkpoint_requires_finite_whole_inventory(self):
+        for quantity, cash in ((Decimal("0.5"), Decimal("100000")),
+                               (Decimal("NaN"), Decimal("100000")),
+                               (Decimal(0), Decimal("Infinity")),
+                               (Decimal(-1), Decimal("100000"))):
+            with self.subTest(quantity=quantity, cash=cash):
+                algo = self.initialize()
+                algo.portfolio[algo.symbol].quantity, algo.portfolio.cash = quantity, cash
+                frame = fixture_frames()[0]
+                algo.utc_time = datetime.fromisoformat(frame["at"])
+                before = algo.bridge.engine.snapshot(), algo.bridge.protocol_trace()
+                with self.assertRaises(ValueError):
+                    algo.on_data(Slice({algo.symbol: {"frame_index": 0}}))
+                self.assertEqual((algo.bridge.engine.snapshot(), algo.bridge.protocol_trace()), before)
+
+    def test_account_checkpoint_alias_partial_input_and_trace_failure_are_atomic(self):
+        for quantity, cash in ((0, Decimal("100000")), (Decimal(0), "100000"),
+                               (False, Decimal("100000")), (Decimal(0), 100000.0),
+                               (None, Decimal("100000")), (Decimal(0), None)):
+            with self.subTest(quantity=quantity, cash=cash):
+                bridge = self.initialize().bridge
+                before = bridge.engine.snapshot(), bridge.protocol_trace()
+                with self.assertRaisesRegex(BridgeError, "malformed native account"):
+                    bridge.step(fixture_frames()[0], native_quantity=quantity, native_cash=cash)
+                self.assertEqual((bridge.engine.snapshot(), bridge.protocol_trace()), before)
+        bridge = self.initialize().bridge
+        before = bridge.engine.snapshot(), bridge.protocol_trace()
+        # The checkpoint fits, but the following frame record does not. Neither
+        # draft record nor the frame's shadow effects may survive the refusal.
+        with patch("research.guidance_revision_drift.lean_bridge.MAX_TRACE_RECORDS", 1), \
+             self.assertRaisesRegex(BridgeError, "trace capacity"):
+            bridge.step(fixture_frames()[0], native_quantity=Decimal(0), native_cash=Decimal("100000"))
+        self.assertEqual((bridge.engine.snapshot(), bridge.protocol_trace()), before)
 
     def test_multiday_reader_and_before_after_data_scans_reconcile_partial_cancel(self):
         # Mirrors the documented synchronous scan order, not .NET execution.

@@ -11690,3 +11690,92 @@ Staged diff hygiene caught one extra EOF blank line omitted from the earlier
 untracked-file diff check; removing it changed only the unexecuted successor's
 draft hash1015dd81 to the finala6c295e5 above, with no economic/source-input
 change or cloud attempt.
+
+### 71.4 Second native failure and final Codex-attempt boundary
+
+The preserved lifecycle successor/source routing was locally committed at
+`db5c9017b219deffb22c5f0d8005bffe1101dd88`; final focused recheck520passed,
+1skip/5.02s and staged hygiene passed. Operation002 manifest SHA256
+`cfb149925d9f428d7020c57062b3d33f881df6c50e16f752225e54be1271b5bf`,
+source-bundle SHA256
+`e61332488b173ed23e90050feafc5481eadd78d6610022f49978b94d3bc504a2`.
+Before replacing own cloud source, a bounded read proved it still exactly
+matched attempt1 (no concurrent cloud edit). Successor readback main SHA256
+`4f57ca9602d778244b3d4f0ece9003ad7afb436d5e3beee88711c64d82655fba`;
+the other three source/config hashes remain unchanged. No second packet upload.
+
+Same candidate/project ON-BASE attempt2 was reserved, compiled and verified
+BuildSuccess: compile
+`1ad74bb42de1d255e631d8aebd581f21-7e50413c30d8bbf250ba92de3985ed11`,
+backtest `95f205174fb735bf4e9a865931c00f5f`. Terminal **Runtime Error** at
+the same warm-up frontier, now explicitly `non-RAW configurations count=1`
+in `_raw_security_configs`.0orders/fills/valuation/decision observations;
+meaningful=false, custody unknown rather than0, interpreted auditv2. Collection
+round1 retained exact receipts. Candidate attempts consumed2, remaining1;
+two new cloud looks plus nine prior observed runs =11, no new economic result.
+The executed v2 module and operation002 evidence are immutable.
+
+Static native-source inspection revealed two distinct context boundaries,
+not proof which exact configuration caused attempt2. The ETF context Symbol
+retains its underlying ETF's Equity security type, so our earlier Base-type
+sentinel was insufficient. [ETF factory](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Data/UniverseSelection/ETFConstituentsUniverseFactory.cs)
+and [custom context construction](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Data/UniverseSelection/ConstituentsUniverse.cs)
+support exact universe-Symbol exclusion from tradable subscription/custody.
+Separately, the internal benchmark configuration shares the symbol-ID registry
+but is requested against a distinct benchmark Security and fresh EquityCache.
+[Benchmark subscription](https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/DataFeeds/UniverseSelection.cs),
+[Security creation](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Securities/SecurityService.cs),
+[cache allocation](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Securities/SecurityCacheProvider.cs).
+Internal Slice bars/dividends/splits are excluded, but this does not license
+blanket internal-feed acceptance: generic caches/fill paths can use internal
+data. [Slice construction](https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/DataFeeds/TimeSliceFactory.cs).
+
+`TPR-OWN-73`: implement an identified v3 successor capturing the six exact
+created universe Symbols before registration, excluding only those contexts
+from money models, minute attachment and action custody. Do not use a ticker
+prefix, security type alone or missing-data-as-zero substitution. Retain every
+actual ETF/constituent trading RAW invariant. This is a source-backed plumbing
+correction, not a selected new signal/universe/economic parameter.
+
+`TPR-OWN-74`: a narrowly classified benchmark-only internal Adjusted Hour
+TradeBar/Trade/noncustom/no-fill-forward exception may be admitted only for
+the exact benchmark Symbol and after native reference checks prove distinct
+Security/cache from its tradable RAW instance. Reject every other non-RAW
+configuration; actual trading needs noninternal RAW Minute Trade, and observed
+custody/explicit RAW History remain independent of benchmark context. Broad
+internal exceptions and merely rewriting mode flags are rejected as unsafe.
+Root and delegated read-only reviewer independently traced the primary-source
+chain; actual cloud classification remains to be demonstrated, not inferred
+from count1. Source master is inspected evidence, not an attestation of the
+exact cloud engine build. Focused red/green proof is required before launch.
+
+`TPR-OWN-75`: if the verified v3 source is locally committed, create fresh
+bounded operation003 for its source hashes, including one explicitly receipted
+read of the same original-derived packet and reuse of the same hash-keyed
+private upload. Same candidate/project, final Codex attempt3: no cap reset.
+After its third unsuccessful terminal attempt, stop Codex changes/relaunches
+of that candidate and use authenticated controllable Mia if available;
+otherwise identify precise owner recovery. Other arms remain unlaunched until
+the shared defect is safely resolved. Decisions73–75 are delegated lane-owned
+corrections under the owner scope, not separate human/Claude approval, and
+remain pending final independent review. No publication yet.
+
+Final pre-attempt successor `matched_algorithm_v3.py`,36851bytes, SHA256
+`a16d6279ab968bab8a3a439b56563aa693cae8d46f74b0e8831da152b6a90029`,
+implements decisions73/74 without changing the freeze.96 algorithm-focused
+checks pass; eight bounded in-memory mutants fail, eight original/restored
+checks pass. Immutable-v2 red controls demonstrate both context and benchmark
+registry false refusals. Wrong benchmark signature, shared Security/cache and
+all non-RAW external configurations still refuse; actual observed RAW custody
+and explicit RAW History are required. One old internal-only test expectation
+was strengthened from missing minute to missing external RAW configuration.
+Root focused successor union: **540passed/1existingplatformskip in5.56s**;
+no complete lane/repository suite. Source/render/cached hygiene and preserved
+executed-module hashes are checked before the local commit/final attempt.
+Read-only peer review found no concrete rejectable v3 defect and independently
+reproduced20 focused native-boundary checks/.42s. Root verified the remaining
+Python interface facts in official references:
+[SubscriptionDataConfig.fill_data_forward](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Data/SubscriptionDataConfig/)
+and [SecurityBenchmark.security](https://www.lean.io/docs/v2/lean-engine/class-reference/py/QuantConnect/Benchmarks/SecurityBenchmark/).
+These source/interface checks justify the narrow plumbing correction, not
+an assertion of actual native execution or unbiased source history.

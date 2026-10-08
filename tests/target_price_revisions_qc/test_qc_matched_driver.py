@@ -13,7 +13,8 @@ def test_rendered_real_template_contains_all_six_closed_configs():
     assert set(row["candidate_id"] for row in rendered["cases"]) == d.ops.CANDIDATES
     assert all(set(row["files"]) == d.ops.SOURCE_FILES for row in rendered["cases"])
     assert rendered["freeze_sha256"] == d.bundle.FREEZE_SHA256
-    assert rendered["template_sha256"] == d.ops.digest((d.PACKAGE / "matched_algorithm_v2.py").read_bytes())
+    assert rendered["template_sha256"] == d.ops.digest((d.PACKAGE / "matched_algorithm_v3.py").read_bytes())
+    assert rendered["template_sha256"] != d.ops.digest((d.PACKAGE / "matched_algorithm_v2.py").read_bytes())
     assert rendered["template_sha256"] != d.ops.digest((d.PACKAGE / "matched_algorithm.py").read_bytes())
 
 

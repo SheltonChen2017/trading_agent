@@ -25,7 +25,7 @@ def matched(monkeypatch):
     api.SplitType = SimpleNamespace(SPLIT_OCCURRED="occurred")
     api.OrderStatus = SimpleNamespace(INVALID="invalid", CANCELED="canceled")
     api.Universe = SimpleNamespace(UNCHANGED="unchanged")
-    api.Resolution = SimpleNamespace(MINUTE="minute", DAILY="daily")
+    api.Resolution = SimpleNamespace(MINUTE="minute", DAILY="daily", HOUR="hour")
     api.TickType = SimpleNamespace(TRADE="trade", QUOTE="quote")
     api.DataNormalizationMode = SimpleNamespace(RAW=0, ADJUSTED=1)
     api.SecurityType = SimpleNamespace(EQUITY="equity", BASE="base")
@@ -33,12 +33,15 @@ def matched(monkeypatch):
     api.ConstantSlippageModel = lambda value: ("slippage", value)
     api.ImmediateSettlementModel = lambda: "immediate"
     monkeypatch.setitem(sys.modules, "AlgorithmImports", api)
+    system = ModuleType("System")
+    system.Object = SimpleNamespace(ReferenceEquals=lambda first, second: first is second)
+    monkeypatch.setitem(sys.modules, "System", system)
     core = ModuleType("proxy_core")
     source = LANE / "cloud_algorithm_v2.py"
     exec(compile(source.read_bytes(), str(source), "exec"), core.__dict__)
     monkeypatch.setitem(sys.modules, "proxy_core", core)
     module = ModuleType("matched_algorithm")
-    source = LANE / "matched_algorithm_v2.py"
+    source = LANE / "matched_algorithm_v3.py"
     exec(compile(source.read_bytes(), str(source), "exec"), module.__dict__)
     return module
 
@@ -53,7 +56,10 @@ class Security:
         self.symbol, self.has_data = symbol, True
         self.type = "equity"
         self.subscriptions = [SimpleNamespace(data_normalization_mode=0,
-            is_internal_feed=False, resolution="minute", tick_type="trade")]
+            is_internal_feed=False, resolution="minute", tick_type="trade", symbol=symbol,
+            type=SimpleNamespace(FullName="QuantConnect.Data.Market.TradeBar"),
+            is_custom_data=False, fill_data_forward=True)]
+        self.cache = object()
 
     @property
     def data_normalization_mode(self):
@@ -101,6 +107,9 @@ def algorithm(matched, arm="tpr_off"):
     algo._snapshots = {etf: [] for etf in matched.ETFS}
     algo._symbols, algo._split_factors, algo._custody_since = {}, {}, {}
     algo._warmup_finished_minute_validated = False
+    algo._context_symbols = set()
+    algo._context_initializer_skips = algo._context_change_skips = 0
+    algo._benchmark_internal_config_max = 0
     algo._delisted_ids, algo._manual_symbols, algo._valuation_days = set(), set(), set()
     algo._targets, algo._target_weights, algo._decision_coverage, algo._tickets = {}, {}, {}, []
     algo._attempted_days, algo._reasons = set(), {}
@@ -114,12 +123,14 @@ def algorithm(matched, arm="tpr_off"):
     algo._max_name_exposure = Fraction(0)
     algo._sleeve_selected_decisions = {etf: 0 for etf in matched.ETFS}
     algo._etf_symbols = {etf: Symbol("ETF-" + etf, etf) for etf in matched.ETFS}
+    algo._benchmark = algo._etf_symbols["SPY"]
+    algo.benchmark = SimpleNamespace(security=None)
     algo.securities = {}
     algo.subscription_manager = SimpleNamespace(subscription_data_config_service=SimpleNamespace(
         get_subscription_data_configs=lambda symbol, internal: list(algo.securities[symbol].subscriptions)))
     algo.portfolio = SimpleNamespace(cash="100000", total_portfolio_value="100000",
                                     total_holdings_value="0", values=lambda: [])
-    algo.logs, algo.orders, algo.add_calls = [], [], []
+    algo.logs, algo.orders, algo.add_calls, algo.history_calls = [], [], [], []
     algo.log = algo.logs.append
     algo.market_on_open_order = lambda symbol, quantity, **kwargs: algo.orders.append((symbol, quantity)) or "ticket"
     def add_security(symbol, resolution, **kwargs):
@@ -128,9 +139,11 @@ def algorithm(matched, arm="tpr_off"):
     algo.add_security = add_security
     class History:
         def __getitem__(self, kind):
-            return lambda symbol, count, resolution: [SimpleNamespace(
-                time=datetime(2024, 12, 31, 9, 30), end_time=datetime(2024, 12, 31, 16),
-                close="100", volume="100000")]
+            def request(symbol, count, resolution, **kwargs):
+                algo.history_calls.append((symbol, count, resolution, kwargs))
+                return [SimpleNamespace(time=datetime(2024, 12, 31, 9, 30),
+                    end_time=datetime(2024, 12, 31, 16), close="100", volume="100000")]
+            return request
     algo.history = History()
     return algo
 
@@ -167,6 +180,7 @@ def test_exact_freeze_and_executed_core_remain_immutable(matched):
     assert hashlib.sha256((LANE / "matched_freeze.json").read_bytes()).hexdigest() == FREEZE_SHA
     assert hashlib.sha256((LANE / "cloud_algorithm_v2.py").read_bytes()).hexdigest() == CORE_SHA
     assert hashlib.sha256((LANE / "matched_algorithm.py").read_bytes()).hexdigest() == "ca3de46384d5aefe384245273bb697f59587e7f34528e139602f9f2fca02fa1f"
+    assert hashlib.sha256((LANE / "matched_algorithm_v2.py").read_bytes()).hexdigest() == "a6c295e5e00364f6c91d6d33c750b45a3ce7c9264c4dfc2f325e9a76f394c612"
     assert matched.DECISIONS == matched.core.DECISIONS and matched.CUTOFFS == matched.core.CUTOFFS
 
 
@@ -472,7 +486,9 @@ def test_positive_raw_or_identity_failures_refuse_even_during_warmup(matched, st
     elif state == "security":
         security.subscriptions[0].data_normalization_mode = 1
         raw = SimpleNamespace(data_normalization_mode=0, is_internal_feed=False,
-            resolution="daily", tick_type="trade")
+            resolution="daily", tick_type="trade", symbol=symbol,
+            type=SimpleNamespace(FullName="QuantConnect.Data.Market.TradeBar"),
+            is_custom_data=False, fill_data_forward=True)
         algo.subscription_manager.subscription_data_config_service.get_subscription_data_configs = lambda *args: [raw]
     elif state == "missing":
         del algo.securities[symbol]
@@ -485,7 +501,7 @@ def test_positive_raw_or_identity_failures_refuse_even_during_warmup(matched, st
 
 @pytest.mark.parametrize("resolution,internal,tick,active,daily,internals", [
     ("daily", False, "trade", 1, 1, 0),
-    ("minute", True, "trade", 0, 0, 1),
+    ("minute", True, "trade", 0, 0, 0),
     ("minute", False, "quote", 1, 0, 0)])
 def test_postwarm_registry_failure_has_aggregate_diagnosis_not_data(matched, resolution, internal, tick, active, daily, internals):
     algo, symbol = algorithm(matched), Symbol("PRIVATE_SENTINEL_DO_NOT_LOG")
@@ -495,7 +511,8 @@ def test_postwarm_registry_failure_has_aggregate_diagnosis_not_data(matched, res
     security.subscriptions[0].tick_type = tick
     algo.securities[symbol] = security
     algo._symbols[symbol.id] = symbol
-    expected = f"no minute trade; active={active}; daily_trade={daily}; internal={internals}"
+    expected = ("no RAW configurations" if internal else
+                f"no minute trade; active={active}; daily_trade={daily}; internal={internals}")
     with pytest.raises(ValueError, match=expected) as error:
         algo.on_warmup_finished()
     assert symbol.value not in str(error.value)
@@ -533,6 +550,182 @@ def test_native_slippage_uses_invariant_dotnet_decimal_without_float(matched, mo
     assert Fraction(security.slippage[1]) == exact
     assert security.leverage == 1 and isinstance(security.fee, matched.core.CentPerShareFee)
     assert security.settlement == "immediate"
+
+
+def test_executed_v2_equity_context_refusal_red_control_and_exact_context_green(matched):
+    original = ModuleType("executed_matched_algorithm_v2")
+    source = LANE / "matched_algorithm_v2.py"
+    exec(compile(source.read_bytes(), str(source), "exec"), original.__dict__)
+    old, new = algorithm(original), algorithm(matched)
+    context = Symbol("EXACT_REGISTERED_CONTEXT_WITH_NO_PREFIX")
+    context.underlying, context.has_underlying = new._etf_symbols["SPY"], True
+    for algo in (old, new):
+        algo.is_warming_up = True
+        security = Security(context)
+        assert security.type == "equity"  # Matches LEAN's ETF context identity.
+        # The global configuration is independent of Security's mutable bag.
+        registered = deepcopy(security.subscriptions[0])
+        registered.symbol = context
+        registered.data_normalization_mode = 1
+        registered.resolution, registered.is_custom_data = "daily", True
+        registered.is_internal_feed, registered.fill_data_forward = True, False
+        registered.type.FullName = "QuantConnect.Data.UniverseSelection.ETFConstituentUniverse"
+        algo.securities[context] = security
+        algo.subscription_manager.subscription_data_config_service.get_subscription_data_configs = lambda *args, row=registered: [row]
+        algo._context_symbols.add(context)
+        if algo is old:
+            with pytest.raises(ValueError, match="non-RAW configurations count=1"):
+                algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
+        else:
+            def forbidden(*args):
+                raise AssertionError("context received a money model or normalization mutation")
+            security.set_leverage = security.set_fee_model = security.set_data_normalization_mode = forbidden
+            algo._initialize_security(security)
+            algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
+            algo._observe_raw_custody(context)
+            with pytest.raises(ValueError, match="context cannot be subscribed"):
+                algo._ensure_raw_subscription(context)
+            with pytest.raises(ValueError, match="context is not tradable"):
+                algo._raw_security_configs(context)
+    assert new._context_initializer_skips == new._context_change_skips == 1
+    assert new._symbols == new._custody_since == {} and new._manual_symbols == set()
+    assert new.add_calls == [] and new.orders == []
+
+
+def test_unregistered_equity_lookalike_is_not_skipped_by_prefix_or_underlying(matched):
+    algo = algorithm(matched)
+    symbol = Symbol("qc-universe-etf-constituents-lookalike")
+    symbol.underlying, symbol.has_underlying = algo._etf_symbols["SPY"], True
+    security = Security(symbol)
+    algo.on_securities_changed(SimpleNamespace(added_securities=[security]))
+    assert algo._symbols[symbol.id] is symbol and len(algo.add_calls) == 1
+    assert algo._context_change_skips == 0 and algo._custody_since == {}
+
+
+def benchmark_configuration(algo):
+    symbol = algo._benchmark
+    tradable, benchmark = Security(symbol), Security(symbol)
+    algo.securities[symbol], algo.benchmark = tradable, SimpleNamespace(security=benchmark)
+    algo._symbols[symbol.id] = symbol
+    internal = SimpleNamespace(symbol=symbol, data_normalization_mode=1,
+        is_internal_feed=True, resolution="hour", tick_type="trade",
+        type=SimpleNamespace(FullName="QuantConnect.Data.Market.TradeBar"),
+        is_custom_data=False, fill_data_forward=False)
+    external = tradable.subscriptions[0]
+    algo.subscription_manager.subscription_data_config_service.get_subscription_data_configs = lambda *args: [external, internal]
+    return symbol, tradable, benchmark, external, internal
+
+
+def test_executed_v2_benchmark_registry_false_alarm_red_then_narrow_isolation_green(matched, monkeypatch):
+    original = ModuleType("executed_matched_algorithm_v2")
+    source = LANE / "matched_algorithm_v2.py"
+    exec(compile(source.read_bytes(), str(source), "exec"), original.__dict__)
+    old = algorithm(original)
+    symbol, _, _, _, _ = benchmark_configuration(old)
+    with pytest.raises(ValueError, match="non-RAW configurations count=1"):
+        old._assert_raw_subscriptions(symbol)
+    new = algorithm(matched)
+    symbol, security, benchmark, _, _ = benchmark_configuration(new)
+    calls = []
+    def native_reference_equals(first, second):
+        calls.append((first, second))
+        return first is second
+    monkeypatch.setattr(sys.modules["System"].Object, "ReferenceEquals", native_reference_equals)
+    assert new._assert_raw_subscriptions(symbol) is security
+    assert calls == [(benchmark, security), (benchmark.cache, security.cache)]
+    assert new._benchmark_internal_config_max == 1 and new._custody_since == {}
+    new.on_data(SimpleNamespace(bars={"raw": SimpleNamespace(symbol=symbol)},
+        dividends={}, splits={}, delistings={}))
+    assert new._custody_since[symbol.id] == new.utc_time.replace(tzinfo=timezone.utc)
+
+
+@pytest.mark.parametrize("fault", ["external", "normalization", "resolution", "tick", "type", "custom", "ff",
+    "config_symbol", "benchmark_symbol", "same_security", "same_cache", "no_benchmark", "other_symbol"])
+def test_benchmark_exception_refuses_every_wrong_signature_or_shared_money_reference(matched, fault):
+    algo = algorithm(matched)
+    symbol, security, benchmark, external, internal = benchmark_configuration(algo)
+    if fault == "external":
+        internal.is_internal_feed = False
+    elif fault == "normalization":
+        internal.data_normalization_mode = 2
+    elif fault == "resolution":
+        internal.resolution = "daily"
+    elif fault == "tick":
+        internal.tick_type = "quote"
+    elif fault == "type":
+        internal.type.FullName = "PRIVATE_SENTINEL_NOT_A_TRADEBAR"
+    elif fault == "custom":
+        internal.is_custom_data = True
+    elif fault == "ff":
+        internal.fill_data_forward = True
+    elif fault == "config_symbol":
+        internal.symbol = Symbol("PRIVATE_SYMBOL_SENTINEL")
+    elif fault == "benchmark_symbol":
+        benchmark.symbol = Symbol("PRIVATE_SYMBOL_SENTINEL")
+    elif fault == "same_security":
+        algo.benchmark.security = security
+    elif fault == "same_cache":
+        benchmark.cache = security.cache
+    elif fault == "no_benchmark":
+        algo.benchmark.security = None
+    else:
+        algo._benchmark = Symbol("PRIVATE_SYMBOL_SENTINEL")
+    with pytest.raises(ValueError) as error:
+        algo._assert_raw_subscriptions(symbol)
+    assert "PRIVATE_SYMBOL_SENTINEL" not in str(error.value)
+    assert algo._custody_since == {} and algo.orders == []
+    assert algo._benchmark_internal_config_max == 0
+
+
+def test_benchmark_only_registry_never_proves_raw_custody_or_trading_feed(matched):
+    algo = algorithm(matched)
+    symbol, security, _, _, internal = benchmark_configuration(algo)
+    algo.subscription_manager.subscription_data_config_service.get_subscription_data_configs = lambda *args: [internal]
+    algo.is_warming_up = True
+    assert algo._assert_raw_subscriptions(symbol) is security
+    algo._observe_raw_custody(symbol)
+    assert algo._custody_since == {}
+    algo.is_warming_up = False
+    with pytest.raises(ValueError, match="no RAW configurations") as error:
+        algo._assert_raw_subscriptions(symbol)
+    assert "internal:1:hour:trade:QuantConnect.Data.Market.TradeBar:native:noff" in str(error.value)
+    assert algo.orders == []
+
+
+def test_isolated_benchmark_cannot_hide_nonraw_security_or_external_quote_feed(matched):
+    algo = algorithm(matched)
+    symbol, security, _, external, internal = benchmark_configuration(algo)
+    external.data_normalization_mode = 1
+    external.tick_type = "quote"
+    with pytest.raises(ValueError, match="non-RAW configurations count=1; external"):
+        algo._assert_raw_subscriptions(symbol)
+    raw = deepcopy(external)
+    raw.symbol, raw.data_normalization_mode = symbol, 0
+    algo.subscription_manager.subscription_data_config_service.get_subscription_data_configs = lambda *args: [raw, internal]
+    with pytest.raises(ValueError, match="non-RAW security normalization"):
+        algo._assert_raw_subscriptions(symbol)
+
+
+def test_native_reference_checker_absence_cannot_use_python_fallback(matched, monkeypatch):
+    algo = algorithm(matched)
+    symbol, _, _, _, _ = benchmark_configuration(algo)
+    monkeypatch.delattr(sys.modules["System"], "Object")
+    with pytest.raises(ImportError):
+        algo._assert_raw_subscriptions(symbol)
+    assert algo.orders == [] and algo._custody_since == {}
+
+
+def test_prior_history_explicit_raw_and_active_feed_guard_precede_request(matched):
+    algo = algorithm(matched)
+    symbol = Symbol("SYNTHETIC")
+    algo.securities[symbol] = Security(symbol)
+    algo._custody_since[symbol.id] = matched.core._clock(matched.CUTOFFS[0]) - timedelta(days=7)
+    assert algo._prior_mark(symbol) == (100, 100000)
+    assert algo.history_calls == [(symbol, 3, "daily", {"data_normalization_mode": 0})]
+    algo.securities[symbol].subscriptions[0].resolution = "daily"
+    with pytest.raises(ValueError, match="no minute trade"):
+        algo._prior_mark(symbol)
+    assert len(algo.history_calls) == 1 and algo.orders == []
 
 
 def test_custom_universe_security_is_not_attached_to_equity_custody(matched):
@@ -661,13 +854,20 @@ def test_neutral_initialization_does_not_touch_packet_or_old_initialize(matched,
                  "add_security_initializer", "add_universe", "set_benchmark", "set_warm_up"):
         setattr(algo, name, lambda *args, **kwargs: None)
     algo.universe_settings = SimpleNamespace()
-    algo.universe = SimpleNamespace(etf=lambda *args, **kwargs: None)
+    algo.universe = SimpleNamespace(etf=lambda symbol, **kwargs: SimpleNamespace(
+        symbol=Symbol("CONTEXT-" + symbol.id)))
     algo.add_equity = lambda etf, resolution, **kwargs: SimpleNamespace(symbol=Symbol(etf))
+    registered = []
+    def register(universe):
+        assert universe.symbol in algo._context_symbols
+        registered.append(universe.symbol)
+    algo.add_universe = register
     algo.schedule = SimpleNamespace(on=lambda *args: None)
     algo.date_rules = SimpleNamespace(every_day=lambda symbol: None)
     algo.time_rules = SimpleNamespace(at=lambda *args: None)
     algo.initialize()
     assert algo._identities == algo._frames == {} and set(algo._etf_symbols) == set(matched.ETFS)
+    assert set(registered) == algo._context_symbols and len(registered) == len(matched.ETFS) == 6
 
 
 def test_live_refusal_precedes_configuration_and_all_api_access(matched):

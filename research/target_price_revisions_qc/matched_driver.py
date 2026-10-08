@@ -23,6 +23,7 @@ REPOSITORY_SOURCES = (
     "research/target_price_revisions_qc/matched_bundle.py",
     "research/target_price_revisions_qc/matched_algorithm.py",
     "research/target_price_revisions_qc/matched_algorithm_v2.py",
+    "research/target_price_revisions_qc/matched_algorithm_v3.py",
     "research/target_price_revisions_qc/matched_audit.py",
     "research/target_price_revisions_qc/matched_audit_v2.py",
     "research/target_price_revisions_qc/matched_freeze.json",
@@ -49,7 +50,7 @@ def render_sources():
     preflight()
     # This is conservative pre-rendering, NOT an entitlement assertion. The
     # controller independently checks each actual newly created project quota.
-    return bundle.build_bundle((PACKAGE / "matched_algorithm_v2.py").read_bytes(),
+    return bundle.build_bundle((PACKAGE / "matched_algorithm_v3.py").read_bytes(),
         (PACKAGE / "cloud_algorithm_v2.py").read_bytes(),
         (PACKAGE / "matched_freeze.json").read_bytes(), max_file_size=60000)
 

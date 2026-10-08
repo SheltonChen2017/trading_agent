@@ -1,27 +1,20 @@
 # Short Interest ETF Strategy — implementation and session record
 
-Status: **CLAUDE HAS REVIEWED ALL TWELVE CODEX COMMITS IN `5275b7d..b0d4a57`
-(SECTION 100): EIGHT ACCEPTED AND FOUR ACCEPTED AFTER RECORD CORRECTION. NO
-P0, P1 OR P2 AND NO CODE OR TEST DEFECT WAS FOUND; FIVE OF SIX IN-MEMORY
-MUTATION PROBES WENT RED ON THE INTENDED BEHAVIOUR AND THE SIXTH GUARD CANNOT
-FIRE BY CONSTRUCTION. `SI-CR19-001` (P3) IS CLOSED BY THIS RECORD COMMIT: FOUR
-CODEX PUSHES (`99b4ef0`, `274f81c`, `dccc564`, `b0d4a57`) ADDED NO PUSH-LEDGER
-ROW, AND RECONSTRUCTED ROWS ARE APPENDED. `SI-CR19-002` (P3, OPEN): THE
-CROSS-LANE SHARADAR BYTE CHECK RESTS ON PARAPHRASED OWNER AUTHORITY.
-`SI-CR19-003` (P3, OPEN): BEFORE THE FIRST REAL EXPLORATORY RUN, RECORD HOW ITS
-LOOK COUNTS AND WHETHER IT MAY INFORM THE CANONICAL STUDY. THE COMPLETE
-26-FILE LANE, NETWORK-DENIED, IS 1,101 PASSED ON `b0d4a57`. THE SEPARATE
-LATEST-REVISED EXPLORATORY SOFTWARE IS BUILT AND REHEARSED ON FABRICATED FILES
-ONLY; ACTUAL BACKTESTING IS BLOCKED ON COMPANION COVERAGE, APPLICABLE
-NON-DISPLAY TERMS, A FINRA CREDENTIAL AND LOOK REGISTRATION. MASSIVE'S
-LATEST-ONLY ENDPOINT IS REFUSED FOR THE CANONICAL PIT STUDY, WHICH REMAINS
-BLOCKED. THE THREE SOURCE P2s, THE SHARED P2 `SI-CR5-005` / `SI-CCR16-007` AND
-THE PROSPECTIVE COMMITMENT ADVISORY `SI-CR15-001` REMAIN OPEN. LOOKBACKS
-20/60/120/252 REMAIN UNSELECTED; REAL LOOKS 0/0, ALPHA 0, PERMANENT LOOKS NONE,
-QC ATTEMPTS 0. PROVIDER DATA, LICENSED/ACTUAL MARKET ROWS, OUTCOMES, HOLDOUT,
-PRODUCTION RANKING/SEEDS, ETF, QC HISTORY/PROJECT/UPLOAD/COMPILE/JOB/BACKTEST,
-PURCHASE, BROKER, OPERATOR DATABASE, DEPLOYMENT, PAPER/LIVE, CAPITAL, ORDERS
-AND TRADING REMAIN GATED.**
+Status: **SECTION 101 COUNTER-REVIEWS CLAUDE'S SOLE `4228eaaf` RECORD COMMIT
+AFTER THE EXACT `b0d4a57f` CHECKPOINT. THE RECONSTRUCTED PUSH LEDGER IS VERIFIED.
+CODEX REPRODUCED A MISSED P2: A MALFORMED DUPLICATE SI ROW COULD LEAVE ITS
+VALID TICKER/SETTLEMENT PEER ADMITTED. RAW-KEY COLLISIONS NOW QUARANTINE BOTH
+COPIES, WITH 24 MATERIAL REGRESSIONS. THE EVALUATION-END GUARD IS RETAINED
+AND DIRECTLY TESTED FOR ALL THREE ALLOCATION ROLES; ITS CLAIMED REDUNDANCY
+WAS OVERBROAD. SHARADAR AUTHORITY IS QUOTED FROM THE OWNER'S ORIGINAL MESSAGE.
+CLAUDE'S 1,101-PASS COMPLETE-LANE RUN REMAINS ITS OWN PRIOR EXECUTION AT
+`b0d4a57f`; CODEX'S FOCUSED VALIDATION PASSED 201 TESTS. RESUMED FINRA SETUP
+IS BLOCKED BECAUSE THE REQUESTED CHROME SESSION IS UNAVAILABLE TO THIS CHAT.
+PUBLIC API ACTIVATION AND THE SI SOURCE COMPARISON HAVE NOT BEEN VERIFIED.
+ACTUAL BACKTESTING STILL REQUIRES COMPANION/USE/ROUTE/LOOK QUALIFICATION.
+THE CANONICAL PIT STUDY REMAINS BLOCKED ON ORIGINALS/CORRECTIONS AND TIMING.
+SOURCE/SHARED P2s AND PROSPECTIVE ADVISORIES ARE RETAINED; LOOKBACKS
+20/60/120/252 ARE UNSELECTED, ACTUAL LOOKS 0/0, ALPHA 0 AND QC ATTEMPTS 0.**
 
 Current publication rule (owner direction, 2026-10-05): finish each completed
 bounded lane round with **one combined push** to
@@ -215,6 +208,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-07 | Codex latest-revised exploratory build (row reconstructed by Claude in section 100 from section 98; Codex's push added none) | `274f81c` -> `dccc564` (anchor `b034cda`, implementation `6f0fc88`, record `dccc564`) | Separate file-fed latest-revised exploratory software | Per section 98: after Massive confirmed overwritten corrections, froze a separate exploratory epoch and built its source, ranking, 48-book replay, runner and CLI; the pinned fabricated rehearsal completed all 48 books. | Codex-reported, focused, network-denied: **382 passed in 104.01s**; CLI rehearsal exit 0. No complete lane or repository suite. Real looks 0/0. | `SI-EXP-001` (P2), `-002` (P1), `-003` (P3), `-004` (P2) confirmed and corrected; `-005` false alarm. Massive endpoint refused for the strict study. | Claude reviews; actual backtesting blocked on companion, terms and look facts. |
 | 2026-10-08 | Codex source-route decision (row reconstructed by Claude in section 100 from section 99; Codex's push added none) | `dccc564` -> `b0d4a57` (record only) | Zero-additional-subscription route and FINRA Public API cross-check | Per section 99: owner approved keeping Massive plus a free FINRA cross-check; recorded FINRA Individual API terms and stronger Massive personal-use guidance; stopped because no FINRA credential is present. | Codex-reported: active-document **69 passed**. Record only. Real looks 0/0. | No new finding; source P2s open. | Owner activates a FINRA Individual credential; Claude reviews. |
 | 2026-10-08 | Claude review | `5275b7d` -> `b0d4a57` reviewed after the push watcher fired; **record-only correction (four reconstructed push-ledger rows above)**; this record commit is the only Claude commit | Independent review of the twelve-commit continuous build: synthetic order engine, ranked-order bridge, Massive qualification, latest-revised exploratory software and FINRA route | Dispositioned all 12 commits. Read the new modules for float use, network clients, imports, the pinned launch boundary, byte-before-parse loading and order-book accounting; verified three bound record hashes and the validation-period protection; ran six in-memory mutants, five red on the intended behaviour and one unreachable by construction. | Pushed tree `b0d4a57`, clean, Codex idle, network-denied: 26-file lane **1,101 passed** (817 existing + 284 new; no skips or warnings); compileall exit 0; active-document plus ML boundary 80 passed; final-tree active-document 69 passed; `git diff --check` clean. Synthetic/fabricated only; **authorized looks 0, consumed looks 0**. | `SI-CR19-001` (P3, closed by correction: four pushes without ledger rows). `SI-CR19-002` (P3, open: cross-lane Sharadar authority paraphrased). `SI-CR19-003` (P3, open advisory: exploratory look accounting before the first real run). Codex's draft findings accepted; source P2s, shared P2 and `SI-CR15-001` open. | Codex counter-reviews this record commit. The owner activates a FINRA credential if the cross-check should proceed. Every outcome, holdout, ranking, seed, ETF, QuantConnect, purchase, broker and trading gate remains closed. |
+| 2026-10-08 | Codex counter-review / correction | `b0d4a57f..4228eaaf` reviewed; correction `cd0481d56d6568ba6bb3e93d1432088a0a28439d`; this final record commit follows | Completed section-100 counter-review; resumed FINRA setup blocked on Chrome access | Sole Claude commit accepted after correction. Raw identifiable duplicates now quarantine valid/malformed peers across pages; successor-end guard gets three direct cases; owner Sharadar-path quotation repairs provenance. | Codex focused, network-denied: **201 passed in 115.51s**; duplicate RED 24 failed then source GREEN 59 passed; successor GREEN 3 passed / mutant RED 3 failed / final GREEN included; targeted compilation exit 0. Final document/preservation/diff checks recorded in section 101. | `SI-CCR30-001` P2 corrected; `SI-CCR30-002..003` P3 qualified; `SI-CR19-001` closure accepted, `-002` closed by quotation, `-003` prospective/open. Source/shared P2s and later-commitment advisory retained; actual looks 0/0. | One combined non-force push; delete handled Claude monitor. Make signed-in Chrome or an activated FINRA Public credential securely accessible, then freeze the bounded SI-only consistency sample. No actual comparison, outcome look or QC launch this round. |
 
 Counter-review correction to the 2026-09-28 handoff row above: its phrase
 “no code or test correction required” is wrong. Claude added the boundary
@@ -13776,3 +13770,161 @@ Codex was idle, network-denied:
    seeds, ETF work, any QuantConnect history/project/upload/compile/job/
    backtest, purchases, broker, operator database, deployment, paper/live,
    capital, orders and trading.
+## 101. Codex counter-review of Claude's continuous-build review — 2026-10-08
+
+### 101.1 Exact trigger, complete range and disposition
+
+The owner reported **"landed"** after instructing Codex to wait for Claude,
+counter-review, then resume the approved FINRA setup in Chrome and proceed.
+The designated physical/Git root is
+`/Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__short_interest`,
+branch `codex/strategy-short-interest`. Initial local and actual matching
+remote were clean and equal to
+`4228eaaf44c978c35bbcd7666ef92e37e169a388`. A matching-ref-only fetch without
+tags confirmed tracking equality and ancestry after
+`b0d4a57f9164421c85c0fd970fea29d4c4d025af`. The local worktree already had
+the pushed review; no fast-forward, branch change or reconciliation was needed.
+
+The complete ordered Claude range **`b0d4a57f..4228eaaf`** contains one commit:
+
+| Commit | Disposition | Scope / reason |
+|---|---|---|
+| `4228eaaf44c978c35bbcd7666ef92e37e169a388` | **Accepted after correction** | Record only, +215/-28: header, five appended ledger rows and section 100. The exact checkpoint and all twelve prior Codex commits are independently dispositioned; completed review and validation are durable. The reconstructed rows are sound. A missed malformed-duplicate P2 and two overbroad statements require the corrections/qualifications below. |
+
+This is completion evidence from the full range and record, not author-name
+or intermediate-push inference. Mechanical comparison restores the five
+appended rows and proves the prior publication rule, every historical section
+1–99 and prior ledger row remain verbatim. Three decision-record SHA-256
+anchors match their committed bytes. Six prior push tips, the twelve-commit
+inventory, 11 modules/one script/eight tests and 7,318 added code/test lines
+agree with Git. Claude's **817 + 284 = 1,101** full-lane count is internally
+consistent; it is not a Codex test execution. Counter-review quality **8/10**:
+useful complete review and ledger repair, with a verified material missed case.
+
+### 101.2 Persistent P0–P3 ledger and appended errata
+
+| ID | Priority | Classification / status | Evidence, reason, correction and verification |
+|---|---|---|---|
+| `SI-CCR30-001` | P2 | Confirmed / corrected | SI duplicate slots were populated only after schema/financial validation. A valid row plus a negative quantity, boolean quantity, malformed ADV/DTC, unknown field or forbidden short-volume peer retained the valid copy. The 24-case regression failed on the intended observation-admission assertion, **24 failed / 35 deselected in 3.30s**. Raw canonical ticker/date identities are now counted before schema/financial validation across all pages. Every identifiable colliding copy is quarantined; malformed reasons, row indices and raw/file hashes are retained. Unrelated observations remain present. Corrected source file **59 passed in 6.15s**. Section 100's no-code-defect and unconditional duplicate-refusal conclusions are superseded for this missed case. |
+| `SI-CCR30-002` | P3 | Confirmed documentation overstatement / corrected by qualification and regression | Section 100.4 calls the successor-exit guard redundant because ending positions would void the book. That is not generally true: all holdings may terminate in-window, leaving no positions. The existing explicit guard is correct and unchanged. A new ten-identity case covers each of the three allocation roles: baseline **3 passed in 0.73s**; removing only that condition in memory produced **3 failed in 0.12s** on the intended completion assertion, then the original function was restored in `finally`. Preserve the guard; it is required even when terminal payouts close every holding before August ends. |
+| `SI-CCR30-003` | P3 | Confirmed wording qualification / closed | The reconstructed `b0d4a57` row says no FINRA credential is present. Section 99 establishes only no known activated credential in the checked session/locations. It is not absence everywhere on this machine. Preserve the historical row and apply this scope qualification; later registration/sign-in still does not establish Public credential activation. |
+| `SI-CR19-001` | P3 | Confirmed / closure accepted | Four missing push-ledger rows are verified against sections 95/96/98/99, exact commits and the matching tracking reflog. UTC dates are correct, including `b0d4a57` at 2026-10-08T06:45:11Z. Keep the reconstructed rows, their attribution and all original sections. |
+| `SI-CR19-002` | P3 | Confirmed quotation omission / closed by provenance append | The exact owner instruction supplied the Sharadar artifact location, quoted below. No new permission or cross-lane access is necessary. Its original message timestamp is unavailable in the retained chat context; do not invent one. The authorization was already recorded on 2026-10-07, and this quotation is appended on 2026-10-08. No other-lane file is read this round. |
+| `SI-CR19-003` | P3 | Valid prospective advisory / open | No actual signal/outcome join exists. Before any such join, bind the descriptive execution and every evaluated cell to a permanent look record, the applicable SI-0M accounting and an explicit canonical-contamination rule. Current runner refusal and actual looks 0/0 remain enforced. The non-outcome SI source comparison cannot resolve or consume this future outcome gate. |
+| `SI-CCR28`, `SI-CCR29`, `SI-EXP` | P1–P3 | Prior confirmed/partial/false-alarm classifications retained | Historical corrections and closed false alarms, including `SI-CCR29-003` and `SI-EXP-005`, remain unchanged. The new duplicate finding does not reopen unrelated resolved items. |
+| `SI-SRC-20260928-001..003` | P2 | Open factual gates | Original/correction archive and availability remain missing for strict PIT; latest-revised coverage/identity/companion/use/QC qualification remains separate. Free API account setup and a consistency comparison cannot manufacture those facts. |
+| `SI-CR5-005` / `SI-CCR16-007` | P2 | Open, shared/out of lane | Retained, with no shared behavior/document correction. |
+| `SI-CR15-001` | P3 | Open, prospective commitment advisory | No purchase or new paid subscription is authorized by this free setup. Required concrete terms/credential-issuance confirmations remain applicable. |
+
+The owner's original path instruction is quoted verbatim from this chat:
+
+> sharadar: /Users/sheltonchen/Documents/Codex/2026-09-03/f/trading_agent__analyst_revisions_v2/artifacts/analyst_revisions_v2/sharadar_capture/arv2-sharadar-source-20260914T003329843989Z
+
+The owner also stated **"sharadar key is already on this machine. other sessions
+have been using it"**. The supplied directory was used only for the section-96
+metadata/byte check, not credential discovery, other-lane execution or SI/PIT
+admission. The quotation repairs the provenance gap; it does not transform
+the artifact into a price/volume archive or licensing receipt.
+
+### 101.3 Focused validation and corrections
+
+Only `latest_revised_source.py` and its focused source tests change behavior;
+the additional order test pins the existing successor guard. Valid distinct
+rows keep their source semantics, and all fixture/decision/protocol hashes
+remain unchanged. Existing schema fields, public launch boundary, financial
+rules and candidate grid remain unchanged. The actual-input launcher still
+refuses unpinned manifests before member/outcome access. Code identity is
+recomputed from the corrected implementation bytes, so a future rehearsal
+has a new implementation/run identity without rewriting older reports.
+
+The source correction and successor guard have the material red/green proofs
+above. All execution uses the qualified CPython **3.13.15** environment,
+an empty inherited environment, explicit system PATH and macOS `sandbox-exec`
+denying network. Targeted lane/script/changed-test compilation exits **0**,
+with bytecode confined to a temporary directory. `git diff --check` passes.
+The final focused command passed **201 tests in 115.51s**, with zero failures,
+skips or warnings: source **59**, orders **38**, runner **15**, lane import
+boundary **9**, repository ML boundary **11**, active-document **69**. This
+includes all 27 new regressions and the restored successor guard. No code
+changed after that run. The correction commit is recorded below before
+publication; final record checks are rerun after the last documentation edit.
+No full lane or repository suite is run by Codex.
+
+The validated correction is commit
+**`cd0481d56d6568ba6bb3e93d1432088a0a28439d`**. It contains only the source
+module and two focused test files (**+82/-2**); this final record commit follows
+before the one combined push. No staged or committed code differs from the
+201-pass tested tree. Final historical-record preservation and document
+checks apply to the closing record, not an invented additional software run.
+The closing record's active-document check passed **69 tests in 0.93s**, with
+zero failures, skips or warnings. Mechanical comparison verifies historical
+sections 1–100 and all prior ledger rows verbatim; only the new publication
+row, status header and section 101 are changed. The added-record privacy scan
+and whitespace check pass. After this validation-text addition, the final
+active-document and staged checks are rerun before publication.
+
+### 101.4 Exercised authorization, resumed step and publication
+
+* **SI-AUTH-20261008-01:** the owner requested a new one-shot Claude push
+  monitor and counter-review. This later direction supersedes section 99's
+  historical statement that the prior monitor stayed deleted.
+* **SI-AUTH-20261008-02:** **"also, signed in. when claude's review landed,
+  counter review and proceed"** authorizes the bounded next lane step after
+  accepted counter-review under standing delegation.
+* **SI-AUTH-20261008-03:** **"signed in chrome. wait for claude's review, then
+  restart"** defers FINRA setup until review/counter-review, then specifies the
+  owner's Chrome session. Sign-in is owner-reported until observed.
+* **SI-DEC-20261008-01:** quarantine every identifiable raw-key collision
+  regardless of financial/schema validity, retaining all refusal provenance.
+  This implements the existing duplicate contract, without changing economics.
+* **SI-DEC-20261008-02:** preserve the explicit successor-exit boundary and
+  directly test in-window terminal closure instead of accepting a redundancy
+  assertion. No evaluation-date or order-policy change.
+* **SI-DEC-20261008-03:** quote the existing Sharadar instruction without
+  inventing its original date or asking for renewed routine authorization.
+* **SI-DEC-20261008-04:** use the requested Chrome session for resumed FINRA
+  setup. If unavailable, preserve the completed counter-review and report the
+  connection prerequisite rather than switch account sessions or search for
+  credentials broadly.
+
+The next authorized milestone is the section-99 bounded FINRA/Massive SI
+consistency comparison. Public API activation and applicable actual source-use
+facts precede any request. Freeze the overlapping settlement sample/matching
+specification before retrieval; compare current/previous quantities and
+coverage/refusal/revision metadata without prices or returns. Agreement is
+shared-source distributor consistency, not proof of original vintages, full
+historical coverage or stable identities. Do not bypass the current actual-
+input refusal or replace a missing credential with more fabricated work.
+The resumed Chrome observation and exact next prerequisite are appended below.
+
+**Resumed setup and factual stop:** after the counter-review/focused validation,
+the existing FINRA API Console was requested in **Chrome**, as the owner
+specified. Browser controls reported Chrome unavailable. The enabled-surface
+inventory exposed only the in-app browser/MCP apps, and a native Google Chrome
+lookup was also unavailable. Thus no authenticated Chrome page or activated
+Public API credential was observed in this continuation. No in-app session
+was substituted, account changed, new secret entered, terms accepted or
+provider request sent. The next required action is to make the owner's
+signed-in Chrome session accessible to this chat, or supply only the secure
+local location/environment-variable names of an already activated FINRA
+Public credential. No credential value should be sent in chat. Once actual
+activation is verified, resume the bounded sample freeze and SI consistency
+comparison. This source milestone was **not implemented or completed**;
+no additional fabricated milestone is substituted for the access prerequisite.
+
+Section 81's **SI-AUTH-20261005-02** permits one combined final non-force push
+of this completed counter-review/correction round if the next milestone is
+blocked. Recheck physical/Git root, branch, HEAD, status and only the matching
+actual remote immediately before each commit/final push. Verify clean local,
+tracking and actual-remote equality afterward. Append the section-5 publication
+row before pushing. Claude's next review range starts at **`4228eaaf`** and
+includes the correction and final record commits. Delete the handled one-shot
+monitor; leave the old QC and exchange monitors paused and unchanged.
+
+Lookbacks **20/60/120/252** remain unselected, actual canonical outcome looks
+**0/0**, exploratory actual looks **0**, alpha **0**, permanent look IDs
+**none**, QC attempts **0**. No provider market rows, prices/outcomes, holdout,
+QC processing/job, broker, operator database, deployment, paper/live, actual
+capital/orders or trading access is performed during counter-review. Shared
+documents and SESSION_HANDOFF remain frozen; historical sections/ledgers and
+published history are preserved.

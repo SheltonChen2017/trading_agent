@@ -18,6 +18,11 @@ import re
 SCHEMA = "TPR-DEV-RAWREV-v1"
 MAX_ROWS = 100_000
 MAX_SESSIONS = 10_000
+STRICT_IDENTITY_POLICY = "strict_figi_snapshot_v1"
+SHARADAR_IDENTITY_POLICY = "sharadar_permaticker_snapshot_v1"
+STRICT_ACTION_POLICY = "strict_action_ambiguity_v1"
+NOMINAL_ACTION_POLICY = "nominal_pair_nonshare_actions_v1"
+_NONSHARE_ACTIONS = frozenset(("dividend", "sicchangefrom", "sicchangeto"))
 _RATING = {"benzinga_id", "benzinga_firm_id", "ticker", "date", "last_updated", "currency",
            "price_target_action", "price_target", "previous_price_target"}
 _IDENTITY = {"ticker", "security_id", "permaticker", "figi", "category", "exchange", "isdelisted"}
@@ -38,7 +43,7 @@ class RawRevisionEvent:
     ticker: str
     security_id: str | int
     permaticker: str | int
-    figi: str
+    figi: str | None
     exchange: str
     issued_date: str
     last_updated_utc: str
@@ -82,6 +87,14 @@ class RawRevisionResult:
     trading: bool = False
     source_inventory_authenticated: bool = False
     calendar_authenticated: bool = False
+    identity_policy: str = STRICT_IDENTITY_POLICY
+    missing_figi_input_rows: int = 0
+    current_snapshot_survivorship_bias_possible: bool = True
+    historical_symbol_match_verified: bool = False
+    action_policy: str = STRICT_ACTION_POLICY
+    nonshare_action_counts: tuple[tuple[str, int], ...] = ()
+    nominal_dividend_effects_possible: bool = False
+    target_pair_like_for_like_proven: bool = False
 
 
 def _fail(reason):
@@ -134,7 +147,7 @@ def _native_id(value):
 
 
 def _ticker(value):
-    return type(value) is str and re.fullmatch(r"[A-Z][A-Z0-9.\-]{0,31}", value) is not None
+    return type(value) is str and re.fullmatch(r"[A-Z][A-Z0-9./-]{0,31}", value) is not None
 
 
 def _day(value):
@@ -201,10 +214,22 @@ def _ratio(new, previous):
     return str(value.numerator) if value.denominator == 1 else str(value.numerator) + "/" + str(value.denominator)
 
 
-def _identity_reason(row):
+def _permaticker(value):
+    """Canonical provider-number syntax, not independent source authentication."""
+    if type(value) is int:
+        return 0 < value < 10**20
+    return type(value) is str and re.fullmatch(r"[1-9][0-9]{0,19}", value) is not None
+
+
+def _identity_reason(row, policy):
+    optional_figi = policy == SHARADAR_IDENTITY_POLICY and row["figi"] is None
+    valid_figi = type(row["figi"]) is str and re.fullmatch(r"[A-Z0-9]{12}", row["figi"]) is not None
     if (not _native_id(row["security_id"]) or not _native_id(row["permaticker"])
-            or type(row["figi"]) is not str or re.fullmatch(r"[A-Z0-9]{12}", row["figi"]) is None
+            or not (optional_figi or valid_figi)
             or type(row["isdelisted"]) is not bool):
+        return "invalid_snapshot_identity"
+    if policy == SHARADAR_IDENTITY_POLICY and (not _permaticker(row["permaticker"])
+            or type(row["security_id"]) is not str or row["security_id"] != "SHARADAR:" + str(row["permaticker"])):
         return "invalid_snapshot_identity"
     if type(row["category"]) is not str or row["category"] != "Domestic Common Stock":
         return "not_domestic_common_stock"
@@ -215,7 +240,7 @@ def _identity_reason(row):
     return None
 
 
-def _identity_map(rows):
+def _identity_map(rows, policy):
     groups, keys = {}, {}
     for row in rows:
         if not _ticker(row["ticker"]):
@@ -223,7 +248,11 @@ def _identity_map(rows):
         groups.setdefault(row["ticker"], {})[_signature(row)] = row
         for field in ("security_id", "permaticker", "figi"):
             if _native_id(row[field]):
-                key = (field, type(row[field]).__name__, str(row[field]))
+                # A provider's numeric identifier has the same collision scope
+                # in its native integer and canonical decimal-string forms.
+                kind = ("provider-number" if policy == SHARADAR_IDENTITY_POLICY
+                    and field == "permaticker" and _permaticker(row[field]) else type(row[field]).__name__)
+                key = (field, kind, str(row[field]))
                 keys.setdefault(key, set()).add(row["ticker"])
     ambiguous = set()
     for symbols in keys.values():
@@ -232,23 +261,32 @@ def _identity_map(rows):
     return groups, ambiguous
 
 
-def _action_exclusions(rows, cutoff):
-    exclusions = set()
+def _action_exclusions(rows, cutoff, policy):
+    exclusions, nonshare_counts = set(), {}
     for row in rows:
         if not _ticker(row["ticker"]):
             _fail("invalid action ticker")
         day = _day(row["date"])
         if day > cutoff.date():
             continue
+        kind = row["action"]
+        if policy == NOMINAL_ACTION_POLICY and type(kind) is str and kind in _NONSHARE_ACTIONS:
+            # This explicit noncanonical nominal-pair policy does not adjust
+            # targets or infer that dividends have no economic effect. Only
+            # ordinary cash dividends and these two metadata-only changes do
+            # not mechanically alter shares. Outcome accounting is separate.
+            nonshare_counts[kind] = nonshare_counts.get(kind, 0) + 1
+            continue
         # With no prior-target date or adjustment-vintage proof, any supplied
         # action at/before this cutoff is a basis/identity ambiguity. Unknown
         # actions are not harmless; no split factor or repair is invented.
         exclusions.add(row["ticker"])
-    return exclusions
+    return exclusions, tuple(sorted(nonshare_counts.items()))
 
 
 def normalize_raw_revisions(ratings, identities, actions, sessions, *, cutoff_utc, capture_utc,
-                            view="censored", action_inventory_complete):
+                            view="censored", action_inventory_complete, identity_policy=STRICT_IDENTITY_POLICY,
+                            action_policy=STRICT_ACTION_POLICY):
     """Normalize the explicitly separate, unknown-horizon stock-only proxy.
 
     Native IDs/types and original eligibility are retained. Censored excludes
@@ -258,17 +296,30 @@ def normalize_raw_revisions(ratings, identities, actions, sessions, *, cutoff_ut
     The second supplied exchange open strictly after issued UTC date is the
     frozen conservative timing policy. Actual calendar/source authentication
     and whole-run corporate-action/outcome admission remain outside this API.
+    The default retains mandatory FIGI. The explicit Sharadar policy permits
+    only null missing FIGI, binds namespaced IDs to genuine supplied permatickers,
+    and preserves snapshot/survivorship risk; it does not prove historical
+    cross-provider symbol joins or create a canonical identity entitlement.
+    Strict action ambiguity is the default. The explicit nominal-pair policy
+    exempts only ordinary dividend and SIC metadata actions as of this cutoff;
+    it neither proves like-for-like target economics nor admits outcome action
+    accounting, and does not screen earlier decisions using future actions.
     """
     if type(view) is not str or view not in ("current", "censored"):
         _fail("invalid raw-revision view")
     if type(action_inventory_complete) is not bool:
         _fail("invalid action-inventory completeness")
+    if type(identity_policy) is not str or identity_policy not in (STRICT_IDENTITY_POLICY, SHARADAR_IDENTITY_POLICY):
+        _fail("invalid snapshot identity policy")
+    if type(action_policy) is not str or action_policy not in (STRICT_ACTION_POLICY, NOMINAL_ACTION_POLICY):
+        _fail("invalid signal action policy")
     cutoff, capture = _utc(cutoff_utc), _utc(capture_utc)
     if cutoff > capture:
         _fail("cutoff exceeds source capture")
     rows = _rows(ratings, _RATING)
-    mapping, ambiguous = _identity_map(_rows(identities, _IDENTITY))
-    exclusions = _action_exclusions(_rows(actions, _ACTION), cutoff)
+    identity_rows = _rows(identities, _IDENTITY)
+    mapping, ambiguous = _identity_map(identity_rows, identity_policy)
+    exclusions, nonshare_counts = _action_exclusions(_rows(actions, _ACTION), cutoff, action_policy)
     axis = _calendar(sessions)
     groups = {}
     for row in rows:
@@ -334,7 +385,7 @@ def normalize_raw_revisions(ratings, identities, actions, sessions, *, cutoff_ut
                 reason = "ambiguous_snapshot_identity"
             else:
                 identity = next(iter(candidates.values()))
-                reason = _identity_reason(identity)
+                reason = _identity_reason(identity, identity_policy)
         if reason is None:
             if not action_inventory_complete:
                 reason = "action_inventory_incomplete"
@@ -364,4 +415,8 @@ def normalize_raw_revisions(ratings, identities, actions, sessions, *, cutoff_ut
         dispositions.append(RawRevisionDisposition(row["benzinga_id"],
                             row["ticker"] if _ticker(row["ticker"]) else None, reason, len(group)))
     return RawRevisionResult(tuple(events), tuple(dispositions), len(rows), duplicates,
-                             tuple(sorted(counts.items())), cutoff.isoformat(), capture.isoformat(), view)
+                             tuple(sorted(counts.items())), cutoff.isoformat(), capture.isoformat(), view,
+                             identity_policy=identity_policy,
+                             missing_figi_input_rows=sum(row["figi"] is None for row in identity_rows),
+                             action_policy=action_policy, nonshare_action_counts=nonshare_counts,
+                             nominal_dividend_effects_possible=action_policy == NOMINAL_ACTION_POLICY)

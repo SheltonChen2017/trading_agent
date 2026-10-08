@@ -219,7 +219,7 @@ def test_missing_held_execution_mark_freezes_buys_despite_complete_decision_mark
     assert result.sessions[0].decision_equity == "1200"
     assert result.sessions[0].open_equity is None
     assert result.fills == () and quantities(result) == {"NATIVE:B": 20}
-    assert "incomplete_execution_marks" in {r.reason for r in result.exclusions}
+    assert "incomplete_open_valuation" in {r.reason for r in result.exclusions}
 
 
 def test_source_identity_separators_cannot_collide_hypothetical_order_ids():
@@ -241,6 +241,165 @@ def test_dust_sale_without_cash_to_cover_commission_remains_pending_not_negative
                  rows=(bar(open="0.001", close="0.001"),))
     assert result.fills == () and quantities(result) == {"NATIVE:A": 20}
     assert result.final_cash == "0" and result.orders[0].pending_quantity == 20
+
+
+def action(kind="cash_dividend", value="1", sid="NATIVE:A", **changes):
+    row = {"action_id": "fixture-action-1", "session_id": "2024-01-03",
+           "security_id": sid, "kind": kind, "value": value}
+    row.update(changes)
+    return row
+
+
+def test_dividend_is_prior_holder_receivable_not_spendable_cash_or_new_buyer_entitlement():
+    result = run(cash="0", positions=positions(("NATIVE:A", 20)),
+                 frame=target((("NATIVE:A", "0"), ("NATIVE:B", "0.1"))),
+                 rows=(bar(tradable=False), bar("NATIVE:B")), corporate_actions=(action(),))
+    assert result.final_cash == "0" and result.final_dividend_receivable == "20"
+    assert result.sessions[0].decision_equity == "200"
+    assert result.sessions[0].open_equity == result.sessions[0].close_equity == "220"
+    assert result.sessions[0].dividend_receivable == "20"
+    assert not result.fills and quantities(result) == {"NATIVE:A": 20}
+    assert result.corporate_actions[0].prior_quantity == 20
+    assert result.dividend_cash_policy == "exdate-receivable-never-spendable-no-assumed-payment-date"
+    fresh = run(corporate_actions=(action(),))
+    assert fresh.fills[0].quantity == 9 and fresh.final_dividend_receivable == "0"
+
+
+def test_exdate_seller_retains_receivable_and_prior_cutoff_does_not_use_new_entitlement():
+    sold = run(cash="0", positions=positions(("NATIVE:A", 20)),
+               frame=target((("NATIVE:A", "0"),)), corporate_actions=(action(),))
+    assert sold.final_positions == () and sold.final_cash == "199.6"
+    assert sold.final_dividend_receivable == "20" and sold.sessions[0].close_equity == "219.6"
+    held = run(positions=positions(("NATIVE:A", 10)), corporate_actions=(action(value="100"),))
+    assert held.sessions[0].decision_equity == "1100" and not held.orders
+    assert held.sessions[0].open_equity == "2100" and held.final_cash == "1000"
+
+
+def test_split_preserves_economics_and_transforms_lagged_capacity_share_units():
+    result = run(cash="1000", positions=positions(("NATIVE:A", 20)),
+                 frame=target((("NATIVE:A", "0"),)), rows=(bar(open="5", close="5", lagged_volume=300),),
+                 corporate_actions=(action("stock_split", "2"),))
+    assert result.sessions[0].decision_equity == result.sessions[0].open_equity == "1200"
+    assert result.orders[0].requested_quantity == 40 and result.orders[0].filled_quantity == 6
+    assert quantities(result) == {"NATIVE:A": 34}
+    assert result.corporate_actions[0].prior_quantity == 20
+    assert result.corporate_actions[0].resulting_quantity == 40
+    assert result.corporate_actions[0].cash_receivable == "0"
+    assert result.corporate_action_accounting_complete is True
+
+
+def test_split_converts_frozen_decision_order_not_later_open_based_sizing():
+    normal = run(rows=(bar(open="5", close="5"),), corporate_actions=(action("stock_split", "2"),))
+    gap = run(rows=(bar(open="20", close="20"),), corporate_actions=(action("stock_split", "2"),))
+    assert normal.orders[0].requested_quantity == gap.orders[0].requested_quantity == 18
+    assert normal.fills[0].quantity == 18 and normal.final_cash == "909.73"
+    assert gap.fills[0].quantity == 4
+
+
+@pytest.mark.parametrize("held", [True, False])
+def test_fractional_split_entitlement_or_order_is_never_truncated_or_fake_liquidated(held):
+    kwargs = dict(corporate_actions=(action("stock_split", "0.5"),))
+    if held:
+        kwargs.update(positions=positions(("NATIVE:A", 3)), frame=target((("NATIVE:A", "0"),)))
+    with pytest.raises(bt.RawBacktestError, match="fractional.*split"):
+        run(**kwargs)
+
+
+def test_held_unresolved_action_retains_last_accounted_quantity_and_unknown_nav():
+    result = run(positions=positions(("NATIVE:A", 20)), frame=target((("NATIVE:A", "0"),)),
+                 corporate_actions=(action("unresolved", None),))
+    assert quantities(result) == {"NATIVE:A": 20} and not result.fills
+    assert result.orders[0].pending_quantity == 20
+    assert result.sessions[0].decision_equity == "1200"
+    assert result.sessions[0].open_equity is None and result.sessions[0].close_equity is None
+    assert result.corporate_action_accounting_complete is False and not result.complete
+    assert result.unresolved_action_security_ids == ("NATIVE:A",)
+    assert result.corporate_actions[0].resulting_quantity is None
+
+
+def test_unheld_unresolved_action_blocks_new_entry_but_not_unused_universe_or_past_fills():
+    blocked = run(corporate_actions=(action("unresolved", None),))
+    assert not blocked.fills and blocked.orders[0].pending_quantity == 9
+    assert blocked.orders[0].reason == "corporate_action_unresolved"
+    assert blocked.sessions[0].close_equity == "1000"
+    untouched = run(corporate_actions=(action("unresolved", None, "NATIVE:B"),))
+    assert untouched.fills == run().fills and untouched.complete
+    later = {"session_id": "2024-01-04", "open_utc": "2024-01-04T14:30:00Z", "close_utc": "2024-01-04T21:00:00Z",
+             "bars": (bar(open_available_at_utc="2024-01-04T14:30:00Z", close_available_at_utc="2024-01-04T21:00:00Z"),)}
+    first = {"session_id": "2024-01-03", "open_utc": OPEN, "close_utc": CLOSE, "bars": (bar(),)}
+    future = run(sessions=(first, later), corporate_actions=(action("unresolved", None, session_id="2024-01-04"),))
+    assert future.fills == run().fills and future.sessions[0].close_equity == "999.82"
+    assert future.sessions[1].close_equity is None
+
+
+def test_simultaneous_split_and_dividend_require_external_entitlement_order_evidence():
+    events = (action("stock_split", "2"), action(action_id="fixture-dividend"))
+    with pytest.raises(bt.RawBacktestError, match="simultaneous.*basis"):
+        run(corporate_actions=events)
+
+
+@pytest.mark.parametrize("changes", [{"action_id": "fixture-action-1"}, {"session_id": "missing"},
+                                     {"security_id": "missing"}, {"kind": "merger"}, {"value": "NaN"}])
+def test_corporate_action_closed_identity_and_financial_contract_refuses(changes):
+    events = (action(), action(**changes)) if changes == {"action_id": "fixture-action-1"} else (action(**changes),)
+    with pytest.raises(bt.RawBacktestError):
+        run(corporate_actions=events)
+
+
+def test_corporate_actions_are_detached_and_decimal_context_independent():
+    events = (action(),)
+    original = deepcopy(events)
+    with localcontext() as context:
+        context.prec = 2
+        result = run(positions=positions(("NATIVE:A", 10)), corporate_actions=events)
+    assert result == run(positions=positions(("NATIVE:A", 10)), corporate_actions=events)
+    assert events == original
+
+
+def test_receivable_persists_into_later_cutoff_without_becoming_cash():
+    second_open, second_close = "2024-01-04T14:30:00Z", "2024-01-04T21:00:00Z"
+    first = {"session_id": "2024-01-03", "open_utc": OPEN, "close_utc": CLOSE, "bars": (bar(),)}
+    second = {"session_id": "2024-01-04", "open_utc": second_open, "close_utc": second_close,
+              "bars": (bar(open_available_at_utc=second_open, close_available_at_utc=second_close),)}
+    later_target = target(session_id="2024-01-04", cutoff_utc=CLOSE,
+        decision_marks=({"security_id": "NATIVE:A", "price": "10", "available_at_utc": CLOSE},))
+    result = run(positions=positions(("NATIVE:A", 10)), sessions=(first, second),
+                 targets=(target(), later_target), corporate_actions=(action(),))
+    assert result.sessions[0].decision_equity == "1100" and result.sessions[1].decision_equity == "1110"
+    assert result.final_cash == "989.98" and result.final_dividend_receivable == "10"
+    assert result.fills[0].quantity == 1 and result.fills[0].session_id == "2024-01-04"
+    assert result.sessions[1].close_equity == "1109.98"
+
+
+def test_held_unresolved_event_freezes_other_buys_but_does_not_block_a_priced_other_exit():
+    result = run(positions=positions(("NATIVE:A", 20), ("NATIVE:C", 10)),
+        frame=target((("NATIVE:A", "0"), ("NATIVE:B", "0.1"), ("NATIVE:C", "0"))),
+        rows=(bar(), bar("NATIVE:B"), bar("NATIVE:C")), corporate_actions=(action("unresolved", None),))
+    assert [(fill.side, fill.security_id) for fill in result.fills] == [("sell", "NATIVE:C")]
+    assert quantities(result) == {"NATIVE:A": 20}
+    assert result.final_cash == "1099.8" and result.sessions[0].close_equity is None
+
+
+@pytest.mark.parametrize("kind,value", [("cash_dividend", "0"), ("stock_split", "0"),
+    ("cash_dividend", "Infinity"), ("stock_split", "-1"), ("cash_dividend", 1.0),
+    ("unresolved", "10"), ("stock_split", "0.0000000001")])
+def test_corporate_action_economic_values_are_exact_finite_and_bounded(kind, value):
+    with pytest.raises(bt.RawBacktestError):
+        run(corporate_actions=(action(kind, value),))
+
+
+@pytest.mark.parametrize("unresolved_action", [True, False])
+def test_same_open_unknown_held_asset_blocks_precomputed_other_buy_without_abort(unresolved_action):
+    missing = {} if unresolved_action else {"open": None, "open_available_at_utc": None}
+    result = run(positions=positions(("NATIVE:A", 20)),
+        frame=target((("NATIVE:A", "0"), ("NATIVE:B", "0.1"))),
+        rows=(bar(**missing), bar("NATIVE:B")),
+        corporate_actions=(action("unresolved", None),) if unresolved_action else ())
+    buy = next(order for order in result.orders if order.side == "buy")
+    assert buy.requested_quantity == buy.pending_quantity == 11 and not result.fills
+    assert buy.reason == "incomplete_open_valuation"
+    assert result.sessions[0].decision_equity == "1200" and result.sessions[0].open_equity is None
+    assert quantities(result) == {"NATIVE:A": 20} and not result.complete
 
 
 def test_later_target_cutoff_before_previous_close_refuses_even_if_before_open():

@@ -44,6 +44,14 @@ def reason(result):
     return result.dispositions[0].reason
 
 
+def test_native_slash_share_class_is_exact_not_an_alias_or_a_global_action_failure():
+    result = run(rows=(rating(ticker="ZZTEST/A"),), identities=(identity(ticker="ZZTEST/A"),),
+                 actions=({"ticker": "OTHER/B", "date": "2025-01-03", "action": "split"},))
+    assert result.events[0].ticker == "ZZTEST/A"
+    mismatched = run(rows=(rating(ticker="ZZTEST/A"),), identities=(identity(ticker="ZZTEST.A"),))
+    assert reason(mismatched) == "missing_snapshot_identity"
+
+
 def test_proxy_preserves_native_ids_exact_ratio_unknown_horizon_and_zero_authority():
     result = run()
     event = result.events[0]
@@ -175,6 +183,71 @@ def test_missing_duplicate_conflicting_and_cross_ticker_identity_are_explicit():
     assert reason(run(identities=(identity(), identity(ticker="OTHER")))) == "ambiguous_snapshot_identity"
 
 
+def snapshot_identity(**changes):
+    return identity(**dict({"security_id": "SHARADAR:101", "permaticker": "101", "figi": None}, **changes))
+
+
+def test_explicit_permaticker_policy_accepts_missing_figi_without_changing_strict_default():
+    supplied = (snapshot_identity(),)
+    assert reason(run(identities=supplied)) == "invalid_snapshot_identity"
+    result = run(identities=supplied, identity_policy="sharadar_permaticker_snapshot_v1")
+    assert len(result.events) == 1
+    event = result.events[0]
+    assert event.security_id == "SHARADAR:101" and event.permaticker == "101" and event.figi is None
+    assert result.identity_policy == "sharadar_permaticker_snapshot_v1"
+    assert result.missing_figi_input_rows == 1
+    assert result.current_snapshot_survivorship_bias_possible is True
+    assert result.historical_symbol_match_verified is result.point_in_time_data is False
+    assert result.canonical_admission is result.quantconnect is False
+
+
+@pytest.mark.parametrize("changes", [
+    {"figi": ""}, {"figi": "MISSING_FIGI"}, {"figi": 123}, {"figi": "bbg000000001"},
+    {"permaticker": ""}, {"permaticker": "00101"}, {"permaticker": True},
+    {"permaticker": "made-up"}, {"permaticker": 0}, {"permaticker": "101.0"},
+    {"security_id": "fixture-security"}, {"security_id": "SHARADAR:102"},
+    {"security_id": 101}, {"isdelisted": 0},
+])
+def test_permaticker_policy_refuses_placeholder_ids_invalid_present_figi_and_namespace_mismatch(changes):
+    result = run(identities=(snapshot_identity(**changes),), identity_policy="sharadar_permaticker_snapshot_v1")
+    assert reason(result) == "invalid_snapshot_identity"
+
+
+@pytest.mark.parametrize("permaticker", [101, "101"])
+def test_permaticker_policy_preserves_native_permaticker_type_and_valid_present_figi(permaticker):
+    value = snapshot_identity(permaticker=permaticker, figi="BBG000000001")
+    result = run(identities=(value,), identity_policy="sharadar_permaticker_snapshot_v1")
+    assert result.events[0].permaticker == permaticker
+    assert result.events[0].figi == "BBG000000001" and result.missing_figi_input_rows == 0
+
+
+@pytest.mark.parametrize("other", [
+    snapshot_identity(ticker="OTHER"),
+    snapshot_identity(ticker="OTHER", permaticker=101, security_id="invalid-namespace"),
+    snapshot_identity(ticker="OTHER", permaticker="102", security_id="SHARADAR:102", figi="BBG000000001"),
+])
+def test_permaticker_policy_never_bypasses_native_or_present_figi_collisions(other):
+    value = snapshot_identity(figi="BBG000000001")
+    assert reason(run(identities=(value, other), identity_policy="sharadar_permaticker_snapshot_v1")) == "ambiguous_snapshot_identity"
+
+
+def test_permaticker_policy_preserves_duplicate_conflict_and_action_gates():
+    value = snapshot_identity()
+    assert len(run(identities=(value, value), identity_policy="sharadar_permaticker_snapshot_v1").events) == 1
+    assert reason(run(identities=(value, snapshot_identity(figi="BBG000000001")),
+        identity_policy="sharadar_permaticker_snapshot_v1")) == "ambiguous_snapshot_identity"
+    assert reason(run(identities=(value,), actions=({"ticker": "ZZTEST", "date": "2025-01-03", "action": "tickerchange"},),
+        identity_policy="sharadar_permaticker_snapshot_v1")) == "corporate_action_ambiguity"
+    assert reason(run(identities=(value,), action_inventory_complete=False,
+        identity_policy="sharadar_permaticker_snapshot_v1")) == "action_inventory_incomplete"
+
+
+@pytest.mark.parametrize("policy", [None, True, "auto", "sharadar_permaticker_snapshot_v2"])
+def test_unknown_identity_policy_cannot_infer_an_opt_in(policy):
+    with pytest.raises(raw.RawRevisionError, match="identity policy"):
+        run(identity_policy=policy)
+
+
 @pytest.mark.parametrize("action", ["split", "reverse_split", "tickerchange", "spinoff", "merger", "delisted", "unknown"])
 def test_corporate_action_or_unclassified_basis_ambiguity_refuses(action):
     assert reason(run(actions=({"ticker": "ZZTEST", "date": "2025-01-03", "action": action},))) == "corporate_action_ambiguity"
@@ -184,6 +257,40 @@ def test_future_action_cannot_change_prior_cutoff_and_missing_inventory_is_not_n
     future = ({"ticker": "ZZTEST", "date": "2025-01-07", "action": "split"},)
     assert run(actions=future) == run()
     assert reason(run(action_inventory_complete=False)) == "action_inventory_incomplete"
+
+
+@pytest.mark.parametrize("kind", ["dividend", "sicchangefrom", "sicchangeto"])
+def test_explicit_nominal_pair_policy_ignores_only_reviewed_nonshare_actions(kind):
+    actions = ({"ticker": "ZZTEST", "date": "2025-01-03", "action": kind},)
+    assert reason(run(actions=actions)) == "corporate_action_ambiguity"
+    result = run(actions=actions, action_policy="nominal_pair_nonshare_actions_v1")
+    assert result.events and result.events[0].raw_revision_ratio == "1/10"
+    assert result.action_policy == "nominal_pair_nonshare_actions_v1"
+    assert result.nonshare_action_counts == ((kind, 1),)
+    assert result.nominal_dividend_effects_possible is True
+    assert result.target_pair_like_for_like_proven is result.point_in_time_data is result.canonical_admission is False
+
+
+@pytest.mark.parametrize("kind", ["split", "reverse_split", "stockdividend", "specialdividend", "Dividend",
+    "tickerchange", "spinoff", "merger", "delisted", "exchangefrom", "mystery", None])
+def test_nominal_pair_policy_does_not_widen_unknown_split_or_identity_treatment(kind):
+    assert reason(run(actions=({"ticker": "ZZTEST", "date": "2025-01-03", "action": kind},),
+        action_policy="nominal_pair_nonshare_actions_v1")) == "corporate_action_ambiguity"
+
+
+def test_nominal_pair_policy_is_as_of_not_future_filter_and_inventory_is_still_required():
+    policy = {"action_policy": "nominal_pair_nonshare_actions_v1"}
+    baseline = run(**policy)
+    future = ({"ticker": "ZZTEST", "date": "2025-01-07", "action": "split"},)
+    assert run(actions=future, **policy) == baseline
+    assert reason(run(actions=future, cutoff_utc="2025-01-07T22:00:00Z", **policy)) == "corporate_action_ambiguity"
+    assert reason(run(action_inventory_complete=False, **policy)) == "action_inventory_incomplete"
+
+
+@pytest.mark.parametrize("policy", [True, None, "ignore-actions", "nominal_pair_nonshare_actions_v2"])
+def test_action_policy_requires_exact_explicit_selector(policy):
+    with pytest.raises(raw.RawRevisionError, match="action policy"):
+        run(action_policy=policy)
 
 
 def test_result_order_and_detachment_do_not_depend_on_input_permutation():

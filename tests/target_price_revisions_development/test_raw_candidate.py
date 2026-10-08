@@ -3,6 +3,8 @@ from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from decimal import Inexact, ROUND_DOWN, ROUND_UP, localcontext
 from fractions import Fraction
+import hashlib
+import json
 from zoneinfo import ZoneInfo
 
 import pytest
@@ -25,7 +27,7 @@ def inputs(count=1):
     ratings, identities = [], []
     for number in range(count):
         ticker = f"ZZTEST{number}"
-        identities.append({"ticker": ticker, "security_id": f"fixture-security-{number:02d}",
+        identities.append({"ticker": ticker, "security_id": f"SHARADAR:{1000 + number}",
                            "permaticker": 1000 + number, "figi": f"BBG{number:09d}",
                            "category": "Domestic Common Stock", "exchange": "NYSE", "isdelisted": False})
         ratings.append({"benzinga_id": f"fixture-event-{number:02d}", "benzinga_firm_id": 12,
@@ -59,12 +61,48 @@ def first_prior(outcomes):
     return next(session for session in outcomes["sessions"] if session["session_id"] == "2024-12-31")
 
 
+def accounted_inputs():
+    structure, outcomes = inputs()
+    structure["actions"] = [{"ticker": "ZZTEST0", "date": "2025-01-03", "action": "dividend"}]
+    digest = hashlib.sha256((json.dumps(structure, sort_keys=True, separators=(",", ":"), ensure_ascii=True)
+                             + "\n").encode("ascii")).hexdigest()
+    prepared = {"schema": "tpr-raw-market-inputs-v1", "structure_sha256": digest, "outcomes": outcomes,
+        "corporate_actions": ({"action_id": "fixture-dividend", "session_id": "2025-01-03",
+            "security_id": "SHARADAR:1000", "kind": "cash_dividend", "value": "0.1"},),
+        "evidence": {"action_inventory_reconciled": True, "observed_provider_availability": False}}
+    return structure, prepared
+
+
+def test_separate_accounted_executor_forwards_entitlements_without_weakening_old_gate():
+    structure, prepared = accounted_inputs()
+    with pytest.raises(ValueError, match="action accounting"):
+        candidate.run_raw_candidate(structure, prepared["outcomes"])
+    result = candidate.run_accounted_raw_candidate(structure, prepared)
+    assert result["backtest"]["final_dividend_receivable"] == "99.8"
+    assert result["backtest"]["corporate_actions"][0]["kind"] == "cash_dividend"
+    assert result["accounting_model"]["observed_provider_availability"] is False
+    assert result["canonical_admission"] is False
+
+
+@pytest.mark.parametrize("change", [
+    lambda p: p.update(structure_sha256="a"*64),
+    lambda p: p["evidence"].update(action_inventory_reconciled=False),
+    lambda p: p.update(corporate_actions=list(p["corporate_actions"])),
+    lambda p: p.update(schema="unbound"),
+])
+def test_accounted_executor_rejects_unbound_or_unreconciled_accounting(change):
+    structure, prepared = accounted_inputs()
+    change(prepared)
+    with pytest.raises(ValueError, match="unbound or unreconciled"):
+        candidate.run_accounted_raw_candidate(structure, prepared)
+
+
 def test_connected_native_schema_candidate_builds_weekly_targets_and_actual_hypothetical_orders():
     structure, outcomes = inputs()
     targets = candidate.build_target_frames(structure)
     assert targets["frames"][0]["session_id"] == "2025-01-02"
     assert targets["frames"][0]["cutoff_utc"] == "2024-12-31T23:00:00+00:00"
-    assert target_map(targets["frames"][0]) == {"fixture-security-00": "0.1"}
+    assert target_map(targets["frames"][0]) == {"SHARADAR:1000": "0.1"}
     result = candidate.run_raw_candidate(structure, outcomes)
     execution = result["backtest"]
     assert execution["complete"] is True and execution["orders"] and execution["fills"]
@@ -84,8 +122,8 @@ def test_positive_top_ten_native_ties_do_not_add_an_eleventh_name_or_negative_na
     structure["ratings"][-1].update(price_target="90", price_target_action="lowers")
     frame = candidate.build_target_frames(structure)["frames"][0]
     weights = target_map(frame)
-    assert sorted(sid for sid, weight in weights.items() if weight == "0.1") == [f"fixture-security-{i:02d}" for i in range(10)]
-    assert weights["fixture-security-10"] == weights["fixture-security-11"] == "0"
+    assert sorted(sid for sid, weight in weights.items() if weight == "0.1") == [f"SHARADAR:{1000 + i}" for i in range(10)]
+    assert weights["SHARADAR:1010"] == weights["SHARADAR:1011"] == "0"
     assert sum(Fraction(value) for value in weights.values()) == 1
 
 
@@ -97,7 +135,7 @@ def test_distinct_native_lineages_collapse_to_unit_median_before_firm_median():
     structure["ratings"].append(dict(first, benzinga_id="fixture-other-firm", benzinga_firm_id=13,
                                       price_target="70", price_target_action="lowers"))
     targets = candidate.build_target_frames(structure)
-    assert target_map(targets["frames"][0]) == {"fixture-security-00": "0"}
+    assert target_map(targets["frames"][0]) == {"SHARADAR:1000": "0"}
     assert Fraction(targets["normalization"][0]["scores"][0]["score"]) == Fraction(-1, 10)
 
 
@@ -113,6 +151,29 @@ def test_native_duplicates_permutation_and_outcome_bar_order_cannot_change_the_c
     duplicated = deepcopy(structure)
     duplicated["ratings"].append(dict(duplicated["ratings"][0]))
     assert candidate.build_target_frames(duplicated)["frames"] == candidate.build_target_frames(structure)["frames"]
+
+
+def test_fixed_candidate_explicitly_selects_snapshot_permaticker_policy_and_discloses_missing_figi():
+    structure, outcomes = inputs()
+    structure["identities"][0]["figi"] = None
+    targets = candidate.build_target_frames(structure)
+    assert targets["policy"]["identity_policy"] == "sharadar_permaticker_snapshot_v1"
+    assert targets["policy"]["current_snapshot_survivorship_bias_possible"] is True
+    assert targets["normalization"][0]["missing_figi_input_rows"] == 1
+    assert target_map(targets["frames"][0]) == {"SHARADAR:1000": "0.1"}
+    report = candidate.run_raw_candidate(structure, outcomes)
+    assert report["backtest"]["orders"] and report["backtest"]["complete"] is True
+    assert report["historical_symbol_match_verified"] is False
+    assert report["canonical_admission"] is False and report["quantconnect_attempts"] == 0
+
+
+@pytest.mark.parametrize("changes", [{"figi": ""}, {"figi": "MISSING"}, {"security_id": "invented-security"}])
+def test_candidate_snapshot_policy_does_not_convert_invalid_identity_to_positive_target(changes):
+    structure, _ = inputs()
+    structure["identities"][0].update(changes)
+    targets = candidate.build_target_frames(structure)
+    assert all(row["weight"] == "0" for frame in targets["frames"] for row in frame["weights"])
+    assert targets["normalization"][0]["refusal_counts"]["invalid_snapshot_identity"] == 1
 
 
 def test_censored_touch_changes_only_later_admitted_frames_and_retains_named_exclusion():
@@ -208,6 +269,66 @@ def test_unselected_name_action_also_refuses_the_whole_run():
     structure["actions"] = [{"ticker": "ZZTEST11", "date": "2025-03-01", "action": "dividend"}]
     with pytest.raises(ValueError, match="corporate action"):
         candidate.build_target_frames(structure)
+
+
+def test_outcome_free_planner_keeps_actions_and_does_not_grant_execution_admission():
+    structure, outcomes = inputs()
+    baseline = candidate.build_target_frames(structure)
+    structure["actions"] = [{"ticker": "ZZTEST0", "date": "2025-01-10", "action": kind}
+        for kind in ("dividend", "sicchangefrom", "sicchangeto")]
+    original = deepcopy(structure)
+    plan = candidate.plan_target_frames(structure)
+    assert plan["frames"] == baseline["frames"]
+    assert plan["proposed_security_ids"] == ["SHARADAR:1000"]
+    assert plan["action_accounting_admitted"] is plan["real_backtest_ready"] is False
+    assert plan["policy"]["signal_action_policy"] == "nominal_pair_nonshare_actions_v1"
+    assert plan["policy"]["nominal_dividend_effects_possible"] is True
+    assert plan["policy"]["target_pair_like_for_like_proven"] is False
+    assert plan["normalization"][2]["nonshare_action_counts"] == {"dividend": 1, "sicchangefrom": 1, "sicchangeto": 1}
+    assert structure == original
+    with pytest.raises(ValueError, match="corporate action"):
+        candidate.build_target_frames(structure)
+    with pytest.raises(ValueError, match="corporate action"):
+        candidate.run_raw_candidate(structure, outcomes)
+
+
+def test_planner_preserves_future_action_until_as_of_cutoff_not_hindsight_name_removal():
+    structure, _ = inputs()
+    baseline = candidate.build_target_frames(structure)
+    structure["actions"] = [{"ticker": "ZZTEST0", "date": "2025-01-07", "action": "split"}]
+    plan = candidate.plan_target_frames(structure)
+    assert plan["frames"][:2] == baseline["frames"][:2]
+    assert target_map(plan["frames"][2]) == {"SHARADAR:1000": "0"}
+    assert plan["normalization"][2]["refusal_counts"]["corporate_action_ambiguity"] == 1
+    assert plan["proposed_security_ids"] == ["SHARADAR:1000"]
+
+
+def test_planner_cannot_override_source_inventory_calendar_or_identity_limits():
+    structure, _ = inputs()
+    structure["action_inventory_complete"] = False
+    with pytest.raises(ValueError, match="source structure"):
+        candidate.plan_target_frames(structure)
+    structure["action_inventory_complete"] = True
+    structure["identities"] *= 4097
+    with pytest.raises(ValueError, match="scope"):
+        candidate.plan_target_frames(structure)
+
+
+def test_action_bound_is_independent_of_smaller_identity_bound_before_outcomes():
+    structure, _ = inputs()
+    action = {"ticker": "ZZTEST0", "date": "2025-01-10", "action": "dividend"}
+    structure["actions"] = [action] * 100000
+    assert candidate.validate_structure(structure, require_action_accounting=False)
+    structure["actions"].append(action)
+    with pytest.raises(ValueError, match="scope"):
+        candidate.validate_structure(structure, require_action_accounting=False)
+
+
+@pytest.mark.parametrize("flag", [None, 0, 1, "no"])
+def test_action_accounting_selector_cannot_be_coerced(flag):
+    structure, _ = inputs()
+    with pytest.raises(ValueError, match="accounting"):
+        candidate.validate_structure(structure, require_action_accounting=flag)
 
 
 @pytest.mark.parametrize("mutation", ["holdout", "no_buffer", "order", "same_clock", "no_actions"])

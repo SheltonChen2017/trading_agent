@@ -28,7 +28,7 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
                            | {"research.target_price_revisions"},
         allowed_stdlib_roots=DEFAULT_ALLOWED_STDLIB_ROOTS | {
             "argparse", "collections", "tempfile", "time", "fractions", "http", "ssl",
-            "pwd", "stat", "signal", "contextlib", "urllib", "uuid", "zoneinfo",
+            "pwd", "stat", "signal", "contextlib", "urllib", "uuid", "zoneinfo", "csv", "io", "html", "bisect",
         },
         allowed_local_prefixes=("research.target_price_revisions_development",),
     )
@@ -54,6 +54,13 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.raw_backtest",
         "research.target_price_revisions_development.raw_candidate",
         "research.target_price_revisions_development.raw_run",
+        "research.target_price_revisions_development.raw_source_capture",
+        "research.target_price_revisions_development.raw_sharadar_source",
+        "research.target_price_revisions_development.raw_sharadar_continue",
+        "research.target_price_revisions_development.raw_source_prepare",
+        "research.target_price_revisions_development.raw_market_inputs",
+        "research.target_price_revisions_development.raw_market_capture",
+        "research.target_price_revisions_development.raw_market_diagnostic",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -213,16 +220,18 @@ def test_source_auditor_is_separate_from_pure_fixtures_and_authority_packages() 
     initializer = ast.parse((ROOT / "research/target_price_revisions_development/__init__.py").read_text(encoding="utf-8"))
     assert all(isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
                and type(node.value.value) is str for node in initializer.body)
+    collectors = {"source_audit", "sharadar_diagnostic", "sharadar_shape", "sharadar_followup",
+                  "raw_source_capture", "raw_sharadar_source", "raw_sharadar_continue", "raw_market_capture", "raw_market_diagnostic"}
     for path in (ROOT / "research/target_price_revisions_development").glob("*.py"):
-        if path.name in {"source_audit.py", "sharadar_diagnostic.py", "sharadar_shape.py", "sharadar_followup.py"}:
+        if path.stem in collectors:
             continue
         for node in ast.walk(ast.parse(path.read_text(encoding="utf-8"))):
             names = ([alias.name for alias in node.names] if isinstance(node, ast.Import)
                      else [node.module or ""] if isinstance(node, ast.ImportFrom) else [])
             assert not any(name.split(".")[0] in {"http", "ssl", "urllib"}
-                           or set(name.split(".")) & {"source_audit", "sharadar_diagnostic", "sharadar_shape", "sharadar_followup"} for name in names)
+                           or set(name.split(".")) & collectors for name in names)
             if isinstance(node, ast.ImportFrom) and node.module is None:
-                assert all(alias.name not in {"source_audit", "sharadar_diagnostic", "sharadar_shape", "sharadar_followup"} for alias in node.names)
+                assert all(alias.name not in collectors for alias in node.names)
 
 
 def test_sharadar_diagnostic_can_only_compose_the_frozen_source_primitives() -> None:
@@ -430,11 +439,13 @@ def test_committed_source_probe_is_exact_non_authorizing_aggregate_not_a_retry()
 
 @pytest.mark.parametrize("name,edges", [("raw_revision", set()), ("raw_backtest", set()),
     ("raw_candidate", {"raw_revision", "raw_backtest"}),
+    ("raw_source_prepare", set()),
+    ("raw_market_inputs", {"raw_candidate"}),
     ("sharadar_metadata", {"sharadar_projection"}), ("sharadar_projection", set())])
 def test_native_development_pure_modules_do_not_gain_input_openers(name, edges):
     tree = ast.parse((ROOT / f"research/target_price_revisions_development/{name}.py").read_text(encoding="utf-8"))
     allowed = {"__future__", "dataclasses", "datetime", "decimal", "fractions",
-               "re", "collections", "zoneinfo", "hashlib"}
+               "re", "collections", "zoneinfo", "hashlib", "json", "bisect"}
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             assert all(alias.name.split(".")[0] in allowed for alias in node.names)

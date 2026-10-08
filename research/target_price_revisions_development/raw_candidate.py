@@ -9,9 +9,11 @@ from dataclasses import asdict
 from datetime import date, datetime, time, timezone
 from decimal import Context, Decimal, ROUND_HALF_EVEN, localcontext
 from fractions import Fraction
+import hashlib
+import json
 from zoneinfo import ZoneInfo
 
-from .raw_revision import normalize_raw_revisions
+from .raw_revision import NOMINAL_ACTION_POLICY, SHARADAR_IDENTITY_POLICY, normalize_raw_revisions
 from .raw_backtest import run_raw_revision_backtest
 
 CANDIDATE_ID = "TPR-DEV-RAWREV-v1"
@@ -23,6 +25,12 @@ SOURCE_START = "2024-08-01"
 def policy() -> dict:
     return {"candidate_id": CANDIDATE_ID, "window_start": WINDOW_START,
         "window_end": WINDOW_END, "source_start": SOURCE_START, "view": "censored",
+        "identity_policy": SHARADAR_IDENTITY_POLICY,
+        "signal_action_policy": NOMINAL_ACTION_POLICY,
+        "nominal_dividend_effects_possible": True,
+        "target_pair_like_for_like_proven": False,
+        "current_snapshot_survivorship_bias_possible": True,
+        "historical_symbol_match_verified": False,
         "signal": "raw-new-divided-by-prior-minus-one-unknown-horizon",
         "ratio_clip": "1", "half_life_sessions": 20, "maximum_age_sessions": 80,
         "aggregation": "median-unit-sum-per-firm-median-firms",
@@ -32,7 +40,10 @@ def policy() -> dict:
         "initial_cash": "100000", "order_based": True,
         "slippage_bps_per_side": "10", "commission_per_share": "0.01",
         "maximum_lagged_volume_fraction": "0.01", "costs_calibrated": False,
-        "corporate_action_policy": "refuse-whole-run-for-in-window-actions",
+        "corporate_action_policy": "require-bound-accounting-otherwise-refuse-in-window-actions",
+        "market_input_model": "sharadar-current-vintage-raw-imputation-v1",
+        "price_clock_model": "assumed_historical_daily_bar_clock-not-observed-provider-availability",
+        "dividend_policy": "imputed-ex-date-receivable-never-spendable",
         "confirmatory_alpha": "0", "canonical_admission": False,
         "point_in_time_data": False, "qc": False, "trading": False}
 
@@ -51,13 +62,16 @@ def _utc(value):
     return result.astimezone(timezone.utc)
 
 
-def validate_structure(structure: dict) -> tuple:
+def validate_structure(structure: dict, *, require_action_accounting: bool = True) -> tuple:
+    """Validate source framing; planning may not confer execution admission."""
+    if type(require_action_accounting) is not bool:
+        raise ValueError("invalid action accounting selector")
     _schema(structure, {"schema", "capture_utc", "calendar", "ratings", "identities",
         "actions", "action_inventory_complete"})
     if (type(structure["schema"]) is not str or structure["schema"] != "tpr-raw-structure-v1"
             or structure["action_inventory_complete"] is not True):
         raise ValueError("incomplete raw source structure")
-    for key, bound in (("calendar", 256), ("ratings", 100000), ("identities", 4096), ("actions", 4096)):
+    for key, bound in (("calendar", 256), ("ratings", 100000), ("identities", 4096), ("actions", 100000)):
         if type(structure[key]) is not list or len(structure[key]) > bound:
             raise ValueError("raw source inventory exceeds scope")
     if not structure["ratings"] or not structure["identities"]:
@@ -100,12 +114,14 @@ def validate_structure(structure: dict) -> tuple:
         ids.append(row["security_id"])
     # A future split/dividend/merger must not be silently ignored or used to
     # cherry-pick names. Until action accounting exists, refuse the ENTIRE run.
+    # The outcome-free planner may retain all actions to calculate prospective
+    # targets, but its result is explicitly not an admitted backtest.
     for action in structure["actions"]:
         _schema(action, {"ticker", "date", "action"})
         if (type(action["date"]) is not str or not SOURCE_START <= action["date"] <= WINDOW_END
                 or date.fromisoformat(action["date"]).isoformat() != action["date"]):
             raise ValueError("invalid corporate action inventory")
-        if WINDOW_START <= action["date"] <= WINDOW_END:
+        if require_action_accounting and WINDOW_START <= action["date"] <= WINDOW_END:
             raise ValueError("in-window corporate action accounting not implemented")
     return tuple(sorted(set(ids)))
 
@@ -116,8 +132,22 @@ def _median(values):
 
 
 def build_target_frames(structure: dict) -> dict:
-    """Outcome-free weekly targets. Every frame re-evaluates censoring as-of."""
-    inventory = validate_structure(structure)
+    """Execution-gated weekly targets; no unimplemented action accounting."""
+    return _target_frames(structure, require_action_accounting=True)
+
+
+def plan_target_frames(structure: dict) -> dict:
+    """Outcome-free proposal only, retaining all supplied actions as-of.
+
+    Proposed identities stay within this private in-memory result for a
+    narrowly scoped collector; they must not be published as a public report.
+    Planning does not authorize data access or admit a real backtest.
+    """
+    return _target_frames(structure, require_action_accounting=False)
+
+
+def _target_frames(structure: dict, *, require_action_accounting: bool) -> dict:
+    inventory = validate_structure(structure, require_action_accounting=require_action_accounting)
     axis = structure["calendar"]
     event_axis = [{"session_date": s["session_date"], "open_utc": s["open_utc"]} for s in axis]
     frames, evidence = [], []
@@ -136,7 +166,8 @@ def build_target_frames(structure: dict) -> dict:
                 raise ValueError("invalid prior-session decision cutoff")
             normalized = normalize_raw_revisions(structure["ratings"], structure["identities"],
                 structure["actions"], event_axis, cutoff_utc=cutoff.isoformat(),
-                capture_utc=structure["capture_utc"], view="censored", action_inventory_complete=True)
+                capture_utc=structure["capture_utc"], view="censored", action_inventory_complete=True,
+                identity_policy=SHARADAR_IDENTITY_POLICY, action_policy=NOMINAL_ACTION_POLICY)
             units = defaultdict(list)
             for event in normalized.events:
                 age = index - 1 - event.eligible_session_index
@@ -162,9 +193,17 @@ def build_target_frames(structure: dict) -> dict:
                 "weights": [{"security_id": sid, "weight": "0.1" if sid in selected else "0"}
                     for sid in inventory]})
             evidence.append({"session_id": session["session_date"], "accepted_events": len(normalized.events),
+                "identity_policy": normalized.identity_policy,
+                "signal_action_policy": normalized.action_policy,
+                "nonshare_action_counts": dict(normalized.nonshare_action_counts),
+                "missing_figi_input_rows": normalized.missing_figi_input_rows,
                 "duplicate_rows": normalized.duplicate_rows, "refusal_counts": dict(normalized.refusal_counts),
                 "scores": [{"security_id": sid, "score": str(score)} for sid, score in ranked]})
     return {"policy": policy(), "frames": frames, "normalization": evidence,
+        "proposed_security_ids": sorted({item["security_id"] for frame in frames
+            for item in frame["weights"] if item["weight"] == "0.1"}),
+        "action_accounting_admitted": require_action_accounting,
+        "real_backtest_ready": False,
         "security_inventory": [{"security_id": sid, "asset_type": "common-stock"} for sid in inventory]}
 
 
@@ -179,6 +218,32 @@ def _jsonable(value):
 def run_raw_candidate(structure: dict, outcomes: dict) -> dict:
     """Consume already admitted private bytes; never load or authorize them."""
     targets = build_target_frames(structure)
+    return _run_candidate(structure, outcomes, targets, ())
+
+
+def run_accounted_raw_candidate(structure: dict, prepared: dict) -> dict:
+    """Run bound, reconciled accounting inputs; source/look custody is external.
+
+    This separate pure entry does not weaken the old unaccounted executor.
+    Its label is an input assertion, not an authentication or source grant.
+    """
+    _schema(prepared, {"schema", "structure_sha256", "outcomes", "corporate_actions", "evidence"})
+    expected = hashlib.sha256((json.dumps(structure, sort_keys=True, separators=(",", ":"),
+        ensure_ascii=True, allow_nan=False) + "\n").encode("ascii")).hexdigest()
+    if (prepared["schema"] != "tpr-raw-market-inputs-v1" or prepared["structure_sha256"] != expected
+            or type(prepared["corporate_actions"]) is not tuple
+            or type(prepared["evidence"]) is not dict
+            or prepared["evidence"].get("action_inventory_reconciled") is not True):
+        raise ValueError("unbound or unreconciled market accounting")
+    targets = plan_target_frames(structure)
+    result = _run_candidate(structure, prepared["outcomes"], targets, prepared["corporate_actions"])
+    result["accounting_model"] = prepared["evidence"]
+    result["policy"] = dict(result["policy"],
+        corporate_action_policy="nonspendable-dividend-receivables-integer-splits-unresolved-explicit")
+    return result
+
+
+def _run_candidate(structure, outcomes, targets, corporate_actions):
     _schema(outcomes, {"schema", "sessions"})
     if (type(outcomes["schema"]) is not str or outcomes["schema"] != "tpr-raw-outcomes-v1"
             or type(outcomes["sessions"]) is not list):
@@ -211,7 +276,8 @@ def run_raw_candidate(structure: dict, outcomes: dict) -> dict:
     # no positions and no fills; exclude their cash-only marks from study NAV.
     execution = tuple(dict(s, bars=tuple(s["bars"])) for s in sessions)
     result = run_raw_revision_backtest(security_inventory=tuple(targets["security_inventory"]),
-        sessions=execution, targets=tuple(frames), initial_cash="100000", initial_positions=())
+        sessions=execution, targets=tuple(frames), initial_cash="100000", initial_positions=(),
+        corporate_actions=corporate_actions)
     backtest = _jsonable(asdict(result))
     backtest["sessions"] = [s for s in backtest["sessions"] if s["session_id"] >= WINDOW_START]
     return {"schema": "tpr-raw-candidate-result-v1", "candidate_id": CANDIDATE_ID,
@@ -220,5 +286,7 @@ def run_raw_candidate(structure: dict, outcomes: dict) -> dict:
         "canonical_admission": False,
         "non_pristine_current_snapshot": True, "confirmatory_alpha": "0",
         "historical_identity_proven": False, "horizon_comparable": False,
+        "current_snapshot_survivorship_bias_possible": True,
+        "historical_symbol_match_verified": False,
         "source_and_run_admission_external_to_pure_function": True,
         "quantconnect_attempts": 0, "trading_authority": False}

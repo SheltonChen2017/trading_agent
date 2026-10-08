@@ -26,9 +26,16 @@ AUTHORITY FOR ONE FRESH SHARADAR METADATA-ONLY DIAGNOSTIC, NOW SPENT. SECTION 62
 RECORDS THE OWNER-APPROVED RICHER INSPECTION, ALSO SPENT, AND ITS CONFIRMED
 DESIGN LIMITATION. SECTION 63 RECORDS THE OWNER'S EXPLICIT APPROVAL OF THE
 FRESH STATUS FOLLOW-UP AND CONTINUOUS DEVELOPMENT TOWARD BACKTEST READINESS.
-NO PREVIOUS SPENT REQUEST IS RENEWED. NO PRICE/OUTCOME ACCESS, RESEARCH
-LOOK, QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
-IS GRANTED. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN SECTION 37.**
+NO PREVIOUS SPENT REQUEST IS RENEWED. SECTION 64 RECORDS THE OWNER'S LATER
+INSTRUCTION TO WAIVE SEPARATE RIGHTS PAPERWORK AND START A PRIVATE DEVELOPMENT
+BACKTEST. IT SCOPES FRESH SOURCE ADMISSION AND ONE FROZEN LOCAL EXPLORATORY
+RUN, NOT CANONICAL ADMISSION OR A CLAIM OF VERIFIED CONTRACTUAL RIGHTS.
+FRESH SOURCE PREPARATION IS COMPLETE; THE FIRST PRICE REQUEST RETURNED HTTP
+400 WITHOUT BODY/ROWS, SO NO REAL BACKTEST RESULT EXISTS. THE FAILED LOOK
+STAYS SPENT; THE SEPARATE ERROR-ONLY DIAGNOSTIC DOES NOT RERUN THE CANDIDATE.
+NO QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
+IS GRANTED BY THAT LOCAL SCOPE. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN
+SECTION 37.**
 
 Sibling-lane changes and their independent reviews remain on their respective
 branches. Their integration into `main` grants this target branch visibility;
@@ -510,6 +517,17 @@ section 63 supersedes the pending-question state in section 62. Routine
 development decisions remain delegated, without another Claude review stop.
 Section 63 owns the new operation, proxy candidate, evidence and remaining
 factual boundary; older one-shot scopes remain historical and spent.
+Section 64 supersedes the separate-agreement prerequisite for the private
+development candidate on the owner's direct instruction. Rights remain
+unverified, not falsely established. Fresh native input capture and a single
+frozen local order-based run are now in scope; data validity, source clocks,
+corporate actions, exact lineage and outcome accounting still apply. Earlier
+zero-access paragraphs describe their historical rounds, not this new scope.
+The actual section-64 source-only preparation produced fourteen weekly frames
+and 43 selected stocks. The first price request then failed HTTP 400 with
+zero response bytes/rows; no market projection or simulation exists. The
+immediate blocker is this provider/request rejection, not rights paperwork,
+Claude review or a missing Windows host. The original look remains spent.
 
 ### Open-issue register
 
@@ -529,7 +547,8 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
-| `TPR-RR24-001` | P2 | Actual development data activation | Exact Massive/Benzinga addon applicability for local retained/derived-strategy processing is unresolved between public guidance and incorporated terms. No admitted private rights/source/calendar/price/action bundle exists for this candidate. Section 63 records the evidence and precise next input; software and routine choices are not waiting for Claude. |
+| `TPR-RR24-001` | P2 | Actual development run | Section 64 waives separate rights paperwork for this private candidate, without proving contractual rights. Native source/calendar/target preparation is complete; the required price/action-value bundle is absent after HTTP 400. The surviving factual blocker is not an agreement-delivery prerequisite. |
+| `TPR-RR25-006` | P2 | Price acquisition and actual backtest | Section 64.4 records the first request and error-only diagnostic both returning HTTP 400. No price rows or simulation exist; the diagnostic's closed projection of 181 error bytes could not establish a specific cause. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -537,9 +556,9 @@ host on 2026-10-05 found neither `tpr_allowed_signers` nor `tpr_registry_anchor`
 under the frozen `C:\ProgramData\CustomizedAgent\trust` path; no key or
 trust-file provisioning was performed. The six canonical
 open findings require an owner decision, an owner-authorized artifact rewrite,
-or a later bounded implementation/validation round. The additional section-61
-development-source finding is a current metadata-contract factual blocker,
-not a newly opened canonical trust gate.
+or a later bounded implementation/validation round. The additional development
+finding now concerns actual data and run compatibility, not the resolved
+metadata parser or a new canonical trust gate.
 ### Historical progression (not the current resume instruction)
 
 The remainder of this section preserves how the earlier v2.1 and v2.2
@@ -9132,3 +9151,421 @@ Do not substitute public plan marketing, subscription possession, fixture
 greens or the Sharadar HTTP response for that evidence. No Claude wait is
 required by this round's direct owner instruction. All parked canonical
 gates, frozen artifacts and previously spent authorities remain unchanged.
+
+## 64. Owner-directed rights waiver and immediate development backtest attempt - 2026-10-07
+
+### 64.1 Exact authority and prospective scope
+
+The owner now explicitly directs:
+
+> other lanes have been using those data. skip the rights part. start backtesting immediately
+
+This later instruction removes the separate-agreement paperwork prerequisite
+for this owner's private exploratory run. It is recorded as an owner-directed
+waiver, never as vendor verification or a conclusion that contractual rights
+are established. Prior sibling usage is relevant implementation precedent,
+not transferable source truth or a license certificate. No vendor contact,
+subscription purchase, credential reset or further general approval is needed.
+
+`TPR-OWN-36`: admit a separately labelled exact owner-waiver manifest for
+`TPR-DEV-RAWREV-v1`, with contractual-rights verification false, personal-only
+use true and QC/canonical/trading authority false. Preserve the prior
+evidence-manifest validation as a distinct path. Do not populate fictional
+vendor-agreement hashes or treat this waiver as an authenticated license.
+
+`TPR-OWN-37`: obtain fresh bounded native source inputs for the frozen
+2024-08-01 through 2025-03-31 source period. The pre-outcome candidate window
+remains 2025-01-02 through 2025-03-31; no optimization, future validation or
+reserved holdout access is introduced. The prior D0/source-audit/Sharadar
+metadata identities remain spent. New operation plans must pin code, helper,
+owner instruction, Git baseline and clocks before credentials or requests.
+Only sanitized source aggregates may be published; exact projections remain
+in ignored owner-only private storage, without API keys or authenticated URLs.
+
+`TPR-OWN-38`: run the existing fixed order-based development candidate once
+if complete valid source and execution inputs can be admitted. Keep its
+configuration, 100,000 initial cash, costs, timing and native identity rules
+frozen before outcomes; reserve and count the empirical look before reading
+or acquiring prices/outcomes. This local private diagnostic is not QC parity,
+canonical strategy acceptance or a trading decision. No QC upload or job is
+selected for this first scoped local diagnostic. If a later QC run is separately
+scoped, the maximum three unsuccessful attempts and Mia recovery rule remain.
+Unknown corporate actions or missing required market records are not repaired
+with invented values, fixture rows, hindsight deletion or empty-cash success.
+
+<!-- TPR-RAW-ADMISSION:START -->
+| Boundary | Scope |
+|---|---|
+| Rights | Exact owner-directed private waiver; contractual verification false |
+| Candidate | TPR-DEV-RAWREV-v1; fixed Q1 2025; order-based; exploratory |
+| Massive | Fresh ratings only; fixed source dates; 1000 rows/page; at most 100 pages and 64 MiB |
+| Sharadar | Fresh stock identities and actions; fixed projected columns; at most ten pages/table and 32 MiB |
+| Requests | Thirty seconds each; no redirects or retries; exact provider hosts |
+| Privacy | Owner-only private projections; public aggregate counts only; no credentials |
+| Outcomes | One frozen local run only after source admission and durable look reservation |
+| Canonical and holdout | Unchanged and unopened; no positive registry authority |
+| QuantConnect and trading | Zero selected QC attempts; no broker, deployment or capital action |
+<!-- TPR-RAW-ADMISSION:END -->
+
+The tracked Analyst record sections 65.3A/73.4 document current-vintage
+Massive capture and Sharadar identity/action capture; they do not provide a
+ready-to-run Target-Price bundle or prove today's physical input availability.
+No sibling private captures are read or copied in this round. The fresh source
+check determines whether actual cutoff-compatible target events exist before
+any price acquisition. The candidate currently refuses in-window corporate
+actions; real inventory, not a green fixture, will determine the next required
+accounting work or a factual missing-data blocker.
+
+### 64.2 Implementation, measured operations and validation
+
+Prospective scope above is recorded before authenticated provider operations.
+Exact frozen plans, operation results, findings and final validation follow.
+
+The exact public owner-waiver artifact has SHA-256
+`b813b8524890088479398a6d3c22b95d30831a08042a3ff063620fc38a32d9d3`;
+its instruction SHA-256 is
+`e24fb532aea2497759f50f050c5f2653afd8d5f788cf084b68aaee378fb92508`.
+Neither is a vendor license. The new controller accepts that exact separate
+schema, preserves the old evidence-validation path, and carries the waiver
+basis into result/reservation/terminal evidence. Missing admission is now
+reported as `source_admission_missing`, not a demand for a vendor agreement.
+The wording regression was red (one failed/four passed), then five passed.
+
+Massive operation `TPR-RAWREV-SOURCE-20261007-001` completed once under plan
+`e204db30fa13fba63605820bc6e40ea66345a01db4977825905b7193ab4e3058`,
+created `2026-10-08T04:54:52.069298+00:00` (2026-10-07 local date),
+24-hour expiry, code
+`95cc73d82388fcdc33c217f381877a681f19b09e1e031ce7dd1184929a3dad39`
+and frozen helper
+`9f2674a47d0d62bb09e2dd5ba1ce7f37eed3c68dce254e40e0d11d1218f46960`.
+Before execution root reproduced 30 focused tests, all passing in 0.49s.
+The operation traversed 48 pages, 47,393 rows, 35,152,963 response bytes,
+without retry or redirect. Aggregate report SHA-256
+`1559e8c587cb1c04b3dda629b719b353ee2cf8c1e6cdc33eedd5e12256fd03b9`.
+It records 1,952 malformed-native-field dispositions, 41,707 pairs with
+positive finite prior/new targets and 41,314 such pairs with valid native
+fields and last touch at/before the latest candidate cutoff. These are
+necessary source-feasibility counts, not accepted signals, a positive
+revision count, complete historical vintages, or proof of market edge.
+Pagination terminated; transactional inventory remains explicitly false.
+The projected rows and per-row dispositions remain private. No sibling
+capture, price/outcome, empirical look or QC operation was used. This fresh
+capture identity is now spent; it does not renew a previous request scope.
+
+Sharadar source operation `TPR-SHARADAR-SOURCE-20261007-001` spent exactly
+one request under final plan
+`f60affc655e237793f3f84ff33ade6f5ea263257e7feb101ba027e8246e696fa`,
+created `2026-10-08T04:57:49.035741+00:00`, collector
+`7487a0990c4d3f80d4230c7f0bc03a471579620a3bc6ea25be7951d7c47dcb03`.
+The earlier draft plan
+`528c054c64bf3a673ffd82436307542d5136d8f3e2a8def9d3d06fce582bebf3`
+was replaced before any request to bind the per-request expiry correction;
+it was never executed. The final collector/boundary selection passed
+90 tests in 1.56s before execution. HTTP 200 returned 451,759 bytes and
+10,000 TICKERS rows with five exact requested native columns but omitted
+FIGI. The original strict six-column parser refused, preserved the private
+CSV, and made no ACTIONS call. Report
+`0530b12a24f61d4602c55d7f2f9468e57c5617624a618dab37bfea2c06b9ba0e`
+is FAILED at `csv_schema`; its zero parsed/action counts are not evidence of
+zero native rows or actions. Exact first CSV SHA-256 is
+`8efa0c24558feebd4f17ba636c231622e177c53ea1d7389c5f37472158d38372`.
+An offline header/count diagnosis reproduced that omission. A separate
+one-off semantic-count command failed on its own regex escaping before
+producing counts; this was not a provider failure and made no request.
+Executed collector bytes remain immutable. A separately pinned continuation
+will authenticate and reuse this exact first page, never refetch it, and
+spend only the remaining original page/byte allowance.
+
+`TPR-OWN-39` (prospective, before any outcomes): the local raw candidate may
+use `sharadar_permaticker_snapshot_v1`, namespaced genuine unique permaticker
+as security identity, with explicit null FIGI when absent. Existing direct
+normalizer callers retain the strict FIGI default; supplied FIGIs remain
+validated and collision checked. No synthetic identifier or historical
+mapping is fabricated. Sharadar's [TICKERS documentation](https://sharadar.com/docs/tickers)
+defines permaticker as permanent and share-class specific; its
+[FAQ](https://sharadar.com/docs/faqs) explains current-symbol rewiring and
+reused-symbol suffixes. These facts support Sharadar-internal pricing keys,
+not historical Benzinga-to-Sharadar identity proof. Snapshot selection,
+current-delisting survivorship, action/ticker ambiguity and non-PIT labels
+remain explicit. The fixed candidate/controller policy binds this amendment
+before any empirical look. Optional absent ACTIONS `contraticker` is also
+retained as null with missing-column evidence, never an invented counterparty.
+
+Continuation `TPR-SHARADAR-CONTINUE-20261007-001` is prospectively frozen
+under plan `b21cde993fb2497e9729e1dc23d4b3719fcf169ffb308788723f949a7a7d2b41`,
+created `2026-10-08T05:08:08.536295+00:00`, 24-hour expiry, code
+`a6d521f6f3eb24ce99765556f691a3e0d76ab848987859f0070d0d39bc70a590`.
+Root reproduced 74 focused continuation/boundary tests in 1.13s. The plan
+pins the executed parent/helper and first-page identities above: at most
+19 remaining GETs, 100,000 native rows/table, and 32 MiB including the
+451,759 bytes already captured. It neither renews nor refetches page zero.
+The corrected aggregate-only semantic diagnosis of that page found zero
+invalid ticker/permaticker/delisting fields or missing category/exchange;
+6,372 exact Domestic Common Stock records, 1,503 currently active. These
+are first-page counts only, not universe-completeness claims.
+
+Continuation completed: five further GETs, six source pages including the
+reused first page, 1,759,412 cumulative bytes, 21,001 identities and 27,788
+actions. No semantic rows were refused; twelve exact projected action
+duplicates are disclosed, not assumed independent events. All three identity
+pages omit FIGI. Aggregate
+`3740fbe451754086736e397b0e0701d8cd73d2ead8ba0d31ebcae702e79cc115`
+binds private projection
+`10731c5c13f853b852bf5a38ed095a9e26de1b539273b75be4bdbb2734bce440`.
+The original source operation remains failed/spent; this continuation does
+not rewrite its history. Global completeness/transactional stability remain
+unproven. The Massive projection's exact private-byte digest is
+`53324ebcb32691286fc9aa9776b65df6cc2c44e0abb679214878cd5ebf1cee20`.
+
+### 64.3 Prospective model choices and source-only target preparation
+
+`TPR-OWN-40`: the explicitly noncanonical nominal-pair signal may retain
+ordinary cash-dividend and SIC-classification events without treating them
+as mechanical share-unit changes. This is a modelling choice, not proof of
+like-for-like prior/new target basis. Only exact `dividend`, `sicchangefrom`
+and `sicchangeto` are exempted. Splits, identity changes and unknown actions
+remain as-of ambiguities. Direct normalizer callers retain strict defaults.
+The action census limit is expanded to the already captured bounded 100,000
+rows, without expanding provider requests, dates, assets or outcome authority.
+An outcome-free planner preserves every action, exposes a private proposal
+union and explicitly cannot authorize execution. Native slash share classes
+are preserved literally, never aliased to dots: an actual unrelated native
+action exposed the narrower old parser; the focused regression was one red,
+then one green. No rows, actions or issuers were deleted to force passage.
+
+Source preparation retains all 47,393 ratings and all 27,788 actions, with
+zero invalid source-date removals, matching 3,798 identities to the 4,023
+rating tickers. Installed `exchange_calendars` 4.13.2 XNYS supplies 166
+sessions, including the two 2024 early closes and excluding 2025-01-09;
+the [NYSE closure notice](https://ir.theice.com/press/news-details/2024/The-New-York-Stock-Exchange-Will-Close-Markets-on-January-9-to-Honor-the-Passing-of-Former-President-Jimmy-Carter-on-National-Day-of-Mourning/default.aspx)
+and [NYSE calendar release](https://ir.theice.com/press/news-details/2022/NYSE-Group-Announces-2023-2024-and-2025-Holiday-and-Early-Closings-Calendar/default.aspx)
+were checked. Exact calendar SHA-256
+`fe5444281ec3d4715ae711ab368757e46fc474b5680cdb406e00a7410a127eae`;
+private structure
+`509047244d47ec489e5a8e1dfbf74e0d0104b51c7dfff19ae7283abba1e9ccd5`;
+public preparation aggregate
+`6f0e68fafcbc2d82fcb67e8f7ec704334846929b0e21c5ad25c0d487875fbee7`.
+Before prices, the fixed policy produces fourteen positive weekly frames
+and a 43-security proposal union. Its selected in-window action inventory
+contains three dividends and no other actions. This census did not influence
+which securities were selected; it follows the already computed targets.
+
+`TPR-OWN-41`: use a gross, current-vintage local accounting model. Impute
+raw open by `open * closeunadj / close`, rounded rationally to eight decimal
+places, half-even; raw volume is the reciprocal `volume * close / closeunadj`,
+floored conservatively. These formulae follow the [Sharadar FAQ](https://sharadar.com/docs/faqs).
+Historical market-open/close clocks are simulation assumptions, not observed
+provider delivery timestamps. Dividends accrue to pre-open holders as
+non-spendable receivables included in NAV; no payment date, tax or cash
+reinvestment is invented. The same-date adjustment factor converts the
+documented split-adjusted dividend amount to an imputed raw entitlement;
+cross-table vintage equivalence is explicitly unverified. Native split-value
+direction is not established, so the converter marks those and other unknown
+economics unresolved. The pure engine additionally supports independently
+admitted integer splits; fractional entitlements and simultaneous split/dividend
+basis ambiguity refuse rather than invent cash-in-lieu. Unresolved held
+events preserve inventory and unknown NAV; new entries are blocked from the
+event onward, not retrospectively. These are diagnostic assumptions, not
+canonical facts, QC parity or broker execution modelling.
+
+`TPR-OWN-42`: the one authorized empirical look starts at price/payoff
+acquisition, not only at simulation. Limit it to the already selected 43-name
+union, stock dates 2024-12-31 through 2025-03-31 (one prior-close buffer),
+and action dates 2025-01-02 through 2025-03-31. At most ten GETs/five pages
+per dataset, 10,000 rows/page, 32 MiB total, 30 seconds/request, no retries
+or redirects. A private plan binds all seven execution/preparation modules,
+source/waiver/policy hashes, exact tickers, Git baseline and expiry. Its public
+summary omits tickers. The existing candidate's same spent-file identity is
+reserved before credentials, so the old controller cannot create a second
+look. Acquisition `CAPTURED` is not backtest completion. The append-only
+simulation receipt must bind these same acquired bytes and code, with no
+retuning or additional source scope. No QC, holdout or trading is selected.
+
+Pre-outcome focused proof includes 238 normalizer/candidate/controller cases,
+74 continuation/boundary cases, 24 public-operation-artifact cases and 151
+source-preparation/candidate/controller cases. These overlap and are not
+summed as independent tests. The action engine added meaningful dividend-
+cash and split-order mutation checks; final engine selection is 66 green.
+Two suggested integration defects (unknown-open buy abort and missing-prior-
+quote abort) were false alarms independently reproduced as correctly blocked
+orders/unknown values; regression coverage retains both. Only the open-NAV
+diagnostic label was clarified. No accounting gate was waived by a green test.
+
+### 64.4 Frozen empirical acquisition and execution
+
+Before any price/payoff request, root reproduced 634 focused tests in 3.47s
+and the three source collectors' 130 focused tests in 1.61s. The numeric-
+notation compatibility defect was corrected before freezing: validated
+scientific/leading-plus CSV decimals are projected to exact fixed-point text;
+native captured CSV bytes remain unchanged. This does not change economics.
+The exact private market plan is
+`3a215f293cae4ad9c150e2bd0ff4d63b6d6cf970c6af7ea2bcf7b9ed2b58c76c`,
+created `2026-10-08T05:38:11.255060+00:00`, expiring exactly 24 hours later.
+Its aggregate-only public summary is
+`bcbb908c3cc5212931cb41402b56c15679e0441d55757e8b3c3bd890b5674750`;
+candidate policy is
+`8e4ca8001df2f2544647f937e4af5535e371a52397cdd7de6492184bbdb2b82f`.
+The public summary contains the seven exact code hashes, source/waiver
+identities, request limits and dates, but no native ticker list. The earlier
+private source-target preparation predates the accounting-policy description
+amendment; this final plan recomputes the same fourteen frames/43 names under
+the final policy and is the execution authority, not that older description.
+The one-shot simulation controller is frozen at
+`953b427aa84d0ae8cdb774a09fe96c1acec259cf61d1049dc83deab38fda0f42`.
+It reserves an additional computation receipt before opening prices, binds
+the existing single empirical look, and distinguishes successful computation
+from complete valuation, corporate-action accounting and fully filled orders.
+
+Acquisition actually FAILED on its first stock request with HTTP 400, before
+reading a response body. No stock or action rows, market projection, result,
+or simulation were produced. The one empirical reservation remains spent;
+no marker is reset. Aggregate
+`491064c4da6ea38d194a3edac2e482d9b9bfd14657db1ca66ef5a643036e03d1`
+records one request, zero response bytes, `failure_stage=response`, zero QC
+attempts and no backtest completion. The official
+[stocks endpoint](https://sharadar.com/docs/stocks) and
+[query syntax](https://sharadar.com/docs/getting-started) were rechecked:
+the endpoint, six fields, comma-separated tickers, date bounds, sort, limit
+and skip are documented. HTTP 400 alone does not establish whether a native
+identifier, entitlement, request limit or provider implementation caused it.
+
+`TPR-OWN-43` (delegated, prospective failure diagnosis): the owner's standing
+instruction to make necessary decisions and start backtesting authorizes one
+separately recorded, error-only diagnostic of the exact rejected stock query.
+This explicitly amends the original no-retry procedure only for diagnosis;
+the original failed terminal and frozen code remain immutable. Reserve a new
+diagnostic receipt before credentials, retain the same spent empirical look,
+and permit exactly one GET, 30 seconds, at most 8,192 error-body bytes, no
+redirect or further retry. A successful HTTP 200 body must not be read. Do
+not persist, hash or print raw error text, credentials, native rows or ticker
+inventory; publish only status, bounded byte count and a closed error
+classification. This neither reruns the candidate nor changes its economics,
+data window, canonical gates or absent QC/trading authority. The diagnostic
+must bind the original private plan, failed aggregate and executed code.
+
+The diagnostic is prospectively frozen under plan
+`235208047c8e23d107378744887198ddc7f60a0997c33a93840c80fc41e8bdc0`,
+created `2026-10-08T05:49:17.502424+00:00`, twelve-hour expiry, source
+`3a4408ecaa89afb56eceadaf93763ee249c3d29871e752e422454a0a492f0a36`.
+Root reproduced 117 focused diagnostic/boundary/public-artifact checks in
+0.81s. The diagnostic's own partial-error-byte counter was corrected with
+a focused red/green test before execution. All seven original modules remain
+byte-identical and are rechecked before and after this diagnostic transport.
+
+The diagnostic completed its one permitted call: HTTP 400 again, with 181
+error-body bytes examined ephemerally and no successful body read. Aggregate
+`0e4d4164e6df1c888dad48df02aea955f24e11f1d928e48e51b8cf5edc02bdc8`
+reports `DIAGNOSED` only as operation completion: the closed classifier
+returned `unknown_response`, no admitted parameter labels and no error code.
+Thus the specific cause is still unknown; this is also a limitation of the
+conservative error projector, not proof that Sharadar supplied no explanation.
+No raw error body or digest was retained, so there is nothing to reinterpret
+offline. The capture and diagnostic are both spent, with two total market-
+endpoint calls, one original reserved development look, zero added looks,
+zero prices/payoff rows, zero simulations and zero QC attempts. No reset,
+silent retry, performance claim or alternative outcome selection follows.
+
+The immediate factual blocker is the reproducible rejected Sharadar stock
+request. A precise sanitized rejection reason or corrected working endpoint
+request is needed to choose a verified correction; current evidence does not
+justify resetting credentials, purchasing another subscription, changing the
+43-stock selection, or attributing failure to entitlement. The next technical
+action is provider-request diagnosis, not a rights-document or Claude wait.
+
+### 64.5 Findings ledger and evidence limits
+
+| Finding | Priority | Status | Evidence and disposition |
+|---|---|---|---|
+| `TPR-RR25-001` | P2 | Corrected | Confirmed optional native FIGI omission: original HTTP 200 page has five columns; exact retained first page reused without refetch. Null FIGI plus genuine namespaced permaticker is an explicit noncanonical choice, not historical identity proof. |
+| `TPR-RR25-002` | P2 | Corrected | Confirmed native slash rejection: source-only preparation refused an unrelated slash-form native action. One focused red then green; literal slash grammar admitted without aliasing, action deletion or universe filtering. |
+| `TPR-RR25-003` | P2 | Corrected | Confirmed scientific/plus decimal mismatch: independent synthetic proof showed collector acceptance followed by converter refusal. Exact fixed-point projection restores compatibility; native CSV unchanged. |
+| `TPR-RR25-004` | P2 | False alarm | Suggested unknown-open buy escape: existing post-action NAV guard already blocked new buys when valuation was unknown. Regression retained; only diagnostic wording changed. |
+| `TPR-RR25-005` | P2 | False alarm | Suggested missing-prior-quote abort: end-to-end converter/accounted-runner cases produce `decision_mark_missing`, incomplete output and no affected-session fills, not an exception or fabricated price. Regression retained. |
+| `TPR-RR25-006` | P2 | Open | Confirmed rejection: initial acquisition and error-only diagnostic both returned HTTP 400. Initial price-body bytes/rows are zero; diagnostic examined 181 error bytes but returned `unknown_response`. Exact cause remains unproved; no projection or simulation exists and raw error bytes were not retained. |
+
+No new P0/P1 issue was identified by these focused checks. There is no claim
+of whole-lane independent acceptance. Existing canonical source/rights,
+manifest, trust-custody and shared-synchronization issues are not closed by
+this local waiver or fixture proof. The native-Windows/macOS distinction and
+fourteen frozen-Windows-Git preregistration exclusions remain unchanged.
+
+### 64.6 Round handoff and completion boundary
+
+Technical milestone: implemented the bounded fresh-source capture, namespaced
+identity path, outcome-free target preparation, action-aware local order
+engine, hash-bound one-look market acquisition and one-computation controller.
+The prospective model and error-diagnostic decisions are `TPR-OWN-36` through
+`TPR-OWN-43`. Native rows remain only in ignored private owner-custody files;
+only waiver/plan/aggregate metadata is published. Source operation failures
+and their exact executed bytes are retained, not overwritten by successors.
+The source/target preparation completed, but real backtest completion did not:
+the frozen stock request was rejected, and no price projection exists.
+
+Plain-language milestone: the lane can build this fixed exploratory strategy
+and simulate its orders and dividends on fixtures. Fresh subscribed source
+data supplied an actual 43-stock selection, but Sharadar rejected prices.
+There is no return, drawdown, completed real backtest, market-edge evidence,
+QC completion or canonical-readiness claim. The rights-paperwork gate was
+waived for this local use as directed; the remaining blocker is factual API
+rejection, not another request for that paperwork or Claude review.
+
+Git scope: starting local and actual matching remote were exactly
+`331cfbb4183e56318a5c1e2b72f1f226c2ae4068`; no incoming Claude commits were
+present, so no incoming per-commit counter-review disposition is applicable.
+This section and the exact public code-bound artifacts form this round's
+single implementation snapshot, whose Git parent is that baseline. This is
+owner-directed implementation with focused self-validation, not attributed
+independent Claude acceptance. All commands, operational checks, edits and
+validation used the physically verified dedicated lane/branch. No shared
+document, canonical artifact, main/sibling behavior, operator stop state or
+operator database was changed. The consumed heartbeat remains paused.
+
+Validation host: bundled Python 3.12.14 on Darwin arm64. Focused pytest uses
+the sections-49/52 isolated in-process runtime-root runner before dispatch-
+fence import. No complete lane or repository suite was run. The canonical
+and original D0 artifacts remain hash-pinned; the fourteen Windows-Git
+preregistration cases were not run or weakened, and this host does not prove
+Windows signer/ACL/protected-parent custody. No credential reset, purchase,
+QC operation, paper/live action, broker action or trading was performed.
+
+Final root-reproduced focused union: **839 passed in 4.71s** with
+`pytest.main(["-q", ...])` in that isolated runner, using exactly:
+
+`tests/target_price_revisions_development/test_raw_source_prepare.py`,
+`tests/target_price_revisions_development/test_raw_revision.py`,
+`tests/target_price_revisions_development/test_raw_candidate.py`,
+`tests/target_price_revisions_development/test_raw_backtest.py`,
+`tests/target_price_revisions_development/test_raw_run.py`,
+`tests/target_price_revisions_development/test_raw_market_inputs.py`,
+`tests/target_price_revisions_development/test_raw_market_capture.py`,
+`tests/target_price_revisions_development/test_raw_operation_artifacts.py`,
+`tests/target_price_revisions_development/test_boundary_and_artifacts.py`,
+`tests/target_price_revisions/test_document_consistency.py`,
+`tests/test_active_document_consistency.py`,
+`tests/target_price_revisions_development/test_raw_source_capture.py`,
+`tests/target_price_revisions_development/test_raw_sharadar_source.py`,
+`tests/target_price_revisions_development/test_raw_sharadar_continue.py`,
+`tests/target_price_revisions_development/test_raw_market_diagnostic.py`.
+
+The union covers normalization, candidate composition, accounting, one-look
+and error-only controllers, source preparations, import boundaries, active
+documents and the twelve aggregate-only public operation artifacts. The
+separate public-artifact selection has 72 passing cases, including mutation
+guards against native/error-text disclosure, invented cause, fresh-look and
+backtest-completion claims. Twenty-five changed Python files compile in
+memory; diff whitespace checks pass. Executed collector/helper hashes, all
+seven frozen market-module hashes, the diagnostic hash, canonical frozen
+artifacts and the unchanged D0 report/code identities are verified by those
+focused tests. The early diagnostic false byte count was corrected before
+execution; the final actual diagnostic correctly reports 181 bytes.
+
+Next role/action: preserve these exact failed/spent receipts and diagnose the
+rejected stock request using a precise sanitized provider rejection or a
+known-working equivalent request. Do not infer an entitlement problem or
+reset Sharadar from HTTP 400 alone. Any later corrected acquisition must be
+an explicitly recorded successor with the failed history intact, not deletion
+of a spent marker, silent retry, new strategy selection or a claimed result.
+Canonical TPR-1/TPR-0B, parked trust protections and shared synchronization
+remain separately blocked; they are not prerequisites invented for this
+owner-waived local diagnostic. The round ends in one matching-lane non-force
+push, not an intermediate Claude review wait.

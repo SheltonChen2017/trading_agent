@@ -2805,3 +2805,53 @@ def test_section_63_records_fresh_approval_proxy_limits_and_factual_blocker():
     assert "2562e6a9e843ec3e7bf5883232d543698ff746048325963526c5a77855f3463e" in section
     assert "TPR-SD22-005" not in _open_issue_register()
     assert "TPR-RR24-001" in _open_issue_register()
+
+
+SECTION64_SCOPE = (
+    ("Rights", "Exact owner-directed private waiver; contractual verification false"),
+    ("Candidate", "TPR-DEV-RAWREV-v1; fixed Q1 2025; order-based; exploratory"),
+    ("Massive", "Fresh ratings only; fixed source dates; 1000 rows/page; at most 100 pages and 64 MiB"),
+    ("Sharadar", "Fresh stock identities and actions; fixed projected columns; at most ten pages/table and 32 MiB"),
+    ("Requests", "Thirty seconds each; no redirects or retries; exact provider hosts"),
+    ("Privacy", "Owner-only private projections; public aggregate counts only; no credentials"),
+    ("Outcomes", "One frozen local run only after source admission and durable look reservation"),
+    ("Canonical and holdout", "Unchanged and unopened; no positive registry authority"),
+    ("QuantConnect and trading", "Zero selected QC attempts; no broker, deployment or capital action"),
+)
+
+
+def test_section_64_records_owner_waiver_without_inventing_vendor_or_data_facts():
+    section = _record_section("## 64.")
+    block = _bounded(section, "<!-- TPR-RAW-ADMISSION:START -->",
+                     "<!-- TPR-RAW-ADMISSION:END -->", "section 64 source admission")
+    rows = tuple((left.strip(), right.strip()) for left, right in
+                 re.findall(r"^\| ([^|]+) \| ([^|]+) \|$", block, re.M)
+                 if left.strip() not in ("Boundary", "---"))
+    assert rows == SECTION64_SCOPE, "owner waiver cannot fabricate source truth or widen run scope"
+    assert "skip the rights part. start backtesting immediately" in section
+    assert all(decision in section for decision in ("TPR-OWN-36", "TPR-OWN-37", "TPR-OWN-38"))
+
+
+def test_section_64_records_actual_failed_price_capture_not_backtest_completion():
+    section = _record_section("## 64.")
+    assert "Acquisition actually FAILED on its first stock request with HTTP 400" in section
+    assert "No stock or action rows, market projection, result," in section
+    assert "or simulation were produced" in section
+    assert "491064c4da6ea38d194a3edac2e482d9b9bfd14657db1ca66ef5a643036e03d1" in section
+    assert "TPR-OWN-43" in section and "A successful HTTP 200 body must not be read" in section
+    assert "TPR-RR25-006" in _open_issue_register()
+
+
+@pytest.mark.parametrize("old,new", [
+    ("contractual verification false", "contractual verification true"),
+    ("at most 100 pages and 64 MiB", "unlimited pages"),
+    ("after source admission and durable look reservation", "without source admission or reservation"),
+])
+def test_section_64_guard_rejects_scope_drift(monkeypatch, old, new):
+    test_section_64_records_owner_waiver_without_inventing_vendor_or_data_facts()
+    original = _record_section
+    changed = original("## 64.").replace(old, new)
+    monkeypatch.setitem(globals(), "_record_section",
+                        lambda heading: changed if heading.startswith("## 64.") else original(heading))
+    with pytest.raises(AssertionError, match="owner waiver cannot fabricate"):
+        test_section_64_records_owner_waiver_without_inventing_vendor_or_data_facts()

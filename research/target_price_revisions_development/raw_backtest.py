@@ -17,6 +17,11 @@ continuous holding-period name-cap guarantee.
 Finite Decimal inputs become exact rationals so caller Decimal context cannot
 round hypothetical money. This separate pure path does not import the
 synthetic-only contract or execution-capable money/assistant packages.
+Corporate-action economics are externally admitted outcomes, never source
+announcement facts. Dividends are gross, non-spendable ex-date receivables;
+no payment date, tax or reinvestment is invented. Splits preserve original
+fill economics and convert raw-share units, with explicit refusal of fractional
+held/order entitlements and simultaneous split/dividend basis ambiguity.
 """
 from __future__ import annotations
 
@@ -36,6 +41,7 @@ MAX_NAME_WEIGHT = Fraction(1, 10)
 MAX_SECURITIES = 4096
 MAX_SESSIONS = 10000
 MAX_BAR_ROWS = 1000000
+MAX_ACTIONS = 100000
 MAX_QUANTITY = 1000000000
 MAX_FIRST_CUTOFF_AGE = timedelta(days=7)
 
@@ -85,6 +91,19 @@ class RawExclusion:
 
 
 @dataclass(frozen=True)
+class RawCorporateAction:
+    action_id: str
+    session_id: str
+    security_id: str
+    kind: str
+    input_value: str | None
+    prior_quantity: int
+    resulting_quantity: int | None
+    cash_receivable: str | None
+    status: str
+
+
+@dataclass(frozen=True)
 class RawSessionResult:
     session_id: str
     cutoff_utc: str | None
@@ -94,6 +113,7 @@ class RawSessionResult:
     cash: str
     positions: tuple[RawPosition, ...]
     unpriced_security_ids: tuple[str, ...]
+    dividend_receivable: str = "0"
 
 
 @dataclass(frozen=True)
@@ -120,6 +140,13 @@ class RawBacktestResult:
     commission_per_share: str = "0.01"
     maximum_name_weight: str = "0.1"
     execution_name_cap_policy: str = "point-of-buy-fill-open-nav-including-own-friction"
+    corporate_actions: tuple[RawCorporateAction, ...] = ()
+    final_dividend_receivable: str = "0"
+    dividend_cash_policy: str = "exdate-receivable-never-spendable-no-assumed-payment-date"
+    corporate_action_accounting_complete: bool = True
+    unresolved_action_security_ids: tuple[str, ...] = ()
+    unresolved_quantity_basis: str = "last-accounted-pre-event-quantity-not-confirmed-entitlement"
+    split_cost_basis_policy: str = "original-fill-notional-and-cost-preserved-no-lot-tax-basis-claim"
 
 
 def _fail(reason):
@@ -208,7 +235,7 @@ def _marked(cash, holdings, prices):
     return cash + sum((qty * prices[sid] for sid, qty in holdings.items() if qty), Fraction()), ()
 
 
-def _validate(security_inventory, sessions, targets, initial_cash, initial_positions):
+def _validate(security_inventory, sessions, targets, initial_cash, initial_positions, corporate_actions):
     inventory = set()
     for row in _rows(security_inventory, MAX_SECURITIES, "stock inventory", nonempty=True):
         _schema(row, {"security_id", "asset_type"})
@@ -283,11 +310,36 @@ def _validate(security_inventory, sessions, targets, initial_cash, initial_posit
             price = None if mark["price"] is None else _number(mark["price"], positive=True, maximum=Fraction(10**12))
             marks[sid] = (price, _optional_clock(mark["available_at_utc"]))
         frames[session_id] = (cutoff, row["cutoff_utc"], weights, marks)
-    return cash, holdings, parsed_sessions, frames
+    actions, action_ids = {}, set()
+    for row in _rows(corporate_actions, MAX_ACTIONS, "corporate actions"):
+        _schema(row, {"action_id", "session_id", "security_id", "kind", "value"})
+        action_id, session_id, sid = _id(row["action_id"]), _id(row["session_id"]), _id(row["security_id"])
+        kind = row["kind"]
+        if (action_id in action_ids or session_id not in session_map or sid not in inventory
+                or type(kind) is not str or kind not in ("cash_dividend", "stock_split", "unresolved")):
+            _fail("invalid unique corporate action identity or kind")
+        action_ids.add(action_id)
+        if kind == "unresolved":
+            if row["value"] is not None:
+                _fail("unresolved action cannot assert an economic value")
+            value = None
+        else:
+            value = _number(row["value"], positive=True, maximum=Fraction(MAX_QUANTITY))
+            if kind == "stock_split" and value < Fraction(1, MAX_QUANTITY):
+                _fail("split ratio outside bounded share units")
+        actions.setdefault(session_id, []).append((action_id, sid, kind, row["value"], value))
+    return cash, holdings, parsed_sessions, frames, actions
+
+
+def _split_quantity(quantity, ratio):
+    converted = quantity * ratio
+    if converted.denominator != 1:
+        _fail("fractional stock split entitlement or order requires admitted cash-in-lieu accounting")
+    return _quantity(converted.numerator)
 
 
 def run_raw_revision_backtest(*, security_inventory, sessions, targets,
-                              initial_cash="100000", initial_positions=()):
+                              initial_cash="100000", initial_positions=(), corporate_actions=()):
     """Compute hypothetical day orders on detached, strictly closed primitives.
 
     Missing valuation means equity is unknown, not zero. An explicit zero target
@@ -295,21 +347,20 @@ def run_raw_revision_backtest(*, security_inventory, sessions, targets,
     if the decision portfolio lacks complete pre-cutoff marks. Liquidity missing
     at cutoff leaves even zero exits pending; no liquidation is invented.
     """
-    cash, holdings, parsed_sessions, frames = _validate(
-        security_inventory, sessions, targets, initial_cash, initial_positions)
+    cash, holdings, parsed_sessions, frames, actions = _validate(
+        security_inventory, sessions, targets, initial_cash, initial_positions, corporate_actions)
     start_cash, start_positions = _text(cash), _positions(holdings)
     orders, fills, exclusions, results = [], [], [], []
     total_commission = total_slippage = Fraction()
+    receivable = Fraction()
+    action_results, unresolved = [], set()
+    accounting_complete = True
     complete = True
     for session_id, opened, closed, bars in parsed_sessions:
         frame = frames.get(session_id)
         decision_equity = None
         cutoff_text = None
-        open_prices = {sid: values[0] for sid, values in bars.items()}
-        open_equity, open_unpriced = _marked(cash, holdings, open_prices)
-        if open_unpriced:
-            complete = False
-            exclusions.extend(RawExclusion(session_id, sid, "held_open_mark_missing") for sid in open_unpriced)
+        desired_quantities = {}
         if frame is not None:
             cutoff, cutoff_text, weights, marks = frame
             if any(qty and sid not in weights for sid, qty in holdings.items()):
@@ -324,14 +375,20 @@ def run_raw_revision_backtest(*, security_inventory, sessions, targets,
                     exclusions.append(RawExclusion(session_id, sid, "decision_mark_missing"))
                     price = None
                 decision_prices[sid] = price
-            decision_equity, _ = _marked(cash, holdings, decision_prices)
+            for sid in unresolved:
+                decision_prices[sid] = None
+            # This is the PRIOR-CUTOFF accounting state. Current-open action
+            # values cannot fund or alter the frozen decision quantity.
+            decision_equity, _ = _marked(cash + receivable, holdings, decision_prices)
             if decision_equity is None:
                 complete = False
-            intended = []
             for sid, weight in sorted(weights.items()):
-                current = holdings.get(sid, 0)
                 if weight == 0:
                     desired = 0
+                elif sid in unresolved:
+                    exclusions.append(RawExclusion(session_id, sid, "corporate_action_unresolved"))
+                    complete = False
+                    continue
                 elif decision_equity is None or decision_prices[sid] is None:
                     exclusions.append(RawExclusion(session_id, sid, "incomplete_decision_marks"))
                     complete = False
@@ -341,7 +398,52 @@ def run_raw_revision_backtest(*, security_inventory, sessions, targets,
                     desired = int(weight * decision_equity // reserve)
                     if desired > MAX_QUANTITY:
                         _fail("target quantity exceeds resource bound")
-                delta = desired - current
+                desired_quantities[sid] = desired
+        grouped_actions = {}
+        for event in actions.get(session_id, ()):
+            grouped_actions.setdefault(event[1], []).append(event)
+        split_units = {}
+        for sid, events in sorted(grouped_actions.items()):
+            kinds = [event[2] for event in events]
+            quantity = holdings.get(sid, 0)
+            if ("stock_split" in kinds and "cash_dividend" in kinds
+                    and (quantity or desired_quantities.get(sid, 0))):
+                _fail("simultaneous split/dividend entitlement basis requires ordered source evidence")
+            if kinds.count("stock_split") > 1 and (quantity or desired_quantities.get(sid, 0)):
+                _fail("simultaneous split entitlement ordering requires source evidence")
+            if "unresolved" in kinds:
+                unresolved.add(sid)
+            for action_id, _, kind, original_value, value in sorted(events, key=lambda item: (item[2], item[0])):
+                quantity = holdings.get(sid, 0)
+                if sid in unresolved:
+                    if quantity:
+                        complete, accounting_complete = False, False
+                        exclusions.append(RawExclusion(session_id, sid, "corporate_action_unresolved"))
+                    action_results.append(RawCorporateAction(action_id, session_id, sid, kind, original_value,
+                        quantity, None if quantity else 0, None,
+                        "unresolved-held-entitlement" if quantity else "unheld-new-entry-blocked"))
+                elif kind == "cash_dividend":
+                    entitlement = quantity * value
+                    receivable += entitlement
+                    action_results.append(RawCorporateAction(action_id, session_id, sid, kind, original_value,
+                        quantity, quantity, _text(entitlement), "gross-exdate-receivable-not-cash"))
+                else:
+                    converted = _split_quantity(quantity, value)
+                    if sid in desired_quantities:
+                        desired_quantities[sid] = _split_quantity(desired_quantities[sid], value)
+                    holdings[sid] = converted
+                    split_units[sid] = split_units.get(sid, Fraction(1)) * value
+                    action_results.append(RawCorporateAction(action_id, session_id, sid, kind, original_value,
+                        quantity, converted, "0", "exact-whole-share-unit-conversion-no-cash-flow"))
+        open_prices = {sid: None if sid in unresolved else values[0] for sid, values in bars.items()}
+        open_equity, open_unpriced = _marked(cash + receivable, holdings, open_prices)
+        if open_unpriced:
+            complete = False
+            exclusions.extend(RawExclusion(session_id, sid, "held_open_mark_missing") for sid in open_unpriced)
+        if frame is not None:
+            intended = []
+            for sid, desired in sorted(desired_quantities.items()):
+                delta = desired - holdings.get(sid, 0)
                 if delta:
                     intended.append(("buy" if delta > 0 else "sell", sid, abs(delta)))
             # Sales precede purchases; stable source-ID ordering allocates scarce cash.
@@ -351,25 +453,30 @@ def run_raw_revision_backtest(*, security_inventory, sessions, targets,
                 order_id = hashlib.sha256((session_id + "\0" + sid + "\0" + side).encode("ascii")).hexdigest()
                 open_price, _, volume, volume_at, tradable = bars.get(sid, (None, None, None, None, False))
                 reason, filled = "filled", 0
-                if open_price is None:
+                if sid in unresolved:
+                    reason = "corporate_action_unresolved"
+                elif open_price is None:
                     reason = "execution_open_missing"
                 elif not tradable:
                     reason = "nontradable"
                 elif side == "buy" and open_equity is None:
-                    reason = "incomplete_execution_marks"
+                    reason = "incomplete_open_valuation"
                 elif volume is None or volume_at is None:
                     reason = "lagged_capacity_missing"
                 elif volume_at > cutoff:
                     reason = "lagged_capacity_after_cutoff"
                 else:
-                    capacity = volume // 100
+                    # The observed lagged bar was in prior-session share units.
+                    # A current split converts units mechanically, not liquidity
+                    # information or a feature available before the cutoff.
+                    capacity = int(volume * split_units.get(sid, Fraction(1)) // 100)
                     unit = open_price * (1 + SLIPPAGE if side == "buy" else 1 - SLIPPAGE)
                     limits = {"lagged_volume_capacity": capacity}
                     if side == "buy":
                         affordable = int(cash // (unit + COMMISSION_PER_SHARE))
                         # Open prices restrict actual risk only; frozen decision
                         # quantities above are never re-sized from future prices.
-                        risk_nav, _ = _marked(cash, holdings, open_prices)
+                        risk_nav, _ = _marked(cash + receivable, holdings, open_prices)
                         if risk_nav is None:
                             _fail("buy risk valuation became unavailable")
                         numerator = MAX_NAME_WEIGHT * risk_nav - holdings.get(sid, 0) * open_price
@@ -403,8 +510,8 @@ def run_raw_revision_backtest(*, security_inventory, sessions, targets,
                 if pending:
                     complete = False
                     exclusions.append(RawExclusion(session_id, sid, reason))
-        close_prices = {sid: values[1] for sid, values in bars.items()}
-        close_equity, unpriced = _marked(cash, holdings, close_prices)
+        close_prices = {sid: None if sid in unresolved else values[1] for sid, values in bars.items()}
+        close_equity, unpriced = _marked(cash + receivable, holdings, close_prices)
         if unpriced:
             complete = False
             exclusions.extend(RawExclusion(session_id, sid, "held_close_mark_missing") for sid in unpriced)
@@ -412,7 +519,10 @@ def run_raw_revision_backtest(*, security_inventory, sessions, targets,
                                        None if decision_equity is None else _text(decision_equity),
                                        None if open_equity is None else _text(open_equity),
                                        None if close_equity is None else _text(close_equity),
-                                       _text(cash), _positions(holdings), unpriced))
+                                       _text(cash), _positions(holdings), unpriced, _text(receivable)))
     return RawBacktestResult(start_cash, start_positions, _text(cash), _positions(holdings),
                              tuple(results), tuple(orders), tuple(fills), tuple(exclusions),
-                             _text(total_commission), _text(total_slippage), complete)
+                             _text(total_commission), _text(total_slippage), complete,
+                             corporate_actions=tuple(action_results), final_dividend_receivable=_text(receivable),
+                             corporate_action_accounting_complete=accounting_complete,
+                             unresolved_action_security_ids=tuple(sorted(unresolved)))

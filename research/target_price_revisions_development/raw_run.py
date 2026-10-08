@@ -1,7 +1,8 @@
 """Private one-look admission for the separately frozen raw-revision candidate.
 
-No import opens inputs. A hash-bound rights manifest is a required input, not
-independent proof of its underlying agreement. No production manifest, bundle,
+No import opens inputs. The hash-bound admission manifest is either source
+evidence (not independent proof of its agreement) or the exact owner's explicit
+private-development waiver (not a legal grant). No production manifest, bundle,
 claim or run is created by implementing this controller. Local owner-only files
 are not signed external custody and cannot prevent rollback by their owner.
 """
@@ -28,6 +29,8 @@ CODE_FILES = ("raw_candidate.py", "raw_revision.py", "raw_backtest.py", "raw_run
 MAX_INPUT_BYTES = 32 * 1024 * 1024
 MAX_RIGHTS_BYTES = 65536
 CONFIG = {"candidate_id": CANDIDATE_ID, "start_date": "2025-01-02", "end_date": "2025-03-31",
+    "identity_policy": "sharadar_permaticker_snapshot_v1",
+    "signal_action_policy": "nominal_pair_nonshare_actions_v1",
     "view": "censored", "development_looks": 1, "order_based": True,
     "personal_only": True, "quantconnect": False, "canonical_admission": False, "trading": False}
 _STRUCTURE_KEYS = {"schema", "capture_utc", "calendar", "ratings", "identities", "actions", "action_inventory_complete"}
@@ -37,6 +40,8 @@ _IDENTITY_KEYS = {"ticker", "security_id", "permaticker", "figi", "category", "e
 _ACTION_KEYS = {"ticker", "date", "action"}
 _CALENDAR_KEYS = {"session_date", "open_utc", "close_utc"}
 _RIGHTS_DATASETS = ("Massive:Benzinga ratings", "Sharadar:TICKERS", "Sharadar:SEP", "Sharadar:ACTIONS")
+OWNER_WAIVER_INSTRUCTION = "other lanes have been using those data. skip the rights part. start backtesting immediately"
+OWNER_WAIVER_INSTRUCTION_SHA256 = hashlib.sha256(OWNER_WAIVER_INSTRUCTION.encode("utf-8")).hexdigest()
 
 
 class RawRunError(ValueError):
@@ -255,6 +260,28 @@ def _rights(body: dict) -> None:
         raise RawRunError("incomplete source-rights inventory")
 
 
+def _source_admission(body: dict) -> dict:
+    """The owner's exact waiver changes this private gate, not vendor facts.
+
+    Both alternatives remain hash-bound in rights.json for spec compatibility.
+    Even the evidence path only validates assertions and their content bindings;
+    neither alternative is independent verification of contractual permission.
+    """
+    if body.get("schema") == "tpr-raw-owner-waiver-v1":
+        expected = {"schema": "tpr-raw-owner-waiver-v1", "candidate_id": CANDIDATE_ID,
+            "owner_decision": "TPR-OWN-36", "owner_instruction_sha256": OWNER_WAIVER_INSTRUCTION_SHA256,
+            "personal_only": True, "quantconnect": False, "canonical_admission": False,
+            "contractual_rights_verified": False, "datasets": list(_RIGHTS_DATASETS)}
+        # Canonical comparison keeps bool/int distinctions and rejects extras.
+        if _canonical(body) != _canonical(expected):
+            raise RawRunError("inapplicable exact owner waiver")
+        return {"basis": "explicit-owner-waiver", "owner_decision": "TPR-OWN-36",
+            "contractual_rights_verified": False}
+    _rights(body)
+    return {"basis": "source-evidence-manifest", "owner_decision": None,
+        "contractual_rights_verified": False}
+
+
 def _date(value: object) -> str:
     if type(value) is not str or re.fullmatch(r"[0-9]{4}-[0-9]{2}-[0-9]{2}", value) is None:
         raise RawRunError("invalid structural date")
@@ -272,7 +299,7 @@ def _structure(body: dict) -> None:
         raise RawRunError("invalid structure framing")
     _clock(body["capture_utc"])
     for name, keys, maximum in (("ratings", _RATING_KEYS, 100000), ("identities", _IDENTITY_KEYS, 4096),
-            ("actions", _ACTION_KEYS, 4096), ("calendar", _CALENDAR_KEYS, 256)):
+            ("actions", _ACTION_KEYS, 100000), ("calendar", _CALENDAR_KEYS, 256)):
         rows = body[name]
         if type(rows) is not list or len(rows) > maximum:
             raise RawRunError("invalid bounded structural rows")
@@ -303,11 +330,12 @@ def _write(descriptor: int, payload: bytes) -> None:
     os.fsync(descriptor)
 
 
-def _reserve(directory_fd: int, spec: dict, spec_sha256: str, started: str) -> None:
+def _reserve(directory_fd: int, spec: dict, spec_sha256: str, started: str, source_admission: dict) -> None:
     payload = _canonical({"schema": "tpr-raw-run-reservation-v1", "candidate_id": CANDIDATE_ID,
         "spec_sha256": spec_sha256, "started_utc": started, "code_hashes": spec["code_hashes"],
         "structure_sha256": spec["structure_sha256"], "outcomes_sha256": spec["outcomes_sha256"],
         "rights_sha256": spec["rights_sha256"], "config_sha256": spec["config_sha256"],
+        "source_admission": source_admission,
         "config": spec["config"], "mode": spec["mode"],
         "development_look_reserved": 1 if spec["mode"] == "production" else 0,
         "fixture_runs": 1 if spec["mode"] == "offline-fixture" else 0})
@@ -380,6 +408,9 @@ class RawRunResult:
     report_sha256: str | None
     report_path: Path | None
     terminal_path: Path
+    source_admission: str = "source-evidence-manifest"
+    owner_decision: str | None = None
+    contractual_rights_verified: bool = False
 
 
 def execute_run(spec_bytes: bytes, root: Path) -> RawRunResult:
@@ -399,7 +430,7 @@ def _execute_fixture_run(spec_bytes: bytes, root: Path) -> RawRunResult:
 
 
 def _execute_run(spec_bytes: bytes, root: Path) -> RawRunResult:
-    """Validate rights and pure targets, reserve, then open outcomes and run.
+    """Validate admission and pure targets, reserve, then open outcomes and run.
 
     Importing the pure candidate for source validation confers no authority;
     its outcome-consuming runner is obtained and called only after reservation.
@@ -415,27 +446,29 @@ def _execute_run(spec_bytes: bytes, root: Path) -> RawRunResult:
     directory_fd = _open_root(root, spec["mode"])
     try:
         _verify_code(spec["code_hashes"])
-        _rights(_decode(_read_file(directory_fd, "rights.json", MAX_RIGHTS_BYTES, spec["rights_sha256"]), MAX_RIGHTS_BYTES))
+        admission = _source_admission(_decode(
+            _read_file(directory_fd, "rights.json", MAX_RIGHTS_BYTES, spec["rights_sha256"]), MAX_RIGHTS_BYTES))
         structure = _decode(_read_file(directory_fd, "structure.json", MAX_INPUT_BYTES, spec["structure_sha256"]), MAX_INPUT_BYTES)
         _structure(structure)
         if _clock(structure["capture_utc"]) > current:
             raise RawRunError("source capture is in the future")
         _prepare_structure(structure)
         try:
-            _reserve(directory_fd, spec, _digest(spec_bytes), current.isoformat())
+            _reserve(directory_fd, spec, _digest(spec_bytes), current.isoformat(), admission)
         except _ReservationFailure as failure:
             status = "INTERRUPTED" if failure.interrupted else "FAILED"
             terminal_name = CANDIDATE_ID + ".terminal.json"
             _publish(directory_fd, terminal_name, _canonical({"schema": "tpr-raw-run-terminal-v1",
                 "candidate_id": CANDIDATE_ID, "spec_sha256": _digest(spec_bytes), "mode": spec["mode"],
                 "status": status, "failure": "reservation_incomplete", "report_sha256": None,
+                "source_admission": admission,
                 "development_look_spent": 1 if spec["mode"] == "production" else 0,
                 "fixture_runs": 1 if spec["mode"] == "offline-fixture" else 0,
                 "quantconnect_attempts": 0, "canonical_admission": False,
                 "canonical_custody": False, "trading": False}))
             if failure.interrupted:
                 raise KeyboardInterrupt("reservation interrupted; look remains spent") from None
-            return RawRunResult(status, None, None, root / terminal_name)
+            return RawRunResult(status, None, None, root / terminal_name, admission["basis"], admission["owner_decision"])
         status, report_sha256, report_path, failure, interrupted = "FAILED", None, None, None, False
         try:
             outcomes = _decode(_read_file(directory_fd, "outcomes.json", MAX_INPUT_BYTES, spec["outcomes_sha256"]), MAX_INPUT_BYTES)
@@ -458,13 +491,15 @@ def _execute_run(spec_bytes: bytes, root: Path) -> RawRunResult:
         _publish(directory_fd, terminal_name, _canonical({"schema": "tpr-raw-run-terminal-v1",
             "candidate_id": CANDIDATE_ID, "spec_sha256": _digest(spec_bytes), "mode": spec["mode"],
             "status": status, "failure": failure, "report_sha256": report_sha256,
+            "source_admission": admission,
             "development_look_spent": 1 if spec["mode"] == "production" else 0,
             "fixture_runs": 1 if spec["mode"] == "offline-fixture" else 0,
             "quantconnect_attempts": 0, "canonical_admission": False,
             "canonical_custody": False, "trading": False}))
         if interrupted:
             raise KeyboardInterrupt("candidate interrupted; look remains spent") from None
-        return RawRunResult(status, report_sha256, report_path, root / terminal_name)
+        return RawRunResult(status, report_sha256, report_path, root / terminal_name,
+            admission["basis"], admission["owner_decision"])
     finally:
         os.close(directory_fd)
 
@@ -472,8 +507,10 @@ def _execute_run(spec_bytes: bytes, root: Path) -> RawRunResult:
 def preflight(root: Path = PRODUCTION_ROOT, *, mode: str = "production") -> dict:
     """Report fixed-file presence/custody only; never open data or imply readiness."""
     result = {"candidate_id": CANDIDATE_ID, "mode": mode, "ready": False,
+        "source_admission": "unverified", "contractual_rights_verified": False,
+        "accepted_admission_schemas": ["tpr-raw-rights-v1", "tpr-raw-owner-waiver-v1"],
         "inputs": {name: "unavailable" for name in ("rights.json", "structure.json", "outcomes.json")},
-        "outcomes_read": False, "development_looks": 0, "reason": "verified_evidence_and_spec_required"}
+        "outcomes_read": False, "development_looks": 0, "reason": "verified_inputs_and_spec_required"}
     if type(mode) is not str or mode not in ("production", "offline-fixture"):
         raise RawRunError("invalid preflight mode")
     if type(root) is not type(LANE_ROOT):
@@ -483,7 +520,7 @@ def preflight(root: Path = PRODUCTION_ROOT, *, mode: str = "production") -> dict
             _verify_lane()
         directory_fd = _open_root(root, mode)
     except RawRunError:
-        result["reason"] = "private_bundle_unavailable" if root.exists() else "rights_missing"
+        result["reason"] = "private_bundle_unavailable" if root.exists() else "source_admission_missing"
         return result
     try:
         for name in result["inputs"]:
@@ -495,7 +532,7 @@ def preflight(root: Path = PRODUCTION_ROOT, *, mode: str = "production") -> dict
             except FileNotFoundError:
                 result["inputs"][name] = "missing"
         if result["inputs"]["rights.json"] == "missing":
-            result["reason"] = "rights_missing"
+            result["reason"] = "source_admission_missing"
         try:
             os.stat(CANDIDATE_ID + ".spent.json", dir_fd=directory_fd, follow_symlinks=False)
             result["reason"] = "candidate_spent"

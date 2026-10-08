@@ -25,6 +25,14 @@ def rights():
             for dataset in controller._RIGHTS_DATASETS]}
 
 
+def owner_waiver():
+    instruction = "other lanes have been using those data. skip the rights part. start backtesting immediately"
+    return {"schema": "tpr-raw-owner-waiver-v1", "candidate_id": controller.CANDIDATE_ID,
+        "owner_decision": "TPR-OWN-36", "owner_instruction_sha256": hashlib.sha256(instruction.encode("utf-8")).hexdigest(),
+        "personal_only": True, "quantconnect": False, "canonical_admission": False,
+        "contractual_rights_verified": False, "datasets": list(controller._RIGHTS_DATASETS)}
+
+
 def structure():
     return {"schema": "tpr-raw-structure-v1", "capture_utc": NOW.isoformat(), "calendar": [
         {"session_date": "2024-12-31", "open_utc": "2024-12-31T14:30:00Z", "close_utc": "2024-12-31T21:00:00Z"},
@@ -289,6 +297,104 @@ def test_each_provider_evidence_classification_is_specific_and_hash_bound(bundle
         controller._rights(source)
 
 
+def test_owner_waiver_is_explicit_in_result_and_receipts_not_a_contractual_grant(bundle):
+    (bundle / "rights.json").write_bytes(controller._canonical(owner_waiver()))
+    frozen = spec(bundle)
+    result = controller._execute_fixture_run(frozen, bundle)
+    assert result.status == "COMPLETED"
+    assert result.source_admission == "explicit-owner-waiver"
+    assert result.owner_decision == "TPR-OWN-36"
+    assert result.contractual_rights_verified is False
+    for name in (controller.CANDIDATE_ID + ".spent.json", controller.CANDIDATE_ID + ".terminal.json"):
+        receipt = json.loads((bundle / name).read_bytes())
+        assert receipt["source_admission"] == {"basis": "explicit-owner-waiver", "owner_decision": "TPR-OWN-36",
+            "contractual_rights_verified": False}
+    with pytest.raises(controller.RawRunError, match="already spent"):
+        controller._execute_fixture_run(frozen, bundle)
+
+
+@pytest.mark.parametrize("mutation", [
+    lambda body: body.update(owner_decision="TPR-OWN-35"),
+    lambda body: body.update(owner_instruction_sha256="a" * 64),
+    lambda body: body.update(candidate_id="another-candidate"),
+    lambda body: body.update(personal_only=1),
+    lambda body: body.update(quantconnect=0),
+    lambda body: body.update(quantconnect=True),
+    lambda body: body.update(canonical_admission=True),
+    lambda body: body.update(contractual_rights_verified=True),
+    lambda body: body["datasets"].pop(),
+    lambda body: body["datasets"].append("Massive:earnings"),
+    lambda body: body["datasets"].__setitem__(0, "Sharadar:TICKERS"),
+    lambda body: body.update(grants=[]),
+])
+def test_invalid_owner_waiver_refuses_before_source_or_outcomes_or_claim(bundle, monkeypatch, mutation):
+    body = owner_waiver()
+    mutation(body)
+    (bundle / "rights.json").write_bytes(controller._canonical(body))
+    frozen = spec(bundle)
+    real_read = controller._read_file
+    def read(fd, name, *args):
+        assert name == "rights.json"
+        return real_read(fd, name, *args)
+    monkeypatch.setattr(controller, "_read_file", read)
+    with pytest.raises(controller.RawRunError):
+        controller._execute_fixture_run(frozen, bundle)
+    assert not (bundle / (controller.CANDIDATE_ID + ".spent.json")).exists()
+
+
+def test_owner_waiver_never_passes_the_unchanged_evidence_manifest_validator():
+    with pytest.raises(controller.RawRunError, match="source rights"):
+        controller._rights(owner_waiver())
+
+
+def test_owner_waiver_cannot_replace_a_different_hash_bound_manifest(bundle):
+    frozen = spec(bundle)
+    (bundle / "rights.json").write_bytes(controller._canonical(owner_waiver()))
+    with pytest.raises(controller.RawRunError, match="input identity mismatch"):
+        controller._execute_fixture_run(frozen, bundle)
+    assert not (bundle / (controller.CANDIDATE_ID + ".spent.json")).exists()
+
+
+@pytest.mark.parametrize("stage", ["reservation", "outcomes"])
+def test_failed_waiver_run_retains_waiver_provenance_and_spent_identity(bundle, monkeypatch, stage):
+    (bundle / "rights.json").write_bytes(controller._canonical(owner_waiver()))
+    frozen = spec(bundle, outcomes_sha256="b" * 64)
+    if stage == "reservation":
+        original = controller._write
+        writes = []
+        def fail_once(fd, payload):
+            writes.append(True)
+            if len(writes) == 1:
+                raise OSError("PRIVATE")
+            return original(fd, payload)
+        monkeypatch.setattr(controller, "_write", fail_once)
+    result = controller._execute_fixture_run(frozen, bundle)
+    assert result.status == "FAILED" and result.source_admission == "explicit-owner-waiver"
+    terminal = json.loads(result.terminal_path.read_bytes())
+    assert terminal["source_admission"]["owner_decision"] == "TPR-OWN-36"
+    assert terminal["source_admission"]["contractual_rights_verified"] is False
+    assert terminal["development_look_spent"] == 0 and terminal["fixture_runs"] == 1
+    with pytest.raises(controller.RawRunError, match="already spent"):
+        controller._execute_fixture_run(spec(bundle), bundle)
+
+
+def test_existing_evidence_path_remains_distinct_and_does_not_claim_legal_verification(bundle):
+    result = controller._execute_fixture_run(spec(bundle), bundle)
+    assert result.source_admission == "source-evidence-manifest"
+    assert result.owner_decision is None and result.contractual_rights_verified is False
+    assert json.loads(result.terminal_path.read_bytes())["source_admission"]["basis"] == "source-evidence-manifest"
+
+
+def test_preflight_describes_waiver_option_without_reading_or_accepting_it(bundle, monkeypatch):
+    (bundle / "rights.json").write_bytes(controller._canonical(owner_waiver()))
+    monkeypatch.setattr(controller, "_read_file", lambda *_: pytest.fail("preflight read a manifest"))
+    result = controller.preflight(bundle, mode="offline-fixture")
+    assert result["source_admission"] == "unverified"
+    assert result["contractual_rights_verified"] is False
+    assert result["accepted_admission_schemas"] == ["tpr-raw-rights-v1", "tpr-raw-owner-waiver-v1"]
+    assert result["ready"] is False and result["development_looks"] == 0
+
+
 @pytest.mark.parametrize("failure", [OSError("PRIVATE filesystem message"), KeyboardInterrupt("PRIVATE interruption")])
 def test_incomplete_reservation_burns_candidate_and_writes_terminal_before_any_outcome_access(bundle, monkeypatch, failure):
     frozen = spec(bundle)
@@ -319,7 +425,7 @@ def test_incomplete_reservation_burns_candidate_and_writes_terminal_before_any_o
 def test_missing_bundle_preflight_never_creates_directory_or_permission(tmp_path):
     root = tmp_path / "absent"
     result = controller.preflight(root, mode="offline-fixture")
-    assert result["reason"] == "rights_missing"
+    assert result["reason"] == "source_admission_missing"
     assert result["ready"] is False and result["outcomes_read"] is False
     assert not root.exists()
 
@@ -347,10 +453,13 @@ def test_exact_source_file_hashes_are_checked_not_caller_flags(bundle, monkeypat
     assert not (bundle / (controller.CANDIDATE_ID + ".spent.json")).exists()
 
 
-def test_private_controller_connects_actual_candidate_on_synthetic_inputs(bundle, monkeypatch):
+@pytest.mark.parametrize("waiver", [False, True])
+def test_private_controller_connects_actual_candidate_on_synthetic_inputs(bundle, monkeypatch, waiver):
     from tests.target_price_revisions_development.test_raw_candidate import inputs
     supplied_structure, supplied_outcomes = inputs()
     supplied_structure["capture_utc"] = NOW.isoformat()
+    if waiver:
+        (bundle / "rights.json").write_bytes(controller._canonical(owner_waiver()))
     for name, body in (("structure.json", supplied_structure), ("outcomes.json", supplied_outcomes)):
         (bundle / name).write_bytes(controller._canonical(body))
     code_root = controller.LANE_ROOT / "research" / "target_price_revisions_development"

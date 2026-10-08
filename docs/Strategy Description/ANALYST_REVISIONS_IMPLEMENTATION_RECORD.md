@@ -37732,3 +37732,53 @@ source in regression tests. Root confirms both proposed output directories are
 absent after the failed build and `git diff --check` passes. Freeze this corrected
 code and record before the same explicitly scoped offline build/prepare steps
 in 263.11. No contact or attempt follows from local test success alone.
+
+### 263.13 Actual publication-integrity refusal and bounded local diagnosis
+
+At `fc7c5e05e431117ef03c97fdf3a9b0a536bfb954`, the corrected production
+builder passes its source comparisons and writes the private public-only input,
+but final reauthentication exits 1 with
+`continuity evidence identity changed after visitation`. Publication rollback
+removes only its own manifest marker. The consumed directory
+`artifacts/analyst_revisions_v2/identity_continuity/R284A1-20261008` retains
+`input.json` (986 bytes) and `manifest.sha256` (65 bytes); it is not a published
+or admitted package and will not be overwritten or used for QC preparation.
+No QC preparation, key/client access, compile, launch, attempt or look occurs.
+
+The same held-file label is used for output and nested vintage/current reads,
+so the message does not identify the changed leaf. Later metadata-only checks
+find `com.apple.provenance` on both surviving output leaves and ctime seconds
+1791438788 versus mtime 1791438784. There is no before-snapshot xattr baseline;
+this cannot identify the failing leaf, actor, cause or time of the original
+change. Root and same-round advisory code inspection find no deterministic
+self-change: link/unlink/fsync finish before `_load` acquires held identities;
+only reading/reconstruction occurs inside that visitor, and atime is excluded.
+Four existing publication/replacement/rollback tests pass under strict network
+denial (a subset of the 119, not added distinct coverage).
+
+**ARV2OD263-J (delegated local diagnostic decision):** preserve this failed
+directory and every identity/ctime/hash check. Add only safe failed-leaf and
+changed-metadata-field diagnostics, including a before/after Boolean for the
+presence of `com.apple.provenance` when available; no xattr values, licensed
+rows or guessed actor/cause. Freeze/test those diagnostics, then make at most
+one new strict-network-denied publication invocation to the distinct private
+directory `artifacts/analyst_revisions_v2/identity_continuity/R284A1-20261008-B`.
+Every original external source pin and all seven comparisons must reauthenticate
+again. This is an offline publication diagnostic, not a new/replacement QC
+candidate or backtest attempt. If it refuses, stop publication and retain the
+precise evidence; do not remove security attributes, relax controls, retry
+automatically or use either partial artifact. A successful fully reauthenticated
+new publication may proceed to the already-frozen offline QC preparation path,
+with its actual package pins recorded before contact. The look floor remains
+313/239/49/699 until an actual QC attempt claim exists.
+
+Root reads the narrow diagnostic diff/tests and freezes bridge SHA-256
+`0602208165cf9d3f307dff6dcbbfe759606520b8253e3a5539b5070866287ad9`,
+test SHA-256
+`fc0aa19e829b073e113095c2629f9bdaf5647fe13e0b58022be70b9770b37316`.
+The original held-leaf guard, including ctime comparison, is unchanged; optional
+xattr inspection changes no acceptance predicate. Root's final same seven-file
+strict-network-denied selection is **785 passed in 16.44s** (129 continuity;
+other six-file counts unchanged). This replaces 775 as the final selection,
+not an additional distinct count. `git diff --check` passes. Commit this local
+diagnostic freeze before the one bounded new-directory invocation above.

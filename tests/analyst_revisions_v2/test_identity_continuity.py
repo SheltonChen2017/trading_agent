@@ -4,6 +4,7 @@ import dataclasses
 import io
 import json
 import os
+from types import SimpleNamespace
 import zipfile
 from pathlib import Path
 
@@ -645,8 +646,67 @@ def test_held_current_csv_replacement_refused_after_parse(tmp_path, monkeypatch)
     vendor = adapter.current.load_sharadar_identity_capture(current_path,
         expected_manifest_sha256=pins["expected_current_manifest_sha256"], price_artifact_path=pins["price_artifact_path"])
     monkeypatch.setattr(adapter.current, "_parse_csv", changed)
-    with pytest.raises(adapter.IdentityContinuityError):
+    with pytest.raises(adapter.IdentityContinuityError, match="scope=current"):
         adapter._current_cusip_candidates(vendor)
+
+
+@pytest.mark.parametrize("dimension,index", list(zip(adapter._IDENTITY_DIMENSIONS, range(5), strict=True)))
+def test_identity_diagnostic_classifies_only_fixed_dimension_names_not_values(dimension, index):
+    values = [100000001, 200000002, 300000003, 400000004, 500000005]
+    after = values[:]
+    after[index] += 999999999
+    metadata = SimpleNamespace(**dict(zip(("st_dev", "st_ino", "st_size", "st_mtime_ns", "st_ctime_ns"), after, strict=True)))
+    assert adapter._changed_dimensions(tuple(values), metadata) == dimension
+
+
+@pytest.mark.parametrize("scope", ["output", "vintage", "current"])
+def test_original_identity_guard_still_refuses_and_diagnostics_only_safe_names_and_presence(tmp_path, monkeypatch, scope):
+    root = tmp_path / "diagnostic-artifact"
+    root.mkdir(mode=0o700)
+    leaf = root / "input.json"
+    write_private(leaf, b"PRIVATE LICENSED BODY MUST NOT APPEAR")
+    observations = iter(([], ["com.apple.provenance", "PRIVATE_XATTR_NAME"]))
+    monkeypatch.setattr(adapter.os, "listxattr", lambda descriptor: next(observations), raising=False)
+    with pytest.raises(adapter.IdentityContinuityError) as refused:
+        with adapter._held(root, {"input.json": 100}, scope=scope):
+            before = leaf.stat()
+            os.utime(leaf, ns=(before.st_atime_ns, before.st_mtime_ns + 1000000000))
+    message = str(refused.value)
+    assert f"scope={scope}" in message
+    assert "artifact=diagnostic-artifact leaf=input.json" in message
+    assert "held_changed=mtime_ns" in message and "named_changed=mtime_ns" in message
+    assert "provenance_before=false provenance_after=true" in message
+    assert "PRIVATE" not in message and str(before.st_mtime_ns) not in message
+
+
+def test_unsupported_optional_xattr_observation_is_unknown_not_guard_suppression(tmp_path, monkeypatch):
+    root = tmp_path / "diagnostic-artifact"
+    root.mkdir(mode=0o700)
+    leaf = root / "input.json"
+    write_private(leaf, b"offline")
+    def unavailable(descriptor):
+        raise OSError("PRIVATE OS DETAIL")
+    monkeypatch.setattr(adapter.os, "listxattr", unavailable, raising=False)
+    # Lack of xattr support does not manufacture either presence or an integrity failure.
+    with adapter._held(root, {"input.json": 100}):
+        pass
+    with pytest.raises(adapter.IdentityContinuityError) as refused:
+        with adapter._held(root, {"input.json": 100}):
+            before = leaf.stat()
+            os.utime(leaf, ns=(before.st_atime_ns, before.st_mtime_ns + 1000000000))
+    assert "provenance_before=unknown provenance_after=unknown" in str(refused.value)
+    assert "PRIVATE OS DETAIL" not in str(refused.value)
+
+
+def test_diagnostic_redacts_nonprotocol_basename_and_leaf(tmp_path, monkeypatch):
+    monkeypatch.setattr(adapter.os, "listxattr", lambda descriptor: [], raising=False)
+    metadata = SimpleNamespace(st_dev=1, st_ino=2, st_size=3, st_mtime_ns=4, st_ctime_ns=5)
+    monkeypatch.setattr(adapter.os, "fstat", lambda descriptor: metadata)
+    monkeypatch.setattr(adapter.os, "stat", lambda *args, **kwargs: metadata)
+    message = adapter._identity_failure_diagnostic(Path("PRIVATE\nNAME"), 1, "PRIVATE LEAF", 2, (1, 2, 3, 4, 5), None, "PRIVATE SCOPE")
+    assert "artifact=redacted leaf=redacted" in message and "PRIVATE" not in message
+    assert "scope=unknown" in message
+    assert "held_changed=none named_changed=none" in message
 
 
 def test_production_cannot_use_synthetic_vintage_or_evidence(tmp_path, monkeypatch):

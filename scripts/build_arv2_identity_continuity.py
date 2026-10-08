@@ -37,6 +37,10 @@ MAX_MANIFEST_BYTES = 128 * 1024
 MAX_INPUT_BYTES = public.MAX_INPUT_BYTES
 MAX_CUSIP_CANDIDATES = 32
 _CUSIP = re.compile(r"[A-Z0-9]{9}")
+_DIAGNOSTIC_BASENAME = re.compile(r"[A-Za-z0-9][A-Za-z0-9_.-]{0,127}")
+_DIAGNOSTIC_LEAVES = frozenset({"manifest.json", "manifest.sha256", "input.json",
+                              "01-tickers-years-full.zip", "stocks.csv", "funds.csv"})
+_IDENTITY_DIMENSIONS = ("dev", "ino", "size", "mtime_ns", "ctime_ns")
 VINTAGE_PATH = source.DEFAULT_ARTIFACT_ROOT / "arv2-sharadar-source-20260914T003329843989Z"
 VINTAGE_MANIFEST_SHA256 = "94251ffdf0529b118ff331b98c4a144d97bc734380d7e7333f94045e4aa6f09b"
 FALSE_FLAGS = tuple(dict.fromkeys(public.FALSE_FLAGS + current.FALSE_FLAGS + (
@@ -125,8 +129,48 @@ def _legacy_cusip_parser_qualified(disposition, parsed: ParsedCusipCandidates) -
     return refused and parsed.representation == "ascii_space_list"
 
 
+def _provenance_presence(descriptor: int) -> bool | None:
+    """Optional fixed-name presence only; never obtains any xattr value."""
+    reader = getattr(os, "listxattr", None)
+    if reader is None:
+        return None
+    try:
+        names = reader(descriptor)
+        if type(names) not in (list, tuple) or any(type(name) is not str for name in names):
+            return None
+        return "com.apple.provenance" in names
+    except Exception:
+        # Unsupported/failed observation is unknown, not a cleared integrity check.
+        return None
+
+
+def _changed_dimensions(identity, metadata) -> str:
+    return ",".join(dimension for dimension, before, after in
+                    zip(_IDENTITY_DIMENSIONS, identity, source._entry_identity(metadata), strict=True)
+                    if before != after) or "none"
+
+
+def _identity_failure_diagnostic(root, root_fd, name, descriptor, identity, provenance_before, scope) -> str:
+    artifact = root.name if _DIAGNOSTIC_BASENAME.fullmatch(root.name) else "redacted"
+    leaf = name if name in _DIAGNOSTIC_LEAVES else "redacted"
+    scope = scope if scope in {"vintage", "current", "output"} else "unknown"
+    changed = []
+    for label, observe in (("held", lambda: os.fstat(descriptor)),
+                           ("named", lambda: os.stat(name, dir_fd=root_fd, follow_symlinks=False))):
+        try:
+            dimensions = _changed_dimensions(identity, observe())
+        except Exception:
+            dimensions = "unknown"
+        changed.append(f"{label}_changed={dimensions}")
+    def presence(value):
+        return "unknown" if value is None else ("true" if value else "false")
+    return (f"continuity evidence identity check refused; scope={scope} artifact={artifact} leaf={leaf} "
+            + " ".join(changed)
+            + f" provenance_before={presence(provenance_before)} provenance_after={presence(_provenance_presence(descriptor))}")
+
+
 @contextlib.contextmanager
-def _held(path: Path, names: dict[str, int], *, exact_inventory: bool = False):
+def _held(path: Path, names: dict[str, int], *, exact_inventory: bool = False, scope: str = "unknown"):
     """Small shared no-follow/held-leaf seam; never opens undeclared archives."""
     root_fd = None
     held = []
@@ -143,17 +187,21 @@ def _held(path: Path, names: dict[str, int], *, exact_inventory: bool = False):
             except BaseException:
                 os.close(descriptor)
                 raise
-            held.append((name, descriptor, identity, maximum))
+            held.append((name, descriptor, identity, maximum, _provenance_presence(descriptor)))
             captured[name] = payload
         yield root, root_fd, captured
-        for name, descriptor, identity, maximum in held:
-            source._require_open_leaf_identity(root_fd, name, descriptor, identity,
-                                               maximum=maximum, label="continuity evidence")
+        for name, descriptor, identity, maximum, provenance_before in held:
+            try:
+                source._require_open_leaf_identity(root_fd, name, descriptor, identity,
+                                                   maximum=maximum, label="continuity evidence")
+            except IdentityContinuityError:
+                raise IdentityContinuityError(_identity_failure_diagnostic(
+                    root, root_fd, name, descriptor, identity, provenance_before, scope)) from None
         if exact_inventory:
             public._inventory(root_fd, set(names))
         public._pinned_directory_path(root, root_fd)
     finally:
-        for _name, descriptor, _identity, _maximum in held:
+        for _name, descriptor, _identity, _maximum, _provenance in held:
             os.close(descriptor)
         if root_fd is not None:
             os.close(root_fd)
@@ -169,7 +217,7 @@ def _vintage_rows(pins: VintagePins, *, synthetic: bool):
         raise IdentityContinuityError("vintage physical byte bounds are invalid")
     leaf = source.ARCHIVE_FILENAMES[source.SharadarDataset.TICKERS]
     names = {"manifest.json": source.MAX_MANIFEST_BYTES, "manifest.sha256": 65, leaf: pins.archive_byte_count}
-    with _held(pins.artifact_path, names) as (root, _fd, captured):
+    with _held(pins.artifact_path, names, scope="vintage") as (root, _fd, captured):
         manifest_bytes = captured["manifest.json"]
         if (sha256_bytes(manifest_bytes) != pins.manifest_sha256
                 or captured["manifest.sha256"] != (pins.manifest_sha256 + "\n").encode("ascii")):
@@ -270,7 +318,7 @@ def _vintage_rows(pins: VintagePins, *, synthetic: bool):
 
 def _current_cusip_candidates(loaded):
     names = {binding.csv_file: current.MAX_RESPONSE_BYTES for binding in loaded.responses}
-    with _held(loaded.artifact_path, names) as (_root, _fd, captured):
+    with _held(loaded.artifact_path, names, scope="current") as (_root, _fd, captured):
         parsed = {}
         for binding in loaded.responses:
             payload = captured[binding.csv_file]
@@ -408,7 +456,7 @@ def _documents(*, public_artifact_path, expected_public_manifest_sha256,
 def _load(artifact_path, expected_continuity_manifest_sha256, *, synthetic, **pins):
     require_sha256(expected_continuity_manifest_sha256, "expected continuity manifest pin")
     with _held(artifact_path, {"manifest.json": MAX_MANIFEST_BYTES, "manifest.sha256": 65,
-                               "input.json": MAX_INPUT_BYTES}, exact_inventory=True) as (root, _fd, captured):
+                               "input.json": MAX_INPUT_BYTES}, exact_inventory=True, scope="output") as (root, _fd, captured):
         manifest_bytes, input_bytes = _documents(output_name=root.name, synthetic=synthetic, **pins)
         if (sha256_bytes(captured["manifest.json"]) != expected_continuity_manifest_sha256
                 or captured["manifest.sha256"] != (expected_continuity_manifest_sha256 + "\n").encode("ascii")

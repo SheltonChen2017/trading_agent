@@ -30,9 +30,14 @@ NO PREVIOUS SPENT REQUEST IS RENEWED. SECTION 64 RECORDS THE OWNER'S LATER
 INSTRUCTION TO WAIVE SEPARATE RIGHTS PAPERWORK AND START A PRIVATE DEVELOPMENT
 BACKTEST. IT SCOPES FRESH SOURCE ADMISSION AND ONE FROZEN LOCAL EXPLORATORY
 RUN, NOT CANONICAL ADMISSION OR A CLAIM OF VERIFIED CONTRACTUAL RIGHTS.
-FRESH SOURCE PREPARATION IS COMPLETE; THE FIRST PRICE REQUEST RETURNED HTTP
-400 WITHOUT BODY/ROWS, SO NO REAL BACKTEST RESULT EXISTS. THE FAILED LOOK
-STAYS SPENT; THE SEPARATE ERROR-ONLY DIAGNOSTIC DOES NOT RERUN THE CANDIDATE.
+SECTION 65 RESOLVES THAT PRICE-REQUEST FAILURE WITH FIXED THREE-STOCK BATCHES
+OVER THE FULL FROZEN INVENTORY. TWO LOCAL ORDER-BASED DEVELOPMENT RESULTS NOW
+EXIST: THE ORIGINAL AND A SEPARATELY RESERVED CASH-DIVIDEND INTERPRETATION
+CORRECTION. THE CORRECTED Q1-2025 RETURN IS -39.35818894%, MAXIMUM DRAWDOWN
+39.60072803%; ALL 60 SESSIONS ARE VALUED AND NO ACTION REMAINS UNRESOLVED.
+UNFILLED DAY ORDERS KEEP ENGINE_COMPLETE FALSE. THIS IS AN EXPLORATORY
+NOMINAL-REVISION PROXY, NOT CANONICAL ETF VALIDATION, A PROVEN EDGE OR QC
+COMPLETION. ALL PRIOR FAILURES, RESULTS AND SPENT RECEIPTS REMAIN INTACT.
 NO QC JOB, BROKER ACTION, PAPER/LIVE DEPLOYMENT, CAPITAL OR TRADING AUTHORITY
 IS GRANTED BY THAT LOCAL SCOPE. MACHINE-LOCAL TRUST ABSENCE IS QUALIFIED IN
 SECTION 37.**
@@ -523,11 +528,18 @@ unverified, not falsely established. Fresh native input capture and a single
 frozen local order-based run are now in scope; data validity, source clocks,
 corporate actions, exact lineage and outcome accounting still apply. Earlier
 zero-access paragraphs describe their historical rounds, not this new scope.
-The actual section-64 source-only preparation produced fourteen weekly frames
-and 43 selected stocks. The first price request then failed HTTP 400 with
-zero response bytes/rows; no market projection or simulation exists. The
-immediate blocker is this provider/request rejection, not rights paperwork,
-Claude review or a missing Windows host. The original look remains spent.
+The section-64 source-only preparation produced fourteen weekly frames and
+43 selected stocks. Section 65 resolves the first HTTP 400 using fixed groups
+of three across all 43 names, with no subset selection. Both the original
+and separately reserved dividend-corrected local backtests now exist. The
+corrected Q1-2025 run returns approximately -39.36% with 39.60% drawdown,
+complete sixty-session valuation and zero unresolved actions. Its unfilled
+day-order constraints are retained, not bypassed. This completes the narrow
+private exploratory local execution milestone; it is not canonical ETF or
+QuantConnect readiness. Finish the stable handoff and make one matching-lane
+push. There is no remaining subscription reset, rights-paperwork or Claude
+wait for this completed local run. Further strategy evaluation must preserve
+the two-look history and the disclosed current-vintage/source limitations.
 
 ### Open-issue register
 
@@ -547,8 +559,6 @@ and are deliberately not listed here.
 | `TPR-CCR10-012` | P1 | Any positive signed-registry authority | A previously valid signed positive registry can be replayed while its key remains trusted. An external exact current-anchor pin or equivalent monotonic state needs owner approval and implementation. |
 | `TPR-CCR10-013` | P1 | Any positive signed-registry authority | Validating only the trust directory and files does not prevent replacement through a writable parent with `FILE_DELETE_CHILD`. The exact protected custody boundary for `C:\ProgramData\CustomizedAgent` needs owner approval and implementation. |
 | `TPR-CCR10-016` | P2 | TPR-TR0-I completion | Rotation, compromised-key removal, rollback, strict review-to-anchor ancestry, layer-specific byte mismatch, and full local Git/OpenSSH integration evidence are not yet complete. |
-| `TPR-RR24-001` | P2 | Actual development run | Section 64 waives separate rights paperwork for this private candidate, without proving contractual rights. Native source/calendar/target preparation is complete; the required price/action-value bundle is absent after HTTP 400. The surviving factual blocker is not an agreement-delivery prerequisite. |
-| `TPR-RR25-006` | P2 | Price acquisition and actual backtest | Section 64.4 records the first request and error-only diagnostic both returning HTTP 400. No price rows or simulation exist; the diagnostic's closed projection of 181 error bytes could not establish a specific cause. |
 
 No open finding is P0. The two P1 findings are inert while the registry is empty,
 but both block any positive registry entry. Read-only checks on this Windows
@@ -8971,7 +8981,7 @@ as a general market-ready engine. No real inventory has yet been inspected.
 
 | ID | Priority | Status | Location / evidence | Correction or required resolution |
 |---|---|---|---|---|
-| `TPR-RR24-001` | P2 | **Open factual activation blocker** | Massive public personal-use guidance and Market Data Terms have unresolved exact-addon applicability; no private admitted source/rights/calendar/price/action bundle exists. | Bind the owner's applicable Benzinga dataset agreement or written provider clarification for local raw retention and personal derived-strategy processing, with deletion duties. Then build a prospectively scoped immutable native input inventory. No extra generic implementation approval or Claude wait is required. |
+| `TPR-RR24-001` | P2 | **Closed for the private development route by sections 64/65; contractual verification remains false** | Historical finding: exact-addon applicability and a private input bundle were absent. The owner explicitly waived separate rights paperwork for this private candidate; subsequent source/price preparation and actual local execution are recorded. | The waiver is not vendor permission or canonical admission. Section 65's completed bounded local runs close this activation blocker only; no historical rights fact or unrelated access authority is invented. |
 | `TPR-RR24-002` | P2 | **Closed by correction** | Prior projection hid unknown descriptor schema; advisory v2 prospective tests 28 failed/23 passed, later seven row-case/table adversaries red. | Bounded schema identifiers plus component/clock evidence; final 95 green, then actual one-shot schema evidence above. Unknown values remain private; executed files frozen. |
 | `TPR-RR24-003` | P2 | **Closed by correction** | Truncated normalizer calendar shifted the second eligible open; one red/53 green. | Explicit calendar-anchor refusal; final normalizer 55 green, seven independent in-memory reverse probes killed and restored. |
 | `TPR-RR24-004` | P2 | **Closed by correction** | Order-engine missing hold-day/open marks, cash-funded dust exits, ambiguous order IDs and gap-driven name-cap errors were reproduced in three red/green groups. | Unknown valuation blocks additions, priced zero exits remain possible, unambiguous IDs and execution-time buy risk caps; final engine 40 green, cost mutation red/restored. |
@@ -9481,7 +9491,7 @@ action is provider-request diagnosis, not a rights-document or Claude wait.
 | `TPR-RR25-003` | P2 | Corrected | Confirmed scientific/plus decimal mismatch: independent synthetic proof showed collector acceptance followed by converter refusal. Exact fixed-point projection restores compatibility; native CSV unchanged. |
 | `TPR-RR25-004` | P2 | False alarm | Suggested unknown-open buy escape: existing post-action NAV guard already blocked new buys when valuation was unknown. Regression retained; only diagnostic wording changed. |
 | `TPR-RR25-005` | P2 | False alarm | Suggested missing-prior-quote abort: end-to-end converter/accounted-runner cases produce `decision_mark_missing`, incomplete output and no affected-session fills, not an exception or fabricated price. Regression retained. |
-| `TPR-RR25-006` | P2 | Open | Confirmed rejection: initial acquisition and error-only diagnostic both returned HTTP 400. Initial price-body bytes/rows are zero; diagnostic examined 181 error bytes but returned `unknown_response`. Exact cause remains unproved; no projection or simulation exists and raw error bytes were not retained. |
+| `TPR-RR25-006` | P2 | Corrected by section 65 | Historical initial acquisition and error-only diagnostic both returned HTTP 400; those failed/spent receipts remain unchanged. The successor identifies `Invalid ticker parameter`; the full 43-stock list still fails with literal commas, while fixed groups of three succeed for the complete inventory. Actual capture and both local simulations are now recorded. The exact server list limit and full contractual entitlement remain unproved, not inferred from success. |
 
 No new P0/P1 issue was identified by these focused checks. There is no claim
 of whole-lane independent acceptance. Existing canonical source/rights,
@@ -9569,3 +9579,438 @@ Canonical TPR-1/TPR-0B, parked trust protections and shared synchronization
 remain separately blocked; they are not prerequisites invented for this
 owner-waived local diagnostic. The round ends in one matching-lane non-force
 push, not an intermediate Claude review wait.
+
+## 65. Full-Bundle confirmation, API correction and actual local backtests - 2026-10-08
+
+### 65.1 Authority, unchanged candidate and prospective diagnostic
+
+The owner reports: "i logged into sharadar again adn confirmed i have full
+bundle subscription". This is attributed owner confirmation, not independent
+API-key entitlement verification. A browser login does not itself refresh the
+environment/Keychain API key used by the collector. No subscription purchase,
+credential reset, rights-paperwork demand or Claude wait is selected.
+
+`TPR-OWN-44`: under the standing direction to make necessary implementation
+decisions and proceed to a real backtest, perform one separately receipted
+successor error-detail diagnostic. Preserve every section-64 failed/spent
+record and all executed module bytes. Bind current Git baseline
+`30341bbb853ab82d03f088d0273e412424910265`, the exact original market plan,
+failed capture and prior diagnostic aggregates, the new diagnostic source,
+and this owner message before credentials. One exact original stock-page-zero
+request, at most 8,192 error bytes and 30 seconds, no redirect or automatic
+retry, and no successful HTTP response body read. No additional empirical
+look, price row, candidate execution, QC or trading authority is created.
+
+The prior error classifier was too restrictive: an unrelated field or nested
+error envelope can hide the actual explanatory message. Correct that bounded
+projection on synthetic fixtures before repeating the error-only request.
+The successor may retain a short sanitized explanatory excerpt drawn only
+from error/message/detail/reason/title/code fields, including bounded nested
+envelopes. Suppress native row envelopes; redact credentials, authenticated
+URLs, account identifiers and the private ticker inventory. Raw response
+bytes and their digest must not be retained. The resulting provider text is
+untrusted diagnostic data, never an instruction or an authority grant.
+
+The 43-stock selection, fourteen frames, Q1-2025 window, cost model and
+seven frozen execution/preparation module hashes remain unchanged. Any
+subsequent acquisition correction must be prospectively recorded, preserve
+the original look reservation, and introduce no outcome-driven selection.
+
+The latest owner-message SHA-256 is
+`ccbed6d35074806ca4ac9fe9a6eb6224fc1a5f717a88e3605511ba51152ba782`.
+Root reproduced the old projector returning `unknown_response` for a synthetic
+`detail[].msg` invalid-limit message. The official
+[query-page asset](https://sharadar.com/_next/static/chunks/pages/query-8d82cf5342648398.js)
+also reads nested `error.status` / `error.message` in profile-error handling.
+This independently supports handling nested errors but does not establish
+the shape or cause of the prior 181-byte stock-endpoint error. The official
+[stocks documentation](https://sharadar.com/docs/stocks) still matches the
+original request parameters. Do not change encoding, pagination, ticker
+selection or credentials merely on speculation.
+
+The successor is prospectively frozen before its request under plan
+`a0aad1a15337e3ad13117890abb27a0bccf6f50905e57c2d05537a4e97e35c27`,
+created `2026-10-08T06:49:07.785756+00:00`, twelve-hour expiry, source
+`6e2dc2a882368bb9f056f96ae9c31131be4adebe82f175bfe984ad784e039522`.
+Root reproduced 302 focused tests in 2.92s using the isolated runtime-root
+runner: new error detail, import boundary, prior public-operation artifacts,
+lane document consistency and active-document consistency. Synthetic red/green
+tests cover nested messages, ignored input/context siblings, embedded market
+rows and credential assignments; a read-only code audit cleared these exact
+source bytes. All original executed modules remain unchanged.
+
+### 65.2 Observed rejection and bounded request comparison
+
+The one error-detail request completed with HTTP 400 and 181 error bytes.
+Aggregate `fd3f3699c653dadc754f585100332e5e639c9271b2f987d5802719493aadc063`
+retains only the sanitized provider explanation `Invalid ticker parameter`,
+from the top-level `error` string. This localizes the reported rejection to
+the ticker parameter; it is not an independently verified entitlement failure
+or successful API-key entitlement check. No successful response body, price,
+payoff, simulation or additional empirical look was read. The historical
+`unknown_response` was a projector limitation, not an absent provider reason.
+
+Read-only inspection of the exact private plan yields aggregate syntax facts:
+43 unique all-uppercase-letter tickers, 38 of length four and five of length
+three, joined length 209, no whitespace/punctuation/digits. The original
+URL encoder percent-encodes commas. The official stocks and querying docs
+show literal comma-separated lists, with no documented list-count or length
+limit. Neither a length limit nor comma decoding is yet proved as the cause.
+
+`TPR-OWN-45` (delegated, prospective): reserve one new comparative error-only
+probe, `TPR-RAWREV-MARKET-REQUESTPROBE-20261007-001`, before credentials.
+It binds the original plan, existing spent look, precise error aggregate,
+unchanged executed sources, latest owner-message hash and current Git baseline.
+Variant A repeats the exact 43-stock/date/field query with literal commas.
+Only if A returns HTTP 400, variant B uses the first three frozen lexical
+tickers with literal commas and all other parameters unchanged. Stop on
+success or any other status. Maximum two GETs, 30 seconds and 8,192 error
+bytes per call, no redirects/automatic retries, no successful response body
+read, no raw error retention/hash and no extra empirical look. This is syntax
+diagnosis only, not selection of a smaller strategy universe. A three-versus-
+43 result does not establish the server's exact maximum count or length.
+Any eventual acquisition must retain all 43 frozen tickers and unchanged
+economics, dates and original reservation; no candidate or outcome choice
+is authorized by a successful probe alone.
+
+Before the comparison, plan
+`1cfa0d7909de07fff0de7c54a6af70294029650b13b8289f6b82f52a31259996`
+was frozen at `2026-10-08T06:56:52.008452+00:00`, twelve-hour expiry,
+with source `3b81176c47fd8ce5c6dd4d6c00dac5c23a8396b6d8a08c7b501fc32ab81752fb`.
+Only ticker commas change at the wire level; field-list comma encoding remains
+unchanged. A synthetic wire-level red/green test corrected that confound before
+freezing. Root reproduced 332 focused checks in 3.35s across probe, detail,
+original diagnostic, public artifacts, lane documents and active documents.
+The read-only audit cleared these exact probe bytes; it was not an independent
+full lane run or an authenticated provider check.
+
+The comparison completed two calls. Full inventory with literal ticker commas
+again returned HTTP 400, `Invalid ticker parameter`, 181 error bytes. The
+first-three lexical inventory returned HTTP 200; its body was not read.
+Aggregate `ad8382777e8821a2b094ccc48dfa0f17e33e18046bbc65d8340b130248e3133d`
+preserves both observations, zero successful body reads, zero added empirical
+looks and no inferred maximum ticker limit. This rules out percent-encoded
+ticker commas as the sole explanation for the full-list rejection and proves
+that this configured API key can obtain an HTTP 200 response for that small
+stock request. It does not independently verify the full account contract,
+all fields/rows, or every selected ticker. Activate only the fixed three-stock
+partition path of `TPR-OWN-46`; keep every original ticker and stop on any
+remaining refused batch instead of narrowing the universe.
+
+### 65.3 Conditional same-candidate acquisition continuation
+
+`TPR-OWN-46` (delegated, prospective; execution conditional on the probe):
+if the literal-comma full-inventory probe returns HTTP 200, resume acquisition
+with that exact serialization. If only the three-ticker probe returns HTTP
+200 after full-inventory HTTP 400, partition the original lexical inventory
+into fixed groups of three and request every group; do not discard a failing
+member or substitute another stock. If neither succeeds, do not acquire.
+The small-batch path is an operational workaround, not proof of a server limit
+or of every member's validity. Keep the original 43 stocks, source structure,
+waiver, policy hash, seven frozen modules, study dates and one-look reservation.
+Preserve all original failures and executed diagnostic sources verbatim.
+
+The separately hash-bound successor plan must authenticate the successful
+probe evidence, current lane/Git identity and its new code before credentials.
+Reserve its own immutable operation receipt, not a second empirical look.
+Maximum 30 GETs, one page per dataset/batch, 10,000 rows per page (a full page
+refuses rather than silently truncates), 4 MiB per page, 32 MiB total, 30 seconds
+per call, no redirect or retry. These limits explicitly supersede the failed
+operation's request budget only for this recorded continuation. Native prices
+and action payoff values remain in owner-only ignored local files; publish
+only plans and aggregate counters. Validate each row against its exact batch
+and original date/field contract, and require all batches to finish before
+publishing an admitted projection. Missing prices are not filled or inferred.
+
+After a complete capture, perform one local order-based computation with the
+unchanged frozen candidate. Reuse the shared candidate-level simulation-spent
+filename with exclusive creation before reading the projection, so neither
+executor can silently repeat the computation. Bind the successor capture and
+projection hashes, original reservation, code and input hashes. Record failure
+or completeness truthfully; do not retune after seeing outcomes. This is the
+previously authorized exploratory local backtest, not canonical admission,
+point-in-time proof, a new independent look, a QuantConnect job, live deployment
+or trading. Rights verification remains false under the existing owner waiver.
+
+The selected `three` continuation is frozen before acquisition under private
+plan `8bb23041fa5809315b158d333c61d94cad37547865a0f4fdc61215f1d41b3422`,
+public summary `a6a0073ed13d6eec6908da2bdf744d185587db6a18d45c6748582548355ecfb8`,
+created `2026-10-08T07:11:10.458221+00:00`, twelve-hour expiry,
+with source `0379c5d958f1cc0b75e8b02e807dc1b2e7074a2aafd9b25db8ff32b4594eba0f`.
+Root reproduced **744 focused tests in 13.33s** before any continuation price
+read, including the genuine frozen converter/candidate/order-engine path over
+43 synthetic names and 60 sessions. Seven forged-capture-receipt admission
+tests were red before strict report checks and green after correction; the
+simulation claim is never created from a partial or mismatched capture record.
+The original seven modules and two executed diagnostic successors remain
+hash-identical. No actual computation or price-acquisition success is inferred
+from fixture proof.
+
+The actual continuation completed all 30 requests with HTTP 200: fifteen stock
+batches and fifteen action batches, 2,623 unique price rows across all 43
+selected stocks, three action rows, zero duplicates and 104,560 response bytes.
+Capture aggregate `725a9ed6aaebf7f230147faf4fe301f9705f0874c55aaade26337e26b7fb18a3`
+binds private projection `9db40559cf2d9e400eb8329556fed4cf000edbd24456d6e11037ef7ba29790c4`.
+Status `CAPTURED` is acquisition only: the report correctly has no completed
+backtest claim. Original look remains spent once, with zero additional looks
+and zero QC attempts. Every selected stock is represented; successful batching
+resolves the acquisition blocker without establishing an exact server limit.
+Proceed to the one already authorized unchanged-candidate computation.
+
+### 65.4 First real backtest and read-only result audit
+
+The unchanged local order-based candidate completed its sixty Q1-2025
+sessions. First aggregate
+`68518f0438ff8f14a3d63fcdbaf890018c5213dc6978fa2c732cc2bcbd186877`
+binds private result
+`bb8bc27fe7a02d36bccabb4895b72f31843578063bfa62bfe5dba0a15fe9de56`.
+It reports 173 orders, 167 fills, final NAV 60,409.40998500 from 100,000,
+return **-39.59059002%** and maximum drawdown **39.83219962%**.
+Commissions total 1,269.40000000 and slippage 678.80501500.
+There are 52 day-order remainders / 15,073 unfilled shares:
+37 name-cap, 13 lagged-volume and two cash-constrained orders. These are
+explicit execution constraints, not an uncompleted simulation. Frozen-window,
+valuation and held-corporate-action accounting completeness are true, but
+`engine_complete` is **false** for both the unfilled day-order remainders and
+three unresolved corporate actions. The engine deliberately reports incomplete
+whenever a requested order is not fully filled; correcting action semantics
+does not remove liquidity, cash or name-cap restrictions or guarantee this flag.
+
+A read-only audit of the exact existing result and captured projection
+independently recomputed return/drawdown, fill-cost totals, order/fill counts
+and pending quantities. Its aggregate is
+`8a06bbc8a5f76aac641b07cf8ec9ed35d6bb5affc9d47416e9a3de7e53d0256f`.
+The 52,570 missing decision marks concern only nonselected, zero-target
+universe entries: **zero** positive-target missing marks and **zero** unpriced
+held-position sessions. No candidate computation or provider request was
+repeated for this audit. The three unresolved native rows are positive cash
+dividends with exact-date prices and the literal counterparty label `N/A`.
+All three were unheld at their action dates; two subsequently blocked positive
+entry targets. Thus the first result must remain provisional, with this
+input-interpretation defect disclosed rather than dismissed by a true
+held-accounting flag.
+
+### 65.5 Prospective cash-dividend compatibility correction
+
+`TPR-OWN-47` (delegated, prospective): interpret the exact pair
+`action == "dividend"` and `contraticker == "N/A"` as no applicable
+counterparty for this private exploratory cash-dividend model only. The
+[official field metadata](https://sharadar.com/_next/static/chunks/1906-370e4d69c2fd7f15.js)
+defines dividends as cash distributions, split-adjusted USD/share amounts
+and ex-dividend dates; counterparties apply where relevant. It does **not**
+document a universal `N/A`-to-null contract. This is a bounded owner-delegated
+development inference, not a verified vendor null convention or a general
+corporate-action normalization. Other counterparties and action kinds,
+including acquisitions, splits and spinoffs, remain untouched/unresolved.
+
+Implement a separate successor adapter/controller; preserve every executed
+module, native captured row, native projected-row action identity and first
+result. Continue using the existing exact-date price-factor imputation for
+split-adjusted dividends, ex-date nonspendable receivables and no assumed
+payment date. Missing amounts/factors still refuse or remain unresolved.
+Reject normalized identity collisions. Synthetic tests must prove the
+cash-dividend accounting correction, native-identity preservation, unchanged
+noncash handling and non-rearmable execution before the real computation.
+
+Reserve one separately hash-bound correction
+`TPR-RAWREV-DIVIDEND-CORRECTION-20261008-001` using only the existing capture,
+projection and original structure. Bind original/resume plans, original spent
+look and simulation claims, actual capture/first-result hashes, source hashes,
+current Git baseline and owner-message hash before projection/outcome read.
+Create a new exclusive correction receipt; never delete, reset or reuse any
+spent receipt. This is **one additional development look, two cumulative
+looks**, because the first performance result has already been seen.
+It is not a pristine candidate or refunded first look. No outcome-driven
+selection, rank, date, cost, universe or parameter change is permitted.
+Publish the corrected result regardless of whether it improves performance.
+
+No new authenticated provider call, data refresh, retained-source expansion,
+QuantConnect launch, canonical admission, operator database, live deployment
+or trading action is selected. Existing source-rights waiver and explicitly
+non-point-in-time/current-vintage research limitations remain unchanged.
+
+Before the correction computation, private plan
+`5f88c00c8a335567daa12ed3e591501725cca5333f29e07d6e797d8c8dd0769b`
+and public summary
+`9b6f16dc05b5a52c7da1978977eede3ee05aac9f51aaee6187b9fe45e682f882`
+were frozen at `2026-10-08T07:37:34.338316+00:00`, expiring at the parent
+resume's `2026-10-08T19:11:10.458221+00:00`. The new source SHA-256 is
+`9090048cd8f001632441898e552c9d4a636420ef411cdecbd29bb36f4256d54e`.
+Root reproduced **849 focused tests in 21.21s**, including 32 new correction
+proofs, before execution. The original-plan historical Git head remains
+different from, and exactly bound beneath, the current resume/correction head;
+a synthetic production-framed red/green test caught an erroneous equality
+requirement before the freeze. The held-share dividend fixture accrues a
+20-unit receivable with zero spendable cash; an ex-date buyer accrues none.
+Native-ID, normalization-collision, input-immutability, exclusive claim,
+old-receipt preservation, corruption, no-provider and non-rearm tests pass.
+The unchanged strategy policy does not imply unchanged orders or results:
+the accounting interpretation deliberately changes. No actual correction
+result is claimed by this prospective evidence.
+
+### 65.6 Actual corrected run and accounting cross-check
+
+The one reserved correction completed with status `SIMULATED`, aggregate
+`c72e77aa4b8dd54930bca36bf08251a7be8740c862da97b40bc44e2f6d34fe53`
+and private result
+`f5edf50e928d3d406ecd7ff2542db9632fd85a4f96468c0147aa9805546f7428`.
+All sixty sessions have valuation; frozen-window and corporate-action
+accounting completeness are true. The same 2,623 prices and 43-stock union
+were used, with zero missing bars, three interpreted cash dividends and
+**zero unresolved actions**. There were zero provider requests or source
+refreshes for this correction, one additional development look and two
+cumulative recorded looks. No original reservation or simulation was rearmed.
+
+| Metric | First, unresolved-action result | Corrected interpretation |
+|---|---:|---:|
+| Return, Q1 2025 | -39.59059002% | -39.35818894% |
+| Maximum drawdown | 39.83219962% | 39.60072803% |
+| Final NAV from 100,000 | 60,409.40998500 | 60,641.81106500 |
+| Orders / fills | 173 / 167 | 176 / 170 |
+| Unfilled day-order remainders | 52 | 53 |
+| Sum of unfilled shares, not live orders | 15,073 | 15,100 |
+| Commissions | 1,269.40000000 | 1,273.22000000 |
+| Slippage cost | 678.80501500 | 693.31393500 |
+| Unresolved action securities | 3 | 0 |
+
+Corrected final cash is 464.69106500 and dividend receivable is zero: each of
+the three events was unheld on its ex-date. The compatibility correction
+removes two later positive-entry blocks without inventing earlier ownership
+or dividends. All proposed target evidence is byte-equivalent as decoded
+data between the two results. The native action IDs match the first result
+and the compact canonical original projected rows exactly.
+
+Read-only corrected-result audit
+`d1e38c0f6d002e805140b15f954cfd35ca43d4034ce457b105ad8905ed8d8a06`
+independently recomputes return/drawdown with rational arithmetic and
+80-digit Decimal rendering; sums individual fill fees/slippage and
+order/fill/remainder counts; verifies original private-result/projection
+hashes, original and new spent claims, unchanged target evidence and native
+action IDs. It performs zero additional candidate computations or provider
+calls. The remaining 53 remainders are 38 name-cap, 13 lagged-volume and two
+cash constraints (1,462 / 13,144 / 494 shares respectively). They deliberately
+keep `engine_complete=false`: it means requested quantities were not all
+filled, not a runtime failure. Zero held positions are unpriced; zero positive
+targets lack a decision mark; zero positive entries are blocked by unresolved
+actions. The 52,570 nonselected missing marks are retained inventory diagnostics,
+not missing selected-stock prices. No execution constraint was loosened.
+
+Technical milestone completed: a prospectively frozen, privately held real-data
+local order-based exploratory run and one separately reserved input-meaning
+correction now have complete sixty-session valuation/accounting and immutable
+public aggregate evidence. The original signal/ranking/weights/dates/cost
+policy and all executed historical modules remain byte-identical. This is
+not the canonical ETF-alpha pipeline or proof of QuantConnect parity/completion;
+all `canonical_admission`, point-in-time and market-edge claims remain false.
+
+Plain language: the API is usable without another login/reset. Small fixed
+requests obtained every selected stock; the local backtest actually ran.
+The corrected strategy lost about 39.36% in Q1 2025 under this exploratory
+model. That is poor performance, not evidence to trade it. The result retains
+current-row censorship, unknown target horizon, nominal-pair comparability,
+current-vintage/survivorship and identity risks, assumed availability clocks,
+cross-table adjustment uncertainty and uncalibrated costs. Neither this loss
+nor a completed simulation justifies silently tuning a new candidate or
+declaring the original canonical lane complete.
+
+### 65.7 Findings, decisions and validation scope
+
+| ID | Priority | Status | Evidence and disposition |
+|---|---|---|---|
+| `TPR-RR26-001` | P2 | Corrected | The prior sanitized error classifier lost the real explanatory message. The successor retains bounded, redacted error fields; actual response explains an invalid ticker parameter. Nested-envelope support is fixture/official-asset evidence, not a claim that this actual response was nested. |
+| `TPR-RR26-002` | P2 | Corrected before execution | Initial literal-comma probe draft also changed field-list encoding, confounding the comparison. A wire-level red/green test fixed only ticker serialization before freezing and executing. |
+| `TPR-RR26-003` | P2 | Corrected before execution | Seven forged capture-receipt admissions were rejected only after strict schema, flags, integer counters and inventory checks. Red/green proof precedes the actual resume; a partial capture cannot reserve or run simulation. |
+| `TPR-RR26-004` | P2 | Corrected under explicit development inference | Three exact dividend/N/A rows became unresolved in the frozen converter and blocked two later entries. OWN47's narrow successor preserves native IDs and old bytes, rejects collisions and leaves other actions/counterparties unresolved; actual corrected audit has zero unresolved actions/blocks. Universal vendor-null semantics are still unverified. |
+| `TPR-RR26-005` | P2 | False alarm, retained | 52,570 missing decision marks initially appeared to imply broad valuation gaps. Read-only first and corrected audits show they are nonselected zero-target inventory entries; positive-target gaps and unpriced held sessions are zero. |
+| `TPR-RR26-006` | P2 | Corrected before execution | The correction plan draft incorrectly required the original historical Git head to equal the later resume head. Production-framed synthetic freeze red/green preserves the original exact hash-bound plan while matching only current parent/correction context. |
+| `TPR-RR26-007` | P3 | Partially correct hypothesis, qualified | Resolving dividends repairs action interpretation but cannot make engine completeness true while day orders remain partially unfilled. The frozen engine deliberately sets false on any remainder; no caps, cash, volume or completeness policy changed. |
+
+OWN44/45/46/47 record every exercised diagnosis, comparative request, acquisition
+continuation and correction choice above. The owner's final instruction,
+“when done, push only once,” is binding: no push has occurred during these
+operations; the stable round is accumulated for one non-force matching-lane
+push. The owner also waived intermediate Claude stops; this is an internally
+second-read Codex implementation round, not a new independent Claude acceptance.
+
+Focused validation uses the section-49/52 isolated runtime-root pytest runner,
+before dispatch-fence/configuration import, with no real operator state/database.
+The pre-execution 849-test union covers new detail/probe/resume/correction
+controllers; frozen diagnostic, capture, input conversion, candidate,
+order-engine and raw-run checks; public artifacts, import boundaries, lane
+and active-document consistency. The new controller's 32 synthetic tests
+include failure-after-claim and no-rearm semantics. A separate read-only agent
+reproduced three dividend/history proofs in 0.51s on the exact frozen source.
+No complete lane or repository suite was run. One earlier mixed pytest path
+ordering produced 388 passes and two missing-`aggregate_only` fixture setup
+errors; regrouping the same development paths before root document paths
+produced 390 passes. No production code or fixture semantics were changed
+to hide that collection-order limitation.
+
+A later documentation-only check returned 156 passes and five failures:
+section 8's existing stale-commit detector interpreted eight-digit decimal
+tails as short Git identities. The routing paragraph now uses two-decimal
+display values and points to section 65's exact results; the detector and
+financial artifacts were not weakened or changed.
+
+This macOS validation excludes the fourteen preregistration tests requiring
+the frozen Windows Git executable, native Windows signer/ACL/parent-custody
+proof, live operator state, full-suite independent review, QC and trading.
+The six canonical trust/PDF/reviewer findings, exact TPR-1/TPR-2/TPR-0B
+manifests and owner-coordinated shared OOL011 synchronization remain unchanged;
+OOL003/004/006 stay closed. D0 remains spent with no re-audit. Only this lane's
+record, lane-owned development controllers/tests and aggregate artifacts change;
+ACTION_PLAN, SESSION_HANDOFF, canonical artifacts and sibling/shared behavior
+remain frozen. No licensed row, ticker inventory or credential is published.
+
+### 65.8 Stable validation and publication handoff
+
+Root's final focused union on Python 3.12.14/macOS returned **919 passed in
+20.45s**, including all 253 public-operation artifact checks and both
+documentation modules. The earlier documentation decimal-tail failure is
+resolved; financial source/report bytes are unchanged. The exact pytest
+argument list, executed through the section-49/52 isolated in-process runner
+from the pinned lane root, is:
+
+```text
+-q
+tests/target_price_revisions_development/test_raw_market_error_detail.py
+tests/target_price_revisions_development/test_raw_market_request_probe.py
+tests/target_price_revisions_development/test_raw_market_resume.py
+tests/target_price_revisions_development/test_raw_market_dividend_correction.py
+tests/target_price_revisions_development/test_raw_market_diagnostic.py
+tests/target_price_revisions_development/test_raw_market_capture.py
+tests/target_price_revisions_development/test_raw_market_inputs.py
+tests/target_price_revisions_development/test_raw_candidate.py
+tests/target_price_revisions_development/test_raw_backtest.py
+tests/target_price_revisions_development/test_raw_run.py
+tests/target_price_revisions_development/test_raw_operation_artifacts.py
+tests/target_price_revisions_development/test_boundary_and_artifacts.py
+tests/target_price_revisions/test_document_consistency.py
+tests/test_active_document_consistency.py
+```
+
+Scoped `compileall -q` for all four new controllers and their tests plus
+artifact/boundary/document tests exited zero. `git diff --check` is clean.
+The focused artifact/import tests pin the seven original execution modules,
+all four new executed controllers, original D0 report/plan and canonical
+artifact hashes. The public corrected audit reverified the original private
+result/projection and spent chain without rerunning a candidate.
+
+No incoming Claude range exists in this round: work starts from published
+`30341bbb853ab82d03f088d0273e412424910265`, and actual origin remained that
+head during implementation. This round's implementation is internally
+**accepted after correction for the narrow exploratory local workflow**;
+that is not independent Claude acceptance or acceptance of strategy economics.
+The new error-detail, request-probe, complete-inventory resume and dividend
+correction sources are all frozen at their recorded executed hashes.
+The following handoff entry will name the resulting implementation commit
+before the single successful matching-lane push. No previous result, source,
+spent marker, shared gate, branch, worktree or operator state was replaced.
+
+Next authorized role: Codex completes publication and reports this achieved
+local backtest milestone to the owner; no Claude wait is imposed. Do not
+re-execute these spent plans. Any later new candidate/evaluation must retain
+both development looks and prospectively record its own scope and assumptions;
+the observed result is not a valid reason to relabel the data pristine or to
+promote to canonical, QC, paper/live or trading readiness. No further data
+operation or strategy tuning is included in this completed snapshot.

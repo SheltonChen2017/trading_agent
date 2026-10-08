@@ -2804,7 +2804,8 @@ def test_section_63_records_fresh_approval_proxy_limits_and_factual_blocker():
     assert "16a0810353f54743f8bdfa93bdf208534f1501c6fe4ee907fcb65692d968ae6d" in section
     assert "2562e6a9e843ec3e7bf5883232d543698ff746048325963526c5a77855f3463e" in section
     assert "TPR-SD22-005" not in _open_issue_register()
-    assert "TPR-RR24-001" in _open_issue_register()
+    assert "TPR-RR24-001" not in _open_issue_register()
+    assert "Closed for the private development route by sections 64/65" in section
 
 
 SECTION64_SCOPE = (
@@ -2839,7 +2840,59 @@ def test_section_64_records_actual_failed_price_capture_not_backtest_completion(
     assert "or simulation were produced" in section
     assert "491064c4da6ea38d194a3edac2e482d9b9bfd14657db1ca66ef5a643036e03d1" in section
     assert "TPR-OWN-43" in section and "A successful HTTP 200 body must not be read" in section
-    assert "TPR-RR25-006" in _open_issue_register()
+    assert "TPR-RR25-006" not in _open_issue_register()
+    assert "Corrected by section 65" in section
+
+
+def test_section_65_distinguishes_owner_bundle_report_from_api_and_prices():
+    section = _record_section("## 65.")
+    assert "attributed owner confirmation, not independent" in section
+    assert "API-key entitlement verification" in section
+    assert "TPR-OWN-44" in section
+    assert "no successful HTTP response body read" in section
+    assert "No additional empirical" in section
+    assert "ccbed6d35074806ca4ac9fe9a6eb6224fc1a5f717a88e3605511ba51152ba782" in section
+    assert "untrusted diagnostic data" in section
+    assert "Invalid ticker parameter" in section
+    assert "TPR-OWN-45" in section
+    assert "Maximum two GETs" in section
+    assert "not selection of a smaller strategy universe" in section
+    assert "TPR-OWN-46" in section
+    assert "Maximum 30 GETs" in section
+    assert "Keep the original 43 stocks" in section
+    assert "shared candidate-level simulation-spent" in section
+    assert "do not retune after seeing outcomes" in section
+
+
+def test_section_65_preserves_first_result_and_prospective_dividend_correction():
+    section = _record_section("## 65.")
+    for required in (
+        "68518f0438ff8f14a3d63fcdbaf890018c5213dc6978fa2c732cc2bcbd186877",
+        "8a06bbc8a5f76aac641b07cf8ec9ed35d6bb5affc9d47416e9a3de7e53d0256f",
+        "-39.59059002%", "39.83219962%", "TPR-OWN-47",
+        'action == "dividend"', 'contraticker == "N/A"',
+        "native projected-row action identity", "Reject normalized identity collisions",
+        "one additional development look, two cumulative",
+        "not a verified vendor null convention", "Publish the corrected result regardless",
+        "zero** positive-target missing marks", "two subsequently blocked positive",
+    ):
+        assert required in section
+
+
+def test_section_65_actual_result_is_not_canonical_or_full_fill_readiness():
+    section = _record_section("## 65.")
+    for required in (
+        "c72e77aa4b8dd54930bca36bf08251a7be8740c862da97b40bc44e2f6d34fe53",
+        "d1e38c0f6d002e805140b15f954cfd35ca43d4034ce457b105ad8905ed8d8a06",
+        "-39.35818894%", "39.60072803%", "zero unresolved actions",
+        "engine_complete=false", "not a runtime failure", "No execution constraint was loosened",
+        "not the canonical ETF-alpha pipeline", "poor performance",
+        "two cumulative recorded looks", "No original reservation or simulation was rearmed",
+        "No complete lane or repository suite was run", "push only once",
+    ):
+        assert required in " ".join(section.split())
+    assert "TPR-RR24-001" not in _open_issue_register()
+    assert "TPR-RR25-006" not in _open_issue_register()
 
 
 @pytest.mark.parametrize("old,new", [

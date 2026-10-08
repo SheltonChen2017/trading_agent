@@ -61,6 +61,10 @@ def test_development_import_closure_cannot_reach_canonical_or_other_authority() 
         "research.target_price_revisions_development.raw_market_inputs",
         "research.target_price_revisions_development.raw_market_capture",
         "research.target_price_revisions_development.raw_market_diagnostic",
+        "research.target_price_revisions_development.raw_market_error_detail",
+        "research.target_price_revisions_development.raw_market_request_probe",
+        "research.target_price_revisions_development.raw_market_resume",
+        "research.target_price_revisions_development.raw_market_dividend_correction",
     }
     assert (ROOT / "research/__init__.py").read_bytes() == b""
 
@@ -221,7 +225,7 @@ def test_source_auditor_is_separate_from_pure_fixtures_and_authority_packages() 
     assert all(isinstance(node, ast.Expr) and isinstance(node.value, ast.Constant)
                and type(node.value.value) is str for node in initializer.body)
     collectors = {"source_audit", "sharadar_diagnostic", "sharadar_shape", "sharadar_followup",
-                  "raw_source_capture", "raw_sharadar_source", "raw_sharadar_continue", "raw_market_capture", "raw_market_diagnostic"}
+                  "raw_source_capture", "raw_sharadar_source", "raw_sharadar_continue", "raw_market_capture", "raw_market_diagnostic", "raw_market_error_detail", "raw_market_request_probe", "raw_market_resume", "raw_market_dividend_correction"}
     for path in (ROOT / "research/target_price_revisions_development").glob("*.py"):
         if path.stem in collectors:
             continue

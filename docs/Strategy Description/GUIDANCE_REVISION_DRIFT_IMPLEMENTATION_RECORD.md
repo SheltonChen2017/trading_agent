@@ -1,11 +1,10 @@
 # Guidance Revision Drift - lane implementation record
 
-Status: **Sections 13-15 (Codex counter-review and ENG-7..ENG-16) independently
-reviewed by Claude in section 16 (2026-10-07): every commit accepted, three lane
-regression tests added, one P2 item documented for the owner's decision, no
-production defect found; Codex counter-review of section 16 pending. Original
+Status: **Section 16 counter-review accepted after correction; ENG-17..ENG-26
+offline backtest-preparation batch in progress (section 17). Native LEAN/QC
+execution and empirical backtest readiness remain unverified/blocked. Original
 GDR-0..6 gates remain closed.**
-Current scope/evidence are sections 13 through 16. Sections 2 through 6 preserve
+Current scope/evidence are sections 16 and 17. Sections 2 through 6 preserve
 the initial GDR-0A snapshot and its then-current restrictions; section 7
 supersedes only its stop-for-review and no-push sequencing for this batch, and
 section 12 records the owner's 2026-10-07 application of the standing lane
@@ -38,9 +37,10 @@ it does not mark GDR-0 complete or adopt a research/trading mandate.
   state. This record and `docs/ACTION_PLAN_2026-08-20.md` supply the subsequent
   bounded implementation status; numeric assumptions remain proposals.
 - `CLAUDE.md` and `AGENTS.md` still govern. The Action Plan owns sequencing;
-  `docs/SESSION_HANDOFF.md` retains its generic-workflow handoff role. No
-  same-branch Claude exception, standing push permission or root-handoff
-  exemption is inferred from the other four lanes' arrangements.
+  the explicit 2026-10-07 owner decision in section 17 supersedes the earlier
+  generic handoff policy for this lane: both agents update this lane record
+  only; root Session Handoff and Action Plan remain frozen. The same existing
+  lane branch/worktree and one combined push per round apply.
 
 The four existing branches/worktrees are not modified. A fifth development
 folder does not create a fifth statistical allocation in their fixed family.
@@ -1070,3 +1070,188 @@ both Claude commits and rotates the pin; the owner decides GDR-CR16-001. No
 GDR-1 or empirical, data, QC, broker, paper or live step starts from this
 review. `docs/ACTION_PLAN_2026-08-20.md` and `docs/SESSION_HANDOFF.md` were
 not edited in this round.
+
+## 17. Codex section-16 counter-review and next bounded batch (2026-10-07)
+
+### 17.1 Owner direction and exact reviewed snapshot
+
+Owner request: counter-review Claude, implement the next ten milestones or
+until ready for backtesting, and push only once. The subsequent explicit
+answer is **"Lane record only; freeze root documents (recommended)"**.
+Both agents therefore leave `docs/SESSION_HANDOFF.md` and
+`docs/ACTION_PLAN_2026-08-20.md` frozen for Guidance rounds. Historical root
+edits are preserved, not reverted or retroactively approved for main. This
+resolves GDR-CR16-001's future handoff question; integration acceptance remains
+separate. This record carries current lane status and the authorized sequence.
+
+Verified clean designated worktree/branch and matching pushed review head
+`a6cc4035361e883ad1ce60e18f2b456b06992de3`, descending from Codex publication
+`d522fad7c3b849f008a369a7a6f458dfdcdc797c`. Reviewed every change in both commits:
+
+| Claude commit | Disposition | Evidence |
+|---|---|---|
+| `5f7dc3087d5c0dd6d3a3e8c9db1aa2084121baf5` | accepted | All three exact regressions pass; isolated N26/N30/N36 mutants fail and restored originals pass; no source change |
+| `a6cc4035361e883ad1ce60e18f2b456b06992de3` | accepted after correction | Findings retained; owner resolves handoff; environment identity and ingestion timing receive bounded corrections below; review status rotates only with this record |
+
+CR16-002's Windows Git trust-root attribution is accepted. CR16-003/004/005
+are accepted with independent red/green verification. CR16-006's distinction
+between interpreter-bound and portable content identity is accepted; the strict
+original verifier will not be weakened. CR16-007 is accepted with a causality
+qualification: ingestion must follow validation availability, not merely a New
+York replacement for the UTC publication date. CR16-008 remains shared/main
+work, not a Guidance source defect; no shared behavior is changed. Claude's
+archive-export validation is historical informational evidence, not permission
+to validate this round outside the designated worktree.
+
+### 17.2 Definitions of done, recorded before implementation
+
+These are ten offline engineering increments, **not** GDR-0 freeze, GDR-1
+source audit, GDR-3 empirical completion, SDK acceptance or trading authority.
+No proposal economics, protected dates, rights or frozen candidate pins change.
+Completion means implemented and focused-tested, pending independent Claude
+review of the final pushed snapshot. Work stops if a required material choice
+or external action cannot remain inside these definitions.
+
+| Increment | Precise bounded definition of done |
+|---|---|
+| ENG-17 — native zero-fee protocol | Accept LEAN's zero-fee null-currency non-economic statuses, still reject non-USD economic fills/nonzero malformed receipts; primary-source contract and failing-then-passing regression |
+| ENG-18 — native cancel lifecycle | Explicit requested `CancelPending` acknowledgement, no premature reservation release, idempotent duplicate and invalid-transition refusals |
+| ENG-19 — multi-day strict reader | Read all exact sidecar frames through one LEAN reader enumeration regardless of source creation date; strict JSON/type/unknown-frame refusal with multiday regression |
+| ENG-20 — receipt availability composition | Integration ingests each observation at the first decision after validated availability in receipt order; late/night/weekend receipts are not backdated or lost; current daytime fixture economics unchanged |
+| ENG-21 — portable content identity | Separate environment-independent content identity beside exact environment-bound identity; verification reconstructs source/content, never ignores economic/code/calendar/authority changes |
+| ENG-22 — deterministic source bundle | Build bounded local deterministic archive of explicitly inventoried source/candidate and exact synthetic sidecar; no credentials, SDK, upload, download or empirical inputs |
+| ENG-23 — bundle integrity verification | Retained outer anchor plus exact member inventory/content validation; refuse traversal, duplicates, extras, altered sources and oversize/unsafe members; no archive code execution or automatic extraction |
+| ENG-24 — callback evidence trace | Bounded hash-linked native protocol transcript with frame/order/fill/cancel evidence and explicit non-native-test labels; deterministic replay, duplicate and failure checks; no cloud-completion claim |
+| ENG-25 — preparation CLI and readiness report | Local bundle export/verification and machine-readable separation of offline prepared, native unverified and empirical blocked; no launch/approval switch and original gates retained |
+| ENG-26 — review release | Regenerate content-addressed review artifact only after source stabilizes; include bundle/portable identity and exact focused evidence; document missing native/comparator/settlement/data validation and next separately authorized action |
+
+Native audit already reproduced zero-fee `QCC` status rejection and the reader
+discarding all but four of 372 multiday frames; `CancelPending` is absent from
+the protocol. Official LEAN source, not an engine run, establishes the callback
+contracts. Native scheduling/overloads remain unverified. No installed LEAN,
+AlgorithmImports, QuantConnect, clr, dotnet or Docker runtime was found.
+
+### 17.3 Findings ledger and dispositions
+
+Resolved findings remain visible. No P0 or P1 finding was identified in this
+counter-review. The shared CR16-008 P2 finding remains open outside this lane.
+
+| ID | Priority / status | Evidence and disposition |
+|---|---|---|
+| GDR-CCR17-001 | P2 / corrected | Native `on_order_event` rejected LEAN's `OrderFee.Zero` currency `QCC` even for zero-economic submitted/cancel statuses. Reproduced exact submission refusal, then added narrow control-event handling; economic fills remain USD-only. ENG-17. |
+| GDR-CCR17-002 | P2 / corrected | LEAN emits `CancelPending`; neither adapter nor bridge supported it. Reproduced rejection with a partial position and 4494.5 cash still reserved. ENG-18 requires an ordered request acknowledgement, preserves reservations, and releases only at terminal cancellation. |
+| GDR-CCR17-003 | P2 / corrected | LEAN keeps the source creation date while enumerating this single multiday file. Reader filtered out 368 of 372 exact rows. ENG-19 validates each frame and uses its own timestamp; creation-day filtering removed. Strict JSON also rejects previously accepted duplicate keys. |
+| GDR-CCR17-004 | P3 / corrected | CR16-007's UTC publication-date ingestion also lost weekend/night observations, backdated delayed validations and ingested post-final or duplicate receipts. Actual durable command regressions failed before correction. ENG-20 uses the visible as-of archive suffix and checks its durable count/head, not a date-only timezone substitution. |
+| GDR-CCR17-005 | P3 / improved | CR16-006's strict interpreter identity was correct but insufficient for cross-interpreter content comparison. ENG-21 adds a separate portable identity/verifier; original exact byte verifier remains strict. No runtime-parity claim. |
+| GDR-CCR17-006 | P2 / unresolved execution limitation | Source/shim corrections do not prove pinned LEAN overloads, bindings, reader integration or transaction timing. Current public LEAN source scans before and after `OnData`; no confirmed scheduling defect was found, but no native/QC run occurred. Missing native comparator/actions and equity cash-settlement parity also remain explicit blockers. |
+
+Primary contract evidence (checked 2026-10-07; current public source, **not** a
+pinned engine acceptance):
+[OrderFee.Zero](https://github.com/QuantConnect/Lean/blob/master/Common/Orders/Fees/OrderFee.cs),
+[null currency](https://github.com/QuantConnect/Lean/blob/master/Common/Currencies.cs),
+[backtesting brokerage](https://github.com/QuantConnect/Lean/blob/master/Brokerages/Backtesting/BacktestingBrokerage.cs),
+[cancel request events](https://github.com/QuantConnect/Lean/blob/master/Engine/TransactionHandlers/BrokerageTransactionHandler.cs),
+[fixed reader date](https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/TextSubscriptionDataSourceReader.cs),
+[source reuse](https://github.com/QuantConnect/Lean/blob/master/Engine/DataFeeds/SubscriptionDataReader.cs),
+[transaction scan ordering](https://github.com/QuantConnect/Lean/blob/master/Engine/AlgorithmManager.cs).
+
+### 17.4 Implemented milestone notes
+
+**ENG-17 technical:** Native adapter normalizes only zero-economic control
+receipts with the documented null-currency sentinel. USD remains mandatory
+for fills; malformed quantities, fees and unsupported currencies refuse.
+
+Plain language: a normal engine status update no longer aborts the fixture,
+but the fix does not allow foreign-currency trades or unexplained charges.
+
+**ENG-18 technical:** Bridge records monotonic event IDs, submission and
+cancel-pending acknowledgements, exact duplicate identities and terminal
+cancel state. Cash remains reserved throughout the cancellation request.
+
+Plain language: asking to cancel is distinct from a confirmed cancellation;
+the same money cannot be spent twice while the request is pending.
+
+**ENG-19 technical:** Strict bounded JSON parsing validates every known frame
+from the single multiday source without filtering against source creation day.
+The shim enumerates all 372 records and scans transactions before/after data.
+
+Plain language: the prepared data file now reaches its later days instead of
+silently ending after day one. This still needs a real engine integration run.
+
+**ENG-20 technical:** Each fixed 10:00 decision ingests only the new validated
+as-of archive prefix, retaining receipt order and first-capture deduplication.
+Tests inspect actual command journals and preserve the original 93-day NAVs.
+
+Plain language: information is not used before it arrives, nor lost because
+it arrived overnight. This is not a new real-time capture service.
+
+**ENG-21 technical:** Release v2 binds portable content separately from two
+interpreter labels. Verification requires retained artifact/content anchors
+and reconstruction; source, engine settings, economics and authority stay bound.
+
+Plain language: another Python version can verify the same research content
+without falsely claiming that the two execution environments are equivalent.
+
+**ENG-22 technical:** A bounded deterministic ZIP contains 36 explicit
+source/helper/candidate members, the exact synthetic sidecar and a manifest.
+Sorted stored members have fixed metadata; source changes during reads refuse.
+
+Plain language: the code and invented input can be handed over as one exact,
+repeatable package. No credentials, licensed observations or SDK are bundled.
+
+**ENG-23 technical:** Bundle verification checks the retained outer hash,
+canonical inventory and current source bytes, refusing unsafe paths, duplicate
+or extra members, compression, metadata changes and self-rehashed forgeries.
+Publication uses no-overwrite hard links with explicit ambiguous-error handling.
+
+Plain language: a changed or damaged package cannot pass just by recalculating
+its own checksum. Verification never extracts or executes archive code.
+
+**ENG-24 technical:** Bounded canonical hash-linked protocol records cover
+frames, native bindings, issued fills and acknowledgements. Base replay has
+380 records; duplicates do not add records, and capacity failures are atomic.
+
+Plain language: callback/order discrepancies can be traced back to a specific
+step. The trace is in-memory synthetic evidence, not proof of a cloud run.
+
+**ENG-25 technical:** `prepare-bundle` and `verify-bundle` expose local-only
+preparation with retained anchors and exclusive flags. Preflight separates
+offline unreviewed source, native unverified execution and blocked empirical use.
+
+Plain language: successful packaging means the package was prepared, not that
+the strategy is ready to trade or permitted to start a backtest.
+
+**ENG-26 technical:** The final source epoch is rebuilt into a content-addressed
+v2 review release plus a separate source bundle. Final hashes, reproduction
+checks and publication range are recorded below when verification completes.
+
+Plain language: Claude receives one stable review snapshot and explicit
+remaining blockers, without confusing fixture completion with market evidence.
+
+### 17.5 Validation and release
+
+| Focused check | Result |
+|---|---|
+| Three exact Claude regressions | 3 passed; N26/N30/N36 mutants failed; restored tests passed |
+| Native bridge/source tests | 20 passed in 33.582s; four isolated mutants caught/restored (QCC control, multiday reader, premature cancel cash release, trace capacity) |
+| Receipt integration tests | Original code: 2 failed / 1 passed; corrected: 3 passed in 24.369s; actual durable ordering/restart and unchanged economic/NAV checks |
+| Bundle, CLI, portable identity and boundaries | 36 passed in 0.811s after source freeze; bundle selection includes 21 tests and 44 subtests; three bundle mutants caught/restored (current-source comparison, compression precheck, overwrite publication) |
+| Active-document guard via normal pytest/conftest | 69 passed in 1.06s |
+| Python compilation | 63 lane source/test files compiled in memory, no bytecode publication; SDK imports not executed |
+| Original proposal, candidate and root documents | Candidate/source pins verified; root Action Plan, Session Handoff and Feature Milestone Record unchanged |
+| Exact release reconstruction/publication | 6 tests passed in 181.215s, including actual reconstruction; CLI local bundle/review publication both exit 0; published-artifact portable verification running below |
+
+Temporary test failures in bundle/CLI assertions were macOS `/var` versus
+resolved `/private/var` path expectations; tests were corrected to compare
+resolved output roots. No production path behavior changed to hide them.
+Author/subagent QA is not independent Claude acceptance. No full lane or
+repository suite, Windows validation, SDK/native/QC run, provider read or
+outcome access was performed. Source/provider, outcome, QC upload/job, broker,
+paper/live and capital gates remain closed.
+
+Source epoch is now frozen at code-manifest SHA-256
+`19175ad06bdb4b8e63b00e60181d0fa5d3e96c97c58cef0a552f57983ca49ecf`.
+The source implementation commit contains the counter-review, ENG-17..25 and
+the ENG-26 release machinery/validation. A closing record/artifact commit will
+name that source commit, record final verification and finish ENG-26 before
+the sole push. No intermediate push is permitted.

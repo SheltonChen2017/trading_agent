@@ -4,8 +4,10 @@ It intentionally cannot certify engine scheduling, fees, subscriptions,
 buying power, data reader integration, .NET conversions or cloud completion.
 """
 from datetime import datetime, timezone
+from dataclasses import replace
 from decimal import Decimal
 import importlib
+import json
 import sys
 from types import ModuleType, SimpleNamespace as NS
 import unittest
@@ -13,6 +15,7 @@ from unittest.mock import patch
 
 from data.financial_primitives import exact_decimal_multiply, exact_decimal_sum
 from research.guidance_revision_drift.lean_bridge import BridgeError, fixture_frames, fixture_stream
+from research.guidance_revision_drift.simulation import Simulation
 
 
 class CashAmount:
@@ -77,12 +80,18 @@ class QCAlgorithm:
                    symbol=symbol, kind=kind, tag=tag, event_sequence=0)
         self.native_orders.append(order)
         # Exercise synchronous submission callback before bridge.bind.
-        self.on_order_event(OrderEvent(order, self.utc_time, OrderFee(CashAmount(0, "USD"))))
+        self.on_order_event(OrderEvent(order, self.utc_time, OrderFee(CashAmount(0, "QCC"))))
         ticket = NS(order_id=order.id)
         def cancel(reason):
             order.event_sequence += 1
-            event = OrderEvent(order, self.utc_time, OrderFee(CashAmount(0, "USD")))
+            event = OrderEvent(order, self.utc_time, OrderFee(CashAmount(0, "QCC")))
+            event.status, event.id = "cancel_pending", order.event_sequence
+            order.status = event.status
+            self.on_order_event(event)
+            order.event_sequence += 1
+            event = OrderEvent(order, self.utc_time, OrderFee(CashAmount(0, "QCC")))
             event.status, event.id = "canceled", order.event_sequence
+            order.status = event.status
             self.on_order_event(event)
             return NS(is_success=True)
         ticket.cancel = cancel
@@ -104,7 +113,8 @@ def sdk_shim():
     module = ModuleType("AlgorithmImports")
     values = dict(QCAlgorithm=QCAlgorithm, PythonData=Slice, FillModel=type("FillModel", (), {}),
         OrderEvent=OrderEvent, OrderFee=OrderFee, CashAmount=CashAmount,
-        OrderStatus=NS(SUBMITTED="submitted", FILLED="filled", PARTIALLY_FILLED="partial", CANCELED="canceled"),
+        OrderStatus=NS(SUBMITTED="submitted", FILLED="filled", PARTIALLY_FILLED="partial",
+                       CANCEL_PENDING="cancel_pending", CANCELED="canceled"),
         Resolution=NS(MINUTE="minute"), TimeZones=NS(UTC="UTC"),
         ConstantFeeModel=lambda fee: ("constant", fee), ImmediateSettlementModel=lambda: "immediate",
         SubscriptionTransportMedium=NS(LOCAL_FILE="local"),
@@ -156,6 +166,8 @@ class LeanSourceTests(unittest.TestCase):
         self.assertEqual(algo.benchmark, "SYN-GDR")
         self.assertEqual(algo.portfolio.cash, Decimal(algo.bridge.finish()["strategy"]["settled_cash"]))
         self.assertIn("no empirical", algo.log[-1])
+        self.assertIn("trace_count=380", algo.log[-1])
+        self.assertIn(algo.bridge.finish()["protocol_trace_head_sha256"], algo.log[-1])
         algo.portfolio.cash += Decimal(1)
         with self.assertRaisesRegex(BridgeError, "cash mismatch"):
             algo.on_end_of_algorithm()
@@ -176,12 +188,48 @@ class LeanSourceTests(unittest.TestCase):
         line = fixture_stream().splitlines()[0].decode()
         point = reader.reader(config, line, day, False)
         self.assertEqual(point["frame_index"], 0)
-        self.assertIsNone(reader.reader(config, line, datetime(2025, 1, 3), False))
+        self.assertEqual(reader.reader(config, line, datetime(2025, 1, 3), False)["frame_index"], 0)
         with self.assertRaises(BridgeError):
             reader.reader(config, line.replace('"50"', '"51"'), day, False)
         with self.assertRaises(BridgeError):
             reader.get_source(config, day, True)
         self.assertEqual(reader.get_source(config, day, False)[1], "local")
+
+    def test_multiday_file_uses_record_time_not_reader_creation_day(self):
+        reader = self.source.GuidanceSyntheticData()
+        points = [reader.reader(NS(symbol="SYN-GDR"), line.decode(), datetime(2025, 1, 2), False)
+                  for line in fixture_stream().splitlines()]
+        self.assertEqual([point["frame_index"] for point in points if point is not None], list(range(372)))
+
+    def test_reader_refuses_duplicate_keys_float_alias_and_unknown_records(self):
+        reader = self.source.GuidanceSyntheticData()
+        line = fixture_stream().splitlines()[0].decode()
+        invalid = [line.replace('"index":0', '"index":0,"index":0'),
+                   line.replace('"index":0', '"index":0.0'),
+                   line.replace('"index":0', '"index":false'),
+                   json.dumps(json.loads(line) | {"extra": 1}), "[]"]
+        for body in invalid:
+            with self.subTest(body=body), self.assertRaises(ValueError):
+                reader.reader(NS(symbol="SYN-GDR"), body, datetime(2025, 1, 2), False)
+
+    def test_zero_qcc_submission_is_control_only(self):
+        algo = self.initialize()
+        for frame in fixture_frames():
+            algo.utc_time = datetime.fromisoformat(frame["at"]).replace(tzinfo=None)
+            algo.on_data(Slice({algo.symbol: {"frame_index": frame["index"]}}))
+            if algo.native_orders:
+                break
+        order = algo.native_orders[0]
+        # Re-deliver the original submission with the actual SDK zero sentinel.
+        event = OrderEvent(order, algo.utc_time, OrderFee(CashAmount(0, "QCC")))
+        algo.on_order_event(event)
+        for currency, fee, quantity, price, status in (
+                ("QCC", 1, 0, 0, "submitted"), ("EUR", 0, 0, 0, "submitted"),
+                ("QCC", 0, 1, 50, "filled"), ("QCC", 0, 0, 0, "filled")):
+            event.order_fee = OrderFee(CashAmount(fee, currency))
+            event.fill_quantity, event.fill_price, event.status = quantity, price, status
+            with self.subTest(currency=currency, status=status), self.assertRaises(BridgeError):
+                algo.on_order_event(event)
 
     def test_missing_frame_and_native_cash_drift_are_visible_failures(self):
         algo = self.initialize()
@@ -190,6 +238,51 @@ class LeanSourceTests(unittest.TestCase):
             algo.on_data(Slice({algo.symbol: {"frame_index": 1}}))
         with self.assertRaises(BridgeError):
             algo.on_end_of_algorithm()
+
+    def test_multiday_reader_and_before_after_data_scans_reconcile_partial_cancel(self):
+        # Mirrors the documented synchronous scan order, not .NET execution.
+        # LEAN suppresses unchanged, zero-quantity fill-model results.
+        algo = self.initialize()
+        reader = self.source.GuidanceSyntheticData()
+        first_day = datetime(2025, 1, 2)
+        config = NS(symbol=algo.symbol)
+
+        def scan():
+            for order in algo.native_orders:
+                if order.status in {"filled", "canceled"}:
+                    continue
+                method = algo.fill_model.limit_fill if order.kind == "limit" else algo.fill_model.market_fill
+                event = method(None, order)
+                if event.status == order.status and event.fill_quantity == 0:
+                    continue
+                order.event_sequence += 1
+                event.id = order.event_sequence
+                order.status = event.status
+                algo.portfolio[algo.symbol].quantity += event.fill_quantity
+                algo.portfolio.cash = exact_decimal_sum((algo.portfolio.cash,
+                    -exact_decimal_multiply(Decimal(event.fill_quantity), event.fill_price),
+                    -event.order_fee.value.amount))
+                algo.on_order_event(event)
+
+        original = Simulation.process_minute
+        with patch.object(Simulation, "process_minute",
+                          lambda engine, minute: original(engine, replace(minute, volume=1000))):
+            for line in fixture_stream().splitlines():
+                point = reader.reader(config, line.decode(), first_day, False)
+                self.assertIsNotNone(point)
+                algo.utc_time = point.end_time
+                scan()
+                algo.on_data(Slice({algo.symbol: point}))
+                scan()
+                scan()  # repeated scans must not duplicate receipts or fees
+        algo.on_end_of_algorithm()
+        report = algo.bridge.finish()
+        self.assertEqual(report["strategy"]["orders"][0]["status"], "cancelled")
+        self.assertEqual(report["strategy"]["orders"][0]["filled_quantity"], 10)
+        self.assertEqual(report["strategy"]["reserved_cash"], "0")
+        self.assertEqual([row["payload"]["status"] for row in algo.bridge.protocol_trace()["records"]
+                          if row["kind"] == "acknowledgement"],
+                         ["submitted", "partially_filled", "cancel_pending", "canceled", "submitted", "filled"])
 
 
 if __name__ == "__main__":

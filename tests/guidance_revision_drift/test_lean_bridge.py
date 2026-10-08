@@ -6,6 +6,8 @@ from decimal import Decimal
 import unittest
 from unittest.mock import patch
 
+from data.hashing import canonical_json, hash_bytes
+from research.guidance_revision_drift import lean_bridge
 from research.guidance_revision_drift.lean_bridge import (
     BridgeError, SyntheticOrderBridge, fixture_frames, fixture_stream,
 )
@@ -13,7 +15,7 @@ from research.guidance_revision_drift.scenario import run_example
 from research.guidance_revision_drift.simulation import Simulation
 
 
-def drive(mode="base", stop_at_fill=False):
+def drive(mode="base", stop_at_fill=False, stop_at_cancel=False, return_bridge=False):
     bridge = SyntheticOrderBridge(mode)
     ids = {}
     events = {}
@@ -44,10 +46,16 @@ def drive(mode="base", stop_at_fill=False):
                 raise AssertionError("duplicate model invocation reissued a fill")
         for order_id in actions["cancel"]:
             native = ids[order_id]
+            if stop_at_cancel:
+                return bridge, native, events[native] + 1
+            events[native] += 1
+            bridge.order_event(native_id=native, event_id=events[native], status="cancel_pending",
+                               at=bridge.current_at, quantity=0, price=Decimal(0), fee=Decimal(0))
             events[native] += 1
             bridge.order_event(native_id=native, event_id=events[native], status="canceled",
                                at=bridge.current_at, quantity=0, price=Decimal(0), fee=Decimal(0))
-    return bridge.finish()
+    report = bridge.finish()
+    return bridge if return_bridge else report
 
 
 class LeanBridgeTests(unittest.TestCase):
@@ -160,6 +168,106 @@ class LeanBridgeTests(unittest.TestCase):
                                quantity=0, price=Decimal(0), fee=Decimal(0))
         with self.assertRaises(BridgeError):
             bridge.issue_fill(999, fill.at)
+        for native_id, instant in ((True, fill.at), (native, None), (native, fill.at.replace(tzinfo=None))):
+            with self.subTest(native_id=native_id, instant=instant), self.assertRaises(BridgeError):
+                bridge.issue_fill(native_id, instant)
+
+    def test_cancel_pending_keeps_reservations_until_ordered_terminal_ack(self):
+        original = Simulation.process_minute
+        with patch.object(Simulation, "process_minute",
+                          lambda engine, minute: original(engine, replace(minute, volume=1000))):
+            bridge, native, event_id = drive(stop_at_cancel=True)
+        before = bridge.engine.snapshot()
+        self.assertGreater(Decimal(before["reserved_cash"]), 0)
+        receipt = dict(native_id=native, event_id=10, status="cancel_pending", at=bridge.current_at,
+                       quantity=0, price=Decimal(0), fee=Decimal(0))
+        trace = bridge.protocol_trace()
+        for change in ({"status": "canceled"}, {"quantity": 1}, {"price": Decimal(1)}, {"fee": Decimal(1)}):
+            with self.subTest(change=change), self.assertRaises(BridgeError):
+                bridge.order_event(**(receipt | change))
+            self.assertEqual(bridge.protocol_trace(), trace)
+            self.assertEqual(bridge.engine.snapshot(), before)
+        bridge.order_event(**receipt)
+        acknowledged_trace = bridge.protocol_trace()
+        bridge.order_event(**receipt)
+        self.assertEqual(bridge.protocol_trace(), acknowledged_trace)
+        self.assertEqual(bridge.engine.snapshot(), before)
+        for change in ({"event_id": 11}, {"event_id": 9, "status": "canceled"}):
+            with self.subTest(change=change), self.assertRaises(BridgeError):
+                bridge.order_event(**(receipt | change))
+        terminal = receipt | {"event_id": 11, "status": "canceled"}
+        bridge.order_event(**terminal)
+        self.assertEqual(bridge.engine.snapshot()["reserved_cash"], "0")
+        terminal_trace = bridge.protocol_trace()
+        bridge.order_event(**terminal)
+        self.assertEqual(bridge.protocol_trace(), terminal_trace)
+        with self.assertRaises(BridgeError):
+            bridge.order_event(**(receipt | {"event_id": 12}))
+
+    def test_transcript_is_reproducible_hash_linked_and_detached(self):
+        bridge = drive(return_bridge=True)
+        trace = bridge.protocol_trace()
+        self.assertEqual(trace, drive(return_bridge=True).protocol_trace())
+        self.assertNotEqual(trace["head_sha256"], drive("stress", return_bridge=True).protocol_trace()["head_sha256"])
+        previous = hash_bytes(canonical_json(trace["genesis"]).encode())
+        self.assertEqual(previous, trace["genesis_sha256"])
+        for sequence, record in enumerate(trace["records"]):
+            self.assertEqual(record["sequence"], sequence)
+            self.assertEqual(record["previous_sha256"], previous)
+            previous = hash_bytes(canonical_json(record).encode())
+        self.assertEqual(previous, trace["head_sha256"])
+        self.assertEqual(trace["count"], 380)
+        self.assertEqual({row["kind"] for row in trace["records"]},
+                         {"frame", "binding", "fill_issue", "acknowledgement"})
+        self.assertEqual(bridge.finish()["protocol_trace_count"], trace["count"])
+        self.assertEqual(bridge.finish()["protocol_trace_head_sha256"], trace["head_sha256"])
+        self.assertFalse(trace["native_runtime_verified"])
+        self.assertFalse(trace["cloud_completed"])
+        trace["records"][0]["payload"]["price"] = "500"
+        self.assertNotEqual(trace, bridge.protocol_trace())
+
+    def test_trace_capacity_refuses_frame_binding_issue_and_ack_atomically(self):
+        bridge = SyntheticOrderBridge()
+        before = bridge.engine.snapshot(), bridge.protocol_trace()
+        with patch.object(lean_bridge, "MAX_TRACE_RECORDS", 0), self.assertRaisesRegex(BridgeError, "capacity"):
+            bridge.step(fixture_frames()[0])
+        self.assertEqual(before, (bridge.engine.snapshot(), bridge.protocol_trace()))
+        native = None
+        for frame in fixture_frames():
+            actions = bridge.step(frame)
+            for order in actions["submit"]:
+                cap = len(bridge.protocol_trace()["records"])
+                with patch.object(lean_bridge, "MAX_TRACE_RECORDS", cap), self.assertRaisesRegex(BridgeError, "capacity"):
+                    bridge.bind(order.order_id, 1)
+                self.assertEqual(bridge._bindings, {})
+                bridge.bind(order.order_id, 1)
+                native = 1
+                bridge.order_event(native_id=1, event_id=0, status="submitted", at=bridge.current_at,
+                                   quantity=0, price=Decimal(0), fee=Decimal(0))
+            if bridge._pending:
+                break
+        before = bridge.engine.snapshot(), bridge.protocol_trace()
+        cap = len(before[1]["records"])
+        with patch.object(lean_bridge, "MAX_TRACE_RECORDS", cap), self.assertRaisesRegex(BridgeError, "capacity"):
+            bridge.issue_fill(native, bridge.current_at)
+        self.assertEqual(bridge._issued, set())
+        self.assertEqual(before, (bridge.engine.snapshot(), bridge.protocol_trace()))
+        fill = bridge.issue_fill(native, bridge.current_at)
+        before = bridge.engine.snapshot(), bridge.protocol_trace()
+        receipt = dict(native_id=native, event_id=1, status="filled", at=fill.at,
+                       quantity=fill.quantity, price=fill.price, fee=fill.fee)
+        with patch.object(lean_bridge, "MAX_TRACE_RECORDS", len(before[1]["records"])), self.assertRaisesRegex(BridgeError, "capacity"):
+            bridge.order_event(**receipt)
+        self.assertEqual(before, (bridge.engine.snapshot(), bridge.protocol_trace()))
+        self.assertEqual(len(bridge._pending), 1)
+        bridge.order_event(**receipt)
+
+    def test_trace_record_bound_is_fail_closed(self):
+        bridge = SyntheticOrderBridge()
+        with patch.object(lean_bridge, "MAX_TRACE_RECORD_BYTES", 1), self.assertRaisesRegex(BridgeError, "record exceeds"):
+            bridge.step(fixture_frames()[0])
+        self.assertEqual(bridge.protocol_trace()["count"], 0)
+        self.assertEqual(bridge._index, -1)
 
 
 if __name__ == "__main__":

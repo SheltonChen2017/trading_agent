@@ -9,16 +9,21 @@ from __future__ import annotations
 from copy import deepcopy
 from datetime import date, datetime, timezone
 from decimal import Decimal
+import json
 
 from data.hashing import canonical_json, hash_bytes
 from research.guidance_revision_drift.assessment import assess_candidate
-from research.guidance_revision_drift.fixtures import example_corpus, fixture_instant
+from research.guidance_revision_drift.fixtures import example_corpus, fixture_instant, fixture_projection
 from research.guidance_revision_drift.simulation import Fill, Minute, Quote, Session, Simulation
 from research.guidance_revision_drift.timing import NY
 
 
 class BridgeError(ValueError):
     """Native callback order or economics differ from the pinned fixture."""
+
+
+MAX_TRACE_RECORDS = 1024
+MAX_TRACE_RECORD_BYTES = 4096
 
 
 def fixture_frames() -> tuple[dict, ...]:
@@ -60,7 +65,43 @@ class SyntheticOrderBridge:
         self._cancels: set[str] = set()
         self._receipts: dict[tuple[int, int], tuple] = {}
         self._submitted: dict[str, tuple] = {}
+        self._submission_acks: set[str] = set()
+        self._cancel_pending_acks: set[str] = set()
+        self._last_event_ids: dict[int, int] = {}
         self._acknowledged = 0
+        self._trace_genesis = canonical_json({"schema": "gdr.lean.protocol-genesis.v1",
+            "mode": mode, "fixture_sha256": hash_bytes(fixture_stream()),
+            "native_runtime_verified": False}).encode("utf-8")
+        self._trace_head = hash_bytes(self._trace_genesis)
+        self._trace_records: list[bytes] = []
+
+    def _prepare_trace(self, kind: str, payload: dict) -> bytes:
+        if len(self._trace_records) >= MAX_TRACE_RECORDS:
+            raise BridgeError("native protocol trace capacity exhausted")
+        raw = canonical_json({"sequence": len(self._trace_records),
+            "previous_sha256": self._trace_head, "kind": kind,
+            "payload": fixture_projection(payload)}).encode("utf-8")
+        if len(raw) > MAX_TRACE_RECORD_BYTES:
+            raise BridgeError("native protocol trace record exceeds bound")
+        return raw
+
+    def _publish_trace(self, raw: bytes) -> None:
+        self._trace_records.append(raw)
+        self._trace_head = hash_bytes(raw)
+
+    def protocol_trace(self) -> dict:
+        """Detached bounded protocol evidence, not a native execution receipt.
+
+        Records hash their exact canonical bytes and link to their predecessor;
+        genesis binds the fixed fixture and execution mode. This in-memory
+        transcript has no durable/external trust root or authorization meaning.
+        """
+        return {"schema": "gdr.lean.protocol-trace.v1",
+                "genesis": json.loads(self._trace_genesis),
+                "genesis_sha256": hash_bytes(self._trace_genesis),
+                "records": [json.loads(raw) for raw in self._trace_records],
+                "count": len(self._trace_records), "head_sha256": self._trace_head,
+                "native_runtime_verified": False, "cloud_completed": False}
 
     @property
     def current_at(self) -> datetime:
@@ -77,6 +118,7 @@ class SyntheticOrderBridge:
             raise BridgeError("missing, duplicated, reordered or modified synthetic frame")
         draft = deepcopy(self)
         result = draft._step(frame)
+        draft._publish_trace(draft._prepare_trace("frame", frame))
         self.__dict__ = draft.__dict__
         return result
 
@@ -121,9 +163,15 @@ class SyntheticOrderBridge:
         if (order_id not in self._submitted or order_id in self._bindings or type(native_id) is not int
                 or native_id <= 0 or native_id in self._bindings.values()):
             raise BridgeError("invalid or duplicate native order binding")
+        raw = self._prepare_trace("binding", {"order_id": order_id, "native_id": native_id,
+            "at": self.current_at, "side_quantity_limit": self._submitted[order_id]})
         self._bindings[order_id] = native_id
+        self._publish_trace(raw)
 
     def issue_fill(self, native_id: int, at: datetime) -> Fill | None:
+        if (type(native_id) is not int or native_id <= 0 or type(at) is not datetime
+                or at.tzinfo is None or at.utcoffset() != timezone.utc.utcoffset(at)):
+            raise BridgeError("malformed native fill request")
         order_id = next((key for key, value in self._bindings.items() if value == native_id), None)
         if order_id is None:
             raise BridgeError("unknown native order")
@@ -132,14 +180,19 @@ class SyntheticOrderBridge:
             return None
         if at != fill.at:
             raise BridgeError("native fill processing shifted outside its exact minute")
+        raw = self._prepare_trace("fill_issue", {"native_id": native_id,
+            "order_id": fill.order_id, "at": fill.at, "side": fill.side,
+            "quantity": fill.quantity, "price": fill.price, "fee": fill.fee,
+            "settlement_session": fill.settlement_session})
         self._issued.add(order_id)
+        self._publish_trace(raw)
         return fill
 
     def order_event(self, *, native_id: int, event_id: int, status: str, at: datetime,
                     quantity: int, price: Decimal, fee: Decimal) -> None:
         if (type(native_id) is not int or type(event_id) is not int or event_id < 0
                 or type(quantity) is not int or type(price) is not Decimal or type(fee) is not Decimal
-                or not price.is_finite() or not fee.is_finite() or at.tzinfo is None
+                or not price.is_finite() or not fee.is_finite() or type(at) is not datetime or at.tzinfo is None
                 or at.utcoffset() != timezone.utc.utcoffset(at)):
             raise BridgeError("malformed native receipt")
         key = (native_id, event_id)
@@ -151,19 +204,35 @@ class SyntheticOrderBridge:
         order_id = next((key for key, value in self._bindings.items() if value == native_id), None)
         if order_id is None:
             raise BridgeError("receipt for unknown native order")
+        if event_id <= self._last_event_ids.get(native_id, -1):
+            raise BridgeError("native receipt event identity is out of order")
         if at != self.current_at:
             raise BridgeError("native receipt clock differs from current frame")
+        raw = self._prepare_trace("acknowledgement", {"native_id": native_id,
+            "event_id": event_id, "order_id": order_id, "status": status,
+            "at": at, "quantity": quantity, "price": price, "fee": fee})
         if status == "submitted":
-            if quantity != 0 or price != 0 or fee != 0:
-                raise BridgeError("submission cannot carry economics")
+            if quantity != 0 or price != 0 or fee != 0 or order_id in self._submission_acks:
+                raise BridgeError("invalid repeated or economic submission")
+            self._submission_acks.add(order_id)
+        elif status == "cancel_pending":
+            if (order_id not in self._cancels or order_id not in self._submission_acks
+                    or order_id in self._cancel_pending_acks
+                    or quantity != 0 or price != 0 or fee != 0):
+                raise BridgeError("unsolicited, repeated or economic cancel-pending receipt")
+            # This acknowledges the request only. The shadow still holds all
+            # reservations and may not advance until terminal cancellation.
+            self._cancel_pending_acks.add(order_id)
         elif status == "canceled":
-            if order_id not in self._cancels or quantity != 0 or price != 0 or fee != 0:
+            if (order_id not in self._cancels or order_id not in self._cancel_pending_acks
+                    or quantity != 0 or price != 0 or fee != 0):
                 raise BridgeError("unsolicited or economic cancellation receipt")
             self.engine.acknowledge_cancel(order_id, at)
             self._cancels.remove(order_id)
+            self._cancel_pending_acks.remove(order_id)
         elif status in {"filled", "partially_filled"}:
             fill = self._pending.get(order_id)
-            if fill is None or order_id not in self._issued:
+            if fill is None or order_id not in self._issued or order_id not in self._submission_acks:
                 raise BridgeError("unsolicited native fill")
             signed = fill.quantity if fill.side == "buy" else -fill.quantity
             expected_status = "filled" if next(o for o in self.engine.orders if o.order_id == order_id).remaining == 0 else "partially_filled"
@@ -175,6 +244,8 @@ class SyntheticOrderBridge:
         else:
             raise BridgeError("native rejected/unsupported order status: " + str(status))
         self._receipts[key] = receipt
+        self._last_event_ids[native_id] = event_id
+        self._publish_trace(raw)
 
     def finish(self) -> dict:
         if self._index != len(self._frames) - 1 or self._pending or self._cancels:
@@ -182,9 +253,14 @@ class SyntheticOrderBridge:
         snapshot = self.engine.snapshot()
         if snapshot["completion_blocked"]:
             raise BridgeError("shadow strategy remains incomplete")
-        if len(self._bindings) != len(self._submitted) or self._acknowledged != len(snapshot["fills"]):
+        if (len(self._bindings) != len(self._submitted)
+                or len(self._submission_acks) != len(self._bindings)
+                or self._acknowledged != len(snapshot["fills"])):
             raise BridgeError("native/shadow order lineage incomplete")
         return {"schema": "gdr.lean.callback-contract.v1", "strategy": snapshot,
                 "acknowledged_fills": self._acknowledged, "native_orders": len(self._bindings),
                 "fixture_sha256": hash_bytes(fixture_stream()), "runtime_verified": False,
-                "cloud_completed": False, "empirical_evidence": False}
+                "cloud_completed": False, "empirical_evidence": False,
+                "protocol_trace_count": len(self._trace_records),
+                "protocol_trace_head_sha256": self._trace_head,
+                "protocol_trace_genesis_sha256": hash_bytes(self._trace_genesis)}

@@ -115,6 +115,7 @@ def run_integrated_fixture(directory: Path, *, mode: str = "base", scenario: str
     assessment = None
     checkpoint = retained_mid_head = retained_mid_state = None
     command_count = 0
+    ingested_entries = ()
 
     def execute(operation, arguments):
         nonlocal command_count
@@ -124,9 +125,21 @@ def run_integrated_fixture(directory: Path, *, mode: str = "base", scenario: str
     for index, session in enumerate(sessions):
         day, decision = session.day, fixture_instant(session.day, 10)
         settlement = sessions[min(index + 1, len(sessions) - 1)].day
-        for observation, bootstrap in lineage.receipts:
-            if observation.disclosure.published_at.date() == day:
-                execute("event_ingest", {"record": observation.disclosure.to_dict(), "bootstrap": bootstrap})
+        # This recipe has only its existing 10:00 decisions, not an intraday
+        # capture service. Ingest at the first such decision after validation,
+        # including night/weekend receipts. Reuse lineage's first-receipt and
+        # exact-redelivery semantics; publication date must not backdate state.
+        replay = lineage.as_of(decision)
+        visible_entries = replay.archive.entries
+        if visible_entries[:len(ingested_entries)] != ingested_entries:
+            raise ValueError("visible receipt archive no longer extends the ingested prefix")
+        for record, bootstrap in visible_entries[len(ingested_entries):]:
+            execute("event_ingest", {"record": record.to_dict(), "bootstrap": bootstrap})
+        ingested_entries = visible_entries
+        current_archive = engine.snapshot()
+        if (current_archive["event_count"] != len(ingested_entries)
+                or current_archive["archive_head"] != replay.archive.head_sha256):
+            raise ValueError("durable event archive differs from visible receipt prefix")
         strategy_price = "25" if scenario == "actions" and day >= date(2025, 4, 7) else "50"
         spy_price = "50" if scenario == "actions" and day >= date(2025, 4, 7) else "100"
         actions = []
@@ -146,7 +159,6 @@ def run_integrated_fixture(directory: Path, *, mode: str = "base", scenario: str
         if current["positions"]:
             execute("execute_due_exits", {"at": _clock(decision), "adv20_by_issuer": {"SYN-ISSUER-A": "25000000"}})
         if day == date(2025, 4, 4):
-            replay = lineage.as_of(decision)
             assessment = assess_candidate(book=replay.book, disclosure_id="SYN-RAISE", as_of=decision,
                 schedule=schedule, permanent_security_id="SYN-SEC-A", references=corpus.references, bars=corpus.bars)
             if assessment.eligible_session != day:

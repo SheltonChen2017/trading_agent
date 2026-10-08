@@ -5,11 +5,12 @@ import argparse
 import sys
 from pathlib import Path
 
-from data.hashing import canonical_json
+from data.hashing import canonical_json, hash_bytes
 from research.guidance_revision_drift.contracts import (
     CandidateError,
     load_candidate,
     verify_source_documents,
+    _read_regular_file,
 )
 from research.guidance_revision_drift.readiness import preflight
 
@@ -17,11 +18,18 @@ from research.guidance_revision_drift.readiness import preflight
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("command", choices=("show-candidate", "preflight", "synthetic-demo", "adapter-manifest",
-                                            "review-release", "launch-preflight"))
-    parser.add_argument("--output-dir", type=Path, help="existing local directory; synthetic-demo/review-release only")
+                                            "review-release", "launch-preflight", "prepare-bundle", "verify-bundle"))
+    parser.add_argument("--output-dir", type=Path, help="existing local directory; demo/release/bundle publication only")
+    parser.add_argument("--bundle-file", type=Path, help="bounded local archive; verify-bundle only, never extracted")
+    parser.add_argument("--expected-sha256", help="caller-retained archive hash; verify-bundle only")
     args = parser.parse_args(argv)
-    if args.output_dir is not None and args.command not in ("synthetic-demo", "review-release"):
-        parser.error("--output-dir is supported only for synthetic-demo or review-release")
+    if args.output_dir is not None and args.command not in ("synthetic-demo", "review-release", "prepare-bundle"):
+        parser.error("--output-dir is supported only for synthetic-demo, review-release or prepare-bundle")
+    if args.command == "verify-bundle":
+        if args.bundle_file is None or args.expected_sha256 is None:
+            parser.error("verify-bundle requires --bundle-file and --expected-sha256")
+    elif args.bundle_file is not None or args.expected_sha256 is not None:
+        parser.error("bundle input and retained hash are supported only for verify-bundle")
     try:
         candidate = load_candidate()
         verify_source_documents(candidate, Path(__file__).resolve().parents[2])
@@ -40,6 +48,22 @@ def main(argv: list[str] | None = None) -> int:
             from research.guidance_revision_drift.release import launch_preflight
             print(canonical_json(launch_preflight()))
             return 2
+        if args.command in ("prepare-bundle", "verify-bundle"):
+            from research.guidance_revision_drift.bundle import build_bundle, verify_bundle, publish_bundle, MAX_BUNDLE_BYTES
+            from research.guidance_revision_drift.release import launch_preflight
+            if args.command == "verify-bundle":
+                raw = _read_regular_file(args.bundle_file, MAX_BUNDLE_BYTES)
+                result = verify_bundle(raw, expected_sha256=args.expected_sha256)
+            else:
+                raw = build_bundle()
+                result = {"status": "local_source_bundle_prepared", "sha256": hash_bytes(raw), "bytes": len(raw)}
+                if args.output_dir is not None:
+                    result["artifact"] = str(publish_bundle(args.output_dir, raw))
+            result["preflight"] = launch_preflight()
+            result["external_authority"] = False
+            result["qc_attempts"] = 0
+            print(canonical_json(result))
+            return 0
         if args.command == "review-release":
             from research.guidance_revision_drift.artifacts import publish_fixture
             from research.guidance_revision_drift.release import build_release

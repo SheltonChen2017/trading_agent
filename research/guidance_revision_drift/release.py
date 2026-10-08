@@ -7,8 +7,10 @@ or newly self-computed outer hash is never sufficient evidence.
 from __future__ import annotations
 
 from dataclasses import asdict
+from copy import deepcopy
 from pathlib import Path
 import platform
+import re
 
 from data.hashing import canonical_json, hash_bytes, hash_payload
 from research.guidance_revision_drift.contracts import (
@@ -21,12 +23,52 @@ from research.guidance_revision_drift.scenario import run_fixture_report
 from research.guidance_revision_drift.specification import ExecutableSpecification
 
 
+def _environment(body: dict) -> dict:
+    """Only interpreter labels are portable; engine/settings stay content-bound."""
+    try:
+        environment = {key: body["engine"][key]
+                       for key in ("python_implementation", "python_version")}
+    except (KeyError, TypeError) as exc:
+        raise ValueError("release interpreter labels missing") from exc
+    for value in environment.values():
+        if type(value) is not str or not re.fullmatch(r"[A-Za-z0-9_.+\-]{1,64}", value):
+            raise ValueError("invalid release interpreter label")
+    return environment
+
+
+def content_projection(body: dict) -> dict:
+    """Drop exactly two descriptive environment labels, never runtime evidence.
+
+    Caller-supplied objects cannot certify themselves: the verifier compares
+    this canonical projection to a fresh reconstruction from current source.
+    """
+    result = deepcopy(body)
+    for key in _environment(body):
+        del result["engine"][key]
+    result.pop("identities", None)
+    return result
+
+
+def _identities(body: dict) -> dict:
+    return {"portable_content_sha256": hash_payload(content_projection(body)),
+            "environment_sha256": hash_payload(_environment(body))}
+
+
 def launch_preflight() -> dict:
     """There is deliberately no approval argument, credential read or launch."""
     specification = ExecutableSpecification(load_candidate()).to_dict()
     return {"status": "blocked", "qc_upload_allowed": False, "qc_launch_allowed": False,
             "provider_access_allowed": False, "paper_live_allowed": False,
             "qc_attempts": 0, "empirical_looks": 0,
+            "readiness": {
+                "offline_source_package": "unreviewed_preparation_candidate",
+                "native_engine_execution": "unverified",
+                "empirical_order_based_backtest": "blocked",
+                "native_missing_evidence": ["pinned_engine_and_binding_run",
+                    "native_callback_scheduling", "native_comparator_and_corporate_actions",
+                    "equity_cash_settlement_parity"],
+                "scope": "fixed_base_SYN_GDR_receipt_replay_not_an_empirical_data_adapter",
+            },
             "required_before_external_evaluation": [
                 "independent_Claude_review_of_exact_pushed_source",
                 "owner_freeze_and_separate_exact_source_outcome_and_QC_authority",
@@ -47,11 +89,14 @@ def build_release() -> dict:
     # Import only the local invented-data composition, never an SDK entrypoint.
     from research.guidance_revision_drift.integration import run_integration_report
     integration = run_integration_report()
+    from research.guidance_revision_drift.bundle import build_bundle, verify_bundle
+    bundle = build_bundle()
+    bundle_receipt = verify_bundle(bundle, expected_sha256=hash_bytes(bundle))
     sources_after = source_manifest()
     if sources_before != sources_after:
         raise ValueError("source changed while building review release")
     result = {
-        "schema": "gdr.synthetic.review-release.v1",
+        "schema": "gdr.synthetic.review-release.v2",
         "status": "unreviewed_offline_engineering_candidate",
         "candidate_sha256": candidate.sha256,
         "proposed_specification_sha256": specification.sha256,
@@ -79,10 +124,13 @@ def build_release() -> dict:
                    "synthetic_sidecar_bytes": len(fixture_stream())},
         "reports": {"original_base_stress_sha256": hash_payload(report),
                     "integration_sha256": hash_payload(integration), "integration": integration},
+        "source_bundle": {"sha256": hash_bytes(bundle), "bytes": len(bundle),
+                          "verification": bundle_receipt},
         "preflight": launch_preflight(),
         "market_evidence": False, "point_in_time_evidence": False,
         "independent_review_complete": False,
     }
+    result["identities"] = _identities(result)
     # Reuse the strict bounded decoder for canonical JSON/number constraints.
     _decode(canonical_json(result).encode("utf-8"))
     return result
@@ -99,3 +147,30 @@ def verify_release(raw: bytes, *, expected_sha256: str) -> dict:
         raise ValueError("release does not reproduce from current local source and fixtures")
     return {"status": "verified_offline_content_only", "sha256": expected_sha256,
             "qc_launch_allowed": False, "market_evidence": False}
+
+
+def verify_release_content(raw: bytes, *, expected_sha256: str,
+                           expected_content_sha256: str) -> dict:
+    """Verify portable content AND the supplied exact artifact's retained anchor.
+
+    Does not relax verify_release's environment-bound byte equality. An
+    environment difference remains explicit and is not a runtime-parity claim.
+    """
+    if type(expected_sha256) is not str or hash_bytes(raw) != expected_sha256:
+        raise ValueError("release differs from caller-retained content anchor")
+    body = _decode(raw)
+    if raw != canonical_json(body).encode("utf-8"):
+        raise ValueError("canonical release bytes required")
+    identities = _identities(body)
+    if (canonical_json(body.get("identities")) != canonical_json(identities)
+            or type(expected_content_sha256) is not str
+            or identities["portable_content_sha256"] != expected_content_sha256):
+        raise ValueError("release identity or retained portable anchor mismatch")
+    current = build_release()
+    if canonical_json(content_projection(body)) != canonical_json(content_projection(current)):
+        raise ValueError("release content does not reproduce from current source and fixtures")
+    return {"status": "verified_portable_offline_content_only", "sha256": expected_sha256,
+            "portable_content_sha256": expected_content_sha256,
+            "artifact_environment": _environment(body), "current_environment": _environment(current),
+            "environment_matches": _environment(body) == _environment(current),
+            "runtime_parity_verified": False, "qc_launch_allowed": False, "market_evidence": False}

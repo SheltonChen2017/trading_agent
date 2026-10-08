@@ -1,6 +1,6 @@
 # Guidance Revision Drift — offline engineering candidate
 
-GDR-0A plus ENG-1 through ENG-16 are implemented as offline review candidates. This
+GDR-0A plus ENG-1 through ENG-26 are implemented as offline review candidates. This
 is **invented-data software**, not a completed research study or deployable
 QuantConnect strategy. Original GDR-0 review/freeze and GDR-1..GDR-6 research,
 data, cloud and operating gates remain closed. The original plan/PDF and
@@ -30,6 +30,12 @@ verified. No other lane's budget or permissions are inherited.
 | ENG-14 | `lean_bridge`, `lean/main.py` | Actual order-based algorithm source and strict native receipt protocol; local Python callback tests, no installed SDK or cloud-parity claim |
 | ENG-15 | `integration` | Stitched invented provider-to-market-to-paired-order journal/restart scenarios, stress and refusal checks |
 | ENG-16 | `release` | Actual source/candidate/contract/calendar/engine fingerprints, reproducible report verification, always-blocked launch preflight |
+| ENG-17/18/19 | `lean/main.py`, `lean_bridge` | Zero-fee native control receipts, requested cancellation-pending protocol and strict multiday reader; primary-source-aligned shim regressions, not native execution |
+| ENG-20 | `integration` | Receipt-ordered as-of archive ingestion at the first existing 10:00 decision after validation, including nighttime/weekend receipts and exact-redelivery deduplication |
+| ENG-21 | `release` | Separate portable content identity and exact interpreter-bound artifact identity; neither grants runtime parity |
+| ENG-22/23 | `bundle` | Deterministic source/sidecar ZIP, explicit inventory, current-source/retained-anchor verification and no-overwrite publication; never extracted or executed |
+| ENG-24 | `lean_bridge` | Bounded hash-linked callback protocol trace, exact duplicate idempotency and atomic capacity refusal |
+| ENG-25/26 | CLI, `release` | Local preparation/verification commands, explicit offline/native/empirical readiness separation and rebuilt review release |
 
 Positive entries require a predecessor captured before publication. Later
 comparable cuts reduce risk when known even if the original raise was received
@@ -65,6 +71,8 @@ python -B -m research.guidance_revision_drift adapter-manifest
 python -B -m research.guidance_revision_drift synthetic-demo
 python -B -m research.guidance_revision_drift review-release
 python -B -m research.guidance_revision_drift launch-preflight
+python -B -m research.guidance_revision_drift prepare-bundle --output-dir /absolute/existing/owned-directory
+python -B -m research.guidance_revision_drift verify-bundle --bundle-file /absolute/bundle.zip --expected-sha256 RETAINED_SHA256
 python -B -m research.guidance_revision_drift synthetic-demo --output-dir /absolute/existing/owned-directory
 ```
 
@@ -73,7 +81,7 @@ schedule. It accepts no external input file. Base and stress each simulate an
 entry, 20-session-interval exit, settlement and the entire paired daily NAV
 calendar. The schedule is a test fixture, **not an audited NYSE calendar**.
 
-`show-candidate`, `adapter-manifest`, a successful demo or review release exit 0,
+`show-candidate`, `adapter-manifest`, a successful demo, release or bundle operation exit 0,
 which means only that the local command completed. `preflight` and
 `launch-preflight` deliberately exit 2 with
 `status=blocked`. Invalid/missing candidate or source files exit 1, as does a
@@ -101,6 +109,28 @@ fields and forged authority. Candidate JSON/local artifacts are limited to
 leaves and recheck descriptor identity/type/size. The in-memory event archive
 allows 256 observations / 8 MiB; archives larger than 64 KiB cannot use this
 small report publisher.
+
+Bundle preparation is separate from report publication. It contains only the
+explicitly inventoried lane Python source, neutral helpers, candidate and exact
+invented sidecar, in repository-relative layout. The 4 MiB bounded ZIP uses
+stored members, fixed metadata and canonical inventory. Verification needs a
+caller-retained archive hash and reconstructs every member from current source;
+it rejects extras, duplicates, altered source, compression and unsafe paths.
+It never extracts or imports archive code. Publication flushes the file and
+directory and never overwrites; ambiguous post-publication failures are reported
+as such. This does not guarantee durability on every platform/filesystem.
+Planning documents and SDK/runtime dependencies are not included. Do not treat
+the source bundle as an automatically deployable QC project.
+
+Release v2 records the source bundle hash and two identities: portable content
+and interpreter environment. `verify_release` still requires exact bytes from
+a reconstruction, including Python implementation/version. The separate
+`verify_release_content` requires both retained artifact and portable hashes,
+reconstructs content, and permits differences **only** in those two interpreter
+labels; changed engine settings, source, inputs, economics and gates refuse.
+Environment differences remain explicit, and runtime parity stays false. Older
+content-addressed releases are retained as historical epochs, not silently
+rewritten to match changed source.
 
 Fixture epochs bind actual code-file bytes, candidate, corpus and schedule.
 Start/terminal base/stress receipts are separate and hash-linked. The ledger
@@ -158,6 +188,7 @@ execution have not been verified.
 
 Exact scope, commit dispositions, checks, corrected findings and next action:
 `docs/Strategy Description/GUIDANCE_REVISION_DRIFT_IMPLEMENTATION_RECORD.md`.
-The Action Plan owns sequencing and `docs/SESSION_HANDOFF.md` owns the generic
-cross-computer handoff. Stop at the published batch for Claude review; no next
+The owner's 2026-10-07 decision makes this lane record the handoff for both
+agents; root Action Plan and Session Handoff remain frozen. Stop at the
+published batch for Claude review; no next
 data/outcome/operational milestone starts automatically.

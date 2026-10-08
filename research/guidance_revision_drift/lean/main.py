@@ -6,7 +6,6 @@ See README before any separately authorized engine evaluation.
 """
 from datetime import datetime, timezone
 from decimal import Decimal
-import json
 from pathlib import Path
 
 from AlgorithmImports import (
@@ -15,7 +14,7 @@ from AlgorithmImports import (
     ConstantFeeModel, ImmediateSettlementModel,
 )
 from data.financial_primitives import to_decimal
-from research.guidance_revision_drift.contracts import _read_regular_file
+from research.guidance_revision_drift.contracts import _decode, _read_regular_file
 from research.guidance_revision_drift.lean_bridge import (
     BridgeError, SyntheticOrderBridge, fixture_frames, fixture_stream,
 )
@@ -40,14 +39,16 @@ class GuidanceSyntheticData(PythonData):
     def reader(self, config, line, day, is_live_mode):
         if is_live_mode:
             raise BridgeError("live data forbidden")
-        frame = json.loads(line)
+        if type(line) is not str:
+            raise BridgeError("synthetic reader requires a text record")
+        frame = _decode(line.encode("utf-8"))
         frames = fixture_frames()
         index = frame.get("index")
         if type(index) is not int or not 0 <= index < len(frames) or frame != frames[index]:
             raise BridgeError("nonfixture or modified stream record")
         instant = datetime.fromisoformat(frame["at"])
-        if instant.date() != day.date():
-            return None
+        # This is one multiday file. LEAN retains the source-creation day for
+        # every Reader call; filtering against it would discard later sessions.
         point = GuidanceSyntheticData()
         point.symbol = config.symbol
         point.time = instant.replace(tzinfo=None)
@@ -143,13 +144,23 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
             self.early_events.append(event)
             return
         statuses = {OrderStatus.SUBMITTED: "submitted", OrderStatus.FILLED: "filled",
+                    OrderStatus.CANCEL_PENDING: "cancel_pending",
                     OrderStatus.PARTIALLY_FILLED: "partially_filled", OrderStatus.CANCELED: "canceled"}
         quantity = to_decimal(event.fill_quantity)
-        if quantity != quantity.to_integral_value() or event.order_fee.value.currency != "USD":
+        price = to_decimal(event.fill_price)
+        fee = to_decimal(event.order_fee.value.amount)
+        status = statuses.get(event.status, "unsupported")
+        # LEAN OrderFee.Zero uses Currencies.NullCurrency (QCC), not USD.
+        # It is admissible only on a genuinely non-economic control receipt.
+        zero_control = (status in {"submitted", "cancel_pending", "canceled"}
+                        and quantity == 0 and price == 0 and fee == 0)
+        currency = event.order_fee.value.currency
+        if (quantity != quantity.to_integral_value()
+                or not (currency == "USD" or (currency == "QCC" and zero_control))):
             raise BridgeError("non-whole-share or non-USD native receipt")
         self.bridge.order_event(native_id=event.order_id, event_id=event.id,
-            status=statuses.get(event.status, "unsupported"), at=utc(event.utc_time),
-            quantity=int(quantity), price=to_decimal(event.fill_price), fee=to_decimal(event.order_fee.value.amount))
+            status=status, at=utc(event.utc_time),
+            quantity=int(quantity), price=price, fee=fee)
 
     def on_end_of_algorithm(self):
         report = self.bridge.finish()
@@ -158,4 +169,7 @@ class GuidanceRevisionDriftAlgorithm(QCAlgorithm):
         expected = to_decimal(report["strategy"]["settled_cash"])
         if to_decimal(self.portfolio.cash) != expected:
             raise BridgeError("terminal native/shadow cash mismatch")
-        self.debug("Synthetic native callback reconciliation finished; no empirical or cloud-parity acceptance.")
+        self.debug("Synthetic native callback reconciliation finished; "
+                   f"trace_count={report['protocol_trace_count']} "
+                   f"trace_head_sha256={report['protocol_trace_head_sha256']}; "
+                   "no empirical or cloud-parity acceptance.")

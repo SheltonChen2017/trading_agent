@@ -6,7 +6,11 @@ CORRECTION. ALL FOUR COMMITS HAVE DISPOSITIONS; TWO TEST GUARDS ARE CORRECTED.
 TPR-CR21-002 HAS A COMMITTED-SOURCE SUCCESSOR DRIVER WITH SOURCE/BUILD BINDING;
 THE PARTIAL HISTORICAL DRIVER LIMITATION REMAINS EXPLICIT. TPR-CR21-003'S
 ADDITIONAL OWNER GATE IS A FALSE ALARM: SCOPED PRIVATE UPLOAD/PROCESSING WAS
-ALREADY AUTHORIZED, NOT PROVIDER-ATTESTED. THE FROZEN MATCHED STUDY IS BLOCKED
+ALREADY AUTHORIZED, NOT PROVIDER-ATTESTED. SECTION72 RECORDS THE OWNER'S NEW
+MARKET-CAP-SELECTION / TPR-WEIGHT-TILT DEVELOPMENT TEST AND EXPLICIT PERMISSION
+TO PROCEED BEFORE CLAUDE'S PENDING REVIEW OF fa78dacd. THIS IS A GENUINELY NEW
+ECONOMIC CANDIDATE, NOT A FOURTH OLD ATTEMPT OR CANONICAL ACCEPTANCE.
+THE PRIOR FROZEN MATCHED STUDY REMAINS BLOCKED
 ON THE EXTERNAL MIA COMPUTER-CONTROL INTERFACE IN SECTION 71.10. ALL THREE
 CODEX ON-BASE ATTEMPTS ARE CONSUMED; THE COMPLETED THIRD RUN REMAINS A
 DELISTING DIAGNOSTIC. NO MIA RECOVERY JOB OR LOOK IS RESERVED OR LAUNCHED;
@@ -516,15 +520,21 @@ outcome-free source audit; no real-row D1, outcomes or QuantConnect access is
 authorized by that audit.
 The trust rollback pin, protected parent custody, reviewer identity and
 adversarial matrix remain unresolved and parked. **Exact next role action:**
-Codex publishes the stable blocked counter-review/build snapshot once, as
-section71.10 records. Claude next reviews this Codex round independently
-at its one final pushed snapshot, including the complete round. The
+Section71.10's blocked round was published once at fa78dacd; its five outgoing
+commits remain pending Claude review. The owner now explicitly authorized the
+new section72 cap-selection/TPR-tilt development test BEFORE that review with
+"yes, authorizee". Codex implements and executes that separately frozen
+candidate/control in the same lane under that direct, scoped owner exception.
+Claude next reviews this Codex round independently at its one final pushed
+snapshot, including the pending predecessor and new round. The previous
 continuous round reached a genuine external
 computer-control blocker, not a routine intermediate checkpoint. Further
 recovery requires restored authenticated controllable Mia in project37547067,
 fresh scope/source checks for the new HEAD and any expired receipt, complete
 observer source/diff/focused proof, and one separately reserved Mia recovery
-job. The three Codex slots cannot be reset or extended. Existing private-upload
+job. The three OLD Codex slots cannot be reset or extended; section72's genuinely
+changed cap-only selection/weight-only tilt candidates each have their own
+permanent three-attempt cap. Existing private-upload
 authority is not an attestation of vendor rights; no known access restriction
 may be bypassed. The owner's latest six-universe QC instruction in section 67
 persists, but the remaining five matched arms have not run.
@@ -12484,3 +12494,218 @@ or native-Windows custody validation was performed by these checks.
 Final documentary/import reprise after recording these validations:
 217passed/1existingplatformskip in3.14s; whitespace and record-only scope
 checks remain green.
+
+## 72. Owner-authorized cap selection / weight-only TPR experiment — 2026-10-09
+
+### 72.1 Prospective authorization, definitions and delegated decisions
+
+Owner request: "run another backtesting using analyst revision lane's strategy.
+i.e., select stocks based on market cap, then use the target price revision as
+a tilt." Codex explicitly asked whether this genuinely new development study
+may proceed before Claude reviews published fa78dacddb0061c305f040fb66487c72c432f3a0;
+the owner answered "yes, authorizee". This grants the two private order-based
+development runs below. It does NOT accept that unreviewed snapshot or this
+new code, grant canonical acceptance/deployment, or authorize a fourth attempt
+of the different exhausted TPR-MATCHED-ON-BASE-v1 candidate. The consumed
+monitor remains PAUSED. Claude next reviews this Codex round independently
+at its one final pushed snapshot; no routine intermediate push/review stop.
+
+All choices in this section are agent-delegated, grounded in that owner
+request, the Analyst-lane reference methodology and the existing TPR research
+boundary. Their independent-review status is PENDING; none is separately
+human- or Claude-approved. Existing canonical findings/gates in70/71 remain
+unchanged, including open TPR-MATCHED-002/006. No sibling/shared code is changed.
+
+`TPR-OWN-87` — choose cap-ranked constituent STOCK selection, not six ETF-only
+positions, cap-proportional weights or score-dependent admission. Ten known
+positive-cap names per sleeve receive equal1/60 base slots; missing cap/slots
+remain explicit/cash. This implements the owner's selection-first direction
+and isolates TPR to weights. Membership weights are retained provenance but
+do not admit/drop names. No AR ratings, score eligibility, fallback or blend.
+The Analyst historical admission/fallback,98% gross,9.8% cap, QCOM exclusion,
+dates and optimized settings are NOT imported. Alternative ETF rotation is
+the original canonical strategy boundary, not the experiment requested here.
+
+`TPR-OWN-88` — two genuine portfolio candidates, not36 universe jobs: fixed
+TPR-CAP-TILT-ON-BASE-v1 with20% within-selected transfer capacity and matched
+TPR-CAP-TILT-OFF-BASE-v1 with0. Use the reference helper's default20%, NOT its
+historically examined100%/200% outcomes. Nonzero signed scores use tied
+midranks; low-relative-rank names donate to high-relative-rank names subject
+to own baseline budget and consolidated1/10 headroom. A lower positive score
+can therefore donate to a higher positive score. Zero is neutral; missing,
+ineligible or unknown is explicitly neutral but never called measured zero.
+Selected identities/counts cannot depend on scores. No sweep/adverse/extra
+ablation or result-driven retuning is authorized by this definition.
+
+`TPR-OWN-89` — freeze all six memberships together: lagged native QC SPY
+S&P500 proxy (not broader large-cap); XLV healthcare; XLE energy; QQQ Nasdaq100
+(not all Nasdaq listings); SOXX semiconductors/equipment; REMX QC-covered US
+subset of global rare-earth/strategic-metals holdings. Effective lag7–21
+calendar days, receipt no later than the frozen cutoff; exact native SID
+identity, cap descending/native SID tie. Current data-vintage/native
+membership is not independently attested official point-in-time membership.
+REMX's unavailable global holdings are neither silently discarded from a
+claimed complete ETF nor renormalized into one. These are covered-subset
+stock experiments, not independently unbiased official-index backtests.
+
+`TPR-OWN-90` — native daily US Fundamental cap callbacks, captured as exact
+represented numeric text for tracked constituent SIDs only. Receipt/effective
+clocks must be no later than the original prior-session18NY cutoff, with
+EndTime's NY date matching that prior exchange session; today's or stale cap
+is refused. Capture Time, EndTime and receipt separately: native EndTime is
+not attested earliest publication or exact prior-close price. None, unknown,
+invalid/nonfinite and nonpositive remain separate coverage states. The native
+managed tapes are not independently byte-frozen/provider-PIT attested. The
+[QC fundamental universe documentation](https://www.quantconnect.com/docs/v2/writing-algorithms/universes/equity/fundamental-universes)
+and [native factory source](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Data/UniverseSelection/FundamentalUniverseFactory.cs)
+ground the daily native New York context; runtime metadata still must verify
+the actual context. All caps are used before any signal lookup/tilt.
+
+`TPR-OWN-91` — preserve Q1-2025 Jan2–Mar31,14 weekly09:20NY decisions using
+prior-session18NY cutoffs and60 valuations. Both arms use100000USD, whole MOO
+orders,09:35 cancellation,1cent/share,10bp slippage,1% prior-session volume,
+97% settled-cash buy budget/no anticipated sale proceeds, unlevered RAW
+split/dividend/action custody and exact NAV ledger. Six equal1/6 sleeves,
+missing slots cash/no ETF fallback/no renormalization,1/10 prior-close soft
+name target. This avoids importing AR dates/capital/costs or choosing dates
+after outcomes. Protected2026-09..2027-08 and sealed2027-09..2029-08 untouched.
+Matched control must reproduce membership, cap-input, selected-ID and base
+weight digests before attributing any difference to the tilt. Consolidated
+overlapping positions do not invent independent realized sleeve P&L.
+
+`TPR-OWN-92` — authorize exactly one necessary fresh bounded read of the
+existing own derived signal-packet.json (SHA256
+4dd3a9d800b7c1cb8114272c829ee18239972cc0a15c71e47a3e86ed6491a316)
+into this new study after a NEW manifest/access receipt, not reuse of spent
+D0/provider/outcome receipts. Preserve its raw nominal target-revision proxy
+to isolate construction; it is NOT canonical price-scaled TPR. OFF never
+reads the signal packet. Fresh native cap/membership/bar consumption occurs
+only inside two new private candidate projects with bounded operations,
+exact source/config/receipt hashes and persistent max3 attempts EACH. No old
+project overwrite, private/licensed rows or secrets in Git/review logs.
+Working rights authorization is not provider attestation; known restrictions
+remain respected. No subscription purchase/change, broker, operator database,
+funded/paper/live action, D0 reopening or unrelated provider exploration.
+
+`TPR-OWN-93` — new typed native delisting observer may qualify only verified
+unheld/unselected/never-ordered/never-filled/no-ticket events with both known
+clocks outside inclusive09:20–09:35. Unknown and nonambient refuse this new
+candidate's execution qualification. Original parent accounting/order handlers
+must still execute; no fabricated flat quantity, inferred UTC clock, open-only
+history or Filled-status-only history. Preserve the original strict diagnostic
+separately. This successor does not retroactively qualify old attempt3 or
+close its missing observer findings. Alternative blanket exception is refused.
+
+Prospective freeze: research/target_price_revisions_qc/cap_tilt_freeze.json,
+SHA256 cee64964545dd99f4f3555875caacc6898ce56d19f2130965398dc97617a9190.
+Before any inputs/outcomes the draft authority key reviewed_base was corrected
+to starting_snapshot; initial draft hash6c7d32 is superseded metadata, not a
+strategy change or attempt reset. Original fa78 is NOT reviewed. At this
+registration: new attempts0, new development looks0;12 historical observed
+runs remain immutable. This is adaptive/correlated exploratory development,
+formal alpha0, no confirmatory claim or winner selection. Required metrics:
+matched return/CAGR/daily-close drawdown/QC sampling discrepancy, volatility,
+Sharpe with risk-free0, partial2025 return only, turnover/costs/order failures,
+cash/gross/name exposure, cap/TPR coverage/selected counts/transfers/underfills,
+exact fee/quantity/cash/NAV parity. Negative/failed runs stay visible.
+
+Governing ETF blueprint identity verified:29pages, SHA256
+f6e98eef0dd5d54a0deb45718d64b00a8e9b0c3d211ffbe0edebdb4e80eec30b.
+Bundled pypdf supplied read-only extraction; pdftotext was unavailable. This
+prospective stock-construction experiment does not replace its price-scaled
+stock-first research/conditional ETF gates. No PDF or canonical freeze edited.
+The full lane suite remains Claude's independent task. Codex uses isolated
+in-process runtime-root focused checks only; native-Windows frozen-Git,
+signer/ACL/protected-parent custody limitations remain unchanged.
+
+### 72.2 Implementation, focused evidence and new operations
+
+Implementation and actual-run evidence will be appended here before handoff.
+No new private data operation, cloud launch or observed outcome has occurred
+at this registration. Exactly one final successful non-force push is reserved
+for the new stable reviewable snapshot; actual matching remote and clean state
+will be verified before/after publication from this same physical lane.
+
+`TPR-OWN-94` — prospectively bound complete own aggregate coverage logs at
+16384 characters (compact JSON), rather than the inherited8192 bound. A
+synthetic six-sleeve row actually measured8367 before compression and failed
+the old bound; widening only this new bounded protocol prevents silently
+truncated/refused hash/state evidence.4000-log,16MiB response and30second
+request bounds remain unchanged. No source rows/prices/caps/identities are
+logged; all such inputs are represented only by hashes and state counts.
+
+`TPR-OWN-95` — require one common selected-stock prior RAW mark/volume digest
+per decision, in addition to the four per-sleeve membership/cap/selection/base
+paths. Exclude holdings-only exits from that common input domain, retain
+explicit unavailable marks, and verify exact prior exchange-session dates.
+Different native mark inputs make the pair unmatched before performance
+attribution. Also verify both fresh projects' native LEAN version metadata.
+This is pre-launch completeness evidence, not a new economic parameter/look.
+
+`TPR-OWN-96` — commit source/prospective registration locally before preparing
+an empirical manifest (NO intermediate push). Any later correction requires
+a fresh HEAD/source-bound operation, persistent same candidate attempt counts,
+and explicitly bounded copying of this study's own immutable captured packet.
+A global spent claim permits the original derived-packet read only once;
+successor scopes do not reopen it, D0 or provider/outcome captures. New access
+and copy claims precede each necessary own-study copy. The private manifest
+pins the16 reachable pure source files, not just the cloud six-file bundle.
+Alternative uncommitted/implicitly reused source authority is refused.
+
+New unexecuted implementation: cap_tilt.py, cap_observer.py,
+cap_tilt_algorithm.py, cap_tilt_bundle.py, cap_tilt_operations.py,
+cap_tilt_driver.py and cap_tilt_audit.py, with focused synthetic tests.
+Executed cloud_algorithm_v2.py remains00f4f3a55ddca276a954e78bb550eaeaafc4b1b95051b3a7f64554edbae464e3;
+matched_algorithm_v3.py remainsa16d6279ab968bab8a3a439b56563aa693cae8d46f74b0e8831da152b6a90029;
+matched_audit_v3.py remainsb418be2fdd41479088b3f775b83548923c0e1aa67df309dbdb47c7956d7bde71.
+No old executed source/artifact or sibling/shared behavior changed.
+
+Pre-launch development findings (not canonical acceptance):
+
+| ID / severity | Evidence and disposition |
+| --- | --- |
+| TPR-CAP-001 / P1 | Confirmed wrong native FundamentalUniverse namespace in the first adapter draft. Main independently checked the official factory source; corrected native fixture produced6failed/31passed, then corrected adapter37passed. Corrected/resolved before any launch. |
+| TPR-CAP-002 / P1 | Confirmed missing post-parent delisting ticket observation. Peer safely reproduced parent-attached ticket incorrectly qualifying ambient; corrected sticky post-ticket/unknown capture and full pre/post history-unknown union. Parent exceptions still propagate. Peer reproduced ticket1/ambient0/refusal after correction,38tests green. Corrected/resolved; old missing observer findings stay open. |
+| TPR-CAP-003 / P2 | Confirmed complete coverage log exceeded inherited8192 bound:1failed/38passed on actual8367-character synthetic row. Compact bounded16384 successor protocol and regression restore39green. Corrected/resolved, no economic change. |
+| TPR-CAP-004 / P2 | Partially complete first matched-input audit omitted common prior price/volume path. Added selected-stock RAW mark hash/session and required pair equality before attribution, with missing/mutated/session/incomplete negative proofs. Corrected/resolved before outcomes. |
+| TPR-CAP-005 / P2 | Inherited operational failure wires could be discarded before API/identity validation. New controller retains redacted parsed wires/loading/conflicts first; token echoes still refused before retention. Focused actual red7failed then corrected green; old frozen response history is not relabeled/recreated. Corrected/resolved in successor. |
+
+Peer helper evidence is attributed execution, not an independent Claude review:
+cap selection/tilt84passed and8 killed in-memory mutants; pure observer103passed
+and10 killed mutants; initial auditor132passed/12 mutants, strengthened mark
+auditor146passed/4 additional mutants. Clean-first/finally-restored controls
+were green. Source/bundle/controller peer proofs are retained in the next
+validation reprise below. Root independently reproduced runtime40passed
+(including actual selected-mark hash matching/mismatch and packet-independent
+seven-context OFF initialization), and the focused document/import/active-doc,
+helper/observer/runtime/audit union590passed/1existingplatformskip in3.74s.
+The section8 identity guard adds only the exact unreviewed owner-authorized
+fa78 start; arbitrary/stale hashes and duplicate recognized roles still refuse.
+No full lane suite, actual operator-state/database read, native-Windows custody
+claim, cloud request, new input read or outcome look occurred in these checks.
+
+Root pre-operation final focused reprise:787passed/1existingplatformskip in
+5.43s across the new cap modules plus document/import/active-document checks.
+Peer packaging/controller/driver197new focused checks and313including bounded
+legacy compatibility checks were green; protocol7mutants gave12expected red
+checks/26original-restored controls, earlier packaging7gave14red/28green and
+controller8gave22red/44green. These are attributed peer validation, not Claude
+acceptance. Main syntax/bytecode checks write no caches; diff whitespace is
+clean. Main template is48246bytes before rendered placeholders, below60000.
+The source/controller protocol retains bounded parsed/redacted valid JSON
+response wires before API/identity gates; malformed/non-JSON bodies retain
+consumed failure metadata, not raw HTTP bodies. The auditor's hash-bound
+result is the unchanged own-portfolio projection (unrelated benchmark/market
+charts excluded for privacy), with full parsed original wire separately private.
+No empirical status/result is rewritten to qualify a failure.
+
+Pre-operation source identities:
+cap_tilt.py262f568b7c0fe0b08af8a26896431465c17746bcd32e9addc568f58631e11a5c;
+cap_observer.pycad8a3306f6b459bc8bf187c8fd8b8bb980c7b1dc0d85465fba11dd318b70c4d;
+cap_tilt_algorithm.pyc8804b43b9a25b5fe1ce3f8b5fac424c129c9e7b39a4ad0480b3fbd98e98ab37;
+cap_tilt_audit.py5f78a9af2d4bbe9da1939788ccd56a0c7a1804b511928ea577a646c0a0d07c5b;
+cap_tilt_bundle.py4815d53e8eff7038c67c39541eb29d56ea7072f17f64f749e3075e9898936f9a;
+cap_tilt_driver.pye93f20264f24eb99406a41198e555912c7a86aaa38295afba734e0ef024b11ed;
+cap_tilt_operations.pyd4d9b8e7500388e294a703ad7262a1e825a6c99762d8b0367bc10a52beb2904a.
+Fresh source/config/input/attempt/look receipts and actual run IDs/results
+follow below; until then attempts/looks remain0 and no QC completion is claimed.

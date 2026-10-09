@@ -394,6 +394,7 @@ SECTION50_SCOPE_BOUNDARIES = {
 SECTION8_STABLE_COMMITS = frozenset({
     "20e20d7f68d39d17af84d6a5c65e22b78dc57eb1",  # TPR-TR0-I code checkpoint
     "bb8dfb6e8d718f9371bbbd85b30f5f9a769f396e",  # reviewed TPR-0A snapshot
+    "fa78dacddb0061c305f040fb66487c72c432f3a0",  # unreviewed, explicit new owner scope start
 })
 SECTION8_BRANCH_RELATION_COMMITS = frozenset({"9e834713", "6590d890", "15bedb56"})
 SECTION8_ROLE_STATEMENT = (

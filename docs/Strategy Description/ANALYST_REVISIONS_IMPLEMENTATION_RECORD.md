@@ -402,7 +402,11 @@ now resides at that approved Code path. Its complete pre/post inventory
 preserves all names, bytes and other recorded metadata, but 21,593 regular
 files have changed ctime, so the strict preservation check refuses. No
 synthetic probe, post-move source reauthentication, production publication
-or R284 operation follows. No metadata waiver or rollback was applied.
+or R284 operation followed in section 272. No metadata waiver or rollback
+was applied. Section 273 records the owner's subsequent "yes, proceed" to
+bounded investigation and a separately frozen, scoped prospective fresh-use
+assessment before the still-uninvoked synthetic probe. The failed original
+preservation audit remains failed; no production guard or formal gate changes.
 The monitor stays paused.
 Real orders, paper/live deployment, funded accounts, broker access, and
 trading remain unauthorized. NO V2 SIGNAL HAS BEEN ACCEPTED AS FORMAL OR
@@ -1315,22 +1319,27 @@ Claude commit `b7169dc0` with documentary qualifications and focused in-root
 checks. Section 271 records the owner's explicit authorization for the
 reversible relocation trial, compatibility audit and bounded synthetic probe
 at `/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`.
-Claude must review section 272 and its exact final pushed snapshot; this is
-not an intermediate acknowledgement wait. The owner subsequently said
+Claude must review section 273 and its exact final pushed snapshot, including
+the still-unreviewed section-272 move; this is not an intermediate
+acknowledgement wait. The owner subsequently said
 "proceed" after the open-session concern was explained. Section 272 supersedes
 the session-exit prerequisite, without authorizing any process interruption.
 The physical move and audit are now recorded in 272.4: all bytes and other
 recorded fields match, but the strict comparison refuses 21,593 ctime changes.
-All repository work must now run solely at the approved new root. Keep the
-trial stopped before post-move loaders and the uninvoked probe; preserve both
-reports without rebaselining, retrying or rewriting history. The next external
-decision is how to disposition that metadata mismatch under an explicit safe
-contract, or whether to use the already-authorized controlled rollback; no
-actor or benign security cause is established by matching bytes. Claude must
-review the exact result and protocol before it is called acceptable evidence.
-This authorization does not clear ARV2E263-001 or permit a publication
-retry/R284 launch by itself. Lane-owned contract design remains delegated,
-but a supported security/consumed-byte contract is not established.
+All repository work must now run solely at the approved new root. Section 273
+records the owner's subsequent "yes, proceed" to the recommendation to keep
+that root, investigate the existing evidence, and freeze a separately scoped
+prospective fresh-use contract before any post-move loader or synthetic probe.
+Preserve both original reports without rebaselining, rerunning or rewriting
+history. No actor or benign security cause is established by matching bytes.
+The original preservation comparison remains failed; the new decision is not
+its acceptance. The one fixed source/security assessment and, only on its
+success, the already-frozen uninvoked ARV2OD272-A probe are defined in 273.3.
+Any failure remains spent and stops this sequence. Claude must review the
+exact result and protocol. This authorization does not clear ARV2E263-001,
+change production source guards or permit a publication retry/R284 launch by
+itself; finite sampled output evidence alone cannot establish production
+publication safety.
 Same-round advisory checks are not independent final review. On 2026-10-09
 the owner explicitly said "stop the monitor"; the matching-lane review
 monitor was paused and must not be rearmed without a new owner request.
@@ -3182,6 +3191,7 @@ Append one row before every push. Never rewrite earlier rows.
 | 2026-10-09 | Codex section-269 counter-review and boundary/authority clarification | `279f37ee..b7169dc0` (one new Claude record commit) -> this section-270 record commit | Accepted after three documentary qualifications; no executable or publication-contract change; owner-stopped monitor remains paused | Preserve Claude's reported evidence with explicit out-of-root and strict/loopback qualifications; no relocation, host-setting change, external temp path, probe or production/QC retry | 45 focused strict-network-denied passes, four byte pins and profile verified; final record gates in 270.3; no full Codex suite | ARV2E263-001 and independent formal evidence remain; 313/239/49/699 unchanged | One final matching-lane push at the concrete barrier; Claude must review section 270; supported remedy or explicit relocation exception required, no monitor rearm |
 | 2026-10-09 | Codex owner-authorized relocation preflight and durable permission record | `44d85d4b` -> this section-271 record commit | Exact old/new roots and reversible trial scope approved; read-only worktree/process and tracked-loader compatibility checks | No move, destination creation, private-artifact census, probe, source/helper change, publication or QC request; preserve all other sessions | Focused record gates below; no full suite or backtest | Three live Claude processes hold the old root; historical path-bound plans are not transparently relocatable; ARV2E263-001 remains | Coordinate session exit, recheck state, complete audit and freeze one new bounded probe; one final lane push at this coordination barrier; monitor remains paused |
 | 2026-10-09 | Codex authorized whole-worktree relocation trial | `4e4a6bfb` -> `dc06ed32` protocol/source freeze and final section-272 result commit | Owner says proceed after session clarification; whole worktree moved to approved Code root on unchanged branch | Complete pre/post census preserves names/bytes/other recorded fields but refuses 21,593 ctime changes; four pre-move source authentications succeeded with existing qualifications; no post-move loader or synthetic probe | 154 distinct focused strict-denied passes, four static compilations; final record checks nonadditive; no full suite | 1,837 of 1,839 artifacts have ctime-only changes; historical absolute-path bindings remain qualified; ARV2E263-001 and formal evidence gates remain | Preserve new root and both exclusive reports; no waiver, retry or automatic rollback; exactly one final matching-lane push, Claude review of section 272; monitor paused |
+| 2026-10-09 | Codex authorized prospective scoped fresh-use assessment | `ac951360` -> section-273 source/protocol freeze and final result commit | Owner approves bounded investigation and a new scoped security/consumption contract, not failed-audit acceptance | Exact 15 source leaves in four existing packages; current security envelope around unchanged fresh loaders; conditional original ARV2OD272-A only | Focused strict-denied tests and actual one-shot results recorded below; no full suite | Historical ACL/xattr equivalence, actor causality, whole-worktree execution compatibility and production safety remain unproven | Preserve all evidence; no retry or R284 bypass; exactly one final matching-lane push; Claude exact-snapshot review; monitor paused |
 
 ## 6. Project-wide `main` synchronization conflict review, 2026-08-31
 
@@ -39644,3 +39654,229 @@ Independent vendor immutable history, reviewed security-master identity,
 scores, cutoff-valid prior-close prices and other formal gates remain;
 readiness/action flags remain false. No funded account, broker, paper/live
 deployment or real-order authority follows from the move or these diagnostics.
+
+## 273. Owner-authorized investigation and prospective scoped fresh-use contract, 2026-10-09
+
+### 273.1 Authority, exact scope and historical dispositions
+
+After section 272 stopped at the failed preservation comparison, the owner
+asked for a recommendation and then explicitly said **"yes, proceed"** to
+keeping the new root, a bounded read-only investigation, and, if justified,
+a separately documented/tested prospective fresh-use contract with security
+checks before source reauthentication and the uninvoked synthetic probe.
+This direction does not authorize changing macOS protections, attribute
+stripping, changing the production source helper, accepting the original
+audit, or automatically publishing/launching R284.
+
+The sole operative root remains
+`/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2`, on
+`codex/strategy-analyst-revisions-v2`. The old Documents path is historical;
+no old-root command, symlink, scratch checkout or new branch is used. Starting
+HEAD and the matching-branch-only fetched remote both equal
+`ac9513601b1b81ebd5cbe63f04a81f34e800b577`; the worktree was clean before this
+round. This is a continuation of owner-authorized implementation, not a new
+Claude review trigger. Codex's prior `dc06ed32` source/protocol and `ac951360`
+result commits are retained with the **failed** preservation disposition in
+272.4, not labelled independently reviewed or accepted by this round.
+No new Claude commit is being disposed here. Same-round agents provide
+advisory implementation/testing only, not independent final review.
+
+The existing monitor remains paused at the owner's direction. No chat is
+messaged, Claude session launched/interrupted or host protection altered.
+Local protocol commits precede actual one-shot use; there is no intermediate
+push or acknowledgement wait. The continuous range starts at the exact
+`ac9513601b1b81ebd5cbe63f04a81f34e800b577` baseline and ends with the final
+section-273 result commit, followed by one successful matching-lane push.
+
+### 273.2 Bounded investigation and why a fresh-use decision is separate
+
+Strict-network-denied parsing authenticated both original report hashes from
+272.4 before examining their metadata. All 21,593 ctime-only differences
+are positive and distinct, falling between
+**2026-10-09 20:19:55.150897009 and 20:19:59.784999387 UTC** (4.634102378
+seconds). The 1,837 changed artifact files occupy 0.382002337 seconds of that
+interval. Every changed file has one link and the UF_TRACKED bit; 4,903 have
+flags 64 and 16,690 have flags 32832. Of the 33 unchanged files, 30 have two
+links/flags 32832 and three have one link/flags 32768. This is an association,
+not process attribution or proof of a safe cause. Empty files also changed.
+
+The current `before.json` mtime is 20:19:33.108896573 UTC; its ctime is
+20:19:55.614812138 UTC. Subject to the retained mtime being truthful, the
+recorded source ctime changes followed baseline-report writing, rather than
+occurring during its earlier census. This does not identify the move, Git,
+document tracking, an agent or another actor as the cause. One initial
+read-only parser assumed Python exposed `st_birthtime_ns` and failed;
+subsequent birthtime was explicitly treated as approximate float evidence,
+not a nanosecond timestamp. No report or source was rewritten.
+
+A bounded lstat of only the 15 required source leaves agrees with every field
+in the pinned `after` report, including ctime, with **zero additional
+metadata changes**; their flags are twelve 64 and three 32832. This endpoint
+observation is not continuous stability. A names-only listing of the Code,
+repository and private artifact directories showed `com.apple.provenance`
+and no displayed ACL entries; it is not used as a complete security proof.
+
+[Apple's stat documentation](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/lstat.2.html)
+defines ctime as status-change time; it is not a cause/actor receipt. The
+decision below therefore **does not waive ctime for an already-consumed
+buffer**. It confines use to freshly read bytes under the original manifest
+pins and independently checks current discretionary-access metadata. Original
+ACLs/xattrs were not inventoried, so historical security equivalence cannot
+be reconstructed and is expressly not claimed. The whole-worktree comparison
+remains failed, including all its ctime findings and 171 path-bearing artifact
+qualifications. No rerun, corrected baseline or broad execution-compatibility
+claim is substituted for it.
+
+### 273.3 Prospective contract and one-shot protocol frozen before use
+
+**273-D1 — authorize scoped fresh use, not preservation acceptance.** Under
+the owner's delegated lane authority and explicit direction above, a separate
+`arv2-relocated-source-fresh-use-v1` assessment may authenticate only the four
+packages/15 leaves pinned in 272.2. Its implementation is
+`scripts/assess_arv2_relocated_sources.py`, with the read-only Darwin observer
+`scripts/arv2_relocation_security.py`. All original source loaders, their
+manifest pins, collision/refusal policies, production metadata equality and
+the census helper remain unchanged.
+
+The exact contract is:
+
+1. Authenticate both original census report hashes; require both complete,
+   the correct schemas/stages and the retained `matches_before=false`.
+   For each selected source leaf, require identical old/new bytes and all
+   historical metadata except the already-recorded forward ctime change.
+   This comparison is only scope selection, not a new passed original audit.
+2. Resolve directories from absolute paths without following symlinks. Pin
+   current directory objects from the owner-held Code anchor downward,
+   requiring current owner, Code/private-directory 0700 and repository 0755.
+   Only UF_TRACKED/UF_HIDDEN flag bits are allowed; every later snapshot must
+   match. Trust in higher ancestors, the kernel and privileged host remains.
+3. Open and hold each regular source leaf no-follow; require **every current
+   field including ctime** to equal its pinned post-move census record,
+   current owner, 0600, one link and at most 8 MiB. Pin held/named identity,
+   hash the held bytes against the historical hash, and keep descriptors open
+   through the fresh source loaders and final checks. New drift refuses; no
+   wait-until-pass or new baseline is available.
+4. Observe native descriptor-bound ACLs and accessible extended attributes
+   before and after consumption, with held stat equality around each
+   observation. Extended ACLs must be absent or exactly empty/unflagged;
+   unknown/error/nonempty cases refuse. Darwin's NULL/ENOENT for absent
+   FILESEC_ACL on a valid held descriptor is distinguished from other errors
+   using Apple's implementation, not a pathname-absence assumption. No ACL
+   mutation or user/group-name resolution is needed.
+5. Bound xattr names to 8 KiB and total value buffers to 64 KiB. Only
+   `com.apple.provenance` is admitted when accessible; its value is read only
+   into bounded memory and represented by length/SHA-256. No raw value is
+   returned, logged or persisted, and no semantics or actor identity is
+   inferred. Recheck the names, ACL and full held stat; compare snapshots
+   across consumption. Unknown names, failures or drift refuse. Native
+   SHOWCOMPRESSION is used, but caller-inaccessible attributes remain outside
+   the observable set, as qualified by
+   [Apple's listxattr documentation](https://developer.apple.com/library/archive/documentation/System/Conceptual/ManPages_iPhoneOS/man2/listxattr.2.html).
+6. Invoke the unchanged public identity, RAW-price, current identity and
+   vintage projection loaders with their original manifest pins and explicit
+   relocated price binding. The newly consumed manifest/payload buffers are
+   authenticated by these loaders; no pre-move buffer is reused. Recheck
+   held/named source objects, full metadata, bytes, current security snapshots
+   and directory identities after all four consumers. Even change-and-restore
+   of bytes/mtime refuses through ctime; hashes alone are insufficient.
+
+The ACL ABI/absence and entry conventions were checked against the installed
+SDK and Apple's primary implementations:
+[acl_file.c](https://raw.githubusercontent.com/apple-oss-distributions/Libc/main/posix1e/acl_file.c),
+[statx_np.c](https://raw.githubusercontent.com/apple-oss-distributions/Libc/main/sys/statx_np.c),
+[filesec.c](https://raw.githubusercontent.com/apple-oss-distributions/Libc/main/gen/filesec.c),
+[acl_entry.c](https://raw.githubusercontent.com/apple-oss-distributions/Libc/main/posix1e/acl_entry.c)
+and [acl_translate.c](https://raw.githubusercontent.com/apple-oss-distributions/Libc/main/posix1e/acl_translate.c).
+The native observer makes read-only calls; it is not an operating-system
+policy change or an import into the shared production source helper.
+
+Invoke **once**, only after source/protocol commit, under strict network denial:
+`python -B -m scripts.assess_arv2_relocated_sources`. The CLI has no override
+path and requires both cwd and module root to equal the operative root. It
+exclusively allocates
+`artifacts/analyst_revisions_v2/relocation_trial/R273-20261009-A`, writes one
+private bounded report (maximum 128 KiB), and retains the directory/report or
+pending evidence on any refusal. No invocation retry or replacement identity
+is authorized. Error reporting is bounded/redacted, without private row data
+or raw attribute values. The existing report publisher pins allocation,
+0600, owner/group, links, flags and held/named metadata, fsyncs and performs
+exact readback. The new output-directory guard requires initially empty
+names, the allocated identity/security fields, and exactly `report.json`
+afterward. On this fixed APFS lane, the one net-new report accounts for
+exactly one directory link-count increment; other identity/security changes
+and extra leaves refuse. Report publication itself does not acquire the
+source observer's native ACL/xattr envelope; no stronger confidentiality or
+continuous-stability property is claimed for the report.
+
+Success requires complete source/security authentication with no refusal,
+successful CLI exit, external report hash/readback and final directory checks,
+not just a written report. The report's `complete`/`source_reauthenticated`
+flags describe its pre-publication assessment; they are serialized before
+final publication checks and cannot alone establish successful completion if
+those later checks fail. If it succeeds, **273-D2** prospectively replaces
+only the failed historical-preservation prerequisite for the uninvoked
+ARV2OD272-A synthetic observation. All its other frozen source/profile/path,
+two-case, 22-poll, 30-second, 45-second cooperative-bound conditions in 272.2
+remain unchanged. Invoke that original identity once, never the spent R266
+identity or a replacement. Any assessment/probe refusal stops this sequence
+and retains evidence; no retry, repair or production publication follows.
+
+This is current, scoped source consumption, not proof about previously open
+handles, historical security equivalence, hidden attributes, uninterrupted
+stability or every relocated artifact. It grants no formal source admission
+or strategy readiness. A finite successful synthetic observation would not
+alone prove future production publication safe. R284 remains independently
+gated and is not automatically prepared/launched. Failed continuity A/B leaves
+remain untouched; all readiness/action flags stay false and the accounting
+floor stays **313 / 239 / 49 / 699**. The missing independent immutable vendor
+history, reviewed security master, scores and cutoff-valid prices remain.
+
+### 273.4 Focused validation and actual results
+
+The two new modules and their synthetic tests have these frozen byte pins:
+
+| File | SHA-256 |
+|---|---|
+| `scripts/arv2_relocation_security.py` | `3435bc07573697d682f25ea15fd2bfd10c5baf8220c184f73ae877016bae4a30` |
+| `scripts/assess_arv2_relocated_sources.py` | `3ff39278a03bfce175d8683f6d980f949379aa674522a1087949f2feacea0f44` |
+| `tests/analyst_revisions_v2/test_relocation_security.py` | `97afaaa0353e34cc265d89f29a59bd490528d35e3e12e8afb39bb3402bda5a68` |
+| `tests/analyst_revisions_v2/test_relocated_source_assessment.py` | `18d331386251d78830d785f3ddca8eb44d0487f9941dc234e50c1205db9795b8` |
+
+Same-round advisory implementation checks report **56 security tests passing
+in 0.74 seconds** and **64 assessment tests passing in 0.51 seconds**, all
+strict-network-denied with fresh operative-root temporary paths. The native
+observer's earlier 48-pass/1-failure run (0.73 seconds) exposed the absent-ACL
+NULL/ENOENT distinction, corrected against Apple's implementation rather
+than by dropping the ACL check. Assessment development earlier had 55 passes/
+2 failures (0.78 seconds), plus one isolating failure, because publishing its
+own report changes APFS directory nlink. The explicit own-entry rule above
+corrects that, while tests reject other metadata changes, directory swaps and
+additional leaves. Each module's ctime-omission in-memory mutation was caught
+by one expected failing test (0.65 and 0.51 seconds); original functions were
+restored in `finally`, with no changed source-file bytes.
+
+Root inspected the code/tests and ran the combined focused selection. The
+initial run had **241 passes / 1 failure in 1.77 seconds**: the live next-step
+sentence still named section 272 for review instead of explicitly naming
+273. The handoff sentence was corrected, without changing the test. The
+failure's traceback carried an inherited cached Python code filename with
+the historical path; the command/cwd/resolved test files were at the new
+root. Subsequent validation uses a fresh in-root PYTHONPYCACHEPREFIX as well
+as TMPDIR/basetemp, without deleting the retained old caches.
+
+Four static compilation checks pass, `git diff --check` is clean, and the
+original audit/probe/test hashes remain the 272.2/272.3 pins. The unchanged
+shared source helper hash is
+`17e516b4cc721c7f97c4690f54dfcc9d2d11d8cebd413100f2e2ffa68e663ca2`.
+No real assessment or probe has run at this protocol-writing point. Final
+focused results, local freeze identity and actual one-shot disposition are
+recorded below before the single final push.
+
+Root's corrected pre-action selection passes **242 distinct focused tests in
+2.38 seconds**: 56 native-security, 64 assessment, 36 original flags-probe and
+86 record/document checks. All run under strict network denial with fresh
+new-root TMPDIR/basetemp/cache prefix. Repeats are nonadditive. No full Codex
+suite, real probe, source acquisition, provider/QC request or research look
+is included in this count. Same-round advisory code review also identified
+the pre-publication report-flag caveat, now explicit in the frozen acceptance
+rule. The result below must include CLI success and external readback.

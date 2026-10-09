@@ -81,6 +81,19 @@ def test_exact_request_fields_and_no_secret_artifacts(tmp_path):
         assert not any(secret in path.read_text() for secret in ("fabricated-client", "fabricated-secret", "fabricated-token"))
 
 
+def test_optional_page_count_header_uses_exact_array_length_not_unverified_completion(tmp_path):
+    actual_headers = headers()
+    actual_headers.pop("Total-Records-On-Page")
+    opener = Opener(setup_responses(Response(rows(), actual_headers)))
+    pages, receipts, _ = capture._capture(tmp_path, ("fabricated-client", "fabricated-secret"), opener,
+                                         tickers=["AAPL"], dates=["2026-07-15"])
+    assert len(pages) == 1
+    assert receipts[0]["records"] == receipts[0]["total"] == 1
+    assert receipts[0]["page_count_origin"] == "exact_json_array_length"
+    transport = json.loads((tmp_path / "2026-07-15-page-00-transport.json").read_text())
+    assert transport["pagination_headers"]["Total-Records-On-Page"] is None
+
+
 @pytest.mark.parametrize("change", ["missing_total", "wrong_offset", "wrong_count", "wrong_limit", "too_many", "wrong_version", "invalid_header"])
 def test_bad_pagination_refused(tmp_path, change):
     altered = headers()
@@ -127,6 +140,14 @@ def test_page_bound_is_not_completion(tmp_path):
         capture._capture(tmp_path, ("fabricated-client", "fabricated-secret"), opener,
                          tickers=["AAPL", "MSFT"], dates=["2026-07-15"])
     assert len(opener.requests) == 4
+
+
+def test_whole_round_remaining_request_budget_is_enforced_before_next_query(tmp_path):
+    opener = Opener(setup_responses(Response(rows(), headers())))
+    with pytest.raises(capture.CaptureRefusal, match="source_request_budget_exhausted"):
+        capture._capture(tmp_path, ("fabricated-client", "fabricated-secret"), opener,
+                         tickers=["AAPL"], dates=["2026-07-15", "2026-07-31"], source_request_budget=1)
+    assert len(opener.requests) == 3  # auth + metadata + only one data query
 
 
 def test_actual_returned_length_controls_next_offset(tmp_path):

@@ -14377,3 +14377,59 @@ SESSION_HANDOFF stay frozen. No email/monitor, paid terms, price/volume/
 outcome/holdout, QC processing/project/upload/compile/job/backtest, production
 ranking/seed, ETF, broker, operator database, deployment, paper/live, capital,
 actual order or trading action is authorized by it.
+
+### 104.4 Observed optional-header incompatibility and bounded correction
+
+The prospective code/record freeze is commit
+**`8cb60ebe2644946a9bf132ad07158e687a130a0e`**, made before market-row
+retrieval. Run `finra-source-20261009T205105Z` published protected protocol/
+start receipts, authenticated, verified production metadata and received the
+first June-30 page, then **refused** with
+`missing_or_invalid_pagination_header`. It is not a completed capture, a
+successful comparison, or a backtest failure/QC attempt. The refused run and
+all original receipts remain immutable; no row values enter Git or chat.
+
+A single deliberate identical June-30 header diagnostic independently
+established HTTP **200**, **Record-Total 8 / Offset 0 / Limit 100 /
+Max-Limit 5000 / Data-Version 1**, but **Total-Records-On-Page absent**.
+Its raw payload is byte-identical to the refused page, SHA-256
+`d567d1e2c143774a9a93d07fc063ec8664500ce3a7e3c0a89cb41a6e8195bc20`.
+The eight raw rows contain exactly the nine requested fields, numeric SI
+quantities and null revision/split flags. That is a partial schema observation,
+not coverage admission or completion of the remaining three cycles.
+
+The [API response-header documentation](https://developer.finra.org/docs)
+says headers **may** include the page-count header. The earlier implementation
+incorrectly made this optional header mandatory; it was a safe false refusal,
+not a provider-data defect or reason to waive completion proof. Append this
+qualification to subsection 104.2's general pagination wording: verify every
+provided header, require total/offset/limit/max/version, derive received count
+from the exact JSON array length, and additionally cross-check the optional
+page-count header **when present**. Invalid or discrepant supplied counts,
+absent required totals, changed totals, wrong offsets/version/domain, repeated
+pages and exhausted bounds still refuse. Completion still requires observed
+offset plus exact received count to equal the provider's total.
+
+Codex first reproduced the false refusal with **one failed focused test**,
+then made only that transport correction and added whitelist-only protected
+page transport receipts *before* validation so future refusals retain their
+evidence. No Authorization, token or API account identifier is recorded.
+The pure protocol hash, sample/date/field selection, exact quantity/flag
+rules, 48/36 denominators and authority closures are **unchanged**. This is
+not a post-data change to a signal, outcome selection, comparison tolerance
+or research claim.
+
+* **SI-DEC-20261009-06:** make exactly one identical source-only diagnostic
+  request to identify the concrete missing transport field; retain the failed
+  run rather than overwrite or count it as complete.
+* **SI-DEC-20261009-07:** correct the verified optional-header false refusal,
+  validate and commit it before **one deliberate** re-execution of the same
+  frozen sample. No automatic retry or arbitrary expansion. Two source POSTs
+  have been used; the corrected run's explicit remaining source-request
+  budget is **six**, so whole-round source POSTs cannot exceed **eight**.
+  Per-capture pagination remains at most two pages per settlement. A further
+  refusal ends this round's acquisition instead of starting another loop.
+
+The final corrected-run result and validation are appended below; they are
+not inferred from the partial page or header diagnostic. No owner decision
+or new credentials are required for this bounded technical correction.

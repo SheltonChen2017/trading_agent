@@ -190,7 +190,9 @@ def _validate_metadata(metadata, headers) -> None:
         raise CaptureRefusal("metadata_fields")
 
 
-def _capture(directory: Path, credentials: tuple[str, str], opener, *, tickers: list[str], dates: list[str]):
+def _capture(directory: Path, credentials: tuple[str, str], opener, *, tickers: list[str], dates: list[str], source_request_budget: int = 8):
+    if type(source_request_budget) is not int or not 1 <= source_request_budget <= 8:
+        raise CaptureRefusal("invalid_source_request_budget")
     basic = base64.b64encode((credentials[0] + ":" + credentials[1]).encode()).decode()
     token_raw, _ = _request(opener, urllib.request.Request(
         TOKEN_URL, data=b"", method="POST",
@@ -208,6 +210,7 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *, tickers: 
     _validate_metadata(_decode(metadata_raw), metadata_headers)
     _publish(directory, "production_metadata.json", metadata_raw)
     pages, receipts = [], []
+    source_requests = 0
     for settlement in dates:
         offset, total, seen = 0, None, set()
         for page_number in range(2):
@@ -215,18 +218,43 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *, tickers: 
                     "domainFilters": [{"fieldName": "symbolCode", "values": tickers}],
                     "sortFields": ["symbolCode"], "limit": 100, "offset": offset, "async": False}
             request = urllib.request.Request(DATA_URL, data=canonical_json(body).encode(), method="POST", headers={**headers, "Content-Type": "application/json"})
+            if source_requests >= source_request_budget:
+                raise CaptureRefusal("source_request_budget_exhausted")
+            source_requests += 1
             started = _utc_now()
             raw, response_headers = _request(opener, request, 1048576)
             completed = _utc_now()
             name = f"{settlement}-page-{page_number:02d}.json"
             _publish(directory, name, raw)
+            # Keep whitelist-only transport evidence even if validation refuses
+            # the page. Never persist Authorization or other credential headers.
+            pagination_headers = {name: response_headers.get(name) for name in (
+                "Record-Total", "Record-Offset", "Record-Limit", "Record-Max-Limit",
+                "Total-Records-On-Page", "Data-Version",
+            )}
+            _publish_json(directory, f"{settlement}-page-{page_number:02d}-transport.json",
+                          {"request_sha256": hash_bytes(canonical_json(body).encode()),
+                           "response_raw_sha256": hash_bytes(raw), "request_started_utc": started,
+                           "response_completed_utc": completed, "http_status": 200,
+                           "pagination_headers": pagination_headers, "source_request_number": source_requests})
             rows = _decode(raw)
-            count = _integer_header(response_headers, "Total-Records-On-Page")
+            if not isinstance(rows, list):
+                raise CaptureRefusal("pagination_contract")
+            # FINRA documents that response headers *may* include a page count;
+            # observed production omits it. Exact array length is independently
+            # cross-checked against required total/offset/limit and any supplied
+            # page-count header. Its absence never implies retrieval completion.
+            count = len(rows)
+            page_count_origin = "exact_json_array_length"
+            if response_headers.get("Total-Records-On-Page") is not None:
+                if _integer_header(response_headers, "Total-Records-On-Page") != count:
+                    raise CaptureRefusal("pagination_contract")
+                page_count_origin = "header_verified_against_exact_json_array_length"
             found = _integer_header(response_headers, "Record-Total")
             reported_offset = _integer_header(response_headers, "Record-Offset")
             limit = _integer_header(response_headers, "Record-Limit")
             maximum = _integer_header(response_headers, "Record-Max-Limit")
-            if not isinstance(rows, list) or count != len(rows) or count > 100 or limit != 100 or maximum < limit or reported_offset != offset or found > 200 or found < offset + count or response_headers.get("Data-Version") != "1":
+            if count > 100 or limit != 100 or maximum < limit or reported_offset != offset or found > 200 or found < offset + count or response_headers.get("Data-Version") != "1":
                 raise CaptureRefusal("pagination_contract")
             for row in rows:
                 if isinstance(row, dict) and (
@@ -244,7 +272,8 @@ def _capture(directory: Path, credentials: tuple[str, str], opener, *, tickers: 
             pages.append(raw)
             receipts.append({"file": name, "raw_sha256": digest, "request_sha256": hash_bytes(canonical_json(body).encode()),
                              "request_started_utc": started, "response_completed_utc": completed,
-                             "settlement_date": settlement, "offset": offset, "records": count, "total": total, "data_version": "1"})
+                             "settlement_date": settlement, "offset": offset, "records": count, "total": total, "data_version": "1",
+                             "page_count_origin": page_count_origin})
             offset += count
             if offset == total:
                 break
@@ -261,6 +290,8 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--expected-protocol-sha256", required=True)
     parser.add_argument("--credential-file", type=Path, required=True)
     parser.add_argument("--run-id", required=True)
+    parser.add_argument("--source-request-budget", type=int, default=8,
+                        help="remaining whole-round source POST budget, at most eight")
     args = parser.parse_args(argv)
     directory = None
     stage = "preflight"
@@ -271,6 +302,8 @@ def main(argv: list[str] | None = None) -> int:
             raise CaptureRefusal("protocol_hash_mismatch")
         if re.fullmatch(r"finra-source-[0-9]{8}T[0-9]{6}Z", args.run_id) is None:
             raise CaptureRefusal("invalid_run_id")
+        if not 1 <= args.source_request_budget <= 8:
+            raise CaptureRefusal("invalid_source_request_budget")
         protocol = qualification_protocol()
         if tuple(protocol["requested_fields"]) != FIELDS:
             raise CaptureRefusal("request_field_drift")
@@ -280,13 +313,15 @@ def main(argv: list[str] | None = None) -> int:
         directory = _prepare_capture_directory(target)
         _publish_json(directory, "protocol.json", protocol)
         _publish_json(directory, "start.json", {"started_utc": _utc_now(), "code_head": args.expected_head,
-                                               "protocol_sha256": PROTOCOL_SHA256, "scope": "finra_only_si_source_qualification", "no_outcomes": True})
+                                               "protocol_sha256": PROTOCOL_SHA256, "scope": "finra_only_si_source_qualification", "no_outcomes": True,
+                                               "maximum_source_requests": args.source_request_budget})
         credentials = _read_credentials(args.credential_file)
         _guard_lane(root, args.expected_head)
         stage = "authenticated_capture"
         opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirect())
         pages, receipts, metadata_sha = _capture(directory, credentials, opener,
-                                               tickers=protocol["tickers"], dates=protocol["settlement_dates"])
+                                               tickers=protocol["tickers"], dates=protocol["settlement_dates"],
+                                               source_request_budget=args.source_request_budget)
         stage = "source_qualification"
         report = qualify_finra_snapshot(pages, expected_protocol_sha256=PROTOCOL_SHA256).to_payload()
         _publish_json(directory, "transport.json", {"code_head": args.expected_head, "protocol_sha256": PROTOCOL_SHA256,

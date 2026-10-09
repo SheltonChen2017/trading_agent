@@ -12709,3 +12709,152 @@ cap_tilt_driver.pye93f20264f24eb99406a41198e555912c7a86aaa38295afba734e0ef024b11
 cap_tilt_operations.pyd4d9b8e7500388e294a703ad7262a1e825a6c99762d8b0367bc10a52beb2904a.
 Fresh source/config/input/attempt/look receipts and actual run IDs/results
 follow below; until then attempts/looks remain0 and no QC completion is claimed.
+
+### 72.3 Actual source-bound operation and persistent attempts
+
+Source/prospective-registration commit82012b68164c33092fd17c690199e9b3035a6f21
+is local only at this point; zero new-round pushes. Remote remained exactfa78
+immediately before that commit. The scope001 manifest pins this HEAD and16
+reachable source hashes:2da582b33a2b89a015ed57f417cfbbc473498d45a8030594b63fabb921e00759.
+Rendered bundle907b7873ccf0fd4c786090703da0743221d8b0adcc314fe0691555e46d52ba51.
+Fresh access/manifest/bundle/global original-read/packet-read receipts preceded
+the sole expressly scoped necessary old derived-packet read. Its exact hash
+verified; no D0/provider/outcome capture was reopened. Authentication succeeded
+using already present QC environment credentials; no credential contents were
+printed, rotated, persisted in Git or used for broker actions.
+
+Fresh private projects: ON37600675, OFF37600676; owner verified, same native
+LEAN version18178,64000 actual file quota (bundle conservatively capped60000),
+no collaborator/nonowner exposure. Exact six-file source readbacks matched.
+New private object keytpr-cap-tilt/TPR-CAP-TILT-20261009-v1/
+4dd3a9d800b7c1cb8114272c829ee18239972cc0a15c71e47a3e86ed6491a316.json
+was uploaded once to this study's organization; OFF does not read it.
+
+| Candidate | Config SHA256 | Rendered main.py SHA256 |
+| --- | --- | --- |
+| TPR-CAP-TILT-ON-BASE-v1 | c37f15a64efa2757a8cd9c9df4080d8050bb364dbecbdc42f8a4e40541176278 | bd419672cb2fcf90074a506cd6468f141dae006d7f57ec7f723bfb165e009f4d |
+| TPR-CAP-TILT-OFF-BASE-v1 | 4fcd1758522670273fd7318931fffc8b9626b9ea10b4c1994a784c5e5240424e | da53a71c78f5e4170278f064330ea70951dbb2684675ca37940bec947801a805 |
+
+Common cloud proxy_core.py3e9493a8cb4bfc530d848c4e31998b8a2acf4f9d6b70589d34481e6a39ce72ab;
+signal_packet.py5e6acee2860c261b2094b94188912a4720fa419fcc4f7bded35ad5ba2b890faa;
+pure helper/observer match72.2. Both config module hashes and all receipts are
+retained in the private source bundle/readbacks and final evidence index.
+
+ON attempt1 was permanently reserved BEFORE compile. Compile
+e703e1b92b3e4dd06bba12ecbbfd03de-a1c888ca9bd3a6c718a44757c768504c
+was independently verified BuildSuccess and exact source again before launch.
+Backtest e05e35c49377dd56bd87682d90f20084 launched2026-10-09T23:21:48.292625Z
+in project37600675, with a look receipt preceding the API request. First
+status In Queue..., not terminal/completed and not evidence of orders or
+strategy readiness. At this event: ON attempts1/new cloud looks1, OFF attempts0;
+historical12+new1=13 observed/consumed development looks conservatively. No
+later arm is tuned after an earlier result. Status/failures and any corrections
+will be appended, never overwritten or used to reset these candidate IDs.
+
+### 72.4 ON attempt1 failed; native final-fill compatibility successor
+
+The first ON job terminated Runtime Error on2025-03-07 (completedTrue,
+errorTrue). It did NOT complete the frozen Jan2–Mar31 comparison. Exact error:
+RAW custody refused: non-RAW security normalization. Its accompanying registry
+inventory nevertheless contained one external RAW MINUTE QUOTE and one
+external RAW MINUTE TRADE subscription. Preserve the error, stack, loading
+responses and all252 filled-status native orders;251 were MOO type4 and one
+was Market type0 tagged Liquidate from delisting. The first terminal collection
+has52 MATCHED aggregate logs, no collection errors, and a pure-audit refusal.
+No performance comparison is accepted from this failed/incomplete job.
+
+Private collection prefixTPR-CAP-TILT-ON-BASE-v1.attempt.1.collection.0001
+retains result/logs/order pages/source receipt/config. Its result projection
+SHA256d4d14604147aa9aa677b042c14287517e402e63d4fbde36abc5325a4f95a4446.
+Fresh failure-review and order-cause spent claims preceded necessary scoped
+inspection of this study's own failed result and order-type/tag aggregates;
+no licensed rows, symbols, quantities or prices were printed in review logs.
+Repeated own-job collection/diagnosis does not reset attempts or create another
+launch. Counts remain ON1/OFF0, one new cloud look,13 total including history.
+
+Public LEAN source independently explains a compatible failure mechanism:
+[Security.Reset and obsolete scalar](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Securities/Security.cs)
+empties the attached subscription bag and refreshes its compatibility scalar
+to Adjusted. The authoritative registry can still retain RAW configurations.
+[Native final liquidation](https://raw.githubusercontent.com/QuantConnect/Lean/master/Engine/TransactionHandlers/BrokerageTransactionHandler.cs)
+creates a MarketOrder, registers its history and adjustment mode, sets Filled,
+updates native portfolio and invokes the user callback before on_data.
+[Order cloning](https://raw.githubusercontent.com/QuantConnect/Lean/master/Common/Orders/Order.cs)
+preserves status/adjustment mode. OrderFee.Zero uses the zero/QCC native null
+currency sentinel, not a fabricated USD cent fee. Current public source is
+explanatory evidence, not attestation of the cloud's exact18178 source. The
+failed v1 did not capture IsDelisted/empty bag/current typed final evidence:
+those flags are inferred, not retroactively proven for attempt1.
+
+| ID / severity | Evidence and disposition |
+| --- | --- |
+| TPR-CAP-006 / P1 | Confirmed scalar-vs-registry runtime refusal with RAW global inventory and an actual native Market liquidation order. The exact lifecycle explanation is source-backed inference until a successor dynamically proves every native condition. Correct using an identified v2 only; failed attempt1 remains failed. |
+| TPR-CAP-007 / P1 interpretability | Native held/final liquidation is nonambient Market/zero-QCC-fee, outside ordinary frozen MOO/cent-per-share order and ambient-observer qualification. Open diagnostic limitation. Do not remove the member, alter dates, synthesize a fee/MOO, or relabel a completed job as qualified. |
+| TPR-CAP-008 / P1 pre-execution | Peer source review caught the first unexecuted v2 draft requiring USD for native zero-fee liquidation; official zero fee is QCC. Corrected draft to the exact native Currencies.NullCurrency sentinel under the same closed path, no ordinary currency waiver. Focused red/green evidence follows before launch. |
+
+`TPR-OWN-97` — agent-delegated source-only correction, provenance this owner's
+new experiment and verified native code path. Choose NEW
+cap_tilt_algorithm_v2.py and cap_tilt_driver_v2.py; preserve executed v1 and
+all bundles/receipts. Exception only while unchanged parent order accounting
+handles a verified typed filled, non-assignment, current-clock native final
+Market liquidation with exact historical order/status/RAW/symbol/ID/tag/message,
+whole full-close ledger quantity, native portfolio zero, known prior RAW
+custody, typed current Slice/final Delisting, delisted/nontradable Security,
+empty attached bag and Adjusted compatibility scalar. All global exact-identity,
+RAW external/minute trade, isolated benchmark and parent ledger checks remain.
+Clear ephemeral authority in finally even on parent failure. No normal order,
+dividend, held valuation, unknown event, empty global registry or general
+non-RAW exception. Alternatives broad mode bypass, resetting Security mode,
+skipping parent accounting or changing strategy economics are rejected.
+Same candidates, freezes/economics, dates,20%tilt, attempt limits, projects and
+immutable packet; successor copies only this study's first captured packet
+under fresh scope002 authority. Additional aggregate compatibility count is
+diagnostic only. Delegated decision pending independent Claude review, not
+separately owner/Claude approval of these details.
+
+V2 pre-launch main evidence: the isolated in-process runner independently
+reproduced903passed/1existingplatformskip in7.11s (new cap focused tests plus
+document/import/active-document boundaries; NOT a complete lane/repository
+suite). Main safe in-memory wrong-USD mutation produced1failed; original
+restored produced1passed, with no file mutations. AST comparison against
+executed v1 changes only initialize, _raw_security_configs, on_order_event
+and on_end_of_algorithm plus the closed _native_final_fill_symbol method:
+selection, tilt, data clocks, scheduling, ordinary economics, parent ledger and
+qualification predicates remain unchanged. Syntax/whitespace checks passed.
+Runtimev2 SHA2565fc7e2c95fea3fedebe66e627d0be700b2b67acab81d4f9e7cdee40c994ce871;
+driverv2 SHA25684673665b22fd9aceff1d364ae932e6bc5fff0e8a6e8a0e2934904cf96371510.
+Executed runtimev1 remainsc8804b43b9a25b5fe1ce3f8b5fac424c129c9e7b39a4ad0480b3fbd98e98ab37.
+Peer driver full41passed and bounded packaging/controller compatibility
+union238passed;5driver mutants produced6red/12original-restored controls.
+New rendered ON main07137d62920f260113f24e9c5657591e6a44b0efa43d296a2a31cda11eb88c63,
+OFF main74480f4eb0362f41de46f1b135a58f3bd68a589169f039b2876f27c5809a9889,
+each52640bytes, exactly six cloud files and18 committed source bindings.
+Bundlee351d1e1ed7cbb49c83573b369466ad35bfa87d09012a4dbe30651c5d0cc61de.
+Config/freeze identities and persistent attempt counters are unchanged.
+
+`TPR-OWN-98` — preserve strict pure-audit refusal and prepare a separate NEW
+pure diagnostic reporter for completed native-execution limitations, before
+any further outcomes. It binds unmodified result/log/order/config/source
+objects and reuses exact order/NAV/coverage evidence helpers, without changing
+their source/globals or converting Market/QCC fees into strategy MOO/USD.
+Native orders include automatic liquidations; strategy submitted-share/order
+counts exclude them. Report both domains and the difference explicitly rather
+than erase extra fills or force submitted>=filled. All acceptance flags remain
+false in a diagnostic. Existing frozen metrics/timing/cost conventions persist;
+this is an observation/reporting correction, not an outcome-dependent portfolio
+redesign or new attempt identity. Any diagnostic pair must verify the same
+input paths/dates before showing a clearly unqualified exploratory difference.
+Missing/unknown evidence stays visible. Alternative overriding old audit
+acceptance is refused. Agent-delegated, pending independent Claude review.
+
+Final pre-launch successor reprise: main334passed/1existingplatformskip in
+3.89s on v2 runtime/driver plus document/import/active-document boundaries.
+Peer runtime76passed,12in-memory mutants each produced1expected red; the
+unchanged executed-v1 bytes also failed the new native-final positive fixture.
+Independent read-only Codex peer reviewed the exactv2 diff and accepted-after-
+correction of the zero-fee sentinel;76passes and2reverse-mutation failures
+reproduced. This is NOT Claude acceptance. Testv2 SHA256
+21b3f9c1f5f15b9890866f1ecfe571cf550d18817211dad8d47847ddeb25946c;
+driverv2testde00ff5a994580808c34e21d7792b57c4bfe9854350021800c60b180e603c3b3.
+CAP008 corrected/resolved before execution; CAP006 compatibility source fix
+is verified locally, cloud proof still pending; CAP007 remains open diagnostic.

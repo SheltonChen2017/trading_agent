@@ -1779,6 +1779,8 @@ Section-20 ledger remains P0 0, P1 0, P2 1, P3 1 (one corrected,
 one documented). The section-19.6 external human approval is retained exactly;
 it is not written into the immutable draft. Research looks and QC launches,
 unsuccessful attempts, project/compile/run IDs remain zero/absent.
+This round adds one corrected author-QA P2 and one corrected reporting P3;
+no P0/P1 finding was identified. Historical out-of-lane/native blockers remain.
 
 ### 21.2 Bounded definition of done before implementation
 
@@ -1915,11 +1917,18 @@ any compile/run or acceptance of Mia changes.
 
 Review range is
 `9df3a12f2fcd4fe24b7a229a5cbcd8c9b68b142a..1d81a28af43ade3e1e7b22f8af752cd7b47bc4ab`;
-both ordered Claude commits are accepted in 21.1. The new implementation range
-starts at that consumed review head; producing and closing commit identities
-will be recorded in the closing checkpoint before the round's single push.
-No intermediate publication has occurred. All new source, tests and this
+both ordered Claude commits are accepted in 21.1. The producing implementation
+commit is `3cc533cd2407b58f73af25f9c66616799d09a52d`; its exact range is
+`1d81a28af43ade3e1e7b22f8af752cd7b47bc4ab..3cc533cd2407b58f73af25f9c66616799d09a52d`.
+This documentation-only closing checkpoint follows it; its Git HEAD is the
+final combined review snapshot and the verified publication SHA is retained
+in the owner-facing/thread/automation checkpoint. No intermediate publication
+has occurred. All new source, tests and this
 record go to Claude as one combined exact snapshot on this same lane.
+After the producing commit, the closing active-document/lane-boundary check
+passed 75 tests; final source, bundle and project identities remained exactly
+those above, and diff checks passed. The remote still named consumed review
+head `1d81a28...` before closing publication preparation.
 
 Next: Claude independently reviews the new loader/generator, preflight/CLI,
 inventory, tests and record at the final pushed HEAD and performs full lane

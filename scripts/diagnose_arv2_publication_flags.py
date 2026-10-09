@@ -26,6 +26,16 @@ PROFILE = {"cases": list(CASES), "offsets_seconds": list(OFFSETS), "maximum_seco
            "xattr_acl_or_protection_queries": False, "metadata_changes_permitted": False}
 PROFILE_SHA256 = probe.sha256_bytes(probe.canonical_json_bytes(PROFILE))
 
+# Section 272 freezes one owner-authorized relocation trial. The historical
+# R266 destination above stays spent; neither entry point accepts a free path.
+RELOCATION_ROOT = Path("/Users/sheltonchen/Code/trading_agent__analyst_revisions_v2")
+RELOCATION_ARTIFACT_PATH = (RELOCATION_ROOT / "artifacts" / "analyst_revisions_v2" /
+                            "publication_metadata" / "R272-20261009-A")
+RELOCATION_PROFILE = {**PROFILE, "authorization_id": "ARV2OD272-A",
+                      "authorized_root": str(RELOCATION_ROOT),
+                      "artifact_relative_path": str(RELOCATION_ARTIFACT_PATH.relative_to(RELOCATION_ROOT))}
+RELOCATION_PROFILE_SHA256 = probe.sha256_bytes(probe.canonical_json_bytes(RELOCATION_PROFILE))
+
 
 def _metadata(info):
     return {**probe._metadata(info), "gid": info.st_gid, "flags": getattr(info, "st_flags", None),
@@ -109,8 +119,13 @@ def _establish(root, root_fd, name):
             os.close(writer)
 
 
-def _run(path, monotonic, sleep, *, synthetic_test):
-    if type(path) is not type(Path()) or (not synthetic_test and path != ARTIFACT_PATH):
+def _run(path, monotonic, sleep, *, synthetic_test, relocation_trial=False):
+    if relocation_trial and (synthetic_test or path != RELOCATION_ARTIFACT_PATH
+            or Path(__file__).resolve().parents[1] != RELOCATION_ROOT
+            or Path.cwd().resolve() != RELOCATION_ROOT):
+        raise probe.private.SharadarCaptureError("authorized relocation root/path required")
+    fixed_path = RELOCATION_ARTIFACT_PATH if relocation_trial else ARTIFACT_PATH
+    if type(path) is not type(Path()) or (not synthetic_test and path != fixed_path):
         raise probe.private.SharadarCaptureError("synthetic flags production path is fixed")
     if synthetic_test and (not path.name.startswith("synthetic-test-") or path == ARTIFACT_PATH):
         raise probe.private.SharadarCaptureError("synthetic flags test path is not explicit")
@@ -160,6 +175,11 @@ def _run(path, monotonic, sleep, *, synthetic_test):
                   "synthetic_only": True, "production_integrity_waiver": False,
                   "proves_perpetual_stability": False, "provider_or_qc_contact": False,
                   "security_attributes_queried": False}
+        if relocation_trial:
+            report.update(schema="arv2-authorized-relocation-flags-v1",
+                          source_profile=RELOCATION_PROFILE,
+                          source_profile_sha256=RELOCATION_PROFILE_SHA256,
+                          fixture_mode="authorized_relocation_synthetic_diagnostic")
         raw = probe.canonical_json_bytes(report)
         if len(raw) > MAX_REPORT_BYTES:
             raise probe.private.SharadarCaptureError("synthetic flags report exceeds byte limit")
@@ -187,9 +207,13 @@ def _diagnose_publication_flags_for_test(path, monotonic, sleep):
 
 
 def main(argv=None):
-    argparse.ArgumentParser(description=__doc__).parse_args(argv)
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--authorized-relocation-r272", action="store_true")
+    args = parser.parse_args(argv)
     try:
-        report, digest = _run(ARTIFACT_PATH, time.monotonic, time.sleep, synthetic_test=False)
+        path = RELOCATION_ARTIFACT_PATH if args.authorized_relocation_r272 else ARTIFACT_PATH
+        options = {"relocation_trial": True} if args.authorized_relocation_r272 else {}
+        report, digest = _run(path, time.monotonic, time.sleep, synthetic_test=False, **options)
         print(f"cases={report['case_count']} observations={report['observation_count']} "
               f"initial_checks={report['initial_verification_count']} refused_initial={report['refused_initial_integrity_count']} "
               f"refused_integrity={report['refused_integrity_observation_count']} "

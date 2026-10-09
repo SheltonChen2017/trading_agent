@@ -456,3 +456,45 @@ def test_cli_count_hash_only_and_redacted_error(monkeypatch, capsys):
     monkeypatch.setattr(subject, "_run", lambda *_args, **_kw: (_ for _ in ()).throw(RuntimeError("PRIVATE_ERROR")))
     assert subject.main([]) == 1
     assert capsys.readouterr().err == "synthetic flags diagnostic refused; all allocated fixtures retained\n"
+
+
+@pytest.mark.parametrize("kind", ["wrong_path", "test_seam", "wrong_cwd", "wrong_source_root"])
+def test_relocation_requires_exact_root_path_and_non_test_mode(tmp_path, monkeypatch, kind):
+    root = tmp_path / "authorized"
+    root.mkdir()
+    path = root / "R272"
+    monkeypatch.setattr(subject, "RELOCATION_ROOT", root)
+    monkeypatch.setattr(subject, "RELOCATION_ARTIFACT_PATH", path)
+    monkeypatch.setattr(subject, "__file__", str(root / "scripts" / "diagnostic.py"))
+    monkeypatch.chdir(root)
+    if kind == "wrong_path":
+        path = root / "other"
+    elif kind == "wrong_cwd":
+        monkeypatch.chdir(tmp_path)
+    elif kind == "wrong_source_root":
+        monkeypatch.setattr(subject, "__file__", str(tmp_path / "scripts" / "diagnostic.py"))
+    clock = Clock()
+    with pytest.raises(subject.probe.private.SharadarCaptureError, match="authorized relocation root/path"):
+        subject._run(path, clock, clock.sleep, synthetic_test=(kind == "test_seam"), relocation_trial=True)
+    assert not list(root.iterdir())
+
+
+def test_relocation_exact_scope_uses_new_schema_and_is_exclusive(tmp_path, monkeypatch):
+    root = tmp_path / "authorized"
+    root.mkdir(mode=0o700)
+    path = root / "R272"
+    monkeypatch.setattr(subject, "RELOCATION_ROOT", root)
+    monkeypatch.setattr(subject, "RELOCATION_ARTIFACT_PATH", path)
+    monkeypatch.setattr(subject, "__file__", str(root / "scripts" / "diagnostic.py"))
+    monkeypatch.chdir(root)
+    clock = Clock()
+    report, digest = subject._run(path, clock, clock.sleep, synthetic_test=False, relocation_trial=True)
+    assert report["complete"] and report["refused_integrity_observation_count"] == 0
+    assert report["refused_initial_integrity_count"] == 0
+    assert report["schema"] == "arv2-authorized-relocation-flags-v1"
+    assert report["source_profile"] == subject.RELOCATION_PROFILE
+    assert report["source_profile_sha256"] == subject.RELOCATION_PROFILE_SHA256
+    assert report["fixture_mode"] == "authorized_relocation_synthetic_diagnostic"
+    assert subject.probe.sha256_bytes((path / "report.json").read_bytes()) == digest
+    with pytest.raises(FileExistsError):
+        subject._run(path, clock, clock.sleep, synthetic_test=False, relocation_trial=True)
